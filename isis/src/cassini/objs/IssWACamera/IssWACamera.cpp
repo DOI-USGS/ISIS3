@@ -43,7 +43,7 @@ namespace Isis {
    */
   IssWACamera::IssWACamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
-    PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+    PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     // Get the camera characteristics
     QString key = "INS" + toString(naifIkCode()) + "_" + bandBin["FilterName"][0] + "_FOCAL_LENGTH";
     key = key.replace("/", "_");
@@ -55,7 +55,7 @@ namespace Isis {
 
 
     // Get the start time in et
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     double et = iTime((QString)inst["StartTime"]).Et();
 

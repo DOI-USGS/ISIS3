@@ -5,7 +5,7 @@
 
 namespace Isis {
   Mixed::Mixed(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {
-    PvlGroup &algorithm = pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algorithm = pvl.findObject("NormalizationModel").findGroup("Algorithm", Pvl::Traverse);
 
     // Set default value
     SetNormPharef(0.0);
@@ -18,37 +18,37 @@ namespace Isis {
     SetNormAlbedo(1.0);
 
     // Get value from user
-    if(algorithm.HasKeyword("Pharef")) {
+    if(algorithm.hasKeyword("Pharef")) {
       SetNormPharef(algorithm["Pharef"]);
     }
 
-    if(algorithm.HasKeyword("Incref")) {
+    if(algorithm.hasKeyword("Incref")) {
       SetNormIncref(algorithm["Incref"]);
     }
 
-    if(algorithm.HasKeyword("Emaref")) {
+    if(algorithm.hasKeyword("Emaref")) {
       SetNormEmaref(algorithm["Emaref"]);
     }
 
-    if(algorithm.HasKeyword("Incmat")) {
+    if(algorithm.hasKeyword("Incmat")) {
       SetNormIncmat(algorithm["Incmat"]);
     }
 
-    if(algorithm.HasKeyword("Phamat")) {
+    if(algorithm.hasKeyword("Phamat")) {
       SetNormPhamat(algorithm["Phamat"]);
     } else {
       p_normPhamat = p_normIncmat;
     }
 
-    if(algorithm.HasKeyword("Emamat")) {
+    if(algorithm.hasKeyword("Emamat")) {
       SetNormEmamat(algorithm["Emamat"]);
     }
 
-    if(algorithm.HasKeyword("Thresh")) {
+    if(algorithm.hasKeyword("Thresh")) {
       SetNormThresh(algorithm["Thresh"]);
     }
 
-    if(algorithm.HasKeyword("Albedo")) {
+    if(algorithm.hasKeyword("Albedo")) {
       SetNormAlbedo(algorithm["Albedo"]);
     }
 

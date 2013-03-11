@@ -274,7 +274,7 @@ namespace Isis {
     // Add the user parameters
     Pvl pvl;
     p_ui->CommandLine(pvl);
-    history.AddGroup(pvl.FindGroup("UserParameters"));
+    history.addGroup(pvl.findGroup("UserParameters"));
 
     return history;
   }
@@ -490,9 +490,9 @@ namespace Isis {
   void Application::SendParentErrors(Isis::PvlObject &errors) {
     if (!HasParent()) return;
 
-    for (int i = 0; i < errors.Groups(); i++) {
+    for (int i = 0; i < errors.groups(); i++) {
       ostringstream ostr;
-      ostr << errors.Group(i) << endl;
+      ostr << errors.group(i) << endl;
       QString data = ostr.str().c_str();
       iApp->SendParentData("ERROR", data);
     }
@@ -574,8 +574,8 @@ namespace Isis {
         ss >> log;
         PvlGroup uname = GetUnameInfo();
         PvlGroup env = GetEnviromentInfo();
-        log.AddGroup(uname);
-        log.AddGroup(env);
+        log.addGroup(uname);
+        log.addGroup(env);
       }
 
       // Write to file
@@ -660,8 +660,8 @@ namespace Isis {
         ss >> log;
         PvlGroup uname = GetUnameInfo();
         PvlGroup env = GetEnviromentInfo();
-        log.AddGroup(uname);
-        log.AddGroup(env);
+        log.addGroup(uname);
+        log.addGroup(env);
       }
 
       // Write to file
@@ -874,21 +874,21 @@ namespace Isis {
     char value[256];
     readTemp.open(tempFile.toAscii().data(), ifstream::in);
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("MachineHardware", value));
+    unameGroup.addKeyword(PvlKeyword("MachineHardware", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("Processor", value));
+    unameGroup.addKeyword(PvlKeyword("Processor", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("HardwarePlatform", value));
+    unameGroup.addKeyword(PvlKeyword("HardwarePlatform", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("OperatingSystem", value));
+    unameGroup.addKeyword(PvlKeyword("OperatingSystem", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("KernelName", value));
+    unameGroup.addKeyword(PvlKeyword("KernelName", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("KernelVersion", value));
+    unameGroup.addKeyword(PvlKeyword("KernelVersion", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("KernelRelease", value));
+    unameGroup.addKeyword(PvlKeyword("KernelRelease", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("FullUnameString", value));
+    unameGroup.addKeyword(PvlKeyword("FullUnameString", value));
 
 #elif defined(__APPLE__)
     // Write uname outputs to temp file
@@ -903,17 +903,17 @@ namespace Isis {
     char value[256];
     readTemp.open(tempFile.toAscii().data(), ifstream::in);
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("MachineHardware", value));
+    unameGroup.addKeyword(PvlKeyword("MachineHardware", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("Processor", value));
+    unameGroup.addKeyword(PvlKeyword("Processor", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("OperatingSystem", value));
+    unameGroup.addKeyword(PvlKeyword("OperatingSystem", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("OperatingSystemVersion", value));
+    unameGroup.addKeyword(PvlKeyword("OperatingSystemVersion", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("OperatingSystemRelease", value));
+    unameGroup.addKeyword(PvlKeyword("OperatingSystemRelease", value));
     readTemp.getline(value, 256);
-    unameGroup.AddKeyword(PvlKeyword("FullUnameString", value));
+    unameGroup.addKeyword(PvlKeyword("FullUnameString", value));
 #endif
 
     // remove temp file and return
@@ -949,15 +949,15 @@ namespace Isis {
     char value[511];
     readTemp.open(tempFile.toAscii().data(), ifstream::in);
     readTemp.getline(value, 255);
-    envGroup.AddKeyword(PvlKeyword("Shell", value));
+    envGroup.addKeyword(PvlKeyword("Shell", value));
     readTemp.getline(value, 255);
-    envGroup.AddKeyword(PvlKeyword("Home", value));
+    envGroup.addKeyword(PvlKeyword("Home", value));
     readTemp.getline(value, 255);
-    envGroup.AddKeyword(PvlKeyword("Pwd", value));
+    envGroup.addKeyword(PvlKeyword("Pwd", value));
     readTemp.getline(value, 255);
-    envGroup.AddKeyword(PvlKeyword("ISISROOT", value));
+    envGroup.addKeyword(PvlKeyword("ISISROOT", value));
     readTemp.getline(value, 255);
-    envGroup.AddKeyword(PvlKeyword("ISIS3DATA", value));
+    envGroup.addKeyword(PvlKeyword("ISIS3DATA", value));
 
     // remove temp file and return
     QString cleanup = "rm -f " + tempFile;

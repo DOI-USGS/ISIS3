@@ -47,7 +47,7 @@ namespace Isis {
     }
 
     // Get the kernel group and save the instrument pointing keyword
-    Isis::PvlGroup kernels = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
+    Isis::PvlGroup kernels = lab.findGroup("Kernels", Isis::Pvl::Traverse);
     p_ckKeyword = kernels["InstrumentPointing"];
 
     p_cacheTime = timeCache;

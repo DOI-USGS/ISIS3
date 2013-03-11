@@ -9,8 +9,8 @@
 namespace Isis {
   MoonAlbedo::MoonAlbedo(Pvl &pvl, PhotoModel &pmodel) :
     NormModel(pvl, pmodel) {
-    PvlGroup &algo = pvl.FindObject("NormalizationModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("NormalizationModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     // Set default values
     SetNormD(0.14);
     SetNormE(-0.4179);
@@ -24,15 +24,15 @@ namespace Isis {
     SetNormXb2(0.0081);
 
     // Get values from user
-    if(algo.HasKeyword("D")) {
+    if(algo.hasKeyword("D")) {
       SetNormD(algo["D"]);
     }
 
-    if(algo.HasKeyword("Wl")) {
+    if(algo.hasKeyword("Wl")) {
       SetNormWl(algo["Wl"]);
     }
 
-    if(algo.HasKeyword("E")) {
+    if(algo.hasKeyword("E")) {
       SetNormE(algo["E"]);
     }
     else {
@@ -44,11 +44,11 @@ namespace Isis {
       }
     }
 
-    if(algo.HasKeyword("F")) {
+    if(algo.hasKeyword("F")) {
       SetNormF(algo["F"]);
     }
 
-    if(algo.HasKeyword("G2")) {
+    if(algo.hasKeyword("G2")) {
       SetNormG2(algo["G2"]);
     }
     else {
@@ -60,15 +60,15 @@ namespace Isis {
       }
     }
 
-    if(algo.HasKeyword("Xmul")) {
+    if(algo.hasKeyword("Xmul")) {
       SetNormXmul(algo["Xmul"]);
     }
 
-    if(algo.HasKeyword("H")) {
+    if(algo.hasKeyword("H")) {
       SetNormH(algo["H"]);
     }
 
-    if(algo.HasKeyword("Bsh1")) {
+    if(algo.hasKeyword("Bsh1")) {
       SetNormBsh1(algo["Bsh1"]);
     }
     else {
@@ -79,11 +79,11 @@ namespace Isis {
       }
     }
 
-    if(algo.HasKeyword("Xb1")) {
+    if(algo.hasKeyword("Xb1")) {
       SetNormXb1(algo["Xb1"]);
     }
 
-    if(algo.HasKeyword("Xb2")) {
+    if(algo.hasKeyword("Xb2")) {
       SetNormXb2(algo["Xb2"]);
     }
 

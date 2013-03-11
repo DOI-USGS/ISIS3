@@ -106,12 +106,12 @@ namespace Isis {
 
     m_pdsFileType = type;
     if(m_pdsFileType == ProcessExportPds::JP2Image) {
-      SetFormat(JP2);
+      setFormat(JP2);
     }
 
     m_formatter = new PvlFormatPds("$base/translations/pdsExportRootGen.typ");
-    m_label->SetFormat(m_formatter);
-    m_label->SetTerminator("END");
+    m_label->setFormat(m_formatter);
+    m_label->setTerminator("END");
 
     if(type == ProcessExportPds::Image || type == ProcessExportPds::JP2Image) {
       CreateImageLabel();
@@ -163,7 +163,7 @@ namespace Isis {
     // The IMAGE_MAP_PROJECTION group is located in the ROOT for PDS IMAGEs. The
     // standard routines will add the IMAGE_MAP_PROJECTION correctly
     StandardAllMapping(mainPvl);
-    mainPvl.GetFormat()->Add("$base/translations/pdsExportAllMapping.typ");
+    mainPvl.format()->add("$base/translations/pdsExportAllMapping.typ");
   }
 
 
@@ -182,8 +182,8 @@ namespace Isis {
     // the output PDS label.
     Pvl mapTmp;
     StandardAllMapping(mapTmp);
-    if(mapTmp.HasObject("IMAGE_MAP_PROJECTION")) {
-      mainPvl.FindObject("QUBE").AddObject(mapTmp.FindObject("IMAGE_MAP_PROJECTION"));
+    if(mapTmp.hasObject("IMAGE_MAP_PROJECTION")) {
+      mainPvl.findObject("QUBE").addObject(mapTmp.findObject("IMAGE_MAP_PROJECTION"));
     }
   }
 
@@ -203,8 +203,8 @@ namespace Isis {
     // extracted and added to the output PDS label.
     Pvl mapTmp;
     StandardAllMapping(mapTmp);
-    if(mapTmp.HasObject("IMAGE_MAP_PROJECTION")) {
-      mainPvl.FindObject("QUBE").AddObject(mapTmp.FindObject("IMAGE_MAP_PROJECTION"));
+    if(mapTmp.hasObject("IMAGE_MAP_PROJECTION")) {
+      mainPvl.findObject("QUBE").addObject(mapTmp.findObject("IMAGE_MAP_PROJECTION"));
     }
   }
 
@@ -245,7 +245,7 @@ namespace Isis {
    * @param mainPvl 
    */
   void ProcessExportPds::StreamJP2ImageRoot(Pvl &mainPvl) {
-    mainPvl.GetFormat()->Add("$base/translations/pdsExportImageJP2.typ");
+    mainPvl.format()->add("$base/translations/pdsExportImageJP2.typ");
     // Create standard ROOT object keywords
     mainPvl += PvlKeyword("PDS_VERSION_ID", "PDS3");
     QString sImageFile = m_detachedPdsLabelFile;
@@ -280,7 +280,7 @@ namespace Isis {
       storagebytes = storagebytes * 2;
     }
     cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", toString(storagebytes));
-    mainPvl.AddObject(cmpObj);
+    mainPvl.addObject(cmpObj);
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
     ucmpObj += PvlKeyword("FILE_NAME", infilename.name());
     ucmpObj += PvlKeyword("RECORD_TYPE", "FIXED_LENGTH");
@@ -291,7 +291,7 @@ namespace Isis {
     ucmpObj += PvlKeyword("RECORD_BYTES", toString(recordbytes));
     ucmpObj += PvlKeyword("FILE_RECORDS", toString(InputCubes[0]->lineCount()));
     ucmpObj += PvlKeyword("^IMAGE", infilename.name());
-    mainPvl.AddObject(ucmpObj);
+    mainPvl.addObject(ucmpObj);
   }
 
 
@@ -333,7 +333,7 @@ namespace Isis {
    * @param  mainPvl
    */
   void ProcessExportPds::FixedJP2ImageRoot(Pvl &mainPvl) {
-    mainPvl.GetFormat()->Add("$base/translations/pdsExportImageJP2.typ");
+    mainPvl.format()->add("$base/translations/pdsExportImageJP2.typ");
     //Create fixed ROOT object keywords
     mainPvl += PvlKeyword("PDS_VERSION_ID", "PDS3");
     QString sImageFile = m_detachedPdsLabelFile;
@@ -368,7 +368,7 @@ namespace Isis {
       storagebytes = storagebytes * 2;
     }
     cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", toString(storagebytes));
-    mainPvl.AddObject(cmpObj);
+    mainPvl.addObject(cmpObj);
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
     ucmpObj += PvlKeyword("FILE_NAME", infilename.name());
     ucmpObj += PvlKeyword("RECORD_TYPE", "FIXED_LENGTH");
@@ -379,7 +379,7 @@ namespace Isis {
     ucmpObj += PvlKeyword("RECORD_BYTES", toString(recordbytes));
     ucmpObj += PvlKeyword("FILE_RECORDS", toString(InputCubes[0]->lineCount()));
     ucmpObj += PvlKeyword("^IMAGE", infilename.name());
-    mainPvl.AddObject(ucmpObj);
+    mainPvl.addObject(ucmpObj);
   }
 
 
@@ -393,7 +393,7 @@ namespace Isis {
    * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardImageImage(Pvl &mainPvl) {
-    mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImage.typ");
+    mainPvl.format()->add("$base/translations/pdsExportImageImage.typ");
     // Build up an IMAGE object:
     // Auto translate standard keywords for the IMAGE object
     Pvl *inputLabel = InputCubes[0]->label();
@@ -433,12 +433,12 @@ namespace Isis {
 
     // Manually set the keyword for the number of bits in a pixel
     // NOTE: this is dependent on settings in ProcessExport and not the cube
-    PvlObject &imgObj = mainPvl.FindObject("IMAGE");
+    PvlObject &imgObj = mainPvl.findObject("IMAGE");
 
-    if(!m_forceBands) imgObj.DeleteKeyword("BANDS");
-    if(!m_forceBandName && imgObj.HasKeyword("BAND_NAME")) imgObj.DeleteKeyword("BAND_NAME");
-    if(!m_forceCenterFilterWavelength && imgObj.HasKeyword("CENTER_FILTER_WAVELENGTH")) imgObj.DeleteKeyword("CENTER_FILTER_WAVELENGTH");
-    if(!m_forceBandwidth && imgObj.HasKeyword("BANDWIDTH")) imgObj.DeleteKeyword("BANDWIDTH");
+    if(!m_forceBands) imgObj.deleteKeyword("BANDS");
+    if(!m_forceBandName && imgObj.hasKeyword("BAND_NAME")) imgObj.deleteKeyword("BAND_NAME");
+    if(!m_forceCenterFilterWavelength && imgObj.hasKeyword("CENTER_FILTER_WAVELENGTH")) imgObj.deleteKeyword("CENTER_FILTER_WAVELENGTH");
+    if(!m_forceBandwidth && imgObj.hasKeyword("BANDWIDTH")) imgObj.deleteKeyword("BANDWIDTH");
 
     if(m_forceBandStorageType) imgObj += PvlKeyword("BAND_STORAGE_TYPE", "BAND_SEQUENTIAL");
     if(m_forceOffset) imgObj += PvlKeyword("OFFSET", toString(base));
@@ -454,7 +454,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel8.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel8.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -465,7 +465,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -476,7 +476,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -487,7 +487,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -498,7 +498,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if(p_pixelType == Isis::Real) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "32");
@@ -515,7 +515,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString(Isis::ILOW_INSTR_SAT4));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString(Isis::IHIGH_REPR_SAT4));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString(Isis::IHIGH_INSTR_SAT4));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel32.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel32.typ");
     }
     else {
       QString msg = "Unsupported PDS pixel type or sample size";
@@ -534,9 +534,9 @@ namespace Isis {
    * @throws Isis::IException::Message
    */
   void ProcessExportPds::StandardJP2Image(Pvl &mainPvl) {
-    mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImage.typ");
+    mainPvl.format()->add("$base/translations/pdsExportImageImage.typ");
     if(m_pdsFileType == ProcessExportPds::JP2Image) {
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageJP2.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageJP2.typ");
     }
     // Build up a JP2 IMAGE object:
     // Auto translate standard keywords for the IMAGE object
@@ -577,12 +577,12 @@ namespace Isis {
 
     // Manually set the keyword for the number of bits in a pixel
     // NOTE: this is dependent on settings in ProcessExport and not the cube
-    PvlObject &imgObj = mainPvl.FindObject("UNCOMPRESSED_FILE").FindObject("IMAGE");
+    PvlObject &imgObj = mainPvl.findObject("UNCOMPRESSED_FILE").findObject("IMAGE");
 
-    if(!m_forceBands) imgObj.DeleteKeyword("BANDS");
-    if(!m_forceBandName && imgObj.HasKeyword("BAND_NAME")) imgObj.DeleteKeyword("BAND_NAME");
-    if(!m_forceCenterFilterWavelength && imgObj.HasKeyword("CENTER_FILTER_WAVELENGTH")) imgObj.DeleteKeyword("CENTER_FILTER_WAVELENGTH");
-    if(!m_forceBandwidth && imgObj.HasKeyword("BANDWIDTH")) imgObj.DeleteKeyword("BANDWIDTH");
+    if(!m_forceBands) imgObj.deleteKeyword("BANDS");
+    if(!m_forceBandName && imgObj.hasKeyword("BAND_NAME")) imgObj.deleteKeyword("BAND_NAME");
+    if(!m_forceCenterFilterWavelength && imgObj.hasKeyword("CENTER_FILTER_WAVELENGTH")) imgObj.deleteKeyword("CENTER_FILTER_WAVELENGTH");
+    if(!m_forceBandwidth && imgObj.hasKeyword("BANDWIDTH")) imgObj.deleteKeyword("BANDWIDTH");
 
     if(m_forceBandStorageType) imgObj += PvlKeyword("BAND_STORAGE_TYPE", "BAND_SEQUENTIAL");
     if(m_forceOffset) imgObj += PvlKeyword("OFFSET", toString(base));
@@ -598,7 +598,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel8.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel8.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -609,7 +609,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -620,7 +620,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -631,7 +631,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
@@ -642,7 +642,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if(p_pixelType == Isis::Real) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "32");
@@ -659,7 +659,7 @@ namespace Isis {
       if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString(Isis::ILOW_INSTR_SAT4));
       if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString(Isis::IHIGH_REPR_SAT4));
       if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString(Isis::IHIGH_INSTR_SAT4));
-      mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel32.typ");
+      mainPvl.format()->add("$base/translations/pdsExportImageImagePixel32.typ");
     }
     else {
       QString msg = "Unsupported PDS pixel type or sample size";
@@ -680,9 +680,9 @@ namespace Isis {
 
     // Get the input Isis cube label and find the Mapping group if it has one
     Pvl *inputLabel = InputCubes[0]->label();
-    if(inputLabel->HasObject("IsisCube") &&
-        !(inputLabel->FindObject("IsisCube").HasGroup("Mapping"))) return;
-    PvlGroup &inputMapping = inputLabel->FindGroup("Mapping", Pvl::Traverse);
+    if(inputLabel->hasObject("IsisCube") &&
+        !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
+    PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
     // Translate the common keywords for a PDS IMAGE_MAP_PROJECTION
     PvlTranslationManager xlatGenProj(*inputLabel,
                                       "$base/translations/pdsExportAllMapping.trn");
@@ -700,68 +700,68 @@ namespace Isis {
     xlatTarget.Auto(outputPvl);
 
     // Add keywords to the PDS labels that could not be handled automatically
-    PvlObject &pdsMapObj = outputPvl.FindObject("IMAGE_MAP_PROJECTION");
+    PvlObject &pdsMapObj = outputPvl.findObject("IMAGE_MAP_PROJECTION");
 
     // Add the projection name
 //    pdsMapObj += PvlKeyword ("MAP_PROJECTION_TYPE", projName.toUpper());
 
     // Modify the radii to be km
     PvlKeyword &aRadius = pdsMapObj["A_AXIS_RADIUS"];
-    QString unit = aRadius.Unit();
+    QString unit = aRadius.unit();
     if(unit.toUpper() == "METERS") {
       double dValue = (double)aRadius;
       dValue /= 1000.0;
-      aRadius.SetValue(toString(dValue), "KM");
+      aRadius.setValue(toString(dValue), "KM");
     }
     PvlKeyword &bRadius = pdsMapObj["B_AXIS_RADIUS"];
-    unit = bRadius.Unit();
+    unit = bRadius.unit();
     if(unit.toUpper() == "METERS") {
       double dValue = (double)bRadius;
       dValue /= 1000.0;
-      bRadius.SetValue(toString(dValue), "KM");
+      bRadius.setValue(toString(dValue), "KM");
     }
     PvlKeyword &cRadius = pdsMapObj["C_AXIS_RADIUS"];
-    unit = cRadius.Unit();
+    unit = cRadius.unit();
     if(unit.toUpper() == "METERS") {
       double dValue = (double)cRadius;
       dValue /= 1000.0;
-      cRadius.SetValue(toString(dValue), "KM");
+      cRadius.setValue(toString(dValue), "KM");
     }
 
     // Modify the units on MAP_SCALE and MAP_RESOLUTION
     PvlKeyword &mapScale = pdsMapObj["MAP_SCALE"];
-    unit = mapScale.Unit();
+    unit = mapScale.unit();
     if((unit.toUpper() == "METERS/PIX") || (unit.toUpper() == "METERS/PIXEL")) {
       if(m_exportResolution == Kilometer) {
         double dValue = (double)mapScale;
         dValue /= 1000.0;
-        mapScale.SetValue(toString(dValue), "KM/PIXEL");
+        mapScale.setValue(toString(dValue), "KM/PIXEL");
       }
       else {
-        mapScale.SetValue(toString((double)mapScale), "METERS/PIXEL");
+        mapScale.setValue(toString((double)mapScale), "METERS/PIXEL");
       }
     }
     PvlKeyword &mapRes = pdsMapObj["MAP_RESOLUTION"];
-    unit = mapRes.Unit();
+    unit = mapRes.unit();
     if(unit.toUpper() == "PIXELS/DEGREE") {
-      mapRes.SetValue((QString)mapRes, "PIX/DEG");
+      mapRes.setValue((QString)mapRes, "PIX/DEG");
     }
 
 
     // Add the EASTERNMOST AND WESTERNMOST LONGITUDE keywords
-    PvlKeyword &isisLonDir = inputMapping.FindKeyword("LongitudeDirection");
+    PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
     QString lonDir = isisLonDir[0];
     lonDir = lonDir.toUpper();
     if(lonDir == "POSITIVEEAST") {
-      double maxLon = inputMapping.FindKeyword("MaximumLongitude");
+      double maxLon = inputMapping.findKeyword("MaximumLongitude");
       pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(maxLon));
-      double minLon = inputMapping.FindKeyword("MinimumLongitude");
+      double minLon = inputMapping.findKeyword("MinimumLongitude");
       pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(minLon));
     }
     else {
-      double minLon = inputMapping.FindKeyword("MinimumLongitude");
+      double minLon = inputMapping.findKeyword("MinimumLongitude");
       pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(minLon));
-      double maxLon = inputMapping.FindKeyword("MaximumLongitude");
+      double maxLon = inputMapping.findKeyword("MaximumLongitude");
       pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(maxLon));
     }
 
@@ -769,53 +769,53 @@ namespace Isis {
     // These keywords are the distance from the origin of the image to the
     // origin of the projection. The units are line or samples. The image origin
     // is the middle of pixel (1,1)
-    double lineOffset = inputMapping.FindKeyword("UpperLeftCornerY");
-    lineOffset /= (double)inputMapping.FindKeyword("PixelResolution");
+    double lineOffset = inputMapping.findKeyword("UpperLeftCornerY");
+    lineOffset /= (double)inputMapping.findKeyword("PixelResolution");
     lineOffset *= 1.0;
     lineOffset += 0.5; // Add half a line to get to the center of (1,1)
     pdsMapObj += PvlKeyword("LINE_PROJECTION_OFFSET", toString(lineOffset), "PIXEL");
-    double sampleOffset = inputMapping.FindKeyword("UpperLeftCornerX");
-    sampleOffset /= (double)inputMapping.FindKeyword("PixelResolution");
+    double sampleOffset = inputMapping.findKeyword("UpperLeftCornerX");
+    sampleOffset /= (double)inputMapping.findKeyword("PixelResolution");
     sampleOffset *= -1.0;
     sampleOffset += 0.5; // Add half a sample to get to the center of (1,1)
     pdsMapObj += PvlKeyword("SAMPLE_PROJECTION_OFFSET", toString(sampleOffset), "PIXEL");
 
     // Add units to keywords already in the IMAGE_MAP_PROJECTION object as necessary
-    if(pdsMapObj.HasKeyword("CENTER_LATITUDE")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("CENTER_LATITUDE");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("CENTER_LATITUDE")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("CENTER_LATITUDE");
+      tempKey.setValue(tempKey[0], "DEG");
     }
-    if(pdsMapObj.HasKeyword("CENTER_LONGITUDE")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("CENTER_LONGITUDE");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("CENTER_LONGITUDE")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("CENTER_LONGITUDE");
+      tempKey.setValue(tempKey[0], "DEG");
     }
-//    if (pdsMapObj.HasKeyword("REFERENCE_LATITUDE")) {
-//      PvlKeyword &tempKey = pdsMapObj.FindKeyword("REFERENCE_LATITUDE");
-//      tempKey.SetValue(tempKey[0], "DEG");
+//    if (pdsMapObj.hasKeyword("REFERENCE_LATITUDE")) {
+//      PvlKeyword &tempKey = pdsMapObj.findKeyword("REFERENCE_LATITUDE");
+//      tempKey.setValue(tempKey[0], "DEG");
 //    }
-    if(pdsMapObj.HasKeyword("REFERENCE_LONGITUDE")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("REFERENCE_LONGITUDE");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("REFERENCE_LONGITUDE")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("REFERENCE_LONGITUDE");
+      tempKey.setValue(tempKey[0], "DEG");
     }
-    if(pdsMapObj.HasKeyword("MAXIMUM_LATITUDE")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("MAXIMUM_LATITUDE");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("MAXIMUM_LATITUDE")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("MAXIMUM_LATITUDE");
+      tempKey.setValue(tempKey[0], "DEG");
     }
-    if(pdsMapObj.HasKeyword("MINIMUM_LATITUDE")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("MINIMUM_LATITUDE");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("MINIMUM_LATITUDE")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("MINIMUM_LATITUDE");
+      tempKey.setValue(tempKey[0], "DEG");
     }
-    if(pdsMapObj.HasKeyword("EASTERNMOST_LONGITUDE")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("EASTERNMOST_LONGITUDE");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("EASTERNMOST_LONGITUDE")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("EASTERNMOST_LONGITUDE");
+      tempKey.setValue(tempKey[0], "DEG");
     }
-    if(pdsMapObj.HasKeyword("WESTERNMOST_LONGITUDE")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("WESTERNMOST_LONGITUDE");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("WESTERNMOST_LONGITUDE")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("WESTERNMOST_LONGITUDE");
+      tempKey.setValue(tempKey[0], "DEG");
     }
-    if(pdsMapObj.HasKeyword("MAP_PROJECTION_ROTATION")) {
-      PvlKeyword &tempKey = pdsMapObj.FindKeyword("MAP_PROJECTION_ROTATION");
-      tempKey.SetValue(tempKey[0], "DEG");
+    if(pdsMapObj.hasKeyword("MAP_PROJECTION_ROTATION")) {
+      PvlKeyword &tempKey = pdsMapObj.findKeyword("MAP_PROJECTION_ROTATION");
+      tempKey.setValue(tempKey[0], "DEG");
     }
 
   }
@@ -857,8 +857,8 @@ namespace Isis {
    */
   int ProcessExportPds::LabelSize() {
     ostringstream temp;
-    if(m_label->GetFormat() != NULL) {
-      temp << *m_label << m_label->GetFormat()->FormatEOL();
+    if(m_label->format() != NULL) {
+      temp << *m_label << m_label->format()->formatEOL();
     }
     else {
       temp << *m_label << endl;
@@ -896,13 +896,13 @@ namespace Isis {
     // corresponding lines in the StandardImageRoot member
     if(m_exportType == Stream) {
       if(m_pdsFileType != ProcessExportPds::JP2Image) {
-        (*m_label)["LABEL_RECORDS"].SetValue(toString(labSize), "BYTES");
+        (*m_label)["LABEL_RECORDS"].setValue(toString(labSize), "BYTES");
         if(!m_detachedLabel) {
-          (*m_label)["^IMAGE"].SetValue(toString(labSize + 1), "BYTES");
+          (*m_label)["^IMAGE"].setValue(toString(labSize + 1), "BYTES");
         }
       }
-      if(m_label->GetFormat() != NULL) {
-        os << *m_label << m_label->GetFormat()->FormatEOL();
+      if(m_label->format() != NULL) {
+        os << *m_label << m_label->format()->formatEOL();
       }
       else {
         os << *m_label << endl;
@@ -917,13 +917,13 @@ namespace Isis {
       int labelRecords;
       if(m_pdsFileType != ProcessExportPds::JP2Image) {
         lineBytes = LineBytes();
-        (*m_label)["RECORD_BYTES"].SetValue(toString(lineBytes));
+        (*m_label)["RECORD_BYTES"].setValue(toString(lineBytes));
 
         // The number of label records is dependent on the number of label bytes
         // and the lint bytes
         labelRecords = (int)ceil((double)labSize / (double)lineBytes);
-        if(m_label->HasKeyword("LABEL_RECORDS")) { //LRO MRF doesn't have this keyword
-          (*m_label)["LABEL_RECORDS"].SetValue(toString(labelRecords));
+        if(m_label->hasKeyword("LABEL_RECORDS")) { //LRO MRF doesn't have this keyword
+          (*m_label)["LABEL_RECORDS"].setValue(toString(labelRecords));
         }
         int totalTableRecords = 0;
         for (unsigned int i = 0; i < m_tableRecords.size(); i++) {
@@ -932,14 +932,14 @@ namespace Isis {
         int imageRecords = InputCubes[0]->lineCount() 
                            * InputCubes[0]->bandCount();
         int fileRecords = labelRecords + imageRecords + totalTableRecords;
-        (*m_label)["FILE_RECORDS"].SetValue(toString(fileRecords));
+        (*m_label)["FILE_RECORDS"].setValue(toString(fileRecords));
 
         if(!m_detachedLabel) {
-          (*m_label)["^IMAGE"].SetValue(toString(labelRecords + 1));
+          (*m_label)["^IMAGE"].setValue(toString(labelRecords + 1));
         }
       }
-      if(m_label->GetFormat() != NULL) {
-        os << *m_label << m_label->GetFormat()->FormatEOL();
+      if(m_label->format() != NULL) {
+        os << *m_label << m_label->format()->formatEOL();
       }
       else {
         os << *m_label << endl;
@@ -1034,7 +1034,7 @@ namespace Isis {
       os.write(tableBuffer, isisTable.Records() * fileRecordBytes);
       os.close();
     }
-    mainPvl.AddObject(metadata);
+    mainPvl.addObject(metadata);
     m_tableRecords.push_back(isisTable.Records());
     return;
   }

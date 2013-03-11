@@ -62,12 +62,12 @@ void IsisMain() {
     int summingMode = 0;
     bool isNarrowAngle = false;
 
-    if(inputPvl.HasKeyword("CROSSTRACK_SUMMING")) {
+    if(inputPvl.hasKeyword("CROSSTRACK_SUMMING")) {
       summingMode = inputPvl["CROSSTRACK_SUMMING"];
       isNarrowAngle = ((QString)inputPvl["INSTRUMENT_ID"] == "MOC-NA");
     }
     else {
-      PvlGroup &inst = inputPvl.FindGroup("Instrument", Pvl::Traverse);
+      PvlGroup &inst = inputPvl.findGroup("Instrument", Pvl::Traverse);
       summingMode = inst["CrosstrackSumming"];
       isNarrowAngle = ((QString)inst["InstrumentId"] == "MOC-NA");
     }
@@ -94,7 +94,7 @@ void IsisMain() {
     }
     else if(ui.WasEntered("MAP")) {
       Pvl mapPvl(FileName(ui.GetFileName("MAP")).expanded());
-      if(mapPvl.FindGroup("Mapping", Pvl::Traverse).HasKeyword("PixelResolution")) {
+      if(mapPvl.findGroup("Mapping", Pvl::Traverse).hasKeyword("PixelResolution")) {
         p.Application("cam2map").AddConstParameter("PIXRES", "MAP");
       }
     }

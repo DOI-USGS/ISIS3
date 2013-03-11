@@ -78,7 +78,7 @@ namespace Isis {
    */
   void StreamExporter::setType(ExportDescription &desc) {
     ProcessExport &p = getProcess();
-    p.SetFormat(ProcessExport::BIL);
+    p.setFormat(ProcessExport::BIL);
 
     m_type = desc.getPixelType();
     createBuffer();

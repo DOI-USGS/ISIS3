@@ -167,8 +167,8 @@ void SpiceSegment::init(Cube &cube) {
 QString SpiceSegment::getKeyValue(PvlObject &label,
                                       const QString &keyword) {
   QString value("");
-  if ( label.HasKeyword(keyword,Pvl::Traverse) ) {
-    value = label.FindKeyword(keyword,Pvl::Traverse)[0];
+  if ( label.hasKeyword(keyword,Pvl::Traverse) ) {
+    value = label.findKeyword(keyword,Pvl::Traverse)[0];
   }
   return (value);
 }
@@ -206,14 +206,14 @@ void SpiceSegment::init() {
 bool SpiceSegment::getImageTimes(Pvl &lab, double &start, double &end) const {
 
   _kernels.Load("LSK,SCLK");
-  PvlObject &cube = lab.FindObject("IsisCube");
+  PvlObject &cube = lab.findObject("IsisCube");
   // Get the start and end time for the cube
-  start = UTCtoET((QString) cube.FindGroup("Instrument")["StartTime"]);
-  if(cube.FindGroup("Instrument").HasKeyword("StopTime")) {
-    end = UTCtoET((QString) cube.FindGroup("Instrument")["StopTime"]);
+  start = UTCtoET((QString) cube.findGroup("Instrument")["StartTime"]);
+  if(cube.findGroup("Instrument").hasKeyword("StopTime")) {
+    end = UTCtoET((QString) cube.findGroup("Instrument")["StopTime"]);
   }
   else {
-    end = UTCtoET (cube.FindGroup("Instrument")["StartTime"]);
+    end = UTCtoET (cube.findGroup("Instrument")["StartTime"]);
   }
 
   return (true);

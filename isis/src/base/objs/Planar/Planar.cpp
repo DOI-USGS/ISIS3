@@ -60,18 +60,18 @@ namespace Isis {
 
     try {
       // Try to read the mapping group
-      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
+      PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Compute and write the default center azimuth if allowed and
       // necessary
-      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterAzimuth"))) {
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterAzimuth"))) {
         double az = (m_minimumAzimuth + m_maximumAzimuth) / 2.0;
         mapGroup += PvlKeyword("CenterAzimuth", toString(az));
       }
 
       // Compute and write the default center radius if allowed and
       // necessary
-      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterRadius"))) {
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterRadius"))) {
         double radius = (m_minimumRadius + m_maximumRadius) / 2.0;
         mapGroup += PvlKeyword("CenterRadius", toString(radius));
       }

@@ -48,7 +48,7 @@ void IsisMain() {
 
   //Checks if in file is rdr
   Pvl lab(inFile.expanded());
-  if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
+  if(lab.hasObject("IMAGE_MAP_PROJECTION")) {
     QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -62,7 +62,7 @@ void IsisMain() {
   }
 
   // We need to know how many filters and their height to import the data properly
-  numFilters = pdsLab["FILTER_NAME"].Size();
+  numFilters = pdsLab["FILTER_NAME"].size();
   currentLine.resize(numFilters);
   filterHeight = 16 / (int)pdsLab["SAMPLING_FACTOR"];
 
@@ -106,7 +106,7 @@ void IsisMain() {
   // Output lines/samps.
 
   int numLines = (int)p.Lines() / numFilters + maxPadding;
-  int numSamples = pdsLab.FindKeyword("LINE_SAMPLES", Pvl::Traverse);
+  int numSamples = pdsLab.findKeyword("LINE_SAMPLES", Pvl::Traverse);
   cubeHeight = numLines;
 
   outputCubes.push_back(new Isis::Cube());
@@ -149,8 +149,8 @@ void IsisMain() {
   for(unsigned int i = 0; i < outputCubes.size(); i++) {
     translateMarciLabels(pdsLab, *outputCubes[i]->label());
 
-    PvlObject &isisCube = outputCubes[i]->label()->FindObject("IsisCube");
-    isisCube.FindGroup("Instrument").AddKeyword(PvlKeyword("Framelets", framelets[i]));
+    PvlObject &isisCube = outputCubes[i]->label()->findObject("IsisCube");
+    isisCube.findGroup("Instrument").addKeyword(PvlKeyword("Framelets", framelets[i]));
 
     outputCubes[i]->write(origLabel);
     delete outputCubes[i];
@@ -273,7 +273,7 @@ void writeCubeOutput(Isis::Buffer &data) {
 void translateMarciLabels(Pvl &pdsLabel, Pvl &cubeLabel) {
   PvlGroup arch("Archive");
 
-  if(pdsLabel.HasKeyword("SAMPLE_BIT_MODE_ID")) {
+  if(pdsLabel.hasKeyword("SAMPLE_BIT_MODE_ID")) {
     arch += PvlKeyword("SampleBitModeId", (QString)pdsLabel["SAMPLE_BIT_MODE_ID"]);
   }
 
@@ -306,7 +306,7 @@ void translateMarciLabels(Pvl &pdsLabel, Pvl &cubeLabel) {
   PvlGroup bandBin("BandBin");
   PvlKeyword filterName("FilterName");
   PvlKeyword origBands("OriginalBand");
-  for(int filter = 0; filter < pdsLabel["FILTER_NAME"].Size(); filter++) {
+  for(int filter = 0; filter < pdsLabel["FILTER_NAME"].size(); filter++) {
     filterName += pdsLabel["FILTER_NAME"][filter];
     origBands += toString(filter + 1);
   }
@@ -314,10 +314,10 @@ void translateMarciLabels(Pvl &pdsLabel, Pvl &cubeLabel) {
   bandBin += filterName;
   bandBin += origBands;
 
-  PvlObject &isisCube = cubeLabel.FindObject("IsisCube");
-  isisCube.AddGroup(inst);
-  isisCube.AddGroup(bandBin);
-  isisCube.AddGroup(arch);
+  PvlObject &isisCube = cubeLabel.findObject("IsisCube");
+  isisCube.addGroup(inst);
+  isisCube.addGroup(bandBin);
+  isisCube.addGroup(arch);
 
   // Map VIS/UV to NaifIkCode
   std::map<QString, int> naifIkCodes;
@@ -340,7 +340,7 @@ void translateMarciLabels(Pvl &pdsLabel, Pvl &cubeLabel) {
   int iakCode = naifIkCodes.find(uvvis)->second;
   kerns += PvlKeyword("NaifIkCode", toString(iakCode));
 
-  isisCube.AddGroup(kerns);
+  isisCube.addGroup(kerns);
 }
 
 /**

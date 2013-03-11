@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
   cout << "UNIT TEST FOR Equirectangular" << endl << endl;
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("EquatorialRadius", toString(1.0));
   mapGroup += PvlKeyword("PolarRadius", toString(1.0));
   mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
@@ -93,8 +93,8 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing default option ... " << endl;
-  mapGroup.DeleteKeyword("CenterLongitude");
-  mapGroup.DeleteKeyword("CenterLatitude");
+  mapGroup.deleteKeyword("CenterLongitude");
+  mapGroup.deleteKeyword("CenterLatitude");
   Equirectangular p2(lab, true);
   cout << lab << endl;
   cout << endl;
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   std::cout << "Check Invalid Latitude" << std::endl;
-  mapGroup.AddKeyword(PvlKeyword("CenterLatitude", toString(90.0)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("CenterLatitude", toString(90.0)), Pvl::Replace);
   std::cout << mapGroup << std::endl;
   try {
     Equirectangular p2(lab);

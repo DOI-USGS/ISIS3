@@ -101,10 +101,10 @@ namespace Isis {
       Pvl &pvl = *cube->label();
       PvlKeyword wavelengths;
 
-      if (pvl.FindObject("IsisCube").HasGroup("BandBin")) {
-        PvlGroup &bandBin = pvl.FindObject("IsisCube").FindGroup("BandBin");
-        if (bandBin.HasKeyword("Center")) {
-          wavelengths = bandBin.FindKeyword("Center");
+      if (pvl.findObject("IsisCube").hasGroup("BandBin")) {
+        PvlGroup &bandBin = pvl.findObject("IsisCube").findGroup("BandBin");
+        if (bandBin.hasKeyword("Center")) {
+          wavelengths = bandBin.findKeyword("Center");
         }
       }
 

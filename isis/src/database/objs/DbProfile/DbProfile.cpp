@@ -95,7 +95,7 @@ namespace Isis {
    */
   void DbProfile::add(const QString &key, const QString &value) {
     if(_keys.exists(key)) {
-      _keys.get(key).AddValue(value);
+      _keys.get(key).addValue(value);
     }
     else {
       _keys.add(key, PvlKeyword(key, value));
@@ -140,7 +140,7 @@ namespace Isis {
    */
   int DbProfile::count(const QString &key) const {
     if(_keys.exists(key)) {
-      return (_keys.get(key).Size());
+      return (_keys.get(key).size());
     }
     return (0);
   }
@@ -197,8 +197,8 @@ namespace Isis {
    */
   void DbProfile::loadkeys(PvlContainer &pvl) {
     PvlContainer::PvlKeywordIterator key;
-    for(key = pvl.Begin() ; key != pvl.End() ; ++key) {
-      _keys.add(key->Name(), *key);
+    for(key = pvl.begin() ; key != pvl.end() ; ++key) {
+      _keys.add(key->name(), *key);
     }
   }
 
@@ -218,7 +218,7 @@ namespace Isis {
     PvlGroup propGroup(_group);
     OrderedKeys::CollectorConstIter okItr;
     for(okItr = okeys.begin() ; okItr != okeys.end() ; ++okItr) {
-      propGroup.AddKeyword(*(okItr->second));
+      propGroup.addKeyword(*(okItr->second));
     }
 
     o << propGroup << std::endl;

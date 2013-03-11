@@ -51,21 +51,21 @@ void IsisMain() {
     p.TranslatePdsLabels(otherLabels);
   }
 
-  if(otherLabels.HasGroup("Mapping") &&
-      (otherLabels.FindGroup("Mapping").Keywords() > 0)) {
-    ocube->putGroup(otherLabels.FindGroup("Mapping"));
+  if(otherLabels.hasGroup("Mapping") &&
+      (otherLabels.findGroup("Mapping").keywords() > 0)) {
+    ocube->putGroup(otherLabels.findGroup("Mapping"));
   }
-  if(otherLabels.HasGroup("Instrument") &&
-      (otherLabels.FindGroup("Instrument").Keywords() > 0)) {
-    ocube->putGroup(otherLabels.FindGroup("Instrument"));
+  if(otherLabels.hasGroup("Instrument") &&
+      (otherLabels.findGroup("Instrument").keywords() > 0)) {
+    ocube->putGroup(otherLabels.findGroup("Instrument"));
   }
-  if(otherLabels.HasGroup("BandBin") &&
-      (otherLabels.FindGroup("BandBin").Keywords() > 0)) {
-    ocube->putGroup(otherLabels.FindGroup("BandBin"));
+  if(otherLabels.hasGroup("BandBin") &&
+      (otherLabels.findGroup("BandBin").keywords() > 0)) {
+    ocube->putGroup(otherLabels.findGroup("BandBin"));
   }
-  if(otherLabels.HasGroup("Archive") &&
-      (otherLabels.FindGroup("Archive").Keywords() > 0)) {
-    ocube->putGroup(otherLabels.FindGroup("Archive"));
+  if(otherLabels.hasGroup("Archive") &&
+      (otherLabels.findGroup("Archive").keywords() > 0)) {
+    ocube->putGroup(otherLabels.findGroup("Archive"));
   }
 
   p.EndProcess();

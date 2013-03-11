@@ -37,7 +37,7 @@ namespace Isis {
   * Constructs an empty PvlFormat
   */
   PvlFormat::PvlFormat() {
-    Init();
+    init();
   }
 
 
@@ -50,8 +50,8 @@ namespace Isis {
   * keyword in this PvlKeyword and TYPE is one of [QString | integer | float ]
   */
   PvlFormat::PvlFormat(const QString &file) {
-    Init();
-    Add(file);
+    init();
+    add(file);
   }
 
 
@@ -63,16 +63,16 @@ namespace Isis {
   * keyword in a PvlKeyword and type is one of [QString | integer | float ]
   */
   PvlFormat::PvlFormat(Pvl &keywordType) {
-    Init();
-    Add(keywordType);
+    init();
+    add(keywordType);
   }
 
 
   //! Clears all PvlFormat data.
-  void PvlFormat::Init() {
-    p_keywordMap.Clear();
-    p_keywordMapFile.clear();
-    p_charLimit = 80;
+  void PvlFormat::init() {
+    m_keywordMap.clear();
+    m_keywordMapFile.clear();
+    m_charLimit = 80;
   }
 
 
@@ -81,13 +81,13 @@ namespace Isis {
   * contain KEYWORD=TYPE (one per line), where TYPE is one of the QStrings
   * KeywordType can convert.
   */
-  void PvlFormat::Add(const QString &file) {
-    p_keywordMapFile = file;
+  void PvlFormat::add(const QString &file) {
+    m_keywordMapFile = file;
 
     // Open the file and internalize it into the Pvl map
     try {
       Pvl pvl(file);
-      Add(pvl);
+      add(pvl);
     }
     catch(IException &e) {
       QString msg;
@@ -103,18 +103,18 @@ namespace Isis {
   * contain KEYWORD=TYPE, where TYPE is one of the QStrings KeywordType can
   * convert.
   */
-  void PvlFormat::Add(Pvl &pvl) {
-    for(int i = 0; i < pvl.Keywords(); ++i) {
+  void PvlFormat::add(Pvl &pvl) {
+    for(int i = 0; i < pvl.keywords(); ++i) {
       PvlKeyword &key = pvl[i];
-      QString name = key.Name().toUpper();
+      QString name = key.name().toUpper();
       QString type = key[0].toUpper();
       PvlKeyword newKey(name, type);
-      for(int j = 1; j < key.Size(); ++j) newKey.AddValue(key[j]);
+      for(int j = 1; j < key.size(); ++j) newKey.addValue(key[j]);
       // Make sure we don't duplicate Keys
-      if (p_keywordMap.HasKeyword(name)) {
-        p_keywordMap.DeleteKeyword(name);
+      if (m_keywordMap.hasKeyword(name)) {
+        m_keywordMap.deleteKeyword(name);
       }
-      p_keywordMap.AddKeyword(newKey);
+      m_keywordMap.addKeyword(newKey);
     }
   }
 
@@ -124,11 +124,11 @@ namespace Isis {
   *
   * @param keyword The PvlKeyword to have its type returned
   */
-  KeywordType PvlFormat::Type(const PvlKeyword &keyword) {
-    QString name = keyword.Name().toUpper();
-    if(p_keywordMap.HasKeyword(name)) {
-      PvlKeyword &key = p_keywordMap.FindKeyword(name);
-      return ToKeywordType(key[0]);
+  KeywordType PvlFormat::type(const PvlKeyword &keyword) {
+    QString name = keyword.name().toUpper();
+    if(m_keywordMap.hasKeyword(name)) {
+      PvlKeyword &key = m_keywordMap.findKeyword(name);
+      return toKeywordType(key[0]);
     }
     return NoTypeKeyword;
   }
@@ -142,11 +142,11 @@ namespace Isis {
   * @return The number of decimal places to be output. If this number is not
   *         available in keyword map return -1.
   */
-  int PvlFormat::Accuracy(const PvlKeyword &keyword) {
-    QString name = keyword.Name().toUpper();
-    if(p_keywordMap.HasKeyword(name)) {
-      PvlKeyword &key = p_keywordMap.FindKeyword(name);
-      if(key.Size() > 1) {
+  int PvlFormat::accuracy(const PvlKeyword &keyword) {
+    QString name = keyword.name().toUpper();
+    if(m_keywordMap.hasKeyword(name)) {
+      PvlKeyword &key = m_keywordMap.findKeyword(name);
+      if(key.size() > 1) {
         return toInt(key[1]);
       }
     }
@@ -160,16 +160,16 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  QString PvlFormat::FormatValue(const PvlKeyword &keyword, int num) {
+  QString PvlFormat::formatValue(const PvlKeyword &keyword, int num) {
 
     QString val;
     val.clear();
 
     // Find out if the units are the same for all values
-    bool singleUnit = IsSingleUnit(keyword);
+    bool singleUnit = isSingleUnit(keyword);
 
     // Create a Null value if the value index is greater than the number of values
-    if(num >= keyword.Size()) {
+    if(num >= keyword.size()) {
       return "Null";
     }
 
@@ -181,31 +181,31 @@ namespace Isis {
       val += keyword[num];
     }
 
-    val = AddQuotes(val);
+    val = addQuotes(val);
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val = "(" + val;
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      val += " <" + keyword.Unit(num) + ">";
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      val += " <" + keyword.unit(num) + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      val += " <" + keyword.Unit(num) + ">";
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      val += " <" + keyword.unit(num) + ">";
     }
 
     return val;
@@ -217,8 +217,8 @@ namespace Isis {
   *
   * @param keyword The PvlContainer being closed.
   */
-  QString PvlFormat::FormatName(const PvlKeyword &keyword) {
-    return keyword.Name();
+  QString PvlFormat::formatName(const PvlKeyword &keyword) {
+    return keyword.name();
   }
 
 
@@ -228,10 +228,10 @@ namespace Isis {
   * @param name The text used to signify the end of a container
   * @param keyword The PvlContainer being closed.
   */
-  QString PvlFormat::FormatEnd(const QString name,
+  QString PvlFormat::formatEnd(const QString name,
                                    const PvlKeyword &keyword) {
-    return "End_" + FormatName(keyword);
-  };
+    return "End_" + formatName(keyword);
+  }
 
 
   /*
@@ -240,7 +240,7 @@ namespace Isis {
   *
   * @param value The PvlKeyword value to be quoted if necessary.
   */
-  QString PvlFormat::AddQuotes(const QString value) {
+  QString PvlFormat::addQuotes(const QString value) {
     QString val = value;
 
     bool needQuotes = false;
@@ -303,12 +303,12 @@ namespace Isis {
    *
    * @param keyword The PvlKeyword to be formatted
    */
-  bool PvlFormat::IsSingleUnit(const PvlKeyword &keyword) {
+  bool PvlFormat::isSingleUnit(const PvlKeyword &keyword) {
 
     // See if the units are all the same
     bool singleUnit = true;
-    for(int i = 0; i < keyword.Size(); i ++) {
-      if(!keyword.StringEqual(keyword.Unit(i), keyword.Unit(0))) {
+    for(int i = 0; i < keyword.size(); i ++) {
+      if(!keyword.stringEqual(keyword.unit(i), keyword.unit(0))) {
         singleUnit = false;
       }
     }

@@ -257,13 +257,13 @@ namespace Isis {
       // if single band then disable spectral plot
       Pvl &pvl = *cvp->cube()->label();
       supportsWavelength = supportsWavelength &&
-                           pvl.FindObject("IsisCube").HasGroup("BandBin");
+                           pvl.findObject("IsisCube").hasGroup("BandBin");
 
       if (supportsWavelength) {
-        PvlGroup &bandBin = pvl.FindObject("IsisCube").FindGroup("BandBin");
+        PvlGroup &bandBin = pvl.findObject("IsisCube").findGroup("BandBin");
         supportsWavelength = supportsWavelength &&
-                             bandBin.HasKeyword("Center") &&
-                             bandBin["Center"].Size() == bandCount;
+                             bandBin.hasKeyword("Center") &&
+                             bandBin["Center"].size() == bandCount;
       }
     }
 
@@ -647,11 +647,11 @@ namespace Isis {
         labels.push_back(band);
       }
       else if (targetUnits == PlotCurve::Wavelength) {
-        if (pvl.FindObject("IsisCube").HasGroup("BandBin")) {
-          PvlGroup &bandBin = pvl.FindObject("IsisCube").FindGroup("BandBin");
-          if (bandBin.HasKeyword("Center")) {
-            PvlKeyword &wavelength = bandBin.FindKeyword("Center");
-            if (wavelength.Size() > (band - 1)) {
+        if (pvl.findObject("IsisCube").hasGroup("BandBin")) {
+          PvlGroup &bandBin = pvl.findObject("IsisCube").findGroup("BandBin");
+          if (bandBin.hasKeyword("Center")) {
+            PvlKeyword &wavelength = bandBin.findKeyword("Center");
+            if (wavelength.size() > (band - 1)) {
               labels.push_back(toDouble(wavelength[band-1]));
             }
           }

@@ -47,13 +47,13 @@ namespace Isis {
     m_interp = NULL;
     m_portal = NULL;
 
-    PvlGroup &kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup &kernels = pvl.findGroup("Kernels", Pvl::Traverse);
 
     QString demCubeFile;
-    if (kernels.HasKeyword("ElevationModel")) {
+    if (kernels.hasKeyword("ElevationModel")) {
       demCubeFile = (QString) kernels["ElevationModel"];
     }
-    else if(kernels.HasKeyword("ShapeModel")) {
+    else if(kernels.hasKeyword("ShapeModel")) {
       demCubeFile = (QString) kernels["ShapeModel"];
     }
 
@@ -73,7 +73,7 @@ namespace Isis {
                             m_interp->HotSample(), m_interp->HotLine());
 
     // Read in the Scale of the DEM file in pixels/degree
-    const PvlGroup &mapgrp = m_demCube->label()->FindGroup("Mapping", Pvl::Traverse);
+    const PvlGroup &mapgrp = m_demCube->label()->findGroup("Mapping", Pvl::Traverse);
 
     // Save map scale in pixels per degree
     m_pixPerDegree = (double) mapgrp["Scale"];

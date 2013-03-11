@@ -32,7 +32,7 @@ namespace Isis {
     p_cpmmNumber = group["CpmmNumber"];
     p_channel = group["ChannelNumber"];
   
-    if(group.HasKeyword("Summing")) {
+    if(group.hasKeyword("Summing")) {
       p_bin = group["Summing"];
     }
     else {
@@ -40,7 +40,7 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   
-    if(group.HasKeyword("Tdi")) {
+    if(group.hasKeyword("Tdi")) {
       p_tdi = group["Tdi"];
     }
     else {

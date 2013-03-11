@@ -23,6 +23,7 @@
  */
 
 #include <algorithm>
+
 #include "PvlContainer.h"
 #include "PvlGroup.h"
 
@@ -63,6 +64,8 @@ namespace Isis {
    *                                  Added assignment operator
    *  @history 2010-09-27 Sharmila Prasad - Validate an Object comparing with the
    *                                        corresponding Template Object
+   *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
+   *                          names up to the current Isis 3 coding standards. Fixes #1533.
    */
   class PvlObject : public Isis::PvlContainer {
     public:
@@ -77,12 +80,12 @@ namespace Isis {
        * Returns the number of groups contained.
        * @return The number of groups.
        */
-      int Groups() const {
-        return p_groups.size();
+      int groups() const {
+        return m_groups.size();
       };
 
-      PvlGroup &Group(const int index);
-      const PvlGroup &Group(const int index) const;
+      PvlGroup &group(const int index);
+      const PvlGroup &group(const int index) const;
 
       //! The counter for groups.
       typedef QList<Isis::PvlGroup>::iterator PvlGroupIterator;
@@ -93,8 +96,8 @@ namespace Isis {
        * Returns the beginning group index.
        * @return The iterator of the beginning group..
        */
-      PvlGroupIterator BeginGroup() {
-        return p_groups.begin();
+      PvlGroupIterator beginGroup() {
+        return m_groups.begin();
       };
 
 
@@ -102,8 +105,8 @@ namespace Isis {
        * Returns the beginning group index.
        * @return The iterator of the beginning group..
        */
-      ConstPvlGroupIterator BeginGroup() const {
-        return p_groups.begin();
+      ConstPvlGroupIterator beginGroup() const {
+        return m_groups.begin();
       };
 
 
@@ -111,8 +114,8 @@ namespace Isis {
        * Returns the ending group index.
        * @return The iterator of the ending group.
        */
-      PvlGroupIterator EndGroup() {
-        return p_groups.end();
+      PvlGroupIterator endGroup() {
+        return m_groups.end();
       };
 
 
@@ -120,8 +123,8 @@ namespace Isis {
        * Returns the const ending group index.
        * @return The iterator of the ending group.
        */
-      ConstPvlGroupIterator EndGroup() const {
-        return p_groups.end();
+      ConstPvlGroupIterator endGroup() const {
+        return m_groups.end();
       };
 
 
@@ -131,7 +134,7 @@ namespace Isis {
        * @param beg The lower index
        * @param end The higher index
        */
-      PvlGroupIterator FindGroup(const QString &name,
+      PvlGroupIterator findGroup(const QString &name,
                                  PvlGroupIterator beg,
                                  PvlGroupIterator end) {
         Isis::PvlGroup temp(name);
@@ -145,7 +148,7 @@ namespace Isis {
        * @param beg The lower index
        * @param end The higher index
        */
-      ConstPvlGroupIterator FindGroup(const QString &name,
+      ConstPvlGroupIterator findGroup(const QString &name,
                                       ConstPvlGroupIterator beg,
                                       ConstPvlGroupIterator end) const {
         Isis::PvlGroup temp(name);
@@ -166,44 +169,44 @@ namespace Isis {
       // The using statements below are used to make the PvlContainer's version
       // of FindKeyword and HasKeyword vissible to other code that otherwise would not be
       // able to see those versions.
-      using PvlContainer::FindKeyword;
+      using PvlContainer::findKeyword;
 
 
-      PvlKeyword &FindKeyword(const QString &kname,
+      PvlKeyword &findKeyword(const QString &kname,
                               FindOptions opts);
 
 
-      using PvlContainer::HasKeyword;
+      using PvlContainer::hasKeyword;
 
 
-      bool HasKeyword(const QString &kname,
+      bool hasKeyword(const QString &kname,
                       FindOptions opts) const;
 
-      Isis::PvlGroup &FindGroup(const QString &name,
+      Isis::PvlGroup &findGroup(const QString &name,
                                 FindOptions opts = None);
 
-      const Isis::PvlGroup &FindGroup(const QString &name,
+      const Isis::PvlGroup &findGroup(const QString &name,
                                       FindOptions opts = None) const;
       /**
        * Add a group to the object.
        * @param group The PvlGroup object to add.
        */
-      void AddGroup(const Isis::PvlGroup &group) {
-        p_groups.push_back(group);
-        //p_groups[p_groups.size()-1].SetFileName(FileName());
+      void addGroup(const Isis::PvlGroup &group) {
+        m_groups.push_back(group);
+        //m_groups[m_groups.size()-1].SetFileName(FileName());
       };
 
       using PvlContainer::operator+=;
       void operator+= (const Isis::PvlGroup &group) {
-        AddGroup(group);
+        addGroup(group);
       }
       void operator+= (const Isis::PvlObject &obj) {
-        AddObject(obj);
+        addObject(obj);
       }
 
-      void DeleteGroup(const QString &name);
+      void deleteGroup(const QString &name);
 
-      void DeleteGroup(const int index);
+      void deleteGroup(const int index);
 
 
       /**
@@ -212,8 +215,8 @@ namespace Isis {
        * @param name The name of the group to look for.
        * @return True if the object has the group, false if not.
        */
-      bool HasGroup(const QString &name) const {
-        if(FindGroup(name, BeginGroup(), EndGroup()) == EndGroup()) return false;
+      bool hasGroup(const QString &name) const {
+        if(findGroup(name, beginGroup(), endGroup()) == endGroup()) return false;
         return true;
       }
 
@@ -221,12 +224,12 @@ namespace Isis {
        * Returns the number of objects.
        * @return The number of objects.
        */
-      int Objects() const {
-        return p_objects.size();
+      int objects() const {
+        return m_objects.size();
       };
 
-      PvlObject &Object(const int index);
-      const PvlObject &Object(const int index) const;
+      PvlObject &object(const int index);
+      const PvlObject &object(const int index) const;
 
       //! The counter for objects.
       typedef QList<PvlObject>::iterator PvlObjectIterator;
@@ -237,8 +240,8 @@ namespace Isis {
        * Returns the index of the beginning object.
        * @return The beginning object's index.
        */
-      PvlObjectIterator BeginObject() {
-        return p_objects.begin();
+      PvlObjectIterator beginObject() {
+        return m_objects.begin();
       };
 
 
@@ -246,8 +249,8 @@ namespace Isis {
        * Returns the const index of the beginning object.
        * @return The beginning object's index.
        */
-      ConstPvlObjectIterator BeginObject() const {
-        return p_objects.begin();
+      ConstPvlObjectIterator beginObject() const {
+        return m_objects.begin();
       };
 
 
@@ -255,8 +258,8 @@ namespace Isis {
        * Returns the index of the ending object.
        * @return The ending object's index.
        */
-      PvlObjectIterator EndObject() {
-        return p_objects.end();
+      PvlObjectIterator endObject() {
+        return m_objects.end();
       };
 
 
@@ -264,8 +267,8 @@ namespace Isis {
        * Returns the const index of the ending object.
        * @return The ending object's index.
        */
-      ConstPvlObjectIterator EndObject() const {
-        return p_objects.end();
+      ConstPvlObjectIterator endObject() const {
+        return m_objects.end();
       };
 
 
@@ -276,7 +279,7 @@ namespace Isis {
        * @param end The higher index.
        * @return The index of the object.
        */
-      PvlObjectIterator FindObject(const QString &name,
+      PvlObjectIterator findObject(const QString &name,
                                    PvlObjectIterator beg,
                                    PvlObjectIterator end) {
         PvlObject temp(name);
@@ -291,7 +294,7 @@ namespace Isis {
        * @param end The higher index.
        * @return The index of the object.
        */
-      ConstPvlObjectIterator FindObject(const QString &name,
+      ConstPvlObjectIterator findObject(const QString &name,
                                         ConstPvlObjectIterator beg,
                                         ConstPvlObjectIterator end) const {
         PvlObject temp(name);
@@ -299,23 +302,23 @@ namespace Isis {
       }
 
 
-      PvlObject &FindObject(const QString &name,
+      PvlObject &findObject(const QString &name,
                             FindOptions opts = None);
 
-      const PvlObject &FindObject(const QString &name,
+      const PvlObject &findObject(const QString &name,
                                   FindOptions opts = None) const;
 
       /**
        * Add a PvlObject.
        * @param object The PvlObject to add.
        */
-      void AddObject(const PvlObject &object) {
-        p_objects.push_back(object);
-        p_objects[p_objects.size()-1].SetFileName(FileName());
+      void addObject(const PvlObject &object) {
+        m_objects.push_back(object);
+        m_objects[m_objects.size()-1].setFileName(fileName());
       }
 
-      void DeleteObject(const QString &name);
-      void DeleteObject(const int index);
+      void deleteObject(const QString &name);
+      void deleteObject(const int index);
 
 
       /**
@@ -325,8 +328,8 @@ namespace Isis {
        * @return True if the current PvlObject has the specified object, false
        * if it does not.
        */
-      bool HasObject(const QString &name) const {
-        if(FindObject(name, BeginObject(), EndObject()) == EndObject()) return false;
+      bool hasObject(const QString &name) const {
+        if(findObject(name, beginObject(), endObject()) == endObject()) return false;
         return true;
       }
 
@@ -338,26 +341,26 @@ namespace Isis {
        * @return True if they are equal, false if not.
        */
       bool operator==(const PvlObject &object) const {
-        return PvlKeyword::StringEqual(object.Name(), this->Name());
+        return PvlKeyword::stringEqual(object.name(), this->name());
       }
 
 
       //! Remove everything from the current PvlObject.
-      void Clear() {
-        Isis::PvlContainer::Clear();
-        p_objects.clear();
-        p_groups.clear();
+      void clear() {
+        Isis::PvlContainer::clear();
+        m_objects.clear();
+        m_groups.clear();
       }
 
       const PvlObject &operator=(const PvlObject &other);
-      
+
       //! Validate Object
-      void ValidateObject(PvlObject & pPvlObj);
-      
+      void validateObject(PvlObject & pPvlObj);
+
     private:
-      QList<PvlObject> p_objects;    /**<A vector of PvlObjects contained
+      QList<PvlObject> m_objects;    /**<A vector of PvlObjects contained
                                                 in the current PvlObject. */
-      QList<PvlGroup> p_groups;/**<A vector of PvlGroups contained
+      QList<PvlGroup> m_groups;/**<A vector of PvlGroups contained
                                                 in the current PvlObject. */
   };
 }

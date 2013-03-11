@@ -12,7 +12,7 @@ void IsisMain() {
   // Get the output map projection file and create an output projection object
   UserInterface &ui = Application::GetUserInterface();
   Pvl lab;
-  lab.Read(ui.GetFileName("MAP"));
+  lab.read(ui.GetFileName("MAP"));
 
   int samples, lines;
   Projection *outmap = ProjectionFactory::CreateForCube(lab, samples, lines);
@@ -58,12 +58,12 @@ void IsisMain() {
   // Write the output file if requested
   if(ui.WasEntered("TO")) {
     Pvl temp;
-    temp.AddGroup(results);
-    temp.AddGroup(lab.FindGroup("Mapping", Pvl::Traverse));
-    temp.Write(ui.GetFileName("TO", "txt"));
+    temp.addGroup(results);
+    temp.addGroup(lab.findGroup("Mapping", Pvl::Traverse));
+    temp.write(ui.GetFileName("TO", "txt"));
   }
 
-  Application::Log(lab.FindGroup("Mapping", Pvl::Traverse));
+  Application::Log(lab.findGroup("Mapping", Pvl::Traverse));
 
   p.EndProcess();
 }

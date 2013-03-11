@@ -65,7 +65,7 @@ namespace Isis {
     multiplicativeLineTimeError = getDouble(ikernKey);
 
     // Get the start time from labels
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockPrerollCount"];
     SpiceDouble etStart;
 

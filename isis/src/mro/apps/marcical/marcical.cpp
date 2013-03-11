@@ -35,7 +35,7 @@ void IsisMain() {
       throw IException();
     }
 
-    if(!icube.group("Archive").HasKeyword("SampleBitModeId")) {
+    if(!icube.group("Archive").hasKeyword("SampleBitModeId")) {
       throw IException();
     }
   }
@@ -62,7 +62,7 @@ void IsisMain() {
     decimation.push_back(1.0);
   }
 
-  QString startTime = icube.label()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  QString startTime = icube.label()->findGroup("Instrument", Pvl::Traverse)["StartTime"][0];
   iTime start(startTime);
   iTime changeTime("November 6, 2006 21:30:00 UTC");
 
@@ -99,15 +99,15 @@ void IsisMain() {
   vector< pair<double, double> > calibrationCoeffs;
 
   // Check our coefficient file
-  if(calibrationData.Objects() != 7) {
+  if(calibrationData.objects() != 7) {
     QString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
-    msg += " only [" + QString(calibrationData.Objects()) + "] objects were found";
+    msg += " only [" + QString(calibrationData.objects()) + "] objects were found";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Read it, make sure it's ordered
-  for(int obj = 0; obj < calibrationData.Objects(); obj ++) {
-    PvlObject &calObj = calibrationData.Object(obj);
+  for(int obj = 0; obj < calibrationData.objects(); obj ++) {
+    PvlObject &calObj = calibrationData.object(obj);
 
     if((int)calObj["FilterNumber"] != obj + 1) {
       QString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
@@ -179,8 +179,8 @@ void IsisMain() {
   filterNameToFilterIndex.insert(pair<QString, int>("SHORT_UV", 6));
   filterNameToFilterIndex.insert(pair<QString, int>("LONG_UV",  7));
 
-  PvlKeyword &filtNames = icube.label()->FindGroup("BandBin", Pvl::Traverse)["FilterName"];;
-  for(int i = 0; i < filtNames.Size(); i++) {
+  PvlKeyword &filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];;
+  for(int i = 0; i < filtNames.size(); i++) {
     if(filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
     }
@@ -191,7 +191,7 @@ void IsisMain() {
   }
 
   bool iof = ui.GetBoolean("IOF");
-  double exposure = ((double)icube.label()->FindGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+  double exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
   Camera *cam = NULL;
   double solarDist = Isis::Null;
 
@@ -265,16 +265,16 @@ void IsisMain() {
   while(!ocubeMgr.end());
 
   // Propagate labels and objects (in case of spice data)
-  PvlObject &inCubeObj = icube.label()->FindObject("IsisCube");
-  PvlObject &outCubeObj = ocube.label()->FindObject("IsisCube");
+  PvlObject &inCubeObj = icube.label()->findObject("IsisCube");
+  PvlObject &outCubeObj = ocube.label()->findObject("IsisCube");
 
-  for(int g = 0; g < inCubeObj.Groups(); g++) {
-    outCubeObj.AddGroup(inCubeObj.Group(g));
+  for(int g = 0; g < inCubeObj.groups(); g++) {
+    outCubeObj.addGroup(inCubeObj.group(g));
   }
 
-  for(int o = 0; o < icube.label()->Objects(); o++) {
-    if(icube.label()->Object(o).IsNamed("Table")) {
-      Blob t(icube.label()->Object(o)["Name"], icube.label()->Object(o).Name());
+  for(int o = 0; o < icube.label()->objects(); o++) {
+    if(icube.label()->object(o).isNamed("Table")) {
+      Blob t(icube.label()->object(o)["Name"], icube.label()->object(o).name());
       icube.read(t);
       ocube.write(t);
     }

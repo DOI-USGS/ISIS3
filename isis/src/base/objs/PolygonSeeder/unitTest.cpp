@@ -23,10 +23,10 @@ int main() {
     alg += PvlKeyword("YSpacing", "11");
 
     PvlObject o("AutoSeed");
-    o.AddGroup(alg);
+    o.addGroup(alg);
 
     Pvl pvl;
-    pvl.AddObject(o);
+    pvl.addObject(o);
     std::cout << pvl << std::endl << std::endl;
 
     PolygonSeeder *ps = PolygonSeederFactory::Create(pvl);

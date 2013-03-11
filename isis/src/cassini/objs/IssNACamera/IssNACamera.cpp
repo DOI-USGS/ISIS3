@@ -48,7 +48,7 @@ namespace Isis {
     // use the default.
     double focalLength = 0.0;
     try {
-      PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+      PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
       QString key = QString("INS%1_%2_FOCAL_LENGTH").
                       arg(naifIkCode()).arg(bandBin["FilterName"][0]);
       key = key.replace("/", "_");
@@ -60,7 +60,7 @@ namespace Isis {
         focalLength = getDouble(key);   
       }
       catch (IException &secondException) {
-        PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+        PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
         IException finalError(IException::Unknown,
             QString("Unable to find a focal length for the requested Cassini ISS NA "
                     "filter combination [%1] or the default focal length")
@@ -78,7 +78,7 @@ namespace Isis {
     instrumentRotation()->SetFrame(Spice::getInteger("INS_" + toString(naifIkCode()) + "_FRAME_ID"));
 
     // Get the start time in et
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     double et = iTime((QString)inst["StartTime"]).Et();
 

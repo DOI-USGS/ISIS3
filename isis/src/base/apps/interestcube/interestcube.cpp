@@ -33,7 +33,7 @@ void IsisMain() {
   try {
     // Get info from the operator group
     // Set the pvlkeywords that need to be set to zero
-    PvlGroup &op = pvl.FindGroup("Operator", Pvl::Traverse);
+    PvlGroup &op = pvl.findGroup("Operator", Pvl::Traverse);
     boxcarSamples = op["Samples"];
     boxcarLines = op["Lines"];
     op["DeltaLine"] = "0";
@@ -42,7 +42,7 @@ void IsisMain() {
     Application::Log(op);
   }
   catch(IException &e) {
-    QString msg = "Improper format for InterestOperator PVL [" + pvl.FileName() + "]";
+    QString msg = "Improper format for InterestOperator PVL [" + pvl.fileName() + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 

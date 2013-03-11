@@ -22,7 +22,7 @@ void IsisMain() {
   Pvl lab(inFile.expanded());
 
   try {
-    id = (QString) lab.FindKeyword("DATA_SET_ID");
+    id = (QString) lab.findKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
     QString msg = "Unable to read [DATA_SET_ID] from input file [" +
@@ -50,7 +50,7 @@ void IsisMain() {
   p.TranslatePdsProjection(otherLabels);
 
   // Get the directory where the generic pds2isis level 2 translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["base"] + "/translations/";
 
   // Translate the Archive group
@@ -59,8 +59,8 @@ void IsisMain() {
   archiveXlater.Auto(otherLabels);
 
   // Write the Archive and Mapping groups to the output cube label
-  outcube->putGroup(otherLabels.FindGroup("Mapping"));
-  outcube->putGroup(otherLabels.FindGroup("Archive"));
+  outcube->putGroup(otherLabels.findGroup("Mapping"));
+  outcube->putGroup(otherLabels.findGroup("Archive"));
 
   // Add the BandBin group
   PvlGroup bbin("BandBin");

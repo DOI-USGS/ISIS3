@@ -103,11 +103,11 @@ namespace Isis {
                        0.5322;
 
       // Try to read the mapping group
-      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
+      PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Compute and write the default center longitude if allowed and
       // necessary
-      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
         mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }

@@ -36,10 +36,10 @@ void IsisMain() {
     }
     else if (ui.WasEntered("TO")) {
       if (append) {
-        pvl.Append(tofile.expanded());
+        pvl.append(tofile.expanded());
       }
       else {
-        pvl.Write(tofile.expanded());
+        pvl.write(tofile.expanded());
       }
     }
     else {
@@ -58,10 +58,10 @@ void IsisMain() {
         text = new TextFile(tofile.expanded(),"overwrite");
       }
     }
-    for(int i = 0; i < pvl.Objects(); ++i) {
-      QString all = pvl.Object(i).Name() + " ";
-      PvlGroup user = pvl.Object(i).FindGroup("UserParameters");
-      for(int j = 0; j < user.Keywords(); ++j) {
+    for(int i = 0; i < pvl.objects(); ++i) {
+      QString all = pvl.object(i).name() + " ";
+      PvlGroup user = pvl.object(i).findGroup("UserParameters");
+      for(int j = 0; j < user.keywords(); ++j) {
         ostringstream os;
         os << user[j];
         QString temp = os.str().c_str();

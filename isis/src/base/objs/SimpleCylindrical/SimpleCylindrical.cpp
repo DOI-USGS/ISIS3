@@ -55,10 +55,10 @@ namespace Isis {
     TProjection::TProjection(label) {
     try {
       // Try to read the mapping group
-      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
+      PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Compute the default value if allowed and needed
-      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
         mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }

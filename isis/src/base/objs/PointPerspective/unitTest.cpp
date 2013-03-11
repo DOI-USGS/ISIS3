@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
   cout << "UNIT TEST FOR PointPerspective" << endl << endl;
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("EquatorialRadius", toString(6371000.));
   mapGroup += PvlKeyword("PolarRadius", toString(6371000.));
   mapGroup += PvlKeyword("LatitudeType", "Planetographic");
@@ -105,8 +105,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Test default computation ... " << endl;
-    mapGroup.DeleteKeyword("CenterLongitude");
-    mapGroup.DeleteKeyword("CenterLatitude");
+    mapGroup.deleteKeyword("CenterLongitude");
+    mapGroup.deleteKeyword("CenterLatitude");
     PointPerspective p2(lab, true);
     cout << lab << endl;
     cout << endl;

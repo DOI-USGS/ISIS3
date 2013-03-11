@@ -16,8 +16,8 @@ void IsisMain() {
     cube.open(ui.GetFileName("FROM"), "rw");
 
     //check for existing polygon, if exists delete it
-    if(cube.label()->HasObject("Polygon")) {
-      cube.label()->DeleteObject("Polygon");
+    if(cube.label()->hasObject("Polygon")) {
+      cube.label()->deleteObject("Polygon");
     }
 
     // Get the camera, interpolate to a parabola
@@ -31,7 +31,7 @@ void IsisMain() {
     // Get the instrument pointing keyword from the kernels group and update
     // its value to table.
     Isis::PvlGroup kernels =
-      cube.label()->FindGroup("Kernels", Isis::Pvl::Traverse);
+      cube.label()->findGroup("Kernels", Isis::Pvl::Traverse);
 
     // Save original kernels in keyword before changing to "Table" in the kernels group
     PvlKeyword origCk = kernels["InstrumentPointing"];
@@ -40,15 +40,15 @@ void IsisMain() {
     kernels["InstrumentPointing"] = "Table";
 
     // And finally write out the original kernels after Table
-    for (int i = 0;  i < origCk.Size();  i++) {
-      kernels["InstrumentPointing"].AddValue(origCk[i]);
+    for (int i = 0;  i < origCk.size();  i++) {
+      kernels["InstrumentPointing"].addValue(origCk[i]);
     }
 
     cube.putGroup(kernels);
 
     // Pull out the pointing cache as a table and write it
     Table cmatrix = cam->instrumentRotation()->Cache("InstrumentPointing");
-    cmatrix.Label().AddComment("Smoothed using spicefit");
+    cmatrix.Label().addComment("Smoothed using spicefit");
     cube.write(cmatrix);
     cube.close();
   }

@@ -47,14 +47,14 @@ namespace Isis {
   HiresCamera::HiresCamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
     // Get the camera characteristics
-    QString filter = (QString)(lab.FindGroup("BandBin", Pvl::Traverse))["FilterName"];
+    QString filter = (QString)(lab.findGroup("BandBin", Pvl::Traverse))["FilterName"];
     filter = filter.toUpper();
 
     SetFocalLength();
     SetPixelPitch();
 
     // Get the start time in et
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
     double time = iTime((QString)inst["StartTime"]).Et();

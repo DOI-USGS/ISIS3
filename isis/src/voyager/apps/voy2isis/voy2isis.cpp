@@ -129,7 +129,7 @@ void ConvertComments(FileName file) {
  */
 void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Get the directory where the Voyager translation tables are
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir[(QString)inputLabel["SpacecraftName"]];
   FileName transFile(missionDir + "/translations/voyager.trn");
 
@@ -141,7 +141,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   labelXlater.Auto(*(outputLabel));
 
   // Add needed keywords that are not in the translation table
-  PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
   // Add Camera_State_1 and Camera_State_2
   // Camera_State_1 is the first number in ScanModeId
@@ -149,15 +149,15 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // it is WA and BSIMAN or BOTSIM
   PvlKeyword sModeId = inst["ScanModeId"];
   QString cs1 = sModeId[0].split(":").first();
-  inst.AddKeyword(PvlKeyword("CameraState1",cs1));
+  inst.addKeyword(PvlKeyword("CameraState1",cs1));
 
   QString shutterMode = inst["ShutterModeId"];
   QString cam = inst["InstrumentId"];
   if (cam == "WIDE_ANGLE_CAMERA" && (shutterMode == "BOTSIM" || shutterMode == "BSIMAN")) {
-    inst.AddKeyword(PvlKeyword("CameraState2","1"));
+    inst.addKeyword(PvlKeyword("CameraState2","1"));
   }
   else {
-    inst.AddKeyword(PvlKeyword("CameraState2","0"));
+    inst.addKeyword(PvlKeyword("CameraState2","0"));
   }
 
   // Translate the band bin group information
@@ -173,18 +173,18 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   }
 
   // Add units of measurement to keywords from translation table
-  inst.FindKeyword("ExposureDuration").SetUnits("seconds");
+  inst.findKeyword("ExposureDuration").setUnits("seconds");
 
-  PvlGroup &bandBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
-  bandBin.FindKeyword("Center").SetUnits("micrometers");
-  bandBin.FindKeyword("Width").SetUnits("micrometers");
+  PvlGroup &bandBin = outputLabel->findGroup("BandBin", Pvl::Traverse);
+  bandBin.findKeyword("Center").setUnits("micrometers");
+  bandBin.findKeyword("Width").setUnits("micrometers");
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
   QString spacecraftNumber;
   int spacecraftCode = 0;
-  QString instId = (QString) inst.FindKeyword("InstrumentId");
-  if((QString) inst.FindKeyword("SpacecraftName") == "VOYAGER_1") {
+  QString instId = (QString) inst.findKeyword("InstrumentId");
+  if((QString) inst.findKeyword("SpacecraftName") == "VOYAGER_1") {
     spacecraftNumber = "1";
     if(instId == "NARROW_ANGLE_CAMERA") {
       spacecraftCode = -31101;
@@ -202,7 +202,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  else if((QString) inst.FindKeyword("SpacecraftName") == "VOYAGER_2") {
+  else if((QString) inst.findKeyword("SpacecraftName") == "VOYAGER_2") {
     spacecraftNumber = "2";
     if(instId == "NARROW_ANGLE_CAMERA") {
       spacecraftCode = -32101;
@@ -221,16 +221,16 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
     }
   }
   else {
-    QString msg = "Spacecraft name [" + (QString)inst.FindKeyword("SpacecraftName") +
+    QString msg = "Spacecraft name [" + (QString)inst.findKeyword("SpacecraftName") +
                  "] does not match Voyager1 or Voyager2 spacecraft";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   ocube->putGroup(kern);
 
   // Modify time to remove Z from end
-  QString time = inst.FindKeyword("StartTime")[0];
+  QString time = inst.findKeyword("StartTime")[0];
   time.remove("Z");
-  inst.FindKeyword("StartTime").SetValue(time);
+  inst.findKeyword("StartTime").setValue(time);
 
   // Fix image number - remove the period, if Wide angle camera and one of two
   // shutter modes, we must fix the wide angle image number for use below.
@@ -367,7 +367,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   char utcOut[25];
   et2utc_c(approxEphemeris, "ISOC", 3, 26, utcOut);
   NaifStatus::CheckErrors();
-  inst["StartTime"].SetValue(QString(utcOut));
+  inst["StartTime"].setValue(QString(utcOut));
 
   // Set up the nominal reseaus group
   PvlGroup res("Reseaus");
@@ -378,7 +378,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   type = PvlKeyword("Type");
   valid = PvlKeyword("Valid");
 
-  PvlKeyword key = nomRes.FindKeyword("VG" + spacecraftNumber + "_"
+  PvlKeyword key = nomRes.findKeyword("VG" + spacecraftNumber + "_"
                                       + instId.toUpper() + "_RESEAUS");
   int numRes = nomRes["VG" + spacecraftNumber + "_" + instId.toUpper()
                       + "_NUMBER_RESEAUS"];

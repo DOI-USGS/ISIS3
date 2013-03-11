@@ -85,7 +85,7 @@ int main() {
     bool result = false;
 
     try {
-      result = keyword.ReadCleanKeyword(keywordsToTry[key],
+      result = keyword.readCleanKeyword(keywordsToTry[key],
                                         keywordComments,
                                         keywordName,
                                         keywordValues);
@@ -166,8 +166,8 @@ int main() {
     cout << keyZRead << endl;
 
     Isis::PvlKeyword keyU("ARRAY_TEST", toString(5.87), "lightyears");
-    keyU.AddValue("5465.6", "lightyears");
-    keyU.AddValue("574.6", "lightyears");
+    keyU.addValue("5465.6", "lightyears");
+    keyU.addValue("574.6", "lightyears");
 
     PvlKeyword keyURead;
     stringstream streamU;
@@ -228,12 +228,12 @@ int main() {
 
     key2 += "5";
     key2 += QString("");
-    key2.AddValue("3.3", "feet");
-    key2.AddValue("Hello World!");
+    key2.addValue("3.3", "feet");
+    key2.addValue("Hello World!");
     QString str = "Hello World! This is a really really long comment that needs to"
                   " be wrapped onto several different lines to make the PVL file "
                   "look really pretty!";
-    key2.AddCommentWrapped(str);
+    key2.addCommentWrapped(str);
     cout << key2 << endl;
 
     cout << key2[1] << endl;
@@ -252,16 +252,16 @@ int main() {
 
     // Test SetUnits methods
     k = Isis::PvlKeyword("k", "radius", "meters");
-    k.AddValue("circumference", "meters");
+    k.addValue("circumference", "meters");
     cout << "\n\n"
          << "Test SetUnits methods:\n\n"
          << "  original condition of Keyword k :\n"
          << "    " << k << "\n\n"
          << "  after k.SetUnits(\"circumference\", \"Fathoms\") :\n";
-    k.SetUnits("circumference", "Fathoms");
+    k.setUnits("circumference", "Fathoms");
     cout << "    " << k << "\n\n"
          << "  after k.SetUnits(\"TeraFathoms\") :\n";
-    k.SetUnits("TeraFathoms");
+    k.setUnits("TeraFathoms");
     cout << "    " << k << "\n\n\n";
 
     //Test casting operators
@@ -307,15 +307,15 @@ int main() {
     // Template Keyword
     PvlKeyword pvlTmplKwrd("KeyName", "integer");
     PvlKeyword pvlKwrd("KeyName", "3");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
-    pvlKwrd.Clear();
+    pvlTmplKwrd.validateKeyword(pvlKwrd);
+    pvlKwrd.clear();
 
     pvlKwrd=PvlKeyword("KeyName", "null");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
-    pvlKwrd.Clear();
+    pvlTmplKwrd.validateKeyword(pvlKwrd);
+    pvlKwrd.clear();
     
     pvlKwrd=PvlKeyword("KeyName", toString(3.5));
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlTmplKwrd.validateKeyword(pvlKwrd);
   } 
   catch(Isis::IException &e) {
    cerr << "Invalid Keyword Type: Integer Expected" << endl;
@@ -325,7 +325,7 @@ int main() {
   try {
     PvlKeyword pvlTmplKwrd("KeyName", "integer");
     PvlKeyword pvlKwrd("KeyName", toString(-3));
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "positive");
+    pvlTmplKwrd.validateKeyword(pvlKwrd, "positive");
   } catch(Isis::IException &e) {
     cerr <<"Positive number Expected" << endl;
   }
@@ -335,7 +335,7 @@ int main() {
     PvlKeyword pvlTmplKwrd("KeyName", "integer");
     PvlKeyword pvlTmplKwrdRange("KeyName__Range", toString(0-10));
     PvlKeyword pvlKwrd("KeyName", toString(11));
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdRange);
+    pvlTmplKwrd.validateKeyword(pvlKwrd, "", &pvlTmplKwrdRange);
   } catch(Isis::IException &e) {
     cerr <<"Integer not in the Range. Expected (0-10)" << endl;
   }
@@ -344,15 +344,15 @@ int main() {
   try {
     PvlKeyword pvlTmplKwrd("KeyName", "string");
     PvlKeyword pvlTmplKwrdValue("KeyName__Value", "value0");
-    pvlTmplKwrdValue.AddValue("value1");
-    pvlTmplKwrdValue.AddValue("value2");
-    pvlTmplKwrdValue.AddValue("value3");
+    pvlTmplKwrdValue.addValue("value1");
+    pvlTmplKwrdValue.addValue("value2");
+    pvlTmplKwrdValue.addValue("value3");
     PvlKeyword pvlKwrd("KeyName", "VALUe3");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdValue);
-    pvlKwrd.Clear();
+    pvlTmplKwrd.validateKeyword(pvlKwrd, "", &pvlTmplKwrdValue);
+    pvlKwrd.clear();
 
     pvlKwrd=PvlKeyword("KeyName", "value");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdValue);
+    pvlTmplKwrd.validateKeyword(pvlKwrd, "", &pvlTmplKwrdValue);
   } 
   catch(Isis::IException &e) {
     cerr << "Invalid Keyword Value: Expected values \"value1\", \"value2\", \"value3\"" << endl;
@@ -362,15 +362,15 @@ int main() {
   try {
     PvlKeyword pvlTmplKwrd("KeyName", "boolean");
     PvlKeyword pvlKwrd("KeyName", "true");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
-    pvlKwrd.Clear();
+    pvlTmplKwrd.validateKeyword(pvlKwrd);
+    pvlKwrd.clear();
 
     pvlKwrd=PvlKeyword("KeyName", "null");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
-    pvlKwrd.Clear();
+    pvlTmplKwrd.validateKeyword(pvlKwrd);
+    pvlKwrd.clear();
     
     pvlKwrd=PvlKeyword("KeyName", "value");
-    pvlTmplKwrd.ValidateKeyword(pvlKwrd);
+    pvlTmplKwrd.validateKeyword(pvlKwrd);
   } 
   catch(Isis::IException &e) {
     cerr << "Invalid Keyword Type: Expected  Boolean values \"true\", \"false\", \"null\"" << endl;

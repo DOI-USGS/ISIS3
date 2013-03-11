@@ -33,21 +33,21 @@ int main(int argc, char *argv[]) {
   PvlKeyword instrument("InstrumentId", "IdealCamera");
   PvlKeyword endKey("StopTime", "2005 DEC 15 12:00:00.000 TDB");
   PvlKeyword endKey2("StopTime", "2005 JUN 15 12:14:00.000 TDB");
-  group2.AddKeyword(keyword);
-  group.AddKeyword(startKey);
-  group.AddKeyword(endKey);
-  group.AddKeyword(spacecraft);
-  group.AddKeyword(instrument);
-  obj.AddGroup(group);
-  obj.AddGroup(group2);
-  lab.AddObject(obj);
+  group2.addKeyword(keyword);
+  group.addKeyword(startKey);
+  group.addKeyword(endKey);
+  group.addKeyword(spacecraft);
+  group.addKeyword(instrument);
+  obj.addGroup(group);
+  obj.addGroup(group2);
+  lab.addObject(obj);
 
   Pvl lab2;
   PvlObject obj2("IsisCube");
-  group.AddKeyword(endKey2, Pvl::Replace);
-  obj2.AddGroup(group);
-  obj2.AddGroup(group2);
-  lab2.AddObject(obj2);
+  group.addKeyword(endKey2, Pvl::Replace);
+  obj2.addGroup(group);
+  obj2.addGroup(group2);
+  lab2.addObject(obj2);
 
   cout << "Pvl Label 1: " << endl;
   cout << lab << endl;
@@ -74,19 +74,19 @@ int main(int argc, char *argv[]) {
   // (3) A config file exists with one match case and a default (Mro)
   //    (a) test for default instrument settings
   //    (b) test for the correct match to CRISM
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("StartTime").SetValue("2008 JAN 12 00:00:00.0");
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("StopTime").SetValue("2008 JAN 12 00:00:00.0"); 
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("StartTime").setValue("2008 JAN 12 00:00:00.0");
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("StopTime").setValue("2008 JAN 12 00:00:00.0"); 
 
   // Note: The following is temporarily commented out since currently there is
   // no conf file for Messenger ISS NAC and WAC
   #if 0
   // (1) and (2a)
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("InstrumentId").SetValue("MDIS-NAC");
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("SpacecraftName").SetValue("Messenger");
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("InstrumentId").setValue("MDIS-NAC");
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("SpacecraftName").setValue("Messenger");
   cout << "/---------------------------------------/" << endl;
   cout << endl << endl;
   cout << "Messenger NAC Label: " << endl;
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
   testKernelAccessors(messengerMatchNac, lab, true);
   
   // (1) and (2b)
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("InstrumentId").SetValue("MDIS-WAC");
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("InstrumentId").setValue("MDIS-WAC");
   cout << "/---------------------------------------/" << endl;
   cout << endl << endl;
   cout << "Messenger WAC Label: " << endl;
@@ -108,10 +108,10 @@ int main(int argc, char *argv[]) {
   #endif
 
   // (1) and (3a)
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("SpacecraftName").SetValue("MarsReconnaissanceOrbiter");
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("InstrumentId").SetValue("HiRISE");
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("SpacecraftName").setValue("MarsReconnaissanceOrbiter");
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("InstrumentId").setValue("HiRISE");
   cout << "/---------------------------------------/" << endl;
   cout << endl << endl;
   cout << "Mro (non-CRISM) Instrument Label: " << endl;
@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
   testKernelAccessors(defaultMroInstrument, lab, true);
 
   // (1) and (3b)
-  lab.FindObject("IsisCube").FindGroup("Instrument")
-     .FindKeyword("InstrumentId").SetValue("CRISM");
+  lab.findObject("IsisCube").findGroup("Instrument")
+     .findKeyword("InstrumentId").setValue("CRISM");
   cout << "/---------------------------------------/" << endl;
   cout << endl << endl;
   cout << "Mro CRISM Label: " << endl;
@@ -164,51 +164,51 @@ int main(int argc, char *argv[]) {
   // this object's selection group has no kernel files
   PvlObject lsk("LeapSecond");
   PvlGroup selGrpLsk("Selection");
-  lsk.AddGroup(selGrpLsk);
-  kernelData.AddObject(lsk);
+  lsk.addGroup(selGrpLsk);
+  kernelData.addObject(lsk);
   // this object has a group that is not named Selection
   PvlObject pck("TargetAttitudeShape");
   PvlGroup selGrpPck("Selection");
   PvlGroup noSelGrpPck("NotSelectionGroup");
   PvlKeyword filePck("File");
-  pck.AddGroup(selGrpPck);
-  filePck.AddValue("pckTest????");
-  selGrpPck.AddKeyword(filePck);
-  noSelGrpPck.AddKeyword(filePck);
-  pck.AddGroup(selGrpPck);
-  pck.AddGroup(noSelGrpPck);
-  kernelData.AddObject(pck);
+  pck.addGroup(selGrpPck);
+  filePck.addValue("pckTest????");
+  selGrpPck.addKeyword(filePck);
+  noSelGrpPck.addKeyword(filePck);
+  pck.addGroup(selGrpPck);
+  pck.addGroup(noSelGrpPck);
+  kernelData.addObject(pck);
   // this selection group has different quality types allowed
   PvlObject spk("TargetPosition");
   PvlGroup selGrp1("Selection");
   PvlKeyword file1("File");
-  file1.AddValue("missionName");
-  file1.AddValue("spkPredict");
+  file1.addValue("missionName");
+  file1.addValue("spkPredict");
   PvlKeyword type1("Type");
-  type1.AddValue("Predicted");
-  selGrp1.AddKeyword(file1);
+  type1.addValue("Predicted");
+  selGrp1.addKeyword(file1);
   PvlGroup selGrp2("Selection");
   PvlKeyword file2("File");
-  file2.AddValue("missionName");
-  file2.AddValue("spkRecon");
+  file2.addValue("missionName");
+  file2.addValue("spkRecon");
   PvlKeyword type2("Type");
-  type2.AddValue("Reconstructed");
-  selGrp2.AddKeyword(file2);
+  type2.addValue("Reconstructed");
+  selGrp2.addKeyword(file2);
   PvlGroup selGrp3("Selection");
   PvlKeyword file3("File");
-  file3.AddValue("missionName");
-  file3.AddValue("spkSmith");
+  file3.addValue("missionName");
+  file3.addValue("spkSmith");
   PvlKeyword type3("Type");
-  type3.AddValue("Smithed");
-  selGrp3.AddKeyword(file3);
-  spk.AddGroup(selGrp1);
-  spk.AddGroup(selGrp2);
-  spk.AddGroup(selGrp3);
-  kernelData.AddObject(spk);
+  type3.addValue("Smithed");
+  selGrp3.addKeyword(file3);
+  spk.addGroup(selGrp1);
+  spk.addGroup(selGrp2);
+  spk.addGroup(selGrp3);
+  kernelData.addObject(spk);
   stringstream istrm;
   istrm << kernelData;
   KernelDb kdb2(istrm,  5);
-  lab.FindObject("IsisCube").FindGroup("Instrument").DeleteKeyword("StopTime");
+  lab.findObject("IsisCube").findGroup("Instrument").deleteKeyword("StopTime");
   cout << "Label, no StopTime: " << endl;
   cout << lab << endl << endl;
   testKernelAccessors(kdb2, lab, false);

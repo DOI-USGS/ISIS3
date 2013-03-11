@@ -55,26 +55,26 @@ void helperButtonGetBlobList() {
   int cnt = 0;
   while(!match) {
     // If we've gone through all objects and found nothing, throw an exception
-    if(cnt >= label.Objects()) {
+    if(cnt >= label.objects()) {
       pos = 0;
       QString msg = "Parameter [FROM] has no blobs.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit,
     // display "NAME" and "TYPE" parameters as blank
-    if(pos >= label.Objects()) {
+    if(pos >= label.objects()) {
       name = "";
       type = "";
       match = true;
       pos = 0;  // Prepare to start over again
     }
     // When we find a blob, fetch its name and type to stick in the parameters
-    else if(label.Object(pos).Type() == "Object" &&
-            label.Object(pos).HasKeyword("Name") &&
-            label.Object(pos).HasKeyword("StartByte") &&
-            label.Object(pos).HasKeyword("Bytes")) {
-      name = label.Object(pos)["Name"][0];
-      type = label.Object(pos).Name();
+    else if(label.object(pos).type() == "Object" &&
+            label.object(pos).hasKeyword("Name") &&
+            label.object(pos).hasKeyword("StartByte") &&
+            label.object(pos).hasKeyword("Bytes")) {
+      name = label.object(pos)["Name"][0];
+      type = label.object(pos).name();
       match = true;
       pos++;
     }

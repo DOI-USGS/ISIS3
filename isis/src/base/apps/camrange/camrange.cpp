@@ -18,7 +18,7 @@ void IsisMain() {
   Camera *cam = icube->camera();
   Pvl mapping;
   cam->BasicMapping(mapping);
-  PvlGroup &mapgrp = mapping.FindGroup("Mapping");
+  PvlGroup &mapgrp = mapping.findGroup("Mapping");
 
   // Setup the output results by first adding the filename
   UserInterface &ui = Application::GetUserInterface();
@@ -53,7 +53,7 @@ void IsisMain() {
   ugr += PvlKeyword("MaximumLongitude", toString(maxlon));
 
   // Get the ographic latitude range
-  mapgrp.AddKeyword(PvlKeyword("LatitudeType", "Planetographic"),
+  mapgrp.addKeyword(PvlKeyword("LatitudeType", "Planetographic"),
                     Pvl::Replace);
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup ogr("LatitudeRange");
@@ -62,7 +62,7 @@ void IsisMain() {
   ogr += PvlKeyword("MaximumLatitude", toString(maxlat));
 
   // Get positive west longitude coordinates in 360 domain
-  mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"),
+  mapgrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"),
                     Pvl::Replace);
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup pos360("PositiveWest360");
@@ -72,9 +72,9 @@ void IsisMain() {
   pos360 += PvlKeyword("MaximumLongitude", toString(maxlon));
 
   // Get positive east longitude coordinates in 180 domain
-  mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"),
+  mapgrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"),
                     Pvl::Replace);
-  mapgrp.AddKeyword(PvlKeyword("LongitudeDomain", "180"),
+  mapgrp.addKeyword(PvlKeyword("LongitudeDomain", "180"),
                     Pvl::Replace);
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup pos180("PositiveEast180");
@@ -84,7 +84,7 @@ void IsisMain() {
   pos180 += PvlKeyword("MaximumLongitude", toString(maxlon));
 
   // Get positive west longitude coordinates in 180 domain
-  mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"),
+  mapgrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"),
                     Pvl::Replace);
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup neg180("PositiveWest180");
@@ -105,14 +105,14 @@ void IsisMain() {
   // Write the output file if requested
   if(ui.WasEntered("TO")) {
     Pvl temp;
-    temp.AddGroup(target);
-    temp.AddGroup(res);
-    temp.AddGroup(ugr);
-    temp.AddGroup(ogr);
-    temp.AddGroup(pos360);
-    temp.AddGroup(pos180);
-    temp.AddGroup(neg180);
-    temp.Write(ui.GetFileName("TO", "txt"));
+    temp.addGroup(target);
+    temp.addGroup(res);
+    temp.addGroup(ugr);
+    temp.addGroup(ogr);
+    temp.addGroup(pos360);
+    temp.addGroup(pos180);
+    temp.addGroup(neg180);
+    temp.write(ui.GetFileName("TO", "txt"));
   }
 
   p.EndProcess();

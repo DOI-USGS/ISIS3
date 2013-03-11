@@ -20,7 +20,7 @@ void IsisMain() {
 
   //Checks if in file is rdr
   label = in.expanded();
-  if(label.HasObject("IMAGE_MAP_PROJECTION")) {
+  if(label.hasObject("IMAGE_MAP_PROJECTION")) {
     QString msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -38,7 +38,7 @@ void IsisMain() {
 void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the directory where the Lunar translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   QString transDir = (QString) dataDir["Lo"] + "/translations/";
@@ -48,15 +48,15 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
   bool hasFiducial = false;
   // Check to see if file is PDS
-  if(inputLabel.HasKeyword("PDS_VERSION_ID", Pvl::None)) {
-    QString pdsVersion = inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0];
+  if(inputLabel.hasKeyword("PDS_VERSION_ID", Pvl::None)) {
+    QString pdsVersion = inputLabel.findKeyword("PDS_VERSION_ID", Pvl::None)[0];
 
     if(pdsVersion == "PDS3") {
-      if(inputLabel.HasKeyword("LO:FIDUCIAL_ID", Pvl::Traverse)) {
+      if(inputLabel.hasKeyword("LO:FIDUCIAL_ID", Pvl::Traverse)) {
         hasFiducial = true;
         bandBinTransFile = transDir + "LoPdsFiducialImport.trn";
       }
-      else if(inputLabel.HasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
+      else if(inputLabel.hasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
         bandBinTransFile = transDir + "LoPdsBoresightImport.trn";
       }
       else {
@@ -72,11 +72,11 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   }
   // Else the input is an Isis2 cube
   else {
-    if(inputLabel.HasKeyword("FIDUCIAL_ID", Pvl::Traverse)) {
+    if(inputLabel.hasKeyword("FIDUCIAL_ID", Pvl::Traverse)) {
       hasFiducial = true;
       bandBinTransFile = transDir + "LoIsis2FiducialImport.trn";
     }
-    else if(inputLabel.HasKeyword("BORESIGHT_SAMPLE", Pvl::Traverse)) {
+    else if(inputLabel.hasKeyword("BORESIGHT_SAMPLE", Pvl::Traverse)) {
       bandBinTransFile = transDir + "LoIsis2BoresightImport.trn";
     }
     else {
@@ -95,50 +95,50 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
   labelXlater.Auto(*(outputLabel));
 
-  PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
   //Creates FiducialCoordinateMicron with the proper units
-  if(!inputLabel.HasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
-    QString fcm = (QString) inst.FindKeyword("FiducialCoordinateMicron");
+  if(!inputLabel.hasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
+    QString fcm = (QString) inst.findKeyword("FiducialCoordinateMicron");
     QString fcmUnits = fcm;
     fcmUnits.remove(QRegExp("^[0-9.]*"));
     fcm.remove(QRegExp("[a-zA-Z]*$"));
-    inst.FindKeyword("FiducialCoordinateMicron").SetValue(fcm, fcmUnits);
+    inst.findKeyword("FiducialCoordinateMicron").setValue(fcm, fcmUnits);
   }
 
   // High Resolution & Fiducial Medium Case
   if(hasFiducial) {
     //Add units to some keywords
-    PvlKeyword fxc = inst.FindKeyword("FiducialXCoordinates");
-    inst.FindKeyword("FiducialXCoordinates").Clear();
-    for(int i = 0; i < fxc.Size(); i++) {
-      inst.FindKeyword("FiducialXCoordinates").AddValue(fxc[i], "mm");
+    PvlKeyword fxc = inst.findKeyword("FiducialXCoordinates");
+    inst.findKeyword("FiducialXCoordinates").clear();
+    for(int i = 0; i < fxc.size(); i++) {
+      inst.findKeyword("FiducialXCoordinates").addValue(fxc[i], "mm");
     }
 
-    PvlKeyword fyc = inst.FindKeyword("FiducialYCoordinates");
-    inst.FindKeyword("FiducialYCoordinates").Clear();
-    for(int i = 0; i < fyc.Size(); i++) {
-      inst.FindKeyword("FiducialYCoordinates").AddValue(fyc[i], "mm");
+    PvlKeyword fyc = inst.findKeyword("FiducialYCoordinates");
+    inst.findKeyword("FiducialYCoordinates").clear();
+    for(int i = 0; i < fyc.size(); i++) {
+      inst.findKeyword("FiducialYCoordinates").addValue(fyc[i], "mm");
     }
 
-    PvlKeyword fl = inst.FindKeyword("FiducialLines");
-    inst.FindKeyword("FiducialLines").Clear();
-    for(int i = 0; i < fl.Size(); i++) {
-      inst.FindKeyword("FiducialLines").AddValue(fl[i], "pixels");
+    PvlKeyword fl = inst.findKeyword("FiducialLines");
+    inst.findKeyword("FiducialLines").clear();
+    for(int i = 0; i < fl.size(); i++) {
+      inst.findKeyword("FiducialLines").addValue(fl[i], "pixels");
     }
 
-    PvlKeyword fs = inst.FindKeyword("FiducialSamples");
-    inst.FindKeyword("FiducialSamples").Clear();
-    for(int i = 0; i < fs.Size(); i++) {
-      inst.FindKeyword("FiducialSamples").AddValue(fs[i], "pixels");
+    PvlKeyword fs = inst.findKeyword("FiducialSamples");
+    inst.findKeyword("FiducialSamples").clear();
+    for(int i = 0; i < fs.size(); i++) {
+      inst.findKeyword("FiducialSamples").addValue(fs[i], "pixels");
     }
   }
   else if(!hasFiducial) {
     //What needs to be done if it contains Boresight info
   }
 
-  QString instrumentID = inst.FindKeyword("InstrumentId");
-  QString spacecraftName = inst.FindKeyword("SpacecraftName");
+  QString instrumentID = inst.findKeyword("InstrumentId");
+  QString spacecraftName = inst.findKeyword("SpacecraftName");
 
   //Determines the NaifFrameCode
   PvlGroup kerns("Kernels");
@@ -161,15 +161,15 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   }
 
   //Create subframe and frame keywords
-  QString imgNumber = (QString) inst.FindKeyword("ImageNumber");
+  QString imgNumber = (QString) inst.findKeyword("ImageNumber");
   int subFrame = toInt(imgNumber.mid(5));
 
-  inst.AddKeyword(PvlKeyword("SubFrame", toString(subFrame)));
+  inst.addKeyword(PvlKeyword("SubFrame", toString(subFrame)));
   //ImageNumber is auto translated, and no longer needed
-  inst.DeleteKeyword("ImageNumber");
+  inst.deleteKeyword("ImageNumber");
 
   kerns += PvlKeyword("NaifFrameCode", frameCode);
-  outputLabel->FindObject("IsisCube").AddGroup(kerns);
+  outputLabel->findObject("IsisCube").addGroup(kerns);
 
   return;
 }

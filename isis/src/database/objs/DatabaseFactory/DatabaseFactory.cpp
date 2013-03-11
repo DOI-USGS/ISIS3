@@ -493,13 +493,13 @@ namespace Isis {
    */
   void DatabaseFactory::initPreferences() {
     Preference &userPref = Preference::Preferences();
-    if(userPref.HasGroup("Database")) {
-      PvlGroup &dbgroup = userPref.FindGroup("Database");
-      if(dbgroup.HasKeyword("AccessConfig")) {
+    if(userPref.hasGroup("Database")) {
+      PvlGroup &dbgroup = userPref.findGroup("Database");
+      if(dbgroup.hasKeyword("AccessConfig")) {
         addAccessProfile(dbgroup["AccessConfig"]);
       }
       // Get default profile name for later use
-      if(dbgroup.HasKeyword("DefaultProfile"))
+      if(dbgroup.hasKeyword("DefaultProfile"))
         _defProfName = (QString) dbgroup["DefaultProfile"];
     }
     return;

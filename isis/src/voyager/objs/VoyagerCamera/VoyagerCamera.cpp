@@ -67,7 +67,7 @@ namespace Isis {
     SetFocalLength();
     // Find out what camera is being used, and set the focal length, altinstcode,
     // and camera
-    PvlGroup inst = lab.FindGroup ("Instrument",Pvl::Traverse);
+    PvlGroup inst = lab.findGroup ("Instrument",Pvl::Traverse);
     QString spacecraft = (QString)inst["SpacecraftName"];
     QString instId = (QString)inst["InstrumentId"];
 

@@ -45,8 +45,8 @@ void IsisMain() {
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube and get the camera
   icube = p.SetInputCube("FROM");
@@ -62,101 +62,101 @@ void IsisMain() {
   // Get the mapping group from the camera
   Pvl camMap;
   incam->basicRingMapping(camMap);
-  PvlGroup &camGrp = camMap.FindGroup("Mapping");
+  PvlGroup &camGrp = camMap.findGroup("Mapping");
 
   // Make the target info match the user mapfile
   double minrad, maxrad, minaz, maxaz;
   incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
-  camGrp.AddKeyword(PvlKeyword("MinimumRadius", toString(minrad)), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MaximumRadius", toString(maxrad)), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MinimumAzimuth", toString(minaz)), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MaximumAzimuth", toString(maxaz)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumRadius", toString(minrad)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumRadius", toString(maxrad)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumAzimuth", toString(minaz)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumAzimuth", toString(maxaz)), Pvl::Replace);
 
   // We want to delete the keywords we just added if the user wants the range
   // out of the mapfile, otherwise they will replace any keywords not in the
   // mapfile
   if (ui.GetString("DEFAULTRANGE") == "MAP" || ui.GetBoolean("MATCHMAP")) {
-    camGrp.DeleteKeyword("MinimumRadius");
-    camGrp.DeleteKeyword("MaximumRadius");
-    camGrp.DeleteKeyword("MinimumAzimuth");
-    camGrp.DeleteKeyword("MaximumAzimuth");
+    camGrp.deleteKeyword("MinimumRadius");
+    camGrp.deleteKeyword("MaximumRadius");
+    camGrp.deleteKeyword("MinimumAzimuth");
+    camGrp.deleteKeyword("MaximumAzimuth");
   }
   // Otherwise, remove the keywords from the map file so the camera keywords
   // will be propogated correctly
   else {
-    while(userGrp.HasKeyword("MinimumRadius")) {
-      userGrp.DeleteKeyword("MinimumRadius");
+    while(userGrp.hasKeyword("MinimumRadius")) {
+      userGrp.deleteKeyword("MinimumRadius");
     }
-    while(userGrp.HasKeyword("MinimumAzimuth")) {
-      userGrp.DeleteKeyword("MinimumAzimuth");
+    while(userGrp.hasKeyword("MinimumAzimuth")) {
+      userGrp.deleteKeyword("MinimumAzimuth");
     }
-    while(userGrp.HasKeyword("MaximumRadius")) {
-      userGrp.DeleteKeyword("MaximumRadius");
+    while(userGrp.hasKeyword("MaximumRadius")) {
+      userGrp.deleteKeyword("MaximumRadius");
     }
-    while(userGrp.HasKeyword("MaximumAzimuth")) {
-      userGrp.DeleteKeyword("MaximumAzimuth");
+    while(userGrp.hasKeyword("MaximumAzimuth")) {
+      userGrp.deleteKeyword("MaximumAzimuth");
     }
   }
 
   // If the user decided to enter a ground range then override
   if(ui.WasEntered("MINAZ") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.AddKeyword(PvlKeyword("MinimumAzimuth",
+    userGrp.addKeyword(PvlKeyword("MinimumAzimuth",
                                   toString(ui.GetDouble("MINAZ"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXAZ") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.AddKeyword(PvlKeyword("MaximumAzimuth",
+    userGrp.addKeyword(PvlKeyword("MaximumAzimuth",
                                   toString(ui.GetDouble("MAXAZ"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MINRAD") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.AddKeyword(PvlKeyword("MinimumRadius",
+    userGrp.addKeyword(PvlKeyword("MinimumRadius",
                                   toString(ui.GetDouble("MINRAD"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXRAD") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.AddKeyword(PvlKeyword("MaximumRadius",
+    userGrp.addKeyword(PvlKeyword("MaximumRadius",
                                   toString(ui.GetDouble("MAXRAD"))), Pvl::Replace);
   }
 
   // If they want the res. from the mapfile, delete it from the camera so
   // nothing gets overridden
   if(ui.GetString("PIXRES") == "MAP" || ui.GetBoolean("MATCHMAP")) {
-    camGrp.DeleteKeyword("PixelResolution");
+    camGrp.deleteKeyword("PixelResolution");
   }
   // Otherwise, delete any resolution keywords from the mapfile so the camera
   // info is propagated over
   else if(ui.GetString("PIXRES") == "CAMERA") {
-    if(userGrp.HasKeyword("Scale")) {
-      userGrp.DeleteKeyword("Scale");
+    if(userGrp.hasKeyword("Scale")) {
+      userGrp.deleteKeyword("Scale");
     }
-    if(userGrp.HasKeyword("PixelResolution")) {
-      userGrp.DeleteKeyword("PixelResolution");
+    if(userGrp.hasKeyword("PixelResolution")) {
+      userGrp.deleteKeyword("PixelResolution");
     }
   }
 
   // Copy any defaults that are not in the user map from the camera map file
-  for(int k = 0; k < camGrp.Keywords(); k++) {
-    if(!userGrp.HasKeyword(camGrp[k].Name())) {
+  for(int k = 0; k < camGrp.keywords(); k++) {
+    if(!userGrp.hasKeyword(camGrp[k].name())) {
       userGrp += camGrp[k];
     }
   }
 
   // If the user decided to enter a resolution then override
   if(ui.GetString("PIXRES") == "MPP" && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.AddKeyword(PvlKeyword("PixelResolution",
+    userGrp.addKeyword(PvlKeyword("PixelResolution",
                                   toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
-    if(userGrp.HasKeyword("Scale")) {
-      userGrp.DeleteKeyword("Scale");
+    if(userGrp.hasKeyword("Scale")) {
+      userGrp.deleteKeyword("Scale");
     }
   }
   else if(ui.GetString("PIXRES") == "PPD" && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.AddKeyword(PvlKeyword("Scale",
+    userGrp.addKeyword(PvlKeyword("Scale",
                                   toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
-    if(userGrp.HasKeyword("PixelResolution")) {
-      userGrp.DeleteKeyword("PixelResolution");
+    if(userGrp.hasKeyword("PixelResolution")) {
+      userGrp.deleteKeyword("PixelResolution");
     }
   }
 
@@ -168,22 +168,22 @@ void IsisMain() {
     if (incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
       if(ui.GetString("AZSEAM") == "AUTO") {
         if((int) userGrp["AzimuthDomain"] == 360) {
-          userGrp.AddKeyword(PvlKeyword("AzimuthDomain", "180"),
+          userGrp.addKeyword(PvlKeyword("AzimuthDomain", "180"),
                              Pvl::Replace);
           if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.AddKeyword(PvlKeyword("AzimuthDomain", "360"),
+            userGrp.addKeyword(PvlKeyword("AzimuthDomain", "360"),
                                Pvl::Replace);
           }
         }
         else {
-          userGrp.AddKeyword(PvlKeyword("AzimuthDomain", "360"),
+          userGrp.addKeyword(PvlKeyword("AzimuthDomain", "360"),
                              Pvl::Replace);
           if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.AddKeyword(PvlKeyword("AzimuthDomain", "180"),
+            userGrp.addKeyword(PvlKeyword("AzimuthDomain", "180"),
                                Pvl::Replace);
           }
         }
@@ -192,16 +192,16 @@ void IsisMain() {
         double minrad, maxrad, minaz, maxaz;
         incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
         if(!ui.WasEntered("MINRAD")) {
-          userGrp.AddKeyword(PvlKeyword("MinimumRadius", toString(minrad)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MinimumRadius", toString(minrad)), Pvl::Replace);
         }
         if(!ui.WasEntered("MAXRAD")) {
-          userGrp.AddKeyword(PvlKeyword("MaximumRadius", toString(maxrad)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MaximumRadius", toString(maxrad)), Pvl::Replace);
         }
         if(!ui.WasEntered("MINAZ")) {
-          userGrp.AddKeyword(PvlKeyword("MinimumAzimuth", toString(minaz)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MinimumAzimuth", toString(minaz)), Pvl::Replace);
         }
         if(!ui.WasEntered("MAXAZ")) {
-          userGrp.AddKeyword(PvlKeyword("MaximumAzimuth", toString(maxaz)), Pvl::Replace);
+          userGrp.addKeyword(PvlKeyword("MaximumAzimuth", toString(maxaz)), Pvl::Replace);
         }
       }
 
@@ -380,7 +380,7 @@ void IsisMain() {
     int frameSize = dmap->frameletHeight() / dmap->LineScaleFactor();
 
     // Check for even/odd cube to determine starting line
-    PvlGroup &instGrp = icube->label()->FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &instGrp = icube->label()->findGroup("Instrument", Pvl::Traverse);
     int startLine = 1;
 
     // Get the alpha cube group in case they cropped the image
@@ -566,9 +566,9 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP"));
 
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Application::GuiLog(userGrp);
@@ -580,17 +580,17 @@ void LoadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
-  if(userGrp.HasKeyword("Scale")) {
+  if(userGrp.hasKeyword("Scale")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["Scale"]);
     ui.Clear("PIXRES");
     ui.PutAsString("PIXRES", "PPD");
   }
-  else if(userGrp.HasKeyword("PixelResolution")) {
+  else if(userGrp.hasKeyword("PixelResolution")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["PixelResolution"]);
     ui.Clear("PIXRES");
@@ -613,7 +613,7 @@ void LoadCameraRes() {
   Camera *cam = c.camera();
   Pvl camMap;
   cam->BasicMapping(camMap);
-  PvlGroup &camGrp = camMap.FindGroup("Mapping");
+  PvlGroup &camGrp = camMap.findGroup("Mapping");
 
   ui.Clear("RESOLUTION");
   ui.PutDouble("RESOLUTION", camGrp["PixelResolution"]);
@@ -628,8 +628,8 @@ void LoadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
   int count = 0;
@@ -637,19 +637,19 @@ void LoadMapRange() {
   ui.Clear("MAXRAD");
   ui.Clear("MINAZ");
   ui.Clear("MAXAZ");
-  if(userGrp.HasKeyword("MinimumRadius")) {
+  if(userGrp.hasKeyword("MinimumRadius")) {
     ui.PutDouble("MINRAD", userGrp["MinimumRadius"]);
     count++;
   }
-  if(userGrp.HasKeyword("MaximumRadius")) {
+  if(userGrp.hasKeyword("MaximumRadius")) {
     ui.PutDouble("MAXRAD", userGrp["MaximumRadius"]);
     count++;
   }
-  if(userGrp.HasKeyword("MinimumAzimuth")) {
+  if(userGrp.hasKeyword("MinimumAzimuth")) {
     ui.PutDouble("MINAZ", userGrp["MinimumAzimuth"]);
     count++;
   }
-  if(userGrp.HasKeyword("MaximumAzimuth")) {
+  if(userGrp.hasKeyword("MaximumAzimuth")) {
     ui.PutDouble("MAXAZ", userGrp["MaximumAzimuth"]);
     count++;
   }
@@ -672,7 +672,7 @@ void LoadCameraRange() {
 
   // Get the map projection file provided by the user
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
+  userMap.read(ui.GetFileName("MAP"));
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;

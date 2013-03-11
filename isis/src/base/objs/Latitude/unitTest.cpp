@@ -167,8 +167,8 @@ int main(int argc, char *argv[]) {
 
   try {
     Isis::Pvl latRangeTest;
-    latRangeTest.AddGroup(Isis::PvlGroup("Mapping"));
-    Isis::PvlGroup &latTestGroup = latRangeTest.FindGroup("Mapping");
+    latRangeTest.addGroup(Isis::PvlGroup("Mapping"));
+    Isis::PvlGroup &latTestGroup = latRangeTest.findGroup("Mapping");
     latTestGroup += Isis::PvlKeyword("ProjectionName", "Equirectangular");
     latTestGroup += Isis::PvlKeyword("EquatorialRadius", "5000.0");
     latTestGroup += Isis::PvlKeyword("PolarRadius", "1000.0");

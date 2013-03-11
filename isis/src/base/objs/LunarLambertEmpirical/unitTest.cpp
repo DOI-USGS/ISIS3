@@ -22,10 +22,10 @@ int main() {
   alg += PvlKeyword("PhaseCurveList", "0.03338,0.03386,0.03350,0.03247,0.03109,0.02949,0.02780,0.02608,0.02432,0.02246,0.02050,0.01832,0.01599,0.01363,0.01134,0.009113,0.006710,0.003510,0.");
 
   PvlObject o("PhotometricModel");
-  o.AddGroup(alg);
+  o.addGroup(alg);
 
   Pvl pvl;
-  pvl.AddObject(o);
+  pvl.addObject(o);
   std::cout << pvl << std::endl << std::endl;
 
   try {

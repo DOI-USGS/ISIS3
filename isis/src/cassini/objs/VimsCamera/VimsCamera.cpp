@@ -57,7 +57,7 @@ namespace Isis {
   VimsCamera::VimsCamera(Pvl &lab) : Camera(lab) {
     NaifStatus::CheckErrors();
 
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString channel = (QString) inst ["Channel"];
 
     // Set Frame mounting

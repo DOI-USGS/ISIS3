@@ -24,7 +24,7 @@
 
 #include "PvlContainer.h"
 
-namespace Isis {  
+namespace Isis {
   /**
    * @brief Contains multiple PvlContainers
    *
@@ -49,7 +49,9 @@ namespace Isis {
    *  @history 2010-04-13 Eric Hyer - Added copy constructor
    *                                  Added assignment operator
    *  @history 2010-09-27 Sharmila Prasad - Added API to Validate a PVLGroup
-   *  
+   *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
+   *                          names up to the current Isis 3 coding standards. Fixes #1533.
+   *
    *  @todo 2005-04-04 Needs coded example.
    */
   class PvlGroup : public Isis::PvlContainer {
@@ -59,19 +61,19 @@ namespace Isis {
       PvlGroup(const PvlGroup &other);
 
       //! Validate a Group comparing with the Template Group
-      void ValidateGroup(PvlGroup & pPvlGrp);
-      
+      void validateGroup(PvlGroup & pPvlGrp);
+
       friend std::istream &operator>>(std::istream &is, PvlGroup &result);
       friend std::ostream &operator<<(std::ostream &os, PvlGroup &group);
       /**
        * Whenever the '==' operator is used on a PvlGroup object, it will call
-       * the StringEqual() method. This returns a boolean value.
+       * the stringEqual() method. This returns a boolean value.
        * @param group The PvlGroup object to compare.
        * @return True if the other PvlGroup has the same name as this one, false
        * if not.
        */
       bool operator==(const PvlGroup &group) const {
-        return PvlKeyword::StringEqual(group.Name(), this->Name());
+        return PvlKeyword::stringEqual(group.name(), this->name());
       };
 
       const PvlGroup &operator=(const PvlGroup &other);

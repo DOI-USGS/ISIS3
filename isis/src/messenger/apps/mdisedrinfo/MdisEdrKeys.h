@@ -122,7 +122,7 @@ namespace Isis {
        */
       void add(const PvlKeyword &key, const QString &name = "") {
         if(name.isEmpty()) {
-          _keys.add(key.Name(), key);
+          _keys.add(key.name(), key);
         }
         else {
           _keys.add(name, key);
@@ -217,20 +217,20 @@ namespace Isis {
           keyname = keyname.trimmed();
           try {
             PvlKeyword &key = _keys.get(keyname);
-            if(group) group->AddKeyword(key);
-            if((key.Size() == 0) || (key.IsNull())) {
+            if(group) group->addKeyword(key);
+            if((key.size() == 0) || (key.isNull())) {
               out << loopSep << "NULL";
             }
-            else if(key.Size() == 1) {
-              out << loopSep << key[0] << formatUnit(key.Unit(0));
+            else if(key.size() == 1) {
+              out << loopSep << key[0] << formatUnit(key.unit(0));
             }
             else {
               out << loopSep << "(";
               QString vsep("");
-              for(int iv = 0 ; iv < key.Size() ; iv++) {
+              for(int iv = 0 ; iv < key.size() ; iv++) {
                 out << vsep << key[iv];
                 if(key[iv] != NAstr) {
-                  out << formatUnit(key.Unit(iv));
+                  out << formatUnit(key.unit(iv));
                 }
                 vsep = ",";
               }
@@ -274,11 +274,11 @@ namespace Isis {
                    const QString prefix = "") {
         QString prekey(prefix);
         if(!prefix.isEmpty()) prekey += "/";
-        PvlContainer::PvlKeywordIterator keyIter = p.Begin();
-        for(; keyIter != p.End() ;  ++keyIter) {
-          QString keyname = prefix + keyIter->Name();
+        PvlContainer::PvlKeywordIterator keyIter = p.begin();
+        for(; keyIter != p.end() ;  ++keyIter) {
+          QString keyname = prefix + keyIter->name();
           PvlKeyword key = *keyIter;
-          key.SetName(keyname);
+          key.setName(keyname);
           keys.add(keyname, key);
         }
         return;
@@ -294,8 +294,8 @@ namespace Isis {
        * @param keys  Container to add the group keywords to
        */
       void LoadGroups(PvlObject &obj, KeyList &keys) {
-        PvlObject::PvlGroupIterator current = obj.BeginGroup();
-        for(; current != obj.EndGroup() ; ++current) {
+        PvlObject::PvlGroupIterator current = obj.beginGroup();
+        for(; current != obj.endGroup() ; ++current) {
           MapKeys(*current, keys);
         }
         return;
@@ -317,13 +317,13 @@ namespace Isis {
 
         //  Now load all the rest of the object keywords ingnoring
         //  all SUBFRAME[12345]_PARAMETERS since they are unsupported.
-        PvlObject::PvlObjectIterator objIter = obj.BeginObject();
-        for(; objIter != obj.EndObject() ; ++objIter) {
-          QString objname(objIter->Name());
+        PvlObject::PvlObjectIterator objIter = obj.beginObject();
+        for(; objIter != obj.endObject() ; ++objIter) {
+          QString objname(objIter->name());
           objname = objname.toUpper();
           int gotSubframe = objname.indexOf("SUBFRAME");
           if(gotSubframe != -1) {
-            LoadKeys(*objIter, keys, objIter->Name());
+            LoadKeys(*objIter, keys, objIter->name());
           }
           else {
             LoadKeys(*objIter, keys);

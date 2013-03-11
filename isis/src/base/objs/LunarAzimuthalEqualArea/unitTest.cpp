@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
   cout << "UNIT TEST FOR LunarAzimuthalEqualArea\n\n";
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("EquatorialRadius", toString(6378206.4));
   mapGroup += PvlKeyword("PolarRadius", toString(6378206.4));
   mapGroup += PvlKeyword("LatitudeType", "Planetographic");

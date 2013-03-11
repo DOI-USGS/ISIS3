@@ -32,7 +32,7 @@ namespace Isis {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.
-        QString snTemp = label.FileName();
+        QString snTemp = label.fileName();
         if(!snTemp.isEmpty()) {
           sn = FileName(snTemp).name();
         }
@@ -74,7 +74,7 @@ namespace Isis {
    */
   PvlGroup ObservationNumber::FindObservationTranslation(Pvl &label) {
     Pvl outLabel;
-    static PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+    static PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
 
     // Get the mission name
     static QString missionTransFile = (QString) dataDir["base"] + "/translations/MissionName2DataDir.trn";
@@ -107,7 +107,7 @@ namespace Isis {
       // Delets the extra
       Pvl translation(snFile.expanded());
       PvlKeyword observationKeys;
-      if(translation.HasKeyword("ObservationKeys")) {
+      if(translation.hasKeyword("ObservationKeys")) {
         observationKeys = translation["ObservationKeys"];
       }
 
@@ -122,14 +122,14 @@ namespace Isis {
 
     translationIterator->second.first.SetLabel(label);
     translationIterator->second.first.Auto(outLabel);
-    PvlGroup snGroup = outLabel.FindGroup("SerialNumberKeywords");
+    PvlGroup snGroup = outLabel.findGroup("SerialNumberKeywords");
 
     // Delets the extra
-    if(!translationIterator->second.second.Name().isEmpty()) {
+    if(!translationIterator->second.second.name().isEmpty()) {
       snGroup += translationIterator->second.second;
     }
     else {
-      snGroup += PvlKeyword("ObservationKeys", toString(snGroup.Keywords()));
+      snGroup += PvlKeyword("ObservationKeys", toString(snGroup.keywords()));
     }
 
     return snGroup;

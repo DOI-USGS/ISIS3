@@ -132,11 +132,11 @@ void IsisMain() {
 
   // Log the changes to NBANDS and to TRACK if any
   PvlObject hist = Isis::iApp->History();
-  Isis::iApp->Log(hist.FindGroup("UserParameters"));
+  Isis::iApp->Log(hist.findGroup("UserParameters"));
 
   // Logs the input file location in the mosaic
-  for (int i = 0; i < p.imagePositions().Groups(); i++) {
-    Application::Log(p.imagePositions().Group(i));
+  for (int i = 0; i < p.imagePositions().groups(); i++) {
+    Application::Log(p.imagePositions().group(i));
   }
 }
 

@@ -80,17 +80,17 @@ void IsisMain() {
     cInCube->read(cOriginalBlob);
     Pvl cOrigLabel;
     PvlObject cOrigLabelObj = cOriginalBlob.ReturnLabels();
-    cOrigLabelObj.SetName("OriginalLabelObject");
-    cOrigLabel.AddObject(cOrigLabelObj);
+    cOrigLabelObj.setName("OriginalLabelObject");
+    cOrigLabel.addObject(cOrigLabelObj);
 
     // Translates the ISIS labels along with the original EDR labels
-    cOrigLabel.AddObject(*(cInCube->label()));
+    cOrigLabel.addObject(*(cInCube->label()));
     PvlTranslationManager cCubeLabel2(cOrigLabel, "$lro/translations/mrfExportOrigLabel.trn");
     cCubeLabel2.Auto(pdsLabel);
 
 
-    if(cInLabel->FindObject("IsisCube").FindGroup("Instrument").HasKeyword("MissionName")) {
-      PvlKeyword &cKeyMissionName = cInLabel->FindObject("IsisCube").FindGroup("Instrument").FindKeyword("MissionName");
+    if(cInLabel->findObject("IsisCube").findGroup("Instrument").hasKeyword("MissionName")) {
+      PvlKeyword &cKeyMissionName = cInLabel->findObject("IsisCube").findGroup("Instrument").findKeyword("MissionName");
       int sFound = cKeyMissionName[0].indexOf("CHANDRAYAAN");
       if(sFound != -1) {
         cCubeLabel2 = PvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelCH1.trn");
@@ -106,16 +106,16 @@ void IsisMain() {
     PvlGroup &cBandBinGrp = cInCube->group("BandBin");
     PvlKeyword cKeyBandBin = PvlKeyword("BAND_NAME");
     PvlKeyword cKeyInBandBin;
-    if(cBandBinGrp.HasKeyword("OriginalBand")) {
-      cKeyInBandBin = cBandBinGrp.FindKeyword("OriginalBand");
+    if(cBandBinGrp.hasKeyword("OriginalBand")) {
+      cKeyInBandBin = cBandBinGrp.findKeyword("OriginalBand");
     }
-    else if(cBandBinGrp.HasKeyword("FilterName")) {
-      cKeyInBandBin = cBandBinGrp.FindKeyword("FilterName");
+    else if(cBandBinGrp.hasKeyword("FilterName")) {
+      cKeyInBandBin = cBandBinGrp.findKeyword("FilterName");
     }
-    for(int i = 0; i < cKeyInBandBin.Size(); i++) {
+    for(int i = 0; i < cKeyInBandBin.size(); i++) {
       cKeyBandBin += cKeyInBandBin[i];
     }
-    PvlObject &cImageObject(pdsLabel.FindObject("IMAGE"));
+    PvlObject &cImageObject(pdsLabel.findObject("IMAGE"));
     cImageObject += cKeyBandBin;
   }
 
@@ -142,10 +142,10 @@ void IsisMain() {
   // Distinguish betweeen Level 2 and 3 images by calling the camera()
   // function as only non mosaic images(Level2) have a camera
   if(bLevel2) {
-    pdsLabel.SetFormatTemplate("$lro/translations/mrfPdsLevel2.pft");
+    pdsLabel.setFormatTemplate("$lro/translations/mrfPdsLevel2.pft");
   }
   else {
-    pdsLabel.SetFormatTemplate("$lro/translations/mrfPdsLevel3.pft");
+    pdsLabel.setFormatTemplate("$lro/translations/mrfPdsLevel3.pft");
   }
 
   int iFound = outFileName.indexOf(".lbl");
@@ -172,40 +172,40 @@ void GetUserLabel(QString psUserLbl, Pvl &pcPdsLbl, bool pbLevel2) {
   Pvl cUsrPvl(psUserLbl);
 
   /*if (pbLevel2 &&
-      (cUsrPvl.HasKeyword("SPACECRAFT_CLOCK_START_COUNT") ||
-       cUsrPvl.HasKeyword("SPACECRAFT_CLOCK_STOP_COUNT")  ||
-       cUsrPvl.HasKeyword("START_TIME") ||
-       cUsrPvl.HasKeyword("STOP_TIME"))) {
+      (cUsrPvl.hasKeyword("SPACECRAFT_CLOCK_START_COUNT") ||
+       cUsrPvl.hasKeyword("SPACECRAFT_CLOCK_STOP_COUNT")  ||
+       cUsrPvl.hasKeyword("START_TIME") ||
+       cUsrPvl.hasKeyword("STOP_TIME"))) {
 
        QString msg = "Unsupported User defined keywords for Level2";
        throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
   }*/
 
   // Add all the keywords in the root
-  for(int j = 0; j < cUsrPvl.Keywords(); j++) {
-    if(pcPdsLbl.HasKeyword(cUsrPvl[j].Name())) {
-      PvlKeyword &cKey = pcPdsLbl.FindKeyword(cUsrPvl[j].Name());
-      cKey.Clear();
-      cKey.SetValue(cUsrPvl[j][0]);
+  for(int j = 0; j < cUsrPvl.keywords(); j++) {
+    if(pcPdsLbl.hasKeyword(cUsrPvl[j].name())) {
+      PvlKeyword &cKey = pcPdsLbl.findKeyword(cUsrPvl[j].name());
+      cKey.clear();
+      cKey.setValue(cUsrPvl[j][0]);
     }
     else
-      pcPdsLbl.AddKeyword(cUsrPvl[j]);
+      pcPdsLbl.addKeyword(cUsrPvl[j]);
   }
 
   // Add keywords in the objects
-  for(int j = 0; j < cUsrPvl.Objects(); j++) {
-    PvlObject cUsrObject = cUsrPvl.Object(j);
-    if(pcPdsLbl.HasObject(cUsrObject.Name())) {
-      PvlObject &cObject = pcPdsLbl.FindObject(cUsrObject.Name());
-      for(int k = 0; k < cUsrObject.Keywords(); k++) {
+  for(int j = 0; j < cUsrPvl.objects(); j++) {
+    PvlObject cUsrObject = cUsrPvl.object(j);
+    if(pcPdsLbl.hasObject(cUsrObject.name())) {
+      PvlObject &cObject = pcPdsLbl.findObject(cUsrObject.name());
+      for(int k = 0; k < cUsrObject.keywords(); k++) {
         PvlKeyword cUsrKeyword = cUsrObject[k];
-        if(cObject.HasKeyword(cUsrKeyword.Name())) {
-          PvlKeyword &cKey = cObject.FindKeyword(cUsrKeyword.Name());
-          cKey.Clear();
-          cKey.SetValue(cUsrKeyword[0]);
+        if(cObject.hasKeyword(cUsrKeyword.name())) {
+          PvlKeyword &cKey = cObject.findKeyword(cUsrKeyword.name());
+          cKey.clear();
+          cKey.setValue(cUsrKeyword[0]);
         }
         else {
-          cObject.AddKeyword(cUsrKeyword);
+          cObject.addKeyword(cUsrKeyword);
         }
       }
     }
@@ -224,11 +224,11 @@ void GetUserLabel(QString psUserLbl, Pvl &pcPdsLbl, bool pbLevel2) {
 void GetSourceProductID(QString psSrcListFile, QString psSrcType, Pvl &pcPdsLbl) {
   PvlKeyword cKeySrcPrdId;
 
-  if(pcPdsLbl.HasKeyword("SOURCE_PRODUCT_ID")) {
-    pcPdsLbl.DeleteKeyword("SOURCE_PRODUCT_ID");
+  if(pcPdsLbl.hasKeyword("SOURCE_PRODUCT_ID")) {
+    pcPdsLbl.deleteKeyword("SOURCE_PRODUCT_ID");
   }
 
-  cKeySrcPrdId.SetName("SOURCE_PRODUCT_ID");
+  cKeySrcPrdId.setName("SOURCE_PRODUCT_ID");
 
   // List File name
   if(psSrcType == "LIST") {
@@ -265,47 +265,47 @@ void GetSourceProductID(QString psSrcListFile, QString psSrcType, Pvl &pcPdsLbl)
 void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
   // Level 3
   if(!pbLevel2) {
-    if(pcPdsLbl.HasKeyword("LINE_EXPOSURE_DURATION")) {
-      pcPdsLbl.DeleteKeyword("LINE_EXPOSURE_DURATION");
+    if(pcPdsLbl.hasKeyword("LINE_EXPOSURE_DURATION")) {
+      pcPdsLbl.deleteKeyword("LINE_EXPOSURE_DURATION");
     }
-    if(pcPdsLbl.HasKeyword("ORBIT_NUMBER")) {
-      pcPdsLbl.DeleteKeyword("ORBIT_NUMBER");
+    if(pcPdsLbl.hasKeyword("ORBIT_NUMBER")) {
+      pcPdsLbl.deleteKeyword("ORBIT_NUMBER");
     }
-    if(pcPdsLbl.HasKeyword("INCIDENCE_ANGLE")) {
-      pcPdsLbl.DeleteKeyword("INCIDENCE_ANGLE");
+    if(pcPdsLbl.hasKeyword("INCIDENCE_ANGLE")) {
+      pcPdsLbl.deleteKeyword("INCIDENCE_ANGLE");
     }
-    if(pcPdsLbl.HasKeyword("INSTRUMENT_MODE_ID")) {
-      pcPdsLbl.DeleteKeyword("INSTRUMENT_MODE_ID");
+    if(pcPdsLbl.hasKeyword("INSTRUMENT_MODE_ID")) {
+      pcPdsLbl.deleteKeyword("INSTRUMENT_MODE_ID");
     }
-    if(pcPdsLbl.HasKeyword("INSTRUMENT_MODE_DESC")) {
-      pcPdsLbl.DeleteKeyword("INSTRUMENT_MODE_DESC");
+    if(pcPdsLbl.hasKeyword("INSTRUMENT_MODE_DESC")) {
+      pcPdsLbl.deleteKeyword("INSTRUMENT_MODE_DESC");
     }
-    if(pcPdsLbl.HasKeyword("LOOK_DIRECTION")) {
-      pcPdsLbl.DeleteKeyword("LOOK_DIRECTION");
+    if(pcPdsLbl.hasKeyword("LOOK_DIRECTION")) {
+      pcPdsLbl.deleteKeyword("LOOK_DIRECTION");
     }
   }
 
   // Additional keywords and update existing keywords
-  if(pcPdsLbl.HasKeyword("LABEL_RECORDS")) {
-    pcPdsLbl.DeleteKeyword("LABEL_RECORDS");
+  if(pcPdsLbl.hasKeyword("LABEL_RECORDS")) {
+    pcPdsLbl.deleteKeyword("LABEL_RECORDS");
   }
 
-  if(!pcPdsLbl.HasKeyword("PRODUCER_FULL_NAME")) {
+  if(!pcPdsLbl.hasKeyword("PRODUCER_FULL_NAME")) {
     PvlKeyword cKeyPrdFullName = PvlKeyword("PRODUCER_FULL_NAME", "USGS AstroGeology Flagstaff");
     pcPdsLbl += cKeyPrdFullName;
   }
 
-  if(!pcPdsLbl.HasKeyword("PRODUCER_INSTITUTION_NAME")) {
+  if(!pcPdsLbl.hasKeyword("PRODUCER_INSTITUTION_NAME")) {
     PvlKeyword cKeyPrdInstName = PvlKeyword("PRODUCER_INSTITUTION_NAME", "USGS AstroGeology");
     pcPdsLbl += cKeyPrdInstName;
   }
 
-  if(!pcPdsLbl.HasKeyword("MISSION_NAME")) {
+  if(!pcPdsLbl.hasKeyword("MISSION_NAME")) {
     PvlKeyword cKeyMissionName = PvlKeyword("MISSION_NAME", "LUNAR RECONNAISSANCE ORBITER");
     pcPdsLbl += cKeyMissionName;
   }
 
-  if(!pcPdsLbl.HasKeyword("PRODUCER_ID")) {
+  if(!pcPdsLbl.hasKeyword("PRODUCER_ID")) {
     PvlKeyword cKeyPrdID = PvlKeyword("PRODUCER_ID", "USGS");
     pcPdsLbl += cKeyPrdID;
   }
@@ -324,19 +324,19 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
   pcPdsLbl += cKeySoftwareVersion;
 
   // Specific to IMAGE Object
-  PvlObject &cImageObject(pcPdsLbl.FindObject("IMAGE"));
-  if(cImageObject.HasKeyword("OFFSET")) {
-    cImageObject.DeleteKeyword("OFFSET");
+  PvlObject &cImageObject(pcPdsLbl.findObject("IMAGE"));
+  if(cImageObject.hasKeyword("OFFSET")) {
+    cImageObject.deleteKeyword("OFFSET");
   }
 
   // Update SAMPLE_TYPE from "IEEE_" to "PC_"
-  if(cImageObject.HasKeyword("SAMPLE_TYPE")) {
-    PvlKeyword &cSampleType = cImageObject.FindKeyword("SAMPLE_TYPE");
+  if(cImageObject.hasKeyword("SAMPLE_TYPE")) {
+    PvlKeyword &cSampleType = cImageObject.findKeyword("SAMPLE_TYPE");
     QString sVal = cSampleType[0];
     int iFound = sVal.indexOf('_');
     if(iFound >= 0) {
       sVal.replace(0, iFound, "PC");
-      cSampleType.SetValue(sVal);
+      cSampleType.setValue(sVal);
     }
   }
 
@@ -348,27 +348,27 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
   }
 
   // Projection object
-  PvlObject &cProjectionObject(pcPdsLbl.FindObject("IMAGE_MAP_PROJECTION"));
-  if(cProjectionObject.HasKeyword("PROJECTION_LATITUDE_TYPE")) {
-    cProjectionObject.DeleteKeyword("PROJECTION_LATITUDE_TYPE");
+  PvlObject &cProjectionObject(pcPdsLbl.findObject("IMAGE_MAP_PROJECTION"));
+  if(cProjectionObject.hasKeyword("PROJECTION_LATITUDE_TYPE")) {
+    cProjectionObject.deleteKeyword("PROJECTION_LATITUDE_TYPE");
   }
 
-  if(!cProjectionObject.HasKeyword("COORDINATE_SYSTEM_TYPE")) {
+  if(!cProjectionObject.hasKeyword("COORDINATE_SYSTEM_TYPE")) {
     PvlKeyword cKeyCordSysType = PvlKeyword("COORDINATE_SYSTEM_TYPE", " ");
     cProjectionObject += cKeyCordSysType;
   }
 
-  if(cProjectionObject.HasKeyword("MAP_PROJECTION_TYPE")) {
-    PvlKeyword cKeyPrjType = cProjectionObject.FindKeyword("MAP_PROJECTION_TYPE");
+  if(cProjectionObject.hasKeyword("MAP_PROJECTION_TYPE")) {
+    PvlKeyword cKeyPrjType = cProjectionObject.findKeyword("MAP_PROJECTION_TYPE");
     if(cKeyPrjType[0] == "OBLIQUE CYLINDRICAL") {
-      PvlKeyword &cKeyCenLon = cProjectionObject.FindKeyword("CENTER_LONGITUDE");
-      cKeyCenLon.SetValue("0.0 <DEG>");
-      PvlKeyword &cKeyCenLat = cProjectionObject.FindKeyword("CENTER_LATITUDE");
-      cKeyCenLat.SetValue("0.0 <DEG>");
+      PvlKeyword &cKeyCenLon = cProjectionObject.findKeyword("CENTER_LONGITUDE");
+      cKeyCenLon.setValue("0.0 <DEG>");
+      PvlKeyword &cKeyCenLat = cProjectionObject.findKeyword("CENTER_LATITUDE");
+      cKeyCenLat.setValue("0.0 <DEG>");
 
       if(pbLevel2) {
         // Get the X,Y,Z values from Proj X Axis Vector
-        PvlKeyword cKeyObXProj = cProjectionObject.FindKeyword("OBLIQUE_PROJ_X_AXIS_VECTOR");
+        PvlKeyword cKeyObXProj = cProjectionObject.findKeyword("OBLIQUE_PROJ_X_AXIS_VECTOR");
         double x, y, z;
         x = IString(cKeyObXProj[0]).ToDouble();
         y = IString(cKeyObXProj[1]).ToDouble();
@@ -389,33 +389,33 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
         PvlKeyword cKeyRefLon("REFERENCE_LONGITUDE");
         QString iStr = toString(dLon, 6);
         iStr += " <DEG>";
-        cKeyRefLon.SetValue(iStr);
-        cProjectionObject.AddKeyword(cKeyRefLon);
+        cKeyRefLon.setValue(iStr);
+        cProjectionObject.addKeyword(cKeyRefLon);
 
         PvlKeyword cKeyRefLat("REFERENCE_LATITUDE");
         iStr = toString(dLat, 6);
         iStr += " <DEG>";
-        cKeyRefLat.SetValue(iStr);
-        cProjectionObject.AddKeyword(cKeyRefLat);
+        cKeyRefLat.setValue(iStr);
+        cProjectionObject.addKeyword(cKeyRefLat);
       }
       else { // Level3 Projection object
-        if(cProjectionObject.HasKeyword("OBLIQUE_PROJ_POLE_LATITUDE")) {
-          cProjectionObject.DeleteKeyword("OBLIQUE_PROJ_POLE_LATITUDE");
+        if(cProjectionObject.hasKeyword("OBLIQUE_PROJ_POLE_LATITUDE")) {
+          cProjectionObject.deleteKeyword("OBLIQUE_PROJ_POLE_LATITUDE");
         }
-        if(cProjectionObject.HasKeyword("OBLIQUE_PROJ_POLE_LONGITUDE")) {
-          cProjectionObject.DeleteKeyword("OBLIQUE_PROJ_POLE_LONGITUDE");
+        if(cProjectionObject.hasKeyword("OBLIQUE_PROJ_POLE_LONGITUDE")) {
+          cProjectionObject.deleteKeyword("OBLIQUE_PROJ_POLE_LONGITUDE");
         }
-        if(cProjectionObject.HasKeyword("OBLIQUE_PROJ_POLE_ROTATION")) {
-          cProjectionObject.DeleteKeyword("OBLIQUE_PROJ_POLE_ROTATION");
+        if(cProjectionObject.hasKeyword("OBLIQUE_PROJ_POLE_ROTATION")) {
+          cProjectionObject.deleteKeyword("OBLIQUE_PROJ_POLE_ROTATION");
         }
-        if(cProjectionObject.HasKeyword("OBLIQUE_PROJ_X_AXIS_VECTOR")) {
-          cProjectionObject.DeleteKeyword("OBLIQUE_PROJ_X_AXIS_VECTOR");
+        if(cProjectionObject.hasKeyword("OBLIQUE_PROJ_X_AXIS_VECTOR")) {
+          cProjectionObject.deleteKeyword("OBLIQUE_PROJ_X_AXIS_VECTOR");
         }
-        if(cProjectionObject.HasKeyword("OBLIQUE_PROJ_Y_AXIS_VECTOR")) {
-          cProjectionObject.DeleteKeyword("OBLIQUE_PROJ_Y_AXIS_VECTOR");
+        if(cProjectionObject.hasKeyword("OBLIQUE_PROJ_Y_AXIS_VECTOR")) {
+          cProjectionObject.deleteKeyword("OBLIQUE_PROJ_Y_AXIS_VECTOR");
         }
-        if(cProjectionObject.HasKeyword("OBLIQUE_PROJ_Z_AXIS_VECTOR")) {
-          cProjectionObject.DeleteKeyword("OBLIQUE_PROJ_Z_AXIS_VECTOR");
+        if(cProjectionObject.hasKeyword("OBLIQUE_PROJ_Z_AXIS_VECTOR")) {
+          cProjectionObject.deleteKeyword("OBLIQUE_PROJ_Z_AXIS_VECTOR");
         }
       }
     }
@@ -424,33 +424,33 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
   PvlKeyword cKeyDataSetMapProj("^DATA_SET_MAP_PROJECTION", "DSMAP.CAT");
   cProjectionObject += cKeyDataSetMapProj;
 
-  if(cProjectionObject.HasKeyword("LINE_PROJECTION_OFFSET")) {
-    PvlKeyword &cLineProjOffset = cProjectionObject.FindKeyword("LINE_PROJECTION_OFFSET");
+  if(cProjectionObject.hasKeyword("LINE_PROJECTION_OFFSET")) {
+    PvlKeyword &cLineProjOffset = cProjectionObject.findKeyword("LINE_PROJECTION_OFFSET");
     QString sVal = cLineProjOffset[0];
     int iFound = sVal.indexOf('<');
     if(iFound >= 0) {
       sVal.remove(iFound, 1);
-      cLineProjOffset.SetValue(sVal);
+      cLineProjOffset.setValue(sVal);
     }
   }
 
-  if(cProjectionObject.HasKeyword("SAMPLE_PROJECTION_OFFSET")) {
-    PvlKeyword &cSampleProjOffset = cProjectionObject.FindKeyword("SAMPLE_PROJECTION_OFFSET");
+  if(cProjectionObject.hasKeyword("SAMPLE_PROJECTION_OFFSET")) {
+    PvlKeyword &cSampleProjOffset = cProjectionObject.findKeyword("SAMPLE_PROJECTION_OFFSET");
     QString sVal = cSampleProjOffset[0];
     int iFound = sVal.indexOf('<');
     if(iFound >= 0) {
       sVal.remove(iFound, 1);
-      cSampleProjOffset.SetValue(sVal);
+      cSampleProjOffset.setValue(sVal);
     }
   }
 
-  if(cProjectionObject.HasKeyword("MAP_SCALE")) {
-    PvlKeyword &cMapScale = cProjectionObject.FindKeyword("MAP_SCALE");
+  if(cProjectionObject.hasKeyword("MAP_SCALE")) {
+    PvlKeyword &cMapScale = cProjectionObject.findKeyword("MAP_SCALE");
     QString sVal = cMapScale[0];
     int iFound = sVal.indexOf("EL");
     if(iFound >= 0) {
       sVal.remove(iFound, 2);
-      cMapScale.SetValue(sVal);
+      cMapScale.setValue(sVal);
     }
   }
 }

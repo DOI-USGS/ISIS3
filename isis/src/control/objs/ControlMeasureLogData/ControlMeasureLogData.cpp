@@ -51,7 +51,7 @@ namespace Isis {
   ControlMeasureLogData::ControlMeasureLogData(PvlKeyword keywordRep) {
     Init();
 
-    QString name = keywordRep.Name();
+    QString name = keywordRep.name();
     p_dataType = NameToDataType(name);
     if (p_dataType != InvalidNumericLogDataType)
       p_numericalValue = toDouble(keywordRep[0]);

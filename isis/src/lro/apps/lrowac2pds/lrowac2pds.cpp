@@ -80,7 +80,7 @@ void IsisMain () {
     for (int i = 0; i < list.size(); i++) {
 
         Pvl tempPvl;
-        tempPvl.Read(list[i].toString());
+        tempPvl.read(list[i].toString());
 
         OriginalLabel origLab(list[i].toString());
         pdsLab = origLab.ReturnLabels();
@@ -95,7 +95,7 @@ void IsisMain () {
             throw IException(IException::User, msg, _FILEINFO_);
         }
 
-        Isis::PvlGroup &inst = tempPvl.FindGroup("Instrument", Pvl::Traverse);
+        Isis::PvlGroup &inst = tempPvl.findGroup("Instrument", Pvl::Traverse);
         QString instId = (QString) inst["InstrumentId"];
         QString framelets = (QString) inst["Framelets"];
         QString numFrames = inst["NumFramelets"];
@@ -111,7 +111,7 @@ void IsisMain () {
             instrumentModeId = instModeId;
         if (numFramelets == 0)
             numFramelets = toInt(numFrames);
-        g_isIoF = tempPvl.FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].toUpper() == "IOF";
+        g_isIoF = tempPvl.findGroup("Radiometry", Pvl::Traverse).findKeyword("RadiometricType")[0].toUpper() == "IOF";
 
         if (instId == "WAC-VIS" && framelets == "Even") {
             viseven = new Cube();
@@ -365,10 +365,10 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     //Pvl to store the labels
     Pvl outLabel;
     PvlFormatPds *p_formatter = new PvlFormatPds("$lro/translations/pdsExportRootGen.typ");
-    labelPvl.SetFormat(p_formatter);
-    labelPvl.SetTerminator("END");
+    labelPvl.setFormat(p_formatter);
+    labelPvl.setTerminator("END");
     //Set up the directory where the translations are
-    PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+    PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
     QString transDir = (QString) dataDir["Lro"] + "/translations/";
 
     stringstream stream;
@@ -380,25 +380,25 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     labelXlator.Auto(outLabel);
 
     // Copy any Translation changes over
-    for (int i = 0; i < outLabel.Keywords(); i++) {
+    for (int i = 0; i < outLabel.keywords(); i++) {
         bool hasUnit = false;
         QString unit = "";
-        if (labelPvl[outLabel[i].Name()].Unit() != "") {
+        if (labelPvl[outLabel[i].name()].unit() != "") {
             hasUnit = true;
-            unit = labelPvl[outLabel[i].Name()].Unit();
+            unit = labelPvl[outLabel[i].name()].unit();
         }
         bool hasComment = false;
         QString comment = "";
-        if (labelPvl[outLabel[i].Name()].Comments() > 0) {
+        if (labelPvl[outLabel[i].name()].comments() > 0) {
             hasComment = true;
-            comment = labelPvl[outLabel[i].Name()].Comment(0);
+            comment = labelPvl[outLabel[i].name()].comment(0);
         }
-        labelPvl[outLabel[i].Name()] = outLabel[i];
+        labelPvl[outLabel[i].name()] = outLabel[i];
 
         if (hasUnit)
-            labelPvl[outLabel[i].Name()].SetUnits(unit);
+            labelPvl[outLabel[i].name()].setUnits(unit);
         if (hasComment)
-            labelPvl[outLabel[i].Name()].AddComment(comment);
+            labelPvl[outLabel[i].name()].addComment(comment);
     }
 
     //Update the product ID
@@ -406,13 +406,13 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     labelPvl["PRODUCT_ID"][0].replace((prod_id.length()-1), 1, "C");
 
     // Update the product creation time
-    labelPvl["PRODUCT_CREATION_TIME"].SetValue(iTime::CurrentGMT());
+    labelPvl["PRODUCT_CREATION_TIME"].setValue(iTime::CurrentGMT());
 
-    labelPvl["PRODUCT_VERSION_ID"].SetValue(g_productVersionId);
+    labelPvl["PRODUCT_VERSION_ID"].setValue(g_productVersionId);
 
     // Update the "IMAGE" Object
-    PvlObject &imageObject = labelPvl.FindObject("IMAGE");
-    imageObject.Clear();
+    PvlObject &imageObject = labelPvl.findObject("IMAGE");
+    imageObject.clear();
     imageObject += PvlKeyword("LINES", toString(cube->lineCount()));
     imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->sampleCount()));
     imageObject += PvlKeyword("SAMPLE_BITS", toString(32));

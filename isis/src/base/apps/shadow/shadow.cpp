@@ -27,7 +27,7 @@ void IsisMain() {
   ShadowFunctor functor(demCube);
 
   PvlKeyword kernelsUsed("Kernels");
-  kernelsUsed.AddCommentWrapped("These NAIF kernels were furnished in order to compute the "
+  kernelsUsed.addCommentWrapped("These NAIF kernels were furnished in order to compute the "
                                 "position of the sun relative to the DEM's target body, in the "
                                 "target body's reference frame. For more information, please see "
                                 "http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/"
@@ -50,7 +50,7 @@ void IsisMain() {
     }
 
     // Find the NAIF target code for the DEM's target
-    QString name = demCube->label()->FindGroup("Mapping", Pvl::Traverse)["TargetName"];
+    QString name = demCube->label()->findGroup("Mapping", Pvl::Traverse)["TargetName"];
     SpiceDouble sunPosition[3];
     SpiceDouble lightTime;
 
@@ -114,7 +114,7 @@ void IsisMain() {
 
   PvlGroup functorLogData = functor.report();
 
-  if (kernelsUsed.Size()) {
+  if (kernelsUsed.size()) {
     functorLogData += kernelsUsed;
   }
 
@@ -122,12 +122,12 @@ void IsisMain() {
 
   // Look for shape model object and remove it from output
   Pvl &outputCubeLabel = *outputCube->label();
-  for (int objectIndex = 0; objectIndex < outputCubeLabel.Objects(); objectIndex++) {
-    PvlObject &object = outputCubeLabel.Object(objectIndex);
+  for (int objectIndex = 0; objectIndex < outputCubeLabel.objects(); objectIndex++) {
+    PvlObject &object = outputCubeLabel.object(objectIndex);
 
-    if (object.IsNamed("Table") && object.HasKeyword("Name") &&
+    if (object.isNamed("Table") && object.hasKeyword("Name") &&
         object["Name"][0] == "ShapeModelStatistics") {
-      outputCubeLabel.DeleteObject(objectIndex);
+      outputCubeLabel.deleteObject(objectIndex);
     }
   }
 }

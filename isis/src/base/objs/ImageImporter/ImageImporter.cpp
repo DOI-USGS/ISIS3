@@ -129,7 +129,7 @@ namespace Isis {
           _FILEINFO_);
     }
     bandBin += name;
-    label->AddGroup(bandBin);
+    label->addGroup(bandBin);
 
     p.SetInputCube(cube);
     p.SetProcessingDirection(ProcessByBrick::BandsFirst);

@@ -61,7 +61,7 @@ int main() {
     grp += Isis::PvlKeyword("myfloat", "12345.67e+89");
     grp += Isis::PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
     Isis::PvlObject obj("Object1");
-    obj.AddGroup(grp);
+    obj.addGroup(grp);
 
     Isis::PvlObject obj2("Object2");
     obj2 += Isis::PvlKeyword("mystring", "stringval");
@@ -69,7 +69,7 @@ int main() {
     obj2 += Isis::PvlKeyword("myint", "12345");
     obj2 += Isis::PvlKeyword("myfloat", "12345.67e+89");
     obj2 += Isis::PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
-    obj.AddObject(obj2);
+    obj.addObject(obj2);
     cout << obj << endl;
   }
 

@@ -52,7 +52,7 @@ namespace Isis {
  
 
     // Get the start time from labels
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = (QString)inst["StartTime"];
     SpiceDouble etStart=0;
 

@@ -48,7 +48,7 @@ namespace Isis {
     // Get the start time.  This includes adding a time offset that could
     // have been put in the labels during ingestion (thm2isis).  This is meant
     // to handle a random timing errors which can be up to four pixels
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockCount"];
     p_etStart = getClockTime(stime).Et();
 
@@ -58,9 +58,9 @@ namespace Isis {
     // If bands have been extracted from the original image then we
     // need to read the band bin group so we can map from the cube band
     // number to the instrument band number
-    PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+    PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     PvlKeyword &orgBand = bandBin["FilterNumber"];
-    for(int i = 0; i < orgBand.Size(); i++) {
+    for(int i = 0; i < orgBand.size(); i++) {
       p_originalBand.push_back(toInt(orgBand[i]));
     }
 
@@ -70,7 +70,7 @@ namespace Isis {
     // Duxbury model it is 33.2871 based on 1/22/2009 email with a readout
     // rate of 30.0417 lines/second
     int sumMode = 1;
-    if(inst.HasKeyword("SpatialSumming")) {
+    if(inst.hasKeyword("SpatialSumming")) {
       sumMode = inst["SpatialSumming"];
     }
     p_lineRate = 33.2871 / 1000.0 * sumMode;

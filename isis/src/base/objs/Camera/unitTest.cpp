@@ -132,11 +132,11 @@ int main() {
   cout << "Calling BasicMapping (pvl)..." << endl;
   c->BasicMapping(pvl);
 
-  double pixRes2 = pvl.FindGroup("Mapping")["PixelResolution"];
+  double pixRes2 = pvl.findGroup("Mapping")["PixelResolution"];
   pixRes2 *= 10000000;
   pixRes2 = round(pixRes2);
   pixRes2 /= 10000000;
-  pvl.FindGroup("Mapping")["PixelResolution"] = toString(pixRes2);
+  pvl.findGroup("Mapping")["PixelResolution"] = toString(pixRes2);
 
   cout << "BasicMapping PVL: " << endl << pvl << endl << endl;
   cout << "FocalLength: " << c->FocalLength() << endl;
@@ -223,30 +223,30 @@ int main() {
   Pvl camMap;
   cam2->BasicMapping(camMap);
 
-  double minLat = camMap.FindGroup("Mapping")["MinimumLatitude"];
+  double minLat = camMap.findGroup("Mapping")["MinimumLatitude"];
   minLat *= 100;
   minLat = round(minLat);
   minLat /= 100;
-  camMap.FindGroup("Mapping")["MinimumLatitude"] = toString(minLat);
+  camMap.findGroup("Mapping")["MinimumLatitude"] = toString(minLat);
 
-  double pixRes = camMap.FindGroup("Mapping")["PixelResolution"];
+  double pixRes = camMap.findGroup("Mapping")["PixelResolution"];
   pixRes *= 100;
   pixRes = round(pixRes);
   pixRes /= 100;
-  camMap.FindGroup("Mapping")["PixelResolution"] = toString(pixRes);
+  camMap.findGroup("Mapping")["PixelResolution"] = toString(pixRes);
 
-  double minLon = camMap.FindGroup("Mapping")["MinimumLongitude"];
+  double minLon = camMap.findGroup("Mapping")["MinimumLongitude"];
   minLon *= 100000000000.0;
   minLon = round(minLon);
   minLon /= 100000000000.0;
-  camMap.FindGroup("Mapping")["MinimumLongitude"] = toString(minLon);
+  camMap.findGroup("Mapping")["MinimumLongitude"] = toString(minLon);
 
   cout << camMap << endl;
 
   cout << endl;
   cout << "180 Domain Range: " << endl;
   double minlat, maxlat, minlon, maxlon;
-  camMap.FindGroup("Mapping")["LongitudeDomain"][0] = "180";
+  camMap.findGroup("Mapping")["LongitudeDomain"][0] = "180";
   cam2->GroundRange(minlat, maxlat, minlon, maxlon, camMap);
   cout << "Latitude Range: " << minlat << " to " << maxlat << endl;
   cout << "Longitude Range: " << minlon << " to " << maxlon

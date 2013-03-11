@@ -26,7 +26,7 @@ void IsisMain() {
   g_delta = ui.GetDouble("DELTA");
 
   Pvl lab(ui.GetFileName("FROM"));
-  PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   // Check if it is a NAC image
   QString instId = inst["InstrumentId"];

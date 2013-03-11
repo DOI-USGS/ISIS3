@@ -119,14 +119,14 @@ void IsisMain() {
     QString group = "GainModeID";
     group += toString(gainModeID);
 
-    if(!gainFactorData.HasGroup(group)) {
+    if(!gainFactorData.hasGroup(group)) {
       QString err = "The Gain Factor for Gain Mode ID [";
       err += toString(gainModeID);
       err += "] could not be found in clemnircal.def";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
 
-    gainFactor = (gainFactorData.FindGroup(group))["GAIN"];
+    gainFactor = (gainFactorData.findGroup(group))["GAIN"];
 
     if(abs(gainFactor) < DBL_EPSILON) {
       QString err = "The Gain Factor for Gain Mode ID [";

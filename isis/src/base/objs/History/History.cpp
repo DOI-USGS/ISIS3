@@ -38,7 +38,7 @@ namespace Isis {
    *  @param name
    */
   History::History(const QString &name) : Isis::Blob(name, "History") {
-    p_history.SetTerminator("");
+    p_history.setTerminator("");
   }
 
   /**
@@ -69,7 +69,7 @@ namespace Isis {
    * @param obj PvlObject to be added
    */
   void History::AddEntry(Isis::PvlObject &obj) {
-    p_history.AddObject(obj);
+    p_history.addObject(obj);
   }
 
   /**

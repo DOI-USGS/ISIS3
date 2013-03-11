@@ -40,8 +40,8 @@ namespace Isis {
    *   p.StartProcess();
    *   // extract vicar keywords ...
    *   Pvl outLab;
-   *   outLab.AddGroup("VICAR");
-   *   outLab.AddKeyword("RecordSize")",inlab.GetInteger("RECSIZ"); opack->AddGroup(outLab,"VICAR");
+   *   outLab.addGroup("VICAR");
+   *   outLab.addKeyword("RecordSize")",inlab.GetInteger("RECSIZ"); opack->addGroup(outLab,"VICAR");
    *   p.EndProcess();
    * @endcode
    *

@@ -3239,7 +3239,7 @@ namespace Isis {
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                         + (templatePvl.FileName()));
+                                         + (templatePvl.fileName()));
       registrationDialog.resize(550,360);
       registrationDialog.exec();
     }

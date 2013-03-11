@@ -40,7 +40,7 @@ void IsisMain() {
   PvlGroup instgrp = mcube->group("Instrument");
   if(!outcam->IsBandIndependent()) {
     PvlKeyword rBand("ReferenceBand", toString(referenceBand));
-    rBand.AddComment("# All bands are aligned to reference band");
+    rBand.addComment("# All bands are aligned to reference band");
     instgrp += rBand;
     mcube->putGroup(instgrp);
     delete outcam;

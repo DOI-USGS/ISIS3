@@ -25,7 +25,7 @@ void IsisMain() {
 
   // Check for filter type of A-D
   Pvl *label = input->label();
-  QString wave = (QString)label->FindGroup("BandBin", Pvl::Traverse)["FilterName"];
+  QString wave = (QString)label->findGroup("BandBin", Pvl::Traverse)["FilterName"];
   if((wave != "A") && (wave != "B") && (wave != "C") && (wave != "D")) {
     QString message = "Invalid FilterName [" + wave + "], can only handle A-D filters";
     throw IException(IException::Unknown, message, _FILEINFO_);
@@ -38,7 +38,7 @@ void IsisMain() {
   p.SetInputCube(flatFile, cubeAtt);
 
   // Check the offset mode for validity
-  int index = label->FindGroup("Instrument", Pvl::Traverse)["OffsetModeID"];
+  int index = label->findGroup("Instrument", Pvl::Traverse)["OffsetModeID"];
   if(index < 0 || index > 5) {
     QString message = "Invalid OffsetModeID, can only handle offests 0-5";
     throw IException(IException::Unknown, message, _FILEINFO_);
@@ -54,7 +54,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("KFROM").compare("COMPUTED") == 0) {
     wave = wave.toUpper();
-    int MCP = label->FindGroup("Instrument", Pvl::Traverse)["MCPGainModeID"];
+    int MCP = label->findGroup("Instrument", Pvl::Traverse)["MCPGainModeID"];
     // Two possible MCP gains for filter A
     if(wave == "A") {
       if(MCP == 156) {

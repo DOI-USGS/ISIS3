@@ -54,6 +54,8 @@ namespace Isis {
    *                                        value.  These changes were made in
    *                                        AddQuotes(), FormatString() and
    *                                        FormatUnknown() methods.
+   *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
+   *                          names up to the current Isis 3 coding standards. Fixes #1533.
    */
 
   class PvlFormatPds : public PvlFormat {
@@ -65,29 +67,29 @@ namespace Isis {
       PvlFormatPds(Pvl &keymap);
       virtual ~PvlFormatPds() {};
 
-      virtual QString FormatValue(const PvlKeyword &keyword,
+      virtual QString formatValue(const PvlKeyword &keyword,
                                       int valueIndex = 0);
-      virtual QString FormatName(const PvlKeyword &keyword);
-      virtual QString FormatEnd(const QString name,
+      virtual QString formatName(const PvlKeyword &keyword);
+      virtual QString formatEnd(const QString name,
                                     const PvlKeyword &keyword);
-      virtual QString FormatEOL() {
+      virtual QString formatEOL() {
         return "\015\012";
       }
 
     protected:
-      virtual QString AddQuotes(const QString value);
+      virtual QString addQuotes(const QString value);
 
-      QString FormatString(const PvlKeyword &keyword, int num);
-      QString FormatInteger(const PvlKeyword &keyword, int num, int bytes);
-      QString FormatReal(const PvlKeyword &keyword, int num, int precision);
-      QString FormatEnum(const PvlKeyword &keyword, int num);
-      QString FormatBinary(const PvlKeyword &keyword, int num, int bytes);
-      QString FormatHex(const PvlKeyword &keyword, int num, int bytes);
-      QString FormatBool(const PvlKeyword &keyword, int num);
-      QString FormatUnknown(const PvlKeyword &keyword, int num);
+      QString formatString(const PvlKeyword &keyword, int num);
+      QString formatInteger(const PvlKeyword &keyword, int num, int bytes);
+      QString formatReal(const PvlKeyword &keyword, int num, int precision);
+      QString formatEnum(const PvlKeyword &keyword, int num);
+      QString formatBinary(const PvlKeyword &keyword, int num, int bytes);
+      QString formatHex(const PvlKeyword &keyword, int num, int bytes);
+      QString formatBool(const PvlKeyword &keyword, int num);
+      QString formatUnknown(const PvlKeyword &keyword, int num);
 
     private:
-      void Init();
+      void init();
   };
 };
 

@@ -20,7 +20,7 @@ void IsisMain() {
 
   //Checks if in file is rdr
   Pvl lab(input.expanded());
-  if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
+  if(lab.hasObject("IMAGE_MAP_PROJECTION")) {
     QString msg = "[" + input.name() + "] has already been projected.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -53,7 +53,7 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
   Pvl outLabel;
 
   // Get the directory where the MER translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Mer"];
   transDir = transDir + "/" + "translations/";
 
@@ -65,13 +65,13 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
   transFile = transDir + "merStructure.trn";
   PvlTranslationManager structXlater(labelPvl, transFile.expanded());
   structXlater.Auto(outLabel);
-  ocube->putGroup(outLabel.FindGroup("ARCHIVE", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("ARCHIVE", Pvl::Traverse));
 
   // Translate the Instrument group
   transFile = transDir + "merInstrument.trn";
   PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
-  ocube->putGroup(outLabel.FindGroup("INSTRUMENT", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("INSTRUMENT", Pvl::Traverse));
 
   // Pull out MiCCD and MiElectronic from the TemperatureName in the instrument group
   void MiFixLab(PvlGroup & instGroup);
@@ -83,37 +83,37 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
   transFile = transDir + "merImageRequest.trn";
   PvlTranslationManager imageReqXlater(labelPvl, transFile.expanded());
   imageReqXlater.Auto(outLabel);
-  ocube->putGroup(outLabel.FindGroup("MER_IMAGE_REQUEST_PARMS", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("MER_IMAGE_REQUEST_PARMS", Pvl::Traverse));
 
   // Translate the Subframe group
   transFile = transDir + "merSubframe.trn";
   PvlTranslationManager subframeXlater(labelPvl, transFile.expanded());
   subframeXlater.Auto(outLabel);
-  ocube->putGroup(outLabel.FindGroup("MER_SUBFRAME_REQUEST_PARMS", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("MER_SUBFRAME_REQUEST_PARMS", Pvl::Traverse));
 }
 
 void MiFixLab(PvlGroup &instGroup) {
   // code to get instrment and electronics temperatures.
-  PvlKeyword temp = instGroup.FindKeyword("InstrumentTemperature");
-  PvlKeyword tempName = instGroup.FindKeyword("InstrumentTemperatureName");
+  PvlKeyword temp = instGroup.findKeyword("InstrumentTemperature");
+  PvlKeyword tempName = instGroup.findKeyword("InstrumentTemperatureName");
 
   PvlKeyword miCCD;
-  miCCD.SetName("TemperatureMiCCD");
-  miCCD.SetValue(temp[6]);
-  instGroup.AddKeyword(miCCD);
+  miCCD.setName("TemperatureMiCCD");
+  miCCD.setValue(temp[6]);
+  instGroup.addKeyword(miCCD);
 
   PvlKeyword miElectornic;
-  miElectornic.SetName("TemperatureMiElectronics");
-  miElectornic.SetValue(temp[7]);
-  instGroup.AddKeyword(miElectornic);
+  miElectornic.setName("TemperatureMiElectronics");
+  miElectornic.setValue(temp[7]);
+  instGroup.addKeyword(miElectornic);
 
   //Code to remove "Z" from the StartTime and StopTime keywords
   //StartTime code
-  QString Newstarttime = (QString)instGroup.FindKeyword("StartTime");
+  QString Newstarttime = (QString)instGroup.findKeyword("StartTime");
   Newstarttime.remove("Z");
-  instGroup.FindKeyword("StartTime").SetValue(Newstarttime);
+  instGroup.findKeyword("StartTime").setValue(Newstarttime);
   //StopTime code
-  QString Newstoptime = (QString)instGroup.FindKeyword("StopTime");
+  QString Newstoptime = (QString)instGroup.findKeyword("StopTime");
   Newstoptime.remove("Z");
-  instGroup.FindKeyword("StopTime").SetValue(Newstoptime);
+  instGroup.findKeyword("StopTime").setValue(Newstoptime);
 }

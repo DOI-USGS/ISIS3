@@ -461,13 +461,13 @@ inline HiVector rebin(const HiVector &v, int n) {
  *              blobs
  */
 inline void RemoveHiBlobs(Pvl &label) {
-  for ( int blob = 0 ; blob < label.Objects() ; blob++ ) {
-    if ( label.Object(blob).IsNamed("Table") ) {
-      QString name = label.Object(blob)["Name"][0];
+  for ( int blob = 0 ; blob < label.objects() ; blob++ ) {
+    if ( label.object(blob).isNamed("Table") ) {
+      QString name = label.object(blob)["Name"][0];
       if ( name.toLower() == "hirise calibration ancillary" ||
            name.toLower() == "hirise calibration image" ||
            name.toLower() == "hirise ancillary" ) {
-        label.DeleteObject(blob);
+        label.deleteObject(blob);
         blob--;
       }
     }

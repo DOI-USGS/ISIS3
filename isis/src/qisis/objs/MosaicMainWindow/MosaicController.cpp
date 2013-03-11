@@ -131,7 +131,7 @@ namespace Isis {
     projFile += p_fileList->toPvl();
     projFile += p_scene->toPvl();
 
-    projFile.Write(projFileName);
+    projFile.write(projFileName);
   }
 
 
@@ -384,11 +384,11 @@ namespace Isis {
       openCubes(QStringList());
     }
     else {
-      if(m_projectPvl && m_projectPvl->HasObject("MosaicFileList"))
-        p_fileList->fromPvl(m_projectPvl->FindObject("MosaicFileList"));
+      if(m_projectPvl && m_projectPvl->hasObject("MosaicFileList"))
+        p_fileList->fromPvl(m_projectPvl->findObject("MosaicFileList"));
 
-      if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
-        p_scene->fromPvl(m_projectPvl->FindObject("MosaicScene"));
+      if(m_projectPvl && m_projectPvl->hasObject("MosaicScene"))
+        p_scene->fromPvl(m_projectPvl->findObject("MosaicScene"));
 
       if(m_projectPvl) {
         delete m_projectPvl;
@@ -464,16 +464,16 @@ namespace Isis {
   void MosaicController::readProject(QString filename) {
     try {
       m_projectPvl = new Pvl(filename);
-      PvlObject &cubes(m_projectPvl->FindObject("Cubes"));
+      PvlObject &cubes(m_projectPvl->findObject("Cubes"));
 
       QList<PvlObject> cubesList;
 
-      for (int i = 0; i < cubes.Objects(); i++) {
-        cubesList.append(cubes.Object(i));
+      for (int i = 0; i < cubes.objects(); i++) {
+        cubesList.append(cubes.object(i));
       }
 
-      if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
-        p_scene->preloadFromPvl(m_projectPvl->FindObject("MosaicScene"));
+      if(m_projectPvl && m_projectPvl->hasObject("MosaicScene"))
+        p_scene->preloadFromPvl(m_projectPvl->findObject("MosaicScene"));
 
       openProjectCubes(cubesList);
     }

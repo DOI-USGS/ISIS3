@@ -424,20 +424,20 @@ namespace Isis {
         m_northAzimuthStat->StandardDeviation());
 
     Pvl returnPvl;
-    returnPvl.SetTerminator("");
-    returnPvl.AddGroup(pUser);
-    returnPvl.AddGroup(pLat);
-    returnPvl.AddGroup(pLon);
-    returnPvl.AddGroup(pSampleRes);
-    returnPvl.AddGroup(pLineRes);
-    returnPvl.AddGroup(pResolution);
-    returnPvl.AddGroup(pAspectRatio);
-    returnPvl.AddGroup(pPhase);
-    returnPvl.AddGroup(pEmission);
-    returnPvl.AddGroup(pIncidence);
-    returnPvl.AddGroup(pTime);
-    returnPvl.AddGroup(pLocalRadius);
-    returnPvl.AddGroup(pNorthAzimuth);
+    returnPvl.setTerminator("");
+    returnPvl.addGroup(pUser);
+    returnPvl.addGroup(pLat);
+    returnPvl.addGroup(pLon);
+    returnPvl.addGroup(pSampleRes);
+    returnPvl.addGroup(pLineRes);
+    returnPvl.addGroup(pResolution);
+    returnPvl.addGroup(pAspectRatio);
+    returnPvl.addGroup(pPhase);
+    returnPvl.addGroup(pEmission);
+    returnPvl.addGroup(pIncidence);
+    returnPvl.addGroup(pTime);
+    returnPvl.addGroup(pLocalRadius);
+    returnPvl.addGroup(pNorthAzimuth);
     return returnPvl;
   }
 }

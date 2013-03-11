@@ -70,7 +70,7 @@ bool HiCalConf::_naifLoaded = false;
    * @param conf Name of configuration file to use
    */
   HiCalConf::HiCalConf(Pvl &label, const QString &conf) :
-       DbAccess(Pvl(filepath(conf)).FindObject("Hical", PvlObject::Traverse)) {
+       DbAccess(Pvl(filepath(conf)).findObject("Hical", PvlObject::Traverse)) {
     _profName.clear();
     init(label);
   }
@@ -121,7 +121,7 @@ bool HiCalConf::_naifLoaded = false;
    * @param conf Name of configuration file to use
    */
   void HiCalConf::setConf(const QString &conf) {
-    load(Pvl(filepath(conf)).FindObject("Hical", PvlObject::Traverse));
+    load(Pvl(filepath(conf)).findObject("Hical", PvlObject::Traverse));
   }
 
   /**
@@ -431,7 +431,7 @@ void HiCalConf::loadNaifTiming( ) {
  * @brief Intialization of object variables
  */
 void HiCalConf::init() {
-  _label.Clear();
+  _label.clear();
   return;
 }
 
@@ -464,11 +464,11 @@ void HiCalConf::init(Pvl &label) {
 PvlKeyword &HiCalConf::getKey(const QString &key,
                               const QString &group) {
   if (!group.isEmpty()) {
-    PvlGroup &grp = _label.FindGroup(group, Pvl::Traverse);
+    PvlGroup &grp = _label.findGroup(group, Pvl::Traverse);
     return (grp[key]);
   }
   else {
-    return (_label.FindKeyword(key));
+    return (_label.findKeyword(key));
   }
 }
 
@@ -528,7 +528,7 @@ DbProfile HiCalConf::getLabelProfile(const DbProfile &profile) const {
     Pvl label = _label;
     for ( int g = 0 ; g < ngroups ; g++ ) {
       QString group = profile("LabelGroups", g);
-      PvlGroup grp = label.FindGroup(group, Pvl::Traverse);
+      PvlGroup grp = label.findGroup(group, Pvl::Traverse);
       lblprof = DbProfile(lblprof,DbProfile(grp));
     }
   }
@@ -540,7 +540,7 @@ int HiCalConf::getChannelIndex(const int &ccd, const int &channel) const {
 }
 
 DbProfile HiCalConf::makeParameters(Pvl &label) const {
-  PvlGroup inst = label.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup inst = label.findGroup("Instrument", Pvl::Traverse);
   DbProfile parms("Parameters");
 
   int ccd = CpmmToCcd((int) inst["CpmmNumber"]);

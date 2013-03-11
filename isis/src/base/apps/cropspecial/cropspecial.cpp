@@ -76,10 +76,10 @@ void IsisMain() {
   Pvl &inLabels = *cube.label();
 
   // Loop through the labels looking for object = Table
-  for(int labelObj = 0; labelObj < inLabels.Objects(); labelObj++) {
-    PvlObject &obj = inLabels.Object(labelObj);
+  for(int labelObj = 0; labelObj < inLabels.objects(); labelObj++) {
+    PvlObject &obj = inLabels.object(labelObj);
 
-    if(obj.Name() != "Table") continue;
+    if(obj.name() != "Table") continue;
 
     // Read the table into a table object
     Table table(obj["Name"], from);

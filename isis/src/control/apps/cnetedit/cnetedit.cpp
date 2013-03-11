@@ -252,9 +252,9 @@ void IsisMain() {
       Pvl defFile(ui.GetFileName("DEFFILE"));
       Pvl pvlTemplate("$ISIS3DATA/base/templates/cnet_validmeasure/validmeasure.def");
       Pvl pvlResults;
-      pvlTemplate.ValidatePvl(defFile, pvlResults);
-      if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
-        Application::Log(pvlResults.Group(0));
+      pvlTemplate.validatePvl(defFile, pvlResults);
+      if (pvlResults.groups() > 0 || pvlResults.keywords() > 0) {
+        Application::Log(pvlResults.group(0));
         QString sErrMsg = "Invalid Deffile\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
@@ -274,7 +274,7 @@ void IsisMain() {
       }
 
       // Log the DEFFILE to the print file
-      Application::Log(defFile.FindGroup("ValidMeasure", Pvl::Traverse));
+      Application::Log(defFile.findGroup("ValidMeasure", Pvl::Traverse));
     }
   }
 
@@ -288,25 +288,25 @@ void IsisMain() {
   if (keepLog) {
     Pvl outputLog;
 
-    outputLog.AddKeyword(PvlKeyword("PointsDeleted", toString(numPointsDeleted)));
-    outputLog.AddKeyword(PvlKeyword("MeasuresDeleted", toString(numMeasuresDeleted)));
+    outputLog.addKeyword(PvlKeyword("PointsDeleted", toString(numPointsDeleted)));
+    outputLog.addKeyword(PvlKeyword("MeasuresDeleted", toString(numMeasuresDeleted)));
 
     PvlObject lockedLog = createLog(
         "EditLocked", editLockedPoints, editLockedMeasures);
-    outputLog.AddObject(lockedLog);
+    outputLog.addObject(lockedLog);
 
-    outputLog.AddObject(createLog("RetainedReferences", retainedReferences));
+    outputLog.addObject(createLog("RetainedReferences", retainedReferences));
 
     // Depending on whether the user chose to delete ignored points and
     // measures, the log will either contain reasons for being ignored, or
     // reasons for being deleted
     PvlObject ignoredLog = createLog(
         deleteIgnored ? "Deleted" : "Ignored", ignoredPoints, ignoredMeasures);
-    outputLog.AddObject(ignoredLog);
+    outputLog.addObject(ignoredLog);
 
     // Write the log
     QString logFileName = ui.GetFileName("LOG");
-    outputLog.Write(logFileName);
+    outputLog.write(logFileName);
 
     // Delete the structures keeping track of the ignored points and measures
     delete ignoredPoints;
@@ -960,13 +960,13 @@ void logResult(QMap<QString, PvlGroup> *measuresLog,
       // If the map already has a group for the given Point ID, simply add the
       // new measure to it
       PvlGroup &pointGroup = (*measuresLog)[pointId];
-      pointGroup.AddKeyword(measureMessage);
+      pointGroup.addKeyword(measureMessage);
     }
     else {
       // Else there is no group for the Point ID of the measure being ignored,
       // so make a new group, add the measure, and insert it into the map
       PvlGroup pointGroup(pointId);
-      pointGroup.AddKeyword(measureMessage);
+      pointGroup.addKeyword(measureMessage);
       (*measuresLog)[pointId] = pointGroup;
     }
   }
@@ -979,7 +979,7 @@ PvlObject createLog(QString label, QMap<QString, QString> *pointsMap) {
   QList<QString> pointIds = pointsMap->keys();
   for (int i = 0; i < pointIds.size(); i++) {
     QString pointId = pointIds.at(i);
-    pointsLog.AddKeyword(PvlKeyword(pointId, (*pointsMap)[pointId]));
+    pointsLog.addKeyword(PvlKeyword(pointId, (*pointsMap)[pointId]));
   }
 
   return pointsLog;
@@ -992,16 +992,16 @@ PvlObject createLog(QString label,
   PvlObject editLog(label);
 
   PvlObject pointsLog = createLog("Points", pointsMap);
-  editLog.AddObject(pointsLog);
+  editLog.addObject(pointsLog);
 
   // Get all the groups of measures from the map
   PvlObject measuresLog("Measures");
   QList<PvlGroup> measureGroups = measuresMap->values();
 
   for (int i = 0; i < measureGroups.size(); i++)
-    measuresLog.AddGroup(measureGroups.at(i));
+    measuresLog.addGroup(measureGroups.at(i));
 
-  editLog.AddObject(measuresLog);
+  editLog.addObject(measuresLog);
   return editLog;
 }
 
@@ -1014,7 +1014,7 @@ void PrintTemp() {
 
   // Get template PVL
   Pvl userTemp;
-  userTemp.Read(ui.GetFileName("DEFFILE"));
+  userTemp.read(ui.GetFileName("DEFFILE"));
 
   // Write template file out to the log
   Isis::Application::GuiLog(userTemp);

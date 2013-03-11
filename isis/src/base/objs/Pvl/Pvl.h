@@ -125,11 +125,12 @@ namespace Isis {
    *                                - Added assignment operator
    *  @history 2010-06-25 Steven Lambright - Quicker to give up
    *            counting line numbers on error
-   *  @history 2010-07-12 Steven Lambright - It's a bad idea to copy 
-   *            p_internalTemplate in the copy constructor since it describes
+   *  @history 2010-07-12 Steven Lambright - It's a bad idea to copy
+   *            m_internalTemplate in the copy constructor since it describes
    *            whether or not to delete an internal pointer.
    *  @history 2010-09-27 Sharmila Prasad - Validate a Pvl with the Template Pvl
-   *  @todo 2005-02-14 add coded example to class documentation.
+   *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
+   *                          names up to the current Isis 3 coding standards. Fixes #1533.
    */
   class Pvl : public Isis::PvlObject {
     public:
@@ -141,13 +142,13 @@ namespace Isis {
       friend std::ostream &operator<<(std::ostream &os, Isis::Pvl &pvl);
 
       ~Pvl() {
-        if(p_internalTemplate) delete p_formatTemplate;
+        if(m_internalTemplate) delete m_formatTemplate;
       };
 
-      void Read(const QString &file);
+      void read(const QString &file);
 
-      void Write(const QString &file);
-      void Append(const QString &file);
+      void write(const QString &file);
+      void append(const QString &file);
 
       /**
        * Sets the terminator used to signify the end of the PVL
@@ -155,8 +156,8 @@ namespace Isis {
        *
        * @param term The user-defined terminator
        */
-      void SetTerminator(const QString &term) {
-        p_terminator = term;
+      void setTerminator(const QString &term) {
+        m_terminator = term;
       };
       /**
        * Returns the terminator used to signify the end of the PVL
@@ -164,22 +165,22 @@ namespace Isis {
        *
        * @return The terminator used by the Pvl object.
        */
-      QString Terminator() const {
-        return p_terminator;
+      QString terminator() const {
+        return m_terminator;
       };
 
-      void SetFormatTemplate(Isis::Pvl &temp);
-      void SetFormatTemplate(const QString &filename);
+      void setFormatTemplate(Isis::Pvl &temp);
+      void setFormatTemplate(const QString &filename);
 
       const Pvl &operator=(const Pvl &other);
-      
+
       //! Validate a Pvl with the Template Pvl
-      void ValidatePvl(const Pvl & pPvl, Pvl & pPvlResults);
+      void validatePvl(const Pvl & pPvl, Pvl & pPvlResults);
 
     private:
-      void Init();
-      bool p_internalTemplate;
-      QString p_terminator; /**<Terminator used to signify the end of the
+      void init();
+      bool m_internalTemplate;
+      QString m_terminator; /**<Terminator used to signify the end of the
                                     PVL informationDefaults to "END"*/
   };
 };

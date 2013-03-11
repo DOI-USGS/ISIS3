@@ -68,7 +68,7 @@ void IsisMain() {
   CameraGroundMap *groundMap = cam->GroundMap();
 
   // Make sure the image contains the InstrumentPointing (aka CK) blob/table
-  PvlGroup test = cube.label()->FindGroup("Kernels", Pvl::Traverse);
+  PvlGroup test = cube.label()->findGroup("Kernels", Pvl::Traverse);
   QString InstrumentPointing = (QString) test["InstrumentPointing"];
   if (InstrumentPointing != "Table") {
     QString msg = "Input image does not contain needed SPICE blobs...run spiceinit with attach=yes.";
@@ -84,7 +84,7 @@ void IsisMain() {
   }
 
   // Get required keywords from instrument and band groups
-  PvlGroup inst = cube.label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
   QString instrumentId = (QString) inst["InstrumentId"];
 
   bool     isMocNA = false;
@@ -97,7 +97,7 @@ void IsisMain() {
   bool     isHRSC = false;
 //TO DO: UNCOMMENT THESE LINE ONCE MOC IS WORKING IN SS
 //  if (instrumentId == "MOC") {
-//    PvlGroup band = cube.label()->FindGroup("BandBin", Pvl::Traverse);
+//    PvlGroup band = cube.label()->findGroup("BandBin", Pvl::Traverse);
 //    QString filter = (QString) band["FilterName"];
 //
 //    if (strcmp(filter.toAscii().data(), "BROAD_BAND") == 0)
@@ -112,7 +112,7 @@ void IsisMain() {
 //  else if (instrumentId == "IdealCamera") {
 //TO DO: DELETE THIS LINE ONCE MOC IS WORKING IN SS
   if (instrumentId == "IdealCamera") {
-    PvlGroup orig = cube.label()->FindGroup("OriginalInstrument",  Pvl::Traverse);
+    PvlGroup orig = cube.label()->findGroup("OriginalInstrument",  Pvl::Traverse);
     QString origInstrumentId = (QString) orig["InstrumentId"];
     if (origInstrumentId == "HIRISE") {
       isHiRise = true;
@@ -385,7 +385,7 @@ void IsisMain() {
   QList< QList<double> > ephemPts;
   QList< QList<double> > ephemRates;
 
-  PvlGroup kernels = cube.label()->FindGroup("Kernels", Pvl::Traverse);
+  PvlGroup kernels = cube.label()->findGroup("Kernels", Pvl::Traverse);
   QString InstrumentPosition = (QString) kernels["InstrumentPosition"];
 
   int numEphem = 0;      // number of ephemeris points
@@ -393,7 +393,7 @@ void IsisMain() {
   if (InstrumentPosition == "Table") {
     // Labels contain SPK blob
     // set up Ephem pts/rates number and spacing
-    Table tablePosition("InstrumentPosition", cubeHeader->FileName());
+    Table tablePosition("InstrumentPosition", cubeHeader->fileName());
     numEphem = tablePosition.Records();
 
     // increase the number of ephem nodes by 20%.  This is somewhat random but
@@ -511,7 +511,7 @@ void IsisMain() {
   // quarternions
 
   //set up quaternions number and spacing
-  Table tablePointing("InstrumentPointing", cubeHeader->FileName());
+  Table tablePointing("InstrumentPointing", cubeHeader->fileName());
 
   //number of quaternions
   int numQuaternions = tablePointing.Records();

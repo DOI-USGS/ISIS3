@@ -30,8 +30,8 @@ void IsisMain() {
   try {
     Pvl lab(in.expanded());
     id = (QString) lab["DATA_SET_ID"];
-    if(lab.FindObject("IMAGE").HasKeyword("ENCODING_TYPE")) compressed = true;
-    projected = lab.HasObject("IMAGE_MAP_PROJECTION");
+    if(lab.findObject("IMAGE").hasKeyword("ENCODING_TYPE")) compressed = true;
+    projected = lab.hasObject("IMAGE_MAP_PROJECTION");
   }
   catch(IException &e) {
     QString msg = "Unable to read [DATA_SET_ID] from input file [" +
@@ -95,7 +95,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   QString startTime, productId, clockCount;
 
   // Get the directory where the MOC translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   QString transDir = (QString) dataDir["Mgs"];
@@ -125,14 +125,14 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   if(instrumentXlater.InputHasKeyword("StartTime")) {
     QString str = instrumentXlater.Translate("StartTime");
     inst += PvlKeyword("StartTime", str);
-    // isisLab.AddKeyword ("StartTime", str+"Z");
+    // isisLab.addKeyword ("StartTime", str+"Z");
     startTime = str;
   }
 
   if(instrumentXlater.InputHasKeyword("StopTime")) {
     QString str = instrumentXlater.Translate("StopTime");
     inst += PvlKeyword("StopTime", str);
-    // isisLab.AddKeyword ("StopTime", str+"Z");
+    // isisLab.addKeyword ("StopTime", str+"Z");
   }
 
   if(instrumentXlater.InputHasKeyword("CrosstrackSumming")) {

@@ -49,9 +49,9 @@ namespace Isis {
       const QList<int> *virtualBandList, const Pvl &labels, bool alreadyOnDisk)
       : CubeIoHandler(dataFile, virtualBandList, labels, alreadyOnDisk) {
 
-    const PvlObject &core = labels.FindObject("IsisCube").FindObject("Core");
+    const PvlObject &core = labels.findObject("IsisCube").findObject("Core");
 
-    if(core.HasKeyword("Format")) {
+    if(core.hasKeyword("Format")) {
       setChunkSizes(core["TileSamples"], core["TileLines"], 1);
     }
     else {
@@ -80,12 +80,12 @@ namespace Isis {
    * @param labels The "Core" object in this Pvl will be updated
    */
   void CubeTileHandler::updateLabels(Pvl &labels) {
-    PvlObject &core = labels.FindObject("IsisCube").FindObject("Core");
-    core.AddKeyword(PvlKeyword("Format", "Tile"),
+    PvlObject &core = labels.findObject("IsisCube").findObject("Core");
+    core.addKeyword(PvlKeyword("Format", "Tile"),
                     PvlContainer::Replace);
-    core.AddKeyword(PvlKeyword("TileSamples", toString(getSampleCountInChunk())),
+    core.addKeyword(PvlKeyword("TileSamples", toString(getSampleCountInChunk())),
                     PvlContainer::Replace);
-    core.AddKeyword(PvlKeyword("TileLines", toString(getLineCountInChunk())),
+    core.addKeyword(PvlKeyword("TileLines", toString(getLineCountInChunk())),
                     PvlContainer::Replace);
   }
 

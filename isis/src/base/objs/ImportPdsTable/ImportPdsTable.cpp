@@ -395,20 +395,20 @@ namespace Isis {
 
     Isis::Pvl label(pdsLabFile);
 
-    if (!label.HasObject(m_tableName)) {
+    if (!label.hasObject(m_tableName)) {
       QString msg = "The PDS file " + pdsLabFile +
                     " does not have the required TABLE object, ["
                     + m_tableName +"]. The PDS label file is probably invalid";
       throw IException(IException::Unknown, msg.toStdString(), _FILEINFO_);
     }
-    m_recordBytes = (int) label.FindKeyword("RECORD_BYTES");
+    m_recordBytes = (int) label.findKeyword("RECORD_BYTES");
     //  Get some pertinent information from the label
-    PvlObject &tabobj = label.FindObject(m_tableName);
+    PvlObject &tabobj = label.findObject(m_tableName);
     pdsTableFile = FileName(pdsLabFile).path() + "/" 
                    + label["^" + m_tableName][0];
-    m_trows = (int) tabobj.FindKeyword("ROWS");
-    int ncols =  (int) tabobj.FindKeyword("COLUMNS");
-    m_pdsTableType = QString(tabobj.FindKeyword("INTERCHANGE_FORMAT"));
+    m_trows = (int) tabobj.findKeyword("ROWS");
+    int ncols =  (int) tabobj.findKeyword("COLUMNS");
+    m_pdsTableType = QString(tabobj.findKeyword("INTERCHANGE_FORMAT"));
     if (m_pdsTableType != "ASCII" && m_pdsTableType.toUpper() != "BINARY") {
       QString msg = "Unable to import the PDS table [" + m_tableName 
                     + "] from the PDS file [" 
@@ -417,13 +417,13 @@ namespace Isis {
                     + "] is not supported. Valid values are ASCII or BINARY.";
       throw IException(IException::User, msg.toStdString(), _FILEINFO_);
     }
-    m_rowBytes = tabobj.FindKeyword("ROW_BYTES");
+    m_rowBytes = tabobj.findKeyword("ROW_BYTES");
 
     m_coldesc.clear();
-    PvlObject::PvlObjectIterator colobj = tabobj.BeginObject();
+    PvlObject::PvlObjectIterator colobj = tabobj.beginObject();
     int icol(0);
-    while (colobj != tabobj.EndObject()) {
-      if (colobj->IsNamed("COLUMN")) {
+    while (colobj != tabobj.endObject()) {
+      if (colobj->isNamed("COLUMN")) {
         m_coldesc.push_back(getColumnDescription(*colobj, icol));
         icol++;
       }

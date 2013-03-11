@@ -75,9 +75,9 @@ namespace Isis {
       if(c == '#') {
         s = ReadComment(stream);
         Isis::PvlToken t("_COMMENT_");
-        t.AddValue(s);
+        t.addValue(s);
 
-        if(newlineFound || tokens.size() == 0 || tokens[tokens.size()-1].ValueSize() == 0) {
+        if(newlineFound || tokens.size() == 0 || tokens[tokens.size()-1].valueSize() == 0) {
           // applies to next pvl item
           tokens.push_back(t);
         }
@@ -98,9 +98,9 @@ namespace Isis {
         if(c == '*') {
           s = ReadComment(stream);
           Isis::PvlToken t("_COMMENT_");
-          t.AddValue(s);
+          t.addValue(s);
 
-          if(newlineFound || tokens.size() == 0 || tokens[tokens.size()-1].ValueSize() == 0) {
+          if(newlineFound || tokens.size() == 0 || tokens[tokens.size()-1].valueSize() == 0) {
             // applies to next pvl item
             tokens.push_back(t);
           }
@@ -117,7 +117,7 @@ namespace Isis {
       s = ReadToken(stream);
       Isis::PvlToken t(s);
 
-      if(t.GetKeyUpper() == upTerminator) {
+      if(t.keyUpper() == upTerminator) {
         tokens.push_back(t);
         return;
       }
@@ -132,7 +132,7 @@ namespace Isis {
 
       if(c != '=') {
         tokens.push_back(t);
-        if(t.GetKeyUpper() == upTerminator) return;
+        if(t.keyUpper() == upTerminator) return;
         continue;
       }
 
@@ -153,7 +153,7 @@ namespace Isis {
           ParseCommaList(t, s);
         }
         catch(IException &e) {
-          QString message = Isis::Message::KeywordValueBad(t.GetKey());
+          QString message = Isis::Message::KeywordValueBad(t.key());
           throw IException(e, IException::Unknown, message, _FILEINFO_);
         }
         tokens.push_back(t);
@@ -167,7 +167,7 @@ namespace Isis {
           ParseCommaList(t, s);
         }
         catch(IException &e) {
-          QString message = Isis::Message::KeywordValueBad(t.GetKey());
+          QString message = Isis::Message::KeywordValueBad(t.key());
           throw IException(e, IException::Unknown, message, _FILEINFO_);
         }
         tokens.push_back(t);
@@ -180,10 +180,10 @@ namespace Isis {
           s = ReadToDoubleQuote(stream);
         }
         catch(IException &e) {
-          QString message = Isis::Message::KeywordValueBad(t.GetKey());
+          QString message = Isis::Message::KeywordValueBad(t.key());
           throw IException(e, IException::Unknown, message, _FILEINFO_);
         }
-        t.AddValue(s);
+        t.addValue(s);
         tokens.push_back(t);
         continue;
       }
@@ -194,17 +194,17 @@ namespace Isis {
           s = ReadToSingleQuote(stream);
         }
         catch(IException &e) {
-          QString message = Isis::Message::KeywordValueBad(t.GetKey());
+          QString message = Isis::Message::KeywordValueBad(t.key());
           throw IException(IException::Unknown, message, _FILEINFO_);
         }
-        t.AddValue(s);
+        t.addValue(s);
         tokens.push_back(t);
         continue;
       }
 
 
       s = ReadToken(stream);
-      t.AddValue(s);
+      t.addValue(s);
       tokens.push_back(t);
       continue;
     }
@@ -486,7 +486,7 @@ namespace Isis {
         s += "}";
       }
       else if(c == ',') {
-        t.AddValue(s);
+        t.addValue(s);
         s.clear();
       }
       else if(c != EOF) {
@@ -495,7 +495,7 @@ namespace Isis {
     }
     while(c != EOF);
 
-    t.AddValue(s);
+    t.addValue(s);
   }
 
 

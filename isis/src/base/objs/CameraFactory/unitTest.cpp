@@ -15,14 +15,14 @@ int main(int argc, char *argv[]) {
   Isis::Pvl lab;
   doit(lab);
 
-  lab.AddGroup(Isis::PvlGroup("Kernels"));
+  lab.addGroup(Isis::PvlGroup("Kernels"));
 
   cerr << "Testing missing spacecraft name ..." << endl;
-  lab.AddGroup(Isis::PvlGroup("Instrument"));
+  lab.addGroup(Isis::PvlGroup("Instrument"));
   doit(lab);
 
   cerr << "Testing missing instrument id ..." << endl;
-  Isis::PvlGroup &inst = lab.FindGroup("Instrument");
+  Isis::PvlGroup &inst = lab.findGroup("Instrument");
   inst += Isis::PvlKeyword("SpacecraftName", "Bogus Spacecraft");
   doit(lab);
 

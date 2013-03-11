@@ -64,9 +64,9 @@ namespace Isis {
   Camera::Camera(Pvl &lab) : Sensor(lab) {
     // Get the image size which can be different than the alpha cube size
 
-    PvlGroup &dims = lab.FindObject("IsisCube")
-                           .FindObject("Core")
-                           .FindGroup("Dimensions");
+    PvlGroup &dims = lab.findObject("IsisCube")
+                           .findObject("Core")
+                           .findGroup("Dimensions");
     p_lines = dims["Lines"];
     p_samples = dims["Samples"];
     p_bands = dims["Bands"];
@@ -77,7 +77,7 @@ namespace Isis {
     p_alphaCube = new AlphaCube(lab);
 
     // Get the projection group if it exists
-    if (lab.FindObject("IsisCube").HasGroup("Mapping")) {
+    if (lab.findObject("IsisCube").hasGroup("Mapping")) {
       p_projection = ProjectionFactory::CreateFromCube(lab);
     }
     else {
@@ -98,8 +98,8 @@ namespace Isis {
     p_skyMap = NULL;
 
     // See if we have a reference band
-    PvlGroup &inst = lab.FindObject("IsisCube").FindGroup("Instrument");
-    if (inst.HasKeyword("ReferenceBand")) {
+    PvlGroup &inst = lab.findObject("IsisCube").findGroup("Instrument");
+    if (inst.hasKeyword("ReferenceBand")) {
       p_referenceBand = inst["ReferenceBand"];
     }
 
@@ -933,18 +933,18 @@ namespace Isis {
     Distance &b = localRadii[2];
 
     // See if the PVL overrides the radii
-    PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup map = pvl.findGroup("Mapping", Pvl::Traverse);
 
-    if(map.HasKeyword("EquatorialRadius"))
+    if(map.hasKeyword("EquatorialRadius"))
       a = Distance(toDouble(map["EquatorialRadius"][0]), Distance::Meters);
 
-    if(map.HasKeyword("PolarRadius"))
+    if(map.hasKeyword("PolarRadius"))
       b = Distance(toDouble(map["PolarRadius"][0]), Distance::Meters);
 
     // Convert to planetographic if necessary
     minlat = p_minlat;
     maxlat = p_maxlat;
-    if(map.HasKeyword("LatitudeType")) {
+    if(map.hasKeyword("LatitudeType")) {
       QString latType = (QString) map["LatitudeType"];
       if (latType.toUpper() == "PLANETOGRAPHIC") {
         if (abs(minlat) < 90.0) {  // So tan doesn't fail
@@ -965,7 +965,7 @@ namespace Isis {
     minlon = p_minlon;
     maxlon = p_maxlon;
     bool domain360 = true;
-    if(map.HasKeyword("LongitudeDomain")) {
+    if(map.hasKeyword("LongitudeDomain")) {
       QString lonDomain = (QString) map["LongitudeDomain"];
       if(lonDomain.toUpper() == "180") {
         minlon = p_minlon180;
@@ -975,7 +975,7 @@ namespace Isis {
     }
 
     // Convert to the proper longitude direction
-    if(map.HasKeyword("LongitudeDirection")) {
+    if(map.hasKeyword("LongitudeDirection")) {
       QString lonDirection = (QString) map["LongitudeDirection"];
       if(lonDirection.toUpper() == "POSITIVEWEST") {
         double swap = minlon;
@@ -1030,7 +1030,7 @@ namespace Isis {
     ringRangeResolution();
 
     // Get the mapping group
-    PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup map = pvl.findGroup("Mapping", Pvl::Traverse);
 
     // Get the ring radius range
     minrad = p_minRadius;
@@ -1040,7 +1040,7 @@ namespace Isis {
     minaz = p_minaz;
     maxaz = p_maxaz;
     bool domain360 = true;
-    if (map.HasKeyword("AzimuthDomain")) {
+    if (map.hasKeyword("AzimuthDomain")) {
       QString azDomain = (QString) map["AzimuthDomain"];
       if (azDomain == "180") {
         minaz = p_minaz180;
@@ -1050,7 +1050,7 @@ namespace Isis {
     }
 
     // Convert to the proper azimuth direction
-    if (map.HasKeyword("AzimuthDirection")) {
+    if (map.hasKeyword("AzimuthDirection")) {
       QString azDirection = (QString) map["AzimuthDirection"];
       if (azDirection.toUpper() == "Clockwise") {
         double swap = minaz;
@@ -1114,7 +1114,7 @@ namespace Isis {
     map += PvlKeyword("PixelResolution", toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Sinusoidal");
-    pvl.AddGroup(map);
+    pvl.addGroup(map);
   }
 
 
@@ -1138,7 +1138,7 @@ namespace Isis {
     map += PvlKeyword("PixelResolution", toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Planar");
-    pvl.AddGroup(map);
+    pvl.addGroup(map);
   }
 
 

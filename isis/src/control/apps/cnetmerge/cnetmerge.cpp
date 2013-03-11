@@ -146,8 +146,8 @@ void IsisMain() {
   // If the user wishes to report on conflicts, write them out to a file
   if (report) {
     Pvl outPvl;
-    outPvl.AddObject(conflictLog);
-    outPvl.Write(logName);
+    outPvl.addObject(conflictLog);
+    outPvl.write(logName);
   }
 
   // Writes out the final Control Net
@@ -176,11 +176,11 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
 
           if (report) {
             PvlObject duplicate("Duplicate");
-            duplicate.AddKeyword(PvlKeyword("PointId", point->GetId()));
-            duplicate.AddKeyword(PvlKeyword(
+            duplicate.addKeyword(PvlKeyword("PointId", point->GetId()));
+            duplicate.addKeyword(PvlKeyword(
                   "SourceNetwork", pointSources[point->GetId()]));
-            duplicate.AddKeyword(PvlKeyword("AddNetwork", cnetName.name()));
-            errors.AddObject(duplicate);
+            duplicate.addKeyword(PvlKeyword("AddNetwork", cnetName.name()));
+            errors.addObject(duplicate);
           }
           else {
             // User has disallowed merging points, so throw an error
@@ -200,8 +200,8 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
 
     if (hasDuplicates && report) {
       Pvl outPvl;
-      outPvl.AddObject(errors);
-      outPvl.Write(logName);
+      outPvl.addObject(errors);
+      outPvl.write(logName);
 
       QString msg = "Networks contained duplicate points.  See log file [" +
         FileName(logName).name() + "] for details.  "
@@ -468,7 +468,7 @@ void addMeasure(ControlPoint *basePoint, ControlPoint *newPoint,
 PvlObject createNetworkLog(ControlNet &cnet) {
   PvlObject cnetLog("Network");
   PvlKeyword networkId("NetworkId", cnet.GetNetworkId());
-  cnetLog.AddKeyword(networkId);
+  cnetLog.addKeyword(networkId);
   return cnetLog;
 }
 
@@ -476,7 +476,7 @@ PvlObject createNetworkLog(ControlNet &cnet) {
 PvlObject createPointLog(ControlPoint *point) {
   PvlObject pointLog("Point");
   PvlKeyword pointId("PointId", point->GetId());
-  pointLog.AddKeyword(pointId);
+  pointLog.addKeyword(pointId);
   return pointLog;
 }
 
@@ -492,7 +492,7 @@ void reportConflict(PvlObject &pointLog, QString conflict) {
   // conflicts to a log file
   if (report) {
     PvlKeyword resolution("Resolution", conflict);
-    pointLog.AddKeyword(resolution);
+    pointLog.addKeyword(resolution);
   }
 }
 
@@ -502,7 +502,7 @@ void reportConflict(PvlGroup &measureLog, QString sn, QString conflict) {
   // conflicts to a log file
   if (report) {
     PvlKeyword resolution(sn, conflict);
-    measureLog.AddKeyword(resolution);
+    measureLog.addKeyword(resolution);
   }
 }
 
@@ -510,22 +510,22 @@ void reportConflict(PvlGroup &measureLog, QString sn, QString conflict) {
 void addLog(PvlObject &conflictLog, PvlObject &cnetLog) {
   // If the network log has at least one point object, then there was at least
   // one conflict, so add it to the log for all conflicts
-  if (cnetLog.Objects() > 0)
-    conflictLog.AddObject(cnetLog);
+  if (cnetLog.objects() > 0)
+    conflictLog.addObject(cnetLog);
 }
 
 
 void addLog(PvlObject &cnetLog, PvlObject &pointLog, PvlGroup &measureLog) {
   // If the measure log has at least one keyword, then it has at least one
   // conflict, so add it to the point log
-  if (measureLog.Keywords() > 0)
-    pointLog.AddGroup(measureLog);
+  if (measureLog.keywords() > 0)
+    pointLog.addGroup(measureLog);
 
   // If the point log has more keywords than the PointId keyword, then it has a
   // conflict and should be added to the network log.  Likewise, if it has a
   // group then its measures had conflicts and thus the point should be added to
   // the output log.
-  if (pointLog.Keywords() > 1 || pointLog.Groups() > 0)
-    cnetLog.AddObject(pointLog);
+  if (pointLog.keywords() > 1 || pointLog.groups() > 0)
+    cnetLog.addObject(pointLog);
 }
 

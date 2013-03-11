@@ -117,8 +117,8 @@ void IsisMain() {
   // Output a file if the user request it
   if(ui.WasEntered("TO")) {
     Pvl lab;
-    lab.AddGroup(results);
-    lab.Write(ui.GetFileName("TO", "txt"));
+    lab.addGroup(results);
+    lab.write(ui.GetFileName("TO", "txt"));
   }
   if(doTable) {
     QString filename = FileName(ui.GetFileName("TO", "txt")).expanded();

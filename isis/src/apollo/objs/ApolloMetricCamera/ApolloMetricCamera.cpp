@@ -70,12 +70,12 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    const PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // The Spacecraft Name should be either Apollo 15, 16, or 17.  The name
     // itself could be formatted any number of ways, but the number contained
     // in the name should be unique between the missions
-    QString spacecraft = inst.FindKeyword("SpacecraftName")[0];
+    QString spacecraft = inst.findKeyword("SpacecraftName")[0];
     if (spacecraft.contains("15")) {
       p_ckFrameId = -915240;
       p_ckReferenceId = 1400015;

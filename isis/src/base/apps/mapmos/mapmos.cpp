@@ -51,13 +51,13 @@ void IsisMain() {
     m.SetCreateFlag(true);
 
     // Use the input projection as a starting point for the mosaic
-    PvlGroup mapGroup = inCube.label()->FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup mapGroup = inCube.label()->findGroup("Mapping", Pvl::Traverse);
     inCube.close();
 
-    mapGroup.AddKeyword(PvlKeyword("MinimumLatitude",  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLatitude",  toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("MINLON"))), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MinimumLatitude",  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MaximumLatitude",  toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("MINLON"))), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
 
     CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
 
@@ -81,8 +81,8 @@ void IsisMain() {
   }
   else {
     // Logs the input file location in the mosaic
-    for (int i = 0; i < m.imagePositions().Groups(); i++) {
-      Application::Log(m.imagePositions().Group(i));
+    for (int i = 0; i < m.imagePositions().groups(); i++) {
+      Application::Log(m.imagePositions().group(i));
     }
   }
 

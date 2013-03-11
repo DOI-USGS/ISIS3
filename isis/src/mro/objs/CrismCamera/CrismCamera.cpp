@@ -54,7 +54,7 @@ namespace Isis {
                                        m_isBandDependent(true) {
     NaifStatus::CheckErrors();
 
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // SensorId = S (VNIR), = L (IR) = J (JOINT)
     QString sensor = (QString) inst ["SensorId"];

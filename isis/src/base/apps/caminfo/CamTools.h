@@ -74,7 +74,7 @@ namespace Isis {
 
   inline PvlKeyword ValidateKey(const QString keyname, PvlKeyword &key,
                                 const QString &unit = "") {
-    if(key.IsNull()) {
+    if(key.isNull()) {
       return (PvlKeyword(keyname, "NULL"));
     }
     else {

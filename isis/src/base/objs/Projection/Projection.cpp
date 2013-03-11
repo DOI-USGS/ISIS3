@@ -106,7 +106,7 @@ namespace Isis {
   Projection::Projection(Pvl &label) : m_mappingGrp("Mapping") {
     try {
       // Try to read the mapping group
-      m_mappingGrp = label.FindGroup("Mapping", Pvl::Traverse);
+      m_mappingGrp = label.findGroup("Mapping", Pvl::Traverse);
 
       // TODO** Try to generalize these to keep in parent Projection class and use for both azimuth and longitude
       // Get the Azimuth or LongitudeDomain
@@ -124,7 +124,7 @@ namespace Isis {
 
       // Get the map rotation
       m_rotation = 0.0;
-      if (m_mappingGrp.HasKeyword("Rotation")) {
+      if (m_mappingGrp.hasKeyword("Rotation")) {
         m_rotation = m_mappingGrp["Rotation"];
       }
 
@@ -132,7 +132,7 @@ namespace Isis {
       m_good = false;
 
       m_pixelResolution = 1.0;
-      if (m_mappingGrp.HasKeyword("PixelResolution")) {
+      if (m_mappingGrp.hasKeyword("PixelResolution")) {
         m_pixelResolution = m_mappingGrp["PixelResolution"];
       }
 
@@ -144,7 +144,7 @@ namespace Isis {
       m_mapper = NULL;
 
       m_sky = false;
-      if (m_mappingGrp.HasKeyword("TargetName")) {
+      if (m_mappingGrp.hasKeyword("TargetName")) {
         QString str = m_mappingGrp["TargetName"];
         if (str.toUpper() == "SKY") m_sky = true;
       }
@@ -1359,8 +1359,8 @@ namespace Isis {
                                       const Displacement &y) {
     PvlKeyword xKeyword("UpperLeftCornerX", toString(x.meters()), "meters");
     PvlKeyword yKeyword("UpperLeftCornerY", toString(y.meters()), "meters");
-    m_mappingGrp.AddKeyword(xKeyword,Pvl::Replace);
-    m_mappingGrp.AddKeyword(yKeyword,Pvl::Replace);
+    m_mappingGrp.addKeyword(xKeyword,Pvl::Replace);
+    m_mappingGrp.addKeyword(yKeyword,Pvl::Replace);
   }
 } //end namespace isis
 

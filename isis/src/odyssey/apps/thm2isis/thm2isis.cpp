@@ -34,7 +34,7 @@ void IsisMain() {
   bool projected;
   try {
     Pvl lab(in.expanded());
-    projected = lab.HasObject("IMAGE_MAP_PROJECTION");
+    projected = lab.hasObject("IMAGE_MAP_PROJECTION");
     QString id;
     id = (QString)lab["DATA_SET_ID"];
     id = id.simplified().trimmed();
@@ -68,7 +68,7 @@ void IsisMain() {
 
   // Set up the output cube
   FileName outFile(ui.GetFileName("TO"));
-  PvlGroup &inst = isis3Lab.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = isis3Lab.findGroup("Instrument", Pvl::Traverse);
 
   if((QString)inst["InstrumentId"] == "THEMIS_VIS") {
     Cube *even = new Cube();
@@ -104,22 +104,22 @@ void IsisMain() {
   p.EndProcess();
 
   for(int i = 0; i < (int)outputCubes.size(); i++) {
-    for(int grp = 0; grp < isis3Lab.Groups(); grp++) {
+    for(int grp = 0; grp < isis3Lab.groups(); grp++) {
 
       // vis image?
       if(outputCubes.size() != 1) {
         int numFramelets = p.Lines() / frameletLines;
-        isis3Lab.FindGroup("Instrument").AddKeyword(
+        isis3Lab.findGroup("Instrument").addKeyword(
           PvlKeyword("NumFramelets", toString(numFramelets)), Pvl::Replace
         );
 
         QString frameletType = ((i == 0) ? "Odd" : "Even");
-        isis3Lab.FindGroup("Instrument").AddKeyword(
+        isis3Lab.findGroup("Instrument").addKeyword(
           PvlKeyword("Framelets", frameletType), Pvl::Replace
         );
       }
 
-      outputCubes[i]->putGroup(isis3Lab.Group(grp));
+      outputCubes[i]->putGroup(isis3Lab.group(grp));
     }
 
     outputCubes[i]->write(origLabels);
@@ -172,14 +172,14 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   inst += PvlKeyword("SpacecraftClockCount",
                      (QString) pdsLab["SpacecraftClockStartCount"]);
 
-  PvlObject &sqube = pdsLab.FindObject("SPECTRAL_QUBE");
+  PvlObject &sqube = pdsLab.findObject("SPECTRAL_QUBE");
   if(instId == "THEMIS_IR") {
     inst += PvlKeyword("GainNumber", (QString)sqube["GainNumber"]);
     inst += PvlKeyword("OffsetNumber", (QString)sqube["OffsetNumber"]);
     inst += PvlKeyword("MissingScanLines", (QString)sqube["MissingScanLines"]);
     inst += PvlKeyword("TimeDelayIntegration",
                        (QString)sqube["TimeDelayIntegrationFlag"]);
-    if(sqube.HasKeyword("SpatialSumming")) {
+    if(sqube.hasKeyword("SpatialSumming")) {
       inst += PvlKeyword("SpatialSumming", (QString)sqube["SpatialSumming"]);
     }
   }
@@ -194,22 +194,22 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   double spacecraftClockOffset = ui.GetDouble("TIMEOFFSET");
   inst += PvlKeyword("SpacecraftClockOffset", toString(spacecraftClockOffset), "seconds");
 
-  isis3.AddGroup(inst);
+  isis3.addGroup(inst);
 
   // Create the Band bin Group
   PvlGroup bandBin("BandBin");
   PvlKeyword originalBand("OriginalBand");
   for(int i = 1; i <= numBands; i++) {
-    originalBand.AddValue(toString(i));
+    originalBand.addValue(toString(i));
   }
   bandBin += originalBand;
-  bandBin += sqube.FindGroup("BandBin")["BandBinCenter"];
-  bandBin += sqube.FindGroup("BandBin")["BandBinWidth"];
-  bandBin += sqube.FindGroup("BandBin")["BandBinFilterNumber"];
-  bandBin["BandBinCenter"].SetName("Center");
-  bandBin["BandBinWidth"].SetName("Width");
-  bandBin["BandBinFilterNumber"].SetName("FilterNumber");
-  isis3.AddGroup(bandBin);
+  bandBin += sqube.findGroup("BandBin")["BandBinCenter"];
+  bandBin += sqube.findGroup("BandBin")["BandBinWidth"];
+  bandBin += sqube.findGroup("BandBin")["BandBinFilterNumber"];
+  bandBin["BandBinCenter"].setName("Center");
+  bandBin["BandBinWidth"].setName("Width");
+  bandBin["BandBinFilterNumber"].setName("FilterNumber");
+  isis3.addGroup(bandBin);
 
   // Create the archive Group
   PvlGroup arch("Archive");
@@ -227,7 +227,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   arch += PvlKeyword("CommandSequenceNumber",
                      (QString)sqube["CommandSequenceNumber"]);
   arch += PvlKeyword("Description", (QString)sqube["Description"]);
-  isis3.AddGroup(arch);
+  isis3.addGroup(arch);
 
   // Create the Kernel Group
   PvlGroup kerns("Kernels");
@@ -237,5 +237,5 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   else {
     kerns += PvlKeyword("NaifFrameCode", toString(-53032));
   }
-  isis3.AddGroup(kerns);
+  isis3.addGroup(kerns);
 }

@@ -719,7 +719,7 @@ namespace Isis
         editorWidget->connectionFilterWidget());
 
     setFileState(HasFile, *curFile);
-    saveAsPvl = !Pvl(*curFile).HasObject("ProtoBuffer");
+    saveAsPvl = !Pvl(*curFile).hasObject("ProtoBuffer");
   }
 
 

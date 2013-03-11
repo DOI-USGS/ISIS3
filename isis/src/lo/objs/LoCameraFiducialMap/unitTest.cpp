@@ -44,7 +44,7 @@ int main(void) {
     Pvl pm("$lo/testData/3083_med_raw.cub");
     Camera *camm = CameraFactory::Create(pm);
 
-    cout << "FileName: " << FileName(pm.FileName()).name() << endl;
+    cout << "FileName: " << FileName(pm.fileName()).name() << endl;
     cout << "CK Frame: " << camm->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -135,7 +135,7 @@ int main(void) {
     Pvl ph("$lo/testData/4164H_Full_mirror.cub");
     Camera *camh = CameraFactory::Create(ph);
 
-    cout << "FileName: " << FileName(ph.FileName()).name() << endl;
+    cout << "FileName: " << FileName(ph.fileName()).name() << endl;
     cout << "CK Frame: " << camh->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

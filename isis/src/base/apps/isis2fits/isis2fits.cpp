@@ -56,7 +56,7 @@ void IsisMain() {
   if(bitpix == "-32") p.SetOutputType(Isis::Real);
 
   // determine core base and multiplier, set up the stretch
-  PvlGroup pix = icube->label()->FindObject("IsisCube").FindObject("Core").FindGroup("Pixels");
+  PvlGroup pix = icube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels");
   double scale = toDouble(pix["Multiplier"][0]);
   double base = toDouble(pix["Base"][0]);
 
@@ -152,10 +152,10 @@ void IsisMain() {
       // Some cameras don't have StopTime
       if(icube->hasGroup("Instrument")) {
         PvlGroup inst = icube->group("Instrument");
-        if(inst.HasKeyword("StopTime")) {
+        if(inst.hasKeyword("StopTime")) {
           header += WritePvl("TIME_END", "Instrument", "StopTime", icube, true);
         }
-        if(inst.HasKeyword("ExposureDuration")) {
+        if(inst.hasKeyword("ExposureDuration")) {
           header += WritePvl("EXPTIME", "Instrument", "ExposureDuration", icube, false);
         }
       }
@@ -241,7 +241,7 @@ QString WritePvl(QString fitsKey, QString group, IString key, Cube *icube, bool 
     if(isString) {
       name = "'" + name + "'";
     }
-    QString unit = theGroup[key].Unit();
+    QString unit = theGroup[key].unit();
     return FitsKeyword(fitsKey, true, name, unit);
   }
   return NULL;

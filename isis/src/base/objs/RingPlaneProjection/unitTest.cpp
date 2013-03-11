@@ -130,8 +130,8 @@ int main(int argc, char *argv[]) {
   Doit(lab);
   cout << endl;
 
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mg = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mg = lab.findGroup("Mapping");
   Doit(lab);
   cout << endl;
 
@@ -192,12 +192,12 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing unordered radius range" << endl;
-  mg["MaximumRadius"].SetValue("45.0", "units");
+  mg["MaximumRadius"].setValue("45.0", "units");
   Doit(lab);
   cout << endl;
 
   cout << "Testing unordered azimuth range" << endl;
-  mg["MaximumRadius"].SetValue("180.0", "units");
+  mg["MaximumRadius"].setValue("180.0", "units");
   Doit(lab);
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
@@ -257,8 +257,8 @@ int main(int argc, char *argv[]) {
    *   were added to accommodate for double imprecission. 
    */
   Isis::Pvl radRangeTest;
-  radRangeTest.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &radTestGroup = radRangeTest.FindGroup("Mapping");
+  radRangeTest.addGroup(Isis::PvlGroup("Mapping"));
+  Isis::PvlGroup &radTestGroup = radRangeTest.findGroup("Mapping");
   radTestGroup += Isis::PvlKeyword("TargetName", "Saturn");
   radTestGroup += Isis::PvlKeyword("ProjectionName", "Planar");
   radTestGroup += Isis::PvlKeyword("AzimuthDirection", "Clockwise");
@@ -567,19 +567,19 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   Pvl mapping;
-  mapping.AddGroup(p4.Mapping());
+  mapping.addGroup(p4.Mapping());
   cout << "Testing Mapping() methods" << endl;
   cout << "Mapping() = " << endl;
   cout << mapping << endl;
-  mapping.DeleteGroup("Mapping");
-  mapping.AddGroup(p4.MappingRadii());
+  mapping.deleteGroup("Mapping");
+  mapping.addGroup(p4.MappingRadii());
   cout << "MappingRadii() = " << endl;
   cout << mapping << endl;
-  mapping.DeleteGroup("Mapping");
-  mapping.AddGroup(p4.MappingAzimuths());
+  mapping.deleteGroup("Mapping");
+  mapping.addGroup(p4.MappingAzimuths());
   cout << "MappingAzimuths() = " << endl;
   cout << mapping << endl;
-  mapping.DeleteGroup("Mapping");
+  mapping.deleteGroup("Mapping");
   cout << endl;
 
   //SetUpperLeftCorner(Displacement x, Displacement y)

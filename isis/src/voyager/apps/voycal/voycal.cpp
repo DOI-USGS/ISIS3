@@ -63,13 +63,13 @@ void IsisMain() {
   }
 
   // access important label objects, will be used later.
-  PvlObject isiscube = incube->label()->FindObject("IsisCube");
-  PvlGroup instrument = isiscube.FindGroup("Instrument");
-  PvlGroup archive = isiscube.FindGroup("Archive");
-  PvlGroup bandbin = isiscube.FindGroup("BandBin");
+  PvlObject isiscube = incube->label()->findObject("IsisCube");
+  PvlGroup instrument = isiscube.findGroup("Instrument");
+  PvlGroup archive = isiscube.findGroup("Archive");
+  PvlGroup bandbin = isiscube.findGroup("BandBin");
 
   // Verify not radiometrically corrected
-  if (isiscube.HasGroup("Radiometry")) {
+  if (isiscube.hasGroup("Radiometry")) {
     QString msg = "Cube [" + ui.GetFileName("FROM") + "] has already been" +
                   " radiometrically corrected";
     throw IException(IException::User,msg,_FILEINFO_);
@@ -91,13 +91,13 @@ void IsisMain() {
   QList<QString> hierarchy;
   try {
     // Search voycal.pvl for appropriate object
-    hierarchy.append(instrument.FindKeyword("SpacecraftName")[0]);
-    hierarchy.append(instrument.FindKeyword("InstrumentId")[0]);
+    hierarchy.append(instrument.findKeyword("SpacecraftName")[0]);
+    hierarchy.append(instrument.findKeyword("InstrumentId")[0]);
     hierarchy.append(
-        QString("ShutterMode" + instrument.FindKeyword("CameraState2")[0]));
-    hierarchy.append(archive.FindKeyword("MissionPhaseName")[0]);
+        QString("ShutterMode" + instrument.findKeyword("CameraState2")[0]));
+    hierarchy.append(archive.findKeyword("MissionPhaseName")[0]);
     hierarchy.append(
-        QString("ScanRate" + instrument.FindKeyword("CameraState1")[0]));
+        QString("ScanRate" + instrument.findKeyword("CameraState1")[0]));
     hierarchy.append(
         QString(bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0]));
 
@@ -179,43 +179,43 @@ void IsisMain() {
 
   PvlGroup calgrp("Radiometry");
   // Regular calibration equation and constants
-  calgrp.AddComment("Calibration equation in voycal:");
-  calgrp.AddComment("OUT(i,j) = (IN(i,j)*GAIN)+DCF(i,j)*XMLT*FFF(i,j)");
-  calgrp.AddComment("XMLT = 1.0/(EXPO*W1)");
-  calgrp.AddComment("EXPO = EXPODUR + DELTAEXPO");
-  calgrp.AddComment("W1 = (W0/1000)*(SUNDIST^2/CALCDIST^2)");
-  calgrp.AddComment("DCF = OffsetCorrectionFile, FFF = GainCorrectionFile");
-  calgrp.AddComment("IN = InputCube, GAIN = GainCorrection");
-  calgrp.AddKeyword(calib[0]);
-  calgrp.AddKeyword(calib[1]);
-  calgrp.AddKeyword(calib[2]);
-  calgrp.AddKeyword(calib[3]);
-  calgrp.AddKeyword(calib[4]);
-  calgrp.AddKeyword(calib[5]);
-  calgrp.AddKeyword(calib[6]);
-  calgrp.AddKeyword(PvlKeyword("CalcSunDistance",toString(dist1)));
-  calgrp.AddKeyword(instrument["ExposureDuration"]);
-  calgrp.AddKeyword(PvlKeyword("XMLT",toString(XMLT)));
-  calgrp.AddKeyword(PvlKeyword("Omega_W1",toString(w1)));
-  calgrp.AddKeyword(PvlKeyword("CalcExpoDuration",toString(newExpo)));
+  calgrp.addComment("Calibration equation in voycal:");
+  calgrp.addComment("OUT(i,j) = (IN(i,j)*GAIN)+DCF(i,j)*XMLT*FFF(i,j)");
+  calgrp.addComment("XMLT = 1.0/(EXPO*W1)");
+  calgrp.addComment("EXPO = EXPODUR + DELTAEXPO");
+  calgrp.addComment("W1 = (W0/1000)*(SUNDIST^2/CALCDIST^2)");
+  calgrp.addComment("DCF = OffsetCorrectionFile, FFF = GainCorrectionFile");
+  calgrp.addComment("IN = InputCube, GAIN = GainCorrection");
+  calgrp.addKeyword(calib[0]);
+  calgrp.addKeyword(calib[1]);
+  calgrp.addKeyword(calib[2]);
+  calgrp.addKeyword(calib[3]);
+  calgrp.addKeyword(calib[4]);
+  calgrp.addKeyword(calib[5]);
+  calgrp.addKeyword(calib[6]);
+  calgrp.addKeyword(PvlKeyword("CalcSunDistance",toString(dist1)));
+  calgrp.addKeyword(instrument["ExposureDuration"]);
+  calgrp.addKeyword(PvlKeyword("XMLT",toString(XMLT)));
+  calgrp.addKeyword(PvlKeyword("Omega_W1",toString(w1)));
+  calgrp.addKeyword(PvlKeyword("CalcExpoDuration",toString(newExpo)));
 
   // Linear correction equation and constants
   if (linear) {
     PvlKeyword linearity = PvlKeyword("LinearityCorrection","True");
-    linearity.AddComment("Linearity correction equation:");
-    linearity.AddComment("OUT(i,j) = LIN( (IN(i,j)*GAIN)+DCF(i,j) )*XMLT*FFF(i,j)");
-    linearity.AddComment("LIN(X) = ACOEF*X+BCOEF*(X/XNORM)^KPOWER");
-    linearity.AddComment("BCOEF = B_HighEndeNon-LinearityCorrection");
-    linearity.AddComment("XNORM = NormalizingPower");
-    linearity.AddComment("KPOWER = K_PowerOfNon-Linearity");
-    calgrp.AddKeyword(linearity);
-    calgrp.AddKeyword(PvlKeyword("ACoefficient",toString(aCoef)));
-    calgrp.AddKeyword(PvlKeyword("B_HighEndNon-LinearityCorrection",toString(bHighEnd)));
-    calgrp.AddKeyword(PvlKeyword("K_PowerOfNon-Linearity",toString(kPowerOf)));
-    calgrp.AddKeyword(PvlKeyword("NormalizingPower",toString(normalizingPower)));
+    linearity.addComment("Linearity correction equation:");
+    linearity.addComment("OUT(i,j) = LIN( (IN(i,j)*GAIN)+DCF(i,j) )*XMLT*FFF(i,j)");
+    linearity.addComment("LIN(X) = ACOEF*X+BCOEF*(X/XNORM)^KPOWER");
+    linearity.addComment("BCOEF = B_HighEndeNon-LinearityCorrection");
+    linearity.addComment("XNORM = NormalizingPower");
+    linearity.addComment("KPOWER = K_PowerOfNon-Linearity");
+    calgrp.addKeyword(linearity);
+    calgrp.addKeyword(PvlKeyword("ACoefficient",toString(aCoef)));
+    calgrp.addKeyword(PvlKeyword("B_HighEndNon-LinearityCorrection",toString(bHighEnd)));
+    calgrp.addKeyword(PvlKeyword("K_PowerOfNon-Linearity",toString(kPowerOf)));
+    calgrp.addKeyword(PvlKeyword("NormalizingPower",toString(normalizingPower)));
   }
   else {
-    calgrp.AddKeyword(PvlKeyword("LinearityCorrection","False"));
+    calgrp.addKeyword(PvlKeyword("LinearityCorrection","False"));
   }
 
   // Add Radiometry group
@@ -279,8 +279,8 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
   PvlObject coefficients;
 
   // Add all the keywords from the calibration PVL top-level object
-  for (int k = 0; k < calibration.Keywords(); k++)
-    coefficients.AddKeyword(calibration[k]);
+  for (int k = 0; k < calibration.keywords(); k++)
+    coefficients.addKeyword(calibration[k]);
 
   // Iterate over every object in the hierarchy looking for coefficient
   // keywords.  The first string is the name of the first object, the second
@@ -291,26 +291,26 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
   for (int o = 0; o < hierarchy.size() && validHierarchy; o++) {
     QString objectName = hierarchy[o];
 
-    if (parent->HasObject(objectName)) {
+    if (parent->hasObject(objectName)) {
       // The object named in the hierarchy exists in the calibration file, so
       // grab it
-      PvlObject &object = parent->FindObject(objectName);
+      PvlObject &object = parent->findObject(objectName);
 
       // Find all the keywords at the object level
-      for (int k = 0; k < object.Keywords(); k++) {
+      for (int k = 0; k < object.keywords(); k++) {
         PvlKeyword &keyword = object[k];
-        if (coefficients.HasKeyword(keyword.Name())) {
+        if (coefficients.hasKeyword(keyword.name())) {
           // The coefficients object already has a value for this coefficient
           // keyword.  Because this one is lower down the chain, it is more
           // specifically defined, thus we should use it instead.
-          PvlKeyword &coefficient = coefficients.FindKeyword(keyword.Name());
-          for (int i = 0; i < coefficient.Size(); i++) {
+          PvlKeyword &coefficient = coefficients.findKeyword(keyword.name());
+          for (int i = 0; i < coefficient.size(); i++) {
             coefficient[i] = keyword[i];
           }
         }
         else {
           // This is a new keyword, so add it to the coefficients object
-          coefficients.AddKeyword(object[k]);
+          coefficients.addKeyword(object[k]);
         }
       }
 
@@ -329,7 +329,7 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
 
 
 void checkCoefficient(PvlObject &coefficients, QString keyName) {
-  if (!coefficients.HasKeyword(keyName))
+  if (!coefficients.hasKeyword(keyName))
     throw IException(
         IException::Programmer,
         "Coefficient [" + keyName + "] was not found in the calibration PVL "

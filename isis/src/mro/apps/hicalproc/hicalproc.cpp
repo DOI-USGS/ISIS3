@@ -53,7 +53,7 @@ void IsisMain() {
       cubeLabel = Pvl(inFile);
     }
     // Get the Summing from the label
-    int iSumming = toInt(cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("Summing")[0]);
+    int iSumming = toInt(cubeLabel.findObject("IsisCube").findGroup("Instrument").findKeyword("Summing")[0]);
 
     Pipeline p1("hicalproc1");
     p1.SetInputFile("FROM");
@@ -439,15 +439,15 @@ void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
   int iChannel=-1, iSumming=-1;
   QString sCcd="";
 
-  PvlGroup instrGrp = pCubeLabel.FindObject("IsisCube").FindGroup("Instrument");
+  PvlGroup instrGrp = pCubeLabel.findObject("IsisCube").findGroup("Instrument");
 
   // Summing keyword
-  if (!instrGrp.HasKeyword("Summing")) {
+  if (!instrGrp.hasKeyword("Summing")) {
     QString sMsg = "Summing keyword not found";
     throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
-    PvlKeyword binKey = instrGrp.FindKeyword("Summing");
+    PvlKeyword binKey = instrGrp.findKeyword("Summing");
     iSumming = toInt(binKey[0]);
     if (iSumming != 1 && iSumming != 2 && iSumming != 4) {
       QString sMsg = "Invalid Summing value in input file, must be 1,2,or 4";
@@ -456,22 +456,22 @@ void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
   }
 
   // CCD Keyword
-  if (!instrGrp.HasKeyword("CcdId")) {
+  if (!instrGrp.hasKeyword("CcdId")) {
     QString sMsg = "CcdId keyword not found";
     throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
-    PvlKeyword ccdKey = instrGrp.FindKeyword("CcdId");
+    PvlKeyword ccdKey = instrGrp.findKeyword("CcdId");
     sCcd = ccdKey[0];
   }
 
   // Channel Keyword
-  if (!instrGrp.HasKeyword("ChannelNumber")) {
+  if (!instrGrp.hasKeyword("ChannelNumber")) {
     QString sMsg = "ChannelNumber keyword not found";
     throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
-    PvlKeyword channelKey = instrGrp.FindKeyword("ChannelNumber");
+    PvlKeyword channelKey = instrGrp.findKeyword("ChannelNumber");
     iChannel = toInt(channelKey[0]);
   }
 

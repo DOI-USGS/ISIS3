@@ -33,8 +33,8 @@ namespace Isis {
 
 
   void ControlNetFileV0001::Read(const Pvl &head, const FileName &file) {
-    const PvlObject &protoBufferInfo = head.FindObject("ProtoBuffer");
-    const PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
+    const PvlObject &protoBufferInfo = head.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
 
     BigInt coreStartPos = protoBufferCore["StartByte"];
     BigInt coreLength = protoBufferCore["Bytes"];
@@ -68,7 +68,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    const PvlObject &logDataInfo = protoBufferInfo.FindObject("LogData");
+    const PvlObject &logDataInfo = protoBufferInfo.findObject("LogData");
     BigInt logStartPos = logDataInfo["StartByte"];
     BigInt logLength = logDataInfo["Bytes"];
 
@@ -94,10 +94,10 @@ namespace Isis {
   }
 
 
-  Pvl ControlNetFileV0001::ToPvl() const {
+  Pvl ControlNetFileV0001::toPvl() const {
     Pvl pvl;
-    pvl.AddObject(PvlObject("ControlNetwork"));
-    PvlObject &network = pvl.FindObject("ControlNetwork");
+    pvl.addObject(PvlObject("ControlNetwork"));
+    PvlObject &network = pvl.findObject("ControlNetwork");
 
     network += PvlKeyword("NetworkId", p_network->networkid().c_str());
     network += PvlKeyword("TargetName", p_network->targetname().c_str());
@@ -311,10 +311,10 @@ namespace Isis {
            binaryPoint.referenceindex() == j)
           pvlMeasure += PvlKeyword("Reference", "True");
 
-        pvlPoint.AddGroup(pvlMeasure);
+        pvlPoint.addGroup(pvlMeasure);
       }
 
-      network.AddObject(pvlPoint);
+      network.addObject(pvlPoint);
     }
 
     return pvl;

@@ -49,8 +49,8 @@ namespace Isis {
    *
    */
   void ControlNetFileV0002::Read(const Pvl &header, const FileName &file) {
-    const PvlObject &protoBufferInfo = header.FindObject("ProtoBuffer");
-    const PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
+    const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
 
     BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
     BigInt headerLength = protoBufferCore["HeaderBytes"];
@@ -195,17 +195,17 @@ namespace Isis {
     PvlObject protoObj("ProtoBuffer");
 
     PvlObject protoCore("Core");
-    protoCore.AddKeyword(PvlKeyword("HeaderStartByte",
+    protoCore.addKeyword(PvlKeyword("HeaderStartByte",
                          toString((BigInt) startCoreHeaderPos)));
-    protoCore.AddKeyword(PvlKeyword("HeaderBytes", toString((BigInt) coreHeaderSize)));
-    protoCore.AddKeyword(PvlKeyword("PointsStartByte",
+    protoCore.addKeyword(PvlKeyword("HeaderBytes", toString((BigInt) coreHeaderSize)));
+    protoCore.addKeyword(PvlKeyword("PointsStartByte",
         toString((BigInt) ( startCoreHeaderPos + coreHeaderSize))));
-    protoCore.AddKeyword(PvlKeyword("PointsBytes",
+    protoCore.addKeyword(PvlKeyword("PointsBytes",
         toString(pointsSize)));
-    protoObj.AddObject(protoCore);
+    protoObj.addObject(protoCore);
 
     PvlGroup netInfo("ControlNetworkInfo");
-    netInfo.AddComment("This group is for informational purposes only");
+    netInfo.addComment("This group is for informational purposes only");
     netInfo += PvlKeyword("NetworkId", p_networkHeader->networkid().c_str());
     netInfo += PvlKeyword("TargetName", p_networkHeader->targetname().c_str());
     netInfo += PvlKeyword("UserName", p_networkHeader->username().c_str());
@@ -215,9 +215,9 @@ namespace Isis {
     netInfo += PvlKeyword("NumberOfPoints", toString(p_controlPoints->size()));
     netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
     netInfo += PvlKeyword("Version", "2");
-    protoObj.AddGroup(netInfo);
+    protoObj.addGroup(netInfo);
 
-    p.AddObject(protoObj);
+    p.addObject(protoObj);
 
     output.seekp(0, ios::beg);
     output << p;
@@ -242,10 +242,10 @@ namespace Isis {
    *                          Tie    ----> Free
    *
    */
-  Pvl ControlNetFileV0002::ToPvl() const {
+  Pvl ControlNetFileV0002::toPvl() const {
     Pvl pvl;
-    pvl.AddObject(PvlObject("ControlNetwork"));
-    PvlObject &network = pvl.FindObject("ControlNetwork");
+    pvl.addObject(PvlObject("ControlNetwork"));
+    PvlObject &network = pvl.findObject("ControlNetwork");
 
     network += PvlKeyword("NetworkId", p_networkHeader->networkid().c_str());
     network += PvlKeyword("TargetName", p_networkHeader->targetname().c_str());
@@ -259,7 +259,7 @@ namespace Isis {
 
     //  Get Target Radii from naif kernel
     PvlGroup pvlRadii;
-    QString target = (QString)network.FindKeyword("TargetName",Pvl::Traverse);
+    QString target = (QString)network.findKeyword("TargetName",Pvl::Traverse);
     if (target != "") {
       try {
         NaifStatus::CheckErrors();
@@ -362,13 +362,13 @@ namespace Isis {
                 Displacement(binaryPoint.apriorix(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriy(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriz(),Displacement::Meters));
-        pvlPoint.FindKeyword("AprioriX").AddComment("AprioriLatitude = " +
+        pvlPoint.findKeyword("AprioriX").addComment("AprioriLatitude = " +
                                  toString(apriori.GetLatitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AprioriY").AddComment("AprioriLongitude = " +
+        pvlPoint.findKeyword("AprioriY").addComment("AprioriLongitude = " +
                                  toString(apriori.GetLongitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AprioriZ").AddComment("AprioriRadius = " +
+        pvlPoint.findKeyword("AprioriZ").addComment("AprioriRadius = " +
                                  toString(apriori.GetLocalRadius().meters()) +
                                  " <meters>");
 
@@ -382,7 +382,7 @@ namespace Isis {
           matrix += toString(binaryPoint.aprioricovar(5));
           pvlPoint += matrix;
 
-          if (pvlRadii.HasKeyword("EquatorialRadius")) {
+          if (pvlRadii.hasKeyword("EquatorialRadius")) {
             apriori.SetRadii(
                          Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
                          Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
@@ -404,7 +404,7 @@ namespace Isis {
                              " <meters>  AprioriRadiusSigma = " +
                              toString(apriori.GetLocalRadiusSigma().meters()) +
                              " <meters>";
-            pvlPoint.FindKeyword("AprioriCovarianceMatrix").AddComment(sigmas);
+            pvlPoint.findKeyword("AprioriCovarianceMatrix").addComment(sigmas);
           }
         }
       }
@@ -429,13 +429,13 @@ namespace Isis {
                 Displacement(binaryPoint.adjustedx(),Displacement::Meters),
                 Displacement(binaryPoint.adjustedy(),Displacement::Meters),
                 Displacement(binaryPoint.adjustedz(),Displacement::Meters));
-        pvlPoint.FindKeyword("AdjustedX").AddComment("AdjustedLatitude = " +
+        pvlPoint.findKeyword("AdjustedX").addComment("AdjustedLatitude = " +
                                  toString(adjusted.GetLatitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AdjustedY").AddComment("AdjustedLongitude = " +
+        pvlPoint.findKeyword("AdjustedY").addComment("AdjustedLongitude = " +
                                  toString(adjusted.GetLongitude().degrees()) +
                                  " <degrees>");
-        pvlPoint.FindKeyword("AdjustedZ").AddComment("AdjustedRadius = " +
+        pvlPoint.findKeyword("AdjustedZ").addComment("AdjustedRadius = " +
                                  toString(adjusted.GetLocalRadius().meters()) +
                                  " <meters>");
 
@@ -449,7 +449,7 @@ namespace Isis {
           matrix += toString(binaryPoint.adjustedcovar(5));
           pvlPoint += matrix;
 
-          if (pvlRadii.HasKeyword("EquatorialRadius")) {
+          if (pvlRadii.hasKeyword("EquatorialRadius")) {
             adjusted.SetRadii(
                          Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
                          Distance(pvlRadii["EquatorialRadius"],Distance::Meters),
@@ -471,7 +471,7 @@ namespace Isis {
                              " <meters>  AdjustedRadiusSigma = " +
                              toString(adjusted.GetLocalRadiusSigma().meters()) +
                              " <meters>";
-            pvlPoint.FindKeyword("AdjustedCovarianceMatrix").AddComment(sigmas);
+            pvlPoint.findKeyword("AdjustedCovarianceMatrix").addComment(sigmas);
           }
         }
       }
@@ -554,10 +554,10 @@ namespace Isis {
            binaryPoint.referenceindex() == j)
           pvlMeasure += PvlKeyword("Reference", "True");
 
-        pvlPoint.AddGroup(pvlMeasure);
+        pvlPoint.addGroup(pvlMeasure);
       }
 
-      network.AddObject(pvlPoint);
+      network.addObject(pvlPoint);
     }
     return pvl;
   }

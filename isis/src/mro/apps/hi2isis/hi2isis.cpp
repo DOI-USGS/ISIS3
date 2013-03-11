@@ -68,8 +68,8 @@ void IsisMain() {
   bool projected;
   try {
     Pvl lab(inFile.expanded());
-    id = (QString) lab.FindKeyword("DATA_SET_ID");
-    projected = lab.HasObject("IMAGE_MAP_PROJECTION");
+    id = (QString) lab.findKeyword("DATA_SET_ID");
+    projected = lab.hasObject("IMAGE_MAP_PROJECTION");
   }
   catch(IException &e) {
     QString msg = "Unable to read [DATA_SET_ID] from input file [" +
@@ -123,26 +123,26 @@ void IsisMain() {
 
   // Set up the Stretch object with the info from the lookup table
   // If the first entry is (0,0) then no lut was applied.
-  if((lutKey.IsNull()) ||
+  if((lutKey.isNull()) ||
       (lutSeq.Size() == 1 && lutSeq[0][0] == "0" && lutSeq[0][1] == "0")) {
     stretch.AddPair(0.0, 0.0);
     stretch.AddPair(65536.0, 65536.0);
-    instgrp.AddKeyword(PvlKeyword("Unlutted", "TRUE"));
-    instgrp.DeleteKeyword("LookupTable");
+    instgrp.addKeyword(PvlKeyword("Unlutted", "TRUE"));
+    instgrp.deleteKeyword("LookupTable");
   }
   // The user wants it unlutted
   else if(ui.GetBoolean("UNLUT")) {
     for(int i = 0; i < lutSeq.Size(); i++) {
       stretch.AddPair(i, ((toDouble(lutSeq[i][0]) + toDouble(lutSeq[i][1])) / 2.0));
     }
-    instgrp.AddKeyword(PvlKeyword("Unlutted", "TRUE"));
-    instgrp.DeleteKeyword("LookupTable");
+    instgrp.addKeyword(PvlKeyword("Unlutted", "TRUE"));
+    instgrp.deleteKeyword("LookupTable");
   }
   // The user does not want the data unlutted
   else {
     stretch.AddPair(0.0, 0.0);
     stretch.AddPair(65536.0, 65536.0);
-    instgrp.AddKeyword(PvlKeyword("Unlutted", "FALSE"));
+    instgrp.addKeyword(PvlKeyword("Unlutted", "FALSE"));
   }
 
   // Save the calibration and ancillary data as BLOBs. Both get run thru the
@@ -231,7 +231,7 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
   Pvl outLabel;
 
   // Get the directory where the MRO HiRISE translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Mro"] + "/translations/";
 
   // Get a filename for the HiRISE EDR label
@@ -254,12 +254,12 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Create the Instrument group keyword CcdId from the ProductId
   // SCS 28-03-06 Do it in the instrument translation table instead of here
-//  PvlGroup &archiveGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-//  QString productId = (QString)archiveGroup.FindKeyword("ProductId");
+//  PvlGroup &archiveGroup(outLabel.findGroup("Archive", Pvl::Traverse));
+//  QString productId = (QString)archiveGroup.findKeyword("ProductId");
 //  productId.Token("_");
 //  productId.Token("_");
 //  productId = productId.Token("_");
-//  outLabel.FindGroup("Instrument", Pvl::Traverse) +=
+//  outLabel.findGroup("Instrument", Pvl::Traverse) +=
 //      PvlKeyword ("CcdId", productId);
 
   // Create the Kernel Group
@@ -268,9 +268,9 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Write the Instrument, BandBin, Archive, and Kernels groups to the output
   // cube label
-  ocube->putGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
-  ocube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
   ocube->putGroup(kerns);
 }
 

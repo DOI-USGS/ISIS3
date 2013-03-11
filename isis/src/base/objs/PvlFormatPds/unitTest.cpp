@@ -40,7 +40,7 @@ int main() {
       }
       {
         PvlKeyword key("fkey2", "rEaL");
-        key.AddValue(toString(2));
+        key.addValue(toString(2));
         out << key << endl;
       }
       {
@@ -49,7 +49,7 @@ int main() {
       }
       {
         PvlKeyword key("fkey0", "real");
-        key.AddValue(toString(0));
+        key.addValue(toString(0));
         out << key << endl;
       }
       {
@@ -66,22 +66,22 @@ int main() {
       }
       {
         PvlKeyword key("hkey2", "hEX");
-        key.AddValue(toString(2));
+        key.addValue(toString(2));
         out << key << endl;
       }
       {
         PvlKeyword key("hkey4", "hEX");
-        key.AddValue(toString(4));
+        key.addValue(toString(4));
         out << key << endl;
       }
       {
         PvlKeyword key("binkey", "binary");
-        key.AddValue(toString(7));
+        key.addValue(toString(7));
         out << key << endl;
       }
       {
         PvlKeyword key("binkey16", "binary");
-        key.AddValue(toString(16));
+        key.addValue(toString(16));
         out << key << endl;
       }
       {
@@ -90,7 +90,7 @@ int main() {
       }
       {
         PvlKeyword key("dblkeyarray", "rEaL");
-        key.AddValue(toString(2));
+        key.addValue(toString(2));
         out << key << endl;
       }
       {
@@ -112,181 +112,181 @@ int main() {
     {
       PvlKeyword key("skey", "somestringval");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("skey", "string val", "chars");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("sNAstring", "N/A");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("sUNKquote", "\"UNK\"");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("ssinglequote", "\'NA\'");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("notinmap", "junk string");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("myint", "12345");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("myfloat", toString(-12345.67e+89), "degrees");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("fkey", toString(-12345.6789));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("fkey0", toString(-9876.543));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("fkey0", toString(-9876.543e-99));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("fkey2", toString(0.123456));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("fkey2", toString(0.123456), "goofys");
-      key.AddValue(toString(987.123), "goofys");
+      key.addValue(toString(987.123), "goofys");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("fkey2", toString(0.123456), "goofys");
-      key.AddValue(toString(987.123));
+      key.addValue(toString(987.123));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("ekey", "unsigned");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("myarray", "(12345,\"a short string\",1.234)");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("hkey0", toString((BigInt)0x123456789abcdeffLL));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("hkey2", toString(0x7a8b));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("hkey4", toString(0x1a2b3c4d));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("binkey", toString(0xA));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("binkey16", toString(0xffff));
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("intkeyarray", toString(1));
-      key.AddValue("NULL");
-      key.AddValue("3");
-      key.AddValue("NULL");
+      key.addValue("NULL");
+      key.addValue("3");
+      key.addValue("NULL");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("intkeyarray", toString(1), "m");
-      key.AddValue("NULL", "m");
-      key.AddValue("3", "m");
-      key.AddValue("N/A");
-      key.AddValue("UNK");
+      key.addValue("NULL", "m");
+      key.addValue("3", "m");
+      key.addValue("N/A");
+      key.addValue("UNK");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
     {
       PvlKeyword key("dblkeyarray", toString(1.01));
-      key.AddValue("NULL");
-      key.AddValue("3.4");
-      key.AddValue("UNK");
+      key.addValue("NULL");
+      key.addValue("3.4");
+      key.addValue("UNK");
       cout << key << endl;
-      key.SetFormat(pdsFormatter);
-      cout << key << pdsFormatter->FormatEOL();
+      key.setFormat(pdsFormatter);
+      cout << key << pdsFormatter->formatEOL();
     }
 
 
@@ -303,9 +303,9 @@ int main() {
       grp += PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
       cout << "=============================== Before" << endl;
       cout << grp << endl;
-      grp.SetFormat(pdsFormatter);
+      grp.setFormat(pdsFormatter);
       cout << "=============================== After" << endl;
-      cout << grp << pdsFormatter->FormatEOL();
+      cout << grp << pdsFormatter->formatEOL();
     }
 
 
@@ -321,7 +321,7 @@ int main() {
       grp += PvlKeyword("myfloat", toString(12345.67e+89));
       grp += PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
       PvlObject obj("Object1");
-      obj.AddGroup(grp);
+      obj.addGroup(grp);
 
       PvlObject obj2("Object2");
       obj2 += PvlKeyword("skey", "stringval");
@@ -332,7 +332,7 @@ int main() {
       obj2 += PvlKeyword("myint", toString(12345));
       obj2 += PvlKeyword("myfloat", toString(12345.67e+89));
       obj2 += PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
-      obj.AddObject(obj2);
+      obj.addObject(obj2);
 
       obj += PvlKeyword("skey", "stringval");
       obj += PvlKeyword("mystring", "string val");
@@ -346,9 +346,9 @@ int main() {
 
       cout << "=============================== Before" << endl;
       cout << obj << endl;
-      obj.SetFormat(pdsFormatter);
+      obj.setFormat(pdsFormatter);
       cout << "=============================== After" << endl;
-      cout << obj << pdsFormatter->FormatEOL();
+      cout << obj << pdsFormatter->formatEOL();
     }
 
 
@@ -367,7 +367,7 @@ int main() {
       grp += PvlKeyword("myint", toString(12345));
       grp += PvlKeyword("myfloat", toString(12345.67e+89));
       grp += PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
-      obj.AddGroup(grp);
+      obj.addGroup(grp);
 
       PvlObject obj2("Object2");
       obj2 += PvlKeyword("skey", "stringval");
@@ -379,7 +379,7 @@ int main() {
       obj2 += PvlKeyword("myfloat", toString(12345.67e+89));
       obj2 += PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
       obj2 += PvlKeyword("binkey16", toString(0x01f0));
-      obj.AddObject(obj2);
+      obj.addObject(obj2);
 
       obj += PvlKeyword("skey", "stringval");
       obj += PvlKeyword("mystring", "string val");
@@ -399,7 +399,7 @@ int main() {
       pvl += PvlKeyword("myfloat", toString(12345.67e+89));
       pvl += PvlKeyword("myarray", "(12345,\"a short string\",1.234)");
 
-      pvl.AddObject(obj);
+      pvl.addObject(obj);
 
       PvlGroup grp2("Group2");
       grp2 += PvlKeyword("skey", "stringval");
@@ -415,29 +415,29 @@ int main() {
                                "Repunzel Repunzel let down your hair. The little toy dog is covered with dust,"
                                " but sturdy and staunch he stands; and the little toy soldier is red with rust.");
       PvlKeyword key(PvlKeyword("array", toString(12345)));
-      key.AddValue(toString(67890));
-      key.AddValue(toString(12345));
-      key.AddValue(toString(67890));
-      key.AddValue(toString(12345));
-      key.AddValue(toString(67890));
-      key.AddValue(toString(12345));
-      key.AddValue(toString(67890));
-      key.AddValue(toString(12345));
-      key.AddValue(toString(67890));
-      key.AddValue(toString(12345));
-      key.AddValue(toString(67890));
-      key.AddValue(toString(12345));
-      key.AddValue(toString(67890));
-      key.AddValue(toString(12345));
+      key.addValue(toString(67890));
+      key.addValue(toString(12345));
+      key.addValue(toString(67890));
+      key.addValue(toString(12345));
+      key.addValue(toString(67890));
+      key.addValue(toString(12345));
+      key.addValue(toString(67890));
+      key.addValue(toString(12345));
+      key.addValue(toString(67890));
+      key.addValue(toString(12345));
+      key.addValue(toString(67890));
+      key.addValue(toString(12345));
+      key.addValue(toString(67890));
+      key.addValue(toString(12345));
       grp2 += key;
-      pvl.AddGroup(grp2);
+      pvl.addGroup(grp2);
 
 
       cout << "=============================== Before" << endl;
       cout << pvl << endl;
-      pvl.SetFormat(pdsFormatter);
+      pvl.setFormat(pdsFormatter);
       cout << "=============================== After" << endl;
-      cout << pvl << pdsFormatter->FormatEOL();
+      cout << pvl << pdsFormatter->formatEOL();
     }
 
 

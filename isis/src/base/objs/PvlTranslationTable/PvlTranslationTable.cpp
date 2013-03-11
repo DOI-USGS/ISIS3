@@ -64,7 +64,7 @@ namespace Isis {
    * @throws IException::Io
    */
   void PvlTranslationTable::AddTable(const QString &transFile) {
-    p_trnsTbl.Read(FileName(transFile).expanded());
+    p_trnsTbl.read(FileName(transFile).expanded());
   }
 
   /**
@@ -77,13 +77,13 @@ namespace Isis {
   void PvlTranslationTable::AddTable(std::istream &transStm) {
     transStm >> p_trnsTbl;
 
-    for(int i = 0; i < p_trnsTbl.Groups(); i++) {
-      PvlGroup currGrp = p_trnsTbl.Group(i);
+    for(int i = 0; i < p_trnsTbl.groups(); i++) {
+      PvlGroup currGrp = p_trnsTbl.group(i);
 
-      if(!currGrp.HasKeyword("InputKey")) {
+      if(!currGrp.hasKeyword("InputKey")) {
         QString message = "Unable to find InputKey for group ["
-                         + currGrp.Name() + "] in file [" +
-                         p_trnsTbl.FileName() + "]";
+                         + currGrp.name() + "] in file [" +
+                         p_trnsTbl.fileName() + "]";
         throw IException(IException::User, message, _FILEINFO_);
       }
 
@@ -101,7 +101,7 @@ namespace Isis {
       validKeywords.push_back(pair<QString, int>("InputKey",        1));
       validKeywords.push_back(pair<QString, int>("InputDefault",   -1));
 
-      for(int j = 0; j < currGrp.Keywords(); j++) {
+      for(int j = 0; j < currGrp.keywords(); j++) {
         bool validKeyword = false;
         bool keywordSizeMismatch = false;
 
@@ -113,16 +113,16 @@ namespace Isis {
             key++) {
 
           // If this is the right keyword (names match) then test sizes
-          if(currKey.Name() == validKeywords[key].first) {
+          if(currKey.name() == validKeywords[key].first) {
 
             // if -1 then test that size() > 0
             if(validKeywords[key].second == -1) {
-              if(currKey.Size() > 0) {
+              if(currKey.size() > 0) {
                 validKeyword = true;
               }
             }
             // otherwise should exact match
-            else if(currKey.Size() == validKeywords[key].second) {
+            else if(currKey.size() == validKeywords[key].second) {
               validKeyword = true;
             }
             else {
@@ -135,16 +135,16 @@ namespace Isis {
         // if we had an error report it
         if(!validKeyword) {
           if(!keywordSizeMismatch) {
-            QString message = "Keyword [" + currKey.Name();
+            QString message = "Keyword [" + currKey.name();
             message += "] is not a valid keyword.";
-            message += " Error in file [" + p_trnsTbl.FileName() + "]" ;
+            message += " Error in file [" + p_trnsTbl.fileName() + "]" ;
 
             throw IException(IException::User, message, _FILEINFO_);
           }
           else {
-            QString message = "Keyword [" + currKey.Name();
+            QString message = "Keyword [" + currKey.name();
             message += "] does not have the correct number of elements.";
-            message += " Error in file [" + p_trnsTbl.FileName() + "]" ;
+            message += " Error in file [" + p_trnsTbl.fileName() + "]" ;
 
             throw IException(IException::User, message, _FILEINFO_);
           }
@@ -167,36 +167,36 @@ namespace Isis {
    */
   QString PvlTranslationTable::Translate(const QString nName,
                                         const QString fValue) const {
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
+                   nName + "] in file [" + p_trnsTbl.fileName() + "]";
 
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    const PvlGroup &tgrp = p_trnsTbl.FindGroup(nName);
+    const PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
 
     // If no input value was passed in search using the input default
     QString tmpFValue = fValue;
     if(tmpFValue.isEmpty()) {
-      if(tgrp.HasKeyword("InputDefault")) {
+      if(tgrp.hasKeyword("InputDefault")) {
         tmpFValue = (QString) tgrp["InputDefault"];
       }
       else {
         QString msg = "No value or default value to translate for ";
         msg += "translation group [";
         msg += nName;
-        msg += "] in file [" + p_trnsTbl.FileName() + "]";
+        msg += "] in file [" + p_trnsTbl.fileName() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
     // Search the Translation keywords for a match to the input value
-    Pvl::ConstPvlKeywordIterator it = tgrp.FindKeyword("Translation",
-                                      tgrp.Begin(),
-                                      tgrp.End());
+    Pvl::ConstPvlKeywordIterator it = tgrp.findKeyword("Translation",
+                                      tgrp.begin(),
+                                      tgrp.end());
 
-    while(it != tgrp.End()) {
+    while(it != tgrp.end()) {
       const PvlKeyword &key = *it;
       if((QString) key[1] == tmpFValue) {
         return key[0];
@@ -210,12 +210,12 @@ namespace Isis {
         }
       }
 
-      it = tgrp.FindKeyword("Translation", it + 1, tgrp.End());
+      it = tgrp.findKeyword("Translation", it + 1, tgrp.end());
     }
 
     QString msg = "Unable to find a translation value for [" +
                  nName +  ", " + fValue + "] in file [" +
-                 p_trnsTbl.FileName() + "]";
+                 p_trnsTbl.fileName() + "]";
 
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -235,36 +235,36 @@ namespace Isis {
   PvlKeyword PvlTranslationTable::InputGroup(const QString nName,
       const int inst) const {
 
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
+                   nName + "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    const PvlGroup &transGrp = p_trnsTbl.FindGroup(nName);
+    const PvlGroup &transGrp = p_trnsTbl.findGroup(nName);
 
     //bool foundLegalInputGroup = false;
 
-    Pvl::ConstPvlKeywordIterator it = transGrp.FindKeyword("InputPosition",
-                                      transGrp.Begin(),
-                                      transGrp.End());
+    Pvl::ConstPvlKeywordIterator it = transGrp.findKeyword("InputPosition",
+                                      transGrp.begin(),
+                                      transGrp.end());
 
     int currentInstance = 0;
 
     // If no InputGroup keywords exist, the answer is root
-    if(inst == 0 && it == transGrp.End()) {
+    if(inst == 0 && it == transGrp.end()) {
       PvlKeyword root("InputPosition");
       root += "ROOT";
       return root;
     }
 
-    while(it != transGrp.End()) {
+    while(it != transGrp.end()) {
       const PvlKeyword &result = *it;
 
       // This check is to prevent backtracking to the old "value,value" way of
       //   doing translation file input groups for the new keyword. Flag it
       //   immediately to give a good error message.
-      if(result.Size() == 1 && result[0].contains(",")) {
+      if(result.size() == 1 && result[0].contains(",")) {
         QString msg = "Keyword [InputPosition] cannot have a comma [,] in ";
         msg += " the value [";
         msg += result[0];
@@ -281,7 +281,7 @@ namespace Isis {
         currentInstance ++;
       }
 
-      it = transGrp.FindKeyword("InputPosition", it + 1, transGrp.End());
+      it = transGrp.findKeyword("InputPosition", it + 1, transGrp.end());
     }
 
     /* Error if no containers were listed
@@ -310,14 +310,14 @@ namespace Isis {
    */
   QString PvlTranslationTable::InputKeywordName(const QString nName) const {
 
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
+                   nName + "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup tgrp = p_trnsTbl.FindGroup(nName);
-    if(tgrp.HasKeyword("InputKey")) return tgrp["InputKey"];
+    Isis::PvlGroup tgrp = p_trnsTbl.findGroup(nName);
+    if(tgrp.hasKeyword("InputKey")) return tgrp["InputKey"];
 
     return "";
   }
@@ -334,56 +334,56 @@ namespace Isis {
    */
   QString PvlTranslationTable::InputDefault(const QString nName) const {
 
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
+                   nName + "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup tgrp = p_trnsTbl.FindGroup(nName);
-    if(tgrp.HasKeyword("InputDefault")) return tgrp["InputDefault"];
+    Isis::PvlGroup tgrp = p_trnsTbl.findGroup(nName);
+    if(tgrp.hasKeyword("InputDefault")) return tgrp["InputDefault"];
 
     return "";
   }
 
   bool PvlTranslationTable::IsAuto(const QString nName) {
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" + nName +
-                   "] in file [" + p_trnsTbl.FileName() + "]";
+                   "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup &tgrp = p_trnsTbl.FindGroup(nName);
-    if(tgrp.HasKeyword("Auto")) return true;
+    Isis::PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
+    if(tgrp.hasKeyword("Auto")) return true;
 
     return false;
   }
 
   bool PvlTranslationTable::IsOptional(const QString nName) {
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" + nName +
-                   "] in file [" + p_trnsTbl.FileName() + "]";
+                   "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup &tgrp = p_trnsTbl.FindGroup(nName);
-    if(tgrp.HasKeyword("Optional")) return true;
+    Isis::PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
+    if(tgrp.hasKeyword("Optional")) return true;
 
     return false;
   }
 
   Isis::PvlKeyword &PvlTranslationTable::OutputPosition(
     const QString nName) {
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
+                   nName + "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup &tgrp = p_trnsTbl.FindGroup(nName);
-    if(!tgrp.HasKeyword("OutputPosition")) {
+    Isis::PvlGroup &tgrp = p_trnsTbl.findGroup(nName);
+    if(!tgrp.hasKeyword("OutputPosition")) {
       QString msg = "Unable to find translation keyword [OutputPostion] in [" +
-                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
+                   nName + "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
 
     }
@@ -393,14 +393,14 @@ namespace Isis {
 
 
   QString PvlTranslationTable::OutputName(const QString nName) {
-    if(!p_trnsTbl.HasGroup(nName)) {
+    if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" + nName +
-                   "] in file [" + p_trnsTbl.FileName() + "]";
+                   "] in file [" + p_trnsTbl.fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup tgrp = p_trnsTbl.FindGroup(nName);
-    if(tgrp.HasKeyword("OutputName")) {
+    Isis::PvlGroup tgrp = p_trnsTbl.findGroup(nName);
+    if(tgrp.hasKeyword("OutputName")) {
       return tgrp["OutputName"];
     }
 

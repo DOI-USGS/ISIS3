@@ -405,8 +405,8 @@ int main(int argc, char *argv[]) {
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
 
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mg = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mg = lab.findGroup("Mapping");
   mg += PvlKeyword("EquatorialRadius", "1.0");
   mg += PvlKeyword("PolarRadius", "0.95");
   mg += PvlKeyword("LatitudeType", "Planetographic");
@@ -515,8 +515,8 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   Isis::Pvl latRangeTest;
-  latRangeTest.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &latTestGroup = latRangeTest.FindGroup("Mapping");
+  latRangeTest.addGroup(Isis::PvlGroup("Mapping"));
+  Isis::PvlGroup &latTestGroup = latRangeTest.findGroup("Mapping");
   latTestGroup += Isis::PvlKeyword("TargetName", "Moon");
   latTestGroup += Isis::PvlKeyword("ProjectionName", "PolarStereographic");
   latTestGroup += Isis::PvlKeyword("EquatorialRadius", toString(1737400.0));
@@ -646,9 +646,9 @@ int main(int argc, char *argv[]) {
   cout << "Rotation Tests" << endl;
   mg += PvlKeyword("Rotation", toString(90.0));
   mg["LongitudeDirection"] = "PositiveEast";
-  mg.DeleteKeyword("EquatorialRadius");
-  mg.DeleteKeyword("PolarRadius");
-  mg.DeleteKeyword("PolarRadius");
+  mg.deleteKeyword("EquatorialRadius");
+  mg.deleteKeyword("PolarRadius");
+  mg.deleteKeyword("PolarRadius");
   mg["TargetName"] = "Moon";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;
@@ -673,7 +673,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   Pvl mapping;
-  mapping.AddGroup(p4.Mapping());
+  mapping.addGroup(p4.Mapping());
   cout << "Testing Mapping() methods" << endl;
   // cout << "Mapping() = " << endl;
   cout << mapping << endl;

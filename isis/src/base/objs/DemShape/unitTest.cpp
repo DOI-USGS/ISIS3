@@ -182,13 +182,13 @@ Local normal = -0.581842, -0.703663, 0.407823
   cout << endl << "  Testing input of dem file with keyword ElevationModel" << endl;
   try {
     Pvl elPvl;
-    PvlGroup kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup kernels = pvl.findGroup("Kernels", Pvl::Traverse);
     QString demCubeFile;
     demCubeFile = (QString) kernels["ShapeModel"];
-    kernels.DeleteKeyword("ShapeModel");
+    kernels.deleteKeyword("ShapeModel");
     PvlKeyword shapeKey("ElevationModel", demCubeFile);
-    kernels.AddKeyword(shapeKey);
-    elPvl.AddGroup(kernels);
+    kernels.addKeyword(shapeKey);
+    elPvl.addGroup(kernels);
     DemShape elShape (&targ, elPvl);
   }
   catch(Isis::IException &e) {

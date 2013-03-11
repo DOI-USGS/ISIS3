@@ -61,7 +61,7 @@ void IsisMain() {
     }
 
     if (logFileSpecified) {
-      gapsFunctor.gaps().Write(ui.GetFileName("LOG"));
+      gapsFunctor.gaps().write(ui.GetFileName("LOG"));
     }
   }
   else {

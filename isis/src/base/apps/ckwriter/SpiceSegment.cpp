@@ -154,8 +154,8 @@ SpiceSegment::SVector SpiceSegment::TickRate() const {
 QString SpiceSegment::getKeyValue(PvlObject &label,
                                       const QString &keyword) {
   QString value("");
-  if ( label.HasKeyword(keyword,Pvl::Traverse) ) {
-    value = label.FindKeyword(keyword,Pvl::Traverse)[0];
+  if ( label.hasKeyword(keyword,Pvl::Traverse) ) {
+    value = label.findKeyword(keyword,Pvl::Traverse)[0];
   }
   return (value);
 }
@@ -179,13 +179,13 @@ void SpiceSegment::import(Cube &cube, const QString &tblname) {
     // OriginalInstrument group to Instrument for the scope of this
     // application.  Only label manipulation occurs and no change to the
     // pixels.
-    if (label->FindObject("IsisCube").HasGroup("OriginalInstrument")) {
-      label->FindObject("IsisCube").DeleteGroup("Instrument");
+    if (label->findObject("IsisCube").hasGroup("OriginalInstrument")) {
+      label->findObject("IsisCube").deleteGroup("Instrument");
       Isis::PvlGroup inst =
-          label->FindObject("IsisCube").FindGroup("OriginalInstrument",
+          label->findObject("IsisCube").findGroup("OriginalInstrument",
           Isis::Pvl::Traverse);
-      inst.SetName("Instrument");
-      label->FindObject("IsisCube").AddGroup(inst);
+      inst.setName("Instrument");
+      label->findObject("IsisCube").addGroup(inst);
       camera = CameraFactory::Create(*label);
     }
     else {
@@ -312,9 +312,9 @@ SpiceSegment::SVector SpiceSegment::getTimes(const SMatrix &spice) const {
 bool SpiceSegment::getTimeDependentFrameIds(Table &table, int &toId, int &fromId) const {
   // Load the constant and time-based frame traces and mission frame ids
   std::vector<int> tdfids;
-  if ( table.Label().HasKeyword("TimeDependentFrames") ) {
+  if ( table.Label().hasKeyword("TimeDependentFrames") ) {
     PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
-    for (int i=0; i<labelTimeFrames.Size(); i++) {
+    for (int i=0; i<labelTimeFrames.size(); i++) {
       tdfids.push_back(toInt(labelTimeFrames[i]));
     }
   }

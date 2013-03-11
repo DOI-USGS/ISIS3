@@ -292,9 +292,9 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     Pvl temp;
     for(int i = 0 ; i < NUM_GROUPS ; i++) {
-      temp.AddGroup(groups[i]);
+      temp.addGroup(groups[i]);
     }
-    temp.Write(ui.GetFileName("TO"));
+    temp.write(ui.GetFileName("TO"));
   }
   else {
     // Log the results

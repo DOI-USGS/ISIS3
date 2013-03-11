@@ -16,8 +16,8 @@ int main(int argc, char *argv[]) {
   cout << "UNIT TEST FOR ObliqueCylindrical" << endl << endl;
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGrp = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGrp = lab.findGroup("Mapping");
 
   mapGrp += PvlKeyword("EquatorialRadius", "2575000.0");
   mapGrp += PvlKeyword("PolarRadius", "2575000.0");

@@ -121,7 +121,7 @@ namespace Isis {
    * @return bool True if the file should have a valid projection
    */
   bool Cube::isProjected() const {
-    return label()->FindObject("IsisCube").HasGroup("Mapping");
+    return label()->findObject("IsisCube").hasGroup("Mapping");
   }
 
 
@@ -240,22 +240,22 @@ namespace Isis {
     // Allocate the cube
     result->create(newFile.expanded());
 
-    PvlObject &isisCube = label()->FindObject("IsisCube");
-    PvlObject &outIsisCube = result->label()->FindObject("IsisCube");
-    for(int i = 0; i < isisCube.Groups(); i++) {
-      outIsisCube.AddGroup(isisCube.Group(i));
+    PvlObject &isisCube = label()->findObject("IsisCube");
+    PvlObject &outIsisCube = result->label()->findObject("IsisCube");
+    for(int i = 0; i < isisCube.groups(); i++) {
+      outIsisCube.addGroup(isisCube.group(i));
     }
 
-    if (label()->HasObject("NaifKeywords")) {
-      result->label()->AddObject(
-          label()->FindObject("NaifKeywords"));
+    if (label()->hasObject("NaifKeywords")) {
+      result->label()->addObject(
+          label()->findObject("NaifKeywords"));
     }
 
-    for (int i = 0; i < m_label->Objects(); i++) {
-      PvlObject &obj = m_label->Object(i);
-      if (obj.IsNamed("Table") || obj.IsNamed("Polygon") || obj.IsNamed("OriginalLabel") ||
-          obj.IsNamed("History")) {
-        Isis::Blob t((QString)obj["Name"], obj.Name());
+    for (int i = 0; i < m_label->objects(); i++) {
+      PvlObject &obj = m_label->object(i);
+      if (obj.isNamed("Table") || obj.isNamed("Polygon") || obj.isNamed("OriginalLabel") ||
+          obj.isNamed("History")) {
+        Isis::Blob t((QString)obj["Name"], obj.name());
         read(t);
         result->write(t);
       }
@@ -286,8 +286,8 @@ namespace Isis {
 //   Just in case the orig label doesn't work... here's original code:
 //       if((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
 //         Isis::Pvl &inlab = *InputCubes[0]->label();
-//         for(int i = 0; i < inlab.Objects(); i++) {
-//           if(inlab.Object(i).IsNamed("OriginalLabel")) {
+//         for(int i = 0; i < inlab.objects(); i++) {
+//           if(inlab.Object(i).isNamed("OriginalLabel")) {
 //             Isis::OriginalLabel ol;
 //             InputCubes[0]->read(ol);
 //             cube->write(ol);
@@ -352,7 +352,7 @@ namespace Isis {
       int maxSizePreference = 0;
 
       maxSizePreference =
-          Preference::Preferences().FindGroup("CubeCustomization")["MaximumSize"];
+          Preference::Preferences().findGroup("CubeCustomization")["MaximumSize"];
 
       if (size > maxSizePreference) {
         QString msg;
@@ -402,7 +402,7 @@ namespace Isis {
       dims += PvlKeyword("Samples", toString(m_samples));
       dims += PvlKeyword("Lines",   toString(m_lines));
       dims += PvlKeyword("Bands",   toString(m_bands));
-      core.AddGroup(dims);
+      core.addGroup(dims);
 
       // Create the pixel type
       PvlGroup ptype("Pixels");
@@ -412,7 +412,7 @@ namespace Isis {
       ptype += PvlKeyword("ByteOrder", ByteOrderName(m_byteOrder));
       ptype += PvlKeyword("Base", toString(m_base));
       ptype += PvlKeyword("Multiplier", toString(m_multiplier));
-      core.AddGroup(ptype);
+      core.addGroup(ptype);
     }
     else {
       cubFile = cubFile.addExtension("ecub");
@@ -427,18 +427,18 @@ namespace Isis {
       m_labelFile = new QFile(cubFile.expanded());
     }
 
-    isiscube.AddObject(core);
+    isiscube.addObject(core);
 
     m_label = new Pvl;
-    m_label->AddObject(isiscube);
+    m_label->addObject(isiscube);
 
     // Setup storage reserved for the label
     PvlObject lbl("Label");
     lbl += PvlKeyword("Bytes", toString(m_labelBytes));
-    m_label->AddObject(lbl);
+    m_label->addObject(lbl);
 
     const PvlGroup &pref =
-        Preference::Preferences().FindGroup("CubeCustomization");
+        Preference::Preferences().findGroup("CubeCustomization");
     bool overwrite = pref["Overwrite"][0].toUpper() == "ALLOW";
     if (!overwrite && m_labelFile->exists() && m_labelFile->size()) {
       QString msg = "Cube file [" + m_labelFileName->original() + "] exists, " +
@@ -518,8 +518,8 @@ namespace Isis {
 
     // Figure out the name of the data file
     try {
-      PvlObject &core = m_label->FindObject("IsisCube").FindObject("Core");
-      if (core.HasKeyword("^Core")) {
+      PvlObject &core = m_label->findObject("IsisCube").findObject("Core");
+      if (core.hasKeyword("^Core")) {
         FileName temp(core["^Core"][0]);
 
         if (temp.originalPath() == ".") {
@@ -534,7 +534,7 @@ namespace Isis {
 
         m_dataFile = new QFile(realDataFileName().expanded());
       }
-      else if (core.HasKeyword("^DnFile")) {
+      else if (core.hasKeyword("^DnFile")) {
         FileName dataFileName(core["^DnFile"][0]);
 
         if (dataFileName.originalPath() == ".") {
@@ -611,7 +611,7 @@ namespace Isis {
 
     // Determine the number of bytes in the label
     if (m_attached) {
-      m_labelBytes = m_label->FindObject("Label")["Bytes"];
+      m_labelBytes = m_label->findObject("Label")["Bytes"];
     }
     else {
       m_labelBytes = labelSize(true);
@@ -1436,11 +1436,11 @@ namespace Isis {
    * @return boolean if it found the blob and deleted it.
    */
   bool Cube::deleteBlob(QString BlobType, QString BlobName) {
-    for(int i = 0; i < m_label->Objects(); i++) {
-      PvlObject obj = m_label->Object(i);
-      if (obj.Name().compare(BlobType) == 0) {
-        if (obj.FindKeyword("Name")[0] == BlobName) {
-          m_label->DeleteObject(i);
+    for(int i = 0; i < m_label->objects(); i++) {
+      PvlObject obj = m_label->object(i);
+      if (obj.name().compare(BlobType) == 0) {
+        if (obj.findKeyword("Name")[0] == BlobName) {
+          m_label->deleteObject(i);
           return true;
         }
       }
@@ -1458,9 +1458,9 @@ namespace Isis {
    * @param[out] group Name of the group to delete.
    */
   void Cube::deleteGroup(const QString &group) {
-    PvlObject &isiscube = label()->FindObject("IsisCube");
-    if (!isiscube.HasGroup(group)) return;
-    isiscube.DeleteGroup(group);
+    PvlObject &isiscube = label()->findObject("IsisCube");
+    if (!isiscube.hasGroup(group)) return;
+    isiscube.deleteGroup(group);
   }
 
 
@@ -1472,8 +1472,8 @@ namespace Isis {
    * @return (PvlGroup) Label which will contain the requested group.
    */
   PvlGroup &Cube::group(const QString &group) const {
-    PvlObject &isiscube = label()->FindObject("IsisCube");
-    return isiscube.FindGroup(group);
+    PvlObject &isiscube = label()->findObject("IsisCube");
+    return isiscube.findGroup(group);
   }
 
 
@@ -1485,8 +1485,8 @@ namespace Isis {
    * @return (bool) True if the cube has the specified group, false if not.
    */
   bool Cube::hasGroup(const QString &group) const {
-    const PvlObject &isiscube = label()->FindObject("IsisCube");
-    if (isiscube.HasGroup(group)) return true;
+    const PvlObject &isiscube = label()->findObject("IsisCube");
+    if (isiscube.hasGroup(group)) return true;
     return false;
   }
 
@@ -1499,10 +1499,10 @@ namespace Isis {
    * @return bool True if the pvl table was found
    */
   bool Cube::hasTable(const QString &name) {
-    for(int o = 0; o < label()->Objects(); o++) {
-      PvlObject &obj = label()->Object(o);
-      if (obj.IsNamed("Table")) {
-        if (obj.HasKeyword("Name")) {
+    for(int o = 0; o < label()->objects(); o++) {
+      PvlObject &obj = label()->object(o);
+      if (obj.isNamed("Table")) {
+        if (obj.hasKeyword("Name")) {
           QString temp = (QString) obj["Name"];
           temp = temp.toUpper();
           QString temp2 = name;
@@ -1524,37 +1524,37 @@ namespace Isis {
    * @param[in] group Label containing the group to put.
    */
   void Cube::putGroup(const PvlGroup &group) {
-    PvlObject &isiscube = label()->FindObject("IsisCube");
-    if (isiscube.HasGroup(group.Name())) {
-      isiscube.FindGroup(group.Name()) = group;
+    PvlObject &isiscube = label()->findObject("IsisCube");
+    if (isiscube.hasGroup(group.name())) {
+      isiscube.findGroup(group.name()) = group;
     }
     else {
-      isiscube.AddGroup(group);
+      isiscube.addGroup(group);
     }
   }
 
 
   void Cube::applyVirtualBandsToLabel() {
-    PvlObject &core = m_label->FindObject("IsisCube").FindObject("Core");
+    PvlObject &core = m_label->findObject("IsisCube").findObject("Core");
 
     // Prune the band bin group if it exists
-    if (m_label->FindObject("IsisCube").HasGroup("BandBin")) {
-      PvlGroup &bandBin = m_label->FindObject("IsisCube").FindGroup("BandBin");
-      for(int k = 0; k < bandBin.Keywords(); k++) {
-        if (bandBin[k].Size() == m_bands && m_virtualBandList) {
+    if (m_label->findObject("IsisCube").hasGroup("BandBin")) {
+      PvlGroup &bandBin = m_label->findObject("IsisCube").findGroup("BandBin");
+      for(int k = 0; k < bandBin.keywords(); k++) {
+        if (bandBin[k].size() == m_bands && m_virtualBandList) {
           PvlKeyword temp = bandBin[k];
-          bandBin[k].Clear();
+          bandBin[k].clear();
           for(int i = 0; i < m_virtualBandList->size(); i++) {
             int physicalBand = m_virtualBandList->at(i) - 1;
-            bandBin[k].AddValue(temp[physicalBand], temp.Unit(physicalBand));
+            bandBin[k].addValue(temp[physicalBand], temp.unit(physicalBand));
           }
         }
       }
     }
 
     // Change the number of bands in the labels of the cube
-    if (m_virtualBandList && core.HasGroup("Dimensions"))
-      core.FindGroup("Dimensions")["Bands"] = toString(m_virtualBandList->size());
+    if (m_virtualBandList && core.hasGroup("Dimensions"))
+      core.findGroup("Dimensions")["Bands"] = toString(m_virtualBandList->size());
   }
 
 
@@ -1648,12 +1648,12 @@ namespace Isis {
       do {
         Pvl guessLabel(guess.expanded());
 
-        PvlObject &core = guessLabel.FindObject("IsisCube").FindObject("Core");
+        PvlObject &core = guessLabel.findObject("IsisCube").findObject("Core");
 
-        if (core.HasKeyword("^DnFile")) {
+        if (core.hasKeyword("^DnFile")) {
           guess = core["^DnFile"][0];
         }
-        else if (core.HasKeyword("^Core")) {
+        else if (core.hasKeyword("^Core")) {
           result = core["^Core"][0];
         }
         else {
@@ -1699,17 +1699,17 @@ namespace Isis {
 
 
   void Cube::initCoreFromLabel(const Pvl &label) {
-    const PvlObject &core = label.FindObject("IsisCube").FindObject("Core");
+    const PvlObject &core = label.findObject("IsisCube").findObject("Core");
 
-    if (!core.HasKeyword("^DnFile")) {
+    if (!core.hasKeyword("^DnFile")) {
       // Dimensions
-      const PvlGroup &dims = core.FindGroup("Dimensions");
+      const PvlGroup &dims = core.findGroup("Dimensions");
       m_samples = dims["Samples"];
       m_lines = dims["Lines"];
       m_bands = dims["Bands"];
 
       // Stored pixel information
-      const PvlGroup &pixelsGroup = core.FindGroup("Pixels");
+      const PvlGroup &pixelsGroup = core.findGroup("Pixels");
       m_byteOrder = ByteOrderEnumeration(pixelsGroup["ByteOrder"]);
       m_base = pixelsGroup["Base"];
       m_multiplier = pixelsGroup["Multiplier"];
@@ -1735,7 +1735,7 @@ namespace Isis {
     try {
       if (labelFileName.fileExists()) {
         m_label = new Pvl(labelFileName.expanded());
-        if (!m_label->Objects()) {
+        if (!m_label->objects()) {
           throw IException();
         }
       }
@@ -1753,7 +1753,7 @@ namespace Isis {
         tmp = tmp.addExtension("cub");
         if (tmp.fileExists()) {
           m_label = new Pvl(tmp.expanded());
-          if (!m_label->Objects()) {
+          if (!m_label->objects()) {
             throw IException();
           }
           labelFileName = tmp;
@@ -1773,7 +1773,7 @@ namespace Isis {
         tmp = tmp.setExtension("lbl");
         if (tmp.fileExists()) {
           m_label = new Pvl(tmp.expanded());
-          if (!m_label->Objects()) {
+          if (!m_label->objects()) {
             throw IException();
           }
           labelFileName = tmp;
@@ -1793,7 +1793,7 @@ namespace Isis {
         tmp = tmp.addExtension("ecub");
         if (tmp.fileExists()) {
           m_label = new Pvl(tmp.expanded());
-          if (!m_label->Objects()) {
+          if (!m_label->objects()) {
             throw IException();
           }
           labelFileName = tmp;
@@ -1816,7 +1816,7 @@ namespace Isis {
 
     // See if this is an old Isis cube format.  If so then we will
     // need to internalize a new label
-    if (m_label->HasKeyword("CCSD3ZF0000100000001NJPL3IF0PDS200000001")) {
+    if (m_label->hasKeyword("CCSD3ZF0000100000001NJPL3IF0PDS200000001")) {
       if (!readWrite) {
         reformatOldIsisLabel(m_labelFileName->expanded());
       }
@@ -1848,9 +1848,9 @@ namespace Isis {
     PvlObject *core = NULL;
 
     do {
-      core = &label.FindObject("IsisCube").FindObject("Core");
+      core = &label.findObject("IsisCube").findObject("Core");
 
-      if (core->HasKeyword("^DnFile")) {
+      if (core->hasKeyword("^DnFile")) {
         label = Pvl((*core)["^DnFile"]);
         core = NULL;
       }
@@ -1899,7 +1899,7 @@ namespace Isis {
     }
 
     // Set the pvl's format template
-    m_label->SetFormatTemplate(m_formatTemplateFile->original());
+    m_label->setFormatTemplate(m_formatTemplateFile->original());
 
     // Write them with attached data
     if (m_attached) {
@@ -1929,7 +1929,7 @@ namespace Isis {
 
     // or detached label
     else {
-      m_label->Write(m_labelFileName->expanded());
+      m_label->write(m_labelFileName->expanded());
     }
   }
 }

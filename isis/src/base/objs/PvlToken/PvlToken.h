@@ -43,6 +43,8 @@ namespace Isis {
    *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
    *                                     isis.astrogeology...
    *  @history 2005-02-14 Elizabeth Ribelin - Modified file to support Doxygen
+   *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
+   *                          names up to the current Isis 3 coding standards. Fixes #1533.
    *                                          documentation
    *
    *  @todo 2005-02-14 Jeff Anderson - add coded and implemetation example to
@@ -51,8 +53,8 @@ namespace Isis {
 
   class PvlToken {
     private:
-      QString key;                 //!< Storage for the keyword name
-      std::vector<QString> value;   /**<Vector storage for a list of values.
+      QString m_key;                 //!< Storage for the keyword name
+      std::vector<QString> m_value;   /**<Vector storage for a list of values.
                                             See the standard template library
                                             for more information on vectors.*/
 
@@ -61,18 +63,18 @@ namespace Isis {
       PvlToken();
       ~PvlToken();
 
-      void SetKey(const QString &k);
-      QString GetKey() const;
-      QString GetKeyUpper() const;
+      void setKey(const QString &k);
+      QString key() const;
+      QString keyUpper() const;
 
-      void AddValue(const QString &v);
-      QString GetValue(const int index = 0) const;
-      QString GetValueUpper(const int index = 0) const;
-      int ValueSize() const;
-      void ValueClear();
+      void addValue(const QString &v);
+      QString value(const int index = 0) const;
+      QString valueUpper(const int index = 0) const;
+      int valueSize() const;
+      void valueClear();
 
-      inline const std::vector<QString> &ValueVector() const {
-        return value;
+      inline const std::vector<QString> &valueVector() const {
+        return m_value;
       };
   };
 };

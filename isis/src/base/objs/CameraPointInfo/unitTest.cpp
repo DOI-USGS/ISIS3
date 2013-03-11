@@ -44,7 +44,7 @@ void LowerPrecision(PvlKeyword &keyword) {
 }
 
 void PrintResults(PvlGroup &grp) {
-  grp.DeleteKeyword("FileName");
+  grp.deleteKeyword("FileName");
 
   LowerPrecision(grp["NorthAzimuth"]);
   LowerPrecision(grp["SpacecraftAzimuth"]);

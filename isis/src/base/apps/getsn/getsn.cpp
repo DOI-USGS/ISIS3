@@ -19,8 +19,8 @@ using namespace std;
 
 void IsisMain() {
   // Set Preferences to always turn off Terminal Output
-  PvlGroup &grp = Isis::Preference::Preferences().FindGroup("SessionLog", Isis::Pvl::Traverse);
-  grp["TerminalOutput"].SetValue("Off");
+  PvlGroup &grp = Isis::Preference::Preferences().findGroup("SessionLog", Isis::Pvl::Traverse);
+  grp["TerminalOutput"].setValue("Off");
 
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
@@ -60,11 +60,11 @@ void IsisMain() {
     if (pvl) {
       // Create a serial number and observation number for this cube & put it in a pvlgroup for output
       Pvl pvl;
-      pvl.AddGroup(sn);
+      pvl.addGroup(sn);
       if(ui.GetBoolean("APPEND"))
-        pvl.Append(ui.GetFileName("TO"));
+        pvl.append(ui.GetFileName("TO"));
       else
-        pvl.Write(ui.GetFileName("TO"));
+        pvl.write(ui.GetFileName("TO"));
     }
     // FLAT option
     else {
@@ -74,7 +74,7 @@ void IsisMain() {
 
       // Build QString
       QString line = "";
-      for (int i = 0; i < sn.Keywords(); i++) {
+      for (int i = 0; i < sn.keywords(); i++) {
         if (i != 0)
           line += ",";
         line += sn[i][0];
@@ -88,7 +88,7 @@ void IsisMain() {
     }
   }
   else {
-    for (int i = 0; i < sn.Keywords(); i++) {
+    for (int i = 0; i < sn.keywords(); i++) {
       cout << sn[i][0] << endl;
     }
   }

@@ -84,68 +84,68 @@ void IsisMain() {
   // Should contains parameter names matching GUI not to be inclusiond
   // in the Pvl defFile
   Pvl photoPvl;
-  photoPvl.AddObject(PvlObject("PhotometricModel"));
-  photoPvl.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
-  photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-           AddKeyword(PvlKeyword("PHTNAME",sPhotoFunc),Pvl::Replace);
+  photoPvl.addObject(PvlObject("PhotometricModel"));
+  photoPvl.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
+  photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+           addKeyword(PvlKeyword("PHTNAME",sPhotoFunc),Pvl::Replace);
 
   if (sPhotoFunc == "HAPKEHEN" || sPhotoFunc == "HAPKELEG") { // Single Particle Phase Function HENYEY-GREENSTEIN
     if (ui.WasEntered("WH")) {
       QString keyval = ui.GetString("WH");
       double wh = toDouble(keyval);
-      photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("WH",toString(wh)),Pvl::Replace);
+      photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+               addKeyword(PvlKeyword("WH",toString(wh)),Pvl::Replace);
     }
     if (ui.WasEntered("HH")) {
       QString keyval = ui.GetString("HH");
       double hh = toDouble(keyval);
-      photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("HH",toString(hh)),Pvl::Replace);
+      photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+               addKeyword(PvlKeyword("HH",toString(hh)),Pvl::Replace);
     }
     if (ui.WasEntered("B0")) {
       QString keyval = ui.GetString("B0");
       double b0 = toDouble(keyval);
-      photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("B0",toString(b0)),Pvl::Replace);
+      photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+               addKeyword(PvlKeyword("B0",toString(b0)),Pvl::Replace);
     }
     if (ui.WasEntered("THETA")) {
       QString keyval = ui.GetString("THETA");
       double theta = toDouble(keyval);
-      photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("THETA",toString(theta)),Pvl::Replace);
+      photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+               addKeyword(PvlKeyword("THETA",toString(theta)),Pvl::Replace);
     }
     if (ui.WasEntered("ZEROB0STANDARD")) {
       QString keyval = ui.GetString("ZEROB0STANDARD");
       keyval = keyval.toUpper();
-      photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("ZEROB0STANDARD",keyval),Pvl::Replace);
+      photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+               addKeyword(PvlKeyword("ZEROB0STANDARD",keyval),Pvl::Replace);
     }
     if (sPhotoFunc == "HAPKEHEN") {
       if (ui.WasEntered("HG1")) {
         QString keyval = ui.GetString("HG1");
         double hg1 = toDouble(keyval);
-        photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("HG1",toString(hg1)),Pvl::Replace);
+        photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+                 addKeyword(PvlKeyword("HG1",toString(hg1)),Pvl::Replace);
       }
       if (ui.WasEntered("HG2")) {
         QString keyval = ui.GetString("HG2");
         double hg2 = toDouble(keyval);
-        photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("HG2",toString(hg2)),Pvl::Replace);
+        photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+                 addKeyword(PvlKeyword("HG2",toString(hg2)),Pvl::Replace);
       }
     }
     else {
       if (ui.WasEntered("BH")) {
         QString keyval = ui.GetString("BH");
         double bh = toDouble(keyval);
-        photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("BH",toString(bh)),Pvl::Replace);
+        photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+                 addKeyword(PvlKeyword("BH",toString(bh)),Pvl::Replace);
       }
       if (ui.WasEntered("CH")) {
         QString keyval = ui.GetString("CH");
         double ch = toDouble(keyval);
-        photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("CH",toString(ch)),Pvl::Replace);
+        photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+                 addKeyword(PvlKeyword("CH",toString(ch)),Pvl::Replace);
       }
     }
   }
@@ -153,16 +153,16 @@ void IsisMain() {
     if (ui.WasEntered("L")) {
       QString keyval = ui.GetString("L");
       double l = toDouble(keyval);
-      photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("L",toString(l)),Pvl::Replace);
+      photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+               addKeyword(PvlKeyword("L",toString(l)),Pvl::Replace);
     }
   }
   else if (sPhotoFunc == "MINNAERT") {
     if (ui.WasEntered("K")) {
       QString keyval = ui.GetString("K");
       double k = toDouble(keyval);
-      photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("K",toString(k)),Pvl::Replace);
+      photoPvl.findObject("PhotometricModel").findGroup("Algorithm").
+               addKeyword(PvlKeyword("K",toString(k)),Pvl::Replace);
     }
   }
 
@@ -170,7 +170,7 @@ void IsisMain() {
   photoModel = PhotoModelFactory::Create(photoPvl);
 
   // Log the Hapke Def File
-  PvlGroup hapkeGrp = photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm");
+  PvlGroup hapkeGrp = photoPvl.findObject("PhotometricModel").findGroup("Algorithm");
   Application::Log(hapkeGrp);
 
   //datafile':get data file only for photometric functions that need it
@@ -184,48 +184,48 @@ void IsisMain() {
   sAsmType = sAsmType.toUpper();
 
   Pvl asmPvl;
-  asmPvl.AddObject(PvlObject("AtmosphericModel"));
-  asmPvl.FindObject("AtmosphericModel").AddGroup(PvlGroup("Algorithm"));
-  asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-           AddKeyword(PvlKeyword("ATMNAME",sAsmType),Pvl::Replace);
+  asmPvl.addObject(PvlObject("AtmosphericModel"));
+  asmPvl.findObject("AtmosphericModel").addGroup(PvlGroup("Algorithm"));
+  asmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
+           addKeyword(PvlKeyword("ATMNAME",sAsmType),Pvl::Replace);
 
   if (ui.WasEntered("WHA")) {
     QString keyval = ui.GetString("WHA");
     double wha = toDouble(keyval);
-    asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-           AddKeyword(PvlKeyword("WHA",toString(wha)),Pvl::Replace);
+    asmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
+           addKeyword(PvlKeyword("WHA",toString(wha)),Pvl::Replace);
   }
   if (ui.WasEntered("HNORM")) {
     QString keyval = ui.GetString("HNORM");
     double hnorm = toDouble(keyval);
-    asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-           AddKeyword(PvlKeyword("HNORM",toString(hnorm)),Pvl::Replace);
+    asmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
+           addKeyword(PvlKeyword("HNORM",toString(hnorm)),Pvl::Replace);
   }
 
   if (sAsmType=="ANISOTROPIC1" || sAsmType=="ANISOTROPIC2" ){
     if (ui.WasEntered("BHA")) {
       QString keyval = ui.GetString("BHA");
       double bha = toDouble(keyval);
-      asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("BHA",toString(bha)),Pvl::Replace);
+      asmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
+             addKeyword(PvlKeyword("BHA",toString(bha)),Pvl::Replace);
     }
   }
   else if (sAsmType=="HAPKEATM1" || sAsmType=="HAPKEATM2" ) {
     if (ui.WasEntered("HGA")) {
       QString keyval = ui.GetString("HGA");
       double hga = toDouble(keyval);
-      asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("HGA",toString(hga)),Pvl::Replace);
+      asmPvl.findObject("AtmosphericModel").findGroup("Algorithm").
+             addKeyword(PvlKeyword("HGA",toString(hga)),Pvl::Replace);
     }
   }
 
   AtmosModel *asmModel=NULL;
 
   // Make sure that optical depth estimation is turned on
-  asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("EstTau", "YES"), Pvl::Replace);
+  asmPvl.findObject("AtmosphericModel").findGroup("Algorithm").addKeyword(PvlKeyword("EstTau", "YES"), Pvl::Replace);
 
   // Log the AtmosphericModel Def File
-  PvlGroup asmGrp = asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm");
+  PvlGroup asmGrp = asmPvl.findObject("AtmosphericModel").findGroup("Algorithm");
   Application::Log(asmGrp);
 
   asmModel = AtmosModelFactory::Create(asmPvl, *photoModel);

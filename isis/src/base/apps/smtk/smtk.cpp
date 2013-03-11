@@ -457,17 +457,17 @@ void IsisMain() {
 
     // Update the label with BandBin keywords
     PvlKeyword filter("FilterName", "Elevation", "meters");
-    filter.AddValue("ElevationError", "meters");
-    filter.AddValue("GoodnessOfFit", "unitless");
+    filter.addValue("ElevationError", "meters");
+    filter.addValue("GoodnessOfFit", "unitless");
     PvlKeyword center("Center", "1.0");
-    center.AddValue("1.0");
-    center.AddValue("1.0");
+    center.addValue("1.0");
+    center.addValue("1.0");
 
-    PvlGroup &bandbin = ocube->label()->FindGroup("BandBin", PvlObject::Traverse);
-    bandbin.AddKeyword(filter, PvlContainer::Replace);
-    bandbin.AddKeyword(center, PvlContainer::Replace);
-    center.SetName("Width");
-    bandbin.AddKeyword(center, PvlContainer::Replace);
+    PvlGroup &bandbin = ocube->label()->findGroup("BandBin", PvlObject::Traverse);
+    bandbin.addKeyword(filter, PvlContainer::Replace);
+    bandbin.addKeyword(center, PvlContainer::Replace);
+    center.setName("Width");
+    bandbin.addKeyword(center, PvlContainer::Replace);
 
 
     p.EndProcess();
@@ -492,10 +492,10 @@ void IsisMain() {
   PvlGroup smtkresultsPvl("SmtkResults");
   smtkresultsPvl += PvlKeyword("SpiceOffImage", toString(matcher.OffImageErrorCount()));
   smtkresultsPvl += PvlKeyword("SpiceDistanceError", toString(matcher.SpiceErrorCount()));
-  arPvl.AddGroup(smtkresultsPvl);
+  arPvl.addGroup(smtkresultsPvl);
 
-  for(int i = 0; i < arPvl.Groups(); i++) {
-    Application::Log(arPvl.Group(i));
+  for(int i = 0; i < arPvl.groups(); i++) {
+    Application::Log(arPvl.group(i));
   }
 
   // add the auto registration information to print.prt
@@ -513,7 +513,7 @@ void helperButtonLog () {
   UserInterface &ui = Application::GetUserInterface();
   QString file(ui.GetFileName("REGDEF"));
   Pvl p;
-  p.Read(file);
+  p.read(file);
   Application::GuiLog(p);
 }
 //...........end of helper function ........

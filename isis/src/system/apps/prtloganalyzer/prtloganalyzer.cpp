@@ -52,12 +52,12 @@ void IsisMain() {
   // Write the output file if requested for individual unique program summaries
   if(ui.WasEntered("SUMMARY")) {
     Pvl temp;
-    temp.AddGroup(analyzer.review());
-    temp.AddGroup(analyzer.cumulative());
+    temp.addGroup(analyzer.review());
+    temp.addGroup(analyzer.cumulative());
     for (int i = 0 ; i < analyzer.Programs() ; i++) {
-      temp.AddGroup(analyzer.summarize(i));
+      temp.addGroup(analyzer.summarize(i));
     }
-    temp.Write(ui.GetFileName("SUMMARY"));
+    temp.write(ui.GetFileName("SUMMARY"));
   }
 
   // Write the output file if requested of CSV formatted data

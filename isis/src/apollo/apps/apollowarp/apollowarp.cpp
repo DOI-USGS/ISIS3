@@ -30,11 +30,11 @@ void IsisMain() {
   }
 
   // Get the master reseau info
-  PvlGroup master = Pvl(reseaus["Master"]).FindGroup("MasterReseaus");
+  PvlGroup master = Pvl(reseaus["Master"]).findGroup("MasterReseaus");
 
   vector<double> inputLine,inputSample,outputLine,outputSample;
   // Setup the parameters for the transform
-  for (int i=0; i<reseaus["Sample"].Size(); i++) {
+  for (int i=0; i<reseaus["Sample"].size(); i++) {
     inputLine.push_back(toDouble(reseaus["Line"][i]));
     inputSample.push_back(toDouble(reseaus["Sample"][i]));
     outputLine.push_back(toDouble(master["Line"][i]));
@@ -46,7 +46,7 @@ void IsisMain() {
   }
 
   // Get the final output image dimensions
-  PvlGroup dimensions = Pvl(reseaus["Master"]).FindGroup("Dimensions");
+  PvlGroup dimensions = Pvl(reseaus["Master"]).findGroup("Dimensions");
   int onl = dimensions["UndistortedSamples"],
       ons = dimensions["UndistortedLines"];
 

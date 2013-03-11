@@ -22,21 +22,21 @@ void IsisMain() {
 
   int numErrors = 0;
   // Search for errors and add to output
-  for(int i = 0; i < input.Objects(); i++) {
-    PvlObject o = input.Object(i);
-    if(o.HasGroup("Error")) {
-      output.AddObject(o);
+  for(int i = 0; i < input.objects(); i++) {
+    PvlObject o = input.object(i);
+    if(o.hasGroup("Error")) {
+      output.addObject(o);
       numErrors++;
     }
   }
   PvlKeyword errors("TotalErrors", toString(numErrors));
-  output.AddKeyword(errors);
+  output.addKeyword(errors);
   // write output to file
   if(!append) {
-    output.Write(outFile.expanded());
+    output.write(outFile.expanded());
   }
   else {
-    output.Append(outFile.expanded());
+    output.append(outFile.expanded());
   }
   cout << errors << endl;
 }

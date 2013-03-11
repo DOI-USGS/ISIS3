@@ -130,8 +130,8 @@ int main(int argc, char *argv[]) {
   kern += PvlKeyword("EndPadding", toString(slope));
 
   Pvl lab;
-  lab.AddGroup(inst);
-  lab.AddGroup(kern);
+  lab.addGroup(inst);
+  lab.addGroup(kern);
 
   // Test bad target
   try {
@@ -144,8 +144,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Test bad getInteger
-  PvlGroup &temp = lab.FindGroup("Instrument");
-  temp.AddKeyword(PvlKeyword("TargetName", "Mars"), Pvl::Replace);
+  PvlGroup &temp = lab.findGroup("Instrument");
+  temp.addKeyword(PvlKeyword("TargetName", "Mars"), Pvl::Replace);
   cout << "Creating Spice object ..." << endl;
   MySpice spi(lab);
   spi.instrumentRotation()->SetTimeBias(-1.15);
@@ -251,8 +251,8 @@ int main(int argc, char *argv[]) {
   cout << endl;
   PvlObject naifKeywords(spi.getStoredNaifKeywords());
   cout << "Get Stored Naif Keywords..." << endl;
-  cout << "Object = " << naifKeywords.Name() << endl;
-  for (int i = 0; i < naifKeywords.Keywords(); i++) {
+  cout << "Object = " << naifKeywords.name() << endl;
+  for (int i = 0; i < naifKeywords.keywords(); i++) {
     cout << "  " << naifKeywords[i] << endl;
   }
   cout << "EndObject" << endl;

@@ -114,10 +114,10 @@ namespace Isis {
       // Get the ground range if it exists
       m_groundRangeGood = false;
 
-      if ((m_mappingGrp.HasKeyword("MinimumAzimuth")) &&
-          (m_mappingGrp.HasKeyword("MaximumAzimuth")) &&
-          (m_mappingGrp.HasKeyword("MaximumRadius")) &&
-          (m_mappingGrp.HasKeyword("MinimumRadius"))) {
+      if ((m_mappingGrp.hasKeyword("MinimumAzimuth")) &&
+          (m_mappingGrp.hasKeyword("MaximumAzimuth")) &&
+          (m_mappingGrp.hasKeyword("MaximumRadius")) &&
+          (m_mappingGrp.hasKeyword("MinimumRadius"))) {
         m_minimumAzimuth = m_mappingGrp["MinimumAzimuth"];
         m_maximumAzimuth = m_mappingGrp["MaximumAzimuth"];
         m_minimumRadius = m_mappingGrp["MinimumRadius"];
@@ -1259,7 +1259,7 @@ namespace Isis {
   PvlGroup RingPlaneProjection::Mapping() {
     PvlGroup mapping("Mapping");
 
-    if (m_mappingGrp.HasKeyword("TargetName")) {
+    if (m_mappingGrp.hasKeyword("TargetName")) {
       mapping += m_mappingGrp["TargetName"];
     }
 
@@ -1267,16 +1267,16 @@ namespace Isis {
     mapping += m_mappingGrp["AzimuthDirection"];
     mapping += m_mappingGrp["AzimuthDomain"];
 
-    if (m_mappingGrp.HasKeyword("PixelResolution")) {
+    if (m_mappingGrp.hasKeyword("PixelResolution")) {
       mapping += m_mappingGrp["PixelResolution"];
     }
-    if (m_mappingGrp.HasKeyword("Scale")) {
+    if (m_mappingGrp.hasKeyword("Scale")) {
       mapping += m_mappingGrp["Scale"];
     }
-    if (m_mappingGrp.HasKeyword("UpperLeftCornerX")) {
+    if (m_mappingGrp.hasKeyword("UpperLeftCornerX")) {
       mapping += m_mappingGrp["UpperLeftCornerX"];
     }
-    if (m_mappingGrp.HasKeyword("UpperLeftCornerY")) {
+    if (m_mappingGrp.hasKeyword("UpperLeftCornerY")) {
       mapping += m_mappingGrp["UpperLeftCornerY"];
     }
 
@@ -1287,7 +1287,7 @@ namespace Isis {
       mapping += m_mappingGrp["MaximumAzimuth"];
     }
 
-    if (m_mappingGrp.HasKeyword("Rotation")) {
+    if (m_mappingGrp.hasKeyword("Rotation")) {
       mapping += m_mappingGrp["Rotation"];
     }
 

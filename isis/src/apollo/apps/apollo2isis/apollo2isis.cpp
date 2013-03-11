@@ -229,13 +229,13 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   
   if ( !IsValidCode() ){
     PvlGroup error("ERROR");
-    error.AddComment("The decrypted code is invalid.");
+    error.addComment("The decrypted code is invalid.");
     for (int i=0; i<4; i++) {
       PvlKeyword keyword("Column"+toString(i+1));
       for (int j=0; j<32; j++) {
         keyword += toString((int)code[i][j]);
       }
-      error.AddKeyword(keyword);
+      error.addKeyword(keyword);
       codeGroup += keyword;
     }
     Application::Log(error);
@@ -267,27 +267,27 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   kern += PvlKeyword("NaifFrameCode", apollo->NaifFrameCode());
 
   // Set up the nominal reseaus group
-  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
   Process p;
   PvlTranslationTable tTable(
       (QString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
   QString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
   Pvl resTemplate(missionDir + "/reseaus/" + apollo->InstrumentId() + "_NOMINAL.pvl");
-  PvlGroup *reseaus = &resTemplate.FindGroup("Reseaus");
+  PvlGroup *reseaus = &resTemplate.findGroup("Reseaus");
   
   // Update reseau locations based on refined code location
-  for (int i=0; i<(reseaus->FindKeyword("Type")).Size(); i++) {
-    double x = toDouble(reseaus->FindKeyword("Sample")[i]) + sampleTranslation + 2278,
-           y = toDouble(reseaus->FindKeyword("Line")[i]) + lineTranslation - 20231;
+  for (int i=0; i<(reseaus->findKeyword("Type")).size(); i++) {
+    double x = toDouble(reseaus->findKeyword("Sample")[i]) + sampleTranslation + 2278,
+           y = toDouble(reseaus->findKeyword("Line")[i]) + lineTranslation - 20231;
     
     if (apollo->IsApollo17()) {
         x += 50;
         y += 20;
     }
     
-    reseaus->FindKeyword("Sample")[i] = toString(
+    reseaus->findKeyword("Sample")[i] = toString(
         cos(rotation)*(x-sampleTranslation) - sin(rotation)*(y-lineTranslation) + sampleTranslation);
-    reseaus->FindKeyword("Line")[i] = toString(
+    reseaus->findKeyword("Line")[i] = toString(
         sin(rotation)*(x-sampleTranslation) + cos(rotation)*(y-lineTranslation) + lineTranslation);
   }
   inst += PvlKeyword("StartTime", utcTime);

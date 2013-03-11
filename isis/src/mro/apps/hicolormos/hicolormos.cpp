@@ -35,10 +35,10 @@ void IsisMain() {
   tf.PutLine(from1 + "\n");
 
   Pvl from1lab(from1);
-  PvlGroup from1Mosaic = from1lab.FindGroup("Mosaic", Pvl::Traverse);
+  PvlGroup from1Mosaic = from1lab.findGroup("Mosaic", Pvl::Traverse);
 
   // Make the procuct ID (from1 archive group)
-  QString ProdId = from1lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"];
+  QString ProdId = from1lab.findGroup("Archive", Pvl::Traverse)["ObservationId"];
   ProdId += "_COLOR";
 
   // Prep for second image if we have one
@@ -48,16 +48,16 @@ void IsisMain() {
     QString from2 = ui.GetFileName("FROM2");
     //Add from2 file to the temporary automos input list
     tf.PutLine(from2 + "\n");
-    from2lab.Read(from2);
+    from2lab.read(from2);
 
     // Test the observation ID between from1 and from2
-    if((QString)from1lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"] !=
-        (QString)from2lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"]) {
+    if((QString)from1lab.findGroup("Archive", Pvl::Traverse)["ObservationId"] !=
+        (QString)from2lab.findGroup("Archive", Pvl::Traverse)["ObservationId"]) {
       QString msg = "Images not from the same observation";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    from2Mosaic = from2lab.FindGroup("Mosaic", Pvl::Traverse);
+    from2Mosaic = from2lab.findGroup("Mosaic", Pvl::Traverse);
   }
   tf.Close();  // Close list remember to delete
 
@@ -66,7 +66,7 @@ void IsisMain() {
   if(ui.WasEntered("FROM2")) {
     // Add source product Id for from2
     PvlKeyword from2SPI =  from2Mosaic["SourceProductId"];
-    for(int i = 0; i < (int)from2SPI.Size(); i++) {
+    for(int i = 0; i < (int)from2SPI.size(); i++) {
       sourceProductId += from2SPI[i];
     }
   }
@@ -141,8 +141,8 @@ void IsisMain() {
     proj->SetWorld(0.5, 0.5);
     double startX = proj->XCoord();
     double endY = proj->YCoord();
-    double nlines = from1lab.FindGroup("Dimensions", Pvl::Traverse)["Lines"];
-    double nsamps = from1lab.FindGroup("Dimensions", Pvl::Traverse)["Samples"];
+    double nlines = from1lab.findGroup("Dimensions", Pvl::Traverse)["Lines"];
+    double nsamps = from1lab.findGroup("Dimensions", Pvl::Traverse)["Samples"];
     proj->SetWorld((nsamps + 0.5), (nlines + 0.5));
     double endX = proj->XCoord();
     double startY = proj->YCoord();
@@ -152,8 +152,8 @@ void IsisMain() {
       proj->SetWorld(0.5, 0.5);
       if(proj->XCoord() < startX) startX = proj->XCoord();
       if(proj->YCoord() > endY) endY = proj->YCoord();
-      nlines = from2lab.FindGroup("Dimensions", Pvl::Traverse)["Lines"];
-      nsamps = from2lab.FindGroup("Dimensions", Pvl::Traverse)["Samples"];
+      nlines = from2lab.findGroup("Dimensions", Pvl::Traverse)["Lines"];
+      nsamps = from2lab.findGroup("Dimensions", Pvl::Traverse)["Samples"];
       proj->SetWorld((nsamps + 0.5), (nlines + 0.5));
       if(proj->XCoord() > endX) endX = proj->XCoord();
       if(proj->YCoord() < startY) startY = proj->YCoord();
@@ -215,13 +215,13 @@ void IsisMain() {
   PvlKeyword specialProcessingFlag = from1Mosaic["SpecialProcessingFlag"];
   if(ui.WasEntered("FROM2")) {
     for(int i = 0; i < 14; i++) {
-      if(! from2Mosaic["cpmmTdiFlag"].IsNull(i)) {
+      if(! from2Mosaic["cpmmTdiFlag"].isNull(i)) {
         cpmmTdiFlag[i] = from2Mosaic["cpmmTdiFlag"][i];
       }
-      if(!from2Mosaic["cpmmSummingFlag"].IsNull(i)) {
+      if(!from2Mosaic["cpmmSummingFlag"].isNull(i)) {
         cpmmSummingFlag[i] = from2Mosaic["cpmmSummingFlag"][i];
       }
-      if(!from2Mosaic["SpecialProcessingFlag"].IsNull()) {
+      if(!from2Mosaic["SpecialProcessingFlag"].isNull()) {
         specialProcessingFlag[i] = from2Mosaic["SpecialProcessingFlag"][i];
       }
     }
@@ -260,7 +260,7 @@ void IsisMain() {
 
   Cube c;
   c.open(ui.GetFileName("TO"), "rw");
-  c.label()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
+  c.label()->findObject("IsisCube", Pvl::Traverse).addGroup(mos);
   c.write(from1OrgLab);
   c.close();
 

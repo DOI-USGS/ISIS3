@@ -35,11 +35,11 @@ int main() {
     //op += PvlKeyword("MaxResolution", 300);
 
     PvlObject o("InterestOperator");
-    o.AddGroup(op);
-    o.AddGroup(opv);
+    o.addGroup(op);
+    o.addGroup(opv);
 
     Pvl pvl;
-    pvl.AddObject(o);
+    pvl.addObject(o);
     std::cout << pvl << std::endl;
 
     InterestOperator *iop = InterestOperatorFactory::Create(pvl);

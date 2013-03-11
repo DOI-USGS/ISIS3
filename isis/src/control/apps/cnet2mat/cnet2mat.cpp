@@ -34,13 +34,13 @@ void IsisMain() {
   for (int f = 0; f < list2.size(); f++) {
     QString currFile(list2[f].toString());
     Pvl lab(currFile);
-    PvlObject qube(lab.FindObject("QUBE"));
+    PvlObject qube(lab.findObject("QUBE"));
     QString fsc;
-    if(qube.HasKeyword("IMAGE_NUMBER")) {
-      fsc = qube.FindKeyword("IMAGE_NUMBER")[0];
+    if(qube.hasKeyword("IMAGE_NUMBER")) {
+      fsc = qube.findKeyword("IMAGE_NUMBER")[0];
     }
-    else if(qube.HasKeyword("IMAGE_ID")) {
-      fsc = qube.FindKeyword("IMAGE_ID")[0];
+    else if(qube.hasKeyword("IMAGE_ID")) {
+      fsc = qube.findKeyword("IMAGE_ID")[0];
     }
     else {
       QString msg = "Unable to find keyword [\"IMAGE_NUMBER\" or \"IMAGE_ID\"] in file [";

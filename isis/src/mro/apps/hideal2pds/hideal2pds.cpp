@@ -42,23 +42,23 @@ void IsisMain() {
   PvlObject *isisCubeLab = inputCube->label();
 
   // Error check to make sure this is a valid cube for this program
-  QString origInstrument = isisCubeLab->FindObject("IsisCube")
-                           .FindGroup("OriginalInstrument")["InstrumentId"][0];
+  QString origInstrument = isisCubeLab->findObject("IsisCube")
+                           .findGroup("OriginalInstrument")["InstrumentId"][0];
   if (origInstrument != "HIRISE") {
     QString msg = "Input cube must from a HiRISE image. The original "
                   "InstrumentId = [" + origInstrument 
                   + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  QString instrumentId = isisCubeLab->FindObject("IsisCube")
-                                    .FindGroup("Instrument")["InstrumentId"][0];
+  QString instrumentId = isisCubeLab->findObject("IsisCube")
+                                    .findGroup("Instrument")["InstrumentId"][0];
   if (instrumentId != "IdealCamera") {
     QString msg = "Input cube must be IdealCamera. InstrumentId = [" 
                   + instrumentId + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  QString target = isisCubeLab->FindObject("IsisCube")
-                              .FindGroup("Instrument")["TargetName"][0];
+  QString target = isisCubeLab->findObject("IsisCube")
+                              .findGroup("Instrument")["TargetName"][0];
   if (target.toUpper() != "MARS") {
     QString msg = "Input cube must from a HiRise image. The target = [" 
                   + target + "] is unsupported by hideal2pds.";
@@ -79,7 +79,7 @@ void IsisMain() {
   p.SetOutputRange(VALID_MINU2, VALID_MAXU2); 
   // output byte order will be MSB
   p.SetOutputEndian(Isis::Msb);
-  p.SetFormat(ProcessExport::BSQ);
+  p.setFormat(ProcessExport::BSQ);
   // multiple table files should be Fixed according to PDS documentation
   p.SetExportType(ProcessExportPds::Fixed);
   p.SetPdsResolution(ProcessExportPds::Meter);
@@ -103,8 +103,8 @@ void IsisMain() {
   inputCube->read(origBlob);
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
-  origLabelObj.SetName("OriginalLabelObject");
-  origLabel.AddObject(origLabelObj);
+  origLabelObj.setName("OriginalLabelObject");
+  origLabel.addObject(origLabelObj);
   PvlTranslationManager orig(origLabel, "$mro/translations/hirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
 
@@ -125,64 +125,64 @@ void IsisMain() {
   Table instRotationTable = cam->instrumentRotation()->Cache("InstrumentPointing");
   p.ExportTable(instRotationTable, pdsTableFile);
   PvlObject isisTableLab = instRotationTable.Label();
-  PvlObject &instPtTabLab = pdsLabel.FindObject("INSTRUMENT_POINTING_TABLE");
-  PvlKeyword tableKeyword = isisTableLab.FindKeyword("TimeDependentFrames");
-  tableKeyword.SetName("TIME_DEPENDENT_FRAMES");
+  PvlObject &instPtTabLab = pdsLabel.findObject("INSTRUMENT_POINTING_TABLE");
+  PvlKeyword tableKeyword = isisTableLab.findKeyword("TimeDependentFrames");
+  tableKeyword.setName("TIME_DEPENDENT_FRAMES");
   instPtTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("ConstantFrames");
-  tableKeyword.SetName("CONSTANT_FRAMES");
+  tableKeyword = isisTableLab.findKeyword("ConstantFrames");
+  tableKeyword.setName("CONSTANT_FRAMES");
   instPtTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("ConstantRotation");
-  tableKeyword.SetName("CONSTANT_ROTATION");
+  tableKeyword = isisTableLab.findKeyword("ConstantRotation");
+  tableKeyword.setName("CONSTANT_ROTATION");
   instPtTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("CkTableStartTime");
-  tableKeyword.SetName("CK_TABLE_START_TIME");
+  tableKeyword = isisTableLab.findKeyword("CkTableStartTime");
+  tableKeyword.setName("CK_TABLE_START_TIME");
   instPtTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("CkTableEndTime");
-  tableKeyword.SetName("CK_TABLE_END_TIME");
+  tableKeyword = isisTableLab.findKeyword("CkTableEndTime");
+  tableKeyword.setName("CK_TABLE_END_TIME");
   instPtTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("CkTableOriginalSize");
-  tableKeyword.SetName("CK_TABLE_ORIGINAL_SIZE");
+  tableKeyword = isisTableLab.findKeyword("CkTableOriginalSize");
+  tableKeyword.setName("CK_TABLE_ORIGINAL_SIZE");
   instPtTabLab += tableKeyword;
 
   pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POSITION_TABLE.dat"; 
   Table instPositionTable = cam->instrumentPosition()->Cache("InstrumentPosition");
   p.ExportTable(instPositionTable, pdsTableFile); 
   isisTableLab = instPositionTable.Label();
-  PvlObject &instPosTabLab = pdsLabel.FindObject("INSTRUMENT_POSITION_TABLE");
-  tableKeyword = isisTableLab.FindKeyword("CacheType");
-  tableKeyword.SetName("CACHE_TYPE");
+  PvlObject &instPosTabLab = pdsLabel.findObject("INSTRUMENT_POSITION_TABLE");
+  tableKeyword = isisTableLab.findKeyword("CacheType");
+  tableKeyword.setName("CACHE_TYPE");
   instPosTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("SpkTableStartTime");
-  tableKeyword.SetName("SPK_TABLE_START_TIME");
+  tableKeyword = isisTableLab.findKeyword("SpkTableStartTime");
+  tableKeyword.setName("SPK_TABLE_START_TIME");
   instPosTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("SpkTableEndTime");
-  tableKeyword.SetName("SPK_TABLE_END_TIME");
+  tableKeyword = isisTableLab.findKeyword("SpkTableEndTime");
+  tableKeyword.setName("SPK_TABLE_END_TIME");
   instPosTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("SpkTableOriginalSize");
-  tableKeyword.SetName("SPK_TABLE_ORIGINAL_SIZE");
+  tableKeyword = isisTableLab.findKeyword("SpkTableOriginalSize");
+  tableKeyword.setName("SPK_TABLE_ORIGINAL_SIZE");
   instPosTabLab += tableKeyword;
 
   pdsTableFile = outPdsFile.baseName() + "_BODY_ROTATION_TABLE.dat"; 
   Table bodyRotationTable = cam->bodyRotation()->Cache("BodyRotation");
   p.ExportTable(bodyRotationTable, pdsTableFile); 
   isisTableLab = bodyRotationTable.Label();
-  PvlObject &bodyRotTabLab = pdsLabel.FindObject("BODY_ROTATION_TABLE");
-  tableKeyword = isisTableLab.FindKeyword("TimeDependentFrames");
-  tableKeyword.SetName("TIME_DEPENDENT_FRAMES");
+  PvlObject &bodyRotTabLab = pdsLabel.findObject("BODY_ROTATION_TABLE");
+  tableKeyword = isisTableLab.findKeyword("TimeDependentFrames");
+  tableKeyword.setName("TIME_DEPENDENT_FRAMES");
   bodyRotTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("CkTableStartTime");
-  tableKeyword.SetName("CK_TABLE_START_TIME");
+  tableKeyword = isisTableLab.findKeyword("CkTableStartTime");
+  tableKeyword.setName("CK_TABLE_START_TIME");
   bodyRotTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("CkTableEndTime");
-  tableKeyword.SetName("CK_TABLE_END_TIME");
+  tableKeyword = isisTableLab.findKeyword("CkTableEndTime");
+  tableKeyword.setName("CK_TABLE_END_TIME");
   bodyRotTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("CkTableOriginalSize");
-  tableKeyword.SetName("CK_TABLE_ORIGINAL_SIZE");
+  tableKeyword = isisTableLab.findKeyword("CkTableOriginalSize");
+  tableKeyword.setName("CK_TABLE_ORIGINAL_SIZE");
   bodyRotTabLab += tableKeyword;
-  if (isisTableLab.HasKeyword("SolarLongitude")) {
-    tableKeyword = isisTableLab.FindKeyword("SolarLongitude");
-    tableKeyword.SetName("SOLAR_LONGITUDE");
+  if (isisTableLab.hasKeyword("SolarLongitude")) {
+    tableKeyword = isisTableLab.findKeyword("SolarLongitude");
+    tableKeyword.setName("SOLAR_LONGITUDE");
   }
   else {
     tableKeyword = PvlKeyword("SOLAR_LONGITUDE", 
@@ -196,27 +196,27 @@ void IsisMain() {
   Table sunPositionTable  = cam->sunPosition()->Cache("SunPosition");
   p.ExportTable(sunPositionTable, pdsTableFile); 
   isisTableLab = sunPositionTable.Label();
-  PvlObject &sunPosTabLab = pdsLabel.FindObject("SUN_POSITION_TABLE");
-  tableKeyword = isisTableLab.FindKeyword("CacheType");
-  tableKeyword.SetName("CACHE_TYPE");
+  PvlObject &sunPosTabLab = pdsLabel.findObject("SUN_POSITION_TABLE");
+  tableKeyword = isisTableLab.findKeyword("CacheType");
+  tableKeyword.setName("CACHE_TYPE");
   sunPosTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("SpkTableStartTime");
-  tableKeyword.SetName("SPK_TABLE_START_TIME");
+  tableKeyword = isisTableLab.findKeyword("SpkTableStartTime");
+  tableKeyword.setName("SPK_TABLE_START_TIME");
   sunPosTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("SpkTableEndTime");
-  tableKeyword.SetName("SPK_TABLE_END_TIME");
+  tableKeyword = isisTableLab.findKeyword("SpkTableEndTime");
+  tableKeyword.setName("SPK_TABLE_END_TIME");
   sunPosTabLab += tableKeyword;
-  tableKeyword = isisTableLab.FindKeyword("SpkTableOriginalSize");
-  tableKeyword.SetName("SPK_TABLE_ORIGINAL_SIZE");
+  tableKeyword = isisTableLab.findKeyword("SpkTableOriginalSize");
+  tableKeyword.setName("SPK_TABLE_ORIGINAL_SIZE");
   sunPosTabLab += tableKeyword;
 
   // Read in the proper keyword types (Real, Enum, String, Integer, etc) for 
   // each PvlKeyword so that the PDS labels have proper format
-  PvlFormat *formatter = pdsLabel.GetFormat();
-  formatter->Add("$mro/templates/labels/hiriseIdealPds.typ");
+  PvlFormat *formatter = pdsLabel.format();
+  formatter->add("$mro/templates/labels/hiriseIdealPds.typ");
 
   // Format ordering of keywords/objects/groups/comments in the PDS labels
-  pdsLabel.SetFormatTemplate("$mro/templates/labels/hiriseIdealPds.pft");
+  pdsLabel.setFormatTemplate("$mro/templates/labels/hiriseIdealPds.pft");
 
   // image line/byte offsets are calculated and values are updated in the labels
   // now that all translations/additions/modifications to the labels have been
@@ -279,7 +279,7 @@ pair<double, double> inputRange(Cube *inputCube) {
  */
 void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
   // Add the image description to the IMAGE object in the label of the PDS product
-  PvlObject &image = pdsLabel.FindObject("IMAGE");
+  PvlObject &image = pdsLabel.findObject("IMAGE");
   image += PvlKeyword("DESCRIPTION", 
                       "HiRISE mosaicked product, not map projected");
 
@@ -289,9 +289,9 @@ void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
   double sourceLines = double(image["LINES"]);
   double firstSample = 0.5;
   double firstLine = 0.5;
-  if (isisCubeLab->FindObject("IsisCube").HasGroup("AlphaCube")) {
-    PvlGroup alphaCubeGroup = isisCubeLab->FindObject("IsisCube")
-                                         .FindGroup("AlphaCube");
+  if (isisCubeLab->findObject("IsisCube").hasGroup("AlphaCube")) {
+    PvlGroup alphaCubeGroup = isisCubeLab->findObject("IsisCube")
+                                         .findGroup("AlphaCube");
 
     int alphaSamples = int(alphaCubeGroup["AlphaSamples"]);
     int alphaLines = int(alphaCubeGroup["AlphaLines"]);
@@ -333,27 +333,27 @@ void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
   // Add center wavelength and bandwidth with correct units to the IMAGE object
   PvlKeyword &oldCenter = image["CENTER_FILTER_WAVELENGTH"];
   PvlKeyword newCenter("CENTER_FILTER_WAVELENGTH");
-  for(int val = 0; val < oldCenter.Size(); ++val) {
-    if(((QString)(oldCenter.Unit(val))).toUpper() == "NANOMETERS") {
-      newCenter.AddValue(oldCenter[val], "NM");
+  for(int val = 0; val < oldCenter.size(); ++val) {
+    if(((QString)(oldCenter.unit(val))).toUpper() == "NANOMETERS") {
+      newCenter.addValue(oldCenter[val], "NM");
     }
     else {
-      newCenter.AddValue(oldCenter[val], oldCenter.Unit(val));
+      newCenter.addValue(oldCenter[val], oldCenter.unit(val));
     }
   }
-  image.AddKeyword(newCenter, Pvl::Replace);
+  image.addKeyword(newCenter, Pvl::Replace);
 
   PvlKeyword &oldBandWidth = image["BAND_WIDTH"];
   PvlKeyword newBandWidth("BAND_WIDTH");
-  for(int val = 0; val < oldBandWidth.Size(); ++val) {
-    if(((QString)(oldBandWidth.Unit(val))).toUpper() == "NANOMETERS") {
-      newBandWidth.AddValue(oldBandWidth[val], "NM");
+  for(int val = 0; val < oldBandWidth.size(); ++val) {
+    if(((QString)(oldBandWidth.unit(val))).toUpper() == "NANOMETERS") {
+      newBandWidth.addValue(oldBandWidth[val], "NM");
     }
     else {
-      newBandWidth.AddValue(oldBandWidth[val], oldBandWidth.Unit(val));
+      newBandWidth.addValue(oldBandWidth[val], oldBandWidth.unit(val));
     }
   }
-  image.AddKeyword(newBandWidth, Pvl::Replace);
+  image.addKeyword(newBandWidth, Pvl::Replace);
 }
 
 
@@ -391,14 +391,14 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
                               UserInterface &ui, Camera *cam) {
   // Replace INSTRUMENT_ID value in the output labels
   PvlKeyword instId("INSTRUMENT_ID", "HIRISE_IDEAL_CAMERA");
-  pdsLabel.AddKeyword(instId, PvlContainer::Replace);
+  pdsLabel.addKeyword(instId, PvlContainer::Replace);
   
   // Add user-entered keywords to ROOT object in the label of the PDS product
   if(ui.WasEntered("RATIONALE_DESC")) {
     PvlKeyword rationale("RATIONALE_DESC", ui.GetAsString("RATIONALE_DESC"));
-    pdsLabel.AddKeyword(rationale, PvlContainer::Replace);
+    pdsLabel.addKeyword(rationale, PvlContainer::Replace);
   }
-  else if ( !pdsLabel.HasKeyword("RATIONALE_DESC") 
+  else if ( !pdsLabel.hasKeyword("RATIONALE_DESC") 
             || QString(pdsLabel["RATIONALE_DESC"]) == "NULL" ){
     QString msg = "Unable to export HiRise product to PDS without "
                   "RationaleDescription value. The input cube value for this "
@@ -416,17 +416,17 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   sfname += "Isis " + Application::Version() + " " +
             Application::GetUserInterface().ProgramName();
   pdsLabel += PvlKeyword("SOFTWARE_NAME", sfname);
-  QString matchedCube = isisCubeLab->FindObject("IsisCube").FindGroup("Instrument")
-                                  .FindKeyword("MatchedCube")[0];
+  QString matchedCube = isisCubeLab->findObject("IsisCube").findGroup("Instrument")
+                                  .findKeyword("MatchedCube")[0];
   FileName matchedCubeFileNoPath(matchedCube);
   pdsLabel += PvlKeyword("MATCHED_CUBE", matchedCubeFileNoPath.name());
 
   // Add jitter correction flag value to the ROOT object
   bool jitter = false;
-  if (isisCubeLab->FindObject("IsisCube").FindGroup("Instrument")
-                 .HasKeyword("ImageJitterCorrected")) {
-    jitter = toInt(isisCubeLab->FindObject("IsisCube")
-                            .FindGroup("Instrument")["ImageJitterCorrected"][0]);
+  if (isisCubeLab->findObject("IsisCube").findGroup("Instrument")
+                 .hasKeyword("ImageJitterCorrected")) {
+    jitter = toInt(isisCubeLab->findObject("IsisCube")
+                            .findGroup("Instrument")["ImageJitterCorrected"][0]);
     pdsLabel += PvlKeyword("IMAGE_JITTER_CORRECTED", toString((int)jitter));          
   }
   else {
@@ -434,8 +434,8 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   }                                                                  
 
   // Add Isis Kernels group keywords to the ROOT object
-  QString shapeModel = isisCubeLab->FindObject("IsisCube").FindGroup("Kernels")
-                                  .FindKeyword("ShapeModel")[0];
+  QString shapeModel = isisCubeLab->findObject("IsisCube").findGroup("Kernels")
+                                  .findKeyword("ShapeModel")[0];
   FileName shapeModelFileNoPath(shapeModel);
   pdsLabel += PvlKeyword("SHAPE_MODEL", shapeModelFileNoPath.name());
 
@@ -446,8 +446,8 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   QString radiiName = "BODY" + QString(cam->naifBodyCode()) + "_RADII";
   PvlObject naifKeywordGroup = cam->getStoredNaifKeywords();
 
-  if (naifKeywordGroup.HasKeyword(radiiName)) {
-    PvlKeyword naifBodyRadii = naifKeywordGroup.FindKeyword(radiiName);
+  if (naifKeywordGroup.hasKeyword(radiiName)) {
+    PvlKeyword naifBodyRadii = naifKeywordGroup.findKeyword(radiiName);
     pdsLabel += PvlKeyword("A_AXIS_RADIUS", naifBodyRadii[0], "KILOMETERS");
     pdsLabel += PvlKeyword("B_AXIS_RADIUS", naifBodyRadii[1], "KILOMETERS");
     pdsLabel += PvlKeyword("C_AXIS_RADIUS", naifBodyRadii[2], "KILOMETERS");
@@ -460,29 +460,29 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     pdsLabel += PvlKeyword("C_AXIS_RADIUS", toString(naifBodyRadii[2].kilometers()), "KILOMETERS");
   }
 
-  if (naifKeywordGroup.HasKeyword("BODY_FRAME_CODE")) {
-    pdsLabel += naifKeywordGroup.FindKeyword("BODY_FRAME_CODE");
+  if (naifKeywordGroup.hasKeyword("BODY_FRAME_CODE")) {
+    pdsLabel += naifKeywordGroup.findKeyword("BODY_FRAME_CODE");
   }
   else {
     pdsLabel += PvlKeyword("BODY_FRAME_CODE", toString(cam->naifBodyFrameCode()));
   }
 
-  if (naifKeywordGroup.HasKeyword("IDEAL_FOCAL_LENGTH")) {
-    pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_FOCAL_LENGTH");
+  if (naifKeywordGroup.hasKeyword("IDEAL_FOCAL_LENGTH")) {
+    pdsLabel += naifKeywordGroup.findKeyword("IDEAL_FOCAL_LENGTH");
   }
   else {
     pdsLabel += PvlKeyword("IDEAL_FOCAL_LENGTH", toString(cam->FocalLength()));
   }
 
-  if (naifKeywordGroup.HasKeyword("IDEAL_PIXEL_PITCH")) {
-    pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_PIXEL_PITCH");
+  if (naifKeywordGroup.hasKeyword("IDEAL_PIXEL_PITCH")) {
+    pdsLabel += naifKeywordGroup.findKeyword("IDEAL_PIXEL_PITCH");
   }
   else {
     pdsLabel += PvlKeyword("IDEAL_PIXEL_PITCH", toString(cam->PixelPitch()));
   }
 
-  if (naifKeywordGroup.HasKeyword("IDEAL_TRANSX")) {
-    pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_TRANSX");
+  if (naifKeywordGroup.hasKeyword("IDEAL_TRANSX")) {
+    pdsLabel += naifKeywordGroup.findKeyword("IDEAL_TRANSX");
   }
   else {
     const double *transXValues = cam->FocalPlaneMap()->TransX();
@@ -493,8 +493,8 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     pdsLabel += transX;
   }
 
-  if (naifKeywordGroup.HasKeyword("IDEAL_TRANSY")) {
-    pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_TRANSY");
+  if (naifKeywordGroup.hasKeyword("IDEAL_TRANSY")) {
+    pdsLabel += naifKeywordGroup.findKeyword("IDEAL_TRANSY");
   }
   else {
     const double *transYValues = cam->FocalPlaneMap()->TransY();
@@ -505,8 +505,8 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     pdsLabel += transY;
   }
 
-  if (naifKeywordGroup.HasKeyword("IDEAL_TRANSS")) {
-    pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_TRANSS");
+  if (naifKeywordGroup.hasKeyword("IDEAL_TRANSS")) {
+    pdsLabel += naifKeywordGroup.findKeyword("IDEAL_TRANSS");
   }
   else {
     const double *transSValues = cam->FocalPlaneMap()->TransS();
@@ -517,8 +517,8 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     pdsLabel += transS;
   }
 
-  if (naifKeywordGroup.HasKeyword("IDEAL_TRANSL")) {
-    pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_TRANSL");
+  if (naifKeywordGroup.hasKeyword("IDEAL_TRANSL")) {
+    pdsLabel += naifKeywordGroup.findKeyword("IDEAL_TRANSL");
   }
   else {
     const double *transLValues = cam->FocalPlaneMap()->TransL();
@@ -548,7 +548,7 @@ void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel) {
   strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
   QString dateTime = (QString) timestr;
   iTime tmpDateTime(dateTime);
-  PvlGroup &timeParam = pdsLabel.FindGroup("TIME_PARAMETERS");
+  PvlGroup &timeParam = pdsLabel.findGroup("TIME_PARAMETERS");
   timeParam += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 }
 

@@ -18,14 +18,14 @@ int main(int argc, char *argv[]) {
   g += PvlKeyword("SpacecraftClockCount", "987654321");
 
   PvlObject o("IsisCube");
-  o.AddGroup(g);
+  o.addGroup(g);
 
   Pvl p;
-  p.AddObject(o);
+  p.addObject(o);
 
   cout << SerialNumber::Compose(p) << endl;
 
-  p.FindGroup("Instrument", Pvl::Traverse).DeleteKeyword("InstrumentId");
+  p.findGroup("Instrument", Pvl::Traverse).deleteKeyword("InstrumentId");
   cout << SerialNumber::Compose(p) << endl;
 
   Cube cube;

@@ -28,7 +28,7 @@ void IsisMain() {
   Pvl lab(inFile.expanded());
 
   try {
-    id = (QString) lab.FindKeyword("DATA_SET_ID");
+    id = (QString) lab.findKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
     QString msg = "Unable to read [DATA_SET_ID] from input file [" +
@@ -44,7 +44,7 @@ void IsisMain() {
   p.StartProcess();
 
   // Get the directory where the Kaguya MI translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Kaguya"] + "/translations/";
   Pvl inputLabel(inFile.expanded());
   Pvl *outputLabel = outcube->label();
@@ -60,24 +60,24 @@ void IsisMain() {
   PvlTranslationManager instrumentXlater(inputLabel, transFile.expanded());
   instrumentXlater.Auto(*(outputLabel));
     //trim trailing z's from the time strings
-  PvlGroup &instGroup(outputLabel->FindGroup("Instrument",Pvl::Traverse));
+  PvlGroup &instGroup(outputLabel->findGroup("Instrument",Pvl::Traverse));
   QString timeString;
     //StartTime 
   PvlKeyword &startTimeKeyword=instGroup["StartTime"];
   timeString = startTimeKeyword[0];
-  startTimeKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
+  startTimeKeyword.setValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
     //StartTimeRaw
   PvlKeyword &startTimeRawKeyword=instGroup["StartTimeRaw"];
   timeString = startTimeRawKeyword[0];
-  startTimeRawKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
+  startTimeRawKeyword.setValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
     //StopTime
   PvlKeyword &stopTimeKeyword=instGroup["StopTime"];
   timeString = stopTimeKeyword[0];
-  stopTimeKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
+  stopTimeKeyword.setValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
     //StopTimeRaw
   PvlKeyword &stopTimeRawKeyword=instGroup["StopTimeRaw"];
   timeString = stopTimeRawKeyword[0];
-  stopTimeRawKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
+  stopTimeRawKeyword.setValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
 
 
   // Translate the BandBin group
@@ -87,23 +87,23 @@ void IsisMain() {
 
   //Set up the Kernels group
   PvlGroup kern("Kernels");
-  if      (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS") {
+  if      (lab.findKeyword("INSTRUMENT_ID")[0] == "MI-VIS") {
     kern += PvlKeyword("NaifFrameCode", toString(-131335));
     kern += PvlKeyword("NaifCkCode", toString(-131330));
   }
-  else if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR") {
+  else if (lab.findKeyword("INSTRUMENT_ID")[0] == "MI-NIR") {
     kern += PvlKeyword("NaifFrameCode", toString(-131341));
     kern += PvlKeyword("NaifCkCode", toString(-131340));
   }
 
   //At the time of this writing there was no expectation that Kaguya ever did any binning
   //  so this is check to make sure an error is thrown if an image was binned
-  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS" && outcube->sampleCount() != 962 ) {
+  if (lab.findKeyword("INSTRUMENT_ID")[0] == "MI-VIS" && outcube->sampleCount() != 962 ) {
     QString msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
                   "unexpected, and is unsupported by the camera model";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR" && outcube->sampleCount() != 320 ) {
+  if (lab.findKeyword("INSTRUMENT_ID")[0] == "MI-NIR" && outcube->sampleCount() != 320 ) {
     QString msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
                   "unexpected, and is unsupported by the camera model";
     throw IException(IException::Unknown, msg, _FILEINFO_);

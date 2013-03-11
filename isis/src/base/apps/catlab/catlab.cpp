@@ -22,10 +22,10 @@ void IsisMain() {
   // Output to file if entered
   if(ui.WasEntered("TO")) {
     if (ui.GetBoolean("APPEND")) {
-      label.Append(FileName(ui.GetFileName("TO")).expanded());
+      label.append(FileName(ui.GetFileName("TO")).expanded());
     }
     else {
-      label.Write(FileName(ui.GetFileName("TO")).expanded());
+      label.write(FileName(ui.GetFileName("TO")).expanded());
     }
   }
 

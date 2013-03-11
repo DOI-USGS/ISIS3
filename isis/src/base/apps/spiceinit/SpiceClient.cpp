@@ -177,13 +177,13 @@ namespace Isis {
         s << *p_rawResponse;
         s >> pvlTest;
 
-        PvlGroup &err = pvlTest.FindGroup("Error", Pvl::Traverse);
+        PvlGroup &err = pvlTest.findGroup("Error", Pvl::Traverse);
 
         *p_error = "The Spice Server was unable to initialize the cube.";
 
-        if (err.FindKeyword("Message")[0] != "") {
+        if (err.findKeyword("Message")[0] != "") {
           *p_error += "  The error reported was: ";
-          *p_error += err.FindKeyword("Message")[0];
+          *p_error += err.findKeyword("Message")[0];
         }
       }
       catch(IException &) {
@@ -431,7 +431,7 @@ namespace Isis {
     Pvl labels;
     pvlStream >> labels;
 
-    return labels.FindGroup("Kernels", Pvl::Traverse);
+    return labels.findGroup("Kernels", Pvl::Traverse);
   }
 
 
@@ -455,7 +455,7 @@ namespace Isis {
     Pvl labels;
     pvlStream >> labels;
 
-    return labels.FindGroup("Kernels", Pvl::Traverse);
+    return labels.findGroup("Kernels", Pvl::Traverse);
   }
 
 
@@ -551,7 +551,7 @@ namespace Isis {
     Pvl labels;
     pvlStream >> labels;
 
-    return labels.FindObject("NaifKeywords");
+    return labels.findObject("NaifKeywords");
   }
 
 

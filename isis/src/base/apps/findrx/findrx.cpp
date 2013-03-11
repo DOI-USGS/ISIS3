@@ -25,26 +25,26 @@ void IsisMain() {
   else {
     regdef = new Pvl("$base/templates/autoreg/findrx.def");
   }
-  PvlGroup &reseaus = cube.label()->FindGroup("Reseaus", Pvl::Traverse);
+  PvlGroup &reseaus = cube.label()->findGroup("Reseaus", Pvl::Traverse);
 
   // If the Keyword sizes don't match up, throw errors.
-  int nres = reseaus["Line"].Size();
-  if(nres != reseaus["Sample"].Size()) {
+  int nres = reseaus["Line"].size();
+  if(nres != reseaus["Sample"].size()) {
     QString msg = "Sample size incorrect [Sample size " +
-                 toString(reseaus["Sample"].Size()) + " != " + " Line size " +
-                 toString(reseaus["Line"].Size()) + "]";
+                 toString(reseaus["Sample"].size()) + " != " + " Line size " +
+                 toString(reseaus["Line"].size()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  if(nres != reseaus["Type"].Size()) {
+  if(nres != reseaus["Type"].size()) {
     QString msg = "Type size incorrect [Type size " +
-                 toString(reseaus["Type"].Size()) + " != " + " Line size " +
-                 toString(reseaus["Line"].Size()) + "]";
+                 toString(reseaus["Type"].size()) + " != " + " Line size " +
+                 toString(reseaus["Line"].size()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  if(nres != reseaus["Valid"].Size()) {
+  if(nres != reseaus["Valid"].size()) {
     QString msg = "Valid size incorrect [Valid size " +
-                 toString(reseaus["Valid"].Size()) + " != " + " Line size " +
-                 toString(reseaus["Line"].Size()) + "]";
+                 toString(reseaus["Valid"].size()) + " != " + " Line size " +
+                 toString(reseaus["Line"].size()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 

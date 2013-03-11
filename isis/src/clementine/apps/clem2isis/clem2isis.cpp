@@ -32,7 +32,7 @@ void IsisMain() {
   bool projected;
   try {
     Pvl lab(in.expanded());
-    projected = lab.HasObject("IMAGE_MAP_PROJECTION");
+    projected = lab.hasObject("IMAGE_MAP_PROJECTION");
     QString id;
     id = (QString)lab["DATA_SET_ID"];
     id = id.simplified().trimmed();
@@ -97,7 +97,7 @@ void WriteLine(Buffer &b) {
 
 void TranslateLabels(FileName in, Cube *ocube) {
   // Get the directory where the Clementine translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   QString transDir = (QString) dataDir["clementine1"];
@@ -111,17 +111,17 @@ void TranslateLabels(FileName in, Cube *ocube) {
   labelXlater.Auto(*(outputLabel));
 
   //Instrument group
-  PvlGroup inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
-  PvlKeyword &startTime = inst.FindKeyword("StartTime");
-  startTime.SetValue(startTime[0].mid(0, startTime[0].size() - 1));
+  PvlKeyword &startTime = inst.findKeyword("StartTime");
+  startTime.setValue(startTime[0].mid(0, startTime[0].size() - 1));
 
   // Old PDS labels used keyword INSTRUMENT_COMPRESSION_TYPE & PDS Labels now use ENCODING_TYPE
-  if(pdsLab.FindObject("Image").HasKeyword("InstrumentCompressionType")) {
-    inst += PvlKeyword("EncodingFormat", (QString) pdsLab.FindObject("Image")["InstrumentCompressionType"]);
+  if(pdsLab.findObject("Image").hasKeyword("InstrumentCompressionType")) {
+    inst += PvlKeyword("EncodingFormat", (QString) pdsLab.findObject("Image")["InstrumentCompressionType"]);
   }
   else {
-    inst += PvlKeyword("EncodingFormat", (QString) pdsLab.FindObject("Image")["EncodingType"]);
+    inst += PvlKeyword("EncodingFormat", (QString) pdsLab.findObject("Image")["EncodingType"]);
   }
 
   if(((QString)inst["InstrumentId"]) == "HIRES") {
@@ -130,17 +130,17 @@ void TranslateLabels(FileName in, Cube *ocube) {
 
   ocube->putGroup(inst);
 
-  PvlGroup bBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
+  PvlGroup bBin = outputLabel->findGroup("BandBin", Pvl::Traverse);
   QString filter = pdsLab["FilterName"];
   if(filter != "F") {
     //Band Bin group
     double center = pdsLab["CenterFilterWavelength"];
     center /= 1000.0;
-    bBin.FindKeyword("Center").SetValue(toString(center), "micrometers");
+    bBin.findKeyword("Center").setValue(toString(center), "micrometers");
   }
   double width = pdsLab["Bandwidth"];
   width /= 1000.0;
-  bBin.FindKeyword("Width").SetValue(toString(width), "micrometers");
+  bBin.findKeyword("Width").setValue(toString(width), "micrometers");
   ocube->putGroup(bBin);
 
   //Kernel group

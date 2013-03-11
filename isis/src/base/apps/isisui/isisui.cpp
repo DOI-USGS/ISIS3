@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
 
 void interface() {
   PvlObject hist = Isis::iApp->History();
-  PvlGroup up = hist.FindGroup("UserParameters");
+  PvlGroup up = hist.findGroup("UserParameters");
   Pvl pvl;
-  pvl.AddGroup(up);
+  pvl.addGroup(up);
   cout << pvl << endl;
 }

@@ -133,7 +133,7 @@ int main(void) {
   cerr << "\n";
 
   Pvl &prefs = Preference::Preferences();
-  PvlGroup &errorPrefs = prefs.FindGroup("ErrorFacility");
+  PvlGroup &errorPrefs = prefs.findGroup("ErrorFacility");
 
   cerr << "Test Preference 'FileLine'\n";
   {

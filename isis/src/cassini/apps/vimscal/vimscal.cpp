@@ -74,7 +74,7 @@ void IsisMain() {
   bool isVims = true;
 
   try {
-    isVims = (icube->label()->FindGroup("Instrument",
+    isVims = (icube->label()->findGroup("Instrument",
               Pvl::Traverse)["InstrumentId"][0] == "VIMS");
   }
   catch(IException &e) {
@@ -86,7 +86,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(icube->label()->FindObject("IsisCube").HasGroup("AlphaCube")) {
+  if(icube->label()->findObject("IsisCube").hasGroup("AlphaCube")) {
     QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -253,7 +253,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   }
 
   bool vis = (icube->label()->
-              FindGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
+              findGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
 
   QString attributes;
 
@@ -278,7 +278,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
  * This calculates the coefficients for specific energy corrections
  */
 void calculateSpecificEnergy(Cube *icube) {
-  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
 
   double coefficient = 1.0;
@@ -357,7 +357,7 @@ void calculateSpecificEnergy(Cube *icube) {
  * @param currCube
  */
 void calculateDarkCurrent(Cube *icube) {
-  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
 
   calibInfo += PvlKeyword("Vis", ((vis) ? "true" : "false"));
@@ -379,7 +379,7 @@ void calculateDarkCurrent(Cube *icube) {
  * @param icube
  */
 void calculateVisDarkCurrent(Cube *icube) {
-  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
 
   // This is the dark current corrections for VIS
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
@@ -449,7 +449,7 @@ void calculateVisDarkCurrent(Cube *icube) {
 
   // If spectral summing is on, go in sets of 8 and set darks to the average
   /*
-  PvlGroup &archive = icube->Label()->FindGroup("Archive", Pvl::Traverse);
+  PvlGroup &archive = icube->Label()->findGroup("Archive", Pvl::Traverse);
   if(archive["SpectralSummingFlag"][0] == "ON") {
     for(int band = 1; band <= 96; band += 8) {
       for(int sample = 1; sample <= 64; sample++) {
@@ -490,12 +490,12 @@ void calculateIrDarkCurrent(Cube *icube) {
   bool found = false;
 
   // verify if IR we have sideplane data
-  for(int obj = 0; !found && obj < icube->label()->Objects(); obj++) {
-    PvlObject &object = icube->label()->Object(obj);
+  for(int obj = 0; !found && obj < icube->label()->objects(); obj++) {
+    PvlObject &object = icube->label()->object(obj);
 
-    if(object.Name() != "Table") continue;
+    if(object.name() != "Table") continue;
 
-    if(object.HasKeyword("Name") && object["Name"][0] == "SideplaneIr") found = true;
+    if(object.hasKeyword("Name") && object["Name"][0] == "SideplaneIr") found = true;
   }
 
   if(!found) {
@@ -507,7 +507,7 @@ void calculateIrDarkCurrent(Cube *icube) {
 
   // If spectal summing is on OR compressor_id isnt N/A then
   //   just return.
-  PvlGroup &archive = icube->label()->FindGroup("Archive", Pvl::Traverse);
+  PvlGroup &archive = icube->label()->findGroup("Archive", Pvl::Traverse);
 
   // If dark subtracted (compressorid is valid) and cant do linear
   //   correction (spectral editing flag on) then do not do dark
@@ -609,7 +609,7 @@ void calculateIrDarkCurrent(Cube *icube) {
  * @param p
  */
 void chooseFlatFile(Cube *icube, ProcessByLine *p) {
-  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
 
@@ -673,7 +673,7 @@ QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
 }
 
 void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
-  const PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+  const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   //  Get sample/line offsets
   int sampOffset = inst ["XOffset"];

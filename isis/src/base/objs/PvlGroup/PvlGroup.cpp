@@ -70,13 +70,13 @@ namespace Isis {
       is.seekg(beforeKeywordPos, ios::beg);
 
       QString msg = "Expected PVL keyword named [Group], found keyword named [";
-      msg += readKeyword.Name();
+      msg += readKeyword.name();
       msg += "] when reading PVL";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    if(readKeyword.Size() == 1) {
-      result.SetName(readKeyword[0]);
+    if(readKeyword.size() == 1) {
+      result.setName(readKeyword[0]);
     }
     else {
       if(is.eof() && !is.bad()) {
@@ -87,7 +87,7 @@ namespace Isis {
 
       QString msg = "Expected a single value for group name, found [(";
 
-      for(int i = 0; i < readKeyword.Size(); i++) {
+      for(int i = 0; i < readKeyword.size(); i++) {
         if(i != 0) msg += ", ";
 
         msg += readKeyword[i];
@@ -98,8 +98,8 @@ namespace Isis {
     }
 
 
-    for(int comment = 0; comment < readKeyword.Comments(); comment++) {
-      result.AddComment(readKeyword.Comment(comment));
+    for(int comment = 0; comment < readKeyword.comments(); comment++) {
+      result.addComment(readKeyword.comment(comment));
     }
 
     readKeyword = PvlKeyword();
@@ -119,15 +119,15 @@ namespace Isis {
           is.seekg(beforeKeywordPos, ios::beg);
 
           QString msg = "Unexpected [";
-          msg += readKeyword.Name();
+          msg += readKeyword.name();
           msg += "] in Group [";
-          msg += result.Name();
+          msg += result.name();
           msg += "] when reading PVL";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
 
-      result.AddKeyword(readKeyword);
+      result.addKeyword(readKeyword);
       readKeyword = PvlKeyword();
       beforeKeywordPos = is.tellg();
 
@@ -142,7 +142,7 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      QString msg = "Group [" + result.Name();
+      QString msg = "Group [" + result.name();
       msg += "] EndGroup not found before end of file when reading PVL";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -159,40 +159,40 @@ namespace Isis {
 
     // Set up a Formatter
     bool removeFormatter = false;
-    if(group.GetFormat() == NULL) {
-      group.SetFormat(new PvlFormat());
+    if(group.format() == NULL) {
+      group.setFormat(new PvlFormat());
       removeFormatter = true;
     }
 
     Isis::PvlGroup temp("DEFAULT");
-    if(group.HasFormatTemplate()) temp = *(Isis::PvlGroup *)group.FormatTemplate();
+    if(group.hasFormatTemplate()) temp = *(Isis::PvlGroup *)group.formatTemplate();
 
     // Output comment from the template
-    if(temp.Comments() > 0) {
-      for(int k = 0; k < temp.Comments(); k++) {
-        for(int l = 0; l < group.Indent(); l++) os << " ";
-        os << temp.Comment(k) << group.GetFormat()->FormatEOL();
+    if(temp.comments() > 0) {
+      for(int k = 0; k < temp.comments(); k++) {
+        for(int l = 0; l < group.indent(); l++) os << " ";
+        os << temp.comment(k) << group.format()->formatEOL();
       }
-//      os << group.GetFormat()->FormatEOL();
+//      os << group.format()->formatEOL();
     }
 
     // Output the group comments and name
-    os << group.GetNameKeyword() << group.GetFormat()->FormatEOL();
-    group.SetIndent(group.Indent() + 2);
+    os << group.nameKeyword() << group.format()->formatEOL();
+    group.setIndent(group.indent() + 2);
 
     // Output the keywords in this group
-    if(group.Keywords() > 0) {
-      os << (Isis::PvlContainer &) group << group.GetFormat()->FormatEOL();
+    if(group.keywords() > 0) {
+      os << (Isis::PvlContainer &) group << group.format()->formatEOL();
     }
 
     // Output the end of the group
-    group.SetIndent(group.Indent() - 2);
-    for(int i = 0; i < group.Indent(); i++) os << " ";
-    os << group.GetFormat()->FormatEnd("End_Group", group.GetNameKeyword());
+    group.setIndent(group.indent() - 2);
+    for(int i = 0; i < group.indent(); i++) os << " ";
+    os << group.format()->formatEnd("End_Group", group.nameKeyword());
 
     if(removeFormatter) {
-      delete group.GetFormat();
-      group.SetFormat(NULL);
+      delete group.format();
+      group.setFormat(NULL);
     }
 
     return os;
@@ -217,15 +217,15 @@ namespace Isis {
    *
    * @param pPvlGrp - PvlGroup to be validated
    */
-  void PvlGroup::ValidateGroup(PvlGroup & pPvlGrp)
+  void PvlGroup::validateGroup(PvlGroup & pPvlGrp)
   {
     // Group cannot be empty - needs to have a keyword
-    if(pPvlGrp.Keywords() <= 0) {
-      QString sErrMsg = "Group \"" + pPvlGrp.Name() + "\" has no Keywords\n";
+    if(pPvlGrp.keywords() <= 0) {
+      QString sErrMsg = "Group \"" + pPvlGrp.name() + "\" has no Keywords\n";
       throw IException(IException::User, sErrMsg, _FILEINFO_);
     }
 
-    ValidateAllKeywords((PvlContainer &)pPvlGrp);
+    validateAllKeywords((PvlContainer &)pPvlGrp);
   }
 
 } // end namespace isis

@@ -30,12 +30,12 @@ namespace Isis {
 
  //     cout << "Testing DawnVirCamera...\n";
 
-      PvlGroup &archive = lab.FindGroup("Archive", Isis::Pvl::Traverse);
+      PvlGroup &archive = lab.findGroup("Archive", Isis::Pvl::Traverse);
       int procLevel = archive["ProcessingLevelId"];
       m_is1BCalibrated = (procLevel > 2) ? true : false;
 
       // Get the start time from labels
-      PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
+      PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
       QString channelId = inst["ChannelId"];
 
       QString instMode = inst["InstrumentModeId"];
@@ -72,7 +72,7 @@ namespace Isis {
 
       // Setup detector map
       //  Get the line scan rates/times
-      readHouseKeeping(lab.FileName(), m_scanRate);
+      readHouseKeeping(lab.fileName(), m_scanRate);
       new VariableLineScanCameraDetectorMap(this, m_lineRates);
       DetectorMap()->SetDetectorSampleSumming(m_summing);
 
@@ -381,14 +381,14 @@ namespace Isis {
     // Create the time dependant frames keyword
     int virZeroId = getInteger("FRAME_" + virZero);
     PvlKeyword tdf("TimeDependentFrames", toString(virZeroId)); // DAWN_VIR_{ID}_ZERO
-    tdf.AddValue("-203200");  // DAWN_VIR
-    tdf.AddValue("-203000");  // DAWN_SPACECRAFT
-    tdf.AddValue("1");        // J2000
+    tdf.addValue("-203200");  // DAWN_VIR
+    tdf.addValue("-203000");  // DAWN_SPACECRAFT
+    tdf.addValue("1");        // J2000
     quats.Label() += tdf;
 
     //  Create constant rotation frames
     PvlKeyword cf("ConstantFrames", toString(virZeroId));
-    cf.AddValue(toString(virZeroId));
+    cf.addValue(toString(virZeroId));
     quats.Label() += cf;
 
     SpiceDouble identity[3][3];
@@ -398,7 +398,7 @@ namespace Isis {
     PvlKeyword crot("ConstantRotation");
     for (int i = 0 ; i < 3 ; i++) {
       for (int j = 0 ; j < 3 ; j++) {
-        crot.AddValue(toString(identity[i][j]));
+        crot.addValue(toString(identity[i][j]));
       }
     }
 

@@ -51,13 +51,13 @@ namespace Isis {
    **/
   NormModel *NormModelFactory::Create(Pvl &pvl, PhotoModel &pmodel) {
     // Get the algorithm name to create
-    PvlGroup &algo = pvl.FindObject("NormalizationModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("NormalizationModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     QString algorithm = "";
-    if (algo.HasKeyword("NormName")) {
+    if (algo.hasKeyword("NormName")) {
       algorithm = QString(algo["NormName"]);
     }
-    else if (algo.HasKeyword("Name")) {
+    else if (algo.hasKeyword("Name")) {
       algorithm = QString(algo["Name"]);
     }
     else {
@@ -70,10 +70,10 @@ namespace Isis {
     Plugin *p = new Plugin;
     FileName f("NormModel.plugin");
     if(f.fileExists()) {
-      p->Read("NormModel.plugin");
+      p->read("NormModel.plugin");
     }
     else {
-      p->Read("$ISISROOT/lib/NormModel.plugin");
+      p->read("$ISISROOT/lib/NormModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it
@@ -107,13 +107,13 @@ namespace Isis {
   NormModel *NormModelFactory::Create(Pvl &pvl, PhotoModel &pmodel,
                                       AtmosModel &amodel) {
     // Get the algorithm name to create
-    PvlGroup &algo = pvl.FindObject("NormalizationModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("NormalizationModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     QString algorithm = "";
-    if (algo.HasKeyword("NormName")) {
+    if (algo.hasKeyword("NormName")) {
       algorithm = QString(algo["NormName"]);
     }
-    else if (algo.HasKeyword("Name")) {
+    else if (algo.hasKeyword("Name")) {
       algorithm = QString(algo["Name"]);
     }
     else {
@@ -126,10 +126,10 @@ namespace Isis {
     Plugin *p = new Plugin;
     FileName f("NormModel.plugin");
     if(f.fileExists()) {
-      p->Read("NormModel.plugin");
+      p->read("NormModel.plugin");
     }
     else {
-      p->Read("$ISISROOT/lib/NormModel.plugin");
+      p->read("$ISISROOT/lib/NormModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it

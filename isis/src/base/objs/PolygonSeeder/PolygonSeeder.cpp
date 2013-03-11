@@ -83,42 +83,42 @@ namespace Isis {
     try {
       // Get info from Algorithm group
       errorSpot = "Algorithm";
-      PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm", Pvl::Traverse);
+      PvlGroup &algo = pvl.findGroup("PolygonSeederAlgorithm", Pvl::Traverse);
 
       // algo is such a cool name for a PvlGroup that it begs to be out done
-      PvlGroup &invalgo = invalidInput->FindGroup("PolygonSeederAlgorithm",
+      PvlGroup &invalgo = invalidInput->findGroup("PolygonSeederAlgorithm",
                           Pvl::Traverse);
 
       // Set the algorithm name
       errorSpot = "Name";
       p_algorithmName = (QString) algo["Name"];
 
-      if(invalgo.HasKeyword("Name"))
-        invalgo.DeleteKeyword("Name");
+      if(invalgo.hasKeyword("Name"))
+        invalgo.deleteKeyword("Name");
 
       // Set the minimum thickness (Area / max(extent X, extent Y)**2
       errorSpot = "MinimumThickness";
       p_minimumThickness = 0.0;
-      if(algo.HasKeyword("MinimumThickness")) {
+      if(algo.hasKeyword("MinimumThickness")) {
         p_minimumThickness = (double) algo["MinimumThickness"];
       }
 
-      if(invalgo.HasKeyword("MinimumThickness"))
-        invalgo.DeleteKeyword("MinimumThickness");
+      if(invalgo.hasKeyword("MinimumThickness"))
+        invalgo.deleteKeyword("MinimumThickness");
 
       // Set the minimum area
       errorSpot = "MinimumArea";
       p_minimumArea = 0.0;
-      if(algo.HasKeyword("MinimumArea")) {
+      if(algo.hasKeyword("MinimumArea")) {
         p_minimumArea = (double) algo["MinimumArea"];
       }
 
-      if(invalgo.HasKeyword("MinimumArea"))
-        invalgo.DeleteKeyword("MinimumArea");
+      if(invalgo.hasKeyword("MinimumArea"))
+        invalgo.deleteKeyword("MinimumArea");
     }
     catch(IException &e) {
       QString msg = "Improper format for PolygonSeeder PVL [";
-      msg +=  pvl.FileName() + "]. Location [" + errorSpot + "]";
+      msg +=  pvl.fileName() + "]. Location [" + errorSpot + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -208,9 +208,9 @@ namespace Isis {
     PvlKeyword minThickness("MinimumThickness", toString(p_minimumThickness));
     PvlKeyword minArea("MinimumArea", toString(p_minimumArea));
 
-    pluginInfo.AddKeyword(name);
-    pluginInfo.AddKeyword(minThickness);
-    pluginInfo.AddKeyword(minArea);
+    pluginInfo.addKeyword(name);
+    pluginInfo.addKeyword(minThickness);
+    pluginInfo.addKeyword(minArea);
 
     return pluginInfo;
   }

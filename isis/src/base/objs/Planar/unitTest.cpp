@@ -18,8 +18,8 @@ int main(int argc, char *argv[]) {
   cout << "UNIT TEST FOR Planar Projection" << endl << endl;
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("ProjectionName", "Planar");
   mapGroup += PvlKeyword("TargetName", "Saturn");
   mapGroup += PvlKeyword("AzimuthDirection", "Clockwise");
@@ -112,8 +112,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing default options in constructor with Projection 2 ... " << endl;
-    mapGroup.DeleteKeyword("CenterAzimuth");
-    mapGroup.DeleteKeyword("CenterRadius");
+    mapGroup.deleteKeyword("CenterAzimuth");
+    mapGroup.deleteKeyword("CenterRadius");
     Planar p2(lab, true);
     cout << lab << endl;
     cout << "Default projection parameters == Original projection ?" << (*p == p2) << endl;
@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing more SetGround conditions...AzimuthDirection = CounterClockwise and AzimuthDomain = 360" << endl;
-    mapGroup["AzimuthDirection"].SetValue("CounterClockwise");
-    mapGroup["AzimuthDomain"].SetValue("360");
+    mapGroup["AzimuthDirection"].setValue("CounterClockwise");
+    mapGroup["AzimuthDomain"].setValue("360");
     Planar p3(lab, true);
 
     // Projection 3 test
@@ -176,10 +176,10 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    mapGroup.DeleteKeyword("MinimumRadius");
-    mapGroup.DeleteKeyword("MaximumRadius");
-    mapGroup.DeleteKeyword("MinimumAzimuth");
-    mapGroup.DeleteKeyword("MaximumAzimuth");
+    mapGroup.deleteKeyword("MinimumRadius");
+    mapGroup.deleteKeyword("MaximumRadius");
+    mapGroup.deleteKeyword("MinimumAzimuth");
+    mapGroup.deleteKeyword("MaximumAzimuth");
 
     // Projection 4 test
     Planar p4(lab, true);
@@ -195,9 +195,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.AddGroup(p->Mapping());
-    tmp2.AddGroup(p->MappingRadii());
-    tmp3.AddGroup(p->MappingAzimuths());
+    tmp1.addGroup(p->Mapping());
+    tmp2.addGroup(p->MappingRadii());
+    tmp3.addGroup(p->MappingAzimuths());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;

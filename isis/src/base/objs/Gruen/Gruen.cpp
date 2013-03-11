@@ -851,9 +851,9 @@ namespace Isis {
     if (m_unclassified > 0) {
       algo += PvlKeyword("UnclassifiedErrors", toString(m_unclassified));
     }
-    pvl.AddGroup(algo);
-    pvl.AddGroup(StatsLog());
-    pvl.AddGroup(ParameterLog());
+    pvl.addGroup(algo);
+    pvl.addGroup(StatsLog());
+    pvl.addGroup(ParameterLog());
     return (pvl);
   }
 
@@ -983,8 +983,8 @@ namespace Isis {
    */
   void Gruen::init(Pvl &pvl) {
     //  Establish the parameters
-    if (pvl.HasObject("AutoRegistration")) {
-      m_prof = DbProfile(pvl.FindGroup("Algorithm", Pvl::Traverse));
+    if (pvl.hasObject("AutoRegistration")) {
+      m_prof = DbProfile(pvl.findGroup("Algorithm", Pvl::Traverse));
     }
     else {
       m_prof = DbProfile(pvl);

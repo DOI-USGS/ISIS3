@@ -34,9 +34,9 @@ void IsisMain() {
   Pvl irLab(irFile);
   Pvl bgLab(bgFile);
 
-  PvlGroup redInst = redLab.FindGroup("Instrument", Pvl::Traverse);
-  PvlGroup irInst  = irLab.FindGroup("Instrument", Pvl::Traverse);
-  PvlGroup bgInst  = bgLab.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup redInst = redLab.findGroup("Instrument", Pvl::Traverse);
+  PvlGroup irInst  = irLab.findGroup("Instrument", Pvl::Traverse);
+  PvlGroup bgInst  = bgLab.findGroup("Instrument", Pvl::Traverse);
 
   // Error check to make sure the proper ccds are stacked
   if((int)redInst["CpmmNumber"] == 5) {
@@ -62,15 +62,15 @@ void IsisMain() {
   // Concatenate all the source products into one keyword
   PvlKeyword sourceProductId("SourceProductId");
   sourceProductId += (QString)bgInst["StitchedProductIds"][0];
-  if(bgInst["StitchedProductIds"].Size() > 1) {
+  if(bgInst["StitchedProductIds"].size() > 1) {
     sourceProductId += (QString)bgInst["StitchedProductIds"][1];
   }
   sourceProductId += (QString)redInst["StitchedProductIds"][0];
-  if(redInst["StitchedProductIds"].Size() > 1) {
+  if(redInst["StitchedProductIds"].size() > 1) {
     sourceProductId += (QString)redInst["StitchedProductIds"][1];
   }
   sourceProductId += (QString)irInst["StitchedProductIds"][0];
-  if(irInst["StitchedProductIds"].Size() > 1) {
+  if(irInst["StitchedProductIds"].size() > 1) {
     sourceProductId += (QString)irInst["StitchedProductIds"][1];
   }
 
@@ -116,9 +116,9 @@ void IsisMain() {
   OriginalLabel bgOrgLab;
   bgOrgLab.Blob::Read(bgFile);
 
-  PvlGroup redGrp = redOrgLab.ReturnLabels().FindGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
-  PvlGroup irGrp = irOrgLab.ReturnLabels().FindGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
-  PvlGroup bgGrp = bgOrgLab.ReturnLabels().FindGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
+  PvlGroup redGrp = redOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
+  PvlGroup irGrp = irOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
+  PvlGroup bgGrp = bgOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
 
   PvlKeyword cpmmTdiFlag("cpmmTdiFlag");
   for(int i = 0; i < 14; i++) {
@@ -144,19 +144,19 @@ void IsisMain() {
   }
   //keyword Special_Processing_Flag may not be present so need to test
   // if not present set to NOMINAL
-  if(redInst.HasKeyword("Special_Processing_Flag")) {
+  if(redInst.hasKeyword("Special_Processing_Flag")) {
     specialProcessingFlag[redInst["CpmmNumber"]] = (QString) redInst["Special_Processing_Flag"];
   }
   else {
     specialProcessingFlag[redInst["CpmmNumber"]] = "NOMINAL";
   }
-  if(irInst.HasKeyword("Special_Processing_Flag")) {
+  if(irInst.hasKeyword("Special_Processing_Flag")) {
     specialProcessingFlag[irInst["CpmmNumber"]] = (QString) irInst["Special_Processing_Flag"];
   }
   else {
     specialProcessingFlag[irInst["CpmmNumber"]] = "NOMINAL";
   }
-  if(bgInst.HasKeyword("Special_Processing_Flag")) {
+  if(bgInst.hasKeyword("Special_Processing_Flag")) {
     specialProcessingFlag[bgInst["CpmmNumber"]] = (QString) bgInst["Special_Processing_Flag"];
   }
   else {
@@ -176,6 +176,6 @@ void IsisMain() {
   // Add the group to the output cube
   Cube c;
   c.open(ui.GetFileName("TO"), "rw");
-  c.label()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
+  c.label()->findObject("IsisCube", Pvl::Traverse).addGroup(mos);
   c.close();
 }

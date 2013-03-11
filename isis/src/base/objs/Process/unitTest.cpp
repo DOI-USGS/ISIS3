@@ -246,10 +246,10 @@ void IsisMain() {
   Isis::Cube *ocube8 = p6.SetOutputCube("TO");
 
   Isis::Pvl *inlab1 = ocube8->label();
-  for(int i = 0; i < inlab1->Objects(); i++) {
-    if(inlab1->Object(i).IsNamed("Polygon")) {
+  for(int i = 0; i < inlab1->objects(); i++) {
+    if(inlab1->object(i).isNamed("Polygon")) {
       cout << "Image Polygon does exist" << endl;
-      cout << "Size: " << (int)inlab1->Object(i)["Bytes"] << endl;
+      cout << "Size: " << (int)inlab1->object(i)["Bytes"] << endl;
       // We cannot instantiate without spice data, so we won't try.
     }
   }
@@ -259,8 +259,8 @@ void IsisMain() {
   bool exists = false;
   Isis::Cube *ocube9 = p6.SetOutputCube("TO4", 126, 126, 1);
   Isis::Pvl *inlab2 = ocube9->label();
-  for(int i = 0; i < inlab2->Objects(); i++) {
-    if(inlab2->Object(i).IsNamed("Polygon")) {
+  for(int i = 0; i < inlab2->objects(); i++) {
+    if(inlab2->object(i).isNamed("Polygon")) {
       cout << "Image Polygon does exist" << endl;
       exists = true;
     }

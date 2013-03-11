@@ -106,8 +106,8 @@ int main(int argc, char *argv[]) {
   kern1 += PvlKeyword("EndPadding", toString(slope));
 
   Pvl lab1;
-  lab1.AddGroup(inst1);
-  lab1.AddGroup(kern1);
+  lab1.addGroup(inst1);
+  lab1.addGroup(kern1);
 
   // Create a Spice object to test radii
   Spice spi(lab1);
@@ -128,8 +128,8 @@ int main(int argc, char *argv[]) {
 
   // Test Sky
   Pvl lab2;
-  lab2.AddGroup(inst2);
-  lab2.AddGroup(kern1);
+  lab2.addGroup(inst2);
+  lab2.addGroup(kern1);
   Target tSky(&spi, lab2);
   cout << endl;
   cout << "  Testing Sky..." << endl;
@@ -142,8 +142,8 @@ int main(int argc, char *argv[]) {
   PvlGroup kern4 = kern1;
   kern4 += PvlKeyword("NaifSpkCode", "-93");
   Pvl lab3;
-  lab3.AddGroup(inst2);
-  lab3.AddGroup(kern4);
+  lab3.addGroup(inst2);
+  lab3.addGroup(kern4);
   Target tSky2(&spi, lab3);
   cout << endl;
   cout << "  Testing Sky with NaifSpkCode..." << endl;
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     cout << "  Testing no instrument group ..." << endl;
-    lab4.AddGroup(kern2);
+    lab4.addGroup(kern2);
     Target tNoInstrument(&spi, lab4);
   }
   catch(IException &e) {
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
   }
   
   Pvl lab5;
-  lab4.AddGroup(inst3);
+  lab4.addGroup(inst3);
 
   // Test without kernels group
   try {
@@ -191,8 +191,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Test case with override of body code
-  // lab5.AddGroup(inst2);
-  // lab5.AddGroup(kern4);
+  // lab5.addGroup(inst2);
+  // lab5.addGroup(kern4);
   // Target tOverrideBodyCode(&spi, lab5);
   // cout << endl;
   // cout << "  Testing case with bodycode override" << endl;
@@ -200,8 +200,8 @@ int main(int argc, char *argv[]) {
 
   // Test methods setShapeEllipsoid and restoreShape
   Pvl lab6;
-  lab6.AddGroup(inst1);
-  lab6.AddGroup(kern3);
+  lab6.addGroup(inst1);
+  lab6.addGroup(kern3);
   Spice spi3(lab6);
   cout << endl << "  Testing methods setShapeEllipsoid and restoreShape..." << endl;
   cout << "    Original shape is " << spi3.target()->shape()->name() << endl;

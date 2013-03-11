@@ -107,8 +107,8 @@ void IsisMain() {
     }
   }
   // Logs the input file location in the mosaic
-  for (int i = 0; i < m.imagePositions().Groups(); i++) {
-    Application::Log(m.imagePositions().Group(i));
+  for (int i = 0; i < m.imagePositions().groups(); i++) {
+    Application::Log(m.imagePositions().group(i));
   }
 
   if(olistFlag) {

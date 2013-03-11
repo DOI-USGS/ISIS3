@@ -235,8 +235,8 @@ namespace Isis {
       o += PvlKeyword("Width", toString(Samples()));
       o += PvlKeyword("Height", toString(Lines()));
       o += PvlKeyword("SamplingPercent", toString(SampPercent()));
-      o.AddGroup(gX);
-      o.AddGroup(gY);
+      o.addGroup(gX);
+      o.addGroup(gY);
 
       PvlKeyword cov("Covariance");
       PvlKeyword cor("Correlation");

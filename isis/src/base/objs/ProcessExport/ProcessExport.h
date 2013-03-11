@@ -157,7 +157,7 @@ namespace Isis {
       };
 
       //! Sets the storage order of the output file
-      void SetFormat(ExportFormat format) {
+      void setFormat(ExportFormat format) {
         p_format = format;
       };
 

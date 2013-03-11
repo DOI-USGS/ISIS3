@@ -68,19 +68,19 @@ namespace Isis {
     // load the system file
     Plugin p;
 
-    if(m_projPlugin.FileName() == "") {
+    if(m_projPlugin.fileName() == "") {
       FileName localFile("Projection.plugin");
       if(localFile.fileExists())
-        m_projPlugin.Read(localFile.expanded());
+        m_projPlugin.read(localFile.expanded());
 
       FileName systemFile("$ISISROOT/lib/Projection.plugin");
       if(systemFile.fileExists())
-        m_projPlugin.Read(systemFile.expanded());
+        m_projPlugin.read(systemFile.expanded());
     }
 
     try {
       // Look for info in the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
       QString proj = mapGroup["ProjectionName"];
 
       // Now get the plugin for the projection
@@ -139,19 +139,19 @@ namespace Isis {
     // load the system file
     Plugin p;
 
-    if(m_projPlugin.FileName() == "") {
+    if(m_projPlugin.fileName() == "") {
       FileName localFile("Projection.plugin");
       if(localFile.fileExists())
-        m_projPlugin.Read(localFile.expanded());
+        m_projPlugin.read(localFile.expanded());
 
       FileName systemFile("$ISISROOT/lib/Projection.plugin");
       if(systemFile.fileExists())
-        m_projPlugin.Read(systemFile.expanded());
+        m_projPlugin.read(systemFile.expanded());
     }
 
     try {
       // Look for info in the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
       QString proj = mapGroup["ProjectionName"];
 
       // Now get the plugin for the projection
@@ -214,7 +214,7 @@ namespace Isis {
     try {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
       try {
         pixelResolution = mapGroup["PixelResolution"];
         scale = (2.0 * Isis::PI * localRadius) / (360.0 * pixelResolution);
@@ -228,10 +228,10 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale latitude
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution), "meters/pixel"),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution), "meters/pixel"),
                           Isis::Pvl::Replace);
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"), Isis::Pvl::Replace);
-      //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLat),
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"), Isis::Pvl::Replace);
+      //mapGroup.addKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLat),
       //                                    Isis::Pvl::Replace);
 
       // Get the upper left corner from the labels if possible
@@ -239,8 +239,8 @@ namespace Isis {
       // output cubes
       bool sizeFound = false;
       double upperLeftX = Null, upperLeftY = Null;
-      if(label.HasObject("IsisCube")) {
-        Isis::PvlGroup &dims = label.FindGroup("Dimensions", Isis::Pvl::Traverse);
+      if(label.hasObject("IsisCube")) {
+        Isis::PvlGroup &dims = label.findGroup("Dimensions", Isis::Pvl::Traverse);
         samples = dims["Samples"];
         lines = dims["Lines"];
 
@@ -295,47 +295,47 @@ namespace Isis {
 
         // Set the upper left corner and add to the labels
         upperLeftX = minX;
-        mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
                             Isis::Pvl::Replace);
 
         upperLeftY = maxY;
-        mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
                             Isis::Pvl::Replace);
 
         // Write it in pixel units as well
 #if 0
         lineOffset += 0.5;    // This matches the PDS definition
         sampleOffset += 0.5;  // of the offsets (center of pixel). This statement is questionable!
-        mapGroup.AddKeyword(Isis::PvlKeyword("LineProjectionOffset", lineOffset),
+        mapGroup.addKeyword(Isis::PvlKeyword("LineProjectionOffset", lineOffset),
                             Isis::Pvl::Replace);
-        mapGroup.AddKeyword(Isis::PvlKeyword("SampleProjectionOffset", sampleOffset),
+        mapGroup.addKeyword(Isis::PvlKeyword("SampleProjectionOffset", sampleOffset),
                             Isis::Pvl::Replace);
 #endif
       }
 
 
       // Make sure labels have good units
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution",
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
                                            (QString) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale",
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale",
                                            (QString) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
                                            (QString) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
                                            (QString) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("EquatorialRadius",
+      mapGroup.addKeyword(Isis::PvlKeyword("EquatorialRadius",
                                            (QString) mapGroup["EquatorialRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("PolarRadius",
+      mapGroup.addKeyword(Isis::PvlKeyword("PolarRadius",
                                            (QString) mapGroup["PolarRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
@@ -348,7 +348,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
+      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       IException finalError(IException::Unknown, msg, _FILEINFO_);
       finalError.append(errors);
       finalError.append(e);
@@ -395,7 +395,7 @@ namespace Isis {
     try {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
 
       try {
         pixelResolution = mapGroup["PixelResolution"];
@@ -410,10 +410,10 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale radius
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
                                            "meters/pixel"),
                           Isis::Pvl::Replace);
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
                           Isis::Pvl::Replace);
 
       //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleRadius", trueScaleRadius),
@@ -424,8 +424,8 @@ namespace Isis {
       // output cubes
       bool sizeFound = false;
       double upperLeftX = Null, upperLeftY = Null;
-      if (label.HasObject("IsisCube")) {
-        Isis::PvlGroup &dims = label.FindGroup("Dimensions", Isis::Pvl::Traverse);
+      if (label.hasObject("IsisCube")) {
+        Isis::PvlGroup &dims = label.findGroup("Dimensions", Isis::Pvl::Traverse);
         samples = dims["Samples"];
         lines = dims["Lines"];
 
@@ -481,11 +481,11 @@ namespace Isis {
 
         // Set the upper left corner and add to the labels
         upperLeftX = minX;
-        mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
                             Isis::Pvl::Replace);
 
         upperLeftY = maxY;
-        mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+        mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
                             Isis::Pvl::Replace);
 
         // Write it in pixel units as well
@@ -501,19 +501,19 @@ namespace Isis {
 
 
       // Make sure labels have good units
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution",
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
                                            (QString) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale",
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale",
                                            (QString) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
                                            (QString) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
                                            (QString) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
@@ -526,7 +526,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
+      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       IException finalError(IException::Unknown, msg, _FILEINFO_);
       finalError.append(errors);
       finalError.append(e);
@@ -572,7 +572,7 @@ namespace Isis {
     try {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
       try {
         pixelResolution = mapGroup["PixelResolution"];
         scale = (2.0 * Isis::PI * localRadius) / (360.0 * pixelResolution);
@@ -584,9 +584,9 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale latitude
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution), "meters/pixel"),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution), "meters/pixel"),
                           Isis::Pvl::Replace);
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"), Isis::Pvl::Replace);
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"), Isis::Pvl::Replace);
       //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLatitude),
       //                                    Isis::Pvl::Replace);
 
@@ -730,35 +730,35 @@ namespace Isis {
 
       // Set the upper left corner and add to the labels
       double upperLeftX = minX;
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
                           Isis::Pvl::Replace);
 
       double upperLeftY = maxY;
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
                           Isis::Pvl::Replace);
 
       // Make sure labels have good units
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution",
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
                                            (QString) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale",
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale",
                                            (QString) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
                                            (QString) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
                                            (QString) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("EquatorialRadius",
+      mapGroup.addKeyword(Isis::PvlKeyword("EquatorialRadius",
                                            (QString) mapGroup["EquatorialRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("PolarRadius",
+      mapGroup.addKeyword(Isis::PvlKeyword("PolarRadius",
                                            (QString) mapGroup["PolarRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
@@ -771,7 +771,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
+      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;
@@ -814,7 +814,7 @@ namespace Isis {
     try {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
       try {
         pixelResolution = mapGroup["PixelResolution"];
         scale = (2.0 * Isis::PI * localRadius) / (360.0 * pixelResolution);
@@ -828,9 +828,9 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale radius
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
                                            "meters/pixel"), Isis::Pvl::Replace);
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
                           Isis::Pvl::Replace);
 
       // Initialize the rest of the projection
@@ -942,27 +942,27 @@ namespace Isis {
 
       // Set the upper left corner and add to the labels
       double upperLeftX = minX;
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX", toString(upperLeftX)),
                           Isis::Pvl::Replace);
 
       double upperLeftY = maxY;
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY", toString(upperLeftY)),
                           Isis::Pvl::Replace);
 
       // Make sure labels have good units
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution",
+      mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution",
                                            (QString) mapGroup["PixelResolution"],
                                            "meters/pixel"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale",
+      mapGroup.addKeyword(Isis::PvlKeyword("Scale",
                                            (QString) mapGroup["Scale"],
                                            "pixels/degree"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerX",
                                            (QString) mapGroup["UpperLeftCornerX"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY",
+      mapGroup.addKeyword(Isis::PvlKeyword("UpperLeftCornerY",
                                            (QString) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
@@ -975,7 +975,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
+      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;
@@ -1019,7 +1019,7 @@ namespace Isis {
     Isis::TProjection *proj;
     try {
       // Get the pixel resolution
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
       double pixelResolution = mapGroup["PixelResolution"];
 
       // Get the upper left corner
@@ -1038,7 +1038,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Unable to initialize cube projection";
-      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
+      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;
@@ -1058,7 +1058,7 @@ namespace Isis {
     Isis::RingPlaneProjection *proj;
     try {
       // Get the pixel resolution
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
       double pixelResolution = mapGroup["PixelResolution"];
 
       // Get the upper left corner
@@ -1077,7 +1077,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Unable to initialize cube projection";
-      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
+      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;

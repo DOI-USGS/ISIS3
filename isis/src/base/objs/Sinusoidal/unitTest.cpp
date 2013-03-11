@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
   cout << "Unit Test For Sinusodial" << endl << endl;
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("EquatorialRadius", toString(1.0));
   mapGroup += PvlKeyword("PolarRadius", toString(1.0));
   mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Test default computation ... " << endl;
-    mapGroup.DeleteKeyword("CenterLongitude");
+    mapGroup.deleteKeyword("CenterLongitude");
     Sinusoidal p2(lab, true);
     cout << lab << endl;
     cout << endl;

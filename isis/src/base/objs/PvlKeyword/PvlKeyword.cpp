@@ -29,14 +29,14 @@
 #include "IException.h"
 #include "Message.h"
 #include "IString.h"
-#include "PvlSequence.h"
 #include "PvlFormat.h"
+#include "PvlSequence.h"
 
 using namespace std;
 namespace Isis {
   //! Constructs a blank PvlKeyword object.
   PvlKeyword::PvlKeyword() {
-    Init();
+    init();
   }
 
 
@@ -46,8 +46,8 @@ namespace Isis {
    * @param name The keyword name
    */
   PvlKeyword::PvlKeyword(QString name) {
-    Init();
-    SetName(name);
+    init();
+    setName(name);
   }
 
 
@@ -61,15 +61,15 @@ namespace Isis {
    */
   PvlKeyword::PvlKeyword(QString name, QString value,
                          QString unit) {
-    Init();
-    SetName(name);
-    AddValue(value, unit);
+    init();
+    setName(name);
+    addValue(value, unit);
   }
 
 
   //! Copy constructor
   PvlKeyword::PvlKeyword(const PvlKeyword &other) {
-    Init();
+    init();
     *this = other;
   }
 
@@ -78,33 +78,33 @@ namespace Isis {
    * Destructs a PvlKeyword object.
    */
   PvlKeyword::~PvlKeyword() {
-    if(p_units) {
-      delete p_units;
-      p_units = NULL;
+    if(m_units) {
+      delete m_units;
+      m_units = NULL;
     }
 
-    if(p_comments) {
-      delete p_comments;
-      p_comments = NULL;
+    if(m_comments) {
+      delete m_comments;
+      m_comments = NULL;
     }
 
-    if(p_name) {
-      delete [] p_name;
-      p_name = NULL;
+    if(m_name) {
+      delete [] m_name;
+      m_name = NULL;
     }
   }
 
 
   //! Clears all PvlKeyword data.
-  void PvlKeyword::Init() {
-    p_name = NULL;
-    p_units = NULL;
-    p_comments = NULL;
-    p_width = 0;
-    p_indent = 0;
-    p_formatter = NULL;
+  void PvlKeyword::init() {
+    m_name = NULL;
+    m_units = NULL;
+    m_comments = NULL;
+    m_width = 0;
+    m_indent = 0;
+    m_formatter = NULL;
 
-    Clear();
+    clear();
   }
 
   /**
@@ -115,16 +115,16 @@ namespace Isis {
    * @return <B>bool</B> True if the value is null, false if it's
    *         not.
    */
-  bool PvlKeyword::IsNull(int index) const {
-    if(Size() == 0) return true;
-    if(index < 0 || index >= (int)p_values.size()) {
+  bool PvlKeyword::isNull(int index) const {
+    if(size() == 0) return true;
+    if(index < 0 || index >= (int)m_values.size()) {
       QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    if(StringEqual("NULL", p_values[index])) return true;
-    if(StringEqual("", p_values[index])) return true;
-    if(StringEqual("\"\"", p_values[index])) return true;
-    if(StringEqual("''", p_values[index])) return true;
+    if(stringEqual("NULL", m_values[index])) return true;
+    if(stringEqual("", m_values[index])) return true;
+    if(stringEqual("\"\"", m_values[index])) return true;
+    if(stringEqual("''", m_values[index])) return true;
     return false;
   }
 
@@ -133,7 +133,7 @@ namespace Isis {
    *
    * @param name The new keyword name.
    */
-  void PvlKeyword::SetName(QString name) {
+  void PvlKeyword::setName(QString name) {
     QString final = name.trimmed();
     if(final.contains(QRegExp("\\s"))) {
       QString msg = "[" + name + "] is invalid. Keyword name cannot ";
@@ -141,15 +141,15 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if(p_name) {
-      delete [] p_name;
-      p_name = NULL;
+    if(m_name) {
+      delete [] m_name;
+      m_name = NULL;
     }
 
     if(final != "") {
       QByteArray finalAscii = final.toAscii();
-      p_name = new char[finalAscii.size() + 1];
-      strncpy(p_name, finalAscii.data(), final.size() + 1);
+      m_name = new char[finalAscii.size() + 1];
+      strncpy(m_name, finalAscii.data(), final.size() + 1);
     }
   }
 
@@ -158,19 +158,19 @@ namespace Isis {
    *
    * If no current value exists, this method sets the given value
    * to the PvlKeyword.  Otherwise, it clears any existing values
-   * and resets to the value given using AddValue(). Defaults to
+   * and resets to the value given using addValue(). Defaults to
    * unit = "" (empty QString).
    *
    * @param value New value to be assigned.
    * @param unit Units of measurement corresponding to the value.
    *
-   * @see AddValue()
+   * @see addValue()
    * @see operator=
    * @see operator+=
    */
-  void PvlKeyword::SetValue(QString value, QString unit) {
-    Clear();
-    AddValue(value, unit);
+  void PvlKeyword::setValue(QString value, QString unit) {
+    clear();
+    addValue(value, unit);
   }
 
 
@@ -179,15 +179,15 @@ namespace Isis {
    *
    * @param units New units to be assigned.
    */
-  void PvlKeyword::SetUnits(QString units) {
-    if(!p_units) {
-      p_units = new std::vector<QString>();
+  void PvlKeyword::setUnits(QString units) {
+    if(!m_units) {
+      m_units = new std::vector<QString>();
     }
 
-    p_units->clear();
+    m_units->clear();
 
-    for(int i = 0; i < p_values.size(); i++) {
-      p_units->push_back(units);
+    for(int i = 0; i < m_values.size(); i++) {
+      m_units->push_back(units);
     }
   }
 
@@ -200,27 +200,27 @@ namespace Isis {
    *
    * @throws Isis::iException::Programmer - Given value must exist
    */
-  void PvlKeyword::SetUnits(QString value, QString units) {
+  void PvlKeyword::setUnits(QString value, QString units) {
 
     bool found = false;
     int i = -1;
-    while(!found && ++i < (int) p_values.size()) {
-      if(value == p_values[i]) {
+    while(!found && ++i < (int) m_values.size()) {
+      if(value == m_values[i]) {
         found = true;
       }
     }
 
     if(found) {
-      if(!p_units) {
-        p_units = new std::vector<QString>(p_values.size());
+      if(!m_units) {
+        m_units = new std::vector<QString>(m_values.size());
       }
       else {
-        p_units->resize(p_values.size());
+        m_units->resize(m_values.size());
       }
 
-      ASSERT(i < (int) p_units->size());
+      ASSERT(i < (int) m_units->size());
 
-      (*p_units)[i] = units;
+      (*m_units)[i] = units;
     }
     else {
       IString msg = "PvlKeyword::SetUnits called with value [" + value +
@@ -233,20 +233,20 @@ namespace Isis {
    *
    * Sets new values.
    *
-   * Overwrites the '=' operator to add a new value using AddValue(). Like
-   * SetValue(), this method clears any previously existing values and resets to
+   * Overwrites the '=' operator to add a new value using addValue(). Like
+   * setValue(), this method clears any previously existing values and resets to
    * the given value with unit = "" (empty QString).
    *
    * @param value The value to be added.
    * @return <B>PvlKeyword&</B> Reference to PvlKeyword object.
    *
-   * @see AddValue()
-   * @see SetValue()
+   * @see addValue()
+   * @see setValue()
    * @see operator+=
    */
   PvlKeyword &PvlKeyword::operator=(QString value) {
-    Clear();
-    AddValue(value);
+    clear();
+    addValue(value);
     return *this;
   }
 
@@ -261,25 +261,25 @@ namespace Isis {
    * @param value New value to be assigned.
    * @param unit Units of measurement corresponding to the value.
    *
-   * @see SetValue()
+   * @see setValue()
    * @see operator=
    * @see operator+=
    */
-  void PvlKeyword::AddValue(QString value, QString unit) {
-    p_values.append(value);
+  void PvlKeyword::addValue(QString value, QString unit) {
+    m_values.append(value);
 
     if(unit != "") {
-      if(!p_units) {
-        p_units = new std::vector<QString>(p_values.size());
+      if(!m_units) {
+        m_units = new std::vector<QString>(m_values.size());
       }
       else {
-        p_units->resize(p_values.size());
+        m_units->resize(m_values.size());
       }
 
-      (*p_units)[p_units->size() - 1] = unit;
+      (*m_units)[m_units->size() - 1] = unit;
     }
-    else if(p_units) {
-      p_units->push_back("");
+    else if(m_units) {
+      m_units->push_back("");
     }
   }
 
@@ -287,29 +287,29 @@ namespace Isis {
    * Adds a value.
    *
    * Overwrites the '+=' operators to add a new value. Like
-   * AddValue(), this method keeps any previously existing values
+   * addValue(), this method keeps any previously existing values
    * and adds the new value with unit = "" (empty QString) to the
    * array of values for this PvlKeyword object.
    *
    * @param value The new value.
    * @return <B>PvlKeyword&</B> Reference to PvlKeyword object.
    *
-   * @see AddValue()
-   * @see SetValue()
+   * @see addValue()
+   * @see setValue()
    * @see operator=
    */
   PvlKeyword &PvlKeyword::operator+=(QString value) {
-    AddValue(value);
+    addValue(value);
     return *this;
   }
 
   //! Clears all values and units for this PvlKeyword object.
-  void PvlKeyword::Clear() {
-    p_values.clear();
+  void PvlKeyword::clear() {
+    m_values.clear();
 
-    if(p_units) {
-      delete p_units;
-      p_units = NULL;
+    if(m_units) {
+      delete m_units;
+      m_units = NULL;
     }
   }
 
@@ -332,13 +332,13 @@ namespace Isis {
    * @see const operator[]
    */
   QString &PvlKeyword::operator[](int index) {
-    if(index < 0 || index >= (int)p_values.size()) {
+    if(index < 0 || index >= (int)m_values.size()) {
       QString msg = (Message::ArraySubscriptNotInRange(index)) +
-                   "for Keyword [" + toString(p_name) + "]";
+                   "for Keyword [" + toString(m_name) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    return p_values[index];
+    return m_values[index];
   }
 
   /**
@@ -354,11 +354,11 @@ namespace Isis {
    * @see operator[]
    */
   const QString &PvlKeyword::operator[](int index) const {
-    if(index < 0 || index >= (int)p_values.size()) {
+    if(index < 0 || index >= (int)m_values.size()) {
       QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    return p_values[index];
+    return m_values[index];
   }
 
   /**
@@ -370,14 +370,14 @@ namespace Isis {
    * @return <B>QString</B> The unit at the index.
    * @throws iException ArraySubscriptNotInRange (index) Index out of bounds.
    */
-  QString PvlKeyword::Unit(int index) const {
-    if(!p_units) return "";
+  QString PvlKeyword::unit(int index) const {
+    if(!m_units) return "";
 
-    if(index < 0 || index >= (int)p_units->size()) {
+    if(index < 0 || index >= (int)m_units->size()) {
       QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    return (*p_units)[index];
+    return (*m_units)[index];
   }
 
   /**
@@ -385,32 +385,32 @@ namespace Isis {
    *
    * @param comment The new comment.
    *
-   * @see AddCommentWrapped()
-   * @see AddComments()
-   * @see ClearComments()
+   * @see addCommentWrapped()
+   * @see addComments()
+   * @see clearComment()
    */
-  void PvlKeyword::AddComment(QString comment) {
-    if(!p_comments) {
-      p_comments = new std::vector<QString>();
+  void PvlKeyword::addComment(QString comment) {
+    if(!m_comments) {
+      m_comments = new std::vector<QString>();
     }
 
     if(comment.size() == 0) {
-      p_comments->push_back("#");
+      m_comments->push_back("#");
     }
     if(comment[0] == '#') {
-      p_comments->push_back(comment);
+      m_comments->push_back(comment);
     }
     else if(comment.size() == 1) {
-      p_comments->push_back("# " + comment);
+      m_comments->push_back("# " + comment);
     }
     else if((comment[0] == '/') && (comment[1] == '*')) {
-      p_comments->push_back(comment);
+      m_comments->push_back(comment);
     }
     else if((comment[0] == '/') && (comment[1] == '/')) {
-      p_comments->push_back(comment);
+      m_comments->push_back(comment);
     }
     else {
-      p_comments->push_back("# " + comment);
+      m_comments->push_back("# " + comment);
     }
   }
 
@@ -419,11 +419,11 @@ namespace Isis {
    *
    * @param comment The new comment to add
    *
-   * @see AddComment()
-   * @see AddComments()
-   * @see ClearComments()
+   * @see addComment()
+   * @see addComments()
+   * @see clearComment()
    */
-  void PvlKeyword::AddCommentWrapped(QString comment) {
+  void PvlKeyword::addCommentWrapped(QString comment) {
     IString cmt = comment;
     IString token = cmt.Token(" ");
     while(cmt != "") {
@@ -435,16 +435,16 @@ namespace Isis {
         token = cmt.Token(" ");
         length = temp.size() + token.size() + 1;
       }
-      AddComment(temp.c_str());
+      addComment(temp.c_str());
     }
-    if(token.size() != 0) AddComment(token.c_str());
+    if(token.size() != 0) addComment(token.c_str());
   }
 
   //! Clears the current comments.
-  void PvlKeyword::ClearComments() {
-    if(p_comments) {
-      delete p_comments;
-      p_comments = NULL;
+  void PvlKeyword::clearComment() {
+    if(m_comments) {
+      delete m_comments;
+      m_comments = NULL;
     }
   }
 
@@ -454,14 +454,14 @@ namespace Isis {
    * @return <B>QString</B> The comment at the index.
    * @throws iException ArraySubscriptNotInRange (index) Index out of bounds.
    */
-  QString PvlKeyword::Comment(int index) const {
-    if(!p_comments) return "";
+  QString PvlKeyword::comment(int index) const {
+    if(!m_comments) return "";
 
-    if(index < 0 || index >= (int)p_comments->size()) {
+    if(index < 0 || index >= (int)m_comments->size()) {
       QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    return (*p_comments)[index];
+    return (*m_comments)[index];
   };
 
   /**
@@ -471,13 +471,13 @@ namespace Isis {
    * @return <B>QString</B> The value in its proper format (iPVL or
    *         PVL).
    */
-  QString PvlKeyword::Reform(const QString &value) const {
+  QString PvlKeyword::reform(const QString &value) const {
 #if 0
     static bool firstTime = true;
     static bool iPVL = true;
     if(firstTime) {
       firstTime = false;
-      Isis::PvlGroup &g = Isis::Preference::Preferences().FindGroup(
+      Isis::PvlGroup &g = Isis::Preference::Preferences().findGroup(
                             "UserInterface", Isis::Pvl::Traverse);
 
       Isis::IString s = (QString) g["PvlFormat"];
@@ -485,9 +485,9 @@ namespace Isis {
       if(s == "PVL") iPVL = false;
     }
 
-    if(iPVL) return ToIPvl(value);
+    if(iPVL) return toIPvl(value);
 #endif
-    return ToPvl(value);
+    return toPvl(value);
   }
 
   /**
@@ -495,7 +495,7 @@ namespace Isis {
    * @param value The value to be converted.
    * @return <B>QString</B> The value in iPVL format.
    */
-  QString PvlKeyword::ToIPvl(const QString &value) const {
+  QString PvlKeyword::toIPvl(const QString &value) const {
     QString out;
     bool upcase = true;
     bool lastlower = true;
@@ -523,7 +523,7 @@ namespace Isis {
    * @param value The value to be converted.
    * @return <B>QString</B> The value in PVL format.
    */
-  QString PvlKeyword::ToPvl(const QString &value) const {
+  QString PvlKeyword::toPvl(const QString &value) const {
     QString out;
     bool lastlower = false;
     for(int i = 0; i < value.size(); i++) {
@@ -548,7 +548,7 @@ namespace Isis {
    * @return <B>bool</B> True or false, depending on whether
    *          the QString values are equal.
    */
-  bool PvlKeyword::StringEqual(const QString &QString1,
+  bool PvlKeyword::stringEqual(const QString &QString1,
                                const QString &QString2) {
     Isis::IString s1(QString1);
     Isis::IString s2(QString2);
@@ -575,13 +575,13 @@ namespace Isis {
    *         false if they're not.
    * @throws iException ArraySubscriptNotInRange (index) Index out of bounds.
    */
-  bool PvlKeyword::IsEquivalent(QString QString1, int index) const {
-    if(index < 0 || index >= (int)p_values.size()) {
+  bool PvlKeyword::isEquivalent(QString QString1, int index) const {
+    if(index < 0 || index >= (int)m_values.size()) {
       QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    return StringEqual(p_values[index], QString1);
+    return stringEqual(m_values[index], QString1);
   }
 
   /**
@@ -590,7 +590,7 @@ namespace Isis {
    * @return <B>PvlKeyword&</B> Reference to PvlKeyword object.
    */
   PvlKeyword &PvlKeyword::operator=(Isis::PvlSequence &seq) {
-    Clear();
+    clear();
     for(int i = 0; i < seq.Size(); i++) {
       QString temp = "(";
       for(int j = 0; j < (int)seq[i].size(); j++) {
@@ -624,7 +624,7 @@ namespace Isis {
    * @return <B>ostream&</B> Reference to ostream.
    * @see operator<<
    */
-  ostream &PvlKeyword::WriteWithWrap(std::ostream &os,
+  ostream &PvlKeyword::writeWithWrap(std::ostream &os,
                                      const QString &textToWrite,
                                      int startColumn,
                                      PvlFormat &format) const {
@@ -677,7 +677,7 @@ namespace Isis {
 
     // Position set
     QString remainingText = textToWrite;
-    int spaceForText = format.CharLimit() - 1 - format.FormatEOL().length() - startColumn;
+    int spaceForText = format.charLimit() - 1 - format.formatEOL().length() - startColumn;
 
     // indexOf quote positions to better determine which line to put the
     //  QString on. Data structure: vector< startPos, endPos > where
@@ -853,8 +853,8 @@ namespace Isis {
 
       // we wrote as much as possible, do a newline and repeat
       if(!remainingText.isEmpty()) {
-        os << format.FormatEOL();
-        WriteSpaces(os, startColumn);
+        os << format.formatEOL();
+        writeSpaces(os, startColumn);
 
         // dont allow spaces to begin the next line inside what we're printing
         if(remainingText[0] == ' ') {
@@ -876,7 +876,7 @@ namespace Isis {
    * @param os Stream to write to
    * @param numSpaces number of spaces to write
    */
-  void PvlKeyword::WriteSpaces(std::ostream &os, int numSpaces) const {
+  void PvlKeyword::writeSpaces(std::ostream &os, int numSpaces) const {
     for(int space = 0; space < numSpaces; space ++) {
       os << " ";
     }
@@ -889,8 +889,8 @@ namespace Isis {
    *
    * @param formatter A pointer to the formatter to be used
    */
-  void PvlKeyword::SetFormat(PvlFormat *formatter) {
-    p_formatter = formatter;
+  void PvlKeyword::setFormat(PvlFormat *formatter) {
+    m_formatter = formatter;
   }
 
 
@@ -900,8 +900,8 @@ namespace Isis {
    * @return <B>PvlFormat*</B> Pointer to PvlFormat.
    *
    */
-  PvlFormat *PvlKeyword::GetFormat() {
-    return p_formatter;
+  PvlFormat *PvlKeyword::format() {
+    return m_formatter;
   };
 
   /**
@@ -925,7 +925,7 @@ namespace Isis {
     while(!error && !keywordDone) {
       istream::pos_type beforeLine = is.tellg();
 
-      line = PvlKeyword::ReadLine(is, multiLineComment);
+      line = PvlKeyword::readLine(is, multiLineComment);
 
       // We read an empty line (failed to read next non-empty line)
       // and didnt complete our keyword, essentially we hit the implicit
@@ -1011,7 +1011,7 @@ namespace Isis {
       bool attemptedRead = false;
 
       try {
-        attemptedRead = PvlKeyword::ReadCleanKeyword(keywordString,
+        attemptedRead = PvlKeyword::readCleanKeyword(keywordString,
                         keywordComments,
                         keywordName,
                         keywordValues);
@@ -1040,11 +1040,11 @@ namespace Isis {
           continue;
         }
 
-        result.SetName(keywordName);
-        result.AddComments(keywordComments);
+        result.setName(keywordName);
+        result.addComments(keywordComments);
 
         for(unsigned int value = 0; value < keywordValues.size(); value++) {
-          result.AddValue(keywordValues[value].first,
+          result.addValue(keywordValues[value].first,
                           keywordValues[value].second);
         }
 
@@ -1106,9 +1106,9 @@ namespace Isis {
    *
    * @param comments Comments to associate with this keyword
    */
-  void PvlKeyword::AddComments(const std::vector<QString> &comments) {
+  void PvlKeyword::addComments(const std::vector<QString> &comments) {
     for(unsigned int i = 0; i < comments.size(); i++) {
-      AddComment(comments[i]);
+      addComment(comments[i]);
     }
   }
 
@@ -1127,7 +1127,7 @@ namespace Isis {
    * @return bool false if it is invalid but could become valid given more data,
    *              true if it is a valid keyword and successful
    */
-  bool PvlKeyword::ReadCleanKeyword(QString keyword,
+  bool PvlKeyword::readCleanKeyword(QString keyword,
                                     std::vector< QString > &keywordComments,
                                     QString &keywordName,
                                     std::vector< std::pair<QString, QString> > &keywordValues) {
@@ -1329,7 +1329,7 @@ namespace Isis {
      */
 
     // Get the keyword name
-    keywordName = ReadValue(keyword, explicitIncomplete);
+    keywordName = readValue(keyword, explicitIncomplete);
 
     // we have taken the name; if nothing remains then it is value-less
     // and we are done.
@@ -1398,7 +1398,7 @@ namespace Isis {
         bool foundComma = false;
         // keyword should be of the format: VALUE <UNIT>,....)
         // Read VALUE from it
-        QString nextItem = ReadValue(keyword, explicitIncomplete, extraDelims);
+        QString nextItem = readValue(keyword, explicitIncomplete, extraDelims);
 
         if(!keyword.isEmpty() && keyword[0] == wrongClosingParen) {
 
@@ -1421,7 +1421,7 @@ namespace Isis {
         // Now there's 2 possibilities: units or no units ->
         //   if we have units, read them
         if(!keyword.isEmpty() && keyword[0] == '<') {
-          QString unitsValue = ReadValue(keyword, explicitIncomplete);
+          QString unitsValue = readValue(keyword, explicitIncomplete);
           keywordValue.second = unitsValue;
         }
 
@@ -1481,7 +1481,7 @@ namespace Isis {
       // Read units here if they exist and apply them
       //  case: (A,B,C) <unit>
       if(!keyword.isEmpty() && keyword[0] == '<') {
-        QString units = ReadValue(keyword, explicitIncomplete);
+        QString units = readValue(keyword, explicitIncomplete);
         for(unsigned int val = 0; val < keywordValues.size(); val++) {
           if(keywordValues[val].second.isEmpty()) {
             keywordValues[val].second = units;
@@ -1499,10 +1499,10 @@ namespace Isis {
         We need to read the single value/unit in the keywordValues array.
        */
       pair<QString, QString> keywordValue;
-      keywordValue.first = ReadValue(keyword, explicitIncomplete);
+      keywordValue.first = readValue(keyword, explicitIncomplete);
 
       if(!keyword.isEmpty() && keyword[0] == '<') {
-        keywordValue.second = ReadValue(keyword, explicitIncomplete);
+        keywordValue.second = readValue(keyword, explicitIncomplete);
       }
 
       keywordValues.push_back(keywordValue);
@@ -1550,10 +1550,10 @@ namespace Isis {
   }
 
 
-  QString PvlKeyword::ReadValue(QString &keyword, bool &quoteProblem) {
+  QString PvlKeyword::readValue(QString &keyword, bool &quoteProblem) {
     std::vector< std::pair<char, char> > otherDelims;
 
-    return ReadValue(keyword, quoteProblem, otherDelims);
+    return readValue(keyword, quoteProblem, otherDelims);
   }
 
   /**
@@ -1572,7 +1572,7 @@ namespace Isis {
    *
    * @return QString The stripped out token.
    */
-  QString PvlKeyword::ReadValue(QString &keyword, bool &quoteProblem,
+  QString PvlKeyword::readValue(QString &keyword, bool &quoteProblem,
                                     const std::vector< std::pair<char, char> > &
                                     otherDelimiters) {
     QString value = "";
@@ -1707,7 +1707,7 @@ namespace Isis {
    *
    * @return QString The first encountered line of data
    */
-  QString PvlKeyword::ReadLine(std::istream &is, bool insideComment) {
+  QString PvlKeyword::readLine(std::istream &is, bool insideComment) {
     QString lineOfData;
 
     while(is.good() && lineOfData.isEmpty()) {
@@ -1767,11 +1767,11 @@ namespace Isis {
    * @param os The output stream.
    * @param keyword The PvlKeyword object to output.
    * @return <B>ostream&</B> Reference to ostream.
-   * @see WriteWithWrap()
+   * @see writeWithWrap()
    */
   ostream &operator<<(std::ostream &os, const Isis::PvlKeyword &keyword) {
     // Set up a Formatter
-    PvlFormat *tempFormat = keyword.p_formatter;
+    PvlFormat *tempFormat = keyword.m_formatter;
     bool removeFormatter = false;
     if(tempFormat == NULL) {
       tempFormat = new PvlFormat();
@@ -1779,23 +1779,23 @@ namespace Isis {
     }
 
     // Write out the comments
-    for(int i = 0; i < keyword.Comments(); i++) {
-      for(int j = 0; j < keyword.Indent(); j++) os << " ";
-      os << keyword.Comment(i) << tempFormat->FormatEOL();
+    for(int i = 0; i < keyword.comments(); i++) {
+      for(int j = 0; j < keyword.indent(); j++) os << " ";
+      os << keyword.comment(i) << tempFormat->formatEOL();
     }
 
     // Write the keyword name & add length to startColumn.
     int startColumn = 0;
-    for(int i = 0; i < keyword.Indent(); i++) {
+    for(int i = 0; i < keyword.indent(); i++) {
       os << " ";
       ++startColumn;
     }
-    QString keyname = tempFormat->FormatName(keyword);
+    QString keyname = tempFormat->formatName(keyword);
     os << keyname;
     startColumn += keyname.length();
 
     // Add padding and then write equal sign.
-    for(int i = 0; i < keyword.Width() - (int)keyname.size(); ++i) {
+    for(int i = 0; i < keyword.width() - (int)keyname.size(); ++i) {
       os << " ";
       ++startColumn;
     }
@@ -1803,17 +1803,17 @@ namespace Isis {
     startColumn += 3;
 
     // If it has no value then write a NULL
-    if(keyword.Size() == 0) {
-      os << tempFormat->FormatValue(keyword);
+    if(keyword.size() == 0) {
+      os << tempFormat->formatValue(keyword);
     }
 
     // Loop and write each array value
     QString stringToWrite;
-    for(int i = 0; i < keyword.Size(); i ++) {
-      stringToWrite += tempFormat->FormatValue(keyword, i);
+    for(int i = 0; i < keyword.size(); i ++) {
+      stringToWrite += tempFormat->formatValue(keyword, i);
     }
 
-    keyword.WriteWithWrap(os,
+    keyword.writeWithWrap(os,
                           stringToWrite,
                           startColumn,
                           *tempFormat);
@@ -1827,39 +1827,39 @@ namespace Isis {
   //! This is an assignment operator
   const PvlKeyword &PvlKeyword::operator=(const PvlKeyword &other) {
     if(this != &other) {
-      p_formatter = other.p_formatter;
+      m_formatter = other.m_formatter;
 
-      if(p_name) {
-        delete [] p_name;
-        p_name = NULL;
+      if(m_name) {
+        delete [] m_name;
+        m_name = NULL;
       }
 
-      if(other.p_name) {
-        SetName(other.p_name);
+      if(other.m_name) {
+        setName(other.m_name);
       }
 
-      p_values = other.p_values;
+      m_values = other.m_values;
 
-      if(p_units) {
-        delete p_units;
-        p_units = NULL;
+      if(m_units) {
+        delete m_units;
+        m_units = NULL;
       }
 
-      if(other.p_units) {
-        p_units = new std::vector<QString>(*other.p_units);
+      if(other.m_units) {
+        m_units = new std::vector<QString>(*other.m_units);
       }
 
-      if(p_comments) {
-        delete p_comments;
-        p_comments = NULL;
+      if(m_comments) {
+        delete m_comments;
+        m_comments = NULL;
       }
 
-      if(other.p_comments) {
-        p_comments = new std::vector<QString>(*other.p_comments);
+      if(other.m_comments) {
+        m_comments = new std::vector<QString>(*other.m_comments);
       }
 
-      p_width = other.p_width;
-      p_indent = other.p_indent;
+      m_width = other.m_width;
+      m_indent = other.m_indent;
     }
 
     return *this;
@@ -1877,11 +1877,11 @@ namespace Isis {
    * @param psValueType  - Value Type (positive / negative) for numbers
    * @param pvlKwrdValue - Template Keyword __Value or __Range to validate keyword's value
    */
-  void PvlKeyword::ValidateKeyword(PvlKeyword & pvlKwrd, QString psValueType, PvlKeyword* pvlKwrdValue)
+  void PvlKeyword::validateKeyword(PvlKeyword & pvlKwrd, QString psValueType, PvlKeyword* pvlKwrdValue)
   {
-    int iSize = pvlKwrd.Size();
+    int iSize = pvlKwrd.size();
 
-    QString sType = p_values[0].toLower();
+    QString sType = m_values[0].toLower();
 
     // Value type
     if(psValueType.length()) {
@@ -1892,7 +1892,7 @@ namespace Isis {
     bool bRange = false;
     bool bValue = false;
     if(pvlKwrdValue != NULL) {
-      QString sValueName = pvlKwrdValue->Name();
+      QString sValueName = pvlKwrdValue->name();
 
       // Check for Range
       if(sValueName.contains("__Range")) {
@@ -1914,30 +1914,30 @@ namespace Isis {
           try {
             iValue = toInt(sValue);
           } catch(IException & e) {
-            QString sErrMsg = "\"" +pvlKwrd.Name() +"\" expects an Integer value";
+            QString sErrMsg = "\"" +pvlKwrd.name() +"\" expects an Integer value";
             throw IException(e, IException::User, sErrMsg, _FILEINFO_);
           }
           if(bRange && (iValue < dRangeMin || iValue > dRangeMax)) {
-            QString sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
+            QString sErrMsg = "\"" +pvlKwrd.name() +"\" is not in the specified Range";
             throw IException(IException::User, sErrMsg, _FILEINFO_);
           }
           if(bValue) {
             bool bFound = false;
-            for(int j=0; j<pvlKwrdValue->Size(); j++) {
+            for(int j=0; j<pvlKwrdValue->size(); j++) {
               if(iValue == toInt((*pvlKwrdValue)[j])) {
                 bFound = true;
                 break;
               }
             }
             if(!bFound) {
-              QString sErrMsg = "\"" +pvlKwrd.Name() +"\" has value not in the accepted list";
+              QString sErrMsg = "\"" +pvlKwrd.name() +"\" has value not in the accepted list";
               throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
           // Type is specified (positive / negative)
           if(psValueType.length()) {
             if((psValueType == "positive" && iValue < 0) || (psValueType == "negative" && iValue >= 0) ) {
-              QString sErrMsg = "\"" +pvlKwrd.Name() +"\" has invalid value";
+              QString sErrMsg = "\"" +pvlKwrd.name() +"\" has invalid value";
               throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
@@ -1953,26 +1953,26 @@ namespace Isis {
         if(sValue != "null"){
           double dValue = toDouble(sValue);
           if(bRange && (dValue < dRangeMin || dValue > dRangeMax)) {
-            QString sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
+            QString sErrMsg = "\"" +pvlKwrd.name() +"\" is not in the specified Range";
             throw IException(IException::User, sErrMsg, _FILEINFO_);
           }
           if(bValue) {
             bool bFound = false;
-            for(int j=0; j<pvlKwrdValue->Size(); j++) {
+            for(int j=0; j<pvlKwrdValue->size(); j++) {
               if(dValue == toDouble((*pvlKwrdValue)[j])) {
                 bFound = true;
                 break;
               }
             }
             if(!bFound) {
-              QString sErrMsg = "\"" +pvlKwrd.Name() +"\" has value not in the accepted list";
+              QString sErrMsg = "\"" +pvlKwrd.name() +"\" has value not in the accepted list";
               throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
           // Type is specified (positive / negative)
           if(psValueType.length()) {
             if((psValueType == "positive" && dValue < 0) || (psValueType == "negative" && dValue >= 0) ) {
-              QString sErrMsg = "\"" +pvlKwrd.Name() +"\" has invalid value";
+              QString sErrMsg = "\"" +pvlKwrd.name() +"\" has invalid value";
               throw IException(IException::User, sErrMsg, _FILEINFO_);
             }
           }
@@ -1986,7 +1986,7 @@ namespace Isis {
       for(int i=0; i<iSize; i++) {
         QString sValue = pvlKwrd[i].toLower();
         if(sValue != "null" && sValue != "true" && sValue != "false"){
-          QString sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
+          QString sErrMsg = "Wrong Type of value in the Keyword \"" + name() + "\" \n";
           throw IException(IException::User, sErrMsg, _FILEINFO_);
         }
       }
@@ -1999,14 +1999,14 @@ namespace Isis {
         QString sValue = pvlKwrd[i].toLower();
         if(bValue) {
           bool bValFound = false;
-          for(int i=0; i<pvlKwrdValue->Size(); i++) {
+          for(int i=0; i<pvlKwrdValue->size(); i++) {
             if(sValue == (*pvlKwrdValue)[i].toLower()) {
               bValFound = true;
               break;
             }
           }
           if(!bValFound) {
-            QString sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
+            QString sErrMsg = "Wrong Type of value in the Keyword \"" + name() + "\" \n";
             throw IException(IException::User, sErrMsg, _FILEINFO_);
           }
         }

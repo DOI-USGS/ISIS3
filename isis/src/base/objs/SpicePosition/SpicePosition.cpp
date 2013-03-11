@@ -368,30 +368,30 @@ namespace Isis {
     }
 
     // Load the full cache time information from the label if available
-    if(table.Label().HasKeyword("SpkTableStartTime")) {
-      p_fullCacheStartTime = toDouble(table.Label().FindKeyword("SpkTableStartTime")[0]);
+    if(table.Label().hasKeyword("SpkTableStartTime")) {
+      p_fullCacheStartTime = toDouble(table.Label().findKeyword("SpkTableStartTime")[0]);
     }
-    if(table.Label().HasKeyword("SpkTableEndTime")) {
-      p_fullCacheEndTime = toDouble(table.Label().FindKeyword("SpkTableEndTime")[0]);
+    if(table.Label().hasKeyword("SpkTableEndTime")) {
+      p_fullCacheEndTime = toDouble(table.Label().findKeyword("SpkTableEndTime")[0]);
     }
-    if(table.Label().HasKeyword("SpkTableOriginalSize")) {
-      p_fullCacheSize = toDouble(table.Label().FindKeyword("SpkTableOriginalSize")[0]);
+    if(table.Label().hasKeyword("SpkTableOriginalSize")) {
+      p_fullCacheSize = toDouble(table.Label().findKeyword("SpkTableOriginalSize")[0]);
     }
 
 
     // set source type by table's label keyword
-    if(!table.Label().HasKeyword("CacheType")) {
+    if(!table.Label().hasKeyword("CacheType")) {
       p_source = Memcache;
     }
-    else if(table.Label().FindKeyword("CacheType")[0] == "Linear") {
+    else if(table.Label().findKeyword("CacheType")[0] == "Linear") {
       p_source = Memcache;
     }
-    else if(table.Label().FindKeyword("CacheType")[0] == "HermiteSpline") {
+    else if(table.Label().findKeyword("CacheType")[0] == "HermiteSpline") {
       p_source = HermiteCache;
       p_overrideTimeScale = 1.;
       p_override = ScaleOnly;
     }
-    else if(table.Label().FindKeyword("CacheType")[0] == "PolyFunction") {
+    else if(table.Label().findKeyword("CacheType")[0] == "PolyFunction") {
       p_source = PolyFunction;
     }
     else {
@@ -605,15 +605,15 @@ namespace Isis {
     // Write original time coverage
     if(p_fullCacheStartTime != 0) {
       table.Label() += PvlKeyword("SpkTableStartTime");
-      table.Label()["SpkTableStartTime"].AddValue(toString(p_fullCacheStartTime));
+      table.Label()["SpkTableStartTime"].addValue(toString(p_fullCacheStartTime));
     }
     if(p_fullCacheEndTime != 0) {
       table.Label() += PvlKeyword("SpkTableEndTime");
-      table.Label()["SpkTableEndTime"].AddValue(toString(p_fullCacheEndTime));
+      table.Label()["SpkTableEndTime"].addValue(toString(p_fullCacheEndTime));
     }
     if(p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("SpkTableOriginalSize");
-      table.Label()["SpkTableOriginalSize"].AddValue(toString(p_fullCacheSize));
+      table.Label()["SpkTableOriginalSize"].addValue(toString(p_fullCacheSize));
     }
   }
 

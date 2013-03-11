@@ -29,7 +29,7 @@ void IsisMain() {
   p.TranslatePdsProjection(otherLabels);
 
   // Get the directory where the MRO HiRISE RDR translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Mro"] + "/translations/";
 
   // Translate the BandBin group
@@ -43,14 +43,14 @@ void IsisMain() {
   archiveXlater.Auto(otherLabels);
 
   // Write the BandBin, Archive, and Mapping groups to the output cube label
-  ocube->putGroup(otherLabels.FindGroup("BandBin"));
+  ocube->putGroup(otherLabels.findGroup("BandBin"));
 
   // Reorder CPMM keywords back to original arrangement.  This copies the values
   //  back to keywords in place.
-  PvlGroup mosgrp = otherLabels.FindGroup("Mosaic");
-  PvlKeyword &ccdFlag = mosgrp.FindKeyword("SpecialProcessingFlag");
-  PvlKeyword &ccdBin = mosgrp.FindKeyword("cpmmSummingFlag");
-  PvlKeyword &ccdTdi = mosgrp.FindKeyword("cpmmTdiFlag");
+  PvlGroup mosgrp = otherLabels.findGroup("Mosaic");
+  PvlKeyword &ccdFlag = mosgrp.findKeyword("SpecialProcessingFlag");
+  PvlKeyword &ccdBin = mosgrp.findKeyword("cpmmSummingFlag");
+  PvlKeyword &ccdTdi = mosgrp.findKeyword("cpmmTdiFlag");
 
   //  Make temp copies of keywords
   PvlKeyword tempccdFlag = ccdFlag;
@@ -66,7 +66,7 @@ void IsisMain() {
 
 //  Modify the output Mosaic group if the Projection is of type
 //  Equirectangular.
-  PvlGroup mapgrp = otherLabels.FindGroup("Mapping");
+  PvlGroup mapgrp = otherLabels.findGroup("Mapping");
   if(mapgrp["ProjectionName"][0].toUpper() == "EQUIRECTANGULAR") {
     static bool pckLoaded(false);
     if(!pckLoaded) {
@@ -77,7 +77,7 @@ void IsisMain() {
     }
 
     //  Get the target and check for validity
-    PvlKeyword &target = label.FindKeyword("TargetName", PvlObject::Traverse);
+    PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
     SpiceInt tcode;
     SpiceBoolean found;
     (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
@@ -88,17 +88,17 @@ void IsisMain() {
       bodvar_c(tcode, "RADII", &n, radii);
 
       // Set existing radius to CenterLatitudeRadius
-      PvlKeyword &eqRadius =  mapgrp.FindKeyword("EquatorialRadius");
-      PvlKeyword &polRadius = mapgrp.FindKeyword("PolarRadius");
+      PvlKeyword &eqRadius =  mapgrp.findKeyword("EquatorialRadius");
+      PvlKeyword &polRadius = mapgrp.findKeyword("PolarRadius");
 
       // Derive (copy, actually) the center radius from the equator radii and
       // update the name
       PvlKeyword clatrad =  eqRadius;
-      clatrad.SetName("CenterLatitudeRadius");
+      clatrad.setName("CenterLatitudeRadius");
 
       //  Assign the proper radii to the group keywords
-      eqRadius.SetValue(toString(radii[0] * 1000.0), "meters");
-      polRadius.SetValue(toString(radii[2] * 1000.0), "meters");
+      eqRadius.setValue(toString(radii[0] * 1000.0), "meters");
+      polRadius.setValue(toString(radii[2] * 1000.0), "meters");
       mapgrp += clatrad;  // Don't do this before updating the above
       // keyword references!  Bad things happen!
     }

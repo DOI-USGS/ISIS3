@@ -745,7 +745,7 @@ namespace Isis {
       else if (vp->projection()) {
         PvlGroup mappingGrp = vp->projection()->Mapping();
 
-        if (mappingGrp.HasKeyword("TargetName"))
+        if (mappingGrp.hasKeyword("TargetName"))
           target = mappingGrp["TargetName"][0];
       }
 

@@ -102,8 +102,8 @@ void IsisMain() {
       if (ui.WasEntered("TO")) //add the msg to the output file if there is one
         fout << msg << endl << endl << endl;
 
-      Application::Log(e.toPvl().FindGroup("Error"));
-      Application::Log(IException(IException::User,msg, _FILEINFO_).toPvl().FindGroup("Error"));
+      Application::Log(e.toPvl().findGroup("Error"));
+      Application::Log(IException(IException::User,msg, _FILEINFO_).toPvl().findGroup("Error"));
 
       continue; //skip to the next next net file
     }

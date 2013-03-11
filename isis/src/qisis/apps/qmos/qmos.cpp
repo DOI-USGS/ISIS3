@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationName("qmos");
 
     // check for forcing of gui style
-//     PvlGroup &uiPref = Preference::Preferences().FindGroup(
+//     PvlGroup &uiPref = Preference::Preferences().findGroup(
 //                                "UserInterface");
 //     if(uiPref.HasKeyword("GuiStyle")) {
 //       string style = uiPref["GuiStyle"];

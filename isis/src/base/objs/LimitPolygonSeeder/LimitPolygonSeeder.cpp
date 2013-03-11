@@ -164,39 +164,39 @@ namespace Isis {
     // Pull parameters specific to this algorithm out
     try {
       // Get info from Algorithm group
-      PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm", Pvl::Traverse);
-      PvlGroup &invalgo = invalidInput->FindGroup("PolygonSeederAlgorithm",
+      PvlGroup &algo = pvl.findGroup("PolygonSeederAlgorithm", Pvl::Traverse);
+      PvlGroup &invalgo = invalidInput->findGroup("PolygonSeederAlgorithm",
                           Pvl::Traverse);
 
       // Set the spacing
       p_majorAxisPts = 0;
-      if(algo.HasKeyword("MajorAxisPoints")) {
+      if(algo.hasKeyword("MajorAxisPoints")) {
         p_majorAxisPts = (int) algo["MajorAxisPoints"];
-        if(invalgo.HasKeyword("MajorAxisPoints")) {
-          invalgo.DeleteKeyword("MajorAxisPoints");
+        if(invalgo.hasKeyword("MajorAxisPoints")) {
+          invalgo.deleteKeyword("MajorAxisPoints");
         }
       }
       else {
         QString msg = "PVL for LimitPolygonSeeder must contain [MajorAxisPoints] in [";
-        msg += pvl.FileName() + "]";
+        msg += pvl.fileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       p_minorAxisPts = 0;
-      if(algo.HasKeyword("MinorAxisPoints")) {
+      if(algo.hasKeyword("MinorAxisPoints")) {
         p_minorAxisPts = (int) algo["MinorAxisPoints"];
-        if(invalgo.HasKeyword("MinorAxisPoints")) {
-          invalgo.DeleteKeyword("MinorAxisPoints");
+        if(invalgo.hasKeyword("MinorAxisPoints")) {
+          invalgo.deleteKeyword("MinorAxisPoints");
         }
       }
       else {
         QString msg = "PVL for LimitPolygonSeeder must contain [MinorAxisPoints] in [";
-        msg += pvl.FileName() + "]";
+        msg += pvl.fileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      QString msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
+      QString msg = "Improper format for PolygonSeeder PVL [" + pvl.fileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -220,11 +220,11 @@ namespace Isis {
     PvlKeyword majAxis("MajorAxisPoints", toString(p_majorAxisPts));
     PvlKeyword minAxis("MinorAxisPoints", toString(p_minorAxisPts));
 
-    pluginInfo.AddKeyword(name);
-    pluginInfo.AddKeyword(minThickness);
-    pluginInfo.AddKeyword(minArea);
-    pluginInfo.AddKeyword(majAxis);
-    pluginInfo.AddKeyword(minAxis);
+    pluginInfo.addKeyword(name);
+    pluginInfo.addKeyword(minThickness);
+    pluginInfo.addKeyword(minArea);
+    pluginInfo.addKeyword(majAxis);
+    pluginInfo.addKeyword(minAxis);
 
     return pluginInfo;
   }

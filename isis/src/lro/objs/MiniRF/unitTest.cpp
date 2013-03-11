@@ -45,7 +45,7 @@ int main(void) {
 
     Pvl p("$chan1/testData/FSR_CDR_LV1_01801_0R.cub");
     Camera *cam = Isis::CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

@@ -58,8 +58,8 @@ void IsisMain() {
     cube.open(ui.GetFileName("MASTER"), "rw");
 
     //check for existing polygon, if exists delete it
-    if(cube.label()->HasObject("Polygon")) {
-      cube.label()->DeleteObject("Polygon");
+    if(cube.label()->hasObject("Polygon")) {
+      cube.label()->deleteObject("Polygon");
     }
 
     // Get the camera
@@ -101,26 +101,26 @@ void IsisMain() {
 
     // Pull out the pointing cache as a table and write it
     Table cmatrix = crot.Cache("InstrumentPointing");
-    //    cmatrix.Label().AddComment("Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
+    //    cmatrix.Label().addComment("Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
     cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
     cmatrix.Label() += PvlKeyword("Kernels");
     PvlKeyword ckKeyword = crot.InstrumentPointingValue();
 
-    for (int i = 0; i < ckKeyword.Size(); i++) {
-      cmatrix.Label()["Kernels"].AddValue(ckKeyword[i]);
+    for (int i = 0; i < ckKeyword.size(); i++) {
+      cmatrix.Label()["Kernels"].addValue(ckKeyword[i]);
     }
 
     cube.write(cmatrix);
 
     // Write out the instrument position table
-    Isis::PvlGroup kernels = cube.label()->FindGroup("Kernels", Isis::Pvl::Traverse);
+    Isis::PvlGroup kernels = cube.label()->findGroup("Kernels", Isis::Pvl::Traverse);
 
     // Save original kernels in keyword before changing to "Table" in the kernels group
     PvlKeyword origCk = kernels["InstrumentPointing"];
     kernels["InstrumentPointing"] = "Table";
 
-    for (int i = 0;  i < origCk.Size();  i++) {
-      kernels["InstrumentPointing"].AddValue(origCk[i]);
+    for (int i = 0;  i < origCk.size();  i++) {
+      kernels["InstrumentPointing"].addValue(origCk[i]);
     }
 
     cube.putGroup(kernels);
@@ -134,8 +134,8 @@ void IsisMain() {
         // Open the cube
         cube.open(list[ifile].toString(), "rw");
         //check for existing polygon, if exists delete it
-        if(cube.label()->HasObject("Polygon")) {
-          cube.label()->DeleteObject("Polygon");
+        if(cube.label()->hasObject("Polygon")) {
+          cube.label()->deleteObject("Polygon");
         }
         // Get the camera and make sure it is a line scan camera
         Camera *cam = cube.camera();
@@ -147,14 +147,14 @@ void IsisMain() {
         cube.write(cmatrix);
 
         // Write out the new instrument pointing table
-        Isis::PvlGroup kernels = cube.label()->FindGroup("Kernels", Isis::Pvl::Traverse);
+        Isis::PvlGroup kernels = cube.label()->findGroup("Kernels", Isis::Pvl::Traverse);
 
         // Save original kernels in keyword before changing to "Table" in the kernels group
         PvlKeyword origCk = kernels["InstrumentPointing"];
         kernels["InstrumentPointing"] = "Table";
 
-        for (int i = 0;  i < origCk.Size();  i++) {
-           kernels["InstrumentPointing"].AddValue(origCk[i]);
+        for (int i = 0;  i < origCk.size();  i++) {
+           kernels["InstrumentPointing"].addValue(origCk[i]);
         }
         cube.putGroup(kernels);
         cube.close();

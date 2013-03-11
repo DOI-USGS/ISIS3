@@ -54,7 +54,7 @@ namespace Isis {
    */
   void MocLabels::ReadLabels(Pvl &lab) {
     // Get stuff out of the instrument group
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     p_instrumentId = (QString) inst["InstrumentId"];
     p_startingSample = inst["FirstLineSample"];
     p_crosstrackSumming = inst["CrosstrackSumming"];
@@ -63,7 +63,7 @@ namespace Isis {
     p_focalPlaneTemp = inst["FocalPlaneTemperature"];
     p_clockCount = (QString) inst["SpacecraftClockCount"];
     p_orbitNumber = 0;
-    if(inst.HasKeyword("OrbitNumber")) {
+    if(inst.hasKeyword("OrbitNumber")) {
       p_orbitNumber = inst["OrbitNumber"];
     }
     p_gainModeId = (QString) inst["GainModeId"];
@@ -72,13 +72,13 @@ namespace Isis {
 
     // Get stuff out of the archive group
     p_dataQuality = "Unknown";
-    PvlGroup &arch = lab.FindGroup("Archive", Pvl::Traverse);
-    if(arch.HasKeyword("DataQualityDesc")) {
+    PvlGroup &arch = lab.findGroup("Archive", Pvl::Traverse);
+    if(arch.hasKeyword("DataQualityDesc")) {
       p_dataQuality = (QString) arch["DataQualityDesc"];
     }
 
     // Get Stuff out of the band bind group
-    PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+    PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     p_filter = (QString) bandBin["FilterName"];
 
     // Get the number of samples in the initial cube as it may have been
@@ -88,7 +88,7 @@ namespace Isis {
     p_nl = a.AlphaLines();
 
     // Get the two kernels for time computations
-    PvlGroup &kerns = lab.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup &kerns = lab.findGroup("Kernels", Pvl::Traverse);
     p_lsk = FileName(kerns["LeapSecond"][0]);
     p_sclk = FileName(kerns["SpacecraftClock"][0]);
   }

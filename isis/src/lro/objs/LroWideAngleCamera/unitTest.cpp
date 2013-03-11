@@ -53,7 +53,7 @@ int main(void) {
     if (cmVersion == 1) {
      knownLat = -70.69638475050628;
      knownLon =  244.3314992195277;
-     p.Read("$lro/testData/wacCameraTest.cub.cv1");
+     p.read("$lro/testData/wacCameraTest.cub.cv1");
     }
     else {
       // Version 2 difference caused by new CK and comprehensive IK kernel support
@@ -64,7 +64,7 @@ int main(void) {
 
 
     Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

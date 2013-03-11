@@ -22,25 +22,25 @@ namespace Isis {
    */
   AlbedoAtm::AlbedoAtm(Pvl &pvl, PhotoModel &pmodel, AtmosModel &amodel) :
     NormModel(pvl, pmodel, amodel) {
-    PvlGroup &algo = pvl.FindObject("NormalizationModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("NormalizationModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     // Set default value
     SetNormPharef(0.0);
     SetNormIncref(0.0);
     SetNormEmaref(0.0);
 
     // Get value from user
-    if(algo.HasKeyword("Incref")) {
+    if(algo.hasKeyword("Incref")) {
       SetNormIncref(algo["Incref"]);
     }
 
-    if(algo.HasKeyword("Pharef")) {
+    if(algo.hasKeyword("Pharef")) {
       SetNormPharef(algo["Pharef"]);
     } else {
       p_normPharef = p_normIncref;
     }
 
-    if(algo.HasKeyword("Emaref")) {
+    if(algo.hasKeyword("Emaref")) {
       SetNormEmaref(algo["Emaref"]);
     }
 

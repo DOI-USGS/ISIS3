@@ -40,7 +40,7 @@ namespace Isis {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.
-        QString snTemp = label.FileName();
+        QString snTemp = label.fileName();
         if(!snTemp.isEmpty()) {
           sn = FileName(snTemp).name();
         }
@@ -90,7 +90,7 @@ namespace Isis {
    */
   PvlGroup SerialNumber::FindSerialTranslation(Pvl &label) {
     Pvl outLabel;
-    static PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+    static PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
 
     // Get the mission name
     static QString missionTransFile = (QString) dataDir["base"] + "/translations/MissionName2DataDir.trn";
@@ -137,8 +137,8 @@ namespace Isis {
     translationIterator->second.SetLabel(label);
     translationIterator->second.Auto(outLabel);
 
-    PvlGroup snGroup = outLabel.FindGroup("SerialNumberKeywords");
-    snGroup += PvlKeyword("ObservationKeys", toString(snGroup.Keywords()));
+    PvlGroup snGroup = outLabel.findGroup("SerialNumberKeywords");
+    snGroup += PvlKeyword("ObservationKeys", toString(snGroup.keywords()));
 
     return snGroup;
   }

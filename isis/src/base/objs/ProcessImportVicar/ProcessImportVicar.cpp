@@ -113,7 +113,7 @@ namespace Isis {
 
       // See if there is end-of-dataset labels
       // If so read them and merge
-      if(vLab.HasKeyword("EOL")) {
+      if(vLab.hasKeyword("EOL")) {
         if((int) vLab["EOL"] == 1) {
           int startByte = (int) vLab["LBLSIZE"] +
                           (int) vLab["NLB"] * (int) vLab["RECSIZE"] +
@@ -129,7 +129,7 @@ namespace Isis {
           lbl >> endLab;
           vicFile.close();
 
-          for(int k = 0; k < endLab.Keywords(); k++) {
+          for(int k = 0; k < endLab.keywords(); k++) {
             vicarLab += endLab[k];
           }
         }

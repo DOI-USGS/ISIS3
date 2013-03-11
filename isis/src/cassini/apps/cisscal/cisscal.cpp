@@ -128,23 +128,23 @@ void IsisMain() {
   }
 
   // Add the radiometry group
-  gbl::calgrp.SetName("Radiometry");
+  gbl::calgrp.setName("Radiometry");
 
   // The first ProcessByLine pass will either compute bitweight values or copy input values
 
   // BITWEIGHT CORRECTION
   gbl::calgrp += PvlKeyword("BitweightCorrectionPerformed", "Yes");
-  gbl::calgrp.FindKeyword("BitweightCorrectionPerformed").AddComment("Bitweight Correction Parameters");
+  gbl::calgrp.findKeyword("BitweightCorrectionPerformed").addComment("Bitweight Correction Parameters");
   // Bitweight correction is not applied to Lossy-compressed or Table-converted images
   if(gbl::cissLab->CompressionType() == "Lossy") {
-    gbl::calgrp.FindKeyword("BitweightCorrectionPerformed").SetValue("No: Lossy compressed");
+    gbl::calgrp.findKeyword("BitweightCorrectionPerformed").setValue("No: Lossy compressed");
     gbl::calgrp += PvlKeyword("BitweightFile", "Not applicable: No bitweight correction");
     firstpass.Progress()->SetText("Lossy compressed: skip bitweight correction as insignificant.\nCopying input image...");
     firstpass.StartProcess(gbl::CopyInput);
     firstpass.EndProcess();
   }
   else if(gbl::cissLab->DataConversionType() == "Table") {
-    gbl::calgrp.FindKeyword("BitweightCorrectionPerformed").SetValue("No: Table converted");
+    gbl::calgrp.findKeyword("BitweightCorrectionPerformed").setValue("No: Table converted");
     gbl::calgrp += PvlKeyword("BitweightFile", "Not applicable: No bitweight correction");
     firstpass.Progress()->SetText("Table converted: skip bitweight correction as insignificant.\nCopying input image...");
     firstpass.StartProcess(gbl::CopyInput);
@@ -153,7 +153,7 @@ void IsisMain() {
   // Skip bitweight correction for GainState==0, there is no data for this case,
   // see ground calibration report 5.1.9 Uneven Bit Weighting
   else if(gbl::cissLab->GainState() == 0) {
-    gbl::calgrp.FindKeyword("BitweightCorrectionPerformed").SetValue("No: No bitweight calibration file for GainState 0.");
+    gbl::calgrp.findKeyword("BitweightCorrectionPerformed").setValue("No: No bitweight calibration file for GainState 0.");
     gbl::calgrp += PvlKeyword("BitweightFile", "Not applicable: No bitweight correction.");
     firstpass.Progress()->SetText("No bitweight calibration file for GainState 0: skip bitweight correction.\nCopying input image...");
     firstpass.StartProcess(gbl::CopyInput);
@@ -185,7 +185,7 @@ void IsisMain() {
     DarkCurrent dark(*gbl::cissLab);
     gbl::dark_DN = dark.ComputeDarkDN();
     gbl::calgrp += PvlKeyword("DarkSubtractionPerformed", "Yes");
-    gbl::calgrp.FindKeyword("DarkSubtractionPerformed").AddComment("Dark Current Subtraction Parameters");
+    gbl::calgrp.findKeyword("DarkSubtractionPerformed").addComment("Dark Current Subtraction Parameters");
     gbl::calgrp += PvlKeyword("DarkParameterFile", dark.DarkParameterFile().expanded());
     if(gbl::cissLab->NarrowAngle()) {
       gbl::calgrp += PvlKeyword("BiasDistortionTable", dark.BiasDistortionTable().expanded());
@@ -233,7 +233,7 @@ void IsisMain() {
   outcube->putGroup(gbl::calgrp);
   secondpass.StartProcess(gbl::Calibrate);
   secondpass.EndProcess();
-  gbl::calgrp.Clear();
+  gbl::calgrp.clear();
   return;
 
 } //END MAIN
@@ -519,7 +519,7 @@ FileName gbl::FindBitweightFile() {
  */
 void gbl::ComputeBias() {
   gbl::calgrp += PvlKeyword("BiasSubtractionPerformed", "Yes");
-  gbl::calgrp.FindKeyword("BiasSubtractionPerformed").AddComment("Bias Subtraction Parameters");
+  gbl::calgrp.findKeyword("BiasSubtractionPerformed").addComment("Bias Subtraction Parameters");
 
   QString fsw(gbl::cissLab->FlightSoftwareVersion());
   double flightSoftwareVersion;
@@ -546,7 +546,7 @@ void gbl::ComputeBias() {
     // 2009-04-27 Jeannie Walldren
     //   following code comment out in new idl cisscal version, 3.6:
     if(gbl::cissLab->DataConversionType() == "Table") { // Lossy + Table = no debias
-      gbl::calgrp.FindKeyword("BiasSubtractionPerformed").SetValue("No: Table converted and Lossy compressed");
+      gbl::calgrp.findKeyword("BiasSubtractionPerformed").setValue("No: Table converted and Lossy compressed");
       gbl::calgrp += PvlKeyword("BiasSubtractionMethod", "Not applicable: No bias subtraction");
       gbl::calgrp += PvlKeyword("NumberOfOverclocks", "Not applicable: No bias subtraction");
       gbl::bias.resize(1);
@@ -557,7 +557,7 @@ void gbl::ComputeBias() {
 
     // according to SIS if 1.2 or 1.3 and Lossy, ignore bias strip mean - invalid data
     if(flightSoftwareVersion <= 1.3) { // Lossy + 1.2 or 1.3 = no debias
-      gbl::calgrp.FindKeyword("BiasSubtractionPerformed").SetValue("No: Lossy compressed on CAS-ISS2 or CAS-ISS3");
+      gbl::calgrp.findKeyword("BiasSubtractionPerformed").setValue("No: Lossy compressed on CAS-ISS2 or CAS-ISS3");
       gbl::calgrp += PvlKeyword("BiasSubtractionMethod", "Not applicable: No bias subtraction");
       gbl::calgrp += PvlKeyword("NumberOfOverclocks", "Not applicable: No bias subtraction");
       gbl::bias.resize(1);
@@ -721,7 +721,7 @@ void gbl::Linearize() {
                      + linearLUT.expanded() + "*** not found.", _FILEINFO_);
   }
   gbl::calgrp += PvlKeyword("LinearityCorrectionPerformed", "Yes");
-  gbl::calgrp.FindKeyword("LinearityCorrectionPerformed").AddComment("Linearity Correction Parameters");
+  gbl::calgrp.findKeyword("LinearityCorrectionPerformed").addComment("Linearity Correction Parameters");
   gbl::calgrp += PvlKeyword("LinearityCorrectionTable", linearLUT.expanded());
 
   TextFile *pairs = new TextFile(linearLUT.expanded());
@@ -779,7 +779,7 @@ void gbl::FindDustRingParameters() {
     gbl::dustCorrection = false;
     gbl::mottleCorrection = false;
     gbl::calgrp += PvlKeyword("DustRingCorrectionPerformed", "No: ISSWA");
-    gbl::calgrp.FindKeyword("DustRingCorrectionPerformed").AddComment("DustRing Correction Parameters");
+    gbl::calgrp.findKeyword("DustRingCorrectionPerformed").addComment("DustRing Correction Parameters");
     gbl::calgrp += PvlKeyword("DustRingFile", "Not applicable: No dustring correction");
     gbl::calgrp += PvlKeyword("MottleCorrectionPerformed", "No: dustring correction");
     gbl::calgrp += PvlKeyword("MottleFile", "Not applicable: No dustring correction");
@@ -791,7 +791,7 @@ void gbl::FindDustRingParameters() {
   // dustring correct for NAC
   gbl::dustCorrection = true;
   gbl::calgrp += PvlKeyword("DustRingCorrectionPerformed", "Yes");
-  gbl::calgrp.FindKeyword("DustRingCorrectionPerformed").AddComment("DustRing Correction Parameters");
+  gbl::calgrp.findKeyword("DustRingCorrectionPerformed").addComment("DustRing Correction Parameters");
   // get name of dust file
   gbl::dustFile = (gbl::GetCalibrationDirectory("dustring") + "nac_dustring_venus."
                    + gbl::cissLab->InstrumentModeId() + ".cub");
@@ -870,7 +870,7 @@ void gbl::FindDustRingParameters() {
           col5 = cols.takeFirst();  // effective wavelength
           if(col5 == "") {
             //       Couldn't find a match in the database
-            gbl::calgrp.FindKeyword("MottleCorrectionPerformed").SetValue("Yes: EffectiveWavelengthFile contained no factor for filter combination, used strengthFactor of 1.0");
+            gbl::calgrp.findKeyword("MottleCorrectionPerformed").setValue("Yes: EffectiveWavelengthFile contained no factor for filter combination, used strengthFactor of 1.0");
             gbl::strengthFactor = 1.0;
           }
           else {
@@ -890,7 +890,7 @@ void gbl::FindDustRingParameters() {
     }
     effwlDB->Close();
     if(gbl::strengthFactor == 0.0) {
-      gbl::calgrp.FindKeyword("MottleCorrectionPerformed").SetValue("Yes: EffectiveWavelengthFile contained no factor for filter combination, used strengthFactor of 1.0");
+      gbl::calgrp.findKeyword("MottleCorrectionPerformed").setValue("Yes: EffectiveWavelengthFile contained no factor for filter combination, used strengthFactor of 1.0");
       gbl::strengthFactor = 1.0;
     }
   }
@@ -987,7 +987,7 @@ FileName gbl::FindFlatFile() {
                      + slopeDatabaseName.expanded() + "*** not found.", _FILEINFO_);
   }
   gbl::calgrp += PvlKeyword("FlatfieldCorrectionPerformed", "Yes");
-  gbl::calgrp.FindKeyword("FlatfieldCorrectionPerformed").AddComment("Flatfield Correction Parameters");
+  gbl::calgrp.findKeyword("FlatfieldCorrectionPerformed").addComment("Flatfield Correction Parameters");
   gbl::calgrp += PvlKeyword("SlopeDataBase", slopeDatabaseName.expanded());
   gbl::flatCorrection = true;
 
@@ -1089,7 +1089,7 @@ FileName gbl::FindFlatFile() {
  */
 void gbl::DNtoElectrons() {
   gbl::calgrp += PvlKeyword("DNtoFluxPerformed", "Yes");
-  gbl::calgrp.FindKeyword("DNtoFluxPerformed").AddComment("DN to Flux Parameters");
+  gbl::calgrp.findKeyword("DNtoFluxPerformed").addComment("DN to Flux Parameters");
   gbl::calgrp += PvlKeyword("DNtoElectrons", "Yes");
   //  Gain used for an image is documented by the GainModID attribute
   //  of the image. Nominal values are as follow:
@@ -1555,7 +1555,7 @@ void gbl::FindCorrectionFactors() {
                        + polarizationFactorFile.expanded() + "*** not found.", _FILEINFO_);
     }
     gbl::calgrp += PvlKeyword("PolarizationFactorPerformed", "Yes");
-    gbl::calgrp.FindKeyword("PolarizationFactorPerformed").AddComment("Correction Factor Parameters");
+    gbl::calgrp.findKeyword("PolarizationFactorPerformed").addComment("Correction Factor Parameters");
     gbl::calgrp += PvlKeyword("PolarizationFactorFile", polarizationFactorFile.expanded());
     CisscalFile *polFact = new CisscalFile(polarizationFactorFile.expanded());
     gbl::polarizationFactor = 0.0;
@@ -1575,7 +1575,7 @@ void gbl::FindCorrectionFactors() {
             if(col4 == "") {
               gbl::polarizationFactor = 1.0;
               // dividing by polarization factor of 1.0 implies this correction is not performed
-              gbl::calgrp.FindKeyword("PolarizationFactorPerformed").SetValue("No: PolarizationFactorFile contained no factor for filter combination");
+              gbl::calgrp.findKeyword("PolarizationFactorPerformed").setValue("No: PolarizationFactorFile contained no factor for filter combination");
             }
             else {
               gbl::polarizationFactor = toDouble(col4);
@@ -1600,7 +1600,7 @@ void gbl::FindCorrectionFactors() {
     if(gbl::polarizationFactor == 0.0) {
       gbl::polarizationFactor = 1.0;
       // dividing by polarization factor of 1.0 implies this correction is not performed
-      gbl::calgrp.FindKeyword("PolarizationFactorPerformed").SetValue("No: PolarizationFactorFile contained no factor for filter combination");
+      gbl::calgrp.findKeyword("PolarizationFactorPerformed").setValue("No: PolarizationFactorFile contained no factor for filter combination");
     }
     else {
       // polarization factor is defined such that they are applied with the correction factor for the related CLR/Filter pair
@@ -1617,7 +1617,7 @@ void gbl::FindCorrectionFactors() {
   else {
     // no polarization correction - gbl::polarizationFactor already initialized to 1 in main()
     gbl::calgrp += PvlKeyword("PolarizationFactorPerformed", "No");
-    gbl::calgrp.FindKeyword("PolarizationFactorPerformed").AddComment("Correction Factor Parameters");
+    gbl::calgrp.findKeyword("PolarizationFactorPerformed").addComment("Correction Factor Parameters");
   }
   // Get the directory where the CISS calibration directories are.
   FileName correctionFactorFile(gbl::GetCalibrationDirectory("correction") + "correctionfactors_qecorr.tab");
@@ -1646,7 +1646,7 @@ void gbl::FindCorrectionFactors() {
           if(col4 == "") {
             gbl::correctionFactor = 1.0;
             // dividing by correction factor of 1.0 implies this correction is not performed
-            gbl::calgrp.FindKeyword("CorrectionFactorPerformed").SetValue("No: CorrectionFactorFile contained no factor for filter combination");
+            gbl::calgrp.findKeyword("CorrectionFactorPerformed").setValue("No: CorrectionFactorFile contained no factor for filter combination");
           }
           else {
             gbl::correctionFactor = toDouble(col4);
@@ -1671,7 +1671,7 @@ void gbl::FindCorrectionFactors() {
   if(gbl::correctionFactor == 0.0) {
     gbl::correctionFactor = 1.0;
     // dividing by correction factor of 1.0 implies this correction is not performed
-    gbl::calgrp.FindKeyword("CorrectionFactorPerformed").SetValue("No: CorrectionFactorFile contained no factor for filter combination");
+    gbl::calgrp.findKeyword("CorrectionFactorPerformed").setValue("No: CorrectionFactorFile contained no factor for filter combination");
   }
   gbl::calgrp += PvlKeyword("CorrectionFactor", toString(gbl::correctionFactor));
   return;
@@ -1690,7 +1690,7 @@ void gbl::FindCorrectionFactors() {
  */
 QString gbl::GetCalibrationDirectory(QString calibrationType) {
   // Get the directory where the CISS calibration directories are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Cassini"];
   return missionDir + "/calibration/" + calibrationType + "/";
 }

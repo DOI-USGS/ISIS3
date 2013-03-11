@@ -97,7 +97,7 @@ void IsisMain() {
   // We need to get a user definition of how to auto correlate around each
   // of the control points.
   Pvl regdef;
-  regdef.Read(ui.GetFileName("DEFFILE"));
+  regdef.read(ui.GetFileName("DEFFILE"));
   AutoReg *ar = AutoRegFactory::Create(regdef);
 
   // We want to create a grid of control points that is N rows by M columns.
@@ -133,7 +133,7 @@ void IsisMain() {
   cn.SetNetworkId("Coreg");
   if (match.hasGroup("Instrument")) {
     PvlGroup inst = match.group("Instrument");
-    PvlKeyword &targname = inst.FindKeyword("TargetName");
+    PvlKeyword &targname = inst.findKeyword("TargetName");
     QString targetname = targname;
     cn.SetTarget(targetname);
   }
@@ -214,8 +214,8 @@ void IsisMain() {
 
   Pvl arPvl = ar->RegistrationStatistics();
 
-  for(int i = 0; i < arPvl.Groups(); i++) {
-    Application::Log(arPvl.Group(i));
+  for(int i = 0; i < arPvl.groups(); i++) {
+    Application::Log(arPvl.group(i));
   }
 
   // add the auto registration information to print.prt
@@ -290,7 +290,7 @@ void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
   QString file(ui.GetFileName("DEFFILE"));
   Pvl p;
-  p.Read(file);
+  p.read(file);
   Application::GuiLog(p);
 }
 //...........end of helper function ........

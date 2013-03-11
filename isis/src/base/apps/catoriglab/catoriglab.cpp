@@ -19,10 +19,10 @@ void IsisMain() {
   }
   else if (ui.WasEntered("TO")) {
     if (ui.GetBoolean("APPEND")) {
-      pvl.Append(FileName(ui.GetFileName("TO")).expanded());
+      pvl.append(FileName(ui.GetFileName("TO")).expanded());
     }
     else {
-      pvl.Write(FileName(ui.GetFileName("TO")).expanded());
+      pvl.write(FileName(ui.GetFileName("TO")).expanded());
     }
   } 
   else {

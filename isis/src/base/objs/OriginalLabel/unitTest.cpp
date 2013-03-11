@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
   Isis::PvlGroup g("Test");
   g += Isis::PvlKeyword("Keyword", "Value");
-  p.AddGroup(g);
+  p.addGroup(g);
 
   cout << p << endl;
   Isis::OriginalLabel ol(p);

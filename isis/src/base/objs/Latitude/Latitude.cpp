@@ -96,7 +96,7 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+    if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
           Distance::Meters);
       m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
@@ -146,16 +146,15 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+    if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
           Distance::Meters);
       m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
           Distance::Meters);
     }
     else {
-      std::cout << mapping << std::endl;
       PvlGroup radiiGrp = TProjection::TargetRadii(mapping["TargetName"]);
-      std::cout << radiiGrp << std::endl;
+
       m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
           Distance::Meters);
       m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
@@ -433,7 +432,7 @@ namespace Isis {
 
     Distance equatorialRadius;
     Distance polarRadius;
-    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+    if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       equatorialRadius = Distance(toDouble(mapping["EquatorialRadius"][0]),
           Distance::Meters);
       polarRadius = Distance(toDouble(mapping["PolarRadius"][0]),

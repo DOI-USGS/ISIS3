@@ -65,59 +65,59 @@ namespace Isis {
     p_transs = 0.0;
     p_standardConditions = false;
 
-    PvlGroup &algorithm = pvl.FindObject("AtmosphericModel").FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algorithm = pvl.findObject("AtmosphericModel").findGroup("Algorithm", Pvl::Traverse);
 
-    if(algorithm.HasKeyword("Nulneg")) {
+    if(algorithm.hasKeyword("Nulneg")) {
       SetAtmosNulneg(algorithm["Nulneg"][0] == "YES");
     }
     else {
       p_atmosNulneg = false;
     }
 
-    if(algorithm.HasKeyword("Tau")) {
+    if(algorithm.hasKeyword("Tau")) {
       SetAtmosTau(algorithm["Tau"]);
     }
     p_atmosTausave = p_atmosTau;
 
-    if(algorithm.HasKeyword("Tauref")) {
+    if(algorithm.hasKeyword("Tauref")) {
       SetAtmosTauref(algorithm["Tauref"]);
     }
 
-    if(algorithm.HasKeyword("Wha")) {
+    if(algorithm.hasKeyword("Wha")) {
       SetAtmosWha(algorithm["Wha"]);
     }
     p_atmosWhasave = p_atmosWha;
 
-    if(algorithm.HasKeyword("Hga")) {
+    if(algorithm.hasKeyword("Hga")) {
       SetAtmosHga(algorithm["Hga"]);
     }
     p_atmosHgasave = p_atmosHga;
 
-    if(algorithm.HasKeyword("Bha")) {
+    if(algorithm.hasKeyword("Bha")) {
       SetAtmosBha(algorithm["Bha"]);
     }
     p_atmosBhasave = p_atmosBha;
 
-    if(algorithm.HasKeyword("Inc")) {
+    if(algorithm.hasKeyword("Inc")) {
       SetAtmosInc(algorithm["Inc"]);
     }
 
-    if(algorithm.HasKeyword("Phi")) {
+    if(algorithm.hasKeyword("Phi")) {
       SetAtmosPhi(algorithm["Phi"]);
     }
 
-    if(algorithm.HasKeyword("Hnorm")) {
+    if(algorithm.hasKeyword("Hnorm")) {
       SetAtmosHnorm(algorithm["Hnorm"]);
     }
 
-    if(algorithm.HasKeyword("Iord")) {
+    if(algorithm.hasKeyword("Iord")) {
       SetAtmosIord(algorithm["Iord"][0] == "YES");
     }
     else {
       p_atmosAddOffset = false;
     }
 
-    if(algorithm.HasKeyword("EstTau")) {
+    if(algorithm.hasKeyword("EstTau")) {
       SetAtmosEstTau(algorithm["EstTau"][0] == "YES");
     }
     else {

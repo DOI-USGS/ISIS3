@@ -66,14 +66,14 @@ void IsisMain() {
   Cube cube;
   cube.open(out, "rw");
 
-  PvlGroup &res = cube.label()->FindGroup("RESEAUS",Pvl::Traverse);
+  PvlGroup &res = cube.label()->findGroup("RESEAUS",Pvl::Traverse);
 
   // Get reseau line, sample, type, and valid Keywords
-  PvlKeyword lines = res.FindKeyword("LINE");
-  PvlKeyword samps = res.FindKeyword("SAMPLE");
-  PvlKeyword type = res.FindKeyword("TYPE");
-  PvlKeyword valid = res.FindKeyword("VALID");
-  int numres = lines.Size();
+  PvlKeyword lines = res.findKeyword("LINE");
+  PvlKeyword samps = res.findKeyword("SAMPLE");
+  PvlKeyword type = res.findKeyword("TYPE");
+  PvlKeyword valid = res.findKeyword("VALID");
+  int numres = lines.size();
 
   Brick brick(dim,dim,1,cube.pixelType());
   int width = ui.GetInteger("WIDTH");

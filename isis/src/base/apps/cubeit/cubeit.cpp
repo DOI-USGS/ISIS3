@@ -55,18 +55,18 @@ void IsisMain() {
       }
 
       // Build up the band bin group
-      PvlObject &isiscube = cube.label()->FindObject("IsisCube");
-      if(isiscube.HasGroup("BandBin")) {
-        PvlGroup &inBandBin = isiscube.FindGroup("BandBin");
-        for(int key = 0; key < inBandBin.Keywords(); key++) {
+      PvlObject &isiscube = cube.label()->findObject("IsisCube");
+      if(isiscube.hasGroup("BandBin")) {
+        PvlGroup &inBandBin = isiscube.findGroup("BandBin");
+        for(int key = 0; key < inBandBin.keywords(); key++) {
           PvlKeyword &inKey = inBandBin[key];
-          if(!outBandBin.HasKeyword(inKey.Name())) {
+          if(!outBandBin.hasKeyword(inKey.name())) {
             outBandBin += inKey;
           }
           else {
-            PvlKeyword &outKey = outBandBin[inKey.Name()];
-            for(int index = 0; index < (int)inKey.Size(); index++) {
-              outKey.AddValue(inKey[index], inKey.Unit(index));
+            PvlKeyword &outKey = outBandBin[inKey.name()];
+            for(int index = 0; index < (int)inKey.size(); index++) {
+              outKey.addValue(inKey[index], inKey.unit(index));
             }
           }
         }
@@ -112,7 +112,7 @@ void IsisMain() {
   p2.StartProcess(NullBand);
 
   // Add the band bin group if necessary
-  if(outBandBin.Keywords() > 0) {
+  if(outBandBin.keywords() > 0) {
     ocube->putGroup(outBandBin);
   }
   p2.EndProcess();

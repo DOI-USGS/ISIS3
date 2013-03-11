@@ -47,8 +47,8 @@ void IsisMain() {
   p.StartProcess();
 
   // add translated values from band bin and archive groups to the output cube
-  outputCube->putGroup(otherGroups.FindGroup("BandBin"));
-  outputCube->putGroup(otherGroups.FindGroup("Archive"));
+  outputCube->putGroup(otherGroups.findGroup("BandBin"));
+  outputCube->putGroup(otherGroups.findGroup("Archive"));
 
   PvlGroup kernelGroup("Kernels");
   kernelGroup += PvlKeyword("NaifIkCode", toString(-74699));
@@ -69,21 +69,21 @@ void IsisMain() {
                                     "$mro/translations/hiriseIdealPdsImportLabel.trn");
   labelXlater.Auto(*isisLabel);
   
-  PvlObject &naifKeywords = isisLabel->FindObject("NaifKeywords");
+  PvlObject &naifKeywords = isisLabel->findObject("NaifKeywords");
   PvlKeyword bodyRadii("BODY499_RADII");
-  bodyRadii.AddValue(QString(pdsLabelPvl["A_AXIS_RADIUS"]));
-  bodyRadii.AddValue(QString(pdsLabelPvl["B_AXIS_RADIUS"]));
-  bodyRadii.AddValue(QString(pdsLabelPvl["C_AXIS_RADIUS"]));
+  bodyRadii.addValue(QString(pdsLabelPvl["A_AXIS_RADIUS"]));
+  bodyRadii.addValue(QString(pdsLabelPvl["B_AXIS_RADIUS"]));
+  bodyRadii.addValue(QString(pdsLabelPvl["C_AXIS_RADIUS"]));
   naifKeywords += bodyRadii;
 
-  PvlObject &isisCubeObject = isisLabel->FindObject("IsisCube");
+  PvlObject &isisCubeObject = isisLabel->findObject("IsisCube");
   // Compute and add SOFTWARE_NAME to the Archive Group
   QString sfname = "Isis " + Application::Version() + " " +
             Application::GetUserInterface().ProgramName();
-  PvlGroup &archiveGroup = isisCubeObject.FindGroup("Archive");
+  PvlGroup &archiveGroup = isisCubeObject.findGroup("Archive");
   archiveGroup += PvlKeyword("SOFTWARE_NAME", sfname);
   
-  PvlObject &pdsImageObj = pdsLabelPvl.FindObject("IMAGE");
+  PvlObject &pdsImageObj = pdsLabelPvl.findObject("IMAGE");
   double samples = double(pdsImageObj["LINE_SAMPLES"]);
   double lines = double(pdsImageObj["LINES"]);
   double firstSamp = double(pdsImageObj["FIRST_LINE_SAMPLE"]);
@@ -118,73 +118,73 @@ void IsisMain() {
  */
 void addTableKeywords(Pvl *isisLabel, Pvl pdsLabelPvl) {
   // add keywords to appropriate tables
-   for (int i = 0; i < isisLabel->Objects(); i++) {
-     if (isisLabel->Object(i).Name() == "Table") {
+   for (int i = 0; i < isisLabel->objects(); i++) {
+     if (isisLabel->object(i).name() == "Table") {
        PvlKeyword keyword;
-       if (QString(isisLabel->Object(i)["Name"]) == "InstrumentPointing") {
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POINTING_TABLE")["TIME_DEPENDENT_FRAMES"];
-         keyword.SetName("TimeDependentFrames");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POINTING_TABLE")["CONSTANT_FRAMES"];
-         keyword.SetName("ConstantFrames");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POINTING_TABLE")["CONSTANT_ROTATION"];
-         keyword.SetName("ConstantRotation");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POINTING_TABLE")["CK_TABLE_START_TIME"];
-         keyword.SetName("CkTableStartTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POINTING_TABLE")["CK_TABLE_END_TIME"];
-         keyword.SetName("CkTableEndTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POINTING_TABLE")["CK_TABLE_ORIGINAL_SIZE"];
-         keyword.SetName("CkTableOriginalSize");
-         isisLabel->Object(i) += keyword;
+       if (QString(isisLabel->object(i)["Name"]) == "InstrumentPointing") {
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POINTING_TABLE")["TIME_DEPENDENT_FRAMES"];
+         keyword.setName("TimeDependentFrames");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POINTING_TABLE")["CONSTANT_FRAMES"];
+         keyword.setName("ConstantFrames");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POINTING_TABLE")["CONSTANT_ROTATION"];
+         keyword.setName("ConstantRotation");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POINTING_TABLE")["CK_TABLE_START_TIME"];
+         keyword.setName("CkTableStartTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POINTING_TABLE")["CK_TABLE_END_TIME"];
+         keyword.setName("CkTableEndTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POINTING_TABLE")["CK_TABLE_ORIGINAL_SIZE"];
+         keyword.setName("CkTableOriginalSize");
+         isisLabel->object(i) += keyword;
        }
-       if (QString(isisLabel->Object(i)["Name"]) == "InstrumentPosition") {
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POSITION_TABLE")["CACHE_TYPE"];
-         keyword.SetName("CacheType");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POSITION_TABLE")["SPK_TABLE_START_TIME"];
-         keyword.SetName("SpkTableStartTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POSITION_TABLE")["SPK_TABLE_END_TIME"];
-         keyword.SetName("SpkTableEndTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("INSTRUMENT_POSITION_TABLE")["SPK_TABLE_ORIGINAL_SIZE"];
-         keyword.SetName("SpkTableOriginalSize");
-         isisLabel->Object(i) += keyword;
+       if (QString(isisLabel->object(i)["Name"]) == "InstrumentPosition") {
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POSITION_TABLE")["CACHE_TYPE"];
+         keyword.setName("CacheType");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POSITION_TABLE")["SPK_TABLE_START_TIME"];
+         keyword.setName("SpkTableStartTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POSITION_TABLE")["SPK_TABLE_END_TIME"];
+         keyword.setName("SpkTableEndTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("INSTRUMENT_POSITION_TABLE")["SPK_TABLE_ORIGINAL_SIZE"];
+         keyword.setName("SpkTableOriginalSize");
+         isisLabel->object(i) += keyword;
        }
-       if (QString(isisLabel->Object(i)["Name"]) == "BodyRotation") {
-         keyword = pdsLabelPvl.FindObject("BODY_ROTATION_TABLE")["TIME_DEPENDENT_FRAMES"];
-         keyword.SetName("TimeDependentFrames");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("BODY_ROTATION_TABLE")["CK_TABLE_START_TIME"];
-         keyword.SetName("CkTableStartTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("BODY_ROTATION_TABLE")["CK_TABLE_END_TIME"];
-         keyword.SetName("CkTableEndTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("BODY_ROTATION_TABLE")["CK_TABLE_ORIGINAL_SIZE"];
-         keyword.SetName("CkTableOriginalSize");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("BODY_ROTATION_TABLE")["SOLAR_LONGITUDE"];
-         keyword.SetName("SolarLongitude");
-         isisLabel->Object(i) += keyword;
+       if (QString(isisLabel->object(i)["Name"]) == "BodyRotation") {
+         keyword = pdsLabelPvl.findObject("BODY_ROTATION_TABLE")["TIME_DEPENDENT_FRAMES"];
+         keyword.setName("TimeDependentFrames");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("BODY_ROTATION_TABLE")["CK_TABLE_START_TIME"];
+         keyword.setName("CkTableStartTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("BODY_ROTATION_TABLE")["CK_TABLE_END_TIME"];
+         keyword.setName("CkTableEndTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("BODY_ROTATION_TABLE")["CK_TABLE_ORIGINAL_SIZE"];
+         keyword.setName("CkTableOriginalSize");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("BODY_ROTATION_TABLE")["SOLAR_LONGITUDE"];
+         keyword.setName("SolarLongitude");
+         isisLabel->object(i) += keyword;
        }
-       if (QString(isisLabel->Object(i)["Name"]) == "SunPosition") {
-         keyword = pdsLabelPvl.FindObject("SUN_POSITION_TABLE")["CACHE_TYPE"];
-         keyword.SetName("CacheType");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("SUN_POSITION_TABLE")["SPK_TABLE_START_TIME"];
-         keyword.SetName("SpkTableStartTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("SUN_POSITION_TABLE")["SPK_TABLE_END_TIME"];
-         keyword.SetName("SpkTableEndTime");
-         isisLabel->Object(i) += keyword;
-         keyword = pdsLabelPvl.FindObject("SUN_POSITION_TABLE")["SPK_TABLE_ORIGINAL_SIZE"];
-         keyword.SetName("SpkTableOriginalSize");
-         isisLabel->Object(i) += keyword;
+       if (QString(isisLabel->object(i)["Name"]) == "SunPosition") {
+         keyword = pdsLabelPvl.findObject("SUN_POSITION_TABLE")["CACHE_TYPE"];
+         keyword.setName("CacheType");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("SUN_POSITION_TABLE")["SPK_TABLE_START_TIME"];
+         keyword.setName("SpkTableStartTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("SUN_POSITION_TABLE")["SPK_TABLE_END_TIME"];
+         keyword.setName("SpkTableEndTime");
+         isisLabel->object(i) += keyword;
+         keyword = pdsLabelPvl.findObject("SUN_POSITION_TABLE")["SPK_TABLE_ORIGINAL_SIZE"];
+         keyword.setName("SpkTableOriginalSize");
+         isisLabel->object(i) += keyword;
        }
      }
    }

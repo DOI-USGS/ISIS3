@@ -69,13 +69,13 @@ void IsisMain() {
     // Write the pvl group out to the file
     if(ui.GetString("FORMAT") == "PVL") {
       Pvl temp;
-      temp.SetTerminator("");
-      temp.AddGroup((*point));
+      temp.setTerminator("");
+      temp.addGroup((*point));
       if(append) {
-        temp.Append(outFile);
+        temp.append(outFile);
       }
       else {
-        temp.Write(outFile);
+        temp.write(outFile);
       }
     }
 
@@ -96,25 +96,25 @@ void IsisMain() {
       }
 
       if(writeHeader) {
-        for(int i = 0; i < (*point).Keywords(); i++) {
-          if((*point)[i].Size() == 3) {
-            os << (*point)[i].Name() << "X,"
-               << (*point)[i].Name() << "Y,"
-               << (*point)[i].Name() << "Z";
+        for(int i = 0; i < (*point).keywords(); i++) {
+          if((*point)[i].size() == 3) {
+            os << (*point)[i].name() << "X,"
+               << (*point)[i].name() << "Y,"
+               << (*point)[i].name() << "Z";
           }
           else {
-            os << (*point)[i].Name();
+            os << (*point)[i].name();
           }
 
-          if(i < point->Keywords() - 1) {
+          if(i < point->keywords() - 1) {
             os << ",";
           }
         }
         os << endl;
       }
 
-      for(int i = 0; i < (*point).Keywords(); i++) {
-        if((*point)[i].Size() == 3) {
+      for(int i = 0; i < (*point).keywords(); i++) {
+        if((*point)[i].size() == 3) {
           os << (QString)(*point)[i][0] << ","
              << (QString)(*point)[i][1] << ","
              << (QString)(*point)[i][2];
@@ -123,7 +123,7 @@ void IsisMain() {
           os << (QString)(*point)[i];
         }
 
-        if(i < (*point).Keywords() - 1) {
+        if(i < (*point).keywords() - 1) {
           os << ",";
         }
       }

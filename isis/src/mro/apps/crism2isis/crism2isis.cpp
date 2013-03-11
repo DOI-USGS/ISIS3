@@ -27,8 +27,8 @@ void IsisMain() {
 
   QString prodType;
 
-  if (labelPvl.HasKeyword("PRODUCT_TYPE")) {
-    prodType = (QString)labelPvl.FindKeyword("PRODUCT_TYPE");
+  if (labelPvl.hasKeyword("PRODUCT_TYPE")) {
+    prodType = (QString)labelPvl.findKeyword("PRODUCT_TYPE");
   }
   else {
     QString msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
@@ -37,8 +37,8 @@ void IsisMain() {
 
   if (prodType.toUpper() == "MAP_PROJECTED_MULTISPECTRAL_RDR") {
     QString prodId;
-    if (labelPvl.HasKeyword("PRODUCT_ID")) {
-      prodId = (QString)labelPvl.FindKeyword("PRODUCT_ID");
+    if (labelPvl.hasKeyword("PRODUCT_ID")) {
+      prodId = (QString)labelPvl.findKeyword("PRODUCT_ID");
       prodId = prodId.mid(prodId.indexOf("_") + 1, prodId.indexOf("_"));
     }
     else {
@@ -51,11 +51,11 @@ void IsisMain() {
     //widths in the band bin group
     if (prodId.toUpper() == "MRRAL" || prodId.toUpper() == "MRRIF") {
       //If the wavelength file is specified in the label
-      if (labelPvl.HasKeyword("MRO:WAVELENGTH_FILE_NAME")) {
+      if (labelPvl.hasKeyword("MRO:WAVELENGTH_FILE_NAME")) {
         PvlGroup bandBin = PvlGroup("BandBin");
         PvlKeyword origBand = PvlKeyword("OriginalBand");
         PvlKeyword widths = PvlKeyword("Width");
-        QString tablePath = (QString)labelPvl.FindKeyword("MRO:WAVELENGTH_FILE_NAME");
+        QString tablePath = (QString)labelPvl.findKeyword("MRO:WAVELENGTH_FILE_NAME");
         tablePath = tablePath.toLower();
         FileName tableFile(inFile.path() + "/" + tablePath);
         //Check if the wavelength file exists
@@ -81,8 +81,8 @@ void IsisMain() {
           }
           delete fin;
 
-          bandBin.AddKeyword(origBand);
-          bandBin.AddKeyword(widths);
+          bandBin.addKeyword(origBand);
+          bandBin.addKeyword(widths);
           ocube->putGroup(bandBin);
         }
         //Otherwise throw an error
@@ -99,18 +99,18 @@ void IsisMain() {
       PvlGroup bandBin = PvlGroup("BandBin");
       PvlKeyword origBand = PvlKeyword("OriginalBand");
       PvlKeyword bandName = PvlKeyword("BandName");
-      PvlKeyword bandNames = labelPvl.FindObject("IMAGE").FindKeyword("BAND_NAME");
-      for (int i = 0; i < bandNames.Size(); i++) {
+      PvlKeyword bandNames = labelPvl.findObject("IMAGE").findKeyword("BAND_NAME");
+      for (int i = 0; i < bandNames.size(); i++) {
         origBand += toString(i + 1);
         bandName += bandNames[i];
       }
-      bandBin.AddKeyword(origBand);
-      bandBin.AddKeyword(bandName);
+      bandBin.addKeyword(origBand);
+      bandBin.addKeyword(bandName);
       ocube->putGroup(bandBin);
     }
     //Translate the Mapping group
     p.TranslatePdsProjection(outLabel);
-    ocube->putGroup(outLabel.FindGroup("Mapping", Pvl::Traverse));
+    ocube->putGroup(outLabel.findGroup("Mapping", Pvl::Traverse));
   }
   else if (prodType.toUpper() == "TARGETED_RDR") {
   }
@@ -118,13 +118,13 @@ void IsisMain() {
     PvlGroup bandBin = PvlGroup("BandBin");
     PvlKeyword origBand = PvlKeyword("OriginalBand");
     PvlKeyword bandName = PvlKeyword("BandName");
-    PvlKeyword bandNames = labelPvl.FindObject("FILE").FindObject("IMAGE").FindKeyword("BAND_NAME");
-    for (int i = 0; i < bandNames.Size(); i++) {
+    PvlKeyword bandNames = labelPvl.findObject("FILE").findObject("IMAGE").findKeyword("BAND_NAME");
+    for (int i = 0; i < bandNames.size(); i++) {
       origBand += toString(i + 1);
       bandName += bandNames[i];
     }
-    bandBin.AddKeyword(origBand);
-    bandBin.AddKeyword(bandName);
+    bandBin.addKeyword(origBand);
+    bandBin.addKeyword(bandName);
     ocube->putGroup(bandBin);
   }
   else {
@@ -142,8 +142,8 @@ void IsisMain() {
   PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
-  ocube->putGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
-  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
 
   p.StartProcess();
   p.EndProcess();

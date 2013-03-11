@@ -145,62 +145,62 @@ namespace Isis {
     // If the linc and sinc are not equal, then the Instrument and
     // Mapping groups are no longer valid.
     if(p_linc != p_sinc) {
-      if(inlabel.FindObject("IsisCube").HasGroup("Mapping")) {
-        inlabel.FindObject("IsisCube").DeleteGroup("Mapping");
+      if(inlabel.findObject("IsisCube").hasGroup("Mapping")) {
+        inlabel.findObject("IsisCube").deleteGroup("Mapping");
         results += PvlKeyword("MappingGroupDeleted", "True");
 
         // We don't want to think our projected cube is unprojected, so if we
         //   delete a mapping group and we have a camera there is a problem.
         //   Remove the camera.
-        if(inlabel.FindObject("IsisCube").HasGroup("Instrument")) {
-          inlabel.FindObject("IsisCube").DeleteGroup("Instrument");
+        if(inlabel.findObject("IsisCube").hasGroup("Instrument")) {
+          inlabel.findObject("IsisCube").deleteGroup("Instrument");
           results += PvlKeyword("InstrumentGroupDeleted", "True");
         }
       }
     }
 
-    if(inlabel.FindObject("IsisCube").HasGroup("Mapping")) {
+    if(inlabel.findObject("IsisCube").hasGroup("Mapping")) {
       // Update the upper left corner X,Y values if the starting line or
       // starting sample are changed.
       if(p_sl != 1 || p_ss != 1) {
         Projection &proj = *icube->projection();
         proj.SetWorld(p_ss - 0.5, p_sl - 0.5);
-        PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
-        mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(proj.XCoord())),
+        PvlGroup &mapgroup = inlabel.findObject("IsisCube").findGroup("Mapping", Pvl::Traverse);
+        mapgroup.addKeyword(PvlKeyword("UpperLeftCornerX", toString(proj.XCoord())),
                             Pvl::Replace);
-        mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerY", toString(proj.YCoord())),
+        mapgroup.addKeyword(PvlKeyword("UpperLeftCornerY", toString(proj.YCoord())),
                             Pvl::Replace);
       }
 
       // If the linc and sinc are not equal to 1, then update the
       // mapping scale and resolution.
       if(p_linc == p_sinc && p_linc != 1.0) {
-        PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
-        QString pixresUnit = mapgroup["PixelResolution"].Unit();
+        PvlGroup &mapgroup = inlabel.findObject("IsisCube").findGroup("Mapping", Pvl::Traverse);
+        QString pixresUnit = mapgroup["PixelResolution"].unit();
         double pixres = toDouble(mapgroup["PixelResolution"][0]);
         mapgroup["PixelResolution"] = toString(pixres * p_linc);
-        mapgroup["PixelResolution"].SetUnits(pixresUnit);
-        QString scaleUnit = mapgroup["Scale"].Unit();
+        mapgroup["PixelResolution"].setUnits(pixresUnit);
+        QString scaleUnit = mapgroup["Scale"].unit();
         double scale = mapgroup["Scale"];
         mapgroup["Scale"] = toString(scale / p_linc);
-        mapgroup["Scale"].SetUnits(scaleUnit);
+        mapgroup["Scale"].setUnits(scaleUnit);
       }
 
       // If the outer bounds of the image are changed, then the
       // latitude,longitude range is no longer valid.
       if(p_sl != 1 || p_ss != 1 || p_el != p_nl || p_es != p_ns) {
-        PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
-        if(mapgroup.HasKeyword("MinimumLatitude")) {
-          mapgroup.DeleteKeyword("MinimumLatitude");
+        PvlGroup &mapgroup = inlabel.findObject("IsisCube").findGroup("Mapping", Pvl::Traverse);
+        if(mapgroup.hasKeyword("MinimumLatitude")) {
+          mapgroup.deleteKeyword("MinimumLatitude");
         }
-        if(mapgroup.HasKeyword("MaximumLatitude")) {
-          mapgroup.DeleteKeyword("MaximumLatitude");
+        if(mapgroup.hasKeyword("MaximumLatitude")) {
+          mapgroup.deleteKeyword("MaximumLatitude");
         }
-        if(mapgroup.HasKeyword("MinimumLongitude")) {
-          mapgroup.DeleteKeyword("MinimumLongitude");
+        if(mapgroup.hasKeyword("MinimumLongitude")) {
+          mapgroup.deleteKeyword("MinimumLongitude");
         }
-        if(mapgroup.HasKeyword("MaximumLongitude")) {
-          mapgroup.DeleteKeyword("MaximumLongitude");
+        if(mapgroup.hasKeyword("MaximumLongitude")) {
+          mapgroup.deleteKeyword("MaximumLongitude");
         }
       }
     }
@@ -209,18 +209,18 @@ namespace Isis {
     if(ocube->hasGroup("Instrument")) {
       ocube->deleteGroup("Instrument");
     }
-    if(inlabel.FindObject("IsisCube").HasGroup("Instrument")) {
+    if(inlabel.findObject("IsisCube").hasGroup("Instrument")) {
       PvlGroup inst;
-      inst = inlabel.FindObject("IsisCube").FindGroup("Instrument");
+      inst = inlabel.findObject("IsisCube").findGroup("Instrument");
       ocube->putGroup(inst);
     }
 
     if(ocube->hasGroup("Mapping")) {
       ocube->deleteGroup("Mapping");
     }
-    if(inlabel.FindObject("IsisCube").HasGroup("Mapping")) {
+    if(inlabel.findObject("IsisCube").hasGroup("Mapping")) {
       PvlGroup mapgrp;
-      mapgrp = inlabel.FindObject("IsisCube").FindGroup("Mapping");
+      mapgrp = inlabel.findObject("IsisCube").findGroup("Mapping");
       ocube->putGroup(mapgrp);
     }
 

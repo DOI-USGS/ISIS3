@@ -14,12 +14,12 @@ int main() {
   Isis::PvlKeyword dog("DOG", toString(5.2), "meters");
   Isis::PvlKeyword cat("CATTLE");
   cat = "Meow";
-  cat.AddComment("Cats shed");
+  cat.addComment("Cats shed");
 
   Isis::PvlGroup ani("Animals");
   ani += dog;
   ani += cat;
-  ani.AddComment("/* Pets are cool");
+  ani.addComment("/* Pets are cool");
 
   cout << ani << endl;
 
@@ -84,31 +84,31 @@ int main() {
   PvlGroup pvlTmplGrp("Point_ErrorMagnitude");
   PvlKeyword pvlTmplKwrd("Point_ErrorMagnitude__Required", "false");
   pvlTmplGrp += pvlTmplKwrd;
-  pvlTmplKwrd.Clear();
+  pvlTmplKwrd.clear();
   
   pvlTmplKwrd = PvlKeyword("LessThan", "double");
   pvlTmplGrp += pvlTmplKwrd;
-  pvlTmplKwrd.Clear();
+  pvlTmplKwrd.clear();
     
   pvlTmplKwrd = PvlKeyword("LessThan__Required", "false");
   pvlTmplGrp += pvlTmplKwrd;
-  pvlTmplKwrd.Clear();
+  pvlTmplKwrd.clear();
 
   pvlTmplKwrd = PvlKeyword("LessThan__Repeated", "false");
   pvlTmplGrp += pvlTmplKwrd;
-  pvlTmplKwrd.Clear();
+  pvlTmplKwrd.clear();
     
   pvlTmplKwrd = PvlKeyword("GreaterThan", "double");
   pvlTmplGrp += pvlTmplKwrd;
-  pvlTmplKwrd.Clear();
+  pvlTmplKwrd.clear();
     
   pvlTmplKwrd = PvlKeyword("GreaterThan__Required", "true");
   pvlTmplGrp += pvlTmplKwrd;
-  pvlTmplKwrd.Clear();
+  pvlTmplKwrd.clear();
 
   pvlTmplKwrd = PvlKeyword("GreaterThan__Repeated", "true");
   pvlTmplGrp += pvlTmplKwrd;
-  pvlTmplKwrd.Clear();
+  pvlTmplKwrd.clear();
   cout << "Template Group:\n" << pvlTmplGrp << endl << endl;
   
   // PvlGroup to be Validated
@@ -116,7 +116,7 @@ int main() {
   PvlKeyword pvlKwrd("LessThan", toString(2.5));
   
   try {
-    pvlTmplGrp.ValidateGroup(pvlGrp);
+    pvlTmplGrp.validateGroup(pvlGrp);
   } 
   catch (IException &e) {
     cerr << "\n**Test1**RequiredKeyword\nResults Group:\n" << pvlGrp << endl;
@@ -126,22 +126,22 @@ int main() {
   
   // Test Repeated values
   try {
-    pvlKwrd.Clear();
+    pvlKwrd.clear();
     PvlKeyword pvlKwrd("LessThan", toString(2.5));
     pvlGrp += pvlKwrd;
     
-    pvlKwrd.Clear();
+    pvlKwrd.clear();
     pvlKwrd = PvlKeyword("GreaterThan", toString(3.5));
     pvlGrp += pvlKwrd;
     
-    pvlKwrd.Clear();
+    pvlKwrd.clear();
     pvlKwrd = PvlKeyword("GreaterThan", toString(4.4545));
     pvlGrp += pvlKwrd;
     
-    pvlKwrd.Clear();
+    pvlKwrd.clear();
     pvlKwrd = PvlKeyword("GreaterThan", toString(100.8988095));
     pvlGrp += pvlKwrd;
-    pvlTmplGrp.ValidateGroup(pvlGrp);
+    pvlTmplGrp.validateGroup(pvlGrp);
     
     cout << "\n**Test2**\nRepeated values are allowed if Repeat flag is set\n";
     cout << "Results Group:\n" << pvlGrp << endl;
@@ -153,15 +153,15 @@ int main() {
   
   // Test for unvalidated elements
   try {
-    pvlKwrd.Clear();
+    pvlKwrd.clear();
     PvlKeyword pvlKwrd("Less123Than", toString(2.5));
     pvlGrp += pvlKwrd;
     
-    pvlKwrd.Clear();
+    pvlKwrd.clear();
     pvlKwrd = PvlKeyword("GreaterThan", toString(3.5));
     pvlGrp += pvlKwrd;
 
-    pvlTmplGrp.ValidateGroup(pvlGrp);
+    pvlTmplGrp.validateGroup(pvlGrp);
     
     cout << "\n**Test3**\nUnvalidated Keywords\n";
     cout << "Results Group:\n" << pvlGrp << endl;

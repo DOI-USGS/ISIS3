@@ -318,11 +318,11 @@ void IsisMain() {
   TestOut(1, 1, 1, ProcessMosaic::UseBandPlacementCriteria, 0);
 
   cout << "********* Test imagePositions() ********" << endl;
-  for (int i = 0; i <= m11.imagePositions().Groups() - 1; i++) {
-    cout << "Name: " << m11.imagePositions().Group(i).Name() << endl;
-    cout << "File: " << m11.imagePositions().Group(i).FindKeyword("File")[0] << endl;
-    cout << "StartSample: " << m11.imagePositions().Group(i).FindKeyword("StartSample")[0] << endl;
-    cout << "StartLine: " << m11.imagePositions().Group(i).FindKeyword("StartLine")[0] << endl;
+  for (int i = 0; i <= m11.imagePositions().groups() - 1; i++) {
+    cout << "Name: " << m11.imagePositions().group(i).name() << endl;
+    cout << "File: " << m11.imagePositions().group(i).findKeyword("File")[0] << endl;
+    cout << "StartSample: " << m11.imagePositions().group(i).findKeyword("StartSample")[0] << endl;
+    cout << "StartLine: " << m11.imagePositions().group(i).findKeyword("StartLine")[0] << endl;
   }
   cout << "*************************************************************************************\n";
 

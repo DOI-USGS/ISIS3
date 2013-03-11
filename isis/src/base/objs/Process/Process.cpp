@@ -410,24 +410,24 @@ namespace Isis {
       // Transfer labels from the first input cube
       if((p_propagateLabels) && (InputCubes.size() > 0)) {
         Isis::PvlObject &incube =
-            InputCubes[0]->label()->FindObject("IsisCube");
-        Isis::PvlObject &outcube = cube->label()->FindObject("IsisCube");
-        for(int i = 0; i < incube.Groups(); i++) {
-          outcube.AddGroup(incube.Group(i));
+            InputCubes[0]->label()->findObject("IsisCube");
+        Isis::PvlObject &outcube = cube->label()->findObject("IsisCube");
+        for(int i = 0; i < incube.groups(); i++) {
+          outcube.addGroup(incube.group(i));
         }
 
-        if (InputCubes[0]->label()->HasObject("NaifKeywords")) {
-          cube->label()->AddObject(
-              InputCubes[0]->label()->FindObject("NaifKeywords"));
+        if (InputCubes[0]->label()->hasObject("NaifKeywords")) {
+          cube->label()->addObject(
+              InputCubes[0]->label()->findObject("NaifKeywords"));
         }
       }
 
       // Transfer tables from the first input cube
       if((p_propagateTables) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->label();
-        for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("Table")) {
-            Isis::Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
+        for(int i = 0; i < inlab.objects(); i++) {
+          if(inlab.object(i).isNamed("Table")) {
+            Isis::Blob t((QString)inlab.object(i)["Name"], inlab.object(i).name());
             InputCubes[0]->read(t);
             cube->write(t);
           }
@@ -437,9 +437,9 @@ namespace Isis {
       // Transfer blobs from the first input cube
       if((p_propagatePolygons) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->label();
-        for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("Polygon")) {
-            Isis::Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
+        for(int i = 0; i < inlab.objects(); i++) {
+          if(inlab.object(i).isNamed("Polygon")) {
+            Isis::Blob t((QString)inlab.object(i)["Name"], inlab.object(i).name());
             InputCubes[0]->read(t);
             cube->write(t);
           }
@@ -449,8 +449,8 @@ namespace Isis {
       // Transfer tables from the first input cube
       if((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
         Isis::Pvl &inlab = *InputCubes[0]->label();
-        for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("OriginalLabel")) {
+        for(int i = 0; i < inlab.objects(); i++) {
+          if(inlab.object(i).isNamed("OriginalLabel")) {
             Isis::OriginalLabel ol;
             InputCubes[0]->read(ol);
             cube->write(ol);
@@ -566,17 +566,17 @@ namespace Isis {
 
     // Loop for each output cube
     for(int i = 0; i < (int)OutputCubes.size(); i++) {
-      Isis::PvlObject &inCubeLabels = inLabels.FindObject("IsisCube");
+      Isis::PvlObject &inCubeLabels = inLabels.findObject("IsisCube");
 
       Isis::Pvl &outLabels(*OutputCubes[i]->label());
-      Isis::PvlObject &outCubeLabels = outLabels.FindObject("IsisCube");
+      Isis::PvlObject &outCubeLabels = outLabels.findObject("IsisCube");
 
-      for(int g = 0; g < inCubeLabels.Groups(); g++) {
-        outCubeLabels.AddGroup(inCubeLabels.Group(g));
+      for(int g = 0; g < inCubeLabels.groups(); g++) {
+        outCubeLabels.addGroup(inCubeLabels.group(g));
       }
 
-      if (inLabels.HasObject("NaifKeywords")) {
-        outLabels.AddObject(inLabels.FindObject("NaifKeywords"));
+      if (inLabels.hasObject("NaifKeywords")) {
+        outLabels.addObject(inLabels.findObject("NaifKeywords"));
       }
     }
   }
@@ -603,11 +603,11 @@ namespace Isis {
     const Pvl *fromLabels = fromCube->label();
 
     for (unsigned int i = 0; i < OutputCubes.size(); i++) {
-      for (int j = 0; j < fromLabels->Objects(); j++) {
-        const PvlObject &object = fromLabels->Object(j);
+      for (int j = 0; j < fromLabels->objects(); j++) {
+        const PvlObject &object = fromLabels->object(j);
 
-        if (object.IsNamed("Table")) {
-          Blob table((QString) object["Name"], object.Name());
+        if (object.isNamed("Table")) {
+          Blob table((QString) object["Name"], object.name());
           fromCube->read(table);
           OutputCubes[i]->write(table);
         }
@@ -665,7 +665,7 @@ namespace Isis {
    */
   QString Process::MissionData(const QString &mission, const QString &file,
                               bool highestVersion) {
-    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
     QString dir = dataDir[mission];
 
     // See if the data directory is installed
@@ -689,9 +689,9 @@ namespace Isis {
       bool addedHist = false;
       if(InputCubes.size() > 0) {
         Isis::Pvl & inlab = *InputCubes[0]->label();
-        for(int i = 0; i < inlab.Objects(); i++) {
-          if(inlab.Object(i).IsNamed("History") && Isis::iApp != NULL) {
-            Isis::History h((QString)inlab.Object(i)["Name"]);
+        for(int i = 0; i < inlab.objects(); i++) {
+          if(inlab.object(i).isNamed("History") && Isis::iApp != NULL) {
+            Isis::History h((QString)inlab.object(i)["Name"]);
             InputCubes[0]->read(h);
             h.AddEntry();
             cube.write(h);

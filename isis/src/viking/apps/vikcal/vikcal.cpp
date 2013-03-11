@@ -60,10 +60,10 @@ void IsisMain() {
   // Set up and add the radiometry group to the output cube label
   PvlGroup calgrp("Radiometry");
 
-  calgrp.AddComment("Calibration equation in vikcal");
-  calgrp.AddComment("DI(l,s) = (1.0/(exp*w1))*G(l,s)*(gain*DR(l,s)+DC(l,s)+offt+offc)");
-  calgrp.AddComment("with  w1 = w0*((dist0*dist0) / (dist1*dist1))");
-  calgrp.AddComment("and  offt(l,s) = A*l + B*l*l + C*s + D*l*s + E");
+  calgrp.addComment("Calibration equation in vikcal");
+  calgrp.addComment("DI(l,s) = (1.0/(exp*w1))*G(l,s)*(gain*DR(l,s)+DC(l,s)+offt+offc)");
+  calgrp.addComment("with  w1 = w0*((dist0*dist0) / (dist1*dist1))");
+  calgrp.addComment("and  offt(l,s) = A*l + B*l*l + C*s + D*l*s + E");
   calgrp += PvlKeyword("offc", toString(calParam->Offset()));
   calgrp += PvlKeyword("exp", toString(calParam->Exposure()));
   calgrp += PvlKeyword("gain", toString(calParam->Gain()));

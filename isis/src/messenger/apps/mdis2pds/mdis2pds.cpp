@@ -35,33 +35,33 @@ inline double SetRound(double value, const int precision) {
 
 inline void ValidateUnit(PvlKeyword &key, const QString &kunit) {
   PvlKeyword temp = key;
-  key.Clear();
-  for(int i = 0 ; i < temp.Size() ; i++) {
+  key.clear();
+  for(int i = 0 ; i < temp.size() ; i++) {
     try {
       //  If this works, check unit, otherwise an exception is thrown
       (void) toDouble(temp[i]);
-      QString unit = temp.Unit(i);
+      QString unit = temp.unit(i);
       if(unit.isEmpty()) unit = kunit;
-      key.AddValue(temp[i], unit);
+      key.addValue(temp[i], unit);
     }
     catch(...) {
-      key.AddValue(temp[i]);
+      key.addValue(temp[i]);
     }
   }
   return;
 }
 
 inline void FixUnit(PvlObject &obj, const QString &key, const QString &unit) {
-  if(obj.HasKeyword(key, PvlObject::Traverse)) {
-    ValidateUnit(obj.FindKeyword(key, PvlObject::Traverse), unit);
+  if(obj.hasKeyword(key, PvlObject::Traverse)) {
+    ValidateUnit(obj.findKeyword(key, PvlObject::Traverse), unit);
   }
   return;
 }
 
 inline void FixQuotes(PvlContainer &kcont, const QString &value = "N/A") {
   PvlContainer::PvlKeywordIterator kiter;
-  for(kiter = kcont.Begin() ; kiter != kcont.End() ; ++kiter) {
-    for(int nv = 0 ; nv < kiter->Size() ; nv++) {
+  for(kiter = kcont.begin() ; kiter != kcont.end() ; ++kiter) {
+    for(int nv = 0 ; nv < kiter->size() ; nv++) {
       if((*kiter)[nv] == value)(*kiter)[nv] = Quote((*kiter)[nv]);
     }
   }
@@ -73,13 +73,13 @@ inline void FixLabels(PvlObject &obj) {
 
   // Fix all nested objects
   PvlObject::PvlObjectIterator o;
-  for(o = obj.BeginObject() ; o != obj.EndObject() ; ++o) {
+  for(o = obj.beginObject() ; o != obj.endObject() ; ++o) {
     FixLabels(*o);
   }
 
   // Fix local groups
   PvlObject::PvlGroupIterator g;
-  for(g = obj.BeginGroup() ; g != obj.EndGroup() ; ++g) {
+  for(g = obj.beginGroup() ; g != obj.endGroup() ; ++g) {
     FixQuotes(*g);
   }
   return;
@@ -185,13 +185,13 @@ void IsisMain() {
   incube->read(origBlob);
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
-  origLabelObj.SetName("OriginalLabelObject");
-  origLabel.AddObject(origLabelObj);
+  origLabelObj.setName("OriginalLabelObject");
+  origLabel.addObject(origLabelObj);
 
   p.CheckStatus();
 
   // Translates the ISIS labels along with the original EDR labels
-  origLabel.AddObject(*(incube->label()));
+  origLabel.addObject(*(incube->label()));
   PvlTranslationManager labels(origLabel,
                                "$messenger/translations/mdisCdrLabel.trn");
   labels.Auto(pdsLabel);
@@ -199,44 +199,44 @@ void IsisMain() {
   p.CheckStatus();
 
   // Add keyword comments
-  PvlKeyword &recordType(pdsLabel.FindKeyword("RECORD_TYPE"));
-  recordType.AddComment("/*** FILE FORMAT ***/");
+  PvlKeyword &recordType(pdsLabel.findKeyword("RECORD_TYPE"));
+  recordType.addComment("/*** FILE FORMAT ***/");
 
-  PvlKeyword &image(pdsLabel.FindKeyword("^IMAGE"));
-  image.AddComment("/*** POINTERS TO START BYTE OFFSET OF OBJECTS IN IMAGE FILE ***/");
+  PvlKeyword &image(pdsLabel.findKeyword("^IMAGE"));
+  image.addComment("/*** POINTERS TO START BYTE OFFSET OF OBJECTS IN IMAGE FILE ***/");
 
-  PvlKeyword &missionName(pdsLabel.FindKeyword("MISSION_NAME"));
-  missionName.AddComment("/*** GENERAL DATA DESCRIPTION PARAMETERS ***/");
+  PvlKeyword &missionName(pdsLabel.findKeyword("MISSION_NAME"));
+  missionName.addComment("/*** GENERAL DATA DESCRIPTION PARAMETERS ***/");
 
-  PvlKeyword &startTime(pdsLabel.FindKeyword("START_TIME"));
-  startTime.AddComment("/*** TIME PARAMETERS ***/");
+  PvlKeyword &startTime(pdsLabel.findKeyword("START_TIME"));
+  startTime.addComment("/*** TIME PARAMETERS ***/");
 
-  PvlKeyword &instrumentName(pdsLabel.FindKeyword("INSTRUMENT_NAME"));
-  instrumentName.AddComment("/*** INSTRUMENT ENGINEERING PARAMETERS ***/");
+  PvlKeyword &instrumentName(pdsLabel.findKeyword("INSTRUMENT_NAME"));
+  instrumentName.addComment("/*** INSTRUMENT ENGINEERING PARAMETERS ***/");
 
-  PvlKeyword &messMetExp(pdsLabel.FindKeyword("MESS:MET_EXP"));
-  messMetExp.AddComment("/*** INSTRUMENT RAW PARAMETERS ***/");
+  PvlKeyword &messMetExp(pdsLabel.findKeyword("MESS:MET_EXP"));
+  messMetExp.addComment("/*** INSTRUMENT RAW PARAMETERS ***/");
 
-  PvlKeyword &geometry(pdsLabel.FindKeyword("RIGHT_ASCENSION"));
-  geometry.AddComment("/*** GEOMETRY INFORMATION ***/");
+  PvlKeyword &geometry(pdsLabel.findKeyword("RIGHT_ASCENSION"));
+  geometry.addComment("/*** GEOMETRY INFORMATION ***/");
 
-  PvlKeyword &target(pdsLabel.FindKeyword("SC_TARGET_POSITION_VECTOR"));
-  target.AddComment("/*** TARGET PARAMETERS ***/");
+  PvlKeyword &target(pdsLabel.findKeyword("SC_TARGET_POSITION_VECTOR"));
+  target.addComment("/*** TARGET PARAMETERS ***/");
 
-  PvlKeyword &sensor(pdsLabel.FindKeyword("SLANT_DISTANCE"));
-  sensor.AddComment("/*** TARGET WITHIN SENSOR FOV ***/");
+  PvlKeyword &sensor(pdsLabel.findKeyword("SLANT_DISTANCE"));
+  sensor.addComment("/*** TARGET WITHIN SENSOR FOV ***/");
 
-  PvlKeyword &spacecraftPosition(pdsLabel.FindKeyword("SUB_SPACECRAFT_LATITUDE"));
-  spacecraftPosition.AddComment("/*** SPACECRAFT POSITION WITH RESPECT TO CENTRAL BODY ***/");
+  PvlKeyword &spacecraftPosition(pdsLabel.findKeyword("SUB_SPACECRAFT_LATITUDE"));
+  spacecraftPosition.addComment("/*** SPACECRAFT POSITION WITH RESPECT TO CENTRAL BODY ***/");
 
-  PvlKeyword &spacecraftLocation(pdsLabel.FindKeyword("SPACECRAFT_SOLAR_DISTANCE"));
-  spacecraftLocation.AddComment("/*** SPACECRAFT LOCATION ***/");
+  PvlKeyword &spacecraftLocation(pdsLabel.findKeyword("SPACECRAFT_SOLAR_DISTANCE"));
+  spacecraftLocation.addComment("/*** SPACECRAFT LOCATION ***/");
 
-  PvlKeyword &solarDistance(pdsLabel.FindKeyword("SOLAR_DISTANCE"));
-  solarDistance.AddComment("/*** VIEWING AND LIGHTING GEOMETRY (SUN ON TARGET) ***/");
+  PvlKeyword &solarDistance(pdsLabel.findKeyword("SOLAR_DISTANCE"));
+  solarDistance.addComment("/*** VIEWING AND LIGHTING GEOMETRY (SUN ON TARGET) ***/");
 
-  PvlGroup &subframe(pdsLabel.FindGroup("SUBFRAME1_PARAMETERS"));
-  subframe.AddComment("/*** GEOMETRY FOR EACH SUBFRAME ***/");
+  PvlGroup &subframe(pdsLabel.findGroup("SUBFRAME1_PARAMETERS"));
+  subframe.addComment("/*** GEOMETRY FOR EACH SUBFRAME ***/");
 
   p.CheckStatus();
 
@@ -248,20 +248,20 @@ void IsisMain() {
 
   PvlKeyword saturated("SATURATED_PIXEL_COUNT", toString(hist->HisPixels()));
 
-  PvlObject &imageObj = pdsLabel.FindObject("IMAGE");
+  PvlObject &imageObj = pdsLabel.findObject("IMAGE");
 
-  minDn.AddComment("/*** IMAGE STATISTICS ***/");
-  imageObj.AddKeyword(minDn);
-  imageObj.AddKeyword(maxDn);
-  imageObj.AddKeyword(meanDn);
-  imageObj.AddKeyword(stddev);
-  saturated.AddComment("/*** PIXEL COUNTS ***/");
-  imageObj.AddKeyword(saturated);
-  if(imageObj.HasKeyword("DARK_STRIP_MEAN")) {
-    PvlKeyword &darkStripMean = imageObj.FindKeyword("DARK_STRIP_MEAN");
+  minDn.addComment("/*** IMAGE STATISTICS ***/");
+  imageObj.addKeyword(minDn);
+  imageObj.addKeyword(maxDn);
+  imageObj.addKeyword(meanDn);
+  imageObj.addKeyword(stddev);
+  saturated.addComment("/*** PIXEL COUNTS ***/");
+  imageObj.addKeyword(saturated);
+  if(imageObj.hasKeyword("DARK_STRIP_MEAN")) {
+    PvlKeyword &darkStripMean = imageObj.findKeyword("DARK_STRIP_MEAN");
 
     try {
-      if(darkStripMean.Size() > 0) {
+      if(darkStripMean.size() > 0) {
         darkStripMean[0] = toString(SetRound(toDouble(darkStripMean[0]), 16));
       }
     }
@@ -274,63 +274,63 @@ void IsisMain() {
   p.CheckStatus();
 
   // Fixes bad keywords
-  PvlKeyword &data_set_id = pdsLabel.FindKeyword("DATA_SET_ID", Pvl::Traverse);
-  data_set_id.SetValue(dataSetID);
-  PvlKeyword &product_id = pdsLabel.FindKeyword("PRODUCT_ID", Pvl::Traverse);
-  if((product_id.Size() == 0) || ((product_id.Size() > 0) && (product_id[0] == "N/A"))) {
-    product_id.SetValue(output.baseName());
+  PvlKeyword &data_set_id = pdsLabel.findKeyword("DATA_SET_ID", Pvl::Traverse);
+  data_set_id.setValue(dataSetID);
+  PvlKeyword &product_id = pdsLabel.findKeyword("PRODUCT_ID", Pvl::Traverse);
+  if((product_id.size() == 0) || ((product_id.size() > 0) && (product_id[0] == "N/A"))) {
+    product_id.setValue(output.baseName());
   }
-  PvlKeyword &product_creation_time = pdsLabel.FindKeyword("PRODUCT_CREATION_TIME", Pvl::Traverse);
-  product_creation_time.SetValue(mdis2pds_runtime);
+  PvlKeyword &product_creation_time = pdsLabel.findKeyword("PRODUCT_CREATION_TIME", Pvl::Traverse);
+  product_creation_time.setValue(mdis2pds_runtime);
 
-  PvlKeyword &software_name = pdsLabel.FindKeyword("SOFTWARE_NAME", Pvl::Traverse);
-  if((software_name.Size() > 0) && (software_name[0] == "N/A")) {
-    software_name.SetValue(mdis2pds_program);
+  PvlKeyword &software_name = pdsLabel.findKeyword("SOFTWARE_NAME", Pvl::Traverse);
+  if((software_name.size() > 0) && (software_name[0] == "N/A")) {
+    software_name.setValue(mdis2pds_program);
   }
 
-  PvlKeyword &software_version_id = pdsLabel.FindKeyword("SOFTWARE_VERSION_ID", Pvl::Traverse);
-  if(software_version_id.Size() > 0) {
+  PvlKeyword &software_version_id = pdsLabel.findKeyword("SOFTWARE_VERSION_ID", Pvl::Traverse);
+  if(software_version_id.size() > 0) {
     if(software_version_id[0] == "N/A") {
-      software_version_id.SetValue(Quote(mdis2pds_version));
+      software_version_id.setValue(Quote(mdis2pds_version));
     }
     else {
-      software_version_id.SetValue(software_version_id[0]);
+      software_version_id.setValue(software_version_id[0]);
     }
   }
 
-  PvlKeyword &filter_number = pdsLabel.FindKeyword("FILTER_NUMBER", Pvl::Traverse);
-  if((filter_number.Size() > 0)) {
-    filter_number.SetValue(Quote(filter_number[0]));
+  PvlKeyword &filter_number = pdsLabel.findKeyword("FILTER_NUMBER", Pvl::Traverse);
+  if((filter_number.size() > 0)) {
+    filter_number.setValue(Quote(filter_number[0]));
   }
 
 
   // Add quotes
-  PvlKeyword &data_quality_id = pdsLabel.FindKeyword("DATA_QUALITY_ID", Pvl::Traverse);
-  data_quality_id.SetValue(Quote(data_quality_id));
-  PvlKeyword &sequence_name = pdsLabel.FindKeyword("SEQUENCE_NAME", Pvl::Traverse);
-  sequence_name.SetValue(Quote(sequence_name));
+  PvlKeyword &data_quality_id = pdsLabel.findKeyword("DATA_QUALITY_ID", Pvl::Traverse);
+  data_quality_id.setValue(Quote(data_quality_id));
+  PvlKeyword &sequence_name = pdsLabel.findKeyword("SEQUENCE_NAME", Pvl::Traverse);
+  sequence_name.setValue(Quote(sequence_name));
 
-  PvlKeyword &start_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_START_COUNT", Pvl::Traverse);
-  start_count.SetValue(Quote(start_count));
-  PvlKeyword &stop_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_STOP_COUNT", Pvl::Traverse);
-  stop_count.SetValue(Quote(stop_count));
+  PvlKeyword &start_count = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT", Pvl::Traverse);
+  start_count.setValue(Quote(start_count));
+  PvlKeyword &stop_count = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT", Pvl::Traverse);
+  stop_count.setValue(Quote(stop_count));
 
-  PvlKeyword &site_id = pdsLabel.FindKeyword("SITE_ID", Pvl::Traverse);
-  site_id.SetValue(Quote(site_id));
-  PvlKeyword &source_product_id = pdsLabel.FindKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
-  for(int i = 0; i < source_product_id.Size(); i++) {
+  PvlKeyword &site_id = pdsLabel.findKeyword("SITE_ID", Pvl::Traverse);
+  site_id.setValue(Quote(site_id));
+  PvlKeyword &source_product_id = pdsLabel.findKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
+  for(int i = 0; i < source_product_id.size(); i++) {
     source_product_id[i] = Quote(source_product_id[i]);
   }
 
   //  Enforce parentheses for scalars
-  if(source_product_id.Size() == 1)
-    source_product_id.SetValue('(' + source_product_id[0] + ')');
+  if(source_product_id.size() == 1)
+    source_product_id.setValue('(' + source_product_id[0] + ')');
 
   // Removes keywords
-  PvlObject &imageObject(pdsLabel.FindObject("IMAGE"));
-  imageObject.DeleteKeyword("FILTER_NAME");
-  imageObject.DeleteKeyword("CENTER_FILTER_WAVELENGTH");
-  imageObject.DeleteKeyword("BANDWIDTH");
+  PvlObject &imageObject(pdsLabel.findObject("IMAGE"));
+  imageObject.deleteKeyword("FILTER_NAME");
+  imageObject.deleteKeyword("CENTER_FILTER_WAVELENGTH");
+  imageObject.deleteKeyword("BANDWIDTH");
 
   p.CheckStatus();
 
@@ -344,10 +344,10 @@ void IsisMain() {
   for(int i = 1 ; i <= 5 ; i++) {
     QString n(toString(i));
     QString group = "SUBFRAME" + n + "_PARAMETERS";
-    if(pdsLabel.HasGroup(group)) {
-      PvlGroup &grp = pdsLabel.FindGroup(group);
-      ValidateUnit(grp.FindKeyword("RETICLE_POINT_LATITUDE"), "DEG");
-      ValidateUnit(grp.FindKeyword("RETICLE_POINT_LONGITUDE"), "DEG");
+    if(pdsLabel.hasGroup(group)) {
+      PvlGroup &grp = pdsLabel.findGroup(group);
+      ValidateUnit(grp.findKeyword("RETICLE_POINT_LATITUDE"), "DEG");
+      ValidateUnit(grp.findKeyword("RETICLE_POINT_LONGITUDE"), "DEG");
     }
   }
 

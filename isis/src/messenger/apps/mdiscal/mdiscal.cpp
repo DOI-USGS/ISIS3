@@ -79,7 +79,7 @@ void IsisMain() {
   ProcessByLine p;
   FileName calibFile("$messenger/calibration/mdisCalibration????.trn");
   calibFile = calibFile.highestVersion();
-  configFile.Read(calibFile.expanded());
+  configFile.read(calibFile.expanded());
 
   // Initialize variables
   calibrationValues.clear();
@@ -359,75 +359,75 @@ void IsisMain() {
 
   // Log calibration activity
   PvlGroup calibrationLog("RadiometricCalibration");
-  calibrationLog.AddKeyword(PvlKeyword("SoftwareName", mdiscal_program));
-  calibrationLog.AddKeyword(PvlKeyword("SoftwareVersion", mdiscal_version));
-  calibrationLog.AddKeyword(PvlKeyword("ProcessDate", mdiscal_runtime));
-  calibrationLog.AddKeyword(PvlKeyword("DarkCurrentModel", darkCurr));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareName", mdiscal_program));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareVersion", mdiscal_version));
+  calibrationLog.addKeyword(PvlKeyword("ProcessDate", mdiscal_runtime));
+  calibrationLog.addKeyword(PvlKeyword("DarkCurrentModel", darkCurr));
 
   if (darkCurrentMode == DarkCurrentLinear) {
     QString equation = "Y = " + toString(calibrationValues[0]) + QString(" + ") + toString(calibrationValues[1]) + QString("x");
-    calibrationLog.AddKeyword(PvlKeyword("DarkCurrentEquation", (QString)equation));
+    calibrationLog.addKeyword(PvlKeyword("DarkCurrentEquation", (QString)equation));
   } else if (darkCurrentMode == DarkCurrentModel) {
-    calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkCurrentFile));
+    calibrationLog.addKeyword(PvlKeyword("DarkCurrentFile", darkCurrentFile));
   }
 
-  calibrationLog.AddKeyword(PvlKeyword("BinnedImage", toString((int)isBinnedData)));
-  calibrationLog.AddKeyword(PvlKeyword("FilterNumber", toString(filterNumber + 1)));
+  calibrationLog.addKeyword(PvlKeyword("BinnedImage", toString((int)isBinnedData)));
+  calibrationLog.addKeyword(PvlKeyword("FilterNumber", toString(filterNumber + 1)));
   if (g_flatfield) {
-    calibrationLog.AddKeyword(PvlKeyword("FlatFieldFile", flatfield.originalPath() + "/" + flatfield.name()));
-    calibrationLog.AddKeyword(PvlKeyword("CalibrationFile", calibFile.originalPath() + "/" + calibFile.name()));
-    calibrationLog.AddKeyword(PvlKeyword("ResponsivityFile", respfile));
-    calibrationLog.AddKeyword(PvlKeyword("SmearCompFile", smearfile));
+    calibrationLog.addKeyword(PvlKeyword("FlatFieldFile", flatfield.originalPath() + "/" + flatfield.name()));
+    calibrationLog.addKeyword(PvlKeyword("CalibrationFile", calibFile.originalPath() + "/" + calibFile.name()));
+    calibrationLog.addKeyword(PvlKeyword("ResponsivityFile", respfile));
+    calibrationLog.addKeyword(PvlKeyword("SmearCompFile", smearfile));
     PvlKeyword rspKey("Response", toString(rsp[0]));
     for (unsigned int i = 1; i < rsp.size(); i++) {
-      rspKey.AddValue(toString(rsp[i]));
+      rspKey.addValue(toString(rsp[i]));
     }
-    calibrationLog.AddKeyword(rspKey);
-    calibrationLog.AddKeyword(PvlKeyword("SmearComponent", toString(smearComponent)));
+    calibrationLog.addKeyword(rspKey);
+    calibrationLog.addKeyword(PvlKeyword("SmearComponent", toString(smearComponent)));
   } else {
-    calibrationLog.AddKeyword(PvlKeyword("FlatFieldFile", "N/A"));
-    calibrationLog.AddKeyword(PvlKeyword("CalibrationFile", "N/A"));
-    calibrationLog.AddKeyword(PvlKeyword("ResponsivityFile", "N/A"));
-    calibrationLog.AddKeyword(PvlKeyword("SmearCompFile", "N/A"));
+    calibrationLog.addKeyword(PvlKeyword("FlatFieldFile", "N/A"));
+    calibrationLog.addKeyword(PvlKeyword("CalibrationFile", "N/A"));
+    calibrationLog.addKeyword(PvlKeyword("ResponsivityFile", "N/A"));
+    calibrationLog.addKeyword(PvlKeyword("SmearCompFile", "N/A"));
     PvlKeyword rspKey("Response");
-    calibrationLog.AddKeyword(PvlKeyword("Response", "N/A"));
-    calibrationLog.AddKeyword(PvlKeyword("SmearComponent", "N/A"));
+    calibrationLog.addKeyword(PvlKeyword("Response", "N/A"));
+    calibrationLog.addKeyword(PvlKeyword("SmearComponent", "N/A"));
   }
 
   QString calibType;
   if (do_iof  && iof_is_good) {
-    calibrationLog.AddKeyword(PvlKeyword("Units", "I over F"));
-    calibrationLog.AddKeyword(PvlKeyword("SolarDistance", toString(solarDist), "AU"));
-    calibrationLog.AddKeyword(PvlKeyword("SolarIrrFile", solirrfile));
-    calibrationLog.AddKeyword(PvlKeyword("FilterIrradianceFactor", toString(F_f)));
-    calibrationLog.AddKeyword(PvlKeyword("IOFFactor", toString(iof)));
+    calibrationLog.addKeyword(PvlKeyword("Units", "I over F"));
+    calibrationLog.addKeyword(PvlKeyword("SolarDistance", toString(solarDist), "AU"));
+    calibrationLog.addKeyword(PvlKeyword("SolarIrrFile", solirrfile));
+    calibrationLog.addKeyword(PvlKeyword("FilterIrradianceFactor", toString(F_f)));
+    calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(iof)));
     calibType = "IF";
   } else if (g_radiometric) {
-    calibrationLog.AddKeyword(PvlKeyword("Units", "W / (m**2 micrometer sr)"));
+    calibrationLog.addKeyword(PvlKeyword("Units", "W / (m**2 micrometer sr)"));
     calibType = "RA";
   } else {
-    calibrationLog.AddKeyword(PvlKeyword("Units", "DN"));
+    calibrationLog.addKeyword(PvlKeyword("Units", "DN"));
     calibType = "DN";
   }
 
-  calibrationLog.AddKeyword(PvlKeyword("ContaminationEventFile", eventfile));
-  calibrationLog.AddKeyword(PvlKeyword("ContaminationEventDate", eventDate));
-  calibrationLog.AddKeyword(PvlKeyword("ContaminationEventFactor",
+  calibrationLog.addKeyword(PvlKeyword("ContaminationEventFile", eventfile));
+  calibrationLog.addKeyword(PvlKeyword("ContaminationEventDate", eventDate));
+  calibrationLog.addKeyword(PvlKeyword("ContaminationEventFactor",
                                        toString(eventCorrection)));
 
 
-  calibrationLog.AddKeyword(PvlKeyword("DarkStripColumns", toString(nDarkColumns)),
+  calibrationLog.addKeyword(PvlKeyword("DarkStripColumns", toString(nDarkColumns)),
                             Pvl::Replace);
-  calibrationLog.AddKeyword(PvlKeyword("ValidDarkColumns", toString(nValidDark)),
+  calibrationLog.addKeyword(PvlKeyword("ValidDarkColumns", toString(nValidDark)),
                             Pvl::Replace);
   if (darkStrip.TotalPixels() > 0) {
     double avgDark = (darkStrip.ValidPixels() > 0) ? darkStrip.Average() : 0.0;
-    calibrationLog.AddKeyword(PvlKeyword("DarkStripMean", toString(avgDark)), 
+    calibrationLog.addKeyword(PvlKeyword("DarkStripMean", toString(avgDark)), 
                                          Pvl::Replace); 
   }
 
   // Report nulled sample count
-  calibrationLog.AddKeyword(PvlKeyword("LeftSamplesNulled", toString(nSampsToNull)));
+  calibrationLog.addKeyword(PvlKeyword("LeftSamplesNulled", toString(nSampsToNull)));
 
   //  Handle updates of ProductId and SourceProduct Id keywords
   PvlGroup& archive = ocube->group("Archive");
@@ -435,13 +435,13 @@ void IsisMain() {
   QString orgProdId = key[0];
   QString newProdId = orgProdId + "_" + calibType + "_" + toString(cdr_version);
   newProdId[0] = 'C';
-  key.SetValue(Quote(newProdId));
-  archive.AddKeyword(key, Pvl::Replace);
+  key.setValue(Quote(newProdId));
+  archive.addKeyword(key, Pvl::Replace);
 
   // Now SourceProductId
-  if (archive.HasKeyword("SourceProductId")) {
+  if (archive.hasKeyword("SourceProductId")) {
     key = archive["SourceProductId"];
-    for (int i = 0; i < key.Size(); i++) {
+    for (int i = 0; i < key.size(); i++) {
       key[i] = Quote(key[i]);
     }
   } else {
@@ -449,20 +449,20 @@ void IsisMain() {
   }
 
   if (!darkCurrentFile.isEmpty()) {
-    key.AddValue(Quote(FileName(darkCurrentFile).baseName()));
+    key.addValue(Quote(FileName(darkCurrentFile).baseName()));
   }
-  key.AddValue(Quote(flatfield.baseName()));
-  key.AddValue(Quote(FileName(respfile).baseName()));
-  // key.AddValue(Quote(FileName(smearfile).baseName()));
+  key.addValue(Quote(flatfield.baseName()));
+  key.addValue(Quote(FileName(respfile).baseName()));
+  // key.addValue(Quote(FileName(smearfile).baseName()));
   if (iof_is_good) {
-    key.AddValue(Quote(FileName(solirrfile).baseName()));
+    key.addValue(Quote(FileName(solirrfile).baseName()));
   }
-  archive.AddKeyword(key, Pvl::Replace);
+  archive.addKeyword(key, Pvl::Replace);
 
   // Write Calibration group to file and log
   ocube->putGroup(calibrationLog);
   Application::Log(calibrationLog);
-  configFile.Clear();
+  configFile.clear();
 }
 
 FileName DetermineFlatFieldFile() {

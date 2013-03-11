@@ -45,7 +45,7 @@ namespace Isis {
    */
   MarciCamera::MarciCamera(Pvl &lab) : PushFrameCamera(lab) {
     NaifStatus::CheckErrors();
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // make sure it is a marci image
     if(inst["InstrumentId"][0] != "Marci") {
       string msg = "The image does not appear to be a Marci Image";
@@ -102,10 +102,10 @@ namespace Isis {
     filterToFrameletOffset.insert(pair<QString, int>("SHORT_UV", 6 * frameletOffsetFactor));
 
     // Get the keywords from labels
-    const PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+    const PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     const PvlKeyword &filtNames = bandBin["FilterName"];
 
-    for(int i = 0; i < filtNames.Size(); i++) {
+    for(int i = 0; i < filtNames.size(); i++) {
       if(filterToDetectorOffset.find(filtNames[i]) == filterToDetectorOffset.end()) {
         QString msg = "Unrecognized filter name [" + filtNames[i] + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);

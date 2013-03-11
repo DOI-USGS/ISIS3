@@ -66,7 +66,7 @@ namespace Isis {
     const int MdisWac(-236800);
     // const int MdisNac(-236820);
 
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // Clarification on MDIS subframe image mode provides us the ability to
     // support this mode now.  The entire MDIS frame is geometrically valid
@@ -96,7 +96,7 @@ namespace Isis {
     //  NAC and WAC support!
     int filterNumber(0);    //  Default appropriate for MDIS-NAC
     if(naifIkCode() == MdisWac) {
-      PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+      PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
       filterNumber = bandBin["Number"];
     }
 
@@ -318,7 +318,7 @@ namespace Isis {
         // Wrap a try clause all around this so that if it fails, will return
         // default
         try {
-          PvlGroup &inst = label.FindGroup("Instrument", Pvl::Traverse);      
+          PvlGroup &inst = label.findGroup("Instrument", Pvl::Traverse);      
           double fpTemp = inst["FocalPlaneTemperature"];
           double fl(0.0);
           QString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";

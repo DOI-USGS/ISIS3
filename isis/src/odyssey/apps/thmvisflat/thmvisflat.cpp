@@ -69,8 +69,8 @@ void IsisMain() {
   vector<int> filter;
 
   PvlKeyword &filtNums =
-      icube.label()->FindGroup("BandBin", Pvl::Traverse)["FilterNumber"];
-  for(int i = 0; i < filtNums.Size(); i++) {
+      icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterNumber"];
+  for(int i = 0; i < filtNums.size(); i++) {
     filter.push_back(toInt(filtNums[i]));
   }
 
@@ -119,17 +119,17 @@ void IsisMain() {
   while(!ocubeMgr.end());
 
   // Propagate labels and objects (in case of spice data)
-  PvlObject &inCubeObj = icube.label()->FindObject("IsisCube");
-  PvlObject &outCubeObj = ocube.label()->FindObject("IsisCube");
+  PvlObject &inCubeObj = icube.label()->findObject("IsisCube");
+  PvlObject &outCubeObj = ocube.label()->findObject("IsisCube");
 
-  for(int g = 0; g < inCubeObj.Groups(); g++) {
-    outCubeObj.AddGroup(inCubeObj.Group(g));
+  for(int g = 0; g < inCubeObj.groups(); g++) {
+    outCubeObj.addGroup(inCubeObj.group(g));
   }
 
-  for(int o = 0; o < icube.label()->Objects(); o++) {
-    if(icube.label()->Object(o).IsNamed("Table")) {
-      Blob t(icube.label()->Object(o)["Name"],
-             icube.label()->Object(o).Name());
+  for(int o = 0; o < icube.label()->objects(); o++) {
+    if(icube.label()->object(o).isNamed("Table")) {
+      Blob t(icube.label()->object(o)["Name"],
+             icube.label()->object(o).name());
       icube.read(t);
       ocube.write(t);
     }

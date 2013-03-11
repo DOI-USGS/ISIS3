@@ -25,7 +25,7 @@ namespace Isis {
 
     void MiCalibration::ReadLabels(Cube &image) {
       PvlGroup labelgrp =
-          image.label()->FindGroup("Instrument", Pvl::Traverse);
+          image.label()->findGroup("Instrument", Pvl::Traverse);
       p_exposureDuration = labelgrp["ExposureDuration"];
       p_instrumentSerialNumber = labelgrp["InstrumentSerialNumber"];
       p_CCDTemperature = toDouble(labelgrp["InstrumentTemperature"][6]);
@@ -45,7 +45,7 @@ namespace Isis {
      */
     void MiCalibration::ReadKernel(Pvl &kernel) {
       QString rover = "MI_" + toString(p_instrumentSerialNumber);
-      PvlGroup kernelgrp = kernel.FindGroup(rover, Pvl::Traverse);
+      PvlGroup kernelgrp = kernel.findGroup(rover, Pvl::Traverse);
       p_DELCCDTa = kernelgrp["DELCCDTa"];
       p_DELCCDTb = kernelgrp["DELCCDTb"];
       p_RPVOFFa = kernelgrp["RPVOFFa"];

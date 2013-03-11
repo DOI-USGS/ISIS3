@@ -22,7 +22,7 @@ void IsisMain() {
   // Get the original cubes dimensions
   UserInterface &ui = Application::GetUserInterface();
   Pvl lab;
-  lab.Read(ui.GetFileName("MAGNITUDE"));
+  lab.read(ui.GetFileName("MAGNITUDE"));
   AlphaCube acube(lab);
   int initSamples = acube.BetaSamples();
   int initLines = acube.BetaLines();

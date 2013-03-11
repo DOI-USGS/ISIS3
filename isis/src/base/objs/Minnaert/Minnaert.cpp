@@ -4,12 +4,12 @@
 
 namespace Isis {
   Minnaert::Minnaert(Pvl &pvl) : PhotoModel(pvl) {
-    PvlGroup &algo = pvl.FindObject("PhotometricModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("PhotometricModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     // Set default value
     SetPhotoK(1.0);
     // Get value from user
-    if(algo.HasKeyword("K")) SetPhotoK(algo["K"]);
+    if(algo.hasKeyword("K")) SetPhotoK(algo["K"]);
   }
 
   /**

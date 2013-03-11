@@ -30,17 +30,17 @@ namespace Isis {
   // Constructor
   SessionLog::SessionLog() {
     // Grab the user preferences for logging
-    Isis::PvlGroup &slog = Isis::Preference::Preferences().FindGroup("SessionLog");
+    Isis::PvlGroup &slog = Isis::Preference::Preferences().findGroup("SessionLog");
     p_termOutput = ((QString)slog["TerminalOutput"]).toUpper() == "ON";
     p_fileOutput = ((QString)slog["FileOutput"]).toUpper() == "ON";
     p_outputFile = (QString) slog["FileName"];
     p_access = ((QString) slog["FileAccess"]).toUpper();
 
     // Add root
-    this->AddObject(Isis::iApp->History());
+    this->addObject(Isis::iApp->History());
     p_errorAdded = false;
     p_acctAdded = false;
-    p_root = &this->Object(0);
+    p_root = &this->object(0);
 
     atexit(Shutdown);
   }
@@ -71,13 +71,13 @@ namespace Isis {
 
     // See if we should write to the print file
     if(p_fileOutput) {
-      SetTerminator("\n");
+      setTerminator("\n");
       try {
         if(p_access == "OVERWRITE") {
-          this->Isis::Pvl::Write(p_outputFile);
+          this->Isis::Pvl::write(p_outputFile);
         }
         else {
-          this->Append(p_outputFile);
+          this->append(p_outputFile);
         }
       }
       catch(...) {
@@ -86,7 +86,7 @@ namespace Isis {
                   << std::endl;
         exit(1);
       }
-      SetTerminator("End");
+      setTerminator("End");
     }
   }
 
@@ -94,16 +94,16 @@ namespace Isis {
     // Update accounting if no errors
     if(p_acctAdded) return;
     if(!p_errorAdded) {
-      p_root->AddGroup(Isis::iApp->Accounting());
+      p_root->addGroup(Isis::iApp->Accounting());
     }
     p_acctAdded = true;
   }
 
   // Add an error message
   void SessionLog::AddError(Isis::Pvl &e) {
-    for(int i = 0; i < e.Groups(); i++) {
-      if(e.Group(i).IsNamed("Error")) {
-        p_root->AddGroup(e.Group(i));
+    for(int i = 0; i < e.groups(); i++) {
+      if(e.group(i).isNamed("Error")) {
+        p_root->addGroup(e.group(i));
         p_errorAdded = true;
       }
     }
@@ -111,7 +111,7 @@ namespace Isis {
 
   // Add results from an application
   void SessionLog::AddResults(Isis::PvlGroup &results) {
-    p_root->AddGroup(results);
+    p_root->addGroup(results);
   }
 
   std::ostream &operator<<(std::ostream &os, Isis::SessionLog &log) {

@@ -49,7 +49,7 @@ namespace Isis {
 
     p_endianSwap = NULL;
 
-    SetFormat(BSQ);
+    setFormat(BSQ);
     SetOutputEndian(Isis::IsLsb() ? Isis::Lsb : Isis::Msb);
     SetOutputType(Isis::Real);
 

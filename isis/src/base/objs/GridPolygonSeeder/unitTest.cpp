@@ -29,7 +29,7 @@ int main() {
     PvlGroup alg("PolygonSeederAlgorithm");
 
     do {
-      if(!alg.HasKeyword("Name")) {
+      if(!alg.hasKeyword("Name")) {
         cout << "Test without subgrid" << endl;
         alg += PvlKeyword("Name", "Grid");
         alg += PvlKeyword("MinimumThickness", toString(0.3));
@@ -43,10 +43,10 @@ int main() {
       }
 
       PvlObject o("AutoSeed");
-      o.AddGroup(alg);
+      o.addGroup(alg);
 
       Pvl pvl;
-      pvl.AddObject(o);
+      pvl.addObject(o);
       cout << pvl << endl << endl;
 
       PolygonSeeder *ps = PolygonSeederFactory::Create(pvl);
@@ -81,8 +81,8 @@ int main() {
         // Create the projection necessary for seeding
         PvlGroup radii = TProjection::TargetRadii("MARS");
         Isis::Pvl maplab;
-        maplab.AddGroup(Isis::PvlGroup("Mapping"));
-        Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
+        maplab.addGroup(Isis::PvlGroup("Mapping"));
+        Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
         mapGroup += Isis::PvlKeyword("EquatorialRadius", radii["EquatorialRadius"]);
         mapGroup += Isis::PvlKeyword("PolarRadius", radii["PolarRadius"]);
         mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
@@ -144,8 +144,8 @@ int main() {
         // Create the projection necessary for seeding
         PvlGroup radii = TProjection::TargetRadii("MARS");
         Isis::Pvl maplab;
-        maplab.AddGroup(Isis::PvlGroup("Mapping"));
-        Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
+        maplab.addGroup(Isis::PvlGroup("Mapping"));
+        Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
         mapGroup += Isis::PvlKeyword("EquatorialRadius", radii["EquatorialRadius"]);
         mapGroup += Isis::PvlKeyword("PolarRadius", radii["PolarRadius"]);
         mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
@@ -167,7 +167,7 @@ int main() {
         e.print();
       }
     }
-    while(!alg.HasKeyword("SubGrid"));
+    while(!alg.hasKeyword("SubGrid"));
   }
   catch(IException &e) {
     e.print();

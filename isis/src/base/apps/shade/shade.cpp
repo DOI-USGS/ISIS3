@@ -37,9 +37,9 @@ void IsisMain() {
     hillshade.setResolution(ui.GetDouble("PIXELRESOL"));
   }
   else {
-    if(inCube->label()->FindObject("IsisCube").HasGroup("Mapping")) {
+    if(inCube->label()->findObject("IsisCube").hasGroup("Mapping")) {
       hillshade.setResolution(
-          inCube->label()->FindObject("IsisCube").FindGroup("Mapping")["PixelResolution"]);
+          inCube->label()->findObject("IsisCube").findGroup("Mapping")["PixelResolution"]);
     }
     else {
       QString msg = "The file [" + ui.GetFileName("FROM") + "] does not have a mapping group,"

@@ -334,12 +334,12 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
 
   // Do we have errors?
   int maxCount = 0;
-  bool errors = point->HasKeyword("Error");
+  bool errors = point->hasKeyword("Error");
   if(errors) {
-    maxCount = point->Keywords() - 1;
+    maxCount = point->keywords() - 1;
   }
   else {
-    maxCount = point->Keywords();
+    maxCount = point->keywords();
   }
 
   // If its first and not appending, write the column labels
@@ -353,13 +353,13 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
 
     // point information
     for(int i = 0; i < maxCount; i++) {
-      if((*point)[i].Size() == 3) {
-        output += QString((*point)[i].Name()) + "X,";
-        output += QString((*point)[i].Name()) + "Y,";
-        output += QString((*point)[i].Name()) + "Z,";
+      if((*point)[i].size() == 3) {
+        output += QString((*point)[i].name()) + "X,";
+        output += QString((*point)[i].name()) + "Y,";
+        output += QString((*point)[i].name()) + "Z,";
       }
       else {
-        output += QString((*point)[i].Name()) + ",";
+        output += QString((*point)[i].name()) + ",";
       }
     }
 
@@ -370,7 +370,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
     //}
 
 
-    if(errors) output += QString((*point)[maxCount].Name());
+    if(errors) output += QString((*point)[maxCount].name());
     isFirst = false;
     measureLabels += output;
     txt->PutLine(measureLabels);
@@ -387,7 +387,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
   // Write out date values
   // point information
   for(int i = 0; i < maxCount; i++) {
-    if((*point)[i].Size() == 3) {
+    if((*point)[i].size() == 3) {
       output += QString(CheckValue((*point)[i][0])) + ",";
       output += QString(CheckValue((*point)[i][1])) + ",";
       output += QString(CheckValue((*point)[i][2])) + ",";

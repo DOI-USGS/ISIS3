@@ -49,7 +49,7 @@ namespace Isis {
   LoHighCamera::LoHighCamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
     // Get the Instrument label information needed to define the camera for this frame
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString spacecraft = (QString)inst["SpacecraftName"];
     QString instId = (QString)inst["InstrumentId"];
 

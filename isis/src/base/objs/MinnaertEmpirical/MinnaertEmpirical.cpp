@@ -4,23 +4,23 @@
 
 namespace Isis {
   MinnaertEmpirical::MinnaertEmpirical(Pvl &pvl) : PhotoModel(pvl) {
-    PvlGroup &algo = pvl.FindObject("PhotometricModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("PhotometricModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     // There are no default values for the Minnaert Empirical function; if user
     // does not provide information, then an exception is thrown
-    if (algo.HasKeyword("PhaseList")) {
+    if (algo.hasKeyword("PhaseList")) {
       SetPhotoPhaseList(algo["PhaseList"]);
     } else {
       std::string msg = "The empirical Minnaert phase list was not provided by user";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    if (algo.HasKeyword("KList")) {
+    if (algo.hasKeyword("KList")) {
       SetPhotoKList(algo["KList"]);
     } else {
       std::string msg = "The empirical Minnaert k exponent list was not provided by user";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    if (algo.HasKeyword("PhaseCurveList")) {
+    if (algo.hasKeyword("PhaseCurveList")) {
       SetPhotoPhaseCurveList(algo["PhaseCurveList"]);
     } else {
       std::string msg = "The empirical Minnaert phase brightness list was not provided by user";

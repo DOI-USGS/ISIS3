@@ -84,11 +84,11 @@ namespace Isis {
       // Map Projections--A Working Manual by John P. Snyder
       
       // Try to read the mapping group
-      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
+      PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Compute and write the default center longitude if allowed and
       // necessary
-      if (!mapGroup.HasKeyword("CenterLongitude")) {
+      if (!mapGroup.hasKeyword("CenterLongitude")) {
         if (allowDefaults) {
           double centerLon = (MinimumLongitude() + MaximumLongitude()) / 2.0;
           mapGroup += PvlKeyword("CenterLongitude", toString(centerLon), "Degrees");
@@ -103,7 +103,7 @@ namespace Isis {
 
       // Compute and write the default center latitude if allowed and
       // necessary
-      if (!mapGroup.HasKeyword("CenterLatitude")) {
+      if (!mapGroup.hasKeyword("CenterLatitude")) {
         if (allowDefaults) {
           double centerLat = (MinimumLatitude() + MaximumLatitude()) / 2.0;
           mapGroup += PvlKeyword("CenterLatitude", toString(centerLat), "Degrees");

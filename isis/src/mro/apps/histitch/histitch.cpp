@@ -357,8 +357,8 @@ void IsisMain() {
         }
 
         PvlGroup stitch = results;
-        stitch.SetName("HiStitch");
-        table.Label().AddGroup(stitch);
+        stitch.setName("HiStitch");
+        table.Label().addGroup(stitch);
         ocube->write(table);
       }
     }
@@ -369,7 +369,7 @@ void IsisMain() {
   p.StartProcess(histitch);
   // All Done
   PvlGroup stitch = results;
-  stitch.SetName("HiStitch");
+  stitch.setName("HiStitch");
   ocube->putGroup(stitch);
   p.EndProcess();
   Application::Log(results);

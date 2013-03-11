@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     Isis::Pvl lab;
     Isis::PvlGroup inst("INSTRUMENT");
     inst += Isis::PvlKeyword("TargetName", "Mars");
-    lab.AddGroup(inst);
+    lab.addGroup(inst);
 
     Isis::PvlGroup kern("Kernels");
     Isis::FileName f("$base/testData/kernels");
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     kern += Isis::PvlKeyword("InstrumentPosition", dir + "moc.bsp");
     kern += Isis::PvlKeyword("InstrumentPointing", dir + "moc.bc");
     kern += Isis::PvlKeyword("Frame", "");
-    lab.AddGroup(kern);
+    lab.addGroup(kern);
 
     // Setup
     double startTime = -69382819.0;
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
          << endl << endl;
 
     Isis::Pvl lab2;
-    lab2.AddGroup(inst);
+    lab2.addGroup(inst);
 
     Isis::PvlGroup kern2("Kernels");
 
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
     kern2 += Isis::PvlKeyword("Frame", "");
     kern2 += Isis::PvlKeyword("ShapeModel",
                         "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub");
-    lab2.AddGroup(kern2);
+    lab2.addGroup(kern2);
 
     // Setup
     Isis::Sensor spi2(lab2);

@@ -134,7 +134,7 @@ void CreatePsf(Pipeline &p) {
 
   // Verify the image looks like a hirise image
   try {
-    const PvlGroup &instGrp = fromCube.label()->FindGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &instGrp = fromCube.label()->findGroup("Instrument", Pvl::Traverse);
     QString instrument = (QString)instGrp["InstrumentId"];
 
     if(instrument != "HIRISE") {
@@ -158,7 +158,7 @@ void CreatePsf(Pipeline &p) {
 
   // Let's figure out which point spread function we're supposed to be using
   QString psfFile = "$mro/calibration/psf/PSF_";
-  QString filter = (QString)fromCube.label()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
+  QString filter = (QString)fromCube.label()->findGroup("Instrument", Pvl::Traverse)["CcdId"];
 
   if(filter.contains("RED")) {
     psfFile += "RED";

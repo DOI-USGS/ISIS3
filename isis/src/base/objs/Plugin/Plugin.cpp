@@ -54,7 +54,7 @@ namespace Isis {
    */
   void *Plugin::GetPlugin(const QString &group) {
     // Get the library and plugin to load
-    PvlGroup &g = FindGroup(group);
+    PvlGroup &g = findGroup(group);
     QString library = g["Library"];
 
     QString path = "./";

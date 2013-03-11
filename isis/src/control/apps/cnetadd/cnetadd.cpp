@@ -65,7 +65,7 @@ void IsisMain() {
     logFile = ui.GetFileName("LOG");
   }
   Pvl results;
-  results.SetName("cnetadd_Results");
+  results.setName("cnetadd_Results");
   PvlKeyword added("FilesAdded");
   PvlKeyword omitted("FilesOmitted");
   PvlKeyword pointsModified("PointsModified");
@@ -95,7 +95,7 @@ void IsisMain() {
 
       // Check for duplicate SNs accross the lists
       if (fromSerials->HasSerialNumber(addSerials.SerialNumber(i))) {
-        duplicates.AddValue(addSerials.FileName(i));
+        duplicates.addValue(addSerials.FileName(i));
       }
 
       // Check for duplicate SNs within the addlist
@@ -250,7 +250,7 @@ void IsisMain() {
 
     if (log) {
       PvlKeyword &logKeyword = (imageAdded) ? added : omitted;
-      logKeyword.AddValue(addList[img].baseName());
+      logKeyword.addValue(addList[img].baseName());
     }
 
     progress.CheckStatus();
@@ -262,14 +262,14 @@ void IsisMain() {
     for (int i = 0; i < modifiedPointsList.size(); i++)
       pointsModified += modifiedPointsList[i];
 
-    results.AddKeyword(added);
-    results.AddKeyword(omitted);
-    results.AddKeyword(pointsModified);
-    if (duplicates.Size() > 0) {
-      results.AddKeyword(duplicates);
+    results.addKeyword(added);
+    results.addKeyword(omitted);
+    results.addKeyword(pointsModified);
+    if (duplicates.size() > 0) {
+      results.addKeyword(duplicates);
     }
 
-    results.Write(logFile.expanded());
+    results.write(logFile.expanded());
   }
 
   // List the modified points

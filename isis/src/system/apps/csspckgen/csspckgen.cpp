@@ -24,7 +24,7 @@ void IsisMain() {
 
   // Read PCK DB file into a PVL and search the PVL for the main object
   Pvl db(inputName.expanded());
-  PvlObject &main = db.FindObject("TargetAttitudeShape");
+  PvlObject &main = db.findObject("TargetAttitudeShape");
 
   // Add a timestamp for when this file was created
   PvlObject latestMain("TargetAttitudeShape");
@@ -38,19 +38,19 @@ void IsisMain() {
   dependencies += PvlKeyword("LeapsecondKernel", lskString);
   latestMain += dependencies;
 
-  for (int g = 0; g < main.Groups(); g++) {
-    PvlGroup &group = main.Group(g);
+  for (int g = 0; g < main.groups(); g++) {
+    PvlGroup &group = main.group(g);
 
     // Look for Selection groups with date-versioned filenames
-    if (group.IsNamed("Selection")) {
+    if (group.isNamed("Selection")) {
       // Copy the Selection group in case we need to replace one or more
       // date-versioned filenames
       PvlGroup latestGroup = group;
 
       bool hasDateVersioning = false;
-      for (int k = 0; k < group.Keywords(); k++) {
+      for (int k = 0; k < group.keywords(); k++) {
         PvlKeyword &keyword = group[k];
-        if (keyword.IsNamed("File")) {
+        if (keyword.isNamed("File")) {
           FileName pckName(keyword[0]);
           if (pckName.isDateVersioned()) {
             pckName = pckName.highestVersion();
@@ -70,16 +70,16 @@ void IsisMain() {
       // the PVL
       if (hasDateVersioning) {
         // Add back the date-versioned path for new versions of Isis
-        latestMain.AddGroup(group);
+        latestMain.addGroup(group);
 
         // Add comment specifying that this PCK is hardcoded for legacy support
         QString comment = "This PCK is hardcoded to support versions of "
           "Isis prior to v3.3.2";
-        latestGroup.AddComment(comment);
+        latestGroup.addComment(comment);
 
         // Add the direct path to the DB file to support older versions of Isis
         // that do not support date-versioned filenames
-        latestMain.AddGroup(latestGroup);
+        latestMain.addGroup(latestGroup);
       }
     }
   }
@@ -97,7 +97,7 @@ void IsisMain() {
 
   // Write the updated PVL as the new PCK DB file
   Pvl latestDb;
-  latestDb.AddObject(latestMain);
-  latestDb.Write(outputName.expanded());
+  latestDb.addObject(latestMain);
+  latestDb.write(outputName.expanded());
 }
 

@@ -34,12 +34,12 @@ void IsisMain() {
   Pvl kernelDb(dbFileName.expanded());
 
   // Get our main objects
-  PvlObject &position = kernelDb.FindObject("SpacecraftPosition");
+  PvlObject &position = kernelDb.findObject("SpacecraftPosition");
 
   // Pull out the reconstructed group and set the ending time to our orbit
   // cutoff
-  PvlGroup &reconstructed = position.FindGroup("Selection");
-  PvlKeyword &time = reconstructed[reconstructed.Keywords() - 3];
+  PvlGroup &reconstructed = position.findGroup("Selection");
+  PvlKeyword &time = reconstructed[reconstructed.keywords() - 3];
   QString reconstructedEnd = time[1];
   time[1] = convertUtcToTdb(ui.GetString("TIME"));
 
@@ -50,16 +50,16 @@ void IsisMain() {
   PvlKeyword predictedTime("Time");
   predictedTime += time[1];
   predictedTime += reconstructedEnd;
-  predicted.AddKeyword(predictedTime);
+  predicted.addKeyword(predictedTime);
 
   PvlKeyword predictedFile("File");
-  predictedFile += reconstructed.FindKeyword("File")[0];
-  predicted.AddKeyword(predictedFile);
+  predictedFile += reconstructed.findKeyword("File")[0];
+  predicted.addKeyword(predictedFile);
 
-  predicted.AddKeyword(PvlKeyword("Type", "Predicted"));
+  predicted.addKeyword(PvlKeyword("Type", "Predicted"));
 
   // Add the modified predicted group to the new DB file
-  position.AddGroup(predicted);
+  position.addGroup(predicted);
 
   // Get the output filename, either user-specified or the latest version for
   // the kernels area (as run by makedb)
@@ -72,7 +72,7 @@ void IsisMain() {
   }
 
   // Write the updated PVL as the new SPK DB file
-  kernelDb.Write(outDBfile.expanded());
+  kernelDb.write(outDBfile.expanded());
 }
 
 

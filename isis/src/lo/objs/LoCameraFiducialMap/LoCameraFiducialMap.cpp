@@ -52,7 +52,7 @@ namespace Isis {
       PvlKeyword &fXs = inst["FiducialXCoordinates"];
       PvlKeyword &fYs = inst["FiducialYCoordinates"];
 
-      for(int i = 0; i < fSamps.Size(); i++) {
+      for(int i = 0; i < fSamps.size(); i++) {
         p_fidSamples.push_back(toDouble(fSamps[i]));
         p_fidLines.push_back(toDouble(fLines[i]));
         p_fidXCoords.push_back(toDouble(fXs[i]));

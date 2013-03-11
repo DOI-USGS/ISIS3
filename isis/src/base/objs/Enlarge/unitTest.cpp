@@ -33,7 +33,7 @@ void IsisMain() {
   p.StartProcess(*trans, *interp);
   trans->UpdateOutputLabel(outCube);
   Pvl *outLabel = outCube->label();
-  outLabel->DeleteObject("History");
+  outLabel->deleteObject("History");
   cerr << *outLabel;
   p.EndProcess();
 

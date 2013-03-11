@@ -90,7 +90,7 @@ void IsisMain() {
 
   //  Print out number of values changed
   PvlGroup results("Results");
-  results.AddComment("The number and type of pixels created");
+  results.addComment("The number and type of pixels created");
   results += PvlKeyword("Null", toString(nnull));
   results += PvlKeyword("Lrs", toString(nlrs));
   results += PvlKeyword("Lis", toString(nlis));

@@ -64,7 +64,7 @@ void IsisMain() {
   PvlGroup inst = mcube->group("Instrument");
   PvlGroup fromInst = icube->group("Instrument");
   QString groupName = (QString) inst["SpacecraftName"] + "/";
-  groupName += (QString) inst.FindKeyword("InstrumentId");
+  groupName += (QString) inst.findKeyword("InstrumentId");
 
   // Get Ideal camera specifications
   FileName specs;
@@ -76,21 +76,21 @@ void IsisMain() {
     specs = specs.highestVersion();
   }
   Pvl idealSpecs(specs.expanded());
-  PvlObject obSpecs = idealSpecs.FindObject("IdealInstrumentsSpecifications");
+  PvlObject obSpecs = idealSpecs.findObject("IdealInstrumentsSpecifications");
 
-  PvlGroup idealGp = obSpecs.FindGroup(groupName);
+  PvlGroup idealGp = obSpecs.findGroup(groupName);
   double transx, transy, transl, transs;
   transx = transy = transl = transs = 0.;
-  if(idealGp.HasKeyword("TransX")) transx = idealGp["TransX"];
-  if(idealGp.HasKeyword("TransY")) transy = idealGp["TransY"];
-  if(idealGp.HasKeyword("ItransL")) transl = idealGp["ItransL"];
-  if(idealGp.HasKeyword("ItransS")) transs = idealGp["ItransS"];
+  if(idealGp.hasKeyword("TransX")) transx = idealGp["TransX"];
+  if(idealGp.hasKeyword("TransY")) transy = idealGp["TransY"];
+  if(idealGp.hasKeyword("ItransL")) transl = idealGp["ItransL"];
+  if(idealGp.hasKeyword("ItransS")) transs = idealGp["ItransS"];
   int detectorSamples = mcube->sampleCount();
-  if(idealGp.HasKeyword("DetectorSamples")) detectorSamples = idealGp["DetectorSamples"];
+  if(idealGp.hasKeyword("DetectorSamples")) detectorSamples = idealGp["DetectorSamples"];
   int numberLines = mcube->lineCount();
   int numberBands = mcube->bandCount();
 
-  if(idealGp.HasKeyword("DetectorLines")) numberLines = idealGp["DetectorLines"];
+  if(idealGp.hasKeyword("DetectorLines")) numberLines = idealGp["DetectorLines"];
 
   int xDepend = incam->FocalPlaneMap()->FocalPlaneXDependency();
 
@@ -169,13 +169,13 @@ void IsisMain() {
   // Extract the times and the target from the instrument group
   QString startTime = inst["StartTime"];
   QString stopTime;
-  if(inst.HasKeyword("StopTime")) stopTime = (QString) inst["StopTime"];
+  if(inst.hasKeyword("StopTime")) stopTime = (QString) inst["StopTime"];
 
   QString target = inst["TargetName"];
 
   // rename the instrument groups
-  inst.SetName("OriginalInstrument");
-  fromInst.SetName("OriginalInstrument");
+  inst.setName("OriginalInstrument");
+  fromInst.setName("OriginalInstrument");
 
   // add it back to the IsisCube object under a new group name
   ocube->putGroup(inst);
@@ -184,113 +184,113 @@ void IsisMain() {
   ocube->deleteGroup("Instrument");
 
   // Now rename the group back to the Instrument group and clear out old keywords
-  inst.SetName("Instrument");
-  inst.Clear();
+  inst.setName("Instrument");
+  inst.clear();
 
   // Add keywords for the "Ideal" instrument
   Isis::PvlKeyword key("SpacecraftName", "IdealSpacecraft");
-  inst.AddKeyword(key);
+  inst.addKeyword(key);
 
-  key.SetName("InstrumentId");
-  key.SetValue("IdealCamera");
-  inst.AddKeyword(key);
+  key.setName("InstrumentId");
+  key.setValue("IdealCamera");
+  inst.addKeyword(key);
 
-  key.SetName("TargetName");
-  key.SetValue(target);
-  inst.AddKeyword(key);
+  key.setName("TargetName");
+  key.setValue(target);
+  inst.addKeyword(key);
 
-  key.SetName("SampleDetectors");
-  key.SetValue(Isis::toString(detectorSamples));
-  inst.AddKeyword(key);
+  key.setName("SampleDetectors");
+  key.setValue(Isis::toString(detectorSamples));
+  inst.addKeyword(key);
 
-  key.SetName("LineDetectors");
-  key.SetValue(Isis::toString(detectorLines));
-  inst.AddKeyword(key);
+  key.setName("LineDetectors");
+  key.setValue(Isis::toString(detectorLines));
+  inst.addKeyword(key);
 
-  key.SetName("InstrumentType");
-  key.SetValue(instType);
-  inst.AddKeyword(key);
+  key.setName("InstrumentType");
+  key.setValue(instType);
+  inst.addKeyword(key);
 
   Pvl &ocubeLabel = *ocube->label();
   PvlObject *naifKeywordsObject = NULL;
 
-  if (ocubeLabel.HasObject("NaifKeywords")) {
-    naifKeywordsObject = &ocubeLabel.FindObject("NaifKeywords");
+  if (ocubeLabel.hasObject("NaifKeywords")) {
+    naifKeywordsObject = &ocubeLabel.findObject("NaifKeywords");
 
     // Clean up the naif keywords object... delete everything that isn't a radii
-    for (int keyIndex = naifKeywordsObject->Keywords() - 1; keyIndex >= 0; keyIndex--) {
-      QString keyName = (*naifKeywordsObject)[keyIndex].Name();
+    for (int keyIndex = naifKeywordsObject->keywords() - 1; keyIndex >= 0; keyIndex--) {
+      QString keyName = (*naifKeywordsObject)[keyIndex].name();
       
       if (!keyName.contains("RADII")) {
-        naifKeywordsObject->DeleteKeyword(keyIndex);
+        naifKeywordsObject->deleteKeyword(keyIndex);
       }
     }
 
     // Clean up the kernels group... delete everything that isn't internalized or the orig frame
     //   code
     PvlGroup &kernelsGroup = ocube->group("Kernels");
-    for (int keyIndex = kernelsGroup.Keywords() - 1; keyIndex >= 0; keyIndex--) {
+    for (int keyIndex = kernelsGroup.keywords() - 1; keyIndex >= 0; keyIndex--) {
       PvlKeyword &kernelsKeyword = kernelsGroup[keyIndex];
 
       bool isTable = false;
-      bool isFrameCode = kernelsKeyword.IsNamed("NaifFrameCode") ||
-                         kernelsKeyword.IsNamed("NaifIkCode");
-      bool isShapeModel = kernelsKeyword.IsNamed("ShapeModel");
+      bool isFrameCode = kernelsKeyword.isNamed("NaifFrameCode") ||
+                         kernelsKeyword.isNamed("NaifIkCode");
+      bool isShapeModel = kernelsKeyword.isNamed("ShapeModel");
 
-      for (int keyValueIndex = 0; keyValueIndex < kernelsKeyword.Size(); keyValueIndex++) {
+      for (int keyValueIndex = 0; keyValueIndex < kernelsKeyword.size(); keyValueIndex++) {
         if (kernelsKeyword[keyValueIndex] == "Table") {
           isTable = true;
         }
       }
 
       if (!isTable && !isFrameCode && !isShapeModel) {
-        kernelsGroup.DeleteKeyword(keyIndex);
+        kernelsGroup.deleteKeyword(keyIndex);
       }
     }
   }
 
   if (naifKeywordsObject) {
-    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_FOCAL_LENGTH", toString(incam->FocalLength())),
+    naifKeywordsObject->addKeyword(PvlKeyword("IDEAL_FOCAL_LENGTH", toString(incam->FocalLength())),
                                    Pvl::Replace);
   }
   else {
-    inst.AddKeyword(PvlKeyword("FocalLength", toString(incam->FocalLength()), "millimeters"));
+    inst.addKeyword(PvlKeyword("FocalLength", toString(incam->FocalLength()), "millimeters"));
   }
 
   double newPixelPitch = incam->PixelPitch() * ui.GetDouble("SUMMINGMODE");
   if (naifKeywordsObject) {
-    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", toString(newPixelPitch)),
+    naifKeywordsObject->addKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", toString(newPixelPitch)),
                                    Pvl::Replace);
   }
   else {
-    inst.AddKeyword(PvlKeyword("PixelPitch", toString(newPixelPitch), "millimeters"));
+    inst.addKeyword(PvlKeyword("PixelPitch", toString(newPixelPitch), "millimeters"));
   }
 
-  key.SetName("EphemerisTime");
-  key.SetValue(Isis::toString(et), "seconds");
-  inst.AddKeyword(key);
+  key.setName("EphemerisTime");
+  key.setValue(Isis::toString(et), "seconds");
+  inst.addKeyword(key);
 
-  key.SetName("StartTime");
-  key.SetValue(startTime);
-  inst.AddKeyword(key);
+  key.setName("StartTime");
+  key.setValue(startTime);
+  inst.addKeyword(key);
 
   if(stopTime != "") {
-    key.SetName("StopTime");
-    key.SetValue(stopTime);
-    inst.AddKeyword(key);
+    key.setName("StopTime");
+    key.setValue(stopTime);
+    inst.addKeyword(key);
   }
 
-  key.SetName("FocalPlaneXDependency");
-  key.SetValue(toString((int)incam->FocalPlaneMap()->FocalPlaneXDependency()));
-  inst.AddKeyword(key);
+  key.setName("FocalPlaneXDependency");
+  key.setValue(toString((int)incam->FocalPlaneMap()->FocalPlaneXDependency()));
+  inst.addKeyword(key);
 
   int xDependency = incam->FocalPlaneMap()->FocalPlaneXDependency();
 
   double newInstrumentTransX = incam->FocalPlaneMap()->SignMostSigX();
-  inst.AddKeyword(PvlKeyword("TransX", toString(newInstrumentTransX)));
+  inst.addKeyword(PvlKeyword("TransX", toString(newInstrumentTransX)));
 
   double newInstrumentTransY = incam->FocalPlaneMap()->SignMostSigY();
-  inst.AddKeyword(PvlKeyword("TransY", toString(newInstrumentTransY)));
+  inst.addKeyword(PvlKeyword("TransY", toString(newInstrumentTransY)));
 
   storeSpice(&inst, naifKeywordsObject, "TransX0", "IDEAL_TRANSX", transx,
              newPixelPitch * newInstrumentTransX, (xDependency == CameraFocalPlaneMap::Sample));
@@ -311,14 +311,14 @@ void IsisMain() {
              transl, transLXCoefficient, (xDependency == CameraFocalPlaneMap::Line));
 
   if(instType == "LINESCAN") {
-    key.SetName("ExposureDuration");
-    key.SetValue(Isis::toString(incam->DetectorMap()->LineRate() * 1000.), "milliseconds");
-    inst.AddKeyword(key);
+    key.setName("ExposureDuration");
+    key.setValue(Isis::toString(incam->DetectorMap()->LineRate() * 1000.), "milliseconds");
+    inst.addKeyword(key);
   }
 
-  key.SetName("MatchedCube");
-  key.SetValue(mcube->fileName());
-  inst.AddKeyword(key);
+  key.setName("MatchedCube");
+  key.setValue(mcube->fileName());
+  inst.addKeyword(key);
 
   ocube->putGroup(inst);
 
@@ -327,12 +327,12 @@ void IsisMain() {
 // Now adjust the label to fake the true size of the image to match without
 // taking all the space it would require for the image data
   Pvl label;
-  label.Read("match.lbl");
-  PvlGroup &dims = label.FindGroup("Dimensions", Pvl::Traverse);
+  label.read("match.lbl");
+  PvlGroup &dims = label.findGroup("Dimensions", Pvl::Traverse);
   dims["Lines"] = toString(numberLines);
   dims["Samples"] = toString(detectorSamples);
   dims["Bands"] = toString(numberBands);
-  label.Write("match.lbl");
+  label.write("match.lbl");
 
 // And run cam2cam to apply the transformation
   QString parameters;
@@ -360,9 +360,9 @@ void IsisMain() {
   toCube.open(ui.GetFileName("TO"), "rw");
 // Extract label and create cube object
   Pvl *toLabel = toCube.label();
-  PvlObject &o = toLabel->FindObject("IsisCube");
-  o.DeleteGroup("OriginalInstrument");
-  o.AddGroup(fromInst);
+  PvlObject &o = toLabel->findObject("IsisCube");
+  o.deleteGroup("OriginalInstrument");
+  o.addGroup(fromInst);
   toCube.close();
 }
 
@@ -396,7 +396,7 @@ void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
                 QString oldName, QString spiceName,
                 double constantCoeff, double multiplierCoeff, bool putMultiplierInX) {
   if(constantCoeff != 0 && !naifKeywordsObject && instrumentGroup) {
-    instrumentGroup->AddKeyword(PvlKeyword(oldName, toString(constantCoeff)));
+    instrumentGroup->addKeyword(PvlKeyword(oldName, toString(constantCoeff)));
   }
   else if (naifKeywordsObject) {
     PvlKeyword spiceKeyword(spiceName);
@@ -411,7 +411,7 @@ void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
       spiceKeyword += toString(multiplierCoeff);
     }
 
-    naifKeywordsObject->AddKeyword(spiceKeyword, Pvl::Replace);
+    naifKeywordsObject->addKeyword(spiceKeyword, Pvl::Replace);
   }
 }
 

@@ -152,15 +152,15 @@ namespace Isis {
     if (m_controlNetFile == "Null")
       m_controlNetFile = "";
 
-    if (obj.HasKeyword("Movement")) {
+    if (obj.hasKeyword("Movement")) {
       m_movementArrowColorSource = fromMovementColorSourceString(obj["Movement"]);
     }
 
-    if (obj.HasKeyword("MovementColorMaxMeasureCount")) {
+    if (obj.hasKeyword("MovementColorMaxMeasureCount")) {
       m_measureCount = toInt(obj["MovementColorMaxMeasureCount"][0]);
     }
 
-    if (obj.HasKeyword("MovementColorMaxResidualMagnitude")) {
+    if (obj.hasKeyword("MovementColorMaxResidualMagnitude")) {
       m_residualMagnitude = toDouble(obj["MovementColorMaxResidualMagnitude"][0]);
     }
 

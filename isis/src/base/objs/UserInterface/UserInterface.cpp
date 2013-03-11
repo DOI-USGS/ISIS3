@@ -478,7 +478,7 @@ namespace Isis {
       LoadBatchList(value);
     }
     else if(name == "-LAST") {
-      PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
+      PvlGroup &grp = p.findGroup("UserInterface", Isis::Pvl::Traverse);
       QString histFile = grp["HistoryPath"][0] + "/" + FileName(
                            p_progName).name() + ".par";
 
@@ -488,7 +488,7 @@ namespace Isis {
       LoadHistory(value);
     }
     else if(name == "-WEBHELP") {
-      Isis::PvlGroup &pref = Isis::Preference::Preferences().FindGroup(
+      Isis::PvlGroup &pref = Isis::Preference::Preferences().findGroup(
                                "UserInterface");
       QString command = pref["GuiHelpBrowser"];
       command += " $ISISROOT/doc/Application/presentation/Tabbed/";
@@ -508,7 +508,7 @@ namespace Isis {
     else if(name == "-HELP") {
       if(value.size() == 0) {
         Pvl params;
-        params.SetTerminator("");
+        params.setTerminator("");
         for(int k = 0; k < NumGroups(); k ++) {
           for(int j = 0; j < NumParams(k); j ++) {
             if(ParamListSize(k, j) == 0) {
@@ -520,9 +520,9 @@ namespace Isis {
               QString def = ParamDefault(k, j);
               for(int l = 0; l < ParamListSize(k, j); l ++) {
                 if(ParamListValue(k, j, l) == def)
-                  key.AddValue("*" + def);
+                  key.addValue("*" + def);
                 else
-                  key.AddValue(ParamListValue(k, j, l));
+                  key.addValue(ParamListValue(k, j, l));
               }
               params += key;
             }
@@ -532,7 +532,7 @@ namespace Isis {
       }
       else {
         Pvl param;
-        param.SetTerminator("");
+        param.setTerminator("");
         QString key = value;
         for(int k = 0; k < NumGroups(); k ++) {
           for(int j = 0; j < NumParams(k); j ++) {
@@ -574,7 +574,7 @@ namespace Isis {
               if(ParamLessThanSize(k, j) > 0) {
                 PvlKeyword key("LessThan");
                 for(int l = 0; l < ParamLessThanSize(k, j); l ++) {
-                  key.AddValue(ParamLessThan(k, j, l));
+                  key.addValue(ParamLessThan(k, j, l));
                 }
                 param += key;
               }
@@ -582,7 +582,7 @@ namespace Isis {
                 PvlKeyword key("LessThanOrEqual");
                 for(int l = 0; l < ParamLessThanOrEqualSize(
                       k, j); l ++) {
-                  key.AddValue(
+                  key.addValue(
                     ParamLessThanOrEqual(k, j, l));
                 }
                 param += key;
@@ -590,7 +590,7 @@ namespace Isis {
               if(ParamNotEqualSize(k, j) > 0) {
                 PvlKeyword key("NotEqual");
                 for(int l = 0; l < ParamNotEqualSize(k, j); l ++) {
-                  key.AddValue(ParamNotEqual(k, j, l));
+                  key.addValue(ParamNotEqual(k, j, l));
                 }
                 param += key;
               }
@@ -598,7 +598,7 @@ namespace Isis {
                 PvlKeyword key("GreaterThan");
                 for(int l = 0; l
                     < ParamGreaterThanSize(k, j); l ++) {
-                  key.AddValue(ParamGreaterThan(k, j, l));
+                  key.addValue(ParamGreaterThan(k, j, l));
                 }
                 param += key;
               }
@@ -606,7 +606,7 @@ namespace Isis {
                 PvlKeyword key("GreaterThanOrEqual");
                 for(int l = 0; l
                     < ParamGreaterThanOrEqualSize(k, j); l ++) {
-                  key.AddValue(ParamGreaterThanOrEqual(k,
+                  key.addValue(ParamGreaterThanOrEqual(k,
                                                        j, l));
                 }
                 param += key;
@@ -614,14 +614,14 @@ namespace Isis {
               if(ParamIncludeSize(k, j) > 0) {
                 PvlKeyword key("Inclusions");
                 for(int l = 0; l < ParamIncludeSize(k, j); l ++) {
-                  key.AddValue(ParamInclude(k, j, l));
+                  key.addValue(ParamInclude(k, j, l));
                 }
                 param += key;
               }
               if(ParamExcludeSize(k, j) > 0) {
                 PvlKeyword key("Exclusions");
                 for(int l = 0; l < ParamExcludeSize(k, j); l ++) {
-                  key.AddValue(ParamExclude(k, j, l));
+                  key.addValue(ParamExclude(k, j, l));
                 }
                 param += key;
               }
@@ -637,7 +637,7 @@ namespace Isis {
                     PvlKeyword include("Inclusions");
                     for(int m = 0; m
                         < ParamListIncludeSize(k, j, l); m ++) {
-                      include.AddValue(ParamListInclude(
+                      include.addValue(ParamListInclude(
                                          k, j, l, m));
                     }
                     grp += include;
@@ -646,12 +646,12 @@ namespace Isis {
                     PvlKeyword exclude("Exclusions");
                     for(int m = 0; m
                         < ParamListExcludeSize(k, j, l); m ++) {
-                      exclude.AddValue(ParamListExclude(
+                      exclude.addValue(ParamListExclude(
                                          k, j, l, m));
                     }
                     grp += exclude;
                   }
-                  param.AddGroup(grp);
+                  param.addGroup(grp);
                 }
               }
               cout << param;
@@ -706,15 +706,15 @@ namespace Isis {
     }
     else if(name == "-LOG") {
       if(value.isEmpty()) {
-        p.FindGroup("SessionLog")["FileOutput"].SetValue("On");
+        p.findGroup("SessionLog")["FileOutput"].setValue("On");
       }
       else {
-        p.FindGroup("SessionLog")["FileOutput"].SetValue("On");
-        p.FindGroup("SessionLog")["FileName"].SetValue(value);
+        p.findGroup("SessionLog")["FileOutput"].setValue("On");
+        p.findGroup("SessionLog")["FileName"].setValue(value);
       }
     }
     else if(name == "-VERBOSE") {
-      p.FindGroup("SessionLog")["TerminalOutput"].SetValue("On");
+      p.findGroup("SessionLog")["TerminalOutput"].setValue("On");
     }
 
     // Can't have a parent id and the gui
@@ -806,15 +806,15 @@ namespace Isis {
       try {
         Isis::Pvl lab(hist.expanded());
 
-        int g = lab.Groups() - 1;
-        if(g >= 0 && lab.Group(g).IsNamed("UserParameters")) {
-          Isis::PvlGroup &up = lab.Group(g);
-          for(int k = 0; k < up.Keywords(); k ++) {
-            QString keyword = up[k].Name();
+        int g = lab.groups() - 1;
+        if(g >= 0 && lab.group(g).isNamed("UserParameters")) {
+          Isis::PvlGroup &up = lab.group(g);
+          for(int k = 0; k < up.keywords(); k ++) {
+            QString keyword = up[k].name();
 
             vector<QString> values;
 
-            for(int i = 0; i < up[k].Size(); i++) {
+            for(int i = 0; i < up[k].size(); i++) {
               values.push_back(up[k][i]);
             }
 
@@ -840,14 +840,14 @@ namespace Isis {
           return;
         }
 
-        for(int o = lab.Objects() - 1; o >= 0; o --) {
-          if(lab.Object(o).IsNamed(ProgramName())) {
-            Isis::PvlObject &obj = lab.Object(o);
-            for(int g = obj.Groups() - 1; g >= 0; g --) {
-              Isis::PvlGroup &up = obj.Group(g);
-              if(up.IsNamed("UserParameters")) {
-                for(int k = 0; k < up.Keywords(); k ++) {
-                  QString keyword = up[k].Name();
+        for(int o = lab.objects() - 1; o >= 0; o --) {
+          if(lab.object(o).isNamed(ProgramName())) {
+            Isis::PvlObject &obj = lab.object(o);
+            for(int g = obj.groups() - 1; g >= 0; g --) {
+              Isis::PvlGroup &up = obj.group(g);
+              if(up.isNamed("UserParameters")) {
+                for(int k = 0; k < up.keywords(); k ++) {
+                  QString keyword = up[k].name();
                   QString value = up[k][0];
                   PutAsString(keyword, value);
                 }
@@ -881,7 +881,7 @@ namespace Isis {
 
     // If history recording is off, return
     Preference &p = Preference::Preferences();
-    PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
+    PvlGroup &grp = p.findGroup("UserInterface", Isis::Pvl::Traverse);
     if(grp["HistoryRecording"][0] == "Off")
       return;
 
@@ -904,23 +904,23 @@ namespace Isis {
     // overwriten with the new entry.
     try {
       if(histFile.fileExists()) {
-        hist.Read(histFile.expanded());
+        hist.read(histFile.expanded());
       }
     }
     catch(IException &) {
     }
 
     // Add it
-    hist.AddGroup(cmdLine.FindGroup("UserParameters"));
+    hist.addGroup(cmdLine.findGroup("UserParameters"));
 
     // See if we have exceeded history length
-    while(hist.Groups() > toInt(grp["HistoryLength"][0])) {
-      hist.DeleteGroup("UserParameters");
+    while(hist.groups() > toInt(grp["HistoryLength"][0])) {
+      hist.deleteGroup("UserParameters");
     }
 
     // Write it
     try {
-      hist.Write(histFile.expanded());
+      hist.write(histFile.expanded());
     }
     catch(IException &) {
     }

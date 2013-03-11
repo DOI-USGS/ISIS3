@@ -58,7 +58,8 @@ namespace Isis {
    *  @history 2010-09-27 Sharmila Prasad - Validate all the Keywords in a Container and
    *                                        verify the 'Repeat' Option also
    *  @history 2010-10-18 Sharmila Prasad - Added more options for the keyword validation
-   *  @todo 2005-04-04 Need coded example.
+   *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
+   *                          names up to the current Isis 3 coding standards. Fixes #1533.
    */
   class PvlContainer {
     public:
@@ -67,15 +68,15 @@ namespace Isis {
       PvlContainer(const PvlContainer &other);
 
       //! Set the name of the container.
-      void SetName(const QString &name) {
-        p_name.SetValue(name);
+      void setName(const QString &name) {
+        m_name.setValue(name);
       };
       /**
        * Returns the container name.
        * @return The container name.
        */
-      inline QString Name() const {
-        return (QString) p_name;
+      inline QString name() const {
+        return (QString) m_name;
       };
       /**
        * Returns whether the given string is equal to the container name or not.
@@ -83,27 +84,27 @@ namespace Isis {
        * @return True if the name and string are the same, false if they are
        * not.
        */
-      bool IsNamed(const QString &match) const {
-        return PvlKeyword::StringEqual(match, (QString)p_name);
+      bool isNamed(const QString &match) const {
+        return PvlKeyword::stringEqual(match, (QString)m_name);
       }
       /**
        * Returns the container type.
        * @return The container type.
        */
-      inline QString Type() const {
-        return p_name.Name();
+      inline QString type() const {
+        return m_name.name();
       };
       /**
        * Returns the number of keywords contained in the PvlContainer.
        * @return The number of keywords.
        */
-      inline int Keywords() const {
-        return p_keywords.size();
+      inline int keywords() const {
+        return m_keywords.size();
       };
 
       //! Clears PvlKeywords
-      void Clear() {
-        p_keywords.clear();
+      void clear() {
+        m_keywords.clear();
       };
       //! Contains both modes: Append or Replace.
       enum InsertMode { Append, Replace };
@@ -112,61 +113,61 @@ namespace Isis {
        * @param keyword The PvlKeyword object to append.
        * @param mode Using the InsertMode value of Append.
        */
-      void AddKeyword(const PvlKeyword &keyword,
+      void addKeyword(const PvlKeyword &keyword,
                       const InsertMode mode = Append);
 
 
       /**
        * When you use the += operator with a PvlKeyword, it will call the
-       * AddKeyword() method.
+       * addKeyword() method.
        * @param keyword The PvlKeyword to be added.
        */
       void operator+= (const PvlKeyword &keyword) {
-        AddKeyword(keyword);
+        addKeyword(keyword);
       };
 
-      PvlKeyword &FindKeyword(const QString &name);
+      PvlKeyword &findKeyword(const QString &name);
       /**
        * When you use the [] operator with a (string) name, it will call the
-       * FindKeyword() method.
+       * findKeyword() method.
        * @param name The name of the keyword to find.
        */
       PvlKeyword &operator[](const QString &name) {
-        return FindKeyword(name);
+        return findKeyword(name);
       };
       PvlKeyword &operator[](const int index);
 
       /**
        * When you use the [] operator with a (char) name, it will call the
-       * FindKeyword() method.
+       * findKeyword() method.
        * @param name The name of the keyword to find.
        */
       PvlKeyword &operator[](const char *name) {
         return operator[](QString(name));
       };
 
-      const PvlKeyword &FindKeyword(const QString &name) const;
+      const PvlKeyword &findKeyword(const QString &name) const;
       /**
        * When you use the [] operator with a (string) name, it will call the
-       * FindKeyword() method.
+       * findKeyword() method.
        * @param name The name of the keyword to find.
        */
 
       const PvlKeyword &operator[](const QString &name) const {
-        return FindKeyword(name);
+        return findKeyword(name);
       };
       const PvlKeyword &operator[](const int index) const;
 
       /**
        * When you use the [] operator with a (char) name, it will call the
-       * FindKeyword() method.
+       * findKeyword() method.
        * @param name The name of the keyword to find.
        */
       PvlKeyword operator[](const char *name) const {
         return operator[](QString(name));
       };
 
-      bool HasKeyword(const QString &name) const;
+      bool hasKeyword(const QString &name) const;
       //! The keyword iterator.
       typedef QList<PvlKeyword>::iterator PvlKeywordIterator;
 
@@ -174,155 +175,155 @@ namespace Isis {
       typedef QList<PvlKeyword>::const_iterator ConstPvlKeywordIterator;
 
 
-      PvlKeywordIterator FindKeyword(const QString &name,
+      PvlKeywordIterator findKeyword(const QString &name,
                                      PvlKeywordIterator beg,
                                      PvlKeywordIterator end);
 
-      ConstPvlKeywordIterator FindKeyword(const QString &name,
+      ConstPvlKeywordIterator findKeyword(const QString &name,
                                           ConstPvlKeywordIterator beg,
                                           ConstPvlKeywordIterator end) const;
 
-      PvlKeywordIterator AddKeyword(const PvlKeyword &keyword,
+      PvlKeywordIterator addKeyword(const PvlKeyword &keyword,
                                     PvlKeywordIterator pos);
 
       /**
        * Return the beginning iterator.
        * @return The beginning iterator.
        */
-      PvlKeywordIterator Begin() {
-        return p_keywords.begin();
+      PvlKeywordIterator begin() {
+        return m_keywords.begin();
       };
 
       /**
        * Return the const beginning iterator.
        * @return The const beginning iterator.
        */
-      ConstPvlKeywordIterator Begin() const {
-        return p_keywords.begin();
+      ConstPvlKeywordIterator begin() const {
+        return m_keywords.begin();
       };
 
       /**
        * Return the ending iterator.
        * @return The ending iterator.
        */
-      PvlKeywordIterator End() {
-        return p_keywords.end();
+      PvlKeywordIterator end() {
+        return m_keywords.end();
       };
 
       /**
        * Return the const ending iterator.
        * @return The const ending iterator.
        */
-      ConstPvlKeywordIterator End() const {
-        return p_keywords.end();
+      ConstPvlKeywordIterator end() const {
+        return m_keywords.end();
       };
 
-      void DeleteKeyword(const QString &name);
-      void DeleteKeyword(const int index);
+      void deleteKeyword(const QString &name);
+      void deleteKeyword(const int index);
 
-      bool CleanDuplicateKeywords();
+      bool cleanDuplicateKeywords();
 
       /**
        * When you use the -= operator with a (string) name, it will call the
-       * DeleteKeyword() method.
+       * deleteKeyword() method.
        * @param name The name of the keyword to remove.
        */
       void operator-= (const QString &name) {
-        DeleteKeyword(name);
+        deleteKeyword(name);
       };
       /**
        * When you use the -= operator with a PvlKeyword object, it will call the
-       * DeleteKeyword() method.
+       * deleteKeyword() method.
        * @param key The PvlKeyword object to remove.
        */
       void operator-= (const PvlKeyword &key) {
-        DeleteKeyword(key.Name());
+        deleteKeyword(key.name());
       };
       /**
        * Returns the filename used to initialise the Pvl object. If the object
        * was not initialized using a file, this string is empty.
        * @return The filename.
        */
-      QString FileName() const {
-        return p_filename;
+      QString fileName() const {
+        return m_filename;
       };
 
-      void SetFormatTemplate(PvlContainer &ref) {
-        p_formatTemplate = &ref;
+      void setFormatTemplate(PvlContainer &ref) {
+        m_formatTemplate = &ref;
       };
 
-      bool HasFormatTemplate() {
-        return p_formatTemplate != NULL;
+      bool hasFormatTemplate() {
+        return m_formatTemplate != NULL;
       };
 
-      PvlContainer *FormatTemplate() {
-        return p_formatTemplate;
+      PvlContainer *formatTemplate() {
+        return m_formatTemplate;
       };
 
-      PvlFormat *GetFormat() {
-        return p_name.GetFormat();
+      PvlFormat *format() {
+        return m_name.format();
       }
-      void SetFormat(PvlFormat *format) {
-        p_name.SetFormat(format);
-      }
-
-      int Indent() {
-        return p_name.Indent();
-      }
-      void SetIndent(int indent) {
-        p_name.SetIndent(indent);
+      void setFormat(PvlFormat *format) {
+        m_name.setFormat(format);
       }
 
-      inline int Comments() const {
-        return p_name.Comments();
+      int indent() {
+        return m_name.indent();
+      }
+      void setIndent(int indent) {
+        m_name.setIndent(indent);
+      }
+
+      inline int comments() const {
+        return m_name.comments();
       };
-      QString Comment(const int index) const {
-        return p_name.Comment(index);
+      QString comment(const int index) const {
+        return m_name.comment(index);
       }
 
-      void AddComment(const QString &comment) {
-        p_name.AddComment(comment);
+      void addComment(const QString &comment) {
+        m_name.addComment(comment);
       }
 
-      PvlKeyword &GetNameKeyword() {
-        return p_name;
+      PvlKeyword &nameKeyword() {
+        return m_name;
       }
-      const PvlKeyword &GetNameKeyword() const {
-        return p_name;
+      const PvlKeyword &nameKeyword() const {
+        return m_name;
       }
 
       const PvlContainer &operator=(const PvlContainer &other);
 
     protected:
-      QString p_filename;                   /**<This contains the filename
+      QString m_filename;                   /**<This contains the filename
                                                     used to initialize
                                                     the pvl object. If the
                                                     object was not
                                                     initialized using a filename
                                                     the string is empty.*/
-      PvlKeyword p_name;                   //!< This is the name keyword
-      QList<PvlKeyword> p_keywords; /**<This is the vector of
+      PvlKeyword m_name;                   //!< This is the name keyword
+      QList<PvlKeyword> m_keywords; /**<This is the vector of
                                                     PvlKeywords the container is
                                                     holding. */
 
-      void Init();
+      void init();
 
       /**
        * Sets the filename to the specified string.
        *
        * @param filename The new filename to use.
        */
-      void SetFileName(const QString &filename) {
-        p_filename = filename;
+      void setFileName(const QString &filename) {
+        m_filename = filename;
       }
 
-      PvlContainer *p_formatTemplate;
-      
+      PvlContainer *m_formatTemplate;
+
       //! Validate All the Keywords in a Container comparing with the Template
-      void ValidateAllKeywords(PvlContainer &pPvlCont);
-      
+      void validateAllKeywords(PvlContainer &pPvlCont);
+
       //! Validate the Repeat Option for a Keyword
-      void ValidateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont);
+      void validateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont);
   };
 
   std::ostream &operator<<(std::ostream &os, PvlContainer &container);

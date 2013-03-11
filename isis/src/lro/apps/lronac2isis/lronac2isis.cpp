@@ -35,15 +35,15 @@ void IsisMain() {
   try {
     Pvl lab(inFile.expanded());
 
-    if(lab.HasKeyword("DATA_SET_ID"))
-      id = (QString) lab.FindKeyword("DATA_SET_ID");
+    if(lab.hasKeyword("DATA_SET_ID"))
+      id = (QString) lab.findKeyword("DATA_SET_ID");
     else {
       QString msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     //Checks if in file is rdr
-    bool projected = lab.HasObject("IMAGE_MAP_PROJECTION");
+    bool projected = lab.hasObject("IMAGE_MAP_PROJECTION");
     if(projected) {
       QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
@@ -51,24 +51,24 @@ void IsisMain() {
     }
 
     // Store the decompanding information
-    PvlKeyword xtermKeyword = lab.FindKeyword("LRO:XTERM"),
-               mtermKeyword = lab.FindKeyword("LRO:MTERM"),
-               btermKeyword = lab.FindKeyword("LRO:BTERM");
+    PvlKeyword xtermKeyword = lab.findKeyword("LRO:XTERM"),
+               mtermKeyword = lab.findKeyword("LRO:MTERM"),
+               btermKeyword = lab.findKeyword("LRO:BTERM");
 
-    if(mtermKeyword.Size() != xtermKeyword.Size() || btermKeyword.Size() != xtermKeyword.Size()) {
+    if(mtermKeyword.size() != xtermKeyword.size() || btermKeyword.size() != xtermKeyword.size()) {
       QString msg = "The decompanding terms do not have the same dimensions";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    for(int i = 0; i < xtermKeyword.Size(); i++) {
+    for(int i = 0; i < xtermKeyword.size(); i++) {
       g_xterm.push_back(toDouble(xtermKeyword[i]));
       g_mterm.push_back(toDouble(mtermKeyword[i]));
       g_bterm.push_back(toDouble(btermKeyword[i]));
     }
 
-    double versionId = toDouble(lab.FindKeyword("PRODUCT_VERSION_ID")[0].remove(QRegExp("^v")));
+    double versionId = toDouble(lab.findKeyword("PRODUCT_VERSION_ID")[0].remove(QRegExp("^v")));
 
-    if(lab.FindKeyword("FRAME_ID")[0] == "RIGHT" && versionId < 1.30)
+    if(lab.findKeyword("FRAME_ID")[0] == "RIGHT" && versionId < 1.30)
       g_flip = true;
     else
       g_flip = false;
@@ -183,7 +183,7 @@ void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
   //Pvl to store the labels
   Pvl outLabel;
   //Set up the directory where the translations are
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Lro"] + "/translations/";
   Pvl labelPvl(labelFile.expanded());
 
@@ -206,25 +206,25 @@ void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
 
   //Set up the Kernels group
   PvlGroup kern("Kernels");
-  if(lab.FindKeyword("FRAME_ID")[0] == "LEFT")
+  if(lab.findKeyword("FRAME_ID")[0] == "LEFT")
     kern += PvlKeyword("NaifFrameCode", "-85600");
   else
     kern += PvlKeyword("NaifFrameCode", "-85610");
 
-  PvlGroup inst = outLabel.FindGroup("Instrument", Pvl::Traverse);
-  if(lab.FindKeyword("FRAME_ID")[0] == "LEFT") {
-    inst.FindKeyword("InstrumentId") = "NACL";
-    inst.FindKeyword("InstrumentName") = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE CAMERA LEFT";
+  PvlGroup inst = outLabel.findGroup("Instrument", Pvl::Traverse);
+  if(lab.findKeyword("FRAME_ID")[0] == "LEFT") {
+    inst.findKeyword("InstrumentId") = "NACL";
+    inst.findKeyword("InstrumentName") = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE CAMERA LEFT";
   }
   else {
-    inst.FindKeyword("InstrumentId") = "NACR";
-    inst.FindKeyword("InstrumentName") = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE CAMERA RIGHT";
+    inst.findKeyword("InstrumentId") = "NACR";
+    inst.findKeyword("InstrumentName") = "LUNAR RECONNAISSANCE ORBITER NARROW ANGLE CAMERA RIGHT";
   }
 
   //Add all groups to the output cube
   ocube->putGroup(inst);
-  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-  ocube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
   ocube->putGroup(kern);
 }
 

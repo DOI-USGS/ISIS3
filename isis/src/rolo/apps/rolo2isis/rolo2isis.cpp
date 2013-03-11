@@ -18,7 +18,7 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO");
   p.StartProcess();
 
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString transDir = (QString) dataDir["Rolo"];
 
   FileName transFile;
@@ -44,13 +44,13 @@ void IsisMain() {
   transFile = transDir + "/" + "translations/roloBandBin.trn";
   translator = new PvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
-  outputLabel.FindGroup("BandBin").FindKeyword("OriginalBand").SetUnits(
+  outputLabel.findGroup("BandBin").findKeyword("OriginalBand").setUnits(
     translator->Translate("BandBinUnit"));
-  outputLabel.FindGroup("BandBin").FindKeyword("Center").SetUnits(translator->
+  outputLabel.findGroup("BandBin").findKeyword("Center").setUnits(translator->
       Translate("BandBinUnit"));
-  outputLabel.FindGroup("BandBin").FindKeyword("Width").SetUnits(translator->
+  outputLabel.findGroup("BandBin").findKeyword("Width").setUnits(translator->
       Translate("BandBinUnit"));
-  outputLabel.FindGroup("BandBin").FindKeyword("Exposure").SetUnits(translator->
+  outputLabel.findGroup("BandBin").findKeyword("Exposure").setUnits(translator->
       Translate("ExposureUnit"));
   delete translator;
   translator = NULL;
@@ -63,21 +63,21 @@ void IsisMain() {
   translator = NULL;
 
   // add outputLabel to cube
-  if(outputLabel.HasGroup("Mapping") &&
-      (outputLabel.FindGroup("Mapping").Keywords() > 0)) {
-    ocube->putGroup(outputLabel.FindGroup("Mapping"));
+  if(outputLabel.hasGroup("Mapping") &&
+      (outputLabel.findGroup("Mapping").keywords() > 0)) {
+    ocube->putGroup(outputLabel.findGroup("Mapping"));
   }
-  if(outputLabel.HasGroup("Instrument") &&
-      (outputLabel.FindGroup("Instrument").Keywords() > 0)) {
-    ocube->putGroup(outputLabel.FindGroup("Instrument"));
+  if(outputLabel.hasGroup("Instrument") &&
+      (outputLabel.findGroup("Instrument").keywords() > 0)) {
+    ocube->putGroup(outputLabel.findGroup("Instrument"));
   }
-  if(outputLabel.HasGroup("BandBin") &&
-      (outputLabel.FindGroup("BandBin").Keywords() > 0)) {
-    ocube->putGroup(outputLabel.FindGroup("BandBin"));
+  if(outputLabel.hasGroup("BandBin") &&
+      (outputLabel.findGroup("BandBin").keywords() > 0)) {
+    ocube->putGroup(outputLabel.findGroup("BandBin"));
   }
-  if(outputLabel.HasGroup("Archive") &&
-      (outputLabel.FindGroup("Archive").Keywords() > 0)) {
-    ocube->putGroup(outputLabel.FindGroup("Archive"));
+  if(outputLabel.hasGroup("Archive") &&
+      (outputLabel.findGroup("Archive").keywords() > 0)) {
+    ocube->putGroup(outputLabel.findGroup("Archive"));
   }
 
   p.EndProcess();

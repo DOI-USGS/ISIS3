@@ -45,16 +45,16 @@ namespace Isis {
     CameraDistortionMap(parent, 1.0) {
     // Set up distortion coefficients
     Pvl mast(fname);
-    PvlGroup dim = mast.FindGroup("Dimensions");
-    p_distortedLines = dim.FindKeyword("DistortedLines");
-    p_distortedSamps = dim.FindKeyword("DistortedSamples");
-    p_undistortedLines = dim.FindKeyword("UndistortedLines");
-    p_undistortedSamps = dim.FindKeyword("UndistortedSamples");
-    PvlGroup mastRes = mast.FindGroup("MasterReseaus");
-    PvlKeyword mline = mastRes.FindKeyword("Line");
-    PvlKeyword msamp = mastRes.FindKeyword("Sample");
-    p_numRes = mline.Size();
-    if(mline.Size() != msamp.Size()) {
+    PvlGroup dim = mast.findGroup("Dimensions");
+    p_distortedLines = dim.findKeyword("DistortedLines");
+    p_distortedSamps = dim.findKeyword("DistortedSamples");
+    p_undistortedLines = dim.findKeyword("UndistortedLines");
+    p_undistortedSamps = dim.findKeyword("UndistortedSamples");
+    PvlGroup mastRes = mast.findGroup("MasterReseaus");
+    PvlKeyword mline = mastRes.findKeyword("Line");
+    PvlKeyword msamp = mastRes.findKeyword("Sample");
+    p_numRes = mline.size();
+    if(mline.size() != msamp.size()) {
       string msg = "The number of lines and samples for the master reseaus are";
       msg += "not equal, the data file may be bad";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -65,10 +65,10 @@ namespace Isis {
     }
     p_pixelPitch = parent->PixelPitch();
 
-    PvlGroup refRes = labels.FindGroup("Reseaus", Pvl::Traverse);
-    PvlKeyword rline = refRes.FindKeyword("Line");
-    PvlKeyword rsamp = refRes.FindKeyword("Sample");
-    if(rline.Size() != rsamp.Size()) {
+    PvlGroup refRes = labels.findGroup("Reseaus", Pvl::Traverse);
+    PvlKeyword rline = refRes.findKeyword("Line");
+    PvlKeyword rsamp = refRes.findKeyword("Sample");
+    if(rline.size() != rsamp.size()) {
       string msg = "The number of lines and samples for the refined reseaus are";
       msg += "not equal, the data file may be bad";
       throw IException(IException::User, msg, _FILEINFO_);

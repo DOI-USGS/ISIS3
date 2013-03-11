@@ -84,9 +84,9 @@ namespace Isis {
     int inst = 0;
     PvlKeyword grp;
 
-    while((grp = InputGroup(nName, inst++)).Name() != "") {
+    while((grp = InputGroup(nName, inst++)).name() != "") {
       if((con = GetContainer(grp)) != NULL) {
-        if(con->HasKeyword(InputKeywordName(nName))) {
+        if(con->hasKeyword(InputKeywordName(nName))) {
           return PvlTranslationTable::Translate(nName,
                                                 (*con)[InputKeywordName(nName)][findex]);
         }
@@ -113,15 +113,15 @@ namespace Isis {
     int inst = 0;
     PvlKeyword grp;
 
-    while((grp = InputGroup(nName, inst++)).Name() != "") {
+    while((grp = InputGroup(nName, inst++)).name() != "") {
       if((con = GetContainer(grp)) != NULL) {
-        if(con->HasKeyword(InputKeywordName(nName))) {
-          key.SetName(OutputName(nName));
+        if(con->hasKeyword(InputKeywordName(nName))) {
+          key.setName(OutputName(nName));
 
-          for(int v = 0; v < (*con)[(InputKeywordName(nName))].Size(); v++) {
-            key.AddValue(Isis::PvlTranslationTable::Translate(nName,
+          for(int v = 0; v < (*con)[(InputKeywordName(nName))].size(); v++) {
+            key.addValue(Isis::PvlTranslationTable::Translate(nName,
                          (*con)[InputKeywordName(nName)][v]),
-                         (*con)[InputKeywordName(nName)].Unit(v));
+                         (*con)[InputKeywordName(nName)].unit(v));
           }
 
           return key;
@@ -141,15 +141,15 @@ namespace Isis {
   // Store the translated key, value pairs in the argument pvl
   void PvlTranslationManager::Auto(Isis::Pvl &outputLabel) {
     // Attempt to translate every group in the translation table
-    for(int i = 0; i < TranslationTable().Groups(); i++) {
-      Isis::PvlGroup &g = TranslationTable().Group(i);
-      if(IsAuto(g.Name())) {
+    for(int i = 0; i < TranslationTable().groups(); i++) {
+      Isis::PvlGroup &g = TranslationTable().group(i);
+      if(IsAuto(g.name())) {
         try {
-          Isis::PvlContainer *con = CreateContainer(g.Name(), outputLabel);
-          (*con) += PvlTranslationManager::DoTranslation(g.Name());
+          Isis::PvlContainer *con = CreateContainer(g.name(), outputLabel);
+          (*con) += PvlTranslationManager::DoTranslation(g.name());
         }
         catch(IException &e) {
-          if(!IsOptional(g.Name())) {
+          if(!IsOptional(g.name())) {
             throw;
           }
         }
@@ -173,13 +173,13 @@ namespace Isis {
     PvlKeyword inputGroupKeyword = InputGroup(nName, instanceNumber);
     bool anInputGroupFound = false;
 
-    while(inputGroupKeyword.Name() != "") {
+    while(inputGroupKeyword.name() != "") {
       const PvlContainer *containingGroup = GetContainer(inputGroupKeyword);
       if(containingGroup != NULL) {
         anInputGroupFound = true;
 
-        if(containingGroup->HasKeyword(InputKeywordName(nName))) {
-          return containingGroup->FindKeyword(InputKeywordName(nName));
+        if(containingGroup->hasKeyword(InputKeywordName(nName))) {
+          return containingGroup->findKeyword(InputKeywordName(nName));
         }
       }
 
@@ -189,20 +189,20 @@ namespace Isis {
 
     if(anInputGroupFound) {
       QString msg = "Unable to find input keyword [" + InputKeywordName(nName) +
-                   "] for output name [" + nName + "] in file [" + TranslationTable().FileName() + "]";
+                   "] for output name [" + nName + "] in file [" + TranslationTable().fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else {
       QString container = "";
 
-      for(int i = 0; i < InputGroup(nName).Size(); i++) {
+      for(int i = 0; i < InputGroup(nName).size(); i++) {
         if(i > 0) container += ",";
 
         container += InputGroup(nName)[i];
       }
 
       QString msg = "Unable to find input group [" + container +
-                   "] for output name [" + nName + "] in file [" + TranslationTable().FileName() + "]";
+                   "] for output name [" + nName + "] in file [" + TranslationTable().fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -224,9 +224,9 @@ namespace Isis {
     //if ((con = GetContainer (InputGroup(nName))) != NULL) {
 
     PvlKeyword grp;
-    while((grp = InputGroup(nName, inst++)).Name() != "") {
+    while((grp = InputGroup(nName, inst++)).name() != "") {
       if((con = GetContainer(grp)) != NULL) {
-        if(con->HasKeyword(InputKeywordName(nName))) return true;
+        if(con->hasKeyword(InputKeywordName(nName))) return true;
       }
     }
 
@@ -255,8 +255,8 @@ namespace Isis {
 
 
     // Return the root container if "ROOT" is the ONLY thing in the list
-    if(inputGroup.Size() == 1 &&
-        PvlKeyword::StringEqual(inputGroup[0], "ROOT")) {
+    if(inputGroup.size() == 1 &&
+        PvlKeyword::stringEqual(inputGroup[0], "ROOT")) {
       return &p_fLabel;
     }
 
@@ -265,10 +265,10 @@ namespace Isis {
     // Search for object containing our solution
     int objectIndex;
     for(objectIndex = 0;
-        objectIndex < inputGroup.Size() - 1;
+        objectIndex < inputGroup.size() - 1;
         objectIndex ++) {
-      if(currentObject->HasObject(inputGroup[objectIndex])) {
-        currentObject = &currentObject->FindObject(inputGroup[objectIndex]);
+      if(currentObject->hasObject(inputGroup[objectIndex])) {
+        currentObject = &currentObject->findObject(inputGroup[objectIndex]);
       }
       else {
         return NULL;
@@ -276,11 +276,11 @@ namespace Isis {
     }
 
     // Our solution can be an object or a group
-    if(currentObject->HasObject(inputGroup[objectIndex])) {
-      return &currentObject->FindObject(inputGroup[objectIndex]);
+    if(currentObject->hasObject(inputGroup[objectIndex])) {
+      return &currentObject->findObject(inputGroup[objectIndex]);
     }
-    else if(currentObject->HasGroup(inputGroup[objectIndex])) {
-      return &currentObject->FindGroup(inputGroup[objectIndex]);
+    else if(currentObject->hasGroup(inputGroup[objectIndex])) {
+      return &currentObject->findGroup(inputGroup[objectIndex]);
     }
     else {
       return NULL;
@@ -300,22 +300,22 @@ namespace Isis {
     Isis::PvlObject *obj = &pvl;
 
     // Look at every pair in the output position
-    for(int c = 0; c < np.Size(); c += 2) {
+    for(int c = 0; c < np.size(); c += 2) {
       // If this pair is an object
       if(np[c].toUpper() == "OBJECT") {
         // If the object doesn't exist create it
-        if(!obj->HasObject(np[c+1])) {
-          obj->AddObject(np[c+1]);
+        if(!obj->hasObject(np[c+1])) {
+          obj->addObject(np[c+1]);
         }
-        obj = &(obj->FindObject(np[c+1]));
+        obj = &(obj->findObject(np[c+1]));
       }
       // If this pair is a group
       else if(np[c].toUpper() == "GROUP") {
         // If the group doesn't exist create it
-        if(!obj->HasGroup(np[c+1])) {
-          obj->AddGroup(np[c+1]);
+        if(!obj->hasGroup(np[c+1])) {
+          obj->addGroup(np[c+1]);
         }
-        return (Isis::PvlContainer *) & (obj->FindGroup(np[c+1]));
+        return (Isis::PvlContainer *) & (obj->findGroup(np[c+1]));
 
       }
     }

@@ -1945,7 +1945,7 @@ namespace Isis {
 
     Isis::Pvl *output = OutputCubes[0]->Label();
     output->Find("IsisCube");
-    output->AddObject("ImportLabel");
+    output->addObject("ImportLabel");
     output->Insert(importLab);
   }
 #endif

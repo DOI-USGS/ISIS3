@@ -22,7 +22,7 @@ void IsisMain() {
   Pvl lab(inFile.expanded());
 
   try {
-    id = (QString) lab.FindKeyword("DATA_SET_ID");
+    id = (QString) lab.findKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
     QString msg = "Unable to read [DATA_SET_ID] from input file [" +
@@ -48,7 +48,7 @@ void IsisMain() {
   Cube *outcube = p.SetOutputCube("TO");
 
   QString bandorder;
-  bandorder = (QString) lab.FindObject("IMAGE").FindKeyword("BAND_STORAGE_TYPE");
+  bandorder = (QString) lab.findObject("IMAGE").findKeyword("BAND_STORAGE_TYPE");
   bandorder = bandorder.toUpper();
   if(bandorder == "BAND_SEQUENTIAL") {
     p.SetOrganization(Isis::ProcessImport::BSQ);
@@ -71,7 +71,7 @@ void IsisMain() {
   p.TranslatePdsProjection(otherLabels);
 
   // Get the directory where the MiniRF level 2 translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Lro"] + "/translations/";
 
   if(id == "CHAN1-L-MRFFR-5-CDR-MAP-V1.0" || id == "LRO-L-MRFLRO-5-CDR-MAP-V1.0") {
@@ -86,9 +86,9 @@ void IsisMain() {
     archiveXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, and Mapping groups to the output cube label
-    outcube->putGroup(otherLabels.FindGroup("BandBin"));
-    outcube->putGroup(otherLabels.FindGroup("Mapping"));
-    outcube->putGroup(otherLabels.FindGroup("Archive"));
+    outcube->putGroup(otherLabels.findGroup("BandBin"));
+    outcube->putGroup(otherLabels.findGroup("Mapping"));
+    outcube->putGroup(otherLabels.findGroup("Archive"));
   }
   else {
     // Translate the BandBin group
@@ -113,15 +113,15 @@ void IsisMain() {
 
     // Write the BandBin, Archive, Instrument, and ImageInfo groups
     // to the output cube label
-    outcube->putGroup(otherLabels.FindGroup("BandBin"));
-    outcube->putGroup(otherLabels.FindGroup("Archive"));
-    outcube->putGroup(otherLabels.FindGroup("Instrument"));
-    outcube->putGroup(otherLabels.FindGroup("ImageInfo"));
+    outcube->putGroup(otherLabels.findGroup("BandBin"));
+    outcube->putGroup(otherLabels.findGroup("Archive"));
+    outcube->putGroup(otherLabels.findGroup("Instrument"));
+    outcube->putGroup(otherLabels.findGroup("ImageInfo"));
 
     // Make sure the ScaledPixelHeight and ScaledPixelWidth are the same
-    PvlGroup &instGrp(otherLabels.FindGroup("Instrument", Pvl::Traverse));
-    if(instGrp.HasKeyword("ScaledPixelHeight") &&
-        instGrp.HasKeyword("ScaledPixelWidth")) {
+    PvlGroup &instGrp(otherLabels.findGroup("Instrument", Pvl::Traverse));
+    if(instGrp.hasKeyword("ScaledPixelHeight") &&
+        instGrp.hasKeyword("ScaledPixelWidth")) {
       double pheight = instGrp["ScaledPixelHeight"];
       double pwidth = instGrp["ScaledPixelWidth"];
       if(pheight != pwidth) {
@@ -135,7 +135,7 @@ void IsisMain() {
     // Set the frequency based on the InstrumentModeId. This has to
     // be done manually, because the frequency information was not
     // put in the PDS labels.
-    if(!(instGrp.HasKeyword("Frequency"))) {
+    if(!(instGrp.hasKeyword("Frequency"))) {
       QString instmodeid = instGrp["InstrumentModeId"];
       double frequency;
       if(instmodeid.startsWith("BASELINE_S") ||
@@ -145,7 +145,7 @@ void IsisMain() {
       else {   // BASELINE_X or ZOOM_X
         frequency = 7140000000.0;
       }
-      instGrp.AddKeyword(PvlKeyword("Frequency", toString(frequency)));
+      instGrp.addKeyword(PvlKeyword("Frequency", toString(frequency)));
       outcube->putGroup(instGrp);
     }
     PvlGroup kerns("Kernels");

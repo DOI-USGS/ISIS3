@@ -35,7 +35,7 @@ void IsisMain() {
   Pvl label(inputFile.expanded());
 
   // If the PVL created from the input labels is empty, then input is raw
-  if(label.Groups() + label.Objects() + label.Keywords() == 0) {
+  if(label.groups() + label.objects() + label.keywords() == 0) {
     isRaw = true;
   }
 
@@ -204,7 +204,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
   bandBin += PvlKeyword("OriginalBand", "1");
   QString center = toString(filterCenter);
   bandBin += PvlKeyword("Center", center);
-  bandBin.FindKeyword("Center").SetUnits("micrometers");
+  bandBin.findKeyword("Center").setUnits("micrometers");
 
   // Dates taken from ASU Mariner website - http://ser.ses.asu.edu/M10/TXT/encounters.html and
   // from Nasa website - http://www.jpl.nasa.gov/missions/missiondetails.cfm?mission_Mariner10
@@ -307,16 +307,16 @@ void UpdateLabels(Cube *cube, const QString &labels) {
 
   // Get the labels and add the updated labels to them
   Pvl *cubeLabels = cube->label();
-  cubeLabels->FindObject("IsisCube").AddGroup(inst);
-  cubeLabels->FindObject("IsisCube").AddGroup(archive);
-  cubeLabels->FindObject("IsisCube").AddGroup(bandBin);
-  cubeLabels->FindObject("IsisCube").AddGroup(kernels);
-  cubeLabels->FindObject("IsisCube").AddGroup(rx);
+  cubeLabels->findObject("IsisCube").addGroup(inst);
+  cubeLabels->findObject("IsisCube").addGroup(archive);
+  cubeLabels->findObject("IsisCube").addGroup(bandBin);
+  cubeLabels->findObject("IsisCube").addGroup(kernels);
+  cubeLabels->findObject("IsisCube").addGroup(rx);
 
   PvlObject original("OriginalLabel");
   original += PvlKeyword("Label", labels);
   Pvl olabel;
-  olabel.AddObject(original);
+  olabel.addObject(original);
   OriginalLabel ol(olabel);
   cube->write(ol);
 }
@@ -324,7 +324,7 @@ void UpdateLabels(Cube *cube, const QString &labels) {
 // Translate Isis 2 labels into Isis 3 labels.
 void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   // Get the directory where the Mariner translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   QString transDir = (QString) dataDir["Mariner10"] + "/translations/";
@@ -339,24 +339,24 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   translation.Auto(*(outputLabel));
 
   //Instrument group
-  PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
 
-  PvlKeyword &instrumentId = inst.FindKeyword("InstrumentId");
-  instrumentId.SetValue("M10_VIDICON_" + instrumentId[0]);
+  PvlKeyword &instrumentId = inst.findKeyword("InstrumentId");
+  instrumentId.setValue("M10_VIDICON_" + instrumentId[0]);
 
-  PvlKeyword &targetName = inst.FindKeyword("TargetName");
+  PvlKeyword &targetName = inst.findKeyword("TargetName");
   QString targetTail(targetName[0].mid(1));
   targetTail = targetTail.toLower();
-  targetName.SetValue(targetName[0].at(0) + targetTail);
+  targetName.setValue(targetName[0].at(0) + targetTail);
 
-  PvlKeyword &startTime = inst.FindKeyword("StartTime");
-  startTime.SetValue(startTime[0].mid(0, startTime[0].size() - 1));
+  PvlKeyword &startTime = inst.findKeyword("StartTime");
+  startTime.setValue(startTime[0].mid(0, startTime[0].size() - 1));
 
-  PvlGroup &archive = outputLabel->FindGroup("Archive", Pvl::Traverse);
-  PvlKeyword &imgNo = archive.FindKeyword("ImageNumber");
+  PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
+  PvlKeyword &imgNo = archive.findKeyword("ImageNumber");
   QString ino = imgNo[0];
   ino = ino.trimmed();
-  imgNo.SetValue(ino);
+  imgNo.setValue(ino);
 
   iTime time(startTime[0]);
   if(time < iTime("1974-2-3T12:00:00")) {
@@ -375,22 +375,22 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
     archive += PvlKeyword("Encounter", "Mercury_3");
   }
 
-  inst.FindKeyword("ExposureDuration").SetUnits("milliseconds");
+  inst.findKeyword("ExposureDuration").setUnits("milliseconds");
 
-  PvlGroup &bBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
-  QString filter = inputLabel.FindObject("QUBE")["FILTER_NAME"];
+  PvlGroup &bBin = outputLabel->findGroup("BandBin", Pvl::Traverse);
+  QString filter = inputLabel.findObject("QUBE")["FILTER_NAME"];
   if(filter != "F") {
     //Band Bin group
-    bBin.FindKeyword("Center").SetUnits("micrometers");
+    bBin.findKeyword("Center").setUnits("micrometers");
   }
 
   // Kernels group
-  PvlGroup &kernels = outputLabel->FindGroup("Kernels", Pvl::Traverse);
-  PvlGroup &reseaus = outputLabel->FindGroup("Reseaus", Pvl::Traverse);
-  PvlKeyword &templ = reseaus.FindKeyword("Template");
-  PvlKeyword &valid = reseaus.FindKeyword("Valid");
+  PvlGroup &kernels = outputLabel->findGroup("Kernels", Pvl::Traverse);
+  PvlGroup &reseaus = outputLabel->findGroup("Reseaus", Pvl::Traverse);
+  PvlKeyword &templ = reseaus.findKeyword("Template");
+  PvlKeyword &valid = reseaus.findKeyword("Valid");
 
-  for(int i = 0; i < valid.Size(); i++) {
+  for(int i = 0; i < valid.size(); i++) {
     valid[i] = valid[i].mid(0, 1);
   }
 
@@ -398,12 +398,12 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   QString camera = "";
   if(QString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
-    kernels.FindKeyword("NaifFrameCode").SetValue("-76110");
+    kernels.findKeyword("NaifFrameCode").setValue("-76110");
     camera = "M10_VIDICON_A_RESEAUS";
   }
   else {
     templ = "$mariner10/reseaus/mar10b.template.cub";
-    kernels.FindKeyword("NaifFrameCode").SetValue("-76120");
+    kernels.findKeyword("NaifFrameCode").setValue("-76120");
     camera = "M10_VIDICON_B_RESEAUS";
   }
 }

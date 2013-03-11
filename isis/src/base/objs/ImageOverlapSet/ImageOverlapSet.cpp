@@ -833,7 +833,7 @@ namespace Isis {
 
       err += serialNumbers;
 
-      if(filename.Size() != 0) {
+      if(filename.size() != 0) {
         err += filename;
       }
 
@@ -856,7 +856,7 @@ namespace Isis {
 
       err += serialNumbers;
 
-      if(filename.Size() != 0) {
+      if(filename.size() != 0) {
         err += filename;
       }
 
@@ -901,7 +901,7 @@ namespace Isis {
 
       err += serialNumbers;
 
-      if(filename.Size() != 0) {
+      if(filename.size() != 0) {
         err += filename;
       }
     }
@@ -920,7 +920,7 @@ namespace Isis {
 
       err += serialNumbers;
 
-      if(filename.Size() != 0) {
+      if(filename.size() != 0) {
         err += filename;
       }
     }
@@ -969,7 +969,7 @@ namespace Isis {
 
       err += serialNumbers;
 
-      if(filename.Size() != 0) {
+      if(filename.size() != 0) {
         err += filename;
       }
     }
@@ -988,7 +988,7 @@ namespace Isis {
 
       err += serialNumbers;
 
-      if(filename.Size() != 0) {
+      if(filename.size() != 0) {
         err += filename;
       }
     }

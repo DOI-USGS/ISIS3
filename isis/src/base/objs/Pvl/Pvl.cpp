@@ -36,7 +36,7 @@ using namespace std;
 namespace Isis {
   //! Constructs an empty Pvl object.
   Pvl::Pvl() : Isis::PvlObject("Root") {
-    Init();
+    init();
   }
 
 
@@ -46,23 +46,23 @@ namespace Isis {
    * @param file The file containing the pvl formatted information
    */
   Pvl::Pvl(const QString &file) : Isis::PvlObject("Root") {
-    Init();
-    Read(file);
+    init();
+    read(file);
   }
 
 
   //! Copy constructor
   Pvl::Pvl(const Pvl &other) : PvlObject::PvlObject(other) {
-    p_internalTemplate = false;
-    p_terminator = other.p_terminator;
+    m_internalTemplate = false;
+    m_terminator = other.m_terminator;
   }
 
 
-  //! Initializes the class
-  void Pvl::Init() {
-    p_filename = "";
-    p_terminator = "End";
-    p_internalTemplate = false;
+  //! initializes the class
+  void Pvl::init() {
+    m_filename = "";
+    m_terminator = "End";
+    m_internalTemplate = false;
   }
 
 
@@ -73,14 +73,14 @@ namespace Isis {
    *
    * @throws Isis::iException::Io
    */
-  void Pvl::Read(const QString &file) {
+  void Pvl::read(const QString &file) {
     // Expand the filename
     Isis::FileName temp(file);
-    p_filename = temp.expanded();
+    m_filename = temp.expanded();
 
     // Open the file
     ifstream istm;
-    istm.open(p_filename.toAscii().data(), std::ios::in);
+    istm.open(m_filename.toAscii().data(), std::ios::in);
     if(!istm) {
       QString message = Message::FileOpen(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
@@ -113,14 +113,14 @@ namespace Isis {
    *
    * @throws Isis::iException::Io
    */
-  void Pvl::Write(const QString &file) {
+  void Pvl::write(const QString &file) {
     // Expand the filename
     Isis::FileName temp(file);
 
     // Set up a Formatter
     bool removeFormatter = false;
-    if(GetFormat() == NULL) {
-      SetFormat(new PvlFormat());
+    if(format() == NULL) {
+      setFormat(new PvlFormat());
       removeFormatter = true;
     }
 
@@ -137,7 +137,7 @@ namespace Isis {
     // Write the labels
     try {
       ostm << *this;
-      if(Terminator() != "") ostm << GetFormat()->FormatEOL();
+      if(terminator() != "") ostm << format()->formatEOL();
     }
     catch(IException &e) {
       ostm.close();
@@ -151,8 +151,8 @@ namespace Isis {
     }
 
     if(removeFormatter) {
-      delete GetFormat();
-      SetFormat(NULL);
+      delete format();
+      setFormat(NULL);
     }
 
     // Close the file
@@ -167,14 +167,14 @@ namespace Isis {
    *
    * @throws Isis::iException::Io
    */
-  void Pvl::Append(const QString &file) {
+  void Pvl::append(const QString &file) {
     // Set up for opening and writing
     Isis::FileName temp(file);
 
     // Set up a Formatter
     bool removeFormatter = false;
-    if(GetFormat() == NULL) {
-      SetFormat(new PvlFormat());
+    if(format() == NULL) {
+      setFormat(new PvlFormat());
       removeFormatter = true;
     }
 
@@ -191,7 +191,7 @@ namespace Isis {
     // Write the labels
     try {
       ostm << *this;
-      if(Terminator() != "") ostm << GetFormat()->FormatEOL();
+      if(terminator() != "") ostm << format()->formatEOL();
     }
     catch(...) {
       ostm.close();
@@ -201,8 +201,8 @@ namespace Isis {
     }
 
     if(removeFormatter) {
-      delete GetFormat();
-      SetFormat(NULL);
+      delete format();
+      setFormat(NULL);
     }
 
     // Close the file
@@ -210,17 +210,17 @@ namespace Isis {
   }
 
 
-  void Pvl::SetFormatTemplate(Isis::Pvl &temp) {
-    if(p_internalTemplate) delete p_formatTemplate;
-    p_internalTemplate = false;
-    Isis::PvlObject::SetFormatTemplate(temp);
+  void Pvl::setFormatTemplate(Isis::Pvl &temp) {
+    if(m_internalTemplate) delete m_formatTemplate;
+    m_internalTemplate = false;
+    Isis::PvlObject::setFormatTemplate(temp);
   }
 
 
-  void Pvl::SetFormatTemplate(const QString &file) {
-    if(p_internalTemplate) delete p_formatTemplate;
-    p_internalTemplate = true;
-    p_formatTemplate = new Isis::Pvl(file);
+  void Pvl::setFormatTemplate(const QString &file) {
+    if(m_internalTemplate) delete m_formatTemplate;
+    m_internalTemplate = true;
+    m_formatTemplate = new Isis::Pvl(file);
   }
 
 
@@ -235,20 +235,20 @@ namespace Isis {
   ostream &operator<<(std::ostream &os, Pvl &pvl) {
     // Set up a Formatter
     bool removeFormatter = false;
-    if(pvl.GetFormat() == NULL) {
-      pvl.SetFormat(new PvlFormat());
+    if(pvl.format() == NULL) {
+      pvl.setFormat(new PvlFormat());
       removeFormatter = true;
     }
 
     Isis::Pvl outTemplate;
-    if(pvl.HasFormatTemplate()) outTemplate = *(Isis::Pvl *)pvl.FormatTemplate();
+    if(pvl.hasFormatTemplate()) outTemplate = *(Isis::Pvl *)pvl.formatTemplate();
 
     // Look for and process all include files and remove duplicates from the
     // format template. Include files take precedence over all other objects and
     // groups
     Isis::Pvl newTemp;
-    for(int i = 0; i < outTemplate.Keywords(); i++) {
-      if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
+    for(int i = 0; i < outTemplate.keywords(); i++) {
+      if(outTemplate[i].isNamed("Isis:PvlTemplate:File")) {
         QString filename = outTemplate[i];
         Isis::FileName file(filename);
         if(!file.fileExists()) {
@@ -257,121 +257,121 @@ namespace Isis {
         }
         Isis::Pvl include(file.expanded());
 
-        for(int j = 0; j < include.Keywords(); j++) {
-          if(!newTemp.HasKeyword(include[j].Name()))
-            newTemp.AddKeyword(include[j]);
+        for(int j = 0; j < include.keywords(); j++) {
+          if(!newTemp.hasKeyword(include[j].name()))
+            newTemp.addKeyword(include[j]);
         }
 
-        for(int j = 0; j < include.Objects(); j++) {
-          if(!newTemp.HasObject(include.Object(j).Name()))
-            newTemp.AddObject(include.Object(j));
+        for(int j = 0; j < include.objects(); j++) {
+          if(!newTemp.hasObject(include.object(j).name()))
+            newTemp.addObject(include.object(j));
         }
 
-        for(int j = 0; j < include.Groups(); j++) {
-          if(!newTemp.HasGroup(include.Group(j).Name()))
-            newTemp.AddGroup(include.Group(j));
+        for(int j = 0; j < include.groups(); j++) {
+          if(!newTemp.hasGroup(include.group(j).name()))
+            newTemp.addGroup(include.group(j));
         }
       }
       // If it is not an include file add it in place
-      else if(!newTemp.HasKeyword(outTemplate[i].Name()))
-        newTemp.AddKeyword(outTemplate[i]);
+      else if(!newTemp.hasKeyword(outTemplate[i].name()))
+        newTemp.addKeyword(outTemplate[i]);
     }
 
     // copy over the objects
-    for(int i = 0; i < outTemplate.Objects(); i++) {
-      if(!newTemp.HasObject(outTemplate.Object(i).Name()))
-        newTemp.AddObject(outTemplate.Object(i));
+    for(int i = 0; i < outTemplate.objects(); i++) {
+      if(!newTemp.hasObject(outTemplate.object(i).name()))
+        newTemp.addObject(outTemplate.object(i));
     }
 
     // copy over the groups
-    for(int i = 0; i < outTemplate.Groups(); i++) {
-      if(!newTemp.HasGroup(outTemplate.Group(i).Name()))
-        newTemp.AddGroup(outTemplate.Group(i));
+    for(int i = 0; i < outTemplate.groups(); i++) {
+      if(!newTemp.hasGroup(outTemplate.group(i).name()))
+        newTemp.addGroup(outTemplate.group(i));
     }
 
     outTemplate = newTemp;
 
     // Output the pvl's comments
-    for(int i = 0; i < pvl.Comments(); i++) {
-      os << pvl.Comment(i) << pvl.GetFormat()->FormatEOL();
-      if(i == (pvl.Comments() - 1)) os << pvl.GetFormat()->FormatEOL();
+    for(int i = 0; i < pvl.comments(); i++) {
+      os << pvl.comment(i) << pvl.format()->formatEOL();
+      if(i == (pvl.comments() - 1)) os << pvl.format()->formatEOL();
     }
 
     // Output the keywords
-    if(pvl.Keywords() > 0) {
-      os << (Isis::PvlContainer &) pvl << pvl.GetFormat()->FormatEOL();
+    if(pvl.keywords() > 0) {
+      os << (Isis::PvlContainer &) pvl << pvl.format()->formatEOL();
     }
 
     // this number keeps track of the number of objects that have been written
     int numObjects = 0;
 
     // Output the objects using the format template
-    for(int i = 0; i < outTemplate.Objects(); i++) {
-      for(int j = 0; j < pvl.Objects(); j++) {
-        if(outTemplate.Object(i).Name() != pvl.Object(j).Name()) continue;
-        if(numObjects == 0 && pvl.Keywords() > 0) os << pvl.GetFormat()->FormatEOL();
-        pvl.Object(j).SetIndent(pvl.Indent());
-        pvl.Object(j).SetFormatTemplate(outTemplate.Object(i));
-        pvl.Object(j).SetFormat(pvl.GetFormat());
-        os << pvl.Object(j) << pvl.GetFormat()->FormatEOL();
-        pvl.Object(j).SetFormat(NULL);
-        pvl.Object(j).SetIndent(0);
-        if(++numObjects < pvl.Objects()) os << pvl.GetFormat()->FormatEOL();
+    for(int i = 0; i < outTemplate.objects(); i++) {
+      for(int j = 0; j < pvl.objects(); j++) {
+        if(outTemplate.object(i).name() != pvl.object(j).name()) continue;
+        if(numObjects == 0 && pvl.keywords() > 0) os << pvl.format()->formatEOL();
+        pvl.object(j).setIndent(pvl.indent());
+        pvl.object(j).setFormatTemplate(outTemplate.object(i));
+        pvl.object(j).setFormat(pvl.format());
+        os << pvl.object(j) << pvl.format()->formatEOL();
+        pvl.object(j).setFormat(NULL);
+        pvl.object(j).setIndent(0);
+        if(++numObjects < pvl.objects()) os << pvl.format()->formatEOL();
       }
     }
 
     // Output the objects that were not included in the format template pvl
-    for(int i = 0; i < pvl.Objects(); i++) {
-      if(outTemplate.HasObject(pvl.Object(i).Name())) continue;
-      if(numObjects == 0 && pvl.Keywords() > 0) os << pvl.GetFormat()->FormatEOL();
-      pvl.Object(i).SetIndent(pvl.Indent());
-      pvl.Object(i).SetFormat(pvl.GetFormat());
-      os << pvl.Object(i) << pvl.GetFormat()->FormatEOL();
-      pvl.Object(i).SetFormat(NULL);
-      pvl.Object(i).SetIndent(0);
-      if(++numObjects < pvl.Objects()) os << pvl.GetFormat()->FormatEOL();
+    for(int i = 0; i < pvl.objects(); i++) {
+      if(outTemplate.hasObject(pvl.object(i).name())) continue;
+      if(numObjects == 0 && pvl.keywords() > 0) os << pvl.format()->formatEOL();
+      pvl.object(i).setIndent(pvl.indent());
+      pvl.object(i).setFormat(pvl.format());
+      os << pvl.object(i) << pvl.format()->formatEOL();
+      pvl.object(i).setFormat(NULL);
+      pvl.object(i).setIndent(0);
+      if(++numObjects < pvl.objects()) os << pvl.format()->formatEOL();
     }
 
     // this number keeps track of the number of groups that have been written
     int numGroups = 0;
 
     // Output the groups using the format template
-    for(int i = 0; i < outTemplate.Groups(); i++) {
-      for(int j = 0; j < pvl.Groups(); j++) {
-        if(outTemplate.Group(i).Name() != pvl.Group(j).Name()) continue;
+    for(int i = 0; i < outTemplate.groups(); i++) {
+      for(int j = 0; j < pvl.groups(); j++) {
+        if(outTemplate.group(i).name() != pvl.group(j).name()) continue;
         if((numGroups == 0) &&
-            (pvl.Objects() > 0 || pvl.Keywords() > 0)) os << pvl.GetFormat()->FormatEOL();
-        pvl.Group(j).SetIndent(pvl.Indent());
-        pvl.Group(j).SetFormatTemplate(outTemplate.Group(i));
-        pvl.Group(j).SetFormat(pvl.GetFormat());
-        os << pvl.Group(j) << pvl.GetFormat()->FormatEOL();
-        pvl.Group(j).SetFormat(NULL);
-        pvl.Group(j).SetIndent(0);
-        if(++numGroups < pvl.Groups()) os << pvl.GetFormat()->FormatEOL();
+            (pvl.objects() > 0 || pvl.keywords() > 0)) os << pvl.format()->formatEOL();
+        pvl.group(j).setIndent(pvl.indent());
+        pvl.group(j).setFormatTemplate(outTemplate.group(i));
+        pvl.group(j).setFormat(pvl.format());
+        os << pvl.group(j) << pvl.format()->formatEOL();
+        pvl.group(j).setFormat(NULL);
+        pvl.group(j).setIndent(0);
+        if(++numGroups < pvl.groups()) os << pvl.format()->formatEOL();
       }
     }
 
     // Output the groups that were not in the format template
-    for(int i = 0; i < pvl.Groups(); i++) {
-      if(outTemplate.HasGroup(pvl.Group(i).Name())) continue;
+    for(int i = 0; i < pvl.groups(); i++) {
+      if(outTemplate.hasGroup(pvl.group(i).name())) continue;
       if((numGroups == 0) &&
-          (pvl.Objects() > 0 || pvl.Keywords() > 0)) os << pvl.GetFormat()->FormatEOL();
-      pvl.Group(i).SetIndent(pvl.Indent());
-      pvl.Group(i).SetFormat(pvl.GetFormat());
-      os << pvl.Group(i) << pvl.GetFormat()->FormatEOL();
-      pvl.Group(i).SetFormat(NULL);
-      pvl.Group(i).SetIndent(0);
-      if(++numGroups < pvl.Groups()) os << pvl.GetFormat()->FormatEOL();
+          (pvl.objects() > 0 || pvl.keywords() > 0)) os << pvl.format()->formatEOL();
+      pvl.group(i).setIndent(pvl.indent());
+      pvl.group(i).setFormat(pvl.format());
+      os << pvl.group(i) << pvl.format()->formatEOL();
+      pvl.group(i).setFormat(NULL);
+      pvl.group(i).setIndent(0);
+      if(++numGroups < pvl.groups()) os << pvl.format()->formatEOL();
     }
 
     // Output the terminator
-    if(pvl.Terminator() != "") {
-      os << pvl.Terminator();
+    if(pvl.terminator() != "") {
+      os << pvl.terminator();
     }
 
     if(removeFormatter) {
-      delete pvl.GetFormat();
-      pvl.SetFormat(NULL);
+      delete pvl.format();
+      pvl.setFormat(NULL);
     }
 
     return os;
@@ -413,7 +413,7 @@ namespace Isis {
             is.seekg(beforeKeywordPos, ios::beg);
 
             QString msg = "Unexpected [";
-            msg += readKeyword.Name();
+            msg += readKeyword.name();
             msg += "] in PVL Object [ROOT]";
             throw IException(IException::Unknown, msg, _FILEINFO_);
           }
@@ -423,16 +423,16 @@ namespace Isis {
           is.seekg(beforeKeywordPos);
           PvlGroup newGroup;
           is >> newGroup;
-          pvl.AddGroup(newGroup);
+          pvl.addGroup(newGroup);
         }
         else if(readKeyword == PvlKeyword("Object")) {
           is.seekg(beforeKeywordPos);
           PvlObject newObject;
           is >> newObject;
-          pvl.AddObject(newObject);
+          pvl.addObject(newObject);
         }
         else {
-          pvl.AddKeyword(readKeyword);
+          pvl.addKeyword(readKeyword);
         }
 
         readKeyword = PvlKeyword();
@@ -496,8 +496,8 @@ namespace Isis {
   const Pvl &Pvl::operator=(const Pvl &other) {
     this->PvlObject::operator=(other);
 
-    p_internalTemplate = other.p_internalTemplate;
-    p_terminator = other.p_terminator;
+    m_internalTemplate = other.m_internalTemplate;
+    m_terminator = other.m_terminator;
 
     return *this;
   }
@@ -512,33 +512,33 @@ namespace Isis {
    * @param pPvl - User Pvl to be validated
    * @param pPvlResults - Contains the unvalidated Pvl
    */
-  void Pvl::ValidatePvl(const Pvl & pPvl, Pvl & pPvlResults)
+  void Pvl::validatePvl(const Pvl & pPvl, Pvl & pPvlResults)
   {
     pPvlResults=Pvl(pPvl);
 
     // Validate Objects
-    int iTmplObjSize = Objects();
+    int iTmplObjSize = objects();
 
     for(int i=0; i<iTmplObjSize; i++) {
-      PvlObject & pvlTmplObj = Object(i);
+      PvlObject & pvlTmplObj = object(i);
 
-      QString sObjName = pvlTmplObj.Name();
+      QString sObjName = pvlTmplObj.name();
       bool bObjFound = false;
 
       // Pvl contains the Object Name
-      if(pPvl.HasObject(sObjName)) {
-        PvlObject & pvlObj = pPvlResults.FindObject(sObjName);
-        pvlTmplObj.ValidateObject(pvlObj);
-        if(pvlObj.Objects()==0 && pvlObj.Groups()==0 && pvlObj.Keywords()==0) {
-          pPvlResults.DeleteObject(sObjName);
+      if(pPvl.hasObject(sObjName)) {
+        PvlObject & pvlObj = pPvlResults.findObject(sObjName);
+        pvlTmplObj.validateObject(pvlObj);
+        if(pvlObj.objects()==0 && pvlObj.groups()==0 && pvlObj.keywords()==0) {
+          pPvlResults.deleteObject(sObjName);
         }
         bObjFound = true;
       }
       else {
         QString sOption = sObjName + "__Required";
         bObjFound = true; // optional is the default
-        if(pvlTmplObj.HasKeyword(sOption)) {
-          PvlKeyword pvlKeyOption = pvlTmplObj.FindKeyword(sOption);
+        if(pvlTmplObj.hasKeyword(sOption)) {
+          PvlKeyword pvlKeyOption = pvlTmplObj.findKeyword(sOption);
           if(pvlKeyOption[0] == "true") { // Required is true
             bObjFound = false;
           }
@@ -551,27 +551,27 @@ namespace Isis {
     }
 
     // Validate Groups
-    int iTmplGrpSize = Groups();
+    int iTmplGrpSize = groups();
     for(int i=0; i<iTmplGrpSize; i++) {
-      PvlGroup & pvlTmplGrp = Group(i);
+      PvlGroup & pvlTmplGrp = group(i);
 
-      QString sGrpName  = pvlTmplGrp.Name();
+      QString sGrpName  = pvlTmplGrp.name();
       bool bGrpFound = false;
 
       // Pvl contains the Object Name
-      if(pPvl.HasGroup(sGrpName)) {
-        PvlGroup & pvlGrp = pPvlResults.FindGroup(sGrpName);
-        pvlTmplGrp.ValidateGroup(pvlGrp);
-        if(pvlGrp.Keywords()==0) {
-          pPvlResults.DeleteGroup(sGrpName);
+      if(pPvl.hasGroup(sGrpName)) {
+        PvlGroup & pvlGrp = pPvlResults.findGroup(sGrpName);
+        pvlTmplGrp.validateGroup(pvlGrp);
+        if(pvlGrp.keywords()==0) {
+          pPvlResults.deleteGroup(sGrpName);
         }
         bGrpFound = true;
       }
       else {
         bGrpFound = true;
         QString sOption = sGrpName + "__Required";
-        if(pvlTmplGrp.HasKeyword(sOption)) {
-          PvlKeyword pvlKeyOption = pvlTmplGrp.FindKeyword(sOption);
+        if(pvlTmplGrp.hasKeyword(sOption)) {
+          PvlKeyword pvlKeyOption = pvlTmplGrp.findKeyword(sOption);
           if(pvlKeyOption[0] == "true") { // Required is true
             bGrpFound = false;
           }
@@ -584,7 +584,7 @@ namespace Isis {
     }
 
     // Validate all the Keywords
-    ValidateAllKeywords((PvlContainer &)pPvlResults);
+    validateAllKeywords((PvlContainer &)pPvlResults);
   }
 
 } //end namespace isis

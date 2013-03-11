@@ -48,7 +48,7 @@ int main(void) {
 
     Pvl p("$mro/testData/PSP_001446_1790_BG12_0.cub");
     Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

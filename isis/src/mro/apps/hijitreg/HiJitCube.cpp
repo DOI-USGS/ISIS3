@@ -103,12 +103,12 @@ namespace Isis {
     OpenCube(filename);
 
     //  Determine if a shift of the CCD exists in the definitions file
-    if(shift.HasGroup(jdata.ccdName)) {
-      PvlGroup &ccddef = shift.FindGroup(jdata.ccdName, Pvl::Traverse);
-      if(ccddef.HasKeyword("SampleOffset")) {
+    if(shift.hasGroup(jdata.ccdName)) {
+      PvlGroup &ccddef = shift.findGroup(jdata.ccdName, Pvl::Traverse);
+      if(ccddef.hasKeyword("SampleOffset")) {
         jdata.sampOffset = (int) ccddef["SampleOffset"];
       }
-      if(ccddef.HasKeyword("LineOffset")) {
+      if(ccddef.hasKeyword("LineOffset")) {
         jdata.lineOffset = (int) ccddef["LineOffset"];
       }
       computePoly();
@@ -225,27 +225,27 @@ namespace Isis {
     Isis::PvlGroup inst;
     Isis::PvlGroup idinst;
     jdata.filename = fileName();
-    Isis::PvlGroup &archive = labelPvl->FindGroup("Archive", Isis::Pvl::Traverse);
+    Isis::PvlGroup &archive = labelPvl->findGroup("Archive", Isis::Pvl::Traverse);
     jdata.productId = (QString) archive["ProductId"];
 
     jdata.lines = lineCount();
-    if(labelPvl->FindObject("IsisCube").HasGroup("OriginalInstrument")) {
-      inst = labelPvl->FindGroup("OriginalInstrument", Isis::Pvl::Traverse);
+    if(labelPvl->findObject("IsisCube").hasGroup("OriginalInstrument")) {
+      inst = labelPvl->findGroup("OriginalInstrument", Isis::Pvl::Traverse);
       originst = true;
     }
     else {
-      inst = labelPvl->FindGroup("Instrument", Isis::Pvl::Traverse);
+      inst = labelPvl->findGroup("Instrument", Isis::Pvl::Traverse);
       originst = false;
     }
     jdata.tdiMode = inst["Tdi"];
     jdata.summing = inst["Summing"];
-    if(labelPvl->FindObject("IsisCube").HasGroup("Instrument") && originst) {
-      idinst = labelPvl->FindGroup("Instrument", Isis::Pvl::Traverse);
-      if (idinst.HasKeyword("PixelPitch")) {
+    if(labelPvl->findObject("IsisCube").hasGroup("Instrument") && originst) {
+      idinst = labelPvl->findGroup("Instrument", Isis::Pvl::Traverse);
+      if (idinst.hasKeyword("PixelPitch")) {
         jdata.pixpitch = idinst["PixelPitch"];
       }
       else {
-        jdata.pixpitch = labelPvl->FindObject("NaifKeywords")["IDEAL_PIXEL_PITCH"];
+        jdata.pixpitch = labelPvl->findObject("NaifKeywords")["IDEAL_PIXEL_PITCH"];
       }
       jdata.summing = (int)(jdata.pixpitch / .012);
     }

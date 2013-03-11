@@ -50,8 +50,8 @@ void IsisMain ()
 
   try {
     Pvl lab(inFile.expanded());
-    instid = (QString) lab.FindKeyword ("CHANNEL_ID");
-    missid = (QString) lab.FindKeyword ("INSTRUMENT_HOST_ID");
+    instid = (QString) lab.findKeyword ("CHANNEL_ID");
+    missid = (QString) lab.findKeyword ("INSTRUMENT_HOST_ID");
   }
   catch (IException &e) {
     QString msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
@@ -84,7 +84,7 @@ void IsisMain ()
   p.StartProcess ();
 
   // Get the directory where the DAWN translation tables are.
-  PvlGroup dataDir (Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Dawn"] + "/translations/";
 
   // Create a PVL to store the translated labels in
@@ -107,15 +107,15 @@ void IsisMain ()
 
   //  Update target if user specifies it
   if (!target.isEmpty()) {
-    PvlGroup &igrp = outLabel.FindGroup("Instrument",Pvl::Traverse);
+    PvlGroup &igrp = outLabel.findGroup("Instrument",Pvl::Traverse);
     igrp["TargetName"] = target;
   }
 
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label
-  outcube->putGroup(outLabel.FindGroup("BandBin",Pvl::Traverse));
-  outcube->putGroup(outLabel.FindGroup("Archive",Pvl::Traverse));
-  outcube->putGroup(outLabel.FindGroup("Instrument",Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("BandBin",Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("Archive",Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("Instrument",Pvl::Traverse));
 
   PvlGroup kerns("Kernels");
   if (instid == "VIS") {
@@ -138,7 +138,7 @@ void IsisMain ()
    hktable.setType("MirrorCos", "DOUBLE");
    Table hktab = hktable.importTable("ScetTimeClock,ShutterStatus,MirrorSin,MirrorCos",
                                       "VIRHouseKeeping");
-   hktab.Label().AddKeyword(PvlKeyword("SourceFile", hkLabel));
+   hktab.Label().addKeyword(PvlKeyword("SourceFile", hkLabel));
    outcube->write(hktab);
  }
  catch (IException &e) {

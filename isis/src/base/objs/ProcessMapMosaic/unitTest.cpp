@@ -69,8 +69,8 @@ void IsisMain() {
   m2.EndProcess();
   cout << "Mosaic label: " << endl;
 
-  labels.Clear();
-  labels.Read("./unitTest.cub");
+  labels.clear();
+  labels.read("./unitTest.cub");
   cout << labels << endl;
 
   Cube tmp;

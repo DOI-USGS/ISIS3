@@ -48,14 +48,14 @@ namespace Isis {
 
 
   void MosaicFileListWidget::fromPvl(PvlObject &pvl) {
-    if(pvl.Name() == "MosaicFileList") {
+    if(pvl.name() == "MosaicFileList") {
       MosaicTreeWidgetItem::TreeColumn col =
           MosaicTreeWidgetItem::FootprintColumn;
       while(col < MosaicTreeWidgetItem::BlankColumn) {
         IString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
         key = key.Convert(" ", '_');
 
-        if (pvl.HasKeyword(key.ToQt())) {
+        if (pvl.hasKeyword(key.ToQt())) {
           bool visible = toBool(pvl[key.ToQt()][0]);
 
           if(visible) {
@@ -84,20 +84,20 @@ namespace Isis {
       }
 
       // Now re-build the tree items
-      for(int cubeGrp = 0; cubeGrp < pvl.Objects(); cubeGrp ++) {
-        PvlObject &cubes = pvl.Object(cubeGrp);
+      for(int cubeGrp = 0; cubeGrp < pvl.objects(); cubeGrp ++) {
+        PvlObject &cubes = pvl.object(cubeGrp);
 
-        QTreeWidgetItem *newCubeGrp = p_tree->addGroup(cubes.Name());
+        QTreeWidgetItem *newCubeGrp = p_tree->addGroup(cubes.name());
 
-        if (cubes.HasKeyword("Expanded")) {
+        if (cubes.hasKeyword("Expanded")) {
           bool expanded = (cubes["Expanded"][0] != "No");
           newCubeGrp->setExpanded(expanded);
         }
 
         for(int cubeFileNameIndex = 0;
-            cubeFileNameIndex < cubes.Keywords();
+            cubeFileNameIndex < cubes.keywords();
             cubeFileNameIndex ++) {
-          if (cubes[cubeFileNameIndex].IsNamed("Cube")) {
+          if (cubes[cubeFileNameIndex].isNamed("Cube")) {
             QString cubeFileName = cubes[cubeFileNameIndex][0];
             newCubeGrp->addChild(takeItem(cubeFileName, allCubes));
           }

@@ -150,18 +150,18 @@ void IsisMain() {
       island += PvlKeyword("NumberFiles", toString(numFiles));
       PvlKeyword files("Files");
       for(int f = 0; f < numFiles; f++) {
-        files.AddValue(islands[p][f]);
+        files.addValue(islands[p][f]);
       }
-      island.AddKeyword(files);
-      results.AddGroup(island);
+      island.addKeyword(files);
+      results.addGroup(island);
     }
     Pvl temp;
-    temp.AddObject(results);
+    temp.addObject(results);
     if(FileName(out).fileExists()) {
-      temp.Append(out);
+      temp.append(out);
     }
     else {
-      temp.Write(out);
+      temp.write(out);
     }
 
   }
