@@ -306,9 +306,9 @@ namespace Isis {
       TProjection *tproj = (TProjection *) proj;
       PvlGroup mappingGroup(tproj->Mapping());
 
-      Distance equatorialRadius(toDouble(tproj->Mapping()["EquatorialRadius"][0]),
+      Distance equatorialRadius(tproj->EquatorialRadius(),
                                 Distance::Meters);
-      Distance polarRadius(toDouble(tproj->Mapping()["PolarRadius"][0]), Distance::Meters);
+      Distance polarRadius(tproj->PolarRadius(), Distance::Meters);
 
       QRectF boundingRect = getWidget()->cubesBoundingRect();
 
@@ -371,12 +371,20 @@ namespace Isis {
             }
           }
           else {
-            m_minLat = Latitude(tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
-            m_maxLat = Latitude(tproj->MaximumLatitude(), mappingGroup, Angle::Degrees);
-            throw IException(IException::Unknown,
-                  "Could not extract latitude extents from the cubes. The extents from the"
-                  " projection were used instead.",
-                _FILEINFO_);
+            m_minLat = Latitude(-90, mappingGroup, Angle::Degrees);
+            m_maxLat = Latitude(90, mappingGroup, Angle::Degrees);
+            m_latExtents = Manual;
+
+            static Projection *lastProjWithThisError = NULL;
+
+            if (proj != lastProjWithThisError) {
+              lastProjWithThisError = proj;
+              QMessageBox::warning(NULL, tr("Latitude Extent Failure"),
+                                   tr("<p/>Could not extract latitude extents from the cubes.<br/>"
+                                      "<br/>The option <strong>\"Compute From Images\"</strong> "
+                                      "will default to using the <strong>Manual</strong> option "
+                                      "for latitude extents with a range of -90 to 90."));
+            }
           }
           break;
 
@@ -486,12 +494,20 @@ namespace Isis {
             }
           }
           else {
-            m_minLat = Latitude(tproj->MinimumLongitude(), Angle::Degrees);
-            m_maxLat = Latitude(tproj->MaximumLongitude(), Angle::Degrees);
-            throw IException(IException::Unknown,
-                  "Could not extract latitude extents from the cubes. The extents from the"
-                  " projection were used instead.",
-                _FILEINFO_);
+            m_minLon = zeroLon;
+            m_maxLon = threeSixtyLon;
+            m_lonExtents = Manual;
+
+            static Projection *lastProjWithThisError = NULL;
+
+            if (proj != lastProjWithThisError) {
+              lastProjWithThisError = proj;
+              QMessageBox::warning(NULL, tr("Longitude Extent Failure"),
+                                   tr("<p/>Could not extract longitude extents from the cubes.<br/>"
+                                      "<br/>The option <strong>\"Compute From Images\"</strong> "
+                                      "will default to using the <strong>Manual</strong> option "
+                                      "for longitude extents with a range of 0 to 360."));
+            }
           }
           break;
 
@@ -544,9 +560,10 @@ namespace Isis {
     if (proj && proj->projectionType() == Projection::Triaxial) {
       TProjection *tproj = (TProjection *) proj;
       Distance equatorialRadius(
-          toDouble(tproj->Mapping()["EquatorialRadius"][0]), Distance::Meters);
+          tproj->EquatorialRadius(),
+          Distance::Meters);
       Distance polarRadius(
-          toDouble(tproj->Mapping()["PolarRadius"][0]), Distance::Meters);
+          tproj->PolarRadius(), Distance::Meters);
 
       if (obj["BaseLatitude"][0] != "Null")
         m_baseLat = Latitude(toDouble(obj["BaseLatitude"][0]), equatorialRadius, polarRadius,
@@ -758,10 +775,10 @@ namespace Isis {
     m_drawGridCheckBox->blockSignals(false);
 
     if (!getWidget()->getProjection()) {
-      IString msg = "Please set the mosaic scene's projection before trying to "
+      QString msg = "Please set the mosaic scene's projection before trying to "
                     "draw a grid. This means either open a cube (a projection "
                     "will be calculated) or set the projection explicitly";
-      throw IException(IException::User, msg, _FILEINFO_);
+      QMessageBox::warning(NULL, tr("Grid Tool Requires Projection"), msg);
     }
 
     if (m_minLon.degrees() < m_maxLon.degrees() && m_minLat.degrees() < m_maxLat.degrees()) {

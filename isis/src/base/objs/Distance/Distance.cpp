@@ -160,6 +160,28 @@ namespace Isis {
 
 
   /**
+   * Get the distance in solar radii (a unit of ~696,265km).
+   *
+   * @return Current distance, in solar radii, guaranteed to be >= 0.0
+   */
+  double Distance::solarRadii() const {
+    return distance(SolarRadii);
+  }
+
+
+  /**
+   * Set the distance in solar radii.
+   *
+   * @param distanceInSolarRadii This is the value to set this distance to,
+   *     given in solar radii. This will throw an exception if the value is
+   *     negative.
+   */
+  void Distance::setSolarRadii(double distanceInSolarRadii) {
+    setDistance(distanceInSolarRadii, SolarRadii);
+  }
+
+
+  /**
    * Get a textual representation of this distance.
    *
    * @return XXX meters (or empty string if not valid).
@@ -407,10 +429,15 @@ namespace Isis {
         resultingDistance = distanceInMeters / 1000.0;
         break;
 
-      case Pixels:
+      case Pixels: {
         IString msg = "Cannot call distance() with pixels, ask for another "
                       "unit";
         throw IException(IException::Programmer, msg, _FILEINFO_);
+        break;
+      }
+
+      case SolarRadii:
+        resultingDistance = distanceInMeters / 6.9599e8;
         break;
     }
 
@@ -451,10 +478,15 @@ namespace Isis {
         distanceInMeters = distance * 1000.0;
         break;
 
-      case Pixels:
+      case Pixels: {
         IString msg = "Cannot setDistance with pixels, must convert to another "
             "unit first";
         throw IException(IException::Programmer, msg, _FILEINFO_);
+        break;
+      }
+
+      case SolarRadii:
+        distanceInMeters = distance * 6.9599e8;
         break;
     }
 

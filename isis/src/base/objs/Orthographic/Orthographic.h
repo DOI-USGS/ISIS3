@@ -72,6 +72,12 @@ namespace Isis {
    *                           #928.
    *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                           References #775.
+   *   @history 2013-02-22 Kimberly Oyama and Debbie Cook - XYRange() and SetCoordinate()
+   *                           were modified because XYRange() was returning the wrong x/y
+   *                           ranges caused by a false failure in SetCoordinate(). Added
+   *                           a case to the unit test to check the x/y values when the
+   *                           lat/lon ranges are smaller than the possible range of the
+   *                           projection (half the planet). Fixes #798.
    */
   class Orthographic : public TProjection {
     public:

@@ -269,15 +269,23 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
 }
 
 
-void SpiceDbGen::FurnishDependencies(QString sclk, QString lsk) {
+void SpiceDbGen::FurnishDependencies(QList<FileName> sclks, QList<FileName> lsks,
+                                     QList<FileName> extras) {
   NaifStatus::CheckErrors();
 
-  //furnish the lsk file
-  furnsh_c(lsk.toAscii().data());
+  // furnish the lsk files
+  foreach (FileName lsk, lsks) {
+    furnsh_c(lsk.expanded().toAscii().data());
+  }
 
-  //get the sclk, if such a file was specified
-  if(sclk != "") {
-    furnsh_c(sclk.toAscii().data());
+  // furnish the sclk files
+  foreach (FileName sclk, sclks) {
+    furnsh_c(sclk.expanded().toAscii().data());
+  }
+
+  // furnish the extra files
+  foreach (FileName extra, extras) {
+    furnsh_c(extra.expanded().toAscii().data());
   }
 
   NaifStatus::CheckErrors();

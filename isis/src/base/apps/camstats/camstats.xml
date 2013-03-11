@@ -71,11 +71,25 @@
     <change name="Janet Richie, Ella Mae Lee" date="2012-11-20">
        Modified documentation, fixes #1174.
      </change>
+     <change name="Lynn Weller" date="2013-02-25">
+       Removed links to applications imbedded in text and replaced with
+       italicized application name.  Added application links to the
+       "Related Objects and Documents" section of the documentation.
+        Fixes mantis ticket #1525.
+     </change>
   </history>
 
   <category>
     <categoryItem>Cameras</categoryItem>
   </category>
+
+  <seeAlso>
+    <applications>
+      <item>spiceinit</item>
+      <item>qmos</item>
+      <item>getkey</item>
+    </applications>
+  </seeAlso>
 
   <groups>
     <group name="Files">
@@ -86,9 +100,7 @@
           Input cube filename
         </brief>
         <description>
-          Input cube with appropriate camera labels (Refer to <a href=
-      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/spiceinit/spiceinit.html"
-      ><i>Spiceinit</i></a>).
+          Input cube with appropriate camera labels (Refer to <i>spiceinit</i>).
           The input must be a <def>Level0</def> or <def>Level1</def> cube.
         </description>
         <filter>
@@ -104,9 +116,8 @@
           If this option is selected, the output camera statistics will be
           attached to the input cube's label under group called "CameraStatistics."
           <p>
-          Applications such as <a href=
-          "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qmos/qmos.html"
-          ><i>Qmos</i></a> reference the attached label for geometric information of the cube.
+          Applications such as <i>qmos</i> reference the attached label for 
+          geometric information of the cube.
           </p>
         </description>
         <default><item>FALSE</item></default>
@@ -122,9 +133,7 @@
         <description>
           A text file in label format (<def>PVL</def>), which will contain the 
 	  results of <i>camstats</i>.  This output file can be used in conjunction 
-	  with the <a href=
-          "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/getkey/getkey.html"
-          ><i>getkey</i></a> application in order to pass the results to another 
+	  with the <i>getkey</i> application in order to pass the results to another 
 	  program when developing scripts.  
           <p>
              Alternatively, the output can be written to a text file format, 

@@ -47,23 +47,23 @@ namespace Isis {
    * @author 2002-04-09 Kris Becker & Jeff Anderson
    *
    * @internal
-   *  @history 2003-05-16 Stuart Sides  - modified schema from
-   *                                      astrogeology...isis.astrogeology
-   *  @history 2005-01-16 Jeff Anderson - moved some private methods/variables
-   *                                      into protected space
-   *  @history 2007-09-05 Kris Becker - Added default constructor for added
-   *           protection;  Added assignment operator for a single value for
-   *           convenience.
-   *  @history 2008-06-25 Noah Hilt - Added some safety measures to the allocate
-   *           and deconstructor methods to prevent accessing buffers that have
-   *           not been initialized. Added memory checking to make sure to release
-   *           any memory if initialized.
-   *  @history 2010-06-22 Steven Lambright - "Copy" now ensures pixel types are
-   *           the same to prevent going out of memory bounds
-   *  @history 2012-07-02 Steven Lambright and Stuart Sides - Added "includeRawBuf" to
-   *                          Copy(). We did this to simplify implementation
-   *                          in Cube::copy()... this ought to be usable in many other areas
-   *                          also. References #961. 
+   *   @history 2003-05-16 Stuart Sides - modified schema from astrogeology...isis.astrogeology
+   *   @history 2005-01-16 Jeff Anderson - moved some private methods/variables into protected space
+   *   @history 2007-09-05 Kris Becker - Added default constructor for added
+   *                           protection;  Added assignment operator for a single value for
+   *                           convenience.
+   *   @history 2008-06-25 Noah Hilt - Added some safety measures to the allocate
+   *                           and deconstructor methods to prevent accessing buffers that have
+   *                           not been initialized. Added memory checking to make sure to release
+   *                           any memory if initialized.
+   *   @history 2010-06-22 Steven Lambright - "Copy" now ensures pixel types are
+   *                           the same to prevent going out of memory bounds
+   *   @history 2012-07-02 Steven Lambright and Stuart Sides - Added "includeRawBuf" to
+   *                           Copy(). We did this to simplify implementation
+   *                           in Cube::copy()... this ought to be usable in many other areas
+   *                           also. References #961.
+   *   @history 2012-11-19 Steven Lambright - Added CopyOverlapFrom() for use as a quicker IO
+   *                           than going back to Cube. References #1232.
    */
   class Buffer {
     public:
@@ -154,6 +154,8 @@ namespace Isis {
         return (p_buf);
       };
       void Copy(const Buffer &in, bool includeRawBuf = true);
+
+      bool CopyOverlapFrom(const Buffer &in);
 
       /**
        * Returns a void pointer to the raw buffer. Cast this void pointer using

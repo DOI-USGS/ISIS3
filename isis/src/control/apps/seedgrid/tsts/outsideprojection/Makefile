@@ -6,7 +6,7 @@ APPNAME = seedgrid
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) map=$(INPUT)/orthographic.map minlat=80 maxlat=90 \
-	minlon=30 maxlon=68 xstep=100000 ystep=100000 \
+	$(APPNAME) map=$(INPUT)/orthographic.map minlat=-90 maxlat=-80 \
+	minlon=0 maxlon=1 xstep=100000 ystep=100000 \
 	networkid=NET001 pointid=PT??????? description="Test control network" \
 	onet=$(OUTPUT)/outnet.net >& /dev/null

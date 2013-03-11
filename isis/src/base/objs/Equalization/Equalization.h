@@ -41,9 +41,9 @@ namespace Isis {
   class Pvl;
   class PvlGroup;
   class Statistics;
-  /** 
-   * This class can be used to calculate, read in, and/or apply equalization 
-   * statistics for a list of files. 
+  /**
+   * This class can be used to calculate, read in, and/or apply equalization
+   * statistics for a list of files.
    * <ul>
    *   <li> Calculating equalization statistics
    *     <ul>
@@ -73,58 +73,83 @@ namespace Isis {
    *       <li> Statistics must be calculated or imported before they can be
    *       applied to the images in the input file list.
    *     </ul>
-   * </ul> 
-   * 
-   * Code example for calculating statistics, writing results to a Pvl, writing 
-   * results to a file, and applying results: 
-   * <code> 
-   * Equalization eq(inputCubeListFileName); 
-   * // calculate 
-   * eq.addHolds(holdListFileName); 
-   * eq.calculateStatistics(sampPercent, mincnt, wtopt, sType, methodType); 
-   * // write to PvlGroup 
-   * PvlGroup resultsGroup = eq.getResults(); 
-   * // write to file 
-   * eq.write(outputStatisticsFileName); 
-   * // apply corrections to cubes in input list  
-   * eq.applyCorrection(); 
-   * </code> 
-   *  
-   * Code example for importing statistics and applying them. 
-   * <code> 
-   * Equalization eq(listFileName); 
-   * eq.importStatistics(inputStatisticsFileName); 
-   * // create new output cubes from equalized cube list and apply corrections 
-   * eq.applyCorrection(equalizedCubeListFileName); 
-   * </code> 
-   *  
-   * This class contains the classes ImageAdjustment, CalculateFunctor, and 
-   * ApplyFunctor. 
-   *  
-   *  
+   * </ul>
+   *
+   * Code example for calculating statistics, writing results to a Pvl, writing
+   * results to a file, and applying results:
+   * <code>
+   * Equalization eq(inputCubeListFileName);
+   * // calculate
+   * eq.addHolds(holdListFileName);
+   * eq.calculateStatistics(sampPercent, mincnt, wtopt, sType, methodType);
+   * // write to PvlGroup
+   * PvlGroup resultsGroup = eq.getResults();
+   * // write to file
+   * eq.write(outputStatisticsFileName);
+   * // apply corrections to cubes in input list
+   * eq.applyCorrection();
+   * </code>
+   *
+   * Code example for importing statistics and applying them.
+   * <code>
+   * Equalization eq(listFileName);
+   * eq.importStatistics(inputStatisticsFileName);
+   * // create new output cubes from equalized cube list and apply corrections
+   * eq.applyCorrection(equalizedCubeListFileName);
+   * </code>
+   *
+   * This class contains the classes ImageAdjustment, CalculateFunctor, and
+   * ApplyFunctor.
+   *
+   *
    * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2012-04-26 Jeannie Backer - Added includes to Filelist, Pvl,
    *                           PvlGroup, and Statistics classes to the
    *                           implementation file.
-   *   @history 2013-01-29 Jeannie Backer - Added input parameter to 
+   *   @history 2013-01-29 Jeannie Backer - Added input parameter to
    *                           calculateStatistics() method. Added error catch
    *                           to improve thrown message. Fixes #962.
    *   @history 2013-01-29 Jeannie Backer - Fixed bugs from previous checkin.
    *                           Improved test coverage by more than 23% for each
    *                           coverage type.
+   *   @history 2013-02-06 Steven Lambright - Made the OverlapNormalization::SolutionType into
+   *                           a member required upon instantiation in order to support
+   *                           gain adjustments without normalization, which uses a separate
+   *                           formula in evaluate() instead of just modifying how statistics
+   *                           are computed. Implemented the GainsWithoutNormalization solution
+   *                           type. References #911.
    */
   class Equalization {
+    public:
+      Equalization(OverlapNormalization::SolutionType sType, QString fromListName);
+      virtual ~Equalization();
+
+      void addHolds(QString holdListName);
+
+      void calculateStatistics(double sampPercent, int mincnt,
+          bool wtopt,
+          LeastSquares::SolveMethod methodType);
+      void importStatistics(QString instatsFileName);
+      void applyCorrection(QString toListName);
+
+      PvlGroup getResults();
+      void write(QString outstatsFileName);
+
+      double evaluate(double dn, int imageIndex, int bandIndex) const;
+
     protected:
       /**
        * @author ????-??-?? Unknown
        *
        * @internal
+       *   @history 2013-02-06 Steven Lambright - Added support for GainsWithoutNormalization
+       *                           solution type, which uses a different formula. References #911.
        */
       class ImageAdjustment {
         public:
-          ImageAdjustment() {}
+          ImageAdjustment(OverlapNormalization::SolutionType sType) { m_sType = sType; }
           ~ImageAdjustment() {}
 
           void addGain(double gain) {
@@ -152,16 +177,27 @@ namespace Isis {
           }
 
           double evaluate(double dn, int index) const {
+            double result = Null;
+
             double gain = gains[index];
-            double offset = offsets[index];
-            double avg = avgs[index];
-            return (dn - avg) * gain + offset + avg;
+            if (m_sType != OverlapNormalization::GainsWithoutNormalization) {
+              double offset = offsets[index];
+              double avg = avgs[index];
+              result = (dn - avg) * gain + offset + avg;
+            }
+            else {
+              result = dn * gain;
+            }
+
+            return result;
           }
 
         private:
           std::vector<double> gains;
           std::vector<double> offsets;
           std::vector<double> avgs;
+
+          OverlapNormalization::SolutionType m_sType;
       };
 
       /**
@@ -205,26 +241,8 @@ namespace Isis {
           const ImageAdjustment *m_adjustment;
       };
 
-      Equalization();
-
-    public:
-      Equalization(QString fromListName);
-      virtual ~Equalization();
-
-      void addHolds(QString holdListName);
-
-      void calculateStatistics(double sampPercent, int mincnt,
-          bool wtopt, OverlapNormalization::SolutionType sType, 
-          LeastSquares::SolveMethod methodType);
-      void importStatistics(QString instatsFileName);
-      void applyCorrection(QString toListName);
-
-      PvlGroup getResults();
-      void write(QString outstatsFileName);
-
-      double evaluate(double dn, int imageIndex, int bandIndex) const;
-
     protected:
+      Equalization();
       void loadInputs(QString fromListName);
       void setInput(int index, QString value);
       const FileList & getInputs() const;
@@ -261,6 +279,8 @@ namespace Isis {
 
       int m_maxCube;
       int m_maxBand;
+
+      OverlapNormalization::SolutionType m_sType;
 
       Pvl *m_results;
   };

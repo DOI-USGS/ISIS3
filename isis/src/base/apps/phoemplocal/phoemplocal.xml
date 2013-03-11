@@ -29,14 +29,7 @@
     model, and the results for a single point are returned by the program.
     The input parameter values and the results for the limb-darkening parameter (L), 
     best fit multiplier, and the RMS error of fit are reported to an output file. 
-    The results are input into the ISIS2 photoclinometry program 
-    <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/pdfs2.cgi?pc2d">Pc2d</a>, 
-    which uses these types of models and does not allow for variation of 
-    the parameters with <def link="Phase Angle">phase angle</def>.    
-    </p>
-    <p>
-    NOTE:  Currently, the photoclinometry application P2cd is not available
-    in ISIS3.
+    The results can be used for photoclinometry application.
     </p>
   </description>
 
@@ -47,6 +40,12 @@
   <oldName>
     <item>pho_emp_local</item>
   </oldName>
+
+  <seeAlso>
+    <applications>
+      <item>photomet</item>
+    </applications>
+  </seeAlso>
 
   <history>
     <change name="Randy Kirk" date= "1999-11-16">
@@ -66,6 +65,12 @@
     <change name="Ella Mae Lee" date="2013-01-28">
       Updated documentation for phoemplocal, and added glossary links and
       examples, fixes #450
+    </change>
+    <change name="Lynn Weller" date="2013-02-25">
+      Removed links to applications imbedded in text and replaced with
+      italicized application name.  Added application links to the
+      "Related Objects and Documents" section of the documentation.
+      Fixes mantis ticket #1525.
     </change>
   </history>
 
@@ -319,9 +324,7 @@
           Specify a photometric function to fit to the Hapke model. The
           lists of brightness and limb-darkening values can be used with the
           LunarLambertEmpirical or MinnaertEmpirical photometric functions in
-          the photometric normalization program <a href=
-    "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-          >Photomet</a>.
+          the photometric normalization program <i>photomet</i>.
         </description>
         <list>
           <option value="LUNARLAMBERT">
@@ -350,9 +353,7 @@
               Fit the Minnaert photometric function to the Hapke Model to
               derive the parameters for the MinnaertEmpirical photometric
               function. The MinnaertEmpirical model as defined by
-              McEwen (1991) and used by the program <a href=
-    "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-          >Photomet</a> is
+              McEwen (1991) and used by the program <i>photomet</i> is
               <blockquote>
               func=b(phase) * u0**k(phase) * u**(k(phase)-1)
               </blockquote>
@@ -750,10 +751,10 @@
 
   <examples>
      <example>
-      <brief>Create a PVL file with Phoemplocal</brief>
+      <brief>Create a PVL file with phoemplocal</brief>
       <description>
         This example shows the GUI and the input setting for each parameter name
-	in the Phoemplocal program.  
+	in the <i>phoemplocal</i> program.  
       </description>
       <terminalInterface>
         <commandLine>
@@ -763,19 +764,19 @@
 	   incidence=30 rms_slope=.5
         </commandLine>
         <description>
-         Run Phoemplocal to generate a PVL file with the parameter values for the
+         Run <i>phoemplocal</i> to generate a PVL file with the parameter values for the
          LunarLambertEmpirical photometric model and no atmospheric scattering.
         </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/phoemplocal_gui.png" width="464" height="750">
-            <brief>Phoemplocal GUI</brief>
+            <brief>phoemplocal GUI</brief>
             <description>
               Screenshot of GUI version of the application.  The parameter values
               are entered by the user, and the results are output to a text file.
             </description>
-            <thumbnail src="assets/thumbs/phoemplocal_gui_thumb.png" caption="Phoemplocal GUI" width="92" height="150"/>
+            <thumbnail src="assets/thumbs/phoemplocal_gui_thumb.png" caption="phoemplocal GUI" width="92" height="150"/>
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -785,9 +786,7 @@
           <description>
             The output <def>PVL</def> file contains the photometric parameter settings
 	    for the LunarLambertEmpirical photometric function.  The contents of this 
-	    file can be used as input to the ISIS2 <a 
-	    href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/pdfs2.cgi?pc2d">Pc2d</a>
-	    program.
+	    file can be used as input for photoclinometry application.
           </description>
           <parameterName>
             TO

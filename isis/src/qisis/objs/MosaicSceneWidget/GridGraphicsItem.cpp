@@ -44,8 +44,8 @@ namespace Isis {
 
         if (mappingGroup["LatitudeType"][0] == "Planetographic") {
 
-          Distance equaRad(toDouble(tproj->Mapping()["EquatorialRadius"][0]), Distance::Meters);
-          Distance polRad(toDouble(tproj->Mapping()["PolarRadius"][0]), Distance::Meters);
+          Distance equaRad(tproj->EquatorialRadius(), Distance::Meters);
+          Distance polRad(tproj->PolarRadius(), Distance::Meters);
 
           minLat = Latitude(latMin.planetographic(Angle::Degrees), mappingGroup,
                             Angle::Degrees);

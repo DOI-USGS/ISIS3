@@ -3,6 +3,7 @@
 #include "Isis.h"
 
 #include <QString>
+#include <QStringList>
 #include <sstream>
 #include "Process.h"
 #include "Pvl.h"
@@ -24,7 +25,7 @@ void IsisMain() {
   // Set Preferences to always turn off Terminal Output
   PvlGroup &grp = Isis::Preference::Preferences().FindGroup("SessionLog", Isis::Pvl::Traverse);
   grp["TerminalOutput"].SetValue("Off");
-
+ 
   // Use a regular Process
   Process p;
 
@@ -89,12 +90,21 @@ void IsisMain() {
     else value = key[i-1];
   }
   else {
-    // Push the whole list into a IString and clean it up before returning it
+
     if(key.Size() > 1) {
-      ostringstream os;
-      os << key;
-      QString temp = os.str().c_str();
-      value = temp.mid(temp.indexOf("(") + 1, temp.indexOf(")") - temp.indexOf("(") - 1).simplified();
+
+      QStringList values;
+
+      for (int i = 0; i < key.Size(); i++) {
+        QString thisValue = key[i];
+
+        if (thisValue.contains (" "))
+          thisValue = "\"" + thisValue + "\"";
+
+        values << thisValue;
+      }
+           
+      value = values.join( ", ");
     }
     // Just get the keyword value since it isnt a list
     else value = (QString)key;

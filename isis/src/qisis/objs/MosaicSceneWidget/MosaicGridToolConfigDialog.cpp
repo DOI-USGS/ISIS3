@@ -64,7 +64,7 @@ namespace Isis {
     QLabel *autoGridLabel = new QLabel("Auto &Grid");
     autoGridLabel->setWhatsThis(autoGridWhatsThis);
     mainLayout->addWidget(autoGridLabel, row, 0, 1, 2);
-    
+
     m_autoGridCheckBox = new QCheckBox;
     autoGridLabel->setBuddy(m_autoGridCheckBox);
     m_autoGridCheckBox->setWhatsThis(autoGridWhatsThis);
@@ -89,14 +89,14 @@ namespace Isis {
     connect(m_baseLatSlider, SIGNAL(valueChanged(int)),
             this, SLOT(onBaseLatSliderChanged()));
     mainLayout->addWidget(m_baseLatSlider, row, 2, 1, 1);
-    
+
     m_baseLatLineEdit = new QLineEdit("0");
     m_baseLatLineEdit->setValidator(new QDoubleValidator(-90.0, 90.0, 99, this));
     m_baseLatLineEdit->setWhatsThis(baseLatWhatsThis);
     connect(m_baseLatLineEdit, SIGNAL(textChanged(const QString &)),
             this, SLOT(refreshWidgetStates()));
     mainLayout->addWidget(m_baseLatLineEdit, row, 3, 1, 1);
-    
+
     m_baseLatTypeLabel = new QLabel("Degrees");
     mainLayout->addWidget(m_baseLatTypeLabel, row, 4, 1, 1);
     row++;
@@ -143,7 +143,7 @@ namespace Isis {
     connect(m_latIncSlider, SIGNAL(valueChanged(int)),
             this, SLOT(onLatIncSliderChanged()));
     mainLayout->addWidget(m_latIncSlider, row, 2, 1, 1);
-    
+
     m_latIncLineEdit = new QLineEdit("45");
     m_latIncLineEdit->setValidator(new QDoubleValidator(0, 180.0, 15, this));
     m_latIncLineEdit->setWhatsThis(latIncWhatsThis);
@@ -169,7 +169,7 @@ namespace Isis {
     connect(m_lonIncSlider, SIGNAL(valueChanged(int)),
             this, SLOT(onLonIncSliderChanged()));
     mainLayout->addWidget(m_lonIncSlider, row, 2, 1, 1);
-    
+
     m_lonIncLineEdit = new QLineEdit("45");
     m_lonIncLineEdit->setValidator(new QDoubleValidator(this));
     m_lonIncLineEdit->setWhatsThis(lonIncWhatsThis);
@@ -255,7 +255,7 @@ namespace Isis {
     row++;
     mainLayout->setRowMinimumHeight(row, 10);
     row++;
-    
+
     QString lonExtentWhatsThis =
         "The longitude range determines the extents of the grid. The \"<b>Read Map File</b>\" "
         "option will derive the extents from the loaded map's projection. The"
@@ -339,7 +339,7 @@ namespace Isis {
     m_densityLabel = new QLabel("Grid Line Density");
     m_densityLabel->setWhatsThis(densityWhatsThis);
     mainLayout->addWidget(m_densityLabel, row, 0, 1, 2);
-    
+
     m_densityEdit = new QLineEdit("10000");
     m_densityEdit->setValidator(new QIntValidator(1, INT_MAX, this));
     m_densityEdit->setWhatsThis(densityWhatsThis);
@@ -358,7 +358,7 @@ namespace Isis {
     m_autoApplyCheckBox = new QCheckBox("Auto Apply");
     m_autoApplyCheckBox->setChecked(true);
     buttonsAreaLayout->addWidget(m_autoApplyCheckBox);
-  
+
     buttonsAreaLayout->addStretch();
 
     QPushButton *okayButton = new QPushButton("&Ok");
@@ -400,7 +400,7 @@ namespace Isis {
   void MosaicGridToolConfigDialog::applySettings(bool shouldReadSettings) {
 
     int cursorPos = 0;
-    
+
     // Validate base latitude value
     QString baseLatitude = m_baseLatLineEdit->text();
     if (m_baseLatLineEdit->isEnabled()) {
@@ -442,7 +442,7 @@ namespace Isis {
           "Longitude increment must be a double",
           _FILEINFO_);
     }
-    
+
     // Validate minLatExtent value
     QString minLatExtent = m_minLatExtentLineEdit->text();
     QValidator::State validMinLatExtent =
@@ -452,7 +452,7 @@ namespace Isis {
           "Minimum latitude extent must be a double",
           _FILEINFO_);
     }
-    
+
     // Validate maxLatExtent value
     QString maxLatExtent = m_maxLatExtentLineEdit->text();
     QValidator::State validMaxLatExtent =
@@ -472,7 +472,7 @@ namespace Isis {
           "Minimum longitude extent must be a double",
           _FILEINFO_);
     }
-    
+
     // Validate maxLonExtent value
     QString maxLonExtent = m_maxLonExtentLineEdit->text();
     QValidator::State validMaxLonExtent =
@@ -545,7 +545,7 @@ namespace Isis {
       // Don't auto apply until we're done
       bool autoApply = m_autoApplyCheckBox->isChecked();
       m_autoApplyCheckBox->setChecked(false);
-      
+
       m_showGridCheckBox->setChecked(m_tool->showGrid());
       m_autoGridCheckBox->setChecked(m_tool->autoGridCheckBox());
       m_baseLonLineEdit->setText(QString::number(m_tool->baseLon().degrees()));
@@ -553,27 +553,30 @@ namespace Isis {
       m_latIncLineEdit->setText(QString::number(m_tool->latInc().degrees()));
       m_lonIncLineEdit->setText(QString::number(m_tool->lonInc().degrees()));
 
+      Latitude minLat = m_tool->minLat();
+      Latitude maxLat = m_tool->maxLat();
       m_latExtentCombo->setCurrentIndex(m_latExtentCombo->findData(m_tool->latExtents()));
       if (m_tool->sceneWidget()->getProjection()->Mapping()["LatitudeType"][0] ==
           "Planetocentric") {
 
         m_baseLatLineEdit->setText(QString::number(m_tool->baseLat().degrees()));
-        m_minLatExtentLineEdit->setText(QString::number(m_tool->minLat().degrees()));
-        m_maxLatExtentLineEdit->setText(QString::number(m_tool->maxLat().degrees()));
+        m_minLatExtentLineEdit->setText(QString::number(minLat.degrees()));
+        m_maxLatExtentLineEdit->setText(QString::number(maxLat.degrees()));
       }
       else {
-
         m_baseLatLineEdit->setText(QString::number(
             m_tool->baseLat().planetographic(Angle::Degrees)));
         m_minLatExtentLineEdit->setText(QString::number(
-                                        m_tool->minLat().planetographic(Angle::Degrees)));
+                                        minLat.planetographic(Angle::Degrees)));
         m_maxLatExtentLineEdit->setText(QString::number(
-                                        m_tool->maxLat().planetographic(Angle::Degrees)));
+                                        maxLat.planetographic(Angle::Degrees)));
       }
 
+      Angle minLon = m_tool->minLon();
+      Angle maxLon = m_tool->maxLon();
       m_lonExtentCombo->setCurrentIndex(m_lonExtentCombo->findData(m_tool->lonExtents()));
-      m_minLonExtentLineEdit->setText(QString::number(m_tool->minLon().degrees()));
-      m_maxLonExtentLineEdit->setText(QString::number(m_tool->maxLon().degrees()));
+      m_minLonExtentLineEdit->setText(QString::number(minLon.degrees()));
+      m_maxLonExtentLineEdit->setText(QString::number(maxLon.degrees()));
 
       m_densityEdit->setText(QString::number(m_tool->density()));
 
@@ -585,7 +588,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Calls the private method refreshWidgetStates with true as the argument
    *   in order to have refreshWidgetStates call apply settings.
@@ -600,10 +603,10 @@ namespace Isis {
    *   the auto apply checkbox is checked.
    */
   void MosaicGridToolConfigDialog::refreshWidgetStates(bool canAutoApply) {
-    
+
     QElapsedTimer timer;
     timer.start();
-    
+
     bool enabled = m_tool->sceneWidget()->getProjection();
     bool showGrid = enabled && m_showGridCheckBox->isChecked();
     bool autoGrid = enabled && m_autoGridCheckBox->isChecked();
@@ -653,7 +656,7 @@ namespace Isis {
     m_latExtentLabel->setEnabled(showGrid);
     m_latExtentCombo->setEnabled(showGrid);
     m_latExtentTypeLabel->setEnabled(showGrid);
-    
+
     m_minLatExtentLabel->setEnabled(enableLatExtents);
     m_minLatExtentLabel->setEnabled(enableLatExtents);
     m_minLatExtentSlider->blockSignals(true);
@@ -662,7 +665,7 @@ namespace Isis {
     m_minLatExtentSlider->blockSignals(false);
     m_minLatExtentLineEdit->setEnabled(enableLatExtents);
     m_minLatExtentTypeLabel->setEnabled(enableLatExtents);
-    
+
     m_maxLatExtentLabel->setEnabled(enableLatExtents);
     m_maxLatExtentSlider->setEnabled(enableLatExtents);
     m_maxLatExtentSlider->blockSignals(true);
@@ -675,7 +678,7 @@ namespace Isis {
     m_lonExtentLabel->setEnabled(showGrid);
     m_lonExtentCombo->setEnabled(showGrid);
     m_lonDomainLabel->setEnabled(showGrid);
-    
+
     m_minLonExtentLabel->setEnabled(enableLonExtents);
     m_minLonExtentSlider->setEnabled(enableLonExtents);
     m_minLonExtentSlider->blockSignals(true);
@@ -694,17 +697,17 @@ namespace Isis {
 
     m_densityLabel->setEnabled(showGrid);
     m_densityEdit->setEnabled(showGrid);
-  
+
     if (m_autoApplyCheckBox->isChecked() && canAutoApply) {
       try {
-        if(m_autoGridCheckBox->isChecked()) 
+        if(m_autoGridCheckBox->isChecked())
           applySettings(true);
         else
           applySettings(false);
       }
       catch (IException &) {
       }
-    
+
       //Time in milliseconds
       if (timer.elapsed() > 250) {
         m_densityEdit->setText(QString::number(
@@ -712,7 +715,7 @@ namespace Isis {
       }
     }
   }
-    
+
   /**
    * Updates the corresponding line edit when the baseLatSlider changes.
    */
@@ -788,7 +791,7 @@ namespace Isis {
       m_densityEdit->setText(QString::number(1000));
   }
 
-  
+
   /**
    * Updates the corresponding line edit when the minLonSlider changes.
    */

@@ -36,8 +36,13 @@
       Algorithm change and input parameter change.
     </change>
     <change name="Mackenzie Boyd" date="2010-01-06">
-      Reversed slopes to be correct. Changed azimuth to be 0 degrees is 12 
+      Reversed slopes to be correct. Changed azimuth to be 0 degrees is 12
       o'clock rotating clockwise. Updated documentation to match.
+    </change>
+    <change name="Steven Lambright" date="2012-11-19">
+      Abstracted out the hillshade algorithm (the algorithm that computes the resulting values from
+      this program) into it's own class. This program's code has changed to utilize the new class,
+      but the functionality should be unchanged. References #1232.
     </change>
   </history>
 
@@ -92,7 +97,7 @@
         <minimum inclusive="yes">0</minimum>
         <maximum inclusive="no">360</maximum>
         <description>
-          The direction of sun with 0 degrees at the 12:00, north position, 
+          The direction of sun with 0 degrees at the 12:00, north position,
           rotating clockwise. Ranging from 0 to 359.9.
         </description>
       </parameter>
@@ -105,7 +110,7 @@
         <minimum inclusive="yes">0</minimum>
         <maximum inclusive="yes">90</maximum>
         <description>
-          The Sun Angle is the elevation at which the sun is relative to the 
+          The Sun Angle is the elevation at which the sun is relative to the
           planet horizon. 90 degrees is at the horizon, 0 is directly overhead.
         </description>
       </parameter>
@@ -120,7 +125,7 @@
           The pixel resolution of the image. This parameter will default to
           the value from the labels or may be used to increase or decrease the
           apparent steepness. If no mapping group exists, the user must enter a
-          pixel resolution. Greater than the image's pixel resolution will level 
+          pixel resolution. Greater than the image's pixel resolution will level
           and smooth, and less than will make steep and sharpen.
         </description>
       </parameter>
@@ -132,14 +137,14 @@
     <example>
       <brief>Shading Vallis Marinaris</brief>
       <description>
-        Creating a shaded relief of Vallis Marinaris with a 22 degree azimuth 
+        Creating a shaded relief of Vallis Marinaris with a 22 degree azimuth
         and a 45 degree zenith
       </description>
       <terminalInterface>
         <commandLine> from=vallis_marinaris.cub to=22.cub azimuth=22
         </commandLine>
         <description>
-          In this example shade will create a shaded relief of Vallis Marinaris 
+          In this example shade will create a shaded relief of Vallis Marinaris
           with a 22 solar azimuth and a 45 degree zenith
         </description>
       </terminalInterface>

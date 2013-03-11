@@ -10,11 +10,10 @@
     <p>
       This program estimates the optical depth (tau) values using a table file 
       that consists of measurements collected at different locations on 
-      <def>Level1</def> images with ISIS 
-      <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html">
-      <b>qview</b></a> or another image display program.  Information for 
-      different images can be entered into a single table file.  The input values 
-      gathered are the average <def link="Digital Number">density</def> measurements 
+      <def>Level1</def> images with ISIS <i>qview</i> or another image 
+      display program.  Information for different images can be entered into 
+      a single table file.  The input values gathered are the average 
+      <def link="Digital Number">density</def> measurements 
       of a dark shadow and its photometric properties, and the average 
       density of an unshadowed level-surface near the measured dark shadow on a 
       <def>Level1</def> image that are output to a table file.  The table file 
@@ -36,7 +35,7 @@
       The image below shows an example of areas that could be measured on a 
       <def>Level1</def> image using the qview tools.  The tracking tool is used 
       to obtain the phase, incidence, and emission angles of the dark shadow.  
-      The statistics tool in qview is used to obtain the 
+      The statistics tool in <i>qview</i> is used to obtain the 
       average density of the selected area on a dark shadow and an unshadowed 
       area near the dark shadow. The average pixel values can be added to the 
       tracking window, under notes, for each point, and saved to an output file.
@@ -89,12 +88,11 @@
     </p>
     <p>
       The surface and atmosphere models use the same assumptions as the 
-      <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html">
-      "<b>Photomet</b></a>" photometric correction software, so the estimated 
+      <i>photomet</i> photometric correction software, so the estimated 
       optical depths are useful for processing images with that program.  In 
       other words, the optical depth calculated by this program is model-dependent; 
       however, it is exactly the model-dependent value that will produce the most 
-      effective photometric correction in "photomet."  
+      effective photometric correction in <i>photomet</i>.  
     </p>
 <small>
 <br/>
@@ -372,6 +370,13 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
     <categoryItem>Radiometric and Photometric Correction</categoryItem>
   </category>
 
+  <seeAlso>
+    <applications>
+      <item>qview</item>
+      <item>photomet</item>
+    </applications>
+  </seeAlso>
+
   <history>
     <change name="Randy Kirk" date= "1999-11-27">
         USGS Flagstaff Original Version
@@ -395,6 +400,12 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
       this change has been removed and the full ZEROB0STANDARD parameter name must be used.
       Support for aliases (deprecated values) must be fully implemented in ISIS before the shorter
       parameter name (ZEROB0ST) will be available. Fixes #1288.
+    </change>
+    <change name="Lynn Weller" date="2013-02-25">
+      Removed links to applications imbedded in text and replaced with
+      italicized application name.  Added application links to the
+      "Related Objects and Documents" section of the documentation.
+      Fixes mantis ticket #1525.
     </change>
   </history>
 
@@ -999,10 +1010,9 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
 	  (PHASELIST, KLIST, PHASECURVELIST) functions.  The file may contain 
 	  sets of values for both empirical functions, generally intended to 
 	  represent the same Hapke model (same planetary surface).  The
-	  <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/phoempglobal/phoempglobal.html">
-          <b>phoempglobal</b></a> program can be used to calculate the parameter 
+          <i>phoempglobal</i> program can be used to calculate the parameter 
           values that best approximate a Hapke model. The output file from 
-	  phoempglobal can be used as input for the datafile parameter.  
+	  <i>phoempglobal</I> can be used as input for the datafile parameter.  
           </p>
 	  <p>
           The example below is for Mars red filter images.  The phase angles 

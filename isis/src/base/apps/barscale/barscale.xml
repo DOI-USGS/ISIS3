@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="barscale" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Creates a bar scale for an image
+  </brief>
+
+  <description>
+  <p>
+    The barscale program creates a horizontal bar scale for a given image. 
+  </p>
+  <p>
+    The bar scale is a bar graphic divided into portions and labeled with a unit
+    measurement associated with corresponding ground length. It indicates, for
+    example, the scale of an image or map. Many users find bar scales helpful to
+    place on maps and images for publication so that observers can make a quick
+    assessment of distance relationships.
+  </p>
+  <p>
+  <b><u>How Barscale Works</u></b>
+  </p>
+  <p>
+    This program uses the USGS standard as a guide for producing the bar scale. The USGS
+    standard can be viewed at http://pubs.usgs.gov/of/1999/of99-430/of99-430_sec35.pdf.
+    The program takes a projected or unprojected image file as input. If the image is
+    unprojected, it must be initialized with SPICE information. This can be achieved by
+    running the spiceinit program on the unprojected file. The pixel resolution 
+    (PIXRES) is obtained either from the CENTER or from a user defined location in the image 
+    file (USERLOC). The user determines the desired length of the bar scale and the unit of 
+    measurement, either METER or KILOMETER, to employ. The length of the bar scale is 
+    controlled using the LEFTLIMIT, LEFTSEGS, RIGHTLIMIT, and RIGHTSEGS parameters. The right 
+    side of a bar scale is used to provide larger divisions of measurement and the left side 
+    provides smaller divisions of measurement but is not required. The examples below are
+    provided to demonstrate how these parameters are used.
+  </p>
+  <p>
+    <u>Example 1:</u> To create a bar scale with no left limit and a right limit of 20 kilometers
+    with 4 divisions: LEFTLIMIT=0 LEFTSEGS=0 RIGHTLIMIT=20 RIGHTSEGS=4 UNIT=KILOMETER
+  </p>
+  <p>
+    <u>Example 2:</u> To create a bar scale with a left limit of 10 kilometers with 5 divisions
+    and a right limit of 20 kilometers with 2 divisions: LEFTLIMIT=10 LEFTSEGS=5 RIGHTLIMIT=20
+    RIGHTSEGS=2 UNIT=KILOMETER
+  </p>
+  <p>
+  <b><u>Important Facts to Remember</u></b>
+  </p>
+  <p>
+  <ul>
+    <li>
+    Ensure that the bar scale limits are set to a reasonable size based on the resolution of the 
+    image. If the limits are set too small, the bar scale will not be useful. For example, if an 
+    image has a resolution of 153 meters/pixel, then the result of setting the limit to 10 times 
+    greater than the resolution will produce a bar scale that is only 10 pixels wide; this may or 
+    may not be considered a useful bar scale. 
+    </li>
+    <li>
+    The vertical height (in pixels) of the bar scale must be provided along with the font size 
+    (in pixels).
+    </li>
+    <li>
+    The width of the bar scale is dependent upon the resolution of the image and the RIGHTLIMIT 
+    and LEFTLIMIT set by the user. It should be noted that the TEXTHEIGHT provided by the user
+    to specify font height does not mean that the characters will be exactly that number of pixels 
+    tall. The height of the text will only be about 75% of what is specified. This is because of 
+    the way that fonts are defined. Each font has a certain number of pixels devoted to the ascent 
+    above its baseline and to the descent below its baseline. Keep this in mind when specifying
+    the height of the text for the bar scale.
+    </li>
+    <li>
+    The BACKGROUND of the bar scale can be set to either BLACK or WHITE. 
+    </li>
+    <li>
+    The text that goes with the bar scale can either go ABOVE the bar scale or BELOW it.
+    </li>
+  </ul>
+  </p>
+  <p>
+  <b><u>How to Place the Bar Scale in the Image File:</u></b>
+  </p>
+  <p>
+    There are two options for placing the bar scale in the image file. 
+  </p>
+  <p>
+    <u>1)</u> Set the PADIMAGE option to false if the bar scale should be placed on the image at a 
+    specified line and sample. The CORNERLINE and CORNERSAMPLE parameters need to be set to the upper 
+    left corner at the bar scale's insertion point.
+  </p>
+  <p>
+    <u>2)</u> Set the PADIMAGE option to true if the bar scale should be appended to the bottom of 
+    the image file. The bar scale will be justified LEFT, CENTER, or RIGHT within the padding 
+    depending on the user's choice.
+  </p>
+  <p>
+    Please note that this program is designed to generate bar scales for localized images. This 
+    program should not be used to generate a bar scale for a global image because of the drastic 
+    resolution changes that occur across the expanse of a global image.
+  </p>
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2013-01-22">
+      Original version.
+    </change>
+    <change name="Janet Richie" date="2013-02-22">
+      Documentation review.
+    </change>
+    <change name="Janet Barrett" date="2013-03-07">
+      Updated code to meet standards. References #575.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube file
+        </brief>
+        <description>
+          This is the input image cube that the bar scale will be created
+	  for.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube file
+        </brief>
+        <description>
+          This is the output file name.  The cube file will contain the bar
+          scale.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Bar Scale Options">
+      <parameter name="PIXRES">
+        <type>string</type>
+        <brief>Specifies the location to calculate pixel resolution</brief>
+        <default><item>CENTER</item></default>
+        <description>
+	  Specifies the location in the image where the pixel resolution will
+	  be calculated: the center of the image or a user-defined line and
+	  sample in the image.
+        </description>
+        <list>
+          <option value="CENTER">
+            <brief>Get the pixel resolution from the center of the image</brief>
+            <description>
+              The pixel resolution will be obtained from the center line and
+              sample of the image.
+            </description>
+            <exclusions>
+              <item>LINE</item>
+              <item>SAMPLE</item>
+            </exclusions>
+          </option>
+          <option value="USER">
+            <brief>Get the pixel resolution from a user defined line and sample</brief>
+            <description>
+              The pixel resolution will be obtained from a user defined line and
+              sample in the image file.
+            </description>
+            <inclusions>
+              <item>LINE</item>
+              <item>SAMPLE</item>
+            </inclusions>
+          </option>
+        </list>
+      </parameter>
+      
+      <parameter name="LINE">
+        <type>double</type>
+        <brief>Line in image to calculate resolution</brief>
+        <description>
+          This is the line number in the input image where the pixel
+          resolution will be calculated at.
+        </description>
+      </parameter>
+
+      <parameter name="SAMPLE">
+        <type>double</type>
+        <brief>Sample in image to calculate resolution</brief>
+        <description>
+          This is the sample number in the input image where the pixel
+          resolution will be calculated at.
+        </description>
+      </parameter>
+
+      <parameter name="UNITS">
+        <type>string</type>
+        <brief>Specifies the units of measurement to use for scale</brief>
+        <default><item>KILOMETER</item></default>
+        <description>
+	  Specifies the units of measurement to use for the bar scale. Must
+	  be METER or KILOMETER.
+        </description>
+        <list>
+          <option value="KILOMETER">
+            <brief>Bar scale unit of measurement</brief>
+            <description>
+              The bar scale will be created using KILOMETER as its unit of
+              measurement.
+            </description>
+          </option>
+          <option value="METER">
+            <brief>Bar scale unit of measurement</brief>
+            <description>
+              The bar scale will be created using METER as its unit of
+              measurement.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="LEFTLIMIT">
+        <type>integer</type>
+        <brief>Size of left side of scale in UNITS specified</brief>
+        <description>
+          If this value is greater than zero, then there will be a left
+          hand side to the scale and the LEFTLIMIT will be the limit
+          in UNITS of that side of the scale.
+        </description>
+        <minimum inclusive="yes">0</minimum>
+        <default><item>0</item></default>
+      </parameter>
+
+      <parameter name="LEFTSEGS">
+        <type>integer</type>
+        <brief>Number of segments in left side of scale</brief>
+        <description>
+          This is the number of segments that the left side of the
+          scale will be divided into.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="RIGHTLIMIT">
+        <type>integer</type>
+        <brief>Size of right side of scale in UNITS specified</brief>
+        <description>
+          This value must be greater than zero. It is the limit in 
+          UNITS of the right side of the scale.
+        </description>
+        <minimum inclusive="no">0</minimum>
+        <default><item>1</item></default>
+      </parameter>
+
+      <parameter name="RIGHTSEGS">
+        <type>integer</type>
+        <brief>Number of segments in right side of scale</brief>
+        <description>
+          This is the number of segments that the right side of the
+          scale will be divided into.
+        </description>
+        <minimum inclusive="yes">1</minimum>
+        <default><item>1</item></default>
+      </parameter>
+
+      <parameter name="CORNERLINE">
+        <type>integer</type>
+        <brief>Line location of upper left corner of scale in image</brief>
+        <description>
+          This is the line in the input image file where the upper left
+          corner of the bar scale will be placed.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="CORNERSAMPLE">
+        <type>integer</type>
+        <brief>Sample location of upper left corner of scale in image</brief>
+        <description>
+          This is the sample in the input image file where the upper left
+          corner of the bar scale will be placed.
+        </description>
+        <internalDefault>None</internalDefault>
+      </parameter>
+
+      <parameter name="BARHEIGHT">
+        <type>integer</type>
+        <brief>Height of bar scale in pixels</brief>
+        <description>
+          This is the number of pixels that will be used in the vertical 
+          dimension of the bar scale. This value has to be at least 5
+          to create a bar scale.
+        </description>
+        <minimum inclusive="yes">5</minimum>
+        <default><item>50</item></default>
+      </parameter>
+
+      <parameter name="BACKGROUND">
+        <type>string</type>
+        <brief>Specifies the background color to use for the scale</brief>
+        <default><item>WHITE</item></default>
+        <description>
+          Specifies the background color to user for the scale bar. If the
+          background is black, then the lines and text will be white. If the
+          background is white, then the lines and text will be black.
+        </description>
+        <list>
+          <option value="BLACK">
+            <brief>Bar scale background will be black</brief>
+            <description>
+              The bar scale will be created using a background color of black.
+              All lines and text used to make the bar scale will be white.
+            </description>
+          </option>
+          <option value="WHITE">
+            <brief>Bar scale background will be white</brief>
+            <description>
+              The bar scale will be created using a background color of white.
+              All lines and text used to make the bar scale will be black.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="TEXTHEIGHT">
+        <type>integer</type>
+        <brief>Bar scale text height in pixels</brief>
+        <description>
+          This is the height in pixels of the text that will be written
+          above/below the bar scale.
+        </description>
+        <minimum inclusive="yes">10</minimum>
+        <default><item>50</item></default>
+      </parameter>
+
+      <parameter name="TEXTLOC">
+        <type>string</type>
+        <brief>Specifies the location of text in relation to the bar scale</brief>
+        <default><item>ABOVE</item></default>
+        <description>
+          Specifies the location of the text in relation to the bar scale. The
+          text can be printed either above or below the bar scale.
+        </description>
+        <list>
+          <option value="ABOVE">
+            <brief>Print text above the bar scale</brief>
+            <description>
+              Print the text above the bar scale.
+            </description>
+          </option>
+          <option value="BELOW">
+            <brief>Print text below the bar scale</brief>
+            <description>
+              Print the text below the bar scale.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="PADIMAGE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Add padding at bottom of image to hold bar scale</brief>
+        <description>
+          Determines if the bar scale will be written directly on the 
+          image file at the line,sample specified, or if the bar scale
+          will be written and appended to the bottom of the image file.
+          The user will still need to specify the upper left sample of
+          the bar scale. 
+        </description>
+        <exclusions>
+          <item>CORNERLINE</item>
+          <item>CORNERSAMPLE</item>
+        </exclusions>
+        <inclusions>
+          <item>PLACEMENT</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="PLACEMENT">
+        <type>string</type>
+        <brief>Specifies how to place the bar scale in the padding of the image</brief>
+        <default><item>LEFT</item></default>
+        <description>
+          This determines how the bar scale will be placed in the padding that is added
+          to the image. The three options are LEFT justified, CENTER, or RIGHT justified.
+        </description>
+        <list>
+          <option value="LEFT">
+            <brief>Left justify the bar scale in the padding</brief>
+            <description>
+              Left justify the bar scale in the padding at the bottom of the image. The
+              bar scale will be placed so that the leftmost part of the bar scale (including
+              text) is 10 pixels in from the left side of the image.
+            </description>
+          </option>
+          <option value="CENTER">
+            <brief>Center the bar scale in the padding</brief>
+            <description>
+              The bar scale will be placed in the padding at the bottom of the image so that the 
+              center of the scale is at the center sample of the image 
+            </description>
+          </option>
+          <option value="RIGHT">
+            <brief>Right justify the bar scale in the padding</brief>
+            <description>
+              Right justify the bar scale in the padding at the bottom of the image. The
+              bar scale will be placed so that the rightmost part of the bar scale (including
+              text) is 10 pixels in from the right side of the image.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+    </group>
+  </groups>
+  
+</application>

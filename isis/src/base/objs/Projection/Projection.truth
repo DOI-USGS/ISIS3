@@ -160,10 +160,8 @@ WorldY:                              50
 
 Testing Mapping() methods
 Group = Mapping
-  TargetName         = SKY
+  TargetName         = Moon
   ProjectionName     = MyProjection
-  EquatorialRadius   = 1.0
-  PolarRadius        = 0.95
   LatitudeType       = Planetographic
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 360

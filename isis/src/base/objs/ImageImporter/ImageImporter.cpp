@@ -397,7 +397,7 @@ namespace Isis {
     if (format == "tiff") {
       importer = new TiffImporter(inputName);
     }
-    else if (format != "") {
+    else if (format != "" && format != "jp2") {
       importer = new QtImporter(inputName);
     }
     else if (JP2Decoder::IsJP2(inputName.expanded().toAscii().data())) {

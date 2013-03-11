@@ -155,6 +155,10 @@ namespace Isis {
    *   @history 2012-01-19 Debbie A. Cook - Moved nongeneral functionality into another virtual
    *                           base class layer of TProjection and PlaneProjection.  Added m_projectionType
    *                           and ProjectionType enum and protected method PixelResolution().
+   *   @history 2013-03-06 Steven Lambright - Cleaned up and fixed an issue with the Mapping()
+   *                           method which sometimes erroneously threw an exception. Added caching
+   *                           to the TargetRadii(QString) method for performance reasons.
+   *                           Fixes #1534.
    *  
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove

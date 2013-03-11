@@ -39,13 +39,18 @@ namespace Isis {
    * @author 2005-02-03 Jeff Anderson
    *
    * @internal
-   *   @history  2009-04-02 Debbie A. Cook Removed obsolete methods IsXAxisTimeDependent,IsYAxisTimeDependent,
-   *              XAxisDirection, YAxisDirection, SetXAxisDirection, and SetYAxisDirection
-   *   @history  2012-07-25 Kris Becker - Corrected bug in
-   *             SetStartingDetectorLine() method in that it applied this value
-   *             to the sample starting detector rather than the line starting
-   *             detector.  It appeared to only affect the MESSENGER/MDIS camera
-   *             model, however.
+   *   @history 2009-04-02 Debbie A. Cook Removed obsolete methods IsXAxisTimeDependent,
+   *                           IsYAxisTimeDependent, XAxisDirection, YAxisDirection,
+   *                           SetXAxisDirection, and SetYAxisDirection
+   *   @history 2012-07-25 Kris Becker - Corrected bug in SetStartingDetectorLine() method
+   *                           in that it applied this value to the sample starting detector
+   *                           rather than the line starting detector.  It appeared to only
+   *                           affect the MESSENGER/MDIS camera model, however.
+   *   @history 2013-02-11 E. Howington-Kraus - Added accessor methods:
+   *                           AdjustedStartingSample() and AdjustedStartingLine().
+   *                           These are tested by application socetlinescankeywords
+   *                           since no unitTest exists. Fixed indentation
+   *                           of history entries.  References #1490.
    *
    */
   class CameraDetectorMap {
@@ -59,25 +64,29 @@ namespace Isis {
 
       virtual bool SetDetector(const double sample, const double line);
 
+      double AdjustedStartingSample() const;
+
+      double AdjustedStartingLine() const;
+
       //! Return parent sample
       inline double ParentSample() const {
         return p_parentSample;
-      };
+      }
 
       //! Return parent line
       inline double ParentLine() const {
         return p_parentLine;
-      };
+      }
 
       //! Return detector sample
       inline double DetectorSample() const {
         return p_detectorSample;
-      };
+      }
 
       //! Return detector line
       inline double DetectorLine() const {
         return p_detectorLine;
-      };
+      }
 
       /** Set the starting detector sample
        *
@@ -90,7 +99,7 @@ namespace Isis {
       inline void SetStartingDetectorSample(const double sample) {
         p_startingDetectorSample = sample;
         Compute();
-      };
+      }
 
       /** Set the starting detector line
        *
@@ -103,7 +112,7 @@ namespace Isis {
       inline void SetStartingDetectorLine(const double line) {
         p_startingDetectorLine = line;
         Compute();
-      };
+      }
 
       /** Set sample summing mode
        *
@@ -117,7 +126,7 @@ namespace Isis {
       inline void SetDetectorSampleSumming(const double summing) {
         p_detectorSampleSumming = summing;
         Compute();
-      };
+      }
 
       /** Set line summing mode
        *
@@ -131,22 +140,23 @@ namespace Isis {
       inline void SetDetectorLineSumming(const double summing) {
         p_detectorLineSumming = summing;
         Compute();
-      };
+      }
 
       //! Return scaling factor for computing sample resolution
       virtual double SampleScaleFactor() const {
         return p_detectorSampleSumming;
-      };
+      }
 
       //! Return scaling factor for computing line resolution
       virtual double LineScaleFactor() const {
         return p_detectorLineSumming;
-      };
+      }
 
       //! Return the line collection rate (0 for framing cameras)
       virtual double LineRate() const {
         return 0.0;
-      };
+      }
+
     protected:
       Camera *p_camera;
 

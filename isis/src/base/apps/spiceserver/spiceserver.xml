@@ -24,7 +24,13 @@
       Original Version
     </change>
     <change name="Debbie A. Cook" date="2012-07-06">
-       Updated Spice members to be more compliant with Isis coding standards. References #972.
+       Updated Spice members to be more compliant with Isis coding standards. 
+       References #972.
+    </change>
+    <change name="Jeannie Backer" date="2013-02-26">
+      Added ability to load multiple ck database files from the system using a 
+      conf file. Changed methods to lower camel case and added "g_" prefix to 
+      global variables to comply with Isis3 standards. References #924.
     </change>
   </history>
 
@@ -60,4 +66,5 @@
       </parameter>
     </group>
   </groups>
+
 </application>

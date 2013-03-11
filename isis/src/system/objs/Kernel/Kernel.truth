@@ -1,0 +1,92 @@
+Testing static conversion methods...
+
+Convert Type to char array...
+1     Predicted
+2     Nadir
+4     Reconstructed
+8     Smithed
+0     Unknown
+3     Unknown
+
+Convert QString to Type...
+Predicted     1
+NADIR         2
+reconstructed 4
+SmItHeD       8
+Unknown       0
+junk          0
+
+
+
+Testing empty constructor Kernel()... 
+Kernel Type (enum): 0
+Kernel Type (QString): Unknown
+Number of Kernel Files: 0
+Kernel Files: 
+Alternate way of accessing info, should match previous lines
+Number of Kernel Files: 0
+Kernel Files: 
+
+
+
+Testing setKernels and setType... 
+Kernel Type (enum): 1
+Kernel Type (QString): Predicted
+Number of Kernel Files: 2
+Kernel Files: 
+	kernelFile1
+	kernelFile2
+Alternate way of accessing info, should match previous lines
+Number of Kernel Files: 2
+Kernel Files: 
+	kernelFile1
+	kernelFile2
+
+
+
+Testing constructor Kernel(type, data)... 
+Kernel Type (enum): 2
+Kernel Type (QString): Nadir
+Number of Kernel Files: 2
+Kernel Files: 
+	kernelFile1
+	kernelFile2
+Alternate way of accessing info, should match previous lines
+Number of Kernel Files: 2
+Kernel Files: 
+	kernelFile1
+	kernelFile2
+
+
+
+Testing kernel.push_back()... 
+Kernel Type (enum): 2
+Kernel Type (QString): Nadir
+Number of Kernel Files: 3
+Kernel Files: 
+	kernelFile1
+	kernelFile2
+	kernelFile3
+Alternate way of accessing info, should match previous lines
+Number of Kernel Files: 3
+Kernel Files: 
+	kernelFile1
+	kernelFile2
+	kernelFile3
+
+
+
+Test < operator: is row < column? 
+			Unknown	Predicted	Nadir	Recon	Smithed
+Unknown			0		1		1		1		1
+Predicted		0		0		1		1		1
+Nadir			0		0		0		1		1
+Reconstructed	0		0		0		0		1
+Smithed			0		0		0		0		0
+
+
+
+Testing errors... 
+
+Testing invalid enumeration: 
+

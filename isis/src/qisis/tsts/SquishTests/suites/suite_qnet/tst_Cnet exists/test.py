@@ -10,7 +10,11 @@ def main():
     type(waitForObject(":_QListView"), "<Return>")
 
     snooze(0.5)
+    mouseClick(waitForObject(":fileNameEdit_QLineEdit_7"), 100, 16, 0, Qt.LeftButton)
     waitForObjectItem(":stackedWidget.treeView_QTreeView_2", "moc3HandLockPoint1\\.net")
+
+
+
     doubleClickItem(":stackedWidget.treeView_QTreeView_2", "moc3HandLockPoint1\\.net", 58, 5, 0, Qt.LeftButton)
     waitFor("object.exists(':Navigator_CP1')", 20000)
     test.compare(findObject(":Navigator_CP1").text, "ssides1")

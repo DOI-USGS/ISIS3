@@ -1,37 +1,247 @@
-LeapSecond: 
+Pvl Label 1: 
+Object = IsisCube
+  Group = Instrument
+    StartTime      = "2005 JUN 15 12:00:00.000 TDB"
+    StopTime       = "2005 DEC 15 12:00:00.000 TDB"
+    SpacecraftName = IdealSpacecraft
+    InstrumentId   = IdealCamera
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+End
+
+LeapSecond Kernels: 
 $base/lsTest
 
-TargetAttitudeShape: 
+TargetAttitudeShape Kernels: 
 $base/pckTest
 
-TargetPosition: 
+TargetPosition Kernels: 
 $base/spkTest1
 $base/spkTest2
 
-SpacecraftPointing: 
+SpacecraftPointing Kernels: 
 $base/ckTest1
 
-SpacecraftPointing 2: 
-$base/ckTest2.1
-$base/ckTest2.2
-
-Instrument: 
+Instrument Kernels: 
 $base/ikTest3
 $base/ikTest4
 
-SpacecraftClock: 
+SpacecraftClock Kernels: 
 $base/sclkTest
 
-SpacecraftPosition: 
+SpacecraftPosition Kernels: 
 $base/spkTest1
 $base/spkTest2
 
-Frame: 
+Frame Kernels: 
 $base/fkTest
 
-InstrumentAddendum: 
+InstrumentAddendum Kernels: 
 $base/iakTest
 
-Dem: 
+Dems: 
 $base/demTest1
 $base/demTest2
+/---------------------------------------/
+
+
+Pvl Label 2: 
+Object = IsisCube
+  Group = Instrument
+    StartTime      = "2005 JUN 15 12:00:00.000 TDB"
+    StopTime       = "2005 JUN 15 12:14:00.000 TDB"
+    SpacecraftName = IdealSpacecraft
+    InstrumentId   = IdealCamera
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+End
+
+LeapSecond Kernels: 
+$base/lsTest
+
+TargetAttitudeShape Kernels: 
+$base/pckTest
+
+TargetPosition Kernels: 
+$base/spkTest1
+$base/spkTest2
+
+SpacecraftPointing Kernels: 
+$base/ckTest2.1
+$base/ckTest2.2
+
+Instrument Kernels: 
+$base/ikTest3
+$base/ikTest4
+
+SpacecraftClock Kernels: 
+$base/sclkTest
+
+SpacecraftPosition Kernels: 
+$base/spkTest1
+$base/spkTest2
+
+Frame Kernels: 
+$base/fkTest
+
+InstrumentAddendum Kernels: 
+$base/iakTest
+
+Dems: 
+$base/demTest1
+$base/demTest2
+/---------------------------------------/
+
+
+Mro (non-CRISM) Instrument Label: 
+Object = IsisCube
+  Group = Instrument
+    StartTime      = "2008 JAN 12 00:00:00.0"
+    StopTime       = "2008 JAN 12 00:00:00.0"
+    SpacecraftName = MarsReconnaissanceOrbiter
+    InstrumentId   = HiRISE
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+End
+
+Database Files read in by loadSystemDb()
+$base/kernels/lsk/kernels.????.db
+$base/kernels/pck/kernels.????.db
+$base/kernels/spk/kernels.????.db
+$base/dems/kernels.????.db
+$mro/kernels/ck/kernels.????.db
+$mro/kernels/fk/kernels.????.db
+$mro/kernels/ik/kernels.????.db
+$mro/kernels/sclk/kernels.????.db
+$mro/kernels/spk/kernels.????.db
+$mro/kernels/iak/kernels.????.db
+
+TargetPosition Kernels: 
+$base/kernels/spk/de405.bsp
+
+SpacecraftPointing Kernels: 
+$mro/kernels/ck/mro_sc_psp_080108_080114.bc
+
+SpacecraftPosition Kernels: 
+$mro/kernels/spk/mro_psp6.bsp
+/---------------------------------------/
+
+
+Mro CRISM Label: 
+Object = IsisCube
+  Group = Instrument
+    StartTime      = "2008 JAN 12 00:00:00.0"
+    StopTime       = "2008 JAN 12 00:00:00.0"
+    SpacecraftName = MarsReconnaissanceOrbiter
+    InstrumentId   = CRISM
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+End
+
+Database Files read in by loadSystemDb()
+$base/kernels/lsk/kernels.????.db
+$base/kernels/pck/kernels.????.db
+$base/kernels/spk/kernels.????.db
+$base/dems/kernels.????.db
+$mro/kernels/ck/kernels.????.db
+$mro/kernels/ck/crism_kernels.????.db
+$mro/kernels/fk/kernels.????.db
+$mro/kernels/ik/kernels.????.db
+$mro/kernels/sclk/kernels.????.db
+$mro/kernels/spk/kernels.????.db
+$mro/kernels/iak/kernels.????.db
+
+TargetPosition Kernels: 
+$base/kernels/spk/de405.bsp
+
+SpacecraftPointing Kernels: 
+$mro/kernels/ck/mro_sc_psp_080108_080114.bc
+$mro/kernels/ck/mro_crm_psp_080101_080131.bc
+
+SpacecraftPosition Kernels: 
+$mro/kernels/spk/mro_psp6.bsp
+
+
+
+Testing better(row, column) method ...
+
+	When all kernel types are allowed, is row better than col?
+			Unknown	Predicted	Nadir	Recon	Smithed
+Unknown			0		0		0		0		0
+Predicted		1		1		0		0		0
+Nadir			1		1		1		0		0
+Reconstructed	1		1		1		1		0
+Smithed			1		1		1		1		1
+
+
+
+Testing better(row, column) method ...
+
+	When Nadir is not allowed, is row better than col?
+			Unknown	Predicted	Nadir	Recon	Smithed
+Unknown			0		0		0		0		0
+Predicted		1		1		0		0		0
+Nadir			0		0		0		0		0
+Reconstructed	1		1		1		1		0
+Smithed			1		1		1		1		1
+/---------------------------------------/
+
+
+Label, no StopTime: 
+Object = IsisCube
+  Group = Instrument
+    StartTime      = "2008 JAN 12 00:00:00.0"
+    SpacecraftName = MarsReconnaissanceOrbiter
+    InstrumentId   = CRISM
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+End
+
+LeapSecond Kernels: 
+No LeapSecond Kernels
+
+TargetAttitudeShape Kernels: 
+**ERROR** No existing files found with a numerial version matching [pckTest????] in [.].
+
+TargetPosition Kernels: 
+$missionName/spkSmith
+
+SpacecraftPointing Kernels: 
+
+Instrument Kernels: 
+No Instrument Kernels
+
+SpacecraftClock Kernels: 
+No SpacecraftClock Kernels
+
+SpacecraftPosition Kernels: 
+No SpacecraftPosition Kernels
+
+Frame Kernels: 
+No Frame Kernels
+
+InstrumentAddendum Kernels: 
+No InstrumentAddendum Kernels
+
+Dems: 
+No DEMs

@@ -646,6 +646,10 @@ int main(int argc, char *argv[]) {
   cout << "Rotation Tests" << endl;
   mg += PvlKeyword("Rotation", toString(90.0));
   mg["LongitudeDirection"] = "PositiveEast";
+  mg.DeleteKeyword("EquatorialRadius");
+  mg.DeleteKeyword("PolarRadius");
+  mg.DeleteKeyword("PolarRadius");
+  mg["TargetName"] = "Moon";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;
   cout << "Testing Ground coordinate routines" << endl;

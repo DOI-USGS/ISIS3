@@ -2,9 +2,9 @@ include $(ISISROOT)/make/isismake.tsts
 
 .ONESHELL:
 
-SQUISHBIN=/opt/Squish/bin
+SQUISHBIN=/home/slambright/Squish/bin
 
-commands:
+commands: configsquish
 	if [ -f "$$HOME/.squish/ver1/server.ini" ]; then
 	  $(RM) "$$HOME/.squish/ver1/server.ini"
 	fi
@@ -47,6 +47,16 @@ configsquish:
 	$(SQUISHBIN)/squishserver --config addAppPath '$(ISISROOT)/bin' >& /dev/null
 	$(SQUISHBIN)/squishrunner --config setCursorAnimation off >& /dev/null
 	$(SQUISHBIN)/squishserver --stop >& /dev/null
+	$(LS) $$PWD/input/Ground/Extracted_AllOverlaps/I*.cub > input/Ground/Extracted_AllOverlaps.lis
+	$(LS) $$PWD/input/Ground/Extracted_AllOverlaps/f*.cub >> input/Ground/Extracted_AllOverlaps.lis
+	$(LS) $$PWD/input/m01018/N1597182735_2_tr.cub > input/m01018/tr.lis
+	$(LS) $$PWD/input/m01018/N1597182896_2_tr.cub >> input/m01018/tr.lis
+	$(LS) $$PWD/input/m01018/N1597183061_2_tr.cub >> input/m01018/tr.lis
+	$(LS) $$PWD/input/m01018/N1597183216_2_tr.cub >> input/m01018/tr.lis
+	$(LS) $$PWD/input/m01018/N1602275390_1_tr.cub >> input/m01018/tr.lis
+	$(LS) $$PWD/input/m01018/N1604169204_2_tr.cub >> input/m01018/tr.lis
+	$(CAT) input/m01018/tr.lis | grep -v 'N1602275390_1_tr.cub' > input/m01018/tr_no390.lis
+	$(LS) $$PWD/input/Ground/Mini/*.cub > input/Ground/Mini.lis
 
 suite_%: configsquish
 	$(SQUISHBIN)/squishserver >& /dev/null & 

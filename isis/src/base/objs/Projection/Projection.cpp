@@ -1362,8 +1362,6 @@ namespace Isis {
     m_mappingGrp.AddKeyword(xKeyword,Pvl::Replace);
     m_mappingGrp.AddKeyword(yKeyword,Pvl::Replace);
   }
-
-
 } //end namespace isis
 
 

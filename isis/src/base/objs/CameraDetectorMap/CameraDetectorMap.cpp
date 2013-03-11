@@ -84,5 +84,15 @@ namespace Isis {
            (p_startingDetectorLine - 1.0);
   }
 
+  //! Return the starting detector sample adjusted for summation
+  double CameraDetectorMap::AdjustedStartingSample() const {
+    return p_ss;
+  }
+
+  //! Return the starting detector line adjusted for summation
+  double CameraDetectorMap::AdjustedStartingLine() const {
+    return p_sl;
+  }
+
 }
 

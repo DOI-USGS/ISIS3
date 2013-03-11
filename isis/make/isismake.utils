@@ -10,6 +10,7 @@ endif
 
 ifeq ($(findstring TC, $(MODE)),TC)
   CODE_COVERAGE_BIN_DIR := $(shell if [ -d /opt/SquishCoco/bin ]; then echo "/opt/SquishCoco/bin"; else echo "$$HOME/SquishCoco/bin"; fi;)
+  CODE_COVERAGE_PATH_DIR := $(shell if [ -d /opt/SquishCoco/wrapper/bin ]; then echo "/opt/SquishCoco/wrapper/bin"; else echo "$$HOME/SquishCoco/wrapper/bin"; fi;)
 endif
 
 empty:=

@@ -41,6 +41,8 @@ namespace Isis {
    *   @history 2012-02-16 Steven Lambright - Brought up to method and member
    *                           naming standards.
    *   @history 2012-03-22 Steven Lambright - Added toString().
+   *   @history 2012-03-22 Steven Lambright - Added solarRadii(), setSolarRadii(), and
+   *                           the unit SolarRadii. References #1232.
    */
   class Distance {
     public:
@@ -55,7 +57,19 @@ namespace Isis {
         //! The distance is being specified in kilometers
         Kilometers,
         //! The distance is being specified in pixels
-        Pixels
+        Pixels,
+        /**
+         * "Solar radius is a unit of distance used to express the size of stars in astronomy equal
+         *   to the current radius of the Sun."
+         *
+         * We're using 6.9599*10^8 meters, because that's the actual unit value, even though the
+         *   radius has been more accurately calculated to 6.96342*10^8 m.
+         *
+         * http://en.wikipedia.org/wiki/Solar_radius
+         * http://www.astro.wisc.edu/~dolan/constants.html
+         * https://www.cfa.harvard.edu/~dfabricant/huchra/ay145/constants.html
+         */
+        SolarRadii
       };
 
       Distance();
@@ -72,6 +86,9 @@ namespace Isis {
 
       double pixels(double pixelsPerMeter = 1.0) const;
       void setPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
+
+      double solarRadii() const;
+      void setSolarRadii(double distanceInSolarRadii);
 
       QString toString() const;
       bool isValid() const;

@@ -6,6 +6,8 @@ Constructor given a value in meters
 1500.5 meters
 Constructor given a value in kilometers
 1500500 meters
+Constructor given a value in solar radius
+1391980000 meters
 Copy constructor
 1500.5 meters
 
@@ -15,6 +17,8 @@ Meters (redundant)
 1 meters
 Kilometers
 1 kilometers
+Solar Radius
+1 solar radii
 
 ----- Testing Operators -----
 

@@ -2,7 +2,14 @@
 #include "SpiceDbGen.h"
 #include "iTime.h"
 
+using namespace std;
 using namespace Isis;
+
+FileName safeHighestVersion(QString fileNameString);
+
+QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTypeName,
+                                     QString parameterName);
+
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
@@ -13,46 +20,19 @@ void IsisMain() {
 
   //Load the SCLK. If it exists, add its location to the dependency group
   //If there is none, set a flag so that no file is searched for
-  bool needSclk = false;
-  FileName sclkFile("");
-  if(ui.WasEntered("SCLK")) {
-    QString sclkString = ui.GetAsString("SCLK");
-    if(sclkString.length() != 0) {
-      sclkString.remove("\\");
-      sclkFile = FileName(sclkString);
-      if (sclkFile.isVersioned()) {
-        sclkFile = sclkFile.highestVersion();
-        sclkString = sclkFile.originalPath() + "/" + sclkFile.name();
-      }
-      dependency += PvlKeyword("SpacecraftClockKernel", sclkString);
-      needSclk = true;
-    }
-  }
+  QList<FileName> sclkFiles = evaluateDependencies(dependency, "SpacecraftClockKernel", "SCLK");
+  QList<FileName> lskFiles = evaluateDependencies(dependency, "LeapsecondKernel", "LSK");
+  QList<FileName> extraFiles = evaluateDependencies(dependency, "ExtraKernel", "EXTRA");
 
-  QString lskString = ui.GetAsString("LSK");
-  lskString.remove("\\");
-  FileName lskFile(lskString);
-  if (lskFile.isVersioned()) {
-    lskFile = lskFile.highestVersion();
-    lskString = lskFile.originalPath() + "/" + lskFile.name();
-  }
-  dependency += PvlKeyword("LeapsecondKernel", lskString);
-  //furnish dependencies with an SCLK
-  if(needSclk) {
-    sdg.FurnishDependencies(sclkFile.expanded(), lskFile.expanded());
-  }
-  //Furnish dependencies without an SCLK
-  else {
-    sdg.FurnishDependencies("", lskFile.expanded());
-  }
+  sdg.FurnishDependencies(sclkFiles, lskFiles, extraFiles);
 
   //Determine the type of kernel that the user wants a database for. This will
   //eventually become the name of the object in the output PVL
   QString kernelType;
-  if(ui.GetString("TYPE") == "CK") {
+  if (ui.GetString("TYPE") == "CK") {
     kernelType = "SpacecraftPointing";
   }
-  else if(ui.GetString("TYPE") == "SPK") {
+  else if (ui.GetString("TYPE") == "SPK") {
     kernelType = "SpacecraftPosition";
   }
   PvlObject selections(kernelType);
@@ -72,7 +52,7 @@ void IsisMain() {
   //  PvlObject::PvlGroupIterator grp = result.BeginGroup();
   //  while(grp != result.EndGroup()){ selections.AddGroup(*grp);grp++;}
   //}
-  if(ui.GetString("PREDICTFILTER") != "none" &&
+  if (ui.GetString("PREDICTFILTER") != "none" &&
       ui.GetString("PREDICTDIR") != "none") {
     QString location = "";
     location = ui.GetString("PREDICTDIR");
@@ -87,7 +67,7 @@ void IsisMain() {
     }
   }
 
-  if(ui.GetString("RECONDIR") != "none" &&
+  if (ui.GetString("RECONDIR") != "none" &&
       ui.GetString("RECONFILTER") != "none") {
     QString location = "";
     location = ui.GetString("RECONDIR");
@@ -102,7 +82,7 @@ void IsisMain() {
     }
   }
 
-  if(ui.GetString("SMITHEDDIR") != "none" &&
+  if (ui.GetString("SMITHEDDIR") != "none" &&
       ui.GetString("SMITHEDFILTER") != "none") {
     QString location = "";
     location = ui.GetString("SMITHEDDIR");
@@ -118,7 +98,7 @@ void IsisMain() {
   }
 
   //if (filter == ""){
-  if(!ui.WasEntered("PREDICTFILTER") && !ui.WasEntered("RECONFILTER") &&
+  if (!ui.WasEntered("PREDICTFILTER") && !ui.WasEntered("RECONFILTER") &&
       !ui.WasEntered("SMITHEDFILTER")) {
     QString message =
       "You must enter a filter AND directory for at least one type of kernel";
@@ -127,7 +107,7 @@ void IsisMain() {
 
   //specify a name for the output file
   FileName to("./kernels.????.db");
-  if(ui.WasEntered("TO")) {
+  if (ui.WasEntered("TO")) {
     to = ui.GetFileName("TO");
   }
   //create a new output version if the user specified any version sequence
@@ -138,4 +118,129 @@ void IsisMain() {
   Pvl writer;
   writer.AddObject(selections);
   writer.Write(to.expanded());
+}
+
+
+/**
+ * This method converts the given string to a FileName. If the file is versioned, the result will
+ *   be the highest version of the file.
+ */
+FileName safeHighestVersion(QString fileNameString) {
+  FileName result(fileNameString);
+
+  if (result.isVersioned()) {
+    result = result.highestVersion();
+  }
+
+  return result;
+}
+
+
+/**
+ * This method gets a list of kernels from the user and populates the dependency group with a list
+ *   of the found kernel file names. If a kernel file has a "db" extension, this method will search
+ *   the DB for kernel files. This only supports very bare-bones, basic kernel db files because
+ *   no matching can be done/there isn't a cube label.
+ *
+ * @param dependencyGroup This is modified with new keywords (named kernelTypeName) with values that
+ *                        match the kernel file names (without variables expanded).
+ * @param kernelTypeName This is used to name new keywords in dependencyGroup
+ * @param parameterName This is the user interface parameter to get the kernels from.
+ *
+ * @return A list of kernel files to be furnished
+ */
+QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTypeName,
+                                     QString parameterName) {
+  QList<FileName> results;
+
+  UserInterface &ui = Application::GetUserInterface();
+  if (ui.WasEntered(parameterName)) {
+    vector<QString> kernelStrings;
+    ui.GetAsString(parameterName, kernelStrings);
+
+    foreach (QString kernelString, kernelStrings) {
+      FileName kernelFileName = safeHighestVersion(kernelString);
+
+      // Try to get kernel file names out of db, if a db was specified instead of an actual kernel
+      if (kernelFileName.extension() == "db") {
+        Pvl kernelDbPvl(kernelFileName.expanded());
+
+        if (kernelDbPvl.Objects() == 1) {
+          PvlObject &primaryObject = kernelDbPvl.Object(0);
+
+          if (primaryObject.Groups() == 1) {
+            PvlGroup &primaryGroup = primaryObject.Group(0);
+
+            if (primaryGroup.Name().toLower() == "selection") {
+
+              if (primaryGroup.Keywords() == 1) {
+                PvlKeyword &key = primaryGroup[0];
+
+                if (key.IsNamed("File")) {
+                  if (key.Size() == 2) {
+                    kernelFileName = safeHighestVersion(QString("$%1/%2").arg(key[0]).arg(key[1]));
+                  }
+                  else {
+                    throw IException(IException::Unknown,
+                                     QObject::tr("Expected the keyword File in [%1] to have two "
+                                                 "values, a mission data directory and a path into "
+                                                 "that directory. The keyword has [%2] values.")
+                                       .arg(kernelFileName.original()).arg(key.Size()),
+                                     _FILEINFO_);
+                  }
+                }
+                else {
+                  throw IException(IException::Unknown,
+                                   QObject::tr("Expected Pvl Group [%1] in the first Pvl Object "
+                                               "[%2] in the DB file [%3] to have a single keyword "
+                                               "named File, but the keyword was named [%4] "
+                                               "instead")
+                                     .arg(primaryGroup.Name()).arg(primaryObject.Name())
+                                     .arg(kernelFileName.original()).arg(key.Name()),
+                                   _FILEINFO_);
+                }
+              }
+              else {
+                throw IException(IException::Unknown,
+                                 QObject::tr("Expected Pvl Group [%1] in the first Pvl Object [%2] "
+                                             "in the DB file [%3] to have a single keyword (named "
+                                             "File), but found [%4] keywords")
+                                   .arg(primaryGroup.Name()).arg(primaryObject.Name())
+                                   .arg(kernelFileName.original()).arg(primaryGroup.Keywords()),
+                                 _FILEINFO_);
+              }
+            }
+            else {
+              throw IException(IException::Unknown,
+                               QObject::tr("Expected Pvl Group in the first Pvl Object [%1] in "
+                                           "the DB file [%2] to be named Selection but found [%3]")
+                                 .arg(primaryObject.Name()).arg(kernelFileName.original())
+                                 .arg(primaryGroup.Name()),
+                               _FILEINFO_);
+            }
+          }
+          else {
+            throw IException(IException::Unknown,
+                             QObject::tr("Expected one Pvl Group in the first Pvl Object [%1] in "
+                                         "the DB file [%2] but found [%3]")
+                               .arg(primaryObject.Name()).arg(kernelFileName.original())
+                               .arg(primaryObject.Groups()),
+                             _FILEINFO_);
+          }
+        }
+        else {
+          throw IException(IException::Unknown,
+                           QObject::tr("Expected one Pvl Object in the DB file [%1] but "
+                                       "found [%2]")
+                             .arg(kernelFileName.original()).arg(kernelDbPvl.Objects()),
+                           _FILEINFO_);
+        }
+      }
+
+      results.append(kernelFileName);
+      dependencyGroup += PvlKeyword(kernelTypeName, kernelFileName.original());
+    }
+  }
+
+  return results;
 }

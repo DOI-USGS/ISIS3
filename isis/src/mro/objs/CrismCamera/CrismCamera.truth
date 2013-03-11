@@ -1,0 +1,47 @@
+Unit Test for CrismCamera...
+FileName: frt0001cfd8_07_if124s_trr3_b24.cub
+CK Frame: -74017
+
+Kernel IDs: 
+CK Frame ID = -74000
+CK Reference ID = -74900
+SPK Target ID = -74
+SPK Reference ID = 1
+
+For upper left corner ...
+Sample: 1.0000
+Line:   1.0000
+Line/Sample SetImage succeeded!
+DeltaSample = -0.0000
+DeltaLine = 0.0000
+
+For upper right corner ...
+Sample: 640.0000
+Line:   1.0000
+Line/Sample SetImage succeeded!
+DeltaSample = 0.0000
+DeltaLine = 0.0000
+
+For lower left corner ...
+Sample: 1.0000
+Line:   420.0000
+Line/Sample SetImage succeeded!
+DeltaSample = -0.0000
+DeltaLine = -0.0000
+
+For lower right corner ...
+Sample: 640.0000
+Line:   420.0000
+Line/Sample SetImage succeeded!
+DeltaSample = -0.0023
+DeltaLine = 0.0057
+
+For center pixel position ...
+Sample: 320.0000
+Line:   210.0000
+Line/Sample SetImage succeeded!
+DeltaSample = -0.0000
+DeltaLine = 0.0001
+
+Latitude OK
+Longitude OK
