@@ -96,7 +96,7 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+    if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
           Distance::Meters);
       m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
@@ -146,7 +146,7 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+    if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
           Distance::Meters);
       m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
@@ -432,7 +432,7 @@ namespace Isis {
 
     Distance equatorialRadius;
     Distance polarRadius;
-    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+    if (mapping.hasKeyword("EquatorialRadius") && mapping.hasKeyword("PolarRadius")) {
       equatorialRadius = Distance(toDouble(mapping["EquatorialRadius"][0]),
           Distance::Meters);
       polarRadius = Distance(toDouble(mapping["PolarRadius"][0]),
