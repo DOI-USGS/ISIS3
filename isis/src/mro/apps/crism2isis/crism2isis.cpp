@@ -144,6 +144,7 @@ void IsisMain() {
 
   ocube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
   ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
 
   p.StartProcess();
   p.EndProcess();

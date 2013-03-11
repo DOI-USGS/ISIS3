@@ -33,6 +33,11 @@
     <change name="Jeannie Backer" date="2013-02-22">
       Added output log containing warning. Fixes #1502.
     </change>
+    <change name="Steven Lambright" date="2013-03-11">
+      Fixed an issue with the output labels missing translations for the Kernels label group. This
+      problem resulted in spiceinit not running when it should have been able to. The
+      fix was developed by Jeff Anderson. Fixes #1552.
+    </change>
   </history>
 
   <category>
