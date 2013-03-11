@@ -3,13 +3,13 @@
 
 namespace Isis {
   LunarLambert::LunarLambert(Pvl &pvl) : PhotoModel(pvl) {
-    PvlGroup &algo = pvl.FindObject("PhotometricModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("PhotometricModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     // Set default value
     SetPhotoL(1.0);
 
     // Get value from user
-    if(algo.HasKeyword("L")) SetPhotoL(algo["L"]);
+    if(algo.hasKeyword("L")) SetPhotoL(algo["L"]);
   }
 
   /**

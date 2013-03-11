@@ -60,17 +60,17 @@ namespace Isis {
    **/
   AutoReg *AutoRegFactory::Create(Pvl &pvl) {
     // Get the algorithm name to create
-    PvlGroup &algo = pvl.FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findGroup("Algorithm", Pvl::Traverse);
     QString algorithm = algo["Name"];
 
     // Open the factory plugin file
     Plugin p;
     FileName f("AutoReg.plugin");
     if(f.fileExists()) {
-      p.Read("AutoReg.plugin");
+      p.read("AutoReg.plugin");
     }
     else {
-      p.Read("$ISISROOT/lib/AutoReg.plugin");
+      p.read("$ISISROOT/lib/AutoReg.plugin");
     }
 
     // Get the algorithm specific plugin and return it

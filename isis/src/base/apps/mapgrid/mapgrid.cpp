@@ -34,22 +34,22 @@ void IsisMain() {
   // Get mapfile, add values for range and create projection
   QString mapFile = ui.GetFileName("MAPFILE");
   Pvl p(mapFile);
-  PvlGroup &mapping = p.FindGroup("Mapping", Pvl::Traverse);
+  PvlGroup &mapping = p.findGroup("Mapping", Pvl::Traverse);
 
-  if(mapping.HasKeyword("MinimumLatitude")) {
-    mapping.DeleteKeyword("MinimumLatitude");
+  if(mapping.hasKeyword("MinimumLatitude")) {
+    mapping.deleteKeyword("MinimumLatitude");
   }
 
-  if(mapping.HasKeyword("MaximumLatitude")) {
-    mapping.DeleteKeyword("MaximumLatitude");
+  if(mapping.hasKeyword("MaximumLatitude")) {
+    mapping.deleteKeyword("MaximumLatitude");
   }
 
-  if(mapping.HasKeyword("MinimumLongitude")) {
-    mapping.DeleteKeyword("MinimumLongitude");
+  if(mapping.hasKeyword("MinimumLongitude")) {
+    mapping.deleteKeyword("MinimumLongitude");
   }
 
-  if(mapping.HasKeyword("MaximumLongitude")) {
-    mapping.DeleteKeyword("MaximumLongitude");
+  if(mapping.hasKeyword("MaximumLongitude")) {
+    mapping.deleteKeyword("MaximumLongitude");
   }
 
   mapping += PvlKeyword("MinimumLatitude", toString(latStart));

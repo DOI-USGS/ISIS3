@@ -6,29 +6,29 @@
 
 namespace Isis {
   Shade::Shade(Pvl &pvl, PhotoModel &pmodel) : NormModel(pvl, pmodel) {
-    PvlGroup &algorithm = pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algorithm = pvl.findObject("NormalizationModel").findGroup("Algorithm", Pvl::Traverse);
 
     SetNormPharef(0.0);
     SetNormIncref(0.0);
     SetNormEmaref(0.0);
     SetNormAlbedo(1.0);
 
-    if(algorithm.HasKeyword("Incref")) {
+    if(algorithm.hasKeyword("Incref")) {
       SetNormIncref(algorithm["Incref"]);
     }
 
-    if(algorithm.HasKeyword("Pharef")) {
+    if(algorithm.hasKeyword("Pharef")) {
       SetNormPharef(algorithm["Pharef"]);
     }
     else {
       p_normPharef = p_normIncref;
     }
 
-    if(algorithm.HasKeyword("Emaref")) {
+    if(algorithm.hasKeyword("Emaref")) {
       SetNormEmaref(algorithm["Emaref"]);
     }
 
-    if(algorithm.HasKeyword("Albedo")) {
+    if(algorithm.hasKeyword("Albedo")) {
       SetNormAlbedo(algorithm["Albedo"]);
     }
   }

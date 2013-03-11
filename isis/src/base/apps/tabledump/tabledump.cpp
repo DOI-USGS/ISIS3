@@ -160,20 +160,20 @@ void helperButtonGetTableList() {
   int cnt = 0;
   while (!match) {
     // If we've gone through all objects and found nothing, throw an exception
-    if (cnt >= label.Objects()) {
+    if (cnt >= label.objects()) {
       g_pos = 0;
       QString msg = "Parameter [FROM] has no tables.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit, display "NAME" parameter as blank
-    if (g_pos >= label.Objects()) {
+    if (g_pos >= label.objects()) {
       list = "";
       match = true;
       g_pos = 0;  // Prepare to start over again
     }
     // When we find a table, fetch its name to stick in the "NAME" parameter
-    else if (label.Object(g_pos).Name() == "Table") {
-      list = label.Object(g_pos)["Name"][0];
+    else if (label.object(g_pos).name() == "Table") {
+      list = label.object(g_pos)["Name"][0];
       match = true;
       g_pos++;
     }

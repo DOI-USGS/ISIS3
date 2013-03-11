@@ -4,23 +4,23 @@
 
 namespace Isis {
   LunarLambertEmpirical::LunarLambertEmpirical(Pvl &pvl) : PhotoModel(pvl) {
-    PvlGroup &algo = pvl.FindObject("PhotometricModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("PhotometricModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
     // There are no default values for the Lunar Lambert Empirical function; if user
     // does not provide information, then an exception is thrown
-    if (algo.HasKeyword("PhaseList")) {
+    if (algo.hasKeyword("PhaseList")) {
       SetPhotoPhaseList(algo["PhaseList"]);
     } else {
       QString msg = "The empirical Lunar Lambert phase list was not provided by user";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    if (algo.HasKeyword("LList")) {
+    if (algo.hasKeyword("LList")) {
       SetPhotoLList(algo["LList"]);
     } else {
       QString msg = "The empirical Lunar Lambert l exponent list was not provided by user";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    if (algo.HasKeyword("PhaseCurveList")) {
+    if (algo.hasKeyword("PhaseCurveList")) {
       SetPhotoPhaseCurveList(algo["PhaseCurveList"]);
     } else {
       QString msg = "The empirical Lunar Lambert phase brightness list was not provided by user";

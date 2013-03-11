@@ -295,14 +295,14 @@ namespace Isis {
 
 
   void MosaicAreaTool::fromPvl(const PvlObject &obj) {
-    if(obj.HasKeyword("Visible")) {
-      if(obj.HasKeyword("Latitude") && obj["Latitude"][0] != "Null")
+    if(obj.hasKeyword("Visible")) {
+      if(obj.hasKeyword("Latitude") && obj["Latitude"][0] != "Null")
         m_latLineEdit->setText(obj["Latitude"][0]);
 
-      if(obj.HasKeyword("Longitude") && obj["Longitude"][0] != "Null")
+      if(obj.hasKeyword("Longitude") && obj["Longitude"][0] != "Null")
         m_lonLineEdit->setText(obj["Longitude"][0]);
 
-      if(obj.HasKeyword("Area") && obj["Area"][0] != "Null")
+      if(obj.hasKeyword("Area") && obj["Area"][0] != "Null")
         m_areaLineEdit->setText(obj["Area"][0]);
 
       if(toBool(obj["Visible"][0]) != false) {

@@ -35,7 +35,7 @@ void IsisMain() {
   UserInterface & ui = Application::GetUserInterface();
 
   Isis::Pvl lab(ui.GetFileName("FROM"));
-  Isis::PvlGroup & inst = lab.FindGroup("Instrument", Pvl::Traverse);
+  Isis::PvlGroup & inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   QString mission = inst["SpacecraftName"];
   if (mission != "Mariner_10") {

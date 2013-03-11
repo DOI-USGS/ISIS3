@@ -261,18 +261,18 @@ namespace Isis {
 
     int samples, lines, bands = 0;
     Pvl label;
-    label.Read(propagationCubes[0].toString());
-    PvlGroup mGroup = label.FindGroup("Mapping", Pvl::Traverse);
-    mGroup.AddKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
-    mGroup.AddKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
-    mGroup.AddKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
-    mGroup.AddKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+    label.read(propagationCubes[0].toString());
+    PvlGroup mGroup = label.findGroup("Mapping", Pvl::Traverse);
+    mGroup.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
 
-    if (mGroup.HasKeyword("UpperLeftCornerX"))
-      mGroup.DeleteKeyword("UpperLeftCornerX");
+    if (mGroup.hasKeyword("UpperLeftCornerX"))
+      mGroup.deleteKeyword("UpperLeftCornerX");
 
-    if (mGroup.HasKeyword("UpperLeftCornerY"))
-      mGroup.DeleteKeyword("UpperLeftCornerY");
+    if (mGroup.hasKeyword("UpperLeftCornerY"))
+      mGroup.deleteKeyword("UpperLeftCornerY");
 
     Pvl mapPvl;
     mapPvl += mGroup;
@@ -284,8 +284,8 @@ namespace Isis {
     proj->XYRange(xmin, xmax, ymin, ymax);
 
     // The xmin/ymax should be rounded for the labels
-    xmin = mapPvl.FindGroup("Mapping")["UpperLeftCornerX"];
-    ymax = mapPvl.FindGroup("Mapping")["UpperLeftCornerY"];
+    xmin = mapPvl.findGroup("Mapping")["UpperLeftCornerX"];
+    ymax = mapPvl.findGroup("Mapping")["UpperLeftCornerY"];
 
     for (int i = 0; i < propagationCubes.size(); i++) {
       Cube cube;
@@ -326,14 +326,14 @@ namespace Isis {
       double slat, double elat, double slon, double elon, int nbands,
       CubeAttributeOutput &oAtt, const QString &mosaicFile) {
     Pvl fileLab(inputFile);
-    PvlGroup &mapping = fileLab.FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup &mapping = fileLab.findGroup("Mapping", Pvl::Traverse);
 
     mapping["UpperLeftCornerX"] = toString(xmin);
     mapping["UpperLeftCornerY"] = toString(ymax);
-    mapping.AddKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
-    mapping.AddKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
-    mapping.AddKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
-    mapping.AddKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
 
     Projection *firstProj = ProjectionFactory::CreateFromCube(fileLab);
     int samps = (int)(ceil(firstProj->ToWorldX(xmax) - firstProj->ToWorldX(xmin)) + 0.5);
@@ -342,7 +342,7 @@ namespace Isis {
 
     if (p_createMosaic) {
       Pvl newMap;
-      newMap.AddGroup(mapping);
+      newMap.addGroup(mapping);
 
       // Initialize the mosaic
       CubeAttributeInput inAtt;
@@ -370,7 +370,7 @@ namespace Isis {
       p.StartProcess(ProcessMapMosaic::FillNull);
 
       // CreateForCube created some keywords in the mapping group that needs to be added
-      ocube->putGroup(newMap.FindGroup("Mapping", Pvl::Traverse));
+      ocube->putGroup(newMap.findGroup("Mapping", Pvl::Traverse));
       p.EndProcess();
     }
 
@@ -395,15 +395,15 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if (mapping.HasKeyword("UpperLeftCornerX"))
-      mapping.DeleteKeyword("UpperLeftCornerX");
+    if (mapping.hasKeyword("UpperLeftCornerX"))
+      mapping.deleteKeyword("UpperLeftCornerX");
 
-    if (mapping.HasKeyword("UpperLeftCornerY"))
-      mapping.DeleteKeyword("UpperLeftCornerY");
+    if (mapping.hasKeyword("UpperLeftCornerY"))
+      mapping.deleteKeyword("UpperLeftCornerY");
 
     if (p_createMosaic) {
       Pvl newMap;
-      newMap.AddGroup(mapping);
+      newMap.addGroup(mapping);
       int samps, lines, bands;
       delete ProjectionFactory::CreateForCube(newMap, samps, lines, false);
 
@@ -431,7 +431,7 @@ namespace Isis {
       p.StartProcess(ProcessMapMosaic::FillNull);
 
       // CreateForCube created some keywords in the mapping group that needs to be added
-      ocube->putGroup(newMap.FindGroup("Mapping", Pvl::Traverse));
+      ocube->putGroup(newMap.findGroup("Mapping", Pvl::Traverse));
       p.EndProcess();
     }
 
@@ -453,7 +453,7 @@ namespace Isis {
     Cube mosaic;
     mosaic.open(mosaicFile);
 
-    PvlGroup &mapping = mosaic.label()->FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup &mapping = mosaic.label()->findGroup("Mapping", Pvl::Traverse);
     CubeAttributeOutput oAtt;
     // The other SetOutput will not use the attribute or filename
     Cube *ocube = SetOutputCube("", mapping, oAtt, mosaicFile);

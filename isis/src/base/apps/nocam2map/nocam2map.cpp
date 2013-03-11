@@ -185,8 +185,8 @@ void IsisMain() {
   if(!ui.GetBoolean("NOWARP")) {
     //Creates the mapping group
     Pvl mapFile;
-    mapFile.Read(ui.GetFileName("MAP"));
-    PvlGroup &mapGrp = mapFile.FindGroup("Mapping", Pvl::Traverse);
+    mapFile.read(ui.GetFileName("MAP"));
+    PvlGroup &mapGrp = mapFile.findGroup("Mapping", Pvl::Traverse);
 
     //Reopen the lat and long cubes
     latCube = new Cube();
@@ -206,11 +206,11 @@ void IsisMain() {
     //Else read the target name from the input cube
     else {
       Pvl fromFile;
-      fromFile.Read(ui.GetFileName("FROM"));
-      targetName = fromFile.FindKeyword("TargetName", Pvl::Traverse);
+      fromFile.read(ui.GetFileName("FROM"));
+      targetName = fromFile.findKeyword("TargetName", Pvl::Traverse);
     }
 
-    mapGrp.AddKeyword(targetName, Pvl::Replace);
+    mapGrp.addKeyword(targetName, Pvl::Replace);
 
     PvlKeyword equRadius;
     PvlKeyword polRadius;
@@ -251,33 +251,33 @@ void IsisMain() {
       polRadius = PvlKeyword("PolarRadius", toString(radii[2] * 1000));
     }
 
-    mapGrp.AddKeyword(equRadius, Pvl::Replace);
-    mapGrp.AddKeyword(polRadius, Pvl::Replace);
+    mapGrp.addKeyword(equRadius, Pvl::Replace);
+    mapGrp.addKeyword(polRadius, Pvl::Replace);
 
 
     //If the latitude type is not in the mapping group, copy it from the input
-    if(!mapGrp.HasKeyword("LatitudeType")) {
+    if(!mapGrp.hasKeyword("LatitudeType")) {
       if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
-        mapGrp.AddKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
+        mapGrp.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
       }
       else {
-        mapGrp.AddKeyword(PvlKeyword("LatitudeType", "Planetographic"), Pvl::Replace);
+        mapGrp.addKeyword(PvlKeyword("LatitudeType", "Planetographic"), Pvl::Replace);
       }
     }
 
     //If the longitude direction is not in the mapping group, copy it from the input
-    if(!mapGrp.HasKeyword("LongitudeDirection")) {
+    if(!mapGrp.hasKeyword("LongitudeDirection")) {
       if(ui.GetString("LONDIR") == "POSITIVEEAST") {
-        mapGrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"), Pvl::Replace);
+        mapGrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"), Pvl::Replace);
       }
       else {
-        mapGrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
+        mapGrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
       }
     }
 
     //If the longitude domain is not in the mapping group, assume it is 360
-    if(!mapGrp.HasKeyword("LongitudeDomain")) {
-      mapGrp.AddKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
+    if(!mapGrp.hasKeyword("LongitudeDomain")) {
+      mapGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
     }
 
     //If the default range is to be computed, use the input lat/long cubes to determine the range
@@ -293,7 +293,7 @@ void IsisMain() {
       double minLat = latStats->Minimum();
       double maxLat = latStats->Maximum();
 
-      bool isOcentric = ((QString)mapGrp.FindKeyword("LatitudeType")) == "Planetocentric";
+      bool isOcentric = ((QString)mapGrp.findKeyword("LatitudeType")) == "Planetocentric";
 
       if(isOcentric) {
         if(ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
@@ -308,11 +308,11 @@ void IsisMain() {
         }
       }
 
-      int lonDomain = (int)mapGrp.FindKeyword("LongitudeDomain");
+      int lonDomain = (int)mapGrp.findKeyword("LongitudeDomain");
       double minLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Minimum()) : Projection::To180Domain(lonStats->Minimum());
       double maxLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Maximum()) : Projection::To180Domain(lonStats->Maximum());
 
-      bool isPosEast = ((QString)mapGrp.FindKeyword("LongitudeDirection")) == "PositiveEast";
+      bool isPosEast = ((QString)mapGrp.findKeyword("LongitudeDirection")) == "PositiveEast";
 
       if(isPosEast) {
         if(ui.GetString("LONDIR") != "POSITIVEEAST") {
@@ -333,30 +333,30 @@ void IsisMain() {
         maxLon = temp;
       }
 
-      mapGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
+      mapGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
+      mapGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
+      mapGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
+      mapGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
     }
 
     //If the user decided to enter a ground range then override
     if(ui.WasEntered("MINLAT")) {
-      mapGrp.AddKeyword(PvlKeyword("MinimumLatitude",
+      mapGrp.addKeyword(PvlKeyword("MinimumLatitude",
                                    toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
     }
 
     if(ui.WasEntered("MAXLAT")) {
-      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude",
+      mapGrp.addKeyword(PvlKeyword("MaximumLatitude",
                                    toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
     }
 
     if(ui.WasEntered("MINLON")) {
-      mapGrp.AddKeyword(PvlKeyword("MinimumLongitude",
+      mapGrp.addKeyword(PvlKeyword("MinimumLongitude",
                                    toString(ui.GetDouble("MINLON"))), Pvl::Replace);
     }
 
     if(ui.WasEntered("MAXLON")) {
-      mapGrp.AddKeyword(PvlKeyword("MaximumLongitude",
+      mapGrp.addKeyword(PvlKeyword("MaximumLongitude",
                                    toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
     }
 
@@ -391,30 +391,30 @@ void IsisMain() {
       double pixels = sqrt(pow(latCube->sampleCount() - 1.0, 2.0) + pow(latCube->lineCount() - 1.0, 2.0));
 
       //Add the scale in pixels/degree to the mapping group
-      mapGrp.AddKeyword(PvlKeyword("Scale",
+      mapGrp.addKeyword(PvlKeyword("Scale",
                                    toString(pixels / angle), "pixels/degree"),
                         Pvl::Replace);
-      if(mapGrp.HasKeyword("PixelResolution")) {
-        mapGrp.DeleteKeyword("PixelResolution");
+      if(mapGrp.hasKeyword("PixelResolution")) {
+        mapGrp.deleteKeyword("PixelResolution");
       }
     }
 
 
     // If the user decided to enter a resolution then override
     if(ui.GetString("PIXRES") == "MPP") {
-      mapGrp.AddKeyword(PvlKeyword("PixelResolution",
+      mapGrp.addKeyword(PvlKeyword("PixelResolution",
                                    toString(ui.GetDouble("RESOLUTION")), "meters/pixel"),
                         Pvl::Replace);
-      if(mapGrp.HasKeyword("Scale")) {
-        mapGrp.DeleteKeyword("Scale");
+      if(mapGrp.hasKeyword("Scale")) {
+        mapGrp.deleteKeyword("Scale");
       }
     }
     else if(ui.GetString("PIXRES") == "PPD") {
-      mapGrp.AddKeyword(PvlKeyword("Scale",
+      mapGrp.addKeyword(PvlKeyword("Scale",
                                    toString(ui.GetDouble("RESOLUTION")), "pixels/degree"),
                         Pvl::Replace);
-      if(mapGrp.HasKeyword("PixelResolution")) {
-        mapGrp.DeleteKeyword("PixelResolution");
+      if(mapGrp.hasKeyword("PixelResolution")) {
+        mapGrp.deleteKeyword("PixelResolution");
       }
     }
 
@@ -704,8 +704,8 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);
@@ -757,17 +757,17 @@ void LoadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
-  if(userGrp.HasKeyword("Scale")) {
+  if(userGrp.hasKeyword("Scale")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["Scale"]);
     ui.Clear("PIXRES");
     ui.PutAsString("PIXRES", "PPD");
   }
-  else if(userGrp.HasKeyword("PixelResolution")) {
+  else if(userGrp.hasKeyword("PixelResolution")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["PixelResolution"]);
     ui.Clear("PIXRES");
@@ -787,8 +787,8 @@ void ComputeInputRange() {
 
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   Statistics *latStats = latCub->statistics();
   Statistics *lonStats = lonCub->statistics();
@@ -796,12 +796,12 @@ void ComputeInputRange() {
   double minLat = latStats->Minimum();
   double maxLat = latStats->Maximum();
 
-  int lonDomain = userGrp.HasKeyword("LongitudeDomain") ? (int)userGrp.FindKeyword("LongitudeDomain") : 360;
+  int lonDomain = userGrp.hasKeyword("LongitudeDomain") ? (int)userGrp.findKeyword("LongitudeDomain") : 360;
   double minLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Minimum()) : Projection::To180Domain(lonStats->Minimum());
   double maxLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Maximum()) : Projection::To180Domain(lonStats->Maximum());
 
-  if(userGrp.HasKeyword("LatitudeType")) {
-    bool isOcentric = ((QString)userGrp.FindKeyword("LatitudeType")) == "Planetocentric";
+  if(userGrp.hasKeyword("LatitudeType")) {
+    bool isOcentric = ((QString)userGrp.findKeyword("LatitudeType")) == "Planetocentric";
 
     double equRadius;
     double polRadius;
@@ -829,8 +829,8 @@ void ComputeInputRange() {
       //Else read the target name from the input cube
       else {
         Pvl fromFile;
-        fromFile.Read(ui.GetFileName("FROM"));
-        target = (QString)fromFile.FindKeyword("TargetName", Pvl::Traverse);
+        fromFile.read(ui.GetFileName("FROM"));
+        target = (QString)fromFile.findKeyword("TargetName", Pvl::Traverse);
       }
 
       SpiceInt code;
@@ -867,8 +867,8 @@ void ComputeInputRange() {
     }
   }
 
-  if(userGrp.HasKeyword("LongitudeDirection")) {
-    bool isPosEast = ((QString)userGrp.FindKeyword("LongitudeDirection")) == "PositiveEast";
+  if(userGrp.hasKeyword("LongitudeDirection")) {
+    bool isPosEast = ((QString)userGrp.findKeyword("LongitudeDirection")) == "PositiveEast";
 
     if(isPosEast) {
       if(ui.GetString("LONDIR") != "POSITIVEEAST") {
@@ -919,8 +919,8 @@ void LoadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
   int count = 0;
@@ -928,19 +928,19 @@ void LoadMapRange() {
   ui.Clear("MAXLAT");
   ui.Clear("MINLON");
   ui.Clear("MAXLON");
-  if(userGrp.HasKeyword("MinimumLatitude")) {
+  if(userGrp.hasKeyword("MinimumLatitude")) {
     ui.PutDouble("MINLAT", userGrp["MinimumLatitude"]);
     count++;
   }
-  if(userGrp.HasKeyword("MaximumLatitude")) {
+  if(userGrp.hasKeyword("MaximumLatitude")) {
     ui.PutDouble("MAXLAT", userGrp["MaximumLatitude"]);
     count++;
   }
-  if(userGrp.HasKeyword("MinimumLongitude")) {
+  if(userGrp.hasKeyword("MinimumLongitude")) {
     ui.PutDouble("MINLON", userGrp["MinimumLongitude"]);
     count++;
   }
-  if(userGrp.HasKeyword("MaximumLongitude")) {
+  if(userGrp.hasKeyword("MaximumLongitude")) {
     ui.PutDouble("MAXLON", userGrp["MaximumLongitude"]);
     count++;
   }

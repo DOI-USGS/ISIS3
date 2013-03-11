@@ -195,46 +195,46 @@ namespace Isis {
   PvlGroup *CameraPointInfo::GetPointInfo(bool passed, bool allowOutside, bool allowErrors) {
     PvlGroup *gp = new PvlGroup("GroundPoint");
     {
-      gp->AddKeyword(PvlKeyword("Filename"));
-      gp->AddKeyword(PvlKeyword("Sample"));
-      gp->AddKeyword(PvlKeyword("Line"));
-      gp->AddKeyword(PvlKeyword("PixelValue"));
-      gp->AddKeyword(PvlKeyword("RightAscension"));
-      gp->AddKeyword(PvlKeyword("Declination"));
-      gp->AddKeyword(PvlKeyword("PlanetocentricLatitude"));
-      gp->AddKeyword(PvlKeyword("PlanetographicLatitude"));
-      gp->AddKeyword(PvlKeyword("PositiveEast360Longitude"));
-      gp->AddKeyword(PvlKeyword("PositiveEast180Longitude"));
-      gp->AddKeyword(PvlKeyword("PositiveWest360Longitude"));
-      gp->AddKeyword(PvlKeyword("PositiveWest180Longitude"));
-      gp->AddKeyword(PvlKeyword("BodyFixedCoordinate"));
-      gp->AddKeyword(PvlKeyword("LocalRadius"));
-      gp->AddKeyword(PvlKeyword("SampleResolution"));
-      gp->AddKeyword(PvlKeyword("LineResolution"));
-      gp->AddKeyword(PvlKeyword("SpacecraftPosition"));
-      gp->AddKeyword(PvlKeyword("SpacecraftAzimuth"));
-      gp->AddKeyword(PvlKeyword("SlantDistance"));
-      gp->AddKeyword(PvlKeyword("TargetCenterDistance"));
-      gp->AddKeyword(PvlKeyword("SubSpacecraftLatitude"));
-      gp->AddKeyword(PvlKeyword("SubSpacecraftLongitude"));
-      gp->AddKeyword(PvlKeyword("SpacecraftAltitude"));
-      gp->AddKeyword(PvlKeyword("OffNadirAngle"));
-      gp->AddKeyword(PvlKeyword("SubSpacecraftGroundAzimuth"));
-      gp->AddKeyword(PvlKeyword("SunPosition"));
-      gp->AddKeyword(PvlKeyword("SubSolarAzimuth"));
-      gp->AddKeyword(PvlKeyword("SolarDistance"));
-      gp->AddKeyword(PvlKeyword("SubSolarLatitude"));
-      gp->AddKeyword(PvlKeyword("SubSolarLongitude"));
-      gp->AddKeyword(PvlKeyword("SubSolarGroundAzimuth"));
-      gp->AddKeyword(PvlKeyword("Phase"));
-      gp->AddKeyword(PvlKeyword("Incidence"));
-      gp->AddKeyword(PvlKeyword("Emission"));
-      gp->AddKeyword(PvlKeyword("NorthAzimuth"));
-      gp->AddKeyword(PvlKeyword("EphemerisTime"));
-      gp->AddKeyword(PvlKeyword("UTC"));
-      gp->AddKeyword(PvlKeyword("LocalSolarTime"));
-      gp->AddKeyword(PvlKeyword("SolarLongitude"));
-      if(allowErrors) gp->AddKeyword(PvlKeyword("Error"));
+      gp->addKeyword(PvlKeyword("Filename"));
+      gp->addKeyword(PvlKeyword("Sample"));
+      gp->addKeyword(PvlKeyword("Line"));
+      gp->addKeyword(PvlKeyword("PixelValue"));
+      gp->addKeyword(PvlKeyword("RightAscension"));
+      gp->addKeyword(PvlKeyword("Declination"));
+      gp->addKeyword(PvlKeyword("PlanetocentricLatitude"));
+      gp->addKeyword(PvlKeyword("PlanetographicLatitude"));
+      gp->addKeyword(PvlKeyword("PositiveEast360Longitude"));
+      gp->addKeyword(PvlKeyword("PositiveEast180Longitude"));
+      gp->addKeyword(PvlKeyword("PositiveWest360Longitude"));
+      gp->addKeyword(PvlKeyword("PositiveWest180Longitude"));
+      gp->addKeyword(PvlKeyword("BodyFixedCoordinate"));
+      gp->addKeyword(PvlKeyword("LocalRadius"));
+      gp->addKeyword(PvlKeyword("SampleResolution"));
+      gp->addKeyword(PvlKeyword("LineResolution"));
+      gp->addKeyword(PvlKeyword("SpacecraftPosition"));
+      gp->addKeyword(PvlKeyword("SpacecraftAzimuth"));
+      gp->addKeyword(PvlKeyword("SlantDistance"));
+      gp->addKeyword(PvlKeyword("TargetCenterDistance"));
+      gp->addKeyword(PvlKeyword("SubSpacecraftLatitude"));
+      gp->addKeyword(PvlKeyword("SubSpacecraftLongitude"));
+      gp->addKeyword(PvlKeyword("SpacecraftAltitude"));
+      gp->addKeyword(PvlKeyword("OffNadirAngle"));
+      gp->addKeyword(PvlKeyword("SubSpacecraftGroundAzimuth"));
+      gp->addKeyword(PvlKeyword("SunPosition"));
+      gp->addKeyword(PvlKeyword("SubSolarAzimuth"));
+      gp->addKeyword(PvlKeyword("SolarDistance"));
+      gp->addKeyword(PvlKeyword("SubSolarLatitude"));
+      gp->addKeyword(PvlKeyword("SubSolarLongitude"));
+      gp->addKeyword(PvlKeyword("SubSolarGroundAzimuth"));
+      gp->addKeyword(PvlKeyword("Phase"));
+      gp->addKeyword(PvlKeyword("Incidence"));
+      gp->addKeyword(PvlKeyword("Emission"));
+      gp->addKeyword(PvlKeyword("NorthAzimuth"));
+      gp->addKeyword(PvlKeyword("EphemerisTime"));
+      gp->addKeyword(PvlKeyword("UTC"));
+      gp->addKeyword(PvlKeyword("LocalSolarTime"));
+      gp->addKeyword(PvlKeyword("SolarLongitude"));
+      if(allowErrors) gp->addKeyword(PvlKeyword("Error"));
     }
 
     bool noErrors = passed;
@@ -251,31 +251,31 @@ namespace Isis {
     }
 
     if(!noErrors) {
-      for(int i = 0; i < gp->Keywords(); i++) {
-        QString name = (*gp)[i].Name();
+      for(int i = 0; i < gp->keywords(); i++) {
+        QString name = (*gp)[i].name();
         // These three keywords have 3 values, so they must have 3 N/As
         if(name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
             name == "SunPosition") {
-          (*gp)[i].AddValue("N/A");
-          (*gp)[i].AddValue("N/A");
-          (*gp)[i].AddValue("N/A");
+          (*gp)[i].addValue("N/A");
+          (*gp)[i].addValue("N/A");
+          (*gp)[i].addValue("N/A");
         }
         else {
-          (*gp)[i].SetValue("N/A");
+          (*gp)[i].setValue("N/A");
         }
       }
       // Set all keywords that still have valid information
-      gp->FindKeyword("Error").SetValue(error);
-      gp->FindKeyword("FileName").SetValue(currentCube->fileName());
-      gp->FindKeyword("Sample").SetValue(toString(camera->Sample()));
-      gp->FindKeyword("Line").SetValue(toString(camera->Line()));
-      gp->FindKeyword("EphemerisTime").SetValue(toString(camera->time().Et()), "seconds");
-      gp->FindKeyword("EphemerisTime").AddComment("Time");
+      gp->findKeyword("Error").setValue(error);
+      gp->findKeyword("FileName").setValue(currentCube->fileName());
+      gp->findKeyword("Sample").setValue(toString(camera->Sample()));
+      gp->findKeyword("Line").setValue(toString(camera->Line()));
+      gp->findKeyword("EphemerisTime").setValue(toString(camera->time().Et()), "seconds");
+      gp->findKeyword("EphemerisTime").addComment("Time");
       QString utc = camera->time().UTC();
-      gp->FindKeyword("UTC").SetValue(utc);
-      gp->FindKeyword("SpacecraftPosition").AddComment("Spacecraft Information");
-      gp->FindKeyword("SunPosition").AddComment("Sun Information");
-      gp->FindKeyword("Phase").AddComment("Illumination and Other");
+      gp->findKeyword("UTC").setValue(utc);
+      gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
+      gp->findKeyword("SunPosition").addComment("Sun Information");
+      gp->findKeyword("Phase").addComment("Illumination and Other");
     }
 
     else {
@@ -292,95 +292,95 @@ namespace Isis {
       double ssplat, ssplon, sslat, sslon, pwlon, oglat;
 
       {
-        gp->FindKeyword("FileName").SetValue(currentCube->fileName());
-        gp->FindKeyword("Sample").SetValue(toString(camera->Sample()));
-        gp->FindKeyword("Line").SetValue(toString(camera->Line()));
-        gp->FindKeyword("PixelValue").SetValue(PixelToString(b[0]));
-        gp->FindKeyword("RightAscension").SetValue(toString(camera->RightAscension()));
-        gp->FindKeyword("Declination").SetValue(toString(camera->Declination()));
-        gp->FindKeyword("PlanetocentricLatitude").SetValue(toString(camera->UniversalLatitude()));
+        gp->findKeyword("FileName").setValue(currentCube->fileName());
+        gp->findKeyword("Sample").setValue(toString(camera->Sample()));
+        gp->findKeyword("Line").setValue(toString(camera->Line()));
+        gp->findKeyword("PixelValue").setValue(PixelToString(b[0]));
+        gp->findKeyword("RightAscension").setValue(toString(camera->RightAscension()));
+        gp->findKeyword("Declination").setValue(toString(camera->Declination()));
+        gp->findKeyword("PlanetocentricLatitude").setValue(toString(camera->UniversalLatitude()));
 
         // Convert lat to planetographic
         Distance radii[3];
         camera->radii(radii);
         oglat = Isis::Projection::ToPlanetographic(camera->UniversalLatitude(),
                 radii[0].kilometers(), radii[2].kilometers());
-        gp->FindKeyword("PlanetographicLatitude").SetValue(toString(oglat));
+        gp->findKeyword("PlanetographicLatitude").setValue(toString(oglat));
 
-        gp->FindKeyword("PositiveEast360Longitude").SetValue(toString(
+        gp->findKeyword("PositiveEast360Longitude").setValue(toString(
           camera->UniversalLongitude()));
 
         //Convert lon to -180 - 180 range
-        gp->FindKeyword("PositiveEast180Longitude").SetValue(toString(
+        gp->findKeyword("PositiveEast180Longitude").setValue(toString(
           Isis::Projection::To180Domain(
             camera->UniversalLongitude())));
 
         //Convert lon to positive west
         pwlon = Isis::Projection::ToPositiveWest(camera->UniversalLongitude(),
                 360);
-        gp->FindKeyword("PositiveWest360Longitude").SetValue(toString(pwlon));
+        gp->findKeyword("PositiveWest360Longitude").setValue(toString(pwlon));
 
         //Convert pwlon to -180 - 180 range
-        gp->FindKeyword("PositiveWest180Longitude").SetValue(toString(
+        gp->findKeyword("PositiveWest180Longitude").setValue(toString(
           Isis::Projection::To180Domain(pwlon)));
 
         camera->Coordinate(pB);
-        gp->FindKeyword("BodyFixedCoordinate").AddValue(toString(pB[0]), "km");
-        gp->FindKeyword("BodyFixedCoordinate").AddValue(toString(pB[1]), "km");
-        gp->FindKeyword("BodyFixedCoordinate").AddValue(toString(pB[2]), "km");
+        gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[0]), "km");
+        gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[1]), "km");
+        gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[2]), "km");
 
-        gp->FindKeyword("LocalRadius").SetValue(toString(camera->LocalRadius().meters()), "meters");
-        gp->FindKeyword("SampleResolution").SetValue(toString(camera->SampleResolution()), "meters/pixel");
-        gp->FindKeyword("LineResolution").SetValue(toString(camera->LineResolution()), "meters/pixel");
+        gp->findKeyword("LocalRadius").setValue(toString(camera->LocalRadius().meters()), "meters");
+        gp->findKeyword("SampleResolution").setValue(toString(camera->SampleResolution()), "meters/pixel");
+        gp->findKeyword("LineResolution").setValue(toString(camera->LineResolution()), "meters/pixel");
 
         camera->instrumentPosition(spB);
-        gp->FindKeyword("SpacecraftPosition").AddValue(toString(spB[0]), "km");
-        gp->FindKeyword("SpacecraftPosition").AddValue(toString(spB[1]), "km");
-        gp->FindKeyword("SpacecraftPosition").AddValue(toString(spB[2]), "km");
-        gp->FindKeyword("SpacecraftPosition").AddComment("Spacecraft Information");
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
+        gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
+        gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
 
-        gp->FindKeyword("SpacecraftAzimuth").SetValue(toString(camera->SpacecraftAzimuth()));
-        gp->FindKeyword("SlantDistance").SetValue(toString(camera->SlantDistance()), "km");
-        gp->FindKeyword("TargetCenterDistance").SetValue(toString(camera->targetCenterDistance()), "km");
+        gp->findKeyword("SpacecraftAzimuth").setValue(toString(camera->SpacecraftAzimuth()));
+        gp->findKeyword("SlantDistance").setValue(toString(camera->SlantDistance()), "km");
+        gp->findKeyword("TargetCenterDistance").setValue(toString(camera->targetCenterDistance()), "km");
         camera->subSpacecraftPoint(ssplat, ssplon);
-        gp->FindKeyword("SubSpacecraftLatitude").SetValue(toString(ssplat));
-        gp->FindKeyword("SubSpacecraftLongitude").SetValue(toString(ssplon));
-        gp->FindKeyword("SpacecraftAltitude").SetValue(toString(camera->SpacecraftAltitude()), "km");
-        gp->FindKeyword("OffNadirAngle").SetValue(toString(camera->OffNadirAngle()));
+        gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat));
+        gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon));
+        gp->findKeyword("SpacecraftAltitude").setValue(toString(camera->SpacecraftAltitude()), "km");
+        gp->findKeyword("OffNadirAngle").setValue(toString(camera->OffNadirAngle()));
         double subspcgrdaz;
         subspcgrdaz = camera->GroundAzimuth(camera->UniversalLatitude(), camera->UniversalLongitude(),
                                             ssplat, ssplon);
-        gp->FindKeyword("SubSpacecraftGroundAzimuth").SetValue(toString(subspcgrdaz));
+        gp->findKeyword("SubSpacecraftGroundAzimuth").setValue(toString(subspcgrdaz));
 
         camera->sunPosition(sB);
-        gp->FindKeyword("SunPosition").AddValue(toString(sB[0]), "km");
-        gp->FindKeyword("SunPosition").AddValue(toString(sB[1]), "km");
-        gp->FindKeyword("SunPosition").AddValue(toString(sB[2]), "km");
-        gp->FindKeyword("SunPosition").AddComment("Sun Information");
+        gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
+        gp->findKeyword("SunPosition").addValue(toString(sB[1]), "km");
+        gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
+        gp->findKeyword("SunPosition").addComment("Sun Information");
 
-        gp->FindKeyword("SubSolarAzimuth").SetValue(toString(camera->SunAzimuth()));
-        gp->FindKeyword("SolarDistance").SetValue(toString(camera->SolarDistance()), "AU");
+        gp->findKeyword("SubSolarAzimuth").setValue(toString(camera->SunAzimuth()));
+        gp->findKeyword("SolarDistance").setValue(toString(camera->SolarDistance()), "AU");
         camera->subSolarPoint(sslat, sslon);
-        gp->FindKeyword("SubSolarLatitude").SetValue(toString(sslat));
-        gp->FindKeyword("SubSolarLongitude").SetValue(toString(sslon));
+        gp->findKeyword("SubSolarLatitude").setValue(toString(sslat));
+        gp->findKeyword("SubSolarLongitude").setValue(toString(sslon));
         double subsolgrdaz;
         subsolgrdaz = camera->GroundAzimuth(camera->UniversalLatitude(), camera->UniversalLongitude(),
                                             sslat, sslon);
-        gp->FindKeyword("SubSolarGroundAzimuth").SetValue(toString(subsolgrdaz));
+        gp->findKeyword("SubSolarGroundAzimuth").setValue(toString(subsolgrdaz));
 
-        gp->FindKeyword("Phase").SetValue(toString(camera->PhaseAngle()));
-        gp->FindKeyword("Phase").AddComment("Illumination and Other");
-        gp->FindKeyword("Incidence").SetValue(toString(camera->IncidenceAngle()));
-        gp->FindKeyword("Emission").SetValue(toString(camera->EmissionAngle()));
-        gp->FindKeyword("NorthAzimuth").SetValue(toString(camera->NorthAzimuth()));
+        gp->findKeyword("Phase").setValue(toString(camera->PhaseAngle()));
+        gp->findKeyword("Phase").addComment("Illumination and Other");
+        gp->findKeyword("Incidence").setValue(toString(camera->IncidenceAngle()));
+        gp->findKeyword("Emission").setValue(toString(camera->EmissionAngle()));
+        gp->findKeyword("NorthAzimuth").setValue(toString(camera->NorthAzimuth()));
 
-        gp->FindKeyword("EphemerisTime").SetValue(toString(camera->time().Et()), "seconds");
-        gp->FindKeyword("EphemerisTime").AddComment("Time");
+        gp->findKeyword("EphemerisTime").setValue(toString(camera->time().Et()), "seconds");
+        gp->findKeyword("EphemerisTime").addComment("Time");
         utc = camera->time().UTC();
-        gp->FindKeyword("UTC").SetValue(utc);
-        gp->FindKeyword("LocalSolarTime").SetValue(toString(camera->LocalSolarTime()), "hour");
-        gp->FindKeyword("SolarLongitude").SetValue(toString(camera->solarLongitude().degrees()));
-        if(allowErrors) gp->FindKeyword("Error").SetValue("N/A");
+        gp->findKeyword("UTC").setValue(utc);
+        gp->findKeyword("LocalSolarTime").setValue(toString(camera->LocalSolarTime()), "hour");
+        gp->findKeyword("SolarLongitude").setValue(toString(camera->solarLongitude().degrees()));
+        if(allowErrors) gp->findKeyword("Error").setValue("N/A");
       }
     }
     return gp;

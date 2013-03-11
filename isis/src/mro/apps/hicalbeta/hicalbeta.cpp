@@ -445,12 +445,12 @@ void IsisMain(){
     rcal += PvlKeyword("Revision",hical_revision);
 
     PvlKeyword key("Conf", conf_file);
-    key.AddCommentWrapped("/* " + hical_program + " application equation */");
-    key.AddComment("/* hdn = idn - ZeroBufferFit(ZeroBufferSmooth) */");
-    key.AddComment("/*           - ZeroReverse - ZeroDark */");
-    key.AddComment("/* odn = hdn / GainLineDrift * GainNonLinearity */");
-    key.AddComment("/*           * GainChannelNormalize * GainFlatField */");
-    key.AddComment("/*           * GainTemperature / GainUnitConversion */");
+    key.addCommentWrapped("/* " + hical_program + " application equation */");
+    key.addComment("/* hdn = idn - ZeroBufferFit(ZeroBufferSmooth) */");
+    key.addComment("/*           - ZeroReverse - ZeroDark */");
+    key.addComment("/* odn = hdn / GainLineDrift * GainNonLinearity */");
+    key.addComment("/*           * GainChannelNormalize * GainFlatField */");
+    key.addComment("/*           * GainTemperature / GainUnitConversion */");
     rcal += key;
 
     //  Record parameter generation history.  Controllable in configuration

@@ -239,8 +239,8 @@ void pvlOut(const QString &StatFile) {
   }
 
   Pvl t;
-  t.AddGroup(results);
-  t.Write(StatFile);
+  t.addGroup(results);
+  t.write(StatFile);
 }
 
 //********************************************************
@@ -298,11 +298,11 @@ void tableOut(const QString &StatFile) {
 //*******************************************************
 void PVLIn(const Isis::FileName &filename) {
   Pvl pvlFileIn;
-  pvlFileIn.Read(filename.name());
-  PvlGroup results = pvlFileIn.FindGroup("Results");
-  PvlObject::PvlKeywordIterator itr = results.Begin();
+  pvlFileIn.read(filename.name());
+  PvlGroup results = pvlFileIn.findGroup("Results");
+  PvlObject::PvlKeywordIterator itr = results.begin();
 
-  while(itr != results.End()) {
+  while(itr != results.end()) {
     StaticStats newStat;
     band.push_back(toInt((*itr)[0]));
     itr++;

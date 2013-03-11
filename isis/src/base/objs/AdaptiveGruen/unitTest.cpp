@@ -32,12 +32,12 @@ int main() {
     schip += PvlKeyword("Lines", "30");
 
     PvlObject o("AutoRegistration");
-    o.AddGroup(alg);
-    o.AddGroup(pchip);
-    o.AddGroup(schip);
+    o.addGroup(alg);
+    o.addGroup(pchip);
+    o.addGroup(schip);
 
     Pvl pvl;
-    pvl.AddObject(o);
+    pvl.addObject(o);
     std::cout << pvl << std::endl;
 
     AutoReg *ar = AutoRegFactory::Create(pvl);

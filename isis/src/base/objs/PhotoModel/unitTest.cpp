@@ -22,30 +22,30 @@ int main() {
   Pvl lab;
   doit(lab);
 
-  lab.AddObject(PvlObject("PhotometricModel"));
+  lab.addObject(PvlObject("PhotometricModel"));
   std::cout << "Testing missing Algorithm group ..." <<
             std::endl;
   doit(lab);
 
-  lab.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
+  lab.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
   std::cout << "Testing missing Name keyword ..." << std::endl;
   doit(lab);
 
   // We can't do this in the unit test because it prints out an absolute path
   // to the isis root which changes.
-  //lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  //    AddKeyword(PvlKeyword("Name","Bogus"));
+  //lab.findObject("PhotometricModel").findGroup("Algorithm").
+  //    addKeyword(PvlKeyword("Name","Bogus"));
   //std::cout << "Testing unsupported photometric model ..." << std::endl;
   //doit(lab);
 
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "Minnaert"), Pvl::Replace);
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "Minnaert"), Pvl::Replace);
 
   std::cout << "Testing supported photometric model ..." << std::endl;
   doit(lab);
 
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "Lambert"), Pvl::Replace);
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "Lambert"), Pvl::Replace);
   PhotoModel *pm = PhotoModelFactory::Create(lab);
 
   std::cout << "Testing photometric model PhtTopder method ..." << std::endl;

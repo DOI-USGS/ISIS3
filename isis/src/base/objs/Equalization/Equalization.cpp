@@ -236,7 +236,7 @@ cout << oNormList[band]->Gain(img) << endl;
     setResults();
 
     for (unsigned int i = 0; i < overlapStats.size(); i++) {
-      m_results->AddObject(overlapStats[i].toPvl());
+      m_results->addObject(overlapStats[i].toPvl());
     }
   }
 
@@ -248,7 +248,7 @@ cout << oNormList[band]->Gain(img) << endl;
     }
 
     m_results = new Pvl();
-    m_results->SetTerminator("");
+    m_results->setTerminator("");
 
     PvlObject equ("EqualizationInformation");
     PvlGroup gen("General");
@@ -257,12 +257,12 @@ cout << oNormList[band]->Gain(img) << endl;
     gen += PvlKeyword("InvalidOverlaps", toString(m_invalidCnt));
     gen += PvlKeyword("Weighted", (m_wtopt) ? "true" : "false");
     gen += PvlKeyword("MinCount", toString(m_mincnt));
-    equ.AddGroup(gen);
+    equ.addGroup(gen);
     for (int img = 0; img < m_imageList.size(); img++) {
       // Format and name information
       PvlGroup norm("Normalization");
-      norm.AddComment("Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET");
-      norm.AddComment("BandN = (GAIN, OFFSET, AVERAGE)");
+      norm.addComment("Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET");
+      norm.addComment("BandN = (GAIN, OFFSET, AVERAGE)");
       norm += PvlKeyword("FileName", m_imageList[img].original());
 
       // Band by band statistics
@@ -278,10 +278,10 @@ cout << oNormList[band]->Gain(img) << endl;
         bandStats += avg;
         norm += bandStats;
       }
-      equ.AddGroup(norm);
+      equ.addGroup(norm);
     }
 
-    m_results->AddObject(equ);
+    m_results->addObject(equ);
   }
 
 
@@ -293,15 +293,15 @@ cout << oNormList[band]->Gain(img) << endl;
     for (int img = 0; img < (int) m_imageList.size(); img++) {
       // Apply correction based on pre-determined statistics information
       Pvl inStats(instatsFileName);
-      PvlObject &equalInfo = inStats.FindObject("EqualizationInformation");
-      PvlGroup &normalization = equalInfo.Group(normIndices[img]);
+      PvlObject &equalInfo = inStats.findObject("EqualizationInformation");
+      PvlGroup &normalization = equalInfo.group(normIndices[img]);
 
       // TODO should we also get the valid and invalid count?
 
       ImageAdjustment *adjustment = new ImageAdjustment(m_sType);
 
       // Get and store the modifiers for each band
-      for (int band = 1; band < normalization.Keywords(); band++) {
+      for (int band = 1; band < normalization.keywords(); band++) {
         adjustment->addGain(toDouble(normalization[band][0]));
         adjustment->addOffset(toDouble(normalization[band][1]));
         adjustment->addAverage(toDouble(normalization[band][2]));
@@ -376,7 +376,7 @@ cout << oNormList[band]->Gain(img) << endl;
 
   void Equalization::write(QString outstatsFileName) {
     // Write the equalization and overlap statistics to the file
-    m_results->Write(outstatsFileName);
+    m_results->write(outstatsFileName);
   }
 
 
@@ -532,10 +532,10 @@ cout << oNormList[band]->Gain(img) << endl;
 
   vector<int> Equalization::validateInputStatistics(QString instatsFileName) {
     Pvl inStats(instatsFileName);
-    PvlObject &equalInfo = inStats.FindObject("EqualizationInformation");
+    PvlObject &equalInfo = inStats.findObject("EqualizationInformation");
 
     // Make sure each file in the instats matches a file in the fromlist
-    if (m_imageList.size() > equalInfo.Groups() - 1) {
+    if (m_imageList.size() > equalInfo.groups() - 1) {
       QString msg = "Each input file in the FROM LIST must have a ";
       msg += "corresponding input file in the INPUT STATISTICS.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -547,8 +547,8 @@ cout << oNormList[band]->Gain(img) << endl;
     for (int i = 0; i < m_imageList.size(); i++) {
       QString fromFile = m_imageList[i].original();
       bool foundFile = false;
-      for (int j = 1; j < equalInfo.Groups(); j++) {
-        PvlGroup &normalization = equalInfo.Group(j);
+      for (int j = 1; j < equalInfo.groups(); j++) {
+        PvlGroup &normalization = equalInfo.group(j);
         QString normFile  = normalization["FileName"][0];
         if (fromFile == normFile) {
 

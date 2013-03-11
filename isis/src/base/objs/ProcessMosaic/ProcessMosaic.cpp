@@ -217,10 +217,10 @@ namespace Isis {
     if (m_enforceBandBinMatch) {
       Pvl *outLab = OutputCubes[0]->label();
 
-      if (inLab->FindObject("IsisCube").HasGroup("BandBin")) {
+      if (inLab->findObject("IsisCube").hasGroup("BandBin")) {
         // Check to make sure the output cube has a bandbin group & make sure it
         // matches the input cube bandbin group
-        if (!m_createOutputMosaic && outLab->FindObject("IsisCube").HasGroup("BandBin")) {
+        if (!m_createOutputMosaic && outLab->findObject("IsisCube").hasGroup("BandBin")) {
           MatchBandBinGroup(isb, inb);
         }
         // Otherwise copy the input cube bandbin to the output file
@@ -237,7 +237,7 @@ namespace Isis {
     // Match BandBin set to false and CREATE and TRACKING is true
     else {
       if (m_createOutputMosaic) {
-        if (inLab->FindObject("IsisCube").HasGroup("BandBin")) {
+        if (inLab->findObject("IsisCube").hasGroup("BandBin")) {
           AddBandBinGroup(isb);
         }
         else {
@@ -462,8 +462,8 @@ namespace Isis {
 
     //get the output label
     Pvl *cInPvl = InputCubes[0]->label();
-    if (cInPvl->FindGroup("Dimensions", Pvl::Traverse).HasKeyword("Bands")) {
-      PvlKeyword &cBandKey = cInPvl->FindGroup("Dimensions", Pvl::Traverse).FindKeyword("Bands");
+    if (cInPvl->findGroup("Dimensions", Pvl::Traverse).hasKeyword("Bands")) {
+      PvlKeyword &cBandKey = cInPvl->findGroup("Dimensions", Pvl::Traverse).findKeyword("Bands");
       QString sStr(cBandKey[0]);
       if (toInt(sStr) < nb) {
         QString m = "The parameter number of input bands exceeds the actual number of bands in the "
@@ -533,8 +533,8 @@ namespace Isis {
 
     //check if the number of bands specified is not greater than the actual number of bands in the input
     Pvl *cInPvl = InputCubes[0]->label();
-    if (cInPvl->FindGroup("Dimensions", Pvl::Traverse).HasKeyword("Bands")) {
-      PvlKeyword &cBandKey = cInPvl->FindGroup("Dimensions", Pvl::Traverse).FindKeyword("Bands");
+    if (cInPvl->findGroup("Dimensions", Pvl::Traverse).hasKeyword("Bands")) {
+      PvlKeyword &cBandKey = cInPvl->findGroup("Dimensions", Pvl::Traverse).findKeyword("Bands");
       QString sStr(cBandKey[0]);
       if (toInt(sStr) < nb) {
         QString m = "The parameter number of input bands exceeds the actual number of bands in the input cube";
@@ -581,8 +581,8 @@ namespace Isis {
 
     if (m_createOutputMosaic) {
       Pvl *outLab = cube->label();
-      if (outLab->FindObject("IsisCube").HasGroup("BandBin")) {
-        outLab->FindObject("IsisCube").DeleteGroup("BandBin");
+      if (outLab->findObject("IsisCube").hasGroup("BandBin")) {
+        outLab->findObject("IsisCube").deleteGroup("BandBin");
       }
     }
 
@@ -649,17 +649,17 @@ namespace Isis {
     cSNField = sSerialNumber;
     cFileRecord += cSNField;
 
-    int iNumObjs = cPvlOut->Objects();
+    int iNumObjs = cPvlOut->objects();
     PvlObject cPvlObj;
 
     // Check if the Table exists
-    if (cPvlOut->HasObject("Table")) {
+    if (cPvlOut->hasObject("Table")) {
       for (int i = 0; i < iNumObjs; i++) {
-        cPvlObj = cPvlOut->Object(i);
-        if (cPvlObj.HasKeyword("Name", Pvl::Traverse)) {
-          PvlKeyword cNameKey = cPvlObj.FindKeyword("Name", Pvl::Traverse);
+        cPvlObj = cPvlOut->object(i);
+        if (cPvlObj.hasKeyword("Name", Pvl::Traverse)) {
+          PvlKeyword cNameKey = cPvlObj.findKeyword("Name", Pvl::Traverse);
           if (cNameKey[0] == sTableName) {
-            PvlKeyword cFieldKey = cPvlObj.FindGroup("Field").FindKeyword("Size");
+            PvlKeyword cFieldKey = cPvlObj.findGroup("Field").findKeyword("Size");
 
             //set the tracker flag to true as the tracking table exists
             m_trackingEnabled = true;
@@ -973,14 +973,14 @@ namespace Isis {
     Pvl* inLabel  = InputCubes[0]->label();
     Pvl* outLabel = OutputCubes[0]->label();
 
-    if (outLabel->FindObject("IsisCube").HasGroup("Mosaic")) {
-      PvlGroup outMosaicGrp = outLabel->FindObject("IsisCube").FindGroup("Mosaic");
-      if (outMosaicGrp.HasKeyword("ShapeModel")) {
-        if (inLabel->FindObject("IsisCube").HasGroup("Kernels")) {
-          PvlGroup inMosaicGrp = inLabel->FindObject("IsisCube").FindGroup("Kernels");
-          if (outMosaicGrp.HasKeyword("ShapeModel") && inMosaicGrp.HasKeyword("ShapeModel")) {
-            PvlKeyword outShapeModelKey = outMosaicGrp.FindKeyword("ShapeModel");
-            QString sShapeModel = inMosaicGrp.FindKeyword("ShapeModel")[0];
+    if (outLabel->findObject("IsisCube").hasGroup("Mosaic")) {
+      PvlGroup outMosaicGrp = outLabel->findObject("IsisCube").findGroup("Mosaic");
+      if (outMosaicGrp.hasKeyword("ShapeModel")) {
+        if (inLabel->findObject("IsisCube").hasGroup("Kernels")) {
+          PvlGroup inMosaicGrp = inLabel->findObject("IsisCube").findGroup("Kernels");
+          if (outMosaicGrp.hasKeyword("ShapeModel") && inMosaicGrp.hasKeyword("ShapeModel")) {
+            PvlKeyword outShapeModelKey = outMosaicGrp.findKeyword("ShapeModel");
+            QString sShapeModel = inMosaicGrp.findKeyword("ShapeModel")[0];
             int found = sShapeModel.lastIndexOf("/");
             if (found != -1) {
               sShapeModel.remove(0, found + 1);
@@ -996,14 +996,14 @@ namespace Isis {
     }
     else {
       if (m_createOutputMosaic) {
-        if (inLabel->FindObject("IsisCube").HasGroup("Kernels")) {
+        if (inLabel->findObject("IsisCube").hasGroup("Kernels")) {
           QString sShapeModel =
-              inLabel->FindObject("IsisCube").FindGroup("Kernels").FindKeyword("ShapeModel")[0];
+              inLabel->findObject("IsisCube").findGroup("Kernels").findKeyword("ShapeModel")[0];
           int found = sShapeModel.lastIndexOf("/");
           if (found != -1){
             sShapeModel.remove(0, found+1);
           }
-          PvlObject & outIsisCubeObj = outLabel->FindObject("IsisCube");
+          PvlObject & outIsisCubeObj = outLabel->findObject("IsisCube");
           PvlGroup mosaicGrp("Mosaic");
           PvlKeyword shapeModelKey("ShapeModel");
           shapeModelKey += sShapeModel;
@@ -1101,9 +1101,9 @@ namespace Isis {
     Pvl *inLab  = InputCubes[0]->label();
     Pvl *outLab = OutputCubes[0]->label();
 
-    PvlGroup &inBin  = inLab->FindGroup("BandBin", Pvl::Traverse);
-    PvlGroup &outBin = outLab->FindGroup("BandBin", Pvl::Traverse);
-    if (inBin.Keywords() != outBin.Keywords()) {
+    PvlGroup &inBin  = inLab->findGroup("BandBin", Pvl::Traverse);
+    PvlGroup &outBin = outLab->findGroup("BandBin", Pvl::Traverse);
+    if (inBin.keywords() != outBin.keywords()) {
       QString msg = "Pvl Group [BandBin] does not match between the input and output cubes";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -1113,12 +1113,12 @@ namespace Isis {
     int osb = (m_osb - 1);
     int iOutBandsHalf = OutputCubes[0]->bandCount()/2;
 
-    for (int i = 0; i < outBin.Keywords(); i++) {
+    for (int i = 0; i < outBin.keywords(); i++) {
       PvlKeyword &outKey = outBin[i];
-      QString sOutName = outKey.Name();
-      if (inBin.HasKeyword(sOutName)) {
+      QString sOutName = outKey.name();
+      if (inBin.hasKeyword(sOutName)) {
         PvlKeyword &inKey = inBin[sOutName];
-        for (int j = osb, k = isb; j < outKey.Size() && k < inKey.Size(); j++, k++) {
+        for (int j = osb, k = isb; j < outKey.size() && k < inKey.size(); j++, k++) {
           if (outKey[j] == "NA") {
             outKey[j] = inKey[k];
             if (m_imageOverlay == AverageImageWithMosaic) {
@@ -1132,15 +1132,15 @@ namespace Isis {
             }
           }
           else if (outKey[j] != inKey[k]) {
-            QString msg = "Pvl Group [BandBin] in Key[" + outKey.Name() + "] In value" + inKey[k] +
+            QString msg = "Pvl Group [BandBin] in Key[" + outKey.name() + "] In value" + inKey[k] +
                          "and Out value=" + outKey[j] + " do not match";
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }
       }
       else {
-        QString msg = "Pvl Group [BandBin] In Keyword[" + inBin[i].Name() + "] and Out Keyword[" +
-                     outBin[i].Name() + "] does not match";
+        QString msg = "Pvl Group [BandBin] In Keyword[" + inBin[i].name() + "] and Out Keyword[" +
+                     outBin[i].name() + "] does not match";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -1178,15 +1178,15 @@ namespace Isis {
     int isb = origIsb - 1; // array zero based
     int osb = m_osb - 1;
 
-    PvlGroup &cInBin  = inLab->FindGroup("BandBin", Pvl::Traverse);
+    PvlGroup &cInBin  = inLab->findGroup("BandBin", Pvl::Traverse);
     PvlGroup cOutBin("BandBin");
 
     int iInBands = InputCubes[0]->bandCount();
 
-    for (int i = 0; i < cInBin.Keywords(); i++) {
+    for (int i = 0; i < cInBin.keywords(); i++) {
       PvlKeyword &cInKey = cInBin[i];
-      int iInKeySize = cInKey.Size();
-      PvlKeyword cOutKey(cInKey.Name());
+      int iInKeySize = cInKey.size();
+      PvlKeyword cOutKey(cInKey.name());
 
       for (int b = 0; b < osb; b++) {
         cOutKey += "NA";
@@ -1211,7 +1211,7 @@ namespace Isis {
         int iTotalOutBands = OutputCubes[0]->bandCount();
         isb = origIsb - 1; // reset the input starting band
         int iOutStartBand = iOutBands + osb;
-        QString sKeyName = cInKey.Name();
+        QString sKeyName = cInKey.name();
         bool bFilterKey = false;
         if (sKeyName.contains("Filter")   ||
             sKeyName.contains("Original") ||
@@ -1236,14 +1236,14 @@ namespace Isis {
 
       // Check for units and make sure output keyword units value is set to input
       // keyword units value
-      if (cOutKey.Unit() != cInKey.Unit()) {
-        cOutKey.SetUnits((QString)(cInKey.Unit()));
+      if (cOutKey.unit() != cInKey.unit()) {
+        cOutKey.setUnits((QString)(cInKey.unit()));
       }
 
       cOutBin += cOutKey;
       isb = origIsb - 1;        // reinitialize the input starting band
     }
-    outLab->FindObject("IsisCube").AddGroup(cOutBin);
+    outLab->findObject("IsisCube").addGroup(cOutBin);
   }
 
 
@@ -1289,7 +1289,7 @@ namespace Isis {
 
     cOutBin += cOutKey;
 
-    outLab->FindObject("IsisCube").AddGroup(cOutBin);
+    outLab->findObject("IsisCube").addGroup(cOutBin);
   }
 
 
@@ -1307,10 +1307,10 @@ namespace Isis {
     //if non-zero integer, must be original band #, 1 based
     if (m_bandPriorityBandNumber) {
       PvlKeyword cKeyOrigBand;
-      if (cPvlLabel.FindGroup("BandBin", Pvl::Traverse).HasKeyword("OriginalBand")) {
-        cKeyOrigBand = cPvlLabel.FindGroup("BandBin", Pvl::Traverse).FindKeyword("OriginalBand");
+      if (cPvlLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword("OriginalBand")) {
+        cKeyOrigBand = cPvlLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("OriginalBand");
       }
-      int iSize = cKeyOrigBand.Size();
+      int iSize = cKeyOrigBand.size();
       QString buff = toString(m_bandPriorityBandNumber);
       for (int i = 0; i < iSize; i++) {
         if (buff == cKeyOrigBand[i]) {
@@ -1323,10 +1323,10 @@ namespace Isis {
     //key name
     else {
       PvlKeyword cKeyName;
-      if (cPvlLabel.FindGroup("BandBin", Pvl::Traverse).HasKeyword(m_bandPriorityKeyName)) {
-        cKeyName = cPvlLabel.FindGroup("BandBin", Pvl::Traverse).FindKeyword(m_bandPriorityKeyName);
+      if (cPvlLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword(m_bandPriorityKeyName)) {
+        cKeyName = cPvlLabel.findGroup("BandBin", Pvl::Traverse).findKeyword(m_bandPriorityKeyName);
       }
-      int iSize = cKeyName.Size();
+      int iSize = cKeyName.size();
       for (int i = 0; i < iSize; i++) {
         if (m_bandPriorityKeyValue.toUpper() == cKeyName[i].toUpper()) {
           iBandIndex = i + 1; //1 based get key value index
@@ -1593,15 +1593,15 @@ namespace Isis {
     Pvl *cPvlOut = OutputCubes[0]->label();
 
     bool bTableExists = false;
-    int iNumObjs = cPvlOut->Objects();
+    int iNumObjs = cPvlOut->objects();
     PvlObject cPvlObj;
 
     //Check if table already exists
-    if (cPvlOut->HasObject("Table")) {
+    if (cPvlOut->hasObject("Table")) {
       for (int i = 0; i < iNumObjs; i++) {
-        cPvlObj = cPvlOut->Object(i);
-        if (cPvlObj.HasKeyword("Name", Pvl::Traverse)) {
-          PvlKeyword cNameKey = cPvlObj.FindKeyword("Name", Pvl::Traverse);
+        cPvlObj = cPvlOut->object(i);
+        if (cPvlObj.hasKeyword("Name", Pvl::Traverse)) {
+          PvlKeyword cNameKey = cPvlObj.findKeyword("Name", Pvl::Traverse);
           if (cNameKey[0] == TRACKING_TABLE_NAME) {
             bTableExists = true;
           }

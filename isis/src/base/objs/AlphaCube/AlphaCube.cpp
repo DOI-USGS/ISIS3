@@ -28,9 +28,9 @@ using namespace std;
 namespace Isis {
   //! Constructs an AlphaCube object using a PVL object.
   AlphaCube::AlphaCube(Isis::Pvl &pvl) {
-    Isis::PvlObject &isiscube = pvl.FindObject("IsisCube");
-    if(isiscube.HasGroup("AlphaCube")) {
-      Isis::PvlGroup &alpha = isiscube.FindGroup("AlphaCube");
+    Isis::PvlObject &isiscube = pvl.findObject("IsisCube");
+    if(isiscube.hasGroup("AlphaCube")) {
+      Isis::PvlGroup &alpha = isiscube.findGroup("AlphaCube");
       p_alphaSamples        = alpha["AlphaSamples"];
       p_alphaLines          = alpha["AlphaLines"];
       p_alphaStartingSample = alpha["AlphaStartingSample"];
@@ -41,7 +41,7 @@ namespace Isis {
       p_betaLines           = alpha["BetaLines"];
     }
     else {
-      Isis::PvlGroup &dims = isiscube.FindGroup("Dimensions", Isis::Pvl::Traverse);
+      Isis::PvlGroup &dims = isiscube.findGroup("Dimensions", Isis::Pvl::Traverse);
       p_alphaSamples        = dims["Samples"];
       p_alphaLines          = dims["Lines"];
       p_alphaStartingSample = 0.5;
@@ -130,16 +130,16 @@ namespace Isis {
     // If we have a mapping group we do not want to update the alpha cube
     // group as it represents the dimensions and sub-area of the raw instrument
     // cube
-    Isis::PvlObject &cube = pvl.FindObject("IsisCube");
-    if(cube.HasGroup("Mapping")) return;
+    Isis::PvlObject &cube = pvl.findObject("IsisCube");
+    if(cube.hasGroup("Mapping")) return;
 
     // Add the labels to the pvl
-    if(cube.HasGroup("AlphaCube")) {
+    if(cube.hasGroup("AlphaCube")) {
       AlphaCube temp(pvl);
       temp.Rehash(*this);
       *this = temp;
 
-      Isis::PvlGroup &alpha = cube.FindGroup("AlphaCube");
+      Isis::PvlGroup &alpha = cube.findGroup("AlphaCube");
       alpha["AlphaSamples"] = toString(p_alphaSamples);
       alpha["AlphaLines"] = toString(p_alphaLines);
       alpha["AlphaStartingSample"] = toString(p_alphaStartingSample);
@@ -159,7 +159,7 @@ namespace Isis {
       alpha += Isis::PvlKeyword("AlphaEndingLine", toString(p_alphaEndingLine));
       alpha += Isis::PvlKeyword("BetaSamples", toString(p_betaSamples));
       alpha += Isis::PvlKeyword("BetaLines", toString(p_betaLines));
-      cube.AddGroup(alpha);
+      cube.addGroup(alpha);
     }
   }
 

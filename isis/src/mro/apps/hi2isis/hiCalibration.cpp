@@ -55,7 +55,7 @@ void SaveHiriseCalibrationData(ProcessImportPds &process, Cube *ocube,
 
   // Get the number of lines in the calibration area. This includes the
   // calibration, mask and ramp lines
-  int calsize = (int)(pdsLabel.FindObject("CALIBRATION_IMAGE")["LINES"]);
+  int calsize = (int)(pdsLabel.findObject("CALIBRATION_IMAGE")["LINES"]);
 
   // Loop through the calibration lines and extract the info needed for the
   // tables.

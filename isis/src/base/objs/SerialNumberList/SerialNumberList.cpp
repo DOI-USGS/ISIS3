@@ -104,19 +104,19 @@ namespace Isis {
   void SerialNumberList::Add(const QString &filename, bool def2filename) {
 
     Pvl p(Isis::FileName(filename).expanded());
-    PvlObject cubeObj = p.FindObject("IsisCube");
+    PvlObject cubeObj = p.findObject("IsisCube");
     try {
       // Test the target name if desired
       if (p_checkTarget) {
         QString target;
         PvlGroup targetGroup;
-        if (cubeObj.HasGroup("Instrument")) {
-          targetGroup = cubeObj.FindGroup("Instrument");
+        if (cubeObj.hasGroup("Instrument")) {
+          targetGroup = cubeObj.findGroup("Instrument");
         }
         else if (def2filename) {
           // No instrument, try Mapping
-          if (cubeObj.HasGroup("Mapping")) {
-            targetGroup = cubeObj.FindGroup("Mapping");
+          if (cubeObj.hasGroup("Mapping")) {
+            targetGroup = cubeObj.findGroup("Mapping");
           }
           else {
             QString msg = "Unable to find Instrument or Mapping group in ";
@@ -193,19 +193,19 @@ namespace Isis {
   void SerialNumberList::Add(const QString &serialNumber, const QString &filename) {
 
     Pvl p(Isis::FileName(filename).expanded());
-    PvlObject cubeObj = p.FindObject("IsisCube");
+    PvlObject cubeObj = p.findObject("IsisCube");
     try {
       // Test the target name if desired
       if (p_checkTarget) {
         QString target;
         PvlGroup targetGroup;
-        if (cubeObj.HasGroup("Instrument")) {
-          targetGroup = cubeObj.FindGroup("Instrument");
+        if (cubeObj.hasGroup("Instrument")) {
+          targetGroup = cubeObj.findGroup("Instrument");
         }
-        else if (cubeObj.HasGroup("Mapping")) {
+        else if (cubeObj.hasGroup("Mapping")) {
           // No instrument, try Mapping
-          if (cubeObj.HasGroup("Mapping")) {
-            targetGroup = cubeObj.FindGroup("Mapping");
+          if (cubeObj.hasGroup("Mapping")) {
+            targetGroup = cubeObj.findGroup("Mapping");
           }
         else {
             QString msg = "Unable to find Instrument or Mapping group in ";

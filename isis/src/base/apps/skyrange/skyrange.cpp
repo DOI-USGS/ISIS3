@@ -59,9 +59,9 @@ void IsisMain() {
   UserInterface ui = Application::GetUserInterface();
   if(ui.WasEntered("TO")) {
     Pvl temp;
-    temp.AddGroup(results);
-    temp.AddGroup(orient);
-    temp.Write(ui.GetFileName("TO", "txt"));
+    temp.addGroup(results);
+    temp.addGroup(orient);
+    temp.write(ui.GetFileName("TO", "txt"));
   }
 
   p.EndProcess();

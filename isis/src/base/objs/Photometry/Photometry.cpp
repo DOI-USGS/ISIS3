@@ -23,16 +23,16 @@ namespace Isis {
     p_phtAmodel = NULL;
     p_phtPmodel = NULL;
     p_phtNmodel = NULL;
-    if(pvl.HasObject("PhotometricModel")) {
+    if(pvl.hasObject("PhotometricModel")) {
       p_phtPmodel = PhotoModelFactory::Create(pvl);
     } else {
       std::string msg = "A Photometric model must be specified to do any type of photometry";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    if(pvl.HasObject("AtmosphericModel")) {
+    if(pvl.hasObject("AtmosphericModel")) {
       p_phtAmodel = AtmosModelFactory::Create(pvl, *p_phtPmodel);
     }
-    if (pvl.HasObject("NormalizationModel")) {
+    if (pvl.hasObject("NormalizationModel")) {
       if (p_phtAmodel != NULL) {
         p_phtNmodel = NormModelFactory::Create(pvl, *p_phtPmodel, *p_phtAmodel);
       } else {

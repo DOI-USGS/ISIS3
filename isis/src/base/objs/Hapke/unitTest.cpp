@@ -19,10 +19,10 @@ int main() {
   algp1 += PvlKeyword("Name", "HapkeHen");
 
   PvlObject op1("PhotometricModel");
-  op1.AddGroup(algp1);
+  op1.addGroup(algp1);
 
   Pvl pvl1;
-  pvl1.AddObject(op1);
+  pvl1.addObject(op1);
   std::cout << pvl1 << std::endl << std::endl;
 
   try {
@@ -55,10 +55,10 @@ int main() {
   algp2 += PvlKeyword("ZeroB0St", "TRUE");
 
   PvlObject op2("PhotometricModel");
-  op2.AddGroup(algp2);
+  op2.addGroup(algp2);
 
   Pvl pvl2;
-  pvl2.AddObject(op2);
+  pvl2.addObject(op2);
   std::cout << pvl2 << std::endl << std::endl;
 
   try {
@@ -91,10 +91,10 @@ int main() {
   algp3 += PvlKeyword("ZeroB0St", "YES");
 
   PvlObject op3("PhotometricModel");
-  op3.AddGroup(algp3);
+  op3.addGroup(algp3);
 
   Pvl pvl3;
-  pvl3.AddObject(op3);
+  pvl3.addObject(op3);
   std::cout << pvl3 << std::endl << std::endl;
 
   try {
@@ -130,10 +130,10 @@ int main() {
   algp4 += PvlKeyword("ZeroB0Standard", "FALSE");
 
   PvlObject op4("PhotometricModel");
-  op4.AddGroup(algp4);
+  op4.addGroup(algp4);
 
   Pvl pvl4;
-  pvl4.AddObject(op4);
+  pvl4.addObject(op4);
   std::cout << pvl4 << std::endl << std::endl;
 
   try {
@@ -166,10 +166,10 @@ int main() {
   algp5 += PvlKeyword("ZeroB0Standard", "NO");
 
   PvlObject op5("PhotometricModel");
-  op5.AddGroup(algp5);
+  op5.addGroup(algp5);
 
   Pvl pvl5;
-  pvl5.AddObject(op5);
+  pvl5.addObject(op5);
   std::cout << pvl5 << std::endl << std::endl;
 
   try {
@@ -202,10 +202,10 @@ int main() {
   algp6 += PvlKeyword("ZeroB0Standard", "MAYBE");
 
   PvlObject op6("PhotometricModel");
-  op6.AddGroup(algp6);
+  op6.addGroup(algp6);
 
   Pvl pvl6;
-  pvl6.AddObject(op6);
+  pvl6.addObject(op6);
   std::cout << pvl6 << std::endl << std::endl;
 
   try {

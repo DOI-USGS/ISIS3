@@ -10,39 +10,39 @@ int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
   PvlToken dog("Dog");
-  dog.AddValue("drools");
+  dog.addValue("drools");
 
   cout << "Info on dog" << endl;
-  cout << "  key:        " << dog.GetKey() << endl;
-  cout << "  upperkey:   " << dog.GetKeyUpper() << endl;
-  cout << "  valuesize:  " << dog.ValueSize() << endl;
-  cout << "  value:      " << dog.GetValue() << endl;
-  cout << "  uppervalue: " << dog.GetValueUpper() << endl;
+  cout << "  key:        " << dog.key() << endl;
+  cout << "  upperkey:   " << dog.keyUpper() << endl;
+  cout << "  valuesize:  " << dog.valueSize() << endl;
+  cout << "  value:      " << dog.value() << endl;
+  cout << "  uppervalue: " << dog.valueUpper() << endl;
   cout << endl;
 
   cout << "Adding another value to dog" << endl;
-  dog.AddValue("wags tail");
-  cout << "  valuesize:  " << dog.ValueSize() << endl;
-  cout << "  value:      " << dog.GetValue(1) << endl;
-  cout << "  uppervalue: " << dog.GetValueUpper(1) << endl;
+  dog.addValue("wags tail");
+  cout << "  valuesize:  " << dog.valueSize() << endl;
+  cout << "  value:      " << dog.value(1) << endl;
+  cout << "  uppervalue: " << dog.valueUpper(1) << endl;
   cout << endl;
 
   cout << "Clearing dog values" << endl;
-  dog.ValueClear();
-  cout << "  valuesize:  " << dog.ValueSize() << endl;
+  dog.valueClear();
+  cout << "  valuesize:  " << dog.valueSize() << endl;
   cout << endl;
 
   cout << "Testing Throws in dog" << endl;
 
   try {
-    dog.GetValue(-1);
+    dog.value(-1);
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-    dog.GetValue(1);
+    dog.value(1);
   }
   catch(IException &e) {
     e.print();

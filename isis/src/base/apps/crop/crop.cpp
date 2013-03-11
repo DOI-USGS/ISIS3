@@ -96,10 +96,10 @@ void IsisMain() {
   Pvl &inLabels = *cube.label();
 
   // Loop through the labels looking for object = Table
-  for(int labelObj = 0; labelObj < inLabels.Objects(); labelObj++) {
-    PvlObject &obj = inLabels.Object(labelObj);
+  for(int labelObj = 0; labelObj < inLabels.objects(); labelObj++) {
+    PvlObject &obj = inLabels.object(labelObj);
 
-    if(obj.Name() != "Table") continue;
+    if(obj.name() != "Table") continue;
 
     // If we're not propagating spice data, dont propagate the following tables...
     if(!ui.GetBoolean("PROPSPICE")) {
@@ -147,15 +147,15 @@ void IsisMain() {
   }
 
   Pvl &outLabels = *ocube->label();
-  if(!ui.GetBoolean("PROPSPICE") && outLabels.FindObject("IsisCube").HasGroup("Kernels")) {
-    PvlGroup &kerns = outLabels.FindObject("IsisCube").FindGroup("Kernels");
+  if(!ui.GetBoolean("PROPSPICE") && outLabels.findObject("IsisCube").hasGroup("Kernels")) {
+    PvlGroup &kerns = outLabels.findObject("IsisCube").findGroup("Kernels");
 
     QString tryKey = "NaifIkCode";
-    if(kerns.HasKeyword("NaifFrameCode")) {
+    if(kerns.hasKeyword("NaifFrameCode")) {
       tryKey = "NaifFrameCode";
     }
 
-    if(kerns.HasKeyword(tryKey)) {
+    if(kerns.hasKeyword(tryKey)) {
       PvlKeyword ikCode = kerns[tryKey];
       kerns = PvlGroup("Kernels");
       kerns += ikCode;

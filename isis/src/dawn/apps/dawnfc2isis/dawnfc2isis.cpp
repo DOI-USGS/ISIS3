@@ -26,8 +26,8 @@ void IsisMain() {
 
   try {
     Pvl lab(inFile.expanded());
-    instid = (QString) lab.FindKeyword("INSTRUMENT_ID");
-    missid = (QString) lab.FindKeyword("MISSION_ID");
+    instid = (QString) lab.findKeyword("INSTRUMENT_ID");
+    missid = (QString) lab.findKeyword("MISSION_ID");
   }
   catch(IException &e) {
     QString msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
@@ -68,7 +68,7 @@ void IsisMain() {
   Cube *outcube = p2.SetOutputCube("TO");
 
   // Get the directory where the DAWN translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Dawn"] + "/translations/";
 
   // Create a PVL to store the translated labels in
@@ -91,19 +91,19 @@ void IsisMain() {
 
   //  Update target if user specifies it
   if (!target.isEmpty()) {
-    PvlGroup &igrp = outLabel.FindGroup("Instrument",Pvl::Traverse);
+    PvlGroup &igrp = outLabel.findGroup("Instrument",Pvl::Traverse);
     igrp["TargetName"] = target;
   }
 
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label
-  outcube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-  outcube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-  outcube->putGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
   // Set the BandBin filter name, center, and width values based on the
   // FilterNumber.
-  PvlGroup &bbGrp(outLabel.FindGroup("BandBin", Pvl::Traverse));
+  PvlGroup &bbGrp(outLabel.findGroup("BandBin", Pvl::Traverse));
   int filtno = bbGrp["FilterNumber"];
   int center;
   int width;
@@ -153,9 +153,9 @@ void IsisMain() {
                  "FilterNumber. The FilterNumber must fall in the range 1 to 8.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  bbGrp.AddKeyword(PvlKeyword("Center", toString(center)));
-  bbGrp.AddKeyword(PvlKeyword("Width", toString(width)));
-  bbGrp.AddKeyword(PvlKeyword("FilterName", filtname));
+  bbGrp.addKeyword(PvlKeyword("Center", toString(center)));
+  bbGrp.addKeyword(PvlKeyword("Width", toString(width)));
+  bbGrp.addKeyword(PvlKeyword("FilterName", filtname));
   outcube->putGroup(bbGrp);
 
   PvlGroup kerns("Kernels");

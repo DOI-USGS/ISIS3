@@ -160,7 +160,7 @@ namespace Isis {
         dpt[1] = double(j) ;
               
         if (!pointInEllipse(&ellBest,dpt,play)) {  //if the point isn't within play pixles of being within the elipse
-          //selectionChip->SetValue(i,j,0.0);
+          //selectionChip->setValue(i,j,0.0);
           selectionChip->SetValue(i,j,0.0);
         }
         
@@ -323,7 +323,7 @@ namespace Isis {
         if (pointInEllipse(ell, ptc, 0.0)) {  //if the point is within the elipse
           ellipsePixels++;  //increment the number of points
           if (selectionChip->GetValue(i,j) == 1) ellipsePixelsSelected++;  //increment the number selected within the ellipse;
-          //else  temp.SetValue(i,j,3.0);//debug
+          //else  temp.setValue(i,j,3.0);//debug
         }  
         else
           if (selectionChip->GetValue(i,j) == 1) outsideEllipsePixelsSelected++;  //increment the number selected outside the ellipse;

@@ -69,8 +69,8 @@ void IsisMain() {
     output += ".map";
   }
   Pvl p;
-  p.AddGroup(mapping);
-  p.Write(output);
+  p.addGroup(mapping);
+  p.write(output);
 }
 
 //Helper function to output map file to log.
@@ -78,8 +78,8 @@ void helperButtonLogMap() {
   UserInterface &ui = Application::GetUserInterface();
   QString mapFile(ui.GetFileName("MAP"));
   Pvl p;
-  p.Read(mapFile);
-  PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
+  p.read(mapFile);
+  PvlGroup t = p.findGroup("mapping", Pvl::Traverse);
   QString OQString = "***** Output of [" + mapFile + "] *****";
   Application::GuiLog(OQString);
   Application::GuiLog(t);
@@ -91,8 +91,8 @@ void helperButtonLoadMap() {
   UserInterface &ui = Application::GetUserInterface();
   QString mapFile(ui.GetFileName("MAP"));
   Pvl p;
-  p.Read(mapFile);
-  PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
+  p.read(mapFile);
+  PvlGroup t = p.findGroup("mapping", Pvl::Traverse);
 //Projection Stuff
   ui.Clear("CLON");
   ui.Clear("CLAT");
@@ -103,48 +103,48 @@ void helperButtonLoadMap() {
   ui.Clear("PLON");
   ui.Clear("PROT");
 
-  if(t.HasKeyword("ProjectionName")) {
+  if(t.hasKeyword("ProjectionName")) {
     QString projIn = (QString)t["ProjectionName"];
     projIn = projIn.toUpper();
     ui.Clear("PROJECTION");
     ui.PutAsString("PROJECTION", projIn);
   }
-  if(t.HasKeyword("CenterLongitude")) {
+  if(t.hasKeyword("CenterLongitude")) {
     double clonIn = t["CenterLongitude"];
     ui.Clear("CLON");
     ui.PutDouble("CLON", clonIn);
   }
-  if(t.HasKeyword("CenterLatitude")) {
+  if(t.hasKeyword("CenterLatitude")) {
     double clatIn = t["CenterLatitude"];
     ui.Clear("CLAT");
     ui.PutDouble("CLAT", clatIn);
   }
-  if(t.HasKeyword("ScaleFactor")) {
+  if(t.hasKeyword("ScaleFactor")) {
     double scaleFactorIn = t["ScaleFactor"];
     ui.Clear("SCALEFACTOR");
     ui.PutDouble("SCALEFACTOR", scaleFactorIn);
   }
-  if(t.HasKeyword("FirstStandardParallel")) {
+  if(t.hasKeyword("FirstStandardParallel")) {
     double par1In = t["FirstStandardParallel"];
     ui.Clear("PAR1");
     ui.PutDouble("PAR1", par1In);
   }
-  if(t.HasKeyword("SecondStandardParallel")) {
+  if(t.hasKeyword("SecondStandardParallel")) {
     double par2In = t["SecondStandardParallel"];
     ui.Clear("PAR2");
     ui.PutDouble("PAR2", par2In);
   }
-  if(t.HasKeyword("PoleLatitude")) {
+  if(t.hasKeyword("PoleLatitude")) {
     double pLatIn = t["PoleLatitude"];
     ui.Clear("PLAT");
     ui.PutDouble("PLAT", pLatIn);
   }
-  if(t.HasKeyword("PoleLongitude")) {
+  if(t.hasKeyword("PoleLongitude")) {
     double pLonIn = t["PoleLongitude"];
     ui.Clear("PLON");
     ui.PutDouble("PLON", pLonIn);
   }
-  if(t.HasKeyword("PoleRotation")) {
+  if(t.hasKeyword("PoleRotation")) {
     double pRotIn = t["PoleRotation"];
     ui.Clear("PROT");
     ui.PutDouble("PROT", pRotIn);
@@ -161,7 +161,7 @@ void helperButtonLoadMap() {
   ui.Clear("EQRADIUS");
   ui.Clear("POLRADIUS");
 
-  if(t.HasKeyword("TargetName")) {
+  if(t.hasKeyword("TargetName")) {
     QString use = "USER";
     ui.Clear("TARGOPT");
     ui.PutAsString("TARGOPT", use);
@@ -199,7 +199,7 @@ void helperButtonLoadMap() {
   ui.Clear("RNGOPT");
   ui.PutAsString("RNGOPT", useR);
 
-  if(t.HasKeyword("MinimumLatitude")) {
+  if(t.hasKeyword("MinimumLatitude")) {
     double minlatIn = t["MinimumLatitude"];
     QString useR = "USER";
     ui.Clear("RNGOPT");
@@ -217,7 +217,7 @@ void helperButtonLoadMap() {
     ui.PutDouble("MAXLON", maxlonIn);
   }
 //Resolution Parameter stuff
-  if(t.HasKeyword("PixelResolution")) {
+  if(t.hasKeyword("PixelResolution")) {
     QString useM = "MPP";
     ui.Clear("RESOPT");
     ui.PutAsString("RESOPT", useM);
@@ -225,7 +225,7 @@ void helperButtonLoadMap() {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", pixresIn);
   }
-  if(t.HasKeyword("Scale")) {
+  if(t.hasKeyword("Scale")) {
     QString useM = "PPD";
     ui.Clear("RESOPT");
     ui.PutAsString("RESOPT", useM);
@@ -241,8 +241,8 @@ void helperButtonLogTargDef() {
   UserInterface &ui = Application::GetUserInterface();
   QString targetFile(ui.GetFileName("TARGDEF"));
   Pvl p;
-  p.Read(targetFile);
-  PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
+  p.read(targetFile);
+  PvlGroup t = p.findGroup("mapping", Pvl::Traverse);
   QString OQString = "***** Output of [" + targetFile + "] *****";
   Application::GuiLog(OQString);
   Application::GuiLog(t);
@@ -256,40 +256,40 @@ void helperButtonLoadTargDef() {
 
 // test if targdef was entered
   Pvl p;
-  p.Read(targetFile);
-  PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
+  p.read(targetFile);
+  PvlGroup t = p.findGroup("mapping", Pvl::Traverse);
 //Load the targdef values into the GUI
   QString tOpt = "USER";
   ui.Clear("TARGOPT");
   ui.PutAsString("TARGOPT", tOpt);
-  if(t.HasKeyword("TargetName")) {
+  if(t.hasKeyword("TargetName")) {
     QString tNameIn = t["TargetName"];
     ui.Clear("TARGETNAME");
     ui.PutAsString("TARGETNAME", tNameIn);
   }
-  if(t.HasKeyword("LatitudeType")) {
+  if(t.hasKeyword("LatitudeType")) {
     QString LTIn = (QString)t["LatitudeType"];
     LTIn = LTIn.toUpper();
     ui.Clear("LATTYPE");
     ui.PutAsString("LATTYPE", LTIn);
   }
-  if(t.HasKeyword("LongitudeDirection")) {
+  if(t.hasKeyword("LongitudeDirection")) {
     QString LDIn = (QString)t["LongitudeDirection"];
     LDIn = LDIn.toUpper();
     ui.Clear("LONDIR");
     ui.PutAsString("LONDIR", LDIn);
   }
-  if(t.HasKeyword("LongitudeDomain")) {
+  if(t.hasKeyword("LongitudeDomain")) {
     QString LDomIn = t["LongitudeDomain"];
     ui.Clear("LONDOM");
     ui.PutAsString("LONDOM", LDomIn);
   }
-  if(t.HasKeyword("EquatorialRadius")) {
+  if(t.hasKeyword("EquatorialRadius")) {
     QString EQIn = t["EquatorialRadius"];
     ui.Clear("EQRADIUS");
     ui.PutAsString("EQRADIUS", EQIn);
   }
-  if(t.HasKeyword("PolarRadius")) {
+  if(t.hasKeyword("PolarRadius")) {
     QString PRIn = t["PolarRadius"];
     ui.Clear("POLRADIUS");
     ui.PutAsString("POLRADIUS", PRIn);
@@ -304,7 +304,7 @@ void helperButtonLogRadius() {
   Pvl tMap;
 //call function to get system radius
   PvlGroup tGrp = Projection::TargetRadii(targetName);
-  tMap.AddGroup(tGrp);
+  tMap.addGroup(tGrp);
   QString OQString = "***** System radii for " + targetName + "*****";
 //writh to log QString(OQString and mapping group
   Application::GuiLog(OQString);
@@ -409,21 +409,21 @@ void addTarget(PvlGroup &mapping) {
   if(ui.GetString("TARGOPT") == "SYSTEM") {
     QString targetFile(ui.GetFileName("TARGDEF"));
     Pvl p;
-    p.Read(targetFile);
-    PvlGroup t = p.FindGroup("mapping");
-    if(t.HasKeyword("TargetName")) {
+    p.read(targetFile);
+    PvlGroup t = p.findGroup("mapping");
+    if(t.hasKeyword("TargetName")) {
       mapping += t["TargetName"];
     }
-    if(t.HasKeyword("EquatorialRadius")) {
+    if(t.hasKeyword("EquatorialRadius")) {
       mapping += t["EquatorialRadius"];
     }
-    if(t.HasKeyword("PolarRadius")) {
+    if(t.hasKeyword("PolarRadius")) {
       mapping += t["PolarRadius"];
     }
-    if(t.HasKeyword("LatitudeType")) {
+    if(t.hasKeyword("LatitudeType")) {
       mapping += t["LatitudeType"];
     }
-    if(t.HasKeyword("LongitudeDirection")) {
+    if(t.hasKeyword("LongitudeDirection")) {
       mapping += t["LongitudeDirection"];
     }
   }
@@ -528,7 +528,7 @@ void calcRange(double &minLat, double &maxLat,
   Pvl userMap;
   PvlGroup userGrp("Mapping");
   if(ui.GetString("TARGOPT") == "SYSTEM") {
-    userMap.Read(ui.GetFileName("TARGDEF"));
+    userMap.read(ui.GetFileName("TARGDEF"));
   }
   else if(ui.GetString("TARGOPT") == "USER") {
     userGrp += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
@@ -563,7 +563,7 @@ void calcRange(double &minLat, double &maxLat,
     userGrp += PvlKeyword("LongitudeDomain", ui.GetString("LONDOM"));
     userGrp += PvlKeyword("EquatorialRadius", toString(equatorialRad));
     userGrp += PvlKeyword("PolarRadius", toString(polarRad));
-    userMap.AddGroup(userGrp);
+    userMap.addGroup(userGrp);
   }
 
   for(int i = 0; i < flist.size(); i++) {
@@ -577,14 +577,14 @@ void calcRange(double &minLat, double &maxLat,
     Camera *cam = c.camera();
     Pvl defaultMap;
     cam->BasicMapping(defaultMap);
-    PvlGroup &defaultGrp = defaultMap.FindGroup("Mapping");
+    PvlGroup &defaultGrp = defaultMap.findGroup("Mapping");
 //Move any defaults that are not in the user map
-    for(int k = 0; k < defaultGrp.Keywords(); k++) {
-      if(!userGrp.HasKeyword(defaultGrp[k].Name())) {
+    for(int k = 0; k < defaultGrp.keywords(); k++) {
+      if(!userGrp.hasKeyword(defaultGrp[k].name())) {
         userGrp += defaultGrp[k];
       }
     }
-    userMap.AddGroup(userGrp);
+    userMap.addGroup(userGrp);
 //get the camera ground range min and max and solve for range
     cam->GroundRange(camMinLat, camMaxLat, camMinLon, camMaxLon, userMap);
     if(camMinLat < minLat) {

@@ -155,7 +155,7 @@ namespace Isis {
    */
   void DbAccess::load(const QString &filename) {
     Pvl pvl(filename);
-    PvlObject db = pvl.FindObject("Database");
+    PvlObject db = pvl.findObject("Database");
     load(db);
   }
 
@@ -178,13 +178,13 @@ namespace Isis {
     loadkeys(pvl);
 
     //  Get all database user access profiles
-    PvlObject::PvlGroupIterator group = pvl.FindGroup("Profile",
-                                        pvl.BeginGroup(),
-                                        pvl.EndGroup());
-    while(group != pvl.EndGroup()) {
+    PvlObject::PvlGroupIterator group = pvl.findGroup("Profile",
+                                        pvl.beginGroup(),
+                                        pvl.endGroup());
+    while(group != pvl.endGroup()) {
       DbProfile dbgroup(*group);
       _profiles.add(dbgroup.Name(), dbgroup);
-      group = pvl.FindGroup("Profile", ++group, pvl.EndGroup());
+      group = pvl.findGroup("Profile", ++group, pvl.endGroup());
     }
     return;
   }

@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
   cout << "Part 1: Sphere..." << endl;
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("EquatorialRadius", toString(1.0));
   mapGroup += PvlKeyword("PolarRadius", toString(1.0));
   mapGroup += PvlKeyword("LatitudeType", "Planetographic");
@@ -103,9 +103,9 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Test default computation ... " << endl;
-    mapGroup.DeleteKeyword("CenterLongitude");
-    mapGroup.DeleteKeyword("CenterLatitude");
-    mapGroup.DeleteKeyword("ScaleFactor");
+    mapGroup.deleteKeyword("CenterLongitude");
+    mapGroup.deleteKeyword("CenterLatitude");
+    mapGroup.deleteKeyword("ScaleFactor");
     TransverseMercator p2(lab, true);
     cout << lab << endl;
     cout << endl;
@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
   cout << endl << "Part 2: Ellipsoid..." << endl;
 
   Pvl lab2;
-  lab2.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup2 = lab2.FindGroup("Mapping");
+  lab2.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup2 = lab2.findGroup("Mapping");
   mapGroup2 += PvlKeyword("EquatorialRadius", toString(6378206.4));
   mapGroup2 += PvlKeyword("PolarRadius", toString(6356583.8));
   mapGroup2 += PvlKeyword("LatitudeType", "Planetographic");
@@ -177,9 +177,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.AddGroup(p.Mapping());
-    tmp2.AddGroup(p.MappingLatitudes());
-    tmp3.AddGroup(p.MappingLongitudes());
+    tmp1.addGroup(p.Mapping());
+    tmp2.addGroup(p.MappingLatitudes());
+    tmp3.addGroup(p.MappingLongitudes());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;

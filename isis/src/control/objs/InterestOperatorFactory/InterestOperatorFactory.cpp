@@ -52,17 +52,17 @@ namespace Isis {
    **/
   InterestOperator *InterestOperatorFactory::Create(Pvl &pPvl) {
     // Get the algorithm name to create
-    PvlGroup &op = pPvl.FindGroup("Operator", Pvl::Traverse);
+    PvlGroup &op = pPvl.findGroup("Operator", Pvl::Traverse);
     QString operatorName = op["Name"];
 
     // Open the factory plugin file
     Plugin p;
     FileName f("InterestOperator.plugin");
     if(f.fileExists()) {
-      p.Read("InterestOperator.plugin");
+      p.read("InterestOperator.plugin");
     }
     else {
-      p.Read("$ISISROOT/lib/InterestOperator.plugin");
+      p.read("$ISISROOT/lib/InterestOperator.plugin");
     }
 
     // Get the algorithm specific plugin and return it

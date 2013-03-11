@@ -71,8 +71,8 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube, get the camera object, and the cam map projection
   // Note: The default target info is positive west, planetocentric, 360
@@ -80,51 +80,51 @@ void IsisMain() {
   incam = icube->camera();
 
 // Pvl lab(ui.GetFileName("FROM"));
-// PvlGroup &inst = lab.FindGroup("Instrument",Pvl::Traverse);
+// PvlGroup &inst = lab.findGroup("Instrument",Pvl::Traverse);
   //inst["TargetName"] = "Sky";
 
   // Add the default mapping info to the user entered mapping group
-  userGrp.AddKeyword(PvlKeyword("TargetName", "Sky"), Pvl::Replace);
-  userGrp.AddKeyword(PvlKeyword("EquatorialRadius", toString(1.0)), Pvl::Replace);
-  userGrp.AddKeyword(PvlKeyword("PolarRadius", toString(1.0)), Pvl::Replace);
-  userGrp.AddKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
-  userGrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
-  userGrp.AddKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
-  if(userGrp.HasKeyword("PixelResolution")) {
-    userGrp.DeleteKeyword("PixelResolution");
+  userGrp.addKeyword(PvlKeyword("TargetName", "Sky"), Pvl::Replace);
+  userGrp.addKeyword(PvlKeyword("EquatorialRadius", toString(1.0)), Pvl::Replace);
+  userGrp.addKeyword(PvlKeyword("PolarRadius", toString(1.0)), Pvl::Replace);
+  userGrp.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
+  userGrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"), Pvl::Replace);
+  userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
+  if(userGrp.hasKeyword("PixelResolution")) {
+    userGrp.deleteKeyword("PixelResolution");
   }
 
   if(ui.GetString("DEFAULTRANGE") == "CAMERA") {
     // Get the default ra/dec range
     double minRa, maxRa, minDec, maxDec;
     incam->RaDecRange(minRa, maxRa, minDec, maxDec);
-    userGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minRa)), Pvl::Replace);
-    userGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxRa)), Pvl::Replace);
-    userGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minDec)), Pvl::Replace);
-    userGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxDec)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minRa)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxRa)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minDec)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxDec)), Pvl::Replace);
   }
   if(ui.GetString("DEFAULTSCALE") == "CAMERA") {
     double res = incam->RaDecResolution();
-    userGrp.AddKeyword(PvlKeyword("Scale", toString(1.0 / res)), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("Scale", toString(1.0 / res)), Pvl::Replace);
   }
 
   // Override computed range with the users request
   if(ui.WasEntered("SRA")) {
-    userGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("SRA"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("SRA"))), Pvl::Replace);
   }
   if(ui.WasEntered("ERA")) {
-    userGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("ERA"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("ERA"))), Pvl::Replace);
   }
   if(ui.WasEntered("SDEC")) {
-    userGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(ui.GetDouble("SDEC"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(ui.GetDouble("SDEC"))), Pvl::Replace);
   }
   if(ui.WasEntered("EDEC")) {
-    userGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(ui.GetDouble("EDEC"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(ui.GetDouble("EDEC"))), Pvl::Replace);
   }
 
   // Get the resolution from the user if they decided to enter it
   if(ui.GetString("DEFAULTSCALE") == "USER") {
-    userGrp.AddKeyword(PvlKeyword("Scale", toString(ui.GetDouble("SCALE"))), Pvl::Replace);
+    userGrp.addKeyword(PvlKeyword("Scale", toString(ui.GetDouble("SCALE"))), Pvl::Replace);
   }
 
   // Create the projection
@@ -267,8 +267,8 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);
@@ -280,11 +280,11 @@ void LoadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
-  if(userGrp.HasKeyword("Scale")) {
+  if(userGrp.hasKeyword("Scale")) {
     ui.Clear("SCALE");
     ui.PutDouble("SCALE", userGrp["Scale"]);
   }
@@ -320,24 +320,24 @@ void LoadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
   int count = 0;
-  if(userGrp.HasKeyword("MinimumLongitude")) {
+  if(userGrp.hasKeyword("MinimumLongitude")) {
     ui.PutDouble("SRA", userGrp["MinimumLongitude"]);
     count++;
   }
-  if(userGrp.HasKeyword("MaximumLongitude")) {
+  if(userGrp.hasKeyword("MaximumLongitude")) {
     ui.PutDouble("ERA", userGrp["MaximumLongitude"]);
     count++;
   }
-  if(userGrp.HasKeyword("MinimumLatitude")) {
+  if(userGrp.hasKeyword("MinimumLatitude")) {
     ui.PutDouble("SDEC", userGrp["MinimumLatitude"]);
     count++;
   }
-  if(userGrp.HasKeyword("MaximumLatitude")) {
+  if(userGrp.hasKeyword("MaximumLatitude")) {
     ui.PutDouble("EDEC", userGrp["MaximumLatitude"]);
     count++;
   }

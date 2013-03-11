@@ -54,7 +54,7 @@ void IsisMain() {
       // Remove up to beginning of data
       line.TrimHead(" ='");
       line.TrimTail(" ");
-      if(label.Name() == "COMMENT" || label.Name() == "HISTORY") {
+      if(label.name() == "COMMENT" || label.name() == "HISTORY") {
         label += line.ToQt();
       }
       else {
@@ -66,10 +66,10 @@ void IsisMain() {
         line.TrimHead(" ");
         // If the remaining line QString has anything, it is comments.
         if(line.size() > 0) {
-          label.AddComment(line.ToQt());
+          label.addComment(line.ToQt());
           // A possible format for units, other possiblites exist.
           if(line != line.Token("[")) {
-            label.SetUnits(line.Token("[").Token("]").ToQt());
+            label.setUnits(line.Token("[").Token("]").ToQt());
           }
         }
       }
@@ -149,10 +149,10 @@ void IsisMain() {
   }
 
   // Base and multiplier
-  if(labels.HasKeyword("BZERO")) {
+  if(labels.hasKeyword("BZERO")) {
     pfits.SetBase(toDouble(labels["BZERO"][0]));
   }
-  if(labels.HasKeyword("BSCALE")) {
+  if(labels.hasKeyword("BSCALE")) {
     pfits.SetMultiplier(toDouble(labels["BSCALE"][0]));
   }
 
@@ -162,19 +162,19 @@ void IsisMain() {
   // Limited section of standardized keywords that could exist
   bool instGrp = false;
   PvlGroup inst("Instrument");
-  if(labels.HasKeyword("DATE-OBS")) {
+  if(labels.hasKeyword("DATE-OBS")) {
     instGrp = true;
     inst += PvlKeyword("StartTime", labels["DATE-OBS"][0]);
   }
-  if(labels.HasKeyword("OBJECT")) {
+  if(labels.hasKeyword("OBJECT")) {
     instGrp = true;
     inst += PvlKeyword("Target", labels["OBJECT"][0]);
   }
-  if(labels.HasKeyword("INSTRUME")) {
+  if(labels.hasKeyword("INSTRUME")) {
     instGrp = true;
     inst += PvlKeyword("InstrumentId", labels["INSTRUME"][0]);
   }
-  if(labels.HasKeyword("OBSERVER")) {
+  if(labels.hasKeyword("OBSERVER")) {
     instGrp = true;
     inst += PvlKeyword("SpacecraftName", labels["OBSERVER"][0]);
   }
@@ -184,7 +184,7 @@ void IsisMain() {
   // Add instrument group if any relevant data exists
   Pvl *lbls = output->label();
   if(instGrp) {
-    lbls->FindObject("IsisCube") += inst;
+    lbls->findObject("IsisCube") += inst;
   }
 
   // Save original labels

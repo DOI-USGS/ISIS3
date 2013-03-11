@@ -16,7 +16,7 @@ void IsisMain() {
 
   // Figure out which masking cube to use
   Pvl p(ui.GetFileName("FROM"));
-  PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
   int spn;
   QString scn = (QString)inst["SpacecraftName"];
   if(scn == "VIKING_ORBITER_1") spn = 1;
@@ -27,7 +27,7 @@ void IsisMain() {
   }
   // determine if # of cols is even or odd
   bool even = true;
-  PvlGroup &arch = p.FindGroup("Archive", Pvl::Traverse);
+  PvlGroup &arch = p.findGroup("Archive", Pvl::Traverse);
   QString id = (QString)arch["ProductId"];
   int num = toInt(id.mid(5, 1));
   if(num == 1 || num == 3 || num == 5 || num == 7 || num == 9) even = false;

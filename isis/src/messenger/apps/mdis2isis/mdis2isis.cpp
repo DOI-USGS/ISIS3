@@ -73,11 +73,11 @@ void IsisMain() {
   Pvl lab(inFile.expanded());
 
   try {
-    needsUnlut = (int) lab.FindKeyword("MESS:COMP12_8");
+    needsUnlut = (int) lab.findKeyword("MESS:COMP12_8");
     // Check for NAC imager
-    if((int) lab.FindKeyword("MESS:IMAGER") == 1) validMaxDn = NACValidMaximum;
-    id = (QString) lab.FindKeyword("MISSION_NAME");
-    projected = lab.HasObject("IMAGE_MAP_PROJECTION");
+    if((int) lab.findKeyword("MESS:IMAGER") == 1) validMaxDn = NACValidMaximum;
+    id = (QString) lab.findKeyword("MISSION_NAME");
+    projected = lab.hasObject("IMAGE_MAP_PROJECTION");
   }
   catch(IException &e) {
     QString msg = "Unable to read [MISSION] from input file [" +
@@ -112,9 +112,9 @@ void IsisMain() {
   PvlKeyword sourceId("SourceProductId", '"' + inFile.baseName() + '"');
 
   //  Create YearDoy keyword in Archive group
-  iTime stime(outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
+  iTime stime(outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
-  (void) outLabel.FindGroup("Archive", Pvl::Traverse).AddKeyword(yeardoy);
+  (void) outLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
 
   if(ui.GetBoolean("UNLUT") == false || !needsUnlut) {
     // We're not going to unlut the data, so just set output cube
@@ -124,16 +124,16 @@ void IsisMain() {
 
     // Write the Instrument, BandBin, Archive, and Kernels groups to the output
     // cube label
-    PvlGroup &group =  outLabel.FindGroup("Instrument", Pvl::Traverse);
-    group.AddKeyword(PvlKeyword("Unlutted", toString((int)!needsUnlut)));
+    PvlGroup &group =  outLabel.findGroup("Instrument", Pvl::Traverse);
+    group.addKeyword(PvlKeyword("Unlutted", toString((int)!needsUnlut)));
     outCube->putGroup(group);
-    outCube->putGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+    outCube->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
-    group = outLabel.FindGroup("Archive", Pvl::Traverse);
-    group.AddKeyword(sourceId, Pvl::Replace);
+    group = outLabel.findGroup("Archive", Pvl::Traverse);
+    group.addKeyword(sourceId, Pvl::Replace);
     outCube->putGroup(group);
 
-    outCube->putGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
+    outCube->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
 
     outCube = NULL;
 
@@ -153,18 +153,18 @@ void IsisMain() {
     outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
     outCube->create(ui.GetFileName("TO"));
 
-    PvlGroup &group =  outLabel.FindGroup("Instrument", Pvl::Traverse);
-    group.AddKeyword(PvlKeyword("Unlutted", toString((int)true)));
-    group.AddKeyword(PvlKeyword("LutInversionTable", lutfile));
-    outCube->label()->FindObject("IsisCube").AddGroup(group);
+    PvlGroup &group =  outLabel.findGroup("Instrument", Pvl::Traverse);
+    group.addKeyword(PvlKeyword("Unlutted", toString((int)true)));
+    group.addKeyword(PvlKeyword("LutInversionTable", lutfile));
+    outCube->label()->findObject("IsisCube").addGroup(group);
 
-    group = outLabel.FindGroup("Archive", Pvl::Traverse);
-    sourceId.AddValue('"' + lutid + '"');
-    group.AddKeyword(sourceId);
-    outCube->label()->FindObject("IsisCube").AddGroup(group);
+    group = outLabel.findGroup("Archive", Pvl::Traverse);
+    sourceId.addValue('"' + lutid + '"');
+    group.addKeyword(sourceId);
+    outCube->label()->findObject("IsisCube").addGroup(group);
 
-    outCube->label()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-    outCube->label()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
+    outCube->label()->findObject("IsisCube").addGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
+    outCube->label()->findObject("IsisCube").addGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
 
     p.StartProcess(UnlutData);
 
@@ -183,7 +183,7 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const QString &target) {
   Pvl outLabel;
 
   // Get the directory where the MESSENGER/MDIS translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Messenger"] + "/translations/";
 
   // Get a filename for the MESSENGER EDR label
@@ -206,8 +206,8 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const QString &target) {
 
   // Create the Kernel Group
   PvlGroup kerns("Kernels");
-  PvlGroup &bandbin(outLabel.FindGroup("BandBin", Pvl::Traverse));
-  PvlGroup &instGrp(outLabel.FindGroup("Instrument", Pvl::Traverse));
+  PvlGroup &bandbin(outLabel.findGroup("BandBin", Pvl::Traverse));
+  PvlGroup &instGrp(outLabel.findGroup("Instrument", Pvl::Traverse));
   QString instId = instGrp["InstrumentId"];
   QString naifCode;
 
@@ -215,11 +215,11 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const QString &target) {
   CreateFilterSpecs(instId, (int) instGrp["FilterWheelPosition"], bandbin,
                     naifCode);
   kerns += PvlKeyword("NaifIkCode", naifCode);
-  outLabel.AddGroup(kerns);
+  outLabel.addGroup(kerns);
 
 //  If the user specifed the target explicitly or it doesn't exist, create
 //  something so the camera will always work
-  if(instGrp.FindKeyword("TargetName").IsNull() || (!target.isEmpty())) {
+  if(instGrp.findKeyword("TargetName").isNull() || (!target.isEmpty())) {
     if(!target.isEmpty()) {
       instGrp["TargetName"] = QString(target);
     }
@@ -293,7 +293,7 @@ int CreateFilterSpecs(const QString &instId, int filter_code,
     calibFile = calibFile.highestVersion();
     Pvl config(calibFile.expanded());
 
-    PvlGroup &confgrp = config.FindGroup("FilterWheel");
+    PvlGroup &confgrp = config.findGroup("FilterWheel");
     int tolerance = confgrp["EncoderTolerance"];
 
     naifCode =  "-236800";
@@ -318,14 +318,14 @@ int CreateFilterSpecs(const QString &instId, int filter_code,
   }
 
   if(!name.isEmpty()) {
-    bandbin.AddKeyword(PvlKeyword("Number", toString(filter)), PvlContainer::Replace);
-    bandbin.AddKeyword(PvlKeyword("Name", name), PvlContainer::Replace);
-    bandbin.AddKeyword(PvlKeyword("Center", center, "NM"), PvlContainer::Replace);
-    bandbin.AddKeyword(PvlKeyword("Width", width, "NM"), PvlContainer::Replace);
+    bandbin.addKeyword(PvlKeyword("Number", toString(filter)), PvlContainer::Replace);
+    bandbin.addKeyword(PvlKeyword("Name", name), PvlContainer::Replace);
+    bandbin.addKeyword(PvlKeyword("Center", center, "NM"), PvlContainer::Replace);
+    bandbin.addKeyword(PvlKeyword("Width", width, "NM"), PvlContainer::Replace);
   }
   else {
     //  If we reach here, we cannot validate the number - set it to unknown
-    bandbin.AddKeyword(PvlKeyword("Number", "Unknown"), PvlContainer::Replace);
+    bandbin.addKeyword(PvlKeyword("Number", "Unknown"), PvlContainer::Replace);
   }
 
   return (0);
@@ -352,7 +352,7 @@ void UnlutData(Buffer &data) {
 }
 
 LutTable LoadLut(Pvl &label, QString &tableused, QString &froot) {
-  int tableToUse = label.FindKeyword("MESS:COMP_ALG");
+  int tableToUse = label.findKeyword("MESS:COMP_ALG");
 
   FileName tableFile("$messenger/calibration/LUT_INVERT/MDISLUTINV_?.TAB");
   tableFile = tableFile.highestVersion();

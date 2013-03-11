@@ -320,10 +320,10 @@ void IsisMain() {
   PvlGroup summary("ResultSummary");
   PvlGroup results("Results");
 
-  summary.AddKeyword(PvlKeyword("InputPoints", toString(inputPoints)));
-  summary.AddKeyword(PvlKeyword("InputMeasures", toString(inputMeasures)));
-  summary.AddKeyword(PvlKeyword("OutputPoints", toString(outputPoints)));
-  summary.AddKeyword(PvlKeyword("OutputMeasures", toString(outputMeasures)));
+  summary.addKeyword(PvlKeyword("InputPoints", toString(inputPoints)));
+  summary.addKeyword(PvlKeyword("InputMeasures", toString(inputMeasures)));
+  summary.addKeyword(PvlKeyword("OutputPoints", toString(outputPoints)));
+  summary.addKeyword(PvlKeyword("OutputMeasures", toString(outputMeasures)));
 
   if (outputPoints != 0) {
     // Write the filenames associated with outNet
@@ -339,13 +339,13 @@ void IsisMain() {
     outProgress.CheckStatus();
   }
   else {
-    summary.AddComment("The output control network file, ["
+    summary.addComment("The output control network file, ["
                        + ui.GetFileName("ONET") +
                        "],  was not created. "
                        "The provided filters have resulted in no points or "
                        "measures extracted.");
     if (ui.WasEntered("TOLIST")) {
-      summary.AddComment("The output cube list file, ["
+      summary.addComment("The output cube list file, ["
                          + ui.GetFileName("TOLIST") + 
                          "], was not created. "
                          "The provided filters have resulted in an empty"
@@ -355,43 +355,43 @@ void IsisMain() {
 
 
   if(noIgnore) {
-    summary.AddKeyword(PvlKeyword("IgnoredPoints", toString((int)ignoredPoints.size())));
-    summary.AddKeyword(PvlKeyword("IgnoredMeasures", toString((int)ignoredMeasures.size())));
+    summary.addKeyword(PvlKeyword("IgnoredPoints", toString((int)ignoredPoints.size())));
+    summary.addKeyword(PvlKeyword("IgnoredMeasures", toString((int)ignoredMeasures.size())));
   }
   if(noSingleMeasure) {
-    summary.AddKeyword(PvlKeyword("SingleMeasurePoints", toString((int)singleMeasurePoints.size())));
+    summary.addKeyword(PvlKeyword("SingleMeasurePoints", toString((int)singleMeasurePoints.size())));
   }
   if(noMeasureless) {
-    summary.AddKeyword(PvlKeyword("MeasurelessPoints", toString((int)measurelessPoints.size())));
+    summary.addKeyword(PvlKeyword("MeasurelessPoints", toString((int)measurelessPoints.size())));
   }
   if(noTolerancePoints) {
-    summary.AddKeyword(PvlKeyword("TolerancePoints", toString((int)tolerancePoints.size())));
+    summary.addKeyword(PvlKeyword("TolerancePoints", toString((int)tolerancePoints.size())));
   }
   if(reference) {
-    summary.AddKeyword(PvlKeyword("NonReferenceMeasures", toString((int)nonReferenceMeasures.size())));
+    summary.addKeyword(PvlKeyword("NonReferenceMeasures", toString((int)nonReferenceMeasures.size())));
   }
   if(fixed) {
-    summary.AddKeyword(PvlKeyword("NonFixedPoints", toString((int)nonFixedPoints.size())));
+    summary.addKeyword(PvlKeyword("NonFixedPoints", toString((int)nonFixedPoints.size())));
   }
   if(cubePoints) {
-    summary.AddKeyword(PvlKeyword("NonCubePoints", toString((int)nonCubePoints.size())));
+    summary.addKeyword(PvlKeyword("NonCubePoints", toString((int)nonCubePoints.size())));
   }
 // This is commented out since this does not correspond to any filters or the
 //  documentation of this application. I did not delete the code in case we find
 //  that we need it later. J.Backer 2012-06-22
 // 
 //  if(noMeasurePoints.size() != 0) {
-//    summary.AddKeyword(PvlKeyword("NoCubeMeasure", toString((int)noMeasurePoints.size())));
+//    summary.addKeyword(PvlKeyword("NoCubeMeasure", toString((int)noMeasurePoints.size())));
 //  }
   if(cubeMeasures) {
-    summary.AddKeyword(PvlKeyword("NonCubeMeasures", toString((int)noCubeMeasures.size())));
+    summary.addKeyword(PvlKeyword("NonCubeMeasures", toString((int)noCubeMeasures.size())));
   }
   if(pointsEntered) {
-    summary.AddKeyword(PvlKeyword("NonListedPoints", toString((int)nonListedPoints.size())));
+    summary.addKeyword(PvlKeyword("NonListedPoints", toString((int)nonListedPoints.size())));
   }
   if(latLon) {
-    summary.AddKeyword(PvlKeyword("LatLonOutOfRange", toString((int)nonLatLonPoints.size())));
-    summary.AddKeyword(PvlKeyword("NoLatLonPoints", toString((int)cannotGenerateLatLonPoints.size())));
+    summary.addKeyword(PvlKeyword("LatLonOutOfRange", toString((int)nonLatLonPoints.size())));
+    summary.addKeyword(PvlKeyword("NoLatLonPoints", toString((int)cannotGenerateLatLonPoints.size())));
   }
 
   outProgress.CheckStatus();
@@ -404,7 +404,7 @@ void IsisMain() {
   Progress resultsProgress;
   if(ui.WasEntered("PREFIX")) {
     if (outputPoints == inputPoints && outputMeasures == inputMeasures) {
-      results.AddComment("No filter reports were created since all points and "
+      results.addComment("No filter reports were created since all points and "
                          "measures from the input control network were "
                          "extracted into the output control network.");
     }
@@ -498,7 +498,7 @@ void IsisMain() {
         WriteResults(namegen, cannotGenerateLatLonPoints, results);
       }
 
-      results.AddComment("Each keyword represents a filter parameter used. "
+      results.addComment("Each keyword represents a filter parameter used. "
                          "Check the documentation for specific keyword descriptions.");
     }
     Application::Log(results);
@@ -770,7 +770,7 @@ void WriteCubeOutList(ControlNet cnet,
   }
   // Don't create file if it will be empty
   if (outputsn.size() == 0) {
-    summary.AddComment("The output cube list file, ["
+    summary.addComment("The output cube list file, ["
                        + ui.GetFileName("TOLIST") + 
                        "], was not created. "
                        "The provided filters have resulted in an empty"
@@ -811,7 +811,7 @@ void WriteResults(QString filename,
   // if no points or measures are being extracted,
   // we will not create the filter report.
   if(notExtracted.size() == 0) {
-    results.AddComment("The output report ["+ filename +"] was not created. "
+    results.addComment("The output report ["+ filename +"] was not created. "
                        "The corresponding filter found no points/measures that "
                        "would not be extracted.");
     return;
@@ -828,7 +828,7 @@ void WriteResults(QString filename,
   }
 
   out_stream.close();
-  results.AddKeyword(PvlKeyword("ReportCreated", filename));
+  results.addKeyword(PvlKeyword("ReportCreated", filename));
   return;
 }
 

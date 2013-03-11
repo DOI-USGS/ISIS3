@@ -23,8 +23,8 @@ map <QString, void *> GuiHelpers() {
 
 void IsisMain() {
   // Set Preferences to always turn off Terminal Output
-  PvlGroup &grp = Isis::Preference::Preferences().FindGroup("SessionLog", Isis::Pvl::Traverse);
-  grp["TerminalOutput"].SetValue("Off");
+  PvlGroup &grp = Isis::Preference::Preferences().findGroup("SessionLog", Isis::Pvl::Traverse);
+  grp["TerminalOutput"].setValue("Off");
  
   // Use a regular Process
   Process p;
@@ -35,7 +35,7 @@ void IsisMain() {
 
   // Open the file ... it must be a label-type file
   Pvl lab;
-  lab.Read(labelFile);
+  lab.read(labelFile);
   bool recursive = ui.GetBoolean("RECURSIVE");
 
   // Set up the requested object
@@ -45,17 +45,17 @@ void IsisMain() {
 
     // Get the keyword from the entered group
     if(ui.WasEntered("GRPNAME")) {
-      PvlObject object = lab.FindObject(obj, Pvl::Traverse);
+      PvlObject object = lab.findObject(obj, Pvl::Traverse);
       QString grp = ui.GetString("GRPNAME");
-      key = object.FindGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
+      key = object.findGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
     }
     // Find the keyword in the object
     else {
       if(recursive) {
-        key = lab.FindObject(obj, Pvl::Traverse).FindKeyword(ui.GetString("KEYWORD"), Pvl::Traverse);
+        key = lab.findObject(obj, Pvl::Traverse).findKeyword(ui.GetString("KEYWORD"), Pvl::Traverse);
       }
       else {
-        key = lab.FindObject(obj, Pvl::Traverse)[ui.GetString("KEYWORD")];
+        key = lab.findObject(obj, Pvl::Traverse)[ui.GetString("KEYWORD")];
       }
     }
   }
@@ -63,13 +63,13 @@ void IsisMain() {
   // Set up the requested group
   else if(ui.WasEntered("GRPNAME")) {
     QString grp = ui.GetString("GRPNAME");
-    key = lab.FindGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
+    key = lab.findGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
   }
 
   // Find the keyword in the label, outside of any object or group
   else {
     if(recursive) {
-      key = lab.FindKeyword(ui.GetString("KEYWORD"), Pvl::Traverse);
+      key = lab.findKeyword(ui.GetString("KEYWORD"), Pvl::Traverse);
     }
     else {
       key = lab[ui.GetString("KEYWORD")];
@@ -81,7 +81,7 @@ void IsisMain() {
     int i = ui.GetInteger("KEYINDEX");
 
     // Make sure they requested a value inside the range of the list
-    if(key.Size() < i) {
+    if(key.size() < i) {
       QString msg = "The value entered for [KEYINDEX] is out of the array ";
       msg += "bounds for the keyword [" + ui.GetString("KEYWORD") + "]";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -91,11 +91,11 @@ void IsisMain() {
   }
   else {
 
-    if(key.Size() > 1) {
+    if(key.size() > 1) {
 
       QStringList values;
 
-      for (int i = 0; i < key.Size(); i++) {
+      for (int i = 0; i < key.size(); i++) {
         QString thisValue = key[i];
 
         if (thisValue.contains (" "))
@@ -131,7 +131,7 @@ void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
   QString file(ui.GetFileName("FROM"));
   Pvl p;
-  p.Read(file);
+  p.read(file);
   Application::GuiLog(p);
 }
 //...........end of helper function LogMap ........

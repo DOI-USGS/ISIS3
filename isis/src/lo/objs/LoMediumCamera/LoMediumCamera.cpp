@@ -50,15 +50,15 @@ namespace Isis {
   LoMediumCamera::LoMediumCamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
     // Get the Instrument label information needed to define the camera for this frame
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString spacecraft = inst["SpacecraftName"];
     QString instId = inst["InstrumentId"];
 
     LoMediumCamera::FocalPlaneMapType type;
-    if(inst.HasKeyword("FiducialSamples")) {
+    if(inst.hasKeyword("FiducialSamples")) {
       type = Fiducial;
     }
-    else if(inst.HasKeyword("BoresightSample")) {
+    else if(inst.hasKeyword("BoresightSample")) {
       type = Boresight;
     }
     else {

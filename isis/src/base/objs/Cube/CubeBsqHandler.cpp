@@ -80,8 +80,8 @@ namespace Isis {
 
 
   void CubeBsqHandler::updateLabels(Pvl &label) {
-    PvlObject &core = label.FindObject("IsisCube").FindObject("Core");
-    core.AddKeyword(PvlKeyword("Format", "BandSequential"),
+    PvlObject &core = label.findObject("IsisCube").findObject("Core");
+    core.addKeyword(PvlKeyword("Format", "BandSequential"),
                     PvlContainer::Replace);
   }
 

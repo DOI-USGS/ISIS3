@@ -53,7 +53,7 @@ namespace Isis {
     SetFocalLength(202.059);
     SetPixelPitch(0.009);
 
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // make sure it is a themis vis image
     if(inst["InstrumentId"][0] != "THEMIS_VIS") {
       string msg = "The image does not appear to be a Themis Vis Image";
@@ -75,9 +75,9 @@ namespace Isis {
     p_nframes = inst["NumFramelets"];
 
     // Get the keywords from labels
-    PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+    PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     PvlKeyword &orgBand = bandBin["OriginalBand"];
-    for(int i = 0; i < orgBand.Size(); i++) {
+    for(int i = 0; i < orgBand.size(); i++) {
       p_originalBand.push_back(toInt(orgBand[i]));
     }
 

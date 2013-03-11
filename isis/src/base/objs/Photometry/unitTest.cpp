@@ -24,100 +24,100 @@ int main() {
             std::endl << std::endl;
 
   Pvl lab;
-  lab.AddObject(PvlObject("PhotometricModel"));
-  lab.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "Minnaert"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Wh", "0.52"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("B0", "0.0"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hh", "0.0"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Theta", "30.0"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hg1", "0.213"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hg2", "1.0"));
+  lab.addObject(PvlObject("PhotometricModel"));
+  lab.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "Minnaert"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Wh", "0.52"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("B0", "0.0"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hh", "0.0"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Theta", "30.0"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hg1", "0.213"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hg2", "1.0"));
 
-  lab.AddObject(PvlObject("AtmosphericModel"));
-  lab.FindObject("AtmosphericModel").AddGroup(PvlGroup("Algorithm"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "Anisotropic1"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Tau", "0.28"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Tauref", "0.001"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Wha", "0.95"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Bha", "0.85"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hga", "0.68"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hnorm", "0.003"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Nulneg", "NO"));
+  lab.addObject(PvlObject("AtmosphericModel"));
+  lab.findObject("AtmosphericModel").addGroup(PvlGroup("Algorithm"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "Anisotropic1"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Tau", "0.28"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Tauref", "0.001"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Wha", "0.95"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Bha", "0.85"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hga", "0.68"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hnorm", "0.003"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Nulneg", "NO"));
 
-  lab.AddObject(PvlObject("NormalizationModel"));
-  lab.FindObject("NormalizationModel").AddGroup(PvlGroup("Algorithm"));
-  lab.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "Albedo"));
-  lab.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Incref", "30.0"));
-  lab.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Albedo", "0.0690507"));
-  lab.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Thresh", "30.0"));
+  lab.addObject(PvlObject("NormalizationModel"));
+  lab.findObject("NormalizationModel").addGroup(PvlGroup("Algorithm"));
+  lab.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "Albedo"));
+  lab.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Incref", "30.0"));
+  lab.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Albedo", "0.0690507"));
+  lab.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Thresh", "30.0"));
 
   Pvl labdem;
-  labdem.AddObject(PvlObject("PhotometricModel"));
-  labdem.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
-  labdem.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "Lambert"));
-  labdem.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Wh", "0.52"));
-  labdem.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("B0", "0.0"));
-  labdem.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hh", "0.0"));
-  labdem.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Theta", "30.0"));
-  labdem.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hg1", "0.213"));
-  labdem.FindObject("PhotometricModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hg2", "1.0"));
+  labdem.addObject(PvlObject("PhotometricModel"));
+  labdem.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
+  labdem.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "Lambert"));
+  labdem.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Wh", "0.52"));
+  labdem.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("B0", "0.0"));
+  labdem.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hh", "0.0"));
+  labdem.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Theta", "30.0"));
+  labdem.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hg1", "0.213"));
+  labdem.findObject("PhotometricModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hg2", "1.0"));
 
-  labdem.AddObject(PvlObject("AtmosphericModel"));
-  labdem.FindObject("AtmosphericModel").AddGroup(PvlGroup("Algorithm"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "Anisotropic1"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Tau", "0.28"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Tauref", "0.001"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Wha", "0.95"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Bha", "0.85"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hga", "0.68"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Hnorm", "0.003"));
-  labdem.FindObject("AtmosphericModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Nulneg", "NO"));
+  labdem.addObject(PvlObject("AtmosphericModel"));
+  labdem.findObject("AtmosphericModel").addGroup(PvlGroup("Algorithm"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "Anisotropic1"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Tau", "0.28"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Tauref", "0.001"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Wha", "0.95"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Bha", "0.85"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hga", "0.68"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Hnorm", "0.003"));
+  labdem.findObject("AtmosphericModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Nulneg", "NO"));
 
-  labdem.AddObject(PvlObject("NormalizationModel"));
-  labdem.FindObject("NormalizationModel").AddGroup(PvlGroup("Algorithm"));
-  labdem.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Name", "AlbedoAtm"));
-  labdem.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Incref", "0.0"));
-  labdem.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Albedo", "0.0690507"));
-  labdem.FindObject("NormalizationModel").FindGroup("Algorithm").
-  AddKeyword(PvlKeyword("Thresh", "30.0"));
+  labdem.addObject(PvlObject("NormalizationModel"));
+  labdem.findObject("NormalizationModel").addGroup(PvlGroup("Algorithm"));
+  labdem.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Name", "AlbedoAtm"));
+  labdem.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Incref", "0.0"));
+  labdem.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Albedo", "0.0690507"));
+  labdem.findObject("NormalizationModel").findGroup("Algorithm").
+  addKeyword(PvlKeyword("Thresh", "30.0"));
 
   std::cout << "Testing creation of photometry object ..." << std::endl;
   try {

@@ -48,7 +48,7 @@ int main(void) {
 
     Pvl p("$galileo/testData/1213r.cub");
     SsiCamera *cam = (SsiCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -62,7 +62,7 @@ int main(void) {
 
     // Test Shutter Open/Close 
 
-    const PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time

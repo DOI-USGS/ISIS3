@@ -333,9 +333,9 @@ namespace Isis {
     p_hasAngularVelocity = false;
 
     // Load the constant and time-based frame traces and the constant rotation
-    if(table.Label().HasKeyword("TimeDependentFrames")) {
+    if(table.Label().hasKeyword("TimeDependentFrames")) {
       PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
-      for(int i = 0; i < labelTimeFrames.Size(); i++) {
+      for(int i = 0; i < labelTimeFrames.size(); i++) {
         p_timeFrames.push_back(toInt(labelTimeFrames[i]));
       }
     }
@@ -344,16 +344,16 @@ namespace Isis {
       p_timeFrames.push_back(J2000Code);
     }
 
-    if(table.Label().HasKeyword("ConstantRotation")) {
+    if(table.Label().hasKeyword("ConstantRotation")) {
       PvlKeyword labelConstantFrames = table.Label()["ConstantFrames"];
       p_constantFrames.clear();
 
-      for(int i = 0; i < labelConstantFrames.Size(); i++) {
+      for(int i = 0; i < labelConstantFrames.size(); i++) {
         p_constantFrames.push_back(toInt(labelConstantFrames[i]));
       }
       PvlKeyword labelConstantRotation = table.Label()["ConstantRotation"];
 
-      for(int i = 0; i < labelConstantRotation.Size(); i++) {
+      for(int i = 0; i < labelConstantRotation.size(); i++) {
         p_TC.push_back(toDouble(labelConstantRotation[i]));
       }
     }
@@ -363,14 +363,14 @@ namespace Isis {
     }
 
     // Load the full cache time information from the label if available
-    if(table.Label().HasKeyword("CkTableStartTime")) {
-      p_fullCacheStartTime = toDouble(table.Label().FindKeyword("CkTableStartTime")[0]);
+    if(table.Label().hasKeyword("CkTableStartTime")) {
+      p_fullCacheStartTime = toDouble(table.Label().findKeyword("CkTableStartTime")[0]);
     }
-    if(table.Label().HasKeyword("CkTableEndTime")) {
-      p_fullCacheEndTime = toDouble(table.Label().FindKeyword("CkTableEndTime")[0]);
+    if(table.Label().hasKeyword("CkTableEndTime")) {
+      p_fullCacheEndTime = toDouble(table.Label().findKeyword("CkTableEndTime")[0]);
     }
-    if(table.Label().HasKeyword("CkTableOriginalSize")) {
-      p_fullCacheSize = toInt(table.Label().FindKeyword("CkTableOriginalSize")[0]);
+    if(table.Label().hasKeyword("CkTableOriginalSize")) {
+      p_fullCacheSize = toInt(table.Label().findKeyword("CkTableOriginalSize")[0]);
     }
 
     int recFields = table[0].Fields();
@@ -700,7 +700,7 @@ namespace Isis {
       table.Label() += PvlKeyword("TimeDependentFrames");
 
       for(int i = 0; i < (int) p_timeFrames.size(); i++) {
-        table.Label()["TimeDependentFrames"].AddValue(toString(p_timeFrames[i]));
+        table.Label()["TimeDependentFrames"].addValue(toString(p_timeFrames[i]));
       }
     }
 
@@ -708,28 +708,28 @@ namespace Isis {
       table.Label() += PvlKeyword("ConstantFrames");
 
       for(int i = 0; i < (int) p_constantFrames.size(); i++) {
-        table.Label()["ConstantFrames"].AddValue(toString(p_constantFrames[i]));
+        table.Label()["ConstantFrames"].addValue(toString(p_constantFrames[i]));
       }
 
       table.Label() += PvlKeyword("ConstantRotation");
 
       for(int i = 0; i < (int) p_TC.size(); i++) {
-        table.Label()["ConstantRotation"].AddValue(toString(p_TC[i]));
+        table.Label()["ConstantRotation"].addValue(toString(p_TC[i]));
       }
     }
 
     // Write original time coverage
     if(p_fullCacheStartTime != 0) {
       table.Label() += PvlKeyword("CkTableStartTime");
-      table.Label()["CkTableStartTime"].AddValue(toString(p_fullCacheStartTime));
+      table.Label()["CkTableStartTime"].addValue(toString(p_fullCacheStartTime));
     }
     if(p_fullCacheEndTime != 0) {
       table.Label() += PvlKeyword("CkTableEndTime");
-      table.Label()["CkTableEndTime"].AddValue(toString(p_fullCacheEndTime));
+      table.Label()["CkTableEndTime"].addValue(toString(p_fullCacheEndTime));
     }
     if(p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("CkTableOriginalSize");
-      table.Label()["CkTableOriginalSize"].AddValue(toString(p_fullCacheSize));
+      table.Label()["CkTableOriginalSize"].addValue(toString(p_fullCacheSize));
     }
     NaifStatus::CheckErrors();
   }

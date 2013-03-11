@@ -55,7 +55,7 @@ namespace Isis {
 
     // Get the ephemeris time from the labels
     double et;
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
     et = getClockTime(stime).Et();
 
@@ -87,15 +87,15 @@ namespace Isis {
     p_nframelets = ParentLines() / (frameletSize / sumMode);
 
     // Setup the line detector offset map for each filter
-    int nbands = (int) lab.FindKeyword("Bands", PvlObject::Traverse);
-    const PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+    int nbands = (int) lab.findKeyword("Bands", PvlObject::Traverse);
+    const PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     const PvlKeyword &filtNames = bandBin["Center"];
     // Sanity check
-    if(nbands != filtNames.Size()) {
+    if(nbands != filtNames.size()) {
       ostringstream mess;
       mess << "Number bands in (file) label (" << nbands
            << ") do not match number of values in BandBin/Center keyword ("
-           << filtNames.Size() << ") - required for band-dependent geoemtry";
+           << filtNames.size() << ") - required for band-dependent geoemtry";
       throw IException(IException::User, mess.str(), _FILEINFO_);
     }
 
@@ -131,7 +131,7 @@ namespace Isis {
     }
 
     //  Now map the actual filter that exist in cube
-    for(int i = 0; i < filtNames.Size(); i++) {
+    for(int i = 0; i < filtNames.size(); i++) {
       if(!filterToDetectorOffset.exists((IString)filtNames[i])) {
         QString msg = "Unrecognized filter name [" + filtNames[i] + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);

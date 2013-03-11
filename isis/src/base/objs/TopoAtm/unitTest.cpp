@@ -26,14 +26,14 @@ int main() {
   algp += PvlKeyword("Name", "Lambert");
 
   PvlObject op("PhotometricModel");
-  op.AddGroup(algp);
+  op.addGroup(algp);
 
   PvlGroup alga("Algorithm");
   alga += PvlKeyword("Name", "Anisotropic1");
   alga += PvlKeyword("Bha", "0.85");
 
   PvlObject oa("AtmosphericModel");
-  oa.AddGroup(alga);
+  oa.addGroup(alga);
 
   PvlGroup algn("Algorithm");
   algn += PvlKeyword("Name", "TopoAtm");
@@ -41,12 +41,12 @@ int main() {
   algn += PvlKeyword("Incref", "30.0");
 
   PvlObject on("NormalizationModel");
-  on.AddGroup(algn);
+  on.addGroup(algn);
 
   Pvl pvl;
-  pvl.AddObject(op);
-  pvl.AddObject(oa);
-  pvl.AddObject(on);
+  pvl.addObject(op);
+  pvl.addObject(oa);
+  pvl.addObject(on);
 
   std::cout << pvl << std::endl << std::endl;
 

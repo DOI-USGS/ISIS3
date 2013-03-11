@@ -66,7 +66,7 @@ int main(void) {
     Pvl pvlBR(FileName("$apollo15/testData/BR.cub").expanded());
     ApolloPanoramicCamera *camBR = (ApolloPanoramicCamera *) CameraFactory::Create(pvlBR);
 
-    cout << "FileName: " << FileName(pvlTL.FileName()).name() << endl;
+    cout << "FileName: " << FileName(pvlTL.fileName()).name() << endl;
     cout << "CK Frame: " << camTL->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

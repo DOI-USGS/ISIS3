@@ -49,9 +49,9 @@ void IsisMain() {
       pvlDefFile = new Pvl(ui.GetFileName("DEFFILE"));
 
       // Log the DefFile
-      Application::Log(pvlDefFile->Group(0));
+      Application::Log(pvlDefFile->group(0));
 
-      if (pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge")) {
+      if (pvlDefFile->group(0).hasKeyword("PixelsFromEdge") && pvlDefFile->group(0).hasKeyword("MetersFromEdge")) {
         QString message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -63,9 +63,9 @@ void IsisMain() {
       else {
         pvlTemplate = Pvl("$ISIS3DATA/base/templates/cnetref/cnetref_nooperator.def");
       }
-      pvlTemplate.ValidatePvl(*pvlDefFile, pvlResults);
-      if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
-        Application::Log(pvlResults.Group(0));
+      pvlTemplate.validatePvl(*pvlDefFile, pvlResults);
+      if (pvlResults.groups() > 0 || pvlResults.keywords() > 0) {
+        Application::Log(pvlResults.group(0));
         QString sErrMsg = "Invalid Deffile\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
@@ -156,7 +156,7 @@ void IsisMain() {
       if (bLogFile) {
         Pvl pvlLog = interestOp->GetLogPvl();
         pvlLog += opGroup;
-        pvlLog.Write(sLogFile);
+        pvlLog.write(sLogFile);
       }
       Application::Log(interestOp->GetStdOptions());
       Application::Log(interestOp->GetStatistics());
@@ -174,7 +174,7 @@ void IsisMain() {
     if (cnetValidMeas) {
       Pvl pvlLog = cnetValidMeas->GetLogPvl();
       if (bLogFile) {
-        pvlLog.Write(sLogFile);
+        pvlLog.write(sLogFile);
       }
       Application::Log(cnetValidMeas->GetStdOptions());
       Application::Log(cnetValidMeas->GetStatistics());
@@ -236,7 +236,7 @@ void ViewDefFile() {
 
   // Get template PVL
   Pvl defFile;
-  defFile.Read(ui.GetFileName("DEFFILE"));
+  defFile.read(ui.GetFileName("DEFFILE"));
 
   // Write deffile file out to the log
   Isis::Application::GuiLog(defFile);

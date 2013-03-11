@@ -50,9 +50,9 @@ int main(void) {
   cout << "TESTING TOKENIZER" << endl;
   int i, j;
   for(i = 0; i < (int)t.size(); i++) {
-    cout << t[i].GetKey() << " is ";
-    for(j = 0; j < t[i].ValueSize(); j++) {
-      cout << t[i].GetValue(j) << " ";
+    cout << t[i].key() << " is ";
+    for(j = 0; j < t[i].valueSize(); j++) {
+      cout << t[i].value(j) << " ";
     }
     cout << endl;
   }

@@ -47,7 +47,7 @@ namespace Isis {
       ikernKey = "INS" + toString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
       multiplicativeLineTimeError = getDouble(ikernKey);
  
-      Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
+      Isis::PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
       QString stime = (QString)inst["StartTime"];  
       SpiceDouble etStart;
       str2et_c(stime.toAscii().data(), &etStart);
@@ -82,7 +82,7 @@ namespace Isis {
       detectorMap->SetDetectorSampleSumming(1.0);
       detectorMap->SetStartingDetectorSample(0.0);
       // Setup focal plane map
-      Isis::PvlGroup &kernel = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
+      Isis::PvlGroup &kernel = lab.findGroup("Kernels", Isis::Pvl::Traverse);
       CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, (int) kernel["NaifFrameCode"]);
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
@@ -100,7 +100,7 @@ namespace Isis {
       new LineScanCameraGroundMap(this);
       new LineScanCameraSkyMap(this);
 
-      Isis::PvlGroup &instP = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
+      Isis::PvlGroup &instP = lab.findGroup("Kernels", Isis::Pvl::Traverse);
       m_CkFrameId = toInt(instP["NaifFrameCode"][0]);
       m_CkFrameId = -int(-m_CkFrameId/1000)*1000;
 

@@ -40,8 +40,8 @@ namespace Isis {
    * @param type The type of the container.
    */
   PvlContainer::PvlContainer(const QString &type) {
-    Init();
-    p_name.SetName(type);
+    init();
+    m_name.setName(type);
   }
 
 
@@ -51,9 +51,9 @@ namespace Isis {
    * @param name The name of the container.
    */
   PvlContainer::PvlContainer(const QString &type, const QString &name) {
-    Init();
-    p_name.SetName(type);
-    SetName(name);
+    init();
+    m_name.setName(type);
+    setName(name);
   }
 
 
@@ -64,9 +64,9 @@ namespace Isis {
 
 
   //! Sets the filename to blank.
-  void PvlContainer::Init() {
-    p_filename = "";
-    p_formatTemplate = NULL;
+  void PvlContainer::init() {
+    m_filename = "";
+    m_formatTemplate = NULL;
   }
 
   /**
@@ -75,12 +75,12 @@ namespace Isis {
    * @return The PvlKeyword object.
    * @throws iException::Pvl The keyword doesn't exist.
    */
-  Isis::PvlKeyword &PvlContainer::FindKeyword(const QString &name) {
-    PvlKeywordIterator key = FindKeyword(name, Begin(), End());
-    if(key == End()) {
+  Isis::PvlKeyword &PvlContainer::findKeyword(const QString &name) {
+    PvlKeywordIterator key = findKeyword(name, begin(), end());
+    if(key == end()) {
       QString msg = "PVL Keyword [" + name + "] does not exist in [" +
-                   Type() + " = " + Name() + "]";
-      if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
+                   type() + " = " + this->name() + "]";
+      if(m_filename.size() > 0) msg += " in file [" + m_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -93,12 +93,12 @@ namespace Isis {
    * @return The PvlKeyword object.
    * @throws IException The keyword doesn't exist.
    */
-  const Isis::PvlKeyword &PvlContainer::FindKeyword(const QString &name) const {
-    ConstPvlKeywordIterator key = FindKeyword(name, Begin(), End());
-    if(key == End()) {
+  const Isis::PvlKeyword &PvlContainer::findKeyword(const QString &name) const {
+    ConstPvlKeywordIterator key = findKeyword(name, begin(), end());
+    if(key == end()) {
       QString msg = "PVL Keyword [" + name + "] does not exist in [" +
-                   Type() + " = " + Name() + "]";
-      if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
+                   type() + " = " + this->name() + "]";
+      if(m_filename.size() > 0) msg += " in file [" + m_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -110,16 +110,16 @@ namespace Isis {
    * @param name The name of the keyword to remove.
    * @throws iException::Pvl Keyword doesn't exist.
    */
-  void PvlContainer::DeleteKeyword(const QString &name) {
-    PvlKeywordIterator key = FindKeyword(name, Begin(), End());
-    if(key == End()) {
+  void PvlContainer::deleteKeyword(const QString &name) {
+    PvlKeywordIterator key = findKeyword(name, begin(), end());
+    if(key == end()) {
       QString msg = "PVL Keyword [" + name + "] does not exist in [" +
-                   Type() + " = " + Name() + "]";
-      if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
+                   type() + " = " + this->name() + "]";
+      if(m_filename.size() > 0) msg += " in file [" + m_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    p_keywords.erase(key);
+    m_keywords.erase(key);
   }
 
 
@@ -128,18 +128,18 @@ namespace Isis {
    * @param index The index of the keyword to remove.
    * @throws iException::Pvl Keyword doesn't exist.
    */
-  void PvlContainer::DeleteKeyword(const int index) {
-    if(index >= (int)p_keywords.size() || index < 0) {
+  void PvlContainer::deleteKeyword(const int index) {
+    if(index >= (int)m_keywords.size() || index < 0) {
       QString msg = "The specified index is out of bounds in PVL [" +
-                   Type() + " = " + Name() + "]";
-      if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
+                   type() + " = " + name() + "]";
+      if(m_filename.size() > 0) msg += " in file [" + m_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    PvlKeywordIterator key = Begin();
+    PvlKeywordIterator key = begin();
     for(int i = 0; i < index; i++) key++;
 
-    p_keywords.erase(key);
+    m_keywords.erase(key);
   }
 
 
@@ -149,15 +149,15 @@ namespace Isis {
    * @return bool True if one or more keywords were deleted; False if no keywords
    *         were deleted.
    */
-  bool PvlContainer::CleanDuplicateKeywords() {
+  bool PvlContainer::cleanDuplicateKeywords() {
     bool keywordDeleted = false;
 
-    for(int index = 0; index < p_keywords.size(); index ++) {
-      PvlKeyword &current = p_keywords[index];
+    for(int index = 0; index < m_keywords.size(); index ++) {
+      PvlKeyword &current = m_keywords[index];
 
-      for(PvlKeywordIterator key = Begin() + index + 1; key < End(); key ++) {
+      for(PvlKeywordIterator key = begin() + index + 1; key < end(); key ++) {
         if(current == *key) {
-          p_keywords.erase(key);
+          m_keywords.erase(key);
           keywordDeleted = true;
         }
       }
@@ -172,9 +172,9 @@ namespace Isis {
    * @param name The name of the keyword to check for.
    * @return True if the keyword exists, false if it doesn't.
    */
-  bool PvlContainer::HasKeyword(const QString &name) const {
-    ConstPvlKeywordIterator key = FindKeyword(name, Begin(), End());
-    if(key == End()) return false;
+  bool PvlContainer::hasKeyword(const QString &name) const {
+    ConstPvlKeywordIterator key = findKeyword(name, begin(), end());
+    if(key == end()) return false;
     return true;
   }
 
@@ -186,11 +186,11 @@ namespace Isis {
    * @throws iException::Message The index is out of bounds.
    */
   PvlKeyword &PvlContainer::operator[](const int index) {
-    if(index < 0 || index >= (int)p_keywords.size()) {
+    if(index < 0 || index >= (int)m_keywords.size()) {
       QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    return *(p_keywords.begin() + index);
+    return *(m_keywords.begin() + index);
   };
 
 
@@ -201,11 +201,11 @@ namespace Isis {
    * @throws iException::Message The index is out of bounds.
    */
   const Isis::PvlKeyword &PvlContainer::operator[](const int index) const {
-    if(index < 0 || index >= (int)p_keywords.size()) {
+    if(index < 0 || index >= (int)m_keywords.size()) {
       QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    return *(p_keywords.begin() + index);
+    return *(m_keywords.begin() + index);
   }
 
   /**
@@ -215,17 +215,17 @@ namespace Isis {
    * Use Append if you just want to add it to the end, Replace if you want to
    * replace it.
    */
-  void PvlContainer::AddKeyword(const Isis::PvlKeyword &key,
+  void PvlContainer::addKeyword(const Isis::PvlKeyword &key,
                                 const InsertMode mode) {
     if(mode == Append) {
-      p_keywords.push_back(key);
+      m_keywords.push_back(key);
     }
-    else if(HasKeyword(key.Name())) {
-      Isis::PvlKeyword &outkey = FindKeyword(key.Name());
+    else if(hasKeyword(key.name())) {
+      Isis::PvlKeyword &outkey = findKeyword(key.name());
       outkey = key;
     }
     else {
-      p_keywords.push_back(key);
+      m_keywords.push_back(key);
     }
   }
 
@@ -246,9 +246,9 @@ namespace Isis {
    * @return PvlContainer::PvlKeywordIterator Returns the position of the
    *          inserted keyword per the STL vector documentation.
    */
-  PvlContainer::PvlKeywordIterator PvlContainer::AddKeyword(const Isis::PvlKeyword &key,
+  PvlContainer::PvlKeywordIterator PvlContainer::addKeyword(const Isis::PvlKeyword &key,
       PvlKeywordIterator pos) {
-    return (p_keywords.insert(pos, key));
+    return (m_keywords.insert(pos, key));
   }
 
   /**
@@ -262,20 +262,20 @@ namespace Isis {
     // Set up a Formatter (This should not be necessary for a container because
     // Object or Group should have done this already, but just in case.
     bool removeFormatter = false;
-    if(container.GetFormat() == NULL) {
-      container.SetFormat(new PvlFormat());
+    if(container.format() == NULL) {
+      container.setFormat(new PvlFormat());
       removeFormatter = true;
     }
 
     Isis::PvlContainer outTemplate("DEFAULT_TEMPLATE");
-    if(container.HasFormatTemplate()) outTemplate = *(container.FormatTemplate());
+    if(container.hasFormatTemplate()) outTemplate = *(container.formatTemplate());
 
     // Look for and process all include files inside the template
-    Isis::PvlContainer newTemp(outTemplate.Type());
+    Isis::PvlContainer newTemp(outTemplate.type());
 
     // Include files take precedence over all other objects and groups
-    for(int i = 0; i < outTemplate.Keywords(); i++) {
-      if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
+    for(int i = 0; i < outTemplate.keywords(); i++) {
+      if(outTemplate[i].isNamed("Isis:PvlTemplate:File")) {
         QString filename = outTemplate[i];
         Isis::FileName file(filename);
         if(!file.fileExists()) {
@@ -284,14 +284,14 @@ namespace Isis {
         }
         Isis::Pvl include(file.expanded());
 
-        for(int j = 0; j < include.Keywords(); j++) {
-          if(!newTemp.HasKeyword(include[j].Name()))
-            newTemp.AddKeyword(include[j]);
+        for(int j = 0; j < include.keywords(); j++) {
+          if(!newTemp.hasKeyword(include[j].name()))
+            newTemp.addKeyword(include[j]);
         }
       }
       // If it is not an include file keyword add it in place
-      else if(!newTemp.HasKeyword(outTemplate[i].Name())) {
-        newTemp.AddKeyword(outTemplate[i]);
+      else if(!newTemp.hasKeyword(outTemplate[i].name())) {
+        newTemp.addKeyword(outTemplate[i]);
       }
     }
 
@@ -299,58 +299,58 @@ namespace Isis {
 
     // Figure out the longest keyword
     int width = 0;
-    for(int i = 0; i < container.Keywords(); i++) {
-      if(container[i].Name().length() > width) width = container[i].Name().length();
+    for(int i = 0; i < container.keywords(); i++) {
+      if(container[i].name().length() > width) width = container[i].name().length();
     }
 
     // This number keeps track of the number of keywords written
     int numKeywords = 0;
 
     // Write out the container using the output format template
-    for(int i = 0; i < outTemplate.Keywords(); i++) {
-      for(int j = 0; j < container.Keywords(); j++) {
-        if(outTemplate[i].Name() != container[j].Name()) continue;
-        container[j].SetIndent(container.Indent());
-        container[j].SetWidth(width);
-        container[j].SetFormat(container.GetFormat());
+    for(int i = 0; i < outTemplate.keywords(); i++) {
+      for(int j = 0; j < container.keywords(); j++) {
+        if(outTemplate[i].name() != container[j].name()) continue;
+        container[j].setIndent(container.indent());
+        container[j].setWidth(width);
+        container[j].setFormat(container.format());
         // Add a blank line before keyword comments
-        if(outTemplate[i].Comments() + container[j].Comments() > 0) os << container.GetFormat()->FormatEOL();
-        if(outTemplate[i].Comments() > 0) {
-          for(int k = 0; k < outTemplate[i].Comments(); k++) {
-            for(int l = 0; l < outTemplate[i].Indent() + container[j].Indent(); l++) os << " ";
-            os << outTemplate[i].Comment(k) << container.GetFormat()->FormatEOL();
+        if(outTemplate[i].comments() + container[j].comments() > 0) os << container.format()->formatEOL();
+        if(outTemplate[i].comments() > 0) {
+          for(int k = 0; k < outTemplate[i].comments(); k++) {
+            for(int l = 0; l < outTemplate[i].indent() + container[j].indent(); l++) os << " ";
+            os << outTemplate[i].comment(k) << container.format()->formatEOL();
           }
         }
         os << container[j];
-        container[j].SetFormat(NULL);
-        container[j].SetIndent(0);
-        container[j].SetWidth(0);
-        if(++numKeywords < container.Keywords()) {
-//          if (j+1 < container.Keywords() && container[j+1].Comments() > 0) os << container.GetFormat()->FormatEOL();
-          os << container.GetFormat()->FormatEOL();
+        container[j].setFormat(NULL);
+        container[j].setIndent(0);
+        container[j].setWidth(0);
+        if(++numKeywords < container.keywords()) {
+//          if (j+1 < container.Keywords() && container[j+1].comments() > 0) os << container.format()->formatEOL();
+          os << container.format()->formatEOL();
         }
       }
     }
 
     // Output the keywords in the container that were not specified in the template
-    for(int i = 0; i < container.Keywords(); i++) {
-      if(outTemplate.HasKeyword(container[i].Name())) continue;
-      container[i].SetIndent(container.Indent());
-      container[i].SetWidth(width);
-      container[i].SetFormat(container.GetFormat());
+    for(int i = 0; i < container.keywords(); i++) {
+      if(outTemplate.hasKeyword(container[i].name())) continue;
+      container[i].setIndent(container.indent());
+      container[i].setWidth(width);
+      container[i].setFormat(container.format());
       os << container[i];
-      container[i].SetFormat(NULL);
-      container[i].SetIndent(0);
-      container[i].SetWidth(0);
-      if(++numKeywords < container.Keywords()) {
-        if(i + 1 < container.Keywords() && container[i+1].Comments() > 0) os << container.GetFormat()->FormatEOL();
-        os << container.GetFormat()->FormatEOL();
+      container[i].setFormat(NULL);
+      container[i].setIndent(0);
+      container[i].setWidth(0);
+      if(++numKeywords < container.keywords()) {
+        if(i + 1 < container.keywords() && container[i+1].comments() > 0) os << container.format()->formatEOL();
+        os << container.format()->formatEOL();
       }
     }
 
     if(removeFormatter) {
-      delete container.GetFormat();
-      container.SetFormat(NULL);
+      delete container.format();
+      container.setFormat(NULL);
     }
 
     return os;
@@ -364,7 +364,7 @@ namespace Isis {
    * @param end The ending iterator.
    * @return The keyword index.
    */
-  PvlContainer::PvlKeywordIterator PvlContainer::FindKeyword(const QString &name,
+  PvlContainer::PvlKeywordIterator PvlContainer::findKeyword(const QString &name,
       PvlContainer::PvlKeywordIterator beg,
       PvlContainer::PvlKeywordIterator end) {
     PvlKeyword temp(name);
@@ -379,7 +379,7 @@ namespace Isis {
    * @param end The ending iterator.
    * @return The keyword index.
    */
-  PvlContainer::ConstPvlKeywordIterator PvlContainer::FindKeyword(const QString &name,
+  PvlContainer::ConstPvlKeywordIterator PvlContainer::findKeyword(const QString &name,
       PvlContainer::ConstPvlKeywordIterator beg,
       PvlContainer::ConstPvlKeywordIterator end) const {
     PvlKeyword temp(name);
@@ -389,10 +389,10 @@ namespace Isis {
 
   //! This is an assignment operator
   const PvlContainer &PvlContainer::operator=(const PvlContainer &other) {
-    p_filename = other.p_filename;
-    p_name = other.p_name;
-    p_keywords = other.p_keywords;
-    p_formatTemplate = other.p_formatTemplate;
+    m_filename = other.m_filename;
+    m_name = other.m_name;
+    m_keywords = other.m_keywords;
+    m_formatTemplate = other.m_formatTemplate;
 
     return *this;
   }
@@ -407,13 +407,13 @@ namespace Isis {
    * @history 2010-10-18 Sharmila Prasad - Added options "Type", "Range", "Value"
    *                                       for the keyword validation
    */
-  void PvlContainer::ValidateAllKeywords(PvlContainer & pPvlCont)
+  void PvlContainer::validateAllKeywords(PvlContainer & pPvlCont)
   {
     // Validate the Keywords in the current Object
-    int iTmplKeySize = Keywords();
+    int iTmplKeySize = keywords();
     for(int i=0; i<iTmplKeySize; i++) {
       PvlKeyword & pvlTmplKwrd = (*this)[i];
-      QString sKeyName = pvlTmplKwrd.Name();
+      QString sKeyName = pvlTmplKwrd.name();
       bool bKwrdFound = false;
 
       // These are reserved keywords for properties like "Range", "Value", "Type",
@@ -424,8 +424,8 @@ namespace Isis {
         continue;
       }
 
-      if(pPvlCont.HasKeyword(sKeyName)) {
-        PvlKeyword & pvlKwrd = pPvlCont.FindKeyword(sKeyName);
+      if(pPvlCont.hasKeyword(sKeyName)) {
+        PvlKeyword & pvlKwrd = pPvlCont.findKeyword(sKeyName);
         QString sTmplKwrdRange = sKeyName + "__Range";
         QString sTmplKwrdValue = sKeyName + "__Value";
         QString sTmplKwrdType  = sKeyName + "__Type";
@@ -433,30 +433,30 @@ namespace Isis {
         PvlKeyword pvlTmplKwrdRange, pvlTmplKwrdValue;
 
         // Check if Type is specified (positive or negative for numbers)
-        if(HasKeyword(sTmplKwrdType)) {
-          sType = FindKeyword(sTmplKwrdType)[0];
+        if(hasKeyword(sTmplKwrdType)) {
+          sType = findKeyword(sTmplKwrdType)[0];
         }
         // Check for Range
-        if(HasKeyword(sTmplKwrdRange)) {
-          pvlTmplKwrdRange = FindKeyword(sTmplKwrdRange);
-          pvlTmplKwrd.ValidateKeyword(pvlKwrd, sType, &pvlTmplKwrdRange);
+        if(hasKeyword(sTmplKwrdRange)) {
+          pvlTmplKwrdRange = findKeyword(sTmplKwrdRange);
+          pvlTmplKwrd.validateKeyword(pvlKwrd, sType, &pvlTmplKwrdRange);
         }
         // Check for Value
-        else if(HasKeyword(sTmplKwrdValue)) {
-          pvlTmplKwrdValue = FindKeyword(sTmplKwrdValue);
-          pvlTmplKwrd.ValidateKeyword(pvlKwrd, sType, &pvlTmplKwrdValue);
+        else if(hasKeyword(sTmplKwrdValue)) {
+          pvlTmplKwrdValue = findKeyword(sTmplKwrdValue);
+          pvlTmplKwrd.validateKeyword(pvlKwrd, sType, &pvlTmplKwrdValue);
         }
         else {
-          pvlTmplKwrd.ValidateKeyword(pvlKwrd, sType);
+          pvlTmplKwrd.validateKeyword(pvlKwrd, sType);
         }
-        pPvlCont.DeleteKeyword(pvlKwrd.Name());
+        pPvlCont.deleteKeyword(pvlKwrd.name());
         bKwrdFound = true;
       }
       else {
         bKwrdFound = true;
         QString sOption = sKeyName + "__Required";
-        if(HasKeyword(sOption)) {
-          PvlKeyword pvlKeyOption = FindKeyword(sOption);
+        if(hasKeyword(sOption)) {
+          PvlKeyword pvlKeyOption = findKeyword(sOption);
           if(pvlKeyOption[0] == "true") { // Required is true
             bKwrdFound = false;
           }
@@ -468,7 +468,7 @@ namespace Isis {
       }
 
       // Check for "Repeated" Option
-      ValidateRepeatOption(pvlTmplKwrd, pPvlCont);
+      validateRepeatOption(pvlTmplKwrd, pPvlCont);
     }
   }
 
@@ -483,32 +483,32 @@ namespace Isis {
    *
    * @history 2010-10-18 Sharmila Prasad - Added option "Type" for the keyword validation
    */
-  void PvlContainer::ValidateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont)
+  void PvlContainer::validateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont)
   {
-    QString sTmplKeyName = pPvlTmplKwrd.Name();
+    QString sTmplKeyName = pPvlTmplKwrd.name();
 
     // Check for the Type
     QString sType = sTmplKeyName + "__Type";
     QString sValueType ="";
-    if(HasKeyword(sType)) {
-      sValueType = FindKeyword(sType)[0];
+    if(hasKeyword(sType)) {
+      sValueType = findKeyword(sType)[0];
     }
     QString sRepeatOption = sTmplKeyName + "__Repeated";
     bool bRepeat =false;
-    if(HasKeyword(sRepeatOption)) {
-      PvlKeyword pvlKeyOption = FindKeyword(sRepeatOption);
+    if(hasKeyword(sRepeatOption)) {
+      PvlKeyword pvlKeyOption = findKeyword(sRepeatOption);
       if(pvlKeyOption[0] == "true") { // Required is true
         bRepeat = true;
       }
     }
     if(bRepeat) {
-      int iKeySize = pPvlCont.Keywords();
+      int iKeySize = pPvlCont.keywords();
       for(int j=(iKeySize-1); j>=0; j--) {
         PvlKeyword & pvlKwrd = pPvlCont[j];
-        QString sKeyName = pvlKwrd.Name();
+        QString sKeyName = pvlKwrd.name();
         if(sTmplKeyName == sKeyName) {
-          pPvlTmplKwrd.ValidateKeyword(pvlKwrd, sValueType);
-          pPvlCont.DeleteKeyword(pvlKwrd.Name());
+          pPvlTmplKwrd.validateKeyword(pvlKwrd, sValueType);
+          pPvlCont.deleteKeyword(pvlKwrd.name());
         }
       }
     }

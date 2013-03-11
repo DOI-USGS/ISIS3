@@ -79,9 +79,9 @@ void IsisMain() {
 
     // Get Summing, CcdId and Channel Number from the cube label
     Pvl cubeLabel = Pvl(sInputFile);
-    int iSumming  = toInt (cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("Summing")[0]);
-    int iChannel  = toInt (cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("ChannelNumber")[0]);
-    QString sCcdId = cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("CcdId");
+    int iSumming  = toInt (cubeLabel.findObject("IsisCube").findGroup("Instrument").findKeyword("Summing")[0]);
+    int iChannel  = toInt (cubeLabel.findObject("IsisCube").findGroup("Instrument").findKeyword("ChannelNumber")[0]);
+    QString sCcdId = cubeLabel.findObject("IsisCube").findGroup("Instrument").findKeyword("CcdId");
 
     // Get the image histogram
     Pipeline p1("hinoise1");

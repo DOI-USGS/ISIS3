@@ -72,13 +72,13 @@ void IsisMain() {
     // Write the pvl group out to the file
     if(ui.GetString("FORMAT") == "PVL") {
       Pvl temp;
-      temp.SetTerminator("");
-      temp.AddGroup(sp);
+      temp.setTerminator("");
+      temp.addGroup(sp);
       if(append) {
-        temp.Append(ui.GetAsString("TO"));
+        temp.append(ui.GetAsString("TO"));
       }
       else {
-        temp.Write(ui.GetAsString("TO"));
+        temp.write(ui.GetAsString("TO"));
       }
     }
     // Create a flatfile of the same data
@@ -98,20 +98,20 @@ void IsisMain() {
       }
 
       if(writeHeader) {
-        for(int i = 0; i < sp.Keywords(); i++) {
-          os << sp[i].Name();
+        for(int i = 0; i < sp.keywords(); i++) {
+          os << sp[i].name();
 
-          if(i < sp.Keywords() - 1) {
+          if(i < sp.keywords() - 1) {
             os << ",";
           }
         }
         os << endl;
       }
 
-      for(int i = 0; i < sp.Keywords(); i++) {
+      for(int i = 0; i < sp.keywords(); i++) {
         os << (QString)sp[i];
 
-        if(i < sp.Keywords() - 1) {
+        if(i < sp.keywords() - 1) {
           os << ",";
         }
       }

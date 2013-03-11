@@ -94,7 +94,7 @@ void IsisMain() {
   ui.CreatePVL(hapkePvl, "HAPKE", "PhotometricModel", "Algorithm", inclusion);
 
   // Log the Hapke Def File
-  PvlGroup hapkeGrp = hapkePvl.FindObject("PhotometricModel").FindGroup("Algorithm");
+  PvlGroup hapkeGrp = hapkePvl.findObject("PhotometricModel").findGroup("Algorithm");
   Application::Log(hapkeGrp);
 
   PhotoModel *hapkeModel = PhotoModelFactory::Create(hapkePvl);
@@ -105,19 +105,19 @@ void IsisMain() {
 
   PvlKeyword limbValue;
   if (sEmpirical == "MINNAERT") {
-    limbValue.SetName("KList");
+    limbValue.setName("KList");
   } else if (sEmpirical == "LUNARLAMBERT") {
-    limbValue.SetName("LList");
+    limbValue.setName("LList");
   } else {
     QString sErrMsg = "Invalid Photometric Model\n";
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
 
   Pvl empPvl;
-  empPvl.AddObject(PvlObject("PhotometricModel"));
-  empPvl.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
-  empPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-        AddKeyword(PvlKeyword("PhtName", sEmpirical), Pvl::Replace);
+  empPvl.addObject(PvlObject("PhotometricModel"));
+  empPvl.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
+  empPvl.findObject("PhotometricModel").findGroup("Algorithm").
+        addKeyword(PvlKeyword("PhtName", sEmpirical), Pvl::Replace);
   PhotoModel *empModel = PhotoModelFactory::Create(empPvl);
 
   // Order of approximation in atmospheric scatter model
@@ -148,7 +148,7 @@ void IsisMain() {
     ui.CreatePVL(asmPvl, "Atmospheric Scattering Model(ATM)", "AtmosphericModel", "Algorithm", inclusion);
 
     // Log the AtmosphericModel Def File
-    PvlGroup asmGrp = asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm");
+    PvlGroup asmGrp = asmPvl.findObject("AtmosphericModel").findGroup("Algorithm");
     Application::Log(asmGrp);
     if(!ui.IsInteractive()) {
       cerr << asmGrp << endl;
@@ -247,16 +247,16 @@ void IsisMain() {
     if (!iord) {
       // Fit with no additive offset:  output multiplier normalized to
       // zero phase, which is the desired phase curve B, and unnormalized
-      phaseAngle.AddValue(toString(lFitParams.phase));
-      limbValue.AddValue(toString(rmsmin));
-      phaseCurve.AddValue(toString(c1/c1_0));
+      phaseAngle.addValue(toString(lFitParams.phase));
+      limbValue.addValue(toString(rmsmin));
+      phaseCurve.addValue(toString(c1/c1_0));
     }
     else {
       // Fit with additive offset:  normalizing would make no sense, just
       // output additive offset and multiplier from fit
-      phaseAngle.AddValue(toString(lFitParams.phase));
-      limbValue.AddValue(toString(rmsmin));
-      phaseCurve.AddValue(toString(c1));
+      phaseAngle.addValue(toString(lFitParams.phase));
+      limbValue.addValue(toString(rmsmin));
+      phaseCurve.addValue(toString(c1));
     }
   }
 
@@ -275,13 +275,13 @@ void IsisMain() {
     photoGrp += phaseCurve;
     if (ui.WasEntered("NOTE")) {
       PvlGroup note("Note");
-      note.AddComment("NOTE DESCRIBING THE FOLLOWING PHOTOMETRIC MODEL");
+      note.addComment("NOTE DESCRIBING THE FOLLOWING PHOTOMETRIC MODEL");
       note += PvlKeyword("NOTE", ui.GetString("NOTE"));
       photoObj += note;
     }
     photoObj += photoGrp;
-    mainPvl.AddObject(photoObj);
-    mainPvl.Write(sOutfile);
+    mainPvl.addObject(photoObj);
+    mainPvl.write(sOutfile);
   }
 
   for (int r=0; r<NS; ++r){

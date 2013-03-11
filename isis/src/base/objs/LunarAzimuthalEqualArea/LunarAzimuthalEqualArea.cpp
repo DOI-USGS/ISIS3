@@ -47,7 +47,7 @@ namespace Isis {
     Pvl &label) : Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
+      PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Get the max libration
       m_maxLibration = mapGroup["MaximumLibration"];

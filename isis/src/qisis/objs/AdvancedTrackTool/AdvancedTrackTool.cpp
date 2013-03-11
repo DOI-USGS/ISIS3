@@ -489,11 +489,11 @@ namespace Isis {
 
     if(cCube->hasTable(TABLE_MOSAIC_SRC)) {
       Pvl *cPvl = cCube->label();
-      PvlObject cObjIsisCube = cPvl->FindObject("IsisCube");
-      PvlGroup cGrpBandBin = cObjIsisCube.FindGroup("BandBin");
-      for(int i = 0; i < cGrpBandBin.Keywords(); i++) {
+      PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
+      PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
+      for(int i = 0; i < cGrpBandBin.keywords(); i++) {
         PvlKeyword &cKeyTrackBand = cGrpBandBin[i];
-        for(int j = 0; j < cKeyTrackBand.Size(); j++) {
+        for(int j = 0; j < cKeyTrackBand.size(); j++) {
           if(cKeyTrackBand[j] == "TRACKING") {
             iTrackBand = j;
             break;

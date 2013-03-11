@@ -177,10 +177,10 @@ namespace Isis {
       Pvl logPvl;
       msgStream >> logPvl;
 
-      if(logPvl.Groups() == 1 &&
-         logPvl.Keywords() == 0 &&
-         logPvl.Objects() == 0) {
-        iApp->Log(logPvl.Group(0));
+      if(logPvl.groups() == 1 &&
+         logPvl.keywords() == 0 &&
+         logPvl.objects() == 0) {
+        iApp->Log(logPvl.group(0));
       }
     }
     else if(code == "GUILOG" && iApp) {
@@ -192,8 +192,8 @@ namespace Isis {
       Pvl errorPvl;
       msgStream >> errorPvl;
 
-      for(int i = 0; i < errorPvl.Groups(); i++) {
-        PvlGroup &g = errorPvl.Group(i);
+      for(int i = 0; i < errorPvl.groups(); i++) {
+        PvlGroup &g = errorPvl.group(i);
         QString eclass = g["Class"];
         QString emsg = g["Message"];
         int ecode = g["Code"];

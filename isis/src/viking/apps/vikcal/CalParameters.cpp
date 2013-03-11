@@ -42,7 +42,7 @@ namespace Isis {
       Pvl pvl(fname.toAscii().data());
 
       // Get keywords from input cube label
-      PvlGroup &instrument = pvl.FindGroup("INSTRUMENT", Pvl::Traverse);
+      PvlGroup &instrument = pvl.findGroup("INSTRUMENT", Pvl::Traverse);
 
       // Make sure it is a viking mission
       QString spacecraft = (QString)instrument["SPACECRAFTNAME"];
@@ -98,7 +98,7 @@ namespace Isis {
       PvlKeyword cs3 = instrument["OFFSETMODEID"];
       if((QString)cs3 == "ON") cs3 = "1";
       else if((QString)cs3 == "OFF") cs3 = "0";
-      PvlKeyword wav = pvl.FindGroup("BANDBIN", Pvl::Traverse)["FILTERID"];
+      PvlKeyword wav = pvl.findGroup("BANDBIN", Pvl::Traverse)["FILTERID"];
 
       // Set up calibration, linearity, and offset variables for the input file
       vikcalSetup(mission, spn, target, cam, wav, (int)cs1, (int)cs2, (int)cs3, (int)cs4);

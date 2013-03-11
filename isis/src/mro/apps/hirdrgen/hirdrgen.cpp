@@ -104,7 +104,7 @@ void IsisMain() {
     FileName lblFile(ui.GetFileName("TO"));
     QString lblFileName = lblFile.path() + "/" + lblFile.baseName() + ".lbl";
     p.SetDetached(lblFileName);
-    p.SetFormat(ProcessExport::JP2);
+    p.setFormat(ProcessExport::JP2);
   }
 
   // Set the output pixel type and the special pixel values
@@ -178,8 +178,8 @@ void IsisMain() {
   icube2->read(origBlob);
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
-  origLabelObj.SetName("OriginalLabelObject");
-  origLabel.AddObject(origLabelObj);
+  origLabelObj.setName("OriginalLabelObject");
+  origLabel.addObject(origLabelObj);
   PvlTranslationManager orig(origLabel,
                              "$mro/translations/hirisePdsRdrOriginalLabel.trn");
   orig.Auto(pdsLabel);
@@ -187,7 +187,7 @@ void IsisMain() {
   // Add labels to the PDS product that could not be handled by the translater
 
   if (ui.WasEntered("RATIONALE_DESC")) {
-    pdsLabel.AddKeyword(
+    pdsLabel.addKeyword(
         PvlKeyword("RATIONALE_DESC", ui.GetString("RATIONALE_DESC")),
         Pvl::Replace);
   }
@@ -199,7 +199,7 @@ void IsisMain() {
   strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
   QString dateTime = (QString) timestr;
   iTime tmpDateTime(dateTime);
-  PvlGroup &timeParam = pdsLabel.FindGroup("TIME_PARAMETERS");
+  PvlGroup &timeParam = pdsLabel.findGroup("TIME_PARAMETERS");
   timeParam += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 
   // Add the N/A constant keyword to the ROOT
@@ -219,77 +219,77 @@ void IsisMain() {
   // As pulled from the input Isis cube, the values are in CPMM order, so
   // convert them to CCD order
   PvlKeyword ccdFlag("MRO:CCD_FLAG");
-  PvlKeyword &cpmmFlag = origLabel.FindObject("OriginalLabelObject").
-                         FindGroup("INSTRUMENT_SETTING_PARAMETERS").
-                         FindKeyword("MRO:POWERED_CPMM_FLAG");
+  PvlKeyword &cpmmFlag = origLabel.findObject("OriginalLabelObject").
+                         findGroup("INSTRUMENT_SETTING_PARAMETERS").
+                         findKeyword("MRO:POWERED_CPMM_FLAG");
   PvlKeyword ccdBin("MRO:BINNING");
-  PvlKeyword &cpmmBin = icube2->label()->FindObject("IsisCube").
-                        FindGroup("Mosaic")["cpmmSummingFlag"];
+  PvlKeyword &cpmmBin = icube2->label()->findObject("IsisCube").
+                        findGroup("Mosaic")["cpmmSummingFlag"];
   PvlKeyword ccdTdi("MRO:TDI");
-  PvlKeyword &cpmmTdi = icube2->label()->FindObject("IsisCube").
-                        FindGroup("Mosaic")["cpmmTdiFlag"];
+  PvlKeyword &cpmmTdi = icube2->label()->findObject("IsisCube").
+                        findGroup("Mosaic")["cpmmTdiFlag"];
   PvlKeyword ccdSpecial("MRO:SPECIAL_PROCESSING_FLAG");
-  PvlKeyword &cpmmSpecial = icube2->label()->FindObject("IsisCube").
-                            FindGroup("Mosaic")["SpecialProcessingFlag"];
+  PvlKeyword &cpmmSpecial = icube2->label()->findObject("IsisCube").
+                            findGroup("Mosaic")["SpecialProcessingFlag"];
   for (int ccd = 0; ccd < 14; ++ccd) {
     const unsigned int cpmmByCcd[] = {0, 1, 2, 3, 5, 8, 10,
                                       11, 12, 13, 6, 7, 4, 9};
-    ccdFlag.AddValue(cpmmFlag[cpmmByCcd[ccd]]);
-    ccdBin.AddValue(cpmmBin[cpmmByCcd[ccd]] != "Null" ? cpmmBin[cpmmByCcd[ccd]] : "-9998");
-    ccdTdi.AddValue(cpmmTdi[cpmmByCcd[ccd]] != "Null" ? cpmmTdi[cpmmByCcd[ccd]] : "-9998");
+    ccdFlag.addValue(cpmmFlag[cpmmByCcd[ccd]]);
+    ccdBin.addValue(cpmmBin[cpmmByCcd[ccd]] != "Null" ? cpmmBin[cpmmByCcd[ccd]] : "-9998");
+    ccdTdi.addValue(cpmmTdi[cpmmByCcd[ccd]] != "Null" ? cpmmTdi[cpmmByCcd[ccd]] : "-9998");
     IString tmp = cpmmSpecial[cpmmByCcd[ccd]];
     tmp.Trim("\"");
-    ccdSpecial.AddValue(tmp.ToQt());
+    ccdSpecial.addValue(tmp.ToQt());
   }
 
-  if (!pdsLabel.HasGroup("INSTRUMENT_SETTING_PARAMETERS")) {
-    pdsLabel.AddGroup(PvlGroup("INSTRUMENT_SETTING_PARAMETERS"));
+  if (!pdsLabel.hasGroup("INSTRUMENT_SETTING_PARAMETERS")) {
+    pdsLabel.addGroup(PvlGroup("INSTRUMENT_SETTING_PARAMETERS"));
   }
-  pdsLabel.FindGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdFlag;
-  pdsLabel.FindGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdBin;
-  pdsLabel.FindGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdTdi;
-  pdsLabel.FindGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdSpecial;
+  pdsLabel.findGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdFlag;
+  pdsLabel.findGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdBin;
+  pdsLabel.findGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdTdi;
+  pdsLabel.findGroup("INSTRUMENT_SETTING_PARAMETERS") += ccdSpecial;
 
   // Add/modify projection info if there is a projection
-  if (pdsLabel.HasObject("IMAGE_MAP_PROJECTION")) {
-    PvlObject &mapObject = pdsLabel.FindObject("IMAGE_MAP_PROJECTION");
+  if (pdsLabel.hasObject("IMAGE_MAP_PROJECTION")) {
+    PvlObject &mapObject = pdsLabel.findObject("IMAGE_MAP_PROJECTION");
     mapObject += PvlKeyword("^DATA_SET_MAP_PROJECTION", "DSMAP.CAT");
 
     // Add the HiRISE comment to the CENTER_LATITUDE keyword
     PvlKeyword &clat = mapObject["CENTER_LATITUDE"];
-    clat.AddComment("/* NOTE:  CENTER_LATITUDE and CENTER_LONGITUDE describe the location  */");
-    clat.AddComment("/* of the center of projection, which is not necessarily equal to the */");
-    clat.AddComment("/* location of the center point of the image.                         */");
+    clat.addComment("/* NOTE:  CENTER_LATITUDE and CENTER_LONGITUDE describe the location  */");
+    clat.addComment("/* of the center of projection, which is not necessarily equal to the */");
+    clat.addComment("/* location of the center point of the image.                         */");
 
-    if (mapObject.HasKeyword("CENTER_LATITUDE")) {
+    if (mapObject.hasKeyword("CENTER_LATITUDE")) {
       PvlKeyword &centerLat = mapObject["CENTER_LATITUDE"];
       // if (centerLat[0] == "N/A") centerLat = -9998;
-      if (centerLat[0] == "N/A") mapObject.DeleteKeyword("CENTER_LATITUDE");
+      if (centerLat[0] == "N/A") mapObject.deleteKeyword("CENTER_LATITUDE");
     }
-    if (mapObject.HasKeyword("CENTER_LONGITUDE")) {
+    if (mapObject.hasKeyword("CENTER_LONGITUDE")) {
       PvlKeyword &centerLon = mapObject["CENTER_LONGITUDE"];
       // if (centerLon[0] == "N/A") centerLon = -9998;
-      if (centerLon[0] == "N/A") mapObject.DeleteKeyword("CENTER_LONGITUDE");
+      if (centerLon[0] == "N/A") mapObject.deleteKeyword("CENTER_LONGITUDE");
     }
-    if (mapObject.HasKeyword("REFERENCE_LATITUDE")) {
+    if (mapObject.hasKeyword("REFERENCE_LATITUDE")) {
       PvlKeyword &refLat = mapObject["REFERENCE_LATITUDE"];
       // if (refLat[0] == "N/A") refLat = -9998;
-      if (refLat[0] == "N/A") mapObject.DeleteKeyword("REFERENCE_LATITUDE");
+      if (refLat[0] == "N/A") mapObject.deleteKeyword("REFERENCE_LATITUDE");
     }
-    if (mapObject.HasKeyword("REFERENCE_LONGITUE")) {
+    if (mapObject.hasKeyword("REFERENCE_LONGITUE")) {
       PvlKeyword &refLon = mapObject["REFERENCE_LONGITUDE"];
       // if (refLon[0] == "N/A") refLon = -9998;
-      if (refLon[0] == "N/A") mapObject.DeleteKeyword("REFERENCE_LONGITUDE");
+      if (refLon[0] == "N/A") mapObject.deleteKeyword("REFERENCE_LONGITUDE");
     }
-    if (mapObject.HasKeyword("FIRST_STANDARD_PARALLEL")) {
+    if (mapObject.hasKeyword("FIRST_STANDARD_PARALLEL")) {
       PvlKeyword &firstSP = mapObject["FIRST_STANDARD_PARALLEL"];
       // if (firstSP[0] == "N/A") firstSP = -9998;
-      if (firstSP[0] == "N/A") mapObject.DeleteKeyword("FIRST_STANDARD_PARALLEL");
+      if (firstSP[0] == "N/A") mapObject.deleteKeyword("FIRST_STANDARD_PARALLEL");
     }
-    if (mapObject.HasKeyword("SECOND_STANDARD_PARALLEL")) {
+    if (mapObject.hasKeyword("SECOND_STANDARD_PARALLEL")) {
       PvlKeyword &secondSP = mapObject["SECOND_STANDARD_PARALLEL"];
       // if (secondSP[0] == "N/A") secondSP = -9998;
-      if (secondSP[0] == "N/A") mapObject.DeleteKeyword("SECOND_STANDARD_PARALLEL");
+      if (secondSP[0] == "N/A") mapObject.deleteKeyword("SECOND_STANDARD_PARALLEL");
     }
 
     // For Equirectangular ONLY
@@ -297,11 +297,11 @@ void IsisMain() {
     // instead of the target radii from NAIF
     if (mapObject["MAP_PROJECTION_TYPE"][0] == "EQUIRECTANGULAR") {
       Projection *proj = ProjectionFactory::CreateFromCube(*icube2);
-      PvlGroup &mapping = icube2->label()->FindGroup("MAPPING", Pvl::Traverse);
+      PvlGroup &mapping = icube2->label()->findGroup("MAPPING", Pvl::Traverse);
       double radius = proj->LocalRadius((double)mapping["CenterLatitude"]) / 1000.0;
-      mapObject["A_AXIS_RADIUS"].SetValue(toString(radius), "KM");
-      mapObject["B_AXIS_RADIUS"].SetValue(toString(radius), "KM");
-      mapObject["C_AXIS_RADIUS"].SetValue(toString(radius), "KM");
+      mapObject["A_AXIS_RADIUS"].setValue(toString(radius), "KM");
+      mapObject["B_AXIS_RADIUS"].setValue(toString(radius), "KM");
+      mapObject["C_AXIS_RADIUS"].setValue(toString(radius), "KM");
     }
 
     projName = mapObject["MAP_PROJECTION_TYPE"][0];
@@ -321,50 +321,50 @@ void IsisMain() {
 
   if (enctype.Equal("jp2")) {
     // Add keywords to the PDS JP2 IMAGE object
-    PvlObject &imagejp2 = pdsLabel.FindObject("UNCOMPRESSED_FILE").FindObject("IMAGE");
+    PvlObject &imagejp2 = pdsLabel.findObject("UNCOMPRESSED_FILE").findObject("IMAGE");
 
     // Add the HiRISE specific description of the IMAGE object
     imagejp2 += PvlKeyword("DESCRIPTION", "HiRISE projected and mosaicked product");
 
     // Add the SCALLING_FACTOR and OFFSET keywords
-    imagejp2.AddKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
-    imagejp2.AddKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);
+    imagejp2.addKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
+    imagejp2.addKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);
 
     // Reformat some keyword units in the image object
     // This is lame, but PDS units are difficult to work with, so for now???
     PvlKeyword &oldFilterNamejp2 = imagejp2["FILTER_NAME"];
     PvlKeyword newFilterName("FILTER_NAME");
-    for (int val = 0; val < oldFilterNamejp2.Size(); ++val) {
+    for (int val = 0; val < oldFilterNamejp2.size(); ++val) {
       QString  filtname(oldFilterNamejp2[val].toUpper());
       if (filtname == "BLUEGREEN") filtname = "BLUE-GREEN";
       else if (filtname == "NEARINFRARED") filtname = "NEAR-INFRARED";
-      newFilterName.AddValue(filtname);
+      newFilterName.addValue(filtname);
     }
-    imagejp2.AddKeyword(newFilterName, Pvl::Replace);
+    imagejp2.addKeyword(newFilterName, Pvl::Replace);
 
     PvlKeyword &oldCenterjp2 = imagejp2["CENTER_FILTER_WAVELENGTH"];
     PvlKeyword newCenter("CENTER_FILTER_WAVELENGTH");
-    for (int val = 0; val < oldCenterjp2.Size(); ++val) {
-      if (((IString)(oldCenterjp2.Unit(val))).UpCase() == "NANOMETERS") {
-        newCenter.AddValue(oldCenterjp2[val], "NM");
+    for (int val = 0; val < oldCenterjp2.size(); ++val) {
+      if (((IString)(oldCenterjp2.unit(val))).UpCase() == "NANOMETERS") {
+        newCenter.addValue(oldCenterjp2[val], "NM");
       }
       else {
-        newCenter.AddValue(oldCenterjp2[val], oldCenterjp2.Unit(val));
+        newCenter.addValue(oldCenterjp2[val], oldCenterjp2.unit(val));
       }
     }
-    imagejp2.AddKeyword(newCenter, Pvl::Replace);
+    imagejp2.addKeyword(newCenter, Pvl::Replace);
 
     PvlKeyword &oldBandWidthjp2 = imagejp2["BAND_WIDTH"];
     PvlKeyword newBandWidth("BAND_WIDTH");
-    for (int val = 0; val < oldBandWidthjp2.Size(); ++val) {
-      if (((IString)(oldBandWidthjp2.Unit(val))).UpCase() == "NANOMETERS") {
-        newBandWidth.AddValue(oldBandWidthjp2[val], "nm");
+    for (int val = 0; val < oldBandWidthjp2.size(); ++val) {
+      if (((IString)(oldBandWidthjp2.unit(val))).UpCase() == "NANOMETERS") {
+        newBandWidth.addValue(oldBandWidthjp2[val], "nm");
       }
       else {
-        newBandWidth.AddValue(oldBandWidthjp2[val], oldBandWidthjp2.Unit(val));
+        newBandWidth.addValue(oldBandWidthjp2[val], oldBandWidthjp2.unit(val));
       }
     }
-    imagejp2.AddKeyword(newBandWidth, Pvl::Replace);
+    imagejp2.addKeyword(newBandWidth, Pvl::Replace);
 
     // Add the min/max per band keywords
     imagejp2 += minimum;
@@ -373,14 +373,14 @@ void IsisMain() {
     // Modify the default SAMPLE_BIT_MASK keyword placed there by the
     // ProcessExportPds
     if (nbits != 8 && nbits != 16) {
-      imagejp2.AddKeyword(PvlKeyword("SAMPLE_BIT_MASK",
+      imagejp2.addKeyword(PvlKeyword("SAMPLE_BIT_MASK",
                                      toString((int)pow(2.0, (double)ui.GetInteger("BITS")) - 1)),
                           Pvl::Replace);
     }
   }
   else {
     // Add keywords to the PDS IMAGE object
-    PvlObject &image = pdsLabel.FindObject("IMAGE");
+    PvlObject &image = pdsLabel.findObject("IMAGE");
 
     // Add the HiRISE specific description of the IMAGE object
     image += PvlKeyword("DESCRIPTION", "HiRISE projected and mosaicked product");
@@ -395,44 +395,44 @@ void IsisMain() {
     // ??? unneccessary calculation - this is done by ProcessExportPds class.
     double slope = (maxmax - minmin) / (p.GetOutputMaximum() - p.GetOutputMinimum()); 
     double intercept = maxmax - slope * p.GetOutputMaximum();
-    image.AddKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
-    image.AddKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);
+    image.addKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
+    image.addKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);
 
     // Reformat some keyword units in the image object
     // This is lame, but PDS units are difficult to work with, so for now
     PvlKeyword &oldFilterName = image["FILTER_NAME"];
     PvlKeyword newFilterName("FILTER_NAME");
-    for (int val = 0; val < oldFilterName.Size(); ++val) {
+    for (int val = 0; val < oldFilterName.size(); ++val) {
       QString  filtname(oldFilterName[val].toUpper());
       if (filtname == "BLUEGREEN") filtname = "BLUE-GREEN";
       else if (filtname == "NEARINFRARED") filtname = "NEAR-INFRARED";
-      newFilterName.AddValue(filtname);
+      newFilterName.addValue(filtname);
     }
-    image.AddKeyword(newFilterName, Pvl::Replace);
+    image.addKeyword(newFilterName, Pvl::Replace);
 
     PvlKeyword &oldCenter = image["CENTER_FILTER_WAVELENGTH"];
     PvlKeyword newCenter("CENTER_FILTER_WAVELENGTH");
-    for (int val = 0; val < oldCenter.Size(); ++val) {
-      if (((IString)(oldCenter.Unit(val))).UpCase() == "NANOMETERS") {
-        newCenter.AddValue(oldCenter[val], "NM");
+    for (int val = 0; val < oldCenter.size(); ++val) {
+      if (((IString)(oldCenter.unit(val))).UpCase() == "NANOMETERS") {
+        newCenter.addValue(oldCenter[val], "NM");
       }
       else {
-        newCenter.AddValue(oldCenter[val], oldCenter.Unit(val));
+        newCenter.addValue(oldCenter[val], oldCenter.unit(val));
       }
     }
-    image.AddKeyword(newCenter, Pvl::Replace);
+    image.addKeyword(newCenter, Pvl::Replace);
 
     PvlKeyword &oldBandWidth = image["BAND_WIDTH"];
     PvlKeyword newBandWidth("BAND_WIDTH");
-    for (int val = 0; val < oldBandWidth.Size(); ++val) {
-      if (((IString)(oldBandWidth.Unit(val))).UpCase() == "NANOMETERS") {
-        newBandWidth.AddValue(oldBandWidth[val], "NM");
+    for (int val = 0; val < oldBandWidth.size(); ++val) {
+      if (((IString)(oldBandWidth.unit(val))).UpCase() == "NANOMETERS") {
+        newBandWidth.addValue(oldBandWidth[val], "NM");
       }
       else {
-        newBandWidth.AddValue(oldBandWidth[val], oldBandWidth.Unit(val));
+        newBandWidth.addValue(oldBandWidth[val], oldBandWidth.unit(val));
       }
     }
-    image.AddKeyword(newBandWidth, Pvl::Replace);
+    image.addKeyword(newBandWidth, Pvl::Replace);
 
     // Add the min/max per band keywords
     image += minimum;
@@ -441,57 +441,57 @@ void IsisMain() {
     // Modify the default SAMPLE_BIT_MASK keyword placed there by the
     // ProcessExportPds
     if (nbits != 8 && nbits != 16) {
-      image.AddKeyword(PvlKeyword("SAMPLE_BIT_MASK",
+      image.addKeyword(PvlKeyword("SAMPLE_BIT_MASK",
                                   toString((int)pow(2.0, (double)ui.GetInteger("BITS")) - 1)),
                        Pvl::Replace);
     }
   }
 
   // Modify the units in the viewing_parameters group
-//  if (pdsLabel.HasGroup("VIEWING_PARAMETERS")) {
-//    PvlGroup &viewGroup = pdsLabel.FindGroup("VIEWING_PARAMETERS");
+//  if (pdsLabel.hasGroup("VIEWING_PARAMETERS")) {
+//    PvlGroup &viewGroup = pdsLabel.findGroup("VIEWING_PARAMETERS");
 
 //    PvlKeyword &incidence = viewGroup["INCIDENCE_ANGLE"];
-//    IString tstr = incidence.Unit();
-//    if (tstr.UpCase() == "DEG") incidence.SetValue((QString)incidence, "deg");
+//    IString tstr = incidence.unit();
+//    if (tstr.UpCase() == "DEG") incidence.setValue((QString)incidence, "deg");
 
 //    PvlKeyword &emission = viewGroup["EMISSION_ANGLE"];
-//    tstr = emission.Unit();
-//    if (tstr.UpCase() == "DEG") emission.SetValue((QString)emission, "deg");
+//    tstr = emission.unit();
+//    if (tstr.UpCase() == "DEG") emission.setValue((QString)emission, "deg");
 
 //    PvlKeyword &phase = viewGroup["PHASE_ANGLE"];
-//    tstr = phase.Unit();
-//    if (tstr.UpCase() == "DEG") phase.SetValue((QString)phase, "deg");
+//    tstr = phase.unit();
+//    if (tstr.UpCase() == "DEG") phase.setValue((QString)phase, "deg");
 
 //    PvlKeyword &solarLon = viewGroup["SOLAR_LONGITUDE"];
-//    tstr = solarLon.Unit();   q
-//    if (tstr.UpCase() == "DEG") solarLon.SetValue((QString)solarLon, "deg");
+//    tstr = solarLon.unit();   q
+//    if (tstr.UpCase() == "DEG") solarLon.setValue((QString)solarLon, "deg");
 
 //    PvlKeyword &localTime = viewGroup["LOCAL_TIME"];
-//    tstr = localTime.Unit();
-//    if (tstr.UpCase() == "LOCALDAY/24") localTime.SetValue((QString)localTime, "local day/24");
+//    tstr = localTime.unit();
+//    if (tstr.UpCase() == "LOCALDAY/24") localTime.setValue((QString)localTime, "local day/24");
 //  }
 
   // Add a keyword type (i.e., QString, bool, int...) file to the PDS label Pvl
-  PvlFormat *formatter = pdsLabel.GetFormat();
-  formatter->Add("$mro/translations/hirisePdsRdrExtras.typ");
+  PvlFormat *formatter = pdsLabel.format();
+  formatter->add("$mro/translations/hirisePdsRdrExtras.typ");
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL
   if (projName == "EQUIRECTANGULAR") {
     if (enctype.Equal("jp2")) {
-      pdsLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsRdrEquiJP2.pft");
+      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrEquiJP2.pft");
     }
     else {
-      pdsLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsRdrEqui.pft");
+      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrEqui.pft");
     }
   }
   else {
     if (enctype.Equal("jp2")) {
-      pdsLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsRdrPolarJP2.pft");
+      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrPolarJP2.pft");
     }
     else {
-      pdsLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsRdrPolar.pft");
+      pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsRdrPolar.pft");
     }
   }
 

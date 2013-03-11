@@ -46,7 +46,7 @@ void IsisMain() {
   Pvl lab(in.expanded());
 
   //Checks if in file is rdr
-  if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
+  if(lab.hasObject("IMAGE_MAP_PROJECTION")) {
     QString msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -54,7 +54,7 @@ void IsisMain() {
 
   //Make sure it is a vims cube
   try {
-    PvlObject qube(lab.FindObject("QUBE"));
+    PvlObject qube(lab.findObject("QUBE"));
     QString id;
     id = (QString)qube["INSTRUMENT_ID"];
     id = id.simplified().trimmed();
@@ -74,7 +74,7 @@ void IsisMain() {
   Pvl pdsLab(in.expanded());
 
   // It's VIMS, let's figure out if it has the suffix data or not
-  if(toInt(lab.FindObject("QUBE")["SUFFIX_ITEMS"][0]) == 0) {
+  if(toInt(lab.findObject("QUBE")["SUFFIX_ITEMS"][0]) == 0) {
     // No suffix data, we can use processimportpds
     ProcessImportPds p;
 
@@ -88,7 +88,7 @@ void IsisMain() {
   }
   else {
     // We do it the hard way
-    ReadVimsBIL(in.expanded(), lab.FindObject("QUBE")["SUFFIX_ITEMS"], tempname.name());
+    ReadVimsBIL(in.expanded(), lab.findObject("QUBE")["SUFFIX_ITEMS"], tempname.name());
   }
 
   // Create holder for original labels
@@ -100,7 +100,7 @@ void IsisMain() {
   PvlGroup status("Results");
 
   //VIS cube
-  const PvlObject &qube = lab.FindObject("Qube");
+  const PvlObject &qube = lab.findObject("Qube");
   if(qube["SAMPLING_MODE_ID"][1] != "N/A") {
     CubeAttributeInput inattvis = CubeAttributeInput("+1-96");
     l.SetInputCube(tempname.name(), inattvis);
@@ -156,7 +156,7 @@ void IsisMain() {
  * @param outFile FileName of the output file
  */
 void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outFile) {
-  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
   QString transDir = (QString) dataDir["Base"];
 
   Pvl pdsLabel(inFileName);
@@ -443,17 +443,17 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
     vims.mi32BandCenterEnd   = 352;
     vims.mi32NaifFrameCode   = -82371;
   }
-  PvlObject qube(pdsLab.FindObject("Qube"));
+  PvlObject qube(pdsLab.findObject("Qube"));
 
 //Create the BandBin Group
   PvlGroup bandbin("BandBin");
   PvlKeyword originalBand("OriginalBand");
   for(int i = vims.mi32OrigBandStart; i <= vims.mi32OrigBinEnd; i++) {
-    originalBand.AddValue(toString(i));
+    originalBand.addValue(toString(i));
   }
   bandbin += originalBand;
   PvlKeyword center("Center");
-  PvlGroup bbin(qube.FindGroup("BandBin"));
+  PvlGroup bbin(qube.findGroup("BandBin"));
   for(int i = vims.mi32BandCenterStart; i < vims.mi32BandCenterEnd; i++) {
     center += (QString) bbin["BandBinCenter"][i];
   }
@@ -484,11 +484,11 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
 //************************************************************
 void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
 
-  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+  Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
   QString transDir = (QString) dataDir["Cassini"];
 
   Isis::FileName transFile(transDir + "/" + "translations/vimsPds.trn");
-  PvlObject qube(pdsLab.FindObject("Qube"));
+  PvlObject qube(pdsLab.findObject("Qube"));
   Pvl pdsLabel(pdsLab);
   Isis::PvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
 
@@ -496,13 +496,13 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   labelXlater.Auto(outputLabel);
 
   //Add needed keywords that are not in translation table to cube's instrument group
-  PvlGroup &inst = outputLabel.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = outputLabel.findGroup("Instrument", Pvl::Traverse);
 
   //trim start and stop time
-  QString strTime = inst.FindKeyword("StartTime")[0];
-  inst.FindKeyword("StartTime").SetValue(strTime.remove("Z"));
+  QString strTime = inst.findKeyword("StartTime")[0];
+  inst.findKeyword("StartTime").setValue(strTime.remove("Z"));
   strTime = (QString)qube["StopTime"];
-  inst.FindKeyword("StopTime").SetValue(strTime.remove("Z"));
+  inst.findKeyword("StopTime").setValue(strTime.remove("Z"));
 
   if(vType == IR) {
     inst += PvlKeyword("SamplingMode", (QString)qube["SamplingModeId"][0]);
@@ -518,8 +518,8 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   }
 
   PvlKeyword expDuration("ExposureDuration");
-  expDuration.AddValue(qube["ExposureDuration"][0], "IR");
-  expDuration.AddValue(qube["ExposureDuration"][1], "VIS");
+  expDuration.addValue(qube["ExposureDuration"][0], "IR");
+  expDuration.addValue(qube["ExposureDuration"][1], "VIS");
   inst += expDuration;
 
   if(vType == IR) {
@@ -532,7 +532,7 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   vimscube->putGroup(inst);
 
   //Get Archive
-  PvlGroup &archive = outputLabel.FindGroup("Archive", Pvl::Traverse);
+  PvlGroup &archive = outputLabel.findGroup("Archive", Pvl::Traverse);
   vimscube->putGroup(archive);
 
   ProcessBands(pdsLab, vimscube, vType);

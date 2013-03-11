@@ -119,7 +119,7 @@ void IsisMain() {
   ui.CreatePVL(hapkePvl, "Hapke", "PhotometricModel", "Algorithm", inclusion);
 
   // Log the Hapke Def File
-  PvlGroup hapkeGrp = hapkePvl.FindObject("PhotometricModel").FindGroup("Algorithm");
+  PvlGroup hapkeGrp = hapkePvl.findObject("PhotometricModel").findGroup("Algorithm");
   Application::Log(hapkeGrp);
 
   PhotoModel *hapkeModel = PhotoModelFactory::Create(hapkePvl);
@@ -129,12 +129,12 @@ void IsisMain() {
   sEmpirical = sEmpirical.toUpper();
 
   Pvl empPvl;
-  empPvl.AddObject(PvlObject("PhotometricModel"));
-  empPvl.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
+  empPvl.addObject(PvlObject("PhotometricModel"));
+  empPvl.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
   if (sEmpirical == "LUNARLAMBERT") {
-    empPvl.FindObject("PhotometricModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "LunarLambert"), Pvl::Replace);
+    empPvl.findObject("PhotometricModel").findGroup("Algorithm").addKeyword(PvlKeyword("Name", "LunarLambert"), Pvl::Replace);
   } else {
-    empPvl.FindObject("PhotometricModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "Minnaert"), Pvl::Replace);
+    empPvl.findObject("PhotometricModel").findGroup("Algorithm").addKeyword(PvlKeyword("Name", "Minnaert"), Pvl::Replace);
   }
 
   // Get Emission, Incidence, Phase Mean Ground Plane Geometry (Datum)
@@ -196,7 +196,7 @@ void IsisMain() {
     ui.CreatePVL(asmPvl, "Atmospheric Scattering Model(ATM)", "AtmosphericModel", "Algorithm", inclusion);
 
     // Log the AtmosphericModel Def File
-    PvlGroup asmGrp = asmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm");
+    PvlGroup asmGrp = asmPvl.findObject("AtmosphericModel").findGroup("Algorithm");
     Application::Log(asmGrp);
 
     asmModel = AtmosModelFactory::Create(asmPvl, *hapkeModel);
@@ -270,7 +270,7 @@ void IsisMain() {
 
   lFitParams.pModel = PhotoModelFactory::Create(empPvl);
   // Log the Empirical Photometric Model Def File
-  PvlGroup empGrp = empPvl.FindObject("PhotometricModel").FindGroup("Algorithm");
+  PvlGroup empGrp = empPvl.findObject("PhotometricModel").findGroup("Algorithm");
   Application::Log(empGrp);
 
   gsl_function Func;
@@ -317,7 +317,7 @@ void IsisMain() {
   os >> results;
 
   if (ui.WasEntered("NOTE")) {
-    note.AddComment("NOTE DESCRIBING DATA IN THE FOLLOWING RESULTS SECTION");
+    note.addComment("NOTE DESCRIBING DATA IN THE FOLLOWING RESULTS SECTION");
     note += PvlKeyword("NOTE", ui.GetString("NOTE"));
   }
 
@@ -325,16 +325,16 @@ void IsisMain() {
   if (ui.WasEntered("TO")) {
     Pvl mainpvl;
     if (ui.WasEntered("NOTE")) {
-      mainpvl.AddGroup(note);
+      mainpvl.addGroup(note);
     }
-    mainpvl.AddGroup(results);
+    mainpvl.addGroup(results);
     QString sOutFile = ui.GetFileName("TO");
     bool append = ui.GetBoolean("APPEND");
     ofstream os;
     if (append) {
-      mainpvl.Append(sOutFile);
+      mainpvl.append(sOutFile);
     } else {
-      mainpvl.Write(sOutFile);
+      mainpvl.write(sOutFile);
     }
   }
 

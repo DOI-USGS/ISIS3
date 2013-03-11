@@ -47,9 +47,9 @@ void TestNetwork(const QString &filename, bool printNetwork) {
 
     if(printNetwork) {
       cerr << "Converted directly to Pvl:" << endl;
-      Pvl pvlVersion(test->ToPvl());
+      Pvl pvlVersion(test->toPvl());
       cerr << pvlVersion << endl;
-      pvlVersion.Write("./tmp.pvl");
+      pvlVersion.write("./tmp.pvl");
     }
 
     // Test the latest binary read/write and Pvl conversion
@@ -67,8 +67,8 @@ void TestNetwork(const QString &filename, bool printNetwork) {
     cerr << "After reading and writing to a binary form does Pvl match?"
          << endl;
     if(printNetwork) {
-      Pvl pvlVersion2(test2->ToPvl());
-      pvlVersion2.Write("./tmp2.pvl");
+      Pvl pvlVersion2(test2->toPvl());
+      pvlVersion2.write("./tmp2.pvl");
       if(system("cmp ./tmp.pvl ./tmp2.pvl")) {
         cerr << "Reading/Writing results in Pvl differences!" << endl;
       }

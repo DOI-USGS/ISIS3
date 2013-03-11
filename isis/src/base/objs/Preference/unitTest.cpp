@@ -17,14 +17,14 @@ int main() {
     Isis::PvlGroup j1("Junk");
     j1 += Isis::PvlKeyword("Fruit", "Tomato");
     j1 += Isis::PvlKeyword("Vegetable", "Potato");
-    system.AddGroup(j1);
-    system.Write("tmpSystem");
+    system.addGroup(j1);
+    system.write("tmpSystem");
 
     Isis::Pvl user;
     Isis::PvlGroup j2("Junk");
     j2 += Isis::PvlKeyword("Vegetable", "Potatoe");
-    user.AddGroup(j2);
-    user.Write("tmpUser");
+    user.addGroup(j2);
+    user.write("tmpUser");
 
     cout << "Testing normally" << endl;
 #if 0
@@ -36,16 +36,16 @@ int main() {
 #endif
 
     Isis::Preference::Preferences(false).Load("tmpSystem");
-    Isis::PvlGroup j3 = Isis::Preference::Preferences(false).FindGroup("Junk");
+    Isis::PvlGroup j3 = Isis::Preference::Preferences(false).findGroup("Junk");
     cout << j3 << endl;
     Isis::Preference::Preferences(false).Load("tmpUser");
-    Isis::PvlGroup j4 = Isis::Preference::Preferences(false).FindGroup("Junk");
+    Isis::PvlGroup j4 = Isis::Preference::Preferences(false).findGroup("Junk");
     cout << j4 << endl;
 
     cout << endl << endl;
-    //  if (p2.HasGroup("Junk")) {
-    if(Isis::Preference::Preferences(false).HasGroup("Junk")) {
-      Isis::PvlGroup &g = Isis::Preference::Preferences(false).FindGroup("Junk");
+    //  if (p2.hasGroup("Junk")) {
+    if(Isis::Preference::Preferences(false).hasGroup("Junk")) {
+      Isis::PvlGroup &g = Isis::Preference::Preferences(false).findGroup("Junk");
       cout << "Value of Vegetable is : " << (QString) g["Vegetable"] << endl;
     }
 

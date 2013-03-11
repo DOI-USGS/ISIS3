@@ -63,7 +63,7 @@ namespace Isis {
                   QApplication::applicationName() + "/" +
                   QApplication::applicationName() + ".html");
 
-    PvlGroup &uig = Preference::Preferences().FindGroup("UserInterface");
+    PvlGroup &uig = Preference::Preferences().findGroup("UserInterface");
     QString command = (QString) uig["GuiHelpBrowser"] +
                       (QString)" file:" + file.expanded() + " &";
     if(system(command.toAscii().data()) != 0) {

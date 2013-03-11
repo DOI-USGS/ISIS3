@@ -86,9 +86,9 @@ void IsisMain() {
 
   Cube *ocube = p.SetOutputCube("TO");
 
-  avgFF = uvvisDef.FindGroup("Filter" + filter.toUpper())["AVGFF"];
-  cr = uvvisDef.FindGroup("Filter" + filter.toUpper())["CO"];
-  gain = uvvisDef.FindGroup(QString("GainModeID") + QString(icube->group("Instrument")["GainModeID"][0]))["GAIN"];
+  avgFF = uvvisDef.findGroup("Filter" + filter.toUpper())["AVGFF"];
+  cr = uvvisDef.findGroup("Filter" + filter.toUpper())["CO"];
+  gain = uvvisDef.findGroup(QString("GainModeID") + QString(icube->group("Instrument")["GainModeID"][0]))["GAIN"];
 
   useDcconst = ui.WasEntered("DCCONST");
   if(useDcconst) {

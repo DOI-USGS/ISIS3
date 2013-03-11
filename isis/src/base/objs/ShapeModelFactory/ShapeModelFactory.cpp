@@ -44,7 +44,7 @@ namespace Isis {
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
     
     // get kernels and instrument Pvl groups
-    PvlGroup &kernelsPvlGroup = pvl.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup &kernelsPvlGroup = pvl.findGroup("Kernels", Pvl::Traverse);
     // Do we need a sky shape model, member variable, or neither? For now treat sky as ellipsoid
     bool skyTarget = target->isSky(); 
 
@@ -62,12 +62,12 @@ namespace Isis {
     if (skyTarget) {
       // Sky targets are ellipsoid shapes
     }
-    else if (kernelsPvlGroup.HasKeyword("ElevationModel") &&
-             !kernelsPvlGroup["ElevationModel"].IsNull())  {//&&
+    else if (kernelsPvlGroup.hasKeyword("ElevationModel") &&
+             !kernelsPvlGroup["ElevationModel"].isNull())  {//&&
       shapeModelFilenames = (QString) kernelsPvlGroup["ElevationModel"];
     }
-    else if (kernelsPvlGroup.HasKeyword("ShapeModel") &&
-             !kernelsPvlGroup["ShapeModel"].IsNull()) {//&&
+    else if (kernelsPvlGroup.hasKeyword("ShapeModel") &&
+             !kernelsPvlGroup["ShapeModel"].isNull()) {//&&
       shapeModelFilenames = (QString) kernelsPvlGroup["ShapeModel"];
     }
 

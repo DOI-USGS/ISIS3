@@ -58,15 +58,15 @@ void IsisMain() {
       Pvl *pmatch = clist[0]->label();
       Pvl *pcomp = clist[i]->label();
       CompareLabels(*pmatch, *pcomp);
-      PvlGroup g = pcomp->FindGroup("Instrument", Pvl::Traverse);
-      if(g.HasKeyword("StitchedProductIds")) {
+      PvlGroup g = pcomp->findGroup("Instrument", Pvl::Traverse);
+      if(g.hasKeyword("StitchedProductIds")) {
         PvlKeyword k = g["StitchedProductIds"];
-        for(int j = 0; j < (int)k.Size(); j++) {
+        for(int j = 0; j < (int)k.size(); j++) {
           sourceProductId += g["stitchedProductIds"][j];
         }
       }
-      ProdId = (QString)pmatch->FindGroup("Archive", Pvl::Traverse)["ObservationId"];
-      QString bandname = (QString)pmatch->FindGroup("BandBin", Pvl::Traverse)["Name"];
+      ProdId = (QString)pmatch->findGroup("Archive", Pvl::Traverse)["ObservationId"];
+      QString bandname = (QString)pmatch->findGroup("BandBin", Pvl::Traverse)["Name"];
       bandname = bandname.toUpper();
       ProdId = ProdId + "_" + bandname;
     }
@@ -137,8 +137,8 @@ void IsisMain() {
           if(proj->YCoord() > endY) endY = proj->YCoord();
         }
         Pvl *p = clist[i]->label();
-        double nlines = p->FindGroup("Dimensions", Pvl::Traverse)["Lines"];
-        double nsamps = p->FindGroup("Dimensions", Pvl::Traverse)["Samples"];
+        double nlines = p->findGroup("Dimensions", Pvl::Traverse)["Lines"];
+        double nsamps = p->findGroup("Dimensions", Pvl::Traverse)["Samples"];
 
         proj->SetWorld((nsamps + 0.5), (nlines + 0.5));
         if(i == 0) {
@@ -185,7 +185,7 @@ void IsisMain() {
     for(int i = 0; i < (int)clist.size(); i++) {
       OriginalLabel origLab;
       clist[i]->read(origLab);
-      PvlGroup timegrp = origLab.ReturnLabels().FindGroup("TIME_PARAMETERS", Pvl::Traverse);
+      PvlGroup timegrp = origLab.ReturnLabels().findGroup("TIME_PARAMETERS", Pvl::Traverse);
       if(i == 0) {
         startClock = (QString)timegrp["SpacecraftClockStartCount"];
         stopClock = (QString)timegrp["SpacecraftClockStopCount"];
@@ -218,14 +218,14 @@ void IsisMain() {
 
     for(int i = 0; i < (int)clist.size(); i++) {
       Pvl *clab = clist[i]->label();
-      PvlGroup cInst = clab->FindGroup("Instrument", Pvl::Traverse);
+      PvlGroup cInst = clab->findGroup("Instrument", Pvl::Traverse);
       OriginalLabel cOrgLab;
       clist[i]->read(cOrgLab);
-      PvlGroup cGrp = cOrgLab.ReturnLabels().FindGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
+      PvlGroup cGrp = cOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
       cpmmTdiFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:TDI"];
       cpmmSummingFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:BINNING"];
 
-      if(cInst.HasKeyword("Special_Processing_Flag")) {
+      if(cInst.hasKeyword("Special_Processing_Flag")) {
         specialProcessingFlag[cInst["CpmmNumber"]] = (QString) cInst["Special_Processing_Flag"];
       }
       else {
@@ -277,8 +277,8 @@ void IsisMain() {
 
     Cube mosCube;
     mosCube.open(ui.GetFileName("TO"), "rw");
-    PvlObject &lab = mosCube.label()->FindObject("IsisCube");
-    lab.AddGroup(mos);
+    PvlObject &lab = mosCube.label()->findObject("IsisCube");
+    lab.addGroup(mos);
     //add orginal label blob to the output cube
     mosCube.write(org);
     mosCube.close();
@@ -297,8 +297,8 @@ void IsisMain() {
 //Function to compare label - CompareLabels
 void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
   // test of the ObservationId
-  PvlGroup matchgrp = pmatch.FindGroup("Archive", Pvl::Traverse);
-  PvlGroup compgrp = pcomp.FindGroup("Archive", Pvl::Traverse);
+  PvlGroup matchgrp = pmatch.findGroup("Archive", Pvl::Traverse);
+  PvlGroup compgrp = pcomp.findGroup("Archive", Pvl::Traverse);
   QString obsMatch = matchgrp["ObservationId"];
   QString obsComp = compgrp["ObservationId"];
 
@@ -308,8 +308,8 @@ void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
   }
 
   // Test of the BandBin filter name
-  PvlGroup bmatchgrp = pmatch.FindGroup("BandBin", Pvl::Traverse);
-  PvlGroup bcompgrp = pcomp.FindGroup("BandBin", Pvl::Traverse);
+  PvlGroup bmatchgrp = pmatch.findGroup("BandBin", Pvl::Traverse);
+  PvlGroup bcompgrp = pcomp.findGroup("BandBin", Pvl::Traverse);
   QString bandMatch = bmatchgrp["Name"];
   QString bandComp = bcompgrp["Name"];
 

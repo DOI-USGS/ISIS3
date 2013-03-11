@@ -75,18 +75,18 @@ namespace Isis {
   IdealCamera::IdealCamera(Pvl &lab) : Camera(lab) {
     NaifStatus::CheckErrors();
     // Get required keywords from instrument group
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // Setup camera characteristics from instrument
 
-    if (inst.HasKeyword("FocalLength")) {
+    if (inst.hasKeyword("FocalLength")) {
       SetFocalLength(inst["FocalLength"]);
     }
     else {
       SetFocalLength(readValue("IDEAL_FOCAL_LENGTH", SpiceDoubleType).toDouble());
     }
 
-    if (inst.HasKeyword("PixelPitch")) {
+    if (inst.hasKeyword("PixelPitch")) {
       SetPixelPitch(inst["PixelPitch"]);
     }
     else {
@@ -96,7 +96,7 @@ namespace Isis {
     double et = inst["EphemerisTime"];
 
     double exposureDuration = 0.0;
-    if (inst.HasKeyword("ExposureDuration")) {
+    if (inst.hasKeyword("ExposureDuration")) {
       exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
     }
 
@@ -114,8 +114,8 @@ namespace Isis {
     double sdir = xdir;
     double ldir = ydir;
 
-    if (inst.HasKeyword("TransX")) xdir = inst["TransX"];
-    if (inst.HasKeyword("TransY")) ydir = inst["TransY"];
+    if (inst.hasKeyword("TransX")) xdir = inst["TransX"];
+    if (inst.hasKeyword("TransY")) ydir = inst["TransY"];
 
     if (xDependency == CameraFocalPlaneMap::Line) {
       yDependency = CameraFocalPlaneMap::Sample;
@@ -131,7 +131,7 @@ namespace Isis {
     catch (IException &) {
       double keyval[3];
       keyval[0] = 0.;
-      if (inst.HasKeyword("TransX0")) {
+      if (inst.hasKeyword("TransX0")) {
         keyval[0] = inst["TransX0"];
       }
 
@@ -150,7 +150,7 @@ namespace Isis {
     catch (IException &) {
       double keyval[3];
       keyval[0] = 0.;
-      if (inst.HasKeyword("TransY0")) {
+      if (inst.hasKeyword("TransY0")) {
         keyval[0] = inst["TransY0"];
       }
 
@@ -169,7 +169,7 @@ namespace Isis {
     catch (IException &) {
       double keyval[3];
       keyval[0] = 0.;
-      if (inst.HasKeyword("TransS0")) {
+      if (inst.hasKeyword("TransS0")) {
         keyval[0] = inst["TransS0"];
       }
 
@@ -188,7 +188,7 @@ namespace Isis {
     catch (IException &) {
       double keyval[3];
       keyval[0] = 0.;
-      if (inst.HasKeyword("TransL0")) {
+      if (inst.hasKeyword("TransL0")) {
         keyval[0] = inst["TransL0"];
       }
 

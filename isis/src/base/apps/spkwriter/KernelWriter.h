@@ -121,7 +121,7 @@ class KernelWriter {
       Commentor<SegmentType> commentor(comfile);
       if (comfile.isEmpty()) { commentor.setCommentHeader(k_header()); }
       kernels.Accept(commentor);
-      return (commentor.Comments());
+      return (commentor.comments());
     }
 
   protected:

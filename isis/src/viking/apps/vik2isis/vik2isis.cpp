@@ -33,8 +33,8 @@ void IsisMain() {
   try {
     Pvl compressionTest(in.expanded());
 
-    if(compressionTest.Groups() == 0 && compressionTest.Objects() == 0 &&
-        compressionTest.Keywords() < 2) {
+    if(compressionTest.groups() == 0 && compressionTest.objects() == 0 &&
+        compressionTest.keywords() < 2) {
       throw IException(IException::Programmer, "", _FILEINFO_);
     }
   }
@@ -225,7 +225,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
       prefix = "VO2_VISB_";
     }
   }
-  PvlKeyword key = nomRes.FindKeyword(prefix + "RESEAUS");
+  PvlKeyword key = nomRes.findKeyword(prefix + "RESEAUS");
   int numRes = nomRes[prefix + "NUMBER_RESEAUS"];
   for(int i = 0; i < numRes * 3; i += 3) {
     lines += key[i];

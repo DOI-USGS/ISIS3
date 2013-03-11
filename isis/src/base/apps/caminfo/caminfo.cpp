@@ -86,31 +86,31 @@ void IsisMain() {
     CameraStatistics stats(filename, sinc, linc);
     Pvl camPvl = stats.toPvl();
 
-    PvlGroup cg = camPvl.FindGroup("Latitude", Pvl::Traverse);
+    PvlGroup cg = camPvl.findGroup("Latitude", Pvl::Traverse);
     camstats->append(MakePair("MinimumLatitude", cg["latitudeminimum"][0]));
     camstats->append(MakePair("MaximumLatitude", cg["latitudemaximum"][0]));
 
-    cg = camPvl.FindGroup("Longitude", Pvl::Traverse);
+    cg = camPvl.findGroup("Longitude", Pvl::Traverse);
     camstats->append(MakePair("MinimumLongitude", cg["longitudeminimum"][0]));
     camstats->append(MakePair("MaximumLongitude", cg["longitudemaximum"][0]));
 
-    cg = camPvl.FindGroup("Resolution", Pvl::Traverse);
+    cg = camPvl.findGroup("Resolution", Pvl::Traverse);
     camstats->append(MakePair("MinimumResolution", cg["resolutionminimum"][0]));
     camstats->append(MakePair("MaximumResolution", cg["resolutionmaximum"][0]));
 
-    cg = camPvl.FindGroup("PhaseAngle", Pvl::Traverse);
+    cg = camPvl.findGroup("PhaseAngle", Pvl::Traverse);
     camstats->append(MakePair("MinimumPhase", cg["phaseminimum"][0]));
     camstats->append(MakePair("MaximumPhase", cg["phasemaximum"][0]));
 
-    cg = camPvl.FindGroup("EmissionAngle", Pvl::Traverse);
+    cg = camPvl.findGroup("EmissionAngle", Pvl::Traverse);
     camstats->append(MakePair("MinimumEmission", cg["emissionminimum"][0]));
     camstats->append(MakePair("MaximumEmission", cg["emissionmaximum"][0]));
 
-    cg = camPvl.FindGroup("IncidenceAngle", Pvl::Traverse);
+    cg = camPvl.findGroup("IncidenceAngle", Pvl::Traverse);
     camstats->append(MakePair("MinimumIncidence", cg["incidenceminimum"][0]));
     camstats->append(MakePair("MaximumIncidence", cg["incidencemaximum"][0]));
 
-    cg = camPvl.FindGroup("LocalSolarTime", Pvl::Traverse);
+    cg = camPvl.findGroup("LocalSolarTime", Pvl::Traverse);
     camstats->append(MakePair("LocalTimeMinimum", cg["localsolartimeMinimum"][0]));
     camstats->append(MakePair("LocalTimeMaximum", cg["localsolartimeMaximum"][0]));
   }
@@ -204,10 +204,10 @@ void IsisMain() {
       PvlObject::PvlObjectIterator objIter;
       bool found = false;
       PvlGroup fpgrp;
-      for (objIter=pvl.EndObject()-1; objIter>=pvl.BeginObject(); objIter--) {
-        if (objIter->Name().toUpper() == "FOOTPRINTINIT") {
+      for (objIter=pvl.endObject()-1; objIter>=pvl.beginObject(); objIter--) {
+        if (objIter->name().toUpper() == "FOOTPRINTINIT") {
           found = true;
-          fpgrp = objIter->FindGroup("UserParameters");
+          fpgrp = objIter->findGroup("UserParameters");
           break;
         }
       }
@@ -215,7 +215,7 @@ void IsisMain() {
         QString msg = "Footprint blob was not found in input image history";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      QString prec = (QString)fpgrp.FindKeyword("INCREASEPRECISION");
+      QString prec = (QString)fpgrp.findKeyword("INCREASEPRECISION");
       prec = prec.toUpper();
       if (prec == "TRUE") {
         precision = true;
@@ -223,28 +223,28 @@ void IsisMain() {
       else {
         precision = false;
       }
-      QString inctype = (QString)fpgrp.FindKeyword("INCTYPE");
+      QString inctype = (QString)fpgrp.findKeyword("INCTYPE");
       inctype = inctype.toUpper();
       if (inctype == "LINCSINC") {
-        int linc = fpgrp.FindKeyword("LINC");
-        int sinc = fpgrp.FindKeyword("SINC");
+        int linc = fpgrp.findKeyword("LINC");
+        int sinc = fpgrp.findKeyword("SINC");
         bandGeom->setSampleInc(sinc);
         bandGeom->setLineInc(linc);
       }
       else {
-        int vertices = fpgrp.FindKeyword("NUMVERTICES");
+        int vertices = fpgrp.findKeyword("NUMVERTICES");
         int lincsinc = (int)(0.5 + (((incube->sampleCount() * 2) +
                        (incube->lineCount() * 2) - 3.0) /
                        vertices));
         bandGeom->setSampleInc(lincsinc);
         bandGeom->setLineInc(lincsinc);
       }
-      if (fpgrp.HasKeyword("MAXINCIDENCE")) {
-        double maxinc = fpgrp.FindKeyword("MAXINCIDENCE");
+      if (fpgrp.hasKeyword("MAXINCIDENCE")) {
+        double maxinc = fpgrp.findKeyword("MAXINCIDENCE");
         bandGeom->setMaxIncidence(maxinc);
       }
-      if (fpgrp.HasKeyword("MAXEMISSION")) {
-        double maxema = fpgrp.FindKeyword("MAXEMISSION");
+      if (fpgrp.hasKeyword("MAXEMISSION")) {
+        double maxema = fpgrp.findKeyword("MAXEMISSION");
         bandGeom->setMaxEmission(maxema);
       }
     }
@@ -305,21 +305,21 @@ void GeneratePVLOutput(Cube *incube,
   PvlObject common("Parameters");
   for(int i = 0; i < general->size(); i++)
     common += PvlKeyword((*general)[i].first, (*general)[i].second);
-  params.AddObject(common);
+  params.addObject(common);
 
   // Add the camstats
   if(camstats) {
     PvlObject pcband("Camstats");
     for(int i = 0; i < camstats->size(); i++)
       pcband += ValidateKey((*camstats)[i].first, toDouble((*camstats)[i].second));
-    params.AddObject(pcband);
+    params.addObject(pcband);
   }
 
   // Add the input ISIS label if requested
   if(ui.GetBoolean("ISISLABEL")) {
     Pvl label = *(incube->label());
-    label.SetName("IsisLabel");
-    params.AddObject(label);
+    label.setName("IsisLabel");
+    params.addObject(label);
   }
 
   // Add the orginal label blob
@@ -327,8 +327,8 @@ void GeneratePVLOutput(Cube *incube,
     OriginalLabel orig;
     incube->read(orig);
     Pvl p = orig.ReturnLabels();
-    p.SetName("OriginalLabel");
-    params.AddObject(p);
+    p.setName("OriginalLabel");
+    params.addObject(p);
   }
 
   // Add the stats
@@ -336,7 +336,7 @@ void GeneratePVLOutput(Cube *incube,
     PvlObject sgroup("Statistics");
     for(int i = 0; i < statistics->size(); i++)
       sgroup += ValidateKey((*statistics)[i].first, toDouble((*statistics)[i].second));
-    params.AddObject(sgroup);
+    params.addObject(sgroup);
   }
 
   // Add the geometry info
@@ -344,25 +344,25 @@ void GeneratePVLOutput(Cube *incube,
     if(ui.GetBoolean("GEOMETRY")) {
       PvlObject ggroup("Geometry");
       bandGeom->generateGeometryKeys(ggroup);
-      params.AddObject(ggroup);
+      params.addObject(ggroup);
     }
 
     if(ui.GetBoolean("POLYGON") || ui.GetBoolean("USELABEL")) {
       PvlObject ggroup("Polygon");
       bandGeom->generatePolygonKeys(ggroup);
-      params.AddObject(ggroup);
+      params.addObject(ggroup);
     }
   }
 
   // Output the result
   Pvl pout;
   QString outFile = ui.GetFileName("TO");
-  pout.AddObject(params);
+  pout.addObject(params);
 
   if(ui.GetBoolean("APPEND"))
-    pout.Append(outFile);
+    pout.append(outFile);
   else
-    pout.Write(outFile);
+    pout.write(outFile);
 }
 
 
@@ -418,8 +418,8 @@ void GenerateCSVOutput(Cube *incube,
   if(ui.GetBoolean("GEOMETRY")) {
     PvlObject geomGrp("Geometry");
     bandGeom->generateGeometryKeys(geomGrp);
-    for(int i = 0; i < geomGrp.Keywords(); i++) {
-      if(not appending) keys += "Geom_" + geomGrp[i].Name() + delim;
+    for(int i = 0; i < geomGrp.keywords(); i++) {
+      if(not appending) keys += "Geom_" + geomGrp[i].name() + delim;
       values += geomGrp[i][0] + delim;
     }
   }

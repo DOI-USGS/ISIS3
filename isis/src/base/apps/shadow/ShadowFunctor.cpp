@@ -144,7 +144,7 @@ namespace Isis {
     if (m_azimuthStats->ValidPixels() > 0) {
       PvlKeyword averageAzimuth("AverageAzimuth",
                                 toString(m_azimuthStats->Average()));
-      averageAzimuth.AddCommentWrapped("The azimuth is measured from three o'clock, going "
+      averageAzimuth.addCommentWrapped("The azimuth is measured from three o'clock, going "
                                        "clockwise, in degrees");
       shadowStats += averageAzimuth;
 
@@ -152,7 +152,7 @@ namespace Isis {
       shadowStats += PvlKeyword("MaximumAzimuth", toString(m_azimuthStats->Maximum()));
 
       PvlKeyword averageElevation("AverageElevation", toString(m_elevationStats->Average()));
-      averageElevation.AddCommentWrapped("The elevation is measured from the normal, with directly "
+      averageElevation.addCommentWrapped("The elevation is measured from the normal, with directly "
           "overhead being 0 degrees and the horizon 90 degrees. Elevations are prevented from "
           "going below the horizon.");
       shadowStats += averageElevation;
@@ -162,7 +162,7 @@ namespace Isis {
     }
 
     PvlKeyword numRays("NumRays", toString(m_rayLengthStats->ValidPixels()));
-    numRays.AddCommentWrapped("This is the total number of rays traced from the surface towards "
+    numRays.addCommentWrapped("This is the total number of rays traced from the surface towards "
                               "the sun in order to detect if any given pixel is in shadow");
     shadowStats += numRays;
 

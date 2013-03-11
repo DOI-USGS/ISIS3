@@ -69,7 +69,7 @@ namespace Isis {
 
   // TODO: DOCUMENT EVERYTHING
   Spice::Spice(Pvl &lab) {
-    PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
 
     init(lab, !hasTables);
@@ -136,24 +136,24 @@ namespace Isis {
     // m_sky = false;
 
     // Get the kernel group and load main kernels
-    PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
     // Get the time padding first
-    if (kernels.HasKeyword("StartPadding")) {
+    if (kernels.hasKeyword("StartPadding")) {
       *m_startTimePadding = toDouble(kernels["StartPadding"][0]);
     }
     else {
       *m_startTimePadding = 0.0;
     }
 
-    if (kernels.HasKeyword("EndPadding")) {
+    if (kernels.hasKeyword("EndPadding")) {
       *m_endTimePadding  = toDouble(kernels["EndPadding"][0]);
     }
     else {
       *m_endTimePadding = 0.0;
     }
 
-    m_usingNaif = !lab.HasObject("NaifKeywords") || noTables;
+    m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
@@ -165,31 +165,31 @@ namespace Isis {
         load(kernels["InstrumentPointing"], noTables);
       }
 
-      if (kernels.HasKeyword("Frame")) {
+      if (kernels.hasKeyword("Frame")) {
         load(kernels["Frame"], noTables);
       }
 
       load(kernels["TargetAttitudeShape"], noTables);
-      if (kernels.HasKeyword("Instrument")) {
+      if (kernels.hasKeyword("Instrument")) {
         load(kernels["Instrument"], noTables);
       }
       // Always load after instrument
-      if (kernels.HasKeyword("InstrumentAddendum")) {
+      if (kernels.hasKeyword("InstrumentAddendum")) {
         load(kernels["InstrumentAddendum"], noTables);
       }
       load(kernels["LeapSecond"], noTables);
-      if ( kernels.HasKeyword("SpacecraftClock")) {
+      if ( kernels.hasKeyword("SpacecraftClock")) {
         load(kernels["SpacecraftClock"], noTables);
       }
 
       // Modified to load extra kernels last to allow overriding default values
       // (2010-04-07) (DAC)
-      if (kernels.HasKeyword("Extra")) {
+      if (kernels.hasKeyword("Extra")) {
         load(kernels["Extra"], noTables);
       }
     }
     else {
-      *m_naifKeywords = lab.FindObject("NaifKeywords");
+      *m_naifKeywords = lab.findObject("NaifKeywords");
     }
 
     // Get NAIF ik, spk, sclk, and ck codes
@@ -208,7 +208,7 @@ namespace Isis {
     //    Use spkbodycode to read body position from spk
 
     QString trykey = "NaifIkCode";
-    if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
+    if (kernels.hasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
     *m_ikCode = toInt(kernels[trykey][0]);
 
     *m_spkCode  = *m_ikCode / 1000;
@@ -227,20 +227,20 @@ namespace Isis {
     *m_spkBodyCode = m_target->naifBodyCode();
 
     // Override them if they exist in the labels
-    if (kernels.HasKeyword("NaifSpkCode")) {
+    if (kernels.hasKeyword("NaifSpkCode")) {
       *m_spkCode = (int) kernels["NaifSpkCode"];
     }
 
-    if (kernels.HasKeyword("NaifCkCode")) {
+    if (kernels.hasKeyword("NaifCkCode")) {
       *m_ckCode = (int) kernels["NaifCkCode"];
     }
 
-    if (kernels.HasKeyword("NaifSclkCode")) {
+    if (kernels.hasKeyword("NaifSclkCode")) {
       *m_sclkCode = (int) kernels["NaifSclkCode"];
     }
 
     if (!m_target->isSky()) {
-      if (kernels.HasKeyword("NaifSpkBodyCode")) {
+      if (kernels.hasKeyword("NaifSpkBodyCode")) {
         *m_spkBodyCode = (int) kernels["NaifSpkBodyCode"];
       }
     }
@@ -254,7 +254,7 @@ namespace Isis {
       // JAA - Modified to stored and look for the frame body code in the
       // cube labels
       SpiceInt frameCode;
-      if ((m_usingNaif) || (!m_naifKeywords->HasKeyword("BODY_FRAME_CODE"))) {
+      if ((m_usingNaif) || (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) {
         char frameName[32];
         SpiceBoolean found;
         cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName,
@@ -298,12 +298,12 @@ namespace Isis {
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
     if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
-      Table t("SunPosition", lab.FileName(), lab);
+      Table t("SunPosition", lab.fileName(), lab);
       m_sunPosition->LoadCache(t);
 
-      Table t2("BodyRotation", lab.FileName(), lab);
+      Table t2("BodyRotation", lab.fileName(), lab);
       m_bodyRotation->LoadCache(t2);
-      if (t2.Label().HasKeyword("SolarLongitude")) {
+      if (t2.Label().hasKeyword("SolarLongitude")) {
         *m_solarLongitude = Longitude(t2.Label()["SolarLongitude"],
             Angle::Degrees);
       }
@@ -318,7 +318,7 @@ namespace Isis {
     //  Table option, so we don't need to check for Table under the old
     //  keywords.
 
-    if (kernels["InstrumentPointing"].Size() == 0) {
+    if (kernels["InstrumentPointing"].size() == 0) {
       throw IException(IException::Unknown,
                        "No camera pointing available",
                        _FILEINFO_);
@@ -335,18 +335,18 @@ namespace Isis {
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
     else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
-      Table t("InstrumentPointing", lab.FileName(), lab);
+      Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
 
-    if (kernels["InstrumentPosition"].Size() == 0) {
+    if (kernels["InstrumentPosition"].size() == 0) {
       throw IException(IException::Unknown,
                        "No instrument position available",
                        _FILEINFO_);
     }
 
     if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
-      Table t("InstrumentPosition", lab.FileName(), lab);
+      Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
 
@@ -365,7 +365,7 @@ namespace Isis {
   void Spice::load(PvlKeyword &key, bool noTables) {
     NaifStatus::CheckErrors();
 
-    for (int i = 0; i < key.Size(); i++) {
+    for (int i = 0; i < key.size(); i++) {
       if (key[i] == "") continue;
       if (IString(key[i]).UpCase() == "NULL") break;
       if (IString(key[i]).UpCase() == "NADIR") break;
@@ -1024,14 +1024,14 @@ namespace Isis {
 
   void Spice::storeValue(QString key, int index, SpiceValueType type,
                          QVariant value) {
-    if (!m_naifKeywords->HasKeyword(key)) {
-      m_naifKeywords->AddKeyword(PvlKeyword(key));
+    if (!m_naifKeywords->hasKeyword(key)) {
+      m_naifKeywords->addKeyword(PvlKeyword(key));
     }
 
-    PvlKeyword &storedKey = m_naifKeywords->FindKeyword(key);
+    PvlKeyword &storedKey = m_naifKeywords->findKeyword(key);
 
-    while(index >= storedKey.Size()) {
-      storedKey.AddValue("");
+    while(index >= storedKey.size()) {
+      storedKey.addValue("");
     }
 
     if (type == SpiceByteCodeType) {
@@ -1058,8 +1058,8 @@ namespace Isis {
     // Read from PvlObject that is our naif keywords
     QVariant result;
 
-    if (m_naifKeywords->HasKeyword(key) && !m_usingNaif) {
-      PvlKeyword &storedKeyword = m_naifKeywords->FindKeyword(key);
+    if (m_naifKeywords->hasKeyword(key) && !m_usingNaif) {
+      PvlKeyword &storedKeyword = m_naifKeywords->findKeyword(key);
 
       try {
         if (type == SpiceDoubleType) {
@@ -1302,29 +1302,29 @@ namespace Isis {
   bool Spice::hasKernels(Pvl &lab) {
 
     // Get the kernel group and check main kernels
-    PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     std::vector<string> keywords;
     keywords.push_back("TargetPosition");
 
-    if (kernels.HasKeyword("SpacecraftPosition")) {
+    if (kernels.hasKeyword("SpacecraftPosition")) {
       keywords.push_back("SpacecraftPosition");
     }
     else {
       keywords.push_back("InstrumentPosition");
     }
 
-    if (kernels.HasKeyword("SpacecraftPointing")) {
+    if (kernels.hasKeyword("SpacecraftPointing")) {
       keywords.push_back("SpacecraftPointing");
     }
     else {
       keywords.push_back("InstrumentPointing");
     }
 
-    if (kernels.HasKeyword("Frame")) {
+    if (kernels.hasKeyword("Frame")) {
       keywords.push_back("Frame");
     }
 
-    if (kernels.HasKeyword("Extra")) {
+    if (kernels.hasKeyword("Extra")) {
       keywords.push_back("Extra");
     }
 
@@ -1332,7 +1332,7 @@ namespace Isis {
     for (int ikey = 0; ikey < (int) keywords.size(); ikey++) {
       key = kernels[ikey];
 
-      for (int i = 0; i < key.Size(); i++) {
+      for (int i = 0; i < key.size(); i++) {
         if (key[i] == "") return false;
         if (IString(key[i]).UpCase() == "NULL") return false;
         if (IString(key[i]).UpCase() == "NADIR") return false;

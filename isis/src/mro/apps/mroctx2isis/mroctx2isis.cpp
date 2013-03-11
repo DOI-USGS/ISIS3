@@ -37,21 +37,21 @@ void IsisMain() {
   bool projected;
   try {
     Pvl lab(inFile.expanded());
-    id = (QString) lab.FindKeyword("DATA_SET_ID");
-    projected = lab.HasObject("IMAGE_MAP_PROJECTION");
-    if(lab.HasKeyword("SPATIAL_SUMMING")) {
-      sumMode = (int)lab.FindKeyword("SPATIAL_SUMMING");
+    id = (QString) lab.findKeyword("DATA_SET_ID");
+    projected = lab.hasObject("IMAGE_MAP_PROJECTION");
+    if(lab.hasKeyword("SPATIAL_SUMMING")) {
+      sumMode = (int)lab.findKeyword("SPATIAL_SUMMING");
     }
     else {
-      sumMode = (int)lab.FindKeyword("SAMPLING_FACTOR");
+      sumMode = (int)lab.findKeyword("SAMPLING_FACTOR");
     }
 
-    bitMode = (QString) lab.FindKeyword("SAMPLE_BIT_MODE_ID");
-    if(lab.HasKeyword("EDIT_MODE_ID")) {
-      editMode = (int)lab.FindKeyword("EDIT_MODE_ID");
+    bitMode = (QString) lab.findKeyword("SAMPLE_BIT_MODE_ID");
+    if(lab.hasKeyword("EDIT_MODE_ID")) {
+      editMode = (int)lab.findKeyword("EDIT_MODE_ID");
     }
     else {
-      editMode = (int)lab.FindKeyword("SAMPLE_FIRST_PIXEL");
+      editMode = (int)lab.findKeyword("SAMPLE_FIRST_PIXEL");
     }
 
   }
@@ -206,7 +206,7 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
   //Pvl to store the labels
   Pvl outLabel;
   //Set up the directory where the translations are
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Mro"] + "/translations/";
   Pvl labelPvl(labelFile.expanded());
 
@@ -232,25 +232,25 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
 
   Pvl lab(labelFile.expanded());
   int sumMode, startSamp;
-  if(lab.HasKeyword("SPATIAL_SUMMING")) {
-    sumMode = (int)lab.FindKeyword("SPATIAL_SUMMING");
+  if(lab.hasKeyword("SPATIAL_SUMMING")) {
+    sumMode = (int)lab.findKeyword("SPATIAL_SUMMING");
   }
   else {
-    sumMode = (int)lab.FindKeyword("SAMPLING_FACTOR");
+    sumMode = (int)lab.findKeyword("SAMPLING_FACTOR");
   }
-  if(lab.HasKeyword("EDIT_MODE_ID")) {
-    startSamp = (int)lab.FindKeyword("EDIT_MODE_ID");
+  if(lab.hasKeyword("EDIT_MODE_ID")) {
+    startSamp = (int)lab.findKeyword("EDIT_MODE_ID");
   }
   else {
-    startSamp = (int)lab.FindKeyword("SAMPLE_FIRST_PIXEL");
+    startSamp = (int)lab.findKeyword("SAMPLE_FIRST_PIXEL");
   }
-  PvlGroup inst = outLabel.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup inst = outLabel.findGroup("Instrument", Pvl::Traverse);
   inst += PvlKeyword("SpatialSumming", toString(sumMode));
   inst += PvlKeyword("SampleFirstPixel", toString(startSamp));
 
   //Add all groups to the output cube
   ocube->putGroup(inst);
-  ocube->putGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
+  ocube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
   ocube->putGroup(bbin);
   ocube->putGroup(kern);
 }

@@ -26,7 +26,7 @@ void IsisMain() {
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
   Pvl userPvl(ui.GetFileName("MAP"));
-  PvlGroup &userMappingGrp = userPvl.FindGroup("Mapping", Pvl::Traverse);
+  PvlGroup &userMappingGrp = userPvl.findGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube and get the projection
   Cube *icube = p.SetInputCube("FROM");
@@ -38,39 +38,39 @@ void IsisMain() {
 
   // If the default range is FROM, then wipe out any range data in user mapping file
   if(ui.GetString("DEFAULTRANGE").compare("FROM") == 0 && !ui.GetBoolean("MATCHMAP")) {
-    if(userMappingGrp.HasKeyword("MinimumLatitude")) {
-      userMappingGrp.DeleteKeyword("MinimumLatitude");
+    if(userMappingGrp.hasKeyword("MinimumLatitude")) {
+      userMappingGrp.deleteKeyword("MinimumLatitude");
     }
 
-    if(userMappingGrp.HasKeyword("MaximumLatitude")) {
-      userMappingGrp.DeleteKeyword("MaximumLatitude");
+    if(userMappingGrp.hasKeyword("MaximumLatitude")) {
+      userMappingGrp.deleteKeyword("MaximumLatitude");
     }
 
-    if(userMappingGrp.HasKeyword("MinimumLongitude")) {
-      userMappingGrp.DeleteKeyword("MinimumLongitude");
+    if(userMappingGrp.hasKeyword("MinimumLongitude")) {
+      userMappingGrp.deleteKeyword("MinimumLongitude");
     }
 
-    if(userMappingGrp.HasKeyword("MaximumLongitude")) {
-      userMappingGrp.DeleteKeyword("MaximumLongitude");
+    if(userMappingGrp.hasKeyword("MaximumLongitude")) {
+      userMappingGrp.deleteKeyword("MaximumLongitude");
     }
   }
 
   // Deal with user overrides entered in the GUI. Do this by changing the user's mapping group, which
   // will then overlay anything in the output mapping group.
   if(ui.WasEntered("MINLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
+    userMappingGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
+    userMappingGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MINLON") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("MINLON"))), Pvl::Replace);
+    userMappingGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("MINLON"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLON") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
+    userMappingGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
   }
 
   /**
@@ -81,7 +81,7 @@ void IsisMain() {
    * the user mapping group into the output group a mimimum overrides a minimum and a maximum overrides a maximum.
    */
   bool sameDirection = true;
-  if(userMappingGrp.HasKeyword("LongitudeDirection")) {
+  if(userMappingGrp.hasKeyword("LongitudeDirection")) {
     if(((QString)userMappingGrp["LongitudeDirection"]).compare(fromMappingGrp["LongitudeDirection"]) != 0) {
       sameDirection = false;
     }
@@ -89,7 +89,7 @@ void IsisMain() {
 
   // Since the out mapping group came from the from mapping group, which came from a valid cube,
   // we can assume both min/max lon exists if min longitude exists.
-  if(!sameDirection && outMappingGrp.HasKeyword("MinimumLongitude")) {
+  if(!sameDirection && outMappingGrp.hasKeyword("MinimumLongitude")) {
     double minLon = outMappingGrp["MinimumLongitude"];
     double maxLon = outMappingGrp["MaximumLongitude"];
 
@@ -100,93 +100,93 @@ void IsisMain() {
   if(ui.GetString("PIXRES").compare("FROM") == 0 && !ui.GetBoolean("MATCHMAP")) {
     // Resolution will be in fromMappingGrp and outMappingGrp at this time
     //   delete from user mapping grp
-    if(userMappingGrp.HasKeyword("Scale")) {
-      userMappingGrp.DeleteKeyword("Scale");
+    if(userMappingGrp.hasKeyword("Scale")) {
+      userMappingGrp.deleteKeyword("Scale");
     }
 
-    if(userMappingGrp.HasKeyword("PixelResolution")) {
-      userMappingGrp.DeleteKeyword("PixelResolution");
+    if(userMappingGrp.hasKeyword("PixelResolution")) {
+      userMappingGrp.deleteKeyword("PixelResolution");
     }
   }
   else if(ui.GetString("PIXRES").compare("MAP") == 0 || ui.GetBoolean("MATCHMAP")) {
     // Resolution will be in userMappingGrp - delete all others
-    if(outMappingGrp.HasKeyword("Scale")) {
-      outMappingGrp.DeleteKeyword("Scale");
+    if(outMappingGrp.hasKeyword("Scale")) {
+      outMappingGrp.deleteKeyword("Scale");
     }
 
-    if(outMappingGrp.HasKeyword("PixelResolution")) {
-      outMappingGrp.DeleteKeyword("PixelResolution");
+    if(outMappingGrp.hasKeyword("PixelResolution")) {
+      outMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    if(fromMappingGrp.HasKeyword("Scale"));
+    if(fromMappingGrp.hasKeyword("Scale"));
     {
-      fromMappingGrp.DeleteKeyword("Scale");
+      fromMappingGrp.deleteKeyword("Scale");
     }
 
-    if(fromMappingGrp.HasKeyword("PixelResolution")) {
-      fromMappingGrp.DeleteKeyword("PixelResolution");
+    if(fromMappingGrp.hasKeyword("PixelResolution")) {
+      fromMappingGrp.deleteKeyword("PixelResolution");
     }
   }
   else if(ui.GetString("PIXRES").compare("MPP") == 0) {
     // Resolution specified - delete all and add to outMappingGrp
-    if(outMappingGrp.HasKeyword("Scale")) {
-      outMappingGrp.DeleteKeyword("Scale");
+    if(outMappingGrp.hasKeyword("Scale")) {
+      outMappingGrp.deleteKeyword("Scale");
     }
 
-    if(outMappingGrp.HasKeyword("PixelResolution")) {
-      outMappingGrp.DeleteKeyword("PixelResolution");
+    if(outMappingGrp.hasKeyword("PixelResolution")) {
+      outMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    if(fromMappingGrp.HasKeyword("Scale")) {
-      fromMappingGrp.DeleteKeyword("Scale");
+    if(fromMappingGrp.hasKeyword("Scale")) {
+      fromMappingGrp.deleteKeyword("Scale");
     }
 
-    if(fromMappingGrp.HasKeyword("PixelResolution")) {
-      fromMappingGrp.DeleteKeyword("PixelResolution");
+    if(fromMappingGrp.hasKeyword("PixelResolution")) {
+      fromMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    if(userMappingGrp.HasKeyword("Scale")) {
-      userMappingGrp.DeleteKeyword("Scale");
+    if(userMappingGrp.hasKeyword("Scale")) {
+      userMappingGrp.deleteKeyword("Scale");
     }
 
-    if(userMappingGrp.HasKeyword("PixelResolution")) {
-      userMappingGrp.DeleteKeyword("PixelResolution");
+    if(userMappingGrp.hasKeyword("PixelResolution")) {
+      userMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    outMappingGrp.AddKeyword(PvlKeyword("PixelResolution", toString(ui.GetDouble("RESOLUTION")), "meters/pixel"), Pvl::Replace);
+    outMappingGrp.addKeyword(PvlKeyword("PixelResolution", toString(ui.GetDouble("RESOLUTION")), "meters/pixel"), Pvl::Replace);
   }
   else if(ui.GetString("PIXRES").compare("PPD") == 0) {
     // Resolution specified - delete all and add to outMappingGrp
-    if(outMappingGrp.HasKeyword("Scale")) {
-      outMappingGrp.DeleteKeyword("Scale");
+    if(outMappingGrp.hasKeyword("Scale")) {
+      outMappingGrp.deleteKeyword("Scale");
     }
 
-    if(outMappingGrp.HasKeyword("PixelResolution")) {
-      outMappingGrp.DeleteKeyword("PixelResolution");
+    if(outMappingGrp.hasKeyword("PixelResolution")) {
+      outMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    if(fromMappingGrp.HasKeyword("Scale")) {
-      fromMappingGrp.DeleteKeyword("Scale");
+    if(fromMappingGrp.hasKeyword("Scale")) {
+      fromMappingGrp.deleteKeyword("Scale");
     }
 
-    if(fromMappingGrp.HasKeyword("PixelResolution")) {
-      fromMappingGrp.DeleteKeyword("PixelResolution");
+    if(fromMappingGrp.hasKeyword("PixelResolution")) {
+      fromMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    if(userMappingGrp.HasKeyword("Scale")) {
-      userMappingGrp.DeleteKeyword("Scale");
+    if(userMappingGrp.hasKeyword("Scale")) {
+      userMappingGrp.deleteKeyword("Scale");
     }
 
-    if(userMappingGrp.HasKeyword("PixelResolution")) {
-      userMappingGrp.DeleteKeyword("PixelResolution");
+    if(userMappingGrp.hasKeyword("PixelResolution")) {
+      userMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    outMappingGrp.AddKeyword(PvlKeyword("Scale", toString(ui.GetDouble("RESOLUTION")), "pixels/degree"), Pvl::Replace);
+    outMappingGrp.addKeyword(PvlKeyword("Scale", toString(ui.GetDouble("RESOLUTION")), "pixels/degree"), Pvl::Replace);
   }
 
   // Rotation will NOT Propagate
-  if(outMappingGrp.HasKeyword("Rotation")) {
-    outMappingGrp.DeleteKeyword("Rotation");
+  if(outMappingGrp.hasKeyword("Rotation")) {
+    outMappingGrp.deleteKeyword("Rotation");
   }
 
 
@@ -194,8 +194,8 @@ void IsisMain() {
    * The user specified map template file overrides what ever is in the
    * cube's mapping group.
    */
-  for(int keyword = 0; keyword < userMappingGrp.Keywords(); keyword ++) {
-    outMappingGrp.AddKeyword(userMappingGrp[keyword], Pvl::Replace);
+  for(int keyword = 0; keyword < userMappingGrp.keywords(); keyword ++) {
+    outMappingGrp.addKeyword(userMappingGrp[keyword], Pvl::Replace);
   }
 
   /**
@@ -215,33 +215,33 @@ void IsisMain() {
   if(!sameDirection) {
     PvlGroup longitudes = inproj->MappingLongitudes();
 
-    for(int index = 0; index < longitudes.Keywords(); index ++) {
-      if(!userMappingGrp.HasKeyword(longitudes[index].Name())) {
+    for(int index = 0; index < longitudes.keywords(); index ++) {
+      if(!userMappingGrp.hasKeyword(longitudes[index].name())) {
         // use the from domain because that's where our values are coming from
         if(((QString)userMappingGrp["LongitudeDirection"]).compare("PositiveEast") == 0) {
-          outMappingGrp[longitudes[index].Name()] = toString(
-            Projection::ToPositiveEast(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]));
+          outMappingGrp[longitudes[index].name()] = toString(
+            Projection::ToPositiveEast(outMappingGrp[longitudes[index].name()], outMappingGrp["LongitudeDomain"]));
         }
         else {
-          outMappingGrp[longitudes[index].Name()] = toString(
-            Projection::ToPositiveWest(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]));
+          outMappingGrp[longitudes[index].name()] = toString(
+            Projection::ToPositiveWest(outMappingGrp[longitudes[index].name()], outMappingGrp["LongitudeDomain"]));
         }
       }
     }
   }
 
   // Second, longitude domain
-  if(userMappingGrp.HasKeyword("LongitudeDomain")) { // user set a new domain?
+  if(userMappingGrp.hasKeyword("LongitudeDomain")) { // user set a new domain?
     if((int)userMappingGrp["LongitudeDomain"] != (int)fromMappingGrp["LongitudeDomain"]) { // new domain different?
       PvlGroup longitudes = inproj->MappingLongitudes();
 
-      for(int index = 0; index < longitudes.Keywords(); index ++) {
-        if(!userMappingGrp.HasKeyword(longitudes[index].Name())) {
+      for(int index = 0; index < longitudes.keywords(); index ++) {
+        if(!userMappingGrp.hasKeyword(longitudes[index].name())) {
           if((int)userMappingGrp["LongitudeDomain"] == 180) {
-            outMappingGrp[longitudes[index].Name()] = toString(Projection::To180Domain(outMappingGrp[longitudes[index].Name()]));
+            outMappingGrp[longitudes[index].name()] = toString(Projection::To180Domain(outMappingGrp[longitudes[index].name()]));
           }
           else {
-            outMappingGrp[longitudes[index].Name()] = toString(Projection::To360Domain(outMappingGrp[longitudes[index].Name()]));
+            outMappingGrp[longitudes[index].name()] = toString(Projection::To360Domain(outMappingGrp[longitudes[index].name()]));
           }
         }
       }
@@ -250,22 +250,22 @@ void IsisMain() {
   }
 
   // Third, planetographic/planetocentric
-  if(userMappingGrp.HasKeyword("LatitudeType")) { // user set a new domain?
+  if(userMappingGrp.hasKeyword("LatitudeType")) { // user set a new domain?
     if(((QString)userMappingGrp["LatitudeType"]).compare(fromMappingGrp["LatitudeType"]) != 0) { // new lat type different?
 
       PvlGroup latitudes = inproj->MappingLatitudes();
 
-      for(int index = 0; index < latitudes.Keywords(); index ++) {
-        if(!userMappingGrp.HasKeyword(latitudes[index].Name())) {
+      for(int index = 0; index < latitudes.keywords(); index ++) {
+        if(!userMappingGrp.hasKeyword(latitudes[index].name())) {
           if(((QString)userMappingGrp["LatitudeType"]).compare("Planetographic") == 0) {
-            outMappingGrp[latitudes[index].Name()] = toString(Projection::ToPlanetographic(
-                  (double)fromMappingGrp[latitudes[index].Name()],
+            outMappingGrp[latitudes[index].name()] = toString(Projection::ToPlanetographic(
+                  (double)fromMappingGrp[latitudes[index].name()],
                   (double)fromMappingGrp["EquatorialRadius"],
                   (double)fromMappingGrp["PolarRadius"]));
           }
           else {
-            outMappingGrp[latitudes[index].Name()] = toString(Projection::ToPlanetocentric(
-                  (double)fromMappingGrp[latitudes[index].Name()],
+            outMappingGrp[latitudes[index].name()] = toString(Projection::ToPlanetocentric(
+                  (double)fromMappingGrp[latitudes[index].name()],
                   (double)fromMappingGrp["EquatorialRadius"],
                   (double)fromMappingGrp["PolarRadius"]));
           }
@@ -308,13 +308,13 @@ void IsisMain() {
   int samples, lines;
   Pvl mapData;
   // Copy to preserve cube labels so we can match cube size
-  if(userPvl.HasObject("IsisCube")) {
+  if(userPvl.hasObject("IsisCube")) {
     mapData = userPvl;
-    mapData.FindObject("IsisCube").DeleteGroup("Mapping");
-    mapData.FindObject("IsisCube").AddGroup(outMappingGrp);
+    mapData.findObject("IsisCube").deleteGroup("Mapping");
+    mapData.findObject("IsisCube").addGroup(outMappingGrp);
   }
   else {
-    mapData.AddGroup(outMappingGrp);
+    mapData.addGroup(outMappingGrp);
   }
 
   // *NOTE: The UpperLeftX,UpperLeftY keywords will not be used in the CreateForCube
@@ -342,10 +342,10 @@ void IsisMain() {
   // ProjectionFactory::CreateForCube updated mapData to have the correct
   //   upperleftcornerx, upperleftcornery, scale and resolution. Use these
   //   updated numbers.
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["UpperLeftCornerX"], Pvl::Replace);
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["UpperLeftCornerY"], Pvl::Replace);
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["Scale"], Pvl::Replace);
-  cleanOutGrp.AddKeyword(mapData.FindGroup("Mapping", Pvl::Traverse)["PixelResolution"], Pvl::Replace);
+  cleanOutGrp.addKeyword(mapData.findGroup("Mapping", Pvl::Traverse)["UpperLeftCornerX"], Pvl::Replace);
+  cleanOutGrp.addKeyword(mapData.findGroup("Mapping", Pvl::Traverse)["UpperLeftCornerY"], Pvl::Replace);
+  cleanOutGrp.addKeyword(mapData.findGroup("Mapping", Pvl::Traverse)["Scale"], Pvl::Replace);
+  cleanOutGrp.addKeyword(mapData.findGroup("Mapping", Pvl::Traverse)["PixelResolution"], Pvl::Replace);
 
   ocube->putGroup(cleanOutGrp);
 
@@ -465,8 +465,8 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);
@@ -479,7 +479,7 @@ void LoadMapRange() {
   Pvl userMap;
 
   try {
-    userMap.Read(ui.GetFileName("MAP"));
+    userMap.read(ui.GetFileName("MAP"));
   }
   catch(IException &e) {
   }
@@ -488,7 +488,7 @@ void LoadMapRange() {
   Pvl fromMap;
 
   try {
-    fromMap.Read(ui.GetFileName("FROM"));
+    fromMap.read(ui.GetFileName("FROM"));
   }
   catch(IException &e) {
   }
@@ -497,7 +497,7 @@ void LoadMapRange() {
   PvlGroup fromMapping("Mapping");
 
   try {
-    fromMapping = fromMap.FindGroup("Mapping", Pvl::Traverse);
+    fromMapping = fromMap.findGroup("Mapping", Pvl::Traverse);
   }
   catch(IException &e) {
   }
@@ -505,7 +505,7 @@ void LoadMapRange() {
   PvlGroup userMapping("Mapping");
 
   try {
-    userMapping = userMap.FindGroup("Mapping", Pvl::Traverse);
+    userMapping = userMap.findGroup("Mapping", Pvl::Traverse);
   }
   catch(IException &e) {
   }
@@ -513,13 +513,13 @@ void LoadMapRange() {
   // Do conversions on from map
 
   // Longitude conversions first
-  if(userMapping.HasKeyword("LongitudeDirection")) {
+  if(userMapping.hasKeyword("LongitudeDirection")) {
     if(((QString)userMapping["LongitudeDirection"]).compare(fromMapping["LongitudeDirection"]) != 0) {
       double minLon = fromMapping["MinimumLongitude"];
       double maxLon = fromMapping["MaximumLongitude"];
       int domain = fromMapping["LongitudeDomain"];
 
-      if(userMapping.HasKeyword("LongitudeDomain")) {
+      if(userMapping.hasKeyword("LongitudeDomain")) {
         domain = userMapping["LongitudeDomain"];
       }
 
@@ -535,7 +535,7 @@ void LoadMapRange() {
   }
 
   // Latitude conversions now
-  if(userMapping.HasKeyword("LatitudeType")) { // user set a new domain?
+  if(userMapping.hasKeyword("LatitudeType")) { // user set a new domain?
     if(((QString)userMapping["LatitudeType"]).compare(fromMapping["LatitudeType"]) != 0) { // new lat type different?
       if(((QString)userMapping["LatitudeType"]).compare("Planetographic") == 0) {
         fromMapping["MinimumLatitude"] = toString(Projection::ToPlanetographic(
@@ -563,8 +563,8 @@ void LoadMapRange() {
   // Failed at longitudes, use our originals!
   if((double)fromMapping["MinimumLongitude"] >= (double)fromMapping["MaximumLongitude"]) {
     try {
-      fromMapping["MinimumLongitude"] = fromMap.FindGroup("Mapping", Pvl::Traverse)["MinimumLongitude"];
-      fromMapping["MaximumLongitude"] = fromMap.FindGroup("Mapping", Pvl::Traverse)["MaximumLongitude"];
+      fromMapping["MinimumLongitude"] = fromMap.findGroup("Mapping", Pvl::Traverse)["MinimumLongitude"];
+      fromMapping["MaximumLongitude"] = fromMap.findGroup("Mapping", Pvl::Traverse)["MaximumLongitude"];
     }
     catch(IException &e) {
     }
@@ -572,19 +572,19 @@ void LoadMapRange() {
 
   // Overlay lat/lons in map file (if DEFAULTRANGE=MAP)
   if(ui.GetString("DEFAULTRANGE") == "MAP") {
-    if(userMapping.HasKeyword("MinimumLatitude")) {
+    if(userMapping.hasKeyword("MinimumLatitude")) {
       fromMapping["MinimumLatitude"] = userMapping["MinimumLatitude"];
     }
 
-    if(userMapping.HasKeyword("MaximumLatitude")) {
+    if(userMapping.hasKeyword("MaximumLatitude")) {
       fromMapping["MaximumLatitude"] = userMapping["MaximumLatitude"];
     }
 
-    if(userMapping.HasKeyword("MinimumLongitude")) {
+    if(userMapping.hasKeyword("MinimumLongitude")) {
       fromMapping["MinimumLongitude"] = userMapping["MinimumLongitude"];
     }
 
-    if(userMapping.HasKeyword("MaximumLongitude")) {
+    if(userMapping.hasKeyword("MaximumLongitude")) {
       fromMapping["MaximumLongitude"] = userMapping["MaximumLongitude"];
     }
   }

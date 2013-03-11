@@ -66,10 +66,10 @@ void IsisMain() {
   p.EndProcess();
 
   PvlKeyword dnPairs = PvlKeyword("StretchPairs");
-  dnPairs.AddValue(str.Text());
+  dnPairs.addValue(str.Text());
 
   PvlGroup results = PvlGroup("Results");
-  results.AddKeyword(dnPairs);
+  results.addKeyword(dnPairs);
 
   Application::Log(results);
 

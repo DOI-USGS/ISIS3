@@ -1380,7 +1380,7 @@ namespace Isis {
 
     PvlKeyword filterName;
     getBandFilterName(filterName);
-    int iFilterSize = filterName.Size();
+    int iFilterSize = filterName.size();
 
     // color
     if(p_color ) {
@@ -1462,11 +1462,11 @@ namespace Isis {
   {
     // get the band info
     Pvl* cubeLbl = p_cube->label();
-    PvlObject isisObj = cubeLbl->FindObject("IsisCube");
-    if (isisObj.HasGroup("BandBin")) {
-      PvlGroup bandBinGrp = isisObj.FindGroup("BandBin");
-      if(bandBinGrp.HasKeyword("FilterName")) {
-        pFilterNameKey =bandBinGrp.FindKeyword("FilterName") ;
+    PvlObject isisObj = cubeLbl->findObject("IsisCube");
+    if (isisObj.hasGroup("BandBin")) {
+      PvlGroup bandBinGrp = isisObj.findGroup("BandBin");
+      if(bandBinGrp.hasKeyword("FilterName")) {
+        pFilterNameKey =bandBinGrp.findKeyword("FilterName") ;
       }
     }
   }
@@ -1512,7 +1512,7 @@ namespace Isis {
     QString sBandInfo ;
     PvlKeyword filterNameKey;
     getBandFilterName(filterNameKey);
-    int iFilterSize = filterNameKey.Size();
+    int iFilterSize = filterNameKey.size();
 
     // color
     if(p_color ) {

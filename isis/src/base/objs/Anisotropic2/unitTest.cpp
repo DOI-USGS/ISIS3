@@ -26,18 +26,18 @@ int main() {
   algp += PvlKeyword("Name", "Lambert");
 
   PvlObject op("PhotometricModel");
-  op.AddGroup(algp);
+  op.addGroup(algp);
 
   PvlGroup alga("Algorithm");
   alga += PvlKeyword("Name", "Anisotropic2");
   alga += PvlKeyword("Tau", "0.28");
 
   PvlObject oa("AtmosphericModel");
-  oa.AddGroup(alga);
+  oa.addGroup(alga);
 
   Pvl pvl;
-  pvl.AddObject(op);
-  pvl.AddObject(oa);
+  pvl.addObject(op);
+  pvl.addObject(oa);
   std::cout << pvl << std::endl << std::endl;
 
   try {

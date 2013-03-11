@@ -911,12 +911,12 @@ namespace Isis {
                                            const bool &manage) {
     KernelList klist;
     // Get the kernel group and load main kernels
-    PvlGroup &kernels = pvl.FindGroup("Kernels",Pvl::Traverse);
+    PvlGroup &kernels = pvl.findGroup("Kernels",Pvl::Traverse);
     // Check for the keyword
-    if (kernels.HasKeyword(kname)) {
+    if (kernels.hasKeyword(kname)) {
       PvlKeyword &kkey = kernels[kname];
-      for (int i = 0 ; i < kkey.Size() ; i++) {
-        if (!kkey.IsNull(i)) {
+      for (int i = 0 ; i < kkey.size() ; i++) {
+        if (!kkey.isNull(i)) {
           if (kkey[i].toLower() != "table") {
             klist.push_back(examine(kkey[i], manage));
           }
@@ -1241,10 +1241,10 @@ namespace Isis {
    *         determined, 0 is returned.
    */
   int Kernels::getCameraVersion(Pvl &pvl) const {
-    PvlGroup &kernels = pvl.FindGroup("Kernels",Pvl::Traverse);
+    PvlGroup &kernels = pvl.findGroup("Kernels",Pvl::Traverse);
     int cv(0);
     // Check for the keyword
-    if (kernels.HasKeyword("CameraVersion")) {
+    if (kernels.hasKeyword("CameraVersion")) {
       PvlKeyword &kkey = kernels["CameraVersion"];
       cv = IString(kkey[0]).ToInteger();
     }

@@ -51,7 +51,7 @@ namespace Isis {
       /**
        * Convert the binary representation to Pvl (any pvl version).
        */
-      virtual Pvl ToPvl() const = 0;
+      virtual Pvl toPvl() const = 0;
 
     private:
       /**

@@ -51,7 +51,7 @@ namespace Isis {
     instrumentRotation()->SetFrame(-74690);
 
     // Get required keywords from instrument group
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     int tdiMode = inst["Tdi"];
     double binMode = inst["Summing"];
     int chan = inst["ChannelNumber"];

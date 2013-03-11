@@ -21,23 +21,23 @@ int main() {
   cout << "p: " << p << "\n";
   Pvl &ref = p;
   Pvl copy(p);
-  copy.DeleteKeyword("LongKeyword");
+  copy.deleteKeyword("LongKeyword");
   cout << "copy deleted a keyword...\np: " << p << "\n\ncopy: " << copy << "\n\n\n";
 
   PvlGroup g("Test");
   g += PvlKeyword("Keyword", "Value");
-  p.AddGroup(g);
+  p.addGroup(g);
 
-  p.SetTerminator("");
-  ref.Write("tmp.unitTest");
-  p.Append("tmp.unitTest");
+  p.setTerminator("");
+  ref.write("tmp.unitTest");
+  p.append("tmp.unitTest");
 
   Pvl p2;
-  p2.Read("tmp.unitTest");
+  p2.read("tmp.unitTest");
   cout << p2 << endl << endl;
 
   Pvl p3;
-  p3.Read("unitTest.pvl");
+  p3.read("unitTest.pvl");
   cout << p3 << endl << endl;
 
   stringstream os;
@@ -50,7 +50,7 @@ int main() {
 
   try {
     Pvl p5;
-    p5.Read("unitTest2.pvl");
+    p5.read("unitTest2.pvl");
     cout << p5 << endl << endl;
   }
   catch(IException &e) {
@@ -78,7 +78,7 @@ int main() {
 
   try {
     Pvl p6;
-    p6.Read("unitTest3.pvl");
+    p6.read("unitTest3.pvl");
     cout << p6 << endl << endl;
   }
   catch(IException &e) {
@@ -107,7 +107,7 @@ int main() {
   cout << "Testing MESSENGER labels with data at bottom..." << endl << endl;
   try {
     Pvl p7;
-    p7.Read("unitTest4.pvl");
+    p7.read("unitTest4.pvl");
     cout << p7 << endl << endl;
   }
   catch(IException &e) {
@@ -139,6 +139,6 @@ int main() {
   cout << "\n\n***Test PVL**\n" << pvlUser << endl;
 
   Pvl pvlResults;
-  pvlTmpl.ValidatePvl(pvlUser, pvlResults);
+  pvlTmpl.validatePvl(pvlUser, pvlResults);
   cout << "\n\n**Result PVL**\n" << pvlResults << endl;
 }

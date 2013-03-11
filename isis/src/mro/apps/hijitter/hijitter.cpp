@@ -351,7 +351,7 @@ void init(FileList &inList) {
     try {
       FileName currentFileName(inList[i]);
       Pvl labels(currentFileName.expanded());
-      PvlGroup &inst = labels.FindGroup("Instrument", Pvl::Traverse);
+      PvlGroup &inst = labels.findGroup("Instrument", Pvl::Traverse);
 
       QString ccdKeywordValue = (QString)inst["CcdId"];
       int ccdNumber = 0;

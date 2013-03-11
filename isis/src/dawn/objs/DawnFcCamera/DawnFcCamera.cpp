@@ -106,7 +106,7 @@ namespace Isis {
     // spacecraft clock start count. There is a delay of 193 ms while the
     // CCD is discharged or cleared.  Finally the exporsure information
     // needs to be obtained.
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
     double et = getClockTime(stime).Et();
     et += 193.0 / 1000.0;

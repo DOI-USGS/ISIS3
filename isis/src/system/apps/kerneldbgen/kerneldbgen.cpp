@@ -38,7 +38,7 @@ void IsisMain() {
   PvlObject selections(kernelType);
 
   selections += PvlKeyword("RunTime", iTime::CurrentLocalTime());
-  selections.AddGroup(dependency);
+  selections.addGroup(dependency);
 
   /* Removed because Nadir is not done using this*/
   //if (ui.GetString("NADIRFILTER") != "none" &&
@@ -49,8 +49,8 @@ void IsisMain() {
   //  std::vector<QString> filter;
   //  ui.GetString("NADIRFILTER", filter);
   //  PvlObject result = sdg.Direct("Nadir",location, filter);
-  //  PvlObject::PvlGroupIterator grp = result.BeginGroup();
-  //  while(grp != result.EndGroup()){ selections.AddGroup(*grp);grp++;}
+  //  PvlObject::PvlGroupIterator grp = result.beginGroup();
+  //  while(grp != result.endGroup()){ selections.addGroup(*grp);grp++;}
   //}
   if (ui.GetString("PREDICTFILTER") != "none" &&
       ui.GetString("PREDICTDIR") != "none") {
@@ -60,9 +60,9 @@ void IsisMain() {
     std::vector<QString> filter;
     ui.GetString("PREDICTFILTER", filter);
     PvlObject result = sdg.Direct("Predicted", location, filter);
-    PvlObject::PvlGroupIterator grp = result.BeginGroup();
-    while(grp != result.EndGroup()) {
-      selections.AddGroup(*grp);
+    PvlObject::PvlGroupIterator grp = result.beginGroup();
+    while(grp != result.endGroup()) {
+      selections.addGroup(*grp);
       grp++;
     }
   }
@@ -75,9 +75,9 @@ void IsisMain() {
     std::vector<QString> filter;
     ui.GetString("RECONFILTER", filter);
     PvlObject result = sdg.Direct("Reconstructed", location, filter);
-    PvlObject::PvlGroupIterator grp = result.BeginGroup();
-    while(grp != result.EndGroup()) {
-      selections.AddGroup(*grp);
+    PvlObject::PvlGroupIterator grp = result.beginGroup();
+    while(grp != result.endGroup()) {
+      selections.addGroup(*grp);
       grp++;
     }
   }
@@ -90,9 +90,9 @@ void IsisMain() {
     std::vector<QString> filter;
     ui.GetString("SMITHEDFILTER", filter);
     PvlObject result = sdg.Direct("Smithed", location, filter);
-    PvlObject::PvlGroupIterator grp = result.BeginGroup();
-    while(grp != result.EndGroup()) {
-      selections.AddGroup(*grp);
+    PvlObject::PvlGroupIterator grp = result.beginGroup();
+    while(grp != result.endGroup()) {
+      selections.addGroup(*grp);
       grp++;
     }
   }
@@ -116,8 +116,8 @@ void IsisMain() {
   }
 
   Pvl writer;
-  writer.AddObject(selections);
-  writer.Write(to.expanded());
+  writer.addObject(selections);
+  writer.write(to.expanded());
 }
 
 
@@ -165,19 +165,19 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
       if (kernelFileName.extension() == "db") {
         Pvl kernelDbPvl(kernelFileName.expanded());
 
-        if (kernelDbPvl.Objects() == 1) {
-          PvlObject &primaryObject = kernelDbPvl.Object(0);
+        if (kernelDbPvl.objects() == 1) {
+          PvlObject &primaryObject = kernelDbPvl.object(0);
 
-          if (primaryObject.Groups() == 1) {
-            PvlGroup &primaryGroup = primaryObject.Group(0);
+          if (primaryObject.groups() == 1) {
+            PvlGroup &primaryGroup = primaryObject.group(0);
 
-            if (primaryGroup.Name().toLower() == "selection") {
+            if (primaryGroup.name().toLower() == "selection") {
 
-              if (primaryGroup.Keywords() == 1) {
+              if (primaryGroup.keywords() == 1) {
                 PvlKeyword &key = primaryGroup[0];
 
-                if (key.IsNamed("File")) {
-                  if (key.Size() == 2) {
+                if (key.isNamed("File")) {
+                  if (key.size() == 2) {
                     kernelFileName = safeHighestVersion(QString("$%1/%2").arg(key[0]).arg(key[1]));
                   }
                   else {
@@ -185,7 +185,7 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
                                      QObject::tr("Expected the keyword File in [%1] to have two "
                                                  "values, a mission data directory and a path into "
                                                  "that directory. The keyword has [%2] values.")
-                                       .arg(kernelFileName.original()).arg(key.Size()),
+                                       .arg(kernelFileName.original()).arg(key.size()),
                                      _FILEINFO_);
                   }
                 }
@@ -195,8 +195,8 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
                                                "[%2] in the DB file [%3] to have a single keyword "
                                                "named File, but the keyword was named [%4] "
                                                "instead")
-                                     .arg(primaryGroup.Name()).arg(primaryObject.Name())
-                                     .arg(kernelFileName.original()).arg(key.Name()),
+                                     .arg(primaryGroup.name()).arg(primaryObject.name())
+                                     .arg(kernelFileName.original()).arg(key.name()),
                                    _FILEINFO_);
                 }
               }
@@ -205,8 +205,8 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
                                  QObject::tr("Expected Pvl Group [%1] in the first Pvl Object [%2] "
                                              "in the DB file [%3] to have a single keyword (named "
                                              "File), but found [%4] keywords")
-                                   .arg(primaryGroup.Name()).arg(primaryObject.Name())
-                                   .arg(kernelFileName.original()).arg(primaryGroup.Keywords()),
+                                   .arg(primaryGroup.name()).arg(primaryObject.name())
+                                   .arg(kernelFileName.original()).arg(primaryGroup.keywords()),
                                  _FILEINFO_);
               }
             }
@@ -214,8 +214,8 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
               throw IException(IException::Unknown,
                                QObject::tr("Expected Pvl Group in the first Pvl Object [%1] in "
                                            "the DB file [%2] to be named Selection but found [%3]")
-                                 .arg(primaryObject.Name()).arg(kernelFileName.original())
-                                 .arg(primaryGroup.Name()),
+                                 .arg(primaryObject.name()).arg(kernelFileName.original())
+                                 .arg(primaryGroup.name()),
                                _FILEINFO_);
             }
           }
@@ -223,8 +223,8 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
             throw IException(IException::Unknown,
                              QObject::tr("Expected one Pvl Group in the first Pvl Object [%1] in "
                                          "the DB file [%2] but found [%3]")
-                               .arg(primaryObject.Name()).arg(kernelFileName.original())
-                               .arg(primaryObject.Groups()),
+                               .arg(primaryObject.name()).arg(kernelFileName.original())
+                               .arg(primaryObject.groups()),
                              _FILEINFO_);
           }
         }
@@ -232,7 +232,7 @@ QList<FileName> evaluateDependencies(PvlGroup &dependencyGroup, QString kernelTy
           throw IException(IException::Unknown,
                            QObject::tr("Expected one Pvl Object in the DB file [%1] but "
                                        "found [%2]")
-                             .arg(kernelFileName.original()).arg(kernelDbPvl.Objects()),
+                             .arg(kernelFileName.original()).arg(kernelDbPvl.objects()),
                            _FILEINFO_);
         }
       }

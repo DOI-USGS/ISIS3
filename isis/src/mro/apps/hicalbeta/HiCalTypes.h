@@ -80,7 +80,7 @@ class HiHistory {
     PvlKeyword makekey(const QString &name = "History") const {
       PvlKeyword key(name);
       for (unsigned int i = 0 ; i < _events.size() ; i++) {
-        key.AddValue(_events[i]);
+        key.addValue(_events[i]);
       }
       return (key); 
     }

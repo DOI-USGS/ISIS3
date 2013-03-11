@@ -53,7 +53,7 @@ int main(void) {
 
     Pvl p("$ISIS3TESTDATA/isis/src/dawn/objs/DawnVirCamera/VIR_VIS_1B_1_362681635_1.cub");
     DawnVirCamera *cam = (DawnVirCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -66,7 +66,7 @@ int main(void) {
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
     // Test Shutter Open/Close 
-    //const PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
+    //const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
     std::pair< double, double > imgTimes = cam->StartEndEphemerisTimes();
     cout << "Start Time: " << imgTimes.first << "\n";
     cout << "End Time:   " << imgTimes.second << "\n";

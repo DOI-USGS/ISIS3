@@ -143,21 +143,21 @@ void IsisMain() {
   PvlKeyword keyword;
 
   //four that are the same for every panaramic mission
-  keyword.SetName("SpacecraftName");
-  keyword.SetValue(mission);
-  inst_pvlG.AddKeyword(keyword);
+  keyword.setName("SpacecraftName");
+  keyword.setValue(mission);
+  inst_pvlG.addKeyword(keyword);
 
-  keyword.SetName("InstrumentName");
-  keyword.SetValue(transTable.Translate("InstrumentName","whatever"));
-  inst_pvlG.AddKeyword(keyword);
+  keyword.setName("InstrumentName");
+  keyword.setValue(transTable.Translate("InstrumentName","whatever"));
+  inst_pvlG.addKeyword(keyword);
 
-  keyword.SetName("InstrumentId");
-  keyword.SetValue(transTable.Translate("InstrumentId","whatever"));
-  inst_pvlG.AddKeyword(keyword);
+  keyword.setName("InstrumentId");
+  keyword.setValue(transTable.Translate("InstrumentId","whatever"));
+  inst_pvlG.addKeyword(keyword);
 
-  keyword.SetName("TargetName");
-  keyword.SetValue(transTable.Translate("TargetName","whatever"));
-  inst_pvlG.AddKeyword(keyword);
+  keyword.setName("TargetName");
+  keyword.setValue(transTable.Translate("TargetName","whatever"));
+  inst_pvlG.addKeyword(keyword);
 
   //three that need to be calculated from input values
   horV = ui.GetDouble("VEL_HORIZ");
@@ -182,61 +182,61 @@ void IsisMain() {
   time1 = time0 + led*FIDL*43;
 
   isisTime = time0;
-  keyword.SetName("StartTime");
-  keyword.SetValue(iStrTEMP=isisTime.UTC());
-  inst_pvlG.AddKeyword(keyword);
+  keyword.setName("StartTime");
+  keyword.setValue(iStrTEMP=isisTime.UTC());
+  inst_pvlG.addKeyword(keyword);
 
   isisTime = time1;
-  keyword.SetName("StopTime");
-  keyword.SetValue(iStrTEMP=isisTime.UTC());
-  inst_pvlG.AddKeyword(keyword);
+  keyword.setName("StopTime");
+  keyword.setValue(iStrTEMP=isisTime.UTC());
+  inst_pvlG.addKeyword(keyword);
 
-  keyword.SetName("LineExposureDuration");
+  keyword.setName("LineExposureDuration");
   //converted led to msec/mm--negative sign to account for the anti-parallel time and line axes
-  keyword.SetValue(iStrTEMP=toString(-led),"sec/mm");  
-  inst_pvlG.AddKeyword(keyword);
+  keyword.setValue(iStrTEMP=toString(-led),"sec/mm");  
+  inst_pvlG.addKeyword(keyword);
 
   panCube.putGroup(inst_pvlG);
 
   ///////////////////////////////////The kernals group
-  kernels_pvlG.SetName("Kernels");
-  kernels_pvlG.Clear();
+  kernels_pvlG.setName("Kernels");
+  kernels_pvlG.clear();
 
-  keyword.SetName("NaifFrameCode");
-  keyword.SetValue(toString(insCode));
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("NaifFrameCode");
+  keyword.setValue(toString(insCode));
+  kernels_pvlG.addKeyword(keyword);
 
-  keyword.SetName("LeapSecond");
-  keyword.SetValue( transTable.Translate("LeapSecond","File1") );
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("LeapSecond");
+  keyword.setValue( transTable.Translate("LeapSecond","File1") );
+  kernels_pvlG.addKeyword(keyword);
 
-  keyword.SetName("TargetAttitudeShape");
-  keyword.SetValue( transTable.Translate("TargetAttitudeShape", "File1") );
-  keyword.AddValue( transTable.Translate("TargetAttitudeShape", "File2") );
-  keyword.AddValue( transTable.Translate("TargetAttitudeShape", "File3") );
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("TargetAttitudeShape");
+  keyword.setValue( transTable.Translate("TargetAttitudeShape", "File1") );
+  keyword.addValue( transTable.Translate("TargetAttitudeShape", "File2") );
+  keyword.addValue( transTable.Translate("TargetAttitudeShape", "File3") );
+  kernels_pvlG.addKeyword(keyword);
 
-  keyword.SetName("TargetPosition");
-  keyword.SetValue("Table");
-  keyword.AddValue( transTable.Translate("TargetPosition", "File1") );
-  keyword.AddValue( transTable.Translate("TargetPosition", "File2") );
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("TargetPosition");
+  keyword.setValue("Table");
+  keyword.addValue( transTable.Translate("TargetPosition", "File1") );
+  keyword.addValue( transTable.Translate("TargetPosition", "File2") );
+  kernels_pvlG.addKeyword(keyword);
 
-  keyword.SetName("ShapeModel");
-  keyword.SetValue( transTable.Translate("ShapeModel", "File1") );
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("ShapeModel");
+  keyword.setValue( transTable.Translate("ShapeModel", "File1") );
+  kernels_pvlG.addKeyword(keyword);
 
-  keyword.SetName("InstrumentPointing");
-  keyword.SetValue("Table");
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("InstrumentPointing");
+  keyword.setValue("Table");
+  kernels_pvlG.addKeyword(keyword);
 
-  keyword.SetName("InstrumentPosition");
-  keyword.SetValue("Table");
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("InstrumentPosition");
+  keyword.setValue("Table");
+  kernels_pvlG.addKeyword(keyword);
 
-  keyword.SetName("InstrumentAddendum");
-  keyword.SetValue( transTable.Translate("InstrumentAddendum",mission));
-  kernels_pvlG.AddKeyword(keyword);
+  keyword.setName("InstrumentAddendum");
+  keyword.setValue( transTable.Translate("InstrumentAddendum",mission));
+  kernels_pvlG.addKeyword(keyword);
 
   panCube.putGroup(kernels_pvlG);
 
@@ -564,21 +564,21 @@ void IsisMain() {
   tableRot.Label() += PvlKeyword("CkTableEndTime", toString(Q[NODES-1][4]));
   tableRot.Label() += PvlKeyword("Description", "Created by appollopan2isis");
 
-  keyword.SetName("TimeDependentFrames");
-  keyword.SetValue(toString(scFrameCode));
-  keyword.AddValue("1");
+  keyword.setName("TimeDependentFrames");
+  keyword.setValue(toString(scFrameCode));
+  keyword.addValue("1");
   tableRot.Label() += keyword;
 
-  keyword.SetName("ConstantFrames");
-  keyword.SetValue(toString(insCode));
-  keyword.AddValue(toString(scFrameCode));
+  keyword.setName("ConstantFrames");
+  keyword.setValue(toString(insCode));
+  keyword.addValue(toString(scFrameCode));
   tableRot.Label() += keyword;
 
-  keyword.SetName("ConstantRotation");
-  keyword.SetValue("1");
+  keyword.setName("ConstantRotation");
+  keyword.setValue("1");
   for (i=1;i<9;i++)
-    if (i%4 == 0) keyword.AddValue("1");
-    else keyword.AddValue("0");
+    if (i%4 == 0) keyword.addValue("1");
+    else keyword.addValue("0");
   tableRot.Label() += keyword;
   panCube.write(tableRot);
 
@@ -643,7 +643,7 @@ void IsisMain() {
   //parameters for maximum correlation autoregestration  
   // see:  file:///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
   FileName fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
-  pvl.Read(fiducialPvl.expanded());  //read in the autoreg parameters
+  pvl.read(fiducialPvl.expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
 
   *arS->PatternChip()   = patternS;  //patternS chip is constant
@@ -808,7 +808,7 @@ void Load_Kernel(Isis::PvlKeyword &key) {
   //Load all the kernal files (file names are stored as values of the PvlKeyword)
   NaifStatus::CheckErrors();
 
-  for(int i = 0; i < key.Size(); i++) {
+  for(int i = 0; i < key.size(); i++) {
      if(key[i] == "") continue;
      if(QString(key[i]).toUpper() == "NULL") break;
      if(QString(key[i]).toUpper() == "NADIR") break;

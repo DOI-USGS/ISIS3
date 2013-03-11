@@ -39,9 +39,9 @@ void IsisMain() {
 
   // Fix the StartTime and StopTime keywords from having the 'Z' value at the end
   Pvl *outLabel = ocube->label();
-  PvlGroup &inst = outLabel->FindGroup("Instrument", Isis::PvlObject::Traverse);
-  PvlKeyword &start = inst.FindKeyword("StartTime");
-  PvlKeyword &stop  = inst.FindKeyword("StopTime");
+  PvlGroup &inst = outLabel->findGroup("Instrument", Isis::PvlObject::Traverse);
+  PvlKeyword &start = inst.findKeyword("StartTime");
+  PvlKeyword &stop  = inst.findKeyword("StopTime");
   QString startValue = start[0];
   QString stopValue  = stop[0];
   start[0] = startValue.remove(QRegExp("Z$"));
@@ -120,7 +120,7 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   Pvl *outLabel = ocube->label();
 
   // Get the directory where the CISS translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Cassini"] + "/translations/";
 
   // Translate
@@ -128,38 +128,38 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto((*outLabel));
 
-  PvlGroup &inst = outLabel->FindGroup("Instrument", Isis::PvlObject::Traverse);
+  PvlGroup &inst = outLabel->findGroup("Instrument", Isis::PvlObject::Traverse);
 
   // Create the correct SpacecraftClockCount value
-  PvlGroup &inInst = labelPvl.FindGroup("ISIS_INSTRUMENT", Pvl::Traverse);
-  QString scc = inInst.FindKeyword("SPACECRAFT_CLOCK_CNT_PARTITION");
-  scc += "/" + (QString) inInst.FindKeyword("ORIGINAL_SPACECRAFT_CLOCK_START_COUN");
-  inst.AddKeyword(PvlKeyword("SpacecraftClockCount", scc));
+  PvlGroup &inInst = labelPvl.findGroup("ISIS_INSTRUMENT", Pvl::Traverse);
+  QString scc = inInst.findKeyword("SPACECRAFT_CLOCK_CNT_PARTITION");
+  scc += "/" + (QString) inInst.findKeyword("ORIGINAL_SPACECRAFT_CLOCK_START_COUN");
+  inst.addKeyword(PvlKeyword("SpacecraftClockCount", scc));
 
   // dataConv is used later
-  QString dataConv = inInst.FindKeyword("DATA_CONVERSION_TYPE");
-  inst.AddKeyword(PvlKeyword("DataConversionType", dataConv));
+  QString dataConv = inInst.findKeyword("DATA_CONVERSION_TYPE");
+  inst.addKeyword(PvlKeyword("DataConversionType", dataConv));
 
   //to add an array of values
-  PvlKeyword opticsTemp(inInst.FindKeyword("OPTICS_TEMPERATURE"));
-  opticsTemp.SetName("OpticsTemperature");
-  inst.AddKeyword(opticsTemp);
+  PvlKeyword opticsTemp(inInst.findKeyword("OPTICS_TEMPERATURE"));
+  opticsTemp.setName("OpticsTemperature");
+  inst.addKeyword(opticsTemp);
 
   //two possible label names for same keyword
-  if(labelPvl.HasKeyword("ENCODING_TYPE")) {
-    QString encodingType = labelPvl.FindKeyword("ENCODING_TYPE", Pvl::Traverse);
-    inst.AddKeyword(PvlKeyword("CompressionType", encodingType));
+  if(labelPvl.hasKeyword("ENCODING_TYPE")) {
+    QString encodingType = labelPvl.findKeyword("ENCODING_TYPE", Pvl::Traverse);
+    inst.addKeyword(PvlKeyword("CompressionType", encodingType));
   }
   else {
-    QString instCmprsType = labelPvl.FindKeyword("INST_CMPRS_TYPE", Pvl::Traverse);
-    inst.AddKeyword(PvlKeyword("CompressionType", instCmprsType));
+    QString instCmprsType = labelPvl.findKeyword("INST_CMPRS_TYPE", Pvl::Traverse);
+    inst.addKeyword(PvlKeyword("CompressionType", instCmprsType));
   }
 
-  QString flightSoftware = labelPvl.FindKeyword("FLIGHT_SOFTWARE_VERSION_ID", Pvl::Traverse);
-  inst.AddKeyword(PvlKeyword("FlightSoftwareVersionId", flightSoftware));
+  QString flightSoftware = labelPvl.findKeyword("FLIGHT_SOFTWARE_VERSION_ID", Pvl::Traverse);
+  inst.addKeyword(PvlKeyword("FlightSoftwareVersionId", flightSoftware));
 
   // Sets the needed Kernel FrameCode
-  QString instrumentID = inst.FindKeyword("InstrumentId");
+  QString instrumentID = inst.findKeyword("InstrumentId");
   PvlGroup kerns("Kernels");
   if(instrumentID == "ISSNA") {
     kerns += PvlKeyword("NaifFrameCode", toString(-82360));
@@ -172,10 +172,10 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
     msg += "angle or wide angle images";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  outLabel->FindObject("IsisCube").AddGroup(kerns);
+  outLabel->findObject("IsisCube").addGroup(kerns);
 
   // Create BandBin group
-  QString filter = labelPvl.FindKeyword("BAND_BIN_FILTER_NAME", Isis::PvlObject::Traverse)[0];
+  QString filter = labelPvl.findKeyword("BAND_BIN_FILTER_NAME", Isis::PvlObject::Traverse)[0];
   filter = filter.mid(0, 3) + "/" + filter.mid(4);
   QString cameraAngleDefs;
   if(instrumentID.at(3) == 'N') {
@@ -211,6 +211,6 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   bandBin += PvlKeyword("OriginalBand", "1");
   bandBin += PvlKeyword("Center", toString(center));
   bandBin += PvlKeyword("Width", toString(width));
-  outLabel->FindObject("IsisCube").AddGroup(bandBin);
+  outLabel->findObject("IsisCube").addGroup(bandBin);
 
 }

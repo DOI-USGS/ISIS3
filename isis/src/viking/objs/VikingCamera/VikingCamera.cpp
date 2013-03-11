@@ -59,7 +59,7 @@ namespace Isis {
 
     // Find out what camera is being used, and set the focal length, altinstcode,
     // raster orientation, cone, crosscone, and camera
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString spacecraft = inst["SPACECRAFTNAME"];
     QString instId = inst["INSTRUMENTID"];
     QString cam;

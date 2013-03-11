@@ -23,7 +23,7 @@ void IsisMain() {
   Pvl pvl(ui.GetFileName("KERNEL"));
 
   // Access the Kernel group section of the input file
-  const PvlGroup &kern = pvl.FindGroup("KERNEL");
+  const PvlGroup &kern = pvl.findGroup("KERNEL");
 
   int lines =  kern["lines"];
   int samples = kern["samples"];
@@ -39,7 +39,7 @@ void IsisMain() {
   }
 
   // Error check kernel for proper amount of data - lines*samples
-  if(lines *samples != kern["data"].Size()) {
+  if(lines *samples != kern["data"].size()) {
     IString msg = "Your kernel does not specify the correct amount of data, must";
     msg += " be equal to lines * samples [";
     msg += IString(lines * samples);
@@ -55,7 +55,7 @@ void IsisMain() {
   p.SetBoxcarSize(samples, lines);
 
   // Iterate through the input kernel's data values to fill the coefs array
-  for(int i = 0 ; i < kern["data"].Size() ; i ++) {
+  for(int i = 0 ; i < kern["data"].size() ; i ++) {
     coefs.push_back(toDouble(kern["data"][i]));
   }
 

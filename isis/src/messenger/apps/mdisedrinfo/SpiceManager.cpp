@@ -88,13 +88,13 @@ namespace Isis {
 
     QString kernlist;
     // Get the kernel group and load main kernels
-    PvlGroup kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup kernels = pvl.findGroup("Kernels", Pvl::Traverse);
     //  Changed 2008-02-27 to load planetary ephemeris before spacecraft
     //  since MESSENGER team may update planet data in the s/c SPK.
     loadKernelFromTable(kernels["TargetPosition"], "SunPosition", pvl);
 
     //  Now do s/c ephemeris
-    if(kernels.HasKeyword("SpacecraftPosition")) {
+    if(kernels.hasKeyword("SpacecraftPosition")) {
       loadKernel(kernels["SpacecraftPosition"]);
     }
     else {
@@ -102,7 +102,7 @@ namespace Isis {
                           pvl);
     }
 
-    if(kernels.HasKeyword("SpacecraftPointing")) {
+    if(kernels.hasKeyword("SpacecraftPointing")) {
       loadKernel(kernels["SpacecraftPointing"]);
     }
     else {
@@ -110,11 +110,11 @@ namespace Isis {
                           pvl);
     }
 
-    if(kernels.HasKeyword("Frame")) {
+    if(kernels.hasKeyword("Frame")) {
       loadKernel(kernels["Frame"]);
     }
 
-    if(kernels.HasKeyword("Extra")) {
+    if(kernels.hasKeyword("Extra")) {
       loadKernel(kernels["Extra"]);
     }
 
@@ -215,7 +215,7 @@ namespace Isis {
    * @see  loadKernelFromTable()
    */
   void SpiceManager::loadKernel(PvlKeyword &key) {
-    for(int i = 0; i < key.Size(); i++) {
+    for(int i = 0; i < key.size(); i++) {
       if(key[i] == "") continue;
       if(IString(key[i]).UpCase() == "NULL") continue;
       if(IString(key[i]).UpCase() == "NADIR") continue;
@@ -249,11 +249,11 @@ namespace Isis {
     }
     else {
       PvlObject::PvlObjectIterator objIter;
-      for(objIter = pvl.BeginObject() ; objIter != pvl.EndObject() ; ++objIter) {
-        if(objIter->Name().toUpper() == "TABLE") {
-          if(objIter->HasKeyword("Name")) {
-            if(objIter->FindKeyword("Name")[0].toUpper() == tblname.toUpper()) {
-              loadKernel(objIter->FindKeyword("Kernels"));
+      for(objIter = pvl.beginObject() ; objIter != pvl.endObject() ; ++objIter) {
+        if(objIter->name().toUpper() == "TABLE") {
+          if(objIter->hasKeyword("Name")) {
+            if(objIter->findKeyword("Name")[0].toUpper() == tblname.toUpper()) {
+              loadKernel(objIter->findKeyword("Kernels"));
               return;
             }
           }

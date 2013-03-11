@@ -55,7 +55,7 @@ namespace Isis {
     p_jp2File.clear();
 
     // Set up a translater for PDS file of type IMAGE
-    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
     p_transDir = (QString) dataDir["Base"];
   }
 
@@ -87,7 +87,7 @@ namespace Isis {
 
     // Internalize the PDS label in the PVL that was passed in
     try {
-      pdsLabel.Read(pdsLabelFile);
+      pdsLabel.read(pdsLabelFile);
     }
     catch (IException &e) {
       throw IException(e, IException::User,
@@ -201,11 +201,11 @@ namespace Isis {
     // If only size 1, we either have a file name or an offset
     // Either way, when we're done with these two ifs, variables offset and
     // dataFileName will be set.
-    if (dataFilePointer.Size() == 1) {
+    if (dataFilePointer.size() == 1) {
       try {
         str = pdsXlater.Translate("DataFilePointer");
         offset = toInt(str);
-        units = dataFilePointer.Unit();
+        units = dataFilePointer.unit();
         // Successful? we have an offset, means current, p_labelFile
         // is the location of the data as well
         dataFileName = FileName(p_labelFile).name();
@@ -220,13 +220,13 @@ namespace Isis {
     }
     // We must have a filename and an offset, in that order
     // Expection ("filname", <offset>)
-    else if (dataFilePointer.Size() == 2) {
+    else if (dataFilePointer.size() == 2) {
       dataFileName = pdsXlater.Translate("DataFilePointer", 0);
       offset = IString(pdsXlater.Translate("DataFilePointer", 1)).ToInteger();
-      units = dataFilePointer.Unit(1);
+      units = dataFilePointer.unit(1);
     }
     // Error, no value
-    else if (dataFilePointer.Size() == 0) {
+    else if (dataFilePointer.size() == 0) {
       QString msg = "Data file pointer ^IMAGE or ^QUBE has no value, must"
                    "have either file name or offset or both, in [" +
                    p_labelFile + "]";
@@ -525,7 +525,7 @@ namespace Isis {
     int linePos = 0;
     int samplePos = 0;
     int bandPos = 0;
-    int val = pdsXlater.InputKeyword("CoreOrganization").Size();
+    int val = pdsXlater.InputKeyword("CoreOrganization").size();
     QString tmp = "";
     for(int i = 0; i < val; i++) {
       str = pdsXlater.Translate("CoreOrganization", i);
@@ -558,7 +558,7 @@ namespace Isis {
       SetOrganization(ProcessImport::BIL);
     }
     else {
-      PvlKeyword pdsCoreOrg = p_pdsLabel.FindKeyword(pdsXlater.
+      PvlKeyword pdsCoreOrg = p_pdsLabel.findKeyword(pdsXlater.
           InputKeywordName("CoreOrganization"), Pvl::Traverse);
 
       stringstream pdsCoreOrgStream;
@@ -637,7 +637,7 @@ namespace Isis {
         (pdsXlater.InputHasKeyword("BandMultiplier"))) {
       vector<double> bases;
       vector<double> mults;
-      for(int i = 0; i < pdsXlater.InputKeyword("BandBase").Size(); i++) {
+      for(int i = 0; i < pdsXlater.InputKeyword("BandBase").size(); i++) {
         str = pdsXlater.Translate("BandBase", i);
         bases.push_back(toDouble(str));
         str = pdsXlater.Translate("BandMultiplier", i);
@@ -688,7 +688,7 @@ namespace Isis {
     Isis::PvlTranslationManager projType(p_pdsLabel, trnsStrm);
 
     // Set up the correct projection translation table for this label
-    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
     QString transDir = (QString) dataDir["Base"];
 
     Isis::FileName transFile;
@@ -761,26 +761,26 @@ namespace Isis {
     projSpecificFileName += p_projection + ".trn";
     Isis::PvlTranslationManager specificXlater(p_pdsLabel, projSpecificFileName);
 
-    lab.AddGroup(mapGroup);
+    lab.addGroup(mapGroup);
     specificXlater.Auto(lab);
 
-    if(lab.FindGroup("Mapping").HasKeyword("CenterLongitude")) {
-      PvlKeyword &centerLon = lab.FindGroup("Mapping")["CenterLongitude"];
+    if(lab.findGroup("Mapping").hasKeyword("CenterLongitude")) {
+      PvlKeyword &centerLon = lab.findGroup("Mapping")["CenterLongitude"];
       if(p_longitudeDomain == 180)
         centerLon = toString(Projection::To180Domain((double)centerLon));
       else
         centerLon = toString(Projection::To360Domain((double)centerLon));
     }
 
-    if(lab.FindGroup("Mapping").HasKeyword("PoleLongitude")) {
-      PvlKeyword &poleLon = lab.FindGroup("Mapping")["PoleLongitude"];
+    if(lab.findGroup("Mapping").hasKeyword("PoleLongitude")) {
+      PvlKeyword &poleLon = lab.findGroup("Mapping")["PoleLongitude"];
       if(p_longitudeDomain == 180)
         poleLon = toString(Projection::To180Domain((double)poleLon));
       else
         poleLon = toString(Projection::To360Domain((double)poleLon));
     }
 
-    OutputCubes[0]->putGroup(lab.FindGroup("Mapping"));
+    OutputCubes[0]->putGroup(lab.findGroup("Mapping"));
   }
 
   /**
@@ -978,7 +978,7 @@ namespace Isis {
 
     str = pdsXlater.Translate("PixelResolution");
     p_pixelResolution = toDouble(str);
-    str = pdsXlater.InputKeyword("PixelResolution").Unit().toUpper();
+    str = pdsXlater.InputKeyword("PixelResolution").unit().toUpper();
     // Assume KM/PIXEL if the unit doesn't exist or is not METERS/PIXEL
     if((str != "METERS/PIXEL") && (str != "M/PIXEL") && (str != "M/PIX")) {
       p_pixelResolution *= 1000.0;
@@ -1134,7 +1134,7 @@ namespace Isis {
    */
   void ProcessImportPds::TranslateIsis2BandBin(Isis::Pvl &lab) {
     // Set up a translater for Isis2 labels
-    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
     QString transDir = (QString) dataDir["Base"];
 
     Isis::FileName transFile(transDir + "/" + "translations/isis2bandbin.trn");
@@ -1152,7 +1152,7 @@ namespace Isis {
    */
   void ProcessImportPds::TranslateIsis2Instrument(Isis::Pvl &lab) {
     // Set up a translater for Isis2 labels
-    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
     QString transDir = (QString) dataDir["Base"];
     Isis::FileName transFile(transDir + "/" + "translations/isis2instrument.trn");
     Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
@@ -1161,9 +1161,9 @@ namespace Isis {
     isis2Xlater.Auto(lab);
 
     //Check StartTime for appended 'z' (Zulu time) and remove
-    Isis::PvlGroup &inst = lab.FindGroup("Instrument");
+    Isis::PvlGroup &inst = lab.findGroup("Instrument");
 
-    if(inst.HasKeyword("StartTime")) {
+    if(inst.hasKeyword("StartTime")) {
       Isis::PvlKeyword &stkey = inst["StartTime"];
       QString stime = stkey[0];
       stime = stime.remove(QRegExp("[Zz]$"));
@@ -1224,20 +1224,20 @@ namespace Isis {
     //  Open projectionOffsetMults file
     Isis::Pvl p(p_transDir + "/" + "translations/pdsProjectionLineSampToXY.def");
 
-    Isis::PvlObject &projDef = p.FindObject("ProjectionOffsetMults",
+    Isis::PvlObject &projDef = p.findObject("ProjectionOffsetMults",
                                             Pvl::Traverse);
 
-    for(int g = 0; g < projDef.Groups(); g++) {
-      QString key = projDef.Group(g)["Keyword"];
-      if(p_pdsLabel.HasKeyword(key)) {
+    for(int g = 0; g < projDef.groups(); g++) {
+      QString key = projDef.group(g)["Keyword"];
+      if(p_pdsLabel.hasKeyword(key)) {
         QString value = p_pdsLabel[key];
-        QString pattern = projDef.Group(g)["Pattern"];
+        QString pattern = projDef.group(g)["Pattern"];
         //  If value contains pattern, then set the mults to what is in translation file
         if(value.contains(pattern)) {
-          xmult = projDef.Group(g)["xMult"];
-          ymult = projDef.Group(g)["yMult"];
-          xoff = projDef.Group(g)["xOff"];
-          yoff = projDef.Group(g)["yOff"];
+          xmult = projDef.group(g)["xMult"];
+          ymult = projDef.group(g)["yMult"];
+          xoff = projDef.group(g)["xOff"];
+          yoff = projDef.group(g)["yOff"];
           return;
         }
       }

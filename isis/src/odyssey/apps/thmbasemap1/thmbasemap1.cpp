@@ -26,7 +26,7 @@ void IsisMain(){
   // Input file options
   FileList cubes;
   Pvl &pref = Preference::Preferences();
-  QString pathName = (QString)pref.FindGroup("DataDirectory")["Temporary"] + "/";
+  QString pathName = (QString)pref.findGroup("DataDirectory")["Temporary"] + "/";
   if (ui.WasEntered("TOPATH")) {
     pathName = (QString)ui.GetString("TOPATH") + "/";
   }
@@ -179,16 +179,16 @@ void IsisMain(){
       pdsSanFile = true;
     }
 
-    QString duration =(QString)lab.FindObject("SPECTRAL_QUBE",Isis::PvlObject::Traverse)["IMAGE_DURATION"];
+    QString duration =(QString)lab.findObject("SPECTRAL_QUBE",Isis::PvlObject::Traverse)["IMAGE_DURATION"];
 
     // Make sure we have THEMIS IR at wavelength 12.57.
     // 12.57um wavelength has the best signal to noise ratio, and 14.88um wavelenght is atmospheric band
-    PvlKeyword bandcenter = lab.FindGroup("BAND_BIN",Pvl::Traverse)["BAND_BIN_CENTER"];
+    PvlKeyword bandcenter = lab.findGroup("BAND_BIN",Pvl::Traverse)["BAND_BIN_CENTER"];
     bool band12_57 = false;
     bool band14_88 = false;
     int procBand = 0;
     int atmosBand = 0;
-    for (int index=0; index<bandcenter.Size(); index++) {
+    for (int index=0; index<bandcenter.size(); index++) {
       if (bandcenter[index] == "12.57") {
         procBand = index + 1;
         band12_57 = true;
@@ -218,9 +218,9 @@ void IsisMain(){
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
     if (reportNadirSpc) {
       Pvl spclab(input);
-      PvlGroup kernels = spclab.FindGroup("Kernels", Pvl::Traverse);
+      PvlGroup kernels = spclab.findGroup("Kernels", Pvl::Traverse);
       bool isNadir = false;
-      for (int j=0; j < kernels["InstrumentPointing"].Size(); j++) {
+      for (int j=0; j < kernels["InstrumentPointing"].size(); j++) {
         if (kernels["InstrumentPointing"][j].toUpper() == "NADIR") {
           isNadir = true;
         }
@@ -239,8 +239,8 @@ void IsisMain(){
     parameters = "FROM=" + input + " TO=" + tempstat1 + " linc = 100 sinc = 100";
     ProgramLauncher::RunIsisProgram("camstats", parameters);
     Pvl p1;
-    p1.Read(tempstat1);
-    double incAngle =p1.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
+    p1.read(tempstat1);
+    double incAngle =p1.findGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
 
     // if do not process night and incidence angle > 90, then exit
     if (!processNight && incAngle >= 90) {
@@ -341,10 +341,10 @@ void IsisMain(){
                  " TO=" + tempgaps + " APPEND=no";
     ProgramLauncher::RunIsisProgram("stats", parameters);
     Pvl tg;
-    tg.Read(tempgaps);
-    QString totalpixels = tg.FindGroup("Results",Pvl::Traverse)["TotalPixels"];
-    QString validpixels = tg.FindGroup("Results",Pvl::Traverse)["ValidPixels"];
-    //if (tg.HasGroup("Gap")) {
+    tg.read(tempgaps);
+    QString totalpixels = tg.findGroup("Results",Pvl::Traverse)["TotalPixels"];
+    QString validpixels = tg.findGroup("Results",Pvl::Traverse)["ValidPixels"];
+    //if (tg.hasGroup("Gap")) {
     if (IString(totalpixels).ToInteger() != IString(validpixels).ToInteger()) {
       cout << tg << endl;
       sgap = "yes";
@@ -365,18 +365,18 @@ void IsisMain(){
     ProgramLauncher::RunIsisProgram("camstats", parameters);
 
     Pvl p2;
-    p2.Read(tempstat2);
-    QString incavg = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceAverage"];
-    QString  resavg = p2.FindGroup("Resolution",Pvl::Traverse)["ResolutionAverage"];
-    QString incmin = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
-    QString incmax = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMaximum"];
+    p2.read(tempstat2);
+    QString incavg = p2.findGroup("IncidenceAngle",Pvl::Traverse)["IncidenceAverage"];
+    QString  resavg = p2.findGroup("Resolution",Pvl::Traverse)["ResolutionAverage"];
+    QString incmin = p2.findGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
+    QString incmax = p2.findGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMaximum"];
     remove (tstat2.expanded().toAscii().data());
 
     double summing = 1;
     FileName tosum = FileName(outFile);
     Pvl sumlab(tosum.expanded());
-    PvlGroup InstGrp = sumlab.FindGroup("Instrument",Pvl::Traverse);
-    if (InstGrp.HasKeyword("SpatialSumming")) {
+    PvlGroup InstGrp = sumlab.findGroup("Instrument",Pvl::Traverse);
+    if (InstGrp.hasKeyword("SpatialSumming")) {
       summing = InstGrp["SpatialSumming"];
     }
 

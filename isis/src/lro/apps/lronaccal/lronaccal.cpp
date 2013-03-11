@@ -62,7 +62,7 @@ void IsisMain() {
   g_iof = (ui.GetString("RADIOMETRICTYPE") == "IOF");
 
   Isis::Pvl lab(ui.GetFileName("FROM"));
-  Isis::PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+  Isis::PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
   // Check if it is a NAC image
   QString instId = inst["InstrumentId"];
@@ -72,12 +72,12 @@ void IsisMain() {
   }
 
   // And check if it has already run through calibration
-  if(lab.FindObject("IsisCube").HasGroup("Radiometry")) {
+  if(lab.findObject("IsisCube").hasGroup("Radiometry")) {
     QString msg = "This image has already been calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(lab.FindObject("IsisCube").HasGroup("AlphaCube")) {
+  if(lab.findObject("IsisCube").hasGroup("AlphaCube")) {
     QString msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -129,7 +129,7 @@ void IsisMain() {
       cutoff = LINE_SIZE / 2;
     }
 
-    for(int i = 0; i < maskedPixels.Size(); i++)
+    for(int i = 0; i < maskedPixels.size(); i++)
       if((g_isLeftNac && toInt(maskedPixels[i]) < cutoff) || (!g_isLeftNac && toInt(maskedPixels[i]) > cutoff))
         g_maskedPixelsLeft.push_back(toInt(maskedPixels[i]));
       else

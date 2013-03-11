@@ -34,12 +34,12 @@ void IsisMain() {
   if(ui.WasEntered("DIFF")) {
     Pvl diffFile(ui.GetFileName("DIFF"));
 
-    if(diffFile.HasGroup("Tolerances")) {
-      tolerances = diffFile.FindGroup("Tolerances");
+    if(diffFile.hasGroup("Tolerances")) {
+      tolerances = diffFile.findGroup("Tolerances");
     }
 
-    if(diffFile.HasGroup("IgnoreKeys")) {
-      ignorekeys = diffFile.FindGroup("IgnoreKeys");
+    if(diffFile.hasGroup("IgnoreKeys")) {
+      ignorekeys = diffFile.findGroup("IgnoreKeys");
     }
   }
 
@@ -58,79 +58,79 @@ void IsisMain() {
 
   if(ui.WasEntered("TO")) {
     Pvl out;
-    out.AddGroup(differences);
-    out.Write(ui.GetFileName("TO"));
+    out.addGroup(differences);
+    out.write(ui.GetFileName("TO"));
   }
 
   differenceReason = "";
 }
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
-  if(pvl1.Name().compare(pvl2.Name()) != 0) {
+  if(pvl1.name().compare(pvl2.name()) != 0) {
     filesMatch = false;
-    differenceReason = "Keyword '" + pvl1.Name() + "' does not match keyword '" + pvl2.Name() + "'";
+    differenceReason = "Keyword '" + pvl1.name() + "' does not match keyword '" + pvl2.name() + "'";
   }
 
-  if(pvl1.Size() != pvl2.Size()) {
+  if(pvl1.size() != pvl2.size()) {
     filesMatch = false;
-    differenceReason = "Keyword '" + pvl1.Name() + "' size does not match.";
+    differenceReason = "Keyword '" + pvl1.name() + "' size does not match.";
     return;
   }
 
-  if(tolerances.HasKeyword(pvl1.Name()) &&
-      tolerances[pvl1.Name()].Size() > 1 &&
-      pvl1.Size() != tolerances[pvl1.Name()].Size()) {
-    QString msg = "Size of keyword '" + pvl1.Name() + "' does not match with ";
+  if(tolerances.hasKeyword(pvl1.name()) &&
+      tolerances[pvl1.name()].size() > 1 &&
+      pvl1.size() != tolerances[pvl1.name()].size()) {
+    QString msg = "Size of keyword '" + pvl1.name() + "' does not match with ";
     msg += "its number of tolerances in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(ignorekeys.HasKeyword(pvl1.Name()) &&
-      ignorekeys[pvl1.Name()].Size() > 1 &&
-      pvl1.Size() != ignorekeys[pvl1.Name()].Size()) {
-    QString msg = "Size of keyword '" + pvl1.Name() + "' does not match with ";
+  if(ignorekeys.hasKeyword(pvl1.name()) &&
+      ignorekeys[pvl1.name()].size() > 1 &&
+      pvl1.size() != ignorekeys[pvl1.name()].size()) {
+    QString msg = "Size of keyword '" + pvl1.name() + "' does not match with ";
     msg += "its number of ignore keys in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  for(int i = 0; i < pvl1.Size() && filesMatch; i++) {
+  for(int i = 0; i < pvl1.size() && filesMatch; i++) {
     QString val1 = pvl1[i];
     QString val2 = pvl2[i];
-    QString unit1 = pvl1.Unit(i);
-    QString unit2 = pvl2.Unit(i);
+    QString unit1 = pvl1.unit(i);
+    QString unit2 = pvl2.unit(i);
 
     int ignoreIndex = 0;
-    if(ignorekeys.HasKeyword(pvl1.Name()) && ignorekeys[pvl1.Name()].Size() > 1) {
+    if(ignorekeys.hasKeyword(pvl1.name()) && ignorekeys[pvl1.name()].size() > 1) {
       ignoreIndex = i;
     }
 
     try {
-      if(!ignorekeys.HasKeyword(pvl1.Name()) ||
-          ignorekeys[pvl1.Name()][ignoreIndex] == "false") {
+      if(!ignorekeys.hasKeyword(pvl1.name()) ||
+          ignorekeys[pvl1.name()][ignoreIndex] == "false") {
 
         if(unit1.toLower() != unit2.toLower()) {
           filesMatch = false;
-          differenceReason = "Keyword '" + pvl1.Name() + "': units do not match.";
+          differenceReason = "Keyword '" + pvl1.name() + "': units do not match.";
           return;
         }
 
         double tolerance = 0.0;
         double difference = abs(toDouble(val1) - toDouble(val2));
 
-        if(tolerances.HasKeyword(pvl1.Name())) {
+        if(tolerances.hasKeyword(pvl1.name())) {
           tolerance = toDouble(
-              (tolerances[pvl1.Name()].Size() == 1) ?
-                 tolerances[pvl1.Name()][0] : tolerances[pvl1.Name()][i]);
+              (tolerances[pvl1.name()].size() == 1) ?
+                 tolerances[pvl1.name()][0] : tolerances[pvl1.name()][i]);
         }
 
         if(difference > tolerance) {
           filesMatch = false;
-          if(pvl1.Size() == 1) {
-            differenceReason = "Keyword '" + pvl1.Name() + "': difference is " +
+          if(pvl1.size() == 1) {
+            differenceReason = "Keyword '" + pvl1.name() + "': difference is " +
                                toString(difference);
           }
           else {
-            differenceReason = "Keyword '" + pvl1.Name() + "' at index " +
+            differenceReason = "Keyword '" + pvl1.name() + "' at index " +
                                toString(i) + ": difference is " + toString(difference);
           }
           differenceReason += " (tolerance is " + toString(tolerance) + ")";
@@ -140,7 +140,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
     catch(IException &) {
       if(val1.toLower() != val2.toLower()) {
         filesMatch = false;
-        differenceReason = "Keyword '" + pvl1.Name() + "': values do not "
+        differenceReason = "Keyword '" + pvl1.name() + "': values do not "
             "match.";
       }
     }
@@ -148,59 +148,59 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
 }
 
 void CompareObjects(const PvlObject &pvl1, const PvlObject &pvl2) {
-  if(pvl1.Name().compare(pvl2.Name()) != 0) {
+  if(pvl1.name().compare(pvl2.name()) != 0) {
     filesMatch = false;
-    differenceReason = "Object " + pvl1.Name() + " does not match " +
-        pvl2.Name();
+    differenceReason = "Object " + pvl1.name() + " does not match " +
+        pvl2.name();
   }
 
-  if(pvl1.Keywords() != pvl2.Keywords()) {
+  if(pvl1.keywords() != pvl2.keywords()) {
     filesMatch = false;
-    differenceReason = "Object " + pvl1.Name() + " has varying keyword counts.";
+    differenceReason = "Object " + pvl1.name() + " has varying keyword counts.";
   }
 
-  if(pvl1.Groups() != pvl2.Groups()) {
+  if(pvl1.groups() != pvl2.groups()) {
     filesMatch = false;
-    differenceReason = "Object " + pvl1.Name() + " has varying group counts.";
+    differenceReason = "Object " + pvl1.name() + " has varying group counts.";
   }
 
-  if(pvl1.Objects() != pvl2.Objects()) {
+  if(pvl1.objects() != pvl2.objects()) {
     filesMatch = false;
-    differenceReason = "Object " + pvl1.Name() + " has varying object counts.";
+    differenceReason = "Object " + pvl1.name() + " has varying object counts.";
   }
 
   if(!filesMatch) {
     return;
   }
 
-  for(int keyword = 0; keyword < pvl1.Keywords() && filesMatch; keyword++) {
+  for(int keyword = 0; keyword < pvl1.keywords() && filesMatch; keyword++) {
     CompareKeywords(pvl1[keyword], pvl2[keyword]);
   }
 
-  for(int object = 0; object < pvl1.Objects() && filesMatch; object++) {
-    CompareObjects(pvl1.Object(object), pvl2.Object(object));
+  for(int object = 0; object < pvl1.objects() && filesMatch; object++) {
+    CompareObjects(pvl1.object(object), pvl2.object(object));
   }
 
-  for(int group = 0; group < pvl1.Groups() && filesMatch; group++) {
-    CompareGroups(pvl1.Group(group), pvl2.Group(group));
+  for(int group = 0; group < pvl1.groups() && filesMatch; group++) {
+    CompareGroups(pvl1.group(group), pvl2.group(group));
   }
 
-  if(!filesMatch && pvl1.Name().compare("Root") != 0) {
-    differenceReason = "Object " + pvl1.Name() + ": " + differenceReason;
+  if(!filesMatch && pvl1.name().compare("Root") != 0) {
+    differenceReason = "Object " + pvl1.name() + ": " + differenceReason;
   }
 }
 
 void CompareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2) {
-  if(pvl1.Keywords() != pvl2.Keywords()) {
+  if(pvl1.keywords() != pvl2.keywords()) {
     filesMatch = false;
     return;
   }
 
-  for(int keyword = 0; keyword < pvl1.Keywords() && filesMatch; keyword++) {
+  for(int keyword = 0; keyword < pvl1.keywords() && filesMatch; keyword++) {
     CompareKeywords(pvl1[keyword], pvl2[keyword]);
   }
 
   if(!filesMatch) {
-    differenceReason = "Group " + pvl1.Name() + ": " + differenceReason;
+    differenceReason = "Group " + pvl1.name() + ": " + differenceReason;
   }
 }

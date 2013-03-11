@@ -172,20 +172,20 @@ void IsisMain() {
 
   sourceInfo += PvlKeyword("From", fromFile.expanded());
   sourceInfo += icube->group("Archive")["ProductId"];
-  outputPvl.AddGroup(sourceInfo);
+  outputPvl.addGroup(sourceInfo);
   if(numSections > 0) {
-    outputPvl.AddObject(leftSide);
-    outputPvl.AddObject(rightSide);
+    outputPvl.addObject(leftSide);
+    outputPvl.addObject(rightSide);
   }
   else {
-    PvlGroup leftGroup = leftSide.FindGroup("Total");
-    PvlGroup rightGroup = rightSide.FindGroup("Total");
-    leftGroup.SetName("LeftSide");
-    rightGroup.SetName("RightSide");
-    outputPvl.AddGroup(leftGroup);
-    outputPvl.AddGroup(rightGroup);
+    PvlGroup leftGroup = leftSide.findGroup("Total");
+    PvlGroup rightGroup = rightSide.findGroup("Total");
+    leftGroup.setName("LeftSide");
+    rightGroup.setName("RightSide");
+    outputPvl.addGroup(leftGroup);
+    outputPvl.addGroup(rightGroup);
   }
-  outputPvl.Write(ui.GetFileName("TO"));
+  outputPvl.write(ui.GetFileName("TO"));
 }
 
 void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
@@ -201,7 +201,7 @@ void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
     left += PvlKeyword("Minimum", toString(stats1.Minimum()));
     left += PvlKeyword("Maximum", toString(stats1.Maximum()));
   }
-  one->AddGroup(left);
+  one->addGroup(left);
 
   PvlGroup right(name);
   right += PvlKeyword("StartLine", toString(start + 1));
@@ -214,5 +214,5 @@ void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
     right += PvlKeyword("Minimum", toString(stats2.Minimum()));
     right += PvlKeyword("Maximum", toString(stats2.Maximum()));
   }
-  two->AddGroup(right);
+  two->addGroup(right);
 }

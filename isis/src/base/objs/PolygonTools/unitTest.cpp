@@ -67,8 +67,8 @@ int main() {
     cout << "Copy of the multipolygon = " << tmpMp->toString() << endl << endl;
 
     Isis::Pvl lab;
-    lab.AddGroup(Isis::PvlGroup("Mapping"));
-    Isis::PvlGroup &mapGroup = lab.FindGroup("Mapping");
+    lab.addGroup(Isis::PvlGroup("Mapping"));
+    Isis::PvlGroup &mapGroup = lab.findGroup("Mapping");
     mapGroup += Isis::PvlKeyword("EquatorialRadius", "1.0");
     mapGroup += Isis::PvlKeyword("PolarRadius", "1.0");
     mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
@@ -89,9 +89,9 @@ int main() {
 
     // Change the radius and set a new projection
     // Then get the XYPolygon again
-    mapGroup.DeleteKeyword("EquatorialRadius");
+    mapGroup.deleteKeyword("EquatorialRadius");
     mapGroup += Isis::PvlKeyword("EquatorialRadius", "10.0");
-    mapGroup.DeleteKeyword("PolarRadius");
+    mapGroup.deleteKeyword("PolarRadius");
     mapGroup += Isis::PvlKeyword("PolarRadius", "10.0");
 
     proj = ProjectionFactory::Create(lab);

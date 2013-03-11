@@ -20,49 +20,49 @@ namespace Isis {
     p_photoHg1 = 0.0;
     p_photoHg2 = 0.0;
 
-    PvlGroup &algorithm = pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algorithm = pvl.findObject("PhotometricModel").findGroup("Algorithm", Pvl::Traverse);
 
     p_algName = AlgorithmName().toUpper();
 
-    if(algorithm.HasKeyword("Hg1")) {
+    if(algorithm.hasKeyword("Hg1")) {
       SetPhotoHg1(algorithm["Hg1"]);
     }
 
-    if(algorithm.HasKeyword("Hg2")) {
+    if(algorithm.hasKeyword("Hg2")) {
       SetPhotoHg2(algorithm["Hg2"]);
     }
 
-    if(algorithm.HasKeyword("Bh")) {
+    if(algorithm.hasKeyword("Bh")) {
       SetPhotoBh(algorithm["Bh"]);
     }
 
-    if(algorithm.HasKeyword("Ch")) {
+    if(algorithm.hasKeyword("Ch")) {
       SetPhotoCh(algorithm["Ch"]);
     }
 
-    if(algorithm.HasKeyword("ZeroB0Standard")) {
+    if(algorithm.hasKeyword("ZeroB0Standard")) {
       SetPhoto0B0Standard(algorithm["ZeroB0Standard"][0]);
-    } else if (algorithm.HasKeyword("ZeroB0St")) {
+    } else if (algorithm.hasKeyword("ZeroB0St")) {
       SetPhoto0B0Standard(algorithm["ZeroB0St"][0]);
     } else {
       SetPhoto0B0Standard("TRUE");
     }
 
-    if(algorithm.HasKeyword("Wh")) {
+    if(algorithm.hasKeyword("Wh")) {
       SetPhotoWh(algorithm["Wh"]);
     }
 
-    if(algorithm.HasKeyword("Hh")) {
+    if(algorithm.hasKeyword("Hh")) {
       SetPhotoHh(algorithm["Hh"]);
     }
 
-    if(algorithm.HasKeyword("B0")) {
+    if(algorithm.hasKeyword("B0")) {
       SetPhotoB0(algorithm["B0"]);
     }
 
     p_photoB0save = p_photoB0;
 
-    if(algorithm.HasKeyword("Theta")) {
+    if(algorithm.hasKeyword("Theta")) {
       SetPhotoTheta(algorithm["Theta"]);
     }
   }

@@ -378,7 +378,7 @@ namespace Isis {
       Pvl &lab) {
 
     QList< priority_queue<Kernel> > queues;
-    PvlObject &cube = lab.FindObject("IsisCube");
+    PvlObject &cube = lab.findObject("IsisCube");
     int cameraVersion = -1;
     
     try {
@@ -388,7 +388,7 @@ namespace Isis {
     }
 
     // Make sure the entry has been loaded into memory
-    if (!m_kernelData.HasObject(entry)) {
+    if (!m_kernelData.hasObject(entry)) {
       priority_queue<Kernel> emptyKernelQueue;
       emptyKernelQueue.push(Kernel());
       queues.push_back(emptyKernelQueue);
@@ -399,35 +399,35 @@ namespace Isis {
     iTime start;
     iTime end;
     
-    if (cube.HasGroup("Instrument")) {
-      start = (QString) cube.FindGroup("Instrument")["StartTime"];
+    if (cube.hasGroup("Instrument")) {
+      start = (QString) cube.findGroup("Instrument")["StartTime"];
 
-      if (cube.FindGroup("Instrument").HasKeyword("StopTime")) {
-        end = ((QString) cube.FindGroup("Instrument")["StopTime"]);
+      if (cube.findGroup("Instrument").hasKeyword("StopTime")) {
+        end = ((QString) cube.findGroup("Instrument")["StopTime"]);
       }
       else {
-        end = ((QString) cube.FindGroup("Instrument")["StartTime"]);
+        end = ((QString) cube.findGroup("Instrument")["StartTime"]);
       }
     }
 
     // Loop through the objects to look for all matches to the entry value
-    for (int i = 0; i < m_kernelData.Objects(); i++) {
-      if (m_kernelData.Object(i).IsNamed(entry)) {
+    for (int i = 0; i < m_kernelData.objects(); i++) {
+      if (m_kernelData.object(i).isNamed(entry)) {
         priority_queue<Kernel> filesFound;
-        PvlObject &obj = m_kernelData.Object(i);
+        PvlObject &obj = m_kernelData.object(i);
 
-        for (int groupIndex = obj.Groups() - 1; groupIndex >= 0; groupIndex--) {
+        for (int groupIndex = obj.groups() - 1; groupIndex >= 0; groupIndex--) {
           // Get the group and start testing the cases in the keywords
           // to see if they all match this cube
-          PvlGroup &grp = obj.Group(groupIndex);
+          PvlGroup &grp = obj.group(groupIndex);
 
           // If the group name isn't selection, skip it.
-          if (!grp.IsNamed("Selection")) continue;
+          if (!grp.isNamed("Selection")) continue;
 
           QString type = "";
 
           // Make sure the type is allowed
-          if (grp.HasKeyword("Type")) {
+          if (grp.hasKeyword("Type")) {
             type = (QString) grp["Type"];
             if (!(Kernel::typeEnum(type) & m_allowedKernelTypes)) {
               // will return 1 for each bit that has 1 in both type and allowed and
@@ -451,11 +451,11 @@ namespace Isis {
           else if (startMatches) {
             // Well, the selection start matched but not the end.
             // Let's look for a second selection to handle overlap areas.
-            for (int endTimeIndex = obj.Groups() - 1;
+            for (int endTimeIndex = obj.groups() - 1;
                 endTimeIndex >= 0;
                 endTimeIndex--) {
 
-              PvlGroup &endTimeGrp = obj.Group(endTimeIndex);
+              PvlGroup &endTimeGrp = obj.group(endTimeIndex);
 
               // The second selection must:
               //   Not be the current selection
@@ -466,9 +466,9 @@ namespace Isis {
               // *If start time is also matched, do not merge and simply take the
               // secondary match
               if (endTimeIndex == groupIndex) continue;
-              if (!endTimeGrp.IsNamed("Selection")) continue;
-              if (grp.HasKeyword("Type") != endTimeGrp.HasKeyword("Type")) continue;
-              if (grp.HasKeyword("Type") &&
+              if (!endTimeGrp.isNamed("Selection")) continue;
+              if (grp.hasKeyword("Type") != endTimeGrp.hasKeyword("Type")) continue;
+              if (grp.hasKeyword("Type") &&
                   grp["Type"] != endTimeGrp["Type"]) continue;
               if (!matches(lab, endTimeGrp, end, cameraVersion)) continue;
 
@@ -480,11 +480,11 @@ namespace Isis {
 
               // Check for matching time ranges
               for (int keyIndex = 0;
-                  !betterMatch && keyIndex < grp.Keywords();
+                  !betterMatch && keyIndex < grp.keywords();
                   keyIndex++) {
                 PvlKeyword &key = grp[keyIndex];
 
-                if (!key.IsNamed("Time")) continue;
+                if (!key.isNamed("Time")) continue;
 
                 iTime timeRangeStart((QString)key[0]);
                 iTime timeRangeEnd((QString)key[1]);
@@ -589,17 +589,17 @@ namespace Isis {
     // as such if and only if there are no time conditionals. If Time keywords
     // exist, one of them has to set matchTime to true. The matchKeywords is
     // true until a mismatch is found.
-    const PvlObject &cube = lab.FindObject("IsisCube");
-    bool matchTime = !grp.HasKeyword("Time");
+    const PvlObject &cube = lab.findObject("IsisCube");
+    bool matchTime = !grp.hasKeyword("Time");
     bool matchKeywords = true;
 
     // First, the time search. Loop through the keywords, if the name isn't
     //  Time then skip it. If it is, then get the start/end times and keep
     //  looking until one is found.
-    for (int keyword = 0; keyword < grp.Keywords(); keyword++) {
+    for (int keyword = 0; keyword < grp.keywords(); keyword++) {
       PvlKeyword key = grp[keyword];
 
-      if (key.IsNamed("Time")) {
+      if (key.isNamed("Time")) {
         // Pull the selections start and end time out
         iTime kernelStart = (QString) key[0];
         iTime kernelEnd   = (QString) key[1];
@@ -610,13 +610,13 @@ namespace Isis {
           matchTime = true;
         }
       }
-      else if (key.IsNamed("Match")) {
+      else if (key.isNamed("Match")) {
         try {
           QString matchGroup = key[0];
           QString matchKey   = key[1];
           QString matchValue = key[2];
 
-          QString cubeValue = cube.FindGroup(matchGroup)[matchKey];
+          QString cubeValue = cube.findGroup(matchGroup)[matchKey];
           cubeValue = cubeValue.simplified().trimmed().toUpper();
           matchValue = matchValue.simplified().trimmed().toUpper();
 
@@ -630,10 +630,10 @@ namespace Isis {
           matchKeywords = false;
         }
       }
-      else if (key.IsNamed("CameraVersion")) {
+      else if (key.isNamed("CameraVersion")) {
         try {
           for (int camVersionKeyIndex = 0;
-              camVersionKeyIndex < key.Size();
+              camVersionKeyIndex < key.size();
               camVersionKeyIndex++) {
 
             bool versionMatch = false;
@@ -718,7 +718,7 @@ namespace Isis {
   void KernelDb::loadSystemDb(const QString &mission, const Pvl &lab) {
 
     // Get the base DataDirectory
-    PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+    PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
     QString baseDir = dataDir["Base"];
 
     // Get the mission DataDirectory
@@ -804,20 +804,20 @@ namespace Isis {
       m_kernelDbFiles.append(kernelDb.highestVersion());
     }
     else { // else, read in the appropriate database files from the config file
-      PvlObject inst = Pvl(configFile.expanded()).FindObject("Instrument");
+      PvlObject inst = Pvl(configFile.expanded()).findObject("Instrument");
       bool foundMatch = false;
       // loop through each group until we find a match
-      for (int groupIndex = 0; groupIndex < inst.Groups(); groupIndex++) {
+      for (int groupIndex = 0; groupIndex < inst.groups(); groupIndex++) {
         if (!foundMatch) {
-          PvlGroup &grp = inst.Group(groupIndex);
+          PvlGroup &grp = inst.group(groupIndex);
           // Only add files in Selection groups with matching intrument id
-          if (grp.IsNamed("Selection") 
+          if (grp.isNamed("Selection") 
               && KernelDb::matches(lab, grp, iTime(), 1)) {
             foundMatch = true;
             // add each File keywords in the matching group to the list
-            for (int keyIndex = 0; keyIndex < grp.Keywords(); keyIndex++) {
+            for (int keyIndex = 0; keyIndex < grp.keywords(); keyIndex++) {
               PvlKeyword keyword = grp[keyIndex];
-              if (keyword.IsNamed("File")) {
+              if (keyword.isNamed("File")) {
                 QString dir = dataDir[keyword[0]];
                 FileName kernelDb( dir + "/" + keyword[1]);
                 m_kernelDbFiles.append(kernelDb.highestVersion());
@@ -852,7 +852,7 @@ namespace Isis {
     // read each of the database files appended to the list into m_kernelData
     foreach (FileName kernelDbFile, m_kernelDbFiles) {
       try {
-        m_kernelData.Read(kernelDbFile.expanded());
+        m_kernelData.read(kernelDbFile.expanded());
       }
       catch (IException &e) {
         QString msg = "Unable to read kernel database file ["
@@ -886,14 +886,14 @@ namespace Isis {
   QStringList KernelDb::files(PvlGroup &grp) {
     QStringList files;
 
-    for (int i = 0; i < grp.Keywords(); i++) {
+    for (int i = 0; i < grp.keywords(); i++) {
       PvlKeyword kfile = grp[i];
-      if (kfile.Name() != "File") continue;
+      if (kfile.name() != "File") continue;
   
       // Two values in the "File" keyword from the DB,
       // indicates an ISIS preference in the DataDirectory section
       // and a filename
-      if (kfile.Size() == 2) {
+      if (kfile.size() == 2) {
         QString pref = kfile[0];
         QString version = kfile[1];
         FileName filename("$" + pref + "/" + version);
@@ -902,7 +902,7 @@ namespace Isis {
         files.push_back(filename.originalPath() + "/" + filename.name());
       }
       // One value in "File" indicates a full file spec
-      else if (kfile.Size() == 1) {
+      else if (kfile.size() == 1) {
         FileName filename(kfile[0]);
         if (filename.isVersioned())
           filename = filename.highestVersion();
@@ -910,7 +910,7 @@ namespace Isis {
       }
       else {
         QString msg = "Invalid File keyword value in [Group = ";
-        msg += grp.Name() + "] in database file [";
+        msg += grp.name() + "] in database file [";
         msg += m_filename + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }

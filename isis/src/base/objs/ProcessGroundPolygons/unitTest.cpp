@@ -39,7 +39,7 @@ void IsisMain() {
   }
 
   Pvl pvl;
-  pvl.AddGroup(mapping);
+  pvl.addGroup(mapping);
 
   PvlGroup vimsMapping("Mapping");
   {
@@ -74,7 +74,7 @@ void IsisMain() {
 
   std::vector<double> vimsSamps, vimsLines, vect;
   Pvl vimsPvl;
-  vimsPvl.AddGroup(vimsMapping);
+  vimsPvl.addGroup(vimsMapping);
 
   CubeAttributeOutput out_atts;
   out_atts.setPixelType(Real);

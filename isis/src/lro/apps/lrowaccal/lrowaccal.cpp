@@ -62,7 +62,7 @@ void IsisMain () {
   Cube *icube = p.SetInputCube("FROM");
 
   // Make sure it is a WAC cube
-  Isis::PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
+  Isis::PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
   QString instId = (QString) inst["InstrumentId"];
   instId = instId.toUpper();
   if (instId != "WAC-VIS" && instId != "WAC-UV") {
@@ -72,12 +72,12 @@ void IsisMain () {
   }
 
   // And check if it has already run through calibration
-  if (icube->label()->FindObject("IsisCube").HasGroup("Radiometry")) {
+  if (icube->label()->findObject("IsisCube").hasGroup("Radiometry")) {
     QString msg = "This image has already been calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (icube->label()->FindObject("IsisCube").HasGroup("AlphaCube")) {
+  if (icube->label()->findObject("IsisCube").hasGroup("AlphaCube")) {
     QString msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -115,7 +115,7 @@ void IsisMain () {
     g_bands.push_back(icube->physicalBand(i));
   }
 
-  Isis::PvlGroup &bandBin = icube->label()->FindGroup("BandBin", Pvl::Traverse);
+  Isis::PvlGroup &bandBin = icube->label()->findGroup("BandBin", Pvl::Traverse);
   QString filter = (QString) bandBin["Center"][0];
   QString filterNum = (QString) bandBin["FilterNumber"][0];
   //We have to pay special attention incase we are passed a 
@@ -171,7 +171,7 @@ void IsisMain () {
 
   if (g_radiometric) {
 
-    Isis::PvlKeyword &bands = icube->label()->FindGroup("BandBin", Pvl::Traverse).FindKeyword("FilterNumber");
+    Isis::PvlKeyword &bands = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
 
     if (radFile.toLower() == "default" || radFile.length() == 0)
       radFile = "$lro/calibration/WAC_RadiometricResponsivity.????.pvl";
@@ -189,7 +189,7 @@ void IsisMain () {
     if (g_iof) {
       responsivity = radPvl["IOF"];
 
-      for (int i = 0; i < bands.Size(); i++)
+      for (int i = 0; i < bands.size(); i++)
         g_iofResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
 
       try {
@@ -223,7 +223,7 @@ void IsisMain () {
     }
     else {
       responsivity = radPvl["Radiance"];
-      for (int i = 0; i < bands.Size(); i++)
+      for (int i = 0; i < bands.size(); i++)
         g_radianceResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
     }
   }
@@ -263,9 +263,9 @@ void IsisMain () {
   PvlGroup calgrp("Radiometry");
   if (g_dark) {
     PvlKeyword darks("DarkFiles");
-    darks.AddValue(darkFiles[0]);
+    darks.addValue(darkFiles[0]);
     if (darkFiles.size() > 1)
-      darks.AddValue(darkFiles[1]);
+      darks.addValue(darkFiles[1]);
     calgrp += darks;
   }
   if (g_flatfield)
@@ -275,12 +275,12 @@ void IsisMain () {
     if (g_iof) {
       calgrp += PvlKeyword("RadiometricType", "IOF");
       for (unsigned int i=0; i< g_iofResponsivity.size(); i++)
-        vals.AddValue(toString(g_iofResponsivity[i]));
+        vals.addValue(toString(g_iofResponsivity[i]));
     }
     else {
       calgrp += PvlKeyword("RadiometricType", "AbsoluteRadiance");
       for (unsigned int i=0; i< g_radianceResponsivity.size(); i++)
-        vals.AddValue(toString(g_radianceResponsivity[i]));
+        vals.addValue(toString(g_radianceResponsivity[i]));
     }
     calgrp += vals;
     calgrp += PvlKeyword("SolarDistance", toString(g_solarDistance));

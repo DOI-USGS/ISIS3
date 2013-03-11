@@ -48,7 +48,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
     double time = iTime((QString)inst["StartTime"]).Et();

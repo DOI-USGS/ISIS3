@@ -46,32 +46,32 @@ namespace Isis {
     Isis::Pvl pvl;
 
     if(Isis::FileName(file).fileExists()) {
-      pvl.Read(file);
+      pvl.read(file);
     }
 
     // Override parameters each time load is called
-    for(int i = 0; i < pvl.Groups(); i++) {
-      Isis::PvlGroup &inGroup = pvl.Group(i);
-      if(this->HasGroup(inGroup.Name())) {
-        Isis::PvlGroup &outGroup = this->FindGroup(inGroup.Name());
-        for(int k = 0; k < inGroup.Keywords(); k++) {
+    for(int i = 0; i < pvl.groups(); i++) {
+      Isis::PvlGroup &inGroup = pvl.group(i);
+      if(this->hasGroup(inGroup.name())) {
+        Isis::PvlGroup &outGroup = this->findGroup(inGroup.name());
+        for(int k = 0; k < inGroup.keywords(); k++) {
           Isis::PvlKeyword &inKey = inGroup[k];
-          while(outGroup.HasKeyword(inKey.Name())) {
-            outGroup.DeleteKeyword(inKey.Name());
+          while(outGroup.hasKeyword(inKey.name())) {
+            outGroup.deleteKeyword(inKey.name());
           }
           outGroup += inKey;
         }
       }
       else {
-        this->AddGroup(inGroup);
+        this->addGroup(inGroup);
       }
     }
 
     // Configure Isis to use the user performance preferences where
     //   appropriate.
-    if (HasGroup("Performance")) {
-      PvlGroup &performance = FindGroup("Performance");
-      if (performance.HasKeyword("GlobalThreads")) {
+    if (hasGroup("Performance")) {
+      PvlGroup &performance = findGroup("Performance");
+      if (performance.hasKeyword("GlobalThreads")) {
         IString threadsPreference = performance["GlobalThreads"][0];
 
         if (threadsPreference.DownCase() != "optimized") {
@@ -126,7 +126,7 @@ namespace Isis {
     // the system and user preferences instead of the TestPreferences.
     else if(unitTest) {
       p_unitTest = unitTest;
-      p_preference->Clear();
+      p_preference->clear();
       p_preference->Load("$ISISROOT/src/base/objs/Preference/TestPreferences");
     }
 

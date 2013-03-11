@@ -74,7 +74,7 @@ namespace Isis {
     if(p_groundMap->Camera()) {
       Pvl tmp;
       p_groundMap->Camera()->BasicMapping(tmp);
-      *p_mapping = tmp.FindGroup("Mapping");
+      *p_mapping = tmp.findGroup("Mapping");
     }
     else {
       *p_mapping = p_groundMap->Projection()->Mapping();
@@ -85,7 +85,7 @@ namespace Isis {
     Distance radius2 = Distance((double)(*p_mapping)["PolarRadius"],
         Distance::Meters);
 
-    if(p_mapping->HasKeyword("MinimumLatitude")) {
+    if(p_mapping->hasKeyword("MinimumLatitude")) {
       p_minLat = new Latitude(
           toDouble((*p_mapping)["MinimumLatitude"][0]), *p_mapping,
           Angle::Degrees);
@@ -94,7 +94,7 @@ namespace Isis {
       p_minLat = new Latitude;
     }
 
-    if(p_mapping->HasKeyword("MaximumLatitude")) {
+    if(p_mapping->hasKeyword("MaximumLatitude")) {
       p_maxLat = new Latitude(
           toDouble((*p_mapping)["MaximumLatitude"][0]), *p_mapping,
           Angle::Degrees);
@@ -103,7 +103,7 @@ namespace Isis {
       p_maxLat = new Latitude;
     }
 
-    if(p_mapping->HasKeyword("MinimumLongitude")) {
+    if(p_mapping->hasKeyword("MinimumLongitude")) {
       p_minLon = new Longitude(
           toDouble((*p_mapping)["MinimumLongitude"][0]), *p_mapping,
           Angle::Degrees);
@@ -112,7 +112,7 @@ namespace Isis {
       p_minLon = new Longitude;
     }
 
-    if(p_mapping->HasKeyword("MaximumLongitude")) {
+    if(p_mapping->hasKeyword("MaximumLongitude")) {
       p_maxLon = new Longitude(
           toDouble((*p_mapping)["MaximumLongitude"][0]), *p_mapping,
           Angle::Degrees);

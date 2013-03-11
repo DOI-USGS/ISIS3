@@ -35,7 +35,7 @@ void IsisMain() {
   Pvl lab(inFile.expanded());
 
   //Checks if in file is rdr
-  if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
+  if(lab.hasObject("IMAGE_MAP_PROJECTION")) {
     QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::Io, msg, _FILEINFO_);
@@ -120,7 +120,7 @@ void TranslateData(Buffer &inData) {
 
 void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   // Get the directory where the MOC translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   QString transDir = (QString) dataDir["Galileo"];
@@ -133,22 +133,22 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   labelXlater.Auto(*(outputLabel));
 
   //Add to the Archive Group
-  PvlGroup &arch = outputLabel->FindGroup("Archive", Pvl::Traverse);
-  PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
-  arch.AddKeyword(PvlKeyword("DataType", "RADIANCE"));
-  QString CTC = (QString) arch.FindKeyword("ObservationId");
+  PvlGroup &arch = outputLabel->findGroup("Archive", Pvl::Traverse);
+  PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
+  arch.addKeyword(PvlKeyword("DataType", "RADIANCE"));
+  QString CTC = (QString) arch.findKeyword("ObservationId");
   QString CTCout = CTC.mid(0, 2);
-  arch.AddKeyword(PvlKeyword("CalTargetCode", CTCout));
+  arch.addKeyword(PvlKeyword("CalTargetCode", CTCout));
 
   // Add to the Instrument Group
-  QString itest = (QString) inst.FindKeyword("StartTime");
+  QString itest = (QString) inst.findKeyword("StartTime");
   itest.remove("Z");
-  inst.FindKeyword("StartTime").SetValue(itest);
+  inst.findKeyword("StartTime").setValue(itest);
   //change exposure duration to seconds
-  double expDur = inst.FindKeyword("exposureDuration");
+  double expDur = inst.findKeyword("exposureDuration");
   double expDurOut = expDur / 1000.0;
-  inst.FindKeyword("exposureDuration").SetValue(toString(expDurOut), "seconds");
-  inst.AddKeyword(PvlKeyword("FrameDuration",
+  inst.findKeyword("exposureDuration").setValue(toString(expDurOut), "seconds");
+  inst.addKeyword(PvlKeyword("FrameDuration",
                              (QString) pdsLabel["frameDuration"], "seconds"));
 
   //Calculate the Frame_Rate_Id keyword
@@ -160,11 +160,11 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
     summingMode = 2;
   }
 
-  inst.AddKeyword(PvlKeyword("Summing", toString(summingMode)));
-  inst.AddKeyword(PvlKeyword("FrameModeId", frameModeId));
+  inst.addKeyword(PvlKeyword("Summing", toString(summingMode)));
+  inst.addKeyword(PvlKeyword("FrameModeId", frameModeId));
 
   // Create the Band bin Group
-  PvlGroup &bandBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
+  PvlGroup &bandBin = outputLabel->findGroup("BandBin", Pvl::Traverse);
   QString filterName = pdsLabel["FILTER_NAME"];
   QString waveLength = "";
   QString width = "";
@@ -200,8 +200,8 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
     waveLength = "0.986";
     width = ".04";
   }
-  bandBin.AddKeyword(PvlKeyword("Center", waveLength, "micrometers"));
-  bandBin.AddKeyword(PvlKeyword("Width", width, "micrometers"));
+  bandBin.addKeyword(PvlKeyword("Center", waveLength, "micrometers"));
+  bandBin.addKeyword(PvlKeyword("Width", width, "micrometers"));
 
   //create the kernel group
   PvlGroup kern("Kernels");

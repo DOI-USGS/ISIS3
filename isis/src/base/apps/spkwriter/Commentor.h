@@ -100,7 +100,7 @@ template <class K>
       }
 
       /** Returns the current contents of the collected comments */
-      QString Comments() const { 
+      QString comments() const { 
         return (_comComment + _comSetComments);
       }
 

@@ -163,7 +163,7 @@ namespace Isis {
 
       //! Compare for int1 greater than / equal to int2
       virtual bool CompareInterests(double int1, double int2);
-      void AddGroup(Isis::PvlObject &obj);  //???? check if used
+      void addGroup(Isis::PvlObject &obj);  //???? check if used
 
       //! Set the Clip Polygon for points to be contained in the overlaps
       void SetClipPolygon(const geos::geom::MultiPolygon &clipPolygon);

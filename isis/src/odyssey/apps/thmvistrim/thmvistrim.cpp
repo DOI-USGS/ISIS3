@@ -105,7 +105,7 @@ void CalculateBottomTrim(Cube *icube) {
   //   to get these, we change the cube labels in a local copy and create an
   //   odd framelet and an even framelet camera.
   Pvl cubeLabels = *icube->label();
-  PvlKeyword &framelets = cubeLabels.FindGroup("Instrument", Pvl::Traverse)["Framelets"];
+  PvlKeyword &framelets = cubeLabels.findGroup("Instrument", Pvl::Traverse)["Framelets"];
   framelets = "Even";
   Camera *camEven = CameraFactory::Create(cubeLabels);
 

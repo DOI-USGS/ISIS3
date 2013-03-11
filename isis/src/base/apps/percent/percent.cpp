@@ -45,7 +45,7 @@ void IsisMain() {
   // Write an output file if requested
   if(ui.WasEntered("TO")) {
     Pvl temp;
-    temp.AddGroup(results);
-    temp.Write(ui.GetFileName("TO", "txt"));
+    temp.addGroup(results);
+    temp.write(ui.GetFileName("TO", "txt"));
   }
 }

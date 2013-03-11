@@ -51,17 +51,17 @@ namespace Isis {
    **/
   PolygonSeeder *PolygonSeederFactory::Create(Pvl &pvl) {
     // Get the algorithm name to create
-    PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findGroup("PolygonSeederAlgorithm", Pvl::Traverse);
     QString algorithm = algo["Name"];
 
     // Open the factory plugin file
     Plugin p;
     FileName f("PolygonSeeder.plugin");
     if(f.fileExists()) {
-      p.Read("PolygonSeeder.plugin");
+      p.read("PolygonSeeder.plugin");
     }
     else {
-      p.Read("$ISISROOT/lib/PolygonSeeder.plugin");
+      p.read("$ISISROOT/lib/PolygonSeeder.plugin");
     }
 
     // Get the algorithm specific plugin and return it

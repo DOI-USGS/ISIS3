@@ -66,7 +66,7 @@ namespace Isis {
       catch (IException &secondError) {
         p_projection = NULL;
         QString msg = "Could not create camera or projection for [" +
-                          pvl.FileName() + "]";
+                          pvl.fileName() + "]";
         IException realError(IException::Unknown, msg, _FILEINFO_);
         realError.append(firstError);
         realError.append(secondError);
@@ -353,10 +353,10 @@ namespace Isis {
       else if (HasProjection()) {
         // Footprint failed, look in the mapping group
         PvlGroup mappingGrp = p_projection->Mapping();
-        if (mappingGrp.HasKeyword("MinimumLatitude") &&
-            mappingGrp.HasKeyword("MaximumLatitude") &&
-            mappingGrp.HasKeyword("MinimumLongitude") &&
-            mappingGrp.HasKeyword("MaximumLongitude")) {
+        if (mappingGrp.hasKeyword("MinimumLatitude") &&
+            mappingGrp.hasKeyword("MaximumLatitude") &&
+            mappingGrp.hasKeyword("MinimumLongitude") &&
+            mappingGrp.hasKeyword("MaximumLongitude")) {
 
           minLat = Latitude(mappingGrp["MinimumLatitude"],
                             mappingGrp, Angle::Degrees);

@@ -161,8 +161,8 @@ void ProgramAnalyzer::include(const QString &name) {
  */
 void ProgramAnalyzer::add(const QString &logfile) {
   Pvl plog(logfile);
-  for(int i = 0; i < plog.Objects(); i++) {
-    add(plog.Object(i));
+  for(int i = 0; i < plog.objects(); i++) {
+    add(plog.object(i));
   }
 }
 
@@ -178,7 +178,7 @@ void ProgramAnalyzer::add(const QString &logfile) {
  */
 void ProgramAnalyzer::add(PvlObject &program) {
   _count++;
-  QString prog(program.Name());
+  QString prog(program.name());
   if ( _excludes.exists(prog) ) {
     _excludes.get(prog)++;
     return;
@@ -375,7 +375,7 @@ QString ProgramAnalyzer::getKey(PvlObject &obj, const QString &key,
 
   QString value("");
   if ( !grp.isEmpty() ) {
-    PvlGroup &g = obj.FindGroup(grp);
+    PvlGroup &g = obj.findGroup(grp);
     value = findKey(g, key);
   }
   else {
@@ -438,12 +438,12 @@ bool ProgramAnalyzer::accounting(PvlObject &obj,
                                  ProgramAnalyzer::ProgramData &pdata) const {
 
   //  Assume an error occured if the Accounting group is missing
-  if ( !obj.HasGroup("Accounting") ) {
+  if ( !obj.hasGroup("Accounting") ) {
     pdata.status = ERRORS;
     return (false);
   }
   
-  PvlGroup &acc = obj.FindGroup("Accounting");
+  PvlGroup &acc = obj.findGroup("Accounting");
   Status status = convertTime(findKey(acc,"ConnectTime"), pdata.connectTime);
   pdata.status = convertTime(findKey(acc, "CpuTime"), pdata.cpuTime);
 

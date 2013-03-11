@@ -59,8 +59,8 @@ void IsisMain() {
   Cube * outCube = p.SetOutputCube("TO");
 
   // FYI, labels are copied on SetOutputCube call, so In and Out labels match
-  PvlObject & isiscube = outCube->label()->FindObject("IsisCube");
-  PvlGroup & inst = isiscube.FindGroup("Instrument");
+  PvlObject & isiscube = outCube->label()->findObject("IsisCube");
+  PvlGroup & inst = isiscube.findGroup("Instrument");
 
   // Verify Voyager1 spacecraft
   if (inst["SpacecraftName"][0] != "VOYAGER_1") {
@@ -70,7 +70,7 @@ void IsisMain() {
   }
 
   // Verify has been radiometrically calibrated
-  if (!isiscube.HasGroup("Radiometry")) {
+  if (!isiscube.hasGroup("Radiometry")) {
     QString msg = "The cube [" + ui.GetFileName("FROM") + "] has not been" +
                   "radiometrically corrected, run voycal first";
   }
@@ -90,7 +90,7 @@ void IsisMain() {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  PvlGroup & radio = isiscube.FindGroup("Radiometry");
+  PvlGroup & radio = isiscube.findGroup("Radiometry");
   double gain = radio["GainCorrection"];
   double off = radio["OffsetCorrection"];
   double XMLT = radio["XMLT"];
@@ -148,7 +148,7 @@ void IsisMain() {
 
   // Create data to go in Radiometry group
   PvlKeyword top = PvlKeyword("TopCorrectiveDN", toString(y1));
-  top.AddComment("Voyramp plasma torus corrective DN values:");
+  top.addComment("Voyramp plasma torus corrective DN values:");
   PvlKeyword mid = PvlKeyword("MiddleCorrectiveDN", toString(y2));
   PvlKeyword bot = PvlKeyword("BottomCorrectiveDN", toString(y3));
 

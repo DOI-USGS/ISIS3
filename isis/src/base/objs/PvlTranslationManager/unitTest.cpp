@@ -180,18 +180,18 @@ int main(void) {
     cout << endl;
 
     cout << "  Testing InputUnits member" << endl;
-    cout << "    PixelResolution = " << transMgr.InputKeyword("PixelResolution").Unit() << endl;
-    cout << "    NumberOfBands   = " << transMgr.InputKeyword("NumberOfBands").Unit() << endl;
+    cout << "    PixelResolution = " << transMgr.InputKeyword("PixelResolution").unit() << endl;
+    cout << "    NumberOfBands   = " << transMgr.InputKeyword("NumberOfBands").unit() << endl;
     cout << "    Error messages:" << endl;
     try {
-      transMgr.InputKeyword("BadGroup").Unit();
+      transMgr.InputKeyword("BadGroup").unit();
     }
     catch(IException &e) {
       cerr << "    ";
       e.print();
     }
     try {
-      transMgr.InputKeyword("GoodGroupBadKey").Unit();
+      transMgr.InputKeyword("GoodGroupBadKey").unit();
     }
     catch(IException &e) {
       cerr << "    ";
@@ -200,18 +200,18 @@ int main(void) {
     cout << endl;
 
     cout << "  Testing InputSize member" << endl;
-    cout << "    BandName        = " << transMgr.InputKeyword("BandName").Size() << endl;
-    cout << "    PixelResolution = " << transMgr.InputKeyword("PixelResolution").Size() << endl;
+    cout << "    BandName        = " << transMgr.InputKeyword("BandName").size() << endl;
+    cout << "    PixelResolution = " << transMgr.InputKeyword("PixelResolution").size() << endl;
     cout << "    Error messages:" << endl;
     try {
-      transMgr.InputKeyword("BadGroup").Size();
+      transMgr.InputKeyword("BadGroup").size();
     }
     catch(IException &e) {
       cerr << "    ";
       e.print();
     }
     try {
-      transMgr.InputKeyword("GoodGroupBadKey").Size();
+      transMgr.InputKeyword("GoodGroupBadKey").size();
     }
     catch(IException &e) {
       cerr << "    ";

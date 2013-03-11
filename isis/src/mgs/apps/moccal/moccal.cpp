@@ -109,7 +109,7 @@ void IsisMain() {
   else {
     camera = "NarrowAngleA";
   }
-  PvlGroup &calCamera = calKernel.FindGroup(camera);
+  PvlGroup &calCamera = calKernel.findGroup(camera);
 
   // Get the camera specific calibration parameters from the kernel file
   // and load detector coefficients (gain/offsets at each pixel)
@@ -163,8 +163,8 @@ void IsisMain() {
   calgrp += PvlKeyword("CoefficientFile", coefFile);
 
   calgrp += PvlKeyword("a", toString(gbl::a));
-  calgrp["a"].AddComment("Radiometric equation in moccal");
-  calgrp["a"].AddComment("r = (pixel - z + off) / a - g / ex - dc");
+  calgrp["a"].addComment("Radiometric equation in moccal");
+  calgrp["a"].addComment("r = (pixel - z + off) / a - g / ex - dc");
   calgrp += PvlKeyword("off", toString(gbl::off));
   calgrp += PvlKeyword("ex", toString(gbl::ex));
   calgrp += PvlKeyword("z", toString(gbl::z));
@@ -172,7 +172,7 @@ void IsisMain() {
   calgrp += PvlKeyword("g", toString(gbl::g));
 
   calgrp += PvlKeyword("w0", toString(gbl::w0));
-  calgrp["w0"].AddComment("Reflectance = r * iof, where iof = (s * s) / w0");
+  calgrp["w0"].addComment("Reflectance = r * iof, where iof = (s * s) / w0");
   calgrp += PvlKeyword("s", toString(sunAU));
   calgrp += PvlKeyword("iof", toString(gbl::iof));
 

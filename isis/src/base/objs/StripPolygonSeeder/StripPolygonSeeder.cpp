@@ -128,39 +128,39 @@ namespace Isis {
     // Pull parameters specific to this algorithm out
     try {
       // Get info from Algorithm group
-      PvlGroup &algo = pvl.FindGroup("PolygonSeederAlgorithm", Pvl::Traverse);
-      PvlGroup &invalgo = invalidInput->FindGroup("PolygonSeederAlgorithm",
+      PvlGroup &algo = pvl.findGroup("PolygonSeederAlgorithm", Pvl::Traverse);
+      PvlGroup &invalgo = invalidInput->findGroup("PolygonSeederAlgorithm",
                           Pvl::Traverse);
 
       // Set the spacing
       p_Xspacing = 0.0;
-      if(algo.HasKeyword("XSpacing")) {
+      if(algo.hasKeyword("XSpacing")) {
         p_Xspacing = (double) algo["XSpacing"];
-        if(invalgo.HasKeyword("XSpacing")) {
-          invalgo.DeleteKeyword("XSpacing");
+        if(invalgo.hasKeyword("XSpacing")) {
+          invalgo.deleteKeyword("XSpacing");
         }
       }
       else {
         QString msg = "PVL for StripSeeder must contain [XSpacing] in [";
-        msg += pvl.FileName() + "]";
+        msg += pvl.fileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       p_Yspacing = 0.0;
-      if(algo.HasKeyword("YSpacing")) {
+      if(algo.hasKeyword("YSpacing")) {
         p_Yspacing = (double) algo["YSpacing"];
-        if(invalgo.HasKeyword("YSpacing")) {
-          invalgo.DeleteKeyword("YSpacing");
+        if(invalgo.hasKeyword("YSpacing")) {
+          invalgo.deleteKeyword("YSpacing");
         }
       }
       else {
         QString msg = "PVL for StripSeeder must contain [YSpacing] in [";
-        msg += pvl.FileName() + "]";
+        msg += pvl.fileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      QString msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
+      QString msg = "Improper format for PolygonSeeder PVL [" + pvl.fileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -183,11 +183,11 @@ namespace Isis {
     PvlKeyword xSpac("XSpacing", toString(p_Xspacing));
     PvlKeyword ySpac("YSpacing", toString(p_Yspacing));
 
-    pluginInfo.AddKeyword(name);
-    pluginInfo.AddKeyword(minThickness);
-    pluginInfo.AddKeyword(minArea);
-    pluginInfo.AddKeyword(xSpac);
-    pluginInfo.AddKeyword(ySpac);
+    pluginInfo.addKeyword(name);
+    pluginInfo.addKeyword(minThickness);
+    pluginInfo.addKeyword(minArea);
+    pluginInfo.addKeyword(xSpac);
+    pluginInfo.addKeyword(ySpac);
 
     return pluginInfo;
   }

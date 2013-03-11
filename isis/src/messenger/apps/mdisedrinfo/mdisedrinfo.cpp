@@ -144,17 +144,17 @@ void IsisMain() {
       }
     }
     else {
-      PvlContainer::PvlKeywordIterator keyIter = geomkeys.Begin();
-      for(; keyIter != geomkeys.End() ;  ++keyIter) {
-        mdiskeys.AddKeyword(*keyIter);
+      PvlContainer::PvlKeywordIterator keyIter = geomkeys.begin();
+      for(; keyIter != geomkeys.end() ;  ++keyIter) {
+        mdiskeys.addKeyword(*keyIter);
       }
     }
 
 //  See if the user wants to write out the PVL keywords
     if(!pvl.isEmpty()) {
       Pvl pout;
-      pout.AddGroup(mdiskeys);
-      pout.Write(pvl);
+      pout.addGroup(mdiskeys);
+      pout.write(pvl);
     }
 
 //  Log the results to the log/terminal/gui

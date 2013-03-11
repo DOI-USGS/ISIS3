@@ -29,18 +29,18 @@ void IsisMain() {
     if(icube->hasGroup("BandBin")) {
       PvlGroup &pvlg = icube->group("BandBin");
       removekeywords(pvlg);
-      if(pvlg.HasKeyword("Center")) {
-        bool hasWidth = pvlg.HasKeyword("Width");
-        PvlKeyword &pvlCenter = pvlg.FindKeyword("Center");
+      if(pvlg.hasKeyword("Center")) {
+        bool hasWidth = pvlg.hasKeyword("Width");
+        PvlKeyword &pvlCenter = pvlg.findKeyword("Center");
         PvlKeyword *pvlWidth = NULL;
         if(hasWidth) {
-          pvlWidth = & pvlg.FindKeyword("Width");
+          pvlWidth = & pvlg.findKeyword("Width");
         }
         std::vector<double> centers;
         centers.resize(icube->bandCount());
         std::vector<double> widths;
         widths.resize(icube->bandCount());
-        for(int i = 0; i < pvlCenter.Size(); i++) {
+        for(int i = 0; i < pvlCenter.size(); i++) {
           centers[i] = toDouble(pvlCenter[i]);
           if(hasWidth)
             widths[i] = toDouble((*pvlWidth)[i]);
@@ -72,25 +72,25 @@ void IsisMain() {
     }
     QString Units = "";
     PvlKeyword pvlCenter;
-    if(pvlg.HasKeyword("Center")) {
-      pvlCenter = pvlg.FindKeyword("Center");
-      Units = pvlCenter.Unit();
-      pvlg.DeleteKeyword("Center");
+    if(pvlg.hasKeyword("Center")) {
+      pvlCenter = pvlg.findKeyword("Center");
+      Units = pvlCenter.unit();
+      pvlg.deleteKeyword("Center");
     }
 
     pvlCenter = PvlKeyword("Center");
-    pvlCenter.SetValue(ui.GetAsString("CENTER"), Units);
-    pvlg.AddKeyword(pvlCenter);
+    pvlCenter.setValue(ui.GetAsString("CENTER"), Units);
+    pvlg.addKeyword(pvlCenter);
     PvlKeyword pvlWidth;
-    if(pvlg.HasKeyword("Width")) {
-      pvlWidth = pvlg.FindKeyword("Width");
-      Units = pvlWidth.Unit();
-      pvlg.DeleteKeyword("Width");
+    if(pvlg.hasKeyword("Width")) {
+      pvlWidth = pvlg.findKeyword("Width");
+      Units = pvlWidth.unit();
+      pvlg.deleteKeyword("Width");
     }
 
     pvlWidth = PvlKeyword("Width");
-    pvlWidth.SetValue(ui.GetAsString("WIDTH"), Units);
-    pvlg.AddKeyword(pvlWidth);
+    pvlWidth.setValue(ui.GetAsString("WIDTH"), Units);
+    pvlg.addKeyword(pvlWidth);
     //Destroys the old and adds the new BandBin Group
     if(ocube->hasGroup("BandBin")) {
       ocube->deleteGroup("BandBin");
@@ -121,11 +121,11 @@ void cubeavg(vector<Buffer *> &in, vector<Buffer *> &out) {
  * @param pvlg the group from which the keywords are removed
  */
 void removekeywords(PvlGroup &pvlg) {
-  if(pvlg.HasKeyword("OriginalBand")) {
-    pvlg.DeleteKeyword("OriginalBand");
+  if(pvlg.hasKeyword("OriginalBand")) {
+    pvlg.deleteKeyword("OriginalBand");
   }
-  if(pvlg.HasKeyword("Name")) {
-    pvlg.DeleteKeyword("Name");
+  if(pvlg.hasKeyword("Name")) {
+    pvlg.deleteKeyword("Name");
   }
 }
 
@@ -133,12 +133,12 @@ void removekeywords(PvlGroup &pvlg) {
 void compute(vector<double> centers, vector<double> widths,
              Cube *ocube) {
   PvlGroup &pvlg = ocube->group("BandBin");
-  PvlKeyword &pvlCenter = pvlg.FindKeyword("Center");
-  QString centerUnit = pvlCenter.Unit();
-  bool hasWidth  = pvlg.HasKeyword("Width");
+  PvlKeyword &pvlCenter = pvlg.findKeyword("Center");
+  QString centerUnit = pvlCenter.unit();
+  bool hasWidth  = pvlg.hasKeyword("Width");
   double large = centers[0] + widths[0] / 2;
   double small = centers[0] - widths[0] / 2;
-  for(int i = 1; i < pvlCenter.Size(); i++) {
+  for(int i = 1; i < pvlCenter.size(); i++) {
     if(large < (double)centers[i] + (double)widths[i] / 2.0) {
       large = (double)centers[i] + (double)widths[i] / 2.0;
     }
@@ -146,15 +146,15 @@ void compute(vector<double> centers, vector<double> widths,
       small = (double)centers[i] - (double)widths[i] / 2.0;
     }
   }
-  pvlCenter.SetValue(toString((large - small) / 2 + small), centerUnit);
+  pvlCenter.setValue(toString((large - small) / 2 + small), centerUnit);
   if(hasWidth) {
-    PvlKeyword &pvlWidth  = pvlg.FindKeyword("Width");
-    pvlWidth.SetValue(toString(large - small), pvlWidth.Unit());
+    PvlKeyword &pvlWidth  = pvlg.findKeyword("Width");
+    pvlWidth.setValue(toString(large - small), pvlWidth.unit());
   }
   else {
     PvlKeyword pvlWidth = PvlKeyword("Width");
-    pvlWidth.SetValue(toString(large - small), centerUnit);
-    pvlg.AddKeyword(pvlWidth);
+    pvlWidth.setValue(toString(large - small), centerUnit);
+    pvlg.addKeyword(pvlWidth);
   }
 
 }

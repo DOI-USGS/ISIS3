@@ -66,7 +66,7 @@ namespace Isis {
    */
   void VimsSkyMap::Init(Pvl &lab) {
 
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     //  Vis or IR
     p_channel = (QString) inst ["Channel"];
@@ -107,7 +107,7 @@ namespace Isis {
     //FileName vectorFile(Spice::getString(key,0));
     //tack on _HR or _NY for other summing modes.
     // Get the directory for the unit vector files.
-    PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+    PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
     QString vecDir = (QString) dataDir["Cassini"] + "/unitVectors/";
 
     FileName vectorFile;

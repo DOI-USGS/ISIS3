@@ -160,7 +160,7 @@ void IsisMain() {
   //parameters for maximum correlation autoregestration  
   // see: ///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
   FileName fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
-  pvl.Read(fiducialPvl.expanded());  //read in the autoreg parameters
+  pvl.read(fiducialPvl.expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
 
   *arS->PatternChip() = patternS;  //patternS chip is constant

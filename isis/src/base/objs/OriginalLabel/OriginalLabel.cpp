@@ -33,7 +33,7 @@ namespace Isis {
    * Constructor for creating an original blob with a given name
    */
   OriginalLabel::OriginalLabel() : Isis::Blob("IsisCube", "OriginalLabel") {
-    m_originalLabel.SetTerminator("");
+    m_originalLabel.setTerminator("");
   }
 
   /**

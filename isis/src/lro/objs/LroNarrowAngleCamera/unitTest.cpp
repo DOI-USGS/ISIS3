@@ -57,7 +57,7 @@ int main(void) {
     if (cmVersion == 1) {
       knownLat = -83.229473272165;
       knownLon = 353.93153626711;
-      p.Read("$lro/testData/M111607830RE_crop.cub.cv1");
+      p.read("$lro/testData/M111607830RE_crop.cub.cv1");
     }
     else {
       knownLat = -83.2598150072595899;
@@ -66,7 +66,7 @@ int main(void) {
 
     Camera *cam = CameraFactory::Create(p);
     
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

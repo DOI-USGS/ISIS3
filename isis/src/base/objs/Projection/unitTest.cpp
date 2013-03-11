@@ -152,8 +152,8 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for missing Equatorial Radius in the mapping group" << endl;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mg = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mg = lab.findGroup("Mapping");
   Doit(lab);
   cout << endl;
 
@@ -280,13 +280,13 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing invalid maximum latitude" << endl;
-  mg["MinimumLatitude"].SetValue(toString(45.0), "units");
-  mg["MaximumLatitude"].SetValue(toString(95.0), "units");
+  mg["MinimumLatitude"].setValue(toString(45.0), "units");
+  mg["MaximumLatitude"].setValue(toString(95.0), "units");
   Doit(lab);
   cout << endl;
 
   cout << "Testing unordered longitude range" << endl;
-  mg["MaximumLatitude"].SetValue(toString(80.0), "units");
+  mg["MaximumLatitude"].setValue(toString(80.0), "units");
   Doit(lab);
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
@@ -350,8 +350,8 @@ int main(int argc, char *argv[]) {
    *   were added to accommodate for double imprecission. 
    */
   Isis::Pvl latRangeTest;
-  latRangeTest.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &latTestGroup = latRangeTest.FindGroup("Mapping");
+  latRangeTest.addGroup(Isis::PvlGroup("Mapping"));
+  Isis::PvlGroup &latTestGroup = latRangeTest.findGroup("Mapping");
   latTestGroup += Isis::PvlKeyword("TargetName", "Moon");
   latTestGroup += Isis::PvlKeyword("ProjectionName", "PolarStereographic");
   latTestGroup += Isis::PvlKeyword("EquatorialRadius", toString(1737400.0));
@@ -701,9 +701,9 @@ int main(int argc, char *argv[]) {
   cout << "Rotation Tests" << endl;
   mg += PvlKeyword("Rotation", toString(90.0));
   mg["LongitudeDirection"] = "PositiveEast";
-  mg.DeleteKeyword("EquatorialRadius");
-  mg.DeleteKeyword("PolarRadius");
-  mg.DeleteKeyword("PolarRadius");
+  mg.deleteKeyword("EquatorialRadius");
+  mg.deleteKeyword("PolarRadius");
+  mg.deleteKeyword("PolarRadius");
   mg["TargetName"] = "Moon";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;
@@ -736,19 +736,19 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   Pvl mapping;
-  mapping.AddGroup(p4.Mapping());
+  mapping.addGroup(p4.Mapping());
   cout << "Testing Mapping() methods" << endl;
   cout << "Mapping() = " << endl;
   cout << mapping << endl;
-  mapping.DeleteGroup("Mapping");
-  mapping.AddGroup(p4.MappingLatitudes());
+  mapping.deleteGroup("Mapping");
+  mapping.addGroup(p4.MappingLatitudes());
   cout << "MappingLatitudes() = " << endl;
   cout << mapping << endl;
-  mapping.DeleteGroup("Mapping");
-  mapping.AddGroup(p4.MappingLongitudes());
+  mapping.deleteGroup("Mapping");
+  mapping.addGroup(p4.MappingLongitudes());
   cout << "MappingLongitudes() = " << endl;
   cout << mapping << endl;
-  mapping.DeleteGroup("Mapping");
+  mapping.deleteGroup("Mapping");
   cout << endl;
 
   //SetUpperLeftCorner(Displacement x, Displacement y)

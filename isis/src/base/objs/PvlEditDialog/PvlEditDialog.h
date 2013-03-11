@@ -32,8 +32,8 @@ namespace Isis {
    *            fixed bugs arising from moving this class from
    *            Qisis and to Isis. Added moc commands to Makefile.
    *   @history 2008-12-15 Jeannie Walldren - Added a verification
-    *            that the edited file is in Pvl format.  Replaced
-    *            error throws with QMessage warning boxes.
+   *            that the edited file is in Pvl format.  Replaced
+   *            error throws with QMessage warning boxes.
    */
   class PvlEditDialog : public QDialog {
       Q_OBJECT

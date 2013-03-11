@@ -74,28 +74,28 @@ void IsisMain() {
 
   if(ui.GetBoolean("TESTXY")) {
     Pvl cubeLab(ui.GetFileName("FROM"));
-    PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
     QString target = inst["TargetName"];
     PvlGroup radii = Projection::TargetRadii(target);
 
     Pvl map(ui.GetFileName("MAP"));
-    PvlGroup &mapping = map.FindGroup("MAPPING");
+    PvlGroup &mapping = map.findGroup("MAPPING");
 
-    if(!mapping.HasKeyword("TargetName"))
+    if(!mapping.hasKeyword("TargetName"))
       mapping += Isis::PvlKeyword("TargetName", target);
-    if(!mapping.HasKeyword("EquatorialRadius"))
+    if(!mapping.hasKeyword("EquatorialRadius"))
       mapping += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
-    if(!mapping.HasKeyword("PolarRadius"))
+    if(!mapping.hasKeyword("PolarRadius"))
       mapping += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
-    if(!mapping.HasKeyword("LatitudeType"))
+    if(!mapping.hasKeyword("LatitudeType"))
       mapping += Isis::PvlKeyword("LatitudeType", "Planetocentric");
-    if(!mapping.HasKeyword("LongitudeDirection"))
+    if(!mapping.hasKeyword("LongitudeDirection"))
       mapping += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-    if(!mapping.HasKeyword("LongitudeDomain"))
+    if(!mapping.hasKeyword("LongitudeDomain"))
       mapping += Isis::PvlKeyword("LongitudeDomain", "360");
-    if(!mapping.HasKeyword("CenterLatitude"))
+    if(!mapping.hasKeyword("CenterLatitude"))
       mapping += Isis::PvlKeyword("CenterLatitude", "0");
-    if(!mapping.HasKeyword("CenterLongitude"))
+    if(!mapping.hasKeyword("CenterLongitude"))
       mapping += Isis::PvlKeyword("CenterLongitude", "0");
 
     sinc = poly.getSinc();
@@ -137,8 +137,8 @@ void IsisMain() {
 
   if(precision) {
     PvlGroup results("Results");
-    results.AddKeyword(PvlKeyword("SINC", toString(sinc)));
-    results.AddKeyword(PvlKeyword("LINC", toString(linc)));
+    results.addKeyword(PvlKeyword("SINC", toString(sinc)));
+    results.addKeyword(PvlKeyword("LINC", toString(linc)));
     Application::Log(results);
   }
 

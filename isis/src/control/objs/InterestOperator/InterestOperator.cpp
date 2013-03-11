@@ -84,7 +84,7 @@ namespace Isis {
     try {
       // Get info from the operator group
       // Required Parameters
-      PvlGroup &op = pPvl.FindGroup("Operator", Pvl::Traverse);
+      PvlGroup &op = pPvl.findGroup("Operator", Pvl::Traverse);
 
       mOperatorGrp += Isis::PvlKeyword(op["Name"]);
 
@@ -105,7 +105,7 @@ namespace Isis {
 
     }
     catch (IException &e) {
-      QString msg = "Improper format for InterestOperator PVL [" + pPvl.FileName() + "]";
+      QString msg = "Improper format for InterestOperator PVL [" + pPvl.fileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -920,9 +920,9 @@ namespace Isis {
 
 
   // add this object's group to the pvl
-  void InterestOperator::AddGroup(Isis::PvlObject &obj) {
+  void InterestOperator::addGroup(Isis::PvlObject &obj) {
     Isis::PvlGroup group;
-    obj.AddGroup(group);
+    obj.addGroup(group);
   }
 
 

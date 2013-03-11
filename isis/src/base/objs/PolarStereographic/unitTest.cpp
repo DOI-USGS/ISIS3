@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
   cout << std::setprecision(14);
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mg = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mg = lab.findGroup("Mapping");
   mg += PvlKeyword("EquatorialRadius", toString(6378388.0));
   mg += PvlKeyword("PolarRadius", toString(6356911.9));
   mg += PvlKeyword("LatitudeType", "Planetographic");
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     e.print();
   }
   cout << endl;
-  mg.AddKeyword(PvlKeyword("CenterLatitude", toString(-71.0)), PvlGroup::Replace);
+  mg.addKeyword(PvlKeyword("CenterLatitude", toString(-71.0)), PvlGroup::Replace);
 
   try {
     Projection &p = *ProjectionFactory::Create(lab);
@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Test default computation ... " << endl;
-    mg.DeleteKeyword("CenterLongitude");
-    mg.DeleteKeyword("CenterLatitude");
+    mg.deleteKeyword("CenterLongitude");
+    mg.deleteKeyword("CenterLatitude");
     PolarStereographic p2(lab, true);
     cout << lab << endl;
     cout << endl;
@@ -129,9 +129,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.AddGroup(p.Mapping());
-    tmp2.AddGroup(p.MappingLatitudes());
-    tmp3.AddGroup(p.MappingLongitudes());
+    tmp1.addGroup(p.Mapping());
+    tmp2.addGroup(p.MappingLatitudes());
+    tmp3.addGroup(p.MappingLongitudes());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;

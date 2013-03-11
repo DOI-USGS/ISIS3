@@ -50,7 +50,7 @@ namespace Isis {
 
     // Get the ground range resolution (ScaledPixelHeight and ScaledPixelWidth
     // are expected to be equal - mrf2isis checks for this)
-    Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
+    Isis::PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
     double groundRangeResolution = inst["ScaledPixelHeight"]; // meters
 
     // Synthesize the pixel pitch to the ground range resolution

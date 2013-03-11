@@ -14,12 +14,12 @@ int main() {
   PvlKeyword dog("DOG", toString(5.2), "meters");
   PvlKeyword cat("CATTLE");
   cat = "Meow";
-  cat.AddComment("Cats shed");
+  cat.addComment("Cats shed");
 
   PvlContainer ani("Animals");
   ani += dog;
   ani += cat;
-  ani.AddComment("/* Pets are cool */");
+  ani.addComment("/* Pets are cool */");
 
 //  cout << "1 ..." << endl;
   cout << ani << endl;
@@ -37,8 +37,8 @@ int main() {
 
   cout << "Test inserter ..." << endl;
   PvlKeyword monkey("Orangutan", "gross");
-  ani.AddKeyword(dog, ani.Begin());
-  ani.AddKeyword(monkey, ani.Begin());
+  ani.addKeyword(dog, ani.begin());
+  ani.addKeyword(monkey, ani.begin());
   cout << ani << endl;
 
   // This is testing reallocation caused by adds,

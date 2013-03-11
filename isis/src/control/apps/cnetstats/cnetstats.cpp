@@ -31,10 +31,10 @@ void IsisMain() {
       pvlDefFile = Pvl(sDefFile);
 
       // Log the DefFile - Cannot log Object... only by Group
-      for (int i=0; i<pvlDefFile.Objects(); i++) {
-        PvlObject pvlObj = pvlDefFile.Object(i);
-        for (int j=0; j<pvlObj.Groups(); j++) {
-          Application::Log(pvlObj.Group(j));
+      for (int i=0; i<pvlDefFile.objects(); i++) {
+        PvlObject pvlObj = pvlDefFile.object(i);
+        for (int j=0; j<pvlObj.groups(); j++) {
+          Application::Log(pvlObj.group(j));
         }
       }
 
@@ -42,12 +42,12 @@ void IsisMain() {
       Pvl pvlTemplate("$ISIS3DATA/base/templates/cnetstats/cnetstats.def");
       //Pvl pvlTemplate("/home/sprasad/isis3/isis/src/control/apps/cnetstats/cnetstats.def");
       Pvl pvlResults;
-      pvlTemplate.ValidatePvl(pvlDefFile, pvlResults);
-      if(pvlResults.Objects() != 0 || pvlResults.Groups() != 0 || pvlResults.Keywords() != 0){
-        for (int i=0; i<pvlResults.Objects(); i++) {
-          PvlObject pvlObj = pvlResults.Object(i);
-          for (int j=0; j<pvlObj.Groups(); j++) {
-            Application::Log(pvlObj.Group(j));
+      pvlTemplate.validatePvl(pvlDefFile, pvlResults);
+      if(pvlResults.objects() != 0 || pvlResults.groups() != 0 || pvlResults.keywords() != 0){
+        for (int i=0; i<pvlResults.objects(); i++) {
+          PvlObject pvlObj = pvlResults.object(i);
+          for (int j=0; j<pvlObj.groups(); j++) {
+            Application::Log(pvlObj.group(j));
           }
         }
         QString sErrMsg = "Invalid Deffile\n";
@@ -116,13 +116,13 @@ void ReadDefFile(ControlNetFilter & pcNetFilter, Pvl & pvlDefFile)
   void (ControlNetFilter::*pt2Filter)(const PvlGroup & pvlGrp, bool pbLastFilter);
 
   // Parse the Groups in Point Object
-  PvlObject filtersObj = pvlDefFile.FindObject("Filters", Pvl::Traverse);
-  int iNumGroups = filtersObj.Groups();
+  PvlObject filtersObj = pvlDefFile.findObject("Filters", Pvl::Traverse);
+  int iNumGroups = filtersObj.groups();
 
   for (int i=0; i<iNumGroups; i++) {
-    PvlGroup pvlGrp = filtersObj.Group(i);
+    PvlGroup pvlGrp = filtersObj.group(i);
     // Get the pointer to ControlNetFilter member function based on Group name
-    pt2Filter=GetPtr2Filter(pvlGrp.Name());
+    pt2Filter=GetPtr2Filter(pvlGrp.name());
     if (pt2Filter != NULL) {
       (pcNetFilter.*pt2Filter)(pvlGrp, ((i==(iNumGroups-1)) ? true : false));
     }

@@ -419,7 +419,7 @@ namespace Isis {
     if(p_lpInitialized) return;
 
     // Get the leap second kernel file open
-    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
+    Isis::PvlGroup &dataDir = Isis::Preference::Preferences().findGroup("DataDirectory");
     QString baseDir = dataDir["Base"];
     baseDir += "/kernels/lsk/";
     FileName leapSecond(baseDir + "naif????.tls");

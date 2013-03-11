@@ -36,7 +36,7 @@ void IsisMain() {
 
   Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup &inst =
-    lab.FindGroup("Instrument", Pvl::Traverse);
+    lab.findGroup("Instrument", Pvl::Traverse);
 
   QString instId = inst["InstrumentId"];
   if(instId != "CTX") {

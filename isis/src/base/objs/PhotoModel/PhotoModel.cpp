@@ -18,14 +18,14 @@ namespace Isis {
    * @see photometricModels.doc
    */
   PhotoModel::PhotoModel(Pvl &pvl) {
-    PvlGroup &algorithm = pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algorithm = pvl.findObject("PhotometricModel").findGroup("Algorithm", Pvl::Traverse);
 
     // Use 'PhtName' instead of 'Name' if using the Gui combo box
     // for unique Pvl keyword in DefFile
-    if(algorithm.HasKeyword("PhtName")) {
+    if(algorithm.hasKeyword("PhtName")) {
       p_photoAlgorithmName = algorithm["PhtName"][0];
     }
-    else if(algorithm.HasKeyword("Name")) {
+    else if(algorithm.hasKeyword("Name")) {
       p_photoAlgorithmName = algorithm["Name"][0];
     }
     else {

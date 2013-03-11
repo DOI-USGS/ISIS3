@@ -201,16 +201,16 @@ void IsisMain() {
           CubeAttributeInput inAtt;
           Cube *c = p.SetInputCube(b->FileName(i), inAtt, ReadWrite);
           //check for existing polygon, if exists delete it
-          if (c->label()->HasObject("Polygon")) {
-            c->label()->DeleteObject("Polygon");
+          if (c->label()->hasObject("Polygon")) {
+            c->label()->deleteObject("Polygon");
           }
 
           // check for CameraStatistics Table, if exists, delete
-          for (int iobj = 0; iobj < c->label()->Objects(); iobj++) {
-            PvlObject obj = c->label()->Object(iobj);
-            if (obj.Name() != "Table") continue;
+          for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
+            PvlObject obj = c->label()->object(iobj);
+            if (obj.name() != "Table") continue;
             if (obj["Name"][0] != QString("CameraStatistics")) continue;
-            c->label()->DeleteObject(iobj);
+            c->label()->deleteObject(iobj);
             break;
           }
 
@@ -219,9 +219,9 @@ void IsisMain() {
           if (b->IsHeld(i)) continue;   // Don't update held images at all
           Table cmatrix = b->Cmatrix(i);
           QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-          cmatrix.Label().AddComment(jigComment);
+          cmatrix.Label().addComment(jigComment);
           Table spvector = b->SpVector(i);
-          spvector.Label().AddComment(jigComment);
+          spvector.Label().addComment(jigComment);
           c->write(cmatrix);
           c->write(spvector);
           p.WriteHistory(*c);

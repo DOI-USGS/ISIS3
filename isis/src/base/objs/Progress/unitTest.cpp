@@ -7,7 +7,7 @@
 using namespace std;
 int main() {
   Isis::Preference &pref = Isis::Preference::Preferences(true);
-  Isis::PvlGroup &uip = pref.FindGroup("UserInterface");
+  Isis::PvlGroup &uip = pref.findGroup("UserInterface");
   uip["ProgressBarPercent"] = "5";
   Isis::Progress p;
 

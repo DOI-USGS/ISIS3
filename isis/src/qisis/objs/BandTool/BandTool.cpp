@@ -208,21 +208,21 @@ namespace Isis {
    * These are the values shown in the gray boxes.
    */
   void BandTool::setList() {
-    if(p_pvl.FindObject("IsisCube").HasGroup("BandBin") &&
+    if(p_pvl.findObject("IsisCube").hasGroup("BandBin") &&
         p_comboBox->count() > 0) {
 
-      PvlGroup &bandBin = p_pvl.FindObject("IsisCube")
-                                .FindGroup("BandBin");
+      PvlGroup &bandBin = p_pvl.findObject("IsisCube")
+                                .findGroup("BandBin");
       p_comboBox->setVisible(true);
       p_grayDisplay->setVisible(true);
       p_redDisplay->setVisible(true);
       p_greenDisplay->setVisible(true);
       p_blueDisplay->setVisible(true);
 
-      for(int i = 0; i < bandBin.Keywords(); i++) {
-        if(bandBin[i].Name() == p_comboBox->currentText()) {
+      for(int i = 0; i < bandBin.keywords(); i++) {
+        if(bandBin[i].name() == p_comboBox->currentText()) {
           p_lineEditValueList.clear();
-          for(int j = 0; j < bandBin[i].Size(); j++) {
+          for(int j = 0; j < bandBin[i].size(); j++) {
             p_lineEditValueList.push_back(QString(bandBin[i][j]));
           }
         }
@@ -251,9 +251,9 @@ namespace Isis {
   void BandTool::setBandBin(Pvl &pvl) {
 
     // Get the number of bands and setup the spin box
-    PvlGroup &dim = pvl.FindObject("IsisCube")
-                          .FindObject("Core")
-                          .FindGroup("Dimensions");
+    PvlGroup &dim = pvl.findObject("IsisCube")
+                          .findObject("Core")
+                          .findGroup("Dimensions");
     p_pvl = pvl;
     p_bands = dim["Bands"];
 
@@ -275,13 +275,13 @@ namespace Isis {
     p_grnSpin->setMaximum(p_bands);
 
     p_comboBox->clear();
-    if(pvl.FindObject("IsisCube").HasGroup("BandBin")) {
-      PvlGroup &bandBin = pvl.FindObject("IsisCube")
-                                .FindGroup("BandBin");
-      for(int i = 0; i < bandBin.Keywords(); i++) {
+    if(pvl.findObject("IsisCube").hasGroup("BandBin")) {
+      PvlGroup &bandBin = pvl.findObject("IsisCube")
+                                .findGroup("BandBin");
+      for(int i = 0; i < bandBin.keywords(); i++) {
         //only add band bin keywords have a size that equals the number of bands
-        if(bandBin[i].Size() == p_bands) {
-          QString bandBinName = bandBin[i].Name();
+        if(bandBin[i].size() == p_bands) {
+          QString bandBinName = bandBin[i].name();
           p_comboBox->addItem(QString(bandBinName));
         }
 

@@ -35,15 +35,15 @@ void IsisMain() {
   }
 
   Pvl dems(dbFileName.expanded());
-  PvlObject &demObject = dems.FindObject("Dem");
+  PvlObject &demObject = dems.findObject("Dem");
 
   QMap< QString, QList<QString> > demMap;
-  for (int i = 0; i < demObject.Groups(); i++) {
-    PvlGroup &group = demObject.Group(i);
+  for (int i = 0; i < demObject.groups(); i++) {
+    PvlGroup &group = demObject.group(i);
 
-    if (group.IsNamed("Selection")) {
-      PvlKeyword &match = group.FindKeyword("Match");
-      PvlKeyword &file = group.FindKeyword("File");
+    if (group.isNamed("Selection")) {
+      PvlKeyword &match = group.findKeyword("Match");
+      PvlKeyword &file = group.findKeyword("File");
 
       // The third element in the Match keyword describes the DEM target (e.g.
       // Mars)
@@ -61,13 +61,13 @@ void IsisMain() {
       if (demFileName.isVersioned()) demFileName = demFileName.highestVersion();
 
       // Find the corresponding Isis Preference if one exists
-      if (Preference::Preferences().HasGroup("DataDirectory")) {
+      if (Preference::Preferences().hasGroup("DataDirectory")) {
         PvlGroup &dataDir =
-          Preference::Preferences().FindGroup("DataDirectory");
+          Preference::Preferences().findGroup("DataDirectory");
 
         // If the mission name maps to a data area in the Isis Preferences file,
         // then replace the variable $MISSION with the path to that area
-        if (dataDir.HasKeyword(mission)) {
+        if (dataDir.hasKeyword(mission)) {
           area = (QString) dataDir[mission];
         }
       }

@@ -215,22 +215,22 @@ namespace Isis {
    * Get a modified mapping pvl that the mosaic scene will be compatible with
    */
   Pvl ProjectionConfigDialog::addMissingKeywords(Pvl mappingPvl) {
-    PvlGroup &mapping = mappingPvl.FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup &mapping = mappingPvl.findGroup("Mapping", Pvl::Traverse);
 
-    if(!mapping.HasKeyword("MinimumLatitude"))
+    if(!mapping.hasKeyword("MinimumLatitude"))
       mapping += PvlKeyword("MinimumLatitude", "-90");
 
-    if(!mapping.HasKeyword("MaximumLatitude"))
+    if(!mapping.hasKeyword("MaximumLatitude"))
       mapping += PvlKeyword("MaximumLatitude", "90");
 
-    if(!mapping.HasKeyword("MinimumLongitude")) {
+    if(!mapping.hasKeyword("MinimumLongitude")) {
       if(mapping["LongitudeDomain"][0] == "360")
         mapping += PvlKeyword("MinimumLongitude", "0");
       else
         mapping += PvlKeyword("MinimumLongitude", "-180");
     }
 
-    if(!mapping.HasKeyword("MaximumLongitude")) {
+    if(!mapping.hasKeyword("MaximumLongitude")) {
       if(mapping["LongitudeDomain"][0] == "360")
         mapping += PvlKeyword("MaximumLongitude", "360");
       else
@@ -283,7 +283,7 @@ namespace Isis {
 
       try {
         Pvl mapFilePvl(mapFile);
-        PvlGroup &mapping = mapFilePvl.FindGroup("Mapping", PvlObject::Traverse);
+        PvlGroup &mapping = mapFilePvl.findGroup("Mapping", PvlObject::Traverse);
 
         Pvl trimmedMapFilePvl;
         trimmedMapFilePvl += mapping;

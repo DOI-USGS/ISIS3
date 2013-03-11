@@ -283,7 +283,7 @@ namespace Isis {
 
     /*Write the pvl group to the cube files.*/
 
-    PvlGroup group = map.FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup group = map.findGroup("Mapping", Pvl::Traverse);
 
     OutputCubes[0]->putGroup(group);
     OutputCubes[1]->putGroup(group);

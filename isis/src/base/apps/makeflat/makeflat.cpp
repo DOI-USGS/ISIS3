@@ -373,7 +373,7 @@ void IsisMain() {
    */
   ocube = new Cube();
   ocube->setDimensions(numOutputSamples, tempFileLength, 2);
-  PvlGroup &prefs = Preference::Preferences().FindGroup("DataDirectory", Pvl::Traverse);
+  PvlGroup &prefs = Preference::Preferences().findGroup("DataDirectory", Pvl::Traverse);
   QString outTmpName = (QString)prefs["Temporary"][0] + "/";
   outTmpName += FileName(ui.GetFileName("TO")).baseName() + ".tmp.cub";
   ocube->create(outTmpName);
@@ -430,7 +430,7 @@ void IsisMain() {
     p.EndProcess();
     p.ClearInputCubes();
 
-    if(excludedDetails[excludedDetails.size()-1].Groups() == 0) {
+    if(excludedDetails[excludedDetails.size()-1].groups() == 0) {
       excludedDetails.resize(excludedDetails.size() - 1);
     }
   }
@@ -509,13 +509,13 @@ void IsisMain() {
     Pvl excludeFile;
 
     // Find excluded files
-    excludeFile.AddGroup(excludedFiles);
+    excludeFile.addGroup(excludedFiles);
 
     for(unsigned int i = 0; i < excludedDetails.size(); i++) {
-      excludeFile.AddObject(excludedDetails[i]);
+      excludeFile.addObject(excludedDetails[i]);
     }
 
-    excludeFile.Write(FileName(ui.GetFileName("EXCLUDE")).expanded());
+    excludeFile.write(FileName(ui.GetFileName("EXCLUDE")).expanded());
   }
 
   remove(outTmpName.toAscii().data());
@@ -673,7 +673,7 @@ void CreateTemporaryData(Buffer &in) {
         else
           currExclusion += PvlKeyword("StandardDeviation", "N/A");
 
-        excludedDetails[excludedDetails.size()-1].AddGroup(currExclusion);
+        excludedDetails[excludedDetails.size()-1].addGroup(currExclusion);
       }
 
       // Let's write our data... CreateNullData took care of nulls for us
@@ -725,7 +725,7 @@ void CreateTemporaryData(Buffer &in) {
                                     "N/A");
       }
 
-      excludedDetails[excludedDetails.size()-1].AddGroup(currExclusion);
+      excludedDetails[excludedDetails.size()-1].addGroup(currExclusion);
     }
 
     // Since this is a line by line iterative process, we need to get the current

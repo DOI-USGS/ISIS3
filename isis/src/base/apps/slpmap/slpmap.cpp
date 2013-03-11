@@ -68,14 +68,14 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO");
 
 
-  PvlObject &lblCubeObj = ocube->label()->FindObject("IsisCube");
-  lblCubeObj.AddGroup(PvlGroup("BandBin"));
-  PvlGroup &bbGroup = lblCubeObj.FindGroup("BandBin");
+  PvlObject &lblCubeObj = ocube->label()->findObject("IsisCube");
+  lblCubeObj.addGroup(PvlGroup("BandBin"));
+  PvlGroup &bbGroup = lblCubeObj.findGroup("BandBin");
 
   g_groundMap = 0;
   if(g_outputType == Aspect) {
     p.StartProcess(createAspectCube);
-    bbGroup.AddKeyword(PvlKeyword("Name", "Aspect", ui.GetString("UNITS").toLower()));
+    bbGroup.addKeyword(PvlKeyword("Name", "Aspect", ui.GetString("UNITS").toLower()));
   }
   else {
     if (ui.GetString("PIXRES") == "AUTOMATIC") {
@@ -90,10 +90,10 @@ void IsisMain() {
     }
 
     if (g_outputType == PercentSlope) {
-      bbGroup.AddKeyword(PvlKeyword("Name", "Slope", "percent"));
+      bbGroup.addKeyword(PvlKeyword("Name", "Slope", "percent"));
     }
     else {
-      bbGroup.AddKeyword(PvlKeyword("Name", "Slope", ui.GetString("UNITS").toLower()));
+      bbGroup.addKeyword(PvlKeyword("Name", "Slope", ui.GetString("UNITS").toLower()));
     }
   }
 

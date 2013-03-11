@@ -24,7 +24,7 @@ int main() {
   algp += PvlKeyword("Name", "LunarLambertMcEwen");
 
   PvlObject op("PhotometricModel");
-  op.AddGroup(algp);
+  op.addGroup(algp);
 
   PvlGroup algn("Algorithm");
   algn += PvlKeyword("Name", "MoonAlbedo");
@@ -36,11 +36,11 @@ int main() {
   algn += PvlKeyword("Bsh1", "1.6");
 
   PvlObject on("NormalizationModel");
-  on.AddGroup(algn);
+  on.addGroup(algn);
 
   Pvl pvl;
-  pvl.AddObject(op);
-  pvl.AddObject(on);
+  pvl.addObject(op);
+  pvl.addObject(on);
 
   std::cout << pvl << std::endl << std::endl;
 

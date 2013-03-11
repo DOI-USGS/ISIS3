@@ -55,13 +55,13 @@ namespace Isis {
     m_spice = spice;
 
     // If we get this far, we know we have a kernels group.  Spice requires it.
-    PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup &kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
-    PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     m_name = new QString;
     *m_name = inst["TargetName"][0];
     QString trykey = "NaifIkCode";
-    if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
+    if (kernels.hasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
 
     if (name().toUpper() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
@@ -69,7 +69,7 @@ namespace Isis {
       int ikCode = toInt(kernels[trykey][0]);
       *m_bodyCode  = ikCode / 1000;
       // Check for override in kernel group
-      if (kernels.HasKeyword("NaifSpkCode"))
+      if (kernels.hasKeyword("NaifSpkCode"))
         *m_bodyCode = (int) kernels["NaifSpkCode"];
     }
     else {
@@ -81,7 +81,7 @@ namespace Isis {
       // m_radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
     }
     // Override it if it exists in the labels
-    if (kernels.HasKeyword("NaifBodyCode"))
+    if (kernels.hasKeyword("NaifBodyCode"))
       *m_bodyCode = (int) kernels["NaifBodyCode"];
     m_shape = ShapeModelFactory::create(this, lab);
   }

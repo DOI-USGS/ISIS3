@@ -34,8 +34,8 @@ void IsisMain() {
 
   // Send the Output to the log area
   Pvl statsPvl = camStats.toPvl();
-  for (int i = 0; i < statsPvl.Groups(); i++) {
-    Application::Log(statsPvl.Group(i));
+  for (int i = 0; i < statsPvl.groups(); i++) {
+    Application::Log(statsPvl.group(i));
   }
 
   if(ui.WasEntered("TO")) {
@@ -45,7 +45,7 @@ void IsisMain() {
 
     // If the user chose a format of PVL, then write to the output file ("TO")
     if(ui.GetString("FORMAT") == "PVL") {
-      (append) ? statsPvl.Append(outfile) : statsPvl.Write(outfile);
+      (append) ? statsPvl.append(outfile) : statsPvl.write(outfile);
     }
     else {
       // Create a flatfile of the data with columhn headings the flatfile is
@@ -154,13 +154,13 @@ void IsisMain() {
 
     // Place all the gathered camera statistics in a table and attach it to the
     // cube. Skip "User Parameters" group.
-    for (int i = 1; i < statsPvl.Groups(); i++) {
-      PvlGroup &group = statsPvl.Group(i);
+    for (int i = 1; i < statsPvl.groups(); i++) {
+      PvlGroup &group = statsPvl.group(i);
 
       int entry = 0;
-      record[entry] = group.Name();
+      record[entry] = group.name();
       entry++;
-      for (int j = 0; j < group.Keywords(); j++) {
+      for (int j = 0; j < group.keywords(); j++) {
         record[entry] = toDouble(group[j][0]);
         entry++;
       }

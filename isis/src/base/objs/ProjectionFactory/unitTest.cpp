@@ -19,8 +19,8 @@ int main(int argc, char *argv[]) {
     cout << "Unit test for ProjectionFactory" << endl;
 
     Pvl lab;
-    lab.AddGroup(PvlGroup("Mapping"));
-    PvlGroup &mapGroup = lab.FindGroup("Mapping");
+    lab.addGroup(PvlGroup("Mapping"));
+    PvlGroup &mapGroup = lab.findGroup("Mapping");
     mapGroup += PvlKeyword("EquatorialRadius", toString(3396190.0));
     mapGroup += PvlKeyword("PolarRadius", toString(3376200.0));
 
@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
     mapGroup += PvlKeyword("MaximumLatitude", toString(34.7603960060206));
     mapGroup += PvlKeyword("MinimumLongitude", toString(219.72432466275));
     mapGroup += PvlKeyword("MaximumLongitude", toString(236.186050244411));
-    mapGroup.DeleteKeyword("UpperLeftCornerX");
-    mapGroup.DeleteKeyword("UpperLeftCornerY");
+    mapGroup.deleteKeyword("UpperLeftCornerX");
+    mapGroup.deleteKeyword("UpperLeftCornerY");
 
     cout << "Testing create method ... " << endl;
     int lines, samples;
@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing create method with existing cube labels" << endl;
-    mapGroup.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(-16000.0)), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("UpperLeftCornerY", toString(2060000.0)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("UpperLeftCornerX", toString(-16000.0)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("UpperLeftCornerY", toString(2060000.0)), Pvl::Replace);
 
     Pvl lab2;
     PvlObject icube("IsisCube");
@@ -88,15 +88,15 @@ int main(int argc, char *argv[]) {
     PvlGroup dims("Dimensions");
     dims += PvlKeyword("Lines", toString(400));
     dims += PvlKeyword("Samples", toString(600));
-    core.AddGroup(dims);
-    icube.AddObject(core);
-    icube.AddGroup(mapGroup);
-    lab2.AddObject(icube);
+    core.addGroup(dims);
+    icube.addObject(core);
+    icube.addGroup(mapGroup);
+    lab2.addObject(icube);
 
     proj = ProjectionFactory::CreateForCube(lab2, samples, lines);
     cout << "Lines:       " << lines << endl;
     cout << "Samples:     " << samples << endl;
-    mapGroup = lab2.FindGroup("Mapping", Pvl::Traverse);
+    mapGroup = lab2.findGroup("Mapping", Pvl::Traverse);
     cout << "UpperLeftX:  " << (double) mapGroup["UpperLeftCornerX"] << endl;
     cout << "UpperLeftY:  " << (double) mapGroup["UpperLeftCornerY"] << endl;
     cout << endl;

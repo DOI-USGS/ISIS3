@@ -355,15 +355,15 @@ namespace Isis {
    *                keywords from
    */
   void Stretch::Load(Isis::Pvl &pvl, QString &grpName) {
-    PvlGroup grp = pvl.FindGroup(grpName, Isis::PvlObject::Traverse);
-    PvlKeyword inputs = grp.FindKeyword("Input");
-    PvlKeyword outputs = grp.FindKeyword("Output");
+    PvlGroup grp = pvl.findGroup(grpName, Isis::PvlObject::Traverse);
+    PvlKeyword inputs = grp.findKeyword("Input");
+    PvlKeyword outputs = grp.findKeyword("Output");
 
-    if(inputs.Size() != outputs.Size()) {
+    if(inputs.size() != outputs.size()) {
       QString msg = "Invalid Pvl file: The number of Input values must equal the number of Output values";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    for(int i = 0; i < inputs.Size(); i++) {
+    for(int i = 0; i < inputs.size(); i++) {
       AddPair(toDouble(inputs[i]), toDouble(outputs[i]));
     }
   }
@@ -382,7 +382,7 @@ namespace Isis {
   void Stretch::Save(QString &file, QString &grpName) {
     Pvl p;
     Save(p, grpName);
-    p.Write(file);
+    p.write(file);
   }
 
   void Stretch::Save(Isis::Pvl &pvl, QString &grpName) {
@@ -390,12 +390,12 @@ namespace Isis {
     PvlKeyword inputs("Input");
     PvlKeyword outputs("Output");
     for(int i = 0; i < Pairs(); i++) {
-      inputs.AddValue(toString(Input(i)));
-      outputs.AddValue(toString(Output(i)));
+      inputs.addValue(toString(Input(i)));
+      outputs.addValue(toString(Output(i)));
     }
-    grp->AddKeyword(inputs);
-    grp->AddKeyword(outputs);
-    pvl.AddGroup(*grp);
+    grp->addKeyword(inputs);
+    grp->addKeyword(outputs);
+    pvl.addGroup(*grp);
   }
 
   /**

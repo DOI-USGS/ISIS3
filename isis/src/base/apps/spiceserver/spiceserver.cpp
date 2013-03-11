@@ -211,7 +211,7 @@ void IsisMain() {
       PvlKeyword key;
       demPvlKeyStream >> key;
 
-      for (int value = 0; value < key.Size(); value++) {
+      for (int value = 0; value < key.size(); value++) {
         dem.push_back(key[value]);
       }
     }
@@ -317,89 +317,89 @@ bool tryKernels(Pvl &label, Process &p,
   PvlKeyword exkKeyword("Extra");
 
   for (int i = 0; i < lk.size(); i++) {
-    lkKeyword.AddValue(lk[i]);
+    lkKeyword.addValue(lk[i]);
   }
   for (int i = 0; i < pck.size(); i++) {
-    pckKeyword.AddValue(pck[i]);
+    pckKeyword.addValue(pck[i]);
   }
   for (int i = 0; i < targetSpk.size(); i++) {
-    targetSpkKeyword.AddValue(targetSpk[i]);
+    targetSpkKeyword.addValue(targetSpk[i]);
   }
   for (int i = 0; i < ck.size(); i++) {
-    ckKeyword.AddValue(ck[i]);
+    ckKeyword.addValue(ck[i]);
   }
   for (int i = 0; i < ik.size(); i++) {
-    ikKeyword.AddValue(ik[i]);
+    ikKeyword.addValue(ik[i]);
   }
   for (int i = 0; i < sclk.size(); i++) {
-    sclkKeyword.AddValue(sclk[i]);
+    sclkKeyword.addValue(sclk[i]);
   }
   for (int i = 0; i < spk.size(); i++) {
-    spkKeyword.AddValue(spk[i]);
+    spkKeyword.addValue(spk[i]);
   }
   for (int i = 0; i < iak.size(); i++) {
-    iakKeyword.AddValue(iak[i]);
+    iakKeyword.addValue(iak[i]);
   }
   for (int i = 0; i < dem.size(); i++) {
-    demKeyword.AddValue(dem[i]);
+    demKeyword.addValue(dem[i]);
   }
   for (int i = 0; i < exk.size(); i++) {
-    exkKeyword.AddValue(exk[i]);
+    exkKeyword.addValue(exk[i]);
   }
 
-  PvlGroup originalKernels = lab.FindGroup("Kernels", Pvl::Traverse);
-  PvlGroup &currentKernels = lab.FindGroup("Kernels", Pvl::Traverse);
-  currentKernels.AddKeyword(lkKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(pckKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(targetSpkKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(ckKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(ikKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(sclkKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(spkKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(iakKeyword, Pvl::Replace);
-  currentKernels.AddKeyword(emptyDemKeyword, Pvl::Replace);
+  PvlGroup originalKernels = lab.findGroup("Kernels", Pvl::Traverse);
+  PvlGroup &currentKernels = lab.findGroup("Kernels", Pvl::Traverse);
+  currentKernels.addKeyword(lkKeyword, Pvl::Replace);
+  currentKernels.addKeyword(pckKeyword, Pvl::Replace);
+  currentKernels.addKeyword(targetSpkKeyword, Pvl::Replace);
+  currentKernels.addKeyword(ckKeyword, Pvl::Replace);
+  currentKernels.addKeyword(ikKeyword, Pvl::Replace);
+  currentKernels.addKeyword(sclkKeyword, Pvl::Replace);
+  currentKernels.addKeyword(spkKeyword, Pvl::Replace);
+  currentKernels.addKeyword(iakKeyword, Pvl::Replace);
+  currentKernels.addKeyword(emptyDemKeyword, Pvl::Replace);
 
   // report qualities
   PvlKeyword spkQuality("InstrumentPositionQuality");
-  spkQuality.AddValue(Kernel::typeEnum(spk.type()));
-  currentKernels.AddKeyword(spkQuality, Pvl::Replace);
+  spkQuality.addValue(Kernel::typeEnum(spk.type()));
+  currentKernels.addKeyword(spkQuality, Pvl::Replace);
 
   PvlKeyword ckQuality("InstrumentPointingQuality");
-  ckQuality.AddValue(Kernel::typeEnum(ck.type()));
-  currentKernels.AddKeyword(ckQuality, Pvl::Replace);
+  ckQuality.addValue(Kernel::typeEnum(ck.type()));
+  currentKernels.addKeyword(ckQuality, Pvl::Replace);
 
-  if (!exkKeyword.IsNull())
-    currentKernels.AddKeyword(exkKeyword, Pvl::Replace);
-  else if (currentKernels.HasKeyword("EXTRA"))
-    currentKernels.DeleteKeyword("EXTRA");
+  if (!exkKeyword.isNull())
+    currentKernels.addKeyword(exkKeyword, Pvl::Replace);
+  else if (currentKernels.hasKeyword("EXTRA"))
+    currentKernels.deleteKeyword("EXTRA");
 
   // Get rid of old keywords from previously inited cubes
-  if (currentKernels.HasKeyword("SpacecraftPointing"))
-    currentKernels.DeleteKeyword("SpacecraftPointing");
+  if (currentKernels.hasKeyword("SpacecraftPointing"))
+    currentKernels.deleteKeyword("SpacecraftPointing");
 
-  if (currentKernels.HasKeyword("SpacecraftPosition"))
-    currentKernels.DeleteKeyword("SpacecraftPosition");
+  if (currentKernels.hasKeyword("SpacecraftPosition"))
+    currentKernels.deleteKeyword("SpacecraftPosition");
 
-  if (currentKernels.HasKeyword("ElevationModel"))
-    currentKernels.DeleteKeyword("ElevationModel");
+  if (currentKernels.hasKeyword("ElevationModel"))
+    currentKernels.deleteKeyword("ElevationModel");
 
-  if (currentKernels.HasKeyword("Frame"))
-    currentKernels.DeleteKeyword("Frame");
+  if (currentKernels.hasKeyword("Frame"))
+    currentKernels.deleteKeyword("Frame");
 
-  if (currentKernels.HasKeyword("StartPadding"))
-    currentKernels.DeleteKeyword("StartPadding");
+  if (currentKernels.hasKeyword("StartPadding"))
+    currentKernels.deleteKeyword("StartPadding");
 
-  if (currentKernels.HasKeyword("EndPadding"))
-    currentKernels.DeleteKeyword("EndPadding");
+  if (currentKernels.hasKeyword("EndPadding"))
+    currentKernels.deleteKeyword("EndPadding");
 
   // Add any time padding the user specified to the spice group
   if (g_startPad > DBL_EPSILON)
-    currentKernels.AddKeyword(PvlKeyword("StartPadding", toString(g_startPad), "seconds"));
+    currentKernels.addKeyword(PvlKeyword("StartPadding", toString(g_startPad), "seconds"));
 
   if (g_endPad > DBL_EPSILON)
-    currentKernels.AddKeyword(PvlKeyword("EndPadding", toString(g_endPad), "seconds"));
+    currentKernels.addKeyword(PvlKeyword("EndPadding", toString(g_endPad), "seconds"));
 
-  currentKernels.AddKeyword(
+  currentKernels.addKeyword(
       PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(lab))),
       Pvl::Replace);
 
@@ -411,17 +411,17 @@ bool tryKernels(Pvl &label, Process &p,
 
       // If success then pretend we had the shape model keyword in there...
       //   this doesn't actually effect the blobs that we care about
-      currentKernels.AddKeyword(demKeyword, Pvl::Replace);
+      currentKernels.addKeyword(demKeyword, Pvl::Replace);
       Pvl applicationLog;
-      applicationLog += lab.FindGroup("Kernels", Pvl::Traverse);
-      applicationLog.Write(ui.GetFileName("TO") + ".print");
+      applicationLog += lab.findGroup("Kernels", Pvl::Traverse);
+      applicationLog.write(ui.GetFileName("TO") + ".print");
     }
     catch (IException &e) {
       Pvl errPvl = e.toPvl();
 
-      if (errPvl.Groups() > 0)
+      if (errPvl.groups() > 0)
         currentKernels += PvlKeyword("Error",
-            errPvl.Group(errPvl.Groups() - 1)["Message"][0]);
+            errPvl.group(errPvl.groups() - 1)["Message"][0]);
 
       Application::Log(currentKernels);
       throw e;
@@ -431,27 +431,27 @@ bool tryKernels(Pvl &label, Process &p,
     ckTable.Label() += PvlKeyword("Description", "Created by spiceinit");
     ckTable.Label() += PvlKeyword("Kernels");
 
-    for (int i = 0; i < ckKeyword.Size(); i++)
-      ckTable.Label()["Kernels"].AddValue(ckKeyword[i]);
+    for (int i = 0; i < ckKeyword.size(); i++)
+      ckTable.Label()["Kernels"].addValue(ckKeyword[i]);
 
     ckTable.Write(ui.GetFileName("TO") + ".pointing");
 
     Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition");
     spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
     spkTable.Label() += PvlKeyword("Kernels");
-    for (int i = 0; i < spkKeyword.Size(); i++)
-      spkTable.Label()["Kernels"].AddValue(spkKeyword[i]);
+    for (int i = 0; i < spkKeyword.size(); i++)
+      spkTable.Label()["Kernels"].addValue(spkKeyword[i]);
 
     spkTable.Write(ui.GetFileName("TO") + ".position");
 
     Table bodyTable = cam->bodyRotation()->Cache("BodyRotation");
     bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
     bodyTable.Label() += PvlKeyword("Kernels");
-    for (int i = 0; i < targetSpkKeyword.Size(); i++)
-      bodyTable.Label()["Kernels"].AddValue(targetSpkKeyword[i]);
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
 
-    for (int i = 0; i < pckKeyword.Size(); i++)
-      bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
+    for (int i = 0; i < pckKeyword.size(); i++)
+      bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
 
     bodyTable.Label() += PvlKeyword("SolarLongitude",
                                     toString(cam->solarLongitude().degrees()));
@@ -460,8 +460,8 @@ bool tryKernels(Pvl &label, Process &p,
     Table sunTable = cam->sunPosition()->Cache("SunPosition");
     sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
     sunTable.Label() += PvlKeyword("Kernels");
-    for (int i = 0; i < targetSpkKeyword.Size(); i++)
-      sunTable.Label()["Kernels"].AddValue(targetSpkKeyword[i]);
+    for (int i = 0; i < targetSpkKeyword.size(); i++)
+      sunTable.Label()["Kernels"].addValue(targetSpkKeyword[i]);
 
     sunTable.Write(ui.GetFileName("TO") + ".sun");
 
@@ -471,21 +471,21 @@ bool tryKernels(Pvl &label, Process &p,
     PvlKeyword origTargPos = currentKernels["TargetPosition"];
 
     currentKernels["InstrumentPointing"] = "Table";
-    for (int i = 0; i < origCk.Size(); i++)
-      currentKernels["InstrumentPointing"].AddValue(origCk[i]);
+    for (int i = 0; i < origCk.size(); i++)
+      currentKernels["InstrumentPointing"].addValue(origCk[i]);
 
     currentKernels["InstrumentPosition"] = "Table";
-    for (int i = 0; i < origSpk.Size(); i++)
-      currentKernels["InstrumentPosition"].AddValue(origSpk[i]);
+    for (int i = 0; i < origSpk.size(); i++)
+      currentKernels["InstrumentPosition"].addValue(origSpk[i]);
 
     currentKernels["TargetPosition"] = "Table";
-    for (int i = 0; i < origTargPos.Size(); i++)
-      currentKernels["TargetPosition"].AddValue(origTargPos[i]);
+    for (int i = 0; i < origTargPos.size(); i++)
+      currentKernels["TargetPosition"].addValue(origTargPos[i]);
 
     Pvl kernelsLabels;
-    kernelsLabels += lab.FindGroup("Kernels", Pvl::Traverse);
+    kernelsLabels += lab.findGroup("Kernels", Pvl::Traverse);
     kernelsLabels += cam->getStoredNaifKeywords();
-    kernelsLabels.Write(ui.GetFileName("TO") + ".lab");
+    kernelsLabels.write(ui.GetFileName("TO") + ".lab");
   }
   catch (IException &) {
     return false;

@@ -87,7 +87,7 @@ namespace Isis {
             }
 
             static QString AlgorithmName ( const PvlObject &pvl ) {
-                return pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse).FindKeyword("Name")[0];
+                return pvl.findObject("PhotometricModel").findGroup("Algorithm", Pvl::Traverse).findKeyword("Name")[0];
             }
 
             virtual double Compute ( const double &line, const double &sample, int band = 1, bool useDem = false);

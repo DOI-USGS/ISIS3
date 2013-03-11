@@ -155,10 +155,10 @@ void IsisMain() {
   QString bname = "DN";
   if ( dn && icube->hasGroup("BandBin") ) {
     PvlGroup &mybb = icube->group("BandBin");
-    if ( mybb.HasKeyword("Name") ) {
+    if ( mybb.hasKeyword("Name") ) {
       bname = mybb["Name"][0];
     }
-    else if ( mybb.HasKeyword("FilterName") ) {
+    else if ( mybb.hasKeyword("FilterName") ) {
       bname = mybb["FilterName"][0];
     }
   }
@@ -212,21 +212,21 @@ void IsisMain() {
   // Add the bandbin group to the output label.  If a BandBin group already
   // exists, remove all existing keywords and add the keywords for this app.
   // Otherwise, just put the group in.
-  PvlObject &cobj = ocube->label()->FindObject("IsisCube");
-  if(!cobj.HasGroup("BandBin")) {
-    cobj.AddGroup(PvlGroup("BandBin"));
+  PvlObject &cobj = ocube->label()->findObject("IsisCube");
+  if(!cobj.hasGroup("BandBin")) {
+    cobj.addGroup(PvlGroup("BandBin"));
   }
 
-  PvlGroup &bb = cobj.FindGroup("BandBin");
-  bb.AddKeyword(name, PvlContainer::Replace);
-  int nvals = name.Size();
+  PvlGroup &bb = cobj.findGroup("BandBin");
+  bb.addKeyword(name, PvlContainer::Replace);
+  int nvals = name.size();
   UpdateBandKey("Center", bb, nvals, "1.0");
 
-  if ( bb.HasKeyword("OriginalBand") ) {
+  if ( bb.hasKeyword("OriginalBand") ) {
     UpdateBandKey("OriginalBand", bb, nvals, "1.0");
   }
 
-  if ( bb.HasKeyword("Number") ) {
+  if ( bb.hasKeyword("Number") ) {
     UpdateBandKey("Number", bb, nvals, "1.0");
   }
 
@@ -469,11 +469,11 @@ void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                    const QString &default_value) {
 
   QString defVal(default_value);
-  if ( bb.HasKeyword(keyname) ) {
+  if ( bb.hasKeyword(keyname) ) {
     defVal = bb[keyname][0];
   }
 
-  bb.AddKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);
+  bb.addKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);
   return;
 }
 

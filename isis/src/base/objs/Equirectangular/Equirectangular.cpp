@@ -56,15 +56,15 @@ namespace Isis {
     Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
+      PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Compute the default value if allowed and needed
-      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLongitude"))) {
         double lon = 0.0;
         mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
-      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
         if (lat >= 65.0) {
           lat = 65.0;
@@ -90,7 +90,7 @@ namespace Isis {
       m_centerLatitude *= PI / 180.0;
 
       // This keyword is just for user's information, and was put in for Hirise
-      if (!mapGroup.HasKeyword("CenterLatitudeRadius")) {
+      if (!mapGroup.hasKeyword("CenterLatitudeRadius")) {
         mapGroup += PvlKeyword("CenterLatitudeRadius");
       }
 

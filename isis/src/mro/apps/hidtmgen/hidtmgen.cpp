@@ -35,7 +35,7 @@ void IsisMain() {
 
   // Verify HiRISE
   if (inCube->bandCount() > 1 ||
-      inCube->label()->HasObject("Instrument")) {
+      inCube->label()->hasObject("Instrument")) {
     QString msg = "Input cube [" + ui.GetFileName("FROM") + "] does not appear"
                 + "to be a DTM";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -90,12 +90,12 @@ void IsisMain() {
 
   // Do not use this after calling AddObject on pdsLabel, there is a note
   // at that location.
-  PvlObject & mapping = pdsLabel.FindObject("IMAGE_MAP_PROJECTION");
+  PvlObject & mapping = pdsLabel.findObject("IMAGE_MAP_PROJECTION");
 
   // Set data for VIEWING_PARAMETERS keyword
   // Also set radius values
   if (mapping["MAP_PROJECTION_TYPE"][0] == "EQUIRECTANGULAR") {
-    mapping["MAP_PROJECTION_TYPE"].SetValue("\"EQUIRECTANGULAR\"");
+    mapping["MAP_PROJECTION_TYPE"].setValue("\"EQUIRECTANGULAR\"");
     northAzimuth = 270;
     isEquirectangular = true;
 
@@ -105,12 +105,12 @@ void IsisMain() {
 
     // Convert radius to KM
     newRadius /= 1000;
-    mapping.FindKeyword("A_AXIS_RADIUS").SetValue(toString(newRadius));
-    mapping.FindKeyword("A_AXIS_RADIUS").SetUnits("KM");
-    mapping.FindKeyword("B_AXIS_RADIUS").SetValue(toString(newRadius));
-    mapping.FindKeyword("B_AXIS_RADIUS").SetUnits("KM");
-    mapping.FindKeyword("C_AXIS_RADIUS").SetValue(toString(newRadius));
-    mapping.FindKeyword("C_AXIS_RADIUS").SetUnits("KM");
+    mapping.findKeyword("A_AXIS_RADIUS").setValue(toString(newRadius));
+    mapping.findKeyword("A_AXIS_RADIUS").setUnits("KM");
+    mapping.findKeyword("B_AXIS_RADIUS").setValue(toString(newRadius));
+    mapping.findKeyword("B_AXIS_RADIUS").setUnits("KM");
+    mapping.findKeyword("C_AXIS_RADIUS").setValue(toString(newRadius));
+    mapping.findKeyword("C_AXIS_RADIUS").setUnits("KM");
   }
   else if (mapping["MAP_PROJECTION_TYPE"][0] == "POLAR STEREOGRAPHIC") {
     double clat = ((toDouble(mapping["MAXIMUM_LATITUDE"][0]) -
@@ -150,26 +150,26 @@ void IsisMain() {
 
   // Create and then add object, this will be used later in orthos as well.
   PvlObject viewingParameters("VIEWING_PARAMETERS");
-  viewingParameters.AddKeyword(PvlKeyword("NORTH_AZIMUTH",toString(northAzimuth),"DEG"));
+  viewingParameters.addKeyword(PvlKeyword("NORTH_AZIMUTH",toString(northAzimuth),"DEG"));
 
-  pdsLabel.AddObject(viewingParameters);
+  pdsLabel.addObject(viewingParameters);
 
   // This is our replacement for mapping
-  PvlObject & projection = pdsLabel.FindObject("IMAGE_MAP_PROJECTION");
-  projection.AddKeyword(
+  PvlObject & projection = pdsLabel.findObject("IMAGE_MAP_PROJECTION");
+  projection.addKeyword(
       PvlKeyword("^DATA_SET_MAP_PROJECTION","DSMAP.CAT"));
 
   // Delete unneeded keywords in object
-  projection.DeleteKeyword("FIRST_STANDARD_PARALLEL");
-  projection.DeleteKeyword("SECOND_STANDARD_PARALLEL");
+  projection.deleteKeyword("FIRST_STANDARD_PARALLEL");
+  projection.deleteKeyword("SECOND_STANDARD_PARALLEL");
 
   // Set format and template, Template is the order of keywords, format is
   // well, format, like integer, real, (hex, 4)
   if (isEquirectangular) {
-    pdsLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsDTMEqui.pft");
+    pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsDTMEqui.pft");
   }
   else {
-    pdsLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsDTMPolar.pft");
+    pdsLabel.setFormatTemplate("$mro/templates/labels/hirisePdsDTMPolar.pft");
   }
 
   Pvl format;
@@ -177,19 +177,19 @@ void IsisMain() {
   // Have to do things this way to get an array of values
   PvlKeyword validMin("VALID_MINIMUM","REAL");
   validMin += "2";
-  format.AddKeyword(validMin);
+  format.addKeyword(validMin);
   PvlKeyword validMax("VALID_MAXIMUM","REAL");
   validMax += "2";
-  format.AddKeyword(validMax);
+  format.addKeyword(validMax);
 
-  format.AddKeyword(PvlKeyword("SAMPLE_BIT_MASK","BINARY"));
+  format.addKeyword(PvlKeyword("SAMPLE_BIT_MASK","BINARY"));
   // Aiming for MISSING_CONSTANT = (HEX, 4); Two separate items.
   PvlKeyword mc("MISSING_CONSTANT","HEX");
   mc += "4";
-  format.AddKeyword(mc);
-  PvlFormat * form = pdsLabel.GetFormat();
-  form->Add(format);
-  pdsLabel.SetFormat(form);
+  format.addKeyword(mc);
+  PvlFormat * form = pdsLabel.format();
+  form->add(format);
+  pdsLabel.setFormat(form);
 
   QString note = "Pixel values in this file represent elevations in meters "
       "above the martian equipotential surface (Mars 2000 Datum) defined by "
@@ -197,26 +197,26 @@ void IsisMain() {
       "units is given by the keyvalues for SCALING_FACTOR and OFFSET. This "
       "DTM was produced using ISIS and SOCET Set (copyright BAE Systems) "
       "software as described in Kirk et al. (2008).";
-  pdsLabel.FindObject("IMAGE").AddKeyword(PvlKeyword("NOTE", note));
+  pdsLabel.findObject("IMAGE").addKeyword(PvlKeyword("NOTE", note));
 
   // Four labels that are pretty set in stone
-  pdsLabel.AddKeyword(PvlKeyword("INSTRUMENT_HOST_NAME","MARS RECONNAISSANCE ORBITER"));
-  pdsLabel.AddKeyword(PvlKeyword("INSTRUMENT_HOST_ID","MRO"));
-  pdsLabel.AddKeyword(PvlKeyword("INSTRUMENT_NAME","HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"));
-  pdsLabel.AddKeyword(PvlKeyword("INSTRUMENT_ID","HIRISE"));
+  pdsLabel.addKeyword(PvlKeyword("INSTRUMENT_HOST_NAME","MARS RECONNAISSANCE ORBITER"));
+  pdsLabel.addKeyword(PvlKeyword("INSTRUMENT_HOST_ID","MRO"));
+  pdsLabel.addKeyword(PvlKeyword("INSTRUMENT_NAME","HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"));
+  pdsLabel.addKeyword(PvlKeyword("INSTRUMENT_ID","HIRISE"));
 
   Pvl inputParameters(ui.GetFileName("PARAMSPVL"));
 
   // These come from the user, mostly, and are in the order they appear in the output labels.
-  pdsLabel.AddKeyword(inputParameters["DATA_SET_ID"]);
-  pdsLabel.AddKeyword(inputParameters["DATA_SET_NAME"]);
-  pdsLabel.AddKeyword(inputParameters["PRODUCER_INSTITUTION_NAME"]);
-  pdsLabel.AddKeyword(inputParameters["PRODUCER_ID"]);
+  pdsLabel.addKeyword(inputParameters["DATA_SET_ID"]);
+  pdsLabel.addKeyword(inputParameters["DATA_SET_NAME"]);
+  pdsLabel.addKeyword(inputParameters["PRODUCER_INSTITUTION_NAME"]);
+  pdsLabel.addKeyword(inputParameters["PRODUCER_ID"]);
   if (ui.WasEntered("PRODUCER_FULL_NAME")) {
-    pdsLabel.AddKeyword(PvlKeyword("PRODUCER_FULL_NAME",ui.GetString("PRODUCER_FULL_NAME")));
+    pdsLabel.addKeyword(PvlKeyword("PRODUCER_FULL_NAME",ui.GetString("PRODUCER_FULL_NAME")));
   }
   else {
-    pdsLabel.AddKeyword(inputParameters["PRODUCER_FULL_NAME"]);
+    pdsLabel.addKeyword(inputParameters["PRODUCER_FULL_NAME"]);
   }
 
   // Will we be using the default names?
@@ -228,8 +228,8 @@ void IsisMain() {
   if (!defaultNames) {
     IString pId = ui.GetFileName("DTMTO");
     pId.substr(0, pId.find_first_of('.')+1);
-    pdsLabel.AddKeyword(PvlKeyword("PRODUCT_ID",ui.GetString("DTM_PRODUCT_ID")));
-    pdsLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
+    pdsLabel.addKeyword(PvlKeyword("PRODUCT_ID",ui.GetString("DTM_PRODUCT_ID")));
+    pdsLabel.addKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
   }
   else {
     // Set projection letter
@@ -237,7 +237,7 @@ void IsisMain() {
     pId += isEquirectangular ? "E" : "P";
 
     // Find scale letter
-    pId += findScaleLetter(projection.FindKeyword("MAP_SCALE"));
+    pId += findScaleLetter(projection.findKeyword("MAP_SCALE"));
 
     // Product ids of orthos
     pId += ortho1.baseName().mid(3,12);
@@ -291,35 +291,35 @@ void IsisMain() {
 
     // Finish off name string
     pId += vers;
-    pdsLabel.AddKeyword(PvlKeyword("PRODUCT_ID",pId));
+    pdsLabel.addKeyword(PvlKeyword("PRODUCT_ID",pId));
 
     // Source product ids
     QString orthoS1 = ortho1.baseName().mid(0,15);
     QString orthoS3 = ortho3.baseName().mid(0,15);
     QString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
-    pdsLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
+    pdsLabel.addKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
   } // End scope of defaultNames true
 
-  pdsLabel.AddKeyword(PvlKeyword("PRODUCT_VERSION_ID",ui.GetAsString("PRODUCT_VERSION_ID")));
-  pdsLabel.AddKeyword(PvlKeyword("RATIONALE_DESC",ui.GetString("RATIONALE_DESC")));
-  pdsLabel.AddKeyword(inputParameters["SOFTWARE_NAME"]);
+  pdsLabel.addKeyword(PvlKeyword("PRODUCT_VERSION_ID",ui.GetAsString("PRODUCT_VERSION_ID")));
+  pdsLabel.addKeyword(PvlKeyword("RATIONALE_DESC",ui.GetString("RATIONALE_DESC")));
+  pdsLabel.addKeyword(inputParameters["SOFTWARE_NAME"]);
 
   // Label records should always be 1, my example didn't included it, so we won't.
-  pdsLabel.DeleteKeyword("LABEL_RECORDS");
+  pdsLabel.deleteKeyword("LABEL_RECORDS");
 
   // Delete or change unneeded keywords in image group
-  PvlObject & image = pdsLabel.FindObject("IMAGE");
-  image.FindKeyword("CORE_NULL").SetName("MISSING_CONSTANT");
-  image.DeleteKeyword("BAND_STORAGE_TYPE");
-  image.DeleteKeyword("CORE_LOW_REPR_SATURATION");
-  image.DeleteKeyword("CORE_LOW_INSTR_SATURATION");
-  image.DeleteKeyword("CORE_HIGH_REPR_SATURATION");
-  image.DeleteKeyword("CORE_HIGH_INSTR_SATURATION");
+  PvlObject & image = pdsLabel.findObject("IMAGE");
+  image.findKeyword("CORE_NULL").setName("MISSING_CONSTANT");
+  image.deleteKeyword("BAND_STORAGE_TYPE");
+  image.deleteKeyword("CORE_LOW_REPR_SATURATION");
+  image.deleteKeyword("CORE_LOW_INSTR_SATURATION");
+  image.deleteKeyword("CORE_HIGH_REPR_SATURATION");
+  image.deleteKeyword("CORE_HIGH_INSTR_SATURATION");
 
   // Create statistics and add to image group
   Statistics * stat = inCube->statistics();
-  image.AddKeyword(PvlKeyword("VALID_MINIMUM",toString(stat->Minimum())));
-  image.AddKeyword(PvlKeyword("VALID_MAXIMUM",toString(stat->Maximum())));
+  image.addKeyword(PvlKeyword("VALID_MINIMUM",toString(stat->Minimum())));
+  image.addKeyword(PvlKeyword("VALID_MAXIMUM",toString(stat->Maximum())));
 
   // The output directory, will be used for ortho images as well
   FileName outDir = FileName(ui.GetString("OUTPUTDIR"));
@@ -336,7 +336,7 @@ void IsisMain() {
   FileName outFile;
   if (defaultNames) {
     QString dir = outDir.expanded();
-    outFile = FileName(dir + pdsLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
+    outFile = FileName(dir + pdsLabel.findKeyword("PRODUCT_ID")[0] + ".IMG");
   }
   else {
     outFile = FileName(ui.GetFileName("DTMTO"));
@@ -391,7 +391,7 @@ void IsisMain() {
     Cube * orthoInCube = p.SetInputCube(ortho);
 
     Pvl & orthoLabel = p.StandardPdsLabel(ProcessExportPds::Image);
-    PvlObject & orthoMap = orthoLabel.FindObject("IMAGE_MAP_PROJECTION");
+    PvlObject & orthoMap = orthoLabel.findObject("IMAGE_MAP_PROJECTION");
 
     QString orthoOut;
     if (!defaultNames) {
@@ -406,7 +406,7 @@ void IsisMain() {
       orthoOut += isEquirectangular ? "E" : "P";
 
       // Find scale letter
-      orthoOut += findScaleLetter(orthoMap.FindKeyword("MAP_SCALE"));
+      orthoOut += findScaleLetter(orthoMap.findKeyword("MAP_SCALE"));
 
       // continue building name
       orthoOut += ortho1.baseName().mid(3,12);
@@ -420,10 +420,10 @@ void IsisMain() {
 
       // Found the version above
       orthoOut += vers;
-      orthoLabel.AddKeyword(PvlKeyword("PRODUCT_ID",orthoOut));
+      orthoLabel.addKeyword(PvlKeyword("PRODUCT_ID",orthoOut));
     }
 
-    orthoMap.AddKeyword(
+    orthoMap.addKeyword(
         PvlKeyword("^DATA_SET_MAP_PROJECTION","DSMAP.CAT"));
 
     if (isEquirectangular) {
@@ -433,12 +433,12 @@ void IsisMain() {
 
       // Convert radius to KM
       newRadius /= 1000;
-      orthoMap.FindKeyword("A_AXIS_RADIUS").SetValue(toString(newRadius));
-      orthoMap.FindKeyword("A_AXIS_RADIUS").SetUnits("KM");
-      orthoMap.FindKeyword("B_AXIS_RADIUS").SetValue(toString(newRadius));
-      orthoMap.FindKeyword("B_AXIS_RADIUS").SetUnits("KM");
-      orthoMap.FindKeyword("C_AXIS_RADIUS").SetValue(toString(newRadius));
-      orthoMap.FindKeyword("C_AXIS_RADIUS").SetUnits("KM");
+      orthoMap.findKeyword("A_AXIS_RADIUS").setValue(toString(newRadius));
+      orthoMap.findKeyword("A_AXIS_RADIUS").setUnits("KM");
+      orthoMap.findKeyword("B_AXIS_RADIUS").setValue(toString(newRadius));
+      orthoMap.findKeyword("B_AXIS_RADIUS").setUnits("KM");
+      orthoMap.findKeyword("C_AXIS_RADIUS").setValue(toString(newRadius));
+      orthoMap.findKeyword("C_AXIS_RADIUS").setUnits("KM");
     }
     // Else case for Polar Stereographic is unnecessary as all it does is
     // calculate view parameters which we already have.
@@ -446,55 +446,55 @@ void IsisMain() {
 
     // Set format and template
     if (isEquirectangular) {
-      orthoLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsDTMEqui.pft");
+      orthoLabel.setFormatTemplate("$mro/templates/labels/hirisePdsDTMEqui.pft");
     }
     else {
-      orthoLabel.SetFormatTemplate("$mro/templates/labels/hirisePdsDTMPolar.pft");
+      orthoLabel.setFormatTemplate("$mro/templates/labels/hirisePdsDTMPolar.pft");
     }
 
     if (!defaultNames) {
-      orthoLabel.AddKeyword(PvlKeyword("PRODUCT_ID",ui.GetString(ortho+"_PRODUCT_ID")));
-      orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
+      orthoLabel.addKeyword(PvlKeyword("PRODUCT_ID",ui.GetString(ortho+"_PRODUCT_ID")));
+      orthoLabel.addKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
     }
     else {
       QString orthoS1 = ortho1.baseName().mid(0,15);
       QString orthoS3 = ortho3.baseName().mid(0,15);
       QString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
-      orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
+      orthoLabel.addKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
     }
 
     // Four labels that are pretty set in stone
-    orthoLabel.AddKeyword(PvlKeyword("INSTRUMENT_HOST_NAME","MARS RECONNAISSANCE ORBITER"));
-    orthoLabel.AddKeyword(PvlKeyword("INSTRUMENT_HOST_ID","MRO"));
-    orthoLabel.AddKeyword(PvlKeyword("INSTRUMENT_NAME","HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"));
-    orthoLabel.AddKeyword(PvlKeyword("INSTRUMENT_ID","HIRISE"));
+    orthoLabel.addKeyword(PvlKeyword("INSTRUMENT_HOST_NAME","MARS RECONNAISSANCE ORBITER"));
+    orthoLabel.addKeyword(PvlKeyword("INSTRUMENT_HOST_ID","MRO"));
+    orthoLabel.addKeyword(PvlKeyword("INSTRUMENT_NAME","HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"));
+    orthoLabel.addKeyword(PvlKeyword("INSTRUMENT_ID","HIRISE"));
 
     // These come from the user, mostly, and are in the order they appear in the output
     // labels.
-    orthoLabel.AddKeyword(inputParameters["DATA_SET_ID"]);
-    orthoLabel.AddKeyword(inputParameters["DATA_SET_NAME"]);
-    orthoLabel.AddKeyword(inputParameters["PRODUCER_INSTITUTION_NAME"]);
-    orthoLabel.AddKeyword(inputParameters["PRODUCER_ID"]);
+    orthoLabel.addKeyword(inputParameters["DATA_SET_ID"]);
+    orthoLabel.addKeyword(inputParameters["DATA_SET_NAME"]);
+    orthoLabel.addKeyword(inputParameters["PRODUCER_INSTITUTION_NAME"]);
+    orthoLabel.addKeyword(inputParameters["PRODUCER_ID"]);
 
     if (ui.WasEntered("PRODUCER_FULL_NAME")) {
-      orthoLabel.AddKeyword(PvlKeyword("PRODUCER_FULL_NAME",ui.GetString("PRODUCER_FULL_NAME")));
+      orthoLabel.addKeyword(PvlKeyword("PRODUCER_FULL_NAME",ui.GetString("PRODUCER_FULL_NAME")));
     }
     else {
-      orthoLabel.AddKeyword(inputParameters["PRODUCER_FULL_NAME"]);
+      orthoLabel.addKeyword(inputParameters["PRODUCER_FULL_NAME"]);
     }
-    orthoLabel.AddKeyword(PvlKeyword("PRODUCT_VERSION_ID",ui.GetAsString("PRODUCT_VERSION_ID")));
-    orthoLabel.AddKeyword(PvlKeyword("RATIONALE_DESC",ui.GetString("RATIONALE_DESC")));
-    orthoLabel.AddKeyword(inputParameters["SOFTWARE_NAME"]);
+    orthoLabel.addKeyword(PvlKeyword("PRODUCT_VERSION_ID",ui.GetAsString("PRODUCT_VERSION_ID")));
+    orthoLabel.addKeyword(PvlKeyword("RATIONALE_DESC",ui.GetString("RATIONALE_DESC")));
+    orthoLabel.addKeyword(inputParameters["SOFTWARE_NAME"]);
 
     // Long ago we made a VIEWING_PARAMETERS object, it still is correct
     // Need to be careful to not use any object references from the Pvl
     // after this call, known problem with Pvl and vector reallocation.
-    orthoLabel.AddObject(viewingParameters);
+    orthoLabel.addObject(viewingParameters);
 
     FileName orthoFile;
     if (defaultNames) {
       QString dir = outDir.expanded();
-      orthoFile = FileName(dir + orthoLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
+      orthoFile = FileName(dir + orthoLabel.findKeyword("PRODUCT_ID")[0] + ".IMG");
     }
     else {
       orthoFile = FileName(ui.GetFileName(ortho + "TO"));

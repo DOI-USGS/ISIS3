@@ -134,7 +134,7 @@ namespace Isis {
    */
   void VimsGroundMap::Init(Pvl &lab) {
 
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     //  Vis or IR
     p_channel = (QString) inst ["Channel"];

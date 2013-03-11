@@ -12,13 +12,13 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
-  PvlGroup &g = Preference::Preferences().FindGroup("SessionLog");
+  PvlGroup &g = Preference::Preferences().findGroup("SessionLog");
   g["TerminalOutput"] = "On";
   try {
     PvlGroup results("Results");;
-    results.AddComment("// This is an example of the results group");
+    results.addComment("// This is an example of the results group");
     results += PvlKeyword("Average", toString(13.5), "Meters");
-    results[0].AddComment("// Average size of a rock");
+    results[0].addComment("// Average size of a rock");
 
     Pvl error;
     PvlGroup temp("Error");
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     temp += PvlKeyword("Message", "Unable to open file");
     temp += PvlKeyword("File", "unitTest.cpp");
     temp += PvlKeyword("Line", toString(501));
-    error.AddGroup(temp);
+    error.addGroup(temp);
     char **s_argv;
     s_argv = new char*[10];
     s_argv[0] = new char[32];

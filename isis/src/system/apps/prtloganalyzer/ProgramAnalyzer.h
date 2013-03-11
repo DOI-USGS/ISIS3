@@ -143,7 +143,7 @@ namespace Isis {
       /** Find a string in a PvlContainer */
       QString findKey(PvlContainer &kset, const QString &key) const {
         QString value("");
-        if ( kset.HasKeyword(key) ) {
+        if ( kset.hasKeyword(key) ) {
           value = kset[key][0];
         }
         return (value);

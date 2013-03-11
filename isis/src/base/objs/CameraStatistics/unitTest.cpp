@@ -25,13 +25,13 @@ int main(int argc, char *argv[]) {
     Pvl statsPvl = camStats.toPvl();
     cout << endl;
 
-    for (int i = 0; i < statsPvl.Groups(); i++) {
-      PvlGroup &group = statsPvl.Group(i);
-      cout << group.Name() << ":" << endl;
+    for (int i = 0; i < statsPvl.groups(); i++) {
+      PvlGroup &group = statsPvl.group(i);
+      cout << group.name() << ":" << endl;
 
-      for (int j = 0; j < group.Keywords(); j++) {
+      for (int j = 0; j < group.keywords(); j++) {
         PvlKeyword &keyword = group[j];
-        cout << "  " << keyword.Name() << " = " << toDouble(keyword[0]) << endl;
+        cout << "  " << keyword.name() << " = " << toDouble(keyword[0]) << endl;
       }
 
       cout << endl;

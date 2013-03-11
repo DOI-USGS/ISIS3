@@ -34,9 +34,9 @@ int main(int argc, char *argv[]) {
                         };
 
   PvlObject hiCCD("Hiccdstitch");
-  hiCCD.AddComment("This file describes the line and sample offsets for each HiRISE");
-  hiCCD.AddComment("CCD in the focal plane.  Negative values shift CCDs left and up.");
-  hiCCD.AddComment("Positive values shift CCD right and down.");
+  hiCCD.addComment("This file describes the line and sample offsets for each HiRISE");
+  hiCCD.addComment("CCD in the focal plane.  Negative values shift CCDs left and up.");
+  hiCCD.addComment("Positive values shift CCD right and down.");
 
   for(int i = 0 ; i < 14 ; i++) {
     PvlGroup ccdGroup(ccdNames[i]);
@@ -51,11 +51,11 @@ int main(int argc, char *argv[]) {
     ccdGroup += PvlKeyword("SampleOffset", 0);
     ccdGroup += PvlKeyword("LineOffset", 0);
 #endif
-    hiCCD.AddGroup(ccdGroup);
+    hiCCD.addGroup(ccdGroup);
   }
 
   Pvl pvl;
-  pvl.AddObject(hiCCD);
+  pvl.addObject(hiCCD);
 #if defined(RED_00001_0000)
   pvl.Write("hiccdstitch.000001_0000_RED.def");
 #else

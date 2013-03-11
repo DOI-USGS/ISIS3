@@ -38,8 +38,8 @@ void IsisMain() {
   QString spacing = ui.GetString("SPACING");
   if (spacing == "METER") {
     Pvl userMap;
-    userMap.Read(ui.GetFileName("MAP"));
-    PvlGroup &mapGroup = userMap.FindGroup("Mapping", Pvl::Traverse);
+    userMap.read(ui.GetFileName("MAP"));
+    PvlGroup &mapGroup = userMap.findGroup("Mapping", Pvl::Traverse);
 
     // Construct a Projection for converting between Lon/Lat and X/Y
     // TODO: Should this be an option to include this in the program?
@@ -47,8 +47,8 @@ void IsisMain() {
     if (ui.WasEntered("TARGET")) {
       target = ui.GetString("TARGET");
     }
-    else if (mapGroup.HasKeyword("TargetName")) {
-      target = mapGroup.FindKeyword("TargetName")[0];
+    else if (mapGroup.hasKeyword("TargetName")) {
+      target = mapGroup.findKeyword("TargetName")[0];
       ui.PutAsString("TARGET", target);
     }
     else {
@@ -58,24 +58,24 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    mapGroup.AddKeyword(PvlKeyword("TargetName", target), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("TargetName", target), Pvl::Replace);
 
-    if (!mapGroup.HasKeyword("EquatorialRadius") ||
-        !mapGroup.HasKeyword("PolarRadius")) {
+    if (!mapGroup.hasKeyword("EquatorialRadius") ||
+        !mapGroup.hasKeyword("PolarRadius")) {
 
       PvlGroup radii = Projection::TargetRadii(target);
-      mapGroup.AddKeyword(PvlKeyword("EquatorialRadius",
+      mapGroup.addKeyword(PvlKeyword("EquatorialRadius",
             (QString) radii["EquatorialRadius"]));
-      mapGroup.AddKeyword(PvlKeyword("PolarRadius",
+      mapGroup.addKeyword(PvlKeyword("PolarRadius",
             (QString) radii["PolarRadius"]));
     }
 
     if (!ui.WasEntered("MAP")) {
-      mapGroup.AddKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
-      mapGroup.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
-      mapGroup.AddKeyword(PvlKeyword("LongitudeDomain", toString(360)));
-      mapGroup.AddKeyword(PvlKeyword("CenterLatitude", toString(0)));
-      mapGroup.AddKeyword(PvlKeyword("CenterLongitude", toString(0)));
+      mapGroup.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
+      mapGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
+      mapGroup.addKeyword(PvlKeyword("LongitudeDomain", toString(360)));
+      mapGroup.addKeyword(PvlKeyword("CenterLatitude", toString(0)));
+      mapGroup.addKeyword(PvlKeyword("CenterLongitude", toString(0)));
     }
 
     double minLat = ui.GetDouble("MINLAT");
@@ -84,10 +84,10 @@ void IsisMain() {
     double maxLon = ui.GetDouble("MAXLON");
     checkLatitude(minLat, maxLat);
 
-    mapGroup.AddKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
+    mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
 
     Projection *proj = ProjectionFactory::Create(userMap);
 
@@ -123,7 +123,7 @@ void IsisMain() {
     double xStepSize = ui.GetDouble("XSTEP");
     double yStepSize = ui.GetDouble("YSTEP");
 
-    equatorialRadius = toDouble(mapGroup.FindKeyword("EquatorialRadius")[0]);
+    equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius")[0]);
 
     Progress gridStatus;
 
@@ -308,8 +308,8 @@ void printMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);

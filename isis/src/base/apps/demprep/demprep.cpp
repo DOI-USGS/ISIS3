@@ -37,12 +37,12 @@ void IsisMain() {
   int inb = icube->bandCount();
   outCubeStats.Reset();
 
-  PvlGroup mapgrp = icube->label()->FindGroup("Mapping", Pvl::Traverse);
+  PvlGroup mapgrp = icube->label()->findGroup("Mapping", Pvl::Traverse);
   bool hasExtents = false;
   bool isGlobal = false;
   double minLat,maxLat,minLon,maxLon;
-  if (mapgrp.HasKeyword("MinimumLatitude") && mapgrp.HasKeyword("MaximumLatitude") &&
-      mapgrp.HasKeyword("MinimumLongitude") && mapgrp.HasKeyword("MaximumLongitude")) {
+  if (mapgrp.hasKeyword("MinimumLatitude") && mapgrp.hasKeyword("MaximumLatitude") &&
+      mapgrp.hasKeyword("MinimumLongitude") && mapgrp.hasKeyword("MaximumLongitude")) {
     hasExtents = true;
     minLat = mapgrp["MinimumLatitude"];
     maxLat = mapgrp["MaximumLatitude"];
@@ -234,12 +234,12 @@ void IsisMain() {
 
   double upperLeftCorner = mapgrp["UpperLeftCornerX"];
   upperLeftCorner -= leftPad * proj->Resolution();
-  mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftCorner), "meters"),
+  mapgrp.addKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftCorner), "meters"),
                     Pvl::Replace);
 
   upperLeftCorner = mapgrp["UpperLeftCornerY"];
   upperLeftCorner += topPad * proj->Resolution();
-  mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftCorner), "meters"),
+  mapgrp.addKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftCorner), "meters"),
                     Pvl::Replace);
 
 

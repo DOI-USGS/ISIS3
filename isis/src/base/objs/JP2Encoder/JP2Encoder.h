@@ -50,7 +50,7 @@ namespace Isis {
    *   JP2Encoder *JP2_encoder;
    *   icube = p.SetInputCube("FROM",Isis::OneBand);
    *   p.SetInputRange();
-   *   p.SetFormat(ProcessExport::BIL);
+   *   p.setFormat(ProcessExport::BIL);
    *   jp2buf = new char* [1];
    *   jp2buf[0] = new char[icube->Samples()];
    *   p.SetOutputType(Isis::UnsignedByte);

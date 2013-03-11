@@ -53,7 +53,7 @@ namespace Isis {
     Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
+      PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       m_poleLatitude = mapGroup["PoleLatitude"];
 
@@ -87,18 +87,18 @@ namespace Isis {
       bool calculateVectors = false;
 
       // Check vectors for the right array size
-      if (!mapGroup.HasKeyword("XAxisVector") 
-          || mapGroup["XAxisVector"].Size() != 3) {
+      if (!mapGroup.hasKeyword("XAxisVector") 
+          || mapGroup["XAxisVector"].size() != 3) {
         calculateVectors = true;
       }
 
-      if (!mapGroup.HasKeyword("YAxisVector") 
-          || mapGroup["YAxisVector"].Size() != 3) {
+      if (!mapGroup.hasKeyword("YAxisVector") 
+          || mapGroup["YAxisVector"].size() != 3) {
         calculateVectors = true;
       }
 
-      if (!mapGroup.HasKeyword("ZAxisVector") 
-          || mapGroup["ZAxisVector"].Size() != 3) {
+      if (!mapGroup.hasKeyword("ZAxisVector") 
+          || mapGroup["ZAxisVector"].size() != 3) {
         calculateVectors = true;
       }
 
@@ -128,14 +128,14 @@ namespace Isis {
         eul2m_c(rotationAngle, latitudeAngle, longitudeAngle, 3, 2, 3, pvec);
 
         // Reset the vector keywords
-        if (mapGroup.HasKeyword("XAxisVector")) {
-          mapGroup.DeleteKeyword("XAxisVector");
+        if (mapGroup.hasKeyword("XAxisVector")) {
+          mapGroup.deleteKeyword("XAxisVector");
         }
-        if (mapGroup.HasKeyword("YAxisVector")) {
-          mapGroup.DeleteKeyword("YAxisVector");
+        if (mapGroup.hasKeyword("YAxisVector")) {
+          mapGroup.deleteKeyword("YAxisVector");
         }
-        if (mapGroup.HasKeyword("ZAxisVector")) {
-          mapGroup.DeleteKeyword("ZAxisVector");
+        if (mapGroup.hasKeyword("ZAxisVector")) {
+          mapGroup.deleteKeyword("ZAxisVector");
         }
 
         mapGroup += PvlKeyword("XAxisVector");

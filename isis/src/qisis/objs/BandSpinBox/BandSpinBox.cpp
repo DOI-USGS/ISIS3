@@ -36,9 +36,9 @@ namespace Isis {
     p_map.clear();
 
     // Get the number of bands and setup the spin box
-    PvlGroup &dim = pvl.FindObject("IsisCube")
-                          .FindObject("Core")
-                          .FindGroup("Dimensions");
+    PvlGroup &dim = pvl.findObject("IsisCube")
+                          .findObject("Core")
+                          .findGroup("Dimensions");
     p_bands = dim["Bands"];
 
     // Put in the default BandNumber list
@@ -49,16 +49,16 @@ namespace Isis {
     p_map["BandNumber"] = list;
 
     // Add any other lists
-    if(pvl.FindObject("IsisCube").HasGroup("BandBin")) {
-      PvlGroup &bandBin = pvl.FindObject("IsisCube")
-                                .FindGroup("BandBin");
-      for(int i = 0; i < bandBin.Keywords(); i++) {
+    if(pvl.findObject("IsisCube").hasGroup("BandBin")) {
+      PvlGroup &bandBin = pvl.findObject("IsisCube")
+                                .findGroup("BandBin");
+      for(int i = 0; i < bandBin.keywords(); i++) {
         list.clear();
-        if(bandBin[i].Size() == p_bands) {
-          for(int j = 0; j < bandBin[i].Size(); j++) {
+        if(bandBin[i].size() == p_bands) {
+          for(int j = 0; j < bandBin[i].size(); j++) {
             list.push_back(QString(bandBin[i][j]));
           }
-          QString bandBinName = bandBin[i].Name();
+          QString bandBinName = bandBin[i].name();
           p_map[bandBinName] = list;
         }
       }

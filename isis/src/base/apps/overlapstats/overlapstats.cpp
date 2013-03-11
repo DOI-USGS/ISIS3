@@ -114,12 +114,12 @@ void IsisMain() {
 
       // Construct a Projection for converting between Lon/Lat and X/Y
       Pvl cubeLab(serialNumbers.FileName(0));
-      PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
+      PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
       QString target = inst["TargetName"];
       PvlGroup radii = Projection::TargetRadii(target);
       Isis::Pvl maplab;
-      maplab.AddGroup(Isis::PvlGroup("Mapping"));
-      Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
+      maplab.addGroup(Isis::PvlGroup("Mapping"));
+      Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
       mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
       mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
       mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
@@ -181,7 +181,7 @@ void IsisMain() {
         errorNum++;
 
         if(ui.WasEntered("ERRORS")) {
-          errors << e.toPvl().Group(0).FindKeyword("Message")[0];
+          errors << e.toPvl().group(0).findKeyword("Message")[0];
 
           for(int serNum = 0; serNum < overlaps[index]->Size(); serNum++) {
             if(serNum == 0) {
@@ -260,7 +260,7 @@ void IsisMain() {
   if(errorNum > 0) {
     PvlGroup grp("OverlapStats");
     PvlKeyword key("ErrorNumber", toString(errorNum));
-    grp.AddKeyword(key);
+    grp.addKeyword(key);
     Application::Log(grp);
   }
 

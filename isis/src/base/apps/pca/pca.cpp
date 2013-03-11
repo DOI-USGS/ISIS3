@@ -83,9 +83,9 @@ void IsisMain() {
     Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->sampleCount(), icube->lineCount(), numDimensions);
     Pvl *label = ocube->label();
     // remove the transform matrix table from the cube
-    for(int i = 0; i < label->Objects(); i++) {
-      if(label->Object(i).HasKeyword("Name")
-          && label->Object(i)["Name"].IsEquivalent("Transform Matrix")) label->DeleteObject(i);
+    for(int i = 0; i < label->objects(); i++) {
+      if(label->object(i).hasKeyword("Name")
+          && label->object(i)["Name"].isEquivalent("Transform Matrix")) label->deleteObject(i);
     }
     p.Progress()->SetText("Inverting Cube");
     p.StartProcess(Inverse);

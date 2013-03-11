@@ -127,7 +127,7 @@ int main(void) {
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
       Pvl p(files[i]);
       Camera *cam = CameraFactory::Create(p);
-      cout << "FileName: " << FileName(p.FileName()).name() << endl;
+      cout << "FileName: " << FileName(p.fileName()).name() << endl;
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
       cout.setf(std::ios::fixed);
       cout << setprecision(9);
@@ -181,7 +181,7 @@ int main(void) {
     //string file = "/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub";
     Pvl p("/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub");
     Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

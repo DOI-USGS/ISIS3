@@ -42,7 +42,7 @@ void IsisMain() {
   //   what they choose to copy.
   Cube sourceCube;
   bool isACube = true;
-  if (!source->HasObject("IsisCube") || !source->FindObject("IsisCube").HasObject("Core")) {
+  if (!source->hasObject("IsisCube") || !source->findObject("IsisCube").hasObject("Core")) {
     isACube = false;
   }
   else {
@@ -219,8 +219,8 @@ void IsisMain() {
 
   if (!sameSize) {
     // Delete old AlphaCube group if it did exist, it'll just screw us up.
-    if (mergeTo->FindObject("IsisCube").HasGroup("AlphaCube"))
-      mergeTo->FindObject("IsisCube").DeleteGroup("AlphaCube");
+    if (mergeTo->findObject("IsisCube").hasGroup("AlphaCube"))
+      mergeTo->findObject("IsisCube").deleteGroup("AlphaCube");
 
     SubArea subarea;
     subarea.SetSubArea(sourceSamps, sourceLines, 1, 1, sourceSamps, sourceLines, lineScale, sampScale);
@@ -229,9 +229,9 @@ void IsisMain() {
 
   // Add History
   bool found = false;
-  for (int i = 0; i < mergeTo->Objects() && !found; i++) {
-    if (mergeTo->Object(i).IsNamed("History")) {
-      History his((QString)mergeTo->Object(i)["Name"]);
+  for (int i = 0; i < mergeTo->objects() && !found; i++) {
+    if (mergeTo->object(i).isNamed("History")) {
+      History his((QString)mergeTo->object(i)["Name"]);
       inOut.read(his);
       his.AddEntry();
       inOut.write(his);
@@ -256,11 +256,11 @@ void IsisMain() {
 bool copyGroup(Pvl * source, Pvl * mergeTo, QString name) {
   try {
     // The call we're looking to get an exception on is the one just below.
-    PvlGroup & toCopy = source->FindGroup(name, Pvl::Traverse);
-    PvlObject & isiscube = mergeTo->FindObject("IsisCube");
-    if (isiscube.HasGroup(name))
-      isiscube.DeleteGroup(name);
-    isiscube.AddGroup(toCopy);
+    PvlGroup & toCopy = source->findGroup(name, Pvl::Traverse);
+    PvlObject & isiscube = mergeTo->findObject("IsisCube");
+    if (isiscube.hasGroup(name))
+      isiscube.deleteGroup(name);
+    isiscube.addGroup(toCopy);
     return true;
   }
   catch (IException &) {

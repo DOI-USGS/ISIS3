@@ -46,7 +46,7 @@ namespace Isis {
   NirCamera::NirCamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
     // Get the camera characteristics
-    QString filter = (QString)(lab.FindGroup("BandBin", Pvl::Traverse))["FilterName"];
+    QString filter = (QString)(lab.findGroup("BandBin", Pvl::Traverse))["FilterName"];
     filter = filter.toUpper();
 
     if(filter.compare("A") == 0) {
@@ -71,7 +71,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
     double et = iTime((QString)inst["StartTime"]).Et();

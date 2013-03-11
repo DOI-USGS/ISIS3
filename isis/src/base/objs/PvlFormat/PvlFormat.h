@@ -51,7 +51,7 @@ namespace Isis {
   * @param type The string to be converted.
   * @return The corresponding KeywordType enum.
   */
-  inline KeywordType ToKeywordType(const QString type) {
+  inline KeywordType toKeywordType(const QString type) {
 
     QString t(type);
     t = t.remove(QRegExp("[\\w_-\"'")).toUpper();
@@ -115,6 +115,8 @@ namespace Isis {
    *           keyword value is output to the next line down.
    *  @history 2010-12-09 Steven Lambright - Values ending in '-' no longer fail
    *           to be quoted properly
+   *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
+   *                          names up to the current Isis 3 coding standards. Fixes #1533.
    */
   class PvlFormat {
 
@@ -125,8 +127,8 @@ namespace Isis {
       PvlFormat(Pvl &keymap);
       virtual ~PvlFormat() {};
 
-      void Add(const QString &file);
-      void Add(Pvl &keymap);
+      void add(const QString &file);
+      void add(Pvl &keymap);
 
       /**
        * Sets the maximum number of characters in a keyword value that
@@ -135,8 +137,8 @@ namespace Isis {
        *
        * @param limit The new character limit.
        */
-      void SetCharLimit(const unsigned int limit) {
-        p_charLimit = limit;
+      void setCharLimit(const unsigned int limit) {
+        m_charLimit = limit;
       };
 
       /**
@@ -146,35 +148,35 @@ namespace Isis {
        *
        * @return <B>unsigned int</B> Maximum number of characters.
        */
-      unsigned int CharLimit() const {
-        return p_charLimit;
+      unsigned int charLimit() const {
+        return m_charLimit;
       };
 
-      virtual QString FormatValue(const PvlKeyword &keyword,
+      virtual QString formatValue(const PvlKeyword &keyword,
                                       int valueIndex = 0);
-      virtual QString FormatName(const PvlKeyword &keyword);
-      virtual QString FormatEnd(const QString name,
+      virtual QString formatName(const PvlKeyword &keyword);
+      virtual QString formatEnd(const QString name,
                                     const PvlKeyword &keyword);
-      virtual QString FormatEOL() {
+      virtual QString formatEOL() {
         return "\n";
       }
 
-      virtual KeywordType Type(const PvlKeyword &keyword);
-      virtual int Accuracy(const PvlKeyword &keyword);
+      virtual KeywordType type(const PvlKeyword &keyword);
+      virtual int accuracy(const PvlKeyword &keyword);
 
     protected:
 
-      virtual QString AddQuotes(const QString value);
-      bool IsSingleUnit(const PvlKeyword &keyword);
+      virtual QString addQuotes(const QString value);
+      bool isSingleUnit(const PvlKeyword &keyword);
 
-      QString p_keywordMapFile;
-      Pvl p_keywordMap;
+      QString m_keywordMapFile;
+      Pvl m_keywordMap;
 
       //! Maximum number of characters on a single line of a keyword value.
-      unsigned int p_charLimit;
+      unsigned int m_charLimit;
 
     private:
-      void Init();
+      void init();
   };
 };
 

@@ -48,7 +48,7 @@ int main(void) {
 
     Pvl p(FileName("$apollo15/testData/AS15-M-0533.cropped.cub").expanded());
     ApolloMetricCamera *cam = (ApolloMetricCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -61,7 +61,7 @@ int main(void) {
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
     
     // Test Shutter Open/Close 
-    const PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time
     str2et_c(stime.toAscii().data(), &et);

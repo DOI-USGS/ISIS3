@@ -111,14 +111,14 @@ namespace Isis {
     naif.add("$base/kernels/pck/pck?????.tpc");
 
     //  Get the target and check for validity
-    PvlKeyword &target = label.FindKeyword("TargetName", PvlObject::Traverse);
+    PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
     SpiceInt tcode;
     SpiceBoolean found;
     (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
     if(found) return (true);
 
     if(makeValid) {
-      target.SetValue("Sky");
+      target.setValue("Sky");
     }
     return (false);
   }
@@ -283,7 +283,7 @@ namespace Isis {
   void MdisGeometry::init(Cube &cube) {
     _label = *cube.label();
     _orglabel = OriginalLabel(cube.fileName()).ReturnLabels();
-    _nSubframes = (int) _orglabel.FindKeyword("MESS:SUBFRAME",
+    _nSubframes = (int) _orglabel.findKeyword("MESS:SUBFRAME",
                   PvlObject::Traverse);
     _camera = CameraFactory::Create(_label);
     _digitsPrecision = _defaultDigits;
@@ -664,13 +664,13 @@ namespace Isis {
     else {
       //  It does exist, extract coordinates from original image label
       QString n(toString(frameno));
-      sample  = (double) _orglabel.FindKeyword("MESS:SUBF_X" + n,
+      sample  = (double) _orglabel.findKeyword("MESS:SUBF_X" + n,
                 PvlObject::Traverse);
-      line    = (double) _orglabel.FindKeyword("MESS:SUBF_Y" + n,
+      line    = (double) _orglabel.findKeyword("MESS:SUBF_Y" + n,
                 PvlObject::Traverse);
-      width   = (double) _orglabel.FindKeyword("MESS:SUBF_DX" + n,
+      width   = (double) _orglabel.findKeyword("MESS:SUBF_DX" + n,
                 PvlObject::Traverse);
-      height  = (double) _orglabel.FindKeyword("MESS:SUBF_DY" + n,
+      height  = (double) _orglabel.findKeyword("MESS:SUBF_DY" + n,
                 PvlObject::Traverse);
 
     }
@@ -743,10 +743,10 @@ namespace Isis {
     (void) sce2c_c(scCode, rotate->EphemerisTime(), &sclkdp);
 
     //  Determine instrument ID (inst)
-    PvlKeyword &key = _label.FindKeyword("NaifIkCode", PvlObject::Traverse);
+    PvlKeyword &key = _label.findKeyword("NaifIkCode", PvlObject::Traverse);
     SpiceInt inst = (int) key;
     IString iCode((int) inst);
-    key = _label.FindKeyword("Number", PvlObject::Traverse);
+    key = _label.findKeyword("Number", PvlObject::Traverse);
     inst -= (int) key;
 
     // Get CK time tolerance (tol)
@@ -840,7 +840,7 @@ namespace Isis {
 
     // dvf has units for mm/sec.  Scale by pixel pitch and multiply
     // by exposure length to obtain smear
-    key = _label.FindKeyword("ExposureDuration", PvlObject::Traverse);
+    key = _label.findKeyword("ExposureDuration", PvlObject::Traverse);
     double explen = (double) key;   // in milliseconds
 
     SpiceDouble smear[2];
@@ -1100,10 +1100,10 @@ namespace Isis {
     PvlKeyword key(name);
     for(unsigned int i = 0 ; i < values.size() ; i++) {
       if(IsSpecial(values[i])) {
-        key.AddValue(_NullDefault);
+        key.addValue(_NullDefault);
       }
       else {
-        key.AddValue(DoubleToString(values[i]), unit);
+        key.addValue(DoubleToString(values[i]), unit);
       }
     }
     return (key);
@@ -1130,10 +1130,10 @@ namespace Isis {
     PvlKeyword key(name);
     for(unsigned int i = 0 ; i < values.size() ; i++) {
       if(values[i].empty()) {
-        key.AddValue(_NullDefault);
+        key.addValue(_NullDefault);
       }
       else {
-        key.AddValue(values[i].c_str(), unit);
+        key.addValue(values[i].c_str(), unit);
       }
     }
     return (key);
@@ -1160,10 +1160,10 @@ namespace Isis {
     PvlKeyword key(name);
     for(unsigned int i = 0 ; i < values.size() ; i++) {
       if(values[i].isEmpty()) {
-        key.AddValue(_NullDefault);
+        key.addValue(_NullDefault);
       }
       else {
-        key.AddValue(values[i], unit);
+        key.addValue(values[i], unit);
       }
     }
     return (key);

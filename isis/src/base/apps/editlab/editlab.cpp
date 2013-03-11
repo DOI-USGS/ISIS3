@@ -23,18 +23,18 @@ void IsisMain() {
 
   // Get user entered option & create IsisCube Object if needed
   Cube *cube = NULL;
-  if(label->HasObject("IsisCube")) {
+  if(label->hasObject("IsisCube")) {
     cube = new Cube();
     cube->open(ui.GetFileName("FROM"), "rw");
-    pvl = &(cube->label()->FindObject("IsisCube"));
+    pvl = &(cube->label()->findObject("IsisCube"));
   }
 
   // Add Template File
   if(option == "ADDTEMP") {
     QString tempfile = ui.GetFileName("TEMPFILE");
     Pvl tempobj(tempfile);
-    for(int i = 0; i < tempobj.Groups(); ++i) {
-      pvl->AddGroup(tempobj.Group(i));
+    for(int i = 0; i < tempobj.groups(); ++i) {
+      pvl->addGroup(tempobj.group(i));
     }
   }
 
@@ -45,53 +45,53 @@ void IsisMain() {
     if(option == "ADDG") {
       PvlGroup g(grpname);
       if(ui.WasEntered("COMMENT"))
-        g.AddComment(ui.GetString("COMMENT"));
-      pvl->AddGroup(g);
+        g.addComment(ui.GetString("COMMENT"));
+      pvl->addGroup(g);
     }
 
     // Delete Group
     else if(option == "DELG") {
-      pvl->DeleteGroup(grpname);
+      pvl->deleteGroup(grpname);
     }
 
     else {
       QString key = ui.GetString("KEYWORD");
-      PvlGroup &grp = pvl->FindGroup(grpname, PvlObject::Traverse);
+      PvlGroup &grp = pvl->findGroup(grpname, PvlObject::Traverse);
 
       // Add Keyword
       if(option == "ADDKEY") {
         PvlKeyword keywrd(key);
-        grp.AddKeyword(modifyKeyword(ui, keywrd));
+        grp.addKeyword(modifyKeyword(ui, keywrd));
       }
 
       // Delete Keyword
       else if(option == "DELKEY") {
-        grp.DeleteKeyword(key);
+        grp.deleteKeyword(key);
       }
 
       // Modify Keyword
       else if(option == "MODKEY") {
-        modifyKeyword(ui, grp.FindKeyword(key));
+        modifyKeyword(ui, grp.findKeyword(key));
       }
 
       // Set Keyword
       else if(option == "SETKEY") {
-        if(grp.HasKeyword(key)) {
+        if(grp.hasKeyword(key)) {
           PvlKeyword *first = NULL;
           // Clean duplicate keywords of ONLY the provided keyword
-          for(int i = 0; i < grp.Keywords(); i++) {
-            if(grp[i].IsNamed(key)) {
+          for(int i = 0; i < grp.keywords(); i++) {
+            if(grp[i].isNamed(key)) {
               if(not first)
                 first = &grp[i];
               else
-                grp.DeleteKeyword(i);
+                grp.deleteKeyword(i);
             }
           }
           modifyKeyword(ui, *first);
         }
         else {
           PvlKeyword keywrd(key);
-          grp.AddKeyword(modifyKeyword(ui, keywrd));
+          grp.addKeyword(modifyKeyword(ui, keywrd));
         }
       }
 
@@ -118,7 +118,7 @@ void IsisMain() {
     cube = NULL;
   }
   else {
-    label->Write(ui.GetFileName("FROM"));
+    label->write(ui.GetFileName("FROM"));
   }
 
   delete label;
@@ -136,10 +136,10 @@ void IsisMain() {
  */
 PvlKeyword &modifyKeyword(UserInterface &ui, PvlKeyword &keyword) {
   if(ui.WasEntered("UNITS"))
-    keyword.SetValue(ui.GetString("VALUE"), ui.GetString("UNITS"));
+    keyword.setValue(ui.GetString("VALUE"), ui.GetString("UNITS"));
   else
-    keyword.SetValue(ui.GetString("VALUE"));
+    keyword.setValue(ui.GetString("VALUE"));
   if(ui.WasEntered("COMMENT"))
-    keyword.AddComment(ui.GetString("COMMENT"));
+    keyword.addComment(ui.GetString("COMMENT"));
   return keyword;
 }

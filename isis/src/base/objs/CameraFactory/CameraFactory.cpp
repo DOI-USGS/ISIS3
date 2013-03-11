@@ -50,7 +50,7 @@ namespace Isis {
 
     try {
       // First get the spacecraft and instrument and combine them
-      PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
+      PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
       QString spacecraft = (QString) inst["SpacecraftName"];
       QString name = (QString) inst["InstrumentId"];
       spacecraft = spacecraft.toUpper();
@@ -58,10 +58,10 @@ namespace Isis {
       QString group = spacecraft + "/" + name;
       group = group.remove(" ");
 
-      PvlGroup &kerns = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
+      PvlGroup &kerns = lab.findGroup("Kernels", Isis::Pvl::Traverse);
       // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
-      if(!kerns.HasKeyword("CameraVersion")) {
-        kerns.AddKeyword(PvlKeyword("CameraVersion", "1"));
+      if(!kerns.hasKeyword("CameraVersion")) {
+        kerns.addKeyword(PvlKeyword("CameraVersion", "1"));
       }
 
       int cameraOriginalVersion = (int)kerns["CameraVersion"];
@@ -102,14 +102,14 @@ namespace Isis {
 
 
   void CameraFactory::initPlugin() {
-    if(m_cameraPlugin.FileName() == "") {
+    if(m_cameraPlugin.fileName() == "") {
       FileName localFile("Camera.plugin");
       if(localFile.fileExists())
-        m_cameraPlugin.Read(localFile.expanded());
+        m_cameraPlugin.read(localFile.expanded());
 
       FileName systemFile("$ISISROOT/lib/Camera.plugin");
       if(systemFile.fileExists())
-        m_cameraPlugin.Read(systemFile.expanded());
+        m_cameraPlugin.read(systemFile.expanded());
     }
   }
 
@@ -128,7 +128,7 @@ namespace Isis {
 
     try {
       // First get the spacecraft and instrument and combine them
-      PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
+      PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
       QString spacecraft = (QString) inst["SpacecraftName"];
       QString name = (QString) inst["InstrumentId"];
       spacecraft = spacecraft.toUpper();
@@ -138,7 +138,7 @@ namespace Isis {
 
       PvlGroup plugin;
       try {
-        plugin = m_cameraPlugin.FindGroup(group);
+        plugin = m_cameraPlugin.findGroup(group);
       }
       catch(IException &e) {
         QString msg = "Unsupported camera model, unable to find plugin for ";
@@ -147,7 +147,7 @@ namespace Isis {
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
-      if(!plugin.HasKeyword("Version")) {
+      if(!plugin.hasKeyword("Version")) {
         QString msg = "Camera model identified by [" + group + "] does not have a version number";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }

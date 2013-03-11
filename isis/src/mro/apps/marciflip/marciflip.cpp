@@ -35,15 +35,15 @@ void IsisMain() {
     // change flipped keyword
     inst["DataFlipped"] = toString(((int)inst["DataFlipped"] + 1) % 2);
 
-    outputCube->label()->FindObject("IsisCube").AddGroup(inst);
+    outputCube->label()->findObject("IsisCube").addGroup(inst);
   }
 
   if(icube->hasGroup("BandBin")) {
-    outputCube->label()->FindObject("IsisCube").AddGroup(
+    outputCube->label()->findObject("IsisCube").addGroup(
         icube->group("BandBin"));
   }
 
-  if(icube->label()->HasObject("OriginalLabel")) {
+  if(icube->label()->hasObject("OriginalLabel")) {
     OriginalLabel origLabel;
     icube->read(origLabel);
     outputCube->write(origLabel);

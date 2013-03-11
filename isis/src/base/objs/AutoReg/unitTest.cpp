@@ -30,8 +30,8 @@ int main() {
   cout << "------------------------------" << endl;
   cout << "Test for missing Name Keyword" << endl;
   cout << "------------------------------" << endl;
-  obj.AddGroup(Isis::PvlGroup("Algorithm"));
-  Isis::PvlGroup &mg = obj.FindGroup("Algorithm");
+  obj.addGroup(Isis::PvlGroup("Algorithm"));
+  Isis::PvlGroup &mg = obj.findGroup("Algorithm");
   Doit(obj);
   cout << endl;
 
@@ -72,15 +72,15 @@ int main() {
   mg["Gradient"] = "None";
   cout << endl;
 
-  obj.AddGroup(Isis::PvlGroup("PatternChip"));
-  Isis::PvlGroup &pc = obj.FindGroup("PatternChip");
+  obj.addGroup(Isis::PvlGroup("PatternChip"));
+  Isis::PvlGroup &pc = obj.findGroup("PatternChip");
   pc += Isis::PvlKeyword("Lines", "90");
   pc += Isis::PvlKeyword("Samples", "90");
 
   cout << "-------------------------------" << endl;
   cout << "Test for missing Lines Keyword" << endl;
   cout << "-------------------------------" << endl;
-  pc.DeleteKeyword("Lines");
+  pc.deleteKeyword("Lines");
   Doit(obj);
   cout << endl;
 
@@ -88,7 +88,7 @@ int main() {
   cout << "Test for missing Samples Keyword" << endl;
   cout << "---------------------------------" << endl;
   pc += Isis::PvlKeyword("Lines", "90");
-  pc.DeleteKeyword("Samples");
+  pc.deleteKeyword("Samples");
   Doit(obj);
   cout << endl;
 
@@ -115,15 +115,15 @@ int main() {
   Doit(obj);
   cout << endl;
 
-  obj.AddGroup(Isis::PvlGroup("SearchChip"));
-  Isis::PvlGroup &sc = obj.FindGroup("SearchChip");
+  obj.addGroup(Isis::PvlGroup("SearchChip"));
+  Isis::PvlGroup &sc = obj.findGroup("SearchChip");
   sc += Isis::PvlKeyword("Lines", "150");
   sc += Isis::PvlKeyword("Samples", "150");
 
   cout << "-------------------------------" << endl;
   cout << "Test for missing Lines Keyword" << endl;
   cout << "-------------------------------" << endl;
-  sc.DeleteKeyword("Lines");
+  sc.deleteKeyword("Lines");
   Doit(obj);
   cout << endl;
 
@@ -131,7 +131,7 @@ int main() {
   cout << "Test for missing Samples Keyword" << endl;
   cout << "---------------------------------" << endl;
   sc += Isis::PvlKeyword("Lines", "150");
-  sc.DeleteKeyword("Samples");
+  sc.deleteKeyword("Samples");
   Doit(obj);
   cout << endl;
 
@@ -294,7 +294,7 @@ int main() {
   cout << "\n---------------------" << endl;
   cout << "Testing Minimum Difference Algorithm" << endl;
   cout << "---------------------" << endl;
-  mg = obj.FindGroup("Algorithm");
+  mg = obj.findGroup("Algorithm");
   mg["Name"] = "MinimumDifference";
   Doit(obj);
   p_ar->SetSubPixelAccuracy(false);
@@ -309,7 +309,7 @@ int main() {
 void Doit(Isis::PvlObject &obj) {
   try {
     Pvl lab;
-    lab.AddObject(obj);
+    lab.addObject(obj);
     p_ar = AutoRegFactory::Create(lab);
     Cube c;
     c.open("search_low.cub");

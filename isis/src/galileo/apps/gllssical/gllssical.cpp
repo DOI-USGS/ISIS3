@@ -95,32 +95,32 @@ void IsisMain() {
   p.StartProcess(Calibrate);
 
   PvlGroup calibrationLog("RadiometricCalibration");
-  calibrationLog.AddKeyword(PvlKeyword("From", ui.GetFileName("FROM")));
+  calibrationLog.addKeyword(PvlKeyword("From", ui.GetFileName("FROM")));
 
   FileName shutterFileName = FindShutterFile(icube);
-  calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" +
+  calibrationLog.addKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" +
                                        darkFileName.name()));
-  calibrationLog.AddKeyword(PvlKeyword("GainFile", gainFileName.originalPath() + "/" +
+  calibrationLog.addKeyword(PvlKeyword("GainFile", gainFileName.originalPath() + "/" +
                                        gainFileName.name()));
-  calibrationLog.AddKeyword(PvlKeyword("ShutterFile", shutterFileName.originalPath() + "/" +
+  calibrationLog.addKeyword(PvlKeyword("ShutterFile", shutterFileName.originalPath() + "/" +
                                        shutterFileName.name()));
-  calibrationLog.AddKeyword(PvlKeyword("ScaleFactor", toString(scaleFactor)));
-  calibrationLog.AddKeyword(PvlKeyword("OutputUnits", iof ? "I/F" : "Radiance"));
+  calibrationLog.addKeyword(PvlKeyword("ScaleFactor", toString(scaleFactor)));
+  calibrationLog.addKeyword(PvlKeyword("OutputUnits", iof ? "I/F" : "Radiance"));
   if (iof) {
-    calibrationLog.AddKeyword(PvlKeyword("S1", toString(s1), "I/F per Ft-Lambert"));
-    calibrationLog.AddKeyword(PvlKeyword("RSUN", toString(rsun), "(Planet-Sun range)/5.2 A.U."));
-    calibrationLog.AddKeyword(PvlKeyword("Scale", toString(scaleFactor), "I/F units per DN"));
-    calibrationLog.AddKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("IOF-SCALE0", toString(scaleFactor0), "(S1/Scale)*(GC/GG)/RSUN**2"));
+    calibrationLog.addKeyword(PvlKeyword("S1", toString(s1), "I/F per Ft-Lambert"));
+    calibrationLog.addKeyword(PvlKeyword("RSUN", toString(rsun), "(Planet-Sun range)/5.2 A.U."));
+    calibrationLog.addKeyword(PvlKeyword("Scale", toString(scaleFactor), "I/F units per DN"));
+    calibrationLog.addKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
+    calibrationLog.addKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
+    calibrationLog.addKeyword(PvlKeyword("IOF-SCALE0", toString(scaleFactor0), "(S1/Scale)*(GC/GG)/RSUN**2"));
   }
   else {
-    calibrationLog.AddKeyword(PvlKeyword("S2", toString(s2), "Nanowatts per Ft-Lambert"));
-    calibrationLog.AddKeyword(PvlKeyword("Scale", toString(scaleFactor),
+    calibrationLog.addKeyword(PvlKeyword("S2", toString(s2), "Nanowatts per Ft-Lambert"));
+    calibrationLog.addKeyword(PvlKeyword("Scale", toString(scaleFactor),
                                          "Nanowatts/cm**2/steradian/nanometer/DN"));
-    calibrationLog.AddKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("Radiance-SCALE0", toString(scaleFactor0), "(S2/Scale)*(GC/GG)"));
+    calibrationLog.addKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
+    calibrationLog.addKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
+    calibrationLog.addKeyword(PvlKeyword("Radiance-SCALE0", toString(scaleFactor0), "(S2/Scale)*(GC/GG)"));
   }
 
   ocube->putGroup(calibrationLog);
@@ -332,10 +332,10 @@ FileName ReadWeightTable(Cube *icube) {
   weightFile = weightFile.highestVersion();
   Pvl weightTables(weightFile.expanded());
   QString group = QString("FrameMode") + icube->group("Instrument")["FrameModeId"][0].at(0);
-  PvlGroup &frameGrp = weightTables.FindGroup(group);
+  PvlGroup &frameGrp = weightTables.findGroup(group);
   QString keyword = QString("GainState") + ((getGainModeID(icube) < 3) ? QString("12") : QString("34"));
 
-  for(int i = 0; i < frameGrp[keyword].Size(); i++) {
+  for(int i = 0; i < frameGrp[keyword].size(); i++) {
     weight.push_back(toDouble(frameGrp[keyword][i]));
   }
 
@@ -392,18 +392,18 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
   Pvl conversionFactors(GetScaleFactorFile().expanded());
   PvlKeyword fltToRef, fltToRad;
 
-  for(int grp = 0; grp < conversionFactors.Groups(); grp++) {
-    PvlGroup currGrp = conversionFactors.Group(grp);
+  for(int grp = 0; grp < conversionFactors.groups(); grp++) {
+    PvlGroup currGrp = conversionFactors.group(grp);
 
     // Match target name
-    if(currGrp.HasKeyword("TargetName")) {
+    if(currGrp.hasKeyword("TargetName")) {
       if(!icube->group("Archive")["CalTargetCode"][0].startsWith(currGrp["TargetName"][0])) {
         continue;
       }
     }
 
     // Match MinimumEncounter
-    if(currGrp.HasKeyword("MinimumTargetName")) {
+    if(currGrp.hasKeyword("MinimumTargetName")) {
       try {
         if((int)currGrp["MinimumTargetName"] >
             (int)toInt(icube->group("Archive")["CalTargetCode"][0].mid(0, 2))) {
@@ -421,7 +421,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
 
   int filterNumber = toInt(icube->group("BandBin")["FilterNumber"][0]);
 
-  if(fltToRef.Size() == 0) {
+  if(fltToRef.size() == 0) {
     throw IException(IException::Unknown,
                      "Unable to find matching reflectance and radiance values for target [" +
                      icube->group("Instrument")["TargetName"][0] + "] in [" +

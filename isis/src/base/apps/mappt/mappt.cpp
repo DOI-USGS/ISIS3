@@ -85,7 +85,7 @@ void IsisMain() {
 
       // Load it up into a new projection
       Pvl mapPvl;
-      mapPvl.Read(mapFile.expanded());
+      mapPvl.read(mapFile.expanded());
       Projection *altmap = ProjectionFactory::CreateFromCube(mapPvl);
 
       // Set lat and lon in its system
@@ -177,11 +177,11 @@ void IsisMain() {
     // Input map coordinate system location
     // Latitude
     if(proj->IsPlanetocentric()) {
-      centLat.AddComment("Input map coordinate system");
+      centLat.addComment("Input map coordinate system");
       results += centLat;
     }
     else {
-      graphLat.AddComment("Input map coordinate system");
+      graphLat.addComment("Input map coordinate system");
       results += graphLat;
     }
 
@@ -206,11 +206,11 @@ void IsisMain() {
     // Non input corrdinate system locations
     // Latitude
     if(proj->IsPlanetocentric()) {
-      graphLat.AddComment("Location in other coordinate systems");
+      graphLat.addComment("Location in other coordinate systems");
       results += graphLat;
     }
     else {
-      centLat.AddComment("Location in other coordinate systems");
+      centLat.addComment("Location in other coordinate systems");
       results += centLat;
     }
 
@@ -252,12 +252,12 @@ void IsisMain() {
       // Write the pvl group out to the file
       if(ui.GetString("FORMAT") == "PVL") {
         Pvl temp;
-        temp.AddGroup(results);
+        temp.addGroup(results);
         if(append) {
-          temp.Append(outFile);
+          temp.append(outFile);
         }
         else {
-          temp.Write(outFile);
+          temp.write(outFile);
         }
       }
 
@@ -278,20 +278,20 @@ void IsisMain() {
         }
 
         if(writeHeader) {
-          for(int i = 0; i < results.Keywords(); i++) {
-            os << results[i].Name();
+          for(int i = 0; i < results.keywords(); i++) {
+            os << results[i].name();
 
-            if(i < results.Keywords() - 1) {
+            if(i < results.keywords() - 1) {
               os << ",";
             }
           }
           os << endl;
         }
 
-        for(int i = 0; i < results.Keywords(); i++) {
+        for(int i = 0; i < results.keywords(); i++) {
           os << (QString)results[i];
 
-          if(i < results.Keywords() - 1) {
+          if(i < results.keywords() - 1) {
             os << ",";
           }
         }
@@ -315,8 +315,8 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);

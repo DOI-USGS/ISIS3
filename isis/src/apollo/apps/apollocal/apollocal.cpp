@@ -19,13 +19,13 @@ void IsisMain() {
   Cube *inCube = p.SetInputCube("FROM");
 
   PvlGroup &dataDir =
-      Preference::Preferences().FindGroup("DataDirectory");
+      Preference::Preferences().findGroup("DataDirectory");
   PvlTranslationTable tTable(
       (QString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
   QString missionDir = dataDir[tTable.Translate("MissionName",
-      (inCube->group("Instrument")).FindKeyword("SpacecraftName")[0])][0];
+      (inCube->group("Instrument")).findKeyword("SpacecraftName")[0])][0];
   QString camera =
-      (inCube->group("Instrument")).FindKeyword("InstrumentId")[0];
+      (inCube->group("Instrument")).findKeyword("InstrumentId")[0];
 
   CubeAttributeInput cai;
   p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);

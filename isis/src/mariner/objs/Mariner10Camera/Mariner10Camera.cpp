@@ -65,7 +65,7 @@ namespace Isis {
     SetFocalLength();
     SetPixelPitch();
 
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
     // Get utc start time
     QString stime = inst["StartTime"];
 

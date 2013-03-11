@@ -153,11 +153,11 @@ void IsisMain() {
   // Write results to Logs
   // Summary group is created with the counts of successes and failures
   PvlGroup summaryGroup = PvlGroup("Summary");
-  summaryGroup.AddKeyword(PvlKeyword("Successes", toString(numSuccesses)));
-  summaryGroup.AddKeyword(PvlKeyword("Failures", toString(numFailures)));
-  summaryGroup.AddKeyword(PvlKeyword("NumberFixedConstrainedPoints",
+  summaryGroup.addKeyword(PvlKeyword("Successes", toString(numSuccesses)));
+  summaryGroup.addKeyword(PvlKeyword("Failures", toString(numFailures)));
+  summaryGroup.addKeyword(PvlKeyword("NumberFixedConstrainedPoints",
                                       toString(numConstrainedFixed)));
-  summaryGroup.AddKeyword(PvlKeyword("NumberEditLockedPoints", toString(numLocked)));
+  summaryGroup.addKeyword(PvlKeyword("NumberEditLockedPoints", toString(numLocked)));
 
   bool errorlog;
   FileName errorlogFile;
@@ -181,19 +181,19 @@ void IsisMain() {
   if (errorlog) {
     // Write details in error log
     Pvl results;
-    results.SetName("Results");
-    results.AddGroup(summaryGroup);
+    results.setName("Results");
+    results.addGroup(summaryGroup);
     if (numFailures > 0) {
       // if there are any failures, add comment to the summary log to alert user
-      summaryGroup.AddComment("Unable to calculate radius for all points. Point"
+      summaryGroup.addComment("Unable to calculate radius for all points. Point"
               " IDs for failures contained in [" + errorlogFile.name() + "].");
       PvlGroup failGroup = PvlGroup("Failures");
-      failGroup.AddComment("A point fails if we are unable to set universal "
+      failGroup.addComment("A point fails if we are unable to set universal "
                "ground or if the radius calculated is a special pixel value.");
-      failGroup.AddKeyword(PvlKeyword("PointIDs", failedIDs));
-      results.AddGroup(failGroup);
+      failGroup.addKeyword(PvlKeyword("PointIDs", failedIDs));
+      results.addGroup(failGroup);
     }
-    results.Write(errorlogFile.expanded());
+    results.write(errorlogFile.expanded());
   }
   // Write summary to application log
   Application::Log(summaryGroup);

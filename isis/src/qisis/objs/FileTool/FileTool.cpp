@@ -570,17 +570,17 @@ namespace Isis {
       ocube->create(psOutFile);
 
       // Transfer labels from the first input cube
-      PvlObject &incube = icube->label()->FindObject("IsisCube");
-      PvlObject &outcube = ocube->label()->FindObject("IsisCube");
-      for(int i = 0; i < incube.Groups(); i++) {
-        outcube.AddGroup(incube.Group(i));
+      PvlObject &incube = icube->label()->findObject("IsisCube");
+      PvlObject &outcube = ocube->label()->findObject("IsisCube");
+      for(int i = 0; i < incube.groups(); i++) {
+        outcube.addGroup(incube.group(i));
       }
 
       // Transfer tables from the first input cube
       Pvl &inlab = *icube->label();
-      for(int i = 0; i < inlab.Objects(); i++) {
-        if (inlab.Object(i).IsNamed("Table")) {
-          Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
+      for(int i = 0; i < inlab.objects(); i++) {
+        if (inlab.object(i).isNamed("Table")) {
+          Blob t((QString)inlab.object(i)["Name"], inlab.object(i).name());
           icube->read(t);
           ocube->write(t);
         }
@@ -588,9 +588,9 @@ namespace Isis {
 
       // Transfer blobs from the first input cube
       inlab = *icube->label();
-      for(int i = 0; i < inlab.Objects(); i++) {
-        if (inlab.Object(i).IsNamed("Polygon")) {
-          Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
+      for(int i = 0; i < inlab.objects(); i++) {
+        if (inlab.object(i).isNamed("Polygon")) {
+          Blob t((QString)inlab.object(i)["Name"], inlab.object(i).name());
           icube->read(t);
           ocube->write(t);
         }
@@ -598,8 +598,8 @@ namespace Isis {
 
       // Transfer tables from the first input cube
       inlab = *icube->label();
-      for(int i = 0; i < inlab.Objects(); i++) {
-        if (inlab.Object(i).IsNamed("OriginalLabel")) {
+      for(int i = 0; i < inlab.objects(); i++) {
+        if (inlab.object(i).isNamed("OriginalLabel")) {
           OriginalLabel ol;
           icube->read(ol);
           ocube->write(ol);
@@ -730,7 +730,7 @@ namespace Isis {
 
     Pvl whatsThisPvl;
     cubeViewport()->getAllWhatsThisInfo(whatsThisPvl);
-    whatsThisPvl.Write(output);
+    whatsThisPvl.write(output);
   }
 
   /**

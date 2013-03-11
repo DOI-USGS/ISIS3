@@ -2085,7 +2085,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     //    Isis::FileName name(value);
     //    value = name.expanded();
     //    if (name.Exists() && param->fileMode == "output"
-    //        && Isis::Preference::Preferences().FindGroup("CubeCustomization").FindKeyword("Overwrite")[0] == "Error") {
+    //        && Isis::Preference::Preferences().findGroup("CubeCustomization").findKeyword("Overwrite")[0] == "Error") {
     //      QString message = "Invalid output cube for [" + param->name + "]. The cube file [" + value + "] already exists.  " +
     //                       "The user preference cube customization group is set to disallow cube overwrites.";
     //      throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
@@ -2381,8 +2381,8 @@ void IsisAml::Verify(const IsisParameterData *param) {
  *   @history 2010-07-19 Jeannie Walldren - Original version.
  */
 void IsisAml::CheckFileNamePreference(QString filename, QString paramname) {
-  Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
-  QString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0].simplified().trimmed();
+  Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().findGroup("FileCustomization");
+  QString overwritePreference = fileCustomization.findKeyword("Overwrite")[0].simplified().trimmed();
   QString temp = overwritePreference;
   if(overwritePreference.toUpper() == "ERROR") {
     QString message = "Invalid output filename for [" + paramname + "]. The file [" + filename + "] already exists.  " +
@@ -2935,7 +2935,7 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
         Isis::PvlKeyword paramKeyword(param->name);
 
         for(unsigned int value = 0; value < param->values.size(); value++) {
-          paramKeyword.AddValue(param->values[value]);
+          paramKeyword.addValue(param->values[value]);
         }
 
         group += paramKeyword;
@@ -2948,7 +2948,7 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
         for(unsigned int value = 0;
            value < param->defaultValues.size();
            value++) {
-          paramKeyword.AddValue(param->defaultValues[value]);
+          paramKeyword.addValue(param->defaultValues[value]);
         }
 
         group += paramKeyword;
@@ -2979,8 +2979,8 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
             for(unsigned int e2 = 0; e2 < param->listOptions[o2].exclude.size(); e2++) {
               const IsisParameterData *param2 =
                 ReturnParam(param->listOptions[o2].exclude[e2]);
-              if(group.HasKeyword(param2->name)) {
-                group.DeleteKeyword(param2->name);
+              if(group.hasKeyword(param2->name)) {
+                group.deleteKeyword(param2->name);
               }
             }
           }
@@ -2989,8 +2989,8 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
     }
   }
 
-  cont.Clear();
-  cont.AddGroup(group);
+  cont.clear();
+  cont.addGroup(group);
   return;
 }
 

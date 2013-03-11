@@ -148,10 +148,10 @@ namespace Isis {
     Pvl tmp;
     tmp += mapping;
 
-    if(!mapping.HasKeyword("EquatorialRadius")) {
+    if(!mapping.hasKeyword("EquatorialRadius")) {
       PvlGroup radii = Projection::TargetRadii(mapping["TargetName"]);
-      tmp.FindGroup("Mapping") += radii["EquatorialRadius"];
-      tmp.FindGroup("Mapping") += radii["PolarRadius"];
+      tmp.findGroup("Mapping") += radii["EquatorialRadius"];
+      tmp.findGroup("Mapping") += radii["PolarRadius"];
     }
 
     setProjection(ProjectionFactory::Create(tmp));
@@ -165,7 +165,7 @@ namespace Isis {
     PvlGroup mapping(proj->Mapping());
 
     if (m_mapButton) {
-      PvlKeyword projectionKeyword = mapping.FindKeyword("ProjectionName");
+      PvlKeyword projectionKeyword = mapping.findKeyword("ProjectionName");
       QString projName = projectionKeyword[0];
       m_mapButton->setText(tr("View/Edit %1 Projection").arg(projName));
     }
@@ -217,7 +217,7 @@ namespace Isis {
     }
     catch(IException &) {
       Pvl mappingPvl("$base/templates/maps/equirectangular.map");
-      PvlGroup &mappingGrp = mappingPvl.FindGroup("Mapping");
+      PvlGroup &mappingGrp = mappingPvl.findGroup("Mapping");
       mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
       mappingGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
       mappingGrp += PvlKeyword("LongitudeDomain", "360");
@@ -242,7 +242,7 @@ namespace Isis {
       }
       catch(IException &) {
         mappingGrp +=
-            label->FindGroup("Instrument", Pvl::Traverse)["TargetName"];
+            label->findGroup("Instrument", Pvl::Traverse)["TargetName"];
       }
 
       return mappingGrp;
@@ -285,7 +285,7 @@ namespace Isis {
 
     if(m_projection) {
       PvlKeyword projectionKeyword =
-          m_projection->Mapping().FindKeyword("ProjectionName");
+          m_projection->Mapping().findKeyword("ProjectionName");
       QString projName = projectionKeyword[0];
       m_mapButton->setText(projName);
     }
@@ -385,7 +385,7 @@ namespace Isis {
       foreach(tool, *m_tools) {
         if(tool->projectPvlObjectName() != "") {
           PvlObject toolObj = tool->toPvl();
-          toolObj.SetName(tool->projectPvlObjectName());
+          toolObj.setName(tool->projectPvlObjectName());
           output += toolObj;
         }
       }
@@ -419,18 +419,18 @@ namespace Isis {
     MosaicTool *tool;
     foreach(tool, *m_tools) {
       if(tool->projectPvlObjectName() != "") {
-        if(project.HasObject(tool->projectPvlObjectName())) {
+        if(project.hasObject(tool->projectPvlObjectName())) {
           const PvlObject &toolSettings(
-              project.FindObject(tool->projectPvlObjectName()));
+              project.findObject(tool->projectPvlObjectName()));
           tool->fromPvl(toolSettings);
         }
       }
 
-      if (project.HasObject("ZOrdering")) {
-        const PvlObject &zOrders = project.FindObject("ZOrdering");
+      if (project.hasObject("ZOrdering")) {
+        const PvlObject &zOrders = project.findObject("ZOrdering");
 
         for (int zOrderIndex = 0;
-             zOrderIndex < zOrders.Keywords();
+             zOrderIndex < zOrders.keywords();
              zOrderIndex ++) {
           const PvlKeyword &zOrder = zOrders[zOrderIndex];
 
@@ -451,9 +451,9 @@ namespace Isis {
         }
       }
 
-      if (project.HasObject("SceneVisiblePosition")) {
+      if (project.hasObject("SceneVisiblePosition")) {
         const PvlObject &positionInfo =
-            project.FindObject("SceneVisiblePosition");
+            project.findObject("SceneVisiblePosition");
 
         QByteArray hexValues(positionInfo["ViewTransform"][0].toAscii());
         QDataStream transformStream(QByteArray::fromHex(hexValues));
@@ -477,7 +477,7 @@ namespace Isis {
    * @param project The project Pvl
    */
   void MosaicSceneWidget::preloadFromPvl(const PvlObject &project) {
-    setProjection(project.FindGroup("Mapping"));
+    setProjection(project.findGroup("Mapping"));
     recalcSceneRect();
   }
 
@@ -1164,13 +1164,13 @@ namespace Isis {
     //   file.
     try {
       PvlGroup mapping(m_projection->Mapping());
-      PvlKeyword minLatKeyword = mapping.FindKeyword("MinimumLatitude");
+      PvlKeyword minLatKeyword = mapping.findKeyword("MinimumLatitude");
       Latitude minLat(toDouble(minLatKeyword[0]), mapping, Angle::Degrees);
-      PvlKeyword minLonKeyword = mapping.FindKeyword("MinimumLongitude");
+      PvlKeyword minLonKeyword = mapping.findKeyword("MinimumLongitude");
       Longitude minLon(toDouble(minLonKeyword[0]), mapping, Angle::Degrees);
-      PvlKeyword maxLatKeyword = mapping.FindKeyword("MaximumLatitude");
+      PvlKeyword maxLatKeyword = mapping.findKeyword("MaximumLatitude");
       Latitude maxLat(toDouble(maxLatKeyword[0]), mapping, Angle::Degrees);
-      PvlKeyword maxLonKeyword = mapping.FindKeyword("MaximumLongitude");
+      PvlKeyword maxLonKeyword = mapping.findKeyword("MaximumLongitude");
       Longitude maxLon(toDouble(maxLonKeyword[0]), mapping, Angle::Degrees);
 
       Angle increment(1, Angle::Degrees);

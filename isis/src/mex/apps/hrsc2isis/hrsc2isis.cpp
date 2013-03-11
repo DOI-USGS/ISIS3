@@ -89,7 +89,7 @@ void IsisMain() {
   Table timesTable("LineScanTimes", timesRecord);
 
   if(hasPrefix) {
-    p.SetDataPrefixBytes((int)label.FindObject("IMAGE")["LINE_PREFIX_BYTES"]);
+    p.SetDataPrefixBytes((int)label.findObject("IMAGE")["LINE_PREFIX_BYTES"]);
     p.SaveDataPrefix();
 
     p.Progress()->SetText("Reading Prefix Data");
@@ -165,29 +165,29 @@ void IsisMain() {
   //p.TranslatePdsLabels (otherLabels);
   TranslateHrscLabels(label, otherLabels);
 
-  if(otherLabels.HasGroup("Mapping") &&
-      (otherLabels.FindGroup("Mapping").Keywords() > 0)) {
-    outCube->putGroup(otherLabels.FindGroup("Mapping"));
+  if(otherLabels.hasGroup("Mapping") &&
+      (otherLabels.findGroup("Mapping").keywords() > 0)) {
+    outCube->putGroup(otherLabels.findGroup("Mapping"));
   }
 
-  if(otherLabels.HasGroup("Instrument") &&
-      (otherLabels.FindGroup("Instrument").Keywords() > 0)) {
-    outCube->putGroup(otherLabels.FindGroup("Instrument"));
+  if(otherLabels.hasGroup("Instrument") &&
+      (otherLabels.findGroup("Instrument").keywords() > 0)) {
+    outCube->putGroup(otherLabels.findGroup("Instrument"));
   }
 
-  if(otherLabels.HasGroup("BandBin") &&
-      (otherLabels.FindGroup("BandBin").Keywords() > 0)) {
-    outCube->putGroup(otherLabels.FindGroup("BandBin"));
+  if(otherLabels.hasGroup("BandBin") &&
+      (otherLabels.findGroup("BandBin").keywords() > 0)) {
+    outCube->putGroup(otherLabels.findGroup("BandBin"));
   }
 
-  if(otherLabels.HasGroup("Archive") &&
-      (otherLabels.FindGroup("Archive").Keywords() > 0)) {
-    outCube->putGroup(otherLabels.FindGroup("Archive"));
+  if(otherLabels.hasGroup("Archive") &&
+      (otherLabels.findGroup("Archive").keywords() > 0)) {
+    outCube->putGroup(otherLabels.findGroup("Archive"));
   }
 
-  if(otherLabels.HasGroup("Kernels") &&
-      (otherLabels.FindGroup("Kernels").Keywords() > 0)) {
-    outCube->putGroup(otherLabels.FindGroup("Kernels"));
+  if(otherLabels.hasGroup("Kernels") &&
+      (otherLabels.findGroup("Kernels").keywords() > 0)) {
+    outCube->putGroup(otherLabels.findGroup("Kernels"));
   }
 
   p.EndProcess();
@@ -224,7 +224,7 @@ void WriteOutput(Isis::Buffer &buf) {
 
 void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   // Get the directory where the MRO HiRISE translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Mex"] + "/translations/";
 
   // Translate the Instrument group
@@ -232,21 +232,21 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   PvlTranslationManager instrumentXlater(inLabels, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
-  if(inLabels.HasKeyword("MACROPIXEL_SIZE")) {
-    outLabel.FindGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", inLabels["MACROPIXEL_SIZE"][0]);
+  if(inLabels.hasKeyword("MACROPIXEL_SIZE")) {
+    outLabel.findGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", inLabels["MACROPIXEL_SIZE"][0]);
   }
   else {
-    outLabel.FindGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", "1");
+    outLabel.findGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", "1");
   }
 
   // Remove 'Z' from times
-  QString startTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  QString startTime = outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0];
   startTime = startTime.mid(0, startTime.size() - 1);
-  outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"] = startTime;
+  outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"] = startTime;
 
-  QString stopTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"][0];
+  QString stopTime = outLabel.findGroup("Instrument", Pvl::Traverse)["StopTime"][0];
   stopTime = stopTime.mid(0, stopTime.size() - 1);
-  outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"] = stopTime;
+  outLabel.findGroup("Instrument", Pvl::Traverse)["StopTime"] = stopTime;
 
   // Translate the BandBin group
   transFile  = transDir + "hrscBandBin.trn";
@@ -271,7 +271,7 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_S1",   -41219));
   naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_SRC",  -41220));
 
-  QString key = outLabel.FindGroup("Archive", Pvl::Traverse)["DetectorId"];
+  QString key = outLabel.findGroup("Archive", Pvl::Traverse)["DetectorId"];
   int ikCode = naifIkCodes[key];
 
   if(ikCode < -41220 || ikCode > -41210) {
@@ -283,5 +283,5 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
 
   PvlGroup kerns("Kernels");
   kerns += PvlKeyword("NaifIkCode", toString(ikCode));
-  outLabel.AddGroup(kerns);
+  outLabel.addGroup(kerns);
 }

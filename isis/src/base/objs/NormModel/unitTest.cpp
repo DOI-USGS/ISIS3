@@ -22,14 +22,14 @@ int main() {
   std::cout << "UNIT TEST for Isis::NormModel" << std::endl << std::endl;
 
   Pvl lab;
-  lab.AddObject(PvlObject("PhotometricModel"));
-  lab.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "Lambert"));
+  lab.addObject(PvlObject("PhotometricModel"));
+  lab.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").addKeyword(PvlKeyword("Name", "Lambert"));
   PhotoModel *pm = PhotoModelFactory::Create(lab);
 
-  lab.AddObject(PvlObject("AtmosphericModel"));
-  lab.FindObject("AtmosphericModel").AddGroup(PvlGroup("Algorithm"));
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "Anisotropic1"));
+  lab.addObject(PvlObject("AtmosphericModel"));
+  lab.findObject("AtmosphericModel").addGroup(PvlGroup("Algorithm"));
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").addKeyword(PvlKeyword("Name", "Anisotropic1"));
   AtmosModel *am = AtmosModelFactory::Create(lab, *pm);
 
   std::cout << "Testing missing NormalizationModel object ..." << std::endl;
@@ -37,19 +37,19 @@ int main() {
   doit(lab, *pm);
   doit(lab, *pm, *am);
 
-  lab.AddObject(PvlObject("NormalizationModel"));
+  lab.addObject(PvlObject("NormalizationModel"));
   std::cout << "Testing missing Algorithm group ..." << std::endl;
 
   doit(lab, *pm);
   doit(lab, *pm, *am);
 
-  lab.FindObject("NormalizationModel").AddGroup(PvlGroup("Algorithm"));
+  lab.findObject("NormalizationModel").addGroup(PvlGroup("Algorithm"));
 
   std::cout << "Testing missing Name keyword ..." << std::endl;
   doit(lab, *pm);
   doit(lab, *pm, *am);
 
-  lab.FindObject("NormalizationModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "Albedo"), Pvl::Replace);
+  lab.findObject("NormalizationModel").findGroup("Algorithm").addKeyword(PvlKeyword("Name", "Albedo"), Pvl::Replace);
   std::cout << "Testing supported normalization model ..." << std::endl;
   doit(lab, *pm);
   doit(lab, *pm, *am);

@@ -44,8 +44,8 @@ namespace Isis {
     m_label = new Pvl;
 
     m_formatter = new PvlFormatPds("$lro/translations/mrfExportRoot.typ");
-    m_label->SetFormat(m_formatter);
-    m_label->SetTerminator("END");
+    m_label->setFormat(m_formatter);
+    m_label->setTerminator("END");
 
     if (type == ProcessExportPds::Image) {
       CreateImageLabel();
@@ -83,7 +83,7 @@ namespace Isis {
     // The IMAGE_MAP_PROJECTION group is located in the ROOT for PDS IMAGEs. The
     // standard routines will add the IMAGE_MAP_PROJECTION correctly
     StandardAllMapping(mainPvl);
-    mainPvl.GetFormat()->Add("$lro/translations/mrfExportAllMapping.typ");
+    mainPvl.format()->add("$lro/translations/mrfExportAllMapping.typ");
   }
 
 }

@@ -48,7 +48,7 @@ namespace Isis {
     p_nbytes = 0;
     p_type = type;
 
-    p_blobPvl.SetName(p_type);
+    p_blobPvl.setName(p_type);
     p_blobPvl += PvlKeyword("Name", p_blobName);
     p_blobPvl += PvlKeyword("StartByte", "0");
     p_blobPvl += PvlKeyword("Bytes", "0");
@@ -181,9 +181,9 @@ namespace Isis {
     try {
       // Search for the blob name
       QString blobName = p_blobName.toUpper();
-      for (int o = 0; o < pvl.Objects(); o++) {
-        const PvlObject &obj = pvl.Object(o);
-        if (obj.IsNamed(p_type)) {
+      for (int o = 0; o < pvl.objects(); o++) {
+        const PvlObject &obj = pvl.object(o);
+        if (obj.isNamed(p_type)) {
           QString curName = obj["Name"];
           curName = curName.toUpper();
           if (blobName == curName) {
@@ -217,13 +217,13 @@ namespace Isis {
       p_startByte = p_blobPvl["StartByte"];
       p_nbytes = p_blobPvl["Bytes"];
       p_detached = "";
-      if (p_blobPvl.HasKeyword("^" + p_type)) {
+      if (p_blobPvl.hasKeyword("^" + p_type)) {
         QString path = "";
         if (p_labelFile != "") {
           path = FileName(p_labelFile).path() + "/";
         }
         p_detached = path + (QString) p_blobPvl["^"+p_type];
-        p_blobPvl.DeleteKeyword("^" + p_type);
+        p_blobPvl.deleteKeyword("^" + p_type);
       }
     }
     catch (IException &e) {
@@ -247,7 +247,7 @@ namespace Isis {
     // Get the pvl
     Pvl pvl;
     try {
-      pvl.Read(temp);
+      pvl.read(temp);
     }
     catch (IException &e) {
       QString msg = "Invalid " + p_type + " label format";
@@ -371,15 +371,15 @@ namespace Isis {
     try {
       WriteInit();
       Pvl pvl;
-      pvl.AddObject(p_blobPvl);
+      pvl.addObject(p_blobPvl);
       ostringstream os;
       os << pvl << endl;
       os.seekp(0, std::ios::end);
       BigInt nbytes = (BigInt) os.tellp() + (BigInt) 64;
       p_startByte = nbytes + 1 + 1; // 1-based;
-      pvl.FindObject(p_type)["StartByte"] = toString(p_startByte);
-      pvl.FindObject(p_type)["Bytes"] = toString(p_nbytes);
-      pvl.Write(file);
+      pvl.findObject(p_type)["StartByte"] = toString(p_startByte);
+      pvl.findObject(p_type)["Bytes"] = toString(p_nbytes);
+      pvl.write(file);
 
       // Prepare and write the binary data
       fstream stream;
@@ -439,9 +439,9 @@ namespace Isis {
     p_blobPvl["Bytes"] = toString(p_nbytes);
 
     bool found = false;
-    for (int i = 0; i < pvl.Objects(); i++) {
-      if (pvl.Object(i).Name() == p_blobPvl.Name()) {
-        PvlObject &obj = pvl.Object(i);
+    for (int i = 0; i < pvl.objects(); i++) {
+      if (pvl.object(i).name() == p_blobPvl.name()) {
+        PvlObject &obj = pvl.object(i);
         if ((QString)obj["Name"] == (QString)p_blobPvl["Name"]) {
           found = true;
 
@@ -473,7 +473,7 @@ namespace Isis {
 
     // Didn't find the same blob so add it to the labels
     if (!found) {
-      pvl.AddObject(p_blobPvl);
+      pvl.addObject(p_blobPvl);
     }
 
     stm.seekp((BigInt) sbyte - (BigInt)1);
@@ -481,7 +481,7 @@ namespace Isis {
 
     // Handle detached blobs
     if (detachedFileName != "") {
-      p_blobPvl.DeleteKeyword("^" + p_type);
+      p_blobPvl.deleteKeyword("^" + p_type);
     }
   }
 
@@ -516,7 +516,7 @@ namespace Isis {
    * @return bool Returns true if the object is a blob, and false if it is not
    */
   bool IsBlob(PvlObject &obj) {
-    if (obj.IsNamed("TABLE")) return true;
+    if (obj.isNamed("TABLE")) return true;
     return false;
   }
 } // end namespace isis

@@ -39,8 +39,8 @@ void IsisMain() {
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   FileList list;
   list.read(ui.GetFileName("FROMLIST"));
@@ -86,7 +86,7 @@ void IsisMain() {
     // Get the mapping group and the BandBin group
     Pvl camMap;
     incam->BasicMapping(camMap);
-    camGrp = camMap.FindGroup("Mapping");
+    camGrp = camMap.findGroup("Mapping");
     if(icube->hasGroup("BandBin")) {
       bandBinGrp = icube->group("BandBin");
 
@@ -110,97 +110,97 @@ void IsisMain() {
     }
   } //end for list.size
 
-  camGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
 
 
   // We want to delete the keywords we just added if the user wants the range
   // out of the mapfile, otherwise they will replace any keywords not in the
   // mapfile
   if(ui.GetString("DEFAULTRANGE") == "MAP") {
-    camGrp.DeleteKeyword("MinimumLatitude");
-    camGrp.DeleteKeyword("MaximumLatitude");
-    camGrp.DeleteKeyword("MinimumLongitude");
-    camGrp.DeleteKeyword("MaximumLongitude");
+    camGrp.deleteKeyword("MinimumLatitude");
+    camGrp.deleteKeyword("MaximumLatitude");
+    camGrp.deleteKeyword("MinimumLongitude");
+    camGrp.deleteKeyword("MaximumLongitude");
   }
   // Otherwise, remove the keywords from the map file so the camera keywords
   // will be propogated correctly
   else {
-    while(userGrp.HasKeyword("MinimumLatitude")) {
-      userGrp.DeleteKeyword("MinimumLatitude");
+    while(userGrp.hasKeyword("MinimumLatitude")) {
+      userGrp.deleteKeyword("MinimumLatitude");
     }
-    while(userGrp.HasKeyword("MinimumLongitude")) {
-      userGrp.DeleteKeyword("MinimumLongitude");
+    while(userGrp.hasKeyword("MinimumLongitude")) {
+      userGrp.deleteKeyword("MinimumLongitude");
     }
-    while(userGrp.HasKeyword("MaximumLatitude")) {
-      userGrp.DeleteKeyword("MaximumLatitude");
+    while(userGrp.hasKeyword("MaximumLatitude")) {
+      userGrp.deleteKeyword("MaximumLatitude");
     }
-    while(userGrp.HasKeyword("MaximumLongitude")) {
-      userGrp.DeleteKeyword("MaximumLongitude");
+    while(userGrp.hasKeyword("MaximumLongitude")) {
+      userGrp.deleteKeyword("MaximumLongitude");
     }
   }
 
   // If the user decided to enter a ground range then override
   if(ui.WasEntered("MINLON")) {
-    userGrp.AddKeyword(PvlKeyword("MinimumLongitude",
+    userGrp.addKeyword(PvlKeyword("MinimumLongitude",
                                   toString(ui.GetDouble("MINLON"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLON")) {
-    userGrp.AddKeyword(PvlKeyword("MaximumLongitude",
+    userGrp.addKeyword(PvlKeyword("MaximumLongitude",
                                   toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MINLAT")) {
-    userGrp.AddKeyword(PvlKeyword("MinimumLatitude",
+    userGrp.addKeyword(PvlKeyword("MinimumLatitude",
                                   toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLAT")) {
-    userGrp.AddKeyword(PvlKeyword("MaximumLatitude",
+    userGrp.addKeyword(PvlKeyword("MaximumLatitude",
                                   toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
   }
 
   // If they want the res. from the mapfile, delete it from the camera so
   // nothing gets overriden
   if(ui.GetString("PIXRES") == "MAP") {
-    camGrp.DeleteKeyword("PixelResolution");
+    camGrp.deleteKeyword("PixelResolution");
   }
   // Otherwise, delete any resolution keywords from the mapfile so the camera
   // info is propogated over
   else if(ui.GetString("PIXRES") == "CAMERA") {
-    if(userGrp.HasKeyword("Scale")) {
-      userGrp.DeleteKeyword("Scale");
+    if(userGrp.hasKeyword("Scale")) {
+      userGrp.deleteKeyword("Scale");
     }
-    if(userGrp.HasKeyword("PixelResolution")) {
-      userGrp.DeleteKeyword("PixelResolution");
+    if(userGrp.hasKeyword("PixelResolution")) {
+      userGrp.deleteKeyword("PixelResolution");
     }
   }
 
   // Copy any defaults that are not in the user map from the camera map file
-  for(int k = 0; k < camGrp.Keywords(); k++) {
-    if(!userGrp.HasKeyword(camGrp[k].Name())) {
+  for(int k = 0; k < camGrp.keywords(); k++) {
+    if(!userGrp.hasKeyword(camGrp[k].name())) {
       userGrp += camGrp[k];
     }
   }
 
   // If the user decided to enter a resolution then override
   if(ui.GetString("PIXRES") == "MPP") {
-    userGrp.AddKeyword(PvlKeyword("PixelResolution",
+    userGrp.addKeyword(PvlKeyword("PixelResolution",
                                   toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
-    if(userGrp.HasKeyword("Scale")) {
-      userGrp.DeleteKeyword("Scale");
+    if(userGrp.hasKeyword("Scale")) {
+      userGrp.deleteKeyword("Scale");
     }
   }
   else if(ui.GetString("PIXRES") == "PPD") {
-    userGrp.AddKeyword(PvlKeyword("Scale",
+    userGrp.addKeyword(PvlKeyword("Scale",
                                   toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
-    if(userGrp.HasKeyword("PixelResolution")) {
-      userGrp.DeleteKeyword("PixelResolution");
+    if(userGrp.hasKeyword("PixelResolution")) {
+      userGrp.deleteKeyword("PixelResolution");
     }
   }
 
@@ -209,32 +209,32 @@ void IsisMain() {
     if(incam->IntersectsLongitudeDomain(userMap)) {
       if(ui.GetString("LONSEAM") == "AUTO") {
         if((int) userGrp["LongitudeDomain"] == 360) {
-          userGrp.AddKeyword(PvlKeyword("LongitudeDomain", toString(180)),
+          userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(180)),
                              Pvl::Replace);
           if(incam->IntersectsLongitudeDomain(userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.AddKeyword(PvlKeyword("LongitudeDomain", toString(360)),
+            userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(360)),
                                Pvl::Replace);
           }
         }
         else {
-          userGrp.AddKeyword(PvlKeyword("LongitudeDomain", toString(360)),
+          userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(360)),
                              Pvl::Replace);
           if(incam->IntersectsLongitudeDomain(userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.AddKeyword(PvlKeyword("LongitudeDomain", toString(180)),
+            userGrp.addKeyword(PvlKeyword("LongitudeDomain", toString(180)),
                                Pvl::Replace);
           }
         }
         // Make the target info match the new longitude domain
         double minlat, maxlat, minlon, maxlon;
         incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
-        userGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-        userGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-        userGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-        userGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+        userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+        userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+        userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+        userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
       }
 
       else if(ui.GetString("LONSEAM") == "ERROR") {
@@ -247,8 +247,8 @@ void IsisMain() {
 
 
   Pvl pvl;
-  pvl.AddGroup(userGrp);
-  pvl.AddGroup(bandBinGrp);
+  pvl.addGroup(userGrp);
+  pvl.addGroup(bandBinGrp);
   g_pgp.SetOutputCube("TO", pvl, g_bands);
 
   for(int f = 0; f < list.size(); f++) {
@@ -276,8 +276,8 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFileName("MAP"));
-  PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);

@@ -740,7 +740,7 @@ int main(void) {
 
   try {
     // FILE OVERWRITE NOT ALLOWED
-    testpref.FindGroup("FileCustomization").FindKeyword("Overwrite")[0] = "Error";
+    testpref.findGroup("FileCustomization").findKeyword("Overwrite")[0] = "Error";
     cout << "  Overwrite not allowed:" << endl;
     aml->VerifyAll();
   }
@@ -749,7 +749,7 @@ int main(void) {
   }
 
   try { // INVALID OVERWRITE VALUE IN USER PREFERENCE FILE
-    testpref.FindGroup("FileCustomization").FindKeyword("Overwrite")[0] = "Err";
+    testpref.findGroup("FileCustomization").findKeyword("Overwrite")[0] = "Err";
     cout << "  Invalid Overwrite preference value:" << endl;
     aml->VerifyAll();
   }

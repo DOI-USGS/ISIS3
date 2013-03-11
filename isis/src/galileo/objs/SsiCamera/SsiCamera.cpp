@@ -52,7 +52,7 @@ namespace Isis {
     double k1;
 
     iTime removeCoverDate("1994/04/01 00:00:00");
-    iTime imageDate(lab.FindKeyword("StartTime", PvlObject::Traverse)[0]);
+    iTime imageDate(lab.findKeyword("StartTime", PvlObject::Traverse)[0]);
     /*
     * Change the Focal Length and K1 constant based on whether or not the protective cover is on
     * See "The Direction of the North Pole and the Control Network of Asteroid 951 Gaspra"  Icarus 107, 18-22 (1994)
@@ -71,7 +71,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     double et = iTime((QString)inst["StartTime"]).Et();
 

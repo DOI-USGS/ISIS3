@@ -65,7 +65,7 @@ void IsisMain() {
   CameraFocalPlaneMap *focalMap = cam->FocalPlaneMap();
 
   // Make sure the image contains the SPICE blobs/tables
-  PvlGroup test = cube.label()->FindGroup("Kernels", Pvl::Traverse);
+  PvlGroup test = cube.label()->findGroup("Kernels", Pvl::Traverse);
   QString instrumentPointing = (QString) test["InstrumentPointing"];
   if (instrumentPointing != "Table") {
     QString msg = QString("Input image [%1] does not contain needed SPICE blobs.  Please run "
@@ -85,13 +85,13 @@ void IsisMain() {
   spice.setTime(et);
 
   // Get required keywords from instrument and band groups
-  PvlGroup inst = cube.label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
   QString instrumentId = (QString) inst["InstrumentId"];
   QString spacecraftName = (QString) inst["SpacecraftName"];
 
   // Compensate for noproj altering cube labels
   if (instrumentId == "IdealCamera") {
-    PvlGroup orig = cube.label()->FindGroup("OriginalInstrument", Pvl::Traverse);
+    PvlGroup orig = cube.label()->findGroup("OriginalInstrument", Pvl::Traverse);
     instrumentId = (QString) orig["InstrumentId"];
     spacecraftName = (QString) orig["SpacecraftName"];
   }
@@ -163,7 +163,7 @@ void IsisMain() {
   } 
   else if (spacecraftName == "Cassini-Huygens") {
     // Get the image filter and replace "/" with "_"
-    PvlGroup bandBin = cube.label()->FindGroup("BandBin", Pvl::Traverse);
+    PvlGroup bandBin = cube.label()->findGroup("BandBin", Pvl::Traverse);
     QString filter = (QString) bandBin["FilterName"];
     filter.replace("/", "_");
     
@@ -355,7 +355,7 @@ void IsisMain() {
     QString swapObserverTarget;
     QString lightTimeCorrection;
     QString ltSurfaceCorrect;
-    PvlObject naifKeywordsObject = cube.label()->FindObject("NaifKeywords");
+    PvlObject naifKeywordsObject = cube.label()->findObject("NaifKeywords");
     if (instrumentId == "MDIS-NAC") {
       ikCode = "236820";
       swapObserverTarget = (QString) naifKeywordsObject["INS-236820_SWAP_OBSERVER_TARGET"];

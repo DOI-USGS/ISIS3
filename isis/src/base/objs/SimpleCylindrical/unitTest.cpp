@@ -14,8 +14,8 @@ int main(int argc, char *argv[]) {
   cout << "UNIT TEST FOR SimpleCylindrical" << endl << endl;
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGrp = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGrp = lab.findGroup("Mapping");
   mapGrp += PvlKeyword("EquatorialRadius", toString(1.0));
   mapGrp += PvlKeyword("PolarRadius", toString(1.0));
   mapGrp += PvlKeyword("LatitudeType", "Planetocentric");
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing default option ... " << endl;
-    mapGrp.DeleteKeyword("CenterLongitude");
+    mapGrp.deleteKeyword("CenterLongitude");
     SimpleCylindrical p2(lab, true);
     cout << lab << endl;
     cout << endl;
@@ -86,9 +86,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.AddGroup(p.Mapping());
-    tmp2.AddGroup(p.MappingLatitudes());
-    tmp3.AddGroup(p.MappingLongitudes());
+    tmp1.addGroup(p.Mapping());
+    tmp2.addGroup(p.MappingLatitudes());
+    tmp3.addGroup(p.MappingLongitudes());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;

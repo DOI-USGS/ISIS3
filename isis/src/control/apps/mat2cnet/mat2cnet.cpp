@@ -30,7 +30,7 @@ std::map <int, QString> snMap;
 void IsisMain() {
   // The following steps can take a significant amount of time, so
   // set up a progress object, incrementing at 1%, to keep the user informed
-  PvlGroup &uip = Preference::Preferences().FindGroup("UserInterface");
+  PvlGroup &uip = Preference::Preferences().findGroup("UserInterface");
   uip["ProgressBarPercent"] = "1";
   UserInterface &ui = Application::GetUserInterface();
   Progress progress;
@@ -62,14 +62,14 @@ void IsisMain() {
     progress.CheckStatus();
     QString currFile(list2[f].toString());
     Pvl lab(currFile);
-    PvlObject qube(lab.FindObject("QUBE"));
+    PvlObject qube(lab.findObject("QUBE"));
 
     IString fsc;
-    if (qube.HasKeyword("IMAGE_NUMBER")) {
-      fsc = qube.FindKeyword("IMAGE_NUMBER")[0];
+    if (qube.hasKeyword("IMAGE_NUMBER")) {
+      fsc = qube.findKeyword("IMAGE_NUMBER")[0];
     }
-    else if (qube.HasKeyword("IMAGE_ID")) {
-      fsc = qube.FindKeyword("IMAGE_ID")[0];
+    else if (qube.hasKeyword("IMAGE_ID")) {
+      fsc = qube.findKeyword("IMAGE_ID")[0];
     }
     else {
       throw IException(IException::Unknown,
@@ -458,7 +458,7 @@ void IsisMain() {
     // Write results to Logs
     // Summary group is created with the counts of RAND PPP only points
     PvlGroup summaryGroup = PvlGroup("Summary");
-    summaryGroup.AddKeyword(PvlKeyword("RandOnlyPoints", toString(numRandOnly)));
+    summaryGroup.addKeyword(PvlKeyword("RandOnlyPoints", toString(numRandOnly)));
 
     bool log;
     FileName logFile;
@@ -482,23 +482,23 @@ void IsisMain() {
     if (log) {
       // Write details in error log
       Pvl results;
-      results.SetName("Results");
-      results.AddGroup(summaryGroup);
+      results.setName("Results");
+      results.addGroup(summaryGroup);
       if (numRandOnly > 0) {
         // if there are any RAND PPP only points,
         // add comment to the summary log to alert user
-        summaryGroup.AddComment("Some Point IDs in the RAND PPP file have no "
+        summaryGroup.addComment("Some Point IDs in the RAND PPP file have no "
                                 "measures in the MATCH file.");
-        summaryGroup.AddComment("These Point IDs are contained "
+        summaryGroup.addComment("These Point IDs are contained "
                                 "in [" + logFile.name() + "].");
         TextFile outlog(logFile.expanded(), "overwrite", randOnlyIDs);
       }
       else {
         // if there are no RAND PPP only points and user wanted to create a log,
         // add comment to the summary log to alert user
-        summaryGroup.AddComment("All Point IDs in the RAND PPP file have "
+        summaryGroup.addComment("All Point IDs in the RAND PPP file have "
                                 "measures in the MATCH file.");
-        summaryGroup.AddComment("No RAND PPP log was created.");
+        summaryGroup.addComment("No RAND PPP log was created.");
       }
     }
     // Write summary to application log

@@ -19,17 +19,17 @@ void IsisMain() {
 
   // Make sure the entered algorithm name is valid
   QString algoName = ui.GetString("ALGORITHM");
-  if(!algos.HasGroup(algoName)) {
+  if(!algos.hasGroup(algoName)) {
     // Give the user a list of possible algorithms
     QString msg = "Invalid value for [ALGORITHM] entered [" + algoName + "].  "
         + "Must be one of [";
 
-    for(int i = 0; i < algos.Groups(); i++) {
+    for(int i = 0; i < algos.groups(); i++) {
       if(i != 0 &&
-         algos.Group(i).Name() == algos.Group(0).Name()) break;
+         algos.group(i).name() == algos.group(0).name()) break;
 
       if(i != 0) msg += ", ";
-      msg += algos.Group(i).Name();
+      msg += algos.group(i).name();
     }
     msg += "]";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -67,7 +67,7 @@ void IsisMain() {
   algorithm += PvlKeyword("ChipInterpolator", paramToInterpMap[ui.GetString("INTERP")]);
 
   // Add algorithm group to the autoreg object
-  autoreg.AddGroup(algorithm);
+  autoreg.addGroup(algorithm);
 
   // Get pattern and search chip size values for error testing
   int psamp = ui.GetInteger("PSAMP");
@@ -144,8 +144,8 @@ void IsisMain() {
   }
 
   // Add groups to the autoreg object
-  autoreg.AddGroup(patternChip);
-  autoreg.AddGroup(searchChip);
+  autoreg.addGroup(patternChip);
+  autoreg.addGroup(searchChip);
 
   // Set up the surface model testing group
   if(subPixelAccuracy) {
@@ -169,15 +169,15 @@ void IsisMain() {
         + toString(winSize) + "].  Must be an odd number (Default = 5)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    autoreg.AddGroup(surfaceModel);
+    autoreg.addGroup(surfaceModel);
   }
 
   // Add autoreg group to Pvl
-  p.AddObject(autoreg);
+  p.addObject(autoreg);
 
   // Write the autoreg group pvl to the output file
   QString output = ui.GetFileName("TOPVL");
-  p.Write(output);
+  p.write(output);
 
   Isis::Application::GuiLog(p);
 }

@@ -73,7 +73,7 @@ namespace Isis {
     if(p_gui != NULL) return p_gui;
 
     // Get preferences
-    PvlGroup &uiPref = Preference::Preferences().FindGroup("UserInterface");
+    PvlGroup &uiPref = Preference::Preferences().findGroup("UserInterface");
 
     // Create the application
     new QApplication(argc, argv);
@@ -84,7 +84,7 @@ namespace Isis {
     // Qt is smart enough to use the style of the system running the program.
     // However, Isis supports overriding this with a setting in IsisPreferences.
     // Here we check to see if this has been done and force the style if needed.
-    if(uiPref.HasKeyword("GuiStyle")) {
+    if(uiPref.hasKeyword("GuiStyle")) {
       QString style = uiPref["GuiStyle"];
       QApplication::setStyle(style);
     }
@@ -667,7 +667,7 @@ namespace Isis {
     Isis::UserInterface &ui = Application::GetUserInterface();
     Preference &p = Preference::Preferences();
 
-    PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
+    PvlGroup &grp = p.findGroup("UserInterface", Isis::Pvl::Traverse);
     Isis::FileName progHist(grp["HistoryPath"][0] + "/" + ui.ProgramName() + ".par");
 
     if(!progHist.fileExists()) {
@@ -679,7 +679,7 @@ namespace Isis {
     Isis::Pvl hist;
 
     try {
-      hist.Read(progHist.expanded());
+      hist.read(progHist.expanded());
     }
     catch(...) {
       p_historyEntry =  -1;
@@ -691,8 +691,8 @@ namespace Isis {
     }
 
     int entries = 0;
-    for(int i = 0; i < hist.Groups(); i++) {
-      if(hist.Group(i).IsNamed("UserParameters")) entries++;
+    for(int i = 0; i < hist.groups(); i++) {
+      if(hist.group(i).isNamed("UserParameters")) entries++;
     }
 
     // If we are past the last entry ring the bell
@@ -705,9 +705,9 @@ namespace Isis {
     int useEntry = entries - p_historyEntry - 1;
 
     try {
-      Isis::PvlGroup &up = hist.Group(useEntry);
-      for(int k = 0; k < up.Keywords(); k++) {
-        QString key = up[k].Name();
+      Isis::PvlGroup &up = hist.group(useEntry);
+      for(int k = 0; k < up.keywords(); k++) {
+        QString key = up[k].name();
         QString val = up[k];
         ui.Clear(key);
         ui.PutAsString(key, val);
@@ -797,7 +797,7 @@ namespace Isis {
 
   // Show help for Isis
   void Gui::AboutIsis() {
-    Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
+    Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
     QString command = (QString) uig["GuiHelpBrowser"] +
                           " http://isis.astrogeology.usgs.gov >> /dev/null &";
     ProgramLauncher::RunSystemCommand(command);
@@ -812,7 +812,7 @@ namespace Isis {
                         Isis::Application::GetUserInterface().ProgramName() +
                         ".html");
 
-    Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
+    Isis::PvlGroup &uig = Isis::Preference::Preferences().findGroup("UserInterface");
     QString command = (QString) uig["GuiHelpBrowser"] +
                           (QString)" file:" + file.expanded() + " &";
     ProgramLauncher::RunSystemCommand(command);

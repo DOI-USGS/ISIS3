@@ -19,10 +19,10 @@ int main() {
   alg += PvlKeyword("Name", "Minnaert");
 
   PvlObject o("PhotometricModel");
-  o.AddGroup(alg);
+  o.addGroup(alg);
 
   Pvl pvl;
-  pvl.AddObject(o);
+  pvl.addObject(o);
   std::cout << pvl << std::endl << std::endl;
 
   try {

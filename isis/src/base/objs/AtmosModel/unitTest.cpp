@@ -21,23 +21,23 @@ int main() {
   cout << "UNIT TEST for Isis::AtmosModel" << endl << endl;
 
   Pvl lab;
-  lab.AddObject(PvlObject("PhotometricModel"));
-  lab.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
-  lab.FindObject("PhotometricModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "Lambert")); // HapkeHen
+  lab.addObject(PvlObject("PhotometricModel"));
+  lab.findObject("PhotometricModel").addGroup(PvlGroup("Algorithm"));
+  lab.findObject("PhotometricModel").findGroup("Algorithm").addKeyword(PvlKeyword("Name", "Lambert")); // HapkeHen
   PhotoModel *pm = PhotoModelFactory::Create(lab);
 
   cout << "Testing missing AtmosphericModel object ..." << endl;
   doit(lab, *pm);
 
-  lab.AddObject(PvlObject("AtmosphericModel"));
+  lab.addObject(PvlObject("AtmosphericModel"));
   cout << "Testing missing Algorithm group ..." << endl;
   doit(lab, *pm);
 
-  lab.FindObject("AtmosphericModel").AddGroup(PvlGroup("Algorithm"));
+  lab.findObject("AtmosphericModel").addGroup(PvlGroup("Algorithm"));
   cout << "Testing missing Name keyword ..." << endl;
   doit(lab, *pm);
 
-  lab.FindObject("AtmosphericModel").FindGroup("Algorithm").AddKeyword(PvlKeyword("Name", "Anisotropic1"), Pvl::Replace);
+  lab.findObject("AtmosphericModel").findGroup("Algorithm").addKeyword(PvlKeyword("Name", "Anisotropic1"), Pvl::Replace);
   cout << "Testing supported atmospheric model ..." << endl;
   doit(lab, *pm);
 

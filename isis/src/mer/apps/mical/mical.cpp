@@ -312,7 +312,7 @@ void helperButtonLogCalKernel() {
   }
 
   Pvl p;
-  p.Read(calKernelFile);
+  p.read(calKernelFile);
   QString OQString = "********** Output of [" + calKernelFile + "] *********";
   Application::GuiLog(OQString);
   Application::GuiLog(p);

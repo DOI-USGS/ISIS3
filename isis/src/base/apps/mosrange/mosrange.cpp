@@ -75,7 +75,7 @@ void IsisMain() {
   QString projection("Equirectangular");
   if(ui.WasEntered("MAP")) {
     Pvl mapfile(ui.GetFileName("MAP"));
-    projection = (QString) mapfile.FindGroup("Mapping")["ProjectionName"];
+    projection = (QString) mapfile.findGroup("Mapping")["ProjectionName"];
   }
 
   if(ui.WasEntered("PROJECTION")) {
@@ -127,11 +127,11 @@ void IsisMain() {
       Camera *cam = cube.camera();
       Pvl mapping;
       cam->BasicMapping(mapping);
-      PvlGroup &mapgrp = mapping.FindGroup("Mapping");
-      mapgrp.AddKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
+      PvlGroup &mapgrp = mapping.findGroup("Mapping");
+      mapgrp.addKeyword(PvlKeyword("ProjectionName", projection), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("LatitudeType", lattype), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("LongitudeDirection", londir), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("LongitudeDomain", londom), Pvl::Replace);
 
       // Get the radii
       Distance radii[3];
@@ -152,21 +152,21 @@ void IsisMain() {
 
       double pixres = (lowres + hires) / 2.0;
       double scale = Scale(pixres, poleRad, eqRad);
-      mapgrp.AddKeyword(PvlKeyword("PixelResolution", toString(pixres)), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("PixelResolution", toString(pixres)), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"), Pvl::Replace);
       mapgrp += PvlKeyword("MinPixelResolution", toString(lowres), "meters");
       mapgrp += PvlKeyword("MaxPixelResolution", toString(hires), "meters");
 
       // Get the universal ground range
       double minlat, maxlat, minlon, maxlon;
       cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
-      mapgrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+      mapgrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
 
-      fmap.AddGroup(mapgrp);
-      fileset.AddObject(fmap);
+      fmap.addGroup(mapgrp);
+      fileset.addObject(fmap);
 
       longitudeStat.AddData(&minlon, 1);
       longitudeStat.AddData(&maxlon, 1);
@@ -211,7 +211,7 @@ void IsisMain() {
   mapping += PvlKeyword("MaximumLongitude", toString(MIN(SetCeil(longitudeStat.Maximum(), digits), 360.0)));
 
   PvlKeyword clat("PreciseCenterLongitude", toString(avgLon));
-  clat.AddComment("Actual Parameters without precision applied");
+  clat.addComment("Actual Parameters without precision applied");
   mapping += clat;
   mapping += PvlKeyword("PreciseCenterLatitude",  toString(avgLat));
   mapping += PvlKeyword("PreciseMinimumLatitude", toString(latitudeStat.Minimum()));
@@ -225,14 +225,14 @@ void IsisMain() {
   // Write the output file if requested
   if(ui.WasEntered("TO")) {
     Pvl temp;
-    temp.AddGroup(mapping);
-    temp.Write(ui.GetFileName("TO", "map"));
+    temp.addGroup(mapping);
+    temp.write(ui.GetFileName("TO", "map"));
   }
 
   if(ui.WasEntered("LOG")) {
     Pvl temp;
-    temp.AddObject(fileset);
-    temp.Write(ui.GetFileName("LOG", "log"));
+    temp.addObject(fileset);
+    temp.write(ui.GetFileName("LOG", "log"));
   }
 
   p.EndProcess();

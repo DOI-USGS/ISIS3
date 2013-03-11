@@ -50,14 +50,14 @@ namespace Isis {
    **/
   PhotoModel *PhotoModelFactory::Create(Pvl &pvl) {
     // Get the algorithm name to create
-    PvlGroup &algo = pvl.FindObject("PhotometricModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("PhotometricModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
 
     QString algorithm = "";
-    if (algo.HasKeyword("PhtName")) {
+    if (algo.hasKeyword("PhtName")) {
       algorithm = algo["PhtName"][0];
     }
-    else if (algo.HasKeyword("Name")) {
+    else if (algo.hasKeyword("Name")) {
       algorithm = algo["Name"][0];
     }
     else {
@@ -70,10 +70,10 @@ namespace Isis {
     Plugin *p = new Plugin;
     FileName f("PhotoModel.plugin");
     if(f.fileExists()) {
-      p->Read("PhotoModel.plugin");
+      p->read("PhotoModel.plugin");
     }
     else {
-      p->Read("$ISISROOT/lib/PhotoModel.plugin");
+      p->read("$ISISROOT/lib/PhotoModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it

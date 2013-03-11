@@ -56,7 +56,7 @@ namespace Isis {
    */
   void CissLabels::ReadLabels(Pvl &lab) {
     // Get values out of the instrument group
-    PvlGroup &inst    = lab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst    = lab.findGroup("Instrument", Pvl::Traverse);
     p_ABflag                = (QString) inst["AntiBloomingStateFlag"];   //valid values: On, Off, Unknown
     p_biasStripMean         = (double) inst["BiasStripMean"];           //valid values: real numbers
     p_compressionRatio      = (QString) inst["CompressionRatio"];        //valid values: NotCompressed or real number
@@ -76,10 +76,10 @@ namespace Isis {
     p_summingMode           = (int)    inst["SummingMode"];             //valid values: 1, 2, 4
     p_frontOpticsTemp       = toDouble(inst["OpticsTemperature"][0]);  //valid values: real numbers
     // Get values out of the archive group
-    PvlGroup &arch    = lab.FindGroup("Archive", Pvl::Traverse);
+    PvlGroup &arch    = lab.findGroup("Archive", Pvl::Traverse);
     p_imageNumber           = (double) arch["ImageNumber"];
     // Get values out of the bandbin group
-    PvlGroup &bandbin = lab.FindGroup("BandBin", Pvl::Traverse);
+    PvlGroup &bandbin = lab.findGroup("BandBin", Pvl::Traverse);
     IString filter = (QString) bandbin["FilterName"];
     p_filter.push_back(filter.Token("/").ToQt());
     p_filter.push_back(filter.ToQt());

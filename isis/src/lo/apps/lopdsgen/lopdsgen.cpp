@@ -74,43 +74,43 @@ void IsisMain() {
   outFileNoExt = outFileNoExt.removeExtension();
   QString productID(outFileNoExt.baseName());
   PvlKeyword productId("PRODUCT_ID", productID.toUpper());
-  pdsLabel.AddKeyword(productId);
+  pdsLabel.addKeyword(productId);
 
   // Translate the keywords from the original labels that go in this label
   OriginalLabel origBlob;
   iCube->read(origBlob);
   Pvl origLabel;
   PvlObject origLabelObj = origBlob.ReturnLabels();
-  origLabelObj.SetName("OriginalLabelObject");
-  origLabel.AddObject(origLabelObj);
+  origLabelObj.setName("OriginalLabelObject");
+  origLabel.addObject(origLabelObj);
 
   // Get the directory where the Lunar translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   QString transDir = (QString) dataDir["Lo"] + "/translations/";
 
   // Isis 3 cubes being exported for the first time
-  if(!origLabel.HasKeyword("PRODUCT_TYPE", Pvl::Traverse)) {
+  if(!origLabel.hasKeyword("PRODUCT_TYPE", Pvl::Traverse)) {
 
     PvlTranslationManager orig(origLabel, transDir + "LoOriginalExport.trn");
     orig.Auto(pdsLabel);
 
     // Add elements of SCAN_PARAMETER keyword to label
-    PvlObject &qube = origLabelObj.FindObject("QUBE");
-    PvlGroup &ingestion = qube.FindGroup("ISIS_INGESTION");
+    PvlObject &qube = origLabelObj.findObject("QUBE");
+    PvlGroup &ingestion = qube.findGroup("ISIS_INGESTION");
 
     // Strips and level1 products use the following two keywords in different ways
-    PvlKeyword &scanResolution = ingestion.FindKeyword("SCAN_RESOLUTION");
-    PvlKeyword &scanDensityRange = ingestion.FindKeyword("SCAN_DENSITY_RANGE");
+    PvlKeyword &scanResolution = ingestion.findKeyword("SCAN_RESOLUTION");
+    PvlKeyword &scanDensityRange = ingestion.findKeyword("SCAN_DENSITY_RANGE");
 
     // Change the units of SCAN_RESOLUTION from "um" to "<micron>"
     QString scanResolutionStr = scanResolution[0];
     int umPos = scanResolutionStr.indexOf("um");
     QString resolution = scanResolutionStr.mid(0, umPos);
     scanResolution[0] = resolution;
-    scanResolution.SetUnits("micron");
-    scanResolution.SetName("LO:FILMSTRIP_SCAN_RESOLUTION");
+    scanResolution.setUnits("micron");
+    scanResolution.setName("LO:FILMSTRIP_SCAN_RESOLUTION");
 
     // Break keyword SCAN_DENSITY_RANGE into two different parts
     QString scanDensityRangeStr = scanDensityRange[0];
@@ -119,36 +119,36 @@ void IsisMain() {
     QString range2 = scanDensityRangeStr.mid(toPos + 4);
 
     // Label translation for strips
-    if(qube.FindGroup("ISIS_INSTRUMENT").HasKeyword("STRIP_NUMBER")) {
+    if(qube.findGroup("ISIS_INSTRUMENT").hasKeyword("STRIP_NUMBER")) {
       PvlTranslationManager orig(origLabel, transDir + "LoStripExport.trn");
       orig.Auto(pdsLabel);
 
-      pdsLabel.AddKeyword(scanResolution, PvlContainer::Replace);
+      pdsLabel.addKeyword(scanResolution, PvlContainer::Replace);
     }
     // Translation for level1 products
-    else if(qube.FindGroup("ISIS_INSTRUMENT").HasKeyword("START_TIME")) {
+    else if(qube.findGroup("ISIS_INSTRUMENT").hasKeyword("START_TIME")) {
       PvlTranslationManager orig(origLabel, transDir + "LoLevel1Export.trn");
       orig.Auto(pdsLabel);
 
-      pdsLabel.AddKeyword(scanResolution, PvlContainer::Replace);
+      pdsLabel.addKeyword(scanResolution, PvlContainer::Replace);
 
-      PvlKeyword &outputMicron = qube.FindKeyword("OUTPUT_MICRON");
+      PvlKeyword &outputMicron = qube.findKeyword("OUTPUT_MICRON");
 
       // Change the units of OUTPUT_MICRON from "um" to "<micron>"
       QString outputMicronStr = outputMicron[0];
       umPos = outputMicronStr.indexOf("um");
       resolution = outputMicronStr.mid(0, umPos);
       outputMicron[0] = resolution;
-      outputMicron.SetUnits("micron");
-      outputMicron.SetName("LO:FILMSTRIP_SCAN_PROCESSING_RES");
+      outputMicron.setUnits("micron");
+      outputMicron.setName("LO:FILMSTRIP_SCAN_PROCESSING_RES");
 
-      pdsLabel.AddKeyword(outputMicron, PvlContainer::Replace);
+      pdsLabel.addKeyword(outputMicron, PvlContainer::Replace);
 
       // Calculate statistics on the cube to be processed and place
       // its MINIMUM and MAXIMUM into the output label
       p.CalculateStatistics();
-      pdsLabel.FindObject("IMAGE").AddKeyword(PvlKeyword("MINIMUM", toString(p.CubeStatistics(0)->Minimum())), Pvl::Replace);
-      pdsLabel.FindObject("IMAGE").AddKeyword(PvlKeyword("MAXIMUM", toString(p.CubeStatistics(0)->Maximum())), Pvl::Replace);
+      pdsLabel.findObject("IMAGE").addKeyword(PvlKeyword("MINIMUM", toString(p.CubeStatistics(0)->Minimum())), Pvl::Replace);
+      pdsLabel.findObject("IMAGE").addKeyword(PvlKeyword("MAXIMUM", toString(p.CubeStatistics(0)->Maximum())), Pvl::Replace);
     }
     else {
       FileName inputFile(ui.GetFileName("FROM"));
@@ -163,7 +163,7 @@ void IsisMain() {
     orig.Auto(pdsLabel);
 
     // Reexporting strips
-    if(origLabel.HasKeyword("STRIP_NUMBER", Pvl::Traverse)) {
+    if(origLabel.hasKeyword("STRIP_NUMBER", Pvl::Traverse)) {
       PvlTranslationManager strip(origLabel, transDir + "LoStripExport.trn");
       strip.Auto(pdsLabel);
     }
@@ -176,24 +176,24 @@ void IsisMain() {
 
   // Add to labels boresight or fiducial data
   QString bandBinTransFile;
-  if(iCube->label()->HasKeyword("FiducialId", Pvl::Traverse)) {
+  if(iCube->label()->hasKeyword("FiducialId", Pvl::Traverse)) {
     bandBinTransFile = transDir + "LoFiducialExport.trn";
     PvlTranslationManager bandLab(*(iCube->label()), bandBinTransFile);
     bandLab.Auto(pdsLabel);
 
     // Change the units of FIDCUAIL_COORDINATE_MICRON from "um" to "<micron>"
-    PvlKeyword &coordMicron = iCube->label()->FindKeyword(
+    PvlKeyword &coordMicron = iCube->label()->findKeyword(
         "FiducialCoordinateMicron", Pvl::Traverse);
     QString coordMicronStr = coordMicron[0];
     int umPos = coordMicronStr.indexOf("um");
     QString coord = coordMicronStr.mid(0, umPos);
     coordMicron[0] = coord;
-    coordMicron.SetUnits("micron");
-    coordMicron.SetName("LO:FIDUCIAL_COORDINATE_MICRON");
+    coordMicron.setUnits("micron");
+    coordMicron.setName("LO:FIDUCIAL_COORDINATE_MICRON");
 
-    pdsLabel.AddKeyword(coordMicron, PvlContainer::Replace);
+    pdsLabel.addKeyword(coordMicron, PvlContainer::Replace);
   }
-  else if(iCube->label()->HasKeyword("BoresightSample", Pvl::Traverse)) {
+  else if(iCube->label()->hasKeyword("BoresightSample", Pvl::Traverse)) {
     bandBinTransFile = transDir + "LoBoresightExport.trn";
     PvlTranslationManager bandLab(*(iCube->label()), bandBinTransFile);
     bandLab.Auto(pdsLabel);
@@ -215,19 +215,19 @@ void IsisMain() {
   pdsLabel += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 
   if(ui.WasEntered("NOTE")) {
-    pdsLabel.AddKeyword(PvlKeyword("NOTE", ui.GetString("NOTE")), Pvl::Replace);
+    pdsLabel.addKeyword(PvlKeyword("NOTE", ui.GetString("NOTE")), Pvl::Replace);
   }
 
   // Add a keyword type (i.e., QString, bool, int...) file to the PDS label Pvl
   PvlFormatPds *formatter = new PvlFormatPds();
-  formatter->SetCharLimit(128);
-  formatter->Add(transDir + "LoExportFormatter.typ");
-  pdsLabel.SetFormat(formatter);
+  formatter->setCharLimit(128);
+  formatter->add(transDir + "LoExportFormatter.typ");
+  pdsLabel.setFormat(formatter);
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL
   QString formatDir = (QString) dataDir["Lo"] + "/templates/labels/";
-  pdsLabel.SetFormatTemplate(formatDir + "LoExportTemplate.pft");
+  pdsLabel.setFormatTemplate(formatDir + "LoExportTemplate.pft");
 
   // Write labels to output file
   FileName outFile(ui.GetFileName("TO", "img"));

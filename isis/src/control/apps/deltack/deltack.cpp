@@ -64,9 +64,9 @@ void IsisMain() {
     Cube c;
     c.open(filename, "rw");
     //check for target name
-    if(c.label()->HasKeyword("TargetName", PvlObject::Traverse)) {
-//       c.Label()->FindKeyword("TargetName");
-      PvlGroup inst = c.label()->FindGroup("Instrument", PvlObject::Traverse);
+    if(c.label()->hasKeyword("TargetName", PvlObject::Traverse)) {
+//       c.Label()->findKeyword("TargetName");
+      PvlGroup inst = c.label()->findGroup("Instrument", PvlObject::Traverse);
       QString targetName = inst["TargetName"];
       cnet.SetTarget(targetName);
     }
@@ -125,18 +125,18 @@ void IsisMain() {
     c.open(filename, "rw");
 
     //check for existing polygon, if exists delete it
-    if(c.label()->HasObject("Polygon")) {
-      c.label()->DeleteObject("Polygon");
+    if(c.label()->hasObject("Polygon")) {
+      c.label()->deleteObject("Polygon");
     }
 
     Table cmatrix = b.Cmatrix(0);
 
     // Write out a description in the spice table
     QString deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();
-    cmatrix.Label().AddComment(deltackComment);
+    cmatrix.Label().addComment(deltackComment);
     //PvlKeyword description("Description");
     //description = "Camera pointing updated via deltack application";
-    //cmatrix.Label().FindObject("Table",Pvl::Traverse).AddKeyword(description);
+    //cmatrix.Label().findObject("Table",Pvl::Traverse).addKeyword(description);
 
     // Update the cube history
     c.write(cmatrix);

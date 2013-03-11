@@ -105,7 +105,7 @@ void IsisMain() {
     // get values from the labels needed to compute the line rate and the
     // actual start time of the input cube
     Pvl &inLabels = *g_cube.label();
-    PvlGroup &inputInst = inLabels.FindObject("IsisCube").FindGroup("Instrument");
+    PvlGroup &inputInst = inLabels.findObject("IsisCube").findGroup("Instrument");
     QString instId = (inputInst["InstrumentId"]);
     if (instId.toUpper() != "HIRISE") {
       IString msg = "Input cube has invalid InstrumentId = [" + instId + "]. "
@@ -313,10 +313,10 @@ void IsisMain() {
     p.ClearInputCubes();
 
     // Loop through the labels looking for object = Table
-    for (int labelObj = 0; labelObj < inLabels.Objects(); labelObj++) {
-      PvlObject &obj = inLabels.Object(labelObj);
+    for (int labelObj = 0; labelObj < inLabels.objects(); labelObj++) {
+      PvlObject &obj = inLabels.object(labelObj);
 
-      if (obj.Name() != "Table") continue;
+      if (obj.name() != "Table") continue;
 
       // Read the table into a table object
       Table table(obj["Name"], inputFileName);
@@ -328,7 +328,7 @@ void IsisMain() {
     // test to see what happens if I don't have this code ???
     Pvl &outLabels = *ocube->label();
     // Change the start/end times and spacecraft start/stop counts in the labels
-    PvlGroup &outputInst = outLabels.FindObject("IsisCube").FindGroup("Instrument");
+    PvlGroup &outputInst = outLabels.findObject("IsisCube").findGroup("Instrument");
     outputInst["StartTime"][0] = cropStartTime.UTC(); //??? use actual or adjusted like clock counts ???
     outputInst["StopTime"][0] = cropStopTime.UTC(); // adjustedCropStopTime ???
     outputInst["SpacecraftClockStartCount"][0] = adjustedCropStartClockCount;

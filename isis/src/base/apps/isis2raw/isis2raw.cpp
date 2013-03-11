@@ -85,10 +85,10 @@ void IsisMain() {
 
   // Set the Output Storage Format
   if(Isis::IString(ui.GetString("STORAGEORDER")).DownCase()  == "bil") {
-    p.SetFormat(ProcessExport::BIL);
+    p.setFormat(ProcessExport::BIL);
   }
   else if(Isis::IString(ui.GetString("STORAGEORDER")).DownCase()  == "bip") {
-    p.SetFormat(ProcessExport::BIP);
+    p.setFormat(ProcessExport::BIP);
   }
 
   // Write the raw cube data

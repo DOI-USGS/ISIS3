@@ -97,7 +97,7 @@ namespace Isis {
       m_cachingAlgorithms = new QList<CubeCachingAlgorithm *>;
 
       PvlGroup &performancePrefs =
-          Preference::Preferences().FindGroup("Performance");
+          Preference::Preferences().findGroup("Performance");
       IString cubeWritePerfOpt = performancePrefs["CubeWriteThread"][0];
       m_useOptimizedCubeWrite = (cubeWritePerfOpt.DownCase() == "optimized");
       if ((m_useOptimizedCubeWrite && !alreadyOnDisk) ||
@@ -119,15 +119,15 @@ namespace Isis {
 
       m_dataFile = dataFile;
 
-      const PvlObject &core = label.FindObject("IsisCube").FindObject("Core");
-      const PvlGroup &pixelGroup = core.FindGroup("Pixels");
+      const PvlObject &core = label.findObject("IsisCube").findObject("Core");
+      const PvlGroup &pixelGroup = core.findGroup("Pixels");
 
-      QString byteOrderStr = pixelGroup.FindKeyword("ByteOrder")[0];
+      QString byteOrderStr = pixelGroup.findKeyword("ByteOrder")[0];
       m_byteSwapper = new EndianSwapper(
           byteOrderStr.toUpper());
-      m_base = pixelGroup.FindKeyword("Base");
-      m_multiplier = pixelGroup.FindKeyword("Multiplier");
-      m_pixelType = PixelTypeEnumeration(pixelGroup.FindKeyword("Type"));
+      m_base = pixelGroup.findKeyword("Base");
+      m_multiplier = pixelGroup.findKeyword("Multiplier");
+      m_pixelType = PixelTypeEnumeration(pixelGroup.findKeyword("Type"));
 
       // If the byte swapper isn't going to do anything, then get rid of it
       //   because it's quicker to check for a NULL byte swapper member than to
@@ -137,12 +137,12 @@ namespace Isis {
         m_byteSwapper = NULL;
       }
 
-      const PvlGroup &dimensions = core.FindGroup("Dimensions");
-      m_numSamples = dimensions.FindKeyword("Samples");
-      m_numLines = dimensions.FindKeyword("Lines");
-      m_numBands = dimensions.FindKeyword("Bands");
+      const PvlGroup &dimensions = core.findGroup("Dimensions");
+      m_numSamples = dimensions.findKeyword("Samples");
+      m_numLines = dimensions.findKeyword("Lines");
+      m_numBands = dimensions.findKeyword("Bands");
 
-      m_startByte = (int)core.FindKeyword("StartByte") - 1;
+      m_startByte = (int)core.findKeyword("StartByte") - 1;
 
       m_samplesInChunk = -1;
       m_linesInChunk = -1;

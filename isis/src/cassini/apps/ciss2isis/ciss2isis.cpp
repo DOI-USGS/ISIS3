@@ -58,7 +58,7 @@ void IsisMain() {
   }
 
   //Checks if in file is rdr
-  if(label.HasObject("IMAGE_MAP_PROJECTION")) {
+  if(label.hasObject("IMAGE_MAP_PROJECTION")) {
     QString msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -75,11 +75,11 @@ void IsisMain() {
 
   //Save off header (includes vicar labels and binary telemetry header)
   // No need to SetFileHeaderBytes() this is already done by ProcessImportPds automatically
-  int vicarLabelBytes = label.FindObject("IMAGE_HEADER").FindKeyword("BYTES");
+  int vicarLabelBytes = label.findObject("IMAGE_HEADER").findKeyword("BYTES");
   p.SaveFileHeader();
 
   //Save off line prefix data, always 24 bytes of binary prefix per line,see SIS version 1.1 pg 103
-  int linePrefixBytes = label.FindObject("IMAGE").FindKeyword("LINE_PREFIX_BYTES");
+  int linePrefixBytes = label.findObject("IMAGE").findKeyword("LINE_PREFIX_BYTES");
   p.SetDataPrefixBytes(linePrefixBytes);
   p.SaveDataPrefix();
 
@@ -99,10 +99,10 @@ void IsisMain() {
     // Pvl outputLabels;
     Pvl *outputLabel = ocube->label();
     //Adjust Table-encoded values from 8 bit back to 12 bit.
-    PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
-    double biasStripMean = inst.FindKeyword("BiasStripMean");
-    inst.FindKeyword("BiasStripMean").SetValue(toString(stretch.Map(biasStripMean)));
-    inst.FindKeyword("BiasStripMean").AddComment("BiasStripMean value converted back to 12 bit.");
+    PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
+    double biasStripMean = inst.findKeyword("BiasStripMean");
+    inst.findKeyword("BiasStripMean").setValue(toString(stretch.Map(biasStripMean)));
+    inst.findKeyword("BiasStripMean").addComment("BiasStripMean value converted back to 12 bit.");
     p.Progress()->SetText("Image was converted using 12-to-8 bit table. \nConverting prefix pixels back to 12 bit and saving line prefix data...");
   }
 
@@ -118,8 +118,8 @@ void IsisMain() {
   unsigned char *header = (unsigned char *) p.FileHeader();
   int roo = *(header + 50 + vicarLabelBytes) / 32 % 2; //**** THIS MAY NEED TO BE CHANGED,
   // SEE BOTTOM OF THIS FILE FOR IN DEPTH COMMENTS ON READOUTORDER
-  PvlGroup &inst = ocube->label()->FindGroup("Instrument", Pvl::Traverse);
-  inst.AddKeyword(PvlKeyword("ReadoutOrder", toString(roo)));
+  PvlGroup &inst = ocube->label()->findGroup("Instrument", Pvl::Traverse);
+  inst.addKeyword(PvlKeyword("ReadoutOrder", toString(roo)));
   p.EndProcess();
 
   // PROCESS 2 : Do 8 bit to 12 bit conversion for image ==============================================//
@@ -208,7 +208,7 @@ vector<double> ConvertLinePrefixPixels(unsigned char *data) {
 // author Jeannie Walldren 2008-08-21
 void CreateStretchPairs() {
   // Set up the strech for the 8 to 12 bit conversion from file
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Cassini"];
   FileName *lutFile = new FileName(missionDir + "/calibration/lut/lut.tab");
   CisscalFile *stretchPairs = new CisscalFile(lutFile->expanded());
@@ -269,7 +269,7 @@ void FixDns(Buffer &buf) {
  */
 void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   // Get the directory where the CISS translation tables are.
-  PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
+  PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Cassini"];
   FileName transFile(missionDir + "/translations/cassiniIss.trn");
 
@@ -282,30 +282,30 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   labelXlater.Auto(*(outputLabel));
 
   //Add needed keywords that are not in translation table to cube's instrument group
-  PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
-  QString scc = inputLabel.FindKeyword("SPACECRAFT_CLOCK_CNT_PARTITION");
-  scc += "/" + (QString) inputLabel.FindKeyword("SPACECRAFT_CLOCK_START_COUNT");
-  inst.AddKeyword(PvlKeyword("SpacecraftClockCount", scc));
+  PvlGroup &inst = outputLabel->findGroup("Instrument", Pvl::Traverse);
+  QString scc = inputLabel.findKeyword("SPACECRAFT_CLOCK_CNT_PARTITION");
+  scc += "/" + (QString) inputLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT");
+  inst.addKeyword(PvlKeyword("SpacecraftClockCount", scc));
 
   //Add units of measurement to keywords from translation table
-  double exposureDuration = inst.FindKeyword("ExposureDuration");
-  inst.FindKeyword("ExposureDuration").SetValue(toString(exposureDuration), "Milliseconds");
+  double exposureDuration = inst.findKeyword("ExposureDuration");
+  inst.findKeyword("ExposureDuration").setValue(toString(exposureDuration), "Milliseconds");
 
-  int gainModeId = inst.FindKeyword("GainModeId");
-  inst.FindKeyword("GainModeId").SetValue(toString(gainModeId), "ElectronsPerDN");
+  int gainModeId = inst.findKeyword("GainModeId");
+  inst.findKeyword("GainModeId").setValue(toString(gainModeId), "ElectronsPerDN");
 
-  PvlKeyword opticsTemp = inst.FindKeyword("OpticsTemperature");
-  inst.FindKeyword("OpticsTemperature").SetValue(opticsTemp[0]);
-  inst.FindKeyword("OpticsTemperature").AddValue(opticsTemp[1], "DegreesCelcius");
+  PvlKeyword opticsTemp = inst.findKeyword("OpticsTemperature");
+  inst.findKeyword("OpticsTemperature").setValue(opticsTemp[0]);
+  inst.findKeyword("OpticsTemperature").addValue(opticsTemp[1], "DegreesCelcius");
 
-  double instDataRate = inst.FindKeyword("InstrumentDataRate");
-  inst.FindKeyword("InstrumentDataRate").SetValue(toString(instDataRate), "KilobitsPerSecond");
+  double instDataRate = inst.findKeyword("InstrumentDataRate");
+  inst.findKeyword("InstrumentDataRate").setValue(toString(instDataRate), "KilobitsPerSecond");
 
   //  initialize global variables
-  dataConversionType = (QString) inst.FindKeyword("DataConversionType");
-  sumMode = inst.FindKeyword("SummingMode");
-  compressionType = (QString) inst.FindKeyword("CompressionType");
-  IString fsw((QString) inst.FindKeyword("FlightSoftwareVersionId"));
+  dataConversionType = (QString) inst.findKeyword("DataConversionType");
+  sumMode = inst.findKeyword("SummingMode");
+  compressionType = (QString) inst.findKeyword("CompressionType");
+  IString fsw((QString) inst.findKeyword("FlightSoftwareVersionId"));
   if(fsw == "Unknown") {
     flightSoftware = 0.0;
   }
@@ -314,24 +314,24 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   }
 
   // Remove the trailing 'Z' in some pds labels
-  QString sUpdateTime = inst.FindKeyword("StartTime")[0];
+  QString sUpdateTime = inst.findKeyword("StartTime")[0];
   sUpdateTime.remove(QRegExp("[Zz]"));
-  inst.FindKeyword("StartTime").SetValue(sUpdateTime);
+  inst.findKeyword("StartTime").setValue(sUpdateTime);
 
-  sUpdateTime = inst.FindKeyword("StopTime")[0];
+  sUpdateTime = inst.findKeyword("StopTime")[0];
   sUpdateTime.remove(QRegExp("[Zz]"));
-  inst.FindKeyword("StopTime").SetValue(sUpdateTime);
+  inst.findKeyword("StopTime").setValue(sUpdateTime);
 
-  sUpdateTime = inst.FindKeyword("ImageTime")[0];
+  sUpdateTime = inst.findKeyword("ImageTime")[0];
   sUpdateTime.remove(QRegExp("[Zz]"));
-  inst.FindKeyword("ImageTime").SetValue(sUpdateTime);
+  inst.findKeyword("ImageTime").setValue(sUpdateTime);
 
 
   // create BandBin group
-  QString filter = inputLabel.FindKeyword("FilterName")[0] + "/" +
-                   inputLabel.FindKeyword("FilterName")[1];
+  QString filter = inputLabel.findKeyword("FilterName")[0] + "/" +
+                   inputLabel.findKeyword("FilterName")[1];
 
-  QString instrumentID = inst.FindKeyword("InstrumentId");
+  QString instrumentID = inst.findKeyword("InstrumentId");
   QString cameraAngleDefs;
   if(instrumentID.at(3) == 'N') {
     cameraAngleDefs = missionDir + "/translations/narrowAngle.def";

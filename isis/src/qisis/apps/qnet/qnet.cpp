@@ -55,9 +55,9 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationName("qnet");
 
     // check for forcing of gui style
-    PvlGroup &uiPref = Preference::Preferences().FindGroup(
+    PvlGroup &uiPref = Preference::Preferences().findGroup(
         "UserInterface");
-    if (uiPref.HasKeyword("GuiStyle")) {
+    if (uiPref.hasKeyword("GuiStyle")) {
       QString style = uiPref["GuiStyle"];
       QApplication::setStyle((QString) style);
     }

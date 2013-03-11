@@ -563,7 +563,7 @@ namespace Isis {
     // East 360 longitude domain and planetocentric laitudes.
     Pvl sinuMap;
     camera.BasicMapping(sinuMap);
-    PvlGroup &mapping = sinuMap.FindGroup("Mapping");
+    PvlGroup &mapping = sinuMap.findGroup("Mapping");
 
     double clon = g.centerLongitude;
     double minLon = (double) mapping["MinimumLongitude"];
@@ -578,18 +578,18 @@ namespace Isis {
       if(!(g.hasNorthPole || g.hasSouthPole)) {
         // Convert the mapping group contents to 180 Longitude domain
         PvlKeyword &ldkey = mapping["LongitudeDomain"];
-        ldkey.SetValue("180");
+        ldkey.setValue("180");
 
         PvlKeyword &minkey = mapping["MinimumLongitude"];
         PvlKeyword &maxkey = mapping["MaximumLongitude"];
-        minkey.SetValue("-180.0");
-        maxkey.SetValue("180.0");
+        minkey.setValue("-180.0");
+        maxkey.setValue("180.0");
 
         // Compute new ranges
         double minLat180, maxLat180, minLon180, maxLon180;
         camera.GroundRange(minLat180, maxLat180, minLon180, maxLon180, sinuMap);
-        minkey.SetValue(ToString(minLon180));
-        maxkey.SetValue(ToString(maxLon180));
+        minkey.setValue(ToString(minLon180));
+        maxkey.setValue(ToString(maxLon180));
         clon = (minLon180 + maxLon180) / 2.0;
 
         // Convert the polygon to 180 domain
@@ -660,7 +660,7 @@ namespace Isis {
     }
 
     // Add the mapping group used to project polygon
-    pband.AddGroup(_mapping.FindGroup("Mapping"));
+    pband.addGroup(_mapping.findGroup("Mapping"));
     return;
   }
 

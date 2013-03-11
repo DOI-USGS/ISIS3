@@ -45,7 +45,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointResMagnitudeFilter(filterGrp, false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -62,7 +62,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointEditLockFilter(filterGrp, false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -79,7 +79,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointNumMeasuresEditLockFilter(filterGrp, false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -98,7 +98,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointPixelShiftFilter(filterGrp, false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -115,7 +115,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointIDFilter(filterGrp, false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -134,7 +134,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointMeasuresFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -153,7 +153,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointPropertiesFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -180,7 +180,7 @@ void IsisMain() {
 
   cnetFilter->PointLatLonFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -199,7 +199,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointDistanceFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -216,7 +216,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointMeasurePropertiesFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -234,7 +234,7 @@ void IsisMain() {
   cnetFilter->PointGoodnessOfFitFilter(filterGrp,  false);
   cout << filterGrp << endl;
   PrintControlNetInfo(*cnet);
-  filterGrp.Clear();
+  filterGrp.clear();
   delete (cnet);
   delete (cnetFilter);
   cnetFilter = NULL;
@@ -256,7 +256,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->PointCubeNamesFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -274,7 +274,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->CubeNameExpressionFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -293,7 +293,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->CubeNumPointsFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -312,7 +312,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->CubeDistanceFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);
@@ -331,7 +331,7 @@ void IsisMain() {
   filterGrp += keyword;
   cnetFilter->CubeConvexHullFilter(filterGrp,  false);
   cout << filterGrp << endl;
-  filterGrp.Clear();
+  filterGrp.clear();
   PrintControlNetInfo(*cnet);
   delete (cnet);
   delete (cnetFilter);

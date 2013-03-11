@@ -59,7 +59,7 @@ namespace Isis {
 
       virtual void Read(const Pvl &header, const FileName &file);
       virtual void Write(const FileName &file) const;
-      virtual Pvl ToPvl() const;
+      virtual Pvl toPvl() const;
 
       /**
        * Get the control network level information - things like NetworkID,

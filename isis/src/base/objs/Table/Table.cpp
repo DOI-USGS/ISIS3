@@ -49,7 +49,7 @@ namespace Isis {
     p_assoc = Table::None;
     p_blobPvl += Isis::PvlKeyword("Records", 0);
     p_blobPvl += Isis::PvlKeyword("ByteOrder", "NULL");
-    for (int f = 0; f < rec.Fields(); f++) p_blobPvl.AddGroup(rec[f].pvlGroup());
+    for (int f = 0; f < rec.Fields(); f++) p_blobPvl.addGroup(rec[f].pvlGroup());
     p_record = rec;
   }
 
@@ -319,16 +319,16 @@ namespace Isis {
     p_records = p_blobPvl["Records"];
 
     Isis::TableRecord rec;
-    for (int g = 0; g < p_blobPvl.Groups(); g++) {
-      if (p_blobPvl.Group(g).IsNamed("Field")) {
-        Isis::TableField f(p_blobPvl.Group(g));
+    for (int g = 0; g < p_blobPvl.groups(); g++) {
+      if (p_blobPvl.group(g).isNamed("Field")) {
+        Isis::TableField f(p_blobPvl.group(g));
         rec += f;
       }
     }
 
     p_record = rec;
 
-    if (p_blobPvl.HasKeyword("Association")) {
+    if (p_blobPvl.hasKeyword("Association")) {
       QString temp = (QString) p_blobPvl["Association"];
       temp = temp.toUpper();
       if (temp == "SAMPLES") p_assoc = Table::Samples;
@@ -389,8 +389,8 @@ namespace Isis {
       p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Msb);
     }
 
-    if (p_blobPvl.HasKeyword("Association")) {
-      p_blobPvl.DeleteKeyword("Association");
+    if (p_blobPvl.hasKeyword("Association")) {
+      p_blobPvl.deleteKeyword("Association");
     }
     if (p_assoc == Samples) {
       p_blobPvl += Isis::PvlKeyword("Association", "Samples");

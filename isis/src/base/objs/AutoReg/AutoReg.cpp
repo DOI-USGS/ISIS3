@@ -77,7 +77,7 @@ namespace Isis {
    * @see patternMatch.doc under the coreg application
    */
   AutoReg::AutoReg(Pvl &pvl) {
-    p_template = pvl.FindObject("AutoRegistration");
+    p_template = pvl.findObject("AutoRegistration");
 
     // Set default parameters
     p_patternChip.SetSize(3, 3);
@@ -207,70 +207,70 @@ namespace Isis {
   void AutoReg::Parse(Pvl &pvl) {
     try {
       // Get info from Algorithm group
-      PvlGroup &algo = pvl.FindGroup("Algorithm", Pvl::Traverse);
+      PvlGroup &algo = pvl.findGroup("Algorithm", Pvl::Traverse);
       SetTolerance(algo["Tolerance"]);
-      if(algo.HasKeyword("ChipInterpolator")) {
+      if(algo.hasKeyword("ChipInterpolator")) {
         SetChipInterpolator((QString)algo["ChipInterpolator"]);
       }
 
-      if(algo.HasKeyword("SubpixelAccuracy")) {
+      if(algo.hasKeyword("SubpixelAccuracy")) {
         SetSubPixelAccuracy((QString)algo["SubpixelAccuracy"] == "True");
       }
 
-      if(algo.HasKeyword("ReductionFactor")) {
+      if(algo.hasKeyword("ReductionFactor")) {
         SetReductionFactor((int)algo["ReductionFactor"]);
       }
 
-      if (algo.HasKeyword("Gradient")) {
+      if (algo.hasKeyword("Gradient")) {
         SetGradientFilterType((QString)algo["Gradient"]);
       }
 
       // Setup the pattern chip
-      PvlGroup &pchip = pvl.FindGroup("PatternChip", Pvl::Traverse);
+      PvlGroup &pchip = pvl.findGroup("PatternChip", Pvl::Traverse);
       PatternChip()->SetSize((int)pchip["Samples"], (int)pchip["Lines"]);
 
       double minimum = Isis::ValidMinimum;
       double maximum = Isis::ValidMaximum;
-      if(pchip.HasKeyword("ValidMinimum")) minimum = pchip["ValidMinimum"];
-      if(pchip.HasKeyword("ValidMaximum")) maximum = pchip["ValidMaximum"];
+      if(pchip.hasKeyword("ValidMinimum")) minimum = pchip["ValidMinimum"];
+      if(pchip.hasKeyword("ValidMaximum")) maximum = pchip["ValidMaximum"];
       PatternChip()->SetValidRange(minimum, maximum);
 
-      if(pchip.HasKeyword("MinimumZScore")) {
+      if(pchip.hasKeyword("MinimumZScore")) {
         SetPatternZScoreMinimum((double)pchip["MinimumZScore"]);
       }
-      if(pchip.HasKeyword("ValidPercent")) {
+      if(pchip.hasKeyword("ValidPercent")) {
         SetPatternValidPercent((double)pchip["ValidPercent"]);
       }
 
       // Setup the search chip
-      PvlGroup &schip = pvl.FindGroup("SearchChip", Pvl::Traverse);
+      PvlGroup &schip = pvl.findGroup("SearchChip", Pvl::Traverse);
       SearchChip()->SetSize((int)schip["Samples"], (int)schip["Lines"]);
 
       minimum = Isis::ValidMinimum;
       maximum = Isis::ValidMaximum;
-      if(schip.HasKeyword("ValidMinimum")) minimum = schip["ValidMinimum"];
-      if(schip.HasKeyword("ValidMaximum")) maximum = schip["ValidMaximum"];
+      if(schip.hasKeyword("ValidMinimum")) minimum = schip["ValidMinimum"];
+      if(schip.hasKeyword("ValidMaximum")) maximum = schip["ValidMaximum"];
       SearchChip()->SetValidRange(minimum, maximum);
-      if(schip.HasKeyword("SubchipValidPercent")) {
+      if(schip.hasKeyword("SubchipValidPercent")) {
         SetSubsearchValidPercent((double)schip["SubchipValidPercent"]);
       }
 
       // Setup surface model
-      PvlObject ar = pvl.FindObject("AutoRegistration");
-      if(ar.HasGroup("SurfaceModel")) {
-        PvlGroup &smodel = ar.FindGroup("SurfaceModel", Pvl::Traverse);
-        if(smodel.HasKeyword("DistanceTolerance")) {
+      PvlObject ar = pvl.findObject("AutoRegistration");
+      if(ar.hasGroup("SurfaceModel")) {
+        PvlGroup &smodel = ar.findGroup("SurfaceModel", Pvl::Traverse);
+        if(smodel.hasKeyword("DistanceTolerance")) {
           SetSurfaceModelDistanceTolerance((double)smodel["DistanceTolerance"]);
         }
 
-        if(smodel.HasKeyword("WindowSize")) {
+        if(smodel.hasKeyword("WindowSize")) {
           SetSurfaceModelWindowSize((int)smodel["WindowSize"]);
         }
       }
 
     }
     catch(IException &e) {
-      QString msg = "Improper format for AutoReg PVL [" + pvl.FileName() + "]";
+      QString msg = "Improper format for AutoReg PVL [" + pvl.fileName() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
     return;
@@ -1183,28 +1183,28 @@ namespace Isis {
     stats += Isis::PvlKeyword("Total", toString(p_totalRegistrations));
     stats += Isis::PvlKeyword("Successful", toString(p_pixelSuccesses + p_subpixelSuccesses));
     stats += Isis::PvlKeyword("Failure", toString(p_totalRegistrations - (p_pixelSuccesses + p_subpixelSuccesses)));
-    pvl.AddGroup(stats);
+    pvl.addGroup(stats);
 
     PvlGroup successes("Successes");
     successes += PvlKeyword("SuccessPixel", toString(p_pixelSuccesses));
     successes += PvlKeyword("SuccessSubPixel", toString(p_subpixelSuccesses));
-    pvl.AddGroup(successes);
+    pvl.addGroup(successes);
 
     PvlGroup grp("PatternChipFailures");
     grp += PvlKeyword("PatternNotEnoughValidData", toString(p_patternChipNotEnoughValidDataCount));
     grp += PvlKeyword("PatternZScoreNotMet", toString(p_patternZScoreNotMetCount));
-    pvl.AddGroup(grp);
+    pvl.addGroup(grp);
 
     PvlGroup fit("FitChipFailures");
     fit += PvlKeyword("FitChipNoData", toString(p_fitChipNoDataCount));
     fit += PvlKeyword("FitChipToleranceNotMet", toString(p_fitChipToleranceNotMetCount));
-    pvl.AddGroup(fit);
+    pvl.addGroup(fit);
 
     PvlGroup model("SurfaceModelFailures");
     model += PvlKeyword("SurfaceModelNotEnoughValidData", toString(p_surfaceModelNotEnoughValidDataCount));
     model += PvlKeyword("SurfaceModelSolutionInvalid", toString(p_surfaceModelSolutionInvalidCount));
     model += PvlKeyword("SurfaceModelDistanceInvalid", toString(p_surfaceModelDistanceInvalidCount));
-    pvl.AddGroup(model);
+    pvl.addGroup(model);
 
     return (AlgorithmStatistics(pvl));
   }
@@ -1219,57 +1219,57 @@ namespace Isis {
   PvlGroup AutoReg::RegTemplate() {
     PvlGroup reg("AutoRegistration");
 
-    PvlGroup &algo = p_template.FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = p_template.findGroup("Algorithm", Pvl::Traverse);
     reg += PvlKeyword("Algorithm", algo["Name"][0]);
     reg += PvlKeyword("Tolerance", algo["Tolerance"][0]);
-    if(algo.HasKeyword("SubpixelAccuracy")) {
+    if(algo.hasKeyword("SubpixelAccuracy")) {
       reg += PvlKeyword("SubpixelAccuracy", algo["SubpixelAccuracy"][0]);
     }
-    if(algo.HasKeyword("ReductionFactor")) {
+    if(algo.hasKeyword("ReductionFactor")) {
       reg += PvlKeyword("ReductionFactor", algo["ReductionFactor"][0]);
     }
-    if(algo.HasKeyword("Gradient")) {
+    if(algo.hasKeyword("Gradient")) {
       reg += PvlKeyword("Gradient", algo["Gradient"][0]);
     }
 
-    PvlGroup &pchip = p_template.FindGroup("PatternChip", Pvl::Traverse);
+    PvlGroup &pchip = p_template.findGroup("PatternChip", Pvl::Traverse);
     reg += PvlKeyword("PatternSamples", pchip["Samples"][0]);
     reg += PvlKeyword("PatternLines", pchip["Lines"][0]);
-    if(pchip.HasKeyword("ValidMinimum")) {
+    if(pchip.hasKeyword("ValidMinimum")) {
       reg += PvlKeyword("PatternMinimum", pchip["ValidMinimum"][0]);
     }
-    if(pchip.HasKeyword("ValidMaximum")) {
+    if(pchip.hasKeyword("ValidMaximum")) {
       reg += PvlKeyword("PatternMaximum", pchip["ValidMaximum"][0]);
     }
-    if(pchip.HasKeyword("MinimumZScore")) {
+    if(pchip.hasKeyword("MinimumZScore")) {
       reg += PvlKeyword("MinimumZScore", pchip["MinimumZScore"][0]);
     }
-    if(pchip.HasKeyword("ValidPercent")) {
+    if(pchip.hasKeyword("ValidPercent")) {
       SetPatternValidPercent((double)pchip["ValidPercent"]);
       reg += PvlKeyword("ValidPercent", pchip["ValidPercent"][0]);
     }
 
-    PvlGroup &schip = p_template.FindGroup("SearchChip", Pvl::Traverse);
+    PvlGroup &schip = p_template.findGroup("SearchChip", Pvl::Traverse);
     reg += PvlKeyword("SearchSamples", schip["Samples"][0]);
     reg += PvlKeyword("SearchLines", schip["Lines"][0]);
-    if(schip.HasKeyword("ValidMinimum")) {
+    if(schip.hasKeyword("ValidMinimum")) {
       reg += PvlKeyword("SearchMinimum", schip["ValidMinimum"][0]);
     }
-    if(schip.HasKeyword("ValidMaximum")) {
+    if(schip.hasKeyword("ValidMaximum")) {
       reg += PvlKeyword("SearchMaximum", schip["ValidMaximum"][0]);
     }
-    if(schip.HasKeyword("SubchipValidPercent")) {
+    if(schip.hasKeyword("SubchipValidPercent")) {
       SetSubsearchValidPercent((double)schip["SubchipValidPercent"]);
       reg += PvlKeyword("SubchipValidPercent", schip["SubchipValidPercent"][0]);
     }
 
-    if(p_template.HasGroup("SurfaceModel")) {
-      PvlGroup &smodel = p_template.FindGroup("SurfaceModel", Pvl::Traverse);
-      if(smodel.HasKeyword("DistanceTolerance")) {
+    if(p_template.hasGroup("SurfaceModel")) {
+      PvlGroup &smodel = p_template.findGroup("SurfaceModel", Pvl::Traverse);
+      if(smodel.hasKeyword("DistanceTolerance")) {
         reg += PvlKeyword("DistanceTolerance", smodel["DistanceTolerance"][0]);
       }
 
-      if(smodel.HasKeyword("WindowSize")) {
+      if(smodel.hasKeyword("WindowSize")) {
         reg += PvlKeyword("WindowSize", smodel["WindowSize"][0]);
       }
     }

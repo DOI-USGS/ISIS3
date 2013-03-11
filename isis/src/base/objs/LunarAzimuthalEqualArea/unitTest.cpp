@@ -19,8 +19,8 @@ int main(int argc, char *argv[]) {
   cout << "UNIT TEST FOR LunarAzimuthalEqualArea\n\n";
 
   Pvl lab;
-  lab.AddGroup(PvlGroup("Mapping"));
-  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  lab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("EquatorialRadius", toString(6378206.4));
   mapGroup += PvlKeyword("PolarRadius", toString(6378206.4));
   mapGroup += PvlKeyword("LatitudeType", "Planetographic");
@@ -79,10 +79,10 @@ int main(int argc, char *argv[]) {
       cout << "true! ..................................... [   OK   ]\n";
     else
       cout << "false! .................................... [ FAILED ]\n";
-    mapGroup["PolarRadius"].SetValue(toString(42));
+    mapGroup["PolarRadius"].setValue(toString(42));
     Pvl tmp1;
     Projection &p2 = *ProjectionFactory::Create(lab);
-    tmp1.AddGroup(p2.Mapping());
+    tmp1.addGroup(p2.Mapping());
     s = &p2;
     cout << "created a second Projection reference p2"
          << "\nusing the same pvl as p except for that PolarRadius = 42"
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
          << "\n  Maximum Y:  " << maxY << "\n";
 
     Pvl tmp2;
-    tmp2.AddGroup(p.Mapping());
+    tmp2.addGroup(p.Mapping());
 
   }
   catch(IException &e) {

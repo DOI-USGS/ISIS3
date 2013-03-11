@@ -73,13 +73,13 @@ void IsisMain() {
 //  Open the shift definitions file
   Pvl shiftdef;
   if(ui.WasEntered("SHIFTDEF")) {
-    shiftdef.Read(ui.GetFileName("SHIFTDEF"));
+    shiftdef.read(ui.GetFileName("SHIFTDEF"));
   }
   else {
-    shiftdef.AddObject(PvlObject("Hiccdstitch"));
+    shiftdef.addObject(PvlObject("Hiccdstitch"));
   }
 
-  PvlObject &stitch = shiftdef.FindObject("Hiccdstitch", Pvl::Traverse);
+  PvlObject &stitch = shiftdef.findObject("Hiccdstitch", Pvl::Traverse);
 
 
   // Open the first cube.  It will be matched to the second input cube.
@@ -136,7 +136,7 @@ void IsisMain() {
   // of the grid points.
   Pvl regdef;
   FileName regFile(ui.GetFileName("REGDEF"));
-  regdef.Read(regFile.expanded());
+  regdef.read(regFile.expanded());
   AutoReg *ar = AutoRegFactory::Create(regdef);
 
 
@@ -186,7 +186,7 @@ void IsisMain() {
   QString transSN = SerialNumber::Compose(trans, true);
   QString matchSN = SerialNumber::Compose(match, true);
 
-  PvlGroup &instrument = trans.label()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &instrument = trans.label()->findGroup("Instrument", Pvl::Traverse);
   cn.SetTarget(instrument["TargetName"][0]);
   cn.SetDescription("Records s/c jitter between two adjacent HiRISE images");
 

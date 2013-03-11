@@ -39,7 +39,7 @@ namespace Isis {
    * @param key keyword containing sequence
    */
   PvlSequence &PvlSequence::operator=(PvlKeyword &key) {
-    for(int i = 0; i < key.Size(); i++) {
+    for(int i = 0; i < key.size(); i++) {
       this->operator+=(key[i]);
     }
     return *this;
@@ -59,7 +59,7 @@ namespace Isis {
     str >> pvl;
     PvlKeyword &key = pvl["temp"];
     std::vector<QString> temp;
-    for(int i = 0; i < key.Size(); i++) {
+    for(int i = 0; i < key.size(); i++) {
       temp.push_back(key[i]);
     }
     p_sequence.push_back(temp);

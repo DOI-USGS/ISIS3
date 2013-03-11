@@ -89,38 +89,38 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
       FileName currFile((QString) location + "/" + files[fileNum]);
       PvlGroup selection = AddSelection(currFile);
       selection += PvlKeyword("Type", quality);
-      result.AddGroup(selection);
+      result.addGroup(selection);
     }
   }
 
   //check each group to make sure it is the same type as others
-  PvlObject::PvlGroupIterator grp = result.BeginGroup();
-  while(grp != result.EndGroup()) {
+  PvlObject::PvlGroupIterator grp = result.beginGroup();
+  while(grp != result.endGroup()) {
     // The kernel did not have any time coverage, so ignore it
-    if(grp->Name() == "No coverage" || grp->Name() == "Null") {
-      result.DeleteGroup(grp->Name());
+    if(grp->name() == "No coverage" || grp->name() == "Null") {
+      result.deleteGroup(grp->name());
     }
     // This is used for the first time thru the while loop
     // DO NOT increment grp here
     else if(type == "none") {
-      type = grp->Name();
+      type = grp->name();
     }
-    else if(grp->Name() == type) {
-      grp->SetName("Selection");
+    else if(grp->name() == type) {
+      grp->setName("Selection");
       grp++;
     }
     else {
-      QString message = "A kernel of type [" + grp->Name() + "] has been found in a directory for type [" + type + "]" ;
+      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + type + "]" ;
       throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
   }
 
   if(type == "SPK") {
-    result.SetName("SpacecraftPosition");
+    result.setName("SpacecraftPosition");
   }
   else if(type == "CK") {
-    result.SetName("SpacecraftPointing");
+    result.setName("SpacecraftPointing");
   }
 
   return result;

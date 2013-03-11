@@ -615,9 +615,9 @@ namespace Isis {
           QString varValue;
 
           // Find the corresponding Isis Preference if one exists
-          if(Preference::Preferences().HasGroup("DataDirectory")) {
-            PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-            if(dataDir.HasKeyword(varName)) {
+          if(Preference::Preferences().hasGroup("DataDirectory")) {
+            PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
+            if(dataDir.hasKeyword(varName)) {
               varValue = ((QString)dataDir[varName.toStdString().c_str()][0]);
             }
           }

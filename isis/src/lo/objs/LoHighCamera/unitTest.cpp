@@ -51,7 +51,7 @@ int main(void) {
 
     Pvl p("$lo/testData/4164H_Full_mirror.cub");
     LoHighCamera *cam = (LoHighCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -65,7 +65,7 @@ int main(void) {
 
     // Test Shutter Open/Close 
 
-    const PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
     // approximate 1 tenth of a second since Lunar Orbiter did not provide
     double exposureDuration = .1; 
     QString stime = inst["StartTime"];

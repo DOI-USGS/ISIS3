@@ -534,7 +534,7 @@ namespace Isis {
       }
 
       if (!exceptionIsBlank)
-        errors.AddGroup(errGroup);
+        errors.addGroup(errGroup);
     }
 
     return errors;
@@ -553,10 +553,10 @@ namespace Isis {
   QString IException::toString() const {
     bool reportFileLine = true;
 
-    if (Preference::Preferences().HasGroup("ErrorFacility")) {
+    if (Preference::Preferences().hasGroup("ErrorFacility")) {
       PvlGroup &errorFacility =
-          Preference::Preferences().FindGroup("ErrorFacility");
-      if (errorFacility.HasKeyword("FileLine")) {
+          Preference::Preferences().findGroup("ErrorFacility");
+      if (errorFacility.hasKeyword("FileLine")) {
         QString fileLine = errorFacility["FileLine"][0];
         reportFileLine = (fileLine.toUpper() == "ON");
       }
@@ -582,10 +582,10 @@ namespace Isis {
 
     bool usePvlFormat = false;
 
-    if (Preference::Preferences().HasGroup("ErrorFacility")) {
+    if (Preference::Preferences().hasGroup("ErrorFacility")) {
       PvlGroup &errorFacility =
-          Preference::Preferences().FindGroup("ErrorFacility");
-      if (errorFacility.HasKeyword("Format")) {
+          Preference::Preferences().findGroup("ErrorFacility");
+      if (errorFacility.hasKeyword("Format")) {
         QString format = errorFacility["Format"][0];
         usePvlFormat = (format.toUpper() == "PVL");
       }
@@ -594,7 +594,7 @@ namespace Isis {
     if (usePvlFormat) {
       Pvl errors = toPvl();
 
-      if (errors.Groups() != 0) {
+      if (errors.groups() != 0) {
         stringstream stringStream;
         stringStream << errors;
         result = stringStream.str().c_str();

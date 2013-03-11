@@ -562,34 +562,34 @@ namespace Isis {
       if (obj["LongitudeIncrement"][0] != "Null")
         m_lonInc = Angle(toDouble(obj["LongitudeIncrement"][0]), Angle::Degrees);
 
-      if (obj.HasKeyword("LatitudeExtentType")) {
+      if (obj.hasKeyword("LatitudeExtentType")) {
         if (obj["LatitudeExtentType"][0] != "Null")
           m_latExtents = (GridExtentSource)toInt(obj["LatitudeExtentType"][0]);
       }
 
-      if (obj.HasKeyword("MinimumLatitude")) {
+      if (obj.hasKeyword("MinimumLatitude")) {
         if (obj["MinimumLatitude"][0] != "Null")
           m_minLat = Latitude(toDouble(obj["MinimumLatitude"][0]), equatorialRadius, polarRadius,
                               Latitude::Planetocentric, Angle::Degrees);
       }
 
-      if (obj.HasKeyword("MaximumLatitude")) {
+      if (obj.hasKeyword("MaximumLatitude")) {
         if (obj["MaximumLatitude"][0] != "Null")
           m_maxLat = Latitude(toDouble(obj["MaximumLatitude"][0]), equatorialRadius, polarRadius,
                               Latitude::Planetocentric, Angle::Degrees);
       }
 
-      if (obj.HasKeyword("LongitudeExtentType")) {
+      if (obj.hasKeyword("LongitudeExtentType")) {
         if (obj["LongitudeExtentType"][0] != "Null")
           m_lonExtents = (GridExtentSource)toInt(obj["LongitudeExtentType"][0]);
       }
 
-      if (obj.HasKeyword("MinimumLongitude")) {
+      if (obj.hasKeyword("MinimumLongitude")) {
         if (obj["MinimumLongitude"][0] != "Null")
           m_minLon = Longitude(toDouble(obj["MinimumLongitude"][0]), Angle::Degrees);
       }
 
-      if (obj.HasKeyword("MaximumLongitude")) {
+      if (obj.hasKeyword("MaximumLongitude")) {
         if (obj["MaximumLongitude"][0] != "Null")
           m_maxLon = Longitude(toDouble(obj["MaximumLongitude"][0]), Angle::Degrees);
       }
@@ -598,7 +598,7 @@ namespace Isis {
         m_density = toDouble(obj["Density"][0]);
 
 
-      if (obj.HasKeyword("CheckTheBoxes")) {
+      if (obj.hasKeyword("CheckTheBoxes")) {
         if (obj["CheckTheBoxes"][0] != "Null") {
           m_shouldCheckBoxes = (obj["CheckTheBoxes"][0] == "true");
         }

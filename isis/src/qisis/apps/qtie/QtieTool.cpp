@@ -850,8 +850,8 @@ namespace Isis {
   void QtieTool::writeNewCmatrix(Table *cmatrix) {
 
     //check for existing polygon, if exists delete it
-    if (p_matchCube->label()->HasObject("Polygon")) {
-      p_matchCube->label()->DeleteObject("Polygon");
+    if (p_matchCube->label()->hasObject("Polygon")) {
+      p_matchCube->label()->deleteObject("Polygon");
     }
 
     // Update the cube history
@@ -927,7 +927,7 @@ namespace Isis {
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                        + (templatePvl.FileName()));
+                                        + (templatePvl.fileName()));
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }

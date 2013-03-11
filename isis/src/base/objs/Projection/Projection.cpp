@@ -104,16 +104,16 @@ namespace Isis {
   Projection::Projection(Pvl &label) : m_mappingGrp("Mapping") {
     try {
       // Try to read the mapping group
-      m_mappingGrp = label.FindGroup("Mapping", Pvl::Traverse);
+      m_mappingGrp = label.findGroup("Mapping", Pvl::Traverse);
 
       // Get the radii from the EquatorialRadius and PolarRadius keywords
-      if ((m_mappingGrp.HasKeyword("EquatorialRadius")) &&
-          (m_mappingGrp.HasKeyword("PolarRadius"))) {
+      if ((m_mappingGrp.hasKeyword("EquatorialRadius")) &&
+          (m_mappingGrp.hasKeyword("PolarRadius"))) {
         m_equatorialRadius = m_mappingGrp["EquatorialRadius"];
         m_polarRadius = m_mappingGrp["PolarRadius"];
       }
       // Get the radii using the "TargetName" keyword and NAIF
-      else  if (m_mappingGrp.HasKeyword("TargetName")) {
+      else  if (m_mappingGrp.hasKeyword("TargetName")) {
         PvlGroup radii = TargetRadii((QString)m_mappingGrp["TargetName"]);
         m_equatorialRadius = radii["EquatorialRadius"];
         m_polarRadius = radii["PolarRadius"];
@@ -180,10 +180,10 @@ namespace Isis {
 
       // Get the ground range if it exists
       m_groundRangeGood = false;
-      if ((m_mappingGrp.HasKeyword("MinimumLatitude")) &&
-          (m_mappingGrp.HasKeyword("MaximumLatitude")) &&
-          (m_mappingGrp.HasKeyword("MinimumLongitude")) &&
-          (m_mappingGrp.HasKeyword("MaximumLongitude"))) {
+      if ((m_mappingGrp.hasKeyword("MinimumLatitude")) &&
+          (m_mappingGrp.hasKeyword("MaximumLatitude")) &&
+          (m_mappingGrp.hasKeyword("MinimumLongitude")) &&
+          (m_mappingGrp.hasKeyword("MaximumLongitude"))) {
         m_minimumLatitude  = m_mappingGrp["MinimumLatitude"];
         m_maximumLatitude  = m_mappingGrp["MaximumLatitude"];
         m_minimumLongitude = m_mappingGrp["MinimumLongitude"];
@@ -233,7 +233,7 @@ namespace Isis {
 
       // Get the map rotation
       m_rotation = 0.0;
-      if (m_mappingGrp.HasKeyword("Rotation")) {
+      if (m_mappingGrp.hasKeyword("Rotation")) {
         m_rotation = m_mappingGrp["Rotation"];
       }
 
@@ -242,7 +242,7 @@ namespace Isis {
       m_good = false;
 
       m_pixelResolution = 1.0;
-      if (m_mappingGrp.HasKeyword("PixelResolution")) {
+      if (m_mappingGrp.hasKeyword("PixelResolution")) {
         m_pixelResolution = m_mappingGrp["PixelResolution"];
       }
 
@@ -268,7 +268,7 @@ namespace Isis {
       m_mapper = NULL;
 
       m_sky = false;
-      if (m_mappingGrp.HasKeyword("TargetName")) {
+      if (m_mappingGrp.hasKeyword("TargetName")) {
         QString str = m_mappingGrp["TargetName"];
         if (str.toUpper() == "SKY") m_sky = true;
       }
@@ -499,29 +499,29 @@ namespace Isis {
     //Check to see if the mapGroup already has the target radii.
     //If BOTH radii are already in the mapGroup then just return back the map 
     //Group. 
-    if (mapGroup.HasKeyword("EquatorialRadius") 
-        && mapGroup.HasKeyword("PolarRadius")) {
+    if (mapGroup.hasKeyword("EquatorialRadius") 
+        && mapGroup.hasKeyword("PolarRadius")) {
       return mapGroup;
     }
     //If the mapping group only has one or the other of the radii keywords, then
     //we are going to replace both, so delete which ever one it does have.
-    if (mapGroup.HasKeyword("EquatorialRadius") 
-        && !mapGroup.HasKeyword("PolarRadius")) {
-      mapGroup.DeleteKeyword("EquatorialRadius");
+    if (mapGroup.hasKeyword("EquatorialRadius") 
+        && !mapGroup.hasKeyword("PolarRadius")) {
+      mapGroup.deleteKeyword("EquatorialRadius");
     }
-    if (!mapGroup.HasKeyword("EquatorialRadius") 
-        && mapGroup.HasKeyword("PolarRadius")) {
-      mapGroup.DeleteKeyword("PolarRadius");
+    if (!mapGroup.hasKeyword("EquatorialRadius") 
+        && mapGroup.hasKeyword("PolarRadius")) {
+      mapGroup.deleteKeyword("PolarRadius");
     }
 
-    PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
     QString target = inst["TargetName"];
     PvlGroup radii = Projection::TargetRadii(target);
     //Now INSERT the EquatorialRadius and PolorRadius into the mapGroup pvl.
     mapGroup += PvlKeyword("EquatorialRadius",  
-                           radii.FindKeyword("EquatorialRadius")[0], "meters");
+                           radii.findKeyword("EquatorialRadius")[0], "meters");
     mapGroup += PvlKeyword("PolarRadius", 
-                           radii.FindKeyword("PolarRadius")[0], "meters");
+                           radii.findKeyword("PolarRadius")[0], "meters");
 
     return mapGroup;
   }
@@ -2157,8 +2157,8 @@ namespace Isis {
                                       const Displacement &y) {
     PvlKeyword xKeyword("UpperLeftCornerX", toString(x.meters()), "meters");
     PvlKeyword yKeyword("UpperLeftCornerY", toString(y.meters()), "meters");
-    m_mappingGrp.AddKeyword(xKeyword,Pvl::Replace);
-    m_mappingGrp.AddKeyword(yKeyword,Pvl::Replace);
+    m_mappingGrp.addKeyword(xKeyword,Pvl::Replace);
+    m_mappingGrp.addKeyword(yKeyword,Pvl::Replace);
   }
 
   /**
@@ -2177,7 +2177,7 @@ namespace Isis {
              << "Rotation";
 
     foreach (QString keyName, keyNames) {
-      if (m_mappingGrp.HasKeyword(keyName)) {
+      if (m_mappingGrp.hasKeyword(keyName)) {
         mapping += m_mappingGrp[keyName];
       }
     }

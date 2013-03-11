@@ -58,16 +58,16 @@ int main() {
   kern1 += PvlKeyword("EndPadding", toString(slope));
 
   Pvl lab1;
-  lab1.AddGroup(inst1);
-  lab1.AddGroup(kern1);
+  lab1.addGroup(inst1);
+  lab1.addGroup(kern1);
 
   // Test ShapeModel keyword
   cout << endl << "  Testing ShapeModel keyword..." << endl;
   PvlGroup kern2 = kern1;
   kern2 += PvlKeyword("ShapeModel", dir2  + "molaMarsPlanetaryRadius0005.cub");
   Pvl lab2;
-  lab2.AddGroup(inst2);
-  lab2.AddGroup(kern2);
+  lab2.addGroup(inst2);
+  lab2.addGroup(kern2);
   Spice spiSh(lab2);
   Target targSh(&spiSh, lab2);
   ShapeModel *smSh = ShapeModelFactory::create(&targSh, lab2);
@@ -79,8 +79,8 @@ int main() {
   PvlGroup kern3 = kern1;
   kern3 += PvlKeyword("ElevationModel", dir2  + "molaMarsPlanetaryRadius0005.cub");
   Pvl lab3;
-  lab3.AddGroup(inst2);
-  lab3.AddGroup(kern3);
+  lab3.addGroup(inst2);
+  lab3.addGroup(kern3);
   Spice spiEl(lab3);
   Target targEl(&spiEl, lab3);
   ShapeModel *smEl = ShapeModelFactory::create(&targEl, lab3);
@@ -92,8 +92,8 @@ int main() {
   PvlGroup kern4 = kern1;;
   kern4 += PvlKeyword("ShapeModel", "Null");
   Pvl lab4;
-  lab4.AddGroup(inst2);
-  lab4.AddGroup(kern4);
+  lab4.addGroup(inst2);
+  lab4.addGroup(kern4);
   Spice spiElNull(lab4);
   Target targElNull(&spiElNull, lab4);
   ShapeModel *smElNull = ShapeModelFactory::create(&targElNull, lab4);
@@ -112,8 +112,8 @@ int main() {
   PvlGroup kern5 = kern1;
   kern5 += PvlKeyword("ShapeModel", "NotAFile");
   Pvl lab5;
-  lab5.AddGroup(inst2);
-  lab5.AddGroup(kern5);
+  lab5.addGroup(inst2);
+  lab5.addGroup(kern5);
   Spice spiBadFile(lab5);
   Target targBadFile(&spiBadFile, lab5);
   ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
@@ -130,8 +130,8 @@ int main() {
   PvlGroup kern5 = kern1;
   kern5 += PvlKeyword("ShapeModel", dir3 + "ab102401.cub");
   Pvl lab5;
-  lab5.AddGroup(inst2);
-  lab5.AddGroup(kern5);
+  lab5.addGroup(inst2);
+  lab5.addGroup(kern5);
   Spice spiBadFile(lab5);
   Target targBadFile(&spiBadFile, lab5);
   ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
@@ -148,8 +148,8 @@ int main() {
   PvlGroup kern5 = kern1;
   kern5 += PvlKeyword("ShapeModel", dir3 + "ab102402.lev2.cub");
   Pvl lab5;
-  lab5.AddGroup(inst2);
-  lab5.AddGroup(kern5);
+  lab5.addGroup(inst2);
+  lab5.addGroup(kern5);
   Spice spiDem(lab5);
   Target targDem(&spiDem, lab5);
   ShapeModel *smDem = ShapeModelFactory::create(&targDem, lab5);

@@ -56,12 +56,12 @@ void IsisMain() {
       if(!filenamesOnly) {
         outFile += errorList[err];
       }
-      else if(errorList[err].HasKeyword("FileNames")) {
+      else if(errorList[err].hasKeyword("FileNames")) {
         PvlGroup origError = errorList[err];
         PvlGroup err("ImageOverlapError");
 
-        for(int keyword = 0; keyword < origError.Keywords(); keyword++) {
-          if(origError[keyword].Name() == "FileNames") {
+        for(int keyword = 0; keyword < origError.keywords(); keyword++) {
+          if(origError[keyword].name() == "FileNames") {
             err += origError[keyword];
           }
         }
@@ -70,7 +70,7 @@ void IsisMain() {
       }
     }
 
-    outFile.Write(FileName(ui.GetFileName("ERRORS")).expanded());
+    outFile.write(FileName(ui.GetFileName("ERRORS")).expanded());
   }
 
   PvlGroup results("Results");

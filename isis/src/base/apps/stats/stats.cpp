@@ -65,7 +65,7 @@ void IsisMain() {
     results += PvlKeyword("HisPixels", toString(stats->HisPixels()));
     results += PvlKeyword("HrsPixels", toString(stats->HrsPixels()));
     
-    mainpvl.AddGroup(results);
+    mainpvl.addGroup(results);
     
     delete stats;
     // Write the results to the log
@@ -82,10 +82,10 @@ void IsisMain() {
     //write the results in the requested format.
     if(ui.GetString("FORMAT") == "PVL") {
       if(append) {
-        mainpvl.Append(outFile);
+        mainpvl.append(outFile);
       }
       else {
-        mainpvl.Write(outFile);
+        mainpvl.write(outFile);
       }
     }
     else {
@@ -102,19 +102,19 @@ void IsisMain() {
       }
 
       if(writeHeader) {
-        for(int i = 0; i < mainpvl.Group(0).Keywords(); i++) {
-          os << mainpvl.Group(0)[i].Name();
-          if( i < mainpvl.Group(0).Keywords() - 1 ) {
+        for(int i = 0; i < mainpvl.group(0).keywords(); i++) {
+          os << mainpvl.group(0)[i].name();
+          if( i < mainpvl.group(0).keywords() - 1 ) {
             os << ",";
           }
         }
         os << endl;
       }
       
-      for(int i = 0; i < mainpvl.Groups(); i++) {
-        for (int j = 0; j < mainpvl.Group(i).Keywords(); j++) {
-          os << (QString)mainpvl.Group(i)[j];
-          if(j < mainpvl.Group(i).Keywords() - 1) {
+      for(int i = 0; i < mainpvl.groups(); i++) {
+        for (int j = 0; j < mainpvl.group(i).keywords(); j++) {
+          os << (QString)mainpvl.group(i)[j];
+          if(j < mainpvl.group(i).keywords() - 1) {
             os << ",";
           }
         }

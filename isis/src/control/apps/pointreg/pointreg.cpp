@@ -466,8 +466,8 @@ void IsisMain() {
   // Log Registration Statistics
   Pvl arPvl = ar->RegistrationStatistics();
 
-  for (int i = 0; i < arPvl.Groups(); i++) {
-    Application::Log(arPvl.Group(i));
+  for (int i = 0; i < arPvl.groups(); i++) {
+    Application::Log(arPvl.group(i));
   }
 
   // add the auto registration information to print.prt
@@ -478,19 +478,19 @@ void IsisMain() {
     PvlGroup validationGroup("ValidationStatistics");
 
     Pvl validationPvl = validator->RegistrationStatistics();
-    for (int g = 0; g < validationPvl.Groups(); g++) {
-      PvlGroup &group = validationPvl.Group(g);
-      if (group.Keywords() > 0) {
-        group[0].AddComment(group.Name());
-        for (int k = 0; k < group.Keywords(); k++)
-          validationGroup.AddKeyword(group[k]);
+    for (int g = 0; g < validationPvl.groups(); g++) {
+      PvlGroup &group = validationPvl.group(g);
+      if (group.keywords() > 0) {
+        group[0].addComment(group.name());
+        for (int k = 0; k < group.keywords(); k++)
+          validationGroup.addKeyword(group[k]);
       }
     }
 
     Application::Log(validationGroup);
 
     PvlGroup validationTemplate = validator->UpdatedTemplate();
-    validationTemplate.SetName("ValidationTemplate");
+    validationTemplate.setName("ValidationTemplate");
     Application::Log(validationTemplate);
   }
 
@@ -820,7 +820,7 @@ void printTemp() {
 
   // Get template pvl
   Pvl userTemp;
-  userTemp.Read(ui.GetFileName("DEFFILE"));
+  userTemp.read(ui.GetFileName("DEFFILE"));
 
   //Write template file out to the log
   Isis::Application::GuiLog(userTemp);

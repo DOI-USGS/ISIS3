@@ -49,82 +49,82 @@ void IsisMain() {
 
   PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
   Pvl invalidInput = seeder->InvalidInput();
-  PvlGroup &unusedDefKeywords = invalidInput.FindGroup(
+  PvlGroup &unusedDefKeywords = invalidInput.findGroup(
                                   "PolygonSeederAlgorithm", Pvl::Traverse);
 
   // Get the distance from the edge of an image a measure must be
   double pixelsFromEdge = -1.0;
-  if(seedDef.HasKeyword("PixelsFromEdge", Pvl::Traverse)) {
-    pixelsFromEdge = seedDef.FindKeyword("PixelsFromEdge", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("PixelsFromEdge"))
-      unusedDefKeywords.DeleteKeyword("PixelsFromEdge");
+  if(seedDef.hasKeyword("PixelsFromEdge", Pvl::Traverse)) {
+    pixelsFromEdge = seedDef.findKeyword("PixelsFromEdge", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("PixelsFromEdge"))
+      unusedDefKeywords.deleteKeyword("PixelsFromEdge");
   }
 
   // Get the Emission range
   double minEmission = 0.0;
   double maxEmission = 180.0;
-  if(seedDef.HasKeyword("MinEmission", Pvl::Traverse)) {
-    minEmission = seedDef.FindKeyword("MinEmission", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("MinEmission"))
-      unusedDefKeywords.DeleteKeyword("MinEmission");
+  if(seedDef.hasKeyword("MinEmission", Pvl::Traverse)) {
+    minEmission = seedDef.findKeyword("MinEmission", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("MinEmission"))
+      unusedDefKeywords.deleteKeyword("MinEmission");
   }
-  if(seedDef.HasKeyword("MaxEmission", Pvl::Traverse)) {
-    maxEmission = seedDef.FindKeyword("MaxEmission", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("MaxEmission"))
-      unusedDefKeywords.DeleteKeyword("MaxEmission");
+  if(seedDef.hasKeyword("MaxEmission", Pvl::Traverse)) {
+    maxEmission = seedDef.findKeyword("MaxEmission", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("MaxEmission"))
+      unusedDefKeywords.deleteKeyword("MaxEmission");
   }
 
   // Get the Incidence range
   double minIncidence = 0.0;
   double maxIncidence = 180.0;
-  if(seedDef.HasKeyword("MinIncidence", Pvl::Traverse)) {
-    minIncidence = seedDef.FindKeyword("MinIncidence", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("MinIncidence"))
-      unusedDefKeywords.DeleteKeyword("MinIncidence");
+  if(seedDef.hasKeyword("MinIncidence", Pvl::Traverse)) {
+    minIncidence = seedDef.findKeyword("MinIncidence", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("MinIncidence"))
+      unusedDefKeywords.deleteKeyword("MinIncidence");
   }
-  if(seedDef.HasKeyword("MaxIncidence", Pvl::Traverse)) {
-    maxIncidence = seedDef.FindKeyword("MaxIncidence", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("MaxIncidence"))
-      unusedDefKeywords.DeleteKeyword("MaxIncidence");
+  if(seedDef.hasKeyword("MaxIncidence", Pvl::Traverse)) {
+    maxIncidence = seedDef.findKeyword("MaxIncidence", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("MaxIncidence"))
+      unusedDefKeywords.deleteKeyword("MaxIncidence");
   }
 
   // Get the DN range
   bool hasDNRestriction = false;
   double minDN = -DBL_MAX;
   double maxDN = DBL_MAX;
-  if(seedDef.HasKeyword("MinDN", Pvl::Traverse)) {
-    minDN = seedDef.FindKeyword("MinDN", Pvl::Traverse);
+  if(seedDef.hasKeyword("MinDN", Pvl::Traverse)) {
+    minDN = seedDef.findKeyword("MinDN", Pvl::Traverse);
     hasDNRestriction = true;
-    if(unusedDefKeywords.HasKeyword("MinDN"))
-      unusedDefKeywords.DeleteKeyword("MinDN");
+    if(unusedDefKeywords.hasKeyword("MinDN"))
+      unusedDefKeywords.deleteKeyword("MinDN");
   }
-  if(seedDef.HasKeyword("MaxDN", Pvl::Traverse)) {
-    maxDN = seedDef.FindKeyword("MaxDN", Pvl::Traverse);
+  if(seedDef.hasKeyword("MaxDN", Pvl::Traverse)) {
+    maxDN = seedDef.findKeyword("MaxDN", Pvl::Traverse);
     hasDNRestriction = true;
-    if(unusedDefKeywords.HasKeyword("MaxDN"))
-      unusedDefKeywords.DeleteKeyword("MaxDN");
+    if(unusedDefKeywords.hasKeyword("MaxDN"))
+      unusedDefKeywords.deleteKeyword("MaxDN");
   }
 
   // Get the resolution
   double minResolution = 0.0;
   double maxResolution = 0.0;
-  if(seedDef.HasKeyword("MinResolution", Pvl::Traverse)) {
-    minResolution  = seedDef.FindKeyword("MinResolution", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("MinResolution"))
-      unusedDefKeywords.DeleteKeyword("MinResolution");
+  if(seedDef.hasKeyword("MinResolution", Pvl::Traverse)) {
+    minResolution  = seedDef.findKeyword("MinResolution", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("MinResolution"))
+      unusedDefKeywords.deleteKeyword("MinResolution");
   }
-  if(seedDef.HasKeyword("MaxResolution", Pvl::Traverse)) {
-    maxResolution  = seedDef.FindKeyword("MaxResolution", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("MaxResolution"))
-      unusedDefKeywords.DeleteKeyword("MaxResolution");
+  if(seedDef.hasKeyword("MaxResolution", Pvl::Traverse)) {
+    maxResolution  = seedDef.findKeyword("MaxResolution", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("MaxResolution"))
+      unusedDefKeywords.deleteKeyword("MaxResolution");
   }
 
   // Get seed domain for unit conversion, no keyword == XY
   SeedDomain seedDomain = XY;
-  if(seedDef.HasKeyword("SeedDomain", Pvl::Traverse)) {
-    IString domain = (QString) seedDef.FindKeyword("SeedDomain", Pvl::Traverse);
-    if(unusedDefKeywords.HasKeyword("SeedDomain"))
-      unusedDefKeywords.DeleteKeyword("SeedDomain");
+  if(seedDef.hasKeyword("SeedDomain", Pvl::Traverse)) {
+    IString domain = (QString) seedDef.findKeyword("SeedDomain", Pvl::Traverse);
+    if(unusedDefKeywords.hasKeyword("SeedDomain"))
+      unusedDefKeywords.deleteKeyword("SeedDomain");
 
     if(domain.UpCase() == "SAMPLELINE") {
       seedDomain = SampleLine;
@@ -143,12 +143,12 @@ void IsisMain() {
   // Construct a Projection for converting between Lon/Lat and X/Y
   // This is used inside the seeding algorithms.
   // Note: Should this be an option to include this in the program?
-  PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
   QString target = inst["TargetName"];
   PvlGroup radii = Projection::TargetRadii(target);
   Isis::Pvl maplab;
-  maplab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
+  maplab.addGroup(Isis::PvlGroup("Mapping"));
+  Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
   mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
   mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
   mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
@@ -295,7 +295,7 @@ void IsisMain() {
         }
         errorNum ++;
 
-        errors << e.toPvl().Group(0).FindKeyword("Message")[0];
+        errors << e.toPvl().group(0).findKeyword("Message")[0];
         for(int serNum = 0; serNum < overlaps[ov]->Size(); serNum++) {
           if(serNum == 0) {
             errors << ": ";
@@ -474,14 +474,14 @@ void IsisMain() {
 
   // create SeedDef group and add to print.prt
   PvlGroup pluginInfo = seeder->PluginParameters("SeedDefinition");
-  pluginInfo.AddKeyword(PvlKeyword("MaxIncidence", toString(maxIncidence)));
-  pluginInfo.AddKeyword(PvlKeyword("MaxEmission", toString(maxEmission)));
+  pluginInfo.addKeyword(PvlKeyword("MaxIncidence", toString(maxIncidence)));
+  pluginInfo.addKeyword(PvlKeyword("MaxEmission", toString(maxEmission)));
   Application::Log(pluginInfo);
 
   // inform user of any unused (invalid) keywords found in the def file
-  if(unusedDefKeywords.Keywords() != 0) {
+  if(unusedDefKeywords.keywords() != 0) {
     PvlGroup unusedKeywords(unusedDefKeywords);
-    unusedKeywords.SetName("InvalidKeyordsFoundInDefFile");
+    unusedKeywords.setName("InvalidKeyordsFoundInDefFile");
     Application::Log(unusedKeywords);
   }
 
@@ -499,10 +499,10 @@ void IsisMain() {
   PvlKeyword cmIgnoredCountKeyword("ControlMeasuresIgnored", toString(cmIgnoredCount));
 
   PvlGroup resultsGrp("Results");
-  resultsGrp.AddKeyword(cpCountKeyword);
-  resultsGrp.AddKeyword(msCountKeyword);
-  resultsGrp.AddKeyword(cpIgnoredCountKeyword);
-  resultsGrp.AddKeyword(cmIgnoredCountKeyword);
+  resultsGrp.addKeyword(cpCountKeyword);
+  resultsGrp.addKeyword(msCountKeyword);
+  resultsGrp.addKeyword(cpIgnoredCountKeyword);
+  resultsGrp.addKeyword(cmIgnoredCountKeyword);
 
   Application::Log(resultsGrp);
 

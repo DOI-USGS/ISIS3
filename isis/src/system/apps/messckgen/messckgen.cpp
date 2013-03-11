@@ -79,28 +79,28 @@ void IsisMain() {
   }
   Pvl kernelDb(dbFileName.expanded());
 
-  PvlObject &pointing = kernelDb.FindObject("SpacecraftPointing");
-  PvlObject &pivotPointing = pivot.FindObject("SpacecraftPointing");
-  PvlObject &atthistPointing = atthist.FindObject("SpacecraftPointing");
+  PvlObject &pointing = kernelDb.findObject("SpacecraftPointing");
+  PvlObject &pivotPointing = pivot.findObject("SpacecraftPointing");
+  PvlObject &atthistPointing = atthist.findObject("SpacecraftPointing");
 
-  PvlKeyword &runtime = pointing.FindKeyword("Runtime");
-  runtime[0] = pivotPointing.FindKeyword("Runtime")[0];
+  PvlKeyword &runtime = pointing.findKeyword("Runtime");
+  runtime[0] = pivotPointing.findKeyword("Runtime")[0];
 
-  PvlKeyword &clock = pointing.FindKeyword(
+  PvlKeyword &clock = pointing.findKeyword(
       "SpacecraftClockKernel", Pvl::Traverse);
-  clock[0] = pivotPointing.FindKeyword(
+  clock[0] = pivotPointing.findKeyword(
       "SpacecraftClockKernel", Pvl::Traverse)[0];
 
-  PvlKeyword &leapsecond = pointing.FindKeyword(
+  PvlKeyword &leapsecond = pointing.findKeyword(
       "LeapsecondKernel", Pvl::Traverse);
-  leapsecond[0] = pivotPointing.FindKeyword(
+  leapsecond[0] = pivotPointing.findKeyword(
       "LeapsecondKernel", Pvl::Traverse)[0];
 
   bool foundMapping = false;
-  for (int i = 0; i < pointing.Groups(); i++) {
-    PvlGroup &ckGroup = pointing.Group(i);
+  for (int i = 0; i < pointing.groups(); i++) {
+    PvlGroup &ckGroup = pointing.group(i);
 
-    if (ckGroup.IsNamed("Selection")) {
+    if (ckGroup.isNamed("Selection")) {
 
       // We've already found the mapping section, so just update the pivot and
       // atthist files for all remaining selection groups
@@ -109,21 +109,21 @@ void IsisMain() {
 
       // We're looking for the group with a comment that says MAPPING,
       // signifying the beginning of the section we wish to update
-      for (int j = 0; j < ckGroup.Comments(); j++) {
-        QString comment = ckGroup.Comment(j);
+      for (int j = 0; j < ckGroup.comments(); j++) {
+        QString comment = ckGroup.comment(j);
         if (comment.contains("MAPPING")) {
           foundMapping = true;
           updatePointing(ckGroup, pivotPointing, atthistPointing);
 
-          PvlGroup &pivotSelection = pivotPointing.FindGroup("Selection");
+          PvlGroup &pivotSelection = pivotPointing.findGroup("Selection");
 
           // Find end time, if it's a week past the current start date, or more,
           // then create a new selection group.  Otherwise, add new kernel
           // entries to the existing group.
           QString pivotEndRaw;
-          for (int k = pivotSelection.Keywords() - 1; k >= 0; k--) {
+          for (int k = pivotSelection.keywords() - 1; k >= 0; k--) {
             PvlKeyword &keyword = pivotSelection[k];
-            if (keyword.IsNamed("Time")) {
+            if (keyword.isNamed("Time")) {
               pivotEndRaw = keyword[1];
               break;
             }
@@ -134,7 +134,7 @@ void IsisMain() {
           pivotEndRaw.remove(QRegExp(" TDB$"));
           QString pivotEnd = pivotEndRaw;
 
-          PvlKeyword &time = ckGroup.FindKeyword("Time");
+          PvlKeyword &time = ckGroup.findKeyword("Time");
           QString currentStartRaw = time[0];
           currentStartRaw.remove(QRegExp(" TDB$"));
           QString currentStart = currentStartRaw;
@@ -156,7 +156,7 @@ void IsisMain() {
           while (coveredTime <= pivotEndTime) {
             // Keep adding a new file for every day that doesn't have coverage
             // in the DB file, but is covered by the pivot and atthist files
-            PvlObject::PvlKeywordIterator itr = currentGroup->Begin();
+            PvlObject::PvlKeywordIterator itr = currentGroup->begin();
             itr++;
 
             // Until our covered time has exceeded a week past the current
@@ -183,7 +183,7 @@ void IsisMain() {
               // then go ahead and add it
               if ((*itr)[0] != bcFileName) {
                 PvlKeyword bcKeyword("File", bcFileName);
-                itr = currentGroup->AddKeyword(bcKeyword, itr);
+                itr = currentGroup->addKeyword(bcKeyword, itr);
               }
               itr++;
 
@@ -204,25 +204,25 @@ void IsisMain() {
               coveredTime = weekFromStart;
               weekFromStart += 7 * 24 * 3600;
 
-              PvlKeyword &currentTime = currentGroup->FindKeyword("Time");
+              PvlKeyword &currentTime = currentGroup->findKeyword("Time");
               currentTime[1] = newEndTime;
               PvlKeyword latestTime(currentTime);
               latestTime[0] = newEndTime;
               latestTime[1] = newEnd;
 
               PvlGroup *latestGroup = new PvlGroup("Selection");
-              latestGroup->AddKeyword(latestTime);
+              latestGroup->addKeyword(latestTime);
 
               PvlKeyword atthistPlaceholder("File");
               atthistPlaceholder += "";
               PvlKeyword pivotPlaceholder("File");
-              pivotPlaceholder.AddComment("Regular pivot angle CK");
+              pivotPlaceholder.addComment("Regular pivot angle CK");
               pivotPlaceholder += "";
 
-              latestGroup->AddKeyword(atthistPlaceholder);
-              latestGroup->AddKeyword(pivotPlaceholder);
+              latestGroup->addKeyword(atthistPlaceholder);
+              latestGroup->addKeyword(pivotPlaceholder);
 
-              latestGroup->AddKeyword(currentGroup->FindKeyword("Type"));
+              latestGroup->addKeyword(currentGroup->findKeyword("Type"));
 
               updatePointing(*latestGroup, pivotPointing, atthistPointing);
               currentGroup = insertGroup(pointing, *latestGroup, i);
@@ -244,7 +244,7 @@ void IsisMain() {
   }
 
   // Write the updated PVL as the new CK DB file
-  kernelDb.Write(outDBfile.expanded());
+  kernelDb.write(outDBfile.expanded());
 }
 
 
@@ -252,20 +252,20 @@ void updatePointing(PvlGroup &ckGroup,
     PvlObject &pivotPointing, PvlObject &atthistPointing) {
 
   bool foundPivot = false;
-  for (int k = ckGroup.Keywords() - 1; k >= 0; k--) {
+  for (int k = ckGroup.keywords() - 1; k >= 0; k--) {
     PvlKeyword &keyword = ckGroup[k];
-    if (keyword.IsNamed("File")) {
+    if (keyword.isNamed("File")) {
       if (!foundPivot) {
         // Last file in the list is the pivot file
-        PvlGroup &pivotSelection = pivotPointing.FindGroup("Selection");
-        keyword[0] = pivotSelection.FindKeyword("File")[0];
+        PvlGroup &pivotSelection = pivotPointing.findGroup("Selection");
+        keyword[0] = pivotSelection.findKeyword("File")[0];
         foundPivot = true;
       }
       else {
         // Atthist file comes just before the pivot file in the
         // MAPPING group
-        PvlGroup &atthistSelection = atthistPointing.FindGroup("Selection");
-        keyword[0] = atthistSelection.FindKeyword("File")[0];
+        PvlGroup &atthistSelection = atthistPointing.findGroup("Selection");
+        keyword[0] = atthistSelection.findKeyword("File")[0];
         break;
       }
     }
@@ -280,19 +280,19 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index) {
 
   // Add a copy of the last group to the end so we can begin shifting all our
   // mapping selection groups down
-  object.AddGroup(object.Group(object.Groups() - 1));
-  for (int i = object.Groups() - 2; i > index; i--) {
+  object.addGroup(object.group(object.groups() - 1));
+  for (int i = object.groups() - 2; i > index; i--) {
     // Shift groups down until we reach the new beginning of the mapping section
-    object.Group(i) = object.Group(i - 1);
+    object.group(i) = object.group(i - 1);
 
     // See if we've found the mapping comments yet
     if (mappingComments.size() == 0) {
       // If not, let's get the comments from the current group and check them
       // against our criteria for the mapping comments
-      PvlGroup &currentGroup = object.Group(i);
+      PvlGroup &currentGroup = object.group(i);
       bool foundMapping = false;
-      for (int j = 0; j < currentGroup.Comments(); j++) {
-        QString comment = currentGroup.Comment(j);
+      for (int j = 0; j < currentGroup.comments(); j++) {
+        QString comment = currentGroup.comment(j);
         mappingComments.append(comment);
 
         if (comment.contains("MAPPING"))
@@ -307,18 +307,18 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index) {
       else {
         // We found the mapping comments, so now that we've extracted them we
         // can remove them from the former latest selection group
-        currentGroup.GetNameKeyword().ClearComments();
+        currentGroup.nameKeyword().clearComment();
       }
     }
   }
 
   // Add the new group
-  object.Group(index) = group;
+  object.group(index) = group;
 
   // Add all the mapping comments
-  PvlGroup &currentGroup = object.Group(index);
+  PvlGroup &currentGroup = object.group(index);
   for (int i = 0; i < mappingComments.size(); i++)
-    currentGroup.AddComment(mappingComments[i]);
+    currentGroup.addComment(mappingComments[i]);
 
   // Return the location of the new group
   return &currentGroup;

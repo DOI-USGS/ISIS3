@@ -176,11 +176,11 @@ namespace Isis {
     double dLesser = Isis::ValidMaximum;
     double dGreater = 0;
 
-    if (pvlGrp.HasKeyword("LessThan")) {
+    if (pvlGrp.hasKeyword("LessThan")) {
       dLesser = fabs((double)pvlGrp["LessThan"]);
     }
 
-    if (pvlGrp.HasKeyword("GreaterThan")) {
+    if (pvlGrp.hasKeyword("GreaterThan")) {
       dGreater = fabs((double)pvlGrp["GreaterThan"]);
     }
 
@@ -251,11 +251,11 @@ namespace Isis {
     int iLesser  = VALID_MAX2;
     int iGreater = 0;
 
-    if (pvlGrp.HasKeyword("LessThan")) {
+    if (pvlGrp.hasKeyword("LessThan")) {
       iLesser = toInt(pvlGrp["LessThan"][0]);
     }
 
-    if (pvlGrp.HasKeyword("GreaterThan")) {
+    if (pvlGrp.hasKeyword("GreaterThan")) {
       iGreater = toInt(pvlGrp["GreaterThan"][0]);
     }
 
@@ -312,7 +312,7 @@ namespace Isis {
   void ControlNetFilter::PointEditLockFilter(const PvlGroup &pvlGrp, bool pbLastFilter){
     bool editLock = false;
 
-    if (pvlGrp.HasKeyword("EditLock")) {
+    if (pvlGrp.hasKeyword("EditLock")) {
       if(pvlGrp["EditLock"][0] == "1" || IString(pvlGrp["EditLock"][0]).DownCase() == "true")
         editLock = true;
     }
@@ -360,13 +360,13 @@ namespace Isis {
     double dLesser  = Isis::ValidMaximum;
     double dGreater = 0;
 
-    if (pvlGrp.HasKeyword("LessThan")) {
+    if (pvlGrp.hasKeyword("LessThan")) {
       if (pvlGrp["LessThan"][0] != "") { 
         dLesser = fabs((double)pvlGrp["LessThan"]);
       }
     }
 
-    if (pvlGrp.HasKeyword("GreaterThan")) {
+    if (pvlGrp.hasKeyword("GreaterThan")) {
       if (pvlGrp["GreaterThan"][0] != "") { 
         dGreater = fabs((double)pvlGrp["GreaterThan"]);
       }
@@ -492,13 +492,13 @@ namespace Isis {
   void ControlNetFilter::PointMeasuresFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     int  iLesser = VALID_MAX2, iGreater = 0;
 
-    if (pvlGrp.HasKeyword("LessThan")) {
+    if (pvlGrp.hasKeyword("LessThan")) {
       if (pvlGrp["LessThan"][0] != "") { 
         iLesser = toInt(pvlGrp["LessThan"][0]);
       }
     }
 
-    if (pvlGrp.HasKeyword("GreaterThan")) {
+    if (pvlGrp.hasKeyword("GreaterThan")) {
       if (pvlGrp["GreaterThan"][0] != "") { 
         iGreater = toInt(pvlGrp["GreaterThan"][0]);
       }
@@ -557,14 +557,14 @@ namespace Isis {
     IString sType = "";
     IString sTemp = "";
 
-    if (pvlGrp.HasKeyword("PointType")) {
+    if (pvlGrp.hasKeyword("PointType")) {
       if (pvlGrp["PointType"][0] != "") { 
         sType = pvlGrp["PointType"][0];
         sType = sType.DownCase(sType);
       }
     }
 
-    if (pvlGrp.HasKeyword("Ignore")) {
+    if (pvlGrp.hasKeyword("Ignore")) {
       iSetIgnoreFlag = 1;
       sTemp = pvlGrp["Ignore"][0];
       if (sTemp == "1" || sTemp.DownCase() == "true") {
@@ -631,25 +631,25 @@ namespace Isis {
     double dMinLat = Isis::ValidMinimum, dMaxLat = Isis::ValidMaximum;
     double dMinLon = Isis::ValidMinimum, dMaxLon = Isis::ValidMaximum;
 
-    if (pvlGrp.HasKeyword("MinLat")) {
+    if (pvlGrp.hasKeyword("MinLat")) {
       if (pvlGrp["MinLat"][0] != "") { 
         dMinLat = pvlGrp["MinLat"];
       }
     }
 
-    if (pvlGrp.HasKeyword("MaxLat")) {
+    if (pvlGrp.hasKeyword("MaxLat")) {
       if (pvlGrp["MaxLat"][0] != "") { 
         dMaxLat = pvlGrp["MaxLat"];
       }
     }
 
-    if (pvlGrp.HasKeyword("MinLon")) {
+    if (pvlGrp.hasKeyword("MinLon")) {
       if (pvlGrp["MinLon"][0] != "") { 
         dMinLon = pvlGrp["MinLon"];
       }
     }
 
-    if (pvlGrp.HasKeyword("MaxLon")) {
+    if (pvlGrp.hasKeyword("MaxLon")) {
       if (pvlGrp["MaxLon"][0] != "") { 
         dMaxLon = pvlGrp["MaxLon"];
       }
@@ -720,13 +720,13 @@ namespace Isis {
     double dMaxDistance = 0;
     QString sUnits = "pixels";
 
-    if (pvlGrp.HasKeyword("MaxDistance")) {
+    if (pvlGrp.hasKeyword("MaxDistance")) {
       if (pvlGrp["MaxDistance"][0] != "") { 
         dMaxDistance = pvlGrp["MaxDistance"];
       }
     }
 
-    if (pvlGrp.HasKeyword("Units")) {
+    if (pvlGrp.hasKeyword("Units")) {
       sUnits = pvlGrp["Units"][0];
     }
 
@@ -858,13 +858,13 @@ namespace Isis {
   void ControlNetFilter::PointGoodnessOfFitFilter(const PvlGroup & pvlGrp, bool pbLastFilter){
     double dLesser=Isis::ValidMaximum, dGreater=0;
 
-    if (pvlGrp.HasKeyword("LessThan")){
+    if (pvlGrp.hasKeyword("LessThan")){
       if (pvlGrp["LessThan"][0] != "") { 
         dLesser = fabs((double)(pvlGrp["LessThan"]));
       }
     }
 
-    if (pvlGrp.HasKeyword("GreaterThan")){
+    if (pvlGrp.hasKeyword("GreaterThan")){
       if (pvlGrp["GreaterThan"][0] != "") { 
         dGreater = fabs((double)pvlGrp["GreaterThan"]);
       }
@@ -934,13 +934,13 @@ namespace Isis {
     string sType = "";
     IString isType;
 
-    if (pvlGrp.HasKeyword("Ignore")) {
+    if (pvlGrp.hasKeyword("Ignore")) {
       iIgnoredFlag = 0;
       if (IString(pvlGrp["Ignore"][0]).DownCase() == "true")
         iIgnoredFlag = 1;
     }
 
-    if (pvlGrp.HasKeyword("MeasureType")) {
+    if (pvlGrp.hasKeyword("MeasureType")) {
       sType = IString(pvlGrp["MeasureType"][0]).DownCase();
     }
 
@@ -1015,7 +1015,7 @@ namespace Isis {
     std::vector <QString> sCubeNames;
 
     // Store the Cubenames from the PvlGroup
-    for (int i = 0; i < pvlGrp.Keywords(); i++) {
+    for (int i = 0; i < pvlGrp.keywords(); i++) {
       sCubeNames.push_back(pvlGrp[i][0]);
     }
 
@@ -1103,13 +1103,13 @@ namespace Isis {
     double dLesser = Isis::ValidMaximum;
     double dGreater = 0;
 
-    if (pvlGrp.HasKeyword("LessThan")) {
+    if (pvlGrp.hasKeyword("LessThan")) {
       if (pvlGrp["LessThan"][0] != "") { 
         dLesser = fabs((double)pvlGrp["LessThan"]);
       }
     }
 
-    if (pvlGrp.HasKeyword("GreaterThan")) {
+    if (pvlGrp.hasKeyword("GreaterThan")) {
       if (pvlGrp["GreaterThan"][0] != "") { 
         dGreater = fabs((double)pvlGrp["GreaterThan"]);
       }
@@ -1159,7 +1159,7 @@ namespace Isis {
    */
   void ControlNetFilter::CubeNameExpressionFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     QString sCubeExpr("");
-    if (pvlGrp.HasKeyword("Expression")) {
+    if (pvlGrp.hasKeyword("Expression")) {
       sCubeExpr = QString(pvlGrp["Expression"][0]);
     }
 
@@ -1227,12 +1227,12 @@ namespace Isis {
    */
   void ControlNetFilter::CubeNumPointsFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     int iLessPoints = VALID_MAX2, iGreaterPoints = 0;
-    if (pvlGrp.HasKeyword("LessThan")) {
+    if (pvlGrp.hasKeyword("LessThan")) {
       if (pvlGrp["LessThan"][0] != "") { 
         iLessPoints = toInt(pvlGrp["LessThan"][0]);
       }
     }
-    if (pvlGrp.HasKeyword("GreaterThan")) {
+    if (pvlGrp.hasKeyword("GreaterThan")) {
       if (pvlGrp["GreaterThan"][0] != "") { 
         iGreaterPoints = toInt(pvlGrp["GreaterThan"][0]);
       }
@@ -1283,13 +1283,13 @@ namespace Isis {
     double dDistance = 0;
     QString sUnits = "pixels";
 
-    if (pvlGrp.HasKeyword("MaxDistance")) {
+    if (pvlGrp.hasKeyword("MaxDistance")) {
       if (pvlGrp["MaxDistance"][0] != "") { 
         dDistance = pvlGrp["MaxDistance"];
       }
     }
 
-    if (pvlGrp.HasKeyword("Units")) {
+    if (pvlGrp.hasKeyword("Units")) {
       sUnits = pvlGrp["Units"][0];
     }
 

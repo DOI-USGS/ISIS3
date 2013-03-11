@@ -60,14 +60,14 @@ namespace Isis {
   AtmosModel *AtmosModelFactory::Create(Pvl &pvl, PhotoModel &pmodel) {
 
     // Get the algorithm name to create
-    PvlGroup &algo = pvl.FindObject("AtmosphericModel")
-                     .FindGroup("Algorithm", Pvl::Traverse);
+    PvlGroup &algo = pvl.findObject("AtmosphericModel")
+                     .findGroup("Algorithm", Pvl::Traverse);
 
     QString algorithm = "";
-    if(algo.HasKeyword("AtmName")) {
+    if(algo.hasKeyword("AtmName")) {
       algorithm = QString(algo["AtmName"]);
     }
-    else if(algo.HasKeyword("Name")) {
+    else if(algo.hasKeyword("Name")) {
       algorithm = QString(algo["Name"]);
     }
     else {
@@ -80,10 +80,10 @@ namespace Isis {
     Plugin *p = new Plugin;
     FileName f("AtmosModel.plugin");
     if(f.fileExists()) {
-      p->Read("AtmosModel.plugin");
+      p->read("AtmosModel.plugin");
     }
     else {
-      p->Read("$ISISROOT/lib/AtmosModel.plugin");
+      p->read("$ISISROOT/lib/AtmosModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it

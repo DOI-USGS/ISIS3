@@ -67,7 +67,7 @@ void IsisMain() {
   if(ui.GetBoolean("UNLUT") && pdsLab["LRO:LOOKUP_TABLE_TYPE"][0] == "STORED") {
     PvlKeyword lutKeyword = pdsLab["LRO:LOOKUP_CONVERSION_TABLE"];
 
-    for(int i = 0; i < lutKeyword.Size(); i ++) {
+    for(int i = 0; i < lutKeyword.size(); i ++) {
       IString lutPair = lutKeyword[i];
       lutPair.ConvertWhiteSpace();
       lutPair.Remove("() ");
@@ -216,8 +216,8 @@ void IsisMain() {
   PvlKeyword numFrameletsKeyword("NumFramelets", toString(numFramelets));
 
   if(uveven) {
-    for(int grp = 0; grp < isis3UvEvenLab.Groups(); grp++) {
-      uveven->putGroup(isis3UvEvenLab.Group(grp));
+    for(int grp = 0; grp < isis3UvEvenLab.groups(); grp++) {
+      uveven->putGroup(isis3UvEvenLab.group(grp));
     }
 
     History history("IsisCube");
@@ -231,8 +231,8 @@ void IsisMain() {
   }
 
   if(uvodd) {
-    for(int grp = 0; grp < isis3UvOddLab.Groups(); grp++) {
-      uvodd->putGroup(isis3UvOddLab.Group(grp));
+    for(int grp = 0; grp < isis3UvOddLab.groups(); grp++) {
+      uvodd->putGroup(isis3UvOddLab.group(grp));
     }
 
     History history("IsisCube");
@@ -246,8 +246,8 @@ void IsisMain() {
   }
 
   if(viseven) {
-    for(int grp = 0; grp < isis3VisEvenLab.Groups(); grp++) {
-      viseven->putGroup(isis3VisEvenLab.Group(grp));
+    for(int grp = 0; grp < isis3VisEvenLab.groups(); grp++) {
+      viseven->putGroup(isis3VisEvenLab.group(grp));
     }
 
     History history("IsisCube");
@@ -261,8 +261,8 @@ void IsisMain() {
   }
 
   if(visodd) {
-    for(int grp = 0; grp < isis3VisOddLab.Groups(); grp++) {
-      visodd->putGroup(isis3VisOddLab.Group(grp));
+    for(int grp = 0; grp < isis3VisOddLab.groups(); grp++) {
+      visodd->putGroup(isis3VisOddLab.group(grp));
     }
 
     History history("IsisCube");
@@ -457,7 +457,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   // Let's start by running through the generic translations.
 
   // Get the directory where the translation tables are.
-  PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Lro"] + "/translations/";
 
   // Translate the in
@@ -494,32 +494,32 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   genericInstrument.push_back(PvlKeyword("Decompanded", (ui.GetBoolean("UNLUT") ? "Yes" : "No")));
 
   // We'll need the instrument groups a lot, get a reference right to them
-  PvlGroup &visEvenInst = isis3VisEven.FindGroup("Instrument", Pvl::Traverse);
-  PvlGroup &visOddInst = isis3VisOdd.FindGroup("Instrument", Pvl::Traverse);
-  PvlGroup &uvEvenInst = isis3UvEven.FindGroup("Instrument", Pvl::Traverse);
-  PvlGroup &uvOddInst = isis3UvOdd.FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &visEvenInst = isis3VisEven.findGroup("Instrument", Pvl::Traverse);
+  PvlGroup &visOddInst = isis3VisOdd.findGroup("Instrument", Pvl::Traverse);
+  PvlGroup &uvEvenInst = isis3UvEven.findGroup("Instrument", Pvl::Traverse);
+  PvlGroup &uvOddInst = isis3UvOdd.findGroup("Instrument", Pvl::Traverse);
 
   // Add user parameters to the instrument group
   for(unsigned int key = 0; key < genericInstrument.size(); key++) {
-    visEvenInst.AddKeyword(genericInstrument[key]);
-    visOddInst.AddKeyword(genericInstrument[key]);
-    uvEvenInst.AddKeyword(genericInstrument[key]);
-    uvOddInst.AddKeyword(genericInstrument[key]);
+    visEvenInst.addKeyword(genericInstrument[key]);
+    visOddInst.addKeyword(genericInstrument[key]);
+    uvEvenInst.addKeyword(genericInstrument[key]);
+    uvOddInst.addKeyword(genericInstrument[key]);
   }
 
   // add labels unique to particular files
   if(viseven) {
-    visEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    visEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(viseven->lineCount() / 14)));
-    visEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
-    visEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+    visEvenInst.addKeyword(PvlKeyword("Framelets", "Even"));
+    visEvenInst.addKeyword(PvlKeyword("NumFramelets", toString(viseven->lineCount() / 14)));
+    visEvenInst.addKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
+    visEvenInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(visodd) {
-    visOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    visOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(visodd->lineCount() / 14)));
-    visOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
-    visOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+    visOddInst.addKeyword(PvlKeyword("Framelets", "Odd"));
+    visOddInst.addKeyword(PvlKeyword("NumFramelets", toString(visodd->lineCount() / 14)));
+    visOddInst.addKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
+    visOddInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   // **TEMPORARY. This should be done by a translation table.
@@ -533,17 +533,17 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
     visWavelength = pdsLab["CENTER_FILTER_WAVELENGTH"][0];
     visFilterNum = pdsLab["FILTER_NUMBER"][0];
 
-    if(pdsLab.HasKeyword("BANDWIDTH")) {
+    if(pdsLab.hasKeyword("BANDWIDTH")) {
       visBandwidth = pdsLab["BANDWIDTH"][0];
     }
   }
   else {
-    for(int i = 0; i < pdsLab["FILTER_NUMBER"].Size(); i++) {
+    for(int i = 0; i < pdsLab["FILTER_NUMBER"].size(); i++) {
       if(toInt(pdsLab["FILTER_NUMBER"][i]) > 2) {
         visWavelength += pdsLab["CENTER_FILTER_WAVELENGTH"][i];
         visFilterNum += pdsLab["FILTER_NUMBER"][i];
 
-        if(pdsLab.HasKeyword("BANDWIDTH")) {
+        if(pdsLab.hasKeyword("BANDWIDTH")) {
           visBandwidth += pdsLab["BANDWIDTH"][i];
         }
       }
@@ -553,7 +553,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   visBandBin += visFilterNum;
   visBandBin += visWavelength;
 
-  if(visBandwidth.Size() != 0) {
+  if(visBandwidth.size() != 0) {
     visBandBin += visBandwidth;
   }
 
@@ -566,17 +566,17 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   isis3VisOdd += visKerns;
 
   if(uveven) {
-    uvEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    uvEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(uveven->lineCount() / 4)));
-    uvEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
-    uvEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+    uvEvenInst.addKeyword(PvlKeyword("Framelets", "Even"));
+    uvEvenInst.addKeyword(PvlKeyword("NumFramelets", toString(uveven->lineCount() / 4)));
+    uvEvenInst.addKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
+    uvEvenInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(uvodd) {
-    uvOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    uvOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(uvodd->lineCount() / 4)));
-    uvOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
-    uvOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
+    uvOddInst.addKeyword(PvlKeyword("Framelets", "Odd"));
+    uvOddInst.addKeyword(PvlKeyword("NumFramelets", toString(uvodd->lineCount() / 4)));
+    uvOddInst.addKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
+    uvOddInst.addKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   // Translate the BandBin group
@@ -585,12 +585,12 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   PvlKeyword uvFilterNum("FilterNumber");
   PvlKeyword uvBandwidth("Width");
 
-  for(int i = 0; i < pdsLab["FILTER_NUMBER"].Size(); i++) {
+  for(int i = 0; i < pdsLab["FILTER_NUMBER"].size(); i++) {
     if(toInt(pdsLab["FILTER_NUMBER"][i]) <= 2) {
       uvWavelength += pdsLab["CENTER_FILTER_WAVELENGTH"][i];
       uvFilterNum += pdsLab["FILTER_NUMBER"][i];
 
-      if(pdsLab.HasKeyword("BANDWIDTH")) {
+      if(pdsLab.hasKeyword("BANDWIDTH")) {
         uvBandwidth += pdsLab["BANDWIDTH"][i];
       }
     }
@@ -599,7 +599,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   uvBandBin += uvFilterNum;
   uvBandBin += uvWavelength;
 
-  if(uvBandwidth.Size() != 0) {
+  if(uvBandwidth.size() != 0) {
     uvBandBin += uvBandwidth;
   }
 
@@ -670,45 +670,45 @@ void ValidateInputLabels(Pvl &pdsLab) {
     // Check known values first to verify they match
     PvlKeyword &lut = pdsLab["LRO:LOOKUP_CONVERSION_TABLE"];
 
-    if(lut.Size() != 256) {
+    if(lut.size() != 256) {
       QString msg = "Keyword [LRO:LOOKUP_CONVERSION_TABLE] has the wrong number of values";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlKeyword &missionName = pdsLab["MISSION_NAME"];
 
-    if(missionName.Size() != 1 || missionName[0] != "LUNAR RECONNAISSANCE ORBITER") {
+    if(missionName.size() != 1 || missionName[0] != "LUNAR RECONNAISSANCE ORBITER") {
       QString msg = "Keyword [MISSION_NAME] does not have a value of [LUNAR RECONNAISSANCER ORBITER]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlKeyword &instrumentId = pdsLab["INSTRUMENT_ID"];
 
-    if(instrumentId.Size() != 1 || instrumentId[0] != "LROC") {
+    if(instrumentId.size() != 1 || instrumentId[0] != "LROC") {
       QString msg = "Keyword [INSTRUMENT_ID] does not have a value of [LROC]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Make sure CENTER_FILTER_WAVELENGTH/FILTER_NUMBER makes sense
-    if(pdsLab["FILTER_NUMBER"].Size() != pdsLab["CENTER_FILTER_WAVELENGTH"].Size()) {
+    if(pdsLab["FILTER_NUMBER"].size() != pdsLab["CENTER_FILTER_WAVELENGTH"].size()) {
       QString msg = "Keywords [FILTER_NUMBER,CENTER_FILTER_WAVELENGTH] must have the same number of values";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    if(pdsLab["INSTRUMENT_MODE_ID"][0] == "BW" && pdsLab["FILTER_NUMBER"].Size() != 1) {
+    if(pdsLab["INSTRUMENT_MODE_ID"][0] == "BW" && pdsLab["FILTER_NUMBER"].size() != 1) {
       QString msg = "Keyword [FILTER_NUMBER] must have size 1 if [INSTRUMENT_MODE_ID] is [BW]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-    else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "COLOR" && (pdsLab["FILTER_NUMBER"].Size() < 5
-            || pdsLab["FILTER_NUMBER"].Size() > 7 || pdsLab["FILTER_NUMBER"].Size() == 6)) {
+    else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "COLOR" && (pdsLab["FILTER_NUMBER"].size() < 5
+            || pdsLab["FILTER_NUMBER"].size() > 7 || pdsLab["FILTER_NUMBER"].size() == 6)) {
       QString msg = "Keyword [FILTER_NUMBER] must have size 5 or 7 if [INSTRUMENT_MODE_ID] is [COLOR]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-    else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "UV" && pdsLab["FILTER_NUMBER"].Size() != 2) {
+    else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "UV" && pdsLab["FILTER_NUMBER"].size() != 2) {
       QString msg = "Keyword [FILTER_NUMBER] must have size 2 if [INSTRUMENT_MODE_ID] is [UV]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-    else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "VIS" && pdsLab["FILTER_NUMBER"].Size() != 5) {
+    else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "VIS" && pdsLab["FILTER_NUMBER"].size() != 5) {
       QString msg = "Keyword [FILTER_NUMBER] must have size 5 if [INSTRUMENT_MODE_ID] is [VIS]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -728,7 +728,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     filters.push_back(pair<int, QString>(6, "643"));
     filters.push_back(pair<int, QString>(7, "689"));
 
-    for(int i = 0; i < pdsLab["FILTER_NUMBER"].Size(); i++) {
+    for(int i = 0; i < pdsLab["FILTER_NUMBER"].size(); i++) {
       bool found = false;
       bool match = false;
       for(int j = 0; !found && j < (int) filters.size(); j++) {
@@ -756,7 +756,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     };
 
     for(unsigned int i = 0; i < sizeof(QString) / sizeof(invalidKeywords); i++) {
-      if(pdsLab.HasKeyword(invalidKeywords[i])) {
+      if(pdsLab.hasKeyword(invalidKeywords[i])) {
         QString msg = "Keyword [";
         msg += invalidKeywords[i];
         msg += "] must not exist";
@@ -768,7 +768,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     PvlKeyword &orbitNumber = pdsLab["ORBIT_NUMBER"];
     QRegExp integerRegex("[0-9]+");
 
-    if(orbitNumber.Size() != 1 || !integerRegex.exactMatch(orbitNumber[0])) {
+    if(orbitNumber.size() != 1 || !integerRegex.exactMatch(orbitNumber[0])) {
       QString msg = "The value of keyword [ORBIT_NUMBER] is not valid";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -787,7 +787,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     };
 
     for(unsigned int i = 0; i < sizeof(numericKeywords) / sizeof(QString); i++) {
-      if(pdsLab[numericKeywords[i]].Size() != 1 || !numberRegex.exactMatch(pdsLab[numericKeywords[i]][0])) {
+      if(pdsLab[numericKeywords[i]].size() != 1 || !numberRegex.exactMatch(pdsLab[numericKeywords[i]][0])) {
         QString msg = "The value of keyword [";
         msg += numericKeywords[i];
         msg += "] is not valid";
@@ -803,7 +803,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     };
 
     for(unsigned int i = 0; i < sizeof(timeKeywords) / sizeof(QString); i++) {
-      if(pdsLab[timeKeywords[i]].Size() != 1 || !timeRegex.exactMatch(pdsLab[timeKeywords[i]][0])) {
+      if(pdsLab[timeKeywords[i]].size() != 1 || !timeRegex.exactMatch(pdsLab[timeKeywords[i]][0])) {
         QString msg = "The value of keyword [";
         msg += timeKeywords[i];
         msg += "] is not valid";
@@ -819,7 +819,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     };
 
     for(unsigned int i = 0; i < sizeof(clockKeywords) / sizeof(QString); i++) {
-      if(pdsLab[clockKeywords[i]].Size() != 1 || !clockRegex.exactMatch(pdsLab[clockKeywords[i]][0])) {
+      if(pdsLab[clockKeywords[i]].size() != 1 || !clockRegex.exactMatch(pdsLab[clockKeywords[i]][0])) {
         QString msg = "The value of keyword [";
         msg += clockKeywords[i];
         msg += "] is not valid";

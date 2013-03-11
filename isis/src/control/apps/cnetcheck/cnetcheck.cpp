@@ -241,7 +241,7 @@ void IsisMain() {
 
   stringstream ss(stringstream::in | stringstream::out);
 
-  results.AddKeyword(PvlKeyword("Islands", toString((BigInt)islands.size())));
+  results.addKeyword(PvlKeyword("Islands", toString((BigInt)islands.size())));
   ss << endl << "----------------------------------------" \
      "----------------------------------------" << endl;
   if (islands.size() == 1) {
@@ -257,7 +257,7 @@ void IsisMain() {
   }
 
   if (ui.GetBoolean("SINGLEMEASURE")  &&  singleMeasureSerialNumbers.size() > 0) {
-    results.AddKeyword(
+    results.addKeyword(
       PvlKeyword("SingleMeasure", toString((BigInt)singleMeasureSerialNumbers.size())));
 
     QString name(FileName(prefix + "SinglePointCubes.txt").expanded());
@@ -275,7 +275,7 @@ void IsisMain() {
   }
 
   if (ui.GetBoolean("NOLATLON")  &&  noLatLonSerialNumbers.size() > 0) {
-    results.AddKeyword(
+    results.addKeyword(
       PvlKeyword("NoLatLonCubes", toString((BigInt)noLatLonSerialNumbers.size())));
 
     QString name(FileName(prefix + "NoLatLon.txt").expanded());
@@ -331,7 +331,7 @@ void IsisMain() {
       ss << "The names of these images, along with the failing convex hull "
         "coverages, are listed in [" << FileName(name).name() << "]" << endl;
 
-      results.AddKeyword(
+      results.addKeyword(
           PvlKeyword(coverageOp, toString((BigInt) failedCoverageCheck)));
     }
   }
@@ -339,7 +339,7 @@ void IsisMain() {
   // At this point, inListNums is the list of cubes NOT included in the
   //  ControlNet, and inListNums are their those cube's serial numbers.
   if (ui.GetBoolean("NOCONTROL") && !inListNums.empty()) {
-    results.AddKeyword(PvlKeyword("NoControl", toString((BigInt)inListNums.size())));
+    results.addKeyword(PvlKeyword("NoControl", toString((BigInt)inListNums.size())));
 
     QString name(FileName(prefix + "NoControl.txt").expanded());
     ofstream out_stream;
@@ -366,7 +366,7 @@ void IsisMain() {
   //  ControlMeasures in the ControlNet that do not have a correlating
   //  cube in the input list.
   if (ui.GetBoolean("NOCUBE")  &&  nonListedSerialNumbers.size() > 0) {
-    results.AddKeyword(
+    results.addKeyword(
       PvlKeyword("NoCube", toString((BigInt)nonListedSerialNumbers.size())));
 
     QString name(FileName(prefix + "NoCube.txt").expanded());
@@ -408,7 +408,7 @@ void IsisMain() {
     }
 
     if (singleMeasureCubes.size() > 0) {
-      results.AddKeyword(
+      results.addKeyword(
         PvlKeyword("SingleCube", toString((BigInt)singleMeasureCubes.size())));
 
       QString name(FileName(prefix + "SingleCube.txt").expanded());

@@ -41,33 +41,33 @@ inline double SetRound(double value, const int precision) {
 
 inline void ValidateUnit(PvlKeyword &key, const QString &kunit) {
   PvlKeyword temp = key;
-  key.Clear();
-  for(int i = 0 ; i < temp.Size() ; i++) {
+  key.clear();
+  for(int i = 0 ; i < temp.size() ; i++) {
     try {
       //  If this works, check unit, otherwise an exception is thrown
       (void) toDouble(temp[i]);
-      QString unit = temp.Unit(i);
+      QString unit = temp.unit(i);
       if(unit.isEmpty()) unit = kunit;
-      key.AddValue(temp[i], unit);
+      key.addValue(temp[i], unit);
     }
     catch(...) {
-      key.AddValue(temp[i]);
+      key.addValue(temp[i]);
     }
   }
   return;
 }
 
 inline void FixUnit(PvlObject &obj, const QString &key, const QString &unit) {
-  if(obj.HasKeyword(key, PvlObject::Traverse)) {
-    ValidateUnit(obj.FindKeyword(key, PvlObject::Traverse), unit);
+  if(obj.hasKeyword(key, PvlObject::Traverse)) {
+    ValidateUnit(obj.findKeyword(key, PvlObject::Traverse), unit);
   }
   return;
 }
 
 inline void FixQuotes(PvlContainer &kcont, const QString &value = "N/A") {
   PvlContainer::PvlKeywordIterator kiter;
-  for(kiter = kcont.Begin() ; kiter != kcont.End() ; ++kiter) {
-    for(int nv = 0 ; nv < kiter->Size() ; nv++) {
+  for(kiter = kcont.begin() ; kiter != kcont.end() ; ++kiter) {
+    for(int nv = 0 ; nv < kiter->size() ; nv++) {
       if((*kiter)[nv] == value)(*kiter)[nv] = Quote((*kiter)[nv]);
     }
   }
@@ -79,13 +79,13 @@ inline void FixLabels(PvlObject &obj) {
 
   // Fix all nested objects
   PvlObject::PvlObjectIterator o;
-  for(o = obj.BeginObject() ; o != obj.EndObject() ; ++o) {
+  for(o = obj.beginObject() ; o != obj.endObject() ; ++o) {
     FixLabels(*o);
   }
 
   // Fix local groups
   PvlObject::PvlGroupIterator g;
-  for(g = obj.BeginGroup() ; g != obj.EndGroup() ; ++g) {
+  for(g = obj.beginGroup() ; g != obj.endGroup() ; ++g) {
     FixQuotes(*g);
   }
   return;
@@ -135,8 +135,8 @@ void IsisMain() {
   try {
     Pvl phoLabel(pfile);
     BandMap bandmap;
-    PvlKeyword bn = phoLabel.FindGroup("BandBin", Pvl::Traverse)["Name"];
-    for(int i = 0 ; i < bn.Size() ; i++) {
+    PvlKeyword bn = phoLabel.findGroup("BandBin", Pvl::Traverse)["Name"];
+    for(int i = 0 ; i < bn.size() ; i++) {
       bandmap.add(bn[i], i + 1);
     }
 
@@ -192,12 +192,12 @@ void IsisMain() {
     from.read(origBlob);
     Pvl origLabel;
     PvlObject origLabelObj = origBlob.ReturnLabels();
-    origLabelObj.SetName("OriginalLabelObject");
-    origLabel.AddObject(origLabelObj);
+    origLabelObj.setName("OriginalLabelObject");
+    origLabel.addObject(origLabelObj);
     p.CheckStatus();
 
     // Translates the ISIS labels along with the original EDR labels
-    origLabel.AddObject(*from.label());
+    origLabel.addObject(*from.label());
     PvlTranslationManager labels(origLabel,
                                  "$messenger/translations/mdisDDRLabel.trn");
     labels.Auto(pdsLabel);
@@ -211,19 +211,19 @@ void IsisMain() {
     pdsLabel += PvlKeyword("SPACECRAFT_NAME", Quote("MESSENGER"));
 
     // Fixes bad keywords
-    PvlKeyword &data_set_id = pdsLabel.FindKeyword("DATA_SET_ID", Pvl::Traverse);
-    data_set_id.SetValue(dataSetID);
+    PvlKeyword &data_set_id = pdsLabel.findKeyword("DATA_SET_ID", Pvl::Traverse);
+    data_set_id.setValue(dataSetID);
     QString prodid(input.baseName());
-    PvlKeyword &product_id = pdsLabel.FindKeyword("PRODUCT_ID", Pvl::Traverse);
-    if((product_id.Size() == 0) || ((product_id.Size() > 0) && (product_id[0] == "N/A"))) {
-      product_id.SetValue(prodid);
+    PvlKeyword &product_id = pdsLabel.findKeyword("PRODUCT_ID", Pvl::Traverse);
+    if((product_id.size() == 0) || ((product_id.size() > 0) && (product_id[0] == "N/A"))) {
+      product_id.setValue(prodid);
     }
     else {
       QString pid = product_id[0];
       pid[0] = 'D';
       pid.remove(QRegExp("_.*"));
       pid.append("_DE_0");
-      product_id.SetValue(pid);
+      product_id.setValue(pid);
       prodid = pid;
     }
 
@@ -233,67 +233,67 @@ void IsisMain() {
     output = output.addExtension("IMG");
     if(!toEntered) ui.PutFileName("TO", output.expanded());
 
-    PvlKeyword &product_creation_time = pdsLabel.FindKeyword("PRODUCT_CREATION_TIME", Pvl::Traverse);
-    product_creation_time.SetValue(mdisddr_runtime);
+    PvlKeyword &product_creation_time = pdsLabel.findKeyword("PRODUCT_CREATION_TIME", Pvl::Traverse);
+    product_creation_time.setValue(mdisddr_runtime);
 
-    PvlKeyword &software_name = pdsLabel.FindKeyword("SOFTWARE_NAME", Pvl::Traverse);
-    software_name.SetValue(mdisddr_program);
+    PvlKeyword &software_name = pdsLabel.findKeyword("SOFTWARE_NAME", Pvl::Traverse);
+    software_name.setValue(mdisddr_program);
 
-    PvlKeyword &software_version_id = pdsLabel.FindKeyword("SOFTWARE_VERSION_ID", Pvl::Traverse);
-    software_version_id.SetValue(Quote(mdisddr_version));
+    PvlKeyword &software_version_id = pdsLabel.findKeyword("SOFTWARE_VERSION_ID", Pvl::Traverse);
+    software_version_id.setValue(Quote(mdisddr_version));
 
-    PvlKeyword &filter_number = pdsLabel.FindKeyword("FILTER_NUMBER", Pvl::Traverse);
-    if((filter_number.Size() > 0)) {
-      filter_number.SetValue(Quote(filter_number[0]));
+    PvlKeyword &filter_number = pdsLabel.findKeyword("FILTER_NUMBER", Pvl::Traverse);
+    if((filter_number.size() > 0)) {
+      filter_number.setValue(Quote(filter_number[0]));
     }
 
 
     // Add quotes
-    PvlKeyword &data_quality_id = pdsLabel.FindKeyword("DATA_QUALITY_ID", Pvl::Traverse);
-    data_quality_id.SetValue(Quote(data_quality_id));
-    PvlKeyword &sequence_name = pdsLabel.FindKeyword("SEQUENCE_NAME", Pvl::Traverse);
-    sequence_name.SetValue(Quote(sequence_name));
-    PvlKeyword &start_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_START_COUNT", Pvl::Traverse);
-    start_count.SetValue(Quote(start_count));
-    PvlKeyword &stop_count = pdsLabel.FindKeyword("SPACECRAFT_CLOCK_STOP_COUNT", Pvl::Traverse);
-    stop_count.SetValue(Quote(stop_count));
+    PvlKeyword &data_quality_id = pdsLabel.findKeyword("DATA_QUALITY_ID", Pvl::Traverse);
+    data_quality_id.setValue(Quote(data_quality_id));
+    PvlKeyword &sequence_name = pdsLabel.findKeyword("SEQUENCE_NAME", Pvl::Traverse);
+    sequence_name.setValue(Quote(sequence_name));
+    PvlKeyword &start_count = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT", Pvl::Traverse);
+    start_count.setValue(Quote(start_count));
+    PvlKeyword &stop_count = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT", Pvl::Traverse);
+    stop_count.setValue(Quote(stop_count));
 
     //  For DDRs, the SOURCE_PRODUCT_ID is made up of SPICE kernels.  I need to
     //  go get em.
     Kernels kernels(from);
     QStringList kfiles = kernels.getKernelList();
-    PvlKeyword &source_product_id = pdsLabel.FindKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
-    source_product_id.Clear();
+    PvlKeyword &source_product_id = pdsLabel.findKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
+    source_product_id.clear();
     for(int i = 0; i < kfiles.size(); i++) {
       FileName kfile(kfiles[i]);
-      source_product_id.AddValue(Quote(kfile.name()));
+      source_product_id.addValue(Quote(kfile.name()));
     }
 
     //  Enforce parentheses for scalars
-    if(source_product_id.Size() == 1)
-      source_product_id.SetValue('(' + source_product_id[0] + ')');
+    if(source_product_id.size() == 1)
+      source_product_id.setValue('(' + source_product_id[0] + ')');
 
     // Removes keywords
-    PvlObject imageObject(pdsLabel.FindObject("IMAGE"));
-    if(imageObject.HasKeyword("CENTER_FILTER_WAVELENGTH")) imageObject.DeleteKeyword("CENTER_FILTER_WAVELENGTH");
-    if(imageObject.HasKeyword("BANDWIDTH")) imageObject.DeleteKeyword("BANDWIDTH");
-    if(imageObject.HasKeyword("UNIT")) imageObject.DeleteKeyword("UNIT");
-    if(imageObject.HasKeyword("DARK_STRIP_MEAN")) imageObject.DeleteKeyword("DARK_STRIP_MEAN");
-    if(imageObject.HasKeyword("OFFSET")) imageObject.DeleteKeyword("OFFSET");
-    if(imageObject.HasKeyword("SCALING_FACTOR")) imageObject.DeleteKeyword("SCALING_FACTOR");
-    if(imageObject.HasKeyword("SAMPLE_BIT_MASK")) imageObject.DeleteKeyword("SAMPLE_BIT_MASK");
+    PvlObject imageObject(pdsLabel.findObject("IMAGE"));
+    if(imageObject.hasKeyword("CENTER_FILTER_WAVELENGTH")) imageObject.deleteKeyword("CENTER_FILTER_WAVELENGTH");
+    if(imageObject.hasKeyword("BANDWIDTH")) imageObject.deleteKeyword("BANDWIDTH");
+    if(imageObject.hasKeyword("UNIT")) imageObject.deleteKeyword("UNIT");
+    if(imageObject.hasKeyword("DARK_STRIP_MEAN")) imageObject.deleteKeyword("DARK_STRIP_MEAN");
+    if(imageObject.hasKeyword("OFFSET")) imageObject.deleteKeyword("OFFSET");
+    if(imageObject.hasKeyword("SCALING_FACTOR")) imageObject.deleteKeyword("SCALING_FACTOR");
+    if(imageObject.hasKeyword("SAMPLE_BIT_MASK")) imageObject.deleteKeyword("SAMPLE_BIT_MASK");
 
     // Add band names to image object
-    PvlKeyword &bandNames = imageObject.FindKeyword("FILTER_NAME");
-    bandNames.SetName("BAND_NAME");
-    bandNames.Clear();
-    bandNames.AddValue("Latitude, planetocentric, deg N");
-    bandNames.AddValue("Longitude, planetocentric, deg E");
-    bandNames.AddValue("Incidence angle at equipotential surface, deg");
-    bandNames.AddValue("Emission angle at equipotential surface, deg");
-    bandNames.AddValue("Phase angle at equipotential surface, deg");
-    pdsLabel.DeleteObject("IMAGE");
-    pdsLabel.AddObject(imageObject);
+    PvlKeyword &bandNames = imageObject.findKeyword("FILTER_NAME");
+    bandNames.setName("BAND_NAME");
+    bandNames.clear();
+    bandNames.addValue("Latitude, planetocentric, deg N");
+    bandNames.addValue("Longitude, planetocentric, deg E");
+    bandNames.addValue("Incidence angle at equipotential surface, deg");
+    bandNames.addValue("Emission angle at equipotential surface, deg");
+    bandNames.addValue("Phase angle at equipotential surface, deg");
+    pdsLabel.deleteObject("IMAGE");
+    pdsLabel.addObject(imageObject);
 
     p.CheckStatus();
 
@@ -307,10 +307,10 @@ void IsisMain() {
     for(int i = 1 ; i <= 5 ; i++) {
       QString n(toString(i));
       QString group = "SUBFRAME" + n + "_PARAMETERS";
-      if(pdsLabel.HasGroup(group)) {
-        PvlGroup &grp = pdsLabel.FindGroup(group);
-        ValidateUnit(grp.FindKeyword("RETICLE_POINT_LATITUDE"), "DEG");
-        ValidateUnit(grp.FindKeyword("RETICLE_POINT_LONGITUDE"), "DEG");
+      if(pdsLabel.hasGroup(group)) {
+        PvlGroup &grp = pdsLabel.findGroup(group);
+        ValidateUnit(grp.findKeyword("RETICLE_POINT_LATITUDE"), "DEG");
+        ValidateUnit(grp.findKeyword("RETICLE_POINT_LONGITUDE"), "DEG");
       }
     }
     p.CheckStatus();
@@ -321,7 +321,7 @@ void IsisMain() {
     p.CheckStatus();
 
     // All done...write result.
-    pdsLabel.SetFormatTemplate("$messenger/templates/labels/mdisPdsDDR.pft");
+    pdsLabel.setFormatTemplate("$messenger/templates/labels/mdisPdsDDR.pft");
     QString ofile(output.expanded());
     ofstream outstream(ofile.toAscii().data());
     processPds.OutputLabel(outstream);

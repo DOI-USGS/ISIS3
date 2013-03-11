@@ -65,7 +65,7 @@ namespace Isis {
       // We don't need old Write methods... since this wasn't already
       //   implemented I'm not going to bother to implement it now.
       virtual void Write(const FileName &file) const {};
-      virtual Pvl ToPvl() const;
+      virtual Pvl toPvl() const;
 
       /**
        * Retrieve the protocol buffer that encapsulates the entire control

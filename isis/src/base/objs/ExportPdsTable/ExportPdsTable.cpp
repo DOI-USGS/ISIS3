@@ -143,22 +143,22 @@ namespace Isis {
     // Data Object Descriptions
     // NOTE: this class is currently only exporting BINARY format PDS tables.
     //       implementation may be added later to export ASCII PDS tables.
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("INTERCHANGE_FORMAT", "BINARY"));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROWS", toString(m_isisTable->Records())));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("COLUMNS", toString(m_isisTable->RecordFields())));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROW_BYTES", toString(m_rowBytes)));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROW_SUFFIX_BYTES", toString(m_outputRecordBytes - m_rowBytes)));
+    pdsTableLabelInfo.addKeyword(PvlKeyword("INTERCHANGE_FORMAT", "BINARY"));
+    pdsTableLabelInfo.addKeyword(PvlKeyword("ROWS", toString(m_isisTable->Records())));
+    pdsTableLabelInfo.addKeyword(PvlKeyword("COLUMNS", toString(m_isisTable->RecordFields())));
+    pdsTableLabelInfo.addKeyword(PvlKeyword("ROW_BYTES", toString(m_rowBytes)));
+    pdsTableLabelInfo.addKeyword(PvlKeyword("ROW_SUFFIX_BYTES", toString(m_outputRecordBytes - m_rowBytes)));
     int startByte = 1;  // PDS begins indexing at 1 
     for(int fieldIndex = 0; fieldIndex < m_isisTable->RecordFields(); fieldIndex++) {
       int columnBytes = 0;
       TableField field = (*m_isisTable)[0][fieldIndex];
       PvlObject columnObj("COLUMN");
-      columnObj.AddKeyword(PvlKeyword("COLUMN_NUMBER", toString(fieldIndex + 1)));
-      columnObj.AddKeyword(PvlKeyword("NAME", field.name()));
+      columnObj.addKeyword(PvlKeyword("COLUMN_NUMBER", toString(fieldIndex + 1)));
+      columnObj.addKeyword(PvlKeyword("NAME", field.name()));
 
 
       if (field.type() == TableField::Text) {
-        columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "CHARACTER"));
+        columnObj.addKeyword(PvlKeyword("DATA_TYPE", "CHARACTER"));
         QString val = field;
         for(int i = 0; i < field.size(); i++) {
           columnBytes++;
@@ -166,34 +166,34 @@ namespace Isis {
       }
       else if (field.type() == TableField::Integer) {
         if (m_pdsByteOrder == "MSB") {
-          columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "MSB_INTEGER"));
+          columnObj.addKeyword(PvlKeyword("DATA_TYPE", "MSB_INTEGER"));
           columnBytes = sizeof(int);
         }
         else { // if (m_pdsByteOrder == "LSB") { 
                // no need to check this. already validated in exportPdsTable()
-          columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "LSB_INTEGER"));
+          columnObj.addKeyword(PvlKeyword("DATA_TYPE", "LSB_INTEGER"));
           columnBytes = sizeof(int);
         }
       }
       else if (field.type() == TableField::Double) {
         if (m_pdsByteOrder == "MSB") {
-          columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "IEEE_REAL"));
+          columnObj.addKeyword(PvlKeyword("DATA_TYPE", "IEEE_REAL"));
           columnBytes = sizeof(double);
         }
         else { // if (m_pdsByteOrder == "LSB") {
                // no need to check this. already validated in exportPdsTable()
-          columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "PC_REAL"));
+          columnObj.addKeyword(PvlKeyword("DATA_TYPE", "PC_REAL"));
           columnBytes = sizeof(double);
         }
       }
       else if (field.type() == TableField::Real) {
         if (m_pdsByteOrder == "MSB") {
-          columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "IEEE_REAL"));
+          columnObj.addKeyword(PvlKeyword("DATA_TYPE", "IEEE_REAL"));
           columnBytes = sizeof(float);
         }
         else { // if (m_pdsByteOrder == "LSB") {
                // no need to check this. already validated in exportPdsTable()
-          columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "PC_REAL"));
+          columnObj.addKeyword(PvlKeyword("DATA_TYPE", "PC_REAL"));
           columnBytes = sizeof(float);
         }
       }
@@ -204,10 +204,10 @@ namespace Isis {
                       "field type found for [" + field.name() + "].";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-      columnObj.AddKeyword(PvlKeyword("START_BYTE", toString(startByte)));
+      columnObj.addKeyword(PvlKeyword("START_BYTE", toString(startByte)));
       startByte += columnBytes;
-      columnObj.AddKeyword(PvlKeyword("BYTES", toString(columnBytes)));
-      pdsTableLabelInfo.AddObject(columnObj);
+      columnObj.addKeyword(PvlKeyword("BYTES", toString(columnBytes)));
+      pdsTableLabelInfo.addObject(columnObj);
     }
     return pdsTableLabelInfo;
   } 

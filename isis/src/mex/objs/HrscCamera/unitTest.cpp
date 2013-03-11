@@ -61,7 +61,7 @@ int main(void) {
 
     Pvl p("$mex/testData/h2254_0000_s12.cub");
     Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "FileName: " << FileName(p.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

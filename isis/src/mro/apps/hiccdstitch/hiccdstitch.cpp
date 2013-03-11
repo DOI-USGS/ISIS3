@@ -140,9 +140,9 @@ void IsisMain() {
 
 //  Open the shift definitions file
   Pvl shiftdef;
-  shiftdef.Read(ui.GetFileName("SHIFTDEF"));
+  shiftdef.read(ui.GetFileName("SHIFTDEF"));
 
-  PvlObject &stitch = shiftdef.FindObject("Hiccdstitch", Pvl::Traverse);
+  PvlObject &stitch = shiftdef.findObject("Hiccdstitch", Pvl::Traverse);
 
   // Get information about each of the input cubes
   bool gotRed = false;
@@ -157,7 +157,7 @@ void IsisMain() {
     Cube *cube = new Cube();
     cube->open(list[i].toString());
 
-    PvlGroup arch = cube->label()->FindGroup("Archive", Pvl::Traverse);
+    PvlGroup arch = cube->label()->findGroup("Archive", Pvl::Traverse);
     if(first) {
       obsId = (QString) arch["ObservationId"];
       first = false;
@@ -170,7 +170,7 @@ void IsisMain() {
       }
     }
 
-    PvlGroup inst = cube->label()->FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = cube->label()->findGroup("Instrument", Pvl::Traverse);
     int chan = inst["ChannelNumber"];
     if(chan != 2) {
       QString msg = "Input file " + list[i].toString() + " contains a single channel";
@@ -226,24 +226,24 @@ void IsisMain() {
                      toString(CCDinfo.tdi);
 
     QString ccdId = ccdNames[ccd];
-    if(stitch.HasObject(ccdId)) {
-      PvlObject &ccddef = stitch.FindObject(ccdId, Pvl::Traverse);
-      if(ccddef.HasKeyword("MosaicOrder")) {
+    if(stitch.hasObject(ccdId)) {
+      PvlObject &ccddef = stitch.findObject(ccdId, Pvl::Traverse);
+      if(ccddef.hasKeyword("MosaicOrder")) {
         CCDinfo.mosOrder = (int) ccddef["MosaicOrder"];
       }
-      if(ccddef.HasKeyword("SampleOffset")) {
+      if(ccddef.hasKeyword("SampleOffset")) {
         CCDinfo.fpsamp = xoffset[ccd] + (int) ccddef["SampleOffset"];
       }
-      if(ccddef.HasKeyword("LineOffset")) {
+      if(ccddef.hasKeyword("LineOffset")) {
         CCDinfo.fpline = yoffset[ccd] + (int) ccddef["LineOffset"];
       }
       //  See if there is a binning group
-      if(ccddef.HasGroup(sumTdi)) {
-        PvlGroup &sumGroup = ccddef.FindGroup(sumTdi);
-        if(sumGroup.HasKeyword("SampleOffset")) {
+      if(ccddef.hasGroup(sumTdi)) {
+        PvlGroup &sumGroup = ccddef.findGroup(sumTdi);
+        if(sumGroup.hasKeyword("SampleOffset")) {
           CCDinfo.fpsamp = xoffset[ccd] + (int) sumGroup["SampleOffset"];
         }
-        if(sumGroup.HasKeyword("LineOffset")) {
+        if(sumGroup.hasKeyword("LineOffset")) {
           CCDinfo.fpline = yoffset[ccd] + (int) sumGroup["LineOffset"];
         }
       }
@@ -349,8 +349,8 @@ void IsisMain() {
 
   //  Delete ChannelNumber and CpmmNumber so that the output cannot be projected.
   PvlGroup oinst = ocube->group("Instrument");
-  oinst.DeleteKeyword("ChannelNumber");
-  oinst.DeleteKeyword("CpmmNumber");
+  oinst.deleteKeyword("ChannelNumber");
+  oinst.deleteKeyword("CpmmNumber");
   ocube->putGroup(oinst);
 
   placing.ClearInputCubes();
@@ -378,7 +378,7 @@ void IsisMain() {
     ccdGroup += PvlKeyword("SampleOffset", toString(CCDlist[CCDindex].fpsamp - xoffset[ccd]));
     ccdGroup += PvlKeyword("LineOffset", toString(CCDlist[CCDindex].fpline - yoffset[ccd]));
 
-    results.AddGroup(ccdGroup);
+    results.addGroup(ccdGroup);
   }
 
   // Process by output file
@@ -520,7 +520,7 @@ void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
   QString file(ui.GetFileName("SHIFTDEF"));
   Pvl p;
-  p.Read(file);
+  p.read(file);
   Application::GuiLog(p);
 }
 //...........end of helper function ........

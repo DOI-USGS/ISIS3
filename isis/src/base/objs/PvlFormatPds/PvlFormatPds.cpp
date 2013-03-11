@@ -42,7 +42,7 @@ namespace Isis {
   * Constructs an empty PvlFormatPds
   */
   PvlFormatPds::PvlFormatPds() {
-    Init();
+    init();
   }
 
 
@@ -54,7 +54,7 @@ namespace Isis {
   * keyword and TYPE is one of [string | integer | float | ...]
   */
   PvlFormatPds::PvlFormatPds(const QString &file) : PvlFormat(file) {
-    Init();
+    init();
   }
 
 
@@ -66,12 +66,12 @@ namespace Isis {
   * keyword in a PvlKeyword and type is one of [string | integer | float ]
   */
   PvlFormatPds::PvlFormatPds(Pvl &keywordType) : PvlFormat(keywordType) {
-    Init();
+    init();
   }
 
 
   //! Clears all PvlFormatPds specific data.
-  void PvlFormatPds::Init() {
+  void PvlFormatPds::init() {
   }
 
 
@@ -81,52 +81,52 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  QString PvlFormatPds::FormatValue(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::formatValue(const PvlKeyword &keyword, int num) {
 
-    QString name = keyword.Name().toUpper();
+    QString name = keyword.name().toUpper();
     if(name == "OBJECT" || (name == "GROUP")) {
       QString val = (QString)keyword;
       return val.toUpper();
     }
 
     // Find out what type this keyword is
-    KeywordType type = Type(keyword);
+    KeywordType keyType = type(keyword);
 
-    switch(type) {
+    switch(keyType) {
       case StringKeyword:
-        return FormatString(keyword, num);
+        return formatString(keyword, num);
         break;
 
       case RealKeyword:
-        return FormatReal(keyword, num, Accuracy(keyword));
+        return formatReal(keyword, num, accuracy(keyword));
         break;
 
       case IntegerKeyword:
-        return FormatInteger(keyword, num, Accuracy(keyword));
+        return formatInteger(keyword, num, accuracy(keyword));
         break;
 
       case HexKeyword:
-        return FormatHex(keyword, num, Accuracy(keyword));
+        return formatHex(keyword, num, accuracy(keyword));
         break;
 
       case BinaryKeyword:
-        return FormatBinary(keyword, num, Accuracy(keyword));
+        return formatBinary(keyword, num, accuracy(keyword));
         break;
 
       case EnumKeyword:
-        return FormatEnum(keyword, num);
+        return formatEnum(keyword, num);
         break;
 
       case BoolKeyword:
-        return FormatBool(keyword, num);
+        return formatBool(keyword, num);
         break;
 
       case NoTypeKeyword:
       default:
-        return FormatUnknown(keyword, num);
+        return formatUnknown(keyword, num);
         break;
     }
-    return FormatUnknown(keyword, num);
+    return formatUnknown(keyword, num);
   }
 
 
@@ -141,13 +141,13 @@ namespace Isis {
   *                                          the if portion of the code already
   *                                          adds quotes automatically
   */
-  QString PvlFormatPds::FormatString(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::formatString(const PvlKeyword &keyword, int num) {
 
     QString val;
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
@@ -158,36 +158,36 @@ namespace Isis {
     }
     else {
       val += keyword[num];
-      val = AddQuotes(val);
+      val = addQuotes(val);
     }
 
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val = "(" + val;
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
       //      unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
       //      unit.UpCase();
       val += " <" + unit + ">";
@@ -203,7 +203,7 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  QString PvlFormatPds::FormatReal(const PvlKeyword &keyword, int num,
+  QString PvlFormatPds::formatReal(const PvlKeyword &keyword, int num,
                                    int places) {
 
     QString val;
@@ -211,12 +211,12 @@ namespace Isis {
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val += "(";
     }
 
@@ -235,25 +235,25 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -268,19 +268,19 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  QString PvlFormatPds::FormatEnum(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::formatEnum(const PvlKeyword &keyword, int num) {
 
     QString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val += "(";
     }
 
@@ -294,25 +294,25 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -332,14 +332,14 @@ namespace Isis {
   *                                          the if portion of the code already
   *                                          adds quotes automatically
   */
-  QString PvlFormatPds::FormatUnknown(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::formatUnknown(const PvlKeyword &keyword, int num) {
 
     QString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
@@ -350,35 +350,35 @@ namespace Isis {
     }
     else {
       val += keyword[num];
-      val = PvlFormat::AddQuotes(val);
+      val = PvlFormat::addQuotes(val);
     }
 
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val = "(" + val;
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -393,19 +393,19 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  QString PvlFormatPds::FormatInteger(const PvlKeyword &keyword, int num, int bytes) {
+  QString PvlFormatPds::formatInteger(const PvlKeyword &keyword, int num, int bytes) {
 
     QString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val += "(";
     }
 
@@ -419,25 +419,25 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -452,7 +452,7 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  QString PvlFormatPds::FormatBinary(const PvlKeyword &keyword, int num, int bits) {
+  QString PvlFormatPds::formatBinary(const PvlKeyword &keyword, int num, int bits) {
 
     QString val;
     val.clear();
@@ -460,12 +460,12 @@ namespace Isis {
 
     // Create a Null value if the value index is greater than the number of values
     stringstream ss;
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val += "(";
     }
 
@@ -490,25 +490,25 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -525,19 +525,19 @@ namespace Isis {
   */
 
 
-  QString PvlFormatPds::FormatHex(const PvlKeyword &keyword, int num, int bytes) {
+  QString PvlFormatPds::formatHex(const PvlKeyword &keyword, int num, int bytes) {
 
     QString val;
     val.clear();
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val += "(";
     }
 
@@ -563,25 +563,25 @@ namespace Isis {
     }
 
     // Add the units to this value
-    if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((!singleUnit) && (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
     // Add the units to the end if all values have the same units
-    if((singleUnit) && (num == keyword.Size() - 1) &&
-        (keyword.Unit(num).size() > 0)) {
-      QString unit = keyword.Unit(num);
+    if((singleUnit) && (num == keyword.size() - 1) &&
+        (keyword.unit(num).size() > 0)) {
+      QString unit = keyword.unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -596,18 +596,18 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  QString PvlFormatPds::FormatBool(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::formatBool(const PvlKeyword &keyword, int num) {
 
     QString val;
     val.clear();
 
     // Create a Null value if the value index is greater than the number of values
-    if((num >= keyword.Size()) || (keyword[num].size() == 0)) {
+    if((num >= keyword.size()) || (keyword[num].size() == 0)) {
       return "NULL";
     }
 
     // If it is an array start it off with a paren
-    if((keyword.Size() > 1) && (num == 0)) {
+    if((keyword.size() > 1) && (num == 0)) {
       val += "(";
     }
 
@@ -622,11 +622,11 @@ namespace Isis {
     }
 
     // Add a comma for arrays
-    if(num != keyword.Size() - 1) {
+    if(num != keyword.size() - 1) {
       val += ", ";
     }
     // If it is an array, close it off
-    else if(keyword.Size() > 1) {
+    else if(keyword.size() > 1) {
       val += ")";
     }
 
@@ -641,8 +641,8 @@ namespace Isis {
   *
   * @param keyword The keyword (i.e., the Object or Group)
   */
-  QString PvlFormatPds::FormatName(const PvlKeyword &keyword) {
-    QString text = keyword.Name();
+  QString PvlFormatPds::formatName(const PvlKeyword &keyword) {
+    QString text = keyword.name();
     text = text.toUpper();
     return text;
   };
@@ -654,7 +654,7 @@ namespace Isis {
   * @param name A string representing the end text.
   * @param keyword The keyword (i.e., the Object or Group) that is ending
   */
-  QString PvlFormatPds::FormatEnd(const QString name,
+  QString PvlFormatPds::formatEnd(const QString name,
                                       const PvlKeyword &keyword) {
     QString left = name.toUpper();
     left += " = ";
@@ -674,7 +674,7 @@ namespace Isis {
   *                                          the first character of the
   *                                          string is " or '
   */
-  QString PvlFormatPds::AddQuotes(const QString value) {
+  QString PvlFormatPds::addQuotes(const QString value) {
 
     QString val = value;
 

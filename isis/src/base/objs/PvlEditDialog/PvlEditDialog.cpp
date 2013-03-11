@@ -30,7 +30,7 @@ namespace Isis {
     fstream input;
 
     // open as input from pvl file
-    input.open(pvl.FileName().toAscii().data(), ios::in);
+    input.open(pvl.fileName().toAscii().data(), ios::in);
     string output;
 
     // read first line of input and write as first output line
@@ -60,7 +60,7 @@ namespace Isis {
     vLayout->addLayout(buttonLayout);
 
     setLayout(vLayout);
-    QString titleBar = "Pvl File: " + QString(pvl.FileName()) ;
+    QString titleBar = "Pvl File: " + QString(pvl.fileName()) ;
     setWindowTitle(titleBar);
 
     // Add functionality to buttons
@@ -123,7 +123,7 @@ namespace Isis {
       // convert QString to std::string needed to open file stream
       QString saveFile = pvlFile;
       try {
-        pvl.Write(saveFile);
+        pvl.write(saveFile);
       }
       catch(IException &e) {
         // report exception(s) to mesage box

@@ -78,10 +78,10 @@ int main() {
 
   try {
     Isis::Pvl lab;
-    lab.AddObject(Isis::PvlObject("IsisCube"));
-    Isis::PvlObject &isiscube = lab.FindObject("IsisCube");
-    isiscube.AddGroup(Isis::PvlGroup("Dimensions"));
-    Isis::PvlGroup &dims = isiscube.FindGroup("Dimensions");
+    lab.addObject(Isis::PvlObject("IsisCube"));
+    Isis::PvlObject &isiscube = lab.findObject("IsisCube");
+    isiscube.addGroup(Isis::PvlGroup("Dimensions"));
+    Isis::PvlGroup &dims = isiscube.findGroup("Dimensions");
     dims += Isis::PvlKeyword("Samples", "4");
     dims += Isis::PvlKeyword("Lines", "8");
     c.UpdateGroup(lab);
