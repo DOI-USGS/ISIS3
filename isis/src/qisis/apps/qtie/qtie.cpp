@@ -15,10 +15,21 @@
 #include "HelpTool.h"
 #include "QtieTool.h"
 #include "RubberBandTool.h"
+#include "ToolList.h"
 
 #define IN_QTIE
 
 using namespace Isis;
+
+template<typename ToolClass>
+ToolClass *createTool(ViewportMainWindow *viewportMainWindow, ToolList *tools) {
+  ToolClass *result = new ToolClass(viewportMainWindow);
+
+  tools->append(result);
+  ((Tool *)result)->addTo(viewportMainWindow);
+
+  return result;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -29,44 +40,34 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationName("qtie");
     app->setStyle("windows");
 
-    ViewportMainWindow *mw = new ViewportMainWindow("Qtie");
+    ViewportMainWindow *vw = new ViewportMainWindow("Qtie");
 
-    Tool *rubberBandTool = RubberBandTool::getInstance(mw);
-    rubberBandTool->addTo(mw);
+    ToolList tools;
+    createTool<RubberBandTool>(vw, &tools);
 
-    QtieFileTool *ftool = new QtieFileTool(mw);
-    ftool->Tool::addTo(mw);
-    mw->permanentToolBar()->addSeparator();
+    QtieFileTool *ftool = createTool<QtieFileTool>(vw, &tools);
+    vw->permanentToolBar()->addSeparator();
 
-    Tool *btool = new BandTool(mw);
-    btool->addTo(mw);
+    createTool<BandTool>(vw, &tools);
 
-    Tool *ztool = new ZoomTool(mw);
-    ztool->addTo(mw);
-    mw->getMenu("&View")->addSeparator();
+    createTool<ZoomTool>(vw, &tools);
+    vw->getMenu("&View")->addSeparator();
 
-    Tool *ptool = new PanTool(mw);
-    ptool->addTo(mw);
-    mw->getMenu("&View")->addSeparator();
+    createTool<PanTool>(vw, &tools);
+    vw->getMenu("&View")->addSeparator();
 
-    Tool *stool = new StretchTool(mw);
-    stool->addTo(mw);
+    Tool *stool = createTool<StretchTool>(vw, &tools);
 
-    Tool *findTool = new FindTool(mw);
-    findTool->addTo(mw);
+    createTool<FindTool>(vw, &tools);
 
-    Tool *ttool = new AdvancedTrackTool(mw);
-    ttool->addTo(mw);
+    createTool<AdvancedTrackTool>(vw, &tools);
 
-    Tool *wtool = new WindowTool(mw);
-    wtool->addTo(mw);
+    createTool<WindowTool>(vw, &tools);
 
-    mw->permanentToolBar()->addSeparator();
-    Tool *htool = new HelpTool(mw);
-    htool->addTo(mw);
+    vw->permanentToolBar()->addSeparator();
+    createTool<HelpTool>(vw, &tools);
 
-    Tool *tieTool = new QtieTool(mw);
-    tieTool->addTo(mw);
+    Tool *tieTool = createTool<QtieTool>(vw, &tools);
     tieTool->activate(true);
 
     QObject::connect(ftool, SIGNAL(cubesOpened(Cube *, Cube *, ControlNet *)),
@@ -74,14 +75,14 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(ftool, SIGNAL(newFiles()), tieTool, SLOT(clearFiles()));
 
-    QObject::connect(mw, SIGNAL(closeWindow()), ftool, SLOT(exit()));
+    QObject::connect(vw, SIGNAL(closeWindow()), ftool, SLOT(exit()));
 
     QObject::connect(stool,
                      SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
                      tieTool,
                      SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
 
-    mw->show();
+    vw->show();
 
     return app->exec();
   }

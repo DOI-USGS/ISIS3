@@ -44,7 +44,7 @@ namespace Isis {
    *   @history 2011-07-26 Jeff Anderson - Modified to support varying focal length
    *                                       and optical distortion based on filter
    */
-  DawnFcCamera::DawnFcCamera(Pvl &lab) : FramingCamera(lab) {
+  DawnFcCamera::DawnFcCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
 
     // The focal length is dependent on wave length.  The NAIF code set
@@ -106,6 +106,7 @@ namespace Isis {
     // spacecraft clock start count. There is a delay of 193 ms while the
     // CCD is discharged or cleared.  Finally the exporsure information
     // needs to be obtained.
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
     double et = getClockTime(stime).Et();
@@ -158,6 +159,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed Dawn
  *            namespace.
  */
-extern "C" Isis::Camera *DawnFcCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::DawnFcCamera(lab);
+extern "C" Isis::Camera *DawnFcCameraPlugin(Isis::Cube &cube) {
+  return new Isis::DawnFcCamera(cube);
 }

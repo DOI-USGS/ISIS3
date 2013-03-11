@@ -3,7 +3,7 @@
 
 #include <QComboBox>
 
-// FIXME: Remove this include!
+#include "FileName.h"
 #include "RubberBandTool.h"
 
 namespace Isis {
@@ -27,7 +27,8 @@ namespace Isis {
       Q_OBJECT
 
     public:
-      RubberBandComboBox(unsigned int bandingOptions, unsigned int defaultOption, bool showIndicatorColors = false);
+      RubberBandComboBox(Tool *tool, unsigned int bandingOptions, unsigned int defaultOption,
+          bool showIndicatorColors = false);
 
       /**
        * Enum to store rubber band shapes.
@@ -45,7 +46,7 @@ namespace Isis {
 
       //! Returns the icon directory.
       QString toolIconDir() const {
-        return RubberBandTool::getInstance()->toolIconDir();
+        return m_tool->toolIconDir();
       }
       void reset();
 
@@ -57,40 +58,42 @@ namespace Isis {
       unsigned int getDefault(unsigned int defaultOption, unsigned int bandingOptions);
 
       //! Enables the angle shape
-      void showAngle()             {
-        RubberBandTool::enable(RubberBandTool::Angle, p_showIndicatorColors);
-      };
+      void showAngle() {
+        m_tool->rubberBandTool()->enable(RubberBandTool::AngleMode, m_showIndicatorColors);
+      }
       //! Enables the circle shape
       void showCircle()            {
-        RubberBandTool::enable(RubberBandTool::Circle, p_showIndicatorColors);
-      };
+        m_tool->rubberBandTool()->enable(RubberBandTool::CircleMode, m_showIndicatorColors);
+      }
       //! Enables the ellipse shape
       void showEllipse()           {
-        RubberBandTool::enable(RubberBandTool::Ellipse, p_showIndicatorColors);
-      };
+        m_tool->rubberBandTool()->enable(RubberBandTool::EllipseMode, m_showIndicatorColors);
+      }
       //! Enables the line
       void showLine()              {
-        RubberBandTool::enable(RubberBandTool::Line, p_showIndicatorColors);
-      };
+        m_tool->rubberBandTool()->enable(RubberBandTool::LineMode, m_showIndicatorColors);
+      }
       //! Enables the rectangle shape
       void showRectangle()         {
-        RubberBandTool::enable(RubberBandTool::Rectangle, p_showIndicatorColors);
-      };
+        m_tool->rubberBandTool()->enable(RubberBandTool::RectangleMode, m_showIndicatorColors);
+      }
       //! Enables the rotated rectangle shape
       void showRotatedRectangle()  {
-        RubberBandTool::enable(RubberBandTool::RotatedRectangle, p_showIndicatorColors);
-      };
+        m_tool->rubberBandTool()->enable(RubberBandTool::RotatedRectangleMode,
+                                         m_showIndicatorColors);
+      }
       //! Enables the polygon shape
       void showPolygon()           {
-        RubberBandTool::enable(RubberBandTool::Polygon, p_showIndicatorColors);
-      };
+        m_tool->rubberBandTool()->enable(RubberBandTool::PolygonMode, m_showIndicatorColors);
+      }
       //! Enables the segmented line shape
       void showSegmentedLine()     {
-        RubberBandTool::enable(RubberBandTool::SegmentedLine, p_showIndicatorColors);
-      };
+        m_tool->rubberBandTool()->enable(RubberBandTool::SegmentedLineMode, m_showIndicatorColors);
+      }
 
-      QStringList p_bandingOptionStrings; //!< List of rubberband options
-      bool p_showIndicatorColors; //!< Show colors?
+      QStringList m_bandingOptionStrings; //!< List of rubberband options
+      bool m_showIndicatorColors; //!< Show colors?
+      Tool *m_tool;
   };
 };
 

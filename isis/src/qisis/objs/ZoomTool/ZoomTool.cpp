@@ -498,18 +498,18 @@ namespace Isis {
   void ZoomTool::rubberBandComplete() {
     QApplication::processEvents();
     MdiCubeViewport *d = cubeViewport();
-    if(!RubberBandTool::isValid()) return;
+    if(!rubberBandTool()->isValid()) return;
 
     // The RubberBandTool has a rectangle
-    if(!RubberBandTool::isPoint()) {
-      QRect r = RubberBandTool::rectangle();
+    if(!rubberBandTool()->figureIsPoint()) {
+      QRect r = rubberBandTool()->rectangle();
       if((r.width() >= 5) && (r.height() >= 5)) {
         int x = r.x() + r.width() / 2;
         int y = r.y() + r.height() / 2;
         double xscale = (double) d->viewport()->width() / r.width();
         double yscale = (double) d->viewport()->height() / r.height();
         double newScale = xscale < yscale ? xscale : yscale;
-        if(RubberBandTool::mouseButton() & Qt::RightButton) {
+        if(rubberBandTool()->mouseButton() & Qt::RightButton) {
           newScale = 1.0 / newScale;
         }
         newScale *= d->scale();
@@ -525,7 +525,7 @@ namespace Isis {
               double xscale = (double) d->viewport()->width() / r.width();
               double yscale = (double) d->viewport()->height() / r.height();
               double newScale = xscale < yscale ? xscale : yscale;
-              if(RubberBandTool::mouseButton() & Qt::RightButton) {
+              if(rubberBandTool()->mouseButton() & Qt::RightButton) {
                 newScale = 1.0 / newScale;
               }
               newScale *= d->scale();
@@ -538,19 +538,19 @@ namespace Isis {
     // The RubberBandTool has a point (mouse click)
     else {
       double factor = 2.0;
-      if(RubberBandTool::mouseButton() & Qt::ControlModifier) {
+      if(rubberBandTool()->mouseButton() & Qt::ControlModifier) {
         factor = 4.0;
       }
-      if(RubberBandTool::mouseButton() & Qt::ShiftModifier) {
+      if(rubberBandTool()->mouseButton() & Qt::ShiftModifier) {
         factor = 8.0;
       }
-      if(RubberBandTool::mouseButton() & Qt::RightButton) {
+      if(rubberBandTool()->mouseButton() & Qt::RightButton) {
         factor = 1.0 / factor;
       }
-      if(RubberBandTool::mouseButton() & Qt::MidButton) {
+      if(rubberBandTool()->mouseButton() & Qt::MidButton) {
         factor = 1.0;
       }
-      if(RubberBandTool::mouseButton() == Qt::MidButton + Qt::ControlModifier) {
+      if(rubberBandTool()->mouseButton() == Qt::MidButton + Qt::ControlModifier) {
         factor = 0.0;
       }
 //      MdiCubeViewport *d = cubeViewport();
@@ -560,7 +560,7 @@ namespace Isis {
         // change scale to 1.0
         newScale = 1.0;
       }
-      QPoint p = RubberBandTool::getVertices()[0];
+      QPoint p = rubberBandTool()->vertices()[0];
       setScale(d, newScale, p.x(), p.y());
       updateTool();
 
@@ -590,10 +590,10 @@ namespace Isis {
    *
    */
   void ZoomTool::enableRubberBandTool() {
-    RubberBandTool::enable(RubberBandTool::Rectangle);
-    RubberBandTool::allowPoints();
-    RubberBandTool::allowAllClicks();
-    RubberBandTool::drawActiveViewportOnly(false);
+    rubberBandTool()->enable(RubberBandTool::RectangleMode);
+    rubberBandTool()->enablePoints();
+    rubberBandTool()->enableAllClicks();
+    rubberBandTool()->setDrawActiveViewportOnly(false);
   }
 
   /**

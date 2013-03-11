@@ -125,9 +125,9 @@ int main(void) {
     corners.push_back(std::make_pair(36, 29));
 
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
-      Pvl p(files[i]);
-      Camera *cam = CameraFactory::Create(p);
-      cout << "FileName: " << FileName(p.fileName()).name() << endl;
+      Cube c(files[i], "r");
+      Camera *cam = CameraFactory::Create(c);
+      cout << "FileName: " << FileName(c.fileName()).name() << endl;
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
       cout.setf(std::ios::fixed);
       cout << setprecision(9);
@@ -179,9 +179,9 @@ int main(void) {
 
     //  Test C1465336166_1.ir.cub
     //string file = "/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub";
-    Pvl p("/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub");
-    Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube c("/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub", "r");
+    Camera *cam = CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

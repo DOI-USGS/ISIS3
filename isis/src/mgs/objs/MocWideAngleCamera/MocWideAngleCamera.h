@@ -56,7 +56,7 @@ namespace Isis {
   class MocWideAngleCamera : public LineScanCamera {
     public:
       // constructors
-      MocWideAngleCamera(Pvl &lab);
+      MocWideAngleCamera(Cube &cube);
 
       //! Destroys the MocWideAngleCamera object
       ~MocWideAngleCamera() {};

@@ -57,7 +57,7 @@ namespace Isis {
    *
    * @param lab Label containing Instrument and Kernels groups.
    */
-  Sensor::Sensor(Pvl &lab) : Spice(lab) {
+  Sensor::Sensor(Cube &cube) : Spice(cube) {
   }
 
   //! Destroys the Sensor
@@ -163,6 +163,8 @@ namespace Isis {
     const vector<double> &sB = bodyRotation()->ReferenceVector(
         instrumentPosition()->Coordinate());
 
+    // double tolerance = resolution() / 100.0; return
+    // target()->shape()->intersectSurface(sB, lookB, tolerance);
     return target()->shape()->intersectSurface(sB, lookB);
   }
 

@@ -71,7 +71,7 @@ int main() {
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
-      PvlGroup radii = Isis::TProjection::TargetRadii("MARS");
+      PvlGroup radii = Projection::TargetRadii("MARS");
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");

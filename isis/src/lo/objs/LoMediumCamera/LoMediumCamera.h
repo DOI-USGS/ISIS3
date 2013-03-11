@@ -59,7 +59,7 @@ namespace Isis {
    */
   class LoMediumCamera : public FramingCamera {
     public:
-      LoMediumCamera(Pvl &lab);
+      LoMediumCamera(Cube &cube);
       //! Destroys the LoMediumCamera Object
       ~LoMediumCamera() {};
       /**

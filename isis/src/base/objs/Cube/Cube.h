@@ -124,11 +124,19 @@ namespace Isis {
    *                           cube is not open, instead of crashing, references #161
    *   @history 2012-02-17 Steven Lambright - Made the read() method const. Added mutex lock calls
    *                           around data file accesses.
+   *   @history 2012-04-05 Stuart Sides and Steven Lambright - Added new
+   *                          constructor which immediately open the cube.
    *   @history 2012-07-02 Steven Lambright and Stuart Sides - Added copy() and added support for
    *                           external cube label files (.ecub). This was done so that cubes can
    *                           be imported into projects without copying the DN data. Also, multiple
    *                           versions of SPICE will be save-able for one cube (multiple ecubs...
    *                           again, not copying DN data). Fixes #961.
+   *   @history 2012-09-06 Steven Lambright - Improved parsing of ^DnFile in the ecub format and
+   *                           simplified/optimized writeLabels().
+   *   @history 2012-09-17 Steven Lambright - Fixed ASSERT in getRealDataFileName() to be in the
+   *                           correct place.
+   *   @history 2012-10-26 Steven Lambright and Stuard Sides - Externel cube label files no longer
+   *                           allocate disk space for DN data when writing out blobs.
    *   @history 2012-11-06 Steven Lambright and Mathew Eis - Fixed (the lack of) deletion of
    *                           temporary files in the unit test. Fixes #1009.
    *   @history 2012-12-31 Steven Lambright - Removed 'get' prefix from accessors. Fixes #1356.
@@ -137,6 +145,7 @@ namespace Isis {
   class Cube {
     public:
       Cube();
+      Cube(const FileName &fileName, QString access = "r");
       virtual ~Cube();
 
       /**
@@ -207,7 +216,7 @@ namespace Isis {
       bool labelsAttached() const;
 
       void close(bool remove = false);
-      Cube *copy(FileName newFile, const CubeAttributeOutput &newFileAttributes) const;
+      Cube *copy(FileName newFile, const CubeAttributeOutput &newFileAttributes);
       void create(const QString &cfile);
       void create(const QString &cfile, const CubeAttributeOutput &att);
       void open(const QString &cfile, QString access = "r");
@@ -230,10 +239,14 @@ namespace Isis {
       void setVirtualBands(const QList<QString> &vbands);
       void setVirtualBands(const std::vector<QString> &vbands);
 
+      void relocateDnData(FileName dnDataFile);
+//       static void relocateDnData(FileName externalLabelFile, FileName dnDataFile);
+
       int bandCount() const;
       double base() const;
       ByteOrder byteOrder() const;
       Camera *camera();
+      FileName externalCubeFileName() const;
       QString fileName() const;
       Format format() const;
       Histogram *histogram(const int &band = 1,
@@ -268,8 +281,11 @@ namespace Isis {
     private:
       void applyVirtualBandsToLabel();
       void cleanUp(bool remove);
+
+      void construct();
       QFile *dataFile() const;
       FileName realDataFileName() const;
+
       void initialize();
       void initCoreFromLabel(const Pvl &label);
       void initLabelFromFile(FileName labelFileName, bool readWrite);

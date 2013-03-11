@@ -4,6 +4,7 @@
 #include "Tool.h"
 
 #include <QDir>
+#include <QPointer>
 #include <QStringList>
 
 class QAction;
@@ -13,9 +14,6 @@ namespace Isis {
   class Buffer;
   class Cube;
   class CubeAttributeOutput;
-}
-
-namespace Isis {
   class MdiCubeViewport;
   class SaveAsDialog;
 
@@ -57,16 +55,22 @@ namespace Isis {
       void addTo(Workspace *ws);
       void addToPermanent(QToolBar *perm);
       //! Returns the open action
-      QAction *openAction() {
+      QPointer<QAction> openAction() {
         return p_open;
       };
       //! Returns the save as action
-      QAction *saveAction() {
+      QPointer<QAction> saveAction() {
         return p_saveAs;
       };
       QStringList p_filterList; //!< Filter List
       QDir p_dir;               //!< Directory
       QStringList p_fileList;   //!< File list
+
+
+      //! Returns the menu name for the file tool
+      QString menuName() const {
+        return "&File";
+      }
 
     signals:
       void fileSelected(QString); //!< This signal is called when a file is selected
@@ -98,29 +102,25 @@ namespace Isis {
       void saveAsCubeByOption(QString); //!< Save as Isis Cube (FullImage, AsIs, FullRes)
 
     protected:
-      //! Returns the menu name for the file tool
-      QString menuName() const {
-        return "&File";
-      };
       //! Updates the tool
       void updateTool();
 
     private:
       static void copy(Buffer &in, Buffer &out);
-      QAction *p_open;   //!< Action to open a file
-      QAction *p_browse; //!< Action to browse and open files
-      QAction *p_print;  //!< Action to print the current view
-      QAction *p_save;   //!< Action to save the current cube
-      QAction *p_saveAs; //!< Action save the current cube as a user specified file
-      QAction *p_saveInfo;   //!< Action to save the current cube's Whatsthis info
-      QAction *p_exportView; //!< Action to export the view as a picture
-      QAction *p_closeAll;   //!< Action to close all windows
-      QAction *p_exit;       //!< Action to exit qview
-      QWidget *p_parent;     //!< The parent widget of this object
+      QPointer<QAction> p_open;   //!< Action to open a file
+      QPointer<QAction> p_browse; //!< Action to browse and open files
+      QPointer<QAction> p_print;  //!< Action to print the current view
+      QPointer<QAction> p_save;   //!< Action to save the current cube
+      QPointer<QAction> p_saveAs; //!< Action save the current cube as a user specified file
+      QPointer<QAction> p_saveInfo;   //!< Action to save the current cube's Whatsthis info
+      QPointer<QAction> p_exportView; //!< Action to export the view as a picture
+      QPointer<QAction> p_closeAll;   //!< Action to close all windows
+      QPointer<QAction> p_exit;       //!< Action to exit qview
+      QPointer<QWidget> p_parent;     //!< The parent widget of this object
       QString p_lastDir;     //!< The last directory opened
-      Workspace *p_workSpace;          //!< The workspace being used
-      MdiCubeViewport *p_lastViewport; //!< The last cubeviewport that was used
-      SaveAsDialog *p_saveAsDialog;    //!< SaveAs Dialog with different save options
+      QPointer<Workspace> p_workSpace;          //!< The workspace being used
+      QPointer<MdiCubeViewport> p_lastViewport; //!< The last cubeviewport that was used
+      QPointer<SaveAsDialog> p_saveAsDialog;    //!< SaveAs Dialog with different save options
 
       //! Save Image in its entirety to an output file
       void saveAsFullImage(Cube *icube, Cube *ocube);

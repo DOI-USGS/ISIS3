@@ -1,8 +1,0 @@
-********* Start testing of Isis::MosaicFileListWidgetTester *********
-Config: Using QTest library 4.8.0, Qt 4.8.0
-PASS   : Isis::MosaicFileListWidgetTester::initTestCase()
-PASS   : Isis::MosaicFileListWidgetTester::testBasicFunctionality()
-PASS   : Isis::MosaicFileListWidgetTester::testSynchronization()
-PASS   : Isis::MosaicFileListWidgetTester::cleanupTestCase()
-Totals: 4 passed, 0 failed, 0 skipped
-********* Finished testing of Isis::MosaicFileListWidgetTester *********

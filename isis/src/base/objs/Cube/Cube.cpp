@@ -54,27 +54,20 @@ using namespace std;
 namespace Isis {
   //! Constructs a Cube object.
   Cube::Cube() {
-    m_labelFile = NULL;
-    m_dataFile = NULL;
-    m_ioHandler = NULL;
-    m_mutex = NULL;
+    construct();
+  }
 
-    m_camera = NULL;
-    m_projection = NULL;
-
-    m_labelFileName = NULL;
-    m_dataFileName = NULL;
-    m_tempCube = NULL;
-    m_formatTemplateFile = NULL;
-    m_label = NULL;
-
-    m_virtualBandList = NULL;
-
-    m_mutex = new QMutex();
-    m_formatTemplateFile =
-        new FileName("$base/templates/labels/CubeFormatTemplate.pft");
-
-    initialize();
+  /**
+   * Construct a cube and open it for reading or reading/writing.
+   *
+   * @param fileName Name of the cube file to open. Environment
+   *     variables in the filename will be automatically expanded.
+   * @param access Defines how the cube will be opened. Either read-only
+   *     "r" or read-write "rw".
+   */
+  Cube::Cube(const FileName &fileName, QString access) {
+    construct();
+    open(fileName.toString(), access);
   }
 
 
@@ -186,7 +179,7 @@ namespace Isis {
   }
 
 
-  Cube *Cube::copy(FileName newFile, const CubeAttributeOutput &newFileAttributes) const {
+  Cube *Cube::copy(FileName newFile, const CubeAttributeOutput &newFileAttributes) {
     if (!isOpen()) {
       throw IException(IException::Unknown,
                        QObject::tr("Cube::copy requires the originating cube to be open"),
@@ -234,6 +227,11 @@ namespace Isis {
       result->setLabelSize(labelSize(true) + (1024 * 6));
     }
     else {
+      if (isReadWrite()) {
+        writeLabels();
+        m_ioHandler->clearCache(true);
+      }
+
       result->setExternalDnData(fileName());
     }
 
@@ -522,8 +520,8 @@ namespace Isis {
       if (core.hasKeyword("^Core")) {
         FileName temp(core["^Core"][0]);
 
-        if (temp.originalPath() == ".") {
-          m_dataFileName = new FileName(m_labelFileName->path() + "/" + temp.name());
+        if (!temp.originalPath().startsWith("/")) {
+          m_dataFileName = new FileName(m_labelFileName->path() + "/" + temp.original());
         }
         else {
           m_dataFileName = new FileName(temp);
@@ -742,10 +740,21 @@ namespace Isis {
       fstream stream(m_labelFileName->expanded().toAscii().data(),
                      ios::in | ios::out | ios::binary);
       stream.seekp(0, ios::end);
+
+      // End byte = end byte of the file (aka eof position, file size)
       streampos endByte = stream.tellp();
-      streampos maxbyte = (streampos) m_labelBytes +
-                          (streampos) m_ioHandler->getDataSize();
-      if (endByte < maxbyte) stream.seekp(maxbyte, ios::beg);
+      // maxbyte = position after the cube DN data and labels
+      streampos maxbyte = (streampos) m_labelBytes;
+     
+      if (m_storesDnData) {
+        maxbyte += (streampos) m_ioHandler->getDataSize();
+      }
+
+      // If EOF is too early, allocate space up to where we want the blob
+      if (endByte < maxbyte) {
+        stream.seekp(maxbyte, ios::beg);
+      }
+
       blob.Write(*m_label, stream);
     }
 
@@ -901,6 +910,12 @@ namespace Isis {
 
     m_storesDnData = false;
     m_dataFileName = new FileName(cubeFileWithDnData);
+
+    delete m_labelFile;
+    m_labelFile = NULL;
+
+    delete m_labelFileName;
+    m_labelFileName = NULL;
   }
 
 
@@ -1006,6 +1021,45 @@ namespace Isis {
   }
 
 
+  void Cube::relocateDnData(FileName dnDataFile) {
+    if (!isOpen()) {
+      throw IException(IException::Unknown,
+                       QString("Cannot relocate the DN data to [%1] for an external cube label "
+                               "file which is not open.")
+                         .arg(dnDataFile.original()),
+                       _FILEINFO_);
+    }
+
+
+    if (m_storesDnData) {
+      throw IException(IException::Unknown,
+                       QString("The cube [%1] stores DN data. It cannot be relocated to [%2] - "
+                               "this is only supported for external cube label files.")
+                         .arg(m_labelFileName->original()).arg(dnDataFile.original()),
+                       _FILEINFO_);
+    }
+
+    m_label->findObject("IsisCube").findObject("Core").findKeyword("^DnFile")[0] =
+        dnDataFile.original();
+    reopen(m_labelFile->isWritable()? "rw" : "r");
+  }
+
+
+//   void Cube::relocateDnData(FileName externalLabelFile, FileName dnDataFile) {
+//     try {
+//       Pvl externalLabelData(externalLabelFile.expanded());
+//       externalLabelData.FindObject("IsisCube").FindObject("Core").FindKeyword("^DnFile")[0] =
+//           dnDataFile.original();
+//     }
+//     catch (IException &e) {
+//       throw IException(e, IException::Io,
+//                        QString("File [%1] does not appear to be an external cube label file")
+//                          .arg(externalLabelFile.original().ToQt()),
+//                        _FILEINFO_);
+//     }
+//   }
+
+
   /**
    * Returns the number of virtual bands for the cube.
    *
@@ -1054,9 +1108,37 @@ namespace Isis {
    */
   Camera *Cube::camera() {
     if (m_camera == NULL && isOpen()) {
-      m_camera = CameraFactory::Create(*label());
+      m_camera = CameraFactory::Create(*this);
     }
     return m_camera;
+  }
+
+
+  /**
+   * If this is an external cube label file, this will give you the cube dn file that this label
+   *   references.
+   *
+   * @return The cube that this external label file references
+   */
+  FileName Cube::externalCubeFileName() const {
+    if (!isOpen()) {
+      throw IException(IException::Unknown,
+                       "An external cube label file must be opened in order to use "
+                         "Cube::getExternalCubeFileName",
+                       _FILEINFO_);
+    }
+
+    if (storesDnData()) {
+      throw IException(IException::Unknown,
+                       "Cube::getExternalCubeFileName can only be called on an external cube label "
+                         "file",
+                       _FILEINFO_);
+    }
+
+
+   PvlObject &core = m_label->findObject("IsisCube").findObject("Core");
+
+    return core["^DnFile"][0];
   }
 
 
@@ -1389,6 +1471,11 @@ namespace Isis {
   }
 
 
+  bool Cube::storesDnData() const {
+    return m_storesDnData;
+  }
+
+
   /**
    * This will add the given caching algorithm to the list of attempted caching
    *   algorithms. The algorithms are tried in the opposite order that they
@@ -1608,6 +1695,35 @@ namespace Isis {
 
 
   /**
+   * Initialize members from their initial undefined states
+   *
+   */
+  void Cube::construct() {
+    m_labelFile = NULL;
+    m_dataFile = NULL;
+    m_ioHandler = NULL;
+    m_mutex = NULL;
+
+    m_camera = NULL;
+    m_projection = NULL;
+
+    m_labelFileName = NULL;
+    m_dataFileName = NULL;
+    m_tempCube = NULL;
+    m_formatTemplateFile = NULL;
+    m_label = NULL;
+
+    m_virtualBandList = NULL;
+
+    m_mutex = new QMutex();
+    m_formatTemplateFile =
+         new FileName("$base/templates/labels/CubeFormatTemplate.pft");
+
+    initialize();
+  }
+
+
+  /**
    * This returns the QFile with cube DN data in it. NULL will be returned
    *   if no files are opened.
    *
@@ -1629,10 +1745,9 @@ namespace Isis {
   FileName Cube::realDataFileName() const {
     FileName result;
 
-    ASSERT(m_labelFileName);
-
     // Attached, stores DN data - normal cube
     if (m_attached && m_storesDnData) {
+      ASSERT(m_labelFileName);
       result = *m_labelFileName;
     }
     // Detached, stores DN data - standard detached cube
@@ -1651,7 +1766,12 @@ namespace Isis {
         PvlObject &core = guessLabel.findObject("IsisCube").findObject("Core");
 
         if (core.hasKeyword("^DnFile")) {
+          FileName currentGuess = guess;
           guess = core["^DnFile"][0];
+
+          if (!guess.path().startsWith("/")) {
+            guess = currentGuess.path() + "/" + guess.original();
+          }
         }
         else if (core.hasKeyword("^Core")) {
           result = core["^Core"][0];
@@ -1724,7 +1844,12 @@ namespace Isis {
       }
     }
     else {
-      initCoreFromLabel(Pvl(core["^DnFile"]));
+      FileName temp(core["^DnFile"][0]);
+      if (!temp.expanded().startsWith("/")) {
+        temp = FileName(m_labelFileName->path() + "/" + temp.original());
+      }
+
+      initCoreFromLabel(Pvl(temp.toString()));
     }
   }
 
@@ -1851,7 +1976,13 @@ namespace Isis {
       core = &label.findObject("IsisCube").findObject("Core");
 
       if (core->hasKeyword("^DnFile")) {
-        label = Pvl((*core)["^DnFile"]);
+
+        FileName temp((*core)["^DnFile"][0]);
+        if (!temp.expanded().startsWith("/")) {
+          temp = FileName(FileName(label.fileName()).path() + "/" + temp.original());
+        }
+
+        label = Pvl(temp.toString());
         core = NULL;
       }
     }
@@ -1910,12 +2041,12 @@ namespace Isis {
       temp << *m_label << endl;
       string tempstr = temp.str();
       if ((int) tempstr.length() < m_labelBytes) {
-        // Clear out the label area
+        QByteArray labelArea(m_labelBytes, '\0');
+        QByteArray labelUnpaddedContents(tempstr.c_str(), tempstr.length());
+        labelArea.replace(0, labelUnpaddedContents.size(), labelUnpaddedContents);
+        // Rewrite the label area
         m_labelFile->seek(0);
-        m_labelFile->write(QByteArray(m_labelBytes, '\0'));
-
-        m_labelFile->seek(0);
-        m_labelFile->write(tempstr.c_str(), tempstr.length());
+        m_labelFile->write(labelArea);
       }
       else {
         locker2.unlock();

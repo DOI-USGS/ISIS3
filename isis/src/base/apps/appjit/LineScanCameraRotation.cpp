@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iomanip>
 
+#include "Cube.h"
 #include "LineScanCameraRotation.h"
 #include "Quaternion.h"
 #include "LineEquation.h"
@@ -31,16 +32,17 @@ namespace Isis {
    *
    * @param frameCode Valid naif frame code.
    */
-  LineScanCameraRotation::LineScanCameraRotation(int frameCode, Isis::Pvl &lab, std::vector<double> timeCache, double tol) : SpiceRotation(frameCode) {
+  LineScanCameraRotation::LineScanCameraRotation(int frameCode, Isis::Cube &cube, std::vector<double> timeCache, double tol) : SpiceRotation(frameCode) {
     // Initialize optional paramters;
     p_pitchRate = 0.;
     p_yaw = 0.;
 
     // Load the Spice kernels to get state matrices
     p_spi = 0;
-    p_spi = new Isis::Spice(lab);
+    p_spi = new Isis::Spice(cube);
 
     // Make sure the kernels are written to the labels and not just the tables (blobs)
+    Pvl &lab = *cube.label();
     if(!p_spi->hasKernels(lab)) {
       QString msg = "The master file must contain the kernel files.  Rerun spiceinit with attach=no";
       throw IException(IException::User, msg, _FILEINFO_);

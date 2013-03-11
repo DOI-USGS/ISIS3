@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
       cout << "true! ..................................... [   OK   ]\n";
     else
       cout << "false! .................................... [ FAILED ]\n";
-    mapGroup["PolarRadius"].SetValue("42");
+    mapGroup["PolarRadius"].setValue(toString(42));
     Pvl tmp1;
     TProjection *p2 = (TProjection *) ProjectionFactory::Create(lab);
     tmp1.AddGroup(p2->Mapping());
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
          << "\n  Maximum Y:  " << maxY << "\n";
 
     Pvl tmp2;
-    tmp2.AddGroup(p->Mapping());
+    tmp2.addGroup(p->Mapping());
 
   }
   catch(IException &e) {

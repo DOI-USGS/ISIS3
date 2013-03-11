@@ -169,7 +169,7 @@ void IsisMain() {
   else if(seedDomain == SampleLine) {
     Cube cube;
     cube.open(serialNumbers.FileName(0));
-    ugmap = new UniversalGroundMap(*cube.label());
+    ugmap = new UniversalGroundMap(cube);
   }
 
   // Create the control net to store the points in.
@@ -194,9 +194,9 @@ void IsisMain() {
   map<QString, UniversalGroundMap *> gMaps;
   for(int sn = 0; sn < serialNumbers.Size(); ++sn) {
     // Create the UGM for the cube associated with this SN
-    Pvl lab = Pvl(serialNumbers.FileName(sn));
+    Cube cube(serialNumbers.FileName(sn), "r");
     gMaps.insert(std::pair<QString, UniversalGroundMap *>
-                 (serialNumbers.SerialNumber(sn), new UniversalGroundMap(lab)));
+                 (serialNumbers.SerialNumber(sn), new UniversalGroundMap(cube)));
   }
 
   stringstream errors(stringstream::in | stringstream::out);
@@ -222,8 +222,8 @@ void IsisMain() {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetRefMeasure();
       QString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
-      Pvl cubepvl(c);
-      Camera *cam = CameraFactory::Create(cubepvl);
+      Cube cube(c);
+      Camera *cam = CameraFactory::Create(cube);
       cam->SetImage(cm->GetSample(), cm->GetLine());
 
 

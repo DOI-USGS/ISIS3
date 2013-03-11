@@ -167,12 +167,12 @@ namespace Isis {
    * @param avgFileName
    * @param countFileName
    */
-  void ProcessGroundPolygons::AppendOutputCube(QString &cube,
+  void ProcessGroundPolygons::AppendOutputCube(QString &cubeStr,
       const QString &avgFileName,
       const QString &countFileName) {
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
-    Pvl pvl(cube);
-    p_groundMap = new UniversalGroundMap(pvl);
+    Cube cube(cubeStr, "r");
+    p_groundMap = new UniversalGroundMap(cube);
     ProcessPolygons::AppendOutputCube(avgFileName, countFileName);
 
   }
@@ -189,14 +189,14 @@ namespace Isis {
   void ProcessGroundPolygons::SetOutputCube(const QString &avgFileName,
       const QString &countFileName,
       Isis::CubeAttributeOutput &outAtts,
-      QString &cube) {
+      QString &cubeStr) {
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
-    Pvl pvl(cube);
-    p_groundMap = new UniversalGroundMap(pvl);
+    Cube cube(cubeStr);
+    p_groundMap = new UniversalGroundMap(cube);
 
     /*setup input cube to transfer projection or camera labels*/
     CubeAttributeInput inAtts;
-    Isis::Process::SetInputCube(cube, inAtts, 0);
+    Isis::Process::SetInputCube(cubeStr, inAtts, 0);
     int nBands = this->InputCubes[0]->bandCount();
     int nLines = this->InputCubes[0]->lineCount();
     int nSamples = this->InputCubes[0]->sampleCount();
@@ -289,7 +289,7 @@ namespace Isis {
     OutputCubes[1]->putGroup(group);
 
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
-    p_groundMap = new UniversalGroundMap(*OutputCubes[0]->label());
+    p_groundMap = new UniversalGroundMap(*OutputCubes[0]);
 
     delete proj;
   }

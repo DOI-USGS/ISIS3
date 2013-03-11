@@ -46,10 +46,11 @@ namespace Isis {
    * @history 2009-07-31 Debbie Cook - Calculated actual tolerance
    *          value to pass into Spice::CreateCache() method.
    */
-  MiniRF::MiniRF(Isis::Pvl &lab) : Isis::RadarCamera(lab) {
+  MiniRF::MiniRF(Isis::Cube &cube) : Isis::RadarCamera(cube) {
 
     // Get the ground range resolution (ScaledPixelHeight and ScaledPixelWidth
     // are expected to be equal - mrf2isis checks for this)
+    Pvl &lab = *cube.label();
     Isis::PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
     double groundRangeResolution = inst["ScaledPixelHeight"]; // meters
 
@@ -197,6 +198,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Lro namespace.
  */
-extern "C" Isis::Camera *MiniRFPlugin(Isis::Pvl &lab) {
-  return new Isis::MiniRF(lab);
+extern "C" Isis::Camera *MiniRFPlugin(Isis::Cube &cube) {
+  return new Isis::MiniRF(cube);
 }

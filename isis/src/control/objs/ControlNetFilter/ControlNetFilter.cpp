@@ -677,9 +677,9 @@ namespace Isis {
 
         QString sn = cm->GetCubeSerialNumber();
         QString filename = mSerialNumList.FileName(sn);
-        Pvl pvl(filename);
+        Cube cube(filename, "r");
 
-        Camera *camera = CameraFactory::Create(pvl);
+        Camera *camera = CameraFactory::Create(cube);
         if (camera->SetImage(cm->GetSample(), cm->GetLine())) {
           cPointSurfPt.SetSpherical(
             Latitude(camera->UniversalLatitude(), Angle::Degrees),
@@ -751,8 +751,8 @@ namespace Isis {
         if (!surfacePt1.Valid()) {
           QString sn1 = cp1RefMeasure->GetCubeSerialNumber();
           QString filename1 = mSerialNumList.FileName(sn1);
-          Pvl pvl1(filename1);
-          cam1 = CameraFactory::Create(pvl1);
+          Cube cube1(filename1, "r");
+          cam1 = CameraFactory::Create(cube1);
           if (cam1->SetImage(cp1RefMeasure->GetSample(),
               cp1RefMeasure->GetLine())) {
             surfacePt1.SetSpherical(
@@ -789,8 +789,8 @@ namespace Isis {
           if (!surfacePt2.Valid()) {
             QString sn2 = cp2RefMeasure->GetCubeSerialNumber();
             QString filename2 = mSerialNumList.FileName(sn2);
-            Pvl pvl2(filename2);
-            cam2 = CameraFactory::Create(pvl2);
+            Cube cube2(filename2, "r");
+            cam2 = CameraFactory::Create(cube2);
 
             if (cam2->SetImage(cp2RefMeasure->GetSample(),
                 cp2RefMeasure->GetLine())) {
@@ -1307,8 +1307,8 @@ namespace Isis {
     int iNumCubes = mSerialNumFilter.Size();
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
       QString sSerialNum = mSerialNumFilter.SerialNumber(sn);
-      Pvl pvl(mSerialNumList.FileName(sSerialNum));
-      Camera *cam = CameraFactory::Create(pvl);
+      Cube cube(mSerialNumList.FileName(sSerialNum), "r");
+      Camera *cam = CameraFactory::Create(cube);
       double dDist = 0;
       bool bMatchDistance = false;
 

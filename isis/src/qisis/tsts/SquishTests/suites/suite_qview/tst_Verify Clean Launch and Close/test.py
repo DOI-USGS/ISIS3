@@ -132,6 +132,7 @@ def main():
     waitFor("object.exists(':Advanced Tracking_Isis::TableMainWindow')", 20000)
     test.compare(findObject(":Advanced Tracking_Isis::TableMainWindow").visible, False)
     sendEvent("QCloseEvent", waitForObject(":qview_Isis::ViewportMainWindow"))
+    snooze(1)
     
     # Restore original qview settings
     try:

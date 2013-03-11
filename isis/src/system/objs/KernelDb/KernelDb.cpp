@@ -31,9 +31,10 @@
 #include "iTime.h"
 #include "Kernel.h"
 #include "Preference.h"
-#include "PvlObject.h"
+#include "Preference.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "PvlObject.h"
 
 using namespace std;
 namespace Isis {

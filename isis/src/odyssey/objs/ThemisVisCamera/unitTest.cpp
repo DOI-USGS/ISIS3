@@ -49,9 +49,9 @@ int main(void) {
     double knownLat = 48.5338707313522;
     double knownLon = 332.0434591311045;
 
-    Pvl p("$odyssey/testData/V14093008RDR.even.cub");
-    Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube c("$odyssey/testData/V14093008RDR.even.cub", "r");
+    Camera *cam = CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

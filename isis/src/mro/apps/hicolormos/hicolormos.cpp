@@ -43,6 +43,7 @@ void IsisMain() {
 
   // Prep for second image if we have one
   Pvl from2lab;
+  Cube from2cube;
   PvlGroup from2Mosaic("Mosaic");
   if(ui.WasEntered("FROM2")) {
     QString from2 = ui.GetFileName("FROM2");
@@ -58,6 +59,7 @@ void IsisMain() {
     }
 
     from2Mosaic = from2lab.findGroup("Mosaic", Pvl::Traverse);
+    from2cube.open(ui.GetFileName("FROM2"), "r");
   }
   tf.Close();  // Close list remember to delete
 
@@ -107,7 +109,8 @@ void IsisMain() {
   // has been left in to be backward compatiable.  See code below that sets
   // image,  this was in 10/07 because pole images would not find an
   // intersect in projection lat. lon. space.
-  Camera *cam = CameraFactory::Create(from1lab);
+  Cube from1cube(from1, "r");
+  Camera *cam = CameraFactory::Create(from1cube);
   if(cam->SetUniversalGround(avgLat, avgLon)) {
     Cemiss = cam->EmissionAngle();
     Cphase = cam->PhaseAngle();
@@ -119,7 +122,7 @@ void IsisMain() {
     runXY = false;
   }
   else if(ui.WasEntered("FROM2")) {
-    Camera *cam = CameraFactory::Create(from2lab);
+    Camera *cam = CameraFactory::Create(from2cube);
     if(cam->SetUniversalGround(avgLat, avgLon)) {
       Cemiss = cam->EmissionAngle();
       Cphase = cam->PhaseAngle();
@@ -163,7 +166,7 @@ void IsisMain() {
     double avgY = (startY + endY) / 2;
     double sample = proj->ToWorldX(avgX);
     double line = proj->ToWorldY(avgY);
-    Camera *cam = CameraFactory::Create(from1lab);
+    Camera *cam = CameraFactory::Create(from1cube);
     if(cam->SetImage(sample, line)) {
       Cemiss = cam->EmissionAngle();
       Cphase = cam->PhaseAngle();
@@ -175,7 +178,7 @@ void IsisMain() {
       runXY = false;
     }
     else if(ui.WasEntered("FROM2")) {
-      Camera *cam = CameraFactory::Create(from2lab);
+      Camera *cam = CameraFactory::Create(from2cube);
       if(cam->SetImage(sample, line)) {
         Cemiss = cam->EmissionAngle();
         Cphase = cam->PhaseAngle();

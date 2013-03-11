@@ -40,12 +40,13 @@ namespace Isis {
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  CTXCamera::CTXCamera(Pvl &lab) : LineScanCamera(lab) {
+  CTXCamera::CTXCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
     SetPixelPitch();
 
+    Pvl &lab = *cube.label();
     // Get the start time from labels
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockCount"];
@@ -101,6 +102,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed Mro
  *            namespace.
  */
-extern "C" Isis::Camera *CTXCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::CTXCamera(lab);
+extern "C" Isis::Camera *CTXCameraPlugin(Isis::Cube &cube) {
+  return new Isis::CTXCamera(cube);
 }

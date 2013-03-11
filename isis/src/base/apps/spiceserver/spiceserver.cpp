@@ -37,7 +37,7 @@ double g_startPad = 0.0;
 double g_endPad = 0.0;
 QString g_shapeKernelStr;
 
-bool tryKernels(Pvl &labels, Process &p,
+bool tryKernels(Cube &cube, Pvl &labels, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik,
@@ -80,12 +80,15 @@ void IsisMain() {
     //   problems really
     inFile.GetLine(hexCode);
 
-    Pvl label;
+    Cube cube;
+    cube.open("$base/testData/isisTruth.cub", "r");
+    Pvl &label = *cube.label();
+    label.clear();
     QString otherVersion;
 
     if (!hexCode.isEmpty()) {
       // Convert HEX to XML
-      QString xml(QByteArray::fromHex(hexCode.toAscii()).constData());
+      QString xml(QByteArray::fromHex(QByteArray(hexCode.toAscii())).constData());
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
       QDomDocument document;
@@ -103,7 +106,7 @@ void IsisMain() {
           if (element.tagName() == "isis_version") {
             QString encoded = element.firstChild().toText().data();
             otherVersion =
-                QString(QByteArray::fromHex(encoded.toAscii()).constData());
+                QByteArray::fromHex(encoded.toAscii()).constData();
           }
           else if (element.tagName() == "parameters") {
             // Read the spiceinit parameters
@@ -132,7 +135,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (otherVersion != Application::Version()) {
+    if (ui.GetBoolean("CHECKVERSION") && otherVersion != Application::Version()) {
       QString msg = "The SPICE server only supports the latest Isis version [" +
                     Application::Version() + "], version [" + otherVersion +
                     "] is not compatible";
@@ -257,7 +260,7 @@ void IsisMain() {
 
       realCkKernel.setKernels(ckKernelList);
 
-      kernelSuccess = tryKernels(label, p, lk, pck, targetSpk,
+      kernelSuccess = tryKernels(cube, label, p, lk, pck, targetSpk,
                                  realCkKernel, fk, ik, sclk, spk,
                                  iak, dem, exk);
     }
@@ -292,7 +295,7 @@ void IsisMain() {
   }
 }
 
-bool tryKernels(Pvl &label, Process &p,
+bool tryKernels(Cube &cube, Pvl &lab, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik, Kernel sclk,
@@ -300,8 +303,7 @@ bool tryKernels(Pvl &label, Process &p,
                 Kernel dem, Kernel exk) {
   UserInterface &ui = Application::GetUserInterface();
 
-  // copy the label
-  Pvl lab = label;
+  Pvl origLabels = lab;
 
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
@@ -400,14 +402,14 @@ bool tryKernels(Pvl &label, Process &p,
     currentKernels.addKeyword(PvlKeyword("EndPadding", toString(g_endPad), "seconds"));
 
   currentKernels.addKeyword(
-      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(lab))),
+      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(cube))),
       Pvl::Replace);
 
   // Create the camera so we can get blobs if necessary
   try {
     Camera *cam = NULL;
     try {
-      cam = CameraFactory::Create(lab);
+      cam = CameraFactory::Create(cube);
 
       // If success then pretend we had the shape model keyword in there...
       //   this doesn't actually effect the blobs that we care about
@@ -488,6 +490,7 @@ bool tryKernels(Pvl &label, Process &p,
     kernelsLabels.write(ui.GetFileName("TO") + ".lab");
   }
   catch (IException &) {
+    lab = origLabels;
     return false;
   }
 
@@ -584,7 +587,7 @@ void packageKernels(QString toFile) {
 
   QString logFile(toFile + ".print");
   Pvl logMessage(logFile);
-  remove(logFile.toAscii().data());
+  QFile::remove(logFile);
   stringstream logStream;
   logStream << logMessage;
   xml +=
@@ -595,7 +598,7 @@ void packageKernels(QString toFile) {
 
   QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
-  remove(kernLabelsFile.toAscii().data());
+  QFile::remove(kernLabelsFile);
   stringstream labelStream;
   labelStream << kernLabels;
 
@@ -612,7 +615,7 @@ void packageKernels(QString toFile) {
 
   xml += "  </tables>\n";
   xml += "</spice_data>\n";
-  QString encodedXml(xml.toAscii().toHex().constData());
+  QString encodedXml(QByteArray(xml.toAscii()).toHex().constData());
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);

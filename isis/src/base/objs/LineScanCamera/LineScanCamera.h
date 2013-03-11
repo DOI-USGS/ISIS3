@@ -49,7 +49,7 @@ namespace Isis {
 
   class LineScanCamera : public Camera {
     public:
-      LineScanCamera(Isis::Pvl &lab);
+      LineScanCamera(Isis::Cube &cube);
 
       /** 
        * Returns the LineScan type of camera, as enumerated in the Camera 

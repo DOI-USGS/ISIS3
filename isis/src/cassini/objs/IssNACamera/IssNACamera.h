@@ -61,11 +61,11 @@ namespace Isis {
    *                           coding standards. References #972.
    *   @history 2012-09-12 Stuart C. Sides -  Added ability for the camera to use the default
    *                           focal length if the observation was taken using a filter
-   *                           combination not supported in the calibraion report. Fixes #837.
+   *                           combination not supported in the calibration report. Fixes #837.
    */
   class IssNACamera : public FramingCamera {
     public:
-      IssNACamera(Pvl &lab);
+      IssNACamera(Cube &cube);
       //! Destroys the IssNACamera object.
       ~IssNACamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

@@ -39,7 +39,7 @@ namespace Isis {
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  ThemisIrCamera::ThemisIrCamera(Pvl &lab) : LineScanCamera(lab) {
+  ThemisIrCamera::ThemisIrCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // Set the detector size
     SetPixelPitch(0.05);
@@ -48,6 +48,7 @@ namespace Isis {
     // Get the start time.  This includes adding a time offset that could
     // have been put in the labels during ingestion (thm2isis).  This is meant
     // to handle a random timing errors which can be up to four pixels
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockCount"];
     p_etStart = getClockTime(stime).Et();
@@ -212,6 +213,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Odyssey namespace.
  */
-extern "C" Isis::Camera *ThemisIrCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::ThemisIrCamera(lab);
+extern "C" Isis::Camera *ThemisIrCameraPlugin(Isis::Cube &cube) {
+  return new Isis::ThemisIrCamera(cube);
 }

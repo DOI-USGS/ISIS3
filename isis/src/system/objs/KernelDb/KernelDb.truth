@@ -1,5 +1,76 @@
 Pvl Label 1: 
 Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
+  Group = Instrument
+    StartTime      = "2005 JUN 15 12:00:00.000 TDB"
+    StopTime       = "2005 DEC 15 12:00:00.000 TDB"
+    SpacecraftName = IdealSpacecraft
+    InstrumentId   = IdealCamera
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 196609
+  Bytes     = 695
+End_Object
+
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
   Group = Instrument
     StartTime      = "2005 JUN 15 12:00:00.000 TDB"
     StopTime       = "2005 DEC 15 12:00:00.000 TDB"
@@ -103,11 +174,82 @@ $base/demTest2
 
 Mro (non-CRISM) Instrument Label: 
 Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
   Group = Instrument
     StartTime      = "2008 JAN 12 00:00:00.0"
     StopTime       = "2008 JAN 12 00:00:00.0"
     SpacecraftName = MarsReconnaissanceOrbiter
     InstrumentId   = HiRISE
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 196609
+  Bytes     = 695
+End_Object
+
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
+  Group = Instrument
+    StartTime      = "2005 JUN 15 12:00:00.000 TDB"
+    StopTime       = "2005 DEC 15 12:00:00.000 TDB"
+    SpacecraftName = IdealSpacecraft
+    InstrumentId   = IdealCamera
   End_Group
 
   Group = TestGroup
@@ -141,11 +283,82 @@ $mro/kernels/spk/mro_psp6.bsp
 
 Mro CRISM Label: 
 Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
   Group = Instrument
     StartTime      = "2008 JAN 12 00:00:00.0"
     StopTime       = "2008 JAN 12 00:00:00.0"
     SpacecraftName = MarsReconnaissanceOrbiter
     InstrumentId   = CRISM
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 196609
+  Bytes     = 695
+End_Object
+
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
+  Group = Instrument
+    StartTime      = "2005 JUN 15 12:00:00.000 TDB"
+    StopTime       = "2005 DEC 15 12:00:00.000 TDB"
+    SpacecraftName = IdealSpacecraft
+    InstrumentId   = IdealCamera
   End_Group
 
   Group = TestGroup
@@ -205,10 +418,81 @@ Smithed			1		1		1		1		1
 
 Label, no StopTime: 
 Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
   Group = Instrument
     StartTime      = "2008 JAN 12 00:00:00.0"
     SpacecraftName = MarsReconnaissanceOrbiter
     InstrumentId   = CRISM
+  End_Group
+
+  Group = TestGroup
+    TestKeyword = TestValue
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 196609
+  Bytes     = 695
+End_Object
+
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 126
+      Lines   = 126
+      Bands   = 2
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Test
+    Keyword = "This is a test"
+  End_Group
+
+  Group = Instrument
+    StartTime      = "2005 JUN 15 12:00:00.000 TDB"
+    StopTime       = "2005 DEC 15 12:00:00.000 TDB"
+    SpacecraftName = IdealSpacecraft
+    InstrumentId   = IdealCamera
   End_Group
 
   Group = TestGroup

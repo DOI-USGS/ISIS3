@@ -41,6 +41,13 @@ namespace Isis {
    *                           file lists. This is now corrected so that it'll
    *                           remember the path to the file list instead of the
    *                           path to the files in the file list. Fixes #848.
+   *   @history 2012-08-28 Tracie Sucharski - Moved the toolpad and active toolbar creation to
+   *                           MosaicSceneWidget.
+   *   @history 2012-09-17 Steven Lambright - Restored the toolpad and active toolbar creation...
+   *                           creation is now in both places, internalization into the scne is for
+   *                           cnetsuite only. This allows movement of toolbars/appropriate
+   *                           placements of other widgets (progress bar, tracking in status, etc)
+   *                           for qmos (aka this class).
    */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT

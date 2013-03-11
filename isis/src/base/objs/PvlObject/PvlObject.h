@@ -27,6 +27,7 @@
 #include "PvlContainer.h"
 #include "PvlGroup.h"
 
+#include <QMetaType>
 
 template<typename T> class QList;
 
@@ -364,5 +365,7 @@ namespace Isis {
                                                 in the current PvlObject. */
   };
 }
+
+Q_DECLARE_METATYPE(Isis::PvlObject);
 
 #endif

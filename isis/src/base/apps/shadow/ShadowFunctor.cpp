@@ -19,6 +19,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Portal.h"
+#include "Projection.h"
 #include "PvlGroup.h"
 #include "Statistics.h"
 #include "SurfacePoint.h"

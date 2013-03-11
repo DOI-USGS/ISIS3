@@ -216,6 +216,8 @@ namespace Isis {
     connect(p_progressTimer, SIGNAL(timeout()), this, SLOT(onProgressTimer()));
 
     p_bgColor = Qt::black;
+
+    p_image = new QImage(viewport()->size(), QImage::Format_RGB32);
   }
 
 
@@ -1691,7 +1693,7 @@ namespace Isis {
         case QEvent::MouseMove: {
           QMouseEvent *m = (QMouseEvent *) e;
           emit mouseMove(m->pos());
-         emit mouseMove(m->pos(), (Qt::MouseButton)(m->button() +
+          emit mouseMove(m->pos(), (Qt::MouseButton)(m->button() +
                                     m->modifiers()));
           return true;
         }

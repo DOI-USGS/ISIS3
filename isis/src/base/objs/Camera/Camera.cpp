@@ -61,22 +61,19 @@ namespace Isis {
    *
    * @param lab Pvl label used to create the Camera object
    */
-  Camera::Camera(Pvl &lab) : Sensor(lab) {
+  Camera::Camera(Cube &cube) : Sensor(cube) {
     // Get the image size which can be different than the alpha cube size
-
-    PvlGroup &dims = lab.findObject("IsisCube")
-                           .findObject("Core")
-                           .findGroup("Dimensions");
-    p_lines = dims["Lines"];
-    p_samples = dims["Samples"];
-    p_bands = dims["Bands"];
+    p_lines = cube.lineCount();
+    p_samples = cube.sampleCount();
+    p_bands = cube.bandCount();
 
     SetGeometricTilingHint();
 
     // Get the AlphaCube information
-    p_alphaCube = new AlphaCube(lab);
+    p_alphaCube = new AlphaCube(cube);
 
     // Get the projection group if it exists
+    Pvl &lab = *cube.label();
     if (lab.findObject("IsisCube").hasGroup("Mapping")) {
       p_projection = ProjectionFactory::CreateFromCube(lab);
     }

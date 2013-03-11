@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -43,13 +43,15 @@ namespace Isis {
    *                          call to ShutterOpenCloseTimes() method. Changed
    *                          centertime to add half exposure duration to start
    *                          time to maintain consistency with other Clementine
-   *                          models. 
+   *                          models.
    */
-  LwirCamera::LwirCamera(Pvl &lab) : FramingCamera(lab) {
+  LwirCamera::LwirCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
 
     // Get the camera characteristics
-    QString filter = (QString)(lab.findGroup("BandBin", Pvl::Traverse))["FilterName"];
+    Pvl &lab = *cube.label();
+    QString filter = (lab.findGroup("BandBin", Pvl::Traverse))["FilterName"];
+
     filter = filter.toUpper();
 
     SetFocalLength();
@@ -84,7 +86,7 @@ namespace Isis {
     focalMap->SetDetectorOrigin(
       Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) + 
+      Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map
@@ -131,7 +133,7 @@ namespace Isis {
 
 /**
  * This is the function that is called in order to instantiate a LwirCamera
- * object. 
+ * object.
  *
  * @param lab Cube labels
  *
@@ -141,6 +143,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Clementine namespace.
  */
-extern "C" Isis::Camera *LwirCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::LwirCamera(lab);
+extern "C" Isis::Camera *LwirCameraPlugin(Isis::Cube &cube) {
+  return new Isis::LwirCamera(cube);
 }

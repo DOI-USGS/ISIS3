@@ -37,7 +37,7 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    m_errors = ThrowAllErrors;
+    m_errors = AllowPastPole;
   }
 
 
@@ -498,7 +498,7 @@ namespace Isis {
    */
   void Latitude::setAngle(double angle, const Angle::Units &units) {
     // Check for passing 90 degrees if that error checking is on
-    if (!IsSpecial(angle) && (m_errors | AllowPastPole) != AllowPastPole) {
+    if (!IsSpecial(angle) && (m_errors & AllowPastPole) != AllowPastPole) {
       Angle tmpAngle(angle, units);
       if(tmpAngle > Angle(90, Angle::Degrees) ||
          tmpAngle < Angle(-90, Angle::Degrees)) {

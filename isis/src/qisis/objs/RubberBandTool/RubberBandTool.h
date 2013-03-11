@@ -3,6 +3,8 @@
 
 #include "Tool.h"
 
+#include <QPointer>
+
 class QRect;
 class QPoint;
 
@@ -16,6 +18,7 @@ namespace geos {
 
 
 namespace Isis {
+  class Angle;
   class MdiCubeViewport;
 
   /**
@@ -40,66 +43,57 @@ namespace Isis {
   *                           just a complete state.
   *   @history 2012-02-08 Tracie Sucharski - Added method to set drawing on the
   *                           active viewport only.
+  *   @history 2012-09-18 Steven Lambright - This is no longer a singleton, which prevented it from
+  *                           working with multiple workspaces. Brought method naming closer to
+  *                           current coding standards.
   */
   class RubberBandTool : public Tool {
       Q_OBJECT
 
     public:
-      static RubberBandTool *getInstance(QWidget *parent = NULL);
+      RubberBandTool(QWidget *parent = NULL);
       virtual ~RubberBandTool();
 
       enum RubberBandMode {
-        Angle,            //<! Measure an angle
-        Circle,           //<! Draw a perfect circle
-        Ellipse,          //<! Draw an ellipse (oval)
-        Line,             //<! Draw a simple line
-        Rectangle,        //<! Draw a rectangle without any rotation (perfectly horizonal/verticle)
-        RotatedRectangle, //<! Draw a rotatable rectangle
-        Polygon,          //<! Draw any closed shape
-        SegmentedLine     //<! Draw any open shape
+        AngleMode,            //<! Measure an angle
+        CircleMode,           //<! Draw a perfect circle
+        EllipseMode,          //<! Draw an ellipse (oval)
+        LineMode,             //<! Draw a simple line
+        RectangleMode,     //<! Draw a rectangle without any rotation (perfectly horizonal/verticle)
+        RotatedRectangleMode, //<! Draw a rotatable rectangle
+        PolygonMode,          //<! Draw any closed shape
+        SegmentedLineMode     //<! Draw any open shape
       };
 
-      static void enable(RubberBandMode mode, bool showIndicatorColors = false);
-      void enableBanding(RubberBandMode mode, bool showIndicatorColors = false);
+      void enable(RubberBandMode mode, bool showIndicatorColors = false);
 
-      static void disable();
-      void disableBanding();
+      void disable();
 
-      static void drawActiveViewportOnly(bool activeOnly = false);
       void setDrawActiveViewportOnly(bool activeOnly = false);
 
-      static QList<QPoint> getVertices();
-      QList<QPoint> getFoundVertices();
+      QList<QPoint> vertices();
 
-      static RubberBandMode getMode();
-      RubberBandMode getCurrentMode();
-      static double getArea();
-      double getAreaMeasure();
-      static double getAngle();
-      double getAngleMeasure(); //<! Returns the angle measurement (in radians)
+      RubberBandMode currentMode();
+      double area();
+      Angle angle();
 
-      static geos::geom::Geometry *geometry();
-      geos::geom::Geometry *getGeometry();
-      static QRect rectangle();
-      QRect getRectangle();
-      static Qt::MouseButton mouseButton();
-      Qt::MouseButton getMouseButton();
+      geos::geom::Geometry *geometry();
+      QRect rectangle();
+      Qt::MouseButton mouseButton();
+
       void paintViewport(MdiCubeViewport *vp, QPainter *painter);
 
-      //<! This returns true if we can return complete & valid data.
-      static bool isValid();
+      //! This returns true if we can return complete & valid data.
+      bool isValid();
       bool figureComplete();
       bool figureValid();
 
-      static bool isPoint();
       bool figureIsPoint();
 
-      static void allowPoints(unsigned int pixTolerance = 2);
       void enablePoints(unsigned int pixTolerance = 2);
-      static void allowAllClicks();
       void enableAllClicks();
 
-      static void clear();
+      void clear();
 
     public slots:
       void escapeKeyPress();
@@ -121,7 +115,6 @@ namespace Isis {
 
     private:
       QPoint snapMouse(QPoint);
-      RubberBandTool(QWidget *parent);
 
       void repaint();
       void paintVerticesConnected(QPainter *painter);
@@ -131,8 +124,6 @@ namespace Isis {
 
       // This is used for rotated rectangle
       void calcRectCorners(QPoint corner1, QPoint corner2, QPoint &corner3, QPoint &corner4);
-
-      static RubberBandTool *p_instance;
 
       void reset();                  //<! This resets the member variables
 

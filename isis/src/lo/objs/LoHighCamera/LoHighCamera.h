@@ -57,7 +57,7 @@ namespace Isis {
    */
   class LoHighCamera : public FramingCamera {
     public:
-      LoHighCamera(Pvl &lab);
+      LoHighCamera(Cube &cube);
       //! Destroys the LoHighCamera Object
       ~LoHighCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

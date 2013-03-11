@@ -104,13 +104,13 @@ void CalculateBottomTrim(Cube *icube) {
   //   a known even-framelet camera and a known odd-framelet camera. In order
   //   to get these, we change the cube labels in a local copy and create an
   //   odd framelet and an even framelet camera.
-  Pvl cubeLabels = *icube->label();
+  Pvl &cubeLabels = *icube->label();
   PvlKeyword &framelets = cubeLabels.findGroup("Instrument", Pvl::Traverse)["Framelets"];
   framelets = "Even";
-  Camera *camEven = CameraFactory::Create(cubeLabels);
+  Camera *camEven = CameraFactory::Create(*icube);
 
   framelets = "Odd";
-  Camera *camOdd = CameraFactory::Create(cubeLabels);
+  Camera *camOdd = CameraFactory::Create(*icube);
 
   // Framelet 2 is even, so let's use the even camera to find the lat,lon at it's beginning
   if(camEven->SetImage(1, frameletSize + 1)) {

@@ -228,6 +228,6 @@ namespace Isis {
     // a Mapping group does not exist in the labels.
     AlphaCube aCube(p_ns, p_nl, ocube->sampleCount(), ocube->lineCount(),
                     p_ss - 0.5, p_sl - 0.5, p_es + 0.5, p_el + 0.5);
-    aCube.UpdateGroup(*ocube->label());
+    aCube.UpdateGroup(*ocube);
   }
 }

@@ -366,7 +366,7 @@ void IsisMain() {
     int startLine = 1;
 
     // Get the alpha cube group in case they cropped the image
-    AlphaCube acube(*icube->label());
+    AlphaCube acube(*icube);
     double betaLine = acube.AlphaLine(1.0);
     if (fabs(betaLine - 1.0) > 0.0000000001) {
       if (fabs(betaLine - (int) betaLine) > 0.00001) {

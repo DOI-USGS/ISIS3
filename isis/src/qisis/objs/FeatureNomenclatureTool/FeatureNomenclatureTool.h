@@ -127,9 +127,9 @@ namespace Isis {
       void setShowApprovedOnly(bool approvedOnly);
       void setVectorType(VectorType show);
 
-    protected:
       QString menuName() const;
 
+    protected:
       QWidget *createToolBarWidget(QStackedWidget *parent);
       QAction *toolPadAction(ToolPad *pad);
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);

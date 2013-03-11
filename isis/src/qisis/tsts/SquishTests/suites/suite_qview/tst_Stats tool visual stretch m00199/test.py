@@ -21,7 +21,7 @@ def main():
     
     # Finished with initial run
     clickButton(waitForObject(":qview_statisticsToolButton"))
-    mouseClick(waitForObject(":viewport1"), 280, 325, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":viewport1"), 280, 378, 0, Qt.LeftButton)
     waitFor("object.exists(':Statistics.Hide Display_QCheckBox')", 20000)
     test.compare(findObject(":Statistics.Hide Display_QCheckBox").text, "Hide Display")
     test.compare(findObject(":Statistics.Hide Display_QCheckBox").checked, True)

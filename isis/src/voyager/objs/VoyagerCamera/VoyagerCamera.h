@@ -59,7 +59,7 @@ namespace Isis {
    */                                                                       
   class VoyagerCamera : public FramingCamera {
     public:
-      VoyagerCamera (Pvl &lab);
+      VoyagerCamera (Cube &cube);
       //! Destroys the VoyagerCamera object.
       ~VoyagerCamera () {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

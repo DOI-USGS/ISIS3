@@ -50,9 +50,9 @@ int main(void) {
     Camera *cam;
 
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
-      Pvl p(files[i]);
-      cam = CameraFactory::Create(p);
-      cout << "FileName: " << FileName(p.fileName()).name() << endl;
+      Cube cube(files[i], "r");
+      cam = CameraFactory::Create(cube);
+      cout << "FileName: " << FileName(files[i]).name() << endl;
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
       cout.setf(std::ios::fixed);
       cout << setprecision(9);

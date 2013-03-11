@@ -29,6 +29,7 @@
 #include <iomanip>
 
 #include "Camera.h"
+#include "Projection.h"
 #include "SpecialPixel.h"
 #include "SmtkMatcher.h"
 

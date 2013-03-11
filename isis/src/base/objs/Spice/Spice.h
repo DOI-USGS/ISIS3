@@ -23,15 +23,18 @@
 
 #include <string>
 #include <vector>
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
+
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
 #include "Pvl.h"
 #include "ShapeModel.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
 
 namespace Isis {
+  class Cube;
   class iTime;
   class Distance;
   class EllipsoidShape;
@@ -259,8 +262,8 @@ namespace Isis {
   class Spice {
     public:
       // constructors
-      Spice(Pvl &label);
-      Spice(Pvl &label, bool noTables);
+      Spice(Cube &cube);
+      Spice(Cube &cube, bool noTables);
 
       // destructor
       virtual ~Spice();

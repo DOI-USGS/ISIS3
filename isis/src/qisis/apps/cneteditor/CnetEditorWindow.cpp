@@ -25,6 +25,7 @@
 #include <QToolBar>
 
 #include "ConcurrentControlNetReader.h"
+#include "Control.h"
 #include "ControlNet.h"
 #include "FileName.h"
 #include "IException.h"
@@ -37,14 +38,12 @@
 
 using std::endl;
 
-namespace Isis
-{
-  CnetEditorFileDialog::CnetEditorFileDialog(QLayout * l,
-      QWidget * parent) : QFileDialog(parent)
-  {
+namespace Isis {
+  CnetEditorFileDialog::CnetEditorFileDialog(QLayout *l,
+      QWidget *parent) : QFileDialog(parent) {
     setAcceptMode(AcceptSave);
     setNameFilter("Control Network files (*.net *.bin);;All files (*)");
-    QGridLayout * mainLayout = qobject_cast< QGridLayout * >(layout());
+    QGridLayout *mainLayout = qobject_cast< QGridLayout * >(layout());
     ASSERT(mainLayout);
 
     if (mainLayout)
@@ -52,8 +51,7 @@ namespace Isis
   }
 
 
-  CnetEditorWindow::CnetEditorWindow()
-  {
+  CnetEditorWindow::CnetEditorWindow() {
     // For some reason GUI style is not detected correctly by Qt for Isis.
     // This solution is less than ideal since it assumes one of at least 4
     // possible styles that could exist for X11 systems.  Plastique will
@@ -74,7 +72,7 @@ namespace Isis
     curFile = new QString;
     cubeListFile = new QString;
     labelFont = new QFont("Sansserif", 9);
-    toolBars = new QList< QToolBar * >;
+    toolBars = new QList<QToolBar *>;
 
     createActions();
     createDockWidgets();
@@ -86,8 +84,8 @@ namespace Isis
     setFileState(NoFile, "");
     setSaveFilteredNetwork(false);
 
-    QHBoxLayout * horizontalLayout = new QHBoxLayout;
-    QWidget * dummyCentralWidget = new QWidget;
+    QHBoxLayout *horizontalLayout = new QHBoxLayout;
+    QWidget *dummyCentralWidget = new QWidget;
     dummyCentralWidget->setLayout(horizontalLayout);
     setCentralWidget(dummyCentralWidget);
 
@@ -104,13 +102,12 @@ namespace Isis
       else
         QMessageBox::warning(this, tr("Unrecognized Argument"),
             tr("Could not determine the type of file [%1]. Expected .net or "
-               ".lis.").arg(arg));
+                ".lis.").arg(arg));
     }
   }
 
 
-  CnetEditorWindow::~CnetEditorWindow()
-  {
+  CnetEditorWindow::~CnetEditorWindow() {
     delete openNetAct;
     openNetAct = NULL;
 
@@ -150,9 +147,6 @@ namespace Isis
     delete labelFont;
     labelFont = NULL;
 
-    delete loadingProgressBar;
-    loadingProgressBar = NULL;
-
     delete cubeListProgressBar;
     cubeListProgressBar = NULL;
 
@@ -163,8 +157,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::nullify()
-  {
+  void CnetEditorWindow::nullify() {
     cnet = NULL;
     displayProperties = NULL;
     cnetReader = NULL;
@@ -186,7 +179,6 @@ namespace Isis
     mainToolBar = NULL;
     toolBars = NULL;
 
-    loadingProgressBar = NULL;
     cubeListProgressBar = NULL;
 
     pointTreeDockWidget = NULL;
@@ -199,10 +191,8 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::closeEvent(QCloseEvent * event)
-  {
-    if (okToContinue())
-    {
+  void CnetEditorWindow::closeEvent(QCloseEvent *event) {
+    if (okToContinue()) {
       writeSettings();
 
       if (editorWidget)
@@ -210,15 +200,13 @@ namespace Isis
 
       event->accept();
     }
-    else
-    {
+    else {
       event->ignore();
     }
   }
 
 
-  void CnetEditorWindow::createActions()
-  {
+  void CnetEditorWindow::createActions() {
     openNetAct = new QAction(QIcon(":open"), tr("&Open control network"), this);
     openNetAct->setShortcut(tr("Ctrl+O"));
     openNetAct->setStatusTip(tr("Open a control network file"));
@@ -253,8 +241,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::createDockWidgets()
-  {
+  void CnetEditorWindow::createDockWidgets() {
     setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
     setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
@@ -308,8 +295,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::createMenus()
-  {
+  void CnetEditorWindow::createMenus() {
     fileMenu = menuBar()->addMenu("&File");
     fileMenu->addAction(openNetAct);
     fileMenu->addSeparator();
@@ -328,8 +314,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::createToolBars()
-  {
+  void CnetEditorWindow::createToolBars() {
     mainToolBar = new QToolBar(tr("Main ToolBar"));
     mainToolBar->setObjectName("main toolbar");
     mainToolBar->setFloatable(false);
@@ -347,20 +332,14 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::createStatusBar()
-  {
-    loadingProgressBar = new ProgressBar("Reading network");
-    statusBar()->addPermanentWidget(loadingProgressBar);
-    loadingProgressBar->setVisible(false);
-
+  void CnetEditorWindow::createStatusBar() {
     cubeListProgressBar = new ProgressBar("Reading cube list");
     statusBar()->addPermanentWidget(cubeListProgressBar);
     cubeListProgressBar->setVisible(false);
   }
 
 
-  void CnetEditorWindow::readSettings()
-  {
+  void CnetEditorWindow::readSettings() {
     QSettings settings(FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded(),
         QSettings::NativeFormat);
@@ -377,8 +356,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::writeSettings()
-  {
+  void CnetEditorWindow::writeSettings() {
     QSettings settings(FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded(),
         QSettings::NativeFormat);
@@ -390,12 +368,10 @@ namespace Isis
   }
 
 
-  bool CnetEditorWindow::okToContinue()
-  {
+  bool CnetEditorWindow::okToContinue() {
     bool ok = true;
 
-    if (dirty)
-    {
+    if (dirty) {
       QString name = QFileInfo(*curFile).fileName();
       int r = QMessageBox::warning(this, tr("cneteditor"),
           "The network \"" + name + "\" has been modified.\n"
@@ -404,35 +380,30 @@ namespace Isis
 
       if (r == QMessageBox::Cancel)
         ok = false;
-      else
-        if (r == QMessageBox::Save)
-          save();
+      else if (r == QMessageBox::Save)
+        save();
     }
 
     return ok;
   }
 
 
-  void CnetEditorWindow::setDirty()
-  {
+  void CnetEditorWindow::setDirty() {
     setDirty(true);
   }
 
 
-  void CnetEditorWindow::setSaveAsPvl(int state)
-  {
+  void CnetEditorWindow::setSaveAsPvl(int state) {
     saveAsPvl = (bool) state;
   }
 
 
-  void CnetEditorWindow::setSaveFilteredNetwork(bool enabled)
-  {
+  void CnetEditorWindow::setSaveFilteredNetwork(bool enabled) {
     saveFilteredNetwork = enabled;
   }
 
 
-  void CnetEditorWindow::openCubeList()
-  {
+  void CnetEditorWindow::openCubeList() {
     QString filename = QFileDialog::getOpenFileName(this,
         tr("Open a cube list file"), ".",
         tr("Cube list files (*.lis);;All files (*)"));
@@ -442,8 +413,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::openNet()
-  {
+  void CnetEditorWindow::openNet() {
     QString filename = QFileDialog::getOpenFileName(this,
         tr("Open a control net file"), ".",
         tr("Control Network files (*.net *.bin);;All files (*)"));
@@ -454,10 +424,8 @@ namespace Isis
 
 
   void CnetEditorWindow::setFileState(CnetEditorWindow::FileState state,
-      QString filename)
-  {
-    switch (state)
-    {
+      QString filename) {
+    switch (state) {
       case HasFile:
         centralWidget()->layout()->addWidget(editorWidget);
 
@@ -468,7 +436,6 @@ namespace Isis
         setDirty(false);
         *curFile = filename;
         setWindowTitle(filename + "[*] - cneteditor *BETA VERSION*");
-        loadingProgressBar->setVisible(false);
         break;
 
       case NoFile:
@@ -481,7 +448,6 @@ namespace Isis
         saveFilteredNetwork = false;
         *curFile = "";
         setWindowTitle("cneteditor *BETA VERSION*");
-        loadingProgressBar->setVisible(false);
         break;
 
       case FileLoading:
@@ -491,35 +457,27 @@ namespace Isis
         closeAct->setEnabled(false);
         *curFile = filename;
         setWindowTitle("cneteditor *BETA VERSION* (loading "
-                       + filename + "...)");
-        loadingProgressBar->setValue(loadingProgressBar->minimum());
-        loadingProgressBar->setVisible(true);
+            + filename + "...)");
         break;
     }
   }
 
 
-  void CnetEditorWindow::load(QString filename)
-  {
-    try
-    {
+  void CnetEditorWindow::load(QString filename) {
+    try {
       cnetReader = new ConcurrentControlNetReader;
 
-      // progress for reading the network
-      connect(cnetReader, SIGNAL(progressRangeChanged(int, int)),
-          loadingProgressBar, SLOT(setRange(int, int)));
-      connect(cnetReader, SIGNAL(progressValueChanged(int)),
-          loadingProgressBar, SLOT(setValue(int)));
+      statusBar()->addWidget(cnetReader->progressBar());
+      cnetReader->progressBar()->setText("Reading network");
 
       // call networkLoaded when the reading is complete
-      connect(cnetReader, SIGNAL(networkReadFinished(ControlNet *)),
-          this, SLOT(networkLoaded(ControlNet *)));
+      connect(cnetReader, SIGNAL(networksReady(QList<Control *>)),
+          this, SLOT(networkLoaded(QList<Control *>)));
 
       cnetReader->read(filename);
       setFileState(FileLoading, filename);
     }
-    catch (IException &)
-    {
+    catch (IException &) {
       QMessageBox::critical(this, tr("cneteditor"),
           tr("Failed to open the file provided"));
       setFileState(NoFile, "");
@@ -528,32 +486,31 @@ namespace Isis
 
 
   void CnetEditorWindow::loadCubeList(QString filename) {
-      ASSERT(displayProperties);
+    ASSERT(displayProperties);
 
-      connect(displayProperties, SIGNAL(composeProgressRangeChanged(int, int)),
-              cubeListProgressBar, SLOT(setRange(int, int)));
-      connect(displayProperties, SIGNAL(composeProgressChanged(int)),
-              cubeListProgressBar, SLOT(setValue(int)));
-      connect(displayProperties, SIGNAL(compositionFinished()),
-              this, SLOT(cubeListLoaded()));
+    connect(displayProperties, SIGNAL(composeProgressRangeChanged(int, int)),
+        cubeListProgressBar, SLOT(setRange(int, int)));
+    connect(displayProperties, SIGNAL(composeProgressChanged(int)),
+        cubeListProgressBar, SLOT(setValue(int)));
+    connect(displayProperties, SIGNAL(compositionFinished()),
+        this, SLOT(cubeListLoaded()));
 
-      // Show the cube list progress bar and start loading the cube list.
-      cubeListProgressBar->setValue(cubeListProgressBar->minimum());
-      cubeListProgressBar->setVisible(true);
-      displayProperties->setCubeList(filename);
-      *cubeListFile = filename;
+    // Show the cube list progress bar and start loading the cube list.
+    cubeListProgressBar->setValue(cubeListProgressBar->minimum());
+    cubeListProgressBar->setVisible(true);
+    displayProperties->setCubeList(filename);
+    *cubeListFile = filename;
   }
 
 
-  void CnetEditorWindow::save()
-  {
+  void CnetEditorWindow::save() {
     ASSERT(!curFile->isEmpty());
 
     if (saveFilteredNetwork) {
       QString newCubeListFileName;
 
       // Get our filtered network and write it to disk.
-      ControlNet * filteredCnet = editorWidget->filteredNetwork();
+      ControlNet *filteredCnet = editorWidget->filteredNetwork();
       filteredCnet->Write(*curFile, saveAsPvl);
 
       if (cubeListFile->size()) {
@@ -567,7 +524,7 @@ namespace Isis
           QFile newCubeListFile(newCubeListFileName);
 
           if (!newCubeListFile.open(QIODevice::WriteOnly | QIODevice::Text |
-                                    QIODevice::Truncate)) {
+              QIODevice::Truncate)) {
             IString msg = "The file [";
             msg += (IString) newCubeListFileName;
             msg += "failed to open for writing.\n";
@@ -576,11 +533,13 @@ namespace Isis
 
           ASSERT(displayProperties);
           QStringList cubeFileNames =
-              displayProperties->getCubeList(filteredCnet);
+            displayProperties->getCubeList(filteredCnet);
 
           QTextStream ts(&newCubeListFile);
-          foreach (QString cubeFileName, cubeFileNames)
+          foreach (QString cubeFileName, cubeFileNames) {
             ts << cubeFileName << endl;
+          }
+
           newCubeListFile.close();
         }
       }
@@ -605,8 +564,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::saveAs()
-  {
+  void CnetEditorWindow::saveAs() {
     QString whatsThis = "Use these radio buttons to select how the file will "
         "be saved.  Your choice is either plain text (in the PVL format) or "
         "binary.  Although the default is inherited from the currently opened "
@@ -615,20 +573,20 @@ namespace Isis
         "need to be able to view and/or edit your control net file using a "
         "text editor.";
 
-    QRadioButton * binButton = new QRadioButton("Save in binary format");
+    QRadioButton *binButton = new QRadioButton("Save in binary format");
     binButton->setToolTip("Save the control network as a binary file");
     binButton->setWhatsThis(whatsThis);
 
-    QRadioButton * pvlButton = new QRadioButton("Save in text (PVL) format");
+    QRadioButton *pvlButton = new QRadioButton("Save in text (PVL) format");
     pvlButton->setToolTip("Save the control network in plain text (PVL "
         "format)");
     pvlButton->setWhatsThis(whatsThis);
 
-    QButtonGroup * buttonGroup = new QButtonGroup;
+    QButtonGroup *buttonGroup = new QButtonGroup;
     buttonGroup->addButton(binButton, 0);
     buttonGroup->addButton(pvlButton, 1);
     connect(buttonGroup, SIGNAL(buttonClicked(int)),
-            this, SLOT(setSaveAsPvl(int)));
+        this, SLOT(setSaveAsPvl(int)));
 
     if (saveAsPvl)
       pvlButton->click();
@@ -640,26 +598,24 @@ namespace Isis
     // action so that the user must select it each time. It wouldn't be a good
     // idea to have this option default to enabled.
     setSaveFilteredNetwork(false);
-    QCheckBox * saveFilteredNetworkCheckBox = new QCheckBox(
-        "Save currently filtered network");
+    QCheckBox *saveFilteredNetworkCheckBox = new QCheckBox(
+      "Save currently filtered network");
     saveFilteredNetworkCheckBox->setToolTip(
-        "Save only the currently filtered control network");
+      "Save only the currently filtered control network");
     connect(saveFilteredNetworkCheckBox, SIGNAL(toggled(bool)),
-            this, SLOT(setSaveFilteredNetwork(bool)));
+        this, SLOT(setSaveFilteredNetwork(bool)));
 
-    QHBoxLayout * buttonLayout = new QHBoxLayout;
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(binButton);
     buttonLayout->addWidget(pvlButton);
     buttonLayout->addWidget(saveFilteredNetworkCheckBox);
 
-    CnetEditorFileDialog * fileDialog = new CnetEditorFileDialog(buttonLayout);
+    CnetEditorFileDialog *fileDialog = new CnetEditorFileDialog(buttonLayout);
 
-    if (fileDialog->exec() == QDialog::Accepted)
-    {
+    if (fileDialog->exec() == QDialog::Accepted) {
       QString filename = fileDialog->selectedFiles().value(0);
 
-      if (!filename.isEmpty())
-      {
+      if (!filename.isEmpty()) {
         setFileState(CnetEditorWindow::HasFile, filename);
         save();
       }
@@ -671,10 +627,8 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::closeNetwork(bool promptToSave)
-  {
-    if (!promptToSave || okToContinue())
-    {
+  void CnetEditorWindow::closeNetwork(bool promptToSave) {
+    if (!promptToSave || okToContinue()) {
       disconnect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
       delete editorWidget;
       editorWidget = NULL;
@@ -683,10 +637,8 @@ namespace Isis
       delete cnetReader;
       cnetReader = NULL;
 
-      foreach (QToolBar * tb, *toolBars)
-      {
-        foreach (QAction * tbAct, tb->actions())
-        {
+      foreach (QToolBar *tb, *toolBars) {
+        foreach (QAction *tbAct, tb->actions()) {
           delete tbAct;
         }
         delete tb;
@@ -698,8 +650,7 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::networkLoaded(ControlNet * net)
-  {
+  void CnetEditorWindow::networkLoaded(ControlNet *net) {
     cnet = net;
     editorWidget = new CnetEditorWidget(cnet, FileName(
         "$HOME/.Isis/cneteditor/cneteditor.config").expanded());
@@ -712,14 +663,20 @@ namespace Isis
     connectionTreeDockWidget->setWidget(editorWidget->connectionTreeView());
 
     pointFilterDockWidget->setWidget(
-        editorWidget->pointFilterWidget());
+      editorWidget->pointFilterWidget());
     serialFilterDockWidget->setWidget(
-        editorWidget->serialFilterWidget());
+      editorWidget->serialFilterWidget());
     connectionFilterDockWidget->setWidget(
-        editorWidget->connectionFilterWidget());
+      editorWidget->connectionFilterWidget());
 
     setFileState(HasFile, *curFile);
     saveAsPvl = !Pvl(*curFile).hasObject("ProtoBuffer");
+  }
+
+
+  void CnetEditorWindow::networkLoaded(QList<Control *> nets) {
+    ASSERT(nets.count() == 1);
+    networkLoaded(nets.first()->controlNet());
   }
 
 
@@ -729,51 +686,44 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::populateMenus()
-  {
+  void CnetEditorWindow::populateMenus() {
     QMap< QAction *, QList< QString > > actionMap;
     actionMap = editorWidget->menuActions();
     QMapIterator< QAction *, QList< QString > > i(actionMap);
 
-    QWidget * widget = NULL;
+    QWidget *widget = NULL;
 
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
       i.next();
-      QAction * act = i.key();
+      QAction *act = i.key();
       QList< QString > location = i.value();
 
       widget = menuBar();
 
-      while (location.size())
-      {
+      while (location.size()) {
         QString menuName = location.takeFirst();
 
         int actListIndex = indexOfActionList(widget->actions(), menuName);
 
         // if menuName not found in current widget's actions,
         // then add needed submenu
-        if (actListIndex == -1)
-        {
-          QMenuBar * mb = qobject_cast< QMenuBar * >(widget);
-          QMenu * m = qobject_cast< QMenu * >(widget);
-          ASSERT((mb != NULL) ^ (m != NULL));
+        if (actListIndex == -1) {
+          QMenuBar *mb = qobject_cast< QMenuBar * >(widget);
+          QMenu *m = qobject_cast< QMenu * >(widget);
+          ASSERT((mb != NULL) ^(m != NULL));
 
-          if (mb)
-          {
+          if (mb) {
             mb->addMenu(menuName);
             int index = indexOfActionList(mb->actions(), menuName);
             widget = mb->actions()[index]->menu();
           }
-          else
-          {
+          else {
             m->addMenu(menuName);
             int index = indexOfActionList(m->actions(), menuName);
             widget = m->actions()[index]->menu();
           }
         }
-        else // menu exists so just update widget
-        {
+        else { // menu exists so just update widget
           widget = widget->actions()[actListIndex]->menu();
         }
       }
@@ -784,8 +734,7 @@ namespace Isis
 
 
   int CnetEditorWindow::indexOfActionList(QList< QAction * > actionList,
-                                          QString actionText)
-  {
+      QString actionText) {
     int index = -1;
     for (int i = 0; index == -1 && i < actionList.size(); i++)
       if (actionList[i]->text() == actionText)
@@ -795,37 +744,34 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::populateToolBars()
-  {
+  void CnetEditorWindow::populateToolBars() {
     QMap< QString, QList< QAction * > > actionMap;
     actionMap = editorWidget->toolBarActions();
     QMapIterator< QString, QList< QAction * > > i(actionMap);
 
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
       i.next();
       QString objName = i.key();
       QList< QAction * > actionList = i.value();
 
       // if toolbar already exists, just add the actions to it
       int index = indexOfToolBar(objName);
-      if (index != -1)
-      {
-        foreach (QAction * action, actionList)
+      if (index != -1) {
+        foreach (QAction *action, actionList) {
           (*toolBars)[index]->addAction(action);
+        }
       }
       // otherwise, it needs to be created
-      else
-      {
+      else {
         // don't allow use of mainToolBar outside this class!
-        if (objName != mainToolBar->objectName())
-        {
-          QToolBar * newToolBar = new QToolBar(objName);
+        if (objName != mainToolBar->objectName()) {
+          QToolBar *newToolBar = new QToolBar(objName);
           toolBars->append(newToolBar);
           newToolBar->setObjectName(objName);
           newToolBar->setFloatable(false);
-          foreach (QAction * action, actionList)
+          foreach (QAction *action, actionList) {
             newToolBar->addAction(action);
+          }
 
           addToolBar(Qt::TopToolBarArea, newToolBar);
         }
@@ -834,8 +780,7 @@ namespace Isis
   }
 
 
-  int CnetEditorWindow::indexOfToolBar(QString objName)
-  {
+  int CnetEditorWindow::indexOfToolBar(QString objName) {
     ASSERT(toolBars);
 
     int index = -1;
@@ -848,20 +793,16 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::removeEmptyMenus()
-  {
+  void CnetEditorWindow::removeEmptyMenus() {
     QQueue< QWidget * > q;
     q.enqueue(menuBar());
 
-    while (q.size())
-    {
-      QWidget * widget = q.dequeue();
-      QList< QAction * > actionList = widget->actions();
-      foreach (QAction * action, actionList)
-      {
-        QMenu * menu = action->menu();
-        if (menu)
-        {
+    while (q.size()) {
+      QWidget *widget = q.dequeue();
+      QList<QAction *> actionList = widget->actions();
+      foreach (QAction *action, actionList) {
+        QMenu *menu = action->menu();
+        if (menu) {
           if (menu->actions().size())
             q.enqueue(menu);
           else
@@ -872,21 +813,18 @@ namespace Isis
   }
 
 
-  void CnetEditorWindow::about()
-  {
+  void CnetEditorWindow::about() {
   }
 
 
-  void CnetEditorWindow::setDirty(bool state)
-  {
+  void CnetEditorWindow::setDirty(bool state) {
     dirty = state;
     saveAct->setEnabled(state);
     setWindowModified(state);
   }
 
 
-  void CnetEditorWindow::setDockWidgetsVisible(bool visibilityState)
-  {
+  void CnetEditorWindow::setDockWidgetsVisible(bool visibilityState) {
     pointTreeDockWidget->setVisible(visibilityState);
     serialTreeDockWidget->setVisible(visibilityState);
     connectionTreeDockWidget->setVisible(visibilityState);

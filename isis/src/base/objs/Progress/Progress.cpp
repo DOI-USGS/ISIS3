@@ -59,6 +59,7 @@ namespace Isis {
     p_currentPercent = 0;
     p_percentIncrement = percent;
     p_printPercent = printPercent;
+    p_autoDisplay = true;
   }
 
   //! Destroys the Progress object
@@ -127,10 +128,12 @@ namespace Isis {
 
     if(p_currentStep == 0) {
       if(Isis::iApp != NULL) {
-        Isis::iApp->UpdateProgress(p_text, p_printPercent);
+        if (p_autoDisplay) {
+          Isis::iApp->UpdateProgress(p_text, p_printPercent);
+        }
       }
       else {
-        if(p_printPercent) {
+        if(p_printPercent && p_autoDisplay) {
           cout << p_text << endl;
         }
       }
@@ -139,10 +142,12 @@ namespace Isis {
     // See if the percent processed needs to be updated
     while(100.0 * p_currentStep / p_maximumSteps >= p_currentPercent) {
       if(Isis::iApp != NULL) {
-        Isis::iApp->UpdateProgress(p_currentPercent, p_printPercent);
+        if (p_autoDisplay) {
+          Isis::iApp->UpdateProgress(p_currentPercent, p_printPercent);
+        }
       }
       else {
-        if(p_printPercent) {
+        if(p_printPercent && p_autoDisplay) {
           if(p_currentPercent < 100) {
             cout << p_currentPercent << "% Processed\r" << flush;
           }
@@ -154,7 +159,7 @@ namespace Isis {
       p_currentPercent += p_percentIncrement;
     }
 
-    if(Isis::iApp != NULL) {
+    if(p_autoDisplay && Isis::iApp != NULL) {
       Isis::iApp->ProcessGuiEvents();
     }
 
@@ -163,6 +168,40 @@ namespace Isis {
 
     return;
   }
+
+
+  /**
+   * Turns off updating the Isis Gui when CheckStatus() is called. You must use
+   *   RedrawProgress() to visually update the current progress.
+   */
+  void Progress::DisableAutomaticDisplay() {
+    p_autoDisplay = false;
+  }
+
+  
+  /**
+   * Returns the maximum number of steps of the progress.
+   *
+   * @see SetMaximumSteps()
+   * @return The maximum number of steps of the progress.
+   */
+  int Progress::MaximumSteps() const {
+    return p_maximumSteps;
+  }
+
+
+  /**
+   * Returns the current step of the progress. This value should always be in the range of:
+   *   [0, MaximumSteps()]. CheckStatus() increments the current step.
+   *
+   * @see CheckStatus()
+   *
+   * @return The current step of the progress
+   */
+  int Progress::CurrentStep() const {
+    return p_currentStep;
+  }
+
 
   /**
    * If the initial step size was a guess, it can be modified using this method.

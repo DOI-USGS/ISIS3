@@ -45,8 +45,8 @@ namespace Isis {
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  LroWideAngleCamera::LroWideAngleCamera(Pvl &lab) :
-    PushFrameCamera(lab) {
+  LroWideAngleCamera::LroWideAngleCamera(Cube &cube) :
+      PushFrameCamera(cube) {
     NaifStatus::CheckErrors();
     // Set up the camera characteristics
     instrumentRotation()->SetFrame(naifIkCode());
@@ -55,6 +55,7 @@ namespace Isis {
 
     // Get the ephemeris time from the labels
     double et;
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
     et = getClockTime(stime).Et();
@@ -288,6 +289,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Lro namespace.
  */
-extern "C" Isis::Camera *LroWideAngleCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::LroWideAngleCamera(lab);
+extern "C" Isis::Camera *LroWideAngleCameraPlugin(Isis::Cube &cube) {
+  return new Isis::LroWideAngleCamera(cube);
 }

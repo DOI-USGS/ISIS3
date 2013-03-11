@@ -21,34 +21,26 @@
 #include "RubberBandTool.h"
 #include "StatisticsTool.h"
 #include "StretchTool.h"
+#include "ToolList.h"
 #include "ViewportMainWindow.h"
 #include "WindowTool.h"
 #include "ZoomTool.h"
 
-#define IN_QNET
-#include "qnet.h"
-
-void startMonitoringMemory();
-void stopMonitoringMemory();
-void SegmentationFault(int);
-void Abort(int);
-void InterruptSignal(int);
-
 using namespace Isis;
 using namespace std;
 
+template<typename ToolClass>
+ToolClass *createTool(ViewportMainWindow *viewportMainWindow, ToolList *tools) {
+  ToolClass *result = new ToolClass(viewportMainWindow);
+
+  tools->append(result);
+  ((Tool *)result)->addTo(viewportMainWindow);
+
+  return result;
+}
+
 int main(int argc, char *argv[]) {
-#ifdef CWDEBUG
-  startMonitoringMemory();
-  signal(SIGSEGV, SegmentationFault);
-  signal(SIGABRT, Abort);
-  signal(SIGINT, InterruptSignal);
-#endif
-
   Isis::Gui::checkX11();
-
-  Qnet::g_controlNetwork = NULL;
-  Qnet::g_serialNumberList = NULL;
 
   try {
     QIsisApplication *app = new QIsisApplication(argc,argv);
@@ -66,78 +58,72 @@ int main(int argc, char *argv[]) {
     FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
     QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
-    Qnet::g_vpMainWindow = new ViewportMainWindow("qnet");
+    ViewportMainWindow *vw = new ViewportMainWindow("qnet");;
 
-    Tool *rubberBandTool = RubberBandTool::getInstance(Qnet::g_vpMainWindow);
-    rubberBandTool->addTo(Qnet::g_vpMainWindow);
+    ToolList tools;
+    Tool *rubberBandTool = createTool<RubberBandTool>(vw , &tools);
 
     /**** ADD FILE TOOL FIRST SO THAT IT APPEARS FIRST IN THE PERMANENT AND MENU TOOLBARS ****/
     // adds file tool buttons and separator on permanent toolbar
     // adds to "File" dropdown of Menu toolbar
-    QnetFileTool *ftool = new QnetFileTool(Qnet::g_vpMainWindow);
-    ftool->Tool::addTo(Qnet::g_vpMainWindow);
-    Qnet::g_vpMainWindow->permanentToolBar()->addSeparator();
+    QnetTool *qnetTool = new QnetTool(vw);
+    
+    QnetFileTool *ftool = new QnetFileTool(qnetTool, vw);
+    ((Tool *)ftool)->addTo(vw);
+    tools.append(ftool);
+    vw->permanentToolBar()->addSeparator();
 
-    QnetNavTool *ntool = new QnetNavTool(Qnet::g_vpMainWindow);
-    ntool->Tool::addTo(Qnet::g_vpMainWindow);
-
+    QnetNavTool *ntool = new QnetNavTool(qnetTool, vw);
+    ((Tool *)ntool)->addTo(vw);
+    tools.append(ntool);
+    
     /**** ADD TOOLS TO TOOL PAD ON LEFT/RIGHT ****/
     // adds band tool button to toolpad on left
-    Tool *btool = new BandTool(Qnet::g_vpMainWindow);
-    btool->addTo(Qnet::g_vpMainWindow);
+    Tool *btool = createTool<BandTool>(vw, &tools);
 
     // adds zoom tool button to toolpad on left
     // adds to "View" dropdown of Menu toolbar with seperator
-    Tool *ztool = new ZoomTool(Qnet::g_vpMainWindow);
-    ztool->addTo(Qnet::g_vpMainWindow);
-    Qnet::g_vpMainWindow->getMenu("&View")->addSeparator();
+    Tool *ztool = createTool<ZoomTool>(vw, &tools);
+    vw->getMenu("&View")->addSeparator();
 
     // adds pan tool button to toolpad on left
     // adds to "View" dropdown of Menu toolbar with seperator
-    Tool *ptool = new PanTool(Qnet::g_vpMainWindow);
-    ptool->addTo(Qnet::g_vpMainWindow);
-    Qnet::g_vpMainWindow->getMenu("&View")->addSeparator();
+    Tool *ptool = createTool<PanTool>(vw, &tools);
+    vw->getMenu("&View")->addSeparator();
 
     // adds stretch tool button to toolpad on left
-    Tool *stool = new StretchTool(Qnet::g_vpMainWindow);
-    stool->addTo(Qnet::g_vpMainWindow);
+    Tool *stool = createTool<StretchTool>(vw, &tools);
 
     // adds find tool button to toolpad on left
     // adds to "Options" dropdown of Menu toolbar
-    Tool *findTool = new FindTool(Qnet::g_vpMainWindow);
-    findTool->addTo(Qnet::g_vpMainWindow);
+    Tool *findTool = createTool<FindTool>(vw, &tools);
 
     // adds hist tool button to toolpad on left
     // adds PlotTool to "Options" dropdown of Menu toolbar
-    Tool *histTool = new HistogramTool(Qnet::g_vpMainWindow);
-    histTool->addTo(Qnet::g_vpMainWindow);
+    Tool *histTool = createTool<HistogramTool>(vw, &tools);
 
     // adds stats tool button to toolpad on left
-    Tool *statsTool = new StatisticsTool(Qnet::g_vpMainWindow);
-    statsTool->addTo(Qnet::g_vpMainWindow);
+    Tool *statsTool = createTool<StatisticsTool>(vw, &tools);
 
     // adds tie tool button to toolpad on left
     // sets tie tool to active button
-    Tool *qnetTool = new QnetTool(Qnet::g_vpMainWindow);
-    qnetTool->addTo(Qnet::g_vpMainWindow);
+    tools.append(qnetTool);
+    ((Tool *)qnetTool)->addTo(vw);
     qnetTool->activate(true);
 
     /**** ADD REMAINING TOOLS TO PERMANENT TOOL PAD ON TOP/BOTTOM ****/
     // adds adv track tool button permanent toolbar
     // adds to "Options" dropdown of Menu toolbar
-    Tool *ttool = new AdvancedTrackTool(Qnet::g_vpMainWindow);
-    ttool->addTo(Qnet::g_vpMainWindow);
+    Tool *ttool = createTool<AdvancedTrackTool>(vw, &tools);
 
     // adds window tool (Link viewports) button and seperator to permanent toolbar
     // adds "Windows" dropdown of Menu toolbar
-    Tool *wtool = new WindowTool(Qnet::g_vpMainWindow);
-    wtool->addTo(Qnet::g_vpMainWindow);
-    Qnet::g_vpMainWindow->permanentToolBar()->addSeparator();
+    Tool *wtool = createTool<WindowTool>(vw, &tools);
+    vw->permanentToolBar()->addSeparator();
 
     // adds help tool button to permanent toolbar
     // adds "Help" dropdown of Menu toolbar
-    Tool *htool = new HelpTool(Qnet::g_vpMainWindow);
-    htool->addTo(Qnet::g_vpMainWindow);
+    Tool *htool = createTool<HelpTool>(vw, &tools);
 
     /**** MAKE CONNECTIONS ****/
     /**** LOADING IMAGES ****/
@@ -204,8 +190,8 @@ int main(int argc, char *argv[]) {
     /**** SAVING CONTROL NET CHANGES ****/
     //  The FileTool needs to now if the control network has changed (delete/
     //  edit/create/ignore point) so that user can be prompted to save net
-    QObject::connect(qnetTool, SIGNAL(netChanged()), ftool, SLOT(setSaveNet()));
-    QObject::connect(ntool, SIGNAL(netChanged()), ftool, SLOT(setSaveNet()));
+    QObject::connect(qnetTool, SIGNAL(netChanged()), ftool, SLOT(setDirty()));
+    QObject::connect(ntool, SIGNAL(netChanged()), ftool, SLOT(setDirty()));
     QObject::connect(qnetTool, SIGNAL(qnetToolSave()), ftool, SLOT(save()));
     QObject::connect(qnetTool, SIGNAL(qnetToolSaveAs()), ftool, SLOT(saveAs()));
 
@@ -219,11 +205,11 @@ int main(int argc, char *argv[]) {
     /**** EXITING ****/
     // Connect the viewport's close signal to the file tool's exit method
     // Added 2008-12-04 by Jeannie Walldren
-    QObject::connect(Qnet::g_vpMainWindow , SIGNAL(closeWindow()),
+    QObject::connect(vw , SIGNAL(closeWindow()),
                      ftool, SLOT(exit()));
     //-----------------------------------------------------------------
 
-    Qnet::g_vpMainWindow->show();
+    vw->show();
     int status = app->exec();
     delete ftool;
     ftool = NULL;
@@ -251,8 +237,10 @@ int main(int argc, char *argv[]) {
     wtool = NULL;
     delete htool;
     htool = NULL;
-    delete Qnet::g_vpMainWindow;
-    Qnet::g_vpMainWindow = NULL;
+    delete rubberBandTool;
+    rubberBandTool = NULL;
+    delete vw;
+    vw = NULL;
     delete app;
     app = NULL;
     return status;
@@ -262,74 +250,3 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 }
-
-#ifdef CWDEBUG
-void startMonitoringMemory() {
-#ifndef NOMEMCHECK
-  MyMutex *mutex = new MyMutex();
-  std::fstream *alloc_output = new std::fstream("/dev/null");
-  Debug(make_all_allocations_invisible_except(NULL));
-  ForAllDebugChannels(if(debugChannel.is_on()) debugChannel.off());
-  Debug(dc::malloc.on());
-  Debug(libcw_do.on());
-  Debug(libcw_do.set_ostream(alloc_output));
-  Debug(libcw_do.set_ostream(alloc_output, mutex));
-  atexit(stopMonitoringMemory);
-#endif
-}
-
-
-void stopMonitoringMemory() {
-#ifndef NOMEMCHECK
-  Debug(
-    alloc_filter_ct alloc_filter;
-    std::vector<std::string> objmasks;
-    objmasks.push_back("libc.so*");
-    objmasks.push_back("libstdc++*");
-    std::vector<std::string> srcmasks;
-    srcmasks.push_back("*new_allocator.h*");
-    srcmasks.push_back("*set_ostream.inl*");
-    alloc_filter.hide_objectfiles_matching(objmasks);
-    alloc_filter.hide_sourcefiles_matching(srcmasks);
-    alloc_filter.hide_unknown_locations();
-    delete libcw_do.get_ostream();
-    libcw_do.set_ostream(&std::cout);
-    list_allocations_on(libcw_do, alloc_filter);
-    dc::malloc.off();
-    libcw_do.off()
-  );
-#endif
-}
-
-
-void SegmentationFault(int) {
-  std::vector<std::string> currentStack;
-  StackTrace::GetStackTrace(&currentStack);
-
-  std::cerr << "Segmentation Fault" << std::endl;
-  for(unsigned int i = 1; i < currentStack.size(); i++) {
-    std::cerr << currentStack[i] << std::endl;
-  }
-
-  exit(1);
-}
-
-void Abort(int) {
-  std::vector<std::string> currentStack;
-  StackTrace::GetStackTrace(&currentStack);
-
-  std::cerr << "Abort" << std::endl;
-  for(unsigned int i = 1; i < currentStack.size(); i++) {
-    std::cerr << currentStack[i] << std::endl;
-  }
-
-  exit(1);
-}
-
-
-void InterruptSignal(int) {
-  exit(1);
-}
-
-#endif
-

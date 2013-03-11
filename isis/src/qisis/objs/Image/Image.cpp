@@ -1,0 +1,824 @@
+#include "Image.h"
+
+#include <QBuffer>
+#include <QDataStream>
+#include <QDir>
+#include <QFileInfo>
+#include <QMutexLocker>
+#include <QScopedPointer>
+#include <QString>
+#include <QUuid>
+#include <QXmlStreamWriter>
+
+#include <geos/geom/MultiPolygon.h>
+#include <geos/io/WKTReader.h>
+#include <geos/io/WKTWriter.h>
+
+#include "Angle.h"
+#include "Cube.h"
+#include "CubeAttribute.h"
+#include "DisplayProperties.h"
+#include "Distance.h"
+#include "ImageDisplayProperties.h"
+#include "IString.h"
+#include "FileName.h"
+#include "ImagePolygon.h"
+#include "PolygonTools.h"
+#include "Project.h"
+#include "XmlStackedHandlerReader.h"
+
+namespace Isis {
+  /**
+   * Create an image from a cube file on disk.
+   *
+   * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub
+   * @param parent The Qt-relationship parent
+   */
+  Image::Image(QString imageFileName, QObject *parent) : QObject(parent) {
+    m_cube = NULL;
+    m_displayProperties = NULL;
+    m_footprint = NULL;
+    m_id = NULL;
+
+    m_aspectRatio = Null;
+    m_resolution = Null;
+    m_lineResolution = Null;
+    m_sampleResolution = Null;
+
+    m_fileName = imageFileName;
+
+    cube();
+
+    initCamStats();
+
+    try {
+      initQuickFootprint();
+    }
+    catch (IException &) {
+    }
+
+    m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
+
+    m_id = new QUuid(QUuid::createUuid());
+  }
+
+
+  /**
+   * Create an image from a cube file on disk.
+   *
+   * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub
+   * @param parent The Qt-relationship parent
+   */
+  Image::Image(Cube *imageCube, QObject *parent) : QObject(parent) {
+    m_fileName = imageCube->fileName();
+
+    m_cube = imageCube;
+    m_displayProperties = NULL;
+    m_footprint = NULL;
+    m_id = NULL;
+
+    m_aspectRatio = Null;
+    m_resolution = Null;
+    m_lineResolution = Null;
+    m_sampleResolution = Null;
+
+    initCamStats();
+
+    try {
+      initQuickFootprint();
+    }
+    catch (IException &e) {
+    }
+
+    m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
+
+    m_id = new QUuid(QUuid::createUuid());
+  }
+
+
+  /**
+   * Construct this image from XML.
+   *
+   * @param imageFolder Where this image XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <image/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  Image::Image(FileName imageFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
+      QObject(parent) {
+    m_cube = NULL;
+    m_displayProperties = NULL;
+    m_footprint = NULL;
+    m_id = NULL;
+
+    m_aspectRatio = Null;
+    m_resolution = Null;
+    m_lineResolution = Null;
+    m_sampleResolution = Null;
+
+    xmlReader->pushContentHandler(new XmlHandler(this, imageFolder));
+  }
+
+
+  /**
+   * Clean up this image. If you haven't saved this image, all of its settings will be lost.
+   */
+  Image::~Image() {
+    delete m_cube;
+    m_cube = NULL;
+
+    delete m_footprint;
+    m_footprint = NULL;
+
+    delete m_id;
+    m_id = NULL;
+
+    //  Image is a "Qt" parent of display properties, so the Image QObject
+    //    destructor will take care of deleting the display props. See call to
+    //    DisplayProperties' constructor.
+    m_displayProperties = NULL;
+  }
+
+
+  /**
+   * Read the image settings from a Pvl.
+   *
+   * <pre>
+   *   Object = Image
+   *     FileName = ...
+   *     ID = ...
+   *   EndObject
+   * </pre>
+   *
+   * @param pvl The PvlObject that contains image information.
+   */
+  void Image::fromPvl(const PvlObject &pvl) {
+    QString pvlFileName = ((IString)pvl["FileName"][0]).ToQt();
+    if (m_fileName != pvlFileName) {
+      throw IException(IException::Unknown,
+          tr("Tried to load Image [%1] with properties/information from [%2].")
+            .arg(m_fileName).arg(pvlFileName),
+          _FILEINFO_);
+    }
+
+    displayProperties()->fromPvl(pvl.findObject("DisplayProperties"));
+
+    if (pvl.hasKeyword("ID")) {
+      QByteArray hexValues(pvl["ID"][0].toAscii());
+      QDataStream valuesStream(QByteArray::fromHex(hexValues));
+      valuesStream >> *m_id;
+    }
+  }
+
+
+  /**
+   * Convert this Image to PVL.
+   *
+   * The output looks like this:
+   * <pre>
+   *   Object = Image
+   *     FileName = ...
+   *     ID = ...
+   *   EndObject
+   * </pre>
+   *
+   * @return A PvlObject that contains image information.
+   */
+  PvlObject Image::toPvl() const {
+    PvlObject output("Image");
+
+    output += PvlKeyword("FileName", m_fileName);
+
+    // Do m_id
+    QBuffer dataBuffer;
+    dataBuffer.open(QIODevice::ReadWrite);
+
+    QDataStream idStream(&dataBuffer);
+    idStream << *m_id;
+
+    dataBuffer.seek(0);
+
+    output += PvlKeyword("ID", QString(dataBuffer.data().toHex()));
+
+    output += displayProperties()->toPvl();
+
+    return output;
+  }
+
+
+  /**
+   * Test to see if it's possible to create a footprint from this image. This may not give an
+   *   accurate answer if the cube isn't open.
+   */
+  bool Image::isFootprintable() const {
+    bool result = false;
+
+    if (m_footprint)
+      result = true;
+
+    if (!result && m_cube) {
+      // TODO: Move this to Blob!
+      ImagePolygon example;
+
+      QString blobType = example.Type();
+      QString blobName = example.Name();
+
+      Pvl &labels = *m_cube->label();
+
+      for (int i = 0; i < labels.objects(); i++) {
+        PvlObject &obj = labels.object(i);
+
+        if (obj.isNamed(blobType) && obj.hasKeyword("Name") && obj["Name"][0] == blobName)
+          result = true;
+      }
+    }
+
+    return result;
+  }
+
+
+  /**
+   * Get the Cube * associated with this display property. This will allocate
+   *   the Cube * if one is not already present.
+   */
+  Cube *Image::cube() {
+    if (!m_cube) {
+      m_cube = new Cube(m_fileName);
+    }
+
+    return m_cube;
+  }
+
+
+  /**
+   * Cleans up the Cube *. You want to call this once you're sure you are done
+   *   with the Cube because the OS will limit how many of these we have open.
+   */
+  void Image::closeCube() {
+    if (m_cube) {
+      delete m_cube;
+      m_cube = NULL;
+    }
+  }
+
+
+  /**
+   * Get the display (GUI) properties (information) associated with this image.
+   *
+   * @return An ImageDisplayProperties that describes how to view this image.
+   */
+  ImageDisplayProperties *Image::displayProperties() {
+    return m_displayProperties;
+  }
+
+
+  /**
+   * Get a non-mutable (const) the display (GUI) properties (information) associated with this
+   *   image.
+   *
+   * @return A non-mutable ImageDisplayProperties that describes how to view this image.
+   */
+  const ImageDisplayProperties *Image::displayProperties() const {
+    return m_displayProperties;
+  }
+
+
+  /**
+   * Get the file name of the cube that this image represents.
+   *
+   * @return A string containing the path to the cube data associated with this image.
+   */
+  QString Image::fileName() const {
+    return m_fileName;
+  }
+
+
+  /**
+   * Get the footprint of this image (if available).
+   *
+   * @return A lat/lon footprint of this image, or NULL if unavailable.
+   */
+  geos::geom::MultiPolygon *Image::footprint() {
+    return m_footprint;
+  }
+
+
+  /**
+   * Override the automatically generated ID with the given ID.
+   */
+  void Image::setId(QString id) {
+    *m_id = QUuid(QString("{%1}").arg(id));
+  }
+
+
+  /**
+   * Get the non-mutable (const) footprint of this image (if available).
+   *
+   * @return A non-mutable (const) lat/lon footprint of this image, or NULL if unavailable.
+   */
+  const geos::geom::MultiPolygon *Image::footprint() const {
+    return m_footprint;
+  }
+
+
+  /**
+   * Calculate a footprint for this image. If the footprint is already stored inside the cube, that
+   *   will be used instead. If no footprint can be found, this throws an exception.
+   */
+  bool Image::initFootprint(QMutex *cameraMutex) {
+    if (!m_footprint) {
+      try {
+        initQuickFootprint();
+      }
+      catch (IException &e) {
+        try {
+          m_footprint = createFootprint(cameraMutex);
+        }
+        catch(IException &e) {
+          IString msg = "Could not read the footprint from cube [" +
+              displayProperties()->displayName() + "]. Please make "
+              "sure footprintinit has been run";
+          throw IException(e, IException::Io, msg, _FILEINFO_);
+        }
+      }
+    }
+
+    // I'm not sure how this could ever be NULL. -SL
+    return (m_footprint != NULL);
+  }
+
+
+  /**
+   * Get the aspect ratio of this image, as calculated and attached by camstats.
+   *
+   * @return The aspect ratio if available, otherwise Null
+   */
+  double Image::aspectRatio() const {
+    return m_aspectRatio;
+  }
+
+
+  /**
+   * Get a unique, identifying string associated with this image.
+   *
+   * @return A unique ID for this image
+   */
+  QString Image::id() const {
+    return m_id->toString().remove(QRegExp("[{}]"));
+  }
+
+
+  /**
+   * Get the resolution of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The resolution if available, otherwise Null
+   */
+  double Image::resolution() const {
+    return m_resolution;
+  }
+
+
+  /**
+   * Get the emission angle of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The emission angle if available, otherwise an invalid angle
+   */
+  Angle Image::emissionAngle() const {
+    return m_emissionAngle;
+  }
+
+
+  /**
+   * Get the incidence angle of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The incidence angle if available, otherwise an invalid angle
+   */
+  Angle Image::incidenceAngle() const {
+    return m_incidenceAngle;
+  }
+
+
+  /**
+   * Get the line resolution of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The line resolution if available, otherwise Null
+   */
+  double Image::lineResolution() const {
+    return m_lineResolution;
+  }
+
+
+  /**
+   * Get the local radius of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The local radius if available, otherwise an invalid Distance
+   */
+  Distance Image::localRadius() const {
+    return m_localRadius;
+  }
+
+
+  /**
+   * Get the north azimuth of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The north azimuth if available, otherwise an invalid angle
+   */
+  Angle Image::northAzimuth() const {
+    return m_northAzimuth;
+  }
+
+
+  /**
+   * Get the phase angle of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The phase angle if available, otherwise an invalid angle
+   */
+  Angle Image::phaseAngle() const {
+    return m_phaseAngle;
+  }
+
+
+  /**
+   * Get the sample resolution of this image, as calculated and attached by camstats. This is the
+   *   image-wide average.
+   *
+   * @return The sample resolution if available, otherwise Null
+   */
+  double Image::sampleResolution() const {
+    return m_sampleResolution;
+  }
+
+
+  /**
+   * Copy the cub/ecub files associated with this image into the new project.
+   */
+  void Image::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
+    if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
+      Cube origImage(m_fileName);
+
+      FileName newExternalLabelFileName(Project::imageDataRoot(newProjectRoot.toString()) + "/" +
+          FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name());
+
+      QScopedPointer<Cube> newExternalLabel(
+          origImage.copy(newExternalLabelFileName, CubeAttributeOutput("+External")));
+
+      // If this is an ecub (it should be) and is pointing to a relative file name,
+      //   then we want to copy the DN cube also.
+      if (!origImage.storesDnData()) {
+        if (origImage.externalCubeFileName().path() == ".") {
+          Cube dnFile(
+              FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());
+
+          FileName newDnFileName = newExternalLabelFileName.setExtension("cub");
+
+          QScopedPointer<Cube> newDnFile(dnFile.copy(newDnFileName, CubeAttributeOutput()));
+          newDnFile->close();
+
+          newExternalLabel->relocateDnData(newDnFileName.name());
+        }
+        else {
+          newExternalLabel->relocateDnData(origImage.externalCubeFileName());
+        }
+      }
+    }
+  }
+
+
+  /**
+   * Delete the image data from disk. The cube() will no longer be accessible until you call
+   *   updateFileName().
+   */
+  void Image::deleteFromDisk() {
+    bool deleteCubAlso = (cube()->externalCubeFileName().path() == ".");
+    closeCube();
+
+    if (!QFile::remove(m_fileName)) {
+      throw IException(IException::Io,
+                       tr("Could not remove file [%1]").arg(m_fileName),
+                       _FILEINFO_);
+    }
+
+    if (deleteCubAlso) {
+      FileName cubFile = FileName(m_fileName).setExtension("cub");
+      if (!QFile::remove(cubFile.expanded())) {
+        throw IException(IException::Io,
+                         tr("Could not remove file [%1]").arg(m_fileName),
+                         _FILEINFO_);
+      }
+    }
+
+    // If we're the last thing in the folder, remove the folder too.
+    QDir dir;
+    dir.rmdir(FileName(m_fileName).path());
+  }
+
+
+  /**
+   * Output format:
+   *
+   *
+   * <image id="..." fileName="...">
+   *   ...
+   * </image>
+   *
+   * (fileName attribute is just the base name)
+   */
+  void Image::save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot)
+      const {
+    stream.writeStartElement("image");
+
+    stream.writeAttribute("id", m_id->toString());
+    stream.writeAttribute("fileName", FileName(m_fileName).name());
+
+    if (!IsSpecial(m_aspectRatio)) {
+      stream.writeAttribute("aspectRatio", IString(m_aspectRatio).ToQt());
+    }
+
+    if (!IsSpecial(m_resolution)) {
+      stream.writeAttribute("resolution", IString(m_resolution).ToQt());
+    }
+
+    if (m_emissionAngle.isValid()) {
+      stream.writeAttribute("emissionAngle", IString(m_emissionAngle.radians()).ToQt());
+    }
+
+    if (m_incidenceAngle.isValid()) {
+      stream.writeAttribute("incidenceAngle", IString(m_incidenceAngle.radians()).ToQt());
+    }
+
+    if (!IsSpecial(m_lineResolution)) {
+      stream.writeAttribute("lineResolution", IString(m_lineResolution).ToQt());
+    }
+
+    if (m_localRadius.isValid()) {
+      stream.writeAttribute("localRadius", IString(m_localRadius.meters()).ToQt());
+    }
+
+    if (m_northAzimuth.isValid()) {
+      stream.writeAttribute("northAzimuth", IString(m_northAzimuth.radians()).ToQt());
+    }
+
+    if (m_phaseAngle.isValid()) {
+      stream.writeAttribute("phaseAngle", IString(m_phaseAngle.radians()).ToQt());
+    }
+
+    if (!IsSpecial(m_sampleResolution)) {
+      stream.writeAttribute("sampleResolution", IString(m_sampleResolution).ToQt());
+    }
+
+    if (m_footprint) {
+      stream.writeStartElement("footprint");
+
+      geos::io::WKTWriter wktWriter;
+      stream.writeCharacters(QString::fromStdString(wktWriter.write(m_footprint)));
+
+      stream.writeEndElement();
+    }
+
+    m_displayProperties->save(stream, project, newProjectRoot);
+
+    stream.writeEndElement();
+  }
+
+
+  /**
+   * Change the on-disk file name for this cube to be where the image ought to be in the given
+   *   project.
+   *
+   * @param project The project that this image is stored in
+   */
+  void Image::updateFileName(Project *project) {
+    closeCube();
+
+    FileName original(m_fileName);
+    FileName newName(project->imageDataRoot() + "/" +
+                     original.dir().dirName() + "/" + original.name());
+    m_fileName = newName.expanded();
+  }
+
+
+  /**
+   * Calculate a footprint for an Image using the camera or projection information.
+   *
+   * @param cameraMutex A mutex that guarantees us serial access to the camera/projection classes
+   * @return The resulting footprint
+   */
+  geos::geom::MultiPolygon *Image::createFootprint(QMutex *cameraMutex) {
+    QMutexLocker lock(cameraMutex);
+
+    // We need to walk the image to create the polygon...
+    ImagePolygon imgPoly;
+
+    int sampleStepSize = cube()->sampleCount() / 10;
+    if (sampleStepSize <= 0) sampleStepSize = 1;
+
+    int lineStepSize = cube()->lineCount() / 10;
+    if (lineStepSize <= 0) lineStepSize = 1;
+
+    imgPoly.Create(*cube(), sampleStepSize, lineStepSize);
+
+    IException e = IException(IException::User,
+        tr("Warning: Polygon re-calculated for [%1] which can be very slow")
+          .arg(displayProperties()->displayName()),
+        _FILEINFO_);
+    e.print();
+
+    return PolygonTools::MakeMultiPolygon(imgPoly.Polys()->clone());
+  }
+
+
+  void Image::initCamStats() {
+    bool hasCamStats = false;
+
+    Pvl &label = *cube()->label();
+    for (int i = 0; !hasCamStats && i < label.objects(); i++) {
+      PvlObject &obj = label.object(i);
+
+      try {
+        if (obj.name() == "Table") {
+          if (obj["Name"][0] == "CameraStatistics") {
+            hasCamStats = true;
+          }
+        }
+      }
+      catch (IException &) {
+      }
+    }
+
+    if (hasCamStats) {
+      Table camStatsTable("CameraStatistics", m_fileName, label);
+
+      int numRecords = camStatsTable.Records();
+      for (int recordIndex = 0; recordIndex < numRecords; recordIndex++) {
+        TableRecord &record = camStatsTable[recordIndex];
+
+        // The TableField class gives us a std::string with NULL (\0) characters... be careful not
+        //   to keep them when going to QString.
+        QString recordName((QString)record["Name"]);
+        double avgValue = (double)record["Average"];
+
+        if (recordName == "AspectRatio") {
+          m_aspectRatio = avgValue;
+        }
+        else if (recordName == "Resolution") {
+          m_resolution = avgValue;
+        }
+        else if (recordName == "EmissionAngle") {
+          m_emissionAngle = Angle(avgValue, Angle::Degrees);
+        }
+        else if (recordName == "IncidenceAngle") {
+          m_incidenceAngle = Angle(avgValue, Angle::Degrees);
+        }
+        else if (recordName == "LineResolution") {
+          m_lineResolution = avgValue;
+        }
+        else if (recordName == "LocalRadius") {
+          m_localRadius = Distance(avgValue, Distance::Meters);
+        }
+        else if (recordName == "NorthAzimuth") {
+          m_northAzimuth = Angle(avgValue, Angle::Degrees);
+        }
+        else if (recordName == "PhaseAngle") {
+          m_phaseAngle = Angle(avgValue, Angle::Degrees);
+        }
+        else if (recordName == "SampleResolution") {
+          m_sampleResolution = avgValue;
+        }
+      }
+    }
+  }
+
+
+  void Image::initQuickFootprint() {
+    ImagePolygon poly;
+    cube()->read(poly);
+    m_footprint = PolygonTools::MakeMultiPolygon(poly.Polys()->clone());
+  }
+
+
+  /**
+   * Create an XML Handler (reader) that can populate the Image class data. See Image::save() for
+   *   the expected format.
+   *
+   * @param image The image we're going to be initializing
+   * @param imageFolder The folder that contains the Cube
+   */
+  Image::XmlHandler::XmlHandler(Image *image, FileName imageFolder) {
+    m_image = image;
+    m_imageFolder = imageFolder;
+  }
+
+
+  /**
+   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
+   *
+   * @return If we should continue reading the XML (usually true).
+   */
+  bool Image::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
+                                       const QString &qName, const QXmlAttributes &atts) {
+    m_characters = "";
+
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+      if (localName == "image") {
+        QString id = atts.value("id");
+        QString fileName = atts.value("fileName");
+
+        QString aspectRatioStr = atts.value("aspectRatio");
+        QString resolutionStr = atts.value("resolution");
+        QString emissionAngleStr = atts.value("emissionAngle");
+        QString incidenceAngleStr = atts.value("incidenceAngle");
+        QString lineResolutionStr = atts.value("lineResolution");
+        QString localRadiusStr = atts.value("localRadius");
+        QString northAzimuthStr = atts.value("northAzimuth");
+        QString phaseAngleStr = atts.value("phaseAngle");
+        QString sampleResolutionStr = atts.value("sampleResolution");
+
+        if (!id.isEmpty()) {
+          delete m_image->m_id;
+          m_image->m_id = NULL;
+          m_image->m_id = new QUuid(id.toAscii());
+        }
+
+        if (!fileName.isEmpty()) {
+          m_image->m_fileName = m_imageFolder.expanded() + "/" + fileName;
+        }
+
+        if (!aspectRatioStr.isEmpty()) {
+          m_image->m_aspectRatio = aspectRatioStr.toDouble();
+        }
+
+        if (!resolutionStr.isEmpty()) {
+          m_image->m_resolution = resolutionStr.toDouble();
+        }
+
+        if (!emissionAngleStr.isEmpty()) {
+          m_image->m_emissionAngle = Angle(emissionAngleStr.toDouble(), Angle::Radians);
+        }
+
+        if (!incidenceAngleStr.isEmpty()) {
+          m_image->m_incidenceAngle = Angle(incidenceAngleStr.toDouble(), Angle::Radians);
+        }
+
+        if (!lineResolutionStr.isEmpty()) {
+          m_image->m_lineResolution = lineResolutionStr.toDouble();
+        }
+
+        if (!localRadiusStr.isEmpty()) {
+          m_image->m_localRadius = Distance(localRadiusStr.toDouble(), Distance::Meters);
+        }
+
+        if (!northAzimuthStr.isEmpty()) {
+          m_image->m_northAzimuth = Angle(northAzimuthStr.toDouble(), Angle::Radians);
+        }
+
+        if (!phaseAngleStr.isEmpty()) {
+          m_image->m_phaseAngle = Angle(phaseAngleStr.toDouble(), Angle::Radians);
+        }
+
+        if (!sampleResolutionStr.isEmpty()) {
+          m_image->m_sampleResolution = sampleResolutionStr.toDouble();
+        }
+      }
+      else if (localName == "displayProperties") {
+        m_image->m_displayProperties = new ImageDisplayProperties(reader());
+      }
+    }
+
+    return true;
+  }
+
+
+
+  bool Image::XmlHandler::characters(const QString &ch) {
+    m_characters += ch;
+
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+
+  bool Image::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                     const QString &qName) {
+    if (localName == "footprint" && !m_characters.isEmpty()) {
+      geos::io::WKTReader wktReader(&globalFactory);
+      m_image->m_footprint = PolygonTools::MakeMultiPolygon(
+          wktReader.read(m_characters.toStdString()));
+    }
+    else if (localName == "image" && !m_image->m_footprint) {
+      QMutex mutex;
+      m_image->initFootprint(&mutex);
+      m_image->closeCube();
+    }
+
+    m_characters = "";
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
+  }
+}
+
+

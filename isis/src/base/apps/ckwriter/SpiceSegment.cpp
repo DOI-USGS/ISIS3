@@ -186,7 +186,7 @@ void SpiceSegment::import(Cube &cube, const QString &tblname) {
           Isis::Pvl::Traverse);
       inst.setName("Instrument");
       label->findObject("IsisCube").addGroup(inst);
-      camera = CameraFactory::Create(*label);
+      camera = CameraFactory::Create(cube);
     }
     else {
       camera = cube.camera();
@@ -433,7 +433,7 @@ void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
   _instCode = toId;
 
   // Load SPICE and extract necessary contents
-  Spice mySpice(*cube.label(), true);  // load w/out tables
+  Spice mySpice(cube, true);  // load w/out tables
 
   QString CLtoId = getFrameName(LtoId);
   QString CtoId = getFrameName(toId);

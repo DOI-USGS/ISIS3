@@ -87,7 +87,7 @@ void IsisMain() {
   lProc.ProcessCubes(&FFT2);
 
   // Add or update the AlphaCube group
-  aCube.UpdateGroup(*ocube->label());
+  aCube.UpdateGroup(*ocube);
 
   // Stop the process and remove the temporary files
   lProc.Finalize();

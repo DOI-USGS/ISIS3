@@ -26,7 +26,8 @@ commands: configsquish
 	      --reportgen xml2.1,$$ABSOUTPUT/$$SUITE.xml 2>&1 >& /dev/null
 	    if [ -f "$$ABSOUTPUT/$$SUITE.xml" ]; then
 	      $(CAT) $$ABSOUTPUT/$$SUITE.xml | sed 's/time="[^"]*"/time="..."/g' | \
-	        sed 's/file="[^"]*"/file="..."/g' > $$ABSOUTPUT/$$SUITE.tmp.xml
+	        sed 's/file="[^"]*"/file="..."/g' | sed 's/Images match.*</Images match</' \
+	        > $$ABSOUTPUT/$$SUITE.tmp.xml
 	      $(MV) $$ABSOUTPUT/$$SUITE.tmp.xml $$ABSOUTPUT/$$SUITE.xml
 	      $(MV) $$ABSOUTPUT/$$SUITE.xml $$ABSOUTPUT/$$SUITE.xml.txt
 	    else

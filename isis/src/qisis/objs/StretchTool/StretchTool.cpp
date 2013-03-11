@@ -61,9 +61,11 @@ namespace Isis {
 
     // Emit a signal when an exception occurs and connect to the Warning object
     // to display Warning icon and the message
-    connect(this, SIGNAL(warningSignal(std::string &, const std::string)),
-            (ViewportMainWindow *)parent,
-            SLOT(displayWarning(std::string &, const std::string &)));
+    ViewportMainWindow *parentMainWindow = qobject_cast<ViewportMainWindow *>(parent);
+    if (parentMainWindow) {
+      connect(this, SIGNAL(warningSignal(std::string &, const std::string)),
+              parentMainWindow, SLOT(displayWarning(std::string &, const std::string &)));
+    }
   }
 
 
@@ -803,9 +805,9 @@ namespace Isis {
   void StretchTool::rubberBandComplete() {
     CubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
-    if(!RubberBandTool::isValid()) return;
+    if(!rubberBandTool()->isValid()) return;
 
-    QRect rubberBandRect = RubberBandTool::rectangle();
+    QRect rubberBandRect = rubberBandTool()->rectangle();
     //Return if the width or height is zero
     if(rubberBandRect.width() == 0 || rubberBandRect.height() == 0) return;
 
@@ -894,8 +896,8 @@ namespace Isis {
    *
    */
   void StretchTool::enableRubberBandTool() {
-    RubberBandTool::enable(RubberBandTool::Rectangle);
-    RubberBandTool::drawActiveViewportOnly(true);
+    rubberBandTool()->enable(RubberBandTool::RectangleMode);
+    rubberBandTool()->setDrawActiveViewportOnly(true);
   }
 
 

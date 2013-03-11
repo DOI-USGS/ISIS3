@@ -45,7 +45,7 @@ namespace Isis {
 
   class RadarCamera : public Camera {
     public:
-      RadarCamera(Pvl &lab);
+      RadarCamera(Cube &cube);
 
       virtual CameraType GetCameraType() const {
         return Radar;

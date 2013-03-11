@@ -126,11 +126,7 @@ namespace Isis {
       ~FindTool();
       void addTo(QMenu *menu);
       void paintViewport(MdiCubeViewport *vp, QPainter *painter);
-    signals:
-      void recordPoint(QPoint p); //!< Emitted when point should be recorded
-
-    protected:
-      QAction *toolPadAction(ToolPad *toolpad);
+      
       /**
        * This method returns the menu name associated with this tool.
        *
@@ -139,7 +135,13 @@ namespace Isis {
        */
       QString menuName() const {
         return "&Options";
-      };
+      }
+
+    signals:
+      void recordPoint(QPoint p); //!< Emitted when point should be recorded
+
+    protected:
+      QAction *toolPadAction(ToolPad *toolpad);
       QWidget *createToolBarWidget(QStackedWidget *parent);
       void updateTool();
       void createDialog(QWidget *parent);

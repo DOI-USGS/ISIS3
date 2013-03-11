@@ -28,6 +28,7 @@
 #include "CameraFactory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 #include "iTime.h"
 #include "Preference.h"
 #include "Pvl.h"
@@ -51,22 +52,22 @@ int main(void) {
     double knownLat = 18.1052476112276679;
     double knownLon = 6.3330663560966673;
 
-    Pvl pvlTL(FileName("$apollo15/testData/TL.cub").expanded());
-    ApolloPanoramicCamera *camTL = (ApolloPanoramicCamera *) CameraFactory::Create(pvlTL);
+    Cube cubeTL(FileName("$apollo15/testData/TL.cub").expanded(), "r");
+    ApolloPanoramicCamera *camTL = (ApolloPanoramicCamera *) CameraFactory::Create(cubeTL);
 
-    Pvl pvlBL(FileName("$apollo15/testData/BL.cub").expanded());
-    ApolloPanoramicCamera *camBL = (ApolloPanoramicCamera *) CameraFactory::Create(pvlBL);
+    Cube cubeBL(FileName("$apollo15/testData/BL.cub").expanded(), "r");
+    ApolloPanoramicCamera *camBL = (ApolloPanoramicCamera *) CameraFactory::Create(cubeBL);
 
-    Pvl pvlM(FileName("$apollo15/testData/M.cub").expanded());
-    ApolloPanoramicCamera *camM = (ApolloPanoramicCamera *) CameraFactory::Create(pvlM);
+    Cube cubeM(FileName("$apollo15/testData/M.cub").expanded(), "r");
+    ApolloPanoramicCamera *camM = (ApolloPanoramicCamera *) CameraFactory::Create(cubeM);
 
-    Pvl pvlTR(FileName("$apollo15/testData/TR.cub").expanded());
-    ApolloPanoramicCamera *camTR = (ApolloPanoramicCamera *) CameraFactory::Create(pvlTR);
+    Cube cubeTR(FileName("$apollo15/testData/TR.cub").expanded(), "r");
+    ApolloPanoramicCamera *camTR = (ApolloPanoramicCamera *) CameraFactory::Create(cubeTR);
 
-    Pvl pvlBR(FileName("$apollo15/testData/BR.cub").expanded());
-    ApolloPanoramicCamera *camBR = (ApolloPanoramicCamera *) CameraFactory::Create(pvlBR);
+    Cube cubeBR(FileName("$apollo15/testData/BR.cub").expanded(), "r");
+    ApolloPanoramicCamera *camBR = (ApolloPanoramicCamera *) CameraFactory::Create(cubeBR);
 
-    cout << "FileName: " << FileName(pvlTL.fileName()).name() << endl;
+    cout << "FileName: " << FileName(cubeTL.fileName()).name() << endl;
     cout << "CK Frame: " << camTL->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

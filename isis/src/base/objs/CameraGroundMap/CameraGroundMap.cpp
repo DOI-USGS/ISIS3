@@ -75,18 +75,6 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-//  bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
-//    Distance radius(p_camera->LocalRadius(lat, lon));
-//    if (radius.isValid()) {
-//      if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
-//        LookCtoFocalPlaneXY();
-//        return true;
-//      }
-//    }
-
-//    return false;
-//  }
-
   bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
     if (p_camera->target()->shape()->name() == "Plane") {
       double radius = lat.degrees();

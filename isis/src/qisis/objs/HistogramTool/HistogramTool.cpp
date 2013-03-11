@@ -40,7 +40,7 @@ namespace Isis {
     if(m_rubberBandCombo) {
       m_rubberBandCombo->reset();
       m_rubberBandCombo->setEnabled(true);
-      RubberBandTool::drawActiveViewportOnly(true);
+      rubberBandTool()->setDrawActiveViewportOnly(true);
     }
   }
 
@@ -76,8 +76,8 @@ namespace Isis {
   QWidget *HistogramTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *wrapper = new QWidget(parent);
 
-    m_rubberBandCombo = new RubberBandComboBox(
-      RubberBandComboBox::Rectangle |
+    m_rubberBandCombo = new RubberBandComboBox(this,
+      RubberBandComboBox::Rectangle|
       RubberBandComboBox::Line,
       RubberBandComboBox::Rectangle
     );
@@ -137,7 +137,7 @@ namespace Isis {
       selectedWindow()->raise();
     }
 
-    if(RubberBandTool::isValid()) {
+    if(rubberBandTool()->isValid()) {
       if (cubeViewport()->isGray()) {
         refreshPlot();
       }
@@ -161,14 +161,14 @@ namespace Isis {
   void HistogramTool::refreshPlot() {
     MdiCubeViewport *activeViewport = cubeViewport();
 
-    if (activeViewport && RubberBandTool::isValid()) {
+    if (activeViewport && rubberBandTool()->isValid()) {
       HistogramPlotWindow *targetWindow = qobject_cast<HistogramPlotWindow *>(
           selectedWindow(true));
 
       QList<QPoint> vertices;
 
-      if(RubberBandTool::getMode() == RubberBandTool::Circle) {
-        geos::geom::Geometry *p = RubberBandTool::geometry();
+      if(rubberBandTool()->currentMode() == RubberBandTool::CircleMode) {
+        geos::geom::Geometry *p = rubberBandTool()->geometry();
         geos::geom::CoordinateSequence *c = p->getCoordinates();
         for(int i = 0; i < (int)c->getSize(); i++) {
           QPoint point((int)(c->getX(i) + 0.5), (int)(c->getY(i) + 0.5));
@@ -177,7 +177,7 @@ namespace Isis {
         delete p;
       }
       else {
-        vertices = RubberBandTool::getVertices();
+        vertices = rubberBandTool()->vertices();
       }
 
       if(vertices.size() < 1) return;
@@ -187,7 +187,7 @@ namespace Isis {
       Histogram hist(*cube, band);
 
       //If the rubber band is a line
-      if(RubberBandTool::getMode() == RubberBandTool::Line) {
+      if (rubberBandTool()->currentMode() == RubberBandTool::LineMode) {
         double ssamp, sline, esamp, eline;
         activeViewport->viewportToCube(vertices[0].rx(), vertices[0].ry(),
                             ssamp, sline);
@@ -283,7 +283,7 @@ namespace Isis {
 
       }
       //If rubber band is a rectangle
-      else if(RubberBandTool::getMode() == RubberBandTool::Rectangle) {
+      else if(rubberBandTool()->currentMode() == RubberBandTool::RectangleMode) {
         double ssamp, sline, esamp, eline;
 
         // Convert them to line sample values
@@ -312,7 +312,7 @@ namespace Isis {
       }
       //If rubber band is a polygon or circle
       else {
-        geos::geom::Geometry *polygon = RubberBandTool::geometry();
+        geos::geom::Geometry *polygon = rubberBandTool()->geometry();
 
         std::vector <int> x_contained, y_contained;
         if(polygon != NULL) {

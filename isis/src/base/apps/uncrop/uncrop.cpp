@@ -10,7 +10,7 @@ void IsisMain() {
   p.SetBandBinMatch(false);
 
   // Set the input cube for the process object
-  p.SetInputCube("FROM");
+  Cube *icube = p.SetInputCube("FROM");
 
   // Set up the mosaic priority
   UserInterface &ui = Application::GetUserInterface();
@@ -24,9 +24,7 @@ void IsisMain() {
   }
 
   // Get the extraction label from the input file
-  Pvl lab;
-  lab.read(ui.GetFileName("FROM"));
-  AlphaCube acube(lab);
+  AlphaCube acube(*icube);
   int outSample = (int)(acube.AlphaSample(0.5) + 0.5);
   int outLine = (int)(acube.AlphaLine(0.5) + 0.5);
   int outBand = 1;

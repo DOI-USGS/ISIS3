@@ -54,10 +54,11 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    *
    */
-  VimsCamera::VimsCamera(Pvl &lab) : Camera(lab) {
+  VimsCamera::VimsCamera(Cube &cube) : Camera(cube) {
     NaifStatus::CheckErrors();
 
-    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+    Pvl &lab = *cube.label();
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString channel = (QString) inst ["Channel"];
 
     // Set Frame mounting
@@ -152,7 +153,7 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Cassini namespace.
  */
-extern "C" Isis::Camera *VimsCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::VimsCamera(lab);
+extern "C" Isis::Camera *VimsCameraPlugin(Isis::Cube &cube) {
+  return new Isis::VimsCamera(cube);
 }
 

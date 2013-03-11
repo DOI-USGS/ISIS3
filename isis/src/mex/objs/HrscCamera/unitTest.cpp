@@ -59,9 +59,9 @@ int main(void) {
     double knownLat = -62.4812045312284781;
     double knownLon = 48.4111512000971160;
 
-    Pvl p("$mex/testData/h2254_0000_s12.cub");
-    Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube c("$mex/testData/h2254_0000_s12.cub", "r");
+    Camera *cam = CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

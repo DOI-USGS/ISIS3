@@ -42,7 +42,7 @@ namespace Isis {
    * @internal 
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  HiriseCamera::HiriseCamera(Pvl &lab) : LineScanCamera(lab) {
+  HiriseCamera::HiriseCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // Setup camera characteristics from instrument and frame kernel
     SetFocalLength();
@@ -51,6 +51,7 @@ namespace Isis {
     instrumentRotation()->SetFrame(-74690);
 
     // Get required keywords from instrument group
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     int tdiMode = inst["Tdi"];
     double binMode = inst["Summing"];
@@ -142,6 +143,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Mro namespace.
  */
-extern "C" Isis::Camera *HiriseCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::HiriseCamera(lab);
+extern "C" Isis::Camera *HiriseCameraPlugin(Isis::Cube &cube) {
+  return new Isis::HiriseCamera(cube);
 }

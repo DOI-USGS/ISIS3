@@ -15,19 +15,19 @@ class QSpinBox;
 class QStackedWidget;
 
 namespace Isis {
-  // FIXME: uncomment this and make p_pvl a Pvl * (make cc and op=, etc)
-  //class Pvl;
-}
-
-namespace Isis {
+  class Cube;
   class ToolPad;
+
   /**
    * @author ????-??-?? Unknown
    * @internal
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-   *            CubeViewport
+   *                           CubeViewport
    *   @history 2010-12-01 Steven Lambright - No longer calls setBandBin() if
-   *            the viewport doesn't change.
+   *                           the viewport doesn't change.
+   *   @history 2012-09-18 Steven Lambright - setBandBin() now takes a Cube instead of a label.
+   *                           This is because the method needs the band count, which is no longer
+   *                           always readily available in the labels.
    */
   class BandTool : public Tool {
       Q_OBJECT
@@ -35,7 +35,6 @@ namespace Isis {
     public:
       BandTool(QWidget *parent);
 
-    protected:
       /**
        * returns the name of the menu.
        *
@@ -45,6 +44,7 @@ namespace Isis {
       QString menuName() const {
         return "&View";
       };
+    protected:
       QAction *toolPadAction(ToolPad *pad);
       QWidget *createToolBarWidget(QStackedWidget *active);
       void updateTool();
@@ -52,7 +52,7 @@ namespace Isis {
     private slots:
       void changeView();
       void setList();
-      void setBandBin(Pvl &pvl);
+      void setBandBin(Cube *cube);
       void setDisplay();
       void copyLinkedViewports();
       void copyAllViewports();

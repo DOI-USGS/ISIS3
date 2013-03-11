@@ -40,7 +40,7 @@ namespace Isis {
    */
   class KaguyaMiCamera : public LineScanCamera {
     public:
-      KaguyaMiCamera(Pvl &lab);
+      KaguyaMiCamera(Cube &cube);
 
       //! Destroys the LroNarrowAngleCamera object
       ~KaguyaMiCamera() {};

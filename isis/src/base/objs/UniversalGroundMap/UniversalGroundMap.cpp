@@ -18,40 +18,19 @@
 
 namespace Isis {
   /**
-   * Constructs a UniversalGroundMap object from a pvl
-   *
-   * @param pvl The Pvl file to create the UniversalGroundMap from
-   * @param priority Try to make a camera or projection first
-   */
-  UniversalGroundMap::UniversalGroundMap(Pvl &pvl, CameraPriority priority) {
-    Init(pvl, priority);
-  }
-
-  /**
    * Constructs a UniversalGroundMap object from a cube
    *
    * @param cube The Cube to create the UniversalGroundMap from
    * @param priority Try to make a camera or projection first
    */
   UniversalGroundMap::UniversalGroundMap(Cube &cube, CameraPriority priority) {
-    Init(*(cube.label()), priority);
-  }
-
-  /**
-   * Creates the UniversalGroundMap
-   *
-   * @param pvl The Pvl file to create the UniversalGroundMap from
-   * @param priority Try to make a camera or projection first
-   *
-   * @throws Isis::iException::Camera - Could not create camera or projection
-   */
-  void UniversalGroundMap::Init(Pvl &pvl, CameraPriority priority) {
     p_camera = NULL;
     p_projection = NULL;
 
+    Pvl &pvl = *cube.label();
     try {
       if(priority == CameraFirst)
-        p_camera = CameraFactory::Create(pvl);
+        p_camera = CameraFactory::Create(cube);
       else
         p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
     }
@@ -63,12 +42,12 @@ namespace Isis {
         if(priority == CameraFirst)
           p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
         else
-          p_camera = CameraFactory::Create(pvl);
+          p_camera = CameraFactory::Create(cube);
       }
       catch (IException &secondError) {
         p_projection = NULL;
         QString msg = "Could not create camera or projection for [" +
-                          pvl.fileName() + "]";
+                          cube.fileName() + "]";
         IException realError(IException::Unknown, msg, _FILEINFO_);
         realError.append(firstError);
         realError.append(secondError);
@@ -227,7 +206,6 @@ namespace Isis {
    * @return Universal Latitude
    */
   double UniversalGroundMap::UniversalLatitude() const {
-    //TODO Should we check for ring plane?
     if (p_camera != NULL) {
       return p_camera->UniversalLatitude();
     }
@@ -243,7 +221,6 @@ namespace Isis {
    * @return Universal Longitude
    */
   double UniversalGroundMap::UniversalLongitude() const {
-    //TODO Should we check for ring plane?
     if (p_camera != NULL) {
       return p_camera->UniversalLongitude();
     }

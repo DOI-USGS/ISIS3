@@ -54,7 +54,7 @@ namespace Isis {
      */
     class DawnVirCamera : public LineScanCamera {
       public:
-        DawnVirCamera(Isis::Pvl &lab);
+        DawnVirCamera(Cube &cube);
 
         ~DawnVirCamera() {};
 

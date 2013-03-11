@@ -34,7 +34,7 @@ void IsisMain() {
   // filename required by the Camera is not passed by the process class in this
   // case.  Use the CameraFactory to create the Camera instead to get around this
   // problem.
-  Camera *outcam = CameraFactory::Create(*(mcube->label()));
+  Camera *outcam = CameraFactory::Create(*mcube);
 
   // Set the reference band we want to match
   PvlGroup instgrp = mcube->group("Instrument");
@@ -48,7 +48,7 @@ void IsisMain() {
   }
 
   // Only recreate the output camera if it was band dependent
-  if(outcam == NULL) outcam = CameraFactory::Create(*(mcube->label()));
+  if(outcam == NULL) outcam = CameraFactory::Create(*mcube);
 
   // We might need the instrument group later, so get a copy before clearing the input
   //   cubes.

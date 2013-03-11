@@ -10,7 +10,8 @@ class QPushButton;
 namespace Isis {
   class ControlNet;
   class ControlNetGraphicsItem;
-  class CubeDisplayProperties;
+  class Image;
+  class ImageList;
 
   /**
    * //TODO: Remove debug printout & comment
@@ -88,6 +89,7 @@ namespace Isis {
     protected:
       QAction *getPrimaryAction();
       QWidget *getToolBarWidget();
+      void mouseButtonRelease(QPointF, Qt::MouseButton s);
 
     private slots:
       void configMovement();
@@ -104,8 +106,7 @@ namespace Isis {
     private:
       void createDialog();
 
-      CubeDisplayProperties *
-          takeDisplay(QString sn, QList< CubeDisplayProperties *> &displays);
+      Image *takeImage(QString sn, ImageList &images);
 
       QPushButton *m_loadControlNetButton;
       QPushButton *m_displayControlNetButton;

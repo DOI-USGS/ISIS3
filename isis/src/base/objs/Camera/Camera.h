@@ -231,7 +231,7 @@ namespace Isis {
   class Camera : public Sensor {
     public:
       // constructors
-      Camera(Pvl &lab);
+      Camera(Cube &cube);
 
       // destructor
       //! Destroys the Camera Object

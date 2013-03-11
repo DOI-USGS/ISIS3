@@ -54,7 +54,7 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    *
    */
-  Mariner10Camera::Mariner10Camera(Pvl &lab) : FramingCamera(lab) {
+  Mariner10Camera::Mariner10Camera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
 
     //  Turn off the aberration corrections for instrument position object
@@ -65,7 +65,8 @@ namespace Isis {
     SetFocalLength();
     SetPixelPitch();
 
-    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+    Pvl &lab = *cube.label();
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // Get utc start time
     QString stime = inst["StartTime"];
 
@@ -163,6 +164,6 @@ namespace Isis {
  *
  * @return Isis::Camera* Mariner10Camera
  */
-extern "C" Isis::Camera *Mariner10CameraPlugin(Isis::Pvl &lab) {
-  return new Isis::Mariner10Camera(lab);
+extern "C" Isis::Camera *Mariner10CameraPlugin(Isis::Cube &cube) {
+  return new Isis::Mariner10Camera(cube);
 }

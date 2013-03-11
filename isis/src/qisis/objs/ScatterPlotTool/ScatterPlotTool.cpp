@@ -197,7 +197,7 @@ namespace Isis {
     try {
       if (!m_configDialog) {
         m_configDialog = new ScatterPlotConfigDialog(
-            cubeViewport(), p_workspace);
+            cubeViewport(), workspace());
         connect(m_configDialog, SIGNAL(accepted()),
                 this, SLOT(onScatterPlotConfigAccepted()));
         connect(m_configDialog, SIGNAL(rejected()),

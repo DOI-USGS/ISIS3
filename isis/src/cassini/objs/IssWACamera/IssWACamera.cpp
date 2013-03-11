@@ -41,9 +41,10 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Added call
    *                          to ShutterOpenCloseTimes() method.
    */
-  IssWACamera::IssWACamera(Pvl &lab) : FramingCamera(lab) {
+  IssWACamera::IssWACamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
-    PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
+    Pvl &lab = *cube.label();
+    PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     // Get the camera characteristics
     QString key = "INS" + toString(naifIkCode()) + "_" + bandBin["FilterName"][0] + "_FOCAL_LENGTH";
     key = key.replace("/", "_");
@@ -131,6 +132,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Cassini namespace.
  */
-extern "C" Isis::Camera *IssWACameraPlugin(Isis::Pvl &lab) {
-  return new Isis::IssWACamera(lab);
+extern "C" Isis::Camera *IssWACameraPlugin(Isis::Cube &cube) {
+  return new Isis::IssWACamera(cube);
 }

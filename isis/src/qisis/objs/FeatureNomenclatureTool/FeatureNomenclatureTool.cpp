@@ -871,7 +871,10 @@ namespace Isis {
       }
     }
 
-    m_action->setChecked(m_nomenclatureEnabled);
+    if (m_action) {
+      m_action->setChecked(m_nomenclatureEnabled);
+    }
+
     featureSelected();
   }
 

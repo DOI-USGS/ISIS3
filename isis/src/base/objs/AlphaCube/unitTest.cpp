@@ -1,13 +1,16 @@
 #include <iostream>
 #include "AlphaCube.h"
+#include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 int main() {
-  Isis::Preference::Preferences(true);
-  Isis::AlphaCube c(4, 8, 2, 3, 1.5, 2.5, 3.5, 5.5);
+  Preference::Preferences(true);
+  AlphaCube c(4, 8, 2, 3, 1.5, 2.5, 3.5, 5.5);
   cout << "1st Test Alpha" << endl;
   cout << c.AlphaSamples() << endl;
   cout << c.AlphaLines() << endl;
@@ -30,7 +33,7 @@ int main() {
   cout << c.BetaLine(c.AlphaLines()) << endl;
   cout << endl;
 
-  Isis::AlphaCube d(2, 3, 2, 4, 1.5, 1.5, 2.5, 3.5);
+  AlphaCube d(2, 3, 2, 4, 1.5, 1.5, 2.5, 3.5);
   cout << "2nd Alpha Test" << endl;
   cout << d.AlphaSamples() << endl;
   cout << d.AlphaLines() << endl;
@@ -77,17 +80,19 @@ int main() {
   cout << endl;
 
   try {
-    Isis::Pvl lab;
-    lab.addObject(Isis::PvlObject("IsisCube"));
-    Isis::PvlObject &isiscube = lab.findObject("IsisCube");
-    isiscube.addGroup(Isis::PvlGroup("Dimensions"));
-    Isis::PvlGroup &dims = isiscube.findGroup("Dimensions");
-    dims += Isis::PvlKeyword("Samples", "4");
-    dims += Isis::PvlKeyword("Lines", "8");
-    c.UpdateGroup(lab);
+    Cube cube("$base/testData/isisTruth.cub", "r");
+    Pvl &lab = *cube.label();
+    lab.clear();
+    lab.addObject(PvlObject("IsisCube"));
+    PvlObject &isiscube = lab.findObject("IsisCube");
+    isiscube.addGroup(PvlGroup("Dimensions"));
+    PvlGroup &dims = isiscube.findGroup("Dimensions");
+    dims += PvlKeyword("Samples", "4");
+    dims += PvlKeyword("Lines", "8");
+    c.UpdateGroup(cube);
     cout << lab << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 

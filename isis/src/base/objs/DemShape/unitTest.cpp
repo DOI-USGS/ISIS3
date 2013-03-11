@@ -70,8 +70,7 @@ int main() {
   cube.open(inputFile);
   Camera *c = cube.camera();
   std::vector<Distance> radii = c->target()->radii();
-  Pvl pvl = *cube.label();
-  Spice spi(pvl);
+  Pvl &pvl = *cube.label();
   Target targ(&spi, pvl);
   targ.setRadii(radii);
 

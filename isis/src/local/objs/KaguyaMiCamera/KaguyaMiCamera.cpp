@@ -41,7 +41,7 @@ namespace Isis {
    * @internal 
    *   @history 2012-06-14 Orrin Thomas - original version
    */
-  KaguyaMiCamera::KaguyaMiCamera(Pvl &lab) : LineScanCamera(lab) {
+  KaguyaMiCamera::KaguyaMiCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
 
@@ -52,6 +52,7 @@ namespace Isis {
  
 
     // Get the start time from labels
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = (QString)inst["StartTime"];
     SpiceDouble etStart=0;
@@ -110,6 +111,6 @@ namespace Isis {
  * @internal
  *   @history 2012-06-14 Orrin Thomas - original version
  */
-extern "C" Isis::Camera *KaguyaMiCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::KaguyaMiCamera(lab);
+extern "C" Isis::Camera *KaguyaMiCameraPlugin(Isis::Cube &cube) {
+  return new Isis::KaguyaMiCamera(cube);
 }

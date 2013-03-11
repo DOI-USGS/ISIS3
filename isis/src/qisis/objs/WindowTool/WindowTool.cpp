@@ -113,12 +113,12 @@ namespace Isis {
    */
   void WindowTool::addTo(Workspace *ws) {
     Tool::addTo(ws);
-    connect(p_cascadeWindows, SIGNAL(activated()), ws, SLOT(cascadeSubWindows()));
-    connect(p_tileWindows, SIGNAL(activated()), ws, SLOT(tileSubWindows()));
-    connect(p_prevWindow, SIGNAL(activated()), ws, SLOT(activatePreviousSubWindow()));
-    connect(p_nextWindow, SIGNAL(activated()), ws, SLOT(activateNextSubWindow()));
-    connect(p_closeWindow, SIGNAL(activated()), ws, SLOT(closeActiveSubWindow()));
-    connect(p_closeAllWindows, SIGNAL(activated()), ws, SLOT(closeAllSubWindows()));
+    connect(p_cascadeWindows, SIGNAL(activated()), ws->mdiArea(), SLOT(cascadeSubWindows()));
+    connect(p_tileWindows, SIGNAL(activated()), ws->mdiArea(), SLOT(tileSubWindows()));
+    connect(p_prevWindow, SIGNAL(activated()), ws->mdiArea(), SLOT(activatePreviousSubWindow()));
+    connect(p_nextWindow, SIGNAL(activated()), ws->mdiArea(), SLOT(activateNextSubWindow()));
+    connect(p_closeWindow, SIGNAL(activated()), ws->mdiArea(), SLOT(closeActiveSubWindow()));
+    connect(p_closeAllWindows, SIGNAL(activated()), ws->mdiArea(), SLOT(closeAllSubWindows()));
     connect(ws, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
             this, SLOT(updateViewportCursor(MdiCubeViewport *)));
   }

@@ -105,7 +105,7 @@ namespace Isis {
     public:
       //! Constructors
 //      LineScanCameraRotation( int frameCode, SpiceRotation *crot, SpiceRotation *prot, SpicePosition *spos );
-      LineScanCameraRotation(int frameCode,  Isis::Pvl &lab, std::vector<double> timeCache, double tol);
+      LineScanCameraRotation(int frameCode,  Isis::Cube &cube, std::vector<double> timeCache, double tol);
 
       //! Destructor
 //      virtual ~LineScanCameraRotation() { };

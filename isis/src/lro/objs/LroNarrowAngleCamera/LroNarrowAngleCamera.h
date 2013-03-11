@@ -47,7 +47,7 @@ namespace Isis {
    */
   class LroNarrowAngleCamera : public LineScanCamera {
     public:
-      LroNarrowAngleCamera(Pvl &lab);
+      LroNarrowAngleCamera(Cube &cube);
 
       //! Destroys the LroNarrowAngleCamera object
       ~LroNarrowAngleCamera() {};

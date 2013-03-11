@@ -81,7 +81,7 @@ namespace Isis {
   void SpectralPlotTool::enableRubberBandTool() {
     if (m_rubberBandCombo) {
       m_rubberBandCombo->reset();
-      RubberBandTool::drawActiveViewportOnly(false);
+      rubberBandTool()->setDrawActiveViewportOnly(false);
 
       m_rubberBandCombo->setEnabled(true);
       m_rubberBandCombo->setVisible(true);
@@ -196,7 +196,7 @@ namespace Isis {
     wrapper->addAction(m_plotStdErr1Action);
     wrapper->addAction(m_plotStdErr2Action);
 
-    m_rubberBandCombo = new RubberBandComboBox(
+    m_rubberBandCombo = new RubberBandComboBox(this,
       RubberBandComboBox::Polygon |
       RubberBandComboBox::Rectangle,
       RubberBandComboBox::Rectangle
@@ -323,7 +323,7 @@ namespace Isis {
       selectedWindow()->raise();
     }
 
-    if (RubberBandTool::isValid()) {
+    if (rubberBandTool()->isValid()) {
       refreshPlot();
     }
     else {
@@ -340,7 +340,7 @@ namespace Isis {
   void SpectralPlotTool::refreshPlot() {
     MdiCubeViewport *activeViewport = cubeViewport();
 
-    if (activeViewport && RubberBandTool::isValid()) {
+    if (activeViewport && rubberBandTool()->isValid()) {
       // Find which window we want to paste into
       PlotWindow *targetWindow = selectedWindow(true);
 
@@ -392,7 +392,7 @@ namespace Isis {
         } /*end for loop*/
 
         if (labels.size() > 0) {
-          QList<QPoint> rubberBandPoints = RubberBandTool::getVertices();
+          QList<QPoint> rubberBandPoints = rubberBandTool()->vertices();
 
           validatePlotCurves();
           if (m_plotAvgAction->isChecked()) {
@@ -554,7 +554,7 @@ namespace Isis {
   void SpectralPlotTool::getSpectralStatistics(QVector<double> &labels,
                                                QVector<Statistics> &data,
                                                MdiCubeViewport *viewport) {
-    QList<QPoint> vertices = RubberBandTool::getVertices();
+    QList<QPoint> vertices = rubberBandTool()->vertices();
 
     if (vertices.size() < 1) return;
 
@@ -576,7 +576,7 @@ namespace Isis {
     Brick *brick = new Brick(*cube, samps, 1, 1);
     Pvl &pvl = *viewport->cube()->label();
 
-    if (RubberBandTool::getMode() == RubberBandTool::Polygon) {
+    if (rubberBandTool()->currentMode() == RubberBandTool::PolygonMode) {
       samps = 1;
       geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
       for (int i = 0; i < vertices.size(); i++) {
@@ -621,7 +621,7 @@ namespace Isis {
       Statistics stats;
 
       /*Rectangle*/
-      if (RubberBandTool::getMode() == RubberBandTool::Rectangle) {
+      if (rubberBandTool()->currentMode() == RubberBandTool::RectangleMode) {
         for (int line = (int)std::min(sl, el); line <= (int)std::max(sl, el); line++) {
           brick->SetBasePosition((int)ss, line, band);
           cube->read(*brick);
@@ -630,7 +630,7 @@ namespace Isis {
       }
 
       /*Polygon*/
-      if (RubberBandTool::getMode() == RubberBandTool::Polygon) {
+      if (rubberBandTool()->currentMode() == RubberBandTool::PolygonMode) {
         for (unsigned int j = 0; j < x_contained.size(); j++) {
 
           brick->SetBasePosition(x_contained[j], y_contained[j], band);

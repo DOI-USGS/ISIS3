@@ -59,16 +59,17 @@ namespace Isis {
       MeasureTool(QWidget *parent);
       void addTo(QMenu *menu);
 
+      //! Returns the menu name.
+      QString menuName() const {
+        return "&Options";
+      }
+
     protected slots:
       virtual void rubberBandComplete();
       virtual void updateMeasure();
       virtual void mouseLeave();
 
     protected:
-      //! Returns the menu name.
-      QString menuName() const {
-        return "&Options";
-      };
       QWidget *createToolBarWidget(QStackedWidget *parent);
       QAction *toolPadAction(ToolPad *pad);
       void updateTool();

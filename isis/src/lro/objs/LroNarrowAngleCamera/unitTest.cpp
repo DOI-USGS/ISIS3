@@ -44,8 +44,8 @@ int main(void) {
   cout << "Unit Test for LroNarrowAngleCamera..." << endl;
   try {
     // Support different camera model versions thusly...
-    Pvl p("$lro/testData/M111607830RE_crop.cub");
-    int cmVersion = CameraFactory::CameraVersion(p);
+    Cube c("$lro/testData/M111607830RE_crop.cub", "r");
+    int cmVersion = CameraFactory::CameraVersion(c);
 
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
@@ -57,16 +57,17 @@ int main(void) {
     if (cmVersion == 1) {
       knownLat = -83.229473272165;
       knownLon = 353.93153626711;
-      p.read("$lro/testData/M111607830RE_crop.cub.cv1");
+      c.close();
+      c.open("$lro/testData/M111607830RE_crop.cub.cv1", "r");
     }
     else {
       knownLat = -83.2598150072595899;
       knownLon = 353.9497987082821737;
     }
 
-    Camera *cam = CameraFactory::Create(p);
+    Camera *cam = CameraFactory::Create(c);
     
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

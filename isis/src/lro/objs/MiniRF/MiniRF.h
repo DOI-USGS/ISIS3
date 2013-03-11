@@ -58,7 +58,7 @@ namespace Isis {
    */
   class MiniRF : public RadarCamera {
     public:
-      MiniRF(Pvl &lab);
+      MiniRF(Cube &cube);
 
       //! Destroys the MiniRF object
       ~MiniRF() {};

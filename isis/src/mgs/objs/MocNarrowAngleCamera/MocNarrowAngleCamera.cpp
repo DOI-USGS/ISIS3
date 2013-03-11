@@ -39,7 +39,7 @@ namespace Isis {
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  MocNarrowAngleCamera::MocNarrowAngleCamera(Pvl &lab) : LineScanCamera(lab) {
+  MocNarrowAngleCamera::MocNarrowAngleCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     //      LoadEulerMounting();
@@ -48,6 +48,7 @@ namespace Isis {
     instrumentRotation()->SetTimeBias(-1.15);
 
     // Get the start time from labels
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockCount"];
     double etStart = getClockTime(stime).Et();
@@ -93,6 +94,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Mgs namespace.
  */
-extern "C" Isis::Camera *MocNarrowAngleCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::MocNarrowAngleCamera(lab);
+extern "C" Isis::Camera *MocNarrowAngleCameraPlugin(Isis::Cube &cube) {
+  return new Isis::MocNarrowAngleCamera(cube);
 }

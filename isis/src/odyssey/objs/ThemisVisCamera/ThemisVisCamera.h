@@ -73,7 +73,7 @@ namespace Isis {
   class ThemisVisCamera : public PushFrameCamera {
     public:
       // constructor
-      ThemisVisCamera(Pvl &lab);
+      ThemisVisCamera(Cube &cube);
 
       //! Destroys the Themis Vis Camera object
       ~ThemisVisCamera() {};

@@ -36,7 +36,7 @@ using namespace Isis;
 
 class MyCamera : public Camera {
   public:
-    MyCamera(Pvl &lab) : Camera(lab) { }
+    MyCamera(Cube &cube) : Camera(cube) { }
 
     bool IsBandIndependent() {
       cout << "IsBandIndependent called..." << endl;
@@ -64,7 +64,7 @@ int main() {
   Camera *c = NULL;
   c = cube.camera();
   Pvl pvl = *cube.label();
-  MyCamera cam(pvl);
+  MyCamera cam(cube);
   double line = 453.0;
   double sample = 534.0;
   Latitude lat(18.221, Angle::Degrees);
@@ -214,7 +214,7 @@ int main() {
   cube.close();
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam2 = CameraFactory::Create(pvl);
+  Camera *cam2 = CameraFactory::Create(cube);
   cube.close();
 
   cout << endl;
@@ -281,7 +281,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_flat.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam3 = CameraFactory::Create(pvl);
+  Camera *cam3 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam3->Samples() / 2.0;
@@ -312,7 +312,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_45left.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam4 = CameraFactory::Create(pvl);
+  Camera *cam4 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam4->Samples() / 2.0;
@@ -338,7 +338,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_45top.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam5 = CameraFactory::Create(pvl);
+  Camera *cam5 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam5->Samples() / 2.0;
@@ -364,7 +364,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_45right.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam6 = CameraFactory::Create(pvl);
+  Camera *cam6 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam6->Samples() / 2.0;
@@ -390,7 +390,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_45bottom.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam7 = CameraFactory::Create(pvl);
+  Camera *cam7 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam7->Samples() / 2.0;
@@ -416,7 +416,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_80left.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam8 = CameraFactory::Create(pvl);
+  Camera *cam8 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam8->Samples() / 2.0;
@@ -442,7 +442,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_80top.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam9 = CameraFactory::Create(pvl);
+  Camera *cam9 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam9->Samples() / 2.0;
@@ -468,7 +468,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_80right.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam10 = CameraFactory::Create(pvl);
+  Camera *cam10 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam10->Samples() / 2.0;
@@ -494,7 +494,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_80bottom.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam11 = CameraFactory::Create(pvl);
+  Camera *cam11 = CameraFactory::Create(cube);
   cube.close();
 
   sample = cam11->Samples() / 2.0;
@@ -520,7 +520,7 @@ int main() {
   inputFile = "$base/testData/f319b18_ideal_flat.cub";
   cube.open(inputFile);
   pvl = *cube.label();
-  Camera *cam12 = CameraFactory::Create(pvl);
+  Camera *cam12 = CameraFactory::Create(cube);
   cube.close();
 
   sample = 1.0;

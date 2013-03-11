@@ -69,7 +69,7 @@ namespace Isis {
   class IdealCamera : public Camera {
     public:
       // Constructs a HiriseCamera object
-      IdealCamera(Pvl &lab);
+      IdealCamera(Cube &cube);
 
       // Destroys the HiriseCamera object
       ~IdealCamera();

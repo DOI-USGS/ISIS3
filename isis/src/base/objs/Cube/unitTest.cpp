@@ -53,8 +53,7 @@ int main(int argc, char *argv[]) {
 
     // Test the open and read methods
     cerr << "Opening cube ... " << endl;
-    Cube in;
-    in.open("IsisCube_01");
+    Cube in("IsisCube_01");
     Report(in);
 
     cerr << "Comparing cube ... " << endl;

@@ -4,8 +4,11 @@
 #include <geos/geom/Polygon.h>
 #include <geos/util/GEOSException.h>
 
+#include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
 #include "PolygonTools.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 #include "UniversalGroundMap.h"
@@ -104,8 +107,8 @@ int main() {
          << endl << endl;
 
     // Create a UniversalGroundMap so we can test the SampleLinePolygon stuff
-    Pvl pvl("unitTest.lbl");
-    UniversalGroundMap ugm = UniversalGroundMap(pvl);
+    Cube cube("unitTest.lbl", "r");
+    UniversalGroundMap ugm = UniversalGroundMap(cube);
 
     // Create coordinate sequence for the first of two polygons
     geos::geom::CoordinateSequence *llpts = new geos::geom::CoordinateArraySequence();

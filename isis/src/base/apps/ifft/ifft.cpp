@@ -19,17 +19,13 @@ void IsisMain() {
   ProcessByTile lProc;
   lProc.Progress()->SetText("First pass");
 
-  // Get the original cubes dimensions
-  UserInterface &ui = Application::GetUserInterface();
-  Pvl lab;
-  lab.read(ui.GetFileName("MAGNITUDE"));
-  AlphaCube acube(lab);
-  int initSamples = acube.BetaSamples();
-  int initLines = acube.BetaLines();
-
   // Setup the input and output cubes
   Cube *magCube = lProc.SetInputCube("MAGNITUDE");
   Cube *phaseCube = lProc.SetInputCube("PHASE");
+
+  AlphaCube acube(*magCube);
+  int initSamples = acube.BetaSamples();
+  int initLines = acube.BetaLines();
 
   int numSamples = magCube->sampleCount();
   int numLines = magCube->lineCount();

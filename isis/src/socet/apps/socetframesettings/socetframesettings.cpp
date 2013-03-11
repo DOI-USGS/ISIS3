@@ -80,8 +80,7 @@ void IsisMain() {
   cam->SetImage(detectorSampleOrigin, detectorLineOrigin);
   double et = cam->time().Et();
 
-  Pvl *cubeHeader = input->label();
-  Spice spice(*cubeHeader);
+  Spice spice(*input);
   spice.setTime(et);
 
   // Get required keywords from instrument and band groups

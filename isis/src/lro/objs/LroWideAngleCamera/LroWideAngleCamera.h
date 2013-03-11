@@ -70,7 +70,7 @@ namespace Isis {
   class LroWideAngleCamera : public PushFrameCamera {
     public:
       // constructor
-      LroWideAngleCamera(Pvl &lab);
+      LroWideAngleCamera(Cube &cube);
 
       //! Destroys the LroWideAngleCamera object
       ~LroWideAngleCamera() {};

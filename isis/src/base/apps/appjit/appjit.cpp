@@ -78,7 +78,9 @@ void IsisMain() {
       // Alternative calculation of .01*ground resolution of a pixel
       tol = cam->PixelPitch() * cam->SpacecraftAltitude() * 1000. / cam->FocalLength() / 100.;
     }
-    LineScanCameraRotation crot(frameCode, *(cube.label()), cam->instrumentRotation()->GetFullCacheTime(), tol);
+
+    LineScanCameraRotation crot(frameCode, cube, cam->instrumentRotation()->GetFullCacheTime(), tol);
+
     crot.SetPolynomialDegree(ui.GetInteger("DEGREE"));
     crot.SetAxes(1, 2, 3);
     if(ui.WasEntered("PITCHRATE")) crot.ResetPitchRate(ui.GetDouble("PITCHRATE"));

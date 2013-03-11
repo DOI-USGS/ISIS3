@@ -69,15 +69,16 @@ namespace Isis {
       ZoomTool(QWidget *parent);
       void addTo(QMenu *menu);
 
+      //! Returns the name of the menu.
+      QString menuName() const {
+        return "&View";
+      }
+
     protected slots:
       void rubberBandComplete();
 
     protected:
       QAction *toolPadAction(ToolPad *toolpad);
-      //! Returns the name of the menu.
-      QString menuName() const {
-        return "&View";
-      };
       void updateTool();
       QWidget *createToolBarWidget(QStackedWidget *parent);
       void enableRubberBandTool();

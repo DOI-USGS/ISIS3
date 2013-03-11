@@ -41,11 +41,12 @@ namespace Isis {
       void addToPermanent(QToolBar *perm);
       void addTo(Workspace *ws);
 
-    protected:
       //! Returns the menu name.
       QString menuName() const {
         return "&Options";
-      };
+      }
+
+    protected:
       void updateTool();
       void setColor(QToolButton *button);
       void readSettings();

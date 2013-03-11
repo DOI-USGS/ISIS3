@@ -48,7 +48,7 @@ namespace Isis {
 
   class PushFrameCamera : public Camera {
     public:
-      PushFrameCamera(Isis::Pvl &lab);
+      PushFrameCamera(Isis::Cube &cube);
 
       /** 
        * Returns the PushFrame type of camera, as enumerated in the Camera 

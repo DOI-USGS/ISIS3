@@ -26,7 +26,6 @@
 #include "Tool.h"
 
 
-// FIXME: remove these two includes!
 #include <QMap>
 #include <QStack>
 

@@ -43,13 +43,14 @@ namespace Isis {
    *                                    the plugin
    * @throws Isis::iException::Camera - Unable to initialize camera model
    */
-  Camera *CameraFactory::Create(Pvl &lab) {
+  Camera *CameraFactory::Create(Cube &cube) {
     // Try to load a plugin file in the current working directory and then
     // load the system file
     initPlugin();
 
     try {
       // First get the spacecraft and instrument and combine them
+      Pvl &lab = *cube.label();
       PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
       QString spacecraft = (QString) inst["SpacecraftName"];
       QString name = (QString) inst["InstrumentId"];
@@ -66,7 +67,7 @@ namespace Isis {
 
       int cameraOriginalVersion = (int)kerns["CameraVersion"];
 
-      int cameraNewestVersion = CameraVersion(lab);
+      int cameraNewestVersion = CameraVersion(cube);
 
       if(cameraOriginalVersion != cameraNewestVersion) {
         string msg = "The camera model used to create a camera for this cube is out of date, " \
@@ -88,11 +89,11 @@ namespace Isis {
       }
 
       // Now cast that pointer in the proper way
-      Camera * (*plugin)(Isis::Pvl & lab);
-      plugin = (Camera * ( *)(Isis::Pvl & lab)) ptr;
+      Camera * (*plugin)(Isis::Cube &cube);
+      plugin = (Camera * ( *)(Isis::Cube &cube)) ptr;
 
       // Create the projection as requested
-      return (*plugin)(lab);
+      return (*plugin)(cube);
     }
     catch(IException &e) {
       string message = "Unable to initialize camera model from group [Instrument]";
@@ -121,6 +122,11 @@ namespace Isis {
    *
    * @return int Latest Camera Version
    */
+  int CameraFactory::CameraVersion(Cube &cube) {
+    return CameraVersion(*cube.label());
+  }
+
+
   int CameraFactory::CameraVersion(Pvl &lab) {
     // Try to load a plugin file in the current working directory and then
     // load the system file

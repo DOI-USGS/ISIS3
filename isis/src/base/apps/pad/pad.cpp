@@ -3,6 +3,7 @@
 #include "ProcessByLine.h"
 #include "AlphaCube.h"
 #include "SpecialPixel.h"
+#include "Projection.h"
 #include "SubArea.h"
 
 using namespace std;

@@ -55,6 +55,8 @@ namespace Isis {
 
     protected:
       void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
+//    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+//    virtual bool eventFilter(QObject *obj, QEvent *ev);
 
     private:
       QRectF calcRect() const;

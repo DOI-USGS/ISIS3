@@ -284,7 +284,7 @@ namespace Isis {
     _orglabel = OriginalLabel(cube.fileName()).ReturnLabels();
     _nSubframes = (int) _orglabel.findKeyword("MESS:SUBFRAME",
                   PvlObject::Traverse);
-    _camera = CameraFactory::Create(_label);
+    _camera = CameraFactory::Create(cube);
     _digitsPrecision = _defaultDigits;
     _NullDefault = "\"N/A\"";
     _doUpdate = true;

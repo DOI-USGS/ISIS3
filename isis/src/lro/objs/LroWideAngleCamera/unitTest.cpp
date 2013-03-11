@@ -40,8 +40,8 @@ int main(void) {
   try {
 
     // Support different camera model versions thusly...
-    Pvl p("$lro/testData/wacCameraTest.cub");
-    int cmVersion = CameraFactory::CameraVersion(p);
+    Cube c("$lro/testData/wacCameraTest.cub", "r");
+    int cmVersion = CameraFactory::CameraVersion(c);
 
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
@@ -53,7 +53,8 @@ int main(void) {
     if (cmVersion == 1) {
      knownLat = -70.69638475050628;
      knownLon =  244.3314992195277;
-     p.read("$lro/testData/wacCameraTest.cub.cv1");
+     c.close();
+     c.open("$lro/testData/wacCameraTest.cub.cv1", "r");
     }
     else {
       // Version 2 difference caused by new CK and comprehensive IK kernel support
@@ -63,8 +64,8 @@ int main(void) {
     }
 
 
-    Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Camera *cam = CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

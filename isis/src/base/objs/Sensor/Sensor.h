@@ -175,6 +175,12 @@ namespace Isis {
    *                           inputs. Fixes #807.
    *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
    *                           coding standards. References #972.
+   *   @history 2012-09-06 Steven Lambright and Stuart Sides - Changed the constructors to take
+   *                           Cube instead of Pvl to prevent redundant parsing. This
+   *                           should eventually be refactored into a CubeLabel or similar object
+   *                           so that an actual cube isn't required in the future, but for now
+   *                           this enables the control net GUI to create a camera from a cube
+   *                           with no dimensions in the label. 
    *   @history 2012-10-10 Debbie A. Cook - Moved the functionality related to the shape model into 
    *                           new classes:  ShapeModel, EllipsoidShape, DemShape, and 
    *                           EquatorialCylindricalShape.  Also modified to use new Target class.  References 
@@ -184,7 +190,7 @@ namespace Isis {
    */
   class Sensor : public Spice {
     public:
-      Sensor(Pvl &lab);
+      Sensor(Cube &cube);
 
       virtual ~Sensor();
 

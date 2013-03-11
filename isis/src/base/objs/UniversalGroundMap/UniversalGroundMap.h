@@ -149,8 +149,6 @@ namespace Isis {
 
 
     private:
-      void Init(Pvl &pvl, CameraPriority priority);
-
       Isis::Camera *p_camera;  //!<The camera (if the image has a camera)
       Isis::Projection *p_projection;  //!<The projection (if the image is projected)
   };
