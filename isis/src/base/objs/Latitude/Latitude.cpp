@@ -153,9 +153,8 @@ namespace Isis {
           Distance::Meters);
     }
     else {
-      std::cout << mapping << std::endl;
       PvlGroup radiiGrp = Projection::TargetRadii(mapping["TargetName"]);
-      std::cout << radiiGrp << std::endl;
+
       m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
           Distance::Meters);
       m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
