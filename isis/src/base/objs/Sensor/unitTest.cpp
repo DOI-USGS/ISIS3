@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl
          << endl << endl;
 
-    kern.Clear();
+    kern.clear();
 
     kern += PvlKeyword("NaifFrameCode", "-94031");
     kern += PvlKeyword("LeapSecond", dir + "naif0007.tls");
@@ -209,8 +209,8 @@ int main(int argc, char *argv[]) {
     kern += PvlKeyword("Frame", "");
     kern += PvlKeyword("ShapeModel",
                         "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub");
-    lab.DeleteGroup("Kernels");
-    lab.AddGroup(kern);
+    lab.deleteGroup("Kernels");
+    lab.addGroup(kern);
 
     // Setup
     Sensor spi2(dummyCube);

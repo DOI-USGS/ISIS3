@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
-    double rad = p1->LocalRadius(mapGroup.FindKeyword("CenterLatitude"));
+    double rad = p1->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -423,8 +423,8 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
-    //rad = mapGroup.FindKeyword("EquatorialRadius");
-    rad = p2->LocalRadius(mapGroup.FindKeyword("CenterLatitude"));
+    //rad = mapGroup.findKeyword("EquatorialRadius");
+    rad = p2->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -637,8 +637,8 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
-    //rad = mapGroup.FindKeyword("EquatorialRadius");
-    rad = p3->LocalRadius(mapGroup.FindKeyword("CenterLatitude"));
+    //rad = mapGroup.findKeyword("EquatorialRadius");
+    rad = p3->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -943,8 +943,8 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
-    //rad = mapGroup.FindKeyword("EquatorialRadius");
-    rad = p4->LocalRadius(mapGroup.FindKeyword("CenterLatitude"));
+    //rad = mapGroup.findKeyword("EquatorialRadius");
+    rad = p4->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -1996,7 +1996,7 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t\t TESTING OTHER METHODS          " << endl;
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    mapGroup.FindKeyword("PolarRadius").SetValue(toString(p8->EquatorialRadius()));
+    mapGroup.findKeyword("PolarRadius").setValue(toString(p8->EquatorialRadius()));
     TProjection *p9 = (TProjection *) ProjectionFactory::Create(lab);
     TProjection *s = p1;
     cout << "Name:                       " << s->Name() << endl;
@@ -2030,9 +2030,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.AddGroup(p1->Mapping());
-    tmp2.AddGroup(p1->MappingLatitudes());
-    tmp3.AddGroup(p1->MappingLongitudes());
+    tmp1.addGroup(p1->Mapping());
+    tmp2.addGroup(p1->MappingLatitudes());
+    tmp3.addGroup(p1->MappingLongitudes());
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;
     cout << "MappingLatitudes() = " << endl;

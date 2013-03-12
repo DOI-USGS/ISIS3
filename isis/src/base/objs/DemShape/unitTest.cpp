@@ -71,7 +71,7 @@ int main() {
   Camera *c = cube.camera();
   std::vector<Distance> radii = c->target()->radii();
   Pvl &pvl = *cube.label();
-  Target targ(&spi, pvl);
+  Target targ(c, pvl);
   targ.setRadii(radii);
 
   cout << "Begin testing Dem Shape Model class...." << endl;

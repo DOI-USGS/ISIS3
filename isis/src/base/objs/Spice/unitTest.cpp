@@ -133,9 +133,9 @@ int main(int argc, char *argv[]) {
   kernelsGroup += PvlKeyword("EndPadding", toString(slope));
 
   Pvl &lab = *dummyCube.label();
-  PvlObject &isisCubeObj = lab.FindObject("IsisCube");
-  isisCubeObj.AddGroup(instrumentGroup);
-  isisCubeObj.AddGroup(kernelsGroup);
+  PvlObject &isisCubeObj = lab.findObject("IsisCube");
+  isisCubeObj.addGroup(instrumentGroup);
+  isisCubeObj.addGroup(kernelsGroup);
 
   // Test bad target
   try {
@@ -148,8 +148,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Test bad getInteger
-  PvlGroup &temp = lab.FindGroup("Instrument", Pvl::Traverse);
-  temp.AddKeyword(PvlKeyword("TargetName", "Mars"), Pvl::Replace);
+  PvlGroup &temp = lab.findGroup("Instrument", Pvl::Traverse);
+  temp.addKeyword(PvlKeyword("TargetName", "Mars"), Pvl::Replace);
   cout << "Creating Spice object ..." << endl;
   MySpice spi(dummyCube);
   spi.instrumentRotation()->SetTimeBias(-1.15);

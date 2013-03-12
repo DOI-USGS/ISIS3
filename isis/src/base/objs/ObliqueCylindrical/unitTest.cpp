@@ -130,9 +130,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.addGroup(p.Mapping());
-    tmp2.addGroup(p.MappingLatitudes());
-    tmp3.addGroup(p.MappingLongitudes());
+    tmp1.addGroup(p->Mapping());
+    tmp2.addGroup(p->MappingLatitudes());
+    tmp3.addGroup(p->MappingLongitudes());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;

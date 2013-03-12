@@ -20,6 +20,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "Cube.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -110,7 +111,9 @@ int main(int argc, char *argv[]) {
   lab1.addGroup(kern1);
 
   // Create a Spice object to test radii
-  Spice spi(lab1);
+  Cube tmp("$base/testData/isisTruth.cub", "r");
+  *tmp.label() = lab1;
+  Spice spi(tmp);
 
   // Test good target
   Target tGood(NULL, lab1);

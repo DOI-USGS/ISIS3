@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     mapGroup["PolarRadius"].setValue(toString(42));
     Pvl tmp1;
     TProjection *p2 = (TProjection *) ProjectionFactory::Create(lab);
-    tmp1.AddGroup(p2->Mapping());
+    tmp1.addGroup(p2->Mapping());
     s = p2;
     cout << "created a second Projection reference p2"
          << "\nusing the same pvl as p except for that PolarRadius = 42"

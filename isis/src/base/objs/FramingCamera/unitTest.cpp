@@ -89,7 +89,7 @@ int main() {
     cout << "Camera = Radar?     " << (cam.GetCameraType() == Camera::Radar) << endl;
 
     // test ShutterOpenCloseTimes() method
-    PvlGroup inst = cube.label()->FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
     QString startTime = inst["StartTime"];
     double eTime = 0.0;
     utc2et_c(startTime.toAscii().data(), &eTime);

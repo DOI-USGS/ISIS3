@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
   Cube cube("$base/testData/isisTruth.cub", "r"); 
   Pvl &lab = *cube.label();
-  PvlObject &obj = lab.FindObject("IsisCube");
+  PvlObject &obj = lab.findObject("IsisCube");
   PvlGroup group("Instrument");
   PvlGroup group2("TestGroup");
   PvlKeyword keyword("TestKeyword", "TestValue");

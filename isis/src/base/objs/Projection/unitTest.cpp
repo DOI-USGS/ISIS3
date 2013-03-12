@@ -21,12 +21,12 @@ class MyProjectionType : public Projection {
   public:
     // create a child subclass
     MyProjectionType (Pvl &lab) : Projection(lab) {
-      if ((m_mappingGrp.HasKeyword("EquatorialRadius")) &&
-          (m_mappingGrp.HasKeyword("PolarRadius"))) {
+      if ((m_mappingGrp.hasKeyword("EquatorialRadius")) &&
+          (m_mappingGrp.hasKeyword("PolarRadius"))) {
         m_equatorialRadius = m_mappingGrp["EquatorialRadius"];
         m_polarRadius = m_mappingGrp["PolarRadius"];
       }
-      // else  if (m_mappingGrp.HasKeyword("TargetName")) {
+      // else  if (m_mappingGrp.hasKeyword("TargetName")) {
       //   PvlGroup radii = TargetRadii((string)m_mappingGrp["TargetName"]);
       //   m_equatorialRadius = radii["EquatorialRadius"];
       //   m_polarRadius = radii["PolarRadius"];
@@ -59,10 +59,10 @@ class MyProjectionType : public Projection {
 
       // Get the ground range if it exists
       m_groundRangeGood = false;
-      if ((m_mappingGrp.HasKeyword("MinimumLatitude")) &&
-          (m_mappingGrp.HasKeyword("MaximumLatitude")) &&
-          (m_mappingGrp.HasKeyword("MinimumLongitude")) &&
-          (m_mappingGrp.HasKeyword("MaximumLongitude"))) {
+      if ((m_mappingGrp.hasKeyword("MinimumLatitude")) &&
+          (m_mappingGrp.hasKeyword("MaximumLatitude")) &&
+          (m_mappingGrp.hasKeyword("MinimumLongitude")) &&
+          (m_mappingGrp.hasKeyword("MaximumLongitude"))) {
         m_minimumLatitude  = m_mappingGrp["MinimumLatitude"];
         m_maximumLatitude  = m_mappingGrp["MaximumLatitude"];
         m_minimumLongitude = m_mappingGrp["MinimumLongitude"];
@@ -222,27 +222,31 @@ class MyProjectionType : public Projection {
     PvlGroup Mapping() {
       PvlGroup mapping("Mapping");
 
-      if (m_mappingGrp.HasKeyword("TargetName")) {
+      if (m_mappingGrp.hasKeyword("TargetName")) {
         mapping += m_mappingGrp["TargetName"];
       }
 
       mapping += m_mappingGrp["ProjectionName"];
-      mapping += m_mappingGrp["EquatorialRadius"];
-      mapping += m_mappingGrp["PolarRadius"];
+
+      if (m_mappingGrp.hasKeyword("EquatorialRadius") && m_mappingGrp.hasKeyword("PolarRadius")) {
+        mapping += m_mappingGrp["EquatorialRadius"];
+        mapping += m_mappingGrp["PolarRadius"];
+      }
+
       mapping += m_mappingGrp["LatitudeType"];
       mapping += m_mappingGrp["LongitudeDirection"];
       mapping += m_mappingGrp["LongitudeDomain"];
 
-      if (m_mappingGrp.HasKeyword("PixelResolution")) {
+      if (m_mappingGrp.hasKeyword("PixelResolution")) {
         mapping += m_mappingGrp["PixelResolution"];
       }
-      if (m_mappingGrp.HasKeyword("Scale")) {
+      if (m_mappingGrp.hasKeyword("Scale")) {
         mapping += m_mappingGrp["Scale"];
       }
-      if (m_mappingGrp.HasKeyword("UpperLeftCornerX")) {
+      if (m_mappingGrp.hasKeyword("UpperLeftCornerX")) {
         mapping += m_mappingGrp["UpperLeftCornerX"];
       }
-      if (m_mappingGrp.HasKeyword("UpperLeftCornerY")) {
+      if (m_mappingGrp.hasKeyword("UpperLeftCornerY")) {
         mapping += m_mappingGrp["UpperLeftCornerY"];
       }
 
@@ -253,7 +257,7 @@ class MyProjectionType : public Projection {
         mapping += m_mappingGrp["MaximumLongitude"];
       }
 
-      if (m_mappingGrp.HasKeyword("Rotation")) {
+      if (m_mappingGrp.hasKeyword("Rotation")) {
         mapping += m_mappingGrp["Rotation"];
       }
 
@@ -648,7 +652,6 @@ int main(int argc, char *argv[]) {
   mg["LongitudeDirection"] = "PositiveEast";
   mg.deleteKeyword("EquatorialRadius");
   mg.deleteKeyword("PolarRadius");
-  mg.deleteKeyword("PolarRadius");
   mg["TargetName"] = "Moon";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;
@@ -677,7 +680,7 @@ int main(int argc, char *argv[]) {
   cout << "Testing Mapping() methods" << endl;
   // cout << "Mapping() = " << endl;
   cout << mapping << endl;
-  mapping.DeleteGroup("Mapping");
+  mapping.deleteGroup("Mapping");
   cout << endl;
 
 }
