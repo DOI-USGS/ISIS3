@@ -465,6 +465,10 @@ namespace Isis {
     // Really... Projection::TargetRadii should be making this call
     NaifStatus::CheckErrors();
 
+    if (QString(network["TargetName"]).startsWith("MRO/")) {
+      network["TargetName"] = "Mars";
+    }
+
     PvlGroup radii;
     try {
       radii = Projection::TargetRadii(network["TargetName"]);
@@ -668,10 +672,24 @@ namespace Isis {
 
         // Estimated => Candidate
         if(cm.hasKeyword("MeasureType")) {
-          IString type = cm["MeasureType"][0];
-          type.DownCase();
+          QString type = cm["MeasureType"][0].toLower();
 
           if(type == "estimated" || type == "unmeasured") {
+            if (type == "unmeasured") {
+              if (cm["Sample"].size() == 0 || cm["Sample"][0].toLower() == "null") {
+                cm["Sample"] = toString(0.0);
+              }
+
+              if (cm["Line"].size() == 0 || cm["Line"][0].toLower() == "null") {
+                cm["Line"] = toString(0.0);
+              }
+
+              if (!cm.hasKeyword("Ignore"))
+                cm += PvlKeyword("Ignore", toString(true));
+              else
+                cm["Ignore"] = toString(true);
+            }
+
             cm["MeasureType"] = "Candidate";
           }
           else if(type == "automatic" || type == "validatedmanual" ||

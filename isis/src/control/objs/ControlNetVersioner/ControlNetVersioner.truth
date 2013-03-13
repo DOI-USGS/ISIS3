@@ -11,7 +11,7 @@ Read network...
 Converted directly to Pvl:
 Object = ControlNetwork
   NetworkId    = Null
-  TargetName   = Moon
+  TargetName   = Mars
   UserName     = Null
   Created      = Null
   LastModified = Null
@@ -23,6 +23,14 @@ Object = ControlNetwork
     PointId     = 1
     ChooserName = Null
     DateTime    = Null
+
+    Group = ControlMeasure
+      SerialNumber = M0
+      MeasureType  = Candidate
+      Ignore       = True
+      Sample       = 0.0
+      Line         = 0.0
+    End_Group
 
     Group = ControlMeasure
       SerialNumber = M1
