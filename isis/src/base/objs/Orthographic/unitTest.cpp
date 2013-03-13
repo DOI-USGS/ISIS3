@@ -116,13 +116,13 @@ int main(int argc, char *argv[]) {
     cout << tmp3 << endl;
     cout << endl;
 
-    mapGroup.FindKeyword("MinimumLatitude").SetValue("-60.0");
-    mapGroup.FindKeyword("MaximumLatitude").SetValue("60.0");
-    mapGroup.FindKeyword("MinimumLongitude").SetValue("-80.0");
-    mapGroup.FindKeyword("MaximumLongitude").SetValue("80.0");
+    mapGroup.findKeyword("MinimumLatitude").setValue("-60.0");
+    mapGroup.findKeyword("MaximumLatitude").setValue("60.0");
+    mapGroup.findKeyword("MinimumLongitude").setValue("-80.0");
+    mapGroup.findKeyword("MaximumLongitude").setValue("80.0");
 
-    mapGroup.FindKeyword("CenterLatitude").SetValue("40.0");
-    mapGroup.FindKeyword("CenterLongitude").SetValue("0.0");
+    mapGroup.findKeyword("CenterLatitude").setValue("40.0");
+    mapGroup.findKeyword("CenterLongitude").setValue("0.0");
 
     cout << "Test XYRange method (not boundary conditions)" << endl;
     Projection &m = *ProjectionFactory::Create(lab);
