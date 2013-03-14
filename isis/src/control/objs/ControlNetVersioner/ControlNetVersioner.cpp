@@ -676,18 +676,21 @@ namespace Isis {
 
           if(type == "estimated" || type == "unmeasured") {
             if (type == "unmeasured") {
-              if (cm["Sample"].size() == 0 || cm["Sample"][0].toLower() == "null") {
-                cm["Sample"] = toString(0.0);
+              bool hasSampleLine = false;
+
+              try {
+                toDouble(cm["Sample"][0]);
+                toDouble(cm["Line"][0]);
+                hasSampleLine = true;
+              }
+              catch (...) {
               }
 
-              if (cm["Line"].size() == 0 || cm["Line"][0].toLower() == "null") {
-                cm["Line"] = toString(0.0);
+              if (!hasSampleLine) {
+                cm.addKeyword(PvlKeyword("Sample", "0.0"), PvlContainer::Replace);
+                cm.addKeyword(PvlKeyword("Line", "0.0"), PvlContainer::Replace);
+                cm.addKeyword(PvlKeyword("Ignore", toString(true)), PvlContainer::Replace);
               }
-
-              if (!cm.hasKeyword("Ignore"))
-                cm += PvlKeyword("Ignore", toString(true));
-              else
-                cm["Ignore"] = toString(true);
             }
 
             cm["MeasureType"] = "Candidate";
