@@ -669,28 +669,34 @@ namespace Isis {
       QString sn = origMsr->GetCubeSerialNumber();
 
       // Do not process Ignored Measures
-      if (!origMsr->IsIgnored()) {
-        InitInterestResults(measure);
-        Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
+      try {
+        if (!origMsr->IsIgnored()) {
+          InitInterestResults(measure);
+          Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
 
-        // Set the clipping polygon for this point
-        // Convert the lon/lat overlap polygon to samp/line using the UGM for
-        // this image
-        if (mbOverlaps) {
-          UniversalGroundMap unvGround = UniversalGroundMap(*inCube);
-          geos::geom::MultiPolygon *poly = PolygonTools::LatLonToSampleLine(*overlapPoly, &unvGround);
-          SetClipPolygon(*poly);
-          delete poly;
-        }
+          // Set the clipping polygon for this point
+          // Convert the lon/lat overlap polygon to samp/line using the UGM for
+          // this image
+          if (mbOverlaps) {
+            UniversalGroundMap unvGround = UniversalGroundMap(*inCube);
+            geos::geom::MultiPolygon *poly = PolygonTools::LatLonToSampleLine(*overlapPoly,
+                                                                              &unvGround);
+            SetClipPolygon(*poly);
+            delete poly;
+          }
 
-        // Run the interest operator on this measurment
-        if (InterestByMeasure(measure, *origMsr, *inCube)) {
-          if (dBestInterestValue == Isis::Null || CompareInterests(mtInterestResults[measure].mdInterest,
-              dBestInterestValue)) {
-            dBestInterestValue = mtInterestResults[measure].mdInterest;
-            iBestMeasureIndex = measure;
+          // Run the interest operator on this measurment
+          if (InterestByMeasure(measure, *origMsr, *inCube)) {
+            if (dBestInterestValue == Isis::Null ||
+                CompareInterests(mtInterestResults[measure].mdInterest, dBestInterestValue)) {
+              dBestInterestValue = mtInterestResults[measure].mdInterest;
+              iBestMeasureIndex = measure;
+            }
           }
         }
+      }
+      catch (IException &e) {
+       // e.print();
       }
     }
     return iBestMeasureIndex;

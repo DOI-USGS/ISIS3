@@ -58,62 +58,64 @@ namespace Isis {
    *
    * @internal
    *   @history 2006-02-11 Jacob Danton - Original Version
-   *   @history 2007-08-02 Steven Koechle - Added better
-   *            documentation to CompareInterests().
-   *   @history 2007-08-02 Steven Koechle - Fixed looping error
-   *            that caused subchip to go outside the chip to the
-   *            left and top, and not check the bottom and right.
-   *   @history 2007-08-14 Steven Koechle - Added virtual method
-   *            Padding() which default returns 0.
-   *   @history 2007-08-16 Steven Koechle - Fixed Looping error
-   *            in Operate. Made the loops <= instead of just <.
-   *            Changed from accepting one delta to accepting a
-   *            deltaSamp and a deltaLine.
+   *   @history 2007-08-02 Steven Koechle - Added better documentation to CompareInterests().
+   *   @history 2007-08-02 Steven Koechle - Fixed looping error that caused subchip to go
+   *                           outside the chip to the left and top, and not check the
+   *                           bottom and right.
+   *   @history 2007-08-14 Steven Koechle - Added virtual method Padding() which default returns 0.
+   *   @history 2007-08-16 Steven Koechle - Fixed Looping error in Operate. Made the
+   *                           loops <= instead of just <. Changed from accepting one
+   *                           delta to accepting a deltaSamp and a deltaLine.
    *   @history 2008-06-18 Stuart Sides - Fixed doc error
-   *   @history 2008-08-19 Steven Koechle - Updated to work with
-   *            Geos3.0.0
+   *   @history 2008-08-19 Steven Koechle - Updated to work with Geos3.0.0
    *   @history 2009-08-11 Travis Addair - Added functionality allowing it and all its
-   *                     subclasses to return the pvl group that they were initialized from
+   *                           subclasses to return the pvl group that they were initialized from
    *   @history 2010-04-09 Sharmila Prasad - API's to check valid DN and Emission Angle.
-   *            Also changed functionality of Operate and made it overloaded.
+   *                           Also changed functionality of Operate and made it overloaded.
    *   @history 2010-04-30 Sharmila Prasad - Added class members mdBestEmissionAngle,
-   *            mdBestDnValue and their access functions.Also added member mUnusedParamGrp
-   *            to check for the default values used for the operator.
-   *   @history 2010-04-30 Sharmila Prasad - 1. Interest Operator child of ControlNetValidMeasure
-   *            which validates all the standard control network options. Changed functionality
-   *            to accomadate ControlNetValidMeasure
-   *            2. Removed class members  mdBestEmissionAngle, mdBestDnValue..., instead
-   *            stored in structure InterestResults structure
-   *            3. Move processing ImageOverlaps from app to here
-   *            4. Added API's to compute Interest by point and by measure
-   *   @history 2010-06-18 Sharmila Prasad - 1. Fixed Bug to ignore Points with bad interest
-   *            2. Do not process previously Ignored points in the Original Control Net
+   *                           mdBestDnValue and their access functions.Also added member
+   *                           mUnusedParamGrp to check for the default values used for
+   *                           the operator.
+   *   @history 2010-04-30 Sharmila Prasad - (1) Interest Operator child of ControlNetValidMeasure
+   *                           which validates all the standard control network options. Changed
+   *                           functionality to accomadate ControlNetValidMeasure (2) Removed
+   *                           class members  mdBestEmissionAngle, mdBestDnValue..., instead
+   *                           stored in structure InterestResults structure (3) Move processing
+   *                           ImageOverlaps from app to here. (4) Added API's to compute Interest
+   *                           by point and by measure.
+   *   @history 2010-06-18 Sharmila Prasad - (1) Fixed Bug to ignore Points with bad interest
+   *                           (2) Do not process previously Ignored points in the Original
+   *                           Control Net
    *   @history 2010-06-21 Sharmila Prasad - Remove references to UniversalGroundMap and Cubes
-   *            use CubeManager instead
+   *                           use CubeManager instead.
    *   @history 2010-06-23 Sharmila Prasad - Use ControlNetValidMeasure's Validate Standard
-   *            Options & Std Options Pixels/Meters from Edge
+   *                           Options & Std Options Pixels/Meters from Edge
    *   @history 2010-07-13 Tracie Sucharski - Make changes to implement the new or modified
-   *            keywords for the implementation of binary control networks.
+   *                           keywords for the implementation of binary control networks.
    *   @history 2010-10-05 Sharmila Prasad - Process EditLock feature
    *   @history 2010-10-15 Sharmila Prasad - Use only a single copy of Control Net
    *   @history 2010-10-22 Sharmila Prasad - Reset apriori for source==Reference
    *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
-   *                                       removing includes from ControlNet.h.
+   *                           removing includes from ControlNet.h.
    *   @history 2010-10-28 Sharmila Prasad - Log, if Reference changed and apriorisource==Reference
    *   @history 2010-11-10 Sharmila Prasad - Modify unit test to accomodate changes in the deffile
    *   @history 2010-11-12 Sharmila Prasad - Move definition of structure InterestResults to private
    *   @history 2010-12-29 Sharmila Prasad - Modified for new ControlNet API's
-   *                                         (UpdatePoint, UpdateMeasure)
+   *                           (UpdatePoint, UpdateMeasure)
    *   @history 2011-02-24 Sharmila Prasad - Fixed segmentation fault
-   *   @history 2011-05-14 Sharmila Prasad - Modified to accomodate changes to ControlNetValidMeasure
-   *                                   which added line, sample residuals for Measure validation
+   *   @history 2011-05-14 Sharmila Prasad - Modified to accomodate changes to
+   *                           ControlNetValidMeasure which added line, sample
+   *                           residuals for Measure validation
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
-   *                          Ground ------> Fixed
-   *                          Tie----------> Free
-   *   @history 2011-11-21 Sharmila Prasad - 1. InterestOperator should run without ValidMeasure Group.
-   *   2. The Validity test must be performed on Measure after moving to new location Fixes Mantis #584
+   *                           Ground ------> Fixed
+   *                           Tie----------> Free
+   *   @history 2011-11-21 Sharmila Prasad - (1) InterestOperator should run without ValidMeasure
+   *                           Group. (2) The Validity test must be performed on Measure after
+   *                           moving to new location. Fixes Mantis #584
    *   @history 2011-11-23 Sharmila Prasad - Process for control nets with Reference not explicitly set.
-   *                                         Fixes #589
+   *                           Fixes #589
+   *   @history 2013-03-08 Kimberly Oyama and Steven Lambright - Added a try/catch to
+   *                           InterestByPoint(). References #825.
    *  
    */
   class InterestOperator : public ControlNetValidMeasure {

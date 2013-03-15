@@ -4,6 +4,7 @@
 #include <geos/geom/Polygon.h>
 #include <geos/util/GEOSException.h>
 
+#include <QDebug>
 #include "IException.h"
 #include "PolygonTools.h"
 #include "Projection.h"
@@ -141,6 +142,28 @@ int main() {
     geos::geom::MultiPolygon *slmPolygon = PolygonTools::LatLonToSampleLine(*llmPolygon, &ugm);
     cout << "Coordinates of Sample/Line polygon:" <<
         PolygonTools::ReducePrecision(slmPolygon, 2)->toString() << endl;
+
+    cout << endl << "Testing LatLonToSampleLine() with coords outside of the valid range." << endl;
+    // Create coordinate sequence for the first of two polygons
+    geos::geom::CoordinateSequence *llpts2 = new geos::geom::CoordinateArraySequence();
+    llpts2->add(geos::geom::Coordinate(175, 0));
+    llpts2->add(geos::geom::Coordinate(175.6, -28));
+    llpts2->add(geos::geom::Coordinate(181.5, -30.6));
+    llpts2->add(geos::geom::Coordinate(186.8, -27));
+    llpts2->add(geos::geom::Coordinate(183.7, -16.6));
+    llpts2->add(geos::geom::Coordinate(175, 0));
+    cout << "Coordinates of Lon/Lat polygon:" << llpts2->toString() << endl << endl;
+
+    // Create the L/L polygon
+    vector<geos::geom::Geometry *> llpolys2;
+    llpolys2.push_back(Isis::globalFactory.createPolygon(
+                        Isis::globalFactory.createLinearRing(llpts2), NULL));
+
+    geos::geom::MultiPolygon *llmPolygon2 = Isis::globalFactory.createMultiPolygon(llpolys2);
+
+    geos::geom::MultiPolygon *slmPolygon2 = PolygonTools::LatLonToSampleLine(*llmPolygon2, &ugm);
+    cout << "Coordinates of Sample/Line polygon:" <<
+        PolygonTools::ReducePrecision(slmPolygon2, 2)->toString() << endl;
 
     cout << endl;
 

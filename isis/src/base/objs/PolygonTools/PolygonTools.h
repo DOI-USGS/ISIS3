@@ -76,53 +76,54 @@ namespace Isis {
    *
    * @internal
    *   @history 2006-08-07 Stuart Sides - Original version
-   *
    *   @history 2007-05-04 Robert Sucharski - Moved the method to
-   *            output WKT from ImagePlygon class to this class.
-   *            Also added method to output GML format.
-   *
+   *                           output WKT from ImagePlygon class to this class.
+   *                           Also added method to output GML format.
    *   @history 2007-11-09 Tracie Sucharski - Remove ToWKT method, geos
-   *             now has a method (toString) to return a WKT string.
-   *             Added To180 method which converts polygon coordinates from
-   *             0/360 system to -180/180 system.  If polygon was split because
-   *             it crossed the 0/360 seam, the two polys coordinates are
-   *             converted then merged.
+   *                           now has a method (toString) to return a WKT string.
+   *                           Added To180 method which converts polygon coordinates from
+   *                           0/360 system to -180/180 system.  If polygon was split because
+   *                           it crossed the 0/360 seam, the two polys coordinates are
+   *                           converted then merged.
    *   @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
    *   @history 2008-08-18 Steven Lambright - Updated to work with geos3.0.0
-   *            instead of geos2. Mostly namespace changes.
+   *                           instead of geos2. Mostly namespace changes.
    *   @history 2008-11-10 Christopher Austin - Added Thickness()
    *   @history 2008-11-25 Steven Koechle - Moved Despike Methods from
-   *            ImageOverlapSet to PolygonTools
+   *                           ImageOverlapSet to PolygonTools
    *   @history 2008-12-01 Steven Lambright - Changed the Despike algorithm to be
-   *            in more methods to clean it up, added the middle point to
-   *            beginning/end of line tests to keep more data. Added "IsSpiked"
-   *            and "TestSpiked."
+   *                           in more methods to clean it up, added the middle point to
+   *                           beginning/end of line tests to keep more data. Added "IsSpiked"
+   *                           and "TestSpiked."
    *   @history 2008-12-10 Steven Koechle - Moved MakeMultiPolygon Method from
-   *             ImageOverlapSet to PolygonTools
+   *                            ImageOverlapSet to PolygonTools
    *   @history 2008-12-12 Steven Lambright - Bug fixes, cleaned up
-   *            Despike/MakeMultiPolygon
+   *                           Despike/MakeMultiPolygon
    *   @history 2008-12-12 Steven Lambright - Renamed methods, polygon conversion
-   *            methods now throw an iException if they fail, updated
-   *            Despike(...)'s algorithm
+   *                           methods now throw an iException if they fail, updated
+   *                           Despike(...)'s algorithm
    *   @history 2008-12-19 Steven Lambright - updated Despike(...)'s algorithm
    *   @history 2008-12-19 Steven Lambright - Added error to Despike (empty or
-   *            invalid result).
+   *                           invalid result).
    *   @history 2009-01-16 Steven Koechle - Fixed Memory Leak in
-   *            LatLonToSampleLine method
+   *                           LatLonToSampleLine method
    *   @history 2009-01-23 Steven Lambright - Added precision reduction algorithms
-   *            and made the Difference and Intersect operators work in a more
-   *            generic way by calling the new method Operate(...).
+   *                           and made the Difference and Intersect operators work in a more
+   *                           generic way by calling the new method Operate(...).
    *   @history 2009-01-28 Steven Lambright - Fixed memory leaks
    *   @history 2009-02-02 Stacy Alley - updated the To180 method
-   *            to handle 360 multi polys that cross the -180/180
-   *            boundry.  We need to return >1 polygon for these
-   *            type of cases.
+   *                           to handle 360 multi polys that cross the -180/180
+   *                           boundry.  We need to return >1 polygon for these
+   *                           type of cases.
    *   @history 2009-01-28 Steven Lambright - Fixed bug in Operate(...) method
-   *            when reducing precision
+   *                           when reducing precision
    *   @history 2009-06-09 Steven Lambright - Added a check to Equal(double,double). This
-   *            never caused a problem but could have.
+   *                           never caused a problem but could have.
    *   @history 2011-05-31 Steven Lambright - Improved To180 (not finished). The
-   *            remaining work is to remove the 0 seam from the polygons.
+   *                           remaining work is to remove the 0 seam from the polygons.
+   *   @history 2013-02-26 Kimberly Oyama and Steven Lambright - Added a check in
+   *                           LatLonToSampleLine() to make sure the linear rings used to create
+   *                           polygons are closed. Fixes #825.
    */
 
   class PolygonTools {
