@@ -27,20 +27,20 @@ void IsisMain() {
 
   // Depending on what type is selected, set values accordingly
   PvlGroup *point = NULL;
-  if(ui.GetString("TYPE") == "IMAGE") {
+  if (ui.GetString("TYPE") == "IMAGE") {
     double sample = 0.0;
     double line = 0.0;
-    if(ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
+    if (ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
       sample = ui.GetDouble("SAMPLE");
       line = ui.GetDouble("LINE");
-      point = ringspt.SetImage(sample, line, outsideAllowed);
+    point = ringspt.SetImage(sample, line, outsideAllowed);
     }
     else {
-      if(ui.WasEntered("SAMPLE")) {
+      if (ui.WasEntered("SAMPLE")) {
         sample = ui.GetDouble("SAMPLE");
         point = ringspt.SetSample(sample, outsideAllowed);
       }
-      else if(ui.WasEntered("LINE")) {
+      else if (ui.WasEntered("LINE")) {
         line = ui.GetDouble("LINE");
         point = ringspt.SetLine(line, outsideAllowed);
       }
@@ -50,16 +50,9 @@ void IsisMain() {
     }
   }
   else {
-    if(ui.WasEntered("RADIUS")) {
-      double radius = ui.GetDouble("RADIUS");
-      double az = ui.GetDouble("LONGITUDE");
-      point = ringspt.SetGround(radius, az, outsideAllowed);
-    }
-    else {
-      double lat = ui.GetDouble("LATITUDE");
-      double lon = ui.GetDouble("LONGITUDE");
-      point = ringspt.SetGround(lat, lon, outsideAllowed);
-    }
+    double radius = ui.GetDouble("RADIUS");
+    double az = ui.GetDouble("AZIMUTH");
+    point = ringspt.SetGround(radius, az, outsideAllowed);
   }
 
   prog.CheckStatus();

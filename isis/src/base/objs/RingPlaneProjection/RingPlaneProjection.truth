@@ -29,9 +29,9 @@ Test for invalid azimuth domain value in the mapping group
 
 Projection Specifications
 Is Equatorial Cylindrical: 0
-Azimuth Direction:       Clockwise
-Is Clockwise:           1
-Is CounterClockwise:           0
+Azimuth Direction:       CounterClockwise
+Is Clockwise:           0
+Is CounterClockwise:           1
 Azimuth Domain:          360
 Has 360 domain:            1
 Has 180 domain:            0
@@ -87,7 +87,7 @@ Azimuth:                      -5
 XCoord:                         -50
 YCoord:                         150
 UniversalRadius:              60
-UniversalAzimuth:             5
+UniversalAzimuth:             355
 
 Testing Universal Ground coordinate routines
 Setting position to (57.3920057293825,  355):  1
@@ -97,7 +97,7 @@ Azimuth:                                     355
 XCoord:                                        3550
 YCoord:                                        147.3920057294
 UniversalRadius:                             57.39200572938
-UniversalAzimuth:                            5
+UniversalAzimuth:                            355
 Setting bad position...0
 
 Planar Projection Specifications
@@ -114,11 +114,11 @@ Rotation:                  0
 Setting position to (9000.0, 0.0)
 Is Good:                                       1
 Radius:                                      9000
-Azimuth:                                     0
+Azimuth:                                     -0
 XCoord:                                        9000
 YCoord:                                        0
 UniversalRadius:                             9000
-UniversalAzimuth:                            -0
+UniversalAzimuth:                            0
 
 Setting position to (9000.0, 360.0)
 Is Good:                                       1
@@ -144,7 +144,7 @@ Azimuth:                           -9
 XCoord:                              -90
 YCoord:                              15
 UniversalRadius:                   -75
-UniversalAzimuth:                  9
+UniversalAzimuth:                  351
 WorldX:                              -90
 WorldY:                              15
 
@@ -156,7 +156,7 @@ Azimuth:                                 -2.25
 XCoord:                                    -22.5
 YCoord:                                    15
 UniversalRadius:                         -75
-UniversalAzimuth:                        2.25
+UniversalAzimuth:                        357.75
 WorldX:                                    -45
 WorldY:                                    45
 Resolution:                                0.5
@@ -169,13 +169,13 @@ Testing IsSky method
 
 Testing == operator condition in class...
 Projection 1 name and resolution = None 1
-Projection 1 azimuth direction = Clockwise
+Projection 1 azimuth direction = CounterClockwise
 Projection 4 name and resolution = None 1
-Projection 4 azimuth direction string = CounterClockwise
+Projection 4 azimuth direction string = Clockwise
 Projection 1 != Projection 4
 
 Testing string routines
-Clockwise
+CounterClockwise
 360
 
 Testing Name and comparision routines
@@ -186,7 +186,7 @@ operator!=:  1
 
 Testing no projection
 Radius:    45
-Azimuth:   90
+Azimuth:   -90
 Is clockwise?0
 Is counterclockwise?1
 Azimuth direction = CounterClockwise

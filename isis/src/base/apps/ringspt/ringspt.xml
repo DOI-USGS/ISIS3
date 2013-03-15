@@ -2,7 +2,7 @@
 
 <application name="ringspt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Outputs latitude/longitude at line/sample or reverse for Cassini images of Saturn rings
+    Outputs radius/azimuth at line/sample or reverse for Cassini images of Saturn rings
   </brief>
 
   <description>
@@ -11,7 +11,7 @@
     The user must also enter one of the following coordinates:
     <pre>
       line/sample
-      latitude/longitude
+      radius/azimuth
     </pre>
     The program will then compute the other coordinates and various other
     spacecraft and instrument related information including but not limited to
@@ -23,7 +23,8 @@ Group = GroundPoint
   Filename                   = /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub
   Sample                     = 1.0
   Line                       = 1.0
-  PixelValue                 = 0.0607816
+  PixelValue     
+l            = 0.0607816
   RightAscension             = 65.749350916052
   Declination                = -18.390093214966
   PlanetocentricLatitude     = 34.444196777763
@@ -182,19 +183,18 @@ End_Group
             <brief>Interprets the coordinate as sample/line</brief>
             <description>
               This option interprets the coordinate as sample/line and will
-              compute latitude/longitude and x/y
+              compute radius/azimuth and x/y/z
             </description>
             <exclusions>
-              <item>LATITUDE</item>
-              <item>LONGITUDE</item>
               <item>RADIUS</item>
+              <item>AZIMUTH</item>
             </exclusions>
           </option>
           <option value="GROUND">
-            <brief>Interprets the coordinates as latitude/longitude</brief>
+            <brief>Interprets the coordinates as radius/azimuth</brief>
             <description>
-              This option interprets the coordinate as latitude/longitude and will
-              compute sample/line and x/y
+              This option interprets the coordinate as radius/azimuth and will
+              compute sample/line and x/y/z
             </description>
             <exclusions>
               <item>LINE</item>
@@ -205,35 +205,6 @@ End_Group
         <description>
           This parameter is used to select the type of coordinate which will be used to
           compute the other two remaining coordinates.
-        </description>
-      </parameter>
-
-      <parameter name="TARGET">
-        <type>string</type>
-        <brief>Target selection</brief>
-        <default><item>BODY</item></default>
-        <list>
-          <option value="BODY">
-            <brief>Target is body</brief>
-            <description>
-              Target is body
-            </description>
-            <exclusions>
-              <item>RADIUS</item>
-            </exclusions>
-          </option>
-          <option value="RINGPLANE">
-            <brief>Target is ring plane</brief>
-            <description>
-              Target is ring plane
-            </description>
-            <exclusions>
-              <item>LATITUDE</item>
-            </exclusions>
-          </option>
-        </list>
-        <description>
-          Select target type (body vs ring plane currently only for Saturn.
         </description>
       </parameter>
 
@@ -259,38 +230,28 @@ End_Group
         </description>
       </parameter>
 
-      <parameter name="LATITUDE">
-        <type>double</type>
-        <brief>
-          Latitude position
-        </brief>
-        <description>
-            This is the planetocentric latitude to try to find in the camera image
-        </description>
-        <minimum inclusive="yes">-90.0</minimum>
-        <maximum inclusive="yes">90.0</maximum>
-      </parameter>
-
-      <parameter name="LONGITUDE">
-        <type>double</type>
-        <brief>
-          Longitude position
-        </brief>
-        <description>
-            This is the positive east longitude to try to find in the camera image
-        </description>
-        <minimum inclusive="yes">0.0</minimum>
-        <maximum inclusive="yes">360.0</maximum>
-      </parameter>
-
       <parameter name="RADIUS">
         <type>double</type>
         <brief>
-          Radius
+          Ring radius position
         </brief>
         <description>
-            Radius in meters
+            This is the ring radius position in kilometers from the center
+            of the target body to try to locate in the  image.
         </description>
+        <minimum inclusive="yes">0.0</minimum>
+      </parameter>
+
+      <parameter name="AZIMUTH">
+        <type>double</type>
+        <brief>
+          Azimuth position
+        </brief>
+        <description>
+            This is the counterclockwise azimuth position  to try to locate in the camera image
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">360.0</maximum>
       </parameter>
 
       <parameter name="ALLOWOUTSIDE">

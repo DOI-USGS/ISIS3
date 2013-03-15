@@ -559,7 +559,7 @@ namespace Isis {
     }
     // Deal with the azimuth first
     m_azimuth = az;
-    if (m_azimuthDirection == CounterClockwise) m_azimuth = -az;
+    if (m_azimuthDirection == Clockwise) m_azimuth = -az;
     if (m_azimuthDomain == 180) {
       m_azimuth = To180Domain(m_azimuth);
     }
@@ -569,6 +569,7 @@ namespace Isis {
     }
 
     // Nothing to do with radius
+
     m_radius = rad;
 
     // Now the rad/az are in user defined coordinates so set them
@@ -576,7 +577,7 @@ namespace Isis {
     }
 
   /**
-   * This returns a universal radius, which is just the radius. 
+   * This returns a universal radius, which is just the radius in meters. 
    *
    * @return double The universal radius.
    */

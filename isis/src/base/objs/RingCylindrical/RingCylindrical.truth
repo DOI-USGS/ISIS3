@@ -32,10 +32,10 @@ XCoord:                 -157079.6326794896
 YCoord:                 -199000
 
 Test XYRange method ... 
-Minimum X:  -20
-Maximum X:  130
-Minimum Y:  0
-Maximum Y:  20000000
+Minimum X:  -453785.6055185257
+Maximum X:  69813.17007977318
+Minimum Y:  -200000
+Maximum Y:  19800000
 
 Test Name and comparision method ... 
 Name:       RingCylindrical

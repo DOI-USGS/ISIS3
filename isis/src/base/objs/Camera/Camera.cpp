@@ -229,7 +229,7 @@ namespace Isis {
           RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
           lat = Latitude(0.0, Angle::Degrees);
           lon = Longitude(rproj->UniversalAzimuth(), Angle::Degrees);
-          rad = Distance(rproj->UniversalRadius(),Distance::Kilometers);
+          rad = Distance(rproj->UniversalRadius(),Distance::Meters);
 
           if (!rad.isValid()) {
             shape->setHasIntersection(false);
@@ -263,7 +263,7 @@ namespace Isis {
    *              false if it was not
    */
   bool Camera::SetUniversalGround(const double latitude, const double longitude) {
-    // Convert lat/lon to undistorted focal plane x/y
+    // Convert lat/lon or rad/az to undistorted focal plane x/y
     if (p_groundMap->SetGround(Latitude(latitude, Angle::Degrees),
                               Longitude(longitude, Angle::Degrees))) {
       return RawFocalPlanetoImage();
@@ -391,7 +391,7 @@ namespace Isis {
           else { // ring plane
             // UniversalLongitude should return azimuth in this case TODO: when we make the change to real azimuths
             // this value may need to be adjusted or code changed in the shapemodel or surfacepoint class.
-            if (p_projection->SetUniversalGround(LocalRadius().kilometers(), UniversalLongitude())) {
+            if (p_projection->SetUniversalGround(LocalRadius().meters(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               shape->setHasIntersection(true);

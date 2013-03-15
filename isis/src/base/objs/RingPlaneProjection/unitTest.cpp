@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for missing azimuth domain in the mapping group" << endl;
-  mg["AzimuthDirection"] = "Clockwise";
+  mg["AzimuthDirection"] = "CounterClockwise";
   Doit(lab);
   cout << endl;
 
@@ -383,7 +383,7 @@ int main(int argc, char *argv[]) {
   cout << "Testing IsSky method" << endl;
   cout << p2.IsSky() << endl;
   mg += PvlKeyword("TargetName", "SKY");
-  mg["AzimuthDirection"] = "CounterClockwise";
+  mg["AzimuthDirection"] = "Clockwise";
   Doit(lab);
   MyProjection p3(lab);
   cout << p3.IsSky() << endl;

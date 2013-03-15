@@ -19,7 +19,7 @@ Projection version   = 1.0
   Minimum azimuth   = -20
   Maximum azimuth  = 130
   Center radius         = 200000
-  Center azimuth      = -0
+  Center azimuth      = 0
 
 Test TrueScaleRadius method...
 TrueScaleRadius = 200000
@@ -34,7 +34,7 @@ YCoord:                 -707.1067811865474
 Test SetCoordinate method ... 
 Setting coordinate to (0.2617993877991494,-0.8726646259971648)
 Radius:               0.9110886174894191
-Azimuth:              73.30075576600632
+Azimuth:              73.30075576600639
 XCoord:                 0.2617993877991494
 YCoord:                 -0.8726646259971648
 
@@ -76,7 +76,7 @@ Projection 3 parameters...
   Minimum azimuth   = -20
   Maximum azimuth  = 130
   Center radius         = 1000000
-  Center azimuth      = 0.9599310885968813
+  Center azimuth      = 55
 
   Setting ground to (1000.0,45.0)
     Radius:             =  1000
@@ -90,13 +90,13 @@ Testing SetGround error condition...
 Testing more SetCoordinate methods ... 
 Setting coordinate to (0.2617993877991494,-0.8726646259971648)
 Radius:               0.9110886174894191
-Azimuth:              286.6992442339936
+Azimuth:              341.6992442339936
 XCoord:                 0.2617993877991494
 YCoord:                 -0.8726646259971648
 
 Setting coordinate to (0.2617993877991494,0.8726646259971648)
 Radius:               0.9110886174894191
-Azimuth:              73.30075576600639
+Azimuth:              128.3007557660064
 XCoord:                 0.2617993877991494
 YCoord:                 0.8726646259971648
 
@@ -108,7 +108,7 @@ Projection 4 parameters...No range
   Azimuth direction  = CounterClockwise
   Azimuth domain    = 360
   Center radius         = 1000000
-  Center azimuth      = 0.9599310885968813
+  Center azimuth      = 55
 
 Mapping() = 
 Group = Mapping

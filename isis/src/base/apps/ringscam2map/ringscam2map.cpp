@@ -236,7 +236,7 @@ void IsisMain() {
     }
   }
   else {
-    QString msg = "The image [" + ui.GetFileName("FROM") + " does not have a plane shape. " +
+    QString msg = "The image [" + ui.GetFileName("FROM") + "] does not have a plane shape. " +
                      " Run spiceinit with shape=ringplane";
         throw IException(IException::User, msg, _FILEINFO_);
   }

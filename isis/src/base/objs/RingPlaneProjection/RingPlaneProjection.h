@@ -274,7 +274,7 @@ namespace Isis {
                            const double constBorder, bool variableIsRad);
       */
     protected:
-      double m_radius;   /**< This contain a radius value. The value is 
+      double m_radius;   /**< This contain a radius value in m. The value is 
                                 only usable if m_good is true.*/
       // 1.  The horizontal angular distance from a reference direction, usually the northern point 
       //      of the horizon, to the point where a vertical circle through a celestial body 
