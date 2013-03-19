@@ -152,7 +152,6 @@ int main() {
     llpts2->add(geos::geom::Coordinate(186.8, -27));
     llpts2->add(geos::geom::Coordinate(183.7, -16.6));
     llpts2->add(geos::geom::Coordinate(175, 0));
-    cout << "Coordinates of Lon/Lat polygon:" << llpts2->toString() << endl << endl;
 
     // Create the L/L polygon
     vector<geos::geom::Geometry *> llpolys2;
