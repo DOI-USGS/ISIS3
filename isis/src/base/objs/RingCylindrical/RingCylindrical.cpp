@@ -200,8 +200,8 @@ namespace Isis {
     // Check to make sure radius is valid
     if (radius < 0) {
       m_good = false;
-      cout << "Unable to set radius. The given radius value ["
-           << IString(radius) << "] is invalid." << endl;
+      // cout << "Unable to set radius. The given radius value ["
+      //      << IString(radius) << "] is invalid." << endl;
       // throw IException(IException::Unknown,
       //                  "Unable to set radius. The given radius value ["
       //                  + IString(radius) + "] is invalid.",

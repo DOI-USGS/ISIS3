@@ -461,7 +461,7 @@ bool ringscam2mapForward::Xform(double &outSample, double &outLine,
 
   // Does that ground coordinate work in the map projection
   // We will be forcing ring data to work by substituting radius for latitude & azimuth for longitude
-  double rad = p_incam->UniversalLatitude();
+  double rad = p_incam->LocalRadius().meters();
   double az = p_incam->UniversalLongitude();
   if(!p_outmap->SetUniversalGround(rad,az)) return false;
 
