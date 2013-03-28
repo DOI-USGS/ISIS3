@@ -10,6 +10,9 @@
   <xs:annotation>
     <xs:documentation>Designed by Stuart Sides, ssides@usgs.gov, and Deborah Lee Soltesz, dsoltesz@usgs.gov, 3/14/2002, USGS Astrogeology Research Program, Flagstaff, AZ</xs:documentation>
   </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>2013-03-27 Jeannie Backer - Added missionItem_type enummeration for NEAR. References #1248.</xs:documentation>
+  </xs:annotation>
   <xs:element name="class">
     <xs:annotation>
       <xs:documentation>root element for XML describing an ISIS object</xs:documentation>
@@ -513,6 +516,7 @@
       <xs:enumeration value="Mars Odyssey"/>
       <xs:enumeration value="Mars Reconnaissance Orbiter"/>
       <xs:enumeration value="Messenger"/>
+      <xs:enumeration value="Near Earth Asteroid Rendezvous"/>
       <xs:enumeration value="Robotic Lunar Observatory"/>
       <xs:enumeration value="Small Missions for Advanced Research and Technology 1"/>
       <xs:enumeration value="Viking"/>

@@ -133,6 +133,10 @@ namespace Isis {
    *                           BoxcarCachingAlgorithm instead of the
    *                           RegionalCachingAlgorithm. Also added unit tests
    *                           to exercise the modified methods. Fixes #819.
+   *   @history 2013-03-27 Jeannie Backer - Added programmer comments and
+   *                           documentation. Changed parameter name from
+   *                           "parameter" to "fname" in SetOutputCube() method.
+   *                           References #1248.
    *
    */
 
@@ -143,8 +147,12 @@ namespace Isis {
       void StartProcess();
       void StartProcess(void funct(Isis::Buffer &out));
       void SetInputFile(const QString &file);
+
+      // SetOutputCube() is not virtual in the Process class, so the following
+      // definitions for this method are the only ones that are allowed for
+      // ProcessImport objects and child objects
       Isis::Cube *SetOutputCube(const QString &parameter);
-      Isis::Cube *SetOutputCube(const QString &parameter,
+      Isis::Cube *SetOutputCube(const QString &fname,
                                 Isis::CubeAttributeOutput &att);
       void SetPixelType(const Isis::PixelType type);
       /**

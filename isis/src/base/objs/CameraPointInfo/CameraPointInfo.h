@@ -47,43 +47,36 @@ namespace Isis {
    *
    * @internal
    *   @history 2009-09-13 Mackenzie Boyd - Added methods SetCenter, SetSample
-   *                                        and SetLine to support campt
-   *                                        functionality. Added CheckCube
-   *                                        private method to check
-   *                                        currentCube isn't NULL.
-   *   @history 2010-03-25 MNB - Modified longitude output to have
-   *                             Positive East and West, 360 and 180
-   *                             longitudes.
-   *   @history 2010-05-25 MNB - Many changes, primary changes had
-   *                             to do with how errors are
-   *                             handled. Depending on the options
-   *                             sent in, errors can be handled by
-   *                             putting an Error keyword into the
-   *                             PvlGroup instead of throwing an
-   *                             exception. Other changes,
-   *                             addition of two booleans, both
-   *                             defaulting to false, to the Set
-   *                             methods (excluding SetCube) so
-   *                             that allowoutside option and
-   *                             allowerrors option could be taken
-   *                             in instead of using setters.
-   *                             CheckConditions method was
-   *                             removed and placed within
-   *                             GetPointInfo, GetPointInfo had 3
-   *                             boolean parameters added, passed
-   *                             - whether or not the SetImage or
-   *                             SetGround done above was
-   *                             successful, allowoutside - if
-   *                             locations outside the cube are
-   *                             acceptable, and allowerrors -
-   *                             what to do with errors.
-   *   @history 2010-06-07 MNB - Changed Error keyword so that it
-   *                             is always present when
-   *                             allowErrors is true.
+   *                           and SetLine to support campt functionality.
+   *                           Added CheckCube private method to check
+   *                           currentCube isn't NULL.
+   *   @history 2010-03-25 MNB - Modified longitude output to have Positive East
+   *                           and West, 360 and 180 longitudes.
+   *   @history 2010-05-25 MNB - Many changes, primary changes had to do with
+   *                           how errors are handled. Depending on the options
+   *                           sent in, errors can be handled by putting an
+   *                           Error keyword into the PvlGroup instead of
+   *                           throwing an exception. Other changes, addition of
+   *                           two booleans, both defaulting to false, to the
+   *                           Set methods (excluding SetCube) so that
+   *                           allowoutside option and allowerrors option could
+   *                           be taken in instead of using setters. 
+   *                           CheckConditions method was removed and placed
+   *                           within GetPointInfo, GetPointInfo had 3 boolean
+   *                           parameters added, passed - whether or not the
+   *                           SetImage or SetGround done above was successful,
+   *                           allowoutside - if locations outside the cube are
+   *                           acceptable, and allowerrors - what to do with
+   *                           errors.
+   *   @history 2010-06-07 MNB - Changed Error keyword so that it is always
+   *                           present when allowErrors is true.
    *   @history 2010-09-13 Steven Lambright - Corrected units for
-   *                             SampleResolution and LineResolution
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           SampleResolution and LineResolution
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more
+   *                           compliant with Isis coding standards.
+   *                           References #972.
+   *   @history 2013-03-27 Jeannie Backer - Added comment in code.
+   *                           References #1248.
    */
   class CameraPointInfo {
 

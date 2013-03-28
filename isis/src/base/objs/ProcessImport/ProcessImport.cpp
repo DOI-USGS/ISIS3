@@ -985,7 +985,7 @@ namespace Isis {
    * Create the output file. Note that all the appropiate calls to at least
    * SetDimensions should be invoked prior to calling this method.
    *
-   * @param parameter The parameter name that holds the output file name.
+   * @param fname The output file name.
    *
    * @param att An output cube attribute to define the characteristics of the
    *            output cube.
@@ -994,9 +994,9 @@ namespace Isis {
    * @throws Isis::iException::Message "File is not in a supported
    *             organization."
    */
-  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter,
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &fname,
       Isis::CubeAttributeOutput &att) {
-    return Isis::Process::SetOutputCube(parameter, att, p_ns, p_nl, p_nb);
+    return Isis::Process::SetOutputCube(fname, att, p_ns, p_nl, p_nb);
   }
 
 

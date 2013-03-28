@@ -169,6 +169,8 @@ namespace Isis {
    *                           imagePositions(), for the PvlObject was also added. The image
    *                           information is used as log output by automos, handmos, and mapmos.
    *                           Fixes #976.
+   *   @history 2013-03-27 Jeannie Backer - Added documentation and programmer comments.
+   *                           References #1248.
    */
 
   class ProcessMosaic : public Process {
@@ -192,28 +194,28 @@ namespace Isis {
         NumImageOverlayOptions
       };
 
-      //! Constructs a Mosaic object
+      // Constructs a Mosaic object
       ProcessMosaic();
 
-      //!  Destroys the Mosaic object. It will close all opened cubes.
+      //  Destroys the Mosaic object. It will close all opened cubes.
       ~ProcessMosaic();
 
-      //! Line Processing method for one input and output cube
+      // Line Processing method for one input and output cube
       void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
 
-      //! Accessor for the placed images.
+      // Accessor for the placed images.
       PvlObject imagePositions();
 
-      //! Set input cube to specified image name at the starting and count of
-      //! samples, lines, bands
+      // Set input cube to specified image name at the starting and count of
+      // samples, lines, bands
       Isis::Cube *SetInputCube(const QString &parameter,
                                const int ss = 1, const int sl = 1,
                                const int sb = 1,
                                const int ns = -1, const int nl = -1,
                                const int nb = -1);
 
-      //! Set input cube to specified image name with specified attributes at the
-      //! starting and count of samples, lines, bands
+      // Set input cube to specified image name with specified attributes at the
+      // starting and count of samples, lines, bands
       Isis::Cube *SetInputCube(const QString &fname,
                                Isis::CubeAttributeInput &att,
                                const int ss = 1, const int sl = 1,
@@ -221,7 +223,10 @@ namespace Isis {
                                const int ns = -1, const int nl = -1,
                                const int nb = -1);
 
-      //! Set output cube to specified image name
+      // SetOutputCube() is not virtual in the Process class, so the following
+      // definitions for this method are the only ones that are allowed for
+      // ProcessMosaic objects and child objects, unless redifined in the
+      // child class
       Isis::Cube *SetOutputCube(const QString &psParameter);
 
       void SetBandBinMatch(bool enforceBandBinMatch);
@@ -253,42 +258,40 @@ namespace Isis {
       static ImageOverlay StringToOverlay(QString);
 
     private:
-      //! Get the file index offset to be saved in the band by pixel type
+      // Get the file index offset to be saved in the band by pixel type
       int GetIndexOffsetByPixelType();
 
-      /**
-       * Compare the input and mosaic for the specified band based on the criteria and update the
-       *   mosaic origin band.
-       */
+      //Compare the input and mosaic for the specified band based on the criteria and update the
+      //  mosaic origin band.
       void BandComparison(int iss, int isl, int isb, int ins, int inl, int inb,
                           int bandPriorityInputBandNumber, int bandPriorityOutputBandNumber,
                           int index);
 
-      //! Mosaicking for Band Priority with no Tracking
+      // Mosaicking for Band Priority with no Tracking
       void BandPriorityWithNoTracking(int iss, int isl, int isb,
                                       int ins, int inl, int inb,
                                       int bandPriorityInputBandNumber,
                                       int bandPriorityOutputBandNumber);
 
-      //! Get the default origin value based on pixel type for the origin band
+      // Get the default origin value based on pixel type for the origin band
       int GetOriginDefaultByPixelType();
 
-      //! Get the Band Index in an image of type (input/output)
+      // Get the Band Index in an image of type (input/output)
       int GetBandIndex(bool inputFile);
 
-      //! Checks for the table with name "InputImage"
+      // Checks for the table with name "InputImage"
       bool GetTrackStatus();
 
-      //! Reset the origin band
+      // Reset the origin band
       void ResetOriginBand();
 
-      //! New mosaic, add the Band Bin group specific to the mosaic
+      // New mosaic, add the Band Bin group specific to the mosaic
       void AddBandBinGroup(int origIsb);
 
-      //! Default BandBin group if Match BandBin is set to False
+      // Default BandBin group if Match BandBin is set to False
       void AddDefaultBandBinGroup();
 
-      //! Mosaic exists, match the band with the input image
+      // Mosaic exists, match the band with the input image
       void MatchBandBinGroup(int origIsb, int &inb);
 
       bool ProcessAveragePriority(int piPixel, Portal& pInPortal, Portal& pOutPortal,
@@ -296,15 +299,15 @@ namespace Isis {
 
       void ResetCountBands();
 
-      //! Match DEM between Input & Mosaic if MatchDEM Flag is enabled
+      // Match DEM between Input & Mosaic if MatchDEM Flag is enabled
       void MatchDEMShapeModel();
 
-      bool m_trackingEnabled;
-      bool m_createOutputMosaic;
-      int  m_bandPriorityBandNumber;
-      QString m_bandPriorityKeyName;
-      QString m_bandPriorityKeyValue;
-      bool m_bandPriorityUseMaxValue;
+      bool m_trackingEnabled;         //!< 
+      bool m_createOutputMosaic;      //!< 
+      int  m_bandPriorityBandNumber;  //!< 
+      QString m_bandPriorityKeyName;  //!< 
+      QString m_bandPriorityKeyValue; //!< 
+      bool m_bandPriorityUseMaxValue; //!< 
 
 
       int m_iss; //!< The starting sample within the input cube
@@ -319,27 +322,24 @@ namespace Isis {
       int m_osb; //!< The starting band within the output cube
       int m_onb; //!< The number of bands in the output cube
 
-      /**
-       * True/False value to determine whether to enforce the input cube
-       * bandbin matches the mosaic bandbin group
-       */
-      bool m_enforceBandBinMatch;
+      bool m_enforceBandBinMatch; /**< True/False value to determine whether to 
+                                       enforce the input cube bandbin matches 
+                                       the mosaic bandbin group*/
 
-      //! DEM of the input and mosaic should match
-      bool m_enforceMatchDEM;
+      bool m_enforceMatchDEM; //!< DEM of the input and mosaic should match
 
-      ImageOverlay m_imageOverlay;
+      ImageOverlay m_imageOverlay; //!< 
       
-      PvlObject m_imagePositions; //! List of images placed on the mosaic.
+      PvlObject m_imagePositions; //!< List of images placed on the mosaic.
 
       /*
        * Set the Special Pixels Flags to True/False.
        * True- allow the special pixel to be passed onto the mosaic.
        * Holds good for input and band priority
        */
-      bool m_placeHighSatPixels;
-      bool m_placeLowSatPixels;
-      bool m_placeNullPixels;
+      bool m_placeHighSatPixels; //!< 
+      bool m_placeLowSatPixels;  //!< 
+      bool m_placeNullPixels;    //!< 
   };
 };
 

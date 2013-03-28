@@ -40,44 +40,46 @@ namespace Isis {
    * @author 2003-04-28 Stuart Sides
    *
    * @internal
-   *  @history 2003-04-28 Stuart Sides - Modified unitTest.cpp to do a better
-   *                          test
-   *  @history 2003-09-04 Jeff Anderson - Added SetInputWorkCube method
-   *  @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
-   *                          documentation
-   *  @history 2006-09-01 Elizabeth Miller - Added BandBinMatch option to
-   *                          propagate the bandbin group to the mosaic and make
-   *                          sure the input cube bandbin groups match the
-   *                          mosaics bandbin group
-   *  @history 2006-10-20 Stuart Sides - Fixed bug BandBin group did not get
-   *                          copied to the output mosaic.
-   *  @history 2008-10-03 Steven Lambright - Fixed problem where return values
-   *                          from SetUniversalGround were not checked
-   *  @history 2008-11-18 Christopher Austin - Added the first cube's history to
-   *                          the mosaic's history along with the history object
-   *                          of the application which did the mosaic.
-   *  @history 2008-12-08 Steven Lambright - Fixed one of the SetOutputCube(...)
-   *                          methods, a lat/lon range was specified but
-   *                          CreateFromCube was still being used (needed
-   *                          CreateFromCube because no cubes existed with the
-   *                          correct range).
-   *  @history 2008-12-08 Steven Lambright - MinimumLatitude,MaximumLatitude,
-   *                          MinimumLongitude,MaximumLongitude keywords no
-   *                          longer required to exist if passed into
-   *                          SetOutputCube
-   *  @history 2010-10-27 Sharmila Prasad - Read input file attributes
-   *  @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature,
-   *                          to double the number of mosaic bands to get Count
-   *                          info
-   *  @history 2011-06-28 Jai Rideout and Steven Lambright - Now uses a
-   *                          different caching algorithm.
-   *  @history 2011-09-08 Sharmila Prasad - Fixed Bug #406, Additional boundary
-   *                          checks similar to ProcessMosaic so that there will
-   *                          be no interruption for applications like automos
-   *  @history 2012-10-05 Jeannie Backer - Fixed indentation of history entries.
-   *                          Added caught exception to new thrown exception.
-   *                          Moved method implementation to cpp. References
-   *                          #1169.
+   *   @history 2003-04-28 Stuart Sides - Modified unitTest.cpp to do a better
+   *                           test
+   *   @history 2003-09-04 Jeff Anderson - Added SetInputWorkCube method
+   *   @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2006-09-01 Elizabeth Miller - Added BandBinMatch option to
+   *                           propagate the bandbin group to the mosaic and make
+   *                           sure the input cube bandbin groups match the
+   *                           mosaics bandbin group
+   *   @history 2006-10-20 Stuart Sides - Fixed bug BandBin group did not get
+   *                           copied to the output mosaic.
+   *   @history 2008-10-03 Steven Lambright - Fixed problem where return values
+   *                           from SetUniversalGround were not checked
+   *   @history 2008-11-18 Christopher Austin - Added the first cube's history to
+   *                           the mosaic's history along with the history object
+   *                           of the application which did the mosaic.
+   *   @history 2008-12-08 Steven Lambright - Fixed one of the SetOutputCube(...)
+   *                           methods, a lat/lon range was specified but
+   *                           CreateFromCube was still being used (needed
+   *                           CreateFromCube because no cubes existed with the
+   *                           correct range).
+   *   @history 2008-12-08 Steven Lambright - MinimumLatitude,MaximumLatitude,
+   *                           MinimumLongitude,MaximumLongitude keywords no
+   *                           longer required to exist if passed into
+   *                           SetOutputCube
+   *   @history 2010-10-27 Sharmila Prasad - Read input file attributes
+   *   @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature,
+   *                           to double the number of mosaic bands to get Count
+   *                           info
+   *   @history 2011-06-28 Jai Rideout and Steven Lambright - Now uses a
+   *                           different caching algorithm.
+   *   @history 2011-09-08 Sharmila Prasad - Fixed Bug #406, Additional boundary
+   *                           checks similar to ProcessMosaic so that there will
+   *                           be no interruption for applications like automos
+   *   @history 2012-10-05 Jeannie Backer - Fixed indentation of history entries.
+   *                           Added caught exception to new thrown exception.
+   *                           Moved method implementation to cpp. References
+   *                           #1169.
+   *   @history 2013-03-27 Jeannie Backer - Added programmer comments.
+   *                           References #1248.
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
    *                          example to class documentation
@@ -90,6 +92,11 @@ namespace Isis {
       ProcessMapMosaic();
 
       ~ProcessMapMosaic();
+
+      // SetOutputCube() is not virtual in the Process class nor in the
+      // ProcessMosaic class, so the following definitions for this method are
+      // the only ones that are allowed for ProcessMapMosaic objects and child
+      // objects  
       Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
                                 const QString &mosaicFile);
 

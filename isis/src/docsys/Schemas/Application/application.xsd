@@ -15,13 +15,16 @@
     <xs:documentation>2006-03-23 Added helpers element based on work by Elizabeth Riblin and Jeff Anderson</xs:documentation>
   </xs:annotation>
   <xs:annotation>
-    <xs:documentation>2007-07-26 Added missionItem_type enummerations for LO and LRO - Steven Koechle </xs:documentation>
+    <xs:documentation>2007-07-26 Steven Koechle - Added missionItem_type enummerations for LO and LRO</xs:documentation>
   </xs:annotation>
   <xs:annotation>
-    <xs:documentation>2010-03-25 Added missionItem_type enummeration for Dawn - Janet Barrett </xs:documentation>
+    <xs:documentation>2010-03-25 Janet Barrett - Added missionItem_type enummeration for Dawn</xs:documentation>
   </xs:annotation>
   <xs:annotation>
-    <xs:documentation>2011-09-16 Added parameter type combo - Sharmila Prasad</xs:documentation>
+    <xs:documentation>2011-09-16 Sharmila Prasad - Added parameter type combo</xs:documentation>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation>2013-03-27 Jeannie Backer - Added missionItem_type enummeration for NEAR. References #1248.</xs:documentation>
   </xs:annotation>
   <xs:element name="application">
     <xs:annotation>
@@ -434,6 +437,7 @@
       <xs:enumeration value="Mars Odyssey"/>
       <xs:enumeration value="Mars Reconnaissance Orbiter"/>
       <xs:enumeration value="Messenger"/>
+      <xs:enumeration value="Near Earth Asteroid Rendezvous"/>
       <xs:enumeration value="Robotic Lunar Observatory"/>
       <xs:enumeration value="Small Missions for Advanced Research and Technology 1"/>
       <xs:enumeration value="Viking"/>

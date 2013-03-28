@@ -101,13 +101,13 @@ namespace Isis {
     //Read starting at element 1 (skipping element 0)
     gdpool_c(key.toAscii().data(), 1, 2, &number, transX, &found);
 
-    if(!found) {
+    if (!found) {
       QString msg = "Cannot find [" + key + "] in text kernels";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     p_axisV = 2;
-    if(transX[0] < transX[1]) p_axisV = 1;
+    if (transX[0] < transX[1]) p_axisV = 1;
 
     NaifStatus::CheckErrors();
   }
@@ -160,6 +160,30 @@ namespace Isis {
   }
 
 
+  /** 
+   * Destructor for SpiceRotation object.
+   */ 
+  SpiceRotation::~SpiceRotation() { }
+
+  /** 
+   * Change the frame to the given frame code.  This method has no effect if
+   * spice is cached. 
+   * @param frameCode The integer-valued frame code 
+   */ 
+  void SpiceRotation::SetFrame(int frameCode) {
+    p_constantFrames[0] = frameCode;
+  }
+
+  /** 
+   * Accessor method that returns the frame code. This is the first value of the 
+   * constant frames member variable. 
+   *  
+   * @return An integer value indicating the frame code. 
+   */ 
+  int SpiceRotation::Frame() {
+    return p_constantFrames[0];
+  }
+
   /** Apply a time bias when invoking SetEphemerisTime method.
    *
    * The bias is used only when reading from NAIF kernels.  It is added to the
@@ -191,7 +215,7 @@ namespace Isis {
   void SpiceRotation::SetEphemerisTime(double et) {
 
     // Save the time
-    if(p_et == et) return;
+    if (p_et == et) return;
     p_et = et;
 
     // Read from the cache
@@ -200,15 +224,15 @@ namespace Isis {
     }
 
     // Apply coefficients defining a function for each of the three camera angles and angular velocity if available
-    else if(p_source == PolyFunction) {
+    else if (p_source == PolyFunction) {
       SetEphemerisTimePolyFunction();
     }
     // Apply coefficients defining a function for each of the three camera angles and angular velocity if available
-    else if(p_source == PolyFunctionOverSpice) {
+    else if (p_source == PolyFunctionOverSpice) {
       SetEphemerisTimePolyFunctionOverSpice();
     }
     // Read from the kernel
-    else if(p_source == Spice) {
+    else if (p_source == Spice) {
       SetEphemerisTimeSpice();
       // Retrieve the J2000 (code=1) to reference rotation matrix
     }
@@ -220,6 +244,30 @@ namespace Isis {
 
     // Set the quaternion for this rotation
 //   p_quaternion.Set ( p_CJ );
+  }
+
+  /** 
+   * Accessor method to get current ephemeris time.
+   * @return The current ephemeris time.
+   */ 
+  double SpiceRotation::EphemerisTime() const {
+    return p_et;
+  }
+
+  /**
+   * Checks if the cache is empty.
+   * @return  Indicates whether this rotation cached.
+   */
+  bool SpiceRotation::IsCached() const {
+    return (p_cache.size() > 0);
+  }
+
+  /**
+   * Set the downsize status to minimize cache. 
+   * @param status The DownsizeStatus enumeration value. 
+   */ 
+  void SpiceRotation::MinimizeCache(DownsizeStatus status) {
+    p_minimizeCache = status;
   }
 
   /** Cache J2000 rotation quaternion over a time range.
@@ -238,23 +286,23 @@ namespace Isis {
   void SpiceRotation::LoadCache(double startTime, double endTime, int size) {
 
     // Check for valid arguments
-    if(size <= 0) {
+    if (size <= 0) {
       QString msg = "Argument cacheSize must not be less or equal to zero";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(startTime > endTime) {
+    if (startTime > endTime) {
       QString msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if((startTime != endTime) && (size == 1)) {
+    if ((startTime != endTime) && (size == 1)) {
       QString msg = "Cache size must be more than 1 if startTime endTime differ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Make sure cache isn't already loaded
-    if(p_source == Memcache) {
+    if (p_source == Memcache) {
       QString msg = "A SpiceRotation cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -265,17 +313,17 @@ namespace Isis {
     p_fullCacheSize = size;
 
     // Make sure the constant frame is loaded.  This method also does the frame trace.
-    if(p_timeFrames.size() == 0) InitConstantRotation(startTime);
+    if (p_timeFrames.size() == 0) InitConstantRotation(startTime);
 
     LoadTimeCache();
     int cacheSize = p_cacheTime.size();
 
     // Loop and load the cache
-    for(int i = 0; i < cacheSize; i++) {
+    for (int i = 0; i < cacheSize; i++) {
       double et = p_cacheTime[i];
       SetEphemerisTime(et);
       p_cache.push_back(p_CJ);
-      if(p_hasAngularVelocity) p_cacheAv.push_back(p_av);
+      if (p_hasAngularVelocity) p_cacheAv.push_back(p_av);
     }
     p_source = Memcache;
 
@@ -333,9 +381,9 @@ namespace Isis {
     p_hasAngularVelocity = false;
 
     // Load the constant and time-based frame traces and the constant rotation
-    if(table.Label().hasKeyword("TimeDependentFrames")) {
+    if (table.Label().hasKeyword("TimeDependentFrames")) {
       PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
-      for(int i = 0; i < labelTimeFrames.size(); i++) {
+      for (int i = 0; i < labelTimeFrames.size(); i++) {
         p_timeFrames.push_back(toInt(labelTimeFrames[i]));
       }
     }
@@ -344,16 +392,16 @@ namespace Isis {
       p_timeFrames.push_back(J2000Code);
     }
 
-    if(table.Label().hasKeyword("ConstantRotation")) {
+    if (table.Label().hasKeyword("ConstantRotation")) {
       PvlKeyword labelConstantFrames = table.Label()["ConstantFrames"];
       p_constantFrames.clear();
 
-      for(int i = 0; i < labelConstantFrames.size(); i++) {
+      for (int i = 0; i < labelConstantFrames.size(); i++) {
         p_constantFrames.push_back(toInt(labelConstantFrames[i]));
       }
       PvlKeyword labelConstantRotation = table.Label()["ConstantRotation"];
 
-      for(int i = 0; i < labelConstantRotation.size(); i++) {
+      for (int i = 0; i < labelConstantRotation.size(); i++) {
         p_TC.push_back(toDouble(labelConstantRotation[i]));
       }
     }
@@ -363,13 +411,13 @@ namespace Isis {
     }
 
     // Load the full cache time information from the label if available
-    if(table.Label().hasKeyword("CkTableStartTime")) {
+    if (table.Label().hasKeyword("CkTableStartTime")) {
       p_fullCacheStartTime = toDouble(table.Label().findKeyword("CkTableStartTime")[0]);
     }
-    if(table.Label().hasKeyword("CkTableEndTime")) {
+    if (table.Label().hasKeyword("CkTableEndTime")) {
       p_fullCacheEndTime = toDouble(table.Label().findKeyword("CkTableEndTime")[0]);
     }
-    if(table.Label().hasKeyword("CkTableOriginalSize")) {
+    if (table.Label().hasKeyword("CkTableOriginalSize")) {
       p_fullCacheSize = toInt(table.Label().findKeyword("CkTableOriginalSize")[0]);
     }
 
@@ -379,11 +427,11 @@ namespace Isis {
     // establish the type of cache and then use the appropriate loop.
 
     // list table of quaternion and time
-    if(recFields == 5) {
-      for(int r = 0; r < table.Records(); r++) {
+    if (recFields == 5) {
+      for (int r = 0; r < table.Records(); r++) {
         TableRecord &rec = table[r];
 
-        if(rec.Fields() != recFields) {
+        if (rec.Fields() != recFields) {
           // throw and error
         }
 
@@ -402,11 +450,11 @@ namespace Isis {
     }
 
     // list table of quaternion, angular velocity vector, and time
-    else if(recFields == 8) {
-      for(int r = 0; r < table.Records(); r++) {
+    else if (recFields == 8) {
+      for (int r = 0; r < table.Records(); r++) {
         TableRecord &rec = table[r];
 
-        if(rec.Fields() != recFields) {
+        if (rec.Fields() != recFields) {
           // throw and error
         }
 
@@ -434,13 +482,13 @@ namespace Isis {
     }
 
     // coefficient table for angle1, angle2, and angle3
-    else if(recFields == 3) {
+    else if (recFields == 3) {
       std::vector<double> coeffAng1, coeffAng2, coeffAng3;
 
-      for(int r = 0; r < table.Records() - 1; r++) {
+      for (int r = 0; r < table.Records() - 1; r++) {
         TableRecord &rec = table[r];
 
-        if(rec.Fields() != recFields) {
+        if (rec.Fields() != recFields) {
           // throw an error
         }
         coeffAng1.push_back((double)rec[0]);
@@ -458,7 +506,7 @@ namespace Isis {
       SetPolynomial(coeffAng1, coeffAng2, coeffAng3);
       p_source = PolyFunction;
       if (degree > 0)  p_hasAngularVelocity = true;
-      if(degree == 0  && p_cacheAv.size() > 0) p_hasAngularVelocity = true;
+      if (degree == 0  && p_cacheAv.size() > 0) p_hasAngularVelocity = true;
     }
     else  {
       QString msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
@@ -552,9 +600,9 @@ namespace Isis {
   Table SpiceRotation::LineCache(const QString &tableName) {
 
     // Apply the function and fill the caches
-    if(p_source >= PolyFunction)  ReloadCache();
+    if (p_source >= PolyFunction)  ReloadCache();
 
-    if(p_source != Memcache) {
+    if (p_source != Memcache) {
       QString msg = "Only cached rotations can be  returned as a line cache of quaternions and time";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -609,7 +657,7 @@ namespace Isis {
       record += q3;
       int timePos = 4;
 
-      if(p_hasAngularVelocity) {
+      if (p_hasAngularVelocity) {
         TableField av1("AV1", TableField::Double);
         TableField av2("AV2", TableField::Double);
         TableField av3("AV3", TableField::Double);
@@ -622,7 +670,7 @@ namespace Isis {
       record += t;
       Table table(tableName, record);
 
-      for(int i = 0; i < (int)p_cache.size(); i++) {
+      for (int i = 0; i < (int)p_cache.size(); i++) {
         Quaternion q(p_cache[i]);
         std::vector<double> v = q.GetQuaternion();
         record[0] = v[0];
@@ -630,7 +678,7 @@ namespace Isis {
         record[2] = v[2];
         record[3] = v[3];
 
-        if(p_hasAngularVelocity) {
+        if (p_hasAngularVelocity) {
           record[4] = p_cacheAv[i][0];
           record[5] = p_cacheAv[i][1];
           record[6] = p_cacheAv[i][2];
@@ -648,7 +696,7 @@ namespace Isis {
       return LineCache(tableName);
     }
     // Load the coefficients for the curves fit to the 3 camera angles
-    else if(p_source == PolyFunction) {
+    else if (p_source == PolyFunction) {
       TableField angle1("J2000Ang1", TableField::Double);
       TableField angle2("J2000Ang2", TableField::Double);
       TableField angle3("J2000Ang3", TableField::Double);
@@ -660,7 +708,7 @@ namespace Isis {
 
       Table table(tableName, record);
 
-      for(int cindex = 0; cindex < p_degree + 1; cindex++) {
+      for (int cindex = 0; cindex < p_degree + 1; cindex++) {
         record[0] = p_coefficients[0][cindex];
         record[1] = p_coefficients[1][cindex];
         record[2] = p_coefficients[2][cindex];
@@ -696,38 +744,38 @@ namespace Isis {
     NaifStatus::CheckErrors();
     // Load the constant and time-based frame traces and the constant rotation
     // into the table as labels
-    if(p_timeFrames.size() > 1) {
+    if (p_timeFrames.size() > 1) {
       table.Label() += PvlKeyword("TimeDependentFrames");
 
-      for(int i = 0; i < (int) p_timeFrames.size(); i++) {
+      for (int i = 0; i < (int) p_timeFrames.size(); i++) {
         table.Label()["TimeDependentFrames"].addValue(toString(p_timeFrames[i]));
       }
     }
 
-    if(p_constantFrames.size() > 1) {
+    if (p_constantFrames.size() > 1) {
       table.Label() += PvlKeyword("ConstantFrames");
 
-      for(int i = 0; i < (int) p_constantFrames.size(); i++) {
+      for (int i = 0; i < (int) p_constantFrames.size(); i++) {
         table.Label()["ConstantFrames"].addValue(toString(p_constantFrames[i]));
       }
 
       table.Label() += PvlKeyword("ConstantRotation");
 
-      for(int i = 0; i < (int) p_TC.size(); i++) {
+      for (int i = 0; i < (int) p_TC.size(); i++) {
         table.Label()["ConstantRotation"].addValue(toString(p_TC[i]));
       }
     }
 
     // Write original time coverage
-    if(p_fullCacheStartTime != 0) {
+    if (p_fullCacheStartTime != 0) {
       table.Label() += PvlKeyword("CkTableStartTime");
       table.Label()["CkTableStartTime"].addValue(toString(p_fullCacheStartTime));
     }
-    if(p_fullCacheEndTime != 0) {
+    if (p_fullCacheEndTime != 0) {
       table.Label() += PvlKeyword("CkTableEndTime");
       table.Label()["CkTableEndTime"].addValue(toString(p_fullCacheEndTime));
     }
-    if(p_fullCacheSize != 0) {
+    if (p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("CkTableOriginalSize");
       table.Label()["CkTableOriginalSize"].addValue(toString(p_fullCacheSize));
     }
@@ -735,9 +783,9 @@ namespace Isis {
   }
 
 
-  /** Return the camera angles at the center time of the observation
-  *
-  */
+  /** 
+   * Return the camera angles at the center time of the observation
+   */
   std::vector<double> SpiceRotation::GetCenterAngles() {
     // Compute the center time
     double etCenter = (p_fullCacheEndTime + p_fullCacheStartTime) / 2.;
@@ -747,11 +795,11 @@ namespace Isis {
   }
 
 
-  /** Return the camera angles (right ascension, declination, and twist) for
-  *
-  * the time-based matrix CJ
-  *
-  */
+  /** 
+   * Return the camera angles (right ascension, declination, and twist) for the 
+   * time-based matrix CJ 
+   *
+   */
   std::vector<double> SpiceRotation::Angles(int axis3, int axis2, int axis1) {
     NaifStatus::CheckErrors();
 
@@ -767,6 +815,38 @@ namespace Isis {
     return angles;
   }
 
+  /** 
+   * Accessor method to get the angular velocity 
+   */ 
+  std::vector<double> SpiceRotation::AngularVelocity() {
+    return p_av;
+  }
+
+  /** 
+   * Accessor method to get the frame chain for the constant part of the 
+   * rotation (ends in target) 
+   * @return The frame chain for the constant part of the rotation. 
+   */ 
+  std::vector<int>  SpiceRotation::ConstantFrameChain() {
+    return p_constantFrames;
+  }
+
+  /** 
+   * Accessor method to get the frame chain for the rotation (begins in J2000).
+   * @return The frame chain for the rotation.
+   */ 
+  std::vector<int>  SpiceRotation::TimeFrameChain() {
+    return p_timeFrames;
+  }
+
+  /** 
+   * Checks whether the rotation has angular velocities.  
+   * @return Indicates whether the rotation has angular velocities.
+   */ 
+  bool SpiceRotation::HasAngularVelocity() {
+    return p_hasAngularVelocity;
+  }
+
   /** Given a direction vector in the reference frame, return a J2000 direction.
    *
    * @param [in]  rVec A direction vector in the reference frame
@@ -778,16 +858,16 @@ namespace Isis {
 
     std::vector<double> jVec;
 
-    if(rVec.size() == 3) {
+    if (rVec.size() == 3) {
       double TJ[3][3];
       mxm_c((SpiceDouble *) &p_TC[0], (SpiceDouble *) &p_CJ[0], TJ);
       jVec.resize(3);
       mtxv_c(TJ, (SpiceDouble *) &rVec[0], (SpiceDouble *) &jVec[0]);
     }
-    else if(rVec.size() == 6) {
+    else if (rVec.size() == 6) {
       // See Naif routine frmchg for the format of the state matrix.  The constant rotation, TC,
       // has a derivative with respect to time of I.
-      if(!p_hasAngularVelocity) {
+      if (!p_hasAngularVelocity) {
         // throw an error
       }
       std::vector<double> stateTJ(36);
@@ -821,16 +901,16 @@ namespace Isis {
 
     std::vector<double> rVec(3);
 
-    if(jVec.size() == 3) {
+    if (jVec.size() == 3) {
       double TJ[3][3];
       mxm_c((SpiceDouble *) &p_TC[0], (SpiceDouble *) &p_CJ[0], TJ);
       rVec.resize(3);
       mxv_c(TJ, (SpiceDouble *) &jVec[0], (SpiceDouble *) &rVec[0]);
     }
-    else if(jVec.size() == 6) {
+    else if (jVec.size() == 6) {
       // See Naif routine frmchg for the format of the state matrix.  The constant rotation, TC,
       // has a derivative with respect to time of I.
-      if(!p_hasAngularVelocity) {
+      if (!p_hasAngularVelocity) {
         // throw an error
       }
       std::vector<double>  stateTJ(36);
@@ -850,14 +930,14 @@ namespace Isis {
    *
    * @internal
    *  @history 2012-05-01 Debbie A. Cook - Added type argument to allow other function types
-                                          beyond PolyFunction
+   *                                       beyond PolyFunction
    */
   void SpiceRotation::SetPolynomial(const Source type) {
     NaifStatus::CheckErrors();
     std::vector<double> coeffAng1, coeffAng2, coeffAng3;
 
     // Rotation is already stored as a polynomial -- throw an error
-    if(p_source == PolyFunction) {
+    if (p_source == PolyFunction) {
       // Nothing to do
       return;
 //      QString msg = "Rotation already fit to a polynomial -- spiceint first to refit";
@@ -865,10 +945,10 @@ namespace Isis {
     }
 
     // Adjust degree of polynomial on available data
-    if(p_cache.size() == 1) {
+    if (p_cache.size() == 1) {
       p_degree = 0;
     }
-    else if(p_cache.size() == 2) {
+    else if (p_cache.size() == 2) {
       p_degree = 1;
     }
 
@@ -893,7 +973,7 @@ namespace Isis {
     ComputeBaseTime();
     std::vector<double> time;
 
-    if(p_cache.size() == 1) {
+    if (p_cache.size() == 1) {
       double t = p_cacheTime.at(0);
       SetEphemerisTime(t);
       std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
@@ -901,7 +981,7 @@ namespace Isis {
       coeffAng2.push_back(angles[1]);
       coeffAng3.push_back(angles[2]);
     }
-    else if(p_cache.size() == 2) {
+    else if (p_cache.size() == 2) {
 // Load the times and get the corresponding rotation angles
       p_degree = 1;
       double t1 = p_cacheTime.at(0);
@@ -920,7 +1000,7 @@ namespace Isis {
       double intercept[3];
 
 // Compute the linear equation for each angle and save them
-      for(int angleIndex = 0; angleIndex < 3; angleIndex++) {
+      for (int angleIndex = 0; angleIndex < 3; angleIndex++) {
         Isis::LineEquation angline(t1, angles1[angleIndex], t2, angles2[angleIndex]);
         slope[angleIndex] = angline.Slope();
         intercept[angleIndex] = angline.Intercept();
@@ -937,14 +1017,14 @@ namespace Isis {
       double start1 = 0.; // value of 1st angle1 in cache
       double start3 = 0.; // value of 1st angle1 in cache
 
-      for(std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
+      for (std::vector<double>::size_type pos = 0; pos < p_cacheTime.size(); pos++) {
         double t = p_cacheTime.at(pos);
         time.push_back((t - p_baseTime) / p_timeScale);
         SetEphemerisTime(t);
         std::vector<double> angles = Angles(p_axis3, p_axis2, p_axis1);
 
 // Fix 180/-180 crossovers on angles 1 and 3 before doing fit.
-        if(pos == 0) {
+        if (pos == 0) {
           start1 = angles[0];
           start3 = angles[2];
         }
@@ -973,7 +1053,7 @@ namespace Isis {
       // each be fit to a unique basis function.
       // Fill the coefficient vectors
 
-      for(int i = 0;  i < function1.Coefficients(); i++) {
+      for (int i = 0;  i < function1.Coefficients(); i++) {
         coeffAng1.push_back(function1.Coefficient(i));
         coeffAng2.push_back(function2.Coefficient(i));
         coeffAng3.push_back(function3.Coefficient(i));
@@ -1068,11 +1148,11 @@ namespace Isis {
 
   //! Compute the base time using cached times
   void SpiceRotation::ComputeBaseTime() {
-    if(p_noOverride) {
+    if (p_noOverride) {
       p_baseTime = (p_cacheTime.at(0) + p_cacheTime.at(p_cacheTime.size() - 1)) / 2.;
       p_timeScale = p_baseTime - p_cacheTime.at(0);
       // Take care of case where 1st and last times are the same
-      if(p_timeScale == 0)  p_timeScale = 1.0;
+      if (p_timeScale == 0)  p_timeScale = 1.0;
     }
     else {
       p_baseTime = p_overrideBaseTime;
@@ -1111,10 +1191,10 @@ namespace Isis {
     double derivative;
     double time = (p_et - p_baseTime) / p_timeScale;
 
-    if(coeffIndex > 0  && coeffIndex <= p_degree) {
+    if (coeffIndex > 0  && coeffIndex <= p_degree) {
       derivative = pow(time, coeffIndex);
     }
-    else if(coeffIndex == 0) {
+    else if (coeffIndex == 0) {
       derivative = 1;
     }
     else {
@@ -1161,8 +1241,8 @@ namespace Isis {
     double dpoly = DPolynomial(coeffIndex);
 
     // Multiply dpoly to complete dmatrix
-    for(int row = 0;  row < 3;  row++) {
-      for(int col = 0;  col < 3;  col++) {
+    for (int row = 0;  row < 3;  row++) {
+      for (int col = 0;  col < 3;  col++) {
         dmatrix[row][col] *= dpoly;
       }
     }
@@ -1211,10 +1291,10 @@ namespace Isis {
     NaifStatus::CheckErrors();
     double diff1 = compareAngle - angle;
 
-    if(diff1 < -1 * pi_c()) {
+    if (diff1 < -1 * pi_c()) {
       angle -= twopi_c();
     }
-    else if(diff1 > pi_c()) {
+    else if (diff1 > pi_c()) {
       angle += twopi_c();
     }
 
@@ -1235,24 +1315,24 @@ namespace Isis {
    */
   void SpiceRotation::SetPolynomialDegree(int degree) {
     // Adjust the degree for the data
-    if(p_fullCacheSize == 1) {
+    if (p_fullCacheSize == 1) {
       degree = 0;
     }
-    else if(p_fullCacheSize == 2) {
+    else if (p_fullCacheSize == 2) {
       degree = 1;
     }
     // If polynomials have not been applied yet then simply set the degree and return
-    if(!p_degreeApplied) {
+    if (!p_degreeApplied) {
       p_degree = degree;
     }
 
     // Otherwise the existing polynomials need to be either expanded ...
-    else if(p_degree < degree) {   // (increase the number of terms)
+    else if (p_degree < degree) {   // (increase the number of terms)
       std::vector<double> coefAngle1(p_coefficients[0]),
           coefAngle2(p_coefficients[1]),
           coefAngle3(p_coefficients[2]);
 
-      for(int icoef = p_degree + 1;  icoef <= degree; icoef++) {
+      for (int icoef = p_degree + 1;  icoef <= degree; icoef++) {
         coefAngle1.push_back(0.);
         coefAngle2.push_back(0.);
         coefAngle3.push_back(0.);
@@ -1261,12 +1341,12 @@ namespace Isis {
       SetPolynomial(coefAngle1, coefAngle2, coefAngle3, p_source);
     }
     // ... or reduced (decrease the number of terms)
-    else if(p_degree > degree) {
+    else if (p_degree > degree) {
       std::vector<double> coefAngle1(degree + 1),
           coefAngle2(degree + 1),
           coefAngle3(degree + 1);
 
-      for(int icoef = 0;  icoef <= degree;  icoef++) {
+      for (int icoef = 0;  icoef <= degree;  icoef++) {
         coefAngle1[icoef] = p_coefficients[0][icoef];
         coefAngle2[icoef] = p_coefficients[1][icoef];
         coefAngle3[icoef] = p_coefficients[2][icoef];
@@ -1276,6 +1356,38 @@ namespace Isis {
     }
   }
 
+  /** 
+   * Accessor method to get the rotation source. 
+   * @return The source of the rotation.
+   */
+  SpiceRotation::Source SpiceRotation::GetSource() {
+    return p_source;
+  }
+
+  /**
+   * Resets the source of the rotation to the given value. 
+   * @param source The rotation source to be set.  
+   */
+  void SpiceRotation::SetSource(Source source) {
+    p_source = source;
+    return;
+  }
+
+  /**
+   * Accessor method to get the rotation base time. 
+   * @return The base time for the rotation
+   */
+  double SpiceRotation::GetBaseTime() {
+    return p_baseTime;
+  }
+
+  /**
+   * Accessor method to get the rotation time scale. 
+   * @return The time scale for the rotation
+   */
+  double SpiceRotation::GetTimeScale() {
+    return p_timeScale;
+  }
 
   /** Set the axes of rotation for decomposition of a rotation
    *  matrix into 3 angles.
@@ -1287,7 +1399,7 @@ namespace Isis {
    *
    */
   void SpiceRotation::SetAxes(int axis1, int axis2, int axis3) {
-    if(axis1 < 1  ||  axis2 < 1  || axis3 < 1  || axis1 > 3  || axis2 > 3  || axis3 > 3) {
+    if (axis1 < 1  ||  axis2 < 1  || axis3 < 1  || axis1 > 3  || axis2 > 3  || axis3 > 3) {
       QString msg = "A rotation axis is outside the valid range of 1 to 3";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1319,7 +1431,7 @@ namespace Isis {
       // Multiple ck case, type 5 ck case, or PolyFunctionOverSpice
       //  final step -- downsize loaded cache and reload
 
-      if(p_fullCacheSize != (int) p_cache.size()) {
+      if (p_fullCacheSize != (int) p_cache.size()) {
 
         Isis::IString msg = "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -1332,9 +1444,9 @@ namespace Isis {
       // We will treat et as the sclock time and avoid converting back and forth 
      for (int r = 0; r < p_fullCacheSize; r++) {
         timeSclkdp[r] = p_cacheTime[r];
-        SpiceDouble CJ[9] = {p_cache[r][0], p_cache[r][1], p_cache[r][2],
-                             p_cache[r][3], p_cache[r][4], p_cache[r][5],
-                             p_cache[r][6], p_cache[r][7], p_cache[r][8]
+        SpiceDouble CJ[9] = { p_cache[r][0], p_cache[r][1], p_cache[r][2],
+                              p_cache[r][3], p_cache[r][4], p_cache[r][5],
+                              p_cache[r][6], p_cache[r][7], p_cache[r][8]
                             };
         m2q_c(CJ, quats[r]);
         vequ_c((SpiceDouble *) &p_cacheAv[r][0], avvs[r]);
@@ -1357,7 +1469,7 @@ namespace Isis {
       std::vector<double> av;
       av.resize(3);
 
-      for(int r = 0; r < sizOut; r++) {
+      for (int r = 0; r < sizOut; r++) {
         SpiceDouble et;
         // sct2e_c(spcode, timeSclkdp[r], &et);
         et = timeSclkdp[r];
@@ -1372,7 +1484,7 @@ namespace Isis {
       timeLoaded = true;
       p_minimizeCache = Done;
     }
-    else if(count == 1  && p_minimizeCache == Yes) {
+    else if (count == 1  && p_minimizeCache == Yes) {
       // case of a single ck -- read instances and data straight from kernel for given time range
       SpiceInt handle;
 
@@ -1397,7 +1509,7 @@ namespace Isis {
       daffna_c(&found);
       int spCode = ((int)(p_constantFrames[0] / 1000)) * 1000;
 
-      while(found) {
+      while (found) {
         observationSpansToNextSegment = false;
         double sum[10];   // daf segment summary
         double dc[2];     // segment starting and ending times in tics
@@ -1412,29 +1524,29 @@ namespace Isis {
         dafus_c(sum, (SpiceInt) 2, (SpiceInt) 6, dc, ic);
 
         // Don't read type 5 ck here
-        if(ic[2] == 5) break;
-        if(ic[2] != 3) {
+        if (ic[2] == 5) break;
+        if (ic[2] != 3) {
           QString msg = "Time fetching method only works on type 3 and 5 ck";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         // Check times for type 3 ck segment if spacecraft matches
-        if(ic[0] == spCode) {
+        if (ic[0] == spCode) {
           sct2e_c((int) spCode / 1000, dc[0], &segStartEt);
           sct2e_c((int) spCode / 1000, dc[1], &segStopEt);
           NaifStatus::CheckErrors();
           double et;
 
           // Get times for this segment
-          if(currentTime >= segStartEt  &&  currentTime <= segStopEt) {
+          if (currentTime >= segStartEt  &&  currentTime <= segStopEt) {
 
             // Check for a gap in the time coverage by making sure the time span of the observation does not
             // cross a segment unless the next segment starts where the current one ends
-            if(observationSpansToNextSegment && currentTime > segStartEt) {
+            if (observationSpansToNextSegment && currentTime > segStartEt) {
               QString msg = "Observation crosses segment boundary--unable to interpolate pointing";
               throw IException(IException::Programmer, msg, _FILEINFO_);
             }
-            if(observEnd > segStopEt) {
+            if (observEnd > segStopEt) {
               observationSpansToNextSegment = true;
             }
 
@@ -1461,22 +1573,22 @@ namespace Isis {
             int instance = 0;
             sct2e_c(sclkSpCode, sclkdp[0], &et);
 
-            while(instance < (ninstances - 1)  &&  et < currentTime) {
+            while (instance < (ninstances - 1)  &&  et < currentTime) {
               instance++;
               sct2e_c(sclkSpCode, sclkdp[instance], &et);
             }
 
-            if(instance > 0) instance--;
+            if (instance > 0) instance--;
             sct2e_c(sclkSpCode, sclkdp[instance], &et);
 
-            while(instance < (ninstances - 1)  &&  et < observEnd) {
+            while (instance < (ninstances - 1)  &&  et < observEnd) {
               p_cacheTime.push_back(et - p_timeBias);
               instance++;
               sct2e_c(sclkSpCode, sclkdp[instance], &et);
             }
             p_cacheTime.push_back(et - p_timeBias);
 
-            if(!observationSpansToNextSegment) {
+            if (!observationSpansToNextSegment) {
               timeLoaded = true;
               p_minimizeCache = Done;
               break;
@@ -1490,20 +1602,20 @@ namespace Isis {
         daffna_c(&found);    // Find next forward array in current daf
       }
     }
-    else if(count == 0  &&  p_source != Nadir  &&  p_minimizeCache == Yes) {
+    else if (count == 0  &&  p_source != Nadir  &&  p_minimizeCache == Yes) {
       QString msg = "No camera kernels loaded...Unable to determine time cache to downsize";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Load times according to cache size (body rotations) -- handle first round of type 5 ck case and multiple ck case --
     // Load a time for every line scan line and downsize later
-    if(!timeLoaded) {
+    if (!timeLoaded) {
       double cacheSlope = 0.0;
-      if(p_fullCacheSize > 1)
+      if (p_fullCacheSize > 1)
         cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
-      for(int i = 0; i < p_fullCacheSize; i++)
+      for (int i = 0; i < p_fullCacheSize; i++)
         p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope);
-      if(p_source == Nadir) p_minimizeCache = No;
+      if (p_source == Nadir) p_minimizeCache = No;
     }
     NaifStatus::CheckErrors();
   }
@@ -1514,16 +1626,16 @@ namespace Isis {
   std::vector<double> SpiceRotation::GetFullCacheTime() {
 
     // No time cache was initialized -- throw an error
-    if(p_fullCacheSize < 1) {
+    if (p_fullCacheSize < 1) {
       QString msg = "Time cache not available -- rerun spiceinit";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     std::vector<double> fullCacheTime;
     double cacheSlope = 0.0;
-    if(p_fullCacheSize > 1)  cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
+    if (p_fullCacheSize > 1)  cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
 
-    for(int i = 0; i < p_fullCacheSize; i++)
+    for (int i = 0; i < p_fullCacheSize; i++)
       fullCacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope);
 
     return fullCacheTime;
@@ -1545,14 +1657,14 @@ namespace Isis {
     std::vector<int> frameTypes;
     frameCodes.push_back(p_constantFrames[0]);
 
-    while(frameCodes[frameCodes.size()-1] != J2000Code) {
+    while (frameCodes[frameCodes.size()-1] != J2000Code) {
       frmidx  =  frameCodes.size() - 1;
       // First get the frame type  (Note:: we may also need to save center if we use dynamic frames)
       frinfo_c((SpiceInt) frameCodes[frmidx], (SpiceInt *) &center, (SpiceInt *) &type, (SpiceInt *) &typid, &found);
 
-      if(!found) {
+      if (!found) {
 
-        if(p_source == Nadir) {
+        if (p_source == Nadir) {
           frameTypes.push_back(0);
           break;
         }
@@ -1564,15 +1676,15 @@ namespace Isis {
       double matrix[3][3];
 
       // To get the next link in the frame chain, use the frame type
-      if(type == INERTL ||  type == PCK) {
+      if (type == INERTL ||  type == PCK) {
         nextFrame = J2000Code;
       }
-      else if(type == CK) {
+      else if (type == CK) {
         ckfrot_((SpiceInt *) &typid, &et, (double *) matrix, &nextFrame, (logical *) &found);
 
-        if(!found) {
+        if (!found) {
 
-          if(p_source == Nadir) {
+          if (p_source == Nadir) {
             frameTypes.push_back(0);
             break;
           }
@@ -1582,14 +1694,14 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
-      else if(type == TK) {
+      else if (type == TK) {
         tkfram_((SpiceInt *) &typid, (double *) matrix, &nextFrame, (logical *) &found);
-        if(!found) {
+        if (!found) {
           QString msg = "The tk rotation from frame " + toString(frameCodes[frmidx]) + " can not be found";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
-      else if(type == DYN) {
+      else if (type == DYN) {
         //
         //        Unlike the other frame classes, the dynamic frame evaluation
         //        routine ZZDYNROT requires the input frame ID rather than the
@@ -1610,7 +1722,7 @@ namespace Isis {
       frameTypes.push_back(type);
     }
 
-    if((int) frameCodes.size() == 1  &&  p_source != Nadir) {  // Must be Sky
+    if ((int) frameCodes.size() == 1  &&  p_source != Nadir) {  // Must be Sky
       p_constantFrames.push_back(frameCodes[0]);
       p_timeFrames.push_back(frameCodes[0]);
       return;
@@ -1618,15 +1730,15 @@ namespace Isis {
 
     int nConstants = 0;
     p_constantFrames.clear();
-    while(frameTypes[nConstants] == TK  &&  nConstants < (int) frameTypes.size()) nConstants++;
+    while (frameTypes[nConstants] == TK  &&  nConstants < (int) frameTypes.size()) nConstants++;
 
 
-    for(int i = 0; i <= nConstants; i++) {
+    for (int i = 0; i <= nConstants; i++) {
       p_constantFrames.push_back(frameCodes[i]);
     }
 
-    if(p_source != Nadir)  {
-      for(int i = nConstants;  i < (int) frameCodes.size(); i++) {
+    if (p_source != Nadir)  {
+      for (int i = nConstants;  i < (int) frameCodes.size(); i++) {
         p_timeFrames.push_back(frameCodes[i]);
       }
     }
@@ -1639,7 +1751,8 @@ namespace Isis {
   }
 
 
-  /** Return the full rotation TJ as a matrix
+  /** 
+   *  Return the full rotation TJ as a matrix
    */
   std::vector<double> SpiceRotation::Matrix() {
     NaifStatus::CheckErrors();
@@ -1650,28 +1763,72 @@ namespace Isis {
     return TJ;
   }
 
-  /** Return constant rotation TC as a quaternion
+  /** 
+   *  Return the constant 3x3 rotation TC matrix as a quaternion.
+   *  
+   *  @return Constant rotation quaternion, TC
    */
   std::vector<double> SpiceRotation::ConstantRotation() {
-     NaifStatus::CheckErrors();
-   std::vector<double> q;
+    NaifStatus::CheckErrors();
+    std::vector<double> q;
     q.resize(4);
-    q2m_c((SpiceDouble( *)[3]) &p_TC[0], (SpiceDouble( *)[3]) &q[0]);
+    m2q_c((SpiceDouble( *)[3]) &p_TC[0], &q[0]);
     NaifStatus::CheckErrors();
     return q;
   }
 
-  /** Return time-based rotation CJ as a quaternion
+  /** 
+   *  Return the constant 3x3 rotation TC matrix as a vector of length 9.
+   *  
+   *  @return Constant rotation matrix, TC
+   */
+  std::vector<double> &SpiceRotation::ConstantMatrix() {
+    return p_TC;
+  }
+
+  /** 
+   *  Set the constant 3x3 rotation TC matrix from a vector of length 9.
+   *  
+   *  @param constantMatrix Constant rotation matrix, TC.
+   */
+  void SpiceRotation::SetConstantMatrix(std::vector<double> constantMatrix) {
+    p_TC = constantMatrix;
+    return;
+  }
+
+  /** 
+   *  Return time-based 3x3 rotation CJ matrix as a quaternion.
+   *  
+   *  @return Time-based rotation quaternion, CJ
    */
   std::vector<double> SpiceRotation::TimeBasedRotation() {
     std::vector<double> q;
     q.resize(4);
-    q2m_c((SpiceDouble( *)[3]) &p_CJ[0], (SpiceDouble( *)[3]) &q[0]);
+    m2q_c((SpiceDouble( *)[3]) &p_CJ[0], &q[0]);
     return q;
   }
 
+  /** 
+   *  Return time-based 3x3 rotation CJ matrix as a vector of length 9.
+   *  
+   *  @return Time-based rotation matrix, CJ
+   */
+  std::vector<double> &SpiceRotation::TimeBasedMatrix() {
+    return p_CJ;
+  }
 
-  /** Initialize the constant rotation
+  /** 
+   *  Set the time-based 3x3 rotation CJ matrix from a vector of length 9.
+   *  
+   *  @param timeBasedMatrix Time-based rotation matrix, TC.
+   */
+  void SpiceRotation::SetTimeBasedMatrix(std::vector<double> timeBasedMatrix) {
+    p_CJ = timeBasedMatrix;
+    return;
+  }
+
+  /** 
+   *  Initialize the constant rotation
    */
   void SpiceRotation::InitConstantRotation(double et) {
     FrameTrace(et);
@@ -1707,7 +1864,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     // Make sure the angles have been fit to polynomials
-    if(p_source < PolyFunction) {
+    if (p_source < PolyFunction) {
       QString msg = "The SpiceRotation pointing angles must be fit to polynomials in order to compute angular velocity";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1743,7 +1900,7 @@ namespace Isis {
     double wmatrix[3][3]; // work matrix
     dCJ.assign(9, 0.);
 
-    for(int angleIndex = 0; angleIndex < 3; angleIndex++) {
+    for (int angleIndex = 0; angleIndex < 3; angleIndex++) {
       drotat_(&(angles[angleIndex]), (integer *) axes + angleIndex, (doublereal *) dmatrix);
       // Transpose to obtain row-major order
       xpose_c(dmatrix, dmatrix);
@@ -1758,8 +1915,8 @@ namespace Isis {
       dangle = function.DerivativeVar((p_et - p_baseTime) / p_timeScale) / p_timeScale;
 
       // Multiply dangle to complete dmatrix
-      for(int row = 0;  row < 3;  row++) {
-        for(int col = 0;  col < 3;  col++) {
+      for (int row = 0;  row < 3;  row++) {
+        for (int col = 0;  col < 3;  col++) {
           dmatrix[row][col] *= dangle;
         }
       }
@@ -1781,7 +1938,7 @@ namespace Isis {
           break;
       }
       int i, j;
-      for(int index = 0; index < 9; index++) {
+      for (int index = 0; index < 9; index++) {
         i = index / 3;
         j = index % 3;
         dCJ[index] += dmatrix[i][j];
@@ -1805,11 +1962,11 @@ namespace Isis {
     int jcol = 0;
     int vpos = 0;
 
-    for(int row = 3; row < 6; row++) {
+    for (int row = 3; row < 6; row++) {
       irow  =  row - 3;
       vpos  =  irow * 3;
 
-      for(int col = 0; col < 3; col++) {
+      for (int col = 0; col < 3; col++) {
         jcol  =  col + 3;
         // Fill the upper left corner
         stateTJ[irow*6 + col] = p_TC[vpos] * stateCJ[0][col] + p_TC[vpos+1] * stateCJ[1][col] + p_TC[vpos+2] * stateCJ[2][col];
@@ -1837,7 +1994,7 @@ namespace Isis {
    std::vector<double> SpiceRotation::Extrapolate(double timeEt) {
     NaifStatus::CheckErrors();
 
-    if(!p_hasAngularVelocity) return p_CJ;
+    if (!p_hasAngularVelocity) return p_CJ;
 
     double diffTime = timeEt - p_et;
     std::vector<double> CJ(9,0.);
@@ -2021,10 +2178,10 @@ namespace Isis {
    angles.push_back(function3.Evaluate(rtime));
 
    // Get the first angle back into the range Naif expects [-180.,180.]
-   if(angles[0] < -1 * pi_c()) {
+   if (angles[0] < -1 * pi_c()) {
      angles[0] += twopi_c();
    }
-   else if(angles[0] > pi_c()) {
+   else if (angles[0] > pi_c()) {
      angles[0] -= twopi_c();
    }
    return angles;
@@ -2048,10 +2205,10 @@ namespace Isis {
    double angle3 = function3.Evaluate(rtime);
 
    // Get the first angle back into the range Naif expects [-180.,180.]
-   if(angle1 < -1 * pi_c()) {
+   if (angle1 < -1 * pi_c()) {
      angle1 += twopi_c();
    }
-   else if(angle1 > pi_c()) {
+   else if (angle1 > pi_c()) {
      angle1 -= twopi_c();
    }
 
@@ -2060,7 +2217,7 @@ namespace Isis {
            (SpiceDouble( *)[3]) &p_CJ[0]);
 
    if (p_hasAngularVelocity) {
-     if( p_degree == 0)
+     if ( p_degree == 0)
        p_av = p_cacheAv[0];
      else
        ComputeAv();

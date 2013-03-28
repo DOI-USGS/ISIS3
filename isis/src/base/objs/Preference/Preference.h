@@ -67,6 +67,8 @@ namespace Isis {
    *                           TestPreferences file
    *   @history 2012-02-24 Steven Lambright - This class now sets the thread
    *                           limit in the Qt global thread pool.
+   *  @history 2013-03-27 Jeannie Backer - Added Near mission to DataDirectory
+   *                          group to TestPreferences file. References #1248.
    */
   class Preference : public Pvl {
 
