@@ -47,7 +47,7 @@ commands:
 	$(APPNAME) from=$(INPUT)/label7.lbl \
 	to=$(OUTPUT)/output.cub 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 
-	$(SED) 's+/.*/input/+input/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
+	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
 	rm -f $(OUTPUT)/error_temp.txt;
 	rm -f $(OUTPUT)/input.cub;
 	rm -f $(OUTPUT)/output.cub;
