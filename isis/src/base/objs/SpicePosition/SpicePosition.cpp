@@ -1110,7 +1110,7 @@ namespace Isis {
    *
    *  coordinate = C0 + C1*t + C2*t**2 + ... +Cn*t**n ,
    *    where t = (time - p_basetime) / p_timeScale.
-   *  velocity = C1 + 2*C2*t + ... + n*Cn*t**(n-1)
+   *  velocity = (1/p_timeScale) * (C1 + 2*C2*t + ... + n*Cn*t**(n-1))
    *  partial(velocity) with respect to C0 = 0.
    *  partial(velocity) with respect to C1 = 1/p_timeScale.
    *  partial(velocity) with respect to C2 = 2*t/p_timeScale
@@ -1136,8 +1136,15 @@ namespace Isis {
     double time = (p_et - p_baseTime) / p_timeScale;
     double derivative = 0.;
 
+    // Handle arithmetic failures
+    double Epsilon = 1.0e-15;
+    if (fabs(time) <= Epsilon) time = 0.0;
+
+    // Only compute for coefficient index > 0 to avoid problems like 0 ** -1
+    if (coeffIndex   > 0) 
+      derivative = coeffIndex * pow(time, coeffIndex-1) / p_timeScale;
+
     // Reset the velocity coordinate to its derivative
-    derivative = coeffIndex * pow(time, coeffIndex-1) / p_timeScale;
     dvelocity[coordIndex] = derivative;
     return dvelocity;
   }

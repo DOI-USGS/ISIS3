@@ -279,5 +279,14 @@ int main(int argc, char *argv[]) {
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   cout << endl;
-  
+
+  // Test radar  nan case when et = baseTime and attempt to calculate velocity partial for first
+  // coefficient 
+  cout << "Test calculation of first coefficient for spacecraft velocity" << endl;
+  std::vector<double> dvelocity(3,0.);
+  pos.SetEphemerisTime((startTime + endTime) / 2.);
+  dvelocity = pos.VelocityPartial(SpicePosition::WRT_X, 0);
+  cout << "  Velocity vector for center time = (" << dvelocity[0] <<  "," << dvelocity[1] <<"," << dvelocity[2] << ")"<< endl;
+
+  cout <<endl;
 }
