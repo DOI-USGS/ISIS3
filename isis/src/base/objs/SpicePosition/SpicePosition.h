@@ -166,6 +166,10 @@ namespace Isis {
    *                           protected, ssupport routines for this
    *                           generalization. Fixes (mostly) #0909, #1136 and
    *                           #1223.
+   *  @history 2013-03-28 Debbie A. Cook - Fixed bug causing jigsaw to fail with a singular definite
+   *                           matrix on radar data.  The bug was in the method VelocityPartial and 
+   *                           occurred when the et = baseTime and the coeffIndex was 0.  This caused
+   *                           the derivative equation to be 0 * 0 ** -1.  This update fixes issue #1582.
    */
   class SpicePosition {
     public:

@@ -29,6 +29,7 @@
 #include <vector>
 #include <cmath>
 
+#include <QDebug>
 #include "geos/geom/BinaryOp.h"
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/LinearRing.h"
@@ -303,14 +304,29 @@ namespace Isis {
 
         // Convert each coordinate in the exterior ring of this polygon
         for(unsigned int cord = 0; cord < llcoords->getSize(); ++cord) {
-          ugm->SetUniversalGround(llcoords->getAt(cord).y,
-                                  llcoords->getAt(cord).x);
-          slcoords->add(geos::geom::Coordinate(ugm->Sample(),
-                                               ugm->Line()));
+          if (ugm->SetUniversalGround(llcoords->getAt(cord).y,
+                                      llcoords->getAt(cord).x)) {
+            slcoords->add(geos::geom::Coordinate(ugm->Sample(),
+                                                ugm->Line()));
+          }
         } // end exterior ring coordinate loop
+       
+        // Make sure that the line string is closed.
+        if (slcoords->getSize() > 0 && !slcoords->front().equals(slcoords->back())) {
+          slcoords->add(slcoords->front());
+        }
 
-        slPolys->push_back(globalFactory.createPolygon(
-                             globalFactory.createLinearRing(slcoords), holes));
+        try {
+          slPolys->push_back(globalFactory.createPolygon(
+                              globalFactory.createLinearRing(slcoords), holes));
+        }
+        catch (std::exception &e) {
+          throw IException(IException::Unknown,
+                           QObject::tr("Unable to convert polygon from Lat/Lon to Sample/Line. The "
+                                       "error given was [%1].").arg(e.what()),
+                           _FILEINFO_);
+        }
+        
         delete llcoords;
       } // end num geometry in multi-poly
 
@@ -329,7 +345,7 @@ namespace Isis {
 
           return despikedPoly;
         }
-        catch(IException &e) {
+        catch (IException &e) {
           IString msg = "Unable to convert polygon from Lat/Lon to Sample/Line";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }

@@ -68,6 +68,23 @@ Deborah Lee Soltesz
         <link rel="stylesheet" href="../assets/styles/main.css"/>
         <link rel="stylesheet" href="../assets/styles/menu.css"/>
         <link rel="stylesheet" media="print" href="../assets/styles/print.css"/>
+        <!-- Dynamic analytics insertion to prevent running on local URLs -->
+        <xsl:text>&#xa;</xsl:text>
+        <script type="text/javascript">
+          //<xsl:comment><![CDATA[
+          (function() {
+            var usgsAnalytics = document.createElement('script');
+            usgsAnalytics.type = 'text/javascript';
+            usgsAnalytics.async = true;
+            usgsAnalytics.src = 'http://www.usgs.gov/scripts/analytics/usgs-analytics.js';
+            if('http:' == document.location.protocol) {
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(usgsAnalytics, s);
+            }
+          })(); 
+          ]]></xsl:comment>
+        <xsl:text>&#xa;</xsl:text>
+        </script>
       </head>
 
       <body>

@@ -1,7 +1,7 @@
 Object = ControlNetwork
   NetworkId    = ""
   NetworkType  = ImageToImage
-  TargetName   = "Moon"
+  TargetName   = "MRO/SomeHiRiseSerialNumber/..."
   UserName     = ""
   Created      = ""
   LastModified = ""
@@ -10,6 +10,13 @@ Object = ControlNetwork
   Object = ControlPoint
     PointType = Tie
     PointId   = "1"
+
+    Group = ControlMeasure
+      SerialNumber   = "M0"
+      MeasureType    = Unmeasured 
+      Sample         = NULL
+      Line           = Null
+    End_Group
 
     Group = ControlMeasure
       SerialNumber   = "M1"

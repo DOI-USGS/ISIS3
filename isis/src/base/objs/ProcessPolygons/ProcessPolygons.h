@@ -1,13 +1,13 @@
 #ifndef ProcessPolygons_h
 #define ProcessPolygons_h
 
-#include "ProjectionFactory.h"
-#include "Process.h"
+#include <geos/geom/Coordinate.h>
+#include <geos/geom/Polygon.h>
+
 #include "Brick.h"
 #include "FileName.h"
-
-#include "geos/geom/Coordinate.h"
-#include "geos/geom/Polygon.h"
+#include "Process.h"
+#include "ProjectionFactory.h"
 
 namespace Isis {
 
@@ -20,12 +20,18 @@ namespace Isis {
    *             points before testing if they are inside a polygon inside
    *             DoWork(...).
    *   @history 2012-02-24 Steven Lambright - Added Finalize()
+   *   @history 2013-03-27 Jeannie Backer - Added programmer comments.
+   *                           References #1248.
    */
   class ProcessPolygons : public Isis::Process {
 
     public:
       ProcessPolygons();
 
+      // SetOutputCube() is not virtual in the Process class, so the following
+      // definitions for this method are the only ones that are allowed for
+      // ProcessPolygons objects and child objects, unless redifined in the
+      // child class
       void SetOutputCube(const QString &parameter, const int nsamps,
                          const int nlines, int nbands = 1);
 

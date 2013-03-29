@@ -12,6 +12,13 @@ Object = ControlNetwork
     PointId   = "1"
 
     Group = ControlMeasure
+      SerialNumber   = "M0"
+      MeasureType    = Unmeasured 
+      Sample         = NULL
+      Line           = Null
+    End_Group
+
+    Group = ControlMeasure
       SerialNumber   = "M1"
       MeasureType    = Estimated
       Sample         = 1

@@ -333,6 +333,7 @@ namespace Isis {
         gp->findKeyword("SampleResolution").setValue(toString(camera->SampleResolution()), "meters/pixel");
         gp->findKeyword("LineResolution").setValue(toString(camera->LineResolution()), "meters/pixel");
 
+        //body fixed
         camera->instrumentPosition(spB);
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");

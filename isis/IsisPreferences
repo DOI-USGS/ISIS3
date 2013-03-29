@@ -172,6 +172,7 @@ Group = DataDirectory
   Messenger   = $ISIS3DATA/messenger
   Mgs         = $ISIS3DATA/mgs
   Mro         = $ISIS3DATA/mro
+  Near        = $ISIS3DATA/near
   Odyssey     = $ISIS3DATA/odyssey
   Rolo        = $ISIS3DATA/rolo
   Smart1      = $ISIS3DATA/smart1

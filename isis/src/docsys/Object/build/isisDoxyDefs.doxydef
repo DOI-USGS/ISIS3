@@ -91,6 +91,7 @@
  * @history  2006-08-10 deborah lee soltesz - Added "Radiometric and Photometric Corrections" and alphabetized mission-specific categories
  * @history  2008-05-19 steven lambright - Fixed Mission End Group Tag
  * @history  2008-05-19 steven lambright - Fixed Bad Namespace Documentation
+ * @history  2013-03-27 Jeannie Backer - Added NEAR Shoemaker mission. References #1248.
  *
  * @todo Develop two different pages for API vs. Programmer
  *       documentation. 2004-11-03
@@ -417,6 +418,19 @@
            * It will be the first new data from Mercury in more than 30 years.
            *
            * Mission site: http://messenger.jhuapl.edu/
+           *
+           */
+
+          // NEAR Shoemaker
+          /**
+           * \defgroup  NearEarthAsteroidRendezvousShoemaker  Near Earth Asteroid Rendezvous - Shoemaker
+           *
+           * These objects provide functionality for manipulating data from the
+           * Near Earth Asteroid Rendezvous - Shoemaker mission. Near Earth 
+           * Asteroid Rendezvous, launched in 1996, flew by Earth, Eros, and 
+           * Mathilde, orbited Eros, then landed on Eros.
+           *
+           * Mission site: http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1996-008A
            *
            */
 

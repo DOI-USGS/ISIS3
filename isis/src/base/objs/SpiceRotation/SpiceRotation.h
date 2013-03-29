@@ -169,12 +169,16 @@ namespace Isis {
    *                           quotation marks with angle braces in 3rd party
    *                           includes, fixed history indentation and line
    *                           length. References #1181.
+   *   @history 2013-03-27 Jeannie Backer - Added methods for MsiCamera. Brought
+   *                           class closer to Isis3 standards: moved method
+   *                           implementation to cpp file, fixed documentation.
+   *                           References #1248.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {
     public:
-      //! Constructors
+      // Constructors
       SpiceRotation(int frameCode);
       /*      SpiceRotation( int NaifCode );
       We would like to call refchg instead to avoid the strings.  Currently Naif does
@@ -182,18 +186,15 @@ namespace Isis {
       SpiceRotation(int frameCode, int targetCode);
       SpiceRotation(const SpiceRotation &rotToCopy);
 
-      //! Destructor
-      virtual ~SpiceRotation() { }
+      // Destructor
+      virtual ~SpiceRotation();
 
-      //! Change the frame (has no effect if cached)
-      void SetFrame(int frameCode) {
-        p_constantFrames[0] = frameCode;
-      };
-      int Frame() {
-        return p_constantFrames[0];
-      };
+      // Change the frame (has no effect if cached)
+      void SetFrame(int frameCode);
+      int Frame();
 
       void SetTimeBias(double timeBias);
+
       /**
        * The rotation can come from one of 3 places for an Isis cube.  The class
        * expects function to be after Memcache.
@@ -202,43 +203,61 @@ namespace Isis {
                     Nadir,                  //!< Nadir pointing
                     Memcache,               //!< From cached table
                     PolyFunction,           //!< From nth degree polynomial
-                    PolyFunctionOverSpice}; //!< Kernels plus nth degree 
-                                            //   polynomial
+                    PolyFunctionOverSpice   //!< Kernels plus nth degree 
+                  };                          //   polynomial
 
-      enum PartialType {WRT_RightAscension, WRT_Declination, WRT_Twist};
+      /** 
+       * This enumeration indicates whether the partial derivative is taken with 
+       * respect to Right Ascension, Declination, or Twist. 
+       */ 
+      enum PartialType { WRT_RightAscension, //!< With respect to Right Ascension
+                         WRT_Declination,    //!< With respect to Declination
+                         WRT_Twist           //!< With respect to Twist
+                       };
 
-      enum DownsizeStatus {Yes, Done, No};
-      enum NaifFrameType { INERTL = 1, PCK = INERTL + 1, CK = PCK + 1, TK = CK + 1, DYN = TK + 1};
+      /** 
+       *  
+       */ 
+      enum DownsizeStatus { Yes,  //!< 
+                            Done, //!< 
+                            No    //!< 
+                          };
+
+      /** 
+       *  
+       */ 
+      enum NaifFrameType { INERTL = 1,       //!< 
+                           PCK = INERTL + 1, //!< 
+                           CK = PCK + 1,     //!< 
+                           TK = CK + 1,      //!< 
+                           DYN = TK + 1      //!< 
+                         };
 
       void SetEphemerisTime(double et);
-
-      //! Return the current ephemeris time
-      double EphemerisTime() const {
-        return p_et;
-      };
+      double EphemerisTime() const;
 
       std::vector<double> GetCenterAngles();
       
       std::vector<double> Matrix();
-      std::vector<double> AngularVelocity() {
-        return p_av;
-      };
-      std::vector<double> &ConstantMatrix() {
-        return p_TC;
-      };
-      std::vector<double> &TimeBasedMatrix() {
-        return p_CJ;
-      };
+      std::vector<double> AngularVelocity();
+
+      // TC
+      std::vector<double> ConstantRotation();
+      std::vector<double> &ConstantMatrix();
+      void SetConstantMatrix(std::vector<double> constantMatrix);
+
+      // CJ
+      std::vector<double> TimeBasedRotation();
+      std::vector<double> &TimeBasedMatrix();
+      void SetTimeBasedMatrix(std::vector<double> timeBasedMatrix);
 
       std::vector<double> J2000Vector(const std::vector<double>& rVec);
 
       std::vector<double> ReferenceVector(const std::vector<double>& jVec);
 
       std::vector<double> EvaluatePolyFunction();
-      //! Set the downsize status
-      void MinimizeCache(DownsizeStatus status) {
-        p_minimizeCache = status;
-      };
+
+      void MinimizeCache(DownsizeStatus status);
 
       void LoadCache(double startTime, double endTime, int size);
 
@@ -257,10 +276,7 @@ namespace Isis {
 
       std::vector<double> Angles(int axis3, int axis2, int axis1);
 
-      //! Is this rotation cached
-      bool IsCached() const {
-        return (p_cache.size() > 0);
-      };
+      bool IsCached() const;
 
       void SetPolynomial(const Source type=PolyFunction);
 
@@ -273,31 +289,13 @@ namespace Isis {
                          std::vector<double>& abcAng2,
                          std::vector<double>& abcAng3);
 
-      //! Set the polynomial degree
+      // Set the polynomial degree
       void SetPolynomialDegree(int degree);
-
-      //! Return the source of the rotation
-      Source GetSource() {
-        return p_source;
-      };
-
-      //! Resets the source of the rotation
-      void SetSource(Source source) {
-        p_source = source;
-        return;
-      };
-
+      Source GetSource();
+      void SetSource(Source source);
       void ComputeBaseTime();
-
-      //! Return the base time for the rotation
-      double GetBaseTime() {
-        return p_baseTime;
-      };
-
-      //! Return the time scale for the rotation
-      double GetTimeScale() {
-        return p_timeScale;
-      };
+      double GetBaseTime();
+      double GetTimeScale();
 
       void SetOverrideBaseTime(double baseTime, double timeScale);
 
@@ -310,25 +308,12 @@ namespace Isis {
       std::vector<double> GetFullCacheTime();
       void FrameTrace(double et);
 
-      //! Return the frame chain for the constant part of the rotation (ends in target)
-      std::vector<int>  ConstantFrameChain() {
-        return p_constantFrames;
-      };
-
-      //! Return the frame chain for the rotation (begins in J2000)
-      std::vector<int>  TimeFrameChain() {
-        return p_timeFrames;
-      };
-
+      // Return the frame chain for the constant part of the rotation (ends in target)
+      std::vector<int>  ConstantFrameChain();
+      std::vector<int>  TimeFrameChain();
       void InitConstantRotation(double et);
-      std::vector<double> ConstantRotation();
-      std::vector<double> TimeBasedRotation();
       void DCJdt(std::vector<double> &dRJ);
-
-      //! Return whether or not the rotation has angular velocities
-      bool HasAngularVelocity() {
-        return p_hasAngularVelocity;
-      };
+      bool HasAngularVelocity();
 
       void ComputeAv();
       std::vector<double> Extrapolate(double timeEt);
@@ -336,48 +321,51 @@ namespace Isis {
 
     protected:
       void SetFullCacheParameters(double startTime, double endTime, int cacheSize);
-      std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
-      std::vector<std::vector<double> > p_cache;      //!< Cached rotations
-      //!< Stored as rotation matrix from
-      //    J2000 to 1st constant frame (CJ) or
-      //    coefficients of polynomial
-      //    fit to rotation angles
-      int p_degree;                     //!< Degree of fit polynomial for angles
-      int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
-      int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
-      int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
       void SetEphemerisTimeMemcache();
       void SetEphemerisTimeNadir();
       void SetEphemerisTimeSpice();
       void SetEphemerisTimePolyFunction();
       void SetEphemerisTimePolyFunctionOverSpice();
+      std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
+      std::vector<std::vector<double> > p_cache; /**< Cached rotations, stored as 
+                                                      rotation matrix from J2000 
+                                                      to 1st constant frame (CJ) or 
+                                                      coefficients of polynomial
+                                                      fit to rotation angles.*/
+      int p_degree;                     //!< Degree of fit polynomial for angles
+      int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
+      int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
+      int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
 
     private:
-      std::vector<int> p_constantFrames;  //!< Chain of Naif frame codes in constant rotation TC
-      //    The first entry will always be the target frame code
-      std::vector<int> p_timeFrames;      //!< Chain of Naif frame codes in time-based rotation CJ
-      //    The last entry will always be 1 (J2000 code)
+      std::vector<int> p_constantFrames;  /**< Chain of Naif frame codes in constant 
+                                               rotation TC. The first entry will always 
+                                               be the target frame code*/
+      std::vector<int> p_timeFrames;      /**< Chain of Naif frame codes in time-based 
+                                               rotation CJ. The last entry will always 
+                                               be 1 (J2000 code)*/
       double p_timeBias;                  //!< iTime bias when reading kernels
 
       double p_et;                        //!< Current ephemeris time
-      Quaternion p_quaternion;            //!< Quaternion for J2000 to reference
-      //   rotation at et
+      Quaternion p_quaternion;            /**< Quaternion for J2000 to reference
+                                               rotation at et*/
 
       bool p_matrixSet;                   //!< Flag indicating p_TJ has been set
 
       Source p_source;                    //!< The source of the rotation data
-      int p_axisP;                        //!< The axis defined by the spacecraft
-      //   vector for defining a nadir rotation
-      int p_axisV;                        //!< The axis defined by the velocity
-      //   vector for defining a nadir rotation
+      int p_axisP;                        /**< The axis defined by the spacecraft
+                                               vector for defining a nadir rotation*/
+      int p_axisV;                        /**< The axis defined by the velocity
+                                               vector for defining a nadir rotation*/
       int p_targetCode;                   //!< For computing Nadir rotation only
 
       double p_baseTime;                  //!< Base time used in fit equations
       double p_timeScale;                 //!< Time scale used in fit equations
-      bool p_degreeApplied;               //!< Flag indicating whether or not a polynomial
-      //    of degree p_degree has been created and
-      //    used to fill the cache
-      std::vector<double> p_coefficients[3];  //!< Coefficients defining functions fit to 3 pointing angles
+      bool p_degreeApplied;               /**< Flag indicating whether or not a polynomial
+                                               of degree p_degree has been created and
+                                               used to fill the cache*/
+      std::vector<double> p_coefficients[3];  /**< Coefficients defining functions fit 
+                                                   to 3 pointing angles*/
       bool p_noOverride;                  //!< Flag to compute base time;
       double p_overrideBaseTime;          //!< Value set by caller to override computed base time
       double p_overrideTimeScale;         //!< Value set by caller to override computed time scale
@@ -385,16 +373,19 @@ namespace Isis {
       double p_fullCacheStartTime;        //!< Initial requested starting time of cache
       double p_fullCacheEndTime;          //!< Initial requested ending time of cache
       int p_fullCacheSize;                //!< Initial requested cache size
-      std::vector<double> p_TC;           //!< Rotation matrix from first constant rotation (after all
-      //    time-based rotations in frame chain from J2000 to target)
-      //    to the target frame
-      std::vector<double> p_CJ;           //!< Rotation matrix from J2000 to first constant rotation
-      //    after all the time-based rotations in frame chain from
+      std::vector<double> p_TC;           /**< Rotation matrix from first constant rotation 
+                                          (after all time-based rotations in frame chain from
+                                           J2000 to target) to the target frame*/
+      std::vector<double> p_CJ;           /**< Rotation matrix from J2000 to first constant 
+                                               rotation after all the time-based rotations 
+                                               in frame chain from*/
       std::vector<std::vector<double> > p_cacheAv;
       //!< Cached angular velocities for corresponding rotactions in p_cache
       std::vector<double> p_av;           //!< Angular velocity for rotation at time p_et
-      bool p_hasAngularVelocity;          //!< Flag indicating whether the rotation includes angular velocity
-      std::vector<double> StateTJ();      //!< State matrix (6x6) for rotating state vectors from J2000 to target frame
+      bool p_hasAngularVelocity;          /**< Flag indicating whether the rotation 
+                                               includes angular velocity*/
+      std::vector<double> StateTJ();      /**< State matrix (6x6) for rotating state 
+                                               vectors from J2000 to target frame*/
   };
 };
 

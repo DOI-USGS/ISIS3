@@ -82,6 +82,7 @@ namespace Isis {
   }
 
 
+  //!  Destroys the Mosaic object. It will close all opened cubes.
   ProcessMosaic::~ProcessMosaic() {
   }
 
@@ -592,6 +593,9 @@ namespace Isis {
   }
 
 
+  /** 
+   * 
+   */ 
   void ProcessMosaic::SetBandBinMatch(bool enforceBandBinMatch) {
     m_enforceBandBinMatch = enforceBandBinMatch;
   }
@@ -825,7 +829,10 @@ namespace Isis {
     m_placeLowSatPixels = placeLowSatPixels;
   }
 
-
+  /**
+   * Set the DEM match flag. 
+   * @param matchDEM If true, the match is enforced between Input & Mosaic 
+   */ 
   void ProcessMosaic::SetMatchDEM(bool matchDEM) {
     m_enforceMatchDEM = matchDEM;
   }
@@ -853,6 +860,9 @@ namespace Isis {
   }
 
 
+  /** 
+   *  
+   */ 
   ProcessMosaic::ImageOverlay ProcessMosaic::GetImageOverlay() const {
     return m_imageOverlay;
   }
@@ -1293,6 +1303,9 @@ namespace Isis {
   }
 
 
+  /** 
+   *  Get the Band Index in an image of type (input/output)
+   */ 
   int ProcessMosaic::GetBandIndex(bool inputFile) {
     bool bFound = false;
     int iBandIndex = 0;

@@ -22,10 +22,17 @@ namespace Isis {
    *   @history 2008-08-18 Steven Lambright - Updated to work with geos3.0.0
    *                           instead of geos2. Mostly namespace changes.
    *   @history 2012-02-24 Steven Lambright - Added Finalize()
+   *   @history 2013-03-27 Jeannie Backer - Added programmer comments.
+   *                           References #1248.
    */
   class ProcessGroundPolygons : public ProcessPolygons {
     public:
       ProcessGroundPolygons();
+
+      // SetOutputCube() is not virtual in the Process class nor in the
+      // ProcessPolygons class, so the following definitions for this method
+      // are the only ones that are allowed for ProcessGroundPolygon objects
+      // and child objects
 
       //Cube is an existing camera cube or projection cube
       void SetOutputCube(const QString &parameter, QString &cube);

@@ -105,7 +105,8 @@ namespace Isis {
 
 
   /**
-  * Sets the brick size
+  * Sets the input and output bricks sizes to the given number of samples, 
+  * lines, and bands. 
   *
   * @param ns Number of samples
   *
@@ -114,22 +115,9 @@ namespace Isis {
   * @param nb Number of bands
   */
   void ProcessByBrick::SetBrickSize(int ns, int nl, int nb) {
-    p_inputBrickSamples.clear();
-    p_inputBrickSamples.resize(InputCubes.size() + 1, ns);
-    p_inputBrickLines.clear();
-    p_inputBrickLines.resize(InputCubes.size() + 1, nl);
-    p_inputBrickBands.clear();
-    p_inputBrickBands.resize(InputCubes.size() + 1, nb);
-
-    p_outputBrickSamples.clear();
-    p_outputBrickSamples.resize(OutputCubes.size() + 1, ns);
-    p_outputBrickLines.clear();
-    p_outputBrickLines.resize(OutputCubes.size() + 1, nl);
-    p_outputBrickBands.clear();
-    p_outputBrickBands.resize(OutputCubes.size() + 1, nb);
-
-    p_inputBrickSizeSet = true;
-    p_outputBrickSizeSet = true;
+    SetInputBrickSize(ns, nl, nb);
+    SetOutputBrickSize(ns, nl, nb);
+    return;
   }
 
 
@@ -251,6 +239,27 @@ namespace Isis {
     p_outputBrickSizeSet = true;
   }
 
+  /**
+   * Create the output file. This method assumes that the output cube size 
+   * matches the input cube size. Therefore, SetInputCube() must be called 
+   * before this method. 
+   *
+   * @param parameter The output file name.
+   *
+   * @param att An output cube attribute to define the characteristics of the
+   *            output cube.
+   *
+   * @return @b Isis::Cube Output cube.
+   * @throws Isis::iException::Message "File is not in a supported
+   *             organization."
+   */
+  Isis::Cube *ProcessByBrick::SetOutputCube(const QString &fname,
+                                     const Isis::CubeAttributeOutput &att) {
+    int nl = InputCubes[0]->lineCount();
+    int ns = InputCubes[0]->sampleCount();
+    int nb = InputCubes[0]->bandCount();
+    return Process::SetOutputCube(fname, att, ns, nl, nb);
+  }
 
   /**
    * Set the direction the data will be read, either all lines in a single band
@@ -309,7 +318,7 @@ namespace Isis {
    * shaped brick through the cube. This method requires that exactly one input
    * cube be loaded. No output cubes are produced.
    *
-   * @deprecated
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes 
    * @param funct (Buffer &in) Receive an nxm brick in the input buffer.
    *                                If n=1 and m=lines this will process by
    *                                columns. Likewise if n=samples and m=1 this
@@ -350,7 +359,7 @@ namespace Isis {
    * cube and one output cube be loaded using the SetInputCube and SetOutputCube
    * methods.
    *
-   * @deprecated
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes 
    * @param funct (Buffer &in, Buffer &out) Receive an nxm brick in
    *              the input buffer and output the an nxm brick. If n=1 and
    *              m=lines this will process by columns. Likewise if n=samples
@@ -390,7 +399,7 @@ namespace Isis {
    * shaped brick through the cube. This method allows multiple input and output
    * cubes.
    *
-   * @deprecated
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes 
    * @param funct (vector<Buffer *> &in, vector<Buffer *> &out)
    *              Receive an nxm brick in the input buffer. If n=1 and m=lines
    *              this will process by columns.  Likewise if n=samples and m=1
@@ -464,7 +473,7 @@ namespace Isis {
    * End the processing sequence and cleans up by closing cubes, freeing memory,
    *   etc.
    *
-   * @deprecated
+   * @deprecated Please use Finalize()
    */
   void ProcessByBrick::EndProcess() {
     p_inputBrickSizeSet = false;
