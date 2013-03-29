@@ -57,9 +57,23 @@ Deborah Lee Soltesz
           ]]></xsl:comment>
         </script>
       -->
-        <script type="text/javascript" src="assets/scripts/homepage.js">
-          <xsl:comment><![CDATA[
+        <script type="text/javascript" src="assets/scripts/homepage.js"></script>
+        <!-- Dynamic analytics insertion to prevent running on local URLs -->
+        <xsl:text>&#xa;</xsl:text>
+        <script type="text/javascript">
+          //<xsl:comment><![CDATA[
+	  (function() {
+            var usgsAnalytics = document.createElement('script');
+            usgsAnalytics.type = 'text/javascript';
+            usgsAnalytics.async = true;
+            usgsAnalytics.src = 'http://www.usgs.gov/scripts/analytics/usgs-analytics.js';
+            if('http:' == document.location.protocol) {
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(usgsAnalytics, s);
+            }
+          })(); 
           ]]></xsl:comment>
+        <xsl:text>&#xa;</xsl:text>
         </script>
       <!-- ** end  PAGE HEADER needs these scripts  ** -->
 
