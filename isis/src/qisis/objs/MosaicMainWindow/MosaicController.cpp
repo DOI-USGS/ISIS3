@@ -180,7 +180,6 @@ namespace Isis {
     foreach (openImage, images) {
       openImage->closeCube();
     }
-
   }
 
 

@@ -54,7 +54,7 @@ namespace Isis {
       bool internalizeToolBarsAndProgress, Directory *directory,
       QWidget *parent) : QWidget(parent) {
     m_projectImageZOrders = NULL;
-    m_projectScrollPos = NULL;
+    m_projectViewTransform = NULL;
     m_directory = directory;
 
     m_mosaicSceneItems = new QList<MosaicSceneItem *>;
@@ -233,8 +233,8 @@ namespace Isis {
     delete m_projectImageZOrders;
     m_projectImageZOrders = NULL;
 
-    delete m_projectScrollPos;
-    m_projectScrollPos = NULL;
+    delete m_projectViewTransform;
+    m_projectViewTransform = NULL;
   }
 
 
@@ -599,17 +599,8 @@ namespace Isis {
         const PvlObject &positionInfo =
             project.findObject("SceneVisiblePosition");
 
-        QByteArray hexValues(positionInfo["ViewTransform"][0].toAscii());
-        QDataStream transformStream(QByteArray::fromHex(hexValues));
-
-        QTransform viewTransform;
-        transformStream >> viewTransform;
-        getView()->setTransform(viewTransform);
-
-        delete m_projectScrollPos;
-        m_projectScrollPos = NULL;
-        m_projectScrollPos = new QPoint(toInt(positionInfo["ScrollPosition"][0]),
-                                        toInt(positionInfo["ScrollPosition"][1]));
+        delete m_projectViewTransform;
+        m_projectViewTransform = new PvlObject(positionInfo);
       }
     }
   }
@@ -1317,19 +1308,30 @@ namespace Isis {
 
     recalcSceneRect();
 
-    if (m_projectScrollPos) {
-      getView()->horizontalScrollBar()->setValue(m_projectScrollPos->x());
-      getView()->verticalScrollBar()->setValue(m_projectScrollPos->y());
+    if (m_projectViewTransform) {
+      PvlObject &positionInfo = *m_projectViewTransform;
+      QByteArray hexValues(positionInfo["ViewTransform"][0].toAscii());
+      QDataStream transformStream(QByteArray::fromHex(hexValues));
 
-      if (!m_projectImageZOrders || m_projectImageZOrders->isEmpty()) {
-        delete m_projectScrollPos;
-        m_projectScrollPos = NULL;
-      }
+      QTransform viewTransform;
+      transformStream >> viewTransform;
+      getView()->setTransform(viewTransform);
+
+      QPoint projectScrollPos(toInt(positionInfo["ScrollPosition"][0]),
+                              toInt(positionInfo["ScrollPosition"][1]));
+        
+      getView()->horizontalScrollBar()->setValue(projectScrollPos.x());
+      getView()->verticalScrollBar()->setValue(projectScrollPos.y());
     }
     else {
       refit();
     }
 
+    if (!m_projectImageZOrders || m_projectImageZOrders->isEmpty()) {
+      delete m_projectViewTransform;
+      m_projectViewTransform = NULL;
+    }
+    
     m_progress->setVisible(false);
     emit cubesChanged();
   }

@@ -313,7 +313,6 @@ namespace Isis {
       ProgressBar *m_progress;
 
       QHash<QString, double> *m_projectImageZOrders;
-      QPoint *m_projectScrollPos;
 
       bool m_blockingSelectionChanged;
       bool m_userToolControl;
@@ -323,6 +322,8 @@ namespace Isis {
 
       double m_currentMinimumFootprintZ;
       double m_currentMaximumFootprintZ;
+      
+      PvlObject *m_projectViewTransform;
   };
 }
 
