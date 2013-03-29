@@ -24,6 +24,7 @@ namespace Isis {
                                              QWidget *parent) : QDialog(parent) {
     m_fileList = NULL;
     m_okButton = NULL;
+    m_qnetTool = qnetTool;
 
     QLabel *listLabel = new QLabel("Select Files:");
 

@@ -25,6 +25,7 @@ namespace Isis {
    */ 
   QnetFixedPointDialog::QnetFixedPointDialog(QnetTool *qnetTool, QString defaultPointId,
                                              QWidget *parent) : QDialog (parent) {
+    m_qnetTool = qnetTool;
     
     m_avg = new QRadioButton("Average Measures");
     m_avg->setChecked(true);

@@ -2802,7 +2802,7 @@ namespace Isis {
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
-        QString sn = m_serialNumberList->SerialNumber((IString) selectedFile);
+        QString sn = m_serialNumberList->SerialNumber(selectedFile);
         m->SetCubeSerialNumber(sn);
         int camIndex =
               m_serialNumberList->FileNameIndex(selectedFile);

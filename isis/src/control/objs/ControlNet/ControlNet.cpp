@@ -1651,6 +1651,17 @@ namespace Isis {
     std::swap(p_cameraList, other.p_cameraList);
     std::swap(p_targetRadii, other.p_targetRadii);
     std::swap(p_invalid, other.p_invalid);
+
+    // points have parent pointers that need updated too...
+    QHashIterator< QString, ControlPoint * > i(*points);
+    while (i.hasNext()) {
+      i.next().value()->parentNetwork = this;
+    }
+
+    QHashIterator< QString, ControlPoint * > i2(*other.points);
+    while (i2.hasNext()) {
+      i2.next().value()->parentNetwork = &other;
+    }
   }
 
 

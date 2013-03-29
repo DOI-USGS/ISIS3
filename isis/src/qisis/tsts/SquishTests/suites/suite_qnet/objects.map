@@ -60,6 +60,7 @@
 :Delete Reference measure?_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Delete Reference measure?'}
 :EditLocked Points.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':EditLocked Points_QMessageBox'}
 :EditLocked Points.editLockPointsListBox_QListWidget	{container=':Set Apriori Point and Constraints.EditLocked Points_QGroupBox' name='editLockPointsListBox' type='QListWidget' visible='1'}
+:EditLocked Points.editLockPointsListBox_QListWidget_2	{container=':Set Apriori Point and Constraints.EditLocked Points_QGroupBox_2' name='editLockPointsListBox' type='QListWidget' visible='1'}
 :EditLocked Points_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='EditLocked Points'}
 :Error.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Error_QMessageBox'}
 :Error_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Error'}
@@ -81,11 +82,13 @@
 :Isis::ViewportMdiSubWindow - I26586032RDR.cub	{type='Isis::ViewportMdiSubWindow' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow' windowTitle?='I26586032RDR.cub*'}
 :Isis::ViewportMdiSubWindow - I27759024RDR.cub	{type='Isis::ViewportMdiSubWindow' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow' windowTitle?='I27759024RDR.cub*'}
 :Latitude Constraints.Latitude Sigma:_QLabel	{container=':Set Apriori Point and Constraints.Latitude Constraints_QGroupBox' name='latSigmaLabel' text='Latitude Sigma:' type='QLabel' visible='1'}
+:Latitude Constraints.Latitude Sigma:_QLabel_2	{container=':Set Apriori Point and Constraints.Latitude Constraints_QGroupBox_2' name='latSigmaLabel' text='Latitude Sigma:' type='QLabel' visible='1'}
 :Left Measure.Edit Lock Measure_QCheckBox	{container=':QnetToolScroll.Left Measure_QGroupBox' text='Edit Lock Measure' type='QCheckBox' unnamed='1' visible='1'}
 :Left Measure_QComboBox	{container=':QnetToolScroll.Left Measure_QGroupBox' type='QComboBox' unnamed='1' visible='1'}
 :Line_QLabel	{container=':qt_tabwidget_stackedwidget_Isis::ImageTab' text='Line' type='QLabel' unnamed='1' visible='1'}
 :Line_QLineEdit	{container=':qt_tabwidget_stackedwidget_Isis::ImageTab' leftWidget=':Line_QLabel' type='QLineEdit' unnamed='1' visible='1'}
 :Longitude Constraints.Longitude Sigma:_QLabel	{container=':Set Apriori Point and Constraints.Longitude Constraints_QGroupBox' name='longSigmaLabel' text='Longitude Sigma:' type='QLabel' visible='1'}
+:Longitude Constraints.Longitude Sigma:_QLabel_2	{container=':Set Apriori Point and Constraints.Longitude Constraints_QGroupBox_2' name='longSigmaLabel' text='Longitude Sigma:' type='QLabel' visible='1'}
 :MdiArea	{occurrence='2' type='QWidget' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :Name_HeaderViewItem	{container=':treeView_QHeaderView' text='Name' type='HeaderViewItem'}
 :Navigator	{type='QDialog' unnamed='1' visible='1' windowTitle='Control Network Navigator'}
@@ -153,6 +156,7 @@
 :QnetToolScroll_QWidget	{container=':QnetTool.QnetToolScroll_QScrollArea' type='QWidget' unnamed='1' visible='1'}
 :QnetTool_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='QnetTool'}
 :Radius Constraints.Radius Sigma:_QLabel	{container=':Set Apriori Point and Constraints.Radius Constraints_QGroupBox' name='radiusSigmaLabel' text='Radius Sigma:' type='QLabel' visible='1'}
+:Radius Constraints.Radius Sigma:_QLabel_2	{container=':Set Apriori Point and Constraints.Radius Constraints_QGroupBox_2' name='radiusSigmaLabel' text='Radius Sigma:' type='QLabel' visible='1'}
 :Right Measure.Edit Lock Measure_QCheckBox	{container=':QnetToolScroll.Right Measure_QGroupBox' text='Edit Lock Measure' type='QCheckBox' unnamed='1' visible='1'}
 :Right Measure.Ignore Measure_QCheckBox	{container=':QnetToolScroll.Right Measure_QGroupBox' text='Ignore Measure' type='QCheckBox' unnamed='1' visible='1'}
 :Right Measure_QComboBox	{container=':QnetToolScroll.Right Measure_QGroupBox' type='QComboBox' unnamed='1' visible='1'}
@@ -181,11 +185,18 @@
 :Select a registration template.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Select a registration template_QFileDialog'}
 :Select a registration template_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Select a registration template'}
 :Set Apriori Point and Constraints.Close_QPushButton	{name='closeButton' text='Close' type='QPushButton' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Close_QPushButton_2	{name='closeButton' text='Close' type='QPushButton' visible='1' window=':Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog'}
 :Set Apriori Point and Constraints.EditLocked Points_QGroupBox	{name='editLockPointsGroupBox' title='EditLocked Points' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.EditLocked Points_QGroupBox_2	{name='editLockPointsGroupBox' title='EditLocked Points' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog'}
 :Set Apriori Point and Constraints.Latitude Constraints_QGroupBox	{name='latitudeConstraintsGroupBox' title='Latitude Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Latitude Constraints_QGroupBox_2	{name='latitudeConstraintsGroupBox' title='Latitude Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog'}
 :Set Apriori Point and Constraints.Longitude Constraints_QGroupBox	{name='longitudeConstraintsGroupBox' title='Longitude Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Longitude Constraints_QGroupBox_2	{name='longitudeConstraintsGroupBox' title='Longitude Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog'}
 :Set Apriori Point and Constraints.Radius Constraints_QGroupBox	{name='radiusConstraintsGroupBox' title='Radius Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Radius Constraints_QGroupBox_2	{name='radiusConstraintsGroupBox' title='Radius Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog'}
 :Set Apriori Point and Constraints.Set Apriori_QPushButton	{name='setAprioriButton' text='Set Apriori' type='QPushButton' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Set Apriori_QPushButton_2	{name='setAprioriButton' text='Set Apriori' type='QPushButton' visible='1' window=':Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog	{name='QnetSetAprioriDialog' type='Isis::QnetSetAprioriDialog' visible='1' windowTitle='Set Apriori Point and Constraints'}
 :Set Apriori Point and Constraints_QnetSetAprioriDialog	{name='QnetSetAprioriDialog' type='QnetSetAprioriDialog' visible='1' windowTitle='Set Apriori Point and Constraints'}
 :VP1	{aboveWidget=':QnetToolScroll.Zoom Factor: 1_QLabel' container=':QnetTool.QnetToolScroll_QScrollArea' type='Isis::ChipViewport' unnamed='1' visible='1'}
 :VP2	{aboveWidget=':QnetToolScroll.Zoom Factor: 1_QLabel_2' container=':QnetTool.QnetToolScroll_QScrollArea' type='Isis::ChipViewport' unnamed='1' visible='1'}
@@ -214,7 +225,9 @@
 :grnd1_QModelIndex	{container=':Navigator_List' text='grnd1' type='QModelIndex'}
 :grnd2_QModelIndex	{container=':Navigator_List' text='grnd2' type='QModelIndex'}
 :latSigmaEdit_QLineEdit	{buddy=':Latitude Constraints.Latitude Sigma:_QLabel' name='latSigmaEdit' type='QLineEdit' visible='1'}
+:latSigmaEdit_QLineEdit_2	{buddy=':Latitude Constraints.Latitude Sigma:_QLabel_2' name='latSigmaEdit' type='QLineEdit' visible='1'}
 :lonSigmaEdit_QLineEdit	{buddy=':Longitude Constraints.Longitude Sigma:_QLabel' name='lonSigmaEdit' type='QLineEdit' visible='1'}
+:lonSigmaEdit_QLineEdit_2	{buddy=':Longitude Constraints.Longitude Sigma:_QLabel_2' name='lonSigmaEdit' type='QLineEdit' visible='1'}
 :qnet.Exit_QToolButton	{text='Exit' type='QToolButton' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet.File_QMenu	{title='File' type='QMenu' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet.File_QMenu_2	{title='File' type='QMenu' unnamed='1' visible='0' window=':qnet_Isis::ViewportMainWindow'}
@@ -241,6 +254,7 @@
 :qnet_Isis::MdiCubeViewport	{occurrence='7' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet_Isis::ViewportMainWindow	{name='MainWindow' type='Isis::ViewportMainWindow' visible='1' windowTitle='qnet'}
 :qnet_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
+:qnet_QMenuBar_2	{occurrence='2' type='QMenuBar' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet_QToolButton	{occurrence='13' type='QToolButton' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet_QToolButton_2	{occurrence='8' type='QToolButton' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet_QToolButton_3	{occurrence='12' type='QToolButton' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
@@ -250,6 +264,7 @@
 :qt_tabwidget_stackedwidget_Isis::ImageTab	{container=':Find Latitude/Longitude Coordinate.qt_tabwidget_stackedwidget_QStackedWidget' type='Isis::ImageTab' unnamed='1' visible='1'}
 :qt_tabwidget_stackedwidget_Isis::QnetPointTypeFilter	{container=':Control Network Navigator.qt_tabwidget_stackedwidget_QStackedWidget' type='Isis::QnetPointTypeFilter' unnamed='1' visible='1'}
 :radiusSigmaEdit_QLineEdit	{buddy=':Radius Constraints.Radius Sigma:_QLabel' name='radiusSigmaEdit' type='QLineEdit' visible='1'}
+:radiusSigmaEdit_QLineEdit_2	{buddy=':Radius Constraints.Radius Sigma:_QLabel_2' name='radiusSigmaEdit' type='QLineEdit' visible='1'}
 :splitter.frame_QFrame	{container=':Select a list of cubes.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.frame_QFrame_2	{container=':Select a control network.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.frame_QFrame_3	{container=':Open ground source.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
