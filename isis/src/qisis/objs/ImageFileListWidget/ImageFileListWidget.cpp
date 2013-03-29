@@ -70,13 +70,15 @@ namespace Isis {
         IString key = ImageTreeWidgetItem::treeColumnToString(col) + "Visible";
         key = key.Convert(" ", '_');
 
-        bool visible = toInt(pvl[key.ToQt()][0]);
+        if (pvl.hasKeyword(key.ToQt())) {
+          bool visible = toBool(pvl[key.ToQt()][0]);
 
-        if(visible) {
-          m_tree->showColumn(col);
-        }
-        else {
-          m_tree->hideColumn(col);
+          if(visible) {
+            m_tree->showColumn(col);
+          }
+          else {
+            m_tree->hideColumn(col);
+          }
         }
 
         col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
@@ -282,7 +284,6 @@ namespace Isis {
 
     QList<QTreeWidgetItem *> selected = m_tree->selectedItems();
 
-
     ImageList alreadyViewedImages = m_tree->imagesInView();
 
 
@@ -365,6 +366,9 @@ namespace Isis {
       m_tree->addTopLevelItem(group);
     }
     restoreExpandedStates(expandedStates, m_tree->invisibleRootItem());
+    
+    if (selectedGroup)
+      selectedGroup->setSelected(true);
 
     m_tree->refit();
     m_progress->setVisible(false);

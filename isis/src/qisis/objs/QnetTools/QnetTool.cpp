@@ -3457,7 +3457,7 @@ namespace Isis {
       QScopedPointer<Cube> newGroundCube(new Cube(ground, "r"));
       QScopedPointer<UniversalGroundMap> newGroundGmap(new UniversalGroundMap(*newGroundCube));
 
-      m_groundFile = FileName(m_groundCube->fileName()).name();
+      m_groundFile = FileName(newGroundCube->fileName()).name();
       m_groundCube.reset(newGroundCube.take());
       m_groundGmap.reset(newGroundGmap.take());
 
@@ -3603,8 +3603,8 @@ namespace Isis {
       try {
         QScopedPointer<Cube> newDemCube(new Cube(demFile, "r"));
 
-        m_demCube.reset(newDemCube.take());
         m_demFile = FileName(newDemCube->fileName()).name();
+        m_demCube.reset(newDemCube.take());
       }
       catch (IException &e) {
         QMessageBox::critical(m_qnetTool, "Error", e.toString());

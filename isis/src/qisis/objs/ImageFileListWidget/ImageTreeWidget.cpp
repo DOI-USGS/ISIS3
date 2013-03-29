@@ -41,11 +41,16 @@ namespace Isis {
 
     setHeaderLabels(header);
 
-//     hideColumn(ImageTreeWidgetItem::ImageColumn);
-//     hideColumn(ImageTreeWidgetItem::LabelColumn);
-//     hideColumn(ImageTreeWidgetItem::ResolutionColumn);
-//     hideColumn(ImageTreeWidgetItem::EmissionAngleColumn);
-//     hideColumn(ImageTreeWidgetItem::IncidenceAngleColumn);
+    hideColumn(ImageTreeWidgetItem::ImageColumn);
+    hideColumn(ImageTreeWidgetItem::LabelColumn);
+    hideColumn(ImageTreeWidgetItem::ResolutionColumn);
+    hideColumn(ImageTreeWidgetItem::EmissionAngleColumn);
+    hideColumn(ImageTreeWidgetItem::IncidenceAngleColumn);
+    hideColumn(ImageTreeWidgetItem::PhaseAngleColumn);
+    hideColumn(ImageTreeWidgetItem::AspectRatioColumn);
+    hideColumn(ImageTreeWidgetItem::SampleResolutionColumn);
+    hideColumn(ImageTreeWidgetItem::LineResolutionColumn);
+    hideColumn(ImageTreeWidgetItem::NorthAzimuthColumn);
     hideColumn(ImageTreeWidgetItem::BlankColumn);
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
