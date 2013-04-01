@@ -14,7 +14,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
-	cnet=$(INPUT)/Ames_5-ImageLSTest_USGS_combined.net \
+	cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
 	onet=$(OUTPUT)/apollo_specialK_out.net \
 	radius=yes \
 	twist=yes \
@@ -30,7 +30,9 @@ commands:
 	ckdegree=2 \
 	cksolvedegree=2 \
 	camsolve=angles \
-	spsolve=position | grep -v "100% Processed" | \
+	spsolve=position \
+	spacecraft_position_sigma=1000.0 \
+	camera_angles_sigma=2.0 | grep -v "100% Processed" | \
 	grep -v "jigsaw" > apollo_specialk_outLog.txt; \
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
@@ -52,7 +54,7 @@ commands:
 	$(RM) apollo_specialk_outLog.txt > /dev/null;
 	$(RM) residuals.csv > /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis  \
-	cnet=$(INPUT)/Ames_5-ImageLSTest_USGS_combined.net \
+	cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
 	onet=$(OUTPUT)/apollo_cholmod_out.net \
 	radius=yes \
 	twist=yes \
@@ -67,7 +69,9 @@ commands:
 	ckdegree=2 \
 	cksolvedegree=2 \
 	camsolve=angles \
-	spsolve=position | grep -v "100% Processed" | \
+	spsolve=position \
+	spacecraft_position_sigma=1000.0 \
+	camera_angles_sigma=2.0 | grep -v "100% Processed" | \
 	grep -v "jigsaw" > apollo_cholmod_outLog.txt;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \

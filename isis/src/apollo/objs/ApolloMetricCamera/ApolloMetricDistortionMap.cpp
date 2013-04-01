@@ -38,13 +38,14 @@ namespace Isis {
    * 
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added documentation.
+   *   @history 2013-03-18 Debbie A. Cook - Added flag to flip focal plane z axis
    */
   ApolloMetricDistortionMap::ApolloMetricDistortionMap(Camera *parent,
                                                        double xp, double yp,
                                                        double k1, double k2,
                                                        double k3, double j1,
                                                        double j2, double t0) :
-                                                       CameraDistortionMap(parent) {
+                                                       CameraDistortionMap(parent, -1.0) {
     p_xp = xp;
     p_yp = yp;
     p_k1 = k1;

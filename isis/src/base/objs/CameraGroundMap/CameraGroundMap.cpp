@@ -91,7 +91,11 @@ namespace Isis {
   void CameraGroundMap::LookCtoFocalPlaneXY() {
     double lookC[3];
     p_camera->Sensor::LookDirection(lookC);
-    double scale = p_camera->FocalLength() / lookC[2];
+
+    //Get the fl as the z coordinate to handle instruments looking down the -z axis 2013-02-22.
+    double fl = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
+    double scale = fl / lookC[2];
+
     p_focalPlaneX = lookC[0] * scale;
     p_focalPlaneY = lookC[1] * scale;
   }

@@ -166,14 +166,16 @@ namespace Isis {
    *
    * @return if the conversion was successful
    * @see SetDistortion
+   *
+   * @internal
+   *   @history 2013-02-22 Debbie A. Cook - Removed signFactor since the z direction is now
+   *                         handled in CameraGroundMap.
    */
   bool LoHighDistortionMap::SetUndistortedFocalPlane(const double ux,
       const double uy) {
-    // Adjust for Z direction
-    double signFactor = fabs(p_zDirection) / p_zDirection;
 
-    p_undistortedFocalPlaneX = ux * signFactor;
-    p_undistortedFocalPlaneY = uy * signFactor;
+    p_undistortedFocalPlaneX = ux;
+    p_undistortedFocalPlaneY = uy;
 
     // Translate the distorted x/y coordinate to be relative to the
     // distortion point of symmetry
