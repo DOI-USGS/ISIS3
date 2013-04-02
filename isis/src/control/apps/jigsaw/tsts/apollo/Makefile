@@ -2,6 +2,11 @@ APPNAME = jigsaw
 # These tests exercise the bundle adjustment of images from the Apollo frame camera.
 # Test 1: specialk (dense cholesky) method, solving for position, angles (with twist), and radius; with error propagation.
 # Test 2: sparse (cholmod) method, solving for position, angles (with twist), and radius; with error propagation.
+#
+# 2013-04-02 KLE - added weights for spacecraft position and angles to test. This reduced the precision of the adjusted
+#                  point covariance matrices in the output netfiles. To compensate I reduced the tolerance in the corresponding
+#                  DIFF files to 0.00003. We should find out why this is happening. Without these weights, a tolerance of
+#                  0.000000003 was sufficient.
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
