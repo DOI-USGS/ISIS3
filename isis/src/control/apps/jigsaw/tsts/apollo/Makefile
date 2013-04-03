@@ -6,7 +6,11 @@ APPNAME = jigsaw
 # 2013-04-02 KLE - added weights for spacecraft position and angles to test. This reduced the precision of the adjusted
 #                  point covariance matrices in the output netfiles. To compensate I reduced the tolerance in the corresponding
 #                  DIFF files to 0.00003. We should find out why this is happening. Without these weights, a tolerance of
-#                  0.000000003 was sufficient.
+#                  0.000000003 was sufficient. 
+# 2013-04-02 DAC - The values in bundleout.txt were working with 5 places across all systems.  With the above change
+#                  they are only good to 4 places now.  Also added tolerance for AprioriX in the control nets and changed the 
+#                  covariance tolerance  to 0.00006 for the specialK test.
+#
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -41,7 +45,7 @@ commands:
 	grep -v "jigsaw" > apollo_specialk_outLog.txt; \
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/apollo_specialK_bundleout.txt;
 	cat apollo_specialk_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
@@ -80,7 +84,7 @@ commands:
 	grep -v "jigsaw" > apollo_cholmod_outLog.txt;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/apollo_cholmod_bundleout.txt;
 	cat apollo_cholmod_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
