@@ -31,6 +31,7 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed
    *                          Apollo namespace wrap inside Isis namespace. Added
    *                          Isis Disclaimer to files.
+   *   @history 2013-03-18 Debbie A. Cook - Added flag to flip focal plane z axis
    */
   class ApolloMetricDistortionMap : public CameraDistortionMap {
     public:

@@ -63,8 +63,12 @@ namespace Isis {
    *                          defined to the image edges
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed Lo
    *                          namespace wrap.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2013-02-22 Debbie A. Cook - Updated SetUndistortedFocalPlane method to reflect 
+   *                          correction made to LookCtoFocalPlaneXY in CameraGroundMap.   The 
+   *                          adjustment for the z direction occurs in CameraGroundMap and is no 
+   *                          needed here.  Fixes Mantis ticket #1524
    */
   class LoMediumDistortionMap : public CameraDistortionMap {
     public:

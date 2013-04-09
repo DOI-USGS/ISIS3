@@ -5,7 +5,7 @@ include $(ISISROOT)/make/isismake.tsts
 # First, test a successful run. Then test errors with bad db files.
 commands:
 	export INPUT="$(INPUT)"; \
-	$(APPNAME) TO=$(OUTPUT)/crism_kernels.????.db.pvl recondir='$$mro/kernels/ck' \
+	$(APPNAME) TO=$(OUTPUT)/crism_kernels.db.pvl recondir='$$mro/kernels/ck' \
 	  reconfilter=mro_crm_psp_??????_??????.bc \
 	  sclk='$$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc' \
 	  lsk='$$base/kernels/lsk/naif????.tls' \
@@ -50,3 +50,5 @@ commands:
 	  lsk='$$base/kernels/lsk/naif????.tls' \
 	  extra='$$INPUT/kernels_nokeyword.db' >& $(OUTPUT)/kernels_nokeyword.txt || true;
       
+	$(SED) 's+mro/kernels/sclk/MRO_SCLKSCET.*tsc+mro/kernels/sclk/MRO_SCLKSCET.tsc+g' $(OUTPUT)/crism_kernels.db.pvl > $(OUTPUT)/crism_kernels.0001.db.pvl;
+	rm $(OUTPUT)/crism_kernels.db.pvl;

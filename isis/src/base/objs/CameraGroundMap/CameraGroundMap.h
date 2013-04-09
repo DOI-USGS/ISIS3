@@ -69,6 +69,8 @@ namespace Isis {
    *                       coding standards. References #972.
    *  @history 2012-10-10 Debbie A. Cook Modified to use new Target class.
    *                        References Mantis ticket #775 and #1114.
+   *  @history 2013-02-22 Debbie A. Cook Fixed LookCtoFocalPlaneXY method to properly handle
+   *                        instruments with a look direction along the negative z axis.  Fixes Mantis ticket #1524
    *
    */
   class CameraGroundMap {
