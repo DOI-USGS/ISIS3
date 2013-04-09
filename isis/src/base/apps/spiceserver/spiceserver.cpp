@@ -528,37 +528,37 @@ void parseParameters(QDomElement parametersElement) {
     if (element.tagName() == "cksmithed") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckSmithed = (attribute.value() == "yes");
+      g_ckSmithed = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "ckrecon") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckRecon = (attribute.value() == "yes");
+      g_ckRecon = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "ckpredicted") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckPredicted = (attribute.value() == "yes");
+      g_ckPredicted = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "cknadir") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckNadir = (attribute.value() == "yes");
+      g_ckNadir = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spksmithed") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_spkSmithed = (attribute.value() == "yes");
+      g_spkSmithed = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spkrecon") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_spkRecon = (attribute.value() == "yes");
+      g_spkRecon = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spkpredicted") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_spkPredicted = (attribute.value() == "yes");
+      g_spkPredicted = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "shape") {
       QDomNode node = element.attributes().namedItem("value");
