@@ -48,7 +48,6 @@ namespace Isis {
    * @author 2012-07-30 Ken Edmundson
    *
    * @internal
-   *  @history
    */
   class PlaneShape : public Isis::ShapeModel {
     public:

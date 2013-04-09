@@ -21,9 +21,9 @@ namespace Isis {
   /**
    * @brief 
    *
+   * Adapted from ImageList
    *
-   *
-   * @author 2012-09-01 Tracie Sucharski - Adapted from ImageList
+   * @author 2012-09-01 Tracie Sucharski 
    *
    * @internal
    */
