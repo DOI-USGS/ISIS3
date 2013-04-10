@@ -249,7 +249,7 @@ namespace Isis {
     }
 
     // failure
-    shape->setHasIntersection(false);
+    shape->clearSurfacePoint();
     return false;
   }
 
@@ -720,6 +720,7 @@ namespace Isis {
    * and min/max resolution
    */
   void Camera::ringRangeResolution() {
+    // TODO Add test to make sure we have a ring plane image **
 
     // Have we already done this
     if (p_ringRangeComputed) return;
@@ -1121,6 +1122,12 @@ namespace Isis {
    * @param pvl Pvl to write mapping group to
    */
   void Camera::basicRingMapping(Pvl &pvl) {
+    if (target()->shape()->name() != "Plane") { // If we get here and we don't have a plane, throw an error
+      IString msg = "A ring plane projection has been requested on an image whose shape is not a ring plane.  ";
+      msg += "Rerun spiceinit with shape=RINGPLANE.  ";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     PvlGroup map("Mapping");
     map += PvlKeyword("TargetName", target()->name());
 

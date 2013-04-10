@@ -26,10 +26,11 @@ void IsisMain() {
 
   // Get the list of cubes to mosaic
   list.read(FileName(ui.GetFileName("FROMLIST")));
-  if(list.size() < 1) {
-    QString msg = "The list file [" + ui.GetFileName("FROMLIST") +"does not contain any data";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
+  // Redundant test.  Already checked in FileList
+  // if(list.size() < 1) {
+  //   QString msg = "The list file [" + ui.GetFileName("FROMLIST") +"does not contain any data";
+  //   throw IException(IException::User, msg, _FILEINFO_);
+  // }
 
   fstream os;
   bool olistFlag = false;

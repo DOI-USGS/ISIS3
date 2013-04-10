@@ -632,7 +632,7 @@
         <brief>Warp algorithm</brief>
         <description>
           Used to choose the warping algorithm, either the forward patch algorithm or the reverse patch 
-          algorithm.   The default is to automattcally choose the algorithm based on the input camera type 
+          algorithm.   The default is to automatically choose the algorithm based on the input camera type 
           (e.g., framing, linescan, pushframe).
         </description>
         <list>
