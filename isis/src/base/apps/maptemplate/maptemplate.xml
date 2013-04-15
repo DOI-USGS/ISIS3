@@ -7,21 +7,24 @@
   </brief>
 
   <description>
-      This program creates a map group template for map projections.  Choose a projection and complete 
-      the highlighted fields in the projection parameters area.  An exsiting target definition file can be used
-      or the user can input target information.  If a target name is specified and no value is entered for radius,
-      the system radii will be used.  The helper button located by the radial fields will display the system radii
-      for the chosen target in the log area.  Using the RNGOPT parameter, the user can specify whether they 
-      want no ground range values put into the map file, or if they want the application to calculate them 
-      using the FROMLIST files,  or whether they want to enter the values themselves.  There is a helper 
-      button next to the RNGOPT parameter that will fill in the range parameters with the calculated values.
-      The RESOPT parameter works very similar to the RNGOPT parameter.  The user can enter a resolution 
-      in pixel resolution(MPP) or scale(PPD).  The resolution can also be calculated using the FROMLIST.  
-      If the calculation option is chosen, the user can choose to calculate the highest resolution, the lowest 
-      resolution, or an average resolution.  All the calculated values will be in pixel resolution which is meters 
-      per pixel.  There is also a helper button on this option that will automatically fill in the resolution value in 
-      the gui.  The output templates can be used in applications that use projections, such as cam2map, map2map,
-      mapsize, skymap, etc.  The output file will automatically have the '.map' extension appended to the filename.
+      This program creates a map group template for map projections.  Choose a projection and
+      complete the highlighted fields in the projection parameters area.  An exsiting target
+      definition file can be used or the user can input target information.  If a target name
+      is specified and no value is entered for radius, the system radii will be used.  The Helper
+      button, located by the radial fields, will display the system radii for the chosen target
+      in the log area.  Using the RNGOPT parameter, the user can specify whether they want no
+      ground range values put into the map file, or if they want the application to calculate
+      them using the FROMLIST files,  or whether they want to enter the values themselves.
+      There is a helper button next to the RNGOPT parameter that will fill in the range
+      parameters with the calculated values. The RESOPT parameter works very similar to the
+      RNGOPT parameter.  The user can enter a resolution in pixel resolution(MPP) or scale(PPD).
+      The resolution can also be calculated using the FROMLIST. If the calculation option is
+      chosen, the user can choose to calculate the highest resolution, the lowest resolution,
+      or an average resolution.  All the calculated values will be in pixel resolution which is
+      meters per pixel.  There is also a helper button on this option that will automatically
+      fill in the resolution value in the gui.  The output templates can be used in applications
+      that use projections, such as cam2map, map2map, mapsize, skymap, etc.  The output file will 
+      automatically have the '.map' extension appended to the filename.
   </description>
   
   <history>
@@ -47,6 +50,9 @@
     <change name="Steven Lambright" date="2011-12-19">
       Updated documentation as per Ella Lee's recommendations in preparation for
       the January 2012 release.
+    </change>
+    <change name="Kimberly Oyama" date="2013-04-03">
+      Added support for Point Perspective Projection. Fixes #212.
     </change>
   </history>
 
@@ -149,6 +155,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="MERCATOR">
@@ -156,7 +163,7 @@
               Mercator Projection
             </brief>
             <description>
-              Create a maptemplate for a mercator projection.
+              Create a maptemplate for a Mercator projection.
             </description>
             <inclusions>
               <item>CLON</item>
@@ -169,6 +176,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="TRANSVERSEMERCATOR">
@@ -176,7 +184,7 @@
               Transverse Mercator Projection
             </brief>
             <description>
-              Create a maptemplate for a transverse mercator projection.
+              Create a maptemplate for a transverse Mercator projection.
             </description>
             <inclusions>
               <item>CLON</item>
@@ -189,6 +197,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="ORTHOGRAPHIC">
@@ -209,6 +218,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="POLARSTEREOGRAPHIC">
@@ -229,6 +239,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="SIMPLECYLINDRICAL">
@@ -249,6 +260,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="EQUIRECTANGULAR">
@@ -269,6 +281,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="LAMBERTCONFORMAL">
@@ -276,7 +289,7 @@
               Lambert Conformal Projection
             </brief>
             <description>
-              Create a maptemplate for a lambert conformal projection.
+              Create a maptemplate for a Lambert conformal projection.
             </description>
             <inclusions>
               <item>CLON</item>
@@ -289,6 +302,7 @@
               <item>PROT</item>
               <item>PLAT</item>
               <item>PLON</item>
+              <item>DIST</item>
             </exclusions>
           </option>
           <option value="OBLIQUECYLINDRICAL">
@@ -309,6 +323,28 @@
               <item>SCALEFACTOR</item>
               <item>PAR1</item>
               <item>PAR2</item>
+              <item>DIST</item>
+            </exclusions>
+          </option>
+          <option value="POINTPERSPECTIVE">
+            <brief>
+              Point Perspective Projection
+            </brief>
+            <description>
+              Create a maptemplate for an point perspective projection.
+            </description>
+            <inclusions>
+              <item>CLON</item>
+              <item>CLAT</item>
+              <item>DIST</item>
+            </inclusions>
+            <exclusions>
+              <item>SCALEFACTOR</item>
+              <item>PAR1</item>
+              <item>PAR2</item>
+              <item>PROT</item>
+              <item>PLAT</item>
+              <item>PLON</item>
             </exclusions>
           </option>
         </list>
@@ -393,6 +429,16 @@
         </brief>
         <description>
           The pole rotation to use for the mapping group.
+        </description>
+      </parameter>
+
+      <parameter name="DIST">
+        <type>double</type>
+        <brief>
+          Distance from the center of the Target
+        </brief>
+        <description>
+          Distance from the center of the Target, should be larger than the target radius.
         </description>
       </parameter>
     </group>
@@ -724,7 +770,7 @@
           Minimum Latitude
         </brief>
         <description>
-          The mimimum latitude value in the mapping template will be set to this user entered value.
+          The minimum latitude value in the mapping template will be set to this user entered value.
         </description>
         <lessThan><item>MAXLAT</item></lessThan>
         <minimum inclusive="yes">-90</minimum>
@@ -937,7 +983,7 @@ End
     <example>
       <brief> Lambert Conformal Map Template</brief>
       <description>
-        This example shows the contents of a PVL text file for a lambert
+        This example shows the contents of a PVL text file for a Lambert
         conformal map projection based on user selected options.  The output
         file, projection type, center latitude, center longitude, first and
         second standard parallel, target option, and target name are entered.

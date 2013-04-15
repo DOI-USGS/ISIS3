@@ -102,6 +102,7 @@ void helperButtonLoadMap() {
   ui.Clear("PLAT");
   ui.Clear("PLON");
   ui.Clear("PROT");
+  ui.Clear("DIST");
 
   if(t.hasKeyword("ProjectionName")) {
     QString projIn = (QString)t["ProjectionName"];
@@ -148,6 +149,11 @@ void helperButtonLoadMap() {
     double pRotIn = t["PoleRotation"];
     ui.Clear("PROT");
     ui.PutDouble("PROT", pRotIn);
+  }
+  if(t.hasKeyword("Distance")) {
+    double distIn = t["Distance"];
+    ui.Clear("DIST");
+    ui.PutDouble("DIST", distIn);
   }
 
 //Target Parameters stuff
@@ -366,6 +372,7 @@ void addProject(PvlGroup &mapping) {
   projLUT ["EQUIRECTANGULAR"] = "Equirectangular";
   projLUT ["LAMBERTCONFORMAL"] = "LambertConformal";
   projLUT ["OBLIQUECYLINDRICAL"] = "ObliqueCylindrical";
+  projLUT ["POINTPERSPECTIVE"] = "PointPerspective";
 
 // Add Projection keywords to the mappping PVL
   mapping += PvlKeyword("ProjectionName", projLUT[projName]);
@@ -400,6 +407,10 @@ void addProject(PvlGroup &mapping) {
   if(ui.WasEntered("PROT")) {
     double prot = ui.GetDouble("PROT");
     mapping += PvlKeyword("PoleRotation", toString(prot));
+  }
+  if(ui.WasEntered("DIST")) {
+    double dist = ui.GetDouble("DIST");
+    mapping += PvlKeyword("Distance", toString(dist));
   }
 }
 
