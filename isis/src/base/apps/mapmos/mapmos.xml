@@ -15,11 +15,14 @@
     }
     </style></head><body> <font size="2" face="Verdana">
     <p>
-      This program allows the user to create a mosaic using map projected cubes.  An individual cube can be placed in a pre-existing mosaic.  
-        An option exists to create the mosaic by allowing the user to specify the latitude/longitude range for the output mosaic.
-        Note that the input cube and mosaic must have the same ProjectionName, PixelResolution, EquatorialRadius, PolarRadius, LatitudeType, 
-        and LongitudeDirection as well as projection specific keywords (e.g., CenterLatitude, CenterLongitude). This application regardless of any 
-        priority and flags set, will always place an input pixel on a NULL mosaic  pixel. This application  also has the ability to track the pixel origin. 
+      This program allows the user to create a mosaic using map projected cubes.  An individual
+      cube can be placed in a pre-existing mosaic. An option exists to create the mosaic by
+      allowing the user to specify the latitude/longitude range for the output mosaic.  Note that
+      the input cube and mosaic must have the same ProjectionName, PixelResolution,
+      EquatorialRadius, PolarRadius, LatitudeType, and LongitudeDirection as well as projection
+      specific keywords (e.g., CenterLatitude, CenterLongitude). This application regardless of any
+      priority and flags set, will always place an input pixel on a NULL mosaic  pixel. This
+      application  also has the ability to track the pixel origin.
     </p>
     <p>There are four different ways/priorities (input, mosaic, band, average) 
     for how the input image has to be placed on the mosaic.</p>
@@ -28,13 +31,15 @@
    
    <p>Priority <b>Mosaic</b> will place the input image beneath the mosaic.</p>
    
-   <p>Priority <b>Band</b> will place the input image on the mosaic based on the "Lessser" or "Greater" criteria 
-   between user defined band in the input and the mosaic images.</p>
+   <p>Priority <b>Band</b> will place the input image on the mosaic based on the "Lessser"
+   or "Greater" criteria between user defined band in the input and the mosaic images.</p>
    
-   <p>Priority <b>Average</b> will average the valid pixels in the input and mosaic images. For each mosaic band, a count band is maintained. The count band 
-   keeps track of the number of images involved in the averaging of the dn value for each pixel in the mosaic. Choosing this priority will cause the mosaic to have twice the number of 
-   bands of the input image, with a count band for each band. <b>Hence the file size of the mosaic is doubled due to the count band.</b>
-   </p>
+   <p>Priority <b>Average</b> will average the valid pixels in the input and mosaic images. For
+   each mosaic band, a count band is maintained. The count band keeps track of the number of
+   images involved in the averaging of the dn value for each pixel in the mosaic. Choosing this
+   priority will cause the mosaic to have twice the number of bands of the input image, with a
+   count band for each band. <b>Hence the file size of the mosaic is doubled due to the count
+   band.</b> </p>
    
    <p>In case of special pixels and the special pixel flags being enabled, the details 
    for each priority is described below.
@@ -245,6 +250,11 @@
       This has been fixed so that there is an entry in the log file for every image placement.
       References #976.
     </change>
+    <change name="Kimberly Oyama" date="2013-04-15">
+      Made the default for the TYPE parameter BANDNUMBER because, when running the GUI and
+      PRIORITY=BAND, a blank "TYPE=" was added to the command line string. This no longer
+      occurs, there is either no TYPE parameter or it is set to "TYPE=BANDNUMBER". Fixes #1549.
+    </change>
   </history>
 
   <oldName>
@@ -365,7 +375,7 @@
         <type>string</type>
         <default>
           <item>
-            BANDNUM
+            BANDNUMBER
           </item>
         </default>
         <brief>Indicate the Band name or number to be used for  comparison</brief>

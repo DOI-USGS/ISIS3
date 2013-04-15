@@ -1311,28 +1311,22 @@ namespace Isis {
     int iBandIndex = 0;
 
     Pvl cPvlLabel;
-
-    if (inputFile)
+    int bandCount = 0;
+    
+    if (inputFile) {
       cPvlLabel = *(InputCubes[0]->label());
-    else
-      cPvlLabel = *(OutputCubes[0]->label());
-
-    //if non-zero integer, must be original band #, 1 based
-    if (m_bandPriorityBandNumber) {
-      PvlKeyword cKeyOrigBand;
-      if (cPvlLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword("OriginalBand")) {
-        cKeyOrigBand = cPvlLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("OriginalBand");
-      }
-      int iSize = cKeyOrigBand.size();
-      QString buff = toString(m_bandPriorityBandNumber);
-      for (int i = 0; i < iSize; i++) {
-        if (buff == cKeyOrigBand[i]) {
-          iBandIndex = i + 1; //1 based get band index
-          bFound = true;
-          break;
-        }
-      }
+      bandCount = InputCubes[0]->bandCount();
     }
+    else {
+      cPvlLabel = *(OutputCubes[0]->label());
+      bandCount = OutputCubes[0]->bandCount();
+    }
+
+    if (m_bandPriorityBandNumber > 0 && m_bandPriorityBandNumber <= bandCount) {
+      bFound = true;
+      iBandIndex = m_bandPriorityBandNumber - 1; 
+    }
+      
     //key name
     else {
       PvlKeyword cKeyName;
@@ -1342,7 +1336,7 @@ namespace Isis {
       int iSize = cKeyName.size();
       for (int i = 0; i < iSize; i++) {
         if (m_bandPriorityKeyValue.toUpper() == cKeyName[i].toUpper()) {
-          iBandIndex = i + 1; //1 based get key value index
+          iBandIndex = i; //1 based get key value index
           bFound = true;
           break;
         }
