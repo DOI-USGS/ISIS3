@@ -2,12 +2,9 @@ include $(ISISROOT)/make/isismake.tsts
 
 .ONESHELL:
 
-SQUISHBIN=/home/slambright/Squish/bin
+SQUISHBIN=/opt/Squish/bin
 
 commands: configsquish
-	if [ -f "$$HOME/.squish/ver1/server.ini" ]; then
-	  $(RM) "$$HOME/.squish/ver1/server.ini"
-	fi
 	$(SQUISHBIN)/squishserver >& /dev/null & 
 	$(SQUISHBIN)/squishserver --config addAppPath '$(ISISROOT)/bin' >& /dev/null
 	$(SQUISHBIN)/squishrunner --config setCursorAnimation off >& /dev/null
@@ -41,9 +38,12 @@ commands: configsquish
 	fi
 
 configsquish:
-	if [ ! -d input ]; then \
-	  ln -s "$(INPUT)";     \
-	fi                      
+	if [ ! -d input ]; then
+	  ln -s "$(INPUT)";
+	fi    
+	if [ -f "$$HOME/.squish/ver1/server.ini" ]; then
+	  $(RM) "$$HOME/.squish/ver1/server.ini"
+	fi                  
 	$(SQUISHBIN)/squishserver >& /dev/null & 
 	$(SQUISHBIN)/squishserver --config addAppPath '$(ISISROOT)/bin' >& /dev/null
 	$(SQUISHBIN)/squishrunner --config setCursorAnimation off >& /dev/null
