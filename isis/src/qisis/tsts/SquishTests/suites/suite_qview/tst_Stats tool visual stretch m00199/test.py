@@ -47,11 +47,15 @@ def main():
     test.vp("stretchedDnDisplay")
     
     clickButton(waitForObject(":qview.Spatial Plot Tool_QToolButton"))
-    mouseDrag(waitForObject(":viewport1_contents"), 63, 94, 250, 0, 1, Qt.LeftButton)
+    mouseDrag(waitForObject(":viewport1_contents"), 388, 136, -338, 21, 1, Qt.LeftButton)
     test.vp("spatialPlot")
+
     sendEvent("QCloseEvent", waitForObject(":qview_Isis::ViewportMainWindow"))
 
+
     snooze(1)
+
+
     
     # Restore original qview settings
     try:
