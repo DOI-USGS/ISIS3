@@ -1,7 +1,7 @@
 # This case tests the errors thrown by ringscam2map
 #
 # A. The image is targeting the sky, use skymap instead.
-# B. The image crosses the azimuth seam. (And azseam=error).
+# B. The image crosses the ring longitude (azimuth) seam. (And ringlonseam=error).
 # C. The image does not have a plane shape. Run spiceinit with shape=ringplane.
 #
 # D. The input file is a pushframe camera cropped at a fractional pixel. Can
@@ -26,12 +26,12 @@ commands:
 	$(APPNAME) from=$(INPUT)/targetSky.cub \
 	map=$(INPUT)/planarCassiniVIMS.map \
 	to=$(OUTPUT)/output.cub 2>> $(OUTPUT)/error_temp.txt > /dev/null;
-#   TEST B: crosses azimuth seam
+#   TEST B: crosses ring longitude (azimuth) seam
 	echo -e "\nError Test B:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) from=$(INPUT)/seam.cub \
 	map=$(INPUT)/seam.map \
 	to=$(OUTPUT)/output.cub \
-	azseam=error 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	ringlonseam=error 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST C: not ring plane shape
 	echo -e "\nError Test C:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) from=$(INPUT)/notRingPlane.cub \

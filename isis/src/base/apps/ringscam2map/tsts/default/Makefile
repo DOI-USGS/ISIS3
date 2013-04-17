@@ -3,7 +3,7 @@
 # matchmap=false
 # pixres=camera
 # defaultrange=minimize
-# azseam=auto
+# ringlonseam=auto
 # interp=cubicconvolution
 # warpalgorithm=automatic
 #

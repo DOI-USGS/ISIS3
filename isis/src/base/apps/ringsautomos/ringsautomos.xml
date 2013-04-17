@@ -15,7 +15,7 @@
     }
    </style></head><body> <font size="2" face="Verdana">
    <p>This program uses a text-based list of cubes, all in the same map projection and equivalent projection parameters (PixelResolution, 
-    CenterAzimuth, etc), to generate a mosaic.  By default,
+    CenterRingLongitude, etc), to generate a mosaic.  By default,
     The program automatically determines the size of the mosaic by examining each cube.  The user also
     has the option of entering their own rad/az range to use for the mosaic.
    </p>
@@ -273,6 +273,10 @@
       Changed to work for ringplane projections and renamed to
       ringsautomos.  Also fixed type in BANDNUMBER parameter default.  References #775
     </change>
+    <change name="Jeannie Backer" date="2013-03-12">
+      Added appTests.  Test coverage appears low (52% scope, 54% line, 50% function), however these
+      tests cover 100% in all three categories for the code that does not apply to the GUI helper methods. 
+    </change>
   </history>
 
   <groups>
@@ -519,8 +523,8 @@
       <brief>Ground Range Options</brief>
       <description>
         The ground range can either be calculated automatically or entered by the user.  
-        If the USER option is selected, values must be entered for the MINRAD, MAXRAD, 
-        MINAZ, and MAXAZ parameters.  AUTO is the default for this parameter.
+        If the USER option is selected, values must be entered for the MINRINGRAD, MAXRINGRAD, 
+        MINRINGLON, and MAXRINGLON parameters.  AUTO is the default for this parameter.
       </description>
       <list>
         <option value="AUTO">
@@ -531,10 +535,10 @@
             default option.
           </description>
           <exclusions>
-            <item>MINRAD</item>
-            <item>MAXRAD</item>
-            <item>MINAZ</item>
-            <item>MAXAZ</item>
+            <item>MINRINGRAD</item>
+            <item>MAXRINGRAD</item>
+            <item>MINRINGLON</item>
+            <item>MAXRINGLON</item>
           </exclusions>
         </option>
         <option value="USER">
@@ -544,50 +548,50 @@
             the mosaic.  
           </description>
           <inclusions>
-            <item>MINRAD</item>
-            <item>MAXRAD</item>
-            <item>MINAZ</item>
-            <item>MAXAZ</item>
+            <item>MINRINGRAD</item>
+            <item>MAXRINGRAD</item>
+            <item>MINRINGLON</item>
+            <item>MAXRINGLON</item>
           </inclusions>
         </option>
       </list>
       </parameter>
-      <parameter name="MINRAD">
+      <parameter name="MINRINGRAD">
         <type>double</type>
-        <brief>Minimum Radius</brief>
+        <brief>Minimum Ring Radius</brief>
         <description>
-          The minimum radius value to use in the mosaic.
+          The minimum ring radius value to use in the mosaic.
         </description>
         <helpers>
           <helper name="H1">
             <function>helperButtonCalcRange</function>
             <brief>Calculate Ranges using FROMLIST</brief>
             <description>
-              This button will calculate the radius and azimuth range using the files in the FROMLIST.
+              This button will calculate the ring radius and ring longitude range using the files in the FROMLIST.
             </description>
             <icon>$ISIS3DATA/base/icons/exec.png</icon>
           </helper>
         </helpers>
       </parameter>
-      <parameter name="MAXRAD">
+      <parameter name="MAXRINGRAD">
         <type>double</type>
-        <brief>Maximum Radius</brief>
+        <brief>Maximum Ring Radius</brief>
         <description>
-          The maximum radius value to use in the mosaic.
+          The maximum ring radius value to use in the mosaic.
         </description>
       </parameter>
-      <parameter name="MINAZ">
+      <parameter name="MINRINGLON">
         <type>double</type>
-        <brief>Minimum Azimuth</brief>
+        <brief>Minimum Ring Longitude</brief>
         <description>
-          The minimum azimuth value to use in the mosaic.
+          The minimum ring longitude value to use in the mosaic.
         </description>
       </parameter>
-      <parameter name="MAXAZ">
+      <parameter name="MAXRINGLON">
         <type>double</type>
-        <brief>Maximum Azimuth</brief>
+        <brief>Maximum Ring Longitude</brief>
         <description>
-          The maximum azimuth value to use in the mosaic.
+          The maximum ring longitude value to use in the mosaic.
         </description>
       </parameter>
     </group>

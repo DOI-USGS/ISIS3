@@ -123,7 +123,7 @@ namespace Isis {
    * @param allowDefaults If false then the projection class as indicated by the
    *                      ProjectionName keyword will require that projection
    *                      specific parameters such as CenterRadius,
-   *                      CenterAzimuth, etc must be in the Pvl label object.
+   *                      CenterRingLongitude, etc must be in the Pvl label object.
    *                      Otherwise if true then those parameters that are not in
    *                      the Pvl object will be initialized using the
    *                      latitude/longitude range.
@@ -388,7 +388,7 @@ namespace Isis {
     // NOTE: by "special radius" we mean that radius where the projection is
     // not distorted
     Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
-    double localRadius = proj->TrueScaleRadius();
+    double localRadius = proj->TrueScaleRingRadius();
     delete proj;
 
     IException errors;
@@ -442,15 +442,15 @@ namespace Isis {
       // Couldn't find the cube size from the labels so compute it
       if (!sizeFound) {
         if (!proj->HasGroundRange()) {
-          QString msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
-          msg += "MinimumAzimuth,MaximumAzimuth] missing or invalid";
+          QString msg = "Invalid ring range [MinimumRingRadius,MaximumRingRadius,";
+          msg += "MinimumRingLongitude,MaximumRingLongitude] missing or invalid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         double minX, maxX, minY, maxY;
         if (!proj->XYRange(minX, maxX, minY, maxY)) {
-          QString msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
-          msg += "MinimumAzimuth,MaximumAzimuth] cause invalid computation ";
+          QString msg = "Invalid ring range [MinimumRingRadius,MaximumRingRadius,";
+          msg += "MinimumRingLongitude,MaximumRingLongitude] cause invalid computation ";
           msg += "of image size";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -807,7 +807,7 @@ namespace Isis {
 
     // Create a temporary projection
     Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
-    double localRadius = proj->TrueScaleRadius();
+    double localRadius = proj->TrueScaleRingRadius();
     delete proj;
 
     IException errors;

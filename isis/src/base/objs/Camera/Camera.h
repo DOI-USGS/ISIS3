@@ -262,8 +262,8 @@ namespace Isis {
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
                        double &maxlon, Pvl &pvl);
-      bool ringRange(double &minradius, double &maxradius, double &minaz,
-                     double &maxaz, Pvl &pvl);
+      bool ringRange(double &minRingRadius, double &maxRingRadius, 
+                     double &minRingLongitude, double &maxRingLongitude, Pvl &pvl);
       bool IntersectsLongitudeDomain(Pvl &pvl);
 
       double PixelResolution();
@@ -501,12 +501,12 @@ namespace Isis {
       bool p_raDecRangeComputed;             /**!< Flag showing if the raDec range
                                                   has been computed successfully.*/
 
-      double p_minRadius;                //!< The minimum ring radius
-      double p_maxRadius;                //!< The maximum ring radius
-      double p_minaz;                       //!< The minimum azimuth
-      double p_maxaz;                       //!< The maximum azimuth
-      double p_minaz180;                    //!< The minimum azimuth in the 180 domain
-      double p_maxaz180;                    //!< The maximum azimuth in the 180 domain
+      double p_minRingRadius;                //!< The minimum ring radius
+      double p_maxRingRadius;                //!< The maximum ring radius
+      double p_minRingLongitude;             //!< The minimum ring longitude (azimuth)
+      double p_maxRingLongitude;             //!< The maximum ring longitude (azimuth)
+      double p_minRingLongitude180;          //!< The minimum ring longitude in the 180 domain
+      double p_maxRingLongitude180;          //!< The maximum ring longitude in the 180 domain
       bool p_ringRangeComputed;              /**!< Flag showing if ring range
                                                   was computed successfully.*/
 

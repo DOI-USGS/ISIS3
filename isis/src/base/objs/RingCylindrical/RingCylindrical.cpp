@@ -42,10 +42,10 @@ namespace Isis {
    * @param label This argument must be a Label containing the proper mapping
    *              information as indicated in the Projection class.
    *              Additionally, the ring cylindrical projection requires the
-   *              center azimuth to be defined in the keyword CenterAzimuth.
+   *              center azimuth to be defined in the keyword CenterRingLongitude.
    *
    * @param allowDefaults If set to false, the constructor requires that the
-   *                      keyword CenterAzimuth exist in the label. Otherwise
+   *                      keyword CenterRingLongitude exist in the label. Otherwise
    *                      if it does not exist it will be computed and written
    *                      to the label using the middle of the azimuth range
    *                      as specified in the labels. Defaults to false
@@ -59,25 +59,25 @@ namespace Isis {
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Compute the default value if allowed and needed
-      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterAzimuth"))) {
-        double az = (m_minimumAzimuth + m_maximumAzimuth) / 2.0;
-        mapGroup += PvlKeyword("CenterAzimuth", toString(az));
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterRingLongitude"))) {
+        double az = (m_minimumRingLongitude + m_maximumRingLongitude) / 2.0;
+        mapGroup += PvlKeyword("CenterRingLongitude", toString(az));
       }
 
       // Compute and write the default center radius if allowed and
       // necessary
-      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterRadius"))) {
-        double radius = (m_minimumRadius + m_maximumRadius) / 2.0;
-        mapGroup += PvlKeyword("CenterRadius", toString(radius));
+      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterRingRadius"))) {
+        double radius = (m_minimumRingRadius + m_maximumRingRadius) / 2.0;
+        mapGroup += PvlKeyword("CenterRingRadius", toString(radius));
       }
 
       // Get the center radius and center azimuth. 
-      m_centerAzimuth = mapGroup["CenterAzimuth"];
-      m_centerRadius = mapGroup["CenterRadius"];
+      m_centerRingLongitude = mapGroup["CenterRingLongitude"];
+      m_centerRingRadius = mapGroup["CenterRingRadius"];
 
       //  Convert to radians, adjust for azimuth direction
-      m_centerAzimuth *= DEG2RAD;
-      if (m_azimuthDirection == Clockwise) m_centerAzimuth *= -1.0;
+      m_centerRingLongitude *= DEG2RAD;
+      if (m_ringLongitudeDirection == Clockwise) m_centerRingLongitude *= -1.0;
     }
     catch(IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -102,8 +102,8 @@ namespace Isis {
     // dont do the below it is a recusive plunge
     //  if (Projection::operator!=(proj)) return false;
     RingCylindrical *ringCyl = (RingCylindrical *) &proj;
-    if ((ringCyl->m_centerAzimuth != m_centerAzimuth) ||
-        (ringCyl->m_centerRadius != m_centerRadius)) return false;
+    if ((ringCyl->m_centerRingLongitude != m_centerRingLongitude) ||
+        (ringCyl->m_centerRingRadius != m_centerRingRadius)) return false;
     return true;
   }
 
@@ -153,8 +153,8 @@ namespace Isis {
     *
     * @return double The center radius.
     */
-  double RingCylindrical::TrueScaleRadius() const {
-    return m_centerRadius;
+  double RingCylindrical::TrueScaleRingRadius() const {
+    return m_centerRingRadius;
   }
 
 
@@ -163,8 +163,8 @@ namespace Isis {
     *
     * @return double The center azimuth.
     */
-  double RingCylindrical::CenterAzimuth() const {
-    return m_centerAzimuth;
+  double RingCylindrical::CenterRingLongitude() const {
+    return m_centerRingLongitude;
   }
 
 
@@ -173,51 +173,51 @@ namespace Isis {
     *
     * @return double The center radius.
     */
-  double RingCylindrical::CenterRadius() const {
-    return m_centerRadius;
+  double RingCylindrical::CenterRingRadius() const {
+    return m_centerRingRadius;
   }
 
 
   /**
    * This method is used to set the radius/longitude (assumed to be of the
-   * correct AzimuthDirection, and AzimuthDomain. The Set
+   * correct RingLongitudeDirection, and RingLongitudeDomain. The Set
    * forces an attempted calculation of the projection X/Y values. This may or
    * may not be successful and a status is returned as such.
    *
-   * @param lat Azimuth value to project
+   * @param ringRadius Ring radius value to project
    *
-   * @param lon Azimuth value to project
+   * @param ringLongitude Ring longitude (azimuth) value to project
    *
    * @return bool
    */
-  bool RingCylindrical::SetGround(const double radius, const double az) {
+  bool RingCylindrical::SetGround(const double ringRadius, const double ringLongitude) {
     //TODO Add  scalar to make azimuth distance equivalent to radius distance at center rad
     // Convert to azimuth to radians and adjust
-    m_azimuth = az;
-    double azRadians = az * DEG2RAD;
-    if (m_azimuthDirection == Clockwise) azRadians *= -1.0;
+    m_ringLongitude = ringLongitude;
+    double ringLongitudeRadians = ringLongitude * DEG2RAD;
+    if (m_ringLongitudeDirection == Clockwise) ringLongitudeRadians *= -1.0;
 
     // Check to make sure radius is valid
-    if (radius < 0) {
+    if (ringRadius < 0) {
       m_good = false;
       // cout << "Unable to set radius. The given radius value ["
-      //      << IString(radius) << "] is invalid." << endl;
+      //      << IString(ringRadius) << "] is invalid." << endl;
       // throw IException(IException::Unknown,
       //                  "Unable to set radius. The given radius value ["
-      //                  + IString(radius) + "] is invalid.",
+      //                  + IString(ringRadius) + "] is invalid.",
       //                  _FILEINFO_);
       return m_good;
     }
-    m_radius = radius;
+    m_ringRadius = ringRadius;
 
     // Compute helper variable
-    double deltaAz = (azRadians - m_centerAzimuth);
+    double deltaAz = (ringLongitudeRadians - m_centerRingLongitude);
 
     // Compute the coordinates
-    double x = m_centerRadius * deltaAz;
-    double y = radius - m_centerRadius;
+    double x = m_centerRingRadius * deltaAz;
+    double y = ringRadius - m_centerRingRadius;
     // double x = deltaAz;
-    // double y = atan2(m_radius, m_centerRadius);
+    // double y = atan2(m_ringRadius, m_centerRingRadius);
     SetComputedXY(x, y);
     m_good = true;
     return m_good;
@@ -241,29 +241,29 @@ namespace Isis {
     SetXY(x, y);
 
     // Compute radius and make sure it is valid
-    m_radius = GetY() + m_centerRadius;
+    m_ringRadius = GetY() + m_centerRingRadius;
     // if (GetY() != 0.)
-    //   m_radius = m_centerRadius * tan(GetY()) ;
+    //   m_ringRadius = m_centerRingRadius * tan(GetY()) ;
     // else
-    //   m_radius = 0.;
+    //   m_ringRingRadius = 0.;
 
-    if (m_radius < m_minimumRadius || m_radius > m_maximumRadius) {
+    if (m_ringRadius < m_minimumRingRadius || m_ringRadius > m_maximumRingRadius) {
       m_good = false;
       return m_good;
     }
 
     // Compute azimuth
-    m_azimuth = m_centerAzimuth + GetX() / m_centerRadius;
-    // m_azimuth = m_centerAzimuth + GetX();
+    m_ringLongitude = m_centerRingLongitude + GetX() / m_centerRingRadius;
+    // m_ringLongitude = m_centerRingLongitude + GetX();
 
     // Convert to degrees
-    m_azimuth *= RAD2DEG;
+    m_ringLongitude *= RAD2DEG;
 
     // Cleanup the azimuth
-    if (m_azimuthDirection == Clockwise) m_azimuth *= -1.0;
+    if (m_ringLongitudeDirection == Clockwise) m_ringLongitude *= -1.0;
     // Do these if the projection is circular
-     m_azimuth = To360Domain (m_azimuth);
-     if (m_azimuthDomain == 180) m_azimuth = To180Domain(m_azimuth);
+     m_ringLongitude = To360Domain (m_ringLongitude);
+     if (m_ringLongitudeDomain == 180) m_ringLongitude = To180Domain(m_ringLongitude);
 
     m_good = true;
     return m_good;
@@ -312,36 +312,36 @@ namespace Isis {
     double rad, az;
 
     // Check the corners of the rad/az range
-    XYRangeCheck(m_minimumRadius, m_minimumAzimuth);
-    XYRangeCheck(m_maximumRadius, m_minimumAzimuth);
-    XYRangeCheck(m_minimumRadius, m_maximumAzimuth);
-    XYRangeCheck(m_maximumRadius, m_maximumAzimuth);
+    XYRangeCheck(m_minimumRingRadius, m_minimumRingLongitude);
+    XYRangeCheck(m_maximumRingRadius, m_minimumRingLongitude);
+    XYRangeCheck(m_minimumRingRadius, m_maximumRingLongitude);
+    XYRangeCheck(m_maximumRingRadius, m_maximumRingLongitude);
 
 //cout << " ************ WALK RADIUS ******************\n";
-//cout << "MIN RAD: " << m_minimumRadius << " MAX LAT: " << m_maximumRadius << "\n";
+//cout << "MIN RAD: " << m_minimumRingRadius << " MAX LAT: " << m_maximumRingRadius << "\n";
     // Walk top and bottom edges in half pixel increments
-    double radiusInc = 2. * (m_maximumRadius - m_minimumRadius) / PixelResolution();
+    double radiusInc = 2. * (m_maximumRingRadius - m_minimumRingRadius) / PixelResolution();
 
-    for (rad = m_minimumRadius; rad <= m_maximumRadius; rad += radiusInc) {
+    for (rad = m_minimumRingRadius; rad <= m_maximumRingRadius; rad += radiusInc) {
 //cout << "WALKED A STEP - rad: " << rad << "\n";
       rad = rad;
-      az = m_minimumAzimuth;
+      az = m_minimumRingLongitude;
       XYRangeCheck(rad, az);
 
       rad = rad;
-      az = m_maximumAzimuth;
+      az = m_maximumRingLongitude;
       XYRangeCheck(rad, az);
-//cout << "MIN RAD: " << m_minimumRadius << " MAX RAD: " << m_maximumRadius << "\n";
+//cout << "MIN RAD: " << m_minimumRingRadius << " MAX RAD: " << m_maximumRingRadius << "\n";
     }
 
 //cout << " ************ WALK AZIMUTH ******************\n";
     // Walk left and right edges
-    for (az = m_minimumAzimuth; az <= m_maximumAzimuth; az += 0.01) {
-      rad = m_minimumRadius;
+    for (az = m_minimumRingLongitude; az <= m_maximumRingLongitude; az += 0.01) {
+      rad = m_minimumRingRadius;
       az = az;
       XYRangeCheck(rad, az);
 
-      rad = m_maximumRadius;
+      rad = m_maximumRingRadius;
       az = az;
       XYRangeCheck(rad, az);
     }
@@ -349,19 +349,19 @@ namespace Isis {
     // Walk the limb 
 /*
     for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
-      double x = m_equatorialRadius * cos(angle * PI / 180.0);
-      double y = m_equatorialRadius * sin(angle * PI / 180.0);
+      double x = m_equatorialRingRadius * cos(angle * PI / 180.0);
+      double y = m_equatorialRingRadius * sin(angle * PI / 180.0);
       if (SetCoordinate(x, y) == 0) {
         if (m_latitude > m_maximumLatitude) {
           continue;
         }
-        if (m_longitude > m_maximumAzimuth) {
+        if (m_longitude > m_maximumRingLongitude) {
           continue;
         }
         if (m_latitude < m_minimumLatitude) {
           continue;
         }
-        if (m_longitude < m_minimumAzimuth) {
+        if (m_longitude < m_minimumRingLongitude) {
           continue;
         }
 
@@ -378,9 +378,9 @@ namespace Isis {
     if (m_minimumY >= m_maximumY) return false;
 
     // Return X/Y min/maxs
-    // m_maximumX = m_maximumRadius*cos(m_maximumAzimuth);
+    // m_maximumX = m_maximumRingRadius*cos(m_maximumRingLongitude);
     // m_minimumX = -m_maximumX;
-    // m_maximumY = m_maximumRadius*sin(m_maximumAzimuth);
+    // m_maximumY = m_maximumRingRadius*sin(m_maximumRingLongitude);
     // m_minimumY = -m_maximumY;
 
     minX = m_minimumX;
@@ -400,8 +400,8 @@ namespace Isis {
   PvlGroup RingCylindrical::Mapping() {
     PvlGroup mapping = RingPlaneProjection::Mapping();
 
-    mapping += PvlKeyword("CenterRadius", toString(m_centerRadius));
-    mapping += PvlKeyword("CenterAzimuth", toString(m_centerAzimuth));
+    mapping += PvlKeyword("CenterRingRadius", toString(m_centerRingRadius));
+    mapping += PvlKeyword("CenterRingLongitude", toString(m_centerRingLongitude));
 
     return mapping;
   }
@@ -411,11 +411,11 @@ namespace Isis {
    *
    * @return PvlGroup The latitude keywords that this projection uses
    */
-  PvlGroup RingCylindrical::MappingRadii() {
-    PvlGroup mapping = RingPlaneProjection::MappingRadii();
+  PvlGroup RingCylindrical::MappingRingRadii() {
+    PvlGroup mapping = RingPlaneProjection::MappingRingRadii();
 
     if (HasGroundRange()) 
-      mapping += m_mappingGrp["CenterRadius"];
+      mapping += m_mappingGrp["CenterRingRadius"];
 
     return mapping;
   }
@@ -426,11 +426,11 @@ namespace Isis {
    *
    * @return PvlGroup The azimuth keywords that this projection uses
    */
-  PvlGroup RingCylindrical::MappingAzimuths() {
-    PvlGroup mapping = RingPlaneProjection::MappingAzimuths();
+  PvlGroup RingCylindrical::MappingRingLongitudes() {
+    PvlGroup mapping = RingPlaneProjection::MappingRingLongitudes();
 
     if (HasGroundRange()) 
-      mapping += m_mappingGrp["CenterAzimuth"];
+      mapping += m_mappingGrp["CenterRingLongitude"];
 
     return mapping;
   }

@@ -21,6 +21,7 @@ void LoadMapRes();
 void LoadCameraRes();
 void LoadMapRange();
 void LoadCameraRange();
+void BandChange(const int band);
 
 map <QString, void *> GuiHelpers() {
   map <QString, void *> helper;
@@ -34,7 +35,6 @@ map <QString, void *> GuiHelpers() {
 
 
 // Global variables
-void BandChange(const int band);
 Cube *icube;
 Camera *incam;
 
@@ -67,56 +67,56 @@ void IsisMain() {
   // Make the target info match the user mapfile
   double minrad, maxrad, minaz, maxaz;
   incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
-  camGrp.addKeyword(PvlKeyword("MinimumRadius", toString(minrad)), Pvl::Replace);
-  camGrp.addKeyword(PvlKeyword("MaximumRadius", toString(maxrad)), Pvl::Replace);
-  camGrp.addKeyword(PvlKeyword("MinimumAzimuth", toString(minaz)), Pvl::Replace);
-  camGrp.addKeyword(PvlKeyword("MaximumAzimuth", toString(maxaz)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumRingRadius", toString(minrad)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumRingRadius", toString(maxrad)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MinimumRingLongitude", toString(minaz)), Pvl::Replace);
+  camGrp.addKeyword(PvlKeyword("MaximumRingLongitude", toString(maxaz)), Pvl::Replace);
 
   // We want to delete the keywords we just added if the user wants the range
   // out of the mapfile, otherwise they will replace any keywords not in the
   // mapfile
   if (ui.GetString("DEFAULTRANGE") == "MAP" || ui.GetBoolean("MATCHMAP")) {
-    camGrp.deleteKeyword("MinimumRadius");
-    camGrp.deleteKeyword("MaximumRadius");
-    camGrp.deleteKeyword("MinimumAzimuth");
-    camGrp.deleteKeyword("MaximumAzimuth");
+    camGrp.deleteKeyword("MinimumRingRadius");
+    camGrp.deleteKeyword("MaximumRingRadius");
+    camGrp.deleteKeyword("MinimumRingLongitude");
+    camGrp.deleteKeyword("MaximumRingLongitude");
   }
   // Otherwise, remove the keywords from the map file so the camera keywords
   // will be propogated correctly
   else {
-    while(userGrp.hasKeyword("MinimumRadius")) {
-      userGrp.deleteKeyword("MinimumRadius");
+    while(userGrp.hasKeyword("MinimumRingRadius")) {
+      userGrp.deleteKeyword("MinimumRingRadius");
     }
-    while(userGrp.hasKeyword("MinimumAzimuth")) {
-      userGrp.deleteKeyword("MinimumAzimuth");
+    while(userGrp.hasKeyword("MinimumRingLongitude")) {
+      userGrp.deleteKeyword("MinimumRingLongitude");
     }
-    while(userGrp.hasKeyword("MaximumRadius")) {
-      userGrp.deleteKeyword("MaximumRadius");
+    while(userGrp.hasKeyword("MaximumRingRadius")) {
+      userGrp.deleteKeyword("MaximumRingRadius");
     }
-    while(userGrp.hasKeyword("MaximumAzimuth")) {
-      userGrp.deleteKeyword("MaximumAzimuth");
+    while(userGrp.hasKeyword("MaximumRingLongitude")) {
+      userGrp.deleteKeyword("MaximumRingLongitude");
     }
   }
 
   // If the user decided to enter a ground range then override
-  if(ui.WasEntered("MINAZ") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MinimumAzimuth",
-                                  toString(ui.GetDouble("MINAZ"))), Pvl::Replace);
+  if(ui.WasEntered("MINRINGLON")) {
+    userGrp.addKeyword(PvlKeyword("MinimumRingLongitude",
+                                  toString(ui.GetDouble("MINRINGLON"))), Pvl::Replace);
   }
 
-  if(ui.WasEntered("MAXAZ") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MaximumAzimuth",
-                                  toString(ui.GetDouble("MAXAZ"))), Pvl::Replace);
+  if(ui.WasEntered("MAXRINGLON")) {
+    userGrp.addKeyword(PvlKeyword("MaximumRingLongitude",
+                                  toString(ui.GetDouble("MAXRINGLON"))), Pvl::Replace);
   }
 
-  if(ui.WasEntered("MINRAD") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MinimumRadius",
-                                  toString(ui.GetDouble("MINRAD"))), Pvl::Replace);
+  if(ui.WasEntered("MINRINGRAD")) {
+    userGrp.addKeyword(PvlKeyword("MinimumRingRadius",
+                                  toString(ui.GetDouble("MINRINGRAD"))), Pvl::Replace);
   }
 
-  if(ui.WasEntered("MAXRAD") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MaximumRadius",
-                                  toString(ui.GetDouble("MAXRAD"))), Pvl::Replace);
+  if(ui.WasEntered("MAXRINGRAD")) {
+    userGrp.addKeyword(PvlKeyword("MaximumRingRadius",
+                                  toString(ui.GetDouble("MAXRINGRAD"))), Pvl::Replace);
   }
 
   // If they want the res. from the mapfile, delete it from the camera so
@@ -143,7 +143,7 @@ void IsisMain() {
   }
 
   // If the user decided to enter a resolution then override
-  if(ui.GetString("PIXRES") == "MPP" && !ui.GetBoolean("MATCHMAP")) {
+  if(ui.GetString("PIXRES") == "MPP") {
     userGrp.addKeyword(PvlKeyword("PixelResolution",
                                   toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
@@ -151,7 +151,7 @@ void IsisMain() {
       userGrp.deleteKeyword("Scale");
     }
   }
-  else if(ui.GetString("PIXRES") == "PPD" && !ui.GetBoolean("MATCHMAP")) {
+  else if(ui.GetString("PIXRES") == "PPD") {
     userGrp.addKeyword(PvlKeyword("Scale",
                                   toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
@@ -160,54 +160,53 @@ void IsisMain() {
     }
   }
 
-  // See if the user want us to handle the azimuth seam
-  if((ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") &&
-      !ui.GetBoolean("MATCHMAP")) {
+  // See if the user want us to handle the azimuth (ring longitude) seam
+  if((ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE")) {
     //TODO This camera method will need attention for rings***** Solution:  just call ringRange directly
     // if(incam->IntersectsLongitudeDomain(userMap)) {
     if (incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
-      if(ui.GetString("AZSEAM") == "AUTO") {
-        if((int) userGrp["AzimuthDomain"] == 360) {
-          userGrp.addKeyword(PvlKeyword("AzimuthDomain", "180"),
+      if(ui.GetString("RINGLONSEAM") == "AUTO") {
+        if((int) userGrp["RingLongitudeDomain"] == 360) {
+          userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "180"),
                              Pvl::Replace);
           if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.addKeyword(PvlKeyword("AzimuthDomain", "360"),
+            userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
                                Pvl::Replace);
           }
         }
         else {
-          userGrp.addKeyword(PvlKeyword("AzimuthDomain", "360"),
+          userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
                              Pvl::Replace);
           if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.addKeyword(PvlKeyword("AzimuthDomain", "180"),
+            userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "180"),
                                Pvl::Replace);
           }
         }
-        // Make the target info match the new azimuth domain
-        // Use radius for where camera expects latitude & azimuth where the camera expects longitude
+        // Make the target info match the new azimuth (ring longitude) domain Use radius for where
+        // camera expects latitude & azimuth (ring longitude) where the camera expects longitude
         double minrad, maxrad, minaz, maxaz;
         incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
-        if(!ui.WasEntered("MINRAD")) {
-          userGrp.addKeyword(PvlKeyword("MinimumRadius", toString(minrad)), Pvl::Replace);
+        if(!ui.WasEntered("MINRINGRAD")) {
+          userGrp.addKeyword(PvlKeyword("MinimumRingRadius", toString(minrad)), Pvl::Replace);
         }
-        if(!ui.WasEntered("MAXRAD")) {
-          userGrp.addKeyword(PvlKeyword("MaximumRadius", toString(maxrad)), Pvl::Replace);
+        if(!ui.WasEntered("MAXRINGRAD")) {
+          userGrp.addKeyword(PvlKeyword("MaximumRingRadius", toString(maxrad)), Pvl::Replace);
         }
-        if(!ui.WasEntered("MINAZ")) {
-          userGrp.addKeyword(PvlKeyword("MinimumAzimuth", toString(minaz)), Pvl::Replace);
+        if(!ui.WasEntered("MINRINGLON")) {
+          userGrp.addKeyword(PvlKeyword("MinimumRingLongitude", toString(minaz)), Pvl::Replace);
         }
-        if(!ui.WasEntered("MAXAZ")) {
-          userGrp.addKeyword(PvlKeyword("MaximumAzimuth", toString(maxaz)), Pvl::Replace);
+        if(!ui.WasEntered("MAXRINGLON")) {
+          userGrp.addKeyword(PvlKeyword("MaximumRingLongitude", toString(maxaz)), Pvl::Replace);
         }
       }
 
-      else if(ui.GetString("AZSEAM") == "ERROR") {
+      else if(ui.GetString("RINGLONSEAM") == "ERROR") {
         QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
-                     "azimuth seam";
+                     "ring longitude seam";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -218,27 +217,19 @@ void IsisMain() {
   RingPlaneProjection *outmap;
   bool trim;
 
-  // Make sure shape model is  ring plane
-  if (incam->target()->shape()->name() == "Plane") {
-    // Determine the image size
-    if(ui.GetString("DEFAULTRANGE") == "MINIMIZE" && !ui.GetBoolean("MATCHMAP")) {
-      outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, *incam);
-      trim = false;
-    }
-    else if(ui.GetString("DEFAULTRANGE") == "CAMERA" && !ui.GetBoolean("MATCHMAP")) {
-      outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, false);
-      trim = ui.GetBoolean("TRIM");
-    }
-    else { // DEFAULTRANGE = MAP
-      outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines,
-               ui.GetBoolean("MATCHMAP"));
-      trim = ui.GetBoolean("TRIM");
-    }
+  // Determine the image size
+  if(ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
+    outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, *incam);
+    trim = false;
   }
-  else {
-    QString msg = "The image [" + ui.GetFileName("FROM") + "] does not have a plane shape. " +
-                     " Run spiceinit with shape=ringplane";
-        throw IException(IException::User, msg, _FILEINFO_);
+  else if(ui.GetString("DEFAULTRANGE") == "CAMERA") {
+    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, false);
+    trim = ui.GetBoolean("TRIM");
+  }
+  else { // DEFAULTRANGE = MAP or MATCHMAP=true
+    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines,
+             ui.GetBoolean("MATCHMAP"));
+    trim = ui.GetBoolean("TRIM");
   }
 
   // Output the mapping group used to the Gui session log
@@ -258,7 +249,7 @@ void IsisMain() {
   else if(ui.GetString("INTERP") == "BILINEAR") {
     interp = new Interpolator(Interpolator::BiLinearType);
   }
-  else if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
+  else {//if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
 
@@ -273,8 +264,9 @@ void IsisMain() {
   double centerSamp = icube->sampleCount() / 2.;
   double centerLine = icube->lineCount() / 2.;
   if(incam->SetImage(centerSamp, centerLine)) {
-    // Force rings data into Isis by returning radius for latitude and azimuth for longitude
-    // if(outmap->SetUniversalGround(incam->UniversalLatitude(),
+    // Force rings data into Isis by returning ring radius for latitude
+    // and azimuth (ring longitude) for longitude
+    //                               if(outmap->SetUniversalGround(incam->UniversalLatitude(),
     //                               incam->UniversalLongitude())) {
     if(outmap->SetUniversalGround(incam->LocalRadius().meters(),
                                   incam->UniversalLongitude())) {
@@ -306,13 +298,10 @@ void IsisMain() {
                                    outmap, trim);
                                    // (Planar*)outmap, trim);
 
-    if (ui.WasEntered("PATCHSIZE")) {
-      int patchSize = ui.GetInteger("PATCHSIZE");
-      if (patchSize <= 1) patchSize = 3; // Make the patchsize reasonable
-      p.setPatchParameters(1, 1, patchSize, patchSize, 
-                           patchSize-1, patchSize-1);
-    }
-
+    int patchSize = ui.GetInteger("PATCHSIZE");
+    if (patchSize <= 1) patchSize = 3; // Make the patchsize reasonable
+    p.setPatchParameters(1, 1, patchSize, patchSize, 
+                         patchSize-1, patchSize-1);
     p.processPatchTransform(*transform, *interp);
   }
 
@@ -322,13 +311,10 @@ void IsisMain() {
                                    outmap, trim);
                                    // (Planar*)outmap, trim);
 
-    if (ui.WasEntered("PATCHSIZE")) {
-      int patchSize = ui.GetInteger("PATCHSIZE");
-      int minPatchSize = 4;
-      if (patchSize < minPatchSize) minPatchSize = patchSize;
-      p.SetTiling(patchSize, minPatchSize);
-    }
-
+    int patchSize = ui.GetInteger("PATCHSIZE");
+    int minPatchSize = 4;
+    if (patchSize < minPatchSize) minPatchSize = patchSize;
+    p.SetTiling(patchSize, minPatchSize);
     p.StartProcess(*transform, *interp);
   }
 
@@ -460,17 +446,18 @@ bool ringscam2mapForward::Xform(double &outSample, double &outLine,
   if (!p_incam->SetImage(inSample,inLine)) return false;
 
   // Does that ground coordinate work in the map projection
-  // We will be forcing ring data to work by substituting radius for latitude & azimuth for longitude
+  // We will be forcing ring data to work by substituting ring radius for latitude
+  // & azimuth (ring longitude) for longitude
   double rad = p_incam->LocalRadius().meters();
   double az = p_incam->UniversalLongitude();
   if(!p_outmap->SetUniversalGround(rad,az)) return false;
 
   // See if we should trim
   if((p_trim) && (p_outmap->HasGroundRange())) {
-    if(p_outmap->Radius() < p_outmap->MinimumRadius()) return false;
-    if(p_outmap->Radius() > p_outmap->MaximumRadius()) return false;
-    if(p_outmap->Azimuth() < p_outmap->MinimumAzimuth()) return false;
-    if(p_outmap->Azimuth() > p_outmap->MaximumAzimuth()) return false;
+    if(p_outmap->RingRadius() < p_outmap->MinimumRingRadius()) return false;
+    if(p_outmap->RingRadius() > p_outmap->MaximumRingRadius()) return false;
+    if(p_outmap->RingLongitude() < p_outmap->MinimumRingLongitude()) return false;
+    if(p_outmap->RingLongitude() > p_outmap->MaximumRingLongitude()) return false;
   }
 
   // Get the output sample/line coordinate
@@ -523,15 +510,15 @@ bool ringscam2mapReverse::Xform(double &inSample, double &inLine,
 
   // See if we should trim
  if((p_trim) && (p_outmap->HasGroundRange())) {
-   if(p_outmap->Radius() < p_outmap->MinimumRadius()) return false;
-   if(p_outmap->Radius() > p_outmap->MaximumRadius()) return false;
-   if(p_outmap->Azimuth() < p_outmap->MinimumAzimuth()) return false;
-   if(p_outmap->Azimuth() > p_outmap->MaximumAzimuth()) return false;
+   if(p_outmap->RingRadius() < p_outmap->MinimumRingRadius()) return false;
+   if(p_outmap->RingRadius() > p_outmap->MaximumRingRadius()) return false;
+   if(p_outmap->RingLongitude() < p_outmap->MinimumRingLongitude()) return false;
+   if(p_outmap->RingLongitude() > p_outmap->MaximumRingLongitude()) return false;
  }
 
   // Get the universal rad/az and see if it can be converted to input line/samp
-  double radius = p_outmap->Radius();
-  double az = p_outmap->UniversalAzimuth();
+  double radius = p_outmap->RingRadius();
+  double az = p_outmap->UniversalRingLongitude();
 
   if(!p_incam->SetUniversalGround(radius, az)) return false;
 
@@ -633,24 +620,24 @@ void LoadMapRange() {
 
   // Set ground range keywords that are found in mapfile
   int count = 0;
-  ui.Clear("MINRAD");
-  ui.Clear("MAXRAD");
-  ui.Clear("MINAZ");
-  ui.Clear("MAXAZ");
-  if(userGrp.hasKeyword("MinimumRadius")) {
-    ui.PutDouble("MINRAD", userGrp["MinimumRadius"]);
+  ui.Clear("MINRINGRAD");
+  ui.Clear("MAXRINGRAD");
+  ui.Clear("MINRINGLON");
+  ui.Clear("MAXRINGLON");
+  if(userGrp.hasKeyword("MinimumRingRadius")) {
+    ui.PutDouble("MINRINGRAD", userGrp["MinimumRingRadius"]);
     count++;
   }
-  if(userGrp.hasKeyword("MaximumRadius")) {
-    ui.PutDouble("MAXRAD", userGrp["MaximumRadius"]);
+  if(userGrp.hasKeyword("MaximumRingRadius")) {
+    ui.PutDouble("MAXRINGRAD", userGrp["MaximumRingRadius"]);
     count++;
   }
-  if(userGrp.hasKeyword("MinimumAzimuth")) {
-    ui.PutDouble("MINAZ", userGrp["MinimumAzimuth"]);
+  if(userGrp.hasKeyword("MinimumRingLongitude")) {
+    ui.PutDouble("MINRINGLON", userGrp["MinimumRingLongitude"]);
     count++;
   }
-  if(userGrp.hasKeyword("MaximumAzimuth")) {
-    ui.PutDouble("MAXAZ", userGrp["MaximumAzimuth"]);
+  if(userGrp.hasKeyword("MaximumRingLongitude")) {
+    ui.PutDouble("MAXRINGLON", userGrp["MaximumRingLongitude"]);
     count++;
   }
 
@@ -684,14 +671,14 @@ void LoadCameraRange() {
   cam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
 
   // Set ground range parameters in UI
-  ui.Clear("MINRAD");
-  ui.PutDouble("MINRAD", minrad);
-  ui.Clear("MAXRAD");
-  ui.PutDouble("MAXRAD", maxrad);
-  ui.Clear("MINAZ");
-  ui.PutDouble("MINAZ", minaz);
-  ui.Clear("MAXAZ");
-  ui.PutDouble("MAXAZ", maxaz);
+  ui.Clear("MINRINGRAD");
+  ui.PutDouble("MINRINGRAD", minrad);
+  ui.Clear("MAXRINGRAD");
+  ui.PutDouble("MAXRINGRAD", maxrad);
+  ui.Clear("MINRINGLON");
+  ui.PutDouble("MINRINGLON", minaz);
+  ui.Clear("MAXRINGLON");
+  ui.PutDouble("MAXRINGLON", maxaz);
 
   // Set default ground range param to camera
   ui.Clear("DEFAULTRANGE");

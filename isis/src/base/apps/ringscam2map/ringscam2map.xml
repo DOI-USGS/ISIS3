@@ -36,17 +36,17 @@
       </tr>
 
       <tr>
-        <td>AzimuthDirection</td>
+        <td>RingLongitudeDirection</td>
         <td>CounterClockwise</td>
       </tr>
 
       <tr>
-        <td>AzimuthDomain</td>
+        <td>RingLongitudeDomain</td>
         <td>Normally, 360.  However, if the 180 domain causes less area to need to be projected then 180.</td>
       </tr>
 
       <tr>
-        <td>Minimum Radius<br />MaximumRadius<br />MinimumAzimuth<br />MaximumAzimuth</td>
+        <td>MinimumRingRadius<br />MaximumRingRadius<br />MinimumRingLongitude<br />MaximumRingLongitude</td>
         <td>Computed from the input cube or read from the map file.   However, any combination of the 
         four values can then be overridden by the user.  The values the user specifies are expected 
         to be in the coodinate system of the projection.</td>
@@ -67,16 +67,16 @@
   Group = Mapping
     TargetName             = Obtained from the Instrument group
 
-    AzimuthDirection     = CounterClockwise
-    AzimuthDomain        = 360 (Could be automatically adjusted to 180 by AZSEAM)
+    RingLongitudeDirection     = CounterClockwise
+    RingLongitudeDomain        = 360 (Could be automatically adjusted to 180 by RINGLONSEAM)
 
-    MinimumRadius          = Computed from the input camera cube
-    MaximumRadius           = Computed from the input camera cube
-    MinimumAzimuth          = Computed from the input camera cube
-    MaximumAzimuth          = Computed from the input camera cube
+    MinimumRingRadius          = Computed from the input camera cube
+    MaximumRingRadius           = Computed from the input camera cube
+    MinimumRingLongitude          = Computed from the input camera cube
+    MaximumRingLongitude          = Computed from the input camera cube
 
     ProjectionName         = Planar
-    CenterAzimuth        = Average of MinimumAzimuth and MaximumAzimuth
+    CenterRingLongitude        = Average of MinimumRingLongitude and MaximumRingLongitude
     PixelResolution        = Computed from the input camera cube
   EndGroup
     </pre>
@@ -93,11 +93,11 @@
    
 
    <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, 
-   AzimuthDirection,  AzimuthDomain, ProjectionName, and projection specific parameters
-   (e.g., CenterAzimuth, CenterRadius) are the same for all cubes. That is,  you should create one
+   RingLongitudeDirection,  RingLongitudeDomain, ProjectionName, and projection specific parameters
+   (e.g., CenterRingLongitude, CenterRingRadius) are the same for all cubes. That is,  you should create one
    map file and use it as input for all the cubes in your mosaic.  By letting the minimum and 
-   maximum radius and azimuth values default, the application will determine the coverage of 
-   each image.  However, if the mosaic Radius and Azimuth range is entered, each output image will
+   maximum ring radius and ring longitude values default, the application will determine the coverage of 
+   each image.  However, if the mosaic Ring Radius and Ring Longitude range is entered, each output image will
    be projected to the full  size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.  
 
    The following Mapping group could be used for mosaicking:
@@ -105,17 +105,17 @@
    <pre>
  Group = Mapping
    ProjectionName         = Planar
-   CenterAzimuth        = 0
+   CenterRingLongitude        = 0
    PixelResolution        = 10000 &lt;meters&gt;
  EndGroup
    </pre>
 
    <p>
      Finally, depending on the projection, problems can occur with cubes that fall on the projection 
-     azimuth seam.  For example, if you are making a mosaic with AzimuthDomain = 360 and your 
-     cube crosses 0/360 seam, this program would compute the default azimuth range of the cube to 
-     MinimumAzimuth = 0 and MaximumAzimuth = 360.  A very large output image could be created 
-     depending on the pixel resolution.  The AZSEAM parameter allows you to selectively handle this case.  
+     ring longitude seam.  For example, if you are making a mosaic with RingLongitudeDomain = 360 and your 
+     cube crosses 0/360 seam, this program would compute the default ring longitude range of the cube to 
+     MinimumRingLongitude = 0 and MaximumRingLongitude = 360.  A very large output image could be created 
+     depending on the pixel resolution.  The RINGLONSEAM parameter allows you to selectively handle this case.  
      If you are making mosaics near the seam you will need to understand and alter the default for this parameter.
      <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections#Problems_at_the_Longitude_Seams">
      Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help 
@@ -246,6 +246,10 @@
      <change name="Ken Edmundson and Debbie A. Cook" date="2013-03-06">
        Revised to work with ring data. References #975.
      </change>
+     <change name="Jeannie Backer" date="2013-03-12">
+       Added appTests.  Test coverage appears low (60% scope, 60% line, 38% function), however these
+       tests cover a large portion in all three categories for the code that does not apply to the GUI helper methods. 
+     </change>
   </history>
 
   <oldName>
@@ -332,10 +336,10 @@
           <item>PIXRES</item>
           <item>RESOLUTION</item>
           <item>DEFAULTRANGE</item>
-          <item>MINRAD</item>
-          <item>MAXRAD</item>
-          <item>MINAZ</item>
-          <item>MAXAZ</item>
+          <item>MINRINGRAD</item>
+          <item>MAXRINGRAD</item>
+          <item>MINRINGLON</item>
+          <item>MAXRINGLON</item>
         </exclusions>
       </parameter>
     </group>
@@ -421,9 +425,9 @@
         <brief>Defines how the default ground range is determined</brief>
         <default><item>MINIMIZE</item></default>
         <description>
-          This parameter is used to specify how the default radius/azimuth ground range for the output map projected image
+          This parameter is used to specify how the default ring ground ranges (radius and longitude) for the output map projected image
           is obtained.  The ground range can be obtained from the camera or map file.  Note the user can overide the default 
-          using the MINRAD, MAXRAD, MINAZ, MAXAZ parameters.  The purpose of the ground range is to define the coverage 
+          using the MINRINGRAD, MAXRINGRAD, MINRINGLON, MAXRINGLON parameters.  The purpose of the ground range is to define the coverage 
           of the map projected image.  Essentially, the ground range and pixel resolution are used to compute the size 
           (samples and line) of the output image.
         </description>
@@ -451,12 +455,12 @@
                curved merdians and/or parallels and hence large output images.  The amount of padding can be 
                quite large for extremely high resolution maps.
              </description>
-             <inclusions><item>AZSEAM</item></inclusions>
+             <inclusions><item>RINGLONSEAM</item></inclusions>
              <exclusions>
-               <item>MINRAD</item>
-               <item>MAXRAD</item>
-               <item>MINAZ</item>
-               <item>MAXAZ</item>
+               <item>MINRINGRAD</item>
+               <item>MAXRINGRAD</item>
+               <item>MINRINGLON</item>
+               <item>MAXRINGLON</item>
                <item>TRIM</item>
              </exclusions>
            </option>
@@ -464,29 +468,32 @@
            <option value="CAMERA">
               <brief> Compute default range from input cube</brief>
               <description>
-                This option will automatically determine the mininum/maximum radius/azimuth from the input 
+                This option will automatically determine the ring radius range 
+                (mininum ring radius, maximum ring radius) and the ring longitude 
+                range (minimum ring longitude, maximum ring longitude) from the input 
                 camera model cube specified using the FROM parameter.
               </description>
-              <inclusions><item>AZSEAM</item></inclusions>
+              <inclusions><item>RINGLONSEAM</item></inclusions>
             </option>
 
            <option value="MAP">
               <brief> Read default range from map file</brief>
               <description>
-                This option will read the mininum/maximum radius/azimuth from the input map file.  
+                This option will read the ring ranges (RingRadiusMininum,  RingRadiusMaximum, 
+                RingLongitudeMinimum and RingLongitudeMaximum keywords) from the input map file.  
                 All four values are expected to be defined.
               </description>
-              <exclusions><item>AZSEAM</item></exclusions>
+              <exclusions><item>RINGLONSEAM</item></exclusions>
             </option>
         </list>
       </parameter>
 
-      <parameter name="MINRAD">
+      <parameter name="MINRINGRAD">
         <type>double</type>
-        <brief>Minimum Radius</brief>
+        <brief>Minimum Ring Radius</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum radius of the output map.   If this is entered by the user it will override 
+          The minimum ring radius of the output map.   If this is entered by the user it will override 
           the default camera or map value.  Units are meters.
         </description>
 
@@ -494,40 +501,40 @@
         <maximum inclusive="yes">9999999999.0</maximum>
       </parameter>
 
-      <parameter name="MAXRAD">
+      <parameter name="MAXRINGRAD">
         <type>double</type>
-        <brief>Maximum Radius</brief>
+        <brief>Maximum Ring Radius</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum radius of the output map.   If this is entered by the user it will override 
+          The maximum ring radius of the output map.   If this is entered by the user it will override 
           the default camera or map value.  Units are meters. 
         </description>
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">999999999999.0</maximum>
-        <greaterThan><item>MINRAD</item></greaterThan>
+        <greaterThan><item>MINRINGRAD</item></greaterThan>
       </parameter>
 
-      <parameter name="MINAZ">
+      <parameter name="MINRINGLON">
         <type>double</type>
-        <brief>Minimum Azimuth</brief>
+        <brief>Minimum Ring Longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The minimum azimuth of the output map.   If this is entered by the user it will override 
-          the default camera or map value.  By default, clockwise azimuths in the range of 0 to 
+          The minimum ring longitude of the output map.   If this is entered by the user it will override 
+          the default camera or map value.  By default, clockwise ring longitudes in the range of 0 to 
           360 are assumed unless the map file specifies otherwise.
         </description>
       </parameter>
 
-      <parameter name="MAXAZ">
+      <parameter name="MAXRINGLON">
         <type>double</type>
-        <brief>Maximum Azimuth</brief>
+        <brief>Maximum Ring Longitude</brief>
         <internalDefault>Use default range</internalDefault>
         <description>
-          The maximum azimuth of the output map.   If this is entered by the user it will override the 
-          default camera or map value.  By default, positive east azimuths in the range of 0 to 360 
+          The maximum ring longitude of the output map.   If this is entered by the user it will override the 
+          default camera or map value.  By default, positive east ring longitudes in the range of 0 to 360 
           are assumed unless the map file specifies otherwise.
         </description>
-        <greaterThan><item>MINAZ</item></greaterThan>
+        <greaterThan><item>MINRINGLON</item></greaterThan>
       </parameter>
 
       <parameter name="TRIM">
@@ -537,50 +544,50 @@
           Null all pixels outside rad/az boundaries
         </brief>
         <description>
-          If this option is selected, pixels outside the radius/azimuth
+          If this option is selected, pixels outside the ring radius range or the ring longitude
           range will be trimmed (set to null).
-          This is useful for certain projections whose lines of radius and
-          azimuth are not parallel to image lines and sample columns.
+          This is useful for certain projections whose lines of ring radius and
+          ring longitude are not parallel to image lines and sample columns.
         </description>
       </parameter>
     </group>
 
-    <group name="Azimuth Seam Options">
-      <parameter name="AZSEAM">
+    <group name="Ring Longitude Seam Options">
+      <parameter name="RINGLONSEAM">
         <type>string</type>
         <default><item>AUTO</item></default>
         <brief>
-          How should images at the azimuth seam be handled
+          How should images at the ring longitude seam be handled
         </brief>
         <description>
-          With this option you can turn on/off the automatic azimuth domain switching that occurs
-          when a file crosses the boundary of the azimuth domain (0-360 or -180 to 180).  If 
+          With this option you can turn on/off the automatic ring longitude domain switching that occurs
+          when a file crosses the boundary of the ring longitude domain (0-360 or -180 to 180).  If 
           the switching is turn off then you have the choice of making the program continue or 
           exit when the cube does cross the bounday.
         </description>
 
         <list>
            <option value="AUTO">
-              <brief>Automatically correct Azimuth Domain</brief>
+              <brief>Automatically correct Ring Longitude Domain</brief>
               <description>
-                If the cube crosses the azimuth seam automatically compute the AzimuthDomain.   
-                When the cube is near 0 or 360 degrees the program will assume 180 AzimuthDomain.  
-                When the cube is near 180 or -180 degrees it will assume 360 AzimuthDomain.
+                If the cube crosses the ring longitude seam automatically compute the RingLongitudeDomain.   
+                When the cube is near 0 or 360 degrees the program will assume 180 RingLongitudeDomain.  
+                When the cube is near 180 or -180 degrees it will assume 360 RingLongitudeDomain.
               </description>
             </option>
 
            <option value="ERROR">
               <brief>Abort program if cube crosses seam</brief>
               <description>
-                If the cube crosses the azimuth seam the program will exit with an error message
+                If the cube crosses the ring longitude seam the program will exit with an error message
               </description>
             </option>
 
             <option value="CONTINUE">
                <brief>Continue program if cube crosses seam</brief>
                <description>
-                 If the cube crosses the azimuth seam the program will continue.  The AzimuthDomain 
-                 in the map file will be used.  If the map file does not have a AzimuthDomain, 0-360 
+                 If the cube crosses the ring longitude seam the program will continue.  The RingLongitudeDomain 
+                 in the map file will be used.  If the map file does not have a RingLongitudeDomain, 0-360 
                  will be used. Note that this could create an extremely large image.
                </description>
              </option>
@@ -712,12 +719,12 @@
 <!-- 
  <examples>
     <example>
-      <brief> Demonstrates the AUTO AZSEAM option </brief>
+      <brief> Demonstrates the AUTO RINGLONSEAM option </brief>
        <description>
          This example is the first of two different runs of <i>ringscam2map</i>
-         demonstrating the AZSEAM option.  In this case it is set to AUTO.  
+         demonstrating the RINGLONSEAM option.  In this case it is set to AUTO.  
          All the user input parameters in this example are identical to the
-         following example except for AZSEAM and TO.  The default for AZSEAM
+         following example except for RINGLONSEAM and TO.  The default for RINGLONSEAM
          is AUTO.
        </description>
       <terminalInterface>
@@ -727,7 +734,7 @@
         </commandLine>
         <description>
           This is the command line used to create the output for the AUTO
-          version of the AZSEAM example.
+          version of the RINGLONSEAM example.
         </description>
       </terminalInterface> 
       <guiInterfaces>
@@ -750,11 +757,11 @@
             </brief>
             <description> 
               Screen shot of middle of GUI with parameters filled in for the  
-              output map ground range and the azimuth seam options.  Under
+              output map ground range and the ring longitude seam options.  Under
               the output map ground range section, notice the grayed out
               parameters.  These values are computed and not allowed to be 
               modified when DEFAULTRANGE = MINIMIZE.  This is the default.
-              The AZSEAM option has been set to AUTO in this example.
+              The RINGLONSEAM option has been set to AUTO in this example.
             </description>
             <thumbnail src="assets/thumbs/cam2map_azseam_auto_gui_p2_thumb.jpg" width="200" height="101" caption="cam2map GUI part 2" />
           </image>
@@ -784,7 +791,7 @@
       </dataFiles>
       <inputImages>
         <image src="assets/images/FromFile_EN0108830655M.jpg" width="496" height="496">
-          <brief> Input image for AZSEAM examples</brief>
+          <brief> Input image for RINGLONSEAM examples</brief>
           <description>
             This is a Messenger narrow angle camera image.
           </description>
@@ -794,23 +801,23 @@
       </inputImages>
       <outputImages>
         <image src="assets/images/ToFile_EN0108830655M_azseam_auto.jpg" width="496" height="496">
-          <brief> Output image for cam2map AZSEAM=AUTO</brief>
-          <description> This is the output of cam2map demonstating AZSEAM set 
+          <brief> Output image for cam2map RINGLONSEAM=AUTO</brief>
+          <description> This is the output of cam2map demonstating RINGLONSEAM set 
                         to AUTO.  Contrast this output with the next example
-                        which was created with the AZSEAM set to CONT.
+                        which was created with the RINGLONSEAM set to CONT.
           </description>
-          <thumbnail caption="Output of cam2map run with AZSEAM=AUTO" src="assets/thumbs/ToFile_EN0108830655M_azseam_auto_thumb.jpg" width="200" height="200"/>
+          <thumbnail caption="Output of cam2map run with RINGLONSEAM=AUTO" src="assets/thumbs/ToFile_EN0108830655M_azseam_auto_thumb.jpg" width="200" height="200"/>
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
     </example>
     <example>
-      <brief> Demonstrates the AUTO AZSEAM option </brief>
+      <brief> Demonstrates the AUTO RINGLONSEAM option </brief>
        <description>
          This example is the second of two different runs of <i>cam2map</i>
-         demonstrating the AZSEAM option.  In this case it is set to CONT.
+         demonstrating the RINGLONSEAM option.  In this case it is set to CONT.
          All the user input parameters in this example are identical to the
-         previous example except for AZSEAM and TO.
+         previous example except for RINGLONSEAM and TO.
        </description>
       <terminalInterface>
         <commandLine> from=EN0108830655M.cub 
@@ -819,7 +826,7 @@
         </commandLine>
         <description>
           This is the command line used to create the output for the CONT
-          version of the AZSEAM example.
+          version of the RINGLONSEAM example.
         </description>
       </terminalInterface> 
       <guiInterfaces>
@@ -842,11 +849,11 @@
             </brief>
             <description> 
               Screen shot of middle of GUI with parameters filled in for the  
-              output map ground range and the azimuth seam options.  Under
+              output map ground range and the ring longitude seam options.  Under
               the output map ground range section, notice the grayed out
               parameters.  These values are computed and not allowed to be 
               modified when DEFAULTRANGE = MINIMIZE.  This is the default.
-              The AZSEAM option has been set to CONT in this example.
+              The RINGLONSEAM option has been set to CONT in this example.
             </description>
             <thumbnail src="assets/thumbs/cam2map_azseam_cont_gui_p2_thumb.jpg" width="200" height="103" caption="cam2map GUI part 2" />
           </image>
@@ -876,7 +883,7 @@
       </dataFiles>
       <inputImages>
         <image src="assets/images/FromFile_EN0108830655M.jpg" width="496" height="496">
-          <brief> Input image for AZSEAM examples</brief>
+          <brief> Input image for RINGLONSEAM examples</brief>
           <description>
             This is a Messenger narrow angle camera image.
           </description>
@@ -886,12 +893,12 @@
       </inputImages>
       <outputImages>
         <image src="assets/images/ToFile_EN0108830655M_azseam_cont.jpg" width="496" height="496">
-          <brief> Output image for cam2map AZSEAM=CONT</brief>
-          <description> This is the output of cam2map demonstating AZSEAM set 
+          <brief> Output image for cam2map RINGLONSEAM=CONT</brief>
+          <description> This is the output of cam2map demonstating RINGLONSEAM set 
                         to CONT.  Contrast this output with the previous example
-                        which was created with the AZSEAM set to AUTO.
+                        which was created with the RINGLONSEAM set to AUTO.
           </description>
-          <thumbnail caption="Output of cam2map run with AZSEAM=CONT" src="assets/thumbs/ToFile_EN0108830655M_azseam_cont_thumb.jpg" width="200" height="200"/>
+          <thumbnail caption="Output of cam2map run with RINGLONSEAM=CONT" src="assets/thumbs/ToFile_EN0108830655M_azseam_cont_thumb.jpg" width="200" height="200"/>
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
@@ -938,12 +945,12 @@
             </brief>
             <description> 
               Screen shot of middle of GUI showing parameters for the  
-              output map ground range and the azimuth seam options.  Under
+              output map ground range and the ring longitude seam options.  Under
               the output map ground range section, notice all the parameters
               are grayed out.  These values are all read or computed from the  
               parameters in the mapping group of the level 2 image entered as
               the MAP and not allowed to be modified because MATCHMAP=YES.
-              The AZSEAM option has been set to AUTO in this example (the 
+              The RINGLONSEAM option has been set to AUTO in this example (the 
               default).
             </description>
             <thumbnail src="assets/thumbs/cam2map_matchmap_image_gui_p2_thumb.jpg" width="200" height="104" caption="cam2map GUI part 2" />
@@ -982,7 +989,7 @@
       </inputImages>
       <outputImages>
         <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
-          <brief> Output image for cam2map AZSEAM=AUTO</brief>
+          <brief> Output image for cam2map RINGLONSEAM=AUTO</brief>
           <description> This is the output of cam2map demonstating the use of 
                         MATCHMAP=YES with an Isis level 2 image as MAP. 
                         Contrast this output with the level 2 image used as MAP 
@@ -1037,11 +1044,11 @@
             </brief>
             <description> 
               Screen shot of middle of GUI showing parameters for the  
-              output map ground range and the azimuth seam options.  Under
+              output map ground range and the ring longitude seam options.  Under
               the output map ground range section, notice all the parameters
               are grayed out.  These values are all read or computed from the map 
               file values and not allowed to be modified because MATCHMAP=YES.
-              The AZSEAM option has been set to AUTO in this example (the 
+              The RINGLONSEAM option has been set to AUTO in this example (the 
               default).
             </description>
             <thumbnail src="assets/thumbs/cam2map_matchmap_mapfile_gui_p2_thumb.jpg" width="200" height="104" caption="cam2map GUI part 2" />
@@ -1082,7 +1089,7 @@
       </inputImages>
       <outputImages>
         <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
-          <brief> Output image for ringscam2map AZSEAM=AUTO</brief>
+          <brief> Output image for ringscam2map RINGLONSEAM=AUTO</brief>
           <description> This is the output of ringscam2map demonstating the use of 
                         MATCHMAP=YES with an Isis map file as MAP.  Contrast
                         this output with the previous example, which was also

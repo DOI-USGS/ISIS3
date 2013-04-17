@@ -711,8 +711,8 @@ namespace Isis {
           }
           else { // RingPlaneProjection
             rproj = (RingPlaneProjection *) cvp->projection();
-            m_startLat = rproj->UniversalRadius();
-            m_startLon = rproj->UniversalAzimuth();
+            m_startLat = rproj->UniversalRingRadius();
+            m_startLon = rproj->UniversalRingLongitude();
           }
 
           if (cvp->projection()->SetWorld(m_endSamp, m_endLine)) {
@@ -726,8 +726,8 @@ namespace Isis {
               m_endLon = tproj->UniversalLatitude();
             } // RingPlaneProjection
             else {
-              m_endLat = rproj->UniversalRadius();
-              m_endLon = rproj->UniversalAzimuth();
+              m_endLat = rproj->UniversalRingRadius();
+              m_endLon = rproj->UniversalRingLongitude();
             }
           }
 
@@ -736,7 +736,7 @@ namespace Isis {
             radius = tproj->LocalRadius();
           }
           else {
-            radius = rproj->Radius();
+            radius = rproj->RingRadius();
           }
         }
       }

@@ -39,12 +39,11 @@ namespace Isis {
    *
    * This is a virtual base class for map projections of plane shape targets. It must be used to 
    * create specific map projection classes such as PlaneCylindrical, PlanePolar, etc. The
-   * foundation of this class is the ability to convert plane ground coordinates
-   * (radius and azimuth) into projection coordinates (x and y) and vice
-   * versa. Options exist to allow conversion to and from programmer specified
-   * world coordinates. The world coordinates can be cube pixels, paper units in
-   * millimeters, or any other unit the program may need. Generally, you should
-   * never directly instantiate this class.
+   * foundation of this class is the ability to convert plane ground coordinates (ring radius 
+   * and ring longitude) into projection coordinates (x and y) and vice versa. Options exist to 
+   * allow conversion to and from programmer specified world coordinates. The world coordinates 
+   * can be cube pixels, paper units in millimeters, or any other unit the program may need. 
+   * Generally, you should never directly instantiate this class. 
    *
    * Here is an example of how to use RingPlaneProjection
    * @code
@@ -76,7 +75,7 @@ namespace Isis {
    *                           methods
    *   @history 2003-11-04 Jeff Anderson - Replace the pure virtual methods for
    *                           SetGround() and SetCoordinate() with virtual
-   *                           method which simply copy lat/lon to x/y and vice
+   *                           method which simply copy ring rad/lon to x/y and vice
    *                           versa. This is essentially no projection.
    *   @history 2003-11-04 Jeff Anderson - Added LocalRadius() methods
    *   @history 2004-02-23 Jeff Anderson - Added Eccentricity(), tCompute(),
@@ -186,50 +185,51 @@ namespace Isis {
        * @return string The Version number of the map projection.
        */
       virtual QString Version() const = 0;
-      virtual double TrueScaleRadius() const;
+      virtual double TrueScaleRingRadius() const;
 
       /**
-       * This enum defines the types of Azimuth directions supported in this 
-       * class.  
+       * This enum defines the types of ring longitude directions supported 
+       * in this class. 
        */
-      enum AzimuthDirection { Clockwise, /**< Azimuth values increase in 
+      enum RingLongitudeDirection { Clockwise, /**< Ring longitude values increase in 
                                                    the clockwise direction. */
-                                CounterClockwise  /**< Azimuth values increase in 
+                                CounterClockwise  /**< Ring longitude values increase in 
                                                    the counterclockwise direction.*/
                               };
 
-      // Check azimuth direction or get azimuth direction as a string
+      // Check ring longitude direction or get ring longitude direction as a string
       bool IsClockwise() const;
       bool IsCounterClockwise() const;
-      std::string AzimuthDirectionString() const;
+      std::string RingLongitudeDirectionString() const;
 
-      // Check azimuth domain or get azimuth domain as a string  TODO** check implementation to see if this can go in Projection
+      // Check ring longitude domain or get ring longitude domain as a string  TODO** check implementation to see if this can go in Projection
       bool Has180Domain() const;
       bool Has360Domain() const;
-      std::string AzimuthDomainString() const;
+      std::string RingLongitudeDomainString() const;
 
-      // Get min/max rad/az
-      double MinimumRadius() const;
-      double MaximumRadius() const;
-      double MinimumAzimuth() const;
-      double MaximumAzimuth() const;
+      // Get min/max ring rad/lon
+      double MinimumRingRadius() const;
+      double MaximumRingRadius() const;
+      double MinimumRingLongitude() const;
+      double MaximumRingLongitude() const;
 
       //  Calculations
       // Set ground position or x/y coordinate
-      virtual bool SetGround(const double rad, const double az);
+      virtual bool SetGround(const double ringRadius, const double ringLongitude);
       virtual bool SetCoordinate(const double x, const double y);
 
       // Methods that depend on successful completion
-      // of SetGround/SetCoordinate Get rad,az, x,y
-      double Radius() const;
-      double Azimuth() const;
+      // of SetGround/SetCoordinate Get ring rad,ring
+      // lon, x,y
+      double RingRadius() const;
+      double RingLongitude() const;
 
       // Set the universal ground coordinate (calls SetGround)
-      bool SetUniversalGround(const double rad, const double az);
+      bool SetUniversalGround(const double ringRadius, const double ringLongitude);
 
       // Return the universal ground coordinate after successful SetCoordinate
-      double UniversalRadius();
-      double UniversalAzimuth();
+      double UniversalRingRadius();
+      double UniversalRingLongitude();
 
       // convert from world coordinate to projected coordinate
       //      double ToProjectionX(const double worldX) const;
@@ -238,25 +238,25 @@ namespace Isis {
       // get resolution and scale for mapping world coordinates
       double Scale() const;
 
-      // Return the x/y range which covers the rad/az range in the labels
+      // Return the x/y range which covers the ring rad/lon range in the labels
       virtual bool XYRange(double &minX, double &maxX, 
                            double &minY, double &maxY);
 
       // get mapping information
       virtual PvlGroup Mapping();
-      virtual PvlGroup MappingRadii();
-      virtual PvlGroup MappingAzimuths();
+      virtual PvlGroup MappingRingRadii();
+      virtual PvlGroup MappingRingLongitudes();
 
-      // change azimuth direction
-      static double ToClockwise(const double az, const int domain);
-      static double ToCounterClockwise(const double az, const int domain);
+      // change ring longitude direction
+      static double ToClockwise(const double ringLongitude, const int domain);
+      static double ToCounterClockwise(const double ringLongitude, const int domain);
 
-      // change azimuth domain 
+      // change ring longitude domain 
       static double To180Domain(const double lon);
       static double To360Domain(const double lon);
 
     protected:
-      void XYRangeCheck(const double radius, const double azimuth);
+      void XYRangeCheck(const double ringRadius, const double ringLongitude);
       //      bool xyRangeOblique(double &minX, double &maxX, 
       //                          double &minY, double &maxY);
 
@@ -264,17 +264,17 @@ namespace Isis {
       // These methods are not currectly being used by the ring plane projections
       /*      void doSearch(double minBorder, double maxBorder, 
                     double &extremeVal, const double constBorder,
-                    bool searchX, bool searchAzimuth, bool findMin);
+                    bool searchX, bool searchRingLongitude, bool findMin);
       void findExtreme(double &minBorder,  double &maxBorder, 
                        double &minBorderX, double &minBorderY, 
                        double &maxBorderX, double &maxBorderY, 
                        const double constBorder, bool searchX, 
-                       bool searchAzimuth, bool findMin);
+                       bool searchRingLongitude, bool findMin);
       void setSearchGround(const double variableBorder, 
                            const double constBorder, bool variableIsRad);
       */
     protected:
-      double m_radius;   /**< This contain a radius value in m. The value is 
+      double m_ringRadius;   /**< This contain a ring radius value in m. The value is 
                                 only usable if m_good is true.*/
       // 1.  The horizontal angular distance from a reference direction, usually the northern point 
       //      of the horizon, to the point where a vertical circle through a celestial body 
@@ -282,34 +282,34 @@ namespace Isis {
       //      is used as the reference direction, and the measurement is made clockwise through 360°.
       // 2.  The horizontal angle of the observer's bearing in surveying, measured clockwise from a 
       //      referent direction, as from the north, or from a referent celestial body, usually Polaris.
-      double m_azimuth;  /**< This contain a azimuth value. The value is 
+      double m_ringLongitude;  /**< This contain a ring longitude value. The value is 
                                 only usable if m_good is true.*/
 
 
-      AzimuthDirection m_azimuthDirection; /**< An enumerated type indicating the 
+      RingLongitudeDirection m_ringLongitudeDirection; /**< An enumerated type indicating the 
                                                     LongitudeDirection read from the 
                                                     labels. It can be either PositiveEast
                                                     or PositiveWest. Indicating which 
                                                     direction the positive axis for 
                                                     longitude is.**/
 
-      // TODO** Can this be generalized for both longitude and azimuth???
-      int m_azimuthDomain; /**< This integer is either 180 or 360 and is read 
-                                  from the labels. It represents the azimuth 
-                                  domain when returning values through Azimuth
+      // TODO** Can this be generalized for both longitude and ring longitude???
+      int m_ringLongitudeDomain; /**< This integer is either 180 or 360 and is read 
+                                  from the labels. It represents the ring longitude 
+                                  domain when returning values through RingLongitude()
                                   method. The domain is either -180 to 180 or
                                   0 to 360.**/
 
-      double m_minimumRadius;   /**< Contains the minimum radius for the
+      double m_minimumRingRadius;   /**< Contains the minimum ring radius for the
                                        entire ground range. Only usable if
                                        m_groundRangeGood is true.*/
-      double m_maximumRadius;   /**< Contains the maximum radius for the
+      double m_maximumRingRadius;   /**< Contains the maximum ring radius for the
                                        entire ground range. Only usable if
                                        m_groundRangeGood is true.*/
-      double m_minimumAzimuth;  /**< Contains the minimum longitude for the
+      double m_minimumRingLongitude;  /**< Contains the minimum longitude for the
                                        entire ground range. Only usable if
                                        m_groundRangeGood is true.*/
-      double m_maximumAzimuth;  /**< Contains the maximum longitude for the
+      double m_maximumRingLongitude;  /**< Contains the maximum longitude for the
                                        entire ground range. Only usable if
                                        m_groundRangeGood is true.*/
 

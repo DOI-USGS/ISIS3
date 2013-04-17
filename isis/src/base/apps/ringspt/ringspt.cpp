@@ -5,7 +5,7 @@
 
 #include "Brick.h"
 #include "Camera.h"
-#include "CameraPointInfo.h"
+#include "CameraRingsPointInfo.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Progress.h"
@@ -18,8 +18,8 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   bool outsideAllowed = ui.GetBoolean("ALLOWOUTSIDE");
 
-  // Set up CameraPointInfo and set  file
-  CameraPointInfo ringspt;
+  // Set up CameraRingsPointInfo and set  file
+  CameraRingsPointInfo ringspt;
   ringspt.SetCube(ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").toString());
 
   Progress prog;
@@ -33,7 +33,7 @@ void IsisMain() {
     if (ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
       sample = ui.GetDouble("SAMPLE");
       line = ui.GetDouble("LINE");
-    point = ringspt.SetImage(sample, line, outsideAllowed);
+      point = ringspt.SetImage(sample, line, outsideAllowed);
     }
     else {
       if (ui.WasEntered("SAMPLE")) {
@@ -50,9 +50,9 @@ void IsisMain() {
     }
   }
   else {
-    double radius = ui.GetDouble("RADIUS");
-    double az = ui.GetDouble("AZIMUTH");
-    point = ringspt.SetGround(radius, az, outsideAllowed);
+    double ringRadius = ui.GetDouble("RINGRADIUS");
+    double ringLongitude = ui.GetDouble("RINGLONGITUDE");
+    point = ringspt.SetGround(ringRadius, ringLongitude, outsideAllowed);
   }
 
   prog.CheckStatus();

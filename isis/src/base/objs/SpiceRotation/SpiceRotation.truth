@@ -201,8 +201,6 @@ CJ(9) = -0.62100725 0.39254656 -0.67842258
 av(9) = -5.6369117e-05 -0.0010744677 -0.00075515741
 
 Test fitting polynomial function over cache to new cache
-Full cache size is 10
-Minimized cache size is 10
 Source = 2
 Time           = -69382819
 CJ(0) = -0.87809698 0.25267525 -0.40632612

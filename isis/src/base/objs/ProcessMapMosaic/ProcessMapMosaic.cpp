@@ -266,10 +266,10 @@ namespace Isis {
     double xmax = -DBL_MAX;
     double ymin = DBL_MAX;
     double ymax = -DBL_MAX;
-    double srad = DBL_MAX;
-    double erad = -DBL_MAX;
-    double saz = DBL_MAX;
-    double eaz = -DBL_MAX;
+    double srad = DBL_MAX;  // starting ring radius
+    double erad = -DBL_MAX; // ending ring radius
+    double saz = DBL_MAX;   // starting azimuth (ring longitude)
+    double eaz = -DBL_MAX;  // ending azimuth (ring longitude)
 
     RingPlaneProjection *proj = NULL;
 
@@ -309,10 +309,10 @@ namespace Isis {
       if (x > xmax) xmax = x;
       if (y > ymax) ymax = y;
 
-      srad = min(srad, projNew->MinimumRadius());
-      erad = max(erad, projNew->MaximumRadius());
-      saz = min(saz, projNew->MinimumAzimuth());
-      eaz = max(eaz, projNew->MaximumAzimuth());
+      srad = min(srad, projNew->MinimumRingRadius());
+      erad = max(erad, projNew->MaximumRingRadius());
+      saz = min(saz, projNew->MinimumRingLongitude());
+      eaz = max(eaz, projNew->MaximumRingLongitude());
 
       // Cleanup
       cube.close();
@@ -399,8 +399,17 @@ namespace Isis {
 
   //*************************************************************************************************
   /**
-   * Set the output cube to specified file name and specified input images
-   * and output attributes and lat,lons
+   * Set the output cube to specified file name using the specified input 
+   * images, output attributes, ring radii values and ring longitude 
+   * values. 
+   *  
+   * @param propagationCubes List of input images
+   * @param srad Start ring radius
+   * @param erad End ring radius
+   * @param saz Start ring longitude (azimuth)
+   * @param eaz End ring longitude (azimuth)
+   * @param oAtt Output attributes
+   * @param mosaicFile Name of the output mosaic file
    */
   Isis::Cube *ProcessMapMosaic::RingsSetOutputCube(FileList &propagationCubes,
       double srad, double erad, double saz, double eaz,
@@ -414,10 +423,10 @@ namespace Isis {
     Pvl label;
     label.read(propagationCubes[0].toString());
     PvlGroup mGroup = label.findGroup("Mapping", Pvl::Traverse);
-    mGroup.addKeyword(PvlKeyword("MinimumRadius", toString(srad)), Pvl::Replace);
-    mGroup.addKeyword(PvlKeyword("MaximumRadius", toString(erad)), Pvl::Replace);
-    mGroup.addKeyword(PvlKeyword("MinimumAzimuth", toString(saz)), Pvl::Replace);
-    mGroup.addKeyword(PvlKeyword("MaximumAzimuth", toString(eaz)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MinimumRingRadius", toString(srad)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MaximumRingRadius", toString(erad)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MinimumRingLongitude", toString(saz)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MaximumRingLongitude", toString(eaz)), Pvl::Replace);
 
     if (mGroup.hasKeyword("UpperLeftCornerX"))
       mGroup.deleteKeyword("UpperLeftCornerX");
@@ -539,8 +548,21 @@ namespace Isis {
   //*************************************************************************************************
 
   /**
-   * Set the output cube to specified file name and specified input images
-   * and output attributes and lat,lons
+   * Set the output cube to specified file name using the specified input
+   * file name, output attributes, ring radii values and ring longitude 
+   * values. 
+   *  
+   * @param inputFile Name of input file 
+   * @param xmin Minimum x-value
+   * @param xmax Maximum x-value
+   * @param ymin Minimum y-value
+   * @param ymax Maximum y-value
+   * @param srad Start ring radius
+   * @param erad End ring radius
+   * @param saz Start ring longitude (azimuth)
+   * @param eaz End ring longitude (azimuth)
+   * @param oAtt Output attributes
+   * @param mosaicFile Name of the output mosaic file
    */
   Isis::Cube *ProcessMapMosaic::RingsSetOutputCube(const QString &inputFile,
       double xmin, double xmax, double ymin, double ymax,
@@ -551,10 +573,10 @@ namespace Isis {
 
     mapping["UpperLeftCornerX"] = toString(xmin);
     mapping["UpperLeftCornerY"] = toString(ymax);
-    mapping.addKeyword(PvlKeyword("MinimumRadius", toString(srad)), Pvl::Replace);
-    mapping.addKeyword(PvlKeyword("MaximumRadius", toString(erad)), Pvl::Replace);
-    mapping.addKeyword(PvlKeyword("MinimumAzimuth", toString(saz)), Pvl::Replace);
-    mapping.addKeyword(PvlKeyword("MaximumAzimuth", toString(eaz)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MinimumRingRadius", toString(srad)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MaximumRingRadius", toString(erad)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MinimumRingLongitude", toString(saz)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MaximumRingLongitude", toString(eaz)), Pvl::Replace);
 
     Projection *firstProj = ProjectionFactory::RingsCreateFromCube(fileLab);
     int samps = (int)(ceil(firstProj->ToWorldX(xmax) - firstProj->ToWorldX(xmin)) + 0.5);

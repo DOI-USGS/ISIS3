@@ -22,12 +22,12 @@ int main(int argc, char *argv[]) {
   PvlGroup &mapGroup = lab.findGroup("Mapping");
   mapGroup += PvlKeyword("ProjectionName", "Planar");
   mapGroup += PvlKeyword("TargetName", "Saturn");
-  mapGroup += PvlKeyword("AzimuthDirection", "Clockwise");
-  mapGroup += PvlKeyword("AzimuthDomain", "180");
-  mapGroup += PvlKeyword("MinimumRadius", "0.0");
-  mapGroup += PvlKeyword("MaximumRadius", "2000000.0");
-  mapGroup += PvlKeyword("MinimumAzimuth", "-20.0");
-  mapGroup += PvlKeyword("MaximumAzimuth", "130.0");
+  mapGroup += PvlKeyword("RingLongitudeDirection", "Clockwise");
+  mapGroup += PvlKeyword("RingLongitudeDomain", "180");
+  mapGroup += PvlKeyword("MinimumRingRadius", "0.0");
+  mapGroup += PvlKeyword("MaximumRingRadius", "2000000.0");
+  mapGroup += PvlKeyword("MinimumRingLongitude", "-20.0");
+  mapGroup += PvlKeyword("MaximumRingLongitude", "130.0");
 
   cout << "Test missing center azimuth keyword ..." << endl;
   try {
@@ -38,9 +38,9 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterAzimuth", "0.0");
+  mapGroup += PvlKeyword("CenterRingLongitude", "0.0");
 
-  cout << "Test missing CenterRadius keyword ..." << endl;
+  cout << "Test missing CenterRingRadius keyword ..." << endl;
   try {
     Planar p(lab);
   }
@@ -49,38 +49,38 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterRadius", "200000.0");
+  mapGroup += PvlKeyword("CenterRingRadius", "200000.0");
 
   try {
     Isis::Planar *p = (Planar *) ProjectionFactory::Create(lab);
 
     // Projection 1 test
     cout << "Projection 1 parameters..." << endl;
-    cout << "Projection version   = " << p->Version() << endl;
-    cout << "  Projection name    =  " <<  p->Name()  << endl;
-    cout << "  Target name          =  " << (QString) mapGroup["TargetName"]  << endl;
-    cout << "  Azimuth direction  = " << p->AzimuthDirectionString() << endl;
-    cout << "  Azimuth domain    = " << p->AzimuthDomainString() << endl;
-    cout << "  Minimum radius     = " << p->MinimumRadius() << endl;
-    cout << "  Maximum radius     = " << p->MaximumRadius() << endl;
-    cout << "  Minimum azimuth   = " << p->MinimumAzimuth() << endl;
-    cout << "  Maximum azimuth  = " << p->MaximumAzimuth() << endl;
-    cout << "  Center radius         = " << p->CenterRadius() << endl;
-    cout << "  Center azimuth      = " << p->CenterAzimuth() << endl;
+    cout << "Projection version         = " << p->Version() << endl;
+    cout << "  Projection name          =  " <<  p->Name()  << endl;
+    cout << "  Target name              =  " << (QString) mapGroup["TargetName"]  << endl;
+    cout << "  RingLongitude direction  = " << p->RingLongitudeDirectionString() << endl;
+    cout << "  RingLongitude domain     = " << p->RingLongitudeDomainString() << endl;
+    cout << "  Minimum ring radius      = " << p->MinimumRingRadius() << endl;
+    cout << "  Maximum ring radius      = " << p->MaximumRingRadius() << endl;
+    cout << "  Minimum ring longitude   = " << p->MinimumRingLongitude() << endl;
+    cout << "  Maximum ring longitude   = " << p->MaximumRingLongitude() << endl;
+    cout << "  Center ring radius       = " << p->CenterRingRadius() << endl;
+    cout << "  Center ring longitude    = " << p->CenterRingLongitude() << endl;
     cout << endl;
 
-    // Test TrueScaleRadius method
-     cout << "Test TrueScaleRadius method..." << endl;
-     cout << "TrueScaleRadius = " << p->TrueScaleRadius() << endl;
+    // Test TrueScaleRingRadius method
+     cout << "Test TrueScaleRingRadius method..." << endl;
+     cout << "TrueScaleRingRadius = " << p->TrueScaleRingRadius() << endl;
      cout << endl;
 
-    // SetGround(const double radius, const double az)
+    // SetGround(const double ring radius, const double az)
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(16);
     cout << "Setting ground to (1000.0,45.0)" << endl;
     p->SetGround(1000.0, 45.0);
-    cout << "Radius:               " << p->LocalRadius() << endl;
-    cout << "Azimuth:              " << p->Azimuth() << endl;
+    cout << "RingRadius:             " << p->LocalRadius() << endl;
+    cout << "RingLongitude:          " << p->RingLongitude() << endl;
     cout << "XCoord:                 " << p->XCoord() << endl;
     cout << "YCoord:                 " << p->YCoord() << endl;
     cout << endl;
@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
     cout << "Test SetCoordinate method ... " << endl;
     cout << "Setting coordinate to (0.2617993877991494,-0.8726646259971648)" << endl;
     p->SetCoordinate(0.2617993877991494, -0.8726646259971648);
-    cout << "Radius:               " << p->LocalRadius() << endl;
-    cout << "Azimuth:              " << p->Azimuth() << endl;
+    cout << "RingRadius:             " << p->LocalRadius() << endl;
+    cout << "RingLongitude:          " << p->RingLongitude() << endl;
     cout << "XCoord:                 " << p->XCoord() << endl;
     cout << "YCoord:                 " << p->YCoord() << endl;
     cout << endl;
@@ -112,37 +112,37 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing default options in constructor with Projection 2 ... " << endl;
-    mapGroup.deleteKeyword("CenterAzimuth");
-    mapGroup.deleteKeyword("CenterRadius");
+    mapGroup.deleteKeyword("CenterRingLongitude");
+    mapGroup.deleteKeyword("CenterRingRadius");
     Planar p2(lab, true);
     cout << lab << endl;
     cout << "Default projection parameters == Original projection ?" << (*p == p2) << endl;
     cout << endl;
     cout << endl;
 
-    cout << "Testing more SetGround conditions...AzimuthDirection = CounterClockwise and AzimuthDomain = 360" << endl;
-    mapGroup["AzimuthDirection"].setValue("CounterClockwise");
-    mapGroup["AzimuthDomain"].setValue("360");
+    cout << "Testing more SetGround conditions...RingLongitudeDirection = CounterClockwise and RingLongitudeDomain = 360" << endl;
+    mapGroup["RingLongitudeDirection"].setValue("CounterClockwise");
+    mapGroup["RingLongitudeDomain"].setValue("360");
     Planar p3(lab, true);
 
     // Projection 3 test
     cout << "Projection 3 parameters..." << endl;
-    cout << "  Projection name    =  " <<  p3.Name()  << endl;
-    cout << "  Target name          =  " << (QString) mapGroup["TargetName"]  << endl;
-    cout << "  Azimuth direction  = " << p3.AzimuthDirectionString() << endl;
-    cout << "  Azimuth domain    = " << p3.AzimuthDomainString() << endl;
-    cout << "  Minimum radius     = " << p3.MinimumRadius() << endl;
-    cout << "  Maximum radius     = " << p3.MaximumRadius() << endl;
-    cout << "  Minimum azimuth   = " << p3.MinimumAzimuth() << endl;
-    cout << "  Maximum azimuth  = " << p3.MaximumAzimuth() << endl;
-    cout << "  Center radius         = " << p3.CenterRadius() << endl;
-    cout << "  Center azimuth      = " << p3.CenterAzimuth() << endl;
+    cout << "  Projection name          =  " <<  p3.Name()  << endl;
+    cout << "  Target name              =  " << (QString) mapGroup["TargetName"]  << endl;
+    cout << "  RingLongitude direction  = " << p3.RingLongitudeDirectionString() << endl;
+    cout << "  RingLongitude domain     = " << p3.RingLongitudeDomainString() << endl;
+    cout << "  Minimum ring radius      = " << p3.MinimumRingRadius() << endl;
+    cout << "  Maximum ring radius      = " << p3.MaximumRingRadius() << endl;
+    cout << "  Minimum ring longitude   = " << p3.MinimumRingLongitude() << endl;
+    cout << "  Maximum ring longitude   = " << p3.MaximumRingLongitude() << endl;
+    cout << "  Center ring radius       = " << p3.CenterRingRadius() << endl;
+    cout << "  Center ring longitude    = " << p3.CenterRingLongitude() << endl;
     cout << endl;
 
     cout << "  Setting ground to (1000.0,45.0)" << endl;
     p3.SetGround(1000.0, 45.0);
-    cout << "    Radius:             =  " << p3.LocalRadius() << endl;
-    cout << "    Azimuth:          =  " << p3.Azimuth() << endl;
+    cout << "    RingRadius:       =  " << p3.LocalRadius() << endl;
+    cout << "    RingLongitude:    =  " << p3.RingLongitude() << endl;
     cout << "    XCoord:           =  " << p3.XCoord() << endl;
     cout << "    YCoord:           =  " << p3.YCoord() << endl;
     cout << endl;
@@ -160,15 +160,15 @@ int main(int argc, char *argv[]) {
     cout << "Testing more SetCoordinate methods ... " << endl;
     cout << "Setting coordinate to (0.2617993877991494,-0.8726646259971648)" << endl;
     p3.SetCoordinate(0.2617993877991494, -0.8726646259971648);
-    cout << "Radius:               " << p3.LocalRadius() << endl;
-    cout << "Azimuth:              " << p3.Azimuth() << endl;
+    cout << "RingRadius:             " << p3.LocalRadius() << endl;
+    cout << "RingLongitude:          " << p3.RingLongitude() << endl;
     cout << "XCoord:                 " << p3.XCoord() << endl;
     cout << "YCoord:                 " << p3.YCoord() << endl;
     cout << endl;
     cout << "Setting coordinate to (0.2617993877991494,0.8726646259971648)" << endl;
     p3.SetCoordinate(0.2617993877991494, 0.8726646259971648);
-    cout << "Radius:               " << p3.LocalRadius() << endl;
-    cout << "Azimuth:              " << p3.Azimuth() << endl;
+    cout << "RingRadius:             " << p3.LocalRadius() << endl;
+    cout << "RingLongitude:          " << p3.RingLongitude() << endl;
     cout << "XCoord:                 " << p3.XCoord() << endl;
     cout << "YCoord:                 " << p3.YCoord() << endl;
     cout << endl;
@@ -176,34 +176,34 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    mapGroup.deleteKeyword("MinimumRadius");
-    mapGroup.deleteKeyword("MaximumRadius");
-    mapGroup.deleteKeyword("MinimumAzimuth");
-    mapGroup.deleteKeyword("MaximumAzimuth");
+    mapGroup.deleteKeyword("MinimumRingRadius");
+    mapGroup.deleteKeyword("MaximumRingRadius");
+    mapGroup.deleteKeyword("MinimumRingLongitude");
+    mapGroup.deleteKeyword("MaximumRingLongitude");
 
     // Projection 4 test
     Planar p4(lab, true);
     cout << "Projection 4 parameters...No range" << endl;
-    cout << "  Projection name    =  " <<  p4.Name()  << endl;
-    cout << "  Target name          =  " << (QString) mapGroup["TargetName"]  << endl;
-    cout << "  Azimuth direction  = " << p4.AzimuthDirectionString() << endl;
-    cout << "  Azimuth domain    = " << p4.AzimuthDomainString() << endl;
-    cout << "  Center radius         = " << p4.CenterRadius() << endl;
-    cout << "  Center azimuth      = " << p4.CenterAzimuth() << endl;
+    cout << "  Projection name          =  " <<  p4.Name()  << endl;
+    cout << "  Target name              =  " << (QString) mapGroup["TargetName"]  << endl;
+    cout << "  RingLongitude direction  = " << p4.RingLongitudeDirectionString() << endl;
+    cout << "  RingLongitude domain     = " << p4.RingLongitudeDomainString() << endl;
+    cout << "  Center ring radius       = " << p4.CenterRingRadius() << endl;
+    cout << "  Center ring longitude    = " << p4.CenterRingLongitude() << endl;
     cout << endl;
 
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
     tmp1.addGroup(p->Mapping());
-    tmp2.addGroup(p->MappingRadii());
-    tmp3.addGroup(p->MappingAzimuths());
+    tmp2.addGroup(p->MappingRingRadii());
+    tmp3.addGroup(p->MappingRingLongitudes());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;
     cout << "MappingRadii() = " << endl;
     cout << tmp2 << endl;
-    cout << "MappingAzimuths() = " << endl;
+    cout << "MappingRingLongitudes() = " << endl;
     cout << tmp3 << endl;
     cout << endl;
   }

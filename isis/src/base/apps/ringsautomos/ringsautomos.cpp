@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Isis;
 
-void calcRange(double &minRad, double &maxRad, double &minAz, double &maxAz);
+void calcRange(double &minRingRad, double &maxRingRad, double &minRingLon, double &maxRingLon);
 void helperButtonCalcRange();
 
 map <QString, void *> GuiHelpers() {
@@ -70,8 +70,8 @@ void IsisMain() {
   CubeAttributeOutput &oAtt = ui.GetOutputAttribute("MOSAIC");
   if(ui.GetString("GRANGE") == "USER") {
     m.RingsSetOutputCube(list,
-                    ui.GetDouble("MINRAD"), ui.GetDouble("MAXRAD"),
-                    ui.GetDouble("MINAZ"), ui.GetDouble("MAXAZ"),
+                    ui.GetDouble("MINRINGRAD"), ui.GetDouble("MAXRINGRAD"),
+                    ui.GetDouble("MINRINGLON"), ui.GetDouble("MAXRINGLON"),
                     oAtt, ui.GetFileName("MOSAIC"));
   }
   else {
@@ -120,13 +120,13 @@ void IsisMain() {
 }
 
 // Function to calculate the ground range from multiple inputs (list of images)
-void calcRange(double &minRad, double &maxRad, double &minAz, double &maxAz) {
+void calcRange(double &minRingRad, double &maxRingRad, double &minRingLon, double &maxRingLon) {
   UserInterface &ui = Application::GetUserInterface();
   FileList list(FileName(ui.GetFileName("FROMLIST")));
-  minRad = DBL_MAX;
-  maxRad = -DBL_MAX;
-  minAz = DBL_MAX;
-  maxAz = -DBL_MAX;
+  minRingRad = DBL_MAX;
+  maxRingRad = -DBL_MAX;
+  minRingLon = DBL_MAX;
+  maxRingLon = -DBL_MAX;
   // We will loop through each input cube and do some
   // computations needed for mosaicking
   int nbands = 0;
@@ -151,10 +151,10 @@ void calcRange(double &minRad, double &maxRad, double &minAz, double &maxAz) {
     }
 
     if(proj->HasGroundRange()) {
-      if(proj->MinimumRadius() < minRad) minRad = proj->MinimumRadius();
-      if(proj->MaximumRadius() > maxRad) maxRad = proj->MaximumRadius();
-      if(proj->MinimumAzimuth() < minAz) minAz = proj->MinimumAzimuth();
-      if(proj->MaximumAzimuth() > maxAz) maxAz = proj->MaximumAzimuth();
+      if(proj->MinimumRingRadius() < minRingRad) minRingRad = proj->MinimumRingRadius();
+      if(proj->MaximumRingRadius() > maxRingRad) maxRingRad = proj->MaximumRingRadius();
+      if(proj->MinimumRingLongitude() < minRingLon) minRingLon = proj->MinimumRingLongitude();
+      if(proj->MaximumRingLongitude() > maxRingLon) maxRingLon = proj->MaximumRingLongitude();
     }
 
     // Cleanup
@@ -167,24 +167,24 @@ void calcRange(double &minRad, double &maxRad, double &minAz, double &maxAz) {
 // Helper function to run calcRange function.
 void helperButtonCalcRange() {
   UserInterface &ui = Application::GetUserInterface();
-  double minRad;
-  double maxRad;
-  double minAz;
-  double maxAz;
+  double minRingRad;
+  double maxRingRad;
+  double minRingLon;
+  double maxRingLon;
 
   // Run the function calcRange of calculate range info
-  calcRange(minRad, maxRad, minAz, maxAz);
+  calcRange(minRingRad, maxRingRad, minRingLon, maxRingLon);
 
   // Write ranges to the GUI
   QString use = "USER";
   ui.Clear("GRANGE");
   ui.PutAsString("GRANGE", use);
-  ui.Clear("MINRAD");
-  ui.PutDouble("MINRAD", minRad);
-  ui.Clear("MAXRAD");
-  ui.PutDouble("MAXRAD", maxRad);
-  ui.Clear("MINAZ");
-  ui.PutDouble("MINAZ", minAz);
-  ui.Clear("MAXAZ");
-  ui.PutDouble("MAXAZ", maxAz);
+  ui.Clear("MINRINGRAD");
+  ui.PutDouble("MINRINGRAD", minRingRad);
+  ui.Clear("MAXRINGRAD");
+  ui.PutDouble("MAXRINGRAD", maxRingRad);
+  ui.Clear("MINRINGLON");
+  ui.PutDouble("MINRINGLON", minRingLon);
+  ui.Clear("MAXRINGLON");
+  ui.PutDouble("MAXRINGLON", maxRingLon);
 }

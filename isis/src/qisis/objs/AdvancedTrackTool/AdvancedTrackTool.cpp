@@ -450,8 +450,8 @@ namespace Isis {
         }
         else { // RingPlane
           RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
-          double lat = rproj->UniversalRadius();
-          double lon = rproj->UniversalAzimuth();
+          double lat = rproj->UniversalRingRadius();
+          double lon = rproj->UniversalRingLongitude();
 
           double wlon = -lon;
           while(wlon < 0.0) wlon += 360.0;

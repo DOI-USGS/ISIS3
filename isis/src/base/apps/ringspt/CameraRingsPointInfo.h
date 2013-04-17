@@ -1,3 +1,5 @@
+#ifndef CameraRingsPointInfo_h
+#define CameraRingsPointInfo_h
 /**
  * @file
  * $Revision: 1.5 $
@@ -20,15 +22,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef CameraPointInfo_h
-#define CameraPointInfo_h
 
 #include <QString>
 
+#include "CameraPointInfo.h"
+
 namespace Isis {
-  class CubeManager;
-  class Cube;
-  class Camera;
   class PvlGroup;
 
 

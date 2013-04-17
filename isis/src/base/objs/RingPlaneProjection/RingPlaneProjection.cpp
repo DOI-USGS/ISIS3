@@ -54,29 +54,29 @@ namespace Isis {
    *            brief example follows:
    *                   @code
    *                       Group = Mapping
-   *                         AzimuthDirection = PositiveEast
-   *                         AzimuthDomain = 360
-   *                         MinimumRadius = 10.8920539924144
-   *                         MaximumRadius = 34.7603960060206
-   *                         MinimumAzimuth = 219.72432466275
-   *                         MaximumAzimuth = 236.186050244411
+   *                         RingLongitudeDirection = PositiveEast
+   *                         RingLongitudeDomain = 360
+   *                         MinimumRingRadius = 10.8920539924144
+   *                         MaximumRingRadius = 34.7603960060206
+   *                         MinimumRingLongitude = 219.72432466275
+   *                         MaximumRingLongitude = 236.186050244411
    *                         PixelResolution = 1387.31209461362
    *                         ProjectionName = Planar
-   *                         CenterAzimuth = 220.0
+   *                         CenterRingLongitude = 220.0
    *                       EndGroup
    *                     End
    *                   @endcode
    *
    * @throw IException::Unknown - "Projection failed. Invalid value 
-   *            for keyword [AzimuthDirection] must be [Clockwise or CounterClockwise]"
+   *            for keyword [RingLongitudeDirection] must be [Clockwise or CounterClockwise]"
    * @throw IException::Unknown - "Projection failed. Invalid value 
-   *            for keyword [AzimuthDomain] must be [180 or 360]"
-   * @throw IException::Unknown - "Projection failed. [MinimumRadius] is not valid"
-   * @throw IException::Unknown - "Projection failed. [MaximumRadius] is not valid"
+   *            for keyword [RingLongitudeDomain] must be [180 or 360]"
+   * @throw IException::Unknown - "Projection failed. [MinimumRingRadius] is not valid"
+   * @throw IException::Unknown - "Projection failed. [MaximumRingRadius] is not valid"
    * @throw IException::Unknown - "Projection failed. 
-   *            [MinimumRadius,MaximumRadius] are not properly ordered"
+   *            [MinimumRingRadius,MaximumRingRadius] are not properly ordered"
    * @throw IException::Unknown - "Projection failed. 
-   *            [MinimumAzimuth,MaximumAzimuth] are not properly ordered"
+   *            [MinimumRingLongitude,MaximumRingLongitude] are not properly ordered"
    * @throw IException::Unknown - "Projection failed. Invalid label 
    *            group [Mapping]"
    * 
@@ -84,73 +84,73 @@ namespace Isis {
   RingPlaneProjection::RingPlaneProjection(Pvl &label) : Projection::Projection(label) {
     try {
       // Mapping group is read by the parent (Projection)
-      // Get the Azimuth Direction
-      if ((QString) m_mappingGrp["AzimuthDirection"] == "Clockwise") {
-        m_azimuthDirection = Clockwise;
+      // Get the RingLongitude Direction
+      if ((QString) m_mappingGrp["RingLongitudeDirection"] == "Clockwise") {
+        m_ringLongitudeDirection = Clockwise;
       }
-      else if ((QString) m_mappingGrp["AzimuthDirection"] == "CounterClockwise") {
-        m_azimuthDirection = CounterClockwise;
+      else if ((QString) m_mappingGrp["RingLongitudeDirection"] == "CounterClockwise") {
+        m_ringLongitudeDirection = CounterClockwise;
       }
       else {
         QString msg = "Projection failed. Invalid value for keyword "
-                      "[AzimuthDirection] must be "
+                      "[RingLongitudeDirection] must be "
                       "[Clockwise or CounterClockwise]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
-      // Get the AzimuthDomain
-      if ((QString) m_mappingGrp["AzimuthDomain"] == "360") {
-        m_azimuthDomain = 360;
+      // Get the RingLongitudeDomain
+      if ((QString) m_mappingGrp["RingLongitudeDomain"] == "360") {
+        m_ringLongitudeDomain = 360;
       }
-      else if ((QString) m_mappingGrp["AzimuthDomain"] == "180") {
-        m_azimuthDomain = 180;
+      else if ((QString) m_mappingGrp["RingLongitudeDomain"] == "180") {
+        m_ringLongitudeDomain = 180;
       }
       else {
         QString msg = "Projection failed. Invalid value for keyword "
-                      "[AzimuthDomain] must be [180 or 360]";
+                      "[RingLongitudeDomain] must be [180 or 360]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       // Get the ground range if it exists
       m_groundRangeGood = false;
 
-      if ((m_mappingGrp.hasKeyword("MinimumAzimuth")) &&
-          (m_mappingGrp.hasKeyword("MaximumAzimuth")) &&
-          (m_mappingGrp.hasKeyword("MaximumRadius")) &&
-          (m_mappingGrp.hasKeyword("MinimumRadius"))) {
-        m_minimumAzimuth = m_mappingGrp["MinimumAzimuth"];
-        m_maximumAzimuth = m_mappingGrp["MaximumAzimuth"];
-        m_minimumRadius = m_mappingGrp["MinimumRadius"];
-        m_maximumRadius = m_mappingGrp["MaximumRadius"];
+      if ((m_mappingGrp.hasKeyword("MinimumRingLongitude")) &&
+          (m_mappingGrp.hasKeyword("MaximumRingLongitude")) &&
+          (m_mappingGrp.hasKeyword("MaximumRingRadius")) &&
+          (m_mappingGrp.hasKeyword("MinimumRingRadius"))) {
+        m_minimumRingLongitude = m_mappingGrp["MinimumRingLongitude"];
+        m_maximumRingLongitude = m_mappingGrp["MaximumRingLongitude"];
+        m_minimumRingRadius = m_mappingGrp["MinimumRingRadius"];
+        m_maximumRingRadius = m_mappingGrp["MaximumRingRadius"];
 
-        if (m_minimumRadius < 0) {
+        if (m_minimumRingRadius < 0) {
           IString msg = "Projection failed. "
-                        "[MinimumRadius] of ["+ IString(m_minimumRadius) +  "] is not "
+                        "[MinimumRingRadius] of ["+ IString(m_minimumRingRadius) +  "] is not "
                         + "valid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
-        if (m_maximumRadius < 0) {
+        if (m_maximumRingRadius < 0) {
           IString msg = "Projection failed. "
-                        "[MaximumRadius] of ["+ IString(m_maximumRadius) +  "] is not "
+                        "[MaximumRingRadius] of ["+ IString(m_maximumRingRadius) +  "] is not "
                         + "valid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
-        if (m_minimumRadius >= m_maximumRadius) {
+        if (m_minimumRingRadius >= m_maximumRingRadius) {
           IString msg = "Projection failed. "
-                        "[MinimumRadius,MaximumRadius] of ["
-                        + IString(m_minimumRadius) + ","
-                        + IString(m_maximumRadius) + "] are not "
+                        "[MinimumRingRadius,MaximumRingRadius] of ["
+                        + IString(m_minimumRingRadius) + ","
+                        + IString(m_maximumRingRadius) + "] are not "
                         + "properly ordered";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
-        if (m_minimumAzimuth >= m_maximumAzimuth) {
+        if (m_minimumRingLongitude >= m_maximumRingLongitude) {
           IString msg = "Projection failed. "
-                        "[MinimumAzimuth,MaximumAzimuth] of ["
-                        + IString(m_minimumAzimuth) + "," 
-                        + IString(m_maximumAzimuth) + "] are not "
+                        "[MinimumRingLongitude,MaximumRingLongitude] of ["
+                        + IString(m_minimumRingLongitude) + "," 
+                        + IString(m_maximumRingLongitude) + "] are not "
                         + "properly ordered";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -158,17 +158,18 @@ namespace Isis {
         m_groundRangeGood = true;
       }
       else {
-        // if no ground range is given, initialize the min/max rad/az to 0
-        m_minimumRadius  = 0.0;
-        m_maximumRadius  = 0.0;
-        m_minimumAzimuth = 0.0;
-        m_maximumAzimuth = 0.0;
+        // if no ground range is given, initialize the min/max ring rad/lon to 0
+        m_minimumRingRadius  = 0.0;
+        m_maximumRingRadius  = 0.0;
+        m_minimumRingLongitude = 0.0;
+        m_maximumRingLongitude = 0.0;
       }
 
       // Initialize miscellaneous protected data elements
-      // initialize the rest of the x,y,rad,az member variables
-      m_radius = Null;
-      m_azimuth = Null;
+      // initialize the rest of the x,y,ring rad,ring lon
+      // member variables
+      m_ringRadius = Null;
+      m_ringLongitude = Null;
 
       // If we made it to this point, we have what we need for a ring plane projection
       setProjectionType(RingPlane);
@@ -185,7 +186,7 @@ namespace Isis {
 
   /**
    * This method determines whether two map projection objects are equal by 
-   * comparing the azimuth direction, resolution, and projection name. 
+   * comparing the ring longitude direction, resolution, and projection name. 
    *  
    * @param proj A reference to a Projection object to which this Projection 
    *             will be compared.
@@ -210,7 +211,7 @@ namespace Isis {
    *
    * @return double The radius where the projection is not distorted.
    */
-  double RingPlaneProjection::TrueScaleRadius() const {
+  double RingPlaneProjection::TrueScaleRingRadius() const {
     return 0.0;
   }
 
@@ -223,7 +224,7 @@ namespace Isis {
    * @return bool
    */
   bool RingPlaneProjection::IsClockwise() const {
-    return m_azimuthDirection == Clockwise;
+    return m_ringLongitudeDirection == Clockwise;
   }
 
   /**
@@ -234,175 +235,178 @@ namespace Isis {
    * @return bool
    */
   bool RingPlaneProjection::IsCounterClockwise() const {
-    return m_azimuthDirection == CounterClockwise;
+    return m_ringLongitudeDirection == CounterClockwise;
   }
 
   /**
-   * This method converts an azimuth into the clockwise direction.
+   * This method converts an ring longitude into the clockwise direction.
    *
-   * @param az Azimuth to convert into the clockwise direction.
+   * @param ringLongitude The ring longitude to convert into the clockwise 
+   *                      direction.
    * @param domain Must be an integer value of 180 (for -180 to 180) or 360 (for 
    *            0 to 360).
    *  
-   * @throw IException::Unknown - "The given azimuth is invalid." 
-   * @throw IException::Unknown - "Unable to convert azimuth.  Domain is
+   * @throw IException::Unknown - "The given ring longitude is invalid." 
+   * @throw IException::Unknown - "Unable to convert ring longitude.  Domain is
    *            not 180 or 360."
    *  
-   * @return double Azimuth value, in clockwise direction.
+   * @return double The ring longitude value, in clockwise direction.
    */
-  double RingPlaneProjection::ToClockwise(const double az, const int domain) {
-    if (az == Null) {
+  double RingPlaneProjection::ToClockwise(const double ringLongitude, const int domain) {
+    if (ringLongitude == Null) {
       throw IException(IException::Unknown, 
-                       "Unable to convert to Clockwise. The given azimuth value [" 
-                       + IString(az) + "] is invalid.", 
+                       "Unable to convert to Clockwise. The given ring longitude value [" 
+                       + IString(ringLongitude) + "] is invalid.", 
                        _FILEINFO_);
     }
-    double myaz = az;
+    double myRingLongitude = ringLongitude;
 
-    myaz *= -1;
+    myRingLongitude *= -1;
 
     if (domain == 360) {
-      myaz = To360Domain(myaz);
+      myRingLongitude = To360Domain(myRingLongitude);
     }
     else if (domain == 180) {
-      myaz = To180Domain(myaz);
+      myRingLongitude = To180Domain(myRingLongitude);
     }
     else {
-      IString msg = "Unable to convert azimuth.  Domain [" + IString(domain) 
+      IString msg = "Unable to convert ring longitude.  Domain [" + IString(domain) 
                     + "] is not 180 or 360.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    return myaz;
+    return myRingLongitude;
   }
 
   /**
-   * This method converts an azimuth into the counterclockwise direction.
+   * This method converts an ring longitude into the counterclockwise direction.
    *
-   * @param lon Azimuth to convert into the counterclockwise direction.
+   * @param ringLongitude The ring Longitude to convert into the counterclockwise 
+   *            direction.
    * @param domain Must be an integer value of 180 (for -180 to 180) or 360 (for 
    *            0 to 360).
    *
-   * @throw IException::Unknown - "The given azimuth is invalid." 
-   * @throw IException::Unknown - "Unable to convert azimuth.  Domain is
+   * @throw IException::Unknown - "The given ring longitude is invalid." 
+   * @throw IException::Unknown - "Unable to convert ring longitude.  Domain is
    *            not 180 or 360."
    *  
-   * @return double Azimuth value, in counterclockwise direction.
+   * @return double The ring longitude value, in counterclockwise direction.
    */
-  double RingPlaneProjection::ToCounterClockwise(const double az, const int domain) {
-    if (az == Null) {
+  double RingPlaneProjection::ToCounterClockwise(const double ringLongitude, const int domain) {
+    if (ringLongitude == Null) {
       throw IException(IException::Unknown, 
-                       "Unable to convert to CounterClockwise. The given azimuth value [" 
-                       + IString(az) + "] is invalid.", 
+                       "Unable to convert to CounterClockwise. The given ring longitude value [" 
+                       + IString(ringLongitude) + "] is invalid.", 
                        _FILEINFO_);
     }
-    double myaz = az;
+    double myRingLongitude = ringLongitude;
 
-    myaz *= -1;
+    myRingLongitude *= -1;
 
     if (domain == 360) {
-      myaz = To360Domain(myaz);
+      myRingLongitude = To360Domain(myRingLongitude);
     }
     else if (domain == 180) {
-      myaz = To180Domain(myaz);
+      myRingLongitude = To180Domain(myRingLongitude);
     }
     else {
-      IString msg = "Unable to convert azimuth.  Domain [" + IString(domain)
+      IString msg = "Unable to convert ring longitude.  Domain [" + IString(domain)
                     + "] is not 180 or 360.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    return myaz;
+    return myRingLongitude;
   }
 
 
   /**
-   * This method returns the azimuth direction as a string. It will return
+   * This method returns the ring longitude direction as a string. It will return
    * either Clockwise or CounterClockwise.
    *
-   * @return string The azimuth direction, "Clockwise" or 
+   * @return string The ring longitude direction, "Clockwise" or 
    *         "CounterClockwise".
    */
-  string RingPlaneProjection::AzimuthDirectionString() const {
-    if (m_azimuthDirection == Clockwise) return "Clockwise";
+  string RingPlaneProjection::RingLongitudeDirectionString() const {
+    if (m_ringLongitudeDirection == Clockwise) return "Clockwise";
     return "CounterClockwise";
   }
 
   /**
    * This indicates if the longitude domain is -180 to 180 (as opposed to 0
-   * to 360). The azimuth domain was obtained from the label during object
+   * to 360). The ring longitude domain was obtained from the label during object
    * construction.
    *
    * @return bool
    */
   bool RingPlaneProjection::Has180Domain() const {
-    return m_azimuthDomain == 180;
+    return m_ringLongitudeDomain == 180;
   }
 
   /**
-   * This indicates if the azimuth domain is 0 to 360 (as opposed to -180
-   * to 180). The azimuth domain was obtained from the label during object
+   * This indicates if the ring longitude domain is 0 to 360 (as opposed to -180
+   * to 180). The ring longitude domain was obtained from the label during object
    * construction.
    *
    * @return bool
    */
   bool RingPlaneProjection::Has360Domain() const {
-    return m_azimuthDomain == 360;
+    return m_ringLongitudeDomain == 360;
   }
 
   /**
-   * This method converts a longitude into the -180 to 180 domain. It will leave
-   * the longitude unchanged if it is already in the domain.
+   * This method converts a ring longitude into the -180 to 180 domain. It will 
+   * leave the ring longitude unchanged if it is already in the domain. 
    *
-   * @param lon Longitude to convert into the -180 to 180 domain.
+   * @param ringLongitude A ring longitude to convert into the -180 to 180 
+   *                      domain.
    *
    * @throw IException::Unknown - "The given longitude is invalid." 
    *  
-   * @return double The longitude, converted to 180 domain.
+   * @return double The ring longitude, converted to 180 domain.
    */
-  double RingPlaneProjection::To180Domain(const double az) {
-    if (az == Null) {
+  double RingPlaneProjection::To180Domain(const double ringLongitude) {
+    if (ringLongitude == Null) {
       throw IException(IException::Unknown, 
-                       "Unable to convert to 180 degree domain. The given azimuth value [" 
-                       + IString(az) + "] is invalid.", 
+                       "Unable to convert to 180 degree domain. The given ring longitude value [" 
+                       + IString(ringLongitude) + "] is invalid.", 
                        _FILEINFO_);
     }
-    return Isis::Longitude(az, Angle::Degrees).force180Domain().degrees();
+    return Isis::Longitude(ringLongitude, Angle::Degrees).force180Domain().degrees();
   }
 
   /**
-   * This method converts an azimuth into the 0 to 360 domain. It will leave 
-   * the azimuth unchanged if it is already in the domain.
+   * This method converts an ring longitude into the 0 to 360 domain. It will leave 
+   * the ring longitude unchanged if it is already in the domain.
    *
-   * @param az Azimuth to convert into the 0 to 360 domain.
+   * @param ringLongitude The ring longitude to convert into the 0 to 360 domain.
    *
-   * @return double The azimuth, converted to 360 domain.
+   * @return double The ring longitude, converted to 360 domain.
    */
-  double RingPlaneProjection::To360Domain(const double az) {
-    if (az == Null) {
+  double RingPlaneProjection::To360Domain(const double ringLongitude) {
+    if (ringLongitude == Null) {
       throw IException(IException::Unknown, 
-                       "Unable to convert to 360 degree domain. The given azimuth value [" 
-                       + IString(az) + "] is invalid.", 
+                       "Unable to convert to 360 degree domain. The given ring longitude value [" 
+                       + IString(ringLongitude) + "] is invalid.", 
                        _FILEINFO_);
     }
-    double result = az;
+    double result = ringLongitude;
 
-    if ( (az < 0.0 || az > 360.0) &&
-        !qFuzzyCompare(az, 0.0) && !qFuzzyCompare(az, 360.0)) {
-     result = Isis::Longitude(az, Angle::Degrees).force360Domain().degrees();
+    if ( (ringLongitude < 0.0 || ringLongitude > 360.0) &&
+        !qFuzzyCompare(ringLongitude, 0.0) && !qFuzzyCompare(ringLongitude, 360.0)) {
+     result = Isis::Longitude(ringLongitude, Angle::Degrees).force360Domain().degrees();
     }
 
     return result;
   }
 
   /**
-   * This method returns the longitude domain as a string. It will return either
-   * 180 or 360.
+   * This method returns the ring longitude domain as a string. It will return 
+   * either 180 or 360. 
    *
-   * @return string The longitude domain, "180" or "360".
+   * @return string The ring longitude domain, "180" or "360".
    */
-  string RingPlaneProjection::AzimuthDomainString() const {
-    if (m_azimuthDomain == 360) return "360";
+  string RingPlaneProjection::RingLongitudeDomainString() const {
+    if (m_ringLongitudeDomain == 360) return "360";
     return "180";
   }
 
@@ -413,8 +417,8 @@ namespace Isis {
    *
    * @return double
    */
-  double RingPlaneProjection::MinimumRadius() const {
-    return m_minimumRadius;
+  double RingPlaneProjection::MinimumRingRadius() const {
+    return m_minimumRingRadius;
   }
 
   /**
@@ -424,71 +428,72 @@ namespace Isis {
    *
    * @return double
    */
-  double RingPlaneProjection::MaximumRadius() const {
-    return m_maximumRadius;
+  double RingPlaneProjection::MaximumRingRadius() const {
+    return m_maximumRingRadius;
   }
 
   /**
-   * This returns the minimum azimuth of the area of interest. The value
+   * This returns the minimum ring longitude of the area of interest. The value
    * was obtained from the labels during object construction. This method 
    * can only be used if HasGroundRange returns a true.
    *
    * @return double
    */
-  double RingPlaneProjection::MinimumAzimuth() const {
-    return m_minimumAzimuth;
+  double RingPlaneProjection::MinimumRingLongitude() const {
+    return m_minimumRingLongitude;
   }
 
   /**
-   * This returns the maximum azimuth of the area of interest. The value
+   * This returns the maximum ring longitude of the area of interest. The value
    * was obtained from the labels during object construction. This method 
    * can only be used if HasGroundRange returns a true.
    *
    * @return double
    */
-  double RingPlaneProjection::MaximumAzimuth() const {
-    return m_maximumAzimuth;
+  double RingPlaneProjection::MaximumRingLongitude() const {
+    return m_maximumRingLongitude;
   }
 
   /**
-   * This method is used to set the latitude/longitude (assumed to be of the
-   * correct LatitudeType, LongitudeDirection, and LongitudeDomain. The Set
-   * forces an attempted calculation of the projection X/Y values. This may or
-   * may not be successful and a status is returned as such. Usually this method
-   * is overridden in a dervied class, for example, Sinusoidal. If not the
-   * default method simply copies lat/lon to x/y which is no projection.
+   * This method is used to set the ring radius/longitude (assumed to be
+   * of the correct LatitudeType, LongitudeDirection, and LongitudeDomain. The 
+   * Set forces an attempted calculation of the projection X/Y values. This may 
+   * or may not be successful and a status is returned as such. Usually this 
+   * method is overridden in a dervied class, for example, Sinusoidal. If not 
+   * the default method simply copies ring rad/lon to x/y which is no 
+   * projection. 
    *
-   * @param lat Latitude value to project
-   * @param lon Longitude value to project
+   * @param ringRadius The ring radius value to project
+   * @param ringLongitude The ring longitude value to project
    *
    * @return bool Indicates whether the method was successful.
    */
-  bool RingPlaneProjection::SetGround(const double rad, const double az) {
-    if (rad == Null || az == Null) {
+  bool RingPlaneProjection::SetGround(const double ringRadius, const double ringLongitude) {
+    if (ringRadius == Null || ringLongitude == Null) {
       m_good = false;
       return m_good;
     }
     else {
-      m_radius = rad;
-      m_azimuth = az;
+      m_ringRadius = ringRadius;
+      m_ringLongitude = ringLongitude;
       m_good = true;
-      SetComputedXY(az, rad);
+      SetComputedXY(ringLongitude, ringRadius);
     }
     return m_good;
   }
 
   /**
    * This method is used to set the projection x/y. The Set forces an attempted
-   * calculation of the corresponding latitude/longitude position. This may or
-   * may not be successful and a status is returned as such.  Usually this 
+   * calculation of the corresponding ring radius/longitude position. This may 
+   * or may not be successful and a status is returned as such.  Usually this 
    * method is overridden in a dervied class, for example, Sinusoidal. If not 
-   * the default method simply copies x/y to  lat/lon to x/y which is no 
+   * the default method simply copies x/y to  ring rad/lon to x/y which is no 
    * projection. 
    *
    * @param x X coordinate of the projection in units that are the same as the
    *          radii in the label
    * @param y Y coordinate of the projection in units that are the same as the
-   *          azimuth in the label
+   *          ring longitude in the label
    *
    * @return bool Indicates whether the method was successful.
    */
@@ -499,8 +504,8 @@ namespace Isis {
     else {
       m_good = true;
       SetXY(x, y);
-      m_radius = XCoord();
-      m_azimuth = YCoord();
+      m_ringRadius = XCoord();
+      m_ringLongitude = YCoord();
     }
     return m_good;
   }
@@ -513,8 +518,8 @@ namespace Isis {
    *
    * @return double
    */
-  double RingPlaneProjection::Radius() const {
-    return m_radius;
+  double RingPlaneProjection::RingRadius() const {
+    return m_ringRadius;
   }
 
 
@@ -526,54 +531,55 @@ namespace Isis {
    * @return double
    */
   double RingPlaneProjection::LocalRadius() const {
-    return m_radius;
+    return m_ringRadius;
   }
 
   /**
-   * This returns a longitude with correct longitude direction and domain as
-   * specified in the label object. The method can only be used if 
+   * This returns a ring longitude with correct ring longitude direction and
+   * domain as specified in the label object. The method can only be used if
    * SetGround, SetCoordinate, SetUniversalGround, or SetWorld return with 
    * success. Success can also be checked using the IsGood method. 
    *
    * @return double
    */
-  double RingPlaneProjection::Azimuth() const {
-    return m_azimuth;
+  double RingPlaneProjection::RingLongitude() const {
+    return m_ringLongitude;
   }
 
   /**
-   * This method is used to set the latitude/longitude which must be
-   * Planetocentric (latitude) and PositiveEast/Domain360 (longitude). The Set
-   * forces an attempted calculation of the projection X/Y values. This may or
-   * may not be successful and a status is returned as such.
+   * This method is used to set the ring radius/longitude which must be
+   * PositiveEast/Domain360 (ring longitude). The Set forces an attempted 
+   * calculation of the projection X/Y values. This may or may not be 
+   * successful and a status is returned as such. 
    *
-   * @param lat Planetocentric Latitude value to project
-   * @param lon PositiveEast, Domain360 Longitude value to project
+   * @param ringRadius The ring radius value to project
+   * @param ringLongitude PositiveEast, Domain360 ring longitude value to 
+   *                      project
    *
    * @return bool Indicates whether the method was successful.
    */
-  bool RingPlaneProjection::SetUniversalGround(const double rad, const double az) {
-    if (rad == Null || az == Null) {
+  bool RingPlaneProjection::SetUniversalGround(const double ringRadius, const double ringLongitude) {
+    if (ringRadius == Null || ringLongitude == Null) {
       m_good = false;
       return m_good;
     }
-    // Deal with the azimuth first
-    m_azimuth = az;
-    if (m_azimuthDirection == Clockwise) m_azimuth = -az;
-    if (m_azimuthDomain == 180) {
-      m_azimuth = To180Domain(m_azimuth);
+    // Deal with the ring longitude first
+    m_ringLongitude = ringLongitude;
+    if (m_ringLongitudeDirection == Clockwise) m_ringLongitude = -ringLongitude;
+    if (m_ringLongitudeDomain == 180) {
+      m_ringLongitude = To180Domain(m_ringLongitude);
     }
     else {
-      // Do this because azimuthDirection could cause (-360,0)
-      m_azimuth = To360Domain(m_azimuth);
+      // Do this because RingLongitudeDirection could cause (-360,0)
+      m_ringLongitude = To360Domain(m_ringLongitude);
     }
 
     // Nothing to do with radius
 
-    m_radius = rad;
+    m_ringRadius = ringRadius;
 
-    // Now the rad/az are in user defined coordinates so set them
-    return SetGround(m_radius, m_azimuth);
+    // Now the rad/ring longitude are in user defined coordinates so set them
+    return SetGround(m_ringRadius, m_ringLongitude);
     }
 
   /**
@@ -581,25 +587,25 @@ namespace Isis {
    *
    * @return double The universal radius.
    */
-  double RingPlaneProjection::UniversalRadius() {
-    double rad = m_radius;
-    return rad;
+  double RingPlaneProjection::UniversalRingRadius() {
+    double ringRadius = m_ringRadius;
+    return ringRadius;
   }
 
 
   /**
-   * This returns a universal azimuth (clockwise in 0 to 360 domain). The
+   * This returns a universal ring longitude (clockwise in 0 to 360 domain). The
    * method can only be used if SetGround, SetCoordinate, SetUniversalGround, or
    * SetWorld return with success. Success can also be checked using the IsGood
    * method.
    *
-   * @return double The universal azimuth.
+   * @return double The universal ring longitude.
    */
-  double RingPlaneProjection::UniversalAzimuth() {
-    double az = m_azimuth;
-    if (m_azimuthDirection == Clockwise) az = -az;
-    az = To360Domain(az);
-    return az;
+  double RingPlaneProjection::UniversalRingLongitude() {
+    double ringLongitude = m_ringLongitude;
+    if (m_ringLongitudeDirection == Clockwise) ringLongitude = -ringLongitude;
+    ringLongitude = To360Domain(ringLongitude);
+    return ringLongitude;
   }
 
 
@@ -615,7 +621,7 @@ namespace Isis {
    */
   double RingPlaneProjection::Scale() const {
     if (m_mapper != NULL) {
-      double localRadius = TrueScaleRadius();
+      double localRadius = TrueScaleRingRadius();
       return localRadius / m_mapper->Resolution() * DEG2RAD;
      // return localRadius / m_mapper->Resolution();
     }
@@ -627,35 +633,35 @@ namespace Isis {
 
   /**
    * This method is used to determine the x/y range which completely covers the
-   * area of interest specified by the rad/az range. The radius/azimuth
-   * range may be obtained from the labels. This method should not be used if
-   * HasGroundRange is false. The purpose of this method is to return the x/y
-   * range so it can be used to compute how large a map may need to be. For
-   * example, how big a piece of paper is needed or how large of an image needs
-   * to be created. This is method and therefore must be written by the derived
-   * class (e.g., Planar). The method may fail as indicated by its return
-   * value.
+   * area of interest specified by the ring radius/longitude range. The ring 
+   * radius/ring longitude range may be obtained from the labels. This method 
+   * should not be used if HasGroundRange is false. The purpose of this method 
+   * is to return the x/y range so it can be used to compute how large a map 
+   * may need to be. For example, how big a piece of paper is needed or how 
+   * large of an image needs to be created. This is method and therefore must 
+   * be written by the derived class (e.g., Planar). The method may fail as 
+   * indicated by its return value. 
    *
    * 
    * @param &minX Reference to the address where the minimum x 
    *             coordinate value will be written.  The Minimum x projection
-   *             coordinate calculated by this method covers the
-   *             radius/azimuth range specified in the labels.
+   *             coordinate calculated by this method covers the ring
+   *             radius/longitude range specified in the labels.
    *
    * @param &maxX Reference to the address where the maximum x 
    *             coordinate value will be written.  The Maximum x projection
-   *             coordinate calculated by this method covers the
-   *             radius/azimuth range specified in the labels.
+   *             coordinate calculated by this method covers the ring
+   *             radius/longitude range specified in the labels.
    *
    * @param &minY Reference to the address where the minimum y 
    *             coordinate value will be written.  The Minimum y projection
-   *             coordinate calculated by this method covers the
-   *             radius/azimuth range specified in the labels.
+   *             coordinate calculated by this method covers the ring
+   *             radius/longitude range specified in the labels.
    *
    * @param &maxY Reference to the address where the maximum y 
    *             coordinate value will be written.  The Maximum y projection
-   *             coordinate calculated by this method covers the
-   *             radius/azimuth range specified in the labels.
+   *             coordinate calculated by this method covers the ring
+   *             radius/longitude range specified in the labels.
    * 
    * @return bool Indicates whether the method was able to determine the X/Y 
    *              Range of the projection.  If yes, minX, maxX, minY, maxY will
@@ -668,10 +674,10 @@ namespace Isis {
       return false;
     }
     if (m_groundRangeGood) {
-      minX = m_minimumAzimuth;
-      maxX = m_maximumAzimuth;
-      minY = m_minimumRadius;
-      maxY = m_maximumRadius;
+      minX = m_minimumRingLongitude;
+      maxX = m_maximumRingLongitude;
+      minY = m_minimumRingRadius;
+      maxY = m_maximumRingRadius;
       return true;
     }
     return false;
@@ -679,23 +685,23 @@ namespace Isis {
 
   /**
    * This convience function is established to assist in the development of the
-   * XYRange virtual method. It allows the developer to test ground points
-   * (rad/az) to see if they produce a minimum/maximum projection coordinate.
-   * For example in Planar,
+   * XYRange virtual method. It allows the developer to test ground points (ring 
+   * radius/longitude) to see if they produce a minimum/maximum projection 
+   * coordinate. For example in Planar, 
    *    @code
    *       bool Planar::XYRange(double &minX, double &maxX,
    *                                    double &minY, double &maxY) {
-   *        // Check the corners of the rad/az range
-   *         XYRangeCheck (m_minimumRadius,m_minimumAzimuth);
-   *         XYRangeCheck (m_maximumRadius,m_minimumAzimuth);
-   *         XYRangeCheck (m_minimumRadius,m_maximumAzimuth);
-   *         XYRangeCheck (m_maximumRadius,m_maximumAzimuth);
+   *        // Check the corners of the ring rad/lon range
+   *         XYRangeCheck (m_minimumRingRadius,m_minimumRingLongitude);
+   *         XYRangeCheck (m_maximumRingRadius,m_minimumRingLongitude);
+   *         XYRangeCheck (m_minimumRingRadius,m_maximumRingLongitude);
+   *         XYRangeCheck (m_maximumRingRadius,m_maximumRingLongitude);
    *
-   *         // If the azimuth crosses 0/360 check there
-   *         if ((m_minimumAzimuth < 0.0) && (m_maximumAzimuth > 0.0)) ||
-   *             (m_minimumAzimuth < 360.0) && (m_maximumAzimuth > 360.0)) {
-   *           XYRangeCheck (minimumRadius, 0. or 360.);
-   *           XYRangeCheck (maximumRadius, 0 or 360.);
+   *         // If the ring longitude crosses 0/360 check there
+   *         if ((m_minimumRingLongitude < 0.0) && (m_maximumRingLongitude > 0.0)) ||
+   *             (m_minimumRingLongitude < 360.0) && (m_maximumRingLongitude > 360.0)) {
+   *           XYRangeCheck (minimumRingRadius, 0. or 360.);
+   *           XYRangeCheck (maximumRingRadius, 0 or 360.);
    *         }
    *
    *         // Make sure everything is ordered
@@ -712,15 +718,15 @@ namespace Isis {
    *    @endcode
    *
    *
-   * @param radius Test for min/max projection coordinates at this radius
-   * @param azimuth Test for min/max projection coordinates at this azimuth
+   * @param ringRadius Test for min/max projection coordinates at this radius
+   * @param ringLongitude Test for min/max projection coordinates at this ring longitude
    */
-  void RingPlaneProjection::XYRangeCheck(const double radius, const double azimuth) {
-    if (radius == Null || azimuth == Null) {
+  void RingPlaneProjection::XYRangeCheck(const double ringRadius, const double ringLongitude) {
+    if (ringRadius == Null || ringLongitude == Null) {
       m_good = false;
       return;
     }
-    SetGround(radius, azimuth);
+    SetGround(ringRadius, ringLongitude);
     if (!IsGood()) return;
 
     if (XCoord() < m_minimumX) m_minimumX = XCoord();
@@ -732,16 +738,17 @@ namespace Isis {
 
   /** 
    * This method is used to find the XY range for oblique aspect projections 
-   * (non-polar projections) by "walking" around each of the min/max lat/lon. 
+   * (non-polar projections) by "walking" around each of the min/max ring 
+   * rad/lon. 
    *  
-   * @param minX Minimum x projection coordinate which covers the latitude
-   *             longitude range specified in the labels.
-   * @param maxX Maximum x projection coordinate which covers the latitude
-   *             longitude range specified in the labels.
-   * @param minY Minimum y projection coordinate which covers the latitude
-   *             longitude range specified in the labels.
-   * @param maxY Maximum y projection coordinate which covers the latitude
-   *             longitude range specified in the labels.
+   * @param minX Minimum x projection coordinate which covers the ring 
+   *             radius/longitude range specified in the labels.
+   * @param maxX Maximum x projection coordinate which covers the ring 
+   *             radius/longitude range specified in the labels.
+   * @param minY Minimum y projection coordinate which covers the ring 
+   *             radius/longitude range specified in the labels.
+   * @param maxY Maximum y projection coordinate which covers the ring 
+   *             radius/longitude range specified in the labels.
    * 
    * @return @b bool Indicates whether the method was successful.
    * @see XYRange()
@@ -756,14 +763,14 @@ namespace Isis {
   //     return false;
   //   }
   //   //For oblique, we'll have to walk all 4 sides to find out min/max x/y values
-  //   if (!HasGroundRange()) return false; // Don't have min/max lat/lon, 
+  //   if (!HasGroundRange()) return false; // Don't have min/max ring rad/lon, 
   //                                       //can't continue
 
   //   m_specialLatCases.clear();
   //   m_specialLonCases.clear();
 
-  //   // First, search longitude for min X/Y
-  //   double minFoundX1, minFoundX2;
+  //   // First, search ring longitude for
+  //   min X/Y double minFoundX1, minFoundX2;
   //   double minFoundY1, minFoundY2;
 
   //   // Search for minX between minlat and maxlat along minlon
@@ -805,9 +812,10 @@ namespace Isis {
   //   double minFoundY6 = min(minFoundY3, minFoundY4);
   //   m_minimumY = min(minFoundY5, minFoundY6);
 
-  //   // Search longitude for max X/Y
-  //   double maxFoundX1, maxFoundX2;
-  //   double maxFoundY1, maxFoundY2;
+  //   // Search ring longitude for
+  //   max X/Y double maxFoundX1,
+  //   maxFoundX2; double maxFoundY1,
+  //   maxFoundY2;
 
   //   // Search for maxX between minlat and maxlat along minlon
   //   doSearch(MinimumLatitude(), MaximumLatitude(), 
@@ -918,9 +926,9 @@ namespace Isis {
   /**
    * This method searches for extreme (min/max/discontinuity) coordinate values
    * along the constBorder line between minBorder and maxBorder (that is, 
-   * across latitudes/longitudes). This method locates the extrema by utilizing
-   * the findExtreme() method until the coordinate values converge. Then, 
-   * extremeVal parameter is updated with this value before returning. 
+   * across ring radii/longitudes). This method locates the extrema by 
+   * utilizing the findExtreme() method until the coordinate values converge. 
+   * Then, extremeVal parameter is updated with this value before returning. 
    *  
    * Discontinuities are stored in m_specialLatCases and m_specialLonCases so 
    * they may be checked again later, which creates significantly more accuracy 
@@ -954,7 +962,7 @@ namespace Isis {
    */
   // void Projection::doSearch(double minBorder, double maxBorder, 
   //                           double &extremeVal, const double constBorder, 
-  //                           bool searchX, bool searchAzimuth, bool findMin) {
+  //                           bool searchX, bool searchRingLongitude, bool findMin) {
   //   if (minBorder == Null || maxBorder == Null || constBorder == Null) {
   //     return;
   //   }
@@ -1070,7 +1078,7 @@ namespace Isis {
   //                              double &minBorderX, double &minBorderY,
   //                              double &maxBorderX, double &maxBorderY, 
   //                              const double constBorder, bool searchX, 
-  //                              bool searchAzimuth, bool findMin) {
+  //                              bool searchRingLongitude, bool findMin) {
   //   if (minBorder == Null || maxBorder == Null || constBorder == Null) {
   //     minBorderX = Null;
   //     minBorderY = minBorderX;
@@ -1078,9 +1086,9 @@ namespace Isis {
   //     minBorderY = minBorderX;
   //     return;
   //   }
-  //   if (!searchAzimuth && (fabs(fabs(constBorder) - 90.0) < DBL_EPSILON)) {
+  //   if (!searchRingLongitude && (fabs(fabs(constBorder) - 90.0) < DBL_EPSILON)) {
   //     // it is impossible to search "along" a pole
-  //     setSearchGround(minBorder, constBorder, searchAzimuth);
+  //     setSearchGround(minBorder, constBorder, searchRingLongitude);
   //     minBorderX = XCoord();
   //     minBorderY = YCoord();
   //     maxBorderX = minBorderX;
@@ -1093,7 +1101,7 @@ namespace Isis {
   //                                                          // all of the steps
   //                                                          // properly
   //   double currBorderVal = minBorder;
-  //   setSearchGround(minBorder, constBorder, searchAzimuth);
+  //   setSearchGround(minBorder, constBorder, searchRingLongitude);
 
   //   // this makes sure that the initial currBorderVal is valid before entering
   //   // the loop below
@@ -1102,10 +1110,10 @@ namespace Isis {
   //     // then, if still not good return?
   //     while (!m_good && currBorderVal <= LOOP_END) {
   //       currBorderVal+=STEP_SIZE;
-  //       if (searchAzimuth && (currBorderVal - 90.0 > DBL_EPSILON)) {
+  //       if (searchRingLongitude && (currBorderVal - 90.0 > DBL_EPSILON)) {
   //         currBorderVal = 90.0;
   //       }
-  //       setSearchGround(currBorderVal, constBorder, searchAzimuth);
+  //       setSearchGround(currBorderVal, constBorder, searchRingLongitude);
   //     }
   //     if (!m_good) {
   //       minBorderX = Null;
@@ -1145,13 +1153,13 @@ namespace Isis {
   //     // latitude less than -90 since we start at the minBorder (already
   //     // assumed to be valid) and step forward toward (and possibly past)
   //     // maxBorder
-  //     if (searchAzimuth && (currBorderVal - 90.0 > DBL_EPSILON)) {
+  //     if (searchRingLongitude && (currBorderVal - 90.0 > DBL_EPSILON)) {
   //       currBorderVal = 90.0;
   //     }
 
   //     // update the current border value along constBorder
   //     currBorderVal += STEP_SIZE;
-  //     setSearchGround(currBorderVal, constBorder, searchAzimuth);
+  //     setSearchGround(currBorderVal, constBorder, searchRingLongitude);
   //     if (!m_good){ 
   //       continue;
   //     } 
@@ -1189,7 +1197,7 @@ namespace Isis {
   //   }
 
   //   // update minBorder coordinate values
-  //   setSearchGround(minBorder, constBorder, searchAzimuth);
+  //   setSearchGround(minBorder, constBorder, searchRingLongitude);
   //   // if (!m_good){
   //   //   this should not happen since minBorder has already been verified in 
   //   //   the while loop above
@@ -1199,7 +1207,7 @@ namespace Isis {
   //   minBorderY = YCoord();
 
   //   // update maxBorder coordinate values
-  //   setSearchGround(maxBorder, constBorder, searchAzimuth);
+  //   setSearchGround(maxBorder, constBorder, searchRingLongitude);
   //   // if (!m_good){
   //   //   this should not happen since maxBorder has already been verified in
   //   //   the while loop above
@@ -1265,8 +1273,8 @@ namespace Isis {
     }
 
     mapping += m_mappingGrp["ProjectionName"];
-    mapping += m_mappingGrp["AzimuthDirection"];
-    mapping += m_mappingGrp["AzimuthDomain"];
+    mapping += m_mappingGrp["RingLongitudeDirection"];
+    mapping += m_mappingGrp["RingLongitudeDomain"];
 
     if (m_mappingGrp.hasKeyword("PixelResolution")) {
       mapping += m_mappingGrp["PixelResolution"];
@@ -1282,10 +1290,10 @@ namespace Isis {
     }
 
     if (HasGroundRange()) {
-      mapping += m_mappingGrp["MinimumRadius"];
-      mapping += m_mappingGrp["MaximumRadius"];
-      mapping += m_mappingGrp["MinimumAzimuth"];
-      mapping += m_mappingGrp["MaximumAzimuth"];
+      mapping += m_mappingGrp["MinimumRingRadius"];
+      mapping += m_mappingGrp["MaximumRingRadius"];
+      mapping += m_mappingGrp["MinimumRingLongitude"];
+      mapping += m_mappingGrp["MaximumRingLongitude"];
     }
 
     if (m_mappingGrp.hasKeyword("Rotation")) {
@@ -1296,16 +1304,16 @@ namespace Isis {
   }
 
   /**
-   * This function returns the radius keywords that this projection uses
+   * This function returns the ring radius keywords that this projection uses
    *
-   * @return PvlGroup The radius keywords that this projection uses
+   * @return PvlGroup The ring radius keywords that this projection uses
    */
-  PvlGroup RingPlaneProjection::MappingRadii() {
+  PvlGroup RingPlaneProjection::MappingRingRadii() {
     PvlGroup mapping("Mapping");
 
     if (HasGroundRange()) {
-      mapping += m_mappingGrp["MinimumRadius"];
-      mapping += m_mappingGrp["MaximumRadius"];
+      mapping += m_mappingGrp["MinimumRingRadius"];
+      mapping += m_mappingGrp["MaximumRingRadius"];
     }
 
     return mapping;
@@ -1313,16 +1321,16 @@ namespace Isis {
 
 
   /**
-   * This function returns the azimuth keywords that this projection uses
+   * This function returns the ring longitude keywords that this projection uses
    *
-   * @return PvlGroup The azimuth keywords that this projection uses
+   * @return PvlGroup The ring longitude keywords that this projection uses
    */
-  PvlGroup RingPlaneProjection::MappingAzimuths() {
+  PvlGroup RingPlaneProjection::MappingRingLongitudes() {
     PvlGroup mapping("Mapping");
 
     if (HasGroundRange()) {
-      mapping += m_mappingGrp["MinimumAzimuth"];
-      mapping += m_mappingGrp["MaximumAzimuth"];
+      mapping += m_mappingGrp["MinimumRingLongitude"];
+      mapping += m_mappingGrp["MaximumRingLongitude"];
     }
 
     return mapping;

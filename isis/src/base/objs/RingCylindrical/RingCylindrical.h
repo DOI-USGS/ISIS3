@@ -55,24 +55,24 @@ namespace Isis {
       QString Name() const;
       QString Version() const;
       bool IsEquatorialCylindrical();
-      double TrueScaleRadius() const;
+      double TrueScaleRingRadius() const;
 
-      double CenterAzimuth() const;
-      double CenterRadius() const;
+      double CenterRingLongitude() const;
+      double CenterRingRadius() const;
 
-      bool SetGround(const double radius, const double az);
+      bool SetGround(const double ringRadius, const double ringLongitude);
       bool SetCoordinate(const double x, const double y);
       bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
 
       PvlGroup Mapping();
-      PvlGroup MappingRadii();
-      PvlGroup MappingAzimuths();
+      PvlGroup MappingRingRadii();
+      PvlGroup MappingRingLongitudes();
 
     protected:
 
     private:
-      double m_centerAzimuth; //!< The center azimuth for the map projection in radians
-      double m_centerRadius;    //!< The center radius for the map projection
+      double m_centerRingLongitude; //!< The center ring longitude (azimuth) for the map projection in radians
+      double m_centerRingRadius;    //!< The center ring radius for the map projection
   };
 };
 

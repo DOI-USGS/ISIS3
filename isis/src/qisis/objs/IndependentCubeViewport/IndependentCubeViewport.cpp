@@ -430,8 +430,8 @@ namespace Isis
           }
           else { // Must be RingPlane
             RingPlaneProjection *rproj = (RingPlaneProjection *) projection();
-            lat = rproj->Radius();
-            lon = rproj->Azimuth();
+            lat = rproj->RingRadius();
+            lon = rproj->RingLongitude();
           }
         }
         

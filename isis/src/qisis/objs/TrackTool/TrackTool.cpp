@@ -183,9 +183,9 @@ namespace Isis {
         }
         else { // RingPlane TODO write out radius azimuth instead of lat/lon
           RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
-          double lat = rproj->Radius();
-          double lon = rproj->Azimuth();
-          p_latLabel->setText(QString("Lat %1").arg(lat));
+          double rad = rproj->RingRadius();
+          double lon = rproj->RingLongitude();
+          p_latLabel->setText(QString("Lat %1").arg(rad));
           p_lonLabel->setText(QString("Lon %1").arg(lon));
         }
       }

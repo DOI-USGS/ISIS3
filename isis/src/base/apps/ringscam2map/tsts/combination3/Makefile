@@ -2,11 +2,10 @@
 #
 # pixres=ppd resolution=23.695644520884
 # defaultrange=map
-# minrad=87899725.492461
-# maxrad=165123259.31231
-# minaz=-179.98841362695
-# maxaz=179.98960224884
-# azseam=continue
+# minringrad=87899725.492461
+# maxringrad=165123259.31231
+# minringlon=-179.98841362695
+# maxringlon=179.98960224884
 #
 APPNAME = ringscam2map
 
@@ -22,10 +21,10 @@ commands:
 	  pixres=ppd \
 	  resolution=23.695644520884 \
 	  defaultrange=map \
-	  minrad=87899725.492461 \
-	  maxrad=165123259.31231 \
-	  minaz=-179.98841362695 \
-	  maxaz=179.98960224884  \
+	  minringrad=87899725.492461 \
+	  maxringrad=165123259.31231 \
+	  minringlon=-179.98841362695 \
+	  maxringlon=179.98960224884  \
 	  > /dev/null;
 	catlab from=$(OUTPUT)/issWAC.cub \
 	  to=$(OUTPUT)/issWAC.pvl > /dev/null;

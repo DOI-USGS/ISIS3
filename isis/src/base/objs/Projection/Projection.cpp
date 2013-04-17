@@ -109,7 +109,7 @@ namespace Isis {
       m_mappingGrp = label.findGroup("Mapping", Pvl::Traverse);
 
       // TODO** Try to generalize these to keep in parent Projection class and use for both azimuth and longitude
-      // Get the Azimuth or LongitudeDomain
+      // Get the RingLongitudeDomain or LongitudeDomain
       // if ((string) m_mappingGrp["LongitudeDomain"] == "360") {
       //   m_longitudeDomain = 360;
       // }
@@ -418,13 +418,14 @@ namespace Isis {
 
 
   /**
-   * This method is used to set the lat/lon or radius/azimuth  coordinate,
-   * depending on the projection type. The Set forces an attempted calculation 
-   * of the projection X/Y values. This may or may not be successful and
-   * a status is returned as such.
+   * This method is used to set the lat/lon or radius/azimuth (i.e. ring longitude)
+   * coordinate, depending on the projection type. The Set forces an attempted 
+   * calculation of the projection X/Y values. This may or may not be successful 
+   * and a status is returned as such.
    *
-   * @param coord1 Planetocentric Latitude value or radius to project
-   * @param coord2 lon PositiveEast, Domain360 Longitude value or azimuth to project
+   * @param coord1 Latitude (planetocentric) or ring radius to project
+   * @param coord2 Longitude or ring longitude to project. The value passed in 
+   *               should be PositiveEast, Domain360.
    *
    * @return bool Indicates whether the method was successful.
    */

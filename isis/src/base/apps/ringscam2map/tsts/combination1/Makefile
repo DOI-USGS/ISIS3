@@ -3,7 +3,7 @@
 # map=*.lev2.cub
 # pixres=map
 # defaultrange=camera
-# azseam=error
+# ringlonseam=error
 # trim=yes
 # interp=bilinear
 # warpalgorithm=reversepatch patch=5
@@ -20,7 +20,7 @@ commands:
 	  to=$(OUTPUT)/vimsIR.cub \
 	  pixres=map \
 	  defaultrange=camera \
-	  azseam=error \
+	  ringlonseam=error \
 	  trim=yes \
 	  interp=bilinear \
 	  warp=reverse \

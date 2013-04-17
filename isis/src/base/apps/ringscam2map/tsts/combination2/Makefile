@@ -2,7 +2,7 @@
 #
 # pixres=mpp resolution=1703.2815626544
 # defaultrange=minimize
-# azseam=continue
+# ringlonseam=continue
 # interp=nearestneighbor
 # warpalgorithm=forwardpatch  patch=4
 #
@@ -18,7 +18,7 @@ commands:
 	  to=$(OUTPUT)/issNAC.cub \
 	  pixres=mpp \
 	  resolution=1703.2815626544 \
-	  azseam=continue \
+	  ringlonseam=continue \
 	  interp=nearestneighbor \
 	  warp=forward \
 	  patch=4 \

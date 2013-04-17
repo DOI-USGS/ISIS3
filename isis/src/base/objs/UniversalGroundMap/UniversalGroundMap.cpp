@@ -81,8 +81,8 @@ namespace Isis {
    * Returns whether the lat/lon position was set successfully in the camera
    * model or projection
    *
-   * @param lat The universal latitude or radius for ring planes
-   * @param lon The universal longitude or azimuth for ring planes
+   * @param lat The universal latitude or ring radius for ring planes
+   * @param lon The universal longitude or ring longitude (azimuth) for ring planes
    *
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not
@@ -106,8 +106,8 @@ namespace Isis {
    * Returns whether the lat/lon position was set successfully in the camera
    * model or projection.
    *
-   * @param lat The latitude
-   * @param lon The longitude
+   * @param lat The universal latitude or ring radius for ring planes
+   * @param lon The universal longitude or ring longitude (azimuth) for ring planes
    *
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not

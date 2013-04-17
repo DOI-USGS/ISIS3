@@ -45,15 +45,8 @@ void IsisMain() {
 
   // Get the lat/lon position if we have a ground point
   else if(ui.GetString("TYPE") == "GROUND") {
-    double rad = ui.GetDouble("RADIUS");
-    double az = ui.GetDouble("AZIMUTH");
-
-    // Make sure we have a valid radius value
-    if(fabs(rad) < 0.0) {
-      QString msg = "Invalid value for RADIUS ["
-                   + toString(rad) + "] not >= 0.0 ";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
+    double rad = ui.GetDouble("RINGRADIUS");
+    double ringLongitude = ui.GetDouble("RINGLONGITUDE");
 
     IString coordsys = ui.GetString("COORDSYS");
     coordsys.UpCase();
@@ -64,12 +57,12 @@ void IsisMain() {
 
     // Counterclockwise, 0-360
     if(coordsys == "UNIVERSAL") {
-      proj->SetUniversalGround(rad, az);
+      proj->SetUniversalGround(rad, ringLongitude);
     }
 
     // Use the coordinate system of the input file
     else if(coordsys == "INPUTFILESYS") {
-      proj->SetGround(rad, az);
+      proj->SetGround(rad, ringLongitude);
     }
 
     // Use the mapping group from a given file
@@ -88,11 +81,11 @@ void IsisMain() {
       RingPlaneProjection *altmap = (RingPlaneProjection *) ProjectionFactory::CreateFromCube(mapPvl);
 
       // Set lat and lon in its system
-      altmap->SetGround(rad, az);
+      altmap->SetGround(rad, ringLongitude);
 
       // Set universal in input cube from universal from given
       // mapping/projection
-      proj->SetUniversalGround(altmap->UniversalRadius(), altmap->UniversalAzimuth());
+      proj->SetUniversalGround(altmap->UniversalRingRadius(), altmap->UniversalRingLongitude());
 
       // I think this is right, no cube owns it, and the factory doesn't.
       delete altmap;
@@ -102,20 +95,20 @@ void IsisMain() {
     // User defined coordinate system, 7 possible combinations
     // we only have to make changes for some of them.
     // Convert from given system to universal and then set.
-    else if(coordsys == "USERDEFINED") {
+    else { // if(coordsys == "USERDEFINED") {
       double rad2 = rad;
-      double az2 = az;
+      double ringLongitude2 = ringLongitude;
 
-      if(ui.GetString("AZDOM") == "180") {
-        az2 = proj->To360Domain(az);
+      if(ui.GetString("RINGLONDOM") == "180") {
+        ringLongitude2 = proj->To360Domain(ringLongitude);
       }
 
-      if(ui.GetString("AZDIR") == "CLOCKWISE") {
-        // Use az2, we know its already in 0-360
-        az2 = proj->ToCounterClockwise(az2, 360);
+      if(ui.GetString("RINGLONDIR") == "CLOCKWISE") {
+        // Use ringLongitude2, we know its already in 0-360
+        ringLongitude2 = proj->ToCounterClockwise(ringLongitude2, 360);
       }
 
-      proj->SetUniversalGround(rad2, az2);
+      proj->SetUniversalGround(rad2, ringLongitude2);
     }
   }
 
@@ -146,72 +139,50 @@ void IsisMain() {
 
     // Put together all the keywords for different coordinate systems.
     PvlKeyword ringRad =
-      PvlKeyword("RingRadius", toString(proj->UniversalRadius()));
+      PvlKeyword("RingRadius", toString(proj->UniversalRingRadius()));
 
     PvlKeyword cC360 =
-      PvlKeyword("CounterClockwise360Azimuth", toString(proj->UniversalAzimuth()));
+      PvlKeyword("CounterClockwise360RingLongitude", toString(proj->UniversalRingLongitude()));
 
     PvlKeyword c360 =
-      PvlKeyword("Clockwise360Azimuth",
-                 toString(proj->ToClockwise(proj->UniversalAzimuth(), 360)));
+      PvlKeyword("Clockwise360RingLongitude",
+                 toString(proj->ToClockwise(proj->UniversalRingLongitude(), 360)));
 
     PvlKeyword cC180 =
-      PvlKeyword("CounterClockwise180Azimuth",
-                 toString(proj->To180Domain(proj->UniversalAzimuth())));
+      PvlKeyword("CounterClockwise180RingLongitude",
+                 toString(proj->To180Domain(proj->UniversalRingLongitude())));
 
     PvlKeyword c180 =
-      PvlKeyword("Clockwise180Azimuth",
+      PvlKeyword("Clockwise180RingLongitude",
                  toString(proj->To180Domain(proj->ToCounterClockwise(
-                            proj->UniversalAzimuth(), 360))));
+                            proj->UniversalRingLongitude(), 360))));
 
     // Input map coordinate system location
+    if(proj->IsCounterClockwise()) {
+      if(proj->Has360Domain()) {
+        cC360.addComment("Input map direction/domain for ring longitude.");       
+      }
+      else {
+        cC180.addComment("Input map direction/domain for ring longitude.");
+      }
+    }
+    else {
+      if(proj->Has360Domain()) {
+        c360.addComment("Input map direction/domain for ring longitude.");
+      }
+      else {
+        c180.addComment("Input map direction/domain for ring longitude.");
+      }
+    }
+
     // Radius
     results += ringRad;
 
-    // Azimuth
-    if(proj->IsCounterClockwise()) {
-      if(proj->Has360Domain()) {
-        results += cC360;
-      }
-      else {
-        results += cC180;
-      }
-    }
-    else {
-      if(proj->Has360Domain()) {
-        results += c360;
-      }
-      else {
-        results += c180;
-      }
-    }
-
-    // Non input coordinate system locations
-    // Azimuth
-    if(proj->IsCounterClockwise()) {
-      if(proj->Has360Domain()) {
-        results += c360;
-        results += cC180;
-        results += c180;
-      }
-      else {
-        results += cC360;
-        results += c360;
-        results += c180;
-      }
-    }
-    else {
-      if(proj->Has360Domain()) {
-        results += cC360;
-        results += cC180;
-        results += c180;
-      }
-      else {
-        results += cC360;
-        results += cC180;
-        results += c360;
-      }
-    }
+    // RingLongitude
+    results += cC360;
+    results += c360;
+    results += cC180;
+    results += c180;
 
     Application::Log(results);
 
