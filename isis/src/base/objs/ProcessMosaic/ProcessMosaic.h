@@ -171,6 +171,9 @@ namespace Isis {
    *                           Fixes #976.
    *   @history 2013-03-27 Jeannie Backer - Added documentation and programmer comments.
    *                           References #1248.
+   *   @history 2013-04-12 Kimberly Oyama - Modified the GetBandIndex() method so that the
+   *                           returned band index is consistent whether the band number or
+   *                           the band keyword is used as input. References #1549.
    */
 
   class ProcessMosaic : public Process {
