@@ -3,4 +3,6 @@ APPNAME = apolloremrx
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	cp $(INPUT)/deferred.txt $(OUTPUT)/deferred.txt > /dev/null;
+	$(APPNAME) from=$(INPUT)/AS17-M-0177.8bit.cropped.cub to=$(OUTPUT)/AS17-M-0177.remrx.cub \
+	  > /dev/null
+
