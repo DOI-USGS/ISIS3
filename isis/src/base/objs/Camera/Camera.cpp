@@ -1617,6 +1617,10 @@ namespace Isis {
    * @return @b double North Azimuth
    */
   double Camera::NorthAzimuth() {
+    if (target()->shape()->name() == "Plane") {
+      QString msg = "North Azimuth is not available for plane target shapes.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     // Get the latitude of your current location using the shape model
     // specified in the image Kernels
     double lat = UniversalLatitude();

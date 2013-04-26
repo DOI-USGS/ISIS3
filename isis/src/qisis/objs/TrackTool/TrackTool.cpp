@@ -185,13 +185,13 @@ namespace Isis {
           RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
           double rad = rproj->RingRadius();
           double lon = rproj->RingLongitude();
-          p_latLabel->setText(QString("Lat %1").arg(rad));
+          p_latLabel->setText(QString("Rad %1").arg(rad));
           p_lonLabel->setText(QString("Lon %1").arg(lon));
         }
       }
       else {
-        p_latLabel->setText("Lat n/a");
-        p_lonLabel->setText("Lon n/a");
+        p_latLabel->setText("Lat N/A");
+        p_lonLabel->setText("Lon N/A");
       }
     }
     // Do we have a camera model?
@@ -206,8 +206,8 @@ namespace Isis {
         p_lonLabel->setText(QString("Lon %1").arg(lon));
       }
       else {
-        p_latLabel->setText("Lat n/a");
-        p_lonLabel->setText("Lon n/a");
+        p_latLabel->setText("Lat N/A");
+        p_lonLabel->setText("Lon N/A");
       }
     }
 
@@ -311,14 +311,14 @@ namespace Isis {
    *
    */
   void TrackTool::clearLabels() {
-    p_sampLabel->setText("S n/a");
-    p_lineLabel->setText("L n/a");
-    p_latLabel->setText("Lat n/a");
-    p_lonLabel->setText("Lon n/a");
-    p_grayLabel->setText("n/a");
-    p_redLabel->setText("R n/a");
-    p_grnLabel->setText("G n/a");
-    p_bluLabel->setText("B n/a");
+    p_sampLabel->setText("S N/A");
+    p_lineLabel->setText("L N/A");
+    p_latLabel->setText("Lat N/A");
+    p_lonLabel->setText("Lon N/A");
+    p_grayLabel->setText("N/A");
+    p_redLabel->setText("R N/A");
+    p_grnLabel->setText("G N/A");
+    p_bluLabel->setText("B N/A");
   }
 
 

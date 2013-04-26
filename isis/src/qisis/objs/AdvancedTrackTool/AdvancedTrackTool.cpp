@@ -377,10 +377,15 @@ namespace Isis {
         }
 
         // Write out columns north azimuth, sun azimuth, solar longitude
-        double northAzi = cvp->camera()->NorthAzimuth();
+        if (shape->name() != "Plane") {
+          double northAzi = cvp->camera()->NorthAzimuth();
+          p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
+        }
+        else { // north azimuth is meaningless for ring plane projections
+          p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText("N/A");
+        }
         double sunAzi   = cvp->camera()->SunAzimuth();
         double solarLon = cvp->camera()->solarLongitude().degrees();
-        p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
         p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));
 
@@ -456,6 +461,8 @@ namespace Isis {
           double wlon = -lon;
           while(wlon < 0.0) wlon += 360.0;
           double radius = lat;
+          p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->setText("0.0");
+          p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText("0.0");
           p_tableWin->table()->item(row, EAST_LON_360)->
                                setText(QString::number(lon, 'f', 15));
           p_tableWin->table()->item(row, EAST_LON_180)->

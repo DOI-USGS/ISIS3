@@ -226,6 +226,9 @@ namespace Isis {
    *                           Fixes #1117.
    *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
    *                           instead of Projection as needed.  References #775.
+   *   @history 2012-04-24 Jeannie Backer - Added a programmer error if NorthAzimuth() is called on
+   *                           a plane projection since this value is meaningless for ring plane
+   *                           projections. References #775.
    */
 
   class Camera : public Sensor {

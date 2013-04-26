@@ -29,7 +29,7 @@ commands:
 	$(APPNAME) from=$(INPUT)/W1591159850_1_cal.cub > $(OUTPUT)/redirectedOutput.txt;
 	echo -e "Group = Results" &> $(OUTPUT)/centersample_centerline_lev1.pvl;
 	$(CAT) $(OUTPUT)/redirectedOutput.txt | grep -v "Processed" | grep -v "ringspt" \
-	  &>> $(OUTPUT)/centersample_centerline_lev1.pvl;
+	  >> $(OUTPUT)/centersample_centerline_lev1.pvl;
 	$(APPNAME) from=$(INPUT)/W1591159850_1_cal.cub \
 	  to=$(OUTPUT)/appendedOutput_tmp.txt \
 	  format=flat \

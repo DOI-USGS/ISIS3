@@ -1,11 +1,12 @@
 # This case tests the following combination of parameters for ringscam2map
 #
-# pixres=ppd resolution=23.695644520884
+# pixres=ppd resolution=23.7
 # defaultrange=map
 # minringrad=87899725.492461
 # maxringrad=165123259.31231
-# minringlon=-179.98841362695
-# maxringlon=179.98960224884
+# minringlon=-180.0
+# maxringlon=-139.0
+# interp=nearestneighbor \
 #
 APPNAME = ringscam2map
 
@@ -19,12 +20,13 @@ commands:
 	  map=$(INPUT)/planar.map \
 	  to=$(OUTPUT)/issWAC.cub \
 	  pixres=ppd \
-	  resolution=23.695644520884 \
+	  resolution=23.7 \
 	  defaultrange=map \
 	  minringrad=87899725.492461 \
 	  maxringrad=165123259.31231 \
-	  minringlon=-179.98841362695 \
-	  maxringlon=179.98960224884  \
+	  minringlon=-180.0 \
+	  maxringlon=-139.0  \
+	  interp=nearestneighbor \
 	  > /dev/null;
 	catlab from=$(OUTPUT)/issWAC.cub \
 	  to=$(OUTPUT)/issWAC.pvl > /dev/null;

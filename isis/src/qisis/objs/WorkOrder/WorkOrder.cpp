@@ -339,11 +339,12 @@ namespace Isis {
     // See Directory::restructureActions
     //
 
+    // if the QUndoCommand has no text, create a warning
     if (result.isEmpty()) {
+      // get the name of the work order
       result = QString(metaObject()->className()).remove("Isis::").remove("WorkOrder")
                    .replace(QRegExp("([a-z0-9])([A-Z])"), "\\1 \\2");
-      qWarning(QString("WorkOrder::bestText(): Work order [%1] has no QUndoCommand text")
-                 .arg(result).toAscii());
+      qWarning() << QString("WorkOrder::bestText(): Work order [%1] has no QUndoCommand text").arg(result);
     }
 
     return result;

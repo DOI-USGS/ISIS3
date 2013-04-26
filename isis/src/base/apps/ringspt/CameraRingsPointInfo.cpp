@@ -113,7 +113,6 @@ namespace Isis {
       gp->addKeyword(PvlKeyword("Phase"));
       gp->addKeyword(PvlKeyword("Incidence"));
       gp->addKeyword(PvlKeyword("Emission"));
-      gp->addKeyword(PvlKeyword("NorthAzimuth"));
       gp->addKeyword(PvlKeyword("EphemerisTime"));
       gp->addKeyword(PvlKeyword("UTC"));
       gp->addKeyword(PvlKeyword("LocalSolarTime"));
@@ -278,7 +277,6 @@ namespace Isis {
         gp->findKeyword("Phase").addComment("Illumination and Other");
         gp->findKeyword("Incidence").setValue(toString(camera()->IncidenceAngle()));
         gp->findKeyword("Emission").setValue(toString(camera()->EmissionAngle()));
-        gp->findKeyword("NorthAzimuth").setValue(toString(camera()->NorthAzimuth()));
 
         gp->findKeyword("EphemerisTime").setValue(toString(camera()->time().Et()), "seconds");
         gp->findKeyword("EphemerisTime").addComment("Time");

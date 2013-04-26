@@ -81,6 +81,8 @@ namespace Isis {
    *                           was undone, for example). Added elapsed time value to the status text
    *                           and fixed warning for work orders without undo text.
    *                           Added listenForImageDestruction() and clearImageList().
+   *   @history 2013-04-25 Jeannie Backer - Modified call to qWarning() to prevent compile warnings
+   *                           on MAC OS 10.8.2
    *
    */
   class WorkOrder : public QAction, public QUndoCommand {
