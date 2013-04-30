@@ -79,8 +79,8 @@ void IsisMain() {
   int width = ui.GetInteger("WIDTH");
   for (int res=0; res<numres; res++) {
     if ((resvalid == 0 || toInt(valid[res]) == 1)) {
-      int baseSamp = (int)(toDouble(samps[res]+0.5)) - (dim/2);
-      int baseLine = (int)(toDouble(lines[res]+0.5)) - (dim/2);
+      int baseSamp = (int)(toDouble(samps[res])+0.5) - (dim/2);
+      int baseLine = (int)(toDouble(lines[res])+0.5) - (dim/2);
       brick.SetBasePosition(baseSamp,baseLine,1);
       cube.read(brick);
       if (action == "NULL") {
