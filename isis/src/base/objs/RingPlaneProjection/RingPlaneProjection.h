@@ -276,12 +276,6 @@ namespace Isis {
     protected:
       double m_ringRadius;   /**< This contain a ring radius value in m. The value is 
                                 only usable if m_good is true.*/
-      // 1.  The horizontal angular distance from a reference direction, usually the northern point 
-      //      of the horizon, to the point where a vertical circle through a celestial body 
-      //      intersects the horizon, usually measured clockwise. Sometimes the southern point
-      //      is used as the reference direction, and the measurement is made clockwise through 360°.
-      // 2.  The horizontal angle of the observer's bearing in surveying, measured clockwise from a 
-      //      referent direction, as from the north, or from a referent celestial body, usually Polaris.
       double m_ringLongitude;  /**< This contain a ring longitude value. The value is 
                                 only usable if m_good is true.*/
 

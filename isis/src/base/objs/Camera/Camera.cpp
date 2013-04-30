@@ -222,10 +222,18 @@ namespace Isis {
             shape->setHasIntersection(false);
             return false;
           }
+          SurfacePoint surfPt(lat, lon, rad);
+          if (SetGround(surfPt)) {
+            p_childSample = sample;
+            p_childLine = line;
+
+            shape->setHasIntersection(true);
+            return true;
+          }
         }
       }
       else { // shape is ring plane
-        if(p_projection->SetWorld(sample, line)) {
+        if (p_projection->SetWorld(sample, line)) {
           RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
           lat = Latitude(0.0, Angle::Degrees);
           lon = Longitude(rproj->UniversalRingLongitude(), Angle::Degrees);
@@ -235,16 +243,15 @@ namespace Isis {
             shape->setHasIntersection(false);
             return false;
           }
+          SurfacePoint surfPt(lat, lon, rad);
+          if (SetGround(surfPt)) {
+            p_childSample = sample;
+            p_childLine = line;
+
+            shape->setHasIntersection(true);
+            return true;
+          }
         }
-      }
-
-      SurfacePoint surfPt(lat, lon, rad);
-      if (SetGround(surfPt)) {
-        p_childSample = sample;
-        p_childLine = line;
-
-        shape->setHasIntersection(true);
-        return true;
       }
     }
 
@@ -364,11 +371,11 @@ namespace Isis {
           double parentSample = p_detectorMap->ParentSample();
           double parentLine = p_detectorMap->ParentLine();
           //cout << "cube: " << parentSample << " " << parentLine << endl; //debug
-          p_pointComputed = true;
 
           if (p_projection == NULL || p_ignoreProjection) {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);
+            p_pointComputed = true;
             shape->setHasIntersection(true);
             return true;
           }
@@ -376,6 +383,7 @@ namespace Isis {
             if (p_projection->SetGround(Declination(), RightAscension())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
+              p_pointComputed = true;
               shape->setHasIntersection(true);
               return true;
             }
@@ -384,6 +392,7 @@ namespace Isis {
             if (p_projection->SetUniversalGround(UniversalLatitude(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
+              p_pointComputed = true;
               shape->setHasIntersection(true);
               return true;
             }
@@ -395,6 +404,7 @@ namespace Isis {
             if (p_projection->SetUniversalGround(LocalRadius().meters(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
+              p_pointComputed = true;
               shape->setHasIntersection(true);
               return true;
             }
@@ -1183,17 +1193,18 @@ namespace Isis {
           if (p_detectorMap->SetDetector(detectorSamp, detectorLine)) {
             double parentSample = p_detectorMap->ParentSample();
             double parentLine = p_detectorMap->ParentLine();
-            p_pointComputed = true;
 
             if (p_projection == NULL || p_ignoreProjection) {
               p_childSample = p_alphaCube->BetaSample(parentSample);
               p_childLine = p_alphaCube->BetaLine(parentLine);
+              p_pointComputed = true;
               return true;
             }
             else if (p_projection->IsSky()) {
               if (p_projection->SetGround(dec, ra)) {
                 p_childSample = p_projection->WorldX();
                 p_childLine = p_projection->WorldY();
+                p_pointComputed = true;
                 return true;
               }
             }
@@ -1202,6 +1213,7 @@ namespace Isis {
                                                   UniversalLongitude())) {
                 p_childSample = p_projection->WorldX();
                 p_childLine = p_projection->WorldY();
+                p_pointComputed = true;
                 return true;
               }
             }

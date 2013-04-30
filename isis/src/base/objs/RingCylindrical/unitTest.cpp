@@ -21,7 +21,8 @@ int main(int argc, char *argv[]) {
   mapGrp += PvlKeyword("TargetName", "Saturn");
   mapGrp += PvlKeyword("RingLongitudeDirection", "Clockwise");
   mapGrp += PvlKeyword("RingLongitudeDomain", "180");
-  mapGrp += PvlKeyword("MinimumRingRadius", "0.0");
+  // mapGrp += PvlKeyword("MinimumRingRadius", "0.0");
+  mapGrp += PvlKeyword("MinimumRingRadius", "18000.0");
   mapGrp += PvlKeyword("MaximumRingRadius", "20000000.0");
   mapGrp += PvlKeyword("MinimumRingLongitude", "-20.0");
   mapGrp += PvlKeyword("MaximumRingLongitude", "130.0");
@@ -74,8 +75,8 @@ int main(int argc, char *argv[]) {
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(16);
-    cout << "Setting ground to (1000.0, 45.0)" << endl;
-    p->SetGround(1000.0, 45.0);
+    cout << "Setting ground to (20000.0, 45.0)" << endl;
+    p->SetGround(20000.0, 45.0);
     cout << "Ring Radius:            " << p->RingRadius() << endl;
     cout << "Ring Longitude:         " << p->RingLongitude() << endl;
     cout << "XCoord:                 " << p->XCoord() << endl;
@@ -83,8 +84,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Test SetCoordinate method ... " << endl;
-    cout << "Setting coordinate to (-157079.6326794896, -199000)" << endl;
-    p->SetCoordinate(-157079.6326794896, -199000);
+    cout << "Setting coordinate to (-157079.6326794896, 180000)" << endl;
+    p->SetCoordinate(-157079.6326794896, 180000);
     cout << "Ring Radius:            " << p->RingRadius() << endl;
     cout << "Ring Longitude:         " << p->RingLongitude() << endl;
     cout << "XCoord:                 " << p->XCoord() << endl;
@@ -92,16 +93,18 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Test SetCoordinate method for radius larger than max ring radius... " << endl;
-    cout << "Setting coordinate to (-157079.6326794896, 19800001)" << endl;
-    bool good = p->SetCoordinate(-157079.6326794896, 19800001);
+    // cout << "Setting coordinate to (-157079.6326794896, 19800001)" << endl;
+    // bool good = p->SetCoordinate(-157079.6326794896, 20000001);
+    cout << "Setting coordinate to (-157079.6326794896, -20000001)" << endl;
+    bool good = p->SetCoordinate(-157079.6326794896, -20000001);
     cout << "Set Coordinate is good? " << good << endl;
     cout << "Ring Radius:            " << p->RingRadius() << endl;
     cout << "Maximum Ring Radius:    " << mapGrp["MaximumRingRadius"][0] << endl;
     cout << endl;
 
     cout << "Test SetCoordinate method for radius smaller than min ring radius... " << endl;
-    cout << "Setting coordinate to (-157079.6326794896, -200000.5)" << endl;
-    good = p->SetCoordinate(-157079.6326794896, -200000.5);
+    cout << "Setting coordinate to (-1570.6326794896, 184000.5)" << endl;
+    good = p->SetCoordinate(-1570.6326794896, 184000.5);
     cout << "Set Coordinate is good? " << good << endl;
     cout << "Ring Radius:            " << p->RingRadius() << endl;
     cout << "Minimum Ring Radius:    " << mapGrp["MinimumRingRadius"][0] << endl;
@@ -162,22 +165,25 @@ int main(int argc, char *argv[]) {
     cout << "  Center ring longitude     = " << p3.CenterRingLongitude() << endl;
     cout << endl;
 
-    cout << "  Setting ground to (1000.0,45.0)" << endl;
-    p3.SetGround(1000.0, 45.0);
+    cout << "  Setting ground to (20000.0,45.0)" << endl;
+    p3.SetGround(20000.0, 45.0);
     cout << "    Ring Radius:      =  " << p3.LocalRadius() << endl;
     cout << "    Ring Longitude:   =  " << p3.RingLongitude() << endl;
     cout << "    XCoord:           =  " << p3.XCoord() << endl;
     cout << "    YCoord:           =  " << p3.YCoord() << endl;
     cout << endl;
 
-    cout << "Testing SetGround error condition..." << endl;
-    cout << "  Setting ground to (-1000.0,45.0)" << endl;
-    try {
-      p3.SetGround(-1000.0, 45.0);
-    }
-    catch(IException &e) {
-      e.print();
-    }
+    cout << "Testing SetGround error conditions..." << endl;
+    cout << "...Testing SetGround with radius < 0..." << endl;
+    cout << "    Setting ground to (-1000.0,45.0)" << endl;
+    if (!p3.SetGround(-1000.0, 45.0))
+      cout << "   SetGround failed" << endl;
+    cout << endl;
+
+    cout << "...Testing SetGround with radius = 0..." << endl;
+    cout << "    Setting ground to (0.0,45.0)" << endl;
+    if(!p3.SetGround(0.0, 45.0))
+      cout << "   SetGround failed" << endl;
     cout << endl;
 
     cout << "Testing more SetCoordinate methods ... " << endl;

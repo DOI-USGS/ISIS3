@@ -41,12 +41,12 @@ namespace Isis {
    *
    * @param label This argument must be a Label containing the proper mapping
    *              information as indicated in the Projection class. Additionally,
-   *              the orthographic projection requires the center azimuth to be
+   *              the orthographic projection requires the center longitude to be
    *              defined in the keyword CenterRingLongitude.
    *
    * @param allowDefaults If set to false the constructor expects that a keyword
    *                      of CenterRingLongitude will be in the label. Otherwise it
-   *                      will attempt to compute the center azimuth using the
+   *                      will attempt to compute the center longitude using the
    *                      middle of the azimuth range specified in the labels.
    *                      Defaults to false.
    *
@@ -62,7 +62,7 @@ namespace Isis {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
-      // Compute and write the default center azimuth if allowed and
+      // Compute and write the default center longitude if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.hasKeyword("CenterRingLongitude"))) {
         double azimuth = (m_minimumRingLongitude + m_maximumRingLongitude) / 2.0;
@@ -76,7 +76,7 @@ namespace Isis {
         mapGroup += PvlKeyword("CenterRingRadius", toString(radius));
       }
 
-      // Get the center azimuth  & radius
+      // Get the center longitude  & radius
       m_centerRingLongitude = mapGroup["CenterRingLongitude"];
       m_centerRingRadius = mapGroup["CenterRingRadius"];
 
@@ -141,9 +141,9 @@ namespace Isis {
 
 
    /**
-    * Returns the center azimuth, in degrees.
+    * Returns the center longitude, in degrees.
     *
-    * @return double The center azimuth.
+    * @return double The center longitude.
     */
   double Planar::CenterRingLongitude() const {
     double dir = 1.0;
@@ -489,8 +489,8 @@ namespace Isis {
     mapping += PvlKeyword("CenterRingRadius", toString(m_centerRingRadius));
     double dir = 1.0;
     if (m_ringLongitudeDirection == Clockwise) dir = -1.0;
-    double azDegrees = m_centerRingLongitude*RAD2DEG*dir;
-    mapping += PvlKeyword("CenterRingLongitude", toString(azDegrees));
+    double lonDegrees = m_centerRingLongitude*RAD2DEG*dir;
+    mapping += PvlKeyword("CenterRingLongitude", toString(lonDegrees));
 
     return mapping;
   }

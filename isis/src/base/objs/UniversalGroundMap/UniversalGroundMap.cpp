@@ -11,6 +11,7 @@
 #include "Longitude.h"
 #include "PolygonTools.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
 #include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "SurfacePoint.h"
@@ -210,8 +211,16 @@ namespace Isis {
       return p_camera->UniversalLatitude();
     }
     else {
-      TProjection *tproj = (TProjection *) p_projection;
-      return tproj->UniversalLatitude();
+      //  Is this a triaxial projection or ring projection.  If ring return Radius as latitude
+      Projection::ProjectionType projType = p_projection->projectionType();
+      if (projType == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) p_projection;
+        return tproj->UniversalLatitude();
+      }
+      else {
+        RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
+        return rproj->RingRadius();
+      }
     }
   }
 
@@ -225,8 +234,17 @@ namespace Isis {
       return p_camera->UniversalLongitude();
     }
     else {
-      TProjection *tproj = (TProjection *) p_projection;
-      return tproj->UniversalLongitude();
+      //  Is this a triaxial projection or ring projection.  If ring return ring longitude as
+      //    longitude
+      Projection::ProjectionType projType = p_projection->projectionType();
+      if (projType == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) p_projection;
+        return tproj->UniversalLongitude();
+      }
+      else {
+        RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
+        return rproj->RingLongitude();
+      }
     }
   }
 

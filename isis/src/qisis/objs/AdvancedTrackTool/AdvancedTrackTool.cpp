@@ -12,10 +12,11 @@
 #include "MdiCubeViewport.h"
 #include "Projection.h"
 #include "RingPlaneProjection.h"
-#include "TProjection.h"
 #include "SerialNumber.h"
 #include "SpecialPixel.h"
 #include "TableMainWindow.h"
+#include "Target.h"
+#include "TProjection.h"
 
 namespace Isis {
 
@@ -377,7 +378,7 @@ namespace Isis {
         }
 
         // Write out columns north azimuth, sun azimuth, solar longitude
-        if (shape->name() != "Plane") {
+        if (cvp->camera()->target()->shape()->name() != "Plane") {
           double northAzi = cvp->camera()->NorthAzimuth();
           p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
         }

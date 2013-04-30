@@ -71,9 +71,13 @@ namespace Isis {
         mapGroup += PvlKeyword("CenterRingRadius", toString(radius));
       }
 
-      // Get the center radius and center azimuth. 
+      // Get the center ring radius and center ring longitude. 
       m_centerRingLongitude = mapGroup["CenterRingLongitude"];
       m_centerRingRadius = mapGroup["CenterRingRadius"];
+
+      // Because the center radius is used to scale the y values of the projection, it cannot be 0.
+      // Perhaps we should fail and issue an error message??? TODO
+      if (m_centerRingRadius == 0.) m_centerRingRadius = 18000.;
 
       //  Convert to radians, adjust for azimuth direction
       m_centerRingLongitude *= DEG2RAD;
@@ -159,12 +163,14 @@ namespace Isis {
 
 
    /**
-    * Returns the center azimuth, in degrees.
+    * Returns the center longitude, in degrees.
     *
-    * @return double The center azimuth.
+    * @return double The center longitude.
     */
   double RingCylindrical::CenterRingLongitude() const {
-    return m_centerRingLongitude;
+    double dir = 1.0;
+    if (m_ringLongitudeDirection == Clockwise) dir = -1.0;
+    return m_centerRingLongitude * RAD2DEG * dir;
   }
 
 
@@ -198,7 +204,7 @@ namespace Isis {
     if (m_ringLongitudeDirection == Clockwise) ringLongitudeRadians *= -1.0;
 
     // Check to make sure radius is valid
-    if (ringRadius < 0) {
+    if (ringRadius <= 0) {
       m_good = false;
       // cout << "Unable to set radius. The given radius value ["
       //      << IString(ringRadius) << "] is invalid." << endl;
@@ -214,10 +220,13 @@ namespace Isis {
     double deltaAz = (ringLongitudeRadians - m_centerRingLongitude);
 
     // Compute the coordinates
-    double x = m_centerRingRadius * deltaAz;
-    double y = ringRadius - m_centerRingRadius;
-    // double x = deltaAz;
-    // double y = atan2(m_ringRadius, m_centerRingRadius);
+    if (ringRadius ==0) {
+      // TODO How should we handle this case? We should use epsilon probably instead of 0 too
+      m_good = false;
+      return m_good;
+    }
+    double x = deltaAz *  m_centerRingRadius;
+    double y =  m_centerRingRadius - ringRadius;
     SetComputedXY(x, y);
     m_good = true;
     return m_good;
@@ -241,20 +250,15 @@ namespace Isis {
     SetXY(x, y);
 
     // Compute radius and make sure it is valid
-    m_ringRadius = GetY() + m_centerRingRadius;
-    // if (GetY() != 0.)
-    //   m_ringRadius = m_centerRingRadius * tan(GetY()) ;
-    // else
-    //   m_ringRingRadius = 0.;
-
+    // m_ringRadius = GetY() + m_centerRingRadius;
+    m_ringRadius = m_centerRingRadius - GetY();
     if (m_ringRadius < m_minimumRingRadius || m_ringRadius > m_maximumRingRadius) {
       m_good = false;
       return m_good;
     }
 
     // Compute azimuth
-    m_ringLongitude = m_centerRingLongitude + GetX() / m_centerRingRadius;
-    // m_ringLongitude = m_centerRingLongitude + GetX();
+    m_ringLongitude =  m_centerRingLongitude + GetX() / m_centerRingRadius;
 
     // Convert to degrees
     m_ringLongitude *= RAD2DEG;
@@ -262,8 +266,8 @@ namespace Isis {
     // Cleanup the azimuth
     if (m_ringLongitudeDirection == Clockwise) m_ringLongitude *= -1.0;
     // Do these if the projection is circular
-     m_ringLongitude = To360Domain (m_ringLongitude);
-     if (m_ringLongitudeDomain == 180) m_ringLongitude = To180Domain(m_ringLongitude);
+    // m_ringLongitude = To360Domain (m_ringLongitude);
+    // if (m_ringLongitudeDomain == 180) m_ringLongitude = To180Domain(m_ringLongitude);
 
     m_good = true;
     return m_good;
@@ -317,13 +321,13 @@ namespace Isis {
     XYRangeCheck(m_minimumRingRadius, m_maximumRingLongitude);
     XYRangeCheck(m_maximumRingRadius, m_maximumRingLongitude);
 
-//cout << " ************ WALK RADIUS ******************\n";
-//cout << "MIN RAD: " << m_minimumRingRadius << " MAX LAT: " << m_maximumRingRadius << "\n";
+// cout << " ************ WALK RADIUS ******************\n";
+// cout << "MIN RAD: " << m_minimumRingRadius << " MAX RAD: " << m_maximumRingRadius << "\n";
     // Walk top and bottom edges in half pixel increments
     double radiusInc = 2. * (m_maximumRingRadius - m_minimumRingRadius) / PixelResolution();
 
     for (rad = m_minimumRingRadius; rad <= m_maximumRingRadius; rad += radiusInc) {
-//cout << "WALKED A STEP - rad: " << rad << "\n";
+// cout << "WALKED A STEP - rad: " << rad << "\n";
       rad = rad;
       az = m_minimumRingLongitude;
       XYRangeCheck(rad, az);
@@ -331,7 +335,7 @@ namespace Isis {
       rad = rad;
       az = m_maximumRingLongitude;
       XYRangeCheck(rad, az);
-//cout << "MIN RAD: " << m_minimumRingRadius << " MAX RAD: " << m_maximumRingRadius << "\n";
+// cout << "MIN RAD: " << m_minimumRingRadius << " MAX RAD: " << m_maximumRingRadius << "\n";
     }
 
 //cout << " ************ WALK AZIMUTH ******************\n";
@@ -401,7 +405,10 @@ namespace Isis {
     PvlGroup mapping = RingPlaneProjection::Mapping();
 
     mapping += PvlKeyword("CenterRingRadius", toString(m_centerRingRadius));
-    mapping += PvlKeyword("CenterRingLongitude", toString(m_centerRingLongitude));
+    double dir = 1.0;
+    if (m_ringLongitudeDirection == Clockwise) dir = -1.0;
+    double lonDegrees = m_centerRingLongitude*RAD2DEG*dir;
+    mapping += PvlKeyword("CenterRingLongitude", toString(lonDegrees));
 
     return mapping;
   }
