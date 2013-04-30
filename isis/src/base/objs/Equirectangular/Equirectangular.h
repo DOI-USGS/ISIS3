@@ -54,7 +54,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2004-02-07 Jeff Anderson - added plug-in capability.
-   *   @history 2004-02-24 Jeff Anderson - Modified forward and inverse methods
+   *   @history 2004-02-24 Jeff Anderson - Modified forward and inverse methods 
    *                           to use the local radius at the center latitude
    *                           instead of the equitorial radius.
    *   @history 2005-03-11 Elizabeth Ribelin - added TrueScaleLatitude method
@@ -74,6 +74,11 @@ namespace Isis {
    *                           implementation file. Minor modifications to
    *                           comply with some coding standards. References
    *                           #928.
+   *  @history 2013-04-26 Jeannie Backer - Modified constructor so that default
+   *                          center lat/lon values are at the center of the
+   *                          lat/lon ranges, respectively. This was done to be
+   *                          consistent with other projection defaults.
+   *                          Improved test coverage. Fixes #1597.
    */
   class Equirectangular : public Projection {
     public:

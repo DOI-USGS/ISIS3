@@ -45,12 +45,22 @@ namespace Isis {
    *
    * @param allowDefaults (Default value is false) If set to false the
    *                      constructor requires that the keywords CenterLongitude
-   *                      and CenterLatitude exist in the label. Otherwise if they
-   *                      do not exist they will be computed and written to the
-   *                      label using the middle of the latitude/longitude range
-   *                      as specified in the labels.
+   *                      and CenterLatitude exist in the label. Otherwise, if
+   *                      they do not exist they will be computed and written to
+   *                      the label using the middle of the latitude/longitude range.
    *
-   * @throw IException  - "Keyword value for CenterLatitude is too close to the pole"
+   * @throw IException  - "Cannot project without [CenterLongitude] value. Keyword 
+   *                       does not exist in the labels and defaults are not allowed."
+   * @throw IException  - "Cannot project without [CenterLatitude] value. Keyword 
+   *                       does not exist in the labels and defaults are not allowed."
+   * @throw IException  - "Keyword value for CenterLatitude is too close to the pole" 
+   * @throw IException  - "Invalid label group [Mapping]." 
+   *  
+   * @internal 
+   *   @history 2013-04-26 Jeannie Backer - Modified so that default center
+   *                           lat/lon values are at the center of the lat/lon ranges,
+   *                           respectively. This was done to be consistent with
+   *                           other projection defaults.
    */
   Equirectangular::Equirectangular(Pvl &label, bool allowDefaults) :
     Projection::Projection(label) {
@@ -59,23 +69,30 @@ namespace Isis {
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
 
       // Compute the default value if allowed and needed
-      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLongitude"))) {
-        double lon = 0.0;
-        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
-      }
-
-      if ((allowDefaults) && (!mapGroup.hasKeyword("CenterLatitude"))) {
-        double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-        if (lat >= 65.0) {
-          lat = 65.0;
-        }
-        else if (lat <= -65.0) {
-          lat = -65.0;
+      if (!mapGroup.hasKeyword("CenterLongitude")) {
+        if (allowDefaults) {
+          double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
+          mapGroup += PvlKeyword("CenterLongitude", toString(lon));
         }
         else {
-          lat = 0.0;
+          QString message = "Cannot project using Equirectangular Cylindrical";
+          message += " without [CenterLongitude] value.  Keyword does not exist";
+          message += " in labels and defaults are not allowed.";
+          throw IException(IException::Unknown, message, _FILEINFO_);
         }
-        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
+      }
+
+      if (!mapGroup.hasKeyword("CenterLatitude")) {
+        if (allowDefaults) {
+          double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
+          mapGroup += PvlKeyword("CenterLatitude", toString(lat));
+        }
+        else {
+          QString message = "Cannot project using Equirectangular Cylindrical";
+          message += " without [CenterLatitude] value.  Keyword does not exist";
+          message += " in labels and defaults are not allowed.";
+          throw IException(IException::Unknown, message, _FILEINFO_);
+        }
       }
 
       // Get the center longitude, convert to radians, adjust for longitude
@@ -152,10 +169,10 @@ namespace Isis {
   }
 
   /**
-   * Returns the latitude of true scale (in the case of Equirectangular it is 
-   * the center latitude).
+   * Returns the latitude of true scale, in degrees. In the case of 
+   * Equirectangular it is the center latitude. 
    *
-   * @return double The center latitude
+   * @return double The center latitude, in degrees.
    */
   double Equirectangular::TrueScaleLatitude() const {
     return m_centerLatitude * 180.0 / PI;
@@ -176,11 +193,10 @@ namespace Isis {
    * forces an attempted calculation of the projection X/Y values. This may or
    * may not be successful and a status is returned as such.
    *
-   * @param lat Latitude value to project
+   * @param lat Latitude value to project, in degreees.
+   * @param lon Longitude value to project, in degreees.
    *
-   * @param lon Longitude value to project
-   *
-   * @return bool
+   * @return bool Indicates whether the ground values were set.
    */
   bool Equirectangular::SetGround(const double lat, const double lon) {
     // Convert to radians
@@ -210,7 +226,7 @@ namespace Isis {
    * @param y Y coordinate of the projection in units that are the same as the
    *          radii in the label
    *
-   * @return bool
+   * @return bool Indicates whether the (x,y) coordinate was set.
    */
   bool Equirectangular::SetCoordinate(const double x, const double y) {
     // Save the coordinate
@@ -262,7 +278,7 @@ namespace Isis {
    * @param maxY Maximum y projection coordinate which covers the latitude
    *             longitude range specified in the labels.
    *
-   * @return bool
+   * @return bool Indicates whether the method was successful.
    */
   bool Equirectangular::XYRange(double &minX, double &maxX,
                                 double &minY, double &maxY) {
@@ -285,7 +301,8 @@ namespace Isis {
   }
 
   /**
-   * This function returns the keywords that this projection uses.
+   * This function returns a PvlGroup containing the keywords that this 
+   * projection uses, namely CenterLatitude and CenterLongitude.
    *
    * @return PvlGroup The keywords that this projection uses
    */
@@ -299,7 +316,8 @@ namespace Isis {
   }
 
   /**
-   * This function returns the latitude keywords that this projection uses
+   * This function returns a PvlGroup containing the latitude keywords that this
+   * projection uses, namely CenterLatitude. 
    *
    * @return PvlGroup The latitude keywords that this projection uses
    */
@@ -312,7 +330,8 @@ namespace Isis {
   }
 
   /**
-   * This function returns the longitude keywords that this projection uses
+   * This function returns a PvlGroup containing the longitude keywords that
+   * this projection uses, namely CenterLongitude. 
    *
    * @return PvlGroup The longitude keywords that this projection uses
    */
