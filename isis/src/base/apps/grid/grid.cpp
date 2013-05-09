@@ -295,7 +295,7 @@ void groundGrid(Buffer &in, Buffer &out) {
   for (int samp = 1; samp <= in.SampleDimension(); samp++) {
     if (!ticks) {
       if (groundDrawPoint(samp, in.Line())) {
-        out[samp - 1] = Hrs;
+        out[samp - 1] = lineValue;
       }
       else {
         if (image)
@@ -320,7 +320,7 @@ void groundGrid(Buffer &in, Buffer &out) {
             sampleTest ++) {
           if (groundDrawPoint(sampleTest, in.Line(), true) &&
               groundDrawPoint(sampleTest, in.Line(), false)) {
-            out[samp - 1] = Hrs;
+            out[samp - 1] = lineValue;
           }
         }
 
@@ -330,7 +330,7 @@ void groundGrid(Buffer &in, Buffer &out) {
             lineTest ++) {
           if (groundDrawPoint(samp, lineTest, true) &&
               groundDrawPoint(samp, lineTest, false)) {
-            out[samp - 1] = Hrs;
+            out[samp - 1] = lineValue;
           }
         }
       }
@@ -346,7 +346,7 @@ void groundGrid(Buffer &in, Buffer &out) {
               (sampleTest <= samp + tickSize)) {
           if (groundDrawPoint(sampleTest, lineTest, true) &&
               groundDrawPoint(sampleTest, lineTest, false)) {
-            out[samp - 1] = Hrs;
+            out[samp - 1] = lineValue;
           }
 
           sampleTest ++;
@@ -362,7 +362,7 @@ void groundGrid(Buffer &in, Buffer &out) {
               (sampleTest >= samp - tickSize)) {
           if (groundDrawPoint(sampleTest, lineTest, true) &&
               groundDrawPoint(sampleTest, lineTest, false)) {
-            out[samp - 1] = Hrs;
+            out[samp - 1] = lineValue;
           }
 
           sampleTest --;
