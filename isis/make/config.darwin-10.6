@@ -85,10 +85,9 @@ CWDLIB    =
 QTDARWINFLAGS += -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED
 QTDIR        = $(ISIS3OPT)
 
-QTFRAMEWORKDIR     = $(QTDIR)/lib
-
+QTFRAMEWORKDIR     = $(QTDIR)/Library/Frameworks
 ifeq (,$(findstring $(QTFRAMEWORKDIR)/QtCore.framework,$(wildcard $(QTFRAMEWORKDIR)/QtCore.framework )))
-  QTFRAMEWORKDIR   = $(ISIS3OPT)/Library/Frameworks
+  QTFRAMEWORKDIR   = $(ISIS3OPT)/lib
 endif
 
 QTINCDIR  = -I$(QTDIR)/share/qt4/mkspecs/macx-g++
@@ -128,9 +127,14 @@ MOCDEFINES   += -D__APPLE__ -D__GNUC__
 #---------------------------------------------------------------------------
 # Set up for Qwt
 #---------------------------------------------------------------------------
-QWTDIR    = $(ISIS3OPT)
-QWTINCDIR = -I$(QWTDIR)/lib/qwt.framework/Headers
-QWTLIBDIR = -L$(QWTDIR)/lib -F$(QWTDIR)/lib
+QWTDIR      = $(ISIS3OPT)
+QWTFRAMES   = $(QWTDIR)/Library/Frameworks
+ifeq (,$(findstring $(QWTFRAMES)/qwt.framework,$(wildcard $(QWTFRAMES)/qwt.framework )))
+  QWTFRAMES  = $(ISIS3OPT)/lib
+endif
+
+QWTINCDIR = -I$(QWTFRAMES)/qwt.framework/Headers
+QWTLIBDIR = -L$(QWTFRAMES) -F$(QWTFRAMES)
 QWTLIB    = -framework qwt 
 
 #---------------------------------------------------------------------------
@@ -272,13 +276,14 @@ THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSvg.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebKit.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtOpenGL.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtTest.framework"
-THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/qwt.framework"
+THIRDPARTYLIBS    += "$(QWTFRAMES)/qwt.framework"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiconv*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxerces-c*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtiff*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/liblzma*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgsl*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libz*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libssl*.dylib"
