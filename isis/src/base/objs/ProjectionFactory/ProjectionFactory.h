@@ -77,6 +77,11 @@ namespace Isis {
    *                         Projections.
    *   @history 2013-03-13 Debbie A. Cook - Modified to differentiate between
    *                         Project subclasses:  TProjection and RingPlaneProjection.
+   *   @history 2013-05-09 Jeannie Backer - Modified CreateForCube and RingsCreateForCube() methods
+   *                           to ensure that the distances from the MinimumX to the MaximumX and
+   *                           from the MinimumY to the MaximumY are at least one pixel resolution.
+   *                           This ensures that the created cube will have at least one sample and
+   *                           at least one line. References #775.
    */
   class ProjectionFactory {
     public:

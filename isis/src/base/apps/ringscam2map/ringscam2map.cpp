@@ -3,14 +3,14 @@
 #include "Isis.h"
 #include "Distance.h"
 #include "Camera.h"
+#include "IException.h"
+#include "IString.h"
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
-#include "IException.h"
+#include "PushFrameCameraDetectorMap.h"
+#include "Pvl.h"
 #include "RingPlaneProjection.h"
 #include "ringscam2map.h"
-#include "Pvl.h"
-#include "IString.h"
-#include "PushFrameCameraDetectorMap.h"
 #include "Target.h"
 
 using namespace std;
@@ -142,72 +142,77 @@ void IsisMain() {
     }
   }
 
-  // If the user decided to enter a resolution then override
-  if(ui.GetString("PIXRES") == "MPP") {
-    userGrp.addKeyword(PvlKeyword("PixelResolution",
-                                  toString(ui.GetDouble("RESOLUTION"))),
-                       Pvl::Replace);
-    if(userGrp.hasKeyword("Scale")) {
-      userGrp.deleteKeyword("Scale");
+  // If the user is not matching the map file and entered a resolution, then reset this value
+  if (!ui.GetBoolean("MATCHMAP")) {
+    if(ui.GetString("PIXRES") == "MPP") {
+      userGrp.addKeyword(PvlKeyword("PixelResolution",
+                                    toString(ui.GetDouble("RESOLUTION"))),
+                         Pvl::Replace);
+      if(userGrp.hasKeyword("Scale")) {
+        userGrp.deleteKeyword("Scale");
+      }
     }
-  }
-  else if(ui.GetString("PIXRES") == "PPD") {
-    userGrp.addKeyword(PvlKeyword("Scale",
-                                  toString(ui.GetDouble("RESOLUTION"))),
-                       Pvl::Replace);
-    if(userGrp.hasKeyword("PixelResolution")) {
-      userGrp.deleteKeyword("PixelResolution");
+    else if(ui.GetString("PIXRES") == "PPD") {
+      userGrp.addKeyword(PvlKeyword("Scale",
+                                    toString(ui.GetDouble("RESOLUTION"))),
+                         Pvl::Replace);
+      if(userGrp.hasKeyword("PixelResolution")) {
+        userGrp.deleteKeyword("PixelResolution");
+      }
     }
   }
 
   // See if the user want us to handle the azimuth (ring longitude) seam
-  if((ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE")) {
-    //TODO This camera method will need attention for rings***** Solution:  just call ringRange directly
-    // if(incam->IntersectsLongitudeDomain(userMap)) {
-    if (incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
-      if(ui.GetString("RINGLONSEAM") == "AUTO") {
-        if((int) userGrp["RingLongitudeDomain"] == 360) {
-          userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "180"),
-                             Pvl::Replace);
-          if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
-            // Its looks like a global image so switch back to the
-            // users preference
-            userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
-                               Pvl::Replace);
-          }
-        }
-        else {
-          userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
-                             Pvl::Replace);
-          if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
-            // Its looks like a global image so switch back to the
-            // users preference
+  // NOTE: For ringscam2map, if the user chooses to MATCHMAP, then we treat
+  // the parameter ringlonseam as if it were set to "continue" (i.e. do nothing)
+  if (!ui.GetBoolean("MATCHMAP")) {
+    if((ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE")) {
+      //TODO This camera method will need attention for rings***** Solution:  just call ringRange directly
+      // if(incam->IntersectsLongitudeDomain(userMap)) {
+      if (incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
+        if(ui.GetString("RINGLONSEAM") == "AUTO") {
+          if((int) userGrp["RingLongitudeDomain"] == 360) {
             userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "180"),
                                Pvl::Replace);
+            if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
+              // Its looks like a global image so switch back to the
+              // users preference
+              userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
+                                 Pvl::Replace);
+            }
+          }
+          else {
+            userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "360"),
+                               Pvl::Replace);
+            if(incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
+              // Its looks like a global image so switch back to the
+              // users preference
+              userGrp.addKeyword(PvlKeyword("RingLongitudeDomain", "180"),
+                                 Pvl::Replace);
+            }
+          }
+          // Make the target info match the new azimuth (ring longitude) domain Use radius for where
+          // camera expects latitude & azimuth (ring longitude) where the camera expects longitude
+          double minrad, maxrad, minaz, maxaz;
+          incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
+          if(!ui.WasEntered("MINRINGRAD")) {
+            userGrp.addKeyword(PvlKeyword("MinimumRingRadius", toString(minrad)), Pvl::Replace);
+          }
+          if(!ui.WasEntered("MAXRINGRAD")) {
+            userGrp.addKeyword(PvlKeyword("MaximumRingRadius", toString(maxrad)), Pvl::Replace);
+          }
+          if(!ui.WasEntered("MINRINGLON")) {
+            userGrp.addKeyword(PvlKeyword("MinimumRingLongitude", toString(minaz)), Pvl::Replace);
+          }
+          if(!ui.WasEntered("MAXRINGLON")) {
+            userGrp.addKeyword(PvlKeyword("MaximumRingLongitude", toString(maxaz)), Pvl::Replace);
           }
         }
-        // Make the target info match the new azimuth (ring longitude) domain Use radius for where
-        // camera expects latitude & azimuth (ring longitude) where the camera expects longitude
-        double minrad, maxrad, minaz, maxaz;
-        incam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
-        if(!ui.WasEntered("MINRINGRAD")) {
-          userGrp.addKeyword(PvlKeyword("MinimumRingRadius", toString(minrad)), Pvl::Replace);
+        else if(ui.GetString("RINGLONSEAM") == "ERROR") {
+          QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
+                       "ring longitude seam";
+          throw IException(IException::User, msg, _FILEINFO_);
         }
-        if(!ui.WasEntered("MAXRINGRAD")) {
-          userGrp.addKeyword(PvlKeyword("MaximumRingRadius", toString(maxrad)), Pvl::Replace);
-        }
-        if(!ui.WasEntered("MINRINGLON")) {
-          userGrp.addKeyword(PvlKeyword("MinimumRingLongitude", toString(minaz)), Pvl::Replace);
-        }
-        if(!ui.WasEntered("MAXRINGLON")) {
-          userGrp.addKeyword(PvlKeyword("MaximumRingLongitude", toString(maxaz)), Pvl::Replace);
-        }
-      }
-
-      else if(ui.GetString("RINGLONSEAM") == "ERROR") {
-        QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
-                     "ring longitude seam";
-        throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
@@ -218,17 +223,19 @@ void IsisMain() {
   bool trim;
 
   // Determine the image size
-  if(ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
-    outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, *incam);
+  if (ui.GetBoolean("MATCHMAP") || ui.GetString("DEFAULTRANGE") == "MAP") { // DEFAULTRANGE = MAP or MATCHMAP=true
+    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines,
+                                                                         ui.GetBoolean("MATCHMAP"));//??? if DR=map, this is always false???
+    trim = ui.GetBoolean("TRIM"); // trim allowed for defaultrange=map
+  }
+  else if(ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
+    outmap = (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, 
+                                                                           *incam);
     trim = false;
   }
-  else if(ui.GetString("DEFAULTRANGE") == "CAMERA") {
-    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, false);
-    trim = ui.GetBoolean("TRIM");
-  }
-  else { // DEFAULTRANGE = MAP or MATCHMAP=true
-    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines,
-             ui.GetBoolean("MATCHMAP"));
+  else { // if(ui.GetString("DEFAULTRANGE") == "CAMERA") {
+    outmap =  (RingPlaneProjection *) ProjectionFactory::RingsCreateForCube(userMap, samples, lines, 
+                                                                            false);
     trim = ui.GetBoolean("TRIM");
   }
 
@@ -260,14 +267,12 @@ void IsisMain() {
 
   //  See if center of input image projects.  If it does, force tile
   //  containing this center to be processed in ProcessRubberSheet.
-  //  TODO:  WEIRD ... why is this needed ... Talk to Tracie ... JAA??
+  //  TODO:  WEIRD ... why is this needed ... Talk to Tracie or JAA???
   double centerSamp = icube->sampleCount() / 2.;
   double centerLine = icube->lineCount() / 2.;
   if(incam->SetImage(centerSamp, centerLine)) {
     // Force rings data into Isis by returning ring radius for latitude
     // and azimuth (ring longitude) for longitude
-    //                               if(outmap->SetUniversalGround(incam->UniversalLatitude(),
-    //                               incam->UniversalLongitude())) {
     if(outmap->SetUniversalGround(incam->LocalRadius().meters(),
                                   incam->UniversalLongitude())) {
       p.ForceTile(outmap->WorldX(), outmap->WorldY());

@@ -43,7 +43,9 @@ namespace Isis {
    *
    * @author 2013-03-10 Debbie A. Cook
    *
-   * @internal
+   * @internal 
+   *   @history 2013-05-09 Jeannie Backer - Added comments and documentation.
+   *            References #775.
    */
   // or Rectilinear projection?? scale azimuth with 1/(2*pi) * radius maybe
   class RingCylindrical : public RingPlaneProjection {
@@ -71,7 +73,8 @@ namespace Isis {
     protected:
 
     private:
-      double m_centerRingLongitude; //!< The center ring longitude (azimuth) for the map projection in radians
+      double m_centerRingLongitude; /**< The center ring longitude (azimuth) for the map projection,
+                                         in radians*/
       double m_centerRingRadius;    //!< The center ring radius for the map projection
   };
 };

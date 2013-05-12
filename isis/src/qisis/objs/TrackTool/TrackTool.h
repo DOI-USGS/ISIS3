@@ -36,6 +36,8 @@ namespace Isis {
    *   @history 2013-04-24 Jeannie Backer - Capitalized text output, "n/a", to
    *                           be consistent with the AdvancedTrackTool text output. References
    *                           #775.
+   *   @history 2013-05-07 Jeannie Backer - Replaced Lat with Rad for non-projected "Plane"
+   *                           shaped models. References #775.
    */
   class TrackTool : public Tool {
       Q_OBJECT

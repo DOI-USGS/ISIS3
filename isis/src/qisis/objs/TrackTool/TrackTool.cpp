@@ -5,11 +5,13 @@
 #include <QCursor>
 
 #include "Camera.h"
-#include "RingPlaneProjection.h"
-#include "Projection.h"
-#include "TProjection.h"
+#include "Distance.h"
 #include "MdiCubeViewport.h"
+#include "Projection.h"
+#include "RingPlaneProjection.h"
 #include "SpecialPixel.h"
+#include "Target.h"
+#include "TProjection.h"
 #include "ViewportBuffer.h"
 #include "WarningWidget.h"
 
@@ -185,6 +187,7 @@ namespace Isis {
           RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
           double rad = rproj->RingRadius();
           double lon = rproj->RingLongitude();
+          //??? p_latLabel->setToolTip("Radius Position");
           p_latLabel->setText(QString("Rad %1").arg(rad));
           p_lonLabel->setText(QString("Lon %1").arg(lon));
         }
@@ -200,10 +203,19 @@ namespace Isis {
       p_lonLabel->show();
 
       if(cvp->camera()->SetImage(sample, line)) {
-        double lat = cvp->camera()->UniversalLatitude();
-        double lon = cvp->camera()->UniversalLongitude();
-        p_latLabel->setText(QString("Lat %1").arg(lat));
-        p_lonLabel->setText(QString("Lon %1").arg(lon));
+        if (cvp->camera()->target()->shape()->name() != "Plane") {
+          double lat = cvp->camera()->UniversalLatitude();
+          double lon = cvp->camera()->UniversalLongitude();
+          p_latLabel->setText(QString("Lat %1").arg(lat));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
+        else {
+          double rad = cvp->camera()->LocalRadius().meters();
+          double lon = cvp->camera()->UniversalLongitude();
+          //??? p_latLabel->setToolTip("Radius Position");
+          p_latLabel->setText(QString("Rad %1").arg(rad));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
       }
       else {
         p_latLabel->setText("Lat N/A");

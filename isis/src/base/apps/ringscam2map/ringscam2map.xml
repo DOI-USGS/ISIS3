@@ -9,19 +9,19 @@
   <description>
     This program projects an ISIS <def link="Level0">level0</def> or <def link="Level1">level1</def> 
     <def link="Cube">cube</def> to a <def link="MAP">map</def> (ISIS <def link="Level2">level2</def> cube).  
-    The input cube requires <def>SPICE</def> data and therefore the program <i>spiceinit</i> should be run on it 
-    with shape set to RingPlane prior to <i>ringscam2map</i>.  The 
+    The input cube requires <def>SPICE</def> data and therefore the program <i>spiceinit</i> should
+    be run on it with shape set to RingPlane prior to <i>ringscam2map</i>.  The 
     <def link="Map Projection">map projection</def> is defined using a <def>PVL</def> file 
     specified with the MAP parameter.  The system default is to use the Planar projection 
-    ($ISIS3DATA/base/templates/maps/planar.map).  To learn more about using map projections in ISIS, 
-    refer to the ISIS Workshop 
+    ($ISIS3DATA/base/templates/maps/planar.map).  To learn more about using map projections in 
+    ISIS, refer to the ISIS Workshop 
     <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections">
     "Learning About Map Projections"</a>.
 
-    <p>If you need to generate your own map file you can use the <i>maptemplate</i> program or alternatively, 
-    hand create a file using your favorite editor.  The file need only specify the ProjectionName 
-    as defaults will be computed for the remaining map file parameters.  The following table indicates 
-    how the defaults are established:
+    <p>If you need to generate your own map file you can use the <i>maptemplate</i> program or 
+    alternatively, hand create a file using your favorite editor.  The file need only specify the 
+    ProjectionName as defaults will be computed for the remaining map file parameters.  The 
+    following table indicates how the defaults are established:
     </p>
 
     <table border="1">
@@ -60,8 +60,8 @@
     </table>
 
     <p>
-      If you only entered the input cube (FROM) and output cube (TO) and changed no other parameters the 
-      following is the default Mapping group:
+      If you only entered the input cube (FROM) and output cube (TO) and changed no other 
+      parameters the following is the default Mapping group:
     </p>
     <pre>
   Group = Mapping
@@ -86,19 +86,20 @@
    cube can use some or all of the keyword values of the map file.  For instance, setting 
    MATCHMAP = true causes all of the mapping parameters to come from the map file, resulting 
    in an output cube having the same number of <def link="Line">lines</def> and 
-   <def link="Sample">samples</def> as the map file.  If MATCHMAP = true and the map file is missing 
-   a keyword like PixelResolution, the application will fail with a PVL error.  Setting 
+   <def link="Sample">samples</def> as the map file.  If MATCHMAP = true and the map file is 
+   missing a keyword like PixelResolution, the application will fail with a PVL error.  Setting 
    MATCHMAP=false allows for some of the mapping components to be overridden by the user or 
    computed from the FROM cube.
    
 
    <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, 
    RingLongitudeDirection,  RingLongitudeDomain, ProjectionName, and projection specific parameters
-   (e.g., CenterRingLongitude, CenterRingRadius) are the same for all cubes. That is,  you should create one
-   map file and use it as input for all the cubes in your mosaic.  By letting the minimum and 
-   maximum ring radius and ring longitude values default, the application will determine the coverage of 
-   each image.  However, if the mosaic Ring Radius and Ring Longitude range is entered, each output image will
-   be projected to the full  size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.  
+   (e.g., CenterRingLongitude, CenterRingRadius) are the same for all cubes. That is,  you should 
+   create one map file and use it as input for all the cubes in your mosaic.  By letting the 
+   minimum and maximum ring radius and ring longitude values default, the application will 
+   determine the coverage of each image.  However, if the mosaic Ring Radius and Ring Longitude 
+   range is entered, each output image will be projected to the full  size of the mosaic resulting 
+   in large file sizes and images with many <def>NULL</def> pixels.  
 
    The following Mapping group could be used for mosaicking:
    </p>
@@ -111,15 +112,18 @@
    </pre>
 
    <p>
-     Finally, depending on the projection, problems can occur with cubes that fall on the projection 
-     ring longitude seam.  For example, if you are making a mosaic with RingLongitudeDomain = 360 and your 
-     cube crosses 0/360 seam, this program would compute the default ring longitude range of the cube to 
-     MinimumRingLongitude = 0 and MaximumRingLongitude = 360.  A very large output image could be created 
-     depending on the pixel resolution.  The RINGLONSEAM parameter allows you to selectively handle this case.  
-     If you are making mosaics near the seam you will need to understand and alter the default for this parameter.
+     Finally, depending on the projection, problems can occur with cubes that fall on the 
+     projection ring longitude seam.  For example, if you are making a mosaic with 
+     RingLongitudeDomain = 360 and your cube crosses 0/360 seam, this program would compute the 
+     default ring longitude range of the cube to MinimumRingLongitude = 0 and 
+     MaximumRingLongitude = 360.  A very large output image could be created 
+     depending on the pixel resolution.  The RINGLONSEAM parameter allows you to selectively handle
+     this case. If you are making mosaics near the seam you will need to understand and alter the 
+     default for this parameter.
      <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections#Problems_at_the_Longitude_Seams">
-     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help 
-     illustrate the problem.
+     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to 
+     help illustrate the problem. Note that if the user chooses to match the map file, then the 
+     user can not set this parameter. The program will behave as if RINGLONSEAM="CONTINUE".
    </p>
   </description>
 
@@ -249,6 +253,11 @@
      <change name="Jeannie Backer" date="2013-03-12">
        Added appTests.  Test coverage appears low (60% scope, 60% line, 38% function), however these
        tests cover a large portion in all three categories for the code that does not apply to the GUI helper methods. 
+        References #775.
+     </change>
+     <change name="Jeannie Backer" date="2013-03-12">
+       Re-added "if MATCHMAP" statements since the IsisAml is not interpreting exclusions as expected. 
+       Added exclusion - if MATCHMAP is true, then the parameter RINGLONSEAM is excluded. References #775.
      </change>
   </history>
 
@@ -340,6 +349,7 @@
           <item>MAXRINGRAD</item>
           <item>MINRINGLON</item>
           <item>MAXRINGLON</item>
+          <item>RINGLONSEAM</item>
         </exclusions>
       </parameter>
     </group>
@@ -425,11 +435,12 @@
         <brief>Defines how the default ground range is determined</brief>
         <default><item>MINIMIZE</item></default>
         <description>
-          This parameter is used to specify how the default ring ground ranges (radius and longitude) for the output map projected image
-          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can overide the default 
-          using the MINRINGRAD, MAXRINGRAD, MINRINGLON, MAXRINGLON parameters.  The purpose of the ground range is to define the coverage 
-          of the map projected image.  Essentially, the ground range and pixel resolution are used to compute the size 
-          (samples and line) of the output image.
+          This parameter is used to specify how the default ring ground ranges (radius and 
+          longitude) for the output map projected image is obtained.  The ground range can be 
+          obtained from the camera or map file.  Note the user can overide the default using the 
+          MINRINGRAD, MAXRINGRAD, MINRINGLON, MAXRINGLON parameters.  The purpose of the ground 
+          range is to define the coverage of the map projected image.  Essentially, the ground 
+          range and pixel resolution are used to compute the size (samples and line) of the output image.
         </description>
 
         <helpers>
@@ -450,10 +461,10 @@
           <option value="MINIMIZE">
              <brief>Minimize output image size</brief>
              <description>
-               This option will use the camera and projection in combination to ensure the output image size 
-               (samples, lines) is minimized.  Using a ground range can cause NULL padding for projections with 
-               curved merdians and/or parallels and hence large output images.  The amount of padding can be 
-               quite large for extremely high resolution maps.
+               This option will use the camera and projection in combination to ensure the output 
+               image size (samples, lines) is minimized.  Using a ground range can cause NULL 
+               padding for projections with curved merdians and/or parallels and hence large output
+               images.  The amount of padding can be quite large for extremely high resolution maps.
              </description>
              <inclusions><item>RINGLONSEAM</item></inclusions>
              <exclusions>
@@ -561,34 +572,37 @@
         </brief>
         <description>
           With this option you can turn on/off the automatic ring longitude domain switching that occurs
-          when a file crosses the boundary of the ring longitude domain (0-360 or -180 to 180).  If 
-          the switching is turn off then you have the choice of making the program continue or 
-          exit when the cube does cross the bounday.
+          when a file crosses the boundary of the ring longitude domain (0 to 360 or -180 to 180).  If 
+          the automatic switching is turned off, then you have the choice of making the program continue or 
+          exit when the cube does cross the boundary.
         </description>
 
         <list>
            <option value="AUTO">
-              <brief>Automatically correct Ring Longitude Domain</brief>
+              <brief>If the cube crosses the seam, automatically switch the RingLongitudeDomain.</brief>
               <description>
-                If the cube crosses the ring longitude seam automatically compute the RingLongitudeDomain.   
-                When the cube is near 0 or 360 degrees the program will assume 180 RingLongitudeDomain.  
-                When the cube is near 180 or -180 degrees it will assume 360 RingLongitudeDomain.
+                If the cube crosses the ring longitude seam, then the program will automatically 
+                compute the RingLongitudeDomain. When the cube is near 0 or 360 degrees, the 
+                program will assume 180 RingLongitudeDomain. When the cube is near 180 or -180 
+                degrees, the program will assume 360 RingLongitudeDomain.
               </description>
             </option>
 
            <option value="ERROR">
-              <brief>Abort program if cube crosses seam</brief>
+              <brief>If the cube crosses the seam, abort the program.</brief>
               <description>
-                If the cube crosses the ring longitude seam the program will exit with an error message
+                If the cube has a LongitudeDomain of 360 and the image crosses the seam at 0/360 degrees or
+                or the cube has a LongitudeDomain of 180 and the image crosses the seam at -180/180 degrees, 
+                then the program will exit with an error message.
               </description>
             </option>
 
             <option value="CONTINUE">
-               <brief>Continue program if cube crosses seam</brief>
+               <brief>If the cube crosses the seam, continue program and keep the RingLongitudeDomain.</brief>
                <description>
-                 If the cube crosses the ring longitude seam the program will continue.  The RingLongitudeDomain 
-                 in the map file will be used.  If the map file does not have a RingLongitudeDomain, 0-360 
-                 will be used. Note that this could create an extremely large image.
+                 If the cube crosses the ring longitude seam, the program will continue.  The RingLongitudeDomain 
+                 will not be changed from the domain in the map file. If the map file does not have a RingLongitudeDomain, 
+                 the default of 360 LongitudeDomain will be used. Note that this could create an extremely large image.
                </description>
              </option>
         </list>
@@ -646,13 +660,13 @@
           <option value="FORWARDPATCH">
             <brief>Forward patch warp algorithm</brief>
             <description>
-              Patches are uniformly distributed over the input cube (FROM).  For each input patch, the rad/azs of 
-              the four corners coordinates are computed using the camera model.  
-              Those four rad/az coordinates are used by the 
-              map projection to determine four output pixel coordinates.   Then the 
+              Patches are uniformly distributed over the input cube (FROM).  For each input patch, the radius/longitude of 
+              the four corner coordinates are computed using the camera model.  
+              Those four radius/longitude coordinates are used by the 
+              map projection to determine four output pixel coordinates.   Then, the 
               four output to input image coordinates are fit with two affine transforms.  
-              That is, isamp=f(osamp,oline) and iline=g(osamp,oline)
-              where f = A+B*osamp+C*oline and similarly for g.
+              That is, inputsamp=f(outputsamp,outputline) and inputline=g(outputsamp,outputline)
+              where f = A+B*outputsamp+C*outputline and similarly for g.
               If the estimated input/sample 
               line (as computed by the affine transform) at the center of the patch is within a tenth 
               of a pixel of the actual computation using the projection and camera model, 
@@ -665,11 +679,11 @@
             <brief>Reverse patch warp algorithm</brief>
             <description>
               Patches are uniformly distributed over the output cube (map projected product).  For each 
-              output patch, the rad/azs of the four corners coordinates 
-              are computed using the map projection.  Those four rad/az coordinates are used 
+              output patch, the radius/longitude of the four corners coordinates 
+              are computed using the map projection.  Those four radius/longitude coordinates are used 
               by the camera model to determine four input pixel coordinates.   Then the 
               four output to input image coordinates are fit with two affine transforms.  That is, 
-              isamp=f(osamp,oline) and iline=g(osamp,oline) where f = A+B*osamp+C*oline and similarly for g.
+              inputsamp=f(outputsamp,outputline) and inputline=g(outputsamp,outputline) where f = A+B*outputsamp+C*outputline and similarly for g.
               If the estimated input/sample 
               line (as computed by the affine transform) at the center of the patch is within a 
               tenth of a pixel of the actual computation using the projection and camera model, 
@@ -707,7 +721,8 @@
           of 256x256 may have the same elevation at the four corners and center of the grid but a 
           crater may exist in one of the four quadrants of the patch.  The crater,
           up to 128 pixels in diamter may not be properly orthorectified.  In general, small patch
-          sizes are recommended (e.g., 4, 8).
+          sizes are recommended (e.g., 4, 8).  <strong>NOTE:</strong> For FORWARDPATCH, if the 
+          entered PATCHSIZE is less than or equal to 1, it is automatically reset to 3.  
         </description>
         <minimum inclusive="yes">1</minimum>
       </parameter>

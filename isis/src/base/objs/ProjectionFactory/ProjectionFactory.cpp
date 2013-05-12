@@ -68,13 +68,13 @@ namespace Isis {
     // load the system file
     Plugin p;
 
-    if(m_projPlugin.fileName() == "") {
+    if (m_projPlugin.fileName() == "") {
       FileName localFile("Projection.plugin");
-      if(localFile.fileExists())
+      if (localFile.fileExists())
         m_projPlugin.read(localFile.expanded());
 
       FileName systemFile("$ISISROOT/lib/Projection.plugin");
-      if(systemFile.fileExists())
+      if (systemFile.fileExists())
         m_projPlugin.read(systemFile.expanded());
     }
 
@@ -139,13 +139,13 @@ namespace Isis {
     // load the system file
     Plugin p;
 
-    if(m_projPlugin.fileName() == "") {
+    if (m_projPlugin.fileName() == "") {
       FileName localFile("Projection.plugin");
-      if(localFile.fileExists())
+      if (localFile.fileExists())
         m_projPlugin.read(localFile.expanded());
 
       FileName systemFile("$ISISROOT/lib/Projection.plugin");
-      if(systemFile.fileExists())
+      if (systemFile.fileExists())
         m_projPlugin.read(systemFile.expanded());
     }
 
@@ -239,7 +239,7 @@ namespace Isis {
       // output cubes
       bool sizeFound = false;
       double upperLeftX = Null, upperLeftY = Null;
-      if(label.hasObject("IsisCube")) {
+      if (label.hasObject("IsisCube")) {
         Isis::PvlGroup &dims = label.findGroup("Dimensions", Isis::Pvl::Traverse);
         samples = dims["Samples"];
         lines = dims["Lines"];
@@ -248,21 +248,21 @@ namespace Isis {
         upperLeftY = mapGroup["UpperLeftCornerY"];
         sizeFound = true;
       }
-      if(!sizeMatch) sizeFound = false;
+      if (!sizeMatch) sizeFound = false;
 
       // Initialize the rest of the projection
       proj = (Isis::TProjection *) Create(label, true);
 
       // Couldn't find the cube size from the labels so compute it
-      if(!sizeFound) {
-        if(!proj->HasGroundRange()) {
+      if (!sizeFound) {
+        if (!proj->HasGroundRange()) {
           QString msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
           msg += "MinimumLongitude,MaximumLongitude] missing or invalid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         double minX, maxX, minY, maxY;
-        if(!proj->XYRange(minX, maxX, minY, maxY)) {
+        if (!proj->XYRange(minX, maxX, minY, maxY)) {
           QString msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
           msg += "MinimumLongitude,MaximumLongitude] cause invalid computation ";
           msg += "of image size";
@@ -275,18 +275,28 @@ namespace Isis {
         // the X/Y position is already close to a whole pixel because
         // the floor/ceil function could cause an extra pixel to be added
         // just due to machine precision issues
-        if(fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
-          if(pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+        if (fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+          if (pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
             double sampleOffset = floor(minX / pixelResolution);
             minX = sampleOffset * pixelResolution;
           }
         }
+        // make sure that the distance from minX to maxX is at least one pixel wide
+        // so we have at least one sample in the created cube
+        if (maxX < minX + pixelResolution) {
+          maxX = minX + pixelResolution;
+        }
 
-        if(fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
-          if(pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+        if (fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+          if (pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
             double lineOffset = -1.0 * ceil(maxY / pixelResolution);
             maxY = -1.0 * lineOffset * pixelResolution;
           }
+        }
+        // make sure that the distance from minY to maxY is at least one pixel wide
+        // so we have at least one line in the created cube
+        if (minY > maxY - pixelResolution) {
+          minY = maxY - pixelResolution;
         }
 
         // Determine the number of samples and lines
@@ -348,7 +358,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
+      if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       IException finalError(IException::Unknown, msg, _FILEINFO_);
       finalError.append(errors);
       finalError.append(e);
@@ -396,19 +406,18 @@ namespace Isis {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
       Isis::PvlGroup &mapGroup = label.findGroup("Mapping", Isis::Pvl::Traverse);
-
       try {
         pixelResolution = mapGroup["PixelResolution"];
         scale = (2.0 * Isis::PI * localRadius) / (360.0 * pixelResolution);
       }
-
-      // If not get the scale and then compute the pixel resolution
       catch(IException &e) {
+        // If this fails, use the scale to compute the pixel resolution
         errors.append(e);
 
         scale = mapGroup["Scale"];
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
+
       // Write out the scale and resolution with units and truescale radius
       mapGroup.addKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
                                            "meters/pixel"),
@@ -433,8 +442,10 @@ namespace Isis {
         upperLeftY = mapGroup["UpperLeftCornerY"];
         sizeFound = true;
       }
-      if (!sizeMatch)
+
+      if (!sizeMatch) {
         sizeFound = false;
+      }
 
       // Initialize the rest of the projection
       proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
@@ -467,12 +478,21 @@ namespace Isis {
             minX = sampleOffset * pixelResolution;
           }
         }
-
+        // make sure that the distance from minX to maxX is at least one pixel wide
+        // so we have at least one sample in the created cube
+        if (maxX < minX + pixelResolution) {
+          maxX = minX + pixelResolution;
+        }
         if (fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
           if (pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
             double lineOffset = -1.0 * ceil(maxY / pixelResolution);
             maxY = -1.0 * lineOffset * pixelResolution;
           }
+        }
+        // make sure that the distance from minY to maxY is at least one pixel wide
+        // so we have at least one line in the created cube
+        if (minY > maxY - pixelResolution) {
+          minY = maxY - pixelResolution;
         }
 
         // Determine the number of samples and lines
@@ -526,7 +546,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
+      if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       IException finalError(IException::Unknown, msg, _FILEINFO_);
       finalError.append(errors);
       finalError.append(e);
@@ -599,7 +619,7 @@ namespace Isis {
 
       // Walk the boundaries of the camera to determine the x/y range
       int eband = cam.Bands();
-      if(cam.IsBandIndependent()) eband = 1;
+      if (cam.IsBandIndependent()) eband = 1;
       for(int band = 1; band <= eband; band++) {
         cam.SetBand(band);
 
@@ -609,32 +629,32 @@ namespace Isis {
           // If it is the first or last line then test the whole line
           int samp;
           for(samp = 0; samp <= cam.Samples(); samp++) {
-            if(cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+            if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
               double lat = cam.UniversalLatitude();
               double lon = cam.UniversalLongitude();
               proj->SetUniversalGround(lat, lon);
-              if(proj->IsGood()) {
-                if(proj->XCoord() < minX) minX = proj->XCoord();
-                if(proj->XCoord() > maxX) maxX = proj->XCoord();
-                if(proj->YCoord() < minY) minY = proj->YCoord();
-                if(proj->YCoord() > maxY) maxY = proj->YCoord();
-                if((line != 0) && (line != cam.Lines())) break;
+              if (proj->IsGood()) {
+                if (proj->XCoord() < minX) minX = proj->XCoord();
+                if (proj->XCoord() > maxX) maxX = proj->XCoord();
+                if (proj->YCoord() < minY) minY = proj->YCoord();
+                if (proj->YCoord() > maxY) maxY = proj->YCoord();
+                if ((line != 0) && (line != cam.Lines())) break;
               }
             }
           }
 
           // Look for the first good lat/lon on the right edge of the image
-          if(samp < cam.Samples()) {
+          if (samp < cam.Samples()) {
             for(samp = cam.Samples(); samp >= 0; samp--) {
-              if(cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+              if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
                 double lat = cam.UniversalLatitude();
                 double lon = cam.UniversalLongitude();
                 proj->SetUniversalGround(lat, lon);
-                if(proj->IsGood()) {
-                  if(proj->XCoord() < minX) minX = proj->XCoord();
-                  if(proj->XCoord() > maxX) maxX = proj->XCoord();
-                  if(proj->YCoord() < minY) minY = proj->YCoord();
-                  if(proj->YCoord() > maxY) maxY = proj->YCoord();
+                if (proj->IsGood()) {
+                  if (proj->XCoord() < minX) minX = proj->XCoord();
+                  if (proj->XCoord() > maxX) maxX = proj->XCoord();
+                  if (proj->YCoord() < minY) minY = proj->YCoord();
+                  if (proj->YCoord() > maxY) maxY = proj->YCoord();
                   break;
                 }
               }
@@ -643,32 +663,32 @@ namespace Isis {
         }
 
         // Special test for ground range to see if either pole is in the image
-        if(cam.SetUniversalGround(90.0, 0.0)) {
-          if(cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
+        if (cam.SetUniversalGround(90.0, 0.0)) {
+          if (cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
               cam.Sample() <= cam.Samples() + 0.5 && cam.Line() <= cam.Lines() + 0.5) {
             double lat = cam.UniversalLatitude();
             double lon = cam.UniversalLongitude();
             proj->SetUniversalGround(lat, lon);
-            if(proj->IsGood()) {
-              if(proj->XCoord() < minX) minX = proj->XCoord();
-              if(proj->XCoord() > maxX) maxX = proj->XCoord();
-              if(proj->YCoord() < minY) minY = proj->YCoord();
-              if(proj->YCoord() > maxY) maxY = proj->YCoord();
+            if (proj->IsGood()) {
+              if (proj->XCoord() < minX) minX = proj->XCoord();
+              if (proj->XCoord() > maxX) maxX = proj->XCoord();
+              if (proj->YCoord() < minY) minY = proj->YCoord();
+              if (proj->YCoord() > maxY) maxY = proj->YCoord();
             }
           }
         }
 
-        if(cam.SetUniversalGround(-90.0, 0.0)) {
-          if(cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
+        if (cam.SetUniversalGround(-90.0, 0.0)) {
+          if (cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
               cam.Sample() <= cam.Samples() + 0.5 && cam.Line() <= cam.Lines() + 0.5) {
             double lat = cam.UniversalLatitude();
             double lon = cam.UniversalLongitude();
             proj->SetUniversalGround(lat, lon);
-            if(proj->IsGood()) {
-              if(proj->XCoord() < minX) minX = proj->XCoord();
-              if(proj->XCoord() > maxX) maxX = proj->XCoord();
-              if(proj->YCoord() < minY) minY = proj->YCoord();
-              if(proj->YCoord() > maxY) maxY = proj->YCoord();
+            if (proj->IsGood()) {
+              if (proj->XCoord() < minX) minX = proj->XCoord();
+              if (proj->XCoord() > maxX) maxX = proj->XCoord();
+              if (proj->YCoord() < minY) minY = proj->YCoord();
+              if (proj->YCoord() > maxY) maxY = proj->YCoord();
             }
           }
         }
@@ -678,8 +698,8 @@ namespace Isis {
         // 0-360 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         for(double lat = p_minlat; lat <= p_maxlat; lat += (p_maxlat - p_minlat) / 10.0) {
-          if(SetUniversalGround(lat, 0.0)) {
-            if(Sample() >= 0.5 && Line() >= 0.5 &&
+          if (SetUniversalGround(lat, 0.0)) {
+            if (Sample() >= 0.5 && Line() >= 0.5 &&
                 Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
               p_minlon = 0.0;
               p_maxlon = 360.0;
@@ -692,8 +712,8 @@ namespace Isis {
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         for(double lat = p_minlat; lat <= p_maxlat; lat += (p_maxlat - p_minlat) / 10.0) {
-          if(SetUniversalGround(lat, 180.0)) {
-            if(Sample() >= 0.5 && Line() >= 0.5 &&
+          if (SetUniversalGround(lat, 180.0)) {
+            if (Sample() >= 0.5 && Line() >= 0.5 &&
                 Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
               p_minlon180 = -180.0;
               p_maxlon180 = 180.0;
@@ -710,18 +730,27 @@ namespace Isis {
       // the X/Y position is already close to a whole pixel because
       // the floor/ceil function could cause an extra pixel to be added
       // just due to machine precision issues
-      if(fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
-        if(pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+      if (fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+        if (pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
           double sampleOffset = floor(minX / pixelResolution);
           minX = sampleOffset * pixelResolution;
         }
       }
-
-      if(fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
-        if(pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+      // make sure that the distance from minX to maxX is at least one pixel wide
+      // so we have at least one sample in the created cube
+      if (maxX < minX + pixelResolution) {
+        maxX = minX + pixelResolution;
+      }
+      if (fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+        if (pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
           double lineOffset = -1.0 * ceil(maxY / pixelResolution);
           maxY = -1.0 * lineOffset * pixelResolution;
         }
+      }
+      // make sure that the distance from minY to maxY is at least one pixel wide
+      // so we have at least one line in the created cube
+      if (minY > maxY - pixelResolution) {
+        minY = maxY - pixelResolution;
       }
 
       // Determine the number of samples and lines
@@ -771,7 +800,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
+      if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;
@@ -842,7 +871,7 @@ namespace Isis {
 
       // Walk the boundaries of the camera to determine the x/y range
       int eband = cam.Bands();
-      if(cam.IsBandIndependent()) eband = 1;
+      if (cam.IsBandIndependent()) eband = 1;
       for(int band = 1; band <= eband; band++) {
         cam.SetBand(band);
 
@@ -852,32 +881,32 @@ namespace Isis {
           // If it is the first or last line then test the whole line
           int samp;
           for(samp = 0; samp <= cam.Samples(); samp++) {
-            if(cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+            if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
               double radius = cam.LocalRadius().meters();
               double az = cam.UniversalLongitude();
               proj->SetGround(radius, az);
-              if(proj->IsGood()) {
-                if(proj->XCoord() < minX) minX = proj->XCoord();
-                if(proj->XCoord() > maxX) maxX = proj->XCoord();
-                if(proj->YCoord() < minY) minY = proj->YCoord();
-                if(proj->YCoord() > maxY) maxY = proj->YCoord();
-                if((line != 0) && (line != cam.Lines())) break;
+              if (proj->IsGood()) {
+                if (proj->XCoord() < minX) minX = proj->XCoord();
+                if (proj->XCoord() > maxX) maxX = proj->XCoord();
+                if (proj->YCoord() < minY) minY = proj->YCoord();
+                if (proj->YCoord() > maxY) maxY = proj->YCoord();
+                if ((line != 0) && (line != cam.Lines())) break;
               }
             }
           }
 
           // Look for the first good rad/az on the right edge of the image
-          if(samp < cam.Samples()) {
+          if (samp < cam.Samples()) {
             for(samp = cam.Samples(); samp >= 0; samp--) {
-              if(cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
+              if (cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
                 double radius = cam.LocalRadius().meters();
                 double az = cam.UniversalLongitude();
                 proj->SetGround(radius, az);
-                if(proj->IsGood()) {
-                  if(proj->XCoord() < minX) minX = proj->XCoord();
-                  if(proj->XCoord() > maxX) maxX = proj->XCoord();
-                  if(proj->YCoord() < minY) minY = proj->YCoord();
-                  if(proj->YCoord() > maxY) maxY = proj->YCoord();
+                if (proj->IsGood()) {
+                  if (proj->XCoord() < minX) minX = proj->XCoord();
+                  if (proj->XCoord() > maxX) maxX = proj->XCoord();
+                  if (proj->YCoord() < minY) minY = proj->YCoord();
+                  if (proj->YCoord() > maxY) maxY = proj->YCoord();
                   break;
                 }
               }
@@ -890,8 +919,8 @@ namespace Isis {
         // 0-360 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         for(double rad = p_minRadius; rad <= p_maxRadius; rad += (p_maxRadius - p_minRadius) / 10.0) {
-          if(SetUniversalGround(rad, 0.0)) {
-            if(Sample() >= 0.5 && Line() >= 0.5 &&
+          if (SetUniversalGround(rad, 0.0)) {
+            if (Sample() >= 0.5 && Line() >= 0.5 &&
                 Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
               p_minaz = 0.0;
               p_maxaz = 360.0;
@@ -904,8 +933,8 @@ namespace Isis {
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
         for(double rad = p_minrad; rad <= p_maxrad; rad += (p_maxrad - p_minrad) / 10.0) {
-          if(SetUniversalGround(rad, 180.0)) {
-            if(Sample() >= 0.5 && Line() >= 0.5 &&
+          if (SetUniversalGround(rad, 180.0)) {
+            if (Sample() >= 0.5 && Line() >= 0.5 &&
                 Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
               p_minaz180 = -180.0;
               p_maxaz180 = 180.0;
@@ -922,18 +951,28 @@ namespace Isis {
       // the X/Y position is already close to a whole pixel because
       // the floor/ceil function could cause an extra pixel to be added
       // just due to machine precision issues
-      if(fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
-        if(pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+      if (fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+        if (pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
           double sampleOffset = floor(minX / pixelResolution);
           minX = sampleOffset * pixelResolution;
         }
       }
+      // make sure that the distance from minX to maxX is at least one pixel wide
+      // so we have at least one sample in the created cube
+      if (maxX < minX + pixelResolution) {
+        maxX = minX + pixelResolution;
+      }
 
-      if(fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
-        if(pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+      if (fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+        if (pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
           double lineOffset = -1.0 * ceil(maxY / pixelResolution);
           maxY = -1.0 * lineOffset * pixelResolution;
         }
+      }
+      // make sure that the distance from minY to maxY is at least one pixel wide
+      // so we have at least one line in the created cube
+      if (minY > maxY - pixelResolution) {
+        minY = maxY - pixelResolution;
       }
 
       // Determine the number of samples and lines
@@ -975,7 +1014,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Unable to create projection";
-      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
+      if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;
@@ -1038,7 +1077,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Unable to initialize cube projection";
-      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
+      if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;
@@ -1077,7 +1116,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Unable to initialize cube projection";
-      if(label.fileName() != "") msg += " from file [" + label.fileName() + "]";
+      if (label.fileName() != "") msg += " from file [" + label.fileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return (Isis::Projection *) proj;

@@ -76,14 +76,17 @@ namespace Isis {
       m_centerRingRadius = mapGroup["CenterRingRadius"];
 
       // Because the center radius is used to scale the y values of the projection, it cannot be 0.
+      // For now, we will reset the center to the radius of Saturn.
       // Perhaps we should fail and issue an error message??? TODO
-      if (m_centerRingRadius == 0.) m_centerRingRadius = 18000.;
+      if (m_centerRingRadius == 0.0) {
+        m_centerRingRadius = 18000.;
+      }
 
       //  Convert to radians, adjust for azimuth direction
       m_centerRingLongitude *= DEG2RAD;
       if (m_ringLongitudeDirection == Clockwise) m_centerRingLongitude *= -1.0;
     }
-    catch(IException &e) {
+    catch (IException &e) {
       string message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
@@ -98,8 +101,8 @@ namespace Isis {
    *
    * @param proj Projection object to do comparison on
    *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
+   * @return @b bool Returns true if the Projection objects are equal, and false
+   *              if they are not
    */
   bool RingCylindrical::operator== (const Projection &proj) {
     if (!Projection::operator==(proj)) return false;
@@ -114,7 +117,7 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "RingCylindrical"
    *
-   * @return string Name of projection, "RingCylindrical"
+   * @return @b QString Name of projection, "RingCylindrical"
    */
   QString RingCylindrical::Name() const {
     return "RingCylindrical";
@@ -123,7 +126,7 @@ namespace Isis {
   /**
    * Returns the version of the map projection
    *
-   * @return std::string Version number
+   * @return @b QString Version number
    */
   QString RingCylindrical::Version() const {
     return "1.0";
@@ -137,7 +140,8 @@ namespace Isis {
    *   the same as an image projected at 360.
    *
    *
-   * @return bool true if the projection is equatorial cylindrical
+   * @return @b bool true if the projection is equatorial 
+   *         cylindrical
    */
   bool RingCylindrical::IsEquatorialCylindrical() {
     return true;
@@ -155,7 +159,7 @@ namespace Isis {
     * that is entirely true to scale. The only true scale for this projection is
     * at the single point, (center radius, center azimuth).
     *
-    * @return double The center radius.
+    * @return @b double The center radius.
     */
   double RingCylindrical::TrueScaleRingRadius() const {
     return m_centerRingRadius;
@@ -165,7 +169,7 @@ namespace Isis {
    /**
     * Returns the center longitude, in degrees.
     *
-    * @return double The center longitude.
+    * @return @b double The center longitude.
     */
   double RingCylindrical::CenterRingLongitude() const {
     double dir = 1.0;
@@ -177,7 +181,7 @@ namespace Isis {
    /**
     * Returns the center radius, in meters.
     *
-    * @return double The center radius.
+    * @return @b double The center radius.
     */
   double RingCylindrical::CenterRingRadius() const {
     return m_centerRingRadius;
@@ -194,7 +198,8 @@ namespace Isis {
    *
    * @param ringLongitude Ring longitude (azimuth) value to project
    *
-   * @return bool
+   * @return @b bool Indicates whether the x and y values were successfully 
+   *         calculated and whether the ground values were successfully set.
    */
   bool RingCylindrical::SetGround(const double ringRadius, const double ringLongitude) {
     //TODO Add  scalar to make azimuth distance equivalent to radius distance at center rad
@@ -243,8 +248,10 @@ namespace Isis {
    * @param y Y coordinate of the projection in units that are the same as the
    *          radii in the label
    *
-   * @return bool
-   */
+   * @return @b bool Indicates whether the ring radius and longitude were 
+   *         successfully calculated and whether the coordinate was
+   *         successfully set.  
+   */ 
   bool RingCylindrical::SetCoordinate(const double x, const double y) {
     // Save the coordinate
     SetXY(x, y);
@@ -305,7 +312,7 @@ namespace Isis {
    *             coordinate calculated by this method covers the
    *             radius/longitude range specified in the labels.
    * 
-   * @return bool Indicates whether the method was able to determine the X/Y 
+   * @return @b bool Indicates whether the method was able to determine the X/Y 
    *              Range of the projection.  If yes, minX, maxX, minY, maxY will
    *              be set with these values.
    *
@@ -397,9 +404,10 @@ namespace Isis {
 
 
   /**
-   * This function returns the keywords that this projection uses.
+   * This function returns the keywords that this projection uses. For 
+   * RingCylindrical, this is the CenterRingRadius and CenterRingLongitude. 
    *
-   * @return PvlGroup The keywords that this projection uses
+   * @return @b PvlGroup The keywords that this projection uses
    */
   PvlGroup RingCylindrical::Mapping() {
     PvlGroup mapping = RingPlaneProjection::Mapping();
@@ -414,9 +422,10 @@ namespace Isis {
   }
 
   /**
-   * This function returns the radii keywords that this projection uses
+   * This function returns the radii keywords that this projection uses. For 
+   * RingCylindrical, this is the CenterRingRadius. 
    *
-   * @return PvlGroup The latitude keywords that this projection uses
+   * @return @b PvlGroup The latitude keywords that this projection uses
    */
   PvlGroup RingCylindrical::MappingRingRadii() {
     PvlGroup mapping = RingPlaneProjection::MappingRingRadii();
@@ -429,9 +438,10 @@ namespace Isis {
 
 
   /**
-   * This function returns the longitude keywords that this projection uses
+   * This function returns the longitude keywords that this projection uses. For 
+   * RingCylindrical, this is the CenterRingLongitude. 
    *
-   * @return PvlGroup The azimuth keywords that this projection uses
+   * @return @b PvlGroup The ring longitude keywords that this projection uses
    */
   PvlGroup RingCylindrical::MappingRingLongitudes() {
     PvlGroup mapping = RingPlaneProjection::MappingRingLongitudes();
