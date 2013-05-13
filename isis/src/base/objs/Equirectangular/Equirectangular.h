@@ -76,6 +76,11 @@ namespace Isis {
    *                           #928.
    *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.  
    *                           References #775.
+   *  @history 2013-04-26 Jeannie Backer - Modified constructor so that default
+   *                          center lat/lon values are at the center of the
+   *                          lat/lon ranges, respectively. This was done to be
+   *                          consistent with other projection defaults.
+   *                          Improved test coverage. Fixes #1597.
    */
   class Equirectangular : public TProjection {
     public:

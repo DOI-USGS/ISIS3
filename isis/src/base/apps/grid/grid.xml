@@ -104,6 +104,9 @@
       between runs, some re-positioning of parameter locations, and creating
       tests. These changes shouldn't break any existing scripts that utilize grid. Fixes #917.
     </change>
+    <change name="Kimberly Oyama" date="2013-05-01">
+      Modified groundGrid() to use the user specified DN value instead of HRS. Fixes #750.
+    </change>
   </history>
 
   <groups>

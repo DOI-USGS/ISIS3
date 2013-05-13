@@ -52,6 +52,10 @@ int main(int argc, char *argv[]) {
 
   Projection &proj = *ProjectionFactory::Create(lab);
   TProjection *p = (TProjection *) &proj;
+  cout << "Projection Name:        " << p.Name() << endl;
+  cout << "Version:                " << p.Version() << endl;
+  cout << "Equatorial Cylindrical? " << p.IsEquatorialCylindrical() << endl;
+  cout << endl;
 
   cout << "Test SetGround method ... " << endl;
   cout << std::setprecision(16);
@@ -92,9 +96,12 @@ int main(int argc, char *argv[]) {
   cout << "operator==  " << (*s == *s) << endl;
   cout << endl;
 
-  cout << "Testing default option ... " << endl;
+  cout << "Testing allow defaults option ... " << endl;
   mapGroup.deleteKeyword("CenterLongitude");
   mapGroup.deleteKeyword("CenterLatitude");
+  mapGroup.findKeyword("MinimumLatitude").setValue(toString(0.0));
+  mapGroup.findKeyword("MinimumLongitude").setValue(toString(0.0));
+  mapGroup.findKeyword("LongitudeDirection").setValue("PositiveWest");
   Equirectangular p2(lab, true);
   cout << lab << endl;
   cout << endl;

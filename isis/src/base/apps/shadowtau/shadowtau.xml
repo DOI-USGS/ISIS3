@@ -407,6 +407,10 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
       "Related Objects and Documents" section of the documentation.
       Fixes mantis ticket #1525.
     </change>
+    <change name="Kimberly Oyama and Janet Barrett" date="2013-04-10">
+      Removed the "NONE" option from the "ATMNAME" parameter because an
+      atmospheric model is required for calculating tau. Fixes #1313.
+    </change>
   </history>
 
   <groups>
@@ -1068,17 +1072,13 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         </brief>
         <description>
           This is the name of the atmospheric photometric function model to be
-	  applied. The models ending with "1" use a first order scattering 
-	  approximation. Those ending with "2" use a second order scattering 
-	  approximation, and are slower but more accurate than the first order 
-	  scattering approximation.  Provides an approximation for strongly 
-	  anisotropic scattering that is similar to Hapke's model for a 
-	  planetary surface for the Hapke atmospheric models. The Chandrasekhar 
-	  solution for isotropic scattering is used for the multiple scattering 
-	  terms, and a correction is made to the singly scattered light for 
-	  anisotropic particle phase function. The atmospheric correction can 
-	  be used with only three atmospheric normalization models: albedoatm, 
-	  shadeatm, and topoatm. See Kirk et al. (2001).
+	  applied;the atmospheric model will be considered when the tau value is
+          calculated. The models ending with "1" use a first order scattering
+          approximation. Those ending with "2" use a second order scattering
+          approximation, and are slower but more accurate than the first order
+          scattering approximation. The atmospheric correction can be used with
+          only three atmospheric normalization models: albedoatm, shadeatm, and
+          topoatm. See Kirk et al. (2001).
 	  <br/>
 	  <br/>
           <b>
@@ -1104,24 +1104,11 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
 	    </table>
           <br/>
         </description>
-        <internalDefault>NONE</internalDefault>
+        <internalDefault>HAPKEATM1</internalDefault>
         <default>
-          <item>NONE</item>
+          <item>HAPKEATM1</item>
         </default>
         <list>
-          <option value="NONE">
-            <brief>No Atmospheric Model</brief>
-            <description>
-	      No atmospheric correction will be applied.
-            </description>
-            <exclusions>
-              <item>HNORM</item>
-              <item>BHA</item>
-              <item>WHA</item>
-              <item>HGA</item>
-            </exclusions>
-          </option>
-
           <option value="ANISOTROPIC1">
             <brief>
               Anisotropic 1 atmospheric model

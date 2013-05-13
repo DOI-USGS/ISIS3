@@ -12,3 +12,4 @@
 /opt/usgs(.*?)/lib/postgresql(.*?)/  @loader_path/../../lib/
 /opt/usgs(.*?)/lib/mysql(.*?)/mysql  @loader_path/../../lib
 /opt/usgs(.*?)/lib                   @loader_path/../../lib
+/opt/usgs(.*?)/Frameworks            @loader_path/../../lib

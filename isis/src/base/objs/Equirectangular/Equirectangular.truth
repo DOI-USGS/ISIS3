@@ -2,11 +2,15 @@ UNIT TEST FOR Equirectangular
 
 Test missing center longitude keyword ...
 **I/O ERROR** Invalid label group [Mapping].
-**ERROR** PVL Keyword [CenterLongitude] does not exist in [Group = Mapping].
+**ERROR** Cannot project using Equirectangular Cylindrical without [CenterLongitude] value.  Keyword does not exist in labels and defaults are not allowed.
 
 Test missing center latitude keyword ...
 **I/O ERROR** Invalid label group [Mapping].
-**ERROR** PVL Keyword [CenterLatitude] does not exist in [Group = Mapping].
+**ERROR** Cannot project using Equirectangular Cylindrical without [CenterLatitude] value.  Keyword does not exist in labels and defaults are not allowed.
+
+Projection Name:        Equirectangular
+Version:                1.0
+Equatorial Cylindrical? 1
 
 Test SetGround method ... 
 Setting ground to (-50,-75)
@@ -35,21 +39,21 @@ Test Name and comparision methods ...
 Name:       Equirectangular
 operator==  1
 
-Testing default option ... 
+Testing allow defaults option ... 
 Group = Mapping
   EquatorialRadius     = 1.0
   PolarRadius          = 1.0
   LatitudeType         = Planetocentric
-  LongitudeDirection   = PositiveEast
+  LongitudeDirection   = PositiveWest
   LongitudeDomain      = 180
-  MinimumLatitude      = -90.0
+  MinimumLatitude      = 0.0
   MaximumLatitude      = 90.0
-  MinimumLongitude     = -180.0
+  MinimumLongitude     = 0.0
   MaximumLongitude     = 180.0
   ProjectionName       = Equirectangular
   CenterLatitudeRadius = 1.0
-  CenterLongitude      = 0.0
-  CenterLatitude       = 0.0
+  CenterLongitude      = 90.0
+  CenterLatitude       = 45.0
 End_Group
 End
 
@@ -90,15 +94,15 @@ Group = Mapping
   EquatorialRadius     = 1.0
   PolarRadius          = 1.0
   LatitudeType         = Planetocentric
-  LongitudeDirection   = PositiveEast
+  LongitudeDirection   = PositiveWest
   LongitudeDomain      = 180
-  MinimumLatitude      = -90.0
+  MinimumLatitude      = 0.0
   MaximumLatitude      = 90.0
-  MinimumLongitude     = -180.0
+  MinimumLongitude     = 0.0
   MaximumLongitude     = 180.0
   ProjectionName       = Equirectangular
   CenterLatitudeRadius = 1.0
-  CenterLongitude      = 0.0
+  CenterLongitude      = 90.0
   CenterLatitude       = 90.0
 End_Group
 **I/O ERROR** Invalid label group [Mapping].
