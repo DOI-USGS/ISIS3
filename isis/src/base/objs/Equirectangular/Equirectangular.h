@@ -81,6 +81,7 @@ namespace Isis {
    *                          lat/lon ranges, respectively. This was done to be
    *                          consistent with other projection defaults.
    *                          Improved test coverage. Fixes #1597.
+   *  @history 2013-05-14 Jeannie Backer - Fixed unitTest merge error. References #775.
    */
   class Equirectangular : public TProjection {
     public:
