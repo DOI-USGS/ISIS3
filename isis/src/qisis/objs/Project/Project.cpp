@@ -101,7 +101,12 @@ namespace Isis {
       if (otherPid != 0) {
         if (!QFile::exists("/proc/" + pidString)) {
           crashedPreviously = true;
-          system( ("rm -rf '" + existingProjectFileName.expanded() + "' &").toAscii().data() );
+          int status = system( ("rm -rf '" + existingProjectFileName.expanded() + "' &").toAscii().data() );
+          if (status != 0) {
+            QString msg = "Executing command [rm -rf" + existingProjectFileName.expanded() +
+                          "' &] failed with return status [" + toString(status) + "]";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
         }
       }
     }

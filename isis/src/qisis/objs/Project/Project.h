@@ -72,6 +72,8 @@ namespace Isis {
    *   @history 2012-10-29 Steven Lambright and Stuart Sides - Added isTemporaryProject(). This is
    *                           useful for the import images to know if it should prompt the user to
    *                           save their project.
+   *   @history 2013-05-14 Jeannie Backer - Used return status of c++ system() in the constructor
+   *                           to verify that the call was successful.
    */
   class Project : public QObject {
     Q_OBJECT
