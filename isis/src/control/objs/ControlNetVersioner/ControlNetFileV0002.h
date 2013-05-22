@@ -51,6 +51,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-06-21 Steven Lambright - Files can have a larger size now
+   *   @history 2013-05-22 Kimberly Oyama and Tracie Sucharski - Added the JIGSAWREJECTED
+   *                           keyword to the toPvl() method. Fixes #661.
    */
   class ControlNetFileV0002 : public ControlNetFile {
     public:

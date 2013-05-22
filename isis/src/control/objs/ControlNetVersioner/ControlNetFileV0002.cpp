@@ -8,6 +8,7 @@
 #include <boost/numeric/ublas/io.hpp>
 
 #include <QList>
+#include <QDebug>
 
 #include "ControlMeasureLogData.h"
 #include "ControlNetFileV0002.pb.h"
@@ -539,6 +540,10 @@ namespace Isis {
         if(binaryMeasure.has_lineresidual())
           pvlMeasure += PvlKeyword("LineResidual", toString(binaryMeasure.lineresidual()),
                                    "pixels");
+
+        if(binaryMeasure.has_jigsawrejected()) {
+         pvlMeasure += PvlKeyword("JigsawRejected", toString(binaryMeasure.jigsawrejected()));
+        }
 
         for(int logEntry = 0;
             logEntry < binaryMeasure.log_size();
