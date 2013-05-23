@@ -1,0 +1,232 @@
+Object = ControlNetwork
+  NetworkId    = LUNAE_PALUS_THEMIS_DIR
+  TargetName   = Mars
+  UserName     = lweller
+  Created      = 2012-01-04T12:09:57
+  LastModified = 2012-01-04T12:09:57
+  Description  = "Themis Day IR Network: Lunae Palus, Lat(0,30) Lon(270-315)"
+  Version      = 3
+
+  Object = ControlPoint
+    PointType                = Free
+    PointId                  = I00826010RDR_bndry_12_LUPA
+    ChooserName              = cnetadd
+    DateTime                 = 2012-01-04T17:01:32
+    AprioriXYZSource         = AverageOfMeasures
+    AprioriRadiusSource      = AverageOfMeasures
+
+    # AprioriLatitude = 14.14339916959 <degrees>
+    AprioriX                 = 1485514.8494536 <meters>
+
+    # AprioriLongitude = 296.82889373072 <degrees>
+    AprioriY                 = -2937138.2000946 <meters>
+
+    # AprioriRadius = 3394325.0717817 <meters>
+    AprioriZ                 = 829401.90409959 <meters>
+
+    # AdjustedLatitude = 14.146765358974 <degrees>
+    AdjustedX                = 1485464.8707894 <meters>
+
+    # AdjustedLongitude = 296.8283466239 <degrees>
+    AdjustedY                = -2937109.019407 <meters>
+
+    # AdjustedRadius = 3394325.2138031 <meters>
+    AdjustedZ                = 829595.31268436 <meters>
+
+    # AdjustedLatitudeSigma = 100.13842019954 <meters>  AdjustedLongitudeSigma = 106.48711145076 <meters>  AdjustedRadiusSigma = 0.099947528407384 <meters>
+    AdjustedCovarianceMatrix = (8096.6118516192, 3791.9236705506,
+                                -1072.6708105639, 2516.0772474838,
+                                2117.9301543094, 9418.2547424025)
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/698683699.000
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 281.08153003015
+      Line               = 11156.102814549
+      AprioriSample      = 281.03269406111
+      AprioriLine        = 11152.532413247
+      SampleResidual     = 0.09390925836783 <pixels>
+      LineResidual       = -0.40064279964683 <pixels>
+      MinimumPixelZScore = -6.9339878963865
+      MaximumPixelZScore = 7.8509687345151
+      GoodnessOfFit      = 0.7774975693515
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Odyssey/THEMIS_IR/703655751.025
+      MeasureType    = Candidate
+      ChooserName    = jigsaw
+      DateTime       = 2012-01-04T17:01:32
+      Sample         = 50.0
+      Line           = 119.0
+      AprioriSample  = 63.884272146677
+      AprioriLine    = 142.5235022424
+      SampleResidual = -0.094840643252908 <pixels>
+      LineResidual   = 0.40119503350171 <pixels>
+      Reference      = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/823772384.051
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 125.64867138851
+      Line               = 6934.86240197
+      AprioriSample      = 125.97474105797
+      AprioriLine        = 6929.0974196911
+      SampleResidual     = -0.21291253682794 <pixels>
+      LineResidual       = 1.5456238534476 <pixels>
+      JigsawRejected     = Yes
+      MinimumPixelZScore = -6.9339878963865
+      MaximumPixelZScore = 7.8509687345151
+      GoodnessOfFit      = 0.83301329654337
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/886537550.076
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 121.71328243649
+      Line               = 1611.0779378425
+      AprioriSample      = 121.96374543834
+      AprioriLine        = 1604.7225382451
+      SampleResidual     = -0.76190274948203 <pixels>
+      LineResidual       = 2.9999718926613 <pixels>
+      JigsawRejected     = Yes
+      MinimumPixelZScore = -6.9339878963865
+      MaximumPixelZScore = 7.8509687345151
+      GoodnessOfFit      = 0.73500978891097
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType                = Free
+    PointId                  = I00826010RDR_bndry_18_LUPA
+    ChooserName              = cnetadd
+    DateTime                 = 2012-01-04T17:01:32
+    AprioriXYZSource         = AverageOfMeasures
+    AprioriRadiusSource      = AverageOfMeasures
+
+    # AprioriLatitude = 1.5761959010641 <degrees>
+    AprioriX                 = 1438906.6184968 <meters>
+
+    # AprioriLongitude = 295.06807013258 <degrees>
+    AprioriY                 = -3076198.23962 <meters>
+
+    # AprioriRadius = 3397378.4988624 <meters>
+    AprioriZ                 = 93449.442681098 <meters>
+
+    # AdjustedLatitude = 1.5740867356935 <degrees>
+    AdjustedX                = 1438753.7401475 <meters>
+
+    # AdjustedLongitude = 295.06519690035 <degrees>
+    AdjustedY                = -3076273.3580737 <meters>
+
+    # AdjustedRadius = 3397378.3342506 <meters>
+    AdjustedZ                = 93324.42152629 <meters>
+
+    # AdjustedLatitudeSigma = 56.560713922924 <meters>  AdjustedLongitudeSigma = 56.546411110445 <meters>  AdjustedRadiusSigma = 0.099943774867249 <meters>
+    AdjustedCovarianceMatrix = (2621.8486551013, 1225.183985133,
+                                -35.999329178353, 575.49833284641,
+                                80.485341554024, 3198.9240672187)
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/698683699.000
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 262.1189848565
+      Line               = 18645.53932567
+      AprioriSample      = 263.9067249829
+      AprioriLine        = 18640.965067677
+      SampleResidual     = -0.12761620783141 <pixels>
+      LineResidual       = 0.473333530677 <pixels>
+      MinimumPixelZScore = -2.4444144842514
+      MaximumPixelZScore = 6.9676729547839
+      GoodnessOfFit      = 0.66365907994161
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/735440023.102
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 113.19805161656
+      Line               = 871.24205655933
+      AprioriSample      = 114.24804752929
+      AprioriLine        = 870.86225771974
+      SampleResidual     = 0.029113440104908 <pixels>
+      LineResidual       = -0.18796253373658 <pixels>
+      MinimumPixelZScore = -2.4444144842514
+      MaximumPixelZScore = 6.9676729547839
+      GoodnessOfFit      = 0.78883477858692
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/743341642.230
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 146.43702923022
+      Line               = 1503.6954607526
+      AprioriSample      = 147.51524919147
+      AprioriLine        = 1503.5776603544
+      SampleResidual     = 0.061164798476028 <pixels>
+      LineResidual       = 0.0089720872815207 <pixels>
+      MinimumPixelZScore = -2.4444144842514
+      MaximumPixelZScore = 6.9676729547839
+      GoodnessOfFit      = 0.89964014420426
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/748668439.128
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 273.35496192874
+      Line               = 7502.064819162
+      AprioriSample      = 274.48842778612
+      AprioriLine        = 7500.1422047045
+      SampleResidual     = -0.070064463477593 <pixels>
+      LineResidual       = -0.24223011077042 <pixels>
+      MinimumPixelZScore = -2.4444144842514
+      MaximumPixelZScore = 6.9676729547839
+      GoodnessOfFit      = 0.86261888858658
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber       = Odyssey/THEMIS_IR/863012025.153
+      MeasureType        = RegisteredSubPixel
+      ChooserName        = jigsaw
+      DateTime           = 2012-01-04T17:01:32
+      Sample             = 103.98926084184
+      Line               = 761.53392870525
+      AprioriSample      = 104.94650253457
+      AprioriLine        = 760.35658417009
+      SampleResidual     = 0.066430623970064 <pixels>
+      LineResidual       = 0.031916462414969 <pixels>
+      MinimumPixelZScore = -2.4444144842514
+      MaximumPixelZScore = 6.9676729547839
+      GoodnessOfFit      = 0.88323894279087
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = Odyssey/THEMIS_IR/865231481.179
+      MeasureType    = Candidate
+      ChooserName    = jigsaw
+      DateTime       = 2012-01-04T17:01:32
+      Sample         = 201.0
+      Line           = 713.0
+      AprioriSample  = 231.97649098258
+      AprioriLine    = 681.86891715185
+      SampleResidual = 0.039205563748425 <pixels>
+      LineResidual   = -0.084795557950841 <pixels>
+      Reference      = True
+    End_Group
+  End_Object
+End_Object
+End
