@@ -110,6 +110,7 @@ void IsisMain() {
   p.EndProcess();
   normalizer.clear();
   band.clear();
+  average.clear();
 }
 
 //**********************************************************

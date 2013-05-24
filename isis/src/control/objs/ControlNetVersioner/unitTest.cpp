@@ -1,7 +1,8 @@
 #include "ControlNetVersioner.h"
 
-#include <QString>
+#include <string>
 
+#include <QString>
 #include <QTime>
 
 #include "ControlNet.h"
@@ -14,7 +15,7 @@
 using namespace std;
 using namespace Isis;
 
-void TestNetwork(const QString &filename, bool printNetwork = true);
+void TestNetwork(const QString &filename, bool printNetwork = true, bool pvlInput = false);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -25,15 +26,16 @@ int main(int argc, char *argv[]) {
   TestNetwork("./oldNetwork2.net"); // Binary V1
   TestNetwork("./badNetwork.net"); // Corrupted (based off of oldNetwork2.net)
   TestNetwork("./semilarge.net", false);
+  TestNetwork("./smallPvlTest.pvl", true, true); // network with rejected jigsaw points
 }
 
-
-void TestNetwork(const QString &filename, bool printNetwork) {
+void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
   cerr << "Reading: " << filename << "...\n\n";
   FileName networkFileName(filename);
 
   LatestControlNetFile * test = NULL;
   LatestControlNetFile * test2 = NULL;
+  
   try {
 
     // If we're reading in a Pvl file, this will call the Pvl update cycle, then
@@ -55,7 +57,7 @@ void TestNetwork(const QString &filename, bool printNetwork) {
     // Test the latest binary read/write and Pvl conversion
     cerr << "Write the network and re-read it..." << endl;
     ControlNetVersioner::Write(FileName("./tmp"), *test);
-
+          
     try {
       test2 = ControlNetVersioner::Read(FileName("./tmp"));
     }
@@ -84,6 +86,57 @@ void TestNetwork(const QString &filename, bool printNetwork) {
     }
     else {
       cerr << "Reading/Writing control network is consistent" << endl;
+    }
+
+    if (pvlInput) {
+
+      LatestControlNetFile * cNet2 = NULL;
+      
+      cerr << "Check conversions between the binary format and the pvl format." << endl;
+      /*
+       * When the input is a pvl, ./tmp is the binary form of the initial input. (pvl1->bin1)
+       * Furthermore, ./tmp.pvl is the first binary conversion reverted back to pvl.
+       * (pvl1->bin1->pvl2)
+       * cNet1 is the binary version of the second pvl. (pvl1->bin1->pvl2->bin2)
+       *
+       *                                  a       b       c
+       *                            (pvl1 -> bin1 -> pvl2 -> bin2)
+       * 
+       * if (pvl1 != pvl2)
+       *        a or b is broken but we don't know which yet
+       *        if(bin1 != bin2)
+       *                bin->pvl is broken (b) because the error happened after bin1 was created.
+       *        else
+       *                pvl-bin is broken (a/c) because the error happened before bin1 was created
+       *                        and was propagated to bin2 via c.
+       * else
+       *        The conversions are up to date and correct because neither a nor b broke.
+       *
+       * 
+       */
+      cNet2 = ControlNetVersioner::Read(FileName("./tmp.pvl"));
+
+      ControlNetVersioner::Write(FileName("./tmpCNet2"), *cNet2);
+
+      //if there are differences between the pvls.
+      QString cmd = "diff -EbB --suppress-common-lines " + filename + " ./tmp.pvl";
+      if(system(cmd.toStdString().c_str())) {
+        
+        //if the binary files are different.
+        if(system("diff -EbB --suppress-common-lines ./tmp ./tmpCNet2")){
+          cerr << "The conversion from binary to pvl is incorrect." << endl;
+        }
+        else {
+          cerr << "The conversion from pvl to binary is incorrect." << endl;
+        }
+      }
+      else {
+        cerr << "The conversion methods for pvl->bin and bin->pvl are correct." << endl;
+      }
+
+      remove("./tmpCNet2");
+      delete cNet2;
+      cNet2 = NULL;
     }
 
     remove("./tmp");
