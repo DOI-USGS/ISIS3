@@ -56,9 +56,9 @@ int main(int argc, char *argv[]) {
   cout << "Version:                " << p->Version() << endl;
   cout << "Equatorial Cylindrical? " << p->IsEquatorialCylindrical() << endl;
   cout << endl;
-  cout << "Projection Name:        " << p.Name() << endl;
-  cout << "Version:                " << p.Version() << endl;
-  cout << "Equatorial Cylindrical? " << p.IsEquatorialCylindrical() << endl;
+  cout << "Projection Name:        " << p->Name() << endl;
+  cout << "Version:                " << p->Version() << endl;
+  cout << "Equatorial Cylindrical? " << p->IsEquatorialCylindrical() << endl;
   cout << endl;
 
   cout << "Test SetGround method ... " << endl;

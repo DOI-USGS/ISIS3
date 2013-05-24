@@ -12,6 +12,10 @@ Projection Name:        Equirectangular
 Version:                1.0
 Equatorial Cylindrical? 1
 
+Projection Name:        Equirectangular
+Version:                1.0
+Equatorial Cylindrical? 1
+
 Test SetGround method ... 
 Setting ground to (-50,-75)
 Latitude:               -50
