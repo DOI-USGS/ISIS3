@@ -39,10 +39,11 @@ void GetMask(QString &fileString, double temp, Buffer* &data);
 
 vector<double> g_iofResponsivity;
 vector<double> g_radianceResponsivity;
+double g_TempratureConstants[7][2];
 
-bool g_dark = true, g_flatfield = true, g_radiometric = true, g_iof = true, g_specpix = true;
+bool g_dark = true, g_flatfield = true, g_radiometric = true, g_iof = true, g_specpix = true, g_temprature = true;
 
-double g_exposure; // Exposure duration
+double g_exposure; //!< Exposure duration
 double g_solarDistance = 1.01; //!< average distance in [AU]
 double g_startTemperature, g_endTemperature;
 double g_temp1, g_temp2;
@@ -87,6 +88,7 @@ void IsisMain () {
   g_radiometric = ui.GetBoolean("RADIOMETRIC");
   g_iof = (ui.GetString("RADIOMETRICTYPE") == "IOF");
   g_specpix = ui.GetBoolean("SPECIALPIXELS");
+  g_temprature = ui.GetBoolean("TEMPERATURE");
 
   // Determine the dark/flat files to use
   QString offset = (QString) inst["BackgroundOffset"];
@@ -109,6 +111,7 @@ void IsisMain () {
   QString flatFile = ui.GetAsString("FLATFIELDFILE");
   QString radFile = ui.GetAsString("RADIOMETRICFILE");
   QString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
+  QString tempFile = ui.GetAsString("TEMPERATUREFILE");
 
   // Figure out which bands are input
   for (int i = 1; i <= icube->bandCount(); i++) {
@@ -241,6 +244,26 @@ void IsisMain () {
       CopyCubeIntoBuffer(specpixFile, g_specpixCube);
   }
 
+  if (g_temprature) {
+    if (tempFile.toLower() == "default" || tempFile.length() == 0)
+      tempFile = "$lro/calibration/WAC_TempratureConstants.????.pvl";
+
+    FileName tempFileName(tempFile);
+    if (tempFileName.isVersioned())
+      tempFileName = tempFileName.highestVersion();
+    if (!tempFileName.fileExists()) {
+      QString msg = tempFile + " does not exist.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    Isis::PvlKeyword &bands = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
+    Pvl tempPvl(tempFileName.expanded());
+    for (int b = 0; b < bands.size(); b++){
+        g_TempratureConstants[g_bands[b]][0]=toDouble(tempPvl[bands[b]][0]);
+        g_TempratureConstants[g_bands[b]][1]=toDouble(tempPvl[bands[b]][1]);
+    }
+  }
+
   if (instModeId == "BW") {
     if (mode == "1" || mode == "0")
       p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, (int)min(BW_BANDS, g_bands.size()));
@@ -294,12 +317,17 @@ void IsisMain () {
 void ResetGlobals () {
   g_iofResponsivity.clear();
   g_radianceResponsivity.clear();
+  for (int b = 0; b < 7; b++){
+    g_TempratureConstants[b][0] = 0;
+    g_TempratureConstants[b][1] = 0;
+  }
 
   g_dark = true;
   g_flatfield = true;
   g_radiometric = true;
   g_iof = true;
   g_specpix = true;
+  g_temprature = true;
 
   g_bands.clear();
 
@@ -328,12 +356,19 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
   int frameSize = inCube.SampleDimension()*inCube.LineDimension();
   int frame = inCube.Line() / frameHeight;
 
+  // Calculate a temperature factor for the current frame (this is done to avoid doing this for each pixel
+  // Used in dark and temprature correction
+  // frameTemp:
+  //
+  //    (WAC end temp - WAC start temp)
+  //    -------------------------------   *   frame   +   WAC start temp
+  //         (WAC num framelets)
+  double frameTemp = (g_endTemperature - g_startTemperature)/g_numFrames * frame + g_startTemperature;
+
   for (int i = 0; i < outCube.size(); i++)
     outCube[i] = inCube[i];
 
   if (g_dark) {
-    // Calculate a temperature factor for the current frame (this is done to avoid doing this for each pixel
-    double frameTemp = (g_endTemperature - g_startTemperature)/g_numFrames * frame + g_startTemperature;
     double tempFactor = (frameTemp - g_temp2) / (g_temp1-g_temp2);
 
     for ( int b=0; b<inCube.BandDimension(); b++) {
@@ -451,6 +486,40 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
       }
     }
   }
+
+  if (g_temprature) {
+      for (int i = 0; i < outCube.size(); i++) {
+          if (IsSpecial(outCube[i]))
+              outCube[i] = Isis::Null;
+          else {
+
+              // Temprature Correction Formula
+              //
+              //       inputPixel
+              //  ---------------------
+              //    a*(frameTemp) + b
+              //
+              // Where:
+              //  'a' and 'b' are band dependant constants read in via a pvl file
+              //  
+              //  AND
+              //  
+              // frameTemp: (Pre-Calculated as it is used in multiple places)
+              //
+              //    (WAC end temp - WAC start temp)
+              //    -------------------------------   *   frame   +   WAC start temp
+              //         (WAC num framelets)
+              // 
+              //
+              //
+              if (correctBand != -1)
+                  outCube[i] = outCube[i]/ (g_TempratureConstants[correctBand][0] * frameTemp + g_TempratureConstants[correctBand][1]);
+              else
+                  outCube[i] = outCube[i]/ (g_TempratureConstants[outCube.Band(i)][0] * frameTemp + g_TempratureConstants[outCube.Band(i)][1]);
+
+          }
+      }
+  }
 }
 
 void CopyCubeIntoBuffer ( QString &fileString, Buffer* &data) {
@@ -521,7 +590,7 @@ struct DarkComp {
  * Finds 2 best dark files for WAC calibration.
  *
  * GetDark will find the 2 closest available dark file tempuratures matching the given file name
- * patter. Then find the dark file at each tempurature with the time closest to the WAC tempurature.
+ * pattern. Then find the dark file at each tempurature with the time closest to the WAC tempurature.
  * If there is only one tempurature, it will pick the 2 closest times at that tempurature.
  *
  *
