@@ -192,6 +192,15 @@ namespace Isis {
    * @history 2012-10-04 Tracie Sucharski - If the ground source serial number already exists in 
    *                          the serial number list, print error and clear out ground information.
    *                          Fixes #1018
+   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and 
+   *                          print warning that point will be deleted. Fixes #1491.
+   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button), 
+   *                          Swapped checking for empty network and not allowing mouse clicks on
+   *                          the ground source. First check if there are any points in the network.
+   *                          If not print message and return.  Fixes #1493.
+   * @history 2013-05-16 Tracie Sucharski - Fixed some bugs when closing a ground source, opening 
+   *                          a new ground source, and printing errors when point does not exist
+   *                          on current ground source.  Fixes #1655.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -290,6 +299,7 @@ namespace Isis {
       void saveChips();
 
       void openGround();
+      void groundViewportClosed(CubeViewport *);
       void openDem();
       void showHideTemplateEditor();
       void saveTemplateFile();

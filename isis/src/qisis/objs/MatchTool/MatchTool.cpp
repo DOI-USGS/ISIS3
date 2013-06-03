@@ -1703,8 +1703,26 @@ namespace Isis {
 
     if (deletePointDialog->exec()) {
 
-      //  Delete entire control point
-      if (deletePointDialog->deleteAllCheckBox->isChecked()) {
+      int numDeleted = deletePointDialog->fileList->selectedItems().count();
+
+      //  Delete entire control point, either through deleteAllCheckBox or all measures selected
+      if (deletePointDialog->deleteAllCheckBox->isChecked() ||
+          numDeleted == m_editPoint->GetNumMeasures()) {
+
+        //  If all measures being deleted, let user know and give them the option to quit operation
+        if (!deletePointDialog->deleteAllCheckBox->isChecked()) {
+          QString message = "You have selected all measures in this point to be deleted.  This "
+            "control point will be deleted.  Do you want to delete this control point?";
+          int  response = QMessageBox::question(m_matchTool,
+                                    "Delete control point", message,
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::Yes);
+          // If No, do nothing
+          if (response == QMessageBox::No) {
+            return;
+          }
+        }
+
         m_matchTool->setShown(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint(m_editPoint->GetId()) == ControlPoint::PointLocked) {
@@ -1740,6 +1758,11 @@ namespace Isis {
                 break;
               //  No:  continue to next measure in the loop
               case 1:
+                //  if only a single measure and it's reference and user chooses not to delete,
+                //  simply return.  The point has not changed.
+                if (numDeleted == 1) {
+                  return;
+                }
                 continue;
             }
           }
@@ -1782,6 +1805,9 @@ namespace Isis {
       // At exit, or when opening new net, use for prompting user for a save
       m_netChanged = true;
 
+      if (m_editPoint) {
+        colorizeSaveButton();
+      }
       emit editPointChanged();
     }
   }

@@ -524,5 +524,10 @@
       number as a cube in the cube list.  This is not allowed, so an error with suggested
       solution is printed.
     </change>
+    <change name="Tracie Sucharski" date="2013-05-16">
+      Fixed bugs when attempting to delete a point in an empty network, deleting all
+      measures in a point.  Fixed repetitive warnings when the current edit point does
+      not fall on the ground source.  Fixes #1491, #1493, #1655.
+    </change>
   </history>
 </application>

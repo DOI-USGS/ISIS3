@@ -108,6 +108,9 @@ namespace Isis {
    *                          until the user selects "Save Point".
    *   @history 2011-03-24 Tracie Sucharski - Added ability to enter Apriori Point values and
    *                          sigmas.
+   *   @history  2013-05-14 Tracie Sucharski - Add Qt::UniqueConnection to the connect statements
+   *                          in ::resetList to prevent multiple connections between the ListWidget
+   *                          and edit point slot and load cube slot.  Fixes #1655.
    *
    *
    */

@@ -921,7 +921,7 @@ namespace Isis {
                           RubberBandTool::getVertices()[0].ry(),
                           samp, line);
       if (RubberBandTool::mouseButton() & Qt::LeftButton) {
-        if (m_controlNet->GetNumMeasures() == 0) {
+        if (!m_controlNet || m_controlNet->GetNumMeasures() == 0) {
           QString message = "No points exist for editing.  Create points ";
           message += "using the right mouse button.";
           QMessageBox::information(m_stereoTool, "Warning", message);
@@ -942,6 +942,13 @@ namespace Isis {
         modifyPoint(point);
       }
       else if (RubberBandTool::mouseButton() & Qt::MidButton) {
+        if (!m_controlNet || m_controlNet->GetNumPoints() == 0) {
+          QString message = "No points exist for deleting.  Create points ";
+          message += "using the right mouse button.";
+          QMessageBox::warning(m_stereoTool, "Warning", message);
+          return;
+        }
+
         //  Find closest control point in network
         ControlPoint *point =
         m_controlNet->FindClosest(sn, samp, line);

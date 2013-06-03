@@ -740,6 +740,9 @@ namespace Isis {
         case 0:
           p_rightMeasure->SetEditLock(false);
           p_lockRightMeasure->setChecked(false);
+// TODO this needs to be re-factored it is returning without saving point after changing editLock
+//   if I put the break, it goes down and checks reference and resets the editLock to original?
+//          break;
         // No:  keep EditLock=true and do NOT save measure
         case 1:
           return;
@@ -1439,6 +1442,10 @@ namespace Isis {
    * @history 2012-05-08 Tracie Sucharski - Clear p_leftFile, only set if creating 
    *                          new point. Change p_leftFile from a std::string to
    *                          a QString.
+   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button), 
+   *                          Swapped checking for empty network and not allowing mouse clicks on
+   *                          the ground source. First check if there are any points in the network.
+   *                          If not print message and return.
    *
    */
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
@@ -1454,17 +1461,17 @@ namespace Isis {
     p_leftFile.clear();
 
     if (s == Qt::LeftButton) {
-      if (sn == p_groundSN) {
-        QString message = "Cannot select point for editing on ground source.  Select ";
-        message += "point using un-projected images or the Navigator Window.";
-        QMessageBox::critical(p_qnetTool, "Error", message);
-        return;
-      }
-
       if (!g_controlNetwork || g_controlNetwork->GetNumPoints() == 0) {
         QString message = "No points exist for editing.  Create points ";
         message += "using the right mouse button.";
         QMessageBox::warning(p_qnetTool, "Warning", message);
+        return;
+      }
+
+      if (sn == p_groundSN) {
+        QString message = "Cannot select point for editing on ground source.  Select ";
+        message += "point using un-projected images or the Navigator Window.";
+        QMessageBox::critical(p_qnetTool, "Error", message);
         return;
       }
 
@@ -1475,6 +1482,13 @@ namespace Isis {
       modifyPoint(point);
     }
     else if (s == Qt::MidButton) {
+      if (!g_controlNetwork || g_controlNetwork->GetNumPoints() == 0) {
+        QString message = "No points exist for deleting.  Create points ";
+        message += "using the right mouse button.";
+        QMessageBox::warning(p_qnetTool, "Warning", message);
+        return;
+      }
+
       if (p_groundOpen && file == p_groundCube->fileName()) {
         QString message = "Cannot select point for deleting on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
@@ -1482,12 +1496,20 @@ namespace Isis {
         return;
       }
       //  Find closest control point in network
-      ControlPoint *point = g_controlNetwork->FindClosest(sn, samp, line);
+      ControlPoint *point = NULL;
+      try {
+        point = g_controlNetwork->FindClosest(sn, samp, line);
 
-      if (point == NULL) {
-        QString message = "No points exist for deleting.  Create points ";
-        message += "using the right mouse button.";
-        QMessageBox::warning(p_qnetTool, "Warning", message);
+        if (point == NULL) {
+          QString message = "No points exist for deleting.  Create points ";
+          message += "using the right mouse button.";
+          QMessageBox::warning(p_qnetTool, "Warning", message);
+          return;
+        }
+      }
+      catch (IException &e) {
+        QString message = "Cannot find point on this image for deleting.";
+        QMessageBox::critical(p_qnetTool, "Error", message);
         return;
       }
 
@@ -1843,6 +1865,8 @@ namespace Isis {
    *                          selected, nothing else happens.
    * @history 2011-07-15 Tracie Sucharski - Print info about deleting editLock
    *                          points and reference measures.
+   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and 
+   *                          print warning that point will be deleted. 
    *
    */
   void QnetTool::deletePoint(ControlPoint *point) {
@@ -1865,6 +1889,7 @@ namespace Isis {
     QnetDeletePointDialog *deletePointDialog = new QnetDeletePointDialog;
     QString CPId = p_editPoint->GetId();
     deletePointDialog->pointIdValue->setText(CPId);
+
     //  Need all files for this point
     for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*p_editPoint)[i];
@@ -1874,8 +1899,26 @@ namespace Isis {
 
     if (deletePointDialog->exec()) {
 
-      //  Delete entire control point
-      if (deletePointDialog->deleteAllCheckBox->isChecked()) {
+      int numDeleted = deletePointDialog->fileList->selectedItems().count();
+
+      //  Delete entire control point, either through deleteAllCheckBox or all measures selected
+      if (deletePointDialog->deleteAllCheckBox->isChecked() ||
+          numDeleted == p_editPoint->GetNumMeasures()) {
+
+        //  If all measures being deleted, let user know and give them the option to quit operation
+        if (!deletePointDialog->deleteAllCheckBox->isChecked()) {
+          QString message = "You have selected all measures in this point to be deleted.  This "
+            "control point will be deleted.  Do you want to delete this control point?";
+          int  response = QMessageBox::question(p_qnetTool,
+                                    "Delete control point", message,
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::Yes);
+          // If No, do nothing
+          if (response == QMessageBox::No) {
+            return;
+          }
+        }
+
         //  First get rid of deleted point from g_filteredPoints list
         //  need index in control net for pt
         //int i = g_controlNetwork->
@@ -1917,7 +1960,12 @@ namespace Isis {
               case 0:
                 break;
               //  No:  continue to next measure in the loop
-              case 1:
+            case 1:
+                //  if only a single measure and it's reference and user chooses not to delete,
+                //  simply return.  The point has not changed.
+                if (numDeleted == 1) {
+                  return;
+                }
                 continue;
             }
           }
@@ -1949,6 +1997,8 @@ namespace Isis {
       // emit signal so the nav tool can update edit point
       if (p_editPoint != NULL) {
         emit editPointChanged(p_editPoint->GetId());
+        //  Change Save Point button text to red
+        colorizeSaveButton();
       }
       else {
         // if the entire point is deleted, update with point Id = ""
@@ -2154,24 +2204,19 @@ namespace Isis {
       }
     }
 
+    //  Determine index for right measure.  
+    //  First, try to find correct ground.  If no correct ground, set right index to either 0 or 1,
+    //  depending on value of the left index.
     if (p_groundOpen && (p_editPoint->GetType() != ControlPoint::Free))  {
       rightIndex = p_rightCombo->findText((QString)p_groundFile);
-      if (rightIndex < 0) {
-        rightIndex = 0;
-        //  Could not find ground source in list, warn user
-        QString message = "Cannot find ground file in list of files, make sure correct ground ";
-        message += "source file was loaded.";
-        QMessageBox::warning(p_qnetTool, "Warning", message);
-      }
     }
-    else {
+    if (rightIndex <= 0) {
       if (leftIndex == 0) {
         rightIndex = 1;
       }
       else {
         rightIndex = 0;
       }
-
     }
 
     //  Handle pts with a single measure, for now simply put measure on left/right
@@ -3506,6 +3551,17 @@ namespace Isis {
     p_groundOpen = true;
     g_vpMainWindow->workspace()->addCubeViewport(p_groundCube);
 
+    //  Get viewport so connect can be made when ground source viewport closed to clean up
+    // ground source
+    MdiCubeViewport *vp;
+    for (int i=0; i<(int)cubeViewportList()->size(); i++) {
+      vp = (*(cubeViewportList()))[i];
+      if (vp->cube()->fileName() == ground) {
+        connect(vp, SIGNAL(viewportClosed(CubeViewport *)),
+                this, SLOT(groundViewportClosed(CubeViewport *)), Qt::UniqueConnection);
+      }
+    }
+
     //  Determine file type of ground for setting AprioriSurfacePointSource
     //  and AprioriRadiusSource.
     if (p_groundCube->hasTable("ShapeModelStatistics")) {
@@ -3665,15 +3721,22 @@ namespace Isis {
 
 
 
-  void QnetTool::clearGroundSource () {
+  /**
+   * Slot called when the ground source cube viewport is closed
+   *
+   * @author  2013-05-15 Tracie Sucharski
+   *
+   */
+  void QnetTool::groundViewportClosed(CubeViewport *) {
 
-    //  If the loaded point is a fixed point, see if there is a temporary measure
-    //  holding the coordinate information for the currentground source. If so,
-    //  delete this measure.
-    if (p_editPoint && p_editPoint->GetType() != ControlPoint::Free &&
-        p_editPoint->HasSerialNumber(p_groundSN)) {
-      p_editPoint->Delete(p_groundSN);
-    }
+    //  Only continue to clearGroundSource if the viewport is not already closed
+    //  Otherwise, it could be called twice
+    clearGroundSource();
+  }
+
+
+
+  void QnetTool::clearGroundSource () {
 
     p_leftCombo->removeItem(p_leftCombo->findText(p_groundFile));
     p_rightCombo->removeItem(p_rightCombo->findText(p_groundFile));
@@ -3683,6 +3746,10 @@ namespace Isis {
     for (int i=0; i<(int)cubeViewportList()->size(); i++) {
       vp = (*(cubeViewportList()))[i];
       if (vp->cube() == p_groundCube) {
+        //  disconnect signal to avoid recursive situartion.  When a viewport is closed, a signal
+        //  is emitted which would then call groundViewportClosed, then this method again.
+        disconnect(vp, SIGNAL(viewportClosed(CubeViewport *)),
+                   this, SLOT(groundViewportClosed(CubeViewport *)));
         vp->parentWidget()->parentWidget()->close();
         QApplication::processEvents();
         break;
@@ -3694,6 +3761,11 @@ namespace Isis {
     p_groundCube = NULL;
     p_groundFile.clear();
 
+    p_groundFileNameLabel->setText("Ground Source File:  ");
+    if (!p_demOpen) {
+      p_radiusFileNameLabel->setText("Radius Source File:  " + p_demFile);
+    }
+
     if (p_groundGmap) {
       delete p_groundGmap;
       p_groundGmap = NULL;
@@ -3701,7 +3773,19 @@ namespace Isis {
 
     // Remove from serial number list
     g_serialNumberList->Delete(p_groundSN);
-    p_groundSN = "";
+
+    //  If the loaded point is a fixed point, see if there is a temporary measure
+    //  holding the coordinate information for the currentground source. If so,
+    //  delete this measure and re-load point
+    if (p_editPoint && p_editPoint->GetType() != ControlPoint::Free &&
+        p_editPoint->HasSerialNumber(p_groundSN)) {
+      p_editPoint->Delete(p_groundSN);
+      p_groundSN = "";
+      loadPoint();
+    }
+    else {
+      p_groundSN = "";
+    }
   }
 
 

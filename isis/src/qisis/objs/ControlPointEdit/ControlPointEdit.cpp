@@ -649,6 +649,10 @@ namespace Isis {
    *                           loading a different control point, so only
    *                           update the right chip if we're not loading a
    *                           different control point.
+   *   @history 2013-04-30  Tracie Sucharski - Fixed bug introduced by linking zooms between left
+   *                           and right viewports.  Zoom factors were being passed into the
+   *                           Chip::Load method as the second argument which should be the rotation
+   *                           value.
    */
   void ControlPointEdit::setLeftMeasure(ControlMeasure *leftMeasure,
                                         Cube *leftCube, QString pointId) {
@@ -671,7 +675,7 @@ namespace Isis {
     p_leftCube = leftCube;
 
     p_leftChip->TackCube(p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
-    p_leftChip->Load(*p_leftCube, p_leftView->zoomFactor());
+    p_leftChip->Load(*p_leftCube);
 
     // Dump into left chipViewport
     p_leftView->setChip(p_leftChip, p_leftCube);
@@ -695,15 +699,19 @@ namespace Isis {
    *   @history 2008-11-19  Tracie Sucharski - If right cube changes, get new
    *                           universalGroundMap.
    *   @history 2008-15-2008 Jeannie Walldren - Added error string to
-  *                             iException::Message before
-  *                             creating QMessageBox
+   *                           iException::Message before
+   *                           creating QMessageBox
    *   @history 2009-09-14  Tracie Sucharski - Call geomChip to make
    *                           sure left chip is initialized in the
    *                           ChipViewport.  This was done for the changes
    *                           made to the Chip class and the ChipViewport
    *                           class where the Cube info is no longer stored.
-  *
-    */
+   *   @history 2013-04-30  Tracie Sucharski - Fixed bug introduced by linking zooms between left
+   *                           and right viewports.  Zoom factors were being passed into the
+   *                           Chip::Load method as the second argument which should be the rotation
+   *                           value.
+   *
+   */
   void ControlPointEdit::setRightMeasure(ControlMeasure *rightMeasure,
                                          Cube *rightCube, QString pointId) {
 
@@ -729,7 +737,7 @@ namespace Isis {
     p_rightChip->TackCube(p_rightMeasure->GetSample(),
                           p_rightMeasure->GetLine());
     if ( p_geomIt == false ) {
-      p_rightChip->Load(*p_rightCube, p_rightView->zoomFactor());
+      p_rightChip->Load(*p_rightCube);
     }
     else {
       try {
@@ -749,6 +757,7 @@ namespace Isis {
 
     // Dump into left chipViewport
     p_rightView->setChip(p_rightChip, p_rightCube);
+
     updateRightGeom();
     //p_rightView->geomChip(p_leftChip,p_leftCube);
 

@@ -119,6 +119,10 @@ namespace Isis {
     *   @history 2012-07-26 Tracie Sucharski - Added ability to link zooming between left and
     *                          right viewports. Added 2 methods, zoomFactor() which returns a
     *                          zoom factor and zoom(double zoomFactor).
+    *   @history 2013-04-30 Tracie Sucharski - Fixed bug introduced by linking zooms between left
+    *                          and right viewports.  Zoom factors were being passed into the
+    *                          Chip::Load method as the second argument which should be the rotation
+    *                          value.
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but

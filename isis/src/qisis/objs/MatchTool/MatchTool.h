@@ -196,6 +196,12 @@ namespace Isis {
    *                          serial number list, but calculates one in real-time base on available
    *                          viewports.  Fixes #1130.  Also, added a few more error checks to
    *                          insure cubes for displayed measures are available.
+   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and 
+   *                          print warning that point will be deleted. References #1491.
+   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button), 
+   *                          Swapped checking for empty network and not allowing mouse clicks on
+   *                          the ground source. First check if there are any points in the network.
+   *                          If not print message and return.  References #1493.
    */
   class MatchTool : public Tool {
     Q_OBJECT

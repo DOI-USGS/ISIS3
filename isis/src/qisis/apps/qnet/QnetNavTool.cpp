@@ -1,3 +1,5 @@
+#include "QnetNavTool.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QComboBox>
@@ -18,7 +20,6 @@
 #include "QnetCubeDistanceFilter.h"
 #include "QnetCubeNameFilter.h"
 #include "QnetCubePointsFilter.h"
-#include "QnetNavTool.h"
 #include "QnetPointCubeNameFilter.h"
 #include "QnetPointDistanceFilter.h"
 #include "QnetPointJigsawErrorFilter.h"
@@ -434,6 +435,9 @@ namespace Isis {
    *                           in control net and all images in serial number
    *                           list.
    *   @history  2010-11-04 Tracie Sucharski - Added double-click connections.
+   *   @history  2013-05-14 Tracie Sucharski - Add Qt::UniqueConnection to the connect statements
+   *                           to prevent multiple connections between the ListWidget and edit point
+   *                           slot and load cube slot.
    */
   void QnetNavTool::resetList() {
     p_filtered = false;
@@ -462,7 +466,7 @@ namespace Isis {
       disconnect(p_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(load(QListWidgetItem *)));
       connect(p_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(editPoint(QListWidgetItem *)));
+          this, SLOT(editPoint(QListWidgetItem *)), Qt::UniqueConnection);
       //p_listBox->setSelectionMode(QAbstractItemView::SingleSelection);
       for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
         QString cNetId = (*g_controlNetwork)[i]->GetId();
@@ -483,7 +487,7 @@ namespace Isis {
       disconnect(p_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(editPoint(QListWidgetItem *)));
       connect(p_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(load(QListWidgetItem *)));
+          this, SLOT(load(QListWidgetItem *)), Qt::UniqueConnection);
       //p_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
       for (int i = 0; i < g_serialNumberList->Size(); i++) {
         FileName filename = FileName(g_serialNumberList->FileName(i));
@@ -682,7 +686,9 @@ namespace Isis {
    */
   void QnetNavTool::editPoint(QListWidgetItem *ptItem) {
 
-    int index = p_listBox->row(ptItem);
+//  int index = p_listBox->row(ptItem);
+    QList<QListWidgetItem *> selected = p_listBox->selectedItems();
+    int index = p_listBox->row(selected[0]);
     if (g_filteredPoints.size() == 0) {
       emit modifyPoint((*g_controlNetwork)[index]);
     }
