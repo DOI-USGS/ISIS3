@@ -14,6 +14,14 @@
     <change name="Steven Lambright" date="2009-01-06">
       Original version
     </change>
+    <change name="Janet Barrett" date="2013-04-29">
+      The program was not working on some newly released MSL ddd files because
+      the number of bytes in the header has increased. The program was modified
+      to read in the image offset from the file header. This image offset is a
+      4 byte integer that starts at byte 20 in the file header. If the offset is
+      set to 0, then this means the label is 1024 bytes long. The offset must be
+      a multiple of 1024.
+    </change>
   </history>
 
   <category>
