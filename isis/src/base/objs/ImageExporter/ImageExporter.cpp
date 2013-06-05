@@ -259,7 +259,7 @@ namespace Isis {
 
     for (int i = 1; i < m_exportDescription->channelCount(); i++) addChannel(i);
 
-    p.SetFormat(ProcessExport::BIL);// why BIL and not default to BSQ??? Doesn't appear to make a 
+    p.setFormat(ProcessExport::BIL);// why BIL and not default to BSQ??? Doesn't appear to make a 
                                     // difference in output images
 
     // set up the output pixel type, special pixels and valid output range for
