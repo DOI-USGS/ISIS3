@@ -247,36 +247,53 @@ namespace Isis {
 
     // find out if we need quotes and what kind of quotes might already exist
     char existingQuoteType = '\0';
-    for(int pos = 0; !needQuotes && pos < val.size(); pos++) {
+    for (int pos = 0; !needQuotes && pos < val.size(); pos++) {
       // check for values indicating we need quotes, if we have a sequence
       //   it should already be properly quoted...
-      if(pos == 0) {
-        if(val[pos] == '(' && val[val.size() - 1] == ')') break;
-        if(val[pos] == '{' && val[val.size() - 1] == '}') break;
+      if (pos == 0) {
+        if (val[pos] == '(' || val[pos] == '{') {
+          //  Find closing
+          int closePos = -1;
+          if (val[pos] == '(') {
+            closePos = val.indexOf(')');
+          }
+          if (val[pos] == '{') {
+            closePos = val.indexOf('}');
+          }
+
+          // If no closing paren or brace or If closing paren/brace not at end of value
+          if (closePos == -1 || closePos != val.size() - 1) {
+            needQuotes = true;
+          }
+          else {
+            break;
+          }
+        }
       }
 
-      if(val[pos] == ' ' || val[pos] == '(' ||
+      if (val[pos] == ' ' || val[pos] == '(' ||
           val[pos] == '(' || val[pos] == ')' ||
           val[pos] == '{' || val[pos] == '}' ||
           val[pos] == ',') {
         needQuotes = true;
       }
 
-      if(pos == val.size() - 1 && val[pos] == '-')
+      if (pos == val.size() - 1 && val[pos] == '-') {
         needQuotes = true;
+      }
 
       // remember if we are a quote, what quote type we are
-      if(existingQuoteType == '\0') {
-        if(val[pos] == '"') {
+      if (existingQuoteType == '\0') {
+        if (val[pos] == '"') {
           existingQuoteType = '"';
         }
-        else if(val[pos] == '\'') {
+        else if (val[pos] == '\'') {
           existingQuoteType = '\'';
         }
       }
       else {
         // make sure we dont have mixing of our outside quote type
-        if(val[pos] == '"' || val[pos] == '\'') {
+        if (val[pos] == '"' || val[pos] == '\'') {
           val[pos] = existingQuoteType;
         }
       }

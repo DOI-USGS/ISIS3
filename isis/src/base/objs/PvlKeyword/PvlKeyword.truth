@@ -76,6 +76,32 @@
 'KEYWORD = ',E)'' ---------------> VALID
     NAME: KEYWORD
     VALUE: ,E)
+'KEYWORD = ((1,2))' -------------> VALID
+    NAME: KEYWORD
+    VALUE: (1,2)
+'KEYWORD = ("(f1+f2)","/(f1-f2)")' > VALID
+    NAME: KEYWORD
+    VALUE: (f1+f2)
+    VALUE: /(f1-f2)
+'KEYWORD = "(F1+F2)/(F1-F2)"' ---> VALID
+    NAME: KEYWORD
+    VALUE: (F1+F2)/(F1-F2)
+'KEYWORD = ( (1,2)  , (A,B) )' --> VALID
+    NAME: KEYWORD
+    VALUE: (1,2)
+    VALUE: (A,B)
+'KEYWORD = "(f1 + min(f2,f3))"' -> VALID
+    NAME: KEYWORD
+    VALUE: (f1 + min(f2,f3))
+'KEYWORD = "(min(f2,f3) + f1)"' -> VALID
+    NAME: KEYWORD
+    VALUE: (min(f2,f3) + f1)
+'KEYWORD = "min(f2,f3) + f1"' ---> VALID
+    NAME: KEYWORD
+    VALUE: min(f2,f3) + f1
+'KEYWORD = "f1 + min(f2,f3)"' ---> VALID
+    NAME: KEYWORD
+    VALUE: f1 + min(f2,f3)
 'KEYWORD = (A <a>, B <b>, C, D <d>)' > VALID
     NAME: KEYWORD
     VALUE: A <a>
@@ -352,6 +378,54 @@ KEYWORD = ',E)'
 
 Output: 
 KEYWORD = ",E)"
+
+Input:
+KEYWORD = ((1,2))
+
+Output: 
+KEYWORD = (1,2)
+
+Input:
+KEYWORD = ("(f1+f2)","/(f1-f2)")
+
+Output: 
+KEYWORD = ((f1+f2), "/(f1-f2)")
+
+Input:
+KEYWORD = "(F1+F2)/(F1-F2)"
+
+Output: 
+KEYWORD = "(F1+F2)/(F1-F2)"
+
+Input:
+KEYWORD = ( (1,2)  , (A,B) )
+
+Output: 
+KEYWORD = ((1,2), (A,B))
+
+Input:
+KEYWORD = "(f1 + min(f2,f3))"
+
+Output: 
+KEYWORD = "(f1 + min(f2,f3))"
+
+Input:
+KEYWORD = "(min(f2,f3) + f1)"
+
+Output: 
+KEYWORD = "(min(f2,f3) + f1)"
+
+Input:
+KEYWORD = "min(f2,f3) + f1"
+
+Output: 
+KEYWORD = "min(f2,f3) + f1"
+
+Input:
+KEYWORD = "f1 + min(f2,f3)"
+
+Output: 
+KEYWORD = "f1 + min(f2,f3)"
 
 Input:
 KEYWORD = (A <a>, B <b>, C, D <d>)
