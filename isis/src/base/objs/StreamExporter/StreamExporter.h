@@ -25,7 +25,6 @@
  */
 
 #include "ImageExporter.h"
-#include "PixelType.h"
 
 namespace Isis {
   /**
@@ -42,6 +41,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-04-04 Travis Addair - Added documentation.
+   *   @history 2013-06-05 Jeannie Backer - Removed setType() and pixelType() methods and pixel
+   *                           type member variable since these are now handled by ImageExporter.
+   *                           Changed ImageExporter calls to new method names, where needed.
+   *                           References #1380.
    *
    */
   class StreamExporter : public ImageExporter {
@@ -53,12 +56,8 @@ namespace Isis {
       virtual void setRgb(ExportDescription &desc);
       virtual void setRgba(ExportDescription &desc);
 
-      void setType(ExportDescription &desc);
-
     protected:
       virtual void initialize(ExportDescription &desc);
-
-      PixelType getPixelType() const;
 
       virtual void writeGrayscale(vector<Buffer *> &in) const;
       virtual void writeRgb(vector<Buffer *> &in) const;
@@ -88,9 +87,6 @@ namespace Isis {
        */
       virtual void writeLine(int l) const = 0;
 
-    private:
-      //! Pixel type to export the data to.
-      PixelType m_type;
   };
 };
 

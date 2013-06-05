@@ -42,14 +42,14 @@ int main() {
   cout << "********* Start testing of " << className << " *********" << endl;
   ExportDescription desc;
 
-  compareEqual("getPixelType()", None, desc.getPixelType(), "None");
+  compareEqual("pixelType()", None, desc.pixelType(), "None");
 
   desc.setPixelType(SignedWord);
-  compareEqual("setPixelType()", SignedWord, desc.getPixelType(), "SignedWord");
+  compareEqual("setPixelType()", SignedWord, desc.pixelType(), "SignedWord");
 
-  compareEqual("getOutputMinimum()", -32752.0, desc.getOutputMinimum());
-  compareEqual("getOutputMaximum()", 32767.0, desc.getOutputMaximum());
-  compareEqual("getOutputNull()", -32768.0, desc.getOutputNull());
+  compareEqual("outputPixelValidMin()", -32752.0, desc.outputPixelValidMin());
+  compareEqual("outputPixelValidMax()", 32767.0, desc.outputPixelValidMax());
+  compareEqual("outputPixelNull()", -32768.0, desc.outputPixelNull());
 
   QList<FileName> filenames;
   filenames.append(FileName("red.cub"));
@@ -75,7 +75,7 @@ int main() {
   IString innerName = "ChannelDescription";
   compareEqual("channelCount()", 3, desc.channelCount());
   for (int i = 0; i < desc.channelCount(); i++) {
-    const ExportDescription::ChannelDescription &channel = desc.getChannel(i);
+    const ExportDescription::ChannelDescription &channel = desc.channel(i);
     compareEqual(innerName + "::filename()",
         filenames[i].name(), channel.filename().name());
     compareEqual(innerName + "::attributes()",
@@ -92,10 +92,10 @@ int main() {
           true, channel.hasCustomRange(), "true");
 
       if (i == 2) {
-        compareEqual(innerName + "::getInputMinimum()",
-            500.0, channel.getInputMinimum());
-        compareEqual(innerName + "::getInputMaximum()",
-            1000.0, channel.getInputMaximum());
+        compareEqual(innerName + "::inputMinimum()",
+            500.0, channel.inputMinimum());
+        compareEqual(innerName + "::inputMaximum()",
+            1000.0, channel.inputMaximum());
       }
     }
   }

@@ -5,6 +5,7 @@
 #include "ProcessExport.h"
 
 using namespace Isis;
+using namespace std;
 
 
 namespace Isis {
@@ -12,7 +13,6 @@ namespace Isis {
    * Construct the stream exporter.
    */
   StreamExporter::StreamExporter() : ImageExporter() {
-    m_type = Isis::None;
   }
 
 
@@ -60,44 +60,14 @@ namespace Isis {
 
 
   /**
-   * Generic initialization with the export description.  Set the input and set
-   * the pixel type.
+   * Generic initialization with the export description.  Set the input, set
+   * the pixel type, and create the buffer.
    *
    * @param desc Export description containing necessary channel information
    */
   void StreamExporter::initialize(ExportDescription &desc) {
-    setInput(desc);
-    setType(desc);
-  }
-
-
-  /**
-   * Set the pixel type from the description and create the buffer.
-   *
-   * @param desc Export description containing necessary bit type information
-   */
-  void StreamExporter::setType(ExportDescription &desc) {
-    ProcessExport &p = getProcess();
-    p.setFormat(ProcessExport::BIL);
-
-    m_type = desc.getPixelType();
+    ImageExporter::initialize(desc);
     createBuffer();
-
-    p.SetOutputType(desc.getPixelType());
-    p.SetOutputNull(desc.getOutputNull());
-    p.SetOutputRange(desc.getOutputMinimum(), desc.getOutputMaximum());
-
-    setOutputRange(desc.getOutputMinimum(), desc.getOutputMaximum());
-  }
-
-
-  /**
-   * Returns the pixel type.  Defaults to None if not set by the user.
-   *
-   * @return The pixel type: {None, UnsignedByte, SignedWord, UnsignedWord}
-   */
-  PixelType StreamExporter::getPixelType() const {
-    return m_type;
   }
 
 
@@ -109,12 +79,13 @@ namespace Isis {
   void StreamExporter::writeGrayscale(vector<Buffer *> &in) const {
     Buffer &grayLine = *in[0];
 
-    for (int i = 0; i < grayLine.SampleDimension(); i++) {
-      int dn = getPixel(grayLine[i]);
-      setBuffer(i, 0, dn);
+    int lineIndex = grayLine.Line() - 1;
+    for (int sampleIndex = 0; sampleIndex < grayLine.SampleDimension(); sampleIndex++) {
+      int pixelValue = outputPixelValue(grayLine[sampleIndex]);
+      setBuffer(sampleIndex, 0, pixelValue);
     }
 
-    writeLine(grayLine.Line() - 1);
+    writeLine(lineIndex);
   }
 
 
@@ -129,9 +100,9 @@ namespace Isis {
     Buffer &blueLine = *in[2];
 
     for (int i = 0; i < redLine.SampleDimension(); i++) {
-      int red = getPixel(redLine[i]);
-      int green = getPixel(greenLine[i]);
-      int blue = getPixel(blueLine[i]);
+      int red = outputPixelValue(redLine[i]);
+      int green = outputPixelValue(greenLine[i]);
+      int blue = outputPixelValue(blueLine[i]);
 
       setBuffer(i, 0, red);
       setBuffer(i, 1, green);
@@ -154,10 +125,10 @@ namespace Isis {
     Buffer &alphaLine = *in[3];
 
     for (int i = 0; i < redLine.SampleDimension(); i++) {
-      int red = getPixel(redLine[i]);
-      int green = getPixel(greenLine[i]);
-      int blue = getPixel(blueLine[i]);
-      int alpha = getPixel(alphaLine[i]);
+      int red = outputPixelValue(redLine[i]);
+      int green = outputPixelValue(greenLine[i]);
+      int blue = outputPixelValue(blueLine[i]);
+      int alpha = outputPixelValue(alphaLine[i]);
 
       setBuffer(i, 0, red);
       setBuffer(i, 1, green);

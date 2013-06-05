@@ -1,15 +1,18 @@
 #include "ImageExporter.h"
 
 #include "Buffer.h"
+#include "Cube.h"
 #include "CubeAttribute.h"
 #include "ExportDescription.h"
 #include "FileName.h"
 #include "JP2Exporter.h"
+#include "PixelType.h"
 #include "ProcessExport.h"
 #include "QtExporter.h"
 #include "TiffExporter.h"
 
 using namespace Isis;
+using namespace std;
 
 
 namespace Isis {
@@ -22,17 +25,34 @@ namespace Isis {
 
     m_writeMethod = NULL;
 
+    m_exportDescription = NULL;
+    m_exportDescription = new ExportDescription();
+
     m_extension = "";
-    m_world = "";
+    m_worldExtension = "";
 
     m_samples = 0;
     m_lines = 0;
     m_bands = 0;
 
-    m_dataMin = 0.0;
-    m_dataMax = 255.0;
+    m_outputPixelMinimum = 0.0;
+    m_outputPixelMaximum = 0.0;
   }
 
+
+  /**
+   * Generic initialization with the export description.  Set the export 
+   * description given the pixel type of the passed in description. Use 
+   * the number of channels in the export description to determine the 
+   * write method (i.e. grayscale, rgb, or rgba). This will also set the
+   * member variables for the number of samples, lines, and bands.
+   *
+   * @param desc Export description containing necessary channel information
+   */
+  void ImageExporter::initialize(ExportDescription &desc) {
+    setExportDescription(desc);
+    initializeProcess();
+  }
 
   /**
    * Destruct the exporter.  Also deletes the process object.
@@ -40,6 +60,8 @@ namespace Isis {
   ImageExporter::~ImageExporter() {
     delete m_process;
     m_process = NULL;
+    delete m_exportDescription;
+    m_exportDescription = NULL;
   }
 
 
@@ -69,7 +91,7 @@ namespace Isis {
    * @param quality The quality of the output from 0 to 100, defaults to 100
    */
   void ImageExporter::write(FileName outputName, int quality) {
-    ProcessExport &p = getProcess();
+    ProcessExport &p = process();
     if (!p.HasInputRange()) p.SetInputRange();
     p.ProcessCubes(*this);
 
@@ -116,7 +138,7 @@ namespace Isis {
    *
    * @return The minimum DN in the input mapped to the minimum of the output
    */
-  double ImageExporter::getInputMinimum(int channel) const {
+  double ImageExporter::inputMinimum(int channel) const {
     return m_process->GetInputMinimum(channel);
   }
 
@@ -129,22 +151,26 @@ namespace Isis {
    *
    * @return The maximum DN in the input mapped to the maximum of the output
    */
-  double ImageExporter::getInputMaximum(int channel) const {
+  double ImageExporter::inputMaximum(int channel) const {
     return m_process->GetInputMaximum(channel);
   }
 
 
   /**
-   * Set the input DN floor and ceiling.  All input DNs less than the min will
-   * be set to the min in the output.  Similarly, all input DNs greater than the
-   * max will be set to the max in the output.
+   * Set the DN floor and ceiling for the exported image.  All DNs less than
+   * the min will be set to the min in the exported image.  Similarly, all DNs 
+   * greater than the max will be set to the max in the exported image. 
+   *  
+   * Note: These values may be "special".  For example, if Null pixels are 
+   * exported to 0.0 and the minimum valid pixels are exported to 2.0, then 0.0 
+   * should be passed in for the value of the @b min parameter. 
    *
-   * @param min The minimum
-   * @param max The maximum
+   * @param min The absolute minimum output DN value. 
+   * @param max The absolute maximum output DN value.
    */
-  void ImageExporter::setOutputRange(double min, double max) {
-    m_dataMin = min;
-    m_dataMax = max;
+  void ImageExporter::setOutputPixelRange(double outputPixelMinimum, double outputPixelMaximum) {
+    m_outputPixelMinimum = outputPixelMinimum;
+    m_outputPixelMaximum = outputPixelMaximum;
   }
 
 
@@ -160,22 +186,55 @@ namespace Isis {
     // World file extension is the first and last characters of the extension
     // with an added 'w' at the end
     int last = extension.length() - 1;
-    m_world = extension.mid(0, 1) + extension.mid(last) + "w";
+    m_worldExtension = extension.mid(0, 1) + extension.mid(last) + "w";
+  }
+
+
+  /**
+   * Gets the extension for the output image.
+   *
+   * @return The extension for the output image
+   */
+  QString ImageExporter::extension() const {
+    return m_extension;
+  }
+
+  /**
+   * Sets the description for the output image. 
+   *
+   * @param desc The export description
+   */
+  void ImageExporter::setExportDescription(ExportDescription &desc) {
+    *m_exportDescription = desc;
+  }
+
+  /**
+   * Gets the description for the output image. 
+   *
+   * @return The export description
+   */
+  ExportDescription &ImageExporter::exportDescription() const {
+    return *m_exportDescription;
   }
 
 
   /**
    * Sets up the export process with the parameters described within the given
-   * description.  Opens cubes for retrieving input data, establishes the
-   * dimensions of the output image, and determines whether to write the data as
-   * grayscale, RGB, or RGBA.
-   *
-   * @param desc The export description
+   * description. 
+   *  
+   * This method determines determines whether to write the data as grayscale, 
+   * RGB, or RGBA. It then opens a cube for retrieving the input data and 
+   * establishing the dimensions of the output image. Next, the ProcessExport 
+   * format is set to BIL and the ProcessExport output pixel type, output valid 
+   * data range, and output null are set based on the given export description. 
+   * Last, the absolute output pixel range is set based on the given description 
+   * (this is the smallest and largest allowed pixel values in the output, 
+   * including "special" pixel values). 
    *
    * @return A cube pointer to the first channel created, owned by the process
    */
-  Cube * ImageExporter::setInput(ExportDescription &desc) {
-    switch (desc.channelCount()) {
+  Cube *ImageExporter::initializeProcess() {
+    switch (m_exportDescription->channelCount()) {
       case 1:
         m_writeMethod = &ImageExporter::writeGrayscale;
         break;
@@ -187,21 +246,34 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Cannot export an image with [" + QString(desc.channelCount()) +
+            "Cannot export an image with [" + QString(m_exportDescription->channelCount()) +
             "] channels",
             _FILEINFO_);
     }
 
-    ProcessExport &p = getProcess();
-    Cube *cube = addChannel(desc, 0);
+    ProcessExport &p = process();
+    Cube *cube = addChannel(0);
     m_samples = cube->sampleCount();
     m_lines = cube->lineCount();
-    m_bands = desc.channelCount();
+    m_bands = m_exportDescription->channelCount();
 
-    for (int i = 1; i < desc.channelCount(); i++) addChannel(desc, i);
+    for (int i = 1; i < m_exportDescription->channelCount(); i++) addChannel(i);
 
-    p.SetOutputRange(1.0, 255.0);
-    p.SetOutputNull(0.0);
+    p.SetFormat(ProcessExport::BIL);// why BIL and not default to BSQ??? Doesn't appear to make a 
+                                    // difference in output images
+
+    // set up the output pixel type, special pixels and valid output range for
+    // the stretch that will be performed by ProcessExport
+    p.SetOutputType(exportDescription().pixelType());
+    p.SetOutputRange(m_exportDescription->outputPixelValidMin(), 
+                     m_exportDescription->outputPixelValidMax());
+    
+    // the dafault value for the null 
+    p.SetOutputNull(m_exportDescription->outputPixelNull());
+
+    // set the absolute min/max values for all pixels (including specials) in the output image 
+    setOutputPixelRange(m_exportDescription->outputPixelAbsoluteMin(), 
+                        m_exportDescription->outputPixelAbsoluteMax());
     return cube;
   }
 
@@ -212,8 +284,23 @@ namespace Isis {
    *
    * @return A reference to the process object
    */
-  ProcessExport & ImageExporter::getProcess() const {
+  ProcessExport &ImageExporter::process() const {
     return *m_process;
+  }
+
+
+  /**
+   * Returns the pixel type.  Defaults to None if not set by the user.
+   *
+   * @return The pixel type: {None, UnsignedByte, SignedWord, UnsignedWord}
+   */
+  PixelType ImageExporter::pixelType() const {
+    if (m_exportDescription) {
+      return m_exportDescription->pixelType();
+    }
+    else {
+      return Isis::None;
+    }   
   }
 
 
@@ -225,8 +312,16 @@ namespace Isis {
    *
    * @return The pixel value for the output
    */
-  int ImageExporter::getPixel(double dn) const {
-    return (dn < m_dataMin) ? m_dataMin : (dn > m_dataMax) ? m_dataMax : dn;
+  int ImageExporter::outputPixelValue(double dn) const {
+    if (dn < m_outputPixelMinimum) {
+      return m_outputPixelMinimum;
+    }
+    else if (dn > m_outputPixelMaximum) {
+      return m_outputPixelMaximum;
+    }
+    else {
+      return dn;
+    }
   }
 
 
@@ -234,20 +329,18 @@ namespace Isis {
    * Add a channel of input data to the process from the export description at
    * the given index.
    *
-   * @param desc The export description
    * @param i Index of the channel to add within the export description
    *
    * @return A cube pointer to the channel added, owned by the process
    */
-  Cube * ImageExporter::addChannel(ExportDescription &desc, int i) {
-    ProcessExport &p = getProcess();
+  Cube * ImageExporter::addChannel(int i) {
+    ProcessExport &p = process();
 
-    const ExportDescription::ChannelDescription &channel = desc.getChannel(i);
-    Cube *cube = p.SetInputCube(
-        channel.filename().expanded(), channel.attributes(), Isis::OneBand);
+    const ExportDescription::ChannelDescription &channel = m_exportDescription->channel(i);
+    Cube *cube = p.SetInputCube(channel.filename().expanded(), channel.attributes(), Isis::OneBand);
 
     if (channel.hasCustomRange())
-      p.SetInputRange(channel.getInputMinimum(), channel.getInputMaximum(), i);
+      p.SetInputRange(channel.inputMinimum(), channel.inputMaximum(), i);
 
     return cube;
   }
@@ -260,9 +353,9 @@ namespace Isis {
    */
   void ImageExporter::createWorldFile(FileName outputName) {
     outputName = outputName.removeExtension();
-    outputName = outputName.addExtension(m_world);
+    outputName = outputName.addExtension(m_worldExtension);
 
-    ProcessExport &p = getProcess();
+    ProcessExport &p = process();
     p.CreateWorldFile(outputName.expanded());
     p.EndProcess();
   }

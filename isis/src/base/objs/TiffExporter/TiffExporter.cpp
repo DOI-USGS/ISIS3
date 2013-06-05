@@ -41,7 +41,7 @@ namespace Isis {
    * bands.
    */
   void TiffExporter::createBuffer() {
-    PixelType type = getPixelType();
+    PixelType type = pixelType();
     int mult = (type == Isis::UnsignedByte) ? 1 : 2;
     int size = samples() * bands() * mult;
 
@@ -80,7 +80,7 @@ namespace Isis {
     TIFFSetField(m_image, TIFFTAG_PHOTOMETRIC,
         bands() == 1 ? PHOTOMETRIC_MINISBLACK : PHOTOMETRIC_RGB);
 
-    PixelType type = getPixelType();
+    PixelType type = pixelType();
     int bps = (type == Isis::UnsignedByte) ? 8 : 16;
     TIFFSetField(m_image, TIFFTAG_BITSPERSAMPLE, bps);
 
@@ -99,7 +99,7 @@ namespace Isis {
    * @param dn The value to set at the given index
    */
   void TiffExporter::setBuffer(int s, int b, int dn) const {
-    PixelType type = getPixelType();
+    PixelType type = pixelType();
     int index = s * bands() + b;
     
     switch (type) {

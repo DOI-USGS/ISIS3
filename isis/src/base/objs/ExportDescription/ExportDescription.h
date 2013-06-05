@@ -49,6 +49,11 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-04-04 Travis Addair - Added documentation.
+   *   @history 2013-06-05 Jeannie Backer - Modified valid min/max for signed and unsigned word
+   *                           pixel types since the exported images do not care about Isis special
+   *                           pixel DNs. Change ouput null/min/max member variable names for
+   *                           clarity. Added absolute min/max member variables and accessors.
+   *                           Added copy constructor and assignment operator. References #1380.
    *
    */
   class ExportDescription {
@@ -77,8 +82,8 @@ namespace Isis {
           CubeAttributeInput attributes() const;
 
           void setInputRange(double min, double max);
-          double getInputMinimum() const;
-          double getInputMaximum() const;
+          double inputMinimum() const;
+          double inputMaximum() const;
           bool hasCustomRange() const;
 
         private:
@@ -100,32 +105,39 @@ namespace Isis {
 
     public:
       ExportDescription();
+      ExportDescription(const ExportDescription &descriptionToCopy);
       virtual ~ExportDescription();
+      ExportDescription &operator=(const ExportDescription &descriptionToCopy);
 
       void setPixelType(PixelType type);
-      PixelType getPixelType() const;
-      double getOutputMinimum() const;
-      double getOutputMaximum() const;
-      double getOutputNull() const;
+      PixelType pixelType() const;
+      double outputPixelNull() const;
+      double outputPixelValidMin() const;
+      double outputPixelValidMax() const;
+      double outputPixelAbsoluteMin() const;
+      double outputPixelAbsoluteMax() const;
 
       int addChannel(FileName filename, CubeAttributeInput &att);
-      int addChannel(FileName filename, CubeAttributeInput &att,
-          double min, double max);
-      const ChannelDescription & getChannel(int i) const;
+      int addChannel(FileName filename, CubeAttributeInput &att, double min, double max);
+      const ChannelDescription &channel(int i) const;
       int channelCount() const;
 
     private:
       //! Pixel type to export the data to, defaults to None.
       PixelType m_type;
 
-      //! Minimum DN in the output, defaults to 0.0.
-      double m_outputMin;
-
-      //! Maximum DN in the output, defaults to 255.0.
-      double m_outputMax;
-
-      //! DN value to output Null pixels to, defaults to 0.0.
-      double m_outputNull;
+      double m_outputPixelNull;        /**< Value to which Null DNs will be mapped in the exported
+                                            image file, defaults to 0.0. */
+      double m_outputPixelValidMin;    /**< Value to which minimum valid DNs will be mapped in the
+                                            exported image file, defaults to 0.0. */
+      double m_outputPixelValidMax;    /**< Value to which maximum valid DNs will be mapped in the 
+                                            exported image file, defaults to 255.0. */
+      double m_outputPixelAbsoluteMin; /**< The smallest allowed pixel value in the exported image
+                                            file. This is the same as the value to which Null DNs
+                                            are mapped. */
+      double m_outputPixelAbsoluteMax; /**< The largest allowed pixel value in the exported image
+                                            file. This is the same as the value to which maximum
+                                            DNs are mapped. */
 
       //! List of color channels to be exported into the output image.
       QList<ChannelDescription *> *m_channels;

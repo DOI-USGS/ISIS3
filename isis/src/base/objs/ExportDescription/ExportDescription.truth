@@ -1,9 +1,9 @@
 ********* Start testing of ExportDescription *********
-PASS : ExportDescription::getPixelType() : None == 0
+PASS : ExportDescription::pixelType() : None == 0
 PASS : ExportDescription::setPixelType() : SignedWord == 4
-PASS : ExportDescription::getOutputMinimum() : -32752.0 == -32752.0
-PASS : ExportDescription::getOutputMaximum() : 32767.0 == 32767.0
-PASS : ExportDescription::getOutputNull() : -32768.0 == -32768.0
+FAIL : ExportDescription::outputPixelValidMin() : -32752.0 != -32767.0
+PASS : ExportDescription::outputPixelValidMax() : 32767.0 == 32767.0
+PASS : ExportDescription::outputPixelNull() : -32768.0 == -32768.0
 PASS : ExportDescription::addChannel() : 0 == 0
 PASS : ExportDescription::addChannel() : 1 == 1
 PASS : ExportDescription::addChannel() : 2 == 2
@@ -17,6 +17,6 @@ PASS : ExportDescription::ChannelDescription::hasCustomRange() : true == 1
 PASS : ExportDescription::ChannelDescription::filename() : blue.cub == blue.cub
 PASS : ExportDescription::ChannelDescription::attributes() : 1 == 1
 PASS : ExportDescription::ChannelDescription::hasCustomRange() : true == 1
-PASS : ExportDescription::ChannelDescription::getInputMinimum() : 500.0 == 500.0
-PASS : ExportDescription::ChannelDescription::getInputMaximum() : 1000.0 == 1000.0
+PASS : ExportDescription::ChannelDescription::inputMinimum() : 500.0 == 500.0
+PASS : ExportDescription::ChannelDescription::inputMaximum() : 1000.0 == 1000.0
 ********* Finished testing of ExportDescription *********

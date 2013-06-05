@@ -12,4 +12,3 @@ commands:
 	then \
 	  true; \
 	fi; \
-

@@ -38,7 +38,7 @@ namespace Isis {
    * bands.
    */
   void JP2Exporter::createBuffer() {
-    PixelType type = getPixelType();
+    PixelType type = pixelType();
     int mult = (type == Isis::UnsignedByte) ? 1 : 2;
 
     m_buffer = new char* [bands()];
@@ -55,7 +55,7 @@ namespace Isis {
    * @param quality The quality of the output, not used for JPEG 2000
    */
   void JP2Exporter::write(FileName outputName, int quality) {
-    PixelType type = getPixelType();
+    PixelType type = pixelType();
     m_encoder = new JP2Encoder(
         outputName.expanded(), samples(), lines(), bands(), type);
     m_encoder->OpenFile();
@@ -72,7 +72,7 @@ namespace Isis {
    * @param dn The value to set at the given index
    */
   void JP2Exporter::setBuffer(int s, int b, int dn) const {
-    PixelType type = getPixelType();
+    PixelType type = pixelType();
     switch (type) {
       case UnsignedByte:
         ((unsigned char *) m_buffer[b])[s] = (unsigned char) dn;
@@ -97,7 +97,7 @@ namespace Isis {
    * @param l The line of the output image, unused for JPEG 2000
    */
   void JP2Exporter::writeLine(int l) const {
-    PixelType type = getPixelType();
+    PixelType type = pixelType();
     if (type == Isis::UnsignedByte)
       m_encoder->Write((unsigned char **) m_buffer);
     else

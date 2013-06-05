@@ -53,6 +53,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-04-04 Travis Addair - Added documentation.
+   *   @history 2013-06-05 Jeannie Backer - Added initialize() method and replaced call to
+   *                           setInput(). Changed ImageExporter calls to new method names, where
+   *                           needed. References #1380.
    *
    */
   class QtExporter : public ImageExporter {
@@ -76,6 +79,8 @@ namespace Isis {
       void checkDataSize(BigInt samples, BigInt lines, int bands);
 
     private:
+      void initialize(ExportDescription &desc);
+       
       //! Structure holding all output image data in memory.
       QImage *m_qimage;
 
