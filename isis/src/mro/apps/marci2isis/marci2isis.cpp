@@ -274,7 +274,12 @@ void translateMarciLabels(Pvl &pdsLabel, Pvl &cubeLabel) {
   PvlGroup arch("Archive");
 
   if(pdsLabel.hasKeyword("SAMPLE_BIT_MODE_ID")) {
+    arch += PvlKeyword("ProductId", (QString)pdsLabel["PRODUCT_ID"]);
+    arch += PvlKeyword("OriginalProductId", (QString)pdsLabel["ORIGINAL_PRODUCT_ID"]);
+    arch += PvlKeyword("OrbitNumber", (QString)pdsLabel["ORBIT_NUMBER"]);
     arch += PvlKeyword("SampleBitModeId", (QString)pdsLabel["SAMPLE_BIT_MODE_ID"]);
+    arch += PvlKeyword("FocalPlaneTemperature", (QString)pdsLabel["FOCAL_PLANE_TEMPERATURE"]);
+    arch += PvlKeyword("RationaleDesc", (QString)pdsLabel["RATIONALE_DESC"]);
   }
 
   PvlGroup inst("Instrument");
