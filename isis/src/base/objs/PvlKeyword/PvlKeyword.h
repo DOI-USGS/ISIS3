@@ -93,6 +93,9 @@ namespace Isis {
    *                 error msg when converting string to integer which has a double value.
    *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
    *                          names up to the current Isis 3 coding standards. Fixes #1533.
+   *  @history 2013-06-05 Tracie Sucharski - When splitting keywords make sure the continuation
+   *                          lines does not start with "//" since Isis Pvl considers that a
+   *                          comment.  Fixes #1230.
    */
   class PvlKeyword {
     public:
