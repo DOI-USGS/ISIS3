@@ -570,6 +570,8 @@ Output:
 KEYWORD = (A, B, C)
 
 ----- Testing Difficult Cases Read/Write -----
+FROM = /archive/projects/cassini/VIMS/UnivAZraw/tour/S60/cubes/GLO000OBMAP00-
+       2//V1654449360_4.QUB
 THE_INTERNET = "Seven thousand eight hundred forty three million seventy four
                 nine seventy six forty two eighty nine sixty seven thirty five
                 million jillion bajillion google six nine four one two three
