@@ -28,27 +28,28 @@ commands:
 	  to=$(OUTPUT)/isis2stdTruth_rgb.tif \
 	  mode=rgb \
 	  format=tiff \
-	  stretch=linear > /dev/null; \
+	  stretch=linear > /dev/null;
 	cat $(OUTPUT)/isis2stdTruth_rgb.tfw | sed 's/\(\.[0-9][0-9][0-9]\)\([0-9]*\)/\1/' \
-	  > $(OUTPUT)/isis2stdTruth_rgb.txt; \
+	  > $(OUTPUT)/isis2stdTruth_rgb.txt;
 	std2isis FROM=$(OUTPUT)/isis2stdTruth_rgb.tif \
-	  TO=$(OUTPUT)/isis2stdTruth_rgb.cub > /dev/null; \
+	  TO=$(OUTPUT)/isis2stdTruth_rgb.cub > /dev/null;
 	$(APPNAME) from=$(INPUT)/grayscale.cub \
 	  to=$(OUTPUT)/isis2stdTruth_gray_u16bit.tif \
 	  mode=grayscale \
 	  format=tiff \
 	  bittype=u16bit \
-	  stretch=linear > /dev/null; \
+	  stretch=linear > /dev/null;
 	std2isis FROM=$(OUTPUT)/isis2stdTruth_gray_u16bit.tif \
-	  TO=$(OUTPUT)/isis2stdTruth_gray_u16bit.cub > /dev/null; \
+	  TO=$(OUTPUT)/isis2stdTruth_gray_u16bit.cub > /dev/null;
+# THIS TEST IS COMMENTED OUT SINCE SIGNED WORD CONVERSION APPEARS TO BE FAILING Test 4: Grayscale, signed 16 bit
 #	$(APPNAME) from=$(INPUT)/grayscale.cub \
 #	  to=$(OUTPUT)/isis2stdTruth_gray_s16bit.tif \
 #	  mode=grayscale \
 #	  format=tiff \
 #	  bittype=s16bit \
-#	  stretch=linear > /dev/null; \
+#	  stretch=linear > /dev/null;
 #	std2isis FROM=$(OUTPUT)/isis2stdTruth_gray_s16bit.tif \
-#	  TO=$(OUTPUT)/isis2stdTruth_gray_s16bit.cub > /dev/null; \
+#	  TO=$(OUTPUT)/isis2stdTruth_gray_s16bit.cub > /dev/null;
 	$(RM) $(OUTPUT)/isis2stdTruth_gray.tif;
 	$(RM) $(OUTPUT)/isis2stdTruth_rgb.tfw;
 	$(RM) $(OUTPUT)/isis2stdTruth_rgb.tif;
