@@ -680,6 +680,8 @@ namespace Isis {
     m_lonDomainLabel->setEnabled(showGrid);
 
     m_minLonExtentLabel->setEnabled(enableLonExtents);
+    m_minLonExtentSlider->setRange(m_tool->domainMinLon().degrees(),
+                                   m_tool->domainMaxLon().degrees());
     m_minLonExtentSlider->setEnabled(enableLonExtents);
     m_minLonExtentSlider->blockSignals(true);
     m_minLonExtentSlider->setValue(m_minLonExtentLineEdit->text().toDouble());
@@ -688,6 +690,8 @@ namespace Isis {
     m_minLonExtentTypeLabel->setEnabled(enableLonExtents);
 
     m_maxLonExtentLabel->setEnabled(enableLonExtents);
+    m_maxLonExtentSlider->setRange(m_tool->domainMinLon().degrees(),
+                                   m_tool->domainMaxLon().degrees());
     m_maxLonExtentSlider->setEnabled(enableLonExtents);
     m_maxLonExtentSlider->blockSignals(true);
     m_maxLonExtentSlider->setValue(m_maxLonExtentLineEdit->text().toDouble());

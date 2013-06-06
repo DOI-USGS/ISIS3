@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <QAction>
+#include <QApplication>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -178,6 +179,11 @@ namespace Isis {
   }
 
 
+  void MosaicFileListWidget::setDefaultFileListCols() {
+    p_tree->setDefaultFileListCols();
+  }
+
+
   QWidget * MosaicFileListWidget::getLongHelp(QWidget * fileListContainer) {
     QScrollArea *longHelpWidgetScrollArea = new QScrollArea;
 
@@ -213,29 +219,30 @@ namespace Isis {
     previewWrapper->setPixmap(preview);
     longHelpLayout->addWidget(previewWrapper);
 
-    QLabel *overview = new QLabel("The mosaic file list is designed to help "
-        "to organize your files. The file list supports changing multiple "
+    QLabel *overview = new QLabel(tr("The mosaic file list is designed to help "
+        "to organize your files within the %1 project. The file list supports changing multiple "
         "files simultaneously using the right-click menus after selecting "
         "several images or groups.<br>"
         "<h3>Groups</h3>"
             "<p>Every cube must be inside of a group. These groups can be "
-            "renamed by double clicking on them. To move a cube between groups "
-            "just click and drag it to the group you want it in. This works "
+            "renamed by double clicking on them. To move a cube between groups, "
+            "click and drag it to the group you want it in. This works "
             "for multiple cubes also. You can change all of the cubes in a "
             "group by right clicking on the group name. You can add a group "
             "by right clicking in the white space below the last cube or on "
             "an existing group.</p>"
         "<h3>Columns</h3>"
-            "You can show and hide columns by using the view menu. These "
+            "Show and hide columns by using the view menu. These "
             "columns show relevant data about the cube, including statistical "
-            "information. Some of this information will be blank if you did "
-            "not run the application <i>camstats</i> before opening the cube."
+            "information. Some of this information will be blank if you do "
+            "not run the application, <i>camstats</i>, before opening the cube."
         "<h3>Sorting</h3>"
-            "You can sort cubes within each group by clicking on the column "
+            "Sort cubes within each group in ascending or descending order "
+            "by clicking on the column "
             "title of the column that you want to sort on. Clicking on the "
             "title again will reverse the sorting order. You can also drag and "
             "drop a cube between two other cubes to change where it is in the "
-            "list.");
+            "list.").arg(QApplication::applicationName()));
     overview->setWordWrap(true);
 
     longHelpLayout->addWidget(overview);

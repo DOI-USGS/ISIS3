@@ -3,13 +3,17 @@
 #include <iostream>
 
 #include <QAction>
+#include <QApplication>
+#include <QDebug>
 #include <QDropEvent>
 #include <QMenu>
 #include <QProgressBar>
+#include <QSettings>
 #include <QScrollBar>
 
 #include "CubeDisplayProperties.h"
 #include "IException.h"
+#include "FileName.h"
 #include "MosaicTreeWidgetItem.h"
 #include "ProgressBar.h"
 
@@ -42,6 +46,30 @@ namespace Isis {
     hideColumn(MosaicTreeWidgetItem::PhaseAngleColumn);
     hideColumn(MosaicTreeWidgetItem::IncidenceAngleColumn);
     hideColumn(MosaicTreeWidgetItem::BlankColumn);
+
+
+    // Read and apply default visibilities from config, if different than defaults
+    QSettings settings(
+        FileName(QString("$HOME/.Isis/%1/fileList.config").arg(QApplication::applicationName()))
+          .expanded(),
+        QSettings::NativeFormat);
+    settings.beginGroup("ColumnsVisible");
+
+    col = MosaicTreeWidgetItem::FootprintColumn;
+    while(col < MosaicTreeWidgetItem::BlankColumn) {
+      bool visible = !isColumnHidden(col);
+
+      if (settings.value(QString("%1Visible").arg(MosaicTreeWidgetItem::treeColumnToString(col)),
+                         visible).toBool() != visible) {
+        if (visible)
+          hideColumn(col);
+        else
+          showColumn(col);
+      }
+
+      col = (MosaicTreeWidgetItem::TreeColumn)(col + 1);
+    }
+    settings.endGroup();
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
 
@@ -548,6 +576,30 @@ namespace Isis {
         viewActIndex ++;
       }
     }
+  }
+
+
+  void MosaicTreeWidget::setDefaultFileListCols() {
+    QSettings settings(
+        FileName(
+          QString("$HOME/.Isis/%1/fileList.config").arg(QApplication::applicationName()))
+          .expanded(),
+        QSettings::NativeFormat);
+    settings.beginGroup("ColumnsVisible");
+
+    MosaicTreeWidgetItem::TreeColumn col =
+        MosaicTreeWidgetItem::FootprintColumn;
+
+    while(col < MosaicTreeWidgetItem::BlankColumn) {
+      bool visible = !isColumnHidden(col);
+
+      settings.setValue(QString("%1Visible").arg(MosaicTreeWidgetItem::treeColumnToString(col)),
+                        visible);
+
+      col = (MosaicTreeWidgetItem::TreeColumn)(col + 1);
+    }
+
+    settings.endGroup();
   }
 
 

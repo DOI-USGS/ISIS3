@@ -93,5 +93,14 @@
       The grid tool should no longer crash when it cannot compute image extents automatically.
       Fixes #1547.
     </change>
+    <change name="Steven Lambright" date="2013-03-19">
+      The grid tool's "Auto Grid" option will now remember it's state between qmos runs. There is
+      now an option to set the current file list columns as the default. These changes will not
+      impact what is stored/loaded from projects. If you try to open a project and cancel the
+      original state of qmos is now properly preserved, instead of closing all open files/settings.
+      The grid tool's handling of the 180 longitude domain has been improved: the longitude extents
+      sometimes failed to cross the 0 boundary and the longitude extent sliders were in 0-360 still,
+      instead of -180 to 180.
+    </change>
   </history>
 </application>

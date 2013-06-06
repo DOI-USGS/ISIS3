@@ -328,7 +328,7 @@ namespace Isis {
         "include:<ul>"
         "<li>All input files are read-only, you cannot edit your input "
             "data</li>"
-        "<li>Large control networks are slow and memory intensive</li>"
+        "<li>Large control networks are slow and memory intensive to load</li>"
         "<li>Show cube DN data is extremely slow</li>"
         "<li>Warnings are not displayed graphically</li>"
         "<li>Zooming in too far causes you to pan off of your data</li></ul>");
@@ -355,10 +355,16 @@ namespace Isis {
         "<li><i>camstats from=future_input_to_qmos.cub attach=true "
             "sinc=... linc=...</i></li>"
         "  <br>This enables qmos to give you the emission angle, incidence "
-               "angle, and resolution in the <b>File List</b>"
+               "angle, phase angle, and resolution in the <b>File List</b>"
         "<li><i>footprintinit from=future_input_to_qmos.cub "
             "sinc=... linc=...</i></li>"
-        "  <br>For Level1 (raw camera space) images, when calculating the "
+        "  <br>Running <i>footprintinit</i> beforehand will significantly speed up loading images "
+            "into qmos.<br/><br/>"
+        "The footprint is created by \"walking\" around the valid image data, and qmos reprojects "
+            "the footprint according to the loaded map file.<br/><br/>"
+        "Qmos displays the footprints, and optionally the image data and map grid to the default "
+            "IAU radius, unless the radius is specified within the loaded map file.<br/><br/>"
+        "For Level1 (raw camera space) images, when calculating the "
                "footprint polygons, footprintinit refers to the image labels "
                "and uses the SPICE kernels and the shape model (DEM if one "
                "exists and is specified, otherwise, the IAU sphere or "
@@ -374,9 +380,6 @@ namespace Isis {
                "polygon is created by 'walking' around the valid image data. "
                "qmos 'reprojects' the footprint polygons according to the "
                "loaded Map File.<br>"
-               "Qmos displays the footprints, and optional image data and map "
-               "grid to the default IAU radius, unless otherwise specified "
-               "within the loaded Map File."
         "</ul>");
     preparationText->setWordWrap(true);
     preparationsLayout->addWidget(preparationText);
@@ -392,17 +395,18 @@ namespace Isis {
     QLabel *projectsTitle = new QLabel("<h2>Projects</h2>");
     projectsLayout->addWidget(projectsTitle);
 
-    QLabel *projectsText = new QLabel("<p>qmos can save and restore its state "
-        "back to where it was at any given time. The stored files are qmos "
-        "project files (*.mos). To load a project, you can specify the project "
+    QLabel *projectsText = new QLabel("<p>The contents of qmos can be saved as a project file, "
+        "which allows the user to restore back to the previous state at any given time. The stored "
+        "files or qmos project files must have a \".mos\" extension.<br/><br/>"
+        "These project files store the input file location information and their qmos properties "
+        "(color, group information, and other attributes).<br/><br/>"
+        "When you initially open qmos you start with a blank project. "
+        "To load a project, you can specify the project "
         "file's name on the command line (qmos myProject.mos) or go to "
-        "File -> Load Project once qmos is already started. When "
-        "loading a project, all current data is lost (your cubes are closed)."
-        "These project files store input file location information and their "
-        "qmos properties (color, group information, and similar attributes). "
-        "As a result, the qmos projects are relatively small files. You can "
-        "save your current project any time by going to File -> Save Project. "
-        "When you initially open qmos you start with a blank project.");
+        "File -> Load Project after qmos is started. When "
+        "loading a project, all current data in the qmos window is lost (your cubes are closed)."
+        "These project files are relatively small files. You can "
+        "save your current project any time by going to File -> Save Project. ");
     projectsText->setWordWrap(true);
     projectsLayout->addWidget(projectsText);
 
@@ -699,12 +703,13 @@ namespace Isis {
    *
    */
   void MosaicMainWindow::loadProject() {
-    closeMosaic();
+    QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
+                  QDir::currentPath(),
+                  "Mosaic (*.mos)");
+      
+    if (!fn.isEmpty()) {
+      closeMosaic();
 
-    if (!m_controllerVisible) {
-      QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
-                    QDir::currentPath(),
-                    "Mosaic (*.mos)");
       m_lastOpenedFile = QFileInfo(fn);
       loadProject(fn);
     }
@@ -745,5 +750,6 @@ namespace Isis {
     }
 
     createController();
+    displayController();
   }
 }

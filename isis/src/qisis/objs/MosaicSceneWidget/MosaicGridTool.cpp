@@ -16,6 +16,7 @@
 
 #include "Angle.h"
 #include "Distance.h"
+#include "FileName.h"
 #include "GridGraphicsItem.h"
 #include "IException.h"
 #include "Latitude.h"
@@ -53,10 +54,9 @@ namespace Isis {
     m_maxLat = Latitude(50.0, Angle::Degrees);
 
     m_lonExtents = Cubes;
-    m_minLon = Longitude(0.0, Angle::Degrees);
-    m_maxLon = Longitude(360.0, Angle::Degrees);
+    m_minLon = domainMinLon();
+    m_maxLon = domainMaxLon();
     m_density = 10000;
-
   }
 
 
@@ -421,9 +421,6 @@ namespace Isis {
       double bottomRight = 0;
       bool cubeRectWorked = true;
 
-      Longitude zeroLon(0.0, Angle::Degrees);
-      Longitude threeSixtyLon(360.0, Angle::Degrees);
-
       switch (source) {
 
         case Map:
@@ -465,22 +462,22 @@ namespace Isis {
             m_maxLon = Longitude(std::max(std::max(topLeft, topRight),
                                           std::max(bottomLeft, bottomRight)),
                                 Angle::Degrees);
-            if (m_minLon < zeroLon) {
-              m_minLon = zeroLon;
+            if (m_minLon < domainMinLon()) {
+              m_minLon = domainMinLon();
             }
-            if (m_maxLon > threeSixtyLon) {
-              m_maxLon = threeSixtyLon;
+            if (m_maxLon > domainMaxLon()) {
+              m_maxLon = domainMaxLon();
             }
             //Draw 0-360 if the pole is in the cubes' bounding rectangle.
             if (m_minLat == Angle(-90.0, Angle::Degrees) ||
                 m_maxLat == Angle(90.0, Angle::Degrees)) {
-              m_minLon = zeroLon;
-              m_maxLon = threeSixtyLon;
+              m_minLon = domainMinLon();
+              m_maxLon = domainMaxLon();
             }
           }
           else {
-            m_minLon = zeroLon;
-            m_maxLon = threeSixtyLon;
+            m_minLon = domainMinLon();
+            m_maxLon = domainMaxLon();
             m_lonExtents = Manual;
 
             static Projection *lastProjWithThisError = NULL;
@@ -652,12 +649,50 @@ namespace Isis {
   }
 
 
+  Longitude MosaicGridTool::domainMinLon() {
+    Longitude result;
+
+    if (getWidget() && getWidget()->getProjection()) {
+      if (getWidget()->getProjection()->Has360Domain()) {
+        result = Longitude(0, Angle::Degrees);
+      }
+      else {
+        result = Longitude(-180, Angle::Degrees);
+      }
+    }
+
+    return result;
+  }
+  
+  
+  Longitude MosaicGridTool::domainMaxLon() {
+    Longitude result;
+
+    if (getWidget() && getWidget()->getProjection()) {
+      if (getWidget()->getProjection()->Has360Domain()) {
+        result = Longitude(360, Angle::Degrees);
+      }
+      else {
+        result = Longitude(180, Angle::Degrees);
+      }
+    }
+
+    return result;
+  }
+
+
   /**
    * Calculates the lat/lon increments from the bounding rectangle of the open cubes.
    *
    * @param draw True if lat/lon increments need to be calculated.
    */
   void MosaicGridTool::autoGrid(bool draw) {
+    QSettings settings(
+        FileName(QString("$HOME/.Isis/%1/mosaicSceneGridTool.config")
+            .arg(QApplication::applicationName())).expanded(),
+        QSettings::NativeFormat);
+    settings.setValue("autoGrid", draw);
+
     if (draw && getWidget()->getProjection()) {
 
       QRectF boundingRect = getWidget()->cubesBoundingRect();
@@ -825,7 +860,21 @@ namespace Isis {
    */
   void MosaicGridTool::onToolOpen(bool check) {
     if (check && m_shouldCheckBoxes) {
-      m_autoGridCheckBox->setChecked(true);
+      QSettings settings(
+          FileName(QString("$HOME/.Isis/%1/mosaicSceneGridTool.config")
+              .arg(QApplication::applicationName())).expanded(),
+          QSettings::NativeFormat);
+
+      bool drawAuto = settings.value("autoGrid", true).toBool();
+      m_autoGridCheckBox->setChecked(drawAuto);
+
+      // This is necessary to fully initialize properly... the auto increments should still be
+      //   the default increments. This will also cause the lat/lon extents to be properly computed.
+      if (!drawAuto) {
+        autoGrid(true);
+        autoGrid(false);
+      }
+
       m_autoGridCheckBox->setEnabled(true);
       m_autoGridLabel->setEnabled(true);
       m_drawGridCheckBox->setChecked(true);

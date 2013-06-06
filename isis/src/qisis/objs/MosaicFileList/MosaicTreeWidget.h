@@ -17,6 +17,7 @@ namespace Isis {
    *   @history 2012-12-27 Steven Lambright - Phase angle support was added. This widget
    *                           hides all camera angle columns by default; this new column
    *                           had to be hidden as well. References #1093.
+   *   @history 2013-03-19 Steven Lambright - Added setDefaultFileListCols().
    */
   class MosaicTreeWidget : public QTreeWidget {
       Q_OBJECT
@@ -33,6 +34,8 @@ namespace Isis {
 
       QList<QAction *> getViewActions();
       void updateViewActs();
+
+      void setDefaultFileListCols();
 
     public slots:
 

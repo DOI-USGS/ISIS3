@@ -612,26 +612,28 @@ namespace Isis {
         "<ul>"
           "<li>The control network tool opens control networks in two ways. "
           "First, if you select the control network tool and no network is "
-          "open, then it will prompt you for one. Second, there is an open "
-          "network button in the active tool area.</li>"
+          "open, then it will prompt you for one. Second, if there is an open "
+          "network, the buttons for the available options are displayed in the "
+          "active tool area.</li>"
           "<li>The control network tool can toggle whether or not control "
           "points are displayed on the screen using the 'Display' button. "
           "Control points are always on top and colored based on their "
           "ignored, locked and type values.</li>"
-          "<li>This tool can also change the color of your files based on "
+          "<li>This tool can also change the color of your footprints based on "
           "connectivity through control points. This is available through the "
           "'Color Islands' button. When you press color islands, all of the "
           "current cube coloring information is lost and re-done based on "
           "how the control network connects the files. Each set of connected "
           "cubes are colored differently; generally speaking, islands are not "
           "a good thing to have in your control network.</li>"
-          "<li>This tool will color your files on a per-image basis if you "
+          "<li>This tool will color your footprints on a per-image basis if you "
           "click color images, effectively reversing color islands.</li>"
-          "<li>The show movement option only displays data when the control "
+          "<li>The show movement option under 'Configure Movement Display' "
+          "only displays data when the control "
           "network has adjusted values. This means that show movement only "
           "works after you have done a jigsaw solution on the control network. "
           "This displays arrows emanating from the apriori latitude/longitude "
-          "and pointing at the adjusted latitude/longitude.</li>");
+          "and pointing toward the adjusted latitude/longitude.</li>");
     overview->setWordWrap(true);
     cnetHelpLayout->addWidget(overview);
 
@@ -679,8 +681,8 @@ namespace Isis {
           "<li>The Map Grid Tool is activated by selecting the 'cross-hatch' "
               "icon or typing 'g' at the keyboard."
           "</li>"
-          "<li>The parameter options are displayed in the configuration dialog. "
-              "Hitting the 'Options' button will open the dialog. Checking "
+          "<li>The parameter options are displayed below the menubar. "
+              "Clicking the 'Grid Options' button will open the dialog. Checking "
               "'Auto Grid' will draw a grid based on the open cubes. Hitting "
               "'Show Grid' will display or hide the grid."
           "</li>"
@@ -705,18 +707,18 @@ namespace Isis {
         "<li>The 'Show Grid' option draws (checked) or clears (unchecked) the grid."
         "</li>"
         "<li>The 'Auto Grid' option draws a grid with extents and increments "
-            "determined by the selected extent types. The values displayed in the dialog "
+            "computed from the set of images that are opened. The values displayed in the dialog "
             "will reflect those used to draw the grid."
         "</li>"
-        "<li>The expected units for each entry are displayed on the right of the "
-            "dialog."
+        "<li>The expected units for each entry are displayed to the right of the "
+            "dialog box."
         "</li>"
         "<li>The 'Extent Type' combo boxes allow you to pick the source of the "
-            "grid extents (from the projection, from the open cubes <default>, or manually "
-            "entered.)"
+            "grid extents from the map file, from the open cubes <default>, or manually "
+            "entered."
         "</li>"
-        "<li>The 'Auto Apply' checkbox allows you to see real time updates in the "
-            "grid when you change the parameters."
+        "<li>The 'Auto Apply' checkbox, inside the 'Grid Options' dialog box, allows you to see "
+            "real time updates in the grid when you change the parameters."
         "</li>"
         "<li> Depending on the projection, the grid may not behave as expected. For instance, "
             "with a polarstereographic projection, the pole will not be included in the 'Auto "
@@ -754,26 +756,26 @@ namespace Isis {
     }
 
     QLabel *overview = new QLabel("The mosaic scene displays cube footprints "
-        "to show you where your files are on a target and how they overlap. "
+        "to show where files are on a target and how they overlap. "
         "The scene always represents projected image space and cannot show raw "
         "or unprojected images; images will be projected on the fly."
         "<h3>Tools</h3>"
-            "<p>You can interact with the mosaic scene in different ways using "
+            "<p>Interact with the mosaic scene in different ways using "
             "the tools. The tools are usually in a toolbar next to the scene. "
             "The tools define what is displayed and what happens when you "
-            "click in the mosaic scene. The tools include:</p>"
+            "click in the mosaic scene. The tools include</p>"
               "<ul><li>Select Tool</li>"
               "<li>Zoom Tool</li>"
               "<li>Pan Tool</li>"
               "<li>Control Network Tool</li>"
               "<li>Show Area Tool</li>"
-              "<li>Find Tool</li></ul>"
+              "<li>Find Tool</li>"
+              "<li>Grid Tool</li></ul>"
         "<h3>Context Menus</h3>"
-            "You can right click on anything in the mosaic scene and be given "
-            "options relevant to what you clicked on. Some typical actions are "
-            "changing which cubes are displayed on top of other cubes and the "
-            "color of a cube. The right click menus only affect the item you "
-            "clicked on, not what was selected.");
+            "Right click on anything in the mosaic scene and a context menu will pop up showing "
+            "a list of actions or information relevant to the item you clicked on. "
+            "<p>Note:  The context menu is not associated with any selection, only the item "
+            "clicked on.</p>");
     overview->setWordWrap(true);
     longHelpLayout->addWidget(overview);
 
@@ -880,7 +882,8 @@ namespace Isis {
 
     QLabel *editingMapFileOverview = new QLabel(tr(
         "<h3>Editing a Map File</h3>"
-        "Editing a map file is possible through the dialog box displayed by %1. The edits are "
+        "Editing a map file is possible through the dialog box displayed by clicking on the "
+        "'View/Edit/Load Map File' icon/button. The edits are "
         "applied to the current session and will be included with a 'Saved Project' (refer to "
         "the help under File-Save Project or Save Project as)."));
 
@@ -963,7 +966,7 @@ namespace Isis {
     QLabel *overview = new QLabel("The mosaic world view displays cube "
         "footprints to show you where your files are on a target and their "
         "general arrangement. The world view does not have tools like "
-        "mosaic scenes do, but otherwise are very similar.");
+        "mosaic scenes, but otherwise they are very similar.");
     overview->setWordWrap(true);
     previewHelpLayout->addWidget(overview);
 

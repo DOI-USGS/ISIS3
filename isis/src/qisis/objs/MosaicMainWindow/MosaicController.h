@@ -53,6 +53,8 @@ namespace Isis {
    *   @history 2011-12-16 Steven Lambright - Applies fixes for maximum number
    *                           of open files to opening project files and fixed
    *                           progress to be more accurate. Fixes #635.
+   *   @history 2013-03-19 Steven Lambright - Added option for changing default file list
+   *                           columns in the settings menu.
    */
 
   class MosaicController : public QObject {
@@ -104,6 +106,7 @@ namespace Isis {
       void defaultFillChanged(bool);
       void loadFinished();
       void saveList();
+      void setDefaultFileListCols();
       void setSmallNumberOfOpenCubes(bool useSmallNumber);
 
     private:

@@ -23,7 +23,15 @@ def main():
     activateItem(waitForObjectItem(":qmos.View_QMenu", "Show Phase Angle Column"))
     setWindowState(waitForObject(":qmos_Isis::MosaicMainWindow"), WindowState.Normal)
     test.vp("Phase Angle Value")
+    
+    # Verify load project->cancel doesn't affect anything
+    activateItem(waitForObjectItem(":qmos_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":_QMenu", "Load Project..."))
+    clickButton(waitForObject(":Load Project.Cancel_QPushButton"))
+    test.vp("Phase Angle Value")
+    
     sendEvent("QCloseEvent", waitForObject(":qmos_Isis::MosaicMainWindow"))
+
                                                                            
     snooze(1)                             
     # Restore original qmos settings                                                                   

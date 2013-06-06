@@ -41,6 +41,9 @@ namespace Isis {
    *                           file lists. This is now corrected so that it'll
    *                           remember the path to the file list instead of the
    *                           path to the files in the file list. Fixes #848.
+   *   @history 2013-03-19 Steven Lambright - Fixed a problem where Open Project would
+   *                           close the current project, even if cancelled. Also removed
+   *                           the closed project state. Fixes #998.
    */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT

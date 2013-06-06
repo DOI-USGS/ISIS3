@@ -156,6 +156,13 @@ namespace Isis {
             this, SLOT(setSmallNumberOfOpenCubes(bool)));
     settingsActs.append(setSmallOpenCubeCount);
 
+    QAction *setFileListCols = new QAction("Set Current File List &Columns as Default", this);
+    setFileListCols->setWhatsThis(tr("Use the currently visible columns in the file list as the "
+          "default when no project has been opened"));
+    connect(setFileListCols, SIGNAL(triggered(bool)),
+            this, SLOT(setDefaultFileListCols()));
+    settingsActs.append(setFileListCols);
+
     QAction *setAlpha = new QAction("Set Default &Transparency", this);
     connect(setAlpha, SIGNAL(triggered(bool)),
             this, SLOT(changeDefaultAlpha()));
@@ -499,6 +506,13 @@ namespace Isis {
     CubeDisplayProperties *cube;
     foreach(cube, p_cubes) {
       file.PutLine( cube->fileName() );
+    }
+  }
+  
+  
+  void MosaicController::setDefaultFileListCols() {
+    if (p_fileList) {
+      p_fileList->setDefaultFileListCols();
     }
   }
 
