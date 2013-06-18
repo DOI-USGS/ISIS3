@@ -1,5 +1,6 @@
 #include "QnetNavTool.h"
 
+#include <QAction>
 #include <QApplication>
 #include <QComboBox>
 #include <QDialog>
@@ -513,7 +514,7 @@ namespace Isis {
       disconnect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(load(QListWidgetItem *)));
       connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(editPoint(QListWidgetItem *)));
+          this, SLOT(editPoint(QListWidgetItem *)), Qt::UniqueConnection);
       //m_listBox->setSelectionMode(QAbstractItemView::SingleSelection);
       for (int i = 0; i < controlNet()->GetNumPoints(); i++) {
         QString cNetId = (*controlNet())[i]->GetId();
@@ -534,7 +535,7 @@ namespace Isis {
       disconnect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(editPoint(QListWidgetItem *)));
       connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(load(QListWidgetItem *)));
+          this, SLOT(load(QListWidgetItem *)), Qt::UniqueConnection);
       //m_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
       for (int i = 0; i < serialNumberList()->Size(); i++) {
         FileName filename = FileName(serialNumberList()->FileName(i));

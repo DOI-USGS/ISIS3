@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 
+#include <QDebug>
 #include <QRadioButton>
 #include <QPushButton>
 #include <QButtonGroup>
@@ -116,13 +117,17 @@ namespace Isis {
 
   // Return the attributes in the dialog
   QString GuiInputAttribute::GetAttributes() {
+    QString attStr("");
     if(p_lineEdit->isEnabled()) {
-      return FileName(p_lineEdit->text()).attributes();
+      attStr = p_lineEdit->text().simplified();
+      attStr = attStr.remove(QRegExp("^[+]*"));
+      if (attStr.length() > 0) {
+        if (attStr.left(1) != "+") attStr.prepend('+');
+      }
     }
-    else {
-      return QString("");
-    }
+    return attStr;
   }
+
 
   // Set the attributes in the dialog
   void GuiInputAttribute::SetAttributes(const QString &value) {

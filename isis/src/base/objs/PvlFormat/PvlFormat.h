@@ -117,6 +117,9 @@ namespace Isis {
    *           to be quoted properly
    *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
    *                          names up to the current Isis 3 coding standards. Fixes #1533.
+   *  @history 2013-06-03 Tracie Sucharski and Jeannie Backer - Fixed the addQuotes method to
+   *                          better handle multi-dimensional arrays vs equations with multiple
+   *                          sets of parens.  Fixes #569.
    */
   class PvlFormat {
 

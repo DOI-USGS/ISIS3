@@ -845,10 +845,19 @@ namespace Isis {
       // we failed to indexOf a space or a comma in our limit,
       //   use a hyphen (-)
       else {
-        os << remainingText.mid(0, charsLeft - 1);
-        os << "-";
-        remainingText = remainingText.mid(charsLeft - 1);
-        printedSoFar += charsLeft - 1;
+        // Make sure we don't break on "//" since Isis thinks that is a comment
+        if (remainingText.mid(charsLeft-1, 2) == "//") {
+          os << remainingText.mid(0, charsLeft - 2);
+          os << "-";
+          remainingText = remainingText.mid(charsLeft - 2);
+          printedSoFar += charsLeft - 2;
+        }
+        else {
+          os << remainingText.mid(0, charsLeft - 1);
+          os << "-";
+          remainingText = remainingText.mid(charsLeft - 1);
+          printedSoFar += charsLeft - 1;
+        }
       }
 
       // we wrote as much as possible, do a newline and repeat

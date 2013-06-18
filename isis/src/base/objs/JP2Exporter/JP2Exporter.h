@@ -42,6 +42,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-04-04 Travis Addair - Added documentation.
+   *   @history 2013-06-05 Jeannie Backer - Removed "get" prefix from ImageExporter method calls.
+   *                           References #1380.
    *
    */
   class JP2Exporter : public StreamExporter {

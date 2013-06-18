@@ -21,16 +21,17 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Process.h"
 
+#include <fstream>
 #include <iostream>
 #include <string>
-#include <fstream>
-#include "Process.h"
+
 #include "Buffer.h"
 #include "BufferManager.h"
-#include "SpecialPixel.h"
 #include "Endian.h"
 #include "EndianSwapper.h"
+#include "SpecialPixel.h"
 #include "Stretch.h"
 
 namespace Isis {
@@ -96,7 +97,10 @@ namespace Isis {
    *  @history 2010-02-24 Janet Barrett - Added code to support JPEG2000
    *  @history 2012-10-04 Jeannie Backer - Added documentation and fixed
    *                          indentation of history entries. No mantis ticket.
-   *  
+   *   @history 2013-06-05 Jeannie Backer - Replaced redundant code in
+   *                           InitProcess() with accessor methods for
+   *                           OutputNull(), et al. Changed local variable names
+   *                           in ProcessCubes for clarity. References #1380.
    *  
    *  
    *  @todo 2005-02-09 Stuart Sides - write documentation for CreateWorldFile
@@ -163,25 +167,32 @@ namespace Isis {
 
 
       template <typename Functor> void ProcessCubes(const Functor & functor) {
-        int length = (p_format == BIP) ?
-          InputCubes[0]->bandCount() : InputCubes[0]->lineCount();
 
         int samples = InputCubes[0]->sampleCount();
+        int length = 0;
+        if (p_format == BIP) {
+          length = InputCubes[0]->bandCount();
+        }
+        else {
+          length = InputCubes[0]->lineCount();
+        }
 
         // Loop and let the app programmer fiddle with the lines
         std::vector<BufferManager *> imgrs = GetBuffers();
         for (int k = 1; k <= length; k++) {
           std::vector<Buffer *> ibufs;
 
-          for (unsigned int j = 0; j < InputCubes.size(); j++) {
-            // Read a line of data
-            InputCubes[j]->read(*imgrs[j]);
+          for (unsigned int cubeIndex = 0; cubeIndex < InputCubes.size(); cubeIndex++) {
+            // Read a line of data from this cube
+            InputCubes[cubeIndex]->read(*imgrs[cubeIndex]);
 
             // Stretch the pixels into the desired range
-            for (int i = 0; i < samples; i++)
-              (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
+            for (int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
+              (*imgrs[cubeIndex])[sampleIndex] = 
+                  p_str[cubeIndex]->Map((*imgrs[cubeIndex])[sampleIndex]);
+            }
 
-            ibufs.push_back(imgrs[j]);
+            ibufs.push_back(imgrs[cubeIndex]);
           }
 
           // Invoke the user function
@@ -227,17 +238,26 @@ namespace Isis {
                                          range of pixel values in the output 
                                          data**/
 
-      double p_Null; //!< Holds the output NULL value
-      double p_Lis;  //!< Holds the output LIS value
-      double p_Lrs;  //!< Holds the output LRS value
-      double p_His;  //!< Holds the output HIS value
-      double p_Hrs;  //!< Holds the output HRS value
+      double p_Null; /**< The output value for pixels whose input DNs are Null values.*/
+      double p_Lis;  /**< The output value for pixels whose input DNs are 
+                          Low Instrument Saturation values.*/
+      double p_Lrs;  /**< The output value for pixels whose input DNs are 
+                          Low Representation Saturation values.*/
+      double p_His;  /**< The output value for pixels whose input DNs are 
+                          High Instrument Saturation values.*/
+      double p_Hrs;  /**< The output value for pixels whose input DNs are 
+                          High Representation Saturation values.*/
 
-      bool p_Null_Set; //!< Indicates if p_Null has been set or not
-      bool p_Lis_Set;  //!< Indicates if p_Lis has been set or not
-      bool p_Lrs_Set;  //!< Indicates if p_Lrs has been set or not
-      bool p_His_Set;  //!< Indicates if p_His has been set or not
-      bool p_Hrs_Set;  //!< Indicates if p_Hrs has been set or not
+      bool p_Null_Set; /**< Indicates whether p_Null has been set 
+                            (i.e. if setNull() has been called).*/
+      bool p_Lis_Set;  /**< Indicates whether p_Lis has been set 
+                            (i.e. if setLis() has been called).*/
+      bool p_Lrs_Set;  /**< Indicates whether p_Lrs has been set 
+                            (i.e. if setLrs() has been called).*/
+      bool p_His_Set;  /**< Indicates whether p_His has been set 
+                            (i.e. if setHis() has been called).*/
+      bool p_Hrs_Set;  /**< Indicates whether p_Hrs has been set 
+                            (i.e. if setHrs() has been called).*/
 
     private:
       //!Method for writing 8-bit unsigned pixel data to a file stream

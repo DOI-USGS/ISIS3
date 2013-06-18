@@ -8,3 +8,5 @@ commands:
 	  to=$(OUTPUT)/${FILE}.uv.odd.cal.cub > /dev/null;
 	$(APPNAME) from=$(INPUT)/${FILE}.uv.even.cub \
           to=$(OUTPUT)/${FILE}.uv.even.cal.cub > /dev/null;
+	$(APPNAME) from=$(INPUT)/${FILE}.uv.even.cub+2 \
+          to=$(OUTPUT)/${FILE}.uv.even.cal.band2.cub > /dev/null;

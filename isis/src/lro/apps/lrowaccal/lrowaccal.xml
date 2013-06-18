@@ -14,7 +14,7 @@
     </p>
 
     <p>
-      Correction is applied in the following order: <b>Dark</b>, <b>Flat-field</b>, <b>Radiometric</b>, <b>Special pixel mask</b>
+      Correction is applied in the following order: <b>Dark</b>, <b>Flat-field</b>, <b>Radiometric</b>, <b>Special pixel mask</b>, <b>Temprature</b>
     </p>
 
     <h3>Dark Correction:</h3>
@@ -118,12 +118,33 @@
     <h3>Special Pixel Mask:</h3>
     <p>
       <pre>
-      for each framelet in output cube
+      for each framelet in the output cube
         if specialPixelMask[pixel] is special
           outputFramelet[pixel] = specialPixelMask[pixel]
       </pre>
 
       If SpecialPixelsFile is not set, special pixel mask is loaded from $lro/calibration/wac_masks/WAC_&lt;wac mode&gt;_&lt;temp&gt;C_SpecialPixels.????.cub. temp is closest temperature to WAC MiddleTemperatureFpa.
+    </p>
+    <h3>Temperature Correction:</h3>
+    <p>
+      <pre>
+        for each framlet in the output cube
+          if output[pixel] is special- leave it alone
+          else preform the correction
+        </pre>
+        Correction:
+        <pre>
+
+                inputPixel
+            --------------------
+             a*(frameTemp) + b
+
+             Where: 
+               'a' and 'b' are band dependant constants, read in from a file.
+             AND
+               frameTemp = (WAC EndTemperatureFpa - WAC BeginTemperatureFpa)/WAC NumFramelets * frame + WAC BeginTemperatureFpa
+      </pre>
+      If TempratureFile is not set, the constants are loaded from $lro/calibration/WAC_TempratureConstants.????.pvl
     </p>
   </description>
 
@@ -149,6 +170,13 @@
     <change name="Adam Licht" date="2012-12-18">
       Fixed an error which would apply band 1 corrections to a
       single passed in band, even if that band was not band 1. 
+    </change>
+    <change name="Adam Licht" date="2013-04-16">
+      Implemented a temprature based correction to lrowaccal.
+      This correction require constants which are read from a 
+      pvl file. A file other than the default can be passed in
+      via an argument. The Correction may also be turned off via
+      an argument.
     </change>
   </history>
 
@@ -189,9 +217,10 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-        Calibrate using the average dark pixels.
+          Calibrate using a dark file.
         </brief>
         <description>
+          Calibrate using a dark file.
         </description>
         <inclusions><item>DarkFile</item></inclusions>
       </parameter>
@@ -200,9 +229,11 @@
         <type>filename</type>
         <default><item>Default</item></default>
         <brief>
-        Calibrate using the average dark pixels.
+          Dark file used for calibration.
         </brief>
         <description>
+          Dark file used for calibration. The default is to use the system defined dark file with
+          the highest version number.
         </description>
       </parameter>
     </group>
@@ -212,9 +243,10 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-        Calibrate using the flatfield.
+          Calibrate using a flatfield file.
         </brief>
         <description>
+          Calibrate using a flatfield file.
         </description>
         <inclusions><item>FlatfieldFile</item></inclusions>
       </parameter>
@@ -223,9 +255,11 @@
         <type>filename</type>
         <default><item>Default</item></default>
         <brief>
-        Calibrate using the average dark pixels.
+          Flatfield file used for calibration.
         </brief>
         <description>
+          Flatfield file used for calibration. The default is to use the system defined dark file with
+          the highest version number.
         </description>
       </parameter>
     </group>
@@ -235,9 +269,10 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-        Calibrate using radiometric calibration.
+          Do radiometric calibration.
         </brief>
         <description>
+          Do radiometric calibration.
         </description>
         <inclusions>
           <item>RadiometricType</item>
@@ -248,9 +283,10 @@
       <parameter name="RadiometricType">
         <type>string</type>
         <brief>
-        Which radiance correction?
+          Calibrated output cube units.
         </brief>
         <description>
+          Calibrated output cube units. I/F or radiance.
         </description>
         <default><item>IOF</item></default>
         <list>
@@ -271,13 +307,15 @@
         <type>filename</type>
         <default><item>Default</item></default>
         <brief>
+          Radiometric constants file used for calibration.
         </brief>
         <description>
+          Radiometric constants file used for calibration.
         </description>
       </parameter>
     </group>
     
-        <group name="Special Pixels Options">
+    <group name="Special Pixels Options">
       <parameter name="SpecialPixels">
         <type>boolean</type>
         <default><item>True</item></default>
@@ -297,6 +335,31 @@
         </description>
       </parameter>
     </group>
-    
+
+    <group name="Temperature Options">
+      <parameter name="Temperature">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Calibrate using temperature a gain and offset.
+        </brief>
+        <description>
+          Calibrate using temperature a gain and offset.
+        </description>
+        <inclusions><item>TemperatureFile</item></inclusions>
+      </parameter>
+      <parameter name="TemperatureFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+          Temperature gain and offset file.
+        </brief>
+        <description>
+          Temperature gain and offset file. The default is to use the system defined temperature gain and offset file with
+          the highest version number.
+        </description>
+      </parameter>
+    </group>
+   
   </groups>
 </application>

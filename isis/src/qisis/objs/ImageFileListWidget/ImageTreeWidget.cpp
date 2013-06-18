@@ -3,10 +3,12 @@
 #include <algorithm>
 
 #include <QAction>
+#include <QApplication>
 #include <QDebug>
 #include <QDropEvent>
 #include <QMenu>
 #include <QProgressBar>
+#include <QSettings>
 #include <QScrollBar>
 #include <QTime>
 
@@ -53,6 +55,29 @@ namespace Isis {
     hideColumn(ImageTreeWidgetItem::NorthAzimuthColumn);
     hideColumn(ImageTreeWidgetItem::BlankColumn);
 
+    // Read and apply default visibilities from config, if different than defaults
+    QSettings settings(
+        FileName(QString("$HOME/.Isis/%1/fileList.config").arg(QApplication::applicationName()))
+          .expanded(),
+        QSettings::NativeFormat);
+    settings.beginGroup("ColumnsVisible");
+
+    col = ImageTreeWidgetItem::FootprintColumn;
+    while(col < ImageTreeWidgetItem::BlankColumn) {
+      bool visible = !isColumnHidden(col);
+
+      if (settings.value(QString("%1Visible").arg(ImageTreeWidgetItem::treeColumnToString(col)),
+                         visible).toBool() != visible) {
+        if (visible)
+          hideColumn(col);
+        else
+          showColumn(col);
+      }
+
+      col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
+    }
+    settings.endGroup();
+
     setContextMenuPolicy(Qt::DefaultContextMenu);
 
     setSortingEnabled(true);
@@ -82,6 +107,22 @@ namespace Isis {
     foreach(contextAction, actions()) {
       removeAction(contextAction);
     }
+  }
+
+
+  QList<QAction *> ImageTreeWidget::actions() {
+
+    QList<QAction *> results;
+    if (!m_setFileListColsAct) {
+      m_setFileListColsAct = new QAction("Set Current File List &Columns as Default", this);
+      m_setFileListColsAct->setWhatsThis(tr("Use the currently visible columns in the file list as "
+            "the default when no project has been opened"));
+      connect(m_setFileListColsAct, SIGNAL(triggered(bool)),
+              this, SLOT(setDefaultFileListCols()));
+    }
+    results.append(m_setFileListColsAct);
+
+    return results;
   }
 
 
@@ -227,6 +268,33 @@ namespace Isis {
         viewActIndex ++;
       }
     }
+  }
+
+
+  /** 
+   *  
+   */  
+  void ImageTreeWidget::setDefaultFileListCols() {
+    QSettings settings(
+        FileName(
+          QString("$HOME/.Isis/%1/fileList.config").arg(QApplication::applicationName()))
+          .expanded(),
+        QSettings::NativeFormat);
+    settings.beginGroup("ColumnsVisible");
+
+    ImageTreeWidgetItem::TreeColumn col =
+        ImageTreeWidgetItem::FootprintColumn;
+
+    while(col < ImageTreeWidgetItem::BlankColumn) {
+      bool visible = !isColumnHidden(col);
+
+      settings.setValue(QString("%1Visible").arg(ImageTreeWidgetItem::treeColumnToString(col)),
+                        visible);
+
+      col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
+    }
+
+    settings.endGroup();
   }
 
 

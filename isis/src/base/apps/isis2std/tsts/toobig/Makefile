@@ -11,5 +11,4 @@ commands:
 	   >& $(OUTPUT)/error.txt` ]; \
 	then \
 	  true; \
-	fi; \
-
+	fi;

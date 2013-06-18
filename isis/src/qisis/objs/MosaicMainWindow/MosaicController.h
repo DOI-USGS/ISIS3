@@ -60,6 +60,8 @@ namespace Isis {
    *                           progress to be more accurate. Fixes #635.
    *   @history 2012-09-17 Steven Lambright - Added compatibility with old versions of project
    *                           files, updated to use changed mosaic scene widget constructor.
+   *   @history 2013-03-19 Steven Lambright - Added option for changing default file list
+   *                           columns in the settings menu.
    */
 
   class MosaicController : public QObject {

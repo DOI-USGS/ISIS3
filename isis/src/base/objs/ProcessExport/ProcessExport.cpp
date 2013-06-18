@@ -709,11 +709,11 @@ namespace Isis {
         }
       }
 
-      p_str[i]->SetNull(p_Null_Set ? p_Null : p_outputMinimum);
-      p_str[i]->SetLis(p_Lis_Set ? p_Lis : p_outputMinimum);
-      p_str[i]->SetLrs(p_Lrs_Set ? p_Lrs : p_outputMinimum);
-      p_str[i]->SetHis(p_His_Set ? p_His : p_outputMaximum);
-      p_str[i]->SetHrs(p_Hrs_Set ? p_Hrs : p_outputMaximum);
+      p_str[i]->SetNull(OutputNull());
+      p_str[i]->SetLis(OutputLis());
+      p_str[i]->SetLrs(OutputLrs());
+      p_str[i]->SetHis(OutputHis());
+      p_str[i]->SetHrs(OutputHrs());
     }
 
     p_progress->CheckStatus();

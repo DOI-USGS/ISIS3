@@ -7,50 +7,20 @@
 
   <description>
     <p>
-      <strong>lronacecho</strong> removes an echo effect from LRO NAC images. The user will need to
-      supply an input and an output file.
+      <b>lronacecho</b> implements a correction designed to remove an echo effect from LROC NAC images.
+      In the summer of 2011, an echo effect was discovered in the NAC detectors. The signal in each pixel is replicated to a smaller extent in the pixel on the same line 2 columns over, 1 collumn in summed NACs. MSSS was consulted and it was confirmed this is a detector effect related to the high speed (>3000 lines/second) of the NAC detectors. The even and odd columns of the detector have separate signal processing chains, so when one pixel is read out, the next pixel with the same signal processing chain is two columns over. There is no measurable effect 4 columns over; the echo has no echo. 
     </p>
     <p>
-      In the summer of 2011, an echo effect was discovered in the NAC detectors. The signal in each
-      pixel is replicated to a smaller extent in the pixel on the same line 2 columns over. MSSS was
-      consulted and it was confirmed this is a detector effect related to the high speed
-      (>3000 lines/second) of the NAC detectors. The even and odd columns of the detector have
-      separate signal processing chains, so when one pixel is read out, the next pixel with the same
-      signal processing chain is two columns over. There is no measurable effect 4 columns over; the
-      echo has no echo. 
+      The size of the echo effect was determined by analyzing the signal at the edge the detector mask on each side of many NAC images, and by analyzing images with stars that had well-defined ghosts offset by two pixels. The effect is large enough that an inverse technique is needed to correct it with sufficient accuracy. The analysis determined that the echo is a larger percent of the signal for signals less than 100 DN. However, the correction uses a fixed fraction equal to  <image src="assets/images/delta_value.png"/>  for all pixels of all images. This value was derived from many flight images and is optimized for signals greater than 100 DN. Using a larger echo fraction for lower DN values would degrade the signal-to-noise too much. To reduce any artifacts in the begining of the image, the <i>SMOOTHINGROWS</i> parameter is used to specify the number of visible samples, before the full <image src="assets/images/delta.png"/> constant is applied. This fractional delta constant is calculated by the function: <image src="assets/images/smooth_delta.png"/> for NACLs, with the offset being from 5064 rather than 0 in the NACR.
     </p>
     <p>
-      The size of the echo effect was determined by analyzing the signal at the edge the detector
-      mask on each side of many NAC images, and by analyzing images with stars that had well-defined
-      ghosts offset by two pixels. The effect is large enough that an inverse technique is needed to
-      correct it with sufficient accuracy. The analysis determined that the echo is a larger percent
-      of the signal for signals less than 100 DN. However, the correction uses a fixed fraction
-      equal to <image src="assets/images/delta_value.png"/> for all pixels of all images. This value
-      was derived from many flight images and is optimized for signals greater than 100 DN. Using a
-      larger echo fraction for lower DN values would degrade the signal-to-noise too much. 
-    </p>
-    <p>
-      A brute force inverse technique derived from simple substitution was used early in the
-      development of the echo correction. Let <image src="assets/images/a_i.png"/> be the NAC-L
-      ideal signal in column i of a line without the echo effect, and
-      <image src="assets/images/signal_w_echo.png"/> the actual signal including the echo effect.
-      Consider an ideal case where the detector response is linear and uniform and we ignore the
-      other calibration corrections. Then 
+      A brute force inverse technique derived from simple substitution was used early in the development of the echo correction. Let <image src="assets/images/a_i.png"/> be the NAC-L ideal signal in column i of a line without the echo effect, and <image src="signal_w_echo.png"/> the actual signal including the echo effect. Consider an ideal case where the detector response is linear and uniform and we ignore the other calibration corrections. Then 
     </p>
     <div style="margin:5px; margin-left:30px;">
       <image src="assets/images/brute_force_inverse.png"/> 
     </div>
     <p>
-      So, we have the line of the actual image <image src="assets/images/b_i.png"/>, which includes
-      the echo, and we want to recover the ideal image line <image src="assets/images/a_i.png"/>
-      without the echo. To avoid confusion, let's call this new calculated value
-      <image src="assets/images/c_i.png"/> where <image src="assets/images/c_i.png"/> is an
-      approximation of the original <image src="assets/images/a_i.png"/> dependent on the accuracy
-      of <image src="assets/images/delta.png"/>. It's trivial for line 0. Then, for line 2 we just
-      substitute the solution from line 0 for <image src="assets/images/c_0.png"/> and solve for
-      <image src="assets/images/c_2.png"/>. Likewise, for line 4 substitute for
-      <image src="assets/images/c_2.png"/> using line 2 and solve for
-      <image src="assets/images/c_4.png"/>, etc. The result is 
+      So, we have the line of the actual image <image src="assets/images/b_i.png"/>, which includes the echo, and we want to recover the ideal image line <image src="assets/images/a_i.png"/> without the echo. To avoid confusion, let's call this new calculated value <image src="assets/images/c_i.png"/> where <image src="assets/images/c_i.png"/> is an approximation of the original <image src="assets/images/a_i.png"/> dependent on the accuracy of <image src="assets/images/delta.png"/>. It's trivial for line 0. Then, for line 2 we just substitute the solution from line 0 for  <image src="assets/images/c_0.png"/> and solve for <image src="assets/images/c_2.png"/>. Likewise, for line 4 substitute for <image src="assets/images/c_2.png"/> using line 2 and solve for <image src="assets/images/c_4.png"/>, etc. The result is 
     </p>
     <div style="margin:5px; margin-left:30px;">
       <image src="assets/images/correction_brute_force.png"/> 
@@ -60,17 +30,13 @@
     </p>
     <div style="margin:5px; margin-left:30px;">
        <image src="assets/images/correction_easy_method.png"/> 
-   </div>
+    </div>
     <p>
-      So we can calculate the new correction factors from the previously corrected pixels
-      (the <image src="assets/images/c_i.png"/> ); there is no need to calculate each fractional
-      "echo" factor from the original image (the  <image src="assets/images/b_i.png"/> ). 
+      So we can calculate the new correction factors from the previously corrected pixels (the <image src="assets/images/c_i.png"/> ); there is no need to calculate each fractional "echo" factor from the original image (the  <image src="assets/images/b_i.png"/> ). 
     </p>
-    At the end of the echo correction, the entire image is scaled by a factor of
-    <image src="assets/images/delta_plus_1.png"/> to maintain the radiometric calibration.
+    At the end of the echo correction, the entire image is scaled by a factor of <image src="assets/images/delta_plus_1.png"/> to maintain the radiometric calibration.
     <p>
-      In practice it has proven most successful to apply the echo correction after the flat field
-      correction.<br/>
+      In practice it has proven most successful to apply the echo correction after the flat field correction.<br/>
       The effect of the echo correction on the flat field is not significant. 
     </p>
   </description>
@@ -84,8 +50,11 @@
       Added Documentation.
     </change>
     <change name="Adam Licht" date="2013-01-25">
-      Updated algorithm to normalize the output cub after preforming the correction, to preserve
-      radiometric calibration.
+      Updated algorithm to normalize the output cub after preforming the correction, to preserve radiometric calibration.
+    </change>
+    <change name="Adam Licht" date="2013-04-05">
+      Added a new parameter "SMOOTHINGROWS". This specifies the number of samples to slowly ramp up the constant in.
+      Fixed how special pixels were handeled in the normalization step.
     </change>
   </history>
 
@@ -139,6 +108,21 @@
           This defines the multiplicative constant for the echo factor
         </description>
       </parameter>
+
+      <parameter name="SMOOTHINGROWS">
+        <type>integer</type>
+        <default>
+          <item>20</item>
+        </default>
+        <brief> Number of rows <i>in detector space</i> to slowly increase the delta constant on</brief>
+        <description>
+          This defines the number of <i>detector samples</i> in the begining of an image before the full correction is reached.
+          Note that in summed images, this number of rows will be divided by two when translated to visible image space.
+          That is:
+            In native images, this parameter's default of 20 detector samples will affect the first 20 visible rows in image space.
+            For summed images, this paramter's default of 20 detector samples will affect the first 10 visible rows in image space.
+        </description>
+      </parameter>
     </group>
   </groups>
 
@@ -174,8 +158,8 @@
         <image width="500" height="500" src="assets/images/example1_input.jpg">
           <brief>Input image nacl00020d3a.cal.cub</brief>
           <description>
-            This is a sub-area calibrated LRO NACL image. The
-            features are slightly blurred due to the echo effect.
+            This is a small area of the input to lronacecho, a calibrated LRO NACL image. The
+            features are slightly blurred due to an echo effect.
           </description>
           <thumbnail width="200" height="200" caption="Input image nacl00020d3a.cal.cub"
                      src="assets/thumbs/example1_input.jpg" />
@@ -185,7 +169,7 @@
         <image width="500" height="500" src="assets/images/example1_output.jpg">
           <brief>Output image nacl00020d3a.cal.echo.cub</brief>
           <description>
-            This is a sub-area of the calibrated LRO NACL image with
+            This is a small area of the output to lronacecho, a calibrated LRO NACL image with
             echo effects removed. The blurring from the echo effect has been removed.
           </description>
           <thumbnail width="200" height="200" caption="Output image nacl00020d3a.cal.echo.cub"
@@ -204,4 +188,3 @@
     </example>
   </examples>
 </application>
-

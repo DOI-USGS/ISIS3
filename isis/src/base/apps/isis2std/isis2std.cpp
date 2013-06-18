@@ -6,6 +6,7 @@
 #include "UserInterface.h"
 
 using namespace Isis;
+using namespace std;
 
 
 int addChannel(ExportDescription &desc, QString param, QString mode);
@@ -20,12 +21,15 @@ void IsisMain() {
   ImageExporter *exporter = ImageExporter::fromFormat(format);
 
   ExportDescription desc;
-  if (ui.GetString("BITTYPE") == "8BIT")
+  if (ui.GetString("BITTYPE") == "8BIT") {
     desc.setPixelType(UnsignedByte);
-  else if (ui.GetString("BITTYPE") == "S16BIT")
-    desc.setPixelType(SignedWord);
-  else if (ui.GetString("BITTYPE") == "U16BIT")
+  }
+  else if (ui.GetString("BITTYPE") == "U16BIT") {
     desc.setPixelType(UnsignedWord);
+  }
+  else { //if (ui.GetString("BITTYPE") == "S16BIT")
+    desc.setPixelType(SignedWord);
+  }
 
   int redIndex = -1;
   int greenIndex = -1;
@@ -42,10 +46,11 @@ void IsisMain() {
     greenIndex = addChannel(desc, "GREEN", mode);
     blueIndex = addChannel(desc, "BLUE", mode);
 
-    if (mode == "RGBA") {
+    if (mode == "ARGB") {
       alphaIndex = addChannel(desc, "ALPHA", mode);
       exporter->setRgba(desc);
     }
+
     else {
       exporter->setRgb(desc);
     }
@@ -59,16 +64,16 @@ void IsisMain() {
     ui.Clear("MINIMUM");
     ui.Clear("MAXIMUM");
 
-    ui.PutDouble("RMIN", exporter->getInputMinimum(redIndex));
-    ui.PutDouble("RMAX", exporter->getInputMaximum(redIndex));
-    ui.PutDouble("GMIN", exporter->getInputMinimum(greenIndex));
-    ui.PutDouble("GMAX", exporter->getInputMaximum(greenIndex));
-    ui.PutDouble("BMIN", exporter->getInputMinimum(blueIndex));
-    ui.PutDouble("BMAX", exporter->getInputMaximum(blueIndex));
+    ui.PutDouble("RMIN", exporter->inputMinimum(redIndex));
+    ui.PutDouble("RMAX", exporter->inputMaximum(redIndex));
+    ui.PutDouble("GMIN", exporter->inputMinimum(greenIndex));
+    ui.PutDouble("GMAX", exporter->inputMaximum(greenIndex));
+    ui.PutDouble("BMIN", exporter->inputMinimum(blueIndex));
+    ui.PutDouble("BMAX", exporter->inputMaximum(blueIndex));
 
     if (mode == "ARGB") {
-      ui.PutDouble("AMIN", exporter->getInputMinimum(alphaIndex));
-      ui.PutDouble("AMAX", exporter->getInputMaximum(alphaIndex));
+      ui.PutDouble("AMIN", exporter->inputMinimum(alphaIndex));
+      ui.PutDouble("AMAX", exporter->inputMaximum(alphaIndex));
     }
   }
 
@@ -117,9 +122,7 @@ int addChannel(ExportDescription &desc, QString param, QString mode) {
 void addResults(PvlGroup &results, ImageExporter *exporter,
     QString channel, int index) {
 
-  results += PvlKeyword(
-      channel + "InputMinimum", toString(exporter->getInputMinimum(index)));
-  results += PvlKeyword(
-      channel + "InputMaximum", toString(exporter->getInputMaximum(index)));
+  results += PvlKeyword(channel + "InputMinimum", toString(exporter->inputMinimum(index)));
+  results += PvlKeyword(channel + "InputMaximum", toString(exporter->inputMaximum(index)));
 }
 

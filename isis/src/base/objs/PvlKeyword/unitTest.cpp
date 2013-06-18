@@ -40,6 +40,14 @@ int main() {
     "KEYWORD = { \"VAL1\" ,",
     "KEYWORD = \"(A,B,\"",
     "KEYWORD = ',E)'",
+    "KEYWORD = ((1,2))",
+    "KEYWORD = (\"(f1+f2)\",\"/(f1-f2)\")",
+    "KEYWORD = \"(F1+F2)/(F1-F2)\"",
+    "KEYWORD = ( (1,2)  , (A,B) )",
+    "KEYWORD = \"(f1 + min(f2,f3))\"",
+    "KEYWORD = \"(min(f2,f3) + f1)\"",
+    "KEYWORD = \"min(f2,f3) + f1\"",
+    "KEYWORD = \"f1 + min(f2,f3)\"",
     "KEYWORD = (A <a>, B <b>, C, D <d>)",
     "KEYWORD = (A <a>, B <b>, C, D <d>) <e>",
     "KEYWORD = ',E) <unit>",
@@ -56,7 +64,7 @@ int main() {
     "/*           A            */\n/* B *//*C*/\nKEYWORD = SOME_VAL",
     "/*C1/**/\nKEYWORD = SOME_VAL",
     "/*C1   \n\nA\n\nC3*//*Neato*//*Man*/KEYWORD = (A,B,C) /*Right?\nYes!*/"
-  };
+    };
 
   cout << endl << endl;
   cout << "----- Testing Basic Read/Write -----" << endl;
@@ -146,6 +154,14 @@ int main() {
 
 
   try {
+
+    const Isis::PvlKeyword keyL("FROM",
+                                "/archive/projects/cassini/VIMS/UnivAZraw/tour/S60/cubes/GLO000OBMAP002//V1654449360_4.QUB");
+    PvlKeyword keyLRead;
+    stringstream streamL;
+    streamL << keyL;
+    streamL >> keyLRead;
+    cout << keyLRead << endl;
 
     const Isis::PvlKeyword keyN("THE_INTERNET",
                                 "Seven thousand eight hundred forty three million seventy four nine seventy six forty two eighty nine sixty seven thirty five million jillion bajillion google six nine four one two three four five six seven eight nine ten eleven twelve thirteen fourteen",

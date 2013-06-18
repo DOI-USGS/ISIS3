@@ -29,6 +29,10 @@
     <change name="Lynn Weller" date="2012-01-23">
       Application category name changed from Import and Export to Kaguya.  Fixes mantis ticket #951.
     </change>
+    <change name="Janet Barrett" date="2013-06-13">
+      Fixed code so that it sets the NaifFrameCode appropriately according to the base band specified
+      in the labels.  Fixes mantis tickets #1167 and #1680.
+    </change>
   </history>
 
   <category>

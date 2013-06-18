@@ -1,6 +1,7 @@
 #ifndef ImageTreeWidget_H
 #define ImageTreeWidget_H
 
+#include <QPointer>
 #include <QTreeWidget>
 
 class QProgressBar;
@@ -23,6 +24,8 @@ namespace Isis {
    *   @history 2012-09-17 Steven Lambright - Optimized for 50,000+ images. Added
    *                           m_displayPropsToTreeItemLookup (changed n/2 operation to log(n)).
    *                           Added queued selection changed (changed some n^2 operations to n).
+   *   @history 2013-03-19 Steven Lambright - Added setDefaultFileListCols() and set column
+   *                           defaults in constructor.
    *
    * Selection changes are very slow (time complexity in our code is delta-selected, but there is a
    *     very high constant that scales to the tree size - maybe an N complexity? making a total
@@ -43,6 +46,8 @@ namespace Isis {
 
       ImageTreeWidget(Directory *directory = 0, QWidget *parent = 0);
       virtual ~ImageTreeWidget();
+
+      QList<QAction *> actions();
 
       QTreeWidgetItem *addGroup(QString imageListName, QString groupName = "", int index = -1);
 
@@ -118,6 +123,7 @@ namespace Isis {
       void requestCloseSelected();
       void toggleColumnVisible();
       void updateDragAndDropability();
+      void setDefaultFileListCols();
 
     private:
       bool mosaicItemInList(QList<QTreeWidgetItem *>);
@@ -129,6 +135,7 @@ namespace Isis {
 
       Directory *m_directory;
       QList<QAction *> m_viewActs;
+      QPointer<QAction> m_setFileListColsAct;
       QMap<DisplayProperties *, ImageTreeWidgetItem *> m_displayPropsToTreeItemLookup;
       bool m_queuedSelectionChanged;
 

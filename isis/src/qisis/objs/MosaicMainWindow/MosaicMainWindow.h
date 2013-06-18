@@ -48,6 +48,9 @@ namespace Isis {
    *                           cnetsuite only. This allows movement of toolbars/appropriate
    *                           placements of other widgets (progress bar, tracking in status, etc)
    *                           for qmos (aka this class).
+   *   @history 2013-03-19 Steven Lambright - Fixed a problem where Open Project would
+   *                           close the current project, even if cancelled. Also removed
+   *                           the closed project state. Fixes #998.
    */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT

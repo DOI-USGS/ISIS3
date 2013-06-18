@@ -12,7 +12,7 @@ void IsisMain() {
   ProcessImport p;
   IString from = ui.GetFileName("FROM");
   EndianSwapper swp("MSB");
-  int nsamples = 0, nlines = 0, nbands = 1;
+  int nsamples = 0, nlines = 0, nbands = 1, noffset = 0;
 
   union {
     char readChars[4];
@@ -34,7 +34,7 @@ void IsisMain() {
    *       8          32-bit integer number of bytes per image line
    *      12          32-bit integer number of bits per image elements
    *      16          32-bit integer currently unused
-   *      20          32-bit integer currently unused
+   *      20          32-bit integer number of bytes to start of image data
    *      24          ASCII label up to 1000 characters long
    *                  The label is NUL-terminated
    *
@@ -67,8 +67,6 @@ void IsisMain() {
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  fin.close();
-
   switch(readBytes.readLong) {
     case 8:
       p.SetPixelType(Isis::UnsignedByte);
@@ -86,8 +84,20 @@ void IsisMain() {
 
   nsamples /= (readBytes.readLong / 8);
 
+  fin.read(readBytes.readChars, 4);
+  readBytes.readFloat = swp.Float(readBytes.readChars);
+
+  fin.read(readBytes.readChars, 4);
+  readBytes.readFloat = swp.Float(readBytes.readChars);
+  noffset = (int)readBytes.readLong;
+  if (noffset < 1024) {
+    noffset = 1024;
+  }
+
+  fin.close();
+
   p.SetDimensions(nsamples, nlines, nbands);
-  p.SetFileHeaderBytes(1024);
+  p.SetFileHeaderBytes(noffset);
   p.SetByteOrder(Isis::Msb);
   p.SetInputFile(ui.GetFileName("FROM"));
   p.SetOutputCube("TO");

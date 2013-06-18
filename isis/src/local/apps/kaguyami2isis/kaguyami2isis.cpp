@@ -88,11 +88,36 @@ void IsisMain() {
   //Set up the Kernels group
   PvlGroup kern("Kernels");
   if      (lab.findKeyword("INSTRUMENT_ID")[0] == "MI-VIS") {
-    kern += PvlKeyword("NaifFrameCode", toString(-131335));
+    if (lab.findKeyword("BASE_BAND")[0] == "MV1") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131331));
+    }
+    else if (lab.findKeyword("BASE_BAND")[0] == "MV2") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131332));
+    }
+    else if (lab.findKeyword("BASE_BAND")[0] == "MV3") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131333));
+    }
+    else if (lab.findKeyword("BASE_BAND")[0] == "MV4") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131334));
+    }
+    else if (lab.findKeyword("BASE_BAND")[0] == "MV5") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131335));
+    }
     kern += PvlKeyword("NaifCkCode", toString(-131330));
   }
   else if (lab.findKeyword("INSTRUMENT_ID")[0] == "MI-NIR") {
-    kern += PvlKeyword("NaifFrameCode", toString(-131341));
+    if (lab.findKeyword("BASE_BAND")[0] == "MN1") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131341));
+    }
+    else if (lab.findKeyword("BASE_BAND")[0] == "MN2") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131342));
+    }
+    else if (lab.findKeyword("BASE_BAND")[0] == "MN3") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131343));
+    }
+    else if (lab.findKeyword("BASE_BAND")[0] == "MN4") {
+      kern += PvlKeyword("NaifFrameCode", toString(-131344));
+    }
     kern += PvlKeyword("NaifCkCode", toString(-131340));
   }
 

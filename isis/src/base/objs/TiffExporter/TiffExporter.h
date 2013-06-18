@@ -25,7 +25,8 @@
  */
 
 #include "StreamExporter.h"
-#include "tiffio.h"
+
+#include <tiffio.h>
 
 namespace Isis {
   /**
@@ -46,6 +47,8 @@ namespace Isis {
    *                         files was not being set, but it was necessary to
    *                         successfully write out tiff files (TIFFTAG_ROWSPERSTRIP),
    *                         References #579.
+   *   @history 2013-06-05 Jeannie Backer - Removed "get" prefix from ImageExporter
+   *                           method calls. References #1380.
    *
    */
   class TiffExporter : public StreamExporter {

@@ -30,6 +30,9 @@ namespace Isis {
    * @author 2012-07-25 Kimberly Oyama and Steven Lambright
    *
    * @internal
+   *   @history 2013-03-19 Steven Lambright - When the mosaic scene's projection is in 180 domain,
+   *                           the longitude extent sliders will now properly range from -180 to
+   *                           180. Before they would always be 0-360.
    */
   class MosaicGridToolConfigDialog : public QDialog {
       Q_OBJECT

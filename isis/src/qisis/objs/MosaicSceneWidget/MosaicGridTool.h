@@ -45,6 +45,8 @@ namespace Isis {
    *                           resulted in freezing or an invalid grid. Fixes #1060.
    *   @history 2013-03-06 Steven Lambright - Added support for getting target radii from TargetName
    *                           if the mapping radii keywords are missing.
+   *   @history 2013-03-19 Steven Lambright - Auto grid now remembers its last setting and defaults
+   *                           to it.
    */
   class MosaicGridTool : public MosaicTool {
       Q_OBJECT
@@ -84,7 +86,7 @@ namespace Isis {
       Longitude maxLon();
       Latitude minLat();
       Longitude minLon();
-      MosaicSceneWidget* sceneWidget();
+      MosaicSceneWidget *sceneWidget();
       bool showGrid();
 
       //Mutators
@@ -102,6 +104,9 @@ namespace Isis {
       void fromPvl(const PvlObject &obj);
       QString projectPvlObjectName() const;
       PvlObject toPvl() const;
+
+      Longitude domainMinLon();
+      Longitude domainMaxLon();
 
     signals:
       void boundingRectChanged();

@@ -28,6 +28,8 @@
 
 #include <QString>
 
+#include "PixelType.h"
+
 using std::vector;
 
 namespace Isis {
@@ -36,7 +38,6 @@ namespace Isis {
   class CubeAttributeOutput;
   class ExportDescription;
   class FileName;
-  class ImageExporter;
   class ProcessExport;
 
   /**
@@ -56,6 +57,13 @@ namespace Isis {
    *   @history 2012-08-28 Steven Lambright - The world file should no longer
    *                           overwrite the output image. This is related to #832/#970.
    *                           References #579.
+   *   @history 2013-06-05 Jeannie Backer - Changed member function and variable names for
+   *                           clarity. Added ExportDescription member variable, mutator, and
+   *                           accessor. Removed "get" prefix from method names to bring class
+   *                           closer to Isis coding standards. Added accessor for extension and
+   *                           pixel type. Added pure virtual initialize() method to be called in
+   *                           the setGrayscale(), setRgb(), and setRgba() methods. References
+   *                           #1380.
    */
   class ImageExporter {
     public:
@@ -70,10 +78,10 @@ namespace Isis {
       int lines() const;
       int bands() const;
 
-      double getInputMinimum(int channel) const;
-      double getInputMaximum(int channel) const;
+      double inputMinimum(int channel) const;
+      double inputMaximum(int channel) const;
 
-      void setOutputRange(double min, double max);
+      void setOutputPixelRange(double outputPixelMinimum, double outputPixelMaximum);
 
       /**
        * Pure virtual method for setting up an export to a grayscale image.
@@ -96,17 +104,26 @@ namespace Isis {
        */
       virtual void setRgba(ExportDescription &desc) = 0; 
 
-      static ImageExporter * fromFormat(QString format);
+      static ImageExporter *fromFormat(QString format);
 
     protected:
       //! Friendly alias for a method used to write a particular color channel.
       typedef void (ImageExporter::*WriteChannels)(vector<Buffer *> &in) const;
 
-      void setExtension(QString extension);
-      Cube * setInput(ExportDescription &desc);
+      virtual void initialize(ExportDescription &desc) = 0;
 
-      ProcessExport & getProcess() const;
-      virtual int getPixel(double dn) const;
+      // member variable mutators
+      void setExtension(QString extension);
+      void setExportDescription(ExportDescription &desc);
+      Cube *initializeProcess();
+
+      // member variable accessors for child classes
+      QString extension() const;
+      ExportDescription &exportDescription() const;
+      ProcessExport &process() const;
+      PixelType pixelType() const;
+
+      virtual int outputPixelValue(double dn) const;
 
       /**
        * Pure virtual method for writing a line of grayscale data to the output
@@ -132,7 +149,7 @@ namespace Isis {
       virtual void writeRgba(vector<Buffer *> &in) const = 0;
 
     private:
-      Cube * addChannel(ExportDescription &desc, int i);
+      Cube *addChannel(int i);
       void createWorldFile(FileName outputName);
 
     private:
@@ -146,7 +163,7 @@ namespace Isis {
       QString m_extension;
 
       //! Extension to append to the output world file.
-      QString m_world;
+      QString m_worldExtension;
 
       //! Number of samples (columns) in the output image.
       int m_samples;
@@ -157,11 +174,18 @@ namespace Isis {
       //! Number of bands (channels) in the output image.
       int m_bands;
 
-      //! Input DN floor, all DNs less than this will be mapped to this.
-      double m_dataMin;
+      /**! The absolute minimum value for the output pixels. Smaller DNs will
+           be mapped to this value. */
+      double m_outputPixelMinimum;
 
-      //! Input DN ceiling, all DNs greater than this will be mapped to this.
-      double m_dataMax;
+      /**! The absolute maximum value for the output pixels. Larger DNs will 
+           be mapped to this value. */
+      double m_outputPixelMaximum;
+
+      /**! The description for the export. This includes, pixel type, number of 
+           channels, and the output values for min valid, max valid, and special 
+           pixels */
+      ExportDescription *m_exportDescription;
   };
 };
 

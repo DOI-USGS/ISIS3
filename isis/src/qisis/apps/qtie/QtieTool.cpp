@@ -424,6 +424,8 @@ namespace Isis {
    *                           button actions.
    * @history  2008-11-19 Tracie Sucharski - Only allow mouse events on
    *                           match cube.
+   * @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
+   *                          network immediately print warning and return.
    *
    */
   void QtieTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
@@ -451,7 +453,7 @@ namespace Isis {
     cvp->viewportToCube(p.x(), p.y(), samp, line);
 
     if (s == Qt::LeftButton) {
-      if (p_controlNet->GetNumMeasures() == 0) {
+      if (!p_controlNet || p_controlNet->GetNumMeasures() == 0) {
         QString message = "No points exist for editing.  Create points ";
         message += "using the right mouse button.";
         QMessageBox::information((QWidget *)parent(), "Warning", message);
@@ -472,6 +474,13 @@ namespace Isis {
       modifyPoint(point);
     }
     else if (s == Qt::MidButton) {
+      if (!p_controlNet || p_controlNet->GetNumPoints() == 0) {
+        QString message = "No points exist for deleting.  Create points ";
+        message += "using the right mouse button.";
+        QMessageBox::warning((QWidget *)parent(), "Warning", message);
+        return;
+      }
+
       //  Find closest control point in network
       ControlPoint *point =
         p_controlNet->FindClosest(sn, samp, line);

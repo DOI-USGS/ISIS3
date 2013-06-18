@@ -30,7 +30,26 @@
 
 namespace Isis {
   /**
-   * @author ????-??-?? Unknown
+   * @brief GUI interface for input cube file attributes. 
+   *  
+   * Graphical user interface for the input cube attributes 
+   * dialog. 
+   *  
+   * @ingroup ApplicationInterface
+   *
+   * @author 2003-01-01 Stuart Sides
+   *
+   * @internal
+   *  @history 2013-06-04 Stuart Sides Fixed a bug where the input
+   *           cube attributes did not propagate to the text field
+   *           after being modified in the input cube attribute
+   *           dialog.
+   */
+
+
+
+/**
+   * @author Stuart Sides
    *
    * @internal
    */

@@ -22,6 +22,9 @@
         The COLOROFFSET keyword in the output instrument group labels
         is now properly set when no color offset is used.
       </change>
+      <change name="Tracie Sucharski" date="2013-06-05">
+        Added keywords to the Archive group in labels.
+      </change>
     </history>
 
     <category>

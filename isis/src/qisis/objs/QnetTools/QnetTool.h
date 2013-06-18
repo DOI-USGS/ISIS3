@@ -4,6 +4,7 @@
 #include "Tool.h"
 #include "ControlPoint.h"
 
+#include <QCloseEvent>
 #include <QPalette>
 #include <QPointer>
 #include <QStringList>
@@ -32,11 +33,11 @@ namespace Isis {
   class ControlPointEdit;
   class Cube;
   class CubeViewport;
-  class Stretch;
   class MainWindow;
   class MdiCubeViewport;
   class QnetHoldPointDialog;
   class SerialNumberList;
+  class Stretch;
   class ToolPad;
   class UniversalGroundMap;
 
@@ -134,22 +135,22 @@ namespace Isis {
    *  
    *
    *   @history 2010-11-17 Eric Hyer - Added newControlNetwork SIGNAL
-   *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for
-   *                forwarding of SIGNAL from StretchTool to ChipViewport
+   *   @history 2010-11-22 Eric Hyer - Added stretchChipViewport SIGNAL for forwarding of SIGNAL
+   *                           from StretchTool to ChipViewport
    *   @history 2010-12-08 Eric Hyer - Template filename now shown.  Widgets
-   *                in main window now organized into groupBoxes.  Removed
-   *                Options menu and moved registration menu to main menu bar.
-   *                Added toolbar for actions also in menu.  All actions now
-   *                have icons.
+   *                           in main window now organized into groupBoxes.  Removed
+   *                           Options menu and moved registration menu to main menu bar.
+   *                           Added toolbar for actions also in menu.  All actions now
+   *                           have icons.
    *   @history 2010-12-14 Eric Hyer - Template editor is now a widget within
-   *                the main window.  Newly saved template files take effect
-   *                after saving.
+   *                           the main window.  Newly saved template files take effect
+   *                           after saving.
    *   @history 2010-12-17 Eric Hyer - Fixed bug where current template file
-   *                was not being updated with saveAs.  Moved template file
-   *                display to outside of control point groupbox.
+   *                           was not being updated with saveAs.  Moved template file
+   *                           display to outside of control point groupbox.
    *   @history 2011-06-08 Tracie Sucharski - Point types renamed:
-   *                   Ground ----> Fixed
-   *                   Tie    ----> Free
+   *                           Ground ----> Fixed
+   *                           Tie    ----> Free
    *   @history 2011-06-28 Tracie Sucharski - Added methods, "loadMeasureTable"
    *                          and "measureColumnToString".  TODO:  If these
    *                          stay in qnet, they really need cleaning up.  This
@@ -192,6 +193,15 @@ namespace Isis {
    * @history 2012-10-04 Tracie Sucharski - If the ground source serial number already exists in 
    *                          the serial number list, print error and clear out ground information.
    *                          Fixes #1018
+   * @history 2013-05-09 Tracie Sucharski - Check for user selecting all measures for deletion and 
+   *                          print warning that point will be deleted. Fixes #1491.
+   * @history 2013-05-09 Tracie Sucharski - For editing (left button) and deleting (right button), 
+   *                          Swapped checking for empty network and not allowing mouse clicks on
+   *                          the ground source. First check if there are any points in the network.
+   *                          If not print message and return.  Fixes #1493.
+   * @history 2013-05-16 Tracie Sucharski - Fixed some bugs when closing a ground source, opening 
+   *                          a new ground source, and printing errors when point does not exist
+   *                          on current ground source.  Fixes #1655.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -297,6 +307,7 @@ namespace Isis {
       void saveChips();
 
       void openGround();
+      void groundViewportClosed(CubeViewport *);
       void openDem();
       void showHideTemplateEditor();
       void saveTemplateFile();

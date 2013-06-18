@@ -33,10 +33,14 @@ namespace Isis {
    *                            references #342
    *    @history 2011-08-29 Steven Lambright - Reworded save file list export
    *                            action, references #342
-   *   @history 2011-09-27 Steven Lambright - Improved user documentation
-   *   @history 2012-06-22 Tracie Sucharski - Adapted from MosaicFileListWidget.
-   *   @history 2012-09-12 Steven Lambright - Added save/load from XML capabilities.
-   *   @history 2012-10-02 Steven Lambright - Added context menu to show/hide the various columns
+   *    @history 2011-09-27 Steven Lambright - Improved user documentation
+   *    @history 2012-06-22 Tracie Sucharski - Adapted from MosaicFileListWidget.
+   *    @history 2012-09-12 Steven Lambright - Added save/load from XML capabilities.
+   *    @history 2012-10-02 Steven Lambright - Added context menu to show/hide the various columns
+   *    @history 2013-03-19 Steven Lambright - Added setDefaultFileListCols().
+   *    @history 2013-06-17 Jeannie Backer, Tracie Sucharski, and Stuart Sides - replaced
+   *                            setDefaultFileListCols() with actions() to call
+   *                            setDefaultFileListCols() from ImageTreeWidget.
    */
   class ImageFileListWidget : public QWidget {
       Q_OBJECT
@@ -50,6 +54,7 @@ namespace Isis {
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
+      QList<QAction *> actions();
       QList<QAction *> getViewActions();
       QList<QAction *> getExportActions();
 

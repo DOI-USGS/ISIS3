@@ -44,6 +44,22 @@ namespace Isis {
     m_qimage = NULL;
   }
 
+  /**
+   * Generic initialization with the export description.  Set the input and set
+   * the pixel type.
+   *
+   * @param desc Export description containing necessary channel information
+   */
+  void QtExporter::initialize(ExportDescription &desc) {
+    // the Qt exporter only exports unsigned byte
+    if (desc.pixelType() != UnsignedByte) {
+      QString msg = "Invalid pixel type. The Qt exporter for file type [";
+      msg += m_format;
+      msg += "] requires an unsigned byte (i.e. 8BIT) output.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+    ImageExporter::initialize(desc);
+  }
 
   /**
    * Set the input with the description generically, check the data size for a
@@ -53,15 +69,16 @@ namespace Isis {
    * @param desc Export description containing necessary channel information
    */
   void QtExporter::setGrayscale(ExportDescription &desc) {
-    Cube *cube = setInput(desc);
-    checkDataSize(cube->sampleCount(), cube->lineCount(), 1);
-    m_qimage = new QImage(
-        cube->sampleCount(), cube->lineCount(), QImage::Format_Indexed8);
+    initialize(desc);
+    checkDataSize(samples(), lines(), 1);
+    m_qimage = new QImage(samples(), lines(), QImage::Format_Indexed8);
     m_qimage->setNumColors(256);
 
     // Create the color table (black = 0 to white = 255)
     QVector<QRgb> colors;
-    for (int i = 0; i < 256; i++) colors.push_back(qRgb(i, i, i));
+    for (int i = 0; i < 256; i++) {
+      colors.push_back(qRgb(i, i, i));
+    }
     m_qimage->setColorTable(colors);
   }
 
@@ -74,10 +91,9 @@ namespace Isis {
    * @param desc Export description containing necessary channel information
    */
   void QtExporter::setRgb(ExportDescription &desc) {
-    Cube *cube = setInput(desc);
-    checkDataSize(cube->sampleCount(), cube->lineCount(), 3);
-    m_qimage = new QImage(
-        cube->sampleCount(), cube->lineCount(), QImage::Format_RGB32);
+    initialize(desc);
+    checkDataSize(samples(), lines(), 3);
+    m_qimage = new QImage(samples(), lines(), QImage::Format_RGB32);
   }
 
 
@@ -89,10 +105,9 @@ namespace Isis {
    * @param desc Export description containing necessary channel information
    */
   void QtExporter::setRgba(ExportDescription &desc) {
-    Cube *cube = setInput(desc);
-    checkDataSize(cube->sampleCount(), cube->lineCount(), 4);
-    m_qimage = new QImage(
-        cube->sampleCount(), cube->lineCount(), QImage::Format_ARGB32);
+    initialize(desc);
+    checkDataSize(samples(), lines(), 4);
+    m_qimage = new QImage(samples(), lines(), QImage::Format_ARGB32);
   }
 
 
@@ -106,15 +121,15 @@ namespace Isis {
 
     // Loop for each column and load the pixel, which will
     // be in the range of [0,255]
-    int l = grayLine.Line() - 1;
-    for (int s = 0; s < grayLine.SampleDimension(); s++) {
-      int dn = getPixel(grayLine[s]);
+    int lineIndex = grayLine.Line() - 1;
+    for (int sampleIndex = 0; sampleIndex < grayLine.SampleDimension(); sampleIndex++) {
+      int pixelValue = outputPixelValue(grayLine[sampleIndex]);
 
       // Since the plausable "exception" thrown by setPixel cannot be caught,
       //  the following if statement does it informally.
-      m_qimage->setPixel(s, l, dn);
-      if (!m_qimage->valid(s, l)) {
-        QString msg = "QT has detected your file size as exceeding 2GB.";
+      m_qimage->setPixel(sampleIndex, lineIndex, pixelValue);
+      if (!m_qimage->valid(sampleIndex, lineIndex)) {
+        QString msg = "Qt has detected your file size as exceeding 2GB.";
         msg += " While your image might be under 2GB, your image labels are more";
         msg += " than likely pushing the file size over 2GB.";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -135,9 +150,9 @@ namespace Isis {
 
     QRgb *line = (QRgb *) m_qimage->scanLine(redLine.Line() - 1);
     for (int s = 0; s < redLine.SampleDimension(); s++) {
-      int red = getPixel(redLine[s]);
-      int green = getPixel(greenLine[s]);
-      int blue = getPixel(blueLine[s]);
+      int red = outputPixelValue(redLine[s]);
+      int green = outputPixelValue(greenLine[s]);
+      int blue = outputPixelValue(blueLine[s]);
 
       line[s] = qRgb(red, green, blue);
     }
@@ -157,10 +172,10 @@ namespace Isis {
 
     QRgb *line = (QRgb *) m_qimage->scanLine(redLine.Line() - 1);
     for (int s = 0; s < redLine.SampleDimension(); s++) {
-      int red = getPixel(redLine[s]);
-      int green = getPixel(greenLine[s]);
-      int blue = getPixel(blueLine[s]);
-      int alpha = getPixel(alphaLine[s]);
+      int red = outputPixelValue(redLine[s]);
+      int green = outputPixelValue(greenLine[s]);
+      int blue = outputPixelValue(blueLine[s]);
+      int alpha = outputPixelValue(alphaLine[s]);
 
       line[s] = qRgba(red, green, blue, alpha);
     }

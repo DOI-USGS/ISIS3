@@ -103,6 +103,9 @@ namespace Isis {
   }
 
 
+  /**
+   * 
+   */
   QProgressBar *MosaicController::getProgress() {
     return m_imageReader->progress();
   }
@@ -129,6 +132,7 @@ namespace Isis {
     QList<QAction *> settingsActs;
 
     settingsActs.append(m_imageReader->actions(ImageDisplayProperties::FootprintViewProperties));
+    settingsActs.append(m_fileList->actions());
 
     QAction *setThreads = new QAction("Set &Thread Limit", this);
     connect(setThreads, SIGNAL(triggered(bool)),
