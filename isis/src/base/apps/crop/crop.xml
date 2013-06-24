@@ -88,6 +88,12 @@
       Now uses the SubArea class to produce output cube labels 
       with corrected Mapping, Instrument, and AlphaCube groups.
     </change>
+    <change name="Stuart Sides" date="2013-06-23">
+      Modified the calculations for number of lines and samples to use double precision math
+      and then round up instead of integer math with truncation. When the number of lines or
+      samples does not divide evenly by the linc or sinc values there will be one additional
+      line or sample in the output cube.
+    </change>
   </history>
 
   <oldName>
