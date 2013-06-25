@@ -304,6 +304,7 @@ void IsisMain() {
 
   // the along scan pixel size is the difference in focal plane X coordinates
   alongScanPxSize = abs(uXCenter - uX);
+
 //TO DO: UNCOMMENT THIS LINE ONCE MOC and HRSC IS WORKING IN SS
 //  }
 
@@ -338,9 +339,9 @@ void IsisMain() {
 
   triParams[15] = focal;
 
-  // Set the Center Ground Point to the center lat/lon of the image, in radians
+  // Set the Center Ground Point at the SOCET Set image, in radians
   double centerGp[3];
-  double  radii[3] = {0.0, 0.0, 0.0};
+  double radii[3] = {0.0, 0.0, 0.0};
   Distance Dradii[3];
 
   cam->radii(Dradii);
@@ -359,12 +360,10 @@ void IsisMain() {
 
   // Now get keyword values that depend on ephemeris data.
 
-  // First get the ephemeris time and camera Lat Lon at the center image line coordinate.
-  // Note: add 0.5 pixel because the upperleft corner of the upperleft image pixel has
-  // line, samp coordinate (0.5,0.5)
-  double centerLine = double(totalLines) / 2.0 + 0.5;
+  // First get the ephemeris time and camera Lat Lon at image center line, boresight sample.
+  double centerLine = double(totalLines) / 2.0;
 
-  cam->SetImage(boresightSample, centerLine); //set to center of image
+  cam->SetImage(boresightSample, centerLine); //set to boresight of image
   double etCenter = cam->time().Et();
 
   // Get the sensor position at the image center in ographic lat,
@@ -389,7 +388,7 @@ void IsisMain() {
   QString InstrumentPosition = (QString) kernels["InstrumentPosition"];
 
   int numEphem = 0;      // number of ephemeris points
-  double dtEphem = 1.0;  // delta time of ephemeris points, seconds
+  double dtEphem = 0.0;  // delta time of ephemeris points, seconds
   if (InstrumentPosition == "Table") {
     // Labels contain SPK blob
     // set up Ephem pts/rates number and spacing
@@ -401,7 +400,12 @@ void IsisMain() {
     // instead of of the potentially more efficient placement used by spiceinit
     numEphem = int(double(numEphem) * 1.2);
 
-    // make the number of nodes is odd
+    // if numEphem calcutated from SPICE blobs is too sparse for SOCET Set,
+    // mulitiply it by a factor of 30
+    // (30X was settled upon emperically.  In the future, make this an input parameter)
+    if (numEphem <= 10) numEphem = tablePosition.Records() * 30;
+
+    // make the number of nodes odd
     numEphem  = (numEphem % 2) == 1 ? numEphem : numEphem + 1;
 
     // SOCET has a max number of ephem pts of 10000, and we're going to add twenty...
@@ -415,35 +419,42 @@ void IsisMain() {
       cam->setTime(iTime(et));
       SpiceRotation *bodyRot = cam->bodyRotation();
       vector<double> pos = bodyRot->ReferenceVector(cam->instrumentPosition()->Coordinate());
-      vector<double> vel = bodyRot->ReferenceVector(cam->instrumentPosition()->Velocity());
+//TO DO: UNCOMMENT THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+      //vector<double> vel = bodyRot->ReferenceVector(cam->instrumentPosition()->Velocity());
 
       //Add the ephemeris position and velocity to their respective lists, in meters and meters/sec
       QList<double> ephemPt;
       QList<double> ephemRate;
       ephemPts.append(ephemPt << pos[0] * 1000 << pos[1] * 1000 << pos[2] * 1000);
-      ephemRates.append(ephemRate << vel[0] * 1000 << vel[1] * 1000 << vel[2] * 1000);
+//TO DO: UNCOMMENT THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+      //ephemRates.append(ephemRate << vel[0] * 1000 << vel[1] * 1000 << vel[2] * 1000);
 
       et += dtEphem;
     }
 
-    // linearlly interpolate 10 additional nodes before line 1 (SOCET requires this)
-    for (int i = 0; i < 10; i++) {
+//TO DO: WHEN VELOCITY BLOBS ARE CORRECT IN ISIS, linearlly interpolate 10 nodes rather than 11
+//       (need 11 now for computation of velocity at first and last ephemeris point)
+    // linearlly interpolate 11 additional nodes before line 1 (SOCET requires this)
+    for (int i = 0; i < 11; i++) {
       double vec[3] = {0.0, 0.0, 0.0};
       vec[0] = ephemPts[0][0] + (ephemPts[0][0] - ephemPts[1][0]);
       vec[1] = ephemPts[0][1] + (ephemPts[0][1] - ephemPts[1][1]);
       vec[2] = ephemPts[0][2] + (ephemPts[0][2] - ephemPts[1][2]);
       QList<double> ephemPt;
       ephemPts.prepend (ephemPt << vec[0] << vec[1] << vec[2]);
-   
-      vec[0] = ephemRates[0][0] + (ephemRates[0][0] - ephemRates[1][0]);
-      vec[1] = ephemRates[0][1] + (ephemRates[0][1] - ephemRates[1][1]);
-      vec[2] = ephemRates[0][2] + (ephemRates[0][2] - ephemRates[1][2]);
-      QList<double> ephemRate;
-      ephemRates.prepend (ephemRate << vec[0] << vec[1] << vec[2]);
+
+//TO DO: UNCOMMENT THE FOLLOWING LINES WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+      //vec[0] = ephemRates[0][0] + (ephemRates[0][0] - ephemRates[1][0]);
+      //vec[1] = ephemRates[0][1] + (ephemRates[0][1] - ephemRates[1][1]);
+      //vec[2] = ephemRates[0][2] + (ephemRates[0][2] - ephemRates[1][2]);
+      //QList<double> ephemRate;
+      //ephemRates.prepend (ephemRate << vec[0] << vec[1] << vec[2]);
     }
 
-    // linearlly interpolate 10 additional nodes after the last line (SOCET requires this)
-    for (int i = 0; i < 10; i++) {
+//TO DO: WHEN VELOCITY BLOBS ARE CORRECT IN ISIS, linearlly interpolate 10 nodes rather than 11
+//       (need 11 now for computation of velocity at first and last ephemeris point)
+    // linearlly interpolate 11 additional nodes after the last line (SOCET requires this)
+    for (int i = 0; i < 11; i++) {
       double vec[3] = {0.0, 0.0, 0.0};
       int index = ephemPts.size() - 1;
       vec[0] = ephemPts[index][0] + (ephemPts[index][0] - ephemPts[index - 1][0]);
@@ -452,14 +463,27 @@ void IsisMain() {
       QList<double> ephemPt;
       ephemPts.append(ephemPt << vec[0] << vec[1] << vec[2]);
 
-      vec[0] = ephemRates[index][0] + (ephemRates[index][0] - ephemRates[index - 1][0]);
-      vec[1] = ephemRates[index][1] + (ephemRates[index][1] - ephemRates[index - 1][1]);
-      vec[2] = ephemRates[index][2] + (ephemRates[index][2] - ephemRates[index - 1][2]);
-      QList<double> ephemRate;
-      ephemRates.append(ephemRate << vec[0] << vec[1] << vec[2]);
+//TO DO: UNCOMMENT THE FOLLOWING LINES WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+      //vec[0] = ephemRates[index][0] + (ephemRates[index][0] - ephemRates[index - 1][0]);
+      //vec[1] = ephemRates[index][1] + (ephemRates[index][1] - ephemRates[index - 1][1]);
+      //vec[2] = ephemRates[index][2] + (ephemRates[index][2] - ephemRates[index - 1][2]);
+      //QList<double> ephemRate;
+      //ephemRates.append(ephemRate << vec[0] << vec[1] << vec[2]);
     }
 
     numEphem += 20;
+
+//TO DO: DELETE THE FOLLOWING LINES WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+    // Compute the spacecraft velocity at each ephemeris point
+    double deltaTime = 2.0 * dtEphem;
+    for (int i = 0; i < numEphem; i++) {
+      double vec[3] = {0.0, 0.0, 0.0};
+      vec[0] = (ephemPts[i+2][0] - ephemPts[i][0]) / deltaTime;
+      vec[1] = (ephemPts[i+2][1] - ephemPts[i][1]) / deltaTime;
+      vec[2] = (ephemPts[i+2][2] - ephemPts[i][2]) / deltaTime;
+      QList<double> ephemRate;
+      ephemRates.append(ephemRate << vec[0] << vec[1] << vec[2]);
+    }
 
   }
   else { 
@@ -469,9 +493,9 @@ void IsisMain() {
     // padding of 10 ephemeris points on either side of the image.
 
     if (isMocNA || isHiRise || isCTX || isLroNACL || isLroNACR || isHRSC)
-      // Try increment of 1/4 second for NA
-      dtEphem = 0.1;  // Make this a user definable increment?
-    else // Increase increment for WA images to one second
+      // Try increment of every 300 image lines
+      dtEphem = 300 * intTime;  // Make this a user definable increment?
+    else // Set increment for WA images to one second
       dtEphem = 1.0;
 
     // Pad by 10 ephem pts on each side of the image
@@ -482,6 +506,9 @@ void IsisMain() {
     if ((numEphem % 2) == 0)
       numEphem++;
 
+//TO DO: DELETE THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+    numEphem = numEphem + 2; // Add two for calcuation of velocity vectors...
+
     // Find the ephemeris time for the first ephemeris point, and from that, get
     // to_ephem needed by SOCET (to_ephem is relative to etCenter)
     double et = etCenter - (((numEphem - 1) / 2) * dtEphem);
@@ -489,15 +516,31 @@ void IsisMain() {
       cam->setTime(iTime(et));
       SpiceRotation *bodyRot = cam->bodyRotation();
       vector<double> pos = bodyRot->ReferenceVector(cam->instrumentPosition()->Coordinate());
-      vector<double> vel = bodyRot->ReferenceVector(cam->instrumentPosition()->Velocity());
+//TO DO: UNCOMMENT THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+      //vector<double> vel = bodyRot->ReferenceVector(cam->instrumentPosition()->Velocity());
 
       //Add the ephemeris position and velocity to their respective lists, in meters and meters/sec
       QList<double> ephemPt;
       QList<double> ephemRate;
       ephemPts.append(ephemPt << pos[0] * 1000 << pos[1] * 1000 << pos[2] * 1000);
-      ephemRates.append(ephemRate << vel[0] * 1000 << vel[1] * 1000 << vel[2] * 1000);
+//TO DO: UNCOMMENT THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+      //ephemRates.append(ephemRate << vel[0] * 1000 << vel[1] * 1000 << vel[2] * 1000);
 
       et += dtEphem;
+    }
+//TO DO: DELETE THE FOLLOWING LINES WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+    // Compute the spacecraft velocity at each ephemeris point
+    // (We must do this when blobs are not attached because the Spice Class
+    // stores in memory the same data that would be in a blob...even when reading NAIF kernels)
+    double deltaTime = 2.0 * dtEphem;
+    numEphem = numEphem - 2; // set numEphem back to the number we need output
+    for (int i = 0; i < numEphem; i++) {
+      double vec[3] = {0.0, 0.0, 0.0};
+      vec[0] = (ephemPts[i+2][0] - ephemPts[i][0]) / deltaTime;
+      vec[1] = (ephemPts[i+2][1] - ephemPts[i][1]) / deltaTime;
+      vec[2] = (ephemPts[i+2][2] - ephemPts[i][2]) / deltaTime;
+      QList<double> ephemRate;
+      ephemRates.append(ephemRate << vec[0] << vec[1] << vec[2]);
     }
   }
 
@@ -506,7 +549,7 @@ void IsisMain() {
   double t0Ephem = etFirstEphem - etCenter;
 
   // Using the intrumentPointing table as a guide build the quarternions
-  // for simplisity sake we'll leave the mountingAngles as identity
+  // for simplicity sake we'll leave the mountingAngles as identity
   // and store the complete rotation from body fixed to camera in the
   // quarternions
 
@@ -515,12 +558,16 @@ void IsisMain() {
 
   //number of quaternions
   int numQuaternions = tablePointing.Records();
-  //numQuaternions = 20;
 
   // increase the number of quaternions nodes by 20%. This is somewhat random but
   // generally intended to compensate for having equally time spaced nodes
   // instead of of the potentially more efficient placement used by spiceinit
   numQuaternions = (int)(numQuaternions * 1.2);
+
+  // if numQuaternions calcutated from SPICE blobs is too sparse for SOCET Set,
+  // mulitiply it by a factor of 30
+  // (30X was settled upon emperically.  In the future, make this an input parameter)
+  if (numQuaternions <= 10) numQuaternions = tablePointing.Records() * 30;
 
   //make the number of nodes odd
   numQuaternions = (numQuaternions % 2) == 1 ? numQuaternions : numQuaternions + 1;
@@ -528,7 +575,6 @@ void IsisMain() {
   // SOCET has a max number of quaternions of 20000, and we're going to add twenty...
   if (numQuaternions > 20000 - 20) numQuaternions = 19179;
 
-  //quaternions time spacing
   double dtQuat = scanDuration / double(numQuaternions);
 
   // build the tables of values
@@ -675,7 +721,7 @@ void IsisMain() {
   for (int i = 1; i < 18; i++) toStrm << " " << triParams[i];
   toStrm << endl;
 
-  toStrm << "T_CENTER  ";
+  toStrm << setprecision(25) << "T_CENTER  ";
   double tCenter = 0.0;
 //TO DO: UNCOMMENT THESE LINES ONCE HRSC IS WORKING IN SS
 //  if (isHRSC) {
@@ -699,7 +745,10 @@ void IsisMain() {
   toStrm << "NUMBER_OF_EPHEM   " << numEphem << endl;
 
   toStrm << "EPHEM_PTS" << endl;
-  for (int i = 0; i < numEphem; i++) {
+//TO DO: DELETE THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+  for (int i = 1; i <= numEphem; i++) {
+//TO DO: UNCOMMENT THE FOLLOWING LINE WHEN VELOCITY BLOBS ARE CORRECT IN ISIS
+  //for (int i = 0; i < numEphem; i++) {
     toStrm << " " << ephemPts[i][0];
     toStrm << " " << ephemPts[i][1];
     toStrm << " " << ephemPts[i][2] << endl;
@@ -781,7 +830,7 @@ void IsisMain() {
 
   toStrm << "STARTING_SAMPLE " << startingSample << endl;
   toStrm << "STARTING_LINE " << startingLine << endl;
-  toStrm << "STARTING_EPHEMERIS_TIME " << etStart << endl;
+  toStrm << "STARTING_EPHEMERIS_TIME " << setprecision(25) << etStart << endl;
   toStrm << "CENTER_EPHEMERIS_TIME " << etCenter << endl;
 
 } // end main
