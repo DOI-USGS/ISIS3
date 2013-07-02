@@ -3,31 +3,33 @@
 <application name="lrowaccal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    This program calibrates WAC images
+    This program calibrates LRO WAC images
   </brief>
 
   <description>
     <p>
-      This program applies a dark, flat-field and radiometric correction for each framelet based on the
-      band's filter number. There is also an optional mask to replace special pixels in the calibrated image. In order to output in I/F units, the cube must have spice
-      data.
+      This program applies dark, flat-field, radiometric, and temperature corrections for each
+      framelet based on the band's filter number. There is also an optional mask to replace
+      special pixels in the calibrated image. In order to output in I/F units, the cube must
+      have spice data.
     </p>
 
     <p>
-      Correction is applied in the following order: <b>Dark</b>, <b>Flat-field</b>, <b>Radiometric</b>, <b>Special pixel mask</b>, <b>Temprature</b>
+      Corrections are  applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature. 
     </p>
 
     <h3>Dark Correction:</h3>
     <p>
-      If DarkFile parameter is set, the given file(s) will be used for calibration. If DarkFile is set to
-      "Default" or not set the dark files will be looked up based on the time and temperature in the WAC being calibrated.
-      <code>MiddleTemperatureFpa</code> is used for temperature and <code>StartTime</code> for time. lrowaccal will attempt
-      to find the 2 dark files with closest time/temperature and interpolate/extrapolate from them. The method for finding dark
-      files is as follows:
+      If the DarkFile parameter is set, the given file(s) will be used for calibration. If DarkFile
+      is set to "Default" or not set at all, the dark files will be looked up based on the time and
+      temperature in the WAC being calibrated. The parameter,MiddleTemperatureFpa, is used for 
+      temperature and StartTime for time. This program, lrowaccal, will attempt to find the 2 dark 
+      files with closest time/temperature and interpolate/extrapolate from them. The method for 
+      finding dark files is as follows: 
       <ul>
-      <li>Create filename template based on WAC image offset and type (UV, BW, etc). example: WAC_UV_Offset68_*C_*T_Dark.????.cub</li>
+      <li>Create filename template based on WAC image offset and type (UV, BW, etc). Example: WAC_UV_Offset68_*C_*T_Dark.????.cub</li>
       <li>Look in $lro/calibration/wac_darks for matching files.</li>
-      <li>Sort files on to factors:
+      <li>Sort files on two factors:
         <ol>
           <li>abs(dark temp - WAC temp)</li>
           <li>abs(dark time - WAC time)</li>
@@ -55,8 +57,8 @@
           </div>
         </li>
       </li>
-      <li>Take the 2 closest tempuratures (-25C and -20C in the example).</li>
-      <li>Select the closest time for each tempurature.
+      <li>Take the 2 closest temperatures (-25C and -20C in the example).</li>
+      <li>Select the closest time for each temperature.
         <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
           Example result:<br/>
           <br/>
@@ -65,8 +67,9 @@
         </div>
       </li>
       <li>
-        If only one tempurature is available, the 2 times closest to the WAC time will be chosen. This will
-        allow WACs to always be calibrated against something, instead of just failing.
+        If only one temperature is available, the 2 times that are closest to the WAC time will be 
+        chosen. This will allow WACs to always be calibrated against something, instead of just 
+        failing.
         <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
           Example result:<br/>
           <br/>
@@ -140,11 +143,11 @@
              a*(frameTemp) + b
 
              Where: 
-               'a' and 'b' are band dependant constants, read in from a file.
+               'a' and 'b' are band dependent constants, read in from a file.
              AND
                frameTemp = (WAC EndTemperatureFpa - WAC BeginTemperatureFpa)/WAC NumFramelets * frame + WAC BeginTemperatureFpa
       </pre>
-      If TempratureFile is not set, the constants are loaded from $lro/calibration/WAC_TempratureConstants.????.pvl
+      If TEMPRATUREFILE is not set, the constants are loaded from $lro/calibration/WAC_TempratureConstants.????.pvl
     </p>
   </description>
 
@@ -172,10 +175,10 @@
       single passed in band, even if that band was not band 1. 
     </change>
     <change name="Adam Licht" date="2013-04-16">
-      Implemented a temprature based correction to lrowaccal.
-      This correction require constants which are read from a 
+      Implemented a temperature based correction to lrowaccal.
+      This correction requires constants which are read from a 
       pvl file. A file other than the default can be passed in
-      via an argument. The Correction may also be turned off via
+      via an argument. The correction may also be turned off via
       an argument.
     </change>
   </history>
@@ -220,7 +223,9 @@
           Calibrate using a dark file.
         </brief>
         <description>
-          Calibrate using a dark file.
+          Calibrate using a correction based off of a dark file. Please see the Dark Correction 
+          section at the beginning of this document for a detailed explanation of how the 
+          correction is applied
         </description>
         <inclusions><item>DarkFile</item></inclusions>
       </parameter>
@@ -232,8 +237,10 @@
           Dark file used for calibration.
         </brief>
         <description>
-          Dark file used for calibration. The default is to use the system defined dark file with
-          the highest version number.
+          Dark file used for calibration. The default is to use the dark file with the closest 
+          time and temperature to the WAC image being calibrated. See the Dark Correction section
+          at the beginning of this document for a detailed explanation of how dark files are
+          chosen.
         </description>
       </parameter>
     </group>
@@ -272,7 +279,8 @@
           Do radiometric calibration.
         </brief>
         <description>
-          Do radiometric calibration.
+          Perform a radiometric calibration on the input cub. This type of this correction is 
+          defined by the RadiometricType parameter. 
         </description>
         <inclusions>
           <item>RadiometricType</item>
@@ -310,7 +318,8 @@
           Radiometric constants file used for calibration.
         </brief>
         <description>
-          Radiometric constants file used for calibration.
+          Radiometric constants file used for calibration. The default is to use the system 
+          defined file with the highest version.
         </description>
       </parameter>
     </group>
@@ -320,8 +329,13 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
+
         </brief>
         <description>
+          This option will apply a special pixel mask to the input cub. The default is to use the 
+          system defined mask file with the matching WAC mode and closest Temperature to the input 
+          cub. Please see this application’s full documentation for a detailed description of the 
+          Special Pixel Mask correction. 
         </description>
         <inclusions><item>SpecialPixelsFile</item></inclusions>
       </parameter>
@@ -330,6 +344,10 @@
         <type>filename</type>
         <default><item>Default</item></default>
         <brief>
+          This option will apply a special pixel mask to the cub. The default is to use the system 
+          defined mask file with the matching WAC mode and closest Temperature to the input cub. 
+          Please see this application’s full documentation for a detailed description of the 
+          Special Pixel Mask correction. 
         </brief>
         <description>
         </description>
@@ -341,10 +359,11 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Calibrate using temperature a gain and offset.
+          Calibrate using temperature base correction.
         </brief>
         <description>
-          Calibrate using temperature a gain and offset.
+          Calibrate using temperature gain and offset.
+          Please see <a href="./assets/documentation/Temperature_Correction.pdf">this</a> document, which outlines how the correction was derived.
         </description>
         <inclusions><item>TemperatureFile</item></inclusions>
       </parameter>
