@@ -334,7 +334,7 @@
         <description>
           This option will apply a special pixel mask to the input cub. The default is to use the 
           system defined mask file with the matching WAC mode and closest Temperature to the input 
-          cub. Please see this application’s full documentation for a detailed description of the 
+          cub. Please see the main documentation for a detailed description of the 
           Special Pixel Mask correction. 
         </description>
         <inclusions><item>SpecialPixelsFile</item></inclusions>
@@ -346,7 +346,7 @@
         <brief>
           This option will apply a special pixel mask to the cub. The default is to use the system 
           defined mask file with the matching WAC mode and closest Temperature to the input cub. 
-          Please see this application’s full documentation for a detailed description of the 
+          Please see the main documentation for a detailed description of the 
           Special Pixel Mask correction. 
         </brief>
         <description>
