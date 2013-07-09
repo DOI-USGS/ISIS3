@@ -33,7 +33,9 @@ namespace Isis {
    *
    * @ingroup Visualization Tools
    * 
-   * @internal
+   * @internal 
+   *   @history 2013-07-01 Tracie Sucharski - Clean up ImageList in mappedFinished method to get
+   *                           rid of Null Image pointers from the list.  Fixes #1693, #1696.
    */
   class ImageReader : public QObject {
       Q_OBJECT

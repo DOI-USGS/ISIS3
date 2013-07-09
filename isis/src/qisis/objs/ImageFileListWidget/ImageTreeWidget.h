@@ -26,6 +26,11 @@ namespace Isis {
    *                           Added queued selection changed (changed some n^2 operations to n).
    *   @history 2013-03-19 Steven Lambright - Added setDefaultFileListCols() and set column
    *                           defaults in constructor.
+   *   @history 2013-06-27 Tracie Sucharski - Fixed bug which resulted in a seg fault when
+   *                           attempting to add a group to the file list.  This was introduced
+   *                           in the changes for "a.out".  Fixes #1693.
+   *   @history 2013-07-02 Tracie Sucharski - Restored old qmos functionality for inserting new
+   *                           groups and fixed bug dragging and dropping groups.  Fixes #1697.
    *
    * Selection changes are very slow (time complexity in our code is delta-selected, but there is a
    *     very high constant that scales to the tree size - maybe an N complexity? making a total

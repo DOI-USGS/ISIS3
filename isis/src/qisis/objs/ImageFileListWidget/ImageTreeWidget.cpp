@@ -125,12 +125,11 @@ namespace Isis {
     return results;
   }
 
-
+  
   QTreeWidgetItem *ImageTreeWidget::addGroup(QString imageListName, QString groupName, int index) {
     if (index >= 0) {
       disableSort();
     }
-
     QTreeWidgetItem *imageList = imageListTreeItem(imageListName);
     QTreeWidgetItem *group = createGroup(imageList, groupName, index);
 
@@ -420,111 +419,175 @@ namespace Isis {
     m_index = -1;
   }
 
-
-  /**
-   * This is why we needed to subclass the QTreeWidget class.
-   * We needed our own dropEvent for the dragging and dropping
-   * of the tree widget items.
-   */
   void ImageTreeWidget::dropEvent(QDropEvent *event) {
     QTreeWidgetItem *droppedAtItem = itemAt(event->pos());
 
-    if (droppedAtItem) {
+    if(droppedAtItem) {
       disableSort();
-      QTreeWidgetItem *droppedAtList  = droppedAtItem;
       QTreeWidgetItem *droppedAtGroup = droppedAtItem;
 
-      // Try to figure out which list / group they dropped into
-      while (droppedAtList->data(0, Qt::UserRole).toInt() != ImageListNameType &&
-             droppedAtList != invisibleRootItem()) {
-        droppedAtList = droppedAtList->parent();
-
-        if (!droppedAtList)
-          droppedAtList = invisibleRootItem();
-      }
-
-      while (droppedAtGroup && droppedAtGroup->data(0, Qt::UserRole).toInt() != ImageGroupType) {
-        droppedAtGroup = droppedAtGroup->parent();
-      }
-
-      QString droppedListName = droppedAtList->text(0);
-
-      // Figure out from which list they're moving items from (to verify they aren't moving
-      //   between file lists)
-      QTreeWidgetItem *firstItemToBeMoved = NULL;
-      QString draggedListName;
-
-      if (selectedItems().count()) {
-        firstItemToBeMoved = selectedItems()[0];
-
-        if (firstItemToBeMoved->data(0, Qt::UserRole).toInt() == ImageGroupType) {
-          draggedListName = firstItemToBeMoved->parent()->text(0);
-        }
-        else if (firstItemToBeMoved->type() == QTreeWidgetItem::UserType) {
-          draggedListName = ((ImageTreeWidgetItem *)firstItemToBeMoved)->imageListName();
-        }
-        else {
-          firstItemToBeMoved = NULL;
-        }
-      }
+      if(droppedAtGroup->type() != QTreeWidgetItem::Type)
+        droppedAtGroup = droppedAtItem->parent();
 
       bool draggedGroup = groupInList(selectedItems());
       bool draggedItem = mosaicItemInList(selectedItems());
 
-      if (firstItemToBeMoved && (draggedListName == droppedListName || droppedListName.isEmpty())) {
-        // If they dropped images into a list item (but not a group), consider it a new group in
-        //   the list
-        if (droppedAtList && !droppedAtGroup && !draggedGroup && draggedItem) {
-          droppedAtGroup = addGroup(droppedListName);
+      // Moving items around...
+      if(draggedItem && !draggedGroup) {
+        int insertPosition = 0;
+
+        if(droppedAtGroup != droppedAtItem) {
+          insertPosition = droppedAtGroup->indexOfChild(droppedAtItem) + 1;
         }
 
-        // Moving items around...
-        if (draggedItem && !draggedGroup) {
-          int insertPosition = 0;
+        QTreeWidgetItem *toBeMoved;
+        foreach(toBeMoved, selectedItems()) {
+          if(toBeMoved != droppedAtItem) {
+            QTreeWidgetItem *parent = toBeMoved->parent();
 
-          if (droppedAtGroup != droppedAtItem) {
-            insertPosition = droppedAtGroup->indexOfChild(droppedAtItem) + 1;
-          }
+            // We need to make sure we handle moving a child within the
+            //   same group and how that effects the insert position
+            int childOrigIndex = parent->indexOfChild(toBeMoved);
 
-          QTreeWidgetItem *toBeMoved;
-          foreach(toBeMoved, selectedItems()) {
-            if (toBeMoved != droppedAtItem) {
-              QTreeWidgetItem *parent = toBeMoved->parent();
+            parent->takeChild(childOrigIndex);
 
-              // We need to make sure we handle moving a child within the
-              //   same group and how that effects the insert position
-              int childOrigIndex = parent->indexOfChild(toBeMoved);
+            int actualInsertPos = insertPosition;
 
-              parent->takeChild(childOrigIndex);
+            if(parent == droppedAtGroup && childOrigIndex < insertPosition)
+              actualInsertPos --;
 
-              int actualInsertPos = insertPosition;
+            droppedAtGroup->insertChild(actualInsertPos, toBeMoved);
 
-              if (parent == droppedAtGroup && childOrigIndex < insertPosition)
-                actualInsertPos --;
-
-              droppedAtGroup->insertChild(actualInsertPos, toBeMoved);
-
-              // This makes multiple items dragged to bottom of group work
-              if (insertPosition != droppedAtGroup->childCount())
-                insertPosition ++;
-            }
+            // This makes multiple items dragged to bottom of group work
+            if(insertPosition != droppedAtGroup->childCount())
+              insertPosition ++;
           }
         }
-        else if (!draggedItem && draggedGroup && droppedAtGroup) {
-          QTreeWidgetItem *toBeMoved;
+      }
+      else if(!draggedItem && draggedGroup) {
+        QTreeWidgetItem *toBeMoved;
 
-          foreach(toBeMoved, selectedItems()) {
-            if (toBeMoved != droppedAtGroup) {
-              int dropPosition = droppedAtList->indexOfChild(droppedAtGroup);
+        foreach(toBeMoved, selectedItems()) {
+          if(toBeMoved != droppedAtGroup) {
+            int dropPosition = indexOfTopLevelItem(droppedAtGroup);
 
-              droppedAtList->takeChild(droppedAtList->indexOfChild(toBeMoved));
-              droppedAtList->insertChild(dropPosition, toBeMoved);
-            }
+            takeTopLevelItem(indexOfTopLevelItem(toBeMoved));
+            insertTopLevelItem(dropPosition, toBeMoved);
           }
         }
       }
     }
   }
+
+  /**
+   * This is why we needed to subclass the QTreeWidget class.
+   * We needed our own dropEvent for the dragging and dropping
+   * of the tree widget items. 
+   *  
+   * @internal 
+   *   @history 2013-07-02 Tracie Sucharski - Replaced this method with the old drop method
+   *                           from MosaiceTreeWidget.cpp.  This method (and class) needs some
+   *                           refactoring to work with both qmos and a.out.
+   */
+//void ImageTreeWidget::dropEvent(QDropEvent *event) {
+//  QTreeWidgetItem *droppedAtItem = itemAt(event->pos());
+//
+//  if (droppedAtItem) {
+//    disableSort();
+//    QTreeWidgetItem *droppedAtList  = droppedAtItem;
+//    QTreeWidgetItem *droppedAtGroup = droppedAtItem;
+//
+//    // Try to figure out which list / group they dropped into
+//    while (droppedAtList->data(0, Qt::UserRole).toInt() != ImageListNameType &&
+//           droppedAtList != invisibleRootItem()) {
+//      droppedAtList = droppedAtList->parent();
+//
+//      if (!droppedAtList)
+//        droppedAtList = invisibleRootItem();
+//    }
+//
+//    while (droppedAtGroup && droppedAtGroup->data(0, Qt::UserRole).toInt() != ImageGroupType) {
+//      droppedAtGroup = droppedAtGroup->parent();
+//    }
+//
+//    QString droppedListName = droppedAtList->text(0);
+//
+//    // Figure out from which list they're moving items from (to verify they aren't moving
+//    //   between file lists)
+//    QTreeWidgetItem *firstItemToBeMoved = NULL;
+//    QString draggedListName;
+//
+//    if (selectedItems().count()) {
+//      firstItemToBeMoved = selectedItems()[0];
+//
+//      if (firstItemToBeMoved->data(0, Qt::UserRole).toInt() == ImageGroupType) {
+//        draggedListName = firstItemToBeMoved->parent()->text(0);
+//      }
+//      else if (firstItemToBeMoved->type() == QTreeWidgetItem::UserType) {
+//        draggedListName = ((ImageTreeWidgetItem *)firstItemToBeMoved)->imageListName();
+//      }
+//      else {
+//        firstItemToBeMoved = NULL;
+//      }
+//    }
+//
+//    bool draggedGroup = groupInList(selectedItems());
+//    bool draggedItem = mosaicItemInList(selectedItems());
+//
+//    if (firstItemToBeMoved && (draggedListName == droppedListName || droppedListName.isEmpty())) {
+//      // If they dropped images into a list item (but not a group), consider it a new group in
+//      //   the list
+//      if (droppedAtList && !droppedAtGroup && !draggedGroup && draggedItem) {
+//        droppedAtGroup = addGroup(droppedListName);
+//      }
+//
+//      // Moving items around...
+//      if (draggedItem && !draggedGroup) {
+//        int insertPosition = 0;
+//
+//        if (droppedAtGroup != droppedAtItem) {
+//          insertPosition = droppedAtGroup->indexOfChild(droppedAtItem) + 1;
+//        }
+//
+//        QTreeWidgetItem *toBeMoved;
+//        foreach(toBeMoved, selectedItems()) {
+//          if (toBeMoved != droppedAtItem) {
+//            QTreeWidgetItem *parent = toBeMoved->parent();
+//
+//            // We need to make sure we handle moving a child within the
+//            //   same group and how that effects the insert position
+//            int childOrigIndex = parent->indexOfChild(toBeMoved);
+//
+//            parent->takeChild(childOrigIndex);
+//
+//            int actualInsertPos = insertPosition;
+//
+//            if (parent == droppedAtGroup && childOrigIndex < insertPosition)
+//              actualInsertPos --;
+//
+//            droppedAtGroup->insertChild(actualInsertPos, toBeMoved);
+//
+//            // This makes multiple items dragged to bottom of group work
+//            if (insertPosition != droppedAtGroup->childCount())
+//              insertPosition ++;
+//          }
+//        }
+//      }
+//      else if (!draggedItem && draggedGroup && droppedAtGroup) {
+//        QTreeWidgetItem *toBeMoved;
+//
+//        foreach(toBeMoved, selectedItems()) {
+//          if (toBeMoved != droppedAtGroup) {
+//            int dropPosition = droppedAtList->indexOfChild(droppedAtGroup);
+//
+//            droppedAtList->takeChild(droppedAtList->indexOfChild(toBeMoved));
+//            droppedAtList->insertChild(dropPosition, toBeMoved);
+//          }
+//        }
+//      }
+//    }
+//  }
+//}
 
 
   /**
@@ -628,24 +691,38 @@ namespace Isis {
   }
 
 
+  /**
+  * 
+  * 
+  * @internal
+  *   @history 2013-07-02 Tracie Sucharski - Returned to old qmos functionality.  Fixes #1697.
+  */
   QTreeWidgetItem *ImageTreeWidget::addGroup() {
     int index = -1;
 
     QTreeWidgetItem *newGroupParent = NULL;
+    QString newGroupParentText = "";
+
     if (selectedItems().size() == 1) {
       if (selectedItems()[0]->data(0, Qt::UserRole).toInt() == ImageGroupType) {
         newGroupParent = selectedItems()[0]->parent();
-        index = newGroupParent->indexOfChild(selectedItems()[0]);
+        if (newGroupParent) {
+          index = newGroupParent->indexOfChild(selectedItems()[0]);
+        }
+        else {
+          newGroupParent = invisibleRootItem();
+          index = indexOfTopLevelItem(selectedItems()[0]);
+        }
       }
       else if (selectedItems()[0]->data(0, Qt::UserRole).toInt() == ImageListNameType) {
         newGroupParent = selectedItems()[0];
       }
     }
 
-    if (!newGroupParent)
-      newGroupParent = invisibleRootItem();
-
-    return addGroup(newGroupParent->text(0), "", index);
+    if (newGroupParent) {
+      newGroupParentText = newGroupParent->text(0);
+    }
+    return addGroup(newGroupParentText, "", index);
   }
 
 

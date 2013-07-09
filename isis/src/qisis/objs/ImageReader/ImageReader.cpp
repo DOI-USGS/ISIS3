@@ -229,6 +229,16 @@ namespace Isis {
 
   void ImageReader::mappedFinished() {
     ImageList images(m_watcher->future().results());
+
+    //  Tracie Sucharski:  Go through list & get rid of NULLs.  This is a temporary fix to get rid
+    //   of seg faulting when something goes wrong.  This is not a good solution & needs to be
+    //   properly fixed
+    foreach (Image *image, images) {
+      if (!image) {
+        images.removeAll(image);
+      }
+    }
+
     emit imagesReady(images);
 
     m_mappedRunning = false;
@@ -274,7 +284,6 @@ namespace Isis {
         fileName = imageData.value<QString>();
 
         result = new Image(FileName(fileName).expanded());
-
         ImageDisplayProperties *prop = result->displayProperties();
         prop->setShowFill(m_openFilled);
 
