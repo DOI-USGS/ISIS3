@@ -1,4 +1,7 @@
 #include "Isis.h"
+
+#include <cmath>
+
 #include "Cube.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
@@ -41,48 +44,48 @@ void IsisMain() {
   int origns = cube.sampleCount();
   int orignl = cube.lineCount();
   int es = cube.sampleCount();
-  if(ui.WasEntered("NSAMPLES")) es = ui.GetInteger("NSAMPLES") + ss - 1;
+  if (ui.WasEntered("NSAMPLES")) es = ss + ui.GetInteger("NSAMPLES") - 1;
   int el = cube.lineCount();
-  if(ui.WasEntered("NLINES")) el = ui.GetInteger("NLINES") + sl - 1;
+  if (ui.WasEntered("NLINES")) el = sl + ui.GetInteger("NLINES") - 1;
   int eb = cube.bandCount();
 
   sinc = ui.GetInteger("SINC");
   linc = ui.GetInteger("LINC");
 
   // Make sure starting positions fall within the cube
-  if(ss > cube.sampleCount()) {
+  if (ss > cube.sampleCount()) {
     cube.close();
     QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(sl > cube.lineCount()) {
+  if (sl > cube.lineCount()) {
     cube.close();
     QString msg = "[LINE] exceeds number of lines in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make sure the number of elements do not fall outside the cube
-  if(es > cube.sampleCount()) {
+  if (es > cube.sampleCount()) {
     cube.close();
     QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
     msg += "samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(el > cube.lineCount()) {
+  if (el > cube.lineCount()) {
     cube.close();
     QString msg = "[LINE+NLINES-1] exceeds number of ";
     msg += "lines in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  // Determine the size of the output cube and then update the image size
-  ns = (es - ss + 1) / sinc;
-  nl = (el - sl + 1) / linc;
+  // Determine the size of the output cube and then set the output image size
+  ns = ceil((double)(es - ss + 1) / sinc);
+  nl = ceil((double)(el - sl + 1) / linc);
   nb = eb;
-  if(ns == 0) ns = 1;
-  if(nl == 0) nl = 1;
+  if (ns == 0) ns = 1;
+  if (nl == 0) nl = 1;
   es = ss + (ns - 1) * sinc;
   el = sl + (nl - 1) * linc;
 

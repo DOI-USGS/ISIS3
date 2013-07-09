@@ -250,7 +250,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         </p>
 
 
-        <h3>Choosing a Rsync Server</h3>
+        <h3>Choosing an Rsync Server</h3>
 
         <p>
           We are distributing Isis3 using two rsync servers. If the "rsync"
@@ -284,9 +284,16 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
 <pre>
         <b>
-        <u>Example for MacOSX 10.6, MacOSX 10.7, and MacOSX 10.8 64-bit Intel compatible systems:</u>
+        <u>Example for MacOSX 10.6 64-bit Intel compatible systems:</u>
         </b>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_darwin_OSX/isis .
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_darwin_OSX10.6/isis .
+</pre>
+
+<pre>
+        <b>
+        <u>Example for MacOSX 10.8 64-bit Intel compatible systems:</u>
+        </b>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_darwin_OSX10.8/isis .
 </pre>
 
 <pre>
@@ -312,14 +319,14 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
 <pre>
         <b>
-        <u>Example for Debian 6.0 Linux x86 64-bit Intel compatible systems:</u>
+        <u>Example for Debian 7.0 Linux x86 64-bit Intel compatible systems:</u>
         </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_DEBIAN/isis .
 </pre>
 
 <pre>
         <b>
-        <u>Example for RHEL 6.2 Linux x86 64-bit Intel compatible systems:</u>
+        <u>Example for RHEL 6.4 Linux x86 64-bit Intel compatible systems:</u>
         </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
 </pre>
@@ -631,6 +638,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Jeff Anderson" date="2012-08-24">Reorganized document format</change>
     <change name="Steven Lambright and Mathew Eis" date="2013-01-09">Updated Mac OSX support to reflect new versions: 10.7 and 10.8</change>
     <change name="Steven Lambright" date="2013-02-12">Updated Fedora support to reflect version upgrade: 16 to 18</change>
+    <change name="Stuart Sides" date="2013-06-23">Updated for latest OSX, RHEL, and Debian versoins</change>
   </history>
 
   <bibliography>

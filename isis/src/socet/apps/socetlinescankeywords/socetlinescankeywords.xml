@@ -68,6 +68,13 @@
       removed support for MEX-HSRC and MGS-MOC sensors until they are tested and working under the
       SOCET Set USGSAstro Line Scanner sensor model.  References #1490.
     </change>
+    <change name="E. Howington-Kraus" date="2013-06-21">
+      Modified to (1) generate ephemeris points and quaternions at a closer time interval if the
+      spacing of the attached SPICE data are too sparse for the SOCET Set USGSAstro Line Scanner
+      sensor model; (2) increase the precision of the output SOCET Set keyword values; (3) redefine
+      the pixel-location of the input image's center ephemeris time, and (4) compute spacecraft
+      velocity values instead of using SPICE velocity data blobs.  Fixes #1672.
+    </change>
   </history>
 
   <groups>
