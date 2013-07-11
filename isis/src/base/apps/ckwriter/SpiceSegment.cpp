@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <functional>
 
+#include <boost/foreach.hpp>
 
 #include "SpiceSegment.h"
 #include "IString.h"
@@ -218,7 +219,7 @@ void SpiceSegment::import(Cube &cube, const QString &tblname) {
     _startTime = _times[0];
     _endTime = _times[size(_times)-1];
 
-    // Load necesary kernels (IAK for Cassini, mainly)
+    // Load necessary kernels (IAK for Cassini, mainly)
     _kernels.Load("FK,SCLK,LSK,IAK");
 
     //  Here's where all the heavy lifting occurs.
@@ -329,6 +330,63 @@ bool SpiceSegment::getTimeDependentFrameIds(Table &table, int &toId, int &fromId
   return (true);
 }
 
+
+/**
+ * @brief Determine left/right CK rotation chains that match mission CK format 
+ *  
+ * This method determines the left and right rotation chains that are needed to 
+ * convert the quaternions stored in ISIS CK blobs to reference and frame states 
+ * as represented in the mission CK kernels.  These chains are determined solely
+ * from the time dependent frames from the blob labels. 
+ *  
+ * Note that if there is no rotation required, an empty or 1 element vector is 
+ * returned.  It is up to the caller to decide how to handle this situation.
+ * 
+ * @author kbecker 2013-06-07
+ * 
+ * @param table 
+ * @param leftBase 
+ * @param rightBase 
+ * @param leftChain 
+ * @param rightChain 
+ * 
+ * @return bool  True if both left and right chains are valid, false if failure 
+ *               occurs.
+ */
+bool SpiceSegment::getFrameChains(Table &table, const int &leftBase, 
+                        const int &rightBase, QVector<int> &leftChain,
+                        QVector<int> &rightChain) const {
+
+  leftChain.clear();
+  rightChain.clear();
+
+  // Load the constant and time-based frame traces and mission frame ids
+  QVector<int> tdfids;
+  if ( table.Label().hasKeyword("TimeDependentFrames") ) {
+    PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
+    for (int i = 0 ; i < labelTimeFrames.size() ; i++) {
+      tdfids.push_back(toInt(labelTimeFrames[i]));
+    }
+  }
+  else {
+    return (false);
+  }
+
+  // Get the left CK ID chain
+  BOOST_FOREACH (int leftId, tdfids) {
+    leftChain.push_back(leftId);
+    if (leftId == leftBase) break;
+  }
+
+    // Get the right CK ID chain
+  BOOST_REVERSE_FOREACH (int rightId, tdfids) {
+    rightChain.push_front(rightId);
+    if (rightId == rightBase) break;
+  }
+
+  return (true);
+}
+
 QString SpiceSegment::getFrameName(int frameid) const {
   SpiceChar frameBuf[40];
   frmnam_c ( (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
@@ -414,38 +472,75 @@ SpiceSegment::SMatrix SpiceSegment::computeStateRotation(const QString &frame1,
   return (state);
 }
 
+SpiceSegment::SMatrix SpiceSegment::computeChainRotation(
+                                       const QVector<int> &fChain, 
+                                       const int &terminatorID,
+                                       const double &etTime) const {
+
+  // Set up identity default
+  SMatrix state = computeStateRotation("J2000", "J2000", etTime);
+
+  if ( fChain.size() > 0 ) {
+    QVector<int> chain = fChain;
+
+    //  Check for case where only 1 frame is given.  It should be the 
+    // terminating frame.  If it isn't, append it to the list as the last
+    // to frame
+   if ( chain.size() == 1 ) {
+      if ( terminatorID != chain[0] ) chain.push_back(terminatorID);
+    }
+
+   SpiceInt toId = chain[0];
+   for ( int i = 1  ; i < chain.size() ; i++ ) {
+     SpiceInt fromId = chain[i];
+     QString CfromId = getFrameName(fromId);
+     QString CtoId = getFrameName(toId);
+//     cout << "FromFrame: " << CfromId << ", ToFrame: " << CtoId << "\n";
+     SMatrix left = computeStateRotation(CtoId, CfromId, etTime);
+     mxmg_c(left[0], state[0], 6, 6, 6, state[0]);
+     toId = fromId;
+   }
+  }
+
+  return (state);
+}
+
 
 void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
                                        SMatSeq &lmats, SMatSeq &rmats,
                                        SVector &sclks) {
 
 
+  //  Base CK frame and reference frames
+  int leftId = camera.CkFrameId();
+  int rightId = camera.CkReferenceId();
+
+#if 0
   int LtoId, LfromId;
   if ( !getTimeDependentFrameIds(table, LtoId, LfromId) ) {
     QString mess = "Cannot determine time dependent frames! - perhaps a spiceinit is in order.";
     throw IException(IException::User, mess, _FILEINFO_);
   }
-
-  int toId = camera.CkFrameId();
-  int fromId = camera.CkReferenceId();
+#else 
+  QVector<int> leftFrames, rightFrames;
+  if ( !getFrameChains(table, leftId, rightId, leftFrames, rightFrames) ) {
+    QString mess = "Cannot determine left/right frame chains! - perhaps a spiceinit is in order.";
+    throw IException(IException::User, mess, _FILEINFO_);
+  }
+#endif
 
   // Set CK instrument code
-  _instCode = toId;
+  _instCode = leftId;
 
   // Load SPICE and extract necessary contents
   Spice mySpice(*cube.label(), true);  // load w/out tables
-
-  QString CLtoId = getFrameName(LtoId);
-  QString CtoId = getFrameName(toId);
-  _instFrame = CtoId;
-  QString CfromId = getFrameName(fromId);
-  _refFrame = CfromId;
-  QString CLfromId = getFrameName(LfromId);
+  _instFrame = getFrameName(leftId);
+  _refFrame = getFrameName(rightId);
 
   SMatSeq lmat(size(_times)), rmat(size(_times)), avr(size(_times));
   for ( int i = 0 ; i < size(_times) ; i++ ) {
-    SMatrix left = computeStateRotation(CtoId, CLtoId, _times[i]);
-    SMatrix right = computeStateRotation(CfromId, CLfromId, _times[i]);
+    SMatrix left = computeChainRotation(leftFrames, leftId, _times[i]);
+    SMatrix right = computeChainRotation(rightFrames, rightId, _times[i]);
     lmat[i] = left;
     rmat[i] = right;
   }
@@ -485,9 +580,6 @@ SpiceSegment::SVector SpiceSegment::convertTimes(
 
   return (sclks);
 }
-
-
-
 
 
 void SpiceSegment::convert(const SpiceSegment::SMatrix &quats,

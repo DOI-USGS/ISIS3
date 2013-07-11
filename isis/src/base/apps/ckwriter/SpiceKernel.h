@@ -63,7 +63,9 @@ namespace Isis {
  * 
  * @author 2010-11-22 Kris Becker
  * @internal
- * @history 2010-12-09 Kris Becker Add documentation and example
+ * @history 2010-12-09 Kris Becker Add documentation and example 
+ * @history 2013-07-10 Kris Becker Updated to better conform with coding 
+ *                                 standards
  */
 class SpiceKernel {
   public:
@@ -71,7 +73,7 @@ class SpiceKernel {
     virtual ~SpiceKernel() { }
 
     /** Returns the number of segments */
-    int size() const { return (_segments.size()); }
+    int size() const { return (m_segments.size()); }
     const SpiceSegment &operator[](const int i) const;
 
     void add(const QString &fname);
@@ -84,7 +86,7 @@ class SpiceKernel {
 
   private:
     typedef std::vector<SpiceSegment> Segments;
-    Segments  _segments;
+    Segments  m_segments;
 
     void init();
     QString getCkComment(const QString &comFile = "") const;
