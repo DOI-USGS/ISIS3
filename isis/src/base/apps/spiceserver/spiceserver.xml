@@ -27,10 +27,17 @@
        Updated Spice members to be more compliant with Isis coding standards. 
        References #972.
     </change>
+    <change name="Steven Lambright" date="2012-09-05">
+      Added parameter CHECKVERSION in order to increase the testability of this program.
+    </change>
     <change name="Jeannie Backer" date="2013-02-26">
       Added ability to load multiple ck database files from the system using a 
       conf file. Changed methods to lower camel case and added "g_" prefix to 
       global variables to comply with Isis3 standards. References #924.
+    </change>
+    <change name="Stuart Sides" date="2013-07-11">
+        Modified so the kernel quality parameters from XML are tested as case insensitive. This
+        change was made in a branch of ISIS, but was not yet moved to the publice version yet.
     </change>
   </history>
 
@@ -63,6 +70,23 @@
             compressed SPICE data, labels, and source file names.
         </description>
         <filter>*.dat</filter>
+      </parameter>
+    </group>
+    
+    <group name="Options">
+      <parameter name="CHECKVERSION">
+        <type>boolean</type>
+        <default><item>true</item></default>
+        <brief>
+          Verify the input hex-encoded file reports the same Isis version as the current version
+          of Isis (requester's version matches server's version).
+        </brief>
+        <description>
+          The input file (which comes from spiceinit's SpiceClient) contains the version of Isis
+          that the requester is running. No guarantees can be made for the validity/usability of
+          the results of the Isis versions of the client and server don't match. This option
+          causes spiceserver to throw an error if the versions of Isis do not match.
+        </description>
       </parameter>
     </group>
   </groups>

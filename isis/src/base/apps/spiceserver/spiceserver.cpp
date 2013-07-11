@@ -37,7 +37,7 @@ double g_startPad = 0.0;
 double g_endPad = 0.0;
 QString g_shapeKernelStr;
 
-bool tryKernels(Pvl &labels, Process &p,
+bool tryKernels(Cube &cube, Pvl &labels, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik,
@@ -80,12 +80,15 @@ void IsisMain() {
     //   problems really
     inFile.GetLine(hexCode);
 
-    Pvl label;
+    Cube cube;
+    cube.open("$base/testData/isisTruth.cub", "r");
+    Pvl &label = *cube.label();
+    label.clear();
     QString otherVersion;
 
     if (!hexCode.isEmpty()) {
       // Convert HEX to XML
-      QString xml(QByteArray::fromHex(hexCode.toAscii()).constData());
+      QString xml(QByteArray::fromHex(QByteArray(hexCode.toAscii())).constData());
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
       QDomDocument document;
@@ -103,7 +106,7 @@ void IsisMain() {
           if (element.tagName() == "isis_version") {
             QString encoded = element.firstChild().toText().data();
             otherVersion =
-                QString(QByteArray::fromHex(encoded.toAscii()).constData());
+                QByteArray::fromHex(encoded.toAscii()).constData();
           }
           else if (element.tagName() == "parameters") {
             // Read the spiceinit parameters
@@ -132,7 +135,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (otherVersion != Application::Version()) {
+    if (ui.GetBoolean("CHECKVERSION") && otherVersion != Application::Version()) {
       QString msg = "The SPICE server only supports the latest Isis version [" +
                     Application::Version() + "], version [" + otherVersion +
                     "] is not compatible";
@@ -257,7 +260,7 @@ void IsisMain() {
 
       realCkKernel.setKernels(ckKernelList);
 
-      kernelSuccess = tryKernels(label, p, lk, pck, targetSpk,
+      kernelSuccess = tryKernels(cube, label, p, lk, pck, targetSpk,
                                  realCkKernel, fk, ik, sclk, spk,
                                  iak, dem, exk);
     }
@@ -292,7 +295,7 @@ void IsisMain() {
   }
 }
 
-bool tryKernels(Pvl &label, Process &p,
+bool tryKernels(Cube &cube, Pvl &lab, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik, Kernel sclk,
@@ -300,8 +303,7 @@ bool tryKernels(Pvl &label, Process &p,
                 Kernel dem, Kernel exk) {
   UserInterface &ui = Application::GetUserInterface();
 
-  // copy the label
-  Pvl lab = label;
+  Pvl origLabels = lab;
 
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
@@ -488,6 +490,7 @@ bool tryKernels(Pvl &label, Process &p,
     kernelsLabels.write(ui.GetFileName("TO") + ".lab");
   }
   catch (IException &) {
+    lab = origLabels;
     return false;
   }
 
@@ -525,37 +528,37 @@ void parseParameters(QDomElement parametersElement) {
     if (element.tagName() == "cksmithed") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckSmithed = (attribute.value() == "yes");
+      g_ckSmithed = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "ckrecon") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckRecon = (attribute.value() == "yes");
+      g_ckRecon = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "ckpredicted") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckPredicted = (attribute.value() == "yes");
+      g_ckPredicted = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "cknadir") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_ckNadir = (attribute.value() == "yes");
+      g_ckNadir = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spksmithed") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_spkSmithed = (attribute.value() == "yes");
+      g_spkSmithed = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spkrecon") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_spkRecon = (attribute.value() == "yes");
+      g_spkRecon = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spkpredicted") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      g_spkPredicted = (attribute.value() == "yes");
+      g_spkPredicted = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "shape") {
       QDomNode node = element.attributes().namedItem("value");
@@ -584,7 +587,7 @@ void packageKernels(QString toFile) {
 
   QString logFile(toFile + ".print");
   Pvl logMessage(logFile);
-  remove(logFile.toAscii().data());
+  QFile::remove(logFile);
   stringstream logStream;
   logStream << logMessage;
   xml +=
@@ -595,7 +598,7 @@ void packageKernels(QString toFile) {
 
   QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
-  remove(kernLabelsFile.toAscii().data());
+  QFile::remove(kernLabelsFile);
   stringstream labelStream;
   labelStream << kernLabels;
 
@@ -612,7 +615,7 @@ void packageKernels(QString toFile) {
 
   xml += "  </tables>\n";
   xml += "</spice_data>\n";
-  QString encodedXml(xml.toAscii().toHex().constData());
+  QString encodedXml(QByteArray(xml.toAscii()).toHex().constData());
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);
