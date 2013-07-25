@@ -90,6 +90,11 @@ Maximum X:  0.984807753
 Minimum Y:  -1
 Maximum Y:  0.6076045
 
+Test polar projection (clat = -90)
+Successful
+X Range:  [-0.0348994967, 0.0348994967]
+Y Range:  [-0.0348994967, 0.0348994967]
+
 Unit test was obtained from:
 
   Map Projections - A Working Manual

@@ -324,7 +324,7 @@ namespace Isis {
           m_longitude += atan2(GetX(), -GetY());
         }
         else {
-          m_longitude += atan2(-GetX(), GetY());
+          m_longitude += atan2(GetX(), GetY());
         }
       }
       else {

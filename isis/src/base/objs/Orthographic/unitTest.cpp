@@ -137,6 +137,26 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
+    mapGroup.findKeyword("MinimumLatitude").setValue("-90.0");
+    mapGroup.findKeyword("MaximumLatitude").setValue("-88.0");
+    mapGroup.findKeyword("MinimumLongitude").setValue("0.0");
+    mapGroup.findKeyword("MaximumLongitude").setValue("360.0");
+
+    mapGroup.findKeyword("CenterLatitude").setValue("-90.0");
+    mapGroup.findKeyword("CenterLongitude").setValue("0.0");
+
+    cout << "Test polar projection (clat = -90)" << endl;
+    Projection &pole = *ProjectionFactory::Create(lab);
+    minX = 0;
+    maxX = 0;
+    minY = 0;
+    maxY = 0;
+    pole.XYRange(minX, maxX, minY, maxY);
+    cout << "Successful" << endl;
+    cout << "X Range:  [" << minX << ", " << maxX << "]" << endl;
+    cout << "Y Range:  [" << minY << ", " << maxY << "]" << endl;
+    cout << endl;
+
     cout << "Unit test was obtained from:" << endl << endl;
     cout << "  Map Projections - A Working Manual" << endl;
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
