@@ -42,17 +42,19 @@ namespace Isis {
    *
    * @internal
    *   @history 2004-02-13 Jeff Anderson - Added another constructor and
-   *   refactored UpdateGroup method.
+   *                           refactored UpdateGroup method.
    *   @history 2004-06-03 Jeff Anderson - Fixed bug in UpdateGroup which
-   *   occured when a cube label did not already have a AlphaCube group.
+   *                           occured when a cube label did not already have a AlphaCube group.
    *   @history 2005-02-14 Leah Dahmer - Modified file to support Doxygen
-   *   documentation.
+   *                           documentation.
+   *   @history 2013-08-08 Kimberly Oyama - Made the Pvl parameter of the constructor
+   *                           const. Fixes #1744.
    *
    *   @todo 2005-04-06 Add coded example.
    */
   class AlphaCube {
     public:
-      AlphaCube(Isis::Pvl &pvl);
+      AlphaCube(const Isis::Pvl &pvl);
       AlphaCube(int alphaSamples, int alphaLines,
                 int betaSamples, int betaLines);
       AlphaCube(int alphaSamples, int alphaLines,

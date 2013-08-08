@@ -27,10 +27,10 @@
 using namespace std;
 namespace Isis {
   //! Constructs an AlphaCube object using a PVL object.
-  AlphaCube::AlphaCube(Isis::Pvl &pvl) {
-    Isis::PvlObject &isiscube = pvl.findObject("IsisCube");
+  AlphaCube::AlphaCube(const Isis::Pvl &pvl) {
+    const Isis::PvlObject &isiscube = pvl.findObject("IsisCube");
     if(isiscube.hasGroup("AlphaCube")) {
-      Isis::PvlGroup &alpha = isiscube.findGroup("AlphaCube");
+      const Isis::PvlGroup &alpha = isiscube.findGroup("AlphaCube");
       p_alphaSamples        = alpha["AlphaSamples"];
       p_alphaLines          = alpha["AlphaLines"];
       p_alphaStartingSample = alpha["AlphaStartingSample"];
@@ -41,7 +41,7 @@ namespace Isis {
       p_betaLines           = alpha["BetaLines"];
     }
     else {
-      Isis::PvlGroup &dims = isiscube.findGroup("Dimensions", Isis::Pvl::Traverse);
+      const Isis::PvlGroup &dims = isiscube.findGroup("Dimensions", Isis::Pvl::Traverse);
       p_alphaSamples        = dims["Samples"];
       p_alphaLines          = dims["Lines"];
       p_alphaStartingSample = 0.5;
