@@ -1,6 +1,10 @@
 #include <iomanip>
 #include <iostream>
 
+#include <QList>
+#include <QPair>
+#include <QString>
+
 #include "IException.h"
 #include "Orthographic.h"
 #include "Preference.h"
@@ -77,15 +81,109 @@ int main(int argc, char *argv[]) {
     cout << "YCoord:                 " << p.YCoord() << endl;
     cout << endl;
 
-    cout << "Test XYRange method ... " << endl;
+    cout << "Test XYRange method... " << endl;
     double minX, maxX, minY, maxY;
-    p.XYRange(minX, maxX, minY, maxY);
-    cout << "Minimum X:  " << minX << endl;
-    cout << "Maximum X:  " << maxX << endl;
-    cout << "Minimum Y:  " << minY << endl;
-    cout << "Maximum Y:  " << maxY << endl;
-    cout << endl;
+    Orthographic r(lab);
 
+    QList< QList<QString> >  lonInfo;
+    QList<QString> currLon;
+    currLon += "-180";
+    currLon += "180";
+    currLon += "0";
+    currLon += "180";
+    lonInfo.append(currLon);
+    currLon[0] = "-400";
+    currLon[1] = "-200";
+    currLon[2] = "-300";
+    currLon[3] = "180";
+    lonInfo.append(currLon);
+    currLon[0] = "-400";
+    currLon[1] = "-200";
+    currLon[2] = "-300";
+    currLon[3] = "360";
+    lonInfo.append(currLon);
+    currLon[0] = "200";
+    currLon[1] = "400";
+    currLon[2] = "300";
+    currLon[3] = "360";
+    lonInfo.append(currLon);
+    currLon[0] = "200";
+    currLon[1] = "400";
+    currLon[2] = "300";
+    currLon[3] = "180";
+    lonInfo.append(currLon);
+    currLon[0] = "0";
+    currLon[1] = "360";
+    currLon[2] = "0";
+    currLon[3] = "360";
+    lonInfo.append(currLon);
+    currLon[0] = "-500";
+    currLon[1] = "-400";
+    currLon[2] = "-450";
+    currLon[3] = "180";
+    lonInfo.append(currLon);
+    currLon[0] = "-500";
+    currLon[1] = "-400";
+    currLon[2] = "-450";
+    currLon[3] = "360";
+    lonInfo.append(currLon);
+    currLon[0] = "400";
+    currLon[1] = "500";
+    currLon[2] = "450";
+    currLon[3] = "180";
+    lonInfo.append(currLon);
+    currLon[0] = "400";
+    currLon[1] = "500";
+    currLon[2] = "450";
+    currLon[3] = "360";
+    lonInfo.append(currLon);
+    currLon[0] = "-270";
+    currLon[1] = "-90";
+    currLon[2] = "-180";
+    currLon[3] = "180";
+    lonInfo.append(currLon);
+    currLon[0] = "-270";
+    currLon[1] = "-90";
+    currLon[2] = "-180";
+    currLon[3] = "360";
+    lonInfo.append(currLon);
+    currLon[0] = "90";
+    currLon[1] = "270";
+    currLon[2] = "180";
+    currLon[3] = "180";
+    lonInfo.append(currLon);
+    currLon[0] = "90";
+    currLon[1] = "270";
+    currLon[2] = "180";
+    currLon[3] = "360";
+    lonInfo.append(currLon);
+    
+    QList<QString> lon;
+    foreach (lon, lonInfo) {
+      try {
+        mapGroup.findKeyword("MinimumLongitude").setValue(lon[0]);
+        mapGroup.findKeyword("MaximumLongitude").setValue(lon[1]);
+        mapGroup.findKeyword("CenterLongitude").setValue(lon[2]);
+        mapGroup.findKeyword("LongitudeDomain").setValue(lon[3]);
+        r = Orthographic(lab);
+        r.XYRange(minX, maxX, minY, maxY);
+        cout << "Lon Range: [" << r.MinimumLongitude() << ", "
+                          << r.MaximumLongitude() << "]" << endl;
+        cout << "X Range: [" << minX << ", " << maxX << "]" << endl;
+        cout << "Y Range: [" << minY << ", " << maxY << "]" << endl;
+        cout << endl;
+      }
+      catch(IException &e) {
+        e.print();
+        cout << endl;
+      }
+    }
+
+//reset everything for the rest of the tests.
+    mapGroup.findKeyword("MinimumLongitude").setValue("-90");
+    mapGroup.findKeyword("MaximumLongitude").setValue("90");
+    mapGroup.findKeyword("CenterLongitude").setValue("0");
+    mapGroup.findKeyword("LongitudeDomain").setValue("180");
     Projection *s = &p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
@@ -95,6 +193,8 @@ int main(int argc, char *argv[]) {
     cout << "Test default computation ... " << endl;
     mapGroup.deleteKeyword("CenterLongitude");
     mapGroup.deleteKeyword("CenterLatitude");
+    mapGroup.findKeyword("MinimumLongitude").setValue("-90.0");
+    mapGroup.findKeyword("MaximumLongitude").setValue("90.0");
     Orthographic p2(lab, true);
     cout << lab << endl;
     cout << endl;
@@ -137,6 +237,51 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
+    cout << endl << "Test the longitude range [-90, 90] when clat=0" << endl;
+    mapGroup.findKeyword("MinimumLongitude").setValue("-90.0");
+    mapGroup.findKeyword("MaximumLongitude").setValue("90.0");
+    //Create new projection because the constructor did the modification
+    Projection &q = *ProjectionFactory::Create(lab);
+    cout << "Minimum Longitude: " << q.MinimumLongitude() << endl;
+    cout << "Maximum Longitude: " << q.MaximumLongitude() << endl << endl;
+
+    //Test bad lon range
+    cout << endl << "Test bad lon range [0, 400]" << endl;
+    mapGroup.findKeyword("CenterLongitude").setValue("0.0");
+    mapGroup.findKeyword("MinimumLongitude").setValue("0.0");
+    mapGroup.findKeyword("MaximumLongitude").setValue("400.0");
+    try {
+      Projection &n = *ProjectionFactory::Create(lab);
+      cout << "Minimum Longitude: " << n.MinimumLongitude() << endl;
+      cout << "Maximum Longitude: " << n.MaximumLongitude() << endl << endl;
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    //test planetocentric
+    mapGroup.findKeyword("CenterLatitude").setValue("1.0");
+    mapGroup.findKeyword("MaximumLongitude").setValue("360.0");
+    mapGroup.findKeyword("LatitudeType").setValue("Planetocentric");
+    try {
+      Projection &n = *ProjectionFactory::Create(lab);
+      cout << endl << " Planetocentric?: " << n.IsPlanetocentric() << endl << endl;
+
+    }
+    catch(IException &e) {
+      e.print();
+    }
+    //test when rho > equaRad
+    try {
+      Orthographic n(lab);
+      n.SetCoordinate(10, 10);
+      cout << " Testing SetCoordinate. " << endl << endl;
+
+    }
+    catch(IException &e) {
+      e.print();
+    }
+    
     mapGroup.findKeyword("MinimumLatitude").setValue("-90.0");
     mapGroup.findKeyword("MaximumLatitude").setValue("-88.0");
     mapGroup.findKeyword("MinimumLongitude").setValue("0.0");

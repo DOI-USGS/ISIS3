@@ -27,7 +27,6 @@
 #include <iomanip>
 
 #include <QDebug>
-
 #include "Constants.h"
 #include "IException.h"
 #include "Projection.h"
@@ -84,6 +83,13 @@ namespace Isis {
         m_centerLatitude = ToPlanetographic(m_centerLatitude);
       }
 
+      //Restrict center longitude to avoid converting between domains.
+      if ((m_centerLongitude < -360.0) || (m_centerLongitude > 360.0)) {
+        QString msg = "The center longitude cannot exceed [-360, 360]. "
+                      "[" + toString(m_centerLongitude) + "] is not valid";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
       // convert to radians, adjust for longitude direction
       m_centerLongitude *= PI / 180.0;
       m_centerLatitude *= PI / 180.0;
@@ -132,6 +138,12 @@ namespace Isis {
         } // else something else is off (i.e. longitude range)
       }
 
+      //Restrict the longitude range to 360 degrees to simplify comparisons.
+      if ((m_maximumLongitude - m_minimumLongitude) > 360.0) {
+        QString msg = "The longitude range cannot exceed 360 degrees.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    
       sinphi = sin(m_minimumLatitude * PI / 180.0);
       cosphi = cos(m_minimumLatitude * PI / 180.0);
 
@@ -147,19 +159,6 @@ namespace Isis {
         if (newMax < m_maximumLatitude && newMax > m_minimumLatitude) {
           m_maximumLatitude = newMax;
         } // else something else is off (i.e. longitude range)
-      }
-
-      /* If we are looking at the side of the planet (clat = 0), then make sure
-       * the longitude range is limited to 90 degrees to either direction
-       */
-      if (m_centerLatitude == 0.0) {
-        if (m_maximumLongitude - m_centerLongitude * 180.0 / PI > 90) {
-          m_maximumLongitude = (m_centerLongitude * 180.0 / PI) + 90;
-        }
-
-        if (m_centerLongitude * 180.0 / PI - m_minimumLongitude > 90) {
-          m_minimumLongitude = (m_centerLongitude * 180.0 / PI) - 90;
-        }
       }
     }
     catch(IException &e) {
@@ -341,12 +340,24 @@ namespace Isis {
 
     // Cleanup the longitude
     if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
+    
+    /*
+     * When the longitude range is 0 to 360 and the seam is within the 180 displayable degrees,
+     * the longitude needs to be converted to its 360 lon domain counterpart. However, if the
+     * range is shifted out of the 0 to 360 range, the conversion is not necessary. For example,
+     * if the specified range is -180 to 180 and the clon is 0, the lon -90 is valid but will
+     * be converted to 270, which does not work with the comparison. The same idea applies if
+     * the range is 200 - 500 and the clon is 360. We want to display 270 to 450 (270 - 360 and
+     * 0 - 90). However, if 450 is converted to the 360 domain it becomes 90 which is no longer
+     * within the original 200 to 500 range.
+     */
     // These need to be done for circular type projections
     m_longitude = To360Domain(m_longitude);
     if (m_longitudeDomain == 180) m_longitude = To180Domain(m_longitude);
 
     // Cleanup the latitude
-    if (IsPlanetocentric()) m_latitude = ToPlanetocentric(m_latitude);
+    if (IsPlanetocentric())
+      m_latitude = ToPlanetocentric(m_latitude);
     
     m_good = true;
     return m_good;
@@ -379,6 +390,17 @@ namespace Isis {
                              double &minY, double &maxY) {
     double lat, lon;
 
+    //Restrict lon range to be between -360 and 360
+    double adjustedLon;
+    double adjustedMinLon = To360Domain(MinimumLongitude());
+    double adjustedMaxLon = To360Domain(MaximumLongitude());
+    bool correctedMinLon = false;
+
+    if (adjustedMinLon >= adjustedMaxLon) {
+      adjustedMinLon -= 360;
+      correctedMinLon = true;
+    }
+
     // Check the corners of the lat/lon range
     XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
     XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
@@ -407,7 +429,6 @@ namespace Isis {
       XYRangeCheck(lat, lon);
     }
 
-    
     /*
      * Walk the limb.
      * When the pair is valid and within the correct range, reassign min/max x/y.
@@ -417,12 +438,12 @@ namespace Isis {
      *               ,       _______         ,
      *               ,       |       |         , <----- Walking the limb would not affect an
      *              ,        |       |          ,       image that does not extend to the
-                    ,        |_______|          ,       limits of the projection.
+     *              ,        |_______|          ,       limits of the projection.
      *              ,   ________________________,_
      *               , |                        , |
      *                ,|                       ,  |
      *                 |,___________________,_'___| <-- This corner would wrap around.
-                          ' - , _ _ _ ,  '              The image would rotate because the
+     *                    ' - , _ _ _ ,  '              The image would rotate because the
      *                                                  center lat was closer to the pole.
      *                                                  This would allow for a more completely
      *                                                  longitude range.
@@ -433,28 +454,30 @@ namespace Isis {
      *                         o         o              to have a lon range that is larger than
      *                            o  o                  180 degrees.
      *
-     *
-     *
-     *
      */
+    
     for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
       double x = m_equatorialRadius * cos(angle * PI / 180.0);
       double y = m_equatorialRadius * sin(angle * PI / 180.0);
 
-      if (SetCoordinate(x, y) &&
-         (m_latitude <= m_maximumLatitude &&
-          m_longitude <= m_maximumLongitude &&
-          m_latitude >= m_minimumLatitude &&
-          m_longitude >= m_minimumLongitude)) {
-
-        m_minimumX = qMin(x, m_minimumX);
-        m_maximumX = qMax(x, m_maximumX);
-        m_minimumY = qMin(y, m_minimumY);
-        m_maximumY = qMax(y, m_maximumY);
-        XYRangeCheck(m_latitude, m_longitude);
+      if (SetCoordinate(x, y)){
+        
+        adjustedLon =    To360Domain(m_longitude);
+        if (adjustedLon > To360Domain(MinimumLongitude()) && correctedMinLon) {
+          adjustedLon -= 360;
+        }
+        if (m_latitude <= m_maximumLatitude &&
+            adjustedLon <= adjustedMaxLon &&
+            m_latitude >= m_minimumLatitude &&
+            adjustedLon >= adjustedMinLon) {
+          m_minimumX = qMin(x, m_minimumX);
+          m_maximumX = qMax(x, m_maximumX);
+          m_minimumY = qMin(y, m_minimumY);
+          m_maximumY = qMax(y, m_maximumY);
+          XYRangeCheck(m_latitude, adjustedLon);
+        }
       }
     }
-
     // Make sure everything is ordered
     if (m_minimumX >= m_maximumX ||
         m_minimumY >= m_maximumY)

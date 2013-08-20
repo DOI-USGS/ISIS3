@@ -25,11 +25,58 @@ Longitude:              -110
 XCoord:                 -0.150383733
 YCoord:                 -0.165191103
 
-Test XYRange method ... 
-Minimum X:  -1
-Maximum X:  1
-Minimum Y:  -1
-Maximum Y:  1
+Test XYRange method... 
+Lon Range: [-180, 180]
+X Range: [-1, 1]
+Y Range: [-1, 1]
+
+Lon Range: [-400, -200]
+X Range: [-1, 1]
+Y Range: [-1, 0.758022222]
+
+Lon Range: [-400, -200]
+X Range: [-1, 1]
+Y Range: [-1, 0.758022222]
+
+Lon Range: [200, 400]
+X Range: [-1, 1]
+Y Range: [-1, 0.758022222]
+
+Lon Range: [200, 400]
+X Range: [-1, 1]
+Y Range: [-1, 0.758022222]
+
+Lon Range: [0, 360]
+X Range: [-1, 1]
+Y Range: [-1, 1]
+
+**I/O ERROR** Invalid label group [Mapping].
+**USER ERROR** The center longitude cannot exceed [-360, 360]. [-450.0] is not valid.
+
+**I/O ERROR** Invalid label group [Mapping].
+**USER ERROR** The center longitude cannot exceed [-360, 360]. [-450.0] is not valid.
+
+**I/O ERROR** Invalid label group [Mapping].
+**USER ERROR** The center longitude cannot exceed [-360, 360]. [450.0] is not valid.
+
+**I/O ERROR** Invalid label group [Mapping].
+**USER ERROR** The center longitude cannot exceed [-360, 360]. [450.0] is not valid.
+
+Lon Range: [-270, -90]
+X Range: [-1, 1]
+Y Range: [-1, 0.71984631]
+
+Lon Range: [-270, -90]
+X Range: [-1, 1]
+Y Range: [-1, 0.71984631]
+
+Lon Range: [90, 270]
+X Range: [-1, 1]
+Y Range: [-1, 0.71984631]
+
+Lon Range: [90, 270]
+X Range: [-1, 1]
+Y Range: [-1, 0.71984631]
 
 Test Name and comparision method ... 
 Name:       Orthographic
@@ -44,8 +91,8 @@ Group = Mapping
   LongitudeDomain    = 180
   MinimumLatitude    = -70.0
   MaximumLatitude    = 70.0
-  MinimumLongitude   = -180.0
-  MaximumLongitude   = 180.0
+  MinimumLongitude   = -90.0
+  MaximumLongitude   = 90.0
   ProjectionName     = Orthographic
   CenterLongitude    = 0.0
   CenterLatitude     = 0.0
@@ -89,6 +136,21 @@ Minimum X:  -0.984807753
 Maximum X:  0.984807753
 Minimum Y:  -1
 Maximum Y:  0.6076045
+
+
+Test the longitude range [-90, 90] when clat=0
+Minimum Longitude: -90
+Maximum Longitude: 90
+
+
+Test bad lon range [0, 400]
+**I/O ERROR** Unable to initialize Projection information from group [Mapping].
+**I/O ERROR** Invalid label group [Mapping].
+**USER ERROR** The longitude range cannot exceed 360 degrees.
+
+ Planetocentric?: 1
+
+ Testing SetCoordinate. 
 
 Test polar projection (clat = -90)
 Successful
