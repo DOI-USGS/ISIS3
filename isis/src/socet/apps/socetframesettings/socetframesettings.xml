@@ -2,15 +2,15 @@
 
 <application name="socetframesettings" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Create a SOCET Set Framing Camera or USGSAstro FrameOffAxis settings file.
+    Create a SOCET SET Framing Camera or USGSAstro FrameOffAxis settings file.
   </brief>
 
   <description>
-    This is an ISIS to SOCET Set (trademark BAE Systems) translation program for Framing Camera
-    images.  It calculates keyword values specific to SOCET Set's Framing Camera Settings files
-    and generates the settings file for input to USGSAstro SOCET Set program 'import_frame.' <br/>
+    This is an ISIS to SOCET SET (trademark BAE Systems) translation program for Framing Camera
+    images.  It calculates keyword values specific to SOCET SET's Framing Camera Settings files
+    and generates the settings file for input to USGSAstro SOCET SET program 'import_frame.' <br/>
     <br/>
-    The input cube must be a "level 1" image <b>with SPICE data attached to the label</b> (see
+    The input cube must be a "level1" image <b>with SPICE data attached to the label</b> (see
     spiceinit). <br/> 
     <br/>
     The following are supported instruments:
@@ -20,6 +20,7 @@
        MESSENGER NAC
        MESSENGER WAC
        VIKING ORBITER
+       CLEMENTINE 1 UVVIS
 <!--
        APOLLO 15 METRIC
        APOLLO 16 METRIC
@@ -59,7 +60,12 @@
       name based on the base name of the FROM cube).  Temporarily removed support for APOLLO METRIC,
       MEX-SRC, and THEMIS-VIS sensors until testing can be completed.  References #1526.
     </change>
-  </history>
+    <change name="Raad A. Saleh" date="2013-09-09">
+      Added support for Clementine 1 UVVIS instrument and updated documentation to reflect the
+      changes. Reference #1749.
+    </change>
+
+</history>
 
   <groups>
     <group name="Files">
@@ -71,7 +77,8 @@
         </brief>
         <description>
           Level 1 input Framing Camera cube with SPICE data attached. Supported instruments are
-          CASSINI SSI, GALILEO ISS, MESSENGER NAC, MESSENGER WAC and VIKING ORBITER.
+          CASSINI SSI, GALILEO ISS, MESSENGER NAC, MESSENGER WAC, VIKING ORBITER and CLEMENTINE 1
+          UVVIS.
         </description>
         <filter>
           *.cub
@@ -81,37 +88,37 @@
       <parameter name="TO">
         <type>filename</type>
         <fileMode>output</fileMode>
-        <brief>SOCET Set Framing Camera Settings file</brief>
+        <brief>SOCET SET Framing Camera Settings file</brief>
         <internalDefault>None</internalDefault>
         <description>
-          Output SOCET Set Framing Camera Settings file. This is a text file and should have a file
-          extension of ".set." This file is one of the input files to USGSAstro SOCET Set program
+          Output SOCET SET Framing Camera Settings file. This is a text file that must have a file
+          extension of ".set." This file is one of the input files to USGSAstro SOCET SET program
           'import_frame.'
         </description>
       </parameter>
 
     </group>
     
-    <group name="SOCET Set Parameters">
+    <group name="SOCET SET Parameters">
 
       <parameter name="SS_PROJECT">
         <type>string</type>
-        <brief>SOCET Set Project name</brief>
+        <brief>SOCET SET Project name</brief>
         <description>
-          Name of the SOCET Set project that you will be importing this image into. Including the
-          ".prj" extension is optional. As an example, for SOCET Set project named TEST, enter<br/>
-          <pre>
-          SS_PROJECT=TEST</pre>
+          Name of the SOCET SET project that you will be importing this image into. Including the
+          ".prj" extension is optional. As an example, for SOCET SET project named TEST, enter
+          SS_PROJECT=TEST.
         </description>
       </parameter>
       
       <parameter name="SS_IMG_LOC">
         <type>string</type>
         <brief>
-        Destination of SOCET Set images as shown in the FIRST COLUMN of SOCET's location.list file
+        Destination of SOCET SET images as shown in the first column of SOCET SET's location.list
+        file
        </brief>
         <description>
-          The "logical" location of the SOCET images as shown in the FIRST COLUMN of SOCET Set file
+          The "logical" location of the SOCET images as shown in the first column of SOCET SET
           internal database file DEVICE/location.list.
         </description>
       </parameter>
@@ -119,21 +126,23 @@
       <parameter name="SS_INPUT_PATH">
         <type>string</type>
         <brief>
-          Full path to location of input images and Framing Camera settings files on the SOCET Set
+          Full path to location of input images and Framing Camera settings files on the SOCET SET
           machine
         </brief>
         <description>
-          Full path on SOCET Set machine where raw images (*.raw) and Framing Camera settings
-          files (*.set) will reside for import into SOCET Set, <b><i>with the ending file path
-          delimeter included.</i></b> This is typically in the SOCET Set project's images directory.
+          Full path on SOCET SET machine where raw images (*.raw) and Framing Camera settings
+          files (*.set) will reside for import into SOCET SET, <b><i>with the ending file path
+          delimiter included.</i></b> This is typically in the SOCET SET project's images directory.
           <br/>
           <br/>
-          Entering the file path delimiters (forward-slash for Unix systes, back-slash for Windows
+          Entering the file path delimiters (forward slash for UNIX systems, backslash for Windows
           systems) is straight forward when entering your path into the dialog box. However, special
           handling is required when running this program at the command line or in processing
           scripts. 
           <pre>
-          For SOCET Set running on Windows, an example input path would be E:\images\test.
+          For SOCET SET running on Windows, an example input path would be
+
+          E:\images\test
 
           To enter a path in the dialog box, enter the path as it normally appears. For this
           example, enter
@@ -141,8 +150,8 @@
           E:\images\test\
 
           To enter a path on the command line, or in a script, use the escape character (which is a
-          back-slash) to pass the delimiters to the program.  For this example, enter
-
+          backslash) to pass the delimiters to the program.  For this example, enter
+          
           SS_INPUT_PATH=E:\\IMAGES\\TEST\\ </pre>
         </description>
       </parameter>
@@ -150,13 +159,14 @@
       <parameter name="SS_CAM_CALIB_PATH">
         <type>string</type>
         <brief>
-          Full path to SOCET Set's camera calibration directory.
+          Full path to SOCET SET's camera calibration directory
         </brief>
         <description>
-          Full path to SOCET Set's internal database camera calibration directory, <b><i>with the
-          ending file path delimeter included.</i></b> 
+          Full path to SOCET SET's internal database camera calibration directory, <b><i>with the
+          ending file path delimiter included.</i></b>
           <pre>
-          For SOCET Set running on Windows, an example path would be
+          For SOCET SET running on Windows, an example path would be
+
           C:\SOCET_SET_5.6.0\internal_dbs\CAM
 
           To enter a path in the dialog box, enter the path as it normally appears. For this
@@ -165,8 +175,8 @@
           C:\SOCET_SET_5.6.0\internal_dbs\CAM\
 
           To enter a path on the command line, or in a script, use the escape character (which is a
-          back-slash) to pass the delimiters to the program.  For this example, enter
-
+          backslash) to pass the delimiters to the program.  For this example, enter
+          
           SS_CAM_CALIB_PATH=C:\\SOCET_SET_5.6.0\\internal_dbs\\CAM\\ </pre>
         </description>
       </parameter>

@@ -100,9 +100,9 @@ void IsisMain() {
   double ographicCamPos[3] = {0.0, 0.0, 0.0};
   double omegaPhiKappa[3] = {0.0, 0.0, 0.0};
   double isisFocalPlane2SocetPlateTranspose[3][3] =
-                                              {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-  getCamPosOPK(spice, spacecraftName, et, cam, ographicCamPos, omegaPhiKappa,
-               isisFocalPlane2SocetPlateTranspose);
+      {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  getCamPosOPK(spice, spacecraftName, et, cam, ographicCamPos,
+               omegaPhiKappa,isisFocalPlane2SocetPlateTranspose);
   
   // Determine the SOCET Set camera calibration file
   QString socetCamFile = socetCameraCalibrationPath;
@@ -123,32 +123,33 @@ void IsisMain() {
       socetCamFile += "VIK2B.cam";
     }
   }
-//----------------------------------------.-------------
-//TO DO: Uncomment these lines when MEX SRC is supported
-//----------------------------------------.-------------
-//  // Mars Express  
-//  else if (spacecraftName == "MARS_EXPRESS") {
-//    socetCamFile += "SRC.cam";
-//  }
-//-----------------------------------------------------
-//TO DO: Uncomment these lines when Themis is supported
-//-----------------------------------------------------
-//  // THEMIS VIS images (MARS Odyssey)
-//  else if (spacecraftName == "MARS_ODYSSEY") {
-//    socetCamFile += "THEMIS_VIS_F3.cam";
-//  } 
-//-----------------------------------------------------
-//TO DO: Uncomment these lines when Apollo is supported
-//-----------------------------------------------------
-//  else if (spacecraftName == "APOLLO 15") {
-//    socetCamFile += "Apollo15_M_ASU.cam";
-//  } 
-//  else if (spacecraftName == "APOLLO 16") {
-//    socetCamFile += "Apollo16_M_ASU.cam";
-//  } 
-//  else if (spacecraftName == "APOLLO 17") {
-//    socetCamFile += "Apollo17_M_ASU.cam";
-//  } 
+  
+  //----------------------------------------.-------------
+  //TO DO: Uncomment these lines when MEX SRC is supported
+  //----------------------------------------.-------------
+  //  // Mars Express
+  //  else if (spacecraftName == "MARS_EXPRESS") {
+  //    socetCamFile += "SRC.cam";
+  //  }
+  //----------------------------------------------------- 
+  //TO DO: Uncomment these lines when Themis is supported
+  //-----------------------------------------------------
+  //  // THEMIS VIS images (MARS Odyssey)
+  //  else if (spacecraftName == "MARS_ODYSSEY") {
+  //    socetCamFile += "THEMIS_VIS_F3.cam";
+  //  }
+  //-----------------------------------------------------
+  //TO DO: Uncomment these lines when Apollo is supported
+  //-----------------------------------------------------
+  //  else if (spacecraftName == "APOLLO 15") {
+  //    socetCamFile += "Apollo15_M_ASU.cam";
+  //  }
+  //  else if (spacecraftName == "APOLLO 16") {
+  //    socetCamFile += "Apollo16_M_ASU.cam";
+  //  }
+  //  else if (spacecraftName == "APOLLO 17") {
+  //    socetCamFile += "Apollo17_M_ASU.cam";
+  //  }
   else if (spacecraftName == "Galileo Orbiter") {
     //Check if this image was aquired with the cover on or off
     iTime removeCoverDate("1994/04/01 00:00:00");
@@ -179,6 +180,12 @@ void IsisMain() {
       socetCamFile += "MDIS_WAC.cam";
     }
   }
+  else if (spacecraftName == "CLEMENTINE 1") {
+    if (instrumentId == "UVVIS") {
+      socetCamFile += "ClemUVVIS.cam";
+    }
+  }
+ 
   // Throw exception for unsupported camera
   else {
     QString msg = QString("The ISIS to SOCET Set translation of input image [%1] is currently "
@@ -188,18 +195,18 @@ void IsisMain() {
 
   // For THEMIS VIS, Galileo SSI, Cassini ISS get the image summation mode
   int summation = 1;
-//-----------------------------------------------------
-//TO DO: Uncomment these lines when Themis is supported
-//-----------------------------------------------------
-//  if (spacecraftName == "MARS_ODYSSEY") {
-//    try {
-//      summation = (int) detectorMap->SampleScaleFactor();
-//    }
-//    catch (IException &e) {
-//      QString msg = "Error reading SpatialSumming from Instrument label";
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
-//  }
+  //-----------------------------------------------------
+  //TO DO: Uncomment these lines when Themis is supported
+  //-----------------------------------------------------
+  //  if (spacecraftName == "MARS_ODYSSEY") {
+  //    try { 
+  //      summation = (int) detectorMap->SampleScaleFactor();
+  //    }
+  //    catch (IException &e) {
+  //      QString msg = "Error reading SpatialSumming from Instrument label";
+  //      throw IException(IException::User, msg, _FILEINFO_);
+  //    }
+  //  }
 
   if (spacecraftName == "Galileo Orbiter") {
     try {
@@ -390,17 +397,17 @@ void IsisMain() {
       toStrm << " " << iTransL[i];
     toStrm << endl;
     toStrm << "M_SOCET2ISIS_FOCALPLANE " << setprecision(2) <<
-                         isisFocalPlane2SocetPlateTranspose[0][0] << " " <<
-                         isisFocalPlane2SocetPlateTranspose[0][1] << " " <<
-                         isisFocalPlane2SocetPlateTranspose[0][2] << endl;
+              isisFocalPlane2SocetPlateTranspose[0][0] << " " <<
+              isisFocalPlane2SocetPlateTranspose[0][1] << " " <<
+              isisFocalPlane2SocetPlateTranspose[0][2] << endl;
     toStrm << "                         " <<
-                         isisFocalPlane2SocetPlateTranspose[1][0] << " " <<
-                         isisFocalPlane2SocetPlateTranspose[1][1] << " " <<
-                         isisFocalPlane2SocetPlateTranspose[1][2] << endl;
+              isisFocalPlane2SocetPlateTranspose[1][0] << " " <<
+              isisFocalPlane2SocetPlateTranspose[1][1] << " " <<
+              isisFocalPlane2SocetPlateTranspose[1][2] << endl;
     toStrm << "                         " <<
-                         isisFocalPlane2SocetPlateTranspose[2][0] << " " <<
-                         isisFocalPlane2SocetPlateTranspose[2][1] << " " <<
-                         isisFocalPlane2SocetPlateTranspose[2][2] << endl;
+              isisFocalPlane2SocetPlateTranspose[2][0] << " " <<
+              isisFocalPlane2SocetPlateTranspose[2][1] << " " <<
+              isisFocalPlane2SocetPlateTranspose[2][2] << endl;
     toStrm << "INS-" << ikCode << "_SWAP_OBSERVER_TARGET = '" << swapObserverTarget << "'\n";
     toStrm << "INS-" << ikCode << "_LIGHTTIME_CORRECTION = '" << lightTimeCorrection << "'\n";
     toStrm << "INS-" << ikCode << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect <<"'\n";
@@ -415,8 +422,8 @@ void IsisMain() {
 // For the USGSAstro FrameOffAxis sensor model, the transpose of the rotation matrix from
 // isis to socet set focal plane coordinates is also returned.
 void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
-                 double ographicCamPos[3], double omegaPhiKappa[3],
-                 double isisFocalPlane2SocetPlateTranspose[3][3]) {
+                  double ographicCamPos[3], double omegaPhiKappa[3],
+                  double isisFocalPlane2SocetPlateTranspose[3][3]) {
 
   // Initialize the isisFocalPlane2SocetPlate matrix based on mission.
   //
@@ -427,42 +434,44 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   //                     +z = up
 
   double isisFocalPlane2SocetPlate[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-//-----------------------------------------------------
-//TO DO: Uncomment these lines when Apollo is supported
-//-----------------------------------------------------
-//  if (spacecraftName == "APOLLO 15" || spacecraftName == "APOLLO 16") {
-//    isisFocalPlane2SocetPlate[0][0] = 1.0;
-//    isisFocalPlane2SocetPlate[1][1] = -1.0;
-//    isisFocalPlane2SocetPlate[2][2] = -1.0;
-//  }
-//  else if (spacecraftName == "APOLLO 17") {
-//    isisFocalPlane2SocetPlate[0][0] = -1.0;
-//    isisFocalPlane2SocetPlate[1][1] = 1.0;
-//    isisFocalPlane2SocetPlate[2][2] = -1.0;
-//  }
-//-----------------------------------------------------
-//TO DO: Uncomment these lines when MEX-SRC is supported
-//-----------------------------------------------------
-//  else if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2" ||
-//           spacecraftName == "MARS_EXPRESS") {
-//-----------------------------------------------------
-//TO DO: Delete this next line when MEX-SRC is supported
-//-----------------------------------------------------
-  if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2") {
+  //-----------------------------------------------------
+  //TO DO: Uncomment these lines when Apollo is supported
+  //-----------------------------------------------------
+  //  if (spacecraftName == "APOLLO 15" || spacecraftName == "APOLLO 16") {
+  //    isisFocalPlane2SocetPlate[0][0] = 1.0;
+  //    isisFocalPlane2SocetPlate[1][1] = -1.0;
+  //    isisFocalPlane2SocetPlate[2][2] = -1.0;
+  //  }
+  //  else if (spacecraftName == "APOLLO 17") {
+  //    isisFocalPlane2SocetPlate[0][0] = -1.0;
+  //    isisFocalPlane2SocetPlate[1][1] = 1.0;
+  //    isisFocalPlane2SocetPlate[2][2] = -1.0;
+  //  }
+  //-----------------------------------------------------
+  //TO DO: Uncomment these lines when MEX-SRC is supported
+  //-----------------------------------------------------
+  //  else if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2" ||
+  //           spacecraftName == "MARS_EXPRESS") {
+  //-----------------------------------------------------
+  //TO DO: Delete this next line when MEX-SRC is supported
+  //-----------------------------------------------------
+  if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2" ||
+      spacecraftName == "CLEMENTINE 1") {
     isisFocalPlane2SocetPlate[1][0] = -1.0;
     isisFocalPlane2SocetPlate[0][1] = -1.0;
     isisFocalPlane2SocetPlate[2][2] = -1.0;
   }
-//-----------------------------------------------------
-//TO DO: Uncomment these lines when Themis-VIS is supported
-//-----------------------------------------------------
-//  else if (spacecraftName == "MARS_ODYSSEY" || spacecraftName == "Galileo Orbiter" ||
-//          spacecraftName == "Cassini-Huygens" || spacecraftName == "Messenger" ) {
-//-----------------------------------------------------
-//TO DO: Delete this next line when Themis-VIS is supported
-//-----------------------------------------------------
+
+  //-----------------------------------------------------
+  //TO DO: Uncomment these lines when Themis-VIS is supported
+  //----------------------------------------------------- 
+  //  else if (spacecraftName == "MARS_ODYSSEY" || spacecraftName == "Galileo Orbiter" ||
+  //          spacecraftName == "Cassini-Huygens" || spacecraftName == "Messenger" ) {
+  //-----------------------------------------------------
+  //TO DO: Delete this next line when Themis-VIS is supported
+  //-----------------------------------------------------
   else if (spacecraftName == "Galileo Orbiter" || spacecraftName == "Cassini-Huygens" ||
-      spacecraftName == "Messenger" ) {
+           spacecraftName == "Messenger" ) {
     isisFocalPlane2SocetPlate[0][0] = 1.0;
     isisFocalPlane2SocetPlate[1][1] = -1.0;
     isisFocalPlane2SocetPlate[2][2] = -1.0;
@@ -473,9 +482,14 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   vector<double>  j2000ToCameraMatrixVector = cam->instrumentRotation()->Matrix();
 
   // Reformat vector-matrices to 3x3 rotation matricies
-  double j2000ToBodyFixedRotationMatrix[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-  double j2000ToCameraRotationMatrix[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-
+  double j2000ToBodyFixedRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
+                                                 {0.0, 0.0, 0.0},
+                                                 {0.0, 0.0, 0.0}};
+                                                 
+  double j2000ToCameraRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
+                                              {0.0, 0.0, 0.0},
+                                              {0.0, 0.0, 0.0}};
+    
   for (int j = 0; j < 3; j++) {
     for (int k = 0; k < 3; k++) {
       j2000ToBodyFixedRotationMatrix[j][k] = j2000ToBodyFixedMatrixVector[3 * j + k];
@@ -484,8 +498,9 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   }
 
   // Compute Camera to Body Fixed rotation matrix
-  double cameraToBodyFixedRotationMatrix[3][3] =
-                                              {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  double cameraToBodyFixedRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
+                                                  {0.0, 0.0, 0.0},
+                                                  {0.0, 0.0, 0.0}};
   mxmt_c(j2000ToBodyFixedRotationMatrix, j2000ToCameraRotationMatrix,
          cameraToBodyFixedRotationMatrix);
 
@@ -515,14 +530,18 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   recgeo_c (instrumentPosition, radii[0], flattening, &lon, &lat, &height);
 
   // Calculate rotation matrix from Socet Set plate to ocentric ground coordinates
-  double socetPlateToOcentricGroundRotationMatrix[3][3] =
-                                                {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  double socetPlateToOcentricGroundRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
+                                                           {0.0, 0.0, 0.0},
+                                                           {0.0, 0.0, 0.0}};
+                                                           
   mxmt_c (isisFocalPlane2SocetPlate, cameraToBodyFixedRotationMatrix,
           socetPlateToOcentricGroundRotationMatrix);
 
   // Populate the ocentric to ographic rotation matrix
-  double ocentricToOgraphicRotationMatrix[3][3] =
-                                               {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  double ocentricToOgraphicRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
+                                                   {0.0, 0.0, 0.0},
+                                                   {0.0, 0.0, 0.0}};
+
   double sinLon = instrumentPosition[1] / xyLength;
   double cosLon = instrumentPosition[0] / xyLength;
   double sinLat = instrumentPosition[2] / xyzLength;
@@ -539,8 +558,10 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
 
   // Compute the Rotation matrix from Socet Set plate to ographic ground coordinates
   // and extract the euler angles to get omega-phi-kappa attidude angles
-  double socetPlateToOgrphicGroundRotationMatrix[3][3] =
-                                               {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  double socetPlateToOgrphicGroundRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
+                                                          {0.0, 0.0, 0.0},
+                                                          {0.0, 0.0, 0.0}};
+
   mxm_c (socetPlateToOcentricGroundRotationMatrix, ocentricToOgraphicRotationMatrix,
          socetPlateToOgrphicGroundRotationMatrix);
 
@@ -560,7 +581,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   omegaPhiKappa[2] = kappa * RAD2DEG;
 
   if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2" ||
-      spacecraftName == "MARS_EXPRESS") {
+      spacecraftName == "MARS_EXPRESS" || spacecraftName == "CLEMENTINE 1") {
     omegaPhiKappa[2] -= 90.0;
   }
 
