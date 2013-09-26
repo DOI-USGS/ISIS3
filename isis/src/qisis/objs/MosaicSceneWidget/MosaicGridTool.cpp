@@ -668,7 +668,7 @@ namespace Isis {
   Longitude MosaicGridTool::domainMinLon() {
     Longitude result;
 
-    if (getWidget()->getProjection()) {
+    if (getWidget() && getWidget()->getProjection()) {
       if (getWidget()->getProjection()->projectionType() == Projection::Triaxial) {
         TProjection *tproj = (TProjection *) getWidget()->getProjection();
         if (tproj->Has360Domain()) {
@@ -686,7 +686,7 @@ namespace Isis {
   Longitude MosaicGridTool::domainMaxLon() {
     Longitude result;
 
-    if (getWidget()->getProjection()) {
+    if (getWidget() && getWidget()->getProjection()) {
       if (getWidget()->getProjection()->projectionType() == Projection::Triaxial) {
         TProjection *tproj = (TProjection *) getWidget()->getProjection();
         if (tproj->Has360Domain()) {
