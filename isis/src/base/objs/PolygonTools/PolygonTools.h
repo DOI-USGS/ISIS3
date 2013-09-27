@@ -121,9 +121,7 @@ namespace Isis {
    *                           never caused a problem but could have.
    *   @history 2011-05-31 Steven Lambright - Improved To180 (not finished). The
    *                           remaining work is to remove the 0 seam from the polygons.
-   *   @history 2013-02-26 Kimberly Oyama and Steven Lambright - Added a check in
-   *                           LatLonToSampleLine() to make sure the linear rings used to create
-   *                           polygons are closed. Fixes #825.
+   *   @history 2013-02-26 Stuart Sides - Modified the output of GML and GML schema
    */
 
   class PolygonTools {
@@ -153,7 +151,12 @@ namespace Isis {
       static geos::geom::MultiPolygon *To180(geos::geom::MultiPolygon *poly360);
 
       //Return a polygon in GML format
-      static QString ToGML(const geos::geom::MultiPolygon *mpolygon, QString idString = QString("0"));
+      static QString ToGML(const geos::geom::MultiPolygon *mpolygon, 
+                           QString idString = QString("0"), 
+                           QString schema = QString(""));
+
+      //Return the GML schema for a polygon
+      static QString GMLSchema();
 
       //Return the thickness of a polygon
       static double Thickness(const geos::geom::MultiPolygon *mpolygon);

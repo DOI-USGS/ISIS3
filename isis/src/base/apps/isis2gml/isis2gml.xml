@@ -7,16 +7,21 @@
   </brief>
 
   <description>
-    This program calculates a lat. lon polygon and outputs a graphical markup
-     language(GML) file.  the input to this program can be in camera space (level1) or 
-     a map projected image (level2).  the output is a lat. lon. polygon with a GML header.
-     The user can use the label parameter to add a value to the ID tag in the header.
-     The ID tag is used by some GIS packages to produce a text label for the footprint.
+    This program calculates a footprint polygon, in (longitude, lattitude) space, for a cube and
+    outputs a graphical markup language (GML) file containing the polygon. The input cube  
+    can be in either camera space (level1) or map projected space (level2). An ID tag can be added
+    to the GML header, see the LABEL parameter.
   </description>
 
   <history>
     <change name="Robert Sucharski" date="2007-01-22">
       Original version
+    </change>
+    <change name="Stuart Sides" date="2013-06-29">
+      Added ability to output either a 0 to 360 longitude domain or -180 to 180 longitude
+      domain polygon. If the cube is map projected (level2) the default will be to match
+      the projection. Also modified the gml output to be more standards compliant including
+      a matching XSD file.
     </change>
   </history>
 
@@ -25,15 +30,16 @@
   </category>
 
   <groups>
+
     <group name="Files">
       <parameter name="FROM">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input  file
+          Input cube
         </brief>
         <description>
-          Input cube to use in polygon generation 
+          Input cube to use for polygon generation 
         </description>
         <filter>
           *.cub *.CUB
@@ -43,31 +49,71 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          GML formatted polygon
+          GML formatted file containing the footprint polygon
         </brief>
-        <internalDefault>None</internalDefault>
+        <internalDefault>Same as input Cube</internalDefault>
         <description>
-            Use this parameter to specify the name of the output image.  the output file
-            is a lon. lat. polygon with a geographic markup language (GML) header. 
+          Use this parameter to specify the name of the output GML file. The output file
+          will be a geographic markup language (GML) file containing a (longitude, lattitude)
+          polygon. If no file name is entered the input cube file name will be used with an
+          extension of "gml". A second output file will be created with the same base name as 
+          the "gml" file, but with the extension of "xsl." The "xsl" file is a standard part
+          of the GML output.
         </description>
         <filter>
           *.gml *.GML
         </filter>
       </parameter>
       </group>
-      <group name="options">
+
+      <group name="GML options">
         <parameter name="LABEL">
           <type>string</type>
+          <internalDefault>none</internalDefault>
           <brief>
-            Added to the header in ID tag 
+            Adds an ID tag to the GML header 
           </brief>
           <description>
-            This value is placed in the GML header within theID tags.  The information within
-            the ID tag is used by arcmap to allows the user to utilize a labeling switch that displays
-            the ID of the footprint.
+            This value is placed in the GML header within the ID tag. The information within
+            the ID tag can be used by GIS packages to display a label on the footprint. If no 
+            value is entered no ID tag will be generated for the GML file.
           </description>
         </parameter>
+
+        <parameter name="LONGITUDEDOMAIN">
+          <type>string</type>
+          <default><item>DEFAULT</item></default>
+          <brief>
+            Domain of the polygon longitudes
+          </brief>
+          <description>
+            This value controls the longitude domain of the output GML polygons.
+          </description>
+          <list>
+            <option value="DEFAULT">
+              <brief>Use the cube projection domain or 0/360 if not projected</brief>
+              <description>
+                Longitudes in the GML polygon will be in the same domain as the input cube projection
+                if the cube is projected. If the input cube is not projected longitudes will be in 
+                the 0 to 360 domain.
+              </description>
+            </option>
+            <option value="180">
+              <brief>Create -180 to 180 longitues</brief>
+              <description>
+                Longitudes within the polygon will be in the 180 to -180 domain
+              </description>
+            </option>
+            <option value="360">
+              <brief>Create 0 to 360 longitues</brief>
+              <description>
+                Longitudes within the polygon will be in the 0 to 360 domain
+              </description>
+            </option>
+          </list>
+        </parameter>
       </group>
-   </groups>
+
+    </groups>
 </application>
 

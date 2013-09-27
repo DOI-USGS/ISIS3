@@ -3,13 +3,35 @@ APPNAME = isis2gml
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(CP) $(INPUT)/ab102401.cub $(OUTPUT)/ab102401.cub;
-	$(APPNAME) from=$(OUTPUT)/ab102401.cub \
-	to=$(OUTPUT)/ab102401gml.txt \
-	label= "appTest" > /dev/null;
-	$(RM) $(OUTPUT)/ab102401.cub
-	cat $(OUTPUT)/ab102401gml.txt | \
-	  sed 's/\([0-9]\.[0-9]\{9\}\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/ab102401gml2.txt;
-	$(MV) $(OUTPUT)/ab102401gml2.txt $(OUTPUT)/ab102401gml.txt \
-	  > /dev/null;
+	$(APPNAME) \
+	  from=$(INPUT)/ab102401.cub \
+	  to=$(OUTPUT)/ab102401_360_1.gml \
+	  longitudedomain=360 \
+	  label= "7" > /dev/null;
+	cat $(OUTPUT)/ab102401_360_1.gml | \
+	  sed 's/\([0-9]\.[0-9]\{9\}\)\([0-9]*\)/\1/g' > \
+	  $(OUTPUT)/ab102401_360_1.gml.txt;
+	$(MV) $(OUTPUT)/ab102401_360_1.xsd $(OUTPUT)/ab102401_360_1.xsd.txt > /dev/null;
+	$(RM) $(OUTPUT)/ab102401_360_1.gml > /dev/null;
+	$(CP) $(INPUT)/ab102401.cub $(OUTPUT)/ab102401.cub > /dev/null;
+	$(APPNAME) \
+	  from=$(OUTPUT)/ab102401.cub \
+	  longitudedomain=360 \
+	  label= "9" > /dev/null;
+	cat $(OUTPUT)/ab102401.gml | \
+	  sed 's/\([0-9]\.[0-9]\{9\}\)\([0-9]*\)/\1/g' > \
+	  $(OUTPUT)/ab102401_360_2.gml.txt;
+	$(MV) $(OUTPUT)/ab102401.xsd $(OUTPUT)/ab102401_360_2.xsd.txt > /dev/null;
+	$(RM) $(OUTPUT)/ab102401.cub > /dev/null;
+	$(RM) $(OUTPUT)/ab102401.gml > /dev/null;
+	$(APPNAME) \
+	  from=$(INPUT)/ab102401.cub \
+	  to=$(OUTPUT)/ab102401_180_3.gml \
+	  longitudedomain=180 \
+	  label= "11" > /dev/null;
+	cat $(OUTPUT)/ab102401_180_3.gml | \
+	  sed 's/\([0-9]\.[0-9]\{9\}\)\([0-9]*\)/\1/g' > \
+	  $(OUTPUT)/ab102401_180_3.gml.txt;
+	$(MV) $(OUTPUT)/ab102401_180_3.xsd $(OUTPUT)/ab102401_180_3.xsd.txt > /dev/null;
+	$(RM) $(OUTPUT)/ab102401_180_3.gml > /dev/null;
+
