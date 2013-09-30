@@ -29,22 +29,24 @@ MULTIPOLYGON (((0.0000000000000000 0.0000000000000000, 0.0000000000000000 1.0000
 GML Ploygon:
 <?xml version="1.0" encoding="utf-8" ?>
 <ogr:FeatureCollection
-    xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://ogr.maptools.org/ "
+    xmlns:ogr="http://ogr.maptools.org/"
     xmlns:gml="http://www.opengis.net/gml">
   <gml:boundedBy>
     <gml:Box>
-      <gml:coord><gml:X>0.0</gml:X><gml:Y>-90.0</gml:Y></gml:coord>
-      <gml:coord><gml:X>360.0</gml:X><gml:Y>90.0</gml:Y></gml:coord>
+      <gml:coord><gml:X>0</gml:X><gml:Y>0</gml:Y></gml:coord>
+      <gml:coord><gml:X>360</gml:X><gml:Y>1</gml:Y></gml:coord>
     </gml:Box>
   </gml:boundedBy>
-  <gml:featureMember>
-   <multi_polygon fid="0">
-      <ID>test</ID>
-      <ogr:geometryProperty><gml:MultiPolygon><gml:polygonMember><gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>0,0 0,1 1,1 1,0 0,0 360,1 359,1 359,0 360,0 360,1 359.75,0.75 359.25,0.75 359.25,0.25 359.75,0.25 359.75,0.75 </gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon></gml:polygonMember></gml:MultiPolygon></ogr:geometryProperty>
-</multi_polygon>
-</gml:featureMember>
-</ogr:FeatureCollection>
 
+  <gml:featureMember>
+   <ogr:multi_polygon fid="0">
+      <ogr:ID>test</ogr:ID>
+      <ogr:geometryProperty><gml:MultiPolygon><gml:polygonMember><gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>0,0 0,1 1,1 1,0 0,0 360,1 359,1 359,0 360,0 360,1 359.75,0.75 359.25,0.75 359.25,0.25 359.75,0.25 359.75,0.75 </gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon></gml:polygonMember></gml:MultiPolygon></ogr:geometryProperty>
+    </ogr:multi_polygon>
+  </gml:featureMember>
+</ogr:FeatureCollection>
 GML Thickness:
 1.35030864197531e-05
 
