@@ -208,6 +208,9 @@ namespace Isis {
    * These are the values shown in the gray boxes.
    */
   void BandTool::setList() {
+    MdiCubeViewport *cvp = cubeViewport();
+    cvp->setComboCount(p_comboBox->count());
+    cvp->setComboIndex(p_comboBox->currentIndex());
     if(p_pvl.findObject("IsisCube").hasGroup("BandBin") &&
         p_comboBox->count() > 0) {
 
@@ -243,8 +246,9 @@ namespace Isis {
 
   /**
    * This method fills the p_comboBox with the keywords from the
-   * band bin group of the currently selected cube.  If there are
-   * values for 'Center', that is choosen as the default.
+   * band bin group of the currently selected cube. If the current
+   * cube viewport doesn't have a currently chosen value for the
+   * p_comboBox, then 'Center' is chosen as the default. 
    *
    * @param pvl
    */
@@ -275,6 +279,7 @@ namespace Isis {
     p_grnSpin->setMaximum(p_bands);
 
     p_comboBox->clear();
+    MdiCubeViewport *cvp = cubeViewport();
     if(pvl.findObject("IsisCube").hasGroup("BandBin")) {
       PvlGroup &bandBin = pvl.findObject("IsisCube")
                                 .findGroup("BandBin");
@@ -287,9 +292,15 @@ namespace Isis {
 
       }
 
-      if(p_comboBox->findText("Center") > 0) {
+      if(cvp->comboCount() > 0) {
+        p_comboBox->setCurrentIndex(cvp->comboIndex());
+      }
+      else if(p_comboBox->findText("Center") > 0) {
         p_comboBox->setCurrentIndex(p_comboBox->findText("Center"));
       }
+
+      cvp->setComboCount(p_comboBox->count());
+      cvp->setComboIndex(p_comboBox->currentIndex());
     }
     setList();
   }

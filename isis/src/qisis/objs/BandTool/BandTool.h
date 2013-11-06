@@ -28,6 +28,12 @@ namespace Isis {
    *            CubeViewport
    *   @history 2010-12-01 Steven Lambright - No longer calls setBandBin() if
    *            the viewport doesn't change.
+   *   @history 2013-11-04 Janet Barrett - Fixed the setBandBin and setList
+   *            methods so that they retain the band bin settings for the current
+   *            viewport. The band bin combo box will now be set to the user
+   *            setting when a viewport is reactivated. Before this change was
+   *            made, the band bin combo box would always reset to 'Center' when
+   *            the user reactivated a viewport. Fixes #1612.
    */
   class BandTool : public Tool {
       Q_OBJECT

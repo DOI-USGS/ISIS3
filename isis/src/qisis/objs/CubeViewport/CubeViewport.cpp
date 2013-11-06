@@ -216,6 +216,9 @@ namespace Isis {
     connect(p_progressTimer, SIGNAL(timeout()), this, SLOT(onProgressTimer()));
 
     p_bgColor = Qt::black;
+
+    p_comboCount = 0;
+    p_comboIndex = 0;
   }
 
 

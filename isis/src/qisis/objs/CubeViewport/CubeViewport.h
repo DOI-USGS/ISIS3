@@ -112,6 +112,11 @@ namespace Isis {
    *  @history 2012-07-27 Tracie Sucharski - Added viewportClosed signal so that tools
    *                          can respond to the user closing a viewport rather than when the
    *                          application exits.
+   *  @history 2013-11-04 Janet Barrett - Added the p_comboCount and p_comboIndex variables to
+   *                          store the current state of the band bin combo box. Also added
+   *                          comboCount(), comboIndex(), setComboCount(), and setComboIndex()
+   *                          accessors and setters to allow the BandTool class to retain the
+   *                          settings for each cube viewport. Fixes #1612.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
@@ -184,6 +189,16 @@ namespace Isis {
         return p_cubeShown;
       };
 
+      //! Return the BandBin combo box count
+      int comboCount() const {
+        return p_comboCount;
+      };
+
+      //! Return the BandBin combo box index
+      int comboIndex() const {
+        return p_comboIndex;
+      }
+
       void cubeContentsChanged(QRect rect);
 
       double fitScale() const;
@@ -242,6 +257,24 @@ namespace Isis {
        */
       void setBackground(QColor color) {
         p_bgColor = color;
+      }
+
+      /**
+       * Sets the band bin combo box count
+       *
+       * @param count
+       */
+      void setComboCount(int count) {
+        p_comboCount = count;
+      }
+
+      /**
+       * Sets the band bin combo box index
+       *
+       * @param index
+       */
+      void setComboIndex(int index) {
+        p_comboIndex = index;
       }
 
       /**
@@ -485,6 +518,9 @@ namespace Isis {
       BandInfo p_red;//!< Red band info
       BandInfo p_green;//!< Green band info
       BandInfo p_blue;//!< Blue band info
+
+      int p_comboCount;//!< Number of elements in band bin combo box
+      int p_comboIndex;//!< Current element chosen from combo box
 
       Brick *p_redBrick;  //!< Bricks for every color.
       Brick *p_grnBrick;  //!< Bricks for every color.
