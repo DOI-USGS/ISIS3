@@ -399,35 +399,51 @@ namespace Isis {
 
 
   /**
-   * Write out the polygon with gml header
+   * Return the polygon with gml header
    *
    *
    * @param [in] mpolygon Polygon with lat/lon vertices
    * @param idString mpolygon's Id
-   * @return istrean  Returns the polygon with lon,lat
-   *         lon,lat format vertices and GML header
+   * @return QString  Returns the polygon with lon,lat lon,lat format vertices and GML header 
    */
 
-  QString PolygonTools::ToGML(const geos::geom::MultiPolygon *mpolygon, QString idString) {
+  QString PolygonTools::ToGML(const geos::geom::MultiPolygon *mpolygon, QString idString,
+                              QString schema) {
 
     ostringstream os;
 
     //Write out the GML header
     os << "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" << endl;
     os << "<ogr:FeatureCollection" << endl;
-    os << "    xmlns:xsi=\"http://www.w3c.org/2001/XMLSchema-instance\"" << endl;
+    os << "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" << endl;
+    os << "    xsi:schemaLocation=\"http://ogr.maptools.org/ " << schema << "\"" << endl;
+    os << "    xmlns:ogr=\"http://ogr.maptools.org/\"" << endl;
     os << "    xmlns:gml=\"http://www.opengis.net/gml\">" << endl;
     os << "  <gml:boundedBy>" << endl;
     os << "    <gml:Box>" << endl;
-    os << "      <gml:coord><gml:X>0.0</gml:X><gml:Y>-90.0</gml:Y></gml:coord>" << endl;
-    os << "      <gml:coord><gml:X>360.0</gml:X><gml:Y>90.0</gml:Y></gml:coord>" << endl;
+    os << "      <gml:coord>";
+    os <<          "<gml:X>" << 
+                       setprecision(15) << mpolygon->getEnvelopeInternal()->getMinX() << 
+                       "</gml:X>";
+    os <<          "<gml:Y>" << 
+                       setprecision(15) << mpolygon->getEnvelopeInternal()->getMinY() << 
+                       "</gml:Y>";
+    os <<      "</gml:coord>" << endl;
+    os << "      <gml:coord>";
+    os <<          "<gml:X>" << 
+                       setprecision(15) << mpolygon->getEnvelopeInternal()->getMaxX() <<
+                       "</gml:X>";
+    os <<          "<gml:Y>" << 
+                       setprecision(15) << mpolygon->getEnvelopeInternal()->getMaxY() << 
+                       "</gml:Y>";
+    os <<        "</gml:coord>" << endl;
     os << "    </gml:Box>" << endl;
-    os << "  </gml:boundedBy>" << endl;
+    os << "  </gml:boundedBy>" << endl << endl;
     os << "  <gml:featureMember>" << endl;
-    os << "   <multi_polygon fid=\"0\">" << endl;
-    os << "      <ID>" << idString << "</ID>" << endl;
+    os << "   <ogr:multi_polygon fid=\"0\">" << endl;
+    os << "      <ogr:ID>" << idString << "</ogr:ID>" << endl;
     os << "      <ogr:geometryProperty><gml:MultiPolygon><gml:polygonMember>" <<
-       "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>";
+                     "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>";
 
 
     for(unsigned int polyN = 0; polyN < mpolygon->getNumGeometries(); polyN++) {
@@ -442,11 +458,76 @@ namespace Isis {
     }
 
     os << "</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs>" <<
-       "</gml:Polygon></gml:polygonMember></gml:MultiPolygon>" <<
-       "</ogr:geometryProperty>" << endl;
-    os << "</multi_polygon>" << endl;
-    os << "</gml:featureMember>" << endl;
-    os << "</ogr:FeatureCollection>" << endl;
+              "</gml:Polygon></gml:polygonMember></gml:MultiPolygon>" <<
+              "</ogr:geometryProperty>" << endl;
+    os << "    </ogr:multi_polygon>" << endl;
+    os << "  </gml:featureMember>" << endl;
+    os << "</ogr:FeatureCollection>";
+
+    return os.str().c_str();
+  }
+
+
+  /**
+   * Return the gml schema
+   *
+   * @return QString  Returns the polygon with lon,lat lon,lat format vertices and GML header
+   */
+
+  QString PolygonTools::GMLSchema() {
+
+    ostringstream os;
+
+    os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
+    os << "<xs:schema targetNamespace=\"http://ogr.maptools.org/\" "
+              "xmlns:ogr=\"http://ogr.maptools.org/\" "
+              "xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+              "xmlns:gml=\"http://www.opengis.net/gml\" "
+              "elementFormDefault=\"qualified\" "
+              "version=\"1.0\">" << endl;
+    os << "  <xs:import namespace=\"http://www.opengis.net/gml\" "
+              "schemaLocation=\"http://schemas.opengis.net/gml/2.1.2/feature.xsd\"/>" << endl;
+    os << "  <xs:element name=\"FeatureCollection\" "
+                 "type=\"ogr:FeatureCollectionType\" "
+                 "substitutionGroup=\"gml:_FeatureCollection\"/>" << endl;
+    os << "  <xs:complexType name=\"FeatureCollectionType\">" << endl;
+    os << "    <xs:complexContent>" << endl;
+    os << "      <xs:extension base=\"gml:AbstractFeatureCollectionType\">" << endl;
+    os << "        <xs:attribute name=\"lockId\" type=\"xs:string\" use=\"optional\"/>" << endl;
+    os << "        <xs:attribute name=\"scope\" type=\"xs:string\" use=\"optional\"/>" << endl;
+    os << "      </xs:extension>" << endl;
+    os << "    </xs:complexContent>" << endl;
+    os << "  </xs:complexType>" << endl;
+    os << "  <xs:element name=\"multi_polygon\" "
+                 "type=\"ogr:multi_polygon_Type\" "
+                 "substitutionGroup=\"gml:_Feature\"/>" << endl;
+    os << "  <xs:complexType name=\"multi_polygon_Type\">" << endl;
+    os << "    <xs:complexContent>" << endl;
+    os << "      <xs:extension base=\"gml:AbstractFeatureType\">" << endl;
+    os << "        <xs:sequence>" << endl;
+    os << "          <xs:element name=\"geometryProperty\" "
+                         "type=\"gml:MultiPolygonPropertyType\" "
+                         "nillable=\"true\" minOccurs=\"0\" maxOccurs=\"1\"/>" << endl;
+    os << "          <xs:element name=\"fid\" nillable=\"true\" minOccurs=\"0\" "
+                         "maxOccurs=\"1\">" << endl;
+    os << "            <xs:simpleType>" << endl;
+    os << "              <xs:restriction base=\"xs:string\">" << endl;
+    os << "              </xs:restriction>" << endl;
+    os << "            </xs:simpleType>" << endl;
+    os << "          </xs:element>" << endl;
+    os << "          <xs:element name=\"ID\" nillable=\"true\" minOccurs=\"0\" "
+                         "maxOccurs=\"1\">" << endl;
+    os << "            <xs:simpleType>" << endl;
+    os << "              <xs:restriction base=\"xs:integer\">" << endl;
+    os << "                <xs:totalDigits value=\"16\"/>" << endl;
+    os << "              </xs:restriction>" << endl;
+    os << "            </xs:simpleType>" << endl;
+    os << "          </xs:element>" << endl;
+    os << "        </xs:sequence>" << endl;
+    os << "      </xs:extension>" << endl;
+    os << "    </xs:complexContent>" << endl;
+    os << "  </xs:complexType>" << endl;
+    os << "</xs:schema>";
 
     return os.str().c_str();
   }

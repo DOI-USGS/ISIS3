@@ -47,7 +47,7 @@ namespace Isis {
    * Please see the Projection class for a full accounting of all the methods 
    * available. 
    *
-   * @ingroup MapProjection
+   * @ingroup MapProjectioncisbell
    *
    * @author 2005-03-04 Elizabeth Ribelin
    *
@@ -78,6 +78,13 @@ namespace Isis {
    *                           a case to the unit test to check the x/y values when the
    *                           lat/lon ranges are smaller than the possible range of the
    *                           projection (half the planet). Fixes #798.
+   *   @history 2013-07-25 Kimberly Oyama - Fixed the longitude equation for the south pole
+   *                           by making x positive instead of negative. Fixes #1719.
+   *   @history 2013-08-20 Kimberly Oyama - Removed code for the special case, clat = 0,
+   *                           in the constructor to give the correct longitude range
+   *                           when clat = 0. Added a range check in SetCoordinate()
+   *                           to make sure m_longitude is in the correct domain.
+   *                           Fixes #1471.
    */
   class Orthographic : public TProjection {
     public:

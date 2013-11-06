@@ -35,6 +35,10 @@
       conf file. Changed methods to lower camel case and added "g_" prefix to 
       global variables to comply with Isis3 standards. References #924.
     </change>
+    <change name="Stuart Sides" date="2013-07-11">
+        Modified so the kernel quality parameters from XML are tested as case insensitive. This
+        change was made in a branch of ISIS, but was not yet moved to the publice version yet.
+    </change>
   </history>
 
   <groups>

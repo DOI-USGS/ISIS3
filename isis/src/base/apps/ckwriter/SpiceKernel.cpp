@@ -58,11 +58,11 @@ void SpiceKernel::add(const QString &cfile) {
 }
 
 void SpiceKernel::add(Cube &cube) {
-  _segments.push_back(SpiceSegment(cube));
+  m_segments.push_back(SpiceSegment(cube));
   return;
 }
 const SpiceSegment &SpiceKernel::operator[](const int i) const {
- return (_segments[i]);
+ return (m_segments[i]);
 }
 
 
@@ -73,7 +73,7 @@ bool CheckSegment(const SpiceSegment *s1, const SpiceSegment *s2) {
 QString SpiceKernel::getSummary(const QString &commfile) const {
   vector<const SpiceSegment *> seglist;
   for ( int i = 0 ; i < size() ; i++) {
-    seglist.push_back(&_segments[i]);
+    seglist.push_back(&m_segments[i]);
   }
 
   // Sorts the Segment pointers
@@ -93,8 +93,8 @@ QString SpiceKernel::getSummary(const QString &commfile) const {
    vector<const SpiceSegment *> seglist;
    int comChars(0);
    for ( int i = 0 ; i < size() ; i++) {
-     seglist.push_back(&_segments[i]);
-     comChars += _segments[i].getComment().size();
+     seglist.push_back(&m_segments[i]);
+     comChars += m_segments[i].getComment().size();
    }
 
    stable_sort(seglist.begin(), seglist.end(), CheckSegment);
@@ -132,7 +132,7 @@ QString SpiceKernel::getSummary(const QString &commfile) const {
  }
 
  void SpiceKernel::init() {
-   _segments.clear();
+   m_segments.clear();
    return;
  }
 

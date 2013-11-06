@@ -17,44 +17,67 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
+  // Get the polygon from the input cube. NOTE: the generated poly is always in the 0 to 360 domain
   Cube cube;
   cube.open(ui.GetFileName("FROM"));
   ImagePolygon poly;
   poly.Create(cube);
-
   geos::geom::MultiPolygon *mPolygon = poly.Polys();
 
-  QString polyString;
-
-  if(ui.WasEntered("LABEL")) {
-    QString fid = ui.GetString("LABEL");
-    polyString = PolygonTools::ToGML(mPolygon, fid);
+  // Decide if the 0 to 360 longitude domain polygon needs to be converted to the -180 to 180 domain
+  bool convertTo180 = false;
+  // If the user wants to match the cube, find out what domain the cube is in
+  if (ui.GetString("LONGITUDEDOMAIN") == "DEFAULT") {
+    if (cube.hasGroup("Mapping")) {
+      PvlGroup &mapping = cube.group("Mapping");
+      PvlKeyword &lond = mapping.findKeyword("LONGITUDEDOMAIN");
+      if (lond[0] == "180") {
+        convertTo180 = true;
+      }
+    }
   }
-  else {
-    polyString = PolygonTools::ToGML(mPolygon);
+  // If the user wants -180 to 180 domain then we need to convert it
+  else if (ui.GetString("LONGITUDEDOMAIN") == "180") {
+    convertTo180 = true;
   }
 
-  QString outfile;
-  ofstream fout;
-  if(ui.WasEntered("TO")) {
-    outfile = ui.GetFileName("TO");
+  if (convertTo180) {
+    mPolygon = PolygonTools::To180(mPolygon);
+  }
+
+  // Get the output gml file name
+  QString outgml;
+  if (ui.WasEntered("TO")) {
+    outgml = ui.GetFileName("TO");
   }
   else {
     FileName inputFile = ui.GetFileName("FROM");
-    inputFile.removeExtension();
-    inputFile.addExtension("gml");
-    outfile = inputFile.name();
+    outgml = inputFile.removeExtension().addExtension("gml").expanded();
   }
-  fout.open(outfile.toAscii().data());
 
+  // Get the output xsd file name
+  QString outxsd = FileName(outgml).removeExtension().addExtension("xsd").expanded();
+
+  // Convert the polygon to GML
+  QString polyString;
+
+  if (ui.WasEntered("LABEL")) {
+    QString fid = ui.GetString("LABEL");
+    polyString = PolygonTools::ToGML(mPolygon, fid, FileName(outxsd).name());
+  }
+  else {
+    polyString = PolygonTools::ToGML(mPolygon, "0", outxsd);
+  }
+
+  // Write the gml file.
+  ofstream fout;
+  fout.open(outgml.toAscii().data());
   fout << polyString << endl;
-
-  //      fout.open(FileName(outfile).expanded().c_str(),ios::out);
   fout.close();
 
-
-
+  // Write the xsd file.
+  fout.open(outxsd.toAscii().data());
+  fout << PolygonTools::GMLSchema() << endl;
+  fout.close();
 }
-
-
 

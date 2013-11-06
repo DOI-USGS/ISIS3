@@ -6,190 +6,650 @@
 
         <h2>Introduction</h2>
         <p>
-        This section describes how to run Isis programs on the command line, instead of the GUI.  This is particularly useful if 1) you desire to setup shell scripts or other batch job mechanisms to run a sequence of programs on cubes or 2) you are a power user who prefers keyboarding over mousing.
+        This section describes how to run ISIS programs on the command line 
+	instead of the GUI.  This is particularly useful 1) to setup shell 
+	scripts or other batch job mechanisms to run a sequence of programs 
+	on cubes or if 2) you prefer keyboarding over mousing.
         </p>
 
         <h2>Invoking a Program</h2>
         <p>
-          To start an ISIS program, simply type it’s name, for example, "ratio".  This starts the program under the GUI, however, if you provide anything after the program name it will be assumed the program is running under the command line.  For example,
+          To start an ISIS program, simply type its name, for example, <i>lowpass</i>.  
+	  This starts the program under the GUI; however, if you provide anything 
+	  after the program name, as in the example below, it is assumed the 
+	  program is running in command line mode.
         </p>
 
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass from=moon.cub to=moon.lpf.cub lines=5 samples=5 minimum=1
-stats from=moon.lpf.cub
 </pre>
 
         <p>
-          The programs will immediately attempt to run and if parameters are missing or wrong, an error will be output.  For example,
+          The program will immediately attempt to run and if parameters are 
+	  missing or wrong, an error will be output.  Example:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass from=moon.cub lines=4 samples=5 minimum=1
-**USER ERROR** Parameter [TO] must be entered.
+
+  Group = Error
+    Program = lowpass
+    Class   = "USER ERROR"
+    Code    = 2
+    Message = "Parameter [TO] must be entered"
+    File    = IsisAml.cpp
+    Line    = 2867
+  End_Group
 
 lowpass from=moon.cub to=moon.lpf.cub lines=4 samples=5 minimum=1
-**USER ERROR** Value for [LINES] must be odd.
+
+  Group = Error
+    Program = lowpass
+    Class   = "USER ERROR"
+    Code    = 2
+    Message = "Value for [LINES] must be odd"
+    File    = IsisAml.cpp
+    Line    = 2357
+  End_Group
 </pre>
 
-        <h2>Parameter-Value Pairs</h2>
+        <h2>Application Specific Parameters</h2>
         <p>
-          For consistency, all Isis command lines take the form of:
+          All ISIS command lines take the following form:
         </p>
 
-<pre style="padding-left:4em;">
-program parameter1=value parameter2=value …parameterN=value
+<pre style="padding-left:2em;">
+program parameter1=value parameter2=value ...parameterN=value
 </pre>
 
         <p>
-          The parameters can occur in any order, can be abbreviated so long as they are unique, are case insensitive, and can be omitted if they have a default value.  The values can be integers, doubles, strings, or booleans  <em><span style="color:red;">[Future Option]</span> The values can also be homogenous arrays of these types.</em>  Using the GUI for lowpass in the below figure as a guide, we can present several examples:
+          The parameters can be entered in any order, can be abbreviated so 
+	  long as they are unique, are case insensitive, and can be omitted 
+	  if they have a default value.  The values can be integers, doubles, 
+	  strings, or booleans, and homogenous arrays 
+	  of these types.  
         </p>
 
-<pre style="padding-left:4em;">
-lowpass f=moon.cub t=moon.lpf.cub s=5 l=5 minimum=1
-lowpass f=moon.cub t=moon.lpf.cub s=5 li=5
-lowpass f=moon.cub t=moon.lpf.cub s=5 lin=5
-</pre>
+<p>
+Display the <i>lowpass</i> GUI from the command line or use the -help reserved 
+parameter to see the parameter names that are available for the program.
+Simply type "lowpass" to display the GUI, or type the command "lowpass -h" to 
+display the parameter names necessary to run a particular ISIS program on the 
+command line.  The default values are shown below, to the right of the equal 
+sign.  The results of the two methods shown below can be used as a guide to 
+construct the commands on the command line.
+</p>
+<p>
+<b>GUI Example</b><br />
+<a href="assets/images/lowpass_GUI_1.png">
+<img src="assets/thumbs/lowpass_GUI_1_thumb.png" width="250" height="250" alt="[lowpass GUI Screenshot]"/></a>
+<br />
+File size 375 x 622,  49.8 KB
+</p>
+
+<b>Command Line Help Example</b><br />
+<table border="1">
+<tr>
+<td>
+<pre>
+Results of <i>lowpass -h</i> are shown below:
 
 
-<table class="imageTable" align="center" style="width:240px;">
-  <tr>
-    <td>
-      <a href="assets/image001.png">
-      <img src="assets/thumbs/image001.png" width="220" height="300" alt="[lowpass GUI Screenshot]"/></a>
-      <p>
-        Parameter-Value Pairs Example
-      </p>
-      <p class="caption">
-        420x627, 22KB
-      </p>
-    </td>
-  </tr>
+FROM	    = Null
+TO	    = Null
+SAMPLES     = Null
+LINES	    = Null
+LOW	    = Null
+HIGH	    = Null
+MINOPT      = (*COUNT, PERCENTAGE)
+MINIMUM     = 1
+REPLACEMENT = (*CENTER, NULL)
+FILTER      = (*ALL, INSIDE, OUTSIDE)
+NULL	    = TRUE
+HRS	    = TRUE
+HIS	    = TRUE
+LRS	    = TRUE
+LIS	    = TRUE
+</pre>    
+</td>
+</tr>
 </table>
 
+<p>
+Below are examples of constructing a command line using the GUI or the parameter
+list shown above as a guide:
+</p>
+<pre style="padding-left:2em;">
+Example1: lowpass f=moon.cub t=moon.lpf.cub s=5 l=5 minimum=1
+Example2: lowpass f=moon.cub t=moon.lpf.cub s=5 li=5 minimum=1
+Example3: lowpass f=moon.cub t=moon.lpf.cub s=5 lin=5
+</pre>
 
         <p>
-          The first example would fail with a uniqueness error as "l" could mean parameter line, lis, lrs, or low.
+          Example 1 would fail because "l" could represent the parameters 
+	  <def link="Line">lines</def>, 
+	  low, <def link="LRS">lrs</def>, or <def link="LIS">lis</def>.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass f=moon.cub t=moon.lpf.cub s=5 l=5 minimum=1
 **USER ERROR** Invalid command line
 **USER ERROR** Parameter [l] is not unique.
 </pre>
         <p>
-          The second example would fail with a uniqueness error as "li" could mean parameter lines or lis.
+          Example 2 would fail because "li" could represent the parameter 
+	  <def link="Line">lines</def> or <def link="LIS">lis</def>.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass f=moon.cub t=moon.lpf.cub s=5 li=5 minimum=1
 **USER ERROR** Invalid command line
 **USER ERROR** Parameter [li] is not unique.
 </pre>
 
         <p>
-          The third example would succeed; note the minimum parameter is not required as it has a default of one, the parameters are case insensitive, and their order has changed.
+          Example 3 would execute successfully because all the parameters provided
+	  by the user are unique. The parameter <b>minimum</b> is not required 
+	  because the default value has been used.  When the default value is not 
+	  used for a specific parameter, then it must be specified.  Also note this
+	  example shows that the parameters are case insensitive and the parameters 
+	  may occur in any order.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass S=5 LIN=5 F=moon.cub T=moon.lpf.cub
 Working
 100% Processed
 </pre>
         <h2>Integer and Double Parameters</h2>
         <p>
-          The application documentation indicates the type of each parameter.  Integer and Double parameters are trivial taking the form of:
+          The documentation for each application indicates the valid data type 
+	  of each parameter.  The examples below show the values entered as
+	  an Integer for samples and a Double for minimum:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 samples=5
 minimum=0.679
 </pre>
 
         <p>
-          Often there will be error check conditions performed by the application to ensure they have a valid range.  For example,
+          Often there will be error checks performed by the application to ensure 
+	  the values entered are valid.  Example:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass f=moon.cub t=moon.lpf.cub s=0 lin=5
-**USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1]
+
+  Group = Error
+    Program = lowpass
+    Class   = "USER ERROR"
+    Code    = 2
+    Message = "Parameter [SAMPLES] must be greater than or equal to [1]"
+    File    = IsisAml.cpp
+    Line    = 2205
+  End_Group
 </pre>
 
         <p>
-          Similarly, two parameters may be required to be ordered
+          Similarly, paired parameters used to specify minimum and maximum
+	  values are verified so that the low value parameters do not exceed 
+	  the high value parameters.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass f=moon.cub t=moon.lpf.cub s=5 lin=5 low=5 hi=3
- **USER ERROR** Parameter [LOW] must be less than parameter [HIGH]
+
+**USER ERROR** Invalid command line.
+**USER ERROR** Parameter [hi] is not unique.
+
+lowpass f=moon.cub t=moon.lpf.cub s=5 lin=5 low=5 high=3
+
+  Group = Error
+    Program = lowpass
+    Class   = "USER ERROR"
+    Code    = 2
+    Message = "Parameter [LOW] must be less than parameter [HIGH]"
+    File    = IsisAml.cpp
+    Line    = 2623
+  End_Group
 </pre>
+
 
         <h2>String Parameters</h2>
         <p>
-          String parameters can be slightly more complicated because of operating system intricacies.  The difference is in one word strings versus multiple word strings.  The following example would cause problems:
-        </p>
+          String parameters can be slightly more complicated because of operating 
+	  system intricacies.  The difference is in one word strings versus multiple 
+	  word strings.  The command line parsing has been improved to handle escape 
+	  sequences and support arrays better for strings.  The equation parser is 
+	  case insensitive, ignores whitespace, and converts all braces to 
+	  parentheses.  Parameter values, when quoted, no longer need the quotes 
+	  escaped.  Please note that the dollar sign ($) still requires a backslash 
+	  for batchlist variables.
+	</p>
 
-<pre style="padding-left:4em;">
-foobar comment=Hello world
-**USER ERROR** Invalid command line
-**USER ERROR** Unknown parameter [world].
-</pre>
-        <p>
-          Therefore multiple word strings must be quoted.  We would expect the following to work, but receive the same error:
-        </p>
+      <p>
+	The command line syntax changes are as follows (with TCSH/BASH examples):
+      </p>
 
-<pre style="padding-left:4em;">
-foobar comment="Hello World"
-**USER ERROR** Invalid command line
-**USER ERROR** Unknown parameter [world].
+<pre style="padding-left:2em;">
+TCSH/BASH 
+Before: 
+     crop from=\"some file.cub\" to=\"output file.cub\"
+Now:    
+     crop from="some file.cub" to="output file.cub"
 </pre>
-        <p>
-          Unfortunately, the Unix shell pre-parses command lines and removes the quotes.  To alleviate this problem use the following:
-        </p>
 
-<pre style="padding-left:4em;">
-Foobar comment=\"Hello World\"
+  
+      <p>
+	  Array values, for programs such as <i>spiceinit</i>, will be the same. 
+      </p>
+
+<pre style="padding-left:2em;">
+TCSH
+Before: 
+     spiceinit from=input.cub ck='(file1.cub,file2.cub)'
+Now:    
+     spiceinit from=input.cub ck='(file1.cub,file2.cub)'
+
+BASH:
+Before: 
+     spiceinit from=input.cub ck='(file1.cub,file2.cub)'
+Now:    
+     spiceinit from=input.cub ck='(file1.cub,file2.cub)'
 </pre>
+
+      <p>   
+	An escape character "\" has been added to differentiate a first parenthesis 
+	from the beginning of an array sequence.
+      </p>
+
+<pre style="padding-left:2em;">
+TCSH
+Before: 
+     fx equation='"(1+2)/2"'
+Now:    
+     fx equation='\(1+2)/2'
+
+BASH
+Before: 
+     fx equation='"(1+2)/2"'
+Now:    
+     fx equation=\(1+2)/2
+</pre>
+	
+      <p>
+	The equation string entered within a GUI interface may not work if the 
+	entire string is copied, pasted, and executed at the command line. If the first 
+	character in the equation is a "(" then it must be prefixed by a "\" 
+	when executing as a command line, but the remaining parentheses do not
+	need to be prefixed with a backslash.
+      </p>
+
+      <p>
+	Example: 
+      </p>
+
+      <p> This equation string works inside the <i>fx</i> GUI: </p>
+<pre style="padding-left:2em;">
+fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub equation=(f1*(f1>.004)) 
+</pre>
+
+      <p>These equation strings fail on the command line: </p> 
+<pre style="padding-left:2em;">
+fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub equation=(f1*(f1>.004)) 
+fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub equation="(f1*(f1>.004))" 
+</pre>
+
+      <p>
+	This equation string works on the command line: </p>
+<pre style="padding-left:2em;">
+fx f1=BIFQF23N004_D218_T069S02_V02_I3.cub to=tt.cub equation="\(f1*(f1>.004))"
+</pre>
+      
+      <p>
+        Other miscellaneous command lines which are not proper 
+	will no longer work, such as the following command,
+	where space is used as an argument:</p>
+	
+<pre style="padding-left:2em;">
+spiceinit from=input.cub " "
+</pre>
+
+      <p>
+	Multiple spaces in strings are detected better now and properly identified 
+	on a command line.  Although spaces are detected better, it is recommended 
+	that file names and directory names do not contain spaces especially if 
+	batch processing will be utilized in subsequent processing steps. <br /><br />
+	TCSH/BASH <br/>
+	Before: 
+	</p>
+<pre style="padding-left:2em;">
+tabledump from=input.cub name=\"some  table\"
+</pre>
+      <p>
+	Now: 
+      </p>
+<pre style="padding-left:2em;">
+tabledump from=input.cub name="some table" 
+tabledump from=input.cub name="some  table" 
+</pre>
+      <p>
+	Note the first example shows a single space between "some" and "table" 
+	and the second example shows two spaces between "some" and "table."
+       </p>
+
+ 
+ <h2>Special Characters</h2>
+
+ <p>
+  When running an ISIS application from the command line, there may be conflicts
+  with the syntax between ISIS and the shell (e.g., bash, tcsh).  ISIS commands 
+  can use characters that the shell reserves for special  actions; therefore,
+  in order for ISIS to get the correct string, certain characters must be escaped 
+  to derive the correct meaning.
+  </p>
+  <p> 
+  Here are some special shell characters that must be escaped when using ISIS
+  commands on the command line:
+  </p>
+<pre>
+   ? $ ' ` " * ( ) { } \
+</pre>
+<p>  
+ <ul>
+ <li>
+  The backslash ( \ ) will escape a single special character; this means the 
+  shell will treat a special character with a backslash in front of it as a 
+  literal character. 
+ </li>
+ <li>
+  The single or double quotes provide cleaner syntax when there are multiple 
+  characters to escape. The single quotes are the strongest type of escape; 
+  every special character is treated as a normal character when it is bound 
+  by single quotes. 
+ </li>
+ <li>
+  Double quotes, on the other hand, only escape some of the special characters.
+ </li>
+ <li>
+  The single quote, double quote, and the backslash have similar functions 
+  in the shell.
+ </li>
+ <li>
+  The dollar sign ($) and back quote (`) retain their special meaning. This 
+  allows command and variable expansion. In bash the backslash (\) also retains 
+  its meaning. However, in tcsh it is escaped. Bash allows you to nest quotes 
+  but tcsh does not. 
+ </li>
+ </ul>
+</p>
+
+<pre style="padding-left:2em;">
+For example, if ISISROOT = /home/checkout/isis, the command
+
+     echo "$ISISROOT"
+
+returns 
+
+     /home/checkout/isis.
+
+However, the commands
+
+     echo '$ISISROOT' and echo \$ISISROOT
+
+return 
+     
+     $ISISROOT.
+</pre>
+
+ <p>
+  When using the command line, escape characters may be necessary to 
+  generate the correct ISIS string. Escape characters will not cause program 
+  errors because ISIS ignores them. 
+ </p>
+
+ <p>
+  The dollar sign ($) signifies a variable as shown in the first example of 
+  this section. The $( ) pair is used for command expansion and $((expression)) 
+  is used for arithmetic expansion. The parentheses are also used to separate 
+  tokens and change the order of precedence, parentheses execute first. The ${ } 
+  pair is used for parameter expansion. The curly braces ({ }) denote reserved 
+  words.
+</p>
+
+<pre style="padding-left:2em;">
+For example,
+
+     echo ${ISISROOT}
+
+will result in
+
+     /home/checkout/isis
+</pre>
+
+ <p>
+  The dollar sign ($) is also used to represent the last line in certain 
+  pattern matching situations. For instance, 3-$ means to begin an action at 
+  line 3 and to keep going with that particular action until the end of the 
+  file is reached. 
+</p>
+
+<pre style="padding-left:2em;">
+sed '3-$d' filename.txt
+</pre>
+
+<p>
+ The dollar sign ($) can also be followed by a number. ISIS ignores dollar 
+ signs unless the batchlist parameter is used. See the "-BATCHLIST PARAMETER"
+ section for more information. 
+</p>
+
+<p>
+ Another very common special character used in ISIS scripts is the question 
+ mark (?). The shell interprets this as any single character. The question 
+ mark can be used when there are multiple strings to read or write. ISIS on 
+ the other hand, replaces the question mark (?) with a single integer 
+ starting at one and continues for the number of digits represented by 
+ question marks. For example, to create the 
+ <def link="Control Point">control point IDs</def> of a 
+ <def link="Control Network">control network</def>, in sequential order, 
+ and to append numbers to a string prefix termed "newpoint," do the following:
+</p>
+
+<pre style="padding-left:2em;">
+pointid="newpoint????"
+</pre>
+
+ <p>
+  This will give each new <def link="Control Point">control point</def> a 
+  unique, sequential name: newpoint0001, newpoint0002, and so on up to 4 
+  digits or up to the number of points in the 
+  <def link="Control Network">control network</def> file.  The numbering
+  starts with 1.
+</p>
+
+ <p>
+   Since the shell processes the special characters in the command before 
+   passing it to the ISIS application, something like the pointid example 
+   above, without the quotes, would fail because the shell would try to find 
+   a file name beginning with "newpoint" followed by exactly four other 
+   characters. It probably would not find anything and would result in an 
+   error. So, what we want is for ISIS to get the "newpoint????" string including 
+   the unprocessed question marks. ISIS will then replace the question marks 
+   with sequential integers. Because there is one level of processing being 
+   done by the shell before the command is passed to ISIS you can use any of 
+   the following to get the same result:
+</p>
+
+<pre style="padding-left:2em;">
+pointid='newpoint????'
+
+pointid="newpoint????"
+
+pointid=newpoint\?\?\?\?
+</pre>
+
+ <p>
+  The asterisk (*) is also used in many ISIS scripts. The shell will replace 
+  the asterisk (*) with any number of characters that complete the string to 
+  fit the pattern. The following example shows a directory's contents, and 
+  then the use of the wildcard, aka the asterisk, to list specific filenames.  
+</p>
+
+<pre style="padding-left:2em;">
+Current directory contents:
+
+moon_a.cub
+mars.cub
+moon.cub
+winter_storm.jpg
+moon.jpg
+starMoon.cub
+</pre>
+<p>
+ Command to make an input list of all filenames that begin with moon, and
+ have the extension .cub:
+</p>
+<pre style="padding-left:2em;">
+ls moon*.cub > inputList.lis
+</pre>
+<p>
+ If you view the contents of <b>inputList.lis</b> file, then it should 
+ contain the following:
+</p>
+ 
+<pre style="padding-left:2em;">
+moon_a.cub
+moon.cub
+</pre>
+
+ <p>
+A very important difference between the asterisk ( * ) and the question mark ( ? ) 
+is that the asterisk will not work as part of an output string like "newpoint????" 
+because it is ambiguous. It will not auto-generate a string to match the pattern.
+</p>
+
+ <p>
+The following command will give an error in both bash and tcsh:
+</p>
+
+<pre style="padding-left:2em;">
+Current directory contents:
+
+a.lis
+b.lis
+c.lis
+</pre>
+
+<p>
+Command to create a list and pump its contents into a ".lis" file using a 
+wildcard:
+</p>
+
+<pre style="padding-left:2em;">
+ls > *.lis
+
+Resulting error:
+
+*.lis: ambiguous
+</pre>
+
+ <p>
+  The asterisk (*) can be escaped with the backslash(\), single quotes('), 
+  or double quotes("), just like the question mark.
+</p>
+
+ <p>
+   The back quote (`), often used in test scripts, are different from double 
+   quotes. Instead of escaping its contents, the back quotes cause the 
+   encompassed command to be executed and the results of that command will 
+   replace the quoted string. The back quotes are special characters that 
+   retain special meaning in double quotes, but this is not the case with 
+   single quotes. 
+</p>
+
+<pre style="padding-left:2em;">
+For example, when the directory contents are
+
+test_a
+test_b
+test_c
+
+and the following command(s) are executed
+  
+  echo `ls test*` and echo "`ls test*`"
+
+both will result in following:
+
+test_a
+test_b
+test_c
+
+Whereas the following command(s)
+  
+  echo "ls tests*" or echo 'ls tests*'
+
+would result in
+
+  ls tests*
+</pre>
+
+
         <h2>Lists of String Parameters</h2>
         <p>
-          Some applications will restrict the values of string parameters to a pre-defined list.  We will use the below "raw2isis" GUI as an example.  In this particular case, both BITTYPE and BYTEORDER are strings restricted to certain values.  Those values are given in parenthesis to the right of the radio buttons.  Two examples of valid command lines are:
+          Some applications will restrict the values of string parameters to a 
+	  pre-defined list.  We will use the <i>raw2isis</i> GUI below as a guide for
+	  the examples.  In this particular case, both 
+	  <def link="Bit Type">BITTYPE</def> and <def link="Byte">BYTEORDER</def> 
+	  are strings restricted to certain values.  Those values are given in 
+	  parentheses to the right of the radio buttons in the GUI.  Two examples follow.
         </p>
 
-<pre style="padding-left:4em;">
-raw2isis byteorder=lsb bittype=real from=file.raw to=file.cub nl=500 ns=500
-raw2isis byteorder=lsb bittype=R from=file.raw to=file.cub nl=500 ns=500
+<pre style="padding-left:2em;">
+raw2isis byteorder=lsb bittype=real from=file.raw to=file.cub line=500 sample=500
+raw2isis byteorder=lsb bittype=R from=file.raw to=file.cub lin=500 samp=500
 </pre>
         <p>
-          When radio buttons appear the GUI, the value can be abbreviated to uniqueness and is case insensitive as well.  The second example, bittype=R implies bittype=real.  The following example would fail because of uniqueness issues matching both UnsignedByte and UnsignedWord:
+          When radio buttons appear in the GUI, the value can be abbreviated to 
+	  uniqueness and is case insensitive as well.  The second example, 
+	  bittype=R implies bittype=real.  The following example would fail 
+	  because the string "unsigned" for the bittype parameter is not unique
+	  for the options UnsignedByte and UnsignedWord:
         </p>
 
-<pre style="padding-left:4em;">
-raw2isis bittype=unsigned from=file.raw to=file.cub nl=500 ns=500
-**PROGRAMMER ERROR** Value of [BITTYPE] does not match a list option uniquely
+<pre style="padding-left:2em;">
+raw2isis bittype=unsigned from=file.raw to=file.cub line=500 samp=500
+
+  Group = Error
+    Program = raw2isis
+    Class   = "PROGRAMMER ERROR"
+    Code    = 3
+    Message = "Value of [BITTYPE] does not match a list option uniquely"
+    File    = IsisAml.cpp
+    Line    = 2188
+  End_Group
 </pre>
 
-
-<table class="imageTable" align="center" style="width:260px;">
-  <tr>
-    <td>
-      <a href="assets/image003.png">
-      <img src="assets/thumbs/image003.png" width="241" height="300" alt="[raw2isis GUI Screenshot]"/></a>
-      <p>
-        Lists of String Parameters Example
-      </p>
-      <p class="caption">
-        503x627, 24KB
-      </p>
-    </td>
-  </tr>
-</table>
+<p>
+   <b>Lists of String Parameters Example</b>
+</p>
+<p>
+<a href="assets/images/raw2isis_gui_1.png">
+<img src="assets/thumbs/raw2isis_gui_1_thumb.png" width="300" height="300" alt="[raw2isis GUI Screenshot]"/></a>
+</p>
+<p>
+   File size 371 x 600, 40.9 KB
+</p>
 
         <h2>Boolean Parameters</h2>
         <p>
-          These parameters are represented by check boxes in the GUI.  Command line examples of the use of a boolean parameter are:
+          These parameters are represented by check boxes in the GUI.  Command 
+	  line examples of the use of a boolean parameter are
         </p>
-
-<pre style="padding-left:4em;">
+	
+<pre style="padding-left:2em;">
 foobar option=yes
 foobar option=no
 foobar option=true
@@ -197,34 +657,57 @@ foobar option=false
 foobar option=t
 foobar option=f
 </pre>
-
         <p>
-          The values are case insensitive.  That is, Yes, YES, True, T, etc work as well.
+          The values are case insensitive.  That is, Yes, YES, True, T, etc. work as well.
         </p>
 
         <h2>Inclusive and Exclusive Parameters</h2>
         <p>
-          The GUI has the ability to include or exclude parameters via stipling (graying out parameters).  The application programs will complain if you get it wrong in command line mode.  Using our "raw2isis" example,
+          The GUI has the ability to include or exclude parameters via stipling 
+	  (graying out parameters). The application programs will throw an error 
+	  if certain parameters are incorrectly included or excluded when executing 
+	  a command in command line mode.  See the following <i>grid</i> example, 
+	  and notice the user errors:
         </p>
 
-<pre style="padding-left:4em;">
-raw2isis fr=my.raw to=my.cub li=500 sa=500 min=0 max=255
-**USER ERROR** Parameter [CREATESPECIAL] must be used
-  if parameter [MINIMUM] is used.
+<pre style="padding-left:2em;">
+grid from=0145r_cal.cub to=gridtest.cub baseline=10 basesamp=20
 
-raw2isis fr=my.raw to=my.cub li=500 sa=500 createspecial=yes
-**USER ERROR** Parameter [MINIMUM] must be used
-  if parameter [CREATESPECIAL] equates to true.
+   Group = Error
+    Program = grid
+    Class   = "USER ERROR"
+    Code    = 2
+    Message = "Parameter [BASELINE] can not be entered if parameter [MODE] is
+               equal to [GROUND]"
+    File    = IsisAml.cpp
+    Line    = 2736
+  End_Group
+</pre>
+<p>
+If the <i>grid</i> GUI is used, the parameters baseline and basesample would be grayed 
+out and the user would not be allowed to define them; however, if the command line 
+mode is used then the error check is performed when the program is executed.  The
+parameter "mode" must be set to "image" to use "baseline" and "basesample" parameters.
+The example below shows the correct usage:
+</p>
+<pre style="padding-left:2em;">
+grid from=0145r_cal.cub to=gridtest.cub baseline=10 basesamp=20 mode=image
 </pre>
 
         <h2>Cube Attributes</h2>
         <p>
-          When a parameter is an input or output cube the GUI presents two extra buttons […] and [att].  The […] button which gives a file selection dialog is not implemented on the command line.  However, the [att] button is fully implemented in order to select the attributes for the input and output cube.
+          When a parameter is an input or output <def link="Cube">cube</def>, the 
+	  GUI presents two extra buttons (1) file selection [dir] and (2) additional options [att].  
+	  The file selection [dir] dialog button is not implemented in the command 
+	  line mode.  However, the additional attribute options shown in the GUI are fully 
+	  implemented for both the input and output cube.  The selected options can 
+	  be appended to the filename on the command line.
         </p>
 
         <h3>Output Cube Attributes</h3>
         <p>
-          The user can specify properties of the output cube.  They include:
+          Below are examples of properties of an output <def link="Cube">cube</def> that 
+	  users may specify:
         </p>
 
         <ul>
@@ -236,18 +719,20 @@ raw2isis fr=my.raw to=my.cub li=500 sa=500 createspecial=yes
         </ul>
 
         <p>
-          On the command line, the user supplements the output parameter with the attributes.  Some examples are:
+          On the command line, the user supplements the output parameter with the attributes
+	  as shown in the examples below:
         </p>
 
-<pre style="padding-left:4em;">
-highpass to=temp.hpf.cub+detached+bsq
-highpass to=temp.hpf.cub+16bit
-highpass to=temp.hpf.cub+8bit+-5.0:5.0
+<pre style="padding-left:2em;">
+highpass from=temp.cub to=temp.hpf.cub+detached+bsq line=51 samp=51
+highpass from=temp.cub to=temp.hpf.cub+16bit line=51 samp=51
+highpass from=temp.cub to=temp.hpf.cub+8bit+-5.0:5.0 line=51 samp=51
 </pre>
 
         <h4>Pixel Type</h4>
         <p>
-          This defines the output pixel type.  There are three types of output pixels:  UnsignedByte, SignedWord, and Real.  Valid values and synonyms are given below:
+          This defines the output pixel type.  There are three types of output pixels:  
+	  UnsignedByte, SignedWord, and Real.  Valid values and synonyms are given below:
         </p>
 
         <ul>
@@ -268,96 +753,121 @@ highpass to=temp.hpf.cub+8bit+-5.0:5.0
         </ul>
 
         <p>
-          The default value depends upon the type of program.  Most geometry-like programs such as crop, rotate, cam2map, pad, etc will simply propagate the input pixel type.  Programs which fiddle with the pixel values such as derive, highpass, grad, etc will generally output real pixels.
+          The default value depends upon the type of program used.  Most geometry-like 
+	  programs such as <i>crop</i>, <i>rotate</i>, <i>cam2map</i>, and <i>pad</i>, 
+	  will simply propagate the input pixel type.  Programs which use pixel values 
+	  such as <i>derive</i>, <i>highpass</i>, and <i>grad</i> will generally 
+	  output real pixels.
         </p>
 
         <h4>Output Pixel Range</h4>
         <p>
-          When choosing an output pixel type other than Real/32-bit the user must define the expected range of output pixels.  The form is +minimum:maximum.  For example,
+          When choosing an output pixel type other than Real/32-bit, the user must 
+	  define the expected range of output pixels.  The form is +minimum:maximum.  
+	  See the following application using the application <i>moccal</i>:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 moccal to=cal.cub+0.0:0.3
 </pre>
 
         <p>
-          It is important to select a good minimum and maximum.  If the window is too tight, pixels in the output file will be saturated (many LRS or HRS special pixels).  If the window is wide then quantization can occur.  That is, all the pixels are mapped to one value in the output cube.  It can be a difficult problem that can be alleviated by outputting real images, understanding that the sacrifice is utilizing more disk space.
+          It is important to select a good minimum and maximum <def link="Digital Number">DN
+	  value</def> for the valid range.  If the window is too 
+	  tight, pixels in the output file will be saturated (many <def>LRS</def> or 
+	  <def>HRS</def> <def link="Special Pixels">special pixels</def>).  If 
+	  the window is too wide, then quantization can occur.  That is, all the pixels are 
+	  mapped to one value in the output <def link="Cube">cube</def>.  It can be a difficult 
+	  problem that can be alleviated by outputting real images, understanding that 
+	  the sacrifice is utilizing more disk space.
         </p>
 
         <h4>Label Format</h4>
         <p>
-          The option exists to create attached or detached labels.  This is facilitated through:
+          The option exists to create attached or detached labels.  The complete 
+	  word must be used.  The default option is read from the system-wide/user 
+	  IsisPreference file.  See the following example using the application <i>crop</i>:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 crop from=input.cub to=output.cub+detached
 crop from=input.cub to=output.cub+attached
 </pre>
 
         <p>
-          Detached labels will be put in a separate file with an .lbl extension.  The default option is read from the system-wide/user IsisPreference file.
+          Detached labels will be put in a separate file with an .lbl extension. 
         </p>
 
         <h4>Pixel Storage Order</h4>
         <p>
-          The output order of 16-bit and 32-bit pixels can be selected in the following manner:
+          The two formats, lsb and msb are for least and most significant 
+	  <def link="Byte">byte</def> orders respectively.  The default is to use 
+	  the format native to the machine's architecture.
+        </p>
+        <p>
+          The output Byte order of 16-bit and 32-bit pixels can be selected in the 
+	  following manner:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 crop from=input.cub to=output.cub+lsb
 crop from=input.cub to=output.cub+msb
 </pre>
 
+
+        <h4>Storage Format</h4>
         <p>
-          The two formats, lsb and msb are for least and most significant byte orders respectively.  The default is to use the format native to the machines architecture.
+          The storage format of the file can be tile or band sequential.  The 
+	  default format is tile, which is preferable for most geometric 
+	  processing programs.  To select the format use
         </p>
 
-        <h4>Storage Format Format</h4>
-        <p>
-          The storage format of the file can be tiled or band sequential.  The default format is tiled which is preferable for most geometric processing programs.  To select the format use:
-        </p>
-
-<pre style="padding-left:4em;">
-lowpass from=input.cub to=output.cub+tiled
+<pre style="padding-left:2em;">
+lowpass from=input.cub to=output.cub+tile
 lowpass from=input.cub to=output.cub+bsq
 lowpass from=input.cub to=output.cub+bandSequential
 </pre>
         <p>
-          Combining
+          Combining the cube attributes
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 lowpass from=input.cub to=output.cub+bandSequential+detached
 </pre>
 
         <p>
-          gives a raw file that can be easily imported into other image processing packages.
+          creates a band sequential output file and a detached label file that can be 
+	  easily imported into other image processing packages.  The ISIS output
+	  <def link="Cube">cube</def> file must be converted to a raw file or another 
+	  format that non-ISIS applications can read.
         </p>
 
         <h3>Input Cube Attributes</h3>
         <p>
-          Input cube attributes are significantly less complicated than those of output.  They allow the user to select the bands on which to operate.  The below example divides all bands by band 5:
+          Input <def link="Cube">cube</def> attributes are significantly less complicated 
+	  than those of output.  They allow the user to select the <def link="Band">bands</def>
+	  on which to operate.  The example below divides all bands by band 5:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 ratio num=input.cub den=input.cub+5 to=dividebyband5.cub
 </pre>
 
         <p>
-          There are several forms of band selection:
+          There are several forms of <def link="Band">band</def> selection:
         </p>
 
         <ul>
             <li>+singleBand</li>
             <li>+startBand-endBand</li>
-            <li><em><span style="color:red;">[Future Option]</span> +filtername</em></li>
         </ul>
 
         <p>
-          The selections can be combined by comma separation.  Below are several examples,
+          The selections can be combined by comma separation.  Below are several 
+	  examples of selecting bands:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 +9
 +3-5
 +3,8,10-12
@@ -367,7 +877,8 @@ ratio num=input.cub den=input.cub+5 to=dividebyband5.cub
 
         <h2>Reserved Parameters</h2>
         <p>
-          All Isis applications have a suite of reserved parameters.  These parameters are
+          All ISIS applications have a suite of reserved parameters that can be specified.  
+	  The options are listed below:
         </p>
 
         <ul>
@@ -388,293 +899,358 @@ ratio num=input.cub den=input.cub+5 to=dividebyband5.cub
 
         <p>
            These parameters may be typed out in full or until the command is distinct.  For instance:
-
-<pre style="padding-left:4em;">
-equalizer -pref=myPreferences -s=ttt –g
+        </p>
+<pre style="padding-left:2em;">
+equalizer -pref=myPreferences -s=ttt -g
 equalizer -l
 </pre>
-          The first command line is acceptable because each parameter is distinct.  However, the second command
-          line would cause an error.  The -l could have been intended to be the -last or -log parameter.  In this case, the 
-          -l must be extended to -lo for log or -la for last.  If you choose to use the shortened version of the parameters, 
-          be sure to watch for conflicts of this sort.
+	<p>
+          The first command line is acceptable because each parameter is distinct.  
+	  However, the second command line would cause an error.  The -l could 
+	  have been intended to be the -last or -log parameter.  In this case, the 
+          -l must be extended to -lo for log or -la for last.  If you choose to 
+	  use the shortened version of the parameters, be sure to watch for 
+	  conflicts of this sort.
         </p>
 
         <h3>-webhelp and -help  Parameters</h3>
         <p>
-          This parameter is used to obtain help on the program.  Typing the <b>-webhelp</b> parameter will launch a
-          browser containing the documentation for the application.  Typing the <b>-help</b> parameter will give a list of the
-          programs parameters with their default value.  For list parameters, all the possible options will be output, and there
-          will be a * denoting the default option.  Typing <b>-help=<i>parameterName</i></b> will give a brief description of
-          the parameter, its default value, inclusion/exclusion information, and any other information given in the xml.  The
-          three possible options and the resulting output are seen below:
+          This parameter is used to obtain help on the program.  Typing the 
+	  <b>-webhelp</b> parameter will launch a browser containing the 
+	  documentation for the application.  Typing the <b>-help</b> 
+	  parameter will give a list of the programs parameters with their 
+	  default value.  All the possible options will be output to the screen, 
+	  and there will be a * placed before the default option if an option can 
+	  be selected from more than one available options.  
+	  Typing <b>-help=<i>parameterName</i></b> will give a brief description 
+	  of the parameter, its default value, inclusion/exclusion information, 
+	  and any other information provided in the program documentation.  The 
+	  three possible options and the resulting output are provided below:
         </p>
 
-<pre style="padding-left:4em;">
-equalizer –webhelp
+<pre style="padding-left:2em;">
+equalizer -webhelp
 </pre>
         <p>
-           This command will cause a web browser to be launched with the documentation for the "equalizer" program.
+           The command above will cause a web browser to be launched with the 
+	   documentation for the <i>equalizer</i> program.
         </p>
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 equalizer -help
 </pre>
         <p>
-           The above command will cause the following terminal output to appear on the screen.
+           The command above will cause the following terminal output to appear 
+	   on the screen:
         </p>
-<pre style="padding-left:4em;">
-FROMLIST = Null
-TO       = Null
-HOLDLIST = Null
-APPLY    = TRUE
-ADJUST   = (*BOTH, CONTRAST, BRIGHTNESS)
-CMODE    = (*PCA, SD)
-MINCOUNT = 1000
-WEIGHT   = FALSE
+<pre style="padding-left:2em;">
+FROMLIST    = Null
+HOLDLIST    = Null
+TOLIST      = Null
+OUTSTATS    = Null
+INSTATS     = Null
+PROCESS     = (*BOTH, CALCULATE, APPLY)
+SOLVEMETHOD = (QRD, *SPARSE)
+ADJUST      = (*BOTH, BRIGHTNESS, CONTRAST, GAIN)
+MINCOUNT    = 1000
+WEIGHT      = FALSE
+PERCENT     = 100.0
 </pre>
          <p>
-           To gain more information on the CMODE parameter, the following command can be used.
+           To gain more information on the ADJUST parameter, the following command can be used:
          </p>
-<pre style="padding-left:4em;">
-equalizer -help=cmode
+<pre style="padding-left:2em;">
+equalizer -help=ADJUST
 </pre>
           <p>
-             This command will cause the following terminal output to appear on the screen.
+             This command will cause the following terminal output to appear on the screen:
           </p>
-<pre style="padding-left:4em;">
-ParameterName = CMODE
-Brief         = "The constrast mode to use for the equalization"
+<pre style="padding-left:2em;">
+ParameterName = ADJUST
+Brief         = "Algorithm type used to adjust the pixel values"
 Type          = string
-Default       = PCA
+Default       = BOTH
 
-Group = PCA
-  Brief = "Principal Component Analysis Fit Mode"
+Group = BOTH
+  Brief = "Adjust the brightness and contrast of the images."
 End_Group
 
-Group = SD
-  Brief = "Standard Deviation Fit Mode"
+Group = BRIGHTNESS
+  Brief = "Adjust the brightness of the images using calculated offsets"
+End_Group
+
+Group = CONTRAST
+  Brief = "Adjust the contrast of the images only using calculated gains"
+End_Group
+
+Group = GAIN
+  Brief = "Adjust the contrast of the images without normalization"
 End_Group
 </pre>
 
         <h3>-last Parameter</h3>
         <p>
-          This parameter will run the program using the parameters from the last time a program was run in the GUI.  For example,
+          This parameter will run the program using the parameter settings from 
+	  the previous program run, if a parameter file exists 
+	  (<b>programName.par</b>).  Example:
         </p>
 
-<pre style="padding-left:4em;">
-highpass –last
+<pre style="padding-left:2em;">
+highpass -last
 </pre>
 
         <p>
           Additionally, parameters can be modified in the following manner:
         </p>
 
-<pre style="padding-left:4em;">
-highpass –last from=next.cub to=next.hpf.cub
+<pre style="padding-left:2em;">
+highpass -last from=next.cub to=next.hpf.cub
 </pre>
 
         <h3>-restore Parameter</h3>
         <p>
-          This parameter allows the user to run the programs with the parameters from a file.  In particular, a file saved using the GUI save mode or a session log.  For example,
+          This parameter allows the user to run the programs with the parameters from 
+	  a file.  In particular, a file saved using the GUI save mode or a session 
+	  log.  Example:
         </p>
 
-<pre style="padding-left:4em;">
-highpass –restore=guiSave.par
-highpass –restore=print.prt
+<pre style="padding-left:2em;">
+highpass -restore=guiSave.par
 </pre>
 
         <p>
-          Either will look for the last occurrence of Group=UserParameters in Object=highpass in the specified file.  Parameters will be loaded from that group.
+          Either will look for the last occurrence of Group=UserParameters in 
+	  Object=highpass in the specified file.  Parameter values will be loaded 
+	  from that group.
         </p>
 
         <h3>-gui Parameter</h3>
 
         <p>
-          This parameter forces the GUI to run.  It can be used in combination with parameters and reserved parameters.  For example,
+          This parameter invokes the GUI.  Other parameter names and values
+	  specified by the user are also loaded into the GUI.  It can be used in 
+	  combination with parameters and reserved parameters.
         </p>
 
-<pre style="padding-left:4em;">
-highpass from=input.cub to=output.cub lines=5 –gui
-highpass –last –gui
-highpass –restore=print.prt –gui
+<pre style="padding-left:2em;">
+highpass from=input.cub to=output.cub lines=5 -gui
+highpass -last -gui
 </pre>
 
 
         <p>
-          All examples cause the GUI to be shown with the values filled into the appropriate fields.
+          All examples cause the GUI to be shown with the values filled into the 
+	  appropriate fields, but does not execute the program.
         </p>
 
         <h3>-nogui Parameter</h3>
 
         <p>
-          This parameter forces the GUI not to run.  Its main intention is to be used on a program with no parameters  For example,
+          This parameter forces the GUI not to run.  Its main intention is to be 
+	  used on a program with no parameters.  For example,
         </p>
 
-<pre style="padding-left:4em;">
-csspck2spk –nogui
+<pre style="padding-left:2em;">
+csspck2spk -nogui
 </pre>
-        <p>
-          All examples cause the GUI to be shown with the values filled into the appropriate fields.
-        </p>
 
         <h3>-batchlist Parameter</h3>
 
         <p>
-          This parameter allows the user to run a program multiple times on a list of input parameters.  It can be used in
-          combination with all parameters.  It cannot be used with the -last, -restore, or -gui reserved parameters.  The
-          batchlist file must be a text file containing one or more columns of data.  The columns can be used in the other
-          parameters by using a '\$' followed by the column number. An example of what the batchList.txt file might look like
-          can be seen below.
+          This parameter allows the user to run a program multiple times on a list 
+	  of input parameters.  It can be used in combination with all parameters,
+	  except -last, -restore, and -gui reserved parameters.  The batch list 
+	  file must be a text file containing one or more columns of data.  The 
+	  columns are referred to in the command line by using a '\$' followed by 
+	  the column number. Below is an example of the contents of a batch list 
+	  file <b>batchList.txt</b>:
         </p>
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 /work2/eribelin/viking/   f387a06.cub
 /work2/eribelin/viking/   f348b26.cub
 /work2/eribelin/viking/   f319b19.cub
 </pre>
         <p>
-           An example commandline would look similar to the following:
+	   Below is a command line using a batch list file where the 
+	   contents of the file will be substituted for $1 (column 1) and $2 
+	   (column 2) upon execution of the <i>highpass</i> program:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass -batchlist=batchList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5
 </pre>
 
         <p>
-          The commandlines that would be run from the above command would be:
+          The command lines that would be constructed and executed from the above 
+	  command are shown below:
         </p>
 
-<pre style="padding-left:4em;">
-highpass from=/work2/eribelin/viking/f387a06.cub to=/work2/eribelin/viking/hpf/f387a06.cub  lines=5 samples=5
-highpass from=/work2/eribelin/viking/f348b26.cub to=/work2/eribelin/viking/hpf/f348b26.cub  lines=5 samples=5
-highpass from=/work2/eribelin/viking/f319b19.cub to=/work2/eribelin/viking/hpf/f319b19.cub  lines=5 samples=5
+<pre style="padding-left:2em;">
+highpass from=/work2/eribelin/viking/f387a06.cub to=/work2/eribelin/viking/hpf/f387a06.cub lines=5 samples=5
+highpass from=/work2/eribelin/viking/f348b26.cub to=/work2/eribelin/viking/hpf/f348b26.cub lines=5 samples=5
+highpass from=/work2/eribelin/viking/f319b19.cub to=/work2/eribelin/viking/hpf/f319b19.cub lines=5 samples=5
 </pre>
 
         <h3>-errlist Parameter</h3>
 
         <p>
-          This parameter will save the lines from the batchlist that an error occurs on in an error file in addition to writing
-          the errors out to the screen.  It can be used in combination with all parameters and the -batchlist and -onerror
-          reserved parameters.  All lines that were not run successfully will be propagated to the errorfile.
+          This parameter will save the lines from the batch list file that failed
+	  to execute to an error file in addition to writing the errors to the screen.  
+	  It can be used in combination with all parameters, and the -batchlist and 
+	  -onerror reserved parameters.  All lines that did not run successfully will 
+	  be propagated to the error file.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass -batchlist=batchList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5 -errlist=errList.txt
 </pre>
         <p>
-          This errorlist can be read back in as the batchlist once the errors are corrected.
+          The error list can be read back in as the batch list file once the 
+	  errors are corrected as shown below:
         </p>
+
+<pre style="padding-left:2em;">
+highpass -batchlist=errList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5 -errlist=errList2.txt
+</pre>
 
         <h3>-onerror Parameter</h3>
 
         <p>
-          This parameter can be used with all parameters, and the -batchlist and -errlist reserved parameters.  If the 
-          <b>continue</b> option is selected, it allows the user to run the program on several different files, without stopping
-          if an error occurs on one of the commandlines.  If the <b>abort</b> option is selected or it is ran without being set 
-          (the default is <b>abort</b>), the program will halt when the first error occurs.
+          This parameter can be used with all parameters, and the -batchlist and 
+	  -errlist reserved parameters.  If the <b>continue</b> option is selected, 
+	  it allows the user to run the program on all the files in the batch
+	  list file without stopping until all the command lines are executed. Any
+	  errors that were encountered are reported to the error list file.  If
+	  the <b>abort</b> option is selected or it is run without being set 
+          (the default is <b>abort</b>), the program will halt when the first error 
+	  occurs.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass -batchlist=batchList.txt from=\$1\$2 to=\$1/hpf/\$2 lines=5 samples=5 -onerror=continue
 </pre>
         <p>
-          In this example, any errors that occur will be printed out to the screen and the program will continue to the next
-          command.  
+          In this example, any errors that occur will be printed out to the screen 
+	  and the program will continue to the next command.  The only record 
+	  of the failures will be in the <b>print.prt</b> file.
         </p>
 
         <h3>-preference Parameter</h3>
 
         <p>
-          This parameter can be used with all parameters, and reserved parameters.  It overrides the current preference file
-          with the file input by the user.  For example,
+          This parameter can be used with all parameters, and reserved parameters.  
+	  It overrides some of the settings in the current or default preference file
+          with the contents of the file input by the user.  For example:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass from=input.cub to=output.cub lines=5 samples=5 -preference=myHighpassPrefs
 </pre>
         <p>
-          In this example, anything currently in the preference file will be overridden with the preferences in the file
-          <b>myHighpassPrefs</b>.
+          In this example, anything currently in the preference file will be overridden 
+	  with the preferences in the file <b>myHighpassPrefs</b>.
         </p>
 
         <h3>-log Parameter</h3>
 
         <p>
-          This parameter can be used with all parameters, and reserved parameters.  It overrides the current log file
-          in the preferences with the file input by the user.  If the -preference option is also used, the log file entered
-          will override the session log loaded in the preference file.  When -log is used without specifying a filename, 
-          the session log will be save to the print.prt file.  If the session log output is turned off in the preferences, using
-          the -log option will override it for the command line being run.  Examples of each use follow.
+          This parameter can be used with all parameters including the reserved 
+	  parameters.  It overrides the current log file in the preferences with 
+	  the file input by the user.  If the -preference option is also used, the 
+	  log file entered will override the session log loaded in the preference 
+	  file.  When -log is used without specifying a filename, the session log 
+	  will be saved to the <b>print.prt</b> file.  If the session log output is turned 
+	  off in the preferences, using the -log option will override it.  
+	  Examples of each use follow.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass from=input.cub to=output.cub lines=5 samples=5 -log
 highpass from=input.cub to=output.cub lines=5 samples=5 -log=temp.prt
 </pre>
         <p>
-          In the first example, the session log will be saved in the <b>print.prt</b> file in the current directory (even if the 
-          session log output is turned off in the preferences). In the second example, the current session log file in the
-          preference file will be overridden with <b>temp.prt</b>, and the session log information will be saved there.
+          In the first example, the session log will be saved in the <b>print.prt</b> 
+	  file in the current directory (even if the session log output is turned off 
+	  in the default preferences file). In the second example, the current session 
+	  log file in the preference file will be overridden with <b>temp.prt</b>, and 
+	  the session log information will be saved there.
         </p>
 
         <h3>-info Parameter</h3>
 
         <p>
-          This parameter can be used with all parameters, and reserved parameters.  It gathers debugging information necessary
-          to help the Isis developers understand user problems. When -info is used without specifying a filename, 
-          the debugging information will be displayed to the console through standard output.  <span class="warning">PLEASE NOTE: The
-          user should remove any data from this file that they consider to be personal and do not want publicly available before posting 
-          the file on the Isis Support Forums</span>  Examples of each use follow.
+          This parameter can be used with all parameters including the reserved 
+	  parameters.  It gathers debugging information necessary to help the ISIS 
+	  developers determine if the program failure is due to user error or a 
+	  program bug. When the -info is used without specifying a filename, 
+          the debugging information will be displayed on the screen through standard 
+	  output.  <span class="warning">PLEASE NOTE: The user should remove any 
+	  data from this file that should not be made publicly available before 
+	  posting the file on the ISIS Support Forums.</span>  Examples of each 
+	  use follow.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass from=input.cub to=output.cub lines=5 samples=5 -info
 highpass from=input.cub to=output.cub lines=5 samples=5 -info=debug.log
 </pre>
         <p>
-          In the first example, the debugging information will be output to standard out. In the second example, the debugging information
-          will be written to <b>debug.log</b>.
+          In the first example, the debugging information will be output to the
+	  screen.  In the second example, the debugging information will be written 
+	  to <b>debug.log</b>.
         </p>
 
         <h3>-save Parameter</h3>
 
         <p>
-          This parameter can be used with all parameters, and reserved parameters except the -batchlist and -errlist
-          options.  It saves the command line parameters to a file in Pvl format.  The output file can be read back in to the
-          program using the -restore option.  The default save file name is <b><i>programName</i>.par</b>.  If the -save
-          option is not used, the history file will be saved by default in the location specified in the preference file under
-          HistoryPath.  If only -save is used, the file will be saved in the current directory, and if the -save option is used 
-          with a specific filename, it will be saved in that location.
+          This parameter can be used with all parameters, and reserved parameters 
+	  except the -batchlist and -errlist options.  It saves the command line 
+	  parameters to a file in <def>PVL</def> format.  The parameters in the output 
+	  file that is saved can be restored into the program using the -restore option.  
+	  The default file name is <b><i>programName</i>.par</b>.  If the -save
+          option is not used, the history file will be saved by default in the location 
+	  specified in the preference file under HistoryPath.  If only -save is used, 
+	  the file will be saved in the current directory.  If the -save option is 
+	  used with a specific filename, it will be saved to that file.
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass from=input.cub to=output.cub lines=5 samples=5 -save=hpf/saveFile.par
 highpass from=input.cub to=output.cub lines=5 samples=5 -save
 </pre>
         <p>
-          In the first example, the program will save the parameters information in the saveFile.par file in the hpf directory.
-          The second example would save the same parameters in the highpass.par file in the current directory.
+          In the first example, the program will save the parameter information in 
+	  the <b>saveFile.par</b> file in the <b>hpf</b> directory.  The second example 
+	  would save the same parameter information to <b>highpass.par</b> file 
+	  in the current directory.
         </p>
 
         <h3>-verbose Parameter</h3>
 
         <p>
-          This parameter can be used with all parameters, and reserved parameters.  If the terminal output preference is
-          turned off in the preferences, the -verbose option will override it, and print the terminal output to the screen for the
-          current command only.  For example,
+          This parameter can be used with all parameters including the reserved 
+	  parameters.  If the terminal output preference is turned off in the 
+	  default preferences file, the -verbose option will override it, and 
+	  print the terminal output to the screen for the current command only.  
+	  For example:
         </p>
 
-<pre style="padding-left:4em;">
+<pre style="padding-left:2em;">
 highpass from=input.cub to=output.cub lines=5 samples=5 -verbose
 </pre>
         <p>
-          The terminal output would be written out to the screen as the program was executed.
+          The terminal output would be written out to the screen as the program 
+	  was executed.
         </p>
 
         <h2>Error Status</h2>
 
         <p>
-          Command lines programs exit with a status indicating success or failure.
-          Further information regarding the status can be found in the
-          <a href="../ErrorHandlingFacility/ErrorHandlingFacility.html">Isis Error Handling Facility</a>.
+          In the command line mode, programs exit with a status indicating 
+	  success (zero) or failure (non-zero).  The status codes are useful to 
+          determine a course of action when batch processing scripts are developed 
+          to run a series of ISIS programs.  Further information regarding the status 
+          can be found in the
+         <a href="../ErrorHandlingFacility/ErrorHandlingFacility.html">ISIS Error Handling Facility</a>.
         </p>
       </body>
 
@@ -698,11 +1274,11 @@ highpass from=input.cub to=output.cub lines=5 samples=5 -verbose
     <title>Command Line Usage</title>
 
     <brief>
-    Invoking Isis programs from the Unix command line
+    Invoking ISIS programs from the UNIX command line
     </brief>
     <description>
-      How to run Isis on the Unix Command Line.
-      Required reading before using the software in any scripting language
+      How to run ISIS on the UNIX Command Line.
+      Required reading before using the software in any scripting language.
     </description>
     <author>Jeff Anderson</author>
     <date>2004-02-27</date>

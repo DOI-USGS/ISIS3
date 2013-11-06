@@ -32,6 +32,7 @@
 #include <sstream>
 
 #include <QString>
+#include <QVector>
 
 #include <naif/SpiceZdf.h>
 #include <tnt/tnt_array1d.h>
@@ -167,14 +168,22 @@ class SpiceSegment {
     SVector getTimes(const SMatrix &spice) const;
 
     bool getTimeDependentFrameIds(Table &table, int &toId, int &fromId) const;
+    bool getFrameChains(Table &table, const int &leftBase, 
+                        const int &rightBase, QVector<int> &leftChain,
+                        QVector<int> &rightChain) const;
+
     QString getFrameName(int frameid) const;
+
     SMatrix getConstantRotation(Table &table) const;
     SMatrix getIdentityRotation(const int &nelements = 3) const;
     SMatrix computeStateRotation(const QString &frame1, 
                                  const QString &frame2, 
                                  double etTime) const;
+    SMatrix computeChainRotation(const QVector<int> &fChain, 
+                                 const int &ckId, const double &etTime) const; 
     void getRotationMatrices(Cube &cube, Camera &camera, Table &table,
                              SMatSeq &lmats, SMatSeq &rmat, SVector &sclks);
+
     SVector convertTimes(int scCode, const SVector &etTimes);
     void convert(const SMatrix &quats, const SMatrix &avvs,
                  const SMatSeq &lmats, const SMatSeq &rmats, 
