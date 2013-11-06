@@ -3,14 +3,63 @@
 <application name="isis2gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    output a GML polygon from an ISIS cube
+    Convert ISIS cube to GML format
   </brief>
 
   <description>
-    This program calculates a footprint polygon, in (longitude, lattitude) space, for a cube and
-    outputs a graphical markup language (GML) file containing the polygon. The input cube  
-    can be in either camera space (level1) or map projected space (level2). An ID tag can be added
-    to the GML header, see the LABEL parameter.
+    <p>
+       This program creates a footprint polygon from a cube using latitude and 
+       longitude space, and then outputs the polygon to a Geography Markup 
+       Language (GML) file. A standard output file with an &quot;xsd&quot; extension is 
+       also created as a companion to the GML formatted file. 
+    </p>
+    <p>
+       Note: 
+       <ul> 
+          <li>
+	     The input cube must be in either camera space (<def>Level1</def>) 
+	     or map projected space (<def>Level2</def>). 
+	  </li>
+          <li> 
+	     This program does not add a projection file, or merge footprints 
+	     from separate files.
+	  </li>
+       </ul>
+    </p>
+    <p>
+       If you specify a string or a filename in the LABEL parameter, it is 
+       stored in the GML header within the ID tag, which will then contain the 
+       values that you specified.  
+    </p>
+    <p>
+       The output file size is influenced by the 
+       increment value assigned to the LINC and SINC parameters.   The higher 
+       the increment value (greater than 1)
+       <ul> 
+          <li>
+	     the sparser the number of points used to draw the polygon,
+	  </li>
+          <li>
+	     the smaller the file size, and
+	  </li>
+          <li>
+	     the faster the job completes.
+	  </li>
+       </ul>
+    </p>
+    <p>
+       The parameter LONGITUDEDOMAIN is used to change the longitude domain 
+       (from 180&#176; to 360&#176; or vice-versa) as needed during the conversion 
+       to GML format. If you do not assign a longitude domain, <i>isis2gml</i> 
+       will default to the value in the ISIS <def link="Cube">cube</def> label.  
+    </p>
+    <p>
+       Example: If your ISIS cube is in the 180&#176; domain, and other non-ISIS 
+       files (ones you plan to load in GIS) are in the 360&#176; domain, the ISIS 
+       cube must be converted to 360&#176; when you create your GML file. This 
+       will make all your files compatible in the 360&#176; domain if you want 
+       to load them in a GIS application.  
+    </p>
   </description>
 
   <history>
@@ -22,6 +71,11 @@
       domain polygon. If the cube is map projected (level2) the default will be to match
       the projection. Also modified the gml output to be more standards compliant including
       a matching XSD file.
+    </change>
+    <change name="Janet Barrett" date="2013-10-30">
+      Added the ability to specify line/sample increment so that the number of points in
+      the output footprint can be decreased. This is needed for large images. Also updated
+      documentation with input from Ella and Janet Richie. Fixes #1675.
     </change>
   </history>
 
@@ -39,7 +93,7 @@
           Input cube
         </brief>
         <description>
-          Input cube to use for polygon generation 
+          Input cube to use for polygon generation. 
         </description>
         <filter>
           *.cub *.CUB
@@ -54,10 +108,10 @@
         <internalDefault>Same as input Cube</internalDefault>
         <description>
           Use this parameter to specify the name of the output GML file. The output file
-          will be a geographic markup language (GML) file containing a (longitude, lattitude)
-          polygon. If no file name is entered the input cube file name will be used with an
+          will be a geographic markup language (GML) file containing a (longitude, latitude)
+          polygon. If no file name is entered, the input cube file name will be used with an
           extension of "gml". A second output file will be created with the same base name as 
-          the "gml" file, but with the extension of "xsl." The "xsl" file is a standard part
+          the "gml" file, but with the extension of "xsd." The "xsd" file is a standard part
           of the GML output.
         </description>
         <filter>
@@ -91,29 +145,55 @@
           </description>
           <list>
             <option value="DEFAULT">
-              <brief>Use the cube projection domain or 0/360 if not projected</brief>
+              <brief>Use the cube projection domain or 360 domain if not projected</brief>
               <description>
-                Longitudes in the GML polygon will be in the same domain as the input cube projection
-                if the cube is projected. If the input cube is not projected longitudes will be in 
-                the 0 to 360 domain.
+                Longitudes in the GML polygon will be in the same domain as the input cube 
+                for a projected cube. If the input cube is unprojected, longitudes 
+                will be in the 0&#176; to 360&#176; domain.
               </description>
             </option>
             <option value="180">
-              <brief>Create -180 to 180 longitues</brief>
+              <brief>Create -180&#176; to 180&#176; longitudes</brief>
               <description>
-                Longitudes within the polygon will be in the 180 to -180 domain
+                Longitudes within the polygon will be in the -180&#176; to 180&#176; domain
               </description>
             </option>
             <option value="360">
-              <brief>Create 0 to 360 longitues</brief>
+              <brief>Create 0&#176; to 360&#176; longitudes</brief>
               <description>
-                Longitudes within the polygon will be in the 0 to 360 domain
+                Longitudes within the polygon will be in the 0&#176; to 360&#176; domain
               </description>
             </option>
           </list>
         </parameter>
-      </group>
 
+        <parameter name="LINC">
+          <type>integer</type>
+          <minimum inclusive="yes">1</minimum>
+          <default><item>1</item></default>
+          <brief>
+            The increment used to limit the number of points in the line direction
+          </brief>
+          <description>
+            This increment is used to limit the number of lines used to create the
+            polygon. A LINC of 1 means that every line will be used to create the
+            polygon. Higher LINC values result in fewer lines being used.
+          </description>
+        </parameter>
+
+        <parameter name="SINC">
+          <type>integer</type>
+          <minimum inclusive="yes">1</minimum>
+          <default><item>1</item></default>
+          <brief>
+            The increment used to limit the number of points in the sample direction
+          </brief>
+          <description>
+            This increment is used to limit the number of samples used to create the
+            polygon. A SINC of 1 means that every sample will be used to create the
+            polygon. Higher SINC values result in fewer samples being used.
+          </description>
+        </parameter>
+      </group>
     </groups>
 </application>
-

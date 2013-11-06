@@ -17,11 +17,15 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  // Get the polygon from the input cube. NOTE: the generated poly is always in the 0 to 360 domain
+  // Get the polygon from the input cube. NOTE: the generated poly is always in the 0 to 360 domain.
+  // Use the linc/sinc requested by the user.
   Cube cube;
   cube.open(ui.GetFileName("FROM"));
+  int sinc = ui.GetInteger("SINC");
+  int linc = ui.GetInteger("LINC");
   ImagePolygon poly;
-  poly.Create(cube);
+  //poly.Create(cube);
+  poly.Create(cube, sinc, linc);
   geos::geom::MultiPolygon *mPolygon = poly.Polys();
 
   // Decide if the 0 to 360 longitude domain polygon needs to be converted to the -180 to 180 domain
@@ -49,6 +53,10 @@ void IsisMain() {
   QString outgml;
   if (ui.WasEntered("TO")) {
     outgml = ui.GetFileName("TO");
+    FileName out = ui.GetFileName("TO");
+    if(out.extension() == "") {
+      outgml += ".gml";
+    }
   }
   else {
     FileName inputFile = ui.GetFileName("FROM");
