@@ -13,11 +13,11 @@ def main():
     startApplication("qnet")
     
     # Open cube list
-    clickButton(waitForObject(":qnet.Open control network  cube list_QToolButton"))
-    clickButton(waitForObject(":Select a list of cubes.toParentButton_QToolButton"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet.File_QMenu", "Open control network and cube list"))
     snooze(0.5)
     mouseClick(waitForObject(":fileNameEdit_QLineEdit"), 95, 13, 0, Qt.LeftButton)
-    type(waitForObject(":fileNameEdit_QLineEdit"), "src/qisis/tsts/SquishTests/input/Ground/Extracted_AllOverlaps.lis")
+    type(waitForObject(":fileNameEdit_QLineEdit"), "../src/qisis/tsts/SquishTests/input/Ground/Extracted_AllOverlaps.lis")
     type(waitForObject(":_QListView"), "<Return>")
 
     clickButton(waitForObject(":Select a control network.Cancel_QPushButton"))
@@ -96,7 +96,7 @@ def main():
     clickButton(waitForObject(":Right Measure.Edit Lock Measure_QCheckBox"))
     clickButton(waitForObject(":QnetToolScroll.Save Measure_QPushButton"))
     clickButton(waitForObject(":Qnet Tool Save Measure.Yes_QPushButton"))
-    #clickButton(waitForObject(":Qnet Tool Save Measure.Yes_QPushButton"))
+    clickButton(waitForObject(":Qnet Tool Save Measure.Yes_QPushButton"))
     mouseClick(waitForObject(":Right Measure_QComboBox"), 123, 11, 0, Qt.LeftButton)
     mouseClick(waitForObjectItem(":Right Measure_QComboBox", "I09439017RDR\\.cub"), 91, 4, 0, Qt.LeftButton)
     clickButton(waitForObject(":Right Measure.Edit Lock Measure_QCheckBox"))
@@ -167,8 +167,8 @@ def main():
     type(waitForObject(":Point ID:_QLineEdit_2"), "<Backspace>")
     type(waitForObject(":Point ID:_QLineEdit_2"), "1")
     
-    clickButton(waitForObject(":Create New ControlPoint.OK_QPushButton"))
-    clickButton(waitForObject(":New Point Id.OK_QPushButton"))
+    #clickButton(waitForObject(":Create New ControlPoint.OK_QPushButton"))
+    #clickButton(waitForObject(":New Point Id.OK_QPushButton"))
     
     mouseClick(waitForObject(":Point ID:_QLineEdit_2"), 2, 6, 0, Qt.LeftButton)
     type(waitForObject(":Point ID:_QLineEdit_2"), "<Right>")
@@ -184,8 +184,8 @@ def main():
     type(waitForObject(":Point ID:_QLineEdit_2"), "<Backspace>")
     type(waitForObject(":Point ID:_QLineEdit_2"), "1")
     
-    clickButton(waitForObject(":Create New ControlPoint.OK_QPushButton"))
-    clickButton(waitForObject(":New Point Id.OK_QPushButton"))
+    #clickButton(waitForObject(":Create New ControlPoint.OK_QPushButton"))
+    #clickButton(waitForObject(":New Point Id.OK_QPushButton"))
     
     mouseClick(waitForObject(":Point ID:_QLineEdit_2"), 2, 6, 0, Qt.LeftButton)
     type(waitForObject(":Point ID:_QLineEdit_2"), "<Right>")
@@ -212,6 +212,6 @@ def main():
     snooze(0.5)
     type(waitForObject(":fileNameEdit_QLineEdit_3"), "<Return>")
 
-    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar_2", "File"))
     activateItem(waitForObjectItem(":qnet.File_QMenu", "Exit"))
     snooze(1)

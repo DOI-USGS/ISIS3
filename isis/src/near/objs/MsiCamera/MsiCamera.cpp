@@ -45,8 +45,9 @@ namespace Isis {
    *                           end of this file should replace the
    *                           LoadCache() call in the constructor.
    */
-  MsiCamera::MsiCamera(Pvl &lab) : FramingCamera(lab) {
+  MsiCamera::MsiCamera(Cube &cube) : FramingCamera(cube) {
 
+    Pvl &lab = *cube.label();
     NaifStatus::CheckErrors();
     SetFocalLength();
     SetPixelPitch();
@@ -171,8 +172,8 @@ namespace Isis {
  *
  * @return Isis::Camera* MsiCamera
  */
-extern "C" Isis::Camera *MsiCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::MsiCamera(lab);
+extern "C" Isis::Camera *MsiCameraPlugin(Isis::Cube &cube) {
+  return new Isis::MsiCamera(cube);
 }
 
 // Comment: 2013-03-08 Jeannie Backer - The following code will adjust the

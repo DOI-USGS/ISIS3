@@ -12,7 +12,7 @@ class nocam2map : public Isis::Transform {
   private:
     Isis::LeastSquares *p_sampleSol;
     Isis::LeastSquares *p_lineSol;
-    Isis::Projection *p_outmap;
+    Isis::TProjection *p_outmap;
     Isis::Cube *p_latCube;
     Isis::Cube *p_lonCube;
     bool p_isOcentric;
@@ -29,7 +29,7 @@ class nocam2map : public Isis::Transform {
 
   public:
     // constructor
-    nocam2map(Isis::LeastSquares sample, Isis::LeastSquares line, Isis::Projection *outmap,
+    nocam2map(Isis::LeastSquares sample, Isis::LeastSquares line, Isis::TProjection *outmap,
               Isis::Cube *latCube, Isis::Cube *lonCube,
               bool isOcentric , bool isPosEast,
               double tolerance, int iterations,

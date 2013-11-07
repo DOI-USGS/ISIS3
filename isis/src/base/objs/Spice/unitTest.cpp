@@ -25,6 +25,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "Cube.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -52,7 +53,7 @@ using namespace std;
  */
 class MySpice : public Spice {
   public:
-    MySpice(Pvl &lab) : Spice(lab) {
+    MySpice(Cube &cube) : Spice(cube) {
       cout << "BodyCode        = " << naifBodyCode()      << endl;
       cout << "SpkCode         = " << naifSpkCode()       << endl;
       cout << "CkCode          = " << naifCkCode()        << endl;
@@ -104,39 +105,42 @@ int main(int argc, char *argv[]) {
   cout << setprecision(10);
   cout << "Unit test for Isis::Spice" << endl;
 
-  PvlGroup inst("Instrument");
-  inst += PvlKeyword("TargetName", "Mard");
+  Cube dummyCube("$base/testData/isisTruth.cub", "r");
 
-  PvlGroup kern("Kernels");
+  PvlGroup instrumentGroup("Instrument");
+  instrumentGroup += PvlKeyword("TargetName", "Mard");
+
+  PvlGroup kernelsGroup("Kernels");
   FileName f("$base/testData/kernels");
   QString dir = f.expanded() + "/";
-  kern += PvlKeyword("NaifFrameCode", "-94031");
-  kern += PvlKeyword("LeapSecond", dir + "naif0007.tls");
-  kern += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
-  kern += PvlKeyword("TargetPosition", dir + "de405.bsp");
-  kern += PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
-  kern += PvlKeyword("Instrument", dir + "mocSpiceUnitTest.ti");
-  kern += PvlKeyword("InstrumentAddendum", dir + "mocAddendum.ti");
-  kern += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
-  kern += PvlKeyword("InstrumentPointing", dir + "moc.bc");
-  kern += PvlKeyword("Frame", "");
+  kernelsGroup += PvlKeyword("NaifFrameCode", "-94031");
+  kernelsGroup += PvlKeyword("LeapSecond", dir + "naif0007.tls");
+  kernelsGroup += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
+  kernelsGroup += PvlKeyword("TargetPosition", dir + "de405.bsp");
+  kernelsGroup += PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
+  kernelsGroup += PvlKeyword("Instrument", dir + "mocSpiceUnitTest.ti");
+  kernelsGroup += PvlKeyword("InstrumentAddendum", dir + "mocAddendum.ti");
+  kernelsGroup += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
+  kernelsGroup += PvlKeyword("InstrumentPointing", dir + "moc.bc");
+  kernelsGroup += PvlKeyword("Frame", "");
 
   // Time Setup
   double startTime = -69382819.0;
   double endTime = -69382512.0;
   double slope = (endTime - startTime) / (10 - 1);
 
-  kern += PvlKeyword("StartPadding", toString(slope));
-  kern += PvlKeyword("EndPadding", toString(slope));
+  kernelsGroup += PvlKeyword("StartPadding", toString(slope));
+  kernelsGroup += PvlKeyword("EndPadding", toString(slope));
 
-  Pvl lab;
-  lab.addGroup(inst);
-  lab.addGroup(kern);
+  Pvl &lab = *dummyCube.label();
+  PvlObject &isisCubeObj = lab.findObject("IsisCube");
+  isisCubeObj.addGroup(instrumentGroup);
+  isisCubeObj.addGroup(kernelsGroup);
 
   // Test bad target
   try {
     cout << "Testing unknown target ..." << endl;
-    MySpice spi(lab);
+    MySpice spi(dummyCube);
   }
   catch(IException &e) {
     e.print();
@@ -144,10 +148,10 @@ int main(int argc, char *argv[]) {
   }
 
   // Test bad getInteger
-  PvlGroup &temp = lab.findGroup("Instrument");
+  PvlGroup &temp = lab.findGroup("Instrument", Pvl::Traverse);
   temp.addKeyword(PvlKeyword("TargetName", "Mars"), Pvl::Replace);
   cout << "Creating Spice object ..." << endl;
-  MySpice spi(lab);
+  MySpice spi(dummyCube);
   spi.instrumentRotation()->SetTimeBias(-1.15);
   cout << endl;
 

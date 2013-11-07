@@ -36,6 +36,7 @@ namespace Isis {
    * @author 2010-07-29 Debbie A. Cook
    *
    * @internal
+   *   @history 2012-10-31 - Ken Edmundson - Implemented plane shape
    */
   class ShapeModelFactory {
     public:

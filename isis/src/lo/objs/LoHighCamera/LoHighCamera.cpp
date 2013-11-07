@@ -46,9 +46,10 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    *
    */
-  LoHighCamera::LoHighCamera(Pvl &lab) : FramingCamera(lab) {
+  LoHighCamera::LoHighCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
     // Get the Instrument label information needed to define the camera for this frame
+    Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString spacecraft = (QString)inst["SpacecraftName"];
     QString instId = (QString)inst["InstrumentId"];
@@ -130,6 +131,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed Lo
  *            namespace.
  */
-extern "C" Isis::Camera *LoHighCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::LoHighCamera(lab);
+extern "C" Isis::Camera *LoHighCameraPlugin(Isis::Cube &cube) {
+  return new Isis::LoHighCamera(cube);
 }

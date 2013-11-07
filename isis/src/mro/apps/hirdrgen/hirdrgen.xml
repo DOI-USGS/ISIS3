@@ -49,49 +49,55 @@
   </category>
 
   <history>
-      <change name="Stuart Sides" date="2006-09-11">
-          Original Version
-      </change>
-      <change name="Stuart Sides" date="2006-12-14">
-          Modified labels to meet PDS standards and add new keywords.
-      </change>
-      <change name="Stuart Sides" date="2007-01-10">
-          Modified to output 8-bit products.
-      </change>
-      <change name="Stuart Sides" date="2007-02-21">
-          Modified with new keywords (NBITS, MINPER, MAXPER). Remove the OUTTYPE keyword.
-          It is now infered by NBITS.
-      </change>
-      <change name="Kris Becker" date="2007-07-24">
-          Modified to convert FILTER_NAME from BLUEGREEN to BLUE-GREEN and
-          NEARINFRARED to NEAR-INFRARED to comply with PDS.
-      </change>
-      <change name="Steven Koechle" date="2007-12-07"> Added parameters to allow 
-          for a user specified manual stretch.
-      </change>
-      <change name="Steven Lambright" date="2008-05-13">
-        Removed references to CubeInfo 
-      </change>
-      <change name="Stuart Sides" date="2008-06-06"> 
-          Changed output keyword PRODUCT_VERSION_ID from an automatic 
-          translation to a user input parameter 
-      </change>
-      <change name="Steven Lambright" date="2008-07-10"> 
-          Added Rationale Description option
-      </change>
-      <change name="Janet Barrett" date="2010-02-17"> 
-          Added ability to write output file in JPEG2000 format.
-      </change>
-      <change name="Christopher Austin" date="2010-03-01"> 
-          Fixed an error which misplaced the proper SCALING_FACTOR and OFFSET
-          keyword values.
-      </change>
-      <change name="Jeannie Backer" date="2012-11-21"> 
-          Changed bandwidth units from nm to NM.  Fixed bug so that the program
-          no uses the default MAXPER=100 value correctly. References #678
-          PROG: [Changed ProcessExportPds::SetDetached() method call to correct
-          spelling. Added g_ to global variables to meet Isis3 standards.]
-      </change>
+    <change name="Stuart Sides" date="2006-09-11">
+      Original Version
+    </change>
+    <change name="Stuart Sides" date="2006-12-14">
+      Modified labels to meet PDS standards and add new keywords.
+    </change>
+    <change name="Stuart Sides" date="2007-01-10">
+      Modified to output 8-bit products.
+    </change>
+    <change name="Stuart Sides" date="2007-02-21">
+      Modified with new keywords (NBITS, MINPER, MAXPER). Remove the OUTTYPE keyword.
+      It is now infered by NBITS.
+    </change>
+    <change name="Kris Becker" date="2007-07-24">
+      Modified to convert FILTER_NAME from BLUEGREEN to BLUE-GREEN and
+      NEARINFRARED to NEAR-INFRARED to comply with PDS.
+    </change>
+    <change name="Steven Koechle" date="2007-12-07">
+      Added parameters to allow for a user specified manual stretch.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Stuart Sides" date="2008-06-06"> 
+      Changed output keyword PRODUCT_VERSION_ID from an automatic 
+      translation to a user input parameter 
+    </change>
+    <change name="Steven Lambright" date="2008-07-10"> 
+      Added Rationale Description option
+    </change>
+    <change name="Janet Barrett" date="2010-02-17"> 
+      Added ability to write output file in JPEG2000 format.
+    </change>
+    <change name="Christopher Austin" date="2010-03-01"> 
+      Fixed an error which misplaced the proper SCALING_FACTOR and OFFSET
+      keyword values.
+    </change>
+    <change name="Jeannie Backer" date="2012-11-21"> 
+      Changed bandwidth units from nm to NM.  Fixed bug so that the program
+      no uses the default MAXPER=100 value correctly. References #678
+      PROG: [Changed ProcessExportPds::SetDetached() method call to correct
+      spelling. Added g_ to global variables to meet Isis3 standards.]
+    </change>
+    <change name="Tracie Sucharski" date="2012-12-06">
+     Changed to use TProjection instead of Projection.  References #775
+    </change>
+   <change name="Tracie Sucharski" date="2012-12-06">
+     Changed to use TProjection instead of Projection.  References #775
+   </change>
  </history>
 
   <groups>

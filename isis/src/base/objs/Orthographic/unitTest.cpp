@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   mapGroup += PvlKeyword("CenterLatitude", "40.0");
 
   try {
-    Projection &p = *ProjectionFactory::Create(lab);
+    TProjection &p = *(TProjection*) ProjectionFactory::Create(lab);
 
     cout << "Test TrueScaleLatitude method... " << endl;
     cout << "TrueScaleLatitude = " << p.TrueScaleLatitude() << endl;
@@ -241,7 +241,7 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("MinimumLongitude").setValue("-90.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("90.0");
     //Create new projection because the constructor did the modification
-    Projection &q = *ProjectionFactory::Create(lab);
+    TProjection &q = *(TProjection*) ProjectionFactory::Create(lab);
     cout << "Minimum Longitude: " << q.MinimumLongitude() << endl;
     cout << "Maximum Longitude: " << q.MaximumLongitude() << endl << endl;
 
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("MinimumLongitude").setValue("0.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("400.0");
     try {
-      Projection &n = *ProjectionFactory::Create(lab);
+      TProjection &n = *(TProjection*) ProjectionFactory::Create(lab);
       cout << "Minimum Longitude: " << n.MinimumLongitude() << endl;
       cout << "Maximum Longitude: " << n.MaximumLongitude() << endl << endl;
     }
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("MaximumLongitude").setValue("360.0");
     mapGroup.findKeyword("LatitudeType").setValue("Planetocentric");
     try {
-      Projection &n = *ProjectionFactory::Create(lab);
+      TProjection &n = *(TProjection*) ProjectionFactory::Create(lab);
       cout << endl << " Planetocentric?: " << n.IsPlanetocentric() << endl << endl;
 
     }

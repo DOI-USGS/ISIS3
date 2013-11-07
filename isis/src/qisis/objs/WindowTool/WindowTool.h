@@ -26,11 +26,12 @@ namespace Isis {
       void addTo(Workspace *ws);
       void addToPermanent(QToolBar *toolbar);
 
-    protected:
       //! Returns the menu name.
       QString menuName() const {
         return "&Window";
-      };
+      }
+
+    protected:
       void updateTool();
       void addConnections(MdiCubeViewport *cvp);
       void removeConnections(MdiCubeViewport *cvp);

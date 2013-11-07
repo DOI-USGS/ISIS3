@@ -31,7 +31,7 @@ using namespace Isis;
 
 class MyCamera : public FramingCamera {
   public:
-    MyCamera(Pvl &lab) : FramingCamera(lab) { }
+    MyCamera(Cube &cube) : FramingCamera(cube) { }
 
     /**
      * This is a pure virtual method from the Camera parent class and must be
@@ -79,9 +79,8 @@ int main() {
   //NOTE: The following cube is not from a framing camera.  The test returns
   //true for framing camera type since MyCamera is a child class of FramingCamera
   try {
-    QString inputFile = "$base/testData/ab102401_ideal.cub";
-    Pvl pvl(inputFile);
-    MyCamera cam(pvl);
+    Cube cube("$base/testData/ab102401_ideal.cub", "r");
+    MyCamera cam(cube);
 
     // test camera type
     cout << "Camera = Framing?   " << (cam.GetCameraType() == Camera::Framing) << endl;
@@ -90,7 +89,7 @@ int main() {
     cout << "Camera = Radar?     " << (cam.GetCameraType() == Camera::Radar) << endl;
 
     // test ShutterOpenCloseTimes() method
-    PvlGroup inst = pvl.findGroup ("Instrument",Pvl::Traverse);
+    PvlGroup inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
     QString startTime = inst["StartTime"];
     double eTime = 0.0;
     utc2et_c(startTime.toAscii().data(), &eTime);

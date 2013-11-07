@@ -29,7 +29,7 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -50,7 +50,7 @@ namespace Isis {
    * @throws IException
    */
   ObliqueCylindrical::ObliqueCylindrical(Pvl &label, bool allowDefaults) :
-    Projection::Projection(label) {
+    TProjection::TProjection(label) {
     try {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
@@ -367,7 +367,7 @@ namespace Isis {
    * @return PvlGroup The keywords that this projection uses
    */
   PvlGroup ObliqueCylindrical::Mapping() {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = TProjection::Mapping();
 
     mapping += m_mappingGrp["PoleLatitude"];
     mapping += m_mappingGrp["PoleLongitude"];
@@ -382,7 +382,7 @@ namespace Isis {
    * @return PvlGroup The latitude keywords that this projection uses
    */
   PvlGroup ObliqueCylindrical::MappingLatitudes() {
-    PvlGroup mapping = Projection::MappingLatitudes();
+    PvlGroup mapping = TProjection::MappingLatitudes();
 
     return mapping;
   }
@@ -393,7 +393,7 @@ namespace Isis {
    * @return PvlGroup The longitude keywords that this projection uses
    */
   PvlGroup ObliqueCylindrical::MappingLongitudes() {
-    PvlGroup mapping = Projection::MappingLongitudes();
+    PvlGroup mapping = TProjection::MappingLongitudes();
 
     return mapping;
   }

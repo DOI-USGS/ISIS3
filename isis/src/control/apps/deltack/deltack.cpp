@@ -158,8 +158,8 @@ void IsisMain() {
 
 // Compute the radius at the lat/lon
 Distance GetRadius(QString filename, Latitude lat, Longitude lon) {
-  Pvl lab(filename);
-  Sensor sensor(lab);
+  Cube cube(filename, "r");
+  Sensor sensor(cube);
   sensor.SetGround(SurfacePoint(lat, lon, sensor.LocalRadius(lat, lon)));
   Distance radius = sensor.LocalRadius();
   if(!radius.isValid()) {

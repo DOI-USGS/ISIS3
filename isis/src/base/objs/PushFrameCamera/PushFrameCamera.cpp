@@ -27,9 +27,9 @@ namespace Isis {
   /**
    * Constructs the PushFrameCamera object
    *
-   * @param lab Pvl label used to create the parent Camera object
+   * @param cube Cube used to create the parent Camera object
    */
-  PushFrameCamera::PushFrameCamera(Isis::Pvl &lab) : Camera(lab) {
+  PushFrameCamera::PushFrameCamera(Isis::Cube &cube) : Camera(cube) {
   }
 };
 

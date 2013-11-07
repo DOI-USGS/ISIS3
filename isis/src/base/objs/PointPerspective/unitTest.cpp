@@ -4,6 +4,7 @@
 #include "IException.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
+#include "TProjection.h"
 
 using namespace Isis;
 using namespace std;
@@ -61,43 +62,43 @@ int main(int argc, char *argv[]) {
   mapGroup += PvlKeyword("Distance", toString(500000.0));
 
   try {
-    Projection &p = *ProjectionFactory::Create(lab);
-    //  PointPerspective p(lab);
+    TProjection *p = (TProjection *) ProjectionFactory::Create(lab);
+    //  Isis::PointPerspective p(lab);
 
     cout << "Test TrueScaleLatitude method... " << endl;
-    cout << "TrueScaleLatitude = " << p.TrueScaleLatitude() << endl;
+    cout << "TrueScaleLatitude = " << p->TrueScaleLatitude() << endl;
     cout << endl;
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(9);
     cout << "Setting ground to (41,-74)" << endl;
-    p.SetGround(41.0, -74.0);
-    cout << "Latitude:               " << p.Latitude() << endl;
-    cout << "Longitude:              " << p.Longitude() << endl;
-    cout << "XCoord:                 " << p.XCoord() << endl;
-    cout << "YCoord:                 " << p.YCoord() << endl;
+    p->SetGround(41.0, -74.0);
+    cout << "Latitude:               " << p->Latitude() << endl;
+    cout << "Longitude:              " << p->Longitude() << endl;
+    cout << "XCoord:                 " << p->XCoord() << endl;
+    cout << "YCoord:                 " << p->YCoord() << endl;
     cout << endl;
 
 
     cout << "Test SetCoordinate method ... " << endl;
     cout << "Setting coordinate to (251640.079, 226487.551)" << endl;
-    p.SetCoordinate(251640.079, 226487.551);
-    cout << "Latitude:               " << p.Latitude() << endl;
-    cout << "Longitude:              " << p.Longitude() << endl;
-    cout << "XCoord:                 " << p.XCoord() << endl;
-    cout << "YCoord:                 " << p.YCoord() << endl;
+    p->SetCoordinate(251640.079, 226487.551);
+    cout << "Latitude:               " << p->Latitude() << endl;
+    cout << "Longitude:              " << p->Longitude() << endl;
+    cout << "XCoord:                 " << p->XCoord() << endl;
+    cout << "YCoord:                 " << p->YCoord() << endl;
     cout << endl;
 
     cout << "Test XYRange method ... " << endl;
     double minX, maxX, minY, maxY;
-    p.XYRange(minX, maxX, minY, maxY);
+    p->XYRange(minX, maxX, minY, maxY);
     cout << "Minimum X:  " << minX << endl;
     cout << "Maximum X:  " << maxX << endl;
     cout << "Minimum Y:  " << minY << endl;
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Projection *s = &p;
+    TProjection *s = p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -115,9 +116,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.addGroup(p.Mapping());
-    tmp2.addGroup(p.MappingLatitudes());
-    tmp3.addGroup(p.MappingLongitudes());
+    tmp1.addGroup(p->Mapping());
+    tmp2.addGroup(p->MappingLatitudes());
+    tmp3.addGroup(p->MappingLongitudes());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;

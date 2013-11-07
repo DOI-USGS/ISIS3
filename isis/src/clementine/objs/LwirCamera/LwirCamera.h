@@ -62,7 +62,7 @@ namespace Isis {
    */
   class LwirCamera : public FramingCamera {
     public:
-      LwirCamera(Pvl &lab);
+      LwirCamera(Cube &cube);
       //! Destroys the LwirCamera object
       ~LwirCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,

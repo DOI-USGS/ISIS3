@@ -41,7 +41,7 @@ namespace Isis {
    * @internal 
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  LroNarrowAngleCamera::LroNarrowAngleCamera(Pvl &lab) : LineScanCamera(lab) {
+  LroNarrowAngleCamera::LroNarrowAngleCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
@@ -65,6 +65,7 @@ namespace Isis {
     multiplicativeLineTimeError = getDouble(ikernKey);
 
     // Get the start time from labels
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockPrerollCount"];
     SpiceDouble etStart;
@@ -130,6 +131,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Lro namespace.
  */
-extern "C" Isis::Camera *LroNarrowAngleCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::LroNarrowAngleCamera(lab);
+extern "C" Isis::Camera *LroNarrowAngleCameraPlugin(Isis::Cube &cube) {
+  return new Isis::LroNarrowAngleCamera(cube);
 }

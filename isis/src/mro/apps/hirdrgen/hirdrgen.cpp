@@ -11,7 +11,7 @@
 #include "OriginalLabel.h"
 #include "PixelType.h"
 #include "ProcessExportPds.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "PvlFormatPds.h"
 #include "PvlTranslationManager.h"
@@ -296,7 +296,7 @@ void IsisMain() {
     // Modify the radii in the pds label to use the radius at the center latitude
     // instead of the target radii from NAIF
     if (mapObject["MAP_PROJECTION_TYPE"][0] == "EQUIRECTANGULAR") {
-      Projection *proj = ProjectionFactory::CreateFromCube(*icube2);
+      TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(*icube2);
       PvlGroup &mapping = icube2->label()->findGroup("MAPPING", Pvl::Traverse);
       double radius = proj->LocalRadius((double)mapping["CenterLatitude"]) / 1000.0;
       mapObject["A_AXIS_RADIUS"].setValue(toString(radius), "KM");

@@ -43,28 +43,31 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
-   *  @history 2008-06-25 Noah Hilt - Added enumeration for different column
-   *           values.
+   *  @history 2008-06-25 Noah Hilt - Added enumeration for different column values.
    *  @history 2008-10-14 Noah Hilt - Added Projected X and Y values to the table.
    *  @history 2008-10-17 Noah Hilt - Added tooltips to certain items in the table
-   *           that did not have descriptive names.
-   *  @history 2010-02-17 Sharmila Prasad -Added the attributes
-   *           TRACK_MOSAIC_INDEX, TRACK_MOSAIC_FILENAME,
-   *           TRACK_MOSAIC_SERIAL_NUM to track mosaic origin
-   *  @history 2010-03-08 Jeannie Walldren - Added
-   *           record() slot to be able to record a
-   *           QPoint passed from the FindTool to the current row.
+   *                          that did not have descriptive names.
+   *  @history 2010-02-17 Sharmila Prasad -Added the attributes TRACK_MOSAIC_INDEX, 
+   *                          TRACK_MOSAIC_FILENAME, TRACK_MOSAIC_SERIAL_NUM to track
+   *                          mosaic origin
+   *  @history 2010-03-08 Jeannie Walldren - Added record() slot to be able to record a
+   *                          QPoint passed from the FindTool to the current row.
    *  @history 2010-05-07 Eric Hyer - record() SLOT now shows the table as well
    *  @history 2010-06-26 Eric Hyer - Class now uses MdiCubeViewport, also fixed
-   *           include issues
+   *                          include issues
    *  @history 2011-02-16 Sharmila Prasad - Added columns for Local Emission and
-   *           Incidence Angles
+   *                          Incidence Angles
    *  @history 2012-06-22 Kimberly Oyama and Steven Lambright - Added a help menu to
    *                          the menu bar and a help dialog that displays when the
    *                          tool is opened the first time and when the user opens
    *                          it through the help menu. Fixes #772.
    *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *           coding standards. References #972.
+   *                          coding standards. References #972.
+   *  @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                          References #775.
+   *  @history 2012-04-24 Jeannie Backer - Modified to print "N/A" for NorthAzimuth if projection
+   *                          is not triaxial since this value is meaningless for ring plane
+   *                          projections. References #775.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT

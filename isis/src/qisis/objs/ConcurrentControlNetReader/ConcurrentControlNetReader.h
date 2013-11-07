@@ -24,37 +24,34 @@
  */
 
 #include <QObject>
+#include <QPair>
+#include <QPointer>
 #include <QString>
+#include <QStringList>
 
 #include "ControlNetFile.h"
-
+#include "ProgressBar.h"
 
 template<typename A> class QAtomicPointer;
 template<typename A> class QFutureWatcher;
 
-
 namespace Isis {
-  class ControlNet;
-  class ControlPoint;
-  class Distance;
+  class Control;
+  class FileName;
+  class Progress;
+  class ProgressBar;
 
 
   /**
-   * @brief This reads a control network in the background
+   * @brief This reads a control net in the background
    *
    * This class provides progress for reading a ControlNet.  Reading is done
    * in separate threads using QtConcurrent.  When reading large Pvl networks
    * the progress will hang at zero percent for a while.
    * 
-   * @author ????-??-?? Eric Hyer, Steven Lambright, Jai Rideout
+   * @author 2012-06-11 Ken Edmundson, Steven Lambright
    *
    * @internal
-   *   @history 2011-07-27 Jai Rideout - The original thread count is now
-   *                           restored after reading has finished.
-   *   @history 2011-08-01 Steven Lambright - Fixed signals/slots not being
-   *                           in correct thread.
-   *   @history 2011-10-06 Steven Lambright - Target name is now optional
-   *     
    */
   class ConcurrentControlNetReader : public QObject {
       Q_OBJECT
@@ -63,103 +60,51 @@ namespace Isis {
       ConcurrentControlNetReader();
       ~ConcurrentControlNetReader();
       void read(QString filename);
-
+      void read(QStringList filenames);
+      ProgressBar *progressBar();
 
     signals:
-      void progressRangeChanged(int, int);
-      void progressValueChanged(int);
-      void networkReadFinished(ControlNet *);
+      void networksReady(QList<Control *>);
 
 
     private:
       void nullify();
+      void start();
 
 
     private slots:
-      void startBuildingNetwork();
-      void networkBuilt();
-
-
-    private:
-      //! provides SIGNALS / SLOTS for ReadNetworkFunctor
-      QFutureWatcher<LatestControlNetFile *> * m_readWatcher;
-      
-      //! provides SIGNALS / SLOTS for NetworkBuilder
-      QFutureWatcher< QAtomicPointer<ControlNet> > * m_builderWatcher;
-      
-      //! This is the binary container when reading a network
-      LatestControlNetFile *m_versionerFile;
-
-      /** 
-       * This is needed to store off the original QtConcurrent thread count so
-       * that it can later be restored. This class uses a single thread to do
-       * the reading, as no performance gains were realized with more threads.
-       */
-      int m_originalThreadCount;
-
+      void updateProgressValue();
+      void mappedFinished();
 
     private:
+      void initProgress();
+
+    private:
+      //! provides SIGNALS / SLOTS for FileNameToControlFunctor
+      QFutureWatcher<Control *> * m_watcher;
+      QStringList m_backlog;
+      bool m_mappedRunning;
+      QList<Progress *> m_progress;
+      QPointer<ProgressBar> m_progressBar;
+      QPointer<QTimer> m_progressUpdateTimer;
+
       /**
-       * @brief This functor reads the network file to the binary container
+       * @brief
        *
-       * This class is designed to be called with QtConcurrent::run()
-       * 
-       * @author ????-??-?? Eric Hyer, Steven Lambright, Jai Rideout
+       * @author ????-??-?? ???
        *
        * @internal
        */
-      class ReadNetworkFunctor : public std::unary_function<
-          void, LatestControlNetFile *> {
-
+      class FileNameToControlFunctor : public std::unary_function<
+          const QPair<FileName, Progress *> &, Control *> {
         public:
-          ReadNetworkFunctor(QString);
-          ~ReadNetworkFunctor();
-          LatestControlNetFile *operator()() const;
-
-
-        private:
-          //! needed by operator() to do call ControlNetVersioner::Read()
-          QString m_networkFileName;
-      };
-
-
-      /**
-       * @brief This functor builds the points in a network
-       *
-       * This class is designed to be called with QtConcurrent::mappedReduced()
-       * 
-       * @author ????-??-?? Eric Hyer, Steven Lambright, Jai Rideout
-       *
-       * @internal
-       */
-      class NetworkBuilder : public std::unary_function<
-          const ControlPointFileEntryV0002 &, ControlPoint *> {
-
-        public:
-          NetworkBuilder(QString, QThread *);
-          NetworkBuilder(NetworkBuilder const &);
-          ~NetworkBuilder();
-          ControlPoint * operator()(const ControlPointFileEntryV0002 &) const;
-          NetworkBuilder & operator=(NetworkBuilder);
-
-          static void addToNetwork(QAtomicPointer<ControlNet> &,
-              ControlPoint * const &);
-
+          FileNameToControlFunctor(QThread *);
+          FileNameToControlFunctor(const FileNameToControlFunctor &);
+          ~FileNameToControlFunctor();
+          Control * operator()(const QPair<FileName, Progress *> &) const;
+          FileNameToControlFunctor & operator=(const FileNameToControlFunctor &);
 
         private:
-          void nullify();
-
-
-        private:
-          //! Needed for construction of ControlPoints
-          Distance *m_majorRad;
-
-          //! Needed for construction of ControlPoints
-          Distance *m_minorRad;
-
-          //! Needed for construction of ControlPoints
-          Distance *m_polarRad;
-
           QThread *m_targetThread;
       };
   };

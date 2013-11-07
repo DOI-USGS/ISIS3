@@ -256,8 +256,11 @@
      <change name="Debbie A. Cook" date="2012-07-06">
        Updated Spice members to be more compliant with Isis coding standards. References #972.
      </change>
-     <change name="Debbie A. Cook" date="2012-10 -11">
+     <change name="Debbie A. Cook" date="2012-10-11">
        Updated to use new Target class. References Mantis ticket number #775 and #1114.
+     </change>
+     <change name="Tracie Sucharski" date="2012-12-06">
+       Changed to use TProjection instead of Projection.  References #775
      </change>
   </history>
 

@@ -51,9 +51,9 @@ int main(void) {
     double knownLat = -1.0309814869702094;
     double knownLon = 82.0423364316989279;
 
-    Pvl p("$voyager1/testData/c1639118.imq.cub");
-    VoyagerCamera *cam = (VoyagerCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube c("$voyager1/testData/c1639118.imq.cub", "r");
+    VoyagerCamera *cam = (VoyagerCamera *) CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -66,7 +66,7 @@ int main(void) {
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
     // Test Shutter Open/Close 
-    const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time

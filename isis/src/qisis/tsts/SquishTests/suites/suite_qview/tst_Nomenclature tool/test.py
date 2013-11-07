@@ -110,10 +110,11 @@ def main():
     
     waitFor("object.exists(':viewport4_progress')")
     waitFor('findObject(":viewport4_progress").text == \"100%\"')
-    snooze(0.5)
+    snooze(1.0)
     waitFor("object.exists(':qview.nomenclatureQueryProgress')")
     waitFor('findObject(":qview.nomenclatureQueryProgress").visible == 0')
     waitFor("object.exists(':ProgressDialog') == 0")
+    snooze(1.5)
     test.vp("viewport4_autosearch")
     
     # Finished with initial run

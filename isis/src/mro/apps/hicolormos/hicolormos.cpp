@@ -12,7 +12,7 @@
 #include "OriginalLabel.h"
 #include "Process.h"
 #include "ProgramLauncher.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TextFile.h"
@@ -43,6 +43,7 @@ void IsisMain() {
 
   // Prep for second image if we have one
   Pvl from2lab;
+  Cube from2cube;
   PvlGroup from2Mosaic("Mosaic");
   if(ui.WasEntered("FROM2")) {
     QString from2 = ui.GetFileName("FROM2");
@@ -58,6 +59,7 @@ void IsisMain() {
     }
 
     from2Mosaic = from2lab.findGroup("Mosaic", Pvl::Traverse);
+    from2cube.open(ui.GetFileName("FROM2"), "r");
   }
   tf.Close();  // Close list remember to delete
 
@@ -72,13 +74,13 @@ void IsisMain() {
   }
 
   // Work with latitude and longitude use projection factory (from1)
-  Projection *proj = ProjectionFactory::CreateFromCube(from1lab);
+  TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from1lab);
   double minLat = proj->MinimumLatitude();
   double maxLat = proj->MaximumLatitude();
   double minLon = proj->MinimumLongitude();
   double maxLon = proj->MaximumLongitude();
   if(ui.WasEntered("FROM2")) {
-    Projection *proj = ProjectionFactory::CreateFromCube(from2lab);
+    TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from2lab);
     if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
     if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
     if(proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
@@ -107,7 +109,8 @@ void IsisMain() {
   // has been left in to be backward compatiable.  See code below that sets
   // image,  this was in 10/07 because pole images would not find an
   // intersect in projection lat. lon. space.
-  Camera *cam = CameraFactory::Create(from1lab);
+  Cube from1cube(from1, "r");
+  Camera *cam = CameraFactory::Create(from1cube);
   if(cam->SetUniversalGround(avgLat, avgLon)) {
     Cemiss = cam->EmissionAngle();
     Cphase = cam->PhaseAngle();
@@ -119,7 +122,7 @@ void IsisMain() {
     runXY = false;
   }
   else if(ui.WasEntered("FROM2")) {
-    Camera *cam = CameraFactory::Create(from2lab);
+    Camera *cam = CameraFactory::Create(from2cube);
     if(cam->SetUniversalGround(avgLat, avgLon)) {
       Cemiss = cam->EmissionAngle();
       Cphase = cam->PhaseAngle();
@@ -137,7 +140,7 @@ void IsisMain() {
   // This is run if no intersect is found when using lat and lon in
   // projection space.
   if(runXY) {
-    Projection *proj = ProjectionFactory::CreateFromCube(from1lab);
+    TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from1lab);
     proj->SetWorld(0.5, 0.5);
     double startX = proj->XCoord();
     double endY = proj->YCoord();
@@ -148,7 +151,7 @@ void IsisMain() {
     double startY = proj->YCoord();
 
     if(ui.WasEntered("FROM2")) {
-      Projection *proj = ProjectionFactory::CreateFromCube(from2lab);
+      TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from2lab);
       proj->SetWorld(0.5, 0.5);
       if(proj->XCoord() < startX) startX = proj->XCoord();
       if(proj->YCoord() > endY) endY = proj->YCoord();
@@ -163,7 +166,7 @@ void IsisMain() {
     double avgY = (startY + endY) / 2;
     double sample = proj->ToWorldX(avgX);
     double line = proj->ToWorldY(avgY);
-    Camera *cam = CameraFactory::Create(from1lab);
+    Camera *cam = CameraFactory::Create(from1cube);
     if(cam->SetImage(sample, line)) {
       Cemiss = cam->EmissionAngle();
       Cphase = cam->PhaseAngle();
@@ -175,7 +178,7 @@ void IsisMain() {
       runXY = false;
     }
     else if(ui.WasEntered("FROM2")) {
-      Camera *cam = CameraFactory::Create(from2lab);
+      Camera *cam = CameraFactory::Create(from2cube);
       if(cam->SetImage(sample, line)) {
         Cemiss = cam->EmissionAngle();
         Cphase = cam->PhaseAngle();

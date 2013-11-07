@@ -16,11 +16,11 @@ def main():
     
     
     # Open cube list (tr.lis)
-    clickButton(waitForObject(":qnet.Open control network  cube list_QToolButton"))
-    clickButton(waitForObject(":Select a list of cubes.toParentButton_QToolButton"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet.File_QMenu", "Open control network and cube list"))
     snooze(0.5)
     mouseClick(waitForObject(":fileNameEdit_QLineEdit"), 95, 13, 0, Qt.LeftButton)
-    type(waitForObject(":fileNameEdit_QLineEdit"), "src/qisis/tsts/SquishTests/input/m01018/tr.lis")
+    type(waitForObject(":fileNameEdit_QLineEdit"), "../src/qisis/tsts/SquishTests/input/m01018/tr.lis")
     type(waitForObject(":_QListView"), "<Return>")
 
     # Open control net (enceladus_sp_no390.net)
@@ -42,11 +42,11 @@ def main():
     
     
     # Open cube list (tr_no390.lis)
-    clickButton(waitForObject(":qnet.Open control network  cube list_QToolButton"))
-    clickButton(waitForObject(":Select a list of cubes.toParentButton_QToolButton"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet.File_QMenu", "Open control network and cube list"))
     snooze(0.5)
     mouseClick(waitForObject(":fileNameEdit_QLineEdit"), 95, 13, 0, Qt.LeftButton)
-    type(waitForObject(":fileNameEdit_QLineEdit"), "src/qisis/tsts/SquishTests/input/m01018/tr_no390.lis")
+    type(waitForObject(":fileNameEdit_QLineEdit"), "../src/qisis/tsts/SquishTests/input/m01018/tr_no390.lis")
     type(waitForObject(":_QListView"), "<Return>")
 
     # Open control net (enceladus_sp_no390.net)
@@ -86,7 +86,7 @@ def main():
     type(waitForObject(":fileNameEdit_QLineEdit_3"), "<Return>")
     
     # Exit
-    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar_2", "File"))
     activateItem(waitForObjectItem(":qnet.File_QMenu", "Exit"))
     snooze(1)
     

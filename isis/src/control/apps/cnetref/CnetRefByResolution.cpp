@@ -356,10 +356,16 @@ namespace Isis {
           }
         }
         else if (meType == Mean) {
-          double dDiff = fabs(dMean - mdResVector[i]);
-          if (dBestResolution == -1 || dDiff <  dBestResolution) {
-            dBestResolution = dDiff;
-            iBestIndex = i;
+          if ((int)mdResVector.size() == 2)  { 
+            // Arbitrarily assign the 1st measure to be reference for a point with only 2 measures
+            iBestIndex  = 0;
+          }
+          else { 
+            double dDiff = fabs(dMean - mdResVector[i]);
+            if (dBestResolution == -1 || dDiff <  dBestResolution) {
+              dBestResolution = dDiff;
+              iBestIndex = i;
+            }
           }
         }
         else if (meType == Nearest) {

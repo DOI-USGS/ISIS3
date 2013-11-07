@@ -824,7 +824,7 @@ void gbl::FindDustRingParameters() {
   }
 
   // Mottling correction for full images after 2003-286T10:28:04
-  gbl::mottleFile = (gbl::GetCalibrationDirectory("duString") + "nac_mottle_1444733393.full.cub");
+  gbl::mottleFile = (gbl::GetCalibrationDirectory("dustring") + "nac_mottle_1444733393.full.cub");
   if(!gbl::mottleFile.fileExists()) { // mottle file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. MottleFile ***"

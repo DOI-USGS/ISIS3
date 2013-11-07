@@ -5,7 +5,7 @@
 #include "FileList.h"
 #include "IException.h"
 #include "SpecialPixel.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 
 using namespace std;
@@ -129,7 +129,7 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
   // We will loop through each input cube and do some
   // computations needed for mosaicking
   int nbands = 0;
-  Projection *firstProj = NULL;
+  TProjection *firstProj = NULL;
 
   for(int i = 0; i < list.size(); i++) {
     // Open the cube and get the maximum number of band in all cubes
@@ -139,7 +139,7 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
 
     // See if the cube has a projection and make sure it matches
     // previous input cubes
-    Projection *proj = Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
+    TProjection *proj = (TProjection *) Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
     if(firstProj == NULL) {
       firstProj = proj;
     }

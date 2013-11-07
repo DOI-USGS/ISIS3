@@ -2,6 +2,7 @@
 #include <iomanip>
 #include "IException.h"
 #include "Equirectangular.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
@@ -49,35 +50,40 @@ int main(int argc, char *argv[]) {
 
   mapGroup += PvlKeyword("CenterLatitude", toString(0.0));
 
-  Projection &p = *ProjectionFactory::Create(lab);
-  cout << "Projection Name:        " << p.Name() << endl;
-  cout << "Version:                " << p.Version() << endl;
-  cout << "Equatorial Cylindrical? " << p.IsEquatorialCylindrical() << endl;
+  Projection &proj = *ProjectionFactory::Create(lab);
+  TProjection *p = (TProjection *) &proj;
+  cout << "Projection Name:        " << p->Name() << endl;
+  cout << "Version:                " << p->Version() << endl;
+  cout << "Equatorial Cylindrical? " << p->IsEquatorialCylindrical() << endl;
+  cout << endl;
+  cout << "Projection Name:        " << p->Name() << endl;
+  cout << "Version:                " << p->Version() << endl;
+  cout << "Equatorial Cylindrical? " << p->IsEquatorialCylindrical() << endl;
   cout << endl;
 
   cout << "Test SetGround method ... " << endl;
   cout << std::setprecision(16);
   cout << "Setting ground to (-50,-75)" << endl;
-  p.SetGround(-50.0, -75.0);
-  cout << "Latitude:               " << p.Latitude() << endl;
-  cout << "Longitude:              " << p.Longitude() << endl;
-  cout << "XCoord:                 " << p.XCoord() << endl;
-  cout << "YCoord:                 " << p.YCoord() << endl;
+  p->SetGround(-50.0, -75.0);
+  cout << "Latitude:               " << p->Latitude() << endl;
+  cout << "Longitude:              " << p->Longitude() << endl;
+  cout << "XCoord:                 " << p->XCoord() << endl;
+  cout << "YCoord:                 " << p->YCoord() << endl;
   cout << endl;
 
 
   cout << "Test SetCoordinate method ... " << endl;
   cout << "Setting coordinate to (0.2617993877991494,-0.8726646259971648)" << endl;
-  p.SetCoordinate(0.2617993877991494, -0.8726646259971648);
-  cout << "Latitude:               " << p.Latitude() << endl;
-  cout << "Longitude:              " << p.Longitude() << endl;
-  cout << "XCoord:                 " << p.XCoord() << endl;
-  cout << "YCoord:                 " << p.YCoord() << endl;
+  p->SetCoordinate(0.2617993877991494, -0.8726646259971648);
+  cout << "Latitude:               " << p->Latitude() << endl;
+  cout << "Longitude:              " << p->Longitude() << endl;
+  cout << "XCoord:                 " << p->XCoord() << endl;
+  cout << "YCoord:                 " << p->YCoord() << endl;
   cout << endl;
 
   cout << "Test XYRange method ... " << endl;
   double minX, maxX, minY, maxY;
-  p.XYRange(minX, maxX, minY, maxY);
+  p->XYRange(minX, maxX, minY, maxY);
   cout << "Minimum X:  " << minX << endl;
   cout << "Maximum X:  " << maxX << endl;
   cout << "Minimum Y:  " << minY << endl;
@@ -85,10 +91,10 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test TrueScaleLatitude method..." << endl;
-  cout << "TrueScaleLatitude = " << p.TrueScaleLatitude() << endl;
+  cout << "TrueScaleLatitude = " << p->TrueScaleLatitude() << endl;
   cout << endl;
 
-  Projection *s = &p;
+  Projection *s = &proj;
   cout << "Test Name and comparision methods ... " << endl;
   cout << "Name:       " << s->Name() << endl;
   cout << "operator==  " << (*s == *s) << endl;
@@ -109,9 +115,9 @@ int main(int argc, char *argv[]) {
   Pvl tmp1;
   Pvl tmp2;
   Pvl tmp3;
-  tmp1.addGroup(p.Mapping());
-  tmp2.addGroup(p.MappingLatitudes());
-  tmp3.addGroup(p.MappingLongitudes());
+  tmp1.addGroup(p->Mapping());
+  tmp2.addGroup(p->MappingLatitudes());
+  tmp3.addGroup(p->MappingLongitudes());
 
   cout << "Mapping() = " << endl;
   cout << tmp1 << endl;

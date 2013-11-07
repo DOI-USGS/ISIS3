@@ -877,10 +877,10 @@ namespace Isis {
    *
    */
   void StereoTool::enableRubberBandTool() {
-    RubberBandTool::enable(RubberBandTool::Line);
-    RubberBandTool::allowPoints();
-    RubberBandTool::allowAllClicks();
-    RubberBandTool::drawActiveViewportOnly(true);
+    rubberBandTool()->enable(RubberBandTool::LineMode);
+    rubberBandTool()->enablePoints();
+    rubberBandTool()->enableAllClicks();
+    rubberBandTool()->setDrawActiveViewportOnly(true);
   }
 
 
@@ -895,7 +895,7 @@ namespace Isis {
     catch (IException &e) {
       QString message = e.toString();
       QMessageBox::critical(m_stereoTool, "Error setting stereo pair", message);
-      RubberBandTool::clear();
+      rubberBandTool()->clear();
       return;
     }
     
@@ -915,12 +915,12 @@ namespace Isis {
       return;
     }
 
-    if (RubberBandTool::isPoint()) {
+    if (rubberBandTool()->figureIsPoint()) {
       double samp, line;
-      cvp->viewportToCube(RubberBandTool::getVertices()[0].rx(),
-                          RubberBandTool::getVertices()[0].ry(),
+      cvp->viewportToCube(rubberBandTool()->vertices()[0].rx(),
+                          rubberBandTool()->vertices()[0].ry(),
                           samp, line);
-      if (RubberBandTool::mouseButton() & Qt::LeftButton) {
+      if (rubberBandTool()->mouseButton() & Qt::LeftButton) {
         if (!m_controlNet || m_controlNet->GetNumMeasures() == 0) {
           QString message = "No points exist for editing.  Create points ";
           message += "using the right mouse button.";
@@ -941,7 +941,7 @@ namespace Isis {
         }
         modifyPoint(point);
       }
-      else if (RubberBandTool::mouseButton() & Qt::MidButton) {
+      else if (rubberBandTool()->mouseButton() & Qt::MidButton) {
         if (!m_controlNet || m_controlNet->GetNumPoints() == 0) {
           QString message = "No points exist for deleting.  Create points ";
           message += "using the right mouse button.";
@@ -961,7 +961,7 @@ namespace Isis {
         }
         deletePoint(point);
       }
-      else if (RubberBandTool::mouseButton() & Qt::RightButton) {
+      else if (rubberBandTool()->mouseButton() & Qt::RightButton) {
         double lat, lon;
         if (cvp->cube() == m_leftCube) {
           m_leftGM->SetImage(samp, line);
@@ -981,7 +981,7 @@ namespace Isis {
           message += e.toString();
           QMessageBox::critical(m_stereoTool, "Error", message);
           m_startPoint = NULL;
-          RubberBandTool::clear();
+          rubberBandTool()->clear();
           return;
         }
       }
@@ -991,10 +991,10 @@ namespace Isis {
       m_startPoint = NULL;
       m_endPoint = NULL;
       //    Right click/drag:  Find closest end points
-      if (RubberBandTool::mouseButton() & Qt::RightButton) {
+      if (rubberBandTool()->mouseButton() & Qt::RightButton) {
         double samp, line;
-        cvp->viewportToCube(RubberBandTool::getVertices()[0].rx(),
-                            RubberBandTool::getVertices()[0].ry(),
+        cvp->viewportToCube(rubberBandTool()->vertices()[0].rx(),
+                            rubberBandTool()->vertices()[0].ry(),
                             samp, line);
         try {
           m_startPoint = m_controlNet->FindClosest(sn, samp, line);
@@ -1007,11 +1007,11 @@ namespace Isis {
           message += e.toString();
           QMessageBox::critical(m_stereoTool, "Error", message);
           m_startPoint = NULL;
-          RubberBandTool::clear();
+          rubberBandTool()->clear();
           return;
         }
-        cvp->viewportToCube(RubberBandTool::getVertices()[1].rx(),
-                            RubberBandTool::getVertices()[1].ry(),
+        cvp->viewportToCube(rubberBandTool()->vertices()[1].rx(),
+                            rubberBandTool()->vertices()[1].ry(),
                             samp, line);
         try {
           m_endPoint = m_controlNet->FindClosest(sn, samp, line);
@@ -1029,7 +1029,7 @@ namespace Isis {
           QMessageBox::critical(m_stereoTool, "Error", message);
           m_startPoint = NULL;
           m_endPoint = NULL;
-          RubberBandTool::clear();
+          rubberBandTool()->clear();
           return;
         }
         profile();
@@ -1058,7 +1058,7 @@ namespace Isis {
   void StereoTool::clearProfile() {
     m_startPoint = NULL;
     m_endPoint = NULL;
-    RubberBandTool::clear();
+    rubberBandTool()->clear();
     delete m_profileDialog;
     m_profileDialog = NULL;  
   }
@@ -1072,8 +1072,8 @@ namespace Isis {
 
     double samp, line;
     double lat, lon;
-    cvp->viewportToCube(RubberBandTool::getVertices()[0].rx(),
-                        RubberBandTool::getVertices()[0].ry(),
+    cvp->viewportToCube(rubberBandTool()->vertices()[0].rx(),
+                        rubberBandTool()->vertices()[0].ry(),
                         samp, line);
     if (cvp->cube() == m_leftCube) {
       m_leftGM->SetImage(samp, line);
@@ -1094,7 +1094,7 @@ namespace Isis {
       QMessageBox::critical(m_stereoTool, "Error", message);
       delete m_profileDialog;
       m_profileDialog = NULL;
-      RubberBandTool::clear();
+      rubberBandTool()->clear();
       return;
     }
     m_startPoint = m_editPoint;
@@ -1109,8 +1109,8 @@ namespace Isis {
 
     double samp, line;
     double lat, lon;
-    cvp->viewportToCube(RubberBandTool::getVertices()[1].rx(),
-                        RubberBandTool::getVertices()[1].ry(),
+    cvp->viewportToCube(rubberBandTool()->vertices()[1].rx(),
+                        rubberBandTool()->vertices()[1].ry(),
                         samp, line);
     if (cvp->cube() == m_leftCube) {
       m_leftGM->SetImage(samp, line);
@@ -1132,7 +1132,7 @@ namespace Isis {
       m_startPoint = NULL;
       delete m_profileDialog;
       m_profileDialog = NULL;
-      RubberBandTool::clear();
+      rubberBandTool()->clear();
       return;
     }
     m_endPoint = m_editPoint;
@@ -1801,7 +1801,7 @@ namespace Isis {
         message += "   Line = " + QString::number(longLine) + "\n\n";
         message += e.toString();
         QMessageBox::critical(m_stereoTool, "Error", message);
-        RubberBandTool::clear();
+        rubberBandTool()->clear();
       }
 
     }
@@ -1848,7 +1848,7 @@ namespace Isis {
     m_profileDialog = NULL;  
 //  m_startPoint = NULL;
 //  m_endPoint = NULL;
-//  RubberBandTool::clear();
+//  rubberBandTool()->clear();
 
   }
 

@@ -687,6 +687,13 @@
               <item>MODEL</item>
             </exclusions>
           </option>
+          <option value="RINGPLANE">
+            <brief>Use targets equatorial ring plane</brief>
+            <description>The camera will use the targets equatorial ringplane for surface intersections</description>
+            <exclusions>
+              <item>MODEL</item>
+            </exclusions>
+          </option>
           <option value="SYSTEM">
             <brief>Search system for a default shape model</brief>
             <description>

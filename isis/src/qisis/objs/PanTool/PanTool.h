@@ -22,10 +22,11 @@ namespace Isis {
       PanTool(QWidget *parent);
       void addTo(QMenu *);
 
-    protected:
       QString menuName() const {
         return "&View";
-      };
+      }
+
+    protected:
       QAction *toolPadAction(ToolPad *pad);
       QWidget *createToolBarWidget(QStackedWidget *parent);
 

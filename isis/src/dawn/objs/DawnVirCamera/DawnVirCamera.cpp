@@ -26,10 +26,11 @@
 using namespace std;
 namespace Isis {
     // constructors
-    DawnVirCamera::DawnVirCamera(Pvl &lab) : LineScanCamera(lab) {
+    DawnVirCamera::DawnVirCamera(Cube &cube) : LineScanCamera(cube) {
 
  //     cout << "Testing DawnVirCamera...\n";
 
+      Pvl &lab = *cube.label();
       PvlGroup &archive = lab.findGroup("Archive", Isis::Pvl::Traverse);
       int procLevel = archive["ProcessingLevelId"];
       m_is1BCalibrated = (procLevel > 2) ? true : false;
@@ -483,6 +484,6 @@ namespace Isis {
 }
 
 /** Instantiate a new DawnVirCamera model for the given label content */
-extern "C" Isis::Camera *DawnVirCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::DawnVirCamera(lab);
+extern "C" Isis::Camera *DawnVirCameraPlugin(Isis::Cube &cube) {
+  return new Isis::DawnVirCamera(cube);
 }

@@ -52,14 +52,15 @@ namespace Isis {
    *                          offset calculation to ShutterOpenCloseTimes()
    *                          method and added a call to the new method.
    */
-  VikingCamera::VikingCamera(Pvl &lab) : FramingCamera(lab) {
+  VikingCamera::VikingCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
     // Set the pixel pitch
     SetPixelPitch(1.0 / 85.0);
 
     // Find out what camera is being used, and set the focal length, altinstcode,
     // raster orientation, cone, crosscone, and camera
-    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+    Pvl &lab = *cube.label();
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString spacecraft = inst["SPACECRAFTNAME"];
     QString instId = inst["INSTRUMENTID"];
     QString cam;
@@ -233,6 +234,6 @@ namespace Isis {
  *
  * @return Isis::Camera* VikingCamera
  */
-extern "C" Isis::Camera *VikingCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::VikingCamera(lab);
+extern "C" Isis::Camera *VikingCameraPlugin(Isis::Cube &cube) {
+  return new Isis::VikingCamera(cube);
 }

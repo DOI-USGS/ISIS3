@@ -34,6 +34,7 @@
 #include "PolygonTools.h"
 #include "Portal.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "Statistics.h"
 #include "geos/geom/Point.h"
 #include "tnt/tnt_array2d_utils.h"
@@ -319,13 +320,13 @@ namespace Isis {
   void Chip::Load(Cube &cube, Chip &match, Cube &matchChipCube, const double scale, const int band) {
     // See if the match cube has a camera or projection
     Camera *matchCam = NULL;
-    Projection *matchProj = NULL;
+    TProjection *matchProj = NULL;
     try {
       matchCam = matchChipCube.camera();
     }
     catch(IException &error1) {
       try {
-        matchProj = matchChipCube.projection();
+        matchProj = (TProjection *) matchChipCube.projection();
       }
       catch(IException &error2) {
         QString msg = "Can not geom chip.  ";

@@ -7,7 +7,6 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "ProcessByBoxcar.h"
-#include "Projection.h"
 #include "SurfacePoint.h"
 #include "UniversalGroundMap.h"
 

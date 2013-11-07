@@ -9,8 +9,9 @@
 #include <QtGui>
 #include <QTreeWidgetItem>
 
-#include "CubeDisplayProperties.h"
 #include "FileName.h"
+#include "Image.h"
+#include "ImageList.h"
 #include "MosaicSceneItem.h"
 #include "MosaicSceneWidget.h"
 
@@ -21,7 +22,7 @@ namespace Isis {
   void MosaicSceneWidgetTester::testBasicFunctionality() {
     QStatusBar status;
 
-    MosaicSceneWidget widget(&status);
+    MosaicSceneWidget widget(&status, true, true, NULL);
     widget.show();
     QTest::qWaitForWindowShown(&widget);
     QVERIFY(widget.getProgress());
@@ -29,17 +30,17 @@ namespace Isis {
     QVERIFY(widget.getScene());
     QVERIFY(widget.getProjection() == NULL);
 
-    QMutex lock;
-    CubeDisplayProperties *image = new CubeDisplayProperties(
-        QString("./lub3994m.342.lev1.cub"), &lock);
+    Image *image = new Image(QString("./lub3994m.342.lev1.cub"));
+    QScopedPointer<QMutex> cameraMutex(new QMutex);
+    image->initFootprint(cameraMutex.data());
 
-    QList<CubeDisplayProperties *> images;
+    ImageList images;
     images.append(image);
 
-    widget.addCubes(images);
-    
+    widget.addImages(images);
+
     QCOMPARE(widget.allMosaicSceneItems().count(), 1);
-    QCOMPARE(image, widget.allMosaicSceneItems().first()->cubeDisplay());
+    QCOMPARE(image, widget.allMosaicSceneItems().first()->image());
     QVERIFY(widget.cubesSelectable());
 
     // Check that the bounding rect is approx. the same
@@ -50,37 +51,42 @@ namespace Isis {
     QVERIFY(qAbs(widget.cubesBoundingRect().bottom() - expected.bottom()) < 1);
     QVERIFY(qAbs(widget.cubesBoundingRect().right() - expected.right()) < 1);
   }
-  
-  
+
+
   void MosaicSceneWidgetTester::testSynchronization() {
     QStatusBar status;
 
-    MosaicSceneWidget widget(&status);
+    MosaicSceneWidget widget(&status, true, true, NULL);
     widget.show();
     QTest::qWaitForWindowShown(&widget);
 
-    QMutex lock;
-    CubeDisplayProperties *image = new CubeDisplayProperties(
-        QString("./lub3994m.342.lev1.cub"), &lock);
+    Image *image = new Image(QString("./lub3994m.342.lev1.cub"));
+    QScopedPointer<QMutex> cameraMutex(new QMutex);
+    image->initFootprint(cameraMutex.data());
 
-    QList<CubeDisplayProperties *> images;
+    ImageList images;
     images.append(image);
 
-    widget.addCubes(images);
-   
-    MosaicSceneItem *sceneItem = widget.allMosaicSceneItems().first(); 
+    widget.addImages(images);
 
-    QCOMPARE(sceneItem->color(), image->getValue(CubeDisplayProperties::Color).value<QColor>());
-    QCOMPARE(sceneItem->isSelected(), image->getValue(CubeDisplayProperties::Selected).toBool());
+    MosaicSceneItem *sceneItem = widget.allMosaicSceneItems().first();
+
+    ImageDisplayProperties *displayProperties = image->displayProperties();
+    QCOMPARE(sceneItem->color(),
+             displayProperties->getValue(ImageDisplayProperties::Color).value<QColor>());
+    QCOMPARE(sceneItem->isSelected(),
+             displayProperties->getValue(ImageDisplayProperties::Selected).toBool());
 
     sceneItem->setSelected(true);
-   
-    QVERIFY(sceneItem->isSelected()); 
-    QCOMPARE(sceneItem->isSelected(), image->getValue(CubeDisplayProperties::Selected).toBool());
-    
-    image->setSelected(false);
-   
-    QVERIFY(!image->getValue(CubeDisplayProperties::Selected).toBool()); 
-    QCOMPARE(sceneItem->isSelected(), image->getValue(CubeDisplayProperties::Selected).toBool());
+
+    QVERIFY(sceneItem->isSelected());
+    QCOMPARE(sceneItem->isSelected(),
+             displayProperties->getValue(ImageDisplayProperties::Selected).toBool());
+
+    displayProperties->setSelected(false);
+
+    QVERIFY(!displayProperties->getValue(ImageDisplayProperties::Selected).toBool());
+    QCOMPARE(sceneItem->isSelected(),
+             displayProperties->getValue(ImageDisplayProperties::Selected).toBool());
   }
 }

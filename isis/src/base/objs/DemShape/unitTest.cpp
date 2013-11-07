@@ -70,9 +70,8 @@ int main() {
   cube.open(inputFile);
   Camera *c = cube.camera();
   std::vector<Distance> radii = c->target()->radii();
-  Pvl pvl = *cube.label();
-  Spice spi(pvl);
-  Target targ(&spi, pvl);
+  Pvl &pvl = *cube.label();
+  Target targ(c, pvl);
   targ.setRadii(radii);
 
   cout << "Begin testing Dem Shape Model class...." << endl;
@@ -215,7 +214,7 @@ Local normal = -0.581842, -0.703663, 0.407823
   cout << endl << "  Testing method calculateLocalNormal with magnitude = 0" << endl;
   shape.calculateLocalNormal(neighborPoints);
   myNormal = shape.normal();
-  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
   }
   catch(Isis::IException &e) {
     e.print();

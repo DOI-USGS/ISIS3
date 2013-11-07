@@ -20,6 +20,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "Cube.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -110,10 +111,12 @@ int main(int argc, char *argv[]) {
   lab1.addGroup(kern1);
 
   // Create a Spice object to test radii
-  Spice spi(lab1);
+  Cube tmp("$base/testData/isisTruth.cub", "r");
+  *tmp.label() = lab1;
+  Spice spi(tmp);
 
   // Test good target
-  Target tGood(&spi, lab1);
+  Target tGood(NULL, lab1);
   cout << endl;
   cout << "  Good target test..." << endl;
   cout << "     NaifBodyCode = " << tGood.naifBodyCode() << endl;
@@ -130,7 +133,7 @@ int main(int argc, char *argv[]) {
   Pvl lab2;
   lab2.addGroup(inst2);
   lab2.addGroup(kern1);
-  Target tSky(&spi, lab2);
+  Target tSky(NULL, lab2);
   cout << endl;
   cout << "  Testing Sky..." << endl;
   cout << "     IsSky = " << tSky.isSky() << endl;
@@ -144,7 +147,7 @@ int main(int argc, char *argv[]) {
   Pvl lab3;
   lab3.addGroup(inst2);
   lab3.addGroup(kern4);
-  Target tSky2(&spi, lab3);
+  Target tSky2(NULL, lab3);
   cout << endl;
   cout << "  Testing Sky with NaifSpkCode..." << endl;
   cout << "     IsSky = " << tSky.isSky() << endl;
@@ -158,7 +161,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "  Testing no instrument group ..." << endl;
     lab4.addGroup(kern2);
-    Target tNoInstrument(&spi, lab4);
+    Target tNoInstrument(NULL, lab4);
   }
   catch(IException &e) {
     e.print();
@@ -172,7 +175,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     cout << "  Testing no kernels group ..." << endl;
-    Target tNoKernels(&spi, lab5);
+    Target tNoKernels(NULL, lab5);
   }
   catch(IException &e) {
     e.print();
@@ -183,7 +186,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     cout << "  Testing unknown target ..." << endl;
-    Target tUnknownTarget(&spi, lab4);
+    Target tUnknownTarget(NULL, lab4);
   }
   catch(IException &e) {
     e.print();
@@ -202,13 +205,13 @@ int main(int argc, char *argv[]) {
   Pvl lab6;
   lab6.addGroup(inst1);
   lab6.addGroup(kern3);
-  Spice spi3(lab6);
+  Target target3(NULL, lab6);
   cout << endl << "  Testing methods setShapeEllipsoid and restoreShape..." << endl;
-  cout << "    Original shape is " << spi3.target()->shape()->name() << endl;
-  spi3.target()->setShapeEllipsoid();
-  cout << "    Shape changed to  " << spi3.target()->shape()->name() << endl;
-  spi3.target()->restoreShape();
-  cout << "    Shape restored to  " << spi3.target()->shape()->name() << endl;
+  cout << "    Original shape is " << target3.shape()->name() << endl;
+  target3.setShapeEllipsoid();
+  cout << "    Shape changed to  " << target3.shape()->name() << endl;
+  target3.restoreShape();
+  cout << "    Shape restored to  " << target3.shape()->name() << endl;
 
   //Test the default constructor
   Target defaultTarget;

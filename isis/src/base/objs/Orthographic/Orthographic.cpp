@@ -29,7 +29,7 @@
 #include <QDebug>
 #include "Constants.h"
 #include "IException.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -53,7 +53,7 @@ namespace Isis {
    * @throws IException
    */
   Orthographic::Orthographic(Pvl &label, bool allowDefaults) :
-    Projection::Projection(label) {
+    TProjection::TProjection(label) {
     try {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
@@ -499,7 +499,7 @@ namespace Isis {
    * @return PvlGroup The keywords that this projection uses
    */
   PvlGroup Orthographic::Mapping() {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = TProjection::Mapping();
 
     mapping += m_mappingGrp["CenterLatitude"];
     mapping += m_mappingGrp["CenterLongitude"];
@@ -513,7 +513,7 @@ namespace Isis {
    * @return PvlGroup The latitude keywords that this projection uses
    */
   PvlGroup Orthographic::MappingLatitudes() {
-    PvlGroup mapping = Projection::MappingLatitudes();
+    PvlGroup mapping = TProjection::MappingLatitudes();
     mapping += m_mappingGrp["CenterLatitude"];
 
     return mapping;
@@ -525,7 +525,7 @@ namespace Isis {
    * @return PvlGroup The longitude keywords that this projection uses
    */
   PvlGroup Orthographic::MappingLongitudes() {
-    PvlGroup mapping = Projection::MappingLongitudes();
+    PvlGroup mapping = TProjection::MappingLongitudes();
 
     mapping += m_mappingGrp["CenterLongitude"];
 

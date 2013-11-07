@@ -16,7 +16,7 @@ namespace Isis {
    * @param parent
    */
   ViewportMainWindow::ViewportMainWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
-    p_workspace = new Workspace(this);
+    p_workspace = new Workspace(false, this);
     setCentralWidget(p_workspace);
     setWindowTitle(title);
     setObjectName("MainWindow");
@@ -44,7 +44,7 @@ namespace Isis {
     p_toolpad->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);
     addToolBar(Qt::RightToolBarArea, p_toolpad);
 
-    readSettings(QSize(800, 600));
+    readSettings(QSize(800, 700));
   }
 
 

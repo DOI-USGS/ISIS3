@@ -8,7 +8,7 @@
 #include "Camera.h"
 #include "FileDialog.h"
 #include "MosaicController.h"
-#include "MosaicFileListWidget.h"
+#include "ImageFileListWidget.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -45,8 +45,7 @@ namespace Isis {
         "show up here. Not all tools have options.");
     addToolBar(m_activeToolbar);
 
-    QStatusBar *sbar = statusBar();
-    sbar->showMessage("Ready");
+    statusBar()->showMessage("Ready");
 
     m_toolpad = new ToolPad("Tool Pad", this);
     m_toolpad->setObjectName("Tool Pad");
@@ -54,9 +53,6 @@ namespace Isis {
     //   want to do something different here
     addToolBar(Qt::RightToolBarArea, m_toolpad);
 
-    m_progressBar = new QProgressBar(parent);
-    m_progressBar->setOrientation(Qt::Horizontal);
-    sbar->addWidget(m_progressBar);
     setupMenus();
 
     m_fileListDock = new QDockWidget("File List", this, Qt::SubWindow);
@@ -416,7 +412,7 @@ namespace Isis {
       tabArea->addTab(overviewTab, "&Overview");
       tabArea->addTab(preparationsTab, "Preparing &Input Cubes");
 
-      tabArea->addTab(MosaicFileListWidget::getLongHelp(m_fileListDock),
+      tabArea->addTab(ImageFileListWidget::getLongHelp(m_fileListDock),
                       "File &List");
       tabArea->addTab(MosaicSceneWidget::getLongHelp(centralWidget()),
                       "Mosaic &Scene");
@@ -436,7 +432,7 @@ namespace Isis {
       tabArea->addTab(overviewTab, "&Overview");
       tabArea->addTab(preparationsTab, "Preparing &Input Cubes");
 
-      tabArea->addTab(MosaicFileListWidget::getLongHelp(),
+      tabArea->addTab(ImageFileListWidget::getLongHelp(),
                       "File &List");
       tabArea->addTab(MosaicSceneWidget::getLongHelp(),
                       "Mosaic &Scene");
@@ -512,7 +508,7 @@ namespace Isis {
       m_controllerVisible = true;
       m_mosaicController->addExportActions(*m_exportMenu);
 
-      m_fileListDock->setWidget(m_mosaicController->getMosaicFileList());
+      m_fileListDock->setWidget(m_mosaicController->getImageFileList());
       m_mosaicPreviewDock->setWidget(m_mosaicController->getMosaicWorldScene());
 
       centralWidget()->layout()->addWidget(
@@ -538,7 +534,7 @@ namespace Isis {
       statusBar()->addWidget(
           m_mosaicController->getMosaicWorldScene()->getProgress());
       statusBar()->addWidget(
-          m_mosaicController->getMosaicFileList()->getProgress());
+          m_mosaicController->getImageFileList()->getProgress());
 
       QList<QAction *> sceneViewActs =
           m_mosaicController->getMosaicScene()->getViewActions();
@@ -553,7 +549,7 @@ namespace Isis {
       m_viewMenu->addSeparator();
 
       QList<QAction *> fileListViewActs =
-          m_mosaicController->getMosaicFileList()->getViewActions();
+          m_mosaicController->getImageFileList()->getViewActions();
 
       foreach(QAction *viewAct, fileListViewActs) {
         connect(viewAct, SIGNAL(destroyed(QObject *)),
@@ -652,7 +648,7 @@ namespace Isis {
     }
 
     if (m_mosaicController)
-      m_mosaicController->openCubes(cubeNames);
+      m_mosaicController->openImages(cubeNames);
   }
 
 

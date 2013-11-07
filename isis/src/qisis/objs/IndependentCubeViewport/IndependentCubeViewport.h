@@ -54,6 +54,7 @@ namespace Isis
    * @internal
    *
    * @see CubeViewport
+   *   @history 2013-02-20 Debbie A. Cook - Changed to use new projection types.  References #775.
    */
   class IndependentCubeViewport : public CubeViewport
   {

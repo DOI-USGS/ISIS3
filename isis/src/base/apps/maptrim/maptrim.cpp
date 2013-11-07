@@ -11,6 +11,7 @@
 #include "ProgramLauncher.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "TProjection.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -21,13 +22,13 @@ void getSize(Buffer &in);
 
 double slat, elat, slon, elon;
 int smallestLine, biggestLine, smallestSample, biggestSample;
-Projection *proj;
+TProjection *proj;
 
 void IsisMain() {
   // Get the projection
   UserInterface &ui = Application::GetUserInterface();
   Pvl pvl(ui.GetFileName("FROM"));
-  proj = ProjectionFactory::CreateFromCube(pvl);
+  proj = (TProjection *) ProjectionFactory::CreateFromCube(pvl);
 
   // Determine ground range to crop and/or trim
   if(ui.WasEntered("MINLAT")) {
@@ -89,7 +90,7 @@ void IsisMain() {
       delete proj;
       proj = NULL;
       Pvl pvl(tempFileName.ToQt());
-      proj = ProjectionFactory::CreateFromCube(pvl);
+      proj = (TProjection *) ProjectionFactory::CreateFromCube(pvl);
     }
   }
 

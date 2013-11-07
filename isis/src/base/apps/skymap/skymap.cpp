@@ -3,7 +3,7 @@
 #include "Isis.h"
 
 #include "Camera.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
 
@@ -37,7 +37,7 @@ map <QString, void *> GuiHelpers() {
 class sky2map : public Transform {
   private:
     Camera *p_incam;
-    Projection *p_outmap;
+    TProjection *p_outmap;
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
@@ -47,7 +47,7 @@ class sky2map : public Transform {
   public:
     // constructor
     sky2map(const int inputSamples, const int inputLines, Camera *incam,
-            const int outputSamples, const int outputLines, Projection *outmap,
+            const int outputSamples, const int outputLines, TProjection *outmap,
             bool trim);
 
     // destructor
@@ -129,7 +129,7 @@ void IsisMain() {
 
   // Create the projection
   int samples, lines;
-  Projection *proj = ProjectionFactory::CreateForCube(userMap, samples, lines);
+  TProjection *proj = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines);
 
   // Output the mapping group used to the gui session log
   Application::GuiLog(userGrp);
@@ -208,7 +208,7 @@ void BandChange(const int band) {
 
 sky2map::sky2map(const int inputSamples, const int inputLines,
                  Camera *incam, const int outputSamples,
-                 const int outputLines, Projection *outmap,
+                 const int outputLines, TProjection *outmap,
                  bool trim) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;

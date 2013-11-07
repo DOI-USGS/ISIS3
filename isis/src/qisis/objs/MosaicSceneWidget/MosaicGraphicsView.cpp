@@ -10,7 +10,14 @@ namespace Isis {
       QWidget *parent) : QGraphicsView(scene, parent) {
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
     p_resizeZooming = true;
+
+//     setRenderHint(QPainter::SmoothPixmapTransform,false);
+//     setRenderHint(QPainter::HighQualityAntialiasing,false);
+//     setRenderHint(QPainter::NonCosmeticDefaultPen,true);
+//     setOptimizationFlag(QGraphicsView::DontSavePainterState);
+    setCacheMode(QGraphicsView::CacheBackground);
   }
 
   MosaicGraphicsView::~MosaicGraphicsView() {

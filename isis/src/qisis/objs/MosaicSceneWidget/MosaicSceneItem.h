@@ -13,7 +13,7 @@ namespace geos {
 
 namespace Isis {
   class Camera;
-  class CubeDisplayProperties;
+  class Image;
   class MosaicSceneWidget;
   class Projection;
   class PvlGroup;
@@ -43,7 +43,7 @@ namespace Isis {
   class MosaicSceneItem : public QGraphicsObject {
       Q_OBJECT
     public:
-      MosaicSceneItem(CubeDisplayProperties *, MosaicSceneWidget *parent);
+      MosaicSceneItem(Image *image, MosaicSceneWidget *parent);
       ~MosaicSceneItem();
 
       virtual QRectF boundingRect() const;
@@ -52,7 +52,7 @@ namespace Isis {
                          QWidget *widget = 0);
 
       QColor color() const;
-      CubeDisplayProperties *cubeDisplay() { return m_cubeDisplay; }
+      Image *image() { return m_image; }
       QGraphicsSimpleTextItem *getLabel() const { return m_label; }
 
       void reproject();
@@ -99,8 +99,11 @@ namespace Isis {
       double getPixelValue(int sample, int line);
       void setupStretch();
 
-      CubeDisplayProperties *m_cubeDisplay;
+      Image *m_image;
       Stretch *m_cubeDnStretch;
+
+      bool m_showingLabel;
+      bool m_ignoreCubeDisplayChanged;
 
       QGraphicsSimpleTextItem *m_label;
   };

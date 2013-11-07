@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 #include <QList>
 #include <QString>
@@ -65,7 +65,7 @@ namespace Isis {
    * @internal
    */
 
-  class Robinson : public Projection {
+  class Robinson : public TProjection {
     public:
       Robinson(Pvl &label, bool allowDefaults = false);
       ~Robinson();

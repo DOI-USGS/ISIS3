@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "Camera.h"
 #include "ProcessByLine.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "SpecialPixel.h"
 
@@ -11,7 +11,7 @@ using namespace Isis;
 // Global variables
 Cube *icube;
 Camera *cam;
-Projection *proj;
+TProjection *proj;
 double minlat;
 double maxlat;
 double minlon;
@@ -53,7 +53,7 @@ void IsisMain() {
   if(ui.WasEntered("MAP")) {
     Pvl lab;
     lab.read(ui.GetFileName("MAP"));
-    proj = ProjectionFactory::Create(lab);
+    proj = (TProjection *) ProjectionFactory::Create(lab);
 
     // add mapping to print.prt
     PvlGroup mapping = proj->Mapping();

@@ -48,7 +48,7 @@ namespace Isis {
   class CrismCamera : public LineScanCamera {
     public:
       // constructors
-      CrismCamera(Pvl &lab);
+      CrismCamera(Cube &cube);
 
       //! Destroys the CrismCamera object.
       virtual ~CrismCamera() {  }

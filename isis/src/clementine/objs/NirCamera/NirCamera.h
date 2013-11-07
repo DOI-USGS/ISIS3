@@ -68,7 +68,7 @@ namespace Isis {
    */
   class NirCamera : public FramingCamera {
     public:
-      NirCamera(Pvl &lab);
+      NirCamera(Cube &cube);
       //! Destroys the NirCamera object
       ~NirCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

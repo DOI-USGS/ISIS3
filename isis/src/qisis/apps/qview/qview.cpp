@@ -40,15 +40,23 @@
 #include "StereoTool.h"
 #include "StretchTool.h"
 #include "SunShadowTool.h"
+#include "ToolList.h"
 #include "ViewportMainWindow.h"
 #include "WindowTool.h"
 #include "Workspace.h"
 #include "ZoomTool.h"
 
-void startMonitoringMemory();
-void stopMonitoringMemory();
-
 using namespace Isis;
+
+template<typename ToolClass>
+ToolClass *createTool(ViewportMainWindow *viewportMainWindow, ToolList *tools) {
+  ToolClass *result = new ToolClass(viewportMainWindow);
+
+  tools->append(result);
+  ((Tool *)result)->addTo(viewportMainWindow);
+
+  return result;
+}
 
 int main(int argc, char *argv[]) {
   Isis::Gui::checkX11();
@@ -126,78 +134,56 @@ int main(int argc, char *argv[]) {
 
   ViewportMainWindow *vw = new ViewportMainWindow("qview");
 
-  Tool *rubberBandTool = RubberBandTool::getInstance(vw);
-  rubberBandTool->addTo(vw);
+  ToolList tools;
+  Tool *rubberBandTool = createTool<RubberBandTool>(vw, &tools);
 
-  Tool *fileTool = new FileTool(vw);
-  fileTool->addTo(vw);
+  Tool *fileTool = createTool<FileTool>(vw, &tools);
   vw->permanentToolBar()->addSeparator();
 
-  Tool *bandTool = new BandTool(vw);
-  bandTool->addTo(vw);
+  Tool *bandTool = createTool<BandTool>(vw, &tools);
 
-  Tool *zoomTool = new ZoomTool(vw);
-  zoomTool->addTo(vw);
+  Tool *zoomTool = createTool<ZoomTool>(vw, &tools);
   zoomTool->activate(true);
   vw->getMenu("&View")->addSeparator();
 
-  Tool *panTool = new PanTool(vw);
-  panTool->addTo(vw);
+  Tool *panTool = createTool<PanTool>(vw, &tools);
   vw->getMenu("&View")->addSeparator();
 
-  Tool *stretchTool = new StretchTool(vw);
-  stretchTool->addTo(vw);
+  Tool *stretchTool = createTool<StretchTool>(vw, &tools);
 
-  Tool *findTool = new FindTool(vw);
-  findTool->addTo(vw);
+  Tool *findTool = createTool<FindTool>(vw, &tools);
 
-  Tool *blinkTool = new BlinkTool(vw);
-  blinkTool->addTo(vw);
+  Tool *blinkTool = createTool<BlinkTool>(vw, &tools);
 
-  Tool *advancedTrackTool = new AdvancedTrackTool(vw);
-  advancedTrackTool->addTo(vw);
+  Tool *advancedTrackTool = createTool<AdvancedTrackTool>(vw, &tools);
 
-  Tool *editTool = new EditTool(vw);
-  editTool->addTo(vw);
+  Tool *editTool = createTool<EditTool>(vw, &tools);
 
-  Tool *windowTool = new WindowTool(vw);
-  windowTool->addTo(vw);
+  Tool *windowTool = createTool<WindowTool>(vw, &tools);
 
-  Tool *measureTool = new MeasureTool(vw);
-  measureTool->addTo(vw);
+  Tool *measureTool = createTool<MeasureTool>(vw, &tools);
 
-  Tool *sunShadowTool = new SunShadowTool(vw);
-  sunShadowTool->addTo(vw);
+  Tool *sunShadowTool = createTool<SunShadowTool>(vw, &tools);
 
-  Tool *featureNomenclatureTool = new FeatureNomenclatureTool(vw);
-  featureNomenclatureTool->addTo(vw);
+  Tool *featureNomenclatureTool = createTool<FeatureNomenclatureTool>(vw, &tools);
 
-  Tool *specialPixelTool = new SpecialPixelTool(vw);
-  specialPixelTool->addTo(vw);
+  Tool *specialPixelTool = createTool<SpecialPixelTool>(vw, &tools);
 
-  Tool *spatialPlotTool = new SpatialPlotTool(vw);
-  spatialPlotTool->addTo(vw);
+  Tool *spatialPlotTool = createTool<SpatialPlotTool>(vw, &tools);
 
-  Tool *spectralPlotTool = new SpectralPlotTool(vw);
-  spectralPlotTool->addTo(vw);
+  Tool *spectralPlotTool = createTool<SpectralPlotTool>(vw, &tools);
 
-  Tool *scatterPlotTool = new ScatterPlotTool(vw);
-  scatterPlotTool->addTo(vw);
+  Tool *scatterPlotTool = createTool<ScatterPlotTool>(vw, &tools);
 
-  Tool *histTool = new HistogramTool(vw);
-  histTool->addTo(vw);
+  Tool *histTool = createTool<HistogramTool>(vw, &tools);
 
-  Tool *statsTool = new StatisticsTool(vw);
-  statsTool->addTo(vw);
+  Tool *statsTool = createTool<StatisticsTool>(vw, &tools);
 
-  Tool *stereoTool = new StereoTool(vw);
-  stereoTool->addTo(vw);
+  Tool *stereoTool = createTool<StereoTool>(vw, &tools);
 
-  Tool *matchTool = new MatchTool(vw);
-  matchTool->addTo(vw);
+  Tool *matchTool = createTool<MatchTool>(vw, &tools);
 
-  Tool *helpTool = new HelpTool(vw);
-  helpTool->addTo(vw);
+  Tool *helpTool = createTool<HelpTool>(vw, &tools);
 
   // Show the application window & open the cubes
   vw->show();
@@ -259,6 +245,8 @@ int main(int argc, char *argv[]) {
     remove(p_socketFile.toAscii().data());
   }
 
+  delete panTool;
+  delete statsTool;
   delete helpTool;
   delete matchTool;
   delete stereoTool;

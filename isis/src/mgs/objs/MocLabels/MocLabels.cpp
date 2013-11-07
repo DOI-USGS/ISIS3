@@ -1,11 +1,12 @@
+#include "MocLabels.h"
+
 #include <cmath>
 #include <cfloat>
 #include <iostream>
 #include <vector>
 #include <fstream>
 
-#include "MocLabels.h"
-#include "IException.h"
+#include "Cube.h"
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
@@ -19,27 +20,27 @@ namespace Isis {
    * Construct MocLabels object using the file name
    */
   MocLabels::MocLabels(const QString &file) {
-    Pvl lab(file);
-    Init(lab);
+    Cube cube(file, "r");
+    Init(cube);
   }
 
   /**
    * Construct MocLabels object using a Pvl object
    */
-  MocLabels::MocLabels(Pvl &lab) {
-    Init(lab);
+  MocLabels::MocLabels(Cube &cube) {
+    Init(cube);
   }
 
   /**
    * General initializer
    * @param lab MOC label for the image
    */
-  void MocLabels::Init(Pvl &lab) {
+  void MocLabels::Init(Cube &cube) {
     // Initialize gain tables
     InitGainMaps();
 
     try {
-      ReadLabels(lab);
+      ReadLabels(cube);
       ValidateLabels();
       Compute();
     }
@@ -52,8 +53,9 @@ namespace Isis {
    * Reads required keywords from the labels
    * @param MOC label for the image
    */
-  void MocLabels::ReadLabels(Pvl &lab) {
+  void MocLabels::ReadLabels(Cube &cube) {
     // Get stuff out of the instrument group
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     p_instrumentId = (QString) inst["InstrumentId"];
     p_startingSample = inst["FirstLineSample"];
@@ -83,7 +85,7 @@ namespace Isis {
 
     // Get the number of samples in the initial cube as it may have been
     // cropped or projected
-    AlphaCube a(lab);
+    AlphaCube a(cube);
     p_ns = a.AlphaSamples();
     p_nl = a.AlphaLines();
 

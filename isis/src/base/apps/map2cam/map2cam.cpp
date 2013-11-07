@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include "ProcessRubberSheet.h"
-#include "Projection.h"
+#include "TProjection.h"
 
 #include "map2cam.h"
 
@@ -27,7 +27,7 @@ void IsisMain() {
   // Open the input projection cube and get the projection information
   ProcessRubberSheet rub;
   Cube *icube = rub.SetInputCube("FROM");
-  Projection *inmap = icube->projection();
+  TProjection *inmap = (TProjection *) icube->projection();
 
   // Set up for rubbersheeting
   Transform *transform = new map2cam(icube->sampleCount(),
@@ -74,7 +74,7 @@ void IsisMain() {
 
 // Transform object constructor
 map2cam::map2cam(const int inputSamples, const int inputLines,
-                 Projection *inmap,
+                 TProjection *inmap,
                  const int outputSamples, const int outputLines,
                  Camera *outcam) {
   p_inputSamples = inputSamples;

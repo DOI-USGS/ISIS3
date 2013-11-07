@@ -12,6 +12,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "TProjection.h"
 
 using namespace std;
 using namespace Isis;
@@ -46,13 +47,14 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t SPHERICAL-PLANETOGRAPHIC-POSITIVEEAST-EQUATORIAL-180" << endl;
     cout << border  << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    Projection &p1 = *ProjectionFactory::Create(lab);
+    Projection &proj = *ProjectionFactory::Create(lab);
+    TProjection *p1 = (TProjection *) &proj;
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
     cout << mapGroup["EquatorialRadius"] << endl;
     cout << mapGroup["PolarRadius"] << endl;
-    cout << "Eccentricity = " << p1.Eccentricity() << endl;
-    cout << "TrueScaleLatitude = " << p1.TrueScaleLatitude() << endl << endl;
+    cout << "Eccentricity = " << p1->Eccentricity() << endl;
+    cout << "TrueScaleLatitude = " << p1->TrueScaleLatitude() << endl << endl;
 
     cout << std::fixed;
     cout << std::setprecision(5);
@@ -63,8 +65,8 @@ int main(int argc, char *argv[]) {
             "page 188" << endl;
     for (double lat = 90; lat >= 0; lat-=10) {
       for (double lon = 0; lon < 50; lon+=10) {
-        p1.SetGround(lat, lon);
-        cout << p1.XCoord() << "/" << p1.YCoord() << " ";
+        p1->SetGround(lat, lon);
+        cout << p1->XCoord() << "/" << p1->YCoord() << " ";
       }
       cout << endl;
     }
@@ -75,8 +77,8 @@ int main(int argc, char *argv[]) {
             "page 189" << endl;
     for (double lat = 90; lat >= 0; lat-=10) {
       for (double lon = 50; lon < 100; lon+=10) {
-        p1.SetGround(lat, lon);
-        cout << p1.XCoord() << "/" << p1.YCoord() << " ";
+        p1->SetGround(lat, lon);
+        cout << p1->XCoord() << "/" << p1->YCoord() << " ";
       }
       cout << endl;
     }
@@ -86,48 +88,48 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "    Testing SetCoordinate(0.03941, 1.28702)\n"
             "    from Snyder Table 28, page 188, line 2 column 2" << endl;
-    p1.SetCoordinate(0.03941, 1.28702);
-    cout << "Latitude:            " << p1.Latitude() << endl;
-    cout << "Longitude:           " << p1.Longitude() << endl;
-    cout << "XCoord:              " << p1.XCoord() << endl;
-    cout << "YCoord:              " << p1.YCoord() << endl;
+    p1->SetCoordinate(0.03941, 1.28702);
+    cout << "Latitude:            " << p1->Latitude() << endl;
+    cout << "Longitude:           " << p1->Longitude() << endl;
+    cout << "XCoord:              " << p1->XCoord() << endl;
+    cout << "YCoord:              " << p1->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(0, 0)" << endl;
-    p1.SetGround(0.0, 0.0);
-    cout << "Latitude:            " << p1.Latitude() << endl;
-    cout << "Longitude:           " << p1.Longitude() << endl;
-    cout << "XCoord:              " << p1.XCoord() << endl;
-    cout << "YCoord:              " << p1.YCoord() << endl;
+    p1->SetGround(0.0, 0.0);
+    cout << "Latitude:            " << p1->Latitude() << endl;
+    cout << "Longitude:           " << p1->Longitude() << endl;
+    cout << "XCoord:              " << p1->XCoord() << endl;
+    cout << "YCoord:              " << p1->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p1.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:            " << p1.Latitude() << endl;
-    cout << "Longitude:           " << p1.Longitude() << endl;
-    cout << "XCoord:              " << p1.XCoord() << endl;
-    cout << "YCoord:              " << p1.YCoord() << endl;
+    p1->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:            " << p1->Latitude() << endl;
+    cout << "Longitude:           " << p1->Longitude() << endl;
+    cout << "XCoord:              " << p1->XCoord() << endl;
+    cout << "YCoord:              " << p1->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to north pole and back\n"
             "    SetGround(90, 0)" << endl;
-    p1.SetGround(90.0, 0.0);
-    cout << "Latitude:            " << p1.Latitude() << endl;
-    cout << "Longitude:             " << p1.Longitude() << endl;
-    cout << "XCoord:                " << p1.XCoord() << endl;
-    cout << "YCoord:                " << p1.YCoord() << endl;
+    p1->SetGround(90.0, 0.0);
+    cout << "Latitude:            " << p1->Latitude() << endl;
+    cout << "Longitude:             " << p1->Longitude() << endl;
+    cout << "XCoord:                " << p1->XCoord() << endl;
+    cout << "YCoord:                " << p1->YCoord() << endl;
     cout << "    SetCoordinate(0, sqrt(2)*sphRad)" << endl;
-    p1.SetCoordinate(0.0, sqrt(2.0));
-    cout << "Latitude:             " << p1.Latitude() << endl;
-    cout << "Longitude:           " << p1.Longitude() << endl;
-    cout << "XCoord:                " << p1.XCoord() << endl;
-    cout << "YCoord:                " << p1.YCoord() << endl;
+    p1->SetCoordinate(0.0, sqrt(2.0));
+    cout << "Latitude:             " << p1->Latitude() << endl;
+    cout << "Longitude:           " << p1->Longitude() << endl;
+    cout << "XCoord:                " << p1->XCoord() << endl;
+    cout << "YCoord:                " << p1->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
-    double rad = p1.LocalRadius(mapGroup.findKeyword("CenterLatitude"));
+    double rad = p1->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -139,53 +141,53 @@ int main(int argc, char *argv[]) {
     // points on circle sqrt(2)*ER in diameter (hemisphere map)
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;
-    p1.SetGround(0, 90);
+    p1->SetGround(0, 90);
     cout << "            SetGround(0, 90) returns ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
-    p1.SetGround(90, 0);
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
+    p1->SetGround(90, 0);
     cout << "            SetGround(90, 0) returns ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
-    p1.SetGround(0, -90);
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
+    p1->SetGround(0, -90);
     cout << "            SetGround(0, -90) returns ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
-    p1.SetGround(0, 270);
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
+    p1->SetGround(0, 270);
     cout << "            SetGround(0, 270) returns ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
-    p1.SetGround(-90, 0);
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
+    p1->SetGround(-90, 0);
     cout << "            SetGround(-90, 0) returns ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
-    p1.SetGround(-45, 90);
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
+    p1->SetGround(-45, 90);
     cout << "            SetGround(-45, 90) returns ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
-    p1.SetGround(30, -90);
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
+    p1->SetGround(30, -90);
     cout << "            SetGround(30, -90) returns ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
     cout << "        BACKWARD" << endl;
     cout << std::setprecision(5);
-    p1.SetCoordinate(rad*sqrt(2), 0);
+    p1->SetCoordinate(rad*sqrt(2), 0);
     cout << "            SetCoordinate(sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p1.Latitude() 
-                             << " / " << p1.Longitude() << endl;
-    p1.SetCoordinate(0, rad*sqrt(2));
+    cout << "lat/lon = " << p1->Latitude() 
+                             << " / " << p1->Longitude() << endl;
+    p1->SetCoordinate(0, rad*sqrt(2));
     cout << "            SetCoordinate(0, sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p1.Latitude() 
-                             << " / " << p1.Longitude() << endl;
-    p1.SetCoordinate(-rad*sqrt(2), 0);
+    cout << "lat/lon = " << p1->Latitude() 
+                             << " / " << p1->Longitude() << endl;
+    p1->SetCoordinate(-rad*sqrt(2), 0);
     cout << "            SetCoordinate(-sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p1.Latitude() 
-                             << " / " << p1.Longitude() << endl;
-    p1.SetCoordinate(0, -rad*sqrt(2));
+    cout << "lat/lon = " << p1->Latitude() 
+                             << " / " << p1->Longitude() << endl;
+    p1->SetCoordinate(0, -rad*sqrt(2));
     cout << "            SetCoordinate(0, -sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p1.Latitude() 
-                             << " / " << p1.Longitude() << endl;
-    p1.SetCoordinate(1, 1);
+    cout << "lat/lon = " << p1->Latitude() 
+                             << " / " << p1->Longitude() << endl;
+    p1->SetCoordinate(1, 1);
     cout << "            SetCoordinate(1, 1) returns ";
-    cout << "lat/lon = " << p1.Latitude() 
-                             << " / " << p1.Longitude() << endl;
-    p1.SetCoordinate(sqrt(6)/2*rad, sqrt(2)/2*rad);
+    cout << "lat/lon = " << p1->Latitude() 
+                             << " / " << p1->Longitude() << endl;
+    p1->SetCoordinate(sqrt(6)/2*rad, sqrt(2)/2*rad);
     cout << "            SetCoordinate(sqrt6/2*rad, sqrt2/2*rad) returns ";
-    cout << "lat/lon = " << p1.Latitude() 
-                             << " / " << p1.Longitude() << endl;
+    cout << "lat/lon = " << p1->Latitude() 
+                             << " / " << p1->Longitude() << endl;
     cout << endl;
     cout << endl;
     // points on circle 2*ER in diameter (whole planet map)
@@ -194,15 +196,15 @@ int main(int argc, char *argv[]) {
     // The following was removed due to roundoff errors on prog8 (mac)
     // cout << "        FORWARD - Project to opposite side of planet " << endl;
     // cout << std::setprecision(7);
-    // if (p1.SetGround(0, 179.99999)) {
+    // if (p1->SetGround(0, 179.99999)) {
     //   cout << "            SetGround(0, 179.99999) returns ";
-    //   cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
+    //   cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
     //   cout << "                 Expect a value near (2*SphRad,0) = (" 
     //        << 2*rad << ", 0.0000000)" << endl;
     // }
-    // if (p1.SetGround(0, -179.99999)) {
+    // if (p1->SetGround(0, -179.99999)) {
     //   cout << "            SetGround(0, -179.99999) returns ";
-    //   cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
+    //   cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
     //   cout << "                 Expect a value near (-2*SphRad,0) = (" 
     //        << -2*rad << ", 0.0000000)" << endl;
     // }
@@ -210,36 +212,36 @@ int main(int argc, char *argv[]) {
     cout << "        BACKWARD - Project from opposite side of planet " << endl;
     cout << "        For each of these, expect a value near" << endl;
     cout << "            - centerLatitude / centerLongitude+180 = 0 / 180" << endl;
-    if (p1.SetCoordinate(rad*2, 0)) {
+    if (p1->SetCoordinate(rad*2, 0)) {
       cout << "            SetCoordinate(2*SphRad, 0) returns ";
-      cout << "lat/lon = " << p1.Latitude() 
-                               << " / " << p1.Longitude() << endl;
+      cout << "lat/lon = " << p1->Latitude() 
+                               << " / " << p1->Longitude() << endl;
     }
     cout << std::setprecision(5);
-    if (p1.SetCoordinate(0, rad*2)) {
+    if (p1->SetCoordinate(0, rad*2)) {
       cout << "            SetCoordinate(0, 2*SphRad) returns ";
-      cout << "lat/lon = " << p1.Latitude() 
-                               << " / " << p1.Longitude() << endl;
+      cout << "lat/lon = " << p1->Latitude() 
+                               << " / " << p1->Longitude() << endl;
     }
-    if (p1.SetCoordinate(-rad*2, 0)) {
+    if (p1->SetCoordinate(-rad*2, 0)) {
       cout << "            SetCoordinate(-2*SphRad, 0) returns ";
-      cout << "lat/lon = " << p1.Latitude() 
-                               << " / " << p1.Longitude() << endl;
+      cout << "lat/lon = " << p1->Latitude() 
+                               << " / " << p1->Longitude() << endl;
     }
-    if (p1.SetCoordinate(0, -rad*2)) {
+    if (p1->SetCoordinate(0, -rad*2)) {
       cout << "            SetCoordinate(0, -2*SphRad) returns ";
-      cout << "lat/lon = " << p1.Latitude() 
-                               << " / " << p1.Longitude() << endl;
+      cout << "lat/lon = " << p1->Latitude() 
+                               << " / " << p1->Longitude() << endl;
     }
-    if (p1.SetCoordinate(sqrt(2)*rad, sqrt(2)*rad)) {
+    if (p1->SetCoordinate(sqrt(2)*rad, sqrt(2)*rad)) {
       cout << "            SetCoordinate(sqrt2*SphRad, sqrt2*SphRad) returns ";
-      cout << "lat/lon = " << p1.Latitude() 
-                               << " / " << p1.Longitude() << endl;
+      cout << "lat/lon = " << p1->Latitude() 
+                               << " / " << p1->Longitude() << endl;
     }
-    if (p1.SetCoordinate(sqrt(3)*rad, rad)) {
+    if (p1->SetCoordinate(sqrt(3)*rad, rad)) {
       cout << "            SetCoordinate(sqrt3*SphRad, SphRad) returns ";
-      cout << "lat/lon = " << p1.Latitude() 
-                               << " / " << p1.Longitude() << endl;
+      cout << "lat/lon = " << p1->Latitude() 
+                               << " / " << p1->Longitude() << endl;
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
@@ -247,95 +249,95 @@ int main(int argc, char *argv[]) {
     cout << std::setprecision(7);
     cout << "    Testing XYRange method" << endl;
     cout << "Given: " << endl;
-    cout << "    Minimum Latitude:  " << p1.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p1.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p1.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p1.MaximumLongitude() << endl;
+    cout << "    Minimum Latitude:  " << p1->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p1->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p1->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p1->MaximumLongitude() << endl;
     double minX, maxX, minY, maxY;
-    p1.XYRange(minX, maxX, minY, maxY);
+    p1->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
     cout << endl;
-    p1.SetCoordinate(maxX,0);
+    p1->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p1.Latitude() << " / " << p1.Longitude() << endl;
-    p1.SetCoordinate(0, maxY);
+         << p1->Latitude() << " / " << p1->Longitude() << endl;
+    p1->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p1.Latitude() << " / " << p1.Longitude()  << endl;
-    p1.SetCoordinate(minX,0);
+         << p1->Latitude() << " / " << p1->Longitude()  << endl;
+    p1->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p1.Latitude() << " / " << p1.Longitude()  << endl;
-    p1.SetCoordinate(0, minY);
+         << p1->Latitude() << " / " << p1->Longitude()  << endl;
+    p1->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p1.Latitude() << " / " << p1.Longitude()  << endl;
+         << p1->Latitude() << " / " << p1->Longitude()  << endl;
     cout << endl;
-    p1.SetGround(20, 0);
+    p1->SetGround(20, 0);
     cout << "            SetGround(20, 0) returns y min? ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
-    p1.SetGround(20, 180);
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
+    p1->SetGround(20, 180);
     cout << "            SetGround(20, 180) returns y max? ";
-    cout << "(x,y) = (" << p1.XCoord() << ", " << p1.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
     cout << endl;
     cout << endl;
     mapGroup.findKeyword("MinimumLatitude").setValue("-90.0");
     mapGroup.findKeyword("MaximumLatitude").setValue("90.0");
     mapGroup.findKeyword("MinimumLongitude").setValue("-179.99999");
     mapGroup.findKeyword("MaximumLongitude").setValue("179.99999");
-    Projection &p1a = *ProjectionFactory::Create(lab);
+    TProjection *p1a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
-    cout << "    Minimum Latitude:  " << p1a.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p1a.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p1a.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p1a.MaximumLongitude() << endl << endl;
-    p1a.XYRange(minX, maxX, minY, maxY);
+    cout << "    Minimum Latitude:  " << p1a->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p1a->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p1a->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p1a->MaximumLongitude() << endl << endl;
+    p1a->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
     cout << endl;
-    p1a.SetCoordinate(maxX,0);
+    p1a->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p1a.Latitude() << " / " << p1a.Longitude()  << endl;
-    p1a.SetCoordinate(0, maxY);
+         << p1a->Latitude() << " / " << p1a->Longitude()  << endl;
+    p1a->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p1a.Latitude() << " / " << p1a.Longitude()  << endl;
-    p1a.SetCoordinate(minX,0);
+         << p1a->Latitude() << " / " << p1a->Longitude()  << endl;
+    p1a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p1a.Latitude() << " / " << p1a.Longitude()  << endl;
-    p1a.SetCoordinate(0, minY);
+         << p1a->Latitude() << " / " << p1a->Longitude()  << endl;
+    p1a->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p1a.Latitude() << " / " << p1a.Longitude()  << endl;
+         << p1a->Latitude() << " / " << p1a->Longitude()  << endl;
     mapGroup.findKeyword("MinimumLongitude").setValue("-90.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("90.0");
     cout << "Given: " << endl;
-    Projection &p1b = *ProjectionFactory::Create(lab);
-    cout << "    Minimum Latitude:  " << p1b.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p1b.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p1b.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p1b.MaximumLongitude() << endl << endl;
-    p1b.XYRange(minX, maxX, minY, maxY);
+    TProjection *p1b = (TProjection *) ProjectionFactory::Create(lab);
+    cout << "    Minimum Latitude:  " << p1b->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p1b->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p1b->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p1b->MaximumLongitude() << endl << endl;
+    p1b->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
     cout << endl;
-    p1b.SetCoordinate(maxX,0);
+    p1b->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p1b.Latitude() << " / " << p1b.Longitude()  << endl;
-    p1b.SetCoordinate(0, maxY);
+         << p1b->Latitude() << " / " << p1b->Longitude()  << endl;
+    p1b->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p1b.Latitude() << " / " << p1b.Longitude()  << endl;
-    p1b.SetCoordinate(minX,0);
+         << p1b->Latitude() << " / " << p1b->Longitude()  << endl;
+    p1b->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p1b.Latitude() << " / " << p1b.Longitude()  << endl;
-    p1b.SetCoordinate(0, minY);
+         << p1b->Latitude() << " / " << p1b->Longitude()  << endl;
+    p1b->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p1b.Latitude() << " / " << p1b.Longitude()  << endl;
+         << p1b->Latitude() << " / " << p1b->Longitude()  << endl;
     cout << endl;
     cout << endl;
     cout << endl;
@@ -353,21 +355,21 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("MinimumLongitude").setValue("-279.99999");
     mapGroup.findKeyword("MaximumLongitude").setValue("79.99999");
     mapGroup.findKeyword("LongitudeDomain").setValue("360");
-    Projection &p2 = *ProjectionFactory::Create(lab);
+    TProjection *p2 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
-    cout << "EquatorialRadius = " << p2.EquatorialRadius() << endl;
-    cout << "PolarRadius = " << p2.PolarRadius() << endl;
-    cout << "Eccentricity = " << p2.Eccentricity() << endl;
-    cout << "TrueScaleLatitude = " << p2.TrueScaleLatitude() << endl << endl;
+    cout << "EquatorialRadius = " << p2->EquatorialRadius() << endl;
+    cout << "PolarRadius = " << p2->PolarRadius() << endl;
+    cout << "Eccentricity = " << p2->Eccentricity() << endl;
+    cout << "TrueScaleLatitude = " << p2->TrueScaleLatitude() << endl << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetGround(-20, 100) from Snyder pages 332-333" << endl;
-    p2.SetGround(-20, 100);
-    cout << "Latitude:            " << p2.Latitude() << endl;
-    cout << "Longitude:           " << p2.Longitude() << endl;
-    cout << "XCoord:              " << p2.XCoord() << endl;
-    cout << "YCoord:              " << p2.YCoord() << endl;
+    p2->SetGround(-20, 100);
+    cout << "Latitude:            " << p2->Latitude() << endl;
+    cout << "Longitude:           " << p2->Longitude() << endl;
+    cout << "XCoord:              " << p2->XCoord() << endl;
+    cout << "YCoord:              " << p2->YCoord() << endl;
     // we do not have relative scale factor methods in Projection as of 06/2012
     // so these need to be tested with a LambertAzimuthalEqualArea object
     // specifically.  The following values were calculated by hand to verify.
@@ -380,49 +382,49 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "    Testing SetCoordinate(-4.2339303, 4.0257775) from Snyder "
             "pages 332-333" << endl;
-    p2.SetCoordinate(-4.2339303, 4.0257775);
-    cout << "Latitude:            " << p2.Latitude() << endl;
-    cout << "Longitude:           " << p2.Longitude() << endl;
-    cout << "XCoord:              " << p2.XCoord() << endl;
-    cout << "YCoord:              " << p2.YCoord() << endl;
+    p2->SetCoordinate(-4.2339303, 4.0257775);
+    cout << "Latitude:            " << p2->Latitude() << endl;
+    cout << "Longitude:           " << p2->Longitude() << endl;
+    cout << "XCoord:              " << p2->XCoord() << endl;
+    cout << "YCoord:              " << p2->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(40, -100)" << endl;
-    p2.SetGround(40.0, -100.0);
-    cout << "Latitude:              " << p2.Latitude() << endl;
-    cout << "Longitude:           " << p2.Longitude() << endl;
-    cout << "XCoord:                 " << p2.XCoord() << endl;
-    cout << "YCoord:                 " << p2.YCoord() << endl;
+    p2->SetGround(40.0, -100.0);
+    cout << "Latitude:              " << p2->Latitude() << endl;
+    cout << "Longitude:           " << p2->Longitude() << endl;
+    cout << "XCoord:                 " << p2->XCoord() << endl;
+    cout << "YCoord:                 " << p2->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p2.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:              " << p2.Latitude() << endl;
-    cout << "Longitude:           " << p2.Longitude() << endl;
-    cout << "XCoord:                 " << p2.XCoord() << endl;
-    cout << "YCoord:                 " << p2.YCoord() << endl;
+    p2->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:              " << p2->Latitude() << endl;
+    cout << "Longitude:           " << p2->Longitude() << endl;
+    cout << "XCoord:                 " << p2->XCoord() << endl;
+    cout << "YCoord:                 " << p2->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to north pole and back\n"
             "    SetGround(90, 0)" << endl;
-    p2.SetGround(90.0, 0.0);
-    cout << "Latitude:            " << p2.Latitude() << endl;
-    cout << "Longitude:            " << p2.Longitude() << endl;
-    cout << "XCoord:               " << p2.XCoord() << endl;
-    cout << "YCoord:               " << p2.YCoord() << endl;
+    p2->SetGround(90.0, 0.0);
+    cout << "Latitude:            " << p2->Latitude() << endl;
+    cout << "Longitude:            " << p2->Longitude() << endl;
+    cout << "XCoord:               " << p2->XCoord() << endl;
+    cout << "YCoord:               " << p2->YCoord() << endl;
     cout << "    SetCoordinate(0, 2.5357096)" << endl;
-    p2.SetCoordinate(0.0, 2.5357096);
-    cout << "Latitude:            " << p2.Latitude() << endl;
-    cout << "Longitude:           " << p2.Longitude() << endl;
-    cout << "XCoord:               " << p2.XCoord() << endl;
-    cout << "YCoord:               " << p2.YCoord() << endl;
+    p2->SetCoordinate(0.0, 2.5357096);
+    cout << "Latitude:            " << p2->Latitude() << endl;
+    cout << "Longitude:           " << p2->Longitude() << endl;
+    cout << "XCoord:               " << p2->XCoord() << endl;
+    cout << "YCoord:               " << p2->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
     //rad = mapGroup.findKeyword("EquatorialRadius");
-    rad = p2.LocalRadius(mapGroup.findKeyword("CenterLatitude"));
+    rad = p2->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -432,36 +434,36 @@ int main(int argc, char *argv[]) {
     // points on circle sqrt(2)*ER in diameter (hemisphere map)
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;
-    p2.SetGround(0, -10);
+    p2->SetGround(0, -10);
     cout << "            SetGround(0, -10) returns ";
-    cout << "(x,y) = (" << p2.XCoord() << ", " << p2.YCoord() << ")"<< endl;
-    p2.SetGround(50, 80);
+    cout << "(x,y) = (" << p2->XCoord() << ", " << p2->YCoord() << ")"<< endl;
+    p2->SetGround(50, 80);
     cout << "            SetGround(50, 80) returns ";
-    cout << "(x,y) = (" << p2.XCoord() << ", " << p2.YCoord() << ")"<< endl;
-    p2.SetGround(0, -190);
+    cout << "(x,y) = (" << p2->XCoord() << ", " << p2->YCoord() << ")"<< endl;
+    p2->SetGround(0, -190);
     cout << "            SetGround(0, -190) returns ";
-    cout << "(x,y) = (" << p2.XCoord() << ", " << p2.YCoord() << ")"<< endl;
-    p2.SetGround(-50, -100);
+    cout << "(x,y) = (" << p2->XCoord() << ", " << p2->YCoord() << ")"<< endl;
+    p2->SetGround(-50, -100);
     cout << "            SetGround(-50, -100) returns ";
-    cout << "(x,y) = (" << p2.XCoord() << ", " << p2.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p2->XCoord() << ", " << p2->YCoord() << ")"<< endl;
     cout << "        BACKWARD" << endl;
     cout << std::setprecision(5);
-    p2.SetCoordinate(rad*sqrt(2), 0);
+    p2->SetCoordinate(rad*sqrt(2), 0);
     cout << "            SetCoordinate(sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
-    p2.SetCoordinate(0, rad*sqrt(2));
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
+    p2->SetCoordinate(0, rad*sqrt(2));
     cout << "            SetCoordinate(0, sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
-    p2.SetCoordinate(-rad*sqrt(2), 0);
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
+    p2->SetCoordinate(-rad*sqrt(2), 0);
     cout << "            SetCoordinate(-sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
-    p2.SetCoordinate(0, -rad*sqrt(2));
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
+    p2->SetCoordinate(0, -rad*sqrt(2));
     cout << "            SetCoordinate(0, -sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
     cout << endl;
     cout << endl;
 
@@ -469,93 +471,93 @@ int main(int argc, char *argv[]) {
     cout << "    Check known values on (almost) whole planet map" << endl;
     // The following was removed due to roundoff errors on prog8 (mac)
     // cout << " FORWARD - Project to opposite side of planet " << endl;
-    // p2.SetGround(-40, 79.99999);
-    // p2.SetGround(-40,-279.99999);
-    // p2.SetGround(-39.99999, 80);
+    // p2->SetGround(-40, 79.99999);
+    // p2->SetGround(-40,-279.99999);
+    // p2->SetGround(-39.99999, 80);
     cout << "        BACKWARD - Project from opposite side of planet " << endl;
     cout << "        For each of these, expect a value near" << endl;
     cout << "            - centerLatitude / centerLongitude+180 "
             "= -40 / 80" << endl;
     cout << std::setprecision(5);
-    p2.SetCoordinate(rad*2, 0);
+    p2->SetCoordinate(rad*2, 0);
     
     cout << "            SetCoordinate(2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
-    p2.SetCoordinate(0, rad*2);
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
+    p2->SetCoordinate(0, rad*2);
     cout << "            SetCoordinate(0, 2*SphRad) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
-    p2.SetCoordinate(-rad*2, 0);
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
+    p2->SetCoordinate(-rad*2, 0);
     cout << "            SetCoordinate(-2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
-    p2.SetCoordinate(0, -rad*2);
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
+    p2->SetCoordinate(0, -rad*2);
     cout << "            SetCoordinate(0, -2*SphRad) returns ";
-    cout << "lat/lon = " << p2.Latitude() 
-                             << " / " << p2.Longitude() << endl;
+    cout << "lat/lon = " << p2->Latitude() 
+                             << " / " << p2->Longitude() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << "    Testing XYRange method" << endl;
     cout << endl;
     cout << "Given: " << endl;
     cout << std::setprecision(7);
-    cout << "    Minimum Latitude:  " << p2.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p2.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p2.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p2.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p2->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p2->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p2->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p2->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p2.XYRange(minX, maxX, minY, maxY);
+    p2->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
     cout << endl;
-    p2.SetCoordinate(maxX,0);
+    p2->SetCoordinate(maxX,0);
     cout << std::setprecision(3);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p2.Latitude() << " / " << p2.Longitude()  << endl;
-    p2.SetCoordinate(0, maxY);
+         << p2->Latitude() << " / " << p2->Longitude()  << endl;
+    p2->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
-         p2.Latitude() << " / " << p2.Longitude()  << endl;
-    p2.SetCoordinate(minX,0);
+         p2->Latitude() << " / " << p2->Longitude()  << endl;
+    p2->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p2.Latitude() << " / " << p2.Longitude()  << endl;
-    p2.SetCoordinate(0, minY);
+         << p2->Latitude() << " / " << p2->Longitude()  << endl;
+    p2->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p2.Latitude() << " / " << p2.Longitude()  << endl;
+         << p2->Latitude() << " / " << p2->Longitude()  << endl;
     cout << endl;
     cout << endl;
     mapGroup.findKeyword("MinimumLongitude").setValue("-110.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("70.0");
-    Projection &p2a = *ProjectionFactory::Create(lab);
+    TProjection *p2a = (TProjection *) ProjectionFactory::Create(lab);
     cout << std::setprecision(7);
     cout << "Given: " << endl;
-    cout << "    Minimum Latitude:  " << p2a.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p2a.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p2a.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p2a.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p2a->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p2a->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p2a->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p2a->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p2a.XYRange(minX, maxX, minY, maxY);
+    p2a->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
     cout << endl;
-    p2a.SetCoordinate(maxX,0);
+    p2a->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p2a.Latitude() << " / " << p2a.Longitude()  << endl;
-    p2a.SetCoordinate(0, maxY);
+         << p2a->Latitude() << " / " << p2a->Longitude()  << endl;
+    p2a->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
-         p2a.Latitude() << " / " << p2a.Longitude()  << endl;
-    p2a.SetCoordinate(minX,0);
+         p2a->Latitude() << " / " << p2a->Longitude()  << endl;
+    p2a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p2a.Latitude() << " / " << p2a.Longitude()  << endl;
-    p2a.SetCoordinate(0, minY);
+         << p2a->Latitude() << " / " << p2a->Longitude()  << endl;
+    p2a->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p2a.Latitude() << " / " << p2a.Longitude()  << endl;
+         << p2a->Latitude() << " / " << p2a->Longitude()  << endl;
     cout << endl;
     cout << endl;
     cout << endl;
@@ -568,21 +570,21 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("CenterLatitude").setValue("-90.0");
     mapGroup.findKeyword("CenterLongitude").setValue("-96.0");
     mapGroup.findKeyword("LongitudeDomain").setValue("180");
-    Projection &p3 = *ProjectionFactory::Create(lab);
+    TProjection *p3 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
-    cout << "EquatorialRadius = " << p3.EquatorialRadius() << endl;
-    cout << "PolarRadius = " << p3.PolarRadius() << endl;
-    cout << "Eccentricity = " << p3.Eccentricity() << endl;
-    cout << "TrueScaleLatitude = " << p3.TrueScaleLatitude() << endl << endl;
+    cout << "EquatorialRadius = " << p3->EquatorialRadius() << endl;
+    cout << "PolarRadius = " << p3->PolarRadius() << endl;
+    cout << "Eccentricity = " << p3->Eccentricity() << endl;
+    cout << "TrueScaleLatitude = " << p3->TrueScaleLatitude() << endl << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetGround(-20, 100) from hand calculation" << endl;
-    p3.SetGround(-20, 100);
-    cout << "Latitude:            " << p3.Latitude() << endl;
-    cout << "Longitude:           " << p3.Longitude() << endl;
-    cout << "XCoord:              " << p3.XCoord() << endl;
-    cout << "YCoord:              " << p3.YCoord() << endl;
+    p3->SetGround(-20, 100);
+    cout << "Latitude:            " << p3->Latitude() << endl;
+    cout << "Longitude:           " << p3->Longitude() << endl;
+    cout << "XCoord:              " << p3->XCoord() << endl;
+    cout << "YCoord:              " << p3->YCoord() << endl;
     // we do not have relative scale factor methods in Projection as of 06/2012
     // so these need to be tested with a LambertAzimuthalEqualArea object
     // specifically.  The following values were calculated by hand to verify.
@@ -594,49 +596,49 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetCoordinate(-0.9485946, -3.3081423)" << endl;
-    p3.SetCoordinate(-0.9485946, -3.3081423);
-    cout << "Latitude:            " << p3.Latitude() << endl;
-    cout << "Longitude:           " << p3.Longitude() << endl;
-    cout << "XCoord:              " << p3.XCoord() << endl;
-    cout << "YCoord:              " << p3.YCoord() << endl;
+    p3->SetCoordinate(-0.9485946, -3.3081423);
+    cout << "Latitude:            " << p3->Latitude() << endl;
+    cout << "Longitude:           " << p3->Longitude() << endl;
+    cout << "XCoord:              " << p3->XCoord() << endl;
+    cout << "YCoord:              " << p3->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(-90, -96)" << endl;
-    p3.SetGround(-90.0, -96.0);
-    cout << "Latitude:            " << p3.Latitude() << endl;
-    cout << "Longitude:           " << p3.Longitude() << endl;
-    cout << "XCoord:                " << p3.XCoord() << endl;
-    cout << "YCoord:                " << p3.YCoord() << endl;
+    p3->SetGround(-90.0, -96.0);
+    cout << "Latitude:            " << p3->Latitude() << endl;
+    cout << "Longitude:           " << p3->Longitude() << endl;
+    cout << "XCoord:                " << p3->XCoord() << endl;
+    cout << "YCoord:                " << p3->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p3.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:            " << p3.Latitude() << endl;
-    cout << "Longitude:           " << p3.Longitude() << endl;
-    cout << "XCoord:                " << p3.XCoord() << endl;
-    cout << "YCoord:                " << p3.YCoord() << endl;
+    p3->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:            " << p3->Latitude() << endl;
+    cout << "Longitude:           " << p3->Longitude() << endl;
+    cout << "XCoord:                " << p3->XCoord() << endl;
+    cout << "YCoord:                " << p3->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to north pole and back\n"
             "    SetGround(90, 0)" << endl;
-    p3.SetGround(90.0, 0.0);
-    cout << "Latitude:            " << p3.Latitude() << endl;
-    cout << "Longitude:            " << p3.Longitude() << endl;
-    cout << "XCoord:               " << p3.XCoord() << endl;
-    cout << "YCoord:              " << p3.YCoord() << endl;
+    p3->SetGround(90.0, 0.0);
+    cout << "Latitude:            " << p3->Latitude() << endl;
+    cout << "Longitude:            " << p3->Longitude() << endl;
+    cout << "XCoord:               " << p3->XCoord() << endl;
+    cout << "YCoord:              " << p3->YCoord() << endl;
     cout << "    SetCoordinate(2*sphRad, -0.6271708)" << endl;
-    p3.SetCoordinate(6.0, -0.6271708);
-    cout << "Latitude:            " << p3.Latitude() << endl;
-    cout << "Longitude:            " << p3.Longitude() << endl;
-    cout << "XCoord:               " << p3.XCoord() << endl;
-    cout << "YCoord:              " << p3.YCoord() << endl;
+    p3->SetCoordinate(6.0, -0.6271708);
+    cout << "Latitude:            " << p3->Latitude() << endl;
+    cout << "Longitude:            " << p3->Longitude() << endl;
+    cout << "XCoord:               " << p3->XCoord() << endl;
+    cout << "YCoord:              " << p3->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
     //rad = mapGroup.findKeyword("EquatorialRadius");
-    rad = p3.LocalRadius(mapGroup.findKeyword("CenterLatitude"));
+    rad = p3->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -648,50 +650,50 @@ int main(int argc, char *argv[]) {
     // points on circle sqrt(2)*ER in diameter (hemisphere map)
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;
-    p3.SetGround(0, -6);
+    p3->SetGround(0, -6);
     cout << "            SetGround(0, -6) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(0, -96);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(0, -96);
     cout << "            SetGround(0, -96) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(0, -186);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(0, -186);
     cout << "            SetGround(0, -186) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(0, 84);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(0, 84);
     cout << "            SetGround(0, 84) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(0, -36);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(0, -36);
     cout << "            SetGround(0, -36) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(0, 129);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(0, 129);
     cout << "            SetGround(0, 129) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
     cout << "        BACKWARD" << endl;
     cout << std::setprecision(5);
-    p3.SetCoordinate(rad*sqrt(2), 0);
+    p3->SetCoordinate(rad*sqrt(2), 0);
     cout << "            SetCoordinate(sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p3.Latitude()  
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(0, rad*sqrt(2));
+    cout << "lat/lon = " << p3->Latitude()  
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(0, rad*sqrt(2));
     cout << "            SetCoordinate(0, sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(-rad*sqrt(2), 0);
+    cout << "lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(-rad*sqrt(2), 0);
     cout << "            SetCoordinate(-sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(0, -rad*sqrt(2));
+    cout << "lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(0, -rad*sqrt(2));
     cout << "            SetCoordinate(0, -sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(rad*sqrt(6)/2, rad*sqrt(2)/2);
+    cout << "lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(rad*sqrt(6)/2, rad*sqrt(2)/2);
     cout << "            SetCoordinate(SphRad*sqrt6/2, SphRad*sqrt2/2)"
-            " returns lat/lon=" << p3.Latitude() 
-                              << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(-3, -3);
+            " returns lat/lon=" << p3->Latitude() 
+                              << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(-3, -3);
     cout << "            SetCoordinate(-SphRad, -SphRad) returns ";
-    cout << "lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
+    cout << "lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
     cout << endl;
     cout << endl;
     // points on circle 2*ER in diameter (whole planet map)
@@ -703,99 +705,99 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "    Check known values on whole planet map" << endl;
     cout << "        FORWARD - Project to opposite side of planet " << endl;
-    p3.SetGround(90, -6);
+    p3->SetGround(90, -6);
     cout << "            SetGround(90, -6) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(90, -96);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(90, -96);
     cout << "            SetGround(90, -96) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(90, 174);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(90, 174);
     cout << "            SetGround(90, 174) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(90, 84);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(90, 84);
     cout << "            SetGround(90, 84) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(90, -36);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(90, -36);
     cout << "            SetGround(90, -36) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(90, 129);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(90, 129);
     cout << "            SetGround(90, 129) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
     cout << "        BACKWARD - Project from opposite side of planet " << endl;
     cout << std::setprecision(5);
-    p3.SetCoordinate(rad*2, 0);
+    p3->SetCoordinate(rad*2, 0);
     cout << "            SetCoordinate(2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(0, rad*2);
+    cout << "lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(0, rad*2);
     cout << "            SetCoordinate(0, 2*SphRad) returns ";
-    cout << "lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(-rad*2, 0);
+    cout << "lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(-rad*2, 0);
     cout << "            SetCoordinate(-2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(0, -rad*2);
+    cout << "lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(0, -rad*2);
     cout << "            SetCoordinate(0, -2*SphRad) returns ";
-    cout << "lat/lon = " << p3.Latitude() << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(rad*sqrt(3), rad);
+    cout << "lat/lon = " << p3->Latitude() << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(rad*sqrt(3), rad);
     cout << "            SetCoordinate(2*SphRad*sqrt3/2, 2*SphRad*1/2) "
-            "returns lat/lon=" << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
-    p3.SetCoordinate(-rad*sqrt(2), -rad*sqrt(2));
+            "returns lat/lon=" << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
+    p3->SetCoordinate(-rad*sqrt(2), -rad*sqrt(2));
     cout << "            SetCoordinate(-SphRad*sqrt2, -SphRad*sqrt2) "
-            "returns lat/lon = " << p3.Latitude() 
-                             << " / " << p3.Longitude() << endl;
+            "returns lat/lon = " << p3->Latitude() 
+                             << " / " << p3->Longitude() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing XYRange method" << endl;
     cout << "Given: " << endl;
     cout << std::setprecision(7);
-    cout << "    Minimum Latitude:  " << p3.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p3.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p3.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p3.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p3->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p3->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p3->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p3->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p3.XYRange(minX, maxX, minY, maxY);
+    p3->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
     cout << endl;
-    p3.SetCoordinate(maxX,0);
+    p3->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p3.Latitude() << " / " << p3.Longitude()  << endl;
-    p3.SetCoordinate(0, maxY);
+         << p3->Latitude() << " / " << p3->Longitude()  << endl;
+    p3->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p3.Latitude() << " / " << p3.Longitude()  << endl;
-    p3.SetCoordinate(minX,0);
+         << p3->Latitude() << " / " << p3->Longitude()  << endl;
+    p3->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p3.Latitude() << " / " << p3.Longitude()  << endl;
-    p3.SetCoordinate(0, minY);
+         << p3->Latitude() << " / " << p3->Longitude()  << endl;
+    p3->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p3.Latitude() << " / " << p3.Longitude()  << endl;
-    p3.SetGround(90, 90);
+         << p3->Latitude() << " / " << p3->Longitude()  << endl;
+    p3->SetGround(90, 90);
     cout << "To check MinimumX: SetGround(90, 90) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
-    p3.SetGround(90, -90);
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
+    p3->SetGround(90, -90);
     cout << "To check MaximumY: SetGround(90, -90) returns ";
-    cout << "(x,y) = (" << p3.XCoord() << ", " << p3.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
     cout << endl;
     cout << endl;
     mapGroup.findKeyword("MinimumLatitude").setValue("-90.0");
     mapGroup.findKeyword("MaximumLatitude").setValue("0.0");
     mapGroup.findKeyword("MinimumLongitude").setValue("-336.0");//24
     mapGroup.findKeyword("MaximumLongitude").setValue("-66.0");//294
-    Projection &p3a = *ProjectionFactory::Create(lab);
+    TProjection *p3a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
-    cout << "    Minimum Latitude:  " << p3a.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p3a.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p3a.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p3a.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p3a->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p3a->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p3a->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p3a->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p3a.XYRange(minX, maxX, minY, maxY);
+    p3a->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -809,30 +811,30 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "        For y = -sqrt2*SphRad/2 = " 
          << -rad*sqrt(2)/2 << endl;
-    p3a.SetCoordinate(maxX,-sqrt(2*rad*rad-maxX*maxX));
+    p3a->SetCoordinate(maxX,-sqrt(2*rad*rad-maxX*maxX));
     cout << "            SetCoordinate(maxX, y) returns lat/lon = " 
-         << p3a.Latitude() << " / " << p3a.Longitude()  << endl;
-    p3a.SetCoordinate(0, maxY);
+         << p3a->Latitude() << " / " << p3a->Longitude()  << endl;
+    p3a->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
-         p3a.Latitude() << " / " << p3a.Longitude()  << endl;
-    p3a.SetCoordinate(minX,0);
+         p3a->Latitude() << " / " << p3a->Longitude()  << endl;
+    p3a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p3a.Latitude() << " / " << p3a.Longitude()  << endl;
-    p3a.SetCoordinate(0, minY);
+         << p3a->Latitude() << " / " << p3a->Longitude()  << endl;
+    p3a->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p3a.Latitude() << " / " << p3a.Longitude()  << endl;
+         << p3a->Latitude() << " / " << p3a->Longitude()  << endl;
     cout << endl;
     cout << endl;
     mapGroup.findKeyword("MinimumLongitude").setValue("-66.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("-51.0");
-    Projection &p3b = *ProjectionFactory::Create(lab);
+    TProjection *p3b = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
-    cout << "    Minimum Latitude:  " << p3b.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p3b.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p3b.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p3b.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p3b->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p3b->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p3b->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p3b->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p3b.XYRange(minX, maxX, minY, maxY);
+    p3b->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -844,20 +846,20 @@ int main(int argc, char *argv[]) {
     cout << "        maxX:  sqrt2*SphRad*sqrt2/2 = " << rad << endl;
     cout << "        maxY:  sqrt2*SphRad*sqrt3/2 = " << rad*sqrt(6)/2 << endl;
     cout << endl;
-    p3b.SetCoordinate(maxX,rad);
+    p3b->SetCoordinate(maxX,rad);
     cout << "            SetCoordinate(maxX, SphRad) returns lat/lon = " 
-         << p3b.Latitude() << " / " << p3b.Longitude()  << endl;
+         << p3b->Latitude() << " / " << p3b->Longitude()  << endl;
     cout << "For x = sqrt2*SphRad/2 = " 
          << rad*sqrt(2)/2 << endl;
-    p3b.SetCoordinate(rad*sqrt(2)/2, maxY);
+    p3b->SetCoordinate(rad*sqrt(2)/2, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " << 
-         p3b.Latitude() << " / " << p3b.Longitude()  << endl;
-    p3b.SetCoordinate(minX,0);
+         p3b->Latitude() << " / " << p3b->Longitude()  << endl;
+    p3b->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p3b.Latitude() << " / " << p3b.Longitude()  << endl;
-    p3b.SetCoordinate(0, minY);
+         << p3b->Latitude() << " / " << p3b->Longitude()  << endl;
+    p3b->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p3b.Latitude() << " / " << p3b.Longitude()  << endl;
+         << p3b->Latitude() << " / " << p3b->Longitude()  << endl;
     cout << endl;
     cout << endl;
     cout << endl;
@@ -874,21 +876,21 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("MaximumLatitude").setValue("0.0");
     mapGroup.findKeyword("MinimumLongitude").setValue("-51.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("129.0");
-    Projection &p4 = *ProjectionFactory::Create(lab);
+    TProjection *p4 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
-    cout << "EquatorialRadius = " << p4.EquatorialRadius() << endl;
-    cout << "PolarRadius = " << p4.PolarRadius() << endl;
-    cout << "Eccentricity = " << p4.Eccentricity() << endl;
-    cout << "TrueScaleLatitude = " << p4.TrueScaleLatitude() << endl << endl;
+    cout << "EquatorialRadius = " << p4->EquatorialRadius() << endl;
+    cout << "PolarRadius = " << p4->PolarRadius() << endl;
+    cout << "Eccentricity = " << p4->Eccentricity() << endl;
+    cout << "TrueScaleLatitude = " << p4->TrueScaleLatitude() << endl << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetGround(-20, 100) hand calculation" << endl;
-    p4.SetGround(-20, 100);
-    cout << "Latitude:            " << p4.Latitude() << endl;
-    cout << "Longitude:           " << p4.Longitude() << endl;
-    cout << "XCoord:              " << p4.XCoord() << endl;
-    cout << "YCoord:              " << p4.YCoord() << endl;
+    p4->SetGround(-20, 100);
+    cout << "Latitude:            " << p4->Latitude() << endl;
+    cout << "Longitude:           " << p4->Longitude() << endl;
+    cout << "XCoord:              " << p4->XCoord() << endl;
+    cout << "YCoord:              " << p4->YCoord() << endl;
     LambertAzimuthalEqualArea lam4(lab);
     lam4.SetGround(-20, 100);
     // we do not have relative scale factor methods in Projection as of 06/2012
@@ -900,49 +902,49 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetCoordinate(1.3547334, 4.7245169)" << endl;
-    p4.SetCoordinate(1.3547334, 4.7245169);
-    cout << "Latitude:            " << p4.Latitude() << endl;
-    cout << "Longitude:           " << p4.Longitude() << endl;
-    cout << "XCoord:              " << p4.XCoord() << endl;
-    cout << "YCoord:              " << p4.YCoord() << endl;
+    p4->SetCoordinate(1.3547334, 4.7245169);
+    cout << "Latitude:            " << p4->Latitude() << endl;
+    cout << "Longitude:           " << p4->Longitude() << endl;
+    cout << "XCoord:              " << p4->XCoord() << endl;
+    cout << "YCoord:              " << p4->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(90, -96)" << endl;
-    p4.SetGround(90.0, -96.0);
-    cout << "Latitude:             " << p4.Latitude() << endl;
-    cout << "Longitude:           " << p4.Longitude() << endl;
-    cout << "XCoord:               " << p4.XCoord() << endl;
-    cout << "YCoord:                " << p4.YCoord() << endl;
+    p4->SetGround(90.0, -96.0);
+    cout << "Latitude:             " << p4->Latitude() << endl;
+    cout << "Longitude:           " << p4->Longitude() << endl;
+    cout << "XCoord:               " << p4->XCoord() << endl;
+    cout << "YCoord:                " << p4->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p4.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:             " << p4.Latitude() << endl;
-    cout << "Longitude:           " << p4.Longitude() << endl;
-    cout << "XCoord:                " << p4.XCoord() << endl;
-    cout << "YCoord:                " << p4.YCoord() << endl;
+    p4->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:             " << p4->Latitude() << endl;
+    cout << "Longitude:           " << p4->Longitude() << endl;
+    cout << "XCoord:                " << p4->XCoord() << endl;
+    cout << "YCoord:                " << p4->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to south pole and back\n"
             "    SetGround(-90, 0)" << endl;
-    p4.SetGround(-90.0, 0.0);
-    cout << "Latitude:            " << p4.Latitude() << endl;
-    cout << "Longitude:             " << p4.Longitude() << endl;
-    cout << "XCoord:               " << p4.XCoord() << endl;
-    cout << "YCoord:                " << p4.YCoord() << endl;
+    p4->SetGround(-90.0, 0.0);
+    cout << "Latitude:            " << p4->Latitude() << endl;
+    cout << "Longitude:             " << p4->Longitude() << endl;
+    cout << "XCoord:               " << p4->XCoord() << endl;
+    cout << "YCoord:                " << p4->YCoord() << endl;
     cout << "    SetCoordinate(-2*sphRad, -0.6271708)" << endl;
-    p4.SetCoordinate(6.0, -0.6271708);
-    cout << "Latitude:            " << p4.Latitude() << endl;
-    cout << "Longitude:             " << p4.Longitude() << endl;
-    cout << "XCoord:                " << p4.XCoord() << endl;
-    cout << "YCoord:               " << p4.YCoord() << endl;
+    p4->SetCoordinate(6.0, -0.6271708);
+    cout << "Latitude:            " << p4->Latitude() << endl;
+    cout << "Longitude:             " << p4->Longitude() << endl;
+    cout << "XCoord:                " << p4->XCoord() << endl;
+    cout << "YCoord:               " << p4->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
     //rad = mapGroup.findKeyword("EquatorialRadius");
-    rad = p4.LocalRadius(mapGroup.findKeyword("CenterLatitude"));
+    rad = p4->LocalRadius(mapGroup.findKeyword("CenterLatitude"));
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -952,43 +954,43 @@ int main(int argc, char *argv[]) {
     // points on circle sqrt(2)*ER in diameter (hemisphere map)
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;
-    p4.SetGround(0, -186);
+    p4->SetGround(0, -186);
     cout << "            SetGround(0, -186) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(0, 84);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(0, 84);
     cout << "            SetGround(0, 84) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(0, -6);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(0, -6);
     cout << "            SetGround(0, -6) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(0, -96);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(0, -96);
     cout << "            SetGround(0, -96) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(0, 129);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(0, 129);
     cout << "            SetGround(0, 129) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
     cout << "        BACKWARD" << endl;
     cout << std::setprecision(5);
-    p4.SetCoordinate(rad*sqrt(2), 0);
+    p4->SetCoordinate(rad*sqrt(2), 0);
     cout << "            SetCoordinate(sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(0, rad*sqrt(2));
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(0, rad*sqrt(2));
     cout << "            SetCoordinate(0, sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(-rad*sqrt(2), 0);
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(-rad*sqrt(2), 0);
     cout << "            SetCoordinate(-sqrt2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(0, -rad*sqrt(2));
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(0, -rad*sqrt(2));
     cout << "            SetCoordinate(0, -sqrt2*SphRad) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(rad, rad);
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(rad, rad);
     cout << "            SetCoordinate(SphRad, SphRad) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
     cout << endl;
     cout << endl;
     // points on circle 2*ER in diameter (whole planet map)
@@ -999,55 +1001,55 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "    Check known values on whole planet map" << endl;
     cout << "        FORWARD - Project to opposite side of planet " << endl;
-    p4.SetGround(-90, 174);
+    p4->SetGround(-90, 174);
     cout << "            SetGround(-90, 174) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(-90, 84);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(-90, 84);
     cout << "            SetGround(-90, 84) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(-90, -6);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(-90, -6);
     cout << "            SetGround(-90, -6) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(-90, -96);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(-90, -96);
     cout << "            SetGround(-90, -96) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
-    p4.SetGround(-90, -126);
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
+    p4->SetGround(-90, -126);
     cout << "            SetGround(-90, -126) returns ";
-    cout << "(x,y) = (" << p4.XCoord() << ", " << p4.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p4->XCoord() << ", " << p4->YCoord() << ")"<< endl;
     cout << "        BACKWARD - Project from opposite side of planet " << endl;
     cout << std::setprecision(5);
-    p4.SetCoordinate(rad*2, 0);
+    p4->SetCoordinate(rad*2, 0);
     cout << "            SetCoordinate(2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(0, rad*2);
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(0, rad*2);
     cout << "            SetCoordinate(0, 2*SphRad) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(-rad*2, 0);
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(-rad*2, 0);
     cout << "            SetCoordinate(-2*SphRad, 0) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(0, -rad*2);
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(0, -rad*2);
     cout << "            SetCoordinate(0, -2*SphRad) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
-    p4.SetCoordinate(rad, -rad*sqrt(3));
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
+    p4->SetCoordinate(rad, -rad*sqrt(3));
     cout << "            SetCoordinate(SphRad, -SphRad*sqrt3) returns ";
-    cout << "lat/lon = " << p4.Latitude() 
-                             << " / " << p4.Longitude() << endl;
+    cout << "lat/lon = " << p4->Latitude() 
+                             << " / " << p4->Longitude() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing XYRange method " << endl;
     cout << "Given: " << endl;
     cout << std::setprecision(7);// so all of the 9's are visible for minlat
-    cout << "    Minimum Latitude:  " << p4.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p4.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p4.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p4.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p4->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p4->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p4->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p4->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p4.XYRange(minX, maxX, minY, maxY);
+    p4->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -1060,32 +1062,32 @@ int main(int argc, char *argv[]) {
     cout << "        -minX, maxY:  2*SphRad     = " << 2*rad << endl;
     cout << endl;   
     cout << std::setprecision(5);
-    p4.SetCoordinate(maxX,maxX);
+    p4->SetCoordinate(maxX,maxX);
     cout << "            SetCoordinate(maxX,sqrt2*SphRad) returns lat/lon = " 
-         << p4.Latitude() << " / " << p4.Longitude()  << endl;
-    p4.SetCoordinate(0, maxY);
+         << p4->Latitude() << " / " << p4->Longitude()  << endl;
+    p4->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p4.Latitude() << " / " << p4.Longitude()  << endl;
-    p4.SetCoordinate(minX,0);
+         << p4->Latitude() << " / " << p4->Longitude()  << endl;
+    p4->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " << 
-         p4.Latitude() << " / " << p4.Longitude()  << endl;
-    p4.SetCoordinate(minY, minY);
+         p4->Latitude() << " / " << p4->Longitude()  << endl;
+    p4->SetCoordinate(minY, minY);
     cout << "            SetCoordinate(sqrt2*SphRad,minY) returns lat/lon = " << 
-         p4.Latitude() << " / " << p4.Longitude()  << endl;
-    p4.SetGround(-90, 90);
+         p4->Latitude() << " / " << p4->Longitude()  << endl;
+    p4->SetGround(-90, 90);
     cout << endl;
     cout << endl;
     mapGroup.findKeyword("MinimumLongitude").setValue("-6.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("24.0");
-    Projection &p4a = *ProjectionFactory::Create(lab);
+    TProjection *p4a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << std::setprecision(7);// so all of the 9's are visible for minlat
-    cout << "    Minimum Latitude:  " << p4a.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p4a.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p4a.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p4a.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p4a->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p4a->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p4a->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p4a->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p4a.XYRange(minX, maxX, minY, maxY);
+    p4a->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -1099,34 +1101,34 @@ int main(int argc, char *argv[]) {
     cout << "        minX:  -2*SphRad             = " << -2*rad << endl;
     cout << endl;
     cout << std::setprecision(5);
-    p4a.SetCoordinate(maxX,sqrt(2)*rad/2);
-    double lat = p4a.Latitude();
+    p4a->SetCoordinate(maxX,sqrt(2)*rad/2);
+    double lat = p4a->Latitude();
     if (lat <= 1E-13) {
       lat = 0.0;
     }
     cout << "            SetCoordinate(maxX, sqrt2*SphRad/2) returns lat/lon = " 
-         << lat << " / " << p4a.Longitude()  << endl;
-    p4a.SetCoordinate(-rad*sqrt(3), maxY);
+         << lat << " / " << p4a->Longitude()  << endl;
+    p4a->SetCoordinate(-rad*sqrt(3), maxY);
     cout << "            SetCoordinate(-2*SphRad*sqrt3/2, maxY) returns lat/lon = " << 
-         p4a.Latitude() << " / " << p4a.Longitude()  << endl;
-    p4a.SetCoordinate(minX,0);
+         p4a->Latitude() << " / " << p4a->Longitude()  << endl;
+    p4a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p4a.Latitude() << " / " << p4a.Longitude()  << endl;
-    p4a.SetCoordinate(0, minY);
+         << p4a->Latitude() << " / " << p4a->Longitude()  << endl;
+    p4a->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p4a.Latitude() << " / " << p4a.Longitude()  << endl;
+         << p4a->Latitude() << " / " << p4a->Longitude()  << endl;
     cout << endl;
     cout << endl;
     mapGroup.findKeyword("MinimumLatitude").setValue("-90.0");
-    Projection &p4b = *ProjectionFactory::Create(lab);
+    TProjection *p4b = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << std::setprecision(7);
-    cout << "    Minimum Latitude:  " << p4b.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p4b.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p4b.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p4b.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p4b->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p4b->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p4b->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p4b->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p4b.XYRange(minX, maxX, minY, maxY);
+    p4b->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -1137,18 +1139,18 @@ int main(int argc, char *argv[]) {
     cout << "        2*SphRad (Spherical Radius)    = " << 2*rad << endl;
     cout << endl;
     cout << std::setprecision(5);
-    p4b.SetCoordinate(maxX, 0);
+    p4b->SetCoordinate(maxX, 0);
     cout << "            SetCoordinate(maxX, 0) returns lat/lon = " 
-         << p4b.Latitude() << " / " << p4b.Longitude()  << endl;
-    p4b.SetCoordinate(0, maxY);
+         << p4b->Latitude() << " / " << p4b->Longitude()  << endl;
+    p4b->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0, maxY) returns lat/lon = " << 
-         p4b.Latitude() << " / " << p4b.Longitude()  << endl;
-    p4b.SetCoordinate(minX, 0);
+         p4b->Latitude() << " / " << p4b->Longitude()  << endl;
+    p4b->SetCoordinate(minX, 0);
     cout << "            SetCoordinate(minX, 0) returns lat/lon = " 
-         << p4b.Latitude() << " / " << p4b.Longitude()  << endl;
-    p4b.SetCoordinate(0, minY);
+         << p4b->Latitude() << " / " << p4b->Longitude()  << endl;
+    p4b->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0, minY) returns lat/lon = " 
-         << p4b.Latitude() << " / " << p4b.Longitude()  << endl;
+         << p4b->Latitude() << " / " << p4b->Longitude()  << endl;
     cout << endl;
     cout << endl;
     cout << endl;
@@ -1206,22 +1208,22 @@ int main(int argc, char *argv[]) {
     cout << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    Projection &p5 = *ProjectionFactory::Create(lab);
+    TProjection *p5 = (TProjection *) ProjectionFactory::Create(lab);
     cout << std::setprecision(7);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
-    cout << "EquatorialRadius = " << p5.EquatorialRadius() << endl;
-    cout << "PolarRadius = " << p5.PolarRadius() << endl;
-    cout << "Eccentricity = " << p5.Eccentricity() << endl;
-    cout << "TrueScaleLatitude = " << p5.TrueScaleLatitude() << endl << endl;
+    cout << "EquatorialRadius = " << p5->EquatorialRadius() << endl;
+    cout << "PolarRadius = " << p5->PolarRadius() << endl;
+    cout << "Eccentricity = " << p5->Eccentricity() << endl;
+    cout << "TrueScaleLatitude = " << p5->TrueScaleLatitude() << endl << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetGround(80, 5) from Snyder pages 334-335" << endl;
-    p5.SetGround(80, 5);
-    cout << "Latitude:            " << p5.Latitude() << endl;
-    cout << "Longitude:           " << p5.Longitude() << endl;
-    cout << "XCoord:              " << p5.XCoord() << endl;
-    cout << "YCoord:              " << p5.YCoord() << endl;
+    p5->SetGround(80, 5);
+    cout << "Latitude:            " << p5->Latitude() << endl;
+    cout << "Longitude:           " << p5->Longitude() << endl;
+    cout << "XCoord:              " << p5->XCoord() << endl;
+    cout << "YCoord:              " << p5->YCoord() << endl;
     LambertAzimuthalEqualArea lam5(lab);
     lam5.SetGround(80, 5);
     cout << "RelativeScaleLatitude:  " << lam5.relativeScaleFactorLatitude() << endl;
@@ -1231,43 +1233,43 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "    Testing SetCoordinate(1077459.7, 288704.5) "
             "from Snyder pages 336-337" << endl;
-    p5.SetCoordinate(1077459.7, 288704.5);
-    cout << "Latitude:            " << p5.Latitude() << endl;
-    cout << "Longitude:           " << p5.Longitude() << endl;
-    cout << "XCoord:              " << p5.XCoord() << endl;
-    cout << "YCoord:              " << p5.YCoord() << endl;
+    p5->SetCoordinate(1077459.7, 288704.5);
+    cout << "Latitude:            " << p5->Latitude() << endl;
+    cout << "Longitude:           " << p5->Longitude() << endl;
+    cout << "XCoord:              " << p5->XCoord() << endl;
+    cout << "YCoord:              " << p5->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(90, -100)" << endl;
-    p5.SetGround(90.0, -100.0);
-    cout << "Latitude:              " << p5.Latitude() << endl;
-    cout << "Longitude:           " << p5.Longitude() << endl;
-    cout << "XCoord:                 " << p5.XCoord() << endl;
-    cout << "YCoord:                " << p5.YCoord() << endl;
+    p5->SetGround(90.0, -100.0);
+    cout << "Latitude:              " << p5->Latitude() << endl;
+    cout << "Longitude:           " << p5->Longitude() << endl;
+    cout << "XCoord:                 " << p5->XCoord() << endl;
+    cout << "YCoord:                " << p5->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p5.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:              " << p5.Latitude() << endl;
-    cout << "Longitude:             " << p5.Longitude() << endl;
-    cout << "XCoord:                 " << p5.XCoord() << endl;
-    cout << "YCoord:                 " << p5.YCoord() << endl;
+    p5->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:              " << p5->Latitude() << endl;
+    cout << "Longitude:             " << p5->Longitude() << endl;
+    cout << "XCoord:                 " << p5->XCoord() << endl;
+    cout << "YCoord:                 " << p5->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to south pole and back\n"
             "    SetGround(-90, 0)" << endl;
-    p5.SetGround(-90.0, 0.0);
-    cout << "Latitude:                 " << p5.Latitude() << endl;
-    cout << "Longitude:                  " << p5.Longitude() << endl;
-    cout << "XCoord:              " << p5.XCoord() << endl;
-    cout << "YCoord:               " << p5.YCoord() << endl;
+    p5->SetGround(-90.0, 0.0);
+    cout << "Latitude:                 " << p5->Latitude() << endl;
+    cout << "Longitude:                  " << p5->Longitude() << endl;
+    cout << "XCoord:              " << p5->XCoord() << endl;
+    cout << "YCoord:               " << p5->YCoord() << endl;
     cout << "    SetCoordinate(12548868.8927037, 2212704.1631568)" << endl;
-    p5.SetCoordinate(12548868.8927037, 2212704.1631568);
-    cout << "Latitude:                 " << p5.Latitude() << endl;
-    cout << "Longitude:                 " << p5.Longitude() << endl;
-    cout << "XCoord:              " << p5.XCoord() << endl;
-    cout << "YCoord:               " << p5.YCoord() << endl;
+    p5->SetCoordinate(12548868.8927037, 2212704.1631568);
+    cout << "Latitude:                 " << p5->Latitude() << endl;
+    cout << "Longitude:                 " << p5->Longitude() << endl;
+    cout << "XCoord:              " << p5->XCoord() << endl;
+    cout << "YCoord:               " << p5->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
@@ -1276,12 +1278,12 @@ int main(int argc, char *argv[]) {
     // This ellipsoidal projection estimates:
     //     d = sqrt(ER^2 + PR^2*factor)
     //     where factor = ln( (1+e) / (1-e) ) / (2e)
-    double poleToEquator = sqrt(p5.EquatorialRadius() * p5.EquatorialRadius()
-                                + p5.PolarRadius() * p5.PolarRadius()
-                                  *1/(2*p5.Eccentricity())
-                                  *log((1+p5.Eccentricity())
-                                        /(1-p5.Eccentricity())));
-    rad = p5.PolarRadius();
+    double poleToEquator = sqrt(p5->EquatorialRadius() * p5->EquatorialRadius()
+                                + p5->PolarRadius() * p5->PolarRadius()
+                                  *1/(2*p5->Eccentricity())
+                                  *log((1+p5->Eccentricity())
+                                        /(1-p5->Eccentricity())));
+    rad = p5->PolarRadius();
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -1290,31 +1292,31 @@ int main(int argc, char *argv[]) {
     // points on circle sqrt(2)*ER in diameter (hemisphere map)
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;
-    p5.SetGround(0, -10);
+    p5->SetGround(0, -10);
     cout << "            SetGround(0, -10) returns ";
-    cout << "(x,y) = (" << p5.XCoord() << ", " << p5.YCoord() << ")"<< endl;
-    p5.SetGround(0, 80);
+    cout << "(x,y) = (" << p5->XCoord() << ", " << p5->YCoord() << ")"<< endl;
+    p5->SetGround(0, 80);
     cout << "            SetGround(0, 80) returns ";
-    cout << "(x,y) = (" << p5.XCoord() << ", " << p5.YCoord() << ")"<< endl;
-    p5.SetGround(0, -190);
+    cout << "(x,y) = (" << p5->XCoord() << ", " << p5->YCoord() << ")"<< endl;
+    p5->SetGround(0, -190);
     cout << "            SetGround(0, -190) returns ";
-    cout << "(x,y) = (" << p5.XCoord() << ", " << p5.YCoord() << ")"<< endl;
-    p5.SetGround(0, -100);
+    cout << "(x,y) = (" << p5->XCoord() << ", " << p5->YCoord() << ")"<< endl;
+    p5->SetGround(0, -100);
     cout << "            SetGround(0, -100) returns ";
-    cout << "(x,y) = (" << p5.XCoord() << ", " << p5.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p5->XCoord() << ", " << p5->YCoord() << ")"<< endl;
     cout << "        BACKWARD" << endl;
-    p5.SetCoordinate(poleToEquator, 0);
+    p5->SetCoordinate(poleToEquator, 0);
     cout << "            SetCoordinate(poleToEquator, 0) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
-    p5.SetCoordinate(0, poleToEquator);
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
+    p5->SetCoordinate(0, poleToEquator);
     cout << "            SetCoordinate(0, poleToEquator) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
-    p5.SetCoordinate(-poleToEquator, 0);
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
+    p5->SetCoordinate(-poleToEquator, 0);
     cout << "            SetCoordinate(-poleToEquator, 0) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
-    p5.SetCoordinate(0, -poleToEquator);
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
+    p5->SetCoordinate(0, -poleToEquator);
     cout << "            SetCoordinate(0, -poleToEquator) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
     cout << endl;
     // points on whole planet map
     double poleToPole = poleToEquator*sqrt(2);
@@ -1324,25 +1326,25 @@ int main(int argc, char *argv[]) {
     cout << "        poleToOppositePole = " << poleToPole << endl;
     cout << endl;
     cout << "        FORWARD - Project to opposite side of planet " << endl;
-    p5.SetGround(-90, 80);
+    p5->SetGround(-90, 80);
     cout << "            SetGround(-90, 80) returns ";
-    cout << "(x,y) = (" << p5.XCoord() << ", " << p5.YCoord() << ")"<< endl;
-    p5.SetGround(-90, -280);
+    cout << "(x,y) = (" << p5->XCoord() << ", " << p5->YCoord() << ")"<< endl;
+    p5->SetGround(-90, -280);
     cout << "            SetGround(-90, -280) returns ";
-    cout << "(x,y) = (" << p5.XCoord() << ", " << p5.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p5->XCoord() << ", " << p5->YCoord() << ")"<< endl;
     cout << "        BACKWARD - Project from opposite side of planet " << endl;
-    p5.SetCoordinate(poleToPole, 0);
+    p5->SetCoordinate(poleToPole, 0);
     cout << "            SetCoordinate(poleToOppositePole, 0) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
-    p5.SetCoordinate(0, poleToPole);
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
+    p5->SetCoordinate(0, poleToPole);
     cout << "            SetCoordinate(0, poleToOppositePole) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
-    p5.SetCoordinate(-poleToPole, 0);
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
+    p5->SetCoordinate(-poleToPole, 0);
     cout << "            SetCoordinate(-poleToOppositePole, 0) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
-    p5.SetCoordinate(0, -poleToPole);
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
+    p5->SetCoordinate(0, -poleToPole);
     cout << "            SetCoordinate(0, -poleToOppositePole) returns ";
-    cout << "lat/lon = " << p5.Latitude() << " / " << p5.Longitude() << endl;
+    cout << "lat/lon = " << p5->Latitude() << " / " << p5->Longitude() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
@@ -1350,12 +1352,12 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "Given: " << endl;
     cout << std::setprecision(7);// so all of the 9's are visible for minlat
-    cout << "    Minimum Latitude:  " << p5.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p5.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p5.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p5.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p5->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p5->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p5->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p5->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p5.XYRange(minX, maxX, minY, maxY);
+    p5->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -1367,31 +1369,31 @@ int main(int argc, char *argv[]) {
          << poleToPole << endl;
     cout << endl;   
     cout << std::setprecision(5);
-    p5.SetCoordinate(maxX, 0);
+    p5->SetCoordinate(maxX, 0);
     cout << "            SetCoordinate(maxX, 0) returns lat/lon = " 
-         << p5.Latitude() << " / " << p5.Longitude()  << endl;
-    p5.SetCoordinate(0, maxY);
+         << p5->Latitude() << " / " << p5->Longitude()  << endl;
+    p5->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p5.Latitude() << " / " << p5.Longitude()  << endl;
-    p5.SetCoordinate(minX,0);
+         << p5->Latitude() << " / " << p5->Longitude()  << endl;
+    p5->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " << 
-         p5.Latitude() << " / " << p5.Longitude()  << endl;
-    p5.SetCoordinate(0, minY);
+         p5->Latitude() << " / " << p5->Longitude()  << endl;
+    p5->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " << 
-         p5.Latitude() << " / " << p5.Longitude()  << endl;
+         p5->Latitude() << " / " << p5->Longitude()  << endl;
     cout << endl;
     cout << endl;
     mapGroup.findKeyword("MinimumLongitude").setValue("-55.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("-10.0");
-    Projection &p5a = *ProjectionFactory::Create(lab);
+    TProjection *p5a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << std::setprecision(7);// so all of the 9's are visible for minlat
-    cout << "    Minimum Latitude:  " << p5a.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p5a.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p5a.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p5a.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p5a->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p5a->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p5a->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p5a->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p5a.XYRange(minX, maxX, minY, maxY);
+    p5a->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -1407,18 +1409,18 @@ int main(int argc, char *argv[]) {
          << -poleToPole*sqrt(2)/2 << endl;
     cout << endl;
     cout << std::setprecision(7);
-    p5a.SetCoordinate(maxX,0);
+    p5a->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX, 0) returns lat/lon = " 
-         << p5a.Latitude() << " / " << p5a.Longitude()  << endl;
-    p5a.SetCoordinate(poleToEquator, maxY);
+         << p5a->Latitude() << " / " << p5a->Longitude()  << endl;
+    p5a->SetCoordinate(poleToEquator, maxY);
     cout << "            SetCoordinate(poleToEquator, maxY) returns lat/lon = "
-         << p5a.Latitude() << " / " << p5a.Longitude()  << endl;
-    p5a.SetCoordinate(minX,-poleToEquator*sqrt(2)/2);
+         << p5a->Latitude() << " / " << p5a->Longitude()  << endl;
+    p5a->SetCoordinate(minX,-poleToEquator*sqrt(2)/2);
     cout << "            SetCoordinate(minX,-poleToEquator*sqrt2/2) returns lat/lon = " 
-         << p5a.Latitude() << " / " << p5a.Longitude()  << endl;
-    p5a.SetCoordinate(poleToPole*sqrt(2)/2, minY);
+         << p5a->Latitude() << " / " << p5a->Longitude()  << endl;
+    p5a->SetCoordinate(poleToPole*sqrt(2)/2, minY);
     cout << "            SetCoordinate(poleToOppositePole*sqrt(2)/2,minY) returns lat/lon = " 
-         << p5a.Latitude() << " / " << p5a.Longitude()  << endl;
+         << p5a->Latitude() << " / " << p5a->Longitude()  << endl;
     cout << endl;
     cout << endl;
     cout << endl;
@@ -1430,22 +1432,22 @@ int main(int argc, char *argv[]) {
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     mapGroup.findKeyword("CenterLatitude").setValue("-90.0");
-    Projection &p6 = *ProjectionFactory::Create(lab);
+    TProjection *p6 = (TProjection *) ProjectionFactory::Create(lab);
     cout << std::setprecision(7);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
-    cout << "EquatorialRadius = " << p6.EquatorialRadius() << endl;
-    cout << "PolarRadius = " << p6.PolarRadius() << endl;
-    cout << "Eccentricity = " << p6.Eccentricity() << endl;
-    cout << "TrueScaleLatitude = " << p6.TrueScaleLatitude() << endl << endl;
+    cout << "EquatorialRadius = " << p6->EquatorialRadius() << endl;
+    cout << "PolarRadius = " << p6->PolarRadius() << endl;
+    cout << "Eccentricity = " << p6->Eccentricity() << endl;
+    cout << "TrueScaleLatitude = " << p6->TrueScaleLatitude() << endl << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetGround(-80, -25)" << endl;
-    p6.SetGround(-80, -25);
-    cout << "Latitude:            " << p6.Latitude() << endl;
-    cout << "Longitude:           " << p6.Longitude() << endl;
-    cout << "XCoord:              " << p6.XCoord() << endl;
-    cout << "YCoord:              " << p6.YCoord() << endl;
+    p6->SetGround(-80, -25);
+    cout << "Latitude:            " << p6->Latitude() << endl;
+    cout << "Longitude:           " << p6->Longitude() << endl;
+    cout << "XCoord:              " << p6->XCoord() << endl;
+    cout << "YCoord:              " << p6->YCoord() << endl;
     LambertAzimuthalEqualArea lam6(lab);
     lam6.SetGround(-80, -25);
     cout << "RelativeScaleLatitude:  " << lam6.relativeScaleFactorLatitude() << endl;
@@ -1454,43 +1456,43 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing SetCoordinate(1077459.7, 288704.5)" << endl;
-    p6.SetCoordinate(1077459.7, 288704.5);
-    cout << "Latitude:            " << p6.Latitude() << endl;
-    cout << "Longitude:           " << p6.Longitude() << endl;
-    cout << "XCoord:              " << p6.XCoord() << endl;
-    cout << "YCoord:              " << p6.YCoord() << endl;
+    p6->SetCoordinate(1077459.7, 288704.5);
+    cout << "Latitude:            " << p6->Latitude() << endl;
+    cout << "Longitude:           " << p6->Longitude() << endl;
+    cout << "XCoord:              " << p6->XCoord() << endl;
+    cout << "YCoord:              " << p6->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(-90, -100)" << endl;
-    p6.SetGround(-90.0, -100.0);
-    cout << "Latitude:             " << p6.Latitude() << endl;
-    cout << "Longitude:           " << p6.Longitude() << endl;
-    cout << "XCoord:                 " << p6.XCoord() << endl;
-    cout << "YCoord:                 " << p6.YCoord() << endl;
+    p6->SetGround(-90.0, -100.0);
+    cout << "Latitude:             " << p6->Latitude() << endl;
+    cout << "Longitude:           " << p6->Longitude() << endl;
+    cout << "XCoord:                 " << p6->XCoord() << endl;
+    cout << "YCoord:                 " << p6->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p6.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:               " << p6.Latitude() << endl;
-    cout << "Longitude:             " << p6.Longitude() << endl;
-    cout << "XCoord:                   " << p6.XCoord() << endl;
-    cout << "YCoord:                   " << p6.YCoord() << endl;
+    p6->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:               " << p6->Latitude() << endl;
+    cout << "Longitude:             " << p6->Longitude() << endl;
+    cout << "XCoord:                   " << p6->XCoord() << endl;
+    cout << "YCoord:                   " << p6->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to north pole and back\n"
             "    SetGround(90, -100)" << endl;
-    p6.SetGround(90.0, -100.0);
-    cout << "Latitude:                  " << p6.Latitude() << endl;
-    cout << "Longitude:               " << p6.Longitude() << endl;
-    cout << "XCoord:                     " << p6.XCoord() << endl;
-    cout << "YCoord:              " << p6.YCoord() << endl;
+    p6->SetGround(90.0, -100.0);
+    cout << "Latitude:                  " << p6->Latitude() << endl;
+    cout << "Longitude:               " << p6->Longitude() << endl;
+    cout << "XCoord:                     " << p6->XCoord() << endl;
+    cout << "YCoord:              " << p6->YCoord() << endl;
     cout << "    SetCoordinate(0, 2*eqRad)" << endl;
-    p6.SetCoordinate(0, 2*p6.EquatorialRadius());
-    cout << "Latitude:                  " << p6.Latitude() << endl;
-    cout << "Longitude:               " << p6.Longitude() << endl;
-    cout << "XCoord:                     " << p6.XCoord() << endl;
-    cout << "YCoord:              " << p6.YCoord() << endl;
+    p6->SetCoordinate(0, 2*p6->EquatorialRadius());
+    cout << "Latitude:                  " << p6->Latitude() << endl;
+    cout << "Longitude:               " << p6->Longitude() << endl;
+    cout << "XCoord:                     " << p6->XCoord() << endl;
+    cout << "YCoord:              " << p6->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
@@ -1499,12 +1501,12 @@ int main(int argc, char *argv[]) {
     // This ellipsoidal projection estimates:
     //     d = sqrt(ER^2 + PR^2*factor)
     //     where factor = ln( (1+e) / (1-e) ) / (2e)
-    poleToEquator = sqrt(p6.EquatorialRadius() * p6.EquatorialRadius()
-                                + p6.PolarRadius() * p6.PolarRadius()
-                                  *1/(2*p6.Eccentricity())
-                                  *log((1+p6.Eccentricity())
-                                        /(1-p6.Eccentricity())));
-    rad = p6.PolarRadius();
+    poleToEquator = sqrt(p6->EquatorialRadius() * p6->EquatorialRadius()
+                                + p6->PolarRadius() * p6->PolarRadius()
+                                  *1/(2*p6->Eccentricity())
+                                  *log((1+p6->Eccentricity())
+                                        /(1-p6->Eccentricity())));
+    rad = p6->PolarRadius();
     cout << "    Testing other known points..." << endl;
     cout << endl;   
     cout << "        Comparison Values" << endl;
@@ -1513,31 +1515,31 @@ int main(int argc, char *argv[]) {
     // points on circle sqrt(2)*ER in diameter (hemisphere map)
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;
-    p6.SetGround(0, -10);
+    p6->SetGround(0, -10);
     cout << "            SetGround(0, -10) returns ";
-    cout << "(x,y) = (" << p6.XCoord() << ", " << p6.YCoord() << ")"<< endl;
-    p6.SetGround(0, -100);
+    cout << "(x,y) = (" << p6->XCoord() << ", " << p6->YCoord() << ")"<< endl;
+    p6->SetGround(0, -100);
     cout << "            SetGround(0, 80) returns ";
-    cout << "(x,y) = (" << p6.XCoord() << ", " << p6.YCoord() << ")"<< endl;
-    p6.SetGround(0, -190);
+    cout << "(x,y) = (" << p6->XCoord() << ", " << p6->YCoord() << ")"<< endl;
+    p6->SetGround(0, -190);
     cout << "            SetGround(0, -190) returns ";
-    cout << "(x,y) = (" << p6.XCoord() << ", " << p6.YCoord() << ")"<< endl;
-    p6.SetGround(0, 80);
+    cout << "(x,y) = (" << p6->XCoord() << ", " << p6->YCoord() << ")"<< endl;
+    p6->SetGround(0, 80);
     cout << "            SetGround(0, -100) returns ";
-    cout << "(x,y) = (" << p6.XCoord() << ", " << p6.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p6->XCoord() << ", " << p6->YCoord() << ")"<< endl;
     cout << "        BACKWARD" << endl;
-    p6.SetCoordinate(poleToEquator, 0);
+    p6->SetCoordinate(poleToEquator, 0);
     cout << "            SetCoordinate(poleToEquator, 0) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
-    p6.SetCoordinate(0, poleToEquator);
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
+    p6->SetCoordinate(0, poleToEquator);
     cout << "            SetCoordinate(0, poleToEquator) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
-    p6.SetCoordinate(-poleToEquator, 0);
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
+    p6->SetCoordinate(-poleToEquator, 0);
     cout << "            SetCoordinate(-poleToEquator, 0) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
-    p6.SetCoordinate(0, -poleToEquator);
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
+    p6->SetCoordinate(0, -poleToEquator);
     cout << "            SetCoordinate(0, -poleToEquator) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
     cout << endl;
     // points on whole planet map
     poleToPole = poleToEquator*sqrt(2);
@@ -1547,25 +1549,25 @@ int main(int argc, char *argv[]) {
     cout << "        poleToOppositePole = " << poleToPole << endl;
     cout << endl;
     cout << "        FORWARD - Project to opposite side of planet " << endl;
-    p6.SetGround(90, 80);
+    p6->SetGround(90, 80);
     cout << "            SetGround(-90, 80) returns ";
-    cout << "(x,y) = (" << p6.XCoord() << ", " << p6.YCoord() << ")"<< endl;
-    p6.SetGround(90, -280);
+    cout << "(x,y) = (" << p6->XCoord() << ", " << p6->YCoord() << ")"<< endl;
+    p6->SetGround(90, -280);
     cout << "            SetGround(-90, -280) returns ";
-    cout << "(x,y) = (" << p6.XCoord() << ", " << p6.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p6->XCoord() << ", " << p6->YCoord() << ")"<< endl;
     cout << "        BACKWARD - Project from opposite side of planet " << endl;
-    p6.SetCoordinate(poleToPole, 0);
+    p6->SetCoordinate(poleToPole, 0);
     cout << "            SetCoordinate(poleToOppositePole, 0) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
-    p6.SetCoordinate(0, poleToPole);
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
+    p6->SetCoordinate(0, poleToPole);
     cout << "            SetCoordinate(0, poleToOppositePole) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
-    p6.SetCoordinate(-poleToPole, 0);
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
+    p6->SetCoordinate(-poleToPole, 0);
     cout << "            SetCoordinate(-poleToOppositePole, 0) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
-    p6.SetCoordinate(0, -poleToPole);
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
+    p6->SetCoordinate(0, -poleToPole);
     cout << "            SetCoordinate(0, -poleToOppositePole) returns ";
-    cout << "lat/lon = " << p6.Latitude() << " / " << p6.Longitude() << endl;
+    cout << "lat/lon = " << p6->Latitude() << " / " << p6->Longitude() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
@@ -1573,12 +1575,12 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "Given: " << endl;
     cout << std::setprecision(7);// so all of the 9's are visible for minlat
-    cout << "    Minimum Latitude:  " << p6.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p6.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p6.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p6.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p6->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p6->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p6->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p6->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p6.XYRange(minX, maxX, minY, maxY);
+    p6->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
@@ -1590,18 +1592,18 @@ int main(int argc, char *argv[]) {
     cout << "        sqrt(2)/2 * poleToEquator = " << sqrt(2)/2 * poleToEquator << endl;
     cout << endl;   
     cout << std::setprecision(5);
-    p6.SetCoordinate(maxX, 0);
+    p6->SetCoordinate(maxX, 0);
     cout << "            SetCoordinate(maxX, 0) returns lat/lon = " 
-         << p6.Latitude() << " / " << p6.Longitude()  << endl;
-    p6.SetCoordinate(maxY, maxY);
+         << p6->Latitude() << " / " << p6->Longitude()  << endl;
+    p6->SetCoordinate(maxY, maxY);
     cout << "            SetCoordinate(maxY,maxY) returns lat/lon = " 
-         << p6.Latitude() << " / " << p6.Longitude()  << endl;
-    p6.SetCoordinate(minX,0);
+         << p6->Latitude() << " / " << p6->Longitude()  << endl;
+    p6->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " << 
-         p6.Latitude() << " / " << p6.Longitude()  << endl;
-    p6.SetCoordinate(0, minY);
+         p6->Latitude() << " / " << p6->Longitude()  << endl;
+    p6->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " << 
-         p6.Latitude() << " / " << p6.Longitude()  << endl;
+         p6->Latitude() << " / " << p6->Longitude()  << endl;
     cout << endl;
     cout << endl;
     cout << endl;
@@ -1621,77 +1623,77 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("MinimumLongitude").setValue("-190.0");
     mapGroup.findKeyword("MaximumLongitude").setValue("-10.0");
     cout << std::setprecision(7);
-    Projection &p7 = *ProjectionFactory::Create(lab);                           
+    TProjection *p7 = (TProjection *) ProjectionFactory::Create(lab);                           
     cout << mapGroup["CenterLatitude"] << endl;                                 
     cout << mapGroup["CenterLongitude"] << endl;                                
-    cout << "EquatorialRadius = " << p7.EquatorialRadius() << endl;             
-    cout << "PolarRadius = " << p7.PolarRadius() << endl;                       
-    cout << "Eccentricity = " << p7.Eccentricity() << endl;                     
-    cout << "TrueScaleLatitude = " << p7.TrueScaleLatitude() << endl << endl;   
+    cout << "EquatorialRadius = " << p7->EquatorialRadius() << endl;             
+    cout << "PolarRadius = " << p7->PolarRadius() << endl;                       
+    cout << "Eccentricity = " << p7->Eccentricity() << endl;                     
+    cout << "TrueScaleLatitude = " << p7->TrueScaleLatitude() << endl << endl;   
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;                                                               
     cout << "    Testing SetGround(30, -110) from Snyder pages 333-334" << endl;   
-    p7.SetGround(30, -110);                                                     
-    cout << "Latitude:            " << p7.Latitude() << endl;                  
-    cout << "Longitude:           " << p7.Longitude() << endl;                 
-    cout << "XCoord:              " << p7.XCoord() << endl;                    
-    cout << "YCoord:              " << p7.YCoord() << endl;                    
+    p7->SetGround(30, -110);                                                     
+    cout << "Latitude:            " << p7->Latitude() << endl;                  
+    cout << "Longitude:           " << p7->Longitude() << endl;                 
+    cout << "XCoord:              " << p7->XCoord() << endl;                    
+    cout << "YCoord:              " << p7->YCoord() << endl;                    
     cout << endl;                                                               
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;                                                               
     cout << "    Testing SetCoordinate(-965932.1, -1056814.9) "                    
             "from Snyder pages 335-336" << endl;                                
-    p7.SetCoordinate(-965932.1, -1056814.9);                                    
-    cout << "Latitude:            " << p7.Latitude() << endl;                  
-    cout << "Longitude:           " << p7.Longitude() << endl;                 
-    cout << "XCoord:              " << p7.XCoord() << endl;                    
-    cout << "YCoord:              " << p7.YCoord() << endl;                    
+    p7->SetCoordinate(-965932.1, -1056814.9);                                    
+    cout << "Latitude:            " << p7->Latitude() << endl;                  
+    cout << "Longitude:           " << p7->Longitude() << endl;                 
+    cout << "XCoord:              " << p7->XCoord() << endl;                    
+    cout << "YCoord:              " << p7->YCoord() << endl;                    
     cout << endl;                                                               
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(40, -100)" << endl;
-    p7.SetGround(40.0, -100.0);
-    cout << "Latitude:              " << p7.Latitude() << endl;
-    cout << "Longitude:           " << p7.Longitude() << endl;
-    cout << "XCoord:                 " << p7.XCoord() << endl;
-    cout << "YCoord:                 " << p7.YCoord() << endl;
+    p7->SetGround(40.0, -100.0);
+    cout << "Latitude:              " << p7->Latitude() << endl;
+    cout << "Longitude:           " << p7->Longitude() << endl;
+    cout << "XCoord:                 " << p7->XCoord() << endl;
+    cout << "YCoord:                 " << p7->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p7.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:              " << p7.Latitude() << endl;
-    cout << "Longitude:           " << p7.Longitude() << endl;
-    cout << "XCoord:                 " << p7.XCoord() << endl;
-    cout << "YCoord:                 " << p7.YCoord() << endl;
+    p7->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:              " << p7->Latitude() << endl;
+    cout << "Longitude:           " << p7->Longitude() << endl;
+    cout << "XCoord:                 " << p7->XCoord() << endl;
+    cout << "YCoord:                 " << p7->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to north pole and back\n"
             "    SetGround(90, 0)" << endl;
-    p7.SetGround(90.0, 0.0);
-    cout << "Latitude:                 " << p7.Latitude() << endl;
-    cout << "Longitude:                 " << p7.Longitude() << endl;
-    cout << "XCoord:                    " << p7.XCoord() << endl;
-    cout << "YCoord:              " << p7.YCoord() << endl;
+    p7->SetGround(90.0, 0.0);
+    cout << "Latitude:                 " << p7->Latitude() << endl;
+    cout << "Longitude:                 " << p7->Longitude() << endl;
+    cout << "XCoord:                    " << p7->XCoord() << endl;
+    cout << "YCoord:              " << p7->YCoord() << endl;
     cout << "    SetCoordinate(0, 5394277.8222559)" << endl;
-    p7.SetCoordinate(0.0, 5394277.8222559);
-    cout << "Latitude:                 " << p7.Latitude() << endl;
-    cout << "Longitude:                " << p7.Longitude() << endl;
-    cout << "XCoord:                    " << p7.XCoord() << endl;
-    cout << "YCoord:              " << p7.YCoord() << endl;
+    p7->SetCoordinate(0.0, 5394277.8222559);
+    cout << "Latitude:                 " << p7->Latitude() << endl;
+    cout << "Longitude:                " << p7->Longitude() << endl;
+    cout << "XCoord:                    " << p7->XCoord() << endl;
+    cout << "YCoord:              " << p7->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     // CHECKING OTHER KNOWN POINTS
-    double a = p7.LocalRadius(0);                                              
-    double c = p7.LocalRadius(mapGroup["CenterLatitude"]);                      
+    double a = p7->LocalRadius(0);                                              
+    double c = p7->LocalRadius(mapGroup["CenterLatitude"]);                      
     double distToSide = sqrt(a*a + c*c);
-    double a2 = p7.LocalRadius(50);
-    double c2 = p7.LocalRadius(mapGroup["CenterLatitude"]);
+    double a2 = p7->LocalRadius(50);
+    double c2 = p7->LocalRadius(mapGroup["CenterLatitude"]);
     double distToTop = sqrt(a2*a2 + c2*c2);
-    double a3 = p7.LocalRadius(-50);
-    double c3 = p7.LocalRadius(mapGroup["CenterLatitude"]);
+    double a3 = p7->LocalRadius(-50);
+    double c3 = p7->LocalRadius(mapGroup["CenterLatitude"]);
     double distToBottom = sqrt(a3*a3+c3*c3);
-    rad = p7.LocalRadius();
+    rad = p7->LocalRadius();
     cout << "    Testing other known points..." << endl;
     cout << endl;
     cout << "        Comparison Values" << endl;
@@ -1702,107 +1704,107 @@ int main(int argc, char *argv[]) {
     // points on circle sqrt(2)*ER in diameter (hemisphere map)
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;
-    p7.SetGround(0, -10);
+    p7->SetGround(0, -10);
     cout << "            SetGround(0, -10) returns ";                       
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(50, 80);                                                   
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(50, 80);                                                   
     cout << "            SetGround(50, 80) returns ";                       
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(0, -190);                                                  
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(0, -190);                                                  
     cout << "            SetGround(0, -190) returns ";                      
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(-50, -100);                                                
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(-50, -100);                                                
     cout << "            SetGround(-50, -100) returns ";                    
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
     cout << "        BACKWARD" << endl;                                     
-    p7.SetCoordinate(distToSide, 0);                                        
+    p7->SetCoordinate(distToSide, 0);                                        
     cout << "            SetCoordinate(DistanceToSide, 0) returns ";        
-    cout << "lat/lon = " << p7.Latitude()                                   
-                             << " / " << p7.Longitude() << endl;            
-    p7.SetCoordinate(0, distToTop);                                         
+    cout << "lat/lon = " << p7->Latitude()                                   
+                             << " / " << p7->Longitude() << endl;            
+    p7->SetCoordinate(0, distToTop);                                         
     cout << "            SetCoordinate(0, DistanceToTop) returns ";         
-    cout << "lat/lon = " << p7.Latitude() << " / "                          
-                             << p7.Longitude() << endl;                     
-    p7.SetCoordinate(-distToSide, 0);                                       
+    cout << "lat/lon = " << p7->Latitude() << " / "                          
+                             << p7->Longitude() << endl;                     
+    p7->SetCoordinate(-distToSide, 0);                                       
     cout << "            SetCoordinate(-DistanceToSide, 0) returns ";       
-    cout << "lat/lon = " << p7.Latitude()                                   
-                             << " / " << p7.Longitude() << endl;            
-    p7.SetCoordinate(0, -distToBottom);                                     
+    cout << "lat/lon = " << p7->Latitude()                                   
+                             << " / " << p7->Longitude() << endl;            
+    p7->SetCoordinate(0, -distToBottom);                                     
     cout << "            SetCoordinate(0, -DistanceToBottom) returns ";     
-    cout << "lat/lon = " << p7.Latitude()                                   
-                             << " / " << p7.Longitude() << endl;            
+    cout << "lat/lon = " << p7->Latitude()                                   
+                             << " / " << p7->Longitude() << endl;            
     cout << endl;                                                           
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "    Testing XYRange method " << endl;
     cout << "Given: " << endl;
-    cout << "    Minimum Latitude:  " << p7.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p7.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p7.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p7.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p7->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p7->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p7->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p7->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p7.XYRange(minX, maxX, minY, maxY);
+    p7->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
     cout << endl;
-    p7.SetGround(90, -100);                                                 
+    p7->SetGround(90, -100);                                                 
     cout << "            SetGround(90, -100) returns ";                     
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(-50, -100);                                               
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(-50, -100);                                               
     cout << "            SetGround(-50, -100) returns ";                    
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
     cout << endl;
 
 
 
-    p7.SetGround(50, 80);                                               
+    p7->SetGround(50, 80);                                               
     cout << "            SetGround(50, 80) returns ";                       
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
     cout << endl;
 
 
 
-    p7.SetGround(0, -190);                                                 
+    p7->SetGround(0, -190);                                                 
     cout << "            SetGround(0, -190) returns ";                      
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(0, -10);                                                  
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(0, -10);                                                  
     cout << "            SetGround(0, -10) returns ";                       
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(-40, -190);                                               
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(-40, -190);                                               
     cout << "            SetGround(-40, -190) returns ";                    
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(-40, -10);                                                
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(-40, -10);                                                
     cout << "            SetGround(-40, -10) returns ";                     
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
     cout << endl;
-    p7.SetGround(-20, -190);                                               
+    p7->SetGround(-20, -190);                                               
     cout << "            SetGround(-20, -190) returns ";                    
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(-20, -10);                                                
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(-20, -10);                                                
     cout << "            SetGround(-20, -10) returns ";                     
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(-21.5, -190);                                              
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(-21.5, -190);                                              
     cout << "            SetGround(-21.5, -190) returns ";                  
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
-    p7.SetGround(-21.5, -10);                                               
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
+    p7->SetGround(-21.5, -10);                                               
     cout << "            SetGround(-21.5, -10) returns ";                   
-    cout << "(x,y) = (" << p7.XCoord() << ", " << p7.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p7->XCoord() << ", " << p7->YCoord() << ")"<< endl;
     cout << endl;
-    p7.SetCoordinate(maxX, -2882473.6383627);                               
+    p7->SetCoordinate(maxX, -2882473.6383627);                               
     cout << "            SetCoordinate(maxX,-2882473.6383627) returns lat/lon = "
-         << p7.Latitude() << " / " << p7.Longitude()  << endl;                   
-    p7.SetCoordinate(0, maxY);                                                  
+         << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
+    p7->SetCoordinate(0, maxY);                                                  
     cout << "            SetCoordinate(0,maxY) returns lat/lon = "               
-         << p7.Latitude() << " / " << p7.Longitude()  << endl;                   
-    p7.SetCoordinate(minX, -2882473.6383627);                                    
+         << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
+    p7->SetCoordinate(minX, -2882473.6383627);                                    
     cout << "            SetCoordinate(minX,-2882473.6383627) returns lat/lon = "
-         << p7.Latitude() << " / " << p7.Longitude()  << endl;                   
-    p7.SetCoordinate(0, minY);                                                  
+         << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
+    p7->SetCoordinate(0, minY);                                                  
     cout << "            SetCoordinate(0,minY) returns lat/lon = "               
-         << p7.Latitude() << " / " << p7.Longitude()  << endl;                   
+         << p7->Latitude() << " / " << p7->Longitude()  << endl;                   
     cout << endl;
     cout << endl;
     cout << endl;
@@ -1817,65 +1819,65 @@ int main(int argc, char *argv[]) {
     mapGroup.findKeyword("MinimumLatitude").setValue("-90");
     mapGroup.findKeyword("MaximumLatitude").setValue("90.0");
     mapGroup.findKeyword("MinimumLongitude").setValue("-90.0");
-    Projection &p8 = *ProjectionFactory::Create(lab);
+    TProjection *p8 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl << endl;
-    cout << "EquatorialRadius = " << p8.EquatorialRadius() << endl;
-    cout << "PolarRadius = " << p8.PolarRadius() << endl;
-    cout << "Eccentricity = " << p8.Eccentricity() << endl;
-    cout << "TrueScaleLatitude = " << p8.TrueScaleLatitude() << endl << endl;
+    cout << "EquatorialRadius = " << p8->EquatorialRadius() << endl;
+    cout << "PolarRadius = " << p8->PolarRadius() << endl;
+    cout << "Eccentricity = " << p8->Eccentricity() << endl;
+    cout << "TrueScaleLatitude = " << p8->TrueScaleLatitude() << endl << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;   
     cout << endl;                                                            
     cout << "    Testing SetGround(30, -110)" << endl;                       
-    p8.SetGround(30, -110);                                                  
-    cout << "Latitude:            " << p8.Latitude() << endl;               
-    cout << "Longitude:           " << p8.Longitude() << endl;              
-    cout << "XCoord:              " << p8.XCoord() << endl;                 
-    cout << "YCoord:              " << p8.YCoord() << endl;                 
-    cout << "TrueScaleLat:           " << p8.TrueScaleLatitude() << endl;    
+    p8->SetGround(30, -110);                                                  
+    cout << "Latitude:            " << p8->Latitude() << endl;               
+    cout << "Longitude:           " << p8->Longitude() << endl;              
+    cout << "XCoord:              " << p8->XCoord() << endl;                 
+    cout << "YCoord:              " << p8->YCoord() << endl;                 
+    cout << "TrueScaleLat:           " << p8->TrueScaleLatitude() << endl;    
     cout << endl;                                                            
     cout << "\t\t\t\t/-----------------------------------------/" << endl;   
     cout << endl;                                                            
     cout << "    Testing SetCoordinate"
             "(-8761895.7861122, 5346904.00797488)" << endl;
     // choose output from forward direction to make sure we get lat=30, lon=-110
-    p8.SetCoordinate(-8761895.7861122, 5346904.00797488);                       
-    cout << "Latitude:            " << p8.Latitude() << endl;                   
-    cout << "Longitude:           " << p8.Longitude() << endl;                  
-    cout << "XCoord:              " << p8.XCoord() << endl;                     
-    cout << "YCoord:              " << p8.YCoord() << endl;                     
+    p8->SetCoordinate(-8761895.7861122, 5346904.00797488);                       
+    cout << "Latitude:            " << p8->Latitude() << endl;                   
+    cout << "Longitude:           " << p8->Longitude() << endl;                  
+    cout << "XCoord:              " << p8->XCoord() << endl;                     
+    cout << "YCoord:              " << p8->YCoord() << endl;                     
     cout << endl;                                                               
     cout << "\t\t\t\t/-----------------------------------------/" << endl;      
     cout << endl;
     cout << "    Testing projection to origin and back\n"
             "    SetGround(0, 0)" << endl;
-    p8.SetGround(0.0, 0.0);
-    cout << "Latitude:            " << p8.Latitude() << endl;
-    cout << "Longitude:           " << p8.Longitude() << endl;
-    cout << "XCoord:              " << p8.XCoord() << endl;
-    cout << "YCoord:              " << p8.YCoord() << endl;
+    p8->SetGround(0.0, 0.0);
+    cout << "Latitude:            " << p8->Latitude() << endl;
+    cout << "Longitude:           " << p8->Longitude() << endl;
+    cout << "XCoord:              " << p8->XCoord() << endl;
+    cout << "YCoord:              " << p8->YCoord() << endl;
     cout << "    SetCoordinate(0, 0)" << endl;
-    p8.SetCoordinate(0.0, 0.0);
-    cout << "Latitude:            " << p8.Latitude() << endl;
-    cout << "Longitude:           " << p8.Longitude() << endl;
-    cout << "XCoord:              " << p8.XCoord() << endl;
-    cout << "YCoord:              " << p8.YCoord() << endl;
+    p8->SetCoordinate(0.0, 0.0);
+    cout << "Latitude:            " << p8->Latitude() << endl;
+    cout << "Longitude:           " << p8->Longitude() << endl;
+    cout << "XCoord:              " << p8->XCoord() << endl;
+    cout << "YCoord:              " << p8->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
     cout << "    Testing projection to north pole and back\n"
             "    SetGround(90, 0)" << endl;
-    p8.SetGround(90.0, 0.0);
-    cout << "Latitude:                 " << p8.Latitude() << endl;
-    cout << "Longitude:                 " << p8.Longitude() << endl;
-    cout << "XCoord:                    " << p8.XCoord() << endl;
-    cout << "YCoord:              " << p8.YCoord() << endl;
+    p8->SetGround(90.0, 0.0);
+    cout << "Latitude:                 " << p8->Latitude() << endl;
+    cout << "Longitude:                 " << p8->Longitude() << endl;
+    cout << "XCoord:                    " << p8->XCoord() << endl;
+    cout << "YCoord:              " << p8->YCoord() << endl;
     cout << "    SetCoordinate(0, distFromEquatorToPole)" << endl;
-    p8.SetCoordinate(0.0, 8999766.9300905);
-    cout << "Latitude:                 " << p8.Latitude() << endl;
-    cout << "Longitude:               " << p8.Longitude() << endl;
-    cout << "XCoord:                    " << p8.XCoord() << endl;
-    cout << "YCoord:              " << p8.YCoord() << endl;
+    p8->SetCoordinate(0.0, 8999766.9300905);
+    cout << "Latitude:                 " << p8->Latitude() << endl;
+    cout << "Longitude:               " << p8->Longitude() << endl;
+    cout << "XCoord:                    " << p8->XCoord() << endl;
+    cout << "YCoord:              " << p8->YCoord() << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;   
@@ -1885,18 +1887,18 @@ int main(int argc, char *argv[]) {
     //     d = sqrt( (ER^2 + PR^2*factor) * (qp/2) )
     //     where factor = ln( (1+e) / (1-e) ) / (2e)
     //     and qp = 1 + (1 - e^2)*factor
-    rad = p8.EquatorialRadius();
-    // double pRad = p8.PolarRadius();                                             
+    rad = p8->EquatorialRadius();
+    // double pRad = p8->PolarRadius();                                             
     // double distToPole = sqrt(rad*rad + pRad*pRad);                              
     double equatorToPole = sqrt(2)/2 
                            * rad 
-                           * (1 - log((1 - p8.Eccentricity())
-                                       /(1 + p8.Eccentricity()))
-                                  * (1 - p8.Eccentricity() * p8.Eccentricity())
-                                  / (2 * p8.Eccentricity()));
-    // double factor = log( (1 + p8.Eccentricity()) / (1 - p8.Eccentricity()) ) / (2 * p8.Eccentricity());
+                           * (1 - log((1 - p8->Eccentricity())
+                                       /(1 + p8->Eccentricity()))
+                                  * (1 - p8->Eccentricity() * p8->Eccentricity())
+                                  / (2 * p8->Eccentricity()));
+    // double factor = log( (1 + p8->Eccentricity()) / (1 - p8->Eccentricity()) ) / (2 * p8->Eccentricity());
     // poleToEquator = sqrt(rad*rad + pRad*pRad*factor);     
-    // double qp = 1 + (1 - p8.Eccentricity() * p8.Eccentricity()) * factor;
+    // double qp = 1 + (1 - p8->Eccentricity() * p8->Eccentricity()) * factor;
     // double eTp = poleToEquator*sqrt( qp / 2 );
     cout << "    Testing other known points..." << endl;                                    
     cout << endl;                                                                           
@@ -1911,18 +1913,18 @@ int main(int argc, char *argv[]) {
     cout << "    Check known values on hemispherical map" << endl;
     cout << "        FORWARD" << endl;                            
                                                                   
-    p8.SetGround(0, 90);                                          
+    p8->SetGround(0, 90);                                          
     cout << "            SetGround(0, 90) returns ";              
-    cout << "(x,y) = (" << p8.XCoord() << ", " << p8.YCoord() << ")"<< endl;
-    p8.SetGround(90, 0);                                                    
+    cout << "(x,y) = (" << p8->XCoord() << ", " << p8->YCoord() << ")"<< endl;
+    p8->SetGround(90, 0);                                                    
     cout << "            SetGround(90, 0) returns ";                        
-    cout << "(x,y) = (" << p8.XCoord() << ", " << p8.YCoord() << ")"<< endl;
-    p8.SetGround(0, -90);                                                   
+    cout << "(x,y) = (" << p8->XCoord() << ", " << p8->YCoord() << ")"<< endl;
+    p8->SetGround(0, -90);                                                   
     cout << "            SetGround(0, -90) returns ";                       
-    cout << "(x,y) = (" << p8.XCoord() << ", " << p8.YCoord() << ")"<< endl;
-    p8.SetGround(-90, 0);                                                   
+    cout << "(x,y) = (" << p8->XCoord() << ", " << p8->YCoord() << ")"<< endl;
+    p8->SetGround(-90, 0);                                                   
     cout << "            SetGround(-90, 0) returns ";                       
-    cout << "(x,y) = (" << p8.XCoord() << ", " << p8.YCoord() << ")"<< endl;
+    cout << "(x,y) = (" << p8->XCoord() << ", " << p8->YCoord() << ")"<< endl;
     cout << endl;                                                           
     cout << "\t\t\t\t/-----------------------------------------/" << endl;  
     cout << endl;
@@ -1930,61 +1932,61 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "Given: " << endl;
     cout << std::setprecision(7);
-    cout << "    Minimum Latitude:  " << p8.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p8.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p8.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p8.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p8->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p8->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p8->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p8->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p8.XYRange(minX, maxX, minY, maxY);
+    p8->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
-    p8.SetCoordinate(maxX,0);
+    p8->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p8.Latitude() << " / " << p8.Longitude()  << endl;
-    p8.SetCoordinate(0, maxY);
+         << p8->Latitude() << " / " << p8->Longitude()  << endl;
+    p8->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p8.Latitude() << " / " << p8.Longitude()  << endl;
-    p8.SetCoordinate(minX,0);
+         << p8->Latitude() << " / " << p8->Longitude()  << endl;
+    p8->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p8.Latitude() << " / " << p8.Longitude()  << endl;
-    p8.SetCoordinate(0, minY);
+         << p8->Latitude() << " / " << p8->Longitude()  << endl;
+    p8->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p8.Latitude() << " / " << p8.Longitude()  << endl;
+         << p8->Latitude() << " / " << p8->Longitude()  << endl;
     cout << endl;
     mapGroup.findKeyword("MaximumLongitude").setValue("90.0");
-    Projection &p8a = *ProjectionFactory::Create(lab);
+    TProjection *p8a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "\t\t\t\t/-----------------------------------------/" << endl;  
     cout << endl;
     cout << "    Testing XYRange method " << endl;
     cout << endl;
     cout << "Given: " << endl;
     cout << std::setprecision(7);
-    cout << "    Minimum Latitude:  " << p8a.MinimumLatitude() << endl;
-    cout << "    Maximum Latitude:  " << p8a.MaximumLatitude() << endl;
-    cout << "    Minimum Longitude: " << p8a.MinimumLongitude() << endl;
-    cout << "    Maximum Longitude: " << p8a.MaximumLongitude() << endl << endl;
+    cout << "    Minimum Latitude:  " << p8a->MinimumLatitude() << endl;
+    cout << "    Maximum Latitude:  " << p8a->MaximumLatitude() << endl;
+    cout << "    Minimum Longitude: " << p8a->MinimumLongitude() << endl;
+    cout << "    Maximum Longitude: " << p8a->MaximumLongitude() << endl << endl;
     minX=0; maxX=0; minY=0; maxY=0;
-    p8a.XYRange(minX, maxX, minY, maxY);
+    p8a->XYRange(minX, maxX, minY, maxY);
     cout << "XYRange method returns" << endl;
     cout << "    Minimum X:  " << minX << endl;
     cout << "    Maximum X:  " << maxX << endl;
     cout << "    Minimum Y:  " << minY << endl;
     cout << "    Maximum Y:  " << maxY << endl;
-    p8a.SetCoordinate(maxX,0);
+    p8a->SetCoordinate(maxX,0);
     cout << "            SetCoordinate(maxX,0) returns lat/lon = " 
-         << p8a.Latitude() << " / " << p8a.Longitude()  << endl;
-    p8a.SetCoordinate(0, maxY);
+         << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
+    p8a->SetCoordinate(0, maxY);
     cout << "            SetCoordinate(0,maxY) returns lat/lon = " 
-         << p8a.Latitude() << " / " << p8a.Longitude()  << endl;
-    p8a.SetCoordinate(minX,0);
+         << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
+    p8a->SetCoordinate(minX,0);
     cout << "            SetCoordinate(minX,0) returns lat/lon = " 
-         << p8a.Latitude() << " / " << p8a.Longitude()  << endl;
-    p8a.SetCoordinate(0, minY);
+         << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
+    p8a->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
-         << p8a.Latitude() << " / " << p8a.Longitude()  << endl;
+         << p8a->Latitude() << " / " << p8a->Longitude()  << endl;
     cout << endl;
     cout << endl;
     cout << endl;
@@ -1994,17 +1996,17 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t\t TESTING OTHER METHODS          " << endl;
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    mapGroup.findKeyword("PolarRadius").setValue(toString(p8.EquatorialRadius()));
-    Projection &p9 = *ProjectionFactory::Create(lab);
-    Projection *s = &p1;
+    mapGroup.findKeyword("PolarRadius").setValue(toString(p8->EquatorialRadius()));
+    TProjection *p9 = (TProjection *) ProjectionFactory::Create(lab);
+    TProjection *s = p1;
     cout << "Name:                       " << s->Name() << endl;
-    cout << "Version:                    " << p1.Version() << endl;
-    cout << "Rotation:                   " << p1.Rotation() << endl;
-    cout << "TrueScaleLatitude:          " << p1.TrueScaleLatitude() << endl;
+    cout << "Version:                    " << p1->Version() << endl;
+    cout << "Rotation:                   " << p1->Rotation() << endl;
+    cout << "TrueScaleLatitude:          " << p1->TrueScaleLatitude() << endl;
     cout << "Testing operator==  (True): " << (*s == *s) << endl;
-    cout << "Testing operator==  (True): " << (*s == p1) << endl;
+    cout << "Testing operator==  (True): " << (*s == proj) << endl;
     // different lat/lon range, all other properties the same
-    cout << "Testing operator==  (True): " << (p1 == p1a) << endl;
+    cout << "Testing operator==  (True): " << (*p1 == *p1a) << endl;
     // different CenterLatitude
     cout << "Testing operator==  (False-different CenterLatitude):   " << (p3 == p4) << endl;
     // same CenterLatitude, different CenterLongitude
@@ -2028,9 +2030,9 @@ int main(int argc, char *argv[]) {
     Pvl tmp1;
     Pvl tmp2;
     Pvl tmp3;
-    tmp1.addGroup(p1.Mapping());
-    tmp2.addGroup(p1.MappingLatitudes());
-    tmp3.addGroup(p1.MappingLongitudes());
+    tmp1.addGroup(p1->Mapping());
+    tmp2.addGroup(p1->MappingLatitudes());
+    tmp3.addGroup(p1->MappingLongitudes());
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;
     cout << "MappingLatitudes() = " << endl;
@@ -2048,25 +2050,25 @@ int main(int argc, char *argv[]) {
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     cout << "Set Ground using invalid Latitude/Longitude value" << endl;
-    cout << "SetGround(-91, 0):     " << p1.SetGround(-91.0,  0.0) << endl;
-    cout << "SetGround(Null, 0):    " << p1.SetGround( Null,  0.0) << endl;
-    cout << "SetGround(0, Null):    " << p1.SetGround( 0.0,  Null) << endl;
+    cout << "SetGround(-91, 0):     " << p1->SetGround(-91.0,  0.0) << endl;
+    cout << "SetGround(Null, 0):    " << p1->SetGround( Null,  0.0) << endl;
+    cout << "SetGround(0, Null):    " << p1->SetGround( 0.0,  Null) << endl;
     cout << "Antipodal point for center lat/lon = 0/0:" << endl;
-    cout << "SetGround(0, 180):     " << p1.SetGround( 0.0,   180) << endl;
-    cout << "SetGround(0, -180):    " << p1.SetGround( 0.0,  -180) << endl;
-    cout << "SetGround(0, 180):     " << p8.SetGround( 0.0,   180) << endl;
-    cout << "SetGround(0, -180):    " << p8.SetGround( 0.0,  -180) << endl;
+    cout << "SetGround(0, 180):     " << p1->SetGround( 0.0,   180) << endl;
+    cout << "SetGround(0, -180):    " << p1->SetGround( 0.0,  -180) << endl;
+    cout << "SetGround(0, 180):     " << p8->SetGround( 0.0,   180) << endl;
+    cout << "SetGround(0, -180):    " << p8->SetGround( 0.0,  -180) << endl;
     cout << "Antipodal point for center lat/lon = 40/-100:" << endl;
-    cout << "SetGround(-40,   80):     " << p2.SetGround(-40.0,   80) << endl;
-    cout << "SetGround(-40, -280):     " << p2.SetGround(-40.0, -280) << endl;
-    cout << "SetGround(-40,   80):     " << p7.SetGround(-40.0,   80) << endl;
-    cout << "SetGround(-40, -280):     " << p7.SetGround(-40.0, -280) << endl;
+    cout << "SetGround(-40,   80):     " << p2->SetGround(-40.0,   80) << endl;
+    cout << "SetGround(-40, -280):     " << p2->SetGround(-40.0, -280) << endl;
+    cout << "SetGround(-40,   80):     " << p7->SetGround(-40.0,   80) << endl;
+    cout << "SetGround(-40, -280):     " << p7->SetGround(-40.0, -280) << endl;
     cout << "Set Coordinate using invalid x/y value" << endl;
-    cout << "SetCoordinate(Null, 0):    " << p1.SetCoordinate(Null, 0.0) << endl;
-    cout << "SetCoordinate(0, Null):    " << p1.SetCoordinate(0.0,  Null) << endl;
+    cout << "SetCoordinate(Null, 0):    " << p1->SetCoordinate(Null, 0.0) << endl;
+    cout << "SetCoordinate(0, Null):    " << p1->SetCoordinate(0.0,  Null) << endl;
     cout << "Set Coordinate using x/y value off the planet" << endl;
-    cout << "SetCoordinate(100, 0):    " << p1.SetCoordinate(100,  0) << endl;
-    cout << "SetCoordinate(0, -100):   " << p1.SetCoordinate(0, -100) << endl;
+    cout << "SetCoordinate(100, 0):    " << p1->SetCoordinate(100,  0) << endl;
+    cout << "SetCoordinate(0, -100):   " << p1->SetCoordinate(0, -100) << endl;
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;

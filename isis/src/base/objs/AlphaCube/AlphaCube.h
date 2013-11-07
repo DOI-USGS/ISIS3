@@ -26,6 +26,8 @@
 #include "Pvl.h"
 
 namespace Isis {
+  class Cube;
+
   /**
    * @brief This class is used to rewrite the "alpha" keywords out of the
    * AlphaCube group or Instrument group.
@@ -47,14 +49,18 @@ namespace Isis {
    *                           occured when a cube label did not already have a AlphaCube group.
    *   @history 2005-02-14 Leah Dahmer - Modified file to support Doxygen
    *                           documentation.
-   *   @history 2013-08-08 Kimberly Oyama - Made the Pvl parameter of the constructor
-   *                           const. Fixes #1744.
+   *   @history 2012-09-06 Steven Lambright - Changed the Pvl constructor to take a Cube instead.
+   *                           This was to prevent duplicating complicated label parsing code. This
+   *                           should eventually be refactored into a CubeLabel or similar object
+   *                           so that an actual cube isn't required in the future, but for now
+   *                           this enables the control net GUI to create a camera from a cube
+   *                           with no dimensions in the label.
    *
    *   @todo 2005-04-06 Add coded example.
    */
   class AlphaCube {
     public:
-      AlphaCube(const Isis::Pvl &pvl);
+      AlphaCube(Cube &cube);
       AlphaCube(int alphaSamples, int alphaLines,
                 int betaSamples, int betaLines);
       AlphaCube(int alphaSamples, int alphaLines,
@@ -97,7 +103,7 @@ namespace Isis {
         return (alphaSample - p_alphaStartingSample) / p_sampSlope + 0.5;
       }
 
-      void UpdateGroup(Isis::Pvl &pvl);
+      void UpdateGroup(Cube &cube);
 
       void Rehash(AlphaCube &alphaCube);
 

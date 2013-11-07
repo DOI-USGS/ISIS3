@@ -44,8 +44,9 @@ namespace Isis {
    *                          time to maintain consistency with other Clementine
    *                          models. 
    */
-  HiresCamera::HiresCamera(Pvl &lab) : FramingCamera(lab) {
+  HiresCamera::HiresCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
+    Pvl &lab = *cube.label();
     // Get the camera characteristics
     QString filter = (QString)(lab.findGroup("BandBin", Pvl::Traverse))["FilterName"];
     filter = filter.toUpper();
@@ -54,7 +55,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
     double time = iTime((QString)inst["StartTime"]).Et();
@@ -138,6 +139,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Clementine namespace.
  */
-extern "C" Isis::Camera *HiresCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::HiresCamera(lab);
+extern "C" Isis::Camera *HiresCameraPlugin(Isis::Cube &cube) {
+  return new Isis::HiresCamera(cube);
 }

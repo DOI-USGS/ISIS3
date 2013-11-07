@@ -27,6 +27,7 @@
 
 
 namespace Isis {
+  class Distance;
   class Latitude;
   class Longitude;
 
@@ -84,6 +85,10 @@ namespace Isis {
                                  const double uz);
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
+      bool SetGroundwithLatitudeLongitude(const Latitude &lat,
+                                        const Longitude &lon);
+      bool SetGroundwithRadiusLongitude(const double &radius,
+                                        const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
 
       void Init(Pvl &lab);
@@ -124,8 +129,11 @@ namespace Isis {
       Latitude *p_maxLat;                        //!< Maximum latitude 
       Longitude *p_minLon;                       //!< Minimum longitude
       Longitude *p_maxLon;                       //!< Maximum longitude
-      QVector< QVector<Latitude> >  *p_latMap;   //!< Latitude map     
-      QVector< QVector<Longitude> > *p_lonMap;   //!< Longitude map    
+      Distance *p_minRadius;                     //!< Minimum radius
+      Distance *p_maxRadius;                     //!< Maximum radius
+      QVector< QVector<Latitude> >  *p_latMap;   //!< Latitude map
+      QVector< QVector<Longitude> > *p_lonMap;   //!< Longitude map
+      QVector< QVector<Distance> > *p_radiusMap; //!< Radius map
   };
 };
 #endif

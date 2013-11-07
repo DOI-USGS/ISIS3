@@ -52,9 +52,9 @@ int main(void) {
     double knownLat = -24.2744713106319;
     double knownLon = 180.6234120834806;
 
-    Pvl p("$viking2/testData/f348b26.cub");
-    VikingCamera *cam = (VikingCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube c("$viking2/testData/f348b26.cub", "r");
+    VikingCamera *cam = (VikingCamera *) CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -67,7 +67,7 @@ int main(void) {
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
     // Test Shutter Open/Close 
-    const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time

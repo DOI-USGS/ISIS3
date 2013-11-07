@@ -14,7 +14,7 @@ namespace Isis {
    */
   TableMainWindow::TableMainWindow(QString title, QWidget *parent) : MainWindow(title, parent) {
     p_parent = parent;
-    connect(p_parent, SIGNAL(closeWindow()), this, SLOT(writeSettings()));
+    
     p_title = title;
     p_table = NULL;
     p_visibleColumns = -1;
@@ -28,7 +28,6 @@ namespace Isis {
 
 
   TableMainWindow::~TableMainWindow() {
-    close();
   }
 
 

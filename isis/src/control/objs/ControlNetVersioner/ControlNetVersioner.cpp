@@ -17,7 +17,7 @@
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Progress.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -471,7 +471,7 @@ namespace Isis {
 
     PvlGroup radii;
     try {
-      radii = Projection::TargetRadii(network["TargetName"]);
+      radii = TProjection::TargetRadii(network["TargetName"]);
     }
     catch(IException &e) {
       try {

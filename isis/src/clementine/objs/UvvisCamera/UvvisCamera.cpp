@@ -41,13 +41,14 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.  Added
    *                          call to ShutterOpenCloseTimes() method.
    */
-  UvvisCamera::UvvisCamera(Pvl &lab) : FramingCamera(lab) {
+  UvvisCamera::UvvisCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
     // Get the camera characteristics
     SetFocalLength();
     SetPixelPitch();
 
     // Get the start time in et
+    Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
@@ -123,6 +124,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Clementine namespace.
  */
-extern "C" Isis::Camera *UvvisCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::UvvisCamera(lab);
+extern "C" Isis::Camera *UvvisCameraPlugin(Isis::Cube &cube) {
+  return new Isis::UvvisCamera(cube);
 }

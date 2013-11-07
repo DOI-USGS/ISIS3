@@ -23,6 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+// This is needed for the QVariant macro
+#include <QMetaType>
+
 #include <QObject> // parent class
 
 #include <map>
@@ -36,6 +39,9 @@ template< typename A, typename B > class QHash;
 template< typename T > class QList;
 template< typename A, typename B > class QPair;
 template< typename T > class QSet;
+class QMutex;
+class QString;
+
 
 namespace Isis {
   class Camera;
@@ -163,7 +169,15 @@ namespace Isis {
    *                           set all measure/point JigsawRejected flags to
    *                           false prior to bundle adjustment.
    *   @history 2012-04-13 Orrin Thomas Added method sortedMeasureList, and functor
-   *                           ControlMeasureLessThanFunctor
+   *                           ControlMeasureLessThanFunctor.
+   *   @history 2012-11-22 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
+   *   @history 2012-09-11 Tracie Sucharski - Added a Mutex and MutexLocker for the SetTarget
+   *                           method.
+   *   @history 2012-09-26 Steven Lambright - Fixed assignment operator to return a non-const
+   *                           ControlNet reference. Added swap(). Refactored assignment
+   *                           operator to use copy-and-swap idiom which fixed a bug where
+   *                           you couldn't access control points by index after an assignment.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -243,12 +257,15 @@ namespace Isis {
       void SetDescription(const QString &newDescription);
       void SetImages(const QString &imageListFile);
       void SetImages(SerialNumberList &list, Progress *progress = 0);
+
       void SetModifiedDate(const QString &date);
+      void SetMutex(QMutex *mutex);
       void SetNetworkId(const QString &id);
       void SetTarget(const QString &target);
       void SetUserName(const QString &name);
 
-      const ControlNet &operator=(ControlNet other);
+      void swap(ControlNet &other);
+      ControlNet &operator=(const ControlNet &other);
 
       const ControlPoint *operator[](QString id) const;
       ControlPoint *operator[](QString id);
@@ -374,6 +391,7 @@ namespace Isis {
       //! hash ControlCubeGraphNodes by CubeSerialNumber
       QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes;
       QStringList *pointIds;
+      QMutex *m_mutex;
 
       QString p_targetName;            //!< Name of the target
       QString p_networkId;             //!< The Network Id
@@ -391,5 +409,8 @@ namespace Isis {
       bool p_invalid;  //!< If the Control Network is currently invalid
   };
 }
+
+//! This allows ControlNet *'s to be stored in a QVariant.
+Q_DECLARE_METATYPE(Isis::ControlNet *);
 
 #endif

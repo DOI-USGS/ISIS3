@@ -1,0 +1,7 @@
+Group = RingCylindrical
+  Library = RingCylindrical
+  Routine = RingCylindricalPlugin
+  Keyword = CenterAzimuth
+  Keyword = CenterRadius
+EndGroup
+ 

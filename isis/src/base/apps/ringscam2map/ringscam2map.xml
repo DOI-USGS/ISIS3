@@ -1,0 +1,1121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="ringscam2map" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Convert camera image to a map projection
+  </brief>
+
+  <description>
+    This program projects an ISIS <def link="Level0">level0</def> or <def link="Level1">level1</def> 
+    <def link="Cube">cube</def> to a <def link="MAP">map</def> (ISIS <def link="Level2">level2</def> cube).  
+    The input cube requires <def>SPICE</def> data and therefore the program <i>spiceinit</i> should
+    be run on it with shape set to RingPlane prior to <i>ringscam2map</i>.  The 
+    <def link="Map Projection">map projection</def> is defined using a <def>PVL</def> file 
+    specified with the MAP parameter.  The system default is to use the Planar projection 
+    ($ISIS3DATA/base/templates/maps/planar.map).  To learn more about using map projections in 
+    ISIS, refer to the ISIS Workshop 
+    <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections">
+    "Learning About Map Projections"</a>.
+
+    <p>If you need to generate your own map file you can use the <i>maptemplate</i> program or 
+    alternatively, hand create a file using your favorite editor.  The file need only specify the 
+    ProjectionName as defaults will be computed for the remaining map file parameters.  The 
+    following table indicates how the defaults are established:
+    </p>
+
+    <table border="1">
+      <tr>
+        <td>PARAMETER</td>
+        <td>DEFAULT</td>
+      </tr>
+
+      <tr>
+        <td>TargetName</td>
+        <td>Read from Instrument group in the input cube labels</td>
+      </tr>
+
+      <tr>
+        <td>RingLongitudeDirection</td>
+        <td>CounterClockwise</td>
+      </tr>
+
+      <tr>
+        <td>RingLongitudeDomain</td>
+        <td>Normally, 360.  However, if the 180 domain causes less area to need to be projected then 180.</td>
+      </tr>
+
+      <tr>
+        <td>MinimumRingRadius<br />MaximumRingRadius<br />MinimumRingLongitude<br />MaximumRingLongitude</td>
+        <td>Computed from the input cube or read from the map file.   However, any combination of the 
+        four values can then be overridden by the user.  The values the user specifies are expected 
+        to be in the coodinate system of the projection.</td>
+      </tr>
+
+      <tr>
+        <td><def>PixelResolution</def><br /><def>Scale</def></td>
+        <td>Computed from the input cube or read from the map file.  The value can be overridden by the user.</td>
+      </tr>
+
+    </table>
+
+    <p>
+      If you only entered the input cube (FROM) and output cube (TO) and changed no other 
+      parameters the following is the default Mapping group:
+    </p>
+    <pre>
+  Group = Mapping
+    TargetName             = Obtained from the Instrument group
+
+    RingLongitudeDirection     = CounterClockwise
+    RingLongitudeDomain        = 360 (Could be automatically adjusted to 180 by RINGLONSEAM)
+
+    MinimumRingRadius          = Computed from the input camera cube
+    MaximumRingRadius           = Computed from the input camera cube
+    MinimumRingLongitude          = Computed from the input camera cube
+    MaximumRingLongitude          = Computed from the input camera cube
+
+    ProjectionName         = Planar
+    CenterRingLongitude        = Average of MinimumRingLongitude and MaximumRingLongitude
+    PixelResolution        = Computed from the input camera cube
+  EndGroup
+    </pre>
+
+   The map file can be an existing map projected (level2) cube.  A level2 cube has PVL labels 
+   and contains the Mapping group.  Depending on the values of the input parameters, the output 
+   cube can use some or all of the keyword values of the map file.  For instance, setting 
+   MATCHMAP = true causes all of the mapping parameters to come from the map file, resulting 
+   in an output cube having the same number of <def link="Line">lines</def> and 
+   <def link="Sample">samples</def> as the map file.  If MATCHMAP = true and the map file is 
+   missing a keyword like PixelResolution, the application will fail with a PVL error.  Setting 
+   MATCHMAP=false allows for some of the mapping components to be overridden by the user or 
+   computed from the FROM cube.
+   
+
+   <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, 
+   RingLongitudeDirection,  RingLongitudeDomain, ProjectionName, and projection specific parameters
+   (e.g., CenterRingLongitude, CenterRingRadius) are the same for all cubes. That is,  you should 
+   create one map file and use it as input for all the cubes in your mosaic.  By letting the 
+   minimum and maximum ring radius and ring longitude values default, the application will 
+   determine the coverage of each image.  However, if the mosaic Ring Radius and Ring Longitude 
+   range is entered, each output image will be projected to the full  size of the mosaic resulting 
+   in large file sizes and images with many <def>NULL</def> pixels.  
+
+   The following Mapping group could be used for mosaicking:
+   </p>
+   <pre>
+ Group = Mapping
+   ProjectionName         = Planar
+   CenterRingLongitude        = 0
+   PixelResolution        = 10000 &lt;meters&gt;
+ EndGroup
+   </pre>
+
+   <p>
+     Finally, depending on the projection, problems can occur with cubes that fall on the 
+     projection ring longitude seam.  For example, if you are making a mosaic with 
+     RingLongitudeDomain = 360 and your cube crosses 0/360 seam, this program would compute the 
+     default ring longitude range of the cube to MinimumRingLongitude = 0 and 
+     MaximumRingLongitude = 360.  A very large output image could be created 
+     depending on the pixel resolution.  The RINGLONSEAM parameter allows you to selectively handle
+     this case. If you are making mosaics near the seam you will need to understand and alter the 
+     default for this parameter.
+     <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections#Problems_at_the_Longitude_Seams">
+     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to 
+     help illustrate the problem. Note that if the user chooses to match the map file, then the 
+     user can not set this parameter. The program will behave as if RINGLONSEAM="CONTINUE".
+   </p>
+  </description>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <history>
+    <change name="Kay Edwards" date="1986-09-02">
+      Original version
+    </change>
+    <change name="Jeff Anderson" date="2003-05-02">
+      Converted to Isis 3.0
+    </change>
+    <change name="Jeff Anderson" date="2003-06-05">
+      Added to Camera category
+    </change>
+    <change name="Stuart Sides" date="2003-07-29">
+      Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2003-12-01">
+      Reworked defaults for user parameters
+    </change>
+    <change name="Jeff Anderson" date="2004-01-21">
+      Modified resolution parameters to eliminate inclusion/exclusion
+      dependences.
+    </change>
+    <change name="Jeff Anderson" date="2004-02-13">
+      Added AUTOLON parameter
+    </change>
+    <change name="Jeff Anderson" date="2004-02-25">
+      Fixed bug with ground range user option
+    </change>
+    <change name="Elizabeth Miller" date="2005-10-25">
+        Added appTest
+    </change>
+    <change name="Jacob Danton" date="2005-12-02">
+        Updated appTest
+    </change>
+     <change name="Elizabeth Miller" date="2006-03-23">
+       Fixed appTest to reflect changes made in all camera models
+     </change>
+     <change name="Tracie Sucharski" date="2006-04-04">
+        Check to see if center of input image projects, if it does, force the  tile containing center
+        to be processed in ProcessRubberSheet.
+     </change>
+     <change name="Jeff Anderson" date="2006-04-04">
+       Reworked user interface
+     </change>
+     <change name="Elizabeth Miller" date="2006-04-10">
+       Reworked code for new user interface and added helper buttons
+     </change>
+     <change name="Elizabeth Miller" date="2006-05-18">
+       Depricated CubeProjection and ProjectionManager to ProjectionFactory
+     </change>
+     <change name="Elizabeth Miller" date="2006-05-30">
+       Moved Helper buttons and fixed error checking in helper methods
+     </change>
+     <change name="Elizabeth Miller" date="2006-09-06">
+       Modified call to ProjectionFactory CreateForCube method to include a value of false
+       for the newly added sizeMatch parameter
+     </change>
+     <change name="Jeff Anderson" date="2006-12-06">
+       Test to see if target is sky and abort
+     </change>
+     <change name="Jeff Anderson" date="2007-03-13">
+       Add minimize option for DEFAULTRANGE
+     </change>
+     <change name="Steven Lambright" date="2007-06-22">
+       Fixed typo and corrected XML
+     </change>
+     <change name="Steven Lambright" date="2007-08-22">
+       Fixed lonseam option to work with minimize option correctly
+     </change>
+     <change name="Stuart Sides" date="2008-02-11"> 
+       Fixed bug where the ground range was not pulled from the map file when 
+       it was supposed to be (using DEFAULTRANGE = MAP).
+     </change>
+     <change name="Christopher Austin" date="2008-04-18">
+       Added the MATCHMAP option.
+     </change>
+     <change name="Steven Lambright" date="2008-05-12">
+       Removed references to CubeInfo 
+     </change>
+     <change name="Christopher Austin" date="2008-07-15">
+       Changed MATCHMAP to default off
+     </change>
+     <change name="Steven Lambright" date="2008-08-04">
+       Changed MATCHMAP to have exclusions. If MATCHMAP is true, the PIXRES and DEFAULTRANGE 
+       options can not be set. Changed the code to enforce MATCHMAP.
+     </change>
+     <change name="Steven Lambright" date="2008-09-10">
+       Added the ability to change ProcessRubberSheet's tiling sizes. Now the Camera will decide upon the
+       tiling sizes used in ProcessRubberSheet, in order to fix problems found with the push frame cameras which
+       have small framelet sizes (less than 64 pixels tall). This is a passive ability with respect to the user; 
+       no options or differences should be noticable.
+     </change>
+     <change name="Christopher Austin" date="2008-10-31">
+      Fixed DEFAULTRANGE > CAMERA option to accept MINLAT, MAXLAT, MINLON, and MAXLON
+      as overriding values.
+     </change>
+     <change name="Christopher Austin" date="2009-01-27">
+       Fixed parameter names.
+     </change>
+     <change name="Travis Addair" date="2009-08-10">
+       Mapping group parameters are now placed into the print file.
+     </change>
+     <change name="Steven Lambright" date="2011-01-31">
+       Improved documentation
+     </change>
+     <change name="Jai Rideout" date="2011-02-10">
+       Print file now includes PixelResolution, Scale, UpperLeftCornerX, and UpperLeftCornerY in Mapping group.
+     </change>
+     <change name="Lynn Weller and Debbie A. Cook" date="2012-01-17">
+       Updated documentation text, added glossary links, and improved compatability with Isis documentation.
+     </change>
+     <change name="Jeff Anderson" date="2012-04-30">
+       Add forward and reverse patch rubbersheeting parameters.  
+     </change>
+     <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+     </change>
+     <change name="Ken Edmundson and Debbie A. Cook" date="2013-03-06">
+       Revised to work with ring data. References #975.
+     </change>
+     <change name="Jeannie Backer" date="2013-03-12">
+       Added appTests.  Test coverage appears low (60% scope, 60% line, 38% function), however these
+       tests cover a large portion in all three categories for the code that does not apply to the GUI helper methods. 
+        References #775.
+     </change>
+     <change name="Jeannie Backer" date="2013-03-12">
+       Re-added "if MATCHMAP" statements since the IsisAml is not interpreting exclusions as expected. 
+       Added exclusion - if MATCHMAP is true, then the parameter RINGLONSEAM is excluded. References #775.
+     </change>
+  </history>
+
+  <oldName>
+    <item>cam2map</item>
+    <item>lev1tolev2</item>
+    <item>plansinu</item>
+    <item>planorth</item>
+
+
+  </oldName>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube to project
+        </brief>
+        <description>
+          The specification of the input cube to be projected.  The cube must
+          have been initialized using the <i>spiceinit</i> program
+          with shape set to RingPlane.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="MAP">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing mapping parameters
+        </brief>
+        <defaultPath>$base/templates/maps</defaultPath>
+        <default><item>$base/templates/maps/planar.map</item></default>
+        <description>
+          A file containing the desired output mapping parameters in PVL.  This
+          file can be a simple label file, hand produced, or created via
+          the <i>maptemplate</i> program.  It can also be an existing cube or cube label
+          which contains a Mapping group.  In the latter case the FROM cube
+          will be transformed into the same map projection, resolution, etc.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>PrintMap</function>
+            <brief>View MapFile</brief>
+            <description>
+              This helper button will cat out the mapping group of the given mapfile to the session log
+               of the application
+             </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
+        <filter>
+          *.map *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Newly mapped cube
+        </brief>
+        <description>
+          This file is the map projected (level2) image.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      <parameter name="MATCHMAP">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Match the map file</brief>
+        <description>
+	  This forces all of the mapping parameters to come from the
+	  map file.  Additionally, when the map file is an image the TO file will have the
+	  same number of lines and samples as the map file.
+        </description>
+        <exclusions>
+          <item>PIXRES</item>
+          <item>RESOLUTION</item>
+          <item>DEFAULTRANGE</item>
+          <item>MINRINGRAD</item>
+          <item>MAXRINGRAD</item>
+          <item>MINRINGLON</item>
+          <item>MAXRINGLON</item>
+          <item>RINGLONSEAM</item>
+        </exclusions>
+      </parameter>
+    </group>
+
+    <group name="Output Map Resolution">
+      <parameter name="PIXRES">
+        <type>string</type>
+        <brief>Defines how the pixel resolution in the output map file is obtained</brief>
+        <default><item>CAMERA</item></default>
+        <description>
+          This parameter is used to specify how the pixel resolution is obtained for the output map
+          projected cube.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>LoadCameraRes</function>
+            <brief>Load Camera Resolution </brief>
+            <description>This helper button will load the default resolution from the camera</description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+          <helper name="H2">
+            <function>LoadMapRes</function>
+            <brief>Load Map File Resolution </brief>
+            <description>This helper button will load the default resolution from the map file</description>
+          </helper>
+        </helpers>
+        <list>
+           <option value="CAMERA">
+              <brief>Compute resolution from input cube</brief>
+              <description>
+                This option will automatically determine the resolution from the input  cube specified using the FROM parameter.
+              </description>
+              <exclusions>
+                <item>RESOLUTION</item>
+              </exclusions>
+            </option>
+
+           <option value="MAP">
+              <brief>Read resolution from input map file</brief>
+              <description>
+                This option will use either the PixelResolution (meters/pixel) or Scale (pixels/degree) in the map file.
+              </description>
+              <exclusions>
+                <item>RESOLUTION</item>
+              </exclusions>
+            </option>
+
+           <option value="MPP">
+              <brief> Get resolution from user in meters per pixel</brief>
+              <description>
+                This option allows the user to specify the resolution in meters per pixel using the RESOLUTION parameter
+              </description>
+              <inclusions>
+                <item>RESOLUTION</item>
+              </inclusions>
+            </option>
+
+           <option value="PPD">
+              <brief> Get resolution from user in pixels per degree</brief>
+              <description>
+                This option allows the user to specify the resolution in pixels per degree using the RESOLUTION parameter
+              </description>
+              <inclusions>
+                <item>RESOLUTION</item>
+              </inclusions>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name="RESOLUTION">
+        <type>double</type>
+        <brief>Pixel resolution</brief>
+        <description>
+          Specifies the resolution in either meters per pixel or pixels per degree
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+    </group>
+
+    <group name="Output Map Ground Range">
+      <parameter name="DEFAULTRANGE">
+        <type>string</type>
+        <brief>Defines how the default ground range is determined</brief>
+        <default><item>MINIMIZE</item></default>
+        <description>
+          This parameter is used to specify how the default ring ground ranges (radius and 
+          longitude) for the output map projected image is obtained.  The ground range can be 
+          obtained from the camera or map file.  Note the user can overide the default using the 
+          MINRINGRAD, MAXRINGRAD, MINRINGLON, MAXRINGLON parameters.  The purpose of the ground 
+          range is to define the coverage of the map projected image.  Essentially, the ground 
+          range and pixel resolution are used to compute the size (samples and line) of the output image.
+        </description>
+
+        <helpers>
+          <helper name="H1">
+            <function>LoadCameraRange</function>
+            <brief>Load Camera Ground Range </brief>
+            <description>This helper button will load the default ground range from the camera</description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+          <helper name="H2">
+            <function>LoadMapRange</function>
+            <brief>Load Map File Ground Range </brief>
+            <description>This helper button will load the default ground range from the map file</description>
+          </helper>
+        </helpers>
+
+        <list>
+          <option value="MINIMIZE">
+             <brief>Minimize output image size</brief>
+             <description>
+               This option will use the camera and projection in combination to ensure the output 
+               image size (samples, lines) is minimized.  Using a ground range can cause NULL 
+               padding for projections with curved merdians and/or parallels and hence large output
+               images.  The amount of padding can be quite large for extremely high resolution maps.
+             </description>
+             <inclusions><item>RINGLONSEAM</item></inclusions>
+             <exclusions>
+               <item>MINRINGRAD</item>
+               <item>MAXRINGRAD</item>
+               <item>MINRINGLON</item>
+               <item>MAXRINGLON</item>
+               <item>TRIM</item>
+             </exclusions>
+           </option>
+
+           <option value="CAMERA">
+              <brief> Compute default range from input cube</brief>
+              <description>
+                This option will automatically determine the ring radius range 
+                (mininum ring radius, maximum ring radius) and the ring longitude 
+                range (minimum ring longitude, maximum ring longitude) from the input 
+                camera model cube specified using the FROM parameter.
+              </description>
+              <inclusions><item>RINGLONSEAM</item></inclusions>
+            </option>
+
+           <option value="MAP">
+              <brief> Read default range from map file</brief>
+              <description>
+                This option will read the ring ranges (RingRadiusMininum,  RingRadiusMaximum, 
+                RingLongitudeMinimum and RingLongitudeMaximum keywords) from the input map file.  
+                All four values are expected to be defined.
+              </description>
+              <exclusions><item>RINGLONSEAM</item></exclusions>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name="MINRINGRAD">
+        <type>double</type>
+        <brief>Minimum Ring Radius</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The minimum ring radius of the output map.   If this is entered by the user it will override 
+          the default camera or map value.  Units are meters.
+        </description>
+
+        <minimum inclusive="yes">0.</minimum>
+        <maximum inclusive="yes">9999999999.0</maximum>
+      </parameter>
+
+      <parameter name="MAXRINGRAD">
+        <type>double</type>
+        <brief>Maximum Ring Radius</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The maximum ring radius of the output map.   If this is entered by the user it will override 
+          the default camera or map value.  Units are meters. 
+        </description>
+        <minimum inclusive="yes">0.0</minimum>
+        <maximum inclusive="yes">999999999999.0</maximum>
+        <greaterThan><item>MINRINGRAD</item></greaterThan>
+      </parameter>
+
+      <parameter name="MINRINGLON">
+        <type>double</type>
+        <brief>Minimum Ring Longitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The minimum ring longitude of the output map.   If this is entered by the user it will override 
+          the default camera or map value.  By default, clockwise ring longitudes in the range of 0 to 
+          360 are assumed unless the map file specifies otherwise.
+        </description>
+      </parameter>
+
+      <parameter name="MAXRINGLON">
+        <type>double</type>
+        <brief>Maximum Ring Longitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The maximum ring longitude of the output map.   If this is entered by the user it will override the 
+          default camera or map value.  By default, positive east ring longitudes in the range of 0 to 360 
+          are assumed unless the map file specifies otherwise.
+        </description>
+        <greaterThan><item>MINRINGLON</item></greaterThan>
+      </parameter>
+
+      <parameter name="TRIM">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Null all pixels outside rad/az boundaries
+        </brief>
+        <description>
+          If this option is selected, pixels outside the ring radius range or the ring longitude
+          range will be trimmed (set to null).
+          This is useful for certain projections whose lines of ring radius and
+          ring longitude are not parallel to image lines and sample columns.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Ring Longitude Seam Options">
+      <parameter name="RINGLONSEAM">
+        <type>string</type>
+        <default><item>AUTO</item></default>
+        <brief>
+          How should images at the ring longitude seam be handled
+        </brief>
+        <description>
+          With this option you can turn on/off the automatic ring longitude domain switching that occurs
+          when a file crosses the boundary of the ring longitude domain (0 to 360 or -180 to 180).  If 
+          the automatic switching is turned off, then you have the choice of making the program continue or 
+          exit when the cube does cross the boundary.
+        </description>
+
+        <list>
+           <option value="AUTO">
+              <brief>If the cube crosses the seam, automatically switch the RingLongitudeDomain.</brief>
+              <description>
+                If the cube crosses the ring longitude seam, then the program will automatically 
+                compute the RingLongitudeDomain. When the cube is near 0 or 360 degrees, the 
+                program will assume 180 RingLongitudeDomain. When the cube is near 180 or -180 
+                degrees, the program will assume 360 RingLongitudeDomain.
+              </description>
+            </option>
+
+           <option value="ERROR">
+              <brief>If the cube crosses the seam, abort the program.</brief>
+              <description>
+                If the cube has a LongitudeDomain of 360 and the image crosses the seam at 0/360 degrees or
+                or the cube has a LongitudeDomain of 180 and the image crosses the seam at -180/180 degrees, 
+                then the program will exit with an error message.
+              </description>
+            </option>
+
+            <option value="CONTINUE">
+               <brief>If the cube crosses the seam, continue program and keep the RingLongitudeDomain.</brief>
+               <description>
+                 If the cube crosses the ring longitude seam, the program will continue.  The RingLongitudeDomain 
+                 will not be changed from the domain in the map file. If the map file does not have a RingLongitudeDomain, 
+                 the default of 360 LongitudeDomain will be used. Note that this could create an extremely large image.
+               </description>
+             </option>
+        </list>
+
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="INTERP">
+        <type>string</type>
+        <default>
+          <item>CUBICCONVOLUTION</item>
+        </default>
+        <brief>Type of interpolation</brief>
+        <description>
+          This is the type of interpolation to be performed on the input.
+        </description>
+        <list>
+          <option value="NEARESTNEIGHBOR">
+            <brief>Nearest Neighbor</brief>
+            <description>
+              Each output pixel will be set to the pixel nearest the
+              calculated input pixel.
+            </description>
+          </option>
+          <option value="BILINEAR">
+            <brief>Bi-Linear interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a bi-linear interpolation of the calculated input pixel.
+            </description>
+          </option>
+          <option value="CUBICCONVOLUTION">
+            <brief>Cubic Convolution interpolation</brief>
+            <description>
+              Each output pixel will be set to the value calculated by
+              a cubic convolution interpolation of the calculated input pixel.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="WARPALGORITHM">
+        <type>string</type>
+        <default>
+          <item>AUTOMATIC</item>
+        </default>
+        <brief>Warp algorithm</brief>
+        <description>
+          Used to choose the warping algorithm, either the forward patch algorithm or the reverse patch 
+          algorithm.   The default is to automatically choose the algorithm based on the input camera type 
+          (e.g., framing, linescan, pushframe).
+        </description>
+        <list>
+          <option value="FORWARDPATCH">
+            <brief>Forward patch warp algorithm</brief>
+            <description>
+              Patches are uniformly distributed over the input cube (FROM).  For each input patch, the radius/longitude of 
+              the four corner coordinates are computed using the camera model.  
+              Those four radius/longitude coordinates are used by the 
+              map projection to determine four output pixel coordinates.   Then, the 
+              four output to input image coordinates are fit with two affine transforms.  
+              That is, inputsamp=f(outputsamp,outputline) and inputline=g(outputsamp,outputline)
+              where f = A+B*outputsamp+C*outputline and similarly for g.
+              If the estimated input/sample 
+              line (as computed by the affine transform) at the center of the patch is within a tenth 
+              of a pixel of the actual computation using the projection and camera model, 
+              the affine transforms are used to place the calculated input pixels in the output patch 
+              (using the specificed INTERPOLATOR).
+            </description>
+            <inclusions><item>PATCHSIZE</item></inclusions>
+          </option>
+          <option value="REVERSEPATCH">
+            <brief>Reverse patch warp algorithm</brief>
+            <description>
+              Patches are uniformly distributed over the output cube (map projected product).  For each 
+              output patch, the radius/longitude of the four corners coordinates 
+              are computed using the map projection.  Those four radius/longitude coordinates are used 
+              by the camera model to determine four input pixel coordinates.   Then the 
+              four output to input image coordinates are fit with two affine transforms.  That is, 
+              inputsamp=f(outputsamp,outputline) and inputline=g(outputsamp,outputline) where f = A+B*outputsamp+C*outputline and similarly for g.
+              If the estimated input/sample 
+              line (as computed by the affine transform) at the center of the patch is within a 
+              tenth of a pixel of the actual computation using the projection and camera model, 
+              the affine transforms are used to place the calculated input pixels in the output patch 
+              (using the specificed INTERPOLATOR).
+            </description>
+            <inclusions><item>PATCHSIZE</item></inclusions>
+          </option>
+          <option value="AUTOMATIC">
+            <brief>Automatically select warp algorithm</brief>
+            <description>
+               The automatic option will choose the appropriate algorithm depending on the camera type 
+               of the input cube (TO).  If the cube is a framing camera image, 
+               the reverse algorithm will be used with a PATCHSIZE of 4.  If the cube is a line scan image, 
+               the forward algorithm will be used with a PATCHSIZE of 5.  If 
+               the cube is a push frame camera (e.g., LRO WAC, MRO MARCI, or THEMIS VIS) 
+               the forward transform with a PATCHSIZE of the pushframe framelet height will be used.  
+               It is recommended
+               that you always use automatic for push frame cameras to ensure the patch size does not cross
+               multiple framelets.
+            </description>
+            <exclusions><item>PATCHSIZE</item></exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="PATCHSIZE">
+        <type>integer</type>
+        <brief>Patch size for forward or reverse warping</brief>
+        <description>
+          The forward and reverse patch algorithms try to fit an affine tranform between the 
+          camera model coordinate and projection coordinate using the four
+          corners of the patches.  Patchs that are too large may run faster at the risk of 
+          missing higher resolution information about the DTM.  For example a patch
+          of 256x256 may have the same elevation at the four corners and center of the grid but a 
+          crater may exist in one of the four quadrants of the patch.  The crater,
+          up to 128 pixels in diamter may not be properly orthorectified.  In general, small patch
+          sizes are recommended (e.g., 4, 8).  <strong>NOTE:</strong> For FORWARDPATCH, if the 
+          entered PATCHSIZE is less than or equal to 1, it is automatically reset to 3.  
+        </description>
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+<!-- 
+ <examples>
+    <example>
+      <brief> Demonstrates the AUTO RINGLONSEAM option </brief>
+       <description>
+         This example is the first of two different runs of <i>ringscam2map</i>
+         demonstrating the RINGLONSEAM option.  In this case it is set to AUTO.  
+         All the user input parameters in this example are identical to the
+         following example except for RINGLONSEAM and TO.  The default for RINGLONSEAM
+         is AUTO.
+       </description>
+      <terminalInterface>
+        <commandLine> from=EN0108830655M.cub 
+                      map=../IN/sinu.map 
+                      to=EN0108830655M_sinu_auto.cub 
+        </commandLine>
+        <description>
+          This is the command line used to create the output for the AUTO
+          version of the RINGLONSEAM example.
+        </description>
+      </terminalInterface> 
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/cam2map_azseam_auto_gui_p1.jpg" width="737" height="432">
+            <brief>
+              Example GUI top of page
+            </brief>
+            <description> 
+              Screen shot of top of GUI with parameters filled in for input 
+              files, output file, and output map resolution. 
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_azseam_auto_gui_p1_thumb.jpg" width="200" height="117" caption="cam2map GUI part 1" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_azseam_auto_gui_p2.jpg" width="737" height="375">
+            <brief>
+              Example GUI middle of page
+            </brief>
+            <description> 
+              Screen shot of middle of GUI with parameters filled in for the  
+              output map ground range and the ring longitude seam options.  Under
+              the output map ground range section, notice the grayed out
+              parameters.  These values are computed and not allowed to be 
+              modified when DEFAULTRANGE = MINIMIZE.  This is the default.
+              The RINGLONSEAM option has been set to AUTO in this example.
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_azseam_auto_gui_p2_thumb.jpg" width="200" height="101" caption="cam2map GUI part 2" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_azseam_auto_gui_p3.jpg" width="737" height="180">
+            <brief>
+              Example GUI bottom of page
+            </brief>
+            <description> 
+              Screen shot of the bottom of the GUI showing the Options menu. 
+              The default value for INTERP is selected (CUBICCONVOLUTION).
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_azseam_auto_gui_p1_thumb.jpg" width="200" height="48" caption="cam2map GUI part 3" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/IN/sinu.map">
+          <brief> Map file </brief>
+          <description>
+            Input map file defining the desired output map projection.  This  
+            file is in PVL format.
+          </description>
+          <parameterName> MAP </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/images/FromFile_EN0108830655M.jpg" width="496" height="496">
+          <brief> Input image for RINGLONSEAM examples</brief>
+          <description>
+            This is a Messenger narrow angle camera image.
+          </description>
+          <thumbnail caption=" Input Messenger image" src="assets/thumbs/FromFile_EN0108830655M_thumb.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/ToFile_EN0108830655M_azseam_auto.jpg" width="496" height="496">
+          <brief> Output image for cam2map RINGLONSEAM=AUTO</brief>
+          <description> This is the output of cam2map demonstating RINGLONSEAM set 
+                        to AUTO.  Contrast this output with the next example
+                        which was created with the RINGLONSEAM set to CONT.
+          </description>
+          <thumbnail caption="Output of cam2map run with RINGLONSEAM=AUTO" src="assets/thumbs/ToFile_EN0108830655M_azseam_auto_thumb.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief> Demonstrates the AUTO RINGLONSEAM option </brief>
+       <description>
+         This example is the second of two different runs of <i>cam2map</i>
+         demonstrating the RINGLONSEAM option.  In this case it is set to CONT.
+         All the user input parameters in this example are identical to the
+         previous example except for RINGLONSEAM and TO.
+       </description>
+      <terminalInterface>
+        <commandLine> from=EN0108830655M.cub 
+                      map=../IN/sinu.map 
+                      to=EN0108830655M_sinu_cont.cub azseam=cont
+        </commandLine>
+        <description>
+          This is the command line used to create the output for the CONT
+          version of the RINGLONSEAM example.
+        </description>
+      </terminalInterface> 
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/cam2map_azseam_cont_gui_p1.jpg" width="737" height="430">
+            <brief>
+              Example GUI top of page
+            </brief>
+            <description> 
+              Screen shot of top of GUI with parameters filled in for input 
+              files, output file, and output map resolution. 
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_azseam_cont_gui_p1_thumb.jpg" width="200" height="116" caption="cam2map GUI part 1" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_azseam_cont_gui_p2.jpg" width="737" height="380">
+            <brief>
+              Example GUI middle of page
+            </brief>
+            <description> 
+              Screen shot of middle of GUI with parameters filled in for the  
+              output map ground range and the ring longitude seam options.  Under
+              the output map ground range section, notice the grayed out
+              parameters.  These values are computed and not allowed to be 
+              modified when DEFAULTRANGE = MINIMIZE.  This is the default.
+              The RINGLONSEAM option has been set to CONT in this example.
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_azseam_cont_gui_p2_thumb.jpg" width="200" height="103" caption="cam2map GUI part 2" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_azseam_cont_gui_p3.jpg" width="737" height="190">
+            <brief>
+              Example GUI bottom of page
+            </brief>
+            <description> 
+              Screen shot of the bottom of the GUI showing the Options menu. 
+              The default value for INTERP is selected (CUBICCONVOLUTION).
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_azseam_cont_gui_p3_thumb.jpg" width="200" height="51" caption="cam2map GUI part 3" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/IN/sinu.map">
+          <brief> Map file </brief>
+          <description>
+            Input map file defining the desired output map projection.  This  
+            file is in PVL format.
+          </description>
+          <parameterName> MAP </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/images/FromFile_EN0108830655M.jpg" width="496" height="496">
+          <brief> Input image for RINGLONSEAM examples</brief>
+          <description>
+            This is a Messenger narrow angle camera image.
+          </description>
+          <thumbnail caption=" Input Messenger image" src="assets/thumbs/FromFile_EN0108830655M_thumb.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/ToFile_EN0108830655M_azseam_cont.jpg" width="496" height="496">
+          <brief> Output image for cam2map RINGLONSEAM=CONT</brief>
+          <description> This is the output of cam2map demonstating RINGLONSEAM set 
+                        to CONT.  Contrast this output with the previous example
+                        which was created with the RINGLONSEAM set to AUTO.
+          </description>
+          <thumbnail caption="Output of cam2map run with RINGLONSEAM=CONT" src="assets/thumbs/ToFile_EN0108830655M_azseam_cont_thumb.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief> Demonstrates one of two different ways to use MATCHMAP </brief>
+       <description>
+         This example is the first of two different runs of <i>cam2map</i>
+         demonstrating usage of MATCHMAP.  In both this example and the next,
+         MATCHMAP is set to YES.  In this case MAP is an Isis3 level 2 image.  
+         The mapping parameters of the output file will be read from the 
+         mapping group of the MAP level 2 image. 
+       </description>
+      <terminalInterface>
+        <commandLine> from=EN0108827082M.lev1.cub map=EN0108828436M.lev2.cub
+                      to=EN0108827082M.lev2.cub matchmap=yes
+        </commandLine>
+        <description>
+          This is the command line used to create the output for the level 2
+          image version of the MATCHMAP example.
+        </description>
+      </terminalInterface> 
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/cam2map_matchmap_image_gui_p1.jpg" width="728" height="433">
+            <brief>
+              Example GUI top of page
+            </brief>
+            <description> 
+              Screen shot of top of GUI with parameters filled in for input 
+              files, output file, and output map resolution. Notice that with
+              MATCHMAP checked the remaining output map resolution parameters
+              are grayed out to show that they are no longer available for 
+              input.  All the mapping parameters will be read from the level 2
+              image entered for MAP.
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_matchmap_image_gui_p1_thumb.jpg" width="200" height="118" caption="cam2map GUI part 1" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_matchmap_image_gui_p2.jpg" width="728" height="377">
+            <brief>
+              Example GUI middle of page
+            </brief>
+            <description> 
+              Screen shot of middle of GUI showing parameters for the  
+              output map ground range and the ring longitude seam options.  Under
+              the output map ground range section, notice all the parameters
+              are grayed out.  These values are all read or computed from the  
+              parameters in the mapping group of the level 2 image entered as
+              the MAP and not allowed to be modified because MATCHMAP=YES.
+              The RINGLONSEAM option has been set to AUTO in this example (the 
+              default).
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_matchmap_image_gui_p2_thumb.jpg" width="200" height="104" caption="cam2map GUI part 2" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_matchmap_image_gui_p3.jpg" width="728" height="190">
+            <brief>
+              Example GUI bottom of page
+            </brief>
+            <description> 
+              Screen shot of the bottom of the GUI showing the Options menu. 
+              The default value for INTERP is selected (CUBICCONVOLUTION).
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_matchmap_image_gui_p3_thumb.jpg" width="200" height="52" caption="cam2map GUI part 3" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/FromFile_EN0108827082M.lev1.jpg" width="496" height="496">
+          <brief> Input image for MATCHMAP examples</brief>
+          <description>
+            This is a Messenger narrow angle camera image.
+          </description>
+          <thumbnail caption=" Input Messenger image" src="assets/thumbs/FromFile_EN0108827082M.lev1_thumb.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+        <image src="assets/images/MatchFile_EN0108828436M.lev2.jpg" width="496" height="496">
+          <brief> Input image for MATCHMAP examples</brief>
+          <description>
+            This is a Messenger narrow angle camera image previously projected into an equirectangular map.
+          </description>
+          <thumbnail caption=" Input level 2 image used for MAP" src="assets/thumbs/MatchFile_EN0108828436M.lev2_thumb.jpg" width="200" height="200"/>
+          <parameterName>MAP</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
+          <brief> Output image for cam2map RINGLONSEAM=AUTO</brief>
+          <description> This is the output of cam2map demonstating the use of 
+                        MATCHMAP=YES with an Isis level 2 image as MAP. 
+                        Contrast this output with the level 2 image used as MAP 
+                        and with the next example which was also created with
+                        MATCHMAP=YES, but uses an Isis map file as MAP.
+          </description>
+          <thumbnail caption="Output of cam2map run with MATCHMAP=YES and map file" src="assets/thumbs/ToFile_EN0108827082M.lev2_thumb.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example>
+    <example>
+      <brief> Demonstrates one of two different ways to use MATCHMAP </brief>
+       <description>
+         This example is the second of two different runs of <i>cam2map</i>
+         demonstrating usage of MATCHMAP.  In both this example and the
+         previous, MATCHMAP is set to YES.  In this case MAP is an  
+         Isis map file.  The mapping parameters of the output file will 
+         be read from this map file. 
+       </description>
+      <terminalInterface>
+        <commandLine> from=EN0108827082M.lev1.cub map=EN0108828436M.map
+                      to=EN0108827082M.lev2.cub matchmap=yes
+        </commandLine>
+        <description>
+          This is the command line used to create the output for the map file
+          version of the MATCHMAP example.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/cam2map_matchmap_mapfile_gui_p1.jpg" width="728" height="430">
+            <brief>
+              Example GUI top of page
+            </brief>
+            <description> 
+              Screen shot of top of GUI with parameters filled in for input 
+              files, output file, and output map resolution. Notice that with
+              MATCHMAP checked the remaining output map resolution parameters
+              are grayed out to show that they are no longer available for 
+              input.  All the mapping parameters will be read from the map file.
+              The application will throw an error if any required information
+              is missing.
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_matchmap_mapfile_gui_p1_thumb.jpg" width="200" height="118" caption="cam2map GUI part 1" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_matchmap_mapfile_gui_p2.jpg" width="728" height="381">
+            <brief>
+              Example GUI middle of page
+            </brief>
+            <description> 
+              Screen shot of middle of GUI showing parameters for the  
+              output map ground range and the ring longitude seam options.  Under
+              the output map ground range section, notice all the parameters
+              are grayed out.  These values are all read or computed from the map 
+              file values and not allowed to be modified because MATCHMAP=YES.
+              The RINGLONSEAM option has been set to AUTO in this example (the 
+              default).
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_matchmap_mapfile_gui_p2_thumb.jpg" width="200" height="104" caption="cam2map GUI part 2" />
+          </image>
+        </guiInterface>
+        <guiInterface>
+          <image src="assets/images/cam2map_matchmap_mapfile_gui_p3.jpg" width="728" height="190">
+            <brief>
+              Example GUI bottom of page
+            </brief>
+            <description> 
+              Screen shot of the bottom of the GUI showing the Options menu. 
+              The default value for INTERP is selected (CUBICCONVOLUTION).
+            </description>
+            <thumbnail src="assets/thumbs/cam2map_matchmap_mapfile_gui_p3_thumb.jpg" width="200" height="52" caption="cam2map GUI part 3" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <dataFiles>
+        <dataFile path="assets/IN/EN0108828436M.map">
+          <brief> Map file </brief>
+          <description>
+            Input map file defining the desired output map projection.  This  
+            file is in PVL format.
+          </description>
+          <parameterName> MAP </parameterName>
+        </dataFile>
+      </dataFiles>
+      <inputImages>
+        <image src="assets/images/FromFile_EN0108827082M.lev1.jpg" width="496" height="496">
+          <brief> Input image for MATCHMAP examples</brief>
+          <description>
+            This is a Messenger narrow angle camera image.
+          </description>
+          <thumbnail caption=" Input Messenger image" src="assets/thumbs/FromFile_EN0108827082M.lev1_thumb.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/ToFile_EN0108827082M.lev2.jpg" width="496" height="496">
+          <brief> Output image for ringscam2map RINGLONSEAM=AUTO</brief>
+          <description> This is the output of ringscam2map demonstating the use of 
+                        MATCHMAP=YES with an Isis map file as MAP.  Contrast
+                        this output with the previous example, which was also
+                        created with MATCHMAP=YES, but uses an Isis level 2 image 
+                        for MAP.
+          </description>
+          <thumbnail caption="Output of ringscam2map run with MATCHMAP=YES and map file" src="assets/thumbs/ToFile_EN0108827082M.lev2_thumb.jpg " width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+    </example> 
+   </examples>
+   -->
+</application>

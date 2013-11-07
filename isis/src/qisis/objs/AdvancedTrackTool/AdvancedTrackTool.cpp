@@ -11,9 +11,12 @@
 #include "Longitude.h"
 #include "MdiCubeViewport.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
 #include "SerialNumber.h"
 #include "SpecialPixel.h"
 #include "TableMainWindow.h"
+#include "Target.h"
+#include "TProjection.h"
 
 namespace Isis {
 
@@ -323,20 +326,20 @@ namespace Isis {
 
         /* 180 Positive East Lon. */
         p_tableWin->table()->item(row, EAST_LON_180)->
-                             setText(QString::number(Projection::To180Domain(lon), 'f', 15));
+                             setText(QString::number(TProjection::To180Domain(lon), 'f', 15));
 
         // Write out the planetographic and positive west values
         lon = -lon;
         while(lon < 0.0) lon += 360.0;
         Distance radii[3];
         cvp->camera()->radii(radii);
-        lat = Projection::ToPlanetographic(lat, radii[0].meters(), radii[2].meters());
+        lat = TProjection::ToPlanetographic(lat, radii[0].meters(), radii[2].meters());
         p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText(QString::number(lat, 'f', 15));
         p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(lon, 'f', 15));
 
         /*180 Positive West Lon.  */
         p_tableWin->table()->item(row, WEST_LON_180)->setText(
-                                  QString::number(Projection::To180Domain(lon), 'f', 15));
+                                  QString::number(TProjection::To180Domain(lon), 'f', 15));
 
         // Next write out columns, the x/y/z position of the lat/lon
         double pos[3];
@@ -375,10 +378,15 @@ namespace Isis {
         }
 
         // Write out columns north azimuth, sun azimuth, solar longitude
-        double northAzi = cvp->camera()->NorthAzimuth();
+        if (cvp->camera()->target()->shape()->name() != "Plane") {
+          double northAzi = cvp->camera()->NorthAzimuth();
+          p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
+        }
+        else { // north azimuth is meaningless for ring plane projections
+          p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText("N/A");
+        }
         double sunAzi   = cvp->camera()->SunAzimuth();
         double solarLon = cvp->camera()->solarLongitude().degrees();
-        p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
         p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));
 
@@ -412,32 +420,57 @@ namespace Isis {
       p_tableWin->table()->item(row, SPACECRAFT_Z)->setText(QString::number(pos[2]));
     }
 
-    else if(cvp->projection() != NULL) {
-      if(cvp->projection()->SetWorld(sample, line)) {
-        double lat = cvp->projection()->UniversalLatitude();
-        double lon = cvp->projection()->UniversalLongitude();
+    else if (cvp->projection() != NULL) {
+      // Determine the projection type
+      Projection::ProjectionType projType = cvp->projection()->projectionType();
 
-        double glat = cvp->projection()->ToPlanetographic(lat);
-        double wlon = -lon;
-        while(wlon < 0.0) wlon += 360.0;
-        if(cvp->projection()->IsSky()) {
-          lon = cvp->projection()->Longitude();
-          p_tableWin->table()->item(row, RIGHT_ASCENSION)->setText(QString::number(lon, 'f', 15));
-          p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(lat, 'f', 15));
+      if (cvp->projection()->SetWorld(sample, line)) {
+        if (projType == Projection::Triaxial) {
+          TProjection *tproj = (TProjection *) cvp->projection();
+          double lat = tproj->UniversalLatitude();
+          double lon = tproj->UniversalLongitude();
+
+          double glat = tproj->ToPlanetographic(lat);
+          double wlon = -lon;
+          while(wlon < 0.0) wlon += 360.0;
+          if (tproj->IsSky()) {
+            lon = tproj->Longitude();
+            p_tableWin->table()->item(row, RIGHT_ASCENSION)->setText(QString::number(lon, 'f', 15));
+            p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(lat, 'f', 15));
+          }
+          else {
+            double radius = tproj->LocalRadius();
+            p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->
+                                 setText(QString::number(lat, 'f', 15));
+            p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->
+                                 setText(QString::number(glat, 'f', 15));
+            p_tableWin->table()->item(row, EAST_LON_360)->
+                                 setText(QString::number(lon, 'f', 15));
+            p_tableWin->table()->item(row, EAST_LON_180)->
+                                 setText(QString::number(TProjection::To180Domain(lon), 'f', 15));
+            p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(wlon, 'f', 15));
+            p_tableWin->table()->item(row, WEST_LON_180)->
+                                 setText(QString::number(TProjection::To180Domain(wlon), 'f', 15));
+            p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
+          }
         }
-        else {
-          double radius = cvp->projection()->LocalRadius();
-          p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->
-                               setText(QString::number(lat, 'f', 15));
-          p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->
-                               setText(QString::number(glat, 'f', 15));
+        else { // RingPlane
+          RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
+          double lat = rproj->UniversalRingRadius();
+          double lon = rproj->UniversalRingLongitude();
+
+          double wlon = -lon;
+          while(wlon < 0.0) wlon += 360.0;
+          double radius = lat;
+          p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->setText("0.0");
+          p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText("0.0");
           p_tableWin->table()->item(row, EAST_LON_360)->
                                setText(QString::number(lon, 'f', 15));
           p_tableWin->table()->item(row, EAST_LON_180)->
-                               setText(QString::number(Projection::To180Domain(lon), 'f', 15));
+                               setText(QString::number(RingPlaneProjection::To180Domain(lon), 'f', 15));
           p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(wlon, 'f', 15));
           p_tableWin->table()->item(row, WEST_LON_180)->
-                               setText(QString::number(Projection::To180Domain(wlon), 'f', 15));
+                               setText(QString::number(RingPlaneProjection::To180Domain(wlon), 'f', 15));
           p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
         }
       }

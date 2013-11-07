@@ -22,7 +22,7 @@ namespace Isis {
    * @param lab Pvl label from an Apollo Panoramic image.
    *
    */
-    ApolloPanoramicCamera::ApolloPanoramicCamera(Isis::Pvl &lab) : Isis::LineScanCamera(lab) {
+    ApolloPanoramicCamera::ApolloPanoramicCamera(Isis::Cube &cube) : Isis::LineScanCamera(cube) {
       // Set up the camera info from ik/iak kernels
       SetFocalLength(610.0);  //nominal (uncalibrated) focal length in mm from "Apollo 15 SIM Bay
                               // Photographic Equipment and Mission Summary" August, 1971
@@ -46,8 +46,9 @@ namespace Isis {
 
       ikernKey = "INS" + toString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
       multiplicativeLineTimeError = getDouble(ikernKey);
- 
-      Isis::PvlGroup &inst = lab.findGroup("Instrument", Isis::Pvl::Traverse);
+
+      Pvl &lab = *cube.label(); 
+      PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
       QString stime = (QString)inst["StartTime"];  
       SpiceDouble etStart;
       str2et_c(stime.toAscii().data(), &etStart);
@@ -82,7 +83,7 @@ namespace Isis {
       detectorMap->SetDetectorSampleSumming(1.0);
       detectorMap->SetStartingDetectorSample(0.0);
       // Setup focal plane map
-      Isis::PvlGroup &kernel = lab.findGroup("Kernels", Isis::Pvl::Traverse);
+      PvlGroup &kernel = lab.findGroup("Kernels", Pvl::Traverse);
       CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, (int) kernel["NaifFrameCode"]);
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
@@ -100,7 +101,7 @@ namespace Isis {
       new LineScanCameraGroundMap(this);
       new LineScanCameraSkyMap(this);
 
-      Isis::PvlGroup &instP = lab.findGroup("Kernels", Isis::Pvl::Traverse);
+      PvlGroup &instP = lab.findGroup("Kernels", Pvl::Traverse);
       m_CkFrameId = toInt(instP["NaifFrameCode"][0]);
       m_CkFrameId = -int(-m_CkFrameId/1000)*1000;
 
@@ -115,7 +116,6 @@ namespace Isis {
  * @param lab Cube labels
  *
  */
-extern "C" Isis::Camera *ApolloPanoramicCameraPlugin(Isis::Pvl &lab) 
-{
-   return new Isis::ApolloPanoramicCamera(lab);
+extern "C" Isis::Camera *ApolloPanoramicCameraPlugin(Isis::Cube &cube) {
+   return new Isis::ApolloPanoramicCamera(cube);
 }

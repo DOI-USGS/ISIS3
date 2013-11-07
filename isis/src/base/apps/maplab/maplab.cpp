@@ -5,7 +5,7 @@
 #include "Pvl.h"
 #include "Cube.h"
 #include "History.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 
 using namespace Isis;
@@ -49,7 +49,7 @@ void IsisMain() {
 
   double x = 0.0;
   double y = 0.0;
-  Projection * proj = ProjectionFactory::Create(userMap, false);
+  TProjection * proj = (TProjection *) ProjectionFactory::Create(userMap, false);
   if(option == "XY") {
     x = ui.GetDouble("X");
     y = ui.GetDouble("Y");

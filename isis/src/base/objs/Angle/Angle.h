@@ -1,5 +1,8 @@
 #ifndef Angle_h
 #define Angle_h
+
+#include <QtGlobal>
+
 /**
  * @file
  * $Revision: 1.14 $

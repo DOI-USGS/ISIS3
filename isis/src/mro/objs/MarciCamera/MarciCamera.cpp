@@ -43,8 +43,9 @@ namespace Isis {
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  MarciCamera::MarciCamera(Pvl &lab) : PushFrameCamera(lab) {
+  MarciCamera::MarciCamera(Cube &cube) : PushFrameCamera(cube) {
     NaifStatus::CheckErrors();
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // make sure it is a marci image
     if(inst["InstrumentId"][0] != "Marci") {
@@ -194,6 +195,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Mro namespace.
  */
-extern "C" Isis::Camera *MarciCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::MarciCamera(lab);
+extern "C" Isis::Camera *MarciCameraPlugin(Isis::Cube &cube) {
+  return new Isis::MarciCamera(cube);
 }

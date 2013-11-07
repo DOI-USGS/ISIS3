@@ -35,6 +35,7 @@
 #include "PixelType.h"
 #include "Preference.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "PvlTokenizer.h"
@@ -767,17 +768,17 @@ namespace Isis {
     if(lab.findGroup("Mapping").hasKeyword("CenterLongitude")) {
       PvlKeyword &centerLon = lab.findGroup("Mapping")["CenterLongitude"];
       if(p_longitudeDomain == 180)
-        centerLon = toString(Projection::To180Domain((double)centerLon));
+        centerLon = toString(TProjection::To180Domain((double)centerLon));
       else
-        centerLon = toString(Projection::To360Domain((double)centerLon));
+        centerLon = toString(TProjection::To360Domain((double)centerLon));
     }
 
     if(lab.findGroup("Mapping").hasKeyword("PoleLongitude")) {
       PvlKeyword &poleLon = lab.findGroup("Mapping")["PoleLongitude"];
       if(p_longitudeDomain == 180)
-        poleLon = toString(Projection::To180Domain((double)poleLon));
+        poleLon = toString(TProjection::To180Domain((double)poleLon));
       else
-        poleLon = toString(Projection::To360Domain((double)poleLon));
+        poleLon = toString(TProjection::To360Domain((double)poleLon));
     }
 
     OutputCubes[0]->putGroup(lab.findGroup("Mapping"));
@@ -967,7 +968,7 @@ namespace Isis {
     if(p_minimumLongitude > p_maximumLongitude) {
       // Force the change to 180
       p_longitudeDomain = 180;
-      p_minimumLongitude = Isis::Projection::To180Domain(p_minimumLongitude);
+      p_minimumLongitude = Isis::TProjection::To180Domain(p_minimumLongitude);
     }
 
     //  If either the minimumLongitude or maximumLongitude are < 0, change

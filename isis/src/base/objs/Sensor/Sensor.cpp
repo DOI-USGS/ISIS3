@@ -57,7 +57,7 @@ namespace Isis {
    *
    * @param lab Label containing Instrument and Kernels groups.
    */
-  Sensor::Sensor(Pvl &lab) : Spice(lab) {
+  Sensor::Sensor(Cube &cube) : Spice(cube) {
   }
 
   //! Destroys the Sensor

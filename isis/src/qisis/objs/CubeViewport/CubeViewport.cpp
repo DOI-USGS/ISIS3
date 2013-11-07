@@ -219,6 +219,8 @@ namespace Isis {
 
     p_comboCount = 0;
     p_comboIndex = 0;
+
+    p_image = new QImage(viewport()->size(), QImage::Format_RGB32);
   }
 
 

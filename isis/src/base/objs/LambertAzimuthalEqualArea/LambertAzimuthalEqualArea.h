@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -102,8 +102,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-07-25 Jeannie Backer - Original version. Fixes #954.
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection. References #775.
    */
-  class LambertAzimuthalEqualArea : public Projection {
+  class LambertAzimuthalEqualArea : public TProjection {
     public:
       LambertAzimuthalEqualArea(Pvl &label, bool allowDefaults = false);
       ~LambertAzimuthalEqualArea();

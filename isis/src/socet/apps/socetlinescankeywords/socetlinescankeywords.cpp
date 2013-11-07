@@ -22,10 +22,10 @@
 #include "LineScanCameraDetectorMap.h"
 #include "NaifStatus.h"
 #include "Process.h"
-#include "Projection.h"
 #include "Pvl.h"
 #include "Spice.h"
 #include "Table.h"
+#include "TProjection.h"
 #include "VariableLineScanCameraDetectorMap.h"
 
 using namespace std;
@@ -352,8 +352,8 @@ void IsisMain() {
   cam->SetImage(boresightSample, totalLines / 2.0);
 
   centerGp[0] = DEG2RAD *
-                  Projection::ToPlanetographic(cam->UniversalLatitude(), radii[0], radii[2]);
-  centerGp[1] = DEG2RAD * Projection::To180Domain(cam->UniversalLongitude());
+                  TProjection::ToPlanetographic(cam->UniversalLatitude(), radii[0], radii[2]);
+  centerGp[1] = DEG2RAD * TProjection::To180Domain(cam->UniversalLongitude());
   centerGp[2] = 0.0;
   //**** NOTE: in the import_pushbroom SOCET SET program, centerGp[2] will be set to the SS
   //**** project's gp_origin_z
@@ -371,8 +371,8 @@ void IsisMain() {
   double sensorPosition[3] = {0.0, 0.0, 0.0};
   double ocentricLat, e360Lon;
   cam->subSpacecraftPoint(ocentricLat, e360Lon);
-  sensorPosition[0] = DEG2RAD * Projection::ToPlanetographic(ocentricLat, radii[0], radii[2]);
-  sensorPosition[1] = DEG2RAD * Projection::To180Domain(e360Lon);
+  sensorPosition[0] = DEG2RAD * TProjection::ToPlanetographic(ocentricLat, radii[0], radii[2]);
+  sensorPosition[1] = DEG2RAD * TProjection::To180Domain(e360Lon);
   sensorPosition[2] = cam->SpacecraftAltitude() * 1000.0;
 
   // Build the ephem data.  If the image label contains the InstrumentPosition

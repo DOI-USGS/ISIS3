@@ -1,5 +1,5 @@
-#ifndef Qisis_Tool_h
-#define Qisis_Tool_h
+#ifndef Tool_h
+#define Tool_h
 
 /**
  * @file
@@ -26,9 +26,8 @@
 
 #include <QObject>
 
-// FIXME: remove this include!
+#include <QDebug>
 #include <QPoint>
-
 
 class QAction;
 class QMenu;
@@ -43,6 +42,8 @@ template< class T > class QVector;
 namespace Isis {
   class CubeViewport;
   class MdiCubeViewport;
+  class RubberBandTool;
+  class ToolList;
   class ToolPad;
   class ViewportMainWindow;
   class Workspace;
@@ -88,16 +89,23 @@ namespace Isis {
       void addTo(ToolPad *toolpad);
 
       /**
-       * requires the programmer to have this member
+       *  Anytime a tool is created, you must give it a name for the
+       *  menu.
        *
+       * @return QString
+       */
+      virtual QString menuName() const {
+        return "";
+      }
+
+
+      /**
        * @param menu
        */
       virtual void addTo(QMenu *menu) {};
 
 
       /**
-       * requires the programmer to have this member
-       *
        * @param toolbar
        */
       virtual void addToPermanent(QToolBar *toolbar) {};
@@ -105,8 +113,6 @@ namespace Isis {
       void addToActive(QToolBar *toolbar);
 
       /**
-       * requires the programmer to have this member
-       *
        * @param ws
        */
       virtual void addTo(Workspace *ws);
@@ -119,18 +125,18 @@ namespace Isis {
        * @return QString
        */
       QString toolIconDir() const {
-        return p_toolIconDir;
+        return m_toolIconDir;
       };
 
 
       /**
-       * requires the programmer to have this member
-       *
        * @param vp
        * @param painter
        */
-      virtual void paintViewport(MdiCubeViewport *vp, QPainter *painter) {};
+      virtual void paintViewport(MdiCubeViewport *vp, QPainter *painter) {}
 
+      RubberBandTool *rubberBandTool();
+      void setList(ToolList *currentList);
 
     public slots:
       void activate(bool);
@@ -146,18 +152,18 @@ namespace Isis {
 
       /**
        */
-      virtual void rubberBandComplete() {};
+      virtual void rubberBandComplete() {  }
 
 
       /**
        * This is called when actions change which pixels from the cube
        *   are displayed.
        */
-      virtual void screenPixelsChanged() {};
+      virtual void screenPixelsChanged() {}
 
       /**
        */
-      virtual void mouseEnter() {};
+      virtual void mouseEnter() {}
 
       virtual void mouseMove(QPoint p);
       virtual void mouseMove(QPoint p, Qt::MouseButton) {}
@@ -172,17 +178,17 @@ namespace Isis {
 
       /**
        */
-      virtual void updateMeasure() {};
+      virtual void updateMeasure() {}
 
 
       /**
        */
-      virtual void scaleChanged() {};
+      virtual void scaleChanged() {}
 
 
       /**
        */
-      virtual void stretchRequested(MdiCubeViewport *, int) {};
+      virtual void stretchRequested(MdiCubeViewport *, int) {}
 
 
       /**
@@ -203,8 +209,8 @@ namespace Isis {
        * @return CubeViewport*
        */
       inline MdiCubeViewport *cubeViewport() const {
-        return p_cvp;
-      };
+        return m_cvp;
+      }
 
 
       /**
@@ -224,18 +230,7 @@ namespace Isis {
        */
       virtual QAction *toolPadAction(ToolPad *toolpad) {
         return NULL;
-      };
-
-
-      /**
-       *  Anytime a tool is created, you must give it a name for the
-       *  menu.
-       *
-       * @return QString
-       */
-      virtual QString menuName() const {
-        return "";
-      };
+      }
 
 
       /**
@@ -247,7 +242,7 @@ namespace Isis {
        */
       virtual QWidget *createToolBarWidget(QStackedWidget *parent) {
         return NULL;
-      };
+      }
 
 
       /**
@@ -255,7 +250,7 @@ namespace Isis {
        *
        * @param cvp
        */
-      virtual void addConnections(MdiCubeViewport *cvp) {};
+      virtual void addConnections(MdiCubeViewport *cvp) {}
 
 
       /**
@@ -263,14 +258,13 @@ namespace Isis {
        *
        * @param cvp
        */
-      virtual void removeConnections(MdiCubeViewport *cvp) {};
+      virtual void removeConnections(MdiCubeViewport *cvp) {}
 
 
       //! Anytime a tool is created, you may use the rubber band tool.
       virtual void enableRubberBandTool();
 
-      MdiCubeViewport *p_cvp;  //!< current cubeviewport
-      Workspace *p_workspace;
+      Workspace *workspace();
 
     private:
       void addViewportConnections();
@@ -278,12 +272,15 @@ namespace Isis {
       void enableToolBar();
       void disableToolBar();
 
-      bool p_active;            //!< Is the tool acitve?
-      QWidget *p_toolBarWidget;  //!< The tool bar on which this tool resides.
-      QAction *p_toolPadAction;  //!< The tool pad on which this tool resides.
-      QString p_toolIconDir;    //!< The pathway to the icon directory.
-      static QStackedWidget *p_activeToolBarStack;  //!< Active tool bars
+      MdiCubeViewport *m_cvp;  //!< current cubeviewport
+      Workspace *m_workspace;
+
+      bool m_active;            //!< Is the tool acitve?
+      QWidget *m_toolBarWidget;  //!< The tool bar on which this tool resides.
+      QAction *m_toolPadAction;  //!< The tool pad on which this tool resides.
+      QString m_toolIconDir;    //!< The pathway to the icon directory.
+      ToolList *m_toolList;
   };
-};
+}
 
 #endif

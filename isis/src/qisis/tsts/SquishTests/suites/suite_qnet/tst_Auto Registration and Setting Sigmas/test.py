@@ -18,11 +18,11 @@ def main():
     startApplication("qnet")
     
     # Open cube list
-    clickButton(waitForObject(":qnet.Open control network  cube list_QToolButton"))
-    clickButton(waitForObject(":Select a list of cubes.toParentButton_QToolButton"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet.File_QMenu", "Open control network and cube list"))
     snooze(0.5)
     mouseClick(waitForObject(":fileNameEdit_QLineEdit"), 95, 13, 0, Qt.LeftButton)
-    type(waitForObject(":fileNameEdit_QLineEdit"), "src/qisis/tsts/SquishTests/input/Ground/Extracted_AllOverlaps.lis")
+    type(waitForObject(":fileNameEdit_QLineEdit"), "../src/qisis/tsts/SquishTests/input/Ground/Extracted_AllOverlaps.lis")
     type(waitForObject(":_QListView"), "<Return>")
 
     # Open control net
@@ -217,17 +217,26 @@ def main():
     clickItem(":Navigator_List", "newpoint001", 89, 8, 0, Qt.LeftButton)
     clickButton(waitForObject(":Control Network Navigator.Modify Point_QPushButton"))
     clickButton(waitForObject(":Control Network Navigator.Set Apriori/Sigmas_QPushButton"))
-    mouseClick(waitForObject(":latSigmaEdit_QLineEdit"), 43, 6, 0, Qt.LeftButton)
-    type(waitForObject(":latSigmaEdit_QLineEdit"), "100")
-    type(waitForObject(":latSigmaEdit_QLineEdit"), "<Tab>")
-    type(waitForObject(":Set Apriori Point and Constraints.Longitude Constraints_QGroupBox"), "<Tab>")
-    type(waitForObject(":lonSigmaEdit_QLineEdit"), "100")
-    type(waitForObject(":lonSigmaEdit_QLineEdit"), "<Tab>")
-    type(waitForObject(":Set Apriori Point and Constraints.Radius Constraints_QGroupBox"), "<Tab>")
-    type(waitForObject(":radiusSigmaEdit_QLineEdit"), "500")
-    clickButton(waitForObject(":Set Apriori Point and Constraints.Set Apriori_QPushButton"))
-    sendEvent("QMoveEvent", waitForObject(":Set Apriori Point and Constraints_QnetSetAprioriDialog"), 4065, 790, 4171, 796)
+
+    mouseClick(waitForObject(":latSigmaEdit_QLineEdit_2"), 43, 6, 0, Qt.LeftButton)
+
+    type(waitForObject(":latSigmaEdit_QLineEdit_2"), "100")
+    type(waitForObject(":latSigmaEdit_QLineEdit_2"), "<Tab>")
+
+    type(waitForObject(":Set Apriori Point and Constraints.Longitude Constraints_QGroupBox_2"), "<Tab>")
+
+    type(waitForObject(":lonSigmaEdit_QLineEdit_2"), "100")
+    type(waitForObject(":lonSigmaEdit_QLineEdit_2"), "<Tab>")
+
+    type(waitForObject(":Set Apriori Point and Constraints.Radius Constraints_QGroupBox_2"), "<Tab>")
+
+    type(waitForObject(":radiusSigmaEdit_QLineEdit_2"), "500")
+    clickButton(waitForObject(":Set Apriori Point and Constraints.Set Apriori_QPushButton_2"))
+
+
+    sendEvent("QMoveEvent", waitForObject(":Set Apriori Point and Constraints_Isis::QnetSetAprioriDialog"), 3569, 403, 3733, 406)
     
+
     # Viewport must be active before clicking on it
     nativeMouseClick(waitForObject(":Isis::ViewportMdiSubWindow - I08528020RDR.cub"), 150, 25, Qt.NoModifier, Qt.LeftButton)
     mouseClick(waitForObject(":qnet.viewport_QWidget_3"), 245, 325, Qt.NoModifier, Qt.RightButton)
@@ -247,7 +256,8 @@ def main():
     snooze(0.5)
     type(waitForObject(":fileNameEdit_QLineEdit_3"), "<Return>")
     
-    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar_2", "File"))
     activateItem(waitForObjectItem(":qnet.File_QMenu", "Exit"))
+
     snooze(1)
 

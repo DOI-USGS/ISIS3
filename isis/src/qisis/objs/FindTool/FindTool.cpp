@@ -1,15 +1,15 @@
 #include "FindTool.h"
 
-#include <QMenu>
-#include <QMenuBar>
-#include <QPushButton>
-#include <QLabel>
-#include <QValidator>
-#include <QHBoxLayout>
 #include <QApplication>
 #include <QCheckBox>
 #include <QDialog>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QValidator>
 
 #include <float.h>
 
@@ -19,11 +19,12 @@
 #include "Longitude.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
-#include "Workspace.h"
 #include "Projection.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
+#include "Workspace.h"
 
 
 namespace Isis {
@@ -319,6 +320,7 @@ namespace Isis {
         p_imageTab->p_lineLineEdit->setText(QString::number(p_line));
       }
       else if (p_lat != DBL_MAX && p_lon != DBL_MAX) {
+        // this should also work for rings (radius, azimuth)
         if (groundMap && groundMap->SetUniversalGround(p_lat, p_lon)) {
           QString lineStr = QString::number(groundMap->Line());
           QString sampStr = QString::number(groundMap->Sample());

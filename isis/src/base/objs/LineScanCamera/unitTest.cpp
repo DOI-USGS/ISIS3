@@ -17,6 +17,9 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
+#include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
 #include "LineScanCamera.h"
 #include "Preference.h"
@@ -27,7 +30,7 @@ using namespace Isis;
 
 class MyCamera : public LineScanCamera {
   public:
-    MyCamera(Pvl &lab) : LineScanCamera(lab) { }
+    MyCamera(Cube &cube) : LineScanCamera(cube) { }
 
     virtual int CkFrameId() const {
       string msg = "CK Frame ID is unqiue to mission-specific cameras";
@@ -47,9 +50,8 @@ class MyCamera : public LineScanCamera {
 
 int main() {
   Preference::Preferences(true);
-  QString inputFile = "$mgs/testData/ab102401.lev2.cub";
-  Pvl pvl(inputFile);
-  MyCamera cam(pvl);
+  Cube cube("$mgs/testData/ab102401.lev2.cub", "r");
+  MyCamera cam(cube);
 
   cout << "Camera = Framing?   " << (cam.GetCameraType() == Camera::Framing) << endl;
   cout << "Camera = LineScan?  " << (cam.GetCameraType() == Camera::LineScan) << endl;

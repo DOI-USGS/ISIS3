@@ -9,7 +9,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Progress.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "SurfacePoint.h"
 
@@ -63,7 +63,7 @@ void IsisMain() {
     if (!mapGroup.hasKeyword("EquatorialRadius") ||
         !mapGroup.hasKeyword("PolarRadius")) {
 
-      PvlGroup radii = Projection::TargetRadii(target);
+      PvlGroup radii = TProjection::TargetRadii(target);
       mapGroup.addKeyword(PvlKeyword("EquatorialRadius",
             (QString) radii["EquatorialRadius"]));
       mapGroup.addKeyword(PvlKeyword("PolarRadius",
@@ -89,7 +89,7 @@ void IsisMain() {
     mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
     mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
 
-    Projection *proj = ProjectionFactory::Create(userMap);
+    TProjection *proj = (TProjection *) ProjectionFactory::Create(userMap);
 
     int lonDomain = (int) IString(proj->LongitudeDomainString());
     checkLongitude(minLon, maxLon, lonDomain);
@@ -177,7 +177,7 @@ void IsisMain() {
     }
 
     QString target = ui.GetString("TARGET");
-    PvlGroup radii = Projection::TargetRadii(target);
+    PvlGroup radii = TProjection::TargetRadii(target);
     equatorialRadius = radii["EquatorialRadius"];
 
     // Create the control net to store the points in.

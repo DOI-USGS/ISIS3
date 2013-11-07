@@ -59,7 +59,7 @@ namespace Isis {
   class ThemisIrCamera : public LineScanCamera {
     public:
       // constructors
-      ThemisIrCamera(Pvl &lab);
+      ThemisIrCamera(Cube &cube);
 
       //! Destroys the ThemisIrCamera object.
       ~ThemisIrCamera() {};

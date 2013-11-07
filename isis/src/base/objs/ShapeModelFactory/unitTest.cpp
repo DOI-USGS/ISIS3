@@ -68,8 +68,7 @@ int main() {
   Pvl lab2;
   lab2.addGroup(inst2);
   lab2.addGroup(kern2);
-  Spice spiSh(lab2);
-  Target targSh(&spiSh, lab2);
+  Target targSh(NULL, lab2);
   ShapeModel *smSh = ShapeModelFactory::create(&targSh, lab2);
   cout << "    Successfully created shape " << smSh->name() << endl;
   delete smSh;
@@ -81,8 +80,7 @@ int main() {
   Pvl lab3;
   lab3.addGroup(inst2);
   lab3.addGroup(kern3);
-  Spice spiEl(lab3);
-  Target targEl(&spiEl, lab3);
+  Target targEl(NULL, lab3);
   ShapeModel *smEl = ShapeModelFactory::create(&targEl, lab3);
   cout << "    Successfully created shape " << smEl->name() << endl;
   delete smEl;
@@ -94,15 +92,13 @@ int main() {
   Pvl lab4;
   lab4.addGroup(inst2);
   lab4.addGroup(kern4);
-  Spice spiElNull(lab4);
-  Target targElNull(&spiElNull, lab4);
+  Target targElNull(NULL, lab4);
   ShapeModel *smElNull = ShapeModelFactory::create(&targElNull, lab4);
   cout << "    Successfully created shape " << smElNull->name() << endl;
   delete smElNull;
 
   // Create Spice and Target objects for sky test
-  Spice skySpi(lab1);
-  Target skyTarget(&skySpi, lab1);
+  Target skyTarget(NULL, lab1);
   ShapeModel *skyShape = ShapeModelFactory::create(&skyTarget,  lab1);
   cout << endl << "  Testing Sky target..." << endl << "    Shape model is " << skyShape->name() << endl;
 
@@ -114,8 +110,7 @@ int main() {
   Pvl lab5;
   lab5.addGroup(inst2);
   lab5.addGroup(kern5);
-  Spice spiBadFile(lab5);
-  Target targBadFile(&spiBadFile, lab5);
+  Target targBadFile(NULL, lab5);
   ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
   cout << "    Successfully created shape " << smBadFile->name() << endl;
   delete smBadFile;
@@ -132,8 +127,7 @@ int main() {
   Pvl lab5;
   lab5.addGroup(inst2);
   lab5.addGroup(kern5);
-  Spice spiBadFile(lab5);
-  Target targBadFile(&spiBadFile, lab5);
+  Target targBadFile(NULL, lab5);
   ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
   cout << "    Successfully created shape " << smBadFile->name() << endl;
   delete smBadFile;
@@ -150,8 +144,7 @@ int main() {
   Pvl lab5;
   lab5.addGroup(inst2);
   lab5.addGroup(kern5);
-  Spice spiDem(lab5);
-  Target targDem(&spiDem, lab5);
+  Target targDem(NULL, lab5);
   ShapeModel *smDem = ShapeModelFactory::create(&targDem, lab5);
   cout << "    Successfully created shape " << smDem->name() << endl;
   delete smDem;
@@ -169,8 +162,7 @@ int main() {
   vector<Distance> radii(3,Distance());
   radii = c->target()->radii();
   Pvl pvl = *cube.label();
-  Spice spi(pvl);
-  Target targ(&spi, pvl);
+  Target targ(NULL, pvl);
   targ.setRadii(radii);
   ShapeModel *sm = ShapeModelFactory::create(&targ, pvl);
   cout << "    Successfully created shape " << sm->name() << endl;
@@ -184,8 +176,7 @@ int main() {
   c = cube.camera();
   radii = c->target()->radii();
   pvl = *cube.label();
-  Spice spi2(pvl);
-  Target targ2(&spi2, pvl);
+  Target targ2(NULL, pvl);
   targ2.setRadii(radii);
   sm = ShapeModelFactory::create(&targ2, pvl);
   cout << "    Successfully created shape " << sm->name() << endl;

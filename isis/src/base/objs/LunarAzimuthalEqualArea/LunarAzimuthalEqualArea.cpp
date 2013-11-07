@@ -27,7 +27,7 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 
@@ -44,7 +44,7 @@ namespace Isis {
   * @throw IException::Unknown - "Invalid label group [Mapping]";
   */
   LunarAzimuthalEqualArea::LunarAzimuthalEqualArea(
-    Pvl &label) : Projection::Projection(label) {
+    Pvl &label) : TProjection::TProjection(label) {
     try {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
@@ -71,7 +71,7 @@ namespace Isis {
    * @return bool Returns true if the Projection objects are equal, and false if
    *              they are not
    */
-   bool LunarAzimuthalEqualArea::operator== (const Projection &proj) {
+   bool LunarAzimuthalEqualArea::operator== (const TProjection &proj) {
      if (!Projection::operator==(proj))
        return false;
      // dont use != (it is a recusive plunge)
@@ -293,7 +293,7 @@ namespace Isis {
   * @return PvlGroup The keywords that this projection uses
   */
   PvlGroup LunarAzimuthalEqualArea::Mapping() {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = TProjection::Mapping();
     mapping += m_mappingGrp["MaximumLibration"];
     return mapping;
   }
@@ -312,7 +312,7 @@ namespace Isis {
  * @return @b Isis::Projection* Pointer to a LunarAzimuthalEqualArea
  *                              projection object.
  */
-extern "C" Isis::Projection *LunarAzimuthalEqualAreaPlugin(Isis::Pvl &lab,
+extern "C" Isis::TProjection *LunarAzimuthalEqualAreaPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::LunarAzimuthalEqualArea(lab);
 }

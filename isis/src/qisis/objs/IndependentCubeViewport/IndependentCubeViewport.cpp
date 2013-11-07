@@ -32,6 +32,8 @@
 
 #include "Camera.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
+#include "TProjection.h"
 #include "Stretch.h"
 #include "StretchTool.h"
 #include "ViewportBuffer.h"
@@ -403,6 +405,10 @@ namespace Isis
       bool camSucceeds = camera() && camera()->SetImage(sample, line);
       bool projSucceeds = !camSucceeds && projection() &&
           projection()->SetWorld(sample, line);
+
+      // Determine the projection type if we have a projection
+      Projection::ProjectionType projType = Projection::Triaxial;
+      if (projSucceeds) projType = projection()->projectionType();
       
       if (camSucceeds || projSucceeds)
       {
@@ -416,8 +422,17 @@ namespace Isis
         }
         else
         {
-          lat = projection()->Latitude();
-          lon = projection()->Longitude();
+          // For now just put radius/az into lat/lon  TODO do it better
+          if (projType == Projection::Triaxial) {
+            TProjection *tproj = (TProjection *) projection();
+            lat = tproj->Latitude();
+            lon = tproj->Longitude();
+          }
+          else { // Must be RingPlane
+            RingPlaneProjection *rproj = (RingPlaneProjection *) projection();
+            lat = rproj->RingRadius();
+            lon = rproj->RingLongitude();
+          }
         }
         
         emit trackingChanged(sample, line, lat, lon, dn, this);

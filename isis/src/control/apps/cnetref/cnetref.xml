@@ -416,6 +416,10 @@
       Updated the documentation. Edited to work for control nets with Reference 
       not set. Fixes #589 and #584 
     </change>
+    <change name="Debbie A. Cook" date="2013-02-11">
+      Changed selection of reference by mean resolution to use the first measure for points 
+      with only 2 measures.  References #775.
+    </change>
     <change name="Kimberly Oyama and Steven Lambright" date="2013-02-25">
       Changed error handling such that, when an error occurs, this program will not choose that
       measure as reference instead of throwing an error and stopping. References #825.

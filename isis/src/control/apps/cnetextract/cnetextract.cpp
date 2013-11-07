@@ -20,7 +20,7 @@
 #include "IString.h"
 #include "Longitude.h"
 #include "Latitude.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "SerialNumber.h"
@@ -638,8 +638,8 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
 
         if(camera == NULL) {
           try {
-            Projection *projection =
-              ProjectionFactory::Create((*(cube->label())));
+            TProjection *projection =
+              (TProjection *) ProjectionFactory::Create((*(cube->label())));
 
             if(!projection->SetCoordinate(controlPt->GetMeasure(cm)->GetSample(),
                                           controlPt->GetMeasure(cm)->GetLine())) {

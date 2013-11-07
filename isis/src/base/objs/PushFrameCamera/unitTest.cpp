@@ -18,6 +18,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "IException.h"
+#include "FileName.h"
 #include "PushFrameCamera.h"
 #include "Preference.h"
 #include "Pvl.h"
@@ -27,7 +28,7 @@ using namespace Isis;
 
 class MyCamera : public PushFrameCamera {
   public:
-    MyCamera(Pvl &lab) : PushFrameCamera(lab) { }
+    MyCamera(Cube &cube) : PushFrameCamera(cube) { }
 
     virtual int CkFrameId() const {
       string msg = "CK Frame ID is unqiue to mission-specific cameras";
@@ -47,9 +48,8 @@ class MyCamera : public PushFrameCamera {
 
 int main() {
   Preference::Preferences(true);
-  QString inputFile = "$mgs/testData/ab102401.lev2.cub";
-  Pvl pvl(inputFile);
-  MyCamera cam(pvl);
+  Cube cube("$mgs/testData/ab102401.lev2.cub", "r");
+  MyCamera cam(cube);
 
   cout << "Camera = Framing?   " << (cam.GetCameraType() == Camera::Framing) << endl;
   cout << "Camera = LineScan?  " << (cam.GetCameraType() == Camera::LineScan) << endl;

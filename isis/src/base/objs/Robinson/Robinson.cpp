@@ -54,7 +54,7 @@ namespace Isis {
    * @throws IException
    */
   Robinson::Robinson(Pvl &label, bool allowDefaults) :
-      Projection::Projection(label) {
+      TProjection::TProjection(label) {
     try {
 
       // Initialize coefficients
@@ -364,7 +364,7 @@ namespace Isis {
    * @return PvlGroup The keywords that this projection uses
    */
   PvlGroup Robinson::Mapping()  {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = TProjection::Mapping();
 
     mapping += m_mappingGrp["CenterLongitude"];
 
@@ -377,7 +377,7 @@ namespace Isis {
    * @return PvlGroup The latitude keywords that this projection uses
    */
   PvlGroup Robinson::MappingLatitudes() {
-    PvlGroup mapping = Projection::MappingLatitudes();
+    PvlGroup mapping = TProjection::MappingLatitudes();
 
     return mapping;
   }
@@ -388,7 +388,7 @@ namespace Isis {
    * @return PvlGroup The longitude keywords that this projection uses
    */
   PvlGroup Robinson::MappingLongitudes() {
-    PvlGroup mapping = Projection::MappingLongitudes();
+    PvlGroup mapping = TProjection::MappingLongitudes();
 
     mapping += m_mappingGrp["CenterLongitude"];
 

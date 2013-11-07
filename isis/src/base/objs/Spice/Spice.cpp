@@ -68,7 +68,8 @@ namespace Isis {
    */
 
   // TODO: DOCUMENT EVERYTHING
-  Spice::Spice(Pvl &lab) {
+  Spice::Spice(Cube &cube) {
+    Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
 
@@ -81,8 +82,8 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Pvl &lab, bool noTables) {
-    init(lab, noTables);
+  Spice::Spice(Cube &cube, bool noTables) {
+    init(*cube.label(), noTables);
   }
 
   /**

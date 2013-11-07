@@ -2,12 +2,9 @@ include $(ISISROOT)/make/isismake.tsts
 
 .ONESHELL:
 
-SQUISHBIN=/home/slambright/Squish/bin
+SQUISHBIN=/opt/Squish/bin
 
 commands: configsquish
-	if [ -f "$$HOME/.squish/ver1/server.ini" ]; then
-	  $(RM) "$$HOME/.squish/ver1/server.ini"
-	fi
 	$(SQUISHBIN)/squishserver >& /dev/null & 
 	$(SQUISHBIN)/squishserver --config addAppPath '$(ISISROOT)/bin' >& /dev/null
 	$(SQUISHBIN)/squishrunner --config setCursorAnimation off >& /dev/null
@@ -26,7 +23,8 @@ commands: configsquish
 	      --reportgen xml2.1,$$ABSOUTPUT/$$SUITE.xml 2>&1 >& /dev/null
 	    if [ -f "$$ABSOUTPUT/$$SUITE.xml" ]; then
 	      $(CAT) $$ABSOUTPUT/$$SUITE.xml | sed 's/time="[^"]*"/time="..."/g' | \
-	        sed 's/file="[^"]*"/file="..."/g' > $$ABSOUTPUT/$$SUITE.tmp.xml
+	        sed 's/file="[^"]*"/file="..."/g' | sed 's/Images match.*</Images match</' \
+	        > $$ABSOUTPUT/$$SUITE.tmp.xml
 	      $(MV) $$ABSOUTPUT/$$SUITE.tmp.xml $$ABSOUTPUT/$$SUITE.xml
 	      $(MV) $$ABSOUTPUT/$$SUITE.xml $$ABSOUTPUT/$$SUITE.xml.txt
 	    else
@@ -40,9 +38,12 @@ commands: configsquish
 	fi
 
 configsquish:
-	if [ ! -d input ]; then \
-	  ln -s "$(INPUT)";     \
-	fi                      
+	if [ ! -d input ]; then
+	  ln -s "$(INPUT)";
+	fi    
+	if [ -f "$$HOME/.squish/ver1/server.ini" ]; then
+	  $(RM) "$$HOME/.squish/ver1/server.ini"
+	fi                  
 	$(SQUISHBIN)/squishserver >& /dev/null & 
 	$(SQUISHBIN)/squishserver --config addAppPath '$(ISISROOT)/bin' >& /dev/null
 	$(SQUISHBIN)/squishrunner --config setCursorAnimation off >& /dev/null

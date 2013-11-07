@@ -602,8 +602,8 @@ void processNoprojFiles(Pipeline &p) {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-  Pvl labels(FileName("$TEMPORARY/noproj.FROM1.cub").expanded());
-  Camera *cam = CameraFactory::Create(labels);
+  Cube cube(FileName("$TEMPORARY/noproj.FROM1.cub").expanded(), "r");
+  Camera *cam = CameraFactory::Create(cube);
 
   double lineRate = cam->DetectorMap()->LineRate();
 

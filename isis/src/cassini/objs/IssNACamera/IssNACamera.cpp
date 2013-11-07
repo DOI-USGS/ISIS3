@@ -41,7 +41,8 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Added call
    *                          to ShutterOpenCloseTimes() method.
    */
-  IssNACamera::IssNACamera(Pvl &lab) : FramingCamera(lab) {
+  IssNACamera::IssNACamera(Cube &cube) : FramingCamera(cube) {
+    Pvl &lab = *cube.label();
 
     // Get the filter wheels positions dependent focal length.
     // If we can not get the focal length for this specific filter wheel combination then
@@ -73,6 +74,7 @@ namespace Isis {
     }
 
     NaifStatus::CheckErrors();
+
     SetFocalLength(focalLength);
     SetPixelPitch();
     instrumentRotation()->SetFrame(Spice::getInteger("INS_" + toString(naifIkCode()) + "_FRAME_ID"));
@@ -154,6 +156,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Cassini namespace.
  */
-extern "C" Isis::Camera *IssNACameraPlugin(Isis::Pvl &lab) {
-  return new Isis::IssNACamera(lab);
+extern "C" Isis::Camera *IssNACameraPlugin(Isis::Cube &cube) {
+  return new Isis::IssNACamera(cube);
 }

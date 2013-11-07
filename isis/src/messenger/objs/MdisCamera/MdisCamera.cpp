@@ -60,12 +60,13 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    *
    */
-  MdisCamera::MdisCamera(Pvl &lab) : FramingCamera(lab) {
+  MdisCamera::MdisCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
     // Set up detector constants
     const int MdisWac(-236800);
     // const int MdisNac(-236820);
 
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // Clarification on MDIS subframe image mode provides us the ability to
@@ -351,6 +352,6 @@ namespace Isis {
  *
  * @return Isis::Camera* MdisCamera
  */
-extern "C" Isis::Camera *MdisCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::MdisCamera(lab);
+extern "C" Isis::Camera *MdisCameraPlugin(Isis::Cube &cube) {
+  return new Isis::MdisCamera(cube);
 }

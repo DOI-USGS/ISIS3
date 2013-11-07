@@ -80,6 +80,8 @@ namespace Isis {
    *                           #1169.
    *   @history 2013-03-27 Jeannie Backer - Added programmer comments.
    *                           References #1248.
+   *  @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
    *                          example to class documentation
@@ -100,8 +102,15 @@ namespace Isis {
       Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
                                 const QString &mosaicFile);
 
+      Isis::Cube *RingsSetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
+                                const QString &mosaicFile);
+
       Isis::Cube *SetOutputCube(FileList &propagationCubes,
                                 double slat, double elat, double slon, double elon,
+                                CubeAttributeOutput &oAtt, const QString &mosaicFile);
+
+      Isis::Cube *RingsSetOutputCube(FileList &propagationCubes,
+                                double srad, double erad, double saz, double eaz,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
       Isis::Cube *SetOutputCube(const QString &inputFile,
@@ -109,10 +118,20 @@ namespace Isis {
                                 double slat, double elat, double slon, double elon, int nbands,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
+      Isis::Cube *RingsSetOutputCube(const QString &inputFile,
+                                double xmin, double xmax, double ymin, double ymax,
+                                double srad, double erad, double saz, double eaz, int nbands,
+                                CubeAttributeOutput &oAtt, const QString &mosaicFile);
+
       Isis::Cube *SetOutputCube(const QString &inputFile, PvlGroup mapping,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
+      Isis::Cube *RingsSetOutputCube(const QString &inputFile, PvlGroup mapping,
+                                CubeAttributeOutput &oAtt, const QString &mosaicFile);
+
       Isis::Cube *SetOutputCube(const QString &mosaicFile);
+
+      Isis::Cube *RingsSetOutputCube(const QString &mosaicFile);
 
       Isis::Cube *SetInputCube();
 

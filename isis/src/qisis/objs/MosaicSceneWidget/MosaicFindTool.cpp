@@ -16,6 +16,7 @@
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 
@@ -65,25 +66,29 @@ namespace Isis {
     double lon = IString(longitude.toStdString()).ToDouble();
 
     Projection *projection = getWidget()->getProjection();
+    Projection::ProjectionType ptype = projection->projectionType();
 
-    if(projection && projection->SetGround(lat, lon)) {
-      QPointF scenePos(projection->XCoord(), -1 * projection->YCoord());
-      QRectF sceneRect(getWidget()->getView()->sceneRect());
+    if (projection && ptype == Projection::Triaxial) {
+      TProjection *tproj = (TProjection *) projection;
+      if (tproj->SetGround(lat, lon)) {
+        QPointF scenePos(projection->XCoord(), -1 * projection->YCoord());
+        QRectF sceneRect(getWidget()->getView()->sceneRect());
 
-      if(sceneRect.contains(scenePos)) {
-        if(p_findSpot != NULL) {
-          clearPoint();
+        if (sceneRect.contains(scenePos)) {
+          if(p_findSpot != NULL) {
+            clearPoint();
+          }
+
+          p_findSpot = new FindSpotGraphicsItem(scenePos, getWidget());
+
+          getWidget()->getScene()->addItem(p_findSpot);
+          getWidget()->getView()->centerOn(scenePos);
         }
-
-        p_findSpot = new FindSpotGraphicsItem(scenePos, getWidget());
-
-        getWidget()->getScene()->addItem(p_findSpot);
-        getWidget()->getView()->centerOn(scenePos);
-      }
-      else {
-        QString message = "Lat/Lon not within this view.";
-        QMessageBox::information(getWidget(), "Point Not Found",
-                                 message, QMessageBox::Ok);
+        else {
+          QString message = "Lat/Lon not within this view.";
+          QMessageBox::information(getWidget(), "Point Not Found",
+                                   message, QMessageBox::Ok);
+        }
       }
     }
   }
@@ -207,19 +212,23 @@ namespace Isis {
 
     if(s == Qt::LeftButton) {
       Projection *proj = getWidget()->getProjection();
+      Projection::ProjectionType ptype = proj->projectionType();
 
-      if(proj && getWidget()->getView()->sceneRect().contains(mouseLoc)) {
-        if(proj->SetCoordinate(mouseLoc.x(), -1 * mouseLoc.y())) {
-          if(p_findSpot != NULL) {
-            clearPoint();
+      if (ptype == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) proj;
+        if (tproj && getWidget()->getView()->sceneRect().contains(mouseLoc)) {
+          if (tproj->SetCoordinate(mouseLoc.x(), -1 * mouseLoc.y())) {
+            if (p_findSpot != NULL) {
+              clearPoint();
+            }
+
+            p_findSpot = new FindSpotGraphicsItem(mouseLoc, getWidget());
+
+            getWidget()->getScene()->addItem(p_findSpot);
+
+            p_latLineEdit->setText(QString::number(tproj->Latitude(), 'g', 10));
+            p_lonLineEdit->setText(QString::number(tproj->Longitude(), 'g', 10));
           }
-
-          p_findSpot = new FindSpotGraphicsItem(mouseLoc, getWidget());
-
-          getWidget()->getScene()->addItem(p_findSpot);
-
-          p_latLineEdit->setText(QString::number(proj->Latitude(), 'g', 10));
-          p_lonLineEdit->setText(QString::number(proj->Longitude(), 'g', 10));
         }
       }
     }

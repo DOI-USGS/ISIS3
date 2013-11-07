@@ -25,14 +25,16 @@
 
 #include <QMdiArea>
 
+#include <QPointer>
+
 template< class T > class QVector;
 
 namespace Isis {
   class Cube;
-}
-
-namespace Isis {
+  class Image;
+  class ImageList;
   class MdiCubeViewport;
+  class ToolList;
 
   /**
   * @brief
@@ -42,41 +44,47 @@ namespace Isis {
   * @author ????-??-?? Jeff Anderson
   *
   * @internal
-  * @history  2007-03-21  Tracie Sucharski - Changed call from fitScale to
+  *   @history 2007-03-21 Tracie Sucharski - Changed call from fitScale to
   *                           fitScaleMinDimension so that the minimum cube
   *                           dimension is displayed in its entirety.
-  * @history  2008-05-27  Noah Hilt - Now allows cubes to be
-  *           opened with additional arguments read by the
-  *           CubeAttributeInput class, specifically to open
-  *           certain bands as well as open 3 bands in RGB mode.
-  * @history 2008-12-04 Jeannie Walldren - Fixed bug in
-  *          addCubeViewport(cubename).  Added exception catch to
-  *          addCubeViewport(cube) to close the CubeViewport from
-  *          the ViewportMainWindow if it cannot be shown.
-  * @history 2009-03-27 Noah Hilt, Steven Lambright - Changed parent class from
-  *          QWorkspace to QMdiArea since QWorkspace is now an obsolete class.
-  *          Also changed how CubeViewports are created.
-  * @history 2010-04-08 Steven Lambright and Eric Hyer - Added progress bar
-  * @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-  *          CubeViewport.  Also fixed include issues.
-  * @history 2010-11-18 Eric Hyer - addBrowseView now deletes the last viewport
-  *              in the subWindowList instead of the first one
-  * @history 2011-09-19 Steven Lambright - Fixed addBrowseView to actually close
-  *                         the old viewports instead of hiding them. Fixes #418
-  * @history 2012-05-29 Steven Lambright - Now utilizes ViewportMdiSubWindow instead of
-  *                         QMdiSubWindow. References #854.
+  *   @history 2008-05-27 Noah Hilt - Now allows cubes to be opened with additional arguments read
+  *                           by the CubeAttributeInput class, specifically to open certain bands as
+  *                           well as open 3 bands in RGB mode.
+  *   @history 2008-12-04 Jeannie Walldren - Fixed bug in
+  *                           addCubeViewport(cubename).  Added exception catch to
+  *                           addCubeViewport(cube) to close the CubeViewport from the
+  *                           ViewportMainWindow if it cannot be shown.
+  *   @history 2009-03-27 Noah Hilt, Steven Lambright - Changed parent class from
+  *                           QWorkspace to QMdiArea since QWorkspace is now an obsolete class. Also
+  *                           changed how CubeViewports are created.
+  *   @history 2010-04-08 Steven Lambright and Eric Hyer - Added progress bar
+  *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
+  *                           CubeViewport.  Also fixed include issues.
+  *   @history 2010-11-18 Eric Hyer - addBrowseView now deletes the last viewport
+  *                           in the subWindowList instead of the first one
+  *   @history 2011-09-19 Steven Lambright - Fixed addBrowseView to actually close
+  *                           the old viewports instead of hiding them. Fixes #418
+  *   @history 2012-05-29 Steven Lambright - Now utilizes ViewportMdiSubWindow instead of
+  *                           QMdiSubWindow. References #854.
+  *   @history 2012-09-18 Steven Lambright - Added the selfContained option to the constructor.
+  *                           This allows us to show a work space without handling the tool and
+  *                           status areas externally. No longer inherits from QMdiArea because
+  *                           of the need to place widgets around the mdi area.
   */
-  class Workspace : public QMdiArea {
+  class Workspace : public QWidget {
       Q_OBJECT
 
     public:
-      Workspace(QWidget *parent = 0);
+      Workspace(bool selfContained, QWidget *parent = 0);
       Workspace(const Workspace &other);
       virtual ~Workspace();
       QVector< MdiCubeViewport * > * cubeViewportList();
-      const Workspace &operator=(Workspace other);
+      Workspace &operator=(Workspace other);
 
+      void addImages(ImageList *images);
       bool confirmClose();
+      QWidget *imageToMdiWidget(Image *image);
+      QMdiArea *mdiArea();
 
     signals:
       void cubeViewportAdded(MdiCubeViewport *);
@@ -92,7 +100,9 @@ namespace Isis {
       void activateViewport(QMdiSubWindow *w);
 
     private:
-      QVector< MdiCubeViewport * > * p_cubeViewportList;
+      QPointer<QMdiArea> m_mdi;
+      QVector< MdiCubeViewport * > * m_cubeViewportList;
+      ToolList *m_tools;
   };
 };
 

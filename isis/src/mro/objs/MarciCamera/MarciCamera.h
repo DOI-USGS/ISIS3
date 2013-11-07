@@ -56,7 +56,7 @@ namespace Isis {
   class MarciCamera : public PushFrameCamera {
     public:
       // constructor
-      MarciCamera(Pvl &lab);
+      MarciCamera(Cube &cube);
 
       //! Destroys the Themis Vis Camera object
       ~MarciCamera() {};

@@ -128,18 +128,17 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Close all cube viewports.";
     p_closeAll->setWhatsThis(whatsThis);
-
-    p_exit = new QAction(parent);
+    
+    p_exit = new QAction(this);
     p_exit->setShortcut(Qt::CTRL + Qt::Key_Q);
     p_exit->setText("E&xit");
     p_exit->setIcon(QPixmap(toolIconDir() + "/fileclose.png"));
     whatsThis =
-      "<b>Function:</b>  Quit qview \
-      <p><b>Shortcut:</b> Ctrl+Q</p>";
+        "<b>Function:</b>  Quit qview \
+        <p><b>Shortcut:</b> Ctrl+Q</p>";
     p_exit->setWhatsThis(whatsThis);
     connect(p_exit, SIGNAL(activated()), this, SLOT(exit()));
 
-    p_lastDir.clear();
     p_lastViewport = NULL;
 
     p_saveAsDialog = NULL;
@@ -174,7 +173,7 @@ namespace Isis {
     connect(this, SIGNAL(fileSelected(QString)),
             ws, SLOT(addCubeViewport(QString)));
 
-    connect(p_closeAll, SIGNAL(activated()), ws, SLOT(closeAllSubWindows()));
+    connect(p_closeAll, SIGNAL(activated()), ws->mdiArea(), SLOT(closeAllSubWindows()));
   }
 
   /**

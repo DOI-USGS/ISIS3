@@ -23,7 +23,7 @@
 *   http://www.usgs.gov/privacy.html.
 */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -56,12 +56,14 @@ namespace Isis {
   *                           Name and Version methods to the implementation
   *                           file. Minor modifications to comply with some
   *                           coding standards. References #928.
+  *  @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+  *                           References #775.
   */
-  class LunarAzimuthalEqualArea : public Projection {
+  class LunarAzimuthalEqualArea : public TProjection {
     public:
       LunarAzimuthalEqualArea(Pvl &label);
       ~LunarAzimuthalEqualArea();
-      bool operator== (const Projection &proj);
+      bool operator== (const TProjection &proj);
 
       QString Name() const;
       QString Version() const;

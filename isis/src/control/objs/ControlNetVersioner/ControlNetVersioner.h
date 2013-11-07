@@ -117,6 +117,8 @@ namespace Isis {
    *                           point type of constrained.
    *   @history 2012-08-14 Steven Lambright - Simplified error handling of invalid
    *                           target names in V1 networks (V1->V2 code).
+   *   @history 2012-11-22 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    *   @history 2013-03-13 Steven Lambright and Stuart Sides - Added support for more V1 Pvl
    *                           networks (specifically, isis3.2.1 hijitreg output networks with
    *                           measures that lack Sample/Line and are set to unmeasured). Fixes

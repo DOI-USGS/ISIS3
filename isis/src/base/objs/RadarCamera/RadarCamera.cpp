@@ -29,7 +29,7 @@ namespace Isis {
    *
    * @param lab Pvl label used to create the parent Camera object
    */
-  RadarCamera::RadarCamera(Isis::Pvl &lab) : Camera(lab) {
+  RadarCamera::RadarCamera(Isis::Cube &cube) : Camera(cube) {
   }
 };
 

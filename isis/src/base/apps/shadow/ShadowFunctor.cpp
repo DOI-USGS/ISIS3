@@ -23,6 +23,7 @@
 #include "PvlGroup.h"
 #include "Statistics.h"
 #include "SurfacePoint.h"
+#include "TProjection.h"
 
 namespace Isis {
   /**
@@ -210,7 +211,7 @@ namespace Isis {
       std::swap(sampleLines[i], sampleLines[ rand() % i ]);
     }
 
-    Projection *elevationModelProjection = m_inputDem->projection();
+    TProjection *elevationModelProjection = (TProjection *)m_inputDem->projection();
 
     QPair<int, int> sampleLine;
     foreach (sampleLine, sampleLines) {

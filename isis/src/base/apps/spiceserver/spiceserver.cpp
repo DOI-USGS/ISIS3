@@ -402,14 +402,14 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     currentKernels.addKeyword(PvlKeyword("EndPadding", toString(g_endPad), "seconds"));
 
   currentKernels.addKeyword(
-      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(lab))),
+      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(cube))),
       Pvl::Replace);
 
   // Create the camera so we can get blobs if necessary
   try {
     Camera *cam = NULL;
     try {
-      cam = CameraFactory::Create(lab);
+      cam = CameraFactory::Create(cube);
 
       // If success then pretend we had the shape model keyword in there...
       //   this doesn't actually effect the blobs that we care about

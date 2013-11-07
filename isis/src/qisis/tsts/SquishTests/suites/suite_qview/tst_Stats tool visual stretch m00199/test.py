@@ -21,7 +21,7 @@ def main():
     
     # Finished with initial run
     clickButton(waitForObject(":qview_statisticsToolButton"))
-    mouseClick(waitForObject(":viewport1"), 280, 325, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":viewport1"), 280, 378, 0, Qt.LeftButton)
     waitFor("object.exists(':Statistics.Hide Display_QCheckBox')", 20000)
     test.compare(findObject(":Statistics.Hide Display_QCheckBox").text, "Hide Display")
     test.compare(findObject(":Statistics.Hide Display_QCheckBox").checked, True)
@@ -47,11 +47,15 @@ def main():
     test.vp("stretchedDnDisplay")
     
     clickButton(waitForObject(":qview.Spatial Plot Tool_QToolButton"))
-    mouseDrag(waitForObject(":viewport1_contents"), 63, 94, 250, 0, 1, Qt.LeftButton)
+    mouseDrag(waitForObject(":viewport1_contents"), 388, 136, -338, 21, 1, Qt.LeftButton)
     test.vp("spatialPlot")
+
     sendEvent("QCloseEvent", waitForObject(":qview_Isis::ViewportMainWindow"))
 
+
     snooze(1)
+
+
     
     # Restore original qview settings
     try:

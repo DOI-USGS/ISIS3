@@ -24,13 +24,20 @@ namespace Isis {
    * @internal
    *
    *   @history 2010-03-18 Sharmila Prasad - Added the Warning widget to the
-   *            status bar to display the error status both icon and message for
-   *            any application activity
+   *                           status bar to display the error status both icon and message for
+   *                           any application activity
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
-   *            CubeViewport.  Fixed include issues.
+   *                           CubeViewport.  Fixed include issues.
    *   @history 2011-04-25 Steven Lambright - Fixed updates at the bottom right
    *   @history 2012-06-18 Steven Lambright - Fixed access of viewport DN data to
    *                           not access out of range data. Fixes #896.
+   *   @history 2013-02-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
+   *   @history 2013-04-24 Jeannie Backer - Capitalized text output, "n/a", to
+   *                           be consistent with the AdvancedTrackTool text output. References
+   *                           #775.
+   *   @history 2013-05-07 Jeannie Backer - Replaced Lat with Rad for non-projected "Plane"
+   *                           shaped models. References #775.
    */
   class TrackTool : public Tool {
       Q_OBJECT

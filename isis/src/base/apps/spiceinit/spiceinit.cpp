@@ -44,12 +44,12 @@ void IsisMain() {
   // Make sure at least one CK & SPK quality was selected
   if (!ui.GetBoolean("CKPREDICTED") && !ui.GetBoolean("CKRECON") &&
      !ui.GetBoolean("CKSMITHED") && !ui.GetBoolean("CKNADIR")) {
-    string msg = "At least one CK quality must be selected";
+    QString msg = "At least one CK quality must be selected";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   if (!ui.GetBoolean("SPKPREDICTED") && !ui.GetBoolean("SPKRECON") &&
      !ui.GetBoolean("SPKSMITHED")) {
-    string msg = "At least one SPK quality must be selected";
+    QString msg = "At least one SPK quality must be selected";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -63,7 +63,7 @@ void IsisMain() {
   }
 
   if (proj != NULL) {
-    string msg = "Can not initialize SPICE for a map projected cube";
+    QString msg = "Can not initialize SPICE for a map projected cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -270,8 +270,6 @@ bool tryKernels(Cube *icube, Process &p,
                 Kernel fk, Kernel ik, Kernel sclk,
                 Kernel spk, Kernel iak,
                 Kernel dem, Kernel exk) {
-  Pvl lab = *icube->label();
-
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
   PvlKeyword pckKeyword("TargetAttitudeShape");
@@ -308,8 +306,15 @@ bool tryKernels(Cube *icube, Process &p,
   for (int i = 0; i < iak.size(); i++) {
     iakKeyword.addValue(iak[i]);
   }
-  for (int i = 0; i < dem.size(); i++) {
-    demKeyword.addValue(dem[i]);
+
+  UserInterface &ui = Application::GetUserInterface();
+  if (ui.GetString("SHAPE") == "RINGPLANE") {
+      demKeyword.addValue("RingPlane");
+  }
+  else {
+    for (int i = 0; i < dem.size(); i++) {
+      demKeyword.addValue(dem[i]);
+    }
   }
   for (int i = 0; i < exk.size(); i++) {
     exkKeyword.addValue(exk[i]);
@@ -362,7 +367,6 @@ bool tryKernels(Cube *icube, Process &p,
   if (currentKernels.hasKeyword("EndPadding"))
     currentKernels.deleteKeyword("EndPadding");
 
-  UserInterface &ui = Application::GetUserInterface();
   // Add any time padding the user specified to the spice group
   if (ui.GetDouble("STARTPAD") > DBL_EPSILON) {
     currentKernels.addKeyword(PvlKeyword("StartPadding",
@@ -375,7 +379,7 @@ bool tryKernels(Cube *icube, Process &p,
   }
 
   currentKernels.addKeyword(
-      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(lab))),
+      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(*icube))),
       Pvl::Replace);
 
   // Add the modified Kernels group to the input cube labels

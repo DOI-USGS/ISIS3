@@ -51,7 +51,7 @@ namespace Isis {
    */
   class MocNarrowAngleCamera : public LineScanCamera {
     public:
-      MocNarrowAngleCamera(Pvl &lab);
+      MocNarrowAngleCamera(Cube &cube);
 
       //! Destroys the MocNarrowAngleCamera object
       ~MocNarrowAngleCamera() {};

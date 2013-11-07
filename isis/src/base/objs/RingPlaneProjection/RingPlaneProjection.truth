@@ -1,0 +1,289 @@
+Unit test for RingPlaneProjection ...
+
+///////////////////////////////////////////////////////////
+Test Error Throws from the constructor...
+
+Test for missing Mapping Group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Unable to find PVL group [Mapping].
+
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** PVL Keyword [RingLongitudeDirection] does not exist in [Group = Mapping].
+
+Test for missing ring longitude direction in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** PVL Keyword [RingLongitudeDirection] does not exist in [Group = Mapping].
+
+Test for invalid ring longitude direction value
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [RingLongitudeDirection] must be [Clockwise or CounterClockwise].
+
+Test for missing ring longitude domain in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** PVL Keyword [RingLongitudeDomain] does not exist in [Group = Mapping].
+
+Test for invalid ring longitude domain value in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [RingLongitudeDomain] must be [180 or 360].
+///////////////////////////////////////////////////////////
+
+Projection Specifications
+Is Equatorial Cylindrical: 0
+Ring Longitude Direction:  CounterClockwise
+Is Clockwise:              0
+Is CounterClockwise:       1
+Ring Longitude Domain:     360
+Has 360 domain:            1
+Has 180 domain:            0
+Has ground range:          0
+Rotation:                  0
+Scale:                     1
+
+
+///////////////////////////////////////////////////////////
+Test More Error Throws...
+
+Testing invalid minimum ring radius...
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumRingRadius] of [-45.0] is not valid.
+
+Testing invalid maximum ring radius
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MaximumRingRadius] of [-80.0] is not valid.
+
+Testing unordered ring radius range
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumRingRadius,MaximumRingRadius] of [80.0,45.0] are not properly ordered.
+
+Testing unordered ring longitude range
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumRingLongitude,MaximumRingLongitude] of [15.0,-190.0] are not properly ordered.
+///////////////////////////////////////////////////////////
+
+Testing xyRange methods...
+
+Get ground range from the labels...  
+Has as ring longitude range:  1
+Minimum ring radius:          80
+Maximum ring radius:          180
+Minimum ring longitude:       15
+Maximum ring longitude:       190
+Find coordinate range ...  
+Minimum X:              150
+Maximum X:              1900
+Minimum Y:              170
+Maximum Y:              270
+
+Testing Ground coordinate routines
+Setting ring radius to (91,  0):       1
+Is Good:                               1
+Setting ring longitude to ( 0,  91):   0
+Is Good:                               0
+Setting position to (60,  -5):         1
+Is Good:                               1
+Ring Radius:                           60
+Local Ring Radius:                     60
+Ring Longitude:                        -5
+XCoord:                                -50
+YCoord:                                150
+Universal Ring Radius:                 60
+Universal Ring Longitude:              355
+
+Testing Universal Ground coordinate routines
+Setting position to (57.3920057293825,  355):  1
+Is Good:                                       1
+Ring Radius:                                   57.39200572938
+Ring Longitude:                                355
+XCoord:                                        3550
+YCoord:                                        147.3920057294
+Universal Ring Radius:                         57.39200572938
+Universal Ring Longitude:                      355
+Setting bad position...0
+
+Planar Projection Specifications
+Is Equatorial Cylindrical: 0
+Ring Longitude Direction:  Clockwise
+Is Clockwise:              1
+Is CounterClockwise:       0
+Ring Longitude Domain:     180
+Has 360 domain:            0
+Has 180 domain:            1
+Has ground range:          1
+Rotation:                  0
+
+Setting position to (9000.0, 0.0)
+Is Good:                     1
+Ring Radius:                 9000
+Ring Longitude:              -0
+XCoord:                      9000
+YCoord:                      0
+Universal Ring Radius:       9000
+Universal Ring Longitude:    0
+
+Setting position to (9000.0, 360.0)
+Is Good:                     1
+Ring Radius:                 9000
+Ring Longitude:              0
+XCoord:                      9000
+YCoord:                      0
+Universal Ring Radius:       9000
+Universal Ring Longitude:    -0
+
+Testing == operator Projection conditions...None
+Projection 1 name and resolution = None 1
+Projection 2 name and resolution = None 1
+Projection 3 name and resolution = Planar 1
+Projection 1 = Projection 2
+Projection 1 != Projection3
+
+Testing projection coordinate routines
+Setting x/y position to (-90,15):    1
+Is Good:                             1
+Ring Radius:                         -75
+Ring Longitude:                      -9
+XCoord:                              -90
+YCoord:                              15
+Universal Ring Radius:               -75
+Universal Ring Longitude:            351
+WorldX:                              -90
+WorldY:                              15
+
+Testing world coordinate routines
+Setting world x/y position to (-45,45):    1
+Is Good:                                   1
+Ring Radius:                               -75
+Ring Longitude:                            -2.25
+XCoord:                                    -22.5
+YCoord:                                    15
+Universal Ring Radius:                     -75
+Universal Ring Longitude:                  357.75
+WorldX:                                    -45
+WorldY:                                    45
+Resolution:                                0.5
+Scale:                                     1.570796326795
+True Scale Ring Radius:                    45
+
+Testing IsSky method
+0
+1
+
+Testing == operator condition in class...
+Projection 1 name and resolution             = None 1
+Projection 1 ring longitude direction        = CounterClockwise
+Projection 4 name and resolution             = None 1
+Projection 4 ring longitude direction string = Clockwise
+Projection 1 != Projection 4
+
+Testing string routines
+CounterClockwise
+360
+
+Testing Name and comparision routines
+Name:        None
+Version:     1.0
+operator==:  0
+operator!=:  1
+
+Testing no projection
+Ring Radius:               45
+Ring Longitude:            -90
+Is clockwise?              0
+Is counterclockwise?       1
+Ring Longitude direction = CounterClockwise
+Has 180 domain?            1
+Has 360 domain?            0
+Ring Longitude domain    = 180
+True scale ring radius   = 0
+
+Testing ring radius methods 
+45
+
+///////////////////////////////////////////////////////////
+
+Testing bad coordinates 
+Testing bad ring radius/ring longitude... Is good?  0
+Testing bad x/y... Is good?  0
+
+///////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////
+Test Error Throws for invalid inputs to conversion methods 
+**ERROR** Unable to convert to 180 degree domain. The given ring longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to 360 degree domain. The given ring longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to Clockwise. The given ring longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert ring longitude.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert to Clockwise. The given ring longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert ring longitude.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert to CounterClockwise. The given ring longitude value [-1.79769313486231e+308] is invalid.
+
+///////////////////////////////////////////////////////////
+Testing conversion routines with valid inputs...
+60 clockwise converted to 300 in 360 domain. 
+60 clockwise converted to -60 in 180 domain. 
+60 counterclockwise converted to 300 in 360 domain. 
+60 counterclockwise converted to -60 in 180 domain. 
+**ERROR** Unable to convert to world x.  The given x-value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to world y.  The given y-value [-1.79769313486231e+308] is invalid.
+///////////////////////////////////////////////////////////
+
+
+Rotation Tests
+Rotation:   90
+Testing Ground coordinate routines
+Setting ring radius to (-91,  0):    0
+Is Good:                             0
+Setting ring radius to ( 9001,  0):  1
+Is Good:                             1
+Setting position to (60,  -5):       1
+Is Good:                             1
+Ring Radius:                         60
+Ring Longitude:                      -5
+XCoord:                              150
+YCoord:                              50
+Universal Ring Radius:               60
+Universal Ring Longitude:            5
+
+Testing projection coordinate routines
+Setting x/y position to (150,50):    1
+Is Good:                             1
+Ring Radius:                         60
+Ring Longitude:                      -5
+XCoord:                              150
+YCoord:                              50
+Universal Ring Radius:               60
+Universal Ring Longitude:            5
+WorldX:                              150
+WorldY:                              50
+
+Testing Mapping() methods
+Mapping() = 
+Group = Mapping
+  TargetName             = SKY
+  ProjectionName         = MyProjection
+  RingLongitudeDirection = Clockwise
+  RingLongitudeDomain    = 180
+  PixelResolution        = 1.0
+  Scale                  = 1.0
+  UpperLeftCornerX       = 1.0
+  UpperLeftCornerY       = 1.0
+  MinimumRingRadius      = 80.0
+  MaximumRingRadius      = 180.0 <units>
+  MinimumRingLongitude   = 15.0
+  MaximumRingLongitude   = 190.0
+  Rotation               = 90.0
+End_Group
+End
+MappingRingRadii() = 
+Group = Mapping
+  MinimumRingRadius = 80.0
+  MaximumRingRadius = 180.0 <units>
+End_Group
+End
+MappingRingLongitudes() = 
+Group = Mapping
+  MinimumRingLongitude = 15.0
+  MaximumRingLongitude = 190.0
+End_Group
+End
+

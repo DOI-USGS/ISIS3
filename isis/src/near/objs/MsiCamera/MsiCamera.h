@@ -42,7 +42,7 @@ namespace Isis {
    */
   class MsiCamera : public FramingCamera {
     public:
-      MsiCamera(Pvl &lab);
+      MsiCamera(Cube &cube);
       ~MsiCamera();
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
                                                              double exposureDuration);

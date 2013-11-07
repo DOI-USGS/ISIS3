@@ -49,6 +49,8 @@ namespace Isis {
   *                           Fixes #218.
    *  @history 2011-11-01 Steven Lambright - Fixed possible seg fault.
    *                          References #205.
+   *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
   */
   class MeasureTool : public Tool {
       Q_OBJECT
@@ -57,16 +59,17 @@ namespace Isis {
       MeasureTool(QWidget *parent);
       void addTo(QMenu *menu);
 
+      //! Returns the menu name.
+      QString menuName() const {
+        return "&Options";
+      }
+
     protected slots:
       virtual void rubberBandComplete();
       virtual void updateMeasure();
       virtual void mouseLeave();
 
     protected:
-      //! Returns the menu name.
-      QString menuName() const {
-        return "&Options";
-      };
       QWidget *createToolBarWidget(QStackedWidget *parent);
       QAction *toolPadAction(ToolPad *pad);
       void updateTool();

@@ -37,9 +37,8 @@
 #include "IException.h"
 #include "IString.h"
 #include "OriginalLabel.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
-#include "Projection.h"
 #include "SpecialPixel.h"
 #include "SpiceManager.h"
 #include "Target.h"
@@ -285,7 +284,7 @@ namespace Isis {
     _orglabel = OriginalLabel(cube.fileName()).ReturnLabels();
     _nSubframes = (int) _orglabel.findKeyword("MESS:SUBFRAME",
                   PvlObject::Traverse);
-    _camera = CameraFactory::Create(_label);
+    _camera = CameraFactory::Create(cube);
     _digitsPrecision = _defaultDigits;
     _NullDefault = "\"N/A\"";
     _doUpdate = true;
@@ -337,7 +336,7 @@ namespace Isis {
     if(rot < 0.0) rot += 360.0;
     // Above completes celestial north, below is twist angle
     double twist_angle = (180.0 - rot);
-    twist_angle = Projection::To360Domain(fmod(twist_angle, 360.0));
+    twist_angle = TProjection::To360Domain(fmod(twist_angle, 360.0));
     geom += format("TWIST_ANGLE", twist_angle, "DEG");
 
 //  Now compute the RA/DEC reticle points

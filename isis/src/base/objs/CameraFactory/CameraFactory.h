@@ -24,8 +24,8 @@
 #include "Plugin.h"
 
 namespace Isis {
-  class Pvl;
   class Camera;
+  class Cube;
 
   /**
    * @brief Initializes a Camera Model
@@ -54,12 +54,16 @@ namespace Isis {
    *   @history 2011-05-23 Jannet Barrett and Steven Lambright - Added
    *                          m_cameraPlugin to reduce cost of instantiating
    *                          Cameras.
+   *   @history 2012-09-06 Steven Lambright - Changed Create() to take
+   *                           Cube instead of Pvl because cameras now require cubes to
+   *                           construct. Please see Camera for more information.   
    */
 
   class CameraFactory {
     public:
-      static Camera *Create(Pvl &pvl);
-      static int CameraVersion(Pvl &pvl);
+      static Camera *Create(Cube &cube);
+      static int CameraVersion(Cube &cube);
+      static int CameraVersion(Pvl &lab);
 
     private:
       static void initPlugin();

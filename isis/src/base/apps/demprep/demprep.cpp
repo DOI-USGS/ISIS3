@@ -4,7 +4,7 @@
 
 #include "Distance.h"
 #include "ProcessByLine.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "SpecialPixel.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
@@ -51,7 +51,7 @@ void IsisMain() {
     if ((maxLat - minLat) >= 180.0 && (maxLon - minLon) >= 360.0) isGlobal = true;
   }
 
-  Projection *proj = icube->projection();
+  TProjection *proj = (TProjection *) icube->projection();
   if(proj == NULL) {
     IString message = "The input cube must be a DEM file, which means it must be projected. ";
     message += "This file is not map projected.";

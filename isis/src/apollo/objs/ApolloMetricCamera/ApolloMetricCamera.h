@@ -52,7 +52,7 @@ namespace Isis {
    */
   class ApolloMetricCamera : public FramingCamera {
     public:
-      ApolloMetricCamera(Pvl &lab);
+      ApolloMetricCamera(Cube &cube);
       //! Destroys the ApolloMetricCamera Object
       ~ApolloMetricCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

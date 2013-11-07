@@ -59,7 +59,7 @@ namespace Isis {
    *                          documentation. Added call to
    *                          ShutterOpenCloseTimes() method.
    */
-  VoyagerCamera::VoyagerCamera (Pvl &lab) : FramingCamera(lab) {
+  VoyagerCamera::VoyagerCamera (Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
 
     // Set the pixel pitch
@@ -67,7 +67,8 @@ namespace Isis {
     SetFocalLength();
     // Find out what camera is being used, and set the focal length, altinstcode,
     // and camera
-    PvlGroup inst = lab.findGroup ("Instrument",Pvl::Traverse);
+    Pvl &lab = *cube.label();
+    PvlGroup &inst = lab.findGroup ("Instrument",Pvl::Traverse);
     QString spacecraft = (QString)inst["SpacecraftName"];
     QString instId = (QString)inst["InstrumentId"];
 
@@ -204,6 +205,6 @@ namespace Isis {
  * @internal
  *   @history 2010-07-19 Mackenzie Boyd - Original Version
  */
-extern "C" Isis::Camera *VoyagerCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::VoyagerCamera(lab);
+extern "C" Isis::Camera *VoyagerCameraPlugin(Isis::Cube &cube) {
+  return new Isis::VoyagerCamera(cube);
 }

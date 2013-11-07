@@ -132,7 +132,7 @@
           <item>5</item>
         </default>
         <minimum inclusive="yes">0</minimum>
-        <maximum incluseive="yes">100</maximum>
+        <maximum inclusive="yes">100</maximum>
       </parameter>
 
       <parameter name="GUILTY_BUMP_PERCENT">
@@ -151,7 +151,7 @@
           <item>10</item>
         </default>
         <minimum inclusive="yes">0</minimum>
-        <maximum incluseive="yes">100</maximum>
+        <maximum inclusive="yes">100</maximum>
       </parameter>
 
       <parameter name="SUSPECT_FLOOR">
@@ -192,7 +192,7 @@
           <item>15</item>
         </default>
         <minimum inclusive="yes">0</minimum>
-        <maximum incluseive="yes">100</maximum>
+        <maximum inclusive="yes">100</maximum>
       </parameter>
 
       <parameter name="MEASURE_REDUCTION_PERCENT">
@@ -205,7 +205,7 @@
           <item>30</item>
         </default>
         <minimum inclusive="yes">0</minimum>
-        <maximum incluseive="yes">100</maximum>
+        <maximum inclusive="yes">100</maximum>
       </parameter>
    </group>
  </groups>

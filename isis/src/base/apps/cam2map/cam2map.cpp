@@ -2,7 +2,7 @@
 
 #include "Isis.h"
 #include "Camera.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
 #include "IException.h"
@@ -213,20 +213,20 @@ void IsisMain() {
 
   // Use the updated label to create the output projection
   int samples, lines;
-  Projection *outmap;
+  TProjection *outmap;
   bool trim;
 
   // Determine the image size
   if(ui.GetString("DEFAULTRANGE") == "MINIMIZE" && !ui.GetBoolean("MATCHMAP")) {
-    outmap = ProjectionFactory::CreateForCube(userMap, samples, lines, *incam);
+    outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, *incam);
     trim = false;
   }
   else if(ui.GetString("DEFAULTRANGE") == "CAMERA" && !ui.GetBoolean("MATCHMAP")) {
-    outmap = ProjectionFactory::CreateForCube(userMap, samples, lines, false);
+    outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, false);
     trim = ui.GetBoolean("TRIM");
   }
   else { // DEFAULTRANGE = MAP
-    outmap = ProjectionFactory::CreateForCube(userMap, samples, lines,
+    outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines,
              ui.GetBoolean("MATCHMAP"));
     trim = ui.GetBoolean("TRIM");
   }
@@ -366,7 +366,7 @@ void IsisMain() {
     int startLine = 1;
 
     // Get the alpha cube group in case they cropped the image
-    AlphaCube acube(*icube->label());
+    AlphaCube acube(*icube);
     double betaLine = acube.AlphaLine(1.0);
     if (fabs(betaLine - 1.0) > 0.0000000001) {
       if (fabs(betaLine - (int) betaLine) > 0.00001) {
@@ -418,7 +418,7 @@ void IsisMain() {
 // Transform object constructor
 cam2mapForward::cam2mapForward(const int inputSamples, const int inputLines,
                                Camera *incam, const int outputSamples,
-                               const int outputLines, Projection *outmap,
+                               const int outputLines, TProjection *outmap,
                                bool trim) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;
@@ -476,7 +476,7 @@ int cam2mapForward::OutputLines() const {
 // Transform object constructor
 cam2mapReverse::cam2mapReverse(const int inputSamples, const int inputLines,
                                Camera *incam, const int outputSamples,
-                               const int outputLines, Projection *outmap,
+                               const int outputLines, TProjection *outmap,
                                bool trim) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;

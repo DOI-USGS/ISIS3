@@ -27,7 +27,7 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -52,7 +52,7 @@ namespace Isis {
    * @throws IException
    */
   Sinusoidal::Sinusoidal(Pvl &label, bool allowDefaults) :
-      Projection::Projection(label) {
+      TProjection::TProjection(label) {
     try {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.findGroup("Mapping", Pvl::Traverse);
@@ -90,9 +90,9 @@ namespace Isis {
    *              they are not
    */
   bool Sinusoidal::operator== (const Projection &proj) {
-    if (!Projection::operator==(proj)) return false;
+    if (!TProjection::operator==(proj)) return false;
     // dont do the below it is a recusive plunge
-    //  if (Projection::operator!=(proj)) return false;
+    //  if (TProjection::operator!=(proj)) return false;
     Sinusoidal *sinu = (Sinusoidal *) &proj;
     if (sinu->m_centerLongitude != m_centerLongitude) return false;
     return true;
@@ -260,7 +260,7 @@ namespace Isis {
    * @return PvlGroup The keywords that this projection uses
    */
   PvlGroup Sinusoidal::Mapping()  {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = TProjection::Mapping();
 
     mapping += m_mappingGrp["CenterLongitude"];
 
@@ -273,7 +273,7 @@ namespace Isis {
    * @return PvlGroup The latitude keywords that this projection uses
    */
   PvlGroup Sinusoidal::MappingLatitudes() {
-    PvlGroup mapping = Projection::MappingLatitudes();
+    PvlGroup mapping = TProjection::MappingLatitudes();
 
     return mapping;
   }
@@ -284,7 +284,7 @@ namespace Isis {
    * @return PvlGroup The longitude keywords that this projection uses
    */
   PvlGroup Sinusoidal::MappingLongitudes() {
-    PvlGroup mapping = Projection::MappingLongitudes();
+    PvlGroup mapping = TProjection::MappingLongitudes();
 
     mapping += m_mappingGrp["CenterLongitude"];
 
@@ -305,7 +305,7 @@ namespace Isis {
  * 
  * @return @b Isis::Projection* Pointer to a Sinusoidal projection object.
  */
-extern "C" Isis::Projection *SinusoidalPlugin(Isis::Pvl &lab,
+extern "C" Isis::TProjection *SinusoidalPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::Sinusoidal(lab, allowDefaults);
 }

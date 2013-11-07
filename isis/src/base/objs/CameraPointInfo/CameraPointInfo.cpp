@@ -24,12 +24,13 @@
 
 #include "Brick.h"
 #include "Camera.h"
+#include "Cube.h"
 #include "CubeManager.h"
 #include "Distance.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Longitude.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "PvlGroup.h"
 
 using namespace std;
@@ -43,11 +44,11 @@ namespace Isis {
    *
    */
   CameraPointInfo::CameraPointInfo() {
-    usedCubes = NULL;
-    usedCubes = new CubeManager();
-    usedCubes->SetNumOpenCubes(50);
-    currentCube = NULL;
-    camera = NULL;
+    m_usedCubes = NULL;
+    m_usedCubes = new CubeManager();
+    m_usedCubes->SetNumOpenCubes(50);
+    m_currentCube = NULL;
+    m_camera = NULL;
   }
 
   /**
@@ -55,9 +56,9 @@ namespace Isis {
    *
    */
   CameraPointInfo::~CameraPointInfo() {
-    if(usedCubes) {
-      delete usedCubes;
-      usedCubes = NULL;
+    if (m_usedCubes) {
+      delete m_usedCubes;
+      m_usedCubes = NULL;
     }
   }
 
@@ -70,8 +71,8 @@ namespace Isis {
    * @param cubeFileName A cube filename
    */
   void CameraPointInfo::SetCube(const QString &cubeFileName) {
-    currentCube = usedCubes->OpenCube(cubeFileName);
-    camera = currentCube->camera();
+    m_currentCube = m_usedCubes->OpenCube(cubeFileName);
+    m_camera = m_currentCube->camera();
   }
 
 
@@ -87,8 +88,8 @@ namespace Isis {
    */
   PvlGroup *CameraPointInfo::SetImage(const double sample, const double line,
                                       const bool outside, const bool errors) {
-    if(CheckCube()) {
-      bool passed = camera->SetImage(sample, line);
+    if (CheckCube()) {
+      bool passed = m_camera->SetImage(sample, line);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -102,8 +103,9 @@ namespace Isis {
    *         the point. Ownership is passed to caller.
    */
   PvlGroup *CameraPointInfo::SetCenter(const bool outside, const bool errors) {
-    if(CheckCube()) {
-      bool passed = camera->SetImage(currentCube->sampleCount() / 2.0, currentCube->lineCount() / 2.0);
+    if (CheckCube()) {
+      bool passed = m_camera->SetImage(m_currentCube->sampleCount() / 2.0, 
+                                       m_currentCube->lineCount() / 2.0);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -120,8 +122,8 @@ namespace Isis {
    */
   PvlGroup *CameraPointInfo::SetSample(const double sample,
                                        const bool outside, const bool errors) {
-    if(CheckCube()) {
-      bool passed = camera->SetImage(sample, currentCube->lineCount() / 2.0);
+    if (CheckCube()) {
+      bool passed = m_camera->SetImage(sample, m_currentCube->lineCount() / 2.0);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -138,8 +140,8 @@ namespace Isis {
    */
   PvlGroup *CameraPointInfo::SetLine(const double line,
                                      const bool outside, const bool errors) {
-    if(CheckCube()) {
-      bool passed = camera->SetImage(currentCube->sampleCount() / 2.0, line);
+    if (CheckCube()) {
+      bool passed = m_camera->SetImage(m_currentCube->sampleCount() / 2.0, line);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -161,8 +163,8 @@ namespace Isis {
    */
   PvlGroup *CameraPointInfo::SetGround(const double latitude, const double longitude,
                                        const bool outside, const bool errors) {
-    if(CheckCube()) {
-      bool passed = camera->SetUniversalGround(latitude, longitude);
+    if (CheckCube()) {
+      bool passed = m_camera->SetUniversalGround(latitude, longitude);
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()
@@ -177,7 +179,7 @@ namespace Isis {
    * @return bool Whether or not a cube has been set, true if it has been.
    */
   bool CameraPointInfo::CheckCube() {
-    if(currentCube == NULL) {
+    if (m_currentCube == NULL) {
       string msg = "Please set a cube before setting parameters";
       throw IException(IException::Programmer, msg, _FILEINFO_);
       return false;
@@ -234,27 +236,27 @@ namespace Isis {
       gp->addKeyword(PvlKeyword("UTC"));
       gp->addKeyword(PvlKeyword("LocalSolarTime"));
       gp->addKeyword(PvlKeyword("SolarLongitude"));
-      if(allowErrors) gp->addKeyword(PvlKeyword("Error"));
+      if (allowErrors) gp->addKeyword(PvlKeyword("Error"));
     }
 
     bool noErrors = passed;
     QString error = "";
-    if(!camera->HasSurfaceIntersection()) {
+    if (!m_camera->HasSurfaceIntersection()) {
       error = "Requested position does not project in camera model; no surface intersection";
       noErrors = false;
-      if(!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
+      if (!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
     }
-    if(!camera->InCube() && !allowOutside) {
+    if (!m_camera->InCube() && !allowOutside) {
       error = "Requested position does not project in camera model; not inside cube";
       noErrors = false;
-      if(!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
+      if (!allowErrors) throw IException(IException::Unknown, error, _FILEINFO_);
     }
 
-    if(!noErrors) {
-      for(int i = 0; i < gp->keywords(); i++) {
+    if (!noErrors) {
+      for (int i = 0; i < gp->keywords(); i++) {
         QString name = (*gp)[i].name();
         // These three keywords have 3 values, so they must have 3 N/As
-        if(name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
+        if (name == "BodyFixedCoordinate" || name == "SpacecraftPosition" ||
             name == "SunPosition") {
           (*gp)[i].addValue("N/A");
           (*gp)[i].addValue("N/A");
@@ -266,12 +268,13 @@ namespace Isis {
       }
       // Set all keywords that still have valid information
       gp->findKeyword("Error").setValue(error);
-      gp->findKeyword("FileName").setValue(currentCube->fileName());
-      gp->findKeyword("Sample").setValue(toString(camera->Sample()));
-      gp->findKeyword("Line").setValue(toString(camera->Line()));
-      gp->findKeyword("EphemerisTime").setValue(toString(camera->time().Et()), "seconds");
+      gp->findKeyword("FileName").setValue(m_currentCube->fileName());
+      gp->findKeyword("Sample").setValue(toString(m_camera->Sample()));
+      gp->findKeyword("Line").setValue(toString(m_camera->Line()));
+      gp->findKeyword("EphemerisTime").setValue(
+                      toString(m_camera->time().Et()), "seconds");
       gp->findKeyword("EphemerisTime").addComment("Time");
-      QString utc = camera->time().UTC();
+      QString utc = m_camera->time().UTC();
       gp->findKeyword("UTC").setValue(utc);
       gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
       gp->findKeyword("SunPosition").addComment("Sun Information");
@@ -280,110 +283,139 @@ namespace Isis {
 
     else {
 
-      Brick b(3, 3, 1, currentCube->pixelType());
+      Brick b(3, 3, 1, m_currentCube->pixelType());
 
-      int intSamp = (int)(camera->Sample() + 0.5);
-      int intLine = (int)(camera->Line() + 0.5);
+      int intSamp = (int)(m_camera->Sample() + 0.5);
+      int intLine = (int)(m_camera->Line() + 0.5);
       b.SetBasePosition(intSamp, intLine, 1);
-      currentCube->read(b);
+      m_currentCube->read(b);
 
       double pB[3], spB[3], sB[3];
       QString utc;
       double ssplat, ssplon, sslat, sslon, pwlon, oglat;
 
       {
-        gp->findKeyword("FileName").setValue(currentCube->fileName());
-        gp->findKeyword("Sample").setValue(toString(camera->Sample()));
-        gp->findKeyword("Line").setValue(toString(camera->Line()));
+        gp->findKeyword("FileName").setValue(m_currentCube->fileName());
+        gp->findKeyword("Sample").setValue(toString(m_camera->Sample()));
+        gp->findKeyword("Line").setValue(toString(m_camera->Line()));
         gp->findKeyword("PixelValue").setValue(PixelToString(b[0]));
-        gp->findKeyword("RightAscension").setValue(toString(camera->RightAscension()));
-        gp->findKeyword("Declination").setValue(toString(camera->Declination()));
-        gp->findKeyword("PlanetocentricLatitude").setValue(toString(camera->UniversalLatitude()));
+        gp->findKeyword("RightAscension").setValue(toString(
+                        m_camera->RightAscension()));
+        gp->findKeyword("Declination").setValue(toString(
+                        m_camera->Declination()));
+        gp->findKeyword("PlanetocentricLatitude").setValue(toString(
+                        m_camera->UniversalLatitude()));
 
         // Convert lat to planetographic
         Distance radii[3];
-        camera->radii(radii);
-        oglat = Isis::Projection::ToPlanetographic(camera->UniversalLatitude(),
-                radii[0].kilometers(), radii[2].kilometers());
+        m_camera->radii(radii);
+        oglat = TProjection::ToPlanetographic(m_camera->UniversalLatitude(),
+                                                    radii[0].kilometers(), 
+                                                    radii[2].kilometers());
         gp->findKeyword("PlanetographicLatitude").setValue(toString(oglat));
 
         gp->findKeyword("PositiveEast360Longitude").setValue(toString(
-          camera->UniversalLongitude()));
+                        m_camera->UniversalLongitude()));
 
         //Convert lon to -180 - 180 range
         gp->findKeyword("PositiveEast180Longitude").setValue(toString(
-          Isis::Projection::To180Domain(
-            camera->UniversalLongitude())));
+                        TProjection::To180Domain(m_camera->UniversalLongitude())));
 
         //Convert lon to positive west
-        pwlon = Isis::Projection::ToPositiveWest(camera->UniversalLongitude(),
-                360);
+        pwlon = TProjection::ToPositiveWest(
+                               m_camera->UniversalLongitude(), 360);
         gp->findKeyword("PositiveWest360Longitude").setValue(toString(pwlon));
 
         //Convert pwlon to -180 - 180 range
         gp->findKeyword("PositiveWest180Longitude").setValue(toString(
-          Isis::Projection::To180Domain(pwlon)));
+                        TProjection::To180Domain(pwlon)));
 
-        camera->Coordinate(pB);
+        m_camera->Coordinate(pB);
         gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[0]), "km");
         gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[1]), "km");
         gp->findKeyword("BodyFixedCoordinate").addValue(toString(pB[2]), "km");
 
-        gp->findKeyword("LocalRadius").setValue(toString(camera->LocalRadius().meters()), "meters");
-        gp->findKeyword("SampleResolution").setValue(toString(camera->SampleResolution()), "meters/pixel");
-        gp->findKeyword("LineResolution").setValue(toString(camera->LineResolution()), "meters/pixel");
+        gp->findKeyword("LocalRadius").setValue(toString(
+                        m_camera->LocalRadius().meters()), "meters");
+        gp->findKeyword("SampleResolution").setValue(toString(
+                        m_camera->SampleResolution()), "meters/pixel");
+        gp->findKeyword("LineResolution").setValue(toString(
+                        m_camera->LineResolution()), "meters/pixel");
 
         //body fixed
-        camera->instrumentPosition(spB);
+        m_camera->instrumentPosition(spB);
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[0]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[1]), "km");
         gp->findKeyword("SpacecraftPosition").addValue(toString(spB[2]), "km");
         gp->findKeyword("SpacecraftPosition").addComment("Spacecraft Information");
 
-        gp->findKeyword("SpacecraftAzimuth").setValue(toString(camera->SpacecraftAzimuth()));
-        gp->findKeyword("SlantDistance").setValue(toString(camera->SlantDistance()), "km");
-        gp->findKeyword("TargetCenterDistance").setValue(toString(camera->targetCenterDistance()), "km");
-        camera->subSpacecraftPoint(ssplat, ssplon);
+        gp->findKeyword("SpacecraftAzimuth").setValue(toString(
+                        m_camera->SpacecraftAzimuth()));
+        gp->findKeyword("SlantDistance").setValue(toString(
+                        m_camera->SlantDistance()), "km");
+        gp->findKeyword("TargetCenterDistance").setValue(toString(
+                        m_camera->targetCenterDistance()), "km");
+        m_camera->subSpacecraftPoint(ssplat, ssplon);
         gp->findKeyword("SubSpacecraftLatitude").setValue(toString(ssplat));
         gp->findKeyword("SubSpacecraftLongitude").setValue(toString(ssplon));
-        gp->findKeyword("SpacecraftAltitude").setValue(toString(camera->SpacecraftAltitude()), "km");
-        gp->findKeyword("OffNadirAngle").setValue(toString(camera->OffNadirAngle()));
+        gp->findKeyword("SpacecraftAltitude").setValue(toString(
+                        m_camera->SpacecraftAltitude()), "km");
+        gp->findKeyword("OffNadirAngle").setValue(toString(
+                        m_camera->OffNadirAngle()));
         double subspcgrdaz;
-        subspcgrdaz = camera->GroundAzimuth(camera->UniversalLatitude(), camera->UniversalLongitude(),
-                                            ssplat, ssplon);
+        subspcgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(), 
+                                              m_camera->UniversalLongitude(),
+                                              ssplat, ssplon);
         gp->findKeyword("SubSpacecraftGroundAzimuth").setValue(toString(subspcgrdaz));
 
-        camera->sunPosition(sB);
+        m_camera->sunPosition(sB);
         gp->findKeyword("SunPosition").addValue(toString(sB[0]), "km");
         gp->findKeyword("SunPosition").addValue(toString(sB[1]), "km");
         gp->findKeyword("SunPosition").addValue(toString(sB[2]), "km");
         gp->findKeyword("SunPosition").addComment("Sun Information");
 
-        gp->findKeyword("SubSolarAzimuth").setValue(toString(camera->SunAzimuth()));
-        gp->findKeyword("SolarDistance").setValue(toString(camera->SolarDistance()), "AU");
-        camera->subSolarPoint(sslat, sslon);
+        gp->findKeyword("SubSolarAzimuth").setValue(toString(m_camera->SunAzimuth()));
+        gp->findKeyword("SolarDistance").setValue(toString(
+                        m_camera->SolarDistance()), "AU");
+        m_camera->subSolarPoint(sslat, sslon);
         gp->findKeyword("SubSolarLatitude").setValue(toString(sslat));
         gp->findKeyword("SubSolarLongitude").setValue(toString(sslon));
         double subsolgrdaz;
-        subsolgrdaz = camera->GroundAzimuth(camera->UniversalLatitude(), camera->UniversalLongitude(),
-                                            sslat, sslon);
+        subsolgrdaz = m_camera->GroundAzimuth(m_camera->UniversalLatitude(), 
+                                              m_camera->UniversalLongitude(),
+                                              sslat, sslon);
         gp->findKeyword("SubSolarGroundAzimuth").setValue(toString(subsolgrdaz));
 
-        gp->findKeyword("Phase").setValue(toString(camera->PhaseAngle()));
+        gp->findKeyword("Phase").setValue(toString(m_camera->PhaseAngle()));
         gp->findKeyword("Phase").addComment("Illumination and Other");
-        gp->findKeyword("Incidence").setValue(toString(camera->IncidenceAngle()));
-        gp->findKeyword("Emission").setValue(toString(camera->EmissionAngle()));
-        gp->findKeyword("NorthAzimuth").setValue(toString(camera->NorthAzimuth()));
+        gp->findKeyword("Incidence").setValue(toString(
+                        m_camera->IncidenceAngle()));
+        gp->findKeyword("Emission").setValue(toString(
+                        m_camera->EmissionAngle()));
+        gp->findKeyword("NorthAzimuth").setValue(toString(
+                        m_camera->NorthAzimuth()));
 
-        gp->findKeyword("EphemerisTime").setValue(toString(camera->time().Et()), "seconds");
+        gp->findKeyword("EphemerisTime").setValue(toString(
+                        m_camera->time().Et()), "seconds");
         gp->findKeyword("EphemerisTime").addComment("Time");
-        utc = camera->time().UTC();
+        utc = m_camera->time().UTC();
         gp->findKeyword("UTC").setValue(utc);
-        gp->findKeyword("LocalSolarTime").setValue(toString(camera->LocalSolarTime()), "hour");
-        gp->findKeyword("SolarLongitude").setValue(toString(camera->solarLongitude().degrees()));
-        if(allowErrors) gp->findKeyword("Error").setValue("N/A");
+        gp->findKeyword("LocalSolarTime").setValue(toString(
+                        m_camera->LocalSolarTime()), "hour");
+        gp->findKeyword("SolarLongitude").setValue(toString(
+                        m_camera->solarLongitude().degrees()));
+        if (allowErrors) gp->findKeyword("Error").setValue("N/A");
       }
     }
     return gp;
+  }
+
+
+  Camera *CameraPointInfo::camera() {
+    return m_camera;
+  }
+
+  Cube *CameraPointInfo::cube() {
+    return m_currentCube;
   }
 }

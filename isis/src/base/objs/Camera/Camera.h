@@ -224,12 +224,17 @@ namespace Isis {
    *   @history 2012-11-20 Janet Barrett - Fixed a problem with the GroundAzimuth method so
    *                           that the azimuth value is calculated correctly for radar data.
    *                           Fixes #1117.
+   *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
+   *                           instead of Projection as needed.  References #775.
+   *   @history 2012-04-24 Jeannie Backer - Added a programmer error if NorthAzimuth() is called on
+   *                           a plane projection since this value is meaningless for ring plane
+   *                           projections. References #775.
    */
 
   class Camera : public Sensor {
     public:
       // constructors
-      Camera(Pvl &lab);
+      Camera(Cube &cube);
 
       // destructor
       //! Destroys the Camera Object
@@ -258,8 +263,10 @@ namespace Isis {
       int Band();
       double Line();
 
-      bool GroundRange(double &minlat, double &maxlat,
-                       double &minlon, double &maxlon, Pvl &pvl);
+      bool GroundRange(double &minlat, double &maxlat, double &minlon,
+                       double &maxlon, Pvl &pvl);
+      bool ringRange(double &minRingRadius, double &maxRingRadius, 
+                     double &minRingLongitude, double &maxRingLongitude, Pvl &pvl);
       bool IntersectsLongitudeDomain(Pvl &pvl);
 
       double PixelResolution();
@@ -272,6 +279,7 @@ namespace Isis {
       double HighestImageResolution();
 
       void BasicMapping(Pvl &map);
+      void basicRingMapping(Pvl &map);
 
       double FocalLength() const;
       double PixelPitch() const;
@@ -464,6 +472,7 @@ namespace Isis {
       double p_pixelPitch;                   //!< The pixel pitch, in millimeters per pixel
 
       void GroundRangeResolution();
+      void ringRangeResolution();
       double p_minlat;                       //!< The minimum latitude
       double p_maxlat;                       //!< The maximum latitude
       double p_minlon;                       //!< The minimum longitude
@@ -472,7 +481,7 @@ namespace Isis {
       double p_maxres;                       //!< The maximum resolution
       double p_minlon180;                    //!< The minimum longitude in the 180 domain
       double p_maxlon180;                    //!< The maximum longitude in the 180 domain
-      bool p_groundRangeComputed;            /**!< Flag showing if the ground range
+      bool p_groundRangeComputed;            /**!< Flag showing if ground range
                                                   was computed successfully.*/
 
       bool p_pointComputed;                  //!< Flag showing if Sample/Line has been computed
@@ -494,6 +503,15 @@ namespace Isis {
       double p_maxra180;                     //!< The maximum right ascension in the 180 domain
       bool p_raDecRangeComputed;             /**!< Flag showing if the raDec range
                                                   has been computed successfully.*/
+
+      double p_minRingRadius;                //!< The minimum ring radius
+      double p_maxRingRadius;                //!< The maximum ring radius
+      double p_minRingLongitude;             //!< The minimum ring longitude (azimuth)
+      double p_maxRingLongitude;             //!< The maximum ring longitude (azimuth)
+      double p_minRingLongitude180;          //!< The minimum ring longitude in the 180 domain
+      double p_maxRingLongitude180;          //!< The maximum ring longitude in the 180 domain
+      bool p_ringRangeComputed;              /**!< Flag showing if ring range
+                                                  was computed successfully.*/
 
       AlphaCube *p_alphaCube;          //!< A pointer to the AlphaCube
       double p_childSample;                  //!< Sample value for child

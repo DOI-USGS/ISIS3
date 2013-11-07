@@ -45,7 +45,7 @@ namespace Isis {
 
   class FramingCamera : public Camera {
     public:
-      FramingCamera(Pvl &lab);
+      FramingCamera(Cube &cube);
       //! Destroys the FramingCamera Object
       ~FramingCamera() {};
 

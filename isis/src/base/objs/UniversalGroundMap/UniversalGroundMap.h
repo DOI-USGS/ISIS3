@@ -73,6 +73,12 @@ namespace Isis {
    *                          a plus that intersects in the center of the image. This
    *                          ensures that the entire longitude range is returned.
    *                          Fixes #855.
+   *  @history 2012-12-20 Debbie A. Cook - Changed to use TProjection 
+   *                           instead of Projection.  References #775.
+   *  @history 2013-04-24 Tracie Sucharski - Added ring plane functionality to methods
+   *                           UniversalLatitude() and UniversalLongitude().  Reference #775.
+   *   @history 2012-04-24 Jeannie Backer - Removed prototype for constructor that has
+   *                           been removed from this class. References #775.
    */
   class UniversalGroundMap {
     public:
@@ -93,7 +99,6 @@ namespace Isis {
         ProjectionFirst
       };
 
-      UniversalGroundMap(Pvl &pvl, CameraPriority priority = CameraFirst);
       UniversalGroundMap(Cube &cube, CameraPriority priority = CameraFirst);
       ~UniversalGroundMap();
 
@@ -147,8 +152,6 @@ namespace Isis {
 
 
     private:
-      void Init(Pvl &pvl, CameraPriority priority);
-
       Isis::Camera *p_camera;  //!<The camera (if the image has a camera)
       Isis::Projection *p_projection;  //!<The projection (if the image is projected)
   };

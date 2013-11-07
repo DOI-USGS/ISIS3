@@ -302,9 +302,9 @@ m_container = container;
     // Rectangle is selected
     if (p_shapeComboBox->currentIndex() == Rectangle) {
 
-      if (!RubberBandTool::isValid()) return;
+      if (!rubberBandTool()->isValid()) return;
 
-      QRect r = RubberBandTool::rectangle();
+      QRect r = rubberBandTool()->rectangle();
       if ((r.width() < 1) || (r.height() < 1)) return;
 
       vp->viewportToCube(r.left(), r.top(), ssamp, sline);
@@ -336,10 +336,10 @@ m_container = container;
     // Line is selected
     else if (p_shapeComboBox->currentIndex() == StartEndLine) {
       //  Convert rubber band line to cube coordinates
-      if (!RubberBandTool::isValid()) return;
-      vp->viewportToCube(RubberBandTool::getVertices()[0].rx(), RubberBandTool::getVertices()[0].ry(),
+      if (!rubberBandTool()->isValid()) return;
+      vp->viewportToCube(rubberBandTool()->vertices()[0].rx(), rubberBandTool()->vertices()[0].ry(),
                          ssamp, sline);
-      vp->viewportToCube(RubberBandTool::getVertices()[1].rx(), RubberBandTool::getVertices()[1].ry(),
+      vp->viewportToCube(rubberBandTool()->vertices()[1].rx(), rubberBandTool()->vertices()[1].ry(),
                          esamp, eline);
 
       QLine l((int)ssamp, (int)sline, (int)esamp, (int)eline);
@@ -928,15 +928,15 @@ m_container = container;
   void EditTool::enableRubberBandTool() {
     int index = p_shapeComboBox->currentIndex();
     if (index == 3) {
-      RubberBandTool::enable(RubberBandTool::Line);
-      RubberBandTool::drawActiveViewportOnly(true);
+      rubberBandTool()->enable(RubberBandTool::LineMode);
+      rubberBandTool()->setDrawActiveViewportOnly(true);
     }
     else if (index == 4) {
-      RubberBandTool::enable(RubberBandTool::Rectangle);
-      RubberBandTool::drawActiveViewportOnly(true);
+      rubberBandTool()->enable(RubberBandTool::RectangleMode);
+      rubberBandTool()->setDrawActiveViewportOnly(true);
     }
     else {
-      RubberBandTool::disable();
+      rubberBandTool()->disable();
     }
   }
 }

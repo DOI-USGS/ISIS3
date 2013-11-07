@@ -23,10 +23,10 @@ Version: **ERROR** Unable to locate latest camera model version number from grou
 Testing unsupported camera mode ...
 Version: **ERROR** Unable to locate latest camera model version number from group [Instrument].
 **ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT].
-**PVL ERROR** Unable to find group [BOGUSSPACECRAFT/BOGUSINSTRUMENT] in file [/usgs/pkgs/isis3nightly/isis/lib/Camera.plugin]
+**ERROR** Unable to find PVL group [BOGUSSPACECRAFT/BOGUSINSTRUMENT].
 
 **ERROR** Unable to initialize camera model from group [Instrument].
 **ERROR** Unable to locate latest camera model version number from group [Instrument].
 **ERROR** Unsupported camera model, unable to find plugin for SpacecraftName [BOGUS SPACECRAFT] with InstrumentId [BOGUS INSTRUMENT].
-**PVL ERROR** Unable to find group [BOGUSSPACECRAFT/BOGUSINSTRUMENT] in file [/usgs/pkgs/isis3nightly/isis/lib/Camera.plugin]
+**ERROR** Unable to find PVL group [BOGUSSPACECRAFT/BOGUSINSTRUMENT].
 

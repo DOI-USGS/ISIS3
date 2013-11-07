@@ -253,8 +253,8 @@ void IsisMain() {
 
   for(int f = 0; f < list.size(); f++) {
 
-    Pvl vimsCubePvl(list[f].toString());
-    g_groundMap = new UniversalGroundMap(vimsCubePvl);
+    Cube vimsCube(list[f].toString(), "r");
+    g_groundMap = new UniversalGroundMap(vimsCube);
 
     // Loop through the input cube and get the all pixels values for all bands
     ProcessByBrick pbb;

@@ -63,6 +63,9 @@
       two new tests to test the processing of level 2 cubes and the use of a map
       template file.
     </change>
+    <change name="Tracie Sucharski" date="2012-12-06">
+      Changed to use TProjection instead of Projection.  References #775
+    </change>
 </history>
 
   <category>

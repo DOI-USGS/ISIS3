@@ -171,8 +171,8 @@ namespace Isis {
       double t = newIntersectPt[0] * newIntersectPt[0] +
           newIntersectPt[1] * newIntersectPt[1];
       
-      latDD = atan2(newIntersectPt[2], sqrt(t)) * 180.0 / PI;
-      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * 180.0 / PI;
+      latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
+      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
        
       if (lonDD < 0)
         lonDD += 360;
@@ -248,9 +248,9 @@ namespace Isis {
       m_demCube->read(*m_portal);
 
       distance = Distance(m_interp->Interpolate(m_demProj->WorldX(),
-                                                                          m_demProj->WorldY(),
-                                                                          m_portal->DoubleBuffer()),
-                          Distance::Meters);
+                                                m_demProj->WorldY(),
+                                                m_portal->DoubleBuffer()),
+                                                Distance::Meters);
     }
 
     return distance;
@@ -312,6 +312,7 @@ namespace Isis {
       normal[1] = 0.;
       normal[2] = 0.;
       setHasNormal(false);
+      return;
    }
     else {
       setHasNormal(true);

@@ -32,6 +32,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "PlaneShape.h"
 #include "Projection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -63,11 +64,11 @@ namespace Isis {
       // Sky targets are ellipsoid shapes
     }
     else if (kernelsPvlGroup.hasKeyword("ElevationModel") &&
-             !kernelsPvlGroup["ElevationModel"].isNull())  {//&&
+             !kernelsPvlGroup["ElevationModel"].isNull())  {
       shapeModelFilenames = (QString) kernelsPvlGroup["ElevationModel"];
     }
     else if (kernelsPvlGroup.hasKeyword("ShapeModel") &&
-             !kernelsPvlGroup["ShapeModel"].isNull()) {//&&
+             !kernelsPvlGroup["ShapeModel"].isNull()) {
       shapeModelFilenames = (QString) kernelsPvlGroup["ShapeModel"];
     }
 
@@ -79,9 +80,9 @@ namespace Isis {
     if (shapeModelFilenames == "") {
       shapeModel = new EllipsoidShape(target);
     }
-    // else if (shapeModelFilenames == "RingPlane") {
-    //  shapeModel = new PlaneShape(target, pvl);
-    // }
+    else if (shapeModelFilenames == "RingPlane") {
+      shapeModel = new PlaneShape(target, pvl);
+    }
     else {
       try {
         // Is the shape model an Isis DEM?

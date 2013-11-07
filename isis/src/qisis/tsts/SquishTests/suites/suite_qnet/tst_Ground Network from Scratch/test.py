@@ -16,11 +16,11 @@ def main():
     startApplication("qnet")
 
     # Open Mini.lis / no network    
-    clickButton(waitForObject(":qnet.Open control network  cube list_QToolButton"))
-    clickButton(waitForObject(":Select a list of cubes.toParentButton_QToolButton"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet.File_QMenu", "Open control network and cube list"))
     snooze(0.5)
     mouseClick(waitForObject(":fileNameEdit_QLineEdit"), 95, 13, 0, Qt.LeftButton)
-    type(waitForObject(":fileNameEdit_QLineEdit"), "src/qisis/tsts/SquishTests/input/Ground/Mini.lis")
+    type(waitForObject(":fileNameEdit_QLineEdit"), "../src/qisis/tsts/SquishTests/input/Ground/Mini.lis")
     type(waitForObject(":_QListView"), "<Return>")
 
     clickButton(waitForObject(":Select a control network.Cancel_QPushButton"))
@@ -203,16 +203,16 @@ def main():
 
     # Set apriori/sigmas on grnd1
     clickButton(waitForObject(":Control Network Navigator.Set Apriori/Sigmas_QPushButton"))
-    waitForObjectItem(":EditLocked Points.editLockPointsListBox_QListWidget", "grnd1")
-    clickItem(":EditLocked Points.editLockPointsListBox_QListWidget", "grnd1", 7, 4, 0, Qt.LeftButton)
-    mouseClick(waitForObject(":latSigmaEdit_QLineEdit"), 46, 17, 0, Qt.LeftButton)
-    type(waitForObject(":latSigmaEdit_QLineEdit"), "100")
-    mouseClick(waitForObject(":lonSigmaEdit_QLineEdit"), 20, 5, 0, Qt.LeftButton)
-    type(waitForObject(":lonSigmaEdit_QLineEdit"), "200")
-    mouseClick(waitForObject(":radiusSigmaEdit_QLineEdit"), 32, 5, 0, Qt.LeftButton)
-    type(waitForObject(":radiusSigmaEdit_QLineEdit"), "300")
-    clickButton(waitForObject(":Set Apriori Point and Constraints.Set Apriori_QPushButton"))
-    clickButton(waitForObject(":Set Apriori Point and Constraints.Close_QPushButton"))
+    waitForObjectItem(":EditLocked Points.editLockPointsListBox_QListWidget_2", "grnd1")
+    clickItem(":EditLocked Points.editLockPointsListBox_QListWidget_2", "grnd1", 7, 4, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":latSigmaEdit_QLineEdit_2"), 46, 17, 0, Qt.LeftButton)
+    type(waitForObject(":latSigmaEdit_QLineEdit_2"), "100")
+    mouseClick(waitForObject(":lonSigmaEdit_QLineEdit_2"), 20, 5, 0, Qt.LeftButton)
+    type(waitForObject(":lonSigmaEdit_QLineEdit_2"), "200")
+    mouseClick(waitForObject(":radiusSigmaEdit_QLineEdit_2"), 32, 5, 0, Qt.LeftButton)
+    type(waitForObject(":radiusSigmaEdit_QLineEdit_2"), "300")
+    clickButton(waitForObject(":Set Apriori Point and Constraints.Set Apriori_QPushButton_2"))
+    clickButton(waitForObject(":Set Apriori Point and Constraints.Close_QPushButton_2"))
 
     # Open "grnd1" (grnd2 was open)
     waitForObjectItem(":Navigator_List", "grnd1")
@@ -307,6 +307,6 @@ def main():
     type(waitForObject(":fileNameEdit_QLineEdit_3"), "<Return>")
     
     # Exit 
-    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet_QMenuBar_2", "File"))
     activateItem(waitForObjectItem(":qnet.File_QMenu", "Exit"))
     snooze(1)

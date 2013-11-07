@@ -8,8 +8,11 @@
 
 #include <QtAlgorithms>
 #include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QPair>
 #include <QQueue>
+#include <QScopedPointer>
 #include <QSet>
 #include <QTime>
 
@@ -27,7 +30,7 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Progress.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
@@ -41,6 +44,7 @@ namespace Isis {
     points = NULL;
     cubeGraphNodes = NULL;
     pointIds = NULL;
+    m_mutex = NULL;
   }
 
   //!Creates an empty ControlNet object
@@ -127,6 +131,8 @@ namespace Isis {
       delete pointIds;
       pointIds = NULL;
     }
+
+    m_mutex = NULL;
   }
 
 
@@ -1490,10 +1496,10 @@ namespace Isis {
     for (int i = 0; i < list.Size(); i++) {
       QString serialNumber = list.SerialNumber(i);
       QString filename = list.FileName(i);
-      Pvl pvl(filename);
+      Cube cube(filename, "r");
 
       try {
-        Isis::Camera *cam = CameraFactory::Create(pvl);
+        Isis::Camera *cam = CameraFactory::Create(cube);
         p_cameraMap[serialNumber] = cam;
         p_cameraMeasuresMap[serialNumber] = 0;
         p_cameraRejectedMeasuresMap[serialNumber] = 0;
@@ -1550,6 +1556,18 @@ namespace Isis {
 
 
   /**
+   * Set mutex to lock for making Naif calls
+   * 
+   * @author 2012-09-11 Tracie Sucharski
+   * 
+   * @param mutex 
+   */
+  void ControlNet::SetMutex(QMutex *mutex) {
+    m_mutex = mutex;
+  }
+
+
+  /**
    * Set the network id
    *
    * @param id The Id of this Control Network
@@ -1565,11 +1583,17 @@ namespace Isis {
    * @param target The name of the target of this Control Network
    */
   void ControlNet::SetTarget(const QString &target) {
+    QScopedPointer <QMutexLocker> locker;
+
+    if (m_mutex) {
+      locker.reset(new QMutexLocker(m_mutex));
+    }
+
     p_targetName = target;
 
     p_targetRadii.clear();
     if (p_targetName != "") {
-      PvlGroup pvlRadii = Projection::TargetRadii(target);
+      PvlGroup pvlRadii = TProjection::TargetRadii(target);
       p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
                                        Distance::Meters));
       // The method Projection::Radii does not provide the B radius
@@ -1595,77 +1619,66 @@ namespace Isis {
     p_userName = name;
   }
 
-  const ControlNet &ControlNet::operator=(ControlNet other) {
-    if (this == &other)
-      return *this;
 
-    if (points) {
-      QHashIterator< QString, ControlPoint * > i(*points);
-      while (i.hasNext()) {
-        i.next();
-        delete(*points)[i.key()];
-        (*points)[i.key()] = NULL;
-      }
-      delete points;
-      points = NULL;
-    }
+  /**
+   * Swaps the member data with the given control net. This is an optimized form of:
+   *   ControlNet a = ...
+   *   ControlNet b = ...
+   *
+   *   Swap 'a' and 'b'
+   *   ControlNet tmp = a;
+   *   a = b;
+   *   b = tmp;
+   *
+   * This is used primarily for the assignment operator in order to do copy-and-swap.
+   *
+   * @param other The control net to swap with.
+   */
+  void ControlNet::swap(ControlNet &other) {
+    std::swap(points, other.points);
+    std::swap(cubeGraphNodes, other.cubeGraphNodes);
+    std::swap(pointIds, other.pointIds);
+    std::swap(m_mutex, other.m_mutex);
+    std::swap(p_targetName, other.p_targetName);
+    std::swap(p_networkId, other.p_networkId);
+    std::swap(p_created, other.p_created);
+    std::swap(p_modified, other.p_modified);
+    std::swap(p_description, other.p_description);
+    std::swap(p_userName, other.p_userName);
+    std::swap(p_cameraMap, other.p_cameraMap);
+    std::swap(p_cameraMeasuresMap, other.p_cameraMeasuresMap);
+    std::swap(p_cameraRejectedMeasuresMap, other.p_cameraRejectedMeasuresMap);
+    std::swap(p_cameraList, other.p_cameraList);
+    std::swap(p_targetRadii, other.p_targetRadii);
+    std::swap(p_invalid, other.p_invalid);
 
-    if (cubeGraphNodes) {
-      QHashIterator< QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
-      while (i.hasNext()) {
-        i.next();
-        delete(*cubeGraphNodes)[i.key()];
-        (*cubeGraphNodes)[i.key()] = NULL;
-      }
-      delete cubeGraphNodes;
-      cubeGraphNodes = NULL;
-    }
-
-    points = new QHash< QString, ControlPoint * >;
-    cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
-
-    QHashIterator < QString, ControlPoint * > i(*other.points);
+    // points have parent pointers that need updated too...
+    QHashIterator< QString, ControlPoint * > i(*points);
     while (i.hasNext()) {
-      i.next();
-
-      ControlPoint *newPoint = new ControlPoint(*i.value());
-      newPoint->parentNetwork = this;
-      QString newPointId = newPoint->GetId();
-      points->insert(newPointId, newPoint);
-
-      // create graph for non-ignored points and measures
-      if (!newPoint->IsIgnored()) {
-        QList< ControlMeasure * > measures = newPoint->getMeasures();
-        for (int i = 0; i < measures.size(); i++) {
-          ControlMeasure *measure = measures[i];
-          QString serial = measure->GetCubeSerialNumber();
-
-          if (!measure->IsIgnored()) {
-            if (cubeGraphNodes->contains(serial)) {
-              (*cubeGraphNodes)[serial]->addMeasure(measure);
-            }
-            else {
-              ControlCubeGraphNode *newControlCubeGraphNode =
-                new ControlCubeGraphNode(serial);
-
-              newControlCubeGraphNode->addMeasure(measure);
-              cubeGraphNodes->insert(serial, newControlCubeGraphNode);
-            }
-          }
-        }
-      }
+      i.next().value()->parentNetwork = this;
     }
 
-    p_targetName = other.p_targetName;
-    p_targetRadii = other.p_targetRadii;
-    p_networkId = other.p_networkId;
-    p_created = other.p_created;
-    p_modified = other.p_modified;
-    p_description = other.p_description;
-    p_userName = other.p_userName;
-    p_invalid = other.p_invalid;
-    p_cameraMap = other.p_cameraMap;
-    p_cameraList = other.p_cameraList;
+    QHashIterator< QString, ControlPoint * > i2(*other.points);
+    while (i2.hasNext()) {
+      i2.next().value()->parentNetwork = &other;
+    }
+  }
+
+
+  /**
+   * Assign other to this.
+   *
+   * This is an exception-safe assignment operator.
+   *
+   * @param other The control net to assign to this.
+   */
+  ControlNet &ControlNet::operator=(const ControlNet &other) {
+    // Optimization: if this == other do nothing.
+    if (this != &other) {
+      // copy & swap
+      ControlNet copy(other);
+      swap(copy);
+    }
 
     return *this;
   }

@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -70,6 +70,8 @@ namespace Isis {
    *                           implementation file. Minor modifications to
    *                           comply with some coding standards. References
    *                           #928.
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    *   @history 2013-02-22 Kimberly Oyama and Debbie Cook - XYRange() and SetCoordinate()
    *                           were modified because XYRange() was returning the wrong x/y
    *                           ranges caused by a false failure in SetCoordinate(). Added
@@ -84,7 +86,7 @@ namespace Isis {
    *                           to make sure m_longitude is in the correct domain.
    *                           Fixes #1471.
    */
-  class Orthographic : public Projection {
+  class Orthographic : public TProjection {
     public:
       Orthographic(Pvl &label, bool allowDefaults = false);
       ~Orthographic();

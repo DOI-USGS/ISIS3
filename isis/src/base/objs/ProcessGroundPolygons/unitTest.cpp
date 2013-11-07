@@ -67,10 +67,10 @@ void IsisMain() {
   ProcessByLine pbl;
   CubeAttributeInput atts0;
 
-  QStringList vimsCube;
-  vimsCube << "$Cassini/testData/CM_1540484927_1_001.ir.cub"
-           << "$Cassini/testData/CM_1540484927_1_002.ir.cub"
-           << "$Cassini/testData/CM_1540484927_1_003.ir.cub";
+  QStringList vimsCubes;
+  vimsCubes << "$Cassini/testData/CM_1540484927_1_001.ir.cub"
+            << "$Cassini/testData/CM_1540484927_1_002.ir.cub"
+            << "$Cassini/testData/CM_1540484927_1_003.ir.cub";
 
   std::vector<double> vimsSamps, vimsLines, vect;
   Pvl vimsPvl;
@@ -84,12 +84,12 @@ void IsisMain() {
 
   p.SetOutputCube(output1 , output2 , out_atts, vimsPvl, 2);
 
-  for(int f = 0; f < vimsCube.size(); f++) {
-    Pvl vimsCubePvl(vimsCube[f]);
-    UniversalGroundMap *groundMap = new UniversalGroundMap(vimsCubePvl);
+  for(int f = 0; f < vimsCubes.size(); f++) {
+    Cube vimsCube(vimsCubes[f], "r");
+    UniversalGroundMap *groundMap = new UniversalGroundMap(vimsCube);
 
     vimsValues.clear();
-    pbl.SetInputCube(vimsCube[f], atts0, 0);
+    pbl.SetInputCube(vimsCubes[f], atts0, 0);
     pbl.StartProcess(readValues);
     pbl.EndProcess();
     double latitude, longitude;

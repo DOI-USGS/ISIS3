@@ -8,7 +8,7 @@
 #include "LeastSquares.h"
 #include "ProcessRubberSheet.h"
 #include "IString.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "Statistics.h"
 #include "TextFile.h"
@@ -297,33 +297,35 @@ void IsisMain() {
 
       if(isOcentric) {
         if(ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
-          minLat = Projection::ToPlanetocentric(minLat, (double)equRadius, (double)polRadius);
-          maxLat = Projection::ToPlanetocentric(maxLat, (double)equRadius, (double)polRadius);
+          minLat = TProjection::ToPlanetocentric(minLat, (double)equRadius, (double)polRadius);
+          maxLat = TProjection::ToPlanetocentric(maxLat, (double)equRadius, (double)polRadius);
         }
       }
       else {
         if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
-          minLat = Projection::ToPlanetographic(minLat, (double)equRadius, (double)polRadius);
-          maxLat = Projection::ToPlanetographic(maxLat, (double)equRadius, (double)polRadius);
+          minLat = TProjection::ToPlanetographic(minLat, (double)equRadius, (double)polRadius);
+          maxLat = TProjection::ToPlanetographic(maxLat, (double)equRadius, (double)polRadius);
         }
       }
 
       int lonDomain = (int)mapGrp.findKeyword("LongitudeDomain");
-      double minLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Minimum()) : Projection::To180Domain(lonStats->Minimum());
-      double maxLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Maximum()) : Projection::To180Domain(lonStats->Maximum());
+      double minLon = lonDomain == 360 ? TProjection::To360Domain(lonStats->Minimum()) :
+                                                    TProjection::To180Domain(lonStats->Minimum());
+      double maxLon = lonDomain == 360 ? TProjection::To360Domain(lonStats->Maximum()) :
+                                                    TProjection::To180Domain(lonStats->Maximum());
 
       bool isPosEast = ((QString)mapGrp.findKeyword("LongitudeDirection")) == "PositiveEast";
 
       if(isPosEast) {
         if(ui.GetString("LONDIR") != "POSITIVEEAST") {
-          minLon = Projection::ToPositiveEast(minLon, lonDomain);
-          maxLon = Projection::ToPositiveEast(maxLon, lonDomain);
+          minLon = TProjection::ToPositiveEast(minLon, lonDomain);
+          maxLon = TProjection::ToPositiveEast(maxLon, lonDomain);
         }
       }
       else {
         if(ui.GetString("LONDIR") == "POSITIVEEAST") {
-          minLon = Projection::ToPositiveWest(minLon, lonDomain);
-          maxLon = Projection::ToPositiveWest(maxLon, lonDomain);
+          minLon = TProjection::ToPositiveWest(minLon, lonDomain);
+          maxLon = TProjection::ToPositiveWest(maxLon, lonDomain);
         }
       }
 
@@ -420,7 +422,8 @@ void IsisMain() {
 
     //Create a projection using the map file we created
     int samples, lines;
-    Projection *outmap = ProjectionFactory::CreateForCube(mapFile, samples, lines, false);
+    TProjection *outmap = (TProjection *) ProjectionFactory::CreateForCube(mapFile, samples, lines,
+                                                                           false);
 
     //Write the map file to the log
     Application::GuiLog(mapGrp);
@@ -480,7 +483,7 @@ void IsisMain() {
 
 
 // Transform object constructor
-nocam2map::nocam2map(LeastSquares sample, LeastSquares line, Projection *outmap,
+nocam2map::nocam2map(LeastSquares sample, LeastSquares line, TProjection *outmap,
                      Cube *latCube, Cube *lonCube,
                      bool isOcentric, bool isPosEast,
                      double tolerance, int iterations,
@@ -797,8 +800,10 @@ void ComputeInputRange() {
   double maxLat = latStats->Maximum();
 
   int lonDomain = userGrp.hasKeyword("LongitudeDomain") ? (int)userGrp.findKeyword("LongitudeDomain") : 360;
-  double minLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Minimum()) : Projection::To180Domain(lonStats->Minimum());
-  double maxLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Maximum()) : Projection::To180Domain(lonStats->Maximum());
+  double minLon = lonDomain == 360 ? TProjection::To360Domain(lonStats->Minimum()) :
+                                       TProjection::To180Domain(lonStats->Minimum());
+  double maxLon = lonDomain == 360 ? TProjection::To360Domain(lonStats->Maximum()) :
+                                       TProjection::To180Domain(lonStats->Maximum());
 
   if(userGrp.hasKeyword("LatitudeType")) {
     bool isOcentric = ((QString)userGrp.findKeyword("LatitudeType")) == "Planetocentric";
@@ -855,14 +860,14 @@ void ComputeInputRange() {
 
     if(isOcentric) {
       if(ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
-        minLat = Projection::ToPlanetocentric(minLat, (double)equRadius, (double)polRadius);
-        maxLat = Projection::ToPlanetocentric(maxLat, (double)equRadius, (double)polRadius);
+        minLat = TProjection::ToPlanetocentric(minLat, (double)equRadius, (double)polRadius);
+        maxLat = TProjection::ToPlanetocentric(maxLat, (double)equRadius, (double)polRadius);
       }
     }
     else {
       if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
-        minLat = Projection::ToPlanetographic(minLat, (double)equRadius, (double)polRadius);
-        maxLat = Projection::ToPlanetographic(maxLat, (double)equRadius, (double)polRadius);
+        minLat = TProjection::ToPlanetographic(minLat, (double)equRadius, (double)polRadius);
+        maxLat = TProjection::ToPlanetographic(maxLat, (double)equRadius, (double)polRadius);
       }
     }
   }
@@ -872,8 +877,8 @@ void ComputeInputRange() {
 
     if(isPosEast) {
       if(ui.GetString("LONDIR") != "POSITIVEEAST") {
-        minLon = Projection::ToPositiveEast(minLon, lonDomain);
-        maxLon = Projection::ToPositiveEast(maxLon, lonDomain);
+        minLon = TProjection::ToPositiveEast(minLon, lonDomain);
+        maxLon = TProjection::ToPositiveEast(maxLon, lonDomain);
 
         if(minLon > maxLon) {
           double temp = minLon;
@@ -884,8 +889,8 @@ void ComputeInputRange() {
     }
     else {
       if(ui.GetString("LONDIR") == "POSITIVEEAST") {
-        minLon = Projection::ToPositiveWest(minLon, lonDomain);
-        maxLon = Projection::ToPositiveWest(maxLon, lonDomain);
+        minLon = TProjection::ToPositiveWest(minLon, lonDomain);
+        maxLon = TProjection::ToPositiveWest(maxLon, lonDomain);
 
         if(minLon > maxLon) {
           double temp = minLon;

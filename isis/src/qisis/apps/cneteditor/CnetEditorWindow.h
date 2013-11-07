@@ -14,9 +14,9 @@ class QString;
 class QToolBar;
 
 
-namespace Isis
-{
+namespace Isis {
   class ConcurrentControlNetReader;
+  class Control;
   class ControlNet;
   class CnetDisplayProperties;
   class CnetEditorWidget;
@@ -29,13 +29,11 @@ namespace Isis
    *
    * @internal
    */
-  class CnetEditorWindow : public QMainWindow
-  {
+  class CnetEditorWindow : public QMainWindow {
       Q_OBJECT
 
     public:
-      enum FileState
-      {
+      enum FileState {
         HasFile,
         NoFile,
         FileLoading
@@ -48,14 +46,14 @@ namespace Isis
 
 
     protected:
-      void closeEvent(QCloseEvent * event);
+      void closeEvent(QCloseEvent *event);
 
 
     private:
       CnetEditorWindow(const CnetEditorWindow &);
-      const CnetEditorWindow & operator=(CnetEditorWindow);
-      
-      
+      const CnetEditorWindow &operator=(CnetEditorWindow);
+
+
     private:
       void nullify();
       void createActions();
@@ -89,44 +87,44 @@ namespace Isis
       void saveAs();
       void closeNetwork(bool promptToSave = true);
       void networkLoaded(ControlNet *);
+      void networkLoaded(QList<Control *>);
       void cubeListLoaded();
 
 
     private: // widgets
-      QAction * openCubeListAct;
-      QAction * openNetAct;
-      QAction * saveAct;
-      QAction * saveAsAct;
-      QAction * aboutAct;
-      QAction * closeAct;
-      QAction * quitAct;
+      QAction *openCubeListAct;
+      QAction *openNetAct;
+      QAction *saveAct;
+      QAction *saveAsAct;
+      QAction *aboutAct;
+      QAction *closeAct;
+      QAction *quitAct;
 
-      QMenu * fileMenu;
-      QMenu * helpMenu;
+      QMenu *fileMenu;
+      QMenu *helpMenu;
 
-      QToolBar * mainToolBar;
+      QToolBar *mainToolBar;
       QList< QToolBar * > * toolBars;
 
-      ProgressBar * loadingProgressBar;
-      ProgressBar * cubeListProgressBar;
+      ProgressBar *cubeListProgressBar;
 
-      QDockWidget * pointTreeDockWidget;
-      QDockWidget * serialTreeDockWidget;
-      QDockWidget * connectionTreeDockWidget;
+      QDockWidget *pointTreeDockWidget;
+      QDockWidget *serialTreeDockWidget;
+      QDockWidget *connectionTreeDockWidget;
 
-      QDockWidget * pointFilterDockWidget;
-      QDockWidget * serialFilterDockWidget;
-      QDockWidget * connectionFilterDockWidget;
+      QDockWidget *pointFilterDockWidget;
+      QDockWidget *serialFilterDockWidget;
+      QDockWidget *connectionFilterDockWidget;
 
 
     private: // data
-      ControlNet * cnet;
-      CnetDisplayProperties * displayProperties;
-      ConcurrentControlNetReader * cnetReader;
-      CnetEditorWidget * editorWidget;
-      QString * curFile;
-      QString * cubeListFile;
-      QFont * labelFont;
+      ControlNet *cnet;
+      CnetDisplayProperties *displayProperties;
+      ConcurrentControlNetReader *cnetReader;
+      CnetEditorWidget *editorWidget;
+      QString *curFile;
+      QString *cubeListFile;
+      QFont *labelFont;
       bool dirty;
       bool saveAsPvl;
       bool saveFilteredNetwork;
@@ -143,10 +141,9 @@ namespace Isis
    *
    * @internal
    */
-  class CnetEditorFileDialog : public QFileDialog
-  {
+  class CnetEditorFileDialog : public QFileDialog {
     public:
-      CnetEditorFileDialog(QLayout * l, QWidget * parent = NULL);
+      CnetEditorFileDialog(QLayout *l, QWidget *parent = NULL);
   };
 
 }

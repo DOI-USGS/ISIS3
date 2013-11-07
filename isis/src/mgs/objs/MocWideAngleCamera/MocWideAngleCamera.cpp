@@ -43,10 +43,11 @@ namespace Isis {
    *          WideAngleRed().
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  MocWideAngleCamera::MocWideAngleCamera(Pvl &lab) : LineScanCamera(lab) {
+  MocWideAngleCamera::MocWideAngleCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // See if we have a moc camera
-    MocLabels *moclab = new MocLabels(lab);
+    Pvl &lab = *cube.label();
+    MocLabels *moclab = new MocLabels(cube);
     double lineRate = moclab->LineRate();
     double csum = moclab->CrosstrackSumming();
     double dsum = moclab->DowntrackSumming();
@@ -110,6 +111,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Mgs namespace.
  */
-extern "C" Isis::Camera *MocWideAngleCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::MocWideAngleCamera(lab);
+extern "C" Isis::Camera *MocWideAngleCameraPlugin(Isis::Cube &cube) {
+  return new Isis::MocWideAngleCamera(cube);
 }

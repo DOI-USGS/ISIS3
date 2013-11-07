@@ -5,9 +5,13 @@
 #include <QCursor>
 
 #include "Camera.h"
-#include "Projection.h"
+#include "Distance.h"
 #include "MdiCubeViewport.h"
+#include "Projection.h"
+#include "RingPlaneProjection.h"
 #include "SpecialPixel.h"
+#include "Target.h"
+#include "TProjection.h"
 #include "ViewportBuffer.h"
 #include "WarningWidget.h"
 
@@ -166,18 +170,31 @@ namespace Isis {
 
     // Do we have a projection?
     if(cvp->projection() != NULL) {
+      // Set up for projection types
+      Projection::ProjectionType projType = cvp->projection()->projectionType();
       p_latLabel->show();
       p_lonLabel->show();
 
       if(cvp->projection()->SetWorld(sample, line)) {
-        double lat = cvp->projection()->Latitude();
-        double lon = cvp->projection()->Longitude();
-        p_latLabel->setText(QString("Lat %1").arg(lat));
-        p_lonLabel->setText(QString("Lon %1").arg(lon));
+        if (projType == Projection::Triaxial) {
+          TProjection *tproj = (TProjection *) cvp->projection();
+          double lat = tproj->Latitude();
+          double lon = tproj->Longitude();
+          p_latLabel->setText(QString("Lat %1").arg(lat));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
+        else { // RingPlane TODO write out radius azimuth instead of lat/lon
+          RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
+          double rad = rproj->RingRadius();
+          double lon = rproj->RingLongitude();
+          //??? p_latLabel->setToolTip("Radius Position");
+          p_latLabel->setText(QString("Rad %1").arg(rad));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
       }
       else {
-        p_latLabel->setText("Lat n/a");
-        p_lonLabel->setText("Lon n/a");
+        p_latLabel->setText("Lat N/A");
+        p_lonLabel->setText("Lon N/A");
       }
     }
     // Do we have a camera model?
@@ -186,14 +203,23 @@ namespace Isis {
       p_lonLabel->show();
 
       if(cvp->camera()->SetImage(sample, line)) {
-        double lat = cvp->camera()->UniversalLatitude();
-        double lon = cvp->camera()->UniversalLongitude();
-        p_latLabel->setText(QString("Lat %1").arg(lat));
-        p_lonLabel->setText(QString("Lon %1").arg(lon));
+        if (cvp->camera()->target()->shape()->name() != "Plane") {
+          double lat = cvp->camera()->UniversalLatitude();
+          double lon = cvp->camera()->UniversalLongitude();
+          p_latLabel->setText(QString("Lat %1").arg(lat));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
+        else {
+          double rad = cvp->camera()->LocalRadius().meters();
+          double lon = cvp->camera()->UniversalLongitude();
+          //??? p_latLabel->setToolTip("Radius Position");
+          p_latLabel->setText(QString("Rad %1").arg(rad));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
       }
       else {
-        p_latLabel->setText("Lat n/a");
-        p_lonLabel->setText("Lon n/a");
+        p_latLabel->setText("Lat N/A");
+        p_lonLabel->setText("Lon N/A");
       }
     }
 
@@ -297,14 +323,14 @@ namespace Isis {
    *
    */
   void TrackTool::clearLabels() {
-    p_sampLabel->setText("S n/a");
-    p_lineLabel->setText("L n/a");
-    p_latLabel->setText("Lat n/a");
-    p_lonLabel->setText("Lon n/a");
-    p_grayLabel->setText("n/a");
-    p_redLabel->setText("R n/a");
-    p_grnLabel->setText("G n/a");
-    p_bluLabel->setText("B n/a");
+    p_sampLabel->setText("S N/A");
+    p_lineLabel->setText("L N/A");
+    p_latLabel->setText("Lat N/A");
+    p_lonLabel->setText("Lon N/A");
+    p_grayLabel->setText("N/A");
+    p_redLabel->setText("R N/A");
+    p_grnLabel->setText("G N/A");
+    p_bluLabel->setText("B N/A");
   }
 
 

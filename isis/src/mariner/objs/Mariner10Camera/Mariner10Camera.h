@@ -57,7 +57,7 @@ namespace Isis {
    */
   class Mariner10Camera : public FramingCamera {
     public:
-      Mariner10Camera(Pvl &lab);
+      Mariner10Camera(Cube &cube);
       //! Destroys the Mariner10Camera Object
       ~Mariner10Camera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

@@ -22,15 +22,16 @@
  */
 #include "AlphaCube.h"
 
-#include "IString.h"
+#include "Cube.h"
 
 using namespace std;
+
 namespace Isis {
   //! Constructs an AlphaCube object using a PVL object.
-  AlphaCube::AlphaCube(const Isis::Pvl &pvl) {
-    const Isis::PvlObject &isiscube = pvl.findObject("IsisCube");
+  AlphaCube::AlphaCube(Cube &cube) {
+    Isis::PvlObject &isiscube = cube.label()->findObject("IsisCube");
     if(isiscube.hasGroup("AlphaCube")) {
-      const Isis::PvlGroup &alpha = isiscube.findGroup("AlphaCube");
+      Isis::PvlGroup &alpha = isiscube.findGroup("AlphaCube");
       p_alphaSamples        = alpha["AlphaSamples"];
       p_alphaLines          = alpha["AlphaLines"];
       p_alphaStartingSample = alpha["AlphaStartingSample"];
@@ -41,9 +42,8 @@ namespace Isis {
       p_betaLines           = alpha["BetaLines"];
     }
     else {
-      const Isis::PvlGroup &dims = isiscube.findGroup("Dimensions", Isis::Pvl::Traverse);
-      p_alphaSamples        = dims["Samples"];
-      p_alphaLines          = dims["Lines"];
+      p_alphaSamples        = cube.sampleCount();
+      p_alphaLines          = cube.lineCount();
       p_alphaStartingSample = 0.5;
       p_alphaStartingLine   = 0.5;
       p_alphaEndingSample   = (double) p_alphaSamples + 0.5;
@@ -126,20 +126,20 @@ namespace Isis {
    * @param &pvl The PVL object to write to.
    *
    */
-  void AlphaCube::UpdateGroup(Isis::Pvl &pvl) {
+  void AlphaCube::UpdateGroup(Isis::Cube &cube) {
     // If we have a mapping group we do not want to update the alpha cube
     // group as it represents the dimensions and sub-area of the raw instrument
     // cube
-    Isis::PvlObject &cube = pvl.findObject("IsisCube");
-    if(cube.hasGroup("Mapping")) return;
+    Isis::PvlObject &cubeObject = cube.label()->findObject("IsisCube");
+    if(cubeObject.hasGroup("Mapping")) return;
 
     // Add the labels to the pvl
-    if(cube.hasGroup("AlphaCube")) {
-      AlphaCube temp(pvl);
+    if(cubeObject.hasGroup("AlphaCube")) {
+      AlphaCube temp(cube);
       temp.Rehash(*this);
       *this = temp;
 
-      Isis::PvlGroup &alpha = cube.findGroup("AlphaCube");
+      Isis::PvlGroup &alpha = cubeObject.findGroup("AlphaCube");
       alpha["AlphaSamples"] = toString(p_alphaSamples);
       alpha["AlphaLines"] = toString(p_alphaLines);
       alpha["AlphaStartingSample"] = toString(p_alphaStartingSample);
@@ -159,7 +159,7 @@ namespace Isis {
       alpha += Isis::PvlKeyword("AlphaEndingLine", toString(p_alphaEndingLine));
       alpha += Isis::PvlKeyword("BetaSamples", toString(p_betaSamples));
       alpha += Isis::PvlKeyword("BetaLines", toString(p_betaLines));
-      cube.addGroup(alpha);
+      cubeObject.addGroup(alpha);
     }
   }
 

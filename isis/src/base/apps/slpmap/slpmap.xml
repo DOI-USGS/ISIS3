@@ -71,6 +71,9 @@
       move away from the latitude and/or longitude of true scale.   Also, improved the
       documentation and added user options to output percent slope.
     </change>
+    <change name="Debbie A. Cook" date="2012-12-10">
+      Removed unused Projection.h include.  References #775
+    </change>
     <change name="Stuart Sides" date="2013-01-30">
       Backward Compatibility Issue: Changed the default output to be slope rather than percent
       slope.

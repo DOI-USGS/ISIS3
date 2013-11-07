@@ -42,7 +42,7 @@ namespace Isis {
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  HrscCamera::HrscCamera(Pvl &lab) : LineScanCamera(lab) {
+  HrscCamera::HrscCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
     // Setup camera characteristics from instrument and frame kernel
     SetFocalLength();
@@ -50,6 +50,7 @@ namespace Isis {
     instrumentRotation()->SetFrame(-41210);
 
     // Get required keywords from instrument group
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     ReadLineRates(lab.fileName());
@@ -126,6 +127,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Mex namespace.
  */
-extern "C" Isis::Camera *HrscCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::HrscCamera(lab);
+extern "C" Isis::Camera *HrscCameraPlugin(Isis::Cube &cube) {
+  return new Isis::HrscCamera(cube);
 }

@@ -26,9 +26,9 @@
 #include <QString>
 
 namespace Isis {
+  class Camera;
   class CubeManager;
   class Cube;
-  class Camera;
   class PvlGroup;
 
 
@@ -46,10 +46,10 @@ namespace Isis {
    * @author 2009-08-25 Mackenzie Boyd
    *
    * @internal
-   *   @history 2009-09-13 Mackenzie Boyd - Added methods SetCenter, SetSample
+   *   @history 2009-09-13 Mackenzie Boyd - Added methods SetCenter, SetSample 
    *                           and SetLine to support campt functionality.
    *                           Added CheckCube private method to check
-   *                           currentCube isn't NULL.
+   *                           m_currentCube isn't NULL.
    *   @history 2010-03-25 MNB - Modified longitude output to have Positive East
    *                           and West, 360 and 180 longitudes.
    *   @history 2010-05-25 MNB - Many changes, primary changes had to do with
@@ -77,6 +77,11 @@ namespace Isis {
    *                           References #972.
    *   @history 2013-03-27 Jeannie Backer - Added comment in code.
    *                           References #1248.
+   *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection.  References #775.
+   *   @history 2013-03-16 Jeannie Backer - Added accessor methods camera()
+   *                           and cube(). Added m_ prefix to member variables. Made
+   *                           GetPointInfo() virtual so it can be redefined in child classes.
+   *                           References #775.
    */
   class CameraPointInfo {
 
@@ -95,12 +100,16 @@ namespace Isis {
       PvlGroup *SetGround(const double latitude, const double longitude,
                           const bool outside = false, const bool error = false);
 
+    protected:
+      Camera *camera();
+      Cube *cube();
+
     private:
       bool CheckCube();
-      PvlGroup *GetPointInfo(bool passed, bool outside, bool errors);
-      CubeManager *usedCubes;
-      Cube *currentCube;
-      Camera *camera;
+      virtual PvlGroup *GetPointInfo(bool passed, bool outside, bool errors);
+      CubeManager *m_usedCubes;
+      Cube *m_currentCube;
+      Camera *m_camera;
   };
 };
 

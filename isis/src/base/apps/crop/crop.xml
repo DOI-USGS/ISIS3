@@ -88,6 +88,9 @@
       Now uses the SubArea class to produce output cube labels 
       with corrected Mapping, Instrument, and AlphaCube groups.
     </change>
+    <change name="Tracie Sucharski" date="2012-12-06">
+      Removed unnecessary include of Projection.h.  References #775
+    </change>
     <change name="Stuart Sides" date="2013-06-23">
       Modified the calculations for number of lines and samples to use double precision math
       and then round up instead of integer math with truncation. When the number of lines or

@@ -1,16 +1,49 @@
 #include "Workspace.h"
 
 #include <QProgressBar>
+#include <QStatusBar>
+#include <QToolBar>
 #include <QVBoxLayout>
 #include <QVector>
 #include <QWeakPointer>
 
+#include "AdvancedTrackTool.h"
+#include "BandTool.h"
+#include "BlinkTool.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "EditTool.h"
+#include "FeatureNomenclatureTool.h"
 #include "FileName.h"
+#include "FileTool.h"
+#include "FindTool.h"
+#include "HelpTool.h"
+#include "HistogramTool.h"
+#include "Image.h"
+#include "ImageList.h"
 #include "IString.h"
+#include "MatchTool.h"
 #include "MdiCubeViewport.h"
+#include "MeasureTool.h"
+#include "PanTool.h"
+#include "RubberBandTool.h"
+#include "QnetFileTool.h"
+#include "QnetNavTool.h"
+#include "QnetTool.h"
+#include "ScatterPlotTool.h"
+#include "SpatialPlotTool.h"
+#include "SpecialPixelTool.h"
+#include "SpectralPlotTool.h"
+#include "StatisticsTool.h"
+#include "StereoTool.h"
+#include "StretchTool.h"
+#include "SunShadowTool.h"
+#include "TrackTool.h"
+#include "ToolList.h"
+#include "ToolPad.h"
 #include "ViewportMdiSubWindow.h"
+#include "WindowTool.h"
+#include "ZoomTool.h"
 
 namespace Isis {
 
@@ -19,27 +52,162 @@ namespace Isis {
    *
    * @param parent
    */
-  Workspace::Workspace(QWidget *parent) : QMdiArea(parent) {
-    p_cubeViewportList = NULL;
-    p_cubeViewportList = new QVector< MdiCubeViewport * >;
+  Workspace::Workspace(bool selfContained, QWidget *parent) : QWidget(parent) {
+    m_cubeViewportList = NULL;
+    m_tools = NULL;
 
-    connect(this, SIGNAL(subWindowActivated(QMdiSubWindow *)),
+    m_cubeViewportList = new QVector< MdiCubeViewport * >;
+    m_tools = new ToolList;
+
+    m_mdi = new QMdiArea(this);
+
+    QGridLayout *layout = new QGridLayout;
+    setLayout(layout);
+
+    if (!selfContained) {
+      layout->setContentsMargins(0, 0, 0, 0);
+      layout->addWidget(m_mdi, 0, 0);
+    }
+    else {
+      /*
+       * Layout:
+       *
+       * ----- MENU ----------------------
+       * -PERM TOOLBAR-ACTIVE TOOLBAR------
+       * |                              |T|
+       * |                              |O|
+       * |                              |O|
+       * |    MDI AREA                  |L|
+       * |                              | |
+       * |                              |L|
+       * |                              |I|
+       * |                              |S|
+       * |                              |T|
+       * ------------Status Bar------------
+       *
+       * The perm/active tool bar are in an hbox layout, the rest follows the grid.
+       */
+      int row = 0;
+
+      QMenuBar *menuBar = new QMenuBar;
+      layout->addWidget(menuBar, row, 0, 1, 2);
+      row++;
+
+      QHBoxLayout *permActiveToolBarLayout = new QHBoxLayout;
+
+      QToolBar *permToolBar = new QToolBar("Standard Tools", this);
+      permToolBar->setObjectName("permToolBar");
+      permToolBar->setIconSize(QSize(22, 22));
+      permActiveToolBarLayout->addWidget(permToolBar);
+
+      QToolBar *activeToolBar = new QToolBar("Active Tool", this);
+      activeToolBar->setObjectName("activeToolBar");
+      activeToolBar->setIconSize(QSize(22, 22));
+      permActiveToolBarLayout->addWidget(activeToolBar);
+
+      layout->addLayout(permActiveToolBarLayout, row, 0, 1, 2);
+      row++;
+
+      layout->addWidget(m_mdi, row, 0, 1, 1);
+
+      ToolPad *toolPad = new ToolPad("Tool Pad", this);
+      toolPad->setObjectName("toolPad");
+      toolPad->setOrientation(Qt::Vertical);
+      layout->addWidget(toolPad, row, 1, 1, 1);
+      row++;
+
+      QStatusBar *statusBar = new QStatusBar(this);
+      layout->addWidget(statusBar, row, 0, 1, 2);
+      row++;
+
+      // Create tools
+      Tool *defaultActiveTool = NULL;
+
+      m_tools->append(new RubberBandTool(this));
+      QnetTool *qnetTool = new QnetTool(this);
+      //m_tools->append(new FileTool(this));
+      m_tools->append(new QnetFileTool(qnetTool, this));
+      m_tools->append(NULL);
+      m_tools->append(new BandTool(this));
+
+      defaultActiveTool = new ZoomTool(this);
+      m_tools->append(defaultActiveTool);
+
+      m_tools->append(new PanTool(this));
+      m_tools->append(new StretchTool(this));
+      m_tools->append(new FindTool(this));
+      m_tools->append(new BlinkTool(this));
+      m_tools->append(new AdvancedTrackTool(this));
+      m_tools->append(new EditTool(this));
+      m_tools->append(new WindowTool(this));
+      m_tools->append(new MeasureTool(this));
+      m_tools->append(new SunShadowTool(this));
+      m_tools->append(new FeatureNomenclatureTool(this));
+      m_tools->append(new SpecialPixelTool(this));
+      m_tools->append(new SpatialPlotTool(this));
+      m_tools->append(new SpectralPlotTool(this));
+      m_tools->append(new ScatterPlotTool(this));
+      m_tools->append(new HistogramTool(this));
+      m_tools->append(new StatisticsTool(this));
+      m_tools->append(new StereoTool(this));
+      m_tools->append(new MatchTool(this));
+      m_tools->append(new HelpTool(this));
+      m_tools->append(new TrackTool(statusBar));
+
+      m_tools->append(new QnetNavTool(qnetTool, this));
+      m_tools->append(qnetTool);
+
+      QMap<QString, QMenu *> subMenus;
+
+      for (int i = 0; i < m_tools->count(); i++) {
+        Tool *tool = (*m_tools)[i];
+
+        if (tool) {
+          tool->addTo(this);
+          tool->addToPermanent(permToolBar);
+          tool->addToActive(activeToolBar);
+          tool->addTo(toolPad);
+
+          if (!tool->menuName().isEmpty()) {
+            QString menuName = tool->menuName();
+
+            QMenu *subMenu = subMenus[menuName];
+
+            if (!subMenu) {
+              subMenus[menuName] = menuBar->addMenu(menuName);
+              subMenu = subMenus[menuName];
+            }
+
+            tool->addTo(subMenu);
+          }
+        }
+        else {
+          permToolBar->addSeparator();
+        }
+      }
+
+      permToolBar->addSeparator();
+      defaultActiveTool->activate(true);
+    }
+
+    connect(m_mdi, SIGNAL(subWindowActivated(QMdiSubWindow *)),
             this, SLOT(activateViewport(QMdiSubWindow *)));
-    setActivationOrder(ActivationHistoryOrder);
+    m_mdi->setActivationOrder(QMdiArea::ActivationHistoryOrder);
   }
 
 
-  Workspace::Workspace(const Workspace &other) : p_cubeViewportList(NULL) {
-    p_cubeViewportList =
-      new QVector< MdiCubeViewport * >(*other.p_cubeViewportList);
+  Workspace::Workspace(const Workspace &other) : m_cubeViewportList(NULL) {
+    m_cubeViewportList =
+      new QVector< MdiCubeViewport * >(*other.m_cubeViewportList);
   }
 
 
   Workspace::~Workspace() {
-    if(p_cubeViewportList) {
-      delete p_cubeViewportList;
-      p_cubeViewportList = NULL;
-    }
+    delete m_cubeViewportList;
+    m_cubeViewportList = NULL;
+
+    delete m_tools;
+    m_tools = NULL;
   }
 
 
@@ -53,7 +221,7 @@ namespace Isis {
       emit cubeViewportActivated((MdiCubeViewport *) w->widget()->layout()->itemAt(0)->widget());
     }
     //Check if there is no current window (on close)
-    else if(!currentSubWindow()) {
+    else if(!m_mdi->currentSubWindow()) {
       emit cubeViewportActivated((MdiCubeViewport *)NULL);
     }
   }
@@ -65,15 +233,33 @@ namespace Isis {
    * @return std::vector<MdiCubeViewport*>*
    */
   QVector< MdiCubeViewport * > * Workspace::cubeViewportList() {
-    p_cubeViewportList->clear();
+    m_cubeViewportList->clear();
 
-    for(int i = 0; i < subWindowList().size(); i++) {
-      p_cubeViewportList->push_back((MdiCubeViewport *)
-                                    subWindowList()[i]->widget()->layout()->itemAt(0)->widget());
+    for(int i = 0; i < m_mdi->subWindowList().size(); i++) {
+      m_cubeViewportList->push_back(
+          (MdiCubeViewport *)m_mdi->subWindowList()[i]->widget()->layout()->itemAt(0)->widget());
     }
 
-    return p_cubeViewportList;
+    return m_cubeViewportList;
   }
+
+
+  Workspace &Workspace::operator=(Workspace other) {
+    delete m_cubeViewportList;
+    m_cubeViewportList = NULL;
+
+    m_cubeViewportList = new QVector< MdiCubeViewport * >;
+    *m_cubeViewportList = *other.m_cubeViewportList;
+    return *this;
+  }
+
+
+  void Workspace::addImages(ImageList *images) {
+    foreach (Image *image, *images) {
+      addCubeViewport(image->cube());
+    }
+  }
+
 
   bool Workspace::confirmClose() {
     QVector< MdiCubeViewport * > viewports = *cubeViewportList();
@@ -86,6 +272,27 @@ namespace Isis {
 
     return confirmed;
   }
+
+
+  QWidget *Workspace::imageToMdiWidget(Image *image) {
+    QWidget *result = NULL;
+
+    for (int i = 0; !result && i < m_cubeViewportList->count(); i++) {
+      MdiCubeViewport *viewport = (*m_cubeViewportList)[i];
+
+      if (viewport->cube() == image->cube()) {
+        result = qobject_cast<QWidget *>(viewport->parent());
+      }
+    }
+
+    return result;
+  }
+
+
+  QMdiArea *Workspace::mdiArea() {
+    return m_mdi;
+  }
+
 
   /**
    * Add a cubeViewport to the workspace, open the cube.
@@ -162,7 +369,7 @@ namespace Isis {
       ViewportMdiSubWindow *window(new ViewportMdiSubWindow(cube));
       window->setAttribute(Qt::WA_DeleteOnClose);
 
-      addSubWindow(window);
+      m_mdi->addSubWindow(window);
 
       window->show();
 
@@ -180,27 +387,18 @@ namespace Isis {
     return result;
   }
 
+
   void Workspace::addBrowseView(QString cubename) {
     /* Close the last browse window if necessary.  */
-    if (subWindowList().size()) {
+    if (m_mdi->subWindowList().size()) {
       QWeakPointer<QMdiSubWindow> windowToRemove =
-          subWindowList()[subWindowList().size() - 1];
+          m_mdi->subWindowList().last();
 
-      removeSubWindow(windowToRemove.data());
+      m_mdi->removeSubWindow(windowToRemove.data());
 
       delete windowToRemove.data();
     }
 
     addCubeViewport(cubename);
-  }
-
-
-  const Workspace &Workspace::operator=(Workspace other) {
-    delete p_cubeViewportList;
-    p_cubeViewportList = NULL;
-
-    p_cubeViewportList = new QVector< MdiCubeViewport * >;
-    *p_cubeViewportList = *other.p_cubeViewportList;
-    return *this;
   }
 }

@@ -72,10 +72,10 @@ namespace Isis {
    *           parameters
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
-  IdealCamera::IdealCamera(Pvl &lab) : Camera(lab) {
+  IdealCamera::IdealCamera(Cube &cube) : Camera(cube) {
     NaifStatus::CheckErrors();
     // Get required keywords from instrument group
-    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
 
     // Setup camera characteristics from instrument
 
@@ -306,6 +306,6 @@ namespace Isis {
  * @param lab The Isis::Pvl label object used for the information as how to
  *            create this object.
  */
-extern "C" Isis::Camera *IdealCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::IdealCamera(lab);
+extern "C" Isis::Camera *IdealCameraPlugin(Isis::Cube &cube) {
+  return new Isis::IdealCamera(cube);
 }

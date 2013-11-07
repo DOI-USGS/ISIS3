@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   mapGroup += PvlKeyword("CenterLongitude", "0.0");
 
   try {
-    Projection *p = ProjectionFactory::Create(lab);
+    TProjection *p = (TProjection *) ProjectionFactory::Create(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(16);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 
   mapGroup.addKeyword(PvlKeyword("EquatorialRadius", "6370997.0"), Pvl::Replace);
   try {
-    Projection *p = ProjectionFactory::Create(lab);
+    TProjection *p = (TProjection *) ProjectionFactory::Create(lab);
     cout << endl;
 
     cout << "Test SetGround method ... " << endl;

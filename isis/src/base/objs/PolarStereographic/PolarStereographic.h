@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -74,8 +74,10 @@ namespace Isis {
    *                           so that it returns false when the lat parameter is the
    *                           pole opposite of the center latitude. Also updated the
    *                           unit tests to exercise this change. References #604.
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    */
-  class PolarStereographic : public Projection {
+  class PolarStereographic : public TProjection {
     public:
       PolarStereographic(Pvl &label, bool allowDefaults = false);
       ~PolarStereographic();

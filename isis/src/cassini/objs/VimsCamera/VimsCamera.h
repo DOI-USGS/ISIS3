@@ -65,7 +65,7 @@ namespace Isis {
   class VimsCamera : public Camera {
     public:
       // constructors
-      VimsCamera(Pvl &lab);
+      VimsCamera(Cube &cube);
 
       //! Destroys the VimsCamera object.
       ~VimsCamera() {};

@@ -41,7 +41,7 @@
 
 #include "SpecialPixel.h"
 #include "PolygonTools.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "UniversalGroundMap.h"
 
@@ -60,8 +60,8 @@ namespace Isis {
    *          multipolygon from (Lon,Lat) to (X,Y).
    */
   geos::geom::MultiPolygon *PolygonTools::LatLonToXY(
-      const geos::geom::MultiPolygon &lonLatPolygon, Projection *projection) {
-    if(projection == NULL) {
+      const geos::geom::MultiPolygon &lonLatPolygon, TProjection *projection) {
+    if (projection == NULL) {
       string msg = "Unable to convert Lon/Lat polygon to X/Y. ";
       msg += "No projection has was supplied";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -166,7 +166,7 @@ namespace Isis {
    *          multipolygon from (X,Y) to (Lon,Lat).
    */
   geos::geom::MultiPolygon *PolygonTools::XYToLatLon(
-    const geos::geom::MultiPolygon &xYPolygon, Projection *projection) {
+    const geos::geom::MultiPolygon &xYPolygon, TProjection *projection) {
 
     if(projection == NULL) {
       string msg = "Unable to convert X/Y polygon to Lon/Lat. ";

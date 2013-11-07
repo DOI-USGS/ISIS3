@@ -2,11 +2,12 @@ import os
 
 def main():
     startApplication("qnet")
-    clickButton(waitForObject(":qnet.Open control network  cube list_QToolButton"))
-    clickButton(waitForObject(":Select a list of cubes.toParentButton_QToolButton"))
+    
+    activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
+    activateItem(waitForObjectItem(":qnet.File_QMenu", "Open control network and cube list"))
     snooze(0.5)
-    mouseClick(waitForObject(":fileNameEdit_QLineEdit"), 95, 13, 0, Qt.LeftButton)
-    type(waitForObject(":fileNameEdit_QLineEdit"), "src/qisis/tsts/SquishTests/input/cube.lis")
+    mouseClick(waitForObject(":fileNameEdit_QLineEdit"))
+    type(waitForObject(":fileNameEdit_QLineEdit"), "../src/qisis/tsts/SquishTests/input/cube.lis")
     type(waitForObject(":_QListView"), "<Return>")
 
     snooze(0.5)
@@ -41,6 +42,6 @@ def main():
     clickButton(waitForObject(":Qnet Tool.Geom_QRadioButton"))
     test.vp("GeomQnetToolView")
     activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
-    activateItem(waitForObjectItem(":qnet.File_QMenu", "Exit"))
+    clickButton(waitForObject(":qnet.Exit_QToolButton"))
     snooze(1)
 

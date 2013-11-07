@@ -24,6 +24,7 @@
 #include "MosaicGraphicsView.h"
 #include "MosaicGridToolConfigDialog.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "MosaicSceneWidget.h"
 #include "PvlObject.h"
 
@@ -137,8 +138,14 @@ namespace Isis {
    */
   QString MosaicGridTool::latType() {
     QString result;
-    if (getWidget()->getProjection())
-      result = getWidget()->getProjection()->LatitudeTypeString();
+
+    if (getWidget()->getProjection()) {
+      if (getWidget()->getProjection()->projectionType() == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) getWidget()->getProjection();
+        result = tproj->LatitudeTypeString();
+      }
+    }
+
     return result;
   }
 
@@ -150,8 +157,14 @@ namespace Isis {
    */
   QString MosaicGridTool::lonDomain() {
     QString result;
-    if (getWidget()->getProjection())
-      result = getWidget()->getProjection()->LongitudeDomainString();
+
+    if (getWidget()->getProjection()) {
+      if (getWidget()->getProjection()->projectionType() == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) getWidget()->getProjection();
+        result = tproj->LongitudeDomainString();
+      }
+    }
+
     return result;
   }
 
@@ -289,12 +302,13 @@ namespace Isis {
     m_latExtents = source;
 
     Projection *proj = getWidget()->getProjection();
-    if (proj) {
-      PvlGroup mappingGroup(proj->Mapping());
+    if (proj && proj->projectionType() == Projection::Triaxial) {
+      TProjection *tproj = (TProjection *) proj;
+      PvlGroup mappingGroup(tproj->Mapping());
 
-      Distance equatorialRadius(proj->EquatorialRadius(),
+      Distance equatorialRadius(tproj->EquatorialRadius(),
                                 Distance::Meters);
-      Distance polarRadius(proj->PolarRadius(), Distance::Meters);
+      Distance polarRadius(tproj->PolarRadius(), Distance::Meters);
 
       QRectF boundingRect = getWidget()->cubesBoundingRect();
 
@@ -307,32 +321,32 @@ namespace Isis {
       switch (source) {
 
         case Map:
-          m_minLat = Latitude(proj->MinimumLatitude(), mappingGroup, Angle::Degrees);
-          m_maxLat = Latitude(proj->MaximumLatitude(), mappingGroup,  Angle::Degrees);
+          m_minLat = Latitude(tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
+          m_maxLat = Latitude(tproj->MaximumLatitude(), mappingGroup,  Angle::Degrees);
           break;
 
         case Cubes:
-          if (proj->SetCoordinate(boundingRect.topLeft().x(), -boundingRect.topLeft().y())) {
-            topLeft = proj->Latitude();
+          if (tproj->SetCoordinate(boundingRect.topLeft().x(), -boundingRect.topLeft().y())) {
+            topLeft = tproj->Latitude();
           }
           else {
             cubeRectWorked = false;
           }
-          if (proj->SetCoordinate(boundingRect.topRight().x(), -boundingRect.topRight().y())) {
-            topRight = proj->Latitude();
+          if (tproj->SetCoordinate(boundingRect.topRight().x(), -boundingRect.topRight().y())) {
+            topRight = tproj->Latitude();
           }
           else {
             cubeRectWorked = false;
           }
-          if (proj->SetCoordinate(boundingRect.bottomLeft().x(), -boundingRect.bottomLeft().y())) {
-            bottomLeft = proj->Latitude();
+          if (tproj->SetCoordinate(boundingRect.bottomLeft().x(), -boundingRect.bottomLeft().y())) {
+            bottomLeft = tproj->Latitude();
           }
           else {
             cubeRectWorked = false;
           }
-          if (proj->SetCoordinate(boundingRect.bottomRight().x(),
+          if (tproj->SetCoordinate(boundingRect.bottomRight().x(),
               -boundingRect.bottomRight().y())) {
-            bottomRight = proj->Latitude();
+            bottomRight = tproj->Latitude();
           }
           else {
             cubeRectWorked = false;
@@ -346,13 +360,13 @@ namespace Isis {
                                         std::max(bottomLeft, bottomRight)), mappingGroup,
                                 Angle::Degrees);
 
-            if (proj->SetUniversalGround(-90.0, 0) &&
-                boundingRect.contains(QPointF(proj->XCoord(), -proj->YCoord()))) {
+            if (tproj->SetUniversalGround(-90.0, 0) &&
+                boundingRect.contains(QPointF(tproj->XCoord(), -tproj->YCoord()))) {
               m_minLat = Latitude(-90.0, mappingGroup, Angle::Degrees);
             }
 
-            if (proj->SetUniversalGround(90.0, 0) &&
-                boundingRect.contains(QPointF(proj->XCoord(), -proj->YCoord()))) {
+            if (tproj->SetUniversalGround(90.0, 0) &&
+                boundingRect.contains(QPointF(tproj->XCoord(), -tproj->YCoord()))) {
               m_maxLat = Latitude(90.0, mappingGroup, Angle::Degrees);
             }
           }
@@ -380,8 +394,8 @@ namespace Isis {
           break;
 
         default:
-          m_minLat = Latitude(proj->MinimumLatitude(), mappingGroup, Angle::Degrees);
-          m_maxLat = Latitude(proj->MaximumLatitude(), mappingGroup, Angle::Degrees);
+          m_minLat = Latitude(tproj->MinimumLatitude(), mappingGroup, Angle::Degrees);
+          m_maxLat = Latitude(tproj->MaximumLatitude(), mappingGroup, Angle::Degrees);
       }
     }
   }
@@ -412,7 +426,8 @@ namespace Isis {
     m_lonExtents = source;
 
     Projection *proj = getWidget()->getProjection();
-    if (proj) {
+    if (proj && proj->projectionType() == Projection::Triaxial) {
+      TProjection * tproj = (TProjection *) proj;
       QRectF boundingRect = getWidget()->cubesBoundingRect();
 
       double topLeft = 0;
@@ -424,32 +439,32 @@ namespace Isis {
       switch (source) {
 
         case Map:
-          m_minLon = Longitude(proj->MinimumLongitude(), Angle::Degrees);
-          m_maxLon = Longitude(proj->MaximumLongitude(), Angle::Degrees);
+          m_minLon = Longitude(tproj->MinimumLongitude(), Angle::Degrees);
+          m_maxLon = Longitude(tproj->MaximumLongitude(), Angle::Degrees);
           break;
 
         case Cubes:
-          if (proj->SetCoordinate(boundingRect.topLeft().x(), -boundingRect.topLeft().y())) {
-            topLeft = proj->Longitude();
+          if (tproj->SetCoordinate(boundingRect.topLeft().x(), -boundingRect.topLeft().y())) {
+            topLeft = tproj->Longitude();
           }
           else {
             cubeRectWorked = false;
           }
-          if (proj->SetCoordinate(boundingRect.topRight().x(), -boundingRect.topRight().y())) {
-            topRight = proj->Longitude();
+          if (tproj->SetCoordinate(boundingRect.topRight().x(), -boundingRect.topRight().y())) {
+            topRight = tproj->Longitude();
           }
           else {
             cubeRectWorked = false;
           }
-          if (proj->SetCoordinate(boundingRect.bottomLeft().x(), -boundingRect.bottomLeft().y())) {
-            bottomLeft = proj->Longitude();
+          if (tproj->SetCoordinate(boundingRect.bottomLeft().x(), -boundingRect.bottomLeft().y())) {
+            bottomLeft = tproj->Longitude();
           }
           else {
             cubeRectWorked = false;
           }
-          if (proj->SetCoordinate(boundingRect.bottomRight().x(),
+          if (tproj->SetCoordinate(boundingRect.bottomRight().x(),
               -boundingRect.bottomRight().y())) {
-            bottomRight = proj->Longitude();
+            bottomRight = tproj->Longitude();
           }
           else {
             cubeRectWorked = false;
@@ -499,8 +514,8 @@ namespace Isis {
           break;
 
         default:
-          m_minLon = Longitude(proj->MinimumLongitude(), Angle::Degrees);
-          m_maxLon = Longitude(proj->MaximumLongitude(), Angle::Degrees);
+          m_minLon = Longitude(tproj->MinimumLongitude(), Angle::Degrees);
+          m_maxLon = Longitude(tproj->MaximumLongitude(), Angle::Degrees);
       }
     }
   }
@@ -538,17 +553,18 @@ namespace Isis {
    */
   void MosaicGridTool::fromPvl(const PvlObject &obj) {
 
-    if (getWidget()->getProjection()) {
+    Projection *proj = getWidget()->getProjection();
+    if (proj && proj->projectionType() == Projection::Triaxial) {
+      TProjection *tproj = (TProjection *) proj;
       Distance equatorialRadius(
-          getWidget()->getProjection()->EquatorialRadius(),
+          tproj->EquatorialRadius(),
           Distance::Meters);
       Distance polarRadius(
-          getWidget()->getProjection()->PolarRadius(),
-          Distance::Meters);
+          tproj->PolarRadius(), Distance::Meters);
 
       if (obj["BaseLatitude"][0] != "Null")
         m_baseLat = Latitude(toDouble(obj["BaseLatitude"][0]), equatorialRadius, polarRadius,
-                            Latitude::Planetocentric, Angle::Degrees);
+                             Latitude::Planetocentric, Angle::Degrees);
 
       if (obj["BaseLongitude"][0] != "Null")
         m_baseLon = Longitude(toDouble(obj["BaseLongitude"][0]), Angle::Degrees);
@@ -653,14 +669,16 @@ namespace Isis {
     Longitude result;
 
     if (getWidget() && getWidget()->getProjection()) {
-      if (getWidget()->getProjection()->Has360Domain()) {
-        result = Longitude(0, Angle::Degrees);
-      }
-      else {
-        result = Longitude(-180, Angle::Degrees);
+      if (getWidget()->getProjection()->projectionType() == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) getWidget()->getProjection();
+        if (tproj->Has360Domain()) {
+          result = Longitude(0, Angle::Degrees);
+        }
+        else {
+          result = Longitude(-180, Angle::Degrees);
+        }
       }
     }
-
     return result;
   }
   
@@ -669,11 +687,14 @@ namespace Isis {
     Longitude result;
 
     if (getWidget() && getWidget()->getProjection()) {
-      if (getWidget()->getProjection()->Has360Domain()) {
-        result = Longitude(360, Angle::Degrees);
-      }
-      else {
-        result = Longitude(180, Angle::Degrees);
+      if (getWidget()->getProjection()->projectionType() == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) getWidget()->getProjection();
+        if (tproj->Has360Domain()) {
+          result = Longitude(360, Angle::Degrees);
+        }
+        else {
+          result = Longitude(180, Angle::Degrees);
+        }
       }
     }
 
@@ -687,14 +708,16 @@ namespace Isis {
    * @param draw True if lat/lon increments need to be calculated.
    */
   void MosaicGridTool::autoGrid(bool draw) {
+
     QSettings settings(
         FileName(QString("$HOME/.Isis/%1/mosaicSceneGridTool.config")
             .arg(QApplication::applicationName())).expanded(),
         QSettings::NativeFormat);
     settings.setValue("autoGrid", draw);
 
-    if (draw && getWidget()->getProjection()) {
-
+    Projection *proj = getWidget()->getProjection();
+    if (draw && proj && proj->projectionType() == Projection::Triaxial) {
+      TProjection *tproj = (TProjection *) proj;
       QRectF boundingRect = getWidget()->cubesBoundingRect();
 
       if (!boundingRect.isNull()) {
@@ -704,7 +727,7 @@ namespace Isis {
 
         double latRange = m_maxLat.degrees() - m_minLat.degrees();
 
-        if (getWidget()->getProjection()->Mapping()["LatitudeType"][0] == "Planetographic") {
+        if (tproj->Mapping()["LatitudeType"][0] == "Planetographic") {
           latRange =
               m_maxLat.planetographic(Angle::Degrees) - m_minLat.planetographic(Angle::Degrees);
         }

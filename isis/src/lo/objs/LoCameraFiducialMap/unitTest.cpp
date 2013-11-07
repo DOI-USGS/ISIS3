@@ -41,10 +41,10 @@ int main(void) {
   try {
 
     cout << "Testing medium fiducial fit on a 100 x 100 cropped frame" << endl;
-    Pvl pm("$lo/testData/3083_med_raw.cub");
-    Camera *camm = CameraFactory::Create(pm);
+    Cube cm("$lo/testData/3083_med_raw.cub", "r");
+    Camera *camm = CameraFactory::Create(cm);
 
-    cout << "FileName: " << FileName(pm.fileName()).name() << endl;
+    cout << "FileName: " << FileName(cm.fileName()).name() << endl;
     cout << "CK Frame: " << camm->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -132,10 +132,10 @@ int main(void) {
     }
 
     cout << "Testing high fiducial fit on a full 34530 x 8750 frame" << endl;
-    Pvl ph("$lo/testData/4164H_Full_mirror.cub");
-    Camera *camh = CameraFactory::Create(ph);
+    Cube ch("$lo/testData/4164H_Full_mirror.cub", "r");
+    Camera *camh = CameraFactory::Create(ch);
 
-    cout << "FileName: " << FileName(ph.fileName()).name() << endl;
+    cout << "FileName: " << FileName(ch.fileName()).name() << endl;
     cout << "CK Frame: " << camh->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

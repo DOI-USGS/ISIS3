@@ -98,7 +98,7 @@ namespace Isis {
    */
   class MdisCamera : public FramingCamera {
     public:
-      MdisCamera(Pvl &lab);
+      MdisCamera(Cube &cube);
       //! Destroys the MdisCamera Object
       ~MdisCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

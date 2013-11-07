@@ -193,6 +193,14 @@
       Changed the parameter FLUXUNITS to UNITS. Changed the default value of the UNITS parameter
       to I/F (instead of INTENSITY). Fixes #219.
     </change>
+    <change name="Debbie A. Cook" date="2013-04-08">
+      Fixed a problem likely introduced when the iString class was changed. The path to the mottle
+      file includes "dustring".  The "s" was incorrectly changed to "S".  The problem was fixed to
+      allow users to continue testing. References #775.
+    </change>
+    <change name="Jeannie Backer" date="2013-03-16">
+      Added new appTest to make sure that the dust ring file location is tested. References #775.
+    </change>
   </history>
 
   <category>

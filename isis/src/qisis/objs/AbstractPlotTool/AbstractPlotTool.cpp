@@ -40,17 +40,19 @@ namespace Isis {
    * Clean up the abstract plot tool. This will destroy all of the plot windows.
    */
   AbstractPlotTool::~AbstractPlotTool() {
-    // currentIndexChanged wants to call a pure virtual method, which crashes.
-    disconnect(m_selectWindowCombo, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(selectedWindowChanged()));
+    if (m_selectWindowCombo) {
+      // currentIndexChanged wants to call a pure virtual method, which crashes.
+      disconnect(m_selectWindowCombo, SIGNAL(currentIndexChanged(int)),
+              this, SLOT(selectedWindowChanged()));
 
-    for (int i = m_selectWindowCombo->count(); i >= 0; i--) {
-      QVariant windowVariant = m_selectWindowCombo->itemData(i);
+      for (int i = m_selectWindowCombo->count(); i >= 0; i--) {
+        QVariant windowVariant = m_selectWindowCombo->itemData(i);
 
-      if (!windowVariant.isNull() && windowVariant.canConvert<PlotWindow *>()) {
-        PlotWindow *window = windowVariant.value<PlotWindow *>();
-        delete window;
-        window = NULL;
+        if (!windowVariant.isNull() && windowVariant.canConvert<PlotWindow *>()) {
+          PlotWindow *window = windowVariant.value<PlotWindow *>();
+          delete window;
+          window = NULL;
+        }
       }
     }
   }

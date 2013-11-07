@@ -23,6 +23,7 @@
  */
 
 #include <map>
+#include <vector>
 
 #include <QString>
 
@@ -30,7 +31,9 @@
 
 
 namespace Isis {
+  class Cube;
   class Pvl;
+
   /**
    * @brief Read values from MOC labels
    *
@@ -59,7 +62,7 @@ namespace Isis {
    */
   class MocLabels {
     public:
-      MocLabels(Pvl &lab);
+      MocLabels(Cube &cube);
       MocLabels(const QString &file);
       //! Empty destructor.
       ~MocLabels() {};
@@ -163,8 +166,8 @@ namespace Isis {
       double Offset(int line = 1);
 
     private:
-      void Init(Pvl &lab);
-      void ReadLabels(Pvl &lab);
+      void Init(Cube &cube);
+      void ReadLabels(Cube &cube);
       void ValidateLabels();
       void Compute();
 

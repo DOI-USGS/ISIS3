@@ -64,7 +64,7 @@ namespace Isis {
    */
   class VikingCamera : public FramingCamera {
     public:
-      VikingCamera(Pvl &lab);
+      VikingCamera(Cube &cube);
       //! Destroys the VikingCamera Object
       ~VikingCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

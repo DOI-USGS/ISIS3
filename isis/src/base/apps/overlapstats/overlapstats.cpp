@@ -9,7 +9,7 @@
 #include "Statistics.h"
 #include "PvlGroup.h"
 #include "Pvl.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "PolygonTools.h"
 #include "Progress.h"
@@ -116,7 +116,7 @@ void IsisMain() {
       Pvl cubeLab(serialNumbers.FileName(0));
       PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
       QString target = inst["TargetName"];
-      PvlGroup radii = Projection::TargetRadii(target);
+      PvlGroup radii = TProjection::TargetRadii(target);
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
@@ -128,7 +128,7 @@ void IsisMain() {
       mapGroup += Isis::PvlKeyword("CenterLatitude", toString(0));
       mapGroup += Isis::PvlKeyword("CenterLongitude", toString(0));
       mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
-      Projection *proj = Isis::ProjectionFactory::Create(maplab);
+      TProjection *proj = (TProjection *) Isis::ProjectionFactory::Create(maplab);
 
       // Sets up the thickness and area stats
       try {

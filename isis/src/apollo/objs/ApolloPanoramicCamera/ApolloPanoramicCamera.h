@@ -46,7 +46,7 @@ namespace Isis {
      */        
     class ApolloPanoramicCamera : public LineScanCamera {
     public:
-      ApolloPanoramicCamera(Isis::Pvl &lab);
+      ApolloPanoramicCamera(Cube &lab);
 
       //! Destorys the ApolloPanoramicCamera object
       ~ApolloPanoramicCamera() {};

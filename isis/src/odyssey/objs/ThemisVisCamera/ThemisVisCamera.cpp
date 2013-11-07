@@ -44,7 +44,7 @@ namespace Isis {
    * @internal
    *   @history 2010-08-04 Jeannie Walldren - Added NAIF error check.
    */
-  ThemisVisCamera::ThemisVisCamera(Pvl &lab) : PushFrameCamera(lab) {
+  ThemisVisCamera::ThemisVisCamera(Cube &cube) : PushFrameCamera(cube) {
     NaifStatus::CheckErrors();
     // Set up the camera characteristics
     // LoadFrameMounting("M01_SPACECRAFT","M01_THEMIS_VIS");
@@ -53,6 +53,7 @@ namespace Isis {
     SetFocalLength(202.059);
     SetPixelPitch(0.009);
 
+    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     // make sure it is a themis vis image
     if(inst["InstrumentId"][0] != "THEMIS_VIS") {
@@ -164,6 +165,6 @@ namespace Isis {
  * @internal
  *   @history 2011-05-03 Jeannie Walldren - Removed Odyssey namespace.
  */
-extern "C" Isis::Camera *ThemisVisCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::ThemisVisCamera(lab);
+extern "C" Isis::Camera *ThemisVisCameraPlugin(Isis::Cube &cube) {
+  return new Isis::ThemisVisCamera(cube);
 }

@@ -2,6 +2,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QBuffer>
 #include <QFileDialog>
 #include <QFuture>
 #include <QFutureWatcher>
@@ -12,14 +13,16 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QSettings>
+#include <QUuid>
 #include <QtConcurrentMap>
 
 #include "ControlNet.h"
 #include "Cube.h"
-#include "CubeDisplayProperties.h"
+#include "DisplayProperties.h"
 #include "FileName.h"
 #include "IException.h"
-#include "MosaicFileListWidget.h"
+#include "ImageFileListWidget.h"
+#include "ImageReader.h"
 #include "MosaicSceneWidget.h"
 #include "ProgressBar.h"
 #include "Pvl.h"
@@ -38,42 +41,36 @@ namespace Isis {
    *
    * @param parent
    */
-  MosaicController::MosaicController(QStatusBar *status, QSettings &settings) :
-      m_cubesLeftToOpen(new QStringList),
-      m_projectCubesLeftToOpen(new QList<PvlObject>) {
+  MosaicController::MosaicController(QStatusBar *status, QSettings &settings) {
+    m_fileList = NULL;
+    m_scene = NULL;
+    m_worldScene = NULL;
+    m_imageReader = NULL;
+
     m_mutex = new QMutex;
-    m_watcher = NULL;
-    m_projectPvl = NULL;
 
-    p_progress = new ProgressBar;
-    p_progress->setVisible(false);
-    p_progress->setValue(0);
+    m_imageReader = new ImageReader(m_mutex);
 
-    p_fileList = new MosaicFileListWidget(settings);
-    p_scene = new MosaicSceneWidget(status);
-    p_worldScene = new MosaicSceneWidget(status);
+    connect(m_imageReader, SIGNAL(imagesReady(ImageList)), this, SLOT(imagesReady(ImageList)));
 
-    connect(this, SIGNAL(cubesAdded(QList<CubeDisplayProperties *>)),
-            p_scene, SLOT(addCubes(QList<CubeDisplayProperties *>)));
+    m_fileList = new ImageFileListWidget;
+    m_scene = new MosaicSceneWidget(status, true, false, NULL);
+    m_worldScene = new MosaicSceneWidget(status, false, false, NULL);
 
-    connect(this, SIGNAL(cubesAdded(QList<CubeDisplayProperties *>)),
-            p_worldScene, SLOT(addCubes(QList<CubeDisplayProperties *>)));
+    connect(this, SIGNAL(imagesAdded(ImageList)), m_scene, SLOT(addImages(ImageList)));
+    connect(this, SIGNAL(imagesAdded(ImageList)), m_worldScene, SLOT(addImages(ImageList)));
+    connect(this, SIGNAL(imagesAdded(ImageList *)), m_fileList, SLOT(addImages(ImageList *)));
 
-    connect(this, SIGNAL(cubesAdded(QList<CubeDisplayProperties *>)),
-            p_fileList, SLOT(addCubes(QList<CubeDisplayProperties *>)));
-
-    connect(p_scene, SIGNAL(projectionChanged(Projection *)),
-            p_worldScene, SLOT(setProjection(Projection *)));
-
-    connect(p_scene, SIGNAL(visibleRectChanged(QRectF)),
-            p_worldScene, SLOT(setOutlineRect(QRectF)));
+    connect(m_scene, SIGNAL(projectionChanged(Projection *)),
+            m_worldScene, SLOT(setProjection(Projection *)));
+    connect(m_scene, SIGNAL(visibleRectChanged(QRectF)),
+            m_worldScene, SLOT(setOutlineRect(QRectF)));
 
     settings.beginGroup("MosaicController");
-    m_openFilled = settings.value("openFilled", true).toBool();
-    m_defaultAlpha = settings.value("defaultAlpha", 60).toInt();
     m_maxThreads = settings.value("maxThreads", 0).toInt();
-    m_maxOpenCubes = settings.value("maxOpenCubes", 750).toInt();
     settings.endGroup();
+
+    applyMaxThreadCount();
   }
 
 
@@ -81,16 +78,10 @@ namespace Isis {
    * Free the allocated memory by this object
    */
   MosaicController::~MosaicController() {
-    if(m_watcher) {
-      m_watcher->waitForFinished();
-      delete m_watcher;
-      m_watcher = NULL;
-    }
-
-    p_fileList->deleteLater();
-    p_scene->deleteLater();
-    p_worldScene->deleteLater();
-    p_progress->deleteLater();
+    delete m_fileList;
+    delete m_scene;
+    delete m_worldScene;
+    delete m_imageReader;
   }
 
 
@@ -98,13 +89,13 @@ namespace Isis {
    * Add actions that are export-related to the menu
    */
   void MosaicController::addExportActions(QMenu &fileMenu) {
-    QList<QAction *> exportActions = p_scene->getExportActions();
+    QList<QAction *> exportActions = m_scene->getExportActions();
 
     foreach (QAction * exportAct, exportActions) {
       fileMenu.addAction(exportAct);
     }
 
-    exportActions = p_fileList->getExportActions();
+    exportActions = m_fileList->getExportActions();
 
     foreach (QAction * exportAct, exportActions) {
       fileMenu.addAction(exportAct);
@@ -112,24 +103,26 @@ namespace Isis {
   }
 
 
+  /**
+   * 
+   */
   QProgressBar *MosaicController::getProgress() {
-    return p_progress;
+    return m_imageReader->progress();
   }
 
 
   void MosaicController::saveProject(QString projFileName) {
     Pvl projFile;
 
-    PvlObject cubeProps("Cubes");
+    PvlObject imageProps("Images");
 
-    CubeDisplayProperties *cube;
-    foreach(cube, p_cubes) {
-      cubeProps += cube->toPvl();
+    foreach (Image *image, m_images) {
+      imageProps += image->toPvl();
     }
 
-    projFile += cubeProps;
-    projFile += p_fileList->toPvl();
-    projFile += p_scene->toPvl();
+    projFile += imageProps;
+    projFile += m_fileList->toPvl();
+    projFile += m_scene->toPvl();
 
     projFile.write(projFileName);
   }
@@ -138,35 +131,8 @@ namespace Isis {
   QList<QAction *> MosaicController::getSettingsActions() {
     QList<QAction *> settingsActs;
 
-    QAction *defaultFill = new QAction("Default Footprints &Filled", this);
-    defaultFill->setCheckable(true);
-    defaultFill->setChecked(m_openFilled);
-    connect(defaultFill, SIGNAL(toggled(bool)),
-            this, SLOT(defaultFillChanged(bool)));
-    settingsActs.append(defaultFill);
-
-    QAction *setSmallOpenCubeCount = new QAction("&Safe File Open", this);
-    setSmallOpenCubeCount->setCheckable(true);
-    setSmallOpenCubeCount->setChecked(m_maxOpenCubes < 750);
-    setSmallOpenCubeCount->setWhatsThis("This lowers the number of "
-        "simulataneously open files drastically in order to stay under the "
-        "operating system limit. Only use this if you are having trouble "
-        "loading large numbers of images.");
-    connect(setSmallOpenCubeCount, SIGNAL(toggled(bool)),
-            this, SLOT(setSmallNumberOfOpenCubes(bool)));
-    settingsActs.append(setSmallOpenCubeCount);
-
-    QAction *setFileListCols = new QAction("Set Current File List &Columns as Default", this);
-    setFileListCols->setWhatsThis(tr("Use the currently visible columns in the file list as the "
-          "default when no project has been opened"));
-    connect(setFileListCols, SIGNAL(triggered(bool)),
-            this, SLOT(setDefaultFileListCols()));
-    settingsActs.append(setFileListCols);
-
-    QAction *setAlpha = new QAction("Set Default &Transparency", this);
-    connect(setAlpha, SIGNAL(triggered(bool)),
-            this, SLOT(changeDefaultAlpha()));
-    settingsActs.append(setAlpha);
+    settingsActs.append(m_imageReader->actions(ImageDisplayProperties::FootprintViewProperties));
+    settingsActs.append(m_fileList->actions());
 
     QAction *setThreads = new QAction("Set &Thread Limit", this);
     connect(setThreads, SIGNAL(triggered(bool)),
@@ -179,92 +145,8 @@ namespace Isis {
 
   void MosaicController::saveSettings(QSettings &settings) {
     settings.beginGroup("MosaicController");
-    settings.setValue("openFilled", m_openFilled);
-    settings.setValue("defaultAlpha", m_defaultAlpha);
     settings.setValue("maxThreads", m_maxThreads);
-    settings.setValue("maxOpenCubes", m_maxOpenCubes);
     settings.endGroup();
-  }
-
-
-  /**
-   * Create a functor for converting from filename to CubeDisplayProperties
-   *
-   * This method is always called from the GUI thread.
-   */
-  MosaicController::FileNameToDisplayFunctor::FileNameToDisplayFunctor(
-      QMutex *cameraMutex, QThread *targetThread, bool openFilled,
-      int defaultAlpha) {
-    m_mutex = cameraMutex;
-    m_targetThread = targetThread;
-    m_openFilled = openFilled;
-    m_defaultAlpha = defaultAlpha;
-  }
-
-
-  /**
-   * Read the QString filename and make a cubedisplayproperties
-   *   from it. Set the default values. This is what we're doing in another
-   *   thread, so make sure the QObject ends up in the correct thread.
-   *
-   * This method is never called from the GUI thread.
-   */
-  CubeDisplayProperties *MosaicController::FileNameToDisplayFunctor::operator()(
-      const QString &filename) {
-    try {
-      CubeDisplayProperties *prop = new CubeDisplayProperties(
-          QString(FileName(filename).expanded()),
-          m_mutex);
-      prop->setShowFill(m_openFilled);
-
-      QColor newColor = prop->getValue(
-          CubeDisplayProperties::Color).value<QColor>();
-      newColor.setAlpha(m_defaultAlpha);
-
-      prop->setColor(newColor);
-      prop->moveToThread(m_targetThread);
-      return prop;
-    }
-    catch(IException &e) {
-      e.print();
-      return NULL;
-    }
-  }
-
-
-  /**
-   * Create a functor for converting from project to CubeDisplayProperties
-   *
-   * This method is always called from the GUI thread.
-   */
-  MosaicController::ProjectToDisplayFunctor::ProjectToDisplayFunctor(
-      QMutex *cameraMutex, QThread *targetThread) {
-    m_mutex = cameraMutex;
-    m_targetThread = targetThread;
-  }
-
-
-  /**
-   * Read the pvlObject from the project file and make a cubedisplayproperties
-   *   from it. This is what we're doing in another thread, so make sure the
-   *   QObject ends up in the correct thread.
-   *
-   * This method is never called from the GUI thread.
-   */
-  CubeDisplayProperties *MosaicController::ProjectToDisplayFunctor::operator()(
-      const PvlObject &projectCube) {
-    try {
-      CubeDisplayProperties *prop = new CubeDisplayProperties(
-          (QString)projectCube["FileName"][0],
-          m_mutex);
-      prop->fromPvl(projectCube);
-      prop->moveToThread(m_targetThread);
-      return prop;
-    }
-    catch(IException &e) {
-      e.print();
-      return NULL;
-    }
   }
 
 
@@ -272,151 +154,35 @@ namespace Isis {
    * Handle opening cubes by filename. This class constructs and owns the
    *   actual Cube objects.
    */
-  void MosaicController::openCubes(QStringList cubeNames) {
-    if (!cubeNames.size() && m_cubesLeftToOpen->size()) {
-      cubeNames = m_cubesLeftToOpen->mid(0, m_maxOpenCubes);
-      *m_cubesLeftToOpen = m_cubesLeftToOpen->mid(m_maxOpenCubes);
-    }
-
-    if(cubeNames.size()) {
-      if(m_watcher && !m_watcher->isFinished()) {
-        m_cubesLeftToOpen->append(cubeNames);
-        p_progress->setRange(0, p_progress->maximum() + cubeNames.size());
-      }
-      else {
-        p_progress->setText("Opening cubes");
-
-        if (cubeNames.size() > m_maxOpenCubes) {
-          m_cubesLeftToOpen->append(cubeNames.mid(m_maxOpenCubes));
-          cubeNames = cubeNames.mid(0, m_maxOpenCubes);
-        }
-
-        QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
-            cubeNames,
-            FileNameToDisplayFunctor(m_mutex, QThread::currentThread(),
-              m_openFilled, m_defaultAlpha));
-
-        if(m_maxThreads > 1)
-          QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
-        else
-          QThreadPool::globalInstance()->setMaxThreadCount(
-              QThread::idealThreadCount());
-
-        delete m_watcher;
-        m_watcher = NULL;
-
-        m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
-        connect(m_watcher, SIGNAL(resultReadyAt(int)),
-                this, SLOT(cubeDisplayReady(int)));
-        connect(m_watcher, SIGNAL(finished()),
-                this, SLOT(loadFinished()));
-        m_watcher->setFuture(displays);
-        if (!p_progress->isVisible())
-          p_progress->setRange(0, cubeNames.size() + m_cubesLeftToOpen->size());
-        p_progress->setVisible(true);
-      }
-    }
+  void MosaicController::openImages(QStringList cubeNames) {
+    m_imageReader->read(cubeNames);
   }
 
 
-  void MosaicController::openProjectCubes(QList<PvlObject> projectCubes) {
-    if (!projectCubes.size() && m_projectCubesLeftToOpen->size()) {
-      projectCubes = m_projectCubesLeftToOpen->mid(0, m_maxOpenCubes);
-      *m_projectCubesLeftToOpen = m_projectCubesLeftToOpen->mid(m_maxOpenCubes);
-    }
-
-    if(projectCubes.size()) {
-      if(m_watcher && !m_watcher->isFinished()) {
-        m_projectCubesLeftToOpen->append(projectCubes);
-        p_progress->setRange(0, p_progress->maximum() + projectCubes.size());
-      }
-      else {
-        p_progress->setText("Opening cubes");
-
-        if (projectCubes.size() > m_maxOpenCubes) {
-          m_projectCubesLeftToOpen->append(projectCubes.mid(m_maxOpenCubes));
-          projectCubes = projectCubes.mid(0, m_maxOpenCubes);
-        }
-
-        QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
-            projectCubes,
-            ProjectToDisplayFunctor(m_mutex, QThread::currentThread()));
-
-        if(m_maxThreads > 1)
-          QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
-        else
-          QThreadPool::globalInstance()->setMaxThreadCount(
-              QThread::idealThreadCount());
-
-        delete m_watcher;
-        m_watcher = NULL;
-
-        m_watcher = new QFutureWatcher< CubeDisplayProperties * >;
-        connect(m_watcher, SIGNAL(resultReadyAt(int)),
-                this, SLOT(cubeDisplayReady(int)));
-        connect(m_watcher, SIGNAL(finished()),
-                this, SLOT(loadFinished()));
-        m_watcher->setFuture(displays);
-        if (!p_progress->isVisible())
-          p_progress->setRange(0,
-              projectCubes.size() + m_projectCubesLeftToOpen->size());
-        p_progress->setVisible(true);
-      }
-    }
+  void MosaicController::openProjectImages(PvlObject projectImages) {
+    m_imageReader->read(projectImages);
   }
 
 
-  void MosaicController::cubeDisplayReady(int index) {
-    if(m_watcher) {
-      CubeDisplayProperties *cubeDisplay = m_watcher->resultAt(index);
-      p_progress->setValue(p_progress->value() + 1);
+  void MosaicController::imagesReady(ImageList images) {
+    m_images.append(images);
 
-      if(cubeDisplay) {
-        p_unannouncedCubes.append(cubeDisplay);
-        p_cubes.append(cubeDisplay);
-        connect(cubeDisplay, SIGNAL(destroyed(QObject *)),
-                this, SLOT(cubeClosed(QObject *)));
-      }
+    foreach (Image *image, images) {
+      connect(image, SIGNAL(destroyed(QObject *)),
+              this, SLOT(imageClosed(QObject *)));
     }
-  }
 
-  void MosaicController::loadFinished() {
-    flushCubes();
+    // We really can't have all of the cubes in memory before
+    //   the OS stops letting us open more files.
+    // Assume cameras are being used in other parts of code since it's
+    //   unknown
+    QMutexLocker lock(m_mutex);
+    emit imagesAdded(images);
+    emit imagesAdded(&images);
 
-    if (m_projectCubesLeftToOpen->size()) {
-      QList<PvlObject> empty;
-      openProjectCubes(empty);
-    }
-    else if (m_cubesLeftToOpen->size()) {
-      openCubes(QStringList());
-    }
-    else {
-      if(m_projectPvl && m_projectPvl->hasObject("MosaicFileList"))
-        p_fileList->fromPvl(m_projectPvl->findObject("MosaicFileList"));
-
-      if(m_projectPvl && m_projectPvl->hasObject("MosaicScene"))
-        p_scene->fromPvl(m_projectPvl->findObject("MosaicScene"));
-
-      if(m_projectPvl) {
-        delete m_projectPvl;
-        m_projectPvl = NULL;
-      }
-
-      p_progress->setVisible(false);
-      p_progress->setValue(0);
-    }
-  }
-
-
-  void MosaicController::changeDefaultAlpha() {
-    bool ok = false;
-    int alpha = QInputDialog::getInt(NULL, "Transparency Value",
-        "Set the default transparency value\n"
-        "Values are 0 (invisible) to 255 (solid)",
-        m_defaultAlpha, 0, 255, 1, &ok);
-
-    if(ok) {
-      m_defaultAlpha = alpha;
+    Image *openImage;
+    foreach (openImage, images) {
+      openImage->closeCube();
     }
   }
 
@@ -427,68 +193,67 @@ namespace Isis {
     QStringList options;
 
     int current = 0;
-    options << "Use all available";
+    options << tr("Use all available");
 
     for(int i = 1; i < 24; i++) {
-      QString option = QString("Use ") + QString::number(i + 1) + " threads";
+      QString option = tr("Use %1 threads").arg(i + 1);
 
       options << option;
       if(m_maxThreads == i + 1)
         current = i;
     }
 
-    QString res = QInputDialog::getItem(NULL, "Concurrency",
-        "Set the number of threads to use",
+    QString res = QInputDialog::getItem(NULL, tr("Concurrency"),
+        tr("Set the number of threads to use"),
         options, current, false, &ok);
 
-    if(ok) {
+    if (ok) {
       m_maxThreads = options.indexOf(res) + 1;
+
+      applyMaxThreadCount();
     }
   }
 
 
   /**
-   * Open cube being deleted
+   * An open image is being deleted
    */
-  void MosaicController::cubeClosed(QObject * cubeDisplayObj) {
-    CubeDisplayProperties *cubeDisplay =
-        (CubeDisplayProperties *)cubeDisplayObj;
+  void MosaicController::imageClosed(QObject * imageObj) {
+    Image *image = qobject_cast<Image *>(imageObj);
 
-    QList<CubeDisplayProperties *>::iterator foundElement;
-    foundElement = qFind(p_cubes.begin(), p_cubes.end(), cubeDisplay);
-    p_cubes.erase(foundElement);
+    if (image) {
+      ImageList::iterator foundElement;
+      foundElement = qFind(m_images.begin(), m_images.end(), image);
+      m_images.erase(foundElement);
 
-    if(p_cubes.empty())
-      emit allCubesClosed();
-  }
-
-
-  void MosaicController::defaultFillChanged(bool fill) {
-    m_openFilled = fill;
+      if(m_images.empty())
+        emit allImagesClosed();
+    }
   }
 
 
   void MosaicController::readProject(QString filename) {
     try {
-      m_projectPvl = new Pvl(filename);
-      PvlObject &cubes(m_projectPvl->findObject("Cubes"));
+      Pvl projectPvl(filename);
 
-      QList<PvlObject> cubesList;
-
-      for (int i = 0; i < cubes.objects(); i++) {
-        cubesList.append(cubes.object(i));
+      // Convert versions <= isis3.4.1 to newer
+      if (projectPvl.hasObject("Cubes")) {
+        convertV1ToV2(projectPvl);
       }
 
-      if(m_projectPvl && m_projectPvl->hasObject("MosaicScene"))
-        p_scene->preloadFromPvl(m_projectPvl->findObject("MosaicScene"));
+      PvlObject &projImages(projectPvl.findObject("Images"));
 
-      openProjectCubes(cubesList);
+      if (projectPvl.hasObject("MosaicScene"))
+        m_scene->fromPvl(projectPvl.findObject("MosaicScene"));
+
+      if (projectPvl.hasObject("ImageFileList"))
+        m_fileList->fromPvl(projectPvl.findObject("ImageFileList"));
+
+      openProjectImages(projImages);
     }
     catch(IException &e) {
-      p_progress->setVisible(false);
-      flushCubes();
-      throw IException(e, IException::Unknown, "Input project file does is not"
-          " an up to date qmos project", _FILEINFO_);
+      throw IException(e, IException::Unknown,
+                       "Input file is not a valid qmos project", _FILEINFO_);
     }
   }
 
@@ -503,47 +268,141 @@ namespace Isis {
 
     TextFile file(output, "output");
 
-    CubeDisplayProperties *cube;
-    foreach(cube, p_cubes) {
-      file.PutLine( cube->fileName() );
-    }
-  }
-  
-  
-  void MosaicController::setDefaultFileListCols() {
-    if (p_fileList) {
-      p_fileList->setDefaultFileListCols();
+    Image *image;
+    foreach (image, m_images) {
+      file.PutLine( image->fileName() );
     }
   }
 
 
-  void MosaicController::setSmallNumberOfOpenCubes(bool useSmallNumber) {
-    if (useSmallNumber)
-      m_maxOpenCubes = 20;
-    else
-      m_maxOpenCubes = 750;
+  void MosaicController::applyMaxThreadCount() {
+    if (m_maxThreads <= 1) {
+      QThreadPool::globalInstance()->setMaxThreadCount(QThread::idealThreadCount());
+    }
+    else {
+      QThreadPool::globalInstance()->setMaxThreadCount(m_maxThreads - 1);
+    }
   }
 
 
   /**
-   * This method takes the opened cube files, announces them to the GUI widgets,
-   *   and then closes the Cube files so that more can be opened later.
+   * This converts qmos project files (no other project files existed) from their original version
+   *   (file names everywhere, CubeDisplayProperties, non-OR'able display properties) to the
+   *   second major version. Cubes are now Images, Display properties' indices have changed,
+   *   Image ID's instead of file names in many places.
+   *
+   * This is only intended to get the project to the major V2 version... minor version adjustments
+   *   ought to be handled internally by each object.
    */
-  void MosaicController::flushCubes() {
-    // We really can't have all of the cubes in memory before
-    //   the OS stops letting us open more files.
-    if(p_unannouncedCubes.size() > 0) {
-      // Assume cameras are being used in other parts of code since it's
-      //   unknown
-      QMutexLocker lock(m_mutex);
-      emit cubesAdded(p_unannouncedCubes);
+  void MosaicController::convertV1ToV2(Pvl &project) {
+    PvlObject &images = project.findObject("Cubes");
 
-      CubeDisplayProperties *openCube;
-      foreach(openCube, p_unannouncedCubes) {
-        openCube->closeCube();
+    images.setName("Images");
+
+    QMap<QString, QString> imageFileToNewId;
+
+    for (int imgObjIndex = 0; imgObjIndex < images.objects(); imgObjIndex++) {
+      PvlObject &image = images.object(imgObjIndex);
+      image.setName("Image");
+
+
+      QBuffer idDataBuffer;
+      idDataBuffer.open(QIODevice::ReadWrite);
+
+      QDataStream idStream(&idDataBuffer);
+
+      QUuid newId = QUuid::createUuid();
+      QString fileName = image["FileName"][0];
+      idStream << newId;
+
+      idDataBuffer.seek(0);
+
+      QString idHex;
+      image += PvlKeyword("ID", QString(idDataBuffer.data().toHex()));
+
+      PvlKeyword oldDisplayPropsValues = image["Values"];
+      image.deleteKeyword("Values");
+
+      PvlObject displayProps("DisplayProperties");
+      displayProps += PvlKeyword("DisplayName", FileName(fileName).name());
+
+      // Convert display properties over
+      enum OldDispProps {
+        OldDispPropColor,
+        OldDispPropUntransferred1, // Selected
+        OldDispPropShowDNs,
+        OldDispPropShowFill,
+        OldDispPropShowLabel,
+        OldDispPropShowOutline,
+        OldDispPropUntransferred2, // Zooming
+        OldDispPropUntransferred3  // ZOrdering
+      };
+
+      QMap<int, QVariant> oldProps;
+      QByteArray oldHexValues(oldDisplayPropsValues[0].toAscii());
+      QDataStream oldValuesStream(QByteArray::fromHex(oldHexValues));
+      oldValuesStream >> oldProps;
+
+      enum V2DispProps {
+        V2DispPropColor = 1,
+        V2DispPropShowDNs = 4,
+        V2DispPropShowFill = 8,
+        V2DispPropShowLabel = 16,
+        V2DispPropShowOutline = 32
+      };
+
+      QMap<int, QVariant> newProps;
+      newProps[V2DispPropColor] = oldProps[OldDispPropColor];
+      newProps[V2DispPropShowDNs] = oldProps[OldDispPropShowDNs];
+      newProps[V2DispPropShowFill] = oldProps[OldDispPropShowFill];
+      newProps[V2DispPropShowLabel] = oldProps[OldDispPropShowLabel];
+      newProps[V2DispPropShowOutline] = oldProps[OldDispPropShowOutline];
+
+      QBuffer newPropsDataBuffer;
+      newPropsDataBuffer.open(QIODevice::ReadWrite);
+
+      QDataStream newPropsStream(&newPropsDataBuffer);
+      newPropsStream << newProps;
+      newPropsDataBuffer.seek(0);
+
+      displayProps += PvlKeyword("Values", newPropsDataBuffer.data().toHex().data());
+      // Finished converting display properties from V1->V2
+
+
+      image += displayProps;
+
+      imageFileToNewId[fileName] = newId.toString().replace(QRegExp("[{}]"), "");
+    }
+
+    PvlObject &fileListOpts = project.findObject("MosaicFileList");
+    fileListOpts.setName("ImageFileList");
+
+    for (int fileListIndex = 0; fileListIndex < fileListOpts.objects(); fileListIndex++) {
+      PvlObject &fileListOrderObj = fileListOpts.object(fileListIndex);
+
+      for (int i = 0; i < fileListOrderObj.keywords(); i++) {
+        PvlKeyword &key = fileListOrderObj[i];
+
+        if (key.isNamed("Cube")) {
+          key.setName("Image");
+          key[0] = imageFileToNewId[key[0]];
+        }
       }
+    }
 
-      p_unannouncedCubes.clear();
+    PvlObject &sceneOpts = project.findObject("MosaicScene");
+
+    if (sceneOpts.hasObject("ZOrdering")) {
+      PvlObject &zOrdering = sceneOpts.findObject("ZOrdering");
+
+
+      for (int i = 0; i < zOrdering.keywords(); i++) {
+        PvlKeyword &key = zOrdering[i];
+
+        if (key.isNamed("ZValue")) {
+          key[0] = imageFileToNewId[key[0]];
+        }
+      }
     }
   }
 }

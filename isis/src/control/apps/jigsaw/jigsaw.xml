@@ -467,7 +467,7 @@
           <item>0.5</item>
         </default>
         <minimum inclusive="no">0</minimum>
-        <maximum incluseive="no">1</maximum>
+        <maximum inclusive="no">1</maximum>
       </parameter>
 
       <parameter name="MODEL2">
@@ -530,7 +530,7 @@
           <item>0.5</item>
         </default>
         <minimum inclusive="no">0</minimum>
-        <maximum incluseive="no">1</maximum>
+        <maximum inclusive="no">1</maximum>
       </parameter>
 
       <parameter name="MODEL3">
@@ -590,7 +590,7 @@
           <item>0.5</item>
         </default>
         <minimum inclusive="no">0</minimum>
-        <maximum incluseive="no">1</maximum>
+        <maximum inclusive="no">1</maximum>
       </parameter>
 
     </group>

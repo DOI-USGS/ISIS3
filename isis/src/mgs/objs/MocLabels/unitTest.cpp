@@ -1,3 +1,4 @@
+#include "Cube.h"
 #include "IException.h"
 #include "Pvl.h"
 #include "MocLabels.h"
@@ -12,8 +13,8 @@ int main() {
   try {
     cout << "Unit test for MocLabels" << endl;
     cout << "MocWideAngleCamera cub test..." << endl;
-    Pvl p1("$mgs/testData/ab102401.cub");
-    MocLabels lab1(p1);
+    Cube c1("$mgs/testData/ab102401.cub", "r");
+    MocLabels lab1(c1);
 
     cout << "NarrowAngle?  " << lab1.NarrowAngle() << endl;
     cout << "WideAngle?  " << lab1.WideAngle() << endl;
@@ -35,8 +36,8 @@ int main() {
     cout << "Offset = " << lab1.Offset() << endl << endl;
 
     cout << "MocNarrowAngleCamera cub test..." << endl;
-    Pvl p2("$mgs/testData/fha00491.lev1.cub");
-    MocLabels lab2(p2);
+    Cube c2("$mgs/testData/fha00491.lev1.cub", "r");
+    MocLabels lab2(c2);
 
     cout << "NarrowAngle?  " << lab2.NarrowAngle() << endl;
     cout << "WideAngle?  " << lab2.WideAngle() << endl;

@@ -47,6 +47,8 @@ namespace Isis {
    *                           if the mapping radii keywords are missing.
    *   @history 2013-03-19 Steven Lambright - Auto grid now remembers its last setting and defaults
    *                           to it.
+   *   @history 2013-09-11 Tracie Sucharski - Check for existence of scene widget before calling
+   *                           methods on it in domainMinLon() and domainMaxLon().  Fixes #1748.
    */
   class MosaicGridTool : public MosaicTool {
       Q_OBJECT

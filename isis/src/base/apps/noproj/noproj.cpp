@@ -149,7 +149,7 @@ void IsisMain() {
   }
 
   // Get the start time for parent line 1
-  AlphaCube alpha(*(icube->label()));
+  AlphaCube alpha(*icube);
   double sample = alpha.BetaSample(.5);
   double line = alpha.BetaLine(.5);
   incam->SetImage(sample, line);

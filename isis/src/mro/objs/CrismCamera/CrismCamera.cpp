@@ -50,9 +50,11 @@ namespace Isis {
    *   @history 2012-04-12  Kris Becker, Flagstaff Original Version
    *
    */
-  CrismCamera::CrismCamera(Pvl &lab) : LineScanCamera(lab), m_lineRates(),
+  CrismCamera::CrismCamera(Cube &cube) : LineScanCamera(cube), m_lineRates(),
                                        m_isBandDependent(true) {
     NaifStatus::CheckErrors();
+
+    Pvl &lab = *cube.label();
 
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
@@ -210,7 +212,7 @@ namespace Isis {
  * @return Isis::Camera* CrismCamera
  * @internal 
  */
-extern "C" Isis::Camera *CrismCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::CrismCamera(lab);
+extern "C" Isis::Camera *CrismCameraPlugin(Isis::Cube &cube) {
+  return new Isis::CrismCamera(cube);
 }
 

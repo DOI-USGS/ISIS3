@@ -321,6 +321,7 @@ namespace Isis {
   void ShapeModel::setNormal(const std::vector<double> normal) {
     if (m_hasIntersection) {
       m_normal = normal;
+      m_hasNormal = true;
     }
     else {
       IString message = "No intersection point in known.  A normal can not be set.";
@@ -329,6 +330,23 @@ namespace Isis {
   }
 
 
+  /** Set the normal for the currect intersection point
+   *
+   */
+  void ShapeModel::setNormal(const double a, const double b, const double c) {
+    if (m_hasIntersection) {
+      m_normal[0] = a;
+      m_normal[1] = b;
+      m_normal[2] = c;
+      m_hasNormal = true;
+    }
+    else {
+      IString message = "No intersection point in known.  A normal can not be set.";
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+  }
+  
+  
   /** Set the shape name
    *
    */

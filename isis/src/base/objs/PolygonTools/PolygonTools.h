@@ -59,7 +59,7 @@ namespace Isis {
    */
 
   class UniversalGroundMap;
-  class Projection;
+  class TProjection;
 
   static geos::geom::GeometryFactory globalFactory;
 
@@ -131,10 +131,10 @@ namespace Isis {
       ~PolygonTools();
 
       static geos::geom::MultiPolygon *LatLonToXY(
-        const geos::geom::MultiPolygon &lonLatPoly, Projection *proj);
+        const geos::geom::MultiPolygon &lonLatPoly, TProjection *proj);
 
       static geos::geom::MultiPolygon *XYToLatLon(
-        const geos::geom::MultiPolygon &xYPoly, Projection *proj);
+        const geos::geom::MultiPolygon &xYPoly, TProjection *proj);
 
       static geos::geom::MultiPolygon *LatLonToSampleLine(
         const geos::geom::MultiPolygon &lonLatPoly, UniversalGroundMap *ugm);

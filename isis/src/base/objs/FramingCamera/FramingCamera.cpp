@@ -29,7 +29,7 @@ namespace Isis {
    *
    * @param lab Pvl label used to create the parent Camera object
    */
-  FramingCamera::FramingCamera(Pvl &lab) : Camera(lab) {
+  FramingCamera::FramingCamera(Cube &cube) : Camera(cube) {
   }
 
   /**

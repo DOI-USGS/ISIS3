@@ -244,8 +244,8 @@ namespace Isis {
                           p_circleSize, p_circleSize);
     }
 
-    QString serialNumber = SerialNumber::Compose(*p_chipCube);
-    if (p_controlNet && p_controlNet->GetCubeSerials().contains(
+    QString serialNumber = p_chipCube? SerialNumber::Compose(*p_chipCube) : QString();
+    if (p_controlNet && !serialNumber.isEmpty() && p_controlNet->GetCubeSerials().contains(
                              serialNumber)) {
       // draw measure locations if we have a control network
       //  If the serial number is Unknown, we probably have a ground source

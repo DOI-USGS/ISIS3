@@ -10,7 +10,6 @@
 #include "OverlapStatistics.h"
 #include "Process.h"
 #include "ProcessByLine.h"
-#include "Projection.h"
 
 using std::string;
 using std::vector;

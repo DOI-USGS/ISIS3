@@ -5,6 +5,7 @@
 #include "Pvl.h"
 #include "Projection.h"
 #include "Preference.h"
+#include "TProjection.h"
 
 using namespace Isis;
 using namespace std;
@@ -46,7 +47,7 @@ int main(int argc, char *argv[]) {
     mapGroup += PvlKeyword("UpperLeftCornerY", toString(2062000.0));
 
     cout << "Testing conversion from image to ground ... " << endl;
-    Projection *proj = ProjectionFactory::CreateFromCube(lab);
+    TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(lab);
     proj->SetWorld(245.0, 355.0);
     cout << setprecision(14);
     cout << "Latitude:  " << proj->Latitude() << endl;
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing create method ... " << endl;
     int lines, samples;
-    proj = ProjectionFactory::CreateForCube(lab, samples, lines);
+    proj = (TProjection *) ProjectionFactory::CreateForCube(lab, samples, lines);
     cout << "Lines:       " << lines << endl;
     cout << "Samples:     " << samples << endl;
     cout << "UpperLeftX:  " << (double) mapGroup["UpperLeftCornerX"] << endl;
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
     icube.addGroup(mapGroup);
     lab2.addObject(icube);
 
-    proj = ProjectionFactory::CreateForCube(lab2, samples, lines);
+    proj = (TProjection *) ProjectionFactory::CreateForCube(lab2, samples, lines);
     cout << "Lines:       " << lines << endl;
     cout << "Samples:     " << samples << endl;
     mapGroup = lab2.findGroup("Mapping", Pvl::Traverse);

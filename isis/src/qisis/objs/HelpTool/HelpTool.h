@@ -42,13 +42,12 @@ namespace Isis {
       void addTo(QMenu *menu);
       void addToPermanent(QToolBar *perm);
 
-    public slots:
-      void whatsThis();
-
-    protected:
       QString menuName() const {
         return "&Help";
-      };
+      }
+
+    public slots:
+      void whatsThis();
 
     private:
       QAction *p_whatsThis;

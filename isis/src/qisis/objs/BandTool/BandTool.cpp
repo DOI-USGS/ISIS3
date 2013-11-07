@@ -252,14 +252,11 @@ namespace Isis {
    *
    * @param pvl
    */
-  void BandTool::setBandBin(Pvl &pvl) {
+  void BandTool::setBandBin(Cube *cube) {
+    p_pvl = *cube->label();
 
     // Get the number of bands and setup the spin box
-    PvlGroup &dim = pvl.findObject("IsisCube")
-                          .findObject("Core")
-                          .findGroup("Dimensions");
-    p_pvl = pvl;
-    p_bands = dim["Bands"];
+    p_bands = cube->bandCount();
 
     p_graySpin->setValue(1);
     p_graySpin->adjustSize();
@@ -280,9 +277,9 @@ namespace Isis {
 
     p_comboBox->clear();
     MdiCubeViewport *cvp = cubeViewport();
-    if(pvl.findObject("IsisCube").hasGroup("BandBin")) {
-      PvlGroup &bandBin = pvl.findObject("IsisCube")
-                                .findGroup("BandBin");
+    if(p_pvl.findObject("IsisCube").hasGroup("BandBin")) {
+      PvlGroup &bandBin = p_pvl.findObject("IsisCube")
+                               .findGroup("BandBin");
       for(int i = 0; i < bandBin.keywords(); i++) {
         //only add band bin keywords have a size that equals the number of bands
         if(bandBin[i].size() == p_bands) {
@@ -475,7 +472,7 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp != NULL) {
       if(p_bandBinViewport != cvp) {
-        setBandBin(*cvp->cube()->label());
+        setBandBin(cvp->cube());
       }
 
       if(cvp->isGray()) {

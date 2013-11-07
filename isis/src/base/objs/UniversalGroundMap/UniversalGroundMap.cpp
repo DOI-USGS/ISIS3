@@ -11,20 +11,13 @@
 #include "Longitude.h"
 #include "PolygonTools.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 namespace Isis {
-  /**
-   * Constructs a UniversalGroundMap object from a pvl
-   *
-   * @param pvl The Pvl file to create the UniversalGroundMap from
-   * @param priority Try to make a camera or projection first
-   */
-  UniversalGroundMap::UniversalGroundMap(Pvl &pvl, CameraPriority priority) {
-    Init(pvl, priority);
-  }
-
   /**
    * Constructs a UniversalGroundMap object from a cube
    *
@@ -32,24 +25,13 @@ namespace Isis {
    * @param priority Try to make a camera or projection first
    */
   UniversalGroundMap::UniversalGroundMap(Cube &cube, CameraPriority priority) {
-    Init(*(cube.label()), priority);
-  }
-
-  /**
-   * Creates the UniversalGroundMap
-   *
-   * @param pvl The Pvl file to create the UniversalGroundMap from
-   * @param priority Try to make a camera or projection first
-   *
-   * @throws Isis::iException::Camera - Could not create camera or projection
-   */
-  void UniversalGroundMap::Init(Pvl &pvl, CameraPriority priority) {
     p_camera = NULL;
     p_projection = NULL;
 
+    Pvl &pvl = *cube.label();
     try {
       if(priority == CameraFirst)
-        p_camera = CameraFactory::Create(pvl);
+        p_camera = CameraFactory::Create(cube);
       else
         p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
     }
@@ -61,12 +43,12 @@ namespace Isis {
         if(priority == CameraFirst)
           p_projection = Isis::ProjectionFactory::CreateFromCube(pvl);
         else
-          p_camera = CameraFactory::Create(pvl);
+          p_camera = CameraFactory::Create(cube);
       }
       catch (IException &secondError) {
         p_projection = NULL;
         QString msg = "Could not create camera or projection for [" +
-                          pvl.fileName() + "]";
+                          cube.fileName() + "]";
         IException realError(IException::Unknown, msg, _FILEINFO_);
         realError.append(firstError);
         realError.append(secondError);
@@ -100,15 +82,15 @@ namespace Isis {
    * Returns whether the lat/lon position was set successfully in the camera
    * model or projection
    *
-   * @param lat The universal latitude
-   * @param lon The universal longitude
+   * @param lat The universal latitude or ring radius for ring planes
+   * @param lon The universal longitude or ring longitude (azimuth) for ring planes
    *
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not
    */
   bool UniversalGroundMap::SetUniversalGround(double lat, double lon) {
     if (p_camera != NULL) {
-      if (p_camera->SetUniversalGround(lat, lon)) {
+      if (p_camera->SetUniversalGround(lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
       else {
@@ -116,7 +98,7 @@ namespace Isis {
       }
     }
     else {
-      return p_projection->SetUniversalGround(lat, lon);
+      return p_projection->SetUniversalGround(lat, lon); // This should work for rings (radius,azimuth)
     }
   }
 
@@ -125,15 +107,15 @@ namespace Isis {
    * Returns whether the lat/lon position was set successfully in the camera
    * model or projection.
    *
-   * @param lat The latitude
-   * @param lon The longitude
+   * @param lat The universal latitude or ring radius for ring planes
+   * @param lon The universal longitude or ring longitude (azimuth) for ring planes
    *
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not
    */
   bool UniversalGroundMap::SetGround(Latitude lat, Longitude lon) {
     if(p_camera != NULL) {
-      if(p_camera->SetGround(lat, lon)) {
+      if(p_camera->SetGround(lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
       else {
@@ -143,7 +125,7 @@ namespace Isis {
     else {
       double universalLat = lat.degrees();
       double universalLon = lon.degrees();
-      return p_projection->SetUniversalGround(universalLat, universalLon);
+      return p_projection->SetUniversalGround(universalLat, universalLon);  // This should work for rings (radius,azimuth)
     }
   }
 
@@ -168,7 +150,7 @@ namespace Isis {
     }
     else {
       return p_projection->SetUniversalGround(sp.GetLatitude().degrees(),
-                                              sp.GetLongitude().degrees());
+                                              sp.GetLongitude().degrees());   // This should work for rings (radius,azimuth)
     }
   }
 
@@ -229,7 +211,16 @@ namespace Isis {
       return p_camera->UniversalLatitude();
     }
     else {
-      return p_projection->UniversalLatitude();
+      //  Is this a triaxial projection or ring projection.  If ring return Radius as latitude
+      Projection::ProjectionType projType = p_projection->projectionType();
+      if (projType == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) p_projection;
+        return tproj->UniversalLatitude();
+      }
+      else {
+        RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
+        return rproj->RingRadius();
+      }
     }
   }
 
@@ -243,7 +234,17 @@ namespace Isis {
       return p_camera->UniversalLongitude();
     }
     else {
-      return p_projection->UniversalLongitude();
+      //  Is this a triaxial projection or ring projection.  If ring return ring longitude as
+      //    longitude
+      Projection::ProjectionType projType = p_projection->projectionType();
+      if (projType == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) p_projection;
+        return tproj->UniversalLongitude();
+      }
+      else {
+        RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
+        return rproj->RingLongitude();
+      }
     }
   }
 
@@ -281,6 +282,13 @@ namespace Isis {
   bool UniversalGroundMap::GroundRange(Cube *cube, Latitude &minLat,
       Latitude &maxLat, Longitude &minLon, Longitude &maxLon,
       bool allowEstimation) {
+    // Do we need a RingRange method?
+    // For now just return false
+    if (HasCamera())
+      if (p_camera->target()->shape()->name() == "Plane") return false;
+    if (HasProjection()) 
+      if (p_projection->projectionType() == Projection::RingPlane) return false;
+
     minLat = Latitude();
     maxLat = Latitude();
     minLon = Longitude();
@@ -374,6 +382,9 @@ namespace Isis {
           //   extent.
           QList<QPointF> imagePoints;
 
+          // Reset to TProjection
+          TProjection *tproj = (TProjection *) p_projection;
+
                     /*
            * This is where we're testing:
            *
@@ -456,10 +467,10 @@ namespace Isis {
           }
 
           foreach (QPointF imagePoint, imagePoints) {
-            if (p_projection->SetWorld(imagePoint.x(), imagePoint.y())) {
-              Latitude latResult(p_projection->UniversalLatitude(),
+            if (tproj->SetWorld(imagePoint.x(), imagePoint.y())) {
+              Latitude latResult(tproj->UniversalLatitude(),
                                  Angle::Degrees);
-              Longitude lonResult(p_projection->UniversalLongitude(),
+              Longitude lonResult(tproj->UniversalLongitude(),
                                   Angle::Degrees);
               if (minLat.isValid())
                 minLat = qMin(minLat, latResult);

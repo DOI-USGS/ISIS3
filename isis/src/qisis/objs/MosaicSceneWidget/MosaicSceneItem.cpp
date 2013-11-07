@@ -13,11 +13,14 @@
 #include <QStyleOptionGraphicsItem>
 #include <QTreeWidgetItem>
 
-#include "CubeDisplayProperties.h"
+#include "Directory.h"
+#include "DisplayProperties.h"
 #include "FileDialog.h"
 #include "Histogram.h"
-#include "IString.h"
+#include "Image.h"
+#include "ImageList.h"
 #include "ImagePolygon.h"
+#include "IString.h"
 #include "LineManager.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
@@ -26,6 +29,7 @@
 #include "Statistics.h"
 #include "Stretch.h"
 #include "Table.h"
+#include "TProjection.h"
 
 using namespace geos::geom;
 
@@ -37,24 +41,25 @@ namespace Isis {
    * @param cubeFileName
    * @param parent
    */
-  MosaicSceneItem::MosaicSceneItem(CubeDisplayProperties *cubeDisplay,
-      MosaicSceneWidget *parent) : QGraphicsObject() {
+  MosaicSceneItem::MosaicSceneItem(Image *image, MosaicSceneWidget *parent) : QGraphicsObject() {
     if (parent->getProjection() == NULL) {
       std::string msg = "Parent does not have projection in MosaicWidget";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    m_cubeDisplay = cubeDisplay;
+    m_image = image;
 
-    connect(m_cubeDisplay, SIGNAL(destroyed(QObject *)),
+    connect(m_image, SIGNAL(destroyed(QObject *)),
             this, SLOT(lostCubeDisplay()));
-    connect(m_cubeDisplay, SIGNAL(destroyed(QObject *)),
+    connect(m_image, SIGNAL(destroyed(QObject *)),
             this, SLOT(deleteLater()));
 
     m_mp = NULL;
     m_polygons = NULL;
     m_cubeDnStretch = NULL;
     groundMap = NULL;
+    m_showingLabel = false;
+    m_ignoreCubeDisplayChanged = false;
 
     m_scene = parent;
 
@@ -62,24 +67,28 @@ namespace Isis {
 
     setupFootprint();
 
-    setToolTip(m_cubeDisplay->displayName());
+    setToolTip(m_image->displayProperties()->displayName());
 
     setAcceptHoverEvents(true);
 
-    m_cubeDisplay->addSupport(CubeDisplayProperties::Color);
-    m_cubeDisplay->addSupport(CubeDisplayProperties::Selected);
-    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowDNs);
-    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowFill);
-    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowLabel);
-    m_cubeDisplay->addSupport(CubeDisplayProperties::ShowOutline);
+    ImageDisplayProperties *displayProp = m_image->displayProperties();
+    ImageDisplayProperties::Property supportToAdd = (ImageDisplayProperties::Property)
+        (ImageDisplayProperties::Color       |
+         ImageDisplayProperties::Selected    |
+         ImageDisplayProperties::ShowDNs     |
+         ImageDisplayProperties::ShowFill    |
+         ImageDisplayProperties::ShowLabel   |
+         ImageDisplayProperties::ShowOutline |
+         ImageDisplayProperties::ZOrdering);
 
     if(parent->userHasTools()) {
-      m_cubeDisplay->addSupport(CubeDisplayProperties::Zooming);
+      supportToAdd = (ImageDisplayProperties::Property)
+          (supportToAdd | ImageDisplayProperties::Zooming);
     }
 
-    m_cubeDisplay->addSupport(CubeDisplayProperties::ZOrdering);
+    displayProp->addSupport(supportToAdd);
 
-    connect(m_cubeDisplay, SIGNAL(propertyChanged(CubeDisplayProperties *)),
+    connect(displayProp, SIGNAL(propertyChanged(DisplayProperties *)),
             this, SLOT(cubeDisplayChanged()));
   }
 
@@ -127,9 +136,17 @@ namespace Isis {
    */
   void MosaicSceneItem::paint(QPainter *painter,
       const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    if(m_cubeDisplay &&
-       m_cubeDisplay->getValue(CubeDisplayProperties::ShowDNs).toBool()) {
+    if(m_image &&
+       m_image->displayProperties()->getValue(ImageDisplayProperties::ShowDNs).toBool()) {
       drawImage(painter, option);
+    }
+
+    // We don't add the polygon items as children because manually painting them is a huge speed
+    //   improvement. It cannot be undone due to the amount of speed it gives.
+    if (!childItems().count()) {
+      foreach (QGraphicsPolygonItem *polyItem, *m_polygons) {
+        polyItem->paint(painter, option, widget);
+      }
     }
   }
 
@@ -138,17 +155,24 @@ namespace Isis {
    *
    */
   void MosaicSceneItem::setupFootprint() {
-    if(m_cubeDisplay) {
-      m_mp = m_cubeDisplay->footprint();
+    if(m_image) {
+      m_mp = m_image->footprint();
+
+      if (!m_mp) {
+        throw IException(IException::Unknown,
+            tr("Cannot display footprints of images which have no footprints. "
+               "Tried to display [%1]").arg(m_image->displayProperties()->displayName()),
+            _FILEINFO_);
+      }
 
       try {
         reproject();
       }
       catch(IException &e) {
-        m_cubeDisplay->deleteLater();
+        m_image->deleteLater();
 
         IString msg = "Could not project the footprint from cube [" +
-            m_cubeDisplay->displayName() + "]";
+            m_image->displayProperties()->displayName() + "]";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -163,12 +187,15 @@ namespace Isis {
     prepareGeometryChange();
 
     MultiPolygon *mp;
-    Projection *proj = m_scene->getProjection();
+    TProjection *proj = (TProjection *)m_scene->getProjection();
 
     // Remove current polygons from the scene
     while(m_polygons->size()) {
       QGraphicsPolygonItem *polyItem = m_polygons->at(0);
-      m_scene->getScene()->removeItem(polyItem);
+
+      if (polyItem->scene()) {
+        polyItem->scene()->removeItem(polyItem);
+      }
       m_polygons->removeAll(polyItem);
 
       delete polyItem;
@@ -183,11 +210,16 @@ namespace Isis {
       mp = m_mp;
     }
 
+    m_showingLabel =
+        m_image->displayProperties()->getValue(ImageDisplayProperties::ShowLabel).toBool();
+
     //----------------------------------------------------------
     // We need to loop thru the num. geom. because some of the
     // cubes will have more than one geom. if it crosses lat/lon
     // boundries.
     //----------------------------------------------------------
+    bool useFullChildrenHierarchy = (mp->getNumGeometries() > 1) || m_showingLabel;
+
     for (unsigned int i = 0; i < mp->getNumGeometries(); i++) {
       const Geometry *geom = mp->getGeometryN(i);
       CoordinateSequence *pts;
@@ -213,20 +245,33 @@ namespace Isis {
 
       setFlag(QGraphicsItem::ItemIsSelectable);
 
-      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(this);
+      QGraphicsPolygonItem *polyItem = NULL;
+
+      if (useFullChildrenHierarchy) {
+        polyItem = new QGraphicsPolygonItem(this);
+      }
+      else {
+        polyItem = new QGraphicsPolygonItem;
+      }
+
       polyItem->setPolygon(QPolygonF(polyPoints));
 
-      QGraphicsSimpleTextItem *label = new QGraphicsSimpleTextItem(polyItem);
-      if(m_cubeDisplay)
-        label->setText(m_cubeDisplay->displayName());
-      label->setFlag(QGraphicsItem::ItemIsMovable);
-      label->setFont(QFont("Helvetica", 10));
-      label->setPos(polyItem->polygon().boundingRect().center());
-      label->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+      if (m_showingLabel) {
+        QGraphicsSimpleTextItem *label = NULL;
 
-      QRectF boundingRect = polyItem->boundingRect();
-      if(boundingRect.width() < boundingRect.height())
-        label->rotate(90);
+        label = new QGraphicsSimpleTextItem(polyItem);
+
+        if(m_image)
+          label->setText(m_image->displayProperties()->displayName());
+        label->setFlag(QGraphicsItem::ItemIsMovable);
+        label->setFont(QFont("Helvetica", 10));
+        label->setPos(polyItem->polygon().boundingRect().center());
+        label->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+
+        QRectF boundingRect = polyItem->boundingRect();
+        if(boundingRect.width() < boundingRect.height())
+          label->rotate(90);
+      }
 
       m_polygons->append(polyItem);
 
@@ -249,10 +294,10 @@ namespace Isis {
   double MosaicSceneItem::getPixelValue(int sample, int line) {
     double pixelValue = 0;
 
-    if(m_cubeDisplay) {
-      Brick gryBrick(1, 1, 1, m_cubeDisplay->cube()->pixelType());
+    if(m_image) {
+      Brick gryBrick(1, 1, 1, m_image->cube()->pixelType());
       gryBrick.SetBasePosition((int)(sample + 0.5), (int)(line + 0.5), 1);
-      m_cubeDisplay->cube()->read(gryBrick);
+      m_image->cube()->read(gryBrick);
 
       pixelValue = gryBrick[0];
       if (pixelValue == Null) {
@@ -311,12 +356,12 @@ namespace Isis {
               m_scene->getProjection()->SetCoordinate(scenePos.x(),
                                                       -1 * scenePos.y());
 
-              double lat = m_scene->getProjection()->UniversalLatitude();
-              double lon = m_scene->getProjection()->UniversalLongitude();
+              double lat = ((TProjection *)(m_scene->getProjection()))->UniversalLatitude();
+              double lon = ((TProjection *)(m_scene->getProjection()))->UniversalLongitude();
 
-              if(m_cubeDisplay) {
+              if(m_image) {
                 if(!groundMap) {
-                  groundMap = new UniversalGroundMap(*m_cubeDisplay->cube());
+                  groundMap = new UniversalGroundMap(*m_image->cube());
                 }
 
                 if(groundMap->SetUniversalGround(lat, lon)) {
@@ -363,7 +408,7 @@ namespace Isis {
 
   QColor MosaicSceneItem::color() const {
     return
-        m_cubeDisplay->getValue(CubeDisplayProperties::Color).value<QColor>();
+        m_image->displayProperties()->getValue(ImageDisplayProperties::Color).value<QColor>();
   }
 
 
@@ -372,11 +417,21 @@ namespace Isis {
    *   whole thing.
    */
   void MosaicSceneItem::cubeDisplayChanged() {
-    m_scene->blockSelectionChange(true);
-    updateSelection(false);
-    m_scene->blockSelectionChange(false);
+    if (!m_ignoreCubeDisplayChanged) {
+      bool wasBlocking = m_scene->blockSelectionChange(true);
+      updateSelection(false);
+      m_scene->blockSelectionChange(wasBlocking);
 
-    updateChildren();
+      if (m_showingLabel !=
+          m_image->displayProperties()->getValue(ImageDisplayProperties::ShowLabel).toBool()) {
+        // Reproject will create or not create a label item correctly. This is an important speed
+        //   improvement - invisible items still cost us time.
+        reproject();
+      }
+      else {
+        updateChildren();
+      }
+    }
   }
 
 
@@ -449,27 +504,33 @@ namespace Isis {
   /**
    * Update the selected state.
    *
-   * @param save True if we need to write to the CubeDisplayProperties, false
-   *             if we need to read from them.
+   * @param save True if we need to write to the
+   *             DisplayProperties, false if we need to read
+   *             from them.
    */
   void MosaicSceneItem::updateSelection(bool save) {
     QGraphicsPolygonItem * polygon;
-    if(save && m_cubeDisplay) {
-      bool selected = isSelected();
 
-      foreach(polygon, *m_polygons) {
-        selected = selected || polygon->isSelected();
+    m_ignoreCubeDisplayChanged = true;
+    if (m_image) {
+      bool selected =
+          m_image->displayProperties()->getValue(ImageDisplayProperties::Selected).toBool();
+
+      if(save) {
+        selected = isSelected();
+
+        // This code only works if the polygons are in the scene.
+        foreach(polygon, *m_polygons) {
+          selected = selected || (polygon->scene() && polygon->isSelected());
+        }
+
+        m_image->displayProperties()->setSelected(selected);
       }
 
-      m_cubeDisplay->setSelected(selected);
-      updateSelection(false);
-    }
-    else if(m_cubeDisplay) {
-      bool selected =
-          m_cubeDisplay->getValue(CubeDisplayProperties::Selected).toBool();
-
       if(selected != isSelected()) {
+        bool wasBlocking = m_scene->blockSelectionChange(true);
         setSelected(selected);
+        m_scene->blockSelectionChange(wasBlocking);
       }
 
       foreach(polygon, *m_polygons) {
@@ -478,7 +539,7 @@ namespace Isis {
         }
       }
     }
-
+    m_ignoreCubeDisplayChanged = false;
   }
 
 
@@ -489,48 +550,40 @@ namespace Isis {
    */
   void MosaicSceneItem::contextMenuEvent(
       QGraphicsSceneContextMenuEvent *event) {
-    if(m_cubeDisplay) {
+    if(m_image) {
       QMenu menu;
 
-      QAction *title = menu.addAction(m_cubeDisplay->displayName());
+      QAction *title = menu.addAction(m_image->displayProperties()->displayName());
       title->setEnabled(false);
       menu.addSeparator();
 
-      QList<CubeDisplayProperties *> cubeDisplays;
-      cubeDisplays.append(m_cubeDisplay);
+      ImageList images;
+      images.append(m_image);
 
-      QList<QAction *> displayActs =
-          CubeDisplayProperties::getSupportedDisplayActions(cubeDisplays);
+      Directory *directory = m_scene->directory();
+      Project *project = directory ? directory->project() : NULL;
+
+      QList<QAction *> displayActs = images.supportedActions(project);
+
+      if (directory) {
+        displayActs.append(NULL);
+        displayActs.append(directory->supportedActions(new ImageList(images)));
+      }
 
       QAction *displayAct;
       foreach(displayAct, displayActs) {
-        menu.addAction(displayAct);
-      }
-
-      QList<QAction *> zoomActs =
-          CubeDisplayProperties::getSupportedZoomActions(cubeDisplays);
-
-      QList<QAction *> zActs =
-          CubeDisplayProperties::getSupportedZOrderActions(cubeDisplays);
-
-      if((zoomActs.size() || zActs.size()) && displayActs.size()) {
-        menu.addSeparator();
-      }
-
-      QAction *zoomAct;
-      foreach(zoomAct, zoomActs) {
-        menu.addAction(zoomAct);
-      }
-
-      QAction *zAct;
-      foreach(zAct, zActs) {
-        menu.addAction(zAct);
+        if (displayAct == NULL) {
+          menu.addSeparator();
+        }
+        else {
+          menu.addAction(displayAct);
+        }
       }
 
       menu.addSeparator();
       QAction *removeAction = menu.addAction("Close Cube");
       connect(removeAction, SIGNAL(triggered()),
-              m_cubeDisplay, SLOT(deleteLater()));
+              m_image, SLOT(deleteLater()));
 
       menu.exec(event->screenPos());
     }
@@ -538,46 +591,55 @@ namespace Isis {
 
 
   void MosaicSceneItem::lostCubeDisplay() {
-    m_cubeDisplay = NULL;
+    m_image = NULL;
   }
 
 
   /**
-   * This applies the cubeDisplayProperties and selectability. It's called
-   *   updateChildren because the child items are the visually displayed
-   *   items on the scene.
+   * This applies the displayProperties and selectability. It's
+   *   called updateChildren because the child items are the
+   *   visually displayed items on the scene.
    */
   void MosaicSceneItem::updateChildren() {
-    setFlag(QGraphicsItem::ItemIsSelectable, m_scene->cubesSelectable());
+    if (childItems().count()) {
+      setFlag(QGraphicsItem::ItemIsSelectable, false);
+    }
+    else {
+      setFlag(QGraphicsItem::ItemIsSelectable, m_scene->cubesSelectable());
+    }
 
     QList<QRectF> regionsChanged;
 
-    if(m_cubeDisplay) {
-      QGraphicsPolygonItem * polygon;
-      foreach(polygon, *m_polygons) {
+    if(m_image) {
+      foreach(QAbstractGraphicsShapeItem *polygon, *m_polygons) {
         // Fill
-        if(m_cubeDisplay->getValue(CubeDisplayProperties::ShowFill).toBool())
+        if (m_image->displayProperties()->getValue(ImageDisplayProperties::ShowFill).toBool()) {
           polygon->setBrush(color());
-        else
+        }
+        else {
           polygon->setBrush(Qt::NoBrush);
+        }
 
         // Outline
         QColor opaqueColor(color());
         opaqueColor.setAlpha(255);
-        if(m_cubeDisplay->getValue(CubeDisplayProperties::ShowOutline).toBool())
+        if (m_image->displayProperties()->getValue(ImageDisplayProperties::ShowOutline).toBool()) {
           polygon->setPen(opaqueColor);
-        else
+        }
+        else {
           polygon->setPen(Qt::NoPen);
+        }
 
         polygon->setFlag(QGraphicsItem::ItemIsSelectable,
                         m_scene->cubesSelectable());
 
-        // Children (label is the only child)
-        QGraphicsItem *polyChild;
-        foreach(polyChild, polygon->childItems()) {
+        // Children (labels are the only children, and there should only be one)
+        foreach(QGraphicsItem *polyChild, polygon->childItems()) {
           polyChild->setVisible(
-              m_cubeDisplay->getValue(
-                CubeDisplayProperties::ShowLabel).toBool());
+              m_image->displayProperties()->getValue(ImageDisplayProperties::ShowLabel).toBool());
+
+          polyChild->setFlag(QGraphicsItem::ItemIsSelectable,
+                          m_scene->cubesSelectable());
 
           // Qt documentation was lacking the enum that this matches to, so this
           //   is the best I could do
@@ -603,9 +665,9 @@ namespace Isis {
    *   re-use the original object. Ownership remains at the class scope.
    */
   Stretch *MosaicSceneItem::getStretch() {
-    if (m_cubeDnStretch != NULL || !m_cubeDisplay) return m_cubeDnStretch;
+    if (m_cubeDnStretch != NULL || !m_image) return m_cubeDnStretch;
 
-    LineManager mgr(*m_cubeDisplay->cube());
+    LineManager mgr(*m_image->cube());
 
     mgr.begin();
     Statistics stats;
@@ -613,7 +675,7 @@ namespace Isis {
     const int skip = 0;
 
     while(mgr ++) {
-      m_cubeDisplay->cube()->read(mgr);
+      m_image->cube()->read(mgr);
       stats.AddData(mgr.DoubleBuffer(), mgr.size());
 
       for(int i = 0; i < skip; i++)

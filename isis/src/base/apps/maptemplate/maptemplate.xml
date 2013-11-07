@@ -54,6 +54,9 @@
     <change name="Kimberly Oyama" date="2013-04-03">
       Added support for Point Perspective Projection. Fixes #212.
     </change>
+    <change name="Debbie A. Cook" date="2013-04-16">
+      Changed to use TProjection instead of Projection.  References #775
+    </change>
   </history>
 
   <seeAlso>

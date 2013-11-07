@@ -20,6 +20,8 @@
 #include "Longitude.h"
 #include "MdiCubeViewport.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
+#include "TProjection.h"
 #include "SurfacePoint.h"
 #include "ToolPad.h"
 
@@ -120,7 +122,7 @@ namespace Isis {
     connect(measureButton, SIGNAL(clicked()), m_tableWin, SLOT(raise()));
     measureButton->setEnabled(true);
 
-    m_rubberBand = new RubberBandComboBox(
+    m_rubberBand = new RubberBandComboBox(this,
       RubberBandComboBox::Angle |
       RubberBandComboBox::Circle |
       RubberBandComboBox::Ellipse |
@@ -151,7 +153,7 @@ namespace Isis {
 
     updateUnitsCombo();
     connect(m_unitsComboBox, SIGNAL(activated(int)), this, SLOT(updateDistEdit()));
-    connect(RubberBandTool::getInstance(), SIGNAL(modeChanged()), this, SLOT(updateUnitsCombo()));
+    connect(rubberBandTool(), SIGNAL(modeChanged()), this, SLOT(updateUnitsCombo()));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
@@ -179,10 +181,10 @@ namespace Isis {
     m_unitsComboBox->clear();
     m_showAllSegments->setEnabled(false);
 
-    if (RubberBandTool::getMode() == RubberBandTool::Line ||
-        RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+    if (rubberBandTool()->currentMode() == RubberBandTool::LineMode ||
+        rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
 
-      if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+      if (rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
         m_showAllSegments->setEnabled(true);
       }
 
@@ -193,7 +195,7 @@ namespace Isis {
         miComboUnit = 2;
       }
     }
-    else if (RubberBandTool::getMode() == RubberBandTool::Angle) {
+    else if (rubberBandTool()->currentMode() == RubberBandTool::AngleMode) {
       m_unitsComboBox->addItem("degrees");
       m_unitsComboBox->addItem("radians");
       if (miComboUnit > 1 || miComboUnit < 0) {   // default && error checking
@@ -272,8 +274,8 @@ namespace Isis {
   void MeasureTool::rubberBandComplete() {
     updateMeasure();
 
-    if (RubberBandTool::getMode() != RubberBandTool::Angle && m_unitsComboBox->currentIndex() != 2) {
-      if (p_cvp->camera() == NULL && p_cvp->projection() == NULL) {
+    if (rubberBandTool()->currentMode() != RubberBandTool::AngleMode && m_unitsComboBox->currentIndex() != 2) {
+      if (cubeViewport()->camera() == NULL && cubeViewport()->projection() == NULL) {
         QMessageBox::information((QWidget *)parent(), "Error",
                                  "File must have a Camera Model or Projection to measure in km or m");
         return;
@@ -308,7 +310,7 @@ namespace Isis {
   void MeasureTool::enableRubberBandTool() {
     if (m_rubberBand) {
       m_rubberBand->reset();
-      RubberBandTool::drawActiveViewportOnly(false);
+      rubberBandTool()->setDrawActiveViewportOnly(false);
     }
   }
 
@@ -429,7 +431,8 @@ namespace Isis {
       }
     }
 
-    if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine && m_distanceSegments.size() > 0) {
+    if (rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode &&
+        m_distanceSegments.size() > 0) {
       double distanceSum = 0;
       for (int i = 0; i < m_distanceSegments.size(); i++) {
         //write a new row for each segment...
@@ -567,8 +570,8 @@ namespace Isis {
     // reset the distnace gui
     m_distLineEdit->setText("");
 
-    if (RubberBandTool::getMode() == RubberBandTool::Line ||
-        RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+    if (rubberBandTool()->currentMode() == RubberBandTool::LineMode ||
+        rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
       m_distanceSegments.clear();
       m_pixDistSegments.clear();
       m_startSampSegments.clear();
@@ -580,13 +583,13 @@ namespace Isis {
       m_startLonSegments.clear();
       m_endLonSegments.clear();
 
-      for (int startIndex = 0; startIndex < RubberBandTool::getVertices().size() - 1; startIndex++) {
-        QPoint start = RubberBandTool::getVertices()[startIndex];
-        QPoint end   = RubberBandTool::getVertices()[startIndex + 1];
+      for (int startIndex = 0; startIndex < rubberBandTool()->vertices().size() - 1; startIndex++) {
+        QPoint start = rubberBandTool()->vertices()[startIndex];
+        QPoint end   = rubberBandTool()->vertices()[startIndex + 1];
 
         setDistances(cvp, start, end);
 
-        if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+        if (rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
           if (m_distanceSegments.size() < 75) {
             m_distanceSegments.append(m_kmDist);
             m_pixDistSegments.append(m_pixDist);
@@ -602,7 +605,7 @@ namespace Isis {
         }
       }
 
-      if (RubberBandTool::getMode() == RubberBandTool::SegmentedLine &&
+      if (rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode &&
           m_pixDistSegments.size()) {
         m_pixDist = m_pixDistSegments[0];
         m_kmDist = m_distanceSegments[0];
@@ -620,12 +623,12 @@ namespace Isis {
         }
       }
     }
-    else if (RubberBandTool::getMode() == RubberBandTool::Angle) {
-      m_radAngle = RubberBandTool::getAngle();
-      m_degAngle = m_radAngle * 180.0 / PI;
+    else if (rubberBandTool()->currentMode() == RubberBandTool::AngleMode) {
+      m_radAngle = rubberBandTool()->angle().radians();
+      m_degAngle = rubberBandTool()->angle().degrees();
     }
     else {
-      geos::geom::Geometry *polygon = RubberBandTool::geometry();
+      geos::geom::Geometry *polygon = rubberBandTool()->geometry();
       if (polygon != NULL) {
         // pix area = screenpix^2 / scale^2
         m_pixArea = polygon->getArea() / pow(cvp->scale(), 2);
@@ -650,16 +653,16 @@ namespace Isis {
         }
       }
 
-      if (RubberBandTool::getMode() == RubberBandTool::Rectangle) {
-        setDistances(cvp, RubberBandTool::getVertices()[0],
-                     RubberBandTool::getVertices()[2]);
+      if (rubberBandTool()->currentMode() == RubberBandTool::RectangleMode) {
+        setDistances(cvp, rubberBandTool()->vertices()[0],
+                     rubberBandTool()->vertices()[2]);
       }
     }
 
     updateDistEdit();
 
     if (m_showAllSegments->isChecked() &&
-        RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+        rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
       updateRows(row);
     }
     else {
@@ -677,6 +680,12 @@ namespace Isis {
     m_mDist   = Null;
     m_kmDist  = Null;
     double radius = Null;
+    TProjection *tproj = NULL;
+    RingPlaneProjection *rproj = NULL;
+    Projection::ProjectionType projType = Projection::Triaxial;
+
+    // Get set for dealing with projection types
+    if (cvp->projection() != NULL)  projType = cvp->projection()->projectionType();
 
     // Don't write anything if we are outside the cube
     if ((m_startSamp >= 0.5) && (m_endSamp >= 0.5) &&
@@ -691,28 +700,44 @@ namespace Isis {
         if (cvp->projection()->SetWorld(m_startSamp, m_startLine)) {
           // If our projection is sky, the lat & lons are switched
           if (cvp->projection()->IsSky()) {
-            m_startLat = cvp->projection()->UniversalLongitude();
-            m_startLon = cvp->projection()->UniversalLatitude();
+            tproj = (TProjection *) cvp->projection();
+            m_startLat = tproj->UniversalLongitude();
+            m_startLon = tproj->UniversalLatitude();
           }
-          else {
-            m_startLat = cvp->projection()->UniversalLatitude();
-            m_startLon = cvp->projection()->UniversalLongitude();
+          else if (projType == Projection::Triaxial) {
+            tproj = (TProjection *) cvp->projection();
+            m_startLat = tproj->UniversalLatitude();
+            m_startLon = tproj->UniversalLongitude();
+          }
+          else { // RingPlaneProjection
+            rproj = (RingPlaneProjection *) cvp->projection();
+            m_startLat = rproj->UniversalRingRadius();
+            m_startLon = rproj->UniversalRingLongitude();
           }
 
           if (cvp->projection()->SetWorld(m_endSamp, m_endLine)) {
             // If our projection is sky, the lat & lons are switched
             if (cvp->projection()->IsSky()) {
-              m_endLat = cvp->projection()->UniversalLongitude();
-              m_endLon = cvp->projection()->UniversalLatitude();
+              m_endLat = tproj->UniversalLongitude();
+              m_endLon = tproj->UniversalLatitude();
             }
+            else if (projType == Projection::Triaxial) {
+              m_endLat = tproj->UniversalLongitude();
+              m_endLon = tproj->UniversalLatitude();
+            } // RingPlaneProjection
             else {
-              m_endLat = cvp->projection()->UniversalLatitude();
-              m_endLon = cvp->projection()->UniversalLongitude();
+              m_endLat = rproj->UniversalRingRadius();
+              m_endLon = rproj->UniversalRingLongitude();
             }
           }
 
           // Calculate and write out the distance between the two points
-          radius = cvp->projection()->LocalRadius();
+          if (projType != Projection::RingPlane) {
+            radius = tproj->LocalRadius();
+          }
+          else {
+            radius = rproj->RingRadius();
+          }
         }
       }
       // Do we have a camera model?
@@ -762,8 +787,8 @@ namespace Isis {
 
   //! Change the value in the distance edit to match the units
   void MeasureTool::updateDistEdit() {
-    if (RubberBandTool::getMode() == RubberBandTool::Line ||
-        RubberBandTool::getMode() == RubberBandTool::SegmentedLine) {
+    if (rubberBandTool()->currentMode() == RubberBandTool::LineMode ||
+        rubberBandTool()->currentMode() == RubberBandTool::SegmentedLineMode) {
       if (m_unitsComboBox->currentIndex() == 0) {
         if (m_kmDist == Null) {
           m_distLineEdit->setText("N/A");
@@ -784,7 +809,7 @@ namespace Isis {
         m_distLineEdit->setText(QString::number(m_pixDist));
       }
     }
-    else if (RubberBandTool::getMode() == RubberBandTool::Angle) {
+    else if (rubberBandTool()->currentMode() == RubberBandTool::AngleMode) {
       if (m_unitsComboBox->currentIndex() == 0) {
         m_distLineEdit->setText(QString::number(m_degAngle));
       }

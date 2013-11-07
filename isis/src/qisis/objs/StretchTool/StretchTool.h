@@ -123,6 +123,16 @@ namespace Isis {
                                             double min, double max);
       void updateAdvStretchDialogforAll(void);
 
+      /**
+       * This let's Tool know which Menu the actions this class has
+       * should be added to. Removal of this results in "Ctrl+R" and "Ctrl+G"
+       * not working.
+       *
+       * @return Name of the Menu
+       */
+      QString menuName() const {
+        return "&View";
+      }
 
     signals:
       /**
@@ -150,16 +160,6 @@ namespace Isis {
       void stretchRegional(CubeViewport *);
 
     protected:
-      /**
-       * This let's Tool know which Menu the actions this class has
-       * should be added to. Removal of this results in "Ctrl+R" and "Ctrl+G"
-       * not working.
-       *
-       * @return Name of the Menu
-       */
-      QString menuName() const {
-        return "&View";
-      };
       QAction *toolPadAction(ToolPad *pad);
       QWidget *createToolBarWidget(QStackedWidget *parent);
       void updateTool();

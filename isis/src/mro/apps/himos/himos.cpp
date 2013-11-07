@@ -11,7 +11,7 @@
 #include "OriginalLabel.h"
 #include "Process.h"
 #include "ProgramLauncher.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "UserInterface.h"
 
 
@@ -80,7 +80,7 @@ void IsisMain() {
     double avgLat;
     double avgLon;
     for(int i = 0; i < (int)clist.size(); i++) {
-      Projection *proj = clist[i]->projection();
+      TProjection *proj = (TProjection *) clist[i]->projection();
       if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
       if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
       if(proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
@@ -88,7 +88,7 @@ void IsisMain() {
     }
     avgLat = (minLat + maxLat) / 2;
     avgLon = (minLon + maxLon) / 2;
-    Projection *proj = clist[0]->projection();
+    TProjection *proj = (TProjection *) clist[0]->projection();
     proj->SetGround(avgLat, avgLon);
     avgLat = proj->UniversalLatitude();
     avgLon = proj->UniversalLongitude();
@@ -126,7 +126,7 @@ void IsisMain() {
       double startY = DBL_MAX;
       double endY =  DBL_MIN;
       for(int i = 0; i < (int)clist.size(); i++) {
-        Projection *proj = clist[i]->projection();
+        TProjection *proj = (TProjection *) clist[i]->projection();
         proj->SetWorld(0.5, 0.5);
         if(i == 0) {
           startX = proj->XCoord();

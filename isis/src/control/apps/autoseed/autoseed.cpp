@@ -26,6 +26,7 @@
 #include "PvlKeyword.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
+#include "TProjection.h"
 #include "UniversalGroundMap.h"
 #include "IException.h"
 #include "IString.h"
@@ -145,7 +146,7 @@ void IsisMain() {
   // Note: Should this be an option to include this in the program?
   PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
   QString target = inst["TargetName"];
-  PvlGroup radii = Projection::TargetRadii(target);
+  PvlGroup radii = TProjection::TargetRadii(target);
   Isis::Pvl maplab;
   maplab.addGroup(Isis::PvlGroup("Mapping"));
   Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
@@ -160,15 +161,15 @@ void IsisMain() {
 
   //PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
 
-  Projection *proj = NULL;
+  TProjection *proj = NULL;
   UniversalGroundMap *ugmap = NULL;
   if(seedDomain == XY) {
-    proj = Isis::ProjectionFactory::Create(maplab);
+    proj = (Isis::TProjection *) Isis::ProjectionFactory::Create(maplab);
   }
   else if(seedDomain == SampleLine) {
     Cube cube;
     cube.open(serialNumbers.FileName(0));
-    ugmap = new UniversalGroundMap(*cube.label());
+    ugmap = new UniversalGroundMap(cube);
   }
 
   // Create the control net to store the points in.
@@ -193,9 +194,9 @@ void IsisMain() {
   map<QString, UniversalGroundMap *> gMaps;
   for(int sn = 0; sn < serialNumbers.Size(); ++sn) {
     // Create the UGM for the cube associated with this SN
-    Pvl lab = Pvl(serialNumbers.FileName(sn));
+    Cube cube(serialNumbers.FileName(sn), "r");
     gMaps.insert(std::pair<QString, UniversalGroundMap *>
-                 (serialNumbers.SerialNumber(sn), new UniversalGroundMap(lab)));
+                 (serialNumbers.SerialNumber(sn), new UniversalGroundMap(cube)));
   }
 
   stringstream errors(stringstream::in | stringstream::out);
@@ -221,8 +222,8 @@ void IsisMain() {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetRefMeasure();
       QString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
-      Pvl cubepvl(c);
-      Camera *cam = CameraFactory::Create(cubepvl);
+      Cube cube(c);
+      Camera *cam = CameraFactory::Create(cube);
       cam->SetImage(cm->GetSample(), cm->GetLine());
 
 

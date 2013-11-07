@@ -10,7 +10,7 @@
 #include "IException.h"
 #include "IString.h"
 #include "Process.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "SpecialPixel.h"
 
@@ -31,7 +31,7 @@ void IsisMain() {
 
   // Open the input cube and initialize the projection
   Cube *icube = p.SetInputCube("FROM");
-  Projection *proj = icube->projection();
+  TProjection *proj = (TProjection *) icube->projection();
 
   // Get the coordinate
   UserInterface &ui = Application::GetUserInterface();
@@ -86,7 +86,7 @@ void IsisMain() {
       // Load it up into a new projection
       Pvl mapPvl;
       mapPvl.read(mapFile.expanded());
-      Projection *altmap = ProjectionFactory::CreateFromCube(mapPvl);
+      TProjection *altmap = (TProjection *) ProjectionFactory::CreateFromCube(mapPvl);
 
       // Set lat and lon in its system
       altmap->SetGround(lat, lon);

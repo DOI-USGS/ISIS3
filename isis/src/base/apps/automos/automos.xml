@@ -266,6 +266,13 @@
       This has been fixed so that there is an entry in the log file for every image placement. Also
       modified mapmos and handmos to do the same. Fixes #976.
     </change>
+    <change name="Debbie A. Cook" date="2012-12-10">
+      Changed to use TProjection instead of Projection.  References #775
+    </change>
+    <change name="Debbie A. Cook" date="2013-04-03">
+      Fixed type in specification of TYPE default in Band Priority group discovered when creating 
+      ringsautomos.  It was fixed here to make the applications consistent.  References #775
+    </change>
   </history>
 
   <groups>
@@ -404,7 +411,7 @@
         <type>string</type>
         <default>
           <item>
-            BANDNUM
+            BANDNUMBER
           </item>
         </default>
         <brief>Indicate the Band name or number to be used for  comparison</brief>

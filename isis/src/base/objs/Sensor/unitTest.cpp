@@ -44,40 +44,42 @@ using namespace std;
  */
 int main(int argc, char *argv[]) {
 
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   try {
 
     cerr << setprecision(9);
-    cerr << "Unit test for Isis::Sensor" << endl;
+    cerr << "Unit test for Sensor" << endl;
 
-    Isis::Pvl lab;
-    Isis::PvlGroup inst("INSTRUMENT");
-    inst += Isis::PvlKeyword("TargetName", "Mars");
+    Cube dummyCube("$base/testData/isisTruth.cub", "r");
+
+    Pvl &lab = *dummyCube.label();
+    PvlGroup inst("INSTRUMENT");
+    inst += PvlKeyword("TargetName", "Mars");
     lab.addGroup(inst);
 
-    Isis::PvlGroup kern("Kernels");
-    Isis::FileName f("$base/testData/kernels");
+    PvlGroup kern("Kernels");
+    FileName f("$base/testData/kernels");
     QString dir = f.expanded() + "/";
 
-    kern += Isis::PvlKeyword("NaifFrameCode", "-94031");
-    kern += Isis::PvlKeyword("LeapSecond", dir + "naif0007.tls");
-    kern += Isis::PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
-    kern += Isis::PvlKeyword("TargetPosition", dir + "de405.bsp");
-    kern += Isis::PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
-    kern += Isis::PvlKeyword("Instrument", dir + "mocSensorUnitTest.ti");
-//  kern += Isis::PvlKeyword("InstrumentAddendum",dir+"mocAddendum.ti");
-    kern += Isis::PvlKeyword("InstrumentAddendum", "");
-    kern += Isis::PvlKeyword("InstrumentPosition", dir + "moc.bsp");
-    kern += Isis::PvlKeyword("InstrumentPointing", dir + "moc.bc");
-    kern += Isis::PvlKeyword("Frame", "");
+    kern += PvlKeyword("NaifFrameCode", "-94031");
+    kern += PvlKeyword("LeapSecond", dir + "naif0007.tls");
+    kern += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
+    kern += PvlKeyword("TargetPosition", dir + "de405.bsp");
+    kern += PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
+    kern += PvlKeyword("Instrument", dir + "mocSensorUnitTest.ti");
+//  kern += PvlKeyword("InstrumentAddendum",dir+"mocAddendum.ti");
+    kern += PvlKeyword("InstrumentAddendum", "");
+    kern += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
+    kern += PvlKeyword("InstrumentPointing", dir + "moc.bc");
+    kern += PvlKeyword("Frame", "");
     lab.addGroup(kern);
 
     // Setup
     double startTime = -69382819.0;
     double endTime = -69382512.0;
     double slope = (endTime - startTime) / (10 - 1);
-    Isis::Sensor spi(lab);
+    Sensor spi(dummyCube);
     spi.instrumentRotation()->SetTimeBias(-1.15);
 
     double v[3] = { 0.0, 0.0, 1.0 };
@@ -192,28 +194,26 @@ int main(int argc, char *argv[]) {
     cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl
          << endl << endl;
 
-    Isis::Pvl lab2;
-    lab2.addGroup(inst);
+    kern.clear();
 
-    Isis::PvlGroup kern2("Kernels");
-
-    kern2 += Isis::PvlKeyword("NaifFrameCode", "-94031");
-    kern2 += Isis::PvlKeyword("LeapSecond", dir + "naif0007.tls");
-    kern2 += Isis::PvlKeyword("SpacecraftClock",
+    kern += PvlKeyword("NaifFrameCode", "-94031");
+    kern += PvlKeyword("LeapSecond", dir + "naif0007.tls");
+    kern += PvlKeyword("SpacecraftClock",
                               dir + "MGS_SCLKSCET.00045.tsc");
-    kern2 += Isis::PvlKeyword("TargetPosition", dir + "de405.bsp");
-    kern2 += Isis::PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
-    kern2 += Isis::PvlKeyword("Instrument", dir + "mocSensorUnitTest.ti");
-    kern2 += Isis::PvlKeyword("InstrumentAddendum", "");
-    kern2 += Isis::PvlKeyword("InstrumentPosition", dir + "moc.bsp");
-    kern2 += Isis::PvlKeyword("InstrumentPointing", dir + "moc.bc");
-    kern2 += Isis::PvlKeyword("Frame", "");
-    kern2 += Isis::PvlKeyword("ShapeModel",
+    kern += PvlKeyword("TargetPosition", dir + "de405.bsp");
+    kern += PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
+    kern += PvlKeyword("Instrument", dir + "mocSensorUnitTest.ti");
+    kern += PvlKeyword("InstrumentAddendum", "");
+    kern += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
+    kern += PvlKeyword("InstrumentPointing", dir + "moc.bc");
+    kern += PvlKeyword("Frame", "");
+    kern += PvlKeyword("ShapeModel",
                         "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub");
-    lab2.addGroup(kern2);
+    lab.deleteGroup("Kernels");
+    lab.addGroup(kern);
 
     // Setup
-    Isis::Sensor spi2(lab2);
+    Sensor spi2(dummyCube);
     spi2.instrumentRotation()->SetTimeBias(-1.15);
 
     // Testing Set Look Direction
@@ -322,7 +322,7 @@ int main(int argc, char *argv[]) {
     spi2.SetUniversalGround(11.57143551329, 43.328646604);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

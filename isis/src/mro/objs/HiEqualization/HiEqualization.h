@@ -51,7 +51,9 @@ namespace Isis {
        * @author ????-??-?? Unknown
        *
        * @internal
-       */
+       *   @history 2012-11-30 Tracie Sucharski - Removed unused include file Projection.h.  This 
+       *                          change was made in reference to #775
+      */
       class HiCalculateFunctor : public CalculateFunctor {
         public:
           HiCalculateFunctor(Statistics *stats, Statistics *statsLeft,

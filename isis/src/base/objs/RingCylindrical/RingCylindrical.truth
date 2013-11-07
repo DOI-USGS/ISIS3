@@ -1,0 +1,181 @@
+UNIT TEST FOR RingCylindrical
+
+Test missing center ring longitude keyword ...
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterRingLongitude] does not exist in [Group = Mapping].
+
+Test missing CenterRingRadius keyword ...
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterRingRadius] does not exist in [Group = Mapping].
+
+Projection 1 parameters...
+Is equatorial cylindrical? = 1
+Projection version         = 1.0
+  Projection name          =  RingCylindrical
+  Target name              =  Saturn
+  Ring Longitude direction = Clockwise
+  Ring Longitude domain    = 180
+  Minimum ring radius      = 18000
+  Maximum ring radius      = 2e+07
+  Minimum ring longitude   = -20
+  Maximum ring longitude   = 130
+  Center ring radius       = 200000
+  Center ring longitude    = 0
+
+Test TrueScaleRingRadius method...
+TrueScaleRingRadius = 200000
+
+Test SetGround method ... 
+Setting ground to (20000.0, 45.0)
+Ring Radius:            20000
+Ring Longitude:         45
+XCoord:                 -157079.6326794896
+YCoord:                 180000
+
+Test SetCoordinate method ... 
+Setting coordinate to (-157079.6326794896, 180000)
+Ring Radius:            20000
+Ring Longitude:         44.99999999999998
+XCoord:                 -157079.6326794896
+YCoord:                 180000
+
+Test SetCoordinate method for radius larger than max ring radius... 
+Setting coordinate to (-157079.6326794896, -20000001)
+Set Coordinate is good? 0
+Ring Radius:            20200001
+Maximum Ring Radius:    20000000.0
+
+Test SetCoordinate method for radius smaller than min ring radius... 
+Setting coordinate to (-1570.6326794896, 184000.5)
+Set Coordinate is good? 0
+Ring Radius:            15999.5
+Minimum Ring Radius:    18000.0
+
+Test XYRange method ... 
+Minimum X:  -453785.6055185257
+Maximum X:  69813.17007977318
+Minimum Y:  -19800000
+Maximum Y:  182000
+
+Test Name and comparision method ... 
+Name:       RingCylindrical
+operator==  1
+operator==  0
+
+Testing default options in constructor with Projection 2 ... 
+Group = Mapping
+  ProjectionName         = RingCylindrical
+  TargetName             = Saturn
+  RingLongitudeDirection = Clockwise
+  RingLongitudeDomain    = 180
+  MinimumRingRadius      = 18000.0
+  MaximumRingRadius      = 20000000.0
+  MinimumRingLongitude   = -20.0
+  MaximumRingLongitude   = 130.0
+  CenterRingLongitude    = 55.0
+  CenterRingRadius       = 10009000.0
+End_Group
+End
+Default projection parameters == Original projection ?0
+
+
+Testing more SetGround conditions...RingLongitudeDirection = CounterClockwise and RingLongitudeDomain = 360
+Projection 3 parameters...
+  Projection name           =  RingCylindrical
+  Target name               =  Saturn
+  Ring Longitude direction  = CounterClockwise
+  Ring Longitude domain     = 360
+  Minimum ring radius       = 18000
+  Maximum ring radius       = 20000000
+  Minimum ring longitude    = -20
+  Maximum ring longitude    = 130
+  Center ring radius        = 10009000
+  Center ring longitude     = 55
+
+  Setting ground to (20000.0,45.0)
+    Ring Radius:      =  20000
+    Ring Longitude:   =  45
+    XCoord:           =  -1746900.048321125
+    YCoord:           =  9989000
+
+Testing SetGround error conditions...
+...Testing SetGround with radius < 0...
+    Setting ground to (-1000.0,45.0)
+   SetGround failed
+
+...Testing SetGround with radius = 0...
+    Setting ground to (0.0,45.0)
+   SetGround failed
+
+Testing more SetCoordinate methods ... 
+Setting coordinate to (0.2617993877991494,-0.8726646259971648)
+Ring Radius:            10009000.87266463
+Ring Longitude:         55.00000149865122
+XCoord:                 0.2617993877991494
+YCoord:                 -0.8726646259971648
+
+Setting coordinate to (0.2617993877991494,0.8726646259971648)
+Ring Radius:            10008999.12733537
+Ring Longitude:         55.00000149865122
+XCoord:                 0.2617993877991494
+YCoord:                 0.8726646259971648
+
+
+Testing Mapping() methods ... 
+   Mapping with ground range ... 
+Mapping() = 
+Group = Mapping
+  TargetName             = Saturn
+  ProjectionName         = RingCylindrical
+  RingLongitudeDirection = Clockwise
+  RingLongitudeDomain    = 180
+  MinimumRingRadius      = 18000.0
+  MaximumRingRadius      = 20000000.0
+  MinimumRingLongitude   = -20.0
+  MaximumRingLongitude   = 130.0
+  CenterRingRadius       = 200000.0
+  CenterRingLongitude    = 0.0
+End_Group
+End
+MappingRingRadii() = 
+Group = Mapping
+  MinimumRingRadius = 18000.0
+  MaximumRingRadius = 20000000.0
+  CenterRingRadius  = 200000.0
+End_Group
+End
+MappingRingLongitudes() = 
+Group = Mapping
+  MinimumRingLongitude = -20.0
+  MaximumRingLongitude = 130.0
+  CenterRingLongitude  = 0.0
+End_Group
+End
+
+Projection 4 parameters...No range
+  Projection name           =  RingCylindrical
+  Target name               =  Saturn
+  Ring Longitude direction  = CounterClockwise
+  Ring Longitude domain     = 360
+  Center ring radius        = 10009000
+  Center ring longitude     = 55
+
+Mapping() = 
+Group = Mapping
+  TargetName             = Saturn
+  ProjectionName         = RingCylindrical
+  RingLongitudeDirection = CounterClockwise
+  RingLongitudeDomain    = 360
+  CenterRingRadius       = 10009000.0
+  CenterRingLongitude    = 55.0
+End_Group
+End
+MappingRingRadii() = 
+Group = Mapping
+End_Group
+End
+MappingRingLongitudes() = 
+Group = Mapping
+End_Group
+End
+

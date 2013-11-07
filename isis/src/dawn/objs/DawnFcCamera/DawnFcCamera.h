@@ -48,7 +48,7 @@ namespace Isis {
    */
   class DawnFcCamera : public FramingCamera {
     public:
-      DawnFcCamera(Pvl &lab);
+      DawnFcCamera(Cube &cube);
       //! Destroys the DawnFcCamera Object
       ~DawnFcCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,

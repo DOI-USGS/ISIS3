@@ -94,7 +94,11 @@ namespace Isis {
 
     // Connect the ViewportMainWindow's (parent) closeWindow signal to a exit slot for 
     // prompting user to save net
-    connect(parent, SIGNAL(closeWindow()), this, SLOT(exiting()));
+    ViewportMainWindow *parentMainWindow = qobject_cast<ViewportMainWindow *>(parent);
+
+    if (parentMainWindow) {
+      connect(parent, SIGNAL(closeWindow()), this, SLOT(exiting()));
+    }
 
     createMatchTool(parent);
 
@@ -102,6 +106,7 @@ namespace Isis {
 
 
   MatchTool::~MatchTool () {
+    // FIXME: Don't write settings in destructor, must do this earlier in close event
     writeSettings();
 
     delete m_controlNet;

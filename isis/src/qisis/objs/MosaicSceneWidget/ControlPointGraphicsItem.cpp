@@ -3,6 +3,8 @@
 #include <float.h>
 #include <iostream>
 
+#include <QDebug>
+#include <QEvent>
 #include <QGraphicsScene>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
@@ -58,6 +60,8 @@ namespace Isis {
     setToolTip(makeToolTip(snList));
 
     setRect(calcRect());
+    setFiltersChildEvents(true);
+//  installEventFilter(this);
   }
 
 
@@ -174,6 +178,11 @@ namespace Isis {
           toolTip());
     }
   }
+//
+//
+//void ControlPointGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+//  qDebug()<<"ControlPointGraphicsItem::mouseReleaseEvent pointId = "<<QString::fromStdString(m_controlPoint->GetId());
+//}
 
 
   QRectF ControlPointGraphicsItem::calcRect() const {
@@ -303,5 +312,13 @@ namespace Isis {
 
     return toolTip;
   }
+
+
+//bool MosaicSceneWidget::eventFilter(QObject *obj, QEvent *event) {
+//
+//  switch(event->type()) {
+//    case QMouseEvent::GraphicsSceneMousePress: {
+
+
 }
 

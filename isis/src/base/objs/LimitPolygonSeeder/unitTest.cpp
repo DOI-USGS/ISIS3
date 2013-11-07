@@ -16,6 +16,7 @@
 #include "ProjectionFactory.h"
 #include "GridPolygonSeeder.h"
 #include "Preference.h"
+#include "TProjection.h"
 
 using namespace std;
 using namespace Isis;
@@ -70,7 +71,7 @@ int main() {
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
-      PvlGroup radii = Projection::TargetRadii("MARS");
+      PvlGroup radii = TProjection::TargetRadii("MARS");
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
@@ -83,7 +84,7 @@ int main() {
       mapGroup += Isis::PvlKeyword("CenterLongitude", "0");
       mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
 
-      Projection *proj = Isis::ProjectionFactory::Create(maplab);
+      Isis::TProjection *proj = (Isis::TProjection *) Isis::ProjectionFactory::Create(maplab);
 
       geos::geom::MultiPolygon *xymp = PolygonTools::LatLonToXY(*mp, proj);
       vector<geos::geom::Point *> seedValues = ps->Seed(xymp);
@@ -133,7 +134,7 @@ int main() {
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
       // Create the projection necessary for seeding
-      PvlGroup radii = Projection::TargetRadii("MARS");
+      PvlGroup radii = TProjection::TargetRadii("MARS");
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
@@ -145,7 +146,7 @@ int main() {
       mapGroup += Isis::PvlKeyword("CenterLatitude", "0");
       mapGroup += Isis::PvlKeyword("CenterLongitude", "0");
       mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
-      //Projection *proj = Isis::ProjectionFactory::Create(maplab);
+      //Isis::TProjection *proj = (Isis::TProjection *) Isis::ProjectionFactory::Create(maplab);
 
       // NOTHING SHOULD BE PRINTED (the thickness test should not have been met)
       vector<geos::geom::Point *> seedValues = ps->Seed(mp);

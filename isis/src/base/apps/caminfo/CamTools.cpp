@@ -52,6 +52,7 @@
 #include "Statistics.h"
 #include "SurfacePoint.h"
 #include "Target.h"
+#include "TProjection.h"
 
 using namespace std;
 
@@ -599,12 +600,12 @@ namespace Isis {
 
     mapping += PvlKeyword("CenterLongitude", toString(clon));
 
-    Projection *sinu = ProjectionFactory::Create(sinuMap, true);
+    TProjection *sinu = (TProjection *) ProjectionFactory::Create(sinuMap, true);
     geos::geom::MultiPolygon *sPoly = PolygonTools::LatLonToXY(*poly, sinu);
     geos::geom::Point *center = sPoly->getCentroid();
 
     sinu->SetCoordinate(center->getX(), center->getY());
-    g.centroidLongitude = Projection::To360Domain(sinu->UniversalLongitude());
+    g.centroidLongitude = TProjection::To360Domain(sinu->UniversalLongitude());
     g.centroidLatitude  = sinu->UniversalLatitude();
     g.surfaceArea = sPoly->getArea() / (1000.0 * 1000.0);
     delete center;

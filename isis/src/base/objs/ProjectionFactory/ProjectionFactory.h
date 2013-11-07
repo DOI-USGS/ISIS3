@@ -29,6 +29,7 @@ namespace Isis {
   class Camera;
   class Cube;
   class Projection;
+  class RingPlaneProjection;
 
   /**
    * @brief Initialize a map projection
@@ -74,17 +75,34 @@ namespace Isis {
    *   @history 2011-05-23 Jannet Barrett and Steven Lambright -
    *                         Added m_projPlugin to reduce cost of instantiating
    *                         Projections.
+   *   @history 2013-03-13 Debbie A. Cook - Modified to differentiate between
+   *                         Project subclasses:  TProjection and RingPlaneProjection.
+   *   @history 2013-05-09 Jeannie Backer - Modified CreateForCube and RingsCreateForCube() methods
+   *                           to ensure that the distances from the MinimumX to the MaximumX and
+   *                           from the MinimumY to the MaximumY are at least one pixel resolution.
+   *                           This ensures that the created cube will have at least one sample and
+   *                           at least one line. References #775.
    */
   class ProjectionFactory {
     public:
       static Isis::Projection *Create(Isis::Pvl &label, bool allowDefaults = false);
+      static Isis::Projection *RingsCreate(Isis::Pvl &label, bool allowDefaults = false);
       static Isis::Projection *CreateFromCube(Isis::Cube &cube);
+      static Isis::Projection *RingsCreateFromCube(Isis::Cube &cube);
       static Isis::Projection *CreateFromCube(Isis::Pvl &label); // Load Method in cm
+      static Isis::Projection *RingsCreateFromCube(Isis::Pvl &label); // Load Method in cm
       static Isis::Projection *CreateForCube(Isis::Pvl &label, int &ns, int &nl,
                                              bool sizeMatch = true); // Create method in cm
+      static Isis::Projection *RingsCreateForCube(Isis::Pvl &label,
+                                                   int &samples, int &lines,
+                                                   bool sizeMatch);
       static Isis::Projection *CreateForCube(Isis::Pvl &label,
                                              int &samples, int &lines,
                                              Camera &cam);
+      static Isis::Projection *RingsCreateForCube(Isis::Pvl &label,
+                                                   int &samples, int &lines,
+                                                   Camera &cam);
+
 
     private:
       /**

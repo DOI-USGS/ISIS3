@@ -46,11 +46,12 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check. Added call
    *                          to ShutterOpenCloseTimes() method.
    */
-  SsiCamera::SsiCamera(Pvl &lab) : FramingCamera(lab) {
+  SsiCamera::SsiCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
     // Get the camera characteristics
     double k1;
 
+    Pvl &lab = *cube.label();
     iTime removeCoverDate("1994/04/01 00:00:00");
     iTime imageDate(lab.findKeyword("StartTime", PvlObject::Traverse)[0]);
     /*
@@ -152,6 +153,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Galileo namespace.
  */
-extern "C" Isis::Camera *SsiCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::SsiCamera(lab);
+extern "C" Isis::Camera *SsiCameraPlugin(Isis::Cube &cube) {
+  return new Isis::SsiCamera(cube);
 }

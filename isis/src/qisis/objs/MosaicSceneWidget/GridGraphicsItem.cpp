@@ -16,6 +16,7 @@
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "UniversalGroundMap.h"
 
 using namespace std;
@@ -30,9 +31,11 @@ namespace Isis {
     if (latInc > Angle(0.0, Angle::Degrees) && lonInc > Angle(0.0, Angle::Degrees)) {
       // Walk the grid, creating a QGraphicsLineItem for each line segment.
       Projection *proj = projectionSrc->getProjection();
+      Projection::ProjectionType pType = proj->projectionType();
 
-      if (proj && lonMin < lonMax && latMin < latMax) {
-        PvlGroup mappingGroup(proj->Mapping());
+      if (proj && pType == Projection::Triaxial && lonMin < lonMax && latMin < latMax) {
+        TProjection *tproj = (TProjection *) proj;
+        PvlGroup mappingGroup(tproj->Mapping());
 
         Latitude minLat;
         Latitude maxLat;
@@ -41,8 +44,8 @@ namespace Isis {
 
         if (mappingGroup["LatitudeType"][0] == "Planetographic") {
 
-          Distance equaRad(proj->EquatorialRadius(), Distance::Meters);
-          Distance polRad(proj->PolarRadius(), Distance::Meters);
+          Distance equaRad(tproj->EquatorialRadius(), Distance::Meters);
+          Distance polRad(tproj->PolarRadius(), Distance::Meters);
 
           minLat = Latitude(latMin.planetographic(Angle::Degrees), mappingGroup,
                             Angle::Degrees);
@@ -182,11 +185,11 @@ namespace Isis {
 
               double x = 0;
               double y = 0;
-              bool valid = proj->SetUniversalGround(lat.degrees(), lon.degrees());
+              bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
 
               if (valid) {
-                x = proj->XCoord();
-                y = -1 * proj->YCoord();
+                x = tproj->XCoord();
+                y = -1 * tproj->YCoord();
 
                 if(havePrevious) {
                   if(previousX != x || previousY != y) {
@@ -265,11 +268,11 @@ namespace Isis {
             while (!atMaxLat) {
               double x = 0;
               double y = 0;
-              bool valid = proj->SetUniversalGround(lat.degrees(), lon.degrees());
+              bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
 
               if (valid) {
-                x = proj->XCoord();
-                y = -1 * proj->YCoord();
+                x = tproj->XCoord();
+                y = -1 * tproj->YCoord();
 
                 if(havePrevious) {
                   x = proj->XCoord();

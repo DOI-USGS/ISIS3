@@ -7,6 +7,7 @@
 #include "Progress.h"
 #include "PvlGroup.h"
 #include "SerialNumber.h"
+#include "TProjection.h"
 
 
 using namespace std;
@@ -76,7 +77,7 @@ void IsisMain() {
     Pvl cubeLab(ui.GetFileName("FROM"));
     PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
     QString target = inst["TargetName"];
-    PvlGroup radii = Projection::TargetRadii(target);
+    PvlGroup radii = TProjection::TargetRadii(target);
 
     Pvl map(ui.GetFileName("MAP"));
     PvlGroup &mapping = map.findGroup("MAPPING");
@@ -102,11 +103,11 @@ void IsisMain() {
     linc = poly.getLinc();
     bool polygonGenerated = false;
     while (!polygonGenerated) {
-      Projection *proj = NULL;
+      TProjection *proj = NULL;
       geos::geom::MultiPolygon *xyPoly = NULL;
 
       try {
-        proj = ProjectionFactory::Create(map, true);
+        proj = (TProjection *) ProjectionFactory::Create(map, true);
         xyPoly = PolygonTools::LatLonToXY(*poly.Polys(), proj);
 
         polygonGenerated = true;

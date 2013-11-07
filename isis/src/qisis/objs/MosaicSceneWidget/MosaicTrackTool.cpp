@@ -5,6 +5,7 @@
 
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   /**
@@ -125,8 +126,9 @@ namespace Isis {
     // lat/lon that corresponds with the given point.
     //----------------------------------------------------------------------
     Projection *proj = getWidget()->getProjection();
+    TProjection *tproj = (TProjection *) proj;
 
-    if(!proj) {
+    if (!proj || proj->projectionType() != Projection::Triaxial) {
       clearLabels();
       return;
     }
@@ -135,12 +137,12 @@ namespace Isis {
 
     if(p_lonLabel) {
       p_lonLabel->setVisible(true);
-      p_lonLabel->setText("LON " + QString::number(proj->Longitude()));
+      p_lonLabel->setText("LON " + QString::number(tproj->Longitude()));
     }
 
     if(p_latLabel) {
       p_latLabel->setVisible(true);
-      p_latLabel->setText("LAT " + QString::number(proj->Latitude()));
+      p_latLabel->setText("LAT " + QString::number(tproj->Latitude()));
     }
 
     if(p_xLabel) {

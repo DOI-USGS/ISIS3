@@ -93,8 +93,8 @@ print the output of the XYRange and Mapping methods...
 
 Name method returns "LunarAzimuthalEqualArea"................ [   OK   ]
 
-Projection * s = &p; // p is this projection
-(*s == p) returns true! ..................................... [   OK   ]
+Projection * s = p; // p is pointer to this projection
+(*s == *p) returns true! ..................................... [   OK   ]
 created a second Projection reference p2
 using the same pvl as p except for that PolarRadius = 42
 Pvl for p2...

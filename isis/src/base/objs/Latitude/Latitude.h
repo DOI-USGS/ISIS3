@@ -68,7 +68,7 @@ namespace Isis {
        *    This will throw an exception.
        */
       enum ErrorChecking {
-        //! Throw an exception if any problems are found (default value).
+        //! Throw an exception if any problems are found.
         ThrowAllErrors = 0,
         //! Don't throw an exception if a latitude beyond -90/90 is found
         AllowPastPole
@@ -105,9 +105,9 @@ namespace Isis {
       Latitude();
       Latitude(double latitude,
                Angle::Units latitudeUnits,
-               ErrorChecking errors = ThrowAllErrors);
+               ErrorChecking errors = AllowPastPole);
 
-      Latitude(Angle latitude, ErrorChecking errors = ThrowAllErrors);
+      Latitude(Angle latitude, ErrorChecking errors = AllowPastPole);
 
       Latitude(Angle latitude,
                PvlGroup mapping,

@@ -53,6 +53,8 @@ namespace Isis {
    *                             camel case. Added resolution() method test to
    *                             improve unitTest code coverage. References
    *                             #1181.
+   *   @history 2012-10-31 - Ken Edmundson - Added another SetNormal method and fixed original to 
+   *                             set the m_hasNormal to true.
    *   @history 2012-11-14 - Jeannie Backer - Removed cout lines left in while
    *                             testing code. References #1181.
    *   @history 2012-12-21 - Debbie A. Cook - Added new members m_hasEllipsoidIntersection
@@ -125,6 +127,7 @@ namespace Isis {
 
       // Set the normal (surface or local) of the current intersection point
       void setNormal(const std::vector<double>);
+      void setNormal(const double a, const double b, const double c);
 
       // Set shape name
       void setName(QString name);

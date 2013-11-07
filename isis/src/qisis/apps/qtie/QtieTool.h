@@ -57,6 +57,8 @@ namespace Isis {
     *                           coding standards. References #972.
     * @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
     *                           #775 and #1114.
+    * @history 2012-11-23 Debbie A. Cook, Removed unnecessary Projection include.  References Mantis
+    *                           ticket #775. 
     * @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
     *                           network immediately print warning and return.  References #1493.
     */

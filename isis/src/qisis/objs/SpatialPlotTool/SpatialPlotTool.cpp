@@ -24,6 +24,8 @@
 #include "PlotWindow.h"
 #include "PolygonTools.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "RubberBandComboBox.h"
 #include "RubberBandTool.h"
@@ -70,7 +72,7 @@ namespace Isis {
     m_rubberBandCombo->reset();
     m_rubberBandCombo->setVisible(true);
     m_rubberBandCombo->setEnabled(true);
-    RubberBandTool::drawActiveViewportOnly(false);
+    rubberBandTool()->setDrawActiveViewportOnly(false);
   }
 
 
@@ -97,7 +99,7 @@ namespace Isis {
   QWidget *SpatialPlotTool::createToolBarWidget(QStackedWidget *parent) {
     QWidget *wrapper = new QWidget(parent);
 
-    m_rubberBandCombo = new RubberBandComboBox(
+    m_rubberBandCombo = new RubberBandComboBox(this,
       RubberBandComboBox::Line |
       RubberBandComboBox::RotatedRectangle,
       RubberBandComboBox::Line,
@@ -204,7 +206,7 @@ namespace Isis {
       selectedWindow()->raise();
     }
 
-    if (RubberBandTool::isValid()) {
+    if (rubberBandTool()->isValid()) {
       refreshPlot();
     }
     else {
@@ -222,7 +224,7 @@ namespace Isis {
   void SpatialPlotTool::refreshPlot() {
     MdiCubeViewport *activeViewport = cubeViewport();
 
-    if (activeViewport && RubberBandTool::isValid()) {
+    if (activeViewport && rubberBandTool()->isValid()) {
       // Find which window we want to paste into
       PlotWindow *targetWindow = selectedWindow(true);
 
@@ -238,7 +240,7 @@ namespace Isis {
 
         // load data into curve
         if (data.size() > 0) {
-          QList<QPoint> rubberBandPoints = RubberBandTool::getVertices();
+          QList<QPoint> rubberBandPoints = rubberBandTool()->vertices();
 
           validatePlotCurves();
           int band = ((viewport->isGray()) ? viewport->grayBand() :
@@ -309,7 +311,7 @@ namespace Isis {
    * @param cvp
    */
   QVector<QPointF> SpatialPlotTool::getSpatialStatistics(MdiCubeViewport *cvp) {
-    QList<QPoint> vertices = RubberBandTool::getVertices();
+    QList<QPoint> vertices = rubberBandTool()->vertices();
 
     QVector<QPointF> data;
 
@@ -327,7 +329,7 @@ namespace Isis {
 
       int band = ((cvp->isGray()) ? cvp->grayBand() : cvp->redBand());
 
-      if (RubberBandTool::getMode() == RubberBandTool::Line) {
+      if (rubberBandTool()->currentMode() == RubberBandTool::LineMode) {
         double startSample = Null;
         double endSample = Null;
         double startLine = Null;
@@ -402,7 +404,7 @@ namespace Isis {
           }
         }
       }
-      else if (RubberBandTool::getMode() == RubberBandTool::RotatedRectangle) {
+      else if (rubberBandTool()->currentMode() == RubberBandTool::RotatedRectangleMode) {
         /*
          * We have a rotated rectangle:
          *

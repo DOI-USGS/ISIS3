@@ -3,8 +3,10 @@
 #include <float.h>
 #include <iostream>
 
+#include <QDebug>
 #include <QGraphicsScene>
 
+#include "Cube.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -135,8 +137,8 @@ namespace Isis {
 
           if(filename.size() > 0) {
             if((*m_cubeToGroundMap)[filename] == NULL) {
-              Pvl label(FileName(filename).expanded());
-              UniversalGroundMap *groundMap = new UniversalGroundMap(label);
+              Cube cube(FileName(filename).expanded(), "r");
+              UniversalGroundMap *groundMap = new UniversalGroundMap(cube);
               (*m_cubeToGroundMap)[filename] = groundMap;
             }
 

@@ -69,7 +69,7 @@ namespace Isis {
    */
   class UvvisCamera : public FramingCamera {
     public:
-      UvvisCamera(Pvl &lab);
+      UvvisCamera(Cube &cube);
       //! Destroys the UvvisCamera object.
       ~UvvisCamera() {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 

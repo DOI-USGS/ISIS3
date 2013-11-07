@@ -45,9 +45,9 @@ int main(void) {
     double knownLat = -75.7874376789158504;
     double knownLon = 270.6409527241640944;
 
-    Pvl p("$clementine1/testData/lhd0147b.200.lev1.cub");
-    HiresCamera *cam = (HiresCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube c("$clementine1/testData/lhd0147b.200.lev1.cub", "r");
+    HiresCamera *cam = (HiresCamera *) CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -60,7 +60,7 @@ int main(void) {
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
     // Test Shutter Open/Close 
-    const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000;
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time

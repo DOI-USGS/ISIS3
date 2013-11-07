@@ -45,9 +45,9 @@ int main(void) {
     double knownLat = 48.3664548995653121;
     double knownLon = 277.9524457902612653;
 
-    Pvl p("$dawn/testData/FC21B0001010_09049002212F5D.cub");
-    DawnFcCamera *cam = (DawnFcCamera *) CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube c("$dawn/testData/FC21B0001010_09049002212F5D.cub", "r");
+    DawnFcCamera *cam = (DawnFcCamera *) CameraFactory::Create(c);
+    cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -60,7 +60,7 @@ int main(void) {
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
     // Test Shutter Open/Close 
-    const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000;
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time

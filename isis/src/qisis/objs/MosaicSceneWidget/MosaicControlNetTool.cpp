@@ -4,14 +4,21 @@
 
 #include <QMenu>
 
+#include "Control.h"
+#include "ControlList.h"
 #include "ControlNet.h"
 #include "ControlNetGraphicsItem.h"
-#include "CubeDisplayProperties.h"
+#include "Directory.h"
 #include "FileDialog.h"
+#include "FileName.h"
 #include "IException.h"
+#include "Image.h"
+#include "ImageDisplayProperties.h"
+#include "ImageList.h"
 #include "IString.h"
 #include "MosaicControlNetToolMovementConfigDialog.h"
 #include "MosaicSceneWidget.h"
+#include "Project.h"
 #include "PvlObject.h"
 #include "SpecialPixel.h"
 
@@ -108,16 +115,16 @@ namespace Isis {
   }
 
 
-  CubeDisplayProperties *MosaicControlNetTool::takeDisplay(
-      QString sn, QList<CubeDisplayProperties *> &displays) {
+  Image *MosaicControlNetTool::takeImage(
+      QString sn, ImageList &images) {
     if (m_controlNet && m_controlNetGraphics) {
       QString filename = m_controlNetGraphics->snToFileName(sn);
 
-      for(int i = 0; i < displays.size(); i++) {
-        CubeDisplayProperties *display = displays[i];
+      for(int i = 0; i < images.size(); i++) {
+        Image *image = images[i];
 
-        if (display->fileName() == filename) {
-          return displays.takeAt(i);
+        if (image->fileName() == filename) {
+          return images.takeAt(i);
         }
       }
     }
@@ -369,7 +376,7 @@ namespace Isis {
    */
   void MosaicControlNetTool::displayConnectivity() {
     if (m_controlNet) {
-      QList<CubeDisplayProperties *> displays = getWidget()->cubeDisplays();
+      ImageList images = getWidget()->images();
 
       QList<QColor> colorsUsed;
 
@@ -382,19 +389,19 @@ namespace Isis {
 
         QString cubeSn;
         foreach(cubeSn, island) {
-          CubeDisplayProperties *display = takeDisplay(cubeSn, displays);
+          Image *image = takeImage(cubeSn, images);
 
-          if (display) {
+          if (image) {
             while(!color.isValid()) {
-              QColor displayColor = display->getValue(
-                  CubeDisplayProperties::Color).value<QColor>();
+              QColor displayColor = image->displayProperties()->getValue(
+                  ImageDisplayProperties::Color).value<QColor>();
 
               if (colorsUsed.indexOf(displayColor) == -1) {
                 colorsUsed.append(displayColor);
                 color = displayColor;
               }
               else {
-                QColor ranColor = CubeDisplayProperties::randomColor();
+                QColor ranColor = ImageDisplayProperties::randomColor();
 
                 if (colorsUsed.indexOf(ranColor) == -1) {
                   colorsUsed.append(ranColor);
@@ -403,7 +410,7 @@ namespace Isis {
               }
             }
 
-            display->setColor(color);
+            image->displayProperties()->setColor(color);
           }
         }
       }
@@ -481,24 +488,57 @@ namespace Isis {
    *
    */
   void MosaicControlNetTool::openControlNet() {
+    if (!getWidget()->directory()) {
+      // Bring up a file dialog for user to select their cnet file.
+      QString netFile = FileDialog::getOpenFileName(getWidget(),
+                        "Select Control Net. File",
+                        QDir::current().dirName() + "/",
+                        "Control Networks (*.net);;All Files (*.*)");
 
-    // Bring up a file dialog for user to select their cnet file.
-    QString netFile = FileDialog::getOpenFileName(getWidget(),
-                      "Select Control Net. File",
-                      QDir::current().dirName() + "/",
-                      "Control Networks (*.net);;All Files (*.*)");
+      //--------------------------------------------------------------
+      // if the file is not empty attempt to load in the control points
+      // for each mosaic item
+      //---------------------------------------------------------------
+      if (!netFile.isEmpty()) {
+        FileName controlNetFile(netFile);
+        m_controlNetFile = controlNetFile.expanded();
+        loadNetwork();
 
-    //--------------------------------------------------------------
-    // if the file is not empty attempt to load in the control points
-    // for each mosaic item
-    //---------------------------------------------------------------
-    if (!netFile.isEmpty()) {
-      FileName controlNetFile(netFile);
-      m_controlNetFile = controlNetFile.expanded();
-      loadNetwork();
+        if (m_displayControlNetButton)
+          m_displayControlNetButton->setChecked(true);
+      }
+    }
+    else {
+      QList<ControlList *> controls = getWidget()->directory()->project()->controls();
+      bool ok = false;
+      if (controls.count() > 0) {
+        QMap<Control *, QString> cnetChoices;
+        foreach (ControlList *list, controls) {
+          foreach (Control *control, *list) {
+            cnetChoices[control] = tr("%1/%2").arg(list->name())
+                .arg(control->displayProperties()->displayName());
+          }
+        }
 
-      if (m_displayControlNetButton)
-        m_displayControlNetButton->setChecked(true);
+        QStringList cnetNames = cnetChoices.values();
+        qSort(cnetNames);
+
+        QString selected = QInputDialog::getItem(NULL, tr("Select control network"),
+                                                 tr("Select control network"), cnetNames, 0, false,
+                                                 &ok);
+        if (ok && !selected.isEmpty()) {
+          m_controlNetFile = cnetChoices.key(selected)->fileName();
+          loadNetwork();
+          if (m_displayControlNetButton)
+            m_displayControlNetButton->setChecked(true);
+        }
+      }
+      else if (controls.count() == 1 && controls.at(0)->count() == 1) {
+        m_controlNetFile = controls.first()->first()->fileName();
+        loadNetwork();
+        if (m_displayControlNetButton)
+          m_displayControlNetButton->setChecked(true);
+      }
     }
   }
 
@@ -553,8 +593,8 @@ namespace Isis {
 
 
   void MosaicControlNetTool::randomizeColors() {
-    foreach (CubeDisplayProperties * display, getWidget()->cubeDisplays()) {
-      display->setColor(CubeDisplayProperties::randomColor());
+    foreach (Image *image, getWidget()->images()) {
+      image->displayProperties()->setColor(ImageDisplayProperties::randomColor());
     }
   }
 
@@ -566,5 +606,13 @@ namespace Isis {
   void MosaicControlNetTool::displayControlNet() {
     if (m_controlNetGraphics && m_displayControlNetButton)
       m_controlNetGraphics->setVisible(m_displayControlNetButton->isChecked());
+  }
+
+
+  void MosaicControlNetTool::mouseButtonRelease(QPointF point, Qt::MouseButton s) {
+    if (!isActive() || !m_controlNet) return;
+
+    //  Find closes point
+
   }
 }

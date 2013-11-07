@@ -1,10 +1,12 @@
 #include <iostream>
+
 #include <sstream>
 
 #include <QList>
 #include <QString>
 #include <QStringList>
 
+#include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
@@ -23,8 +25,9 @@ void testKernelAccessors(KernelDb &kdb, Pvl &lab, bool timeBasedKernelsOnly);
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
-  Pvl lab;
-  PvlObject obj("IsisCube");
+  Cube cube("$base/testData/isisTruth.cub", "r"); 
+  Pvl &lab = *cube.label();
+  PvlObject &obj = lab.findObject("IsisCube");
   PvlGroup group("Instrument");
   PvlGroup group2("TestGroup");
   PvlKeyword keyword("TestKeyword", "TestValue");
@@ -78,34 +81,6 @@ int main(int argc, char *argv[]) {
      .findKeyword("StartTime").setValue("2008 JAN 12 00:00:00.0");
   lab.findObject("IsisCube").findGroup("Instrument")
      .findKeyword("StopTime").setValue("2008 JAN 12 00:00:00.0"); 
-
-  // Note: The following is temporarily commented out since currently there is
-  // no conf file for Messenger ISS NAC and WAC
-  #if 0
-  // (1) and (2a)
-  lab.findObject("IsisCube").findGroup("Instrument")
-     .findKeyword("InstrumentId").setValue("MDIS-NAC");
-  lab.findObject("IsisCube").findGroup("Instrument")
-     .findKeyword("SpacecraftName").setValue("Messenger");
-  cout << "/---------------------------------------/" << endl;
-  cout << endl << endl;
-  cout << "Messenger NAC Label: " << endl;
-  cout << lab << endl;
-  KernelDb messengerMatchNac(13);
-  testLoadSystemDb(messengerMatchNac, "Messenger", lab);
-  testKernelAccessors(messengerMatchNac, lab, true);
-  
-  // (1) and (2b)
-  lab.findObject("IsisCube").findGroup("Instrument")
-     .findKeyword("InstrumentId").setValue("MDIS-WAC");
-  cout << "/---------------------------------------/" << endl;
-  cout << endl << endl;
-  cout << "Messenger WAC Label: " << endl;
-  cout << lab << endl;
-  KernelDb messengerMatchWac(4);
-  testLoadSystemDb(messengerMatchWac, "Messenger", lab);
-  testKernelAccessors(messengerMatchWac, lab, true);
-  #endif
 
   // (1) and (3a)
   lab.findObject("IsisCube").findGroup("Instrument")

@@ -33,8 +33,6 @@ namespace Isis {
       void writeSettings();
       void readSettings();
 
-
-    protected:
       /**
        * Returns the menu name.
        *
@@ -44,6 +42,8 @@ namespace Isis {
       QString menuName() const {
         return "&Options";
       };
+    
+    protected:
       void updateTool();
       bool eventFilter(QObject *o, QEvent *e);
 

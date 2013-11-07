@@ -55,7 +55,7 @@ namespace Isis {
   class HrscCamera : public LineScanCamera {
     public:
       // Constructs a HiriseCamera object
-      HrscCamera(Pvl &lab);
+      HrscCamera(Cube &cube);
 
       // Destroys the HiriseCamera object
       ~HrscCamera();

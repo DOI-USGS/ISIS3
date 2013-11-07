@@ -37,13 +37,13 @@ namespace Isis {
   /**
    * Constructs an Apollo Metric Camera object using the image labels.
    *
-   * @param lab Pvl label from an Apollo Metric image.
+   * @param cube An Apollo Metric image.
    *
    * @internal
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods.
    *   @history 2011-05-03 Jeannie Walldren - Added documentation.
    */
-  ApolloMetricCamera::ApolloMetricCamera(Pvl &lab) : FramingCamera(lab) {
+  ApolloMetricCamera::ApolloMetricCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
 
     // Get the camera characteristics
@@ -70,6 +70,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
+    Pvl &lab = *cube.label();
     const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // The Spacecraft Name should be either Apollo 15, 16, or 17.  The name
@@ -147,6 +148,6 @@ namespace Isis {
  *   @history 2011-05-03 Jeannie Walldren - Added documentation. Removed Apollo
  *            namespace.
  */
-extern "C" Isis::Camera *ApolloMetricCameraPlugin(Isis::Pvl &lab) {
-  return new Isis::ApolloMetricCamera(lab);
+extern "C" Isis::Camera *ApolloMetricCameraPlugin(Isis::Cube &cube) {
+  return new Isis::ApolloMetricCamera(cube);
 }

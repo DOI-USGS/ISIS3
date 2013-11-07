@@ -30,10 +30,13 @@
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
+#include "RingPlaneProjection.h"
 #include "SpecialPixel.h"
+#include "TProjection.h"
 #include "UniqueIOCachingAlgorithm.h"
 
 using namespace std;
+
 
 namespace Isis {
   //! Constructs a Mosaic object
@@ -41,8 +44,10 @@ namespace Isis {
     p_createMosaic = true;
   }
 
+
   //! Destructor
   ProcessMapMosaic::~ProcessMapMosaic() { }
+
 
  /**
   * Input cube cannot be set here
@@ -52,6 +57,7 @@ namespace Isis {
                      "ProcessMapMosaic does not support the SetInputCube method",
                      _FILEINFO_);
   }
+
 
   /**
    * Mosaic Processing method, returns false if the cube is not inside the mosaic
@@ -174,6 +180,7 @@ namespace Isis {
     return true;
   }
 
+
   //*************************************************************************************************
   /**
    * Set the output cube to specified file name and specified input images
@@ -191,7 +198,7 @@ namespace Isis {
     double slon = DBL_MAX;
     double elon = -DBL_MAX;
 
-    Projection *proj = NULL;
+    TProjection *proj = NULL;
 
     if (propagationCubes.size() < 1) {
       QString msg = "The list does not contain any data";
@@ -206,8 +213,8 @@ namespace Isis {
 
       // See if the cube has a projection and make sure it matches
       // previous input cubes
-      Projection *projNew =
-          Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
+      TProjection *projNew =
+        (TProjection *) Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
       if ((proj != NULL) && (*proj != *projNew)) {
         QString msg = "Mapping groups do not match between cubes [" +
                      propagationCubes[0].toString() + "] and [" + propagationCubes[i].toString() + "]";
@@ -245,6 +252,80 @@ namespace Isis {
     return SetOutputCube(propagationCubes[0].toString(), xmin, xmax, ymin, ymax,
                          slat, elat, slon, elon, bands, oAtt, mosaicFile);
   }
+
+
+  //*************************************************************************************************
+  /**
+   * Set the output cube to specified file name and specified input images
+   * and output attributes
+   */
+  Isis::Cube *ProcessMapMosaic::RingsSetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
+      const QString &mosaicFile) {
+    int bands = 0;
+    double xmin = DBL_MAX;
+    double xmax = -DBL_MAX;
+    double ymin = DBL_MAX;
+    double ymax = -DBL_MAX;
+    double srad = DBL_MAX;  // starting ring radius
+    double erad = -DBL_MAX; // ending ring radius
+    double saz = DBL_MAX;   // starting azimuth (ring longitude)
+    double eaz = -DBL_MAX;  // ending azimuth (ring longitude)
+
+    RingPlaneProjection *proj = NULL;
+
+    if (propagationCubes.size() < 1) {
+      QString msg = "The list does not contain any data";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    for (int i = 0; i < propagationCubes.size(); i++) {
+      // Open the cube and get the maximum number of band in all cubes
+      Cube cube;
+      cube.open(propagationCubes[i].toString());
+      bands = max(bands, cube.bandCount());
+
+      // See if the cube has a projection and make sure it matches
+      // previous input cubes
+      RingPlaneProjection *projNew =
+        (RingPlaneProjection *) Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
+      if ((proj != NULL) && (*proj != *projNew)) {
+        QString msg = "Mapping groups do not match between cubes [" +
+                     propagationCubes[0].toString() + "] and [" + propagationCubes[i].toString() + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      // Figure out the x/y range as it may be needed later
+      double x = projNew->ToProjectionX(0.5);
+      double y = projNew->ToProjectionY(0.5);
+      if (x < xmin) xmin = x;
+      if (y < ymin) ymin = y;
+      if (x > xmax) xmax = x;
+      if (y > ymax) ymax = y;
+
+      x = projNew->ToProjectionX(cube.sampleCount() + 0.5);
+      y = projNew->ToProjectionY(cube.lineCount() + 0.5);
+      if (x < xmin) xmin = x;
+      if (y < ymin) ymin = y;
+      if (x > xmax) xmax = x;
+      if (y > ymax) ymax = y;
+
+      srad = min(srad, projNew->MinimumRingRadius());
+      erad = max(erad, projNew->MaximumRingRadius());
+      saz = min(saz, projNew->MinimumRingLongitude());
+      eaz = max(eaz, projNew->MaximumRingLongitude());
+
+      // Cleanup
+      cube.close();
+      if (proj) delete proj;
+      proj = projNew;
+    }
+
+    if (proj) delete proj;
+
+    return RingsSetOutputCube(propagationCubes[0].toString(), xmin, xmax, ymin, ymax,
+                         srad, erad, saz, eaz, bands, oAtt, mosaicFile);
+  }
+
 
   //*************************************************************************************************
   /**
@@ -315,6 +396,86 @@ namespace Isis {
                          slat, elat, slon, elon, bands, oAtt, mosaicFile);
   }
 
+
+  //*************************************************************************************************
+  /**
+   * Set the output cube to specified file name using the specified input 
+   * images, output attributes, ring radii values and ring longitude 
+   * values. 
+   *  
+   * @param propagationCubes List of input images
+   * @param srad Start ring radius
+   * @param erad End ring radius
+   * @param saz Start ring longitude (azimuth)
+   * @param eaz End ring longitude (azimuth)
+   * @param oAtt Output attributes
+   * @param mosaicFile Name of the output mosaic file
+   */
+  Isis::Cube *ProcessMapMosaic::RingsSetOutputCube(FileList &propagationCubes,
+      double srad, double erad, double saz, double eaz,
+      CubeAttributeOutput &oAtt, const QString &mosaicFile) {
+    if (propagationCubes.size() < 1) {
+      QString msg = "The list does not contain any data";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    int samples, lines, bands = 0;
+    Pvl label;
+    label.read(propagationCubes[0].toString());
+    PvlGroup mGroup = label.findGroup("Mapping", Pvl::Traverse);
+    mGroup.addKeyword(PvlKeyword("MinimumRingRadius", toString(srad)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MaximumRingRadius", toString(erad)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MinimumRingLongitude", toString(saz)), Pvl::Replace);
+    mGroup.addKeyword(PvlKeyword("MaximumRingLongitude", toString(eaz)), Pvl::Replace);
+
+    if (mGroup.hasKeyword("UpperLeftCornerX"))
+      mGroup.deleteKeyword("UpperLeftCornerX");
+
+    if (mGroup.hasKeyword("UpperLeftCornerY"))
+      mGroup.deleteKeyword("UpperLeftCornerY");
+
+    Pvl mapPvl;
+    mapPvl += mGroup;
+
+    // Use CreateForCube because our range differs from any of the cubes (manually specified)
+    Projection *proj = Isis::ProjectionFactory::RingsCreateForCube(mapPvl, samples, lines, false);
+
+    double xmin, xmax, ymin, ymax;
+    proj->XYRange(xmin, xmax, ymin, ymax);
+
+    // The xmin/ymax should be rounded for the labels
+    xmin = mapPvl.findGroup("Mapping")["UpperLeftCornerX"];
+    ymax = mapPvl.findGroup("Mapping")["UpperLeftCornerY"];
+
+    for (int i = 0; i < propagationCubes.size(); i++) {
+      Cube cube;
+      cube.open(propagationCubes[i].toString());
+      bands = max(cube.bandCount(), bands);
+
+      // See if the cube has a projection and make sure it matches
+      // previous input cubes
+      Projection *projNew = Isis::ProjectionFactory::RingsCreateFromCube(*(cube.label()));
+
+      if (proj == NULL) {
+      }
+      else if (*proj != *projNew) {
+        QString msg = "Mapping groups do not match between cube [" + propagationCubes[i].toString() +
+                     "] and [" + propagationCubes[0].toString() + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      if (proj) delete proj;
+      proj = projNew;
+    }
+
+    if (proj) delete proj;
+
+    return RingsSetOutputCube(propagationCubes[0].toString(), xmin, xmax, ymin, ymax,
+                         srad, erad, saz, eaz, bands, oAtt, mosaicFile);
+  }
+
+
+  //NExt
   //*************************************************************************************************
 
   /**
@@ -382,6 +543,89 @@ namespace Isis {
     return mosaicCube;
   }
 
+
+  //NExt
+  //*************************************************************************************************
+
+  /**
+   * Set the output cube to specified file name using the specified input
+   * file name, output attributes, ring radii values and ring longitude 
+   * values. 
+   *  
+   * @param inputFile Name of input file 
+   * @param xmin Minimum x-value
+   * @param xmax Maximum x-value
+   * @param ymin Minimum y-value
+   * @param ymax Maximum y-value
+   * @param srad Start ring radius
+   * @param erad End ring radius
+   * @param saz Start ring longitude (azimuth)
+   * @param eaz End ring longitude (azimuth)
+   * @param oAtt Output attributes
+   * @param mosaicFile Name of the output mosaic file
+   */
+  Isis::Cube *ProcessMapMosaic::RingsSetOutputCube(const QString &inputFile,
+      double xmin, double xmax, double ymin, double ymax,
+      double srad, double erad, double saz, double eaz, int nbands,
+      CubeAttributeOutput &oAtt, const QString &mosaicFile) {
+    Pvl fileLab(inputFile);
+    PvlGroup &mapping = fileLab.findGroup("Mapping", Pvl::Traverse);
+
+    mapping["UpperLeftCornerX"] = toString(xmin);
+    mapping["UpperLeftCornerY"] = toString(ymax);
+    mapping.addKeyword(PvlKeyword("MinimumRingRadius", toString(srad)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MaximumRingRadius", toString(erad)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MinimumRingLongitude", toString(saz)), Pvl::Replace);
+    mapping.addKeyword(PvlKeyword("MaximumRingLongitude", toString(eaz)), Pvl::Replace);
+
+    Projection *firstProj = ProjectionFactory::RingsCreateFromCube(fileLab);
+    int samps = (int)(ceil(firstProj->ToWorldX(xmax) - firstProj->ToWorldX(xmin)) + 0.5);
+    int lines = (int)(ceil(firstProj->ToWorldY(ymin) - firstProj->ToWorldY(ymax)) + 0.5);
+    delete firstProj;
+
+    if (p_createMosaic) {
+      Pvl newMap;
+      newMap.addGroup(mapping);
+
+      // Initialize the mosaic
+      CubeAttributeInput inAtt;
+
+      ProcessByLine p;
+      p.SetInputCube(inputFile, inAtt);
+      p.PropagateHistory(false);
+      p.PropagateLabels(false);
+      p.PropagateTables(false);
+      p.PropagatePolygons(false);
+      p.PropagateOriginalLabel(false);
+
+      // If track set, create the origin band
+      if (GetTrackFlag()) {
+        nbands += 1;
+      }
+      // For average priority, get the new band count
+      else if (GetImageOverlay() == AverageImageWithMosaic) {
+        nbands *= 2;
+      }
+
+      Cube *ocube = p.SetOutputCube(mosaicFile, oAtt, samps, lines, nbands);
+      p.Progress()->SetText("Initializing mosaic");
+      p.ClearInputCubes();
+      p.StartProcess(ProcessMapMosaic::FillNull);
+
+      // CreateForCube created some keywords in the mapping group that needs to be added
+      ocube->putGroup(newMap.findGroup("Mapping", Pvl::Traverse));
+      p.EndProcess();
+    }
+
+    Cube *mosaicCube = new Cube();
+    mosaicCube->open(mosaicFile, "rw");
+    mosaicCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2));
+
+    AddOutputCube(mosaicCube);
+    return mosaicCube;
+  }
+
+
   //*************************************************************************************************
 
   /**
@@ -443,6 +687,69 @@ namespace Isis {
     return mosaicCube;
   }
 
+
+  //*************************************************************************************************
+
+  /**
+   * Set the output cube to specified file name and specified input images
+   * and output attributes and lat,lons
+   */
+  Isis::Cube *ProcessMapMosaic::RingsSetOutputCube(const QString &inputFile, PvlGroup mapping,
+      CubeAttributeOutput &oAtt, const QString &mosaicFile) {
+    if (OutputCubes.size() != 0) {
+      QString msg = "You can only specify one output cube and projection";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    if (mapping.hasKeyword("UpperLeftCornerX"))
+      mapping.deleteKeyword("UpperLeftCornerX");
+
+    if (mapping.hasKeyword("UpperLeftCornerY"))
+      mapping.deleteKeyword("UpperLeftCornerY");
+
+    if (p_createMosaic) {
+      Pvl newMap;
+      newMap.addGroup(mapping);
+      int samps, lines, bands;
+      delete ProjectionFactory::RingsCreateForCube(newMap, samps, lines, false);
+
+      // Initialize the mosaic
+      ProcessByLine p;
+      CubeAttributeInput inAtt(inputFile);
+      Cube *propCube = p.SetInputCube(inputFile, inAtt);
+      bands = propCube->bandCount();
+
+      // If track set, create the origin band
+      if (GetTrackFlag()) {
+        bands += 1;
+      }
+      // For average priority, get the new band count
+      else if (GetImageOverlay() == AverageImageWithMosaic) {
+        bands *= 2;
+      }
+
+      p.PropagateHistory(false);
+      p.PropagateLabels(false);
+      Cube *ocube = p.SetOutputCube(mosaicFile, oAtt, samps, lines, bands);
+      p.Progress()->SetText("Initializing mosaic");
+      p.ClearInputCubes();
+
+      p.StartProcess(ProcessMapMosaic::FillNull);
+
+      // CreateForCube created some keywords in the mapping group that needs to be added
+      ocube->putGroup(newMap.findGroup("Mapping", Pvl::Traverse));
+      p.EndProcess();
+    }
+
+    Cube *mosaicCube = new Cube();
+    AddOutputCube(mosaicCube);
+    mosaicCube->open(mosaicFile, "rw");
+    mosaicCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2));
+
+    return mosaicCube;
+  }
+
+
   //*************************************************************************************************
 
   /**
@@ -461,6 +768,27 @@ namespace Isis {
 
     return ocube;
   }
+
+
+  //*************************************************************************************************
+
+  /**
+   * Mosaic output method for Mosaic Processing Method, this will use an existing mosaic
+   */
+  Cube *ProcessMapMosaic::RingsSetOutputCube(const QString &mosaicFile) {
+    p_createMosaic = false;
+    Cube mosaic;
+    mosaic.open(mosaicFile);
+
+    PvlGroup &mapping = mosaic.label()->findGroup("Mapping", Pvl::Traverse);
+    CubeAttributeOutput oAtt;
+    // The other SetOutput will not use the attribute or filename
+    Cube *ocube = RingsSetOutputCube("", mapping, oAtt, mosaicFile);
+    p_createMosaic = true;
+
+    return ocube;
+  }
+
 
   //*************************************************************************************************
   /**

@@ -25,9 +25,9 @@
 #include "Distance.h"
 #include "IException.h"
 #include "IString.h"
-#include "Projection.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
+#include "TProjection.h"
 
 namespace Isis {
   /**
@@ -37,7 +37,7 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    m_errors = ThrowAllErrors;
+    m_errors = AllowPastPole;
   }
 
 
@@ -103,7 +103,7 @@ namespace Isis {
           Distance::Meters);
     }
     else {
-      PvlGroup radiiGrp = Projection::TargetRadii(mapping["TargetName"]);
+      PvlGroup radiiGrp = TProjection::TargetRadii(mapping["TargetName"]);
 
       m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
           Distance::Meters);
@@ -153,7 +153,7 @@ namespace Isis {
           Distance::Meters);
     }
     else {
-      PvlGroup radiiGrp = Projection::TargetRadii(mapping["TargetName"]);
+      PvlGroup radiiGrp = TProjection::TargetRadii(mapping["TargetName"]);
 
       m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
           Distance::Meters);
@@ -439,7 +439,7 @@ namespace Isis {
           Distance::Meters);
     }
     else {
-      PvlGroup radiiGrp = Projection::TargetRadii(mapping["TargetName"]);
+      PvlGroup radiiGrp = TProjection::TargetRadii(mapping["TargetName"]);
 
       equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
           Distance::Meters);
@@ -498,7 +498,7 @@ namespace Isis {
    */
   void Latitude::setAngle(double angle, const Angle::Units &units) {
     // Check for passing 90 degrees if that error checking is on
-    if (!IsSpecial(angle) && (m_errors | AllowPastPole) != AllowPastPole) {
+    if (!IsSpecial(angle) && (m_errors & AllowPastPole) != AllowPastPole) {
       Angle tmpAngle(angle, units);
       if(tmpAngle > Angle(90, Angle::Degrees) ||
          tmpAngle < Angle(-90, Angle::Degrees)) {

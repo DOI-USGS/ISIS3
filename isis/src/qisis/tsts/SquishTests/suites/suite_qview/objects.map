@@ -49,6 +49,14 @@
 :Options.Tracking ..._QAction	{container=':qview.Options_QMenu' text='Tracking ...' type='QAction' unnamed='1' visible='true'}
 :ProgressDialog	{type='QProgressDialog'}
 :QwtLegendView_QwtLegendItem	{container=':Spatial Plot.QwtLegendView_QScrollArea' type='QwtLegendItem' unnamed='1' visible='1'}
+:Save As.Export As Is_QRadioButton	{text='Export As Is' type='QRadioButton' unnamed='1' visible='1' window=':Save As_Isis::SaveAsDialog'}
+:Save As.Export Full Res_QRadioButton	{text='Export Full Res' type='QRadioButton' unnamed='1' visible='1' window=':Save As_Isis::SaveAsDialog'}
+:Save As.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Save As_Isis::SaveAsDialog'}
+:Save As.Save_QPushButton	{text='Save' type='QPushButton' unnamed='1' visible='1' window=':Save As_Isis::SaveAsDialog'}
+:Save As.fileTypeCombo_QComboBox	{name='fileTypeCombo' type='QComboBox' visible='1' window=':Save As_Isis::SaveAsDialog'}
+:Save As.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Save As_Isis::SaveAsDialog'}
+:Save As.toParentButton_QToolButton	{name='toParentButton' type='QToolButton' visible='1' window=':Save As_Isis::SaveAsDialog'}
+:Save As_Isis::SaveAsDialog	{name='QFileDialog' type='Isis::SaveAsDialog' visible='1' windowTitle='Save As'}
 :Select Color.Basic colors_QColorPicker	{leftWidget=':Basic colors_QWellArray' type='QColorPicker' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
 :Select Color.Basic colors_QLabel	{text='Basic colors' type='QLabel' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
 :Select Color.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
@@ -97,12 +105,15 @@
 :_QMenu	{type='QMenu' unnamed='1' visible='1'}
 :_QWebView	{type='QWebView' unnamed='1' visible='1'}
 :fileNameEdit_QLineEdit	{buddy=':Open.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
+:fileNameEdit_QLineEdit_2	{buddy=':Save As.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :frame.stackedWidget_QStackedWidget	{container=':splitter.frame_QFrame' name='stackedWidget' type='QStackedWidget' visible='1'}
+:frame.stackedWidget_QStackedWidget_2	{container=':splitter.frame_QFrame_2' name='stackedWidget' type='QStackedWidget' visible='1'}
 :nomenclatureToolButton	{toolTip='Nomenclature (N)' type='QToolButton' visible='true'}
 :qview.Active Tool_QToolBar	{name='Active' type='QToolBar' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='Active Tool'}
 :qview.Disclaimer_QPushButton	{text='Disclaimer' type='QPushButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview.File_QMenu	{title='File' type='QMenu' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview.Gray_QRadioButton	{text='Gray' type='QRadioButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.I26649003RDR.crop.tr.lev2.cub @ 275.556% (Gray = 1)_Isis::ViewportMdiSubWindow	{type='Isis::ViewportMdiSubWindow' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='I26649003RDR.crop.tr.lev2.cub @ 275.556% (Gray = 1)'}
 :qview.Open_QToolButton	{text='Open' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview.Options_QMenu	{title='Options' type='QMenu' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview.RGB_QRadioButton	{text='RGB' type='QRadioButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
@@ -116,6 +127,7 @@
 :qview.Window_QMenu	{title='Window' type='QMenu' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview.lub0388c.342.lev1.cub @ 129.167% (Gray = 1)_QMdiSubWindow	{type='QMdiSubWindow' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='lub0388c.342.lev1.cub @ 129.167% (Gray = 1)'}
 :qview.nomenclatureQueryProgress	{name='nomenclatureQueryProgress' type='QProgressBar' window=':qview_Isis::ViewportMainWindow'}
+:qview.saveAsFullImage.cub @ 137.778% (Gray = 1)_Isis::ViewportMdiSubWindow	{type='Isis::ViewportMdiSubWindow' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='saveAsFullImage.cub @ 137.778% (Gray = 1)'}
 :qview.to All Viewports_QStackedWidget	{leftWidget=':qview.to All Viewports_QToolButton' type='QStackedWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview.to All Viewports_QToolButton	{text='to All Viewports' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview_Isis::MdiCubeViewport	{occurrence='3' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
@@ -126,6 +138,7 @@
 :qview_QLabel_2	{occurrence='13' type='QLabel' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview_QLabel_3	{occurrence='14' type='QLabel' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview_QLineEdit	{occurrence='2' type='QLineEdit' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview_QSpinBox	{type='QSpinBox' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview_QSpinBox_2	{occurrence='2' type='QSpinBox' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview_QSpinBox_3	{occurrence='3' type='QSpinBox' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
@@ -136,8 +149,10 @@
 :qview_bandToolButton	{toolTip='Band Selection (B)' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview_statisticsToolButton	{toolTip='Statistics' type='QToolButton' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :splitter.frame_QFrame	{container=':Open.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
+:splitter.frame_QFrame_2	{container=':Save As.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.sidebar_QSidebar	{container=':Open.splitter_QSplitter' name='sidebar' type='QSidebar' visible='1'}
 :stackedWidget.treeView_QTreeView	{container=':frame.stackedWidget_QStackedWidget' name='treeView' type='QTreeView' visible='1'}
+:stackedWidget.treeView_QTreeView_2	{container=':frame.stackedWidget_QStackedWidget_2' name='treeView' type='QTreeView' visible='1'}
 :viewport1	{occurrence='1' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :viewport1_contents	{name='viewport' type='QWidget' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :viewport1_progress	{parent=':viewport1' type='QProgressBar'}

@@ -2,6 +2,8 @@
 #include <iomanip>
 
 #include "Camera.h"
+#include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -22,8 +24,8 @@ int main(int argc, char *argv[]) {
     cout << "UnitTest for Universal Ground Map" << endl;
 
     cout << "  Testing Camera Model..." << endl;
-    Isis::Pvl p("$viking2/testData/f348b26.cub");
-    Isis::UniversalGroundMap ugm(p);;
+    Cube c("$viking2/testData/f348b26.cub", "r");
+    UniversalGroundMap ugm(c);
     cout << setprecision(9);
 
     cout << "Is Projection? = " << ugm.HasProjection() << endl << endl;
@@ -81,8 +83,8 @@ int main(int argc, char *argv[]) {
     }
 
     cout << "  Testing Projection..." << endl;
-    Isis::Pvl p2("$base/dems/molaMarsPlanetaryRadius0001.cub");
-    Isis::UniversalGroundMap ugm2(p2);
+    Cube c2("$base/dems/molaMarsPlanetaryRadius0001.cub", "r");
+    UniversalGroundMap ugm2(c2);
     cout << "Is Projection? = " << ugm2.HasProjection() << endl << endl;
 
     // Test all four corners to make sure the conversions are right
@@ -131,8 +133,8 @@ int main(int argc, char *argv[]) {
     }
 
     cout << "  Testing Camera Model and Projection..." << endl;
-    Isis::Pvl p3("$mgs/testData/m0402852.cub");
-    Isis::UniversalGroundMap ugm3(p3);
+    Cube c3("$mgs/testData/m0402852.cub", "r");
+    UniversalGroundMap ugm3(c3);
     cout << "Is Projection? = " << ugm3.HasProjection() << endl << endl;
 
     // Test all four corners to make sure the conversions are right

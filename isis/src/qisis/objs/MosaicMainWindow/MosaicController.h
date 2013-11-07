@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include <QPointer>
+
 class QAction;
 template <typename A> class QFutureWatcher;
 template <typename A> class QList;
@@ -18,12 +20,15 @@ class QStatusBar;
 // This is the parent of the inner class
 #include <functional>
 
+#include "ImageList.h"
 #include "PvlObject.h"
+#include "MosaicSceneWidget.h"
+#include "ImageFileListWidget.h"
 
 namespace Isis {
   class ControlNet;
-  class CubeDisplayProperties;
-  class MosaicFileListWidget;
+  class FileName;
+  class ImageReader;
   class MosaicSceneWidget;
   class ProgressBar;
   class PvlObject;
@@ -53,6 +58,8 @@ namespace Isis {
    *   @history 2011-12-16 Steven Lambright - Applies fixes for maximum number
    *                           of open files to opening project files and fixed
    *                           progress to be more accurate. Fixes #635.
+   *   @history 2012-09-17 Steven Lambright - Added compatibility with old versions of project
+   *                           files, updated to use changed mosaic scene widget constructor.
    *   @history 2013-03-19 Steven Lambright - Added option for changing default file list
    *                           columns in the settings menu.
    */
@@ -65,15 +72,15 @@ namespace Isis {
       virtual ~MosaicController();
 
       MosaicSceneWidget *getMosaicScene() {
-        return p_scene;
+        return m_scene;
       }
 
       MosaicSceneWidget *getMosaicWorldScene() {
-        return p_worldScene;
+        return m_worldScene;
       }
 
-      MosaicFileListWidget *getMosaicFileList() {
-        return p_fileList;
+      ImageFileListWidget *getImageFileList() {
+        return m_fileList;
       }
 
       void addExportActions(QMenu &fileMenu);
@@ -86,96 +93,44 @@ namespace Isis {
 
     signals:
       /**
-       * Emitted when new cubes are available.
+       * Emitted when new images are available.
        */
-      void cubesAdded(QList<CubeDisplayProperties *>);
+      void imagesAdded(ImageList images);
+      void imagesAdded(ImageList *images);
 
-      void allCubesClosed();
+      void allImagesClosed();
 
     public slots:
       void saveProject(QString filename);
       void readProject(QString filename);
-      void openCubes(QStringList filenames);
-      void openProjectCubes(QList<PvlObject> projectCubes);
-      void cubeDisplayReady(int);
+      void openImages(QStringList filenames);
+      void openProjectImages(PvlObject projectImages);
 
     private slots:
-      void changeDefaultAlpha();
       void changeMaxThreads();
-      void cubeClosed(QObject * cubeDisplay);
-      void defaultFillChanged(bool);
-      void loadFinished();
+      void imageClosed(QObject * image);
+      void imagesReady(ImageList);
       void saveList();
-      void setDefaultFileListCols();
-      void setSmallNumberOfOpenCubes(bool useSmallNumber);
 
     private:
-      void flushCubes();
+      void applyMaxThreadCount();
+      void convertV1ToV2(Pvl &project);
 
     private:
-      QList<CubeDisplayProperties *> p_cubes;
-      QList<CubeDisplayProperties *> p_unannouncedCubes;
+      ImageList m_images;
 
-      MosaicFileListWidget *p_fileList;
-      MosaicSceneWidget *p_scene;
-      MosaicSceneWidget *p_worldScene;
-      ProgressBar *p_progress;
-      PvlObject *m_projectPvl;
+      QPointer<ImageFileListWidget> m_fileList;
+      QPointer<MosaicSceneWidget> m_scene;
+      QPointer<MosaicSceneWidget> m_worldScene;
+      QPointer<ImageReader> m_imageReader;
 
-      bool m_openFilled;
-      int m_defaultAlpha;
-      int m_maxOpenCubes;
       int m_maxThreads;
-
-      QScopedPointer< QStringList > m_cubesLeftToOpen;
-      QScopedPointer< QList<PvlObject> > m_projectCubesLeftToOpen;
 
       // Cameras are not re-entrant and so this mutex will make sure they
       //   aren't overly abused
       QMutex *m_mutex;
-
-      QFutureWatcher< CubeDisplayProperties * > * m_watcher;
-
-
-      /**
-       * @author ????-??-?? Steven Lambright
-       *
-       * @internal
-       */
-      class FileNameToDisplayFunctor : public std::unary_function<
-          const QString &, CubeDisplayProperties *> {
-
-        public:
-          FileNameToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread,
-              bool openFilled, int defaultAlpha);
-          CubeDisplayProperties *operator()(const QString &);
-
-        private:
-          QMutex *m_mutex;
-          QThread *m_targetThread;
-          bool m_openFilled;
-          int m_defaultAlpha;
-      };
-
-
-      /**
-       * @author ????-??-?? Steven Lambright
-       *
-       * @internal
-       */
-      class ProjectToDisplayFunctor : public std::unary_function<
-          const PvlObject &, CubeDisplayProperties *> {
-
-        public:
-          ProjectToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread);
-          CubeDisplayProperties *operator()(const PvlObject &);
-
-        private:
-          QMutex *m_mutex;
-          QThread *m_targetThread;
-      };
   };
-};
+}
 
 #endif
 

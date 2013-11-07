@@ -1,0 +1,141 @@
+UNIT TEST FOR Planar Projection
+
+Test missing center azimuth keyword ...
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterRingLongitude] does not exist in [Group = Mapping].
+
+Test missing CenterRingRadius keyword ...
+**I/O ERROR** Invalid label group [Mapping].
+**ERROR** PVL Keyword [CenterRingRadius] does not exist in [Group = Mapping].
+
+Projection 1 parameters...
+Projection version         = 1.0
+  Projection name          =  Planar
+  Target name              =  Saturn
+  RingLongitude direction  = Clockwise
+  RingLongitude domain     = 180
+  Minimum ring radius      = 0
+  Maximum ring radius      = 2e+06
+  Minimum ring longitude   = -20
+  Maximum ring longitude   = 130
+  Center ring radius       = 200000
+  Center ring longitude    = 0
+
+Test TrueScaleRingRadius method...
+TrueScaleRingRadius = 200000
+
+Test SetGround method ... 
+Setting ground to (1000.0,45.0)
+RingRadius:             1000
+RingLongitude:          45
+XCoord:                 707.1067811865476
+YCoord:                 -707.1067811865474
+
+Test SetCoordinate method ... 
+Setting coordinate to (0.2617993877991494,-0.8726646259971648)
+RingRadius:             0.9110886174894191
+RingLongitude:          73.30075576600639
+XCoord:                 0.2617993877991494
+YCoord:                 -0.8726646259971648
+
+Test XYRange method ... 
+Minimum X:  -1285575.219373079
+Maximum X:  2000000
+Minimum Y:  -2000000
+Maximum Y:  684040.2866513374
+
+Test Name and comparision methods ... 
+Name:       Planar
+operator==  1
+
+Testing default options in constructor with Projection 2 ... 
+Group = Mapping
+  ProjectionName         = Planar
+  TargetName             = Saturn
+  RingLongitudeDirection = Clockwise
+  RingLongitudeDomain    = 180
+  MinimumRingRadius      = 0.0
+  MaximumRingRadius      = 2000000.0
+  MinimumRingLongitude   = -20.0
+  MaximumRingLongitude   = 130.0
+  CenterRingLongitude    = 55.0
+  CenterRingRadius       = 1000000.0
+End_Group
+End
+Default projection parameters == Original projection ?0
+
+
+Testing more SetGround conditions...RingLongitudeDirection = CounterClockwise and RingLongitudeDomain = 360
+Projection 3 parameters...
+  Projection name          =  Planar
+  Target name              =  Saturn
+  RingLongitude direction  = CounterClockwise
+  RingLongitude domain     = 360
+  Minimum ring radius      = 0
+  Maximum ring radius      = 2000000
+  Minimum ring longitude   = -20
+  Maximum ring longitude   = 130
+  Center ring radius       = 1000000
+  Center ring longitude    = 55
+
+  Setting ground to (1000.0,45.0)
+    RingRadius:       =  1000
+    RingLongitude:    =  45
+    XCoord:           =  984.807753012208
+    YCoord:           =  -173.6481776669304
+
+Testing SetGround error condition...
+  Setting ground to (-1000.0,45.0)
+
+Testing more SetCoordinate methods ... 
+Setting coordinate to (0.2617993877991494,-0.8726646259971648)
+RingRadius:             0.9110886174894191
+RingLongitude:          341.6992442339936
+XCoord:                 0.2617993877991494
+YCoord:                 -0.8726646259971648
+
+Setting coordinate to (0.2617993877991494,0.8726646259971648)
+RingRadius:             0.9110886174894191
+RingLongitude:          128.3007557660064
+XCoord:                 0.2617993877991494
+YCoord:                 0.8726646259971648
+
+
+Testing Mapping() methods ... 
+Projection 4 parameters...No range
+  Projection name          =  Planar
+  Target name              =  Saturn
+  RingLongitude direction  = CounterClockwise
+  RingLongitude domain     = 360
+  Center ring radius       = 1000000
+  Center ring longitude    = 55
+
+Mapping() = 
+Group = Mapping
+  TargetName             = Saturn
+  ProjectionName         = Planar
+  RingLongitudeDirection = Clockwise
+  RingLongitudeDomain    = 180
+  MinimumRingRadius      = 0.0
+  MaximumRingRadius      = 2000000.0
+  MinimumRingLongitude   = -20.0
+  MaximumRingLongitude   = 130.0
+  CenterRingRadius       = 200000.0
+  CenterRingLongitude    = 0.0
+End_Group
+End
+MappingRadii() = 
+Group = Mapping
+  MinimumRingRadius = 0.0
+  MaximumRingRadius = 2000000.0
+  CenterRingRadius  = 200000.0
+End_Group
+End
+MappingRingLongitudes() = 
+Group = Mapping
+  MinimumRingLongitude = -20.0
+  MaximumRingLongitude = 130.0
+  CenterRingLongitude  = 0.0
+End_Group
+End
+

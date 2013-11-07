@@ -66,7 +66,7 @@ namespace Isis {
    */
   class CTXCamera : public LineScanCamera {
     public:
-      CTXCamera(Pvl &lab);
+      CTXCamera(Cube &cube);
 
       //! Destroys the CTXCamera object.
       ~CTXCamera() {};

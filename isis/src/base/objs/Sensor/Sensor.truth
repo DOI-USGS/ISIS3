@@ -1,4 +1,4 @@
-Unit test for Isis::Sensor
+Unit test for Sensor
 Test SetLookDirection using ShapeModel=Null
 Has Intersection    = 0
 Has Intersection    = 1
