@@ -103,7 +103,7 @@ void IsisMain() {
     isEquirectangular = true;
 
     // Get projection and use radius for new radius
-    Projection *proj = ProjectionFactory::CreateFromCube(*inCube);
+    TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(*inCube);
     newRadius = proj->LocalRadius((double)mapping["CENTER_LATITUDE"]);
 
     // Convert radius to KM
