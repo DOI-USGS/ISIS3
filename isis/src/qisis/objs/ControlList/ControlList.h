@@ -23,7 +23,8 @@ namespace Isis {
    *
    * @author 2012-09-01 Tracie Sucharski 
    *
-   * @internal
+   * @internal 
+   *   @history 2012-09-01 Tracie Sucharski - Original version. 
    */
   class ControlList : public QObject, public QList<Control *> {
     Q_OBJECT
