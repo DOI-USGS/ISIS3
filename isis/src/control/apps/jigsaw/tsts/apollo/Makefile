@@ -10,7 +10,9 @@ APPNAME = jigsaw
 # 2013-04-02 DAC - The values in bundleout.txt were working with 5 places across all systems.  With the above change
 #                  they are only good to 4 places now.  Also added tolerance for AprioriX in the control nets and changed the 
 #                  covariance tolerance  to 0.00006 for the specialK test.
-#
+# 2013-11-12 KLE - Modified apollo test input Net "Ames_7-ImageLSTest_USGS_combined.net" by changing point AS15_SocetPAN_45
+#                  from "Constrained" to "Free" but leaving a priori constraints on coordinates. This is to test toggling a
+#                  point between "Constrained" and "Free" while leaving constraints in place.  
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths

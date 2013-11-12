@@ -75,7 +75,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
     m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defual
     m_cumPro=NULL;
-    m_maxLikelihoodIndex=0;    
+    m_maxLikelihoodIndex=0;
+    m_maxLikelihoodMedianR2Residuals=0.0;
   }
 
   BundleAdjust::BundleAdjust(const QString &cnetFile,
@@ -101,7 +102,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     //initialize maximum likelihood estimation parameters
     m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
-    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defual
+    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by default
     m_cumPro=NULL;    
     m_maxLikelihoodIndex=0;
   }
@@ -1152,7 +1153,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         //  reset the tweaking contant to the desired quantile of the |residual| distribution
         m_wFunc[m_maxLikelihoodIndex]->setTweakingConstant(m_cumPro->value(m_maxLikelihoodQuan[m_maxLikelihoodIndex]));
         //  print meadians of residuals
-        printf("Median of R^2 residauls:  %lf\n",m_cumPro->value(0.5));
+        m_maxLikelihoodMedianR2Residuals = m_cumPro->value(0.5);
+        printf("Median of R^2 residuals:  %lf\n",m_maxLikelihoodMedianR2Residuals);
         //restart the dynamic calculation of the cumulative probility distribution of |R^2 residuals| --so it will be up to date for the next iteration
         m_cumPro->initialize(101);
       }
@@ -1949,96 +1951,66 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
 //      std::cout << weights << std::endl;
 
-//      if( point->Held() || point->Type() == ControlPoint::Fixed )
       if (point->GetType() == ControlPoint::Fixed) {
         weights[0] = 1.0e+50;
         weights[1] = 1.0e+50;
         weights[2] = 1.0e+50;
       }
-      else {
-          if( point->IsLatitudeConstrained() ) {
-            apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().meters();
-              weights[0] = point->GetAprioriSurfacePoint().GetLatWeight();
+      else if (point->GetType() == ControlPoint::Free) {
+        if( m_dGlobalLatitudeAprioriSigma > 0.0 ) {
+          apriorisigmas[0] = m_dGlobalLatitudeAprioriSigma;
+          d = m_dGlobalLatitudeAprioriSigma*m_dMTR;
+          weights[0] = 1.0/(d*d);
+        }
+        if( m_dGlobalLongitudeAprioriSigma > 0.0 ) {
+          apriorisigmas[1] = m_dGlobalLongitudeAprioriSigma;
+          d = m_dGlobalLongitudeAprioriSigma*m_dMTR;
+          weights[1] = 1.0/(d*d);
+        }
+        if (!m_bSolveRadii)
+          weights[2] = 1.0e+50;
+        else {
+          if( m_dGlobalRadiusAprioriSigma > 0.0 ) {
+            apriorisigmas[2] = m_dGlobalRadiusAprioriSigma;
+            d = m_dGlobalRadiusAprioriSigma*0.001;
+            weights[2] = 1.0/(d*d);
           }
-          else if( m_dGlobalLatitudeAprioriSigma > 0.0 ) {
-              apriorisigmas[0] = m_dGlobalLatitudeAprioriSigma;
-              d = m_dGlobalLatitudeAprioriSigma*m_dMTR;
-              weights[0] = 1.0/(d*d);
+        }
+      }
+      else if (point->GetType() == ControlPoint::Constrained) {
+        if( point->IsLatitudeConstrained() ) {
+          apriorisigmas[0] = point->GetAprioriSurfacePoint().GetLatSigmaDistance().meters();
+          weights[0] = point->GetAprioriSurfacePoint().GetLatWeight();
+        }
+        else if( m_dGlobalLatitudeAprioriSigma > 0.0 ) {
+          apriorisigmas[0] = m_dGlobalLatitudeAprioriSigma;
+          d = m_dGlobalLatitudeAprioriSigma*m_dMTR;
+          weights[0] = 1.0/(d*d);
+        }
+
+        if( point->IsLongitudeConstrained() ) {
+          apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters();
+          weights[1] = point->GetAprioriSurfacePoint().GetLonWeight();
+        }
+        else if( m_dGlobalLongitudeAprioriSigma > 0.0 ) {
+          apriorisigmas[1] = m_dGlobalLongitudeAprioriSigma;
+          d = m_dGlobalLongitudeAprioriSigma*m_dMTR;
+          weights[1] = 1.0/(d*d);
+        }
+
+        if (!m_bSolveRadii)
+          weights[2] = 1.0e+50;
+        else {
+          if( point->IsRadiusConstrained() ) {
+            apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters();
+            weights[2] = point->GetAprioriSurfacePoint().GetLocalRadiusWeight();
           }
-
-//      dAprioriSigmaX = point->GetAprioriSurfacePoint().GetXSigma();
-//      if(  dAprioriSigmaX <= 0.0 || dAprioriSigmaX >= 1000.0 ) {
-//        if( m_dGlobalSurfaceXAprioriSigma > 0.0 )
-//          dAprioriSigmaX = m_dGlobalSurfaceXAprioriSigma;
-//      }
-//      apriorisigmas[0] = dAprioriSigmaX;
-//
-//      if( dAprioriSigmaX > 0.0 && dAprioriSigmaX < 1000.0  ) {
-//        // We bundle in km and store in meters
-//        d = dAprioriSigmaX * 0.001;
-//        weights[0] = 1.0/(d*d);
-//      }
-
-//     if(  m_dGlobalLongitudeAprioriSigma > 0.0 )
-//       dAprioriSigmaLon = m_dGlobalLongitudeAprioriSigma;
-//     else
-//       dAprioriSigmaLon = point->AprioriSigmaLongitude();
-
-          if( point->IsLongitudeConstrained() ) {
-            apriorisigmas[1] = point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters();
-              weights[1] = point->GetAprioriSurfacePoint().GetLonWeight();
+          else if( m_dGlobalRadiusAprioriSigma > 0.0 ) {
+            apriorisigmas[2] = m_dGlobalRadiusAprioriSigma;
+            d = m_dGlobalRadiusAprioriSigma*0.001;
+            weights[2] = 1.0/(d*d);
           }
-          else if( m_dGlobalLongitudeAprioriSigma > 0.0 ) {
-              apriorisigmas[1] = m_dGlobalLongitudeAprioriSigma;
-              d = m_dGlobalLongitudeAprioriSigma*m_dMTR;
-              weights[1] = 1.0/(d*d);
-          }
-
-//      dAprioriSigmaY = point->GetAprioriSurfacePoint().GetYSigma();
-//        if(  dAprioriSigmaY <= 0.0 || dAprioriSigmaY >= 1000.0 ) {
-//          if( m_dGlobalSurfaceYAprioriSigma > 0.0 )
-//            dAprioriSigmaY = m_dGlobalSurfaceYAprioriSigma;
-//        }
-//        apriorisigmas[1] = dAprioriSigmaY;
-//
-//        if( dAprioriSigmaY > 0.0 && dAprioriSigmaY < 1000.0  ) {
-//          // We bundle in km and store in meters
-//          d = dAprioriSigmaY * 0.001;
-//          weights[1] = 1.0/(d*d);
-//        }
-
-//      if(  m_dGlobalRadiusAprioriSigma > 0.0 )
-//        dAprioriSigmaRad = m_dGlobalRadiusAprioriSigma;
-//      else
-//        dAprioriSigmaRad = point->AprioriSigmaRadius();
-
-          if ( !m_bSolveRadii )
-              weights[2] = 1.0e+50;
-          else {
-              if( point->IsRadiusConstrained() ) {
-                apriorisigmas[2] = point->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters();
-                  weights[2] = point->GetAprioriSurfacePoint().GetLocalRadiusWeight();
-              }
-              else if( m_dGlobalRadiusAprioriSigma > 0.0 ) {
-                  apriorisigmas[2] = m_dGlobalRadiusAprioriSigma;
-                  d = m_dGlobalRadiusAprioriSigma*0.001;
-                  weights[2] = 1.0/(d*d);
-              }
-          }
-
-//      dAprioriSigmaZ = point->GetAprioriSurfacePoint().GetZSigma();
-//        if(  dAprioriSigmaZ <= 0.0 || dAprioriSigmaZ >= 1000.0 ) {
-//          if( m_dGlobalSurfaceZAprioriSigma > 0.0 )
-//            dAprioriSigmaZ = m_dGlobalSurfaceZAprioriSigma;
-//        }
-//        apriorisigmas[2] = dAprioriSigmaZ;
-//
-//        if( dAprioriSigmaZ > 0.0 && dAprioriSigmaZ < 1000.0  ) {
-//          // We bundle in km and store in meters
-//          d = dAprioriSigmaZ * 0.001;
-//          weights[2] = 1.0/(d*d);
-//        }
-
+        }
       }
 
 //      printf("LatWt: %20.10lf LonWt: %20.10lf RadWt: %20.10lf\n",weights[0],weights[1],weights[2]);
@@ -5811,6 +5783,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     gp += PvlKeyword("SigmaX", toString(sigmaX), "mm");
     gp += PvlKeyword("SigmaY", toString(sigmaY), "mm");
 
+    if (m_maxLikelihoodFlag[m_maxLikelihoodIndex]) {  //if maximum likelihood estimation is being used
+      gp += PvlKeyword("Maximum_Likelihood_Tier: ", toString(m_maxLikelihoodIndex));
+      gp += PvlKeyword("Median_of_R^2_residuals: ", toString(m_maxLikelihoodMedianR2Residuals));
+    }
+
     std::ostringstream ostr;
     ostr<<gp<<endl;
     m_iterationSummary += QString::fromStdString(ostr.str());
@@ -5835,6 +5812,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     gp += PvlKeyword("Unknown_Parameters", toString(m_nUnknownParameters));
     gp += PvlKeyword("Degrees_of_Freedom", toString(m_nDegreesOfFreedom));
     gp += PvlKeyword("Rejected_Measures", toString(m_nRejectedObservations/2));
+
+    if (m_maxLikelihoodFlag[m_maxLikelihoodIndex]) {  //if maximum likelihood estimation is being used
+      gp += PvlKeyword("Maximum_Likelihood_Tier: ", toString(m_maxLikelihoodIndex));
+      gp += PvlKeyword("Median_of_R^2_residuals: ", toString(m_maxLikelihoodMedianR2Residuals));
+    }
 
     if ( m_bConverged ) {
         gp += PvlKeyword("Converged", "TRUE");

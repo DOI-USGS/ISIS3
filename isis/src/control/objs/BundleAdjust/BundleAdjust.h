@@ -151,6 +151,15 @@ namespace Isis {
    *                         statistic computations;bundleout.txt modifed to
    *                         show N/A for RMS, Min, Max of Radius Sigmas when
    *                         not solving for radius. References #783.
+   *   @history 201-11-12 Ken Edmundson Programmers Note. References #813, #1521, #1653
+   *                          #813 - info echoed to screen when using Maximum Likelihood
+   *                                 methods are now printed to print.prt file.
+   *                         #1521 - cout debug statements that appear on screen when updating
+   *                                 images removed from SpiceRotation.cpp
+   *                         #1653 - Constraints were being applied for "Free" points that have
+   *                                 constrained coordinates. Also found that a priori coordinates
+   *                                 for these points were not being computed in
+   *                                 ControlPoint::ComputeApriori, this has also been fixed.
    */
   class BundleAdjust {
     public:
@@ -673,6 +682,10 @@ namespace Isis {
       /**  Quantiles of the |residual| distribution to be used for tweaking constants of the maximum probability models
        */
       double m_maxLikelihoodQuan[3];
+
+      /** Median of R^2 residuals
+       */
+      double m_maxLikelihoodMedianR2Residuals;
 
       public: void maximumLikelihoodSetup( QList<QString> models, QList<double> quantiles );
   };

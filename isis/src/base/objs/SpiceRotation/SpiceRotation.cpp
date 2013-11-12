@@ -633,8 +633,13 @@ namespace Isis {
     // by converting it to the full Memcache and try to downsize it
     if (p_source == PolyFunctionOverSpice) {
       LineCache(tableName);
+
+      //std::cout << "Full cache size is " << p_cache.size() << endl;
+
       p_minimizeCache = Yes;
       LoadTimeCache();
+
+      //std::cout << "Minimized cache size is " << p_cache.size() << endl;
     }
 
     // Load the list of rotations and their corresponding times

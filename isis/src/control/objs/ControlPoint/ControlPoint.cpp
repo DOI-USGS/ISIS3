@@ -1018,6 +1018,8 @@ namespace Isis {
 
     // Don't goof with fixed points.  The lat/lon is what it is ... if
     // it exists!
+    // 2013-11-12 KLE I think this check should include points with any
+    // number of constrained coordinates???
     if (GetType() == Fixed) {
       if (!aprioriSurfacePoint.Valid()) {
         QString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
@@ -1084,12 +1086,23 @@ namespace Isis {
     }
 
     // Don't update the apriori x/y/z for fixed points  TODO This needs a closer look
-    if (GetType() == Fixed || NumberOfConstrainedCoordinates() == 3
+    if (GetType() == Free ) {
+      // point can be tagged as "Free" but still have constrained coordinates
+      // if tagged "Free" we want to compute approximate a priori coordinates
+    }
+    // if point is "Fixed" or otherwise constrained in one, two, or all three
+    // coordinates, then we use the a priori surface point coordinates that
+    // have been given via other means (e.g. through qnet or cneteditor)
+    // 2013-11-12 KLE Is the next check better as "if Fixed or if # of
+    // constrained coordinates > 1" ???
+    else if (GetType() == Fixed
+        || NumberOfConstrainedCoordinates() == 3
         || IsLatitudeConstrained()
+        || IsLongitudeConstrained()
         || IsRadiusConstrained()) {
-      // Initialize the adjusted x/y/z to the apriori in this case
+      
+      // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
-
 
       return Success;
     }
@@ -1102,7 +1115,8 @@ namespace Isis {
     }
 
     // Compute the averages
-    if (NumberOfConstrainedCoordinates() == 0) {
+    //if (NumberOfConstrainedCoordinates() == 0) {
+    if (GetType() == Free || NumberOfConstrainedCoordinates() == 0) {
       double avgX = xB / goodMeasures;
       double avgY = yB / goodMeasures;
       double avgZ = zB / goodMeasures;

@@ -173,6 +173,10 @@ namespace Isis {
    *                           class closer to Isis3 standards: moved method
    *                           implementation to cpp file, fixed documentation.
    *                           References #1248.
+   *   @history 2013-11-12 Ken Edmundson Programmers notes - Commented out cout
+   *                           debug statements on lines 637 and 642 that appeared
+   *                           onscreen during jigsaw runs when images are updated.
+   *                           References #1521.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */

@@ -326,6 +326,11 @@ namespace Isis {
    *                           of code.  Also revised 
    *                           ComputeResidualsMillimeters to make the radar
    *                           case handled the same as other instruments.
+   *   @history 2013-11-12 Ken Edmundson Programmer note:  Revised 
+   *                           ComputeApriori such that initial coordinates are
+   *                           computed for "Free" points that have constrained
+   *                           coordinates.
+   *                           References #1653.
    */
   class ControlPoint : public QObject {
 
