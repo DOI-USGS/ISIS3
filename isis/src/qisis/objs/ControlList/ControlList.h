@@ -104,7 +104,9 @@ namespace Isis {
        *
        * @author 2012-10-11 Tracie Sucharski - Adapted from Copy ImageDataFunctor
        *
-       * @internal
+       * @internal 
+       *   @history 2012-10-11 Tracie Sucharski - Original version. 
+       *  
        */
       class CopyControlDataFunctor : public std::unary_function<Control * const &, void *> {
         public:
@@ -122,10 +124,10 @@ namespace Isis {
       };
 
       /**
-       * @author 2012-09-27 Tracie Sucharski
+       * @author 2012-09-27 Tracie Sucharski - Adapted from ImageList::XmlHandler
        *
        * @internal 
-       *   @history Adapted from ImageList::XmlHandler
+       *   @history 2012-09-27 Tracie Sucharski - Original version.
        */
       class XmlHandler : public XmlStackedHandler {
         public:
