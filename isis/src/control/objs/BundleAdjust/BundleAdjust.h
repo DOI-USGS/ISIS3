@@ -151,7 +151,7 @@ namespace Isis {
    *                         statistic computations;bundleout.txt modifed to
    *                         show N/A for RMS, Min, Max of Radius Sigmas when
    *                         not solving for radius. References #783.
-   *   @history 201-11-12 Ken Edmundson Programmers Note. References #813, #1521, #1653
+   *   @history 2013-11-12 Ken Edmundson Programmers Note. References #813, #1521, #1653
    *                          #813 - info echoed to screen when using Maximum Likelihood
    *                                 methods are now printed to print.prt file.
    *                         #1521 - cout debug statements that appear on screen when updating
