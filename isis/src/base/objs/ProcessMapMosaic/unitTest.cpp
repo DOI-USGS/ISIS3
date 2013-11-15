@@ -87,7 +87,48 @@ void IsisMain() {
   }
 
   tmp.close();
-  remove("./unitTest.cub");
+  remove("./unitTest.cub");  // Create the temp parent cube
+
+  cout << endl << "Testing Mosaic where the input (x, y) is negative,"
+          " according to the output cube." << endl;
+  QString inputFile = "./unitTest1.cub";
+  Cube inCube;
+  inCube.open(inputFile);
+  PvlGroup mapGroup = inCube.label()->findGroup("Mapping", Pvl::Traverse);
+
+  mapGroup.addKeyword(PvlKeyword("MinimumLatitude",  toString(-4.9)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("MaximumLatitude",  toString(-4.7)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(30.7)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(31)), Pvl::Replace);
+  
+  inCube.close();
+  CubeAttributeOutput oAtt2( FileName("./unitTest3.cub") );
+  ProcessMapMosaic m3;
+  
+  m3.SetBandBinMatch(false);
+  m3.SetOutputCube(inputFile, mapGroup, oAtt2, "./unitTest3.cub");
+
+  //set priority
+  m3.SetImageOverlay(priority);
+  m3.SetHighSaturationFlag(false);
+  m3.SetLowSaturationFlag(false);
+  m3.SetNullFlag(false);
+
+  if(m3.StartProcess(inputFile)) {
+    cout << "The mosaic was successfull." << endl;
+  }
+  else {
+    cout << "The mosaic was not successfull." << endl;
+  }
+
+  m3.EndProcess();
+  cout << "Mosaic label: " << endl;
+
+  Pvl labels2("./unitTest3.cub");
+  cout << labels2 << endl;
+
+  remove("./unitTest3.cub");
+
 }
 
 

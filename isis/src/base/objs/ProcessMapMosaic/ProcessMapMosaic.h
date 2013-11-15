@@ -80,8 +80,11 @@ namespace Isis {
    *                           #1169.
    *   @history 2013-03-27 Jeannie Backer - Added programmer comments.
    *                           References #1248.
-   *  @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                           References #775.
+   *   @history 2013-11-14 Kimberly Oyama - Modified StartProcess() to account for a negative x
+   *                           or y from the projection. These x and y values are used to
+   *                           calculate the outline and outsample. Fixes #1736.
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
    *                          example to class documentation

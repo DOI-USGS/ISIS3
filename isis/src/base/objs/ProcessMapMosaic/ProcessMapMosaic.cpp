@@ -22,6 +22,7 @@
 #include "ProcessMapMosaic.h"
 
 #include <QTime>
+#include <QDebug>
 
 #include "Application.h"
 #include "IException.h"
@@ -89,9 +90,21 @@ namespace Isis {
     }
 
     int outSample, outSampleEnd, outLine, outLineEnd;
-    outSample = (int)(oproj->ToWorldX(iproj->ToProjectionX(1.0)) + 0.5);
-    outLine   = (int)(oproj->ToWorldY(iproj->ToProjectionY(1.0)) + 0.5);
-
+    
+    
+    if (oproj->ToWorldX(iproj->ToProjectionX(1.0)) < 0) {
+      outSample = (int)(oproj->ToWorldX(iproj->ToProjectionX(1.0)) - 0.5);
+    }
+    else {
+      outSample = (int)(oproj->ToWorldX(iproj->ToProjectionX(1.0)) + 0.5);
+    }
+    if (oproj->ToWorldY(iproj->ToProjectionY(1.0)) < 0) {
+      outLine   = (int)(oproj->ToWorldY(iproj->ToProjectionY(1.0)) - 0.5);
+    }
+    else {
+      outLine   = (int)(oproj->ToWorldY(iproj->ToProjectionY(1.0)) + 0.5);
+    }
+    
     int ins = InputCubes[0]->sampleCount();
     int inl =  InputCubes[0]->lineCount();
     outSampleEnd = outSample + ins;
