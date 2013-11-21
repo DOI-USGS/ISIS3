@@ -266,6 +266,10 @@
       "Related Objects and Documents" section of the documentation.
       Fixes mantis ticket #1525.
     </change>
+    <change name="Kimberly Oyama" date="2013-11-20">
+      The error thrown when the input is a projected image was misleading. It has been fixed to 
+      be more helpful for the user. Fixes #923.
+    </change>
   </history>
 
   <category>
