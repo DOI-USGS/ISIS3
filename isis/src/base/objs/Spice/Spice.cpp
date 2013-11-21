@@ -24,6 +24,7 @@
 #include <cfloat>
 #include <iomanip>
 
+#include <QDebug>
 #include <QVector>
 
 #include "Constants.h"
@@ -187,6 +188,14 @@ namespace Isis {
       // (2010-04-07) (DAC)
       if (kernels.hasKeyword("Extra")) {
         load(kernels["Extra"], noTables);
+      }
+
+      // If Target is Saturn and ShapeModel is RingPlane, load the extra rings pck file
+      //  which changes the prime meridian values to report longitudes with respect to
+      // the ascending node of the ringplane.
+      if (m_target->name().toUpper() == "SATURN" && m_target->shape()->name().toUpper() == "PLANE") {
+        PvlKeyword ringPck = PvlKeyword("RingPCK","$cassini/kernels/pck/saturnRings_v001.tpc");
+        load(ringPck, noTables);
       }
     }
     else {

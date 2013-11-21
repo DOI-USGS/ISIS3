@@ -257,6 +257,11 @@ namespace Isis {
    *                           condition that never exhibited any problems, but valgrind
    *                           caught it. This was discovered when adding support for Mac
    *                           OSX 10.8. References #1354.
+   *   @history 2013-09-26 Tracie Sucharski - If the Target is Saturn and the shape model
+   *                           is the ring plane, load an extra kernel, saturnRings_v001.tpc,
+   *                           which changes the prime meridian to {0, 0, 0}.  This insures
+   *                           the longitude values are calculated in the inertial system
+   *                           relative to the ascending node of the ring plane.  Fixes #1757.
    *                           
    */
   class Spice {
