@@ -239,7 +239,7 @@ void IsisMain() {
         results += pW360;
       }
     }
-
+        
     Application::Log(results);
 
     // Write an output label file if necessary
@@ -276,6 +276,21 @@ void IsisMain() {
           os.open(outFile.toAscii().data(), ios::out);
           writeHeader = true;
         }
+
+        // Rearrange the order of the lat/lons for the csv
+        results.deleteKeyword( pE360.name() );
+        results.deleteKeyword( pE180.name() );
+        results.deleteKeyword( pW360.name() );
+        results.deleteKeyword( pW180.name() );
+        results.deleteKeyword( centLat.name() );
+        results.deleteKeyword( graphLat.name() );
+        //Correct order.
+        results += centLat;
+        results += graphLat;
+        results += pE360;
+        results += pE180;
+        results += pW360;
+        results += pW180;
 
         if(writeHeader) {
           for(int i = 0; i < results.keywords(); i++) {
