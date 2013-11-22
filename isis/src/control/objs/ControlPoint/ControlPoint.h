@@ -329,8 +329,9 @@ namespace Isis {
    *   @history 2013-11-12 Ken Edmundson Programmer note:  Revised 
    *                           ComputeApriori such that initial coordinates are
    *                           computed for "Free" points that have constrained
-   *                           coordinates.
-   *                           References #1653.
+   *                           coordinates. References #1653.
+   *   @history 2013-11-13 Kimberly Oyama - Added missing member variables to == operator and
+   *                           made sure the comparisons are being done correctly. Fixes #1014.
    */
   class ControlPoint : public QObject {
 

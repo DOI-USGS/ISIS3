@@ -4,6 +4,7 @@
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
+#include <QDebug>
 #include <QHash>
 #include <QString>
 #include <QStringList>
@@ -1986,14 +1987,20 @@ namespace Isis {
         other.editLock == editLock &&
         other.ignore == ignore &&
         other.aprioriSurfacePointSource  == aprioriSurfacePointSource &&
-        other.aprioriSurfacePointSourceFile
-        == aprioriSurfacePointSourceFile &&
+        other.aprioriSurfacePointSourceFile == aprioriSurfacePointSourceFile &&
         other.aprioriRadiusSource  == aprioriRadiusSource &&
         other.aprioriRadiusSourceFile  == aprioriRadiusSourceFile &&
         other.aprioriSurfacePoint == aprioriSurfacePoint &&
         other.adjustedSurfacePoint == adjustedSurfacePoint &&
         other.invalid == invalid &&
-        other.measures == measures;
+        other.measures == measures &&
+        other.dateTime == dateTime &&
+        other.jigsawRejected == jigsawRejected &&
+        other.constraintStatus == constraintStatus &&
+        other.referenceExplicitlySet == referenceExplicitlySet &&
+        other.numberOfRejectedMeasures == numberOfRejectedMeasures &&
+        other.cubeSerials == cubeSerials &&
+        other.referenceMeasure == referenceMeasure;
   }
 
 
