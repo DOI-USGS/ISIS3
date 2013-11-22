@@ -76,160 +76,172 @@ void IsisMain() {
   // We want to delete the keywords we just added if the user wants the range
   // out of the mapfile, otherwise they will replace any keywords not in the
   // mapfile
-  if(ui.GetString("DEFAULTRANGE") == "MAP" || ui.GetBoolean("MATCHMAP")) {
+  
+  // Use the updated label to create the output projection
+  int samples, lines;
+  TProjection *outmap = NULL;
+  bool trim = ui.GetBoolean("TRIM");
+
+  if( !ui.GetBoolean("MATCHMAP") ) {
+    if(ui.GetString("DEFAULTRANGE") == "MAP") {
+      camGrp.deleteKeyword("MinimumLatitude");
+      camGrp.deleteKeyword("MaximumLatitude");
+      camGrp.deleteKeyword("MinimumLongitude");
+      camGrp.deleteKeyword("MaximumLongitude");
+    }
+    // Otherwise, remove the keywords from the map file so the camera keywords
+    // will be propogated correctly
+    else {
+      while(userGrp.hasKeyword("MinimumLatitude")) {
+        userGrp.deleteKeyword("MinimumLatitude");
+      }
+      while(userGrp.hasKeyword("MinimumLongitude")) {
+        userGrp.deleteKeyword("MinimumLongitude");
+      }
+      while(userGrp.hasKeyword("MaximumLatitude")) {
+        userGrp.deleteKeyword("MaximumLatitude");
+      }
+      while(userGrp.hasKeyword("MaximumLongitude")) {
+        userGrp.deleteKeyword("MaximumLongitude");
+      }
+    }
+
+    // If the user decided to enter a ground range then override
+    if( ui.WasEntered("MINLON") ) {
+      userGrp.addKeyword(PvlKeyword("MinimumLongitude",
+                                    toString(ui.GetDouble("MINLON"))), Pvl::Replace);
+    }
+
+    if( ui.WasEntered("MAXLON") ) {
+      userGrp.addKeyword(PvlKeyword("MaximumLongitude",
+                                    toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
+    }
+
+    if( ui.WasEntered("MINLAT") ) {
+      userGrp.addKeyword(PvlKeyword("MinimumLatitude",
+                                    toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
+    }
+
+    if( ui.WasEntered("MAXLAT") ) {
+      userGrp.addKeyword(PvlKeyword("MaximumLatitude",
+                                    toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
+    }
+
+    // If they want the res. from the mapfile, delete it from the camera so
+    // nothing gets overriden
+    if(ui.GetString("PIXRES") == "MAP") {
+      camGrp.deleteKeyword("PixelResolution");
+    }
+    // Otherwise, delete any resolution keywords from the mapfile so the camera
+    // info is propogated over
+    else if(ui.GetString("PIXRES") == "CAMERA") {
+      if(userGrp.hasKeyword("Scale")) {
+        userGrp.deleteKeyword("Scale");
+      }
+      if(userGrp.hasKeyword("PixelResolution")) {
+        userGrp.deleteKeyword("PixelResolution");
+      }
+    }
+
+    // Copy any defaults that are not in the user map from the camera map file
+    for(int k = 0; k < camGrp.keywords(); k++) {
+      if(!userGrp.hasKeyword(camGrp[k].name())) {
+        userGrp += camGrp[k];
+      }
+    }
+
+    // If the user decided to enter a resolution then override
+    if(ui.WasEntered("PIXRES")) {
+      if(ui.GetString("PIXRES") == "MPP") {
+        userGrp.addKeyword(PvlKeyword("PixelResolution",
+                                      toString(ui.GetDouble("RESOLUTION"))),
+                          Pvl::Replace);
+        if(userGrp.hasKeyword("Scale")) {
+          userGrp.deleteKeyword("Scale");
+        }
+      }
+      else if(ui.GetString("PIXRES") == "PPD") {
+        userGrp.addKeyword(PvlKeyword("Scale",
+                                      toString(ui.GetDouble("RESOLUTION"))),
+                          Pvl::Replace);
+        if(userGrp.hasKeyword("PixelResolution")) {
+          userGrp.deleteKeyword("PixelResolution");
+        }
+      }
+    }
+
+    // See if the user want us to handle the longitude seam
+
+
+    if( (ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") ) {
+      if(incam->IntersectsLongitudeDomain(userMap)) {
+        if(ui.GetString("LONSEAM") == "AUTO") {
+          if((int) userGrp["LongitudeDomain"] == 360) {
+            userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"), Pvl::Replace);
+            if(incam->IntersectsLongitudeDomain(userMap)) {
+              // Its looks like a global image so switch back to the users preference
+              userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
+            }
+          }
+          else {
+            userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
+            if(incam->IntersectsLongitudeDomain(userMap)) {
+              // Its looks like a global image so switch back to the
+              // users preference
+              userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"), Pvl::Replace);
+            }
+          }
+          // Make the target info match the new longitude domain
+          double minlat, maxlat, minlon, maxlon;
+          incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
+          if(!ui.WasEntered("MINLAT")) {
+            userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+          }
+          if(!ui.WasEntered("MAXLAT")) {
+            userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+          }
+          if(!ui.WasEntered("MINLON")) {
+            userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+          }
+          if(!ui.WasEntered("MAXLON")) {
+            userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
+          }
+        }
+
+        else if(ui.GetString("LONSEAM") == "ERROR") {
+          QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
+                        "longitude seam";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+      }
+    }
+
+    // Determine the image size
+    if(ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
+      outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, *incam);
+      trim = false;
+    }
+    else {//if(ui.GetString("DEFAULTRANGE") == "CAMERA" || DEFAULTRANGE = MAP) {
+      outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, false);
+    }
+//     else {
+//       outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, false);
+//     }
+  }
+  else { // MATCHMAP=TRUE
+    //does this have any affect on anything?
     camGrp.deleteKeyword("MinimumLatitude");
     camGrp.deleteKeyword("MaximumLatitude");
     camGrp.deleteKeyword("MinimumLongitude");
     camGrp.deleteKeyword("MaximumLongitude");
-  }
-  // Otherwise, remove the keywords from the map file so the camera keywords
-  // will be propogated correctly
-  else {
-    while(userGrp.hasKeyword("MinimumLatitude")) {
-      userGrp.deleteKeyword("MinimumLatitude");
-    }
-    while(userGrp.hasKeyword("MinimumLongitude")) {
-      userGrp.deleteKeyword("MinimumLongitude");
-    }
-    while(userGrp.hasKeyword("MaximumLatitude")) {
-      userGrp.deleteKeyword("MaximumLatitude");
-    }
-    while(userGrp.hasKeyword("MaximumLongitude")) {
-      userGrp.deleteKeyword("MaximumLongitude");
-    }
-  }
-
-  // If the user decided to enter a ground range then override
-  if(ui.WasEntered("MINLON") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MinimumLongitude",
-                                  toString(ui.GetDouble("MINLON"))), Pvl::Replace);
-  }
-
-  if(ui.WasEntered("MAXLON") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MaximumLongitude",
-                                  toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
-  }
-
-  if(ui.WasEntered("MINLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MinimumLatitude",
-                                  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
-  }
-
-  if(ui.WasEntered("MAXLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("MaximumLatitude",
-                                  toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
-  }
-
-  // If they want the res. from the mapfile, delete it from the camera so
-  // nothing gets overriden
-  if(ui.GetString("PIXRES") == "MAP" || ui.GetBoolean("MATCHMAP")) {
     camGrp.deleteKeyword("PixelResolution");
-  }
-  // Otherwise, delete any resolution keywords from the mapfile so the camera
-  // info is propogated over
-  else if(ui.GetString("PIXRES") == "CAMERA") {
-    if(userGrp.hasKeyword("Scale")) {
-      userGrp.deleteKeyword("Scale");
-    }
-    if(userGrp.hasKeyword("PixelResolution")) {
-      userGrp.deleteKeyword("PixelResolution");
-    }
+    // Copy any defaults that are not in the user map from the camera map file
+    outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap,
+                                                              samples,
+                                                              lines,
+                                                              true);//change usrmap to camgrp?
   }
 
-  // Copy any defaults that are not in the user map from the camera map file
-  for(int k = 0; k < camGrp.keywords(); k++) {
-    if(!userGrp.hasKeyword(camGrp[k].name())) {
-      userGrp += camGrp[k];
-    }
-  }
-
-  // If the user decided to enter a resolution then override
-  if(ui.GetString("PIXRES") == "MPP" && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("PixelResolution",
-                                  toString(ui.GetDouble("RESOLUTION"))),
-                       Pvl::Replace);
-    if(userGrp.hasKeyword("Scale")) {
-      userGrp.deleteKeyword("Scale");
-    }
-  }
-  else if(ui.GetString("PIXRES") == "PPD" && !ui.GetBoolean("MATCHMAP")) {
-    userGrp.addKeyword(PvlKeyword("Scale",
-                                  toString(ui.GetDouble("RESOLUTION"))),
-                       Pvl::Replace);
-    if(userGrp.hasKeyword("PixelResolution")) {
-      userGrp.deleteKeyword("PixelResolution");
-    }
-  }
-
-  // See if the user want us to handle the longitude seam
-  if((ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") &&
-      !ui.GetBoolean("MATCHMAP")) {
-    if(incam->IntersectsLongitudeDomain(userMap)) {
-      if(ui.GetString("LONSEAM") == "AUTO") {
-        if((int) userGrp["LongitudeDomain"] == 360) {
-          userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"),
-                             Pvl::Replace);
-          if(incam->IntersectsLongitudeDomain(userMap)) {
-            // Its looks like a global image so switch back to the
-            // users preference
-            userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"),
-                               Pvl::Replace);
-          }
-        }
-        else {
-          userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"),
-                             Pvl::Replace);
-          if(incam->IntersectsLongitudeDomain(userMap)) {
-            // Its looks like a global image so switch back to the
-            // users preference
-            userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"),
-                               Pvl::Replace);
-          }
-        }
-        // Make the target info match the new longitude domain
-        double minlat, maxlat, minlon, maxlon;
-        incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
-        if(!ui.WasEntered("MINLAT")) {
-          userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
-        }
-        if(!ui.WasEntered("MAXLAT")) {
-          userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
-        }
-        if(!ui.WasEntered("MINLON")) {
-          userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
-        }
-        if(!ui.WasEntered("MAXLON")) {
-          userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
-        }
-      }
-
-      else if(ui.GetString("LONSEAM") == "ERROR") {
-        QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
-                      "longitude seam";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-    }
-  }
-
-  // Use the updated label to create the output projection
-  int samples, lines;
-  TProjection *outmap;
-  bool trim;
-
-  // Determine the image size
-  if(ui.GetString("DEFAULTRANGE") == "MINIMIZE" && !ui.GetBoolean("MATCHMAP")) {
-    outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, *incam);
-    trim = false;
-  }
-  else if(ui.GetString("DEFAULTRANGE") == "CAMERA" && !ui.GetBoolean("MATCHMAP")) {
-    outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, false);
-    trim = ui.GetBoolean("TRIM");
-  }
-  else { // DEFAULTRANGE = MAP
-    outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines,
-             ui.GetBoolean("MATCHMAP"));
-    trim = ui.GetBoolean("TRIM");
-  }
 
   // Output the mapping group used to the Gui session log
   PvlGroup cleanMapping = outmap->Mapping();
@@ -292,12 +304,11 @@ void IsisMain() {
                                    icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
 
-    if (ui.WasEntered("PATCHSIZE")) {
-      int patchSize = ui.GetInteger("PATCHSIZE");
-      if (patchSize <= 1) patchSize = 3; // Make the patchsize reasonable
-      p.setPatchParameters(1, 1, patchSize, patchSize, 
-                           patchSize-1, patchSize-1);
+    int patchSize = ui.GetInteger("PATCHSIZE");
+    if (patchSize <= 1) {
+      patchSize = 3; // Make the patchsize reasonable
     }
+    p.setPatchParameters(1, 1, patchSize, patchSize, patchSize-1, patchSize-1);
 
     p.processPatchTransform(*transform, *interp);
   }
@@ -307,12 +318,13 @@ void IsisMain() {
                                    icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
 
-    if (ui.WasEntered("PATCHSIZE")) {
-      int patchSize = ui.GetInteger("PATCHSIZE");
-      int minPatchSize = 4;
-      if (patchSize < minPatchSize) minPatchSize = patchSize;
-      p.SetTiling(patchSize, minPatchSize);
+    int patchSize = ui.GetInteger("PATCHSIZE");
+    int minPatchSize = 4;
+    if (patchSize < minPatchSize) {
+      minPatchSize = patchSize;
     }
+    p.SetTiling(patchSize, minPatchSize);
+
 
     p.StartProcess(*transform, *interp);
   }
