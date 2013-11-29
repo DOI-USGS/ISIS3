@@ -437,7 +437,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
 
   if (iof) {
     Pvl *label = icube->label();
-    Spice spicegll(*label);
+    Spice spicegll(*icube);
     spicegll.instrumentPosition()->SetAberrationCorrection("LT+S");
     QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
     Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
