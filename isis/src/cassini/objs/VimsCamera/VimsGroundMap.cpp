@@ -23,8 +23,10 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QDebug>
 #include <QVector>
 
+#include "BasisFunction.h"
 #include "Camera.h"
 #include "Constants.h"
 #include "Distance.h"
@@ -51,27 +53,6 @@ namespace Isis {
    */
   VimsGroundMap::VimsGroundMap(Camera *parent, Pvl &lab) :
     CameraGroundMap(parent) {
-    // Init(lab);
-    p_minLat = NULL;
-    p_maxLat = NULL;
-    p_minLon = NULL;
-    p_maxLon = NULL;
-    p_minRadius = NULL;
-    p_maxRadius = NULL;
-    p_latMap = NULL;
-    p_lonMap = NULL;
-    p_radiusMap = NULL;
-
-    p_minLat = new Latitude();
-    p_maxLat = new Latitude();
-    p_minLon = new Longitude();
-    p_maxLon = new Longitude();
-    p_minRadius = new Distance();
-    p_maxRadius = new Distance();
-
-    p_latMap = new QVector< QVector<Latitude> >(64, QVector<Latitude>(64));
-    p_lonMap = new QVector< QVector<Longitude> >(64, QVector<Longitude>(64));
-    p_radiusMap = new QVector< QVector<Distance> >(64, QVector<Distance>(64));
 
     if (parent->ParentSamples() > 64 || parent->ParentLines() > 64) {
       IString msg = "The Vims ground map does not understand cubes that "
@@ -80,55 +61,15 @@ namespace Isis {
     }
   }
 
+
+
   /**
    * Destroys the VimsGroundMap object
    */
   VimsGroundMap::~VimsGroundMap() {
-    if(p_minLat) {
-      delete p_minLat;
-      p_minLat = NULL;
-    }
-
-    if(p_maxLat) {
-      delete p_maxLat;
-      p_minLat = NULL;
-    }
-
-    if(p_minLon) {
-      delete p_minLon;
-      p_minLon = NULL;
-    }
-
-    if(p_maxLon) {
-      delete p_maxLon;
-      p_maxLon = NULL;
-    }
-
-    if(p_minRadius) {
-      delete p_minRadius;
-      p_minRadius = NULL;
-    }
-
-    if(p_maxRadius) {
-      delete p_maxRadius;
-      p_maxRadius = NULL;
-    }
-
-    if(p_latMap) {
-      delete p_latMap;
-      p_latMap = NULL;
-    }
-
-    if(p_lonMap) {
-      delete p_lonMap;
-      p_lonMap = NULL;
-    }
-
-    if(p_radiusMap) {
-      delete p_radiusMap;
-      p_radiusMap = NULL;
-    }
   }
+
+
 
   /**
    * Initialize vims camera model
@@ -154,6 +95,16 @@ namespace Isis {
    *   @history 2009-08-06 Tracie Sucharski, Bug in unit vector change made
    *                           on 2008-02-05, had the incorrect boresight for
    *                           VIS Hires.
+   *   @history 2013-09-09 Tracie Sucharski, Turns out the times in the labels
+   *                          are NOT corrected, so the corrections NEED to happen in the
+   *                          code.  There was discussion among UofA Vims and PDS about reproducing
+   *                          PDS archive with labels corrected, but the decision was made to
+   *                          perform the correction in the code and leave the archive alone.
+   *                          Some history:  08-23-2004 Rick McCloskey gave me the correction to
+   *                          put in the code since he said the label values were incorrect.
+   *                          11-27-2006 John Ivens said the labels values were corrected, so I
+   *                          removed the correction factor from the code.
+   *                          For more info, See previous history entries: 2007-04-18.                                                       
    */
   void VimsGroundMap::Init(Pvl &lab) {
 
@@ -172,10 +123,9 @@ namespace Isis {
     //  Because of inaccuracy with the 15 Mhz clock, the IR exposure and
     //  interline delay need to be adjusted.
     //----------------------------------------------------------------------
-    p_irExp = (double) inst ["ExposureDuration"] / 1000.;
-    p_visExp = toDouble(inst ["ExposureDuration"][1]) / 1000.;
-    p_interlineDelay =
-      (double) inst ["InterlineDelayDuration"] / 1000.;
+    p_irExp = (toDouble(inst ["ExposureDuration"][0]) * 1.01725) / 1000.;
+    p_visExp = (toDouble(inst ["ExposureDuration"][1])) / 1000.;
+    p_interlineDelay = (toDouble(inst ["InterlineDelayDuration"]) * 1.01725) / 1000.;
 
     // Get summation mode
     QString sampMode = QString((QString)inst ["SamplingMode"]).toUpper();
@@ -188,15 +138,15 @@ namespace Isis {
     p_swathWidth = inst ["SwathWidth"];
     p_swathLength = inst ["SwathLength"];
 
-    if(p_channel == "VIS") {
-      if(sampMode == "NORMAL") {
+    if (p_channel == "VIS") {
+      if (sampMode == "NORMAL") {
         p_xPixSize = p_yPixSize = 0.00051;
         p_xBore = p_yBore = 31;
         p_camSampOffset = sampOffset - 1;
         p_camLineOffset = lineOffset - 1;
 
       }
-      else {
+      else if (sampMode == "HI-RES") {
         p_xPixSize = p_yPixSize = 0.00051 / 3.0;
         p_xBore = p_yBore = 94;
         //New as of 2009-08-04 per Dyer Lytle's email
@@ -205,15 +155,19 @@ namespace Isis {
         p_camSampOffset = (3 * (sampOffset + p_swathWidth / 2)) - p_swathWidth / 2;
         p_camLineOffset = (3 * (lineOffset + p_swathLength / 2)) - p_swathLength / 2;
       }
+      else {
+        string msg = "Unsupported SamplingMode [" + IString(sampMode) + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
     }
-    else if(p_channel == "IR") {
-      if(sampMode == "NORMAL") {
+    else if (p_channel == "IR") {
+      if (sampMode == "NORMAL") {
         p_xPixSize = p_yPixSize = 0.000495;
         p_xBore = p_yBore = 31;
         p_camSampOffset = sampOffset - 1;
         p_camLineOffset = lineOffset - 1;
       }
-      if(sampMode == "HI-RES") {
+      else if (sampMode == "HI-RES") {
         p_xPixSize = 0.000495 / 2.0;
         p_yPixSize = 0.000495;
         p_xBore = 62.5;
@@ -221,18 +175,18 @@ namespace Isis {
         p_camSampOffset = 2 * ((sampOffset - 1) + ((p_swathWidth - 1) / 4));
         p_camLineOffset = lineOffset - 1;
       }
-      if(sampMode == "NYQUIST") {
-        string msg = "Cannot process NYQUIST(undersampled) mode ";
-        throw IException(IException::Io, msg, _FILEINFO_);
+      else {
+        string msg = "Unsupported SamplingMode [" + IString(sampMode) + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
     //---------------------------------------------------------------------
     //  Loop for each pixel in cube, get pointing information and calculate
-    //  control point (line,sample,lat,lon) for later use in latlon_to_linesamp.
+    //  control point (line, sample, x, y, z) for later use in latlon_to_linesamp.
     //---------------------------------------------------------------------
     p_camera->IgnoreProjection(true);
-    for(int line = 0; line < p_camera->ParentLines(); line++) {
+    for (int line = 0; line < p_camera->ParentLines(); line++) {
 
       //  VIS exposure is for a single line.  According to SIS,
       //  NATIVE_START_TIME is for the first pixel of the IR exposure.
@@ -240,49 +194,32 @@ namespace Isis {
       //   IrExposMsec - VisExposMsec)/2".
       //  This needs to be moved to forward routine
 
-      if(p_channel == "VIS") {
+      if (p_channel == "VIS") {
         double et = ((double)p_etStart + (((p_irExp * p_swathWidth) - p_visExp) / 2.)) +
                     ((line + 0.5) * p_visExp);
         p_camera->setTime(et);
       }
 
-      for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
-        if(p_channel == "IR") {
+      for (int samp = 0; samp < p_camera->ParentSamples(); samp++) {
+        if (p_channel == "IR") {
           double et = (double)p_etStart +
                       (line * p_camera->ParentSamples() * p_irExp) +
                       (line * p_interlineDelay) + ((samp + 0.5) * p_irExp);
           p_camera->setTime(et);
         }
 
-        if(p_camera->SetImage((double) samp + 1, (double)line + 1)) {
-          const Latitude &latitude = p_camera->GetLatitude();
-          const Longitude &longitude = p_camera->GetLongitude();
-          Distance radius = p_camera->LocalRadius();
+        if (p_camera->SetImage((double) samp + 1, (double)line + 1)) {
+          double xyz[3];
+          p_camera->Coordinate(xyz);
 
-          // could do
-          // double lat = this->UniversalLatitude ()
-          if(!p_minLat->isValid() || latitude < *p_minLat)
-            *p_minLat = latitude;
-          if(!p_maxLat->isValid() || latitude > *p_maxLat)
-            *p_maxLat = latitude;
-          if(!p_minLon->isValid() || longitude < *p_minLon)
-            *p_minLon = longitude;
-          if(!p_maxLon->isValid() || longitude > *p_maxLon)
-            *p_maxLon = longitude;
-
-          if (!p_minRadius->isValid() || radius < *p_minRadius)
-            *p_minRadius = radius;
-          if (!p_maxRadius->isValid() || radius > *p_maxRadius)
-            *p_maxRadius = radius;
-
-
-          (*p_latMap)[line][samp] = latitude;
-          (*p_lonMap)[line][samp] = longitude;
-          (*p_radiusMap)[line][samp] = radius;
+          if (xyz[0] != Null && xyz[1] != Null && xyz[2] != Null) {
+            p_xyzMap[line][samp].setX(xyz[0]);
+            p_xyzMap[line][samp].setY(xyz[1]);
+            p_xyzMap[line][samp].setZ(xyz[2]);
+          }
         }
       }
     }
-
     p_camera->IgnoreProjection(false);
   }
 
@@ -318,7 +255,7 @@ namespace Isis {
     double imgSamp = ux;
     double imgLine = uy;
 
-    if((imgLine < 0.5) || (imgLine > p_camera->ParentLines() + 0.5) ||
+    if ((imgLine < 0.5) || (imgLine > p_camera->ParentLines() + 0.5) ||
         (imgSamp < 0.5) || (imgSamp > p_camera->ParentSamples() + 0.5)) {
       return false;
     }
@@ -328,11 +265,11 @@ namespace Isis {
     // does interline_delay & exposure-duration account for summing modes?
     // if not, won't use p_parentLine/p_parentSample
     double et = 0.;
-    if(p_channel == "VIS") {
+    if (p_channel == "VIS") {
       et = (p_etStart + ((p_irExp * p_swathWidth) - p_visExp) / 2.) +
            ((imgLine + 0.5) * p_visExp);
     }
-    else if(p_channel == "IR") {
+    else if (p_channel == "IR") {
       et = (double)p_etStart +
            (imgLine * p_camera->ParentSamples() * p_irExp) +
            (imgLine * p_interlineDelay) + ((imgSamp + 0.5) * p_irExp);
@@ -346,15 +283,6 @@ namespace Isis {
     SpiceDouble unitLookC[3];
     vhat_c(lookC, unitLookC);
     return p_camera->SetLookDirection(unitLookC);
-  }
-
-  bool VimsGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
-    if (p_camera->target()->shape()->name() == "Plane") {
-        double radius = lat.degrees();
-        return SetGroundwithRadiusLongitude(radius, lon);
-      }
-    else
-      return SetGroundwithLatitudeLongitude(lat, lon);
   }
 
 
@@ -387,39 +315,46 @@ namespace Isis {
    *                            data, therefore we cannot back project, so return false.
    *
    */
-  bool VimsGroundMap::SetGroundwithLatitudeLongitude(const Latitude &lat,
-                                                     const Longitude &lon) {
+  bool VimsGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
 
-    if (!p_minLat->isValid() || !p_minLon->isValid() ||
-        !p_maxLat->isValid() || !p_maxLon->isValid()) return false;
+    QVector3D xyz;
+    if (p_camera->target()->shape()->name() == "Plane") {
+        double radius = lat.degrees();
+        if(radius <= 0.0)
+          return false;
 
-    if (lat < *p_minLat || lat > *p_maxLat) return false;
-    if (lon < *p_minLon || lon > *p_maxLon) return false;
+        double xCheck = radius * 0.001 * cos(lon.radians());
+        double yCheck = radius * 0.001 * sin(lon.radians());
 
-    //  Find closest points  ??? what tolerance ???
-    double minDist = 9999.;
+        xyz.setX(xCheck);
+        xyz.setY(yCheck);
+        xyz.setZ(0.);
+      }
+    else {
+        //  Convert lat/lon to x/y/z
+        Distance radius = p_camera->LocalRadius(lat, lon);
+        SpiceDouble pB[3];
+        latrec_c(radius.kilometers(), lon.radians(), lat.radians(), pB);
+
+        xyz.setX(pB[0]);
+        xyz.setY(pB[1]);
+        xyz.setZ(pB[2]);
+    }
+
+    double minDist = DBL_MAX;
     int minSamp = -1;
     int minLine = -1;
 
-    for(int line = 0; line < p_camera->ParentLines(); line++) {
+    //  Find closest points  ??? what tolerance ???
+    for (int line = 0; line < p_camera->ParentLines(); line++) {
+      for (int samp = 0; samp < p_camera->ParentSamples(); samp++) {
 
-      for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
-        const Latitude &mapLat = (*p_latMap)[line][samp];
-        if(!mapLat.isValid()) continue;
-        Longitude mapLon = (*p_lonMap)[line][samp];
-        if(!mapLon.isValid()) continue;
+        if (p_xyzMap[line][samp].isNull()) continue;
 
-        //  If on boundary convert lons.  If trying to find 360, convert
-        //  lons on other side of meridian to values greater than 360.  If
-        //  trying to find 1.0, convert lons on other side to negative numbers.
-        WrapWorldToBeClose(lon, mapLon);
-
-        Angle deltaLat = lat - mapLat;
-        Angle deltaLon = lon - mapLon;
-        double dist = (deltaLat.radians() * deltaLat.radians()) +
-                      (deltaLon.radians() * deltaLon.radians());
-        if(dist < minDist) {
-          minDist = dist;
+        //  Subtract map from coordinate then get length
+        QVector3D deltaXyz = xyz - p_xyzMap[line][samp];
+        if (deltaXyz.length() < minDist) {
+          minDist = deltaXyz.length();
           minSamp = samp;
           minLine = line;
         }
@@ -431,84 +366,51 @@ namespace Isis {
     //  closest point.  Use this point and surrounding 8 pts as
     //  control pts.
     //----------------------------------------------------------------
-    if(minDist >= 9999.) return false;
+    if (minDist >= DBL_MAX) return false;
 
-    //-----------------------------------------------------------------
-    //  Test for reasonable point using resolution.
-    //-----------------------------------------------------------------
-#if 0
-      p_camera->IgnoreProjection(true);
-      p_camera->SetImage(minSamp + 1, minLine + 1);
-      p_camera->IgnoreProjection(false);
-
-      double radii[3];
-      p_camera->radii(radii);
-      double degPerSamp =
-        1.0 / ((rpd_c() * radii[0] * 1000.) / p_camera->SampleResolution());
-      double degPerLine =
-        1.0 / ((rpd_c() * radii[0] * 1000.) / p_camera->LineResolution());
-
-      // Convert lon if needed
-      double mapLon = p_lonMap[minLine][minSamp];
-      if(abs(mapLon - lon) > 180) {
-        if((lon - mapLon) > 0) {
-          mapLon = 360. + mapLon;
-        }
-        else if((lon - mapLon) < 0) {
-          mapLon = mapLon - 360.;
-        }
-      }
-      if(abs(p_latMap[minLine][minSamp] - lat) > (degPerLine * 5.) ||
-          abs(mapLon - lon) > (degPerSamp * 5.))
-        return false;
-#endif
     //-------------------------------------------------------------
     //  Set-up for LU decomposition (least2 fit).
     //  Assume we will have 9 control points, this may not be true
     //  and will need to be adjusted before the final solution.
     //-------------------------------------------------------------
-    PolynomialBivariate sampBasis(1);
-    PolynomialBivariate lineBasis(1);
-    LeastSquares sampLsq(sampBasis);
-    LeastSquares lineLsq(lineBasis);
-    vector<double> known(2);
+    BasisFunction sampXyzBasis("Sample", 4, 4);
+    BasisFunction lineXyzBasis("Line", 4, 4);
+    LeastSquares sampXyzLsq(sampXyzBasis);
+    LeastSquares lineXyzLsq(lineXyzBasis);
+    vector<double> knownXyz(4);
 
-    for(int line = minLine - 1; line < minLine + 2; line++) {
-      if(line < 0 || line > p_camera->ParentLines() - 1) continue;
-      for(int samp = minSamp - 1; samp < minSamp + 2; samp++) {
+    //  Solve using x/y/z
+    for (int line = minLine - 1; line < minLine + 2; line++) {
+      if (line < 0 || line > p_camera->ParentLines() - 1) continue;
+      for (int samp = minSamp - 1; samp < minSamp + 2; samp++) {
         //  Check for edges
-        if(samp < 0 || samp > p_camera->ParentSamples() - 1) continue;
+        if (samp < 0 || samp > p_camera->ParentSamples() - 1) continue;
+        if (p_xyzMap[line][samp].isNull()) continue;
 
-        Latitude mapLat = (*p_latMap)[line][samp];
-        Longitude mapLon = (*p_lonMap)[line][samp];
-        if((!mapLat.isValid()) || (!mapLon.isValid())) continue;
-
-        //  If on boundary convert lons.  If trying to find 360, convert
-        //  lons on other side of meridian to values greater than 360.  If
-        //  trying to find 1.0, convert lons on other side to negative numbers.
-        WrapWorldToBeClose(lon, mapLon);
-
-        known[0] = mapLat.degrees();
-        known[1] = mapLon.degrees();
-        sampLsq.AddKnown(known, samp + 1);
-        lineLsq.AddKnown(known, line + 1);
+        knownXyz[0] = p_xyzMap[line][samp].x();
+        knownXyz[1] = p_xyzMap[line][samp].y();
+        knownXyz[2] = p_xyzMap[line][samp].z();
+        knownXyz[3] = 1;
+        sampXyzLsq.AddKnown(knownXyz, samp + 1);
+        lineXyzLsq.AddKnown(knownXyz, line + 1);
       }
     }
-    if(sampLsq.Knowns() < 3) return false;
 
-    sampLsq.Solve();
-    lineLsq.Solve();
+    if (sampXyzLsq.Knowns() < 4) return false;
 
-    //  Solve for new sample position
-    known[0] = lat.degrees();
-    known[1] = lon.degrees();
-    double inSamp = sampLsq.Evaluate(known);
-    double inLine = lineLsq.Evaluate(known);
+    sampXyzLsq.Solve();
+    lineXyzLsq.Solve();
 
-// OLD CODE:  Why < 0 and not < 1???
-//      if (inSamp < 0 || inSamp > p_camera->ParentSamples() + 0.5 ||
-//          inLine < 0 || inLine > p_camera->ParentLines() + 0.5) {
-    if(inSamp < 0.5 || inSamp > p_camera->ParentSamples() + 0.5 ||
+    //  Solve for sample, line position corresponding to input lat, lon
+    knownXyz[0] = xyz.x();
+    knownXyz[1] = xyz.y();
+    knownXyz[2] = xyz.z();
+    knownXyz[3] = 1;
+    double inSamp = sampXyzLsq.Evaluate(knownXyz);
+    double inLine = lineXyzLsq.Evaluate(knownXyz);
+
+
+    if (inSamp < 0.5 || inSamp > p_camera->ParentSamples() + 0.5 ||
         inLine < 0.5 || inLine > p_camera->ParentLines() + 0.5) {
       return false;
     }
@@ -516,217 +418,12 @@ namespace Isis {
     p_camera->IgnoreProjection(true);
     p_camera->SetImage(inSamp, inLine);
     p_camera->IgnoreProjection(false);
-    if(!p_camera->HasSurfaceIntersection()) return false;
+    if (!p_camera->HasSurfaceIntersection()) return false;
 
     p_focalPlaneX = inSamp;
     p_focalPlaneY = inLine;
 
     return true;
-  }
-
-
-  /** Compute undistorted focal plane coordinate from ground position
-   *
-   * @param lat Planetocentric latitude in degrees
-   * @param lon Planetocentric longitude in degrees
-   *
-   * @return @b bool Indicates whether the conversion was successful
-   *
-   * @internal
-   * @history 2007-04-18  Tracie Sucharski - Added check for reasonable
-   *                             match when attempting to find closest
-   *                             lat/lon in map arrays.
-   * @history 2007-09-14  Tracie Sucharski - Added check for longitude
-   *                             outside min/max bounds.  Don't know why
-   *                             this wasn't put in before (lat check was
-   *                             in), was it oversight, or did I take it out
-   *                             for some reason???
-   * @history 2007-12-14  Tracie Sucharski - Remove resolution test, too
-   *                            image dependent and the resolution for vims is
-   *                            incorrect due to the instrument having
-   *                            rectangular pixels.
-   * @history 2008-01-02  Tracie Sucharski -  Check validity of resulting
-   *                            sample and line against edge of starting
-   *                            ending pixels (0.5/Parent+0.5) instead of
-   *                            center of pixels.
-   *
-   */
-  bool VimsGroundMap::SetGroundwithRadiusLongitude(const double &radius,
-                                                   const Longitude &lon) {
-
-    if(radius <= 0.0)
-      return false;
-
-    //double dlon = lon.degrees();
-    //double dminlon = p_minLon->degrees();
-    //double dmaxlon = p_maxLon->degrees();
-
-    if(lon < *p_minLon || lon > *p_maxLon)
-      return false;
-
-    double xCheck = radius * 0.001 * cos(lon.radians());
-    double yCheck = radius * 0.001 * sin(lon.radians());
-
-    //  Find closest points  ??? what tolerance ???
-    double minDist = 99999999999.;
-    int minSamp = -1;
-    int minLine = -1;
-
-    for(int line = 0; line < p_camera->ParentLines(); line++) {
-
-      for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
-
-        const Distance &mapRadius = (*p_radiusMap)[line][samp];
-        if (!mapRadius.isValid())
-          continue;
-
-        Longitude mapLon = (*p_lonMap)[line][samp];
-        if (!mapLon.isValid())
-          continue;
-
-        //  If on boundary convert lons.  If trying to find 360, convert
-        //  lons on other side of meridian to values greater than 360.  If
-        //  trying to find 1.0, convert lons on other side to negative numbers.
-        WrapWorldToBeClose(lon, mapLon);
-
-        double x = mapRadius.kilometers() * cos(mapLon.radians());
-        double y = mapRadius.kilometers() * sin(mapLon.radians());
-
-        double dx = x - xCheck;
-        double dy = y - yCheck;
-        double dist = dx*dx + dy*dy;
-        if(dist < minDist) {
-          minDist = dist;
-          minSamp = samp;
-          minLine = line;
-        }
-      }
-    }
-
-    //-----------------------------------------------------------------
-    //  If dist is less than some ??? tolerance ??? this is the
-    //  closest point.  Use this point and surrounding 8 pts as
-    //  control pts.
-    //----------------------------------------------------------------
-    //if(minDist >= 9999.) return false;
-
-    //-----------------------------------------------------------------
-    //  Test for reasonable point using resolution.
-    //-----------------------------------------------------------------
-#if 0
-      p_camera->IgnoreProjection(true);
-      p_camera->SetImage(minSamp + 1, minLine + 1);
-      p_camera->IgnoreProjection(false);
-
-      double radii[3];
-      p_camera->radii(radii);
-      double degPerSamp =
-        1.0 / ((rpd_c() * radii[0] * 1000.) / p_camera->SampleResolution());
-      double degPerLine =
-        1.0 / ((rpd_c() * radii[0] * 1000.) / p_camera->LineResolution());
-
-      // Convert lon if needed
-      double mapLon = p_lonMap[minLine][minSamp];
-      if(abs(mapLon - lon) > 180) {
-        if((lon - mapLon) > 0) {
-          mapLon = 360. + mapLon;
-        }
-        else if((lon - mapLon) < 0) {
-          mapLon = mapLon - 360.;
-        }
-      }
-      if(abs(p_latMap[minLine][minSamp] - lat) > (degPerLine * 5.) ||
-          abs(mapLon - lon) > (degPerSamp * 5.))
-        return false;
-#endif
-    //-------------------------------------------------------------
-    //  Set-up for LU decomposition (least2 fit).
-    //  Assume we will have 9 control points, this may not be true
-    //  and will need to be adjusted before the final solution.
-    //-------------------------------------------------------------
-    PolynomialBivariate sampBasis(1);
-    PolynomialBivariate lineBasis(1);
-    LeastSquares sampLsq(sampBasis);
-    LeastSquares lineLsq(lineBasis);
-    vector<double> known(2);
-
-    for(int line = minLine - 1; line < minLine + 2; line++) {
-      if (line < 0 || line > p_camera->ParentLines() - 1)
-        continue;
-
-      for(int samp = minSamp - 1; samp < minSamp + 2; samp++) {
-        //  Check for edges
-        if (samp < 0 || samp > p_camera->ParentSamples() - 1)
-          continue;
-
-        Distance mapRadius = (*p_radiusMap)[line][samp];
-        Longitude mapLon = (*p_lonMap)[line][samp];
-        if ((!mapRadius.isValid()) || (!mapLon.isValid()))
-          continue;
-
-        //  If on boundary convert lons.  If trying to find 360, convert
-        //  lons on other side of meridian to values greater than 360.  If
-        //  trying to find 1.0, convert lons on other side to negative numbers.
-        WrapWorldToBeClose(lon, mapLon);
-
-//        known[0] = mapRadius.kilometers();
-        known[0] = mapRadius.meters();
-        known[1] = mapLon.degrees();
-        sampLsq.AddKnown(known, samp + 1);
-        lineLsq.AddKnown(known, line + 1);
-      }
-    }
-    if(sampLsq.Knowns() < 3) return false;
-
-    sampLsq.Solve();
-    lineLsq.Solve();
-
-    //  Solve for new sample position
-    known[0] = radius;
-    known[1] = lon.degrees();
-    double inSamp = sampLsq.Evaluate(known);
-    double inLine = lineLsq.Evaluate(known);
-
-// OLD CODE:  Why < 0 and not < 1???
-//      if (inSamp < 0 || inSamp > p_camera->ParentSamples() + 0.5 ||
-//          inLine < 0 || inLine > p_camera->ParentLines() + 0.5) {
-    if(inSamp < 0.5 || inSamp > p_camera->ParentSamples() + 0.5 ||
-        inLine < 0.5 || inLine > p_camera->ParentLines() + 0.5) {
-      return false;
-    }
-
-    p_camera->IgnoreProjection(true);
-    p_camera->SetImage(inSamp, inLine);
-    p_camera->IgnoreProjection(false);
-    if(!p_camera->HasSurfaceIntersection()) return false;
-
-    p_focalPlaneX = inSamp;
-    p_focalPlaneY = inLine;
-
-    return true;
-  }
-
-
-  /**
-   * If on boundary convert longitude values.  If trying to find 360, convert
-   * longitude values on other side of meridian to values greater than 360.  If
-   * trying to find 1.0, convert longitude values on other side to negative
-   * numbers.
-   *
-   * This modifies lon2 and leaves lon1 alone.
-   * @param lon1 Longitude value 1
-   * @param lon2 Longitude value to be modified.
-   */
-  void VimsGroundMap::WrapWorldToBeClose(const Longitude &lon1,
-                                         Longitude &lon2) {
-    if(abs((lon1 - lon2).degrees()) > 180) {
-      if(lon1 > lon2) {
-        lon2 += Angle(360, Angle::Degrees);
-      }
-      else {
-        lon2 -= Angle(360, Angle::Degrees);
-      }
-    }
   }
 
 
@@ -740,8 +437,8 @@ namespace Isis {
    * @internal
    */
   bool VimsGroundMap::SetGround(const SurfacePoint &surfacePoint) {
-//    return SetGround(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
-    return SetGroundwithLatitudeLongitude(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
+    return SetGround(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
+//    return SetGroundwithLatitudeLongitude(surfacePoint.GetLatitude(), surfacePoint.GetLongitude());
   }
 
 

@@ -23,10 +23,14 @@
  */
 
 #include "Spice.h"
+
+#include <QList>
+#include <QPointF>
+
 #include "Cube.h"
-#include "ProjectionFactory.h"
-#include "Portal.h"
 #include "Interpolator.h"
+#include "Portal.h"
+#include "ProjectionFactory.h"
 
 namespace Isis {
   class Distance;
@@ -187,6 +191,10 @@ namespace Isis {
    *                           #775 and #1114
    *   @history 2012-10-25 Jeannie Backer - Changed resolution() method to lower
    *                           camel case. References #1181.
+   *   @history 2012-03-04 Tracie Sucharski - Added new method, PixelIfovOffsets, which will return
+   *                           the ifov offsets from the center of the pixel in mm.  This is a
+   *                           virtual method and if not implemented in the specific instrument
+   *                           camera, this class will throw an error.  References #1604.
    */
   class Sensor : public Spice {
     public:
@@ -246,6 +254,8 @@ namespace Isis {
         return 1.0;
       };
       void IgnoreElevationModel(bool ignore);
+
+      virtual QList<QPointF> PixelIfovOffsets();
 
     private:
       // This version of DemRadius is for SetLookDirection ONLY. Do not call.

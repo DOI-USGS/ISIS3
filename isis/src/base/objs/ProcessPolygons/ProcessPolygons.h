@@ -2,6 +2,7 @@
 #define ProcessPolygons_h
 
 #include <geos/geom/Coordinate.h>
+#include <geos/geom/MultiPolygon.h>
 #include <geos/geom/Polygon.h>
 
 #include "Brick.h"
@@ -22,6 +23,15 @@ namespace Isis {
    *   @history 2012-02-24 Steven Lambright - Added Finalize()
    *   @history 2013-03-27 Jeannie Backer - Added programmer comments.
    *                           References #1248.
+   *   @history 2013-02-06 Tracie Sucharski - Improved speed by adding BoxcarCaching Algorithm
+   *                           for I/O, using prepared polygons for the intersections and read/write
+   *                           the entire spectra for the input pixel rather than one band at a
+   *                           time.  References #1289.
+   *   @history 2013-09-10 Stuart Sides, Tracie Sucharski - Cleaned up code, added additional error
+   *                           checks for valid polygons, added option to check for either input
+   *                           pixel intersecting the center of the output pixel or any part of the
+   *                           output pixel.  References #1604.
+   *                          
    */
   class ProcessPolygons : public Isis::Process {
 
@@ -38,6 +48,7 @@ namespace Isis {
       void SetOutputCube(const QString &avgFileName, const QString
                          &countFileName, Isis::CubeAttributeOutput &atts,
                          const int nsamps, const int nlines, int nbands = 1);
+      void SetIntersectAlgorithm(const bool useCenter);
 
       Isis::Cube *AppendOutputCube(const QString &avgFileName,
                                    const QString &countFileName = "");
@@ -50,22 +61,19 @@ namespace Isis {
                      std::vector<double> &lines,
                      int &band, double &value);
 
-
       void EndProcess();
       void Finalize();
 
     private:
-      void DoWork(int Flag);
       void FillPolygon(int Flag);
       void GetPolygonCoords();
-      std::vector<double> p_samples, p_lines, p_values;
-      std::vector<geos::geom::Coordinate> p_polygonCoordinates;
-      double p_value;
-      int p_band;
-      Brick *p_brick1;
-      Brick *p_brick2;
-      geos::geom::Polygon *p_imagePoly;
 
+      bool m_useCenter;
+      std::vector<double> m_sampleVertices, m_lineVertices, m_dns;
+      int m_band;
+      Brick *m_average;
+      Brick *m_count;
+      geos::geom::Polygon *m_imagePoly;
 
   };
 

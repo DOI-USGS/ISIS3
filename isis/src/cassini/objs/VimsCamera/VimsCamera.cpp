@@ -26,6 +26,10 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QDebug>
+#include <QList>
+#include <QPointF>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -61,24 +65,54 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString channel = (QString) inst ["Channel"];
 
-    // Set Frame mounting
-
-    if(channel == "VIS") {
+    //  Vims pixel pitch is not always square, but Isis does not have the ability to store
+    //  more than a single value for pixel pitch.  Member variables for pixelPitch x and y
+    //  were created for proper calculation of ifov.
+    if (channel == "VIS") {
       //LoadFrameMounting ("CASSINI_SC_COORD","CASSINI_VIMS_V");
 
       SetFocalLength(143.0);
-      if(QString((QString)inst["SamplingMode"]).toUpper() == "NORMAL") {
+      if (QString((QString)inst["SamplingMode"]).toUpper() == "NORMAL") {
         SetPixelPitch(3 * .024);
+        // Should this .506?  According to 2002 paper ground calibration shows .506 +/- .003 mrad
+        m_pixelPitchX = 0.024 * 3;
+        m_pixelPitchY = 0.024 * 3;
+      }
+      else if (QString((QString)inst["SamplingMode"]).toUpper() == "HI-RES") {
+        SetPixelPitch(.024);
+        m_pixelPitchX = 0.024;
+        m_pixelPitchY = 0.024;
+      }
+      else if (QString((QString)inst["SamplingMode"]).toUpper() == "UNDER") {
+        QString msg = "Isis cannot process images with a SamplingMode = \"UNDER\" (or NYQUIST)";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       else {
-        SetPixelPitch(.024);
+        QString msg = "Unknown SamplingMode [" + (QString) inst["SamplingMode"] + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
-    else if(channel == "IR") {
+    else if (channel == "IR") {
       //LoadFrameMounting ("CASSINI_SC_COORD","CASSINI_VIMS_IR");
 
       SetFocalLength(426.0);
       SetPixelPitch(.2);
+      if (QString((QString)inst["SamplingMode"]).toUpper() == "NORMAL") {
+        m_pixelPitchX = 0.2;
+        m_pixelPitchY = 0.2;
+      }
+      else if (QString((QString)inst["SamplingMode"]).toUpper() == "HI-RES") {
+        m_pixelPitchX = 0.103;
+        m_pixelPitchY = 0.2;
+      }
+      else if (QString((QString)inst["SamplingMode"]).toUpper() == "UNDER") {
+        QString msg = "Isis cannot process images with a SamplingMode = \"UNDER\" (or NYQUIST)";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      else {
+        QString msg = "Unknown SamplingMode [" + (QString) inst["SamplingMode"] + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
     }
 
     // Get the start time in et
@@ -123,13 +157,13 @@ namespace Isis {
 
     double tol = PixelResolution();
 
-    if(tol < 0.) {
+    if (tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
       tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 1000. / 100.;
     }
 
-    if(channel == "VIS") createCache(etStart, etStop, 64 * 64, tol);
-    if(channel == "IR") createCache(etStart, etStop, 64 * 64, tol);
+    if (channel == "VIS") createCache(etStart, etStop, 64 * 64, tol);
+    if (channel == "IR") createCache(etStart, etStop, 64 * 64, tol);
 
     //  Call SetImage so that the et is reset to beginning of image w/o
     //   padding.
@@ -139,8 +173,43 @@ namespace Isis {
     NaifStatus::CheckErrors();
     return;
   }
-}
 
+
+  /**
+   * Returns the pixel ifov offsets from center of pixel.  For vims this will be a rectangle or 
+   * square, depending on the sampling mode.  The first vertex is the top left. 
+   *  
+   * @internal 
+   *   @history 2013-08-09 Tracie Sucharski - Add more vertices along each edge.  This might need
+   *                          to be a user parameter evenually?  Might be dependent on resolution.
+   */
+   QList<QPointF> VimsCamera::PixelIfovOffsets() {
+
+     QList<QPointF> offsets;
+
+     //  Create 100 pts on each edge of pixel
+     int npts = 100;
+
+     //  Top edge of pixel
+     for (double x = -m_pixelPitchX / 2.0; x <= m_pixelPitchX / 2.0; x += m_pixelPitchX / (npts-1)) {
+       offsets.append(QPointF(x, -m_pixelPitchY / 2.0));
+     }
+     //  Right edge of pixel
+     for (double y = -m_pixelPitchY / 2.0; y <= m_pixelPitchY / 2.0; y += m_pixelPitchY / (npts-1)) {
+       offsets.append(QPointF(m_pixelPitchX / 2.0, y));
+     }
+     //  Bottom edge of pixel
+     for (double x = m_pixelPitchX / 2.0; x >= -m_pixelPitchX / 2.0; x -= m_pixelPitchX / (npts-1)) {
+       offsets.append(QPointF(x, m_pixelPitchY / 2.0));
+     }
+     //  Left edge of pixel
+     for (double y = m_pixelPitchY / 2.0; y >= -m_pixelPitchY / 2.0; y -= m_pixelPitchY / (npts-1)) {
+       offsets.append(QPointF(-m_pixelPitchX / 2.0, y));
+     }
+
+     return offsets;
+   }
+}
 
 // Plugin
 /** 

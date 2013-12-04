@@ -1,8 +1,15 @@
 #include "ProcessGroundPolygons.h"
 
-#include <geos/geosAlgorithm.h>
+#include <vector>
+
+#include "geos/geom/CoordinateSequence.h"
+#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/LineString.h"
+#include "geos/geosAlgorithm.h"
 
 #include "Application.h"
+#include "BoxcarCachingAlgorithm.h"
+#include "IException.h"
 #include "PolygonTools.h"
 #include "Projection.h"
 
@@ -12,6 +19,7 @@ namespace Isis {
   ProcessGroundPolygons::ProcessGroundPolygons() {
     p_groundMap = NULL;
   }
+
 
   /**
    * This method gets called from the application with the lat/lon
@@ -26,10 +34,70 @@ namespace Isis {
   void ProcessGroundPolygons::Rasterize(std::vector<double> &lat,
                                         std::vector<double> &lon,
                                         std::vector<double> &values) {
-    Convert(lat, lon);
-    ProcessPolygons::Rasterize(p_samples, p_lines, values);
 
+    // Decide if we need to split the poly on the 360 boundry
+    // Yes, we can do this better. The lat and lon vectors should be passed in as polygons, but
+    // for now this is reusing older code.
+    bool crosses = false;
+    for (unsigned int i = 0; i < lon.size() - 1; i++) {
+      if (fabs(lon[i] - lon[i+1]) > 180.0) {
+        crosses = true;
+        break;
+      }
+    }
+
+    if (crosses) {
+      // Make a polygon from the lat/lon vectors and split it on 360
+      geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+      for (unsigned int i = 0; i < lat.size(); i++) {
+        pts->add(geos::geom::Coordinate(lon[i], lat[i]));
+      }
+      pts->add(geos::geom::Coordinate(lon[0], lat[0]));
+
+      geos::geom::Polygon *crossingPoly = Isis::globalFactory.createPolygon(
+          globalFactory.createLinearRing(pts), NULL);
+
+      geos::geom::MultiPolygon *splitPoly = NULL;
+      try {
+        splitPoly = PolygonTools::SplitPolygonOn360(crossingPoly);
+      }
+      // Ignore any pixel footprints that could not be split. This should only be pixels
+      // that contain the pole.
+      catch (IException &) {
+        // See leading comment
+      }
+
+      delete crossingPoly;
+
+      if (splitPoly != NULL) {
+        // Process the polygons in the split multipolygon as if we were still using the lat/lon vectors
+        for (unsigned int g = 0; g < splitPoly->getNumGeometries(); ++g) {
+          const geos::geom::Polygon *poly = 
+              dynamic_cast<const geos::geom::Polygon *>(splitPoly->getGeometryN(g));
+
+          geos::geom::CoordinateSequence *llcoords = poly->getExteriorRing()->getCoordinates();
+
+          // Move each coordinate in the exterior ring of this lat/lon polygon to vectors
+          // Ignore any holes in the polygon
+          std::vector<double> tlat;
+          std::vector<double> tlon;
+          for (unsigned int cord = 0; cord < llcoords->getSize() - 1; ++cord) {
+            tlon.push_back(llcoords->getAt(cord).x);
+            tlat.push_back(llcoords->getAt(cord).y);
+          }
+
+          Convert(tlat, tlon);
+          ProcessPolygons::Rasterize(p_samples, p_lines, values);
+        }
+        delete splitPoly;
+      }
+    }
+    else {
+      Convert(lat, lon);
+      ProcessPolygons::Rasterize(p_samples, p_lines, values);
+    }
   }
+
 
   /**
    * This method gets called from the application with the lat/lon
@@ -47,16 +115,8 @@ namespace Isis {
 
     Convert(lat, lon);
     ProcessPolygons::Rasterize(p_samples, p_lines, band, value);
-
   }
 
-  void ProcessGroundPolygons::Rasterize(double &lat, double &lon,
-                                        int &band, double &value) {
-
-    Convert(lat, lon);
-    ProcessPolygons::Rasterize(p_samples, p_lines, band, value);
-
-  }
 
   /**
    * Converts lat/long to line/sample using the universal ground
@@ -70,64 +130,15 @@ namespace Isis {
 
     p_samples.clear();
     p_lines.clear();
-    double sample = 1;
-    double line = 1;
-    //double midSample, midLine;
-    for(unsigned int i = 0; i < lat.size(); i++) {
-      //std::cout << "ProcessGroundPolygons::Convert i = " << i << std::endl;
-      if(p_groundMap->SetUniversalGround(lat[i], lon[i])) {
 
-        sample = p_groundMap->Sample();
-        line = p_groundMap->Line();
-        p_samples.push_back(sample);
-        p_lines.push_back(line);
-        //std::cout << "sample = " << sample << " Line = " << line << std::endl;
-
-        /*if(i>0) {
-          std::cout << "Calculated:: midSample = " << (p_samples[i]+p_samples[i-1])/2 <<
-                                    " midLine = " << (p_lines[i]+p_lines[i-1])/2<< std::endl;
-
-          //get the actual numbers
-          p_groundMap->SetUniversalGround(lat[i], (lon[i-1]+lon[i])/2);
-          midSample = p_groundMap->Sample();
-          p_groundMap->SetUniversalGround((lat[i-1]+lat[i])/2, lon[i]);
-          midLine = p_groundMap->Line();
-
-          std::cout << "Actual:: midSample = " << midSample << " midLine = " << midLine << "\n\n" <<std::endl;
-        }*/
-
+    for (unsigned int i = 0; i < lat.size(); i++) {
+      if (p_groundMap->SetUniversalGround(lat[i], lon[i])) {
+        p_samples.push_back(p_groundMap->Sample());
+        p_lines.push_back(p_groundMap->Line());
       }
-      else {
-        p_samples.push_back(sample);
-        p_lines.push_back(line);
-
-      }
-
-    }/* end for loop*/
-
-  }
-
-  void ProcessGroundPolygons::Convert(double &lat, double &lon) {
-
-    p_samples.clear();
-    p_lines.clear();
-    double sample = 1;
-    double line = 1;
-    //std::cout << "\n\nProcessGroundPolygons::Convert " << std::endl;
-    //std::cout << "lat = " << lat << " Lon = " << lon << std::endl;
-    //std::cout << "ProcessGroundPolygons::Convert i = " << i << std::endl;
-    if(p_groundMap->SetUniversalGround(lat, lon)) {
-
-      sample = p_groundMap->Sample();
-      line = p_groundMap->Line();
-      //std::cout << "sample = " << sample << " Line = " << line << std::endl;
-      p_samples.push_back(sample);
-      p_lines.push_back(line);
-
     }
-
-
   }
+
 
   /**
    * This method cleans up any open outputcube files and deletes
@@ -145,6 +156,7 @@ namespace Isis {
     ProcessPolygons::EndProcess();
   }
 
+
   /**
    * This method cleans up any open outputcube files and deletes
    * the pointer to the universal ground map if there was one
@@ -159,6 +171,7 @@ namespace Isis {
 
     ProcessPolygons::Finalize();
   }
+
 
   /**
    * This gives the option to append to the cube
@@ -176,6 +189,7 @@ namespace Isis {
     ProcessPolygons::AppendOutputCube(avgFileName, countFileName);
 
   }
+
 
   /**
    * This method creates two cubes and creates a universal ground
@@ -203,6 +217,9 @@ namespace Isis {
 
     this->Process::SetOutputCube(avgFileName, outAtts, nSamples, nLines, nBands);
     this->Process::SetOutputCube(countFileName, outAtts, nSamples, nLines, nBands);
+
+    OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+    OutputCubes[1]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
     ClearInputCubes();
 
@@ -234,6 +251,7 @@ namespace Isis {
     SetOutputCube(avgString, countString, atts, cube);
 
   }
+
 
   /**
    *
@@ -281,6 +299,9 @@ namespace Isis {
     this->ProcessPolygons::SetOutputCube(avgFileName, countFileName, atts,
                                          samples, lines, bands);
 
+    OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+    OutputCubes[1]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+
     /*Write the pvl group to the cube files.*/
 
     PvlGroup group = map.findGroup("Mapping", Pvl::Traverse);
@@ -293,7 +314,6 @@ namespace Isis {
 
     delete proj;
   }
-
 
 } /* end namespace isis*/
 

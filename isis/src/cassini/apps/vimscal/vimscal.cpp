@@ -295,7 +295,7 @@ void calculateSpecificEnergy(Cube *icube) {
     coefficient /= toDouble(inst["ExposureDuration"][1]) / 1000.0;
   }
   else {
-    coefficient /= (toDouble(inst["ExposureDuration"][0])) / 1000.0 - 0.004;
+    coefficient /= (toDouble(inst["ExposureDuration"][0]) * 1.01725) / 1000.0 - 0.004;
   }
 
   QString specEnergyFile = "$cassini/calibration/vims/";

@@ -22,6 +22,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QDebug>
+
 #include "Camera.h"
 #include "FileName.h"
 #include "IException.h"
@@ -65,7 +67,6 @@ namespace Isis {
    *                     *Reference:  email from John Ivens 11/27/2006.
    */
   void VimsSkyMap::Init(Pvl &lab) {
-
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     //  Vis or IR
@@ -82,10 +83,9 @@ namespace Isis {
     //  Because of inaccuracy with the 15 Mhz clock, the IR exposure and
     //  interline delay need to be adjusted.
     //----------------------------------------------------------------------
-    p_irExp = (double) inst ["ExposureDuration"] / 1000.;
+    p_irExp = (toDouble(inst ["ExposureDuration"][0]) * 1.01725) / 1000.;
     p_visExp = toDouble(inst ["ExposureDuration"][1]) / 1000.;
-    p_interlineDelay =
-      (double) inst ["InterlineDelayDuration"] / 1000.;
+    p_interlineDelay = (toDouble(inst ["InterlineDelayDuration"]) * 1.01725) / 1000.;
 
     // Get summation mode
     QString sampMode = QString((QString)inst ["SamplingMode"]).toUpper();
@@ -98,103 +98,50 @@ namespace Isis {
     p_swathWidth = inst ["SwathWidth"];
     p_swathLength = inst ["SwathLength"];
 
-    //-----------------------------------------------------------------------
-    // Set up correct limits for unit vector file,  calculate offsets and
-    //  Read unit vectors.
-    //-----------------------------------------------------------------------
-    //int code = naifIkCode();
-    //string key = "INS" + IString(code) + "_UNIT_VECTORS";
-    //FileName vectorFile(Spice::getString(key,0));
-    //tack on _HR or _NY for other summing modes.
-    // Get the directory for the unit vector files.
-    PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-    QString vecDir = (QString) dataDir["Cassini"] + "/unitVectors/";
-
-    FileName vectorFile;
-    if(p_channel == "VIS") {
-      if(sampMode == "NORMAL") {
-        vectorFile = vecDir + "VIS_NORMAL_uv.bin";
-        p_nsUv = 64;
-        p_nlUv = 64;
+    if (p_channel == "VIS") {
+      if (sampMode == "NORMAL") {
+        p_xPixSize = p_yPixSize = 0.00051;
+        p_xBore = p_yBore = 31;
         p_camSampOffset = sampOffset - 1;
+        p_camLineOffset = lineOffset - 1;
+
+      }
+      else if (sampMode == "HI-RES") {
+        p_xPixSize = p_yPixSize = 0.00051 / 3.0;
+        p_xBore = p_yBore = 94;
+        //New as of 2009-08-04 per Dyer Lytle's email
+        // Old Values:p_camSampOffset = 3 * (sampOffset - 1) + p_swathWidth;
+        //            p_camLineOffset = 3 * (lineOffset - 1) + p_swathLength;
+        p_camSampOffset = (3 * (sampOffset + p_swathWidth / 2)) - p_swathWidth / 2;
+        p_camLineOffset = (3 * (lineOffset + p_swathLength / 2)) - p_swathLength / 2;
+      }
+      else {
+        string msg = "Unsupported SamplingMode [" + IString(sampMode) + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    else if (p_channel == "IR") {
+      if (sampMode == "NORMAL") {
+        p_xPixSize = p_yPixSize = 0.000495;
+        p_xBore = p_yBore = 31;
+        p_camSampOffset = sampOffset - 1;
+        p_camLineOffset = lineOffset - 1;
+      }
+      else if (sampMode == "HI-RES") {
+        p_xPixSize = 0.000495 / 2.0;
+        p_yPixSize = 0.000495;
+        p_xBore = 62.5;
+        p_yBore = 31;
+        p_camSampOffset = 2 * ((sampOffset - 1) + ((p_swathWidth - 1) / 4));
         p_camLineOffset = lineOffset - 1;
       }
       else {
-        vectorFile = vecDir + "VIS_HI-RES_uv.bin";
-        p_nsUv = 192;
-        p_nlUv = 192;
-
-        p_camSampOffset = 3 * (sampOffset - 1) + p_swathWidth;
-        p_camLineOffset = 3 * (lineOffset - 1) + p_swathLength;
-        /*p_camLineOffset = 3 * (lineOffset - 1) + swathLength - 6;*/
-        /*p_camLineOffset = 93 - (3 * (lineOffset - 1)) - swathLength;*/
-        /*  This is in range of 450 (top) to -537 (boresight at 0).  */
-        /*  The unit Vector file is in the range 94 to -98 (boresight at 0).  */
-        /*  Change to 0 to 191 range for indexing into uv file.   */
-        /*p_camLineOffset = p_camLineOffset + 94;*/
-      }
-    }
-    else if(p_channel == "IR") {
-      if(sampMode == "NORMAL") {
-        vectorFile = vecDir + "IR_NORMAL_uv.bin";
-        p_nsUv = 64;
-        p_nlUv = 64;
-        p_camSampOffset = sampOffset - 1;
-        p_camLineOffset = lineOffset - 1;
-      }
-      if(sampMode == "HI-RES") {
-        vectorFile = vecDir + "IR_HI-RES_uv.bin";
-        p_nsUv = 128;
-        p_nlUv = 64;
-        p_camSampOffset = 2 * ((sampOffset - 1) + ((p_swathWidth - 1) / 4));
-        p_camLineOffset = lineOffset - 1;
-        /*  camSampOffset = 2 * (sampOffset - 1);   SHIFT TOO FAR TO RIGHT    */
-        /*sampOffset = sampOffset * 2;*/
-      }
-      if(sampMode == "NYQUIST") {
-        string msg = "Cannot process NYQUIST(undersampled) mode ";
-        throw IException(IException::Io, msg, _FILEINFO_);
+        string msg = "Unsupported SamplingMode [" + IString(sampMode) + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
-    ifstream fin;
-    QString vectorFileName(vectorFile.expanded());
-    fin.open(vectorFileName.toAscii().data(), ios::in | ios::binary);
-    if(!fin.is_open()) {
-      string msg = "Can't open unit vector file";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-    //  Read correct band
-    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    /  DONT FORGET TO TAKE THIS OUT WHEN WE HAVE UNIT VECTORS FOR ALL BANDS.
-    /  This needs to be smartened up for different summing modes.        */
-
-    int band = 0;
-    int startByte = (band * (p_nsUv * p_nlUv * 3)) * 8;
-    fin.seekg(startByte, ios_base::beg);
-
-    for(int line = 0; line < p_nlUv; line++) {
-      for(int samp = 0; samp < p_nsUv; samp++) {
-        fin.read((char *)&p_unitVector[line][samp][0], sizeof(double));
-        fin.read((char *)&p_unitVector[line][samp][1], sizeof(double));
-        fin.read((char *)&p_unitVector[line][samp][2], sizeof(double));
-      }
-    }
-
-    //  Rotate unit vector -90 degrees around the x-axis to match the
-    //  boresight defined in the frames kernel.
-    SpiceDouble Z[3] = {1., 0., 0.};
-    SpiceDouble newvec[3];
-
-    for(int line = 0; line < p_nlUv; line++) {
-      for(int samp = 0; samp < p_nsUv; samp++) {
-        vrotv_c(&p_unitVector[line][samp][0], Z, -1.570796327, newvec);
-        memcpy(&p_unitVector[line][samp][0], &newvec, 3 * sizeof(SpiceDouble));
-      }
-    }
-    fin.close();
-
-    //  Calculate lat/lon maps
+    //  Calculate ra/dec maps
     for(int line = 0; line < p_camera->ParentLines(); line++) {
       for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
         p_raMap[line][samp] = Isis::NULL8;
@@ -264,12 +211,15 @@ namespace Isis {
    */
   bool VimsSkyMap::SetFocalPlane(const double ux, const double uy,
                                  const double uz) {
+    p_ux = ux;
+    p_uy = uy;
+    p_uz = uz;
 
-    int imgSamp = (int)(ux + .5);
-    int imgLine = (int)(uy + .5);
+    double imgSamp = ux;
+    double imgLine = uy;
 
-    if((imgLine < 1) || (imgLine > p_camera->ParentLines()) ||
-        (imgSamp < 1) || (imgSamp > p_camera->ParentSamples())) {
+    if((imgLine < 0.5) || (imgLine > p_camera->ParentLines() + 0.5) ||
+       (imgSamp < 0.5) || (imgSamp > p_camera->ParentSamples() + 0.5)) {
       return false;
     }
     imgLine--;
@@ -289,18 +239,8 @@ namespace Isis {
     }
     p_camera->setTime(et);
 
-    // Make sure line/samp fall within unitVector ,if not return false???
-    int uvLine = imgLine + p_camLineOffset;
-    int uvSamp = imgSamp + p_camSampOffset;
-    if(uvSamp < 0 || uvSamp > p_nsUv ||
-        uvLine < 0 || uvLine > p_nlUv) {
-      return false;
-    }
-
     SpiceDouble lookC[3];
-    lookC[0] = p_unitVector[uvLine][uvSamp][0];
-    lookC[1] = p_unitVector[uvLine][uvSamp][1];
-    lookC[2] = p_unitVector[uvLine][uvSamp][2];
+    LookDirection(lookC);
 
     SpiceDouble unitLookC[3];
     vhat_c(lookC, unitLookC);
@@ -422,5 +362,34 @@ namespace Isis {
     p_focalPlaneY = inLine;
 
     return true;
+  }
+
+
+  /**
+   * Determines the look direction in the camera coordinate system
+   *
+   * @param  [out]  v   Look direction vector in camera coordinates
+   *
+   * This method will compute the look direction vector in the camera coordinate
+   * system.  This code was converted from Rick McCloskey's point_tbl c
+   * code.
+   *
+   * @internal
+   *   @history 2008-01-03  Tracie Sucharski - Converted Rick'scode rather than using the unitVector
+   *                     files from Rick.
+   *   @history 2013-11-18  Tracie Sucharski - Added this method to VimsSkyMap,so that old
+   *                           unitVector files are no longer needed.
+   */
+  void VimsSkyMap::LookDirection(double v[3]) {
+    double x = p_ux - 1. + p_camSampOffset;
+    double y = p_uy - 1. + p_camLineOffset;
+
+    //  Compute pointing angles based on pixel size separation
+    double theta = Isis::HALFPI - (y - p_yBore) * p_yPixSize;
+    double phi = (-1. * Isis::HALFPI) + (x - p_xBore) * p_xPixSize;
+
+    v[0] = sin(theta) * cos(phi);
+    v[1] = cos(theta);
+    v[2] = sin(theta) * sin(phi) / -1.;
   }
 }

@@ -24,7 +24,7 @@
 
 Group=UserInterface
   ProgressBarPercent = 10
-  ProgressBar        = On
+  ProgressBar        = Off
   GuiHelpBrowser     = firefox
   GuiFontName        = helvitica
   GuiFontSize        = 10

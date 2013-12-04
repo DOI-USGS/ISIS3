@@ -1,7 +1,7 @@
-
 #include "ProcessPolygons.h"
 #include "PolygonTools.h"
 #include "Application.h"
+#include "BoxcarCachingAlgorithm.h"
 #include "SpecialPixel.h"
 
 #include "geos/geom/CoordinateSequence.h"
@@ -11,6 +11,8 @@
 #include "geos/geom/LineString.h"
 #include "geos/geom/Geometry.h"
 #include "geos/geom/Point.h"
+#include "geos/geom/prep/PreparedGeometryFactory.h"
+#include "geos/geom/prep/PreparedPolygon.h"
 #include "geos/util/IllegalArgumentException.h"
 #include "geos/operation/overlay/snap/GeometrySnapper.h"
 
@@ -18,8 +20,13 @@ using namespace std;
 namespace Isis {
 
   ProcessPolygons::ProcessPolygons() {
-
+    m_useCenter = true;
+    m_average = NULL;
+    m_count = NULL;
+    m_imagePoly = NULL;
   }
+
+
 
   /**
    *
@@ -31,16 +38,18 @@ namespace Isis {
   void ProcessPolygons::Rasterize(std::vector<double> &samples,
                                   std::vector<double> &lines,
                                   std::vector<double> &values) {
-    p_samples = samples;
-    p_lines = lines;
-    p_values = values;
-    DoWork(0);
-    //FillPolygon(0);
 
+    m_sampleVertices = samples;
+    m_lineVertices = lines;
+    m_dns = values;
+    FillPolygon(0);
   }
 
+
+
   /**
-   *
+   * Rasterize multiband instruments where the bands have dependent geometry (i.e., the bands are 
+   * not geometrically registered). 
    *
    * @param samples
    * @param lines
@@ -51,144 +60,15 @@ namespace Isis {
                                   std::vector<double> &lines,
                                   int &band, double &value) {
 
-    p_samples = samples;
-    p_lines = lines;
-    p_band = band;
-    p_value = value;
+    m_sampleVertices = samples;
+    m_lineVertices = lines;
+    m_band = band;
+    m_dns.clear();
+    m_dns.push_back(value);
 
-    /*Make sure we only loop thru one time since we only have one band.*/
-    p_values.clear();
-    p_values.push_back(1.0);
-    DoWork(1);
-    //FillPolygon(1);
-
-
+    FillPolygon(1);
   }
 
-
-
-  void ProcessPolygons::FillPolygon(int Flag) {
-
-    geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
-    for(unsigned int i = 0; i < p_samples.size(); i++) {
-      pts->add(geos::geom::Coordinate(p_samples[i], p_lines[i]));
-    }/*end for*/
-    /*Add the first point again in order to make a closed line string*/
-    pts->add(geos::geom::Coordinate(p_samples[0], p_lines[0]));
-
-    try {
-      geos::geom::Polygon *poly = Isis::globalFactory.createPolygon(
-                                    globalFactory.createLinearRing(pts), NULL);
-
-      /*If there is not an intersecting polygon, there is no reason to go on.*/
-      if(!poly->intersects(p_imagePoly))return;
-
-      geos::geom::MultiPolygon *intersectPoly = PolygonTools::MakeMultiPolygon(
-          p_imagePoly->intersection(poly));
-      const geos::geom::Envelope *envelope = intersectPoly->getEnvelopeInternal();
-
-      for(double y = floor(envelope->getMinY()); y <= ceil(envelope->getMaxY()); y++) {
-        /*create a horizontal line that runs across the entire evelope.*/
-        geos::geom::CoordinateSequence *linePts = new geos::geom::CoordinateArraySequence();
-        linePts->add(geos::geom::Coordinate(floor(envelope->getMinX()), y));
-        linePts->add(geos::geom::Coordinate(floor(envelope->getMaxX()), y));
-
-        geos::geom::LineString *line = Isis::globalFactory.createLineString(linePts);
-
-        /*intersect the line with the polygon*/
-        geos::geom::Geometry *intersects = poly->intersection(line);
-
-        /*find out all the points were the line intersects the polygon*/
-        geos::geom::CoordinateSequence *intersectCoords = intersects->getCoordinates();
-
-        for(unsigned int l = 0; l < intersectCoords->getSize() - 1; l++) {
-
-          /*now i want to go from coord 1 - coord 2 and do work....*/
-          for(int x = (int) intersectCoords->getAt(l * 2).x; x < (int)intersectCoords->getAt(l * 2 + 1).x; x++) {
-
-            for(unsigned int i = 0; i < p_values.size(); i++) {    /* for each band */
-
-              /*write the count file*/
-              if(Flag == 0) {
-                p_brick2->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), i + 1);
-              }
-              if(Flag == 1) {
-                p_brick2->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), p_band);
-              }
-
-              this->OutputCubes[1]->read(*p_brick2);
-              double previousPixelCount = (*p_brick2)[0];
-
-
-              if((*p_brick2)[0] != Isis::Null) {
-                (*p_brick2)[0] += 1;
-              }
-              else {
-                (*p_brick2)[0] = 1;
-              }
-
-              this->OutputCubes[1]->write(*p_brick2);
-              double currentCount = (*p_brick2)[0];
-
-
-              /*write the average file*/
-              if(Flag == 0) {
-                p_brick1->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), i + 1);
-              }
-              if(Flag == 1) {
-                p_brick1->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), p_band);
-              }
-              //We need to think about how to handle special pixels in p_values also if
-              //the read-in value is a special pixel.
-              this->OutputCubes[0]->read(*p_brick1);
-              double previousPixelValue = (*p_brick1)[0];
-              if((*p_brick1)[0] == Isis::Null) {
-                if(Flag == 0) {
-                  (*p_brick1)[0] = p_values[i];
-                }
-                if(Flag == 1) {
-                  (*p_brick1)[0] = p_value;
-                }
-              }
-              else {
-                /*Calculate the running average.*/
-                double avg = 0;
-                if(Flag == 0) {
-                  avg = (previousPixelCount * previousPixelValue + p_values[i])
-                        / currentCount;
-                }
-                if(Flag == 1) {
-                  avg = (previousPixelCount * previousPixelValue + p_value)
-                        / currentCount;
-                }
-                (*p_brick1)[0] = avg;
-
-              }
-
-              /*The new average value is written to the output cube.*/
-              this->OutputCubes[0]->write(*p_brick1);
-            }/*End for each band*/
-
-          } /*End for x*/
-        }
-        delete linePts;
-      }/*End for y*/
-
-      delete poly;
-      delete intersectPoly;
-
-
-    } /*end try*/
-
-    catch(geos::util::IllegalArgumentException *ill) {
-      QString msg = "ERROR! geos exception 1 [";
-      msg += QString(ill->what()) + "]";
-      delete ill;
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }/*end catch*/
-
-
-  }
 
   /**
    * This method does the actuall reading and writing to the cube
@@ -200,115 +80,145 @@ namespace Isis {
    *
    * @param Flag
    */
-  void ProcessPolygons::DoWork(int Flag) {
+  void ProcessPolygons::FillPolygon(int Flag) {
 
+    // Create a sample/line polygon for the input pixel vertices
     geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
-    for(unsigned int i = 0; i < p_samples.size(); i++) {
-      pts->add(geos::geom::Coordinate(p_samples[i], p_lines[i]));
-    }/*end for*/
-    /*Add the first point again in order to make a closed line string*/
-    pts->add(geos::geom::Coordinate(p_samples[0], p_lines[0]));
+    for (unsigned int i = 0; i < m_sampleVertices.size(); i++) {
+      pts->add(geos::geom::Coordinate(m_sampleVertices[i], m_lineVertices[i]));
+    }
+    pts->add(geos::geom::Coordinate(m_sampleVertices[0], m_lineVertices[0]));
 
     try {
-      geos::geom::Polygon *poly = Isis::globalFactory.createPolygon(
-                                    globalFactory.createLinearRing(pts), NULL);
+      //  Create a polygon from the pixel vertices.  This polygon may have spikes or other
+      //  problems such as multiple polygons.  Despike, then make sure we have a single polygon.
+      //  Do not rasterize pixel if despiking fails or there are multiple polygons.
+      geos::geom::Polygon *spikedPixelPoly = Isis::globalFactory.createPolygon(
+          globalFactory.createLinearRing(pts), NULL);
 
-      /*If there is not an intersecting polygon, there is no reason to go on.*/
-      if(!poly->intersects(p_imagePoly))return;
+      const geos::geom::Polygon *projectedInputPixelPoly;
+
+      if (spikedPixelPoly->isValid()) {
+        projectedInputPixelPoly = spikedPixelPoly;
+      }
+      else {
+        geos::geom::MultiPolygon *despikedPixelPoly;
+        try {
+          despikedPixelPoly = PolygonTools::Despike(spikedPixelPoly);
+        }
+        catch (IException &e) {
+          delete spikedPixelPoly;
+          return;
+        }
+
+        try {
+          despikedPixelPoly = PolygonTools::Despike(spikedPixelPoly);
+        }
+        catch (IException &e) {
+          delete spikedPixelPoly;
+          return;
+        }
+
+        if (despikedPixelPoly->getNumGeometries() > 1) return;
+        projectedInputPixelPoly =
+            dynamic_cast<const geos::geom::Polygon *>(despikedPixelPoly->getGeometryN(0));
+      }
+
+      /* If there is not an intersecting polygon, there is no reason to go on.*/
+      if (!projectedInputPixelPoly->intersects(m_imagePoly)) return;
 
       geos::geom::MultiPolygon *intersectPoly = PolygonTools::MakeMultiPolygon(
-          p_imagePoly->intersection(poly));
+          m_imagePoly->intersection(projectedInputPixelPoly));
+      geos::geom::prep::PreparedPolygon *preparedPoly =
+        new geos::geom::prep::PreparedPolygon(intersectPoly);
       const geos::geom::Envelope *envelope = intersectPoly->getEnvelopeInternal();
 
-      geos::operation::overlay::snap::GeometrySnapper snap(*intersectPoly);
+      // Go thru each coord. in the envelope and ask if it is within the polygon
+      for (double x = floor(envelope->getMinX()); x <= ceil(envelope->getMaxX()); x++) {
+        if (x == 0) continue;
 
-      /*go thru each coord. in the envelope and ask if it is within the polygon*/
-      for(double x = floor(envelope->getMinX()); x <= ceil(envelope->getMaxX()); x++) {
-        if(x == 0) continue;
+        for (double y = floor(envelope->getMinY()); y <= ceil(envelope->getMaxY()); y++) {
+          if (y == 0) continue;
 
-        for(double y = floor(envelope->getMinY()); y <= ceil(envelope->getMaxY()); y++) {
-          if(y == 0) continue;
+          bool contains;
 
-          geos::geom::Coordinate c(x, y);
-          geos::geom::Point *p = Isis::globalFactory.createPoint(c);
-          geos::geom::Geometry *pSnapped = snap.snapTo(*p, 1.0e-10)->clone();
+          if (m_useCenter) {
+            geos::geom::Coordinate c(x, y);
+            geos::geom::Point *p = Isis::globalFactory.createPoint(c);
+            contains = preparedPoly->contains(p);
+            delete p;
+          }
+          else {
+            geos::geom::CoordinateSequence *tpts = new geos::geom::CoordinateArraySequence();
+            tpts->add(geos::geom::Coordinate(x - 0.5, y - 0.5));
+            tpts->add(geos::geom::Coordinate(x + 0.5, y - 0.5));
+            tpts->add(geos::geom::Coordinate(x + 0.5, y + 0.5));
+            tpts->add(geos::geom::Coordinate(x - 0.5, y + 0.5));
+            tpts->add(geos::geom::Coordinate(x - 0.5, y - 0.5));
 
-          bool contains = pSnapped->within(intersectPoly);
+            geos::geom::Polygon *outPixelFootPrint = Isis::globalFactory.createPolygon(
+                                      globalFactory.createLinearRing(tpts), NULL);
+            contains = preparedPoly->intersects(outPixelFootPrint);
+            delete outPixelFootPrint;
+          }
 
-          delete p;
-          delete pSnapped;
+          if (contains) {
 
-          if(contains) {
-            /*write the count file*/
-            for(unsigned int i = 0; i < p_values.size(); i++) {
-              if(Flag == 0) {
-                p_brick2->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), i + 1);
+            // Read spectral noodle from samp, line position
+            m_average->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), 1);
+            this->OutputCubes[0]->read(*m_average);
+            m_count->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), 1);
+            this->OutputCubes[1]->read(*m_count);
 
-              }
-              if(Flag == 1) {
-                p_brick2->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), p_band);
-              }
+            //  Process each band in the buffer
+            for (unsigned int i = 0; i < m_dns.size(); i++) {
 
-              this->OutputCubes[1]->read(*p_brick2);
-              double previousPixelCount = (*p_brick2)[0];
-
-              if((*p_brick2)[0] != Isis::Null) {
-                (*p_brick2)[0] += 1;
-              }
-              else {
-                (*p_brick2)[0] = 1;
-              }
-
-              this->OutputCubes[1]->write(*p_brick2);
-              double currentCount = (*p_brick2)[0];
-
-
-              /*write the average band*/
-              if(Flag == 0) {
-                p_brick1->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), i + 1);
-              }
-              if(Flag == 1) {
-                p_brick1->SetBasePosition((int)(x + 0.5), (int)(y + 0.5), p_band);
-              }
-              //We need to think about how to handle special pixels in p_values also if
-              //the read-in value is a special pixel.
-              this->OutputCubes[0]->read(*p_brick1);
-              double previousPixelValue = (*p_brick1)[0];
-              if((*p_brick1)[0] == Isis::Null) {
-                if(Flag == 0) {
-                  (*p_brick1)[0] = p_values[i];
-                }
-                if(Flag == 1) {
-                  (*p_brick1)[0] = p_value;
-                }
+              int band;
+              if (Flag == 0) {
+                band = i;
               }
               else {
-                /*Calculate the running average.*/
-                double avg = 0;
-                if(Flag == 0) {
-                  avg = (previousPixelCount * previousPixelValue + p_values[i])
-                        / currentCount;
-                }
-                if(Flag == 1) {
-                  avg = (previousPixelCount * previousPixelValue + p_value)
-                        / currentCount;
-                }
-                (*p_brick1)[0] = avg;
-
+                band = m_band - 1;
               }
 
-              /*The new average value is written to the output cube.*/
-              this->OutputCubes[0]->write(*p_brick1);
-            }/*End for each band*/
+              double inputDn = m_dns[i];
 
-          }/*End if (contains)*/
+              // The input dn is good
+              if (IsValidPixel(inputDn)) {
+                if (IsValidPixel((*m_average)[band])) {
+                  double currentCount = (*m_count)[band];
+                  double newCount = ++((*m_count)[band]);
+                  double currentAverage = (*m_average)[band];
+                  (*m_average)[band] = ((currentAverage * currentCount) + inputDn) / newCount;
+                }
+                else {
+                  (*m_average)[band] = inputDn;
+                  (*m_count)[band] = 1;
+                }
+              }
+
+              // The input dn is special
+              else {
+                if (((*m_average)[band] == Isis::Null) || (inputDn != Null)) {
+                  (*m_average)[band] = inputDn;
+                }
+              }
+
+            } /*End for each band*/
+
+            // Write spectral noodles back out to average and count cubes
+            this->OutputCubes[0]->write(*m_average);
+            this->OutputCubes[1]->write(*m_count);
+
+          } /*End if (contains)*/
 
         } /*End for y*/
 
-      }/*End for x*/
+      } /*End for x*/
 
-      delete poly;
+      delete projectedInputPixelPoly;
       delete intersectPoly;
+      delete preparedPoly;
 
     } /*end try*/
 
@@ -321,27 +231,32 @@ namespace Isis {
 
   }
 
+
   /**
    *
    * @deprecated Please use Finalize()
    */
   void ProcessPolygons::EndProcess() {
-    delete p_imagePoly;
-    delete p_brick1;
-    delete p_brick2;
+
+    delete m_imagePoly;
+    delete m_average;
+    delete m_count;
     Process::EndProcess();
   }
+
 
   /**
    *
    *
    */
   void ProcessPolygons::Finalize() {
-    delete p_imagePoly;
-    delete p_brick1;
-    delete p_brick2;
+
+    delete m_imagePoly;
+    delete m_average;
+    delete m_count;
     Process::Finalize();
   }
+
 
   /**
    * This gives the option to append to the cube
@@ -367,7 +282,7 @@ namespace Isis {
     /*Now open the count file with read/write permission*/
     Cube *countCube = new Cube();
 
-    if(countFileName == "") {
+    if (countFileName == "") {
       /*if the countFileName was set to nothing, then we use the default count
       file name.*/
       QString openFile = path + "/" + filename + "-count-." + extension;
@@ -381,6 +296,8 @@ namespace Isis {
     AddOutputCube(countCube);
     return countCube;
   }
+
+
 
   /**
    *
@@ -400,6 +317,9 @@ namespace Isis {
     this->Process::SetOutputCube(avgFileName, atts, nsamps, nlines, nbands);
     this->Process::SetOutputCube(countFileName, atts, nsamps, nlines, nbands);
 
+    OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+    OutputCubes[1]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+
     geos::geom::CoordinateArraySequence imagePts;
 
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
@@ -409,12 +329,14 @@ namespace Isis {
     imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->sampleCount(), 0.0));
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
 
-    p_imagePoly = Isis::globalFactory.createPolygon(
+    m_imagePoly = Isis::globalFactory.createPolygon(
                     globalFactory.createLinearRing(imagePts), NULL);
 
-    p_brick1 = new Brick(*this->OutputCubes[0], 1, 1, nbands);
-    p_brick2 = new Brick(*this->OutputCubes[1], 1, 1, nbands);
+    m_average = new Brick(*this->OutputCubes[0], 1, 1, nbands);
+    m_count = new Brick(*this->OutputCubes[1], 1, 1, nbands);
   }
+
+
 
   /**
    *
@@ -440,6 +362,17 @@ namespace Isis {
     QString countString = path + "/" + filename + "-count";
     SetOutputCube(avgString, countString, atts, nsamps, nlines, nbands);
 
+  }
+
+
+  /**
+   * Sets the algorithm for how output pixels are rasterized
+   *
+   * @param useCenter 
+   *
+   */
+  void ProcessPolygons::SetIntersectAlgorithm(const bool useCenter) {
+    m_useCenter = useCenter;
   }
 
 

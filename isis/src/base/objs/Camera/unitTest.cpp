@@ -27,6 +27,7 @@
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "PixelIfov.h"
 #include "Preference.h"
 #include "Pvl.h"
 #include "SurfacePoint.h"
@@ -73,6 +74,11 @@ int main() {
   double dec = -51.2677;
 
   cout << endl << "Camera* from: " << inputFile << endl;
+  QList<QPointF> ifovOffsets = c->PixelIfovOffsets();
+  cout << "Pixel Ifov: " << endl;
+  foreach (QPointF offset, ifovOffsets) {
+    cout << offset.x() << " , " << offset.y() << endl;
+  }
   cout << "Line: " << line << ", Sample: " << sample << endl;
   cout << "Lat: " << lat.degrees() << ", Lon: " << lon.degrees() << endl;
   cout << "RightAscension: " << ra << ", Declination: " << dec << endl << endl;
@@ -219,6 +225,11 @@ int main() {
 
   cout << endl;
   cout << "Camera* from: " << inputFile << endl;
+  ifovOffsets = cam2->PixelIfovOffsets();
+  cout << "Pixel Ifov: " << endl;
+  foreach (QPointF offset, ifovOffsets) {
+    cout << offset.x() << " , " << offset.y() << endl;
+  }
   cout << "Basic Mapping: " << endl;
   Pvl camMap;
   cam2->BasicMapping(camMap);
@@ -541,4 +552,21 @@ int main() {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam12;
+
+  //  Test PixelIfov for Vims which sets the field of view if it in hires mode.  The Ifov is
+  //  rectangular instead of square.
+  inputFile = "$base/testData/CM_1515945709_1.ir.cub";
+  cube.open(inputFile);
+  pvl = *cube.label();
+  Camera *cam13 = CameraFactory::Create(pvl);
+  cube.close();
+
+  cout << endl << endl << "Testing non-square pixel Ifov using Hires vims cube" << endl;
+  cout << "Camera* from: " << inputFile << endl;
+  ifovOffsets = cam13->PixelIfovOffsets();
+  cout << "Pixel Ifov: " << endl;
+  foreach (QPointF offset, ifovOffsets) {
+    cout << offset.x() << " , " << offset.y() << endl;
+  }
+  delete cam13;
 }

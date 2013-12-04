@@ -7,71 +7,67 @@ unittest: Working
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 File Name: ProcessGroundPolygonsTest.cub
 unittest: Working
-0% ProcessedBand: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0726764 
-Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0719842 Band: 1 DN: 0.0719842 Band: 1 DN: 0.0719842 Band: 1 DN: 0.0726764 
-Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0719842 Band: 1 DN: 0.0719842 Band: 1 DN: 0.0720996 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 
-Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0719842 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0732532 Band: 1 DN: 0.0732532 Band: 1 DN: 0.0726764 
-10% ProcessedBand: 1 DN: 0.0715228 Band: 1 DN: 0.070946 Band: 1 DN: 0.0712921 Band: 1 DN: 0.072182 Band: 1 DN: 0.072182 Band: 1 DN: 0.0732532 Band: 1 DN: 0.0732532 Band: 1 DN: 0.0726764 
-Band: 1 DN: 0.070946 Band: 1 DN: 0.070946 Band: 1 DN: 0.070946 Band: 1 DN: 0.072182 Band: 1 DN: 0.072182 Band: 1 DN: 0.07383 Band: 1 DN: 0.07383 Band: 1 DN: 0.07383 
-Band: 1 DN: 0.0692156 Band: 1 DN: 0.070946 Band: 1 DN: 0.070946 Band: 1 DN: 0.0711932 Band: 1 DN: 0.0711932 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 Band: 1 DN: 0.070946 
-20% ProcessedBand: 1 DN: 0.0718112 Band: 1 DN: 0.0718112 Band: 1 DN: 0.072182 Band: 1 DN: 0.072182 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0712921 
-Band: 1 DN: 0.0718112 Band: 1 DN: 0.0718112 Band: 1 DN: 0.0716876 Band: 1 DN: 0.0716876 Band: 1 DN: 0.06971 Band: 1 DN: 0.0697924 Band: 1 DN: 0.0697924 
-Band: 1 DN: 0.070946 Band: 1 DN: 0.070946 Band: 1 DN: 0.072182 Band: 1 DN: 0.072182 Band: 1 DN: 0.070946 Band: 1 DN: 0.0715228 Band: 1 DN: 0.0715228 
-30% ProcessedBand: 1 DN: 0.070946 Band: 1 DN: 0.070946 Band: 1 DN: 0.0716876 Band: 1 DN: 0.0716876 Band: 1 DN: 0.0696001 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 
-Band: 1 DN: 0.0700808 Band: 1 DN: 0.0700808 Band: 1 DN: 0.0711932 Band: 1 DN: 0.0711932 Band: 1 DN: 0.0699847 Band: 1 DN: 0.0699078 Band: 1 DN: 0.0699078 
-Band: 1 DN: 0.0700808 Band: 1 DN: 0.0700808 Band: 1 DN: 0.0703692 Band: 1 DN: 0.0703692 Band: 1 DN: 0.0687212 Band: 1 DN: 0.0669084 Band: 1 DN: 0.0669084 
-40% ProcessedBand: 1 DN: 0.0703692 Band: 1 DN: 0.0703692 Band: 1 DN: 0.0705999 Band: 1 DN: 0.0705999 Band: 1 DN: 0.0705999 Band: 1 DN: 0.070946 Band: 1 DN: 0.070946 
-Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 
-Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 
-50% ProcessedBand: 2 DN: 0.126674 Band: 2 DN: 0.126674 Band: 2 DN: 0.114 Band: 2 DN: 0.114 Band: 2 DN: 0.114 Band: 2 DN: 0.107663 
-Band: 2 DN: 0.126674 Band: 2 DN: 0.126674 Band: 2 DN: 0.11475 Band: 2 DN: 0.11475 Band: 2 DN: 0.111915 Band: 2 DN: 0.104761 Band: 2 DN: 0.104761 Band: 2 DN: 0.102076 
-Band: 2 DN: 0.105757 Band: 2 DN: 0.105757 Band: 2 DN: 0.10218 Band: 2 DN: 0.10218 Band: 2 DN: 0.100805 Band: 2 DN: 0.0953482 Band: 2 DN: 0.0953482 Band: 2 DN: 0.0909011 
-Band: 2 DN: 0.0997953 Band: 2 DN: 0.0997953 Band: 2 DN: 0.0944196 Band: 2 DN: 0.0933281 Band: 2 DN: 0.0933281 Band: 2 DN: 0.088881 Band: 2 DN: 0.088881 Band: 2 DN: 0.0909011 
-60% ProcessedBand: 2 DN: 0.0997953 Band: 2 DN: 0.0960567 Band: 2 DN: 0.0932076 Band: 2 DN: 0.0916828 Band: 2 DN: 0.0916828 Band: 2 DN: 0.087366 Band: 2 DN: 0.087366 Band: 2 DN: 0.088881 
-Band: 2 DN: 0.086356 Band: 2 DN: 0.0855985 Band: 2 DN: 0.0855985 Band: 2 DN: 0.0870053 Band: 2 DN: 0.0870053 Band: 2 DN: 0.089386 Band: 2 DN: 0.089386 Band: 2 DN: 0.089891 
-Band: 2 DN: 0.087871 Band: 2 DN: 0.0855985 Band: 2 DN: 0.0855985 Band: 2 DN: 0.0870053 Band: 2 DN: 0.0870053 Band: 2 DN: 0.088376 Band: 2 DN: 0.088376 Band: 2 DN: 0.087871 
-70% ProcessedBand: 2 DN: 0.0855985 Band: 2 DN: 0.0855985 Band: 2 DN: 0.0865724 Band: 2 DN: 0.0865724 Band: 2 DN: 0.087366 Band: 2 DN: 0.087366 Band: 2 DN: 0.086659 
-Band: 2 DN: 0.086356 Band: 2 DN: 0.086356 Band: 2 DN: 0.0870053 Band: 2 DN: 0.0870053 Band: 2 DN: 0.0870053 Band: 2 DN: 0.086861 Band: 2 DN: 0.086861 
-Band: 2 DN: 0.086356 Band: 2 DN: 0.086356 Band: 2 DN: 0.0870053 Band: 2 DN: 0.0870053 Band: 2 DN: 0.0867348 Band: 2 DN: 0.086861 Band: 2 DN: 0.086861 
-80% ProcessedBand: 2 DN: 0.0871135 Band: 2 DN: 0.0871135 Band: 2 DN: 0.0874382 Band: 2 DN: 0.0874382 Band: 2 DN: 0.0875343 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 
-Band: 2 DN: 0.086356 Band: 2 DN: 0.086356 Band: 2 DN: 0.0865724 Band: 2 DN: 0.0865724 Band: 2 DN: 0.086861 Band: 2 DN: 0.087265 Band: 2 DN: 0.087265 
-Band: 2 DN: 0.0855985 Band: 2 DN: 0.0855985 Band: 2 DN: 0.085851 Band: 2 DN: 0.085851 Band: 2 DN: 0.0861396 Band: 2 DN: 0.086861 Band: 2 DN: 0.086861 
-90% ProcessedBand: 2 DN: 0.085851 Band: 2 DN: 0.085851 Band: 2 DN: 0.086053 Band: 2 DN: 0.086053 Band: 2 DN: 0.086053 Band: 2 DN: 0.086356 Band: 2 DN: 0.086356 
-Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.085851 Band: 2 DN: 0.085851 Band: 2 DN: 0.085851 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 
-Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 
+0% ProcessedBand: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 
+Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.070946 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 
+Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 
+Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 
+10% ProcessedBand: 1 DN: 0.0726764 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0761372 Band: 1 DN: 0.0761372 Band: 1 DN: 0.0761372 Band: 1 DN: 0.0761372 
+Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 
+Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 
+20% ProcessedBand: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 
+Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0761372 Band: 1 DN: 0.0761372 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0692156 
+Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0674852 Band: 1 DN: 0.0657548 
+30% ProcessedBand: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0761372 Band: 1 DN: 0.0744068 Band: 1 DN: 0.0726764 
+Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0726764 Band: 1 DN: 0.0657548 Band: 1 DN: 0.0588333 
+Band: 1 DN: 0.0726764 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 
+40% ProcessedBand: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 Band: 1 DN: 0.0692156 
+Band: 1 DN: 0.0692156 
+50% ProcessedBand: 2 DN: 0.121396 Band: 2 DN: 0.121396 Band: 2 DN: 0.121396 
+Band: 2 DN: 0.126674 Band: 2 DN: 0.126674 Band: 2 DN: 0.110302 Band: 2 DN: 0.0939311 Band: 2 DN: 0.0939311 
+Band: 2 DN: 0.126674 Band: 2 DN: 0.126674 Band: 2 DN: 0.108787 Band: 2 DN: 0.0909011 Band: 2 DN: 0.0909011 Band: 2 DN: 0.0909011 Band: 2 DN: 0.0909011 
+Band: 2 DN: 0.126674 Band: 2 DN: 0.084841 Band: 2 DN: 0.083326 Band: 2 DN: 0.081811 Band: 2 DN: 0.081811 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 
+60% ProcessedBand: 2 DN: 0.084841 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.0939311 Band: 2 DN: 0.0939311 
+Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 
+Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.0909011 Band: 2 DN: 0.0909011 Band: 2 DN: 0.0909011 Band: 2 DN: 0.0909011 
+70% ProcessedBand: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 
+Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.083326 Band: 2 DN: 0.081811 
+Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.089386 Band: 2 DN: 0.0909011 Band: 2 DN: 0.089386 Band: 2 DN: 0.087871 
+80% ProcessedBand: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.086356 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 
+Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 Band: 2 DN: 0.086356 Band: 2 DN: 0.084841 Band: 2 DN: 0.086356 Band: 2 DN: 0.087871 
+Band: 2 DN: 0.087871 Band: 2 DN: 0.084841 Band: 2 DN: 0.086356 Band: 2 DN: 0.087871 Band: 2 DN: 0.087871 
+90% ProcessedBand: 2 DN: 0.084841 Band: 2 DN: 0.084841 Band: 2 DN: 0.084841 
+Band: 2 DN: 0.084841 
 100% Processed
 File Name: ProcessGroundPolygonsTest_count.cub
 unittest: Working
-0% ProcessedBand: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 3 Band: 1 DN: 3 Band: 1 DN: 3 Band: 1 DN: 2 
-Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 3 Band: 1 DN: 3 Band: 1 DN: 5 Band: 1 DN: 5 Band: 1 DN: 5 Band: 1 DN: 3 
-Band: 1 DN: 2 Band: 1 DN: 2 Band: 1 DN: 5 Band: 1 DN: 5 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 3 
-Band: 1 DN: 3 Band: 1 DN: 3 Band: 1 DN: 5 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 3 
-10% ProcessedBand: 1 DN: 3 Band: 1 DN: 4 Band: 1 DN: 5 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 3 
-Band: 1 DN: 2 Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 3 
-Band: 1 DN: 1 Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 4 
-20% ProcessedBand: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 5 
-Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 6 Band: 1 DN: 6 
-Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 8 Band: 1 DN: 6 Band: 1 DN: 6 
-30% ProcessedBand: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 9 Band: 1 DN: 6 Band: 1 DN: 6 
-Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 7 Band: 1 DN: 7 Band: 1 DN: 9 Band: 1 DN: 5 Band: 1 DN: 5 
-Band: 1 DN: 4 Band: 1 DN: 4 Band: 1 DN: 6 Band: 1 DN: 6 Band: 1 DN: 7 Band: 1 DN: 3 Band: 1 DN: 3 
-40% ProcessedBand: 1 DN: 3 Band: 1 DN: 3 Band: 1 DN: 5 Band: 1 DN: 5 Band: 1 DN: 5 Band: 1 DN: 2 Band: 1 DN: 2 
-Band: 1 DN: 2 Band: 1 DN: 2 Band: 1 DN: 3 Band: 1 DN: 3 Band: 1 DN: 3 Band: 1 DN: 1 Band: 1 DN: 1 
-Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
-50% ProcessedBand: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 3 Band: 2 DN: 3 Band: 2 DN: 3 Band: 2 DN: 2 
-Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 3 Band: 2 DN: 3 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 3 
-Band: 2 DN: 2 Band: 2 DN: 2 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 3 
-Band: 2 DN: 3 Band: 2 DN: 3 Band: 2 DN: 5 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 3 
-60% ProcessedBand: 2 DN: 3 Band: 2 DN: 4 Band: 2 DN: 5 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 3 
-Band: 2 DN: 2 Band: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 3 
-Band: 2 DN: 1 Band: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 4 
-70% ProcessedBand: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 5 
-Band: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 6 Band: 2 DN: 6 
-Band: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 8 Band: 2 DN: 6 Band: 2 DN: 6 
-80% ProcessedBand: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 9 Band: 2 DN: 6 Band: 2 DN: 6 
-Band: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 7 Band: 2 DN: 7 Band: 2 DN: 9 Band: 2 DN: 5 Band: 2 DN: 5 
-Band: 2 DN: 4 Band: 2 DN: 4 Band: 2 DN: 6 Band: 2 DN: 6 Band: 2 DN: 7 Band: 2 DN: 3 Band: 2 DN: 3 
-90% ProcessedBand: 2 DN: 3 Band: 2 DN: 3 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 5 Band: 2 DN: 2 Band: 2 DN: 2 
-Band: 2 DN: 2 Band: 2 DN: 2 Band: 2 DN: 3 Band: 2 DN: 3 Band: 2 DN: 3 Band: 2 DN: 1 Band: 2 DN: 1 
-Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+0% ProcessedBand: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+10% ProcessedBand: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+20% ProcessedBand: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 
+30% ProcessedBand: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 
+Band: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 2 Band: 1 DN: 1 Band: 1 DN: 1 
+40% ProcessedBand: 1 DN: 1 Band: 1 DN: 1 Band: 1 DN: 1 
+Band: 1 DN: 1 
+50% ProcessedBand: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+60% ProcessedBand: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+70% ProcessedBand: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 
+80% ProcessedBand: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 
+Band: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 2 Band: 2 DN: 1 Band: 2 DN: 1 
+90% ProcessedBand: 2 DN: 1 Band: 2 DN: 1 Band: 2 DN: 1 
+Band: 2 DN: 1 
 100% Processed

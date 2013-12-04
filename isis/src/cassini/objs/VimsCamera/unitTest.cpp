@@ -41,6 +41,11 @@ void TestLineSamp(Camera *cam, double samp, double line);
  *   @history 2012-12-03 Tracie Sucharski, Added new test image to test validity even if none of
  *                         pixels' centers intersect the ground.  Error checking was added to
  *                         SetGround which returns false if any of the min/max lat/lons are invalid.
+ *   @history 2013-10-23 Tracie Sucharski, Change known values because of changes to the Vims
+ *                         Camera model.  The adjustment to the Ir times is once again being
+ *                         calculated in code-the label keywords for Ir exposure and interline
+ *                         delay is incorrect.  The camera model is also now doing calculations
+ *                         in x, y, z instead of lat, lon.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -75,17 +80,17 @@ int main(void) {
                             "$cassini/testData/CM_1515945709_1.vis.cub"
                           };
 
-    double knownLat[5] = { 0.238187729668092,
-                           -34.842880495045549,
-                           -41.440694242217511,
-                           -42.375769525935951,
-                           -37.412633452415633
+    double knownLat[5] = { -0.4635396765968510,
+                           -34.8446732028169848,
+                           -40.8016661988669753,
+                           -42.7683454790732966,
+                           -37.4368893866915258
                          };
-    double knownLon[5] = { 198.059202300647257,
-                           123.561260864268348,
-                           131.725836878894256,
-                           202.623084593112708,
-                           213.598346090590496
+    double knownLon[5] = { 198.1302329741679102,
+                           123.5608203785339327,
+                           131.8443786754731661,
+                           202.6731689530125493,
+                           213.5879007185106673    
                          };
 
     vector< pair <int, int > > corners;
@@ -203,8 +208,8 @@ int main(void) {
     samp = 3.0121;
     line = 4.39113;
     cout << "Sample:3.0121    Line:4.39113" << endl;
-    double expectedLat = -19.449323030297;
-    double expectedLon = 45.696549423913;
+    double expectedLat = -19.3962073091522598;
+    double expectedLon = 45.5092093638429773;
     if (!cam->SetImage(samp, line)) {
       cout << "ERROR" << endl;
     }

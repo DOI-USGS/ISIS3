@@ -51,7 +51,9 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed
    *                          Cassini namespace wrap inside Isis namespace.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *              coding standards. References #972.
+   *   @history 2013-11-18 Tracie Sucharski - Added LookDirection method to calculate unit vectors
+   *                          so that old unit vector files are no longer needed.
    */
   class VimsSkyMap : public CameraSkyMap {
     public:
@@ -70,11 +72,21 @@ namespace Isis {
     protected:
 
     private:
+      void LookDirection(double v[3]);
+
       SpiceDouble p_etStart;           //!< Start ephemeris time
 
       double p_exposureDuration;       //!< Exposure duration
       double p_interlineDelay;         /**< InterlineDelayDuration keyword value from
                                             the instrument group of the labels, divided by 1000 */
+      double p_ux;               //!< Distorted focal plane x, in millimeters    
+      double p_uy;               //!< Distorted focal plane y, in millimeters    
+      double p_uz;               //!< Distorted focal plane z, in millimeters    
+
+      double p_xPixSize;         //!< X pixel size
+      double p_yPixSize;         //!< Y pixel size
+      double p_xBore;            //!< X boresight
+      double p_yBore;            //!< Y boresight
 
       QString p_channel;           /**< Channel keyword value from the instrument group of the labels.
                                             Possible values are IR or VIS */
@@ -88,8 +100,6 @@ namespace Isis {
                                             This will be image size unless occultation image */
       int    p_camSampOffset;          //!< Sample offset
       int    p_camLineOffset;          //!< Line offset
-
-      double p_unitVector[192][192][3];//!< Unit vector
 
       double p_minRa;                  //!< Minimum right ascension
       double p_maxRa;                  //!< Maximum right ascension
