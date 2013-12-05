@@ -27,6 +27,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
+#include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
 #include "PixelIfov.h"
@@ -51,9 +52,10 @@ int main(void) {
     QList<double> knownLon;
     knownLon << 277.953830179 << 277.951849380 << 277.951061539 << 277.953042126;
 
-    Pvl p(file);
-    Camera *cam = CameraFactory::Create(p);
-    cout << "FileName: " << FileName(p.fileName()).name() << endl;
+    Cube cube;
+    cube.open(file);
+    Camera *cam = CameraFactory::Create(cube);
+    cout << "FileName: " << file << endl;
 
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

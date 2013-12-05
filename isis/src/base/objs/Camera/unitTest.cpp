@@ -557,8 +557,7 @@ int main() {
   //  rectangular instead of square.
   inputFile = "$base/testData/CM_1515945709_1.ir.cub";
   cube.open(inputFile);
-  pvl = *cube.label();
-  Camera *cam13 = CameraFactory::Create(pvl);
+  Camera *cam13 = CameraFactory::Create(cube);
   cube.close();
 
   cout << endl << endl << "Testing non-square pixel Ifov using Hires vims cube" << endl;
