@@ -40,7 +40,7 @@ ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
 ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
 ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
 ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
-ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
+ISISLOCALVERSION     ?= $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
 ISISRELEASE          := REL_0_0
 
 # set up HOST_OS
