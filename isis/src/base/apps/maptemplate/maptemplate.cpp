@@ -59,9 +59,9 @@ void IsisMain() {
   addRange(mapping);
   addResolution(mapping);
 
-  // Get map file name form GUI and write the mapping group pvl
+  // Get map file name from GUI and write the mapping group pvl
   // to the output file, add .map extension if the
-  // user didnt enter an extension
+  // user did not enter an extension
   UserInterface &ui = Application::GetUserInterface();
   FileName out = ui.GetFileName("MAP");
   QString output = ui.GetFileName("MAP");
@@ -157,10 +157,10 @@ void helperButtonLoadMap() {
   }
 
 //Target Parameters stuff
-  QString use = "IMAGE";
+  QString use = "NONE";
   ui.Clear("TARGOPT");
   ui.PutAsString("TARGOPT", use);
-  ui.Clear("TARGDEF");
+  ui.Clear("FILE");
   ui.Clear("TARGETNAME");
   ui.Clear("LATTYPE");
   ui.Clear("LONDIR");
@@ -201,7 +201,7 @@ void helperButtonLoadMap() {
   ui.Clear("MAXLAT");
   ui.Clear("MINLON");
   ui.Clear("MAXLON");
-  QString useR = "IMAGE";
+  QString useR = "NONE";
   ui.Clear("RNGOPT");
   ui.PutAsString("RNGOPT", useR);
 
@@ -245,7 +245,7 @@ void helperButtonLoadMap() {
 //helper function to output targdef to log
 void helperButtonLogTargDef() {
   UserInterface &ui = Application::GetUserInterface();
-  QString targetFile(ui.GetFileName("TARGDEF"));
+  QString targetFile(ui.GetFileName("FILE"));
   Pvl p;
   p.read(targetFile);
   PvlGroup t = p.findGroup("mapping", Pvl::Traverse);
@@ -258,7 +258,7 @@ void helperButtonLogTargDef() {
 //helper function to load target def. to GUI
 void helperButtonLoadTargDef() {
   UserInterface &ui = Application::GetUserInterface();
-  QString targetFile(ui.GetFileName("TARGDEF"));
+  QString targetFile(ui.GetFileName("FILE"));
 
 // test if targdef was entered
   Pvl p;
@@ -371,8 +371,10 @@ void addProject(PvlGroup &mapping) {
   projLUT ["SIMPLECYLINDRICAL"] = "SimpleCylindrical";
   projLUT ["EQUIRECTANGULAR"] = "Equirectangular";
   projLUT ["LAMBERTCONFORMAL"] = "LambertConformal";
+  projLUT ["LAMBERTAZIMUTHALEQUALAREA"] = "LambertAzimuthalEqualArea";
   projLUT ["OBLIQUECYLINDRICAL"] = "ObliqueCylindrical";
   projLUT ["POINTPERSPECTIVE"] = "PointPerspective";
+  projLUT ["ROBINSON"] = "Robinson";
 
 // Add Projection keywords to the mappping PVL
   mapping += PvlKeyword("ProjectionName", projLUT[projName]);
@@ -417,8 +419,8 @@ void addProject(PvlGroup &mapping) {
 // Function to Add the target information to the Mapping PVL
 void addTarget(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
-  if(ui.GetString("TARGOPT") == "SYSTEM") {
-    QString targetFile(ui.GetFileName("TARGDEF"));
+  if(ui.GetString("TARGOPT") == "SELECT") {
+    QString targetFile(ui.GetFileName("FILE"));
     Pvl p;
     p.read(targetFile);
     PvlGroup t = p.findGroup("mapping");
@@ -538,8 +540,8 @@ void calcRange(double &minLat, double &maxLat,
   // most current info from GUI to calculate the range
   Pvl userMap;
   PvlGroup userGrp("Mapping");
-  if(ui.GetString("TARGOPT") == "SYSTEM") {
-    userMap.read(ui.GetFileName("TARGDEF"));
+  if(ui.GetString("TARGOPT") == "SELECT") {
+    userMap.read(ui.GetFileName("FILE"));
   }
   else if(ui.GetString("TARGOPT") == "USER") {
     userGrp += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));

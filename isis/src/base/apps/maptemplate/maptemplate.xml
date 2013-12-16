@@ -3,28 +3,354 @@
 <application name="maptemplate" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-      Create mapping group template for a projection
+      Create map file template for a projection
   </brief>
 
   <description>
-      This program creates a map group template for map projections.  Choose a projection and
-      complete the highlighted fields in the projection parameters area.  An exsiting target
-      definition file can be used or the user can input target information.  If a target name
-      is specified and no value is entered for radius, the system radii will be used.  The Helper
-      button, located by the radial fields, will display the system radii for the chosen target
-      in the log area.  Using the RNGOPT parameter, the user can specify whether they want no
-      ground range values put into the map file, or if they want the application to calculate
-      them using the FROMLIST files,  or whether they want to enter the values themselves.
-      There is a helper button next to the RNGOPT parameter that will fill in the range
-      parameters with the calculated values. The RESOPT parameter works very similar to the
-      RNGOPT parameter.  The user can enter a resolution in pixel resolution(MPP) or scale(PPD).
-      The resolution can also be calculated using the FROMLIST. If the calculation option is
-      chosen, the user can choose to calculate the highest resolution, the lowest resolution,
-      or an average resolution.  All the calculated values will be in pixel resolution which is
-      meters per pixel.  There is also a helper button on this option that will automatically
-      fill in the resolution value in the gui.  The output templates can be used in applications
-      that use projections, such as cam2map, map2map, mapsize, skymap, etc.  The output file will 
-      automatically have the '.map' extension appended to the filename.
+   <p>
+     This program produces a <def>PVL</def> formatted file that contains the 
+     mapping group keywords required to transform an image to a 
+     <def link="Map Projection">map projection</def>.
+   </p>
+ 
+   <p>
+     <b>Required Input</b>
+     <ul>
+       <li>Map File Template output filename</li>
+       <li>Projection name</li>
+       <li>Additional parameters required for specific projections</li>
+       <li>Input list if CALC option will be used</li>
+     </ul>
+   </p>
+ 
+   <p>
+     <b>Output</b><br /><br />
+     A PVL formatted Map File Template containing mapping group keywords
+     for the selected projection.  The '.map' extension is appended to the output 
+     file automatically, if the file extension is not provided by the user.  The 
+     output file may contain all or some of the map specifications listed below:
+     <ul>
+       <li>User-preferred projection type (required)</li>
+       <li>Other keywords required for specific projections</li>
+       <li>Target body radii</li>
+       <li>Latitude/longitude coverage or ground range</li>
+       <li>Pixel resolution</li>
+       <li>Latitude and longitude definitions</li>
+       <li>Distance from center of target</li>
+       <li>Standard parallels</li>
+     </ul>
+   </p>
+ 
+   <p>
+     <b>Map File Template Creation</b> <br /><br />
+     To convert a raw instrument/camera cube (<def>Level1</def>) to a map projected 
+     image (<def>Level2</def>) the user must (1) create a  custom <def>PVL</def> formatted 
+     text file, (2) use this <i>maptemplate</i> application to produce one, or (3) use 
+     the automated, projection-specific Map File Template in $ISIS3DATA/base/templates/maps.
+     Whichever method that you choose, the Map File Template should contain the necessary 
+     keywords to project an image. 
+   </p>
+
+
+   <p>
+     <b>Map File Template Creation Choices:</b>
+     <ol>
+     <li>
+       <def>PVL</def> formatted text file: you must make a list of parameters 
+       based on the projection you wish to use, and input the appropriate values 
+       for each. The following example is a custom Map File Template for defining 
+       the projection of an image of Mars to the sinusoidal projection:
+<blockquote>
+<pre>
+ Group = Mapping
+ TargetName         = Mars
+ EquatorialRadius   = 3396190.0 &lt;meters&gt;
+ PolarRadius        = 3376200.0 &lt;meters&gt;
+ LatitudeType       = Planetocentric
+ LongitudeDirection = PositiveEast
+ LongitudeDomain    = 360
+
+ ProjectionName     = Sinusoidal
+ CenterLongitude    = 227.95679808356
+
+ MinimumLatitude    = 10.766902750622
+ MaximumLatitude    = 34.44419678224
+ MinimumLongitude   = 219.7240455337
+ MaximumLongitude   = 236.18955063342
+
+ PixelResolution    = 426.87763879023 &lt;meters/pixel&gt;
+ End_Group
+</pre>
+</blockquote>
+     </li>
+     The example above contains both required and optional keywords.<br /><br />
+     <li>
+       The <i>maptemplate</i> application: <i>maptemplate</i> will prompt you for 
+       all the necessary parameters to project your image. However, the planar and 
+       ring cylindrical projections are excluded from use in the application, because 
+       it requires keywords that are not defined in the program.<br /><br />
+     </li>
+     <li>
+       Templates in $ISIS3DATA/base/templates/maps:  the template contains all the 
+       parameters necessary to project an image, and only the Projection name is 
+       "uncommented" in the file. This is because some projections only require 
+       that you enter a projection name, and the default values are computed for 
+       the remaining keywords. In such cases where the default value cannot be 
+       calculated using the camera model or ISIS system default, you must 
+       "uncomment" the appropriate line(s) of the template and set the values.
+       See example below:
+<blockquote>
+<pre>
+Group = Mapping
+  ProjectionName  = LambertConformal
+# CenterLatitude  = 0.0 &lt;degrees&gt;
+# CenterLongitude = 0.0 &lt;degrees&gt;
+# Earth (ographic)
+# FirstStandardParallel  = 33.0 &lt;degrees&gt;
+# SecondStandardParallel = 45.0 &lt;degrees&gt;
+
+# Mars (ographic)
+# <b>FirstStandardParallel</b>  = 35.83 &lt;degrees&gt;  <b>*Remove # to uncomment and change 35.83 to your value</b>
+# <b>SecondStandardParallel</b> = 59.17 &lt;degrees&gt;  <b>*Remove # to uncomment and change 59.17 to your value</b>
+  End_Group
+</pre>      
+</blockquote>
+     </li>
+     </ol>
+   </p>  
+   <p>
+     <b>Identifying Required Parameters:</b><br /><br />
+     The following is a list of projections and keywords that are required. When 
+     a keyword is missing, and you try to project an image using projection 
+     software like <i>cam2map</i>, an error will occur. Below is a list of 
+     projections and the keywords that must be in the Map File Template:<br />
+
+<table class="tableFormattedInformation" border="1" style="width:700px;">
+<tr>
+   <th>
+      PROJECTION	
+   </th>
+   <th>
+      ASSIGN VALUES FOR THESE KEYWORDS
+   </th>
+</tr>
+<tr>
+   <td>
+      Lambert Conformal
+   </td>
+   <td>
+      FirstStandardParallel, SecondStandardParallel
+   </td>
+</tr>
+ <tr>
+   <td>
+      Oblique cylindrical
+   </td>
+   <td>
+      PoleLatitude, PoleLongitude, PoleRotation
+   </td>
+</tr>
+ <tr>
+   <td>
+     Point perspective 
+   </td>
+   <td>
+     Distance 
+   </td>
+</tr>
+ <tr>
+   <td>
+     Planar (unavailable in <i>maptemplate</i>)
+   </td>
+   <td>
+     CenterRingRadius, CenterRingLongitude, RingLongitudeDirection, RingLongitudeDomain 
+   </td>
+</tr>
+
+ <tr>
+   <td>
+      Ring cylindrical (unavailable in <i>maptemplate</i>)
+   </td>
+   <td>
+      CenterRingRadius, CenterRingLongitude, RingLongitudeDirection, RingLongitudeDomain
+   </td>
+</tr>
+</table>
+
+</p>
+<br />
+<p>
+<b>How the defaults are set for Mapping Group keywords:</b>
+
+<table class="tableFormattedInformation" border="1" style="width:700px;">
+<tr>
+   <th>
+      DEFAULT SOURCE	
+   </th>
+   <th>
+      MAPPING GROUP KEYWORDS
+   </th>
+</tr>
+<tr>
+   <td>
+      From Label
+   </td>
+   <td>
+      TargetName
+   </td>
+</tr>
+      
+<tr>
+   <td>
+      From camera model
+   </td>
+   <td>
+      CenterLatitude, CenterLongitude, MaximumLatitude, MaximumLongitude, 
+      MinimumLatitude, MinimumLongitude, PixelResolution, Scale
+   </td>
+</tr>
+<tr>
+   <td>
+      ISIS Map defaults
+   </td>
+   <td>
+      LatitudeType (ocentric), LongitudeDomain (360), LongitudeDirection (East), 
+      ScaleFactor (1)
+   </td>
+</tr>
+<tr>
+   <td>
+      From PCK file for Target
+   </td>
+   <td>
+      EquatorialRadius, PolarRadius
+   </td>
+</tr>
+
+<tr>
+   <td>
+      Not computed, user must set
+   </td>
+   <td>
+      CenterRingLongitude, CenterRingRadius, Distance, FirstStandardParallel,
+      MaximumRingLongitude, MaximumRingRadius, MinimumRingLongitude,
+      MinimumRingRadius, PoleLatitude, PoleLongitude, PoleRotation,
+      RingLongitudeDirection, RingLongitudeDomain, SecondStandardParallel
+   </td>
+</tr>
+</table>   
+</p>
+<br />  
+   <p>
+     <b><i>Maptemplate</i> GUI Interface</b><br /><br />
+     Radio buttons in the GUI are used to select options. Once an option is 
+     selected, the required parameters pertinent to that option become activated; 
+     therefore the user should complete the highlighted fields in the different 
+     parameter sections. Use the right scroll bar on the right side of the GUI 
+     to see all the available options.  
+    </p> 
+    <p>
+     The <image src="assets/images/exec.png" alt="Gear Button" height="22" width="22"> 
+     </image> button is used for RNGOPT and RESOPT options. If the button is clicked,
+     the range will be calculated and automatically entered in the GUI 
+     fields with the appropriate values.  For SELECT, the 
+     <image src="assets/images/view_tree.png" alt="File Tree Icon" height="22" 
+     width="22"> </image> button is used to select a Map File Template, the  
+     <image src="assets/images/view_text.png" alt="View File Icon" 
+     height="22" width="22"> </image> button is use to view the contents of
+     the selected file at the bottom of the GUI, and the "Down Arrow" button is 
+     used to load the contents of the selected file into the appropriate GUI fields. 
+     When the target name is set and no other value is specified, the 
+     <image src="assets/images/view_text.png" alt="View File Icon" height="22" 
+     width="22"> </image> button next to EQRADIUS is used to display the system
+     radii in the log area.
+   </p>
+
+   <p>
+     <b>Parameter Setting Action</b>
+
+     <table class="tableFormattedInformation" border="1" style="width:700px;">
+     
+     <tr>
+       <th>
+     	 PARAMETER
+       </th>
+       <th>
+     	 ACTION
+       </th>
+     </tr>
+     <tr>
+       <td>
+     	 NONE
+       </td>
+       <td>
+     	 No keywords regarding the target will be added to the Map File Template. 
+	 The value for the required keywords is derived based on the ISIS defaults 
+	 at the time of projection. If a target name is specified and no value is 
+	 entered for radius, the system radii will be used.
+       </td>
+     </tr>
+
+     <tr>
+       <td>
+     	 USER
+       </td>
+       <td>
+     	 The user must enter the target and the preferred settings for the selected 
+	 projection. The user can select meters per pixel (MPP) or pixels per degree 
+	 (PPD) to define the units for the value entered for Resolution. If MPP is 
+	 chosen, the value is set for the keyword PixelResolution. If PPD is chosen, 
+	 the value is set for the keyword Scale.
+       </td>
+     </tr>
+     <tr>
+       <td>
+     	 SELECT
+       </td>
+       <td>
+     	 The target definition information is retrieved from an existing Map File 
+	 Template.  The information can be displayed in the log area or loaded into
+	 appropriate GUI fields.  The Help buttons located by the radial fields can 
+	 only be used when the GUI is used to specify the parameters. 
+       </td>
+     </tr>
+     <tr>
+       <td>
+     	 CALC
+       </td>
+       <td>
+     	 The application <i>maptemplate</i> will calculate the values using the files 
+	 in the input list specified in the FROMLIST parameter. For the ground range, 
+	 the keywords MinimumLatitude, MaximumLatitude, MinimumLongitude, and 
+	 MaximumLongitude are set. The values for ground range are in degrees. For 
+	 the resolution, the keywords PixelResolution and Scale are set. All the 
+	 calculated values for resolution will be meters per pixel for the keyword 
+	 PixelResolution.
+       </td>
+     </tr>
+     <tr>
+       <td>
+     	 RESCALCOPT
+       </td>
+       <td>
+     	The PixelResolution value is set based on whether the user selected HIGH, 
+	LOW, or AVERAGE when the CALC option is used to calculate the resolution. 
+       </td>
+     </tr>
+    </table> 
+   </p>
+
+   <p>
+     <b>Other Uses for Your Created Map file:</b> The output Map File can be used 
+     in applications that use projections, such as <i>cam2map</i>, <i>map2map</i>, 
+     <i>mapsize</i>, <i>skymap</i>, and more. 
+    </p>
+    <p>
+     See <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections">"Learning About Map Projections:"</a>
+     to learn more about mapping keywords.
+   </p>
+<br />  
+   
   </description>
   
   <history>
@@ -35,11 +361,11 @@
       Added .map extension to TO file and fixed bug with spaces in the projection name
     </change>
     <change name="Elizabeth Miller" date="2006-05-18">
-      Depricated CubeProjection and ProjectionManager to ProjectionFactory
+      Deprecated CubeProjection and ProjectionManager to ProjectionFactory
     </change>
     <change name="Robert Sucharski" date="2006-06-02">
       Redid GUI, added code to calculate ground range and resolution using FROMLIST, and
-      added helper buttons
+      added Help buttons
     </change>
     <change name="Steven Lambright" date="2008-04-23">
       Added oblique cylindrical projection
@@ -56,6 +382,15 @@
     </change>
     <change name="Debbie A. Cook" date="2013-04-16">
       Changed to use TProjection instead of Projection.  References #775
+    </change>
+    <change name="Ella Mae Lee" date="2013-11-25">
+      Added LambertAzimuthalEqualArea and Robinson projections.  Updated the user 
+      documentation, fixes #845.
+    </change>
+    <change name="Ella Mae Lee" date="2013-12-12">
+      Backward compatability issue due to parameter name change: TARGOPT options 
+      changed from SYSTEM to SELECT, IMAGE to NONE, and TARGDEF to FILE. The
+      description was modified to describe the behavior when selected, fixes #845.
     </change>
   </history>
 
@@ -81,43 +416,48 @@
           Output text file containing mapping keywords and values
         </brief>
         <description>
-          This file will contain the mapping group template.  If this file currently exists, the application will write over
-          the file.  The '.map' extension will automatically be appended to the entered filename if you do not type
-           in an extension.
+          This file will contain the mapping information for a projection.  If 
+	  this file currently exists, the application overwrites the file.  
+	  The '.map' extension will automatically append to the filename entered 
+	  if you do not type in an extension. If the file name 
+	  in the GUI field does not have the extension, add ".map" to the string
+	  before pressing the button to display the contents.  
         </description>
         <helpers>
           <helper name="H1">
             <function>helperButtonLogMap</function>
             <brief>View map file in log area</brief>
-            <description>This helper button will display the current map file in the log area</description>
+            <description>This Help button will display the current map file in 
+	    the log area
+	    </description>
             <icon>$ISIS3DATA/base/icons/view_text.png</icon>
           </helper>
           <helper name="H2">
             <function>helperButtonLoadMap</function>
             <brief>Load Map File values into the GUI</brief>
             <description>
-              This helper button will take the values currently in the mapfile and 
-              load them into their correct locations in the gui
+              This Help button will take the values currently in the map file 
+	      and load them into their correct locations in the GUI
             </description>
             <icon>$ISIS3DATA/base/icons/exec.png</icon>
           </helper>
         </helpers>
         <filter>
-          *.map
+          *.map *.cub
         </filter>
       </parameter>
 
       <parameter name="FROMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
-        <internalDefault>list of images used when calculation option is selected</internalDefault>
+        <internalDefault>Input list that is used only when CALC option is invoked</internalDefault>
         <brief>
           Input list of images used when calculation option is selected
         </brief>
         <description>
-          A list of file names that will be used by the calculation (CALC)
-          option for the ground range (RNGOPT) and resolution (RESOPT) parameters.
-          It is also used when a user selects the helper button for the two
+          A list of file names that will be used to calculate the values when (CALC)
+          option is selected for the ground range (RNGOPT) or resolution (RESOPT) 
+	  parameters.  It is also used when a user selects the help button for the two
           parameters.
         </description>
         <filter>
@@ -130,11 +470,12 @@
       <parameter name="PROJECTION">
         <type>string</type>
         <brief>
-            Name of Projection to create mapping group for
+            Projection selection for the map file
         </brief>
         <description>
-            This is the name of the projection for the mapping group being
-            created.
+            This is the name of the projection for the map file being
+            created.  The <i>maptemplate</i> application currently does not
+	    support Planar and Ring Cylindrical projections.
         </description>
         <default>
           <item>SINUSOIDAL</item>
@@ -250,7 +591,7 @@
               Simple Cylindrical Projection
             </brief>
             <description>
-              Create a maptemplate for a simple cylindrical projection
+              Create a maptemplate for a simple cylindrical projection.
             </description>
             <inclusions>
               <item>CLON</item>
@@ -308,6 +649,27 @@
               <item>DIST</item>
             </exclusions>
           </option>
+          <option value="LAMBERTAZIMUTHALEQUALAREA">
+            <brief>
+              Lambert Azimuthal Equal-area Projection
+            </brief>
+            <description>
+              Create a maptemplate for a Lambert azimuthal equal area projection.
+            </description>
+            <inclusions>
+              <item>CLON</item>
+              <item>CLAT</item>
+            </inclusions>
+            <exclusions>
+              <item>SCALEFACTOR</item>
+              <item>PAR1</item>
+              <item>PAR2</item>
+              <item>PROT</item>
+              <item>PLAT</item>
+              <item>PLON</item>
+              <item>DIST</item>
+            </exclusions>
+          </option>
           <option value="OBLIQUECYLINDRICAL">
             <brief>
               Oblique Cylindrical Projection
@@ -334,7 +696,7 @@
               Point Perspective Projection
             </brief>
             <description>
-              Create a maptemplate for an point perspective projection.
+              Create a maptemplate for a point perspective projection.
             </description>
             <inclusions>
               <item>CLON</item>
@@ -342,6 +704,27 @@
               <item>DIST</item>
             </inclusions>
             <exclusions>
+              <item>SCALEFACTOR</item>
+              <item>PAR1</item>
+              <item>PAR2</item>
+              <item>PROT</item>
+              <item>PLAT</item>
+              <item>PLON</item>
+            </exclusions>
+          </option>
+          <option value="ROBINSON">
+            <brief>
+              Robinson Projection
+            </brief>
+           <description>
+              Create a maptemplate for a Robinson projection.
+            </description>
+            <inclusions>
+              <item>CLON</item>
+            </inclusions>
+            <exclusions>
+              <item>CLAT</item>
+              <item>DIST</item>
               <item>SCALEFACTOR</item>
               <item>PAR1</item>
               <item>PAR2</item>
@@ -441,7 +824,8 @@
           Distance from the center of the Target
         </brief>
         <description>
-          Distance from the center of the Target, should be larger than the target radius.
+          Distance from the center of the Target: value should be greater
+	  than the target radius.
         </description>
       </parameter>
     </group>
@@ -454,28 +838,29 @@
         </brief>
         <description>
           This option specifies how the target information will be created.  The
-          default is IMAGE.  The other options include SYSTEM and USER.  The
-          IMAGE option will not add any target information to the map file,
-          allowing the target information from the image to be used.  The SYSTEM
-          option will retrieve the target information from the system defaults,
-          and the USER option allows the user to specify their own target
-          information.
+          default is NONE.  The other options are SELECT and USER.  The
+          NONE option will not add any target information to the map file,
+          allowing the target information from the image to be used.  The SELECT
+          option allows the user to select an existing file with mapping group, and load
+	  the target loaded information in the GUI fields.  The target information
+	  is written to the output file. The USER option allows the user to 
+	  specify their target information.
         </description>
         <default>
-          <item>IMAGE</item>
+          <item>NONE</item>
         </default>
         <list>
-          <option value="IMAGE">
+          <option value="NONE">
             <brief>
-              Image Defaults
+              No Target Information Output
             </brief>
             <description>
-              No target information will be put into the map template file.
-              This information will be retrieved from the image at the time
-              of projection.
+              No target information is put into the map template file.
+              This information is retrieved or calculated for the image at 
+	      the time of projection.
             </description>
             <exclusions>
-              <item>TARGDEF</item>
+              <item>FILE</item>
               <item>TARGETNAME</item>
               <item>EQRADIUS</item>
               <item>POLRADIUS</item>
@@ -484,15 +869,17 @@
               <item>LONDOM</item>
             </exclusions>
           </option>
-          <option value="SYSTEM">
+          <option value="SELECT">
             <brief>
-              System Defaults
+              Select Existing File
             </brief>
             <description>
-              The information needed will be automatically generated from system defaults.
+              This parameter is used to select an existing File with mapping group information.
+	      The contents of the map file must be loaded into the GUI fields
+	      for the keywords to be written to the output Map file.
             </description>
             <inclusions>
-              <item>TARGDEF</item>
+              <item>FILE</item>
             </inclusions>
             <exclusions>
               <item>TARGETNAME</item>
@@ -508,8 +895,8 @@
               User Input
             </brief>
             <description>
-              The information needed is based on the target name, latitude type,
-              and the longitude direction and domain.
+              The user defines the target name, latitude type, longitude direction, 
+	      longitude domain, equatorial radius, and polar radius.
             </description>
             <inclusions>
               <item>TARGETNAME</item>
@@ -518,36 +905,40 @@
               <item>LONDOM</item>
             </inclusions>
             <exclusions>
-              <item>TARGDEF</item>
+              <item>FILE</item>
             </exclusions>
           </option>
         </list>
       </parameter>
 
-      <parameter name="TARGDEF">
+      <parameter name="FILE">
         <type>filename</type>
         <defaultPath>
           $ISIS3DATA/base/templates/targets/
         </defaultPath>
         <brief>
-            Name of the Target Definition File
+            Name of the Map File
         </brief>
         <description>
-            This is the Target Definition file that will be used for the projection.
+            This is the Map File Template that is used to set the target 
+	    specific values in the mapping group for the projection.
         </description>
+        <filter>
+          *.map *.txt *.def *.pvl *.cub
+        </filter>
         <helpers>
           <helper name="H4">
             <function>helperButtonLogTargDef</function>
-            <brief>View TARGDEF file in log area</brief>
-            <description>This helper button will display the  selected target def file in the log area</description>
+            <brief>View MAP file contents in log area</brief>
+            <description>This Help button will display the selected map file contents in the log area</description>
             <icon>$ISIS3DATA/base/icons/view_text.png</icon>
           </helper>
           <helper name="H3">
             <function>helperButtonLoadTargDef</function>
-            <brief>Load values from TARGDEF into GUI</brief>
+            <brief>Load values from map file into GUI</brief>
             <description>
-              This helper button will take the values currently in the target def file and 
-              load them into their correct locations in the gui
+              This Help button will take the values in the map file and 
+              load them into their correct locations in the GUI.
             </description>
             <icon>$ISIS3DATA/base/icons/exec.png</icon>
           </helper>
@@ -643,7 +1034,7 @@
         <list>
           <option value="360">
             <brief>
-              0 to 360 Degree Longitude Domain
+              0 to 360 degree longitude values
             </brief>
             <description>
               Sets the longitude domain in the mapping template to 360 degrees.
@@ -651,7 +1042,7 @@
           </option>
           <option value="180">
             <brief>
-              -180 to 180 Degree Longitude Domain
+              -180 to 180 degree longitude values
             </brief>
             <description>
               Sets the longitude domain in the mapping template to 180 degrees.
@@ -667,14 +1058,16 @@
         </brief>
         <internalDefault>IAU Default</internalDefault>
         <description>
-          The equatorial radius value to put in the maptemplate.  If this value is left blank, the system default will be used
+          The equatorial radius value to put in the map template.  If this 
+	     value is left blank, the system default will be used.
         </description>
         <helpers>
           <helper name="H5">
             <function>helperButtonLogRadius</function>
-            <brief>Show the system default radius for TARGETNAME in log area</brief>
+            <brief>Show the system default radius for the target in log area</brief>
             <description>
-              This button will display the system radii values for the target name in the log area
+              This button will display the system radii values for the target 
+	        name in the log area
             </description>
             <icon>$ISIS3DATA/base/icons/view_text.png</icon>
           </helper>
@@ -688,7 +1081,8 @@
         </brief>
         <internalDefault>IAU Default</internalDefault>
         <description>
-          The polar radius value to put in the maptemplate.  If this value is left blank, the system default will be used.
+          The polar radius value to put in the Map File Template.  If this value 
+	  is left blank, the system default will be used.
         </description>
       </parameter>
     </group>
@@ -701,33 +1095,37 @@
         </brief>
         <description>
           This option specifies how the ground range information will be
-          created. IMAGE is the default value. The other options are USER
-          and CALC. The IMAGE option does not write any ground range
-          information to the map template file, allowing the range to be
-          calculated from the image at the time of projection. The USER
-          option allows the user to enter their own values for the ground
-          range, and the CALC option will calculate the ground range using
-          the files listed in the FROMLIST parameter.
+          created. NONE is the default value. The other options are USER
+          and CALC. For the NONE option, none of the ground range information 
+	  is written to the map template file, allowing the range to be
+          calculated from the image at the time of projection. For the USER
+          option, the user enters their values for the ground range.  For
+	  the CALC option, <i>maptemplate</i> calculates the ground range using
+          the files in the input list (FROMLIST). If CALC option is used,
+          the MinimumLatitude, MaximumLatitude, MinimumLongitude, and
+          MaximumLongitude are added to the mapping group after the calculation
+	  is performed.
         </description>
         <default>
-          <item>IMAGE</item>
+          <item>NONE</item>
         </default>
         <helpers>
           <helper name="H3">
             <function>helperButtonCalcRange</function>
             <brief>Calculate Ranges using FROMLIST</brief>
             <description>
-              This button will calculate the latitude and longitude range using the files in the FROMLIST.
-              The ranges will be calculated using the target information in the GUI.  If no target information
-               is entered, then the camera defaults will be used.
+              Upon clicking this button, the program will calculate the latitude 
+	      and longitude range using the files in the FROMLIST.
+              The ranges will be calculated using the target information in the GUI.  
+	      If no target information is entered, then the camera defaults will be used.
             </description>
             <icon>$ISIS3DATA/base/icons/exec.png</icon>
           </helper>
         </helpers>
         <list>
-          <option value="IMAGE">
+          <option value="NONE">
             <brief>
-              Image Defaults
+              No ground range keywords are output
             </brief>
             <description>
               No ground range values will be put into the mapping template.  These values will be computed
@@ -752,10 +1150,11 @@
 
           <option value="CALC">
             <brief>
-              Calculate Ground Range Using Input Parameter FROMLIST
+              Calculate Ground Range Using Input List
             </brief>
             <description>
-              The values used for ground range will be calculated using the files in the from list (FROMLIST).
+              The values used for ground range will be calculated using the files in 
+	      (FROMLIST).
             </description>
             <exclusions>
               <item>MINLAT</item>
@@ -823,37 +1222,38 @@
           Resolution Selection Options
         </brief>
         <description>
-          This option decides how the resolution information will be created.
-          The default is IMAGE. The other options are MPP, PPD and CALC. The
-          IMAGE option does not write any resolution information to the map
+          This option specifies how the resolution information will be created.
+          The default is NONE. The other options are MPP, PPD, and CALC. The
+          NONE option does not write any resolution information to the map
           file, allowing the resolution to be calculated from the image at the
           time of projection. The MPP and PPD option allow the user to enter
-          their own values for the resolution and select the appropriate units.
-          The CALC option will calculate the resolution using the files listed
-          in the FROMLIST parameter. 
+          their own value in meters per pixel or pixels per degree for the 
+          resolution.  The CALC option will calculate the resolution using the 
+          files listed in the FROMLIST parameter. 
         </description>
         <default>
-          <item>IMAGE</item>
+          <item>NONE</item>
         </default>
         <helpers>
           <helper name="H6">
             <function>helperButtonCalcResolution</function>
             <brief>Calculate Pixel Resolution using FROMLIST</brief>
             <description>
-              This button will calculate the resolution value using the files in the FROMLIST.  The output from this calculation
-              will be in meters/pixel which is Pixel Resolution in the map file.
+              Click this button to calculate the resolution value using the files in 
+              the FROMLIST.  The result of this calculation will be in meters/pixel 
+              and defined as the PixelResolution in the map file.
             </description>
             <icon>$ISIS3DATA/base/icons/exec.png</icon>
           </helper>
         </helpers>
         <list>
-          <option value="IMAGE">
+          <option value="NONE">
             <brief>
-              Image Defaults
+              No resolution keywords are output
             </brief>
             <description>
-              No resolution value will be put into the mapping template.  It will be computed from the image at the time 
-              of projection.
+              No resolution value will be put into the mapping template.  It will be 
+              computed from the image at the time of projection.
             </description>
             <exclusions>
               <item>RESOLUTION</item>
@@ -862,11 +1262,10 @@
           </option>
           <option value="MPP">
             <brief>
-              User entered Pixel Resolution (MPP)
+              Specify the PixelResolution in meters per pixel
             </brief>
             <description>
-              The values used for resolution are user entered in meters per
-              pixel. This value is the keyword PixelResoution in the map
+              The unit for PixelResolution is set to meters per pixel in the map
               template file.
             </description>
             <exclusions>
@@ -875,11 +1274,11 @@
           </option>
           <option value="PPD">
             <brief>
-             User entered Scale (PPD)
+             Specify the Scale in pixels per degree
             </brief>
             <description>
-              The values used for resolution are user entered in pixels per
-              degree. This value is the keyword Scale in the map template file.
+              The unit for Scale is set to pixels per degree in the map
+              template file.
             </description>
             <exclusions>
               <item>RESCALCOPT</item>
@@ -890,8 +1289,8 @@
               Calculate Resolution Using Input Parameter FROMLIST
             </brief>
             <description>
-              The values used for resolution will be calculated using the files in the FROMLIST parameter.  The value that
-              is returned will be in meter per pixel (which is the PixelResolution keyword).
+              The resolution will be calculated using the files in the FROMLIST parameter.  The value that
+              is returned will be in meters per pixel and assigned to PixelResolution keyword.
             </description>
             <exclusions>
               <item>RESOLUTION</item>
@@ -906,24 +1305,25 @@
           Resolution
         </brief>
         <description>
-          The values used for resolution in the mapping template.  The units are specified by the user as pixels per degree (PPD)
-          or meters per pixel (MPP).
+          This value is assigned to PixelResolution keyword if CALC or MPP was chosen, or Scale if 
+          PPD was chosen by the user.
         </description>
       </parameter>
 
       <parameter name="RESCALCOPT">
         <type>string</type>
         <brief>
-          Select highest value, lowest value, or average value
+          Calculated Resolution Selection Options
         </brief>
         <description>
-          This option specifies how the resolution information will be
-          calculated. The default is HIGH. The other options are LOW and
-          AVERAGE. The HIGH option gets the highest resolution from the list
-          of images, the LOW option gets the lowest resolution, and the AVERAGE
-          option calculates the average resolution from all of the files in the
-          FROMLIST parameter. All options output the resolution in meters per
-          pixel.
+          This option specifies how the resolution information calculated for
+          the files in FROMLIST will be used to set the value for PixelResolution. 
+          The default is HIGH. The other options are LOW and AVERAGE. The HIGH 
+          option gets the highest resolution from the list of images, the LOW 
+          option gets the lowest resolution, and the AVERAGE option calculates
+          the average resolution from all of the files in the FROMLIST parameter
+          to set the value for PixelResolution in the map template. All options
+          output the resolution in meters per pixel.
         </description>
         <default>
           <item>HIGH</item>
@@ -931,18 +1331,20 @@
         <list>
           <option value="HIGH">
             <brief>
-              Calculate Highest / Best Resolution
+              Select Highest / Best Resolution
             </brief>
             <description>
-              Calculate the highest/best resolution from the images in the input list.  Output is in meters per pixel.
+              Select the highest/best resolution from the images in the input list
+              to define PixelResolution. Output is in meters per pixel.
             </description>
           </option>
           <option value="LOW">
             <brief>
-              Calculate Lowest / Worst Resolution
+              Select Lowest / Worst Resolution
             </brief>
             <description>
-              Calculate the lowest/worst resolution from the  images in the input list.  Output is in meters per pixel.
+              Select the lowest/worst resolution from the images in the input list
+              to define PixelResolution.  Output is in meters per pixel.
             </description>
           </option>
           <option value="AVERAGE">
@@ -950,7 +1352,8 @@
               Calculate Average Resolution
             </brief>
             <description>
-              The average resolution is calculated from the input images.  Output is in meters per pixel.
+              The average resolution is calculated from the input images and set
+              to PixelResolution.  Output is in meters per pixel.
             </description>
           </option>
         </list>
@@ -963,9 +1366,9 @@
       <brief> Sinusoidal Map Template</brief>
       <description>
         This example shows the contents of a PVL text file generated by the
-        maptemplate application.  The settings are all default for this example,
-        other than the output filename and center longitude which are entered
-        by the user.
+        maptemplate application.  The settings are in default status for this 
+	example except for the output filename and center longitude which must
+	be entered by the user.
         <pre>
 Group = Mapping
   ProjectionName     = Sinusoidal
@@ -973,15 +1376,31 @@ Group = Mapping
 End_Group
 End
         </pre>
-        The above output is the text file resulting when the following command line is run.
+        The text above is the contents of the map template file when the 
+        following command line is executed.
       </description>
       <terminalInterface>
         <commandLine> map=out.txt clon=0.0
         </commandLine>
         <description>
-        Just run maptemplate with an output file name and center longitude.
+        Run the maptemplate application specifying only the output file name 
+        and center longitude.
         </description>
       </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="557" height="900" src="assets/images/maptemplate_GUI.png">
+            <brief>Example GUI</brief>
+            <description>
+	        Screenshot of maptemplate GUI before the
+	        center longitude was entered for the sinusoidal projection.  
+	    </description>
+            <thumbnail width="93" height="150" caption="Maptemplate GUI" src="assets/thumb/maptemplate_GUI_thumb.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
     </example>
     <example>
       <brief> Lambert Conformal Map Template</brief>
@@ -989,8 +1408,8 @@ End
         This example shows the contents of a PVL text file for a Lambert
         conformal map projection based on user selected options.  The output
         file, projection type, center latitude, center longitude, first and
-        second standard parallel, target option, and target name are entered.
-        The rest of the settings are left in their default state.
+        second standard parallels, target option, and target name are entered.
+        The remaining settings are left in their default state.
         <pre>
 Group = Mapping
   ProjectionName     = LambertConformal
@@ -1006,14 +1425,16 @@ Group = Mapping
   LongitudeDomain    = 360
 End_Group
         </pre>
-        The above output is the text file resulting when the following command line is run.
+        The text shown above is the contents of the output file created when the 
+        following command line is executed.
       </description>
       <terminalInterface>
         <commandLine> map=out.txt projection=LambertConformal clon=0.0 clat=90.0 par1=45.0 par2=55.0 targopt=user targetname=MARS 
         </commandLine>
         <description>
-        Just run maptemplate with the output file, projection type, center latitude, center longitude, 
-        first and second standard parallel, target option, and target name.
+        Run the maptemplate application by specifying the output file, projection type, 
+        center latitude, center longitude, first and second standard parallels, 
+        target option, and target name.
         </description>
       </terminalInterface>
     </example>
