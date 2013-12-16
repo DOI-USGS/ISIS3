@@ -7,34 +7,34 @@
         <ul>
           <li><a href="../Overview/Overview.html">Overview</a></li>
           <ul>
-          <li><a href="../Overview/Overview.html#WhatIsIsis">What is Isis</a></li>
-          <li><a href="../Overview/Overview.html#MissionSpecificCapabilities">Mission Specific Capabilities</a></li>
-          <li><a href="../Overview/Overview.html#CartographicCapabilities">Cartographic Capabilities</a></li>
+          <li><a href="../Overview/Overview.html#WhatIsIsis">What is ISIS?</a></li>
+          <li><a href="../Overview/Overview.html#SupportingPlanetarySpaceMissions">Supporting Planetary Space Missions</a></li>
           </ul>
 
           <li><a href="../IsisHistory/IsisHistory.html">History</a></li>
           <ul>
           <li><a href="../IsisHistory/IsisHistory.html#Introduction">Introduction</a></li>
           <li><a href="../IsisHistory/IsisHistory.html#TheEarlyYears">The Early Years</a></li>
+          <li><a href="../IsisHistory/IsisHistory.html#FlagstaffImageProcessingSystem">The Flagstaff Image Processing System</a></li>
           <li><a href="../IsisHistory/IsisHistory.html#ThePlanetaryImageCartographySystem">The Planetary Image Cartography System</a></li>
-          <li><a href="../IsisHistory/IsisHistory.html#AStarIsBorn">A Star is Born</a></li>
-          <li><a href="../IsisHistory/IsisHistory.html#CurrentEvents">Current Events</a></li>
-          <li><a href="../IsisHistory/IsisHistory.html#IsisPedigree">Isis Pedigree</a></li>
+          <li><a href="../IsisHistory/IsisHistory.html#IsisSoftware">Integrated System for Imagers and Spectrometers</a></li>
+          <li><a href="../IsisHistory/IsisHistory.html#IsisVersions">Summary of Major Versions of ISIS</a></li>
+
           </ul>
 
-          <li><a href="../Conversion/Conversion.html">Conversion of Isis 2 to Isis 3.0</a></li>
+          <li><a href="../Conversion/Conversion.html">Conversion of ISIS 2 to ISIS 3.0</a></li>
           <ul>
           <li><a href="../Conversion/Conversion.html#DrivingForceOfTheConversion">Driving Force of the Conversion</a></li>
           <li><a href="../Conversion/Conversion.html#UserDesignConsiderations">User Design Considerations</a></li>
           <li><a href="../Conversion/Conversion.html#ProgrammerDesignConsiderations">Programmer Design Considerations</a></li>
-          <li><a href="../Conversion/Conversion.html#IsisSystemManagementDesignConsiderations">Isis System Management Design Considerations</a></li>
+          <li><a href="../Conversion/Conversion.html#IsisSystemManagementDesignConsiderations">ISIS System Management Design Considerations</a></li>
           <li><a href="../Conversion/Conversion.html#OtherSignificantDesignChanges">Other Significant Design Changes</a></li>
           </ul>
 
           <li><a href="../EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html">Environment and Preference Setup</a></li>
           <ul>
           <li><a href="../EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html#Introduction">Introduction</a></li>
-          <li><a href="../EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html#UnixSetup">Unix Setup</a></li>
+          <li><a href="../EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html#UnixSetup">UNIX Setup</a></li>
           <li><a href="../EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html#SystemPreferenceFile">System Preference File</a></li>
           <li><a href="../EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html#UserPreferenceFile">User Preference File</a></li>
           <li><a href="../EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html#ProjectPreferenceFile">Project Preference File</a></li>
@@ -104,8 +104,8 @@
   </audience>
   <bibliography>
     <title>System Architecture</title>
-    <brief>An indepth "get started" tour of Isis, including history, mechanics, and basic use.</brief>
-    <description>Take an indepth "get started" tour of Isis, from the software's history to an overview of the newest features. Learn the basics of working in the Isis software environment.</description>
+    <brief>An in-depth "get started" tour of ISIS, including history, mechanics, and basic use.</brief>
+    <description>Take an in-depth "get started" tour of ISIS, from the software's history to an overview of the newest features. Learn the basics of working in the ISIS software environment.</description>
     <author>Jeff Anderson</author>
     <date>2003-06-25</date>
   </bibliography>

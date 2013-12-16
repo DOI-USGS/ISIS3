@@ -85,7 +85,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        Isis Documentation</p>
+        ISIS Documentation</p>
 
         <hr/>
 
@@ -105,13 +105,13 @@ Deborah Lee Soltesz
 
 
       <p>
-      See the <a href="../documents/InstallGuide/index.html">Isis 3 Installation Guide</a>
-      for instructions on downloading and installing Isis 3.
+      See the <a href="../documents/InstallGuide/index.html">ISIS 3 Installation Guide</a>
+      for instructions on downloading and installing ISIS 3.
       </p>
 
       <p>
-        Refer to the <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">Isis 2 Installation Guide</a>
-      for instructions on downloading and installing Isis 2.
+        Refer to the <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">ISIS 2 Installation Guide</a>
+      for instructions on downloading and installing ISIS 2.
       </p>
 
       <table class="tableTOC">

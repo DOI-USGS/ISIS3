@@ -3,17 +3,18 @@
   <files>
     <file>
       <body>
-        <h2>Recent Astrogeology Contributors</h2>
+	<h2>Introduction</h2>
         <p>
-        As indicated in the
-        <a href="../IsisHistory/IsisHistory.html">history</a>,
-        Isis has been in existence in one form or another for over 40 years.
+        ISIS has been a staple for the cartographic and scientific analysis of
+	planetary image data since 1992 with a heritage reaching back to 1971.
         Contributors from the USGS and other institutions have been involved 
         in the design and development of ISIS during the course of its evolution.  
         These include scientists, programmers, image processors, and students.
-        Astrogeology Team members who are currently involved in the development 
-        of ISIS are listed below.
-        </p>
+	Below are the names of those who have contributed to ISIS:
+	</p>
+	<br />
+	
+	<h2>Current USGS Astrogeology Contributors</h2>
         
         <table class="tableGeneralInformation" align="center" width="90%">
           <tr>
@@ -25,29 +26,23 @@
           <tr>
             <td>Kris Becker</td>
             <td>Tammy Becker</td>
-            <td>Debbie Cook</td>
             <td>Kenneth Edmundson</td>
-          </tr>
-          <tr>
-            <td>Mathew Eis</td>
             <td>Robin Fergason</td>
+         </tr>
+          <tr>
             <td>Paul Geissler</td>
             <td>Lisa Gaddis</td>
-          </tr>
-          <tr>
             <td>Trent Hare</td>
             <td>Ken Herkenhoff</td>
+          </tr>
+          <tr>
             <td>Annie Howington-Kraus</td>
             <td>Chris Isbell</td>
-          </tr>
-          <tr>
             <td>Laszlo Keszthelyi</td>
             <td>Randy Kirk</td>
-            <td>Steven Lambright</td>
-            <td>Ella Lee</td>
           </tr>
           <tr>
-            <td>Moses Milazzo</td>
+            <td>Ella Lee</td>
             <td>Kimberly Oyama</td>
             <td>Bonnie Redding</td>
             <td>Janet Richie</td>
@@ -67,11 +62,7 @@
         </table>
         <br />
 
-        <h2>Past USGS Contributors</h2>
-        <p>
-        Listed below are former Astrogeology or other USGS employees who 
-        have contributed to the image processing software. 
-        </p>
+        <h2>Former Astrogeology and other USGS Contributors</h2>
 
         <table class="tableGeneralInformation" align="center" width="90%">
           <tr>
@@ -90,47 +81,53 @@
              <td>MacKenzie Boyd</td>
              <td>Pat Chavez</td>
              <td>Way Christensen</td>
-             <td>Jim Crawforth</td>
+             <td>Debbie Cook</td>
           </tr>
           <tr>
+	     <td>Jim Crawforth</td>
              <td>Sean Crosby</td>
              <td>Norm Cushing</td>
              <td>Leah Dahmer</td>
-             <td>Jacob Danton</td>
           </tr>
           <tr>
+             <td>Jacob Danton</td>
              <td>Phil Davis</td>
              <td>Drew Davidson</td>
              <td>Kay Edwards</td>
-             <td>Eric Eliason</td>
           </tr>
           <tr>
+	     <td>Mathew Eis</td>
+             <td>Eric Eliason</td>
              <td>Patrica Eliason</td>
              <td>Brendan George</td>
+          </tr>
+          <tr>
              <td>Verna Gregg</td> 
              <td>Rae Harvey</td>
-          </tr>
-          <tr>
              <td>Eric Hyer</td>
              <td>Noah Hilt</td>
+          </tr>
+          <tr>
              <td>Tom Kelleher</td>
              <td>Hugh Kieffer</td> 
-          </tr>
-          <tr>
              <td>Jeff Johnson</td>
              <td>Steven Koechle</td>
-             <td>Brian Lipkowitz</td>
-             <td>Mike Martin</td>
           </tr>
           <tr>
+             <td>Steven Lambright</td>
+	     <td>Brian Lipkowitz</td>
+             <td>Mike Martin</td>
              <td>Phillip Martinez</td>
+          </tr>
+          <tr>
              <td>Jim Mathews</td>
              <td>Jason Mawhinney</td>
              <td>Alfred McEwen</td>
+	     <td>Dennis McMacken</td>
           </tr>
           <tr>
-             <td>Dennis McMacken</td>
-             <td>Elizabeth Miller</td>
+             <td>Moses Milazzo</td>
+	     <td>Elizabeth Miller</td>
              <td>Wendy Parker</td>
              <td>Sharmila Prasad</td>
           </tr>
@@ -154,13 +151,8 @@
         </table>
         <br />
 
-        <h2>Outside Contributors</h2>
-        <p>
-        Finally, contributions have been made to Isis by many people outside
-        of the USGS.  Their involvement came at various times during the
-        evolution of Isis and is sincerely appreciated:
-        </p>
-
+        <h2>Non-USGS Contributors</h2>
+ 
         <table class="tableGeneralInformation" align="center" width="90%">
           <tr>
             <td>Don Anderson, ASU</td>
@@ -192,12 +184,12 @@
         </table>
         <br />
 
-        <h2>Don't Be Forgotten</h2>
+        <h2>Are we missing an ISIS contributor?</h2>
         <p>
-        There are undoubtedly individuals that were overlooked in their
-        contributions to this image processing system.  Their exclusion were
-        not intentional or deliberate.  Our apologies for any oversight and
-        please feel free to contact us by email and include your name as you 
+        There are undoubtedly individuals that we failed to acknowledge for their
+	contributions to this image processing system.  Their exclusion was not
+	intentional or deliberate, and we apologize for any oversight. Please 
+	feel free to contact us by email and include your name as you 
         would like it to appear in the credits.
         </p>
 
@@ -221,12 +213,20 @@
 
   <bibliography>
     <title>Credits</title>
-    <brief>Contributors to the Isis software package</brief>
+    <brief>Contributors to the ISIS software package</brief>
     <description>
-      A summary of USGS and non-USGS contributors to the Isis
+      A summary of USGS and non-USGS contributors to the ISIS
       software package
     </description>
     <author>Jeff Anderson</author>
     <date>2003-03-25</date>
   </bibliography>
+
+  <history>
+    <change date="2003-03-25" name="Jeff Anderson">Original document</change>
+    <change date="2013-12-11" name="Ella Mae Lee">Updated document</change>
+  </history>
+
+
+
 </documentation>

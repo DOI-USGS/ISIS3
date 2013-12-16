@@ -5,7 +5,7 @@
       <body>
 <h2><a name="Introduction">Introduction</a></h2>
 <p>
-This reference document describes the elements of the Isis User Preference file.  See Environment and Preference Setup for detailed information.
+This reference document describes the elements of the ISIS User Preference file.  See Environment and Preference Setup for detailed information.
 </p>
 
 <h2><a name="UserInterface">User Interface</a></h2>
@@ -41,7 +41,7 @@ EndGroup
 <p>
 Errors can be written in either standard (single line) or PVL format.  
 Additionally, the source file and line number identifying where the error 
-occurred can be suppressed. Stack traces can also be displayed when running Isis 
+occurred can be suppressed. Stack traces can also be displayed when running ISIS 
 in debug mode.
 
 <pre style="padding-left:4em;">
@@ -83,7 +83,7 @@ EndGroup
 
 <h2><a name="">Data Directories</a></h2>
 <p>
-Isis supports many missions that require various data such as SPICE kernels or calibration files.  Because these files can be quite large it may be required to move the data into a different directories from the normal distribution.  This customization supports that requirement.  The Isis system manager would generally modify this group in the system-wide preference file.
+ISIS supports many missions that require various data such as SPICE kernels or calibration files.  Because these files can be quite large it may be required to move the data into a different directories from the normal distribution.  This customization supports that requirement.  The ISIS system manager would generally modify this group in the system-wide preference file.
 
 <pre style="padding-left:4em;">
 Group = DataDirectory

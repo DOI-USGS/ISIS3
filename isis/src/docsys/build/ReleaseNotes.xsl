@@ -148,8 +148,8 @@
 
   <bibliography>
     <title>Release Notes</title>
-    <brief>Changes since the last Isis 3 release</brief>
-    <description>Complete listing of the changes to Isis 3 since the last major release.</description>
+    <brief>Changes since the last ISIS 3 release</brief>
+    <description>Complete listing of the changes to ISIS 3 since the last major release.</description>
     <author>Steven Lambright</author>
     <date>2011-09-27</date>
   </bibliography>

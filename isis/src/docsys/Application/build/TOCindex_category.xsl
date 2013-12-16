@@ -89,7 +89,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; margin-bottom:0px;">
-        Isis 3 Application Documentation</p>
+        ISIS 3 Application Documentation</p>
 
         <hr/>
 

@@ -53,14 +53,14 @@
 
           <definition name="SPICE">
             Spacecraft &amp; Planetary ephemerides, Instrument C-matrix and
-            Event kernels.  SPICE refers to all the information required by Isis
+            Event kernels.  SPICE refers to all the information required by ISIS
             in order to compute and map each image pixel onto a surface with
             reference to spacecraft position, sun position, instrument and
-            mission activities.  Isis uses software (ToolKit) supplied by the
+            mission activities.  ISIS uses software (ToolKit) supplied by the
             Navigation and Ancillary Information Facility (NAIF) for SPICE access
             and kernel management (Refer to spiceinit).
             <p>
-              SPICE is available only for mission instruments supported by Isis
+              SPICE is available only for mission instruments supported by ISIS
               (camera models).
             </p>
           </definition>
@@ -83,7 +83,7 @@
           <definition name="LRS">
             LRS [Low Representation Saturation] is a representation special
             pixel value that is tracked and reported to the user.  LRS is set
-            when an Isis application causes the output DN pixel to fall 'below'
+            when an ISIS application causes the output DN pixel to fall 'below'
             the possible range of valid values.
             <p>
             LRS represents "Undersaturated".  LRS is set in 16-and 32-bit type image data.
@@ -94,7 +94,7 @@
           <definition name="HRS">
             HRS [High Representation Saturation] is a representation special
             pixel value that is tracked and reported to the user.  HRS is set
-            when an Isis application causes the output DN pixel to fall 'above'
+            when an ISIS application causes the output DN pixel to fall 'above'
             the possible range of valid values.
             <p>
                HRS represents "Oversaturated". HRS is set in all 8, 16, 32-bit type image data.
@@ -104,7 +104,7 @@
           <definition name="LIS">
             LIS [Low Instrument Saturation] is an instrument special pixel value
             that is tracked and reported to the user.  LIS is set during the
-            ingestion of the image data into Isis.  The input image sensor
+            ingestion of the image data into ISIS.  The input image sensor
             acquired a value too low to be measured accurately.
             <p>
               LIS represents "Undersaturated".  LIS is set in 16-and 32-bit type image data.
@@ -115,7 +115,7 @@
           <definition name="HIS">
             HIS [High Instrument Saturation] is an instrument special pixel
             value that is tracked and reported to the user.  HIS is set during
-            the ingestion of the image data into Isis.  The input image sensor
+            the ingestion of the image data into ISIS.  The input image sensor
             acquired a value too high to be measured accurately.
             <p>
                HIS represents "Oversaturated".  HIS is set in 16-and 32-bit type image data.
@@ -153,7 +153,7 @@
             applications).
             <p>
               The serial number associated with each control measure is included
-              as a field in the binary control network.  'getsn' is an Isis
+              as a field in the binary control network.  'getsn' is an ISIS
               application that will return the SN value for a given image
               filename.
             </p>
@@ -210,10 +210,10 @@
 
           <definition name="Level0">
             Level0 is a standard cartographic processing phase that describes an
-            image has been ingested into Isis (PDS EDR) and will often have
-            SPICE information loaded on the Isis cube labels (spiceinit).
+            image has been ingested into ISIS (PDS EDR) and will often have
+            SPICE information loaded on the ISIS cube labels (spiceinit).
             Level0 image cubes are often the input to mission specific
-            radiomatric calibration applications if supported in Isis.
+            radiomatric calibration applications if supported in ISIS.
             <p>
               Level0 implies a 'non-projected', raw image cube ('camera space').
             </p>
@@ -221,13 +221,13 @@
 
           <definition name="Level1">
             Level1 is a standard cartographic processing phase that describes an
-            image has been radiometrically calibrated (PDS CDR or the Isis output
+            image has been radiometrically calibrated (PDS CDR or the ISIS output
             of a mission specific calibration application) with SPICE information
-            loaded on the Isis cube labels.
+            loaded on the ISIS cube labels.
             <p>
               This level will often represent an image that also has had  noise removed.
-              Isis reports the camera geometry (viewing geometry of an image cube) for
-              a Level1. Most Isis application names that start with a prefix of 'cam'
+              ISIS reports the camera geometry (viewing geometry of an image cube) for
+              a Level1. Most ISIS application names that start with a prefix of 'cam'
               expect a Level1  cube as input (refer to applications such as camstats, campt, cam2map).
             </p>
             <p>
@@ -241,7 +241,7 @@
             Mapping keywords that describe the projection and all associated map
             characteristics.
             <p>
-               Most Isis applications that start with a prefix of
+               Most ISIS applications that start with a prefix of
               'map' expects a Level2 cube as input (refer to applications such as
                mappt, map2map, map2cam).
             </p>
@@ -279,10 +279,10 @@
             campt as example reporting applications of the radius value at every
             image pixel location.
             <p>
-               Isis expects and reports the radius value in Meters.
+               ISIS expects and reports the radius value in Meters.
             </p>
             <p>
-              Isis requires a radius DEM model in order to orthorectify an image
+              ISIS requires a radius DEM model in order to orthorectify an image
               (refer to spiceinit- shapemodel/cam2map).  This is not to be
               confused with a topography file where the radius is subtracted
               from the (best fit trixial or aeroid) shape of the target body.
@@ -292,7 +292,7 @@
           <definition name="Emission Angle">
             The emission angle (EMA) is the angle between the spacecraft and a
             vector drawn perpendicular to the planet's surface (surface normal).
-            Using SPICE, Isis applications compute this angle from the ellipsoid.
+            Using SPICE, ISIS applications compute this angle from the ellipsoid.
             <p>
               Emission Angle is in degrees.  The valid range is between 0 - 90.
             </p>
@@ -300,7 +300,7 @@
 
           <definition name="Incidence Angle">
             The incidence angle (INC) is the angle between the sun and the
-            surface normal.  Isis applications use SPICE to compute this angle
+            surface normal.  ISIS applications use SPICE to compute this angle
             from the ellipsoid or the elevation model (e.g., local slopes) at
             every pixel.
             <p>
@@ -316,7 +316,7 @@
 
           <definition name="Phase Angle">
             The phase angle is the angle between the sun and the spacecraft at a point
-            on the surface.  Isis applications will use SPICE to compute this angle
+            on the surface.  ISIS applications will use SPICE to compute this angle
             from the ellipsoid or the elevation model (e.g., local slopes) at every pixel.
           <p>
              Phase Angle is in degrees.
@@ -474,7 +474,7 @@
             The local emission angle is the angle between the spacecraft and a
             vector drawn perpendicular to the planet's surface (surface normal).
             <p>
-              Using SPICE, Isis applications compute this angle using an elevation model
+              Using SPICE, ISIS applications compute this angle using an elevation model
               (e.g., local slopes) at every pixel; ONLY if the elevation model exists on the
               image cube labels (Instrument Group, ShapeModel keyword, Refer to the Spiceinit
               application).  If the elevation model does not exist, the computation will
@@ -489,7 +489,7 @@
             The local incidence angle is the angle between the sun and a vector
             drawn perpendicular to the planet's surface (surface normal).
             <p>
-              Isis applications use SPICE to compute this angle using the elevation model
+              ISIS applications use SPICE to compute this angle using the elevation model
               (e.g., local slopes) at every pixel; ONLY IF the elevation model exists on
               the image cube labels (Instrument Group, ShapeModel keyword, refer
               to the application, spiceinit).   If the elevation model does not exist,
@@ -518,7 +518,7 @@
               A planetary coordinate system where the coordinates are
               not time varying. 
              <p>
-              For a body-fixed reference frame, Isis refers to the NAIF 
+              For a body-fixed reference frame, ISIS refers to the NAIF 
               planet kernel (PCK) for high-accuracy orientation (rotation) 
               data for any solar system target body.
               This kernel includes location of the pole, prime meridian,
@@ -592,7 +592,7 @@
              </p>
              <p>
                Refer to the definition for Latitude Type for more information
-               within the Isis environment.
+               within the ISIS environment.
              </p>
            </definition>
 
@@ -603,7 +603,7 @@
              radius); however they differ on an ellipsoid body
              (e.g., Mars, Earth).
              <p>
-               The default for Latitude Type in Isis is Planetocentric.
+               The default for Latitude Type in ISIS is Planetocentric.
                Latitude Type will affect the computed values for latitude
                range (Minimum and Maximum Latitude) and Center latitude.
                Refer to the definitions for Planetocentric Latitude and
@@ -627,7 +627,7 @@
              <p>
               Refer to the definitions for Longitude Direction and
               Longitude Domain for more information on computed and
-              reported values within the Isis environment.
+              reported values within the ISIS environment.
              </p>
           </definition>
 
@@ -635,7 +635,7 @@
              Longitude direction of a target body indicates whether
              longitude increases (positive) to the east or the west.
              <p>
-              The default for Longitude Direction in Isis is East.
+              The default for Longitude Direction in ISIS is East.
               Longitude Direction will affect the reported values
               for longitude range (Minimum and Maximum Longitude)
               and Center longitude.
@@ -685,7 +685,7 @@
               Longitude Seams.
              </p>
              <p>
-              The default Longitude Domain in Isis is 360.
+              The default Longitude Domain in ISIS is 360.
              </p>
           </definition>
 
@@ -693,7 +693,7 @@
             The distance from a point on the surface of a body to its geometric
             center.
              <p>
-               Isis expects and reports the local radius value in Meters.
+               ISIS expects and reports the local radius value in Meters.
              </p>
           </definition>
 
@@ -737,7 +737,7 @@
 -->
 
           <definition name="Ephemeris Time">
-             Ephemeris Time (ET) as defined by NAIF (Toolkit used by Isis),
+             Ephemeris Time (ET) as defined by NAIF (Toolkit used by ISIS),
              is the uniform scale represented by the independent variable in
              the differential equations that describe the motions of the planets,
              sun and moon.  Ephemeris time is described as a count of ephemeris
@@ -792,18 +792,18 @@
 
           <definition name="PVL">
              Parameter Value Language (PVL) is used extensively by
-             Isis as a standard keyword value type language for naming and
-             expressing data values. PVL format in Isis is compatible with
+             ISIS as a standard keyword value type language for naming and
+             expressing data values. PVL format in ISIS is compatible with
              syntax used by the Planetary Data System.
              <p>
-              For example, the keyword labels of a typical Isis image cube
+              For example, the keyword labels of a typical ISIS image cube
               is in PVL format (refer to catlab in order to view image cube labels).
               A parameter name (or keyword name) is used to reference the value.
               The value portion of an assignment statement may contain a simple value
               (i.e., numeric, string, date/time value), a set or a sequence of values.
              </p>
              <p>
-              Refer to the Isis application, getkey, for one method of
+              Refer to the ISIS application, getkey, for one method of
               extracting data values from a PVL formatted file.
              </p>
           </definition>
@@ -865,7 +865,7 @@
           </definition>
 
           <definition name="Universal Coordinate">
-            The Isis default coordinate system
+            The ISIS default coordinate system
             <pre>
               LatitudeType = Planetocentric
               Longitude Direction = East

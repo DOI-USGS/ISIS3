@@ -92,11 +92,11 @@ Introduction: Conventions and Definitions of this Guide
 
 <h3>Purpose</h3>
 <p>
-This guide has been generated for Isis programming team as a style reference for
+This guide has been generated for ISIS programming team as a style reference for
 writing in-code documentation to meet team requirements for consistency,
 content, and information dissemination. Serving as a reference for proper
 documentation structure for automatic generation of documentation in various formats,
-primarily HTML, is the primary focus of this guide. Isis Applications have their own
+primarily HTML, is the primary focus of this guide. ISIS Applications have their own
 code and documentation style. Information for the documentation system maintainers
 will be provided in a separate document covering system level tags (such as
 @mainpage and @defgroup), directory structure, naming conventions, etc.
@@ -145,7 +145,7 @@ Two sets of documentation are maintained, one for each audience.
 <ul>
   <li>
     <b>Application Developers</b>:
-    These folks only want to know how to use Isis objects. They use
+    These folks only want to know how to use ISIS objects. They use
     the <b>API</b>, which gives information about public and protected
     entities, new features, and descriptions and examples of usage.
     This audience will be encouraged to use the web pages for reading
@@ -153,7 +153,7 @@ Two sets of documentation are maintained, one for each audience.
   </li>
   <li>
     <b>Object Programmers</b>:
-    These folks are mainly the ones who maintain and develop Isis.
+    These folks are mainly the ones who maintain and develop ISIS.
     This audience needs to know details about the inner workings of
     the code in order to maintain it. They use the <b>Programmers' Reference</b>,
     which provides all the verbose nitty gritty information, such as documentation
@@ -243,7 +243,7 @@ Source Code Documentation Structure
 </h3>
 
 <p>
-Currently, the Isis programming team is using the
+Currently, the ISIS programming team is using the
 <a href="http://www.doxygen.org ">Doxygen</a>
 documentation extraction software. Doxygen has extended the tag set of the
 <a href="http://java.sun.com/j2se/javadoc">javadoc documentation style</a>,
@@ -462,7 +462,7 @@ Top</a>
                   <a href="#classes_example">Inline Examples</a>
                 </li>
                 <li>
-                  <a href="#classes_isisexample">Isis Examples</a>
+                  <a href="#classes_isisexample">ISIS Examples</a>
                 </li>
                 <li>
                   <a href="#classes_author">author</a>
@@ -634,13 +634,13 @@ Top</a>
 </p>
 <blockquote>
   <p>
-    Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
+    Unless noted otherwise, the portions of ISIS written by the USGS are public domain. See
     individual third-party library and package descriptions for intellectual property information,
     user agreements, and related information.
   </p>
 
   <p>
-    Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
+    Although ISIS has been used by the USGS, no warranty, expressed or implied, is made by the
     USGS as to the accuracy and functioning of such software and related material nor shall the
     fact of distribution constitute any such warranty, and no responsibility is assumed by the
     USGS in connection therewith.
@@ -648,7 +648,7 @@ Top</a>
 
   <p>
     For additional information, launch $ISISROOT/doc/documents/Disclaimers/Disclaimers.html
-    in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+    in a browser or see the Privacy &amp; Disclaimers page on the ISIS website,
     http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
     http://www.usgs.gov/privacy.html.
   </p>
@@ -709,9 +709,9 @@ your code snippet will be parsed and special characters properly rendered for yo
 
 <p>
 <a name="classes_isisexample"></a>
-<b>Linking to Examples in Other Isis Objects or Applications:</b>
+<b>Linking to Examples in Other ISIS Objects or Applications:</b>
 
-Whenever possible, point out working Isis sourcecode where your object is in heavy and thorough use, such
+Whenever possible, point out working ISIS sourcecode where your object is in heavy and thorough use, such
 as a class or application containing your object or a a class inheriting your object.
 In the web page output, names of files and classes in your descriptions are automatically linked
 to the appropriate documentation. Simply write a sentence that contains the class or file names
@@ -727,8 +727,8 @@ Statistics class documentation:
 
 <p>
 In the resulting web page output, Statistics, Histogram, and stats.cpp will all be linked
-to pages about those classes and file. The percent sign (%) in '%Isis' prevents the word Isis from being
-linked to the Isis namespace documentation.
+to pages about those classes and file. The percent sign (%) in '%Isis' prevents the word ISIS from being
+linked to the ISIS namespace documentation.
 </p>
 
 <p>
@@ -754,7 +754,7 @@ bug documentation when the bug is fixed, and make a note in a
 <b>@ingroup(&lt;groupname&gt;[&lt;groupname&gt; &lt;groupname&gt;])</b>:
 Categorize this class as belonging to a particular group of Objects.
 The class documentation will be linked in the group's page (identified by &lt;groupname&gt;).
-Groups are listed in the Modules section of the Isis documentation, and defined by the
+Groups are listed in the Modules section of the ISIS documentation, and defined by the
 <a href="assets/isisDoxyDefs.doxydef">isisDoxyDefs.doxydef</a>
 file.
 </p>
@@ -1602,7 +1602,7 @@ Top</a>
 
   <p>
   Inserts an image into the documentation. Image files must be in the <b>assets</b> directory beneath
-  the Isis Object source code($ISISROOT/src/*/obj/*). If the image is found, it will be copied
+  the ISIS Object source code($ISISROOT/src/*/obj/*). If the image is found, it will be copied
   to the correct output directory.
   </p>
 
@@ -1610,7 +1610,7 @@ Top</a>
   This command is output format-specific,
   so if you want to insert an image into generated documentation for more than one format, you'll have to
   enter the command for each format. The format values supported are <b>html</b> and
-  <b>latex</b>, however Isis documentation is <em>not</em> generated in latex format,
+  <b>latex</b>, however ISIS documentation is <em>not</em> generated in latex format,
   so html should be the only format specified.
   You can also use a URL to specify image
   location, but doxygen will not check for existance or copy it into a directory
@@ -1762,17 +1762,17 @@ important. Remember, member functions are documented where they're implemented.
  * &#036;Date&#036;
  * &#036;Revision&#036;
  *
- *  Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
+ *  Unless noted otherwise, the portions of ISIS written by the USGS are public domain. See
  *  individual third-party library and package descriptions for intellectual property information,
  *  user agreements, and related information.
  *
- *  Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
+ *  Although ISIS has been used by the USGS, no warranty, expressed or implied, is made by the
  *  USGS as to the accuracy and functioning of such software and related material nor shall the
  *  fact of distribution constitute any such warranty, and no responsibility is assumed by the
  *  USGS in connection therewith.
  *
  *  For additional information, launch $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *  in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *  in a browser or see the Privacy &amp; Disclaimers page on the ISIS website,
  *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *  http://www.usgs.gov/privacy.html.
  */
@@ -1934,17 +1934,17 @@ important.
  * &#036;Date&#036;
  * &#036;Revision&#036;
  *
- *  Unless noted otherwise, the portions of Isis written by the USGS are public domain. See
+ *  Unless noted otherwise, the portions of ISIS written by the USGS are public domain. See
  *  individual third-party library and package descriptions for intellectual property information,
  *  user agreements, and related information.
  *
- *  Although Isis has been used by the USGS, no warranty, expressed or implied, is made by the
+ *  Although ISIS has been used by the USGS, no warranty, expressed or implied, is made by the
  *  USGS as to the accuracy and functioning of such software and related material nor shall the
  *  fact of distribution constitute any such warranty, and no responsibility is assumed by the
  *  USGS in connection therewith.
  *
  *  For additional information, launch $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
- *  in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *  in a browser or see the Privacy &amp; Disclaimers page on the ISIS website,
  *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *  http://www.usgs.gov/privacy.html.
  */

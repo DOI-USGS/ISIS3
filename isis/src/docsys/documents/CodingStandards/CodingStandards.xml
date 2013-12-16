@@ -94,8 +94,8 @@
         <h2> <a name="intro">Introduction</a> </h2>
         <p>
           This document will describe the coding standards for maintaining <strong>
-          Isis 3</strong> source code.  It was created to ensure that the <strong>
-          Isis 3</strong> package is programmed for consistency, readability and ease
+          ISIS 3</strong> source code.  It was created to ensure that the <strong>
+          ISIS 3</strong> package is programmed for consistency, readability and ease
           of future maintenance. This document does not attempt to address every
           possible issue. However, the guidelines that have been outlined should not
           be deviated from, except under special situations.
@@ -104,7 +104,7 @@
         <h2> <a name="formatting">Formatting</a> </h2>
         <h3> <a name="indenting">Indenting</a> </h3>
         <p>
-          The general indenting scheme for <strong>Isis 3</strong> is 2 spaces (no
+          The general indenting scheme for <strong>ISIS 3</strong> is 2 spaces (no
           tabs).  Wrapped lines of code should be indented a minimum of 4 spaces
           from the beginning line of the command.  Programmers may choose to indent
           more than 4 spaces to make the code more readable.  For example, it is
@@ -203,7 +203,7 @@
               if</b></font> ( (a &amp;&amp; b) || (c &amp;&amp; d) ) statement;<br /><br />
               <font color="green">
               // Use padding before opening curly brace  </font><br />
-              <font color="purple"><b>namespace</b></font> Isis {<br />
+              <font color="purple"><b>namespace</b></font> ISIS {<br />
                 ...<br />
               }<br />
             </blockquote>
@@ -311,7 +311,7 @@
         <p>
           When declaring a vector or list data type, no space between the keyword
           and the opening angle bracket should be used.  This is merely an aesthetic
-          preference for consistency throughout <strong>Isis 3</strong>.
+          preference for consistency throughout <strong>ISIS 3</strong>.
         </p>
         <p>
           For example:
@@ -419,7 +419,7 @@
 
         <h3> <a name="logicalOperators">Logical Operators</a> </h3>
         <p>
-          The use of aliases for logical operators is prohibited in <strong>Isis 3
+          The use of aliases for logical operators is prohibited in <strong>ISIS 3
           </strong>.  For example, a program must not contain the following aliases:
           <table border="1">
             <tr>
@@ -508,13 +508,13 @@
           letter.  As a general rule, class names should be nouns.
         </p>
         <p>
-          <strong>**Note:</strong>  There are 3 existing classes in <strong>Isis 3
+          <strong>**Note:</strong>  There are 3 existing classes in <strong>ISIS 3
           </strong> that do not follow this convention.  The <strong>iString
           </strong> and <strong>iTime</strong> classes needed a prefix to
           distinguish them from the C++ system string and time classes.  While
           these classes will not be changed at this time, in the event that
           similar classes are created, a capital letter <i>I</i> prefix should
-          be used to remain consistent with the rest of <strong>Isis 3</strong>.
+          be used to remain consistent with the rest of <strong>ISIS 3</strong>.
         </p>
         <p>
           For example:
@@ -533,7 +533,7 @@
           Member functions should be lower camel case, when possible.  That is, the
           first letter should be lower case and, if the class is a multi-word
           phrase, spaces are eliminated and each subsequent word should begin with a
-          capital letter.  This should remain consistent throughout <strong>Isis 3
+          capital letter.  This should remain consistent throughout <strong>ISIS 3
           </strong> except in two cases.  Constructor and destructor methods must be
           upper camel case to match the class name.   The other case in which this
           convention may not be followed is when a method overrides or overloads an
@@ -588,10 +588,10 @@
 
         <h3> <a name="dataMemberNames">Data Member Names</a> </h3>
         <p>
-          <strong>Isis 3</strong> currently uses three types of data members: <i>
+          <strong>ISIS 3</strong> currently uses three types of data members: <i>
           global</i>, <i>protected</i>, and <i>private</i>. Note that global and
           protected data members should be avoided and public member data in
-          classes is not permitted in <strong>Isis 3</strong>.
+          classes is not permitted in <strong>ISIS 3</strong>.
         </p>
         <p>
           Global variables should have the prefix <i>g_</i> followed by a lower
@@ -687,9 +687,9 @@
 
         <h3> <a name="namespaceNames">Namespace Names</a> </h3>
         <p>
-          Currently, the only namespace that is used is the <i>Isis</i> namespace.
+          Currently, the only namespace that is used is the <i>ISIS</i> namespace.
           However, if namespaces are added, they should be upper camel case.  Also
-          note that any new namespaces should be inside the Isis namespace.
+          note that any new namespaces should be inside the ISIS namespace.
         </p>
         <p>
           For example:
@@ -706,7 +706,7 @@
         <p>
           In some situations, having multiple files with the same name (regardless
           of case sensitivity) might cause compiler errors.  To prevent these
-          problems the use of the same file name anywhere in Isis should be avoided,
+          problems the use of the same file name anywhere in ISIS should be avoided,
           when possible.
         </p>
         <p align="right"><a href="#top"><font size="1">
@@ -774,11 +774,11 @@
         <h3> <a name="orderingLibraryIncludes">Ordering Library Includes</a> </h3>
         <p>
           No code should exist before <font color="olive"><b>#include</b></font>
-          statements in <strong>Isis 3</strong> files.  These <font color="olive"><b>
+          statements in <strong>ISIS 3</strong> files.  These <font color="olive"><b>
           #include</b></font> statements should be separated into groups of
           libraries by a single blank line and each group should be ordered
           alphabetically.  All <font color="olive"><b>#include</b></font> statements
-          for third party libraries (i.e. not in the Isis namespace) should use
+          for third party libraries (i.e. not in the ISIS namespace) should use
           angle brackets, not quotation marks.
         </p>
         <p>
@@ -795,7 +795,7 @@
           The order of the groups are defined below:
           <ol>
           <li>
-            Isis, IsisDebug and ThisClass header files.
+            ISIS, IsisDebug and ThisClass header files.
           </li>
             <dd>
               When needed, the Isis.h and IsisDebug.h should
@@ -816,7 +816,7 @@
               Scientific Library (GSL), Geomethry Engine Open
               Source (GEOS), and Google Protocol Buffers
             </dd>
-          <li> Other Isis headers </li>
+          <li> Other ISIS headers </li>
           </ol>
         </p>
         <p>
@@ -835,7 +835,7 @@
             <font color="olive"><b>#include</b></font> "PvlGroup.h"
             <font color="olive"><b>#include</b></font> "WorldMapper.h"
 
-            <font color="purple"><b>namespace</b></font> Isis {
+            <font color="purple"><b>namespace</b></font> ISIS {
               class Displacement;
               class Pvl;
               ...
@@ -862,7 +862,7 @@
             <font color="olive"><b>#include</b></font> "WorldMapper.h"
 
             <font color="purple"><b>using namespace</b></font> std;
-            <font color="purple"><b>namespace</b></font> Isis {
+            <font color="purple"><b>namespace</b></font> ISIS {
               ...
           </strong></pre>
         </p>
@@ -880,7 +880,7 @@
             <font color="olive"><b>#include</b></font> "UserInterface.h"
 
             <font color="purple"><b>using namespace</b></font> std;
-            <font color="purple"><b>using namespace</b></font> Isis;
+            <font color="purple"><b>using namespace</b></font> ISIS;
             <font color="purple"><b>void</b></font> IsisMain() {
               ...
           </strong></pre>
@@ -920,7 +920,7 @@
 
         <h2> <a name="documentation">Documentation</a> </h2>
         <p>
-          Documentation for <strong>Isis 3</strong> is done using Doxygen.
+          Documentation for <strong>ISIS 3</strong> is done using Doxygen.
         </p>
         <p align="right"><a href="#top"><font size="1">
           Return to Table of Contents
@@ -940,7 +940,7 @@
         <p>
           All history entries should be below an internal tag and indented 2 spaces
           from the start of the internal tag.  Doxygen history entries in <strong>
-          Isis 3</strong> should begin with the date of the form YYYY-MM-DD, followed
+          ISIS 3</strong> should begin with the date of the form YYYY-MM-DD, followed
           by the name of the programmer(s) responsible for the changes.  This is
           followed by a dash, padded by a space on each side before the comment.
           When wrapping a Doxygen history entry, the subsequent lines should begin 4
@@ -1015,12 +1015,12 @@
         <h3> <a name="structures">Structures</a> </h3>
         <p>
           The <font color="purple"><b>struct</b></font> keyword is not all together
-          disallowed in <strong>Isis 3</strong>, however there are restrictions on
+          disallowed in <strong>ISIS 3</strong>, however there are restrictions on
           its use.  The use of a structure is prohibited from the public API in
-          <strong>Isis 3</strong>, this would include global definitions in a header
+          <strong>ISIS 3</strong>, this would include global definitions in a header
           file.  That is, any structures in a class must be private or protected.
           Structures can also be used in applications.  A structure that contains
-          only data is acceptable in Isis 3.  Structures in <strong>Isis 3
+          only data is acceptable in ISIS 3.  Structures in <strong>ISIS 3
           </strong> can not have methods.
         </p>
         <p align="right"><a href="#top"><font size="1">
@@ -1196,7 +1196,7 @@
             <li>
               There was no obvious choice for which string class to use in new classes (in many
               cases) because if you are writing a qisis app, you want QStrings, but most
-              of Isis uses std::string and we should choose iString most of the time because we
+              of ISIS uses std::string and we should choose iString most of the time because we
               implemented it.
             </li>
             <li>
@@ -1280,7 +1280,7 @@
             for the standards chosen.
           </li>
           <li>
-            Should  the Disclaimer be required for all Isis files?
+            Should  the Disclaimer be required for all ISIS files?
           </li>
           </ul>
       </body>
@@ -1302,12 +1302,12 @@
   </audience>
 
   <bibliography>
-    <title>Isis 3 Coding Standards and Style Guide</title>
-    <brief>Coding standards for Isis 3 developers. Effective February 1, 2012.</brief>
+    <title>ISIS 3 Coding Standards and Style Guide</title>
+    <brief>Coding standards for ISIS 3 developers (effective February 1, 2012).</brief>
     <description>
       This document will describe the coding standards for maintaining <strong>
-      Isis 3</strong> source code.  It was created to ensure that the <strong>
-      Isis 3</strong> package is programmed for consistency, readability and ease
+      ISIS 3</strong> source code.  It was created to ensure that the <strong>
+      ISIS 3</strong> package is programmed for consistency, readability and ease
       of future maintenance. This document does not attempt to address every
       possible issue. However, the guidelines that have been outlined should not
       be deviated from, except under special situations.

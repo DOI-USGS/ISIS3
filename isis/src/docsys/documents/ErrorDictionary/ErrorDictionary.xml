@@ -8,7 +8,7 @@
           <a name="Introduction">Introduction</a>
         </h2>
         <p>
-          This dictionary contains information regarding the various classes of errors that can occur in Isis programs.  Below is a table of the classes of errors with accompanying error codes. The code is sent to the operating system when a program exits due to an error.
+          This dictionary contains information regarding the various classes of errors that can occur in ISIS programs.  Below is a table of the classes of errors with accompanying error codes. The code is sent to the operating system when a program exits due to an error.
         </p>
 
         <table class="tableFormattedInformation" align="center" style="width:300px;">
@@ -95,7 +95,7 @@
           Examples include entering 1) a negative integer when the parameter only allows positive integers,
           2) parameters that do not exist in a program (usually a typo), and 3) entering a value not in a required
           list (8bit, 16bit, 32bit).  The error is almost always related to the user input provided in either the
-          Isis GUI or on the command line.
+          ISIS GUI or on the command line.
         </p>
 
         <h2>
@@ -106,14 +106,14 @@
           class and/or method.  Generally, these errors are caught by the programmer during the development
           stage of the software.  They can occur under unusual circumstances such as array out-of-bounds or
           memory leaks.  Users should report these errors to the
-          <a href="http://isisdist.wr.usgs.gov" target="_blank">Isis Support Site</a>.
+          <a href="http://isisdist.wr.usgs.gov" target="_blank">ISIS Support Site</a>.
         </p>
 
         <h2>
           <a name="PVLError">PVL Error</a>
         </h2>
         <p>
-          Isis makes heavy use of Parameter Value Language (PVL).  The most common error that can occur with
+          ISIS makes heavy use of Parameter Value Language (PVL).  The most common error that can occur with
           PVL is requesting parameter-values (Objects, Groups, or Keywords) that do not exist.  Generally, the
           PVL error message is the most specific information in a stack of error messages.  For example,
         </p>
@@ -149,7 +149,7 @@
         </h2>
         <p> Projection errors occur when reading labels of a cube or a map file.  In most cases, a require keyword
             is missing or there may be some type of syntax error with the map projection group.  Another possibility
-            is that the map projection is not supported by the Isis system.
+            is that the map projection is not supported by the ISIS system.
         </p>
 
         <h2>
@@ -164,7 +164,7 @@
         </h2>
         <p> This error relates to operating system or instruction set errors.  Example may include insufficient
             dynamic memory, out of bounds array errors, or division by zero.  Often these errors are due to insufficient
-            checks made by the programmer.  Such error should be submitted to the Isis support web site.
+            checks made by the programmer.  Such error should be submitted to the ISIS support web site.
         </p>
 
 

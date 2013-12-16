@@ -7,9 +7,9 @@
 
 <h2><a name="Introduction">Introduction</a></h2>
 <p>
-Errors will occur when running Isis applications.  For example, the user may have entered invalid parameters 
+Errors will occur when running ISIS applications.  For example, the user may have entered invalid parameters 
 or <abbr title="Input/Output">I/O</abbr> to a file may have failed due to insufficient disk space.  This document discusses the various aspects 
-of the Isis Error Handling Facility.
+of the ISIS Error Handling Facility.
 </p>
 
 <p>
@@ -28,7 +28,7 @@ When an error occurs several elements can be reported.  They include:
 
 <p>
 How these elements are presented and where they are written is user selectable as described in the 
-<a href="../PreferenceDictionary/PreferenceDictionary.html">Isis Preference Dictionary</a>.
+<a href="../PreferenceDictionary/PreferenceDictionary.html">ISIS Preference Dictionary</a>.
 </p>
 
 <h2><a name="StandardForm">Standard Form</a></h2>
@@ -57,7 +57,7 @@ is a general identifier that can help the user narrow down the scope of the prob
 <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CAMERA ERROR</code>.  
 Because there are a variety of error 
 <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CLASSES</code> we have developed the 
-<a href="../ErrorDictionary/ErrorDictionary.html">Isis Error Dictionary</a>. This dictionary gives
+<a href="../ErrorDictionary/ErrorDictionary.html">ISIS Error Dictionary</a>. This dictionary gives
 users additional context regarding the error, which may direct them to a solution.
 </p>
 
@@ -72,7 +72,7 @@ The <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">
 <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">LINE</code> is an element 
 of the message more useful for programmers.  This allows the programmer to track down problems more easily.  
 Some users may desire to turn this feature off and can do so by modifying their personal 
-Isis Preference file.
+ISIS Preference file.
 
 <pre style="padding-left:4em;">
 Group = ErrorFacility
@@ -163,7 +163,7 @@ error (e.g., <code style="font-family:Courier, Courier New, MONOSPACE;font-weigh
 <abbr title="Input/Output">I/O</abbr> ERROR</code>).  
 To find out the various <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CLASS</code> 
 versus <code style="font-family:Courier, Courier New, MONOSPACE;font-weight:bold;">CODE</code> relationships you should examine 
-the <a href="../ErrorDictionary/ErrorDictionary.html">Isis Error Dictionary</a>.
+the <a href="../ErrorDictionary/ErrorDictionary.html">ISIS Error Dictionary</a>.
 </p>
 
 <p>
@@ -182,7 +182,7 @@ in the user preference file.
 <div class="highlightSection">
 <h2><a name="TipsForProgrammers">Tips For Programmers</a></h2>
 <p>
-Dealing with errors in Isis is generally quite simple.  Application programs will automatically trap 
+Dealing with errors in ISIS is generally quite simple.  Application programs will automatically trap 
 errors using C++ expections.  For example, the following program has no required error checking.  
 It will automatically report invalid user input or <abbr title="Input/Output">I/O</abbr> errors such as opening or allocating cubes.
 
@@ -234,7 +234,7 @@ if (from-&gt;Lines() / 2 == 0) {
 </p>
 
 <p>
-  See the <a href="../../Object/index.html">Isis Developers Reference</a>.
+  See the <a href="../../Object/index.html">ISIS Developers Reference</a>.
 </p>
 
 </div>

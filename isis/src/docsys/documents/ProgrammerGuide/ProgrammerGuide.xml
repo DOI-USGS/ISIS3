@@ -21,8 +21,8 @@
   </audience>
   <bibliography>
     <title>Programmer Guide</title>
-    <brief>Guide to Programming the Isis software package</brief>
-    <description>Guide to the Isis software for Isis Programmers, using libraries, writing libraries and applications, working in the team development area, writing XML files, and winning lottery numbers.</description>
+    <brief>Guide to Programming the ISIS software package</brief>
+    <description>Guide for the Programmers using ISIS software libraries, writing libraries and applications, working in the team development area, and writing XML files.</description>
     <author>Deborah Lee Soltesz</author>
     <date>2002-12-09</date>
   </bibliography>

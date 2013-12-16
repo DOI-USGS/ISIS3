@@ -21,12 +21,12 @@
         BIBLIOGRAPHY
         ******************************************** -->
   <bibliography>
-    <title>Isis Documents How-to</title>
-    <brief>Guide to writing documents using Isis Documentation XML</brief>
-    <description>Guide to adding documents to the Isis documentation tree. All documents added to the official Isis
-                        documentation will be automatically linked on the Isis web pages and distributed with Isis. This guide
+    <title>ISIS Documents How-to</title>
+    <brief>Guide to writing documents using ISIS Documentation XML</brief>
+    <description>Guide to adding documents to the ISIS documentation tree. All documents added to the official ISIS
+                        documentation will be automatically linked on the ISIS web pages and distributed with ISIS. This guide
                         describes the formats documents may be in, what types of documents may be added, and how to
-                        write the Isis Documentation XML metadata file that is used automatically add a document to the Isis
+                        write the ISIS Documentation XML metadata file that is used automatically add a document to the ISIS
                         system.</description>
     <author>Deborah Lee Soltesz</author>
     <date>2003-01-29</date>
@@ -47,18 +47,18 @@
         <!-- OVERVIEW -->
         <h2>Overview</h2>
         <p>
-           Isis has three kinds of documentation: Application, Object, and General Documents. Application and Object documentation
-           are part of the programming and development structure and are discussed in those portions of the Isis documentation.
+           ISIS has three kinds of documentation: Application, Object, and General Documents. Application and Object documentation
+           are part of the programming and development structure and are discussed in those portions of the ISIS documentation.
            General Documents are not associated directly with Applications or Objects. Such documents include user guides,
            procedural instructions, administration references, and this very document you are reading now. This guide describes
-           the formats Documents may be in, what types of Documents may be added, and how to write the Isis Documentation XML
-           metadata file that is used to automatically add a Document to the Isis system.
+           the formats Documents may be in, what types of Documents may be added, and how to write the ISIS Documentation XML
+           metadata file that is used to automatically add a Document to the ISIS system.
         </p>
         <p>
-          Isis documentation is part of the source code distribution, resides in an organized structure, and in part is automatically
-          generated from text files written in the Isis XML languages. When Isis is installed on a system, a complete copy of the
-          documentation is installed with the software. Additionally, a copy of the documentation is published to the Isis web site, therefore
-          the Isis web site and the Isis documentation are identical. In this document, the term "web site" will refer to the complete Isis
+          ISIS documentation is part of the source code distribution, resides in an organized structure, and in part is automatically
+          generated from text files written in the ISIS XML languages. When ISIS is installed on a system, a complete copy of the
+          documentation is installed with the software. Additionally, a copy of the documentation is published to the ISIS web site, therefore
+          the ISIS web site and the ISIS documentation are identical. In this document, the term "web site" will refer to the complete ISIS
           documentation.
         </p>
 
@@ -67,45 +67,45 @@
         <h3>What do I need to know?</h3>
         <p>
             You should have a general understanding of what XML is - this document explains how to write an XML file for
-            adding a Document to Isis. If you plan to add a web page to Isis, you should be able to write basic HTML. It also helps if
-            you are familiar with the Isis web site and how it is organized from a visitor's standpoint. There are many good tutorials on the web
+            adding a Document to ISIS. If you plan to add a web page to ISIS, you should be able to write basic HTML. It also helps if
+            you are familiar with the ISIS web site and how it is organized from a visitor's standpoint. There are many good tutorials on the web
             for learning XML and HTML, such as <a href="http://www.w3schools.com/default.asp" target="_blank">W3Schools.com</a>.
         </p>
 
         <h3>What is a Document?</h3>
         <p>
-            A Document is a file, or a set of files, that supply information related to Isis. Documents that are most common are guides and
-            reference manuals. Documents are automatically linked into the upper levels of the Isis website based on the <i>audience</i> and
-            <i>category</i> supplied in the metadata file. Documents may be written by the Isis team members and housed in the documentation
+            A Document is a file, or a set of files, that supply information related to ISIS. Documents that are most common are guides and
+            reference manuals. Documents are automatically linked into the upper levels of the ISIS website based on the <i>audience</i> and
+            <i>category</i> supplied in the metadata file. Documents may be written by the ISIS team members and housed in the documentation
             or may be external resources on other web sites.
         </p>
 
         <h3>What is the Document metadata file?</h3>
         <p>
             The Document metadata file is an XML file that describes a Document, and may even contain the HTML formatted content of the Document itself.
-            In the latter case, the Document metadata will be automatically transformed to an HTML file during the building of the Isis documentation.
+            In the latter case, the Document metadata will be automatically transformed to an HTML file during the building of the ISIS documentation.
             The metadata file also contains bibliographic information, history tracking, file information, and the target audience and category the
-            Document will be linked under on the Isis web site.
+            Document will be linked under on the ISIS web site.
         </p>
 
         <h3>Where do I find the Document XML specification?</h3>
         <p>
             A
             <a href="../../Schemas/Documentation/documentation/index.html">
-            handy reference to the Document XML language</a> is available as part of the Isis documentation.
+            handy reference to the Document XML language</a> is available as part of the ISIS documentation.
         </p>
 
         <h3>What does "mandatory by policy" mean?</h3>
         <p>
             An element that is "mandatory by policy" means it must be used in certain situations according to the policies
-            of the Isis Programming Team, USGS, DOI, Section 508, or common sense. For instance, specifying file size
+            of the ISIS Programming Team, USGS, DOI, Section 508, or common sense. For instance, specifying file size
             for non-text files is a USGS policy and is standard practice in web development - when a link to a non-text file
-            is created on the Isis website, the link will include the file size information so visitors will know how big the file
+            is created on the ISIS website, the link will include the file size information so visitors will know how big the file
             they're getting ready to download is. Not only does the USGS say we have to give this information, but it's also a
             very polite practice, and visitors love polite web developers.
         </p>
 
-        <h3>Where do Documents go in the Isis structure?</h3>
+        <h3>Where do Documents go in the ISIS structure?</h3>
         <p>
             Documents live in $ISISROOT/src/docsys/documents/. Each Document (its metadata and files) should be in its
             own directory, and subcomponents should reside in a directory named <tt>assets</tt>. The XML metadata file should
@@ -158,7 +158,7 @@
 
         <p>
               The purpose of the <tt>history</tt> element is to record changes to a Document. This element is not mandatory because
-              a Document may be a resource on another website and not maintained by the Isis team. However, if you are creating a new
+              a Document may be a resource on another website and not maintained by the ISIS team. However, if you are creating a new
               Document or editing an existing Document, this element is mandatory by policy!
         </p>
 
@@ -201,20 +201,20 @@
         <p>
               All elements are mandatory except for publisher (which should be used when the publisher is not the Astrogeology Research Program).
               All elements may contain free text except the <tt>date</tt> and may appear in any order. The bibliography information is used to
-              create links in the Isis web pages and generate title and header information if the Document metadata is to be transformed to an HTML file.
+              create links in the ISIS web pages and generate title and header information if the Document metadata is to be transformed to an HTML file.
         </p>
 
         <h4>Example</h4>
         <pre><code>  &lt;bibliography&gt;
-    &lt;title&gt;Isis Documents How-to&lt;/title&gt;
-    &lt;brief&gt;Guide to writing documents using Isis Documentation XML&lt;/brief&gt;
-    &lt;description&gt;Guide to adding documents to the Isis
-    documentation tree. All documents added to the official Isis
-    documentation will be automatically linked on the Isis web
-    pages and distributed with Isis. This guide describes the formats
+    &lt;title&gt;ISIS Documents How-to&lt;/title&gt;
+    &lt;brief&gt;Guide to writing documents using ISIS Documentation XML&lt;/brief&gt;
+    &lt;description&gt;Guide to adding documents to the ISIS
+    documentation tree. All documents added to the official ISIS
+    documentation will be automatically linked on the ISIS web
+    pages and distributed with ISIS. This guide describes the formats
     documents may be in, what types of documents may be added, and
-    how to write the Isis Documentation XML metadata file that is
-    used automatically add a document to the Isis system.&lt;/description&gt;
+    how to write the ISIS Documentation XML metadata file that is
+    used automatically add a document to the ISIS system.&lt;/description&gt;
     &lt;author&gt;Deborah Lee Soltesz&lt;/author&gt;
     &lt;date&gt;2003-01-29&lt;/date&gt;
   &lt;/bibliography&gt;</code></pre>
@@ -234,15 +234,15 @@
         </p>
 
         <ul>
-          <li><b>hidden:</b> A special category that will prevent this document from being linked on the Isis website</li>
-          <li><b>about:</b> The document falls under the <b>About Isis</b> section of the site. E.g. <i>The History of the Isis Software Package</i></li>
-          <li><b>guide:</b> The document serves as a guide to some element of using, developing, or administrating Isis. E.g. this document</li>
+          <li><b>hidden:</b> A special category that will prevent this document from being linked on the ISIS website</li>
+          <li><b>about:</b> The document falls under the <b>About ISIS</b> section of the site. E.g. <i>The History of the ISIS Software Package</i></li>
+          <li><b>guide:</b> The document serves as a guide to some element of using, developing, or administrating ISIS. E.g. this document</li>
           <li><b>tutorial:</b> The document serves as a step-by-step tutorial or lesson. E.g. Destriping Noisy Data</li>
-          <li><b>installation:</b> The document is related to installing Isis</li>
-          <li><b>administration:</b> The document is related to maintaining the installation of Isis</li>
-          <li><b>technicaldoc:</b> This is a technical document about developing, programming, or the adminstration of Isis. This document falls under the Technical Documents section of the site.</li>
-          <li><b>support:</b> The document is related to Isis technical support</li>
-          <li><b>information:</b> General information about Isis</li>
+          <li><b>installation:</b> The document is related to installing ISIS</li>
+          <li><b>administration:</b> The document is related to maintaining the installation of ISIS</li>
+          <li><b>technicaldoc:</b> This is a technical document about developing, programming, or the adminstration of ISIS. This document falls under the Technical Documents section of the site.</li>
+          <li><b>support:</b> The document is related to ISIS technical support</li>
+          <li><b>information:</b> General information about ISIS</li>
           <li><b>reference:</b> This document is a reference (such as a listing of commands without the detailed examples and explanations a guide might include)</li>
           <li><b>policy:</b> This document outlines a policy. E.g. <i>Privacy Policy</i> and <i>Disclaimers</i></li>
           <li><b>xml:</b> This document is about one of the XML languages. E.g. this document </li>
@@ -275,12 +275,12 @@
         </p>
 
         <ul>
-          <li><b>user:</b> A person who is new to Isis, or uses Isis and has basic skill at using the software</li>
+          <li><b>user:</b> A person who is new to ISIS, or uses ISIS and has basic skill at using the software</li>
           <li><b>intermediate:</b> An intermediate user. A person who has mastered basic skills and is performing intermediate level functions</li>
           <li><b>advanced:</b> An advanced user. A person who has advanced skills or is performing advanced functions</li>
           <li><b>administrator:</b> A person who maintains the software on the computer, usually a systems administrator</li>
-          <li><b>developer:</b> A person who uses the Isis API to develop applications. This group may include image processors and scientists</li>
-          <li><b>programmer:</b> A person who writes Isis base software libraries. This is generally a member of the Astrogeology Programming Team</li>
+          <li><b>developer:</b> A person who uses the ISIS API to develop applications. This group may include image processors and scientists</li>
+          <li><b>programmer:</b> A person who writes ISIS base software libraries. This is generally a member of the Astrogeology Programming Team</li>
           <li><b>all:</b> Everybody</li>
         </ul>
 
@@ -304,7 +304,7 @@
 
         <p>
               The purpose of the <tt>files</tt> element is to specify the information about the file or files in this Document.
-              This information is used to create links in the Isis web pages and even transform the metadata file into new HTML documents.
+              This information is used to create links in the ISIS web pages and even transform the metadata file into new HTML documents.
         </p>
         <p>
               The <tt>files</tt> element contains one or more <tt>file</tt> elements. There is one <tt>file</tt> element for each
@@ -337,7 +337,7 @@
                                            </ol>
 
           <li><b>body:</b> If your Document is an autogenerated web page, this is where the content of your webpage goes. <i>All</i> web page Documents
-                                         should be created this way, not as a separate HTML file. When Isis is built, the web page will be generated with consistent formatting
+                                         should be created this way, not as a separate HTML file. When ISIS is built, the web page will be generated with consistent formatting
                                          and layout, summary information (ie. HTML <tt>title</tt> and <tt>meta</tt> tags), and page headers and footers. The <tt>body</tt>
                                          element contains <b>one</b> of the following:</li>
 

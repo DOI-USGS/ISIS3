@@ -7,12 +7,12 @@
           <a name="DrivingForceOfTheConversion">Driving Force of the Conversion</a>
         </h2>
         <p>
-          The major reason for embarking on the conversion of Isis was to modernize a nearly 15-year old software package.
-          Isis was prototyped in the mid-to-late 1980's.   Mainstream use began when it was ported to Unix around 1990.
+          The major reason for embarking on the conversion of ISIS was to modernize a nearly 15-year old software package.
+          ISIS was prototyped in the mid-to-late 1980's.   Mainstream use began when it was ported to Unix around 1990.
           At that time, the technologies used in the development included TAE (a text-based user interface) and Fortran and C.
           Later IDL and X-Windows were used to add display functionality to the system.  In the mid-1990's, the Perl scripting
           language was used to replace TAE PDF procedures.  A modernization needed to be undertaken, one that would benefit users,
-          software developers, and Isis system management.
+          software developers, and ISIS system management.
         </p>
 
         <h2>
@@ -21,7 +21,7 @@
 
         <p>
           Two major elements were considered, the first was replacing the TAE text-based user interface and the second was
-          easing the users learning curve.  Currently, Isis employs a graphic user interface derived from the Qt API.
+          easing the users learning curve.  Currently, ISIS employs a graphic user interface derived from the Qt API.
           A significant reason the Qt API was selected is it is available on Unix, Windows, and Macintosh platforms.
         </p>
 
@@ -43,7 +43,7 @@
 
         <p>
           In addition to replacing the user interface, several other problem areas were identified and addressed in order
-          to make learning and using Isis easier.  They include
+          to make learning and using ISIS easier.  They include
         </p>
 
         <ul>
@@ -174,14 +174,14 @@ There were many major design considerations relating to software development.  T
 
         <h3>Increase code reuse</h3>
         <p>
-          The Isis API consisted of many hundreds of C and Fortran subroutines.  The documentation for the routines
+          The ISIS API consisted of many hundreds of C and Fortran subroutines.  The documentation for the routines
           was located in the source code, forcing application programmers to manually find and locate the desired
           function.  Coupled with fact there was no table of contents or other front-end navigation ability meant
           developers often relied on word-of-mouth to determine existing capabilities.  In the worst case, capabilities
           were sometimes re-coded because of lack of information.
         </p>
         <p>
-          The conversion process allowed for more planning in regards to the Isis Application Programmer API.  The API
+          The conversion process allowed for more planning in regards to the ISIS Application Programmer API.  The API
           reference presents a full developer documentation set in a consistent, web-based interface.  The following is
           an example of the documentation for a C++ class,
         </p>
@@ -197,10 +197,10 @@ There were many major design considerations relating to software development.  T
         <table class="tableFormattedInformation" align="center">
           <tr>
             <th>
-              Isis 2.1
+              ISIS 2.1
             </th>
             <th>
-              Isis 3.0
+              ISIS 3.0
             </th>
           </tr>
           <tr>
@@ -236,7 +236,7 @@ There were many major design considerations relating to software development.  T
         <h3>Utilize more third party APIs</h3>
         <p>
           To further increase code reuse there was a desire to utilize third party APIs.  Many of the newer APIs
-          are restricted to C++ or Java and not available in Fortran or C.   Currently the Isis system utilizes
+          are restricted to C++ or Java and not available in Fortran or C.   Currently the ISIS system utilizes
           the following APIs:
         </p>
 
@@ -256,10 +256,10 @@ There were many major design considerations relating to software development.  T
         </p>
 
         <h2>
-          <a name="IsisSystemManagementDesignConsiderations">Isis System Management Design Considerations</a>
+          <a name="IsisSystemManagementDesignConsiderations">ISIS System Management Design Considerations</a>
         </h2>
         <p>
-          The administration of Isis is especially critical as it is being used more and more by the external USGS
+          The administration of ISIS is especially critical as it is being used more and more by the external USGS
           planetary community.  In particular the following areas were addressed:
         </p>
 
@@ -272,32 +272,32 @@ There were many major design considerations relating to software development.  T
 
         <h3>Source Maintenance</h3>
         <p>
-          Isis source code maintenance is now handled through Concurrent Versions System.  CVS allows for programmers
-          to check out, modify, and commit changes to the Isis source repository.  It monitors conflicts between
+          ISIS source code maintenance is now handled through Concurrent Versions System.  CVS allows for programmers
+          to check out, modify, and commit changes to the ISIS source repository.  It monitors conflicts between
           simultaneous access to the source code by developers, as well as providing methods for retrieving all
           previous versions of the source.
         </p>
 
         <h3>Software Verification</h3>
         <p>
-          A major need for system management was the ability to verify Isis functions properly when porting to
+          A major need for system management was the ability to verify ISIS functions properly when porting to
           a new operating system, upgrading operating systems, changing compilers, or modifying compiler switches.
-          Isis now relies on a suite of “unit tests” to verify the entire API is functioning properly.  In addition,
+          ISIS now relies on a suite of “unit tests” to verify the entire API is functioning properly.  In addition,
           a suite of “application tests” is used to verify individual programs are operating the same.
         </p>
 
         <h3>Distribution</h3>
         <p>
-          The distribution of Isis on CD/DVDs to external customers became problematic due to the growing size of
+          The distribution of ISIS on CD/DVDs to external customers became problematic due to the growing size of
           support files (SPICE and calibration) for current missions.  To facilitate timely distribution and quick
           installation, a self-syncing system was constructed.  The system utilizes the “rsync” software package
-          to distribute Isis over the Internet in time period of 2 to 10 hours.
+          to distribute ISIS over the Internet in time period of 2 to 10 hours.
         </p>
 
         <h3>User Support</h3>
-        <p> Previously, Isis user support was handled through an email-based mechanism.  It was not centralized
+        <p> Previously, ISIS user support was handled through an email-based mechanism.  It was not centralized
         and therefore questions could fall through the cracks.  Additionally, no uniform methods existed for
-        collecting user information (e.g., platform, O/S level, Isis version, etc).  Currently, we utilize a
+        collecting user information (e.g., platform, O/S level, ISIS version, etc).  Currently, we utilize a
         web-based ticket tracking system.  It can be found at http://isis-support.wr.usgs.gov/
         </p>
 
@@ -320,7 +320,7 @@ There were many major design considerations relating to software development.  T
 
         <h3>Session Log File</h3>
         <p>
-          In the previous version of Isis, the session log files were partially PVL and then free-format as the
+          In the previous version of ISIS, the session log files were partially PVL and then free-format as the
           programmer output results of the program.  The current version requires all output to the session log
           be in PVL format.  Results of the program will be stored in a RESULTS group.  Additional information
           needed to be free-format can be written to a user specified output file.  For example, the histogram
@@ -331,12 +331,12 @@ There were many major design considerations relating to software development.  T
 
         <h3>Cube Format and Compatibility</h3>
         <p>
-          The cube format for Isis has been upgraded.  In particular, Isis outputs a new tiled format discussed
+          The cube format for ISIS has been upgraded.  In particular, ISIS outputs a new tiled format discussed
           at a later point in this document.  The tiled format is better suited for large spatial products and
-          still allows for rapid access in the hyper-spectral modes.  However, all programs in Isis 3 will
-          continue to read the band sequential format produced in Isis 2 for backward compatibility. Support
+          still allows for rapid access in the hyper-spectral modes.  However, all programs in ISIS 3 will
+          continue to read the band sequential format produced in ISIS 2 for backward compatibility. Support
           is also continued for 8-bit unsigned, 16-bit signed, and 32-bit real pixel types, along with the
-          various special pixel values.  Finally, the Isis software will be endian-neutral.  That is, programs
+          various special pixel values.  Finally, the ISIS software will be endian-neutral.  That is, programs
           will automatically handle LSB or MSB pixel storage order, regardless of machine architecture.
         </p>
 
@@ -344,8 +344,8 @@ There were many major design considerations relating to software development.  T
         <i>
         <p>
           <font color="RED">[Future Option]</font> Much effort went into the design and development of suffix data such as backplanes,
-          sideplanes, and bottomplanes.  Conceptually, the idea of suffix data was appealing in the original Isis design.   Realistically, most
-          of the Isis 2 application programs never dealt with them because of the complexity.   In Isis 3 we plan to continue with the ability to
+          sideplanes, and bottomplanes.  Conceptually, the idea of suffix data was appealing in the original ISIS design.   Realistically, most
+          of the ISIS 2 application programs never dealt with them because of the complexity.   In ISIS 3 we plan to continue with the ability to
           support suffix data, albeit in a different form and name.  Suffix data will be handled through BLOBs (Binary Large OBjects).  The
           advantage is the BLOB is a contingous
           chunk of data unlike suffixes which were intermixed amongst the pixel data.  A BLOB will be able to represent a sideplane, bottomplane,
@@ -355,7 +355,7 @@ There were many major design considerations relating to software development.  T
 
         <h3>SFROM, ORANGE and OTYPE Parameters</h3>
         <p>
-          In Isis 2.1, the SFROM, ORANGE, and OTYPE parameters were essentially qualifiers for input and output
+          In ISIS 2.1, the SFROM, ORANGE, and OTYPE parameters were essentially qualifiers for input and output
           cubes, respectively.  The functionality of these three parameters still exists; however, it is handled
           via attributes to cube files as opposed to sets of parameters. For example, TO2, ORANGE2, OTYPE2 or
           FROM2, SFROM2 are replaced by a file specification with attributes TO=output.cub+16bit
@@ -364,7 +364,7 @@ There were many major design considerations relating to software development.  T
         <h3>Display Software</h3>
         <p>
           Image display was handled via “qview” for cartographic (large spatial) and “cv” for hyper-spectral cubes.
-          They were coded using X-Windows and IDL, respectively.    Display capabilities for Isis 3 are coded in
+          They were coded using X-Windows and IDL, respectively.    Display capabilities for ISIS 3 are coded in
           the Qt API.  The design for these capabilities will follow the PICS TVDO concept.  That is, an image
           display base class is provided.  This class allows for standard display functions such as zoom, roam,
           stretch, blink, cursor interrogation, and measurement tools.  Individual display programs that perform
@@ -386,9 +386,9 @@ There were many major design considerations relating to software development.  T
     <target>intermediate</target>
   </audience>
   <bibliography>
-    <title>Conversion from Isis 2 to Isis 3</title>
-    <brief>The reasons, considerations, and major design changes related to the upgrade from Isis 2 to Isis 3</brief>
-    <description>The reasons, considerations, and major design changes related to the upgrade from Isis 2 to Isis 3</description>
+    <title>Conversion from ISIS 2 to ISIS 3</title>
+    <brief>Reasons and considerations to upgrade from ISIS 2 to ISIS 3</brief>
+    <description>The reasons, considerations, and major design changes related to the upgrade from ISIS 2 to ISIS 3</description>
     <author>Jeff Anderson</author>
     <date>2003-06-30</date>
     <history>

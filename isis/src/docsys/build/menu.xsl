@@ -25,11 +25,11 @@ Deborah Lee Soltesz
 
     <div>
       <a href="{$menuPath}AboutIsis/index.html" target="_top">
-      About Isis</a>
+      About ISIS</a>
     </div>
 
     <div>
-      <a href="http://isis.astrogeology.usgs.gov/IsisSupport" target="_blank" title="Launch the Isis Support Center in a new window">
+      <a href="http://isis.astrogeology.usgs.gov/IsisSupport" target="_blank" title="Launch the ISIS Support Center in a new window">
       Support</a>
     </div>
 
@@ -40,7 +40,7 @@ Deborah Lee Soltesz
 
     <hr/>
     <h2>
-      Isis 3
+      ISIS 3
     </h2>
 
     <div>
@@ -50,7 +50,7 @@ Deborah Lee Soltesz
 
     <!-- Isis Workshop is only available on the website  -->
     <div>
-      <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop" target="_blank" title="Launch Isis Workshop in a new window">
+      <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop" target="_blank" title="Launch ISIS Workshop in a new window">
       Tutorials</a>
     </div>
 
@@ -62,7 +62,7 @@ Deborah Lee Soltesz
 
     <hr/>
     <h2>
-      Isis 2
+      ISIS 2
     </h2>
 
     <div>

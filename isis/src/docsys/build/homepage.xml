@@ -17,7 +17,7 @@
   </div>
 
 
-  <h1>Isis</h1>
+  <h1>ISIS</h1>
   <h1 class="subtitle">Integrated Software for Imagers and Spectrometers</h1>
   <hr/>
   <table>
@@ -25,9 +25,10 @@
       <td valign="top">
         <h2>Welcome</h2>
         <p>
-        This is the home page for Isis, an image processing software package. The focus
-        of the software is to manipulate imagery collected by current and past NASA
-        planetary missions sent to Mars, Jupiter, Saturn, and other solar system bodies.
+	  This is the home page for ISIS, a digital image processing software 
+	  package. The focus of the software is to manipulate imagery collected 
+	  by current and past NASA and International planetary missions sent 
+	  throughout our Solar System. 
         </p>
         <h2>Announcements</h2>
         <div style="text-align:center;">
@@ -41,11 +42,11 @@
         <ul>
           <li>
             <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/isis.cgi">
-              Isis 2 Home Page
+              ISIS 2 Home Page
             </a>
           </li>
           <li>
-            <a href="Application/index.html">Isis 3 Application Table of Contents</a>
+            <a href="Application/index.html">ISIS 3 Application Table of Contents</a>
           </li>
         </ul>
 
