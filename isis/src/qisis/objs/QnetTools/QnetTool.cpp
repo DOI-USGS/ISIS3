@@ -1483,6 +1483,9 @@ namespace Isis {
    *                          Swapped checking for empty network and not allowing mouse clicks on
    *                          the ground source. First check if there are any points in the network.
    *                          If not print message and return.
+   * @history 2013-12-17 Tracie Sucharski - Check for valid serial number at beginning.  This 
+   *                          prevents seg fault if user opens a new cube list but clicks on a
+   *                          cube that was open from a previous list.
    *
    */
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
@@ -1490,7 +1493,17 @@ namespace Isis {
     if (cvp  == NULL) return;
 
     QString file = cvp->cube()->fileName();
-    QString sn = m_serialNumberList->SerialNumber(file);
+    QString sn;
+    try {
+      sn = m_serialNumberList->SerialNumber(file);
+    }
+    catch (IException &e) {
+      QString message = "Cannot get serial number for " + file + ".  Is file contained in the ";
+      message += "cube list?\n";
+      message += e.toString();
+      QMessageBox::critical(m_qnetTool, "Error", message);
+      return;
+    }
 
     double samp,line;
     cvp->viewportToCube(p.x(),p.y(),samp,line);
