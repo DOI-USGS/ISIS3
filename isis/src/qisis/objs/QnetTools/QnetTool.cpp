@@ -675,6 +675,8 @@ namespace Isis {
    *                          if no ground is loaded the checkReference was not being called and
    *                          reference measure could not be changed and there was no warning
    *                          printed.
+   *   @history 2013-12-05 Tracie Sucharski - If saving measure on fixed or constrained point and
+   *                        reference measure is ignored, print warning and return.
    */
   void QnetTool::measureSaved() {
     // Read original measures from the network for comparison with measures
@@ -683,33 +685,6 @@ namespace Isis {
                 m_editPoint->GetMeasure(m_leftMeasure->GetCubeSerialNumber());
     ControlMeasure *origRightMeasure =
                 m_editPoint->GetMeasure(m_rightMeasure->GetCubeSerialNumber());
-
-
-    //  Only print error if both original measure in network and the current
-    //  edit measure are both editLocked.  If only the edit measure is
-    //  locked, then user just locked and it needs to be saved.
-    //  Do not use this classes IsMeasureLocked since we actually want to
-    //  check the original againsted the edit measure and we don't care
-    //  if this is a reference measure.  The check for moving a reference is
-    //  done below.
-    if (origRightMeasure->IsEditLocked() && m_rightMeasure->IsEditLocked()) {
-      QString message = "You are saving changes to a measure that is locked ";
-      message += "for editing.  Do you want to set EditLock = False for this ";
-      message += "measure?";
-      switch (QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
-                                    message, "&Yes", "&No", 0, 0)) {
-        // Yes:  set EditLock=false for the right measure
-        case 0:
-          m_rightMeasure->SetEditLock(false);
-          m_lockRightMeasure->setChecked(false);
-// TODO this needs to be re-factored it is returning without saving point after changing editLock
-//   if I put the break, it goes down and checks reference and resets the editLock to original?
-//          break;
-        // No:  keep EditLock=true and do NOT save measure
-        case 1:
-          return;
-      }
-    }
 
     if (m_editPoint->IsIgnored()) {
       QString message = "You are saving changes to a measure on an ignored ";
@@ -753,6 +728,13 @@ namespace Isis {
     //  Only check reference if point contains explicit reference.  Otherwise,
     //  there has not been a reference set, set the measure on the left as the reference.
     if (m_editPoint->IsReferenceExplicit()) {
+      if (m_editPoint->IsEditLocked()) {
+        QString message = "This control point is edit locked.  The Apriori latitude, longitude and ";
+        message += "radius cannot be updated.  You must first unlock the point by clicking the ";
+        message += "check box above labeled \"Edit Lock Point\".";
+        QMessageBox::warning(m_qnetTool, "Point Locked", message);
+        return;
+      }
       checkReference();
     }
     else if (m_leftMeasure->GetCubeSerialNumber() != m_groundSN) {
@@ -762,9 +744,26 @@ namespace Isis {
     // If this is a fixed or constrained point, and the right measure is the ground source,
     // update the lat,lon,radius.  Only the right measure can be moved, so only need to update
     // position if the ground measure is loaded on the right.
+    // 
+    // If point is locked and it is not a new point, print error
     //  TODO::  Only update if the measure moved
     if (m_editPoint->GetType() != ControlPoint::Free && (m_groundOpen &&
-        m_rightMeasure->GetCubeSerialNumber() == m_groundSN)) updateGroundPosition();
+        m_rightMeasure->GetCubeSerialNumber() == m_groundSN)) {
+      if (m_editPoint->IsEditLocked() && m_controlNet->ContainsPoint(m_editPoint->GetId())) {
+        QString message = "This control point is edit locked.  The Apriori latitude, longitude and ";
+        message += "radius cannot be updated.  You must first unlock the point by clicking the ";
+        message += "check box above labeled \"Edit Lock Point\".";
+        QMessageBox::warning(m_qnetTool, "Point Locked", message);
+        return;
+      }
+      if (m_leftMeasure->IsIgnored()) {
+        QString message = "This is a Constrained or Fixed point and the reference measure is ";
+        message += "Ignored.  Unset the Ignore flag on the reference measure before saving.";
+        QMessageBox::warning(m_qnetTool, "Point Locked", message);
+        return;
+      }
+      updateGroundPosition();
+    }
 
     // Save the right measure and left (if ignore or edit lock flag changed) to
     // the editPoint The Ignore flag is the only thing that can change on the left
@@ -848,10 +847,8 @@ namespace Isis {
         m_editPoint->SetRefMeasure(m_leftMeasure->GetCubeSerialNumber());
         // Update reference measure to new reference measure
         refMeasure = m_editPoint->GetRefMeasure();
-
       }
-
-          // ??? Need to set rest of measures to Candiate and add more warning. ???//
+      // ??? Need to set rest of measures to Candidate and add more warning. ???//
     }
 
     // If the right measure is the reference, make sure they really want
@@ -887,26 +884,6 @@ namespace Isis {
   */
   void QnetTool::updateGroundPosition() {
 
-    //  Point is editLocked.  Print warning if the point already exists in the
-    //  network.  If it is a new point with the editLock keyword set, do not
-    //  print warning.
-    if (m_editPoint->IsEditLocked() && m_controlNet->ContainsPoint(
-                                        m_editPoint->GetId())) {
-      QString message = "This point is locked for editing.  Do want to set ";
-      message += "EditLock = False?";
-      switch (QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
-                                    message, "&Yes", "&No", 0, 0)) {
-        // Yes:  set EditLock=false for the point and save point
-        case 0:
-          m_editPoint->SetEditLock(false);
-          m_lockPoint->setChecked(false);
-        // No:  keep EditLock=true and return
-        case 1:
-          loadPoint();
-          return;
-
-      }
-    }
     //  TODO:  If groundSource file opened does not match the SurfacePoint Source
     //  file, print warning.
 
@@ -960,9 +937,9 @@ namespace Isis {
             Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
         radius =
             m_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
-//        cout.width(15);
-//        cout.precision(4);
-//        cout<<"Camera Radius = "<<fixed<<radius<<endl;
+//      cout.width(15);
+//      cout.precision(4);
+//      cout<<"Camera Radius = "<<fixed<<radius<<endl;
         //radius = m_groundGmap->Projection()->LocalRadius();
       }
       else {
@@ -973,6 +950,7 @@ namespace Isis {
         return;
       }
     }
+
     try {
       //  Read apriori surface point if it exists so that point is
       //  replaced, but sigmas are retained.  Save sigmas because the
@@ -981,8 +959,8 @@ namespace Isis {
       if (m_editPoint->HasAprioriCoordinates()) {
         SurfacePoint aprioriPt = m_editPoint->GetAprioriSurfacePoint();
         aprioriPt.SetRadii(Distance(targetRadii[0]),
-                              Distance(targetRadii[1]),
-                              Distance(targetRadii[2]));
+                           Distance(targetRadii[1]),
+                           Distance(targetRadii[2]));
         Distance latSigma = aprioriPt.GetLatSigmaDistance();
         Distance lonSigma = aprioriPt.GetLonSigmaDistance();
         Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
@@ -1082,29 +1060,125 @@ namespace Isis {
    *
    * @author 2011-07-05 Tracie Sucharski
    *
-   * @internal
+   * @internal 
+   *   @history 2013-12-06 Tracie Sucharski - If changing point type to constrained or fixed make
+   *                           sure reference measure is not ignored.
    */
   void QnetTool::setPointType (int pointType) {
     if (m_editPoint == NULL) return;
 
-    ControlPoint::Status status =
-         m_editPoint->SetType((ControlPoint::PointType) pointType);
-    if (status == ControlPoint::PointLocked) {
+    //  If pointType is equal to current type, nothing to do
+    if (m_editPoint->GetType() == pointType) return;
+
+    if (pointType != ControlPoint::Free && m_leftMeasure->IsIgnored()) {
       m_pointType->setCurrentIndex((int) m_editPoint->GetType());
-      QString message = "Unable to change the point type.  Set EditLock ";
-      message += " to False.";
-      QMessageBox::critical(m_qnetTool, "Error", message);
+      QString message = "The reference measure is Ignored.  Unset the Ignore flag on the ";
+      message += "reference measure before setting the point type to Constrained or Fixed.";
+      QMessageBox::warning(m_qnetTool, "Ignored Reference Measure", message);
       return;
     }
 
-    //  If ground loaded, readd temporary ground measure to the point
-    if (m_groundOpen) {
+    bool unloadGround = false;
+    if (m_editPoint->GetType() != ControlPoint::Free && pointType == ControlPoint::Free) 
+      unloadGround = true;
+
+    ControlPoint::Status status = m_editPoint->SetType((ControlPoint::PointType) pointType);
+    if (status == ControlPoint::PointLocked) {
+      m_pointType->setCurrentIndex((int) m_editPoint->GetType());
+      QString message = "This control point is edit locked.  The point type cannot be changed.  You ";
+      message += "must first unlock the point by clicking the check box above labeled ";
+      message += "\"Edit Lock Point\".";
+      QMessageBox::warning(m_qnetTool, "Point Locked", message);
+      return;
+    }
+
+    //  If ground loaded, read temporary ground measure to the point
+    if (pointType != ControlPoint::Free && m_groundOpen) {
+      loadGroundMeasure();
+      m_pointEditor->colorizeSaveButton();
+    }
+    //  If going from constrained or fixed to free, unload the ground measure.
+    else if (unloadGround) {
+      // Find in point and delete, it will be re-created with current
+      // ground source if this is a fixed point
+      if (m_editPoint->HasSerialNumber(m_groundSN)) {
+          m_editPoint->Delete(m_groundSN);
+      }
+
       loadPoint();
       m_pointEditor->colorizeSaveButton();
     }
 
-
     colorizeSaveButton();
+  }
+
+
+
+  /** 
+   * Load ground measure into right side and add to file combo boxes.
+   *
+   * @author 2013-12-06 Tracie Sucharski 
+   *
+   * @internal 
+   *   @history 2013-12-06 Tracie Sucharski - Original version.
+   *
+   */
+  void QnetTool::loadGroundMeasure () {
+
+    if (!m_groundOpen) return;
+
+    // Use apriori surface point to find location on ground source.  If
+    // apriori surface point does not exist use reference measure
+    double lat = 0.;
+    double lon = 0.;
+    if (m_editPoint->HasAprioriCoordinates()) {
+      SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
+      lat = sPt.GetLatitude().degrees();
+      lon = sPt.GetLongitude().degrees();
+    }
+    else {
+      ControlMeasure m = *(m_editPoint->GetRefMeasure());
+      int camIndex = m_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
+      Camera *cam;
+      cam = m_controlNet->Camera(camIndex);
+      cam->SetImage(m.GetSample(),m.GetLine());
+      lat = cam->UniversalLatitude();
+      lon = cam->UniversalLongitude();
+    }
+
+    //  Try to locate point position on current ground source,
+    //  TODO ???if doesn't exist,???
+    if (!m_groundGmap->SetUniversalGround(lat,lon)) {
+      QString message = "This point does not exist on the ground source.\n";
+      message += "Latitude = " + QString::number(lat);
+      message += "  Longitude = " + QString::number(lon);
+      message += "\n A ground measure will not be created.";
+      QMessageBox::warning(m_qnetTool, "Warning", message);
+    }
+    else {
+      // Create a temporary measure to hold the ground point info for ground source
+      // This measure will be deleted when the ControlPoint is saved to the
+      // ControlNet.
+      ControlMeasure *groundMeasure = new ControlMeasure;
+      groundMeasure->SetCubeSerialNumber(m_groundSN);
+      groundMeasure->SetType(ControlMeasure::Candidate);
+      groundMeasure->SetCoordinate(m_groundGmap->Sample(),m_groundGmap->Line());
+      m_editPoint->Add(groundMeasure);
+
+      // Add to measure combo boxes
+      QString file = m_serialNumberList->FileName(groundMeasure->GetCubeSerialNumber());
+      m_pointFiles<<file;
+      QString tempFileName = FileName(file).name();
+      m_leftCombo->addItem(tempFileName);
+      m_rightCombo->addItem(tempFileName);
+      int rightIndex = m_rightCombo->findText((QString)m_groundFile);
+      m_rightCombo->setCurrentIndex(rightIndex);
+      selectRightMeasure(rightIndex);
+
+      updateSurfacePointInfo ();
+
+      loadMeasureTable();
+    }
   }
 
 
@@ -1143,9 +1217,10 @@ namespace Isis {
     ControlPoint::Status status = m_editPoint->SetIgnored(ignore);
     if (status == ControlPoint::PointLocked) {
       m_ignorePoint->setChecked(m_editPoint->IsIgnored());
-      QString message = "Unable to change Ignored on point.  Set EditLock ";
-      message += " to False.";
-      QMessageBox::critical(m_qnetTool, "Error", message);
+      QString message = "This control point is edit locked.  The Ignored status cannot be ";
+      message += "changed.  You must first unlock the point by clicking the check box above ";
+      message += "labeled \"Edit Lock Point\".";
+      QMessageBox::warning(m_qnetTool, "Point Locked", message);
       return;
     }
     colorizeSaveButton();

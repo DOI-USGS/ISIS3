@@ -178,6 +178,7 @@ namespace Isis {
    *                           ControlNet reference. Added swap(). Refactored assignment
    *                           operator to use copy-and-swap idiom which fixed a bug where
    *                           you couldn't access control points by index after an assignment.
+   *   @history 2013-11-08 Tracie Sucharski - Add camera to ignored measures.  References #1603. 
    */
   class ControlNet : public QObject {
       Q_OBJECT

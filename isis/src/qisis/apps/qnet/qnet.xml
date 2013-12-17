@@ -529,5 +529,11 @@
       measures in a point.  Fixed repetitive warnings when the current edit point does
       not fall on the ground source.  Fixes #1491, #1493, #1655.
     </change>
+    <change name="Tracie Sucharski" date="2013-12-06">
+      Fixed following bugs: seg fault when selecting a new reference measure and moving
+      the point, seg fault when moving edit locked points without un-locking.
+      Also, improved error checking on ignored reference measures on constrained and
+      fixed points.  Fixes #1603, #1624.
+    </change>
   </history>
 </application>

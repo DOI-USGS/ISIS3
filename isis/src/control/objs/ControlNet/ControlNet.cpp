@@ -1525,20 +1525,18 @@ namespace Isis {
       for (int m = 0; m < serialNums.size(); m++) {
         ControlMeasure *curMeasure = (*curPoint)[serialNums[m]];
 
-        if (!curMeasure->IsIgnored()) {
-          QString serialNumber = curMeasure->GetCubeSerialNumber();
-          if (list.HasSerialNumber(serialNumber)) {
-            curMeasure->SetCamera(p_cameraMap[serialNumber]);
+        QString serialNumber = curMeasure->GetCubeSerialNumber();
+        if (list.HasSerialNumber(serialNumber)) {
+          curMeasure->SetCamera(p_cameraMap[serialNumber]);
 
-            // increment number of measures for this image (camera)
-            p_cameraMeasuresMap[serialNumber]++;
-          }
-          else {
-            IString msg = "Control point [" + curPoint->GetId() +
-                "], measure [" + curMeasure->GetCubeSerialNumber() +
-                "] does not have a cube with a matching serial number";
-            throw IException(IException::User, msg, _FILEINFO_);
-          }
+          // increment number of measures for this image (camera)
+          p_cameraMeasuresMap[serialNumber]++;
+        }
+        else {
+          IString msg = "Control point [" + curPoint->GetId() +
+              "], measure [" + curMeasure->GetCubeSerialNumber() +
+              "] does not have a cube with a matching serial number";
+          throw IException(IException::User, msg, _FILEINFO_);
         }
       }
     }

@@ -123,6 +123,10 @@ namespace Isis {
     *                          and right viewports.  Zoom factors were being passed into the
     *                          Chip::Load method as the second argument which should be the rotation
     *                          value.
+    *   @history 2013-11-07 Tracie Sucharski - Moved error checking on edit locked measures from
+    *                          QnetTool::measureSaved to ::saveMeasure.  The error checking now
+    *                          forces the edit lock check box to be unchecked before the measure
+    *                          can be saved.  Fixes #1624.
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but

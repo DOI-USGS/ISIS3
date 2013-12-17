@@ -151,6 +151,7 @@
 :QnetToolScroll.Zoom Factor: 1_QLabel	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Zoom Factor: 1' type='QLabel' unnamed='1' visible='1'}
 :QnetToolScroll.Zoom Factor: 1_QLabel_2	{container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='2' text='Zoom Factor: 1' type='QLabel' unnamed='1' visible='1'}
 :QnetToolScroll_Isis::ControlPointEdit	{container=':QnetTool.QnetToolScroll_QScrollArea' type='Isis::ControlPointEdit' unnamed='1' visible='1'}
+:QnetToolScroll_QScrollBar	{container=':QnetTool.QnetToolScroll_QScrollArea' type='QScrollBar' unnamed='1' visible='1'}
 :QnetToolScroll_QToolButton	{container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='8' type='QToolButton' unnamed='1' visible='1'}
 :QnetToolScroll_QToolButton_2	{container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='7' type='QToolButton' unnamed='1' visible='1'}
 :QnetToolScroll_QWidget	{container=':QnetTool.QnetToolScroll_QScrollArea' type='QWidget' unnamed='1' visible='1'}

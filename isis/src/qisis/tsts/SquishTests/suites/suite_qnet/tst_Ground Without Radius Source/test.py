@@ -45,7 +45,15 @@ def main():
     mouseClick(waitForObject(":Right Measure_QComboBox"), 148, 5, 0, Qt.LeftButton)
     clickButton(waitForObject(":Left Measure.Edit Lock Measure_QCheckBox"))
     clickButton(waitForObject(":QnetToolScroll.Save Measure_QPushButton"))
+    clickButton(waitForObject(":QnetToolScroll.OK_QPushButton"))
+    clickButton(waitForObject(":Right Measure.Edit Lock Measure_QCheckBox"))
+    scrollTo(waitForObject(":QnetToolScroll_QScrollBar"), 598)
+    clickButton(waitForObject(":QnetToolScroll.Save Measure_QPushButton"))
     clickButton(waitForObject(":Qnet Tool Save Measure.Yes_QPushButton"))
+    clickButton(waitForObject(":QnetToolScroll.OK_QPushButton"))
+
+    clickButton(waitForObject(":Qnet Tool Save Measure.Yes_QPushButton"))
+
     clickButton(waitForObject(":QnetToolScroll.Save Point_QPushButton"))
     mouseClick(waitForObject(":VP2"), 164, 160, 0, Qt.LeftButton)
     clickButton(waitForObject(":QnetToolScroll.Save Measure_QPushButton"))
