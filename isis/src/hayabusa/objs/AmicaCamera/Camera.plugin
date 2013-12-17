@@ -1,0 +1,6 @@
+Group = Hayabusa/Amica
+  Version = 1
+  Library = AmicaCamera
+  Routine = AmicaCameraPlugin
+EndGroup
+ 
