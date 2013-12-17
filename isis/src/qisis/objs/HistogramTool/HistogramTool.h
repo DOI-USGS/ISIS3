@@ -27,6 +27,10 @@ namespace Isis {
   *                          histograms were not created correctly for any bands
   *                          but band 1. Added check for RGB mode. Fixes #668.
   *  @history 2012-01-20 Steven Lambright - Completed documentation.
+  *  @history 2013-12-11 Janet Barrett - Fixed refreshPlot method so that it 
+  *                          checks the start sample and end sample for the
+  *                          plot and starts the plot at the minimum of the 
+  *                          2 samples. Fixes #1760.
   */
   class HistogramTool : public AbstractPlotTool {
       Q_OBJECT

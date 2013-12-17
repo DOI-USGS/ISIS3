@@ -304,7 +304,8 @@ namespace Isis {
 
         //For each line read nsamps and add it to the histogram
         for(int line = (int)std::min(sline, eline); line <= (int)std::max(sline, eline); line++) {
-          brick->SetBasePosition((int)ssamp, line, band);
+          int isamp = std::min(ssamp,esamp);
+          brick->SetBasePosition(isamp, line, band);
           cube->read(*brick);
           hist.AddData(brick->DoubleBuffer(), nsamps);
         }
