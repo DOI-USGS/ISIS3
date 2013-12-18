@@ -398,8 +398,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     QString msg = "Images with one or less measures:\n";
     int nImages = m_pSnList->Size();
     for (int i = 0; i < nImages; i++) {
-      int nMeasures =
-        m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+      int nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
 
       if ( nMeasures > 1 )
         continue;
@@ -6317,8 +6316,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         double rmsLineResiduals = m_rmsImageLineResiduals[i].Rms();
         double rmsLandSResiduals = m_rmsImageResiduals[i].Rms();
 
-        nMeasures =
-            m_pCnet->GetNumberOfMeasuresInImage(m_pSnList->SerialNumber(i));
+        nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
         nRejectedMeasures =
             m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(
                                               m_pSnList->SerialNumber(i));

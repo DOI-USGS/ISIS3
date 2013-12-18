@@ -1306,10 +1306,13 @@ namespace Isis {
   /**
    * Return the number of measures in image specified by serialNumber
    *
-   * @return Number of valid measures in image
+   * @return Number of valid measures in image 
+   *  
+   * @history 2013-12-18 Tracie Sucharski - Renamed from GetNumberOfMeasuresInImage, it is 
+   *                         returning a count of only valid measures (Ignore=False). 
    */
-  int ControlNet::GetNumberOfMeasuresInImage(const QString &serialNumber) {
-    return p_cameraMeasuresMap[serialNumber];
+  int ControlNet::GetNumberOfValidMeasuresInImage(const QString &serialNumber) {
+    return p_cameraValidMeasuresMap[serialNumber];
   }
 
 
@@ -1501,7 +1504,7 @@ namespace Isis {
       try {
         Isis::Camera *cam = CameraFactory::Create(cube);
         p_cameraMap[serialNumber] = cam;
-        p_cameraMeasuresMap[serialNumber] = 0;
+        p_cameraValidMeasuresMap[serialNumber] = 0;
         p_cameraRejectedMeasuresMap[serialNumber] = 0;
         p_cameraList.push_back(cam);
       }
@@ -1530,7 +1533,7 @@ namespace Isis {
           curMeasure->SetCamera(p_cameraMap[serialNumber]);
 
           // increment number of measures for this image (camera)
-          p_cameraMeasuresMap[serialNumber]++;
+          if (!curMeasure->IsIgnored()) p_cameraValidMeasuresMap[serialNumber]++;
         }
         else {
           IString msg = "Control point [" + curPoint->GetId() +
@@ -1644,7 +1647,7 @@ namespace Isis {
     std::swap(p_description, other.p_description);
     std::swap(p_userName, other.p_userName);
     std::swap(p_cameraMap, other.p_cameraMap);
-    std::swap(p_cameraMeasuresMap, other.p_cameraMeasuresMap);
+    std::swap(p_cameraValidMeasuresMap, other.p_cameraValidMeasuresMap);
     std::swap(p_cameraRejectedMeasuresMap, other.p_cameraRejectedMeasuresMap);
     std::swap(p_cameraList, other.p_cameraList);
     std::swap(p_targetRadii, other.p_targetRadii);

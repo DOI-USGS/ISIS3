@@ -178,7 +178,13 @@ namespace Isis {
    *                           ControlNet reference. Added swap(). Refactored assignment
    *                           operator to use copy-and-swap idiom which fixed a bug where
    *                           you couldn't access control points by index after an assignment.
-   *   @history 2013-11-08 Tracie Sucharski - Add camera to ignored measures.  References #1603. 
+   *   @history 2013-11-08 Tracie Sucharski - Add camera to ignored measures.  References #1603.
+   *   @history 2013-12-18 Tracie Sucharski - Previous change caused problems for jigsaw app.  It
+   *                           was expecting the method GetNumberOfMeasuresInImage to only return
+   *                           the number of VALID (Ignore=False) measures.  Renamed
+   *                           method to GetNumberOfValidMeasuresInImage and the private
+   *                           variable p_cameraMeasuresMap to p_cameraValidMeasuresMap.
+   *                           References #1603.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -239,7 +245,7 @@ namespace Isis {
       int GetNumEditLockMeasures();
       int GetNumEditLockPoints();
       int GetNumIgnoredMeasures();
-      int GetNumberOfMeasuresInImage(const QString &serialNumber);
+      int GetNumberOfValidMeasuresInImage(const QString &serialNumber);
       int GetNumberOfJigsawRejectedMeasuresInImage(const QString &serialNumber);
       void ClearJigsawRejected();
       void IncrementNumberOfRejectedMeasuresInImage(const QString &serialNumber);
@@ -401,7 +407,7 @@ namespace Isis {
       QString p_description;           //!< Textual Description of network
       QString p_userName;              //!< The user who created the network
       std::map<QString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
-      std::map<QString, int> p_cameraMeasuresMap; //!< A map from serialnumber to #measures
+      std::map<QString, int> p_cameraValidMeasuresMap; //!< A map from serialnumber to #measures
       std::map<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
       //!  #rejected measures
       std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera

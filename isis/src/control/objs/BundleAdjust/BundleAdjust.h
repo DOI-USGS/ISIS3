@@ -160,6 +160,9 @@ namespace Isis {
    *                                 constrained coordinates. Also found that a priori coordinates
    *                                 for these points were not being computed in
    *                                 ControlPoint::ComputeApriori, this has also been fixed.
+   *   @history 2013-12-18 Tracie Sucharski - The ControlNet::GetNumberOfMeasuresInImage was
+   *                                 renamed to ControlNet::GetNumberOfValidMeasuresInImage and
+   *                                 only returns the number of valid (Ignore= False) measures.
    */
   class BundleAdjust {
     public:
