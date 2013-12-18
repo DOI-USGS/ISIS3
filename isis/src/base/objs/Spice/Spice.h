@@ -262,6 +262,8 @@ namespace Isis {
    *                           which changes the prime meridian to {0, 0, 0}.  This insures
    *                           the longitude values are calculated in the inertial system
    *                           relative to the ascending node of the ring plane.  Fixes #1757.
+   *   @history 2013-12-17 Janet Barrett - Added the instrumentBodyFixedPosition and
+   *                           instrumentBodyFixedVelocity methods. Fixes #1684.
    *                           
    */
   class Spice {
@@ -276,10 +278,11 @@ namespace Isis {
       // Methods
       void setTime(const iTime &time);
       void instrumentPosition(double p[3]) const;
+      void instrumentBodyFixedPosition(double p[3]) const;
       void sunPosition(double p[3]) const;
       double targetCenterDistance() const;
       Longitude solarLongitude();
-      void instrumentVelocity(double v[3]) const;
+      void instrumentBodyFixedVelocity(double v[3]) const;
       iTime time() const;
 
       void radii(Distance r[3]) const;
