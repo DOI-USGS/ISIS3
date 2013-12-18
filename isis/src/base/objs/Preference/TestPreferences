@@ -155,34 +155,36 @@ EndGroup
 ########################################################
 
 Group = DataDirectory
-  Apollo15    = $ISIS3DATA/apollo15
-  Apollo16    = $ISIS3DATA/apollo16
-  Apollo17    = $ISIS3DATA/apollo17
-  Base        = $ISIS3DATA/base
-  Cassini     = $ISIS3DATA/cassini
-  Chan1       = $ISIS3DATA/chan1
-  Clementine1 = $ISIS3DATA/clementine1
-  Control     = $ISIS3DATA/control
-  Dawn        = $ISIS3DATA/dawn
-  Galileo     = $ISIS3DATA/galileo
-  Kaguya      = $ISIS3DATA/kaguya
-  Lo          = $ISIS3DATA/lo
-  Lro         = $ISIS3DATA/lro
-  Mariner10   = $ISIS3DATA/mariner10
-  Mer         = $ISIS3DATA/mer
-  Mex         = $ISIS3DATA/mex
-  Messenger   = $ISIS3DATA/messenger
-  Mgs         = $ISIS3DATA/mgs
-  Mro         = $ISIS3DATA/mro
-  Near        = $ISIS3DATA/near
-  Odyssey     = $ISIS3DATA/odyssey
-  Rolo        = $ISIS3DATA/rolo
-  Smart1      = $ISIS3DATA/smart1
-  Viking1     = $ISIS3DATA/viking1
-  Viking2     = $ISIS3DATA/viking2
-  Voyager1    = $ISIS3DATA/voyager1
-  Voyager2    = $ISIS3DATA/voyager2
-  Temporary   = .
+  Apollo15     = $ISIS3DATA/apollo15
+  Apollo16     = $ISIS3DATA/apollo16
+  Apollo17     = $ISIS3DATA/apollo17
+  Base         = $ISIS3DATA/base
+  Cassini      = $ISIS3DATA/cassini
+  Chan1        = $ISIS3DATA/chan1
+  Chandrayaan1 = $ISIS3DATA/chandrayaan1
+  Clementine1  = $ISIS3DATA/clementine1
+  Control      = $ISIS3DATA/control
+  Dawn         = $ISIS3DATA/dawn
+  Galileo      = $ISIS3DATA/galileo
+  Hayabusa     = $ISIS3DATA/hayabusa
+  Kaguya       = $ISIS3DATA/kaguya
+  Lo           = $ISIS3DATA/lo
+  Lro          = $ISIS3DATA/lro
+  Mariner10    = $ISIS3DATA/mariner10
+  Mer          = $ISIS3DATA/mer
+  Mex          = $ISIS3DATA/mex
+  Messenger    = $ISIS3DATA/messenger
+  Mgs          = $ISIS3DATA/mgs
+  Mro          = $ISIS3DATA/mro
+  Near         = $ISIS3DATA/near
+  Odyssey      = $ISIS3DATA/odyssey
+  Rolo         = $ISIS3DATA/rolo
+  Smart1       = $ISIS3DATA/smart1
+  Viking1      = $ISIS3DATA/viking1
+  Viking2      = $ISIS3DATA/viking2
+  Voyager1     = $ISIS3DATA/voyager1
+  Voyager2     = $ISIS3DATA/voyager2
+  Temporary    = .
 EndGroup
 
 End

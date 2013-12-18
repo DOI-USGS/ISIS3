@@ -45,8 +45,7 @@ int main(void) {
     double knownLat = 7.1947879130674721;
     double knownLon = 38.6322075033570158;
 
-//    Cube c("$hayabusa/testData/st_2530292409_v.cub", "r")
-    Cube c("st_2530292409_v.cub", "r");
+    Cube c("$hayabusa/testData/st_2530292409_v.cub", "r");
     AmicaCamera *cam = (AmicaCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
