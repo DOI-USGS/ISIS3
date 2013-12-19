@@ -292,7 +292,7 @@
             </p>
           </definition>
 
-          <definition name="">
+          <definition name="Emission Angle">
             The emission angle (EMA) is the angle between the spacecraft and a
             vector drawn perpendicular to the planet's surface (surface normal).
             Using SPICE, ISIS applications compute this angle from the ellipsoid.
@@ -944,7 +944,7 @@
       Added more definitions scale from Lynn Weller and local radius
     </change>
     <change name="Ella Mae Lee" date="2013-12-17">
-      Change Brief description to "ISIS and Image Processing Terms 
+      Changed Brief description to "ISIS and Image Processing Terms 
       and Definitions" and fixed misspellings.
     </change>
   </history>
