@@ -85,7 +85,7 @@
 	memory, two 2.5 megabyte removable disks, an 800 bpi tape drive, a card 
 	reader, and a teletype terminal. The PDP-11/20 ran a single user DOS/Batch 
 	operating system that executed programs which were read from keypunch 
-	cards.  The images were printed on film tranparencies with an 
+	cards.  The images were printed on film transparencies with an 
 	$80,000 Optronics International Inc. filmwriter, and then viewed by 
 	the analyst. 
         </p>
@@ -326,7 +326,7 @@
 	controlled mosaics consisting of thousands of large images from the Lunar 
 	Reconnaissance Orbiter Camera Narrow Angle Camera (NAC).  Solving 
 	for the position and orientation of the spacecraft required handling 
-	complex manipulations of extremely large matricies.  Even the 
+	complex manipulations of extremely large matrices.  Even the 
 	efficient access of ancillary data, historically stored as text in 
 	file headers, became an issue.  ISIS 3 underwent a series of major 
 	updates to improve the efficiency and accuracy of the map projected 

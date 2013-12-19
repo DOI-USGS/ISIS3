@@ -10,16 +10,17 @@
         <definitions>
           <definition name="Adjusted">
             The term, Adjusted, refers to the output pixel coordinate or output geographic location
-            within a control network.  Applications such as pointreg or jigsaw report and update
-            the "Adjusted" output pixel coordinate (pointreg) or geographic location (jigsaw) in
-            the output control network.
+            within a control network.  Applications such as <i>pointreg</i> or <i>jigsaw</i> 
+	    report and update the "Adjusted" output pixel coordinate (<i>pointreg</i>) or
+	     geographic location (<i>jigsaw</i>) in the output control network.
           </definition>
 
           <definition name="A Priori">
             The term, "A Priori", refers to the initial or original value of a pixel coordinate or
-            geographic location within a control network.  Applications such as pointreg or jigsaw
-            refer to the a priori values for an input pixel coordinate (pointreg) or geographic
-            location (jigsaw) in an input control network.
+            geographic location within a control network.  Applications such as <i>pointreg</i> or 
+	    <i>jigsaw</i>
+            refer to the a priori values for an input pixel coordinate (<i>pointreg</i>) or geographic
+            location (<i>jigsaw</i>) in an input control network.
           </definition>
 
           <definition name="Band">
@@ -47,7 +48,7 @@
                Within the ISIS environment, "Byte" refers to how many bits there are
                per single meaningful value in an image cube file.  The Byte information
                for an image cube file is stored on the image cube labels in Group=Pixels, where
-               the keywords Type and ByteOrder describe the what byte format the image cube is.
+               the keywords Type and ByteOrder describe the byte format.
             </p>
           </definition>
 
@@ -55,7 +56,7 @@
             Spacecraft &amp; Planetary ephemerides, Instrument C-matrix and
             Event kernels.  SPICE refers to all the information required by ISIS
             in order to compute and map each image pixel onto a surface with
-            reference to spacecraft position, sun position, instrument and
+            reference to spacecraft position, sun position, instrument, and
             mission activities.  ISIS uses software (ToolKit) supplied by the
             Navigation and Ancillary Information Facility (NAIF) for SPICE access
             and kernel management (Refer to spiceinit).
@@ -125,11 +126,11 @@
 
          <definition name="Control Network">
             A network of Control Points.  Within the ISIS environment, the control network
-            file is binary.  The network contains multiple fields of information for
-            control points identified and measures collected between any number of image cubes.
+            file is binary file.  The network contains multiple fields of information for
+            control points and measures collected between any number of image cubes.
             <p>
-              Refer to qnet, cneteditor, cnetbin2pvl for more information about the control network
-              contents.
+              Refer to <i>qnet</i>, <i>cneteditor</i>, and <i>cnetbin2pvl</i> for more 
+	      information about the control network contents.
             </p>
           </definition>
 
@@ -153,8 +154,8 @@
             applications).
             <p>
               The serial number associated with each control measure is included
-              as a field in the binary control network.  'getsn' is an ISIS
-              application that will return the SN value for a given image
+              as a field in the binary control network.  ISIS <i>getsn</i>
+              application will return the SN value for a given image
               filename.
             </p>
           </definition>
@@ -172,9 +173,10 @@
             </p>
             <p>
               There are control network applications that can set the Reference=True
-              explicitly (cnetref, qnet) or 'runtime' implicitly (If reference is not set,
-              the implicit default is the first 'valid' measure listed within a control point,
-              refer to the 'pointreg' application for more information).
+              explicitly (<i>cnetref</i>, <i>qnet</i>) or 'runtime' implicitly 
+	      (If reference is not set, the implicit default is the first 
+	      'valid' measure listed within a control point,
+              refer to the <i>pointreg</i> application for more information).
             </p>
           </definition>
 
@@ -211,9 +213,9 @@
           <definition name="Level0">
             Level0 is a standard cartographic processing phase that describes an
             image has been ingested into ISIS (PDS EDR) and will often have
-            SPICE information loaded on the ISIS cube labels (spiceinit).
+            SPICE information loaded on the ISIS cube labels (<i>spiceinit</i>).
             Level0 image cubes are often the input to mission specific
-            radiomatric calibration applications if supported in ISIS.
+            radiometric calibration applications if supported in ISIS.
             <p>
               Level0 implies a 'non-projected', raw image cube ('camera space').
             </p>
@@ -227,8 +229,9 @@
             <p>
               This level will often represent an image that also has had  noise removed.
               ISIS reports the camera geometry (viewing geometry of an image cube) for
-              a Level1. Most ISIS application names that start with a prefix of 'cam'
-              expect a Level1  cube as input (refer to applications such as camstats, campt, cam2map).
+              a Level1. Most ISIS application names that starts with a prefix of 'cam'
+              expect a Level1  cube as input (refer to applications such as 
+	      <i>camstats</i>, <i>campt</i>, and <i>cam2map</i>).
             </p>
             <p>
               Level1 implies a 'non-projected' radiometrically calibrated cube ('camera space').
@@ -243,7 +246,7 @@
             <p>
                Most ISIS applications that start with a prefix of
               'map' expects a Level2 cube as input (refer to applications such as
-               mappt, map2map, map2cam).
+               <i>mappt</i>, <i>map2map</i>, and <i>map2cam</i>).
             </p>
             <p>
               Level2 implies a 'map-projected' cube.
@@ -275,26 +278,26 @@
 
           <definition name="Radius">
             The distance (vector) value between the center of and a point on a
-            circle, sphere, ellipse or ellipsoid.  Refer to qview, camstats,
-            campt as example reporting applications of the radius value at every
+            circle, sphere, ellipse or ellipsoid.  Refer to <i>qview</i>, <i>camstats</i>,
+             or <i>campt</i> as examples of applications that report radius value at every
             image pixel location.
             <p>
                ISIS expects and reports the radius value in Meters.
             </p>
             <p>
               ISIS requires a radius DEM model in order to orthorectify an image
-              (refer to spiceinit- shapemodel/cam2map).  This is not to be
+              (refer to <i>spiceinit</i>- shape model/<i>cam2map</i>).  This is not to be
               confused with a topography file where the radius is subtracted
-              from the (best fit trixial or aeroid) shape of the target body.
+              from the (best fit triaxial or aeroid) shape of the target body.
             </p>
           </definition>
 
-          <definition name="Emission Angle">
+          <definition name="">
             The emission angle (EMA) is the angle between the spacecraft and a
             vector drawn perpendicular to the planet's surface (surface normal).
             Using SPICE, ISIS applications compute this angle from the ellipsoid.
             <p>
-              Emission Angle is in degrees.  The valid range is between 0 - 90.
+              Emission Angle is in degrees.  The valid range is between 0 and 90.
             </p>
           </definition>
 
@@ -364,12 +367,12 @@
 
           <definition name="Ground Azimuth">
             A clockwise angle between one reference point and another reference
-            point.  Each pixel location has a latitude, longitude associated with
+            point.  Each pixel location has a latitude and longitude associated with
             it (ground point).  The only information required to calculate a
             ground azimuth is to form a spherical triangle from three points on
-            the planet (ground point, north pole, and point of interest) The
+            the planet (ground point, North Pole, and point of interest). The
             point of interest is often the sub-spacecraft or sub-solar point.
-            Spherical trignometry is then used to calculate the angle.
+            Spherical trigonometry is then used to calculate the angle.
             <p>
               Ground Azimuth has nothing to do with the image, meaning it does
               not rely on camera geometry for its calculation.
@@ -476,9 +479,9 @@
             <p>
               Using SPICE, ISIS applications compute this angle using an elevation model
               (e.g., local slopes) at every pixel; ONLY if the elevation model exists on the
-              image cube labels (Instrument Group, ShapeModel keyword, Refer to the Spiceinit
+              image cube labels (Instrument Group, ShapeModel keyword, Refer to the <i>spiceinit</i>
               application).  If the elevation model does not exist, the computation will
-              then be based on the the ellipsoid (the result will match "Emission Angle").
+              then be based on the ellipsoid (the result will match "Emission Angle").
             </p>
             <p>
                Local Emission Angle is in degrees.
@@ -492,7 +495,7 @@
               ISIS applications use SPICE to compute this angle using the elevation model
               (e.g., local slopes) at every pixel; ONLY IF the elevation model exists on
               the image cube labels (Instrument Group, ShapeModel keyword, refer
-              to the application, spiceinit).   If the elevation model does not exist,
+              to the application, <i>spiceinit</i>).   If the elevation model does not exist,
               the computation will then be based on the ellipsoid
               (the result will match "Incidence Angle").
             </p>
@@ -528,7 +531,7 @@
           </definition>
 
           <definition name="Right Ascension">
-              Right Ascension (RA) is one of two angles of the north pole
+              Right Ascension (RA) is one of two angles of the North Pole
               of a target body as a function of time.  
              <p>
               For more information, refer to Euler Angles, Declination and Prime Meridian
@@ -536,7 +539,7 @@
           </definition>
 
           <definition name="Declination">
-              Declination (Dec) is one of two angles of the north pole of
+              Declination (Dec) is one of two angles of the North Pole of
               a target body as a function of time.
              <p>
               For more information, refer to Euler Angles, Right Ascension and Prime Meridian
@@ -545,7 +548,7 @@
 
           <definition name="Prime Meridian">
               Prime Meridian (W) location is the third Euler angle which is expressed
-              as a rotation about the north pole as a function of time.  The reference
+              as a rotation about the North Pole as a function of time.  The reference
               frame is J2000.
              <p>
               For more information, refer to Euler Angles
@@ -569,7 +572,7 @@
              <p>
                For more details refer to the definition for Latitude Type and
                the interactive demonstration in the "Learning About Map Projections"
-               on the IsisWorkshop website.
+               on the ISIS Workshop website.
              </p>
           </definition>
 
@@ -579,7 +582,7 @@
              <p>
                For more details refer to the definition for Latitude Type and
                the interactive demonstration in the "Learning About Map Projections"
-               on the IsisWorkshop website.
+               on the ISIS Workshop website.
              </p>
            </definition>
 
@@ -648,7 +651,7 @@
              <p>
               For more details refer to the definition for Longitude
               Direction and the interactive demonstration in the
-              "Learning About Map Projections" on the IsisWorkshop
+              "Learning About Map Projections" on the ISIS Workshop
               website.
              </p>
           </definition>
@@ -659,7 +662,7 @@
              <p>
               For more details refer to the definition for Longitude
               Direction and the interactive demonstration in the
-              "Learning About Map Projections" on the IsisWorkshop
+              "Learning About Map Projections" on the ISIS Workshop
               website.
              </p>
           </definition>
@@ -669,17 +672,17 @@
              interpreted and reported for a target body.
              <p>
               Longitude Domain = 360 will report longitude values
-             (including Minimimum, Maximum and Center longitude) in
+             (including Minimum, Maximum and Center longitude) in
              a degree range between 0 to 360.
              </p>
              <p>
               Longitude Domain = 180 will report longitude values
-             (including Minimimum, Maximum and Center longitude) in
+             (including Minimum, Maximum and Center longitude) in
              a degree range between -180 to 180.
              </p>
              <p>
               For more details, refer to the interactive demonstration
-              in "Learning About Map Projections" on the IsisWorkshop
+              in "Learning About Map Projections" on the ISIS Workshop
               website.  For potential challenges refer to the workshop
               discussion regarding image data that crosses the
               Longitude Seams.
@@ -743,7 +746,7 @@
              sun and moon.  Ephemeris time is described as a count of ephemeris
              seconds past the ephemeris reference epoch (J2000).
              <p>
-               The basic spacial reference system for SPICE is the J2000 system.
+               The basic spatial reference system for SPICE is the J2000 system.
                This is an inertial reference frame in which the equations of
                motion for the solar system may be integrated.  This reference
                frame is specified by the orientation of the earth's mean equator
@@ -797,13 +800,13 @@
              syntax used by the Planetary Data System.
              <p>
               For example, the keyword labels of a typical ISIS image cube
-              is in PVL format (refer to catlab in order to view image cube labels).
+              is in PVL format (refer to <i>catlab</i> in order to view image cube labels).
               A parameter name (or keyword name) is used to reference the value.
               The value portion of an assignment statement may contain a simple value
               (i.e., numeric, string, date/time value), a set or a sequence of values.
              </p>
              <p>
-              Refer to the ISIS application, getkey, for one method of
+              Refer to the ISIS application, <i>getkey</i>, for one method of
               extracting data values from a PVL formatted file.
              </p>
           </definition>
@@ -866,11 +869,11 @@
 
           <definition name="Universal Coordinate">
             The ISIS default coordinate system
-            <pre>
-              LatitudeType = Planetocentric
-              Longitude Direction = East
-              Longitude Domain = 360
-            </pre>
+   <pre>
+     LatitudeType = Planetocentric
+     LongitudeDirection = East
+     LongitudeDomain = 360
+   </pre>
           </definition>
 
           <definition name="Scale">
@@ -908,8 +911,7 @@
   <bibliography>
     <title>Glossary</title>
     <brief>
-      A collection of definitions for common ideas used in ISIS and image
-      processing in general.
+      ISIS and Image Processing Terms and Definitions
     </brief>
     <description>
       This article acts as a collection of common definitions used frequently in
@@ -940,6 +942,10 @@
     </change>
     <change name="Debbie Cook" date="2012-01-19">
       Added more definitions scale from Lynn Weller and local radius
+    </change>
+    <change name="Ella Mae Lee" date="2013-12-17">
+      Change Brief description to "ISIS and Image Processing Terms 
+      and Definitions" and fixed misspellings.
     </change>
   </history>
 </documentation>

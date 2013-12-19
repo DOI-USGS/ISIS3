@@ -127,7 +127,7 @@
         </font></a></p>
         <h3> <a name="lineLength">Line Length</a> </h3>
         <p>
-          Lines of code should not exceed 100 characters unless they can not be
+          Lines of code should not exceed 100 characters unless they cannot be
           wrapped.  This may be difficult in a few cases, however there are little
           if any cases in which the 100 character limit must be broken.  For function
           implementation, lines may be broken between the return type and class name
@@ -168,8 +168,8 @@
         <h4> <a name="aroundParentheses">Around Parentheses, Braces, and Brackets</a> </h4>
         <p>
           Padding is not used inside parentheses ( ) or angle brackets &lt; &gt; if
-          the interior is short and simple.  For embedded paretheses, padding may be
-          used to make code more readable.  For embeded angle brackets, padding
+          the interior is short and simple.  For embedded parentheses, padding may be
+          used to make code more readable.  For embedded angle brackets, padding
           is required between closing brackets.  If the interior is not simple,
           programmers can also use padding in such a way to make the code more
           readable.
@@ -557,9 +557,9 @@
           </strong></pre>
         </p>
         <p>
-          All appropriate mutator and accesor methods should begin with
+          All appropriate mutator and accessor methods should begin with
           <i>set</i>, <i>has</i>, or <i>is</i>.  The <i>get</i> prefix should
-          not be used for accessor methods, with the exception of overriden
+          not be used for accessor methods, with the exception of overridden
           methods inherited from third party libraries.
         </p>
         <p>
@@ -577,7 +577,7 @@
             int size();
             Stretch stretch();
             <font color="green">
-            // The 'get' prefix sometimes is required for overriden methods from
+            // The 'get' prefix sometimes is required for overridden methods from
             // third party packages, such as the following method from QInputDialog.</font>
             QString getText();
           </strong></pre>
@@ -813,7 +813,7 @@
           </li>
             <dd>
               Examples include NAIF libraries, Boost, GNU
-              Scientific Library (GSL), Geomethry Engine Open
+              Scientific Library (GSL), Geometry Engine Open
               Source (GEOS), and Google Protocol Buffers
             </dd>
           <li> Other ISIS headers </li>
@@ -1021,7 +1021,7 @@
           file.  That is, any structures in a class must be private or protected.
           Structures can also be used in applications.  A structure that contains
           only data is acceptable in ISIS 3.  Structures in <strong>ISIS 3
-          </strong> can not have methods.
+          </strong> cannot have methods.
         </p>
         <p align="right"><a href="#top"><font size="1">
           Return to Table of Contents
@@ -1110,7 +1110,7 @@
 
         <h4> <a name="initializing">Initializing Variables</a> </h4>
         <p>
-          Primitive variable types should be initialized using an equals sign, not
+          Primitive variable types should be initialized using an equal sign, not
           parentheses.
         </p>
         <p>
@@ -1190,7 +1190,7 @@
           This was motivated by the following:
           <ul>
             <li>
-              There is minimal compatibility with the Qt inteface, despite operators to QString and
+              There is minimal compatibility with the Qt interface, despite operators to QString and
               a constructor that converts from QString.
             </li>
             <li>
@@ -1201,7 +1201,7 @@
             </li>
             <li>
               There have been multiple instances of taking 3 lines of code to get a string from type
-              A to type B in qisis code -- a rediculous amount of effort for what was needed.
+              A to type B in qisis code -- a ridiculous amount of effort for what was needed.
             </li>
             <li>
               Ambiguous conversions because of the implicit casting operators in iString which
@@ -1274,7 +1274,7 @@
             </ol>
           </li>
           <li> Consider separating documentation standards from coding standards.</li>
-          <li> Consider separating style guidlines from coding standards.</li>
+          <li> Consider separating style guidelines from coding standards.</li>
           <li>
             Create links for each section to a page that shows justification
             for the standards chosen.
