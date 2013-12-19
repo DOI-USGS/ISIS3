@@ -86,7 +86,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; margin-bottom:0px;">
-        Isis 3 Application Documentation</p>
+        ISIS 3 Application Documentation</p>
 
         <hr/>
 
@@ -180,19 +180,19 @@ Deborah Lee Soltesz
         <xsl:if test="oldName">
           <hr/>
           <h2>
-            Related Applications in Previous Versions of Isis
+            Related Applications to Previous Versions of ISIS
           </h2>
 
-          This application replaces the following
+          This program replaces the following
           <xsl:choose>
             <xsl:when test="count(oldName/item) > 1">
-            applications existing in previous versions of Isis, which have been deprecated
+            applications 
             </xsl:when>
             <xsl:otherwise>
-            application existing in previous versions of Isis, which has been deprecated
+            application 
             </xsl:otherwise>
           </xsl:choose>
-          from the current version of Isis:
+          existing in previous versions of ISIS:
 
           <ul>
             <xsl:for-each select="oldName/item">
