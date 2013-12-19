@@ -24,7 +24,7 @@
     <group name="GRP">
       <parameter name="CUBE">
         <type>cube</type>
-        <filemode>output</filemode>
+        <fileMode>output</fileMode>
         <internalDefault>Default</internalDefault>
         <brief>Brief for parameter CUBE</brief>
         <description>

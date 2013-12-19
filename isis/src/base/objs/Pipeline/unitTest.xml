@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
+
   </brief>
 
   <description>
   
   </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
 
   <history>
     <change name="Steven Lambright" date="2008-08-04">

@@ -188,7 +188,9 @@
     <author>Jeff Anderson</author>
     <date>2003-06-30</date>
     <history>
-      <change date="2006-04-10" name="Deborah Lee Soltesz" hidden="true">Added brief and description; changed category to 'reference'</change>
+      <change date="2006-04-10" name="Deborah Lee Soltesz" hidden="true">
+	Added brief and description; changed category to 'reference'
+      </change>
     </history>
   </bibliography>
 </documentation>

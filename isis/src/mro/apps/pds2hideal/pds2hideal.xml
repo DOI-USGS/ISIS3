@@ -61,9 +61,7 @@
           The name of the output file.  This file will contain the imported
           Isis3 HiRISE Ideal cube and the related Spice Tables. 
         </description>
-        <pixelType>
-          signedWord
-        </pixelType>
+        <pixelType>signedWord</pixelType>
         <filter>
           *.cub
         </filter>

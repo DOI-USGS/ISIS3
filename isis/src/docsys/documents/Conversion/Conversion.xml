@@ -392,7 +392,9 @@ There were many major design considerations relating to software development.  T
     <author>Jeff Anderson</author>
     <date>2003-06-30</date>
     <history>
-      <change date="2006-04-10" name="Deborah Lee Soltesz" hidden="true">Added brief and description</change>
+      <change date="2006-04-10" name="Deborah Lee Soltesz" hidden="true">
+	      Added brief and description
+      </change>
     </history>
   </bibliography>
 </documentation>
