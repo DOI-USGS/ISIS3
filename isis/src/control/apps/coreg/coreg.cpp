@@ -179,7 +179,7 @@ void IsisMain() {
       }
 
       // Add the measures to a control point
-      QString str = "Row " + toString(r) + " Column " + toString(c);
+      QString str = "Row_" + toString(r) + "_Column_" + toString(c);
       ControlPoint * cp = new ControlPoint(str);
       cp->SetType(ControlPoint::Free);
       cp->Add(cmTrans);

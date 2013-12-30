@@ -135,5 +135,9 @@
       The plot tables should no longer have multiple rows with the same X value. Also, fixed a crash
       related to closing the plot table windows. Fixes #710. Fixes #818.
     </change>
+    <change name="Kimberly Oyama and Stuart Sices" date="2013-12-30">
+      Changed the character that is used as a token when parsing the list of file names used when
+      the socket is already open. Fixes #1551.
+    </change>
   </history>
 </application>

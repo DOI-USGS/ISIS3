@@ -127,6 +127,9 @@ namespace Isis {
     *                          QnetTool::measureSaved to ::saveMeasure.  The error checking now
     *                          forces the edit lock check box to be unchecked before the measure
     *                          can be saved.  Fixes #1624.
+    *   @history 2013-12-30 Kimberly Oyama and Stuart Sides - In saveChips(), added single quotes
+    *                           around the file names in case there are spaces or other special
+    *                           characters in them. Fixes #1551.
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but

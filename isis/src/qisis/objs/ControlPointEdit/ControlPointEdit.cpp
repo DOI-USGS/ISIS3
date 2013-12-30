@@ -726,6 +726,7 @@ namespace Isis {
 
     p_rightMeasure = rightMeasure;
     p_pointId = pointId;
+    qDebug() << "setright Measure:" << p_pointId;
 
     if (p_useGeometry) {
       //  get new ground map
@@ -1556,19 +1557,20 @@ namespace Isis {
     }
 
     //  Save chips - pattern, search and fit
-    QString baseFile = p_pointId + "_" +
+    QString baseFile = p_pointId.replace(" ", "_") + "_" +
                            toString((int)(p_leftMeasure ->GetSample())) + "_" +
                            toString((int)(p_leftMeasure ->GetLine()))   + "_" +
                            toString((int)(p_rightMeasure->GetSample())) + "_" +
                            toString((int)(p_rightMeasure->GetLine()))   + "_";
     QString fname = baseFile + "Search.cub";
-    QString command = "$ISISROOT/bin/qview " + fname;
+    qDebug() << "in save chips fname:" << fname;
+    QString command = "$ISISROOT/bin/qview \'" + fname + "\'";
     p_autoRegFact->RegistrationSearchChip()->Write(fname);
     fname = baseFile + "Pattern.cub";
-    command += " " + fname;
+    command += " \'" + fname + "\'";
     p_autoRegFact->RegistrationPatternChip()->Write(fname);
     fname = baseFile + "Fit.cub";
-    command += " " + fname + "&";
+    command += " \'" + fname + "\' &";
     p_autoRegFact->FitChip()->Write(fname);
     ProgramLauncher::RunSystemCommand(command);
   }
