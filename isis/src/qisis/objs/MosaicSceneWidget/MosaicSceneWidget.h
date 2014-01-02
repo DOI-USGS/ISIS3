@@ -101,6 +101,11 @@ namespace Isis {
    *   @history 2012-12-21 Steven Lambright - Renamed askNewProjection() to
    *                           configProjectionParameters() and upgraded it's functionality to view
    *                           and edit the current projection. Fixes #1034.
+   *   @history 2013-12-24 Tracie Sucharski - Initialized bool member variables,
+   *                           m_queuedSelectionChanged and m_shouldRequestSelectionChanged.
+   *                           Removed unused private member, m_projectionFootprint.  The
+   *                           uninitialized values were causing the qmos selection tool to not
+   *                           work properly.  Fixes #1742.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -295,7 +300,6 @@ namespace Isis {
       QGraphicsScene *m_graphicsScene; //!< The graphics scene that makes up this widget.
       MosaicGraphicsView *m_graphicsView; //!< The graphics view
       Projection *m_projection; //!< The current projection type.
-      QGraphicsPolygonItem *m_projectionFootprint;
       QList<MosaicSceneItem *> *m_mosaicSceneItems;
       QMap<DisplayProperties *, MosaicSceneItem *> m_displayPropsToMosaicSceneItemMap;
       QGraphicsRectItem *m_outlineRect;
