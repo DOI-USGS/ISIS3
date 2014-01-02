@@ -226,6 +226,10 @@
       registrations whose measurements differ in resolution greater than the
       specified tolerance.
     </change>
+    <change name="Tracie Sucharski" date="2014-01-02">
+      Fixed bug which caused pointreg to crash on Mac OSX platforms because of too
+      many open files.  Fixes #1946.
+    </change>
   </history>
 
   <groups>
