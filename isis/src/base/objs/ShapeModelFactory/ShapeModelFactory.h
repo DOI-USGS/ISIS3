@@ -37,6 +37,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-10-31 - Ken Edmundson - Implemented plane shape
+   *   @history 2014-01-14 - Jeannie Backer - Improved error message. Fixes
+   *            #1957.
    */
   class ShapeModelFactory {
     public:

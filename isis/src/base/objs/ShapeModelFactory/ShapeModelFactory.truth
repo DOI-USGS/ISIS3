@@ -20,9 +20,16 @@ Unit test for Isis::ShapeModel
   Testing Isis cube file for dem that is not map projected
 **ERROR** Failed opening shape file /usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub.
 **USER ERROR** Shape model cube must be an Isis DEM file, meaning it must be map-projected. This cube is NOT map projected.
+**ERROR** Unable to initialize cube projection from file [/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub].
+**ERROR** Unable to find PVL group [Mapping] in file [/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub].
 
   Testing a dem that's not equatorial cylindrical
     Successfully created shape DemShape
+
+  Testing Isis cube file for dem that is missing shape model statistics
+**ERROR** Failed opening shape file unitTestDemNoShapeModelStats.pvl.
+**USER ERROR** Unable to create shape model from the given Isis DEM file.
+**USER ERROR** The input cube references a ShapeModel that has not been updated for the new ray tracing algorithm. All DEM files must now be padded at the poles and contain a ShapeModelStatistics table defining their minimum and maximum radii values. The demprep program should be used to prepare the DEM before you can run this program. There is more information available in the documentation of the demprep program.
 
   Testing dem shape...
     Successfully created shape EquatorialCylindricalShape

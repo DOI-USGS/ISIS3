@@ -93,24 +93,34 @@ namespace Isis {
           shapeModelCube.open(FileName(shapeModelFilenames).expanded(), "r" );
         }
         catch (IException &e) {
-          IString msg = "Shape file " + shapeModelFilenames + " does not exist or is not an Isis cube";
+          IString msg = "Shape file " + shapeModelFilenames 
+                        + " does not exist or is not an Isis cube.";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
         
+        Projection *projection = NULL;
         try {
           // get projection of shape model cube
-          Projection *projection = shapeModelCube.projection();
-
-          // Next, check if ISIS DEM cube is an equatorial cylindrical projection
-          if (projection->IsEquatorialCylindrical())
-            shapeModel = new EquatorialCylindricalShape(target, pvl);
-          else 
-            shapeModel = new DemShape(target, pvl);
+          projection = shapeModelCube.projection();
         }
-        catch (IException &e) {
-          QString msg = "Shape model cube must be an Isis DEM file, meaning it must " \
-                        "be map-projected. This cube is NOT map projected.";
-          throw IException(IException::User, msg, _FILEINFO_);
+        catch (IException &projectionException) {
+          QString msg = "Shape model cube must be an Isis DEM file, meaning it must "
+              "be map-projected. This cube is NOT map projected.";
+          throw IException(projectionException, IException::User, msg, _FILEINFO_);
+        }
+
+        try {
+          // Next, check if ISIS DEM cube is an equatorial cylindrical projection
+          if (projection->IsEquatorialCylindrical()) {
+            shapeModel = new EquatorialCylindricalShape(target, pvl);
+          }
+          else {
+            shapeModel = new DemShape(target, pvl);
+          }
+        }
+        catch (IException &shapeModelException) {
+          QString msg = "Unable to create shape model from the given Isis DEM file.";
+          throw IException(shapeModelException, IException::User, msg, _FILEINFO_);
         }
       }
       catch (IException &e) {
