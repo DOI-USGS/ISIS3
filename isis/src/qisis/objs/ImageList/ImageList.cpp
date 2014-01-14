@@ -481,23 +481,26 @@ namespace Isis {
     if (!project) {
       if (allSupport(ImageDisplayProperties::ZOrdering)) {
         QAction *moveToTopAct = new QAction(tr("Bring to Front"), this);
-        connect(moveToTopAct, SIGNAL(triggered()),
-                first()->displayProperties(), SIGNAL(moveToTop()));
-        actions.append(moveToTopAct);
-
         QAction *moveUpAct = new QAction(tr("Bring Forward"), this);
-        connect(moveUpAct, SIGNAL(triggered()),
-                first()->displayProperties(), SIGNAL(moveUpOne()));
-        actions.append(moveUpAct);
-
         QAction *moveToBottomAct = new QAction(tr("Send to Back"), this);
-        connect(moveToBottomAct, SIGNAL(triggered()),
-                first()->displayProperties(), SIGNAL(moveToBottom()));
-        actions.append(moveToBottomAct);
-
         QAction *moveDownAct = new QAction(tr("Send Backward"), this);
-        connect(moveDownAct, SIGNAL(triggered()),
-                first()->displayProperties(), SIGNAL(moveDownOne()));
+
+        foreach (Image *image, *this) {
+          connect(moveToTopAct, SIGNAL(triggered()),
+                  image->displayProperties(), SIGNAL(moveToTop()));
+
+          connect(moveUpAct, SIGNAL(triggered()),
+                  image->displayProperties(), SIGNAL(moveUpOne()));
+
+          connect(moveToBottomAct, SIGNAL(triggered()),
+                  image->displayProperties(), SIGNAL(moveToBottom()));
+
+          connect(moveDownAct, SIGNAL(triggered()),
+                  image->displayProperties(), SIGNAL(moveDownOne()));
+        }
+        actions.append(moveToTopAct);
+        actions.append(moveUpAct);
+        actions.append(moveToBottomAct);
         actions.append(moveDownAct);
       }
 
