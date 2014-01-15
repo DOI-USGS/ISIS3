@@ -6,8 +6,11 @@
 #include "UserInterface.h"
 #include "IException.h"
 
+#include <QList>
+
 using namespace std;
 using namespace Isis;
+
 void getStats(vector<Buffer *> &in, vector<Buffer *> &out);
 void toneMatch(Buffer &in, Buffer &out);
 
@@ -21,14 +24,20 @@ void IsisMain() {
   // Get the user interface
   UserInterface &ui = Application::GetUserInterface();
 
-  // If the user selected pOverlap, get the projected overlap statistics
-  if(ui.GetBoolean("POVERLAP")) {
-    // Set up the overlap statistics object
-    Cube from, match;
-    from.open(ui.GetFileName("FROM"));
-    match.open(ui.GetFileName("MATCH"));
-    OverlapStatistics oStats(from, match);
+  Cube from, match;
+  from.open( ui.GetFileName("FROM") );
+  match.open( ui.GetFileName("MATCH") );
 
+  if( (from.bandCount() != 1) || (match.bandCount() != 1) ) {
+    string msg = "tonematch only works for single band images.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+  // If the user selected pOverlap, get the projected overlap statistics
+
+  // Set up the overlap statistics object
+  OverlapStatistics oStats(from, match);
+
+  if( ui.GetBoolean("POVERLAP") ) {
     //Make sure the projections overlap
     if(!oStats.HasOverlap()) {
       string msg = "Input Cubes do not appear to overlap";
@@ -51,6 +60,19 @@ void IsisMain() {
   // compute the linear regression fit of the mvstats data
   stats.LinearRegression(base, mult);
 
+  PvlGroup results("Results");
+  QString stringNum = "";
+  results += PvlKeyword( "Offset", stringNum.setNum(base) );
+  results += PvlKeyword( "Gain", stringNum.setNum(mult) );
+  Pvl fileOutput;
+  fileOutput += results;
+  fileOutput += oStats.toPvl();
+  Application::Log(results);
+
+  if (ui.WasEntered("OUTSTATS")) {
+    fileOutput.write(ui.GetFileName("OUTSTATS"));
+  }
+
   // Apply the correction
   p.ClearInputCubes();
   p.SetInputCube("FROM");
@@ -59,9 +81,13 @@ void IsisMain() {
   p.EndProcess();
 }
 
+
+
 void getStats(vector<Buffer *> &in, vector<Buffer *> &out) {
   stats.AddData(in[0]->DoubleBuffer(), in[1]->DoubleBuffer(), in[0]->size());
 }
+
+
 
 void toneMatch(Buffer &in, Buffer &out) {
   for(int i = 0; i < in.size(); i++) {

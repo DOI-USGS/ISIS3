@@ -2,14 +2,22 @@
 
 <application name="tonematch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Matches the tone of two images
+    Matches the tone of two, single-band images
   </brief>
 
   <description>
-    This application is very similar to the equalizer application, but is only used on two images.   
-    Tonematch collects statistics on each individual cube.  It then uses this data to find a linear
-    regression model between the input cube and the match cube.  The linear regression is 
-    applied to the input cube, creating the output cube (whose tone is equal to that of the match cube).
+    <p>This application matches the tone of two single-band images. It is very similar to the 
+    equalizer application, but is only used on two images and only works on single band images. 
+    The user can choose whether to match the tone of the entire image, or perform overlap matching
+    using the projection information. The default behavior is to match the tones of the entire
+    area of the input cube and the match cube.
+    </p>
+
+    <p>First, tonematch collects statistics on each individual cube. It then uses this data to 
+    find a linear regression between the pixel values of the input cube and the match cube. The
+    linear regression provides offset and gain values that are applied to the input cube, creating
+    the output cube whose tone is equal to that of the match cube.
+    </p>
   </description>
 
   <category>
@@ -35,6 +43,11 @@
     <change name="Elizabeth Miller" date="2006-02-10">
       Moved to Photometry and Radiometry group in documentation
     </change>
+    <change name="Kimberly Oyama" date="2013-01-14">
+      Output the statistics used for the linear regression to the log. Updated documentation to 
+      correctly describe the POVERLAP option and to explain that this application only works on
+      single band cubes. Fixes #1383.
+    </change>
   </history>
 
   <groups>
@@ -43,7 +56,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input cube 
+          Input single band cube 
         </brief>
         <description>
           The pixels of the input cube will be altered using the base and multiplier found 
@@ -58,7 +71,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Match Cube
+          Match Cube (single band)
         </brief>
         <description>
           The match cube will be used to find the tone that the output cube should have.
@@ -81,6 +94,24 @@
           *.cub
         </filter>
       </parameter>
+
+      <parameter name="OUTSTATS">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output text file containing thorough equalization-related
+          statistics
+        </brief>
+        <description>
+          This file will contain the statistics of the overlapping area along with the computed
+          equalizing factors (OFFSET and GAIN). Since the output statistics are of the overlapping
+          area, the POVERLAP option must be selected. Specifying this output file is optional.
+        </description>
+        <internalDefault>None</internalDefault>
+        <filter>
+          *.txt *.pvl *.lis *.lst
+        </filter>
+      </parameter>
     </group>
 
     <group name="Option">
@@ -90,11 +121,12 @@
           Projection Overlap
         </brief>
         <description>
-          This parameter allows the user to match the tone of the entire images, or just match the overlapping
-          area of the cubes.  If this option is chosen, both cubes must have the same projection parameters and
-          must be overlapping.
+          This parameter allows the user to match the tone of the overlapping area of the cubes
+          instead of matching the tone of the entire area of both cubes. If this option is set to
+          TRUE, both cubes must have the same projection parameters and must overlap.
         </description>
         <default><item>FALSE</item></default>
+        <inclusions><item>OUTSTATS</item></inclusions>
       </parameter>
     </group>
   </groups>

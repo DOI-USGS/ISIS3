@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?><tableofcontents><document>
-<title>Backward Compatibility Policy</title>
-<brief>Policy for ISIS backward compatibility for users</brief>
+<title>References</title>
+<brief>ISIS References/Citations and Preferred Acknowledgement</brief>
 <description>
-     Backward Compatibility Policy for user applications to help ensure
-     processing scripts developed outside of the USGS are easier to maintain.
+      Acknowledgement, Citations, and References for the ISIS software package.
     </description>
 <category>
 <categoryItem>about</categoryItem>
@@ -14,20 +13,75 @@
 <files>
 <file hidden="" primary="">
 <type>HTML</type>
-<source>../documents/BackwardCompatibility/BackwardCompatibility.html</source>
+<source>../documents/References/References.html</source>
 </file>
 </files>
 </document>
 <document>
-<title>ISIS 3 Coding Standards and Style Guide</title>
-<brief>Coding standards for ISIS 3 developers (effective February 1, 2012).</brief>
+<title>Environment and Preference Setup</title>
+<brief>Setting up the UNIX environment and customizing ISIS preferences</brief>
+<description>Setting up the UNIX environment to run ISIS and customizing the operation of ISIS</description>
+<category>
+<categoryItem>administration</categoryItem>
+<categoryItem>guide</categoryItem>
+</category>
+<audience>
+<target>intermediate</target>
+<target>administrator</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>User Rights Notice</title>
+<brief>Licensing, copyright, distribution, and warranty information</brief>
 <description>
-      This document will describe the coding standards for maintaining 
-      ISIS 3 source code.  It was created to ensure that the 
-      ISIS 3 package is programmed for consistency, readability, and ease
-      of future maintenance. This document does not attempt to address every
-      possible issue. However, the guidelines that have been outlined should not
-      be deviated from, except under special situations.
+      User Rights Notice
+    </description>
+<category>
+<categoryItem>about</categoryItem>
+</category>
+<audience>
+<target>all</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/UserRights/UserRights.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>ISIS 2 Technical Documentation</title>
+<brief>Links to ISIS 2 Technical Documents</brief>
+<description>List of links to ISIS 2 documents covering technical topics, such as administration, release notes, and installation.</description>
+<category>
+<categoryItem>hidden</categoryItem>
+<categoryItem>technicaldoc</categoryItem>
+<categoryItem>isis2</categoryItem>
+</category>
+<audience>
+<target>developer</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/Isis2TechnicalDocs/index.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Glossary</title>
+<brief>
+      ISIS and Image Processing Terms and Definitions
+    </brief>
+<description>
+      This article acts as a collection of common definitions used frequently in
+      ISIS and general image processing.
     </description>
 <category>
 <categoryItem>reference</categoryItem>
@@ -38,7 +92,65 @@
 <files>
 <file hidden="" primary="">
 <type>HTML</type>
-<source>../documents/CodingStandards/CodingStandards.html</source>
+<source>../documents/Glossary/Glossary.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Disclaimers</title>
+<brief>Standard legalese regarding usage, trademarks, and privacy</brief>
+<description>
+      This section contain standard USGS comments regarding software
+      accuracy, use of trademarks and tradenames and other general
+      disclaimers.
+    </description>
+<category>
+<categoryItem>about</categoryItem>
+</category>
+<audience>
+<target>all</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/Disclaimers/Disclaimers.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Label Dictionary</title>
+<brief>Reference to the objects and groups in ISIS cube labels</brief>
+<description>
+        This document is a reference to the various objects and groups, which can be found in ISIS labels.
+        The definition of each object/group, the parameter meanings, and an example will be given.
+    </description>
+<category>
+<categoryItem>reference</categoryItem>
+</category>
+<audience>
+<target>intermediate</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/LabelDictionary/LabelDictionary.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Error Handling Facility</title>
+<brief>Guide to the various aspects of the Error Handling Facility</brief>
+<description>General overview of the Error Handling Facility, what form error messages take, how error messages differ between the command line and GUI, and Tips For Programmers.</description>
+<category>
+<categoryItem>guide</categoryItem>
+</category>
+<audience>
+<target>intermediate</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/ErrorHandlingFacility/ErrorHandlingFacility.html</source>
 </file>
 </files>
 </document>
@@ -65,6 +177,47 @@
 </files>
 </document>
 <document>
+<title>ISIS 2 User Documentation</title>
+<brief>Links to ISIS 2 User Documents</brief>
+<description>List of links to documents covering general topics for users of ISIS 2.1</description>
+<category>
+<categoryItem>hidden</categoryItem>
+<categoryItem>technicaldoc</categoryItem>
+<categoryItem>isis2</categoryItem>
+</category>
+<audience>
+<target>developer</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/Isis2UserDocs/index.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>ISIS Application Examples How-to</title>
+<brief>Guide to writing the examples section of ISIS Application XML</brief>
+<description>Guide to writing application examples in the ISIS Application XML. All examples added to the official ISIS
+                        application documentation will be automatically added to the application documentation pages. This guide
+                        describes the examples section of the ISIS Application XML, provides instructions on how to add sample
+                        files to an example, and gives general guidance for writing examples for ISIS.</description>
+<category>
+<categoryItem>xml</categoryItem>
+<categoryItem>technicaldoc</categoryItem>
+<categoryItem>guide</categoryItem>
+</category>
+<audience>
+<target>developer</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/HowToApplicationExamples/index.html</source>
+</file>
+</files>
+</document>
+<document>
 <title>Conversion from ISIS 2 to ISIS 3</title>
 <brief>Reasons and considerations to upgrade from ISIS 2 to ISIS 3</brief>
 <description>The reasons, considerations, and major design changes related to the upgrade from ISIS 2 to ISIS 3</description>
@@ -78,6 +231,100 @@
 <file hidden="" primary="">
 <type>HTML</type>
 <source>../documents/Conversion/Conversion.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Session Logs</title>
+<brief>Guide to understanding, controlling, and reading Session Logs</brief>
+<description>Guide to understanding, controlling, and reading Session Logs, a mechanism for users to keep track of work that they have done</description>
+<category>
+<categoryItem>guide</categoryItem>
+</category>
+<audience>
+<target>intermediate</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/SessionLogs/SessionLogs.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Programmer Guide</title>
+<brief>Guide to Programming the ISIS software package</brief>
+<description>Guide for the Programmers using ISIS software libraries, writing libraries and applications, working in the team development area, and writing XML files.</description>
+<category>
+<categoryItem>technicaldoc</categoryItem>
+<categoryItem>guide</categoryItem>
+<categoryItem>api</categoryItem>
+</category>
+<audience>
+<target>programmer</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/ProgrammerGuide/ProgrammerGuide.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Backward Compatibility Policy</title>
+<brief>Policy for ISIS backward compatibility for users</brief>
+<description>
+     Backward Compatibility Policy for user applications to help ensure
+     processing scripts developed outside of the USGS are easier to maintain.
+    </description>
+<category>
+<categoryItem>about</categoryItem>
+</category>
+<audience>
+<target>all</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/BackwardCompatibility/BackwardCompatibility.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>System Architecture</title>
+<brief>An in-depth "get started" tour of ISIS, including history, mechanics, and basic use.</brief>
+<description>Take an in-depth "get started" tour of ISIS, from the software's history to an overview of the newest features. Learn the basics of working in the ISIS software environment.</description>
+<category>
+<categoryItem>guide</categoryItem>
+</category>
+<audience>
+<target>user</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/SystemArchitecture/SystemArchitecture.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Preference Dictionary</title>
+<brief>
+    Complete reference to all user preference settings
+    </brief>
+<description>
+      Complete reference to all user preference settings
+    </description>
+<category>
+<categoryItem>reference</categoryItem>
+</category>
+<audience>
+<target>intermediate</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/PreferenceDictionary/PreferenceDictionary.html</source>
 </file>
 </files>
 </document>
@@ -102,12 +349,11 @@
 </files>
 </document>
 <document>
-<title>Disclaimers</title>
-<brief>Standard legalese regarding usage, trademarks, and privacy</brief>
+<title>History</title>
+<brief>History of USGS Astrogeology image processing software</brief>
 <description>
-      This section contain standard USGS comments regarding software
-      accuracy, use of trademarks and tradenames, and other general
-      disclaimers.
+      This is a history of the evolution of the USGS Astrogeology image 
+      processing software from 1971 to 2013.
     </description>
 <category>
 <categoryItem>about</categoryItem>
@@ -118,7 +364,113 @@
 <files>
 <file hidden="" primary="">
 <type>HTML</type>
-<source>../documents/Disclaimers/Disclaimers.html</source>
+<source>../documents/IsisHistory/IsisHistory.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>ISIS Application and Category Test How-to</title>
+<brief>Guide to writing an application and category tests </brief>
+<description>Guide to writing application and category tests using make. This guide describes
+      step by step the process of writing a test for an application or category.  The guide
+      also gives general guidance on errors and common mistakes in writing a test.
+    </description>
+<category>
+<categoryItem>xml</categoryItem>
+<categoryItem>technicaldoc</categoryItem>
+<categoryItem>guide</categoryItem>
+</category>
+<audience>
+<target>developer</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/HowToApplicationCategoryTest/index.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Pattern Matching</title>
+<brief>
+      A discussion of pattern matching techniques used in ISIS, designed to help
+      users construct automatic registration templates.
+    </brief>
+<description>
+      This article describes the pattern matching techniques used for automatic
+      registration in ISIS.  The information is designed to give users an idea
+      of how they can alter their automatic registration templates to improve
+      their results from applications such as "pointreg" and "coreg".  This
+      should also give programmers a better understanding of how AutoReg works.
+    </description>
+<category>
+<categoryItem>guide</categoryItem>
+</category>
+<audience>
+<target>advanced</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/PatternMatch/PatternMatch.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Installing ISIS</title>
+<brief>Downloading and installing ISIS 3</brief>
+<description>
+      This document describes how to download and install a
+      binary version of ISIS.
+    </description>
+<category>
+<categoryItem>technicaldoc</categoryItem>
+</category>
+<audience>
+<target>administrator</target>
+</audience>
+<files>
+<file hidden="" primary="true">
+<type>HTML</type>
+<source>../documents/InstallGuide/index.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>ISIS 2 Tutorials</title>
+<brief>Links to ISIS 2 tutorials, procedures, and how-to's</brief>
+<description>List of links to ISIS 2 tutorials, procedures, and how-to's.</description>
+<category>
+<categoryItem>hidden</categoryItem>
+<categoryItem>technicaldoc</categoryItem>
+<categoryItem>isis2</categoryItem>
+</category>
+<audience>
+<target>developer</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/Isis2Tutorials/index.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>Overview</title>
+<brief>Summary of ISIS</brief>
+<description>
+      This document summarizes ISIS and support for planetary space missions.
+    </description>
+<category>
+<categoryItem>about</categoryItem>
+</category>
+<audience>
+<target>all</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/Overview/Overview.html</source>
 </file>
 </files>
 </document>
@@ -174,67 +526,15 @@
 </files>
 </document>
 <document>
-<title>Environment and Preference Setup</title>
-<brief>Setting up the UNIX environment and customizing ISIS preferences</brief>
-<description>Setting up the UNIX environment to run ISIS and customizing the operation of ISIS</description>
-<category>
-<categoryItem>administration</categoryItem>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>intermediate</target>
-<target>administrator</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Error Dictionary</title>
-<brief>Reference of error messages, their meanings, and resolving errors</brief>
-<description>Reference of error messages, their meanings, and resolving errors</description>
-<category>
-<categoryItem>reference</categoryItem>
-</category>
-<audience>
-<target>intermediate</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/ErrorDictionary/ErrorDictionary.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Error Handling Facility</title>
-<brief>Guide to the various aspects of the Error Handling Facility</brief>
-<description>General overview of the Error Handling Facility, what form error messages take, 
-how error messages differ between the command line and GUI, and Tips For Programmers.</description>
-<category>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>intermediate</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/ErrorHandlingFacility/ErrorHandlingFacility.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Glossary</title>
-<brief>
-      ISIS and Image Processing Terms and Definitions
-    </brief>
+<title>ISIS 3 Coding Standards and Style Guide</title>
+<brief>Coding standards for ISIS 3 developers (effective February 1, 2012).</brief>
 <description>
-      This article contains a collection of common definitions that are used frequently in
-      ISIS and general image processing.
+      This document will describe the coding standards for maintaining 
+      ISIS 3 source code.  It was created to ensure that the 
+      ISIS 3 package is programmed for consistency, readability and ease
+      of future maintenance. This document does not attempt to address every
+      possible issue. However, the guidelines that have been outlined should not
+      be deviated from, except under special situations.
     </description>
 <category>
 <categoryItem>reference</categoryItem>
@@ -245,191 +545,7 @@ how error messages differ between the command line and GUI, and Tips For Program
 <files>
 <file hidden="" primary="">
 <type>HTML</type>
-<source>../documents/Glossary/Glossary.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>ISIS Application and Category Test How-to</title>
-<brief>Guide to writing an application and category tests </brief>
-<description>Guide to writing application and category tests using make software utility. This guide describes
-      step by step the process of writing a test for an application or category.  The guide
-      also gives general guidance on errors and common mistakes in writing a test.
-    </description>
-<category>
-<categoryItem>xml</categoryItem>
-<categoryItem>technicaldoc</categoryItem>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>developer</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/HowToApplicationCategoryTest/index.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>ISIS Application Examples How-to</title>
-<brief>Guide to writing the examples section of ISIS Application XML</brief>
-<description>Guide to writing application examples in the ISIS Application XML. All examples added to the official ISIS
-                        application documentation will be automatically added to the application documentation pages. This guide
-                        describes the examples section of the ISIS Application XML, provides instructions on how to add sample
-                        files to an example, and gives general guidance for writing examples for ISIS.</description>
-<category>
-<categoryItem>xml</categoryItem>
-<categoryItem>technicaldoc</categoryItem>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>developer</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/HowToApplicationExamples/index.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>ISIS Documents How-to</title>
-<brief>Guide to writing documents using ISIS Documentation XML</brief>
-<description>Guide to adding documents to the ISIS documentation tree. All documents added to the official ISIS
-                        documentation will be automatically linked on the ISIS web pages and distributed with ISIS. This guide
-                        describes the formats documents may be in, what types of documents may be added, and how to
-                        write the ISIS Documentation XML metadata file that is used automatically add a document to the ISIS
-                        system.</description>
-<category>
-<categoryItem>xml</categoryItem>
-<categoryItem>technicaldoc</categoryItem>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>developer</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/HowToGeneralDocumentation/index.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Installing ISIS</title>
-<brief>Downloading and installing ISIS 3</brief>
-<description>
-      This document describes how to download and install a
-      binary version of ISIS.
-    </description>
-<category>
-<categoryItem>technicaldoc</categoryItem>
-</category>
-<audience>
-<target>administrator</target>
-</audience>
-<files>
-<file hidden="" primary="true">
-<type>HTML</type>
-<source>../documents/InstallGuide/index.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>ISIS 2 Technical Documentation</title>
-<brief>Links to ISIS 2 Technical Documents</brief>
-<description>List of links to ISIS 2 documents covering technical topics, such as administration, release notes, and installation.</description>
-<category>
-<categoryItem>hidden</categoryItem>
-<categoryItem>technicaldoc</categoryItem>
-<categoryItem>isis2</categoryItem>
-</category>
-<audience>
-<target>developer</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/Isis2TechnicalDocs/index.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>ISIS 2 Tutorials</title>
-<brief>Links to ISIS 2 tutorials, procedures, and how-to's</brief>
-<description>List of links to ISIS 2 tutorials, procedures, and how-to's.</description>
-<category>
-<categoryItem>hidden</categoryItem>
-<categoryItem>technicaldoc</categoryItem>
-<categoryItem>isis2</categoryItem>
-</category>
-<audience>
-<target>developer</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/Isis2Tutorials/index.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>ISIS 2 User Documentation</title>
-<brief>Links to ISIS 2 User Documents</brief>
-<description>List of links to documents covering general topics for users of ISIS 2.1</description>
-<category>
-<categoryItem>hidden</categoryItem>
-<categoryItem>technicaldoc</categoryItem>
-<categoryItem>isis2</categoryItem>
-</category>
-<audience>
-<target>developer</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/Isis2UserDocs/index.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>History</title>
-<brief>History of USGS Astrogeology image processing software</brief>
-<description>
-      This is a history of the evolution of the USGS Astrogeology image 
-      processing software since 1971.
-    </description>
-<category>
-<categoryItem>about</categoryItem>
-</category>
-<audience>
-<target>all</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/IsisHistory/IsisHistory.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Label Dictionary</title>
-<brief>Reference to the objects and groups in ISIS cube labels</brief>
-<description>
-        This document is a reference to the various objects and groups, which can be found in ISIS labels.
-        The definition of each object/group, the parameter meanings, and an example will be given.
-    </description>
-<category>
-<categoryItem>reference</categoryItem>
-</category>
-<audience>
-<target>intermediate</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/LabelDictionary/LabelDictionary.html</source>
+<source>../documents/CodingStandards/CodingStandards.html</source>
 </file>
 </files>
 </document>
@@ -453,58 +569,9 @@ how error messages differ between the command line and GUI, and Tips For Program
 </files>
 </document>
 <document>
-<title>Overview</title>
-<brief>Summary of ISIS</brief>
-<description>
-      This document summarizes ISIS and support for planetary space missions.
-    </description>
-<category>
-<categoryItem>about</categoryItem>
-</category>
-<audience>
-<target>all</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/Overview/Overview.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Pattern Matching</title>
-<brief>
-      A discussion of pattern matching techniques used in ISIS, designed to help
-      users construct automatic registration templates.
-    </brief>
-<description>
-      This article describes the pattern matching techniques used for automatic
-      registration in ISIS.  The information is designed to give users an idea
-      of how they can alter their automatic registration templates to improve
-      their results from applications such as "pointreg" and "coreg".  This
-      should also give programmers a better understanding of how AutoReg works.
-    </description>
-<category>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>advanced</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/PatternMatch/PatternMatch.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Preference Dictionary</title>
-<brief>
-    Complete reference to all user preference settings
-    </brief>
-<description>
-      Complete reference to all user preference settings
-    </description>
+<title>Error Dictionary</title>
+<brief>Reference of error messages, their meanings, and resolving errors</brief>
+<description>Reference of error messages, their meanings, and resolving errors</description>
 <category>
 <categoryItem>reference</categoryItem>
 </category>
@@ -514,98 +581,30 @@ how error messages differ between the command line and GUI, and Tips For Program
 <files>
 <file hidden="" primary="">
 <type>HTML</type>
-<source>../documents/PreferenceDictionary/PreferenceDictionary.html</source>
+<source>../documents/ErrorDictionary/ErrorDictionary.html</source>
 </file>
 </files>
 </document>
 <document>
-<title>Programmer Guide</title>
-<brief>Guide to Programming the ISIS software package</brief>
-<description>Guide for the Programmers using ISIS software libraries, writing libraries and applications, working in the team development area, and writing XML files.</description>
+<title>ISIS Documents How-to</title>
+<brief>Guide to writing documents using ISIS Documentation XML</brief>
+<description>Guide to adding documents to the ISIS documentation tree. All documents added to the official ISIS
+                        documentation will be automatically linked on the ISIS web pages and distributed with ISIS. This guide
+                        describes the formats documents may be in, what types of documents may be added, and how to
+                        write the ISIS Documentation XML metadata file that is used automatically add a document to the ISIS
+                        system.</description>
 <category>
+<categoryItem>xml</categoryItem>
 <categoryItem>technicaldoc</categoryItem>
 <categoryItem>guide</categoryItem>
-<categoryItem>api</categoryItem>
 </category>
 <audience>
-<target>programmer</target>
+<target>developer</target>
 </audience>
 <files>
 <file hidden="" primary="">
 <type>HTML</type>
-<source>../documents/ProgrammerGuide/ProgrammerGuide.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>References</title>
-<brief>ISIS References/Citations and Preferred Acknowledgement</brief>
-<description>
-      Acknowledgement, Citations, and References for the ISIS software package.
-    </description>
-<category>
-<categoryItem>about</categoryItem>
-</category>
-<audience>
-<target>all</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/References/References.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>Session Logs</title>
-<brief>Guide to understanding, controlling, and reading Session Logs</brief>
-<description>Guide to understanding, controlling, and reading Session Logs, a mechanism for users to keep track of work that they have done</description>
-<category>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>intermediate</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/SessionLogs/SessionLogs.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>System Architecture</title>
-<brief>An in-depth "get started" tour of ISIS, including history, mechanics, and basic use.</brief>
-<description>Take an in-depth "get started" tour of ISIS, from the software's history to an overview of the newest features. Learn the basics of working in the ISIS software environment.</description>
-<category>
-<categoryItem>guide</categoryItem>
-</category>
-<audience>
-<target>user</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/SystemArchitecture/SystemArchitecture.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>User Rights Notice</title>
-<brief>Licensing, copyright, distribution, and warranty information</brief>
-<description>
-      User Rights Notice
-    </description>
-<category>
-<categoryItem>about</categoryItem>
-</category>
-<audience>
-<target>all</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/UserRights/UserRights.html</source>
+<source>../documents/HowToGeneralDocumentation/index.html</source>
 </file>
 </files>
 </document>
