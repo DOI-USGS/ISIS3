@@ -66,6 +66,7 @@ void IsisMain() {
   results += PvlKeyword( "Gain", stringNum.setNum(mult) );
   Pvl fileOutput;
   fileOutput += results;
+  oStats.SetMincount( ui.GetInteger("MINCOUNT") );
   fileOutput += oStats.toPvl();
   Application::Log(results);
 

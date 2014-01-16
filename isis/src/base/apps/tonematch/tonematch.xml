@@ -46,7 +46,11 @@
     <change name="Kimberly Oyama" date="2013-01-14">
       Output the statistics used for the linear regression to the log. Updated documentation to 
       correctly describe the POVERLAP option and to explain that this application only works on
-      single band cubes. Fixes #1383.
+      single band cubes.  Fixes #1383.
+    </change>
+    <change name="Kimberly Oyama" date="2014-01-16">
+      Added the MINCOUNT option to allow the user to determine how much of the
+      images need to overlap for the overlap to be considered valid. References #1383.
     </change>
   </history>
 
@@ -127,6 +131,18 @@
         </description>
         <default><item>FALSE</item></default>
         <inclusions><item>OUTSTATS</item></inclusions>
+      </parameter>
+
+      <parameter name="MINCOUNT">
+        <type>integer</type>
+        <brief>
+          Minimum number of points in overlapping area required for the overlap to be valid.
+        </brief>
+        <description>
+          If the number of points in the overlapping area meets or exceeds this value, the area is
+          considered valid. If there are fewer points the output statistics may not be accurate.
+        </description>
+        <default><item>1000</item></default>
       </parameter>
     </group>
   </groups>
