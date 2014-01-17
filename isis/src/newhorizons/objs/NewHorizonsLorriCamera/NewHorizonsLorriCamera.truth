@@ -1,0 +1,32 @@
+Unit Test for NewHorizonsLorriCamera...
+FileName: lor_0034821014_0x630_sci_1.cub
+CK Frame: -98301
+
+Kernel IDs: 
+CK Frame ID = -98000
+CK Reference ID = 1
+SPK Target ID = -98
+SPK Reference ID = 1
+
+Shutter open = 225787161.551337481
+Shutter close = 225787161.551341474
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
