@@ -10,11 +10,12 @@
 using namespace Isis;
 using namespace std;
 
-int main(int argc, char *argv[]) {
-  Preference::Preferences(true);
-
+void ReportError(QString err);
   void doit(Pvl & lab);
   void doit2(Pvl & lab);
+
+int main(int argc, char *argv[]) {
+  Preference::Preferences(true);
 
   try {
     cout << "Unit test for ProjectionFactory" << endl;
@@ -131,7 +132,7 @@ int main(int argc, char *argv[]) {
     proj->SetWorld(245.0, 355.0);
   }
   catch(IException &e) {
-    e.print();
+    ReportError( e.toString() );
   }
 }
 
@@ -156,4 +157,7 @@ void doit2(Pvl &lab) {
   cout << endl;
 }
 
+void ReportError(QString err) {
+  cout << err.replace(QRegExp("\\[[^\\]]*\\.plugin\\]"), "[isis/lib/Projection.plugin]") << endl << endl;
+}
 
