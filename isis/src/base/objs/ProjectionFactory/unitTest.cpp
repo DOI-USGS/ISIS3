@@ -108,6 +108,31 @@ int main(int argc, char *argv[]) {
   catch(IException &e) {
     e.print();
   }
+  try {
+    cout << endl << "Test for ProjectionFactory's Create with unsupported projection" << endl;
+
+    Pvl lab;
+    lab.addGroup(PvlGroup("Mapping"));
+    PvlGroup &mapGroup = lab.findGroup("Mapping");
+    mapGroup += PvlKeyword("EquatorialRadius", toString(3396190.0));
+    mapGroup += PvlKeyword("PolarRadius", toString(3376200.0));
+
+    mapGroup += PvlKeyword("LatitudeType", "Planetographic");
+    mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+    mapGroup += PvlKeyword("LongitudeDomain", toString(360));
+
+    mapGroup += PvlKeyword("ProjectionName", "UnsupportedProjection");
+    mapGroup += PvlKeyword("CenterLongitude", toString(220.0));
+    mapGroup += PvlKeyword("PixelResolution", toString(2000.0));
+    mapGroup += PvlKeyword("UpperLeftCornerX", toString(-18000.0));
+    mapGroup += PvlKeyword("UpperLeftCornerY", toString(2062000.0));
+
+    TProjection *proj = (TProjection *) ProjectionFactory::Create(lab);
+    proj->SetWorld(245.0, 355.0);
+  }
+  catch(IException &e) {
+    e.print();
+  }
 }
 
 void doit(Pvl &lab) {

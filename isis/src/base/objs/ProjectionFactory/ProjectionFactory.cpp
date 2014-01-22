@@ -91,7 +91,7 @@ namespace Isis {
       catch(IException &e) {
         QString msg = "Unsupported projection, unable to find plugin for [" +
                      proj + "]";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       // Now cast that pointer in the proper way
@@ -162,7 +162,7 @@ namespace Isis {
       catch(IException &e) {
         QString msg = "Unsupported projection, unable to find plugin for [" +
                       proj + "]";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       // Now cast that pointer in the proper way
