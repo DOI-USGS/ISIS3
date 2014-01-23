@@ -67,3 +67,9 @@ Object = IsisCube
   End_Group
 End_Object
 End
+
+Test for ProjectionFactory's Create with unsupported projection
+**I/O ERROR** Unable to initialize Projection information from group [Mapping].
+**ERROR** Unsupported projection, unable to find plugin for [UnsupportedProjection].
+**ERROR** Unable to find PVL group [UnsupportedProjection] in file [isis/lib/Projection.plugin].
+
