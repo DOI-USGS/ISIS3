@@ -45,6 +45,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-03-28 Travis Addair - Added documentation.
+   *   @history 2014-01-17 Kimberly Oyama - Added the history label to the output cube. Fixes #1894.
    *
    */
   class ImageImporter {

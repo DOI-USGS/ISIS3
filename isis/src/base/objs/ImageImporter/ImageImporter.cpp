@@ -5,6 +5,7 @@
 #include "Buffer.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
+#include "History.h"
 #include "JP2Decoder.h"
 #include "JP2Importer.h"
 #include "ProcessByLine.h"
@@ -129,8 +130,19 @@ namespace Isis {
           _FILEINFO_);
     }
     bandBin += name;
-    label->addGroup(bandBin);
-
+    label->findObject("IsisCube").addGroup(bandBin);
+    
+    History hist = History("IsisCube");
+    try {
+      // read history from cube, if it exists.
+      cube->read(hist);
+    }
+    catch(IException &e) {
+      // If the cube doesn't have a history, std2isis will add the first entry.
+    }
+    hist.AddEntry();
+    cube->write(hist);
+  
     p.SetInputCube(cube);
     p.SetProcessingDirection(ProcessByBrick::BandsFirst);
     p.ProcessCubeInPlace(*this, false);
