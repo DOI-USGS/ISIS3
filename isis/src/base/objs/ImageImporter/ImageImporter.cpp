@@ -131,19 +131,9 @@ namespace Isis {
     }
     bandBin += name;
     label->findObject("IsisCube").addGroup(bandBin);
-    
-    History hist = History("IsisCube");
-    try {
-      // read history from cube, if it exists.
-      cube->read(hist);
-    }
-    catch(IException &e) {
-      // If the cube doesn't have a history, std2isis will add the first entry.
-    }
-    hist.AddEntry();
-    cube->write(hist);
   
     p.SetInputCube(cube);
+    p.WriteHistory(*cube);
     p.SetProcessingDirection(ProcessByBrick::BandsFirst);
     p.ProcessCubeInPlace(*this, false);
     p.EndProcess();

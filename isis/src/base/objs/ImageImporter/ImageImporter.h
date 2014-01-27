@@ -46,6 +46,9 @@ namespace Isis {
    * @internal
    *   @history 2012-03-28 Travis Addair - Added documentation.
    *   @history 2014-01-17 Kimberly Oyama - Added the history label to the output cube. Fixes #1894.
+   *   @history 2014-01-27 Kimberly Oyama - Changed the method of adding the history to the cube
+   *                           from adding it in the import method to using Process' WriteHistory
+   *                           method. References #1894.
    *
    */
   class ImageImporter {
