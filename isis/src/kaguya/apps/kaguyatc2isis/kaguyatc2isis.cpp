@@ -41,6 +41,23 @@ void IsisMain() {
   p.SetPdsFile(labelFile, "", label);
   Cube *outcube = p.SetOutputCube("TO");
 
+  // Get user entered special pixel ranges
+  if(ui.GetBoolean("SETNULLRANGE")) {
+    p.SetNull(ui.GetDouble("NULLMIN"), ui.GetDouble("NULLMAX"));
+  }
+  if(ui.GetBoolean("SETHRSRANGE")) {
+    p.SetHRS(ui.GetDouble("HRSMIN"), ui.GetDouble("HRSMAX"));
+  }
+  if(ui.GetBoolean("SETHISRANGE")) {
+    p.SetHIS(ui.GetDouble("HISMIN"), ui.GetDouble("HISMAX"));
+  }
+  if(ui.GetBoolean("SETLRSRANGE")) {
+    p.SetLRS(ui.GetDouble("LRSMIN"), ui.GetDouble("LRSMAX"));
+  }
+  if(ui.GetBoolean("SETLISRANGE")) {
+    p.SetLIS(ui.GetDouble("LISMIN"), ui.GetDouble("LISMAX"));
+  }
+
   p.SetOrganization(Isis::ProcessImport::BSQ);
 
   p.StartProcess();

@@ -16,6 +16,11 @@
     <change name="Janet Barrett" date="2012-05-03">
       Added support for Terrain Camera Ortho TCO_MAP.
     </change>
+    <change name="Janet Barrett" date="2013-07-19">
+      Added parameters (SETNULLRANGE, SETHRSRANGE, SETHISRANGE,
+      SETLRSRANGE, SETLISRANGE) to allow the user to specify
+      special pixel values. Fixes #1718.
+    </change>
   </history>
 
   <category>
@@ -41,19 +46,239 @@
       </parameter>
 
       <parameter name="TO">
-         <type>cube</type>
-         <fileMode>output</fileMode>
-         <brief>
-           Output Isis cube
-         </brief>
-         <description>
-           Use this parameter to select the output filename
-         </description>
-         <filter>
-           *.cub
-         </filter>
-       </parameter>
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output Isis cube
+        </brief>
+        <description>
+          Use this parameter to select the output filename
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="SETNULLRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Option to convert pixel values to NULL</brief>
+        <description>
+          If this option is set to "yes" or "true", a range of input raw pixels
+          defined by the NULLMIN and NULLMAX parameters are converted to <def>NULL</def>
+          pixels.  All other valid pixels that do not fall within the ranges
+          specified for LIS, LRS, HIS, and HRS pixels are transferred to the output file
+          unchanged.  If the <def link="Bit Type">bit type</def> of the input
+          file is changed, the NULL and HRS <def link="Special Pixels">special
+          pixels</def> may be incorrectly set to valid pixel values.  For example,
+          if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0"
+          and "255" may be converted to actual values instead of retaining the
+          special pixel property.  If the output file remains as 8-bit, then "0"
+          stays as NULL and "255" stays as HRS.
+        </description>
+        <inclusions>
+          <item>NULLMIN</item>
+          <item>NULLMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMIN">
+        <type>double</type>
+        <brief> Minimum value for NULL</brief>
+        <description>
+          Minimum pixel value to set to <def>NULL</def>.  All values greater than or equal to
+          NULLMIN and less than or equal to NULLMAX are converted to NULL.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="NULLMAX">
+        <type>double</type>
+        <brief> Maximum value for NULL </brief>
+        <description>
+          Maximum pixel value to set to <def>NULL</def>.  All values greater than or equal to
+          NULLMIN and less than or equal to NULLMAX are converted to NULL.
+        </description>
+        <inclusions>
+          <item>SETNULLRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Option to convert pixel values to HRS</brief>
+        <description>
+	  If this option is set to "yes" or "true", a range of input raw pixels
+	  defined by the HRSMIN and HRSMAX parameters are converted to HRS
+	  pixels.  All other valid pixels that do not fall within the ranges 
+	  specified for LIS, LRS, HIS, and NULL pixels are transferred to the output file 
+	  unchanged.  If the <def link="Bit Type">bit type</def> of the input 
+	  file is changed, the NULL and HRS <def link="Special Pixels">special 
+	  pixels</def> may be incorrectly set to valid pixel values.  For example, 
+	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0" 
+	  and "255" may be converted to actual values instead of retaining the 
+	  special pixel property.  If the output file remains as 8-bit, then "0" 
+	  stays as NULL and "255" stays as HRS.
+        </description>
+        <inclusions>
+          <item>HRSMIN</item>
+          <item>HRSMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMIN">
+        <type>double</type>
+        <brief> Minimum value for HRS</brief>
+        <description>
+          Minimum pixel value to set to <def>HRS</def>.  All values greater than or equal to
+	  HRSMIN and less than or equal to HRSMAX are converted to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HRSMAX">
+        <type>double</type>
+        <brief> Maximum value for HRS</brief>
+        <description>
+          Maximum pixel value to set to <def>HRS</def>.  All values greater than or equal to
+	  HRSMIN and less than or equal to HRSMAX are converted to HRS.
+        </description>
+        <inclusions>
+          <item>SETHRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETHISRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Option to convert pixel values to HIS</brief>
+        <description>
+	  If this option is set to "yes" or "true", a range of input raw pixels
+	  defined by the HISMIN and HISMAX parameters are converted to HIS
+	  pixels.  All other valid pixels that do not fall within the ranges 
+	  specified for LIS, LRS, HRS, and NULL pixels are transferred to the 
+	  output file unchanged. 
+        </description>
+        <inclusions>
+          <item>HISMIN</item>
+          <item>HISMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HISMIN">
+        <type>double</type>
+        <brief> Minimum value for HIS</brief>
+        <description>
+          Minimum pixel value to set to <def>HIS</def>.  All values greater than or equal to
+	  HISMIN and less than or equal to HISMAX are converted to HIS.
+        </description>
+        <inclusions>
+          <item>SETHISRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="HISMAX">
+        <type>double</type>
+        <brief> Maximum value for HIS</brief>
+        <description>
+          Maximum pixel value to set to <def>HIS</def>.  All values greater than or equal to
+	  HISMIN and less than or equal to HISMAX are converted to HIS.
+        </description>
+        <inclusions>
+          <item>SETHISRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLRSRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Option to convert pixel values to LRS</brief>
+        <description>
+	  If this option is set to "yes" or "true", a range of input raw pixels
+	  defined by the LRSMIN and LRSMAX parameters are converted to LRS
+	  pixels.  All other valid pixels that do not fall within the ranges 
+	  specified for LIS, HIS, HRS, and NULL pixels are transferred to the 
+	  output file unchanged.
+        </description>
+        <inclusions>
+          <item>LRSMIN</item>
+          <item>LRSMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMIN">
+        <type>double</type>
+        <brief> Minimum value for LRS</brief>
+        <description>
+          Minimum pixel value to set to <def>LRS</def>.  All values greater than or equal to
+	  LRSMIN and less than or equal to LRSMAX are converted to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LRSMAX">
+        <type>double</type>
+        <brief> Maximum value for LRS </brief>
+        <description>
+          Maximum pixel value to set to <def>LRS</def>.  All values greater than or equal to
+	  LRSMIN and less than or equal to LRSMAX are converted to LRS.
+        </description>
+        <inclusions>
+          <item>SETLRSRANGE</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SETLISRANGE">
+        <type>boolean</type>
+        <default>
+          <item>NO</item>
+        </default>
+        <brief>Option to convert pixel values to LIS</brief>
+        <description>
+	  If this option is set to "yes" or "true", a range of input raw pixels
+	  defined by the LISMIN and LISMAX parameters are converted to LIS
+	  pixels.  All other valid pixels that do not fall within the ranges 
+	  specified for LRS, HIS, HRS, and NULL pixels are transferred to the 
+	  output file unchanged.
+        </description>
+        <inclusions>
+          <item>LISMIN</item>
+          <item>LISMAX</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LISMIN">
+        <type>double</type>
+        <brief> Minimum value for LIS </brief>
+        <description>
+          Minimum pixel value to set to <def>LIS</def>.  All values greater than or equal to
+	  LISMIN and less than or equal to LISMAX are converted to LIS.
+        </description>
+        <inclusions>
+          <item>SETLISRANGE</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LISMAX">
+        <type>double</type>
+        <brief> Maximum value for LIS </brief>
+        <description>
+          Maximum pixel value to set to <def>LIS</def>.  All values greater than or equal to
+	  LISMIN and less than or equal to LISMAX are converted to LIS.
+        </description>
+        <inclusions>
+          <item>SETLISRANGE</item>
+        </inclusions>
+      </parameter>
 
     </group>
+
   </groups>
 </application>
