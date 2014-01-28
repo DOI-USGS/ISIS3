@@ -56,15 +56,25 @@ void IsisMain() {
   // Export the cube
   p.StartProcess();
 
-  // Get as many of the other labels as we can
+  // Translate the mapping labels 
   Pvl otherLabels;
   p.TranslatePdsProjection(otherLabels);
-  if(p.IsIsis2()) {
-    p.TranslateIsis2Labels(otherLabels);
-  }
-  else {
-    p.TranslatePdsLabels(otherLabels);
-  }
+
+  // Translate the remaining MI MAP labels
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
+  QString transDir = (QString) dataDir["Kaguya"] + "/translations/";
+
+  FileName transFile(transDir + "mimapBandBin.trn");
+  PvlTranslationManager bandBinXlater(label, transFile.expanded());
+  bandBinXlater.Auto(otherLabels);
+
+  transFile = transDir + "mimapInstrument.trn";
+  PvlTranslationManager instXlater(label, transFile.expanded());
+  instXlater.Auto(otherLabels);
+
+  transFile = transDir + "mimapArchive.trn";
+  PvlTranslationManager archiveXlater(label, transFile.expanded());
+  archiveXlater.Auto(otherLabels);
 
   if(otherLabels.hasGroup("Mapping") &&
       (otherLabels.findGroup("Mapping").keywords() > 0)) {
