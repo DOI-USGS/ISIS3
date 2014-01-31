@@ -451,37 +451,35 @@ namespace Isis {
         m_path = FileName(cubeViewport()->cube()->fileName()).path();
         m_fileName = FileName(cubeViewport()->cube()->fileName()).name();
 
-        //
-        // \  |  /
-        //  \ | /
-        //    _
-        //-- / \ --    THE SUN
-        //-- \_/ --
-        //  / | \  -
-        // /  |  \   -      <--- vector from the sun that intersects P1 and P2
-        //             -
-        //     _         -_
-        //     ^         /^\-     P2
-        //     |        / | \  -   |
-        //   H |       /  |  \   - v
-        //    _v______/  P1   \__T_-_________
-        //                      ^
-        //                    Shadow
-        //
-        //   T: Angle from the horizon to the sun
-        //   H: Difference in planetary radius between P1 and P2
-        //   L : length(Shadow)
-        //   H = L * sin(T)
-        //
-        // We do not want the local incidence angle for T.
-        //
-        // Equation to variable mapping:
-        //   T: theta
-        //   H: m_shadowHeight
-        //   L: m_shadowLength
-        //   P1: m_startSurfacePoint
-        //   P2: m_endSurfacePoint
-
+        /*     |
+         *   \ _ /
+         * -= (_) =-    THE SUN
+         *   /   \ -
+         *     |     -      <--- vector from the sun that intersects P1 and P2
+         *              -
+         *                -_         |
+         *                /^\-       | 
+         *               / | \  -    |
+         *              / H|  \   -  |
+         *     ________/   |   \__T_-|_________
+         *                 P1     ^  P2
+         *                     Shadow
+         *
+         *  T: Angle from the horizon to the sun
+         *  H: Difference in planetary radius between P1 and P2
+         *  L : length(Shadow)
+         *  H = L * tan(T)
+         *
+         * We do not want the local incidence angle for T.
+         *
+         * Equation to variable mapping:
+         *  T: theta
+         *  H: m_shadowHeight
+         *  L: m_shadowLength
+         *  P1: m_startSurfacePoint
+         *  P2: m_endSurfacePoint
+         */
+        
         bool success = true;
         Camera *cam = cubeViewport()->cube()->camera();
         success = cam->SetImage(m_startSamp, m_startLine);
@@ -525,25 +523,19 @@ namespace Isis {
           *m_incidenceAngle = Angle(cam->IncidenceAngle(), Angle::Degrees);
           Angle theta = Angle(90.0, Angle::Degrees) - *m_incidenceAngle;
 
-          Displacement deltaX = m_startSurfacePoint->GetX() -
-                                m_endSurfacePoint->GetX();
+          Displacement deltaX = m_startSurfacePoint->GetX() - m_endSurfacePoint->GetX();
 
-          Displacement deltaY = m_startSurfacePoint->GetY() -
-                                m_endSurfacePoint->GetY();
+          Displacement deltaY = m_startSurfacePoint->GetY() - m_endSurfacePoint->GetY();
 
-          Displacement deltaZ = m_startSurfacePoint->GetZ() -
-                                m_endSurfacePoint->GetZ();
+          Displacement deltaZ = m_startSurfacePoint->GetZ() - m_endSurfacePoint->GetZ();
 
-          *m_shadowLength = Distance(
-            sqrt(
-              deltaX.meters() * deltaX.meters() +
-              deltaY.meters() * deltaY.meters() +
-              deltaZ.meters() * deltaZ.meters()),
-            Distance::Meters);
+          *m_shadowLength = Distance(sqrt( deltaX.meters() * deltaX.meters() +
+                                           deltaY.meters() * deltaY.meters() +
+                                           deltaZ.meters() * deltaZ.meters() ),
+                                     Distance::Meters);
 
-          *m_shadowHeight = Distance(
-              m_shadowLength->meters() * sin(theta.radians()),
-              Distance::Meters);
+          *m_shadowHeight = Distance(m_shadowLength->meters() * tan( theta.radians() ),
+                                     Distance::Meters);
         }
       }
     }
