@@ -62,6 +62,13 @@
       the actual raw value 3.0 could be designated as NULL or LIS; however, the actual
       assignment is NULL (highest priority).
     </p>
+    <p>
+      <b>Processing Notes:</b> If the output MI MAP cubes are to be mosaicked using
+      programs such as automos, then please be aware that you must set the matchbandbin
+      option to false when mosaicking. This is required because the BaseBand keyword in 
+      each file will not always match and this will cause your mosaic to fail if you 
+      don't set the matchbandbin option to false.
+    </p>
   </description>
 
   <history>
