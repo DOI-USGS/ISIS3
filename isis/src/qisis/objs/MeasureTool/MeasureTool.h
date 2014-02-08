@@ -47,10 +47,12 @@ namespace Isis {
   *   @history 2011-09-20 Steven Lambright - Added some abstraction, fixed
   *                           problems with segmented line and rectangle.
   *                           Fixes #218.
-   *  @history 2011-11-01 Steven Lambright - Fixed possible seg fault.
-   *                          References #205.
-   *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
-   *                           References #775.
+  *   @history 2011-11-01 Steven Lambright - Fixed possible seg fault.
+  *                          References #205.
+  *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
+  *                           References #775.
+  *   @history 2014-02-07 Tracie Sucharski - Latitude and Longitude were swapped in the endpoints.
+  *                           Fixes #2032.
   */
   class MeasureTool : public Tool {
       Q_OBJECT
