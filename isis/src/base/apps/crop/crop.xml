@@ -97,6 +97,11 @@
       samples does not divide evenly by the linc or sinc values there will be one additional
       line or sample in the output cube.
     </change>
+    <change name="Janet Barrett" date="2014-02-10">
+      Delete input cube between successive runs of the program. This makes sure that the
+      projection information is initialized each time the program is run in the GUI.
+      Fixes #1500.
+    </change>
   </history>
 
   <oldName>
