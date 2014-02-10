@@ -538,4 +538,72 @@ void IsisMain() {
   imapcube.close();
 
   results.clear();
+
+  Cube smapcube;
+  QString from3 = ui.GetFileName("FROM3");
+  smapcube.open(from3);
+  inl = smapcube.lineCount();
+  ins = smapcube.sampleCount();
+  ProcessByLine p11;
+  p11.SetInputCube("FROM3");
+  sl = 2070;
+  ss = 818;
+  el = 2270;
+  es = 1018;
+  linc = 1.0;
+  sinc = 1.0;
+  onl = (int)ceil((double)(el - sl + 1) / linc);
+  ons = (int)ceil((double)(es - ss + 1) / sinc);
+  omapcube = p11.SetOutputCube("TO", ons, onl, 1);
+
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
+
+  s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
+  s.UpdateLabel(&smapcube, omapcube, results);
+
+  cout << "Input Simple Cylindrical projected cube label: " << endl << endl;
+  inlabel = *smapcube.label();
+  cout << inlabel.findObject("IsisCube").findObject("Core").findGroup("Dimensions") << endl << endl;
+  if(inlabel.findObject("IsisCube").hasGroup("Instrument")) {
+    cout << inlabel.findObject("IsisCube").findGroup("Instrument") << endl << endl;
+  }
+  if(inlabel.findObject("IsisCube").hasGroup("Mapping")) {
+    cout << inlabel.findObject("IsisCube").findGroup("Mapping") << endl << endl;
+  }
+  if(inlabel.findObject("IsisCube").hasGroup("AlphaCube")) {
+    cout << inlabel.findObject("IsisCube").findGroup("AlphaCube") << endl << endl;
+  }
+
+  cout << "Testing sub image area with linc=1.0, sinc=1.0 ";
+  cout << "for Simple Cylindrical projected cube..." << endl;
+
+  Isis::Application::Log(results);
+  cout << endl;
+  p11.EndProcess();
+
+  cout << "Output cube label: " << endl << endl;
+  cube.open(file);
+  label = *cube.label();
+  cube.close(true);
+  cout << label.findObject("IsisCube").findObject("Core").findGroup("Dimensions") << endl << endl;
+  if(label.findObject("IsisCube").hasGroup("Instrument")) {
+    cout << label.findObject("IsisCube").findGroup("Instrument") << endl << endl;
+  }
+  if(label.findObject("IsisCube").hasGroup("Mapping")) {
+    cout << label.findObject("IsisCube").findGroup("Mapping") << endl << endl;
+  }
+  if(label.findObject("IsisCube").hasGroup("AlphaCube")) {
+    cout << label.findObject("IsisCube").findGroup("AlphaCube") << endl << endl;
+  }
+
+  results.clear();
 }

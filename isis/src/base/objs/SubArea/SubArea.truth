@@ -633,3 +633,130 @@ Group = AlphaCube
   BetaLines           = 1347
 End_Group
 
+Input Simple Cylindrical projected cube label: 
+
+Group = Dimensions
+  Samples = 2259
+  Lines   = 3270
+  Bands   = 1
+End_Group
+
+Group = Instrument
+  SpacecraftName        = "MARS GLOBAL SURVEYOR"
+  InstrumentId          = MOC-WA
+  TargetName            = Mars
+  StartTime             = 1997-10-20T10:58:37.46
+  StopTime              = 1997-10-20T11:03:44.66
+  CrosstrackSumming     = 4
+  DowntrackSumming      = 4
+  FocalPlaneTemperature = 213.1
+  GainModeId            = 1A
+  LineExposureDuration  = 100.000000 <milliseconds>
+  MissionPhaseName      = AB-1
+  OffsetModeId          = 5
+  SpacecraftClockCount  = 561812335:32
+  RationaleDesc         = "OLYMPUS MONS SPECIAL RED WIDE ANGLE"
+  FirstLineSample       = 673
+End_Group
+
+Group = Mapping
+  ProjectionName     = SimpleCylindrical
+  CenterLongitude    = 227.87092862105
+  TargetName         = Mars
+  EquatorialRadius   = 3396190.0 <meters>
+  PolarRadius        = 3376200.0 <meters>
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 360
+  MinimumLatitude    = 10.764699407299
+  MaximumLatitude    = 34.460212012267
+  MinimumLongitude   = 219.68763086864
+  MaximumLongitude   = 236.05422637345
+  UpperLeftCornerX   = -485337.86318746 <meters>
+  UpperLeftCornerY   = 2042714.0507253 <meters>
+  PixelResolution    = 429.50253379421 <meters/pixel>
+  Scale              = 138.00779473796 <pixels/degree>
+End_Group
+
+Group = AlphaCube
+  AlphaSamples        = 640
+  AlphaLines          = 768
+  AlphaStartingSample = 0.5
+  AlphaStartingLine   = 0.5
+  AlphaEndingSample   = 640.5
+  AlphaEndingLine     = 768.5
+  BetaSamples         = 640
+  BetaLines           = 768
+End_Group
+
+Testing sub image area with linc=1.0, sinc=1.0 for Simple Cylindrical projected cube...
+
+Group = Results
+  InputLines      = 3270
+  InputSamples    = 2259
+  StartingLine    = 2070
+  StartingSample  = 818
+  EndingLine      = 2270
+  EndingSample    = 1018
+  LineIncrement   = 1.0
+  SampleIncrement = 1.0
+  OutputLines     = 201
+  OutputSamples   = 201
+End_Group
+
+Output cube label: 
+
+Group = Dimensions
+  Samples = 201
+  Lines   = 201
+  Bands   = 1
+End_Group
+
+Group = Instrument
+  SpacecraftName        = "MARS GLOBAL SURVEYOR"
+  InstrumentId          = MOC-WA
+  TargetName            = Mars
+  StartTime             = 1997-10-20T10:58:37.46
+  StopTime              = 1997-10-20T11:03:44.66
+  CrosstrackSumming     = 4
+  DowntrackSumming      = 4
+  FocalPlaneTemperature = 213.1
+  GainModeId            = 1A
+  LineExposureDuration  = 100.000000 <milliseconds>
+  MissionPhaseName      = AB-1
+  OffsetModeId          = 5
+  SpacecraftClockCount  = 561812335:32
+  RationaleDesc         = "OLYMPUS MONS SPECIAL RED WIDE ANGLE"
+  FirstLineSample       = 673
+End_Group
+
+Group = Mapping
+  ProjectionName     = SimpleCylindrical
+  CenterLongitude    = 227.87092862105
+  TargetName         = Mars
+  EquatorialRadius   = 3396190.0 <meters>
+  PolarRadius        = 3376200.0 <meters>
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 360
+  MinimumLatitude    = 18.013475287539
+  MaximumLatitude    = 19.469914761713
+  MinimumLongitude   = 225.60294078316
+  MaximumLongitude   = 227.05938025733
+  UpperLeftCornerX   = -134434.29307759
+  UpperLeftCornerY   = 1154073.3083051
+  PixelResolution    = 429.50253379421 <meters/pixel>
+  Scale              = 138.00779473796 <pixels/degree>
+End_Group
+
+Group = AlphaCube
+  AlphaSamples        = 640
+  AlphaLines          = 768
+  AlphaStartingSample = 0.5
+  AlphaStartingLine   = 0.5
+  AlphaEndingSample   = 640.5
+  AlphaEndingLine     = 768.5
+  BetaSamples         = 640
+  BetaLines           = 768
+End_Group
+

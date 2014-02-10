@@ -29,6 +29,7 @@
 #include "AlphaCube.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "TProjection.h"
 #include "IException.h"
 #include "IString.h"
 
@@ -162,13 +163,13 @@ namespace Isis {
     if(inlabel.findObject("IsisCube").hasGroup("Mapping")) {
       // Update the upper left corner X,Y values if the starting line or
       // starting sample are changed.
+      TProjection *proj = (TProjection *) icube->projection();
       if(p_sl != 1 || p_ss != 1) {
-        Projection &proj = *icube->projection();
-        proj.SetWorld(p_ss - 0.5, p_sl - 0.5);
+        proj->SetWorld(p_ss - 0.5, p_sl - 0.5);
         PvlGroup &mapgroup = inlabel.findObject("IsisCube").findGroup("Mapping", Pvl::Traverse);
-        mapgroup.addKeyword(PvlKeyword("UpperLeftCornerX", toString(proj.XCoord())),
+        mapgroup.addKeyword(PvlKeyword("UpperLeftCornerX", toString(proj->XCoord())),
                             Pvl::Replace);
-        mapgroup.addKeyword(PvlKeyword("UpperLeftCornerY", toString(proj.YCoord())),
+        mapgroup.addKeyword(PvlKeyword("UpperLeftCornerY", toString(proj->YCoord())),
                             Pvl::Replace);
       }
 
@@ -190,17 +191,65 @@ namespace Isis {
       // latitude,longitude range is no longer valid.
       if(p_sl != 1 || p_ss != 1 || p_el != p_nl || p_es != p_ns) {
         PvlGroup &mapgroup = inlabel.findObject("IsisCube").findGroup("Mapping", Pvl::Traverse);
-        if(mapgroup.hasKeyword("MinimumLatitude")) {
-          mapgroup.deleteKeyword("MinimumLatitude");
+        if (proj->IsEquatorialCylindrical()) {
+          double minlat, maxlat;
+          double minlon, maxlon;
+          proj->SetWorld(p_ss-.5, p_sl-.5);
+          if (proj->IsGood()) {
+            maxlat = proj->UniversalLatitude();
+            if (proj->IsPlanetographic()) {
+              maxlat = proj->ToPlanetographic(maxlat);
+            }
+            if (proj->IsPositiveEast()) {
+              minlon = proj->UniversalLongitude();
+              if (proj->Has180Domain()) {
+                minlon = proj->To180Domain(minlon);
+              }
+            }
+            else {
+              minlon = proj->ToPositiveWest(proj->UniversalLongitude(), 360);
+              if (proj->Has180Domain()) {
+                minlon = proj->To180Domain(proj->ToPositiveWest(proj->UniversalLongitude(), 360));
+              }
+            }
+            proj->SetWorld(p_es+.5, p_el+.5);
+            if (proj->IsGood()) {
+              minlat = proj->UniversalLatitude();
+              if (proj->IsPlanetographic()) {
+                minlat = proj->ToPlanetographic(minlat);
+              }
+              if (proj->IsPositiveEast()) {
+                maxlon = proj->UniversalLongitude();
+                if (proj->Has180Domain()) {
+                  maxlon = proj->To180Domain(maxlon);
+                }
+              }
+              else {
+                maxlon = proj->ToPositiveWest(proj->UniversalLongitude(), 360);
+                if (proj->Has180Domain()) {
+                  maxlon = proj->To180Domain(proj->ToPositiveWest(proj->UniversalLongitude(), 360));
+                }
+              }
+              mapgroup.addKeyword(PvlKeyword("MinimumLatitude",toString(minlat)),Pvl::Replace);
+              mapgroup.addKeyword(PvlKeyword("MaximumLatitude",toString(maxlat)),Pvl::Replace);
+              mapgroup.addKeyword(PvlKeyword("MinimumLongitude",toString(minlon)),Pvl::Replace);
+              mapgroup.addKeyword(PvlKeyword("MaximumLongitude",toString(maxlon)),Pvl::Replace);
+            }
+          }
         }
-        if(mapgroup.hasKeyword("MaximumLatitude")) {
-          mapgroup.deleteKeyword("MaximumLatitude");
-        }
-        if(mapgroup.hasKeyword("MinimumLongitude")) {
-          mapgroup.deleteKeyword("MinimumLongitude");
-        }
-        if(mapgroup.hasKeyword("MaximumLongitude")) {
-          mapgroup.deleteKeyword("MaximumLongitude");
+        else {
+          if(mapgroup.hasKeyword("MinimumLatitude")) {
+            mapgroup.deleteKeyword("MinimumLatitude");
+          }
+          if(mapgroup.hasKeyword("MaximumLatitude")) {
+            mapgroup.deleteKeyword("MaximumLatitude");
+          }
+          if(mapgroup.hasKeyword("MinimumLongitude")) {
+            mapgroup.deleteKeyword("MinimumLongitude");
+          }
+          if(mapgroup.hasKeyword("MaximumLongitude")) {
+            mapgroup.deleteKeyword("MaximumLongitude");
+          }
         }
       }
     }

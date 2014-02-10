@@ -48,6 +48,20 @@
         </filter>
         <default><item>unitTest_map.cub</item></default>
       </parameter>
+      <parameter name="FROM3">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>unitTest_mapsimp.cub</item></default>
+      </parameter>
       <parameter name="TO">
         <type>cube</type>
         <fileMode>output</fileMode>
