@@ -85,6 +85,11 @@ namespace Isis {
    *   @history 2013-11-14 Kimberly Oyama - Modified StartProcess() to account for a negative x
    *                           or y from the projection. These x and y values are used to
    *                           calculate the outline and outsample. Fixes #1736.
+   *   @history 2013-12-27 Janet Barrett - Added additional latlonflag parameter to the
+   *                           SetOutputCube method so that valid lat/lon values are checked
+   *                           for in the input files that make up a mosaic. This change was
+   *                           needed to handle input files that are missing the min/max lat/lon
+   *                           keywords (such as those that were cropped). Fixes #1500. 
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
    *                          example to class documentation
@@ -119,7 +124,8 @@ namespace Isis {
       Isis::Cube *SetOutputCube(const QString &inputFile,
                                 double xmin, double xmax, double ymin, double ymax,
                                 double slat, double elat, double slon, double elon, int nbands,
-                                CubeAttributeOutput &oAtt, const QString &mosaicFile);
+                                CubeAttributeOutput &oAtt, const QString &mosaicFile,
+                                bool latlonflag=true);
 
       Isis::Cube *RingsSetOutputCube(const QString &inputFile,
                                 double xmin, double xmax, double ymin, double ymax,

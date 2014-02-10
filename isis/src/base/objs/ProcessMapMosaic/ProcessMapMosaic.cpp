@@ -210,6 +210,7 @@ namespace Isis {
     double elat = -DBL_MAX;
     double slon = DBL_MAX;
     double elon = -DBL_MAX;
+    bool latlonflag = true;
 
     TProjection *proj = NULL;
 
@@ -249,6 +250,11 @@ namespace Isis {
       if (x > xmax) xmax = x;
       if (y > ymax) ymax = y;
 
+      if (projNew->MinimumLatitude() == 0.0 && projNew->MaximumLatitude() == 0.0 &&
+          projNew->MinimumLongitude() == 0.0 && projNew->MaximumLongitude() == 0.0) {
+        latlonflag = false;
+      }
+
       slat = min(slat, projNew->MinimumLatitude());
       elat = max(elat, projNew->MaximumLatitude());
       slon = min(slon, projNew->MinimumLongitude());
@@ -263,7 +269,7 @@ namespace Isis {
     if (proj) delete proj;
 
     return SetOutputCube(propagationCubes[0].toString(), xmin, xmax, ymin, ymax,
-                         slat, elat, slon, elon, bands, oAtt, mosaicFile);
+                         slat, elat, slon, elon, bands, oAtt, mosaicFile, latlonflag);
   }
 
 
@@ -357,10 +363,20 @@ namespace Isis {
     Pvl label;
     label.read(propagationCubes[0].toString());
     PvlGroup mGroup = label.findGroup("Mapping", Pvl::Traverse);
-    mGroup.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
-    mGroup.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
-    mGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
-    mGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+
+    // All mosaicking programs use only the upper left x and y to determine where to
+    // place an image into a mosaic. For clarity purposes, the mosaic programs do
+    // not use lat/lon ranges for anything except creating the mosaic. By specifying
+    // the lat/lon range of the mosaic, we compute the upper left x/y of the mosaic.
+    // All map projected cubes must have an upper left x/y and do not require a lat/lon
+    // range. If the current values for the latitude and longitude range are out of
+    // order or equal, then we don't write them to the labels.
+    if (slat < elat && slon < elon) {
+      mGroup.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
+      mGroup.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
+      mGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
+      mGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+    }
 
     if (mGroup.hasKeyword("UpperLeftCornerX"))
       mGroup.deleteKeyword("UpperLeftCornerX");
@@ -498,16 +514,28 @@ namespace Isis {
   Isis::Cube *ProcessMapMosaic::SetOutputCube(const QString &inputFile,
       double xmin, double xmax, double ymin, double ymax,
       double slat, double elat, double slon, double elon, int nbands,
-      CubeAttributeOutput &oAtt, const QString &mosaicFile) {
+      CubeAttributeOutput &oAtt, const QString &mosaicFile, bool latlonflag) {
     Pvl fileLab(inputFile);
     PvlGroup &mapping = fileLab.findGroup("Mapping", Pvl::Traverse);
 
     mapping["UpperLeftCornerX"] = toString(xmin);
     mapping["UpperLeftCornerY"] = toString(ymax);
-    mapping.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
-    mapping.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
-    mapping.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
-    mapping.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+
+    // All mosaicking programs use only the upper left x and y to determine where to
+    // place an image into a mosaic. For clarity purposes, the mosaic programs do
+    // not use lat/lon ranges for anything except creating the mosaic. By specifying
+    // the lat/lon range of the mosaic, we compute the upper left x/y of the mosaic.
+    // All map projected cubes must have an upper left x/y and do not require a lat/lon
+    // range. If the current values for the latitude and longitude range are out of
+    // order or equal, then we don't write them to the labels.
+    if (latlonflag) {
+      if (slat < elat && slon < elon) {
+        mapping.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
+        mapping.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
+        mapping.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
+        mapping.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+      }
+    }
 
     Projection *firstProj = ProjectionFactory::CreateFromCube(fileLab);
     int samps = (int)(ceil(firstProj->ToWorldX(xmax) - firstProj->ToWorldX(xmin)) + 0.5);

@@ -129,7 +129,34 @@ void IsisMain() {
 
   remove("./unitTest3.cub");
 
+  // Create the temp parent cube
+  FileList cubes_crop;
+  cubes_crop.read("unitTest_crop.lis");
+
+  cout << endl << "Testing Mosaic containing cropped image." << endl;
+  ProcessMapMosaic m4;
+  CubeAttributeOutput oAtt3;
+  priority = ProcessMapMosaic::PlaceImagesOnTop;
+  m4.SetBandBinMatch(false);
+  m4.SetOutputCube(cubes_crop, oAtt3, "./unitTest4.cub");
+
+  //set priority
+  m4.SetImageOverlay(priority);
+
+  for(int i = 0; i < cubes_crop.size(); i++) {
+    if(m4.StartProcess(cubes_crop[i].toString())) {
+      cout << cubes_crop[i].toString() << " is inside the mosaic" << endl;
+    }
+    else {
+      cout << cubes_crop[i].toString() << " is outside the mosaic" << endl;
+    }
+  }
+
+  m4.EndProcess();
+  cout << "Mosaic label: " << endl;
+
+  Pvl labels_crop("./unitTest4.cub");
+  cout << labels_crop << endl;
+
+  remove("./unitTest4.cub");
 }
-
-
-
