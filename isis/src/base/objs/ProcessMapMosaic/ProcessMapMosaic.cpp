@@ -528,12 +528,24 @@ namespace Isis {
     // All map projected cubes must have an upper left x/y and do not require a lat/lon
     // range. If the current values for the latitude and longitude range are out of
     // order or equal, then we don't write them to the labels.
-    if (latlonflag) {
-      if (slat < elat && slon < elon) {
-        mapping.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
-        mapping.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
-        mapping.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
-        mapping.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+    if (latlonflag && slat < elat && slon < elon) {
+      mapping.addKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
+      mapping.addKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
+      mapping.addKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
+      mapping.addKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
+    }
+    else {
+      if (mapping.hasKeyword("MinimumLatitude")) {
+        mapping.deleteKeyword("MinimumLatitude");
+      }
+      if (mapping.hasKeyword("MaximumLatitude")) {
+        mapping.deleteKeyword("MaximumLatitude");
+      }
+      if (mapping.hasKeyword("MinimumLongitude")) {
+        mapping.deleteKeyword("MinimumLongitude");
+      }
+      if (mapping.hasKeyword("MaximumLongitude")) {
+        mapping.deleteKeyword("MaximumLongitude");
       }
     }
 
