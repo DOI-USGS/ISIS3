@@ -169,8 +169,12 @@
       Added REJECTION_MULTIPLIER to interface, part of Mantis issue #637.
     </change>
     <change name="Ken Edmundson" date="2012-01-19">
-      Added SPKDEGEE and SPKSOLVEDEGREE; changed name of SOLVEDEGREE to
+      Added SPKDEGREE and SPKSOLVEDEGREE; changed name of SOLVEDEGREE to
       CKSOLVEDEGREE.
+    </change>
+    <change name="Ken Edmundson" date="2014-02-13">
+      Added separate group for Error Propagation with option to write inverse matrix to binary
+      file. For extremely large networks where memory/time for error propagation is limited.
     </change>
   </history>
 
@@ -225,29 +229,6 @@
           *.net
         </filter>
       </parameter>
-
-<!--  Removed until fully functional 2011-09-26
-      <parameter name="SC_SIGMAS">
-        <type>filename</type>
-        <internalDefault>none</internalDefault>
-        <fileMode>input</fileMode>
-        <brief>
-          Input spacecraft parameter uncertainties
-        </brief>
-        <description>
-          This file contains a list of parameter uncertainties for position and 
-        angle parameters (including those of velocity and acceleration). Format 
-        is one instrument per line; entries separated by commas; as follows... 
-          SPACECRAFTNAME/INSTRUMENTID, sPos, sPos(v), sPos(a), sAngles, 
-          sAngles(v), sAngles(a). Any entries without values should be filled 
-          with a -1.0 as a placeholder
-        </description>
-        <filter>
-          *.csv *.txt
-        </filter>
-      </parameter>
--->
-
       <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
@@ -263,7 +244,7 @@
           *.net
         </filter>
       </parameter>
-      </group>
+    </group>
 
     <group name="Solve Options">
       <parameter name="OBSERVATIONS">
@@ -373,19 +354,6 @@
         </list>
       </parameter>
 
-      <parameter name="ERRORPROPAGATION">
-        <brief> Compute variance-covariance matrix</brief>
-        <description>
-            Select this option to compute the variance-covariance matrix of the 
-            parameters.  The parameter uncertainties can be computed from this
-            matrix.
-        </description>
-        <type>boolean</type>
-        <default>
-          <item>No</item>
-        </default>
-      </parameter>
-
       <parameter name="OUTLIER_REJECTION">
       <brief> Auto-rejection of outliers</brief>
       <description>
@@ -405,10 +373,22 @@
           <item>3.0</item>
         </default>
       </parameter>
+
+    <parameter name="ERRORPROPAGATION">
+      <brief> Compute variance-covariance matrix</brief>
+      <description>
+          Select this option to compute the variance-covariance matrix of the
+          parameters.  The parameter uncertainties can be computed from this
+          matrix.
+      </description>
+      <type>boolean</type>
+      <default>
+        <item>No</item>
+      </default>
+    </parameter>
    </group>
 
    <group name="Maximum Likelihood Estimation">
-    
       <parameter name="MODEL1">
         <type>string</type>
         <brief>A maximum likelihood estimation model selection.</brief>
@@ -592,10 +572,7 @@
         <minimum inclusive="no">0</minimum>
         <maximum inclusive="no">1</maximum>
       </parameter>
-
     </group>
-
- 
 
     <group name="Convergence Criteria">
       <parameter name="SIGMA0">

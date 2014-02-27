@@ -1,5 +1,6 @@
 #ifndef BundleAdjust_h
 #define BundleAdjust_h
+
 /**
  * @file
  * $Revision: 1.20 $
@@ -22,7 +23,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
 
 #include <QObject> // parent class
 
@@ -52,8 +52,8 @@ template< typename A, typename B > class QMap;
 #endif
 
 namespace Isis {
-  class LeastSquares;
   class BasisFunction;
+  class LeastSquares;
   class MaximumLikelihoodWFunctions;
   class StatCumProbDistDynCalc;
 
@@ -161,8 +161,10 @@ namespace Isis {
    *                                 for these points were not being computed in
    *                                 ControlPoint::ComputeApriori, this has also been fixed.
    *   @history 2013-12-18 Tracie Sucharski - The ControlNet::GetNumberOfMeasuresInImage was
-   *                                 renamed to ControlNet::GetNumberOfValidMeasuresInImage and
-   *                                 only returns the number of valid (Ignore= False) measures.
+   *                         renamed to ControlNet::GetNumberOfValidMeasuresInImage and only returns
+   *                         the number of valid (Ignore= False) measures.
+   *   @history 2014-02-25 Ken Edmundson - Speed up and memory improvements to error propagation.
+   *                         References #2031.
    */
   class BundleAdjust {
     public:
@@ -175,8 +177,6 @@ namespace Isis {
       BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
                    Isis::SerialNumberList &heldsnlist, bool printSummary = true);
       ~BundleAdjust();
-
-      bool ReadSCSigmas(const QString &scsigmasList);
 
       double Solve();
       bool SolveCholesky();
@@ -193,6 +193,7 @@ namespace Isis {
 
       void SetSolveTwist(bool solve) { m_bSolveTwist = solve; ComputeNumberPartials(); }
       void SetSolveRadii(bool solve) { m_bSolveRadii = solve; }
+      void SetUpdateCubes(bool update) { m_bUpdateCubes = update; }
       void SetSolvePolyOverHermite(bool b) { m_bSolvePolyOverHermite = b;
         if( b ) m_nPositionType = SpicePosition::PolyFunctionOverHermiteConstant; }
 
@@ -230,6 +231,7 @@ namespace Isis {
       void SetCSVOutput(bool b) { m_bOutputCSV = b; }
       void SetResidualOutput(bool b) { m_bOutputResiduals = b; }
       void SetOutputFilePrefix(const QString &str) { m_strOutputFilePrefix = str; }
+//      void SetErrorPropagationBinaryFilePath(const QString &str)  { m_strBinaryFilePath = str; }
 
       enum DecompositionMethod {
         NoneSelected,
@@ -318,7 +320,7 @@ namespace Isis {
       void CheckHeldList();
       void ApplyHeldList();
 
-      // triangulation functions
+      // triangulation methods
       int Triangulation(bool bDoApproximation = false);
       bool ApproximatePoint_ClosestApproach(const ControlPoint &rpoint, int nIndex);
       bool TriangulatePoint(const ControlPoint &rpoint);
@@ -327,9 +329,9 @@ namespace Isis {
       bool SetParameterWeights();
       void SetPostBundleSigmas();
 
-      // output functions
-      void IterationSummary(double avErr, double sigmaXY, double sigmaHat, 
-                            double sigmaX, double sigmaY);
+      // output methods
+      void IterationSummary(double avErr, double sigmaXY, double sigmaHat, double sigmaX,
+                            double sigmaY);
       void SpecialKIterationSummary();
       bool Output();
       bool OutputHeader(std::ofstream& fp_out);
@@ -340,10 +342,10 @@ namespace Isis {
       bool OutputResiduals();
       bool WrapUp();
       bool ComputeBundleStatistics();
-
                                                              //!< flags...
       bool m_bSolveTwist;                                    //!< to solve for "twist" angle
       bool m_bSolveRadii;                                    //!< to solve for point radii
+      bool m_bUpdateCubes;                                   //!< update cubes (only here for output into bundleout.txt)
       bool m_bSolvePolyOverHermite;                          //!< to fit polynomial over existing Hermite
       bool m_bSolvePolyOverPointing;                         //!< to fit polynomial over existing pointing
       bool m_bObservationMode;                               //!< for observation mode (explain this somewhere)
@@ -446,7 +448,6 @@ namespace Isis {
 
       std::vector<double> m_dImageParameterWeights;
 
-
       double m_dRTM;                                         //!< radians to meters conversion factor (body specific)
       double m_dMTR;                                         //!< meters to radians conversion factor (body specific)
       Distance m_BodyRadii[3];                               //!< body radii i meters
@@ -460,6 +461,7 @@ namespace Isis {
       QString m_strCnetFileName;                         //!< Control Net file specification
       QString m_strSolutionMethod;                       //!< solution method string (QR,SVD,SPARSE-LU,SPECIALK)
       QString m_strOutputFilePrefix;                     //!< output file prefix
+//      QString m_strBinaryFilePath;                       //!< path for binary file for normals inverse matrix
 
       //!< pointers to...
       Isis::LeastSquares *m_pLsq;                            //!< 'LeastSquares' object
@@ -492,8 +494,9 @@ namespace Isis {
 
       std::vector<SpacecraftWeights>  m_SCWeights;
 
-      // beyond this place (there be dragons) all refers to the folded bundle solution (referred to as 'SpecialK'
-      // in the interim; there is no dependence on the least-squares class
+      // BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution (referred to
+      // as either 'CHOLMOD' (sparse solution) or 'SpecialK' (dense solution - less desirable) in
+      // the interim; there is no dependence on the least-squares class.
 
     private:
       int m_nRank;
@@ -504,24 +507,23 @@ namespace Isis {
       boost::numeric::ublas::symmetric_matrix < double,
             boost::numeric::ublas::upper, boost::numeric::ublas::column_major >
             m_Normals; //!< reduced normal equations matrix
-//      symmetric_matrix<double,lower>     m_Normals;                      //!< reduced normal equations matrix
       boost::numeric::ublas::vector< double > m_nj;
 
       //!< array of Qs   (see Brown, 1976)
       std::vector< boost::numeric::ublas::compressed_matrix< double> > m_Qs_SPECIALK;
       std::vector< SparseBlockRowMatrix > m_Qs_CHOLMOD;
 
-//      vector<bounded_vector<double,3> >  m_NICs;                         //!< array of NICs (see Brown, 1976)
       //!< array of NICs (see Brown, 1976)
       std::vector< boost::numeric::ublas::bounded_vector< double, 3 > >  m_NICs;
 
       boost::numeric::ublas::vector<double> m_Image_Corrections;                                  //!< image parameter cumulative correction vector
       boost::numeric::ublas::vector<double> m_Image_Solution;                                     //!< image parameter solution vector
 
-//      vector<bounded_vector<double,3> >  m_Point_Corrections;            //!< vector of corrections to 3D point parameter
       std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_Corrections;         //!< vector of corrections to 3D point parameter
       std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_AprioriSigmas;       //!< vector of apriori sigmas for 3D point parameters
       std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_Weights;             //!< vector of weights for 3D point parameters
+
+      std::vector< boost::numeric::ublas::vector< double > > m_Image_AdjustedSigmas;                 //!< vector of a posteriori (adjusted image parameter sigmas
 
       void Initialize();
       bool InitializePointWeights();
@@ -567,8 +569,7 @@ namespace Isis {
       bool errorPropagation_CHOLMOD();
 
       // solution, error propagation, and matrix methods for specialk approach
-      // TODO: this may be able to go away if I can verify cholmod behaviour for
-      // a truly dense matrix
+      // TODO: this may be able to go away if I can verify cholmod behavior for a truly dense matrix
       bool formNormalEquations_SPECIALK();
 
       bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>&N22,
@@ -657,36 +658,42 @@ namespace Isis {
       bool cholmod_Inverse();
       bool loadCholmodTriplet();
 
-
-
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables and methods for maximum likelihood estimation
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      /**  This class is used to reweight observations in order to achieve more robust parameter estimation, up to three different maximum likelihood estimation models can be used in succession
+      /** This class is used to reweight observations in order to achieve more robust parameter
+       *    estimation, up to three different maximum likelihood estimation models can be used in
+       *    succession.
        */
       MaximumLikelihoodWFunctions *m_wFunc[3];
      
-      /**  This class will be used to calculate the cumulative probability distribution of |R^2 residuals|, quantiles of this distribution are used to adjust the maximum likelihood functions dynamically iteration by iteration
+      /** This class will be used to calculate the cumulative probability distribution of |R^2
+       *    residuals|, quantiles of this distribution are used to adjust the maximum likelihood
+       *    functions dynamically iteration by iteration.
        */
       StatCumProbDistDynCalc *m_cumPro;
 
-      /**  This class keeps track of the cumulative probability distribution of residuals (in unweighted pixels), this is used for reporting, and not for computation
+      /** This class keeps track of the cumulative probability distribution of residuals (in
+       *    unweighted pixels), this is used for reporting, and not for computation.
        */
       StatCumProbDistDynCalc *m_cumProRes;
 
-      /**  Up to three different maximum likelihood estimation models can be used in succession, these flags record if they are enabled 
+      /** Up to three different maximum likelihood estimation models can be used in succession,
+       *    these flags record if they are enabled .
        */
       bool m_maxLikelihoodFlag[3];
 
-      /**  This count keeps track of which stadge of the maximum likelihood adjustment the bundle is currently on
+      /** This count keeps track of which stadge of the maximum likelihood adjustment the bundle is
+       *    currently on.
        */
       int m_maxLikelihoodIndex;
 
-      /**  Quantiles of the |residual| distribution to be used for tweaking constants of the maximum probability models
+      /** Quantiles of the |residual| distribution to be used for tweaking constants of the maximum
+       *    probability models.
        */
       double m_maxLikelihoodQuan[3];
 
-      /** Median of R^2 residuals
+      /** Median of R^2 residuals.
        */
       double m_maxLikelihoodMedianR2Residuals;
 

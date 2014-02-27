@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <QFile>
+#include <QDebug>
 
 #include "SpecialPixel.h"
 #include "BasisFunction.h"
@@ -28,11 +30,13 @@
 #include "boost/numeric/ublas/vector_proxy.hpp"
 #include "boost/lexical_cast.hpp"
 
+#include "boost/numeric/ublas/io.hpp"
+
 using namespace boost::numeric::ublas;
 
 namespace Isis {
 
-static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
+  static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       const char* message) {
 
     QString errlog;
@@ -51,6 +55,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     errlog += ". (See print.prt for details)";
     throw IException(IException::Unknown, errlog, _FILEINFO_);
   }
+
 
   BundleAdjust::BundleAdjust(const QString &cnetFile,
                              const QString &cubeList,
@@ -79,6 +84,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_maxLikelihoodMedianR2Residuals=0.0;
   }
 
+
   BundleAdjust::BundleAdjust(const QString &cnetFile,
                              const QString &cubeList,
                              const QString &heldList,
@@ -92,7 +98,6 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_strCnetFileName = cnetFile;
     m_strOutputFilePrefix = "";
     m_bDeltack = false;
-
  
     Init(&progress);
 
@@ -106,6 +111,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_cumPro=NULL;    
     m_maxLikelihoodIndex=0;
   }
+
 
   BundleAdjust::BundleAdjust(Isis::ControlNet &cnet,
                              Isis::SerialNumberList &snlist,
@@ -133,6 +139,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_maxLikelihoodIndex=0;
   }
 
+
   BundleAdjust::BundleAdjust(Isis::ControlNet &cnet,
                              Isis::SerialNumberList &snlist,
                              Isis::SerialNumberList &heldsnlist,
@@ -158,6 +165,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_cumPro=NULL;    
     m_maxLikelihoodIndex=0;
   }
+
 
   BundleAdjust::~BundleAdjust() {
     // If we have ownership
@@ -188,50 +196,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     delete m_cumPro;
   }
 
-  bool BundleAdjust::ReadSCSigmas(const QString &scsigmasList) {
-    CSVReader csv;
-    csv.setSkip(20);
 
-    try {
-      csv.read(scsigmasList);
-    }
-    catch (IException &e) {
-      QString msg = "Failed to read spacecraft sigmas file";
-      throw IException(e, IException::Io, msg, _FILEINFO_);
-    }
-
-    int nrows = csv.rows();
-    m_SCWeights.resize(nrows);
-
-    for (int i = 0; i < nrows; i++) {
-      CSVReader::CSVAxis row = csv.getRow(i);
-      int ntokens = row.dim();
-      int nsigmas = ntokens - 2;
-
-      SpacecraftWeights &scs = m_SCWeights[i];
-
-      scs.SpacecraftName = row[0];
-      scs.InstrumentId = row[1];
-      scs.weights.resize(6);
-
-      for (int j = 0; j < nsigmas; j++) {
-        QString str = row[j+2];
-
-        double d = atof(str.toAscii().data());
-        if (d == 0.0)
-          continue;
-
-        if (j < 3)
-          scs.weights[j] = 1.0e+6 / (d * d); // position - input units are m and converted to km, km/s, km/s/s
-        else
-          scs.weights[j] = 1.0 / (DEG2RAD * DEG2RAD * d * d); // angles - input units are decimal degrees, converted to rads, rads/s, rads/s/s
-      }
-    }
-
-    return true;
-  }
-
-/**
+  /**
    * Initialize solution parameters
    *
    * @internal
@@ -289,6 +255,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // Set default variables to solve for
     m_bSolveTwist = true;
     m_bSolveRadii = false;
+    m_bUpdateCubes = false;
     m_bErrorPropagation = false;
     m_bMaxIterationsReached = false;
     m_cmatrixSolveType = AnglesOnly;
@@ -379,6 +346,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       validateNetwork();
   }
 
+
   /**
    * control network validation - on the very real chance that the net
    * has not been checked before running the bundle
@@ -440,6 +408,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       return true;
   }
 
+
   /**
    * Initializations for Cholmod sparse matrix package
    */
@@ -453,6 +422,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     return true;
   }
+
 
   /**
    * This method fills the point index map and needs to know the solution
@@ -495,6 +465,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
    * This method checks all cube files in the held list to make sure they are in the
    * input list.
@@ -509,11 +480,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
-   * This method determines the number of partials per image and
-   * per point.  It is based on the variables to be solved for
-   * (e.g., twist, radii, cmatrix velocity, cmatrix acceleration,
-   * degree of camera position polynomial, etc)
+   * This method determines the number of partials per image and per point.  It is based on the
+   * variables to be solved for (e.g., twist, radii, cmatrix velocity, cmatrix acceleration, degree
+   * of camera position polynomial, etc).
    */
   void BundleAdjust::ComputeNumberPartials() {
     m_nNumImagePartials = 0;
@@ -563,9 +534,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
-   * Weighting for image parameter
-   * ComputeNumberPartials must be called first
+   * Weighting for image parameter ComputeNumberPartials must be called first.
    */
   void BundleAdjust::ComputeImageParameterWeights() {
     // size and initialize to 0.0
@@ -635,10 +606,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
-   * This method turns on observation mode and creates the observation number list.
-   * It also checks to make sure the held image list is consistent for all images in
-   * an observation.
+   * This method turns on observation mode and creates the observation number list. It also checks
+   * to make sure the held image list is consistent for all images in an observation.
    *
    * Is this still going to be necessary.  Is the code that uses it still intact?
    */
@@ -671,14 +642,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
    * Set decomposition method. Choices are...
-   * SpecialK (dense normal equations matrix)
-   * Sparse (Cholmod sparse normal equations matrix)
+   *   SpecialK (dense normal equations matrix)
+   *   Sparse (Cholmod sparse normal equations matrix)
    */
   void BundleAdjust::SetDecompositionMethod(DecompositionMethod method) {
     m_decompositionMethod = method;
   }
+
 
   /**
    * For which camera angle coefficients do we solve?
@@ -717,6 +690,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
    * For which camera position coefficients do we solve?
    */
@@ -754,10 +728,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
-   * Determine the number of columns we will need for the least
-   * squares. When we create a row of data we will store all the
-   * image partials first and then the point partials
+   * Determine number of columns needed for least squares. When we create a row of data we store all
+   * image partials first and then the point partials.
    *
    */
   int BundleAdjust::BasisColumns() {
@@ -773,8 +747,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return m_nImageParameters + nPointParameterColumns;
   }
 
+
   /**
-   * Initializes matrices and parameters for bundle adjustment
+   * Initializes matrices and parameters for bundle adjustment.
    */
   void BundleAdjust::Initialize() {
 
@@ -890,15 +865,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
-   * The solve method is an least squares solution for updating the camera
-   * pointing.  It is iterative as the equations are non-linear.  If it does
-   * not iterate to a solution in maxIterations it will throw an error.  During
-   * each iteration it is updating portions of the control net, as well as the
-   * instrument pointing in the camera
-   .  An error is thrown if it does not
-   * converge in the maximum iterations.  However, even if an error is thrown
-   * the control network will contain the errors at each control measure.
+   * The solve method is a least squares solution for updating the camera pointing, etc. It is
+   * iterative as the equations are non-linear. If it doesn't iterate to a solution in maxIterations
+   * it will throw an error. During each iteration it is updating portions of the control net, as
+   * well as the instrument pointing in the camera. An error is thrown if it does not converge
+   * within the maximum iterations. However, even if an error is thrown the control network will
+   * contain the errors (residuals) for each control measure.
    *
    * @param tol             Maximum pixel error for any control network
    *                        measurement
@@ -1112,7 +1086,6 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       printf("Observations: %d\nConstrained Parameters:%d\nUnknowns: %d\nDegrees of Freedom: %d\n",
              m_nObservations, m_nConstrainedPointParameters, m_nUnknownParameters, m_nDegreesOfFreedom);
 
-
       // check for convergence
       if ( !m_bDeltack ) {
         if (fabs(dSigma0_previous - m_dSigma0) <= m_dConvergenceThreshold) {
@@ -1183,9 +1156,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     if ( m_bConverged && m_bErrorPropagation ) {
       clock_t terror1 = clock();
-      printf("\nStarting Error Propagation\n");
+      printf("\nStarting Error Propagation");
       errorPropagation();
-      printf("\nError Propagation Complete\n");
+      printf("\n\nError Propagation Complete\n");
       clock_t terror2 = clock();
       m_dElapsedTimeErrorProp = ((terror2 - terror1) / (double)CLOCKS_PER_SEC);
     }
@@ -1210,6 +1183,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+
   /**
    * Forming the least-squares normal equations matrix.
    */
@@ -1222,8 +1196,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return false;
   }
 
+
   /**
-   * solve normal equations system.
+   * Solve normal equations system.
    */
   bool BundleAdjust::solveSystem() {
     if ( m_decompositionMethod == CHOLMOD )
@@ -1233,6 +1208,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     return false;
   }
+
 
   /**
    * Forming the least-squares normal equations matrix via cholmod.
@@ -1380,6 +1356,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return bStatus;
 }
 
+
+  /**
+   * Forming first set of auxiliary matrices for normal equations matrix via cholmod.
+   */
   bool BundleAdjust::formNormals1_CHOLMOD(symmetric_matrix<double, upper>&N22,
       SparseBlockColumnMatrix& N12, compressed_vector<double>& n1,
       vector<double>& n2, matrix<double>& coeff_image,
@@ -1456,6 +1436,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Forming second set of auxiliary matrices for normal equations matrix via cholmod.
+   */
   bool BundleAdjust::formNormals2_CHOLMOD(symmetric_matrix<double, upper>&N22,
       SparseBlockColumnMatrix& N12, vector<double>& n2, vector<double>& nj,
       int nPointIndex, int i) {
@@ -1553,10 +1537,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
   /**
-   * apply weighting for spacecraft position, velocity, acceleration and camera
-   * angles, angular velocities, angular accelerations
-   * if so stipulated (legalese)
+   * Apply weighting for spacecraft position, velocity, acceleration and camera angles, angular
+   * velocities, angular accelerations if so stipulated (legalese).
    */
   bool BundleAdjust::formNormals3_CHOLMOD(compressed_vector<double>& n1,
                                   vector<double>& nj) {
@@ -1588,6 +1572,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     return true;
   }
+
 
   /**
    * Forming the least-squares normal equations matrix via specialk.
@@ -1726,6 +1711,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return bStatus;
   }
 
+
+  /**
+   * Forming first set of auxiliary matrices for normal equations matrix via specialk.
+   */
   bool BundleAdjust::formNormals1_SPECIALK(symmetric_matrix<double, upper>&N22,
       matrix<double>& N12, compressed_vector<double>& n1, vector<double>& n2,
       matrix<double>& coeff_image, matrix<double>& coeff_point3D,
@@ -1795,6 +1784,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Forming second set of auxiliary matrices for normal equations matrix via specialk.
+   */
   bool BundleAdjust::formNormals2_SPECIALK(symmetric_matrix<double, upper>&N22,
       matrix<double>& N12, vector<double>& n2, vector<double>& nj,
       int nPointIndex, int i) {
@@ -1889,10 +1882,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       return true;
     }
 
+
   /**
-   * apply weighting for spacecraft position, velocity, acceleration and camera
-   * angles, angular velocities, angular accelerations
-   * if so stipulated (legalese)
+   * apply weighting for spacecraft position, velocity, acceleration and camera angles, angular
+   * velocities, angular accelerations if so stipulated (legalese).
    */
   bool BundleAdjust::formNormals3_SPECIALK(compressed_vector<double>& n1,
       vector<double>& nj) {
@@ -1923,6 +1916,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
 
+  /**
+   * Initialize point coordinaate weights.
+   */
   bool BundleAdjust::InitializePointWeights() {
     // TODO:  Get working as is then convert to use new classes (Angles, etc.) and xyz with radius constraints
 //  Distance dAprioriXSigma;
@@ -2036,7 +2032,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
-// This method will definitely need to be revisited
+
+  /**
+   * Initializing points.
+   *
+   * This method will definitely need to be revisited.
+   */
   void BundleAdjust::InitializePoints() {
     int n3DPoints = m_pCnet->GetNumPoints();
 
@@ -2052,6 +2053,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
   }
 
+
+  /**
+   * Dedicated matrix multiplication method.
+   *
+   * TODO: Define.
+   */
   void BundleAdjust::product_AV(double alpha, bounded_vector<double,3>& v2,
       SparseBlockRowMatrix& Q, vector< double >& v1) {
 
@@ -2068,11 +2075,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
-  // C = A x B(transpose) where
-  //    A is a boost matrix
-  //    B is a SparseBlockColumn matrix
-  //    C is a SparseBlockRowMatrix
-  //    each block of B and C are boost matrices
+
+  /**
+   * C = A x B(transpose) where
+   *     A is a boost matrix
+   *     B is a SparseBlockColumn matrix
+   *     C is a SparseBlockRowMatrix
+   *     each block of B and C are boost matrices
+   */
   bool BundleAdjust::product_ATransB(symmetric_matrix <double,upper>& N22,
       SparseBlockColumnMatrix& N12, SparseBlockRowMatrix& Q) {
 
@@ -2092,7 +2102,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
-  // NOTE: A = N12, B = Q
+
+  /**
+   * Dedicated matrix multiplication method.
+   *
+   * TODO: Define.
+   *
+   * NOTE: A = N12, B = Q
+   */
   void BundleAdjust::AmultAdd_CNZRows_CHOLMOD(double alpha,
       SparseBlockColumnMatrix& N12, SparseBlockRowMatrix& Q) {
 
@@ -2128,6 +2145,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
 
+  /**
+   * Dedicated matrix multiplication method.
+   *
+   * TODO: Define.
+   *
+   */
   void BundleAdjust::AmultAdd_CNZRows_SPECIALK(double alpha, matrix<double>& A, compressed_matrix<double>& B,
                                       symmetric_matrix<double, upper, column_major>& C)
   {
@@ -2168,6 +2191,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
+  /**
+   * Dedicated matrix multiplication method.
+   *
+   * TODO: Define.
+   */
   void BundleAdjust::transA_NZ_multAdd_CHOLMOD(double alpha,
       SparseBlockRowMatrix& Q, vector<double>& n2, vector<double>& m_nj) {
 
@@ -2191,6 +2220,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
+  /**
+   * Dedicated matrix multiplication method.
+   *
+   * TODO: Define.
+   */
   void BundleAdjust::transA_NZ_multAdd_SPECIALK(double alpha, compressed_matrix<double>& A,
   vector<double>& B, vector<double>& C) {
 
@@ -2227,7 +2262,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
-  // new
+
+  /**
+   * Dedicated matrix multiplication method.
+   *
+   * TODO: Define.
+   */
   void BundleAdjust::AmulttransBNZ(matrix<double>& A,
       compressed_matrix<double>& B, matrix<double> &C, double alpha) {
 
@@ -2272,7 +2312,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
   }
 
-  // new
+
+  /**
+   * Dedicated matrix multiplication method.
+   *
+   * TODO: Define.
+   */
   void BundleAdjust::ANZmultAdd(compressed_matrix<double>& A,
       symmetric_matrix<double, upper, column_major>& B,
       matrix<double>& C, double alpha) {
@@ -2316,6 +2361,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
   }
 
+
+  /**
+   * Solution with CHOLMOD.
+   *
+   */
   bool BundleAdjust::solveSystem_CHOLMOD() {
 
     // load cholmod triplet
@@ -2399,6 +2449,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Load sparse normal equations matrix into CHOLMOD triplet.
+   *
+   */
   bool BundleAdjust::loadCholmodTriplet() {
     //printf("Starting CholMod conversion to triplet\n");
     double d;
@@ -2497,6 +2552,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Solution with specialk (dense).
+   *
+   */
   bool BundleAdjust::solveSystem_SPECIALK() {
     // decomposition (this is UTDU - need to test row vs column major
     // storage and access, and use of matrix iterators)
@@ -2525,6 +2585,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Upper triangular, square-root free cholesky.
+   *
+   */
   bool BundleAdjust::CholeskyUT_NOSQR() {
     int i, j, k;
     double sum, divisor;
@@ -2607,11 +2672,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
-  bool BundleAdjust::CholeskyUT_NOSQR_BackSub(symmetric_matrix<double, upper, column_major>& m, vector<double>& s,
-      vector<double>& rhs)
-//  bool BundleAdjust::CholeskyUT_NOSQR_BackSub(symmetric_matrix<double,lower>& m, vector<double>& s,
-//                                              vector<double>& rhs)
-  {
+
+  /**
+   * Backsubstitution for above square-root free cholesky method.
+   *
+   */
+  bool BundleAdjust::CholeskyUT_NOSQR_BackSub(symmetric_matrix<double, upper, column_major>& m,
+                                              vector<double>& s, vector<double>& rhs) {
     int i, j;
     double sum;
     double d1, d2;
@@ -2643,6 +2710,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Compute inverse of normal equations matrix for above square-root free cholesky method.
+   *
+   */
   bool BundleAdjust::CholeskyUT_NOSQR_Inverse() {
     int i, j, k;
     double div, sum;
@@ -2697,6 +2769,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Computate inverse of normal equations matrix for CHOLMOD.
+   *
+   */
   bool BundleAdjust::cholmod_Inverse() {
     int i, j;
 
@@ -2727,11 +2804,21 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       cholmod_free_dense(&x,&m_cm);
     }
 
+    //
+    //std::cout << m_Normals;
+    //
+
     cholmod_free_dense(&b,&m_cm);
 
     return true;
   }
 
+
+  /**
+   * Dedicated quick inverse of 3x3 matrix
+   *
+   * TODO: belongs in matrix class or wrapper.
+   */
   bool BundleAdjust::Invert_3x3(symmetric_matrix<double, upper>& m) {
     double det;
     double den;
@@ -2757,6 +2844,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     return true;
   }
+
 
   /**
    * compute partials for measure
@@ -3272,15 +3360,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
   */
 
+
   /**
-  * The solve method is an least squares solution for updating the camera
-  * pointing.  It is iterative as the equations are non-linear.  If it does
-  * not iterate to a solution in maxIterations it will throw an error.  During
-  * each iteration it is updating portions of the control net, as well as the
-  * instrument pointing in the camera
-  .  An error is thrown if it does not
-  * converge in the maximum iterations.  However, even if an error is thrown
-  * the control network will contain the errors at each control measure.
+  * The solve method is an least squares solution for updating the camera pointing, etc. It is
+  * iterative as the equations are non-linear. During each iteration it is updating portions of the
+  * control net, as well as the instrument pointing/position in the camera. If it doesn't converge
+  * to a solution in maxIterations it will throw an error. However, even if an error is thrown
+  * the control network will contain the errors (residuals) at each control measure.
   *
   * @param tol             Maximum pixel error for any control network
   *                        measurement
@@ -3559,10 +3645,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+
   /**
-   * Retrieve parameter correction vector for old sparse least-squares object
-   * and parse into m_Image_Corrections and m_Point_Corrections vectors so we
-   * can use the same output as SpecialK and Cholmod Sparse solutions
+   * Retrieve parameter correction vector for old sparse least-squares object and parse into
+   * m_Image_Corrections and m_Point_Corrections vectors so we can use the same output as SpecialK
+   * and Cholmod Sparse solutions.
    */
   void BundleAdjust::GetSparseParameterCorrections() {
 
@@ -3600,9 +3687,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
   }
 
+
   /**
-   * Populate the least squares matrix with measures for a point
-   * specific to frame cameras (for now)
+   * Populate least squares matrix with measures for a point (specific to frame cameras for now).
    */
   void BundleAdjust::AddPartials(int nPointIndex) {
     const ControlPoint *point = m_pCnet->GetPoint(nPointIndex);
@@ -3656,7 +3743,6 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       const ControlMeasure *measure = point->GetMeasure(i);
       if (measure->IsIgnored())
         continue;
-
 
       // zero partial derivative vectors
       memset(px, 0, m_nBasisColumns * sizeof(double));
@@ -3777,11 +3863,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
 
-
-
   /**
-   * Populate the least squares matrix with measures for a point
-   * specific to frame cameras (for now)
+   * Populate least squares matrix with measures for a point (specific to frame cameras for now).
    */
   /*
   void BundleAdjust::AddPartials(int nPointIndex) {
@@ -4148,7 +4231,6 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 */
 
 
-
   /**
    * Triangulates all points (including control points).
    *
@@ -4190,6 +4272,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     return nSuccessfullyTriangulated;
   }
+
 
   /**
    * Triangulates an individual point.
@@ -4450,6 +4533,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
   /**
    * apply parameter corrections
    */
@@ -4460,8 +4544,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       return applyParameterCorrections_SPECIALK();
   }
 
+
   /**
-   * apply parameter corrections
+   * apply parameter corrections for CHOLMOD solution.
    */
   void BundleAdjust::applyParameterCorrections_CHOLMOD() {
 //    std::cout << "image corrections: " << m_Image_Corrections << std::endl;
@@ -4652,8 +4737,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     } // end loop over point corrections
   }
 
+
   /**
-   * apply parameter corrections
+   * Apply parameter corrections for specialk solution.
    */
   void BundleAdjust::applyParameterCorrections_SPECIALK() {
 //    std::cout << "image corrections: " << m_Image_Corrections << std::endl;
@@ -4843,6 +4929,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     } // end loop over point corrections
   }
 
+
   /**
    * This method computes the focal plane residuals for the measures.
    *
@@ -4965,6 +5052,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return vtpv;
   }
 
+
+  /**
+   * Bundle wrap up.
+   *
+   */
   bool BundleAdjust::WrapUp() {
     // compute residuals in pixels
 
@@ -4983,6 +5075,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Compute Bundle statistics.
+   *
+   */
   bool BundleAdjust::ComputeBundleStatistics() {
       int nImages = Images();
        int nMeasures;
@@ -5116,6 +5213,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
 
+  /**
+   * Compute rejection limit.
+   *
+   */
   bool BundleAdjust::ComputeRejectionLimit() {
       double vx, vy;
 
@@ -5216,6 +5317,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       return true;
   }
 
+
+  /**
+   * Flag outlier measurements.
+   *
+   */
   bool BundleAdjust::FlagOutliers() {
     double vx, vy;
     int nRejected;
@@ -5343,6 +5449,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return false;
   }
 
+
+  /**
+   * error propagation for specialk solution.
+   */
   bool BundleAdjust::errorPropagation_SPECIALK() {
 
     // create inverse of normal equations matrix
@@ -5365,6 +5475,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if ( point->IsRejected() )
             continue;
+
+        printf("\rProcessing point %d of %d",i+1,nObjectPoints);
 
         T.clear();
         QS.clear();
@@ -5415,15 +5527,21 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+/*
+  //
+  // error propagation for CHOLMOD solution.
+  //
   bool BundleAdjust::errorPropagation_CHOLMOD() {
 
     // free unneeded memory
     cholmod_free_triplet(&m_pTriplet, &m_cm);
     cholmod_free_sparse(&m_N, &m_cm);
-    m_SparseNormals.wipe();
+//  m_SparseNormals.wipe();
 
     // create inverse of normal equations matrix
     if ( !cholmod_Inverse() )
+//    if ( !cholmod_Inverse_binarywrite() )
       return false;
 
     matrix<double> T(3, 3);
@@ -5448,18 +5566,22 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       if ( point->IsRejected() )
         continue;
 
+      printf("\rProcessing point %d of %d   Time: %s",i+1, nObjectPoints, Isis::iTime::CurrentLocalTime().toAscii().data());
+      
       T.clear();
       QS.clear();
 
       // get corresponding Q matrix
       SparseBlockRowMatrix& Qblock = m_Qs_CHOLMOD[nPointIndex];
 
+      qDebug() << Qblock;
+
       // copy into compressed boost matrix
       // TODO_CHOLMOD: don't want to do this
       Qblock.copyToBoost(Q);
 
 //      Qblock.print();
-//      std::cout << "Copy of Q" << Q << std::endl;
+      std::cout << "Copy of Q" << Q << std::endl;
 
       // form QS
       QS = prod(Q, m_Normals);
@@ -5471,7 +5593,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
 //      AmulttransBNZ(QS, Q, T);
 
-//      std::cout << "T" << std::endl << T << std::endl;
+      std::cout << "T" << std::endl << T << std::endl;
 
       // Ask Ken what is happening here...Setting just the sigmas is not very
       // accurate
@@ -5510,15 +5632,253 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     return true;
   }
+*/
+
 
   /**
-   * This method uses the basis function after the matrix has been solved.
-   * The coefficients of the basis function represent the new right ascension,
-   * declination, and twist values of the camera.  Each is a polynomial based on
-   * time.  For example, ra = A + B * (t - t0) + C * (t - t0)^2.  However,
-   * as the function we were solving was non-linear we had to take the
-   * dervative to linearize.  Therefore we have the change in ra, dec, and
-   * twist. Really we have the change in A, B, and C.
+   * error propagation for CHOLMOD solution.
+   */
+  bool BundleAdjust::errorPropagation_CHOLMOD() {
+
+    // free unneeded memory
+    cholmod_free_triplet(&m_pTriplet, &m_cm);
+    cholmod_free_sparse(&m_N, &m_cm);
+
+    matrix<double> T(3, 3);
+    double dSigmaLat, dSigmaLong, dSigmaRadius;
+    double t;
+
+    double dSigma02 = m_dSigma0 * m_dSigma0;
+
+    int nObjectPoints = m_pCnet->GetNumPoints();
+
+    std::string strTime = Isis::iTime::CurrentLocalTime().toAscii().data();
+    printf("     Time: %s\n\n", strTime.c_str());
+
+    // create and initialize array of 3x3 matrices for all object points
+    std::vector< symmetric_matrix<double> > point_covs(nObjectPoints,symmetric_matrix<double>(3));
+    for (int d = 0; d < nObjectPoints; d++)
+      point_covs[d].clear();
+
+    // allocate memory for adjusted image parameter sigmas
+    m_Image_AdjustedSigmas.resize(m_SparseNormals.size());
+
+    cholmod_dense *x;        // solution vector
+    cholmod_dense *b;        // right-hand side (column vectors of identity)
+
+    b = cholmod_zeros ( m_nRank, 1, CHOLMOD_REAL, &m_cm );
+    double* pb = (double*)b->x;
+
+    double* px = NULL;
+
+    SparseBlockColumnMatrix sbcMatrix;
+
+    int i, j, k;
+    int nCurrentColumn = 0;
+    int ncolsCurrentBlockColumn = 0;
+
+    int nBlockColumns = m_SparseNormals.size();
+    for (i = 0; i < nBlockColumns; i++) {
+
+      // columns in this column block
+      SparseBlockColumnMatrix* normalsColumn = m_SparseNormals.at(i);
+      if (i == 0) {
+        ncolsCurrentBlockColumn = normalsColumn->numberOfColumns();
+        int nRows = m_SparseNormals.at(i)->numberOfRows();
+        sbcMatrix.InsertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
+        sbcMatrix.zeroBlocks();
+      }
+      else {
+        if (normalsColumn->numberOfColumns() == ncolsCurrentBlockColumn) {
+          int nRows = m_SparseNormals.at(i)->numberOfRows();
+          sbcMatrix.InsertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
+          sbcMatrix.zeroBlocks();
+        }
+        else {
+          ncolsCurrentBlockColumn = normalsColumn->numberOfColumns();
+
+          // reset sbcMatrix
+          sbcMatrix.wipe();
+
+          // insert blocks
+          for (j = 0; j < (i+1); j++) {
+            SparseBlockColumnMatrix* normalsRow = m_SparseNormals.at(j);
+            int nRows = normalsRow->numberOfRows();
+
+            sbcMatrix.InsertMatrixBlock(j, nRows, ncolsCurrentBlockColumn);
+          }
+        }
+      }
+
+      int localCol = 0;
+
+      // solve for inverse for nCols
+      for (j = 0; j < ncolsCurrentBlockColumn; j++) {
+        if ( nCurrentColumn > 0 )
+          pb[nCurrentColumn-1] = 0.0;
+        pb[nCurrentColumn] = 1.0;
+
+        x = cholmod_solve ( CHOLMOD_A, m_L, b, &m_cm );
+        px = (double*)x->x;
+        int rp = 0;
+
+        // store solution in corresponding column of inverse
+        for ( k = 0; k < sbcMatrix.size(); k++ ) {
+          matrix<double>* matrix = sbcMatrix.value(k);
+
+          int sz1 = matrix->size1();
+
+          for (int ii = 0; ii < sz1; ii++) {
+            (*matrix)(ii,localCol) = px[ii + rp];
+          }
+          rp += matrix->size1();
+        }
+
+        nCurrentColumn++;
+        localCol++;
+
+        cholmod_free_dense(&x,&m_cm);
+      }
+
+      // save adjusted image sigmas
+      m_Image_AdjustedSigmas[i].resize(ncolsCurrentBlockColumn);
+      matrix<double>* imageCovMatrix = sbcMatrix.value(i);
+      for( int z = 0; z < ncolsCurrentBlockColumn; z++) {
+          m_Image_AdjustedSigmas[i][z] = (*imageCovMatrix)(z,z);
+      }
+
+      // now loop over all object points to sum contributions into 3x3 point covariance matrix
+      int nPointIndex = 0;
+      for (j = 0; j < nObjectPoints; j++) {
+
+        ControlPoint *point = m_pCnet->GetPoint(j);
+        if ( point->IsIgnored() )
+          continue;
+
+        if ( point->IsRejected() )
+          continue;
+
+        // only update point every 100 points
+        if (j%100 == 0) {
+            printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", i+1,
+                   nBlockColumns,  j+1, nObjectPoints);
+        }
+
+        // get corresponding Q matrix
+        SparseBlockRowMatrix& Q = m_Qs_CHOLMOD[nPointIndex];
+
+        T.clear();
+
+        // get corresponding point covariance matrix
+        symmetric_matrix<double>& cv = point_covs[nPointIndex];
+
+        // get qT - index i is the key into Q for qT
+        matrix<double>* qT = Q.value(i);
+        if (!qT) {
+          nPointIndex++;
+          continue;
+        }
+
+        // iterate over Q
+        // q is current map value
+        QMapIterator<int, matrix<double>*> it(Q);
+         while ( it.hasNext() ) {
+           it.next();
+
+           int nKey = it.key();
+
+           if (it.key() > i)
+             break;
+
+           matrix<double>* q = it.value();
+
+           if ( !q ) // should never be NULL
+             continue;
+
+           matrix<double>* nI = sbcMatrix.value(it.key());
+
+           if ( !nI ) // should never be NULL
+             continue;
+
+           T = prod(*nI, trans(*qT));
+           T = prod(*q,T);
+
+           if (nKey != i)
+             T += trans(T);
+
+           cv += T;
+         }
+
+        nPointIndex++;
+      }
+    }
+
+    // can free sparse normals now
+    m_SparseNormals.wipe();
+
+    printf("\n\n");
+    strTime = Isis::iTime::CurrentLocalTime().toAscii().data();
+    printf("\rFilling point covariance matrices: Time %s", strTime.c_str());
+    printf("\n\n");
+
+    // now loop over points again and set final covariance stuff
+    int nPointIndex = 0;
+    for (j = 0; j < nObjectPoints; j++) {
+
+      ControlPoint *point = m_pCnet->GetPoint(j);
+      if ( point->IsIgnored() )
+        continue;
+
+      if ( point->IsRejected() )
+        continue;
+
+      if (j%100 == 0) {
+        printf("\rError Propagation: Filling point covariance matrices %8d of %8d",j+1,
+               nObjectPoints);
+      }
+
+      // get corresponding point covariance matrix
+      symmetric_matrix<double>& cv = point_covs[nPointIndex];
+
+      // Ask Ken what is happening here...Setting just the sigmas is not very accurate
+      // Shouldn't we be updating and setting the matrix???  TODO
+      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+
+      dSigmaLat = SurfacePoint.GetLatSigma().radians();
+      dSigmaLong = SurfacePoint.GetLonSigma().radians();
+      dSigmaRadius = SurfacePoint.GetLocalRadiusSigma().meters();
+
+      t = dSigmaLat*dSigmaLat + cv(0, 0);
+      Distance tLatSig(sqrt(dSigma02 * t) * m_dRTM, Distance::Meters);
+
+      t = dSigmaLong*dSigmaLong + cv(1, 1);
+      t = sqrt(dSigma02 * t) * m_dRTM;
+      Distance tLonSig(
+          t * cos(point->GetAdjustedSurfacePoint().GetLatitude().radians()),
+          Distance::Meters);
+
+      t = dSigmaRadius*dSigmaRadius + cv(2, 2);
+      t = sqrt(dSigma02 * t) * 1000.0;
+
+      SurfacePoint.SetSphericalSigmasDistance(tLatSig, tLonSig,
+                                              Distance(t, Distance::Meters));
+
+      point->SetAdjustedSurfacePoint(SurfacePoint);
+
+      nPointIndex++;
+    }
+
+    return true;
+  }
+
+
+  /**
+   * This method uses the basis function after the matrix has been solved. The coefficients of the
+   * basis function represent the new right ascension, declination, and twist values of the camera.
+   * Each is a polynomial based on time. For example, ra = A + B * (t - t0) + C * (t - t0)^2.
+   * However, as the function we were solving was non-linear we had to take the derivative to
+   * linearize. Therefore we have the change in ra, dec, and twist. Really we have the change in A,
+   * B, and C.
    */
   void BundleAdjust::Update(BasisFunction &basis) {
     // Update selected spice for each image
@@ -5655,7 +6015,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
-  //! Return index to basis function for ith point
+
+  /**
+   * Return index to basis function for ith point.
+   *
+   */
   int BundleAdjust::PointIndex(int i) const {
     int nIndex;
 
@@ -5669,16 +6033,23 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return nIndex;
   }
 
-  //! Return index to basis function for ith image
-  int BundleAdjust::ImageIndex (int i) const
-  {
+
+  /**
+   * Return index to basis function for image with index i.
+   *
+   */
+  int BundleAdjust::ImageIndex (int i) const {
     if ( !m_bObservationMode )
       return m_nImageIndexMap[i] * m_nNumImagePartials;
     else
       return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
   }
 
-  //! Return the ith filename in the cube list file given to constructor
+
+  /**
+   * Return the ith filename in the cube list file given to constructor.
+   *
+   */
   QString BundleAdjust::FileName(int i) {
 //    QString serialNumber = (*m_pSnList)[i];
 //    return m_pSnList->FileName(serialNumber);
@@ -5686,7 +6057,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
 
-  //! Return whether the ith file in the cube list is held
+  /**
+   * Return whether the ith file in the cube list is held.
+   *
+   */
   bool BundleAdjust::IsHeld(int i) {
     if ( m_nHeldImages > 0 )
          if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))))
@@ -5694,8 +6068,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return false;
   }
 
-  //! Return a table cmatrix for the ith cube in the cube list given to the
-  //! constructor
+
+  /**
+   * Return a table cmatrix for the ith cube in the cube list given to the constructor.
+   *
+   */
   Table BundleAdjust::Cmatrix(int i) {
     return m_pCnet->Camera(i)->instrumentRotation()->Cache("InstrumentPointing");
   }
@@ -5706,7 +6083,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return m_pCnet->Camera(i)->instrumentPosition()->Cache("InstrumentPosition");
   }
 
-  //! Return the number of observations in list given to the constructor
+
+  /**
+   * Return the number of observations in list given to the constructor.
+   *
+   */
   int BundleAdjust::Observations() const {
     if (!m_bObservationMode)
       return m_pSnList->Size();
@@ -5714,6 +6095,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     else
       return m_pObsNumList->ObservationSize();
   }
+
 
 //std::vector<double> BundleAdjust::PointPartial(Isis::ControlPoint &point, PartialDerivative wrt)
 //{
@@ -5749,22 +6131,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //  return v;
 //}
 //
+
+
   /**
     * This method creates a iteration summary and creates an iteration group for
     * the Sparse BundleAdjust summary.
     *
     * @param it              Iteration number
-    *
     * @param it_time         Iteration time
-    *
     * @param avErr           Average error or iteration (pixels)
-    *
     * @param sigmaXY         Standard deviation of coordinates (mm)
-    *
     * @param sigmaHat        Aposteriori standard deviation of unit weight (mm)
-    *
     * @param sigmaX          Standard deviation of deltax (mm)
-    *
     * @param sigmaY          Standard deviation of deltay (mm)
     *
     */
@@ -5793,9 +6171,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if (m_bPrintSummary) Application::Log(gp);
   }
 
-  /* This method creates a iteration summary and creates an iteration group for
-  * the SpecialK BundleAdjust summary.
-  */
+
+  /**
+   * This method creates a iteration summary and creates an iteration group for the SpecialK
+   * solution summary.
+   */
   void BundleAdjust::SpecialKIterationSummary() {
     QString itlog;
     if ( m_bConverged )
@@ -5831,11 +6211,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if (m_bPrintSummary) Application::Log(gp);
   }
 
+
   /**
    * set parameter weighting for old SPARSE solution
    *
-   * @history 2011-04-19 Debbie A. Cook - Added initialization to m_Point_AprioriSigmas
-   *                      for old sparse method case
+   * @history 2011-04-19 Debbie A. Cook - Added initialization to m_Point_AprioriSigmas for old
+   *                                      sparse method case.
    */
   bool BundleAdjust::SetParameterWeights() {
 
@@ -5959,6 +6340,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
+  /**
+   * Set parameter sigmas (uncertainties) after bundle.
+   *
+   */
   void BundleAdjust::SetPostBundleSigmas() {
     double dSigmaLat;
     double dSigmaLong;
@@ -5998,349 +6384,852 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
   }
 
+
   /**
-   * output bundle results to file
+   * Output bundle results to file.
    */
   bool BundleAdjust::Output() {
+    if (m_bOutputStandard) {
+      if (m_bConverged && m_bErrorPropagation)
+        OutputWithErrorPropagation();
+      else
+        OutputNoErrorPropagation();
+    }
 
-      if ( m_bOutputStandard ) {
-          if( m_bConverged && m_bErrorPropagation )
-              OutputWithErrorPropagation();
-          else
-              OutputNoErrorPropagation();
-      }
+    if (m_bOutputCSV) {
+      OutputPointsCSV();
+      OutputImagesCSV();
+    }
 
-      if ( m_bOutputCSV ) {
-          OutputPointsCSV();
-          OutputImagesCSV();
-      }
-
-      if ( m_bOutputResiduals )
-          OutputResiduals();
+    if (m_bOutputResiduals)
+      OutputResiduals();
 
     return true;
   }
 
+
+  /**
+   * Output header for bundle results file.
+   *
+   */
   bool BundleAdjust::OutputHeader(std::ofstream& fp_out) {
+    if (!fp_out)
+      return false;
 
-      if (!fp_out)
-          return false;
+    char buf[1056];
+    int nImages = Images();
+    int nValidPoints = m_pCnet->GetNumValidPoints();
+    int nInnerConstraints = 0;
+    int nDistanceConstraints = 0;
+    int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
+    int nConvergenceCriteria = 1;
 
-      char buf[1056];
-      int nImages = Images();
-      int nValidPoints = m_pCnet->GetNumValidPoints();
-      int nInnerConstraints = 0;
-      int nDistanceConstraints = 0;
-      int nDegreesOfFreedom = m_nObservations + m_nConstrainedPointParameters + m_nConstrainedImageParameters - m_nUnknownParameters;
-      int nConvergenceCriteria = 1;
+    if (!m_bDeltack)
+      sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
+    else
+      sprintf(buf, "JIGSAW (DELTACK or QTIE): BUNDLE ADJUSTMENT\n=========================\n");
 
-      if (!m_bDeltack)
-        sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
-      else
-        sprintf(buf, "JIGSAW (DELTACK or QTIE): BUNDLE ADJUSTMENT\n=========================\n");
-
-      fp_out << buf;
-      sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().toAscii().data());
-      fp_out << buf;
-      sprintf(buf,"\n               Network Filename: %s", m_strCnetFileName.toAscii().data());
-      fp_out << buf;
-      sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().toAscii().data());
-      fp_out << buf;
-      sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().toAscii().data());
-      fp_out << buf;
-      sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().toAscii().data());
-      fp_out << buf;
-      sprintf(buf,"\n\n                   Linear Units: kilometers");
-      fp_out << buf;
-      sprintf(buf,"\n                  Angular Units: decimal degrees");
-      fp_out << buf;
-      sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
-      fp_out << buf;
-      m_bObservationMode ? sprintf(buf, "\n                   OBSERVATIONS: ON"):
-              sprintf(buf, "\n                   OBSERVATIONS: OFF");
-      fp_out << buf;
-      m_bSolveRadii ? sprintf(buf, "\n                         RADIUS: ON"):
-              sprintf(buf, "\n                         RADIUS: OFF");
-      fp_out << buf;
-      sprintf(buf,"\n                  SOLUTION TYPE: %s", m_strSolutionMethod.toAscii().data());
-      fp_out << buf;
-      m_bErrorPropagation ? sprintf(buf, "\n              ERROR PROPAGATION: ON"):
-              sprintf(buf, "\n              ERROR PROPAGATION: OFF");
-      fp_out << buf;
-      m_bOutlierRejection ? sprintf(buf, "\n              OUTLIER REJECTION: ON"):
-              sprintf(buf, "\n              OUTLIER REJECTION: OFF");
-      fp_out << buf;
-      sprintf(buf,"\n           REJECTION MULTIPLIER: %lf",m_dRejectionMultiplier);
-      fp_out << buf;
-      sprintf(buf, "\n\nMAXIMUM LIKELIHOOD ESTIMATION\n============================\n");
-      fp_out << buf;
-      for (int tier=0;tier<3;tier++) {
-        if (m_maxLikelihoodFlag[tier]) {
-          sprintf(buf, "\n                         Tier %d Enabled: TRUE",tier);
-          fp_out << buf;
-          sprintf(buf,"\n               Maximum Likelihood Model: ");
-          fp_out << buf;
-          m_wFunc[tier]->maximumLikelihoodModel(buf);
-          fp_out << buf;
-          sprintf(buf, "\n    Quantile used for tweaking constant: %lf",m_maxLikelihoodQuan[tier]);
-          fp_out << buf;
-          sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",m_wFunc[tier]->tweakingConstant());
-          fp_out << buf;
-          sprintf(buf, "\n       Approx. weighted Residual cutoff: ");
-          fp_out << buf;
-          m_wFunc[tier]->weightedResidualCutoff(buf);
-          fp_out << buf;
-          if (tier != 2) fp_out << "\n";
-        }
-        else {
-          sprintf(buf, "\n                         Tier %d Enabled: FALSE",tier);
-          fp_out << buf;
-        }
+    fp_out << buf;
+    sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().toAscii().data());
+    fp_out << buf;
+    sprintf(buf,"\n               Network Filename: %s", m_strCnetFileName.toAscii().data());
+    fp_out << buf;
+    sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().toAscii().data());
+    fp_out << buf;
+    sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().toAscii().data());
+    fp_out << buf;
+    sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().toAscii().data());
+    fp_out << buf;
+    sprintf(buf,"\n\n                   Linear Units: kilometers");
+    fp_out << buf;
+    sprintf(buf,"\n                  Angular Units: decimal degrees");
+    fp_out << buf;
+    sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
+    fp_out << buf;
+    m_bObservationMode ? sprintf(buf, "\n                   OBSERVATIONS: ON"):
+        sprintf(buf, "\n                   OBSERVATIONS: OFF");
+    fp_out << buf;
+    m_bSolveRadii ? sprintf(buf, "\n                         RADIUS: ON"):
+        sprintf(buf, "\n                         RADIUS: OFF");
+    fp_out << buf;
+    m_bUpdateCubes ? sprintf(buf, "\n                         UPDATE: YES"):
+        sprintf(buf, "\n                         UPDATE: NO");
+    fp_out << buf;
+    sprintf(buf,"\n                  SOLUTION TYPE: %s", m_strSolutionMethod.toAscii().data());
+    fp_out << buf;
+    m_bErrorPropagation ? sprintf(buf, "\n              ERROR PROPAGATION: ON"):
+        sprintf(buf, "\n              ERROR PROPAGATION: OFF");
+    fp_out << buf;
+    m_bOutlierRejection ? sprintf(buf, "\n              OUTLIER REJECTION: ON"):
+        sprintf(buf, "\n              OUTLIER REJECTION: OFF");
+    fp_out << buf;
+    sprintf(buf,"\n           REJECTION MULTIPLIER: %lf",m_dRejectionMultiplier);
+    fp_out << buf;
+    sprintf(buf, "\n\nMAXIMUM LIKELIHOOD ESTIMATION\n============================\n");
+    fp_out << buf;
+    for (int tier=0;tier<3;tier++) {
+      if (m_maxLikelihoodFlag[tier]) {
+        sprintf(buf, "\n                         Tier %d Enabled: TRUE",tier);
+        fp_out << buf;
+        sprintf(buf,"\n               Maximum Likelihood Model: ");
+        fp_out << buf;
+        m_wFunc[tier]->maximumLikelihoodModel(buf);
+        fp_out << buf;
+        sprintf(buf, "\n    Quantile used for tweaking constant: %lf",m_maxLikelihoodQuan[tier]);
+        fp_out << buf;
+        sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",m_wFunc[tier]->tweakingConstant());
+        fp_out << buf;
+        sprintf(buf, "\n       Approx. weighted Residual cutoff: ");
+        fp_out << buf;
+        m_wFunc[tier]->weightedResidualCutoff(buf);
+        fp_out << buf;
+        if (tier != 2) fp_out << "\n";
       }
-      sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
-      fp_out << buf;
-      sprintf(buf,"\n                         SIGMA0: %e",m_dConvergenceThreshold);
-      fp_out << buf;
-      sprintf(buf,"\n             MAXIMUM ITERATIONS: %d",m_nMaxIterations);
-      fp_out << buf;
-      sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
-      fp_out << buf;
-      switch (m_cmatrixSolveType) {
-        case BundleAdjust::AnglesOnly:
-          sprintf(buf,"\n                       CAMSOLVE: ANGLES");
-          break;
-        case BundleAdjust::AnglesVelocity:
-          sprintf(buf,"\n                       CAMSOLVE: ANGLES, VELOCITIES");
-          break;
-        case BundleAdjust::AnglesVelocityAcceleration:
-          sprintf(buf,"\n                       CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
-          break;
-        case BundleAdjust::CKAll:
-          sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveCKDegree);
-          break;
-      case BundleAdjust::None:
-          sprintf(buf,"\n                       CAMSOLVE: NONE");
-          break;
+      else {
+        sprintf(buf, "\n                         Tier %d Enabled: FALSE",tier);
+        fp_out << buf;
+      }
+    }
+    sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
+    fp_out << buf;
+    sprintf(buf,"\n                         SIGMA0: %e",m_dConvergenceThreshold);
+    fp_out << buf;
+    sprintf(buf,"\n             MAXIMUM ITERATIONS: %d",m_nMaxIterations);
+    fp_out << buf;
+    sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
+    fp_out << buf;
+    switch (m_cmatrixSolveType) {
+      case BundleAdjust::AnglesOnly:
+        sprintf(buf,"\n                          CAMSOLVE: ANGLES");
+        break;
+      case BundleAdjust::AnglesVelocity:
+        sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES");
+        break;
+      case BundleAdjust::AnglesVelocityAcceleration:
+        sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
+        break;
+      case BundleAdjust::CKAll:
+        sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveCKDegree);
+        break;
+    case BundleAdjust::None:
+        sprintf(buf,"\n                          CAMSOLVE: NONE");
+        break;
+    default:
+      break;
+    }
+    fp_out << buf;
+    m_bSolveTwist ? sprintf(buf, "\n                             TWIST: ON"):
+        sprintf(buf, "\n                             TWIST: OFF");
+    fp_out << buf;
+
+    m_bSolvePolyOverPointing ? sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
+        sprintf(buf, "\nPOLYNOMIAL OVER EXISTING POINTING : OFF");
+    fp_out << buf;
+
+    sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
+    fp_out << buf;
+    switch (m_spacecraftPositionSolveType) {
+      case Nothing:
+        sprintf(buf,"\n                        SPSOLVE: NONE");
+        break;
+      case PositionOnly:
+        sprintf(buf,"\n                        SPSOLVE: POSITION");
+        break;
+      case PositionVelocity:
+        sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES");
+        break;
+      case PositionVelocityAcceleration:
+        sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
+        break;
+      case BundleAdjust::SPKAll:
+        sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveSPKDegree);
+        break;
       default:
         break;
-      }
-      fp_out << buf;
-      m_bSolveTwist ? sprintf(buf, "\n                          TWIST: ON"):
-              sprintf(buf, "\n                          TWIST: OFF");
-      fp_out << buf;
-      sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
-      fp_out << buf;
-      switch (m_spacecraftPositionSolveType) {
-        case Nothing:
-          sprintf(buf,"\n                        SPSOLVE: NONE");
-          break;
-        case PositionOnly:
-          sprintf(buf,"\n                        SPSOLVE: POSITION");
-          break;
-        case PositionVelocity:
-          sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES");
-          break;
-        case PositionVelocityAcceleration:
-          sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
-          break;
-        case BundleAdjust::SPKAll:
-          sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveSPKDegree);
-          break;
-        default:
-          break;
-      }
-      fp_out << buf;
+    }
+    fp_out << buf;
 
-      m_bSolvePolyOverHermite ? sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
-                sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
-      fp_out << buf;
+    m_bSolvePolyOverHermite ? sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
+        sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
+    fp_out << buf;
 
-      sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
-      fp_out << buf;
-      (m_dGlobalLatitudeAprioriSigma == -1) ? sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
-              sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)",m_dGlobalLatitudeAprioriSigma);
-      fp_out << buf;
-      (m_dGlobalLongitudeAprioriSigma == -1) ? sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
-              sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)",m_dGlobalLongitudeAprioriSigma);
-      fp_out << buf;
-      (m_dGlobalRadiusAprioriSigma == -1) ? sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
-              sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",m_dGlobalRadiusAprioriSigma);
-      fp_out << buf;
+    sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
+    fp_out << buf;
+    (m_dGlobalLatitudeAprioriSigma == -1) ? sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
+        sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)",m_dGlobalLatitudeAprioriSigma);
+    fp_out << buf;
+    (m_dGlobalLongitudeAprioriSigma == -1) ? sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
+        sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)",m_dGlobalLongitudeAprioriSigma);
+    fp_out << buf;
+    (m_dGlobalRadiusAprioriSigma == -1) ? sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
+        sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",m_dGlobalRadiusAprioriSigma);
+    fp_out << buf;
 
-      if (m_nNumberCamPosCoefSolved < 1 || m_dGlobalSpacecraftPositionAprioriSigma[0] == -1)
-        sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A");
-      else
-        sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma[0]);
-      fp_out << buf;
+    if (m_nNumberCamPosCoefSolved < 1 || m_dGlobalSpacecraftPositionAprioriSigma[0] == -1)
+      sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A");
+    else
+      sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma[0]);
+    fp_out << buf;
 
-      if (m_nNumberCamPosCoefSolved < 2 || m_dGlobalSpacecraftPositionAprioriSigma[1] == -1)
-        sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A");
-      else
-        sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftPositionAprioriSigma[1]);
-      fp_out << buf;
+    if (m_nNumberCamPosCoefSolved < 2 || m_dGlobalSpacecraftPositionAprioriSigma[1] == -1)
+      sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A");
+    else
+      sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftPositionAprioriSigma[1]);
+    fp_out << buf;
 
-      if (m_nNumberCamPosCoefSolved < 3 || m_dGlobalSpacecraftPositionAprioriSigma[2] == -1)
-        sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A");
-      else
-        sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftPositionAprioriSigma[2]);
-      fp_out << buf;
+    if (m_nNumberCamPosCoefSolved < 3 || m_dGlobalSpacecraftPositionAprioriSigma[2] == -1)
+      sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A");
+    else
+      sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftPositionAprioriSigma[2]);
+    fp_out << buf;
 
+    if (m_nNumberCamAngleCoefSolved < 1 || m_dGlobalCameraAnglesAprioriSigma[0] == -1)
+      sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A");
+    else
+      sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",m_dGlobalCameraAnglesAprioriSigma[0]);
+    fp_out << buf;
 
-      if (m_nNumberCamAngleCoefSolved < 1 || m_dGlobalCameraAnglesAprioriSigma[0] == -1)
-        sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A");
-      else
-        sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",m_dGlobalCameraAnglesAprioriSigma[0]);
-      fp_out << buf;
+    if (m_nNumberCamAngleCoefSolved < 2 || m_dGlobalCameraAnglesAprioriSigma[1] == -1)
+      sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A");
+    else
+      sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",m_dGlobalCameraAnglesAprioriSigma[1]);
+    fp_out << buf;
 
-      if (m_nNumberCamAngleCoefSolved < 2 || m_dGlobalCameraAnglesAprioriSigma[1] == -1)
-        sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A");
-      else
-        sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",m_dGlobalCameraAnglesAprioriSigma[1]);
-      fp_out << buf;
+    if (m_nNumberCamAngleCoefSolved < 3 || m_dGlobalCameraAnglesAprioriSigma[2] == -1)
+      sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A");
+    else
+      sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
+    fp_out << buf;
 
-      if (m_nNumberCamAngleCoefSolved < 3 || m_dGlobalCameraAnglesAprioriSigma[2] == -1)
-        sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A");
-      else
-        sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
-      fp_out << buf;
+    sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");
+    fp_out << buf;
+    sprintf(buf,"\n                         Images: %6d",nImages);
+    fp_out << buf;
+    sprintf(buf,"\n                         Points: %6d",nValidPoints);
+    fp_out << buf;
+    sprintf(buf,"\n                 Total Measures: %6d",(m_nObservations+m_nRejectedObservations)/2);
+    fp_out << buf;
+    sprintf(buf,"\n             Total Observations: %6d",m_nObservations+m_nRejectedObservations);
+    fp_out << buf;
+    sprintf(buf,"\n              Good Observations: %6d",m_nObservations);
+    fp_out << buf;
+    sprintf(buf,"\n          Rejected Observations: %6d",m_nRejectedObservations);
+    fp_out << buf;
 
-      sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");
+    if (m_nConstrainedPointParameters > 0) {
+      sprintf(buf, "\n   Constrained Point Parameters: %6d",m_nConstrainedPointParameters);
       fp_out << buf;
-      sprintf(buf,"\n                         Images: %6d",nImages);
+    }
+    if (m_nConstrainedImageParameters > 0) {
+      sprintf(buf, "\n   Constrained Image Parameters: %6d",m_nConstrainedImageParameters);
       fp_out << buf;
-      sprintf(buf,"\n                         Points: %6d",nValidPoints);
+    }
+    sprintf(buf,"\n                       Unknowns: %6d",m_nUnknownParameters);
+    fp_out << buf;
+    if (nInnerConstraints > 0) {
+      sprintf(buf, "\n      Inner Constraints: %6d",nInnerConstraints);
+     fp_out << buf;
+    }
+    if (nDistanceConstraints > 0) {
+      sprintf(buf, "\n   Distance Constraints: %d",nDistanceConstraints);
       fp_out << buf;
-      sprintf(buf,"\n                 Total Measures: %6d",(m_nObservations+m_nRejectedObservations)/2);
-      fp_out << buf;
-      sprintf(buf,"\n             Total Observations: %6d",m_nObservations+m_nRejectedObservations);
-      fp_out << buf;
-      sprintf(buf,"\n              Good Observations: %6d",m_nObservations);
-      fp_out << buf;
-      sprintf(buf,"\n          Rejected Observations: %6d",m_nRejectedObservations);
-      fp_out << buf;
+    }
 
-      if( m_nConstrainedPointParameters > 0 ) {
-          sprintf(buf, "\n   Constrained Point Parameters: %6d",m_nConstrainedPointParameters);
-          fp_out << buf;
-      }
-      if( m_nConstrainedImageParameters > 0 ){
-          sprintf(buf, "\n   Constrained Image Parameters: %6d",m_nConstrainedImageParameters);
-          fp_out << buf;
-      }
-      sprintf(buf,"\n                       Unknowns: %6d",m_nUnknownParameters);
-      fp_out << buf;
-      if( nInnerConstraints > 0) {
-          sprintf(buf, "\n      Inner Constraints: %6d",nInnerConstraints);
-          fp_out << buf;
-      }
-      if( nDistanceConstraints > 0) {
-          sprintf(buf, "\n   Distance Constraints: %d",nDistanceConstraints);
-          fp_out << buf;
-      }
+    sprintf(buf,"\n             Degrees of Freedom: %6d",nDegreesOfFreedom);
+    fp_out << buf;
+    sprintf(buf,"\n           Convergence Criteria: %6.3g",m_dConvergenceThreshold);
+    fp_out << buf;
 
-      sprintf(buf,"\n             Degrees of Freedom: %6d",nDegreesOfFreedom);
+    if (nConvergenceCriteria == 1) {
+      sprintf(buf, "(Sigma0)");
       fp_out << buf;
-      sprintf(buf,"\n           Convergence Criteria: %6.3g",m_dConvergenceThreshold);
-      fp_out << buf;
+    }
 
-      if( nConvergenceCriteria == 1 ) {
-          sprintf(buf, "(Sigma0)");
-          fp_out << buf;
-      }
+    sprintf(buf, "\n                     Iterations: %6d",m_nIteration);
+    fp_out << buf;
 
-      sprintf(buf, "\n                     Iterations: %6d",m_nIteration);
+    if (m_nIteration >= m_nMaxIterations) {
+      sprintf(buf, "(Maximum reached)");
       fp_out << buf;
+    }
 
-      if( m_nIteration >= m_nMaxIterations ) {
-          sprintf(buf, "(Maximum reached)");
-          fp_out << buf;
-      }
-
-    //      sprintf(buf, "\n                         Sigma0: %6.4lf\n",m_dSigma0);
-      sprintf(buf, "\n                         Sigma0: %30.20lf\n",m_dSigma0);
+    sprintf(buf, "\n                         Sigma0: %30.20lf\n",m_dSigma0);
+    fp_out << buf;
+    sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTimeErrorProp);
+    fp_out << buf;
+    sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
+    fp_out << buf;
+    if (m_nObservations+m_nRejectedObservations > 100) {  //if there was enough data to calculate percentiles and box plot data
+      sprintf(buf, "\n           Residual Percentiles:\n");
       fp_out << buf;
-      sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTimeErrorProp);
-      fp_out << buf;
-      sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",m_dElapsedTime);
-      fp_out << buf;
-      if ( m_nObservations+m_nRejectedObservations > 100) {  //if there was enough data to calculate percentiles and box plot data
-        sprintf(buf, "\n           Residual Percentiles:\n");
-        fp_out << buf;
-        try {
-          for ( int bin=1;bin<34;bin++) {
-            //double quan = m_cumProRes->value(double(bin)/100);
-            sprintf(buf, "                 Percentile %3d: %+8.3lf                 Percentile %3d: %+8.3lf                 Percentile %3d: %+8.3lf\n",bin   ,m_cumProRes->value(double(bin   )/100.0),
+      try {
+        for (int bin=1;bin<34;bin++) {
+          //double quan = m_cumProRes->value(double(bin)/100);
+          sprintf(buf, "                 Percentile %3d: %+8.3lf                 Percentile %3d: %+8.3lf                 Percentile %3d: %+8.3lf\n",bin   ,m_cumProRes->value(double(bin   )/100.0),
                                                                                                                                                     bin+33,m_cumProRes->value(double(bin+33)/100.0),  
                                                                                                                                                     bin+66,m_cumProRes->value(double(bin+66)/100.0));
-            fp_out << buf;
-          }
-        }
-        catch (IException &e) {
-          QString msg = "Faiiled to output residual percentiles for bundleout";
-          throw IException(e, IException::Io, msg, _FILEINFO_);
-        }
-        try {
-          sprintf(buf, "\n              Residual Box Plot:");
           fp_out << buf;
-          sprintf(buf, "\n                        minimum: %+8.3lf",m_cumProRes->min()); 
-          fp_out << buf;
-          sprintf(buf, "\n                     Quartile 1: %+8.3lf",m_cumProRes->value(0.25));
-          fp_out << buf;
-          sprintf(buf, "\n                         Median: %+8.3lf",m_cumProRes->value(0.50));
-          fp_out << buf;
-          sprintf(buf, "\n                     Quartile 3: %+8.3lf",m_cumProRes->value(0.75));
-          fp_out << buf;
-          sprintf(buf, "\n                        maximum: %+8.3lf\n",m_cumProRes->max());
-          fp_out << buf;
-        }
-        catch (IException &e) {
-          QString msg = "Faiiled to output residual box plot for bundleout";
-          throw IException(e, IException::Io, msg, _FILEINFO_);
         }
       }
-      
+      catch (IException &e) {
+        QString msg = "Faiiled to output residual percentiles for bundleout";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+      try {
+        sprintf(buf, "\n              Residual Box Plot:");
+        fp_out << buf;
+        sprintf(buf, "\n                        minimum: %+8.3lf",m_cumProRes->min());
+        fp_out << buf;
+        sprintf(buf, "\n                     Quartile 1: %+8.3lf",m_cumProRes->value(0.25));
+        fp_out << buf;
+        sprintf(buf, "\n                         Median: %+8.3lf",m_cumProRes->value(0.50));
+        fp_out << buf;
+        sprintf(buf, "\n                     Quartile 3: %+8.3lf",m_cumProRes->value(0.75));
+        fp_out << buf;
+        sprintf(buf, "\n                        maximum: %+8.3lf\n",m_cumProRes->max());
+        fp_out << buf;
+      }
+      catch (IException &e) {
+        QString msg = "Faiiled to output residual box plot for bundleout";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
 
-     
+    sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
+    fp_out << buf;
 
-      sprintf(buf,"\nIMAGE MEASURES SUMMARY\n==========================\n\n");
+    int nMeasures;
+    int nRejectedMeasures;
+    int nUsed;
+
+    for (int i = 0; i < nImages; i++) {
+      // ImageIndex(i) retrieves index into the normal equations matrix
+      // for Image(i)
+      double rmsSampleResiduals = m_rmsImageSampleResiduals[i].Rms();
+      double rmsLineResiduals = m_rmsImageLineResiduals[i].Rms();
+      double rmsLandSResiduals = m_rmsImageResiduals[i].Rms();
+
+      nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
+      nRejectedMeasures =
+          m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
+
+      nUsed = nMeasures - nRejectedMeasures;
+
+      if (nUsed == nMeasures)
+        sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
+                m_pSnList->FileName(i).toAscii().data(),
+                (nMeasures-nRejectedMeasures), nMeasures,
+                rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+      else
+        sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
+                m_pSnList->FileName(i).toAscii().data(),
+                (nMeasures-nRejectedMeasures), nMeasures,
+                rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+      fp_out << buf;
+    }
+
+    return true;
+  }
+
+
+  /**
+   * output bundle results to file with error propagation
+   */
+  bool BundleAdjust::OutputWithErrorPropagation() {
+
+   QString ofname("bundleout.txt");
+    if( m_strOutputFilePrefix.length() != 0 )
+        ofname = m_strOutputFilePrefix + "_" + ofname;
+
+    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    if (!fp_out)
+      return false;
+
+    char buf[1056];
+    std::vector<double> coefX(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefY(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
+    std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
+    std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
+    std::vector<double> angles;
+    Camera *pCamera = NULL;
+    SpicePosition *pSpicePosition = NULL;
+    SpiceRotation *pSpiceRotation = NULL;
+
+    int nImages = Images();
+    double dSigma=0;
+    int nIndex = 0;
+    bool bSolveSparse = false;
+
+    gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
+
+    if (m_strSolutionMethod == "OLDSPARSE") {
+      lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix from the least-squares object
+      bSolveSparse = true;
+    }
+
+    // data structure to contain adjusted image parameter sigmas for CHOLMOD error propagation only
+    vector<double> vImageAdjustedSigmas;
+
+    OutputHeader(fp_out);
+
+    sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
+    fp_out << buf;
+
+    for (int i = 0; i < nImages; i++) {
+
+      //if ( m_nHeldImages > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+      //    bHeld = true;
+
+      pCamera = m_pCnet->Camera(i);
+      if (!pCamera)
+        continue;
+
+      // ImageIndex(i) retrieves index into the normal equations matrix for Image(i)
+      nIndex = ImageIndex(i);
+
+     if (m_decompositionMethod == CHOLMOD)
+        vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
+
+      pSpicePosition = pCamera->instrumentPosition();
+      if (!pSpicePosition)
+        continue;
+
+      pSpiceRotation = pCamera->instrumentRotation();
+      if (!pSpiceRotation)
+        continue;
+
+      // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
+      // and orientation angles). For others (linescan, radar) we retrieve the polynomial
+      // coefficients from which the Exterior Orientation parameters are derived.
+      if (m_spacecraftPositionSolveType > 0)
+        pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
+      else { // not solving for position
+        std::vector <double> coordinate(3);
+        coordinate = pSpicePosition->GetCenterCoordinate();
+        coefX.push_back(coordinate[0]);
+        coefY.push_back(coordinate[1]);
+        coefZ.push_back(coordinate[2]);
+      }
+
+      if (m_cmatrixSolveType > 0)
+        pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+      //          else { // frame camera
+      else { // This is for m_cmatrixSolveType = None and no polynomial fit has occurred
+        angles = pSpiceRotation->GetCenterAngles();
+        coefRA.push_back(angles.at(0));
+        coefDEC.push_back(angles.at(1));
+        coefTWI.push_back(angles.at(2));
+      }
+
+      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).toAscii().data());
+      fp_out << buf;
+      sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).toAscii().data());
+      fp_out << buf;
+      sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
+              "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
       fp_out << buf;
 
-      int nMeasures;
-      int nRejectedMeasures;
-      int nUsed;
+      int nSigmaIndex = 0;
 
-      for (int i = 0; i < nImages; i++) {
-        // ImageIndex(i) retrieves index into the normal equations matrix
-        // for Image(i)
-        double rmsSampleResiduals = m_rmsImageSampleResiduals[i].Rms();
-        double rmsLineResiduals = m_rmsImageLineResiduals[i].Rms();
-        double rmsLandSResiduals = m_rmsImageResiduals[i].Rms();
+      if (m_nNumberCamPosCoefSolved > 0) {
+        char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+        std::ostringstream ostr;
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (bSolveSparse)
+            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+          else if (m_decompositionMethod == CHOLMOD)
+            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+          else if (m_decompositionMethod == SPECIALK)
+            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          if (i == 0) {
+            sprintf(buf, "  X (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),coefX[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefX[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+          }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),coefX[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefX[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+          nSigmaIndex++;
+        }
+        strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (bSolveSparse)
+            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+          else if (m_decompositionMethod == CHOLMOD)
+            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+          else if (m_decompositionMethod == SPECIALK)
+            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          if (i == 0) {
+            sprintf(buf, "  Y (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),coefY[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefY[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+          }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),coefY[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefY[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+          nSigmaIndex++;
+        }
+        strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if ( i == 0 )
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (bSolveSparse)
+            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+          else if (m_decompositionMethod == CHOLMOD)
+            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+          else if (m_decompositionMethod == SPECIALK)
+            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          if (i == 0) {
+            sprintf(buf, "  Z (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),coefZ[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefZ[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+          }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),coefZ[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefZ[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+          nSigmaIndex++;
+        }
+      }
 
-        nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
-        nRejectedMeasures =
-            m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(
-                                              m_pSnList->SerialNumber(i));
-        nUsed = nMeasures - nRejectedMeasures;
-
-        if (nUsed == nMeasures)
-          sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                  m_pSnList->FileName(i).toAscii().data(),
-                  (nMeasures-nRejectedMeasures), nMeasures,
-                  rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
-        else
-          sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                  m_pSnList->FileName(i).toAscii().data(),
-                  (nMeasures-nRejectedMeasures), nMeasures,
-                  rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+      else {
+        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefX[0], 0.0, coefX[0], 0.0, "N/A");
+        fp_out << buf;
+        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefY[0], 0.0, coefY[0], 0.0, "N/A");
+        fp_out << buf;
+        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefZ[0], 0.0, coefZ[0], 0.0, "N/A");
         fp_out << buf;
       }
 
-      return true;
+      if (m_nNumberCamAngleCoefSolved > 0) {
+        char strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+        std::ostringstream ostr;
+        for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (bSolveSparse)
+            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+          else if (m_decompositionMethod == CHOLMOD)
+            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+          else if (m_decompositionMethod == SPECIALK)
+            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          if (i == 0) {
+            sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                          m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+          }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                          m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+          nSigmaIndex++;
+        }
+        strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+        for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (bSolveSparse)
+            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+          else if (m_decompositionMethod == CHOLMOD)
+            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+          else if (m_decompositionMethod == SPECIALK)
+            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          if (i == 0) {
+            sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+          }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+          nSigmaIndex++;
+        }
+
+        if (!m_bSolveTwist) {
+          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+          fp_out << buf;
+        }
+        else {
+          strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
+          for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+            if (i == 0)
+              ostr << "  " << strcoeff;
+            else if (i == 1)
+              ostr << " " << strcoeff << "t";
+            else
+              ostr << strcoeff << "t" << i;
+            if (bSolveSparse)
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else if (m_decompositionMethod == CHOLMOD)
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+            else if (m_decompositionMethod == SPECIALK)
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            if (i == 0) {
+              sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                            ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                            m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                            m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+            }
+            else {
+              sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                            ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                            m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                            m_dGlobalCameraAnglesAprioriSigma[i], dSigma * RAD2DEG);
+            }
+            fp_out << buf;
+            ostr.str("");
+            strcoeff--;
+            nIndex++;
+            nSigmaIndex++;
+          }
+        }
+      }
+
+      else {
+        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
+        fp_out << buf;
+        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
+        fp_out << buf;
+        sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+        fp_out << buf;
+      }
+    }
+
+    // output point data
+    sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
+    fp_out << buf;
+    sprintf(buf, " RMS Sigma Latitude(m)%20.8lf\n", m_drms_sigmaLat);
+    fp_out << buf;
+    sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
+            m_dminSigmaLatitude,m_idMinSigmaLatitude.toAscii().data());
+    fp_out << buf;
+    sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
+            m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.toAscii().data());
+    fp_out << buf;
+    sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n", m_drms_sigmaLon);
+    fp_out << buf;
+    sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
+            m_dminSigmaLongitude,m_idMinSigmaLongitude.toAscii().data());
+    fp_out << buf;
+    sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
+            m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.toAscii().data());
+    fp_out << buf;
+    if (m_bSolveRadii) {
+      sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n", m_drms_sigmaRad);
+      fp_out << buf;
+      sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
+              m_dminSigmaRadius,m_idMinSigmaRadius.toAscii().data());
+      fp_out << buf;
+      sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
+              m_dmaxSigmaRadius,m_idMaxSigmaRadius.toAscii().data());
+      fp_out << buf;
+    }
+    else {
+      sprintf(buf, "   RMS Sigma Radius(m)                 N/A\n");
+      fp_out << buf;
+      sprintf(buf, "   MIN Sigma Radius(m)                 N/A\n");
+      fp_out << buf;
+      sprintf(buf, "   MAX Sigma Radius(m)                 N/A\n");
+      fp_out << buf;
+    }
+
+    // output point data
+    sprintf(buf, "\n\nPOINTS SUMMARY\n==============\n%103sSigma          Sigma              Sigma\n"
+            "           Label         Status     Rays    RMS        Latitude       Longitude          Radius"
+            "        Latitude       Longitude          Radius\n", "");
+    fp_out << buf;
+
+    int nRays = 0;
+    double dLat, dLon, dRadius;
+    double dSigmaLat, dSigmaLong, dSigmaRadius;
+    double cor_lat_dd, cor_lon_dd, cor_rad_m;
+    double cor_lat_m, cor_lon_m;
+    double dLatInit, dLonInit, dRadiusInit;
+    int nGoodRays;
+    double dResidualRms;
+    QString strStatus;
+    int nPointIndex = 0;
+
+    int nPoints = m_pCnet->GetNumPoints();
+    for (int i = 0; i < nPoints; i++) {
+
+      const ControlPoint *point = m_pCnet->GetPoint(i);
+      if (point->IsIgnored())
+        continue;
+
+      nRays = point->GetNumMeasures();
+      dResidualRms = point->GetResidualRms();
+      dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
+      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
+      nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+
+      if (point->GetType() == ControlPoint::Fixed)
+        strStatus = "FIXED";
+      else if (point->GetType() == ControlPoint::Constrained)
+        strStatus = "CONSTRAINED";
+      else if (point->GetType() == ControlPoint::Free)
+        strStatus = "FREE";
+      else
+        strStatus = "UNKNOWN";
+
+      sprintf(buf, "%16s%15s%5d of %d%6.2lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
+              point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays,
+              dResidualRms, dLat, dLon, dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
+      fp_out << buf;
+      nPointIndex++;
+    }
+
+    // output point data
+    sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
+    fp_out << buf;
+
+    nPointIndex = 0;
+    for (int i = 0; i < nPoints; i++) {
+
+      const ControlPoint *point = m_pCnet->GetPoint(i);
+      if ( point->IsIgnored() )
+        continue;
+
+      nRays = point->GetNumMeasures();
+      dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
+      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
+      nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+
+      // point corrections and initial sigmas
+      bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+      bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
+
+      cor_lat_dd = corrections[0] * Isis::RAD2DEG;
+      cor_lon_dd = corrections[1] * Isis::RAD2DEG;
+      cor_rad_m  = corrections[2] * 1000.0;
+
+      cor_lat_m = corrections[0] * m_dRTM;
+      cor_lon_m = corrections[1] * m_dRTM * cos(dLat*Isis::DEG2RAD);
+
+      dLatInit = dLat - cor_lat_dd;
+      dLonInit = dLon - cor_lon_dd;
+      dRadiusInit = dRadius - (corrections[2] * 1000.0);
+
+      if (point->GetType() == ControlPoint::Fixed)
+        strStatus = "FIXED";
+      else if (point->GetType() == ControlPoint::Constrained)
+        strStatus = "CONSTRAINED";
+      else if (point->GetType() == ControlPoint::Free)
+        strStatus = "FREE";
+      else
+        strStatus = "UNKNOWN";
+
+      sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
+              point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays);
+      fp_out << buf;
+
+      sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
+              "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
+              "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
+      fp_out << buf;
+
+      sprintf(buf, "  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
+              dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], dSigmaLat);
+      fp_out << buf;
+
+      sprintf(buf, " LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
+              dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], dSigmaLong);
+      fp_out << buf;
+
+      sprintf(buf, "    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n\n",
+              dRadiusInit * 0.001, corrections[2], cor_rad_m, dRadius * 0.001,
+              apriorisigmas[2], dSigmaRadius);
+
+      fp_out << buf;
+      nPointIndex++;
+    }
+
+    fp_out.close();
+
+    return true;
   }
 
-/**
- * output bundle results to file with error propagation
- */
+
+  /**
+   * output bundle results to file with error propagation
+   */
+/*
     bool BundleAdjust::OutputWithErrorPropagation() {
 
       QString ofname("bundleout.txt");
@@ -6380,7 +7269,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       OutputHeader(fp_out);
-
+//
       sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
       fp_out << buf;
 
@@ -6645,7 +7534,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               fp_out << buf;
           }
       }
-
+/
       // output point data
       sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
       fp_out << buf;
@@ -6810,8 +7699,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       return true;
   }
+*/
 
-   /**
+  /**
    * output bundle results to file with no error propagation
    *
    * @internal
@@ -6824,15 +7714,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    */
   bool BundleAdjust::OutputNoErrorPropagation() {
 
-      QString ofname("bundleout.txt");
-      if( !m_strOutputFilePrefix.isEmpty() )
-          ofname = m_strOutputFilePrefix + "_" + ofname;
+    QString ofname("bundleout.txt");
+    if (!m_strOutputFilePrefix.isEmpty())
+      ofname = m_strOutputFilePrefix + "_" + ofname;
 
-      std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-      if (!fp_out)
-          return false;
+    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    if (!fp_out)
+      return false;
 
-      char buf[1056];
+    char buf[1056];
 
     //bool bHeld = false;
     std::vector<double> coefX(m_nNumberCamPosCoefSolved);
@@ -6878,18 +7768,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       // For all instruments we retrieve the polynomial coefficients from which the
       // Exterior Orientation parameters are derived.  For framing cameras, a single
       // coefficient for each coordinate is returned.
-      if ( m_spacecraftPositionSolveType > 0 )
-          pSpicePosition->GetPolynomial(coefX,coefY,coefZ);
+      if (m_spacecraftPositionSolveType > 0)
+        pSpicePosition->GetPolynomial(coefX,coefY,coefZ);
       //      else { // frame camera
       else { // This is for m_spacecraftPositionSolveType = None and no polynomial fit has occurred
-          std::vector <double> coordinate(3);
-          coordinate = pSpicePosition->GetCenterCoordinate();
-          coefX.push_back(coordinate[0]);
-          coefY.push_back(coordinate[1]);
-          coefZ.push_back(coordinate[2]);
+        std::vector <double> coordinate(3);
+        coordinate = pSpicePosition->GetCenterCoordinate();
+        coefX.push_back(coordinate[0]);
+        coefY.push_back(coordinate[1]);
+        coefZ.push_back(coordinate[2]);
       }
 
-      if ( m_cmatrixSolveType > 0 ) {
+      if (m_cmatrixSolveType > 0) {
 //          angles = pSpiceRotation->Angles(3,1,3);
           pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
       }
@@ -6908,83 +7798,83 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
       fp_out << buf;
 
-      if( m_nNumberCamPosCoefSolved > 0 ) {
-          char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
-          std::ostringstream ostr;
-          for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
-              if( i ==0 )
-                  ostr << "  " << strcoeff;
-              else if ( i == 1 )
-                  ostr << " " << strcoeff << "t";
-              else
-                  ostr << strcoeff << "t" << i;
-              if( i == 0 ) {
-                sprintf(buf, "  X (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                        ostr.str().c_str(), coefX[i] - m_Image_Corrections(nIndex),
-                        m_Image_Corrections(nIndex), coefX[i],
-                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
-              }
-              else {
-                sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                        ostr.str().c_str(), coefX[i] - m_Image_Corrections(nIndex),
-                        m_Image_Corrections(nIndex), coefX[i],
-                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
-              }
-              fp_out << buf;
-              ostr.str("");
-              strcoeff--;
-              nIndex++;
+      if (m_nNumberCamPosCoefSolved > 0) {
+        char strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
+        std::ostringstream ostr;
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (i == 0) {
+            sprintf(buf, "  X (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(), coefX[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefX[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
           }
-          strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
-          for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
-              if( i ==0 )
-                  ostr << "  " << strcoeff;
-              else if ( i == 1 )
-                  ostr << " " << strcoeff << "t";
-              else
-                  ostr << strcoeff << "t" << i;
-              if( i == 0 ) {
-                sprintf(buf, "  Y (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                        ostr.str().c_str(), coefY[i] - m_Image_Corrections(nIndex),
-                        m_Image_Corrections(nIndex), coefY[i],
-                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
-              }
-              else {
-                sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                        ostr.str().c_str(), coefY[i] - m_Image_Corrections(nIndex),
-                        m_Image_Corrections(nIndex), coefY[i],
-                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
-              }
-              fp_out << buf;
-              ostr.str("");
-              strcoeff--;
-              nIndex++;
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(), coefX[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefX[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
           }
-          strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
-          for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
-              if( i ==0 )
-                  ostr << "  " << strcoeff;
-              else if ( i == 1 )
-                  ostr << " " << strcoeff << "t";
-              else
-                  ostr << strcoeff << "t" << i;
-              if( i == 0 ) {
-                sprintf(buf, "  Z (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                        ostr.str().c_str(), coefZ[i] - m_Image_Corrections(nIndex),
-                        m_Image_Corrections(nIndex), coefZ[i],
-                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
-              }
-              else {
-                sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                        ostr.str().c_str(), coefZ[i] - m_Image_Corrections(nIndex),
-                        m_Image_Corrections(nIndex), coefZ[i],
-                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
-              }
-              fp_out << buf;
-              ostr.str("");
-              strcoeff--;
-              nIndex++;
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+        }
+        strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (i == 0  ) {
+            sprintf(buf, "  Y (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(), coefY[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefY[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
           }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(), coefY[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefY[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+        }
+        strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (i == 0) {
+            sprintf(buf, "  Z (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(), coefZ[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefZ[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+          }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(), coefZ[i] - m_Image_Corrections(nIndex),
+                          m_Image_Corrections(nIndex), coefZ[i],
+                          m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+        }
       }
       else {
         sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18s%18s\n", coefX[0], 0.0, coefX[0], "N/A", "N/A");
@@ -6995,103 +7885,103 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         fp_out << buf;
       }
 
-      if( m_nNumberCamAngleCoefSolved > 0 ) {
-          char strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
-          std::ostringstream ostr;
-          for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
-              if( i ==0 )
-                  ostr << "  " << strcoeff;
-              else if ( i == 1 )
-                  ostr << " " << strcoeff << "t";
-              else
-                  ostr << strcoeff << "t" << i;
-              if( i == 0 ) {
-                  sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+      if (m_nNumberCamAngleCoefSolved > 0) {
+        char strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
+        std::ostringstream ostr;
+        for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (i == 0) {
+            sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                           ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
                           m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
                           m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
-              }
-              else {
-                  sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
-                          m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
-              }
-              fp_out << buf;
-              ostr.str("");
-              strcoeff--;
-              nIndex++;
-          }
-          strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
-          for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
-              if( i ==0 )
-                  ostr << "  " << strcoeff;
-              else if ( i == 1 )
-                  ostr << " " << strcoeff << "t";
-              else
-                  ostr << strcoeff << "t" << i;
-              if( i == 0 ) {
-                  sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
-              }
-              else {
-                  sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
-                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
-                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
-              }
-              fp_out << buf;
-              ostr.str("");
-              strcoeff--;
-              nIndex++;
-          }
-          if ( !m_bSolveTwist ) {
-              sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                      coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-              fp_out << buf;
           }
           else {
-              strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
-              for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
-                  if( i ==0 )
-                      ostr << "  " << strcoeff;
-                  else if ( i == 1 )
-                      ostr << " " << strcoeff << "t";
-                  else
-                      ostr << strcoeff << "t" << i;
-                  if( i == 0 ) {
-                      sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                              ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
-                              m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
-                  }
-                  else {
-                      sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                              ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
-                              m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
-                              m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
-                  }
-                  fp_out << buf;
-                  ostr.str("");
-                  strcoeff--;
-                  nIndex++;
-              }
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(),(coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG,
+                          m_Image_Corrections(nIndex) * RAD2DEG, coefRA[i] * RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
           }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+        }
+        strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
+        for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+          if (i == 0)
+            ostr << "  " << strcoeff;
+          else if (i == 1)
+            ostr << " " << strcoeff << "t";
+          else
+            ostr << strcoeff << "t" << i;
+          if (i == 0) {
+            sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+          }
+          else {
+            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                          ostr.str().c_str(),(coefDEC[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                          m_Image_Corrections(nIndex)*RAD2DEG, coefDEC[i]*RAD2DEG,
+                          m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+          }
+          fp_out << buf;
+          ostr.str("");
+          strcoeff--;
+          nIndex++;
+        }
+        if (!m_bSolveTwist) {
+          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+          fp_out << buf;
+        }
+        else {
+          strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
+          for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+            if (i == 0)
+              ostr << "  " << strcoeff;
+            else if (i == 1)
+              ostr << " " << strcoeff << "t";
+            else
+              ostr << strcoeff << "t" << i;
+            if (i == 0) {
+              sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                            ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                            m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                            m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+            }
+            else {
+              sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                            ostr.str().c_str(),(coefTWI[i] - m_Image_Corrections(nIndex))*RAD2DEG,
+                            m_Image_Corrections(nIndex)*RAD2DEG, coefTWI[i]*RAD2DEG,
+                            m_dGlobalCameraAnglesAprioriSigma[i], "N/A");
+            }
+            fp_out << buf;
+            ostr.str("");
+            strcoeff--;
+            nIndex++;
+          }
+        }
       }
       else {
-          sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
-          fp_out << buf;
-          sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
-          fp_out << buf;
-          sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-          fp_out << buf;
+        sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
+        fp_out << buf;
+        sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
+        fp_out << buf;
+        sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                      coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
+        fp_out << buf;
       }
-  }
+    }
 
     fp_out << "\n\n\n";
 
@@ -7114,31 +8004,31 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     int nPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nPoints; i++) {
 
-        const ControlPoint* point = m_pCnet->GetPoint(i);
-        if( point->IsIgnored() )
-            continue;
+      const ControlPoint* point = m_pCnet->GetPoint(i);
+      if (point->IsIgnored())
+        continue;
 
-        nRays = point->GetNumMeasures();
-        dResidualRms = point->GetResidualRms();
-        dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-        dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
-        nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+      nRays = point->GetNumMeasures();
+      dResidualRms = point->GetResidualRms();
+      dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
+      nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
-        if( point->GetType() == ControlPoint::Fixed)
-            strStatus = "FIXED";
-        else if( point->GetType() == ControlPoint::Constrained)
-            strStatus = "CONSTRAINED";
-        else if( point->GetType() == ControlPoint::Free)
-            strStatus = "FREE";
-        else
-            strStatus = "UNKNOWN";
+      if (point->GetType() == ControlPoint::Fixed)
+        strStatus = "FIXED";
+      else if (point->GetType() == ControlPoint::Constrained)
+        strStatus = "CONSTRAINED";
+      else if (point->GetType() == ControlPoint::Free)
+        strStatus = "FREE";
+      else
+        strStatus = "UNKNOWN";
 
-        sprintf(buf, "%16s%12s%4d of %d%6.2lf%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
-                point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays, dResidualRms, dLat,
-                dLon, dRadius * 0.001,"N/A","N/A","N/A");
+      sprintf(buf, "%16s%12s%4d of %d%6.2lf%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
+              point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays,
+              dResidualRms, dLat, dLon, dRadius * 0.001,"N/A","N/A","N/A");
 
-        fp_out << buf;
+      fp_out << buf;
     }
 
     sprintf(buf,"\n\nPOINTS DETAIL\n=============\n\n");
@@ -7147,69 +8037,70 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     int nPointIndex = 0;
     for (int i = 0; i < nPoints; i++) {
 
-        const ControlPoint* point = m_pCnet->GetPoint(i);
-        if( point->IsIgnored() )
-            continue;
+      const ControlPoint* point = m_pCnet->GetPoint(i);
+      if (point->IsIgnored())
+        continue;
 
-        nRays = point->GetNumMeasures();
-        dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-        dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-        dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
-        nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
+      nRays = point->GetNumMeasures();
+      dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
+      dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
+      dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
+      nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
 
-        // point corrections and initial sigmas
-        bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
-        bounded_vector<double,3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
+      // point corrections and initial sigmas
+      bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
+      bounded_vector<double,3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
 
-        cor_lat_dd = corrections[0]*Isis::RAD2DEG;
-        cor_lon_dd = corrections[1]*Isis::RAD2DEG;
-        cor_rad_m  = corrections[2]*1000.0;
+      cor_lat_dd = corrections[0]*Isis::RAD2DEG;
+      cor_lon_dd = corrections[1]*Isis::RAD2DEG;
+      cor_rad_m  = corrections[2]*1000.0;
 
-        cor_lat_m = corrections[0]*m_dRTM;
-        cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
+      cor_lat_m = corrections[0]*m_dRTM;
+      cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
 
-        dLatInit = dLat-cor_lat_dd;
-        dLonInit = dLon-cor_lon_dd;
-        dRadiusInit = dRadius-(corrections[2]*1000.0);
+      dLatInit = dLat-cor_lat_dd;
+      dLonInit = dLon-cor_lon_dd;
+      dRadiusInit = dRadius-(corrections[2]*1000.0);
 
-        if( point->GetType() == ControlPoint::Fixed)
-            strStatus = "FIXED";
-        else if( point->GetType() == ControlPoint::Constrained)
-            strStatus = "CONSTRAINED";
-        else if( point->GetType() == ControlPoint::Free)
-            strStatus = "FREE";
-        else
-            strStatus = "UNKNOWN";
+      if (point->GetType() == ControlPoint::Fixed)
+        strStatus = "FIXED";
+      else if (point->GetType() == ControlPoint::Constrained)
+        strStatus = "CONSTRAINED";
+      else if (point->GetType() == ControlPoint::Free)
+        strStatus = "FREE";
+      else
+        strStatus = "UNKNOWN";
 
-        sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-                point->GetId().toAscii().data(),strStatus.toAscii().data(),nGoodRays,nRays);
-        fp_out << buf;
+      sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",
+              point->GetId().toAscii().data(),strStatus.toAscii().data(),nGoodRays,nRays);
+      fp_out << buf;
 
-        sprintf(buf,"\n     Point         Initial               Total               Total              Final             Initial             Final\n"
-                "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
-                "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
-        fp_out << buf;
+      sprintf(buf,"\n     Point         Initial               Total               Total              Final             Initial             Final\n"
+              "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
+              "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n");
+      fp_out << buf;
 
-        sprintf(buf,"  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
-                dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], "N/A");
-        fp_out << buf;
+      sprintf(buf,"  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
+              dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], "N/A");
+      fp_out << buf;
 
-        sprintf(buf," LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
-                dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], "N/A");
-        fp_out << buf;
+      sprintf(buf," LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
+              dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], "N/A");
+      fp_out << buf;
 
-        sprintf(buf,"    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n\n",
-                dRadiusInit*0.001, corrections[2], cor_rad_m, dRadius*0.001, apriorisigmas[2], "N/A");
+      sprintf(buf,"    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n\n",
+              dRadiusInit*0.001, corrections[2], cor_rad_m, dRadius*0.001, apriorisigmas[2], "N/A");
 
-        fp_out << buf;
+      fp_out << buf;
 
-        nPointIndex++;
+      nPointIndex++;
     }
 
     fp_out.close();
 
     return true;
   }
+
 
   /**
    * output point data to csv file
@@ -7218,12 +8109,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     char buf[1056];
 
     QString ofname("bundleout_points.csv");
-    if( !m_strOutputFilePrefix.isEmpty() )
-        ofname = m_strOutputFilePrefix + "_" + ofname;
+    if (!m_strOutputFilePrefix.isEmpty())
+      ofname = m_strOutputFilePrefix + "_" + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
-        return false;
+      return false;
 
     int nPoints = m_pCnet->GetNumPoints();
 
@@ -7259,10 +8150,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     for (int i = 0; i < nPoints; i++) {
       const ControlPoint *point = m_pCnet->GetPoint(i);
 
-      if ( !point )
-          continue;
+      if (!point)
+        continue;
 
-      if ( point->IsIgnored() || point->IsRejected() )
+      if (point->IsIgnored() || point->IsRejected())
         continue;
 
       dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
@@ -7314,6 +8205,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
   }
 
+
   /**
    * output image coordinate residuals to comma-separated-value
    * file
@@ -7322,12 +8214,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     char buf[1056];
 
     QString ofname("residuals.csv");
-    if( !m_strOutputFilePrefix.isEmpty() )
-        ofname = m_strOutputFilePrefix + "_" + ofname;
+    if (!m_strOutputFilePrefix.isEmpty())
+      ofname = m_strOutputFilePrefix + "_" + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
-        return false;
+      return false;
 
     // output column headers
     sprintf(buf, ",,,x image,y image,Measured,Measured,sample,line,Residual Vector\n");
@@ -7339,7 +8231,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     int nImageIndex;
 
-    //    printf("output residuals!!!\n");
+    // printf("output residuals!!!\n");
 
     int nObjectPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nObjectPoints; i++) {
@@ -7384,544 +8276,566 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    * output image data to csv file
    */
   bool BundleAdjust::OutputImagesCSV() {
-      char buf[1056];
+    char buf[1056];
 
-      QString ofname("bundleout_images.csv");
-      if( !m_strOutputFilePrefix.isEmpty() )
-          ofname = m_strOutputFilePrefix + "_" + ofname;
+    QString ofname("bundleout_images.csv");
+    if (!m_strOutputFilePrefix.isEmpty())
+      ofname = m_strOutputFilePrefix + "_" + ofname;
 
-      std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-      if (!fp_out)
-          return false;
+    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    if (!fp_out)
+      return false;
 
-      // setup column headers
-      std::vector<QString> output_columns;
+    // setup column headers
+    std::vector<QString> output_columns;
 
-      output_columns.push_back("Image,");
+    output_columns.push_back("Image,");
 
-      output_columns.push_back("rms,");
-      output_columns.push_back("rms,");
-      output_columns.push_back("rms,");
+    output_columns.push_back("rms,");
+    output_columns.push_back("rms,");
+    output_columns.push_back("rms,");
 
-      char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
-      std::ostringstream ostr;
-      int ncoeff = 1;
-      if ( m_nNumberCamPosCoefSolved > 0 )
-        ncoeff = m_nNumberCamPosCoefSolved;
+    char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+    std::ostringstream ostr;
+    int ncoeff = 1;
+    if (m_nNumberCamPosCoefSolved > 0)
+      ncoeff = m_nNumberCamPosCoefSolved;
 
-      for( int i = 0; i < ncoeff; i++) {
-          if( i ==0 )
-              ostr << strcoeff;
-          else if ( i == 1 )
-              ostr << strcoeff << "t";
-          else
-              ostr << strcoeff << "t" << i;
-          for( int j = 0; j < 5; j++ ) {
-              if( ncoeff == 1 )
-                  output_columns.push_back("X,");
-              else {
-                  QString str = "X(";
-                  str += ostr.str().c_str();
-                  str += "),";
-                  output_columns.push_back(str);
-              }
-          }
-          ostr.str("");
-          strcoeff--;
-      }
-      strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
-      for( int i = 0; i < ncoeff; i++) {
-          if( i ==0 )
-              ostr << strcoeff;
-          else if ( i == 1 )
-              ostr << strcoeff << "t";
-          else
-              ostr << strcoeff << "t" << i;
-          for( int j = 0; j < 5; j++ ) {
-              if( ncoeff == 1 )
-                  output_columns.push_back("Y,");
-              else {
-                  QString str = "Y(";
-                  str += ostr.str().c_str();
-                  str += "),";
-                  output_columns.push_back(str);
-              }
-          }
-          ostr.str("");
-          strcoeff--;
-      }
-      strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
-      for ( int i = 0; i < ncoeff; i++) {
-
-        if ( i ==0 )
-          ostr << strcoeff;
-        else if ( i == 1 )
-          ostr << strcoeff << "t";
-        else
-          ostr << strcoeff << "t" << i;
-
-        for ( int j = 0; j < 5; j++ ) {
-          if ( ncoeff == 1) {
-            output_columns.push_back("Z,");
-          }
-          else {
-            QString str = "Z(";
-            str += ostr.str().c_str();
-            str += "),";
-            output_columns.push_back(str);
-          }
+    for (int i = 0; i < ncoeff; i++) {
+      if (i == 0)
+        ostr << strcoeff;
+      else if (i == 1)
+        ostr << strcoeff << "t";
+      else
+        ostr << strcoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (ncoeff == 1)
+          output_columns.push_back("X,");
+        else {
+          QString str = "X(";
+          str += ostr.str().c_str();
+          str += "),";
+          output_columns.push_back(str);
         }
-
-        ostr.str("");
-        strcoeff--;
-        if (!m_bSolveTwist) break;
       }
-
-      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
-      for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
-          if( i ==0 )
-              ostr << strcoeff;
-          else if ( i == 1 )
-              ostr << strcoeff << "t";
-          else
-              ostr << strcoeff << "t" << i;
-          for( int j = 0; j < 5; j++ ) {
-              if( m_nNumberCamAngleCoefSolved == 1 )
-                  output_columns.push_back("RA,");
-              else {
-                  QString str = "RA(";
-                  str += ostr.str().c_str();
-                  str += "),";
-                  output_columns.push_back(str);
-              }
-          }
-          ostr.str("");
-          strcoeff--;
-      }
-      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
-      for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
-          if( i ==0 )
-              ostr << strcoeff;
-          else if ( i == 1 )
-              ostr << strcoeff << "t";
-          else
-              ostr << strcoeff << "t" << i;
-          for( int j = 0; j < 5; j++ ) {
-              if( m_nNumberCamAngleCoefSolved == 1 )
-                  output_columns.push_back("DEC,");
-              else {
-                  QString str = "DEC(";
-                  str += ostr.str().c_str();
-                  str += "),";
-                  output_columns.push_back(str);
-              }
-          }
-          ostr.str("");
-          strcoeff--;
-      }
-      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
-      for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
-
-        if ( i ==0 )
-          ostr << strcoeff;
-        else if ( i == 1 )
-          ostr << strcoeff << "t";
-        else
-          ostr << strcoeff << "t" << i;
-
-        for ( int j = 0; j < 5; j++ ) {
-
-          if ( m_nNumberCamAngleCoefSolved == 1 || !m_bSolveTwist) {
-            output_columns.push_back("TWIST,");
-          }
-          else {
-            QString str = "TWIST(";
-            str += ostr.str().c_str();
-            str += "),";
-            output_columns.push_back(str);
-          }
+      ostr.str("");
+      strcoeff--;
+    }
+    strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
+    for (int i = 0; i < ncoeff; i++) {
+      if (i == 0)
+        ostr << strcoeff;
+      else if (i == 1)
+        ostr << strcoeff << "t";
+      else
+        ostr << strcoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (ncoeff == 1)
+          output_columns.push_back("Y,");
+        else {
+          QString str = "Y(";
+          str += ostr.str().c_str();
+          str += "),";
+          output_columns.push_back(str);
         }
-
-        ostr.str("");
-        strcoeff--;
-        if (!m_bSolveTwist) break;
       }
-
-      // print first column header to buffer and output to file
-      int ncolumns = output_columns.size();
-      for ( int i = 0; i < ncolumns; i++) {
-          QString str = output_columns.at(i);
-          sprintf(buf, "%s", (const char*)str.toAscii().data());
-          fp_out << buf;
-      }
-      sprintf(buf, "\n");
-      fp_out << buf;
-
-      output_columns.clear();
-      output_columns.push_back("Filename,");
-
-      output_columns.push_back("sample res,");
-      output_columns.push_back("line res,");
-      output_columns.push_back("total res,");
-
-      int nparams = 3;
-      if (m_nNumberCamPosCoefSolved)
-        nparams = 3 * m_nNumberCamPosCoefSolved;
-
-      int numCameraAnglesSolved = 2;
-      if (m_bSolveTwist) numCameraAnglesSolved++;
-      nparams += numCameraAnglesSolved*m_nNumberCamAngleCoefSolved;
-      if (!m_bSolveTwist) nparams += 1; // Report on twist only
-      for(int i = 0; i < nparams; i++ ) {
-          output_columns.push_back("Initial,");
-          output_columns.push_back("Correction,");
-          output_columns.push_back("Final,");
-          output_columns.push_back("Apriori Sigma,");
-          output_columns.push_back("Adj Sigma,");
-      }
-
-      // print second column header to buffer and output to file
-      ncolumns = output_columns.size();
-      for( int i = 0; i < ncolumns; i++) {
-          QString str = output_columns.at(i);
-          sprintf(buf, "%s", (const char*)str.toAscii().data());
-          fp_out << buf;
-      }
-      sprintf(buf, "\n");
-      fp_out << buf;
-
-      Camera *pCamera = NULL;
-      SpicePosition *pSpicePosition = NULL;
-      SpiceRotation *pSpiceRotation = NULL;
-
-      int nImages = Images();
-      double dSigma = 0.;
-      int nIndex = 0;
-      bool bSolveSparse = false;
-      //bool bHeld = false;
-      std::vector<double> coefX(m_nNumberCamPosCoefSolved);
-      std::vector<double> coefY(m_nNumberCamPosCoefSolved);
-      std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
-      std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
-      std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
-      std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
-      std::vector<double> angles;
-
-      output_columns.clear();
-
-      gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
-      if (m_strSolutionMethod == "OLDSPARSE" && m_bErrorPropagation) {
-//      Get reference to the covariance matrix from the least-squares object
-        lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
-        bSolveSparse = true;
-      }
-
-      std::vector<double> BFP(3);
-
-      for ( int i = 0; i < nImages; i++ ) {
-
-        //if (m_nHeldImages > 0 &&
-        //    m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
-        //  bHeld = true;
-
-        pCamera = m_pCnet->Camera(i);
-        if ( !pCamera )
-          continue;
-
-        // ImageIndex(i) retrieves index into the normal equations matrix for
-        //  Image(i)
-        nIndex = ImageIndex(i) ;
-
-        pSpicePosition = pCamera->instrumentPosition();
-        if ( !pSpicePosition )
-          continue;
-
-        pSpiceRotation = pCamera->instrumentRotation();
-        if ( !pSpiceRotation )
-            continue;
-
-        // for frame cameras we directly retrieve the J2000 Exterior Orientation
-        // (i.e. position and orientation angles). For others (linescan, radar)
-        //  we retrieve the polynomial coefficients from which the Exterior
-        // Orientation parameters are derived.
-        if ( m_spacecraftPositionSolveType > 0 )
-          pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
-        else { // not solving for position so report state at center of image
-          std::vector <double> coordinate(3);
-          coordinate = pSpicePosition->GetCenterCoordinate();
-
-          coefX.push_back(coordinate[0]);
-          coefY.push_back(coordinate[1]);
-          coefZ.push_back(coordinate[2]);
-        }
-
-        if ( m_cmatrixSolveType > 0 )
-          pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
-//          else { // frame camera
-        else if (pCamera->GetCameraType() != 3) {
-// This is for m_cmatrixSolveType = None (except Radar which has no pointing)
-// and no polynomial fit has occurred
-          angles = pSpiceRotation->GetCenterAngles();
-          coefRA.push_back(angles.at(0));
-          coefDEC.push_back(angles.at(1));
-          coefTWI.push_back(angles.at(2));
-        }
-
-        // clear column vector
-        output_columns.clear();
-
-        // add filename
-        output_columns.push_back(m_pSnList->FileName(i).toAscii().data());
-
-        // add rms of sample, line, total image coordinate residuals
-        output_columns.push_back(
-            toString(m_rmsImageSampleResiduals[i].Rms()));
-        output_columns.push_back(
-            toString(m_rmsImageLineResiduals[i].Rms()));
-        output_columns.push_back(
-            toString(m_rmsImageResiduals[i].Rms()));
-
-        if ( m_nNumberCamPosCoefSolved > 0 ) {
-          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
-
-            if ( m_bErrorPropagation && m_bConverged ) {
-              if (bSolveSparse )
-                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-            }
-
-            output_columns.push_back(
-                toString(coefX[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(
-                toString(m_Image_Corrections(nIndex)));
-            output_columns.push_back(
-                toString(coefX[i]));
-            output_columns.push_back(
-                toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
-
-            if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(
-                  toString(dSigma));
-            else
-              output_columns.push_back("N/A");
-            nIndex++;
-          }
-          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
-
-            if ( m_bErrorPropagation && m_bConverged ) {
-              if (bSolveSparse )
-                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-            }
-
-            output_columns.push_back(
-                toString(coefY[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(
-                toString(m_Image_Corrections(nIndex)));
-            output_columns.push_back(
-                toString(coefY[i]));
-            output_columns.push_back(
-                toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
-
-            if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(
-                  toString(dSigma));
-            else
-              output_columns.push_back("N/A");
-            nIndex++;
-          }
-          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
-
-            if ( m_bErrorPropagation && m_bConverged ) {
-              if (bSolveSparse )
-                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-            }
-
-            output_columns.push_back(
-                toString(coefZ[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(
-                toString(m_Image_Corrections(nIndex)));
-            output_columns.push_back(
-                toString(coefZ[i]));
-            output_columns.push_back(
-                toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
-
-            if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(toString
-                  (dSigma));
-            else
-              output_columns.push_back("N/A");
-            nIndex++;
-          }
+      ostr.str("");
+      strcoeff--;
+    }
+    strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
+    for (int i = 0; i < ncoeff; i++) {
+      if (i == 0)
+        ostr << strcoeff;
+      else if (i == 1)
+        ostr << strcoeff << "t";
+      else
+        ostr << strcoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (ncoeff == 1) {
+          output_columns.push_back("Z,");
         }
         else {
-          output_columns.push_back(toString(coefX[0]));
-          output_columns.push_back(toString(0));
-          output_columns.push_back(toString(coefX[0]));
-          output_columns.push_back(toString(0));
-          output_columns.push_back("N/A");
-          output_columns.push_back(toString(coefY[0]));
-          output_columns.push_back(toString(0));
-          output_columns.push_back(toString(coefY[0]));
-          output_columns.push_back(toString(0));
-          output_columns.push_back("N/A");
-          output_columns.push_back(toString(coefZ[0]));
-          output_columns.push_back(toString(0));
-          output_columns.push_back(toString(coefZ[0]));
-          output_columns.push_back(toString(0));
+          QString str = "Z(";
+          str += ostr.str().c_str();
+          str += "),";
+          output_columns.push_back(str);
+        }
+      }
+      ostr.str("");
+      strcoeff--;
+      if (!m_bSolveTwist)
+        break;
+    }
+
+    strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
+    for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+      if(i == 0)
+        ostr << strcoeff;
+      else if (i == 1)
+        ostr << strcoeff << "t";
+      else
+        ostr << strcoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (m_nNumberCamAngleCoefSolved == 1)
+          output_columns.push_back("RA,");
+        else {
+          QString str = "RA(";
+          str += ostr.str().c_str();
+          str += "),";
+          output_columns.push_back(str);
+        }
+      }
+      ostr.str("");
+      strcoeff--;
+    }
+    strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
+    for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+      if (i == 0)
+        ostr << strcoeff;
+      else if (i == 1)
+        ostr << strcoeff << "t";
+      else
+        ostr << strcoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (m_nNumberCamAngleCoefSolved == 1)
+          output_columns.push_back("DEC,");
+        else {
+          QString str = "DEC(";
+          str += ostr.str().c_str();
+          str += "),";
+          output_columns.push_back(str);
+        }
+      }
+      ostr.str("");
+      strcoeff--;
+    }
+    strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
+    for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+      if (i == 0)
+        ostr << strcoeff;
+      else if (i == 1)
+        ostr << strcoeff << "t";
+      else
+        ostr << strcoeff << "t" << i;
+      for (int j = 0; j < 5; j++) {
+        if (m_nNumberCamAngleCoefSolved == 1 || !m_bSolveTwist) {
+          output_columns.push_back("TWIST,");
+        }
+        else {
+          QString str = "TWIST(";
+          str += ostr.str().c_str();
+          str += "),";
+          output_columns.push_back(str);
+        }
+      }
+      ostr.str("");
+      strcoeff--;
+      if (!m_bSolveTwist)
+        break;
+    }
+
+    // print first column header to buffer and output to file
+    int ncolumns = output_columns.size();
+    for (int i = 0; i < ncolumns; i++) {
+      QString str = output_columns.at(i);
+      sprintf(buf, "%s", (const char*)str.toAscii().data());
+      fp_out << buf;
+    }
+    sprintf(buf, "\n");
+    fp_out << buf;
+
+    output_columns.clear();
+    output_columns.push_back("Filename,");
+
+    output_columns.push_back("sample res,");
+    output_columns.push_back("line res,");
+    output_columns.push_back("total res,");
+
+    int nparams = 3;
+    if (m_nNumberCamPosCoefSolved)
+      nparams = 3 * m_nNumberCamPosCoefSolved;
+
+    int numCameraAnglesSolved = 2;
+    if (m_bSolveTwist) numCameraAnglesSolved++;
+    nparams += numCameraAnglesSolved*m_nNumberCamAngleCoefSolved;
+    if (!m_bSolveTwist) nparams += 1; // Report on twist only
+    for (int i = 0; i < nparams; i++) {
+      output_columns.push_back("Initial,");
+      output_columns.push_back("Correction,");
+      output_columns.push_back("Final,");
+      output_columns.push_back("Apriori Sigma,");
+      output_columns.push_back("Adj Sigma,");
+    }
+
+    // print second column header to buffer and output to file
+    ncolumns = output_columns.size();
+    for (int i = 0; i < ncolumns; i++) {
+      QString str = output_columns.at(i);
+      sprintf(buf, "%s", (const char*)str.toAscii().data());
+      fp_out << buf;
+    }
+    sprintf(buf, "\n");
+    fp_out << buf;
+
+    Camera *pCamera = NULL;
+    SpicePosition *pSpicePosition = NULL;
+    SpiceRotation *pSpiceRotation = NULL;
+
+    int nImages = Images();
+    double dSigma = 0.;
+    int nIndex = 0;
+    bool bSolveSparse = false;
+    //bool bHeld = false;
+    std::vector<double> coefX(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefY(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
+    std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
+    std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
+    std::vector<double> angles;
+
+    output_columns.clear();
+
+    gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
+    if (m_strSolutionMethod == "OLDSPARSE" && m_bErrorPropagation) {
+      // Get reference to the covariance matrix from the least-squares object
+      lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
+      bSolveSparse = true;
+    }
+
+    // data structure to contain adjusted image parameter sigmas for CHOLMOD error propagation only
+    vector<double> vImageAdjustedSigmas;
+
+    std::vector<double> BFP(3);
+
+    for (int i = 0; i < nImages; i++) {
+
+      //if (m_nHeldImages > 0 &&
+      //    m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+      //  bHeld = true;
+
+      pCamera = m_pCnet->Camera(i);
+      if (!pCamera)
+        continue;
+
+      // ImageIndex(i) retrieves index into the normal equations matrix for
+      //  Image(i)
+      nIndex = ImageIndex(i) ;
+
+      if (m_bErrorPropagation && m_decompositionMethod == CHOLMOD)
+        vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
+
+      pSpicePosition = pCamera->instrumentPosition();
+      if (!pSpicePosition)
+        continue;
+
+      pSpiceRotation = pCamera->instrumentRotation();
+      if (!pSpiceRotation)
+          continue;
+
+      // for frame cameras we directly retrieve the J2000 Exterior Orientation
+      // (i.e. position and orientation angles). For others (linescan, radar)
+      //  we retrieve the polynomial coefficients from which the Exterior
+      // Orientation parameters are derived.
+      if (m_spacecraftPositionSolveType > 0)
+        pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
+      else { // not solving for position so report state at center of image
+        std::vector <double> coordinate(3);
+        coordinate = pSpicePosition->GetCenterCoordinate();
+
+        coefX.push_back(coordinate[0]);
+        coefY.push_back(coordinate[1]);
+        coefZ.push_back(coordinate[2]);
+      }
+
+      if (m_cmatrixSolveType > 0)
+        pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+//          else { // frame camera
+      else if (pCamera->GetCameraType() != 3) {
+// This is for m_cmatrixSolveType = None (except Radar which has no pointing)
+// and no polynomial fit has occurred
+        angles = pSpiceRotation->GetCenterAngles();
+        coefRA.push_back(angles.at(0));
+        coefDEC.push_back(angles.at(1));
+        coefTWI.push_back(angles.at(2));
+      }
+
+      // clear column vector
+      output_columns.clear();
+
+      // add filename
+      output_columns.push_back(m_pSnList->FileName(i).toAscii().data());
+
+      // add rms of sample, line, total image coordinate residuals
+      output_columns.push_back(
+          toString(m_rmsImageSampleResiduals[i].Rms()));
+      output_columns.push_back(
+          toString(m_rmsImageLineResiduals[i].Rms()));
+      output_columns.push_back(
+          toString(m_rmsImageResiduals[i].Rms()));
+
+      int nSigmaIndex = 0;
+      if (m_nNumberCamPosCoefSolved > 0) {
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+
+          if (m_bErrorPropagation && m_bConverged) {
+            if (bSolveSparse)
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else if (m_decompositionMethod == CHOLMOD)
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+            else if (m_decompositionMethod == SPECIALK)
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(
+              toString(coefX[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(
+              toString(m_Image_Corrections(nIndex)));
+          output_columns.push_back(
+              toString(coefX[i]));
+          output_columns.push_back(
+              toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
+
+          if (m_bErrorPropagation && m_bConverged)
+            output_columns.push_back(
+                toString(dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+          nSigmaIndex++;
+        }
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+
+          if (m_bErrorPropagation && m_bConverged) {
+            if (bSolveSparse)
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else if (m_decompositionMethod == CHOLMOD)
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+            else if (m_decompositionMethod == SPECIALK)
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(
+              toString(coefY[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(
+              toString(m_Image_Corrections(nIndex)));
+          output_columns.push_back(
+              toString(coefY[i]));
+          output_columns.push_back(
+              toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
+
+          if (m_bErrorPropagation && m_bConverged)
+            output_columns.push_back(
+                toString(dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+          nSigmaIndex++;
+        }
+        for (int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+
+          if (m_bErrorPropagation && m_bConverged) {
+            if (bSolveSparse)
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else if (m_decompositionMethod == CHOLMOD)
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+            else if (m_decompositionMethod == SPECIALK)
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(
+              toString(coefZ[0] - m_Image_Corrections(nIndex)));
+          output_columns.push_back(
+              toString(m_Image_Corrections(nIndex)));
+          output_columns.push_back(
+              toString(coefZ[i]));
+          output_columns.push_back(
+              toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
+
+          if (m_bErrorPropagation && m_bConverged)
+            output_columns.push_back(toString
+                (dSigma));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+          nSigmaIndex++;
+        }
+      }
+      else {
+        output_columns.push_back(toString(coefX[0]));
+        output_columns.push_back(toString(0));
+        output_columns.push_back(toString(coefX[0]));
+        output_columns.push_back(toString(0));
+        output_columns.push_back("N/A");
+        output_columns.push_back(toString(coefY[0]));
+        output_columns.push_back(toString(0));
+        output_columns.push_back(toString(coefY[0]));
+        output_columns.push_back(toString(0));
+        output_columns.push_back("N/A");
+        output_columns.push_back(toString(coefZ[0]));
+        output_columns.push_back(toString(0));
+        output_columns.push_back(toString(coefZ[0]));
+        output_columns.push_back(toString(0));
+        output_columns.push_back("N/A");
+      }
+
+      if (m_nNumberCamAngleCoefSolved > 0) {
+        for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+
+          if (m_bErrorPropagation && m_bConverged) {
+            if (bSolveSparse)
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else if (m_decompositionMethod == CHOLMOD)
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+            else if (m_decompositionMethod == SPECIALK)
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(toString
+              ((coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+          output_columns.push_back(toString
+              (m_Image_Corrections(nIndex) * RAD2DEG));
+          output_columns.push_back(toString
+              (coefRA[i] * RAD2DEG));
+          output_columns.push_back(toString(
+              m_dGlobalCameraAnglesAprioriSigma[i]));
+
+          if (m_bErrorPropagation && m_bConverged)
+            output_columns.push_back(toString
+                (dSigma * RAD2DEG));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+          nSigmaIndex++;
+        }
+        for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+
+          if (m_bErrorPropagation && m_bConverged) {
+            if (bSolveSparse)
+              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+            else if (m_decompositionMethod == CHOLMOD)
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+            else if (m_decompositionMethod == SPECIALK)
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+          }
+
+          output_columns.push_back(toString
+              ((coefDEC[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+          output_columns.push_back(toString
+              (m_Image_Corrections(nIndex) * RAD2DEG));
+          output_columns.push_back(toString
+              (coefDEC[i] * RAD2DEG));
+          output_columns.push_back(toString
+              (m_dGlobalCameraAnglesAprioriSigma[i]));
+
+          if (m_bErrorPropagation && m_bConverged)
+            output_columns.push_back(toString
+                (dSigma * RAD2DEG));
+          else
+            output_columns.push_back("N/A");
+          nIndex++;
+          nSigmaIndex++;
+        }
+        if (!m_bSolveTwist) {
+          output_columns.push_back(toString
+              (coefTWI[0]*RAD2DEG));
+          output_columns.push_back(toString(0.0));
+          output_columns.push_back(toString
+              (coefTWI[0]*RAD2DEG));
+          output_columns.push_back(toString(0.0));
           output_columns.push_back("N/A");
         }
+        else {
+          for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
 
-        if ( m_nNumberCamAngleCoefSolved > 0 ) {
-          for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
-
-            if ( m_bErrorPropagation && m_bConverged ) {
-              if (bSolveSparse )
+            if (m_bErrorPropagation && m_bConverged) {
+              if (bSolveSparse)
                 dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
+              else if (m_decompositionMethod == CHOLMOD)
+                dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_dSigma0;
+              else if (m_decompositionMethod == SPECIALK)
                 dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
             }
 
             output_columns.push_back(toString
-                ((coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+                ((coefTWI[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
             output_columns.push_back(toString
                 (m_Image_Corrections(nIndex) * RAD2DEG));
             output_columns.push_back(toString
-                (coefRA[i] * RAD2DEG));
-            output_columns.push_back(toString(
-                m_dGlobalCameraAnglesAprioriSigma[i]));
-
-            if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(toString
-                  (dSigma * RAD2DEG));
-            else
-              output_columns.push_back("N/A");
-            nIndex++;
-          }
-          for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
-
-            if ( m_bErrorPropagation && m_bConverged ) {
-              if (bSolveSparse )
-                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-            }
-
-            output_columns.push_back(toString
-                ((coefDEC[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-            output_columns.push_back(toString
-                (m_Image_Corrections(nIndex) * RAD2DEG));
-            output_columns.push_back(toString
-                (coefDEC[i] * RAD2DEG));
+                (coefTWI[i] * RAD2DEG));
             output_columns.push_back(toString
                 (m_dGlobalCameraAnglesAprioriSigma[i]));
 
-            if ( m_bErrorPropagation && m_bConverged )
+            if (m_bErrorPropagation && m_bConverged)
               output_columns.push_back(toString
                   (dSigma * RAD2DEG));
             else
               output_columns.push_back("N/A");
             nIndex++;
-          }
-          if ( !m_bSolveTwist ) {
-            output_columns.push_back(toString
-                (coefTWI[0]*RAD2DEG));
-            output_columns.push_back(toString(0.0));
-            output_columns.push_back(toString
-                (coefTWI[0]*RAD2DEG));
-            output_columns.push_back(toString(0.0));
-            output_columns.push_back("N/A");
-          }
-          else {
-            for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
-
-              if ( m_bErrorPropagation && m_bConverged ) {
-                if (bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-                else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              }
-
-              output_columns.push_back(toString
-                  ((coefTWI[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-              output_columns.push_back(toString
-                  (m_Image_Corrections(nIndex) * RAD2DEG));
-              output_columns.push_back(toString
-                  (coefTWI[i] * RAD2DEG));
-              output_columns.push_back(toString
-                  (m_dGlobalCameraAnglesAprioriSigma[i]));
-
-              if ( m_bErrorPropagation && m_bConverged )
-                output_columns.push_back(toString
-                    (dSigma * RAD2DEG));
-              else
-                output_columns.push_back("N/A");
-              nIndex++;
-            }
+            nSigmaIndex++;
           }
         }
-
-        else if ( pCamera->GetCameraType() != 3 ) {
-          output_columns.push_back(toString
-              (coefRA[0]*RAD2DEG));
-          output_columns.push_back(toString(0.0));
-          output_columns.push_back(toString
-              (coefRA[0]*RAD2DEG));
-          output_columns.push_back(toString(0.0));
-          output_columns.push_back("N/A");
-          output_columns.push_back(toString
-              (coefDEC[0]*RAD2DEG));
-          output_columns.push_back(toString(0.0));
-          output_columns.push_back(toString
-              (coefDEC[0]*RAD2DEG));
-          output_columns.push_back(toString(0.0));
-          output_columns.push_back("N/A");
-          output_columns.push_back(toString
-              (coefTWI[0]*RAD2DEG));
-          output_columns.push_back(toString(0.0));
-          output_columns.push_back(toString
-              (coefTWI[0]*RAD2DEG));
-          output_columns.push_back(toString(0.0));
-          output_columns.push_back("N/A");
-        }
-
-        // print column vector to buffer and output to file
-        int ncolumns = output_columns.size();
-        for ( int i = 0; i < ncolumns; i++) {
-          QString str = output_columns.at(i);
-
-          if (i < ncolumns-1)
-            sprintf(buf, "%s,", (const char*)str.toAscii().data());
-          else
-            sprintf(buf, "%s", (const char*)str.toAscii().data());
-          fp_out << buf;
-        }
-        sprintf(buf, "\n");
-        fp_out << buf;
       }
 
-      fp_out.close();
+      else if (pCamera->GetCameraType() != 3) {
+        output_columns.push_back(toString
+            (coefRA[0]*RAD2DEG));
+        output_columns.push_back(toString(0.0));
+        output_columns.push_back(toString
+            (coefRA[0]*RAD2DEG));
+        output_columns.push_back(toString(0.0));
+        output_columns.push_back("N/A");
+        output_columns.push_back(toString
+            (coefDEC[0]*RAD2DEG));
+        output_columns.push_back(toString(0.0));
+        output_columns.push_back(toString
+            (coefDEC[0]*RAD2DEG));
+        output_columns.push_back(toString(0.0));
+        output_columns.push_back("N/A");
+        output_columns.push_back(toString
+            (coefTWI[0]*RAD2DEG));
+        output_columns.push_back(toString(0.0));
+        output_columns.push_back(toString
+            (coefTWI[0]*RAD2DEG));
+        output_columns.push_back(toString(0.0));
+        output_columns.push_back("N/A");
+      }
 
-      return true;
+      // print column vector to buffer and output to file
+      int ncolumns = output_columns.size();
+      for (int i = 0; i < ncolumns; i++) {
+        QString str = output_columns.at(i);
+
+        if (i < ncolumns-1)
+          sprintf(buf, "%s,", (const char*)str.toAscii().data());
+        else
+          sprintf(buf, "%s", (const char*)str.toAscii().data());
+        fp_out << buf;
+      }
+      sprintf(buf, "\n");
+      fp_out << buf;
+    }
+
+    fp_out.close();
+
+    return true;
   }
 
 
   /**
-   * This method sets the solution method for solving the matrix and fills
-   * the point index map, which is dependent on the solution method.
-   */
+    * This method sets the solution method for solving the matrix and fills the point index map,
+    * which is dependent on the solution method.
+    */
   void BundleAdjust::SetSolutionMethod(QString str) {
     m_strSolutionMethod = str;
     FillPointIndexMap();
   }
 
-  /**  This method steps up the maximum likelihood estimation solution.  Zero to three successive solutions models are available.
-   */
-   void BundleAdjust::maximumLikelihoodSetup( QList<QString> models, QList<double> quantiles ) {
+
+  /** This method steps up the maximum likelihood estimation solution.  Zero to three successive
+    * solutions models are available.
+    */
+  void BundleAdjust::maximumLikelihoodSetup( QList<QString> models, QList<double> quantiles ) {
      m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
      m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defualt
      if (models.size() == 0) {  //MaximumLikeliHood Estimation not being used, so leave everything NULL
@@ -7933,13 +8847,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
        for (int i=0;i<models.size() && i<3;i++) {
          m_maxLikelihoodFlag[i] = true;
          m_wFunc[i] = new MaximumLikelihoodWFunctions;
-         if ( models[i].compare("HUBER") == 0 )
+         if (models[i].compare("HUBER") == 0)
            m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Huber);
-         else if ( models[i].compare("HUBER_MODIFIED") == 0 )
+         else if (models[i].compare("HUBER_MODIFIED") == 0)
            m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::HuberModified);
-         else if ( models[i].compare("WELSCH") == 0 )
+         else if (models[i].compare("WELSCH") == 0)
            m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Welsch);
-         else if ( models[i].compare("CHEN") == 0 )
+         else if (models[i].compare("CHEN") == 0)
            m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Chen);
          else {
             QString msg = "Unsuported Maximum Likelihood estimation model: " + models[i] + "\n";
@@ -7948,10 +8862,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
          }
        }
      }
-     for (int i=0;i<quantiles.size() && i<3;i++) m_maxLikelihoodQuan[i] = quantiles[i];
+     for (int i=0;i<quantiles.size() && i<3;i++)
+       m_maxLikelihoodQuan[i] = quantiles[i];
 
-     //maximum likelihood estimation tiered solutions requiring multiple convergeances are support, this index keeps track
-     // of which tier the solution is in
+     //maximum likelihood estimation tiered solutions requiring multiple convergeances are support,
+     // this index keeps track of which tier the solution is in
      m_maxLikelihoodIndex=0;
    }
 }
