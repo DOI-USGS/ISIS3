@@ -272,6 +272,7 @@ namespace Isis {
     m_bOutputResiduals = true;
     m_nPositionType = SpicePosition::PolyFunction;
     m_nPointingType = SpiceRotation::PolyFunction;
+    m_bSolvePolyOverPointing = false;
     m_bSolvePolyOverHermite = false;
 
     m_idMinSigmaLatitude = "";
