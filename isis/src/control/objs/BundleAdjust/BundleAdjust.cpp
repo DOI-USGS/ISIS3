@@ -8523,7 +8523,7 @@ namespace Isis {
       //  Image(i)
       nIndex = ImageIndex(i) ;
 
-      if (m_bErrorPropagation && m_decompositionMethod == CHOLMOD)
+      if (m_bErrorPropagation && m_bConverged && (m_decompositionMethod == CHOLMOD))
         vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
 
       pSpicePosition = pCamera->instrumentPosition();
