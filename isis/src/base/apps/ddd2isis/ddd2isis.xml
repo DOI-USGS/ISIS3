@@ -20,7 +20,15 @@
       to read in the image offset from the file header. This image offset is a
       4 byte integer that starts at byte 20 in the file header. If the offset is
       set to 0, then this means the label is 1024 bytes long. The offset must be
-      a multiple of 1024.
+      a multiple of 1024. Fixes #1594.
+    </change>
+    <change name="Janet Barrett" date="2013-07-11">
+      Modified code to write out number of lines, number of samples, number of
+      bands, bit type, and label bytes to assist in determining how the file
+      should be read in. If the input file is a standard ddd file, then this
+      program will be able to import it. If the data is interleaved, then it
+      will need to be read in using a combination of the raw2isis and crop
+      programs. Fixes #1713.
     </change>
   </history>
 
@@ -47,6 +55,7 @@
       <parameter name="TO">
          <type>cube</type>
          <fileMode>output</fileMode>
+         <internalDefault>None</internalDefault>
          <brief>
            Output Isis cube
          </brief>
