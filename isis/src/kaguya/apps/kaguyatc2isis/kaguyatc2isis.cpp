@@ -13,16 +13,15 @@ using namespace Isis;
 
 void IsisMain() {
   ProcessImportPds p;
-  Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
   QString labelFile = ui.GetFileName("FROM");
   FileName inFile = ui.GetFileName("FROM");
   QString id;
-  Pvl lab(inFile.expanded());
+  Pvl label(inFile.expanded());
 
   try {
-    id = (QString) lab.findKeyword("DATA_SET_ID");
+    id = (QString) label.findKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
     QString msg = "Unable to read [DATA_SET_ID] from input file [" +
@@ -38,7 +37,12 @@ void IsisMain() {
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
-  p.SetPdsFile(labelFile, "", label);
+  if (!label.hasKeyword("TARGET_NAME")) {
+    label.addKeyword(PvlKeyword("TARGET_NAME", "MOON"), Pvl::Replace);
+  }
+
+  p.SetPdsFile(label, labelFile);
+
   Cube *outcube = p.SetOutputCube("TO");
 
   // Get user entered special pixel ranges
@@ -66,18 +70,38 @@ void IsisMain() {
   Pvl otherLabels;
   p.TranslatePdsProjection(otherLabels);
 
-  // Get the directory where the generic pds2isis level 2 translation tables are.
+  // Translate the remaining MI MAP labels
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
-  QString transDir = (QString) dataDir["base"] + "/translations/";
-
-  // Translate the Archive group
-  FileName transFile(transDir + "pdsImageArchive.trn");
+  QString transDir = (QString) dataDir["Kaguya"] + "/translations/";
+  
+  FileName transFile(transDir + "tcmapBandBin.trn");
+  PvlTranslationManager bandBinXlater(label, transFile.expanded());
+  bandBinXlater.Auto(otherLabels);
+  
+  transFile = transDir + "tcmapInstrument.trn";
+  PvlTranslationManager instXlater(label, transFile.expanded());
+  instXlater.Auto(otherLabels);
+  
+  transFile = transDir + "tcmapArchive.trn";
   PvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
-
-  // Write the Archive and Mapping groups to the output cube label
-  outcube->putGroup(otherLabels.findGroup("Mapping"));
-  outcube->putGroup(otherLabels.findGroup("Archive"));
+  
+  if(otherLabels.hasGroup("Mapping") &&
+    (otherLabels.findGroup("Mapping").keywords() > 0)) {
+    outcube->putGroup(otherLabels.findGroup("Mapping"));
+  }
+  if(otherLabels.hasGroup("Instrument") &&
+    (otherLabels.findGroup("Instrument").keywords() > 0)) {
+    outcube->putGroup(otherLabels.findGroup("Instrument"));
+  }
+  if(otherLabels.hasGroup("BandBin") &&
+    (otherLabels.findGroup("BandBin").keywords() > 0)) {
+    outcube->putGroup(otherLabels.findGroup("BandBin"));
+  }
+  if(otherLabels.hasGroup("Archive") &&
+    (otherLabels.findGroup("Archive").keywords() > 0)) {
+    outcube->putGroup(otherLabels.findGroup("Archive"));
+  }
 
   // Add the BandBin group
   PvlGroup bbin("BandBin");

@@ -21,6 +21,9 @@
       SETLRSRANGE, SETLISRANGE) to allow the user to specify
       special pixel values. Fixes #1718.
     </change>
+    <change name="Janet Barrett" date="2014-02-11">
+      Added check for TARGET_NAME keyword. Fixes #2036.
+    </change>
   </history>
 
   <category>
