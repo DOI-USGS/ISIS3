@@ -72,6 +72,8 @@ namespace Isis {
     *  @history 2013-01-31 Steven Lambright - Fixed LocationString() to return
     *                          valid text. Also, added a test for this text.
     *                          Fixes #1436. 
+    *  @history 2014-03-03 Janet Barrett - Initialize the mdDnValue variable in
+    *                          the ValidStandardOptions method. Fixes #2040.
     */
 
   class ControlNetValidMeasure {

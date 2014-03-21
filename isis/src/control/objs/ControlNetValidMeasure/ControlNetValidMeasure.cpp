@@ -197,6 +197,7 @@ namespace Isis {
 
     mdEmissionAngle  = 0;
     mdIncidenceAngle = 0;
+    mdDnValue        = 0;
     mdResolution     = 0;
     mdSampleResidual = 0;
     mdLineResidual   = 0;

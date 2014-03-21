@@ -116,6 +116,8 @@ namespace Isis {
    *                           Fixes #589
    *   @history 2013-03-08 Kimberly Oyama and Steven Lambright - Added a try/catch to
    *                           InterestByPoint(). References #825.
+   *   @history 2014-03-03 Janet Barrett - Changed the FindCnetRef method to report status on number
+   *                           of points processed instead of number of measures. Fixes #2040.
    *  
    */
   class InterestOperator : public ControlNetValidMeasure {

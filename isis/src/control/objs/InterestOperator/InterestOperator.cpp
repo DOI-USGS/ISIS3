@@ -364,7 +364,7 @@ namespace Isis {
 
     // Status Report
     mStatus.SetText("Choosing Reference by Interest...");
-    mStatus.SetMaximumSteps(pNewNet.GetNumMeasures());
+    mStatus.SetMaximumSteps(pNewNet.GetNumPoints());
     mStatus.CheckStatus();
 
     // Process each existing control point in the network
