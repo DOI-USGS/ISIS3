@@ -82,6 +82,10 @@
         only one or two points.  The information is already listed
         in bundleout.txt.
     </change>
+    <change name="Kimberly Oyama" date="2014-03-28">
+       Added check for history group in input cube. If it's there, add a new entry. If not, add a
+       new history group. Added an app test. Fixes #1350.
+    </change>
   </history>
 
   <groups>
@@ -93,8 +97,8 @@
           Input camera cube
         </brief>
         <description>
-  	   The file specification for the input cube.   The cube will have
-           its camera pointing updated.
+  	   The file specification for the input cube. The cube will have its camera pointing
+           updated.
         </description>
         <filter>
           *.cub
@@ -106,8 +110,8 @@
       <parameter name="SIGMA0">
         <brief>Standard deviation of unit weight</brief>
         <description>
-           Convergence is reached when the solution parameters change by 
-           less than Sigma0.  Units:  unitless.
+           Convergence is reached when the solution parameters change by less than Sigma0.
+           Units:  unitless.
         </description>
         <type>double</type>
         <default><item>1.0e-10</item></default>
@@ -124,9 +128,9 @@
         <brief>Solve for camera twist</brief>
         <default><item>False</item></default>
         <description>
-          In addition to angle1 and angle2, if this parameter is set the program 
-          will solve for the camera twist.  This requires input of a second 
-          fixed coordinate (SAMP2,LINE2) and (LAT2,LON2)
+          In addition to angle1 and angle2, if this parameter is set the program will solve for
+          the camera twist.  This requires input of a second fixed coordinate (SAMP2,LINE2) and
+          (LAT2,LON2)
         </description>
         <inclusions>
           <item>LINE2</item>
@@ -243,9 +247,8 @@
        <brief>Radius, point #2</brief>
        <internalDefault>Computed</internalDefault>
        <description>
-         Radius at the image coordinate (SAMP2,LINE2).  It will 
-         be automatically computed using the shape model that was 
-         initialized in the "spiceinit" application.  Units:  meters.
+         Radius at the image coordinate (SAMP2,LINE2). It will be automatically computed using the
+         shape model that was initialized in the "spiceinit" application.  Units:  meters.
        </description>
        <minimum inclusive="no">0.0</minimum>
        <inclusions>
