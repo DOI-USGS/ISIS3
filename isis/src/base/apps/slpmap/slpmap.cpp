@@ -1,5 +1,6 @@
-#include <cmath>
 #include "Isis.h"
+
+#include <cmath>
 
 #include "Angle.h"
 #include "Camera.h"
@@ -7,7 +8,9 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "ProcessByBoxcar.h"
+#include "Projection.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "UniversalGroundMap.h"
 
 using namespace std;
@@ -66,15 +69,14 @@ void IsisMain() {
   // Create output cube
   Cube *ocube = p.SetOutputCube("TO");
 
-
   PvlObject &lblCubeObj = ocube->label()->findObject("IsisCube");
-  lblCubeObj.addGroup(PvlGroup("BandBin"));
+  lblCubeObj.addGroup( PvlGroup("BandBin") );
   PvlGroup &bbGroup = lblCubeObj.findGroup("BandBin");
-
+  
   g_groundMap = 0;
   if(g_outputType == Aspect) {
     p.StartProcess(createAspectCube);
-    bbGroup.addKeyword(PvlKeyword("Name", "Aspect", ui.GetString("UNITS").toLower()));
+    bbGroup.addKeyword( PvlKeyword( "Name", "Aspect", ui.GetString("UNITS").toLower() ) );
   }
   else {
     if (ui.GetString("PIXRES") == "AUTOMATIC") {
@@ -83,21 +85,24 @@ void IsisMain() {
       p.StartProcess(createSlpCubeAutomatic);
     }
     else {
-      g_resolution = ui.GetDouble("RESOLUTION");
+      if (ui.GetString("PIXRES") == "FILE") {
+        g_groundMap = new UniversalGroundMap(*icube);
+        g_resolution = g_groundMap->Resolution();
+      }
+      else {
+        g_resolution = ui.GetDouble("RESOLUTION");
+      }
       g_conversionFactor = ui.GetDouble("CONVERSION");
       p.StartProcess(createSlpCube);
     }
 
     if (g_outputType == PercentSlope) {
-      bbGroup.addKeyword(PvlKeyword("Name", "Slope", "percent"));
+      bbGroup.addKeyword( PvlKeyword("Name", "Slope", "percent") );
     }
     else {
-      bbGroup.addKeyword(PvlKeyword("Name", "Slope", ui.GetString("UNITS").toLower()));
+      bbGroup.addKeyword( PvlKeyword( "Name", "Slope", ui.GetString("UNITS").toLower() ) );
     }
   }
-
-
-
 
   // Cleanup
   delete g_groundMap;
@@ -128,9 +133,7 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
     v = Isis::Null;
     return;
   }
-
-  // Save off the radius at the center of the current 3x3
-  Distance centerRadius;
+  
   try {
     Distance(in[4], Distance::Meters);
   }
@@ -138,48 +141,48 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
     QString msg = QString("The input cube contains a negative DN at (sample,line,band) "
         "[(%1,%2,%3)]. The automatic pixel resolution option requires the input cube contain "
         "raduis values. It is possible the input cube contains elevation or other data.").
-        arg(in.Sample(4)).arg(in.Line(4)).arg(in.Band(4));
+        arg( in.Sample(4) ).arg( in.Line(4) ).arg( in.Band(4) );
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   // Get the lat/lons of the four corners of the pixel
-  if (!g_upperLeft.Valid()) {
-    if (g_groundMap->SetImage(in.Sample(4)-0.5,in.Line(4)-0.5)) {
+  if ( !g_upperLeft.Valid() ) {
+    if ( g_groundMap->SetImage(in.Sample(4) - 0.5, in.Line(4) - 0.5) ) {
       g_upperLeft.SetSphericalCoordinates(
-           Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-           Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-           Distance(in[4],Distance::Meters));
+                     Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                     Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                     Distance(in[4],Distance::Meters));
     }  
   }
 
-  if (!g_lowerLeft.Valid()) {
-    if (g_groundMap->SetImage(in.Sample(4)-0.5,in.Line(4)+0.5)) {
+  if ( !g_lowerLeft.Valid() ) {
+    if ( g_groundMap->SetImage(in.Sample(4) - 0.5, in.Line(4) + 0.5) ) {
       g_lowerLeft.SetSphericalCoordinates(
-           Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-           Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-           Distance(in[4],Distance::Meters));
+                     Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                     Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                     Distance(in[4],Distance::Meters));
     }  
   }
 
   SurfacePoint upperRight;
-  if (g_groundMap->SetImage(in.Sample(4)+0.5,in.Line(4)-0.5)) {
+  if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) - 0.5) ) {
     upperRight.SetSphericalCoordinates(
-         Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-         Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-         Distance(in[4],Distance::Meters));
+                   Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                   Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                   Distance(in[4],Distance::Meters));
   }  
 
   SurfacePoint lowerRight;
-  if (g_groundMap->SetImage(in.Sample(4)+0.5,in.Line(4)+0.5)) {
+  if ( g_groundMap->SetImage(in.Sample(4) + 0.5, in.Line(4) + 0.5) ) {
     lowerRight.SetSphericalCoordinates(
-         Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-         Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-         Distance(in[4],Distance::Meters));
+                   Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                   Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                   Distance(in[4],Distance::Meters) );
   }  
 
   // Are all four corners good?
-  if (!g_upperLeft.Valid() || !g_lowerLeft.Valid() || 
-      !upperRight.Valid() || !lowerRight.Valid()) {
+  if ( !g_upperLeft.Valid() || !g_lowerLeft.Valid() ||
+       !upperRight.Valid() || !lowerRight.Valid() ) {
     g_upperLeft = upperRight;
     g_lowerLeft = lowerRight;
     v = Isis::Null;
@@ -189,10 +192,10 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
   // Have four good corners so compute the resolutions
   // Do not apply the conversion factor to the resolutions because the projection/camera
   // has already been used and the Z value (DN) was assumed to be meters.
-  double xResolution = ((g_upperLeft.GetDistanceToPoint(upperRight)).meters() + 
-                        (g_lowerLeft.GetDistanceToPoint(lowerRight)).meters()) / 2.0;
-  double yResolution = ((g_upperLeft.GetDistanceToPoint(g_lowerLeft)).meters() + 
-                        (upperRight.GetDistanceToPoint(lowerRight)).meters()) / 2.0;
+  double xResolution = ( ( g_upperLeft.GetDistanceToPoint(upperRight) ).meters() +
+                         ( g_lowerLeft.GetDistanceToPoint(lowerRight) ).meters() ) / 2.0;
+  double yResolution = ( ( g_upperLeft.GetDistanceToPoint(g_lowerLeft) ).meters() +
+                         ( upperRight.GetDistanceToPoint(lowerRight) ).meters() ) / 2.0;
 
   // Pull height values out of 3x3 buffer (in)
   const double &a = in[0];
@@ -209,13 +212,13 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
   // NOTE: When the 3x3 kernel wraps from the right edge of one line to the left edge of the next
   // line this test will fail due to the 3x3 having NULL pixels from sample zero (Outside the cube
   // boundries)
-  if(Isis::IsSpecial(a) ||
-     Isis::IsSpecial(b) ||
-     Isis::IsSpecial(c) ||
-     Isis::IsSpecial(f) ||
-     Isis::IsSpecial(g) ||
-     Isis::IsSpecial(h) ||
-     Isis::IsSpecial(i)) {
+  if ( Isis::IsSpecial(a) ||
+       Isis::IsSpecial(b) ||
+       Isis::IsSpecial(c) ||
+       Isis::IsSpecial(f) ||
+       Isis::IsSpecial(g) ||
+       Isis::IsSpecial(h) ||
+       Isis::IsSpecial(i) ) {
     g_upperLeft = upperRight;
     g_lowerLeft = lowerRight;
 
@@ -224,10 +227,10 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
   }
 
   // [dz/dx] = ((c + 2f + i) - (a + 2d + g)) / (8 * x_cell_size)
-  double changeInX = ((c + 2 * f + i) - (a + 2 * d + g)) / (8 * xResolution);
+  double changeInX = ( (c + 2 * f + i) - (a + 2 * d + g) ) / (8 * xResolution);
 
   // [dz/dy] = ((g + 2h + i) - (a + 2b + c)) / (8 * y_cell_size)
-  double changeInY = ((g + 2 * h + i) - (a + 2 * b + c)) / (8 * yResolution);
+  double changeInY = ( (g + 2 * h + i) - (a + 2 * b + c) ) / (8 * yResolution);
 
   double changeMag = sqrt(changeInX * changeInX + changeInY * changeInY);
 
@@ -288,22 +291,22 @@ void createSlpCube(Buffer &in, double &v) {
   const double &i = in[8];
 
   // If anything we're actually calculating with is special, fail
-  if(Isis::IsSpecial(a) ||
-      Isis::IsSpecial(b) ||
-      Isis::IsSpecial(c) ||
-      Isis::IsSpecial(f) ||
-      Isis::IsSpecial(g) ||
-      Isis::IsSpecial(h) ||
-      Isis::IsSpecial(i)) {
+  if ( Isis::IsSpecial(a) ||
+       Isis::IsSpecial(b) ||
+       Isis::IsSpecial(c) ||
+       Isis::IsSpecial(f) ||
+       Isis::IsSpecial(g) ||
+       Isis::IsSpecial(h) ||
+       Isis::IsSpecial(i) ) {
     v = Isis::Null;
     return;
   }
 
   // [dz/dx] = ((c + 2f + i) - (a + 2d + g)) / (8 * x_cell_size)
-  double changeInX = ((c + 2 * f + i) - (a + 2 * d + g)) / (8 * xResolution);
+  double changeInX = ( (c + 2 * f + i) - (a + 2 * d + g) ) / (8 * xResolution);
 
   // [dz/dy] = ((g + 2h + i) - (a + 2b + c)) / (8 * y_cell_size)
-  double changeInY = ((g + 2 * h + i) - (a + 2 * b + c)) / (8 * yResolution);
+  double changeInY = ( (g + 2 * h + i) - (a + 2 * b + c) ) / (8 * yResolution);
 
   double changeMag = sqrt(changeInX * changeInX + changeInY * changeInY);
 
@@ -344,22 +347,22 @@ void createAspectCube(Buffer &in, double &v) {
   const double &i = in[8];
 
   // If anything we're actually calculating with is special, fail
-  if(Isis::IsSpecial(a) ||
-      Isis::IsSpecial(b) ||
-      Isis::IsSpecial(c) ||
-      Isis::IsSpecial(f) ||
-      Isis::IsSpecial(g) ||
-      Isis::IsSpecial(h) ||
-      Isis::IsSpecial(i)) {
+  if ( Isis::IsSpecial(a) ||
+       Isis::IsSpecial(b) ||
+       Isis::IsSpecial(c) ||
+       Isis::IsSpecial(f) ||
+       Isis::IsSpecial(g) ||
+       Isis::IsSpecial(h) ||
+       Isis::IsSpecial(i) ) {
     v = Isis::Null;
     return;
   }
 
   // [dz/dx] = ((c + 2f + i) - (a + 2d + g)) / 8
-  double changeInX = ((c + 2 * f + i) - (a + 2 * d + g)) / 8;
+  double changeInX = ( (c + 2 * f + i) - (a + 2 * d + g) ) / 8;
 
   // [dz/dy] = ((g + 2h + i) - (a + 2b + c)) / 8
-  double changeInY = ((g + 2 * h + i) - (a + 2 * b + c)) / 8;
+  double changeInY = ( (g + 2 * h + i) - (a + 2 * b + c) ) / 8;
 
   // aspect = atan2 ([dz/dy], -[dz/dx])
   double aspectRadians = atan2(changeInY, -changeInX);
