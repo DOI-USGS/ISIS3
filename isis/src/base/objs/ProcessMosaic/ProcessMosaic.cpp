@@ -21,8 +21,6 @@
  */
 #include "Preference.h"
 
-#include <QDebug>
-
 #include "Application.h"
 #include "IException.h"
 #include "IString.h"
@@ -290,8 +288,13 @@ namespace Isis {
     }
     else if (m_imageOverlay == AverageImageWithMosaic) {
       m_onb /= 2;
+      if (m_onb < 1) {
+        QString msg = "The mosaic cube needs a count band.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
     }
 
+    
     // Process Band Priority with no tracking
     if (m_imageOverlay == UseBandPlacementCriteria && !m_trackingEnabled ) {
       BandPriorityWithNoTracking(iss, isl, isb, ins, inl, inb, bandPriorityInputBandNumber,
@@ -384,7 +387,7 @@ namespace Isis {
           } // End sample loop
           if (bChanged) {
             if (m_trackingEnabled || m_imageOverlay == AverageImageWithMosaic) {
-            OutputCubes[0]->write(origPortal);
+              OutputCubes[0]->write(origPortal);
             }
           }
           OutputCubes[0]->write(oPortal);
