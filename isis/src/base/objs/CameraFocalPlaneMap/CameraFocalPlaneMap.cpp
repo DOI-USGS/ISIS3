@@ -23,7 +23,9 @@
 #include "CameraFocalPlaneMap.h"
 
 #include <cmath>
+#include <QDebug>
 
+#include "Affine.h"
 #include "Camera.h"
 #include "Spice.h"
 
@@ -48,6 +50,44 @@ namespace Isis {
   }
   CameraFocalPlaneMap::~CameraFocalPlaneMap(){
   }
+
+/**
+ * Added new method to allow programmer to pass in affine coefficients
+ * 
+ * @author janderson (3/25/2014)
+ * 
+ * @param parent Parent camera
+ * @param affine Affine transform containing the coefficients for both 
+ *               transforms to (samp,line) to (x,y) and reverse
+ */
+  CameraFocalPlaneMap::CameraFocalPlaneMap(Camera *parent, Affine &affine) {
+    p_detectorSampleOrigin = 0.0;
+    p_detectorLineOrigin = 0.0;
+    p_detectorSampleOffset = 0.0;
+    p_detectorLineOffset = 0.0;
+    p_camera = parent;
+
+    p_transx[0]  = affine.Coefficients(1)[2];
+    p_transx[1]  = affine.Coefficients(1)[0];
+    p_transx[2]  = affine.Coefficients(1)[1];
+
+    p_transy[0]  = affine.Coefficients(2)[2];
+    p_transy[1]  = affine.Coefficients(2)[0];
+    p_transy[2]  = affine.Coefficients(2)[1];
+
+    p_itranss[0]  = affine.InverseCoefficients(1)[2];
+    p_itranss[1]  = affine.InverseCoefficients(1)[0];
+    p_itranss[2]  = affine.InverseCoefficients(1)[1];
+
+    p_itransl[0]  = affine.InverseCoefficients(2)[2];
+    p_itransl[1]  = affine.InverseCoefficients(2)[0];
+    p_itransl[2]  = affine.InverseCoefficients(2)[1];
+
+    if (parent != 0) {
+      p_camera->SetFocalPlaneMap(this);
+    }
+  }
+
 
   void CameraFocalPlaneMap::Init(Camera *parent, const int naifIkCode) {
     p_detectorSampleOrigin = 0.0;

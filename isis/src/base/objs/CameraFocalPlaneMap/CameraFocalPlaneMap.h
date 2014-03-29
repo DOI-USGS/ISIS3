@@ -25,6 +25,7 @@
 
 
 namespace Isis {
+  class Affine;
   class Camera;
   /** Convert between distorted focal plane and detector coordinates
    *
@@ -87,12 +88,18 @@ namespace Isis {
    *                           compliant with Isis standards. Added
    *                           documentation to member
    *                           variables.References #678.
+   *   @history 2014-03-27 Jeff Anderson - Added constructor which takes an
+   *                           Affine transform instead of only reading from 
+   *                           NAIF kernels to obtain the transform.  This is
+   *                           required for non-NAIF instruments such as
+   *                           Aerial photos.
    *  
    */
   class CameraFocalPlaneMap {
     public:
       CameraFocalPlaneMap(Camera *parent, const int naifIkCode);
       CameraFocalPlaneMap(const int naifIkCode);
+      CameraFocalPlaneMap(Camera *parent, Affine &affine);
       virtual ~CameraFocalPlaneMap();
 
       virtual bool SetDetector(const double sample, const double line);

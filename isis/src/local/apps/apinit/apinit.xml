@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apinit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Initialize aerial photo with interior and exterior orientation information.
+  </brief>
+
+  <description>
+    This program is used to initialize the interior and exterior orientation of film-based aerial photographs.  Interior orientation information such as the focal length, optical distortion, and fiducial
+    locations are input by the user and recorded on the label of the cube in the Instrument group.   This information is typical found in a USGS Report of Calibration that is specific for the camera
+    flown during the particular aerial survey.   Apriori exterior orientation information such as the position of the aircraft and it's attitude are
+    computed from user input such as altitude and latitude/longitude at the center of the image.  The computed exterior orientation is stored as binary tables in the cube.  
+
+    This program mimics the capabilities of the "spiceinit" program which is used for initalized interior/exterior orientation information for NASA space instruments observing other than Earth 
+    targets.  Once the interior/exterior information is added to a cube, other ISIS cartography programs can be used such as cam2map (orthorectification), caminfo (image georeferencing information), 
+    qmos (mosaicking tools), and jigsaw (bundle adjustments to the aircraft position/attitude for creating seamless mosaics).
+
+    The results of this program should not be immediately used until the exterior orientation has been corrected.   That is, do not run cam2map and expect proper 
+    georeferencing/orthorectification.   There will be an error in attitude because there is not enough user information to determine the twist/yaw of the aircraft.  Instead run 
+    "findfeatures" to automatically generate a ground control network and then jigsaw to solve for the actual aircraft position and attitude.
+  </description>
+    <category>
+    <categoryItem>Aerial Photos</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeff Anderson" date="2013-11-15">
+      Original Version
+    </change>
+  </history>
+
+    <groups>
+    <group name="Input File">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The filename of the input cube to have the interior/exterior orientation added
+        </brief>
+        <description>
+          The input file which will have new group labels that indicate information about the aerial photograph.  The information provided by the user should be sufficient enough to
+          create a functioning camera model so that the interior/exterior orientation information can be solved for in jigsaw..
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+
+    <group name="Observation / Exterior Orientation Information">
+      <parameter name="DATETIME">
+        <type>string</type>
+        <brief>Date and time of the obseration</brief>
+        <description>
+          Date and time in format ?????.   Important to get this information correct if plan to compute phase incidence and emission angles.
+        </description>
+      </parameter>
+
+      <parameter name="ALTITUDE">
+        <type>double</type>
+        <brief>Estimated altitude</brief>
+        <description>
+          Estimated mean altitude above terrian in meters???????
+        </description>
+        <minimum inclusive="no">0</minimum>
+      </parameter>
+
+      <parameter name="CENTERLAT">
+        <type>double</type>
+        <brief>Estimated latitude at center of image</brief>
+        <description>
+          ???
+        </description>
+        <minimum inclusive="yes">-90</minimum>
+        <maximum inclusive="yes">90</maximum>
+      </parameter>
+
+      <parameter name="CENTERLON">
+        <type>double</type>
+        <brief>Estimated longitude at center of image</brief>
+        <description>
+          ???
+        </description>
+        <minimum inclusive="yes">-360</minimum>
+        <maximum inclusive="yes">360</maximum>
+      </parameter>
+
+      <parameter name="SHAPEMODEL">
+        <type>cube</type>
+        <brief>Shape model of earth</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Interior Orientation Information">
+      <parameter name="FOCALLENGTH">
+        <type>double</type>
+        <brief>Camera focal length</brief>
+        <description>
+          Focal length of the camera in millimeters.  This is often referred to as the calibrated focal length in the camera calibration report. 
+        </description>
+        <minimum inclusive="no">0</minimum>
+      </parameter>
+
+      <parameter name="FIDUCIALX">
+        <type>string</type>
+        <brief>X position of the eight fiducials in the focal plane</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="FIDUCIALY">
+        <type>string</type>
+        <brief>Y position of the eight fiducials in the focal plane</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="FIDUCIALSAMPLE">
+        <type>string</type>
+        <brief>Sample positions of the eight fiducials in the image</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="FIDUCIALLINE">
+        <type>string</type>
+        <brief>Line positions of the eight fiducials in the image</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="FIDUCIALTEMPLATE">
+        <type>cube</type>
+        <brief>Template cube containing average example of the eight fiducials</brief>
+        <description>
+          ???
+        </description>
+        <default><item>None</item></default>
+      </parameter>
+
+      <parameter name="KCOEFS">
+        <type>string</type>
+        <brief>Five radial optical distortion coefficients (k0-k4)</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="PCOEFS">
+        <type>string</type>
+        <brief>Four decentering distortion coefficients (p1-p4)</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="XP">
+        <type>double</type>
+        <brief>X coordinate for calibrated principal point</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="YP">
+        <type>double</type>
+        <brief>Y coordinate for calibrated principal point</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="XIPP">
+        <type>double</type>
+        <brief>X coordinate for indicated principal point</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+      <parameter name="YIPP">
+        <type>double</type>
+        <brief>Y coordinate for indicated principal point</brief>
+        <description>
+          ???
+        </description>
+      </parameter>
+
+
+    </group>
+
+    <group name="Archive Information">
+      <parameter name="ROLLNUMBER">
+        <type>string</type>
+        <default><item>Unknown</item></default>
+        <brief>Roll number containing the image</brief>
+        <description>
+          The film roll number that contained this image. This can typically be found on the image. 
+        </description>
+      </parameter>
+
+      <parameter name="FRAMENUMBER">
+        <type>string</type>
+        <default><item>Unknown</item></default>
+        <brief>Frame number of the image</brief>
+        <description>
+          The frame number on the roll. This can typically be found on the image. 
+        </description>
+      </parameter>
+
+      <parameter name="CAMERASN">
+        <type>string</type>
+        <default><item>Unknown</item></default>
+        <brief>Camera serial number</brief>
+        <description>
+          The serial number of the camera.  Often found in the calibration report.
+        </description>
+      </parameter>
+
+      <parameter name="LENSESN">
+        <type>string</type>
+        <default><item>Unknown</item></default>
+        <brief>Lense serial number</brief>
+        <description>
+          The serial number of the lense.  Often found in the calibration report.
+        </description>
+      </parameter>
+
+      <parameter name="CALREPORT">
+        <type>string</type>
+        <default><item>Unknown</item></default>
+        <brief>Calibration report</brief>
+        <description>
+          The USGS Report No. that contains the information used to define the interior orientation including focal length, optical distortion coefficients, and fiducial mark locations.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+</application>
