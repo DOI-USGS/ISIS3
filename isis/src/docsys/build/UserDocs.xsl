@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        Isis 3 Documentation</p>
+        ISIS 3 Documentation</p>
 
         <hr/>
 
@@ -120,16 +120,17 @@ Deborah Lee Soltesz
             Software Manual</a>
           </th>
           <td>
-          Handy reference guide to all Isis applications
+          Handy reference guide to all ISIS applications
           </td>
         </tr>
         <tr valign="top">
           <th style="width:25%">
-            <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop" target="_blank" title="Launch Isis Workshop in a new window">
-            Isis Workshop</a>
+            <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop" target="_blank" title="Launch ISIS Workshop in a new window">
+            ISIS Workshop</a>
           </th>
           <td>
-          Interactive and hands on tutorials designed to guide users through the basics of using Isis to advanced processing techniques for creating mosaics from mission data,
+          Interactive and hands-on tutorials designed to guide users through the basics of using ISIS 
+	  to advanced processing techniques for creating mosaics from mission data,
           correcting and enhancing problem data, and other techniques.
           </td>
         </tr>
@@ -199,7 +200,7 @@ Deborah Lee Soltesz
             Software Manual</a>
           </th>
           <td>
-          Handy reference guide to all Isis applications
+          Handy reference guide to all ISIS applications
           </td>
         </tr>
 
@@ -209,7 +210,7 @@ Deborah Lee Soltesz
             Old vs. New Program Names</a>
           </th>
           <td>
-          A useful table cross-referencing the current application names in Isis 3 to the names of applications in previous versions of Isis.
+          A useful table cross-referencing the current application names in ISIS 3 to the names of applications in previous versions of ISIS.
 
           </td>
         </tr>

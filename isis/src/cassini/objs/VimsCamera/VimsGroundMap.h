@@ -25,6 +25,7 @@
 
 #include "CameraGroundMap.h"
 
+#include <QVector3D>
 
 namespace Isis {
   class Distance;
@@ -71,9 +72,16 @@ namespace Isis {
    *                           fault.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
-   *   @history 2012-12-03  Tracie Sucharski - Added error check to SetGround method.  Returns false
+   *   @history 2012-09-10 Ken Edmundson,  Added new methods, SetGroundwithLatitudeLongitude and
+   *                          SetGroundwithRadiusLongitude to support rings data.
+   *   @history 2012-12-03 Tracie Sucharski - Added error check to SetGround method.  Returns false
    *                          if none of the pixel centers in the cube intersect with the planet.
    *                          Fixes #1306.
+   *   @history 2013-07-24 Tracie Sucharski - Fix bug in camera model which causes a problems
+   *                          finding either north or south poles in images.  References #1289.
+   *   @history 2013-08-12 Tracie Sucharski - Change all computations base on latitude and
+   *                          longitude to x, y and z.  This takes care of pole problems and
+   *                          improves accuracy.
    */
   class VimsGroundMap : public CameraGroundMap {
     public:
@@ -85,16 +93,13 @@ namespace Isis {
                                  const double uz);
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
-      bool SetGroundwithLatitudeLongitude(const Latitude &lat,
-                                        const Longitude &lon);
-      bool SetGroundwithRadiusLongitude(const double &radius,
-                                        const Longitude &lon);
+//    bool SetGroundwithLatitudeLongitude(const Latitude &lat, const Longitude &lon);
+//    bool SetGroundwithRadiusLongitude(const double &radius, const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
 
       void Init(Pvl &lab);
 
     private:
-      void WrapWorldToBeClose(const Longitude &lon1, Longitude &lon2);
       void LookDirection(double v[3]);
 
       SpiceDouble p_etStart;     //!< Start ephemeris time
@@ -125,15 +130,8 @@ namespace Isis {
       int    p_camSampOffset;    //!< Sample offset                                                     
       int    p_camLineOffset;    //!< Line offset                                                       
 
-      Latitude *p_minLat;                        //!< Minimum latitude 
-      Latitude *p_maxLat;                        //!< Maximum latitude 
-      Longitude *p_minLon;                       //!< Minimum longitude
-      Longitude *p_maxLon;                       //!< Maximum longitude
-      Distance *p_minRadius;                     //!< Minimum radius
-      Distance *p_maxRadius;                     //!< Maximum radius
-      QVector< QVector<Latitude> >  *p_latMap;   //!< Latitude map
-      QVector< QVector<Longitude> > *p_lonMap;   //!< Longitude map
-      QVector< QVector<Distance> > *p_radiusMap; //!< Radius map
+      QVector3D p_xyzMap[64][64];
+     
   };
 };
 #endif

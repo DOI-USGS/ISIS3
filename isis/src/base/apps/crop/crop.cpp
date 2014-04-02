@@ -20,7 +20,7 @@ using namespace Isis;
 int ss, sl, sb;
 int ns, nl, nb;
 int sinc, linc;
-Cube cube;
+Cube *cube = NULL;
 LineManager *in = NULL;
 
 void crop(Buffer &out);
@@ -32,49 +32,50 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   QString from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
-  cube.setVirtualBands(inAtt.bands());
+  cube = new Cube();
+  cube->setVirtualBands(inAtt.bands());
   from = ui.GetFileName("FROM");
-  cube.open(from);
+  cube->open(from);
 
   // Determine the sub-area to extract
   ss = ui.GetInteger("SAMPLE");
   sl = ui.GetInteger("LINE");
   sb = 1;
 
-  int origns = cube.sampleCount();
-  int orignl = cube.lineCount();
-  int es = cube.sampleCount();
+  int origns = cube->sampleCount();
+  int orignl = cube->lineCount();
+  int es = cube->sampleCount();
   if (ui.WasEntered("NSAMPLES")) es = ss + ui.GetInteger("NSAMPLES") - 1;
-  int el = cube.lineCount();
+  int el = cube->lineCount();
   if (ui.WasEntered("NLINES")) el = sl + ui.GetInteger("NLINES") - 1;
-  int eb = cube.bandCount();
+  int eb = cube->bandCount();
 
   sinc = ui.GetInteger("SINC");
   linc = ui.GetInteger("LINC");
 
   // Make sure starting positions fall within the cube
-  if (ss > cube.sampleCount()) {
-    cube.close();
+  if (ss > cube->sampleCount()) {
+    cube->close();
     QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (sl > cube.lineCount()) {
-    cube.close();
+  if (sl > cube->lineCount()) {
+    cube->close();
     QString msg = "[LINE] exceeds number of lines in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make sure the number of elements do not fall outside the cube
-  if (es > cube.sampleCount()) {
-    cube.close();
+  if (es > cube->sampleCount()) {
+    cube->close();
     QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
     msg += "samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (el > cube.lineCount()) {
-    cube.close();
+  if (el > cube->lineCount()) {
+    cube->close();
     QString msg = "[LINE+NLINES-1] exceeds number of ";
     msg += "lines in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -96,7 +97,7 @@ void IsisMain() {
   p.ClearInputCubes();
 
   // propagate tables manually
-  Pvl &inLabels = *cube.label();
+  Pvl &inLabels = *cube->label();
 
   // Loop through the labels looking for object = Table
   for(int labelObj = 0; labelObj < inLabels.objects(); labelObj++) {
@@ -122,7 +123,7 @@ void IsisMain() {
     /* Deal with associations, sample first
     if(table.IsSampleAssociated()) {
       int numDeleted = 0;
-      for(int samp = 0; samp < cube.sampleCount(); samp++) {
+      for(int samp = 0; samp < cube->sampleCount(); samp++) {
         // This tests checks to see if we would include this sample.
         //   samp - (ss-1)) / sinc must be a whole number less than ns.
         if((samp - (ss-1)) % sinc != 0 || (samp - (ss-1)) / sinc >= ns || (samp - (ss-1)) < 0) {
@@ -135,7 +136,7 @@ void IsisMain() {
     // Deal with line association
     if(table.IsLineAssociated()) {
       int numDeleted = 0;
-      for(int line = 0; line < cube.lineCount(); line++) {
+      for(int line = 0; line < cube->lineCount(); line++) {
         // This tests checks to see if we would include this line.
         //   line - (sl-1)) / linc must be a whole number less than nl.
         if((line - (sl-1)) % linc != 0 || (line - (sl-1)) / linc >= nl || (line - (sl-1)) < 0) {
@@ -166,7 +167,7 @@ void IsisMain() {
   }
 
   // Create a buffer for reading the input cube
-  in = new LineManager(cube);
+  in = new LineManager(*cube);
 
   // Crop the input cube
   p.StartProcess(crop);
@@ -189,13 +190,18 @@ void IsisMain() {
 
   // Update the Mapping, Instrument, and AlphaCube groups in the output
   // cube label
-  SubArea s;
-  s.SetSubArea(orignl, origns, sl, ss, el, es, linc, sinc);
-  s.UpdateLabel(&cube, ocube, results);
+  SubArea *s;
+  s = new SubArea;
+  s->SetSubArea(orignl, origns, sl, ss, el, es, linc, sinc);
+  s->UpdateLabel(cube, ocube, results);
+  delete s;
+  s = NULL;
 
   // Cleanup
   p.EndProcess();
-  cube.close();
+  cube->close();
+  delete cube;
+  cube = NULL;
 
   // Write the results to the log
   Application::Log(results);
@@ -206,7 +212,7 @@ void crop(Buffer &out) {
   // Read the input line
   int iline = sl + (out.Line() - 1) * linc;
   in->SetLine(iline, sb);
-  cube.read(*in);
+  cube->read(*in);
 
   // Loop and move appropriate samples
   for(int i = 0; i < out.size(); i++) {

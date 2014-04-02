@@ -1,44 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="mappt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="ringsmappt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Outputs ring radius and longitude for given  line and sample or reverse
+    Outputs ring radius/longitude at line/sample or reverse
   </brief>
 
   <description>
-    This program requires the user supply a cube in a map projection.
-    The user must also enter one of the following coordinates:
-    <pre>
-      line/sample
-      ring radius/ring longitude
-      x/y
-    </pre>
-    The program will then compute the other two coordinates.  For example,
-    entering a line/sample will cause the program to compute ring radius/longitude 
-    and x/y.  The output can be sent to a text file using the TO parameter and can
-    be read in a script via the "getkey" program.
+  <p>
+    The <i>ringsmappt</i> application computes various coordinate formats using
+    a map-projected cube.
+    </p>
+    <p>
+      The following table shows input parameters and the resulting coordinates 
+      that will be computed:
+    <table border="1">
+    <tr>
+      <th>Input Parameters</th>
+      <th>Coordinates Computed</th>
+    </tr>
+    <tr>
+      <td>Line and sample</td>
+      <td>Ring radius, ring longitude, X, and Y</td>
+    </tr>
+    <tr>
+      <td>Ring radius and ring longitude</td>
+      <td>Line, sample, X, and Y</td>
+    </tr>
+    <tr>
+      <td>X and Y</td>
+      <td>Line, sample, ring radius, and ring longitude</td>
+    </tr>
+    </table>
+    </p>
+    
+    <p>
+    The output options are the following:
+    <ul>
+      <li>Display to the screen only </li>
+      <li>PVL format text file </li>
+      <li>Comma delimited text file or flat file </li>
+    </ul>
+    </p>
+     <p>
+    The output file (TO) can be used as input to extract keyword values with a script via the <i>getkey</i> program.
+    Below is an example of the command line to execute the program, and the results that show the keywords and
+    the computed values: 
+<pre>
+ringsmappt from=W1591159850_1_cal.lev2.cub sample=1024 line=1024 
 
-    Example output:
-    <pre>
-      Group = Results
-        Filename                 = /home/mboyd/mapped.cub
-        Sample                   = 400.0
-        Line                     = 400.0
-        PixelValue               = Null
-        X                        = 36094.582198722
-        Y                        = -2602604.7032335
+Group = Results
+  Filename			   = W1591159850_1_cal.lev2.cub
+  Sample                           = 1024.0
+  Line                             = 1024.0
+  PixelValue                       = 2.9266113e+11
+  X                                = -58752169.950728
+  Y                                = -83725336.55945
+  RingRadius                       = 102282693.82409
 
-        # Input map coordinate system
-        PlanetocentricLatitude   = -85.828401770565
-        PositiveEast180Longitude = 26.807891885122
-
-        # Location in other coordinate systems
-        PlanetographicLatitude   = -85.828401770565
-        PositiveEast360Longitude = 26.807891885122
-        PositiveWest360Longitude = 333.19210811488
-        PositiveWest180Longitude = -26.807891885122
-      End_Group
-    </pre>
+  # Input map direction/domain for ring longitude.
+  CounterClockwise360RingLongitude = 234.9416974425
+  Clockwise360RingLongitude        = 125.0583025575
+  CounterClockwise180RingLongitude = -125.0583025575
+  Clockwise180RingLongitude        = 125.0583025575
+End_Group
+</pre>    
+</p>
+  <p>
+  The user can specify how the program interprets the rings longitude domain  
+  and rings longitude direction by defining the coordinate system parameters (COORDSYS).
+  The ring longitude direction can be set to clockwise or counterclockwise.
+  </p>
   </description>
 
   <category>
@@ -50,7 +81,7 @@
       Original version
     </change>
     <change name="Stuart Sides" date="2003-11-07">
-      Modified results pvl to not include the results group
+      Modified results PVL to not include the results group
     </change>
     <change name="Brendan George" date="2005-11-21">
       Added application test
@@ -60,7 +91,7 @@
     </change>
     <change name="Sean Crosby" date="2007-04-12">
       Changed flatfile output so it duplicates PVL data.  User now
-      required to entered a flatfile name.
+      required to enter a flatfile name.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
@@ -74,7 +105,7 @@
       documentation.
     </change>
     <change name="Mackenzie Boyd" date="2010-02-16">
-      Added many parameters accesible when inputing a lat lon, all under 
+      Added many parameters accessible when inputting a lat and lon, all under 
       coordinate system. These parameters are to select the input coordinate 
       system being used. Updated documentation to match.
     </change>
@@ -85,8 +116,11 @@
       Changed to work for ring plane projections.  References #775
     </change>
     <change name="Jeannie Backer" date="2013-03-12">
-      Added appTests.  Test coverage 96% scope, 94% line, 67% function. Function coverage is low since
-      there are GUI helper methods. 
+      Added appTests.  Test coverage 96% scope, 94% line, 67% function. 
+      Function coverage is low since there are GUI helper methods. 
+    </change>
+    <change name="Ella Mae Lee" date="2013-12-24">
+      Updated user documentation, fixes #1934.
     </change>
   </history>
 
@@ -96,10 +130,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Filename of a cube
+          Filename of a projected cube
         </brief>
         <description>
-          Input cube which must have a Mapping group in the labels.
+          Specify an input cube that contains Mapping group keywords in the labels.
         </description>
         <filter>
           *.cub
@@ -109,40 +143,41 @@
       <parameter name="TO">
         <type>filename</type>
         <fileMode>output</fileMode>
-        <brief>Text file</brief>
+        <brief>Output text file</brief>
         <internalDefault>None</internalDefault>
         <description>
-          A text file which will contain the results of this program.  This file can
-          be used in conjunction with the "getkey" program in order to pass 
-          the results to another program when developing scripts if the PVL 
+          Output filename that contains the results of <i>ringsmappt</i>.  This file can
+          be used in conjunction with the <i>getkey</i> program to pass 
+          the results to another program when developing scripts, if the PVL 
           format is selected.
         </description>
       </parameter>
       <parameter name="FORMAT">
         <type>string</type>
         <brief>
-          Output Format
+          Output format
         </brief>
         <description>
-          Format type for output file.  Pvl format is default.
+          The format type for the output file.  The default is in <def>PVL</def> format.
         </description>  
         <default><item>PVL</item></default>
         <list>
           <option value="PVL">
             <brief>
-              Pvl Format
+              PVL Format
             </brief>
             <description>
-              Output file will be in pvl format
+              Output file in PVL format
             </description>
           </option>
           <option value="FLAT">
             <brief>
-              FlatFile Format
+              Flat file Format
             </brief>
             <description>
-              Output file will be a comma deliminated flatfile.  This file format can easily be 
-              imported into excel.
+              Output file is a comma delimited text file with column headings.
+	      This file format can easily be imported into the Microsoft Excel 
+	      program or other spreadsheets.
             </description>
           </option>
         </list>
@@ -151,11 +186,12 @@
       <parameter name="APPEND">
         <type>boolean</type>
         <brief>
-          Append Output to File
+          Append result to output file
         </brief>
         <description>
-          If this option is selected, the output from the application will be appended to the file. 
-          If it is not selected, any information in the TO file will be overwritten.
+          If this option is selected, the output from <i>ringsmappt</i> will be 
+	  appended to the output file. If it is not selected, any information 
+	  in the TO file will be overwritten.
         </description>
         <default><item>TRUE</item></default>
       </parameter>
@@ -171,7 +207,7 @@
             <brief>Interprets the coordinate as sample/line</brief>
             <description>
               This option interprets the coordinate as sample/line and will
-              compute latitude/longitude and x/y
+              compute ring radius/ring longitude, and X/Y
             </description>
             <inclusions>
               <item>SAMPLE</item>
@@ -189,10 +225,10 @@
             </exclusions>
           </option>
           <option value="GROUND">
-            <brief>Interprets the coordinates as ring radius and longitude</brief>
+            <brief>Interprets the coordinates as ring radius and ring longitude</brief>
             <description>
-              This option interprets the coordinate as ring radius/longitude and will
-              compute sample/line and x/y
+              This option interprets the coordinate as ring radius/ring longitude and will
+              compute sample/line and X/Y
             </description>
             <inclusions>
               <item>RINGRADIUS</item>
@@ -207,10 +243,10 @@
             </exclusions>
           </option>
           <option value="PROJECTION">
-            <brief>Interprets the coordinate as x/y</brief>
+            <brief>Interprets the coordinate as X/Y</brief>
             <description>
-              This option interprets the coordinate as x/y and will
-              compute sample/line and ring radius/longitude
+              This option interprets the coordinate as X/Y and will
+              compute sample/line and ring radius/ring longitude
             </description>
             <inclusions>
               <item>X</item>
@@ -229,28 +265,29 @@
           </option>
         </list>
         <description>
-          This parameter is used to select the type of coordinate which will be used to
-          compute the other two remaining coordinates.
+          This parameter is used to select the type of input coordinate. The 
+	  options are IMAGE (sample/line), GROUND (ring radius/ring longitude),
+	  and PROJECTION (X/Y).
         </description>
       </parameter>
 
       <parameter name="SAMPLE">
         <type>double</type>
         <brief>
-          Sample Position
+          Sample position
         </brief>
         <description>
-            This is the sample position used to compute information about the camera state at the pixel.
+            This is the sample position used to compute information about the camera state at the pixel level.
         </description>
       </parameter>
 
       <parameter name="LINE">
         <type>double</type>
         <brief>
-          Line Position
+          Line position
         </brief>
         <description>
-            This is the line position used to compute information about the camera state at the pixel.
+            This is the line position used to compute information about the camera state at the pixel level.
         </description>
       </parameter>
 
@@ -258,10 +295,11 @@
         <type>double</type>
         <minimum inclusive="yes">0.0</minimum>
         <brief>
-          Ring Radius Value
+          Ring Radius value
         </brief>
         <description>
-          This is the ring ring radius from the center of target  used to compute the other coordinate values.        </description>
+          This is the ring radius value to use for the target.        
+	 </description>
       </parameter>
 
       <parameter name="RINGLONGITUDE">
@@ -270,10 +308,10 @@
           Ring Longitude value
         </brief>
         <description>
-          This is the ring longitude value used to compute the other coordinate values.  The ring longitude
-          will be interpreted as either CounterClockwise or Clockwise ring longitude 
-          and -180 to 180 or 0 to 360 domain depending on the option selected 
-          under coordinate system.
+          This is the ring longitude value.  The ring longitude will be interpreted as 
+	  either CounterClockwise or Clockwise, and as -180&#176; to 180&#176; or 0&#176; 
+	  to 360&#176; ring longitude domain, 
+	  depending on the option selected under coordinate system.
         </description>
       </parameter>
 
@@ -283,8 +321,7 @@
           X coordinate
         </brief>
         <description>
-          This is the x coordinate value used to compute the other coordinate values. It
-          will be a projection X value in meters.
+          This is the X coordinate value in meters.
         </description>
       </parameter>
 
@@ -294,8 +331,7 @@
           Y coordinate
         </brief>
         <description>
-          This is the y coordinate value used to compute the other coordinate values.  It
-           will be a projection Y value in meters.
+          This is the Y coordinate value in meters.
         </description>
       </parameter>
     </group>
@@ -304,13 +340,16 @@
       <parameter name="COORDSYS">
         <type>string</type>
         <brief> 
-          The coordinate system of the input ring radius and ring longitude.
+          The coordinate system of the ring radius and ring longitude
         </brief>
         <default><item>INPUTFILESYS</item></default>
         <description>
-          This is the coordinate system the input ring radius and ring longitude will be 
-          interpreted in. There are four possible options with the variation of 
-          counterclockwise or clockwise, 180 to -180 range or 0 to 360.
+          This is the coordinate system that the input ring radius and ring 
+	  longitude will be interpreted in. There are four possible options
+	  that include using the input cube settings, the ISIS defaults, user
+	  defined settings, or an existing map file template.  The values will 
+	  be interpreted as counterclockwise or clockwise, and -180&#176; to 180&#176; or 
+	  0&#176; to 360&#176; rings longitude domain.
         </description>
         <list>
           <option value="INPUTFILESYS">
@@ -318,7 +357,7 @@
               Use coordinate system of input file
             </brief>  
             <description>
-              This option uses the coordinate system of the input cube, this 
+              This option uses the coordinate system of the input cube; this 
               could be any of four possibilities. This is the default behavior.
             </description>
             <exclusions>
@@ -330,11 +369,12 @@
 
           <option value="UNIVERSAL">
             <brief>
-              Isis default
+              ISIS default
             </brief>
             <description>
-              The Isis default coordinate system of counterclockwise, 
-              domain 0 to 360. 
+              The ISIS default coordinate system of counterclockwise
+	      ring longitude direction and rings longitude
+              domain 0&#176; to 360&#176;. 
             </description>
             <exclusions>
               <item>RINGLONDIR</item>
@@ -348,8 +388,8 @@
               User defined coordinate system  
             </brief>  
             <description>
-              Accepts latitude and longitude in a user defined coordinate 
-              system, any of eight possible combinations.
+              The user defines the rings longitude direction and rings longitude
+	      domain for the coordinate system.
             </description>
             <inclusions>
               <item>RINGLONDIR</item>
@@ -362,11 +402,11 @@
           
           <option value="MAP">
             <brief>
-              Use mapping group from other file
+              Use mapping group from another file
             </brief>  
             <description>
-              The mapping group of the given file is read in to convert from its
-              system to universal to be set in the input cube's projection.
+	      Use an existing file (NOT THE INPUT FILE) with Mapping group 
+	      information to determine the coordinate system for the computations.
             </description>
             <inclusions>
               <item>MAP</item>
@@ -386,17 +426,17 @@
           File containing mapping parameters
         </brief>
         <description>
-          This file can be a cube or a simple hand produced map file. This file 
-          must contain a maping group and is how the coordinate system will be 
-          determined if selected.
+          This file can be a cube or a user generated map file template, but 
+	  not the input file. This file must contain the mapping group and is 
+	  used to determine the coordinate system, if selected.
         </description>
         <helpers>
           <helper name="H1">
             <function>PrintMap</function>
             <brief>View MapFile</brief>
             <description>
-              This helper button will cat out the mapping group of the given mapfile to the session log
-               of the application
+              This help button will display the mapping group of the selected 
+	      Map File to the session log of the application
              </description>
             <icon>$ISIS3DATA/base/icons/labels.png</icon>
           </helper>
@@ -409,11 +449,12 @@
       <parameter name="RINGLONDIR">
         <type>string</type>
         <brief>
-          Ring Longitude Direction
+          Ring Longitude direction
         </brief>
         <description>
-          The ring longitude direction for the projection.  It can have a direction of Counterclockwise 
-          or Clockwise.  COUNTERCLOCKWISE is the default.
+          This is the ring longitude direction for the projection.  The  
+	  direction can be Counterclockwise or Clockwise.  COUNTERCLOCKWISE is 
+	  the default.
         </description>
         <default>
           <item>COUNTERCLOCKWISE</item>
@@ -424,8 +465,8 @@
               CounterClockwise Ring Longitude Direction
             </brief>
             <description>
-              Sets the ring longitude direction of the input  to be interpreted as 
-              CounterClockwise.
+              Sets the ring longitude direction of the input to be interpreted 
+	      as CounterClockwise.
             </description>
           </option>
           <option value="CLOCKWISE">
@@ -443,11 +484,11 @@
       <parameter name="RINGLONDOM">
         <type>string</type>
         <brief>
-          Ring Longitude Domain
+          Ring Longitude domain
         </brief>
         <description>
-          The ring longitude domain for the projection. It can either have a domain
-          of 180 or 360. 360 is the default.
+          The ring longitude domain for the projection can either be
+	  180 or 360.  The default setting is 360.
         </description>
         <default>
           <item>360</item>
@@ -458,7 +499,7 @@
               0 to 360 Degree Ring Longitude Domain
             </brief>
             <description>
-              Sets the ring longitude domain of the input to be intrepreted as 0 to 
+              Sets the ring longitude domain of the input to be interpreted as 0 to 
               360 degrees.
             </description>
           </option>
@@ -467,8 +508,8 @@
               -180 to 180 Degree Ring Longitude Domain
             </brief>
             <description>
-              Sets the ring longitude domain of the input to be interpreted as 0 to 
-              180 degrees.
+              Sets the ring longitude domain of the input to be interpreted as 
+	      -180 to 180 degrees.
             </description>
           </option>
         </list>

@@ -7,11 +7,11 @@
 
 <h2><a name="Introduction">Introduction</a></h2>
 <p>
-Session logs are a mechanism for users to keep track of work they have done.  It is a record of the execution of an Isis program or sequence of Isis programs.  Information written to the log includes:
+Session logs are a mechanism for users to keep track of work they have done.  It is a record of the execution of an ISIS program or sequence of ISIS programs.  Information written to the log includes:
 </p>
 
   <ul>
-	<li>Isis version number</li>
+	<li>ISIS version number</li>
 	<li>Program version date</li>
 	<li>Date and time the program was run</li>
 	<li>Computer name on which the program was run</li>
@@ -25,7 +25,7 @@ Session logs are a mechanism for users to keep track of work they have done.  It
 
 <p>
 Control of session logs can be handled via user preferences.  For specific information on these preferences see the 
-<a href="../PreferenceDictionary/PreferenceDictionary.html">Isis Preference Dictionary</a>.
+<a href="../PreferenceDictionary/PreferenceDictionary.html">ISIS Preference Dictionary</a>.
 
 <pre style="padding-left:4em;">Group = SessionLog
   TerminalOutput = On | Off

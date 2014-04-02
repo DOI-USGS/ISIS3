@@ -82,6 +82,8 @@ namespace Isis {
    *                           from the MinimumY to the MaximumY are at least one pixel resolution.
    *                           This ensures that the created cube will have at least one sample and
    *                           at least one line. References #775.
+   *  @history 2014-01-16 Kimberly Oyama - Updated the error messages for unsupported projections
+   *                          to include the source of the error. Fixes #988.
    */
   class ProjectionFactory {
     public:

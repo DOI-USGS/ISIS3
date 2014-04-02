@@ -23,10 +23,11 @@
 
 #include <QMap>
 #include <QList>
-
 #include <iostream>
 
 #include <boost/numeric/ublas/fwd.hpp>
+
+class QDebug;
 
 namespace Isis {
 
@@ -41,6 +42,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-07-29 Ken Edmundson Created
+   *   @history 2014-02-25 Ken Edmundson - operators to read/write matrices to binary disk file and
+   *                       to write matrices to QDebug stream.
    */
   class SparseBlockColumnMatrix :
       public QMap< int, boost::numeric::ublas::matrix<double>* > {
@@ -60,8 +63,18 @@ namespace Isis {
     void zeroBlocks();
     bool InsertMatrixBlock(int nColumnBlock, int nRows, int nCols);
     int numberOfElements();
+    int numberOfRows();
+    int numberOfColumns();
     void print(std::ostream& outstream);
   };
+
+  // operators to read/write SparseBlockColumnMatrix to/from binary disk file
+  QDataStream &operator<<(QDataStream &, const SparseBlockColumnMatrix &);
+  QDataStream &operator>>(QDataStream &, SparseBlockColumnMatrix &);
+
+  // operator to write SparseBlockColumnMatrix to QDebug stream
+  QDebug operator<<(QDebug dbg, const SparseBlockColumnMatrix &sbcm);
+
 
   /**
    * @brief SparseBlockRowMatrix
@@ -74,6 +87,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-07-29 Ken Edmundson Created
+   *   @history 2014-02-25 Ken Edmundson - operators to read/write matrices to binary disk file and
+   *                       to write matrices to QDebug stream.
    */
   class SparseBlockRowMatrix :
       public QMap< int, boost::numeric::ublas::matrix<double>* > {
@@ -87,6 +102,7 @@ namespace Isis {
 
     SparseBlockRowMatrix& operator=(const SparseBlockRowMatrix& src);
 
+
     void wipe();
     void copy(const SparseBlockRowMatrix& src);
 
@@ -96,6 +112,13 @@ namespace Isis {
     int numberOfElements();
     void print(std::ostream& outstream);
   };
+
+  // operators to read/write SparseBlockRowMatrix to/from binary disk file
+  QDataStream &operator<<(QDataStream &, const SparseBlockRowMatrix &);
+  QDataStream &operator>>(QDataStream &, SparseBlockRowMatrix &);
+
+  // operator to write SparseBlockRowMatrix to QDebug stream
+  QDebug operator<<(QDebug dbg, const SparseBlockRowMatrix &sbcm);
 
   /**
    * @brief SparseBlockMatrix
@@ -108,6 +131,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-07-29 Ken Edmundson Created
+   *   @history 2014-02-25 Ken Edmundson - operators to read/write matrices to binary disk file and
+   *                       to write matrices to QDebug stream.
    */
   class SparseBlockMatrix : public QList< SparseBlockColumnMatrix* > {
 
@@ -132,7 +157,15 @@ namespace Isis {
     int numberOfOffDiagonalBlocks();
     int numberOfElements();
     void print(std::ostream& outstream);
+    bool write(std::ofstream &fp_out, bool binary=true);
   };
+
+  // operators to read/write SparseBlockMatrix to/from binary disk file
+  QDataStream &operator<<(QDataStream &, const SparseBlockMatrix &);
+  QDataStream &operator>>(QDataStream &, SparseBlockMatrix &);
+
+  // operator to write SparseBlockMatrix to QDebug stream
+  QDebug operator<<(QDebug dbg, const SparseBlockMatrix &m);
 }
 
 #endif

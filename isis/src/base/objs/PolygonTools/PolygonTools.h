@@ -122,6 +122,9 @@ namespace Isis {
    *   @history 2011-05-31 Steven Lambright - Improved To180 (not finished). The
    *                           remaining work is to remove the 0 seam from the polygons.
    *   @history 2013-02-26 Stuart Sides - Modified the output of GML and GML schema
+   *   @history 2013-08-12 Stuart Sides - Added SplitPolygonOn360 and
+   *                           FixPolePolygon methods.  Code was extracted from the ImagePolygon
+   *                           class.  References #1604.
    */
 
   class PolygonTools {
@@ -161,48 +164,64 @@ namespace Isis {
       //Return the thickness of a polygon
       static double Thickness(const geos::geom::MultiPolygon *mpolygon);
 
-      static geos::geom::Geometry *Intersect(const geos::geom::Geometry *geom1, const geos::geom::Geometry *geom2);
-      static geos::geom::Geometry *Difference(const geos::geom::Geometry *geom1, const geos::geom::Geometry *geom2);
+      static geos::geom::Geometry *Intersect(const geos::geom::Geometry *geom1,
+                                             const geos::geom::Geometry *geom2);
+      static geos::geom::Geometry *Difference(const geos::geom::Geometry *geom1,
+                                              const geos::geom::Geometry *geom2);
 
       static geos::geom::MultiPolygon *MakeMultiPolygon(const geos::geom::Geometry *geom);
 
       static QString GetGeometryName(const geos::geom::Geometry *geom);
 
-      static bool Equal(const geos::geom::MultiPolygon *poly1, const geos::geom::MultiPolygon *poly2);
+      static bool Equal(const geos::geom::MultiPolygon *poly1,
+                        const geos::geom::MultiPolygon *poly2);
       static bool Equal(const geos::geom::Polygon *poly1, const geos::geom::Polygon *poly2);
-      static bool Equal(const geos::geom::LineString *lineString1, const geos::geom::LineString *lineString2);
+      static bool Equal(const geos::geom::LineString *lineString1,
+                        const geos::geom::LineString *lineString2);
       static bool Equal(const geos::geom::Coordinate &coord1, const geos::geom::Coordinate &coord2);
       static bool Equal(const double d1, const double d2);
-    private:
-      geos::geom::MultiPolygon *p_polygons;
 
+      static geos::geom::MultiPolygon *FixSeam(const geos::geom::MultiPolygon *poly);
+      static geos::geom::MultiPolygon *FixSeam(const geos::geom::Polygon *polyA,
+                                               const geos::geom::Polygon *polyB);
+
+      static geos::geom::Geometry     *ReducePrecision(const geos::geom::Geometry *geom,
+                                                       unsigned int precision);
+      static geos::geom::MultiPolygon *ReducePrecision(const geos::geom::MultiPolygon *poly,
+                                                       unsigned int precision);
+      static geos::geom::Polygon      *ReducePrecision(const geos::geom::Polygon *poly,
+                                                       unsigned int precision);
+      static geos::geom::LinearRing   *ReducePrecision(const geos::geom::LinearRing *ring,
+                                                       unsigned int precision);
+      static geos::geom::Coordinate   *ReducePrecision(const geos::geom::Coordinate *coord,
+                                                       unsigned int precision);
+      static double ReducePrecision(double num, unsigned int precision);
+
+      static geos::geom::MultiPolygon *FixPolePolygon(const geos::geom::MultiPolygon *polePolygon,
+                                                      UniversalGroundMap *ugm);
+      static geos::geom::MultiPolygon *SplitPolygonOn360(const geos::geom::Polygon *inPoly);
+
+
+    private:
       //! Returns true if the middle point is spiked
-      static bool IsSpiked(geos::geom::Coordinate first, geos::geom::Coordinate middle, geos::geom::Coordinate last);
+      static bool IsSpiked(geos::geom::Coordinate first,
+                           geos::geom::Coordinate middle, geos::geom::Coordinate last);
       //! Used by IsSpiked to directionally test (first/last matter) the spike
-      static bool TestSpiked(geos::geom::Coordinate first, geos::geom::Coordinate middle, geos::geom::Coordinate last);
+      static bool TestSpiked(geos::geom::Coordinate first, geos::geom::Coordinate middle,
+                             geos::geom::Coordinate last);
 
       static geos::geom::Geometry     *FixGeometry(const geos::geom::Geometry *geom);
       static geos::geom::MultiPolygon *FixGeometry(const geos::geom::MultiPolygon *poly);
       static geos::geom::Polygon      *FixGeometry(const geos::geom::Polygon *poly);
       static geos::geom::LinearRing   *FixGeometry(const geos::geom::LinearRing *ring);
 
-    public:
-      static geos::geom::MultiPolygon *FixSeam(const geos::geom::MultiPolygon *poly);
-      static geos::geom::MultiPolygon *FixSeam(const geos::geom::Polygon *polyA,
-                                               const geos::geom::Polygon *polyB);
-      
-      static geos::geom::Geometry     *ReducePrecision(const geos::geom::Geometry *geom, unsigned int precision);
-      static geos::geom::MultiPolygon *ReducePrecision(const geos::geom::MultiPolygon *poly, unsigned int precision);
-      static geos::geom::Polygon      *ReducePrecision(const geos::geom::Polygon *poly, unsigned int precision);
-      static geos::geom::LinearRing   *ReducePrecision(const geos::geom::LinearRing *ring, unsigned int precision);
-      static geos::geom::Coordinate   *ReducePrecision(const geos::geom::Coordinate *coord, unsigned int precision);
-      static double ReducePrecision(double num, unsigned int precision);
-
-    private:
-
-      static geos::geom::Geometry *Operate(const geos::geom::Geometry *geom1, const geos::geom::Geometry *geom2, unsigned int opcode);
+      static geos::geom::Geometry *Operate(const geos::geom::Geometry *geom1,
+                                           const geos::geom::Geometry *geom2, unsigned int opcode);
 
       static int DecimalPlace(double);
+
+      geos::geom::MultiPolygon *p_polygons;
+
   };
 };
 

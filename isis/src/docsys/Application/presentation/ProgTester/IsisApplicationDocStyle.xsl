@@ -6,7 +6,7 @@
 
 <!--
 
-This stylesheet generates the PROGRAMMERS TEST HTML version of the application documentation, used by Isis Programmers for testing and previewing their documentation. The stylesheet is used by Xalan during the "make {app name}.html" command. An HTML file will be written to the working directory where she can open it in any browser.
+This stylesheet generates the PROGRAMMERS TEST HTML version of the application documentation, used by ISIS Programmers for testing and previewing their documentation. The stylesheet is used by Xalan during the "make {app name}.html" command. An HTML file will be written to the working directory where she can open it in any browser.
 
 Author
 Deborah Lee Soltesz
@@ -140,7 +140,7 @@ Deborah Lee Soltesz
   /*  ISIS APPLICATION DOC STYLE SHEET
    *  FILENAME: IsisApplicationDocStyle.css
    *
-   *  Purpose: formatting style sheet for Isis Application
+   *  Purpose: formatting style sheet for ISIS Application
    *           documentation presentation
    *
    *  Author:  Deborah Lee Soltesz, USGS, 04/03/2002
@@ -509,7 +509,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; margin-bottom:0px;">
-        Isis 3 Application Documentation</p>
+        ISIS 3 Application Documentation</p>
 
         <hr/>
 
@@ -592,19 +592,19 @@ Deborah Lee Soltesz
         <xsl:if test="oldName">
           <hr/>
           <h2>
-            Related Applications in Previous Versions of Isis
+            Related Applications to Previous Versions of ISIS
           </h2>
 
-          This application replaces the following
+          This program replaces the following
           <xsl:choose>
             <xsl:when test="count(oldName/item) > 1">
-            applications existing in previous versions of Isis, which have been deprecated
+            applications 
             </xsl:when>
             <xsl:otherwise>
-            application existing in previous versions of Isis, which has been deprecated
+            application 
             </xsl:otherwise>
           </xsl:choose>
-          from the current version of Isis:
+          existing in previous versions of ISIS:
 
           <ul>
             <xsl:for-each select="oldName/item">

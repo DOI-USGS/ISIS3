@@ -7,7 +7,7 @@
         <h2>Introduction</h2>
 
         <p>
-        This document is a reference to the various objects and groups, which can be found in Isis labels.
+        This document is a reference to the various objects and groups, which can be found in ISIS labels.
         The definition of each object/group, the parameter meanings, and an example will be given.
         </p>
 
@@ -16,7 +16,7 @@
         </h2>
 
         <p>
-        The IsisCube Object is simply a container.  It is used to house the various elements (groups and objects) that make up an Isis cube.  The IsisCube object is comprised of the Core object, which defines the cube size and pixel attributes and many optional groups that are described elsewhere in this document including Archive, BandBin, Instrument, Kernels, and Mapping Groups.  While we present a whole IsisCube object we will save of the individual elements in their own sections.
+        The IsisCube Object is simply a container.  It is used to house the various elements (groups and objects) that make up an ISIS cube.  The IsisCube object is comprised of the Core object, which defines the cube size and pixel attributes and many optional groups that are described elsewhere in this document including Archive, BandBin, Instrument, Kernels, and Mapping Groups.  While we present a whole IsisCube object we will save of the individual elements in their own sections.
         </p>
 
 <pre style="padding-left:4em;">
@@ -96,7 +96,7 @@ EndObject
           </tr>
           <tr><td>Format</td>
               <td>String (Tile or BandSequential)</td>
-              <td>This keyword indicates how the cube data is arranged.  BandSequential indicates the pixels are stored first by sample, then by line, and finally by band.  Tile indicates the pixels are stored in tiles which is the preferred storage mechanism in Isis 3 as it facilities the fastest “universal access”. The tiles are stored in row major format.  That is, all the tiles for band 1 ordered from left-to-right, then top-to-bottom, followed by all the tiles for band 2, etc.</td>
+              <td>This keyword indicates how the cube data is arranged.  BandSequential indicates the pixels are stored first by sample, then by line, and finally by band.  Tile indicates the pixels are stored in tiles which is the preferred storage mechanism in ISIS 3 as it facilities the fastest “universal access”. The tiles are stored in row major format.  That is, all the tiles for band 1 ordered from left-to-right, then top-to-bottom, followed by all the tiles for band 2, etc.</td>
           </tr>
           <tr><td>TileSamples, TileLines</td>
               <td>Integer</td>
@@ -148,7 +148,7 @@ EndGroup
   </tr>
   <tr><td>Type</td>
       <td>String (UnsignedByte, SignedWord, Real)</td>
-      <td>Currently there are three type of pixels in Isis which represent unsigned 8-bit vaues (0 to 255), signed 16-bit values (-32768 to 32767) and 32-bit IEEE floating point pixel values.  [Future option] Support alternative pixel types.</td>
+      <td>Currently there are three type of pixels in ISIS which represent unsigned 8-bit vaues (0 to 255), signed 16-bit values (-32768 to 32767) and 32-bit IEEE floating point pixel values.  [Future option] Support alternative pixel types.</td>
   </tr>
   <tr><td>ByteOrder</td>
       <td>String (Lsb, Msb)</td>
@@ -162,7 +162,7 @@ EndGroup
 
         <h2>AlphaCube Group</h2>
         <p>
-        This group is used to map pixel locations in a child cube (beta) back to its parent cube (alpha).  It is necessary in order to determine which detector a pixel represents in Isis camera models.  The group is created by Isis ingestion programs (e.g., thm2isis, moc2isis, ciss2isis, etc) and automatically updated by programs such as crop, pad, reduce, or enlarge.  The keywords found in this group can occur in one of two places.  Either inside of the AlphaCube group or inside of the Instrument group and therefore they can occur twice.  Once if a crop occurred in Instrument (level 1) space and again if a crop occurred in Mapping (level 2) space.
+        This group is used to map pixel locations in a child cube (beta) back to its parent cube (alpha).  It is necessary in order to determine which detector a pixel represents in ISIS camera models.  The group is created by ISIS ingestion programs (e.g., thm2isis, moc2isis, ciss2isis, etc) and automatically updated by programs such as crop, pad, reduce, or enlarge.  The keywords found in this group can occur in one of two places.  Either inside of the AlphaCube group or inside of the Instrument group and therefore they can occur twice.  Once if a crop occurred in Instrument (level 1) space and again if a crop occurred in Mapping (level 2) space.
         </p>
 
 <pre style="padding-left:4em;">
@@ -244,7 +244,7 @@ EndGroup
 </table>
 
         <h2>ImportLabel Object</h2>
-        This object contains the original labels that were read during the import process, if possible.  For example, vicar2isis and pds2isis often have many more labels than are required by Isis programs.  However, there may be information in those labels that the user would like to examine or preserve.  Note that Isis program should never use any keywords values in these labels.
+        This object contains the original labels that were read during the import process, if possible.  For example, vicar2isis and pds2isis often have many more labels than are required by ISIS programs.  However, there may be information in those labels that the user would like to examine or preserve.  Note that ISIS program should never use any keywords values in these labels.
 
 <pre style="padding-left:4em;">
 Object = ImportLabel
@@ -351,7 +351,7 @@ EndGroup
   </tr>
   <tr><td>  InstrumentAddendum</td>
       <td>    Filename</td>
-      <td>  The name of the Isis addendum to the instrument kernel for the particular mission/instrument.  This often contains information that is lacking from the NAIF instrument kernel in order to have a properly functioning sensor model.</td>
+      <td>  The name of the ISIS addendum to the instrument kernel for the particular mission/instrument.  This often contains information that is lacking from the NAIF instrument kernel in order to have a properly functioning sensor model.</td>
   </tr>
   <tr><td>  SpacecraftPosition</td>
       <td>    Filename</td>
@@ -367,13 +367,13 @@ EndGroup
   </tr>
   <tr><td>  ElevationModel</td>
       <td>    Filename</td>
-      <td>  The name of an Isis cube containing the local (or global) radii covering the cube’s latitude/longitude ground range.  The elevation model will utilized by the camera model to remove topographic effects.  If one is not available the local radii is computed from the ellipsoid defined in the TargetAttitudeShape kernel.</td>
+      <td>  The name of an ISIS cube containing the local (or global) radii covering the cube’s latitude/longitude ground range.  The elevation model will utilized by the camera model to remove topographic effects.  If one is not available the local radii is computed from the ellipsoid defined in the TargetAttitudeShape kernel.</td>
   </tr>
 </table>
 
         <h2>Mapping Group</h2>
         <p>
-        The Mapping Group is used to define map projections.  Recommending reading includes the Isis Map Projection Guide and Map Projections – A Working Manual, Snyder, J.P., U.S. Geological Survey, Bulletin 1532.
+        The Mapping Group is used to define map projections.  Recommending reading includes the ISIS Map Projection Guide and Map Projections – A Working Manual, Snyder, J.P., U.S. Geological Survey, Bulletin 1532.
         </p>
 
 <pre style="padding-left:4em;">
@@ -471,9 +471,9 @@ EndGroup
 
   <bibliography>
     <title>Label Dictionary</title>
-    <brief>Reference to the objects and groups in Isis cube labels</brief>
+    <brief>Reference to the objects and groups in ISIS cube labels</brief>
     <description>
-        This document is a reference to the various objects and groups, which can be found in Isis labels.
+        This document is a reference to the various objects and groups, which can be found in ISIS labels.
         The definition of each object/group, the parameter meanings, and an example will be given.
     </description>
     <author>Jeff Anderson</author>

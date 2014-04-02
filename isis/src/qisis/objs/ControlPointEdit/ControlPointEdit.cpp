@@ -726,6 +726,7 @@ namespace Isis {
 
     p_rightMeasure = rightMeasure;
     p_pointId = pointId;
+    qDebug() << "setright Measure:" << p_pointId;
 
     if (p_useGeometry) {
       //  get new ground map
@@ -1073,11 +1074,22 @@ namespace Isis {
    *                          and current coordinate.  If autoreg has been
    *                          calculated, save coordinate to apriori before
    *                          updating to subpixel registered coordinate.
+   *   @history 2013-11-07 Tracie Sucharski - Moved error checking on edit locked measures from
+   *                          QnetTool::measureSaved to ::saveMeasure.  The error checking now
+   *                          forces the edit lock check box to be unchecked before the measure
+   *                          can be saved.
    *
    */
   void ControlPointEdit::saveMeasure() {
 
     if ( p_rightMeasure != NULL ) {
+
+      if (p_rightMeasure->IsEditLocked()) {
+        QString message = "The right measure is locked.  You must first unlock the measure by ";
+        message += "clicking the check box above labeled \"Edit Lock Measure\".";
+        QMessageBox::warning((QWidget *)parent(),"Warning",message);
+        return;
+      }
 
       if ( p_autoRegShown ) {
         //  Reset AprioriSample/Line to the current coordinate, before the
@@ -1125,6 +1137,13 @@ namespace Isis {
 
     if ( p_allowLeftMouse ) {
       if ( p_leftMeasure != NULL ) {
+        if (p_leftMeasure->IsEditLocked()) {
+          QString message = "The left measure is locked.  You must first unlock the measure by ";
+          message += "clicking the check box above labeled \"Edit Lock Measure\".";
+          QMessageBox::warning((QWidget *)parent(),"Warning",message);
+          return;
+        }
+
         p_leftMeasure->SetCoordinate(p_leftView->tackSample(), p_leftView->tackLine());
         p_leftMeasure->SetDateTime();
         p_leftMeasure->SetChooserName(Application::UserName());
@@ -1538,19 +1557,20 @@ namespace Isis {
     }
 
     //  Save chips - pattern, search and fit
-    QString baseFile = p_pointId + "_" +
+    QString baseFile = p_pointId.replace(" ", "_") + "_" +
                            toString((int)(p_leftMeasure ->GetSample())) + "_" +
                            toString((int)(p_leftMeasure ->GetLine()))   + "_" +
                            toString((int)(p_rightMeasure->GetSample())) + "_" +
                            toString((int)(p_rightMeasure->GetLine()))   + "_";
     QString fname = baseFile + "Search.cub";
-    QString command = "$ISISROOT/bin/qview " + fname;
+    qDebug() << "in save chips fname:" << fname;
+    QString command = "$ISISROOT/bin/qview \'" + fname + "\'";
     p_autoRegFact->RegistrationSearchChip()->Write(fname);
     fname = baseFile + "Pattern.cub";
-    command += " " + fname;
+    command += " \'" + fname + "\'";
     p_autoRegFact->RegistrationPatternChip()->Write(fname);
     fname = baseFile + "Fit.cub";
-    command += " " + fname + "&";
+    command += " \'" + fname + "\' &";
     p_autoRegFact->FitChip()->Write(fname);
     ProgramLauncher::RunSystemCommand(command);
   }

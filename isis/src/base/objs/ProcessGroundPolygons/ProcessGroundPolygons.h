@@ -24,6 +24,8 @@ namespace Isis {
    *   @history 2012-02-24 Steven Lambright - Added Finalize()
    *   @history 2013-03-27 Jeannie Backer - Added programmer comments.
    *                           References #1248.
+   *   @history 2013-09-10 Stuart Sides, Tracie Sucharski - Cleaned up and removed extraneous code.
+   *                           References #1604.
    */
   class ProcessGroundPolygons : public ProcessPolygons {
     public:
@@ -59,8 +61,6 @@ namespace Isis {
                      std::vector<double> &lon,
                      int &band, double &value);
 
-      void Rasterize(double &lat, double &lon, int &band, double &value);
-
       void EndProcess();
       void Finalize();
       UniversalGroundMap *GetUniversalGroundMap() {
@@ -69,7 +69,6 @@ namespace Isis {
 
     private:
       void Convert(std::vector<double> &lat, std::vector<double> &lon);
-      void Convert(double &lat, double &lon);
       UniversalGroundMap *p_groundMap;
       std::vector<double> p_samples, p_lines;
 

@@ -1,0 +1,6 @@
+Group = NewHorizons/LORRI
+  Version = 1
+  Library = NewHorizonsLorriCamera
+  Routine = NewHorizonsLorriCameraPlugin
+EndGroup
+

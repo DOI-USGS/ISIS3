@@ -51,6 +51,13 @@ namespace Isis {
    *                                         and sinc are not equal, so now
    *                                         this class is more likely to not
    *                                         delete the instrument group.
+   *  @history 2013-12-27 Janet Barrett - Modified the UpdateLabel method so that
+   *                                      it updates the MinimumLatitude, MaximumLatitude,
+   *                                      MinimumLongitude, and MaximumLongitude keywords
+   *                                      for equatorial cylindrical projections. All other
+   *                                      projections will not have these keywords in their
+   *                                      labels because it is not possible to recalculate
+   *                                      them for curved projections. Fixes #1500.
    */
 
   class SubArea {

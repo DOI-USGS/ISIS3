@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        Isis 3 Documentation</p>
+        ISIS 3 Documentation</p>
 
         <hr/>
 

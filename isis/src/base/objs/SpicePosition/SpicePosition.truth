@@ -232,7 +232,7 @@ Spacecraft (J) = -2908.5547 -1132.341 1981.0143
 Velocity (J) = -3.4897304 1.5779899 -2.6234689
 
 Test fitting polynomial function over Hermite to new Hermite
-Cache size is 453Source = 1
+Source = 1
 Time           = -69382819
 Spacecraft (J) = -1730.4648 -1562.2158 2691.2808
 Velocity (J) = -4.1416825 1.1953732 -1.9583854

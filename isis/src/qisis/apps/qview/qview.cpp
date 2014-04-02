@@ -83,12 +83,15 @@ int main(int argc, char *argv[]) {
         if((connect(p_socket, (struct sockaddr *)&p_socketName,
                     sizeof(p_socketName))) >= 0) {
           QString temp;
+          /*
+           * We need a very uncommon token to use for parsing.
+           */
+          QChar escape(27);
           for(int i = 1; i < argc; i++) {
-            temp += QFileInfo(
-                  FileName(argv[i]).expanded()).absoluteFilePath()
-                + " ";
+            temp += QFileInfo(FileName(argv[i]).expanded()).absoluteFilePath();
+            temp += QString(escape);
           }
-          temp += "raise ";
+          temp += "raise";
           // Try to send data to the socket
           if(send(p_socket, temp.toAscii().data(), temp.size(), 0) >= 0) {
             // Success, the other qview will open this file.

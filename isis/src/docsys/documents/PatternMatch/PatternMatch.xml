@@ -72,7 +72,7 @@
         <h2><a name="Introduction">Introduction</a></h2>
         <p>
           This document attempts to describe how automatic registration is
-          accomplished in Isis 3.  In simple terms, automatic registration is
+          accomplished in ISIS 3.  In simple terms, automatic registration is
           the attempt to match a pattern in a cube.  For example, given a reseau
           template pattern, we would like to find positions in a cube which
           match the reseau.  Similarly, if we extract from a cube a ground
@@ -85,7 +85,7 @@
         <p>
           Automatic registration is a tricky subject.  Algorithms and
           parameters that successfully work for one pattern are likely not to
-          work for other conditions.  In Isis 3, we do not want to restrict our
+          work for other conditions.  In ISIS 3, we do not want to restrict our
           registration programs (e.g., coreg, pointreg) to a single algorithm.
           We would view this similar to map projections or camera models.  That
           is, if a particular registration algorithm meets our needs we can
@@ -208,7 +208,7 @@
           find the "best" match within the search area.
         </p>
         <p>
-          An objective of the Isis 3 automatic registration design is to allow
+          An objective of the ISIS 3 automatic registration design is to allow
           for a variety of match algorithms.  For example, an algorithm could
           be developed that works best for matching MGS/MOC wide angle and
           Odyssey Themis IR cameras.  For this objective to be met we will
@@ -536,7 +536,7 @@
         </p>
 
         <p>
-           As of isis3.4.0, the subpixel algorithm was replaced with the algorithm
+           As of ISIS3.4.0, the subpixel algorithm was replaced with the algorithm
            described under SurfaceModeling. To estimate the true registration postion,
            the previous algorithm used a least squares fit to generate a 2nd degree 
            2-dimentional polynomial given an NxN window of points from the fit chip.

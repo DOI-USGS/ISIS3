@@ -22,7 +22,9 @@ namespace Isis {
   /**
    * @author 2012-??-?? ???
    *
-   * @internal
+   * @internal 
+   * @history 2014-01-08 Tracie Sucharski - Added layer re-ordering connections to all images 
+   *                         in list instead of just the first image.  Fixes #1755. 
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT

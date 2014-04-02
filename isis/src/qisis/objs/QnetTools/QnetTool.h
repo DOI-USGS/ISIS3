@@ -202,6 +202,17 @@ namespace Isis {
    * @history 2013-05-16 Tracie Sucharski - Fixed some bugs when closing a ground source, opening 
    *                          a new ground source, and printing errors when point does not exist
    *                          on current ground source.  Fixes #1655.
+   * @history 2013-11-07 Tracie Sucharski - Moved error checking on edit locked measures from
+   *                          ::measureSaved to ControlPointEdit::saveMeasure.  The error checking now
+   *                          forces the edit lock check box to be unchecked before the measure
+   *                          can be saved.  Fixes #1624.
+   * @history 2013-12-05 Tracie Sucharski - Added error check for an ignored reference measure 
+   *                          when changing point type to constrained or fixed or when saving
+   *                          constrained or fixed point with an ignored reference measure.
+   *                          Added new method, loadGroundMeasure, so that loadPoint does not
+   *                          need to be called from setPointType.  This avoids reloading the point
+   *                          in case the ignored flag has been changed, but measure has not been
+   *                          saved.  References #1603.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -321,6 +332,7 @@ namespace Isis {
       void createMenus();
       void createToolBars();
       void loadPoint();
+      void loadGroundMeasure();
       void loadMeasureTable();
       void drawAllMeasurments (MdiCubeViewport *vp,QPainter *painter);
       void drawGroundMeasures (MdiCubeViewport *vp,QPainter *painter);

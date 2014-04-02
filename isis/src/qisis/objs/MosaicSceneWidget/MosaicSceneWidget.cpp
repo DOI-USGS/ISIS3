@@ -81,6 +81,8 @@ namespace Isis {
     m_rubberBandOrigin = NULL;
     m_outlineRect = NULL;
     m_blockingSelectionChanged = false;
+    m_queuedSelectionChanged = false;
+    m_shouldRequeueSelectionChanged = false;
 
     m_userToolControl = false;
     m_ownProjection = false;

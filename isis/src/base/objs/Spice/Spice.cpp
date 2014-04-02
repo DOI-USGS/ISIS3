@@ -24,6 +24,7 @@
 #include <cfloat>
 #include <iomanip>
 
+#include <QDebug>
 #include <QVector>
 
 #include "Constants.h"
@@ -187,6 +188,14 @@ namespace Isis {
       // (2010-04-07) (DAC)
       if (kernels.hasKeyword("Extra")) {
         load(kernels["Extra"], noTables);
+      }
+
+      // If Target is Saturn and ShapeModel is RingPlane, load the extra rings pck file
+      //  which changes the prime meridian values to report longitudes with respect to
+      // the ascending node of the ringplane.
+      if (m_target->name().toUpper() == "SATURN" && m_target->shape()->name().toUpper() == "PLANE") {
+        PvlKeyword ringPck = PvlKeyword("RingPCK","$cassini/kernels/pck/saturnRings_v001.tpc");
+        load(ringPck, noTables);
       }
     }
     else {
@@ -700,6 +709,19 @@ namespace Isis {
    * @throw Isis::iException::Programmer - "You must call SetTime first"
    */
   void Spice::instrumentPosition(double p[3]) const {
+    instrumentBodyFixedPosition(p);
+  }
+
+  /**
+   * Returns the spacecraft position in body-fixed frame km units.
+   *
+   * @param p[] Spacecraft position
+   *
+   * @see setTime()
+   *
+   * @throw Isis::iException::Programmer - "You must call SetTime first"
+   */
+  void Spice::instrumentBodyFixedPosition(double p[3]) const {
     if (m_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -711,24 +733,30 @@ namespace Isis {
     p[2] = sB[2];
   }
 
-
   /**
    * Returns the spacecraft velocity in body-fixed frame km/sec units.
    *
    * @param v[] Spacecraft velocity
    */
-  void Spice::instrumentVelocity(double v[3]) const {
+  void Spice::instrumentBodyFixedVelocity(double v[3]) const {
     if (m_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    std::vector<double> vB = m_bodyRotation->ReferenceVector(m_instrumentPosition->Velocity());
-    v[0] = vB[0];
-    v[1] = vB[1];
-    v[2] = vB[2];
-  }
+    std::vector<double> state;
+    state.push_back(m_instrumentPosition->Coordinate()[0]);
+    state.push_back(m_instrumentPosition->Coordinate()[1]);
+    state.push_back(m_instrumentPosition->Coordinate()[2]);
+    state.push_back(m_instrumentPosition->Velocity()[0]);
+    state.push_back(m_instrumentPosition->Velocity()[1]);
+    state.push_back(m_instrumentPosition->Velocity()[2]);
 
+    std::vector<double> vB = m_bodyRotation->ReferenceVector(state);
+    v[0] = vB[3];
+    v[1] = vB[4];
+    v[2] = vB[5];
+  }
 
   /**
     * Returns the ephemeris time in seconds which was used to obtain the

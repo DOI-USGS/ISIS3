@@ -701,8 +701,8 @@ namespace Isis {
           // If our projection is sky, the lat & lons are switched
           if (cvp->projection()->IsSky()) {
             tproj = (TProjection *) cvp->projection();
-            m_startLat = tproj->UniversalLongitude();
-            m_startLon = tproj->UniversalLatitude();
+            m_startLat = tproj->UniversalLatitude();
+            m_startLon = tproj->UniversalLongitude();
           }
           else if (projType == Projection::Triaxial) {
             tproj = (TProjection *) cvp->projection();
@@ -718,12 +718,12 @@ namespace Isis {
           if (cvp->projection()->SetWorld(m_endSamp, m_endLine)) {
             // If our projection is sky, the lat & lons are switched
             if (cvp->projection()->IsSky()) {
-              m_endLat = tproj->UniversalLongitude();
-              m_endLon = tproj->UniversalLatitude();
+              m_endLat = tproj->UniversalLatitude();
+              m_endLon = tproj->UniversalLongitude();
             }
             else if (projType == Projection::Triaxial) {
-              m_endLat = tproj->UniversalLongitude();
-              m_endLon = tproj->UniversalLatitude();
+              m_endLat = tproj->UniversalLatitude();
+              m_endLon = tproj->UniversalLongitude();
             } // RingPlaneProjection
             else {
               m_endLat = rproj->UniversalRingRadius();

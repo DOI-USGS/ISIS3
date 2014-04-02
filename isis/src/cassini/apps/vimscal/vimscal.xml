@@ -66,6 +66,11 @@
       Fixed the default value for the solar remove coefficient. Without this fix, some resulting
       files had I/F values much larger than 1.0. Fixes #1143.
     </change>
+    <change name="Tracie Sucharski" date="2013-09-09">
+      The Ir exposure duration in the Vims labels is incorrect due to the inaccuracy of the Vims
+      clock.  The Ir exposure duration needs a correction factor of 1.01725 applied before using.
+      References #1759.
+    </change>
   </history>
 
   <category>

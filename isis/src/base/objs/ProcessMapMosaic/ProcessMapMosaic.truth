@@ -11,10 +11,7 @@ unittest: Mosaicking unitTest2.cub
 Mosaic label: 
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
     Format      = Tile
-    TileSamples = 128
-    TileLines   = 128
 
     Group = Dimensions
       Samples = 124
@@ -24,7 +21,6 @@ Object = IsisCube
 
     Group = Pixels
       Type       = UnsignedByte
-      ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
     End_Group
@@ -51,13 +47,10 @@ Object = IsisCube
 End_Object
 
 Object = Label
-  Bytes = 65536
 End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 81921
-  Bytes     = 3026
 End_Object
 End
 Testing Mosaic 2
@@ -72,10 +65,7 @@ unittest: Mosaicking unitTest2.cub
 Mosaic label: 
 Object = IsisCube
   Object = Core
-    StartByte   = 65537
     Format      = Tile
-    TileSamples = 128
-    TileLines   = 128
 
     Group = Dimensions
       Samples = 248
@@ -85,7 +75,6 @@ Object = IsisCube
 
     Group = Pixels
       Type       = UnsignedByte
-      ByteOrder  = Lsb
       Base       = 0.0
       Multiplier = 1.0
     End_Group
@@ -112,13 +101,10 @@ Object = IsisCube
 End_Object
 
 Object = Label
-  Bytes = 65536
 End_Object
 
 Object = History
   Name      = IsisCube
-  StartByte = 131073
-  Bytes     = 3026
 End_Object
 End
 Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
@@ -370,3 +356,250 @@ Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
 Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
 Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
 Mosaic Data: -1.79769e+308	-1.79769e+308	-1.79769e+308
+
+Testing Mosaic where the input (x, y) is negative, according to the output cube.
+unittest: Initializing mosaic
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Mosaicking unitTest1.cub
+0% Processed10% Processed20% ProcessedThe mosaic was successfull.
+Mosaic label: 
+Object = IsisCube
+  Object = Core
+    Format      = Tile
+
+    Group = Dimensions
+      Samples = 38
+      Lines   = 25
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 30.5
+    TargetName         = MOON
+    EquatorialRadius   = 1737400.0 <meters>
+    PolarRadius        = 1737400.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    MinimumLatitude    = -4.9
+    MaximumLatitude    = -4.7
+    MinimumLongitude   = 30.7
+    MaximumLongitude   = 31
+    UpperLeftCornerX   = 5882.1621749878 <meters>
+    UpperLeftCornerY   = -142397.34265283 <meters>
+    PixelResolution    = 245.09009062449 <meters/pixel>
+    Scale              = 123.72328210776 <pixels/degree>
+  End_Group
+End_Object
+
+Object = Label
+End_Object
+
+Object = Table
+  Name        = InstrumentPointing
+  Records     = 1
+  Description = "Created by spiceinit"
+  Kernels     = ($clementine1/kernels/fk/clem_v11.tf,
+                 $Clementine1/kernels/ck/clem_5sc.bck)
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name        = InstrumentPosition
+  Records     = 1
+  Description = "Created by spiceinit"
+  Kernels     = $Clementine1/kernels/spk/SPKMERGE_940219_940504_CLEMV001b.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name           = BodyRotation
+  Records        = 1
+  Description    = "Created by spiceinit"
+  Kernels        = ($base/kernels/spk/de405.bsp,
+                    $base/kernels/pck/pck00008.tpc,
+                    $base/kernels/pck/lunar_de403_1950-2199_pa.bpc,
+                    $base/kernels/fk/lunarMeanEarth001.tf)
+  SolarLongitude = 150.63510050494
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name        = SunPosition
+  Records     = 1
+  Description = "Created by spiceinit"
+  Kernels     = $base/kernels/spk/de405.bsp
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+End_Object
+End
+
+Testing Mosaic containing cropped image.
+unittest: Initializing mosaic
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Mosaicking unitTest_crop.cub
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+./unitTest_crop.cub is inside the mosaic
+unittest: Mosaicking unitTest_nocrop.cub
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+./unitTest_nocrop.cub is inside the mosaic
+Mosaic label: 
+Object = IsisCube
+  Object = Core
+    Format      = Tile
+
+    Group = Dimensions
+      Samples = 2215
+      Lines   = 3271
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 227.87092862105
+    TargetName         = Mars
+    EquatorialRadius   = 3396190.0 <meters>
+    PolarRadius        = 3376200.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    UpperLeftCornerX   = -475029.8023764
+    UpperLeftCornerY   = 2042714.0507253
+    PixelResolution    = 429.50253379421 <meters/pixel>
+    Scale              = 138.00779473796 <pixels/degree>
+  End_Group
+End_Object
+
+Object = Label
+End_Object
+
+Object = History
+  Name      = IsisCube
+End_Object
+End

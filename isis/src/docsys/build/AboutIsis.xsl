@@ -86,7 +86,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        Isis Documentation</p>
+        ISIS Documentation</p>
 
         <hr/>
 
@@ -95,7 +95,7 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                About Isis
+                ABOUT ISIS
               </h1>
             </td>
             <td align="right" class="caption">

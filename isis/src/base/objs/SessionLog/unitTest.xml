@@ -86,7 +86,7 @@
 
       <parameter name="TO">
         <type>cube</type>
-        <pixelType>Real</pixelType>
+        <pixelType>real</pixelType>
         <fileMode>output</fileMode>
         <brief>
           Output cube

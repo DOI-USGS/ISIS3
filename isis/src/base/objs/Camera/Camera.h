@@ -24,6 +24,10 @@
  */
 
 #include "Sensor.h"
+
+#include <QList>
+#include <QPointF>
+
 #include "AlphaCube.h"
 
 namespace Isis {
@@ -224,11 +228,15 @@ namespace Isis {
    *   @history 2012-11-20 Janet Barrett - Fixed a problem with the GroundAzimuth method so
    *                           that the azimuth value is calculated correctly for radar data.
    *                           Fixes #1117.
-   *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
-   *                           instead of Projection as needed.  References #775.
    *   @history 2012-04-24 Jeannie Backer - Added a programmer error if NorthAzimuth() is called on
    *                           a plane projection since this value is meaningless for ring plane
    *                           projections. References #775.
+   *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
+   *                           instead of Projection as needed.  References #775.
+   *   @history 2013-03-04 Tracie Sucharski - Added new method, PixelIfovOffsets, which will return
+   *                           the ifov offsets,in x and y, from the center of the pixel in mm.  The
+   *                           default camera offsets will be half of the pixel pitch in both the x
+   *                           and y directions.  References #1604.
    */
 
   class Camera : public Sensor {
@@ -283,6 +291,8 @@ namespace Isis {
 
       double FocalLength() const;
       double PixelPitch() const;
+      virtual QList<QPointF> PixelIfovOffsets();
+
       int Samples() const;
       int Lines() const;
       int Bands() const;

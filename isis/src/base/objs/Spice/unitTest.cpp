@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
     spi.instrumentPosition(p);
     cout << "Spacecraft          (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     double v[3];
-    spi.instrumentVelocity(v);
+    spi.instrumentBodyFixedVelocity(v);
     cout << "Spacecraft Velocity (B) = " << v[0] << " " << v[1] << " " << v[2] << endl;
     spi.sunPosition(p);
     cout << "Sun                 (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
     spi.instrumentPosition(p);
     cout << "Spacecraft (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     double v[3];
-    spi.instrumentVelocity(v);
+    spi.instrumentBodyFixedVelocity(v);
     cout << "Spacecraft Velocity (B) = " << v[0] << " " << v[1] << " " << v[2] << endl;
     spi.sunPosition(p);
     cout << "Sun        (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;

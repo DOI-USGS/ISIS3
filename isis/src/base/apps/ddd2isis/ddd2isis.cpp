@@ -3,6 +3,7 @@
 #include "UserInterface.h"
 #include "SpecialPixel.h"
 #include "FileName.h"
+#include "Pvl.h"
 
 using namespace std;
 using namespace Isis;
@@ -12,7 +13,7 @@ void IsisMain() {
   ProcessImport p;
   IString from = ui.GetFileName("FROM");
   EndianSwapper swp("MSB");
-  int nsamples = 0, nlines = 0, nbands = 1, noffset = 0;
+  int nsamples = 0, nlines = 0, nbands = 1, noffset = 0, bittype = 0, nbytes = 0;
 
   union {
     char readChars[4];
@@ -57,7 +58,7 @@ void IsisMain() {
 
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
-  nsamples = (int)readBytes.readLong;
+  nbytes = (int)readBytes.readLong;
 
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
@@ -67,22 +68,7 @@ void IsisMain() {
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  switch(readBytes.readLong) {
-    case 8:
-      p.SetPixelType(Isis::UnsignedByte);
-      break;
-    case 16:
-      p.SetPixelType(Isis::UnsignedWord);
-      break;
-    case 32:
-      p.SetPixelType(Isis::Real);
-      break;
-    default:
-      IString msg = "Unsupported bit per pixel count [" + IString((int)readBytes.readLong) + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-  }
-
-  nsamples /= (readBytes.readLong / 8);
+  bittype = readBytes.readLong;
 
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
@@ -94,16 +80,46 @@ void IsisMain() {
     noffset = 1024;
   }
 
+  PvlGroup results("FileInfo");
+  results += PvlKeyword("NumberOfLines", toString(nlines));
+  results += PvlKeyword("NumberOfBytesPerLine", toString(nbytes));
+  results += PvlKeyword("BitType", toString(bittype));
+  nsamples = nbytes / (bittype / 8);
+  results += PvlKeyword("NumberOfSamples", toString(nsamples));
+  nbands = nbytes / nsamples;
+  results += PvlKeyword("NumberOfBands", toString(nbands));
+  results += PvlKeyword("LabelBytes", toString(noffset));
+  Application::Log(results);
+
   fin.close();
 
-  p.SetDimensions(nsamples, nlines, nbands);
-  p.SetFileHeaderBytes(noffset);
-  p.SetByteOrder(Isis::Msb);
-  p.SetInputFile(ui.GetFileName("FROM"));
-  p.SetOutputCube("TO");
+  if (ui.WasEntered("TO")) {
+    switch(bittype) {
+      case 8:
+        p.SetPixelType(Isis::UnsignedByte);
+        break;
+      case 16:
+        p.SetPixelType(Isis::UnsignedWord);
+        break;
+      case 32:
+        p.SetPixelType(Isis::Real);
+        break;
+      default:
+        IString msg = "Unsupported bit per pixel count [" + IString(bittype) + "]. ";
+        msg += "(Use the raw2isis and crop programs to import the file in case it is ";
+        msg += "line or sample interleaved.)";
+        throw IException(IException::Io, msg, _FILEINFO_);
+    }
 
-  p.StartProcess();
-  p.EndProcess();
+    p.SetDimensions(nsamples, nlines, nbands);
+    p.SetFileHeaderBytes(noffset);
+    p.SetByteOrder(Isis::Msb);
+    p.SetInputFile(ui.GetFileName("FROM"));
+    p.SetOutputCube("TO");
+
+    p.StartProcess();
+    p.EndProcess();
+  }
 
   return;
 }

@@ -18,12 +18,12 @@
         BIBLIOGRAPHY
         ******************************************** -->
   <bibliography>
-    <title>Isis Application Examples How-to</title>
-    <brief>Guide to writing the examples section of Isis Application XML</brief>
-    <description>Guide to writing application examples in the Isis Application XML. All examples added to the official Isis
+    <title>ISIS Application Examples How-to</title>
+    <brief>Guide to writing the examples section of ISIS Application XML</brief>
+    <description>Guide to writing application examples in the ISIS Application XML. All examples added to the official ISIS
                         application documentation will be automatically added to the application documentation pages. This guide
-                        describes the examples section of the Isis Application XML, provides instructions on how to add sample
-                        files to an example, and gives general guidance for writing examples for Isis.</description>
+                        describes the examples section of the ISIS Application XML, provides instructions on how to add sample
+                        files to an example, and gives general guidance for writing examples for ISIS.</description>
     <author>Deborah Lee Soltesz</author>
     <date>2003-04-22</date>
   </bibliography>
@@ -40,7 +40,7 @@
         <!-- OVERVIEW -->
         <h2>Overview</h2>
         <p>
-           Isis Application XML files are used for a variety of purposes: a guide for users, documentation for programmers, context-sensitive help,
+           ISIS Application XML files are used for a variety of purposes: a guide for users, documentation for programmers, context-sensitive help,
            and generating the application window when a user runs the program in graphical mode to name a few. This guide focuses on the
            specific task of adding examples to an application's XML file, which become part of the users' Software Manual.
         </p>
@@ -59,15 +59,15 @@
             You should have a general understanding of what XML is - this document explains how to add to an XML file in order
             to add an example to the software documentation. You may want to be able to write basic HTML in order to enhance the formatting
             of certain sections. You should know some basic image processing, such as how to create a JPEG, how to resize an image and sharpen
-            it, and so forth -- the image processing tasks required can be performed in Isis, Adobe Photoshop, or a number of other popular image
+            it, and so forth -- the image processing tasks required can be performed in ISIS, Adobe Photoshop, or a number of other popular image
             processing software packages.
-            It also helps if you are familiar with the Isis web site and how it is organized from a visitor's standpoint. There are many good tutorials on the web
+            It also helps if you are familiar with the ISIS web site and how it is organized from a visitor's standpoint. There are many good tutorials on the web
             for learning XML and HTML, such as <a href="http://www.w3schools.com/default.asp" target="_blank">W3Schools.com</a>.
         </p>
 
         <h3>What is an Application?</h3>
         <p>
-          In a nutshell: it's a computer program, or software. For example, in Isis <tt>algebra</tt>, <tt>sharpen</tt>, and <tt>compare</tt> are all applications.
+          In a nutshell: it's a computer program, or software. For example, in ISIS <tt>algebra</tt>, <tt>sharpen</tt>, and <tt>compare</tt> are all applications.
         </p>
 
         <h3>What is Application XML?</h3>
@@ -81,20 +81,20 @@
         <p>
             A
             <a href="../../Schemas/Application/documentation/index.html">
-            handy reference to the Application XML language</a> is available as part of the Isis documentation.
+            handy reference to the Application XML language</a> is available as part of the ISIS documentation.
         </p>
 
         <h3>What does "mandatory by policy" mean?</h3>
         <p>
             An element that is "mandatory by policy" means it must be used in certain situations according to the policies
-            of the Isis Programming Team, USGS, DOI, Section 508, or common sense. For instance, specifying file size
+            of the ISIS Programming Team, USGS, DOI, Section 508, or common sense. For instance, specifying file size
             for non-text files is a USGS policy and is standard practice in web development - when a link to a non-text file
-            is created on the Isis website, the link will include the file size information so visitors will know how big the file
+            is created on the ISIS website, the link will include the file size information so visitors will know how big the file
             they're getting ready to download is. Not only does the USGS say we have to give this information, but it's also a
             very polite practice, and visitors love polite web developers.
         </p>
 
-        <h3>Where do the Application XML files go in the Isis structure?</h3>
+        <h3>Where do the Application XML files go in the ISIS structure?</h3>
         <p>
             Base Application XML files and source code all live in $ISISROOT/src/base/apps/. Mission-specific Application XML files
             and source code live in $ISISROOT/src/{mission}/apps/. Each application has its own directory with the same name as the
@@ -116,7 +116,7 @@
               <img class="blackBorderedImage" src="assets/screenshot_small.jpg" width="106" height="200" alt="[Screenshot - Crop Application Web Page]" align="left"/></a>
 
               <p>
-                  When the Isis system is built, the <a href="../../Application/index.html">Isis Software Manual</a> is generated from the Application XML files.
+                  When the ISIS system is built, the <a href="../../Application/index.html">ISIS Software Manual</a> is generated from the Application XML files.
                   Each application has its own web page in the manual, and the examples are part of the page for their respective applications.
               </p>
               <p>
@@ -204,10 +204,10 @@
                   <img class="blackBorderedImage" src="assets/examples_thumb.png" width="150" height="180" alt="[Examples XML Diagram (fully expanded)]"/>
                 </a>
                 <p class="caption">
-                  <b>Above:</b> Fully expanded diagram of examples section of the Isis Application XML. Click to view image in a new window. (1300x1600, 45 KB)
+                  <b>Above:</b> Fully expanded diagram of examples section of the ISIS Application XML. Click to view image in a new window. (1300x1600, 45 KB)
                 </p>
                 <p class="caption">
-                  <b>Left:</b> Collapsed diagram of the Examples section of Isis Application XML.
+                  <b>Left:</b> Collapsed diagram of the Examples section of ISIS Application XML.
                 </p>
               </td>
             </tr>
@@ -300,7 +300,7 @@
 
         <h5>What format should my images be?</h5>
         <p>
-          JPEG, PNG, or GIF. JPEG may be the easiest because Isis has a file exporter (<tt>isis2std</tt>).
+          JPEG, PNG, or GIF. JPEG may be the easiest because ISIS has a file exporter (<tt>isis2std</tt>).
         </p>
 
         <ul>

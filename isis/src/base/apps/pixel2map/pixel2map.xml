@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="pixel2map" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert camera image to a map projection using a forward driven algorithm
+  </brief>
+
+  <description>
+    This specialized program projects an ISIS <def link="Level0">level0</def> or <def link="Level1">level1</def> 
+    <def link="Cube">cube</def> to a <def link="MAP">map</def> projected (ISIS <def link="Level2">level2</def>) cube.  
+    <p>
+    The program, <i>cam2map</i>, also projects a cube, and is recommended for most mapping applications. Use
+    <i>pixel2map</i> to project cubes where pixels do not overlap, for instance in data from a point instrument such
+    as Cassini VIMS, or the Mars Reconnaissance Orbiter CRISM instrument where scan lines may not overlap.
+    </p>
+    <p>
+    Note: <i>pixel2map</i> cannot currently process the input <b>pixel</b> which contains either pole
+    (i.e. latitude of 90.0 degrees or -90.0 degrees), which will cause a NULL pixel in your output map projected
+    cube where the pole is located.
+    </p>
+    <p>
+    <b>How <i>pixel2map</i> and <i>cam2map</i> differ</b>
+    </p>
+    <p>
+    <ul>
+    <li>The <i>pixel2map</i> application uses a forward driven algorithm.</li>
+    <li>Each input pixel is converted to a polygon and rasterized into the output projected image by calculating output
+     pixels that fall in the boundary of the input pixel.</li>
+    <li>The space between pixels is retained in the output projected cube.</li>
+    </ul>
+    Versus
+    <ul>
+    <li>The <i>cam2map</i> application uses a reverse driven algorithm.</li>
+    <li>Each input pixel is not converted to a polygon and rasterized into the output projected image. The input pixels
+    are calculated by pixels situated at the same latitude and longitude.</li>
+    <li>The space between pixels are interpolated thus gaps are filled in the output projected cube.</li>
+    </ul>
+    </p>
+    <p>
+    The examples below are Mars Reconnaissance Orbiter/CRISM cubes where scan lines do not overlap in their original state.
+    The major difference is in the output of the application used to project the cube. Both applications will project the cube,
+    but also result in a different spatial outcome. 
+    Left Cube: cam2map was chosen to project the cube. Notice the scan lines have been interpolated thus filled.  If you want to
+    preserve gaps, cam2map will not achieve this result. In addition, the cube is no longer spatially correct. 
+    Right Cube: pixel2map was chosen to project the cube. Notice how the gaps are retained in the output. The cube is spatially
+    correct.   
+    </p>
+    <img src="assets/crismCam2mapEqui.jpg"> </img>
+    <img src="assets/crismPixel2mapEqui.jpg"> </img>
+    <p>
+    The input cube requires <def>SPICE</def> data and therefore the program <i>spiceinit</i> should be run on it 
+    prior to <i>pixel2map</i>.  The <def link="Map Projection">map projection</def> is defined using a 
+    <def>PVL</def> file specified with the MAP parameter.  The default projection is the system Sinusoidal projection 
+    ($ISIS3DATA/base/templates/maps/sinusoidal.map).  To learn more about using map projections in ISIS, 
+    refer to the ISIS Workshop 
+    <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections">
+    "Learning About Map Projections"</a>.
+    </p>
+    <p>
+      If you need to generate your own map file you can use the <i>maptemplate</i> program or alternatively, 
+    hand create a file using your favorite editor.  The file need only specify the ProjectionName 
+    as defaults will be computed for the remaining map file parameters.  The following table indicates 
+    how the defaults are established:
+    </p>
+
+    <table border="1">
+      <tr>
+        <td>PARAMETER</td>
+        <td>DEFAULT</td>
+      </tr>
+
+      <tr>
+        <td>TargetName</td>
+        <td>Read from Instrument group in the input cube labels</td>
+      </tr>
+
+      <tr>
+        <td>Equatorial<def>Radius</def><br />PolarRadius</td>
+        <td>Read from SPICE pck file set during <i>spiceinit</i>.  The pck file is defined in the Kernels 
+        group via the TargetAttitudeShape keyword</td>
+      </tr>
+
+      <tr>
+        <td><def link="Latitude Type">LatitudeType</def></td>
+        <td><def link="Planetocentric Latitude">Planetocentric</def></td>
+      </tr>
+
+      <tr>
+        <td><def link="Longitude Direction">LongitudeDirection</def></td>
+        <td><def link="Positive East Longitude">PositiveEast</def></td>
+      </tr>
+
+      <tr>
+        <td><def link="Longitude Domain">LongitudeDomain</def></td>
+        <td>Normally, 360.  However, if the 180 domain causes less area to need to be projected then 180.</td>
+      </tr>
+
+      <tr>
+        <td>Minimum<def>Latitude</def><br />MaximumLatitude<br />Minimum<def>Longitude</def><br />MaximumLongitude</td>
+        <td>Computed from the input cube or read from the map file.   However, any combination of the 
+        four values can then be overridden by the user.  The values the user specifies are expected 
+        to be in the coodinate system of the projection.</td>
+      </tr>
+
+      <tr>
+        <td><def>PixelResolution</def><br /><def>Scale</def></td>
+        <td>Computed from the input cube or read from the map file.  The value can be overridden by the user.</td>
+      </tr>
+
+    </table>
+
+    <p>
+      If you only entered the input cube (FROM) and output cube (TO) and changed no other parameters the 
+      following is the default Mapping group:
+    </p>
+    <pre>
+  Group = Mapping
+    TargetName             = Obtained from the Instrument group
+    EquatorialRadius       = Obtained from TargetAttitudeShape kernel
+    PolarRadius            = Obtained from TargetAttitudeShape kernel
+
+    LatitudeType           = Planetocentric
+    LongitudeDirection     = PositiveEast
+    LongitudeDomain        = 360 (Could be automatically adjusted to 180 by LONSEAM)
+
+    MinimumLatitude        = Computed from the input camera cube
+    MaximumLatitude        = Computed from the input camera cube
+    MinimumLongitude       = Computed from the input camera cube
+    MaximumLongitude       = Computed from the input camera cube
+
+    ProjectionName         = Sinusoidal
+    CenterLongitude        = Average of MinimumLongitude and MaximumLongitude
+    PixelResolution        = Computed from the input camera cube
+  EndGroup
+    </pre>
+
+   The map file can be an existing map projected (level2) cube.  A level2 cube has PVL labels 
+   and contains the Mapping group.  Depending on the values of the input parameters, the output 
+   cube can use some or all of the keyword values of the map file.  For instance, setting 
+   MATCHMAP=true causes all of the mapping parameters to come from the map file, resulting 
+   in an output cube having the same number of <def link="Line">lines</def> and 
+   <def link="Sample">samples</def> as the map file.  If MATCHMAP=true and the map file is missing 
+   a keyword like PixelResolution, the application will fail with a PVL error.  Setting 
+   MATCHMAP=false allows for some of the mapping components to be overridden by the user or 
+   computed from the FROM cube.
+   
+
+   <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, EquatorialRadius, 
+   PolarRadius, LatitudeType, LongitudeDirection, LongitudeDomain, ProjectionName, and projection 
+   specific parameters (e.g., CenterLongitude, CenterLatitude) are the same for all cubes.  That is, 
+   you should create one map file and use it as input for all the cubes in your mosaic.  By letting the 
+   minimum and maximum latitude and longitude values default, the application will determine the coverage of each image.  
+   However, if the mosaic Latiude and Longitude range is entered, each output image will be projected to the full 
+   size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.  
+
+   The following Mapping group could be used for mosaicking:
+   </p>
+   <pre>
+ Group = Mapping
+   ProjectionName         = Sinusoidal
+   CenterLongitude        = 0
+   PixelResolution        = 100 &lt;meters&gt;
+ EndGroup
+   </pre>
+
+   <p>
+     Finally, depending on the projection, problems can occur with cubes that fall on the projection 
+     longitude seam.  For example, if you are making a mosaic with LongitudeDomain = 360 and your 
+     cube crosses 0/360 seam, this program would compute the default longitude range of the cube to 
+     MinimumLongitude = 0 and MaximumLongitude = 360.  A very large output image could be created 
+     depending on the pixel resolution.  The LONSEAM parameter allows you to selectively handle this case.  
+     If you are making mosaics near the seam you will need to understand and alter the default for this parameter.
+     <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections#Problems_at_the_Longitude_Seams">
+     Section 14 </a>of The ISIS Workshop "Learning About Map Projections" includes an example to help 
+     illustrate the problem.
+   </p>
+
+   <p>
+   <b>Output of pixel2map</b>
+   </p>
+   <p>
+   A single input file produces a projected level2 cube. A list of files (filelist) produces an averaged mosaic as output.
+   A count cube that contains the number of input pixels averaged into each output pixel is created along with the output
+   cube or mosaic.
+   </p>
+  </description>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+    <categoryItem>Cameras</categoryItem>
+  </category>
+
+  <oldName>
+    <item>vims2map</item>
+  </oldName>
+
+  <history>
+    <change name="Stacy Alley" date="2008-02-13"> 
+      Original version
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Christopher Austin" date="2008-01-27">
+      Fixed parameter names
+    </change>
+    <change name="Tracie Sucharski" date="2012-09-12">
+      Restored from revision 3911 and updated for revised IEXception, iString and FileName classes.
+    </change>
+    <change name="Debbie Cook" date="2012-10-11">
+      Updated to use new Target class.  References Mantis ticket #775 and #1114.
+    </change>
+    <change name="Tracie Sucharski, Stuart Sides" date="2013-07-30">
+      Renamed from vims2map, generalized for all instruments, improved performance and accuracy. Fixes #1604.
+    </change>
+    <change name="Janet Richie, Ella Lee" date="2013-11-21">
+      Updated documentation.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMTYPE">
+        <type>string</type>
+        <brief>From type selection (From or FromList)</brief>
+        <default><item>FROM</item></default>
+        <description>
+          This parameter indicates whether a single cube will be entered in the 'FROM' parameter or a file
+          containing a list of cubes will be given by the 'FROMLIST' parameter.
+        </description>
+        <list>
+          <option value="FROM">
+            <brief>A single input cube to project</brief>
+            <description>
+              The specification of the input cube to be projected.  The cube must
+              have been initialized using the <i>spiceinit</i> program.
+              This option allows a single input cube to be processed.
+            </description>
+            <exclusions><item>FROMLIST</item></exclusions>
+          </option>
+          <option value="FROMLIST">
+            <brief>Input list of cubes to be projected</brief>
+            <description>
+              This option allows a list to be used to process multiple input cubes.  All cubes 
+              contained in this list will be projected to the same output cube given in the 'TO'
+              parameter.  This effictively projects and mosaics all input cubes given in the list
+              to the same output map projected file.
+            </description>
+            <exclusions><item>FROM</item></exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="FROM">
+        <type>cube</type>
+        <filter>*.cub</filter>
+        <brief>A single input cube to project</brief>
+        <description>
+          The specification of the input cube to be projected.  The cube must
+          have been initialized using the <i>spiceinit</i> program.
+          This option allows a single input cube to be processed.
+        </description>
+        <exclusions><item>FROMLIST</item></exclusions>
+      </parameter>
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <filter>*.lis</filter>
+        <brief>Input list of cubes to be projected</brief>
+        <description>
+          This option allows a list to be used to process multiple input cubes.  All cubes 
+          contained in this list will be projected to the same output cube given in the 'TO'
+          parameter.  This effictively projects and mosaics all input cubes given in the list
+          to the same output map projected file.
+        </description>
+        <exclusions><item>FROM</item></exclusions>
+      </parameter>
+
+      <parameter name="MAP">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing mapping parameters
+        </brief>
+        <defaultPath>$base/templates/maps</defaultPath>
+        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <description>
+          A file containing the desired output mapping parameters in PVL.  This
+          file can be a simple label file, hand produced, or created via
+          the <i>maptemplate</i> program.  It can also be an existing cube or cube label
+          which contains a Mapping group.  In the latter case the FROM cube
+          will be transformed into the same map projection, resolution, etc.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>PrintMap</function>
+            <brief>View MapFile</brief>
+            <description>
+              This helper button will cat out the mapping group of the given mapfile to the session log
+               of the application
+             </description>
+            <icon>$ISIS3DATA/base/icons/labels.png</icon>
+          </helper>
+        </helpers>
+        <filter>
+          *.map *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+          <pixelType>real</pixelType>
+        <brief>
+          Newly mapped cube
+        </brief>
+        <description>
+          This file is the map projected (level2) image.  If multiple input cubes were given in 'FROMLIST',
+          they will all be projected into this output image.  A "count" cube is also created with the same
+          filename with '-count-' appended.  The DN values in this output cube indicate how many input pixels
+          were included in the average calculation to create the output pixel.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Output Average">
+      <parameter name="METHOD">
+        <type>string</type>
+        <brief>Method used to calculate average for output pixels</brief>
+        <default><item>CENTER</item></default>
+        <description>
+          This parameter is used to determine which input pixels get added to the average to create
+          the output pixel.
+        </description>
+        <list>
+           <option value="CENTER">
+              <brief>Add to average if pixel centers overlap</brief>
+              <description>
+                Add the input pixel to the average of the output pixel if it intersects with the center
+                of the output pixel.
+              </description>
+            </option>
+           <option value="WHOLEPIXEL">
+              <brief>Add to average if any part of the input pixel overlaps the output pixel</brief>
+              <description>
+                Add the input pixel to the average of the output pixel if it intersects with any part
+                of the output pixel.
+              </description>
+            </option>
+        </list>
+      </parameter>
+    </group>
+
+
+    <group name="Output Map Resolution">
+      <parameter name="PIXRES">
+        <type>string</type>
+        <brief>Defines how the pixel resolution in the output map file is obtained</brief>
+        <default><item>CAMERA</item></default>
+        <description>
+          This parameter is used to specify how the pixel resolution is obtained for the output map
+          projected cube.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>LoadCameraRes</function>
+            <brief>Load Camera Resolution </brief>
+            <description>This helper button will load the default resolution from the camera</description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+          <helper name="H2">
+            <function>LoadMapRes</function>
+            <brief>Load Map File Resolution </brief>
+            <description>This helper button will load the default resolution from the map file</description>
+          </helper>
+        </helpers>
+        <list>
+           <option value="CAMERA">
+              <brief>Compute resolution from input cube</brief>
+              <description>
+                This option will automatically determine the resolution from the input  cube specified using the FROM parameter.
+              </description>
+              <exclusions>
+                <item>RESOLUTION</item>
+              </exclusions>
+            </option>
+
+           <option value="MAP">
+              <brief>Read resolution from input map file</brief>
+              <description>
+                This option will use either the PixelResolution (meters/pixel) or Scale (pixels/degree) in the map file.
+              </description>
+              <exclusions>
+                <item>RESOLUTION</item>
+              </exclusions>
+            </option>
+
+           <option value="MPP">
+              <brief> Get resolution from user in meters per pixel</brief>
+              <description>
+                This option allows the user to specify the resolution in meters per pixel using the RESOLUTION parameter
+              </description>
+              <inclusions>
+                <item>RESOLUTION</item>
+              </inclusions>
+            </option>
+
+           <option value="PPD">
+              <brief> Get resolution from user in pixels per degree</brief>
+              <description>
+                This option allows the user to specify the resolution in pixels per degree using the RESOLUTION parameter
+              </description>
+              <inclusions>
+                <item>RESOLUTION</item>
+              </inclusions>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name="RESOLUTION">
+        <type>double</type>
+        <brief>Pixel resolution</brief>
+        <description>
+          Specifies the resolution in either meters per pixel or pixels per degree
+        </description>
+        <minimum inclusive="no">0.0</minimum>
+      </parameter>
+    </group>
+
+    <group name="Output Map Ground Range">
+      <parameter name="DEFAULTRANGE">
+        <type>string</type>
+        <brief>Defines how the default ground range is determined</brief>
+        <default><item>MINIMIZE</item></default>
+        <description>
+          This parameter is used to specify how the default latitude/longitude ground range for the output map projected image
+          is obtained.  The ground range can be obtained from the camera or map file.  Note the user can overide the default
+          using the MINLAT, MAXLAT, MINLON, MAXLON parameters.  The purpose of the ground range is to define the coverage of
+          the map projected image.  Essentially, the ground range and pixel resolution are used to compute the
+          size (samples and line) of the output image.
+        </description>
+
+        <helpers>
+          <helper name="H1">
+            <function>LoadCameraRange</function>
+            <brief>Load Camera Ground Range </brief>
+            <description>This helper button will load the default ground range from the camera</description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+          <helper name="H2">
+            <function>LoadMapRange</function>
+            <brief>Load Map File Ground Range </brief>
+            <description>This helper button will load the default ground range from the map file</description>
+          </helper>
+        </helpers>
+
+        <list>
+          <option value="MINIMIZE">
+             <brief>Minimize output image size</brief>
+             <description>
+               This option will use the camera and projection in combination to ensure the output image size 
+               (samples, lines) is minimized.  Using a ground range can cause NULL padding for projections with 
+               curved merdians and/or parallels and hence large output images.  The amount of padding can be 
+               quite large for extremely high resolution maps.
+             </description>
+             <inclusions><item>LONSEAM</item></inclusions>
+             <exclusions>
+               <item>MINLAT</item>
+               <item>MAXLAT</item>
+               <item>MINLON</item>
+               <item>MAXLON</item>
+               <item>TRIM</item>
+             </exclusions>
+           </option>
+
+           <option value="CAMERA">
+              <brief> Compute default range from input cube</brief>
+              <description>
+                This option will automatically determine the mininum/maximum latitude/longitude from the input
+                camera model cube specified using the FROM parameter.
+              </description>
+              <inclusions><item>LONSEAM</item></inclusions>
+            </option>
+
+           <option value="MAP">
+              <brief> Read default range from map file</brief>
+              <description>
+                This option will read the mininum/maximum latitude/longitude from the input map file.
+                All four values are expected to be defined.
+              </description>
+              <exclusions><item>LONSEAM</item></exclusions>
+            </option>
+        </list>
+      </parameter>
+
+      <parameter name="MINLAT">
+        <type>double</type>
+        <brief>Minimum latitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The minimum latitude of the ground range.   If this is entered by the user it will override
+          the default camera or map value.  By default, planetocentric latitudes are assumed unless
+          the MAP file specifies otherwise.
+        </description>
+
+        <minimum inclusive="yes">-90.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+      </parameter>
+
+      <parameter name="MAXLAT">
+        <type>double</type>
+        <brief>Maximum latitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The maximum latitude of the ground range.   If this is entered by the user it will override
+          the default camera or map value.  By default, planetocentric latitudes are assumed unless
+          the MAP file specifies otherwise.
+        </description>
+        <minimum inclusive="yes">-90.0</minimum>
+        <maximum inclusive="yes">90.0</maximum>
+        <greaterThan><item>MINLAT</item></greaterThan>
+      </parameter>
+
+      <parameter name="MINLON">
+        <type>double</type>
+        <brief>Minimum longitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The minimum longitude of the ground range.   If this is entered by the user it will override
+          the default camera or map value.  By default, positive east longitudes in the range of 0 to
+          360 are assumed unless the MAP file specifies otherwise.
+        </description>
+      </parameter>
+
+      <parameter name="MAXLON">
+        <type>double</type>
+        <brief>Maximum longitude</brief>
+        <internalDefault>Use default range</internalDefault>
+        <description>
+          The maximum longitude of the ground range.   If this is entered by the user it will override
+          the default camera or map value.  By default, positive east longitudes in the range of 0 to
+          360 are assumed unless the MAP file specifies otherwise.
+        </description>
+        <greaterThan><item>MINLON</item></greaterThan>
+      </parameter>
+
+      <parameter name="TRIM">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Null all pixels outside lat/lon boundaries
+        </brief>
+        <description>
+          If this option is selected, pixels outside the latitude/longtiude
+          range will be trimmed (set to null).
+          This is useful for certain projections whose lines of latitude and
+          longitude are not parallel to image lines and sample columns.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Longitude Seam Options">
+      <parameter name="LONSEAM">
+        <type>string</type>
+        <default><item>AUTO</item></default>
+        <brief>
+          How should images at the longitude seam be handled
+        </brief>
+        <description>
+          With this option you can turn on/off the automatic longitude domain switching that occurs
+          when a file crosses the boundary of the longitude domain (0-360 or -180 to 180).  If 
+          the switching is turn off then you have the choice of making the program continue or 
+          exit when the cube does cross the bounday.
+        </description>
+
+        <list>
+           <option value="AUTO">
+              <brief>Automatically correct Longitude Domain</brief>
+              <description>
+                If the cube crosses the longitude seam automatically compute the LongitudeDomain.   
+                When the cube is near 0 or 360 degrees the program will assume 180 LongitudeDomain.  
+                When the cube is near 180 or -180 degrees it will assume 360 LongitudeDomain.
+              </description>
+            </option>
+
+           <option value="ERROR">
+              <brief>Abort program if cube crosses seam</brief>
+              <description>
+                If the cube crosses the longitude seam the program will exit with an error message
+              </description>
+            </option>
+
+            <option value="CONTINUE">
+               <brief>Continue program if cube crosses seam</brief>
+               <description>
+                 If the cube crosses the longitude seam the program will continue.  The LongitudeDomain 
+                 in the map file will be used.  If the map file does not have a LongitudeDomain, 0-360 
+                 will be used. Note that this could create an extremely large image.
+               </description>
+             </option>
+        </list>
+
+      </parameter>
+    </group>
+  </groups>
+</application>

@@ -5,32 +5,57 @@
   </brief>
 
   <description>
-    This program computes statistics for the pixels in each band of a multiple
-    band cube. if the band specification (e.g., file.cub+3) is not given the
-    program will default to all bands. The statistics calculated include:
-<pre>
-        Average
-        Standard deviation
-        Variance
-        Median
-        Mode
-        Skew
-        Minimum
-        Maximum
-        Total pixels
-        Valid pixels
-        Null pixels
-        Low instrument saturation pixels
-        Low representation saturation pixels
-        High instrument saturation pixels
-        High representation saturation pixels
-</pre>
-    The statistics will be output to the
-    logging device.  Additionally, if the user specifies a file using the
-    TO parameter, the statistics
-    be written to the file in a standard label format
-    which can then be read using
-    the getkey proram.
+    <p>
+      This program computes statistics for the pixels in each selected <def link="Band">band</def>
+      of an image <def link="Cube">cube</def>, and output the results. By default, all bands are 
+      processed. The <i>stats</i> program generates statistics that will help you find new insights 
+      in your data to make more accurate predictions and achieve better outcomes.
+    </p>
+
+    <h4>
+      How to Specify a Band:
+    </h4>
+
+    <p>
+      You may process one or a few specific bands if you indicate the band(s) in which you desire
+      to gather statistics. A <def link="Band">band</def> may be specified by simply placing a 
+      plus sign and the band number after the input filename (e.g., peaks.cub+3). For several 
+      bands, commas and hyphens are used to communicate effectively with the program as in the 
+      following example: peaks.cub+2,4-6.
+    </p>
+
+    <h4>
+      Output:
+    </h4>
+
+    <p>
+      The statistics are output to the display screen. Additionally, if the user specifies a file
+      using the TO parameter, the statistics are written to a file in the standard label format
+      (<def>PVL</def>) or a comma delimited text file. For multi-band images, each band has its 
+      own statistics information that will be appended to the output file.  The contents of the 
+      PVL file can be read using the <i>getkey</i> program. The comma delimited text file can 
+      be imported into Excel or other applications.  The statistics calculated and reported are 
+      as follows:
+    </p>
+
+    <pre>
+
+Average        Standard deviation        Null pixels
+
+Minimum        Variance 	         Low representation saturation pixels
+
+Maximum        Skew                      High representation saturation pixels
+
+Median         Valid pixels              Low instrument saturation pixels
+
+Mode           Total pixels              High instrument saturation pixels 
+
+    </pre>
+    
+    <p>
+      If the output file exists and the APPEND parameter is set to "no," the contents will be
+      overwritten.
+    </p>
   </description>
 
   <category>
@@ -59,7 +84,7 @@
      Added application test
     </change>
     <change name="Stuart Sides" date="2003-05-16">
-      Modified schema location from astogeology... to isis.astrogeology..."
+      Modified schema location from astrogeology... to isis.astrogeology..."
     </change>
     <change name="Stuart Sides" date="2003-05-30">
       Made changes to application test truth files to reflect -O1 optimization
@@ -98,6 +123,10 @@
       if an input cube attribute is specified, only those bands will be
       processed. Previously, the program only processed the first band.
     </change>
+    <change name="Kimberly Oyama" date="2013-11-12">
+      Fixed spelling error in FORMAT=FLAT brief. Documentation updated
+      and reviewed.  Fixes #1681.
+    </change>
   </history>
 
   <oldName>
@@ -106,18 +135,25 @@
     <item>bandstats</item>
   </oldName>
 
+  <seeAlso>
+    <applications>
+    <item>getkey</item>
+    </applications>
+  </seeAlso>
+
   <groups>
     <group name="Files">
       <parameter name="FROM">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Single band of a cube to get statistics from
+          Input cube
         </brief>
         <description>
-  	      The file specification for the input cube. The statistics will be
-          calculated for one band only. The default band is one but can be
-          overridden using the band specifier (e.g., file.cub+3).
+  	  This specifies the input <def link="Cube">cube</def>. The default is 
+	  to calculate statistics for all bands in the input cube, but can be 
+	  overridden using the band specifier (e.g., file.cub+3).  The 
+	  statistics are calculated for all the bands or each selected band.
         </description>
         <filter>
           *.cub
@@ -128,17 +164,17 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Output file to contain statistics
+          Output file that contains the statistics
         </brief>
         <internalDefault>
-          No Output file will be created
+          No output file is created
         </internalDefault>
         <description>
-          This ascii file will contain the statistics of the individual
-          band.  It is written in such a format that the values can be
-          read using the getkey program.  This is useful for when developing
-          scripts. In order to generate an output file, an output filename
-          must be included. To specify format, use the format parameter.
+          This text file will contain the statistics for each individual band. 
+	  If it is written in PVL format, the values can be read using the 
+	  <i>getkey</i> program. This is useful for developing scripts. In 
+	  order to generate an output file, an output filename must be entered 
+	  along with the preferred format.
         </description>
         <filter>
           *.txt
@@ -148,10 +184,11 @@
        <parameter name="FORMAT">
         <type>string</type>
         <brief>
-          Output Format
+          Output format (PVL or FLAT)
         </brief>
         <description>
-          Format type for output file.  PVL format is default.
+          This is the format type for the output file.  PVL format is the 
+	  default. The format is ignored unless the TO parameter is specified.
         </description>  
         <default><item>PVL</item></default>
         <list>
@@ -160,28 +197,31 @@
               Format the output file as PVL.
             </brief>
             <description>
-              Output file will be in PVL format.
+              Output the results to a PVL formatted file.
             </description>
           </option>
           <option value="FLAT">
             <brief>
-              Firnat the output file as comma delimited flat.
+              Format the output as a comma delimited text file.
             </brief>
             <description>
-              Output file will be a comma deliminated flatfile.  This file format can easily be 
-              imported into excel. The format is ignored unless the TO parameter is specified.
+              Output the results to a comma delimited text file.  This file 
+	      format can easily be imported into the Excel application. 
             </description>
           </option>
         </list>
       </parameter>
+      
       <parameter name="APPEND">
         <type>boolean</type>
         <brief>
-          Append Output to File
+          Append results to output file
         </brief>
         <description>
-          If this option is selected, the output from the application will be appended to the file. 
-          If it is not selected, any information in the TO file will be overwritten.
+          If this option is not selected, the output from the <i>stats</i> 
+	  application is appended to the output file. If this option is
+	  set to "NO" or "FALSE," any information in the TO file is 
+	  overwritten. 
         </description>
         <default><item>TRUE</item></default>
       </parameter>
@@ -192,26 +232,28 @@
       <parameter name="VALIDMIN">
         <type>double</type>
         <brief>
-          Minimum DN valid to count as valid
+          Minimum valid DN value
         </brief>
         <internalDefault>
           No minimum DN value
         </internalDefault>
         <description>
-          The statistics will exclude any DN values below this value
+          The statistics will exclude any <def link="Digital Number">DN</def> 
+	  values below this value.
         </description>
       </parameter>
 
        <parameter name="VALIDMAX">
         <type>double</type>
         <brief>
-          Maximum DN valid to count as valid
+          Maximum valid DN value
         </brief>
         <internalDefault>
           No maximum DN value
         </internalDefault>
         <description>
-          The statistics will exclude any DN values above this value
+          The statistics will exclude any <def link="Digital Number">DN</def> 
+	  values above this value.
         </description>
       </parameter>
     </group>
@@ -219,87 +261,89 @@
 
   <examples>
   <example>
-      <brief>Calculating statistics for all bands in a cube</brief>
+      <brief>Calculate statistics for all bands in a cube</brief>
       <description>
-        This example shows the statistics gathered from all bands in a single
-        cube. When no band is specified by the user, stats default behavior is
-        to calculate stats for all bands of a cube.
+        This example shows the statistics computed for all bands in 
+	the input cube. When no band is specified by the user, <i>stats</i>
+	default behavior is to calculate statistics for all bands in a cube. 
       </description>
       <terminalInterface>
         <commandLine>
           from=peaks.cub to=peaks0_stats.log
         </commandLine>
         <description>
-          Running stats in the command line mode with the only parameter "FROM"
-          set to no particular band of the cube peaks.cub.
+          Command to run stats in the command line mode using all bands in 
+	  peaks.cub and output the results to peaks0_stats.log. 
         </description>
       </terminalInterface>
       <dataFiles>
         <dataFile path="assets/peaks0_stats.log">
           <brief>
-            Output from stats
+            Output from stats application
           </brief>
           <description>
-            This is the output captured in "peaks0_stats.log" by the
-            redirection of standard out.
+            This is the results captured in "peaks0_stats.log" by the
+            redirection of standard output.
           </description>
           <parameterName></parameterName>
         </dataFile>
       </dataFiles>
     </example>
+    
     <example>
-      <brief>Calculating statistics for a band in a cube</brief>
+      <brief>Calculate statistics for a single band from an input cube</brief>
       <description>
-        This example shows the statistics gathered from a single band of
-        a cube. Using the plus on the end of the FROM parameter, a user is able
-        to specify a single layer to be processed.
+        This example shows the statistics computed from band 3 of the input 
+	cube.  A band may be specified by simply placing the plus sign and 
+	the band number after the input filename.
       </description>
       <terminalInterface>
         <commandLine>
           from=peaks.cub+3 to=peaks1_stats.log
         </commandLine>
         <description>
-          Running stats in the command line mode with the only parameter "FROM"
-          set to the third band of the cube peaks.cub.
+          Command to run stats in the command line mode using the third band  
+	  of peaks.cub and output the results to peaks1_stats.log.
         </description>
       </terminalInterface>
       <dataFiles>
         <dataFile path="assets/peaks1_stats.log">
           <brief>
-            Output from stats
+            Output from stats application
           </brief>
           <description>
-            This is the output captured in "peaks3_stats.log" by the
-            redirection of standard out.
+            This is the results captured in "peaks3_stats.log" by the
+            redirection of standard output.
           </description>
           <parameterName></parameterName>
         </dataFile>
       </dataFiles>
     </example>
     <example>
-      <brief>Calculating statistics for multiple bands in a cube</brief>
+      <brief>Calculate statistics for multiple bands from an input cube</brief>
       <description>
-        This example shows the statistics gathered from a multiple bands
-        of a cube. In addition to the plus suffix, one can use commas and
-        hyphens in order to specify multiple bands of the cube to process.
+        This example shows the statistics computed for selected bands of a cube. 
+	In addition to the plus suffix, the comma and hyphen are used to specify 
+	multiple bands from the input cube to process. 
       </description>
       <terminalInterface>
         <commandLine>
           from=peaks.cub+2,4-6 to=peaks2_stats.log
         </commandLine>
         <description>
-          Running stats in the command line mode with the only parameter "FROM"
-          set to the second, forth, fifth, and sixth bands of the cube peaks.cub.
+          Command to run stats in the command line mode using the second, fourth,
+	  fifth, and sixth bands of peaks.cub and output the results to 
+	  peaks2_stats.log.
         </description>
       </terminalInterface>
       <dataFiles>
         <dataFile path="assets/peaks2_stats.log">
           <brief>
-            Output from stats
+            Output from stats application
           </brief>
           <description>
-            This is the output captured in "peaks2_stats.log" by the
-            redirection of standard out.
+            This is the results captured in "peaks2_stats.log" by the
+            redirection of standard output.
           </description>
           <parameterName></parameterName>
         </dataFile>

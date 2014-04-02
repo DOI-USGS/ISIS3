@@ -111,8 +111,9 @@ Deborah Lee Soltesz
 
 
 <p>
-Several applications have been renamed or evolved into multiple
-applications in the newest version of Isis. The following table cross-references the current application names in Isis 3 to the names of applications in previous versions of Isis.
+Several applications have been renamed or evolved into multiple applications in 
+the newest version of ISIS. The following table cross-references the current 
+application names in ISIS 3 to the names of applications in previous versions of ISIS.
 </p>
 
 
@@ -126,7 +127,7 @@ applications in the newest version of Isis. The following table cross-references
             Previous Versions
           </th>
           <th class="tableCellLevel1_th">
-            Isis 3
+            ISIS 3
           </th>
         </tr>
 

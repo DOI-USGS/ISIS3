@@ -8,6 +8,9 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
+   *   @history 2013-12-30 Kimberly Oyama and Stuart Sides - In run, changed the token used to
+   *                           parse the input buffer from a space to the escape character
+   *                           (ascii #27). Fixes #1551.
    */
   class SocketThread : public QThread {
       Q_OBJECT

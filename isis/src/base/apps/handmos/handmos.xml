@@ -38,6 +38,8 @@
    keeps track of the number of images involved in the averaging of the dn value for each pixel in the mosaic. Choosing this priority will cause the mosaic to have twice the number of 
    bands of the input image, with a count band for each band. <b>Hence the file size of the mosaic is doubled due to the count band.</b>
    </p>
+
+   <p>An error will be thrown if the mosaic cube has no count band. </p>
    
    <p>In case of special pixels and the special pixel flags being enabled, the details 
    for each priority is described below.
@@ -216,15 +218,17 @@
       comparison "CRITERIA" are "LESSER" or "GREATER" than.  Also there are 
       options "HIGHSATURATION", "LOWSATURATION" and "NULL", set to true will 
       cause HS, LS and NULL input pixels to be copied to the mosaic regardless 
-      of the priorities and criteria. These options are not supported for  "BENEATH" priority.
+      of the priorities and criteria. These options are not supported for
+      "BENEATH" priority.
     </change>
     <change name="Sharmila Prasad" date="2009-12-16">
      Always place an input pixel over a NULL mosaic pixel. 
       Track the origin for  multiband ONTOP priority if all the Special Pixel  flags are set. 
       Store the Serial numbers of the input mosaic in the mosaic along with the  file name.
     </change>
-    <change name="Sharmila Prasad" date="2010-10-27">Process Input Image's 
-     Attributes</change> 
+    <change name="Sharmila Prasad" date="2010-10-27">
+      Process Input Image's Attributes
+    </change>
     <change name="Sharmila Prasad" date="2011-01-19">
       Added "AVERAGE" priority where the mosaic will be average of valid input 
       and mosaic pixels.
@@ -249,6 +253,10 @@
       encompasses the image more than once) only the last occurance was written to the log file.
       This has been fixed so that there is an entry in the log file for every image placement.
       References #976.
+    </change>
+    <change name="Kimberly Oyama" date="2014-03-28">
+      Added an app test for the error check when PRIORITY=AVERAGE and the mosaic does not have
+      a count band. References #746.
     </change>
   </history>
 

@@ -46,22 +46,22 @@ void IsisMain() {
   QVector<Cube *> cubes;
   Cube *outCube;
 
-  if(ui.GetString("MODE") == "CUBES") {
+  if (ui.GetString("MODE") == "CUBES") {
     // Require atleast one file to be specified
     cubes.push_back(p.SetInputCube("F1", Isis::AllMatchOrOne));
-    if(ui.WasEntered("F2")) cubes.push_back(p.SetInputCube("F2", Isis::AllMatchOrOne));
-    if(ui.WasEntered("F3")) cubes.push_back(p.SetInputCube("F3", Isis::AllMatchOrOne));
-    if(ui.WasEntered("F4")) cubes.push_back(p.SetInputCube("F4", Isis::AllMatchOrOne));
-    if(ui.WasEntered("F5")) cubes.push_back(p.SetInputCube("F5", Isis::AllMatchOrOne));
+    if (ui.WasEntered("F2")) cubes.push_back(p.SetInputCube("F2", Isis::AllMatchOrOne));
+    if (ui.WasEntered("F3")) cubes.push_back(p.SetInputCube("F3", Isis::AllMatchOrOne));
+    if (ui.WasEntered("F4")) cubes.push_back(p.SetInputCube("F4", Isis::AllMatchOrOne));
+    if (ui.WasEntered("F5")) cubes.push_back(p.SetInputCube("F5", Isis::AllMatchOrOne));
     outCube = p.SetOutputCube("TO");
   }
-  else if(ui.GetString("MODE") == "LIST") {
+  else if (ui.GetString("MODE") == "LIST") {
     FileList list(ui.GetFileName("FROMLIST"));
 
     // Run through file list and set its entries as input cubes
-    for(int i = 0; i < list.size(); i++) {
-      CubeAttributeInput att(list[i].toString());
-      cubes.push_back(p.SetInputCube(list[i].toString(), att, Isis::AllMatchOrOne));
+    for (int i = 0; i < list.size(); i++) {
+      CubeAttributeInput att(list[i].original());
+      cubes.push_back(p.SetInputCube(list[i].original(), att, Isis::AllMatchOrOne));
     }
     outCube = p.SetOutputCube("TO");
   }
@@ -98,7 +98,7 @@ void Evaluate(vector<Buffer *> &input, vector<Buffer *> &output) {
                             outBuffer.Line(), outBuffer.Band());
 
   // If final result is a scalar, set all pixels to that value.
-  if(results.size() == 1) {
+  if (results.size() == 1) {
     for(int i = 0; i < (int)outBuffer.size(); i++) {
       outBuffer[i] = results[0];
     }

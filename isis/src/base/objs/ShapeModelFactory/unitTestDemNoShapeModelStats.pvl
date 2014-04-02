@@ -1,0 +1,53 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 128
+    TileLines   = 128
+
+    Group = Dimensions
+      Samples = 46082
+      Lines   = 23042
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = SignedWord
+      ByteOrder  = Lsb
+      Base       = 3396000.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Mapping
+    ProjectionName     = SimpleCylindrical
+    CenterLongitude    = 180.0000000
+    TargetName         = Mars
+    EquatorialRadius   = 3396190.0 <meters>
+    PolarRadius        = 3376200.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    UpperLeftCornerX   = -10669909.2276 <meters>
+    UpperLeftCornerY   = 5335186.1556 <meters>
+    PixelResolution    = 463.0836 <meters/pixel>
+    Scale              = 127.99999292419 <pixels/degree>
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 2141162145
+  Bytes     = 5884
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 2141159441
+  Bytes     = 2704
+End_Object
+End

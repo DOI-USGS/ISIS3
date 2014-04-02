@@ -14,7 +14,7 @@ commands:
 	  name=footprint \
 	  type=Polygon > /dev/null;
 	$(CAT) $(OUTPUT)/CM_1504753137_1.txt | \
-	  sed 's/\([0-9]\.[0-9]\{4\}\)\([0-9]*\)/\1/g' | \
+	  sed 's/\([0-9]\.[0-9]\{3\}\)\([0-9]*\)/\1/g' | \
 	  sed -e '$$G' > $(OUTPUT)/CM_1504753137_1.trimmed.txt
 	$(CP) $(INPUT)/CM_1504753137_1.ir.cub \
 	  $(OUTPUT)/CM_1504753137_1.2.ir.cub;

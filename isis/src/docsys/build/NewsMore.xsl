@@ -37,7 +37,7 @@ Deborah Lee Soltesz
     <html>
       <head>
         <title>
-            USGS Isis: Isis News
+            USGS Isis: ISIS News
         </title>
         <meta name="keywords" content="news, Isis, image processing, software, open source, remote sensing, planetary science, astrogeology"/>
         <meta name="description" content="About the Integrated Software for Imagers and Spectrometers (ISIS), created and managed by the USGS Astrogeology Research Program. ISIS provides a comprehensive, user-friendly, portable tool for processing, analyzing, and displaying remotely sensed image data."/>
@@ -86,7 +86,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        Isis News</p>
+        ISIS News</p>
 
         <hr/>
 
@@ -95,7 +95,7 @@ Deborah Lee Soltesz
           <tr valign="top">
             <td align="left">
               <h1>
-                Headlines: Isis
+                Headlines: ISIS
                 <xsl:choose>
                   <xsl:when test="$IsisVer = '3'">3</xsl:when>
                   <xsl:when test="$IsisVer = '2'">2.1</xsl:when>

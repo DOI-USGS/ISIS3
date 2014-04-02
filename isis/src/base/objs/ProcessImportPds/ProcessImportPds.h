@@ -179,6 +179,14 @@ namespace Isis {
    *  @history 2012-11-21 Jeannie Backer - Added methods and member variables to 
    *                          import binary PDS tables found in the PDS file.
    *                          Added a default destructor. References #700.
+   *  @history 2014-02-11 Janet Barrett - Created new version of SetPdsFile method
+   *                          so that calling applications can intercept the PDS
+   *                          label before it gets loaded by this class. This is
+   *                          needed so that missing keywords can be added to the
+   *                          PDS label by the application before it gets loaded.
+   *                          This also required moving some of the code from the
+   *                          SetPdsFile method to a new method, ProcessLabel. Fixes
+   *                          #2036.
    *  
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
@@ -191,6 +199,8 @@ namespace Isis {
       ~ProcessImportPds();
       void SetPdsFile(const QString &pdsLabelFile, const QString &pdsDataFile,
                       Pvl &pdsLabel);
+      void SetPdsFile(const Pvl &pdsLabelPvl, const QString &pdsDataFile);
+      void ProcessLabel(const QString &pdsDataFile);
 
       void TranslatePdsProjection(Pvl &lab);
       void TranslateIsis2Labels(Pvl &lab);

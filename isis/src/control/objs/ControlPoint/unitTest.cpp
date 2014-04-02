@@ -110,8 +110,13 @@ int main() {
 
   cout << "Testing copy constructor...\n";
   ControlPoint copy(cp);
+  cout << "\t Also testing == operator" << endl;
+  bool equal = (cp == cp);
+  cout << "\t\t original == its self (yes)? " << equal << endl;
   copy.SetEditLock(false);
   copy.SetRefMeasure(0);
+  equal = (cp == copy);
+  cout << "\t\t original == copy (no)? " << equal << endl;
   printPoint(cp);
   cout << "Testing assignment operator...\n";
   ControlPoint assignment = copy;

@@ -7,17 +7,17 @@
         <h2><a name="Introduction">Introduction</a></h2>
 
         <p>
-          This basic guide focuses on core Isis labels and a conceptual file structure for a cube.  The intent is not to describe the complex nature of the physical file format or the meaning of every element of an Isis label.  There are other programmer-related documents that delve into this detailed information.  They include, Isis Physical Cube Format Guide and Isis Label Reference.   While this document is basic in nature, it is not intended to be an introduction to image processing.  We assume the reader has a general understanding of common terminology such as pixels, lines, samples, bit-type, etc.
+          This basic guide focuses on core ISIS labels and a conceptual file structure for a cube.  The intent is not to describe the complex nature of the physical file format or the meaning of every element of an ISIS label.  There are other programmer-related documents that delve into this detailed information.  They include, ISIS Physical Cube Format Guide and ISIS Label Reference.   While this document is basic in nature, it is not intended to be an introduction to image processing.  We assume the reader has a general understanding of common terminology such as pixels, lines, samples, bit-type, etc.
         </p>
         <p>
-          From our past experiences we know that a digital image is a two-dimensional array of pixels.  The Isis cube format expands an image into the third dimension.
+          From our past experiences we know that a digital image is a two-dimensional array of pixels.  The ISIS cube format expands an image into the third dimension.
         </p>
 
         <div align="center">
           <div  style="width:360px;">
-              <img src="assets/cubediagram.png" width="353" height="131" alt="[Line Diagram of the Isis Cube image format]"/><br/>
+              <img src="assets/cubediagram.png" width="353" height="131" alt="[Line Diagram of the ISIS Cube image format]"/><br/>
             <p class="caption">
-            This diagram illustrates that the Isis Cube image format can be visualized as a rectangular prism,
+            This diagram illustrates that the ISIS Cube image format can be visualized as a rectangular prism,
             with the origin in the closest upper left corner , the lines running in the height direction, the
             samples running in the width direction, and the bands running in the depth direction.
             </p>
@@ -38,7 +38,7 @@
           As usual, each individual pixel contains a number representing some physical property (e.g., radiance, reflectance, elevation).  As a user, these numbers should always be thought of as a floating-point number.  That is, 15.397 or –1E15.  The conversion from 8-bit or 16-bit pixels is handled behind the scene, thus presenting users (and application programmers) with real world values.
       </p>
       <p>
-          Isis has the ability to deal with unique conditions within a cube.  That is, there are reserved values that have special meaning and hence the name "special pixels".
+          ISIS has the ability to deal with unique conditions within a cube.  That is, there are reserved values that have special meaning and hence the name "special pixels".
           The following is a table of pixel value you may encounter when running programs or visually examining cubes:
       </p>
 
@@ -94,8 +94,8 @@
         <h2><a name="FileSpecifications">File Specifications</a></h2>
 
         <p>
-          An Isis cube consists of two parts, the labels and the pixel data.  These can be stored together in one file (attached) or
-          in two separate files (detached).  As Isis programs automatically enforce an extension of .cub on the output file you can expect
+          An ISIS cube consists of two parts, the labels and the pixel data.  These can be stored together in one file (attached) or
+          in two separate files (detached).  As ISIS programs automatically enforce an extension of .cub on the output file you can expect
           to find the pixels in a file with an extension of .cub; if you decide detach your labels you will also have a file with an extension of .lbl.
           The following is an example of the minimum labels for a cube:
 
@@ -132,7 +132,7 @@ End
           There are many other groups that you will find in the labels of a cube.  For example,
           <tt>Instrument</tt>, <tt>Kernels</tt>, <tt>Archive</tt>, and <tt>Mapping</tt>, to name a few.
           Definitions of these groups and their keywords, as well as the IsisCube object presented above, can be found in the
-          <a href="../LabelDictionary/LabelDictionary.html">Isis Label Dictionary</a>.
+          <a href="../LabelDictionary/LabelDictionary.html">ISIS Label Dictionary</a>.
           </p>
 
       </body>
@@ -155,9 +155,9 @@ End
 
   <bibliography>
     <title>Logical Cube Format Guide</title>
-    <brief>Guide to core Isis labels and a conceptual file structure for a cube</brief>
+    <brief>Guide to core ISIS labels and a conceptual file structure for a cube</brief>
     <description>
-    This basic guide focuses on core Isis labels and a conceptual file structure for a cube
+    This basic guide focuses on core ISIS labels and a conceptual file structure for a cube
     </description>
     <author>Jeff Anderson</author>
     <date>2003-03-26</date>

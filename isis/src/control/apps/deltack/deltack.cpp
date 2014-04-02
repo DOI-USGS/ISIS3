@@ -139,12 +139,21 @@ void IsisMain() {
     //cmatrix.Label().findObject("Table",Pvl::Traverse).addKeyword(description);
 
     // Update the cube history
-    c.write(cmatrix);
-    History h("IsisCube");
-    c.read(h);
-    h.AddEntry();
-    c.write(h);
+    History hist = History("IsisCube");
+    try {
+      // read history from cube, if it exists.
+      c.read(hist);
+    }
+    catch(IException &e) {
+      // if the history does not exist in the cube, the cube's write method will add it.
+    }
+      c.write(cmatrix); 
+      hist.AddEntry();
+      c.write(hist);
+
+    // clean up
     c.close();
+
     PvlGroup gp("DeltackResults");
     gp += PvlKeyword("Status", "Camera pointing updated");
     Application::Log(gp);

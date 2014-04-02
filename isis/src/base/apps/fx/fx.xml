@@ -696,6 +696,10 @@
        "Related Objects and Documents" section of the documentation.
        Fixes mantis ticket #1525.
     </change>
+    <change name="Tracie Sucharski" date="2013-12-11">
+      Fixed bug where the cube attributes on files in the fromlist were
+      ignored.  Fixes #1926."
+    </change>
   </history>
 
   <groups>     

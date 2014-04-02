@@ -159,6 +159,10 @@
       Print calibration parameters and coefficients to print.prt and RadiometricCalibration
       group in cube labels.
     </change>
+    <change name="Janet Barrett" date="2013-11-26">
+      Modified code that it doesn't require a camera model to calculate the I/F.
+      Fixes #1740.
+    </change>
   </history>
 
   <groups>     

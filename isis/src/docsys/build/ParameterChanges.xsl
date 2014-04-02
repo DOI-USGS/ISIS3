@@ -152,8 +152,8 @@
 
   <bibliography>
     <title>Application Parameter Changes</title>
-    <brief>Changes since the last Isis 3 release</brief>
-    <description>Listing of the parameters that have changed in Isis 3 since the last major release.</description>
+    <brief>Changes since the last ISIS 3 release</brief>
+    <description>Listing of the parameters that have changed in ISIS 3 since the last major release.</description>
     <author>Steven Lambright</author>
     <date>2011-10-05</date>
   </bibliography>

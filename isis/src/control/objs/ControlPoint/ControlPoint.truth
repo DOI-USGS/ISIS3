@@ -156,6 +156,9 @@ End
 Done printing point.
 
 Testing copy constructor...
+	 Also testing == operator
+		 original == its self (yes)? 1
+		 original == copy (no)? 0
 Printing point:
 Object = ControlNetwork
   NetworkId    = Identifier

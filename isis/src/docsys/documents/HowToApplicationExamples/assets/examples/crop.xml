@@ -53,7 +53,7 @@
     <group name="Files">
       <parameter name="FROM">
         <type>filename</type>
-        <filemode>input</filemode>
+        <fileMode>input</fileMode>
         <brief>
           Input cube
         </brief>
@@ -67,7 +67,7 @@
 
       <parameter name="TO">
         <type>filename</type>
-        <filemode>output</filemode>
+        <fileMode>output</fileMode>
         <brief>
           Output cropped cube
         </brief>

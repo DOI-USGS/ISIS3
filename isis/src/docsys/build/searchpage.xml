@@ -3,7 +3,7 @@
   <a name="top" accesskey="T"/><a href="http://www.usgs.gov"><img src="../assets/icons/littleVIS.gif" width="80" height="22" border="0" alt="USGS"/></a>
 
 
-  <h1>Isis Advanced Search</h1>
+  <h1>ISIS Advanced Search</h1>
   <hr/>
   <div align="right">
     <a href="http://search.usgs.gov/help/?la=en">Help</a> |
@@ -28,23 +28,23 @@
                           Entire site</td>
                         <td nowrap="nowrap">
                           <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/documents"/>
-                          Isis 3.0: Guides &amp; References</td>
+                          ISIS 3.0: Guides &amp; References</td>
                       </tr>
                       <tr>
                         <td nowrap="nowrap">
                           <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Application/presentation/Tabbed"/>
-                          Isis 3.0: Software Manual</td>
+                          ISIS 3.0: Software Manual</td>
                         <td nowrap="nowrap">
                           <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Object/presentation/APITabbed"/>
-                          Isis 3.0: Developers Reference</td>
+                          ISIS 3.0: Developers Reference</td>
                       </tr>
                       <tr>
                         <td nowrap="nowrap">
                           <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Object/presentation/ProgTabbed"/>
-                          Isis 3.0: Programmers Reference</td>
+                          ISIS 3.0: Programmers Reference</td>
                         <td nowrap="nowrap">
                           <input type="checkbox" name="oq" value="url:isis.astrogeology.usgs.gov/Isis2"/>
-                          Isis 2.1: All Documentation</td>
+                          ISIS 2.1: All Documentation</td>
                       </tr>
                     </table>
 

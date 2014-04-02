@@ -32,6 +32,7 @@
 #include <QDebug>
 #include "geos/geom/BinaryOp.h"
 #include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/CoordinateSequence.h"
 #include "geos/geom/LinearRing.h"
 #include "geos/geom/Point.h"
 #include "geos/geom/Polygon.h"
@@ -110,7 +111,7 @@ namespace Isis {
           poly->getExteriorRing()->getCoordinates();
 
         // Convert each coordinate in the exterior ring of this polygon
-        for(unsigned int cord = 0; cord < llcoords->getSize(); ++cord) {
+        for (unsigned int cord = 0; cord < llcoords->getSize(); ++cord) {
           projection->SetGround(llcoords->getAt(cord).y,
                                 llcoords->getAt(cord).x);
           xycoords->add(geos::geom::Coordinate(projection->XCoord(),
@@ -406,7 +407,6 @@ namespace Isis {
    * @param idString mpolygon's Id
    * @return QString  Returns the polygon with lon,lat lon,lat format vertices and GML header 
    */
-
   QString PolygonTools::ToGML(const geos::geom::MultiPolygon *mpolygon, QString idString,
                               QString schema) {
 
@@ -669,6 +669,7 @@ namespace Isis {
     return despiked;
   }
 
+
   /**
    * Create a new multipolygon without the spikes associated with
    * some versions of the geos package.
@@ -814,7 +815,8 @@ namespace Isis {
         index + 1
       };
 
-      // Make sure the index is inside of our coordinates array (we'll have both too small/too big of an index)
+      // Make sure the index is inside of our coordinates array (we'll have both too small/too 
+      // big of an index)
       for(int j = 0; j < 3; j++) {
         while(testCoords[j] < 0) {
           testCoords[j] += vertices->getSize();
@@ -859,7 +861,9 @@ namespace Isis {
    *
    * @return bool Returns true if middle point is spiked
    */
-  bool PolygonTools::IsSpiked(geos::geom::Coordinate first, geos::geom::Coordinate middle, geos::geom::Coordinate last) {
+  bool PolygonTools::IsSpiked(geos::geom::Coordinate first, 
+                              geos::geom::Coordinate middle, 
+                              geos::geom::Coordinate last) {
     return TestSpiked(first, middle, last) || TestSpiked(last, middle, first);
   }
 
@@ -891,7 +895,8 @@ namespace Isis {
    *
    * @return bool Returns true if middle point spiked given this first/last pt
    */
-  bool PolygonTools::TestSpiked(geos::geom::Coordinate first, geos::geom::Coordinate middle, geos::geom::Coordinate last) {
+  bool PolygonTools::TestSpiked(geos::geom::Coordinate first, geos::geom::Coordinate middle, 
+                                geos::geom::Coordinate last) {
     geos::geom::Point *firstPt = Isis::globalFactory.createPoint(first);
     geos::geom::Point *middlePt = Isis::globalFactory.createPoint(middle);
     geos::geom::Point *lastPt = Isis::globalFactory.createPoint(last);
@@ -914,8 +919,8 @@ namespace Isis {
 
     if(distanceLastMiddle == 0.0) return true; // get rid of same point
 
-    // Checks the ratio of the distance between the last point and the line, and the last point and the middle point
-    // if the ratio is very small then there is a spike
+    // Checks the ratio of the distance between the last point and the line, and the last point
+    // and the middle point if the ratio is very small then there is a spike
     if(distanceLastLine / distanceLastMiddle >= .05) {
       spiked = false;
     }
@@ -940,7 +945,8 @@ namespace Isis {
       geos::geom::Polygon *poly = Isis::globalFactory.createPolygon(shell, empty);
 
 
-      // if these 3 points define a straight line then the middle is worthless (defines nothing) or problematic
+      // if these 3 points define a straight line then the middle is worthless (defines nothing) 
+      // or problematic
       if(poly->getArea() < 1.0e-10) {
         spiked = true;
       }
@@ -971,7 +977,8 @@ namespace Isis {
    *
    * @return geos::geom::Geometry* geom1 intersected with geom2
    */
-  geos::geom::Geometry *PolygonTools::Intersect(const geos::geom::Geometry *geom1, const geos::geom::Geometry *geom2) {
+  geos::geom::Geometry *PolygonTools::Intersect(const geos::geom::Geometry *geom1, 
+                                                const geos::geom::Geometry *geom2) {
     try {
       return Operate(geom1, geom2, (unsigned int)geos::operation::overlay::OverlayOp::opINTERSECTION);
     }
@@ -991,7 +998,9 @@ namespace Isis {
   }
 
 
-  geos::geom::Geometry *PolygonTools::Operate(const geos::geom::Geometry *geom1, const geos::geom::Geometry *geom2, unsigned int opcode) {
+  geos::geom::Geometry *PolygonTools::Operate(const geos::geom::Geometry *geom1,
+                                              const geos::geom::Geometry *geom2, 
+                                              unsigned int opcode) {
 
     geos::operation::overlay::OverlayOp::OpCode code =
       (geos::operation::overlay::OverlayOp::OpCode)opcode;
@@ -1180,7 +1189,8 @@ namespace Isis {
         newExterior = FixGeometry((geos::geom::LinearRing *)exterior);
       }
       else {
-        IString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
+        IString msg = "Failed when attempting to fix exterior ring of polygon. The exterior "
+                      "ring is not simple and closed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -1238,8 +1248,8 @@ namespace Isis {
 
       minDiff = min(minDiff, fabs(DecimalPlace(thisCoordinate->y) - DecimalPlace(difference[1])));
 
-      // Cases where the difference in one direction is exactly zero, and the other direction is next to zero
-      //  appear often enough (especially in despike).
+      // Cases where the difference in one direction is exactly zero, and the other direction is 
+      // next to zero appear often enough (especially in despike).
       if(difference[0] == 0.0 && difference[1] != 0.0) {
         // subtracted the two points, got deltaX = 0.0, use the y difference decimal place
         minDiff = fabs(DecimalPlace(thisCoordinate->y) - DecimalPlace(difference[1]));
@@ -1336,12 +1346,14 @@ namespace Isis {
    *
    * @return geos::geom::Geometry*
    */
-  geos::geom::Geometry *PolygonTools::Difference(const geos::geom::Geometry *geom1, const geos::geom::Geometry *geom2) {
+  geos::geom::Geometry *PolygonTools::Difference(const geos::geom::Geometry *geom1, 
+                                                 const geos::geom::Geometry *geom2) {
     try {
       return Operate(geom1, geom2, (unsigned int)geos::operation::overlay::OverlayOp::opDIFFERENCE);
     }
     catch(geos::util::GEOSException *exc) {
-      IString msg = "Difference operation failed. The reason given was [" + IString(exc->what()) + "]";
+      IString msg = "Difference operation failed. The reason given was [" + 
+                    IString(exc->what()) + "]";
       delete exc;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1564,7 +1576,8 @@ namespace Isis {
    *
    * @return geos::geom::Geometry* The lower precision geometry
    */
-  geos::geom::Geometry *PolygonTools::ReducePrecision(const geos::geom::Geometry *geom, unsigned int precision) {
+  geos::geom::Geometry *PolygonTools::ReducePrecision(const geos::geom::Geometry *geom, 
+                                                      unsigned int precision) {
     if(geom->getGeometryTypeId() == geos::geom::GEOS_MULTIPOLYGON) {
       return ReducePrecision(
           dynamic_cast<const geos::geom::MultiPolygon *>(geom), precision);
@@ -1581,7 +1594,8 @@ namespace Isis {
       return ReducePrecision(MakeMultiPolygon(geom), precision);
     }
     else {
-      IString msg = "PolygonTools::ReducePrecision does not support [" + GetGeometryName(geom) + "]";
+      IString msg = "PolygonTools::ReducePrecision does not support [" + 
+                    GetGeometryName(geom) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -1596,7 +1610,8 @@ namespace Isis {
    *
    * @return geos::geom::MultiPolygon* The lower precision MultiPolygon
    */
-  geos::geom::MultiPolygon *PolygonTools::ReducePrecision(const geos::geom::MultiPolygon *poly, unsigned int precision) {
+  geos::geom::MultiPolygon *PolygonTools::ReducePrecision(const geos::geom::MultiPolygon *poly, 
+                                                          unsigned int precision) {
     // Maybe two points are on top of each other
     vector<geos::geom::Geometry *> *newPolys = new vector<geos::geom::Geometry *>;
 
@@ -1629,7 +1644,8 @@ namespace Isis {
    *
    * @return geos::geom::Polygon* The lower precision polygon
    */
-  geos::geom::Polygon *PolygonTools::ReducePrecision(const geos::geom::Polygon *poly, unsigned int precision) {
+  geos::geom::Polygon *PolygonTools::ReducePrecision(const geos::geom::Polygon *poly, 
+                                                     unsigned int precision) {
     // Convert each hole inside this polygon
     vector<geos::geom::Geometry *> *holes = new vector<geos::geom::Geometry *>;
     for(unsigned int holeIndex = 0; holeIndex < poly->getNumInteriorRing(); holeIndex ++) {
@@ -1642,7 +1658,8 @@ namespace Isis {
       }
 
       try {
-        geos::geom::LinearRing *newHole = ReducePrecision((geos::geom::LinearRing *)thisHole, precision);
+        geos::geom::LinearRing *newHole = ReducePrecision((geos::geom::LinearRing *)thisHole, 
+                                                          precision);
 
         if(!newHole->isEmpty()) {
           holes->push_back(newHole);
@@ -1668,7 +1685,8 @@ namespace Isis {
         newExterior = ReducePrecision((geos::geom::LinearRing *)exterior, precision);
       }
       else {
-        IString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
+        IString msg = "Failed when attempting to fix exterior ring of polygon. The exterior "
+                      "ring is not simple and closed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -1690,7 +1708,8 @@ namespace Isis {
    *
    * @return geos::geom::LinearRing* The lower precision linear ring
    */
-  geos::geom::LinearRing *PolygonTools::ReducePrecision(const geos::geom::LinearRing *ring, unsigned int precision) {
+  geos::geom::LinearRing *PolygonTools::ReducePrecision(const geos::geom::LinearRing *ring, 
+                                                        unsigned int precision) {
     geos::geom::CoordinateSequence *coords = ring->getCoordinates();
 
     // Check this, just in case
@@ -1754,7 +1773,8 @@ namespace Isis {
    *
    * @return geos::geom::Coordinate* The lower precision coordinate
    */
-  geos::geom::Coordinate *PolygonTools::ReducePrecision(const geos::geom::Coordinate *coord, unsigned int precision) {
+  geos::geom::Coordinate *PolygonTools::ReducePrecision(const geos::geom::Coordinate *coord, 
+                                                        unsigned int precision) {
     return new geos::geom::Coordinate(
              ReducePrecision(coord->x, precision),
              ReducePrecision(coord->y, precision),
@@ -1827,7 +1847,8 @@ namespace Isis {
   }
 
 
-  bool PolygonTools::Equal(const geos::geom::MultiPolygon *poly1, const geos::geom::MultiPolygon *poly2) {
+  bool PolygonTools::Equal(const geos::geom::MultiPolygon *poly1, 
+                           const geos::geom::MultiPolygon *poly2) {
 
     vector<const geos::geom::Polygon *> polys1;
     vector<const geos::geom::Polygon *> polys2;
@@ -1900,7 +1921,8 @@ namespace Isis {
   }
 
 
-  bool PolygonTools::Equal(const geos::geom::LineString *lineString1, const geos::geom::LineString *lineString2) {
+  bool PolygonTools::Equal(const geos::geom::LineString *lineString1, 
+                           const geos::geom::LineString *lineString2) {
 
     geos::geom::CoordinateSequence *coords1 = lineString1->getCoordinates();
     geos::geom::CoordinateSequence *coords2 = lineString2->getCoordinates();
@@ -1930,7 +1952,8 @@ namespace Isis {
   }
 
 
-  bool PolygonTools::Equal(const geos::geom::Coordinate &coord1, const geos::geom::Coordinate &coord2) {
+  bool PolygonTools::Equal(const geos::geom::Coordinate &coord1, 
+                           const geos::geom::Coordinate &coord2) {
 
     if(!Equal(coord1.x, coord2.x))  return false;
     if(!Equal(coord1.y, coord2.y))  return false;
@@ -1971,5 +1994,218 @@ namespace Isis {
   }
 
 
+  /**
+   * If the cube crosses the 0/360 boundary and does not include a pole, this will divide the 
+   * polygon into multiple polygons (one for each time the polygon crosses the boundry and back).
+   * These polygons are put into a geos Multipolygon. If the cube does not cross the 0/360 boundary 
+   * then the returned Multipolygon will contain a single Polygon. 
+   *  
+   * @param polygon projection The projection to be used to convert the Xs and Ys to Lon
+   *                   and Lats
+   *
+   * @return  Returns a pointer to a multipolygon which is the result of splitting the input 
+   *          parameter polygon every where it crosses the 0/360 longitude boundry. The caller
+   *          assumes responsibility for deleting the returned multipolygon 
+   *
+   */
+  geos::geom::MultiPolygon *PolygonTools::SplitPolygonOn360(const geos::geom::Polygon *inPoly) {
+    bool convertLon = false;
+    bool negAdjust = false;
+    bool newCoords = false;  //  coordinates have been adjusted
+    geos::geom::CoordinateSequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
+    double lon, lat;
+    double lonOffset = 0;
+    geos::geom::CoordinateSequence *inPolyCoords = inPoly->getCoordinates();
+    double prevLon = inPolyCoords->getAt(0).x;
+    double prevLat = inPolyCoords->getAt(0).y;
+
+    newLonLatPts->add(geos::geom::Coordinate(prevLon, prevLat));
+    double dist = 0.0;
+    for (unsigned int i = 1; i < inPolyCoords->getSize(); i++) {
+      lon = inPolyCoords->getAt(i).x;
+      lat = inPolyCoords->getAt(i).y;
+      // check to see if you just crossed the Meridian
+      if (abs(lon - prevLon) > 180 && (prevLat != 90 && prevLat != -90)) {
+        newCoords = true;
+        // if you were already converting then stop (crossed Meridian even number of times)
+        if (convertLon) {
+          convertLon = false;
+          lonOffset = 0;
+        }
+        else {   // Need to start converting again, deside how to adjust coordinates
+          if ((lon - prevLon) > 0) {
+            lonOffset = -360.;
+            negAdjust = true;
+          }
+          else if ((lon - prevLon) < 0) {
+            lonOffset = 360.;
+            negAdjust = false;
+          }
+          convertLon = true;
+        }
+      }
+
+      // Change to a minimum calculation
+      if (newCoords  &&  dist == 0.0) {
+        double longitude = (lon + lonOffset) - prevLon;
+        double latitude = lat - prevLat;
+        dist = std::sqrt((longitude * longitude) + (latitude * latitude));
+      }
+
+      // add coord
+      newLonLatPts->add(geos::geom::Coordinate(lon + lonOffset, lat));
+
+      // set current to old
+      prevLon = lon;
+      prevLat = lat;
+    }
+
+    delete inPolyCoords;
+
+    // Nothing was done so return
+    if (!newCoords) {
+      geos::geom::Polygon *newPoly = globalFactory.createPolygon
+                                     (globalFactory.createLinearRing(newLonLatPts), NULL);
+      geos::geom::MultiPolygon *multi_polygon = PolygonTools::MakeMultiPolygon(newPoly);
+      delete newLonLatPts;
+      return multi_polygon;
+    }
+
+    // bisect into seperate polygons
+    try {
+      geos::geom::Polygon *newPoly = globalFactory.createPolygon
+                                     (globalFactory.createLinearRing(newLonLatPts), NULL);
+
+      geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();
+      geos::geom::CoordinateSequence *pts2 = new geos::geom::CoordinateArraySequence();
+
+      // Depending on direction of compensation bound accordingly
+      //***************************************************
+
+      // please verify correct if you change these values
+      //***************************************************
+      if (negAdjust) {
+        pts->add(geos::geom::Coordinate(0., 90.));
+        pts->add(geos::geom::Coordinate(-360., 90.));
+        pts->add(geos::geom::Coordinate(-360., -90.));
+        pts->add(geos::geom::Coordinate(0., -90.));
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+          pts->add(geos::geom::Coordinate(0.0, lat));
+        }
+        pts->add(geos::geom::Coordinate(0., 90.));
+        pts2->add(geos::geom::Coordinate(0., 90.));
+        pts2->add(geos::geom::Coordinate(360., 90.));
+        pts2->add(geos::geom::Coordinate(360., -90.));
+        pts2->add(geos::geom::Coordinate(0., -90.));
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+          pts2->add(geos::geom::Coordinate(0.0, lat));
+        }
+        pts2->add(geos::geom::Coordinate(0., 90.));
+      }
+      else {
+        pts->add(geos::geom::Coordinate(360., 90.));
+        pts->add(geos::geom::Coordinate(720., 90.));
+        pts->add(geos::geom::Coordinate(720., -90.));
+        pts->add(geos::geom::Coordinate(360., -90.));
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+          pts->add(geos::geom::Coordinate(360.0, lat));
+        }
+        pts->add(geos::geom::Coordinate(360., 90.));
+        pts2->add(geos::geom::Coordinate(360., 90.));
+        pts2->add(geos::geom::Coordinate(0., 90.));
+        pts2->add(geos::geom::Coordinate(0., -90.));
+        pts2->add(geos::geom::Coordinate(360., -90.));
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+          pts2->add(geos::geom::Coordinate(360.0, lat));
+        }
+        pts2->add(geos::geom::Coordinate(360., 90.));
+      }
+
+      geos::geom::Polygon *boundaryPoly = globalFactory.createPolygon
+                                          (globalFactory.createLinearRing(pts), NULL);
+      geos::geom::Polygon *boundaryPoly2 = globalFactory.createPolygon
+                                           (globalFactory.createLinearRing(pts2), NULL);
+      /*------------------------------------------------------------------------
+      /  Intersecting the original polygon (converted coordinates) with the
+      /  boundary polygons will create the multi polygons with the converted coordinates.
+      /  These will need to be converted back to the original coordinates.
+      /-----------------------------------------------------------------------*/
+      geos::geom::Geometry *intersection = PolygonTools::Intersect(newPoly, boundaryPoly);
+      geos::geom::MultiPolygon *convertPoly = PolygonTools::MakeMultiPolygon(intersection);
+      delete intersection;
+
+      intersection = PolygonTools::Intersect(newPoly, boundaryPoly2);
+      geos::geom::MultiPolygon *convertPoly2 = PolygonTools::MakeMultiPolygon(intersection);
+      delete intersection;
+
+      /*------------------------------------------------------------------------
+      / Adjust points created in the negative space or >360 space to be back in
+      / the 0-360 world.  This will always only need to be done on convertPoly.
+      / Then add geometries to finalpolys.
+      /-----------------------------------------------------------------------*/
+      vector<geos::geom::Geometry *> *finalpolys = new vector<geos::geom::Geometry *>;
+      geos::geom::Geometry *newGeom = NULL;
+
+      for (unsigned int i = 0; i < convertPoly->getNumGeometries(); i++) {
+        newGeom = (convertPoly->getGeometryN(i))->clone();
+        pts = convertPoly->getGeometryN(i)->getCoordinates();
+        geos::geom::CoordinateSequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
+        // fix the points
+
+        for (unsigned int k = 0; k < pts->getSize() ; k++) {
+          double lon = pts->getAt(k).x;
+          double lat = pts->getAt(k).y;
+          if (negAdjust) {
+            lon = lon + 360;
+          }
+          else {
+            lon = lon - 360;
+          }
+          newLonLatPts->add(geos::geom::Coordinate(lon, lat), k);
+
+        }
+        // Add the points to polys
+        finalpolys->push_back(globalFactory.createPolygon
+                              (globalFactory.createLinearRing(newLonLatPts), NULL));
+      }
+
+      // This loop is over polygons that will always be in 0-360 space no need to convert
+      for (unsigned int i = 0; i < convertPoly2->getNumGeometries(); i++) {
+        newGeom = (convertPoly2->getGeometryN(i))->clone();
+        finalpolys->push_back(newGeom);
+      }
+
+      geos::geom::MultiPolygon *multi_polygon = globalFactory.createMultiPolygon(*finalpolys);
+
+      delete finalpolys;
+      delete newGeom;
+      delete newLonLatPts;
+      delete pts;
+      delete pts2;
+      return multi_polygon;
+    }
+    catch(geos::util::IllegalArgumentException *geosIll) {
+      std::string msg = "Unable to split polygon on longitude boundry (SplitPolygonOn360) due to ";
+      msg += "geos illegal argument [" + IString(geosIll->what()) + "]";
+      delete geosIll;
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+    catch(geos::util::GEOSException *geosExc) {
+      std::string msg = "Unable to split polygon on longitude boundry (SplitPolygonOn360) due to ";
+      msg += "geos exception [" + IString(geosExc->what()) + "]";
+      delete geosExc;
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+    catch(IException &e) {
+      std::string msg = "Unable to split polygon on longitude boundry (SplitPolygonOn360) due to ";
+      msg += "isis operation exception [" + IString(e.what()) + "]";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
+    catch(...) {
+      std::string msg = "Unable to split polygon on longitude boundry (SplitPolygonOn360) due to ";
+      msg += "unknown exception";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+  }
 } // end namespace isis
 

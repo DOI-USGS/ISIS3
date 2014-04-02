@@ -18,7 +18,7 @@
   BIBLIOGRAPHY
   ******************************************** -->
   <bibliography>
-    <title>Isis Application and Category Test How-to</title>
+    <title>ISIS Application and Category Test How-to</title>
     <brief>Guide to writing an application and category tests </brief>
     <description>Guide to writing application and category tests using make. This guide describes
       step by step the process of writing a test for an application or category.  The guide
@@ -167,7 +167,7 @@
           </ol>
           <li>Type
             <I>cd testname</I>
-            to chage directories to the test</li>
+            to change directories to the test</li>
         </ol>
 
         The template makefile should look like this.
@@ -333,7 +333,7 @@
         <!-- Comparing Files -->
         <h2>Comparing Files</h2>
 
-        <h3>Pvl</h3>
+        <h3>PVL</h3>
         <p>
           In order to assure the most accurate testing possible, pvl
           (parameter value language)  files are compared by parsing through

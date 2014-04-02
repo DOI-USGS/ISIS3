@@ -1,0 +1,35 @@
+\begindata
+
+ INS-130102_PIXEL_PITCH       = 0.012
+ INS-130102_BORESIGHT_SAMPLE  = 511.5
+ INS-130102_BORESIGHT_LINE    = 511.5
+
+\begintex
+  The AMICA orientientiation in ISIS camera model implemenation
+  is +Y = -LINE, +X = +SAMPLE, Z = +Z
+\begindata
+
+ INS-130102_TRANSY  = (0.0, 0.0, -0.012)
+ INS-130102_TRANSX  = (0.0, 0.012, 0.0)
+ INS-130102_ITRANSL = (0.0, 0.0, -83.33333333)
+ INS-130102_ITRANSS = (0.0, 83.33333333, 0.0)
+
+\begintext
+  The AMICA distortion uses the basic radial distortion model where 
+  R**2 = x**2 + y **2.  The distortion for X and Y is:
+
+    Xc = X ( 1 + K1*R2)
+    Yc = Y ( 1 + K1*R2)
+
+  ISIS implementation of the distortion model is slightly different but can be
+  used to implement this distortion model.
+  
+  For AMICA, only one term, K1 = -2.8x10**(-5), is used.  Source for this
+  information is Ishiguro, Masateru, et al. "The Hayabusa Spacecraft Asteroid 
+  Multi-band Imaging Camera (AMICA)". Icarus 207.2 (2010): 714-731.
+
+\begindata
+
+  INS-130102_OD_K = ( 0.0, 0.000028, 0.0)
+
+\begintext

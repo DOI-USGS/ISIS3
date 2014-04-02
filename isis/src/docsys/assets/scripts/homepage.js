@@ -19,7 +19,7 @@ function writeAnnouncements() {
       document.write (
                      "<div><script language=\"JavaScript\" type=\"text/javascript\" src=\"http://isis.astrogeology.usgs.gov/IsisSupport/topics_anywhere.php?mode=show&f=1&n=3&a=y&t=_top&rt=n&so=d&b=dis&lpd=3&af=p3R0pyCnbHB0pw%3D%3D&l=y\"></script></div>"   );
     } else {
-      document.write ( "Visit the <a href=\"http://isis.astrogeology.usgs.gov/IsisSupport/\" target=\"_top\">Isis Support Center</a> for the latest news and announcements.") ;
+      document.write ( "Visit the <a href=\"http://isis.astrogeology.usgs.gov/IsisSupport/\" target=\"_top\">ISIS Support Center</a> for the latest news and announcements.") ;
     }
     if (isWeb) {
       document.write (
@@ -29,7 +29,7 @@ function writeAnnouncements() {
                      "</p>" ) ;
     }
     */
-  document.write("Visit the <a href=\"http://isis.astrogeology.usgs.gov/IsisSupport/\" target=\"_top\">Isis Support Center</a> for the latest news and announcements.");
+  document.write("Visit the <a href=\"http://isis.astrogeology.usgs.gov/IsisSupport/\" target=\"_top\">ISIS Support Center</a> for the latest news and announcements.");
 }
 
 function writeWhatsUpAtTheSupportCenter () {
@@ -42,7 +42,7 @@ function writeWhatsUpAtTheSupportCenter () {
     if (isWeb) {
       document.write (
                      "<!- - Isis Support - ->                                                                                                                                                                                                                                                                 " +
-                     "<h2>What's Up at the Isis Support Center?</h2>                                                                                                                                                                                                                                        " +
+                     "<h2>What's Up at the ISIS Support Center?</h2>                                                                                                                                                                                                                                        " +
                      "<div style=\"text-align:center;\">                                                                                                                                                                                                                                                    " +
                      "<div style=\"padding:10px; text-align: left;\">                                                                                                                                                                                                                                       "
                      );

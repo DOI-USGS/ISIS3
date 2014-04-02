@@ -444,8 +444,25 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     stream << labelPvl;
     pdsLabel += stream.str().c_str();
 
+    /* Ensure that we have enough room for the actual label content, plus at
+     * least two bytes for a carriage return and a linefeed, so the end of the
+     * label looks pretty */
+    while ((int)pdsLabel.length() + 2 > (int)(labelRecords * recordBytes)) {
+        labelRecords++;
+        // Refresh the label content
+        labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 4 + labelRecords));
+        labelPvl["LABEL_RECORDS"] = toString(labelRecords);
+        labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
+        stream.str(std::string());
+        stream << labelPvl;
+        pdsLabel = stream.str().c_str();
+    }
+
+    /* Now, add a carriage return and linefeed, and then pad the label with
+     * spaces if necessary */
+    pdsLabel += "\r\n";
     while ((int)pdsLabel.length() < (int) (labelRecords * recordBytes)) {
-        pdsLabel += '\n';
+        pdsLabel += " ";
     }
 
     fout << pdsLabel;

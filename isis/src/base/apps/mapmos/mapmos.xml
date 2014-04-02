@@ -40,6 +40,8 @@
    priority will cause the mosaic to have twice the number of bands of the input image, with a
    count band for each band. <b>Hence the file size of the mosaic is doubled due to the count
    band.</b> </p>
+
+   <p>An error will be thrown if the mosaic cube has no count band. </p>
    
    <p>In case of special pixels and the special pixel flags being enabled, the details 
    for each priority is described below.

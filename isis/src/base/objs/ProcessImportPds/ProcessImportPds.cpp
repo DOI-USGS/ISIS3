@@ -66,6 +66,30 @@ namespace Isis {
 
 
   /**
+   * Set the input label PVL and data file and initialize a Pvl with the PDS labels.
+   * This method was written to allow the calling application to intercept the PDS
+   * labels and make any modifications to them necessary (such as adding missing
+   * keywords like TARGET_NAME) before this class loads them. See the kaguyatc2isis
+   * program for an example.
+   *
+   * @param pdsLabelPvl The PVL containing the PDS label. 
+   *
+   * @param pdsDataFile The name of the PDS data file where the actual image/cube
+   *                    data is stored. This parameter cannot be empty.
+   *
+   * @throws Isis::iException::Message
+   */
+  void ProcessImportPds::SetPdsFile(const Isis::Pvl &pdsLabelPvl,
+                                    const QString &pdsDataFile) {
+
+    // Save the label and file for future use
+    p_pdsLabel = pdsLabelPvl;
+    p_labelFile = pdsDataFile;
+    ProcessLabel(pdsDataFile);
+  }
+
+
+  /**
    * Set the input label file, data file and initialize a Pvl with the PDS labels.
    *
    * @param pdsLabelFile The name of the PDS label file.This must be the file
@@ -100,7 +124,26 @@ namespace Isis {
     // Save the label and file for future use
     p_pdsLabel = pdsLabel;
     p_labelFile = pdsLabelFile;
+    ProcessLabel(pdsDataFile);
+  }
 
+
+  /**
+   * Load the PDS labels after determining what type of data file was provided.
+   * This code used to be part of the SetPdsFile method, but had to be moved to
+   * a separate method in order to allow calling applications to intercept the PDS
+   * labels before this method loaded them. This was necessary to fix problems in
+   * PDS labels such as adding missing keywords.
+   *
+   * @param pdsDataFile The name of the PDS data file where the actual image/cube
+   *                    data is stored. This parameter can be an empty QString, in
+   *                    which case the label information will be searched to find
+   *                    the data file name or the data will be assumed to be
+   *                    after the label information.
+   *
+   * @throws Isis::iException::Message
+   */
+  void ProcessImportPds::ProcessLabel(const QString &pdsDataFile) {
     // Create a temporary Isis::PvlTranslationManager so we can find out what
     // type of PDS file this is (i.e., Qube or Image or SpectralQube)
     stringstream trnsStrm;

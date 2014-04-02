@@ -6,7 +6,7 @@
 #include "CubeAttribute.h"
 #include "iTime.h"
 #include <vector>
-
+#include <QDir>
 
 using namespace std;
 using namespace Isis;
@@ -17,7 +17,6 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   QString cnetFile = ui.GetFileName("CNET");
   QString cubeList = ui.GetFileName("FROMLIST");
-
   
   BundleAdjust *b = NULL;
 
@@ -28,7 +27,7 @@ void IsisMain() {
   }
   else {
     b = new BundleAdjust(cnetFile, cubeList);
-   }
+  }
 
   //build lists of maximum likelihood estimation model strings and quantiles
   QList<QString> maxLikeModels;
@@ -54,9 +53,23 @@ void IsisMain() {
   b->SetObservationMode(ui.GetBoolean("OBSERVATIONS"));
   b->SetSolutionMethod(ui.GetString("METHOD"));
   b->SetSolveRadii(ui.GetBoolean("RADIUS"));
-  b->SetErrorPropagation(ui.GetBoolean("ERRORPROPAGATION"));
-  b->SetOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"));
+  b->SetUpdateCubes(ui.GetBoolean("UPDATE"));
   b->SetRejectionMultiplier(ui.GetDouble("REJECTION_MULTIPLIER"));
+  b->SetOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"));
+
+  b->SetErrorPropagation(ui.GetBoolean("ERRORPROPAGATION"));
+//  if (ui.WasEntered("BINARYFILEPATH")) {
+//    QString binaryfilepath = ui.GetString("BINARYFILEPATH");
+//    QDir dir(binaryfilepath);
+
+//    // verify path exists
+//    if (!dir.exists()) {
+//      QString msg = QString("BINARYFILEPATH [%1] does not exist").arg(binaryfilepath);
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+//    else
+//      b->SetErrorPropagationBinaryFilePath(binaryfilepath);
+//  }
 
   b->SetCKDegree(ui.GetInteger("CKDEGREE"));
   b->SetSolveCKDegree(ui.GetInteger("CKSOLVEDEGREE"));
@@ -242,5 +255,4 @@ void IsisMain() {
   }
 
   delete b;
-
 }

@@ -482,7 +482,7 @@ namespace Isis {
       // TODO Figure out how to get the tolerance -- for now hard code .01
       Memcache2HermiteCache(0.01);
 
-      std::cout << "Cache size is " << p_cache.size();
+      //std::cout << "Cache size is " << p_cache.size();
 
     }
 

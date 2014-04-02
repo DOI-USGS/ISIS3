@@ -109,10 +109,10 @@ Deborah Lee Soltesz
          <p style="margin-top:10px; margin-bottom:0px;">
            <xsl:choose>
              <xsl:when test="category[categoryItem = 'isis2']">
-             Isis 2 Documentation
+             ISIS 2 Documentation
              </xsl:when>
              <xsl:otherwise>
-             Isis 3 Documentation
+             ISIS 3 Documentation
              </xsl:otherwise>
            </xsl:choose>
          </p>

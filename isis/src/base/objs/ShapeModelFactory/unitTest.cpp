@@ -153,7 +153,24 @@ int main() {
     e.print();
   }
 
- // Test demshape with ShapeModel keyword
+  try {
+    // Test ShapeModel without shape model statistics
+    cout << endl << "  Testing Isis cube file for dem that is missing shape model statistics" << endl;
+    PvlGroup kern5 = kern1;
+    kern5 += PvlKeyword("ShapeModel", "unitTestDemNoShapeModelStats.pvl");
+    Pvl lab5;
+    lab5.addGroup(inst2);
+    lab5.addGroup(kern5);
+    Target targBadFile(NULL, lab5);
+    ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
+    cout << "    Successfully created shape " << smBadFile->name() << endl;
+    delete smBadFile;
+  }
+  catch (Isis::IException &e) {
+    e.print();
+  }
+
+  // Test demshape with ShapeModel keyword
   cout << endl << "  Testing dem shape..." << endl;
   QString inputFile = "$ISIS3DATA/mgs/testData/ab102401.cub";
   Cube cube;

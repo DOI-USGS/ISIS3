@@ -171,6 +171,9 @@ namespace Isis {
    *                           Fixes #976.
    *   @history 2013-03-27 Jeannie Backer - Added documentation and programmer comments.
    *                           References #1248.
+   *   @history 2014-03-28 Kimberly Oyama - Added check for count band when priority=average. The
+   *                           mosaic apps should fail when priority=average and there is no count
+   *                           band. Fixes #746.
    */
 
   class ProcessMosaic : public Process {

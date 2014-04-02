@@ -10,7 +10,7 @@
 #
 APPNAME = ringscam2map
 
-vimsIR.cub.TOLERANCE = .000062
+vimsIR.cub.TOLERANCE = .0892
 
 include $(ISISROOT)/make/isismake.tsts
 

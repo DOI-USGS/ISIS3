@@ -232,6 +232,9 @@
       Modified the documentation a bit and informed the user of the new
       qview-MatchTool that will now display the output network.
     </change>
+    <change name="Kimberly Oyama" date="2013-12-30">
+      Replaced the spaces in the point ID with underscores. References #1551.
+    </change>
   </history>
 
   <groups>

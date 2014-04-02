@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        Isis 3 Documentation</p>
+        ISIS 3 Documentation</p>
 
         <hr/>
 
@@ -121,9 +121,9 @@ Deborah Lee Soltesz
         <!-- hard coded links -->
           <p>
             <a href="../Object/Developer/index.html" target="_blank">
-            Isis Developers Reference</a><br/>
-            A handy reference guide to the Isis API and documentation for all Isis libraries and objects
-            for developers of new Isis applications
+            ISIS Developers Reference</a><br/>
+            A handy reference guide to the ISIS API and documentation for all ISIS libraries and objects
+            for developers of new ISIS applications
           </p>
 
       <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'api' and
@@ -145,15 +145,15 @@ Deborah Lee Soltesz
         <!-- hard coded links -->
           <p>
             <a href="../Schemas/Application/documentation/index.html">
-            Isis Application XML Reference</a><br/>
-            Reference guide for the Isis Application XML language
+            ISIS Application XML Reference</a><br/>
+            Reference guide for the ISIS Application XML language
           </p>
       
         <!-- hard coded links -->
           <p>
             <a href="../Schemas/Documentation/documentation/index.html">
-            Isis Documentation XML Reference</a><br/>
-            Reference guide for the Isis Documentation XML language
+            ISIS Documentation XML Reference</a><br/>
+            Reference guide for the ISIS Documentation XML language
           </p>
 
       <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'xml' and
@@ -201,8 +201,8 @@ Deborah Lee Soltesz
         <!-- hard coded links -->
           <p>
                   <a href="../Object/Programmer/index.html" target="_blank">
-                  Isis Programmers Reference</a><br/>
-                  An indepth reference guide for programmers who modify the Isis software package
+                  ISIS Programmers Reference</a><br/>
+                  An in-depth reference guide for programmers who modify the ISIS software
           </p>
 
       <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'api' and

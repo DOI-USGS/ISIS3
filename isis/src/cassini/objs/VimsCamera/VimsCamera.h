@@ -23,7 +23,11 @@
 
 #include "Camera.h"
 
+#include <QList>
+#include <QPointF>
+
 namespace Isis {
+  class Pvl;
   /**
    * @brief Cassini Vims camera model
    *
@@ -60,7 +64,17 @@ namespace Isis {
    *                          to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
-   *
+   *   @history 2012-03-04 Tracie Sucharski - Added new method, PixelIfovOffsets, which will return
+   *                           the ifov offsets,in x and y, from the center of the pixel in mm.  The
+   *                           pixel ifov size for vims is dependent on the sampling mode.
+   *   @history 2013-09-10 Tracie Sucharski, The Vims 15 Mhz clock actually oscillates closer to
+   *                           14.7456 Mhz, so the IR exposure duration, interline delay and
+   *                           interframe delay in the VIMS header need to be scaled by 1.01725.
+   *                           This change will affect where VIMS pixels map in projected space.
+   *                           Fixes #1759.
+   *   @history 2013-12-04 Tracie Sucharski - Fixed bug when checking for unsupported Nyquist
+   *                           cubes.  The SamplingMode keyword is actually "UNDER" not "NYQUIST".
+   *                           Print appropriate error indicating that these cubes are not supported.
    */
   class VimsCamera : public Camera {
     public:
@@ -114,6 +128,11 @@ namespace Isis {
        */
       virtual int SpkReferenceId() const { return (1); }
 
+      virtual QList<QPointF> PixelIfovOffsets();
+
+    private:
+      double m_pixelPitchX;
+      double m_pixelPitchY;
   };
 };
 #endif

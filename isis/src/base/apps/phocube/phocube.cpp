@@ -3,6 +3,7 @@
 #include "Angle.h"
 #include "Camera.h"
 #include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
@@ -94,8 +95,8 @@ void IsisMain() {
       cam = icube->camera();
     }
     catch(IException &e) {
-      QString msg = "Input file needs to have spiceinit run on it - if this file ";
-      msg += "is a mosaic, then check the MOSAICONLY box";
+      QString msg = "If " + FileName(ui.GetFileName("FROM")).name() + " is a mosaic, make sure the SOURCE "
+      "option is set to PROJECTION";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }

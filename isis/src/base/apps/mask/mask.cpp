@@ -1,4 +1,7 @@
 #include "Isis.h"
+
+#include <QDebug>
+
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "IException.h"
@@ -24,11 +27,19 @@ void IsisMain() {
   // Setup the input and output cubes
   UserInterface &ui = Application::GetUserInterface();
 
-  if(!ui.WasEntered("MASK"))
-    ui.PutAsString("MASK", ui.GetAsString("FROM"));
-
   p.SetInputCube("FROM");
-  p.SetInputCube("MASK", OneBand);
+  if(!ui.WasEntered("MASK")) {
+    p.SetInputCube("FROM");
+  }
+  else {
+    try {
+      p.SetInputCube("MASK", OneBand);
+    }
+    catch (IException &e) {
+      QString msg = "The MASK input must be a single band.";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+  }
   p.SetOutputCube("TO");
 
   //  Get min/max info

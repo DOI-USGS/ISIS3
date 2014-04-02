@@ -26,6 +26,7 @@
 #include <cmath>
 #include <iomanip>
 
+#include <QDebug>
 #include <QList>
 #include <QPair>
 #include <QTime>
@@ -2364,6 +2365,28 @@ namespace Isis {
   }
 
   /**
+   * Returns the pixel ifov offsets from center of pixel, which defaults to the 
+   * (pixel pitch * summing mode ) / 2.  If an instrument has a non-square ifov, it must implement 
+   * this method to return the offsets from the center of the pixel. 
+   *  
+   */
+   QList<QPointF> Camera::PixelIfovOffsets() {
+
+     QList<QPointF> offsets;
+     offsets.append(QPointF(-PixelPitch() * DetectorMap()->SampleScaleFactor() / 2.0,
+                            -PixelPitch() * DetectorMap()->LineScaleFactor() / 2.0));
+     offsets.append(QPointF(PixelPitch() * DetectorMap()->SampleScaleFactor() / 2.0,
+                            -PixelPitch() * DetectorMap()->LineScaleFactor() / 2.0));
+     offsets.append(QPointF(PixelPitch() * DetectorMap()->SampleScaleFactor() / 2.0,
+                            PixelPitch() * DetectorMap()->LineScaleFactor() / 2.0));
+     offsets.append(QPointF(-PixelPitch() * DetectorMap()->SampleScaleFactor() / 2.0,
+                            PixelPitch() * DetectorMap()->LineScaleFactor() / 2.0));
+
+     return offsets;
+   }
+
+
+  /**
    * Returns the number of samples in the image
    *
    * @return @b int Number of Samples
@@ -2558,6 +2581,5 @@ namespace Isis {
   void Camera::SetPixelPitch(double v) {
     p_pixelPitch = v;
   }
-
 // end namespace isis
 }

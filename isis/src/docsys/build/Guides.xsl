@@ -88,7 +88,7 @@ Deborah Lee Soltesz
 
 
         <p style="margin-top:10px; padding-bottom:0px;">
-        Isis 3 Documentation</p>
+        ISIS 3 Documentation</p>
 
         <hr/>
 
@@ -113,9 +113,9 @@ Deborah Lee Soltesz
 
 <p>
 <strong>
-Coming Soon! Isis Workshop!</strong>
+Coming Soon! ISIS Workshop!</strong>
 This section has been temporarily removed.
-We will soon be unveiling the new Isis Workshop
+We will soon be unveiling the new ISIS Workshop
 which will feature tutorials on using Isis 3
 for everyone from beginners to advanced users!
 </p>
@@ -125,7 +125,7 @@ for everyone from beginners to advanced users!
 </p>
 
 <!--
-      <h3>Getting Started Using Isis</h3>
+      <h3>Getting Started Using ISIS</h3>
       <table class="tableTOC">
       <xsl:for-each select="//document[normalize-space(category/categoryItem) = 'tutorial' and
                                        normalize-space(category/categoryItem) != 'hidden' and

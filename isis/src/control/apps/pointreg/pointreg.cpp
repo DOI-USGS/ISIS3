@@ -2,6 +2,8 @@
 
 #include "Isis.h"
 
+#include <sys/resource.h>
+
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "Camera.h"
@@ -252,8 +254,17 @@ void IsisMain() {
   progress.SetMaximumSteps(outNet.GetNumPoints());
   progress.CheckStatus();
 
+  //  Get the maximum allowable number of open files
+  struct rlimit limit;
+  if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
+    QString msg = "Cannot read the maximum allowable open files from system resources.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+  //  Allow for library files, etc
+  unsigned int maxOpenFiles = limit.rlim_cur * .60;
+
   cubeMgr = new CubeManager;
-  cubeMgr->SetNumOpenCubes(500);
+  cubeMgr->SetNumOpenCubes(maxOpenFiles);
 
   QString validate = ui.GetString("VALIDATE");
   if (validate != "SKIP") {

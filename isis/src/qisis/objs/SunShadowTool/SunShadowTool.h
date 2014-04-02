@@ -28,8 +28,12 @@ namespace Isis {
   * @author 2012-03-12 Steven Lambright
   *
   * @internal
-  *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-  *                         coding standards. References #972.
+  *  @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis
+  *                          coding standards. References #972.
+  *  @history 2014-01-16 Kimberly Oyama - Corrected the equation, in the recalculateShadowHeight()
+  *                          method, that finds the height of the object casting the shadow. It now
+  *                          uses the tangent of the angle multiplied by the length of the shadow
+  *                          instead of the sine of the angle. Fixes #1933.
   */
   class SunShadowTool : public Tool {
       Q_OBJECT

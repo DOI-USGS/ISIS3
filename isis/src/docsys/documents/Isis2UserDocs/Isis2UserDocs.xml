@@ -21,9 +21,9 @@
         BIBLIOGRAPHY
         ******************************************** -->
   <bibliography>
-    <title>Isis 2 User Documentation</title>
-    <brief>Links to Isis 2 User Documents</brief>
-    <description>List of links to documents covering general topics for users of Isis 2.1</description>
+    <title>ISIS 2 User Documentation</title>
+    <brief>Links to ISIS 2 User Documents</brief>
+    <description>List of links to documents covering general topics for users of ISIS 2.1</description>
     <author>Deborah Lee Soltesz</author>
     <date>2003-04-03</date>
   </bibliography>
@@ -44,11 +44,11 @@
         <H2>General Documentation</H2>
         <ul>
           <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/whats_new.cgi">What's New on the ISIS Web Site</A></LI>
-          <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/isis_overview.cgi">Isis Overview</A></LI>
+          <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/isis_overview.cgi">ISIS Overview</A></LI>
           <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/release_notes.cgi?cv_standalone.html">HDF/HDF-EOS Data Standalone CV (Cube Visualization) Program</A></LI>
         </ul>
 
-        <H2>Isis User Documentation</H2>
+        <H2>ISIS User Documentation</H2>
         <UL>
           <LI><A HREF ="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/intro_isis_text.cgi">Introduction to ISIS</A></LI>
           <LI><A HREF ="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/documentation_notes.cgi">Notes on ISIS Documentation</A></LI>
@@ -71,8 +71,8 @@
           <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/key_defs.cgi">Definition of Keywords in the Image Map Projection Group for ISIS</A></LI>
           <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/proj_descrep.cgi">Projection Offset Parameter Descrepancies Among USGS-Produced Planetary Digital Global Maps</A></LI>
           <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/release.cgi">Release Notes</A></LI>
-          <LI><A HREF="http://isis.astrogeology.usgs.gov/IsisSupport/viewforum.php?f=28">Requested Changes/Features</A> - please log into the Isis Support
-                 Center and submit requests as a new topic on the Isis 2 Support forum</LI>
+          <LI><A HREF="http://isis.astrogeology.usgs.gov/IsisSupport/viewforum.php?f=28">Requested Changes/Features</A> - please log into the ISIS Support
+                 Center and submit requests as a new topic on the ISIS 2 Support forum</LI>
           <LI><A HREF="http://isis.astrogeology.usgs.gov/IsisSupport/viewforum.php?f=20">Known Bugs</A></LI>
           <LI><A HREF="../Credits/Credits.html">Credits and Acknowledgements</A></LI>
           <LI><A HREF="http://isis.astrogeology.usgs.gov/Isis2/isis-bin//faq.cgi">Frequently Asked Questions (FAQ)</A></LI>

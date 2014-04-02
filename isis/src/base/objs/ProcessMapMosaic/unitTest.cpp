@@ -87,8 +87,76 @@ void IsisMain() {
   }
 
   tmp.close();
-  remove("./unitTest.cub");
+  remove("./unitTest.cub");  // Create the temp parent cube
+
+  cout << endl << "Testing Mosaic where the input (x, y) is negative,"
+          " according to the output cube." << endl;
+  QString inputFile = "./unitTest1.cub";
+  Cube inCube;
+  inCube.open(inputFile);
+  PvlGroup mapGroup = inCube.label()->findGroup("Mapping", Pvl::Traverse);
+
+  mapGroup.addKeyword(PvlKeyword("MinimumLatitude",  toString(-4.9)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("MaximumLatitude",  toString(-4.7)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(30.7)), Pvl::Replace);
+  mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(31)), Pvl::Replace);
+  
+  inCube.close();
+  CubeAttributeOutput oAtt2( FileName("./unitTest3.cub") );
+  ProcessMapMosaic m3;
+  
+  m3.SetBandBinMatch(false);
+  m3.SetOutputCube(inputFile, mapGroup, oAtt2, "./unitTest3.cub");
+
+  //set priority
+  m3.SetImageOverlay(priority);
+  m3.SetHighSaturationFlag(false);
+  m3.SetLowSaturationFlag(false);
+  m3.SetNullFlag(false);
+
+  if(m3.StartProcess(inputFile)) {
+    cout << "The mosaic was successfull." << endl;
+  }
+  else {
+    cout << "The mosaic was not successfull." << endl;
+  }
+
+  m3.EndProcess();
+  cout << "Mosaic label: " << endl;
+
+  Pvl labels2("./unitTest3.cub");
+  cout << labels2 << endl;
+
+  remove("./unitTest3.cub");
+
+  // Create the temp parent cube
+  FileList cubes_crop;
+  cubes_crop.read("unitTest_crop.lis");
+
+  cout << endl << "Testing Mosaic containing cropped image." << endl;
+  ProcessMapMosaic m4;
+  CubeAttributeOutput oAtt3;
+  priority = ProcessMapMosaic::PlaceImagesOnTop;
+  m4.SetBandBinMatch(false);
+  m4.SetOutputCube(cubes_crop, oAtt3, "./unitTest4.cub");
+
+  //set priority
+  m4.SetImageOverlay(priority);
+
+  for(int i = 0; i < cubes_crop.size(); i++) {
+    if(m4.StartProcess(cubes_crop[i].toString())) {
+      cout << cubes_crop[i].toString() << " is inside the mosaic" << endl;
+    }
+    else {
+      cout << cubes_crop[i].toString() << " is outside the mosaic" << endl;
+    }
+  }
+
+  m4.EndProcess();
+  cout << "Mosaic label: " << endl;
+
+  Pvl labels_crop("./unitTest4.cub");
+  cout << labels_crop << endl;
+
+  remove("./unitTest4.cub");
 }
-
-
-

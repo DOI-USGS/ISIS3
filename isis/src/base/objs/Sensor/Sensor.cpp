@@ -22,9 +22,10 @@
 
 #include "Sensor.h"
 
-#include <QDebug>
-
 #include <iomanip>
+
+#include <QDebug>
+#include <QString>
 
 #include "Angle.h"
 #include "Constants.h"
@@ -79,6 +80,22 @@ namespace Isis {
     else {
       target()->setShapeEllipsoid();
     }
+  }
+
+
+/**
+ * This method is implemented in Camera which defaults to the (pixel pitch * summing mode ) / 2. 
+ * If the instrument has a non-square ifov, it must implement this method to return offsets 
+ * from the center of the pixel. 
+ * 
+ * @author tsucharski (3/8/2013)
+ * 
+ * @return QList<QPointF> 
+ */
+  QList<QPointF> Sensor::PixelIfovOffsets() {
+
+    QString message = "Pixel Ifov offsets not implemented for this camera.";
+    throw IException(IException::Programmer, message, _FILEINFO_);
   }
 
 

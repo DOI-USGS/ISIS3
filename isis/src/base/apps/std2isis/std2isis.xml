@@ -37,6 +37,10 @@
     <change name="Janet Barrett" date="2010-01-24">
       Added support for JPEG2000 files.
     </change>
+    <change name="Kimberly Oyama" date="2014-01-17">
+      Updated the default app test to make sure the history group is in the resulting cube label.
+      References #1894.
+    </change>
   </history>
 
   <category>
