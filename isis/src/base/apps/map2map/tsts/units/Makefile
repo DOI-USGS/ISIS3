@@ -7,4 +7,4 @@ commands:
 	MAP=$(INPUT)/mapfile.map \
 	TO=$(OUTPUT)/map2mapTruth.cub \
 	MAXLON=-109 > /dev/null;
-	catlab FROM=$(OUTPUT)/map2mapTruth.cub >& $(OUTPUT)/labels.pvl;
+	catlab FROM=$(OUTPUT)/map2mapTruth.cub to=$(OUTPUT)/labels.pvl > /dev/null;

@@ -59,7 +59,7 @@ int g_cropEndLine = 0;
 int g_cropLineCount = 0;
 
 void IsisMain() {
-  Isis::Preference::Preferences(true); // delete ???
+//   Isis::Preference::Preferences(true); // delete ???
   cout << setprecision(25);// ???
 
   // get user inputs for input cube and open

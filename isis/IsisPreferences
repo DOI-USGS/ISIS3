@@ -78,7 +78,7 @@ EndGroup
 ########################################################
 
 Group = SessionLog
-  TerminalOutput = Off
+  TerminalOutput = On
   FileOutput     = On
   FileName       = print.prt
   FileAccess     = Append

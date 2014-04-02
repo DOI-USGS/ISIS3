@@ -16,5 +16,5 @@ commands:
 		VEL_AZM = 292.6602745 \
 		VEL_HORIZ = 1.6212918 \
 		VEL_RADIAL = -0.0056892 > /dev/null;
-	catlab from=$(OUTPUT)/apolloPanImage.cub > $(OUTPUT)/label.pvl;
+	catlab from=$(OUTPUT)/apolloPanImage.cub to=$(OUTPUT)/label.pvl > /dev/null;
 	$(RM) $(OUTPUT)/apolloPanImage.cub > /dev/null;

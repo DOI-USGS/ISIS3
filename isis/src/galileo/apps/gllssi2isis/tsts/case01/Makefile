@@ -7,4 +7,4 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	 $(APPNAME) from=$(INPUT)/0826r.lbl \
 	  to=$(OUTPUT)/gllssi2isisTruth1.cub > /dev/null;
-	  catlab from=$(OUTPUT)/gllssi2isisTruth1.cub >& $(OUTPUT)/labels.txt;
+	  catlab from=$(OUTPUT)/gllssi2isisTruth1.cub to=$(OUTPUT)/labels.txt > /dev/null;

@@ -14,5 +14,5 @@ commands:
 	ATTACH=NO \
 	CKREC=TRUE \
 	CKSMITH=true > /dev/null;
-	catlab from=$(OUTPUT)/spiceinitTruth.cub > $(OUTPUT)/labels.pvl;
+	catlab from=$(OUTPUT)/spiceinitTruth.cub to=$(OUTPUT)/labels.pvl > /dev/null;
 	rm $(OUTPUT)/spiceinitTruth.cub;

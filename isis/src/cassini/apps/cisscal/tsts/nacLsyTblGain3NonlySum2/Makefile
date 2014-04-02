@@ -8,4 +8,4 @@ commands:
 	to=$(OUTPUT)/N1355543510_1.truth.cub \
 	units="INTENSITY" \
 	> /dev/null;
-	catlab from=$(OUTPUT)/N1355543510_1.truth.cub >& $(OUTPUT)/labels.truth.pvl;
+	catlab from=$(OUTPUT)/N1355543510_1.truth.cub to=$(OUTPUT)/labels.truth.pvl > /dev/null;

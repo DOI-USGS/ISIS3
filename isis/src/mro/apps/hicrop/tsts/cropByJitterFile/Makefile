@@ -16,32 +16,32 @@ commands:
 	lsk=$(INPUT)/naif0010.tls \
 	to=$(OUTPUT)/cropped1.cub \
 	source=jitterfile \
-        jitter=$(INPUT)/PSP_008469_2040.txt >& $(OUTPUT)/resultsLog1.txt;
-	catlab from=$(OUTPUT)/cropped1.cub to=$(OUTPUT)/croppedLabel1.pvl;
+        jitter=$(INPUT)/PSP_008469_2040.txt > /dev/null;
+	catlab from=$(OUTPUT)/cropped1.cub to=$(OUTPUT)/croppedLabel1.pvl > /dev/null;
 	$(APPNAME) FROM=$(INPUT)/PSP_008469_2040_RED6.balance.cub \
 	ck=$(INPUT)/mro_sc_psp_080513_080519.bc \
 	sclk=$(INPUT)/MRO_SCLKSCET.00049.65536.tsc \
 	lsk=$(INPUT)/naif0010.tls \
 	to=$(OUTPUT)/cropped2.cub \
 	source=jitterfile \
-        jitter=$(INPUT)/PSP_008469_2040_noZeroOffset.txt >& $(OUTPUT)/resultsLog2.txt;
-	catlab from=$(OUTPUT)/cropped2.cub to=$(OUTPUT)/croppedLabel2.pvl;
+        jitter=$(INPUT)/PSP_008469_2040_noZeroOffset.txt > /dev/null;
+	catlab from=$(OUTPUT)/cropped2.cub to=$(OUTPUT)/croppedLabel2.pvl > /dev/null;
 	$(APPNAME) FROM=$(INPUT)/PSP_008469_2040_RED6.balance.cub \
 	ck=$(INPUT)/mro_sc_psp_080513_080519.bc \
 	sclk=$(INPUT)/MRO_SCLKSCET.00049.65536.tsc \
 	lsk=$(INPUT)/naif0010.tls \
 	to=$(OUTPUT)/cropped3.cub \
 	source=jitterfile \
-        jitter=$(INPUT)/PSP_008469_2040_zeroSampOffset.txt >& $(OUTPUT)/resultsLog3.txt;
-	catlab from=$(OUTPUT)/cropped3.cub to=$(OUTPUT)/croppedLabel3.pvl;
+        jitter=$(INPUT)/PSP_008469_2040_zeroSampOffset.txt > /dev/null;
+	catlab from=$(OUTPUT)/cropped3.cub to=$(OUTPUT)/croppedLabel3.pvl > /dev/null;
 	$(APPNAME) FROM=$(INPUT)/PSP_008469_2040_RED6.balance.cub \
 	ck=$(INPUT)/mro_sc_psp_080513_080519.bc \
 	sclk=$(INPUT)/MRO_SCLKSCET.00049.65536.tsc \
 	lsk=$(INPUT)/naif0010.tls \
 	to=$(OUTPUT)/cropped4.cub \
 	source=jitterfile \
-        jitter=$(INPUT)/PSP_008469_2040_zeroLineOffset.txt >& $(OUTPUT)/resultsLog4.txt;
-	catlab from=$(OUTPUT)/cropped4.cub to=$(OUTPUT)/croppedLabel4.pvl;
-	cubediff from=$(OUTPUT)/cropped1.cub from2=$(OUTPUT)/cropped2.cub | grep -v "Processed" >& $(OUTPUT)/cubediff12.txt;
-	cubediff from=$(OUTPUT)/cropped2.cub from2=$(OUTPUT)/cropped3.cub | grep -v "Processed" >& $(OUTPUT)/cubediff23.txt;
-	cubediff from=$(OUTPUT)/cropped3.cub from2=$(OUTPUT)/cropped4.cub | grep -v "Processed" >& $(OUTPUT)/cubediff34.txt;
+        jitter=$(INPUT)/PSP_008469_2040_zeroLineOffset.txt > /dev/null;
+	catlab from=$(OUTPUT)/cropped4.cub to=$(OUTPUT)/croppedLabel4.pvl > /dev/null;
+	cubediff from=$(OUTPUT)/cropped1.cub from2=$(OUTPUT)/cropped2.cub to=$(OUTPUT)/cubediff12.txt > /dev/null;
+	cubediff from=$(OUTPUT)/cropped2.cub from2=$(OUTPUT)/cropped3.cub to=$(OUTPUT)/cubediff23.txt > /dev/null;
+	cubediff from=$(OUTPUT)/cropped3.cub from2=$(OUTPUT)/cropped4.cub to=$(OUTPUT)/cubediff34.txt > /dev/null;

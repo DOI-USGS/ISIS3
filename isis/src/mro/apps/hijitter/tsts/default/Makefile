@@ -14,21 +14,19 @@ commands:
 	  JITTER=$(INPUT)/PSP_007556_2010.cropped.txt \
 	  JITTERCK=$(OUTPUT)/jitter.bc \
 	  REGDEF=$(INPUT)/hijitreg.p0745.s1570.def \
-	  TO=$(OUTPUT)/outlist.lis | grep -v "Processed" > $(OUTPUT)/outputLog.txt;
+	  TO=$(OUTPUT)/outlist.lis > /dev/null;
 	$(CP) $(INPUT)/PSP_007556_2010_RED5.balance.cropped.cub $(OUTPUT)/red5.cub;
 	spiceinit from=$(OUTPUT)/red5.cub \
 	  ck=$(OUTPUT)/jitter.bc > /dev/null;
 	tabledump from=$(OUTPUT)/red5.cub \
 	  to=$(OUTPUT)/cktable.csv \
 	  name=InstrumentPointing > /dev/null;
-	stats from=output/PSP_007556_2010_RED4.balance.cropped.cub \
+	stats from=$(OUTPUT)/PSP_007556_2010_RED4.balance.cropped.cub \
 	  to=$(OUTPUT)/red4.stats.pvl > /dev/null;
-	stats from=output/PSP_007556_2010_RED5.balance.cropped.cub \
+	stats from=$(OUTPUT)/PSP_007556_2010_RED5.balance.cropped.cub \
 	  to=$(OUTPUT)/red5.stats.pvl > /dev/null;
-	stats from=output/PSP_007556_2010_RED6.balance.cropped.cub \
+	stats from=$(OUTPUT)/PSP_007556_2010_RED6.balance.cropped.cub \
 	  to=$(OUTPUT)/red6.stats.pvl > /dev/null;
-	$(SED) 's+mro/kernels/sclk/MRO_SCLKSCET.*tsc+mro/kernels/sclk/MRO_SCLKSCET.tsc+g' $(OUTPUT)/outputLog.txt > $(OUTPUT)/output.txt;
-	$(RM) $(OUTPUT)/outputLog.txt;
 	$(RM) $(OUTPUT)/files.lis $(OUTPUT)/outlist.lis;
 	$(RM) $(OUTPUT)/jitter.bc $(OUTPUT)/red5.cub print.prt;
 #	$(RM) $(OUTPUT)/PSP_007556_2010_RED4.balance.cropped.cub;

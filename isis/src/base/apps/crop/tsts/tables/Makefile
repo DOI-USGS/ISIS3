@@ -4,10 +4,10 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) PROPSPICE=false FROM=$(INPUT)/h1235_0001_bl2.cub TO=$(OUTPUT)/h1235_0001_bl2.cub > /dev/null;
-	catlab FROM=$(OUTPUT)/h1235_0001_bl2.cub > $(OUTPUT)/nospice.pvl;
+	catlab FROM=$(OUTPUT)/h1235_0001_bl2.cub to=$(OUTPUT)/nospice.pvl > /dev/null;
 	$(APPNAME) FROM=$(INPUT)/h1235_0001_bl2.cub TO=$(OUTPUT)/h1235_0001_bl2.cub  \
 	  PROPSPICE=TRUE > /dev/null;
-	catlab FROM=$(OUTPUT)/h1235_0001_bl2.cub > $(OUTPUT)/spice.pvl;
+	catlab FROM=$(OUTPUT)/h1235_0001_bl2.cub to=$(OUTPUT)/spice.pvl > /dev/null;
 	$(RM) $(OUTPUT)/h1235_0001_bl2.cub;
 	$(APPNAME) FROM=$(INPUT)/PSP_001365_2720_RED4_0.cub LINE=500 NLINES=30 \
 	TO=$(OUTPUT)/hirise.cub LINC=3 > /dev/null;

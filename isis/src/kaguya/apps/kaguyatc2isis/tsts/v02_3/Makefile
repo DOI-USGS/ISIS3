@@ -9,4 +9,4 @@ commands:
 	  to=$(OUTPUT)/tc_eve_02_006_k2i_spx_noscale.cub setn=y sethrs=y \
 	  sethis=y setlrs=y hismi=-20000 hisma=-20000 hrsmi=-21000 \
 	  hrsma=-21000 lrsmi=-22000 lrsma=-22000 nullmi=-30000 nullma=-23000 > /dev/null;
-	  catlab from=$(OUTPUT)/tc_eve_02_006_k2i_spx_noscale.cub >& $(OUTPUT)/labels.txt;
+	  catlab from=$(OUTPUT)/tc_eve_02_006_k2i_spx_noscale.cub to=$(OUTPUT)/labels.txt > /dev/null;

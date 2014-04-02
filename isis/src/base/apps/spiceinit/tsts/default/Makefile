@@ -6,7 +6,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	cp $(INPUT)/spiceinitTruth.cub $(OUTPUT)/ > /dev/null;
 	$(APPNAME) from=$(OUTPUT)/spiceinitTruth.cub > /dev/null;
-	catlab from=$(OUTPUT)/spiceinitTruth.cub > $(OUTPUT)/labels.pvl;
+	catlab from=$(OUTPUT)/spiceinitTruth.cub to=$(OUTPUT)/labels.pvl > /dev/null;
 	$(APPNAME) from=$(OUTPUT)/spiceinitTruth.cub > /dev/null;
-	catlab from=$(OUTPUT)/spiceinitTruth.cub > $(OUTPUT)/labelsTwice.pvl;
+	catlab from=$(OUTPUT)/spiceinitTruth.cub to=$(OUTPUT)/labelsTwice.pvl > /dev/null;
 	rm $(OUTPUT)/spiceinitTruth.cub;
