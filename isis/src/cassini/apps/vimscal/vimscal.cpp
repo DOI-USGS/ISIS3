@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdio.h>
 
+#include <QDebug>
 #include <QFile>
 
 #include "Camera.h"
@@ -14,6 +15,7 @@
 #include "PolynomialUnivariate.h"
 #include "ProcessByLine.h"
 #include "ProgramLauncher.h"
+#include "PvlGroup.h"
 #include "Statistics.h"
 #include "Table.h"
 #include "UserInterface.h"
@@ -59,6 +61,8 @@ PvlGroup calibInfo;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
+  const QString calVersion = "RC17";
+  
   tempFiles.clear();
   specificEnergyCorrections.clear();
   sampleBasedDarkCorrections.clear();
@@ -66,7 +70,8 @@ void IsisMain() {
   solarRemoveCoefficient = 1.0;
   iof = (ui.GetString("UNITS") == "IOF");
 
-  calibInfo = PvlGroup("Results");
+  calibInfo = PvlGroup("RadiometricCalibration");
+  calibInfo += PvlKeyword("CalibrationVersion", calVersion);
 
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM");
@@ -91,6 +96,8 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+  calibInfo += PvlKeyword("OutputUnits", ((iof) ? "I/F" : "Specific Energy"));
+
   // done first since it's likely to cause an error if one exists
   calculateSolarRemove(icube, &p);
 
@@ -100,12 +107,14 @@ void IsisMain() {
   chooseFlatFile(icube, &p);
   calculateSpecificEnergy(icube);
 
-  calibInfo += PvlKeyword("OutputUnits", ((iof) ? "I/F" : "Specific Energy"));
+  Cube *outCube = p.SetOutputCube("TO");
+  p.StartProcess(calibrate);
 
+  outCube->putGroup(calibInfo);
+  // Rename group to Results for writing to Log
+  calibInfo.setName("Results");
   Application::Log(calibInfo);
 
-  p.SetOutputCube("TO");
-  p.StartProcess(calibrate);
   p.EndProcess();
 
   for(unsigned int i = 0; i < tempFiles.size(); i++) {
@@ -270,6 +279,9 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   FileName solarFileName("$cassini/calibration/vims/solar_v????.cub");
   solarFileName = solarFileName.highestVersion();
 
+  calibInfo += PvlKeyword("SolarColorFile",
+                          solarFileName.originalPath() + "/" + solarFileName.name());
+
   p->SetInputCube(createCroppedFile(icube, solarFileName.expanded()), iatt);
 }
 
@@ -320,6 +332,11 @@ void calculateSpecificEnergy(Cube *icube) {
 
   Cube waveCalCube;
   waveCalCube.open(waveCalFileName.expanded());
+
+  calibInfo += PvlKeyword("SpecificEnergyFile",
+                          specEnergyFileName.originalPath() + "/" + specEnergyFileName.name());
+  calibInfo += PvlKeyword("WavelengthCalibrationFile",
+                          waveCalFileName.originalPath() + "/" + waveCalFileName.name());
 
   LineManager specEnergyMgr(specEnergyCube);
   LineManager waveCalMgr(waveCalCube);

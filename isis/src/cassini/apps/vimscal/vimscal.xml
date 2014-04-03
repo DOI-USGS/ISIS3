@@ -71,6 +71,10 @@
       clock.  The Ir exposure duration needs a correction factor of 1.01725 applied before using.
       References #1759.
     </change>
+		<change name="Tracie Sucharski" date="2014-04-02">
+			Added RadiometricCalibration group to output cube labels, which contains calibration files
+			and other calibration parameters.  Fixes #2055.
+		</change>
   </history>
 
   <category>
