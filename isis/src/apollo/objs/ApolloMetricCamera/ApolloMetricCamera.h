@@ -49,6 +49,9 @@ namespace Isis {
    *                          to files.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards.   References #972.
+   *   @history 2014-01-17 Kris Becker - Set CkReferenceID to J2000 to resolve
+   *                           problem with ckwriter. Also, set the SpkReferenceId
+   *                           to J2000. References #1737 and #1739.
    */
   class ApolloMetricCamera : public FramingCamera {
     public:
@@ -71,9 +74,9 @@ namespace Isis {
 
       /**
        * CK Reference ID -
-       * APOLLO_15_NADIR = 1400015
-       * APOLLO_16_NADIR = 1400016
-       * APOLLO_17_NADIR = 1400017 
+       * APOLLO_15_NADIR = 1
+       * APOLLO_16_NADIR = 1
+       * APOLLO_17_NADIR = 1
        *  
        * @return @b int The appropriate instrument code for the "Camera-matrix" Kernel 
        *         Reference ID
@@ -92,12 +95,16 @@ namespace Isis {
       virtual int SpkTargetId() const { return p_spkTargetId; }
 
       /** 
-       *  SPK Reference ID - B1950
+       *  SPK Reference ID - J2000
        *  
+       *  Even thought the ephemeris is relative to B1950, this specification
+       *  is for writing SPK kernels.  We should stay with the J2000 epoch in
+       *  these cases.
+       *
        * @return @b int The appropriate instrument code for the Spacecraft 
        *         Kernel Reference ID,
        */
-      virtual int SpkReferenceId() const { return (2); }
+      virtual int SpkReferenceId() const { return (1); }
 
     private:
       int p_ckFrameId;       //!< "Camera-matrix" Kernel Frame ID

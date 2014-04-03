@@ -42,6 +42,8 @@ namespace Isis {
    * @internal
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods.
    *   @history 2011-05-03 Jeannie Walldren - Added documentation.
+   *   @history 2014-01-17 Kris Becker - Set CkReferenceID to J2000 to resolve
+   *                         problem with ckwriter
    */
   ApolloMetricCamera::ApolloMetricCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
@@ -79,17 +81,17 @@ namespace Isis {
     QString spacecraft = inst.findKeyword("SpacecraftName")[0];
     if (spacecraft.contains("15")) {
       p_ckFrameId = -915240;
-      p_ckReferenceId = 1400015;
+      p_ckReferenceId = 1;
       p_spkTargetId = -915;
     }
     else if (spacecraft.contains("16")) {
       p_ckFrameId = -916240;
-      p_ckReferenceId = 1400016;
+      p_ckReferenceId = 1;
       p_spkTargetId = -916;
     }
     else if (spacecraft.contains("17")) {
       p_ckFrameId = -917240;
-      p_ckReferenceId = 1400017;
+      p_ckReferenceId = 1;
       p_spkTargetId = -917;
     }
     else {
