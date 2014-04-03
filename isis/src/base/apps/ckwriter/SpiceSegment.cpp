@@ -22,6 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include <QString>
+#include <QStringList>
 #include <vector>
 #include <numeric>
 #include <iostream>
@@ -222,6 +223,11 @@ void SpiceSegment::import(Cube &cube, const QString &tblname) {
     // Load necessary kernels (IAK for Cassini, mainly)
     _kernels.Load("FK,SCLK,LSK,IAK");
 
+//    _kernels.Load("FK,SCLK,LSK,IAK,SPK");
+//   QStringList loaded = _kernels.getLoadedList();
+//   cout << "\nKernels prior to conversion...\n" << loaded.join("\n");
+
+
     //  Here's where all the heavy lifting occurs.
     SMatSeq lmats, rmats;
     SVector sclks;
@@ -257,6 +263,10 @@ void SpiceSegment::import(Cube &cube, const QString &tblname) {
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
     _kernels.UnLoad("FK,SCLK,LSK,IAK");
+
+//    _kernels.UnLoad("FK,SCLK,LSK,IAK,SPK");
+//    loaded = _kernels.getLoadedList();
+//    cout << "\nKernels after unloading...\n" << loaded.join("\n");
 
   } catch ( IException &ie  ) {
     ostringstream mess;
@@ -342,7 +352,11 @@ bool SpiceSegment::getTimeDependentFrameIds(Table &table, int &toId, int &fromId
  * Note that if there is no rotation required, an empty or 1 element vector is 
  * returned.  It is up to the caller to decide how to handle this situation.
  * 
- * @author kbecker 2013-06-07
+ * @author 2013-06-07 Kris Becker 
+ * @internal 
+ *   @history 2012-12-16 Kris Becker - Fixed problem when the
+ *                         TimeDependentFrames keyword does not contain one or
+ *                         both of the CK reference frames.  Fixes #1737.
  * 
  * @param table 
  * @param leftBase 
@@ -372,17 +386,49 @@ bool SpiceSegment::getFrameChains(Table &table, const int &leftBase,
     return (false);
   }
 
+  //  First, check to see if any of the ID are in the list.  Gotta have at
+  // least 1.
+  int nfound(0);
+  BOOST_FOREACH (int fid, tdfids) {
+    if ( rightBase == fid ) nfound++;
+    if ( leftBase  == fid ) nfound++;
+  }
+
+  if ( (nfound == 0) || (nfound > 2) ) {
+    ostringstream mess;
+    mess << "Left/Right CK frame ids invalid in TimeDependentFrames label keyword." 
+         <<  " Must have at least 1 and no more than 2 ids but have " 
+         << QString::number(nfound);
+    throw IException(IException::User, mess.str(), _FILEINFO_);
+  }
+
   // Get the left CK ID chain
+  int lastLeft(leftBase);
   BOOST_FOREACH (int leftId, tdfids) {
+    //  Order is important in this code section!
+    if ( rightBase == leftId ) break;  // Reached right reference frame
     leftChain.push_back(leftId);
+    lastLeft = leftId;  // Record last valid one
     if (leftId == leftBase) break;
   }
 
+  // Ensure the left chain is complete
+  if ( leftBase != lastLeft) leftChain.push_back(leftBase);
+
     // Get the right CK ID chain
+  int lastRight(rightBase); 
   BOOST_REVERSE_FOREACH (int rightId, tdfids) {
+//    if  (rightId == 1) continue;  //  REMOVE THIS - its only testing B1950!
+    //  Order is important in this code section!
+    if ( leftBase == rightId ) break;  // Reached left reference frame
+    if ( lastLeft == rightId ) break;  // Reach last left id that we cannot ignore
     rightChain.push_front(rightId);
+    lastRight = rightId;
     if (rightId == rightBase) break;
   }
+
+   // Ensure the right chain is complete
+  if ( rightBase != lastRight) rightChain.push_front(rightBase);
 
   return (true);
 }
@@ -449,6 +495,9 @@ SpiceSegment::SMatrix SpiceSegment::computeStateRotation(const QString &frame1,
                                                          double etTime) const {
   SMatrix state(6,6);
   NaifStatus::CheckErrors();
+//  cout << "StateRotations for frame1 = " << frame1 
+//       << " to frame2 = " << frame2 << "\n";
+
   try {
     // Get pointing w/AVs
     sxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
@@ -480,6 +529,7 @@ SpiceSegment::SMatrix SpiceSegment::computeChainRotation(
   // Set up identity default
   SMatrix state = computeStateRotation("J2000", "J2000", etTime);
 
+//  cout << "\nCompute Chain Rotations...\n";
   if ( fChain.size() > 0 ) {
     QVector<int> chain = fChain;
 

@@ -34,6 +34,17 @@
            application but the user can provide their own comment for the kernel 
            if it is not sufficient in the COMFILE parameter.
        </p>
+       <p>
+            Each image is checked for overlap in start/end time ranges.  Any 
+            files that have common time coverages are identified and reported. 
+            Furthermore, the user may select with the OVERLAP parameter how to 
+            treat occurances of overlapping time ranges. It seems highly likely 
+            that images with common time coverage is a conflict and an error 
+            should be generated and the output CK kernel is not created. 
+            However, if the user chooses, they can be treated as warnings and 
+            the TO output CK kernel will be generated in this case.  It is up to 
+            the user to determine if this is intended/valid behavior. 
+       </p>
       <p>
           Provided in every CK kernel file created is the complete list of all 
           the SPICE kernels, DEMs and extras loaded by          
@@ -114,6 +125,11 @@ Usage Note
       internally cached SPICE data is extracted and transformed into the
       appropriate content to satisfy NAIF's SPICE kernel storage
       requirements.  The contents of this kernel are summarized below.
+
+User Comments
+-----------------------------------------------------------------------
+ 
+      NONE
  
 Segment (by file) Summary
 -----------------------------------------------------------------------
@@ -149,9 +165,9 @@ Segment (by file) Summary
     $base/dems/molaMarsPlanetaryRadius0004.cub
       </PRE>
       <p>
-          Contents of the comment section in the CK kernel can be replaced by 
-          the user if desired.  The individual file segment information will 
-          always be written to the label.
+          Contents of the comment section in the CK kernel may include comments 
+          provided by the user in a file specified by the COMFILE parameter if 
+          desired.
       </p>
       <p>
           To extract the contents of the SPICE CK kernel it is recommended you 
@@ -265,6 +281,14 @@ spiceinit from=EN0131771668M.cub ck=EN0131771668M.bc extra=$extra
         computing rotations/transformations of dynamic kernels in the frame 
         hierarchy.  Fixes #1663.
     </change>
+    <change name="Kris Becker" date="2014-03-25">
+        Fixed problem where the right/left CK reference frames were not present 
+        in the TimeDependentFrames label keyword.  This produced erroneous CK 
+        kernels.  Changed how user provided comments are processed.  User 
+        comments provided in a COMFILE are now included in the generic comments 
+        instead of completely replacing them. Added OVERLAP parameter to allow 
+        user to specify how start/end time conflicts are handled.  Fixes #1737. 
+    </change>
 </history>
 
   <groups>
@@ -326,12 +350,14 @@ spiceinit from=EN0131771668M.cub ck=EN0131771668M.bc extra=$extra
         </brief>
         <description>
             This file is optional and its contents will be added to the output 
-            CK SPICE kernel file specified by the TO parameter.  This will 
-            replace the generic comment that is provided.  It may contain 
-            additional information that users will be able to see using the NAIF 
-            SPICE <b>commnt</b> utility.  The command to use to extract the 
-            comment from the SPICE kernel file is <b>commnt -r ck_kernel.bc</b> 
-            where ck_kernel.bc is a NAIF CK SPICE kernel file.
+            CK SPICE kernel file specified by the TO parameter.  Comments 
+            contained in this file will be included in the the generic comment 
+            under the heading <b>User Comments</b>.  It may contain additional 
+            information that users will be able to see using the NAIF SPICE 
+            <b>commnt</b> utility.  The command to use to extract the comment 
+            from the SPICE kernel file is <b>commnt -r ck_kernel.bc</b> where 
+            ck_kernel.bc is a NAIF CK SPICE  kernel file. If no COMFILE is   
+            provided, a line containing "NONE" is written to the output CK file.
         </description>
         <filter>
           *.txt
@@ -388,6 +414,39 @@ spiceinit from=EN0131771668M.cub ck=EN0131771668M.bc extra=$extra
                   Please see the <a href="http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/ck.html">NAIF CK reference</a> 
                   for additional information regarding these kernel types. 
               </description>
+          </parameter>
+
+          <parameter name="OVERLAP">
+              <type>string</type> 
+              <brief>Specify behavior should images contain common time coverage</brief>
+              <description>
+                  This option allows the user to specify how images that contain 
+                  start/end time overlaps are treat.  Users can specify this 
+                  condition as an error or a warning.  Specification of ERROR 
+                  will result in program termination and no output CK file is 
+                  generated.  WARNING will log the images with overlaps and the 
+                  output TO CK kernel is still generated. 
+              </description>
+              <default><item>ERROR</item></default>
+              <list>
+                <option value="ERROR">
+                  <brief>Do not allow time overlaps in output CK kernel</brief>
+                  <description>
+                    This option will treat images that have time overlaps as an 
+                    error.  The output TO CK kernel will <b>not</b> be generated 
+                    if this option is specifed and an error is generated.
+                  </description>
+                </option>
+                <option value="WARNING">
+                  <brief>Allow time overlaps in output CK kernel</brief>
+                  <description>
+                    This option will treat images that have time overlaps as a 
+                    warning. The output TO CK kernel is generated if this option 
+                    is specifed but the overlapping images are reported in the 
+                    log file.
+                  </description>
+                </option>
+              </list>
           </parameter>
       </group>
   </groups>

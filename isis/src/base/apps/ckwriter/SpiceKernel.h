@@ -66,6 +66,8 @@ namespace Isis {
  * @history 2010-12-09 Kris Becker Add documentation and example 
  * @history 2013-07-10 Kris Becker Updated to better conform with coding 
  *                                 standards
+ * @history 2013-12-17 Kris Becker Include user comments in generic comments 
+ *                                 rather than replacing them. 
  */
 class SpiceKernel {
   public:
@@ -80,6 +82,8 @@ class SpiceKernel {
     void add(Cube &cube);
 
     QString getSummary(const QString &commfile = "") const;
+
+    bool validate() const;
 
     void write(const QString &kname, const QString &commfile = "",
                const int ckType = 3) const;
