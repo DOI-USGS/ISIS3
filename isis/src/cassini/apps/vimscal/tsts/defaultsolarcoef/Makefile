@@ -20,7 +20,7 @@ commands:
 	  to=$(OUTPUT)/V1515948001_1.ir.cal2.cub UNITS=SPECENERGY \
 	  IRORIGDARK=false DARK=true > /dev/null;
 	catlab from=$(OUTPUT)/V1515948001_1.ir.cal2.cub \
-	  TO=$(OUTPUT)/V1515948001_1.ir.cal2.pvl < /dev/null;
+	  TO=$(OUTPUT)/V1515948001_1.ir.cal2.pvl > /dev/null;
 	$(APPNAME) from=$(INPUT)/V1515948001_1.ir.cub \
 	  to=$(OUTPUT)/V1515948001_1.ir.cal3.cub UNITS=IOF \
 	  IRORIGDARK=true DARK=true > /dev/null;
