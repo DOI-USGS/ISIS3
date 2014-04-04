@@ -4,6 +4,7 @@
 #include <QString>
 #include <algorithm>
 
+#include "AlphaCube.h"
 #include "Brick.h"
 #include "FileName.h"
 #include "ImportFits.h"
@@ -143,6 +144,24 @@ void IsisMain ()
   // Now write the FITS augmented label as the original label
   OriginalLabel oldLabel(label);
   outcube->write(oldLabel);
+
+  // Check for subimage and create an AlphaCube that describes thes subarea and
+  // update the cube labels. DO NOT adjust for scale.  Camera model will handle
+  // that. Coordinates in label are 0-based.
+  if ( (1024 != nsamps) || (1024 != nlines) ) {
+     PvlGroup inst = outLabel.findGroup("Instrument",Pvl::Traverse);
+     int starting_samp = (int) inst["FirstSample"] + 1;
+     int starting_line = (int) inst["FirstLine"] + 1;
+     int ending_samp = (int) inst["LastSample"] + 1;
+     int ending_line = (int) inst["LastLine"] + 1;
+
+     AlphaCube subarea(1024, 1024, 
+                       nsamps, nlines, 
+                       starting_samp - 0.5, starting_line - 0.5,
+                       ending_samp + 0.5,   ending_line + 0.5);
+
+     subarea.UpdateGroup(*outcube);
+  }
 
   //  All done...
    p.EndProcess();

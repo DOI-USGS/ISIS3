@@ -199,6 +199,11 @@
     <change name="Kris Becker" date="2013-11-27">
       Original version
     </change>
+    <change name="Kris Becker" date="2014-04-03">
+      Added support for subimage areas.  This was done by using the AlphaCube 
+      (or crop) feature which provides necessary elements for the AMICA camera 
+      model to work properly.  Fixes #2056.
+    </change>
   </history>
 
   <category>
