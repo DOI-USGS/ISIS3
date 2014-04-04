@@ -73,7 +73,7 @@ plugins:
 
 
 clean:
-	rm -f lib/lib*.so* lib/lib*.dylib
+	rm -f lib/lib*.so* lib/lib*.dylib lib/lib*.a
 	cd lib && rm -rf *.framework
 	@for plugs in plugins/*; do \
 	  if [ -d $$plugs -a $$plugs != "plugins/CVS" ]; \

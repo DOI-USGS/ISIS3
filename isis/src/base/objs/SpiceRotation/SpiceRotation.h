@@ -177,6 +177,8 @@ namespace Isis {
    *                           debug statements on lines 637 and 642 that appeared
    *                           onscreen during jigsaw runs when images are updated.
    *                           References #1521.
+   *   @history 2014-03-11 Stuart Sides - Programmers notes - Fixed a bug in the copy constructor
+   *                           that was going out of array bounds.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */

@@ -158,7 +158,7 @@ namespace Isis {
    *                          files with a detached PDS label
    *  @history 2010-08-23 Steven Lambright - Non-numeric string values for
    *                          PDS projection rotations are now supported.
-   *  @history 2010-08-27 Steven Lambright - Longitude domain correction added 
+   *  @history 2010-08-27 Steven Lambright - Longitude domain correction added
    *                          for center and pole longitude keywords in PDS
    *                          projections
    *  @history 2010-11-17 Eric Hyer - Inside ProcessPdsImageLabel method
@@ -171,14 +171,22 @@ namespace Isis {
    *                          removed duplicate code in ProcessImage and
    *                          ProcessQube labels. Fixed functionality regarding
    *                          ^QUBE pointer having no offest.
-   *  @history 2011-04-27 Mackenzie Boyd - Changed ProcessQubeLabels to set BIP 
+   *  @history 2011-04-27 Mackenzie Boyd - Changed ProcessQubeLabels to set BIP
    *                          for BANDSAMPLELINE axes instead of LINEBANDSAMPLE
    *                          and added exception for unknown storage order.
    *  @history 2012-05-03 Tracie Sucharski - Added a try/catch in SetPdsFile
    *                          when attempting to read PDS label
-   *  @history 2012-11-21 Jeannie Backer - Added methods and member variables to 
+   *  @history 2012-11-21 Jeannie Backer - Added methods and member variables to
    *                          import binary PDS tables found in the PDS file.
    *                          Added a default destructor. References #700.
+   *  @history 2013-03-12 Steven Lambright and Tracie Sucharski - Added ProcessPdsRdnLabel() to
+   *                          handle Chandrayaan M3 RDN files.  Added a file type to handle
+   *                          Chandrayaan Loc and Obs files on the same import as the Rdn files.
+   *                          Also added support for 64 bit input data. 
+   *                          Note:  There may be loss of precision since the output type is 32-bit.
+   *                          Return reference to imported table.  Needed so that M3 table data
+   *                          can be flipped to match image data depending on yaw and orbit limb
+   *                          direction.
    *  @history 2014-02-11 Janet Barrett - Created new version of SetPdsFile method
    *                          so that calling applications can intercept the PDS
    *                          label before it gets loaded by this class. This is
@@ -195,12 +203,23 @@ namespace Isis {
   class ProcessImportPds : public ProcessImport {
 
     public:
+      enum PdsFileType {
+        Image = 1,
+        Qube = 2,
+        SpectralQube = 4,
+        L0 = 8,
+        Rdn = 16,
+        Loc = 32,
+        Obs = 64,
+        All = Image | Qube | SpectralQube | L0 | Rdn | Loc | Obs
+      };
       ProcessImportPds();
       ~ProcessImportPds();
       void SetPdsFile(const QString &pdsLabelFile, const QString &pdsDataFile,
-                      Pvl &pdsLabel);
-      void SetPdsFile(const Pvl &pdsLabelPvl, const QString &pdsDataFile);
-      void ProcessLabel(const QString &pdsDataFile);
+                      Pvl &pdsLabel, PdsFileType allowedTypes = All);
+      void SetPdsFile(const Pvl &pdsLabelPvl, const QString &pdsDataFile,
+                      PdsFileType allowedTypes = All);
+      void ProcessLabel(const QString &pdsDataFile, PdsFileType allowedTypes);
 
       void TranslatePdsProjection(Pvl &lab);
       void TranslateIsis2Labels(Pvl &lab);
@@ -210,8 +229,8 @@ namespace Isis {
 
       void OmitOriginalLabel();
 
-      void ImportTable(QString pdsTableName);
-      // since we are overriding StartProcess(), we must specify for other 
+      Table &ImportTable(QString pdsTableName);
+      // since we are overriding StartProcess(), we must specify for other
       // overloaded calls to StartProcess(), the ProcessImport class method
       // definitions should be used.
       using ProcessImport::StartProcess;
@@ -221,24 +240,25 @@ namespace Isis {
     private:
 
 
-      enum Source { 
-        NOSOURCE, 
-        PDS, 
-        ISIS2 
+      enum Source {
+        NOSOURCE,
+        PDS,
+        ISIS2
       };
 
-      enum EncodingType { 
-        NONE, 
-        JP2 
+      enum EncodingType {
+        NONE,
+        JP2
       };
 
-      void ProcessDataFilePointer(PvlTranslationManager & pdsXlater, 
+      void ProcessDataFilePointer(PvlTranslationManager & pdsXlater,
                                   const bool & calcOffsetOnly);
       void ProcessPixelBitandType(PvlTranslationManager & pdsXlater);
       void ProcessSpecialPixels(PvlTranslationManager & pdsXlater, const bool & isQube);
 
       void ProcessPdsImageLabel(const QString &pdsDataFile);
       void ProcessPdsQubeLabel(const QString &pdsDataFile, const QString &transFile);
+      void ProcessPdsM3Label(const QString &pdsDataFile, PdsFileType fileType);
 
       void ExtractPdsProjection(PvlTranslationManager &pdsXlater);
       void GetProjectionOffsetMults(double &xoff, double &yoff,
@@ -298,8 +318,8 @@ namespace Isis {
 
       bool p_keepOriginalLabel;       /**< determines whether or not to keep the
                                            OriginalLabel blob.*/
-      std::vector<Table> p_tables; /**< Vector of Isis Table objects that 
-                                        were imported from PDS and need to be 
+      std::vector<Table> p_tables; /**< Vector of Isis Table objects that
+                                        were imported from PDS and need to be
                                         added to the imported cube file. */
 
       Source p_source;

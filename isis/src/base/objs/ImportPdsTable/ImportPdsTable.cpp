@@ -401,14 +401,31 @@ namespace Isis {
                     + m_tableName +"]. The PDS label file is probably invalid";
       throw IException(IException::Unknown, msg.toStdString(), _FILEINFO_);
     }
-    m_recordBytes = (int) label.findKeyword("RECORD_BYTES");
     //  Get some pertinent information from the label
-    PvlObject &tabobj = label.findObject(m_tableName);
-    pdsTableFile = FileName(pdsLabFile).path() + "/" 
-                   + label["^" + m_tableName][0];
-    m_trows = (int) tabobj.findKeyword("ROWS");
-    int ncols =  (int) tabobj.findKeyword("COLUMNS");
-    m_pdsTableType = QString(tabobj.findKeyword("INTERCHANGE_FORMAT"));
+    PvlObject &tabObj = label.findObject(m_tableName);
+    if (tabObj.hasKeyword("RECORD_BYTES")) {
+      m_recordBytes = (int) tabObj.findKeyword("RECORD_BYTES");
+    }
+    else {
+      m_recordBytes = (int) label.findKeyword("RECORD_BYTES");
+    }
+    
+    QString trueTableName;
+    PvlObject *tableDetails = &tabObj;
+    if (label.hasKeyword("^" + m_tableName)) {
+      trueTableName = m_tableName;
+      pdsTableFile = FileName(pdsLabFile).path() + "/" 
+                     + label["^" + m_tableName][0];
+    }
+    else if (tabObj.objects() == 1) {
+      trueTableName = tabObj.object(0).name();
+      tableDetails = &tabObj.object(0);
+      pdsTableFile = FileName(pdsLabFile).path() + "/" 
+                     + tabObj["^" + trueTableName][0];
+    }
+    m_trows = (int) tableDetails->findKeyword("ROWS");
+    int ncols =  (int) tableDetails->findKeyword("COLUMNS");
+    m_pdsTableType = QString(tableDetails->findKeyword("INTERCHANGE_FORMAT"));
     if (m_pdsTableType != "ASCII" && m_pdsTableType.toUpper() != "BINARY") {
       QString msg = "Unable to import the PDS table [" + m_tableName 
                     + "] from the PDS file [" 
@@ -417,12 +434,12 @@ namespace Isis {
                     + "] is not supported. Valid values are ASCII or BINARY.";
       throw IException(IException::User, msg.toStdString(), _FILEINFO_);
     }
-    m_rowBytes = tabobj.findKeyword("ROW_BYTES");
+    m_rowBytes = tableDetails->findKeyword("ROW_BYTES");
 
     m_coldesc.clear();
-    PvlObject::PvlObjectIterator colobj = tabobj.beginObject();
+    PvlObject::PvlObjectIterator colobj = tableDetails->beginObject();
     int icol(0);
-    while (colobj != tabobj.endObject()) {
+    while (colobj != tableDetails->endObject()) {
       if (colobj->isNamed("COLUMN")) {
         m_coldesc.push_back(getColumnDescription(*colobj, icol));
         icol++;

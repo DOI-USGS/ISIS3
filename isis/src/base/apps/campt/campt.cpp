@@ -27,20 +27,20 @@ void IsisMain() {
 
   // Depending on what type is selected, set values accordingly
   PvlGroup *point = NULL;
-  if(ui.GetString("TYPE") == "IMAGE") {
+  if (ui.GetString("TYPE") == "IMAGE") {
     double sample = 0.0;
     double line = 0.0;
-    if(ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
+    if (ui.WasEntered("SAMPLE") && ui.WasEntered("LINE")) {
       sample = ui.GetDouble("SAMPLE");
       line = ui.GetDouble("LINE");
       point = campt.SetImage(sample, line, outsideAllowed);
     }
     else {
-      if(ui.WasEntered("SAMPLE")) {
+      if (ui.WasEntered("SAMPLE")) {
         sample = ui.GetDouble("SAMPLE");
         point = campt.SetSample(sample, outsideAllowed);
       }
-      else if(ui.WasEntered("LINE")) {
+      else if (ui.WasEntered("LINE")) {
         line = ui.GetDouble("LINE");
         point = campt.SetLine(line, outsideAllowed);
       }
@@ -60,18 +60,18 @@ void IsisMain() {
   // Log it
   Application::Log((*point));
 
-  if(ui.WasEntered("TO")) {
+  if (ui.WasEntered("TO")) {
     // Get user params from ui
     QString outFile = FileName(ui.GetFileName("TO")).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
     // Write the pvl group out to the file
-    if(ui.GetString("FORMAT") == "PVL") {
+    if (ui.GetString("FORMAT") == "PVL") {
       Pvl temp;
       temp.setTerminator("");
       temp.addGroup((*point));
-      if(append) {
+      if (append) {
         temp.append(outFile);
       }
       else {
@@ -84,9 +84,9 @@ void IsisMain() {
     else {
       ofstream os;
       bool writeHeader = false;
-      if(append) {
+      if (append) {
         os.open(outFile.toAscii().data(), ios::app);
-        if(!exists) {
+        if (!exists) {
           writeHeader = true;
         }
       }
@@ -95,9 +95,9 @@ void IsisMain() {
         writeHeader = true;
       }
 
-      if(writeHeader) {
-        for(int i = 0; i < (*point).keywords(); i++) {
-          if((*point)[i].size() == 3) {
+      if (writeHeader) {
+        for (int i = 0; i < (*point).keywords(); i++) {
+          if ((*point)[i].size() == 3) {
             os << (*point)[i].name() << "X,"
                << (*point)[i].name() << "Y,"
                << (*point)[i].name() << "Z";
@@ -106,15 +106,15 @@ void IsisMain() {
             os << (*point)[i].name();
           }
 
-          if(i < point->keywords() - 1) {
+          if (i < point->keywords() - 1) {
             os << ",";
           }
         }
         os << endl;
       }
 
-      for(int i = 0; i < (*point).keywords(); i++) {
-        if((*point)[i].size() == 3) {
+      for (int i = 0; i < (*point).keywords(); i++) {
+        if ((*point)[i].size() == 3) {
           os << (QString)(*point)[i][0] << ","
              << (QString)(*point)[i][1] << ","
              << (QString)(*point)[i][2];
@@ -123,7 +123,7 @@ void IsisMain() {
           os << (QString)(*point)[i];
         }
 
-        if(i < (*point).keywords() - 1) {
+        if (i < (*point).keywords() - 1) {
           os << ",";
         }
       }
@@ -131,7 +131,7 @@ void IsisMain() {
     }
   }
   else {
-    if(ui.GetString("FORMAT") == "FLAT") {
+    if (ui.GetString("FORMAT") == "FLAT") {
       string msg = "Flat file must have a name.";
       throw IException(IException::User, msg, _FILEINFO_);
     }

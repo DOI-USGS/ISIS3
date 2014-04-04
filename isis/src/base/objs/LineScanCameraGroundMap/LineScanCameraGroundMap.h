@@ -66,14 +66,12 @@ namespace Isis {
    */
   class LineScanCameraGroundMap : public CameraGroundMap {
     public:
-      /** Constructor
-       *
-       * @param cam pointer to camera model
-       */
-      LineScanCameraGroundMap(Camera *cam) : CameraGroundMap(cam) {};
+
+      //! Constructor
+      LineScanCameraGroundMap(Camera *cam);
 
       //! Destructor
-      virtual ~LineScanCameraGroundMap() {};
+      virtual ~LineScanCameraGroundMap();
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
@@ -89,6 +87,7 @@ namespace Isis {
       FindFocalPlaneStatus FindFocalPlane(const int &approxLine,
                                           const SurfacePoint &surfacePoint);
       double FindSpacecraftDistance(int line, const SurfacePoint &surfacePoint);
+
   };
 };
 #endif

@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <QDebug>
+
 #include "BasisFunction.h"
 #include "IException.h"
 #include "IString.h"
@@ -141,7 +143,8 @@ namespace Isis {
     p_timeScale = rotToCopy.p_timeScale;
     p_degreeApplied = rotToCopy.p_degreeApplied;
 
-    for (std::vector<double>::size_type i = 0; i < rotToCopy.p_coefficients[0].size(); i++) 
+//    for (std::vector<double>::size_type i = 0; i < rotToCopy.p_coefficients[0].size(); i++) 
+    for (int i = 0; i < 3; i++) 
       p_coefficients[i] = rotToCopy.p_coefficients[i];
 
     p_noOverride = rotToCopy.p_noOverride;
@@ -1449,7 +1452,9 @@ namespace Isis {
                               p_cache[r][6], p_cache[r][7], p_cache[r][8]
                             };
         m2q_c(CJ, quats[r]);
-        vequ_c((SpiceDouble *) &p_cacheAv[r][0], avvs[r]);
+        if (p_hasAngularVelocity) {
+          vequ_c((SpiceDouble *) &p_cacheAv[r][0], avvs[r]);
+        }
       }
 
       double cubeStarts = timeSclkdp[0]; //,timsSclkdp[ckBlob.Records()-1] };
@@ -1460,7 +1465,8 @@ namespace Isis {
       SpiceInt intarr[p_fullCacheSize]; // Integer work array
       SpiceInt sizOut = p_fullCacheSize; // Size of downsized cache
 
-      ck3sdn(radTol, avflag, (int *) &sizOut, timeSclkdp, (doublereal *) quats, (SpiceDouble *) avvs, nints, &cubeStarts, dparr, (int *) intarr);
+      ck3sdn(radTol, avflag, (int *) &sizOut, timeSclkdp, (doublereal *) quats, 
+             (SpiceDouble *) avvs, nints, &cubeStarts, dparr, (int *) intarr);
 
       // Clear full cache and load with downsized version
       p_cacheTime.clear();
@@ -1997,7 +2003,7 @@ namespace Isis {
     if (!p_hasAngularVelocity) return p_CJ;
 
     double diffTime = timeEt - p_et;
-    std::vector<double> CJ(9,0.);
+    std::vector<double> CJ(9, 0.0);
     double dmat[3][3];
 
     // Create a rotation matrix for the axis and magnitude of the angular velocity * the time difference
