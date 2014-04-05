@@ -1,0 +1,33 @@
+Unit Test for AerialPhotoCamera...
+FileName: eros_ap.lbl
+CK Frame: -2000001
+
+Kernel IDs: 
+CK Frame ID = -2000001
+CK Reference ID = -2000000
+SPK Target ID = -2000
+SPK Reference ID = 1
+
+Shutter open = -17538835.815374449
+Shutter close = -17538835.815374449
+Focal Length = 152.818000000
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
