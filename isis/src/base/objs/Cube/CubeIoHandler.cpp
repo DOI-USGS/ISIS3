@@ -28,6 +28,7 @@
 #include <cmath>
 #include <iomanip>
 
+#include <QDebug>
 #include <QFile>
 #include <QList>
 #include <QListIterator>
@@ -264,6 +265,7 @@ namespace Isis {
 
     // NON-THREADED CUBE READ
     QList<RawCubeChunk *> cubeChunks;
+    QList<int > chunkBands;
 
     int bufferSampleCount = bufferToFill.SampleDimension();
     int bufferLineCount = bufferToFill.LineDimension();
@@ -302,6 +304,7 @@ namespace Isis {
           chunkEndLine == bufferEndLine &&
           chunkEndBand == bufferEndBand) {
         cubeChunks.append(getChunk(expectedChunkIndex, true));
+      chunkBands.append(cubeChunks.last()->getStartBand());
       }
     }
 
@@ -312,15 +315,17 @@ namespace Isis {
         bufferToFill[i] = Null;
       }
 
-      cubeChunks = findCubeChunks(
+    QPair< QList<RawCubeChunk *>, QList<int> > chunkInfo;
+      chunkInfo = findCubeChunks(
           bufferToFill.Sample(), bufferToFill.SampleDimension(),
           bufferToFill.Line(), bufferToFill.LineDimension(),
           bufferToFill.Band(), bufferToFill.BandDimension());
+      cubeChunks = chunkInfo.first;
+      chunkBands = chunkInfo.second;
     }
 
-    RawCubeChunk * fileData;
-    foreach (fileData, cubeChunks) {
-      writeIntoDouble(*fileData, bufferToFill);
+    for (int i = 0; i < cubeChunks.size(); i++) {
+      writeIntoDouble(*cubeChunks[i], bufferToFill, chunkBands[i]);
     }
 
     // Minimize the cache if it changed in size
@@ -752,13 +757,16 @@ namespace Isis {
    * @param numBands The number of bands of cube data
    * @return The cube chunks that correspond to the given cube area
    */
-  QList<RawCubeChunk *> CubeIoHandler::findCubeChunks(int startSample,
+  QPair< QList<RawCubeChunk *>, QList<int> > CubeIoHandler::findCubeChunks(int startSample,
       int numSamples, int startLine, int numLines, int startBand,
       int numBands) const {
     QList<RawCubeChunk *> results;
-
-    int lastBand = min(startBand + numBands - 1,
-                       bandCount());
+    QList<int> resultBands;
+/************************************************************************CHANGED THIS!!!!!!!!******/
+    int lastBand = startBand + numBands - 1;
+//     int lastBand = min(startBand + numBands - 1,
+//                        bandCount());
+/************************************************************************CHANGED THIS!!!!!!!!******/
 
     QRect areaInBand(
         QPoint(max(startSample, 1),
@@ -783,7 +791,6 @@ namespace Isis {
         else
           actualBand = (m_virtualBands->at(band - 1) - 1) / m_bandsInChunk + 1;
       }
-
       // We will be consuming areaLeftInBand until we've got all of the area
       //   requested.
       while(!areaLeftInBand.isEmpty()) {
@@ -841,6 +848,7 @@ namespace Isis {
         int initialChunkYPos = (areaStartLine - 1)   / m_linesInChunk;
         int initialChunkZPos = (actualBand - 1) / m_bandsInChunk;
         int initialChunkBand = initialChunkZPos * m_bandsInChunk + 1;
+        
 
         QRect chunkRect(initialChunkXPos * m_samplesInChunk + 1,
                       initialChunkYPos * m_linesInChunk + 1,
@@ -860,10 +868,11 @@ namespace Isis {
               (chunkYPos * getChunkCountInSampleDimension()) +
               (chunkZPos * getChunkCountInSampleDimension() *
                           getChunkCountInLineDimension());
-
+            
           RawCubeChunk * newChunk = getChunk(chunkIndex, true);
 
           results.append(newChunk);
+          resultBands.append(band);
 
           chunkRect.moveLeft(chunkRect.right() + 1);
         }
@@ -872,7 +881,7 @@ namespace Isis {
       }
     }
 
-    return results;
+    return QPair< QList<RawCubeChunk *>, QList<int> >(results, resultBands);
   }
 
 
@@ -1188,7 +1197,7 @@ namespace Isis {
         nullBuffer[i] = Null;
       }
 
-      writeIntoRaw(nullBuffer, *result);
+      writeIntoRaw(nullBuffer, *result, result->getStartBand());
       m_nullChunkData = new QByteArray(result->getRawData());
     }
     else {
@@ -1260,6 +1269,7 @@ namespace Isis {
    */
   void CubeIoHandler::synchronousWrite(const Buffer &bufferToWrite) {
     QList<RawCubeChunk *> cubeChunks;
+    QList<int> cubeChunkBands;
 
     int bufferSampleCount = bufferToWrite.SampleDimension();
     int bufferLineCount = bufferToWrite.LineDimension();
@@ -1291,6 +1301,9 @@ namespace Isis {
            bufferBand >= chunkStartBand &&
            bufferBand <= chunkStartBand + chunkBands - 1) {
           cubeChunks = *m_lastProcessByLineChunks;
+          for (int i = 0; i < cubeChunks.size(); i++) {
+            cubeChunkBands.append( cubeChunks[i]->getStartBand() );
+          }
         }
       }
     }
@@ -1328,14 +1341,18 @@ namespace Isis {
           chunkEndLine == bufferEndLine &&
           chunkEndBand == bufferEndBand) {
         cubeChunks.append(getChunk(expectedChunkIndex, true));
+        cubeChunkBands.append(cubeChunks.last()->getStartBand());
       }
     }
 
+    QPair< QList<RawCubeChunk *>, QList<int> > chunkInfo;
     if(cubeChunks.empty()) {
-      cubeChunks = findCubeChunks(
+      chunkInfo = findCubeChunks(
          bufferToWrite.Sample(), bufferSampleCount,
          bufferToWrite.Line(), bufferLineCount,
          bufferToWrite.Band(), bufferBandCount);
+      cubeChunks = chunkInfo.first;
+      cubeChunkBands = chunkInfo.second;
     }
 
     // process by line optimization
@@ -1351,7 +1368,7 @@ namespace Isis {
     }
 
     for(int i = 0; i < cubeChunks.size(); i++) {
-      writeIntoRaw(bufferToWrite, *cubeChunks[i]);
+      writeIntoRaw(bufferToWrite, *cubeChunks[i], cubeChunkBands[i]);
     }
 
     minimizeCache(cubeChunks, bufferToWrite);
@@ -1365,7 +1382,7 @@ namespace Isis {
    * @param output The data destination
    */
   void CubeIoHandler::writeIntoDouble(const RawCubeChunk &chunk,
-                                      Buffer &output) const {
+                                      Buffer &output, int index) const {
     // The code in this method is highly optimized. Even the order of the if
     //   statements will have a significant impact on performance if changed.
     //   Also, there is a lot of duplicate code in both writeIntoDouble(...) and
@@ -1398,9 +1415,7 @@ namespace Isis {
       const int &bandIntoChunk = z - chunkStartBand;
       int virtualBand = z;
 
-      if(m_virtualBands) {
-        virtualBand = m_virtualBands->indexOf(virtualBand) + 1;
-      }
+      virtualBand = index;
 
       if(virtualBand != 0 && virtualBand >= bufferBand &&
          virtualBand <= bufferBand + bufferBands - 1) {
@@ -1498,7 +1513,7 @@ namespace Isis {
    * @param buffer The data source
    * @param output The data destination
    */
-  void CubeIoHandler::writeIntoRaw(const Buffer &buffer, RawCubeChunk &output)
+  void CubeIoHandler::writeIntoRaw(const Buffer &buffer, RawCubeChunk &output, int index)
       const {
     // The code in this method is highly optimized. Even the order of the if
     //   statements will have a significant impact on performance if changed.
@@ -1529,8 +1544,9 @@ namespace Isis {
 
     for(int z = startZ; z <= endZ; z++) {
       const int &bandIntoChunk = z - outputStartBand;
-      int virtualBand = z;
+      int virtualBand = index;
 
+      
       if(m_virtualBands) {
         virtualBand = m_virtualBands->indexOf(virtualBand) + 1;
       }
