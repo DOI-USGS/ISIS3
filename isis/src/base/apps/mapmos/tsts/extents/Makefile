@@ -3,28 +3,23 @@ APPNAME  = mapmos
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/ab102401.lev2.cub \
-	  mosaic=$(OUTPUT)/mapmosTruthLats.cub \
+	$(APPNAME) from=$(INPUT)/ab102401_noMinLat.lev2.cub \
+	  mosaic=$(OUTPUT)/mapmosAllExtents.cub \
 	  create=true \
 	  minlat=10.765 \
 	  maxlat=34.445 \
-	  null=true > /dev/null;
-	$(APPNAME) from=$(INPUT)/ab102401.lev2.cub \
-	  mosaic=$(OUTPUT)/mapmosTruthLons.cub \
-	  create=true \
 	  minlon=219.720 \
 	  maxlon=236.190 \
 	  null=true > /dev/null;
-	$(APPNAME) from=$(INPUT)/copy_ab102401.lev2.cub \
-	  mosaic=$(OUTPUT)/mapmosTruthLons.cub \
+	$(APPNAME) from=$(INPUT)/ab102401_noMinLat.lev2.cub \
+	  mosaic=$(OUTPUT)/mapmosOneExtent.cub \
 	  create=true \
-	  minlon=219.720 \
-	  maxlon=236.190 \
-	  null=true >& $(OUTPUT)/errors.txt || true;
-	$(APPNAME) from=$(INPUT)/ab102401.lev2.cub \
-	  mosaic=$(OUTPUT)/mapmosTruthLons.cub \
+	  minlat=10.765 \
+	  null=true > /dev/null;
+	if [ `$(APPNAME) from=$(INPUT)/ab102401_noMinLat.lev2.cub \
+	  mosaic=$(OUTPUT)/mapmosNoExtents.cub \
 	  create=true \
-	  minlon=219.720 \
-	  null=true >& $(OUTPUT)/errors_tmp.txt || true;
-	  cat $(OUTPUT)/errors_tmp.txt >> $(OUTPUT)/errors.txt;
-	  $(RM) $(OUTPUT)/errors_tmp.txt;
+	  null=true >& $(OUTPUT)/error.txt` ]; \
+        then \
+	  true; \
+        fi;
