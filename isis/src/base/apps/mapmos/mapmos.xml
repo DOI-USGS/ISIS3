@@ -17,8 +17,9 @@
     <p>
       This program allows the user to create a mosaic using map projected cubes.  An individual
       cube can be placed in a pre-existing mosaic. An option exists to create the mosaic by
-      allowing the user to specify the latitude/longitude range for the output mosaic.  Note that
-      the input cube and mosaic must have the same ProjectionName, PixelResolution,
+      allowing the user to specify the latitude/longitude range for the output mosaic.  Only one
+      range is needed. You may enter either the longitude range or the latitude range. Note
+      that the input cube and mosaic must have the same ProjectionName, PixelResolution,
       EquatorialRadius, PolarRadius, LatitudeType, and LongitudeDirection as well as projection
       specific keywords (e.g., CenterLatitude, CenterLongitude). This application regardless of any
       priority and flags set, will always place an input pixel on a NULL mosaic  pixel. This
@@ -233,7 +234,8 @@
       cause HS, LS and NULL input pixels to be copied to the mosaic regardless 
       of the priorities and criteria. These options are not supported for  "BENEATH" priority.
     </change>
-    <change name="Sharmila Prasad" date="2010-10-27">Process Input File 
+    <change name="Sharmila Prasad" date="2010-10-27">
+      Process Input File 
       Attributes</change>
     <change name="Sharmila Prasad" date="2011-01-19">
       Added "AVERAGE" priority where the mosaic will be average of valid input 
@@ -256,6 +258,12 @@
       Made the default for the TYPE parameter BANDNUMBER because, when running the GUI and
       PRIORITY=BAND, a blank "TYPE=" was added to the command line string. This no longer
       occurs, there is either no TYPE parameter or it is set to "TYPE=BANDNUMBER". Fixes #1549.
+    </change>
+    <change name="Kimberly Oyama" date="2014-02-14">
+      Removed the requirement that all four lat/lon extents be entered by the user. The user can
+      now enter either min/max lat or min/max lon. The other pair will come from the input cube.
+      If the input cube is missing the pair, an error will be thrown telling the user that they
+      have to enter them. Fixes #1550.
     </change>
   </history>
 
@@ -514,9 +522,7 @@
         <description>
             This parameter specifies the minimum latitude to determine the bounding box of the mosaic
         </description>
-        <inclusions>
-            <item>CREATE</item>
-        </inclusions>
+        <internalDefault>Use Map Value</internalDefault>
       </parameter>
 
       <parameter name="MAXLAT">
@@ -529,9 +535,7 @@
         <greaterThan>
             <item>MINLAT</item>
         </greaterThan>
-        <inclusions>
-            <item>CREATE</item>
-        </inclusions>
+        <internalDefault>Use Map Value</internalDefault>
       </parameter>
 
       <parameter name="MINLON">
@@ -540,9 +544,7 @@
         <description>
             This parameter specifies the minimum longitude to determine the bounding box of the mosaic
         </description>
-        <inclusions>
-            <item>CREATE</item>
-        </inclusions>
+        <internalDefault>Use Map Value</internalDefault>
       </parameter>
 
       <parameter name="MAXLON">
@@ -554,9 +556,7 @@
         <greaterThan>
             <item>MINLON</item>
         </greaterThan>
-        <inclusions>
-            <item>CREATE</item>
-        </inclusions>
+        <internalDefault>Use Map Value</internalDefault>
       </parameter>
     </group>
 
