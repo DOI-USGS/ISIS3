@@ -3,23 +3,30 @@
 <application name="chan1m32isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
  <brief>
-    Import Chandrayaan 1 Moon Mineralogy Mapper (M3) images into ISIS cubes
+    Import Chandrayaan-1 Moon Mineralogy Mapper (M3) images into ISIS cubes
  </brief>
 
  <description>
-    This program imports Chandrayaan 1 Moon Mineralogy Mapper (M3) Level 1B (L1B) or Level 0 (L0) PDS
-    products into ISIS. 
+    This program imports Chandrayaan-1 Moon Mineralogy Mapper (M3) Level 1B (L1B) or Level 0 (L0) PDS
+    products into ISIS cubes. 
     <p>
-      Chandrayaan 1 M3 L1B PDS data products consist of an external PDS label file, 
-      a multiple-band image file containing the calibrated spectral radiance image data in units 
-      of (W/m^2/µm/sr), a 3-band image file containing pixel location 
-      data, and a 10-band image file containing observation geometry.  Importing the location and
-      observation geometry image files are optional.
+      Chandrayaan-1 M3 L1B PDS data products consist of:
+      <ul>
+        <li> An detached PDS label file </li> 
+        <li> A multiple-band image file containing the calibrated spectral radiance image data in units 
+      of (W/m^2/µm/sr)</li>
+        <li> A 3-band image file containing pixel location data </li>
+        <li> A 10 band image file containing observation geometry </li>
+      </ul>
     </p>
     <p>
-      Chandrayaan 1 M3 L0 PDS data products consist of an external PDS label file, and a  
-      multiple-band file containing the raw data.
+      Chandrayaan-1 M3 L0 PDS data products consist of:
+      <ul>
+        <li> An detached PDS label file </li>
+        <li> A multi-band file containing the raw data </li>
+        </ul>
     </p>
+
  </description>
 
   <history>
@@ -41,12 +48,12 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input detached PDS formatted Chandrayaan 1 M3 label file
+          Input detached PDS formatted Chandrayaan-1 M3 label file
         </brief>
         <description>
           This file is a detached PDS formatted label which contains pointers to the following files:
           <ul>
-            <li>Multiple band image of calibrated spectral radiance level 1B data or raw level 0 data (*_RDN.IMG, *_L0.IMG) </li>
+            <li>Multi-band image of calibrated spectral radiance level 1B data or raw level 0 data (*_RDN.IMG, *_L0.IMG) </li>
             <li>Three band image containing position of each image pixel on the Moon (*_LOC.IMG). Not used for L0 label files.</li>
             <li>Ten band image containing observation geometry (*_OBS.IMG). Not used for L0 label files.</li>
           </ul>
@@ -79,9 +86,8 @@
          </brief>
          <description>
            This is an optional output file containing location information for the center of all pixels 
-           contained in the radiance image file (L1B) created from the "TO" parameter. The output will
-           contain a 3-band ISIS cube with
-           the three bands containing the following:
+           contained in the radiance image file (L1B) created from the "TO" parameter. The output 
+           ISIS cube will 3 band containing the following:
            <ol>
              <li>Planetocentric latitude in decimal degrees</li>
              <li>Longitude in decimal degrees</li>
@@ -102,9 +108,8 @@
            Optional output file containing observation geometry information for all radiance image pixels.
          </brief>
          <description>
-           This is an optional output file containing observation geometry information for all radiance image pixels
-           contained in the radiance image file created from the "TO" parameter. The output will contain
-           a 10-band ISIS Cube with the ten bands containing the following:
+           This is an optional output file containing observation geometry information for each
+           pixel in the  radiance image. The output ISIS cube with have ten bands containing the following:
            <ol>
              <li> To-sun azimuth angle (decimal degrees, clockwise from local north)</li>
              <li> To-sun zenith angle (incidence angle in decimal degrees, zero at zenith)</li>
