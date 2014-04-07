@@ -346,10 +346,41 @@ namespace Isis {
             // Band Priority
             else if (m_trackingEnabled && m_imageOverlay == UseBandPlacementCriteria) {
               int iPixelOrigin = qRound(origPortal[pixel]);
+              
+              Portal iComparePortal( ins, 1, InputCubes[0]->pixelType() );
+              Portal oComparePortal( ins, 1, OutputCubes[0]->pixelType() );
+              iComparePortal.SetPosition(iss, il, bandPriorityInputBandNumber);
+              InputCubes[0]->read(iComparePortal);
+              oComparePortal.SetPosition(m_oss, ol, bandPriorityOutputBandNumber);
+              OutputCubes[0]->read(oComparePortal);
+
               if (iPixelOrigin == iIndex) {
-                oPortal[pixel] = iPortal[pixel];
-                iChanged++;
-                bChanged = true;
+                if ( ( IsValidPixel(iComparePortal[pixel]) &&
+                       IsValidPixel(oComparePortal[pixel]) ) &&
+                     ( (!m_bandPriorityUseMaxValue &&
+                        iComparePortal[pixel] < oComparePortal[pixel]) ||
+                       (m_bandPriorityUseMaxValue &&
+                        iComparePortal[pixel] > oComparePortal[pixel]) ) ) {
+
+                  if ( IsValidPixel(iPortal[pixel]) ||
+                       ( m_placeHighSatPixels && IsHighPixel(iPortal[pixel]) ) ||
+                       ( m_placeLowSatPixels  && IsLowPixel (iPortal[pixel]) ) ||
+                       ( m_placeNullPixels    && IsNullPixel(iPortal[pixel]) ) ){
+                    oPortal[pixel] = iPortal[pixel];
+                    iChanged++;
+                    bChanged = true;
+                  }
+                }
+                else { //bad comparison
+                  if ( ( IsValidPixel(iPortal[pixel]) && !IsValidPixel(oPortal[pixel]) ) ||
+                       ( m_placeHighSatPixels && IsHighPixel(iPortal[pixel]) ) ||
+                       ( m_placeLowSatPixels  && IsLowPixel (iPortal[pixel]) ) ||
+                       ( m_placeNullPixels    && IsNullPixel(iPortal[pixel]) ) ) {
+                    oPortal[pixel] = iPortal[pixel];
+                    iChanged++;
+                    bChanged = true;
+                  }
+                }
               }
             }
             // OnTop/Input Priority
@@ -1315,29 +1346,47 @@ namespace Isis {
 
     Pvl cPvlLabel;
 
-    if (inputFile)
+    if (inputFile) {
       cPvlLabel = *(InputCubes[0]->label());
-    else
-      cPvlLabel = *(OutputCubes[0]->label());
-
-    //if non-zero integer, must be original band #, 1 based
-    if (m_bandPriorityBandNumber) {
-      PvlKeyword cKeyOrigBand;
-      if (cPvlLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword("OriginalBand")) {
-        cKeyOrigBand = cPvlLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("OriginalBand");
-      }
-      int iSize = cKeyOrigBand.size();
-      QString buff = toString(m_bandPriorityBandNumber);
-      for (int i = 0; i < iSize; i++) {
-        if (buff == cKeyOrigBand[i]) {
-          iBandIndex = i + 1; //1 based get band index
+      if (m_bandPriorityBandNumber <= InputCubes[0]->bandCount() &&
+          m_bandPriorityBandNumber > 0) {
+          iBandIndex = m_bandPriorityBandNumber;
           bFound = true;
-          break;
-        }
+      }
+    }        
+    else {
+      cPvlLabel = *(OutputCubes[0]->label());
+      if (m_bandPriorityBandNumber <= OutputCubes[0]->bandCount() &&
+          m_bandPriorityBandNumber > 0) {
+          iBandIndex = m_bandPriorityBandNumber;
+          bFound = true;
       }
     }
+// qDebug() << "Band Index:" << iBandIndex;
+// qDebug() << "Priority Band:" << m_bandPriorityBandNumber;
+// qDebug() << "Input Bands:" << InputCubes[0]->bandCount();
+// qDebug() << "output Bands:" << OutputCubes[0]->bandCount();
+// qDebug();
+
+    //if non-zero integer, must be original band #, 1 based
+//     if (m_bandPriorityBandNumber <= InputCubes[0]->bandCount() &&
+//         m_bandPriorityBandNumber > 0) {
+//       PvlKeyword cKeyOrigBand;
+//       if (cPvlLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword("OriginalBand")) {
+//         cKeyOrigBand = cPvlLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("OriginalBand");
+//       }
+//       int iSize = cKeyOrigBand.size();
+//       QString buff = toString(m_bandPriorityBandNumber);
+//       for (int i = 0; i < iSize; i++) {
+//         if (buff == cKeyOrigBand[i]) {
+//           iBandIndex = m_bandPriorityBandNumber;//i + 1; //1 based get band index
+//           bFound = true;
+//           break;
+//         }
+//       }
+//     }
     //key name
-    else {
+    if (!m_bandPriorityBandNumber) {
       PvlKeyword cKeyName;
       if (cPvlLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword(m_bandPriorityKeyName)) {
         cKeyName = cPvlLabel.findGroup("BandBin", Pvl::Traverse).findKeyword(m_bandPriorityKeyName);
@@ -1351,11 +1400,12 @@ namespace Isis {
         }
       }
     }
+//     qDebug() << "Band Index:" << iBandIndex;
+// qDebug();
     if (!bFound) {
       QString msg = "Invalid Band / Key Name, Value ";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-
     return iBandIndex;
   }
 
@@ -1424,63 +1474,57 @@ namespace Isis {
    *
    * @author Sharmila Prasad (1/4/2012)
    */
-  void ProcessMosaic::BandPriorityWithNoTracking(
-      int iss, int isl, int isb, int ins, int inl, int inb,
-      int bandPriorityInputBandNumber, int bandPriorityOutputBandNumber) {
-    // Create portal buffers for the input and output files pointing to the
-    // specified band for comparison
-    Portal iComparePortal(ins, 1, InputCubes[0]->pixelType());
-    Portal oComparePortal(ins, 1, OutputCubes[0]->pixelType());
-
-    Portal resultsPortal (ins, 1, OutputCubes[0]->pixelType());
+void ProcessMosaic::BandPriorityWithNoTracking(int iss, int isl, int isb, int ins, int inl,
+                                                 int inb, int bandPriorityInputBandNumber,
+                                                 int bandPriorityOutputBandNumber) {
+    /*
+     * specified band for comparison
+     * Create portal buffers for the input and output files pointing to the
+     */
+    Portal iComparePortal( ins, 1, InputCubes[0]->pixelType() );
+    Portal oComparePortal( ins, 1, OutputCubes[0]->pixelType() );
+    Portal resultsPortal ( ins, 1, OutputCubes[0]->pixelType() );
 
     // Create portal buffers for the input and output files
-    Portal iPortal(ins, 1, InputCubes[0]->pixelType());
-    Portal oPortal(ins, 1, OutputCubes[0]->pixelType());
+    Portal iPortal( ins, 1, InputCubes[0]->pixelType() );
+    Portal oPortal( ins, 1, OutputCubes[0]->pixelType() );
 
     for (int inLine = isl, outLine = m_osl; inLine < isl + inl; inLine++, outLine++) {
-      // Set the position of the portals in the input and output cubes
+//       Set the position of the portals in the input and output cubes
       iComparePortal.SetPosition(iss, inLine, bandPriorityInputBandNumber);
       InputCubes[0]->read(iComparePortal);
 
       oComparePortal.SetPosition(m_oss, outLine, bandPriorityOutputBandNumber);
       OutputCubes[0]->read(oComparePortal);
 
-      Portal iPortal(ins, 1, InputCubes[0]->pixelType());
-      Portal oPortal(ins, 1, OutputCubes[0]->pixelType());
+      Portal iPortal( ins, 1, InputCubes[0]->pixelType() );
+      Portal oPortal( ins, 1, OutputCubes[0]->pixelType() );
 
       bool inCopy = false;
-
-      // Move the input data to the output
+//       Move the input data to the output
       for (int iPixel = 0; iPixel < ins; iPixel++) {
         resultsPortal[iPixel] = false;
         if (m_createOutputMosaic) {
           resultsPortal[iPixel] = true;
           inCopy = true;
         }
-        else if ((m_placeHighSatPixels && IsHighPixel(iComparePortal[iPixel])) ||
-                (m_placeLowSatPixels  && IsLowPixel (iComparePortal[iPixel])) ||
-                (m_placeNullPixels    && IsNullPixel(iComparePortal[iPixel]))) {
+        else if ( IsValidPixel(iComparePortal[iPixel]) && IsValidPixel(oComparePortal[iPixel]) ) {
+          if ( (m_bandPriorityUseMaxValue == false  &&
+                iComparePortal[iPixel] < oComparePortal[iPixel]) ||
+                (m_bandPriorityUseMaxValue == true &&
+                iComparePortal[iPixel] > oComparePortal[iPixel]) ) {
+            resultsPortal[iPixel] = true;
+            inCopy = true;
+          }
+        }
+        else if (IsValidPixel(iComparePortal[iPixel]) && !IsValidPixel(oComparePortal[iPixel]) ) {
           resultsPortal[iPixel] = true;
           inCopy = true;
         }
-        else {
-          if (IsValidPixel(iComparePortal[iPixel])) {
-            if (IsSpecial(oComparePortal[iPixel]) ||
-                (m_bandPriorityUseMaxValue == false  && iComparePortal[iPixel] <
-                 oComparePortal[iPixel]) ||
-                (m_bandPriorityUseMaxValue == true && iComparePortal[iPixel] >
-                 oComparePortal[iPixel])) {
-              resultsPortal[iPixel] = true;
-              inCopy = true;
-            }
-          }
-        }
       }
-
       if (inCopy) {
         for (int ib = isb, ob = m_osb; ib < (isb + inb) && ob <= m_onb; ib++, ob++) {
-          // Set the position of the portals in the input and output cubes
+//           Set the position of the portals in the input and output cubes
           iPortal.SetPosition(iss, inLine, ib);
           InputCubes[0]->read(iPortal);
 
@@ -1489,6 +1533,17 @@ namespace Isis {
 
           for (int iPixel = 0; iPixel < ins; iPixel++) {
             if (resultsPortal[iPixel]) {
+              if (m_createOutputMosaic) {
+                oPortal[iPixel] = iPortal[iPixel];
+              }
+              else if ( IsValidPixel(iPortal[iPixel]) ||
+                        (m_placeHighSatPixels && IsHighPixel(iPortal[iPixel]) ) ||
+                        (m_placeLowSatPixels  && IsLowPixel (iPortal[iPixel]) ) ||
+                        (m_placeNullPixels    && IsNullPixel(iPortal[iPixel]) ) ) {
+                oPortal[iPixel] = iPortal[iPixel];
+              }
+            }
+            else if ( IsValidPixel(iPortal[iPixel])  && !IsValidPixel(oPortal[iPixel]) ) {
               oPortal[iPixel] = iPortal[iPixel];
             }
           }
@@ -1497,6 +1552,7 @@ namespace Isis {
       }
     }
   }
+
 
 
   /**

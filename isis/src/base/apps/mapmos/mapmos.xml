@@ -6,186 +6,371 @@
   </brief>
 
   <description>
-    <html><head><style>
-    .td {
-      padding-left: 20px; width:70px; align:center;
-    }
-    .td1 {
-      padding-left: 5px; width:70px; align:left;
-    }
-    </style></head><body> <font size="2" face="Verdana">
-    <p>
-      This program allows the user to create a mosaic using map projected cubes.  An individual
-      cube can be placed in a pre-existing mosaic. An option exists to create the mosaic by
-      allowing the user to specify the latitude/longitude range for the output mosaic.  Only one
-      range is needed. You may enter either the longitude range or the latitude range. Note
-      that the input cube and mosaic must have the same ProjectionName, PixelResolution,
-      EquatorialRadius, PolarRadius, LatitudeType, and LongitudeDirection as well as projection
-      specific keywords (e.g., CenterLatitude, CenterLongitude). This application regardless of any
-      priority and flags set, will always place an input pixel on a NULL mosaic  pixel. This
-      application  also has the ability to track the pixel origin.
+    <html>
+      <head>
+        <style>
+          .td {
+          padding-left: 20px; width:70px; align:center;
+          }
+          .td1 {
+          padding-left: 5px; width:70px; align:left;
+          }
+        </style>
+      </head>
+    <body> <font size="2" face="Verdana">
+   <p>
+      This program allows the user to create a mosaic using a map projected cube (<def>Level2</def>). 
+      A mosaic can be created from an initial cube or the input cube can be placed in a pre-existing mosaic.
     </p>
-    <p>There are four different ways/priorities (input, mosaic, band, average) 
-    for how the input image has to be placed on the mosaic.</p>
-    
-   <p>Priority <b>Input</b> will place the input image on top of the mosaic.</p>
-   
-   <p>Priority <b>Mosaic</b> will place the input image beneath the mosaic.</p>
-   
-   <p>Priority <b>Band</b> will place the input image on the mosaic based on the "Lessser"
-   or "Greater" criteria between user defined band in the input and the mosaic images.</p>
-   
-   <p>Priority <b>Average</b> will average the valid pixels in the input and mosaic images. For
-   each mosaic band, a count band is maintained. The count band keeps track of the number of
-   images involved in the averaging of the dn value for each pixel in the mosaic. Choosing this
-   priority will cause the mosaic to have twice the number of bands of the input image, with a
-   count band for each band. <b>Hence the file size of the mosaic is doubled due to the count
-   band.</b> </p>
-
-   <p>An error will be thrown if the mosaic cube has no count band. </p>
-   
-   <p>In case of special pixels and the special pixel flags being enabled, the details 
-   for each priority is described below.
-   </p>
-    <p> Tracking can be set at the time of Mosaic creation
-      only and cannot be turned on after the mosaic is created. But the tracking
-      will be turned off for multiband ONTOP and BENEATH priority even though it 
-      was turned on while creating the mosaic. Tracking for multiband input with
-      ONTOP priority is possible only if  all the Special Pixel Flags are set to 
-      True else the Tracking will be turned off. ONTOP priority basically places 
-      all the valid input pixels onto the mosaic unless the special pixel flags 
-      are turned on or if mosaic has a NULL pixel. In a multi band scenario, a 
-      pixel origin in particular line and sample will not be the same in all the 
-      different bands, which means we have to keep track of every pixel in every 
-      band. i.e. the size of the tracking bands will be the same as the number 
-      of bands in the mosaic.i.e the number of bands will be doubled. </p> 
-      <p><b>WARNING: </b>If Tracking is turned on in a mosaic, any subsequent
-                             applications that modify "dn" values will corrupt
-                             the Tracking band. It may be necessary to remove
-                             the Tracking band from the mosaic and then add it
-                             back after all the processing is complete. See
-                             "crop" and "cubeit".
+      <p>
+        REQUIREMENT: The input cube must be map projected (<def>Level2</def>).
+        The input cube is required to be projected to the EXACT SAME ProjectionName,
+        PixelResolution (or MapScale), EquatorialRadius, PolarRadius, LatitudeType,
+        LongitudeDirection, as well as specific map projection keywords (e.g., CenterLatitude,
+        CenterLongitude).  If these map projection requirements are not met, an error will be
+        encountered.
       </p>
-      <p>Priority BAND can track origin for multi band input image based on a 
-      specified band using LESSER or GREATER than criteria. Each pixel in the
-      specified band is compared to the corresponding pixel in the chosen band 
-      in the mosaic based on the chosen criteria. This comparison true or false 
-      is used for all the other bands whether the input pixel is copied onto the 
-      mosaic and hence the origin for that pixel is stored. Band can be chosen 
-      by choosing the TYPE, BANDNUMBER or KEYWORD. If BANDNUMBER is chosen then 
-      the band number can be entered in the NUMBER field. If KEYWORD is chosen 
-      then PVL key name and value from the BANDBIN group can be entered in the 
-      KEYNAME and KEYVALUE fields. </p>
-        <p>For example,  for a multi band input with BAND priority,  if the BAND 
-        chosen is Emission Angle band(EMA), if input pixels are (30,30,30) in 
-        EMA Band for some sample, line and the corresponding pixels in the EMA 
-        band in the mosaic has (75, 75, 75) and the criteria is GREATER than, 
-        then since input pixels are not GREATER than corresponding mosaic 
-        pixels, then the input pixels are not copied to the mosaic, so also the
-        corresponding pixels in all the other bands in the input. Hence the 
-        origin for those pixels remains unchanged. If LESSER than was the 
-        criteria, then all the corresponding pixels in all the input bands will 
-        be copied to the mosaic and the origin for those pixels is the current 
-        input image.
+      <b>Note</b>: The latitude and longitude range of the individual input cubes may vary. 
+      <p>
+      If a new mosaic is to be created, it must be intialized with an input cube and CREATE=YES. The
+      default size of the output mosaic will be the SAME latitude and longitude extents of the input
+      file.  The size of the output mosaic can be entered by the user through the any or all four
+      boundary parameters: MINLAT, MAXLAT, MINLON, MAXLON.  The input cube also establishes the
+      number of bands and BandBin Group of the output mosaic.  If there are list of input cubes to
+      mosaic together refer to the similiar application called <b>automos</b>. 
+     </p>
+       <p>
+        <b>Integrity-check Parameters</b>:
+        <p>
+          MATCHBANDBIN = TRUE, the default is to require all the bandbin group and wavelength
+          keywords of the input cube files exactly match the output mosaic.
         </p>
-      <p>There are options like MATCHBANDIN, if set requires the specfied input 
-      bands to match the mosaic bands and the bands can be anywhere in the 
-      mosaic but must be contiguous for multi-band. If MATCHBANDIN is not set 
-      then any input image can be placed on the mosaic within it's boundaries.
+        <p>
+          MATCHDEM = FALSE, the default does not check the SHAPEMODEL keyword of the input cube
+          files and does not propogate what DEM Shapemodel that was used when the input files were
+          projected.
+        </p>
       </p>
-      <p> Options HIGHSATURATION, LOWSATURATION and NULL if
-      set will cause the the input pixels with these values to be copied to the
-      mosaic for ONTOP and BAND priorities regardless of the CRITERIA for the
-      BAND priority. These options are not supported for BENEATH priority. </p>
-      <p>Currently Tracking can be viewed in the Advanced Tool Tracking  option 
-        of the <b>qview</b> application. Following are the Tracking info:</p> 
-      <p><b>Index :</b> Zero based and is in the order in which  the image was 
-        placed on the mosaic. No origin is represented as -1.</p>
-         <p><b>FileName:</b> File name  of  input image </p>
-         <p> <b>Serial Number:</b>Serial Number of the input image </p>
-       <p>Following are the values for the origin band depending on the pixel type
-             <table border="1" cellspacing="0" cellpadding="2" width="500">
-             <tr><th>Pixel Type<br></br>(bits)</th><th>Default<br></br> (No  Origin)</th><th>Start Value</th><th>Max Value</th><th>Total Images<br></br> Supported</th></tr>
-               <tr><td class="td">32</td><td class="td">-16777216</td><td class="td">-16777215</td><td class="td">16777216</td><td class="td">33549932</td></tr>
-               <tr><td class="td">16</td><td class="td">-32768</td><td class="td">-32767</td><td class="td">32767 </td><td class="td">65535</td></tr>
-               <tr><td class="td">8</td><td class="td">0</td><td class="td">1</td><td class="td">255</td><td class="td">255</td></tr>
-             </table>
+      <p>
+        The PRIORITY parameter will determine how each input cube is combined with the current
+        output mosaic cube. The process involves replacing an output mosaic pixel (or not) with
+        an input pixel at the same location. There are many user options and criteria that
+        influence the pixel replacement. Use of the PRIORITY parameter with and without other
+        options is explained in the tables and descriptions below.
       </p>
-      <p> Following is the table for Special Pixel options, input, mosaic
-      pixels and the resulting output for different priorities.
-     <br><b>Tags: F(FALSE), T(TRUE), V(VALID), HS(HIGH SATURATION), LS(LOW SATURATION), 
-           S(SPECIAL PIXEL HS, LS, NULL), N(NULL), I(INPUT), M(MOSAIC),  HL(HS,LS)
-      </b></br>
-      </p> 
-     <li />
-     <table cellspacing="0" cellpadding="1" border="0"> 
-       <tr><th colspan="3" align="center"><u>Priority Beneath</u></th></tr>
-       <tr height="15"><th colspan="3"></th></tr>
-     <tr><td class="td"><img src="assets/Beneath.jpg" alt="Priority Beneath" />  </td><td class="td" width="30"></td>
-         <td class="td"><table cellspacing="0" cellpadding="1" border="1"> 
-         <tr><th colspan="3" align="center">BENEATH</th></tr>
-         <tr><th>Input</th><th>Mosaic</th> <th>Output </th></tr>
-         <tr><td class="td">S,V</td><td class="td">N</td><td class="td">I</td></tr>
-         <tr><td class="td">S,V</td><td class="td">HL,V</td><td class="td">M</td></tr>
-     </table></td></tr> </table><br></br><br></br><br></br>
-     <li />
-      <table cellspacing="0" cellpadding="1" border="0"> 
-        <tr><th colspan="3" align="center"><u>  Priority OnTop</u></th></tr>
-        <tr height="15"><th colspan="3"></th></tr>
-     <tr><td class="td"><img src="assets/OnTop.jpg" alt="Priority OnTop" />  </td><td class="td"></td>
-     <td class="td"><table cellspacing="0" cellpadding="1" border="1" width="350">
-          <tr><th colspan="6" align="center">ONTOP</th></tr>
-          <tr><th colspan="3" align="center">Options</th><th colspan="3" align="center">Images</th></tr>
-          <tr><th>HS</th><th>LS</th><th>NULL</th><th>Input</th><th>Mosaic</th><th>Output</th></tr>
-          <tr><td class="td"> F</td><td class="td"> F </td><td class="td">F</td><td class="td">V</td><td class="td">S,V</td><td class="td">I</td></tr>
-          <tr><td class="td"> F</td><td class="td"> F </td><td class="td">F</td><td class="td"> S </td><td class="td"> HL,V</td><td class="td">M </td></tr>  
-          <tr><td class="td"> F</td><td class="td"> F </td><td class="td">F</td><td class="td"> S,V </td><td class="td"> N </td><td class="td">I</td></tr>                    
-          <tr><td class="td"> T OR </td><td class="td"> T OR  </td><td class="td">T</td><td class="td">V </td><td class="td">S,V</td><td class="td">I </td></tr>           
-          <tr><td class="td"> T OR </td><td class="td"> T OR  </td><td class="td">T</td><td class="td">S</td><td class="td">S,V</td><td class="td">I (H,L,N)</td></tr>
-      </table></td></tr> </table>
-      <br></br><br></br><br></br>
-      <li />
-      <table cellspacing="0" cellpadding="1" border="0"> 
-        <tr><th colspan="3" align="center"><u> Priority Band</u></th></tr>
-        <tr height="15"><th colspan="3"></th></tr>
-     <tr><td class="td"><img src="assets/Band.jpg" alt="Priority Band" />  </td><td class="td"></td>
-     <td class="td"><table cellspacing="0" cellpadding="0" border="1" width="380">
-          <tr><th colspan="6" align="center"> BAND</th></tr>
-          <tr><th colspan="3" align="center">Options</th><th colspan="3" align="center">Images</th></tr>
-          <tr><th>HS</th><th>LS</th><th>NULL</th><th>Input</th><th>Mosaic</th><th>Output</th></tr>
-          <tr><td class="td"> F</td><td class="td">   F</td><td class="td">F </td><td class="td">V</td><td class="td">V</td><td class="td">Criteria based</td></tr>
-          <tr><td class="td">F</td><td class="td"> F </td><td class="td"> F</td><td class="td">V</td><td class="td">S </td><td class="td"> I </td></tr>
-          <tr><td class="td">F</td><td class="td"> F</td><td class="td"> F</td><td class="td"> S </td><td class="td">HL,V</td><td class="td">M</td></tr>
-          <tr><td class="td">F</td><td class="td"> F</td><td class="td"> F</td><td class="td">S,V</td><td class="td">N</td><td class="td">I</td></tr>
-          <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td"> T</td><td class="td">  S</td><td class="td"> S,V</td><td class="td"> I(H,L,N)</td></tr>
-          <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td">T </td><td class="td">V</td><td class="td">V</td><td class="td">Criteria based</td></tr>
-          <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td"> T </td><td class="td">V</td><td class="td"> S</td><td class="td">I</td></tr>
-       </table></td></tr> </table><br></br><br></br><br></br>
-       <li />
-       <table cellspacing="0" cellpadding="1" border="0"> 
-        <tr><th colspan="3" align="center"><u> Priority Average</u></th></tr>
-        <tr height="15"><th colspan="3"></th></tr>
-        <tr><td class="td"><img src="assets/Average.jpg" alt="Priority Average" />  
-        </td><td class="td"></td>
-        <td class="td"><table cellspacing="0" cellpadding="0" border="1" width="400">
-          <tr><th colspan="7" align="center"> AVERAGE</th></tr>
-          <tr><th colspan="3" align="center">Options</th><th colspan="4" align="center">Images</th></tr>
-          <tr><th>HS</th><th>LS</th><th>NULL</th><th>Input</th><th>Mosaic</th><th>Output</th><th>Count</th></tr>
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td"> F</td><td class="td">V</td><td class="td"> V</td><td class="td1">Average</td><td class="td1">count++</td></tr> 
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">V</td><td class="td">S</td><td class="td">I</td><td class="td">1</td></tr>
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">S</td><td class="td">S</td><td class="td">M</td><td class="td">0</td></tr> 
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">S</td><td class="td">V</td><td class="td">M</td><td class="td1">count</td></tr>
-        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">S</td><td class="td">S,V</td><td class="td">I</td><td class="td">0</td></tr>
-        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">V</td><td class="td">V</td><td class="td1">Average</td><td class="td1">count++</td></tr>
-        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">V</td><td class="td">S</td><td class="td">I</td><td class="td">1</td></tr>
-        </table></td></tr> </table><li />
-   </font>
-   </body></html>
+      <p>
+        The Track feature creates a band in the output mosaic file containing the index
+            values for every pixel in the output mosaic. The Track-band can only be used appropriately through
+        the  QVIEW-AdvancedTracking tool. As the user interactively pans across the displayed
+        mosaic band (Band1), for every mosaic pixel location QVIEW-AdvancedTracking will report
+        the source cube filename that was input to automos. The Track-band cannot be used outside
+        the QVIEW-AdvancedTracking tool. <b>Hence the file (byte) size of the mosaic is increased due to
+                the track-band.</b>
+      </p>
+      <p>
+        The Track feature works with Priority options ONTOP (with HIGHSATURATION and
+        LOWSATURATION parameters) and BENEATH for single band input cubes.  It does NOT support
+        multiple band input cubes with these priority options. It does work for multiband cubes
+        when PRIORITY=BAND. Furthermore, this feature is NOT supported when PRIORITY=AVERAGE.
+      </p>
+      <p>
+        <b>
+          The following table describes how the program will determine the pixel value in the output
+          mosaic for areas of image overlap.
+        </b>
+        <table border="1" >
+          <tr><th>PRIORITY</th><th>RESULT</th></tr>
+          <tr>
+            <td>ONTOP</td>
+            <td>
+              This is the default.  The current input image will be placed on top of the
+              output mosaic. Thus in any area of overlap, the Valid pixel values for the
+              current input image will appear in the output mosaic (it replaces the output mosaic
+              pixel).  Invalid input <def>Special Pixels</def>
+              (<def>NULL</def>,<def>HRS</def>,<def>HIS</def>,<def>LRS</def>,<def>LIS</def>) will NOT
+              replace an existing Valid output mosaic pixel. Refer to parameters HIGHSATURATION,
+              LOWSATURATION, and NULL to override replacement of Valid output mosaic pixels.
+            </td>
+          </tr>
+          <tr>
+            <td>BENEATH</td>
+            <td>
+              The current input image will be placed beneath the output mosaic. Thus in
+              any area of overlap, the Valid pixel values for the current mosaic will remain in
+              the output mosaic. The Valid pixel values for the current input image will only
+              replace the NULL pixels values in the output mosaic.  The HRS,HIS,LRS and LIS  special
+              pixel values in the output mosaic will NOT be replaced by the Valid input pixel.
+              The parameters HIGHSATURATION, LOWSATURATION and NULL are not supported under this
+              priority.
+            </td>
+          </tr>
+          <tr>
+            <td>BAND</td>
+            <td>
+              The input image pixels will be placed in the output mosaic based on the "Lesser" or
+              "Greater" criteria of a priority band defined by the user.  Parameters that apply to
+              this priority feature are TYPE, NUMBER, KEYNAME, KEYVALUE, CRITERIA.
+            </td>
+          </tr>
+          <tr>
+            <td>AVERAGE</td>
+            <td>
+              Overlapping Valid pixel values from the current input image and output mosaic will be
+              averaged for the new mosaic pixel values. A count-band is created with the output
+              mosaic file.  The count-band keeps track of the number of images involved in the
+              averaging of the input dn values for each pixel in the mosaic. Invalid input pixel
+              values will not be included in the average.  In the case where only one Valid pixel
+              exists between the input image pixels or the current mosaic pixel, the Valid pixel is
+              retained in the current output mosaic. Refer to parameters HIGHSATURATION,
+              LOWSATURATION, and NULL to override replacement of valid output mosaic pixels.
+              <p>
+                Choosing this priority will cause the mosaic to have twice the number of bands of
+                the input image. <b>Hence the file (byte) size of the mosaic is increased due to
+                the count-bands.</b>
+              </p>
+              <p>
+                <b>NOTE</b>: If an existing mosaic does not already contain a count-band, an error
+                will be encountered.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </p>
+      
+      <p>
+        Each of the following priority option tables indicates the resulting output pixel for a
+        particular input pixel, given the selected special pixel options  (parameters
+        HIGHSATURATION for HRS, HIS;  LOWSATURATION for LRS, LIS; and NULL) in each table row.
+
+        <!--
+          *******************************************************************************
+          The graphics below are commented out because they are no longer correct.
+          *******************************************************************************
+        -->
+        <!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u>  Priority OnTop</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/OnTop.jpg" alt="Priority OnTop" />  </td>
+              <td class="td"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="1" border="1" width="1000">
+                  <tr><th colspan="6" align="center">PRIORITY=ONTOP</th></tr>
+                  <tr><th colspan="3" align="center">Options</th>
+                      <th colspan="3" align="center">Images</th></tr>
+                  <tr><th>High Saturation</th>
+                      <th>Low Saturation</th>
+                      <th>Null</th>
+                      <th>Input Pixel Value Type</th>
+                      <th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">High Saturation or Low Saturation or Valid</td>
+                      <td class="td2">Mosaic</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Null</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                </table>
+    <!--              </td>
+          </tr>
+        </table>-->
+        <br></br><br></br><br></br>
+    <!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u>Priority Beneath</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/Beneath.jpg" alt="Priority Beneath" />  </td>
+              <td class="td" width="30"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="1" border="1">
+                  <tr><th colspan="3" align="center">PRIORITY=BENEATH</th></tr>
+                  <tr><th>Input Pixel Value Type</th>
+                      <th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th>
+                  </tr>
+                  <tr><td class="td2">Special or Valid</td>
+                      <td class="td2">Null</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">Special or Valid</td>
+                      <td class="td2">High Saturation or Low Saturation or Valid</td>
+                      <td class="td2">Mosaic</td>
+                  </tr>
+                </table>
+              <!--</td>
+          </tr>
+        </table>-->
+
+        <br></br><br></br><br></br>
+    <!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u> Priority Band</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/Band.jpg" alt="Priority Band" />  </td>
+              <td class="td"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="0" border="1" width="1000">
+                  <tr><th colspan="6" align="center">PRIORITY=BAND</th></tr>
+                  <tr><th colspan="3" align="center">Options</th><th colspan="3" align="center">
+                    Images</th></tr>
+                  <tr><th>High Saturation</th><th>Low Saturation</th><th>Null</th>
+                      <th>Input Pixel Value Type</th><th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Criteria based</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">High Saturation or Low Saturation or Valid</td>
+                      <td class="td2">Mosaic</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Null</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Criteria based</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td></tr>
+                </table>
+    <!--              </td>
+          </tr>
+        </table>-->
+        <br></br><br></br><br></br>
+    <!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u>Priority Average</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/Average.jpg" alt="Priority Average" /></td>
+              <td class="td"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="0" border="1" width="1000">
+                  <tr><th colspan="7" align="center">PRIORITY=AVERAGE</th></tr>
+                  <tr><th colspan="3" align="center">Options</th><th colspan="4" align="center">
+                    Images</th></tr>
+                  <tr><th>High Saturation</th><th>Low Saturation</th><th>Null</th>
+                      <th>Input Pixel Value Type</th><th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th>
+                      <th>Count Band Pixel Value (# of images used for average)</th></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Average</td>
+                      <td class="td2">increment count by 1</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td>
+                      <td class="td2">count = 1</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Mosaic</td>
+                      <td class="td2">count = 0</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Mosaic</td>
+                      <td class="td2">count unchanged</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td>
+                      <td class="td2">count = 0</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Average</td>
+                      <td class="td2">increment count by 1</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td>
+                      <td class="td2">count = 1</td></tr>
+                </table>
+                <!--</td></tr>
+        </table>
+      -->
+        </p>
+        <p>
+          Refer to <b>automos</b> for additional information and examples.
+        </p>
+      </font></body>
+    </html>
   </description>
 
   <category>
     <categoryItem>Mosaicking</categoryItem>
   </category>
+  <seeAlso>
+    <applications>
+      <item>automos</item>
+      <item>handmos</item>
+    </applications>
+  </seeAlso>
 
   <history>
     <change name="Eric Eliason" date="1986-01-02">
@@ -207,8 +392,8 @@
       Depricated CubeProjection and ProjectionManager to ProjectionFactory
     </change>
     <change name="Elizabeth Miller" date="2006-09-01">
-      Added the MATCHBANDBIN option that checks to make sure the input
-      cube bandbin group matches the mosaic bandbin group.  The default is true.
+      Added the MATCHBANDBIN option that checks to make sure the input cube bandbin group
+      matches the mosaic bandbin group. The default is true.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
       This program now utilizes ProcessMapMosaic
@@ -219,31 +404,29 @@
     </change>
     <change name="Christopher Austin" date="2008-12-11">
       Changed the parameters SLAT, ELAT, SLON, ELON to MINLAT, MAXLAT, MINLON,
-      MAXLON in correlation with autimos.
+      MAXLON in correlation with automos.
     </change>
     <change name="Sharmila Prasad" date="2009-10-15">
-     Added option "TRACK" to track pixel origin. Also added new priority called 
-      BAND where  specified input and mosaic band is compared for moving input 
-      to mosaic and to track the pixel origin. Added parameter "TYPE" to choose 
-      Band "NUMBER" or PVL "KEYWORD" from the BandBin group. If "BANDNUMBER" is 
-      chosen, then "NUMBER" is activated to enter band number. If "KEYWORD" 
-      is chosen then parameter "KEYNAME" and "KEYVALUE" are activated to enter  
-      key name and value from the BandBin group for band comparison. Band 
-      comparison "CRITERIA" are "LESSER" or "GREATER" than.  Also there are 
-      options "HIGHSATURATION", "LOWSATURATION" and "NULL", set to true will 
-      cause HS, LS and NULL input pixels to be copied to the mosaic regardless 
-      of the priorities and criteria. These options are not supported for  "BENEATH" priority.
+      Added option "TRACK" to track pixel origin. Also added new priority called BAND where
+      specified input and mosaic band is compared for moving input to mosaic and to track the
+      pixel origin. Added parameter "TYPE" to choose Band "NUMBER" or PVL "KEYWORD" from the
+      BandBin group. If "BANDNUMBER" is chosen, then "NUMBER" is activated to enter band number.
+      If "KEYWORD" is chosen then parameter "KEYNAME" and "KEYVALUE" are activated to enter key
+      name and value from the BandBin group for band comparison. Band comparison "CRITERIA" are
+      "LESSER" or "GREATER" than.  Also there are options "HIGHSATURATION", "LOWSATURATION" and
+      "NULL", set to true will cause HS, LS and NULL input pixels to be copied to the mosaic
+      regardless of the priorities and criteria. These options are not supported for  "BENEATH"
+      priority.
     </change>
     <change name="Sharmila Prasad" date="2010-10-27">
-      Process Input File 
-      Attributes</change>
+      Process Input File Attributes
+    </change>
     <change name="Sharmila Prasad" date="2011-01-19">
-      Added "AVERAGE" priority where the mosaic will be average of valid input 
-      and mosaic pixels.
+      Added "AVERAGE" priority where the mosaic will be average of valid input and mosaic pixels.
     </change>
     <change name="Sharmila Prasad" date="2011-01-24">
-      Option to match DEM and also added new group "mosaic" to hold ShapeModel 
-      attributes for the mosaic
+      Option to match DEM and also added new group "mosaic" to hold ShapeModel attributes for the
+      mosaic.
     </change>
     <change name="Sharmila Prasad" date="2011-11-07">
       Updated documentation for Average priority. Fixes #553.
@@ -265,6 +448,10 @@
       If the input cube is missing the pair, an error will be thrown telling the user that they
       have to enter them. Fixes #1550.
     </change>
+    <change name="Kimberly Oyama and Tammy Becker" date="2014-04-05">
+      Updated Documentation. Updated unit test for priority=band. Fixes #1620. References #1623.
+      References #1550.
+    </change>
   </history>
 
   <oldName>
@@ -277,10 +464,13 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Cube to place in the mosaic
+          Cube to be placed in the mosaic
         </brief>
         <description>
-          This is the cube which will be placed into the mosaic.  It must have a Mapping group which sufficiently matches the mosaic.
+          This cube will be placed in the mosaic. It must have the same ProjectionName,
+          PixelResolution, EquatorialRadius, PolarRadius, LatitudeType, and LongitudeDirection as
+          the mosaic. The projection specific keywords, such as CenterLatitude and CenterLongitude,
+          must match as well. 
         </description>
         <filter>
           *.cub
@@ -291,10 +481,12 @@
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
-          Mosaic output cube
+          Mosaic cube
         </brief>
         <description>
-          The mosaic cube which will have the input cube placed into it.  
+          The ouput mosaic cube which will have the input cube placed in it. If the selected cube does
+          not already exist as a mosaic, the CREATE option must be selected and it will be created.
+          In this case the latitude and longitude range parameters must be entered.
         </description>
         <filter>
           *.cub
@@ -306,20 +498,23 @@
         <default>
           <item>ONTOP</item>
         </default>
-        <brief>The priority of pixel placement</brief>
+        <brief>
+          The priority of pixel placement
+        </brief>
         <description>
-          This parameter is used to select one of two ways to mosaic the
-          pixels in areas of overlap.
+          This parameter determines how the pixels from the input cube will be placed
+          in the mosaic.
         </description>
 
         <list>
           <option value="ONTOP">
-            <brief> Input cube will be placed on top of the mosaic </brief>
+            <brief>
+              Input cube will be placed on top of the mosaic
+            </brief>
             <description>
-              An input pixel will always be copied onto a NULL mosaic pixel . 
-              Valid input pixel will also be always copied onto the mosaic. 
-              Special input pixel will be copied onto the mosaic only if the 
-              special pixel flags are set.
+              Valid input pixels will always be copied onto the mosaic. Any input pixel will be
+              placed onto a NULL mosaic pixel. If the mosaic pixel is not NULL and the input pixel 
+              is special, it will only be copied onto the mosaic if the special pixel flags are set.
             </description>
             <exclusions>
               <item>TYPE</item>
@@ -330,10 +525,12 @@
            </exclusions>
           </option>
           <option value="BENEATH">
-            <brief>Input cube will be placed beneath the mosaic </brief>
+            <brief>
+              Input cube will be placed beneath the mosaic
+            </brief>
             <description>
-               If the mosaic pixel is NULL, then the input pixel will be written 
-              onto the mosaic otherwise it remains unchanged.
+               If the mosaic pixel is NULL, then the input pixel will be placed on top of the
+               mosaic. Otherwise, it remains unchanged.
             </description>
             <exclusions>
               <item>TYPE</item>
@@ -347,12 +544,17 @@
            </exclusions>
           </option>
           <option value="BAND">
-            <brief>Input pixel is placed on top of the mosaic based on the criteria in the selected band</brief>
+            <brief>
+              Input pixel is placed based on the CRITERIA parameter
+            </brief>
             <description>
-              Input pixel is copied onto the mosaic if the mosaic pixel is NULL 
-              or if the chosen input pixel satisfies the criteria in comparison 
-              with the corresponding pixel in the mosaic. Special Input pixels 
-              are copied onto the mosaic if the special pixel flags are set.
+              If the input and mosaic pixel of the priority band, specified by NUMBER or KEYNAME
+              and KEYVALUE, are valid, a less than or greater than comparison is done. Depending on
+              the CRITERIA selected, the lower or higher of the two pixels is placed on top.
+              Special and NULL pixels are not placed on top unless their flags are set. So, if the
+              comparison of the priority band says that the input pixel should be on top but the
+              input pixel on any other band is null, without the null option being selected, the
+              mosaic pixel will remain unchanged for that band.
             </description>
              <inclusions>
               <item>TYPE</item>
@@ -360,13 +562,14 @@
            </inclusions>
           </option>
           <option value="AVERAGE">
-            <brief>Average of valid input and the mosaic pixels</brief>
+            <brief>
+              Average of valid input and the mosaic pixels
+            </brief>
             <description>
-              If the Input and Mosaic pixels are valid then the output will be 
-              the average of the 2 values. A count band is created for each 
-              corresponding band in the mosaic and holds the count of the 
-              images corresponding to the Average DN value of each pixel in the 
-              mosaic .
+              If the Input and Mosaic pixels are valid, the output will be the average of
+              the 2 values. A count band is created for each corresponding band in the mosaic and
+              holds the count of the images corresponding to the Average DN value of each pixel in
+              the  mosaic.
             </description>
             <exclusions>
               <item>TYPE</item>
@@ -388,19 +591,18 @@
             BANDNUMBER
           </item>
         </default>
-        <brief>Indicate the Band name or number to be used for  comparison</brief>
+        <brief>
+          Indicate the Band name or number to be used for comparison.
+        </brief>
         <description>
-          The pixels in this band will be used for comparison between input 
-          image and the mosaic for a decision to be made in copying image into 
-          the mosaic.
+          This option allows you to select the method to specify the band
+          to use for the pixel comparison. 
         </description>
         <list>
           <option value="BANDNUMBER">
             <brief>Band Number </brief>
             <description>
-              Choose this option to enter the band number to be used for 
-              comparison. This band number will be compared with the band # in 
-              the OriginalBand.
+              You can enter the band number to use in the pixel comparison.
             </description>
             <inclusions>
               <item>NUMBER</item> 
@@ -411,14 +613,16 @@
             </exclusions>
           </option>
           <option value="KEYWORD">
-            <brief>PVL Keyword in "BandBin" group</brief>
+            <brief>
+              PVL Keyword in "BandBin" group
+            </brief>
             <description>
-              Choose this option to enter Keyword from the "BandBin" group of 
-              the PVL
+              Selecting this option allows you to enter the Keyword name and value
+              corresponding to the band to use in the pixel comparison.
             </description>
            <exclusions>
               <item>NUMBER</item> 
-              </exclusions>
+            </exclusions>
             <inclusions>
               <item>KEYNAME</item>
               <item>KEYVALUE</item>
@@ -430,56 +634,68 @@
       <parameter name="NUMBER">
         <type>integer</type>
         <default><item>1</item></default>
-        <brief>Enter the Band Number</brief>
-        <description>The band number should match that in the 
-          "OriginalBand" of "BandBin" Group</description>
+        <brief>
+          Enter the Band Number
+        </brief>
+        <description>
+          This is the number of the band to use for the pixel comparison.
+        </description>
       </parameter>
 
       <parameter name="KEYNAME">
         <type>string</type>
         <default><item>OriginalBand</item></default>
-        <brief>Enter the Key name as it appears in the PVL</brief>
-        <description>The entered key name must match the key name in the 
-          "BandBin" 
+        <brief>
+          Enter the Keyword name as it appears in the BandBin Group
+        </brief>
+        <description>
+          This is the keyword string. The entered keyword name must match the name in the
+          BandBin group in the image labels.
         </description>
       </parameter>
 
       <parameter name="KEYVALUE">
         <type>string</type>
-        <default><item>1</item></default>
-        <brief>Enter the value associated with the "KEYNAME"</brief>
-        <description>This value must match the value associated with the key 
-          name entered in the KEYNAME
-          </description>
+        <default>
+          <item>1</item>
+        </default>
+        <brief>
+          Enter the value associated with the "KEYNAME"
+        </brief>
+        <description>
+          This value must match the value associated with the KEYNAME parameter.
+        </description>
       </parameter>
 
       <parameter name="CRITERIA">
-        <type>string</type> 
-         <default><item>LESSER</item></default>
-        <brief>The criteria (Lesser or Greater) of pixel placement in  a chosen  band </brief>
+        <type>string</type>
+        <default>
+           <item>LESSER</item>
+        </default>
+        <brief>
+          Determines pixel placement given a band
+        </brief>
         <description>
-          This parameter is used to select one of two ways to mosaic the
-          pixels in areas of overlap when doing by band comparison.
+          Select which type of comparison to do on the pixels. You can choose whether the lesser
+          or greater of the two pixels will be placed on top of the mosaic.
         </description>
-
         <list>
-        <option value="LESSER">
-          <brief>Input pixel LESSER  than the corresponding pixel in the mosaic 
+          <option value="LESSER">
+            <brief>
+              The lower DN value between the input and mosaic pixels will be placed on top.
             </brief>
             <description>
-              If the dn value of a pixel in the input cube is lesser than the 
-            corresponding pixel in the mosaic in the chosen band, then the input 
-            cube pixel will replace the corresponding pixel for all the bands in 
-            the mosaic.
+              The lower DN value between the input and mosaic pixels will be placed on top of
+              the mosaic.
             </description>
           </option>
           <option value="GREATER">
-           <brief>Input pixel GREATER than the corresponding pixel in the mosaic
-            </brief>
-            <description> If the dn value of a pixel in the input cube is 
-            greater than the corresponding pixel in the mosaic in the chosen 
-            band, then the input cube pixel will replace the corresponding pixel 
-            for all the bands in the mosaic.
+           <brief>
+             The larger DN value between the input and mosaic pixels will be placed on top.
+           </brief>
+            <description>
+              The larger DN value between the input and mosaic pixels will be placed on top of
+              the mosaic.
             </description> 
         </option>
       </list>
@@ -492,9 +708,11 @@
         <default>
           <item>NO</item>
         </default>
-        <brief>Create the output mosaic</brief>
+        <brief>
+          Create the output mosaic
+        </brief>
         <description>
-          This parameter is used to specify if the mosaic needs to be created.
+          Select this parameter if the mosaic does not already exist.
         </description>
         <inclusions>
             <item>MINLAT</item>
@@ -506,21 +724,44 @@
       </parameter>
 
       <parameter name="TRACK">
-          <type>boolean</type>
-         <default><item>FALSE</item></default>
-          <brief>Track the mosaic origin</brief>
-          <description>
-            If selected the application will track the mosaic origin. Once 
-            origin is tracked, the tracker cannot be turned off.
-          </description>
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Track the source filename for each mosaic pixel</brief>
+        <description>
+          <p>
+            The Track feature creates a band in the output mosaic file containing the index
+            values for every pixel in the output mosaic. The Track-band can only be used
+            appropriately through the  QVIEW-AdvancedTracking tool. As the user interactively
+            pans across the displayed mosaic band (Band1), for every mosaic pixel location
+            QVIEW-AdvancedTracking will report the source cube filename that was input to
+            automos. The Track-band cannot be used outside the QVIEW-AdvancedTracking tool.
+            TRACK must be set to TRUE at the time of mosaic creation only and cannot be turned
+            on after the mosaic is created. When a mosaic is created with TRACK=TRUE, all
+            subsequent runs will default to TRACK=TRUE. When a mosaic is created with
+            TRACK=FALSE, an error will be encountered if subsequent runs have TRACK=TRUE. 
+            <b>Hence the file (byte) size of the mosaic is increased due to
+                the track-band.</b>
+          </p>
+          <p>
+            A table, called InputImages, containing the names of the images used in the mosaic
+            will be added to the cube when TRACK=TRUE.
+          </p>
+          <p>
+            WARNING:
+            If Tracking is turned on in a mosaic, any subsequent applications that modify "dn"
+            values will corrupt the track-band, for instance the application <def>reduce</def>.
+          </p>
+        </description>
       </parameter>
 
       <parameter name="MINLAT">
         <type>double</type>
         <minimum inclusive="yes">-90.0</minimum>
-        <brief>Minimum Latitude</brief>
+        <brief>
+          Minimum Latitude
+        </brief>
         <description>
-            This parameter specifies the minimum latitude to determine the bounding box of the mosaic
+          This parameter specifies the minimum latitude of the mosaic.
         </description>
         <internalDefault>Use Map Value</internalDefault>
       </parameter>
@@ -528,9 +769,11 @@
       <parameter name="MAXLAT">
         <type>double</type>
         <maximum inclusive="yes">90.0</maximum>
-        <brief>Maximum Latitude</brief>
+        <brief>
+          Maximum Latitude
+        </brief>
         <description>
-            This parameter specifies the maximum latitude to determine the bounding box of the mosaic
+            This parameter specifies the maximum latitude of the mosaic.
         </description>
         <greaterThan>
             <item>MINLAT</item>
@@ -540,18 +783,22 @@
 
       <parameter name="MINLON">
         <type>double</type>
-        <brief>Minimum Longitude</brief>
+        <brief>
+          Minimum Longitude
+        </brief>
         <description>
-            This parameter specifies the minimum longitude to determine the bounding box of the mosaic
+            This parameter specifies the minimum longitude of the mosaic
         </description>
         <internalDefault>Use Map Value</internalDefault>
       </parameter>
 
       <parameter name="MAXLON">
         <type>double</type>
-        <brief>Maximum Longitude</brief>
+        <brief>
+          Maximum Longitude
+        </brief>
         <description>
-            This parameter specifies the maximum longitude to determine the bounding box of the mosaic
+            This parameter specifies the maximum longitude of the mosaic
         </description>
         <greaterThan>
             <item>MINLON</item>
@@ -563,49 +810,60 @@
      <group name="Options">
       <parameter name="MATCHBANDBIN">
         <type>boolean</type>
-        <brief>Enforce BandBin Group Match</brief>
+        <brief>
+          Enforce BandBin Group Match
+        </brief>
         <description>
-          This option causes the application to fail if the input bandbin group does not 
-          match the mosaic bandbin group.
+          This option causes the application to fail if the input
+	  BandBin Group keywords do not 
+          match the mosaic BandBin Group.
         </description>
         <default><item>TRUE</item></default>
       </parameter>
         <parameter name="MATCHDEM">
         <type>boolean</type>
-        <brief>Enforce DEM Match</brief>
+        <brief>
+          Enforce DEM Match
+        </brief>
         <description>
-          This option causes the application to fail if the input DEM 
-        shapemodel does not match the mosaic's' shapemodel. 
+          This option causes the application to fail if the input DEM
+	  shapemodel file does not
+          match the filename value in the output mosaic ShapeModel.
         </description>
         <default><item>FALSE</item></default>
       </parameter>
       <parameter name="HIGHSATURATION">
         <type>boolean</type>
         <default><item> FALSE</item></default>
-        <brief>Copy Input HS (Instrument and Representation) values </brief>
+        <brief>
+          Copy Input HS (Instrument and Representation) values
+        </brief>
         <description>
-          This option causes High Saturation values (both Instrument and 
-          Representation) in the input image to be automatically copied to the 
-          mosaic irrespective of the priority
+          This option causes an input High Saturation special pixel value
+          (both Instrument and Representation) to replace the output mosaic pixel
+          regardless of the priority set or the original value of the mosaic pixel.
         </description>
       </parameter>
       <parameter name="LOWSATURATION">
         <type>boolean</type>
         <default><item> FALSE</item></default>
-        <brief>Copy Input LS (Instrument and Representation) values</brief>
+        <brief>
+          Copy Input LS (Instrument and Representation) values
+        </brief>
         <description>
-          This option causes Low Saturation values (both Instrument and 
-          Representation) in the input image to be automatically copied to the 
-          mosaic irrespective of the priority
+          This option causes input NULL pixel values to replace the output mosaic pixel
+          regardless of the priority set or the original value of the mosaic pixel.
         </description>
       </parameter>
       <parameter name="NULL">
         <type>boolean</type>
         <default><item> FALSE</item></default>
-        <brief>Copy Input NULL values</brief>
+        <brief>
+          Copy Input NULL values
+        </brief>
         <description>
           This option causes NULL values  in the input image to be automatically 
-          copied to the mosaic irrespective of the priority
+          copied to the mosaic regardless of the priority
         </description>
       </parameter>
     </group>

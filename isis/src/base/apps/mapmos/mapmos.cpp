@@ -1,4 +1,7 @@
 #include "Isis.h"
+
+#include <QDebug>
+
 #include "ProcessMapMosaic.h"
 #include "PvlGroup.h"
 
@@ -24,8 +27,7 @@ void IsisMain() {
   // Gets the input file along with attributes
   QString sInputFile = ui.GetAsString("FROM");
 
-  ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay(
-      ui.GetString("PRIORITY"));
+  ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay( ui.GetString("PRIORITY") );
 
   if (overlay == ProcessMapMosaic::UseBandPlacementCriteria) {
     if(ui.GetString("TYPE") == "BANDNUMBER") {
@@ -89,7 +91,7 @@ void IsisMain() {
   m.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
   m.SetNullFlag(ui.GetBoolean("NULL"));
 
-  // Start Process
+  // Start Process  
   if(!m.StartProcess(sInputFile)) {
     // Logs the cube if it falls outside of the given mosaic
     PvlGroup outsiders("Outside");

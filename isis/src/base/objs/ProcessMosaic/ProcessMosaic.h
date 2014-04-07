@@ -174,6 +174,14 @@ namespace Isis {
    *   @history 2014-03-28 Kimberly Oyama - Added check for count band when priority=average. The
    *                           mosaic apps should fail when priority=average and there is no count
    *                           band. Fixes #746.
+   *   @history 2014-04-07 Kimberly Oyama - Updated the GetBandIndex() method to return the same
+   *                           number when you use the band number or band name. For example, if
+   *                           band 3 is the emission angle, GetBandIndex() should return 3 whether
+   *                           you enter 3 or emission angle. Modified BandPriorityWithNoTracking()
+   *                           so valid data is always placed on top of the mosaic regardless of
+   *                           the placement criteria (priority=band). The only way to place
+   *                           special or null pixels is to check those options in mapmos or
+   *                           automos. Fixes #1620. Fixes #1623.
    */
 
   class ProcessMosaic : public Process {

@@ -169,6 +169,7 @@ namespace Isis {
       try {
         do {
           int outBand = 1;
+          
           ProcessMosaic::StartProcess(outSample, outLine, outBand);
 
           // Increment for projections where occurrances may happen multiple times

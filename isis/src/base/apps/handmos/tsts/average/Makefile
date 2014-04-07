@@ -21,5 +21,5 @@ commands:
 	  outsample=5 \
 	  outline=5 \
 	  outband=1 \
-	  matchbandbin=false 2>> $(OUTPUT)/errors.txt > /dev/null;\
+	  matchbandbin=false >& $(OUTPUT)/errors.txt > /dev/null;\
 	$(RM) $(OUTPUT)/average.cub;
