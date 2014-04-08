@@ -118,8 +118,8 @@ class KernelWriter {
 
     /** Accumulate comment from K object and individed set */
     QString getComment(const K &kernels, const QString &comfile) {
-      Commentor<SegmentType> commentor(comfile);
-      if (comfile.isEmpty()) { commentor.setCommentHeader(k_header()); }
+      Commentor<SegmentType> commentor;
+      commentor.setCommentHeader(k_header(comfile));
       kernels.Accept(commentor);
       return (commentor.comments());
     }
@@ -129,14 +129,14 @@ class KernelWriter {
     virtual int k_open(const QString &kfile, const int &comsize = 512) = 0;
     virtual void k_write(const SpiceInt &handle, const K &kernels) = 0;
     virtual void k_close(SpiceInt &handle) = 0;
-    virtual QString k_header() const = 0;
+    virtual QString k_header(const QString &comfile = "") const = 0;
 
   private:
     SpiceInt    _handle;    ///< SPICE file handle
 
 
     /**
-     * @brief WRite comments to output NAIF SPICE kernel.
+     * @brief Write comments to output NAIF SPICE kernel.
      *
      * @return bool Returns success if so.
      */

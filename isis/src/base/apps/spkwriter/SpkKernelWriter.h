@@ -58,9 +58,11 @@ typedef SpiceKernel<SpkSegment> SpkKernel;
  * handle need to write the segment and the addComment() method to add details
  * in the kernel file regarding the segment being written.
  *
- * @author ????-??-?? Unknown
+ * @author 2011-05-02 Kris Becker
  *
- * @internal
+ * @internal 
+ * @history 2013-12-19 Kris Becker Add user comments to header section rather 
+ *                                 than replace generic comments.
  */
 
 class SpkKernelWriter : public KernelWriter<SpkKernel> {
@@ -104,7 +106,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       return (myHandle);
     }
 
-    QString k_header() const;
+    QString k_header(const QString &comfile = "") const;
 
     void k_write(const SpiceInt &handle, const SpkKernel &kernels) {
       if ( _spkType == 9 ) {

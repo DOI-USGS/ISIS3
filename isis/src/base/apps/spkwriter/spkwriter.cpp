@@ -1,6 +1,10 @@
 #include <cmath>
-
 #include "Isis.h"
+
+#include <QString>
+#include <QStringList>
+
+#include "IException.h"
 #include "FileList.h"
 #include "Cube.h"
 #include "Process.h"
@@ -12,6 +16,32 @@
 
 using namespace std;
 using namespace Isis;
+
+typedef SpiceKernel<SpkSegment> SpkKernelContainer;
+
+/** Validation routine for SPK kernel segments */
+void validate(const SpkKernelContainer &kernel) {
+  QStringList errors;
+  for (int k = 1 ; k < kernel.size() ; k++) {
+    if ( kernel.at(k).overlaps(kernel.at(k-1)) ) {
+      errors  << "SPKSegment " + kernel.at(k).Id() + " overlaps SPKSegment "
+                  + kernel.at(k-1).Id();
+    }
+  }
+
+  //  Now check for problems
+  if ( 0 < errors.size() ) {
+     QString mess = "Time/body overlap conflicts are present in segment (image) list. "
+                    "This will likely create erroneous positions in one or more "
+                    "images.  You should create a seperate kernel for conflicting "
+                    "images that overlap another.  Images with time/body overlap "
+                    "conflicts are:   \n"
+                    + errors.join("; ");
+     throw IException(IException::User, mess, _FILEINFO_);
+  }
+  return;
+}
+
 
 void IsisMain() {
   Process p;
@@ -26,22 +56,45 @@ void IsisMain() {
     throw IException(IException::User,msg,_FILEINFO_);
   }
 
-  SpiceKernel<SpkSegment> kernel;
+  bool overlap_is_error = ( "ERROR" == ui.GetString("OVERLAP") ) ? true : false;
+  int spkType = ui.GetInteger("TYPE");
+
+  SpkKernelContainer kernel;
   Progress prog;
   prog.SetMaximumSteps(flist.size());
   prog.CheckStatus();
 
   for (int i = 0 ; i < flist.size() ; i++) {
     // Add and process each image
-    kernel.add(SpkSegment(flist[i].toString()));
+    kernel.add(SpkSegment(flist[i].toString(), spkType));
     prog.CheckStatus();
   }
+
+  // Validate the segments
+  try {
+    validate(kernel);
+  }
+  catch ( IException &ie ) {
+
+    // Check for user preference in treatment overlaps
+    if ( overlap_is_error ) { throw; }
+
+    //  Log it to file
+    Pvl overrors = ie.toPvl();
+    for(int i = 0; i < overrors.groups(); i++) {
+      PvlGroup overlap = overrors.group(i);
+      overlap.setName("Overlaps");
+      overlap.addKeyword(PvlKeyword("Class", "WARNING"), PvlContainer::Replace);
+      Application::Log(overlap); 
+    }
+  }
+
 
   //  Process CK kernel requests
   QString comfile("");
   if (ui.WasEntered("COMFILE")) comfile = ui.GetFileName("COMFILE");
 
-  SpkKernelWriter kwriter(ui.GetInteger("TYPE"));
+  SpkKernelWriter kwriter(spkType);
 
   // Write the output file if requested
   if (ui.WasEntered("TO")) {

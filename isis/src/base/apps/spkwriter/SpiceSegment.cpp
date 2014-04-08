@@ -61,6 +61,7 @@ void SpiceSegment::setId(const QString &name) {
 }
 
 
+
 /**
  * @brief Provide on-demand loading of a kernel type in the NAIF pool
  *

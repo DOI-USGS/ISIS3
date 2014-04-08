@@ -33,6 +33,8 @@
 #include <functional>
 #include <algorithm>
 
+#include <QtGlobal>
+
 #include "IString.h"
 #include "IException.h"
 #include "SpiceSegment.h"
@@ -93,7 +95,7 @@ template <typename K>
       virtual ~SpiceKernel() { }
   
       /** Returns the number of segments */
-      int size() const { return (_segments.size()); }
+      int size() const { return (m_segments.size()); }
 
       /**
        * Const iterator into list
@@ -101,7 +103,7 @@ template <typename K>
        * @return ConstSegmentIter Returns a const iterator to the list
        */
       ConstSegmentIter begin() const {
-        return _segments.begin();
+        return m_segments.begin();
       }
 
       /**
@@ -110,7 +112,7 @@ template <typename K>
        * @return ConstSegmentIter  Returns the const end of the list
        */
       ConstSegmentIter end() const {
-        return _segments.end();
+        return m_segments.end();
       }
 
       /**
@@ -119,7 +121,7 @@ template <typename K>
        * @return SegmentIter Returns an iterator on the collection
        */
       SegmentIter begin() {
-        return _segments.begin();
+        return m_segments.begin();
       }
 
       /**
@@ -129,7 +131,14 @@ template <typename K>
        *         of the iteration loop
        */
       SegmentIter end() {
-        return _segments.end();
+        return m_segments.end();
+      }
+
+      /** Return const reference to segment at index */
+      const K &at(int index) const {
+        Q_ASSERT(index >= 0);
+        Q_ASSERT(index < size());
+        return (m_segments[index]);
       }
 
       /**
@@ -141,8 +150,8 @@ template <typename K>
        * @param segment New segment to add to list
        */
       void add(const K &segment) {
-        _segments.push_back(segment);
-        std::stable_sort(_segments.begin(), _segments.end());
+        m_segments.push_back(segment);
+        std::stable_sort(m_segments.begin(), m_segments.end());
       }
 
       /**
@@ -186,7 +195,7 @@ template <typename K>
 
 
     private:
-      SegmentList  _segments;  ///< List of arbitrary segments
+      SegmentList  m_segments;  ///< List of arbitrary segments
   };
 
 

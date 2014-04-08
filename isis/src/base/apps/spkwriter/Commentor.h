@@ -41,26 +41,21 @@ namespace Isis {
  *  
  * @author 2011-04-01 Kris Becker 
  * @internal 
- * @history 2011-04-11 Kris Becker Completed documentation
+ * @history 2011-04-11 Kris Becker Completed documentation 
+ * @history 2013-12-19 Kris Becker Simplified by removing user comment file 
+ *                                 handling.  See SpkKernelWriter. 
  */
 template <class K>
   class Commentor {
     public:
       /** Constructor w/initialization  */
       Commentor() { init(); }
-      /** Constructor w/caller provided file containing comments */
-      Commentor(const QString &comfile) {
-        init();
-        if ( !comfile.isEmpty() ) {
-          loadCommentFile(comfile);
-        }
-      }
 
       /** Destructor  */
       virtual ~Commentor() { }
        
       /** Returns full size of current comments internalized  */
-      int size() const { return (_comComment.size() + _comSetComments.size()); }
+      int size() const { return (m_comComment.size() + m_comSetComments.size()); }
 
       /**
        * @brief operator() method to collect comments from each segment
@@ -72,71 +67,34 @@ template <class K>
        * @param K Segment where specific comments are retreived
        */
       void operator()(const K &source)  {
-         _comSetComments.append(source.getComment());
+         m_comSetComments.append(source.getComment());
          return;
-      }
-
-      /** 
-       * @brief Loads general comments from a given file 
-       *
-       * @internal
-       * @history Debbie A. Cook - Added spkwriter signature keyword to user's
-       *                           comment
-       */
-      void loadCommentFile(const QString &comFile) {
-        _comComment = readCommentFile(comFile);
-        // The following line was added to ensure that a
-        // user's entered comment file includes the
-        // keyword indicating an spkwriter-created kernel.
-        _comComment += "  (ID:USGS_SPK_ABCORR=NONE)\n";
-        _comFile = comFile;
-        return;
       }
 
       /** Allows user to set comment header string */
       void setCommentHeader(const QString &comment) {
-        _comComment = comment;
+        m_comComment = comment;
         return;
       }
 
       /** Returns the current contents of the collected comments */
       QString comments() const { 
-        return (_comComment + _comSetComments);
+        return (m_comComment + m_comSetComments);
       }
 
       /** Clear out all comments collected for starting over */
       void Clear() {
-        _comSetComments.clear();
+        m_comSetComments.clear();
         return;
       }
 
     private:
-      QString _comFile;
-      QString _comComment;
-      QString _comSetComments;
-
-      /**
-       * @brief Read comments from a file
-       *  
-       * This method reads a text file containing comments that will be written 
-       * to the SPICE kernel written. 
-       *                          
-       * @return QString Returns contents of of comment file
-       */
-      QString readCommentFile(const QString comfile) {
-        TextFile t(comfile);
-        QString comment;
-        QString cline;
-        while ( t.GetLine(cline, false) ) {
-          cline.push_back('\n');
-          comment += cline;
-        }
-        return (comment);
-      }
+      QString m_comComment;
+      QString m_comSetComments;
 
       /** Initialize setting all content to empty strings */
       void init() {
-        _comFile = _comComment = _comSetComments = "";
+        m_comComment = m_comSetComments = "";
       }
   };
 
