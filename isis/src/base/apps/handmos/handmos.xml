@@ -431,7 +431,10 @@
       a count band. References #746.
     </change>
     <change name="Tammy Becker and Kimberly Oyama" date="2014-04-07">
-      Updated user documentation. Fixes #1620. References #1623.
+      Updated user documentation. Backward Compatibility Issue: The MATCHBANDBIN parameter now
+      defaults to FALSE because the input cubes for handmos are not required to have the BandBin
+      group in the cube labels which could impact processing scripts/pipelines. Fixes #1620.
+      References #1623.
     </change>
   </history>
 

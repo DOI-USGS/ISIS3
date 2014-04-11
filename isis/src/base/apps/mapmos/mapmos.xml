@@ -449,10 +449,7 @@
       extents are missing, an error will be thrown. Fixes #1550.
     </change>
     <change name="Kimberly Oyama and Tammy Becker" date="2014-04-05">
-      Updated Documentation. Updated unit test for priority=band. Backward Compatibility Issue:
-      The MATCHBANDBIN parameter now defaults to FALSE because the input cubes for handmos are not
-      required to have the BandBin group in the cube labels which could impact processing
-      scripts/pipelines. Fixes #1620. References #1623. References #1550.
+      Updated Documentation. Updated unit test for priority=band. Fixes #1620. References #1623. References #1550.
     </change>
   </history>
 
