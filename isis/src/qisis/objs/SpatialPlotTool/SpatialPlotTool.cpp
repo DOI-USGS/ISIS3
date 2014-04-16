@@ -269,13 +269,15 @@ namespace Isis {
             m_xUnitsCombo->currentIndex()).toInt();
 
       QPen spatialPen(Qt::white);
-      spatialPen.setWidth(2);
+      spatialPen.setWidth(1);
+      spatialPen.setStyle(Qt::SolidLine);
 
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
         if (!(*m_spatialCurves)[viewport] ||
             (*m_spatialCurves)[viewport]->xUnits() != targetUnits) {
           CubePlotCurve *plotCurve = createCurve("DN Values", spatialPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_spatialCurves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }

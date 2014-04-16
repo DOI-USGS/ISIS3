@@ -45,6 +45,9 @@ namespace Isis {
    *                           instead of Projection.  References #775.
    *   @history 2013-01-24 Steven Lambright - Fixed positioning of portal/interpolator used
    *                           when reading DN data to create a plot. Fixes #997.
+   *   @history 2014-04-15 Tracie Sucharski - Reset defaults for plots to the following:
+   *                         SolidLine, Width=1, NoSymbols.  This is a temporary fix until
+   *                         the defaults can be saved on a user basis.  Fixes #2062.
    */
   class SpatialPlotTool : public AbstractPlotTool {
       Q_OBJECT

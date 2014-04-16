@@ -458,23 +458,23 @@ namespace Isis {
             m_displayCombo->currentIndex()).toInt();
 
       QPen avgPen(Qt::white);
-      avgPen.setWidth(2);
-      avgPen.setStyle(Qt::NoPen);
+      avgPen.setWidth(1);
+      avgPen.setStyle(Qt::SolidLine);
 
       QPen minMaxPen(Qt::cyan);
 //       minMaxPen.setStyle(Qt::DashLine);
-      minMaxPen.setWidth(2);
-      minMaxPen.setStyle(Qt::NoPen);
+      minMaxPen.setWidth(1);
+      minMaxPen.setStyle(Qt::SolidLine);
 
       QPen stdDevPen(Qt::red);
-      stdDevPen.setWidth(2);
+      stdDevPen.setWidth(1);
 //       stdDevPen.setStyle(Qt::DotLine);
-      stdDevPen.setStyle(Qt::NoPen);
+      stdDevPen.setStyle(Qt::SolidLine);
 
       QPen stdErrPen(Qt::green);
-      stdErrPen.setWidth(2);
+      stdErrPen.setWidth(1);
 //       stdErrPen.setStyle(Qt::DotLine);
-      stdErrPen.setStyle(Qt::NoPen);
+      stdErrPen.setStyle(Qt::SolidLine);
 
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
         if (m_plotAvgAction->isChecked() &&
@@ -482,6 +482,7 @@ namespace Isis {
             (*m_avgCurves)[viewport]->xUnits() != targetUnits)) {
           CubePlotCurve *plotCurve = createCurve("Average", avgPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_avgCurves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
@@ -491,6 +492,7 @@ namespace Isis {
             (*m_minCurves)[viewport]->xUnits() != targetUnits)) {
           CubePlotCurve *plotCurve = createCurve("Minimum", minMaxPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_minCurves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
@@ -500,6 +502,7 @@ namespace Isis {
             (*m_maxCurves)[viewport]->xUnits() != targetUnits)) {
           CubePlotCurve *plotCurve = createCurve("Maximum", minMaxPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_maxCurves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
@@ -509,6 +512,7 @@ namespace Isis {
             (*m_stdDev1Curves)[viewport]->xUnits() != targetUnits)) {
           CubePlotCurve *plotCurve = createCurve("+ Sigma", stdDevPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_stdDev1Curves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
@@ -518,6 +522,7 @@ namespace Isis {
             (*m_stdDev2Curves)[viewport]->xUnits() != targetUnits)) {
           CubePlotCurve *plotCurve = createCurve("- Sigma", stdDevPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_stdDev2Curves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
@@ -527,6 +532,7 @@ namespace Isis {
             (*m_stdErr1Curves)[viewport]->xUnits() != targetUnits)) {
           CubePlotCurve *plotCurve = createCurve("+ Std Error", stdErrPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_stdErr1Curves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
@@ -536,6 +542,7 @@ namespace Isis {
             (*m_stdErr2Curves)[viewport]->xUnits() != targetUnits)) {
           CubePlotCurve *plotCurve = createCurve("- Std Error", stdErrPen,
               targetUnits, CubePlotCurve::CubeDN);
+          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_stdErr2Curves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
