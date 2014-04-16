@@ -81,7 +81,12 @@ namespace Isis {
    *                          finding either north or south poles in images.  References #1289.
    *   @history 2013-08-12 Tracie Sucharski - Change all computations base on latitude and
    *                          longitude to x, y and z.  This takes care of pole problems and
-   *                          improves accuracy.
+   *                          improves accuracy.  Fixes #1289.
+   *   @history 2014-04-09 Tracie Sucharski - When changing the camera model from lat/lon
+   *                          to x/y/z calculations the range checking was removed.  This caused
+   *                          extra pixels to be projected into incorrect positions when doing
+   *                          global projections. Range checking was put back in using x/y/z values.
+   *                          References #1289.
    */
   class VimsGroundMap : public CameraGroundMap {
     public:
@@ -129,6 +134,10 @@ namespace Isis {
                                       This will be image size unless occultation image */
       int    p_camSampOffset;    //!< Sample offset                                                     
       int    p_camLineOffset;    //!< Line offset                                                       
+
+      double p_minX,p_maxX;
+      double p_minY,p_maxY;
+      double p_minZ,p_maxZ;
 
       QVector3D p_xyzMap[64][64];
      

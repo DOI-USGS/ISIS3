@@ -54,6 +54,13 @@ namespace Isis {
   VimsGroundMap::VimsGroundMap(Camera *parent, Pvl &lab) :
     CameraGroundMap(parent) {
 
+    p_minX = DBL_MAX;
+    p_maxX = -DBL_MAX;
+    p_minY = DBL_MAX;
+    p_maxY = -DBL_MAX;
+    p_minZ = DBL_MAX;
+    p_maxZ = -DBL_MAX;
+
     if (parent->ParentSamples() > 64 || parent->ParentLines() > 64) {
       IString msg = "The Vims ground map does not understand cubes that "
                     "initially have more than 64 lines or 64 samples.";
@@ -67,6 +74,7 @@ namespace Isis {
    * Destroys the VimsGroundMap object
    */
   VimsGroundMap::~VimsGroundMap() {
+
   }
 
 
@@ -104,7 +112,18 @@ namespace Isis {
    *                          put in the code since he said the label values were incorrect.
    *                          11-27-2006 John Ivens said the labels values were corrected, so I
    *                          removed the correction factor from the code.
-   *                          For more info, See previous history entries: 2007-04-18.                                                       
+   *                          For more info, See previous history entries: 2007-04-18.
+   *  @history 2014-04-09 Tracie Sucharski - When converting the camera model from lat/lon to x/y/z
+   *                          calculations, the range check in the SetGround method was removed.
+   *                          When creating global projections,  the pixel data would be replicated
+   *                          in incorrect locations due to the least squares fitting always finding
+   *                          a fit, even if it's incorrect.  The range checking was added back in
+   *                          using x/y/z min/max values.  However, this caused the pole not to be
+   *                          found, so the min/max z values are adjusted to include the pole if
+   *                          they are within 1 km of the pole.  This value was chosen through
+   *                          trial and error, and I have concerns that this may need to be
+   *                          adjusted for images with different resolutions.  I think it would
+   *                          just cause a few extra pixels at the edge worse case scenario.
    */
   void VimsGroundMap::Init(Pvl &lab) {
 
@@ -209,6 +228,7 @@ namespace Isis {
         }
 
         if (p_camera->SetImage((double) samp + 1, (double)line + 1)) {
+
           double xyz[3];
           p_camera->Coordinate(xyz);
 
@@ -216,10 +236,41 @@ namespace Isis {
             p_xyzMap[line][samp].setX(xyz[0]);
             p_xyzMap[line][samp].setY(xyz[1]);
             p_xyzMap[line][samp].setZ(xyz[2]);
+
+//          if (samp !=0 ) {
+//            QVector3D deltaXyz = p_xyzMap[line][samp-1] - p_xyzMap[line][samp];
+//            qDebug()<<"samp:line = "<<samp<<" : "<<line<<" xyzMap[line][samp-1] = "<<p_xyzMap[line][samp-1]<<"  xyzMap[line][samp] = "<<p_xyzMap[line][samp]<<"  delta = "<<deltaXyz.length();
+//          }
+
+            // Find min/max x,y,z for use in SetGround method to make sure incoming lat/lon falls
+            // within image.
+            if (xyz[0] < p_minX) p_minX = xyz[0];
+            if (xyz[0] > p_maxX) p_maxX = xyz[0];
+            if (xyz[1] < p_minY) p_minY = xyz[1];
+            if (xyz[1] > p_maxY) p_maxY = xyz[1];
+            if (xyz[2] < p_minZ) p_minZ = xyz[2];
+            if (xyz[2] > p_maxZ) p_maxZ = xyz[2];
           }
         }
       }
     }
+
+    //  Fine tune min/max Z so that if the pole is actually in the image, it will be found in
+    //  the SetGround method.  If the min/max values found for pixels centers is used, the pole
+    //  will not be found even if it is actually in the image.  if the min/max z values are within
+    //  1 km of the radius, set to the radius.
+
+    //  NOTE:  IF THERE ARE PROBLEMS FOUND IN THE CAMERA MODEL,  THIS WOULD BE THE FIRST PLACE
+    //         I WOULD LOOK.
+    Distance radii[3];
+    p_camera->radii(radii);
+    if (abs(abs(p_minZ) - radii[2].kilometers()) < 1.0) {
+      p_minZ = radii[2].kilometers() * (int(abs(p_minZ) / p_minZ));
+    }
+    if (abs(abs(p_maxZ) - radii[2].kilometers()) < 1.0) {
+      p_maxZ = radii[2].kilometers() * (int(abs(p_maxZ) / p_maxZ));
+    }
+
     p_camera->IgnoreProjection(false);
   }
 
@@ -313,9 +364,17 @@ namespace Isis {
    * @history 2012-12-03  Tracie Sucharski - Check for valid minLat/maxLat, minLon/maxLon.  If 
    *                            none are valid, this means the latMap and lonMap have no valid
    *                            data, therefore we cannot back project, so return false.
+   * @history 2014-04-08  Tracie Sucharski - Change the sanity check made on 2012-12-03 from lat/lon 
+   *                            to xyz.
    *
    */
   bool VimsGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+
+
+    //  Make sure at least 1 pixel in image has projected onto surface
+    if (p_minX == DBL_MAX || p_maxX == -DBL_MAX ||
+        p_minY == DBL_MAX || p_maxY == -DBL_MAX ||
+        p_minZ == DBL_MAX || p_maxZ == -DBL_MAX) return false;
 
     QVector3D xyz;
     if (p_camera->target()->shape()->name() == "Plane") {
@@ -335,6 +394,11 @@ namespace Isis {
         Distance radius = p_camera->LocalRadius(lat, lon);
         SpiceDouble pB[3];
         latrec_c(radius.kilometers(), lon.radians(), lat.radians(), pB);
+
+        //  Make sure this point falls within range of image
+        if (pB[0] < p_minX || pB[0] > p_maxX ||
+            pB[1] < p_minY || pB[1] > p_maxY ||
+            pB[2] < p_minZ || pB[2] > p_maxZ) return false;
 
         xyz.setX(pB[0]);
         xyz.setY(pB[1]);
@@ -366,7 +430,7 @@ namespace Isis {
     //  closest point.  Use this point and surrounding 8 pts as
     //  control pts.
     //----------------------------------------------------------------
-    if (minDist >= DBL_MAX) return false;
+    if (minDist >= DBL_MAX) return false; 
 
     //-------------------------------------------------------------
     //  Set-up for LU decomposition (least2 fit).
@@ -415,6 +479,7 @@ namespace Isis {
       return false;
     }
 
+    // Sanity check
     p_camera->IgnoreProjection(true);
     p_camera->SetImage(inSamp, inLine);
     p_camera->IgnoreProjection(false);
