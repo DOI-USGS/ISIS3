@@ -20,7 +20,7 @@ namespace Isis {
    * properties.
    */
   PlotCurve::PlotCurve(Units xUnits, Units yUnits)  : QwtPlotCurve() {
-    m_markerSymbol.setStyle(QwtSymbol::XCross);
+    m_markerSymbol.setStyle(QwtSymbol::NoSymbol);
     m_markerSymbol.setSize(6, 6);
     m_color = QColor(Qt::white);
     m_xUnits = xUnits;

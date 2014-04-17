@@ -277,7 +277,6 @@ namespace Isis {
             (*m_spatialCurves)[viewport]->xUnits() != targetUnits) {
           CubePlotCurve *plotCurve = createCurve("DN Values", spatialPen,
               targetUnits, CubePlotCurve::CubeDN);
-          plotCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
           m_spatialCurves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
