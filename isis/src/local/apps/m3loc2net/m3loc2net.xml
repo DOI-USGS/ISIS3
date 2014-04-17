@@ -21,7 +21,10 @@
 
 <history>
   <change name="Tracie Sucharski" date="2013-07-19">
-Original version
+    Original version
+  </change>
+  <change name="Tracie Sucharski" date="2014-04-17">
+    Make sure control points are always included for last line and last sample in cube.
   </change>
 </history>
 

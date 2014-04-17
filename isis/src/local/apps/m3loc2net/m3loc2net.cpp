@@ -77,7 +77,7 @@ void IsisMain() {
     locBrick.SetBasePosition(1, line + 1, 1);
     locCube.read(locBrick);
     for (int samp = 0; samp < inputCube.sampleCount(); samp += sampInc) {
-
+      qDebug()<<"samp : line = "<<samp<<" : "<<line;
       ControlPoint *point = new ControlPoint(pointId.Next());
       point->SetId(pointId.Next());
       point->SetType(ControlPoint::Fixed);
@@ -108,8 +108,19 @@ void IsisMain() {
       point->Add(measure);
 
       cnet.AddPoint(point);
+
+      //  Make sure last sample is always included
+      if ((samp != (inputCube.sampleCount() - 1)) && ((samp + sampInc) >= inputCube.sampleCount())) {
+        samp = inputCube.sampleCount() - sampInc - 1;
+        qDebug()<<"lastSamp = "<<samp;
+      }
  
 //      gridStatus.CheckStatus();
+    }
+    //  Make sure last line is always included
+    if ((line != (inputCube.lineCount() - 1)) && ((line + lineInc) >= inputCube.lineCount())) {
+      line = inputCube.lineCount() - lineInc - 1;
+      qDebug()<<"lastLine = "<<line;
     }
   }
 
