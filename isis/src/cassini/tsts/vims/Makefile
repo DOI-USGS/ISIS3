@@ -9,6 +9,8 @@ CAMPT = campt
 CAM2MAP = cam2map
 GETSN = getsn
 
+C1514302573_1.irBand71.sinu.cub.TOLERANCE = 0.0000001 
+ 
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
