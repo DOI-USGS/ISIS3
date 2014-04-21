@@ -115,6 +115,7 @@ namespace Isis {
       virtual bool isExecutable(Context);
       virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(ImageList *images);
+      virtual bool isExecutable(QString projectFileName);
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
       virtual void setData(Context);
