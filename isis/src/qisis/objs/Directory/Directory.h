@@ -81,6 +81,10 @@ namespace Isis {
       void setHistoryContainer(QDockWidget *historyContainer);
       void setWarningContainer(QDockWidget *warningContainer);
 
+      // TODO
+      void setRecentProjectsList(QStringList recentProjects);
+      QStringList recentProjectsList() { return m_recentProjects; }
+
       CnetEditorWidget *addCnetEditorView(Control *network);
       Workspace *addCubeDnView();
       MosaicSceneWidget *addFootprint2DView();
@@ -148,6 +152,7 @@ namespace Isis {
       void cleanupFileListWidgets();
       void cleanupFootprint2DViewWidgets();
       void imagesAddedToProject(ImageList *images);
+      void updateRecentProjects(Project *);
 
     private:
       /**
@@ -203,6 +208,8 @@ namespace Isis {
 
       QList< QPointer<WorkOrder> > m_workOrders;
 
+      QStringList m_recentProjects;
+
       // We only need to store the work orders that go into menus uniquely... all work orders
       //   (including these) should be stored in m_workOrders
       QPointer<WorkOrder> m_exportControlNetWorkOrder;
@@ -212,8 +219,11 @@ namespace Isis {
       QPointer<WorkOrder> m_openProjectWorkOrder;
       QPointer<WorkOrder> m_saveProjectWorkOrder;
       QPointer<WorkOrder> m_saveProjectAsWorkOrder;
+      QPointer<WorkOrder> m_openRecentProjectWorkOrder;
+      QPointer<WorkOrder> m_closeProjectWorkOrder;
 
       QPointer<WorkOrder> m_renameProjectWorkOrder;
+      QPointer<WorkOrder> m_runJigsawWorkOrder;
   };
 }
 

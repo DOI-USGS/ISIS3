@@ -35,6 +35,7 @@
 #include <QStringList>
 #include <QXmlStreamWriter>
 
+#include "CloseProjectWorkOrder.h"
 #include "CnetEditorViewWorkOrder.h"
 #include "CnetEditorWidget.h"
 #include "Control.h"
@@ -52,6 +53,7 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImageFileListWidget.h"
+#include "JigsawWorkOrder.h"
 #include "MosaicSceneWidget.h"
 #include "OpenProjectWorkOrder.h"
 #include "Project.h"
@@ -59,6 +61,8 @@
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
 #include "SaveProjectAsWorkOrder.h"
+#include "OpenRecentProjectWorkOrder.h"
+#include "ViewControlNet3DWorkOrder.h"
 #include "WarningTreeWidget.h"
 #include "WorkOrder.h"
 #include "Workspace.h"
@@ -81,6 +85,9 @@ namespace Isis {
     connect(m_project, SIGNAL(imagesAdded(ImageList *)),
             this, SLOT(imagesAddedToProject(ImageList *)));
 
+    connect(m_project, SIGNAL(projectLoaded(Project *)),
+            this, SLOT(updateRecentProjects(Project *)));
+
     m_projectTreeWidget = new ProjectTreeWidget(this);
 
     try {
@@ -88,16 +95,19 @@ namespace Isis {
       createWorkOrder<CubeViewportViewWorkOrder>();
       createWorkOrder<Footprint2DViewWorkOrder>();
       createWorkOrder<ImageFileListViewWorkOrder>();
+      createWorkOrder<ViewControlNet3DWorkOrder>();
 
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
       m_exportImagesWorkOrder = createWorkOrder<ExportImagesWorkOrder>();
       m_importControlNetWorkOrder = createWorkOrder<ImportControlNetWorkOrder>();
       m_importImagesWorkOrder = createWorkOrder<ImportImagesWorkOrder>();
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
+      m_openRecentProjectWorkOrder = createWorkOrder<OpenRecentProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
       m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
-
       m_renameProjectWorkOrder = createWorkOrder<RenameProjectWorkOrder>();
+      m_closeProjectWorkOrder = createWorkOrder<CloseProjectWorkOrder>();
+      m_runJigsawWorkOrder = createWorkOrder<JigsawWorkOrder>();
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
@@ -122,31 +132,66 @@ namespace Isis {
   void Directory::populateMainMenu(QMenuBar *menuBar) {
     QMenu *fileMenu = menuBar->findChild<QMenu *>("fileMenu");
     if (fileMenu) {
-      fileMenu->addAction(m_importControlNetWorkOrder->clone());
-      fileMenu->addAction(m_importImagesWorkOrder->clone());
-      fileMenu->addSeparator();
-      fileMenu->addAction(m_openProjectWorkOrder->clone());
+      QAction *openProjectAction = m_openProjectWorkOrder->clone();
+      openProjectAction->setIcon(QIcon(":open"));
+      fileMenu->addAction(openProjectAction);
+
+      QMenu *recentProjectsMenu = fileMenu->addMenu("Recent P&rojects");
+      int nRecentProjects = m_recentProjects.size();
+      for (int i = 0; i < nRecentProjects; i++) {
+        FileName projectFileName = m_recentProjects.at(i);
+        if (!projectFileName.fileExists())
+          continue;
+
+        QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
+        openRecentProjectAction->setData(m_recentProjects.at(i));
+        openRecentProjectAction->setText(m_recentProjects.at(i));
+
+//        if (!openRecentProjectWorkOrder->isExecutable(m_recentProjects.at(i)))
+//          continue;
+
+//        QAction *openRecentProjectAction = (QAction*)openRecentProjectWorkOrder;
+
+        recentProjectsMenu->addAction(openRecentProjectAction);
+      }
+
       fileMenu->addSeparator();
 
       QAction *saveAction = m_saveProjectWorkOrder->clone();
       saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
+      saveAction->setIcon(QIcon(":save"));
 
       connect(project()->undoStack(), SIGNAL(cleanChanged(bool)),
               saveAction, SLOT(setDisabled(bool)));
 
       fileMenu->addAction(saveAction);
 
-      fileMenu->addAction(m_saveProjectAsWorkOrder->clone());
+      QAction *addAction = m_saveProjectAsWorkOrder->clone();
+      addAction->setIcon(QIcon(":saveAs"));
+      fileMenu->addAction(addAction);
 
       fileMenu->addSeparator();
-      fileMenu->addAction(m_exportControlNetWorkOrder->clone());
-      fileMenu->addAction(m_exportImagesWorkOrder->clone());
+
+      QMenu *importMenu = fileMenu->addMenu("&Import");
+      importMenu->addAction(m_importControlNetWorkOrder->clone());
+      importMenu->addAction(m_importImagesWorkOrder->clone());
+
+      QMenu *exportMenu = fileMenu->addMenu("&Export");
+
+      exportMenu->addAction(m_exportControlNetWorkOrder->clone());
+      exportMenu->addAction(m_exportImagesWorkOrder->clone());
+
+      fileMenu->addSeparator();
+
+      fileMenu->addAction(m_closeProjectWorkOrder->clone());
+
       fileMenu->addSeparator();
     }
 
     QMenu *projectMenu = menuBar->findChild<QMenu *>("projectMenu");
     if (projectMenu) {
       projectMenu->addAction(m_renameProjectWorkOrder->clone());
+      projectMenu->addAction(m_runJigsawWorkOrder->clone());
     }
   }
 
@@ -164,6 +209,11 @@ namespace Isis {
       m_warningTreeWidget = new WarningTreeWidget;
     }
     warningContainer->setWidget(m_warningTreeWidget);
+  }
+
+
+  void Directory::setRecentProjectsList(QStringList recentProjects) {
+    m_recentProjects.append(recentProjects);
   }
 
 
@@ -339,6 +389,12 @@ namespace Isis {
 
   void Directory::imagesAddedToProject(ImageList *imageList) {
     m_projectTreeWidget->addImageGroup(imageList);
+  }
+
+
+  void Directory::updateRecentProjects(Project *project) {
+    if (!m_recentProjects.contains(project->projectRoot()))
+      m_recentProjects.insert(0, project->projectRoot());
   }
 
 

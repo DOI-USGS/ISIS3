@@ -24,12 +24,9 @@
  */
 #include "WorkOrder.h"
 
-#include "FileName.h"
-
 class QString;
 
 namespace Isis {
-  class FileName;
 
   /**
    * This opens a project that's saved on disk.
