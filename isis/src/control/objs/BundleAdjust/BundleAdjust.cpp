@@ -124,34 +124,6 @@ namespace Isis {
     m_dConvergenceThreshold = 0.;    // This is needed for deltack???
     m_strCnetFileName = "";
     m_strOutputFilePrefix = "";
-    m_bDeltack = true;
-
-    Init();
-
-    //cumulative residual probability distribution calculator
-    m_cumProRes = new StatCumProbDistDynCalc;
-    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
-
-    //initialize maximum likelihood estimation parameters
-    m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
-    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defual
-    m_cumPro=NULL;    
-    m_maxLikelihoodIndex=0;
-  }
-
-
-  BundleAdjust::BundleAdjust(Isis::ControlNet &cnet,
-                             Isis::SerialNumberList &snlist,
-                             Isis::SerialNumberList &heldsnlist,
-                             bool bPrintSummary) {
-    m_bCleanUp = false;
-    m_pCnet = &cnet;
-    m_pSnList = &snlist;
-    m_pHeldSnList = &heldsnlist;
-    m_bPrintSummary = bPrintSummary;
-    m_strCnetFileName = "";
-    m_strOutputFilePrefix = "";
-    m_bDeltack = false;
 
     Init();
 
@@ -605,6 +577,14 @@ namespace Isis {
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
       }
     }
+  }
+
+  /**
+   * Sets deltack flag
+   *
+   */
+  void BundleAdjust::SetDeltaCK(bool bdeltaCK) {
+    m_bDeltack = bdeltaCK;
   }
 
 

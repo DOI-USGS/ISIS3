@@ -289,6 +289,7 @@ namespace Isis {
       int IgnoredPoints() const { return m_nIgnoredPoints; }
       int FixedPoints() const { return m_nFixedPoints; }
       void SetObservationMode(bool bObservationMode);
+      void SetDeltaCK(bool bdeltaCK);
 
       void SetConvergenceThreshold(double d) { m_dConvergenceThreshold = d; }
       void SetMaxIterations(int n) { m_nMaxIterations = n; }
