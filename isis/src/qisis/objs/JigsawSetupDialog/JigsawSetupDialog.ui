@@ -1,0 +1,676 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>JigsawSetupDialog</class>
+ <widget class="QDialog" name="JigsawSetupDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>668</width>
+    <height>595</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Jigsaw Setup</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/jigsaw.png</normaloff>icons/jigsaw.png</iconset>
+  </property>
+  <property name="inputMethodHints">
+   <set>Qt::ImhNone</set>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>560</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="JigsawSetup">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>671</width>
+     <height>561</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>General</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>190</y>
+       <width>310</width>
+       <height>338</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="5" column="0" colspan="2">
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="14" column="0">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>CKDegree</string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="0" colspan="2">
+       <widget class="QComboBox" name="PointingCombobox">
+        <property name="maximumSize">
+         <size>
+          <width>1000</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Camera Pointing Options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>ANGLES</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>NONE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>VELOCITIES</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ACCELERATION</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ALL</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="2">
+       <widget class="QComboBox" name="SpacecraftCombobox">
+        <property name="maximumSize">
+         <size>
+          <width>201</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spacecraft Solve Options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>NONE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>POSITION</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>VELOCITY</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ACCELERATION</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ALL</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>SPKSolveDegree</string>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="1">
+       <widget class="QSpinBox" name="CKSolveDegree">
+        <property name="minimum">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>SPKDegree</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" colspan="2">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="13" column="0">
+       <widget class="QCheckBox" name="Twist">
+        <property name="text">
+         <string>Twist</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Solve Method</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="1">
+       <widget class="QSpinBox" name="CKDegree">
+        <property name="minimum">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0" colspan="2">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Camera Pointing Solve Options</string>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QSpinBox" name="SPKDegree">
+        <property name="minimum">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="SolveMethod">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Solve method&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>SPARSE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>SPECIALK</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QSpinBox" name="SPKSolveDegree">
+        <property name="minimum">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>CKSolveDegree</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Spacecraft Solve Options</string>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>11</y>
+       <width>222</width>
+       <height>139</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="ObservationMode">
+        <property name="text">
+         <string>Observation Mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="Radius">
+        <property name="text">
+         <string>Radius</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QCheckBox" name="UpdateCubeLabel">
+        <property name="text">
+         <string>Update Cube Label</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="ErrorPropagation">
+        <property name="minimumSize">
+         <size>
+          <width>74</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Error Propagation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="OutlierRejection">
+        <property name="minimumSize">
+         <size>
+          <width>74</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Outlier Rejection</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1" colspan="2">
+       <widget class="QLineEdit" name="OutlierRejectionMultiplier">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Outlier Rejection Multiplier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>3</string>
+        </property>
+        <property name="placeholderText">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="2">
+       <widget class="QLabel" name="label_21">
+        <property name="text">
+         <string>Multiplier</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>10</y>
+       <width>401</width>
+       <height>39</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_22">
+        <property name="text">
+         <string>Control Network</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="ControlNetCombo"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>190</y>
+       <width>222</width>
+       <height>65</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Sigma0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="Sigma0Edit">
+        <property name="text">
+         <string>1.0e-10</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_19">
+        <property name="text">
+         <string>Maximum Iterations</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="MaxIterationsEdit">
+        <property name="text">
+         <string>50</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string>Convergence Criteria</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QDialogButtonBox" name="buttonBox_2">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>560</y>
+       <width>341</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_5">
+    <attribute name="title">
+     <string>Weighting</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>267</width>
+       <height>247</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="4" column="2">
+       <widget class="QLineEdit" name="SpacecraftPositionSigma"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Spacecraft Velocity Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="2">
+       <widget class="QLineEdit" name="SensorAccelerationSigma"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Camera Angles Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>Global Parameter Uncertainties</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Point Latitude Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2">
+       <widget class="QLineEdit" name="SensorAngleSigma"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="PointLongitudeSigma"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Point Longitude Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="PointLatitudeSigma"/>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLineEdit" name="SpacecraftVelocitySigma"/>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Spacecraft Acceleration Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Point Radius Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="PointRadiusSigma"/>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Camera Velocity Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Spacecraft Position Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2">
+       <widget class="QLineEdit" name="SensorVelocitySigma"/>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Camera Acceleration Sigma</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2">
+       <widget class="QLineEdit" name="SpacecraftAccelerationSigma"/>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_4">
+    <attribute name="title">
+     <string>Maximum Liklihood</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Self-Calibration</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Target Body</string>
+    </attribute>
+   </widget>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>ObservationMode</tabstop>
+  <tabstop>Radius</tabstop>
+  <tabstop>UpdateCubeLabel</tabstop>
+  <tabstop>ErrorPropagation</tabstop>
+  <tabstop>OutlierRejection</tabstop>
+  <tabstop>OutlierRejectionMultiplier</tabstop>
+  <tabstop>SolveMethod</tabstop>
+  <tabstop>SpacecraftCombobox</tabstop>
+  <tabstop>SPKDegree</tabstop>
+  <tabstop>SPKSolveDegree</tabstop>
+  <tabstop>PointingCombobox</tabstop>
+  <tabstop>Twist</tabstop>
+  <tabstop>CKDegree</tabstop>
+  <tabstop>CKSolveDegree</tabstop>
+  <tabstop>ControlNetCombo</tabstop>
+  <tabstop>Sigma0Edit</tabstop>
+  <tabstop>MaxIterationsEdit</tabstop>
+  <tabstop>PointLatitudeSigma</tabstop>
+  <tabstop>PointLongitudeSigma</tabstop>
+  <tabstop>PointRadiusSigma</tabstop>
+  <tabstop>SpacecraftPositionSigma</tabstop>
+  <tabstop>SpacecraftVelocitySigma</tabstop>
+  <tabstop>SpacecraftAccelerationSigma</tabstop>
+  <tabstop>SensorAngleSigma</tabstop>
+  <tabstop>SensorVelocitySigma</tabstop>
+  <tabstop>SensorAccelerationSigma</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>JigsawSetup</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>JigsawSetupDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>JigsawSetupDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
