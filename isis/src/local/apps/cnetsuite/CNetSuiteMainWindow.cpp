@@ -119,6 +119,8 @@ namespace Isis {
     foreach (QProgressBar *progressBar, m_directory->progressBars()) {
       statusBar()->addWidget(progressBar);
     }
+
+    setAnimated(false);
   }
 
 
