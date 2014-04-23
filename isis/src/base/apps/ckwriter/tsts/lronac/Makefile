@@ -12,7 +12,9 @@ commands: $(BASES)
 #  Only use 12 digits in the output of tabledump due to precision issues
 $(BASES): $(OUTPUT)/lrock.bc
 	$(CP) $(INPUT)/$@.cub $(OUTPUT)
-	spiceinit from=$(OUTPUT)/$@.cub ck=$(OUTPUT)/lrock.bc > /dev/null;
+	$(RM) $(OUTPUT)/extra.ck
+	getkey from=$(INPUT)/$@.cub objnam=isiscube grpname=Kernels keyword=InstrumentPointing keyindex=2 > $(OUTPUT)/extra.ck;
+	spiceinit from=$(OUTPUT)/$@.cub ck=$(OUTPUT)/lrock.bc extra=`cat $(OUTPUT)/extra.ck` > /dev/null;
 	tabledump from=$(OUTPUT)/$@.cub to=$(OUTPUT)/$@.dat \
 	  name=InstrumentPointing > /dev/null;
 	cat $(OUTPUT)/$@.dat \
@@ -20,6 +22,7 @@ $(BASES): $(OUTPUT)/lrock.bc
 	  > $(OUTPUT)/$@.txt;
 	$(RM) $(OUTPUT)/$@.cub 
 	$(RM) $(OUTPUT)/$@.dat
+	$(RM) $(OUTPUT)/extra.ck
 
 ck: $(OUTPUT)/lrock.bc
 
