@@ -20,6 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QVector>
 #include "CameraDistortionMap.h"
 
 namespace Isis {
@@ -47,26 +48,30 @@ namespace Isis {
    *            the IK based upon analysis of the VIS and UV.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *            coding standards. References #972.
+   *   @history 2011-08-30 Kris Becker - Implemented new decentering distortion
+   *            model.  This becomes version 3 of the camera model
+   *   @history 2012-03-06 Kris Becker - Added distortion model tolerance parameter
+   *   @history 2013-03-07 Kris Becker - Modified to implement new distortion
+   *            model with three terms and allow for band independant
+   *            distortions.
    */
   class LroWideAngleCameraDistortionMap : public CameraDistortionMap {
     public:
       LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode);
 
       //! Destroys the LroWideAngleCameraDistortionMap object
-      virtual ~LroWideAngleCameraDistortionMap() {};
+      virtual ~LroWideAngleCameraDistortionMap() { }
+
+      void addFilter(int naifIkCode);
+      void setBand(int vband);
 
       virtual bool SetFocalPlane(const double dx, const double dy);
 
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
-      void SetFilter(int filter) {
-        p_filter = filter;
-      }
-
     private:
-      int p_filter;
-      double p_k1;
-      double p_k2;
+      QVector<std::vector<double> > m_odkFilters;
+
   };
 };
 #endif

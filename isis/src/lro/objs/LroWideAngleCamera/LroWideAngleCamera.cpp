@@ -19,15 +19,20 @@
  */
 
 #include "LroWideAngleCamera.h"
+#include "LroWideAngleCameraFocalPlaneMap.h"
 #include "LroWideAngleCameraDistortionMap.h"
 
 #include <sstream>
 #include <iomanip>
 
+#include <QString>
+#include <QVector>
+
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
 #include "CollectorMap.h"
 #include "IException.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "PushFrameCameraDetectorMap.h"
@@ -46,42 +51,47 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   LroWideAngleCamera::LroWideAngleCamera(Cube &cube) :
-      PushFrameCamera(cube) {
+    PushFrameCamera(cube) {
+
     NaifStatus::CheckErrors();
     // Set up the camera characteristics
     instrumentRotation()->SetFrame(naifIkCode());
     SetFocalLength();
     SetPixelPitch();
 
+    Pvl &lab = *cube.label();
+
     // Get the ephemeris time from the labels
     double et;
-    Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
     et = getClockTime(stime).Et();
 
-    p_exposureDur = inst["ExposureDuration"];
+    p_exposureDur = toDouble(inst["ExposureDuration"]);
     // TODO:  Changed et - exposure to et + exposure.
     //   Think about if this is correct
     p_etStart = et + ((p_exposureDur / 1000.0) / 2.0);
 
     // Compute the framelet size and number of framelets
-    IString instId = QString((QString) inst["InstrumentId"]).toUpper();
+    QString instId = inst["InstrumentId"][0].toUpper();
 
     int frameletSize = 14;
     int sumMode = 1;
+    int filterIKBase = 10;
 
-    if(instId == "WAC-UV") {
+    if (instId == "WAC-UV") {
       sumMode = 4;
       frameletSize = 16;
+      filterIKBase = 15 - 1; //  New UV IK code = filterIKBase + BANDID
     }
-    else if(instId == "WAC-VIS") {
+    else if (instId == "WAC-VIS") {
       sumMode = 1;
       frameletSize = 14;
+      filterIKBase = 10 - 3; //  New VIS IK code = filterIKBase + BANDID
     }
     else {
-      string msg = "Invalid value [" + instId
-                   + "] for keyword [InstrumentId]";
+      QString msg = "Invalid value [" + instId
+                    + "] for keyword [InstrumentId]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -91,8 +101,9 @@ namespace Isis {
     int nbands = (int) lab.findKeyword("Bands", PvlObject::Traverse);
     const PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
     const PvlKeyword &filtNames = bandBin["Center"];
+
     // Sanity check
-    if(nbands != filtNames.size()) {
+    if (nbands != filtNames.size()) {
       ostringstream mess;
       mess << "Number bands in (file) label (" << nbands
            << ") do not match number of values in BandBin/Center keyword ("
@@ -104,42 +115,55 @@ namespace Isis {
     bool dataflipped = (inst["DataFlipped"][0].toUpper() == "YES");
 
     //  Now create detector offsets
-    QString instCode = "INS" + toString(naifIkCode());
+    QString instCode = "INS" + QString::number(naifIkCode());
+
     QString ikernKey = instCode + "_FILTER_BANDCENTER";
-    vector<int> fbc = GetVector(ikernKey);
+    IntParameterList fbc = GetVector(ikernKey);
+
     ikernKey = instCode + "_FILTER_OFFSET";
-    vector<int> foffset = GetVector(ikernKey);
+    IntParameterList foffset = GetVector(ikernKey);
+
+    //  Get band ID to determine new filter dependent IK codes
+    ikernKey = instCode + "_FILTER_BANDID";
+    IntParameterList fbandid = GetVector(ikernKey);
 
 
     // Create a map of filter wavelength to offset.  Also needs a reverse
     // lookup to order the offset into the CCD (ascending sort provided
     // automagically be CollectorMap).
-    CollectorMap<int, int> filterToDetectorOffset, wavel;
-    for(unsigned int i = 0 ; i < foffset.size() ; i++) {
+    CollectorMap<int, int> filterToDetectorOffset, wavel,filterIKCode;
+    for (int i = 0 ; i < foffset.size() ; i++) {
       filterToDetectorOffset.add(fbc[i], foffset[i]);
       wavel.add(foffset[i], fbc[i]);
+      filterIKCode.add(fbc[i], naifIkCode() - (filterIKBase + fbandid[i]));  // New IK code
     }
 
     // Construct special format for framelet offsets into CCD.  Uses the above
     // reverse map.  Need only get the value (wavelength) of the map as the
     // key (offset) is sorted above.
     int frameletOffsetFactor = inst["ColorOffset"];
-    if(dataflipped) frameletOffsetFactor *= -1;
+    if ( dataflipped ) frameletOffsetFactor *= -1;
     CollectorMap<int, int> filterToFrameletOffset;
-    for(int j = 0 ; j < wavel.size() ; j++) {
+    for (int j = 0 ; j < wavel.size() ; j++) {
       int wavelen = wavel.getNth(j);
       filterToFrameletOffset.add(wavelen, j * frameletOffsetFactor);
     }
 
-    //  Now map the actual filter that exist in cube
-    for(int i = 0; i < filtNames.size(); i++) {
-      if(!filterToDetectorOffset.exists((IString)filtNames[i])) {
+    //  Now map the actual filters that exist in cube to camera components or
+    // storage vectors for later band selection (see SetBand(vband))
+    for (int i = 0; i < filtNames.size(); i++) {
+      if (!filterToDetectorOffset.exists(filtNames[i].toInt())) {
         QString msg = "Unrecognized filter name [" + filtNames[i] + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-      p_detectorStartLines.push_back(filterToDetectorOffset.get((IString)filtNames[i]));
-      p_frameletOffsets.push_back(filterToFrameletOffset.get((IString)filtNames[i]));
+      p_detectorStartLines.push_back(filterToDetectorOffset.get(filtNames[i].toInt()));
+      p_frameletOffsets.push_back(filterToFrameletOffset.get(filtNames[i].toInt()));
+
+      QString kBase = "INS" + QString::number(filterIKCode.get(filtNames[i].toInt()));
+      p_focalLength.push_back(getDouble(kBase+"_FOCAL_LENGTH"));
+      p_boreSightSample.push_back(getDouble(kBase+"_BORESIGHT_SAMPLE"));
+      p_boreSightLine.push_back(getDouble(kBase+"_BORESIGHT_LINE"));
     }
 
     // Setup detector map
@@ -152,24 +176,10 @@ namespace Isis {
     // flipping disabled if already flipped
     bool flippedFramelets = dataflipped;
     dmap->SetFlippedFramelets(flippedFramelets, p_nframelets);
-
-    // Setup focal plane map
-    new CameraFocalPlaneMap(this, naifIkCode());
-
-    // The line detector origin varies based on instrument mode
-    double detectorOriginLine;
-    double detectorOriginSamp;
-
     dmap->SetGeometricallyFlippedFramelets(false);
 
-    ikernKey = instCode + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = getDouble(ikernKey);
-
-    ikernKey = instCode + "_BORESIGHT_LINE";
-    double lineBoreSight = getDouble(ikernKey);
-
     //  get instrument-specific sample offset
-    QString instModeId = ((QString)inst["InstrumentModeId"]).toUpper();
+    QString instModeId = inst["InstrumentModeId"][0].toUpper();
     // For BW mode, add the mode (0,1 (non-polar) or 2,3 (polar)) used to
     // acquire image
     if (instModeId == "BW") {
@@ -178,26 +188,25 @@ namespace Isis {
       //   and there must be 1 filter.
       p_frameletOffsets[0] = 0;
     }
+
     ikernKey = instCode + "_" + instModeId + "_SAMPLE_OFFSET";
     int sampOffset = getInteger(ikernKey);
-
-    detectorOriginSamp = sampleBoreSight + 1;
-    detectorOriginLine = lineBoreSight + 1;
-
-    FocalPlaneMap()->SetDetectorOrigin(detectorOriginSamp,
-                                       detectorOriginLine);
     dmap->SetStartingDetectorSample(sampOffset+1);
 
-    // Setup distortion map
-    new LroWideAngleCameraDistortionMap(this, naifIkCode());
+    // Setup focal plane and distortion maps
+    LroWideAngleCameraFocalPlaneMap *fplane = new LroWideAngleCameraFocalPlaneMap(this, naifIkCode());
+    LroWideAngleCameraDistortionMap *distort = new LroWideAngleCameraDistortionMap(this, naifIkCode());
+    for ( int i = 0 ; i < filtNames.size() ; i++ ) {
+      fplane->addFilter(filterIKCode.get(filtNames[i].toInt()));
+      distort->addFilter(filterIKCode.get(filtNames[i].toInt()));
+    }
 
     // Setup the ground and sky map
-    bool evenFramelets = (QString(inst["Framelets"][0]).toUpper()
-                          == "EVEN");
-
+    bool evenFramelets = (inst["Framelets"][0].toUpper() == "EVEN");
     new PushFrameCameraGroundMap(this, evenFramelets);
-
     new CameraSkyMap(this);
+
+    SetBand(1);
     LoadCache();
     NaifStatus::CheckErrors();
 
@@ -219,7 +228,7 @@ namespace Isis {
 
     // Sanity check on requested band
     int maxbands = min(p_detectorStartLines.size(), p_frameletOffsets.size());
-    if((vband <= 0) || (vband > maxbands)) {
+    if ((vband <= 0) || (vband > maxbands)) {
       ostringstream mess;
       mess << "Requested virtual band (" << vband
            << ") outside valid (BandBin/Center) limits (1 - " << maxbands
@@ -233,6 +242,17 @@ namespace Isis {
     dmap = (PushFrameCameraDetectorMap *) DetectorMap();
     dmap->SetBandFirstDetectorLine(p_detectorStartLines[vband - 1]);
     dmap->SetFrameletOffset(p_frameletOffsets[vband - 1]);
+
+    SetFocalLength(p_focalLength[vband-1]);
+
+    LroWideAngleCameraFocalPlaneMap *fplane = (LroWideAngleCameraFocalPlaneMap *) FocalPlaneMap();
+    fplane->setBand(vband);
+    fplane->SetDetectorOrigin(p_boreSightSample[vband-1] + 1.0, 
+                              p_boreSightLine[vband-1]   + 1.0);
+
+    LroWideAngleCameraDistortionMap *distort = (LroWideAngleCameraDistortionMap *) DistortionMap();
+    distort->setBand(vband);
+    return;
   }
 
   /**
@@ -244,7 +264,7 @@ namespace Isis {
     SpiceInt n;
     SpiceChar ctype[1];
     dtpool_c(key.toAscii().data(), &found, &n, ctype);
-    if(!found) n = 0;
+    if (!found) n = 0;
     return (n);
   }
 
@@ -252,23 +272,23 @@ namespace Isis {
    * @param key
    * @return @b vector < @b int >
    */
-  vector<int> LroWideAngleCamera::GetVector(const QString &key) {
+  LroWideAngleCamera::IntParameterList LroWideAngleCamera::GetVector(const QString &key) {
     QVariant poolKeySize = getStoredResult(key + "_SIZE", SpiceIntType);
 
     int nvals = poolKeySize.toInt();
 
-    if(nvals == 0) {
+    if (nvals == 0) {
       nvals = PoolKeySize(key);
       storeResult(key + "_SIZE", SpiceIntType, nvals);
     }
 
-    if(nvals <= 0) {
+    if (nvals <= 0) {
       QString mess = "Kernel pool keyword " + key + " not found!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
-    vector<int> parms;
-    for(int i = 0 ; i < nvals ; i++) {
+    IntParameterList parms;
+    for (int i = 0 ; i < nvals ; i++) {
       parms.push_back(getInteger(key, i));
     }
 

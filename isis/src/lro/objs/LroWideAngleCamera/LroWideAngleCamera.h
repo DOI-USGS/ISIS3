@@ -22,13 +22,30 @@
 
 #include "PushFrameCamera.h"
 
+#include <QString>
+#include <QVector>
+
 namespace Isis {
   /**
    * @brief LRO Wide Angle Camera Model
    *
    * This is the camera model for the Lunar Reconnaissance Orbiter wide angle 
-   * camera. 
-   *
+   * camera. Much work has been put into this model by the ASU LROC team. 
+   *  
+   * The current best model (2013-02-19) has the following items changing per 
+   * band: 
+   *     - FOCAL_LENGTH
+   *     - BORESIGHT_SAMPLE
+   *     - BORESIGHT_LINE
+   *     - OD_K
+   *     - TRANSX
+   *     - TRANSY
+   *     - ITRANSS
+   *     - ITRANSL 
+   *  
+   *  
+   * These values are incorporated in the SPICE kernels (FK, IK and IAK). 
+   *  
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup LunarReconnaissanceOrbiter
    *
@@ -65,6 +82,8 @@ namespace Isis {
    *            Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *            coding standards. References #972.
+   *   @history 2013-03-05 Kris Becker - added band dependent parameters as
+   *            determined by the ASU LROC team.
    *  
    */
   class LroWideAngleCamera : public PushFrameCamera {
@@ -112,17 +131,23 @@ namespace Isis {
       virtual int SpkReferenceId() const { return (1); }
 
     private:
+      typedef QVector<int>    IntParameterList;
+      typedef QVector<double> DblParameterList;
       double p_etStart;              //!< Ephemeris Start iTime
       double p_bandTimeOffset;       //!< Offset iTime for Band
       double p_exposureDur;          //!< Exposure Duration value from labels
       double p_interframeDelay;      //!< Interframe Delay value from labels
       int p_nframelets;                 //!< Number of framelets in whole image
-      std::vector<int> p_detectorStartLines;
-      std::vector<int> p_frameletOffsets;
+      IntParameterList p_detectorStartLines;
+      IntParameterList p_frameletOffsets;
+      DblParameterList p_focalLength;
+      DblParameterList p_boreSightSample;
+      DblParameterList p_boreSightLine;
+
 
       int PoolKeySize(const QString &key) const;
-      std::vector<int> GetVector(const QString &key);
+      IntParameterList GetVector(const QString &key);
   };
-};
+}  // namespace Isis
 #endif
 
