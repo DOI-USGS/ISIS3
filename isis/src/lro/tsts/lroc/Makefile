@@ -16,18 +16,10 @@ commands:
 	$(IMPORT) from=$(INPUT)/$(INPUTFILE).img \
 	  to=$(OUTPUT)/$(INPUTFILE).cub \
 	  > /dev/null;
-	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
-	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-	  shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).vis.even.cub > /dev/null;
-	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
-	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-          shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).vis.odd.cub > /dev/null;
-	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
-	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-          shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).uv.even.cub > /dev/null;
-	$(SPICEINIT) ck='$$lro/kernels/ck/moc42_2009258_2009259_v01.bc' \
-	  sclk='$$lro/kernels/sclk/lro_clkcor_2010158_v00.tsc' \
-          shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).uv.odd.cub > /dev/null;
+	$(SPICEINIT) shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).vis.even.cub > /dev/null;
+	$(SPICEINIT) shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).vis.odd.cub > /dev/null;
+	$(SPICEINIT) shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).uv.even.cub > /dev/null;
+	$(SPICEINIT) shape=ellipsoid from=$(OUTPUT)/$(INPUTFILE).uv.odd.cub > /dev/null;
 	catlab from=$(OUTPUT)/$(INPUTFILE).vis.even.cub > $(OUTPUT)/vislabel.pvl;
 	catlab from=$(OUTPUT)/$(INPUTFILE).uv.odd.cub > $(OUTPUT)/uvlabel.pvl;
 	$(CROP) from=$(OUTPUT)/$(INPUTFILE).vis.even.cub line=3000 nlines=200 \
