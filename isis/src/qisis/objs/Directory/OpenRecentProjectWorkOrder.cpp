@@ -24,12 +24,8 @@
 
 #include <QCoreApplication>
 #include <QDebug>
-#include <QFileDialog>
 #include <QMessageBox>
-#include <QtConcurrentMap>
 
-#include "Cube.h"
-#include "CubeAttribute.h"
 #include "FileName.h"
 #include "Project.h"
 
@@ -37,16 +33,9 @@ namespace Isis {
 
   OpenRecentProjectWorkOrder::OpenRecentProjectWorkOrder(Project *project) :
       WorkOrder(project) {
-//    QAction::setText(tr("fred"));
+    QAction::setText(tr("Open &Recent Project"));
+
     setCreatesCleanState(true);
-
-    QStringList args = QCoreApplication::arguments();
-
-    if (args.count() == 2) {
-      connect(this, SIGNAL(openProjectFromCommandLine(QString)),
-              project, SLOT(open(QString)), Qt::QueuedConnection);
-      emit openProjectFromCommandLine(args.last());
-    }
   }
 
 
@@ -64,10 +53,12 @@ namespace Isis {
     return new OpenRecentProjectWorkOrder(*this);
   }
 
+
   bool OpenRecentProjectWorkOrder::isExecutable(QString projectFileName) {
     FileName fname = projectFileName;
     if (!fname.fileExists())
       return false;
+
     return true;
   }
 

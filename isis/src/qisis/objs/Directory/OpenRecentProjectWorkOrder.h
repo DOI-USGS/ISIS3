@@ -23,11 +23,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "WorkOrder.h"
-#include "FileName.h"
+//#include "FileName.h"
 
-#include <functional>
+//#include <functional>
 
-#include <QDir>
+//#include <QDir>
 
 class QString;
 
@@ -51,9 +51,6 @@ namespace Isis {
 
       virtual bool isExecutable(QString projectFileName);
       bool execute();
-
-  signals:
-    void openProjectFromCommandLine(QString);
 
     private:
       OpenRecentProjectWorkOrder &operator=(const OpenRecentProjectWorkOrder &rhs);

@@ -144,13 +144,12 @@ namespace Isis {
           continue;
 
         QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
+
         openRecentProjectAction->setData(m_recentProjects.at(i));
         openRecentProjectAction->setText(m_recentProjects.at(i));
 
-//        if (!openRecentProjectWorkOrder->isExecutable(m_recentProjects.at(i)))
-//          continue;
-
-//        QAction *openRecentProjectAction = (QAction*)openRecentProjectWorkOrder;
+        if (!((OpenRecentProjectWorkOrder*)openRecentProjectAction)->isExecutable(m_recentProjects.at(i)))
+          continue;
 
         recentProjectsMenu->addAction(openRecentProjectAction);
       }
