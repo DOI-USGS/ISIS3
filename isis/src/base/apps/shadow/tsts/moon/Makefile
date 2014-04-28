@@ -25,7 +25,7 @@ A15:
 	$(APPNAME) from=$(INPUT)/A15.crop2.dem.cub to=$(OUTPUT)/A15.lowprec.cub \
 	  sunpositionsource=TIME TIME="2012-10-08T00:33:06.000" preset=custom precision=10 \
 	  cacheinterpolatedvalues=true \
-	  spk='($$lro/kernels/spk/fdf29_2012282_2012283_n01.bsp, $$lro/kernels/tspk/de421.bsp, $$lro/kernels/tspk/moon_pa_de421_1900-2050.bpc)' \
+	  spk='($$lro/kernels/spk/fdf29r_2012275_2012306_v01.bsp, $$lro/kernels/tspk/de421.bsp, $$lro/kernels/tspk/moon_pa_de421_1900-2050.bpc)' \
 	  pck='($$base/kernels/pck/pck00009.tpc, $$lro/kernels/pck/moon_080317.tf, $$lro/kernels/pck/moon_assoc_me.tf)' \
 	  | grep -v 'shadow:' | grep -v Processed \
 	  > $(OUTPUT)/A15.lowprec.log.pvl;
