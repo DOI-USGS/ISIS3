@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
+#include "FileName.h"
 #include "IString.h"
 #include "Kernel.h"
 #include "KernelDb.h"
@@ -71,42 +72,56 @@ void IsisMain() {
     g_startPad = 0.0;
     g_endPad = 0.0;
 
-    // Get the single line of encoded XML from the input file that the client,
-    //   spiceinit, sent us.
-    TextFile inFile(ui.GetFileName("FROM"));
+    // Get the single line of encoded XML from the input file that the client, spiceinit, sent us.
+    TextFile inFile( ui.GetFileName("FROM") );
     QString hexCode;
-
-    // GetLine returns false if it was the last line... so we can't check for
-    //   problems really
+    
+    // GetLine returns false if it was the last line... so we can't check for problems really
     inFile.GetLine(hexCode);
 
-    Cube cube;
-    cube.open("$base/testData/isisTruth.cub", "r");
-    Pvl &label = *cube.label();
+    /*
+     * For Debugging, you may want to run spiceserver locally (without spiceinit).
+     *
+     * Uncomment the following code and run the spiceinit with web=true. An error will be thrown
+     * with the file name of the stored input hex file. You can rsync that file to your work area
+     * and run spice server locally.
+     */
+    /*
+     * const char *inmode = "overwrite";
+     * const char *ext  = "dat";
+     * TextFile newInput;
+     * newInput.Open(QString("/tmp/spice_web_service/input"), inmode, ext);
+     * newInput.Rewind();//start at begining
+     * newInput.PutLine(hexCode);
+     * newInput.Close();
+     * QString msg = "In: " + ui.GetFileName("FROM") + "   " + ui.GetFileName("TO");
+     * throw IException(IException::Programmer, msg, _FILEINFO_);
+     */
+
+    Pvl label;
     label.clear();
     QString otherVersion;
 
-    if (!hexCode.isEmpty()) {
+    if ( !hexCode.isEmpty() ) {
       // Convert HEX to XML
-      QString xml(QByteArray::fromHex(QByteArray(hexCode.toAscii())).constData());
+      QString xml( QByteArray::fromHex( QByteArray( hexCode.toAscii() ) ).constData() );
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
       QDomDocument document;
       QString error;
       int errorLine, errorCol;
-      if (document.setContent(QString(xml), &error, &errorLine, &errorCol)) {
+      if ( document.setContent(QString(xml), &error, &errorLine, &errorCol) ) {
         QDomElement rootElement = document.firstChild().toElement();
 
-        for (QDomNode node = rootElement.firstChild();
-            !node .isNull();
-            node = node.nextSibling()) {
+        for ( QDomNode node = rootElement.firstChild();
+              !node .isNull();
+              node = node.nextSibling() ) {
           QDomElement element = node.toElement();
 
           // Store off the other isis version
           if (element.tagName() == "isis_version") {
             QString encoded = element.firstChild().toText().data();
-            otherVersion =
-                QByteArray::fromHex(encoded.toAscii()).constData();
+            otherVersion = QByteArray::fromHex( encoded.toAscii() ).constData();
           }
           else if (element.tagName() == "parameters") {
             // Read the spiceinit parameters
@@ -116,8 +131,7 @@ void IsisMain() {
             // Get the cube label
             QString encoded = element.firstChild().toText().data();
             stringstream labStream;
-            labStream <<
-                QString(QByteArray::fromHex(encoded.toAscii()).constData());
+            labStream << QString( QByteArray::fromHex( encoded.toAscii() ).constData() );
             labStream >> label;
           }
         }
@@ -135,7 +149,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (ui.GetBoolean("CHECKVERSION") && otherVersion != Application::Version()) {
+    if ( ui.GetBoolean("CHECKVERSION") && otherVersion != Application::Version() ) {
       QString msg = "The SPICE server only supports the latest Isis version [" +
                     Application::Version() + "], version [" + otherVersion +
                     "] is not compatible";
@@ -148,8 +162,7 @@ void IsisMain() {
 
     // Set up for getting the mission name
     // Get the directory where the system missions translation table is.
-    QString transFile = p.MissionData("base",
-                                      "translations/MissionName2DataDir.trn");
+    QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
 
     // Get the mission translation manager ready
     PvlTranslationManager missionXlater(label, transFile);
@@ -188,18 +201,19 @@ void IsisMain() {
     fk        = ckKernels.frame(label);
     ck        = ckKernels.spacecraftPointing(label);
     spk       = spkKernels.spacecraftPosition(label);
+
     if (g_ckNadir) {
       // Only add nadir if no spacecraft pointing found
       QStringList nadirCk;
       nadirCk.push_back("Nadir");
       // if a priority queue already exists, add Nadir with low priority of 0
       if (ck.size() > 0) {
-        ck[0].push(Kernel((Kernel::Type)0, nadirCk));
+        ck[0].push( Kernel( (Kernel::Type)0, nadirCk ) );
       }
       // if no queue exists, create a nadir queue
       else {
         priority_queue<Kernel> nadirQueue;
-        nadirQueue.push(Kernel((Kernel::Type)0, nadirCk));
+        nadirQueue.push( Kernel( (Kernel::Type)0, nadirCk ) );
         ck.push_back(nadirQueue);
       }
     }
@@ -228,29 +242,34 @@ void IsisMain() {
                        _FILEINFO_);
     }
 
+    FileName inputLabels;
+    
     while (ck.at(0).size() != 0 && !kernelSuccess) {
-      // create an empty kernel 
+      // create an empty kernel
       Kernel realCkKernel;
       QStringList ckKernelList;
 
-      // Add the list of cks from each Kernel object at the top of each
-      // priority queue. If multiple priority queues exist, we will not
-      // pop of the top priority from any of the queues except for the
-      // first one.  So each time tryKernels() fails, the same files
-      // will be loaded with the next priority from the first queue.
+      /*
+       * Add the list of cks from each Kernel object at the top of each
+       * priority queue. If multiple priority queues exist, we will not\
+       * pop of the top priority from any of the queues except for the
+       * first one.  So each time tryKernels() fails, the same files
+       * will be loaded with the next priority from the first queue.
+       */
       for (int i = ck.size() - 1; i >= 0; i--) {
         if (ck.at(i).size() != 0) {
           Kernel topPriority = ck.at(i).top();
-          ckKernelList.append(topPriority.kernels());
-          // set the type to equal the type of the to priority of the first
-          //queue 
-          realCkKernel.setType(topPriority.type()); 
+          ckKernelList.append( topPriority.kernels() );
+          // set the type to equal the type of the to priority of the first queue
+          realCkKernel.setType( topPriority.type() );
         }
       }
 
-      // pop the top priority ck off only the first queue so that the next 
-      // iteration will test the next highest priority of the first queue with
-      // the top priority of each of the other queues.
+      /*
+       * pop the top priority ck off only the first queue so that the next
+       * iteration will test the next highest priority of the first queue with
+       * the top priority of each of the other queues.
+       */
       ck[0].pop();
 
       // Merge SpacecraftPointing and Frame into ck
@@ -259,37 +278,46 @@ void IsisMain() {
       }
 
       realCkKernel.setKernels(ckKernelList);
-
+      
+      /*
+       * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
+       * classes take a cube instead of a pvl as input.
+       *
+       * This program has read and write access on the spice server in /tmp/spice_web_service.
+       */
+      inputLabels = FileName::createTempFile("/tmp/spice_web_service/inputLabels.cub");// ui.GetFileName("TEMPFILE") );
+      //"/tmp/spice_web_service/inputLabels.cub");
+      label.write( inputLabels.expanded() );
+      Cube cube;
+      cube.open(inputLabels.expanded(), "r");
       kernelSuccess = tryKernels(cube, label, p, lk, pck, targetSpk,
                                  realCkKernel, fk, ik, sclk, spk,
                                  iak, dem, exk);
     }
 
     if (!kernelSuccess) {
-      throw IException(IException::Unknown,
-                       "Unable to initialize camera model",
-                       _FILEINFO_);
+      throw IException(IException::Unknown, "Unable to initialize camera model", _FILEINFO_);
     }
     else {
-      packageKernels(ui.GetFileName("TO"));
+      packageKernels( ui.GetFileName("TO") );
     }
-
+    remove( inputLabels.expanded().toAscii() ); //clean up
     p.EndProcess();
   }
   catch (...) {
     // We failed at something, delete the temp files...
     QString outFile = ui.GetFileName("TO");
     QFile pointingFile(outFile + ".pointing");
-    if (pointingFile.exists()) pointingFile.remove();
+    if ( pointingFile.exists() ) pointingFile.remove();
 
     QFile positionFile(outFile + ".position");
-    if (positionFile.exists()) positionFile.remove();
+    if ( positionFile.exists() ) positionFile.remove();
 
     QFile bodyRotFile(outFile + ".bodyrot");
-    if (bodyRotFile.exists()) bodyRotFile.remove();
+    if ( bodyRotFile.exists() ) bodyRotFile.remove();
 
     QFile sunFile(outFile + ".sun");
-    if (sunFile.exists()) sunFile.remove();
+    if ( sunFile.exists() ) sunFile.remove();
 
     throw;
   }
@@ -350,7 +378,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   }
 
   PvlGroup originalKernels = lab.findGroup("Kernels", Pvl::Traverse);
-  PvlGroup &currentKernels = lab.findGroup("Kernels", Pvl::Traverse);
+  PvlGroup currentKernels = lab.findGroup("Kernels", Pvl::Traverse);
   currentKernels.addKeyword(lkKeyword, Pvl::Replace);
   currentKernels.addKeyword(pckKeyword, Pvl::Replace);
   currentKernels.addKeyword(targetSpkKeyword, Pvl::Replace);
@@ -360,50 +388,54 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   currentKernels.addKeyword(spkKeyword, Pvl::Replace);
   currentKernels.addKeyword(iakKeyword, Pvl::Replace);
   currentKernels.addKeyword(emptyDemKeyword, Pvl::Replace);
+  currentKernels.addKeyword(demKeyword, Pvl::Replace);
 
   // report qualities
   PvlKeyword spkQuality("InstrumentPositionQuality");
-  spkQuality.addValue(Kernel::typeEnum(spk.type()));
+  spkQuality.addValue( Kernel::typeEnum( spk.type() ) );
   currentKernels.addKeyword(spkQuality, Pvl::Replace);
 
   PvlKeyword ckQuality("InstrumentPointingQuality");
-  ckQuality.addValue(Kernel::typeEnum(ck.type()));
+  ckQuality.addValue( Kernel::typeEnum( ck.type() ) );
   currentKernels.addKeyword(ckQuality, Pvl::Replace);
 
-  if (!exkKeyword.isNull())
+  if ( !exkKeyword.isNull() )
     currentKernels.addKeyword(exkKeyword, Pvl::Replace);
-  else if (currentKernels.hasKeyword("EXTRA"))
+  else if ( currentKernels.hasKeyword("EXTRA") )
     currentKernels.deleteKeyword("EXTRA");
 
   // Get rid of old keywords from previously inited cubes
-  if (currentKernels.hasKeyword("SpacecraftPointing"))
+  if ( currentKernels.hasKeyword("SpacecraftPointing") )
     currentKernels.deleteKeyword("SpacecraftPointing");
 
-  if (currentKernels.hasKeyword("SpacecraftPosition"))
+  if ( currentKernels.hasKeyword("SpacecraftPosition") )
     currentKernels.deleteKeyword("SpacecraftPosition");
 
-  if (currentKernels.hasKeyword("ElevationModel"))
+  if ( currentKernels.hasKeyword("ElevationModel") )
     currentKernels.deleteKeyword("ElevationModel");
 
-  if (currentKernels.hasKeyword("Frame"))
+  if ( currentKernels.hasKeyword("Frame") )
     currentKernels.deleteKeyword("Frame");
 
-  if (currentKernels.hasKeyword("StartPadding"))
+  if ( currentKernels.hasKeyword("StartPadding") )
     currentKernels.deleteKeyword("StartPadding");
 
-  if (currentKernels.hasKeyword("EndPadding"))
+  if ( currentKernels.hasKeyword("EndPadding") )
     currentKernels.deleteKeyword("EndPadding");
 
   // Add any time padding the user specified to the spice group
   if (g_startPad > DBL_EPSILON)
-    currentKernels.addKeyword(PvlKeyword("StartPadding", toString(g_startPad), "seconds"));
+    currentKernels.addKeyword( PvlKeyword("StartPadding", toString(g_startPad), "seconds") );
 
   if (g_endPad > DBL_EPSILON)
-    currentKernels.addKeyword(PvlKeyword("EndPadding", toString(g_endPad), "seconds"));
+    currentKernels.addKeyword( PvlKeyword("EndPadding", toString(g_endPad), "seconds") );
+
 
   currentKernels.addKeyword(
-      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(cube))),
-      Pvl::Replace);
+      PvlKeyword( "CameraVersion", toString( CameraFactory::CameraVersion(cube) ) ), Pvl::Replace);
+
+  // Add the modified Kernels group to the input cube labels
+  cube.putGroup(currentKernels);
 
   // Create the camera so we can get blobs if necessary
   try {
@@ -412,23 +444,19 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
       cam = CameraFactory::Create(cube);
 
       // If success then pretend we had the shape model keyword in there...
-      //   this doesn't actually effect the blobs that we care about
-      currentKernels.addKeyword(demKeyword, Pvl::Replace);
       Pvl applicationLog;
-      applicationLog += lab.findGroup("Kernels", Pvl::Traverse);
+      applicationLog += currentKernels;
       applicationLog.write(ui.GetFileName("TO") + ".print");
     }
     catch (IException &e) {
       Pvl errPvl = e.toPvl();
 
       if (errPvl.groups() > 0)
-        currentKernels += PvlKeyword("Error",
-            errPvl.group(errPvl.groups() - 1)["Message"][0]);
+        currentKernels += PvlKeyword("Error", errPvl.group(errPvl.groups() - 1)["Message"][0]);
 
       Application::Log(currentKernels);
       throw e;
     }
-
     Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing");
     ckTable.Label() += PvlKeyword("Description", "Created by spiceinit");
     ckTable.Label() += PvlKeyword("Kernels");
@@ -455,8 +483,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
     for (int i = 0; i < pckKeyword.size(); i++)
       bodyTable.Label()["Kernels"].addValue(pckKeyword[i]);
 
-    bodyTable.Label() += PvlKeyword("SolarLongitude",
-                                    toString(cam->solarLongitude().degrees()));
+    bodyTable.Label() += PvlKeyword( "SolarLongitude", toString( cam->solarLongitude().degrees() ) );
     bodyTable.Write(ui.GetFileName("TO") + ".bodyrot");
 
     Table sunTable = cam->sunPosition()->Cache("SunPosition");
@@ -485,7 +512,7 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
       currentKernels["TargetPosition"].addValue(origTargPos[i]);
 
     Pvl kernelsLabels;
-    kernelsLabels += lab.findGroup("Kernels", Pvl::Traverse);
+    kernelsLabels += currentKernels;
     kernelsLabels += cam->getStoredNaifKeywords();
     kernelsLabels.write(ui.GetFileName("TO") + ".lab");
   }
@@ -503,13 +530,13 @@ QString tableToXml(QString tableName, QString file) {
   xml += "    <" + tableName + ">\n";
 
   QFile tableFile(file);
-  if (!tableFile.open(QIODevice::ReadOnly)) {
+  if ( !tableFile.open(QIODevice::ReadOnly) ) {
     QString msg = "Unable to read temporary file [" + file + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   QByteArray data = tableFile.readAll();
-  xml += QString(data.toHex().constData()) + "\n";
+  xml += QString( data.toHex().constData() ) + "\n";
   tableFile.close();
   // we should now be completely done with this temp file
   tableFile.remove();
@@ -520,59 +547,59 @@ QString tableToXml(QString tableName, QString file) {
 
 
 void parseParameters(QDomElement parametersElement) {
-  for (QDomNode node = parametersElement.firstChild();
-       !node .isNull();
-       node = node.nextSibling()) {
+  for ( QDomNode node = parametersElement.firstChild();
+        !node .isNull();
+        node = node.nextSibling() ) {
     QDomElement element = node.toElement();
 
     if (element.tagName() == "cksmithed") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_ckSmithed = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "ckrecon") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_ckRecon = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "ckpredicted") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_ckPredicted = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "cknadir") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_ckNadir = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spksmithed") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_spkSmithed = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spkrecon") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_spkRecon = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "spkpredicted") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_spkPredicted = (attribute.value().toLower() == "yes");
     }
     else if (element.tagName() == "shape") {
       QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_shapeKernelStr = attribute.value();
     }
     else if (element.tagName() == "startpad") {
       QDomNode node = element.attributes().namedItem("time");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_startPad = attribute.value().toDouble();
     }
     else if (element.tagName() == "endpad") {
       QDomNode node = element.attributes().namedItem("time");
-      QDomAttr attribute = *((QDomAttr *)&node);
+      QDomAttr attribute = *( (QDomAttr *)&node );
       g_endPad = attribute.value().toDouble();
     }
   }
@@ -590,8 +617,7 @@ void packageKernels(QString toFile) {
   QFile::remove(logFile);
   stringstream logStream;
   logStream << logMessage;
-  xml +=
-      QString(QByteArray(logStream.str().c_str()).toHex().constData()) + "\n";
+  xml += QString( QByteArray( logStream.str().c_str() ).toHex().constData() ) + "\n";
   xml += "  </application_log>\n";
 
   xml += "  <kernels_label>\n";
@@ -602,8 +628,7 @@ void packageKernels(QString toFile) {
   stringstream labelStream;
   labelStream << kernLabels;
 
-  xml +=
-      QString(QByteArray(labelStream.str().c_str()).toHex().constData()) + "\n";
+  xml += QString( QByteArray( labelStream.str().c_str() ).toHex().constData() ) + "\n";
 
   xml += "  </kernels_label>\n";
 
@@ -615,10 +640,10 @@ void packageKernels(QString toFile) {
 
   xml += "  </tables>\n";
   xml += "</spice_data>\n";
-  QString encodedXml(QByteArray(xml.toAscii()).toHex().constData());
+  QString encodedXml( QByteArray( xml.toAscii() ).toHex().constData() );
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);
-  finalOutput.write(encodedXml.toAscii());
+  finalOutput.write( encodedXml.toAscii() );
   finalOutput.close();
 }
