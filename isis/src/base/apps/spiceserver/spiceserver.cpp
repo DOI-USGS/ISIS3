@@ -285,8 +285,7 @@ void IsisMain() {
        *
        * This program has read and write access on the spice server in /tmp/spice_web_service.
        */
-      inputLabels = FileName::createTempFile("/tmp/spice_web_service/inputLabels.cub");// ui.GetFileName("TEMPFILE") );
-      //"/tmp/spice_web_service/inputLabels.cub");
+      inputLabels = FileName::createTempFile( ui.GetFileName("TEMPFILE") );
       label.write( inputLabels.expanded() );
       Cube cube;
       cube.open(inputLabels.expanded(), "r");
