@@ -1,5 +1,5 @@
-#ifndef BUNDLESETTINGS_H
-#define BUNDLESETTINGS_H
+#ifndef BUNDLERESULTS_H
+#define BUNDLERESULTS_H
 
 /**
  * @file
@@ -25,10 +25,17 @@
  */
 
 namespace Isis {
+  class BundleSettings;
+  class BundleStatistics;
+  class ControlNet;
 
-  class BundleSettings {
-  public:
-    BundleSettings();
+  class BundleResults {
+    public:
+      BundleResults();
+    private:
+      BundleStatistics *m_outputStatistics;
+      ControlNet *m_outputCNet;
+      BundleSettings *m_settings;
   };
 };
-#endif // BUNDLESETTINGS_H
+#endif // BUNDLERESULTS_H

@@ -1,5 +1,5 @@
-#ifndef BUNDLESETTINGS_H
-#define BUNDLESETTINGS_H
+#ifndef BundleStatistics_H
+#define BundleStatistics_H
 
 /**
  * @file
@@ -25,10 +25,13 @@
  */
 
 namespace Isis {
-
-  class BundleSettings {
-  public:
-    BundleSettings();
+  class CorrelationMatrix;
+  
+  class BundleStatistics {
+    public:
+      BundleStatistics();
+    private:
+      CorrelationMatrix *m_correlationMatrix;
   };
 };
-#endif // BUNDLESETTINGS_H
+#endif // BundleStatistics_H
