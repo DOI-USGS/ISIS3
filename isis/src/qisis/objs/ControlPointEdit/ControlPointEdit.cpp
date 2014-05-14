@@ -726,7 +726,6 @@ namespace Isis {
 
     p_rightMeasure = rightMeasure;
     p_pointId = pointId;
-    qDebug() << "setright Measure:" << p_pointId;
 
     if (p_useGeometry) {
       //  get new ground map
@@ -1563,7 +1562,6 @@ namespace Isis {
                            toString((int)(p_rightMeasure->GetSample())) + "_" +
                            toString((int)(p_rightMeasure->GetLine()))   + "_";
     QString fname = baseFile + "Search.cub";
-    qDebug() << "in save chips fname:" << fname;
     QString command = "$ISISROOT/bin/qview \'" + fname + "\'";
     p_autoRegFact->RegistrationSearchChip()->Write(fname);
     fname = baseFile + "Pattern.cub";
