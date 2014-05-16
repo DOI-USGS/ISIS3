@@ -84,7 +84,7 @@ namespace Isis {
     m_baseRadius = Distance(0., Distance::Meters);
 
     createStereoTool(parent);
-    connect(this, SIGNAL(toolActivated()), this, SLOT(activateTool()));
+    connect( this, SIGNAL( toolActivated() ), this, SLOT( activateTool() ) );
   }
 
 
@@ -119,12 +119,12 @@ namespace Isis {
 
     m_pointEditor = new ControlPointEdit(NULL, parent, true);
     gridLayout->addWidget(m_pointEditor, row++, 0, 1, 3);
-    connect(m_pointEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
+    connect( m_pointEditor, SIGNAL( measureSaved() ), this, SLOT( measureSaved() ) );
     m_pointEditor->show();
     connect(this,
-            SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
+            SIGNAL( stretchChipViewport(Stretch *, CubeViewport *) ),
             m_pointEditor,
-            SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
+            SIGNAL( stretchChipViewport(Stretch *, CubeViewport *) ) );
 
     m_elevationLabel = new QLabel;
     m_elevationLabel->setToolTip("Calculated elevation in meters.");
@@ -149,15 +149,15 @@ namespace Isis {
     gridLayout->addWidget(m_rightDemRadiiLabel, row++, 2);
 
 //  QPushButton *elevationButton = new QPushButton("Calculate Elevation");
-//  connect(elevationButton, SIGNAL(clicked()),
-//          this, SLOT(calculateElevation()));
+//  connect(elevationButton, SIGNAL(clicked() ),
+//          this, SLOT(calculateElevation() ));
 //  gridLayout->addWidget(elevationButton, row++, 1);
 
     QWidget *cw = new QWidget();
     cw->setLayout(gridLayout);
     m_stereoTool->setCentralWidget(cw);
 
-    connect(this, SIGNAL(editPointChanged()), this, SLOT(paintAllViewports()));
+    connect( this, SIGNAL( editPointChanged() ), this, SLOT( paintAllViewports() ) );
 
   }
 
@@ -174,7 +174,7 @@ namespace Isis {
     QString whatsThis =
       "<b>Function:</b> Saves the elevation calulations to current file.";
     m_save->setWhatsThis(whatsThis);
-    connect(m_save, SIGNAL(activated()), this, SLOT(saveElevations()));
+    connect( m_save, SIGNAL( activated() ), this, SLOT( saveElevations() ) );
     m_save->setDisabled(true);
 
     QAction *saveAs = new QAction(m_stereoTool);
@@ -182,7 +182,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Saves the elevation calulations to a file.";
     saveAs->setWhatsThis(whatsThis);
-    connect(saveAs, SIGNAL(activated()), this, SLOT(saveAsElevations()));
+    connect( saveAs, SIGNAL( activated() ), this, SLOT( saveAsElevations() ) );
 
     QAction *closeStereoTool = new QAction(m_stereoTool);
     closeStereoTool->setText("&Close");
@@ -191,7 +191,7 @@ namespace Isis {
       "<b>Function:</b> Closes the Stereo Tool window for this point \
        <p><b>Shortcut:</b> Alt+F4 </p>";
     closeStereoTool->setWhatsThis(whatsThis);
-    connect(closeStereoTool, SIGNAL(activated()), m_stereoTool, SLOT(close()));
+    connect( closeStereoTool, SIGNAL( activated() ), m_stereoTool, SLOT( close() ) );
 
     QMenu *fileMenu = m_stereoTool->menuBar()->addMenu("&File");
     fileMenu->addAction(m_save);
@@ -203,7 +203,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Allows user to select a new file to set as the registration template";
     templateFile->setWhatsThis(whatsThis);
-    connect(templateFile, SIGNAL(activated()), this, SLOT(setTemplateFile()));
+    connect( templateFile, SIGNAL( activated() ), this, SLOT( setTemplateFile() ) );
 
     QAction *viewTemplate = new QAction(m_stereoTool);
     viewTemplate->setText("&View/edit registration template");
@@ -211,7 +211,7 @@ namespace Isis {
       "<b>Function:</b> Displays the curent registration template.  \
        The user may edit and save changes under a chosen filename.";
     viewTemplate->setWhatsThis(whatsThis);
-    connect(viewTemplate, SIGNAL(activated()), this, SLOT(viewTemplateFile()));
+    connect( viewTemplate, SIGNAL( activated() ), this, SLOT( viewTemplateFile() ) );
 
 
     QMenu *optionMenu = m_stereoTool->menuBar()->addMenu("&Options");
@@ -222,8 +222,8 @@ namespace Isis {
     //    registrationMenu->addAction(interestOp);
 
     QAction *showHelpAct = new QAction("stereo tool &Help", m_stereoTool);
-    showHelpAct->setIcon(QPixmap(toolIconDir() + "/help-contents.png"));
-    connect(showHelpAct, SIGNAL(activated()), this, SLOT(showHelp()));
+    showHelpAct->setIcon(QPixmap(toolIconDir() + "/help-contents.png") );
+    connect( showHelpAct, SIGNAL( activated() ), this, SLOT( showHelp() ));
 
     QMenu *helpMenu = m_stereoTool->menuBar()->addMenu("&Help");
     helpMenu->addAction(showHelpAct);
@@ -241,9 +241,8 @@ namespace Isis {
 
   QAction *StereoTool::toolPadAction(ToolPad *pad) {
     QAction *action = new QAction(pad);
-    action->setIcon(QPixmap(toolIconDir() + "/3d-glasses-icon.png"));
-    action->setToolTip("Stereo (S)");
-    action->setShortcut(Qt::Key_S);
+    action->setIcon( QPixmap(toolIconDir() + "/3d-glasses-icon.png") );
+    action->setToolTip("Stereo");
     action->setWhatsThis("<strong>Functionality:</strong> "
                "<ul>"
                  "<li>Calculate elevation at a single point by creating a "
@@ -283,8 +282,8 @@ namespace Isis {
       "<b>Function: </b>Source for the local radius used for elevation "
       "calculations.";
     m_radiusBox->setWhatsThis(text);
-    connect(m_radiusBox, SIGNAL(activated(int)),
-            this, SLOT(updateRadiusLineEdit()));
+    connect( m_radiusBox, SIGNAL( activated(int) ),
+            this, SLOT( updateRadiusLineEdit() ));
 
     m_radiusLineEdit = new QLineEdit(hbox);
     QDoubleValidator *dval = new QDoubleValidator(hbox);
@@ -298,24 +297,24 @@ namespace Isis {
       "This can be changed by selecting \"Custom Radius\" in the box to "
       "the left.";
     m_radiusLineEdit->setWhatsThis(text);
-//  connect(m_radiusLineEdit, SIGNAL(textEdited(QString)),
-//          this, SLOT(userBaseRadius(QString)));
-    connect(m_radiusLineEdit, SIGNAL(editingFinished()),
-            this, SLOT(userBaseRadius()));
+//  connect(m_radiusLineEdit, SIGNAL(textEdited(QString) ),
+//          this, SLOT(userBaseRadius(QString) ));
+    connect( m_radiusLineEdit, SIGNAL( editingFinished() ),
+            this, SLOT( userBaseRadius() ));
     //  Do not enable unless radius box set to Custom Radius
     m_radiusLineEdit->setEnabled(false);
 
     QLabel *radiusUnit = new QLabel("Meters");
 
     QToolButton *helpButton = new QToolButton(hbox);
-    helpButton->setIcon(QPixmap(toolIconDir() + "/help-contents.png"));
+    helpButton->setIcon( QPixmap(toolIconDir() + "/help-contents.png") );
     helpButton->setToolTip("Help");
-    helpButton->setIconSize(QSize(22, 22));
-    connect(helpButton, SIGNAL(clicked()), this, SLOT(showHelp()));
+    helpButton->setIconSize( QSize(22, 22) );
+    connect( helpButton, SIGNAL( clicked() ), this, SLOT( showHelp() ));
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setMargin(0);
-    layout->addWidget(AbstractPlotTool::createToolBarWidget(parent));
+    layout->addWidget(AbstractPlotTool::createToolBarWidget(parent) );
     layout->addWidget(boxLabel);
     layout->addWidget(m_radiusBox);
     layout->addWidget(m_radiusLineEdit);
@@ -341,7 +340,7 @@ namespace Isis {
   PlotWindow *StereoTool::createWindow() {
     return new PlotWindow("Elevation Profile", PlotCurve::PixelNumber,
                           PlotCurve::Elevation,
-                          qobject_cast<QWidget *>(parent()));
+                          qobject_cast<QWidget *>( parent() ) );
 
   }
 
@@ -374,10 +373,10 @@ namespace Isis {
       QPushButton *okButton = new QPushButton("OK");
       mainLayout->addStretch();
       mainLayout->addWidget(okButton);
-      connect(okButton, SIGNAL(clicked()), warningDialog, SLOT(accept()));
+      connect( okButton, SIGNAL( clicked() ), warningDialog, SLOT( accept() ));
 
-      if (warningDialog->exec()) {
-        if (showWarning->isChecked()) m_showWarning = false;
+      if ( warningDialog->exec() ) {
+        if ( showWarning->isChecked() ) m_showWarning = false;
       }
       writeSettings();
     }
@@ -575,10 +574,10 @@ namespace Isis {
     buttonsLayout->addStretch();
 
     QPushButton *closeButton = new QPushButton("&Close");
-    closeButton->setIcon(QPixmap(toolIconDir() + "/guiStop.png"));
+    closeButton->setIcon( QPixmap( toolIconDir() + "/guiStop.png" ) );
     closeButton->setDefault(true);
-    connect(closeButton, SIGNAL(clicked()),
-            helpDialog, SLOT(close()));
+    connect( closeButton, SIGNAL( clicked() ),
+             helpDialog, SLOT( close() ) );
     buttonsLayout->addWidget(closeButton);
 
     mainLayout->addLayout(buttonsLayout);
@@ -614,14 +613,14 @@ namespace Isis {
   }
 
 
-
+  
   void StereoTool::updateRadiusLineEdit() {
 
 
-    if (m_radiusBox->currentText() == "Ellipsoid Equitorial Radius") {
-      if (m_targetRadius.isValid()) {
-        m_radiusLineEdit->setText(QString::number(m_targetRadius.meters(), 'f',
-                                                  6));
+    if ( m_radiusBox->currentText() == "Ellipsoid Equitorial Radius" ) {
+      if ( m_targetRadius.isValid() ) {
+        m_radiusLineEdit->setText( QString::number( m_targetRadius.meters(), 'f',
+                                                  6) );
         m_baseRadius = m_targetRadius;
       }
       else {
@@ -630,11 +629,11 @@ namespace Isis {
       m_radiusLineEdit->setReadOnly(true);
       m_radiusLineEdit->setEnabled(false);
     }
-    else if (m_radiusBox->currentText() == "DEM Radius") {
+    else if ( m_radiusBox->currentText() == "DEM Radius" ) {
       //  If cubes set, make sure they have an elevation model
       if (m_leftCube) {
         m_leftCube->camera()->IgnoreElevationModel(false);
-        if (m_leftCube->camera()->target()->shape()->name() == "Ellipsoid") {
+        if ( m_leftCube->camera()->target()->shape()->name() == "Ellipsoid" ) {
         QString message = "No valid Dem on cube.  Run <i>spicinit</i> using a "
            "dem shape model.  The local radius will default back to the ellipsoid.";
         QMessageBox::warning(m_stereoTool, "Warning", message);
@@ -656,7 +655,7 @@ namespace Isis {
     }
 
     //  If stereo Tool visible and has valid point, update elevation
-    if (m_stereoTool->isVisible() && m_editPoint != NULL) {
+    if ( m_stereoTool->isVisible() && m_editPoint != NULL ) {
       calculateElevation();
     }
   }
@@ -674,17 +673,17 @@ namespace Isis {
          
     */
     m_linkedViewports.clear();
-    for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
-      if ((*(cubeViewportList()))[i]->isLinked())
-        m_linkedViewports.push_back((*(cubeViewportList()))[i]);
+    for (int i = 0; i < (int) cubeViewportList()->size(); i++) {
+      if ( (*( cubeViewportList() ) )[i]->isLinked() )
+        m_linkedViewports.push_back( (*( cubeViewportList() ) )[i]);
     }
 
-    if (m_linkedViewports.size() < 2) {
+    if ( m_linkedViewports.size() < 2 ) {
       IString message = "Two cube viewports containing a stereo pair "
                         "need to be linked.";
       throw IException(IException::User, message, _FILEINFO_);
     }
-    if (m_linkedViewports.size() > 2) {
+    if ( m_linkedViewports.size() > 2 ) {
       IString message = "Only two cube viewports containing a stereo pair "
                         "may be linked.";
       throw IException(IException::User, message, _FILEINFO_);
@@ -692,10 +691,10 @@ namespace Isis {
 
     //  If linked viewports contain the same cubes,  simply return,
     //  all data should be retained.
-    if (m_linkedViewports.at(0)->cube() == m_leftCube ||
-        m_linkedViewports.at(0)->cube() == m_rightCube) {
-      if (m_linkedViewports.at(1)->cube() == m_leftCube ||
-          m_linkedViewports.at(1)->cube() == m_rightCube) {
+    if ( m_linkedViewports.at(0)->cube() == m_leftCube ||
+         m_linkedViewports.at(0)->cube() == m_rightCube ) {
+      if ( m_linkedViewports.at(1)->cube() == m_leftCube ||
+           m_linkedViewports.at(1)->cube() == m_rightCube ) {
         return;
       }
     }
@@ -703,8 +702,8 @@ namespace Isis {
     //  Control net already exists, make sure new cubes are the same target
     //  as the current control net.
     if (m_controlNet) {
-      if (m_controlNet->GetTarget() !=
-          m_linkedViewports.at(0)->cube()->camera()->target()->name()) {
+      if ( m_controlNet->GetTarget() !=
+           m_linkedViewports.at(0)->cube()->camera()->target()->name() ) {
         //  Allow opportunity to save current data before clearing for new
         //  target.
         QString message = "You have changed targets.  All data must be re-set";
@@ -721,14 +720,14 @@ namespace Isis {
         clearNetData();
         m_controlNet = new ControlNet();
         m_controlNet->SetTarget(
-                                m_linkedViewports.at(0)->cube()->camera()->target()->name());
+                                m_linkedViewports.at(0)->cube()->camera()->target()->name() );
         m_serialNumberList = new SerialNumberList(false);
       }
     }
     else {
       m_controlNet = new ControlNet();
       m_controlNet->SetTarget(
-                              m_linkedViewports.at(0)->cube()->camera()->target()->name());
+                              m_linkedViewports.at(0)->cube()->camera()->target()->name() );
       m_serialNumberList = new SerialNumberList(false);
     }
 
@@ -736,7 +735,7 @@ namespace Isis {
     // TODO:  For now simply clear & set always, but should check if cubes are
     // not new.
     clearFiles();
-    setFiles(m_linkedViewports.at(0)->cube(), m_linkedViewports.at(1)->cube());
+    setFiles( m_linkedViewports.at(0)->cube(), m_linkedViewports.at(1)->cube() );
 
   }
 
@@ -780,8 +779,8 @@ namespace Isis {
     m_leftCube = leftCube;
     m_rightCube = rightCube;
 
-    QString leftName = FileName(m_leftCube->fileName()).name();
-    QString rightName = FileName(m_rightCube->fileName()).name();
+    QString leftName = FileName( m_leftCube->fileName() ).name();
+    QString rightName = FileName( m_rightCube->fileName() ).name();
     //  Update cube name labels
     m_leftCubeLabel->setText(leftName);
     m_rightCubeLabel->setText(rightName);
@@ -790,17 +789,17 @@ namespace Isis {
     m_rightSN = SerialNumber::Compose(*m_rightCube);
 
     //  TODO   Do I need list?
-    if (!m_serialNumberList->HasSerialNumber(m_leftSN)) {
-      m_serialNumberList->Add(m_leftCube->fileName());
+    if ( !m_serialNumberList->HasSerialNumber(m_leftSN) ) {
+      m_serialNumberList->Add( m_leftCube->fileName() );
     }
-    if (!m_serialNumberList->HasSerialNumber(m_rightSN)) {
-      m_serialNumberList->Add(m_rightCube->fileName());
+    if ( !m_serialNumberList->HasSerialNumber(m_rightSN) ) {
+      m_serialNumberList->Add( m_rightCube->fileName() );
     }
 
     vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
     m_targetRadius = Distance(targetRadius[0]);
     //  If radius combo box set to ellipsoid, update the radius line edit
-    if (!m_targetRadius.isValid()) {
+    if ( !m_targetRadius.isValid() ) {
       QString message = "Could not determine target radius.";
       QMessageBox::critical(m_stereoTool,"Error",message);
       m_baseRadius = Distance(0., Distance::Meters);
@@ -849,11 +848,11 @@ namespace Isis {
     double lon = m_leftGM->UniversalLongitude();
 
     m_rightGM->SetGround(
-              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees));
+              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees) );
     try {
-      m_editPoint->SetAprioriSurfacePoint(SurfacePoint(
+      m_editPoint->SetAprioriSurfacePoint(SurfacePoint (
                 Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees),
-                m_targetRadius));
+                m_targetRadius ) );
     }
     catch (IException &e) {
       QString message = "Unable to set Apriori Surface Point.\n";
@@ -915,13 +914,13 @@ namespace Isis {
       return;
     }
 
-    if (rubberBandTool()->figureIsPoint()) {
+    if ( rubberBandTool()->figureIsPoint() ) {
       double samp, line;
-      cvp->viewportToCube(rubberBandTool()->vertices()[0].rx(),
-                          rubberBandTool()->vertices()[0].ry(),
-                          samp, line);
-      if (rubberBandTool()->mouseButton() & Qt::LeftButton) {
-        if (!m_controlNet || m_controlNet->GetNumMeasures() == 0) {
+      cvp->viewportToCube( rubberBandTool()->vertices()[0].rx(),
+                           rubberBandTool()->vertices()[0].ry(),
+                           samp, line );
+      if ( rubberBandTool()->mouseButton() & Qt::LeftButton ) {
+        if ( !m_controlNet || m_controlNet->GetNumMeasures() == 0 ) {
           QString message = "No points exist for editing.  Create points ";
           message += "using the right mouse button.";
           QMessageBox::information(m_stereoTool, "Warning", message);
@@ -941,8 +940,8 @@ namespace Isis {
         }
         modifyPoint(point);
       }
-      else if (rubberBandTool()->mouseButton() & Qt::MidButton) {
-        if (!m_controlNet || m_controlNet->GetNumPoints() == 0) {
+      else if ( rubberBandTool()->mouseButton() & Qt::MidButton ) {
+        if ( !m_controlNet || m_controlNet->GetNumPoints() == 0 ) {
           QString message = "No points exist for deleting.  Create points ";
           message += "using the right mouse button.";
           QMessageBox::warning(m_stereoTool, "Warning", message);
@@ -961,7 +960,7 @@ namespace Isis {
         }
         deletePoint(point);
       }
-      else if (rubberBandTool()->mouseButton() & Qt::RightButton) {
+      else if ( rubberBandTool()->mouseButton() & Qt::RightButton ) {
         double lat, lon;
         if (cvp->cube() == m_leftCube) {
           m_leftGM->SetImage(samp, line);
@@ -991,11 +990,11 @@ namespace Isis {
       m_startPoint = NULL;
       m_endPoint = NULL;
       //    Right click/drag:  Find closest end points
-      if (rubberBandTool()->mouseButton() & Qt::RightButton) {
+      if ( rubberBandTool()->mouseButton() & Qt::RightButton ) {
         double samp, line;
-        cvp->viewportToCube(rubberBandTool()->vertices()[0].rx(),
-                            rubberBandTool()->vertices()[0].ry(),
-                            samp, line);
+        cvp->viewportToCube( rubberBandTool()->vertices()[0].rx(),
+                             rubberBandTool()->vertices()[0].ry(),
+                             samp, line );
         try {
           m_startPoint = m_controlNet->FindClosest(sn, samp, line);
         }
@@ -1010,12 +1009,12 @@ namespace Isis {
           rubberBandTool()->clear();
           return;
         }
-        cvp->viewportToCube(rubberBandTool()->vertices()[1].rx(),
-                            rubberBandTool()->vertices()[1].ry(),
-                            samp, line);
+        cvp->viewportToCube( rubberBandTool()->vertices()[1].rx(),
+                             rubberBandTool()->vertices()[1].ry(),
+                            samp, line );
         try {
           m_endPoint = m_controlNet->FindClosest(sn, samp, line);
-          if (m_startPoint->GetId() == m_endPoint->GetId()) {
+          if ( m_startPoint->GetId() == m_endPoint->GetId() ) {
             throw IException(IException::User, "No End Point",
                                       _FILEINFO_);
           }
@@ -1037,16 +1036,16 @@ namespace Isis {
       else {
         //    Left click/drag:  Create control points at the line endpoints.
         m_profileDialog = new ProfileDialog();
-        connect(m_profileDialog, SIGNAL(createStart()),
-                this, SLOT(createStartPoint()));
-        connect(m_profileDialog, SIGNAL(createEnd()),
-                this, SLOT(createEndPoint()));
-        connect(m_profileDialog, SIGNAL(accepted()),
-                this, SLOT(profile()));
-        connect(m_profileDialog, SIGNAL(accepted()),
-                this, SLOT(profile()));
-        connect(m_profileDialog, SIGNAL(rejected()),
-                this, SLOT(clearProfile()));
+        connect( m_profileDialog, SIGNAL( createStart() ),
+                 this, SLOT( createStartPoint() ) );
+        connect( m_profileDialog, SIGNAL( createEnd() ),
+                 this, SLOT( createEndPoint() ) );
+        connect( m_profileDialog, SIGNAL( accepted() ),
+                 this, SLOT( profile() ) );
+        connect( m_profileDialog, SIGNAL( accepted() ),
+                this, SLOT( profile() ) );
+        connect( m_profileDialog, SIGNAL( rejected() ),
+                this, SLOT( clearProfile() ) );
         m_profileDialog->show();
         m_profileDialog->activateWindow();
       }
@@ -1067,15 +1066,15 @@ namespace Isis {
 
   void StereoTool::createStartPoint() {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp  == NULL)
+    if (cvp == NULL)
       return;
 
     double samp, line;
     double lat, lon;
-    cvp->viewportToCube(rubberBandTool()->vertices()[0].rx(),
-                        rubberBandTool()->vertices()[0].ry(),
-                        samp, line);
-    if (cvp->cube() == m_leftCube) {
+    cvp->viewportToCube( rubberBandTool()->vertices()[0].rx(),
+                         rubberBandTool()->vertices()[0].ry(),
+                        samp, line );
+    if ( cvp->cube() == m_leftCube ) {
       m_leftGM->SetImage(samp, line);
       lat = m_leftGM->UniversalLatitude();
       lon = m_leftGM->UniversalLongitude();
@@ -1104,15 +1103,15 @@ namespace Isis {
 
   void StereoTool::createEndPoint() {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp  == NULL)
+    if (cvp == NULL)
       return;
 
     double samp, line;
     double lat, lon;
-    cvp->viewportToCube(rubberBandTool()->vertices()[1].rx(),
-                        rubberBandTool()->vertices()[1].ry(),
-                        samp, line);
-    if (cvp->cube() == m_leftCube) {
+    cvp->viewportToCube( rubberBandTool()->vertices()[1].rx(),
+                         rubberBandTool()->vertices()[1].ry(),
+                         samp, line );
+    if ( cvp->cube() == m_leftCube ) {
       m_leftGM->SetImage(samp, line);
       lat = m_leftGM->UniversalLatitude();
       lon = m_leftGM->UniversalLongitude();
@@ -1161,22 +1160,22 @@ namespace Isis {
     double rightSamp = 0, rightLine = 0;
 
     //  Make sure point exists on both linked cubes
-    if (m_leftGM->SetUniversalGround(lat, lon)) {
+    if ( m_leftGM->SetUniversalGround(lat, lon) ) {
       leftSamp = m_leftGM->Sample();
       leftLine = m_leftGM->Line();
 
       //  Make sure point is on Right cube
-      if (m_rightGM->SetUniversalGround(lat, lon)) {
+      if ( m_rightGM->SetUniversalGround(lat, lon) ) {
         //  Make sure point on Right cube
         rightSamp = m_rightGM->Sample();
         rightLine = m_rightGM->Line();
-        if (rightSamp < 1 || rightSamp > m_rightCube->sampleCount() ||
-            rightLine < 1 || rightLine > m_rightCube->lineCount()) {
+        if ( rightSamp < 1 || rightSamp > m_rightCube->sampleCount() ||
+             rightLine < 1 || rightLine > m_rightCube->lineCount() ) {
           IString message = "Point does not exist on cube, " +
                             m_rightCube->fileName() + ".";
           throw IException(IException::User, message, _FILEINFO_);
 //        QString message = "Point does not exist on cube, " +
-//                          QString(m_rightCube->fileName().c_str()) + ".";
+//                          QString(m_rightCube->fileName().c_str() ) + ".";
 //        QMessageBox::critical(m_stereoTool, "Error", message);
 //        return;
         }
@@ -1186,7 +1185,7 @@ namespace Isis {
                           m_rightCube->fileName() + ".";
         throw IException(IException::User, message, _FILEINFO_);
 //      QString message = "Point does not exist on cube, " +
-//                        QString(m_rightCube->fileName().c_str()) + ".";
+//                        QString(m_rightCube->fileName().c_str() ) + ".";
 //      QMessageBox::critical(m_stereoTool, "Error", message);
 //      return;
       }
@@ -1196,7 +1195,7 @@ namespace Isis {
                         m_leftCube->fileName() + ".";
       throw IException(IException::User, message, _FILEINFO_);
 //    QString message = "Point does not exist on cube, " +
-//                      QString(m_leftCube->fileName().c_str()) + ".";
+//                      QString(m_leftCube->fileName().c_str() ) + ".";
 //    QMessageBox::critical(m_stereoTool, "Error", message);
 //    return;
     }
@@ -1216,7 +1215,7 @@ namespace Isis {
       {
         return;
       }
-      if (ok && id.isEmpty()) {
+      if ( ok && id.isEmpty() ) {
         // user clicked "Ok" but did not enter a point ID
         QString message = "You must enter a point Id.";
         QMessageBox::warning(m_stereoTool, "Warning", message);
@@ -1224,8 +1223,8 @@ namespace Isis {
       else {
         // Make sure Id doesn't already exist
         newPoint = new ControlPoint(id);
-        if (m_controlNet->GetNumPoints() > 0 &&
-            m_controlNet->ContainsPoint(newPoint->GetId())) {
+        if ( m_controlNet->GetNumPoints() > 0 &&
+             m_controlNet->ContainsPoint(newPoint->GetId() ) ) {
           QString message = "A ControlPoint with Point Id = [" +
                             newPoint->GetId() +
                             "] already exists.  Re-enter unique Point Id.";
@@ -1239,9 +1238,9 @@ namespace Isis {
     }
 
     newPoint->SetType(ControlPoint::Free);
-    newPoint->SetAprioriSurfacePoint(SurfacePoint(
+    newPoint->SetAprioriSurfacePoint( SurfacePoint(
               Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees),
-              m_targetRadius));
+              m_targetRadius) );
 
     // Set first measure to Left
     ControlMeasure *mLeft = new ControlMeasure;
@@ -1249,7 +1248,7 @@ namespace Isis {
     mLeft->SetCoordinate(leftSamp, leftLine);
     mLeft->SetType(ControlMeasure::Manual);
     mLeft->SetDateTime();
-    mLeft->SetChooserName(Application::UserName());
+    mLeft->SetChooserName( Application::UserName() );
     newPoint->Add(mLeft);
     //  Second measure is Right measure
     ControlMeasure *mRight = new ControlMeasure;
@@ -1257,13 +1256,13 @@ namespace Isis {
     mRight->SetCoordinate(rightSamp, rightLine);
     mRight->SetType(ControlMeasure::Manual);
     mRight->SetDateTime();
-    mRight->SetChooserName(Application::UserName());
+    mRight->SetChooserName( Application::UserName() );
     newPoint->Add(mRight);
 
     //  Add new control point to control network
     m_controlNet->AddPoint(newPoint);
     //  Read newly added point
-    m_editPoint = m_controlNet->GetPoint((QString) newPoint->GetId());
+    m_editPoint = m_controlNet->GetPoint( (QString) newPoint->GetId() );
     //  Load new point in StereoTool
     loadPoint();
     m_stereoTool->setShown(true);
@@ -1293,7 +1292,7 @@ namespace Isis {
 
     //loadPoint();
 
-    m_controlNet->DeletePoint(m_editPoint->GetId());
+    m_controlNet->DeletePoint( m_editPoint->GetId() );
     m_stereoTool->setShown(false);
     m_editPoint = NULL;
 
@@ -1325,10 +1324,10 @@ namespace Isis {
   void StereoTool::loadPoint() {
 
     //  Initialize pointEditor with measures
-    m_pointEditor->setLeftMeasure(m_editPoint->GetMeasure(Left), m_leftCube,
-                                  m_editPoint->GetId());
-    m_pointEditor->setRightMeasure(m_editPoint->GetMeasure(Right),
-                                   m_rightCube, m_editPoint->GetId());
+    m_pointEditor->setLeftMeasure( m_editPoint->GetMeasure(Left), m_leftCube,
+                                   m_editPoint->GetId() );
+    m_pointEditor->setRightMeasure( m_editPoint->GetMeasure(Right),
+                                    m_rightCube, m_editPoint->GetId() );
 
     //  Write pointId
     QString ptId = "Point ID:  " + m_editPoint->GetId();
@@ -1345,12 +1344,12 @@ namespace Isis {
     // Draw profile
     int x1, y1, x2, y2;
     //MdiCubeViewport *cvp = cubeViewport();
-    vp->cubeToViewport(m_startPoint->GetMeasure(serialNumber)->GetSample(),
-                       m_startPoint->GetMeasure(serialNumber)->GetLine(),
-                       x1, y1);
-    vp->cubeToViewport(m_endPoint->GetMeasure(serialNumber)->GetSample(),
-                       m_endPoint->GetMeasure(serialNumber)->GetLine(),
-                       x2, y2);
+    vp->cubeToViewport( m_startPoint->GetMeasure(serialNumber)->GetSample(),
+                        m_startPoint->GetMeasure(serialNumber)->GetLine(),
+                        x1, y1 );
+    vp->cubeToViewport( m_endPoint->GetMeasure(serialNumber)->GetSample(),
+                        m_endPoint->GetMeasure(serialNumber)->GetLine(),
+                        x2, y2 );
     painter->setPen(Qt::green); // set all other point markers green
     painter->drawLine(x1, y1, x2, y2);
 
@@ -1370,14 +1369,14 @@ namespace Isis {
     AbstractPlotTool::paintViewport(vp, painter);
     
     //  Make sure we have points to draw
-    if (m_controlNet == NULL || m_controlNet->GetNumPoints() == 0)
+    if ( m_controlNet == NULL || m_controlNet->GetNumPoints() == 0 )
       return;
 
     QString serialNumber = SerialNumber::Compose(*vp->cube(), true);
 
     //  If viewport serial number not found in control net, return
-    if (!m_controlNet->GetCubeSerials().contains(
-               serialNumber)) return;
+    if ( !m_controlNet->GetCubeSerials().contains(
+               serialNumber) ) return;
 
     //  Draw profile if it exists
 //  if (m_startPoint != NULL && m_endPoint != NULL) {
@@ -1396,15 +1395,15 @@ namespace Isis {
       int x, y;
       vp->cubeToViewport(samp, line, x, y);
       // if the point is ignored,
-      if (m->Parent()->IsIgnored()) {
-        painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+      if ( m->Parent()->IsIgnored() ) {
+        painter->setPen( QColor(255, 255, 0) ); // set point marker yellow
       }
       // point is not ignored, but measure matching this image is ignored,
-      else if (m->IsIgnored()) {
-        painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+      else if ( m->IsIgnored() ) {
+        painter->setPen( QColor(255, 255, 0) ); // set point marker yellow
       }
       // Neither point nor measure is not ignored and the measure is fixed,
-      else if (m->Parent()->GetType() != ControlPoint::Free) {
+      else if ( m->Parent()->GetType() != ControlPoint::Free) {
         painter->setPen(Qt::magenta);// set point marker magenta
       }
       else {
@@ -1416,9 +1415,9 @@ namespace Isis {
     }
 
     // if StereoTool is open,
-    if (m_editPoint != NULL) {
+    if ( m_editPoint != NULL ) {
       // and the selected point is in the image,
-      if (m_editPoint->HasSerialNumber(serialNumber)) {
+      if ( m_editPoint->HasSerialNumber(serialNumber) ) {
         // find the measurement
         double samp = (*m_editPoint)[serialNumber]->GetSample();
         double line = (*m_editPoint)[serialNumber]->GetLine();
@@ -1449,8 +1448,8 @@ namespace Isis {
     // Calling update will cause the Tool class to call all registered tools 
     // if point has been deleted, this will remove it from the main window
     MdiCubeViewport *vp;
-    for (int i=0; i<(int)cubeViewportList()->size(); i++) {
-      vp = (*(cubeViewportList()))[i];
+    for (int i = 0; i < (int) cubeViewportList()->size(); i++) {
+      vp = (*( cubeViewportList() ) )[i];
        vp->viewport()->update();
     }
   }
@@ -1475,13 +1474,13 @@ namespace Isis {
     //  If the local radius combo box is set to DEM, get the dem radius
     //  First, SetImage using the Elevation model, before turning off
     //  to get camera angles.
-    if (m_radiusBox->currentText() == "DEM Radius") {
+    if ( m_radiusBox->currentText() == "DEM Radius" ) {
       leftCamera->IgnoreElevationModel(false);
-      leftCamera->SetImage((*point)[Left]->GetSample(),
-                           (*point)[Left]->GetLine());
-      m_baseRadius = leftCamera->LocalRadius(leftCamera->GetLatitude(),
-                                             leftCamera->GetLongitude());
-      if (!m_baseRadius.isValid()) {
+      leftCamera->SetImage( (*point)[Left]->GetSample(),
+                           (*point)[Left]->GetLine() );
+      m_baseRadius = leftCamera->LocalRadius( leftCamera->GetLatitude(),
+                                              leftCamera->GetLongitude() );
+      if ( !m_baseRadius.isValid() ) {
         QString message = "Invalid Dem radius, defaulting to ellipsoidal.";
         QMessageBox::warning(m_stereoTool, "Invalid Dem radius", message);
         m_baseRadius = m_targetRadius;
@@ -1489,16 +1488,16 @@ namespace Isis {
     }
 
     leftCamera->IgnoreElevationModel(true);
-    leftCamera->SetImage((*point)[Left]->GetSample(),
-                         (*point)[Left]->GetLine());
+    leftCamera->SetImage( (*point)[Left]->GetSample(),
+                         (*point)[Left]->GetLine() );
     Camera *rightCamera = m_rightCube->camera();
     rightCamera->IgnoreElevationModel(true);
-    rightCamera->SetImage((*point)[Right]->GetSample(),
-                          (*point)[Right]->GetLine());
+    rightCamera->SetImage( (*point)[Right]->GetSample(),
+                          (*point)[Right]->GetLine() );
 
     double radius, lat, lon, sepang;
-    if (Stereo::elevation(*leftCamera,*rightCamera,radius,lat,lon,sepang,
-                          elevationError)) {
+    if ( Stereo::elevation( *leftCamera, *rightCamera, radius, lat, lon, sepang,
+                            elevationError ) ) {
       elevation = radius - m_baseRadius.meters();
 //      cout<<setprecision(15)<<"radius = "<<radius<<"  baseRadius = "<<m_baseRadius.meters()<<"  elevation = "<<elevation<<endl;
     }
@@ -1509,7 +1508,7 @@ namespace Isis {
     // TODO:  Find better way - This is not a good way to do this, using
     // ControlMeasure to save other values.  Save The baseRadius in Diameter
     point->GetMeasure(Left)->SetFocalPlaneMeasured(elevation, elevationError);
-    point->GetMeasure(Left)->SetDiameter(m_baseRadius.meters());
+    point->GetMeasure(Left)->SetDiameter(m_baseRadius.meters() );
     updateLabels();
 
     return;
@@ -1525,11 +1524,11 @@ namespace Isis {
    */
 
   void StereoTool::setTemplateFile() {
-    QString filename = QFileDialog::getOpenFileName(m_stereoTool,
+    QString filename = QFileDialog::getOpenFileName( m_stereoTool,
                        "Select a registration template", ".",
-                       "Registration template files (*.def *.pvl);;All files (*)");
+                       "Registration template files (*.def *.pvl);;All files (*)" );
 
-    if (filename.isEmpty())
+    if ( filename.isEmpty() )
       return;
 
     m_pointEditor->setTemplateFile(filename);
@@ -1551,12 +1550,12 @@ namespace Isis {
   void StereoTool::viewTemplateFile() {
     try {
       // Get the template file from the ControlPointEditor object
-      Pvl templatePvl(m_pointEditor->templateFileName());
+      Pvl templatePvl( m_pointEditor->templateFileName() );
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
-      registrationDialog.setWindowTitle("View or Edit Template File: "
-                                        + templatePvl.fileName());
+      registrationDialog.setWindowTitle( "View or Edit Template File: "
+                                         + templatePvl.fileName() );
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }
@@ -1574,15 +1573,15 @@ namespace Isis {
    */
   void StereoTool::saveAsElevations() {
 
-    QString fn = QFileDialog::getSaveFileName(m_stereoTool,
+    QString fn = QFileDialog::getSaveFileName( m_stereoTool,
                  "Choose filename to save under",
                  ".",
-                 "CSV Files (*.csv)");
+                 "CSV Files (*.csv)" );
     QString filename;
 
     //Make sure the filename is valid
-    if(!fn.isEmpty()) {
-      if(!fn.endsWith(".csv")) {
+    if( !fn.isEmpty() ) {
+      if( !fn.endsWith(".csv") ) {
         filename = fn + ".csv";
       }
       else {
@@ -1604,7 +1603,7 @@ namespace Isis {
 
   void StereoTool::saveElevations() {
 
-    if (m_currentFile.fileName().isEmpty()) return;
+    if ( m_currentFile.fileName().isEmpty() ) return;
 
     bool success = m_currentFile.open(QIODevice::WriteOnly);
     if(!success) {
@@ -1621,26 +1620,26 @@ namespace Isis {
     header += "Image 1, Sample, Line, Image  2, Sample, Line";
     text << header << endl;
 
-    QString leftFile = FileName(m_leftCube->fileName()).name();
-    QString rightFile = FileName(m_rightCube->fileName()).name();
+    QString leftFile = FileName( m_leftCube->fileName() ).name();
+    QString rightFile = FileName( m_rightCube->fileName() ).name();
     QString data;
     for (int i = 0; i < m_controlNet->GetNumPoints(); i++) {
-      ControlPoint &p = *((*m_controlNet)[i]);
+      ControlPoint &p = *( (*m_controlNet)[i] );
       SurfacePoint apriori = p.GetAprioriSurfacePoint();
       data = p.GetId() + "," +
-             QString::number(apriori.GetLatitude().degrees()) + "," +
-             QString::number(apriori.GetLongitude().degrees()) + "," +
-             QString::number(p.GetMeasure(Left)->GetDiameter(), 'f', 6) + 
+             QString::number( apriori.GetLatitude().degrees() ) + "," +
+             QString::number( apriori.GetLongitude().degrees() ) + "," +
+             QString::number( p.GetMeasure(Left)->GetDiameter(), 'f', 6 ) + 
              "," + 
-             QString::number(p.GetMeasure(Left)->GetFocalPlaneMeasuredX(), 'f',
-                             6) + "," +
-             QString::number(p.GetMeasure(Left)->GetFocalPlaneMeasuredY(), 'f',
-                             6) + "," + leftFile + "," +
-             QString::number(p.GetMeasure(Left)->GetSample()) + "," +
-             QString::number(p.GetMeasure(Left)->GetLine()) + "," +
+             QString::number( p.GetMeasure(Left)->GetFocalPlaneMeasuredX(), 'f',
+                              6 ) + "," +
+             QString::number( p.GetMeasure(Left)->GetFocalPlaneMeasuredY(), 'f',
+                              6 ) + "," + leftFile + "," +
+             QString::number( p.GetMeasure(Left)->GetSample() ) + "," +
+             QString::number( p.GetMeasure(Left)->GetLine() ) + "," +
              rightFile + "," +
-             QString::number(p.GetMeasure(Right)->GetSample()) + "," +
-             QString::number(p.GetMeasure(Right)->GetLine());
+             QString::number( p.GetMeasure(Right)->GetSample() ) + "," +
+             QString::number( p.GetMeasure(Right)->GetLine() );
       text << data << endl;
     }
     m_currentFile.close();
@@ -1676,36 +1675,36 @@ namespace Isis {
 //  calculateElevation(m_startPoint);
 //  calculateElevation(m_endPoint);
   
-    QPointF leftStart((*m_startPoint)[Left]->GetSample(),
-                      (*m_startPoint)[Left]->GetLine());
-    QPointF leftEnd((*m_endPoint)[Left]->GetSample(),
-                    (*m_endPoint)[Left]->GetLine());
+    QPointF leftStart( (*m_startPoint)[Left]->GetSample(),
+                      (*m_startPoint)[Left]->GetLine() );
+    QPointF leftEnd( (*m_endPoint)[Left]->GetSample(),
+                    (*m_endPoint)[Left]->GetLine() );
 
-    QPointF rightStart((*m_startPoint)[Right]->GetSample(),
-                       (*m_startPoint)[Right]->GetLine());
-    QPointF rightEnd((*m_endPoint)[Right]->GetSample(),
-                     (*m_endPoint)[Right]->GetLine());
+    QPointF rightStart( (*m_startPoint)[Right]->GetSample(),
+                       (*m_startPoint)[Right]->GetLine() );
+    QPointF rightEnd( (*m_endPoint)[Right]->GetSample(),
+                     (*m_endPoint)[Right]->GetLine() );
 
     // Convert these to screen coordinates for updating the rubberband
     QList< QList<QPoint> > rubberBandVertices;
     QList<QPoint> rubberBand1;
     int sx, sy, ex, ey;
-    m_linkedViewports.at(0)->cubeToViewport((*m_startPoint)[Left]->GetSample(),
+    m_linkedViewports.at(0)->cubeToViewport( (*m_startPoint)[Left]->GetSample(),
                       (*m_startPoint)[Left]->GetLine(), sx, sy);
-    m_linkedViewports.at(0)->cubeToViewport((*m_endPoint)[Left]->GetSample(),
+    m_linkedViewports.at(0)->cubeToViewport( (*m_endPoint)[Left]->GetSample(),
                       (*m_endPoint)[Left]->GetLine(), ex, ey);
-    rubberBand1.push_back(QPoint(sx, sy));
-    rubberBand1.push_back(QPoint(ex, ey));
+    rubberBand1.push_back( QPoint(sx, sy) );
+    rubberBand1.push_back( QPoint(ex, ey) );
 
     rubberBandVertices.push_back(rubberBand1);
 
     QList<QPoint> rubberBand2;
-    m_linkedViewports.at(1)->cubeToViewport((*m_startPoint)[Right]->GetSample(),
+    m_linkedViewports.at(1)->cubeToViewport( (*m_startPoint)[Right]->GetSample(),
                       (*m_startPoint)[Right]->GetLine(), sx, sy);
-    m_linkedViewports.at(1)->cubeToViewport((*m_endPoint)[Right]->GetSample(),
+    m_linkedViewports.at(1)->cubeToViewport( (*m_endPoint)[Right]->GetSample(),
                       (*m_endPoint)[Right]->GetLine(), ex, ey);
-    rubberBand2.push_back(QPoint(sx, sy));
-    rubberBand2.push_back(QPoint(ex, ey));
+    rubberBand2.push_back( QPoint(sx, sy) );
+    rubberBand2.push_back( QPoint(ex, ey) );
 
     rubberBandVertices.push_back(rubberBand2);
 
@@ -1717,7 +1716,7 @@ namespace Isis {
     // finding the matching position on the longer line.
     QLineF longProfile, shortProfile;
     Cube *longCube, *shortCube;
-    if (leftProfile.length() > rightProfile.length()) {
+    if ( leftProfile.length() > rightProfile.length() ) {
       longProfile = leftProfile;
       longCube = m_leftCube;
       shortProfile = rightProfile;
@@ -1743,33 +1742,33 @@ namespace Isis {
     for (int i = 0; i <= (int) shortProfile.length(); i++) {
       double shortSamp=0, shortLine=0, longSamp=0, longLine=0;
       try {
-        shortSamp = shortProfile.pointAt(1/shortProfile.length() * i).x();
-        shortLine = shortProfile.pointAt(1/shortProfile.length() * i).y();
+        shortSamp = shortProfile.pointAt( 1/shortProfile.length() * i ).x();
+        shortLine = shortProfile.pointAt( 1/shortProfile.length() * i ).y();
 
-        longSamp = longProfile.pointAt(1/shortProfile.length() * i).x();
-        longLine = longProfile.pointAt(1/shortProfile.length() * i).y();
+        longSamp = longProfile.pointAt( 1/shortProfile.length() * i ).x();
+        longLine = longProfile.pointAt( 1/shortProfile.length() * i ).y();
 
         // Coreg
         ar->PatternChip()->TackCube(shortSamp, shortLine);
         ar->PatternChip()->Load(*shortCube);
         ar->SearchChip()->TackCube(longSamp, longLine);
-        ar->SearchChip()->Load(*longCube, *(ar->PatternChip()), *shortCube);
+        ar->SearchChip()->Load( *longCube, *( ar->PatternChip() ), *shortCube );
         ar->Register();
 //        AutoReg::RegisterStatus status = ar->Register();
-        if (ar->Success()) {
+        if ( ar->Success() ) {
           longSamp = ar->CubeSample();
           longLine = ar->CubeLine();
 
           //  If the local radius combo box is set to DEM, get the dem radius
           //  First, SetImage using the Elevation model, before turning off
           //  to get camera angles.
-          if (m_radiusBox->currentText() == "DEM Radius") {
+          if ( m_radiusBox->currentText() == "DEM Radius" ) {
             shortCube->camera()->IgnoreElevationModel(false);
             shortCube->camera()->SetImage(shortSamp, shortLine);
             m_baseRadius = shortCube->camera()->LocalRadius(
                                   shortCube->camera()->GetLatitude(),
-                                  shortCube->camera()->GetLongitude());
-            if (!m_baseRadius.isValid()) {
+                                  shortCube->camera()->GetLongitude() );
+            if ( !m_baseRadius.isValid() ) {
               QString message = "Invalid Dem radius, defaulting to ellipsoidal.";
               QMessageBox::warning(m_stereoTool, "Invalid Dem radius", message);
               m_baseRadius = m_targetRadius;
@@ -1782,10 +1781,10 @@ namespace Isis {
           shortCube->camera()->SetImage(shortSamp, shortLine);
           longCube->camera()->SetImage(longSamp,longLine);
           double radius, lat, lon, sepang;
-          if (Stereo::elevation(*shortCube->camera(), *longCube->camera(),
-                                radius, lat, lon, sepang, elevationError))
+          if (Stereo::elevation( *shortCube->camera(), *longCube->camera(),
+                                 radius, lat, lon, sepang, elevationError) )
           elevation = radius - m_baseRadius.meters();
-          profileData.append(QPointF(i, elevation));
+          profileData.append( QPointF(i, elevation) );
 //        elevations.push_back(elevation);
 //        pixels.push_back(i);
         }
@@ -1809,7 +1808,7 @@ namespace Isis {
 
 //    cout<<"Registration attempts = "<<(int)shortLength<<"  failures = "<<failureCount<<endl;
     QString message = "Registration attempts (pixels on line) = " +
-                      QString::number((int)shortProfile.length()) +
+                      QString::number( (int)shortProfile.length() ) +
                       "\n\nRegistration failures = " +
                       QString::number(failureCount) +
                       "\n\nYou can adjust registration parameters in the "
@@ -1819,7 +1818,7 @@ namespace Isis {
                       "\"View/edit registration template\".";
     QMessageBox::information(m_stereoTool, "Registration Report", message);
 
-    if (((int)shortProfile.length()+1 - failureCount) < 2) {
+    if ( ( (int)shortProfile.length() + 1 - failureCount ) < 2 ) {
       QString message = "Cannot create profile, all auto-registration between ";
       message += "the left and right cubes along the profile failed.  Try ";
       message += "adjusting the registration parameters.";
@@ -1830,10 +1829,10 @@ namespace Isis {
     plotWindow->setAxisLabel(0,"Elevation (meters)");
     CubePlotCurve *plotCurve = new CubePlotCurve(PlotCurve::PixelNumber,
                                                  PlotCurve::Elevation);
-//  plotCurve->setData(&pixels[0], &elevations[0], pixels.size());
-    plotCurve->setData(new QwtPointSeriesData(profileData));
+//  plotCurve->setData(&pixels[0], &elevations[0], pixels.size() );
+    plotCurve->setData( new QwtPointSeriesData(profileData) );
     plotCurve->setTitle("Elevations (Meters)");
-    plotCurve->setPen(QPen(Qt::white));
+    plotCurve->setPen( QPen(Qt::white) );
     plotCurve->setColor(Qt::white);
     //  Create vertices for rubberband based on refined profile end points
 
@@ -1858,27 +1857,27 @@ namespace Isis {
     // Empty elevation info if nothing there
     QString elevationLabel, elevationErrorLabel;
     QString baseRadiiLabel, leftDemRadiiLabel, rightDemRadiiLabel;
-    if (m_editPoint->GetMeasure(Left)->GetFocalPlaneMeasuredX() != Isis::Null) {
+    if ( m_editPoint->GetMeasure(Left)->GetFocalPlaneMeasuredX() != Isis::Null ) {
       elevationLabel = "Elevation:  " +
-                       QString::number(m_editPoint->GetMeasure(Left)->
-                       GetFocalPlaneMeasuredX(), 'f', 6);
+                       QString::number( m_editPoint->GetMeasure(Left)->
+                       GetFocalPlaneMeasuredX(), 'f', 6 );
       elevationErrorLabel = "Elevation Error:  " +
-                            QString::number(m_editPoint->GetMeasure(Left)->
-                            GetFocalPlaneMeasuredY(), 'f', 6);
+                            QString::number( m_editPoint->GetMeasure(Left)->
+                            GetFocalPlaneMeasuredY(), 'f', 6 );
       baseRadiiLabel = "Local Radii:  " + QString::number(
-                         m_baseRadius.meters(), 'f', 6);
+                         m_baseRadius.meters(), 'f', 6 );
 
       Camera *leftCamera = m_leftCube->camera();
-      leftCamera->SetImage((*m_editPoint)[Left]->GetSample(),
-                           (*m_editPoint)[Left]->GetLine());
+      leftCamera->SetImage( (*m_editPoint)[Left]->GetSample(),
+                           (*m_editPoint)[Left]->GetLine() );
       double leftDemRadii =
                   leftCamera->GetSurfacePoint().GetLocalRadius().meters();
       leftDemRadiiLabel = "Left DEM Radii:  " +
                           QString::number(leftDemRadii, 'f', 6);
 
       Camera *rightCamera = m_rightCube->camera();
-      rightCamera->SetImage((*m_editPoint)[Right]->GetSample(),
-                            (*m_editPoint)[Right]->GetLine());
+      rightCamera->SetImage( (*m_editPoint)[Right]->GetSample(),
+                            (*m_editPoint)[Right]->GetLine() );
       double rightDemRadii =
                   rightCamera->GetSurfacePoint().GetLocalRadius().meters();
       rightDemRadiiLabel = "Right DEM Radii:  " +
