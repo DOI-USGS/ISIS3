@@ -121,7 +121,7 @@ void IsisMain() {
 
       outputCubes[i]->putGroup(isis3Lab.group(grp));
     }
-
+    p.WriteHistory(*outputCubes[i]);
     outputCubes[i]->write(origLabels);
     outputCubes[i]->close();
     delete outputCubes[i];
