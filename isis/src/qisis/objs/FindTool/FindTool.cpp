@@ -57,8 +57,20 @@ namespace Isis {
     p_findPoint = new QAction(parent);
     p_findPoint->setShortcut(Qt::CTRL + Qt::Key_F);
     p_findPoint->setText("&Find Point");
-    p_findPoint->setIcon(QPixmap(toolIconDir() + "/find.png"));
-    p_findPoint->setEnabled(false);
+    p_findPoint->setIcon( QPixmap(toolIconDir() + "/find.png") );
+    QString text =
+      "<b>Function:</b> Centers all linked viewports to the selected lat/lon. \
+      The user can click anywhere on the image to have that point centered, or \
+      they can use the shortcut or button to bring up a window that they can \
+      enter a specific lat/lon position into. \
+      <p><b>Shortcut: </b> Ctrl+F </p> \
+      <p><b>Hint: </b> This option will only work if the image has a camera \
+            model or is projected, and will only center the point on images  \
+            where the selected lat/lon position exists.</p>";
+    p_findPoint->setWhatsThis(text);
+    p_findPoint->setEnabled(false); 
+    connect( p_findPoint, SIGNAL( triggered() ),
+             p_dialog, SLOT( show() ) ); 
   }
 
   FindTool::~FindTool() {
@@ -66,6 +78,7 @@ namespace Isis {
     delete p_groundTab->p_lonLineEdit->validator();
   }
 
+  
   /**
    * Creates the dialog used by this tool
    *
@@ -83,13 +96,16 @@ namespace Isis {
 
     // Create the action buttons
     QPushButton *okButton = new QPushButton("Ok");
-    connect(okButton, SIGNAL(clicked()), this, SLOT(handleOkClicked()));
+    connect( okButton, SIGNAL( clicked() ), 
+             this, SLOT( handleOkClicked() ) );
 
     QPushButton *recordButton = new QPushButton("Record Point");
-    connect(recordButton, SIGNAL(clicked()), this, SLOT(handleRecordClicked()));
+    connect( recordButton, SIGNAL( clicked() ), 
+             this, SLOT( handleRecordClicked() ) );
 
     QPushButton *closeButton = new QPushButton("Close");
-    connect(closeButton, SIGNAL(clicked()), p_dialog, SLOT(hide()));
+    connect( closeButton, SIGNAL( clicked() ), 
+             p_dialog, SLOT( hide() ) );
 
     // Put the buttons in a horizontal orientation
     QHBoxLayout *actionLayout = new QHBoxLayout();
@@ -112,10 +128,10 @@ namespace Isis {
   GroundTab::GroundTab(QWidget *parent) : QWidget(parent) {
     p_latLineEdit = new QLineEdit();
     p_latLineEdit->setText("");
-    p_latLineEdit->setValidator(new QDoubleValidator(-90.0, 90.0, 99, parent));
+    p_latLineEdit->setValidator( new QDoubleValidator(-90.0, 90.0, 99, parent) );
     p_lonLineEdit = new QLineEdit();
     p_lonLineEdit->setText("");
-    p_lonLineEdit->setValidator(new QDoubleValidator(parent));
+    p_lonLineEdit->setValidator( new QDoubleValidator(parent) );
     QLabel *latLabel = new QLabel("Latitude");
     QLabel *lonLabel = new QLabel("Longitude");
 
@@ -128,6 +144,7 @@ namespace Isis {
     setLayout(gridLayout);
   }
 
+  
   /**
    * The image tab used by the dialog in the FindTool
    *
@@ -148,9 +165,9 @@ namespace Isis {
     gridLayout->addWidget(lineLabel, 1, 0);
     gridLayout->addWidget(p_lineLineEdit, 1, 1);
     setLayout(gridLayout);
-
   }
 
+ 
   /**
    * Adds the find tool to the toolpad
    *
@@ -160,7 +177,7 @@ namespace Isis {
    */
   QAction *FindTool::toolPadAction(ToolPad *toolpad) {
     QAction *action = new QAction(toolpad);
-    action->setIcon(QPixmap(toolIconDir() + "/find.png"));
+    action->setIcon( QPixmap(toolIconDir() + "/find.png") );
     action->setToolTip("Find (F)");
     action->setShortcut(Qt::Key_F);
     QString text =
@@ -170,6 +187,7 @@ namespace Isis {
     return action;
   }
 
+  
   /**
    * Adds the find tool to the menu
    *
@@ -179,6 +197,7 @@ namespace Isis {
     menu->addAction(p_findPoint);
   }
 
+  
   /**
    * Creates the tool bar for the find tool
    *
@@ -190,7 +209,7 @@ namespace Isis {
     QWidget *hbox = new QWidget(parent);
 
     p_showDialogButton = new QToolButton(hbox);
-    p_showDialogButton->setIcon(QPixmap(toolIconDir() + "/find.png"));
+    p_showDialogButton->setIcon( QPixmap(toolIconDir() + "/find.png") );
     p_showDialogButton->setToolTip("Find Point");
     QString text =
       "<b>Function:</b> Centers all linked viewports to the selected lat/lon. \
@@ -202,9 +221,10 @@ namespace Isis {
             model or is projected, and will only center the point on images  \
             where the selected lat/lon position exists.</p>";
     p_showDialogButton->setWhatsThis(text);
-    connect(p_showDialogButton, SIGNAL(clicked()), p_dialog, SLOT(show()));
+    connect( p_showDialogButton, SIGNAL( clicked() ), 
+             p_dialog, SLOT( show() ) );
     p_showDialogButton->setAutoRaise(true);
-    p_showDialogButton->setIconSize(QSize(22, 22));
+    p_showDialogButton->setIconSize( QSize(22, 22) );
 
     p_syncScale = new QCheckBox("Sync Scale");
     p_syncScale->setChecked(true);
@@ -213,22 +233,22 @@ namespace Isis {
     p_syncScale->setWhatsThis(text);
 
     p_linkViewportsButton = new QToolButton(hbox);
-    p_linkViewportsButton->setIcon(QPixmap(toolIconDir() + "/link_valid.png"));
+    p_linkViewportsButton->setIcon( QPixmap(toolIconDir() + "/link_valid.png") );
     p_linkViewportsButton->setToolTip("Link Georeferenced Images");
     p_linkViewportsButton->setWhatsThis("<b>Function: </b> Links all open images that have\
                               a camera model or are map projections");
-    connect(p_linkViewportsButton, SIGNAL(clicked()), this,
-            SLOT(handleLinkClicked()));
+    connect( p_linkViewportsButton, SIGNAL( clicked() ), 
+             this, SLOT( handleLinkClicked() ) );
     p_linkViewportsButton->setAutoRaise(true);
-    p_linkViewportsButton->setIconSize(QSize(22, 22));
+    p_linkViewportsButton->setIconSize( QSize(22, 22) );
 
     p_togglePointVisibleButton = new QToolButton(hbox);
-    p_togglePointVisibleButton->setIcon(QPixmap(toolIconDir() + "/redDot.png"));
+    p_togglePointVisibleButton->setIcon( QPixmap(toolIconDir() + "/redDot.png") );
     p_togglePointVisibleButton->setToolTip("Hide red dot");
     p_togglePointVisibleButton->setCheckable(true);
     p_togglePointVisibleButton->setChecked(true);
-    connect(p_togglePointVisibleButton, SIGNAL(clicked()), this,
-            SLOT(togglePointVisible()));
+    connect( p_togglePointVisibleButton, SIGNAL( clicked() ), 
+             this, SLOT( togglePointVisible() ) );
 
     p_statusEdit = new QLineEdit();
     p_statusEdit->setReadOnly(true);
@@ -250,7 +270,8 @@ namespace Isis {
 
     return hbox;
   }
-
+  
+  
   /**
    * Overriden method to update this tool - Checks if cube is open and
    * checks if the image has camera and/or projection or none and sets
@@ -271,7 +292,7 @@ namespace Isis {
       p_showDialogButton->setEnabled(false);
       p_syncScale->setEnabled(false);
       p_statusEdit->setText("None");
-      if (p_dialog->isVisible()) {
+      if ( p_dialog->isVisible() ) {
         p_dialog->close();
       }
     }
@@ -291,7 +312,7 @@ namespace Isis {
 
       if (activeViewport->camera() != NULL) {
         p_statusEdit->setText("Camera");
-        if (cubeViewport()->camera()->HasProjection()) {
+        if ( cubeViewport()->camera()->HasProjection() ) {
           p_statusEdit->setText("Both");
         }
       }
@@ -305,9 +326,9 @@ namespace Isis {
       UniversalGroundMap *groundMap = activeViewport->universalGroundMap();
 
       if (p_samp != DBL_MAX && p_line != DBL_MAX) {
-        if (groundMap && groundMap->SetImage(p_samp, p_line)) {
-          QString latStr = QString::number(groundMap->UniversalLatitude());
-          QString lonStr = QString::number(groundMap->UniversalLongitude());
+        if ( groundMap && groundMap->SetImage(p_samp, p_line) ) {
+          QString latStr = QString::number( groundMap->UniversalLatitude() );
+          QString lonStr = QString::number( groundMap->UniversalLongitude() );
           p_groundTab->p_latLineEdit->setText(latStr);
           p_groundTab->p_lonLineEdit->setText(lonStr);
         }
@@ -316,14 +337,14 @@ namespace Isis {
           p_groundTab->p_lonLineEdit->setText("");
         }
 
-        p_imageTab->p_sampLineEdit->setText(QString::number(p_samp));
-        p_imageTab->p_lineLineEdit->setText(QString::number(p_line));
+        p_imageTab->p_sampLineEdit->setText( QString::number(p_samp) );
+        p_imageTab->p_lineLineEdit->setText( QString::number(p_line) );
       }
       else if (p_lat != DBL_MAX && p_lon != DBL_MAX) {
         // this should also work for rings (radius, azimuth)
-        if (groundMap && groundMap->SetUniversalGround(p_lat, p_lon)) {
-          QString lineStr = QString::number(groundMap->Line());
-          QString sampStr = QString::number(groundMap->Sample());
+        if ( groundMap && groundMap->SetUniversalGround(p_lat, p_lon) ) {
+          QString lineStr = QString::number( groundMap->Line() );
+          QString sampStr = QString::number( groundMap->Sample() );
           p_imageTab->p_lineLineEdit->setText(lineStr);
           p_imageTab->p_sampLineEdit->setText(sampStr);
         }
@@ -332,8 +353,8 @@ namespace Isis {
           p_imageTab->p_sampLineEdit->setText("");
         }
 
-        p_groundTab->p_latLineEdit->setText(QString::number(p_lat));
-        p_groundTab->p_lonLineEdit->setText(QString::number(p_lon));
+        p_groundTab->p_latLineEdit->setText( QString::number(p_lat) );
+        p_groundTab->p_lonLineEdit->setText( QString::number(p_lon) );
       }
     } // of if activeViewport != NULL
   }
@@ -352,12 +373,11 @@ namespace Isis {
     p_lat = DBL_MAX;
     p_lon = DBL_MAX;
 
-
-    if (p_tabWidget->tabText(p_tabWidget->currentIndex()) == "Ground") {
+    if (p_tabWidget->tabText( p_tabWidget->currentIndex() ) == "Ground") {
       p_lat = p_groundTab->p_latLineEdit->text().toDouble();
       p_lon = p_groundTab->p_lonLineEdit->text().toDouble();
     }
-    else if (p_tabWidget->tabText(p_tabWidget->currentIndex()) == "Image") {
+    else if (p_tabWidget->tabText( p_tabWidget->currentIndex() ) == "Image") {
       p_line = p_imageTab->p_lineLineEdit->text().toDouble();
       p_samp = p_imageTab->p_sampLineEdit->text().toDouble();
     }
@@ -367,6 +387,7 @@ namespace Isis {
     updateTool();
   }
 
+  
   /**
    * Slot called when the record button is clicked.  It creates a
    * QPoint from the current line/sample in the active cube
@@ -391,7 +412,7 @@ namespace Isis {
       UniversalGroundMap *groundMap = cvp->universalGroundMap();
 
       if (groundMap) {
-        if (groundMap->SetUniversalGround(p_lat, p_lon)) {
+        if ( groundMap->SetUniversalGround(p_lat, p_lon) ) {
           line = groundMap->Line();
           samp = groundMap->Sample();
         }
@@ -428,7 +449,7 @@ namespace Isis {
     p_lon = DBL_MAX;
 
     if (groundMap) {
-      if (groundMap->SetImage(samp, line)) {
+      if ( groundMap->SetImage(samp, line) ) {
         p_lat = groundMap->UniversalLatitude();
         p_lon = groundMap->UniversalLongitude();
       }
@@ -457,7 +478,7 @@ namespace Isis {
    *                                 images, whether they have a cam or not
    */
   void FindTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
-    if ((vp == cubeViewport() || (cubeViewport()->isLinked() && vp->isLinked()))
+    if ( (vp == cubeViewport() || ( cubeViewport()->isLinked() && vp->isLinked() ) )
         && p_pointVisible) {
       double samp = p_samp;
       double line = p_line;
@@ -465,7 +486,7 @@ namespace Isis {
       UniversalGroundMap *groundMap = vp->universalGroundMap();
 
       if (p_lat != DBL_MAX && p_lon != DBL_MAX && groundMap) {
-        if (groundMap->SetUniversalGround(p_lat, p_lon)) {
+        if ( groundMap->SetUniversalGround(p_lat, p_lon) ) {
           samp = groundMap->Sample();
           line = groundMap->Line();
         }
@@ -486,6 +507,7 @@ namespace Isis {
     }
   }
 
+  
   //! toggles visibility of the red circle
   void FindTool::togglePointVisible() {
     // toggle the member boolean that specifies visibility
@@ -509,7 +531,7 @@ namespace Isis {
   void FindTool::handleLinkClicked() {
     MdiCubeViewport *d;
     for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
-      d = (*(cubeViewportList()))[i];
+      d = ( *( cubeViewportList() ) )[i];
       if (d->universalGroundMap() != NULL) {
         d->setLinked(true);
       }
@@ -533,25 +555,24 @@ namespace Isis {
     //   otherViewportZoomFactor = activeViewportZoomFactor *
     //       (otherViewportResolution / activeViewportResolution)
     if (syncScale) {
-      viewportResolutionToMatch = distancePerPixel(activeViewport, p_lat,
-                                                   p_lon);
+      viewportResolutionToMatch = distancePerPixel(activeViewport, p_lat, p_lon);
     }
 
     for (int i = 0; i < cubeViewportList()->size(); i++) {
-      MdiCubeViewport *viewport = (*(cubeViewportList()))[i];
+      MdiCubeViewport *viewport = ( *( cubeViewportList() ) )[i];
 
-      if (viewport == activeViewport ||
-          (activeViewport->isLinked() && viewport->isLinked())) {
+      if ( viewport == activeViewport ||
+           ( activeViewport->isLinked() && viewport->isLinked() ) ) {
         groundMap = viewport->universalGroundMap();
         double otherViewportZoomFactor = viewport->scale();
 
-        if (groundMap && !IsSpecial(p_lat) && p_lat != DBL_MAX &&
-            !IsSpecial(p_lon) && p_lon != DBL_MAX &&
-            groundMap->SetUniversalGround(p_lat, p_lon)) {
+        if ( groundMap && !IsSpecial(p_lat) && p_lat != DBL_MAX &&
+             !IsSpecial(p_lon) && p_lon != DBL_MAX &&
+             groundMap->SetUniversalGround(p_lat, p_lon) ) {
           double samp = groundMap->Sample();
           double line = groundMap->Line();
 
-          if (viewportResolutionToMatch.isValid()) {
+          if ( viewportResolutionToMatch.isValid() ) {
             Distance otherViewportResolution = distancePerPixel(viewport,
                                                                 p_lat, p_lon);
             otherViewportZoomFactor = activeViewport->scale() *
@@ -592,20 +613,19 @@ namespace Isis {
     UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
 
-    if (groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&
-        lat != DBL_MAX && lon != DBL_MAX &&
-        groundMap->SetUniversalGround(lat, lon)) {
+    if ( groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&
+         lat != DBL_MAX && lon != DBL_MAX &&
+         groundMap->SetUniversalGround(lat, lon) ) {
       // Distance/pixel
-      viewportResolution = Distance(groundMap->Resolution(),
-                                    Distance::Meters);
+      viewportResolution = Distance(groundMap->Resolution(), Distance::Meters);
       double samp = groundMap->Sample();
       double line = groundMap->Line();
 
-      if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
+      if ( groundMap->SetImage(samp - 0.5, line - 0.5) ) {
         double lat1 = groundMap->UniversalLatitude();
         double lon1 = groundMap->UniversalLongitude();
 
-        if (groundMap->SetImage(samp + 0.5, line + 0.5)) {
+        if ( groundMap->SetImage(samp + 0.5, line + 0.5) ) {
           double lat2 = groundMap->UniversalLatitude();
           double lon2 = groundMap->UniversalLongitude();
 
@@ -613,15 +633,13 @@ namespace Isis {
               groundMap->Projection()->LocalRadius() :
               groundMap->Camera()->LocalRadius().meters();
 
-          SurfacePoint point1(
-              Latitude(lat1, Angle::Degrees),
-              Longitude(lon1, Angle::Degrees),
-              Distance(radius, Distance::Meters));
+          SurfacePoint point1( Latitude(lat1, Angle::Degrees),
+                               Longitude(lon1, Angle::Degrees),
+                               Distance(radius, Distance::Meters) );
 
-          SurfacePoint point2(
-              Latitude(lat2, Angle::Degrees),
-              Longitude(lon2, Angle::Degrees),
-              Distance(radius, Distance::Meters));
+          SurfacePoint point2( Latitude(lat2, Angle::Degrees),
+                               Longitude(lon2, Angle::Degrees),
+                               Distance(radius, Distance::Meters) );
 
           viewportResolution = point1.GetDistanceToPoint(point2);
         }
@@ -636,9 +654,9 @@ namespace Isis {
   void FindTool::refresh() {
     MdiCubeViewport *activeVp = cubeViewport();
     for (int i = 0; i < cubeViewportList()->size(); i++) {
-      MdiCubeViewport *vp = (*(cubeViewportList()))[i];
+      MdiCubeViewport *vp = ( *( cubeViewportList() ) )[i];
 
-      if (vp == activeVp || (activeVp->isLinked() && vp->isLinked()))
+      if ( vp == activeVp || (activeVp->isLinked() && vp->isLinked() ) )
         vp->viewport()->repaint();
     }
   }
