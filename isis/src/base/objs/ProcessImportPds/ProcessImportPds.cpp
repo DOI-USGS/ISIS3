@@ -1217,18 +1217,26 @@ namespace Isis {
 
 
   /**
-   * End the processing sequence and cleans up by closing cubes,
-   * freeing memory, etc. Adds the OriginalLabel data to the end
-   * of the cube file, unless OmitOriginalLabel() has been called.
-   */
+  * @deprecated. Please use Finalize. 
+  */
   void ProcessImportPds::EndProcess() {
+    ProcessImportPds::Finalize();
+  }
+
+
+  /**
+  * End the processing sequence and cleans up by closing cubes,
+  * freeing memory, etc. Adds the OriginalLabel data to the end of
+  * the cube file, unless OmitOriginalLabel() has been called. 
+  */
+  void ProcessImportPds::Finalize() {
     if (p_keepOriginalLabel) {
       OriginalLabel ol(p_pdsLabel);
-      for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+      for (unsigned int i = 0; i < OutputCubes.size(); i++) {
         OutputCubes[i]->write(ol);
       }
     }
-    Process::EndProcess();
+    Process::Finalize();
   }
 
 

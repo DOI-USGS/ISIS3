@@ -56,6 +56,7 @@ void IsisMain() {
   //  The first process will import the image into Cube format as is.
   ProcessImportPds importPds;
   Pvl inputLabelPvl;
+
   importPds.SetPdsFile(from.expanded(), "", inputLabelPvl);
 
   // from the pds label, verfify that the image is valid before continuing
@@ -108,7 +109,7 @@ void IsisMain() {
   importPds.SetOutputCube(importProcessOutCube.expanded(), outatt);
   importPds.StartProcess();
   importPds.Finalize();
-  
+
   CubeAttributeInput inatt;
   
   // The second process will enlarge the imported cube from 537x244 to 537x412
@@ -247,7 +248,6 @@ void translateMsiLabels(Pvl inputLabelPvl, Pvl *isisLabelPvl) {
   instGrp += PvlKeyword("DpuDeckTemperature", 
                      inputLabelPvl["INSTRUMENT_TEMPERATURE"][1], 
                      inputLabelPvl["INSTRUMENT_TEMPERATURE"].unit()); 
-
 
   // we might want to read values from the FITS header in the future. For
   // example...

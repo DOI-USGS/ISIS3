@@ -195,7 +195,15 @@ namespace Isis {
    *                          This also required moving some of the code from the
    *                          SetPdsFile method to a new method, ProcessLabel. Fixes
    *                          #2036.
-   *  
+   *  @history 2014-03-19 Kristin Berry - Added a Finalize method
+   *                          identical to the old EndProcess
+   *                          method so that
+   *                          ProcessImportPds::Finalize is
+   *                          called, rather than
+   *                          Process::Finalize on
+   *                          ProcessImportPds objects. Marked
+   *                          EndProcess as deprecated.
+   *                     
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
@@ -236,7 +244,7 @@ namespace Isis {
       using ProcessImport::StartProcess;
       void StartProcess();
       void EndProcess();
-
+      void Finalize();
     private:
 
 
