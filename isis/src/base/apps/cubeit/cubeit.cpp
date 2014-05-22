@@ -34,10 +34,11 @@ void IsisMain() {
   try {
     for(int i = 0; i < cubeList.size(); i++) {
       Cube cube;
-      CubeAttributeInput inatt(cubeList[i].original());
+      CubeAttributeInput inatt(cubeList[i].original()); 
       vector<QString> bands = inatt.bands();
       cube.setVirtualBands(bands);
       cube.open(cubeList[i].toString());
+
       if(i == 0) {
         nsamps = cube.sampleCount();
         nlines = cube.lineCount();
@@ -103,7 +104,6 @@ void IsisMain() {
   }
   p2.SetInputCube(cubeList[index].toString(), inatt);
 
-
   // Create the output cube
   Cube *ocube = p2.SetOutputCube("TO", nsamps, nlines, nbands);
   p2.ClearInputCubes();
@@ -127,7 +127,7 @@ void IsisMain() {
     prog->SetText("Adding band " + toString((int)i + 1) +
                   " of " + toString(nbands));
     m.SetOutputCube("TO");
-    CubeAttributeInput attrib(cubeList[i].toString());
+    CubeAttributeInput attrib(cubeList[i].original()); 
     Cube *icube = m.SetInputCube(cubeList[i].toString(), attrib);
     m.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
     m.StartProcess(1, 1, sband);

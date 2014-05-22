@@ -52,6 +52,9 @@
       Fixed handling of band specifications in the list file. The band bin group is still incorrect,
       but the correct bands are now placed in the output cube. Fixes #964.
     </change>
+     <change name="Kristin Berry" date="2014-05-20">
+       Fixed handing of input attributes so that the specified input band(s) are included in the output cube. 
+     </change>
   </history>
 
   <groups>
