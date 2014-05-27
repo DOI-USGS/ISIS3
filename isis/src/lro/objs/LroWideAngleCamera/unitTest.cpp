@@ -30,6 +30,10 @@
 using namespace std;
 using namespace Isis;
 
+// 2013-12-19 We will have new CK kernels with temperature dependence coming
+// that will affect the lat/lon values here.  Also must get a new FK, IK and
+// IAK.  Don;t forget to move the new test cube to $ISISROOT/lro/testData!!!!
+
 void TestLineSamp(Camera *cam, double samp, double line);
 
 int main(void) {
@@ -40,8 +44,9 @@ int main(void) {
   try {
 
     // Support different camera model versions thusly...
-    Cube c("$lro/testData/wacCameraTest.cub", "r");
-    int cmVersion = CameraFactory::CameraVersion(c);
+    Cube cube;
+    cube.open("$lro/testData/wacCameraTest.cub");
+    int cmVersion = CameraFactory::CameraVersion(cube);
 
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
@@ -53,19 +58,18 @@ int main(void) {
     if (cmVersion == 1) {
      knownLat = -70.69638475050628;
      knownLon =  244.3314992195277;
-     c.close();
-     c.open("$lro/testData/wacCameraTest.cub.cv1", "r");
+     cube.open("$lro/testData/wacCameraTest.cub.cv1");
     }
     else {
-      // Version 2 difference caused by new CK and comprehensive IK kernel support
-      //   and no longer using a DEM
-      knownLat = -70.70409850373171;
-      knownLon = 244.3339031595905;
+      // Version 2 or higher difference caused by new CK and comprehensive IK
+      //   kernel support and no longer using a DEM
+      knownLat = -70.7067960917672735;
+      knownLon = 244.3369098738304217;
     }
 
 
-    Camera *cam = CameraFactory::Create(c);
-    cout << "FileName: " << FileName(c.fileName()).name() << endl;
+    Camera *cam = CameraFactory::Create(cube);
+    cout << "FileName: " << FileName(cube.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

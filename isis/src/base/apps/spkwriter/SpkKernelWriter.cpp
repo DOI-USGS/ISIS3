@@ -50,7 +50,7 @@ namespace Isis {
    *                                 kernel as needing special light time and
    *                                 stellar aberration correction in spiceinit
    */
-  QString SpkKernelWriter::k_header() const {
+  QString SpkKernelWriter::k_header(const QString &comfile) const {
     ostringstream comment;
     comment << "\
  ****************************************************************************\n\
@@ -118,9 +118,31 @@ namespace Isis {
        computation correcting for light time/stellar abberation is turned\n\
        off. It should be noted that this option applies to all files\n\
        contained herein.  (ID:USGS_SPK_ABCORR=NONE)\n\
- \n\
+\n\
         The contents of this kernel are summarized below.\n\
- \n\
+\n\
+User Comments\n\
+-----------------------------------------------------------------------\n\
+\n";
+
+    // Now write any user comments provided
+   if ( !comfile.isEmpty() ) {
+
+     // Write user comment header
+     TextFile txt(comfile);
+     QString cline;
+     while ( txt.GetLineNoFilter(cline )) {
+       comment << cline << "\n";
+     }
+   }
+   else {
+     // None provided
+     comment << "\
+      NONE\n";
+   }
+
+   //  Finish comments for segement data
+   comment << "\
  \n\
  Segment (by file) Summary\n\
  -----------------------------------------------------------------------\n\

@@ -9,5 +9,5 @@ commands:
 	crop from=$(OUTPUT)/$(FILE).cub nlines=5 \
 	  to=$(OUTPUT)/$(FILE).small.cub > /dev/null;
 	catlab from=$(OUTPUT)/$(FILE).small.cub \
-	  > $(OUTPUT)/$(FILE).small.pvl;
+	  to=$(OUTPUT)/$(FILE).small.pvl > /dev/null;
 	$(RM) $(OUTPUT)/$(FILE).cub;

@@ -30,6 +30,9 @@
         http://isis.astrogeology.usgs.gov/documents/CommandLine/CommandLine.html
       for an explanation of Cube Attributes.
     </change>
+    <change name="Kimberly Oyama" date="2014-04-07">
+      Added an app test for repeating virtual band input. References #1927.
+    </change>
   </history>
 
   <groups>

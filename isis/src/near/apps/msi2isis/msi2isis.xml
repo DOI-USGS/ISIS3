@@ -11,8 +11,7 @@
     (MSI) instrument, to ISIS3 data file format. 
 
     The raw image must be in FITS (Flexible Image Transport) format and  
-    have a PDS label file that points to the location of the FITS image. The 
-    user must input either the label file or the FITS file for the "TO" input 
+    have a PDS label file that points to the location of the FITS image. You must input either the label file or the FITS file for the "TO" input 
     parameter.  Please note if the FITS file is given, the label file must 
     exist in the same directory or the program will throw an error.
 
@@ -27,9 +26,10 @@
       <li>LINE_DISPLAY_DIRECTION = UP</li>
     </ul>
 
-    The output cube- successfully imported into ISIS3 will have gone through the following processes
+    The output cube- successfully imported into ISIS3 goes through the following processes:
     <ul>
-      <li>Convert the raw FITS format to ISIS3 format.</li>
+      <li>Convert the raw FITS image data to an ISIS3 Cube.</li>
+      <li> Save the labels from the input PDS label file to the output ISIS3 Cube. Note that FITS labels are not transferred. </li>
       <li>Enlarge the image from 537 samples x 244 lines to 537 x 412 using the user-specified interpolation algorithm. Defaults to cubic convolution.</li>
       <li>Flip the image vertically, i.e. across the horizontal axis.</li>
       <li>Trim 33 pixels from the top, bottom, left and right sides. These 
@@ -37,10 +37,13 @@
     </ul>
 
   </description>
-  
+
   <history>
     <change name="Jeannie Backer" date="2013-03-27">
       Original version of msi2isis. References #1248. 
+    </change>
+     <change name="Kristin Berry" date="2014-05-19">
+         Updated to add labels from the input PDS label file to the output ISIS3 cube. References #2088. 
     </change> 
   </history>
 
@@ -68,7 +71,7 @@
         </brief>
         <description>
           Name of the input NEAR MSI image file to be imported into ISIS3 
-          format. The user may enter the label or the image file. If the image 
+          format. You may enter the label or the image file. If the image 
           file is given, the program will search in the same directory for a 
           label file with the same base name as the image file base name.
         </description>
@@ -109,21 +112,21 @@
           <option value="CUBICCONVOLUTION">
             <brief>Cubic Convolution interpolation</brief>
             <description>
-              Each output pixel will be set to the value calculated by
+              Each output pixel is set to the value calculated by
               a cubic convolution interpolation of the calculated input pixel.
             </description>
           </option>
           <option value="NEARESTNEIGHBOR">
             <brief>Nearest Neighbor</brief>
             <description>
-              Each output pixel will be set to the pixel nearest the
+              Each output pixel is set to the pixel nearest the
               calculated input pixel.
             </description>
           </option>
           <option value="BILINEAR">
             <brief>Bi-Linear interpolation</brief>
             <description>
-              Each output pixel will be set to the value calculated by
+              Each output pixel is set to the value calculated by
               a bi-linear interpolation of the calculated input pixel.
             </description>
           </option>
@@ -169,7 +172,7 @@
           <description>
             Example of raw NEAR MSI image without the enlarge, flip, and trim processes performed by msi2isis.
           </description>
-          <thumbnail width="183" height="200" caption="Raw image" src="assets/thumgs/fits2isis.cub.jpg" />
+          <thumbnail width="183" height="200" caption="Raw image" src="assets/thumbs/fits2isis.cub.jpg" />
           <parameterName>FROM</parameterName>
         </image>
       </inputImages>
@@ -181,7 +184,7 @@
           <description>
             Example of imported NEAR MSI image with the enlarge, flip, and trim processes applied.
           </description>
-          <thumbnail width="182" height="200" caption="Imported cube" src="assets/thumgs/imported.cub.jpg" />
+          <thumbnail width="182" height="200" caption="Imported cube" src="assets/thumbs/imported.cub.jpg" />
           <parameterName>TO</parameterName>
         </image>
       </outputImages>

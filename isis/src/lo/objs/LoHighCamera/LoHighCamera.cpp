@@ -82,6 +82,21 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
+    //  Determine the NAIF ID for the CK frame reference.
+    if ( spacecraft.contains("3") ) {
+      m_ckFrameId = -533000;
+    }
+    else if ( spacecraft.contains("4") ) {
+      m_ckFrameId = -534000;
+    }
+    else if ( spacecraft.contains("5") ) {
+      m_ckFrameId = -535000;
+    }
+    else {
+      QString msg = "File does not appear to be an LunarOrbiter 3,4,5 image";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     setTime(time);
     LoadCache();
     NaifStatus::CheckErrors();

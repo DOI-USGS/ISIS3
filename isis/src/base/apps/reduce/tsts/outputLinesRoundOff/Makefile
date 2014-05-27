@@ -7,8 +7,6 @@ APPNAME = reduce
 # certain scales there would be a round off error and the ONL/ONS would be 1 greater than what the
 # user had entered.
 
-NOPREFERENCES = true
-
 labels.txt.IGNORELINES = ByteOrder StartByte Bytes TileSamples TileLines
 results.pvl.SKIPLINES=2
 
@@ -21,5 +19,4 @@ commands:
 	  mode=total \
 	  ons=80 \
 	  onl=483 > $(OUTPUT)/results.pvl;
-	catlab from=$(OUTPUT)/reduceTruth.cub > $(OUTPUT)/labels.txt;
-
+	catlab from=$(OUTPUT)/reduceTruth.cub to=$(OUTPUT)/labels.txt > /dev/null;

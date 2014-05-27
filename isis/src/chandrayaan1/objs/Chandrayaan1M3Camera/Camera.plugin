@@ -1,0 +1,6 @@
+Group = CHANDRAYAAN-1/M3
+  Version = 1
+  Library = Chandrayaan1M3Camera
+  Routine = Chandrayaan1M3CameraPlugin
+EndGroup
+ 

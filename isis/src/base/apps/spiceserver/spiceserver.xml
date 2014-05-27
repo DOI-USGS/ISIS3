@@ -39,6 +39,14 @@
         Modified so the kernel quality parameters from XML are tested as case insensitive. This
         change was made in a branch of ISIS, but was not yet moved to the publice version yet.
     </change>
+    <change name="Kimberly Oyama" date="2014-04-28">
+      Instead of opening $base/testdata/isisTruth.cub spiceserver now creates a cube from the label
+      information that it receives from spiceinit. This change was made because the camera classes
+      (Camera, CameraFactory, Sensor, Spice,...) now take a cube as input to their constructors
+      instead of a pvl. The isisTruth.cub dimensions did not match the dimensions in the label
+      (from spiceinit), causing spiceserver to return an incorrect end time for the spice
+      information. Added TEMPFILE parameter for testing purposes. Fixes #2030.
+    </change>
   </history>
 
   <groups>
@@ -87,6 +95,21 @@
           the results of the Isis versions of the client and server don't match. This option
           causes spiceserver to throw an error if the versions of Isis do not match.
         </description>
+      </parameter>
+
+      <parameter name="TEMPFILE">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <default><item>/tmp/spice_web_service/inputLabels.cub</item></default>
+        <brief>
+          Location of temp cube
+        </brief>
+        <description>
+          This parameter was added for testing purposes only. The spice server has access to the
+          default location but the app tests will use their own output directory as the temp cube 
+          location.
+        </description>
+        <filter>*.cub</filter>
       </parameter>
     </group>
   </groups>

@@ -44,7 +44,6 @@ void IsisMain() {
   cout << endl << "Average: " << stat->Average() << endl;
   cout << endl << "Variance: " << stat->Variance() << endl;
   p2.EndProcess();
-  QFile::remove(file);
   cout << endl;
 
   //Checks the setting of special pixel ranges
@@ -148,4 +147,6 @@ void IsisMain() {
   p4.SetOutputCube("TO");
   p4.StartProcess();
   p4.EndProcess();
+
+  QFile::remove(file);
 }

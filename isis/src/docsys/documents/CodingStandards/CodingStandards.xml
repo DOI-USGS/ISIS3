@@ -225,7 +225,7 @@
           <pre><strong>
             <font color="green"> // Correct form </font>
             int functionName() {
-            <font color="purple"><b>if</b></font> (success())
+            <font color="purple"><b>if</b></font> ( success() )
             <font color="green">
             // Incorrect form has space after function name </font>
             int functionName () {

@@ -1,4 +1,7 @@
 #include "Isis.h"
+
+#include <QDebug>
+
 #include "ProcessMapMosaic.h"
 #include "PvlGroup.h"
 
@@ -24,8 +27,7 @@ void IsisMain() {
   // Gets the input file along with attributes
   QString sInputFile = ui.GetAsString("FROM");
 
-  ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay(
-      ui.GetString("PRIORITY"));
+  ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay( ui.GetString("PRIORITY") );
 
   if (overlay == ProcessMapMosaic::UseBandPlacementCriteria) {
     if(ui.GetString("TYPE") == "BANDNUMBER") {
@@ -53,14 +55,31 @@ void IsisMain() {
     // Use the input projection as a starting point for the mosaic
     PvlGroup mapGroup = inCube.label()->findGroup("Mapping", Pvl::Traverse);
     inCube.close();
-
-    mapGroup.addKeyword(PvlKeyword("MinimumLatitude",  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
-    mapGroup.addKeyword(PvlKeyword("MaximumLatitude",  toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
-    mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("MINLON"))), Pvl::Replace);
-    mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
-
+    
+    if ( ui.WasEntered("MINLAT") ) { 
+      mapGroup.addKeyword(PvlKeyword( "MinimumLatitude",  toString( ui.GetDouble("MINLAT") ) ),
+                          Pvl::Replace);
+    }
+    if ( ui.WasEntered("MAXLAT") ) {
+      mapGroup.addKeyword(PvlKeyword( "MaximumLatitude",  toString( ui.GetDouble("MAXLAT") ) ),
+                          Pvl::Replace);
+    }
+    if ( ui.WasEntered("MINLON") ) {
+      mapGroup.addKeyword(PvlKeyword( "MinimumLongitude", toString( ui.GetDouble("MINLON") ) ),
+                          Pvl::Replace);
+    }
+    if ( ui.WasEntered("MAXLON") ) {
+      mapGroup.addKeyword(PvlKeyword( "MaximumLongitude", toString( ui.GetDouble("MAXLON") ) ),
+                          Pvl::Replace);
+    }
+    //check to make sure they're all there. If not, throw error, need to enter all.
+    if (!mapGroup.hasKeyword("MinimumLongitude") || !mapGroup.hasKeyword("MaximumLongitude") ||
+        !mapGroup.hasKeyword("MinimumLatitude") || !mapGroup.hasKeyword("MaximumLatitude") ) {
+      QString msg = "One of the extents is missing. Please input all extents.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    
     CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
-
     m.SetOutputCube(sInputFile, mapGroup, oAtt, ui.GetFileName("MOSAIC"));
   }
   else {
@@ -72,7 +91,7 @@ void IsisMain() {
   m.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
   m.SetNullFlag(ui.GetBoolean("NULL"));
 
-  // Start Process
+  // Start Process  
   if(!m.StartProcess(sInputFile)) {
     // Logs the cube if it falls outside of the given mosaic
     PvlGroup outsiders("Outside");

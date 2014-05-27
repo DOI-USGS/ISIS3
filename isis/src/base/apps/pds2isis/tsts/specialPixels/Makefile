@@ -13,4 +13,4 @@ commands:
 	setlrsrange=yes lrsmin=96.0 lrsmax=125.0 \
 	setlisrange=yes lismin=65.0 lismax=95.0 \
 	> /dev/null;
-	catlab from=$(OUTPUT)/pds2isisTruth.cub >& $(OUTPUT)/labels.txt;
+	catlab from=$(OUTPUT)/pds2isisTruth.cub to=$(OUTPUT)/labels.txt > /dev/null;

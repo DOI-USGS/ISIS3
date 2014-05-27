@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <QFileInfo>
+#include <QDebug>
 
 #include "IException.h"
 #include "Brick.h"
@@ -254,7 +255,6 @@ int main(int argc, char *argv[]) {
     cerr << "Band 1 = " << in.physicalBand(1) << endl;
     cerr << endl;
 
-
     //  Test ReOpen
     cerr << "ReOpen tests" << endl;
     Report(in);
@@ -263,23 +263,20 @@ int main(int argc, char *argv[]) {
     in.reopen("r");
     Report(in);
 
-
     // Test reading past cube boundaries.
     // First create a new cube for us to test and fill it with ones.
     cerr << "Testing reading past cube boundaries ... " << endl;
-    cerr << "Constructing cube ... " << endl;
+    cerr << "Constructing cube ... " << endl << endl;
     Cube boundaryTestCube;
-    boundaryTestCube.setDimensions(10, 10, 2);
+    boundaryTestCube.setDimensions(10, 10, 4);
     boundaryTestCube.create("IsisCube_boundary");
     Report(boundaryTestCube);
     LineManager boundaryLine(boundaryTestCube);
-    j = 0;
+    
     for(boundaryLine.begin(); !boundaryLine.end(); boundaryLine++) {
       for(int i = 0; i < boundaryLine.size(); i++) {
         boundaryLine[i] = 1.0;
-        j++;
       }
-      j--;
       boundaryTestCube.write(boundaryLine);
     }
 
@@ -292,23 +289,22 @@ int main(int argc, char *argv[]) {
     readBrick.SetBasePosition(1, 1, 1);
     boundaryTestCube.read(readBrick);
 
-    cerr << "Comparing results ... " << endl;
+    cerr << "\tComparing results ... " << endl;
     for(int i = 0; i < readBrick.size(); i++) {
       if (readBrick[i] != 1.0) {
-        cerr << "Not all values in brick were 1.0.\n";
+        cerr << "\tNot all values in brick were 1.0." << endl;
         return 1;
       }
     }
-    cerr << endl;
 
     cerr << "Reading completely outside band boundaries ... " << endl;
     readBrick.SetBasePosition(1, 1, -1);
     boundaryTestCube.read(readBrick);
 
-    cerr << "Comparing results ... " << endl;
+    cerr << "\tComparing results ... " << endl;
     for(int i = 0; i < readBrick.size(); i++) {
       if (readBrick[i] != Null) {
-        cerr << "Not all values in brick were Null.\n";
+        cerr << "\tNot all values in brick were Null." << endl;
         return 1;
       }
     }
@@ -316,28 +312,32 @@ int main(int argc, char *argv[]) {
 
     // Read before the bands start in the cube.
     cerr << "Reading partially within band boundaries ... " << endl;
+    cerr << "\t Reading bands 0 (should be null) and 1 (should be 1.0)... " << endl;
+    cerr << "\t\t Comparing results ... " << endl;
     readBrick.SetBasePosition(1, 1, 0);
     boundaryTestCube.read(readBrick);
 
-    cerr << "Comparing results ... " << endl;
     if (readBrick[0] != Null) {
-      cerr << "Value outside cube boundary was not Null.\n";
+      cerr << "\t\t Value outside cube boundary was not Null." << endl;
       return 1;
     }
     if (readBrick[1] != 1.0) {
-      cerr << "Value inside cube boundary was not 1.0.\n";
+      cerr << "\t\t Value inside cube boundary was not 1.0." << endl;
       return 1;
     }
 
+    cerr << "\t Reading bands 4 (should be 1.0) and 5 (should be null)... " << endl;
+    cerr << "\t\t Comparing results ... " << endl;
     // Read after the bands start in the cube.
-    readBrick.SetBasePosition(1, 1, 2);
+    readBrick.SetBasePosition(1, 1, 4);
     boundaryTestCube.read(readBrick);
+    
     if (readBrick[0] != 1.0) {
-      cerr << "Value inside cube boundary was not 1.0.\n";
+      cerr << "\t\t Value inside cube boundary was not 1.0." << endl;
       return 1;
     }
     if (readBrick[1] != Null) {
-      cerr << "Value outside cube boundary was not Null.\n";
+      cerr << "\t\t Value outside cube boundary was not Null." << endl;
       return 1;
     }
     cerr << endl;
@@ -345,38 +345,44 @@ int main(int argc, char *argv[]) {
     boundaryTestCube.close();
 
     // Test reading outside a cube with virtual bands.
-    cerr << "Testing reading past cube boundaries with virtual bands ... \n";
+    cerr << "Testing reading past cube boundaries with virtual bands (2, 1, 3, 4, 2)... " << endl;
     QList<QString> virtualBands;
+    virtualBands.push_back("2");
+    virtualBands.push_back("1");
+    virtualBands.push_back("3");
+    virtualBands.push_back("4");
     virtualBands.push_back("2");
     boundaryTestCube.setVirtualBands(virtualBands);
     boundaryTestCube.open("IsisCube_boundary");
 
     cerr << "Reading completely outside virtual band boundaries ... " << endl;
-    readBrick.SetBasePosition(1, 1, 2);
+    readBrick.SetBasePosition(1, 1, 6);
     boundaryTestCube.read(readBrick);
 
-    cerr << "Comparing results ... " << endl;
+    cerr << "\tComparing results starting at band 6... " << endl;
     for(int i = 0; i < readBrick.size(); i++) {
       if (readBrick[i] != Null) {
-        cerr << "Not all values in brick were Null.\n";
+        cerr << "\tNot all values in brick (outside cube boundary) were Null. " << i << endl;
         return 1;
       }
     }
 
+    cerr << "\tComparing results starting at band 1000... " << endl;
     readBrick.SetBasePosition(1, 1, 1000);
     boundaryTestCube.read(readBrick);
     for(int i = 0; i < readBrick.size(); i++) {
       if (readBrick[i] != Null) {
-        cerr << "Not all values in brick were Null.\n";
+        cerr << "\tNot all values in brick (outside cube boundary) were Null." << endl;
         return 1;
       }
     }
 
+    cerr << "\tComparing results starting at band -1... " << endl;
     readBrick.SetBasePosition(1, 1, -1);
     boundaryTestCube.read(readBrick);
     for(int i = 0; i < readBrick.size(); i++) {
       if (readBrick[i] != Null) {
-        cerr << "Not all values in brick were Null.\n";
+        cerr << "Not all values in brick (outside cube boundary) were Null. " << endl;
         return 1;
       }
     }
@@ -389,23 +395,24 @@ int main(int argc, char *argv[]) {
 
     cerr << "Comparing results ... " << endl;
     if (readBrick[0] != Null) {
-      cerr << "Value outside cube boundary was not Null.\n";
+      cerr << "Value outside cube boundary (band 0) was not Null." << endl;
       return 1;
     }
     if (readBrick[1] != 1.0) {
-      cerr << "Value inside cube boundary was not 1.0.\n";
+      cerr << "Value inside cube boundary (band 1) was not 1.0." << endl;
       return 1;
     }
 
     // Read after the bands start in the cube.
-    readBrick.SetBasePosition(1, 1, 1);
+    readBrick.SetBasePosition(1, 1, 5);
     boundaryTestCube.read(readBrick);
+
     if (readBrick[0] != 1.0) {
-      cerr << "Value inside cube boundary was not 1.0.\n";
+      cerr << "Value inside cube boundary (band 5) was not 1.0." << endl;
       return 1;
     }
     if (readBrick[1] != Null) {
-      cerr << "Value outside cube boundary was not Null.\n";
+      cerr << "Value outside cube boundary (band 6) was not Null." << endl;
       return 1;
     }
 
@@ -416,18 +423,22 @@ int main(int argc, char *argv[]) {
     readBrick.SetBasePosition(1, 1, -10);
     boundaryTestCube.read(readBrick);
     for (int i = 0; i < readBrick.size(); i++) {
-      if (i == 11) {
-        if (readBrick[i] != 1.0)
-          cerr << "Value inside cube boundary was not 1.0.\n";
+      if (i >= 11 && i <= 15) {
+        if (readBrick[i] != 1.0) {
+          cerr << "Value inside cube boundary, at brick band " << i + 1 << " was not 1.0." << endl;
+          return 1;
+        }
       }
       else {
-        if (readBrick[i] != Null)
-          cerr << "Value outside cube boundary was not Null.\n";
+        if (readBrick[i] != Null) {
+          cerr << "Value outside cube boundary, at brick band " << i + 1
+               << " was not Null." << endl;
+          return 1;
+        }
       }
     }
     cerr << endl;
     boundaryTestCube.close();
-
 
     // Check errors
     cerr << "Testing errors ... " << endl;

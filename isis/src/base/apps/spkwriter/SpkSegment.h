@@ -54,6 +54,12 @@ class PvlObject;
  * @internal 
  *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
  *                          coding standards. References #972.
+ *   @history 2013-12-19 Kris Becker Add SPK kernel type parameter to
+ *                          constructors; removed adjustTimes() method; modified
+ *                          variable names to conform to coding rules.
+ *                          References #1739.
+ *   @history 2014-03-26 Kris Becker Added overlap() method to compare time
+ *                          ranges of another SPK segment. References #1739.
  * 
  */
 class SpkSegment : public SpiceSegment {
@@ -62,48 +68,54 @@ class SpkSegment : public SpiceSegment {
     typedef SpiceSegment::SMatrix SMatrix;
 
     SpkSegment();
-    SpkSegment(const QString &fname);
-    SpkSegment(Cube &cube);
+    SpkSegment(const QString &fname, const int spkType);
+    SpkSegment(Cube &cube, const int spkType);
     virtual ~SpkSegment() { }
 
     void import(Cube &cube);
     
     /** Returns the number of elements in the vectors */
-    int size() const { return (size(_states)); }
+    int size() const { return (size(m_states)); }
+
+    /** Return kernel type */
+    int ktype() const { return (m_spkType) ; }
 
     /** Returns SPK segment reference frame */
-    int BodyCode() const { return (_body); }
+    int BodyCode() const { return (m_body); }
     /** NAIF SPICE instrument code */
-    int CenterCode() const { return (_center); }
+    int CenterCode() const { return (m_center); }
     /** Returns CK segment reference frame */
-    QString ReferenceFrame() const { return (_refFrame); }
+    QString ReferenceFrame() const { return (m_refFrame); }
     /** Get times of each entry */
-    SVector Epochs() const { return (_epochs); }
+    SVector Epochs() const { return (m_epochs); }
     /** Returns instance of quaternions */
-    const SMatrix &States() const { return (_states); }
+    const SMatrix &States() const { return (m_states); }
 
-    int Degree() const { return (_degree);   }
+    int Degree() const { return (m_degree);   }
 
-    bool HasVelocityVectors() const { return (_hasVV); }
+    bool HasVelocityVectors() const { return (m_hasVV); }
 
     /** Returns a comment summarizing the segment */
     QString getComment() const;
 
+    bool overlaps(const SpkSegment &other) const;
+
   private:
     enum { MinimumStates = 3, MaximumDegree = 7};  // Sensible? NAIF extremes
 
-    int         _body;         //  NAIF body code of the SPICE segment
-    QString _bodyFrame;    //  NAIF body frame
-    int         _center;       //  NAIF center code of the SPICE segment
-    QString _centerFrame;  //  NAIF center frame
-    QString _refFrame;     //  NAIF reference frame
-    SMatrix     _states;       //  Position states
-    SVector     _epochs;       //  ET times of records
-    bool        _hasVV;        //  Has velocity vectors?
-    int         _degree;       //  Degree of polynomial to fit in NAIF kernel
+    int         m_spkType;      //  Type 9 or 13 kernel type
+    int         m_body;         //  NAIF body code of the SPICE segment
+    QString     m_bodyFrame;    //  NAIF body frame
+    int         m_center;       //  NAIF center code of the SPICE segment
+    QString     m_centerFrame;  //  NAIF center frame
+    QString     m_refFrame;     //  NAIF reference frame
+    SMatrix     m_states;       //  Position states
+    SVector     m_epochs;       //  ET times of records
+    bool        m_hasVV;        //  Has velocity vectors?
+    int         m_degree;       //  Degree of polynomial to fit in NAIF kernel
 
     // Internal processing methods
-    void init();
+    void init(const int spkType = 13);
     template <class TNTSTORE> int size(const TNTSTORE &t) const { return (t.dim1()); }
 
     SMatrix load(Table &cache);
@@ -111,8 +123,7 @@ class SpkSegment : public SpiceSegment {
                    SVector &epochs, bool &hasVV) const; 
     SVector makeState(SpicePosition *position, const double &time0,
                       const SVector &stateT, const double &timeT) const;
-    SVector adjustTimes(Camera &camera, const SVector &epochs) const;
-
+    void validateType(const int spktype) const;
 };
 
 };     // namespace Isis

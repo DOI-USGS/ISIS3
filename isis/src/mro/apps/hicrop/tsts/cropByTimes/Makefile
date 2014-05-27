@@ -12,4 +12,4 @@ commands:
 	source=time \
         start=264289110.0 \
         stop=264289111.0 >& $(OUTPUT)/resultsLog.txt;
-	catlab from=$(OUTPUT)/cropped.cub to=$(OUTPUT)/croppedLabel.pvl;
+	catlab from=$(OUTPUT)/cropped.cub to=$(OUTPUT)/croppedLabel.pvl > /dev/null;

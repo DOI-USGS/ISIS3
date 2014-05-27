@@ -15,4 +15,4 @@ commands:
 	$(APPNAME) FROM=$(INPUT)/WAC_GLD100_V1.0_GLOBAL_with_LOLA_30M_POLE.10km.cub \
 	  MAP=$(INPUT)/orthographic.map TO=$(OUTPUT)/orthoTruth.cub DEFAULTRANGE=MAP \
 	  > /dev/null;
-	catlab FROM=$(OUTPUT)/map2mapTruth.cub >& $(OUTPUT)/labels.txt;
+	catlab FROM=$(OUTPUT)/map2mapTruth.cub to=$(OUTPUT)/labels.txt > /dev/null;

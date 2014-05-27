@@ -36,6 +36,9 @@
     <change name="Sharmila Prasad" date="2011-01-21">
       Changed the category
     </change>
+    <change name="Kristin Berry" date="2014-05-22"> 
+	Updated to work on PDS level 2 label files which lack the BAND_NAME field. 
+    </change>
   </history>
 
   <category>

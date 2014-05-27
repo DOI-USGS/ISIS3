@@ -1,0 +1,29 @@
+Unit Test for Chandrayaan1M3Camera...
+FileName: M3T20090630T083407_V03_RDN.cub
+CK Frame: -86520
+
+Kernel IDs: 
+CK Frame ID = -86000
+CK Reference ID = 1
+SPK Target ID = -86
+SPK Reference ID = 1
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK

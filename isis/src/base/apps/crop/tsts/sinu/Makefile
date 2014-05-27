@@ -7,5 +7,5 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) from=$(INPUT)/mapsinu.cub to=$(OUTPUT)/mapsinucrop.cub \
 	  sample=818 nsamples=300 sinc=1 line=2070 nlines=300 linc=1 > /dev/null;
-	catlab from=$(OUTPUT)/mapsinucrop.cub > $(OUTPUT)/sinu.txt;
+	catlab from=$(OUTPUT)/mapsinucrop.cub to=$(OUTPUT)/sinu.txt > /dev/null;
 	rm $(OUTPUT)/mapsinucrop.cub;

@@ -96,14 +96,17 @@ namespace Isis {
    *                           were run before the adaptive cache flush size was
    *                           added, which improved performance further.
    *                           References #727.
-   * 
    *   @history 2012-06-06 Jeff Anderson - The read() method was modified to
    *                           improve the speed for small buffer sizes as seen
    *                           in ProcessByBoxcar and ProcessRubbersheet.  The
    *                           internal cache was always checked to be minimized
    *                           which is slow for every read.  Now the cache is
    *                           only mimimized if it changed in size.  
-   *                           Reference #894. 
+   *                           Reference #894.
+   *    @history 2014-04-07 Kimberly Oyama and Stuart Sides - Modified the findCubeChunks,
+   *                            writeIntoDouble, and writeIntoRaw methods to handle
+   *                            repeating virtual bands. Fixes #1927.
+   *   
    */
   class CubeIoHandler {
     public:
@@ -227,9 +230,9 @@ namespace Isis {
 
       static bool bufferLessThan(Buffer * const &lhs, Buffer * const &rhs);
 
-      QList<RawCubeChunk *> findCubeChunks(int startSample,
-          int numSamples, int startLine, int numLines, int startBand,
-          int numBands) const;
+      QPair< QList<RawCubeChunk *>, QList<int> > findCubeChunks(int startSample, int numSamples,
+                                                                int startLine, int numLines,
+                                                                int startBand, int numBands) const;
 
       void findIntersection(const RawCubeChunk &cube1,
           const Buffer &cube2, int &startX, int &startY, int &startZ,
@@ -254,9 +257,9 @@ namespace Isis {
 
       void synchronousWrite(const Buffer &bufferToWrite);
 
-      void writeIntoDouble(const RawCubeChunk &chunk, Buffer &output) const;
+      void writeIntoDouble(const RawCubeChunk &chunk, Buffer &output, int startIndex) const;
 
-      void writeIntoRaw(const Buffer &buffer, RawCubeChunk &output) const;
+      void writeIntoRaw(const Buffer &buffer, RawCubeChunk &output, int index) const;
 
       void writeNullDataToDisk() const;
 

@@ -52,7 +52,7 @@ class SpiceSegment;
  * the handle need to write the segment and the addComment() method to add
  * details in the kernel file regarding the segment being written.
  *
- * @author ????-??-?? Unknown
+ * @author 2010-11-25 Kris Becker
  *
  * @internal
  */

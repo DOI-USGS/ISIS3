@@ -3,19 +3,17 @@ APPNAME  = mapmos
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/ab102401.lev2.cub \
-	  mosaic=$(OUTPUT)/mapmosTruth1.cub \
-	  create=true \
-	  track=true \
-	  priority=BAND \
-	  type=KEYWORD \
-	  keyname=FilterName \
-	  keyvalue=RED \
-	  criteria=LESSER \
-	  minlat=10.765 \
-	  maxlat=34.445 \
-	  minlon=219.720 \
-	  maxlon=236.190 \
-	  highsaturation=false \
-	  lowsaturation=false \
-	  null=false > /dev/null;
+	$(CP) $(INPUT)/bandPriorityInput.cub $(OUTPUT)/bandGreaterThanMosaic.cub; \
+	$(CP) $(INPUT)/bandPriorityInput.cub $(OUTPUT)/bandLessThanMosaic.cub;    \
+	$(APPNAME) from=$(INPUT)/secondInput.cub                                  \
+	  mosaic=$(OUTPUT)/bandGreaterThanMosaic.cub                              \
+	  priority=band                                                           \
+	  type=bandnumber \
+	  number=2                                                                \
+	  criteria=greater > /dev/null;                                           \
+	$(APPNAME) from=$(INPUT)/secondInput.cub                                  \
+	  mosaic=$(OUTPUT)/bandLessThanMosaic.cub                                 \
+	  priority=band                                                           \
+	  number=2                                                                \
+	  null=true                                                               \
+	  criteria=lesser > /dev/null;

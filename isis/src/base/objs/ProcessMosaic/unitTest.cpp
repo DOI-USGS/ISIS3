@@ -208,7 +208,7 @@ void IsisMain() {
   cout << "8. Test for band priority with BandNumber set\n";
   ProcessMosaic m8;
   m8.SetTrackFlag(true);
-  m8.SetCreateFlag(true);
+  m8.SetCreateFlag(false);
   m8.SetImageOverlay(ProcessMosaic::UseBandPlacementCriteria);
   m8.SetBandNumber(1);
   m8.SetBandUseMaxValue(false);

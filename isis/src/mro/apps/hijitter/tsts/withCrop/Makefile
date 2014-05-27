@@ -15,7 +15,7 @@ commands:
 	  JITTERCK=$(OUTPUT)/jitter.bc \
 	  REGDEF=$(INPUT)/hijitreg.p0745.s1570.def \
 	  crop=true \
-	  TO=$(OUTPUT)/outlist.lis | grep -v "Processed" > $(OUTPUT)/outputLog.txt;
+	  TO=$(OUTPUT)/outlist.lis > /dev/null;
 	$(CP) $(INPUT)/PSP_007556_2010_RED5.balance.cropped.cub $(OUTPUT)/red5.cub;
 	spiceinit from=$(OUTPUT)/red5.cub \
 	  ck=$(OUTPUT)/jitter.bc > /dev/null;
@@ -28,8 +28,6 @@ commands:
 	  to=$(OUTPUT)/red5.stats.pvl > /dev/null;
 	stats from=output/PSP_007556_2010_RED6.balance.cropped.cub \
 	  to=$(OUTPUT)/red6.stats.pvl > /dev/null;
-	$(SED) 's+mro/kernels/sclk/MRO_SCLKSCET.*tsc+mro/kernels/sclk/MRO_SCLKSCET.tsc+g' $(OUTPUT)/outputLog.txt > $(OUTPUT)/output.txt;
-	$(RM) $(OUTPUT)/outputLog.txt;
 	$(RM) $(OUTPUT)/files.lis $(OUTPUT)/outlist.lis > /dev/null;
 	$(RM) $(OUTPUT)/jitter.bc $(OUTPUT)/red5.cub print.prt > /dev/null;
 #	$(RM) $(OUTPUT)/PSP_007556_2010_RED4.balance.cropped.cub;

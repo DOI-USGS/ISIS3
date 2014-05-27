@@ -22,6 +22,8 @@
  */
 #include "CameraPointInfo.h"
 
+#include <iomanip>
+
 #include "Brick.h"
 #include "Camera.h"
 #include "Cube.h"
@@ -90,6 +92,8 @@ namespace Isis {
                                       const bool outside, const bool errors) {
     if (CheckCube()) {
       bool passed = m_camera->SetImage(sample, line);
+
+
       return GetPointInfo(passed, outside, errors);
     }
     // Should never get here, error will be thrown in CheckCube()

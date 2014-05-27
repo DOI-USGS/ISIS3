@@ -37,6 +37,9 @@ namespace Isis {
    *   @history 2012-01-20 Steven Lambright - Completed documentation.
    *   @history 2012-07-03 Steven Lambright - Added Meters, Kilometers to the Units enum.
    *                           References #853.
+   *   @history 2014-04-15 Tracie Sucharski - Reset defaults for plots to the following:
+   *                         SolidLine, Width=1, NoSymbols.  This is a temporary fix until
+   *                         the defaults can be saved on a user basis.  Fixes #2062.
    */
   class PlotCurve : public QwtPlotCurve {
 

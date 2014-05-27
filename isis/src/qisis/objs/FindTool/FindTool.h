@@ -117,6 +117,10 @@ namespace Isis {
    *                          image coordinates - is it supposed to?
    *  @history 2013-01-10 Steven Lambright - Improved sync scale calculations
    *                          to work in more cases. Fixes #953.
+   *  @history 2014-05-19 Ian Humphrey - Fixed CTRL+F shortcut and menu option to open Find Tool's
+   *                          Find Latitude/Longitude Coordinate dialog window. Added help text
+   *                          to Find Tool menu option. Minor coding standards fixes. 
+   *                          Fixes #2087.
    */
   class FindTool : public Tool {
       Q_OBJECT

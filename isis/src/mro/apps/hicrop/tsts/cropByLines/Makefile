@@ -14,7 +14,7 @@ commands:
 	source=linevalues \
         line=10 \
         nlines=30 >& $(OUTPUT)/resultsLog1.txt;
-	catlab from=$(OUTPUT)/cropped1.cub to=$(OUTPUT)/croppedLabel1.pvl;
+	catlab from=$(OUTPUT)/cropped1.cub to=$(OUTPUT)/croppedLabel1.pvl > /dev/null;
 	$(APPNAME) FROM=$(INPUT)/PSP_008469_2040_RED6.balance.cub \
 	ck=$(INPUT)/mro_sc_psp_080513_080519.bc \
 	sclk=$(INPUT)/MRO_SCLKSCET.00049.65536.tsc \
@@ -23,4 +23,4 @@ commands:
 	source=linevalues \
         line=79990 \
         nlines=30 >& $(OUTPUT)/resultsLog2.txt;
-	catlab from=$(OUTPUT)/cropped2.cub to=$(OUTPUT)/croppedLabel2.pvl;
+	catlab from=$(OUTPUT)/cropped2.cub to=$(OUTPUT)/croppedLabel2.pvl > /dev/null;

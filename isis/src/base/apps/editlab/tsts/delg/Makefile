@@ -15,8 +15,8 @@ commands:
 	$(APPNAME) from=$(OUTPUT)/tempCube.cub option=addkey grpname=NewGroup keyword=Key1 value=null;
 	$(APPNAME) from=$(OUTPUT)/tempCube.cub option=addkey grpname=NewGroup keyword=Key2 value=value;
 	$(APPNAME) from=$(OUTPUT)/tempCube.cub option=delg grpname=NewGroup;
-	catlab from=$(OUTPUT)/tempCube.cub >& $(OUTPUT)/tempLab1.txt;
+	catlab from=$(OUTPUT)/tempCube.cub to=$(OUTPUT)/tempLab1.txt > /dev/null;
 	head -n 26 $(OUTPUT)/tempLab1.txt > $(OUTPUT)/editlabTruth3.txt;
-	cathist from=$(OUTPUT)/tempCube.cub >& $(OUTPUT)/history.pvl;
+	cathist from=$(OUTPUT)/tempCube.cub to=$(OUTPUT)/history.pvl > /dev/null;
 	$(RM) $(OUTPUT)/tempCube.cub;
 	$(RM) $(OUTPUT)/tempLab1.txt;

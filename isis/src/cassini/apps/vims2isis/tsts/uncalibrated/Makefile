@@ -7,6 +7,6 @@ commands:
 	vis=$(OUTPUT)/vimsVisTruth.cub \
         ir=$(OUTPUT)/vimsIrTruth.cub > /dev/null;
 	catlab from=$(OUTPUT)/vimsVisTruth.cub \
-	  > $(OUTPUT)/vis.pvl;
+	  to=$(OUTPUT)/vis.pvl > /dev/null;
 	catlab from=$(OUTPUT)/vimsIrTruth.cub \
-	  > $(OUTPUT)/ir.pvl;
+	  to=$(OUTPUT)/ir.pvl > /dev/null;

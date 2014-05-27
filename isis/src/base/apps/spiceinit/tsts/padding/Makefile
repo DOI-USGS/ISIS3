@@ -10,10 +10,10 @@ commands:
 	ENDPAD=0.5 \
 	ATTACH=FALSE \
 	fk='$$cassini/kernels/fk/cas_v40_usgs.tf' > /dev/null;
-	catlab FROM=$(OUTPUT)/v1545949478_1.cub > $(OUTPUT)/labels.pvl;
+	catlab FROM=$(OUTPUT)/v1545949478_1.cub to=$(OUTPUT)/labels.pvl > /dev/null;
 	$(APPNAME) FROM=$(OUTPUT)/v1545949478_1.cub \
 	STARTPAD=1.1 ENDPAD=0.5 ATTACH=FALSE \
 	sclk='$$cassini/kernels/sclk/cas00132.tsc' \
 	fk='$$cassini/kernels/fk/cas_v40_usgs.tf' > /dev/null;
-	catlab FROM=$(OUTPUT)/v1545949478_1.cub > $(OUTPUT)/labelsTwice.pvl;
+	catlab FROM=$(OUTPUT)/v1545949478_1.cub to=$(OUTPUT)/labelsTwice.pvl > /dev/null;
 	rm $(OUTPUT)/v1545949478_1.cub;

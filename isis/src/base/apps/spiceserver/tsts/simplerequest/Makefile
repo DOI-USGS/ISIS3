@@ -15,4 +15,4 @@ include $(ISISROOT)/make/isismake.tsts
 # Valid text comes out magically. I promise! :)
 commands:
 	$(APPNAME) from=$(INPUT)/request.txt checkversion=false to=$(OUTPUT)/result.txt \
-	  > /dev/null;
+	  tempfile=$(OUTPUT)/tempCube.cub > /dev/null;

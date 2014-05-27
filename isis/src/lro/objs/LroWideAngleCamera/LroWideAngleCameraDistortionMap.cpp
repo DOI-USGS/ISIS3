@@ -22,8 +22,14 @@
  */
 #include <cmath>
 
+#include <sstream>
+#include <iomanip>
+#include <boost/foreach.hpp>
+
 #include "IString.h"
 #include "LroWideAngleCameraDistortionMap.h"
+
+using namespace std;
 
 namespace Isis {
   /** Camera distortion map constructor
@@ -38,11 +44,64 @@ namespace Isis {
    *                      (either 1 or -1)
    *
    */
-  LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode) : CameraDistortionMap(parent) {
-    QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
-    for(int i = 0; i < 2; i++) {
-      p_odk.push_back(p_camera->getDouble(odkkey, i));
+  LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(Camera *parent, 
+                                                                   int naifIkCode) : 
+                                                                   CameraDistortionMap(parent) {
+    SetDistortion(naifIkCode);
+  }
+
+
+/**
+ * @brief Add an additional set of parameters for a given LROC/WAC filter 
+ *  
+ * This method will read the parameters for LROC/WAC filter as indicated by the 
+ * IK code provided. It will create a vector of these parameters and append them 
+ * to the band list. 
+ *  
+ * The filters added should correspond directly to the order in which the 
+ * filters are physically stored in the ISIS cube (or the virtually selected 
+ * bands). 
+ * 
+ * @author 2013-03-07 Kris Becker
+ * 
+ * @param naifIkCode NAIF IK code for the desired filter to add.
+ */
+  void LroWideAngleCameraDistortionMap::addFilter(int naifIkCode) {
+    QString odkkey = "INS" + QString::number(naifIkCode) + "_OD_K";
+    
+    std::vector<double> v_odk; 
+    for(int i = 0; i < 3; i++) {
+      v_odk.push_back(p_camera->getDouble(odkkey, i));
     }
+
+    m_odkFilters.push_back(v_odk);
+  }
+
+
+/**
+ * @brief Implements band-dependant distortion parameters 
+ *  
+ * This method should be used to switch to another band's set of distortion 
+ * parameters.  See the addFilter() method to add additional band parameters to 
+ * this object. Note that the band number should correspond with the same order 
+ * as they were added in the addFilter() method. 
+ * 
+ * @author 2013-03-07 Kris Becker
+ * 
+ * @param vband  Band number to select.  Range is 1 to Bands.
+ */
+  void LroWideAngleCameraDistortionMap::setBand(int vband) {
+    if ( (vband <= 0) || (vband > m_odkFilters.size()) ) {
+      QString mess = "Invalid band (" + QString::number(vband) + " requested " +
+                     " Must be <= " + QString::number(m_odkFilters.size());
+      throw IException(IException::Programmer, mess, _FILEINFO_);
+    }
+     
+    //  Install new parameters
+    p_odk = m_odkFilters[vband-1];
+    
+    return;
+
   }
 
   /** Compute undistorted focal plane x/y
@@ -63,17 +122,19 @@ namespace Isis {
 
     double dk1 = p_odk[0];
     double dk2 = p_odk[1];
+    double dk3 = p_odk[2];
 
     double rr = dx * dx + dy * dy;
-    double r = sqrt(rr);
 
-    double dr = 1.0 + dk1 * rr + dk2 * r * rr;
-    if(dr == 0.0)
-      return false;
+    double dr = 1.0 + dk1 * rr + dk2 * rr * rr + dk3 * rr * rr * rr;
+    
+    // This was in here when the model used to be dx/dr so that the model
+    // would never divide by zero.
+    if ( dr == 0.0 ) return false;
 
     // Compute the undistorted positions
-    p_undistortedFocalPlaneX = dx / dr;
-    p_undistortedFocalPlaneY = dy / dr;
+    p_undistortedFocalPlaneX = dx * dr;
+    p_undistortedFocalPlaneY = dy * dr;
 
     return true;
   }
@@ -99,32 +160,33 @@ namespace Isis {
     double xt = ux;
     double yt = uy;
 
-    double r, rr, dr;
+    double rr, dr;
     double xdistorted, ydistorted;
     double xprevious, yprevious;
 
     xprevious = 1000000.0;
     yprevious = 1000000.0;
-    double tolerance = 1.0e-10;
+    // Changed this line to 10^-6... it allows the outer pixels to be found
+    // when mapping back to the sensor
+    double tolerance = 1.0e-6;
 
     bool bConverged = false;
 
     double dk1 = p_odk[0];
     double dk2 = p_odk[1];
+    double dk3 = p_odk[2];
 
     // iterating to introduce distortion...
     // we stop when the difference between distorted coordinates
     // in successive iterations is at or below the given tolerance
     for(int i = 0; i < 50; i++) {
       rr = xt * xt + yt * yt;
-      r = sqrt(rr);
-
       // dr is the radial distortion contribution
-      dr = 1.0 + dk1 * rr + dk2 * r * rr;
+      dr = 1.0 + dk1 * rr + dk2 * rr * rr + dk3 * rr * rr * rr;
 
       // introducing distortion
-      xt = ux * dr;
-      yt = uy * dr;
+      xt = ux / dr;
+      yt = uy / dr;
 
       // distorted point
       xdistorted = xt;
@@ -140,10 +202,12 @@ namespace Isis {
       yprevious = yt;
     }
 
+
     if(bConverged) {
       p_focalPlaneX = xdistorted;
       p_focalPlaneY = ydistorted;
     }
+
     return bConverged;
   }
 }

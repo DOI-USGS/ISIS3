@@ -31,6 +31,14 @@ namespace Isis {
   /**
    * @brief This class defines an instantaneous field of view
    *  
+   * This class defines an instantaneous field of view for a given camera.  The latLonVertices 
+   * method take a camera, assuming a SetImage has already been called to set the pixel.  The 
+   * latitude, longitudes of each defined vertex of the pixel is returned.  The number of vertices 
+   * is instrment dependent.  The default  Camera::PixelIfovOffsets assumes a square pixel and 
+   * simply returns the offsets of the four corner vertices in microns from the current pixel center.
+   * If the instruments pixels are not square, the Camera::PixelIfov will  need to be implemented in 
+   * the the instrument's camera model.  For an example, see VimsCamera::PixelIfov().
+    
    * @ingroup SpiceInstrumentsAndCameras
    *
    * @author 2013-02-15 Tracie Sucharski

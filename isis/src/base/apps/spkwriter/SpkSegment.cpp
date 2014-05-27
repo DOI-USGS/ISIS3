@@ -41,7 +41,6 @@
 #include "IException.h"
 
 #include "naif/SpiceUsr.h"
-#define PURE_METHODS_PRESENT 1
 
 using namespace std;
 
@@ -53,8 +52,8 @@ SpkSegment::SpkSegment() : SpiceSegment() {
 }
 
 /** Constructor from ISIS cube file by name of the cube */
-SpkSegment::SpkSegment(const QString &fname) : SpiceSegment() {
-  init();
+SpkSegment::SpkSegment(const QString &fname, const int spkType) : SpiceSegment() {
+  init(spkType);
   Cube cube;
   cube.open(fname);
   SpiceSegment::init(cube);
@@ -62,8 +61,8 @@ SpkSegment::SpkSegment(const QString &fname) : SpiceSegment() {
 }
 
 /** Constructor from ISIS cube object */
-SpkSegment::SpkSegment(Cube &cube) : SpiceSegment(cube) {
-  init();
+SpkSegment::SpkSegment(Cube &cube, const int spkType) : SpiceSegment(cube) {
+  init(spkType);
   import(cube);
 }
 
@@ -91,7 +90,7 @@ SpkSegment::SpkSegment(Cube &cube) : SpiceSegment(cube) {
 void SpkSegment::import(Cube &cube) {
   typedef std::vector<QString>  StrList;
 
-  //  Extract ISIS SPK blob and transform to CK 3 content
+  //  Extract ISIS SPK blob and transform to requested content
   NaifStatus::CheckErrors();
   try {
 
@@ -100,83 +99,75 @@ void SpkSegment::import(Cube &cube) {
 
     // Load necessary kernels and id frames
     kernels.Load("PCK,LSK,FK,SPK,EXTRA");
-#if defined(PURE_METHODS_PRESENT)
-    _body = camera->SpkTargetId();
-    _center = camera->SpkCenterId();
-    _refFrame = getNaifName(camera->SpkReferenceId());
-#else
-    // This probably covers 95% of the missions - really needs the pure methods
-    _body = camera->naifSpkCode();
-    _center = camera->naifBodyCode();
-    _refFrame = getNaifName(1);
-#endif
-    _bodyFrame = getNaifName(_body);
-    _centerFrame = getNaifName(_center);
+    m_body = camera->SpkTargetId();
+    m_center = camera->SpkCenterId();
+    m_refFrame = getNaifName(camera->SpkReferenceId());
+    m_bodyFrame = getNaifName(m_body);
+    m_centerFrame = getNaifName(m_center);
 
     //  Get the SPICE data
-//       spkCache = camera->instrumentPosition()->LineCache("SpkSegment");
-      Table spkCache = camera->instrumentPosition()->LoadHermiteCache("SpkSegment");
-    getStates(*camera, load(spkCache), _states, _epochs, _hasVV);
+    Table spkCache("SpkSegment");
+    if ( 9 == m_spkType ) {
+      spkCache = camera->instrumentPosition()->LineCache("SpkSegment");
+    }
+    else if ( 13 == m_spkType ) {
+      spkCache = camera->instrumentPosition()->LoadHermiteCache("SpkSegment");
+    }
+    else {
+      QString mess = "Unsupported SPK kernel type (" + 
+                     QString::number(m_spkType) + ") - must be 9 or 13.";
+      throw IException(IException::User, mess, _FILEINFO_);
+    }
+
+    getStates(*camera, load(spkCache), m_states, m_epochs, m_hasVV);
 
       // Save current time
     SpicePosition *ipos(camera->instrumentPosition());
     double currentTime = ipos->EphemerisTime();
 
-
-
-#if 0
-    ////  This is currently determined to not be required and needs to bei
-    ////   turned off.  (2011-05-17 KJB)
-
-    //  Adjust times for aberration and light time corrections.  Note this
-    //  is a kludge only needed until we correct this on read by spiceinit
-    _epochs = adjustTimes(*camera, _epochs);
-#endif
-
     // Add records with 3 milliseconds padding to top and bottom of records
-//     const double Epsilon(3.0e-3);
     const double Epsilon(3.0e-3);
 
     // Pad the top and bottom of the
-    _states = expand(1, 1, _states);
-    _epochs = expand(1, 1, _epochs);
+    m_states = expand(1, 1, m_states);
+    m_epochs = expand(1, 1, m_epochs);
 
-    int ndim1(_states.dim1());
-    int ndim2(_states.dim2());
+    int ndim1(m_states.dim1());
+    int ndim2(m_states.dim2());
 
     // Add record to top of states
-    SVector stateT(ndim2, _states[1]);  // Map to to first record
-    double sTime = _epochs[1] - Epsilon;
-    SVector s0 = makeState(ipos, _epochs[1], stateT, sTime);
-    SVector(ndim2, _states[0]).inject(s0);
-    _epochs[0] = sTime;
+    SVector stateT(ndim2, m_states[1]);  // Map to to first record
+    double sTime = m_epochs[1] - Epsilon;
+    SVector s0 = makeState(ipos, m_epochs[1], stateT, sTime);
+    SVector(ndim2, m_states[0]).inject(s0);
+    m_epochs[0] = sTime;
 
     // Add record to bottom of states
-    stateT = SVector(ndim2, _states[ndim1-2]);
-    sTime = _epochs[ndim1-2] + Epsilon;
-    s0 = makeState(ipos, _epochs[ndim1-2], stateT, sTime);
-    SVector(ndim2, _states[ndim1-1]).inject(s0);
-    _epochs[ndim1-1] = sTime;
+    stateT = SVector(ndim2, m_states[ndim1-2]);
+    sTime = m_epochs[ndim1-2] + Epsilon;
+    s0 = makeState(ipos, m_epochs[ndim1-2], stateT, sTime);
+    SVector(ndim2, m_states[ndim1-1]).inject(s0);
+    m_epochs[ndim1-1] = sTime;
 
     //  Restore saved time and determine degree of NAIF interpolation
     ipos->SetEphemerisTime(currentTime);
-    _degree = std::min((int) MaximumDegree, _states.dim1()-1);
+    m_degree = std::min((int) MaximumDegree, m_states.dim1()-1);
     //  Ensure the degree is odd and less that the even value
-    _degree = (((_degree - 1) / 2) * 2) + 1;
+    m_degree = (((m_degree - 1) / 2) * 2) + 1;
 
 
 #if 0
     // Prints state vectors
     for ( int i = 0 ; i < size() ; i++ ) {
       cout << i << ":";
-      for ( int j = 0 ; j < _states.dim2() ; j++ ) {
-        cout << " " << setw(26) << setprecision(13) << _states[i][j];
+      for ( int j = 0 ; j < m_states.dim2() ; j++ ) {
+        cout << " " << setw(26) << setprecision(13) << m_states[i][j];
       }
-      cout << " " << setw(26) << setprecision(13) << _epochs[i] << "\n";
+      cout << " " << setw(26) << setprecision(13) << m_epochs[i] << "\n";
     }
 #endif
-    setStartTime(_epochs[0]);
-    setEndTime(_epochs[size(_epochs)-1]);
+    setStartTime(m_epochs[0]);
+    setEndTime(m_epochs[size(m_epochs)-1]);
 
   } catch ( IException &ie  ) {
     ostringstream mess;
@@ -221,25 +212,26 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
   epochs = SVector(nrecs);
   hasVV = (nelems == 7);
 
-  // cout << "Number Records: " << nrecs << "\n";
+   // cout << "Number Records: " << nrecs << "\n";
 
   // Extract contents
   for ( int i = 0 ; i < nrecs ; i++ ) {
- //   cout  << "Rec: " << i;
+    // cout  << "Rec: " << i;
     for ( int j = 0 ; j < (nelems-1) ; j++ ) {
       states[i][j] = spice[i][j];
- //     cout << " " << setw(26) << setprecision(13) << _states[i][j];
+      // cout << " " << setw(26) << setprecision(13) << m_states[i][j];
     }
     epochs[i] = spice[i][nelems-1];
- //   cout << " " << setw(26) << setprecision(13) << _epochs[i] << "\n";
+    // cout << " " << setw(26) << setprecision(13) << _epochs[i] << "\n";
   }
 
   //  Compute state rotations relative to the reference frame
   QString j2000 = getNaifName(1);  // ISIS stores in J2000
-  if (j2000 != _refFrame) {
+  if (j2000 != m_refFrame) {
+    // cout << "FromFrame = " << j2000 << ", TOFrame = " << _refFrame << "\n";
     for (int n = 0 ; n < nrecs ; n++) {
       SpiceDouble xform[6][6];
-      sxform_c(j2000.toAscii().data(), _refFrame.toAscii().data(), epochs[n], xform);
+      sxform_c(j2000.toAscii().data(), m_refFrame.toAscii().data(), epochs[n], xform);
       mxvg_c(xform, states[n], 6, 6, states[n]);
     }
   }
@@ -272,17 +264,12 @@ SpkSegment::SVector SpkSegment::makeState(SpicePosition *position, const double 
 
   SVector stateT = state0.copy();
   // The code below seems to be working well for fixing the ends so I am putting it back in DAC
-#if 1
   position->SetEphemerisTime(time0);
   std::vector<double> tstate = position->Extrapolate(timeT);
   int nElems = std::min((int) tstate.size(), state0.dim1());
   for ( int i = 0 ; i < nElems ; i++ ) {
     stateT[i] = tstate[i];
   }
-#endif
-//   for ( int i = 3 ; i < stateT.dim1() ; i++ ) {
-//     stateT[i] = 0.0;
-//   }
 
   return (stateT);
 }
@@ -303,17 +290,18 @@ QString SpkSegment::getComment() const {
 "  Segment ID:  " << Id() << " (ProductId)" << endl <<
 "  StartTime:   " << utcStartTime() << endl <<
 "  EndTime:     " << utcEndTime() << endl <<
-"  Target Body: " << "Body " << _body << ", " << _bodyFrame << endl <<
-"  Center Body: " << "Body " << _center << ", " << _centerFrame << endl <<
-"  RefFrame:    " << _refFrame << endl <<
+"  Target Body: " << "Body " << m_body << ", " << m_bodyFrame << endl <<
+"  Center Body: " << "Body " << m_center << ", " << m_centerFrame << endl <<
+"  RefFrame:    " << m_refFrame << endl <<
 "  Records:     " << size() << endl;
 
-  string hasVV = (_hasVV) ? "YES" : "NO";
+  string hasVV = (m_hasVV) ? "YES" : "NO";
   comment <<
 "  HasVV:       " << hasVV << endl;
 
   comment <<
-"  PolyDegree:  " << _degree << endl <<
+"  SpkType:     " << m_spkType << endl <<
+"  PolyDegree:  " << m_degree << endl <<
 "  CamVersion:  " << CameraVersion() << endl;
   QStringList klist = getKernels().getKernelList();
   if ( klist.size() > 0 ) {
@@ -329,17 +317,50 @@ QString SpkSegment::getComment() const {
 }
 
 /**
+ * @brief Determine if another SPK segment has common time/body coverage 
+ *  
+ * This method is used to determine if another SPK segment contains some of the 
+ * same coverage information as this one.  This is typically a conflict when 
+ * creating SPK kernels from a list of files. 
+ *  
+ * If the body and center codes of the two segments are not the same, this is 
+ * allowed even if the times are the same as it indicates different position 
+ * data.  If the codes are the same, then if any portion of the segements 
+ * contain common times of coverage, then this would indicate one of them would 
+ * be hidden in the resulting SPK kernel. 
+ *  
+ * Using this method, users can determine how to handle common times of 
+ * coverage. 
+ * 
+ * @author 2014-03-26 Kris Becker
+ * 
+ * @param other  Other SpkSegment to check for common coverage
+ * 
+ * @return bool True if data represents the same coverage, false otherwise.
+ */
+bool SpkSegment::overlaps(const SpkSegment &other) const {
+  if ( BodyCode()   != other.BodyCode() )   { return (false); }
+  if ( CenterCode() != other.CenterCode() ) { return (false); }
+  if ( endTime()    <  other.startTime() )  { return (false); }
+  if ( startTime()  >  other.endTime() )    { return (false); }
+  return (true);
+}
+
+
+/**
  * @brief Initialize object parameters
  *
  * @author kbecker (5/2/2011)
  */
-void SpkSegment::init() {
-  _body = _center = 1;
-  _bodyFrame = _centerFrame = _refFrame = "";
-  _states = SMatrix(0,0);
-  _epochs = SVector(0);
-  _hasVV = false;
-  _degree = 1;
+void SpkSegment::init(const int spkType) {
+  validateType(spkType);
+  m_spkType = spkType;
+  m_body = m_center = 1;
+  m_bodyFrame = m_centerFrame = m_refFrame = "";
+  m_states = SMatrix(0,0);
+  m_epochs = SVector(0);
+  m_hasVV = false;
+  m_degree = 1;
   return;
 }
 
@@ -386,44 +407,14 @@ SpkSegment::SMatrix SpkSegment::load(Table &table) {
   return (spice);
 }
 
-/**
- * @brief Adjust times for stellar aberration and light time
- *
- * This method adjusts the times for stellar aberration and light time
- * correction if needed.  This is only a temporary fix until it is corrected in
- * the SpicePosition class.
- *
- * Prerequisites:  Upon calling this method, the appropriate SPK must be loaded.
- * The reference frame (_refFrame), typically "J2000", must also be defined.
- *
- * Currently, several missions do not apply these corrections.  These are
- * LunarOrbiter and Mariner10.
- *
- * @author kbecker (5/2/2011)
- *
- * @param epochs Times to correct for aberration and light time
- *
- * @return SpkSegment::SVector Corrected/adjust times
- */
-SpkSegment::SVector SpkSegment::adjustTimes(Camera &camera,
-                                            const SVector &epochs) const {
-
-  SpiceInt observer = camera.naifSpkCode();
-
-  // Don't adjust the following spacecraft:
-  SpiceInt LunarOrbiter(-533), Mariner10(-76);
-  if (observer == LunarOrbiter) return (epochs);
-  if (observer == Mariner10)    return (epochs);
-
-  SpiceInt target   = camera.naifBodyCode();
-  SVector ltEpochs(epochs.dim1());
-  for ( int i = 0 ; i < epochs.dim1() ; i++ ) {
-    SpiceDouble lt;
-    SpiceDouble state[6];
-    spkez_c(observer, epochs[i], _refFrame.toAscii().data(), "LT+S", target, state, &lt);
-    ltEpochs[i] = epochs[i] - lt;
+void SpkSegment::validateType(const int spktype) const {
+  if ( !(( 9 == spktype ) || ( 13 == spktype )) ) {
+    QString mess = "Unsupported SPK kernel type (" + 
+                   QString::number(spktype) + ") - must be 9 or 13.";
+    throw IException(IException::User, mess, _FILEINFO_);
   }
-  return (ltEpochs);
+  return;
 }
+
 };  // namespace Isis
 

@@ -9,4 +9,4 @@ commands:
 	$(APPNAME) from=$(INPUT)/N1597182735_2.cub \
 	to=$(OUTPUT)/N1597182735_2.truth.cub \
 	> /dev/null;
-	catlab from=$(OUTPUT)/N1597182735_2.truth.cub >& $(OUTPUT)/labels.truth.pvl;
+	catlab from=$(OUTPUT)/N1597182735_2.truth.cub to=$(OUTPUT)/labels.truth.pvl > /dev/null;

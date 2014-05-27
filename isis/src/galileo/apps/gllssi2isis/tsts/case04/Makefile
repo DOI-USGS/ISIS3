@@ -7,4 +7,4 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) FROM=$(INPUT)/7500r.lbl \
 	TO=$(OUTPUT)/7500r.cub > /dev/null;
-	catlab FROM=$(OUTPUT)/7500r.cub > $(OUTPUT)/7500r.txt;
+	catlab FROM=$(OUTPUT)/7500r.cub to=$(OUTPUT)/7500r.txt > /dev/null;

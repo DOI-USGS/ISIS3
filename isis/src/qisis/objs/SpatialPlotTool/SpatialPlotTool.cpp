@@ -269,7 +269,8 @@ namespace Isis {
             m_xUnitsCombo->currentIndex()).toInt();
 
       QPen spatialPen(Qt::white);
-      spatialPen.setWidth(2);
+      spatialPen.setWidth(1);
+      spatialPen.setStyle(Qt::SolidLine);
 
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
         if (!(*m_spatialCurves)[viewport] ||

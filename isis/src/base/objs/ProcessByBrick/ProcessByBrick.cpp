@@ -337,14 +337,15 @@ namespace Isis {
     p_progress->CheckStatus();
 
     for (brick->begin(); !brick->end(); (*brick)++) {
-      if (haveInput)
+      if (haveInput) 
         cube->read(*brick);  // input only
-
+   
       funct(*brick);
 
       // output only or input/output
-      if ((!haveInput) || (cube->isReadWrite()))
+      if ((!haveInput) || (cube->isReadWrite())) {
         cube->write(*brick);
+      }
 
       p_progress->CheckStatus();
     }
@@ -625,7 +626,7 @@ namespace Isis {
       *bricks = new Brick(**cube, p_outputBrickSamples[1],
           p_outputBrickLines[1], p_outputBrickBands[1], p_reverse);
     }
-
+    
     return haveInput;
   }
 

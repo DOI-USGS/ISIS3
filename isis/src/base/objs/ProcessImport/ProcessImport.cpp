@@ -82,7 +82,7 @@ namespace Isis {
 
   //!  Destroys the Import object
   ProcessImport::~ProcessImport() {
-    if(p_fileHeader) {
+    if (p_fileHeader) {
       delete [] p_fileHeader;
       p_fileHeader = NULL;
     }
@@ -106,7 +106,7 @@ namespace Isis {
       for(unsigned int i = 0; i < temp.size(); i++) delete [] temp[i];
     }
 
-    if(p_fileTrailer) {
+    if (p_fileTrailer) {
       delete p_fileTrailer;
     }
   }
@@ -122,7 +122,7 @@ namespace Isis {
    */
   void ProcessImport::SetPixelType(const Isis::PixelType type) {
 
-    if((type == Isis::Real) || (type == Isis::SignedWord) ||
+    if ((type == Isis::Double) || (type == Isis::Real) || (type == Isis::SignedWord) ||
         (type == Isis::UnsignedWord) || (type == Isis::UnsignedByte)) {
       p_pixelType = type;
     }
@@ -147,7 +147,7 @@ namespace Isis {
    * @throws Isis::iException::Message "Illegal dimension."
    */
   void ProcessImport::SetDimensions(const int ns, const int nl, const int nb) {
-    if(ns > 0 && nl > 0 && nb > 0) {
+    if (ns > 0 && nl > 0 && nb > 0) {
       p_ns = ns;
       p_nl = nl;
       p_nb = nb;
@@ -190,7 +190,7 @@ namespace Isis {
    *
    */
   void ProcessImport::SetFileHeaderBytes(const int bytes) {
-    if(bytes >= 0) {
+    if (bytes >= 0) {
       p_fileHeaderBytes = bytes;
     }
     else {
@@ -219,7 +219,7 @@ namespace Isis {
   *
   */
   void ProcessImport::SetFileTrailerBytes(const int bytes) {
-    if(bytes >= 0) {
+    if (bytes >= 0) {
       p_fileTrailerBytes = bytes;
     }
     else {
@@ -247,7 +247,7 @@ namespace Isis {
    * @see DataHeader()
    */
   void ProcessImport::SetDataHeaderBytes(const int bytes) {
-    if(bytes >= 0) {
+    if (bytes >= 0) {
       p_dataHeaderBytes = bytes;
     }
     else {
@@ -277,7 +277,7 @@ namespace Isis {
    */
   void ProcessImport::SetDataTrailerBytes(const int bytes) {
 
-    if(bytes >= 0) {
+    if (bytes >= 0) {
       p_dataTrailerBytes = bytes;
     }
     else {
@@ -306,7 +306,7 @@ namespace Isis {
    */
   void ProcessImport::SetDataPrefixBytes(const int bytes) {
 
-    if(bytes >= 0) {
+    if (bytes >= 0) {
       p_dataPreBytes = bytes;
     }
     else {
@@ -335,7 +335,7 @@ namespace Isis {
    */
   void ProcessImport::SetDataSuffixBytes(const int bytes) {
 
-    if(bytes >= 0) {
+    if (bytes >= 0) {
       p_dataPostBytes = bytes;
     }
     else {
@@ -362,7 +362,7 @@ namespace Isis {
   * @see FileHeader()
   */
   void ProcessImport::SaveFileHeader() {
-    if(p_fileHeaderBytes == 0) {
+    if (p_fileHeaderBytes == 0) {
       QString msg = "File header bytes equals 0.  There is nothing to save.  "
                     "Use SetFileHeaderBytes() first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -388,7 +388,7 @@ namespace Isis {
    * @see FileTrailer()
    */
   void ProcessImport::SaveFileTrailer() {
-    if(p_fileTrailerBytes == 0) {
+    if (p_fileTrailerBytes == 0) {
       QString msg = "File trailer bytes equals 0.  There is nothing to save.  "
                     "Use SetFileTrailerBytes() first.";
       throw IException(IException::Programmer, msg,
@@ -416,7 +416,7 @@ namespace Isis {
    * @see DataHeader()
    */
   void ProcessImport::SaveDataHeader() {
-    if(p_dataHeaderBytes == 0) {
+    if (p_dataHeaderBytes == 0) {
       QString msg = "Data header bytes equals 0.  There is nothing to save.  "
                     "Use SetDataHeaderBytes() first.";
       throw IException(IException::Programmer, msg,
@@ -444,7 +444,7 @@ namespace Isis {
    * @see DataTrailer()
    */
   void ProcessImport::SaveDataTrailer() {
-    if(p_dataTrailerBytes == 0) {
+    if (p_dataTrailerBytes == 0) {
       QString msg = "Data trailer bytes equals 0.  There is nothing to save.  "
                     "Use SetDataTrailerBytes() first.";
       throw IException(IException::Programmer, msg,
@@ -471,7 +471,7 @@ namespace Isis {
    * @see DataPrefix()
    */
   void ProcessImport::SaveDataPrefix() {
-    if(p_dataPreBytes == 0) {
+    if (p_dataPreBytes == 0) {
       QString msg = "Data prefix bytes equals 0.  There is nothing to save.  "
                     "Use SetDataPrefixBytes() first.";
       throw IException(IException::Programmer, msg,
@@ -499,7 +499,7 @@ namespace Isis {
    * @see DataSuffix()
    */
   void ProcessImport::SaveDataSuffix() {
-    if(p_dataPostBytes == 0) {
+    if (p_dataPostBytes == 0) {
       QString msg = "Data suffix bytes equals 0.  There is nothing to save.  "
                     "Use SetDataSuffixBytes() first.";
       throw IException(IException::Programmer, msg,
@@ -527,7 +527,7 @@ namespace Isis {
    * @see SaveFileHeader()
    */
   char *ProcessImport::FileHeader() {
-    if(p_saveFileHeader) {
+    if (p_saveFileHeader) {
       return p_fileHeader;
     }
     QString msg = "File header was not saved.  Use SaveFileHeader().";
@@ -552,7 +552,7 @@ namespace Isis {
    * @see SaveFileTrailer()
    */
   char *ProcessImport::FileTrailer() {
-    if(p_saveFileTrailer) {
+    if (p_saveFileTrailer) {
       return p_fileTrailer;
     }
     QString msg = "File trailer was not saved.  Use SaveFileTrailer()";
@@ -580,7 +580,7 @@ namespace Isis {
    * @see SaveDataHeader()
    */
   std::vector<char *> ProcessImport::DataHeader() {
-    if(p_saveDataHeader) {
+    if (p_saveDataHeader) {
       return p_dataHeader;
     }
     QString msg = "Data header was not saved.  Use SaveDataHeader()";
@@ -607,7 +607,7 @@ namespace Isis {
    * @see SaveDataTrailer()
    */
   std::vector<char *> ProcessImport::DataTrailer() {
-    if(p_saveDataTrailer) {
+    if (p_saveDataTrailer) {
       return p_dataTrailer;
     }
     QString msg = "Data trailer was not saved.  Use SaveDataTrailer()";
@@ -634,7 +634,7 @@ namespace Isis {
    * @see SaveDataPrefix()
    */
   std::vector<std::vector<char *> > ProcessImport::DataPrefix() {
-    if(p_saveDataPre) {
+    if (p_saveDataPre) {
       return p_dataPre;
     }
     QString msg = "Data prefix was not saved.  Use SaveDataPrefix()";
@@ -661,7 +661,7 @@ namespace Isis {
    * @see SaveDataSuffix()
    */
   std::vector<std::vector<char *> > ProcessImport::DataSuffix() {
-    if(p_saveDataPost) {
+    if (p_saveDataPost) {
       return p_dataPost;
     }
     QString msg = "Data suffix was not saved.  Use SaveDataSuffix()";
@@ -837,9 +837,9 @@ namespace Isis {
    */
   void ProcessImport::CheckPixelRange(QString pixelName, double pixelMin,
                                       double pixelMax) {
-    if(pixelMin == DBL_MAX || pixelMax == -DBL_MAX) return;
+    if (pixelMin == DBL_MAX || pixelMax == -DBL_MAX) return;
 
-    if(p_null_min != DBL_MAX && p_null_max != -DBL_MAX && ( //-null has been set
+    if (p_null_min != DBL_MAX && p_null_max != -DBL_MAX && ( //-null has been set
           (pixelMin > p_null_min && pixelMin < p_null_max) ||  // --min crossing
           (pixelMax > p_null_min && pixelMax < p_null_max) ||  // --max crossing
           (pixelMin < p_null_min && pixelMax > p_null_max))) { // --straddling
@@ -850,7 +850,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if(p_lrs_min != DBL_MAX && p_lrs_max != -DBL_MAX && (
+    if (p_lrs_min != DBL_MAX && p_lrs_max != -DBL_MAX && (
           (pixelMin > p_lrs_min && pixelMin < p_lrs_max) ||
           (pixelMax > p_lrs_min && pixelMax < p_lrs_max) ||
           (pixelMin < p_lrs_min && pixelMax > p_lrs_max))) {
@@ -860,7 +860,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if(p_lis_min != DBL_MAX && p_lis_max != -DBL_MAX && (
+    if (p_lis_min != DBL_MAX && p_lis_max != -DBL_MAX && (
           (pixelMin > p_lis_min && pixelMin < p_lis_max) ||
           (pixelMax > p_lis_min && pixelMax < p_lis_max) ||
           (pixelMin < p_lis_min && pixelMax > p_lis_max))) {
@@ -870,7 +870,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if(p_hrs_min != DBL_MAX && p_hrs_max != -DBL_MAX && (
+    if (p_hrs_min != DBL_MAX && p_hrs_max != -DBL_MAX && (
           (pixelMin > p_hrs_min && pixelMin < p_hrs_max) ||
           (pixelMax > p_hrs_min && pixelMax < p_hrs_max) ||
           (pixelMin < p_hrs_min && pixelMax > p_hrs_max))) {
@@ -880,7 +880,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if(p_his_min != DBL_MAX && p_his_max != -DBL_MAX && (
+    if (p_his_min != DBL_MAX && p_his_max != -DBL_MAX && (
           (pixelMin > p_his_min && pixelMin < p_his_max) ||
           (pixelMax > p_his_min && pixelMax < p_his_max) ||
           (pixelMin < p_his_min && pixelMax > p_his_max))) {
@@ -904,19 +904,19 @@ namespace Isis {
   *         special pixel.
   */
   double ProcessImport::TestPixel(const double pixel) {
-    if(pixel <= p_null_max && pixel >= p_null_min) {
+    if (pixel <= p_null_max && pixel >= p_null_min) {
       return Isis::NULL8;
     }
-    else if(pixel <= p_hrs_max && pixel >= p_hrs_min) {
+    else if (pixel <= p_hrs_max && pixel >= p_hrs_min) {
       return Isis::HIGH_REPR_SAT8;
     }
-    else if(pixel <= p_lrs_max && pixel >= p_lrs_min) {
+    else if (pixel <= p_lrs_max && pixel >= p_lrs_min) {
       return Isis::LOW_REPR_SAT8;
     }
-    else if(pixel <= p_his_max && pixel >= p_his_min) {
+    else if (pixel <= p_his_max && pixel >= p_his_min) {
       return Isis::HIGH_INSTR_SAT8;
     }
-    else if(pixel <= p_lis_max && pixel >= p_lis_min) {
+    else if (pixel <= p_lis_max && pixel >= p_lis_min) {
       return Isis::LOW_INSTR_SAT8;
     }
     else {
@@ -938,22 +938,23 @@ namespace Isis {
     CubeAttributeOutput &att =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
-    if(att.propagateMinimumMaximum()) {
+    if (att.propagateMinimumMaximum()) {
       double min, max;
-      if((p_pixelType == Isis::Real) ||
+      if ((p_pixelType == Isis::Double) ||
+          (p_pixelType == Isis::Real) ||
           (p_base.size() > 1) || (p_mult.size() > 1)) {
         min = Isis::VALID_MIN4;
         max = Isis::VALID_MAX4;
       }
-      else if(p_pixelType == Isis::SignedWord) {
+      else if (p_pixelType == Isis::SignedWord) {
         min = Isis::VALID_MIN2 * p_mult[0] + p_base[0];
         max = Isis::VALID_MAX2 * p_mult[0] + p_base[0];
       }
-      else if(p_pixelType == Isis::UnsignedWord) {
+      else if (p_pixelType == Isis::UnsignedWord) {
         min = Isis::VALID_MINU2 * p_mult[0] + p_base[0];
         max = Isis::VALID_MAXU2 * p_mult[0] + p_base[0];
       }
-      else if(p_pixelType == Isis::UnsignedByte) {
+      else if (p_pixelType == Isis::UnsignedByte) {
         min = Isis::VALID_MIN1 * p_mult[0] + p_base[0];
         max = Isis::VALID_MAX1 * p_mult[0] + p_base[0];
       }
@@ -966,11 +967,11 @@ namespace Isis {
       att.setMaximum(max);
     }
 
-    if(att.propagatePixelType()) {
-      if((p_base.size() > 1) || (p_mult.size() > 1)) {
+    if (att.propagatePixelType()) {
+      if ((p_base.size() > 1) || (p_mult.size() > 1)) {
         att.setPixelType(Isis::Real);
       }
-      else if(p_pixelType == Isis::UnsignedWord) {
+      else if (p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::Double) {
         att.setPixelType(Isis::Real);
       }
       else {
@@ -1002,16 +1003,16 @@ namespace Isis {
 
   //! Process the input file and write it to the output.
   void ProcessImport::StartProcess() {
-    if(p_organization == ProcessImport::JP2) {
+    if (p_organization == ProcessImport::JP2) {
       ProcessJp2();
     }
-    else if(p_organization == ProcessImport::BSQ) {
+    else if (p_organization == ProcessImport::BSQ) {
       ProcessBsq();
     }
-    else if(p_organization == ProcessImport::BIL) {
+    else if (p_organization == ProcessImport::BIL) {
       ProcessBil();
     }
-    else if(p_organization == ProcessImport::BIP) {
+    else if (p_organization == ProcessImport::BIP) {
       ProcessBip();
     }
     else {
@@ -1032,16 +1033,16 @@ namespace Isis {
    *             organization."
    */
   void ProcessImport::StartProcess(void funct(Isis::Buffer &out)) {
-    if(p_organization == ProcessImport::JP2) {
+    if (p_organization == ProcessImport::JP2) {
       ProcessJp2(funct);
     }
-    else if(p_organization == ProcessImport::BSQ) {
+    else if (p_organization == ProcessImport::BSQ) {
       ProcessBsq(funct);
     }
-    else if(p_organization == ProcessImport::BIL) {
+    else if (p_organization == ProcessImport::BIL) {
       ProcessBil(funct);
     }
-    else if(p_organization == ProcessImport::BIP) {
+    else if (p_organization == ProcessImport::BIP) {
       ProcessBip(funct);
     }
     else {
@@ -1077,14 +1078,14 @@ namespace Isis {
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
     fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
-    if(!fin.is_open()) {
+    if (!fin.is_open()) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
     streampos pos = fin.tellg();
-    if(p_saveFileHeader) {
+    if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
       fin.read(p_fileHeader, p_fileHeaderBytes);
     }
@@ -1093,7 +1094,7 @@ namespace Isis {
     }
 
     // Check the last io
-    if(!fin.good()) {
+    if (!fin.good()) {
       QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                    toString((int)pos) + "]. Byte count [" +
                    toString(p_fileHeaderBytes) + "]" ;
@@ -1103,7 +1104,7 @@ namespace Isis {
     // Construct a line buffer manager
     Isis::Buffer *out = NULL;
 
-    if(funct != NULL) {
+    if (funct != NULL) {
       out = new Isis::Brick(p_ns, 1, 1, p_pixelType);
     }
     else {
@@ -1118,7 +1119,7 @@ namespace Isis {
     for(int band = 0; band < p_nb; band++) {
       // Set the base multiplier
       double base, mult;
-      if(p_base.size() > 1) {
+      if (p_base.size() > 1) {
         base = p_base[band];
         mult = p_mult[band];
       }
@@ -1129,7 +1130,7 @@ namespace Isis {
 
       // Handle any data headers (e.g., the data at the beginning of each band)
       pos = fin.tellg();
-      if(p_saveDataHeader) {
+      if (p_saveDataHeader) {
         p_dataHeader.push_back(new char[p_dataHeaderBytes]);
         fin.read(p_dataHeader.back(), p_dataHeaderBytes);
       }
@@ -1138,7 +1139,7 @@ namespace Isis {
       }
 
       // Check the last io
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(p_dataHeaderBytes) + "]" ;
@@ -1153,7 +1154,7 @@ namespace Isis {
 
         // Handle any line prefix bytes
         pos = fin.tellg();
-        if(p_saveDataPre) {
+        if (p_saveDataPre) {
           tempPre.push_back(new char[p_dataPreBytes]);
           fin.read(tempPre.back(), p_dataPreBytes);
         }
@@ -1162,7 +1163,7 @@ namespace Isis {
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_dataPreBytes) + "]" ;
@@ -1173,7 +1174,7 @@ namespace Isis {
         // Get a line of data from the input file
         pos = fin.tellg();
         fin.read(in, readBytes);
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(readBytes) + "]" ;
@@ -1197,6 +1198,9 @@ namespace Isis {
             case Isis::Real:
               (*out)[samp] = (double)swapper.Float((float *)in+samp);
               break;
+            case Isis::Double:
+              (*out)[samp] = (double)swapper.Double((double *)in+samp);
+              break;
             default:
               break;
           }
@@ -1204,12 +1208,12 @@ namespace Isis {
           // Sets out to isis special pixel or leaves it if valid
           (*out)[samp] = TestPixel((*out)[samp]);
 
-          if(Isis::IsValidPixel((*out)[samp])) {
+          if (Isis::IsValidPixel((*out)[samp])) {
             (*out)[samp] = mult * ((*out)[samp]) + base;
           }
         } // End sample loop
 
-        if(funct == NULL) {
+        if (funct == NULL) {
           // Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
           OutputCubes[0]->write(*out);
@@ -1225,7 +1229,7 @@ namespace Isis {
 
         // Handle any line suffix bytes
         pos = fin.tellg();
-        if(p_saveDataPost) {
+        if (p_saveDataPost) {
           tempPost.push_back(new char[p_dataPostBytes]);
           fin.read(tempPost.back(), p_dataPostBytes);
         }
@@ -1234,7 +1238,7 @@ namespace Isis {
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_dataPreBytes) + "]" ;
@@ -1243,20 +1247,20 @@ namespace Isis {
       } // End line loop
 
       // Save off the prefix bytes vector
-      if(p_saveDataPre) {
+      if (p_saveDataPre) {
         p_dataPre.push_back(tempPre);
         tempPre.clear();
       }
 
       // Save off the suffix bytes vector
-      if(p_saveDataPost) {
+      if (p_saveDataPost) {
         p_dataPost.push_back(tempPost);
         tempPost.clear();
       }
 
       // Handle the band trailer
       pos = fin.tellg();
-      if(p_saveDataTrailer) {
+      if (p_saveDataTrailer) {
         p_dataTrailer.push_back(new char[p_dataTrailerBytes]);
         fin.read(p_dataTrailer.back(), p_dataTrailerBytes);
       }
@@ -1265,7 +1269,7 @@ namespace Isis {
       }
 
       // Check the last io
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(p_fileHeaderBytes) + "]" ;
@@ -1276,7 +1280,7 @@ namespace Isis {
 
     // Handle the file trailer
     pos = fin.tellg();
-    if(p_saveFileTrailer) {
+    if (p_saveFileTrailer) {
       fin.seekg(0, ios_base::end);
       streampos e = fin.tellg();
       p_fileTrailerBytes = (int)(e - pos + (streampos)1);
@@ -1285,7 +1289,7 @@ namespace Isis {
       fin.read(p_fileTrailer, p_fileTrailerBytes);
 
       // Check the io
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(p_fileTrailerBytes) + "]" ;
@@ -1327,14 +1331,14 @@ namespace Isis {
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
     fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
-    if(!fin.is_open()) {
+    if (!fin.is_open()) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
     streampos pos = fin.tellg();
-    if(p_saveFileHeader) {
+    if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
       fin.read(p_fileHeader, p_fileHeaderBytes);
     }
@@ -1343,7 +1347,7 @@ namespace Isis {
     }
 
     // Check the last io
-    if(!fin.good()) {
+    if (!fin.good()) {
       QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                    toString((int)pos) + "]. Byte count [" +
                    toString(p_fileHeaderBytes) + "]" ;
@@ -1355,7 +1359,7 @@ namespace Isis {
     // Construct a line buffer manager
     Isis::Buffer *out = NULL;
 
-    if(funct != NULL) {
+    if (funct != NULL) {
       out = new Isis::Buffer(p_ns, p_nl, p_nb, p_pixelType);
     }
     else {
@@ -1372,7 +1376,7 @@ namespace Isis {
       for(int band = 0; band < p_nb; band++) {
         // Set the base multiplier
         double base, mult;
-        if(p_base.size() > 1) {
+        if (p_base.size() > 1) {
           base = p_base[band];
           mult = p_mult[band];
         }
@@ -1382,7 +1386,7 @@ namespace Isis {
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_dataHeaderBytes) + "]" ;
@@ -1395,7 +1399,7 @@ namespace Isis {
 
         // Handle any line prefix bytes
         pos = fin.tellg();
-        if(p_saveDataPre) {
+        if (p_saveDataPre) {
           tempPre.push_back(new char[p_dataPreBytes]);
           fin.read(tempPre.back(), p_dataPreBytes);
         }
@@ -1404,7 +1408,7 @@ namespace Isis {
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_dataPreBytes) + "]" ;
@@ -1415,7 +1419,7 @@ namespace Isis {
         // Get a line of data from the input file
         pos = fin.tellg();
         fin.read(in, readBytes);
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(readBytes) + "]" ;
@@ -1439,6 +1443,9 @@ namespace Isis {
             case Isis::Real:
               (*out)[samp] = (double)swapper.Float((float *)in+samp);
               break;
+            case Isis::Double:
+              (*out)[samp] = (double)swapper.Double((double *)in+samp);
+              break;
             default:
               break;
           }
@@ -1446,12 +1453,12 @@ namespace Isis {
           // Sets out to isis special pixel or leaves it if valid
           (*out)[samp] = TestPixel((*out)[samp]);
 
-          if(Isis::IsValidPixel((*out)[samp])) {
+          if (Isis::IsValidPixel((*out)[samp])) {
             (*out)[samp] = mult * ((*out)[samp]) + base;
           }
         } // End sample loop
 
-        if(funct == NULL) {
+        if (funct == NULL) {
           //Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
           OutputCubes[0]->write(*out);
@@ -1464,7 +1471,7 @@ namespace Isis {
 
         // Handle any line suffix bytes
         pos = fin.tellg();
-        if(p_saveDataPost) {
+        if (p_saveDataPost) {
           tempPost.push_back(new char[p_dataPostBytes]);
           fin.read(tempPost.back(), p_dataPostBytes);
         }
@@ -1473,7 +1480,7 @@ namespace Isis {
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_dataPreBytes) + "]" ;
@@ -1482,19 +1489,19 @@ namespace Isis {
 
 
         // Save off the prefix bytes vector
-        if(p_saveDataPre) {
+        if (p_saveDataPre) {
           p_dataPre.push_back(tempPre);
           tempPre.clear();
         }
 
         // Save off the suffix bytes vector
-        if(p_saveDataPost) {
+        if (p_saveDataPost) {
           p_dataPost.push_back(tempPost);
           tempPost.clear();
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_fileHeaderBytes) + "]" ;
@@ -1507,7 +1514,7 @@ namespace Isis {
 
     // Handle the file trailer
     pos = fin.tellg();
-    if(p_saveFileTrailer) {
+    if (p_saveFileTrailer) {
       fin.seekg(0, ios_base::end);
       streampos e = fin.tellg();
       p_fileTrailerBytes = (int)(e - pos + (streampos)1);
@@ -1516,7 +1523,7 @@ namespace Isis {
       fin.read(p_fileTrailer, p_fileTrailerBytes);
 
       // Check the io
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(p_fileTrailerBytes) + "]" ;
@@ -1559,14 +1566,14 @@ namespace Isis {
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
     fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
-    if(!fin.is_open()) {
+    if (!fin.is_open()) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     // Handle the file header
     streampos pos = fin.tellg();
-    if(p_saveFileHeader) {
+    if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
       fin.read(p_fileHeader, p_fileHeaderBytes);
     }
@@ -1575,7 +1582,7 @@ namespace Isis {
     }
 
     // Check the last io
-    if(!fin.good()) {
+    if (!fin.good()) {
       QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                    toString((int)pos) + "]. Byte count [" +
                    toString(p_fileHeaderBytes) + "]" ;
@@ -1587,7 +1594,7 @@ namespace Isis {
     // Construct a line buffer manager
     Isis::Buffer *out = NULL;
 
-    if(funct != NULL) {
+    if (funct != NULL) {
       out = new Isis::Buffer(p_ns, p_nl, p_nb, p_pixelType);
     }
     else {
@@ -1601,7 +1608,7 @@ namespace Isis {
     // Loop for each line
     for(int line = 0; line < p_nl; line++) {
       // Check the last io
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(p_dataHeaderBytes) + "]" ;
@@ -1614,7 +1621,7 @@ namespace Isis {
 
       // Handle any line prefix bytes
       pos = fin.tellg();
-      if(p_saveDataPre) {
+      if (p_saveDataPre) {
         tempPre.push_back(new char[p_dataPreBytes]);
         fin.read(tempPre.back(), p_dataPreBytes);
       }
@@ -1623,7 +1630,7 @@ namespace Isis {
       }
 
       // Check the last io
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(p_dataPreBytes) + "]" ;
@@ -1633,7 +1640,7 @@ namespace Isis {
       // Get a line of data from the input file
       pos = fin.tellg();
       fin.read(in, readBytes);
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(readBytes) + "]" ;
@@ -1644,7 +1651,7 @@ namespace Isis {
       for(int band = 0; band < p_nb; band++) {
         // Set the base multiplier
         double base, mult;
-        if(p_base.size() > 1) {
+        if (p_base.size() > 1) {
           base = p_base[band];
           mult = p_mult[band];
         }
@@ -1671,6 +1678,9 @@ namespace Isis {
             case Isis::Real:
               (*out)[osamp] = (double)swapper.Float((float *)in+samp);
               break;
+            case Isis::Double:
+              (*out)[samp] = (double)swapper.Double((double *)in+samp);
+              break;
             default:
               break;
           }
@@ -1678,13 +1688,13 @@ namespace Isis {
           // Sets out to isis special pixel or leaves it if valid
           (*out)[osamp] = TestPixel((*out)[osamp]);
 
-          if(Isis::IsValidPixel((*out)[osamp])) {
+          if (Isis::IsValidPixel((*out)[osamp])) {
             (*out)[osamp] = mult * ((*out)[osamp]) + base;
           }
           osamp++;
         } // End sample loop
 
-        if(funct == NULL) {
+        if (funct == NULL) {
           //Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
           OutputCubes[0]->write(*out);
@@ -1695,7 +1705,7 @@ namespace Isis {
 
         // Handle any line suffix bytes
         pos = fin.tellg();
-        if(p_saveDataPost) {
+        if (p_saveDataPost) {
           tempPost.push_back(new char[p_dataPostBytes]);
           fin.read(tempPost.back(), p_dataPostBytes);
         }
@@ -1704,7 +1714,7 @@ namespace Isis {
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_dataPreBytes) + "]" ;
@@ -1713,19 +1723,19 @@ namespace Isis {
 
 
         // Save off the prefix bytes vector
-        if(p_saveDataPre) {
+        if (p_saveDataPre) {
           p_dataPre.push_back(tempPre);
           tempPre.clear();
         }
 
         // Save off the suffix bytes vector
-        if(p_saveDataPost) {
+        if (p_saveDataPost) {
           p_dataPost.push_back(tempPost);
           tempPost.clear();
         }
 
         // Check the last io
-        if(!fin.good()) {
+        if (!fin.good()) {
           QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                        toString((int)pos) + "]. Byte count [" +
                        toString(p_fileHeaderBytes) + "]" ;
@@ -1740,7 +1750,7 @@ namespace Isis {
 
     // Handle the file trailer
     pos = fin.tellg();
-    if(p_saveFileTrailer) {
+    if (p_saveFileTrailer) {
       fin.seekg(0, ios_base::end);
       streampos e = fin.tellg();
       p_fileTrailerBytes = (int)(e - pos + (streampos)1);
@@ -1749,7 +1759,7 @@ namespace Isis {
       fin.read(p_fileTrailer, p_fileTrailerBytes);
 
       // Check the io
-      if(!fin.good()) {
+      if (!fin.good()) {
         QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
                      toString((int)pos) + "]. Byte count [" +
                      toString(p_fileTrailerBytes) + "]" ;
@@ -1809,7 +1819,7 @@ namespace Isis {
     // Construct a line buffer manager
     Isis::Buffer *out = NULL;
 
-    if(funct != NULL) {
+    if (funct != NULL) {
       out = new Isis::Buffer(p_ns, p_nl, p_nb, p_pixelType);
     }
     else {
@@ -1822,7 +1832,7 @@ namespace Isis {
 
     // Loop for each line
     for(int line = 0; line < p_nl; line++) {
-      if(p_pixelType == Isis::UnsignedByte) {
+      if (p_pixelType == Isis::UnsignedByte) {
         JP2_decoder->Read((unsigned char **)in);
       }
       else {
@@ -1832,7 +1842,7 @@ namespace Isis {
       for(int band = 0; band < p_nb; band++) {
         // Set the base multiplier
         double base, mult;
-        if(p_base.size() > 1) {
+        if (p_base.size() > 1) {
           base = p_base[band];
           mult = p_mult[band];
         }
@@ -1846,7 +1856,7 @@ namespace Isis {
 
 
         // Handle any line prefix bytes
-        if(p_saveDataPre) {
+        if (p_saveDataPre) {
           tempPre.push_back(new char[p_dataPreBytes]);
           memcpy(&tempPre[0], in[band], p_dataPreBytes);
         }
@@ -1871,12 +1881,12 @@ namespace Isis {
           // Sets out to isis special pixel or leaves it if valid
           (*out)[samp] = TestPixel((*out)[samp]);
 
-          if(Isis::IsValidPixel((*out)[samp])) {
+          if (Isis::IsValidPixel((*out)[samp])) {
             (*out)[samp] = mult * ((*out)[samp]) + base;
           }
         } // End sample loop
 
-        if(funct == NULL) {
+        if (funct == NULL) {
           //Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
           OutputCubes[0]->write(*out);
@@ -1888,20 +1898,20 @@ namespace Isis {
         p_progress->CheckStatus();
 
         // Handle any line suffix bytes
-        if(p_saveDataPost) {
+        if (p_saveDataPost) {
           tempPost.push_back(new char[p_dataPostBytes]);
           memcpy(&tempPost[0], &in[band][p_dataPreBytes+p_ns*sizeofpixel],
                  p_dataPostBytes);
         }
 
         // Save off the prefix bytes vector
-        if(p_saveDataPre) {
+        if (p_saveDataPre) {
           p_dataPre.push_back(tempPre);
           tempPre.clear();
         }
 
         // Save off the suffix bytes vector
-        if(p_saveDataPost) {
+        if (p_saveDataPost) {
           p_dataPost.push_back(tempPost);
           tempPost.clear();
         }
@@ -1961,7 +1971,7 @@ namespace Isis {
    */
   void ProcessImport::SetInputFile(const QString &file) {
     p_inFile = file;
-    if(!Isis::FileName(file).fileExists()) {
+    if (!Isis::FileName(file).fileExists()) {
       QString msg = "File [" + file + "] does not exist";
       throw IException(IException::User, msg, _FILEINFO_);
     }

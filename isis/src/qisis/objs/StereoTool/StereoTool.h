@@ -44,6 +44,9 @@ namespace Isis {
     *                        #775 and #1114.
     * @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
     *                           network immediately print warning and return.  References #1493.
+    * @history 2014-05-15 Ian Humphrey - Removed the shortcut from StereoTool to avoid conflict 
+    *                         with StretchTool shortcut. Minor corrections for coding standards.
+    *                         Fixes #2086.
     *
     */
   class StereoTool : public AbstractPlotTool {

@@ -458,23 +458,23 @@ namespace Isis {
             m_displayCombo->currentIndex()).toInt();
 
       QPen avgPen(Qt::white);
-      avgPen.setWidth(2);
-      avgPen.setStyle(Qt::NoPen);
+      avgPen.setWidth(1);
+      avgPen.setStyle(Qt::SolidLine);
 
       QPen minMaxPen(Qt::cyan);
 //       minMaxPen.setStyle(Qt::DashLine);
-      minMaxPen.setWidth(2);
-      minMaxPen.setStyle(Qt::NoPen);
+      minMaxPen.setWidth(1);
+      minMaxPen.setStyle(Qt::SolidLine);
 
       QPen stdDevPen(Qt::red);
-      stdDevPen.setWidth(2);
+      stdDevPen.setWidth(1);
 //       stdDevPen.setStyle(Qt::DotLine);
-      stdDevPen.setStyle(Qt::NoPen);
+      stdDevPen.setStyle(Qt::SolidLine);
 
       QPen stdErrPen(Qt::green);
-      stdErrPen.setWidth(2);
+      stdErrPen.setWidth(1);
 //       stdErrPen.setStyle(Qt::DotLine);
-      stdErrPen.setStyle(Qt::NoPen);
+      stdErrPen.setStyle(Qt::SolidLine);
 
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
         if (m_plotAvgAction->isChecked() &&

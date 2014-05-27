@@ -22,6 +22,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include <QString>
+#include <QStringList>
+
 #include <vector>
 #include <numeric>
 #include <iostream>
@@ -88,6 +90,44 @@ QString SpiceKernel::getSummary(const QString &commfile) const {
   return (comment);
 }
 
+bool SpiceKernel::validate() const {
+
+ QVector<const SpiceSegment *> seglist;
+  for ( int i = 0 ; i < size() ; i++) {
+    seglist.push_back(&m_segments[i]);
+  }
+
+  // Sorts the Segment pointers
+  stable_sort(seglist.begin(), seglist.end(), CheckSegment);
+
+  // Now check for overlapping times.  In general, any segment that overlaps
+  // another is suspect and will be flagged as an error.  An IException is
+  // created and thrown when all images have been evaluated and overlaps are
+  // found to exist.
+  QStringList errors;
+  for (int seg = 1 ; seg < seglist.size() ; seg++) {
+    if ( (seglist[seg-1]->endTime() > seglist[seg]->startTime()) &&
+         (seglist[seg-1]->InstCode() == seglist[seg]->InstCode()) ) {
+      errors  << "CKSegment " + seglist[seg]->Id() + " overlaps CKSegment "
+                  + seglist[seg-1]->Id();
+    }
+  }
+
+  //  Now check for problems
+  if ( 0 < errors.size() ) {
+     QString mess = "Time overlap conflicts are present in segment (image) list. "
+                    "This will likely create erroneous pointing in one or more "
+                    "images.  You should create a seperate kernel for conflicting "
+                    "images that overlap another.  Images with time overlap "
+                    "conflicts are:   \n"
+                    + errors.join("; ");
+     throw IException(IException::User, mess, _FILEINFO_);
+  }
+
+  return (true); 
+}
+
+
  void SpiceKernel::write(const QString &kname, const QString &comfile,
                          const int cktype) const {
    vector<const SpiceSegment *> seglist;
@@ -138,15 +178,9 @@ QString SpiceKernel::getSummary(const QString &commfile) const {
 
  QString SpiceKernel::getCkComment(const QString &comFile) const {
    ostringstream comment;
-   if ( !comFile.isEmpty() ) {
-     TextFile txt(comFile);
-     QString cline;
-     while ( txt.GetLineNoFilter(cline )) {
-       comment << cline << "\n";
-     }
-   }
-   else {
-     comment << "\
+
+   // Write generic comment
+   comment << "\
 ****************************************************************************\n\
   USGS ISIS (ckwriter) Generated CK Kernel\n\
   Created By:   " << Application::UserName() << "\n\
@@ -212,6 +246,29 @@ Usage Note\n\
       appropriate content to satisfy NAIF\'s SPICE kernel storage\n\
       requirements.  The contents of this kernel are summarized below.\n\
 \n\
+User Comments\n\
+-----------------------------------------------------------------------\n\
+\n";
+
+// Now write any user comments provided
+   if ( !comFile.isEmpty() ) {
+
+     // Write user comment header
+     TextFile txt(comFile);
+     QString cline;
+     while ( txt.GetLineNoFilter(cline )) {
+       comment << cline << "\n";
+     }
+   }
+   else {
+     // None provided
+     comment << "\
+      NONE\n";
+   }
+
+   //  Finish comments for segement data
+   comment << "\
+\n\
 Segment (by file) Summary\n\
 -----------------------------------------------------------------------\n\
 \n\
@@ -220,7 +277,6 @@ Segment (by file) Summary\n\
       the kernels listed for each file should be supplied to ensure proper\n\
       geometry can be reproduced accurately.\n\
 \n";
-   }
 
    return (QString(comment.str().c_str()));
 }

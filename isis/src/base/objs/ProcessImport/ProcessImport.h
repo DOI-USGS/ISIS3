@@ -133,6 +133,8 @@ namespace Isis {
    *                           BoxcarCachingAlgorithm instead of the
    *                           RegionalCachingAlgorithm. Also added unit tests
    *                           to exercise the modified methods. Fixes #819.
+   *  @history 2013-03-12 Steven Lambright and Tracie Sucharski - Added support for 64 bit input
+   *                           data.  Note:  Possibility of lost precision since ouput is in 32 bit.
    *   @history 2013-03-27 Jeannie Backer - Added programmer comments and
    *                           documentation. Changed parameter name from
    *                           "parameter" to "fname" in SetOutputCube() method.

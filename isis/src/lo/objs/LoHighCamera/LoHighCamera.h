@@ -54,6 +54,9 @@ namespace Isis {
    *                          to files. Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2014-01-17 Kris Becker Corrected CkFrameId reference to
+   *                          properly define LO 3,4,5 at runtime for generation
+   *                          of CKs using ckwriter. References #1737.
    */
   class LoHighCamera : public FramingCamera {
     public:
@@ -68,7 +71,7 @@ namespace Isis {
        * @return @b int The appropriate instrument code for the "Camera-matrix" 
        *         Kernel Frame ID
        */
-      virtual int CkFrameId() const { return (-533000); }
+      virtual int CkFrameId() const { return (m_ckFrameId); }
 
       /** 
        * CK Reference ID - J2000
@@ -85,6 +88,9 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+
+    private:
+      int m_ckFrameId;                        // LO 3,4,5 CK frame id
   };
 };
 #endif
