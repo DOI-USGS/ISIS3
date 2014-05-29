@@ -16,21 +16,12 @@ commands:
 	cnet=$(INPUT)/Ames_5-ImageLSTest_USGS_combined.net \
 	onet=$(OUTPUT)/mEstimator_out.net \
 	radius=yes \
-	twist=yes \
-	update=no \
-	maxits=150 \
         model1=huber \
         max_model1_c_quantile=0.6 \
         model2=chen \
         max_model2_c_quantile=.98 \
 	sigma0=1.e-3  \
-	ckdegree=yes \
-	bundleout_txt=yes \
-	output_csv=yes \
-	residuals_csv=yes \
-	ckdegree=2 \
-	cksolvedegree=2 \
-	camsolve=angles \
+	maxits=150 \
 	spsolve=position > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \

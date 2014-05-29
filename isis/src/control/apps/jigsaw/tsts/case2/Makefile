@@ -18,10 +18,10 @@ commands:
 	heldlist=$(OUTPUT)/held.lis  \
 	cnet=$(INPUT)/mocVik.net \
 	onet=$(OUTPUT)/case2OutNet.net \
-	maxits=10 \
+	update=yes \
 	method=oldsparse \
 	sigma0=1.e-5  \
-	update=yes \
+	maxits=10 \
 	spsolve=position > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'jigsawdialog.ui'
 **
-** Created: Mon Apr 21 17:30:35 2014
+** Created: Thu May 29 11:52:37 2014
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

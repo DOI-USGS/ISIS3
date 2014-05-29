@@ -16,13 +16,9 @@ commands:
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	cnet=$(INPUT)/Cabeus_Orbit400_withSS_AprioriPts.net \
 	onet=$(OUTPUT)/radar_sparse_poh_out.net \
-	method=sparse \
 	maxits=10 \
-	sigma0=1.0e-10 \
-	update=no \
 	errorprop=yes \
 	spsolve=accelerations \
-	overhermite=no \
 	camsolve=no > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
@@ -42,10 +38,7 @@ commands:
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	cnet=$(INPUT)/Cabeus_Orbit400_withSS_AprioriPts.net \
 	onet=$(OUTPUT)/radar_sparse_out.net \
-	method=sparse \
 	maxits=10 \
-	sigma0=1.0e-10 \
-	update=no \
 	errorprop=yes \
 	spsolve=position \
 	overhermite=yes \

@@ -1,16 +1,18 @@
-#ifndef JIGSAWDIALOG_H
-#define JIGSAWDIALOG_H
+#ifndef JigsawDialog_h
+#define JigsawDialog_h
 
-#include "JigsawSetupDialog.h"
 #include <QDialog>
+
+#include "BundleSettings.h"
+#include "JigsawSetupDialog.h"
 
 namespace Ui {
   class JigsawDialog;
 }
 
 namespace Isis {
-  class Project;
   class Control;
+  class Project;
 
   class JigsawDialog : public QDialog
   {
@@ -29,28 +31,9 @@ namespace Isis {
 
   protected:
     Project *m_project;
-    bool   m_errorPropagation;
-    bool   m_radius;
-    bool   m_twist;
-    bool   m_observationMode;
-    int    m_maxIterations;
-    bool   m_outlierRejection;
-    double m_outlierRejectionMultiplier;
-    bool   m_updateCubeLabel;
-    double m_sigma0;
-    double m_globalPointLatitudeSigma;
-    double m_globalPointLongitudeSigma;
-    double m_globalPointRadiusSigma;
-    double m_globalSensorAngleSigma;
-    double m_globalSensorAngularVelocitySigma;
-    double m_globalSensorAngularAccelerationSigma;
-    double m_globalSpacecraftPositionSigma;
-    double m_globalSpacecraftVelocitySigma;
-    double m_globalSpacecraftAccelerationSigma;
-    Control* m_pselectedControl;
-    QString m_solveMethod;
-    QString m_spSolve;
-    QString m_ckSolve;
+     
+    Control *m_pselectedControl;
+    BundleSettings m_bundleSettings;
   };
 };
-#endif // JIGSAWDIALOG_H
+#endif // JigsawDialog_h

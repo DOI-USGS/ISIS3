@@ -18,10 +18,10 @@ commands:
 	cnet=$(INPUT)/redPntreg.net \
 	onet=$(OUTPUT)/case01OutNet.net \
 	observations=yes \
+	update=yes \
 	method=oldsparse \
 	cksolvedegree=3 \
 	camsolve=all \
-	update=yes \
 	file_pre=t \
 	twist=no > /dev/null;
 	cat t_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \

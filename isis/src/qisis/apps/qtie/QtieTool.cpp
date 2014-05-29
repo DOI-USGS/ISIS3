@@ -27,6 +27,7 @@
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "BundleAdjust.h"
+#include "BundleSettings.h"
 #include "ControlMeasure.h"
 #include "Distance.h"
 #include "FileName.h"
@@ -39,11 +40,11 @@
 #include "MdiCubeViewport.h"
 #include "PvlEditDialog.h"
 #include "PvlObject.h"
-//#include "TProjection.h"
 #include "QIsisApplication.h"
 #include "SerialNumber.h"
 #include "Target.h"
 #include "ToolPad.h"
+//#include "TProjection.h"
 #include "UniversalGroundMap.h"
 
 
@@ -781,21 +782,48 @@ namespace Isis {
         net.AddPoint(pt);
       }
 
-      BundleAdjust b(net, *p_serialNumberList, false);
-      b.SetSolveTwist(p_twist);
-      b.SetSolveCmatrix(BundleAdjust::AnglesOnly);
-      b.SetSolveSpacecraftPosition(BundleAdjust::Nothing);
-      b.SetErrorPropagation(false);
-      b.SetOutlierRejection(false);
-      b.SetSolutionMethod("SPECIALK");
-      b.SetStandardOutput(false);
-      b.SetCSVOutput(false);
-      b.SetResidualOutput(false);
-      b.SetConvergenceThreshold(p_sigma0);
-      b.SetMaxIterations(p_maxIterations);
 
-      b.SetDecompositionMethod(BundleAdjust::SPECIALK);
-      b.SolveCholesky();
+      // =========================================================================================//
+      // ============= Use the bundle settings to initialize member variables ====================//
+      // =========================================================================================//
+      BundleSettings settings;
+      settings.setValidateNetwork(false);
+      // set the following:
+      //     solve observation mode = false
+      //     update cube label      = false
+      //     error propagation      = false
+      //     solve radius           = false
+      //     latitude sigma         = 1000.0
+      //     longitude sigma        = 1000.0
+      //     radius sigma           = -1.0 (since we are not solving for radius)
+      //     outlier rejection = false
+      settings.setSolveOptions(BundleSettings::SpecialK, false, false, false, false, 
+                              1000.0, 1000.0, -1.0);
+
+      // NOTE: no need to set position sigmas or solve degrees since we are not solving for any
+      // position factors
+      //       position option sigmas default to -1.0
+      //       spkDegree = spkSolveDegree = 2
+      //       solveOverHermiteSpline = false
+      //       position sigma = velocity sigma = acceleration sigma = -1.0
+      settings.setObserverPositionSolveOptions(BundleSettings::NoPositionFactors);
+
+      // use defaults
+      //       orientation option sigmas -1.0
+      //       ckDegree = ckSolveDegree = 2
+      //       fitOverExisting = false
+      //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
+      settings.setObserverOrientationSolveOptions(BundleSettings::AnglesOnly, p_twist);
+
+      settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
+                                      p_sigma0, p_maxIterations);
+      settings.setOutputFiles("", false, false, false);
+      // =========================================================================================//
+      // =============== End Bundle Settings =====================================================//
+      // =========================================================================================//
+
+      BundleAdjust bundleAdjust(settings, net, *p_serialNumberList, false);
+      bundleAdjust.solveCholesky();
 
       // Print results and give user option of updating cube pointin
       double maxError = net.GetMaximumResidual();
@@ -820,14 +848,14 @@ namespace Isis {
                           "this.  The camera pointing will not be updated.  "
                           "You can attempt to refine the control points and "
                           "attempt a new solution.");
-      msgBox.setDetailedText(b.IterationSummaryGroup());
+      msgBox.setDetailedText(bundleAdjust.iterationSummaryGroup());
       msgBox.setDefaultButton(close);
       msgBox.setMinimumWidth(5000);
       //msgBox.setSizeGripEnabled(true);
       msgBox.exec();
       if (msgBox.clickedButton() == update) {
         p_matchCube->reopen("rw");
-        Table cmatrix = b.Cmatrix(0);
+        Table cmatrix = bundleAdjust.cMatrix(0);
         //cmatrix = b.Cmatrix(0);
         emit newSolution(&cmatrix);
       }

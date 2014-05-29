@@ -10,10 +10,9 @@ commands:
 	cnet=$(INPUT)/redPntreg.net \
 	onet=$(OUTPUT)/obsmode_cholmod_out.net \
 	observations=yes \
-	method=sparse \
+	update=yes \
 	cksolvedegree=3 \
 	camsolve=all \
-	update=yes \
 	twist=no > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \

@@ -1,5 +1,5 @@
-#ifndef JIGSAWSETUPDIALOG_H
-#define JIGSAWSETUPDIALOG_H
+#ifndef JigsawSetupDialog_h
+#define JigsawSetupDialog_h
 
 #include <QDialog>
 
@@ -10,6 +10,7 @@ namespace Ui {
 namespace Isis {
   class Project;
   class Control;
+  class BundleSettings;
 
   class JigsawSetupDialog : public QDialog
   {
@@ -19,28 +20,8 @@ namespace Isis {
     explicit JigsawSetupDialog(Project* project, QWidget *parent = 0);
     ~JigsawSetupDialog();
 
-    QString solveMethod();
-    bool errorPropagation();
-    bool radius();
-    bool twist();
-    bool observationMode();
-    int maxIterations();
-    bool outlierRejection();
-    double outlierRejectionMultiplier();
-    bool updateCubeLabel();
-    double sigma0();
-    double pointLatitudeSigma();
-    double pointLongitudeSigma();
-    double pointRadiusSigma();
-    double spacecraftPositionSigma();
-    double spacecraftVelocitySigma();
-    double spacecraftAccelerationSigma();
-    double sensorAngleSigma();
-    double sensorAngularVelocitySigma();
-    double sensorAngularAccelerationSigma();
     Control* selectedControl();
-    QString spSolve();
-    QString ckSolve();
+    BundleSettings bundleSettings();
 
   private slots:
     void on_OutlierRejection_toggled(bool checked);
@@ -51,10 +32,7 @@ namespace Isis {
 
   private:
     Ui::JigsawSetupDialog *ui;
-
-  private:
-
     Project * m_project;
   };
 };
-#endif // JIGSAWSETUPDIALOG_H
+#endif // JigsawSetupDialog_h

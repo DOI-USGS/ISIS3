@@ -1,19 +1,20 @@
 #include "Isis.h"
 
 #include "BundleAdjust.h"
+#include "BundleSettings.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Distance.h"
 #include "History.h"
 #include "IException.h"
+#include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Process.h"
 #include "Sensor.h"
 #include "SerialNumberList.h"
 #include "Table.h"
-#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -102,24 +103,53 @@ void IsisMain() {
 
   // Bundle adjust to solve for new pointing
   try {
-    BundleAdjust b(cnet, serialNumberList);
-    b.SetSolveTwist(ui.GetBoolean("TWIST"));
-    //    double tol = ui.GetDouble("TOL");
-    //int maxIterations = ui.GetInteger("MAXITS");
-    //b.Solve(tol, maxIterations);
-    b.SetSolveCmatrix(BundleAdjust::AnglesOnly);
-    b.SetSolveSpacecraftPosition(BundleAdjust::Nothing);
-    b.SetErrorPropagation(false);
-    b.SetOutlierRejection(false);
-    b.SetSolutionMethod("SPECIALK");
-    b.SetStandardOutput(true);
-    b.SetCSVOutput(false);
-    b.SetResidualOutput(true);
-    b.SetConvergenceThreshold(ui.GetDouble("SIGMA0"));
-    b.SetMaxIterations(ui.GetInteger("MAXITS"));
 
-    b.SetDecompositionMethod(BundleAdjust::SPECIALK);
-    b.SolveCholesky();
+
+
+    // =========================================================================================//
+    // ============= Use the bundle settings to initialize member variables ====================//
+    // =========================================================================================//
+    BundleSettings settings;
+    settings.setValidateNetwork(false);
+
+    // set the following:
+    //     solve observation mode = false
+    //     update cube label      = false
+    //     error propagation      = false
+    //     solve radius           = false
+    //     latitude sigma         = 1000.0
+    //     longitude sigma        = 1000.0
+    //     radius sigma           = -1.0 (since we are not solving for radius)
+    //     outlier rejection = false
+    settings.setSolveOptions(BundleSettings::SpecialK, false, false, false, false,
+                             1000.0, 1000.0, -1.0);
+
+    // NOTE: no need to set position sigmas or solve degrees since we are not solving for any
+    // position factors
+    //       position option sigmas default to -1.0
+    //       spkDegree = spkSolveDegree = 2
+    //       solveOverHermiteSpline = false
+    //       position sigma = velocity sigma = acceleration sigma = -1.0
+    settings.setObserverPositionSolveOptions(BundleSettings::NoPositionFactors);
+
+    // use defaults
+    //       orientation option sigmas -1.0
+    //       ckDegree = ckSolveDegree = 2
+    //       fitOverExisting = false
+    //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
+    settings.setObserverOrientationSolveOptions(BundleSettings::AnglesOnly, ui.GetBoolean("TWIST"));
+
+    settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
+                                    ui.GetDouble("SIGMA0"),
+                                    ui.GetInteger("MAXITS"));
+
+    settings.setOutputFiles("", true, false, true);
+    // ===========================================================================================//
+    // =============== End Bundle Settings =======================================================//
+    // ===========================================================================================//
+
+    BundleAdjust bundleAdjust(settings, cnet, serialNumberList);
+    bundleAdjust.solveCholesky();
 
     Cube c;
     c.open(filename, "rw");
@@ -129,7 +159,7 @@ void IsisMain() {
       c.label()->deleteObject("Polygon");
     }
 
-    Table cmatrix = b.Cmatrix(0);
+    Table cmatrix = bundleAdjust.cMatrix(0);
 
     // Write out a description in the spice table
     QString deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();
