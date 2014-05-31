@@ -101,8 +101,8 @@ namespace Isis {
     double positionSigma     = ui->SpacecraftPositionSigma->text().toDouble();
     double velocitySigma     = ui->SpacecraftVelocitySigma->text().toDouble();
     double accelerationSigma = ui->SpacecraftAccelerationSigma->text().toDouble();
-    settings.setObserverPositionSolveOptions(
-        BundleSettings::stringToObserverPositionSolveOption(ui->SpacecraftCombobox->currentText()),
+    settings.setInstrumentPositionSolveOptions(
+        BundleSettings::stringToInstrumentPositionSolveOption(ui->SpacecraftCombobox->currentText()),
         false, // do not solve over Hermite spline ???
         ui->SPKDegree->text().toInt(), 
         ui->SPKSolveDegree->text().toInt(),
@@ -113,8 +113,8 @@ namespace Isis {
     double anglesSigma              = ui->SensorAngleSigma->text().toDouble();
     double angularVelocitySigma     = ui->SensorVelocitySigma->text().toDouble();
     double angularAccelerationSigma = ui->SensorAccelerationSigma->text().toDouble();
-    settings.setObserverOrientationSolveOptions(
-        BundleSettings::stringToObserverOrientationSolveOption(ui->PointingCombobox->currentText()),
+    settings.setInstrumentPointingSolveOptions(
+        BundleSettings::stringToInstrumentPointingSolveOption(ui->PointingCombobox->currentText()),
         ui->Twist->isChecked(), 
         false,  // do not fit over existing pointing ???
         ui->CKDegree->text().toInt(), 
