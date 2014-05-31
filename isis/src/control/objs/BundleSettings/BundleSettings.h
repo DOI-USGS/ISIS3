@@ -99,69 +99,69 @@ namespace Isis {
 
       // Spacecraft Position Options
       /**
-       * This enum defines the options for solving for observer position information (SPK).
+       * This enum defines the options for solving for instrument position information (SPK).
        */
-      enum ObserverPositionSolveOption {
+      enum InstrumentPositionSolveOption {
         NoPositionFactors,            /**< Solve for none of the position factors.*/
-        PositionOnly,                 /**< Solve for observer positions only.*/
-        PositionVelocity,             /**< Solve for observer positions and velocities.*/
-        PositionVelocityAcceleration, /**< Solve for observer positions, velocities, and  
+        PositionOnly,                 /**< Solve for instrument positions only.*/
+        PositionVelocity,             /**< Solve for instrument positions and velocities.*/
+        PositionVelocityAcceleration, /**< Solve for instrument positions, velocities, and  
                                            accerlations.*/
         AllPositionCoefficients       /**< Solve for all coefficients in the polynomials fit to
-                                           the observer positions.*/
+                                           the instrument positions.*/
       };
-      static ObserverPositionSolveOption stringToObserverPositionSolveOption(QString option);
-      static QString observerPositionSolveOptionToString(ObserverPositionSolveOption option);
-//      void setObserverPositionSolveOptions(ObserverPositionSolveOption option,
+      static InstrumentPositionSolveOption stringToInstrumentPositionSolveOption(QString option);
+      static QString instrumentPositionSolveOptionToString(InstrumentPositionSolveOption option);
+//      void setInstrumentPositionSolveOptions(InstrumentPositionSolveOption option,
 //                                           bool solveOverHermiteSpline = false,
 //                                           int spkDegree = 2, int spkSolveDegree = 2);
-      void setObserverPositionSolveOptions(ObserverPositionSolveOption option,
+      void setInstrumentPositionSolveOptions(InstrumentPositionSolveOption option,
                            bool solveOverHermiteSpline = false,
                            int spkDegree = 2, int spkSolveDegree = 2,
-                           double globalObserverPositionAprioriSigma = -1.0,  
-                           double globalObserverVelocityAprioriSigma = -1.0,  
-                           double globalObserverAccelerationAprioriSigma = -1.0);
-      ObserverPositionSolveOption observerPositionSolveOption() const;
-      bool solveObserverPositionOverHermiteSpline() const;
+                           double globalInstrumentPositionAprioriSigma = -1.0,  
+                           double globalInstrumentVelocityAprioriSigma = -1.0,  
+                           double globalInstrumentAccelerationAprioriSigma = -1.0);
+      InstrumentPositionSolveOption instrumentPositionSolveOption() const;
+      bool solveInstrumentPositionOverHermiteSpline() const;
       int spkDegree() const;
       int spkSolveDegree() const;
-      double globalObserverPositionAprioriSigma() const;
-      double globalObserverVelocityAprioriSigma() const;
-      double globalObserverAccelerationAprioriSigma() const;
+      double globalInstrumentPositionAprioriSigma() const;
+      double globalInstrumentVelocityAprioriSigma() const;
+      double globalInstrumentAccelerationAprioriSigma() const;
 
       // Camera Pointing Options
       /**
-       * This enum defines the options for solving for observer orientation information (CK). 
+       * This enum defines the options for solving for instrument pointing information (CK). 
        */
-      enum ObserverOrientationSolveOption {
-        NoOrientationFactors,       /**< Solve for none of the orientation factors.*/
-        AnglesOnly,                 /**< Solve for orientation angles: right ascension, declination
+      enum InstrumentPointingSolveOption {
+        NoPointingFactors,          /**< Solve for none of the pointing factors.*/
+        AnglesOnly,                 /**< Solve for pointing angles: right ascension, declination
                                          and, optionally, twist.*/
-        AnglesVelocity,             //!< Solve for orientation angles and their angular velocities.
-        AnglesVelocityAcceleration, /**< Solve for orientation angles, their velocities and their 
+        AnglesVelocity,             //!< Solve for pointing angles and their angular velocities.
+        AnglesVelocityAcceleration, /**< Solve for pointing angles, their velocities and their 
                                          accelerations.*/
-        AllOrientationCoefficients  /**< Solve for all coefficients in the polynomials fit to the
-                                         orientation angles.*/
+        AllPointingCoefficients     /**< Solve for all coefficients in the polynomials fit to the
+                                         pointing angles.*/
       };
-      static ObserverOrientationSolveOption stringToObserverOrientationSolveOption(QString option);
-      static QString observerOrientationSolveOptionToString(ObserverOrientationSolveOption option);
-//      void setObserverOrientationSolveOptions(ObserverOrientationSolveOption option, 
+      static InstrumentPointingSolveOption stringToInstrumentPointingSolveOption(QString option);
+      static QString instrumentPointingSolveOptionToString(InstrumentPointingSolveOption option);
+//      void setInstrumentPointingSolveOptions(InstrumentPointingSolveOption option, 
 //                                              bool solveTwist,  bool fitOverExisting = false,
 //                                              int ckDegree = 2, int ckSolveDegree = 2);
-      void setObserverOrientationSolveOptions(ObserverOrientationSolveOption option,
+      void setInstrumentPointingSolveOptions(InstrumentPointingSolveOption option,
                            bool solveTwist,  bool fitOverExisting = false,
                            int ckDegree = 2, int ckSolveDegree = 2,
-                           double globalObserverOrientationAnglesAprioriSigma = -1.0,
-                           double globalObserverOrientationAngularVelocityAprioriSigma = -1.0,
-                           double globalObserverOrientationAngularAccelerationAprioriSigma = -1.0);
-      ObserverOrientationSolveOption observerOrientationSolveOption() const;
+                           double globalInstrumentPointingAnglesAprioriSigma = -1.0,
+                           double globalInstrumentPointingAngularVelocityAprioriSigma = -1.0,
+                           double globalInstrumentPointingAngularAccelerationAprioriSigma = -1.0);
+      InstrumentPointingSolveOption instrumentPointingSolveOption() const;
       bool solveTwist() const;
-      bool fitOrientationPolynomialOverExisting() const;
+      bool fitInstrumentPointingPolynomialOverExisting() const;
       int ckDegree() const;
       int ckSolveDegree() const;
-      double globalObserverOrientationAnglesAprioriSigma() const;
-      double globalObserverOrientationAngularVelocityAprioriSigma() const;
-      double globalObserverOrientationAngularAccelerationAprioriSigma() const;
+      double globalInstrumentPointingAnglesAprioriSigma() const;
+      double globalInstrumentPointingAngularVelocityAprioriSigma() const;
+      double globalInstrumentPointingAngularAccelerationAprioriSigma() const;
 
       // Convergence Criteria
       /**
@@ -186,12 +186,12 @@ namespace Isis {
 //      void setGlobalLatitudeAprioriSigma(double sigma);
 //      void setGlobalLongitudeAprioriSigma(double sigma);
 //      void setGlobalRadiiAprioriSigma(double sigma);
-//      void setGlobalObserverPositionAprioriSigma(double sigma);
-//      void setGlobalObserverVelocityAprioriSigma(double sigma);
-//      void setGlobalObserverAccelerationAprioriSigma(double sigma);
-//      void setGlobalObserverOrientationAnglesAprioriSigma(double sigma);
-//      void setGlobalObserverOrientationAngularVelocityAprioriSigma(double sigma);
-//      void setGlobalObserverOrientationAngularAccelerationAprioriSigma(double sigma);
+//      void setGlobalInstrumentPositionAprioriSigma(double sigma);
+//      void setGlobalInstrumentVelocityAprioriSigma(double sigma);
+//      void setGlobalInstrumentAccelerationAprioriSigma(double sigma);
+//      void setGlobalInstrumentPointingAnglesAprioriSigma(double sigma);
+//      void setGlobalInstrumentPointingAngularVelocityAprioriSigma(double sigma);
+//      void setGlobalInstrumentPointingAngularAccelerationAprioriSigma(double sigma);
 
       // Maximum Likelihood Estimation Options
       /**
@@ -230,6 +230,7 @@ namespace Isis {
       bool createBundleOutputFile() const;
       bool createCSVPointsFile() const;
       bool createResidualsFile() const;
+
       PvlGroup pvlGroup() const;
 
     private:
@@ -243,15 +244,15 @@ namespace Isis {
       SolveMethod m_solveMethod;
 
       // Spacecraft Position Options
-      ObserverPositionSolveOption m_observerPositionSolveOption;
+      InstrumentPositionSolveOption m_instrumentPositionSolveOption;
       bool m_solvePositionOverHermiteSpline; // false if option = none
       int m_spkDegree; // not used unless option = all
       int m_spkSolveDegree; // not used unless option = all
 
       // Camera Pointing Options
-      ObserverOrientationSolveOption m_observerOrientationSolveOption;
+      InstrumentPointingSolveOption m_instrumentPointingSolveOption;
       bool m_solveTwist; // false if option = none
-      bool m_fitOrientationPolynomialOverExisting; // false if option = none
+      bool m_fitInstrumentPointingPolynomialOverExisting; // false if option = none
       int m_ckDegree; // not used unless option = all
       int m_ckSolveDegree; // not used unless option = all
 
@@ -264,12 +265,12 @@ namespace Isis {
       double m_globalLatitudeAprioriSigma;
       double m_globalLongitudeAprioriSigma;
       double m_globalRadiusAprioriSigma;
-      double m_globalObserverPositionAprioriSigma;
-      double m_globalObserverVelocityAprioriSigma;
-      double m_globalObserverAccelerationAprioriSigma;
-      double m_globalObserverOrientationAnglesAprioriSigma;
-      double m_globalObserverOrientationVelocityAprioriSigma;
-      double m_globalObserverOrientationAccelerationAprioriSigma;
+      double m_globalInstrumentPositionAprioriSigma;
+      double m_globalInstrumentVelocityAprioriSigma;
+      double m_globalInstrumentAccelerationAprioriSigma;
+      double m_globalInstrumentPointingAnglesAprioriSigma;
+      double m_globalInstrumentPointingVelocityAprioriSigma;
+      double m_globalInstrumentPointingAccelerationAprioriSigma;
 
       // Maximum Likelihood Estimation Options
       // model and maxModelCQuantile for each

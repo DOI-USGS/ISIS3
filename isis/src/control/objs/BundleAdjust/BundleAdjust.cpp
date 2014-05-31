@@ -348,12 +348,12 @@ namespace Isis {
     observationModeSetUp();
     // SetUp method initializes m_nNumberCamPosCoefSolved, m_nPositionType
     // resizes m_dGlobalSpacecraftPositionAprioriSigma and initializes with -1.0s
-    observerPositionSetUp();
+    instrumentPositionSetUp();
 
     // SetUp method initializes m_nNumberCamAngleCoefSolved, m_nPointingType;
     // resizes m_dGlobalCameraAnglesAprioriSigma and initializes with
     // -1.0s;
-    observerOrientationSetUp();
+    instrumentPointingSetUp();
     
     // SetUp method initializes m_dGlobalLatitudeAprioriSigma,
     // m_dGlobalLongitudeAprioriSigma, m_dGlobalRadiusAprioriSigma;
@@ -521,7 +521,7 @@ namespace Isis {
   void BundleAdjust::computeNumberPartials() {
     m_nNumImagePartials = 0;
 
-    if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+    if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
       // Solve for ra/dec always
       m_nNumImagePartials = 2;
 
@@ -534,17 +534,17 @@ namespace Isis {
       m_nNumImagePartials *= m_nNumberCamAngleCoefSolved;
     }
 
-    if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+    if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
 
       // Do we solve for position and velocity, position, velocity and acceleration, or position only
-//      if (m_bundleSettings.observerPositionSolveOption() == BundleSettings::Position) {
+//      if (m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::Position) {
 //        nImagePosPartials = 3;
 //      }
-//      else if (m_bundleSettings.observerPositionSolveOption() ==
+//      else if (m_bundleSettings.instrumentPositionSolveOption() ==
 //      BundleSettings::PositionVelocity) {
 //        nImagePosPartials = 6;
 //      }
-//      else if (m_bundleSettings.observerPositionSolveOption() ==
+//      else if (m_bundleSettings.instrumentPositionSolveOption() ==
 //      BundleSettings::PositionVelocityAcceleration) {
 //        nImagePosPartials = 9;
 //      }
@@ -585,13 +585,13 @@ namespace Isis {
     }
 
     int nIndex = 0;
-    if (m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionOnly) {
+    if (m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionOnly) {
       m_dImageParameterWeights[0] = m_dGlobalSpacecraftPositionWeight;
       m_dImageParameterWeights[1] = m_dGlobalSpacecraftPositionWeight;
       m_dImageParameterWeights[2] = m_dGlobalSpacecraftPositionWeight;
       nIndex += 3;
     }
-    else if (m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionVelocity) {
+    else if (m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionVelocity) {
       m_dImageParameterWeights[0] = m_dGlobalSpacecraftPositionWeight;
       m_dImageParameterWeights[1] = m_dGlobalSpacecraftVelocityWeight;
       m_dImageParameterWeights[2] = m_dGlobalSpacecraftPositionWeight;
@@ -600,7 +600,7 @@ namespace Isis {
       m_dImageParameterWeights[5] = m_dGlobalSpacecraftVelocityWeight;
       nIndex += 6;
     }
-    else if (m_bundleSettings.observerPositionSolveOption() >= BundleSettings::PositionVelocityAcceleration) {
+    else if (m_bundleSettings.instrumentPositionSolveOption() >= BundleSettings::PositionVelocityAcceleration) {
       m_dImageParameterWeights[0] = m_dGlobalSpacecraftPositionWeight;
       m_dImageParameterWeights[1] = m_dGlobalSpacecraftVelocityWeight;
       m_dImageParameterWeights[2] = m_dGlobalSpacecraftAccelerationWeight;
@@ -613,7 +613,7 @@ namespace Isis {
       nIndex += 9;
     }
 
-    if (m_bundleSettings.observerOrientationSolveOption() == BundleSettings::AnglesOnly) {
+    if (m_bundleSettings.instrumentPointingSolveOption() == BundleSettings::AnglesOnly) {
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
 
@@ -621,7 +621,7 @@ namespace Isis {
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
       }
     }
-    else if (m_bundleSettings.observerOrientationSolveOption() == BundleSettings::AnglesVelocity) {
+    else if (m_bundleSettings.instrumentPointingSolveOption() == BundleSettings::AnglesVelocity) {
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
@@ -631,7 +631,7 @@ namespace Isis {
         m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
       }
     }
-    if (m_bundleSettings.observerOrientationSolveOption() >= BundleSettings::AnglesVelocityAcceleration) {
+    if (m_bundleSettings.instrumentPointingSolveOption() >= BundleSettings::AnglesVelocityAcceleration) {
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAnglesWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularVelocityWeight;
       m_dImageParameterWeights[nIndex++] = m_dGlobalCameraAngularAccelerationWeight;
@@ -692,16 +692,16 @@ namespace Isis {
   /**
    * For which camera angle coefficients do we solve?
    */
-  void BundleAdjust::observerOrientationSetUp() {
+  void BundleAdjust::instrumentPointingSetUp() {
 
-    if (m_bundleSettings.fitOrientationPolynomialOverExisting()) {
+    if (m_bundleSettings.fitInstrumentPointingPolynomialOverExisting()) {
       m_nPointingType = SpiceRotation::PolyFunctionOverSpice;
     }
     else {
       m_nPointingType = SpiceRotation::PolyFunction;
     }
 
-    switch (m_bundleSettings.observerOrientationSolveOption()) {
+    switch (m_bundleSettings.instrumentPointingSolveOption()) {
       case BundleSettings::AnglesOnly:
         m_nNumberCamAngleCoefSolved = 1;
         break;
@@ -711,7 +711,7 @@ namespace Isis {
       case BundleSettings::AnglesVelocityAcceleration:
         m_nNumberCamAngleCoefSolved = 3;
         break;
-      case BundleSettings::AllOrientationCoefficients:
+      case BundleSettings::AllPointingCoefficients:
         m_nNumberCamAngleCoefSolved = m_bundleSettings.ckSolveDegree() + 1;
         break;
       default:
@@ -737,16 +737,16 @@ namespace Isis {
   /**
    * For which camera position coefficients do we solve?
    */
-  void BundleAdjust::observerPositionSetUp() {
+  void BundleAdjust::instrumentPositionSetUp() {
     
-    if (m_bundleSettings.solveObserverPositionOverHermiteSpline()) {
+    if (m_bundleSettings.solveInstrumentPositionOverHermiteSpline()) {
       m_nPositionType = SpicePosition::PolyFunctionOverHermiteConstant;
     }
     else {
       m_nPositionType = SpicePosition::PolyFunction;
     }
     
-    switch (m_bundleSettings.observerPositionSolveOption()) {
+    switch (m_bundleSettings.instrumentPositionSolveOption()) {
       case BundleSettings::PositionOnly:
         m_nNumberCamPosCoefSolved = 1;
         break;
@@ -936,9 +936,9 @@ namespace Isis {
     PvlGroup g = m_bundleSettings.pvlGroup();
     cout << g << endl;
 
-    // throw error if a frame camera is included AND if m_bundleSettings.solveObserverPositionOverHermiteSpline()
+    // throw error if a frame camera is included AND if m_bundleSettings.solveInstrumentPositionOverHermiteSpline()
     // is set to true (can only use for line scan or radar)
-//    if (m_bundleSettings.solveObserverPositionOverHermiteSpline() == true) {
+//    if (m_bundleSettings.solveInstrumentPositionOverHermiteSpline() == true) {
 //      int nImages = images();
 //      for (int i = 0; i < nImages; i++) {
 //        if (m_pCnet->Camera(i)->GetCameraType() == 0) {
@@ -971,7 +971,7 @@ namespace Isis {
         iIndex = observationInitialValueIndex[oIndex];          // get image index for initial observation values
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
         // For observations, find the index of the first image and use its polynomial for the observation
         // initial coefficient values.  Initialize indices to -1
 
@@ -1004,7 +1004,7 @@ namespace Isis {
         }
       }
 
-      if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+      if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
         // Set the spacecraft position to an equation
         SpicePosition *pSpicePos = pCamera->instrumentPosition();
 
@@ -2984,7 +2984,7 @@ namespace Isis {
 
     int nIndex = 0;
 
-    if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+    if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
 //      SpicePosition* pInstPos = pCamera->instrumentPosition();
 
       // Add the partial for the x coordinate of the position (differentiating
@@ -3016,7 +3016,7 @@ namespace Isis {
 
     }
 
-    if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+    if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
 
       // Add the partials for ra
       for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
@@ -3232,7 +3232,7 @@ namespace Isis {
 
     int nIndex = 0;
 
-    if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+    if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
 //      SpicePosition* pInstPos = pCamera->instrumentPosition();
 
       // Add the partial for the x coordinate of the position (differentiating
@@ -3240,13 +3240,13 @@ namespace Isis {
 //      coeff_image(0,nIndex) = a1 * (CJ[6]*a2 - CJ[0]);
 //      coeff_image(1,nIndex) = a1 * (CJ[6]*a3 - CJ[3]);
 
-      for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+      for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
         pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, icoef, &coeff_image(0, nIndex), &coeff_image(1, nIndex));
         nIndex++;
       }
 
 //      std::cout << coeff_image << std::endl;
-//      if ( m_bundleSettings.observerPositionSolveOption() > BundleSettings::PositionOnly ) {
+//      if ( m_bundleSettings.instrumentPositionSolveOption() > BundleSettings::PositionOnly ) {
 //        dTime = pInstPos->EphemerisTime() - pInstPos->GetBaseTime();
 //        dTime = dTime/pInstRot->GetTimeScale();
 //
@@ -3254,7 +3254,7 @@ namespace Isis {
 //        coeff_image(1,nIndex) = coeff_image(1,nIndex - 1) * dTime;
 //        nIndex++;
 //
-//        if ( m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionVelocityAcceleration ) {
+//        if ( m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionVelocityAcceleration ) {
 //          coeff_image(0,nIndex) = coeff_image(0,nIndex - 1) * dTime;
 //          coeff_image(1,nIndex) = coeff_image(1,nIndex - 1) * dTime;
 //          nIndex++;
@@ -3264,17 +3264,17 @@ namespace Isis {
       // Add the partial for the y coordinate of the position
 //      coeff_image(0,nIndex) = a1 * (CJ[7]*a2 - CJ[1]);
 //      coeff_image(1,nIndex) = a1 * (CJ[7]*a3 - CJ[4]);
-      for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+      for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
         pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, icoef, &coeff_image(0, nIndex), &coeff_image(1, nIndex));
         nIndex++;
       }
 
-//      if ( m_bundleSettings.observerPositionSolveOption() > BundleSettings::PositionOnly ) {
+//      if ( m_bundleSettings.instrumentPositionSolveOption() > BundleSettings::PositionOnly ) {
 //         coeff_image(0,nIndex) = coeff_image(0,nIndex - 1) * dTime;
 //         coeff_image(1,nIndex) = coeff_image(1,nIndex - 1) * dTime;
 //         nIndex++;
 //
-//         if ( m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionVelocityAcceleration ) {
+//         if ( m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionVelocityAcceleration ) {
 //           coeff_image(0,nIndex) = coeff_image(0,nIndex - 1) * dTime;
 //           coeff_image(1,nIndex) = coeff_image(1,nIndex - 1) * dTime;
 //           nIndex++;
@@ -3284,17 +3284,17 @@ namespace Isis {
       // Add the partial for the z coordinate of the position
 //      coeff_image(0,nIndex) = a1 * (CJ[8]*a2 - CJ[2]);
 //      coeff_image(1,nIndex) = a1 * (CJ[8]*a3 - CJ[5]);
-      for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+      for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
         pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, icoef, &coeff_image(0, nIndex), &coeff_image(1, nIndex));
         nIndex++;
       }
 
-//      if ( m_bundleSettings.observerPositionSolveOption() > BundleSettings::PositionOnly ) {
+//      if ( m_bundleSettings.instrumentPositionSolveOption() > BundleSettings::PositionOnly ) {
 //        coeff_image(0,nIndex) = coeff_image(0,nIndex - 1) * dTime;
 //        coeff_image(1,nIndex) = coeff_image(1,nIndex - 1) * dTime;
 //        nIndex++;
 //
-//        if ( m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionVelocityAcceleration ) {
+//        if ( m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionVelocityAcceleration ) {
 //          coeff_image(0,nIndex) = coeff_image(0,nIndex - 1) * dTime;
 //          coeff_image(1,nIndex) = coeff_image(1,nIndex - 1) * dTime;
 //          nIndex++;
@@ -3302,7 +3302,7 @@ namespace Isis {
 //      }
     }
 //
-    if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+    if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
 //      TC = pInstRot->ConstantMatrix();
 //      TB = pInstRot->TimeBasedMatrix();
 //
@@ -3482,7 +3482,7 @@ namespace Isis {
         iIndex = observationInitialValueIndex[oIndex];          // get image index for initial observation values
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
         // For observations, find the index of the first image and use its polynomial for the observation
         // initial coefficient values.  Initialize indices to -1
 
@@ -3516,7 +3516,7 @@ namespace Isis {
         }
       }
 
-      if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+      if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
         // Set the spacecraft position to an equation
         SpicePosition *pSpicePos = pCamera->instrumentPosition();
 
@@ -3861,31 +3861,31 @@ namespace Isis {
       nIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
       nIndex = imageIndex(nIndex);
 
-      if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+      if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
 
         // Add the partial for the x coordinate of the position (differentiating
         // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
 
-        for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+        for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
           pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, icoef,
                                                 &px[nIndex], &py[nIndex]);
           nIndex++;
         }
 
         // Add the partial for the y coordinate of the position
-        for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+        for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
           pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
         }
 
         // Add the partial for the z coordinate of the position
-        for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+        for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
           pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
         }
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::BundleSettings::NoOrientationFactors) {
+      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::BundleSettings::NoPointingFactors) {
 
         // Add the partials for ra
         for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
@@ -4090,7 +4090,7 @@ namespace Isis {
       nIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
       nIndex = imageIndex(nIndex);
 
-      if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+      if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
 //         SpicePosition *pInstPos = pCamera->instrumentPosition();
 
         // Add the partial for the x coordinate of the position (differentiating
@@ -4099,7 +4099,7 @@ namespace Isis {
 //         px[nIndex] = a1 * (CJ[6] * a2 - CJ[0]);
 //         py[nIndex] = a1 * (CJ[6] * a3 - CJ[3]);
 
-        for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+        for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
           pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, icoef,
                                                 &px[nIndex], &py[nIndex]);
           nIndex++;
@@ -4107,7 +4107,7 @@ namespace Isis {
 
 //         nIndex++;
 
-//         if (m_bundleSettings.observerPositionSolveOption() > BundleSettings::PositionOnly) {
+//         if (m_bundleSettings.instrumentPositionSolveOption() > BundleSettings::PositionOnly) {
 //           dTime = pInstPos->EphemerisTime() - pInstPos->GetBaseTime();
 //           dTime = dTime / pInstPos->GetTimeScale();
 
@@ -4115,7 +4115,7 @@ namespace Isis {
 //           py[nIndex] = py[nIndex - 1] * dTime;
 //           nIndex++;
 
-//           if (m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionVelocityAcceleration) {
+//           if (m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionVelocityAcceleration) {
 //             px[nIndex] = px[nIndex - 1] * dTime;
 //             py[nIndex] = py[nIndex - 1] * dTime;
 //             nIndex++;
@@ -4123,7 +4123,7 @@ namespace Isis {
 //         }
 
         // Add the partial for the y coordinate of the position
-        for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+        for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
           pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
         }
@@ -4131,12 +4131,12 @@ namespace Isis {
 //         py[nIndex] = a1 * (CJ[7] * a3 - CJ[4]);
 //         nIndex++;
 
-//         if (m_bundleSettings.observerPositionSolveOption() > BundleSettings::PositionOnly) {
+//         if (m_bundleSettings.instrumentPositionSolveOption() > BundleSettings::PositionOnly) {
 //           px[nIndex] = px[nIndex - 1] * dTime;
 //           py[nIndex] = py[nIndex - 1] * dTime;
 //           nIndex++;
 
-//           if (m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionVelocityAcceleration) {
+//           if (m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionVelocityAcceleration) {
 //             px[nIndex] = px[nIndex - 1] * dTime;
 //             py[nIndex] = py[nIndex - 1] * dTime;
 //             nIndex++;
@@ -4146,19 +4146,19 @@ namespace Isis {
         // Add the partial for the z coordinate of the position
 //         px[nIndex] = a1 * (CJ[8] * a2 - CJ[2]);
 //         py[nIndex] = a1 * (CJ[8] * a3 - CJ[5]);
-        for (int icoef = 0; icoef < m_bundleSettings.observerPositionSolveOption(); icoef++) {
+        for (int icoef = 0; icoef < m_bundleSettings.instrumentPositionSolveOption(); icoef++) {
           pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
         }
 //         nIndex++;
 
-//         if (m_bundleSettings.observerPositionSolveOption() > BundleSettings::PositionOnly) {
+//         if (m_bundleSettings.instrumentPositionSolveOption() > BundleSettings::PositionOnly) {
 //           px[nIndex] = px[nIndex - 1] * dTime;
 //           py[nIndex] = py[nIndex - 1] * dTime;
 
 //           nIndex++;
 
-//           if (m_bundleSettings.observerPositionSolveOption() == BundleSettings::PositionVelocityAcceleration) {
+//           if (m_bundleSettings.instrumentPositionSolveOption() == BundleSettings::PositionVelocityAcceleration) {
 //             px[nIndex] = px[nIndex - 1] * dTime;
 //             py[nIndex] = py[nIndex - 1] * dTime;
 //             nIndex++;
@@ -4166,7 +4166,7 @@ namespace Isis {
 //         }
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
 
 //         TC = pInstRot->ConstantMatrix();
 //         TB = pInstRot->TimeBasedMatrix();
@@ -4678,7 +4678,7 @@ namespace Isis {
 
           currentindex = index;
 
-          if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+          if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
             SpicePosition         *pInstPos = pCamera->instrumentPosition();
             std::vector< double > coefX(m_nNumberCamPosCoefSolved),
                 coefY(m_nNumberCamPosCoefSolved),
@@ -4717,7 +4717,7 @@ namespace Isis {
             pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
           }
 
-      if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
         SpiceRotation         *pInstRot = pCamera->instrumentRotation();
         std::vector< double > coefRA(m_nNumberCamAngleCoefSolved),
             coefDEC(m_nNumberCamAngleCoefSolved),
@@ -4882,7 +4882,7 @@ namespace Isis {
 
           currentindex = index;
 
-          if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+          if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
             SpicePosition         *pInstPos = pCamera->instrumentPosition();
             std::vector< double > coefX(m_nNumberCamPosCoefSolved),
                 coefY(m_nNumberCamPosCoefSolved),
@@ -4915,7 +4915,7 @@ namespace Isis {
             pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
           }
 
-      if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
         SpiceRotation         *pInstRot = pCamera->instrumentRotation();
         std::vector< double > coefRA(m_nNumberCamAngleCoefSolved),
             coefDEC(m_nNumberCamAngleCoefSolved),
@@ -6024,7 +6024,7 @@ namespace Isis {
       Camera *pCamera = m_pCnet->Camera(i);
       int index = i;
       index = imageIndex(index);
-      if (m_bundleSettings.observerPositionSolveOption() != BundleSettings::NoPositionFactors) {
+      if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
         SpicePosition         *pInstPos = pCamera->instrumentPosition();
         std::vector< double > coefX(m_nNumberCamPosCoefSolved),
             coefY(m_nNumberCamPosCoefSolved),
@@ -6054,7 +6054,7 @@ namespace Isis {
         pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() != BundleSettings::NoOrientationFactors) {
+      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
         SpiceRotation         *pInstRot = pCamera->instrumentRotation();
         std::vector< double > coefRA(m_nNumberCamAngleCoefSolved),
             coefDEC(m_nNumberCamAngleCoefSolved),
@@ -6634,8 +6634,8 @@ namespace Isis {
     fp_out << buf;
     sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
     fp_out << buf;
-//??? this line could replace the switch/case below...   sprintf(buf, "\n                          CAMSOLVE: %s", BundleSettings::observerOrientationSolveOptionToString(m_bundleSettings.observerOrientationSolveOption()).toUpper();
-    switch (m_bundleSettings.observerOrientationSolveOption()) {
+//??? this line could replace the switch/case below...   sprintf(buf, "\n                          CAMSOLVE: %s", BundleSettings::instrumentPointingSolveOptionToString(m_bundleSettings.instrumentPointingSolveOption()).toUpper();
+    switch (m_bundleSettings.instrumentPointingSolveOption()) {
       case BundleSettings::AnglesOnly:
         sprintf(buf,"\n                          CAMSOLVE: ANGLES");
         break;
@@ -6645,10 +6645,10 @@ namespace Isis {
       case BundleSettings::AnglesVelocityAcceleration:
         sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
         break;
-      case BundleSettings::AllOrientationCoefficients:
+      case BundleSettings::AllPointingCoefficients:
         sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_bundleSettings.ckSolveDegree());
         break;
-      case BundleSettings::NoOrientationFactors:
+      case BundleSettings::NoPointingFactors:
         sprintf(buf,"\n                          CAMSOLVE: NONE");
         break;
     default:
@@ -6659,14 +6659,14 @@ namespace Isis {
         sprintf(buf, "\n                             TWIST: OFF");
     fp_out << buf;
 
-    m_bundleSettings.fitOrientationPolynomialOverExisting() ? sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
+    m_bundleSettings.fitInstrumentPointingPolynomialOverExisting() ? sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
         sprintf(buf, "\nPOLYNOMIAL OVER EXISTING POINTING : OFF");
     fp_out << buf;
 
     sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
     fp_out << buf;
-//??? this line could replace the switch/case below...    sprintf(buf, "\n                          SPSOLVE: %s", BundleSettings::observerPositionSolveOptionToString(m_bundleSettings.observerPositionSolveOption()).toUpper();
-    switch (m_bundleSettings.observerPositionSolveOption()) {
+//??? this line could replace the switch/case below...    sprintf(buf, "\n                          SPSOLVE: %s", BundleSettings::instrumentPositionSolveOptionToString(m_bundleSettings.instrumentPositionSolveOption()).toUpper();
+    switch (m_bundleSettings.instrumentPositionSolveOption()) {
       case BundleSettings::NoPositionFactors:
         sprintf(buf,"\n                        SPSOLVE: NONE");
         break;
@@ -6687,7 +6687,7 @@ namespace Isis {
     }
     fp_out << buf;
 
-    m_bundleSettings.solveObserverPositionOverHermiteSpline() ? sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
+    m_bundleSettings.solveInstrumentPositionOverHermiteSpline() ? sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
         sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
     fp_out << buf;
 
@@ -6939,10 +6939,10 @@ namespace Isis {
         continue;
       }
 
-      // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
+      // for frame cameras we directly retrieve the Exterior Pointing (i.e. position
       // and orientation angles). For others (linescan, radar) we retrieve the polynomial
-      // coefficients from which the Exterior Orientation parameters are derived.
-      if (m_bundleSettings.observerPositionSolveOption() > 0)
+      // coefficients from which the Exterior Pointing parameters are derived.
+      if (m_bundleSettings.instrumentPositionSolveOption() > 0)
         pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
       else { // not solving for position
         std::vector <double> coordinate(3);
@@ -6952,10 +6952,10 @@ namespace Isis {
         coefZ.push_back(coordinate[2]);
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() > 0)
+      if (m_bundleSettings.instrumentPointingSolveOption() > 0)
         pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
       //          else { // frame camera
-      else { // This is for m_bundleSettings.observerOrientationSolveOption() = BundleSettings::NoOrientationFactors and no polynomial fit has occurred
+      else { // This is for m_bundleSettings.instrumentPointingSolveOption() = BundleSettings::NoPointingFactors and no polynomial fit has occurred
         angles = pSpiceRotation->GetCenterAngles();
         coefRA.push_back(angles.at(0));
         coefDEC.push_back(angles.at(1));
@@ -7522,10 +7522,10 @@ namespace Isis {
           if ( !pSpiceRotation )
               continue;
 
-          // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
+          // for frame cameras we directly retrieve the Exterior Pointing (i.e. position
           // and orientation angles). For others (linescan, radar) we retrieve the polynomial
-          // coefficients from which the Exterior Orientation parameters are derived.
-          if ( m_bundleSettings.observerPositionSolveOption() > 0 )
+          // coefficients from which the Exterior Pointing parameters are derived.
+          if ( m_bundleSettings.instrumentPositionSolveOption() > 0 )
               pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
           else { // not solving for position
               std::vector <double> coordinate(3);
@@ -7535,10 +7535,10 @@ namespace Isis {
               coefZ.push_back(coordinate[2]);
           }
 
-          if ( m_bundleSettings.observerOrientationSolveOption() > 0 )
+          if ( m_bundleSettings.instrumentPointingSolveOption() > 0 )
               pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
           //          else { // frame camera
-          else { // This is for m_bundleSettings.observerOrientationSolveOption() = BundleSettings::NoOrientationFactors and no polynomial fit has occurred
+          else { // This is for m_bundleSettings.instrumentPointingSolveOption() = BundleSettings::NoPointingFactors and no polynomial fit has occurred
             angles = pSpiceRotation->GetCenterAngles();
             coefRA.push_back(angles.at(0));
             coefDEC.push_back(angles.at(1));
@@ -7990,17 +7990,17 @@ namespace Isis {
       if (!pSpiceRotation)
         continue;
 
-      // for frame cameras we directly retrieve the Exterior Orientation (i.e. position
+      // for frame cameras we directly retrieve the Exterior Pointing (i.e. position
       // and orientation angles). For others (linescan, radar) we retrieve the polynomial
-      // coefficients from which the Exterior Orientation paramters are derived.
+      // coefficients from which the Exterior Pointing paramters are derived.
       // This is incorrect...Correction below
       // For all instruments we retrieve the polynomial coefficients from which the
-      // Exterior Orientation parameters are derived.  For framing cameras, a single
+      // Exterior Pointing parameters are derived.  For framing cameras, a single
       // coefficient for each coordinate is returned.
-      if (m_bundleSettings.observerPositionSolveOption() > 0)
+      if (m_bundleSettings.instrumentPositionSolveOption() > 0)
         pSpicePosition->GetPolynomial(coefX,coefY,coefZ);
       //      else { // frame camera
-      else { // This is for m_bundleSettings.observerPositionSolveOption() = BundleSettings::None and no polynomial fit has occurred
+      else { // This is for m_bundleSettings.instrumentPositionSolveOption() = BundleSettings::None and no polynomial fit has occurred
         std::vector <double> coordinate(3);
         coordinate = pSpicePosition->GetCenterCoordinate();
         coefX.push_back(coordinate[0]);
@@ -8008,7 +8008,7 @@ namespace Isis {
         coefZ.push_back(coordinate[2]);
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() > 0) {
+      if (m_bundleSettings.instrumentPointingSolveOption() > 0) {
 //          angles = pSpiceRotation->Angles(3,1,3);
           pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
       }
@@ -8808,11 +8808,11 @@ namespace Isis {
           continue;
       }
 
-      // for frame cameras we directly retrieve the J2000 Exterior Orientation
+      // for frame cameras we directly retrieve the J2000 Exterior Pointing
       // (i.e. position and orientation angles). For others (linescan, radar)
       //  we retrieve the polynomial coefficients from which the Exterior
-      // Orientation parameters are derived.
-      if (m_bundleSettings.observerPositionSolveOption() > 0) {
+      // Pointing parameters are derived.
+      if (m_bundleSettings.instrumentPositionSolveOption() > 0) {
         pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
       }
       else { // not solving for position so report state at center of image
@@ -8824,11 +8824,11 @@ namespace Isis {
         coefZ.push_back(coordinate[2]);
       }
 
-      if (m_bundleSettings.observerOrientationSolveOption() > 0)
+      if (m_bundleSettings.instrumentPointingSolveOption() > 0)
         pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
 //          else { // frame camera
       else if (pCamera->GetCameraType() != 3) {
-// This is for m_bundleSettings.observerOrientationSolveOption() = BundleSettings::NoOrientationFactors (except Radar which
+// This is for m_bundleSettings.instrumentPointingSolveOption() = BundleSettings::NoPointingFactors (except Radar which
 // has no pointing) and no polynomial fit has occurred
         angles = pSpiceRotation->GetCenterAngles();
         coefRA.push_back(angles.at(0));
@@ -9177,23 +9177,23 @@ namespace Isis {
     m_dGlobalRadiusAprioriSigma    = m_bundleSettings.globalRadiusAprioriSigma();
 
     if (m_nNumberCamPosCoefSolved >= 1) {
-      m_dGlobalSpacecraftPositionAprioriSigma[0] = m_bundleSettings.globalObserverPositionAprioriSigma();
+      m_dGlobalSpacecraftPositionAprioriSigma[0] = m_bundleSettings.globalInstrumentPositionAprioriSigma();
     }
     if (m_nNumberCamPosCoefSolved >= 2) {
-      m_dGlobalSpacecraftPositionAprioriSigma[1] = m_bundleSettings.globalObserverVelocityAprioriSigma();
+      m_dGlobalSpacecraftPositionAprioriSigma[1] = m_bundleSettings.globalInstrumentVelocityAprioriSigma();
     }
     if (m_nNumberCamPosCoefSolved >= 3) {
-      m_dGlobalSpacecraftPositionAprioriSigma[2] = m_bundleSettings.globalObserverAccelerationAprioriSigma();
+      m_dGlobalSpacecraftPositionAprioriSigma[2] = m_bundleSettings.globalInstrumentAccelerationAprioriSigma();
     }
 
     if (m_nNumberCamAngleCoefSolved >= 1) {
-      m_dGlobalCameraAnglesAprioriSigma[0] = m_bundleSettings.globalObserverOrientationAnglesAprioriSigma();
+      m_dGlobalCameraAnglesAprioriSigma[0] = m_bundleSettings.globalInstrumentPointingAnglesAprioriSigma();
     }
     if (m_nNumberCamAngleCoefSolved >= 2) {
-      m_dGlobalCameraAnglesAprioriSigma[1] = m_bundleSettings.globalObserverOrientationAngularVelocityAprioriSigma();
+      m_dGlobalCameraAnglesAprioriSigma[1] = m_bundleSettings.globalInstrumentPointingAngularVelocityAprioriSigma();
     }
     if (m_nNumberCamAngleCoefSolved >= 3) {
-      m_dGlobalCameraAnglesAprioriSigma[2] = m_bundleSettings.globalObserverOrientationAngularAccelerationAprioriSigma();
+      m_dGlobalCameraAnglesAprioriSigma[2] = m_bundleSettings.globalInstrumentPointingAngularAccelerationAprioriSigma();
     }
   }
 

@@ -806,14 +806,14 @@ namespace Isis {
       //       spkDegree = spkSolveDegree = 2
       //       solveOverHermiteSpline = false
       //       position sigma = velocity sigma = acceleration sigma = -1.0
-      settings.setObserverPositionSolveOptions(BundleSettings::NoPositionFactors);
+      settings.setInstrumentPositionSolveOptions(BundleSettings::NoPositionFactors);
 
       // use defaults
-      //       orientation option sigmas -1.0
+      //       pointing option sigmas -1.0
       //       ckDegree = ckSolveDegree = 2
       //       fitOverExisting = false
       //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
-      settings.setObserverOrientationSolveOptions(BundleSettings::AnglesOnly, p_twist);
+      settings.setInstrumentPointingSolveOptions(BundleSettings::AnglesOnly, p_twist);
 
       settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
                                       p_sigma0, p_maxIterations);

@@ -363,6 +363,9 @@
       <default>
         <item>No</item>
       </default>
+      <inclusions>
+        <item>REJECTION_MULTIPLIER</item>
+     </inclusions>
     </parameter>
 
      <parameter name="REJECTION_MULTIPLIER">
@@ -372,6 +375,9 @@
         <default>
           <item>3.0</item>
         </default>
+        <inclusions>
+          <item>OUTLIER_REJECTION</item>
+       </inclusions>
       </parameter>
 
     <parameter name="ERRORPROPAGATION">
@@ -676,6 +682,12 @@
                    Adjustments are not applied unless the solution converges and UPDATE is 
                    selected. Solving for angles only is equivalent to using CKSOLVEDEGREE=0.
             </description>
+<!--
+            <exclusions    >
+              <item>CKDEGREE</item>
+              <item>CKSOLVEDEGREE</item>
+            </exclusions>
+-->
           </option>
 
           <option value="VELOCITIES">
@@ -685,6 +697,12 @@
                    solution.  Solving for angles and velocities is equivalent to using 
                    CKSOLVEDEGREE=1.
             </description>
+<!--
+            <exclusions>
+              <item>CKDEGREE</item>
+              <item>CKSOLVEDEGREE</item>
+            </exclusions>
+-->
           </option>
 
           <option value="ACCELERATIONS">
@@ -694,6 +712,12 @@
                    adjusted in the solution.  Solving for angles, angular velocities, and 
                    accelerations is equivalent to using CKSOLVEDEGREE=2.
             </description>
+<!--
+            <exclusions>
+              <item>CKDEGREE</item>
+              <item>CKSOLVEDEGREE</item>
+            </exclusions>
+-->
           </option>
 
           <option value="ALL">
@@ -801,6 +825,12 @@
                    Spacecraft positions will be adjusted in the solution, but 
                    not the velocity or the acceleration.
             </description>
+<!--
+            <exclusions>
+              <item>SPKDEGREE</item>
+              <item>SPKSOLVEDEGREE</item>
+            </exclusions>
+-->
           </option>
 
           <option value="VELOCITIES">
@@ -809,6 +839,12 @@
                    Spacecraft positions will be adjusted in the solution, as 
                    well as the velocities of the spacecraft at each instance.
             </description>
+<!--
+            <exclusions>
+              <item>SPKDEGREE</item>
+              <item>SPKSOLVEDEGREE</item>
+            </exclusions>
+-->
           </option>
 
           <option value="ACCELERATIONS">
@@ -818,7 +854,14 @@
                    as the velocities and accelerations of the spacecraft at each 
                    instance.
             </description>
+<!--
+            <exclusions>
+              <item>SPKDEGREE</item>
+              <item>SPKSOLVEDEGREE</item>
+            </exclusions>
+-->
           </option>
+
           <option value="ALL">
             <brief>Solve for all coefficients in the polynomials fit to the camera position.</brief>
             <description>

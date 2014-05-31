@@ -157,6 +157,12 @@ BundleSettings bundleSettings() {
                            ui.GetBoolean("OBSERVATIONS"), ui.GetBoolean("UPDATE"), 
                            ui.GetBoolean("ERRORPROPAGATION"), ui.GetBoolean("RADIUS"),
                            latitudeSigma, longitudeSigma, radiusSigma);
+  // ??? double multiplier = -1.0;
+  // ??? if (ui.WasEntered( "REJECTION_MULTIPLIER" )) {
+  // ???   multiplier = -1.0;
+  // ??? }
+  // ??? settings.setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
+  // ???                              multiplier);
   settings.setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
                                ui.GetDouble("REJECTION_MULTIPLIER"));
 
@@ -173,14 +179,14 @@ BundleSettings bundleSettings() {
   if (ui.WasEntered("SPACECRAFT_ACCELERATION_SIGMA")) {
     accelerationSigma = ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA");
   }
-  settings.setObserverPositionSolveOptions(
-      BundleSettings::stringToObserverPositionSolveOption(ui.GetString("SPSOLVE")),
+  settings.setInstrumentPositionSolveOptions(
+      BundleSettings::stringToInstrumentPositionSolveOption(ui.GetString("SPSOLVE")),
       ui.GetBoolean("OVERHERMITE"),
       ui.GetInteger("SPKDEGREE"),
       ui.GetInteger("SPKSOLVEDEGREE"),
       positionSigma, velocitySigma, accelerationSigma);
 
-  // orientation settings
+  // pointing settings
   double anglesSigma              = -1.0;
   double angularVelocitySigma     = -1.0;
   double angularAccelerationSigma = -1.0;
@@ -193,8 +199,8 @@ BundleSettings bundleSettings() {
   if (ui.WasEntered("CAMERA_ANGULAR_ACCELERATION_SIGMA")) {
     angularAccelerationSigma = ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA");
   }
-  settings.setObserverOrientationSolveOptions(
-      BundleSettings::stringToObserverOrientationSolveOption(ui.GetString("CAMSOLVE")),
+  settings.setInstrumentPointingSolveOptions(
+      BundleSettings::stringToInstrumentPointingSolveOption(ui.GetString("CAMSOLVE")),
       ui.GetBoolean("TWIST"),
       ui.GetBoolean("OVEREXISTING"),
       ui.GetInteger("CKDEGREE"),

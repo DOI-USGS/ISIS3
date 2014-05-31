@@ -257,8 +257,8 @@ namespace Isis {
       // where does this happen ???
       void maximumLikelihoodSetUp();
       void observationModeSetUp();
-      void observerPositionSetUp();
-      void observerOrientationSetUp();
+      void instrumentPositionSetUp();
+      void instrumentPointingSetUp();
       void setGlobalAprioriSigmas();
       void fillPointIndexMap();
       void computeNumberPartials();
@@ -662,11 +662,11 @@ namespace Isis {
 // ??? delete bool m_bErrorPropagation;                              //!< to perform error propagation
 // ??? delete bool m_bOutlierRejection;                              //!< to perform automatic outlier detection/rejection
 //??? delete double m_dRejectionMultiplier;                         //!< outlier rejection multiplier
-// ??? delete BundleSettings::ObserverPositionSolveOption m_spacecraftPositionSolveType; //!< spacecraft position solve type (define)
+// ??? delete BundleSettings::InstrumentPositionSolveOption m_spacecraftPositionSolveType; //!< spacecraft position solve type (define)
 // ??? delete bool m_bSolvePolyOverHermite;                          //!< to fit polynomial over existing Hermite
 //??? delete int m_nSPKDegree;                                      //!< spk degree (define)
 //??? delete int m_nsolveSPKDegree;                                 //!< solve spk degree (define)
-// ??? delete BundleSettings::ObserverOrientationSolveOption m_cmatrixSolveType; //!< cmatrix solve type (define)
+// ??? delete BundleSettings::InstrumentPointingSolveOption m_cmatrixSolveType; //!< cmatrix solve type (define)
 // ??? bool m_bSolveTwist;                                    //!< to solve for "twist" angle
 // ??? delete bool m_bSolvePolyOverPointing;                         //!< to fit polynomial over existing pointing    //??? delete int m_nCKDegree;                                       //!< ck degree (define)
 //??? delete int m_nsolveCKDegree;                                  //!< solve cad degree (define)

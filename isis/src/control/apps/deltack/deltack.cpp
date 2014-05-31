@@ -130,14 +130,14 @@ void IsisMain() {
     //       spkDegree = spkSolveDegree = 2
     //       solveOverHermiteSpline = false
     //       position sigma = velocity sigma = acceleration sigma = -1.0
-    settings.setObserverPositionSolveOptions(BundleSettings::NoPositionFactors);
+    settings.setInstrumentPositionSolveOptions(BundleSettings::NoPositionFactors);
 
     // use defaults
-    //       orientation option sigmas -1.0
+    //       pointing option sigmas -1.0
     //       ckDegree = ckSolveDegree = 2
     //       fitOverExisting = false
     //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
-    settings.setObserverOrientationSolveOptions(BundleSettings::AnglesOnly, ui.GetBoolean("TWIST"));
+    settings.setInstrumentPointingSolveOptions(BundleSettings::AnglesOnly, ui.GetBoolean("TWIST"));
 
     settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
                                     ui.GetDouble("SIGMA0"),

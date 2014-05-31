@@ -19,17 +19,17 @@ namespace Isis {
     m_outlierRejectionMultiplier = 3.0; // default to rejection = false, i.e. multiplier = 1.0      ???
 
     // Spacecraft Position Options
-    m_observerPositionSolveOption = NoPositionFactors;
+    m_instrumentPositionSolveOption = NoPositionFactors;
     m_spkDegree = 2; // -1
     m_spkSolveDegree = 2; // -1
     m_solvePositionOverHermiteSpline = false;
 
     // Camera Pointing Options
-    m_observerOrientationSolveOption = AnglesOnly;
+    m_instrumentPointingSolveOption = AnglesOnly;
     m_solveTwist = true;
     m_ckDegree = 2; // 0 since we default to angles ???
     m_ckSolveDegree = 2; // 0 since we default to angles ???
-    m_fitOrientationPolynomialOverExisting = false;
+    m_fitInstrumentPointingPolynomialOverExisting = false;
 
     // Convergence Criteria
     m_convergenceCriteria = BundleSettings::Sigma0;
@@ -40,12 +40,12 @@ namespace Isis {
     m_globalLatitudeAprioriSigma = -1.0;
     m_globalLongitudeAprioriSigma = -1.0;
     m_globalRadiusAprioriSigma = -1.0;
-    m_globalObserverPositionAprioriSigma = -1.0;
-    m_globalObserverVelocityAprioriSigma = -1.0;
-    m_globalObserverAccelerationAprioriSigma = -1.0;
-    m_globalObserverOrientationAnglesAprioriSigma = -1.0;
-    m_globalObserverOrientationVelocityAprioriSigma = -1.0;
-    m_globalObserverOrientationAccelerationAprioriSigma = -1.0;
+    m_globalInstrumentPositionAprioriSigma = -1.0;
+    m_globalInstrumentVelocityAprioriSigma = -1.0;
+    m_globalInstrumentAccelerationAprioriSigma = -1.0;
+    m_globalInstrumentPointingAnglesAprioriSigma = -1.0;
+    m_globalInstrumentPointingVelocityAprioriSigma = -1.0;
+    m_globalInstrumentPointingAccelerationAprioriSigma = -1.0;
 
     // Maximum Likelihood Estimation Options no default in the constructor - must be set.
 
@@ -239,7 +239,7 @@ namespace Isis {
   // =============================================================================================//
   // ======================== Spacecraft Position Options ========================================//
   // =============================================================================================//
-  BundleSettings::ObserverPositionSolveOption BundleSettings::stringToObserverPositionSolveOption(
+  BundleSettings::InstrumentPositionSolveOption BundleSettings::stringToInstrumentPositionSolveOption(
       QString option) {
     if (option.compare("NONE", Qt::CaseInsensitive) == 0) {
       return BundleSettings::NoPositionFactors;
@@ -258,14 +258,14 @@ namespace Isis {
     }
     else {
       throw IException(IException::Programmer,
-                          "Unknown bundle observer position solve option " + option + ".",
+                          "Unknown bundle instrument position solve option " + option + ".",
                           _FILEINFO_);
     }
   }
 
 
 
-  QString BundleSettings::observerPositionSolveOptionToString(ObserverPositionSolveOption option) {
+  QString BundleSettings::instrumentPositionSolveOptionToString(InstrumentPositionSolveOption option) {
     if (option == NoPositionFactors)                 return "None";
     else if (option == PositionOnly)                 return "PositionOnly";
     else if (option == PositionVelocity)             return "PositionAndVelocity";
@@ -278,76 +278,76 @@ namespace Isis {
 
 
 
-//   void BundleSettings::setObserverPositionSolveOptions(ObserverPositionSolveOption option, 
+//   void BundleSettings::setInstrumentPositionSolveOptions(InstrumentPositionSolveOption option, 
 //                                                        bool solveOverHermiteSpline,
 //                                                        int spkDegree, int spkSolveDegree) {
-//     m_observerPositionSolveOption = option;
-//     if (m_observerPositionSolveOption != NoPositionFactors) {
+//     m_instrumentPositionSolveOption = option;
+//     if (m_instrumentPositionSolveOption != NoPositionFactors) {
 //       m_solvePositionOverHermiteSpline = solveOverHermiteSpline;
 //     }
-// //    if (m_observerPositionSolveOption == AllPositionCoefficients) {
+// //    if (m_instrumentPositionSolveOption == AllPositionCoefficients) {
 //       m_spkDegree = spkDegree;
 //       m_spkSolveDegree = spkSolveDegree;
 // //    }
 // //    else {
-// //      m_spkDegree = (int) (m_observerPositionSolveOption - 1);
-// //      m_spkSolveDegree = (int) (m_observerPositionSolveOption - 1);
+// //      m_spkDegree = (int) (m_instrumentPositionSolveOption - 1);
+// //      m_spkSolveDegree = (int) (m_instrumentPositionSolveOption - 1);
 // //    }
 //   }
 
 
 
-  void BundleSettings::setObserverPositionSolveOptions(ObserverPositionSolveOption option, 
+  void BundleSettings::setInstrumentPositionSolveOptions(InstrumentPositionSolveOption option, 
                                                     bool solveOverHermiteSpline,
                                                     int spkDegree, int spkSolveDegree,
-                                                    double globalObserverPositionAprioriSigma,
-                                                    double globalObserverVelocityAprioriSigma,
-                                                    double globalObserverAccelerationAprioriSigma) {
-    m_observerPositionSolveOption = option;
-    if (m_observerPositionSolveOption != NoPositionFactors) {
+                                                    double globalInstrumentPositionAprioriSigma,
+                                                    double globalInstrumentVelocityAprioriSigma,
+                                                    double globalInstrumentAccelerationAprioriSigma) {
+    m_instrumentPositionSolveOption = option;
+    if (m_instrumentPositionSolveOption != NoPositionFactors) {
       m_solvePositionOverHermiteSpline = solveOverHermiteSpline;
     }
-//    if (m_observerPositionSolveOption == AllPositionCoefficients) {
+//    if (m_instrumentPositionSolveOption == AllPositionCoefficients) {
     m_spkDegree = spkDegree;
     m_spkSolveDegree = spkSolveDegree;
 //    }
 //    else {
-//      m_spkDegree = (int) (m_observerPositionSolveOption - 1);
-//      m_spkSolveDegree = (int) (m_observerPositionSolveOption - 1);
+//      m_spkDegree = (int) (m_instrumentPositionSolveOption - 1);
+//      m_spkSolveDegree = (int) (m_instrumentPositionSolveOption - 1);
 //    }
     if (option > NoPositionFactors) {
 
-      m_globalObserverPositionAprioriSigma = globalObserverPositionAprioriSigma;
+      m_globalInstrumentPositionAprioriSigma = globalInstrumentPositionAprioriSigma;
 
       if (option > PositionOnly) {
-        m_globalObserverVelocityAprioriSigma = globalObserverVelocityAprioriSigma;
+        m_globalInstrumentVelocityAprioriSigma = globalInstrumentVelocityAprioriSigma;
 
         if (option > PositionVelocityAcceleration) {
-          m_globalObserverAccelerationAprioriSigma = globalObserverAccelerationAprioriSigma;
+          m_globalInstrumentAccelerationAprioriSigma = globalInstrumentAccelerationAprioriSigma;
         }
         else {
-          m_globalObserverAccelerationAprioriSigma = -1.0;
+          m_globalInstrumentAccelerationAprioriSigma = -1.0;
         }
 
       }
       else {
-        m_globalObserverVelocityAprioriSigma = -1.0;
+        m_globalInstrumentVelocityAprioriSigma = -1.0;
       }
     }
     else {
-      m_globalObserverPositionAprioriSigma = -1.0;
+      m_globalInstrumentPositionAprioriSigma = -1.0;
     }
   }
 
 
 
-  BundleSettings::ObserverPositionSolveOption BundleSettings::observerPositionSolveOption() const {
-    return m_observerPositionSolveOption;
+  BundleSettings::InstrumentPositionSolveOption BundleSettings::instrumentPositionSolveOption() const {
+    return m_instrumentPositionSolveOption;
   }
 
 
 
-  bool BundleSettings::solveObserverPositionOverHermiteSpline() const {
+  bool BundleSettings::solveInstrumentPositionOverHermiteSpline() const {
     return m_solvePositionOverHermiteSpline;
   }
   
@@ -365,20 +365,20 @@ namespace Isis {
 
 
 
-  double BundleSettings::globalObserverPositionAprioriSigma() const {
-    return m_globalObserverPositionAprioriSigma;
+  double BundleSettings::globalInstrumentPositionAprioriSigma() const {
+    return m_globalInstrumentPositionAprioriSigma;
   }
 
 
 
-  double BundleSettings::globalObserverVelocityAprioriSigma() const {
-    return m_globalObserverVelocityAprioriSigma;
+  double BundleSettings::globalInstrumentVelocityAprioriSigma() const {
+    return m_globalInstrumentVelocityAprioriSigma;
   }
 
 
 
-  double BundleSettings::globalObserverAccelerationAprioriSigma() const {
-    return m_globalObserverAccelerationAprioriSigma;
+  double BundleSettings::globalInstrumentAccelerationAprioriSigma() const {
+    return m_globalInstrumentAccelerationAprioriSigma;
   }
 
 
@@ -386,10 +386,10 @@ namespace Isis {
   // =============================================================================================//
   // ======================== Camera Pointing Options ============================================//
   // =============================================================================================//
-  BundleSettings::ObserverOrientationSolveOption 
-      BundleSettings::stringToObserverOrientationSolveOption(QString option) {
+  BundleSettings::InstrumentPointingSolveOption 
+      BundleSettings::stringToInstrumentPointingSolveOption(QString option) {
     if (option.compare("NONE", Qt::CaseInsensitive) == 0) {
-      return BundleSettings::NoOrientationFactors;
+      return BundleSettings::NoPointingFactors;
     }
     else if (option.compare("ANGLES", Qt::CaseInsensitive) == 0) {
       return BundleSettings::AnglesOnly;
@@ -401,99 +401,99 @@ namespace Isis {
       return BundleSettings::AnglesVelocityAcceleration;
     }
     else if (option.compare("ALL", Qt::CaseInsensitive) == 0) {
-      return BundleSettings::AllOrientationCoefficients;
+      return BundleSettings::AllPointingCoefficients;
     }
     else {
       throw IException(IException::Programmer,
-                       "Unknown bundle observer orientation solve option " + option + ".",
+                       "Unknown bundle instrument pointing solve option " + option + ".",
                        _FILEINFO_);
     }
   }
 
 
 
-  QString BundleSettings::observerOrientationSolveOptionToString(
-      ObserverOrientationSolveOption option) {
-    if (option == NoOrientationFactors)            return "None";
+  QString BundleSettings::instrumentPointingSolveOptionToString(
+      InstrumentPointingSolveOption option) {
+    if (option == NoPointingFactors)            return "None";
     else if (option == AnglesOnly)                 return "AnglesOnly";
     else if (option == AnglesVelocity)             return "AnglesAndVelocity";
     else if (option == AnglesVelocityAcceleration) return "AnglesVelocityAndAcceleration";
-    else if (option == AllOrientationCoefficients) return "AllPolynomialCoefficients";
+    else if (option == AllPointingCoefficients) return "AllPolynomialCoefficients";
     else throw IException(IException::Programmer,
-                          "Unknown orientation solve option enum [" + toString(option) + "].",
+                          "Unknown pointing solve option enum [" + toString(option) + "].",
                           _FILEINFO_);
   }
 
 
 
-//   void BundleSettings::setObserverOrientationSolveOptions(ObserverOrientationSolveOption option, 
+//   void BundleSettings::setInstrumentPointingSolveOptions(InstrumentPointingSolveOption option, 
 //                                                           bool solveTwist, bool fitOverExisting,
 //                                                           int ckDegree, int ckSolveDegree) {
-//     m_observerOrientationSolveOption = option;
-//     if (m_observerOrientationSolveOption != NoOrientationFactors){
+//     m_instrumentPointingSolveOption = option;
+//     if (m_instrumentPointingSolveOption != NoPointingFactors){
 //       m_solveTwist = solveTwist;
-//       m_fitOrientationPolynomialOverExisting = fitOverExisting;
+//       m_fitInstrumentPointingPolynomialOverExisting = fitOverExisting;
 //     }
-// //    if (m_observerOrientationSolveOption == AllOrientationCoefficients){
+// //    if (m_instrumentPointingSolveOption == AllPointingCoefficients){
 //       m_ckDegree = ckDegree;
 //       m_ckSolveDegree = ckSolveDegree;
 // //    }
 // //    else {
-// //      m_ckDegree = (int) (m_observerOrientationSolveOption - 1);
-// //      m_ckSolveDegree = (int) (m_observerOrientationSolveOption - 1);
+// //      m_ckDegree = (int) (m_instrumentPointingSolveOption - 1);
+// //      m_ckSolveDegree = (int) (m_instrumentPointingSolveOption - 1);
 // //    }
 //   }
 
 
 
-  void BundleSettings::setObserverOrientationSolveOptions(ObserverOrientationSolveOption option,
+  void BundleSettings::setInstrumentPointingSolveOptions(InstrumentPointingSolveOption option,
                           bool solveTwist, bool fitOverExisting, int ckDegree, int ckSolveDegree,
-                          double globalObserverOrientationAnglesAprioriSigma,
-                          double globalObserverOrientationAngularVelocityAprioriSigma,
-                          double globalObserverOrientationAngularAccelerationAprioriSigma) {
-    m_observerOrientationSolveOption = option;
-    if (m_observerOrientationSolveOption != NoOrientationFactors) {
+                          double globalInstrumentPointingAnglesAprioriSigma,
+                          double globalInstrumentPointingAngularVelocityAprioriSigma,
+                          double globalInstrumentPointingAngularAccelerationAprioriSigma) {
+    m_instrumentPointingSolveOption = option;
+    if (m_instrumentPointingSolveOption != NoPointingFactors) {
       m_solveTwist = solveTwist;
-      m_fitOrientationPolynomialOverExisting = fitOverExisting;
+      m_fitInstrumentPointingPolynomialOverExisting = fitOverExisting;
     }
-//    if (m_observerOrientationSolveOption == AllOrientationCoefficients){
+//    if (m_instrumentPointingSolveOption == AllPointingCoefficients){
     m_ckDegree = ckDegree;
     m_ckSolveDegree = ckSolveDegree;
 //    }
 //    else {
-//      m_ckDegree = (int) (m_observerOrientationSolveOption - 1);
-//      m_ckSolveDegree = (int) (m_observerOrientationSolveOption - 1);
+//      m_ckDegree = (int) (m_instrumentPointingSolveOption - 1);
+//      m_ckSolveDegree = (int) (m_instrumentPointingSolveOption - 1);
 //    }
-    if (option > NoOrientationFactors) {
+    if (option > NoPointingFactors) {
 
-      m_globalObserverOrientationAnglesAprioriSigma = globalObserverOrientationAnglesAprioriSigma;
+      m_globalInstrumentPointingAnglesAprioriSigma = globalInstrumentPointingAnglesAprioriSigma;
 
       if (option > AnglesOnly) {
-        m_globalObserverOrientationVelocityAprioriSigma = globalObserverOrientationAngularVelocityAprioriSigma;
+        m_globalInstrumentPointingVelocityAprioriSigma = globalInstrumentPointingAngularVelocityAprioriSigma;
 
         if (option > AnglesVelocity) {
-          m_globalObserverOrientationAccelerationAprioriSigma 
-              = globalObserverOrientationAngularAccelerationAprioriSigma;
+          m_globalInstrumentPointingAccelerationAprioriSigma 
+              = globalInstrumentPointingAngularAccelerationAprioriSigma;
         }
         else {
-          m_globalObserverOrientationAccelerationAprioriSigma = -1.0;
+          m_globalInstrumentPointingAccelerationAprioriSigma = -1.0;
         }
 
       }
       else {
-        m_globalObserverOrientationVelocityAprioriSigma = -1.0;
+        m_globalInstrumentPointingVelocityAprioriSigma = -1.0;
       }
     }
     else {
-      m_globalObserverOrientationAnglesAprioriSigma = -1.0;
+      m_globalInstrumentPointingAnglesAprioriSigma = -1.0;
     }
   }
 
 
 
-  BundleSettings::ObserverOrientationSolveOption 
-      BundleSettings::observerOrientationSolveOption() const {
-    return m_observerOrientationSolveOption;
+  BundleSettings::InstrumentPointingSolveOption 
+      BundleSettings::instrumentPointingSolveOption() const {
+    return m_instrumentPointingSolveOption;
   }
 
 
@@ -504,8 +504,8 @@ namespace Isis {
   
 
 
-  bool BundleSettings::fitOrientationPolynomialOverExisting() const {
-    return m_fitOrientationPolynomialOverExisting;
+  bool BundleSettings::fitInstrumentPointingPolynomialOverExisting() const {
+    return m_fitInstrumentPointingPolynomialOverExisting;
   }
   
 
@@ -522,20 +522,20 @@ namespace Isis {
   
 
 
-  double BundleSettings::globalObserverOrientationAnglesAprioriSigma() const {
-    return m_globalObserverOrientationAnglesAprioriSigma;
+  double BundleSettings::globalInstrumentPointingAnglesAprioriSigma() const {
+    return m_globalInstrumentPointingAnglesAprioriSigma;
   }
 
 
 
-  double BundleSettings::globalObserverOrientationAngularVelocityAprioriSigma() const {
-    return m_globalObserverOrientationVelocityAprioriSigma;
+  double BundleSettings::globalInstrumentPointingAngularVelocityAprioriSigma() const {
+    return m_globalInstrumentPointingVelocityAprioriSigma;
   }
 
 
 
-  double BundleSettings::globalObserverOrientationAngularAccelerationAprioriSigma() const {
-    return m_globalObserverOrientationAccelerationAprioriSigma;
+  double BundleSettings::globalInstrumentPointingAngularAccelerationAprioriSigma() const {
+    return m_globalInstrumentPointingAccelerationAprioriSigma;
   }
 
 
@@ -618,38 +618,38 @@ namespace Isis {
 // 
 // 
 // 
-//   void BundleSettings::setGlobalObserverPositionAprioriSigma(double sigma) {
-//     m_globalObserverPositionAprioriSigma = sigma;
+//   void BundleSettings::setGlobalInstrumentPositionAprioriSigma(double sigma) {
+//     m_globalInstrumentPositionAprioriSigma = sigma;
 //   }
 // 
 // 
 // 
-//   void BundleSettings::setGlobalObserverVelocityAprioriSigma(double sigma) {
-//     m_globalObserverVelocityAprioriSigma = sigma;
+//   void BundleSettings::setGlobalInstrumentVelocityAprioriSigma(double sigma) {
+//     m_globalInstrumentVelocityAprioriSigma = sigma;
 //   }
 // 
 // 
 // 
-//   void BundleSettings::setGlobalObserverAccelerationAprioriSigma(double sigma) {
-//     m_globalObserverAccelerationAprioriSigma = sigma;
+//   void BundleSettings::setGlobalInstrumentAccelerationAprioriSigma(double sigma) {
+//     m_globalInstrumentAccelerationAprioriSigma = sigma;
 //   }
 // 
 // 
 // 
-//   void BundleSettings::setGlobalObserverOrientationAnglesAprioriSigma(double sigma) {
-//     m_globalObserverOrientationAnglesAprioriSigma = sigma;
+//   void BundleSettings::setGlobalInstrumentPointingAnglesAprioriSigma(double sigma) {
+//     m_globalInstrumentPointingAnglesAprioriSigma = sigma;
 //   }
 // 
 // 
 // 
-//   void BundleSettings::setGlobalObserverOrientationAngularVelocityAprioriSigma(double sigma) {
-//     m_globalObserverOrientationVelocityAprioriSigma = sigma;
+//   void BundleSettings::setGlobalInstrumentPointingAngularVelocityAprioriSigma(double sigma) {
+//     m_globalInstrumentPointingVelocityAprioriSigma = sigma;
 //   }
 // 
 // 
 // 
-//   void BundleSettings::setGlobalObserverOrientationAngularAccelerationAprioriSigma(double sigma) {
-//     m_globalObserverOrientationAccelerationAprioriSigma = sigma;
+//   void BundleSettings::setGlobalInstrumentPointingAngularAccelerationAprioriSigma(double sigma) {
+//     m_globalInstrumentPointingAccelerationAprioriSigma = sigma;
 //   }
 
 
@@ -758,6 +758,8 @@ namespace Isis {
 
   PvlGroup BundleSettings::pvlGroup() const {
     PvlGroup group("BundleSettings");
+
+    // General Solve Options
     group += PvlKeyword("SolveMethod", solveMethodToString(m_solveMethod));
     group += PvlKeyword("SolveObservationMode", toString(m_solveObservationMode));
     group += PvlKeyword("SolveRadius", toString(m_solveRadius));
@@ -767,40 +769,58 @@ namespace Isis {
     if (m_outlierRejection) {
       group += PvlKeyword("OutlierMultiplier", toString(m_outlierRejectionMultiplier));
     }
-    group += PvlKeyword("ObserverPositionSolveOption",
-                        observerPositionSolveOptionToString(m_observerPositionSolveOption));
+    group += PvlKeyword("GlobalLatitudeAprioriSigma", toString(m_globalLatitudeAprioriSigma));
+    group += PvlKeyword("GlobalLongitudeAprioriSigma", toString(m_globalLongitudeAprioriSigma));
+    if (m_solveRadius) {
+      group += PvlKeyword("GlobalRadiiAprioriSigma", toString(m_globalRadiusAprioriSigma));
+    }
+
+    // Position Solve Options
+    group += PvlKeyword("InstrumentPositionSolveOption",
+                        instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
     group += PvlKeyword("SPKDegree", toString(m_spkDegree));
     group += PvlKeyword("SPKSolveDegree", toString(m_spkSolveDegree));
     group += PvlKeyword("SolvePositionOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
-    group += PvlKeyword("ObserverOrientationSolveOption",
-                        observerOrientationSolveOptionToString(m_observerOrientationSolveOption));
+    if (m_instrumentPositionSolveOption == 4) {
+      group += PvlKeyword("GlobalInstrumentPositionAprioriSigma", toString(m_globalInstrumentPositionAprioriSigma));
+      group += PvlKeyword("GlobalInstrumentVelocityAprioriSigma", toString(m_globalInstrumentVelocityAprioriSigma));
+      group += PvlKeyword("GlobalInstrumentAccelerationAprioriSigma",
+                          toString(m_globalInstrumentAccelerationAprioriSigma));
+    }
+
+
+    // Pointing Solve Options
+    group += PvlKeyword("InstrumentPointingSolveOption",
+                        instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
     group += PvlKeyword("CKDegree", toString(m_ckDegree));
     group += PvlKeyword("CKSolveDegree", toString(m_ckSolveDegree));
     group += PvlKeyword("SolveTwist", toString(m_solveTwist));
-    group += PvlKeyword("FitOrientationPolynomialOverExisting",
-                        toString(m_fitOrientationPolynomialOverExisting));
+    group += PvlKeyword("FitPointingPolynomialOverExisting",
+                        toString(m_fitInstrumentPointingPolynomialOverExisting));
+    if (m_instrumentPointingSolveOption == 4) {
+      group += PvlKeyword("GlobalInstrumentPointingAnglesAprioriSigma", 
+                          toString(m_globalInstrumentPointingAnglesAprioriSigma));
+      group += PvlKeyword("GlobalInstrumentPointingAngularVelocityAprioriSigma",
+                          toString(m_globalInstrumentPointingVelocityAprioriSigma));
+      group += PvlKeyword("GlobalInstrumentPointingAngularAccelerationAprioriSigma",
+                          toString(m_globalInstrumentPointingAccelerationAprioriSigma));
+    }
+
+    // Convergence Criteria
     group += PvlKeyword("ConvergenceCriteria", convergenceCriteriaToString(m_convergenceCriteria));
     group += PvlKeyword("ConvergenceCriteriaThreshold", toString(m_convergenceCriteriaThreshold));
     group += PvlKeyword("ConvergenceCriteriaMaximumIterations",
                         toString(m_convergenceCriteriaMaximumIterations));
-    group += PvlKeyword("GlobalLatitudeAprioriSigma", toString(m_globalLatitudeAprioriSigma));
-    group += PvlKeyword("GlobalLongitudeAprioriSigma", toString(m_globalLongitudeAprioriSigma));
-    group += PvlKeyword("GlobalRadiiAprioriSigma", toString(m_globalRadiusAprioriSigma));
-    group += PvlKeyword("GlobalObserverPositionAprioriSigma", toString(m_globalObserverPositionAprioriSigma));
-    group += PvlKeyword("GlobalObserverVelocityAprioriSigma", toString(m_globalObserverVelocityAprioriSigma));
-    group += PvlKeyword("GlobalObserverAccelerationAprioriSigma",
-                        toString(m_globalObserverAccelerationAprioriSigma));
-    group += PvlKeyword("GlobalObserverOrientationAnglesAprioriSigma",
-                        toString(m_globalObserverOrientationAnglesAprioriSigma));
-    group += PvlKeyword("GlobalObserverOrientationAngularVelocityAprioriSigma",
-                        toString(m_globalObserverOrientationVelocityAprioriSigma));
-    group += PvlKeyword("GlobalObserverOrientationAngularAccelerationAprioriSigma",
-                        toString(m_globalObserverOrientationAccelerationAprioriSigma));
-    group += PvlKeyword("FilePrefix", m_outputFilePrefix);
+
+    // Output Options
     group += PvlKeyword("CreateBundleOutputFile", toString(m_createBundleOutputFile));
     group += PvlKeyword("CreateCSVPointsFile", toString(m_createCSVPointsFile));
     group += PvlKeyword("CreateResidualsFile", toString(m_createResidualsFile));
+    if (m_createBundleOutputFile || m_createCSVPointsFile || m_createResidualsFile) {
+      group += PvlKeyword("FilePrefix", m_outputFilePrefix);
+    }
 
+    // Maximum Likelihood Options
     for (int i = 0;i < m_maximumLikelihood.size();i++) {
       group += PvlKeyword("MaximumLikelihoodModel", maximumLikelihoodModelToString(m_maximumLikelihood[i].first));
       group += PvlKeyword("Quantile", toString(m_maximumLikelihood[i].second));
