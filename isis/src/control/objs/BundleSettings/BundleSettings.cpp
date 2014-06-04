@@ -244,7 +244,7 @@ namespace Isis {
     if (option.compare("NONE", Qt::CaseInsensitive) == 0) {
       return BundleSettings::NoPositionFactors;
     }
-    else if (option.compare("POSITION", Qt::CaseInsensitive) == 0) {
+    else if (option.compare("POSITIONS", Qt::CaseInsensitive) == 0) {
       return BundleSettings::PositionOnly;
     }
     else if (option.compare("VELOCITIES", Qt::CaseInsensitive) == 0) {

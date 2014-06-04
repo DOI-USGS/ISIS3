@@ -3,7 +3,6 @@
 
 #include <QDialog>
 
-#include "BundleSettings.h"
 #include "JigsawSetupDialog.h"
 
 namespace Ui {
@@ -11,6 +10,7 @@ namespace Ui {
 }
 
 namespace Isis {
+  class BundleSettings;
   class Control;
   class Project;
 
@@ -27,13 +27,12 @@ namespace Isis {
     void on_JigsawRunButton_clicked();
 
   private:
-    Ui::JigsawDialog *ui;
+    Ui::JigsawDialog *m_ui;
 
   protected:
     Project *m_project;
-     
-    Control *m_pselectedControl;
-    BundleSettings m_bundleSettings;
+    Control *m_selectedControl;
+    BundleSettings *m_bundleSettings;
   };
 };
 #endif // JigsawDialog_h

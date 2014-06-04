@@ -277,6 +277,11 @@
         <default>
           <item>No</item>
         </default>
+        <inclusions>
+          <item>
+            POINT_RADIUS_SIGMA
+          </item>
+        </inclusions>
       </parameter>
       
       <parameter name="UPDATE">
@@ -819,7 +824,7 @@
             </exclusions>
           </option>
 
-          <option value="POSITION">
+          <option value="POSITIONS">
             <brief>Solve for the spacecraft positions</brief>
             <description>
                    Spacecraft positions will be adjusted in the solution, but 
@@ -926,6 +931,11 @@
           <type>double</type>
           <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
+          <inclusions>
+            <item>
+              RADIUS
+            </item>
+          </inclusions>
         </parameter>
 
         <parameter name="SPACECRAFT_POSITION_SIGMA">

@@ -5100,7 +5100,7 @@ namespace Isis {
         m_Statsrxy.AddData(vx);
         m_Statsrxy.AddData(vy);
 
-        printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point->GetId().toAscii().data(),vx,vy);
+//        printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point->GetId().toAscii().data(),vx,vy);
 
         vtpv += vx * vx * dWeight + vy * vy * dWeight;
       }
@@ -5428,11 +5428,11 @@ namespace Isis {
         mediandev = resvectors[nmidpoint];
       }
 
-      std::cout << "median deviation: " << mediandev << std::endl;
+//      std::cout << "median deviation: " << mediandev << std::endl;
 
       mad = 1.4826 * mediandev;
 
-      std::cout << "mad: " << mad << std::endl;
+//      std::cout << "mad: " << mad << std::endl;
 
 //      double dLow = median - m_bundleSettings.rejectionMultiplier() * mad;
 //      double dHigh = median + m_bundleSettings.rejectionMultiplier() * mad;
@@ -5442,7 +5442,7 @@ namespace Isis {
 
       m_dRejectionLimit = median + m_bundleSettings.outlierRejectionMultiplier() * mad;
 
-      std::cout << "Rejection Limit: " << m_dRejectionLimit << std::endl;
+//      std::cout << "Rejection Limit: " << m_dRejectionLimit << std::endl;
 
       return true;
   }
@@ -5563,7 +5563,7 @@ namespace Isis {
     printf("\n\t       Rejected Observations:%10d (Rejection Limit:%12.5lf\n",
            m_nRejectedObservations, dUsedRejectionLimit);
 
-    std::cout << "Measures that came back: " << nComingBack << std::endl;
+//    std::cout << "Measures that came back: " << nComingBack << std::endl;
 
     return true;
 }
