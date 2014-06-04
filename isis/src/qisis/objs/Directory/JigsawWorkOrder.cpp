@@ -38,6 +38,7 @@ namespace Isis {
   JigsawWorkOrder::JigsawWorkOrder(Project *project) :
       WorkOrder(project) {
     QAction::setText(tr("&Bundle Adjustment..."));
+    QUndoCommand::setText("&Bundle Adjustment...");
   }
 
 
