@@ -14,7 +14,10 @@
     <change name="Jacob Danton" date="2007-01-30">
       Original version
     </change>
-  </history>
+    <change name="Kristin Berry" date="2014-05-29"> 
+	Updated to fix string conversion error. References #2043. 
+    </change>
+    </history>
 
   <category>
     <missionItem>Apollo</missionItem>

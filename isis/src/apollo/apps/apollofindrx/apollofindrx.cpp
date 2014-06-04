@@ -94,8 +94,8 @@ void IsisMain ()
     // for (int res=0; res<nres; res++)
     for (int res=0; res<nres; res++)
     {
-        currentLine = (int)(toDouble(reseaus["Line"][res]+0.5));
-        currentSample = (int)(toDouble(reseaus["Sample"][res]+0.5));
+      currentLine = (int)(toDouble(reseaus["Line"][res])+0.5);
+      currentSample = (int)(toDouble(reseaus["Sample"][res])+0.5);
 
       // Output chips
       chip.SetSize(patternSize + 2*ds , patternSize + 2*dl);
@@ -110,10 +110,10 @@ void IsisMain ()
         double horizontalShift = currentSample - patternSize/2 - ds + bestSample-1 - toDouble(reseaus["Sample"][res]) - dx,
                     verticalShift = currentLine - patternSize/2 - dl + bestLine-1 - toDouble(reseaus["Line"][res]) - dy;
         for (int i=res; i<nres; i++) {
-          reseaus["Sample"][i] = toDouble(reseaus["Sample"][i]) + horizontalShift + ((i/dim) - (res/dim) + 1)*dx;
-          reseaus["Line"][i] = toDouble(reseaus["Line"][i]) + verticalShift + ((i%dim) - (res%dim) + 1)*dy;
+          reseaus["Sample"][i] = toString(toDouble(reseaus["Sample"][i]) + horizontalShift + ((i/dim) - (res/dim) + 1)*dx);
+          reseaus["Line"][i] = toString(toDouble(reseaus["Line"][i]) + verticalShift + ((i%dim) - (res%dim) + 1)*dy);
         }
-        reseaus["Valid"][res] = 1;
+        reseaus["Valid"][res] = "1";
         validReseaus++;
 
         std::vector< double > xy;
@@ -142,8 +142,8 @@ void IsisMain ()
         std::vector< double > xy;
         xy.push_back(res%(int)sqrt(nres));
         xy.push_back(res/(int)sqrt(nres));
-        reseaus["Sample"][res] = sampFunc.Evaluate(xy);
-        reseaus["Line"][res] = lineFunc.Evaluate(xy);
+        reseaus["Sample"][res] = toString(sampFunc.Evaluate(xy));
+        reseaus["Line"][res] = toString(lineFunc.Evaluate(xy));
       }
     }
 

@@ -41,8 +41,8 @@ void IsisMain() {
     outputSample.push_back(toDouble(master["Sample"][i]));
 
     // Update the cube's reseau information
-    reseaus["Line"][i] = outputLine[i];
-    reseaus["Sample"][i] = outputSample[i];
+    reseaus["Line"][i] = toString(outputLine[i]); //added toString
+    reseaus["Sample"][i] = toString(outputSample[i]); //""
   }
 
   // Get the final output image dimensions

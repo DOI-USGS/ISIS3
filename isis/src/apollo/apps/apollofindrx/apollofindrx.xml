@@ -27,6 +27,9 @@
     <change name="Jacob Danton" date="2007-01-24">
       Original version
     </change>
+    <change name="Kristin Berry" date="2014-05-23">
+      Updated to fix string conversion error. References #2043
+    </change>
   </history>
 
   <groups>
