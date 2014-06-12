@@ -219,7 +219,7 @@ namespace Isis {
    * An open image is being deleted
    */
   void MosaicController::imageClosed(QObject * imageObj) {
-    Image *image = qobject_cast<Image *>(imageObj);
+    Image *image = (Image *)imageObj;
 
     if (image) {
       ImageList::iterator foundElement;
