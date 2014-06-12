@@ -301,7 +301,7 @@ namespace Isis {
     try {
       ImageTreeWidgetItem *item = new ImageTreeWidgetItem(imageList, image);
 
-      connect(image, SIGNAL(destroyed(QObject *)),
+      connect(image->displayProperties(), SIGNAL(destroyed(QObject *)),
               this, SLOT(imageDeleted(QObject *)));
       connect(image->displayProperties(), SIGNAL(propertyChanged(DisplayProperties *)),
               this, SLOT(propertiesChanged(DisplayProperties *)));
@@ -740,11 +740,11 @@ namespace Isis {
 
 
   void ImageTreeWidget::imageDeleted(QObject *imageObj) {
-    Image *image = (Image *)imageObj;
-    ImageTreeWidgetItem *item = treeItem(image);
+    ImageDisplayProperties *imagedisp = (ImageDisplayProperties *)imageObj;
+    ImageTreeWidgetItem *item = treeItem(imagedisp);
 
     if (item && item->parent()) {
-      m_displayPropsToTreeItemLookup.remove(image->displayProperties());
+      m_displayPropsToTreeItemLookup.remove(imagedisp);
 
       item->forgetImage();
       delete item->parent()->takeChild( item->parent()->indexOfChild(item) );
