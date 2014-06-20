@@ -34,6 +34,19 @@ void IsisMain() {
 
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
 
+  // Get the first label and make sure this is a New Horizons LORRI file
+  PvlGroup mainLabel = importFits.fitsLabel(0);
+  if (mainLabel["MISSION"][0] != "New Horizons" || mainLabel["INSTRU"][0] != "lor") {
+    QString msg = QObject::tr("Input file [%1] does not appear to be a New Horizons LORRI FITS "
+                              "file. Input file label value for MISSION is [%2], "
+                              "INSTRU is [%3]").
+                  arg(ui.GetFileName("FROM")).arg(mainLabel["MISSION"][0]).
+                  arg(mainLabel["INSTRU"][0]);
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  importFits.setProcessFileStructure(0);
+
   Cube *output = importFits.SetOutputCube("TO");
 
   // Get the directory where the New Horizons translation tables are.
@@ -45,10 +58,7 @@ void IsisMain() {
 
   // Get the FITS label
   Pvl fitsLabel;
-  fitsLabel.addGroup(importFits.fitsLabel());
-
-  // Check to make sure this looks like a New Horizons LORRI image
-
+  fitsLabel.addGroup(importFits.fitsLabel(0));
 
   // Create an Instrument group
   FileName insTransFile(transDir + "lorriInstrument_fit.trn");
@@ -84,15 +94,75 @@ void IsisMain() {
 
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
-  pvl += importFits.fitsLabel();
+  pvl += importFits.fitsLabel(0);
   OriginalLabel originals(pvl);
   output->write(originals);
 
-  // Convert the image data
+  // Convert the main image data
+  importFits.Progress()->SetText("Importing main LORRI image");
   importFits.StartProcess();
+  importFits.ClearCubes();
+
+
+  // Convert the Error image. It is currently assumed to be the second image in the FITS file
+  if (ui.WasEntered("ERROR")) {
+    // Get the label of the Error image and make sure this is a New Horizons LORRI Error image
+    PvlGroup errorLabel = importFits.fitsLabel(1);
+    if (errorLabel["XTENSION"][0] != "IMAGE" || errorLabel["EXTNAME"][0] != "LORRI Error image") {
+      QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Error image "
+                                "Input file label value for EXTNAME is [%2]").
+                    arg(ui.GetFileName("FROM")).arg(mainLabel["EXTNAME"][0]);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    importFits.setProcessFileStructure(1);
+
+    Cube *outputError = importFits.SetOutputCube("ERROR");
+
+    // Save the input FITS label in the Cube original labels
+    Pvl pvlError;
+    pvlError += importFits.fitsLabel(1);
+    OriginalLabel originals(pvlError);
+    outputError->write(originals);
+
+    // Convert the main image data
+    importFits.Progress()->SetText("Importing LORRI Error image");
+    importFits.StartProcess();
+    importFits.ClearCubes();
+  }
+
+
+  // Convert the Quality image. It is currently assumed to be the third image in the FITS file
+  if (ui.WasEntered("QUALITY")) {
+    // Get the label of the Quality image and make sure this is a New Horizons LORRI Quality image
+    PvlGroup errorLabel = importFits.fitsLabel(2);
+    if (errorLabel["XTENSION"][0] != "IMAGE" || 
+        errorLabel["EXTNAME"][0] != "LORRI Quality flag image") {
+      QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Quality image "
+                                "Input file label value for EXTNAME is [%2]").
+                    arg(ui.GetFileName("FROM")).arg(mainLabel["EXTNAME"][0]);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    importFits.setProcessFileStructure(2);
+
+    Cube *outputError = importFits.SetOutputCube("QUALITY");
+
+    // Save the input FITS label in the Cube original labels
+    Pvl pvlError;
+    pvlError += importFits.fitsLabel(2);
+    OriginalLabel originals(pvlError);
+    outputError->write(originals);
+
+    // Convert the main image data
+    importFits.Progress()->SetText("Importing LORRI Quality image");
+    importFits.StartProcess();
+    importFits.ClearCubes();
+  }
+
   importFits.Finalize();
 
-  // The images need to be flipped from top to bottom to put the origin in the upper left for ISIS
+// The images need to be flipped from top to bottom to put the origin in the upper left for ISIS
 // Commented out because we don't need to do this. If we find later that we do, remove comments
 //  ProcessBySample flipLines;
 //  CubeAttributeInput inAttribute;

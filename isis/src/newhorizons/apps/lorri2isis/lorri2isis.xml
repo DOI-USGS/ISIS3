@@ -3,13 +3,13 @@
 <application name="lorri2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   
   <brief>
-    Import New Horizons LORRI files into Isis format
+    Import New Horizons LORRI files into ISIS format
   </brief>
   <description>
     <p>
       This program will import FITS (Flexible Image Transport System) formatted files from the 
-      New Horizons LORRI instument into the
-      ISIS format. 
+      New Horizons LORRI instument into the ISIS format. This include the main LORRI image,
+      the Error image and the Quality image.
     </p>
     <p>
       The LORRI instrument has two summing modes, (1x1) and (4x4). The instrument team
@@ -21,6 +21,9 @@
     <change name="Stuart Sides" date="2013-10-08">
       Original version
     </change> 
+    <change name="Stuart Sides" date="2014-06-08">
+      Modified  to allow the FITS extension images to be imported
+    </change> 
   </history>
 
   <seeAlso>
@@ -30,7 +33,7 @@
   </seeAlso>
 
   <category>
-    <categoryItem>New Horizons</categoryItem>
+    <missionItem>New Horizons</missionItem>
   </category>
 
   <groups>
@@ -54,15 +57,49 @@
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
-          Output ISIS cube file
+          Output ISIS cube file for the main image
         </brief>
         <description>
-          The output cube file that will containing the New Horizons LORRI image in ISIS format.
+          The output cube file that will containing the New Horizons LORRI image in ISIS format. The 
+          main LORRI image must be the first image in the FITS file. 
         </description>
         <filter>
           *.cub
         </filter>
       </parameter>
+
+      <parameter name="ERROR">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the Error image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons LORRI Error image in ISIS 
+          format. The Error image must be in the first FITS extension (i.e., second image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="QUALITY">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the Quality image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons LORRI Quality image in ISIS 
+          format. The Quality image must be in the second FITS extension (i.e., third image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
     </group>
   </groups>
 

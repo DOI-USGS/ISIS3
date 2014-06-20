@@ -1,0 +1,6 @@
+Group = NewHorizons/MVIC_TDI
+  Version = 1
+  Library = MvicTdiCamera
+  Routine = MvicTdiCameraPlugin
+EndGroup
+ 

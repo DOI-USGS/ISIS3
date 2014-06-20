@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="mvic2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  
+  <brief>
+    Import New Horizons MVIC files into Isis format
+  </brief>
+  <description>
+    This program will import FITS (Flexible Image Transport System) formatted files from the 
+    New Horizons MVIC instument into the ISIS format.
+  </description>
+  
+  <history>
+    <change name="Stuart Sides" date="2013-10-08">
+      Original version
+    </change>
+    <change name="Tracie Sucharski" date="2013-01-15">
+      Adapted from lorri2isis.
+    </change>
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>fits2isis</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <categoryItem>New Horizons</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A New Horizons MVIC fits file to be converted to an Isis cube
+        </brief>
+        <description>
+          Use this parameter to select the filename of a New Horizons
+          MVIC file to be converted to a cube. This is expected to be a FITS formatted file. 
+        </description>
+        <filter>
+          *.fits
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS cube file
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons MVIC image in ISIS format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+
+</application>

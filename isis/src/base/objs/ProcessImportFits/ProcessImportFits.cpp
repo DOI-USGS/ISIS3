@@ -23,14 +23,16 @@
 #include "ProcessImportFits.h"
 
 #include <iostream>
+#include <math.h>
+
 #include <QDebug>
 #include <QString>
 #include <sstream>
 
-#include "Preference.h"
 #include "IException.h"
 #include "IString.h"
 #include "LineManager.h"
+#include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PixelType.h"
@@ -43,7 +45,8 @@ namespace Isis {
    * Constructor for ProcessImportFits
    */
   ProcessImportFits::ProcessImportFits() {
-    m_fitsLabel = NULL;
+    m_fitsLabels = NULL;
+    m_headerSizes = NULL;
   }
 
 
@@ -51,125 +54,188 @@ namespace Isis {
    * Destructor for ProcessImportFits
    */
   ProcessImportFits::~ProcessImportFits() {
-    delete m_fitsLabel;
+    delete m_fitsLabels;
+    delete m_headerSizes;
     m_file.close();
   }
 
 
   /**
-   * Extract the FITS label from the file
+   * Extract all the FITS labels from the file. This includes the main and all extensions
    *
    */
-  void ProcessImportFits::extractFitsLabel() {
+  void ProcessImportFits::extractFitsLabels() {
 
-    // The main FITS label starts at the beginning of the file
-    // Each FITS keyword in the lable is store in 80 bytes (space padded to 80 if necessary)
+    m_fitsLabels = new QList< PvlGroup * >;
+    m_headerSizes = new QList < int >;
 
-    m_fitsLabel = new PvlGroup("FitsLabels");
-
-    // Read in the FITS labels and convert to PVL
+    // Process each FITS label area. Storing each in its own PvlGroup
     char readBuf[81];
     IString line = "";
-    unsigned int place = 0;
+    unsigned int place;
 
-    // Read the first line
-    m_file.seekg(0);
-    m_file.read(readBuf, 80);
-    readBuf[80] = '\0';
-    line = readBuf;
-    place += 80;
+    // The main FITS label starts at the beginning of the file
+    // FITS extension labels start after the previous data and on a 2080 byte boundry 
+    // Each FITS keyword in all lables is store in 80 bytes (space padded to 80 if necessary)
 
-    // Process each fits label record (80 bytes) and place keyword, value pairs into PvlKeywords
-    while(line.substr(0, 3) != "END") {
+    // Start at the beginning of the file for the main FITS label
+    m_file.seekg(0, std::ios_base::beg);
 
-      // Check for blank lines
-      if (line.substr(0, 1) != " " && line.substr(0, 1) != "/") {
-        // Name of keyword
-        PvlKeyword label(line.Token(" =").ToQt()); // Stop on spaces OR equal sign
-        // Remove up to beginning of data
-        line.TrimHead(" =");
-        line.TrimTail(" ");
-        if (label.name() == "COMMENT" || label.name() == "HISTORY") {
-          label += line.ToQt();
-        }
-        else {
-          // Check for a quoted value
-          if (line.substr(0,1) == "'") {
-            line.TrimHead("'");
-            label += line.Token("'").TrimHead(" ").TrimTail(" ").ToQt();
-            line.TrimHead(" '");
+    // Read the first label line (80 chars)
+    // We are assuming the file pointer is set to the beginning of the first/next label
+    while (m_file.read(readBuf, 80) && m_file.gcount() == 80) {
+
+      PvlGroup *fitsLabel = new PvlGroup("FitsLabels");
+
+      readBuf[80] = '\0';
+      line = readBuf;
+      place = 80;
+
+      // Process each fits label record (80 bytes) and place keyword, value pairs into PvlKeywords 
+      // with any associated comments
+      while (line.substr(0, 3) != "END") {
+
+        // Check for blank lines
+        if (line.substr(0, 1) != " " && line.substr(0, 1) != "/") {
+          // Name of keyword
+          PvlKeyword label(line.Token(" =").ToQt()); // Stop on spaces OR equal sign
+          // Remove up to beginning of data
+          line.TrimHead(" =");
+          line.TrimTail(" ");
+          if (label.name() == "COMMENT" || label.name() == "HISTORY") {
+            label += line.ToQt();
           }
           else {
-            // Access any remaining data without the trailing comment if there is one
-            IString value = line.Token("/");
-            // Clear to end of data
-            value.TrimTail(" ");
-            label += value.ToQt();
-            line.TrimHead(" ");
-          }
-          // If the line still has anything in it, treat it is as a comment.
-          if (line.size() > 0) {
-            line.TrimHead(" /");
-            label.addComment(line.ToQt());
-            // A possible format for units, other possiblites exist.
-            if (line != line.Token("[")) {
-              label.setUnits(line.Token("[").Token("]").ToQt());
+            // Check for a quoted value
+            if (line.substr(0,1) == "'") {
+              line.TrimHead("'");
+              label += line.Token("'").TrimHead(" ").TrimTail(" ").ToQt();
+              line.TrimHead(" '");
+            }
+            else {
+              // Access any remaining data without the trailing comment if there is one
+              IString value = line.Token("/");
+              // Clear to end of data
+              value.TrimTail(" ");
+              label += value.ToQt();
+              line.TrimHead(" ");
+            }
+            // If the line still has anything in it, treat it is as a comment.
+            if (line.size() > 0) {
+              line.TrimHead(" /");
+              label.addComment(line.ToQt());
+              // A possible format for units, other possiblites exist.
+              if (line != line.Token("[")) {
+                label.setUnits(line.Token("[").Token("]").ToQt());
+              }
             }
           }
+          fitsLabel->addKeyword(label);
         }
-        m_fitsLabel->addKeyword(label);
+
+        // Read the next label line
+        m_file.read(readBuf, 80);
+        readBuf[80] = '\0';
+        line = readBuf;
+        place += 80;
       }
 
-      // Read the next line
-      m_file.seekg(place);
-      m_file.read(readBuf, 80);
-      readBuf[80] = '\0';
-      place += 80;
-      line = readBuf;
+      // Save off the PvlGroup and the number of records read from this label
+      m_fitsLabels->push_back(fitsLabel);
+      m_headerSizes->push_back((int)ceil(place / 2880.0));
+
+      // The file pointer should be pointing at the end of the record that contained "END"
+      // Move the file pointer past the padding after the "END"
+      std::streamoff jump;
+      jump = m_headerSizes->last() * 2880 - place;
+      m_file.seekg(jump, std::ios_base::cur);
+
+      // NOTE: For now we only handle image data (i.e., keywords BITPIX & NAXIS & NAXISx must exist)
+      // Does this look like a label for a FITS image? Stop after the first label that does not
+      // because we don't know how to move the file pointer past a non-image data.
+      if (fitsLabel->hasKeyword("BITPIX") && fitsLabel->hasKeyword("NAXIS") && 
+          fitsLabel->hasKeyword("NAXIS1")) {
+
+        int bytesPerPixel = 0;
+        bytesPerPixel = (int)((*fitsLabel)["BITPIX"]);
+        bytesPerPixel = fabs(bytesPerPixel);
+        bytesPerPixel /= 8;
+
+        unsigned int axis1 = 1;
+        axis1 = toInt((*fitsLabel)["NAXIS1"]);
+
+        unsigned int axis2 = 1;
+        if (fitsLabel->hasKeyword("NAXIS2")) {
+          axis2 = toInt((*fitsLabel)["NAXIS2"]);
+        }
+
+        unsigned int axis3 = 1;
+        if (fitsLabel->hasKeyword("NAXIS3")) {
+          axis3 = toInt((*fitsLabel)["NAXIS3"]);
+        }
+
+        jump = (int)(ceil(bytesPerPixel * axis1 * axis2 * axis3 / 2880.0) * 2880.0);
+        m_file.seekg(jump, std::ios_base::cur);
+      }
+      // Do we have at least on header that looks like it has image data? If so, we can continue,
+      // but ignore the rest of the file because we don't know how to skip over a non-image data.
+      else if (m_fitsLabels->size() > 1) {
+        m_fitsLabels->pop_back();
+        m_headerSizes->pop_back();
+        break;
+      }
+      else {
+        QString msg = QObject::tr("The FITS file does not contain a section header that looks "
+                                  "like it describes an image [%1]").arg(m_name.toString());
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
-
-    // Save off the number of header records read
-    m_headers = (int)((place + 2881) / 2880);
-
   }
 
 
   /**
-   * Supplies the FITS label 
+   * Supplies the requested FITS label 
    * 
-   * @param FITS label after being converted to a PvlGroup
+   * @param labelNumber FITS label number. zero (0) is the first/main label
+   * @return PvlGroup version of a FITS label corrisponding to requested label number
    */
-  PvlGroup ProcessImportFits::fitsLabel() const {
-    if (!m_fitsLabel) {
+  PvlGroup ProcessImportFits::fitsLabel(int labelNumber) const {
+    if (!m_fitsLabels) {
       QString msg = QObject::tr("The FITS label has not been initialized, call setFitsFile first");
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    else if (m_fitsLabels->size() < labelNumber) {
+      QString msg = QObject::tr("The requested FITS label number does not exist from file [%1]").arg(m_name.toString());
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
-    return *m_fitsLabel;
+    return *(*m_fitsLabels)[labelNumber];
   }
 
 
   /**
    * Return a populated instrument group 
-   * 
+   *  
+   * @param a FITS label after being converted to a PvlGroup
+   * @return an instrument group filled with keywords from the FITS label
    */
-  PvlGroup ProcessImportFits::standardInstrumentGroup() const {
+  PvlGroup ProcessImportFits::standardInstrumentGroup(PvlGroup fitsLabel) const {
 
     // NOTE: This needs to be changed over to use translation files
 
     // Attempt to extract the standard instrument group keywords
     PvlGroup inst("Instrument");
-    if (m_fitsLabel->hasKeyword("DATE-OBS")) {
-      inst += PvlKeyword("StartTime", (*m_fitsLabel)["DATE-OBS"][0]);
+    if (fitsLabel.hasKeyword("DATE-OBS")) {
+      inst += PvlKeyword("StartTime", fitsLabel["DATE-OBS"][0]);
     }
-    if (m_fitsLabel->hasKeyword("OBJECT")) {
-      inst += PvlKeyword("Target", (*m_fitsLabel)["OBJECT"][0]);
+    if (fitsLabel.hasKeyword("OBJECT")) {
+      inst += PvlKeyword("Target", fitsLabel["OBJECT"][0]);
     }
-    if (m_fitsLabel->hasKeyword("INSTRUME")) {
-      inst += PvlKeyword("InstrumentId", (*m_fitsLabel)["INSTRUME"][0]);
+    if (fitsLabel.hasKeyword("INSTRUME")) {
+      inst += PvlKeyword("InstrumentId", fitsLabel["INSTRUME"][0]);
     }
-    if (m_fitsLabel->hasKeyword("OBSERVER")) {
-      inst += PvlKeyword("SpacecraftName", (*m_fitsLabel)["OBSERVER"][0]);
+    if (fitsLabel.hasKeyword("OBSERVER")) {
+      inst += PvlKeyword("SpacecraftName", fitsLabel["OBSERVER"][0]);
     }
 
     return inst;
@@ -192,32 +258,34 @@ namespace Isis {
     }
 
     // Get the FITS labels internalized
-    extractFitsLabel();
+    extractFitsLabels();
 
     // Check to make sure it is a FITS file we can handle
-    PvlGroup label = fitsLabel();
+    PvlGroup label = fitsLabel(0);
     if (label["SIMPLE"][0] == "F") {
       QString msg = QObject::tr("The file [%1] can not be processed. It is an unsupported format.").
           arg(fitsFile.toString());
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    setProcessFileStructure(label);
-
     m_file.close();
   }
 
 
   /**
-   * Sets all the Process file structure parameters. Mostly based on the FITS labels 
+   * Sets the Process file structure parameters based on the FITS labels of choice 
+   *  
+   * @param labelNumber FITS label number. zero (0) is the first/main label
    * 
    */
-  void ProcessImportFits::setProcessFileStructure(PvlGroup label) {
+  void ProcessImportFits::setProcessFileStructure(int labelNumber) {
 
-    SetFileHeaderBytes(m_headers * 2880);
+    PvlGroup label = *(*m_fitsLabels)[labelNumber];
+
+    SetFileHeaderBytes((*m_headerSizes)[labelNumber] * 2880);
     SaveFileHeader();
 
-    // Find pixel type, there are several unsupported possiblites
+    // Find pixel type. NOTE: There are several unsupported possiblites
     Isis::PixelType type;
     QString msg = "";
     switch (toInt(label["BITPIX"][0])) {
@@ -268,8 +336,14 @@ namespace Isis {
     if (label.hasKeyword("BZERO")) {
       SetBase(toDouble(label["BZERO"][0]));
     }
+    else {
+      SetBase(0.0);
+    }
     if (label.hasKeyword("BSCALE")) {
       SetMultiplier(toDouble(label["BSCALE"][0]));
+    }
+    else {
+      SetMultiplier(1.0);
     }
 
     // Byte order
@@ -277,19 +351,5 @@ namespace Isis {
 
   }
 
-
-
-
-
-
 } // end namespace Isis
-
-
-
-
-
-
-
-
-
 

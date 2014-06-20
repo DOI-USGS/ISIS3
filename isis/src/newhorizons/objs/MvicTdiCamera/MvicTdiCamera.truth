@@ -1,0 +1,29 @@
+Unit Test for MvicFrameCamera...
+FileName: mc0_0034942918_0x536_sci_1.cub
+CK Frame: -98906
+
+Kernel IDs: 
+CK Frame ID = -98000
+CK Reference ID = 1
+SPK Target ID = -98
+SPK Reference ID = 1
+
+For upper left  ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
