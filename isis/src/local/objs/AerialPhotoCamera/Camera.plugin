@@ -1,6 +1,0 @@
-
-Group = Aircraft/AerialPhoto
-  Library = AerialPhotoCamera
-  Routine = AerialPhotoCameraPlugin
-  Version = 1
-EndGroup
