@@ -8,7 +8,7 @@ namespace Isis {
   
   MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions() {
     this->setModel(Huber);
-  } //choose Model and define the tweaking constant
+  } // choose Model and define the tweaking constant
 
 
 
@@ -25,7 +25,7 @@ namespace Isis {
    */
   MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(Model modelSelection, 
                                                            double tweakingConstant) {
-    //choose Model and define the tweaking constant
+    // choose Model and define the tweaking constant
     m_PI = acos(-1.0);
     m_model = modelSelection;
     if (tweakingConstant <= 0.0) {
@@ -45,7 +45,7 @@ namespace Isis {
    *                                        (see documentation for enum Model)
    */
   MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(Model modelSelection) {
-    //choose Model and define the tweaking constant
+    // choose Model and define the tweaking constant
     m_PI = acos(-1.0);
     m_model = modelSelection;
     this->setTweakingConstantDefault();
@@ -54,7 +54,7 @@ namespace Isis {
 
 
   MaximumLikelihoodWFunctions::~MaximumLikelihoodWFunctions() {
-  } //empty destructor
+  } // empty destructor
 
 
 
@@ -70,7 +70,7 @@ namespace Isis {
    * @throws IsisProgrammerError if tweakingConstant <= 0.0
    */
   bool MaximumLikelihoodWFunctions::setModel(Model modelSelection, double tweakingConstant) { 
-    //choose Model and define the tweaking constant
+    // choose Model and define the tweaking constant
     m_model = modelSelection;
     if (tweakingConstant <= 0.0) {
       IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
@@ -91,7 +91,7 @@ namespace Isis {
    *                                        (see documentation for enum Model)
    */
   bool MaximumLikelihoodWFunctions::setModel(Model modelSelection) {  
-    //choose Model and use default tweaking constant
+    // choose Model and use default tweaking constant
     m_model = modelSelection;
     this->setTweakingConstantDefault();
     return true;
@@ -132,9 +132,9 @@ namespace Isis {
    * @throws IsisProgrammerError if tweakingConstant <= 0.0
    */
   bool MaximumLikelihoodWFunctions::setTweakingConstant(double tweakingConstant) { 
-    //leave model type unaltered and change tweaking constant
+    // leave model type unaltered and change tweaking constant
     if (tweakingConstant <= 0.0) {
-      return false;  //the constant must be positive
+      return false;  // the constant must be positive
     }
     if (tweakingConstant <= 0.0) {
       IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
@@ -173,7 +173,7 @@ namespace Isis {
     default:
       strcpy(cutoff,"None");
       return;  // default to prevent nonsense from being returned, 
-               //but the program should never reach this line
+               // but the program should never reach this line
     }
   }
 
@@ -204,7 +204,7 @@ namespace Isis {
       return this->chen(residualZScore);
     default:
       return 1.0;  // default to prevent nonsense from being returned, 
-                   //but the program should never reach this line
+                   // but the program should never reach this line
     }
   }
 
@@ -221,12 +221,12 @@ namespace Isis {
    *         nominal sqrt(weight) = 1 /sigma and sqrt(weight') = scaler/sigma
    */
   double MaximumLikelihoodWFunctions::sqrtWeightScaler(double residualZScore) {
-    //it is often convient to use square roots of weights when building normals, this function
-    //provides the scaler for the square root of the weight directly
+    // it is often convient to use square roots of weights when building normals, this function
+    // provides the scaler for the square root of the weight directly
     double scaler = this->weightScaler(residualZScore);
     if (scaler <= 0.0) {
-      return 0.0;  //<0 should never happen, but 0.0 may be quite frequent
-                   //  (thus this saves some time)
+      return 0.0;  // <0 should never happen, but 0.0 may be quite frequent
+                   //    (thus this saves some time)
     }
     return sqrt(scaler);
   }
@@ -244,7 +244,7 @@ namespace Isis {
    *         nominal weight = 1 /sigma/sigma and weight' = scaler/sigma/sigma
    */
   double MaximumLikelihoodWFunctions::huber(double residualZScore) {
-    //huber weight function
+    // huber weight function
     if ( fabs(residualZScore) < m_c) {
       return 1.0;
     }
@@ -266,7 +266,7 @@ namespace Isis {
    *         nominal weight = 1 /sigma/sigma and weight' = scaler/sigma/sigma
    */
   double MaximumLikelihoodWFunctions::huberModified(double residualZScore) {
-    //huber modified weight function
+    // huber modified weight function
     if ( fabs(residualZScore)/m_c < m_PI/2.0) {
       return m_c*(sin(residualZScore/m_c)/residualZScore);
     }
@@ -288,7 +288,7 @@ namespace Isis {
    *         nominal weight = 1 /sigma/sigma and weight' = scaler/sigma/sigma
    */
   double MaximumLikelihoodWFunctions::welsch(double residualZScore) {
-    //welsch weight function
+    // welsch weight function
     return exp(-((residualZScore/m_c)*(residualZScore/m_c)));
   }
 
@@ -305,7 +305,7 @@ namespace Isis {
    *         nominal weight = 1 /sigma/sigma and weight' = scaler/sigma/sigma
    */
   double MaximumLikelihoodWFunctions::chen(double residualZScore) {
-    //chen weight function
+    // chen weight function
     if ( fabs(residualZScore) <= m_c) {
       return 6*(m_c*m_c-residualZScore*residualZScore)*(m_c*m_c-residualZScore*residualZScore);
     }
@@ -320,25 +320,25 @@ namespace Isis {
    * Sets default tweaking constants based on the maximum likelihood estimation model being used.
    */
   bool MaximumLikelihoodWFunctions::setTweakingConstantDefault() {
-    //default tweaking constants for the various likelihood models
+    // default tweaking constants for the various likelihood models
     switch(m_model) {
     case Huber:
-      m_c = 1.345;  //"95% asymptotice efficiecy on the standard normal distribution" is obtained
+      m_c = 1.345;  // "95% asymptotice efficiecy on the standard normal distribution" is obtained
                     // with this constant, see Zhang's "Parameter Estimation"
       break;
     case HuberModified:
-      m_c = 1.2107; //"95% asymptotice efficiecy on the standard normal distribution" is obtained
+      m_c = 1.2107; // "95% asymptotice efficiecy on the standard normal distribution" is obtained
                     // with this constant, see Zhang's "Parameter Estimation"
       break;
     case Welsch:
-      m_c=2.9846; //"95% asymptotice efficiecy on the standard normal distribution" is obtained
+      m_c=2.9846; // "95% asymptotice efficiecy on the standard normal distribution" is obtained
                   // with this constant, see Zhang's "Parameter Estimation"
       break;
     case Chen:
-      m_c=1;  //This is the constant used by Chen in his paper, no specific reason why is stated
+      m_c=1;  // This is the constant used by Chen in his paper, no specific reason why is stated
       break;
     default:
-      m_c=1;  //default, though at the time of writing this should never actually be used
+      m_c=1;  // default, though at the time of writing this should never actually be used
       break;
      }
     return true;
@@ -354,25 +354,25 @@ namespace Isis {
    *         distribution of the residuals) should be used as the tweaking constant.
    */
   double MaximumLikelihoodWFunctions::tweakingConstantQuantile() {  
-    //returns which quantile of the sqaured residuals is recommended to use as the tweaking 
-    //constants, this varies as a function of the model being employed desired quantiles for various 
-    //models,  these parameters are estimated based on inspection of the fucntions and should be 
-    //tested and revised with experience
+    // returns which quantile of the sqaured residuals is recommended to use as the tweaking 
+    // constants, this varies as a function of the model being employed desired quantiles for
+    // various models,  these parameters are estimated based on inspection of the fucntions and
+    // should be tested and revised with experience
     switch(m_model) {
     case Huber:
-      return 0.5;  //In this model m_c determines the point at which residuals stop having increased
-                   // influence on the solution, so after the median all the measures will have the
-                   //  same effect on the solution regardless of magnitude
+      return 0.5;  // In this model m_c determines the point at which residuals stop having
+                   // increased influence on the solution, so after the median all the measures will
+                   // have the same effect on the solution regardless of magnitude
     case HuberModified:
-      return 0.4; //In this model after residualZScore >= m_c*m_PI/2.0 the residuals have the same
+      return 0.4; // In this model after residualZScore >= m_c*m_PI/2.0 the residuals have the same
                   // influence on the solution, 
     case Welsch:
-      return 0.7; //at about double m_c the residuals have very little influence
+      return 0.7; // at about double m_c the residuals have very little influence
     case Chen:
-      return 0.98; //after r > m_c residuals have no influence
+      return 0.98; // after r > m_c residuals have no influence
     default:
-      return 0.5; //default, though at the time of writing this should never actually be used
+      return 0.5; // default, though at the time of writing this should never actually be used
     }
   }
 
-}//end namespace Isis
+}// end namespace Isis
