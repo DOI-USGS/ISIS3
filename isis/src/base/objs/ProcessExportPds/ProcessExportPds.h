@@ -71,7 +71,13 @@ namespace Isis {
    *                           altered in the export program unless
    *                           functionality is added to deal with the new start
    *                           byte values. References #678.
+   *   @history 2014-06-06 Kristin Berry - Added default units to assume if there
+   *                           are no units on certain values in the input Isis cube. 
+   *                           Unlabeled radii are assumed to be in meters; map scales 
+   *                           to be in meters/pixel, and map resolutions to be in
+   *                           pixels/degree.
    */
+
   class ProcessExportPds : public Isis::ProcessExport {
     public:
       /** 

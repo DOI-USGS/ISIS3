@@ -705,24 +705,24 @@ namespace Isis {
     // Add the projection name
 //    pdsMapObj += PvlKeyword ("MAP_PROJECTION_TYPE", projName.toUpper());
 
-    // Modify the radii to be km
+    // Modify the radii to be km. 
     PvlKeyword &aRadius = pdsMapObj["A_AXIS_RADIUS"];
     QString unit = aRadius.unit();
-    if(unit.toUpper() == "METERS") {
+    if( (unit.toUpper() == "METERS") || (unit == "") ) { //if no units, assume in meters
       double dValue = (double)aRadius;
       dValue /= 1000.0;
       aRadius.setValue(toString(dValue), "KM");
     }
     PvlKeyword &bRadius = pdsMapObj["B_AXIS_RADIUS"];
     unit = bRadius.unit();
-    if(unit.toUpper() == "METERS") {
+    if( (unit.toUpper() == "METERS") || (unit == "") ) {
       double dValue = (double)bRadius;
       dValue /= 1000.0;
       bRadius.setValue(toString(dValue), "KM");
     }
     PvlKeyword &cRadius = pdsMapObj["C_AXIS_RADIUS"];
     unit = cRadius.unit();
-    if(unit.toUpper() == "METERS") {
+    if( (unit.toUpper() == "METERS") || (unit == "") ) {
       double dValue = (double)cRadius;
       dValue /= 1000.0;
       cRadius.setValue(toString(dValue), "KM");
@@ -731,7 +731,8 @@ namespace Isis {
     // Modify the units on MAP_SCALE and MAP_RESOLUTION
     PvlKeyword &mapScale = pdsMapObj["MAP_SCALE"];
     unit = mapScale.unit();
-    if((unit.toUpper() == "METERS/PIX") || (unit.toUpper() == "METERS/PIXEL")) {
+    //if no units, assume in meters/pixel
+    if( (unit.toUpper() == "METERS/PIX") || (unit.toUpper() == "METERS/PIXEL") || (unit == "") ) {
       if(m_exportResolution == Kilometer) {
         double dValue = (double)mapScale;
         dValue /= 1000.0;
@@ -743,10 +744,10 @@ namespace Isis {
     }
     PvlKeyword &mapRes = pdsMapObj["MAP_RESOLUTION"];
     unit = mapRes.unit();
-    if(unit.toUpper() == "PIXELS/DEGREE") {
+    //if no units, asume in pixels/degree
+    if( (unit.toUpper() == "PIXELS/DEGREE") || (unit == "") ) {
       mapRes.setValue((QString)mapRes, "PIX/DEG");
     }
-
 
     // Add the EASTERNMOST AND WESTERNMOST LONGITUDE keywords
     PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
