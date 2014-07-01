@@ -18,15 +18,13 @@ using namespace Isis;
 BundleSettings bundleSettings();
 
 void IsisMain() {
-
   // Get the control network and image list
   UserInterface &ui = Application::GetUserInterface();
   QString cnetFile = ui.GetFileName("CNET");
   QString cubeList = ui.GetFileName("FROMLIST");
-  
   BundleSettings settings = bundleSettings();
   BundleAdjust *bundleAdjustment = NULL;
-
+  
   // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
   if (ui.WasEntered("HELDLIST")) {
     QString heldList = ui.GetFileName("HELDLIST");
@@ -35,7 +33,7 @@ void IsisMain() {
   else {
     bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
   }
-
+  
   //build lists of maximum likelihood estimation model strings and quantiles
   // change params needed QList<QString> maxLikeModels;
   // change params needed QList<double> maxQuan;
@@ -124,7 +122,6 @@ void IsisMain() {
     }
     Application::Log(gp);
   }
-
   catch(IException &e) {
     bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
     QString msg = "Unable to bundle adjust network [" + cnetFile + "]";
@@ -157,12 +154,6 @@ BundleSettings bundleSettings() {
                            ui.GetBoolean("OBSERVATIONS"), ui.GetBoolean("UPDATE"), 
                            ui.GetBoolean("ERRORPROPAGATION"), ui.GetBoolean("RADIUS"),
                            latitudeSigma, longitudeSigma, radiusSigma);
-  // ??? double multiplier = -1.0;
-  // ??? if (ui.WasEntered( "REJECTION_MULTIPLIER" )) {
-  // ???   multiplier = -1.0;
-  // ??? }
-  // ??? settings.setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
-  // ???                              multiplier);
   settings.setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
                                ui.GetDouble("REJECTION_MULTIPLIER"));
 

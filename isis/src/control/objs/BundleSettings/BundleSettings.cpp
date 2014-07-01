@@ -18,36 +18,36 @@ namespace Isis {
     m_outlierRejection     = false;
     m_outlierRejectionMultiplier = 3.0; // default to rejection = false, i.e. multiplier = 1.0      ???
 
+    m_globalLatitudeAprioriSigma  = -1.0;
+    m_globalLongitudeAprioriSigma = -1.0;
+    m_globalRadiusAprioriSigma    = -1.0;
+
     // Spacecraft Position Options
     m_instrumentPositionSolveOption = NoPositionFactors;
-    m_spkDegree = 2; // -1
-    m_spkSolveDegree = 2; // -1
     m_solvePositionOverHermiteSpline = false;
+    m_spkDegree      = 2; // -1
+    m_spkSolveDegree = 2; // -1
+    m_globalInstrumentPositionAprioriSigma     = -1.0;
+    m_globalInstrumentVelocityAprioriSigma     = -1.0;
+    m_globalInstrumentAccelerationAprioriSigma = -1.0;
 
     // Camera Pointing Options
     m_instrumentPointingSolveOption = AnglesOnly;
     m_solveTwist = true;
-    m_ckDegree = 2; // 0 since we default to angles ???
-    m_ckSolveDegree = 2; // 0 since we default to angles ???
     m_fitInstrumentPointingPolynomialOverExisting = false;
+    m_ckDegree      = 2; // 0 since we default to angles ???
+    m_ckSolveDegree = 2; // 0 since we default to angles ???
+    m_globalInstrumentPointingAnglesAprioriSigma       = -1.0;
+    m_globalInstrumentPointingVelocityAprioriSigma     = -1.0;
+    m_globalInstrumentPointingAccelerationAprioriSigma = -1.0;
 
     // Convergence Criteria
     m_convergenceCriteria = BundleSettings::Sigma0;
-    m_convergenceCriteriaThreshold = 1.0e-10;
+    m_convergenceCriteriaThreshold         = 1.0e-10;
     m_convergenceCriteriaMaximumIterations = 50;
 
-    // Parameter Uncertainties (Weighting)
-    m_globalLatitudeAprioriSigma = -1.0;
-    m_globalLongitudeAprioriSigma = -1.0;
-    m_globalRadiusAprioriSigma = -1.0;
-    m_globalInstrumentPositionAprioriSigma = -1.0;
-    m_globalInstrumentVelocityAprioriSigma = -1.0;
-    m_globalInstrumentAccelerationAprioriSigma = -1.0;
-    m_globalInstrumentPointingAnglesAprioriSigma = -1.0;
-    m_globalInstrumentPointingVelocityAprioriSigma = -1.0;
-    m_globalInstrumentPointingAccelerationAprioriSigma = -1.0;
-
     // Maximum Likelihood Estimation Options no default in the constructor - must be set.
+    m_maximumLikelihood.clear();
 
     // Self Calibration ??? (from cnetsuite only)
 
@@ -65,8 +65,74 @@ namespace Isis {
   }
 
 
+  BundleSettings::BundleSettings(const BundleSettings &other) {
+    m_validateNetwork = other.validateNetwork();
 
-  BundleSettings::~BundleSettings() {}
+    m_solveMethod = other.solveMethod();
+    m_solveObservationMode = other.solveObservationMode();
+    m_solveRadius = other.solveRadius();
+    m_updateCubeLabel = other.updateCubeLabel();
+    m_errorPropagation = other.errorPropagation();
+
+    m_outlierRejection = other.outlierRejection();
+    m_outlierRejectionMultiplier = other.outlierRejectionMultiplier();
+
+    m_globalLatitudeAprioriSigma = other.globalLatitudeAprioriSigma();
+    m_globalLongitudeAprioriSigma = other.globalLongitudeAprioriSigma();
+    m_globalRadiusAprioriSigma = other.globalRadiusAprioriSigma();
+
+    // Spacecraft Position Options
+    m_instrumentPositionSolveOption = other.instrumentPositionSolveOption();
+    m_spkDegree = other.spkDegree();
+    m_spkSolveDegree = other.spkSolveDegree();
+    m_solvePositionOverHermiteSpline = other.solveInstrumentPositionOverHermiteSpline();
+    m_globalInstrumentPositionAprioriSigma = other.globalInstrumentPositionAprioriSigma();
+    m_globalInstrumentVelocityAprioriSigma = other.globalInstrumentVelocityAprioriSigma();
+    m_globalInstrumentAccelerationAprioriSigma = other.globalInstrumentAccelerationAprioriSigma();
+
+    // Camera Pointing Options
+    m_instrumentPointingSolveOption = other.instrumentPointingSolveOption();
+    m_solveTwist = other.solveTwist();
+    m_ckDegree = other.ckDegree();
+    m_ckSolveDegree = other.ckSolveDegree();
+    m_fitInstrumentPointingPolynomialOverExisting
+        = other.fitInstrumentPointingPolynomialOverExisting();
+    m_globalInstrumentPointingAnglesAprioriSigma
+        = other.globalInstrumentPointingAnglesAprioriSigma();
+    m_globalInstrumentPointingVelocityAprioriSigma
+        = other.globalInstrumentPointingAngularVelocityAprioriSigma();
+    m_globalInstrumentPointingAccelerationAprioriSigma
+        = other.globalInstrumentPointingAngularAccelerationAprioriSigma();
+
+    // Convergence Criteria
+    m_convergenceCriteria = other.convergenceCriteria();
+    m_convergenceCriteriaThreshold = other.convergenceCriteriaThreshold();
+    m_convergenceCriteriaMaximumIterations = other.convergenceCriteriaMaximumIterations();
+
+    // Maximum Likelihood Estimation Options no default in the constructor - must be set.
+    for (int i = 0; i < other.maximumLikelihoodEstimatorModels().size(); i++) {
+      addMaximumLikelihoodEstimatorModel(other.maximumLikelihoodEstimatorModels()[i].first,
+                                         other.maximumLikelihoodEstimatorModels()[i].second);
+    }
+    // Self Calibration ??? (from cnetsuite only)
+
+    // Target Body ??? (from cnetsuite only)
+
+
+
+
+    // Output Options
+    m_outputFilePrefix = other.outputFilePrefix();
+    m_createBundleOutputFile = other.createBundleOutputFile();
+    m_createCSVPointsFile    = other.createCSVPointsFile();
+    m_createResidualsFile    = other.createResidualsFile();
+
+  }
+
+
+
+  BundleSettings::~BundleSettings() {
+  }
 
 
 
@@ -76,7 +142,7 @@ namespace Isis {
 
 
 
-  bool BundleSettings::validateNetwork() {
+  bool BundleSettings::validateNetwork() const {
     return m_validateNetwork;
   }
 

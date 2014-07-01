@@ -37,6 +37,7 @@
 #endif
 
 #include "BundleSettings.h"
+#include "BundleStatistics.h"
 #include "Camera.h"
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
@@ -56,7 +57,6 @@ template< typename A, typename B > class QMap;
 namespace Isis {
   class BasisFunction;
   class LeastSquares;
-  class MaximumLikelihoodWFunctions;
   class StatCumProbDistDynCalc;
 
   /**
@@ -227,9 +227,7 @@ namespace Isis {
       int fixedPoints() const { // move code to cpp ???
         return m_nFixedPoints;
       }
-      bool isConverged() {
-        return m_bConverged;
-      } // move code to cpp ???
+      bool isConverged();
       QString iterationSummaryGroup() const {
         return m_iterationSummary;
       } // move code to cpp ???
@@ -295,7 +293,6 @@ namespace Isis {
       bool outputImagesCSV();
       bool outputResiduals();
       bool wrapUp();
-      bool computeBundleStatistics();
 #if 0
       QString formatPolynomialOutputString(bool paddedTerms,
                                            int numCoefficients,
@@ -431,68 +428,39 @@ namespace Isis {
       bool cholmod_Inverse();
       bool loadCholmodTriplet();
 
-      // JWB - member data should be reorganized... by type possibly? by use
-      //       probably better??? !< flags...
+      // JWB - member data should be reorganized...
+      //       by type possibly? by use probably better???
+      //       !< flags...
       //       we can probably remove several that are unused ???
-      bool m_bPrintSummary;                                  //!< to print summary
-      bool m_bCleanUp;                                       //!< for cleanup (i.e. in destructor)
-      bool m_bSimulatedData;                                 //!< indicating simulated (i.e. 'perfect' data)
+      bool m_bPrintSummary;                  //!< to print summary
+      bool m_bCleanUp;                       //!< for cleanup (i.e. in destructor)
+      bool m_bSimulatedData;                 //!< indicating simulated (i.e. 'perfect' data)
       bool m_bLastIteration;
       bool m_bMaxIterationsReached;
 
-      int m_nIteration;                                      //!< current iteration
-      int m_nNumImagePartials;                               //!< number of image-related partials
-      int m_nNumPointPartials;                               //!< number of point-related partials
-      int m_nObservations;                                   //!< number of image coordinate observations
-      int m_nRejectedObservations;                         //!< number of rejected image coordinate observations                                             //!
-      int m_nImageParameters;                                //!< number of image parameters
-      int m_nConstrainedPointParameters;                     //!< number of constrained point parameters
-      int m_nConstrainedImageParameters;                     //!< number of constrained image parameters
-      int m_nDegreesOfFreedom;                               //!< degrees of freedom                                            //!
-      int m_nFixedPoints;                                    //!< number of 'fixed' (ground) points (define)
-      int m_nIgnoredPoints;                                  //!< number of ignored points
-      int m_nHeldImages;                                     //!< number of 'held' images (define)
-      int m_nNumberCamAngleCoefSolved;                         //!< number of camera angle coefficients in solution
-      int m_nNumberCamPosCoefSolved;                         //!< number of camera position coefficients in solution
-      int m_nUnknownParameters;                              //!< total number of parameters to solve for
-      int m_nBasisColumns;                                   //!< number of columns (parameters) in normal equations
-      SpicePosition::Source m_nPositionType;                 //!< type of SpicePosition interpolation
-      SpiceRotation::Source m_nPointingType;                 //!< type of SpiceRotation interpolation
-      std::vector< int > m_nPointIndexMap;                     //!< index into normal equations of point parameter positions
-      std::vector< int > m_nImageIndexMap;                     //!< index into normal equations of image parameter positions
+      int m_nIteration;                      //!< current iteration
+      int m_nNumImagePartials;               //!< number of image-related partials
+      int m_nNumPointPartials;               //!< number of point-related partials
 
-      double m_dError;                                       //!< error
-      double m_dElapsedTime;                                 //!< elapsed time for bundle
-      double m_dElapsedTimeErrorProp;                        //!< elapsed time for error propagation                                            //!
-      double m_dSigma0;                                      //!< std deviation of unit weight
-      double m_drms_rx;                                      //!< rms of x residuals
-      double m_drms_ry;                                      //!< rms of y residuals
-      double m_drms_rxy;                                     //!< rms of all x and y residuals
-      double m_drms_sigmaLat;                           //!< rms of adjusted Latitude sigmas
-      double m_drms_sigmaLon;                          //!< rms of adjusted Longitude sigmas
-      double m_drms_sigmaRad;                          //!< rms of adjusted Radius sigmas
-      double m_dminSigmaLatitude;
-      QString m_idMinSigmaLatitude;
-      double m_dmaxSigmaLatitude;
-      QString m_idMaxSigmaLatitude;
-      double m_dminSigmaLongitude;
-      QString m_idMinSigmaLongitude;
-      double m_dmaxSigmaLongitude;
-      QString m_idMaxSigmaLongitude;
-      double m_dminSigmaRadius;
-      QString m_idMinSigmaRadius;
-      double m_dmaxSigmaRadius;
-      QString m_idMaxSigmaRadius;
+      int m_nNumberCamAngleCoefSolved;       //!< number of camera angle coefficients in solution
+      int m_nNumberCamPosCoefSolved;         //!< number of camera position coefficients in solution
+      int m_nBasisColumns;                   //!< number of columns (parameters) in normal equations
+      SpicePosition::Source m_nPositionType; //!< type of SpicePosition interpolation
+      SpiceRotation::Source m_nPointingType; //!< type of SpiceRotation interpolation
+      std::vector< int > m_nPointIndexMap;   //!< index into normal equations of point parameter positions
+      std::vector< int > m_nImageIndexMap;   //!< index into normal equations of image parameter positions
 
-      double m_dRejectionLimit;                              //!< current rejection limit
+      double m_dError;                       //!< error
+
+
 
       //!< apriori sigmas from user interface
       //!< for points, these override values control-net except
 
       //!< for "held" & "fixed" points
-      double m_dGlobalLatitudeAprioriSigma;                  //!< latitude apriori sigma
-      double m_dGlobalLongitudeAprioriSigma;                 //!< longitude apriori sigma
-      double m_dGlobalRadiusAprioriSigma;                    //!< radius apriori sigma
+      double m_dGlobalLatitudeAprioriSigma;  //!< latitude apriori sigma
+      double m_dGlobalLongitudeAprioriSigma; //!< longitude apriori sigma
+      double m_dGlobalRadiusAprioriSigma;    //!< radius apriori sigma
 
       std::vector< double > m_dGlobalSpacecraftPositionAprioriSigma; //!< camera position apriori sigmas: size is # camera position coefficients solved
 //      double m_dGlobalSpacecraftPositionAprioriSigma;        //!< spacecraft coordinates apriori sigmas
@@ -513,44 +481,26 @@ namespace Isis {
 
       std::vector< double > m_dImageParameterWeights;
 
-      double m_dRTM;                                         //!< radians to meters conversion factor (body specific)
-      double m_dMTR;                                         //!< meters to radians conversion factor (body specific)
-      Distance m_BodyRadii[3];                               //!< body radii i meters
+      double m_dRTM;                             //!< radians to meters conversion factor (body specific)
+      double m_dMTR;                             //!< meters to radians conversion factor (body specific)
+      Distance m_BodyRadii[3];                   //!< body radii i meters
 
-      std::vector< double > m_dEpsilons;                       //!< vector maintaining total corrections to parameters
-      std::vector< double > m_dParameterWeights;               //!< vector of parameter weights
+      std::vector< double > m_dEpsilons;         //!< vector maintaining total corrections to parameters
+      std::vector< double > m_dParameterWeights; //!< vector of parameter weights
 
       std::vector< double > m_dxKnowns;
       std::vector< double > m_dyKnowns;
 
-      QString m_strCnetFileName;                    //!< Control Net file specification
+      QString m_strCnetFileName;                 //!< Control Net file specification
 
 //      QString m_strBinaryFilePath;                  //!< path for binary file for normals inverse matrix
 
       //!< pointers to...
-      LeastSquares *m_pLsq;                            //!< 'LeastSquares' object
-      ControlNet *m_pCnet;                             //!< 'ControlNet' object
-      SerialNumberList *m_pSnList;                     //!< list of image serial numbers
-      SerialNumberList *m_pHeldSnList;                 //!< list of held image serial numbers
-      ObservationNumberList *m_pObsNumList;            //!< list of observation numbers
-
-      //!< vectors for statistical computations...
-      Statistics m_Statsx;                                   //!<  x errors
-      Statistics m_Statsy;                                   //!<  y errors
-      Statistics m_Statsrx;                                  //!<  x residuals
-      Statistics m_Statsry;                                  //!<  y residuals
-      Statistics m_Statsrxy;                                 //!< xy residuals
-
-      std::vector< Statistics > m_rmsImageSampleResiduals;
-      std::vector< Statistics > m_rmsImageLineResiduals;
-      std::vector< Statistics > m_rmsImageResiduals;
-      std::vector< Statistics > m_rmsImageXSigmas;
-      std::vector< Statistics > m_rmsImageYSigmas;
-      std::vector< Statistics > m_rmsImageZSigmas;
-      std::vector< Statistics > m_rmsImageRASigmas;
-      std::vector< Statistics > m_rmsImageDECSigmas;
-      std::vector< Statistics > m_rmsImageTWISTSigmas;
-
+      LeastSquares *m_pLsq;                      //!< 'LeastSquares' object
+      ControlNet *m_pCnet;                       //!< 'ControlNet' object
+      SerialNumberList *m_pSnList;               //!< list of image serial numbers
+      SerialNumberList *m_pHeldSnList;           //!< list of held image serial numbers
+      ObservationNumberList *m_pObsNumList;      //!< list of observation numbers
 
       // BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution (referred to
       // as either 'CHOLMOD' (sparse solution) or 'SpecialK' (dense solution - less desirable) in
@@ -558,8 +508,6 @@ namespace Isis {
 
       int m_nRank;
 
-      bool m_bConverged;
-      bool m_bError;
 
       boost::numeric::ublas::symmetric_matrix< double,
       boost::numeric::ublas::upper, boost::numeric::ublas::column_major >
@@ -573,8 +521,8 @@ namespace Isis {
       //!< array of NICs (see Brown, 1976)
       std::vector< boost::numeric::ublas::bounded_vector< double, 3 > >  m_NICs;
 
-      boost::numeric::ublas::vector< double > m_Image_Corrections;                                  //!< image parameter cumulative correction vector
-      boost::numeric::ublas::vector< double > m_Image_Solution;                                     //!< image parameter solution vector
+      boost::numeric::ublas::vector< double > m_imageCorrections;                                  //!< image parameter cumulative correction vector
+      boost::numeric::ublas::vector< double > m_imageSolution;                                     //!< image parameter solution vector
 
       std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_Corrections;         //!< vector of corrections to 3D point parameter
       std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_AprioriSigmas;       //!< vector of apriori sigmas for 3D point parameters
@@ -594,85 +542,26 @@ namespace Isis {
       SparseBlockMatrix m_SparseNormals;
       cholmod_triplet *m_pTriplet;
 
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // variables for maximum likelihood estimation
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      /** This class is used to reweight observations in order to achieve more robust parameter
-       *    estimation, up to three different maximum likelihood estimation models can be used in
-       *    succession.
-       */
-      MaximumLikelihoodWFunctions *m_wFunc[3];
-
-      /** This class will be used to calculate the cumulative probability distribution of |R^2
-       *    residuals|, quantiles of this distribution are used to adjust the maximum likelihood
-       *    functions dynamically iteration by iteration.
-       */
-      StatCumProbDistDynCalc *m_cumPro;
-
-      /** This class keeps track of the cumulative probability distribution of residuals (in
-       *    unweighted pixels), this is used for reporting, and not for computation.
-       */
-      StatCumProbDistDynCalc *m_cumProRes;
-
-      /** Up to three different maximum likelihood estimation models can be used in succession,
-       *    these flags record if they are enabled .
-       */
-      bool m_maxLikelihoodFlag[3]; // JWB - possibly delete this variable ???
-
-      /** This count keeps track of which stadge of the maximum likelihood adjustment the bundle is
-       *    currently on.
-       */
-      int m_maxLikelihoodIndex;
-
-      /** Quantiles of the |residual| distribution to be used for tweaking constants of the maximum
-       *    probability models.
-       */
-      double m_maxLikelihoodQuan[3];
-
-      /** Median of R^2 residuals.
-       */
-      double m_maxLikelihoodMedianR2Residuals;
 
       BundleSettings m_bundleSettings; // pointer ??? then bundle settings method needs copy constructor ???
                                        // or constructors here take a const ref ???
-// unused variable ???      int m_nPointParameters;                                //!< total number of point parameters (including constrained)
-// unused variable ???      int m_nHeldPoints;                                     //!< number of 'held' points (define)
-// unused variable ???      int m_nHeldObservations;                               //!< number of 'held' observations (define)
 // unused variable ???      double m_dGlobalSurfaceXAprioriSigma;                  //!< surface point x apriori sigma
 // unused variable ???      double m_dGlobalSurfaceYAprioriSigma;                  //!< surface point y apriori sigma
 // unused variable ???      double m_dGlobalSurfaceZAprioriSigma;                  //!< surface point z apriori sigma
 // unused variable ???      std::vector< SpacecraftWeights >  m_SCWeights;
-};
+
+      int m_nFixedPoints;                    //!< number of 'fixed' (ground) points (define)
+      int m_nIgnoredPoints;                  //!< number of ignored points
+      int m_nHeldImages;                     //!< number of 'held' images (define)
+bool m_bError;
+// ??? moved to bundle stats class    //!< vectors for statistical computations...
+Statistics m_Statsx;                       //!<  x errors
+Statistics m_Statsy;                       //!<  y errors
+Statistics m_Statsrx;                      //!<  x residuals
+Statistics m_Statsry;                      //!<  y residuals
+Statistics m_Statsrxy;                     //!< xy residuals
+    BundleStatistics m_bundleStatistics;
+  };
 }
 
 #endif
-
-
-
-
-// BundleSettings::SolveMethod m_solutionMethod; //!< solution method for matrix decomposition
-// (QRD,SVD,SPARSE-LU) are no longer used...
-// decomposition method choices are...
-//     *   SpecialK (dense normal equations matrix)
-//     *   Sparse (Cholmod sparse normal equations matrix)
-//     *   OldSparse (not cholesky model)
-// ??? delete bool m_bObservationMode;                               //!< for observation mode (explain this somewhere)
-// ??? delete bool m_bSolveRadii;                                    //!< to solve for point radii
-// ??? delete bool m_bUpdateCubes;                                   //!< update cubes (only here for output into bundleout.txt)
-// ??? delete bool m_bErrorPropagation;                              //!< to perform error propagation
-// ??? delete bool m_bOutlierRejection;                              //!< to perform automatic outlier detection/rejection
-//??? delete double m_dRejectionMultiplier;                         //!< outlier rejection multiplier
-// ??? delete BundleSettings::InstrumentPositionSolveOption m_spacecraftPositionSolveType; //!< spacecraft position solve type (define)
-// ??? delete bool m_bSolvePolyOverHermite;                          //!< to fit polynomial over existing Hermite
-//??? delete int m_nSPKDegree;                                      //!< spk degree (define)
-//??? delete int m_nsolveSPKDegree;                                 //!< solve spk degree (define)
-// ??? delete BundleSettings::InstrumentPointingSolveOption m_cmatrixSolveType; //!< cmatrix solve type (define)
-// ??? bool m_bSolveTwist;                                    //!< to solve for "twist" angle
-// ??? delete bool m_bSolvePolyOverPointing;                         //!< to fit polynomial over existing pointing    //??? delete int m_nCKDegree;                                       //!< ck degree (define)
-//??? delete int m_nsolveCKDegree;                                  //!< solve cad degree (define)
-// ??? delete double m_dConvergenceThreshold;                        //!< bundle convergence threshold
-// ??? delete int m_nMaxIterations;                                  //!< maximum iterations
-//??? delete QString m_strOutputFilePrefix;                //!< output file prefix      // ??? delete bool m_bOutputStandard;                                //!< to print standard bundle output file (bundleout.txt)
-// ??? delete bool m_bOutputCSV;                                     //!< to output points and image station data in csv format
-// ??? delete bool m_bOutputResiduals;                               //!< to output residuals in csv format
-

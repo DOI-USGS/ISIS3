@@ -25,7 +25,7 @@
 #include <QList>
 #include <QPair>
 
-#include "MaximumLikelihoodWFunctions.h" // why not forward declare???
+#include "MaximumLikelihoodWFunctions.h"
 
 namespace Isis {
   class MaximumLikelihoodWFunctions;
@@ -46,19 +46,22 @@ namespace Isis {
  class BundleSettings {
    public:
       BundleSettings();
+      BundleSettings(const BundleSettings &other);
       ~BundleSettings();
 
       void setValidateNetwork(bool validate);
-      bool validateNetwork();
+      bool validateNetwork() const;
 
       // Solve Options
       /**
-       * This enum defines the types of solve methods.
+       * This enum defines the types matrix decompisition methods available for 
+       * solving the bundle.  Note tha QRD, SVD, and SPARSE LU are no longer 
+       * used, but may be reimplemented. 
        */
       enum SolveMethod {
-        Sparse,   //!< CholMod
-        SpecialK, //!< Dense
-        OldSparse //!< Sparse Matrix Solver
+        Sparse,   //!< Cholesky model sparse normal equations matrix. (Uses the cholmod library).
+        SpecialK, //!< Dense normal equations matrix.
+        OldSparse //!< Sparse Matrix Solver. (Not a Cholesky model).
       };
       // converter
       static SolveMethod stringToSolveMethod(QString solveMethod);
@@ -235,31 +238,31 @@ namespace Isis {
 
     private:
       bool m_validateNetwork;
-      bool m_solveObservationMode;
-      bool m_solveRadius;
-      bool m_updateCubeLabel;
-      bool m_errorPropagation;
-      bool m_outlierRejection;
-      double m_outlierRejectionMultiplier; // multiplier = 1 if rejection = false
-      SolveMethod m_solveMethod;
+      bool m_solveObservationMode; //!< for observation mode (explain this somewhere)
+      bool m_solveRadius; //!< to solve for point radii
+      bool m_updateCubeLabel; //!< update cubes (only here for output into bundleout.txt)
+      bool m_errorPropagation; //!< to perform error propagation
+      bool m_outlierRejection; //!< to perform automatic outlier detection/rejection
+      double m_outlierRejectionMultiplier; //!< outlier rejection multiplier
+      SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
 
       // Spacecraft Position Options
-      InstrumentPositionSolveOption m_instrumentPositionSolveOption;
-      bool m_solvePositionOverHermiteSpline; // false if option = none
-      int m_spkDegree; // not used unless option = all
-      int m_spkSolveDegree; // not used unless option = all
+      InstrumentPositionSolveOption m_instrumentPositionSolveOption; //!< spacecraft position solve type (define)
+      bool m_solvePositionOverHermiteSpline; //!< to fit polynomial over existing Hermite
+      int m_spkDegree; //!< spk degree (define)
+      int m_spkSolveDegree; //!< solve spk degree (define)
 
       // Camera Pointing Options
-      InstrumentPointingSolveOption m_instrumentPointingSolveOption;
-      bool m_solveTwist; // false if option = none
-      bool m_fitInstrumentPointingPolynomialOverExisting; // false if option = none
-      int m_ckDegree; // not used unless option = all
-      int m_ckSolveDegree; // not used unless option = all
+      InstrumentPointingSolveOption m_instrumentPointingSolveOption;  //!< cmatrix solve type (define)
+      bool m_solveTwist; //!< to solve for "twist" angle
+      bool m_fitInstrumentPointingPolynomialOverExisting; //!< to fit polynomial over existing pointing
+      int m_ckDegree;  //!< ck degree (define)
+      int m_ckSolveDegree; //!< solve cad degree (define)
 
       // Convergence Criteria
       ConvergenceCriteria m_convergenceCriteria;
-      double m_convergenceCriteriaThreshold;
-      int m_convergenceCriteriaMaximumIterations;
+      double m_convergenceCriteriaThreshold; //!< bundle convergence threshold
+      int m_convergenceCriteriaMaximumIterations; //!< maximum iterations
 
       // Parameter Uncertainties (Weighting)
       double m_globalLatitudeAprioriSigma;
@@ -273,11 +276,8 @@ namespace Isis {
       double m_globalInstrumentPointingAccelerationAprioriSigma;
 
       // Maximum Likelihood Estimation Options
-      // model and maxModelCQuantile for each
-      // of the three maximum likelihood
-      // estimations.  Note that Welsch and
-      // Chen can not be used for the first
-      // model.
+      // model and maxModelCQuantile for each of the three maximum likelihood estimations.
+      // Note that Welsch and Chen can not be used for the first model.
       QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
 
       // Self Calibration ??? (from cnetsuite only)
@@ -285,10 +285,10 @@ namespace Isis {
       // Target Body ??? (from cnetsuite only)
 
       // Output Options ??? (from Jigsaw only)
-      QString m_outputFilePrefix;
-      bool m_createBundleOutputFile;
-      bool m_createCSVPointsFile;
-      bool m_createResidualsFile;
+      QString m_outputFilePrefix; //!< output file prefix
+      bool m_createBundleOutputFile; //!< to print standard bundle output file (bundleout.txt)
+      bool m_createCSVPointsFile; //!< to output points and image station data in csv format
+      bool m_createResidualsFile; //!< to output residuals in csv format
  };
 };
 #endif
