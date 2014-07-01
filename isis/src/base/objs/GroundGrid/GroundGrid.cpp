@@ -294,7 +294,7 @@ namespace Isis {
       latRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 
-    if(!lonRes.isValid() || latRes <= Angle(0, Angle::Degrees)) {
+    if(!lonRes.isValid() || lonRes <= Angle(0, Angle::Degrees)) {
       lonRes = Angle(p_defaultResolution, Angle::Degrees);
     }
 

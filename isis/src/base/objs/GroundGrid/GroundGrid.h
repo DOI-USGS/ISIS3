@@ -55,6 +55,9 @@ namespace Isis {
    *                           to be known in the constructor any more
    *   @history 2011-12-08 Steven Lambright - Fixed a bug causing the longitude
    *                           range to be incorrect. Fixes #607.
+   *   @history 2014-06-06 Kristin Berry - Fixed a bug where lat/lon were swapped
+   *                           in the code. Fixes #2081.
+   *          
    */
   class GroundGrid {
     public:

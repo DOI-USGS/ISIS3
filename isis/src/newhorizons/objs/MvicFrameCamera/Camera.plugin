@@ -1,0 +1,6 @@
+Group = NewHorizons/MVIC_FRAMING
+  Version = 1
+  Library = MvicFrameCamera
+  Routine = MvicFrameCameraPlugin
+EndGroup
+ 

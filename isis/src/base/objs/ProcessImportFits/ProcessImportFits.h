@@ -22,7 +22,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+
 #include "ProcessImport.h"
+
+template <typename T> class QList;
 
 namespace Isis {
   /**
@@ -37,7 +40,7 @@ namespace Isis {
    * @author 2013-10-08 Stuart Sides
    *
    * @internal
-   *
+   *   @history 2014-06-06 Stuart Sides - Added ability to read and process the FITS extension
    */
 
   class ProcessImportFits : public ProcessImport {
@@ -46,16 +49,16 @@ namespace Isis {
       ProcessImportFits();
       ~ProcessImportFits();
 
-      PvlGroup standardInstrumentGroup() const;
-      PvlGroup fitsLabel() const;
+      PvlGroup standardInstrumentGroup(PvlGroup fitsLabel) const;
+      PvlGroup fitsLabel(int labelNumber) const;
       void setFitsFile(FileName fitsFile);
+      void setProcessFileStructure(int labelNumber);
 
     private:
-      void extractFitsLabel();
-      void setProcessFileStructure(PvlGroup label);
+      void extractFitsLabels();
 
-      //! Holds the PvlGroup with the converted FITS labels
-      PvlGroup *m_fitsLabel;
+      //! Holds the PvlGroups with the converted FITS labels from the main and all extensions
+      QList<PvlGroup *> *m_fitsLabels;
 
       //! The name of the input FITS file
       FileName m_name;
@@ -63,8 +66,8 @@ namespace Isis {
       //! The stream used to read the FITS file
       std::ifstream m_file;
 
-      //! The number of 2880 byte header records before the first data
-      int m_headers;
+      //! The number of 2880 byte header records before each data section
+      QList<int> *m_headerSizes;
   };
 };
 

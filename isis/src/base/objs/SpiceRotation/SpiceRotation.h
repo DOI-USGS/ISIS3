@@ -177,6 +177,10 @@ namespace Isis {
    *                           debug statements on lines 637 and 642 that appeared
    *                           onscreen during jigsaw runs when images are updated.
    *                           References #1521.
+   *   @history 2014-03-11 Tracie Sucharski - In the LoadTimeCache method, do not throw error if
+   *                           if first segment in kernel is not type 3 or 5.  As long as the
+   *                           segment needed is type 3 or 5, we're ok.  This was changed for
+   *                           New Horizons which had ck's with both type 2 and type 3 segments.
    *   @history 2014-03-11 Stuart Sides - Programmers notes - Fixed a bug in the copy constructor
    *                           that was going out of array bounds.
    *

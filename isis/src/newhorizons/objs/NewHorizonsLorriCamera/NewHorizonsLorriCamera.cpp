@@ -28,6 +28,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
+#include "NewHorizonsLorriDistortionMap.h"
 
 using namespace std;
 
@@ -81,9 +82,14 @@ namespace Isis {
 
     // Setup distortion map. Start by reading the distortion coefficient from the instrument kernel.
     // Then construct the distortion model.
-    new CameraDistortionMap(this, -1);
+//    new CameraDistortionMap(this, -1);
 //    CameraDistortionMap *distortionMap = new CameraDistortionMap(this, -1);
 //    distortionMap->SetDistortion(naifIkCode());
+    QString e2("INS" + toString(naifIkCode()) + "_EPSILON2");
+    QString e5("INS" + toString(naifIkCode()) + "_EPSILON5");
+    QString e6("INS" + toString(naifIkCode()) + "_EPSILON6");
+    new NewHorizonsLorriDistortionMap(this, getDouble(e2, 0), getDouble(e5, 0), 
+                                      getDouble(e6, 0), -1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);

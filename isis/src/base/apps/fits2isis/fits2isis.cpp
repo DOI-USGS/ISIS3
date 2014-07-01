@@ -24,11 +24,12 @@ void IsisMain() {
   ProcessImportFits pfits;
 
   pfits.setFitsFile(FileName(ui.GetFileName("FROM")));
+  pfits.setProcessFileStructure(0);
 
   Cube *output = pfits.SetOutputCube("TO");
 
   // Add instrument group if any keywords were put into it.
-  PvlGroup instGrp = pfits.standardInstrumentGroup();
+  PvlGroup instGrp = pfits.standardInstrumentGroup(pfits.fitsLabel(0));
   if (instGrp.keywords() > 0) {
     
     output->label()->findObject("IsisCube") += instGrp;
@@ -36,7 +37,7 @@ void IsisMain() {
 
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
-  pvl += pfits.fitsLabel();
+  pvl += pfits.fitsLabel(0);
   OriginalLabel originals(pvl);
   output->write(originals);
 

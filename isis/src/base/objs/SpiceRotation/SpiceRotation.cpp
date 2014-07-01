@@ -1531,13 +1531,9 @@ namespace Isis {
 
         // Don't read type 5 ck here
         if (ic[2] == 5) break;
-        if (ic[2] != 3) {
-          QString msg = "Time fetching method only works on type 3 and 5 ck";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-
+//      
         // Check times for type 3 ck segment if spacecraft matches
-        if (ic[0] == spCode) {
+        if (ic[0] == spCode && ic[2] == 3) {
           sct2e_c((int) spCode / 1000, dc[0], &segStartEt);
           sct2e_c((int) spCode / 1000, dc[1], &segStopEt);
           NaifStatus::CheckErrors();

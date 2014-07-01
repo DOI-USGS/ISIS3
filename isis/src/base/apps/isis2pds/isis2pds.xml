@@ -21,7 +21,10 @@
     <change name="Christopher Austin" date="2008-08-07">
       Added the Label Type capability (param)
     </change>
-  </history>
+    <change name="Kristin Berry" date="2014-06-06">
+      Changed to assume that radii without units in the input Isis cube are in meters, map scales without units are in meters/pixel, and map resolutions without units are in pixels/degree. 
+    </change>
+    </history>
 
   <groups>
     <group name="Files">

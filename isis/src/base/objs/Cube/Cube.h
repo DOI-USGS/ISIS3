@@ -140,7 +140,8 @@ namespace Isis {
    *   @history 2012-11-06 Steven Lambright and Mathew Eis - Fixed (the lack of) deletion of
    *                           temporary files in the unit test. Fixes #1009.
    *   @history 2012-12-31 Steven Lambright - Removed 'get' prefix from accessors. Fixes #1356.
-   *
+   *   @history 2014-06-20 Ian Humphrey - Added checks to statistics() and histogram() to throw
+   *                           an error if the cube is unopened. Fixes #2085.
    */
   class Cube {
     public:
