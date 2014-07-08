@@ -1,8 +1,12 @@
 #include "MaximumLikelihoodWFunctions.h"
-#include "math.h"
+
+#include <QString>
+
+#include <math.h>
+#include <stdio.h>
+
 #include "IException.h"
 #include "IString.h"
-#include <stdio.h>
 
 namespace Isis {
   
@@ -12,6 +16,20 @@ namespace Isis {
 
 
 
+  /** 
+   * Sets up a maximumlikelihood estimation function with specified model and default tweaking
+   * constant
+   * 
+   * @param[in] enum Model modelSelection,  the model to be used
+   *                                        (see documentation for enum Model)
+   */
+  MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(Model modelSelection) {
+    // choose Model and define the tweaking constant
+    this->setModel(modelSelection);
+  }
+
+
+  
   /** 
    * Sets up a maximumlikelihood estimation function with specified model and tweaking constant
    * 
@@ -26,62 +44,30 @@ namespace Isis {
   MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(Model modelSelection, 
                                                            double tweakingConstant) {
     // choose Model and define the tweaking constant
-    m_PI = acos(-1.0);
     m_model = modelSelection;
     if (tweakingConstant <= 0.0) {
       IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    m_c = tweakingConstant;
+    m_tweakingConstant = tweakingConstant;
   }
 
-
-
-  /** 
-   * Sets up a maximumlikelihood estimation function with specified model and default tweaking
-   * constant
-   * 
-   * @param[in] enum Model modelSelection,  the model to be used
-   *                                        (see documentation for enum Model)
-   */
-  MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(Model modelSelection) {
-    // choose Model and define the tweaking constant
-    m_PI = acos(-1.0);
-    m_model = modelSelection;
-    this->setTweakingConstantDefault();
+  MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(
+      const MaximumLikelihoodWFunctions &other)
+      : m_model(other.m_model), m_tweakingConstant(other.m_tweakingConstant) {
   }
-
 
 
   MaximumLikelihoodWFunctions::~MaximumLikelihoodWFunctions() {
   } // empty destructor
 
 
-
-  /** 
-   * Allows the maximum likelihood model to be changed together with the tweaking constant
-   *
-   * @param[in] enum Model modelSelection,  the model to be used
-   *                                        (see documentation for enum Model)
-   * @param[in] double tweaking constant,  exact meaning varies by model, but generally the
-   *                                       larger the value the more influence larger resiudals
-   *                                       have on the solution. As well as possibly the more
-   *                                       measures are included in the solution.
-   * @throws IsisProgrammerError if tweakingConstant <= 0.0
-   */
-  bool MaximumLikelihoodWFunctions::setModel(Model modelSelection, double tweakingConstant) { 
-    // choose Model and define the tweaking constant
-    m_model = modelSelection;
-    if (tweakingConstant <= 0.0) {
-      IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-      return false;
-    }
-    m_c = tweakingConstant;
-    return true;
+  MaximumLikelihoodWFunctions &MaximumLikelihoodWFunctions::operator=(
+      const MaximumLikelihoodWFunctions &other) {
+    m_model = other.m_model;
+    m_tweakingConstant = other.m_tweakingConstant;
+    return *this;
   }
-
-
 
   /** 
    * Allows the maximum likelihood model to be changed together and the default tweaking constant
@@ -90,7 +76,7 @@ namespace Isis {
    * @Param[in] enum Model modelSelection,  the model to be used
    *                                        (see documentation for enum Model)
    */
-  bool MaximumLikelihoodWFunctions::setModel(Model modelSelection) {  
+  bool MaximumLikelihoodWFunctions::setModel(Model modelSelection) {
     // choose Model and use default tweaking constant
     m_model = modelSelection;
     this->setTweakingConstantDefault();
@@ -99,25 +85,62 @@ namespace Isis {
 
 
 
-  void MaximumLikelihoodWFunctions::maximumLikelihoodModel(char *model) {
-    switch(m_model) {
-    case Huber:
-      strcpy(model,"Huber");
-      return;  
-    case HuberModified:
-      strcpy(model,"HuberModified");
-      return;
-    case Welsch:
-      strcpy(model,"Welsch");
-      return;  
-    case Chen:
-      strcpy(model,"Chen");
-      return;
-    default:
-      strcpy(model,"None");
-      return;  // default to prevent nonsense from being returned, 
-               // but the program should never reach this line
+  /** 
+   * Sets default tweaking constants based on the maximum likelihood estimation model being used.
+   */
+  bool MaximumLikelihoodWFunctions::setTweakingConstantDefault() {
+    // default tweaking constants for the various likelihood models
+    switch (m_model) {
+      case Huber:
+        m_tweakingConstant = 1.345; // "95% asymptotice efficiecy on the standard normal distribution"
+                                    // is obtained with this constant, 
+                                    // see Zhang's "Parameter Estimation"
+        break;
+      case HuberModified:
+        m_tweakingConstant = 1.2107;// "95% asymptotice efficiecy on the standard normal distribution"
+                                    // is obtained with this constant,
+                                    // see Zhang's "Parameter Estimation"
+        break;
+      case Welsch:
+        m_tweakingConstant = 2.9846;// "95% asymptotice efficiecy on the standard normal distribution"
+                                    // is obtained with this constant,
+                                    // see Zhang's "Parameter Estimation"
+        break;
+      case Chen:
+        m_tweakingConstant = 1;     // This is the constant used by Chen in his paper, 
+                                    // no specific reason why is stated
+        break;
+      default:
+        m_tweakingConstant = 1;     // default, though at the time of writing this class,
+                                    // this value should never actually be used
+        break;
     }
+    return true;
+  }
+
+
+
+/** 
+ * Allows the maximum likelihood model to be changed together with the tweaking constant
+ *
+ * @param[in] enum Model modelSelection,  the model to be used
+ *                                        (see documentation for enum Model)
+ * @param[in] double tweaking constant,  exact meaning varies by model, but generally the
+ *                                       larger the value the more influence larger resiudals
+ *                                       have on the solution. As well as possibly the more
+ *                                       measures are included in the solution.
+ * @throws IsisProgrammerError if tweakingConstant <= 0.0
+ */
+  bool MaximumLikelihoodWFunctions::setModel(Model modelSelection, double tweakingConstant) { 
+    // choose Model and define the tweaking constant
+    m_model = modelSelection;
+    if (tweakingConstant <= 0.0) {
+      IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+      return false;
+    }
+    m_tweakingConstant = tweakingConstant;
+    return true;
   }
 
 
@@ -141,7 +164,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
       return false;
     }
-    m_c = tweakingConstant;
+    m_tweakingConstant = tweakingConstant;
     return true;
   }
 
@@ -151,30 +174,7 @@ namespace Isis {
    *  Returns the current tweaking constant
    */
   double MaximumLikelihoodWFunctions::tweakingConstant() {
-    return m_c;
-  }
-
-
-
-  void MaximumLikelihoodWFunctions::weightedResidualCutoff(char *cutoff) {
-    switch(m_model) {
-    case Huber:
-      strcpy(cutoff,"N/A");
-      return;  
-    case HuberModified:
-      strcpy(cutoff,"N/A");
-      return;
-    case Welsch:
-      sprintf(cutoff,"%lf",m_c*1.5);
-      return;  
-    case Chen:
-      sprintf(cutoff,"%lf",m_c);
-      return;
-    default:
-      strcpy(cutoff,"None");
-      return;  // default to prevent nonsense from being returned, 
-               // but the program should never reach this line
-    }
+    return m_tweakingConstant;
   }
 
 
@@ -245,11 +245,11 @@ namespace Isis {
    */
   double MaximumLikelihoodWFunctions::huber(double residualZScore) {
     // huber weight function
-    if ( fabs(residualZScore) < m_c) {
+    if ( fabs(residualZScore) < m_tweakingConstant) {
       return 1.0;
     }
     else {
-      return m_c/fabs(residualZScore);
+      return m_tweakingConstant/fabs(residualZScore);
     }
   }
 
@@ -267,11 +267,11 @@ namespace Isis {
    */
   double MaximumLikelihoodWFunctions::huberModified(double residualZScore) {
     // huber modified weight function
-    if ( fabs(residualZScore)/m_c < m_PI/2.0) {
-      return m_c*(sin(residualZScore/m_c)/residualZScore);
+    if ( fabs(residualZScore)/m_tweakingConstant < Isis::HALFPI) {
+      return m_tweakingConstant*(sin(residualZScore/m_tweakingConstant)/residualZScore);
     }
     else {
-      return m_c / fabs(residualZScore);
+      return m_tweakingConstant / fabs(residualZScore);
     }
   }
 
@@ -289,7 +289,8 @@ namespace Isis {
    */
   double MaximumLikelihoodWFunctions::welsch(double residualZScore) {
     // welsch weight function
-    return exp(-((residualZScore/m_c)*(residualZScore/m_c)));
+    double weightFactor = residualZScore / m_tweakingConstant;
+    return exp(-(weightFactor)*(weightFactor));
   }
 
 
@@ -306,42 +307,15 @@ namespace Isis {
    */
   double MaximumLikelihoodWFunctions::chen(double residualZScore) {
     // chen weight function
-    if ( fabs(residualZScore) <= m_c) {
-      return 6*(m_c*m_c-residualZScore*residualZScore)*(m_c*m_c-residualZScore*residualZScore);
+    if ( fabs(residualZScore) <= m_tweakingConstant) {
+      double weightFactor = m_tweakingConstant * m_tweakingConstant 
+                            - residualZScore * residualZScore;
+      return 6 * weightFactor * weightFactor;  // use of weight factor variable reduces number of
+                                               // operations from 7 to 4 
     }
     else {
       return 0.0;
     }
-  }
-
-
-
-  /** 
-   * Sets default tweaking constants based on the maximum likelihood estimation model being used.
-   */
-  bool MaximumLikelihoodWFunctions::setTweakingConstantDefault() {
-    // default tweaking constants for the various likelihood models
-    switch(m_model) {
-    case Huber:
-      m_c = 1.345;  // "95% asymptotice efficiecy on the standard normal distribution" is obtained
-                    // with this constant, see Zhang's "Parameter Estimation"
-      break;
-    case HuberModified:
-      m_c = 1.2107; // "95% asymptotice efficiecy on the standard normal distribution" is obtained
-                    // with this constant, see Zhang's "Parameter Estimation"
-      break;
-    case Welsch:
-      m_c=2.9846; // "95% asymptotice efficiecy on the standard normal distribution" is obtained
-                  // with this constant, see Zhang's "Parameter Estimation"
-      break;
-    case Chen:
-      m_c=1;  // This is the constant used by Chen in his paper, no specific reason why is stated
-      break;
-    default:
-      m_c=1;  // default, though at the time of writing this should never actually be used
-      break;
-     }
-    return true;
   }
 
 
@@ -360,19 +334,66 @@ namespace Isis {
     // should be tested and revised with experience
     switch(m_model) {
     case Huber:
-      return 0.5;  // In this model m_c determines the point at which residuals stop having
+      return 0.5;  // In this model m_tweakingConstant determines the point at which residuals stop having
                    // increased influence on the solution, so after the median all the measures will
                    // have the same effect on the solution regardless of magnitude
     case HuberModified:
-      return 0.4; // In this model after residualZScore >= m_c*m_PI/2.0 the residuals have the same
+      return 0.4; // In this model after residualZScore >= m_tweakingConstant*Isis::HALFPI the residuals have the same
                   // influence on the solution, 
     case Welsch:
-      return 0.7; // at about double m_c the residuals have very little influence
+      return 0.7; // at about double m_tweakingConstant the residuals have very little influence
     case Chen:
-      return 0.98; // after r > m_c residuals have no influence
+      return 0.98; // after r > m_tweakingConstant residuals have no influence
     default:
       return 0.5; // default, though at the time of writing this should never actually be used
     }
+  }
+
+
+
+  /** 
+   * Static method to return a string represtentation for a given MaximumLikelihoodWFunctions::Model 
+   * enum. 
+   *  
+   * @param model Enumerated value for a MaximumLikelihoodWFunctions model.
+   * @return QString label for the enumeration.  
+   */
+  QString MaximumLikelihoodWFunctions::modelToString(MaximumLikelihoodWFunctions::Model model) {
+    if (model == MaximumLikelihoodWFunctions::Huber)              return "Huber";
+    else if (model == MaximumLikelihoodWFunctions::HuberModified) return "HuberModified";
+    else if (model == MaximumLikelihoodWFunctions::Welsch)        return "Welsch";
+    else if (model == MaximumLikelihoodWFunctions::Chen)          return "Chen";
+    else throw IException(IException::Programmer,
+                          "Unknown estimation model enum [" + toString(model) + "].",
+                          _FILEINFO_);
+  }
+
+
+
+  /** 
+   * Method to return a string represtentation of the weighted residual cutoff (if it exists) for 
+   * the MaximumLikelihoodWFunctions::Model.  If no cutoff exists, the string "N/A" is returned. 
+   *  
+   * @return QString label for the weighted residual cut off of the maximum likelihood estimation 
+   *         model.
+   * @throw  "Estimation model has not been set."
+   */
+  QString MaximumLikelihoodWFunctions::weightedResidualCutoff() {
+    if (m_model == Huber || m_model == HuberModified) return "N/A";
+    else if (m_model == Welsch) return toString(m_tweakingConstant * 1.5);
+    else if (m_model == Chen) return toString(m_tweakingConstant);
+    else throw IException(IException::Programmer, "Estimation model has not been set.", _FILEINFO_);
+  }
+
+
+
+  /** 
+   * Accessor method to return the MaximumLikelihoodWFunctions::Model enumeration.
+   *  
+   * @return enum for the maximum likelihood estimation model.
+   */
+  MaximumLikelihoodWFunctions::Model MaximumLikelihoodWFunctions::model() {
+    return m_model;
   }
 
 }// end namespace Isis

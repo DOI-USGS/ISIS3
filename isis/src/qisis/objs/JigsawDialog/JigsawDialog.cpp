@@ -3,6 +3,7 @@
 #include <QDebug>
 
 #include "BundleAdjust.h"
+#include "BundleResults.h"
 #include "BundleSettings.h"
 #include "Control.h"
 #include "JigsawSetupDialog.h"
@@ -75,6 +76,7 @@ namespace Isis {
 
     BundleAdjust ba(*m_bundleSettings, *cnet, snlist, false);
 // run bundle (thread with BundleThread::QThread) - pump output to modeless dialog
+    // BundleResults results = ba.solveCholesky();
     ba.solveCholesky();
 
   }

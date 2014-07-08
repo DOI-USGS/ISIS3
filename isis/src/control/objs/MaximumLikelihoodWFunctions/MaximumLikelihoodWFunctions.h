@@ -24,6 +24,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Class provides maximum likelihood estimation functions for robust parameter estimation, 
@@ -46,16 +48,18 @@ namespace Isis {
    *
    *
    * @internal
-   *   @history 2012-03-23 Orrin Thomas -- Original Version
+   *   @history 2012-03-23 Orrin Thomas - Original Version
    *   @history 2014-06-23 Jeannie Backer - Moved method implementation to cpp file and other ISIS
    *                           coding standards fixes.
+   *   @history 2014-07-03 Jeannie Backer - Replace member variable m_PI with Isis constant
    */
   class MaximumLikelihoodWFunctions {
   public:
-    /** These are/supported maximum likelihood estimation models,
-     *    each has an accompannying private method that converts
-     *    from a resiuduals to a weight scaler.
+    /** 
+     * The supported maximum likelihood estimation models.
      */
+    // Each model has an accompannying private method that converts from a
+    // resiuduals to a weight scaler.
     enum Model {
 
       /**  According to Zhang (Parameter Estimation: A Tutorial with application to conic fitting)
@@ -96,16 +100,23 @@ namespace Isis {
        */
       Chen
     };
+    static QString modelToString(Model model);
 
     MaximumLikelihoodWFunctions();
-    MaximumLikelihoodWFunctions(Model modelSelection, double tweakingConstant);
     MaximumLikelihoodWFunctions(Model modelSelection);
+    MaximumLikelihoodWFunctions(Model modelSelection, double tweakingConstant);
+    MaximumLikelihoodWFunctions(const MaximumLikelihoodWFunctions &other);
     ~MaximumLikelihoodWFunctions();
+    MaximumLikelihoodWFunctions &operator=(const MaximumLikelihoodWFunctions &other);
+
+    bool setModel(Model modelSelection); // uses default tweaking constant
+    bool setTweakingConstantDefault();
 
     bool setModel(Model modelSelection, double tweakingConstant);
-    bool setModel(Model modelSelection);
     bool setTweakingConstant(double tweakingConstant);
-    bool setTweakingConstantDefault();
+
+    Model model();
+    double tweakingConstant();
 
     // the W functions provide an additional weighting factor W which is used
     // to 're-weight' each observation dynamically during an adjustment, the
@@ -119,30 +130,10 @@ namespace Isis {
     double tweakingConstantQuantile(); // returns which quantile of the residuals is recommended to
                                        // use as the tweaking constant, this varies as a function of
                                        // the model being employed
-    double tweakingConstant();
 
-    void maximumLikelihoodModel(char *model);
- 
-    void weightedResidualCutoff(char *cutoff);
+    QString weightedResidualCutoff();
 
   private:
-
-    /** Tweaking constant for the maximum likelihood estimation function
-      *   Suggested values are available for each method: setTweakingConstantDefault()
-      *   They can also be manually adjusted: setTweakingConstant(double tweakingConstant)
-      *   If there is knowlege of the probility distrubtion of the residuals in an adjustement
-      *   tweakingConstantQuantile() will recommend what qunatile to use as the tweaking constant;
-      */
-    double m_c;    //the tweaking constant for the maximum likelihood models
-
-    /** the constant pi, so it only has to calculated one
-     */
-    double m_PI;   //PI
-
-    /** Which maximum likelihood model is being used
-     */
-    Model m_model; //selected maximum likelihood estimation model
-
     double weightScaler(double residualZScore); // This directly provides the scaler for the weight
                                                 // (instead of the radical weight), thus it provides
                                                 // sqrtWeightScaler^2
@@ -150,7 +141,17 @@ namespace Isis {
     double huberModified(double residualZScore);
     double welsch(double residualZScore);
     double chen(double residualZScore);
-  };
+
+   Model m_model; //!< The enumerated value for the maximum likelihood estimation model to be used.
+   double m_tweakingConstant; /**< The tweaking constant for the maximum likelihood models.
+                                   Default values are available for each model using the method
+                                   setTweakingConstantDefault(). This value can also be manually
+                                   adjusted using the method setTweakingConstant(). If there is 
+                                   knowlege of the probility distrubtion of the residuals in an
+                                   adjustment, tweakingConstantQuantile() will recommend which
+                                   quantile to use as the tweaking constant.*/
+
+ };
 }// end namespace Isis
 
 #endif

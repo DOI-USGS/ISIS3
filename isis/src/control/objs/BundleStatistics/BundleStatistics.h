@@ -24,6 +24,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QDataStream>
 #include <QList>
 #include <QPair>
 #include <QString>
@@ -40,12 +41,21 @@ namespace Isis {
   class CorrelationMatrix;
   class SerialNumberList;
   class StatCumProbDistDynCalc;
-
+  class PvlGroup;
+  /**
+   * A utility class containing statistical results from a BundleAdjust solution. 
+   *  
+   * @author 2014-07-01 Jeannie Backer
+   *
+   * @internal
+   *   @history 2014-07-01 Jeannie Backer - Original version
+   */
   class BundleStatistics {
     public:
       BundleStatistics();
       BundleStatistics(const BundleStatistics &other);
       ~BundleStatistics();
+      BundleStatistics &operator=(const BundleStatistics &other);
 
       // mutators and computation methods
       bool computeBundleStatistics(SerialNumberList *m_pSnList, 
@@ -61,6 +71,13 @@ namespace Isis {
       void addProbabilityDistributionObservation(double obsValue);
       void addProbabilityDistributionObservation(double obsValue, bool residuals);
       void incrementMaximumLikelihoodModelIndex();
+
+      void incrementFixedPoints();
+      int numberFixedPoints();
+      void incrementHeldImages();
+      int numberHeldImages();
+      void incrementIgnoredPoints();
+      int numberIgnoredPoints(); // currently unused ???
 #if 0
       double computeRejectionLimit(ControlNet *p_Cnet,
                                    double outlierRejectionMultiplier,
@@ -154,6 +171,8 @@ namespace Isis {
       bool setNumberHeldImages(SerialNumberList m_pHeldSnList,
                                SerialNumberList *m_pSnList);
 
+      PvlGroup pvlGroup(QString name = "BundleStatistics") const;
+
     private:
       CorrelationMatrix *m_correlationMatrix;
 
@@ -163,9 +182,9 @@ namespace Isis {
 // ???       Statistics m_statsry;                      //!<  y residuals
 // ???       Statistics m_statsrxy;                     //!< xy residuals
 
-      int m_fixedPoints;                //!< number of 'fixed' (ground) points (define)
-      int m_ignoredPoints;              //!< number of ignored points
-      int m_heldImages;                 //!< number of 'held' images (define)
+      int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
+      int m_numberIgnoredPoints;              //!< number of ignored points                  // currently set but unused ???
+      int m_numberHeldImages;                 //!< number of 'held' images (define)          
       
       
       
@@ -225,7 +244,9 @@ namespace Isis {
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables for maximum likelihood estimation
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      int m_numberMaximumLikelihoodModels;            /**< The number of maximum likelihood estimation 
+
+      // ??? we can get rid of this variable by allowing m_wFunc/Quan to be a QList/QVector of variable size and checking the size...
+      int m_numberMaximumLikelihoodModels;    /**< The number of maximum likelihood estimation 
                                                     models. Up to three different models can be used
                                                     in succession.*/
       MaximumLikelihoodWFunctions *m_wFunc[3]; /**< This class is used to reweight observations in 
@@ -233,10 +254,10 @@ namespace Isis {
                                                     estimation, up to three different maximum 
                                                     likelihood estimation models can be used in
                                                     succession.*/
-      double m_maximumLikelihoodQuan[3];           /**< Quantiles of the |residual| distribution to be
+      double m_maximumLikelihoodQuan[3];       /**< Quantiles of the |residual| distribution to be
                                                     used for tweaking constants of the maximum 
                                                     probability models.*/
-      int m_maximumLikelihoodIndex;                /**< This count keeps track of which stadge of the
+      int m_maximumLikelihoodIndex;            /**< This count keeps track of which stadge of the
                                                     maximum likelihood adjustment the bundle is
                                                     currently on.*/
       StatCumProbDistDynCalc *m_cumPro;        /**< This class will be used to calculate the
@@ -251,5 +272,10 @@ namespace Isis {
       double m_maximumLikelihoodMedianR2Residuals; /**< Median of R^2 residuals.*/ 
        
   };
+  // operators to read/write SparseBlockColumnMatrix to/from binary disk file
+  // operator to write SparseBlockColumnMatrix to QDebug stream
+  QDataStream&operator<<(QDataStream &stream, const BundleStatistics&);
+  QDataStream&operator>>(QDataStream &stream, BundleStatistics&);
+  QDebug operator<<(QDebug dbg, const BundleStatistics &bundleStatistics);
 };
 #endif // BundleStatistics_h

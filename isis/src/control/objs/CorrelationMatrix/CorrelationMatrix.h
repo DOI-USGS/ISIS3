@@ -53,7 +53,9 @@ namespace Isis {
   class CorrelationMatrix {
     public:
       CorrelationMatrix();
+      CorrelationMatrix(const CorrelationMatrix &other);
       ~CorrelationMatrix();
+      CorrelationMatrix &operator=(const CorrelationMatrix &other);
       // get values given upper and lower corners of range...
       // display block... when user wants to see one (x,y) we can show whole block for reference.
       void getCorrelationMatrix(QString fileName);

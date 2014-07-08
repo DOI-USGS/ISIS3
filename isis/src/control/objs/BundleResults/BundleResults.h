@@ -1,5 +1,5 @@
-#ifndef BUNDLERESULTS_H
-#define BUNDLERESULTS_H
+#ifndef BundleResults_h
+#define BundleResults_h
 
 /**
  * @file
@@ -23,19 +23,37 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <QString>
+
+#include "BundleSettings.h"
+#include "BundleStatistics.h"
+#include "ControlNet.h"
 
 namespace Isis {
-  class BundleSettings;
-  class BundleStatistics;
-  class ControlNet;
+  class PvlObject;
 
   class BundleResults {
     public:
-      BundleResults();
+      BundleResults(BundleSettings inputSettings, ControlNet outputControlNet, 
+                    QString controlNetworkFileName = "");
+      BundleResults(const BundleResults &other);
+      ~BundleResults();
+      BundleResults &operator=(const BundleResults &other);
+      void setOutputStatistics(BundleStatistics statisticsResults);
+      PvlObject pvlObject(QString resultsName = "BundleResults",
+                          QString settingsName = "InputSettings",
+                          QString statisticsName = "StatisticsResults");
     private:
-      BundleStatistics *m_outputStatistics;
+      BundleResults();
+      QString    m_controlNetworkFileName;
       ControlNet *m_outputCNet;
-      BundleSettings *m_settings;
+      BundleSettings   *m_settings;
+      BundleStatistics *m_statisticsResults;
   };
+  // operators to read/write SparseBlockColumnMatrix to/from binary disk file
+  // operator to write SparseBlockColumnMatrix to QDebug stream
+  QDataStream&operator<<(QDataStream &stream, const BundleResults&);
+  QDataStream&operator>>(QDataStream &stream, BundleResults&);
+  QDebug operator<<(QDebug dbg, const BundleResults &bundleResults);
 };
-#endif // BUNDLERESULTS_H
+#endif // BundleResults_h

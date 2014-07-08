@@ -1,5 +1,25 @@
 #include "CorrelationMatrix.h"
+namespace Isis {
+  CorrelationMatrix::CorrelationMatrix(){
+  }
+  CorrelationMatrix::CorrelationMatrix(const CorrelationMatrix &other) {
 
+    m_imagesAndParameters = other.m_imagesAndParameters;
+    m_covarianceFileName = other.m_covarianceFileName;
+    m_correlationFileName = m_correlationFileName;
+    m_diagonals = m_diagonals;
+
+  }
+  CorrelationMatrix::~CorrelationMatrix() {
+  }
+  CorrelationMatrix &CorrelationMatrix::operator = (const CorrelationMatrix &other) {
+    m_imagesAndParameters = other.m_imagesAndParameters;
+    m_covarianceFileName = other.m_covarianceFileName;
+    m_correlationFileName = m_correlationFileName;
+    m_diagonals = m_diagonals;
+    return *this;
+  }
+}
 // #include <QDataStream>
 // #include <QFile>
 // #include <QList>

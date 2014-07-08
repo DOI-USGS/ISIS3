@@ -65,73 +65,102 @@ namespace Isis {
   }
 
 
-  BundleSettings::BundleSettings(const BundleSettings &other) {
-    m_validateNetwork = other.validateNetwork();
-
-    m_solveMethod = other.solveMethod();
-    m_solveObservationMode = other.solveObservationMode();
-    m_solveRadius = other.solveRadius();
-    m_updateCubeLabel = other.updateCubeLabel();
-    m_errorPropagation = other.errorPropagation();
-
-    m_outlierRejection = other.outlierRejection();
-    m_outlierRejectionMultiplier = other.outlierRejectionMultiplier();
-
-    m_globalLatitudeAprioriSigma = other.globalLatitudeAprioriSigma();
-    m_globalLongitudeAprioriSigma = other.globalLongitudeAprioriSigma();
-    m_globalRadiusAprioriSigma = other.globalRadiusAprioriSigma();
-
-    // Spacecraft Position Options
-    m_instrumentPositionSolveOption = other.instrumentPositionSolveOption();
-    m_spkDegree = other.spkDegree();
-    m_spkSolveDegree = other.spkSolveDegree();
-    m_solvePositionOverHermiteSpline = other.solveInstrumentPositionOverHermiteSpline();
-    m_globalInstrumentPositionAprioriSigma = other.globalInstrumentPositionAprioriSigma();
-    m_globalInstrumentVelocityAprioriSigma = other.globalInstrumentVelocityAprioriSigma();
-    m_globalInstrumentAccelerationAprioriSigma = other.globalInstrumentAccelerationAprioriSigma();
-
-    // Camera Pointing Options
-    m_instrumentPointingSolveOption = other.instrumentPointingSolveOption();
-    m_solveTwist = other.solveTwist();
-    m_ckDegree = other.ckDegree();
-    m_ckSolveDegree = other.ckSolveDegree();
-    m_fitInstrumentPointingPolynomialOverExisting
-        = other.fitInstrumentPointingPolynomialOverExisting();
-    m_globalInstrumentPointingAnglesAprioriSigma
-        = other.globalInstrumentPointingAnglesAprioriSigma();
-    m_globalInstrumentPointingVelocityAprioriSigma
-        = other.globalInstrumentPointingAngularVelocityAprioriSigma();
-    m_globalInstrumentPointingAccelerationAprioriSigma
-        = other.globalInstrumentPointingAngularAccelerationAprioriSigma();
-
-    // Convergence Criteria
-    m_convergenceCriteria = other.convergenceCriteria();
-    m_convergenceCriteriaThreshold = other.convergenceCriteriaThreshold();
-    m_convergenceCriteriaMaximumIterations = other.convergenceCriteriaMaximumIterations();
-
-    // Maximum Likelihood Estimation Options no default in the constructor - must be set.
-    for (int i = 0; i < other.maximumLikelihoodEstimatorModels().size(); i++) {
-      addMaximumLikelihoodEstimatorModel(other.maximumLikelihoodEstimatorModels()[i].first,
-                                         other.maximumLikelihoodEstimatorModels()[i].second);
+  BundleSettings::BundleSettings(const BundleSettings &other)
+      : m_validateNetwork(other.m_validateNetwork),
+        m_solveMethod(other.m_solveMethod),
+        m_solveObservationMode(other.m_solveObservationMode),
+        m_solveRadius(other.m_solveRadius),
+        m_updateCubeLabel(other.m_updateCubeLabel),
+        m_errorPropagation(other.m_errorPropagation),
+        m_outlierRejection(other.m_outlierRejection),
+        m_outlierRejectionMultiplier(other.m_outlierRejectionMultiplier),
+        m_globalLatitudeAprioriSigma(other.m_globalLatitudeAprioriSigma),
+        m_globalLongitudeAprioriSigma(other.m_globalLongitudeAprioriSigma),
+        m_globalRadiusAprioriSigma(other.m_globalRadiusAprioriSigma),
+        m_instrumentPositionSolveOption(other.m_instrumentPositionSolveOption),
+        m_spkDegree(other.m_spkDegree),
+        m_spkSolveDegree(other.m_spkSolveDegree),
+        m_solvePositionOverHermiteSpline(other.m_solvePositionOverHermiteSpline), 
+        m_globalInstrumentPositionAprioriSigma(other.m_globalInstrumentPositionAprioriSigma),
+        m_globalInstrumentVelocityAprioriSigma(other.m_globalInstrumentVelocityAprioriSigma),
+        m_globalInstrumentAccelerationAprioriSigma(other.m_globalInstrumentAccelerationAprioriSigma),
+        m_instrumentPointingSolveOption(other.m_instrumentPointingSolveOption),
+        m_solveTwist(other.m_solveTwist),
+        m_ckDegree(other.m_ckDegree),
+        m_ckSolveDegree(other.m_ckSolveDegree),
+        m_fitInstrumentPointingPolynomialOverExisting(
+            other.m_fitInstrumentPointingPolynomialOverExisting),
+        m_globalInstrumentPointingAnglesAprioriSigma(
+            other.m_globalInstrumentPointingAnglesAprioriSigma),
+        m_globalInstrumentPointingVelocityAprioriSigma(
+            other.m_globalInstrumentPointingVelocityAprioriSigma), 
+        m_globalInstrumentPointingAccelerationAprioriSigma(
+            other.m_globalInstrumentPointingAccelerationAprioriSigma),
+        m_convergenceCriteria(other.m_convergenceCriteria),
+        m_convergenceCriteriaThreshold(other.m_convergenceCriteriaThreshold),
+        m_convergenceCriteriaMaximumIterations(other.m_convergenceCriteriaMaximumIterations),
+        m_outputFilePrefix(other.m_outputFilePrefix),
+        m_createBundleOutputFile(other.m_createBundleOutputFile),
+        m_createCSVPointsFile(other.m_createCSVPointsFile),
+        m_createResidualsFile(other.m_createResidualsFile) {
+    
+    for (int i = 0; i < other.m_maximumLikelihood.size(); i++) {
+      m_maximumLikelihood.append(other.m_maximumLikelihood[i]);
     }
-    // Self Calibration ??? (from cnetsuite only)
-
-    // Target Body ??? (from cnetsuite only)
-
-
-
-
-    // Output Options
-    m_outputFilePrefix = other.outputFilePrefix();
-    m_createBundleOutputFile = other.createBundleOutputFile();
-    m_createCSVPointsFile    = other.createCSVPointsFile();
-    m_createResidualsFile    = other.createResidualsFile();
-
   }
 
 
 
   BundleSettings::~BundleSettings() {
+  }
+
+
+
+  BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
+    if (&other != this) {
+      m_validateNetwork = other.m_validateNetwork;
+      m_solveMethod = other.m_solveMethod;
+      m_solveObservationMode = other.m_solveObservationMode;
+      m_solveRadius = other.m_solveRadius;
+      m_updateCubeLabel = other.m_updateCubeLabel;
+      m_errorPropagation = other.m_errorPropagation;
+      m_outlierRejection = other.m_outlierRejection;
+      m_outlierRejectionMultiplier = other.m_outlierRejectionMultiplier;
+      m_globalLatitudeAprioriSigma = other.m_globalLatitudeAprioriSigma;
+      m_globalLongitudeAprioriSigma = other.m_globalLongitudeAprioriSigma;
+      m_globalRadiusAprioriSigma = other.m_globalRadiusAprioriSigma;
+      m_instrumentPositionSolveOption = other.m_instrumentPositionSolveOption;
+      m_spkDegree = other.m_spkDegree;
+      m_spkSolveDegree = other.m_spkSolveDegree;
+      m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
+      m_globalInstrumentPositionAprioriSigma = other.m_globalInstrumentPositionAprioriSigma;
+      m_globalInstrumentVelocityAprioriSigma = other.m_globalInstrumentVelocityAprioriSigma;
+      m_globalInstrumentAccelerationAprioriSigma = other.m_globalInstrumentAccelerationAprioriSigma;
+      m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
+      m_solveTwist = other.m_solveTwist;
+      m_ckDegree = other.m_ckDegree;
+      m_ckSolveDegree = other.m_ckSolveDegree;
+      m_fitInstrumentPointingPolynomialOverExisting
+          = other.m_fitInstrumentPointingPolynomialOverExisting;
+      m_globalInstrumentPointingAnglesAprioriSigma
+          = other.m_globalInstrumentPointingAnglesAprioriSigma;
+      m_globalInstrumentPointingVelocityAprioriSigma
+          = other.m_globalInstrumentPointingVelocityAprioriSigma;
+      m_globalInstrumentPointingAccelerationAprioriSigma
+          = other.m_globalInstrumentPointingAccelerationAprioriSigma;
+      m_convergenceCriteria = other.m_convergenceCriteria;
+      m_convergenceCriteriaThreshold = other.m_convergenceCriteriaThreshold;
+      m_convergenceCriteriaMaximumIterations = other.m_convergenceCriteriaMaximumIterations;
+      m_outputFilePrefix = other.m_outputFilePrefix;
+      m_createBundleOutputFile = other.m_createBundleOutputFile;
+      m_createCSVPointsFile = other.m_createCSVPointsFile;
+      m_createResidualsFile = other.m_createResidualsFile;
+
+      for (int i = 0;i < other.m_maximumLikelihood.size();i++) {
+        m_maximumLikelihood.append(other.m_maximumLikelihood[i]);
+      }
+    }
+    return *this;
   }
 
 
@@ -822,8 +851,9 @@ namespace Isis {
     return m_createResidualsFile;
   }
 
-  PvlGroup BundleSettings::pvlGroup() const {
-    PvlGroup group("BundleSettings");
+  PvlGroup BundleSettings::pvlGroup(QString name) const {
+
+    PvlGroup group(name);
 
     // General Solve Options
     group += PvlKeyword("SolveMethod", solveMethodToString(m_solveMethod));
@@ -887,9 +917,26 @@ namespace Isis {
     }
 
     // Maximum Likelihood Options
-    for (int i = 0;i < m_maximumLikelihood.size();i++) {
-      group += PvlKeyword("MaximumLikelihoodModel", maximumLikelihoodModelToString(m_maximumLikelihood[i].first));
-      group += PvlKeyword("Quantile", toString(m_maximumLikelihood[i].second));
+    PvlKeyword models("MaximumLikelihoodModels"); 
+    if (m_maximumLikelihood.size() > 0) {
+
+      models.addValue(MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[0].first));
+
+//      PvlKeyword models("MaximumLikelihoodModels",
+//                        MaximumLikelihoodWFunctions::modelToString(m_wFunc[0]->model()));
+
+      PvlKeyword quantiles("MaximumLikelihoodQuantiles", 
+                           toString(m_maximumLikelihood[0].second));
+
+      for (int i = 1; i < m_maximumLikelihood.size(); i++) {
+        models.addValue(MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[i].first));
+        quantiles.addValue(toString(m_maximumLikelihood[i].second));
+      }
+      group += models;
+      group += quantiles;
+    }
+    else {
+      models.addValue("None");
     }
 
     return group;

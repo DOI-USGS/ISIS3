@@ -1,6 +1,7 @@
 #include "Isis.h"
 
 #include "BundleAdjust.h"
+#include "BundleResults.h"
 #include "BundleSettings.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -150,6 +151,7 @@ void IsisMain() {
 
     BundleAdjust bundleAdjust(settings, cnet, serialNumberList);
     bundleAdjust.solveCholesky();
+//    bundleAdjust.solveCholeskyBR();
 
     Cube c;
     c.open(filename, "rw");

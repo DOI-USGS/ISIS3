@@ -27,6 +27,7 @@
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "BundleAdjust.h"
+#include "BundleResults.h"
 #include "BundleSettings.h"
 #include "ControlMeasure.h"
 #include "Distance.h"
@@ -824,6 +825,7 @@ namespace Isis {
 
       BundleAdjust bundleAdjust(settings, net, *p_serialNumberList, false);
       bundleAdjust.solveCholesky();
+      // bundleAdjust.solveCholeskyBR();
 
       // Print results and give user option of updating cube pointin
       double maxError = net.GetMaximumResidual();

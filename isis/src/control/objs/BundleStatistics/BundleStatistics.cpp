@@ -1,6 +1,7 @@
 #include "BundleStatistics.h"
 
 #include <QDebug>
+#include <QDataStream>
 
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
@@ -13,6 +14,8 @@
 #include "ControlPoint.h"
 #include "CorrelationMatrix.h"
 #include "MaximumLikelihoodWFunctions.h"
+#include "PvlKeyword.h"
+#include "PvlGroup.h"
 #include "SerialNumberList.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
@@ -24,12 +27,12 @@ namespace Isis {
 
     m_correlationMatrix = NULL;
 
-    m_fixedPoints = 0; // set in BA constructor->init->fillPointIndexMap
-    m_ignoredPoints = 0; // set in BA constructor->init->fillPointIndexMap
+    m_numberFixedPoints = 0; // set in BA constructor->init->fillPointIndexMap
+    m_numberIgnoredPoints = 0; // set in BA constructor->init->fillPointIndexMap
 
 
     // set in BundleAdjust init()
-    m_heldImages = 0;
+    m_numberHeldImages = 0;
 
     // members set while computing bundle stats
     m_rmsImageSampleResiduals.clear();
@@ -119,62 +122,60 @@ namespace Isis {
 
 
 
-  BundleStatistics::BundleStatistics(const BundleStatistics &other) {
-    //??? deep copy CorrelationMatrix           *m_correlationMatrix;
+  BundleStatistics::BundleStatistics(const BundleStatistics &other)
+      : // ??? m_correlationMatrix(new CorrelationMatrix(*other.m_correlationMatrix)),
+        m_numberFixedPoints(other.m_numberFixedPoints),
+        m_numberIgnoredPoints(other.m_numberIgnoredPoints),
+        m_numberHeldImages(other.m_numberHeldImages),
+        m_rms_rx(other.m_rms_rx),
+        m_rms_ry(other.m_rms_ry),
+        m_rms_rxy(other.m_rms_rxy),
+        m_rejectionLimit(other.m_rejectionLimit),
+        m_numberRejectedObservations(other.m_numberRejectedObservations),
+        m_numberObservations(other.m_numberObservations),
+        m_numberImageParameters(other.m_numberImageParameters),
+        m_numberConstrainedPointParameters(other.m_numberConstrainedPointParameters),
+        m_numberConstrainedImageParameters(other.m_numberConstrainedImageParameters),
+        m_numberUnknownParameters(other.m_numberUnknownParameters),
+        m_degreesOfFreedom(other.m_degreesOfFreedom),
+        m_sigma0(other.m_sigma0),
+        m_elapsedTime(other.m_elapsedTime),
+        m_elapsedTimeErrorProp(other.m_elapsedTimeErrorProp),
+        m_converged(other.m_converged),
+        m_rmsImageSampleResiduals(other.m_rmsImageSampleResiduals),
+        m_rmsImageLineResiduals(other.m_rmsImageLineResiduals),
+        m_rmsImageResiduals(other.m_rmsImageResiduals),
+        m_rmsImageXSigmas(other.m_rmsImageXSigmas),    
+        m_rmsImageYSigmas(other.m_rmsImageYSigmas),    
+        m_rmsImageZSigmas(other.m_rmsImageZSigmas),    
+        m_rmsImageRASigmas(other.m_rmsImageRASigmas),   
+        m_rmsImageDECSigmas(other.m_rmsImageDECSigmas),  
+        m_rmsImageTWISTSigmas(other.m_rmsImageTWISTSigmas),
+        m_minSigmaLatitude(other.m_minSigmaLatitude),
+        m_minSigmaLatitudePointId(other.m_minSigmaLatitudePointId),
+        m_maxSigmaLatitude(other.m_maxSigmaLatitude),
+        m_maxSigmaLatitudePointId(other.m_maxSigmaLatitudePointId),
+        m_minSigmaLongitude(other.m_minSigmaLongitude),
+        m_minSigmaLongitudePointId(other.m_minSigmaLongitudePointId),
+        m_maxSigmaLongitude(other.m_maxSigmaLongitude),
+        m_maxSigmaLongitudePointId(other.m_maxSigmaLongitudePointId),
+        m_minSigmaRadius(other.m_minSigmaRadius),
+        m_minSigmaRadiusPointId(other.m_minSigmaRadiusPointId),
+        m_maxSigmaRadius(other.m_maxSigmaRadius),
+        m_maxSigmaRadiusPointId(other.m_maxSigmaRadiusPointId),
+        m_rmsSigmaLat(other.m_rmsSigmaLat),
+        m_rmsSigmaLon(other.m_rmsSigmaLon),
+        m_rmsSigmaRad(other.m_rmsSigmaRad),
+        m_numberMaximumLikelihoodModels(other.m_numberMaximumLikelihoodModels),
+        m_maximumLikelihoodIndex(other.m_maximumLikelihoodIndex),
+        m_cumPro(new StatCumProbDistDynCalc(*other.m_cumPro)),
+        m_cumProRes(new StatCumProbDistDynCalc(*other.m_cumProRes)), 
+        m_maximumLikelihoodMedianR2Residuals(other.m_maximumLikelihoodMedianR2Residuals) {
 
-    m_fixedPoints = other.m_fixedPoints;
-    m_ignoredPoints = other.m_ignoredPoints;
-    m_heldImages = other.m_heldImages;
-
-    m_rms_rx = other.m_rms_rx;
-    m_rms_ry = other.m_rms_ry;
-    m_rms_rxy = other.m_rms_rxy;
-    m_rejectionLimit = other.m_rejectionLimit;
-    m_numberRejectedObservations = other.m_numberRejectedObservations;
-    m_numberObservations = other.m_numberObservations;
-    m_numberImageParameters = other.m_numberImageParameters;
-    m_numberConstrainedPointParameters = other.m_numberConstrainedPointParameters;
-    m_numberConstrainedImageParameters = other.m_numberConstrainedImageParameters;
-    m_numberUnknownParameters = other.m_numberUnknownParameters;
-    m_degreesOfFreedom = other.m_degreesOfFreedom;
-    m_sigma0 = other.m_sigma0;
-    m_elapsedTime = other.m_elapsedTime;
-    m_elapsedTimeErrorProp = other.m_elapsedTimeErrorProp;
-    m_converged = other.m_converged;
-
-    m_rmsImageSampleResiduals = other.m_rmsImageSampleResiduals;
-    m_rmsImageLineResiduals   = other.m_rmsImageLineResiduals;
-    m_rmsImageResiduals       = other.m_rmsImageResiduals;
-    m_rmsImageXSigmas         = other.m_rmsImageXSigmas;    
-    m_rmsImageYSigmas         = other.m_rmsImageYSigmas;    
-    m_rmsImageZSigmas         = other.m_rmsImageZSigmas;    
-    m_rmsImageRASigmas        = other.m_rmsImageRASigmas;   
-    m_rmsImageDECSigmas       = other.m_rmsImageDECSigmas;  
-    m_rmsImageTWISTSigmas     = other.m_rmsImageTWISTSigmas;
-
-    m_minSigmaLatitude         = other.m_minSigmaLatitude;
-    m_minSigmaLatitudePointId  = other.m_minSigmaLatitudePointId;
-    m_maxSigmaLatitude         = other.m_maxSigmaLatitude;
-    m_maxSigmaLatitudePointId  = other.m_maxSigmaLatitudePointId;
-    m_minSigmaLongitude        = other.m_minSigmaLongitude;
-    m_minSigmaLongitudePointId = other.m_minSigmaLongitudePointId;
-    m_maxSigmaLongitude        = other.m_maxSigmaLongitude;
-    m_maxSigmaLongitudePointId = other.m_maxSigmaLongitudePointId;
-    m_minSigmaRadius           = other.m_minSigmaRadius;
-    m_minSigmaRadiusPointId    = other.m_minSigmaRadiusPointId;
-    m_maxSigmaRadius           = other.m_maxSigmaRadius;
-    m_maxSigmaRadiusPointId    = other.m_maxSigmaRadiusPointId;
-
-    m_rmsSigmaLat = other.m_rmsSigmaLat;
-    m_rmsSigmaLon = other.m_rmsSigmaLon;
-    m_rmsSigmaRad = other.m_rmsSigmaRad;
-    m_numberMaximumLikelihoodModels = other.m_numberMaximumLikelihoodModels;
-    // ??? MaximumLikelihoodWFunctions *m_wFunc[3];
-    // ??? double                      m_maximumLikelihoodQuan[3];
-    m_maximumLikelihoodIndex = other.m_maximumLikelihoodIndex;
-    // ??? StatCumProbDistDynCalc      *m_cumPro;
-    // ??? StatCumProbDistDynCalc      *m_cumProRes;
-    m_maximumLikelihoodMedianR2Residuals = other.m_maximumLikelihoodMedianR2Residuals;
+    for (int i = 0; i < 3; i++) {
+      m_wFunc[i] = new MaximumLikelihoodWFunctions(*other.m_wFunc[i]);
+      m_maximumLikelihoodQuan[i] = other.m_maximumLikelihoodQuan[i];
+    }
 
   }
 
@@ -182,6 +183,9 @@ namespace Isis {
 
   BundleStatistics::~BundleStatistics() {
     
+    delete m_correlationMatrix;
+    m_correlationMatrix = NULL;
+
     delete m_cumPro;
     m_cumPro = NULL;
 
@@ -194,6 +198,81 @@ namespace Isis {
     }
 
   }
+
+  
+
+  BundleStatistics &BundleStatistics::operator=(const BundleStatistics &other) {
+
+    if (&other != this) {
+      delete m_correlationMatrix;
+//      m_correlationMatrix = new CorrelationMatrix(*other.m_correlationMatrix);
+
+      m_numberFixedPoints = other.m_numberFixedPoints;
+      m_numberIgnoredPoints = other.m_numberIgnoredPoints;
+      m_numberHeldImages = other.m_numberHeldImages;
+      m_rms_rx = other.m_rms_rx;
+      m_rms_ry = other.m_rms_ry;
+      m_rms_rxy = other.m_rms_rxy;
+      m_rejectionLimit = other.m_rejectionLimit;
+      m_numberRejectedObservations = other.m_numberRejectedObservations;
+      m_numberObservations = other.m_numberObservations;
+      m_numberImageParameters = other.m_numberImageParameters;
+      m_numberConstrainedPointParameters = other.m_numberConstrainedPointParameters;
+      m_numberConstrainedImageParameters = other.m_numberConstrainedImageParameters;
+      m_numberUnknownParameters = other.m_numberUnknownParameters;
+      m_degreesOfFreedom = other.m_degreesOfFreedom;
+      m_sigma0 = other.m_sigma0;
+      m_elapsedTime = other.m_elapsedTime;
+      m_elapsedTimeErrorProp = other.m_elapsedTimeErrorProp;
+      m_converged = other.m_converged;
+      m_rmsImageSampleResiduals = other.m_rmsImageSampleResiduals;
+      m_rmsImageLineResiduals = other.m_rmsImageLineResiduals;
+      m_rmsImageResiduals = other.m_rmsImageResiduals;
+      m_rmsImageXSigmas = other.m_rmsImageXSigmas;
+      m_rmsImageYSigmas = other.m_rmsImageYSigmas;
+      m_rmsImageZSigmas = other.m_rmsImageZSigmas;
+      m_rmsImageRASigmas = other.m_rmsImageRASigmas;
+      m_rmsImageDECSigmas = other.m_rmsImageDECSigmas;
+      m_rmsImageTWISTSigmas = other.m_rmsImageTWISTSigmas;
+      m_minSigmaLatitude = other.m_minSigmaLatitude;
+      m_minSigmaLatitudePointId = other.m_minSigmaLatitudePointId;
+      m_maxSigmaLatitude = other.m_maxSigmaLatitude;
+      m_maxSigmaLatitudePointId = other.m_maxSigmaLatitudePointId;
+      m_minSigmaLongitude = other.m_minSigmaLongitude;
+      m_minSigmaLongitudePointId = other.m_minSigmaLongitudePointId;
+      m_maxSigmaLongitude = other.m_maxSigmaLongitude;
+      m_maxSigmaLongitudePointId = other.m_maxSigmaLongitudePointId;
+      m_minSigmaRadius = other.m_minSigmaRadius;
+      m_minSigmaRadiusPointId = other.m_minSigmaRadiusPointId;
+      m_maxSigmaRadius = other.m_maxSigmaRadius;
+      m_maxSigmaRadiusPointId = other.m_maxSigmaRadiusPointId;
+      m_rmsSigmaLat = other.m_rmsSigmaLat;
+      m_rmsSigmaLon = other.m_rmsSigmaLon;
+      m_rmsSigmaRad = other.m_rmsSigmaRad;
+      m_numberMaximumLikelihoodModels = other.m_numberMaximumLikelihoodModels;
+
+      for (int i = 0; i < m_numberMaximumLikelihoodModels; i++){
+
+        delete m_wFunc[i];
+        m_wFunc[i] = new MaximumLikelihoodWFunctions(*other.m_wFunc[i]);
+
+        m_maximumLikelihoodQuan[i] = other.m_maximumLikelihoodQuan[i];
+      }
+
+      m_maximumLikelihoodIndex = other.m_maximumLikelihoodIndex;
+
+      delete m_cumPro;
+      m_cumPro = new StatCumProbDistDynCalc(*other.m_cumPro);
+
+      delete m_cumProRes;
+      m_cumProRes = new StatCumProbDistDynCalc(*other.m_cumProRes);
+
+      m_maximumLikelihoodMedianR2Residuals = other.m_maximumLikelihoodMedianR2Residuals;
+    }
+    return *this;
+  }
+
+
 
 
   /**
@@ -484,6 +563,35 @@ namespace Isis {
     m_maximumLikelihoodIndex++;
   }
 
+
+
+  void BundleStatistics::incrementFixedPoints() {
+    m_numberFixedPoints++;
+  }
+
+
+
+  int BundleStatistics::numberFixedPoints() {
+    return m_numberFixedPoints;
+  }
+
+
+
+  void BundleStatistics::incrementHeldImages() {
+    m_numberHeldImages++;
+  }
+
+
+
+  int BundleStatistics::numberHeldImages() {
+    return m_numberHeldImages;
+  }
+
+
+
+  void BundleStatistics::incrementIgnoredPoints() {
+    m_numberIgnoredPoints++;
+  }
 
 
   void BundleStatistics::setRmsXYResiduals(double rx, double ry, double rxy) {
@@ -861,9 +969,232 @@ namespace Isis {
     return m_maximumLikelihoodQuan[modelIndex];
   }
 
+  /**
+   * Writes matrix to binary disk file pointed to by QDataStream stream
+   */
+#if 0
+  QDataStream&operator<<(QDataStream &stream, const BundleStatistics &bundleStatistics) {
+
+    //??? add operator to CorrelationMatrix ??? stream << *m_correlationMatrix;
+    stream << (qint32)m_numberFixedPoints;
+    stream << (qint32)m_numberIgnoredPoints;
+    stream << (qint32)m_numberHeldImages;
+    stream << m_rms_rx;
+    stream << m_rms_ry;
+    stream << m_rms_rxy;
+    stream << m_rejectionLimit;
+    stream << (qint32)m_numberRejectedObservations;
+    stream << (qint32)m_numberObservations;
+    stream << (qint32)m_numberImageParameters;
+    stream << (qint32)m_numberConstrainedPointParameters;
+    stream << (qint32)m_numberConstrainedImageParameters;
+    stream << (qint32)m_numberUnknownParameters;
+    stream << (qint32)m_degreesOfFreedom;
+    stream << m_sigma0;
+    stream << m_elapsedTime;
+    stream << m_elapsedTimeErrorProp;
+    stream << m_converged;
+    //??? stream << QVector< Statistics >       m_rmsImageSampleResiduals;
+    //??? stream << QVector< Statistics >       m_rmsImageLineResiduals;
+    //??? stream << QVector< Statistics >       m_rmsImageResiduals;
+    //??? stream << QVector< Statistics >       m_rmsImageXSigmas;     // unset and unused ???
+    //??? stream << QVector< Statistics >       m_rmsImageYSigmas;     // unset and unused ???
+    //??? stream << QVector< Statistics >       m_rmsImageZSigmas;     // unset and unused ???
+    //??? stream << QVector< Statistics >       m_rmsImageRASigmas;    // unset and unused ???
+    //??? stream << QVector< Statistics >       m_rmsImageDECSigmas;   // unset and unused ???
+    //??? stream << QVector< Statistics >       m_rmsImageTWISTSigmas; // unset and unused ???
+    stream << m_minSigmaLatitude;
+    stream << m_minSigmaLatitudePointId;
+    stream << m_maxSigmaLatitude;
+    stream << m_maxSigmaLatitudePointId;
+    stream << m_minSigmaLongitude;
+    stream << m_minSigmaLongitudePointId;
+    stream << m_maxSigmaLongitude;
+    stream << m_maxSigmaLongitudePointId;
+    stream << m_minSigmaRadius;
+    stream << m_minSigmaRadiusPointId;
+    stream << m_maxSigmaRadius;
+    stream << m_maxSigmaRadiusPointId;
+    stream << m_rmsSigmaLat;
+    stream << m_rmsSigmaLon;
+    stream << m_rmsSigmaRad;
+    stream << (qint32)m_numberMaximumLikelihoodModels;
+    // ??? MaximumLikelihoodWFunctions *m_wFunc[3];
+    stream << m_maximumLikelihoodQuan[3];
+    // ??? stream << (qint32)m_maximumLikelihoodIndex;
+    // ??? StatCumProbDistDynCalc      *m_cumPro;
+    // ??? StatCumProbDistDynCalc      *m_cumProRes;
+    stream << m_maximumLikelihoodMedianR2Residuals;
+
+    return stream;
+  }
+#endif
 
 
-  // ??? QList< QPair< MaximumLikelihoodWFunctions, double > > 
+  /**
+   * Reads matrix from binary disk file pointed to by QDataStream stream
+   */
+  QDataStream&operator>>(QDataStream &stream, BundleStatistics &bundleStatistics) {
+    // CorrelationMatrix *m_correlationMatrix;
+    qint32 numberFixedPoints;
+    qint32 numberIgnoredPoints;
+    qint32 numberHeldImages;
+    double rms_rx;
+    double rms_ry;
+    double rms_rxy;
+    double rejectionLimit;
+    qint32 numberRejectedObservations;
+    qint32 numberObservations;
+    qint32 numberImageParameters;
+    qint32 numberConstrainedPointParameters;
+    qint32 numberConstrainedImageParameters;
+    qint32 numberUnknownParameters;
+    qint32 degreesOfFreedom;
+    double sigma0;
+    double elapsedTime;
+    double elapsedTimeErrorProp;
+    bool converged;
+    // QVector< Statistics > rmsImageSampleResiduals;
+    // QVector< Statistics > rmsImageLineResiduals;
+    // QVector< Statistics > rmsImageResiduals;
+    // QVector< Statistics > rmsImageXSigmas;
+    // QVector< Statistics > rmsImageYSigmas;
+    // QVector< Statistics > rmsImageZSigmas;
+    // QVector< Statistics > rmsImageRASigmas;
+    // QVector< Statistics > rmsImageDECSigmas;
+    // QVector< Statistics > rmsImageTWISTSigmas;
+    double  minSigmaLatitude;
+    QString minSigmaLatitudePointId;
+    double  maxSigmaLatitude;
+    QString maxSigmaLatitudePointId;
+    double  minSigmaLongitude;
+    QString minSigmaLongitudePointId;
+    double  maxSigmaLongitude;
+    QString maxSigmaLongitudePointId;
+    double  minSigmaRadius;
+    QString minSigmaRadiusPointId;
+    double  maxSigmaRadius;
+    QString maxSigmaRadiusPointId;
+    double rmsSigmaLat;
+    double rmsSigmaLon;
+    double rmsSigmaRad;
+    qint32 numberMaximumLikelihoodModels;
+    // MaximumLikelihoodWFunctions *wFunc[3]; 
+    // double maximumLikelihoodQuan[3];
+    qint32 maximumLikelihoodIndex;
+    // StatCumProbDistDynCalc *cumPro;
+    // StatCumProbDistDynCalc *cumProRes;
+    double maximumLikelihoodMedianR2Residuals;
+
+    stream >> numberFixedPoints >> numberIgnoredPoints >> numberHeldImages
+           >> rms_rx >> rms_ry >> rms_rxy >> rejectionLimit >> numberRejectedObservations
+           >> numberObservations >> numberImageParameters
+           >> numberConstrainedPointParameters >> numberConstrainedImageParameters
+           >> numberUnknownParameters >> degreesOfFreedom >> sigma0
+           >> elapsedTime >> elapsedTimeErrorProp >> converged
+           >> minSigmaLatitude >> minSigmaLatitudePointId
+           >> maxSigmaLatitude >> maxSigmaLatitudePointId
+           >> minSigmaLongitude >> minSigmaLongitudePointId
+           >> maxSigmaLongitude >> maxSigmaLongitudePointId
+           >> minSigmaRadius >> minSigmaRadiusPointId
+           >> maxSigmaRadius >> maxSigmaRadiusPointId
+           >> rmsSigmaLat >> rmsSigmaLon >> rmsSigmaRad
+           >> numberMaximumLikelihoodModels >> maximumLikelihoodIndex
+           >> maximumLikelihoodMedianR2Residuals;
+    return stream;
+  }
+
+
+
+  /**
+   * Writes matrix to QDebug stream (dbg)
+   */
+  QDebug operator<<(QDebug dbg, const BundleStatistics &bundleStatistics) {
+      dbg << bundleStatistics;
+
+    return dbg;
+  }
+
+
+  PvlGroup BundleStatistics::pvlGroup(QString name) const {
+
+    PvlGroup group(name);
+
+    group += PvlKeyword("CorrelationMatrix", toString(bool(m_correlationMatrix != NULL)));
+    group += PvlKeyword("NumberFixedPoints", toString(m_numberFixedPoints));
+    group += PvlKeyword("NumberIgnoredPoints", toString(m_numberIgnoredPoints));
+    group += PvlKeyword("NumberHeldImages", toString(m_numberHeldImages));
+    group += PvlKeyword("RMSResidualX", toString(m_rms_rx));
+    group += PvlKeyword("RMSResidualY", toString(m_rms_ry));
+    group += PvlKeyword("RMSResidualXY", toString(m_rms_rxy));
+    group += PvlKeyword("RejectionLimit", toString(m_rejectionLimit));
+    group += PvlKeyword("NumberRejectedObservations", toString(m_numberRejectedObservations));
+    group += PvlKeyword("NumberObservations", toString(m_numberObservations));
+    group += PvlKeyword("NumberImageParameters", toString(m_numberImageParameters));
+    group += PvlKeyword("NumberConstrainedPointParameters", toString(m_numberConstrainedPointParameters));
+    group += PvlKeyword("NumberConstrainedImageParameters", toString(m_numberConstrainedImageParameters));
+    group += PvlKeyword("NumberUnknownParameters", toString(m_numberUnknownParameters));
+    group += PvlKeyword("DegreesOfFreedom", toString(m_degreesOfFreedom));
+    group += PvlKeyword("Sigma0", toString(m_sigma0));
+    group += PvlKeyword("ElapsedTime", toString(m_elapsedTime));
+    group += PvlKeyword("ElapsedTimeErrorProp", toString(m_elapsedTimeErrorProp));
+    group += PvlKeyword("Converged", toString(m_converged));
+    // for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
+    //   group += PvlKeyword("// QVector< Statistics > rmsImageSampleResiduals", toString(m_));
+    // }
+    // group += PvlKeyword("// QVector< Statistics > rmsImageLineResiduals", toString(m_));
+    // group += PvlKeyword("// QVector< Statistics > rmsImageResiduals", toString(m_));
+    // group += PvlKeyword("// QVector< Statistics > rmsImageXSigmas", toString(m_));
+    // group += PvlKeyword("// QVector< Statistics > rmsImageYSigmas", toString(m_));
+    // group += PvlKeyword("// QVector< Statistics > rmsImageZSigmas", toString(m_));
+    // group += PvlKeyword("// QVector< Statistics > rmsImageRASigmas", toString(m_));
+    // group += PvlKeyword("// QVector< Statistics > rmsImageDECSigmas", toString(m_));
+    // group += PvlKeyword("// QVector< Statistics > rmsImageTWISTSigmas", toString(m_));
+    group += PvlKeyword("MinSigmaLatitude", toString(m_minSigmaLatitude));
+    group += PvlKeyword("MinSigmaLatitudePointId", m_minSigmaLatitudePointId);
+    group += PvlKeyword("MaxSigmaLatitude", toString(m_maxSigmaLatitude));
+    group += PvlKeyword("MaxSigmaLatitudePointId", m_maxSigmaLatitudePointId);
+    group += PvlKeyword("MinSigmaLongitude", toString(m_minSigmaLongitude));
+    group += PvlKeyword("MinSigmaLongitudePointId", m_minSigmaLongitudePointId);
+    group += PvlKeyword("MaxSigmaLongitude", toString(m_maxSigmaLongitude));
+    group += PvlKeyword("MaxSigmaLongitudePointId", m_maxSigmaLongitudePointId);
+    group += PvlKeyword("MinSigmaRadius", toString(m_minSigmaRadius));
+    group += PvlKeyword("MinSigmaRadiusPointId", m_minSigmaRadiusPointId);
+    group += PvlKeyword("MaxSigmaRadius", toString(m_maxSigmaRadius));
+    group += PvlKeyword("MaxSigmaRadiusPointId", m_maxSigmaRadiusPointId);
+    group += PvlKeyword("RmsSigmaLat", toString(m_rmsSigmaLat));
+    group += PvlKeyword("RmsSigmaLon", toString(m_rmsSigmaLon));
+    group += PvlKeyword("RmsSigmaRad", toString(m_rmsSigmaRad));
+    group += PvlKeyword("NumberMaximumLikelihoodModels", toString(m_numberMaximumLikelihoodModels));
+    if (m_numberMaximumLikelihoodModels > 0) {
+
+//      char *modelName = NULL;
+//      m_wFunc[0]->maximumLikelihoodModel(modelName);
+//      PvlKeyword models("MaximumLikelihoodModels", toString(modelName));
+
+      PvlKeyword models("MaximumLikelihoodModels",
+                        MaximumLikelihoodWFunctions::modelToString(m_wFunc[0]->model()));
+      
+      PvlKeyword quantiles("MaximumLikelihoodQuantiles", toString(m_maximumLikelihoodQuan[0]));
+
+      for (int i = 1; i < m_numberMaximumLikelihoodModels; i++) {
+//        modelName = NULL;
+//        m_wFunc[i]->maximumLikelihoodModel(modelName);
+//        models.addValue(toString(modelName));
+        models.addValue(MaximumLikelihoodWFunctions::modelToString(m_wFunc[i]->model()));
+        quantiles.addValue(toString(m_maximumLikelihoodQuan[i]));
+      }
+      group += models;
+      group += quantiles;
+      group += PvlKeyword("MaximumLikelihoodMedianR2Residuals", 
+                          toString(m_maximumLikelihoodMedianR2Residuals));
+    }
+
+    return group;
+  }
+
+
+  // ??? QList< QPair< MaximumLikelihoodWFunctions, double > >
   // ???     BundleStatistics::maximumLikelihoodModels() const {
   // ??? }
 

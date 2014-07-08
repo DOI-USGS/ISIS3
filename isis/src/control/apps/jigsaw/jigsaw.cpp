@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "BundleAdjust.h"
+#include "BundleResults.h"
 #include "BundleSettings.h"
 #include "CubeAttribute.h"
 #include "IException.h"
@@ -18,6 +19,8 @@ using namespace Isis;
 BundleSettings bundleSettings();
 
 void IsisMain() {
+
+//qDebug() << "jigsaw" << 1;
   // Get the control network and image list
   UserInterface &ui = Application::GetUserInterface();
   QString cnetFile = ui.GetFileName("CNET");
@@ -25,6 +28,7 @@ void IsisMain() {
   BundleSettings settings = bundleSettings();
   BundleAdjust *bundleAdjustment = NULL;
   
+//qDebug() << "jigsaw" << 2;
   // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
   if (ui.WasEntered("HELDLIST")) {
     QString heldList = ui.GetFileName("HELDLIST");
@@ -33,7 +37,7 @@ void IsisMain() {
   else {
     bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
   }
-  
+//qDebug() << "jigsaw" << 3;
   //build lists of maximum likelihood estimation model strings and quantiles
   // change params needed QList<QString> maxLikeModels;
   // change params needed QList<double> maxQuan;
@@ -66,6 +70,7 @@ void IsisMain() {
   // Bundle adjust the network
   try {
 
+//qDebug() << "jigsaw" << 4;
     if (ui.GetString("METHOD") == "OLDSPARSE") {
       // the Solve method below is the old, LU Sparse routine, not explicitly used
       // in Jigsaw now, but retained indefinitely as a additional approach to
@@ -74,11 +79,13 @@ void IsisMain() {
     }
     else {
       bundleAdjustment->solveCholesky();
+      //bundleAdjustment->solveCholeskyBR();
     }
     
     bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
     PvlGroup gp("JigsawResults");
-    
+
+//qDebug() << "jigsaw" << 5;
     // Update the cube pointing if requested but ONLY if bundle has converged
     if (ui.GetBoolean("UPDATE") ) {
       if ( !bundleAdjustment->isConverged() )
@@ -120,6 +127,8 @@ void IsisMain() {
     else {
       gp += PvlKeyword("Status", "Camera pointing NOT updated");
     }
+
+//qDebug() << "jigsaw" << 6;
     Application::Log(gp);
   }
   catch(IException &e) {

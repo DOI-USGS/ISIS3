@@ -56,6 +56,7 @@ template< typename A, typename B > class QMap;
 
 namespace Isis {
   class BasisFunction;
+  class BundleResults;
   class LeastSquares;
   class StatCumProbDistDynCalc;
 
@@ -203,7 +204,8 @@ namespace Isis {
       ~BundleAdjust();
     
       double           solve();
-      bool             solveCholesky();
+      BundleResults    solveCholeskyBR();
+bool    solveCholesky();
 
       // accessors
       ControlNet       *controlNet() { return m_pCnet; }
@@ -293,6 +295,7 @@ namespace Isis {
       bool outputImagesCSV();
       bool outputResiduals();
       bool wrapUp();
+      BundleResults bundleResults();
 #if 0
       QString formatPolynomialOutputString(bool paddedTerms,
                                            int numCoefficients,
@@ -456,11 +459,10 @@ namespace Isis {
 
       //!< apriori sigmas from user interface
       //!< for points, these override values control-net except
-
       //!< for "held" & "fixed" points
-      double m_dGlobalLatitudeAprioriSigma;  //!< latitude apriori sigma
-      double m_dGlobalLongitudeAprioriSigma; //!< longitude apriori sigma
-      double m_dGlobalRadiusAprioriSigma;    //!< radius apriori sigma
+// moved to bundlesettings      double m_dGlobalLatitudeAprioriSigma;  //!< latitude apriori sigma
+// moved to bundlesettings      double m_dGlobalLongitudeAprioriSigma; //!< longitude apriori sigma
+// moved to bundlesettings      double m_dGlobalRadiusAprioriSigma;    //!< radius apriori sigma
 
       std::vector< double > m_dGlobalSpacecraftPositionAprioriSigma; //!< camera position apriori sigmas: size is # camera position coefficients solved
 //      double m_dGlobalSpacecraftPositionAprioriSigma;        //!< spacecraft coordinates apriori sigmas
@@ -509,9 +511,9 @@ namespace Isis {
       int m_nRank;
 
 
-      boost::numeric::ublas::symmetric_matrix< double,
-      boost::numeric::ublas::upper, boost::numeric::ublas::column_major >
-      m_Normals; //!< reduced normal equations matrix
+      boost::numeric::ublas::symmetric_matrix< double, 
+                                               boost::numeric::ublas::upper, 
+                                               boost::numeric::ublas::column_major > m_Normals; //!< reduced normal equations matrix
       boost::numeric::ublas::vector< double > m_nj;
 
       //!< array of Qs   (see Brown, 1976)

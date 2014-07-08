@@ -24,6 +24,7 @@
 
 #include <QList>
 #include <QPair>
+#include <QString>
 
 #include "MaximumLikelihoodWFunctions.h"
 
@@ -48,6 +49,7 @@ namespace Isis {
       BundleSettings();
       BundleSettings(const BundleSettings &other);
       ~BundleSettings();
+      BundleSettings &operator=(const BundleSettings &other);
 
       void setValidateNetwork(bool validate);
       bool validateNetwork() const;
@@ -197,9 +199,6 @@ namespace Isis {
 //      void setGlobalInstrumentPointingAngularAccelerationAprioriSigma(double sigma);
 
       // Maximum Likelihood Estimation Options
-      /**
-       * This enum defines the options for maximum likelihood estimation. 
-       */
       enum MaximumLikelihoodModel {
         NoMaximumLikelihoodEstimator, /**< Do not use a maximum likelihood model.*/
         Huber,                        /**< Use a Huber maximum likelihood model. This model
@@ -234,46 +233,46 @@ namespace Isis {
       bool createCSVPointsFile() const;
       bool createResidualsFile() const;
 
-      PvlGroup pvlGroup() const;
+      PvlGroup pvlGroup(QString name = "BundleSettings") const;
 
     private:
       bool m_validateNetwork;
+      SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
       bool m_solveObservationMode; //!< for observation mode (explain this somewhere)
       bool m_solveRadius; //!< to solve for point radii
       bool m_updateCubeLabel; //!< update cubes (only here for output into bundleout.txt)
       bool m_errorPropagation; //!< to perform error propagation
       bool m_outlierRejection; //!< to perform automatic outlier detection/rejection
       double m_outlierRejectionMultiplier; //!< outlier rejection multiplier
-      SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
+      // Parameter Uncertainties (Weighting)
+      double m_globalLatitudeAprioriSigma;
+      double m_globalLongitudeAprioriSigma;
+      double m_globalRadiusAprioriSigma;
 
       // Spacecraft Position Options
       InstrumentPositionSolveOption m_instrumentPositionSolveOption; //!< spacecraft position solve type (define)
-      bool m_solvePositionOverHermiteSpline; //!< to fit polynomial over existing Hermite
       int m_spkDegree; //!< spk degree (define)
       int m_spkSolveDegree; //!< solve spk degree (define)
+      bool m_solvePositionOverHermiteSpline; //!< to fit polynomial over existing Hermite
+      double m_globalInstrumentPositionAprioriSigma;
+      double m_globalInstrumentVelocityAprioriSigma;
+      double m_globalInstrumentAccelerationAprioriSigma;
 
       // Camera Pointing Options
       InstrumentPointingSolveOption m_instrumentPointingSolveOption;  //!< cmatrix solve type (define)
       bool m_solveTwist; //!< to solve for "twist" angle
-      bool m_fitInstrumentPointingPolynomialOverExisting; //!< to fit polynomial over existing pointing
       int m_ckDegree;  //!< ck degree (define)
       int m_ckSolveDegree; //!< solve cad degree (define)
+      bool m_fitInstrumentPointingPolynomialOverExisting; //!< to fit polynomial over existing pointing
+      double m_globalInstrumentPointingAnglesAprioriSigma;
+      double m_globalInstrumentPointingVelocityAprioriSigma;
+      double m_globalInstrumentPointingAccelerationAprioriSigma;
 
       // Convergence Criteria
       ConvergenceCriteria m_convergenceCriteria;
       double m_convergenceCriteriaThreshold; //!< bundle convergence threshold
       int m_convergenceCriteriaMaximumIterations; //!< maximum iterations
 
-      // Parameter Uncertainties (Weighting)
-      double m_globalLatitudeAprioriSigma;
-      double m_globalLongitudeAprioriSigma;
-      double m_globalRadiusAprioriSigma;
-      double m_globalInstrumentPositionAprioriSigma;
-      double m_globalInstrumentVelocityAprioriSigma;
-      double m_globalInstrumentAccelerationAprioriSigma;
-      double m_globalInstrumentPointingAnglesAprioriSigma;
-      double m_globalInstrumentPointingVelocityAprioriSigma;
-      double m_globalInstrumentPointingAccelerationAprioriSigma;
 
       // Maximum Likelihood Estimation Options
       // model and maxModelCQuantile for each of the three maximum likelihood estimations.
@@ -292,3 +291,17 @@ namespace Isis {
  };
 };
 #endif
+
+
+#if 0 
+moved from bundleadjust - use this documentation
+
+//!< apriori sigmas from user interface
+//!< for points, these override values control-net except
+//!< for "held" & "fixed" points
+double m_dGlobalLatitudeAprioriSigma;  //!< latitude apriori sigma
+double m_dGlobalLongitudeAprioriSigma; //!< longitude apriori sigma
+double m_dGlobalRadiusAprioriSigma;    //!< radius apriori sigma
+std::vector< double > m_dGlobalSpacecraftPositionAprioriSigma; //!< camera position apriori sigmas: size is # camera position coefficients solved
+std::vector< double > m_dGlobalCameraAnglesAprioriSigma; //!< camera angles apriori sigmas: size is # camera angle coefficients solved
+#endif 
