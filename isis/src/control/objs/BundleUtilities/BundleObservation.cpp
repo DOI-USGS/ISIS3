@@ -163,8 +163,8 @@ namespace Isis {
     if (m_solveSettings->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
 
-      double positionBaseTime;
-      double positiontimeScale;
+      double positionBaseTime = 0.0;
+      double positiontimeScale = 0.0;
       std::vector<double> posPoly1, posPoly2, posPoly3;
 
       for (int i = 0; i < size(); i++) {
@@ -199,8 +199,8 @@ namespace Isis {
     if (m_solveSettings->instrumentPointingSolveOption() !=
         BundleObservationSolveSettings::NoPointingFactors) {
 
-      double rotationBaseTime;
-      double rotationtimeScale;
+      double rotationBaseTime = 0.0;
+      double rotationtimeScale = 0.0;
       std::vector<double> anglePoly1, anglePoly2, anglePoly3;
 
       for (int i = 0; i < size(); i++) {

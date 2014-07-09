@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'BundleImage.h'
 **
-** Created: Wed Jul 9 16:08:36 2014
+** Created: Wed Jul 9 16:46:07 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
