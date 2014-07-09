@@ -23,10 +23,12 @@
  */
 
 #include <QList>
+#include <QVector>
 #include <QPair>
 #include <QString>
 
-#include "MaximumLikelihoodWFunctions.h"
+#include "BundleObservationSolveSettings.h"
+#include "MaximumLikelihoodWFunctions.h" // why not forward declare???
 
 namespace Isis {
   class MaximumLikelihoodWFunctions;
@@ -49,6 +51,8 @@ namespace Isis {
       BundleSettings();
       BundleSettings(const BundleSettings &other);
       ~BundleSettings();
+
+      // copy constructor
       BundleSettings &operator=(const BundleSettings &other);
 
       void setValidateNetwork(bool validate);
@@ -56,18 +60,16 @@ namespace Isis {
 
       // Solve Options
       /**
-       * This enum defines the types matrix decompisition methods available for 
-       * solving the bundle.  Note tha QRD, SVD, and SPARSE LU are no longer 
-       * used, but may be reimplemented. 
+       * This enum defines the types of solve methods.
        */
       enum SolveMethod {
         Sparse,   //!< Cholesky model sparse normal equations matrix. (Uses the cholmod library).
         SpecialK, //!< Dense normal equations matrix.
-        OldSparse //!< Sparse Matrix Solver. (Not a Cholesky model).
       };
       // converter
       static SolveMethod stringToSolveMethod(QString solveMethod);
       static QString solveMethodToString(SolveMethod solveMethod);
+
       // mutators
       void setSolveOptions(SolveMethod method, 
                            bool solveObservationMode = false,
@@ -77,19 +79,14 @@ namespace Isis {
                            double globalLatitudeAprioriSigma = -1.0, 
                            double globalLongitudeAprioriSigma = -1.0, 
                            double globalRadiusAprioriSigma = -1.0);
-//      void setSolveOptions(SolveMethod method, 
-//                           bool updateCubeLabel = false,
-//                           bool errorPropagation = false, 
-//                           bool solveRadius = false, 
-//                           double globalLatitudeAprioriSigma = -1.0, 
-//                           double globalLongitudeAprioriSigma = -1.0, 
-//                           double globalRadiusAprioriSigma = -1.0);
       void setSolveMethod(SolveMethod method);
       void setSolveObservationMode(bool observationMode);
       void setSolveRadius(bool radius);
       void setUpdateCubeLabel(bool updateCubeLabel);
       void setErrorPropagation(bool errorPropagation);
       void setOutlierRejection(bool outlierRejection, double multiplier);
+      void setObservationSolveOptions(QVector<BundleObservationSolveSettings*>& observationSolveSettings);
+
       // accessors
       SolveMethod solveMethod() const;
       bool solveObservationMode() const;
@@ -102,71 +99,11 @@ namespace Isis {
       double globalLongitudeAprioriSigma() const;
       double globalRadiusAprioriSigma() const;
 
-      // Spacecraft Position Options
-      /**
-       * This enum defines the options for solving for instrument position information (SPK).
-       */
-      enum InstrumentPositionSolveOption {
-        NoPositionFactors,            /**< Solve for none of the position factors.*/
-        PositionOnly,                 /**< Solve for instrument positions only.*/
-        PositionVelocity,             /**< Solve for instrument positions and velocities.*/
-        PositionVelocityAcceleration, /**< Solve for instrument positions, velocities, and  
-                                           accerlations.*/
-        AllPositionCoefficients       /**< Solve for all coefficients in the polynomials fit to
-                                           the instrument positions.*/
-      };
-      static InstrumentPositionSolveOption stringToInstrumentPositionSolveOption(QString option);
-      static QString instrumentPositionSolveOptionToString(InstrumentPositionSolveOption option);
-//      void setInstrumentPositionSolveOptions(InstrumentPositionSolveOption option,
-//                                           bool solveOverHermiteSpline = false,
-//                                           int spkDegree = 2, int spkSolveDegree = 2);
-      void setInstrumentPositionSolveOptions(InstrumentPositionSolveOption option,
-                           bool solveOverHermiteSpline = false,
-                           int spkDegree = 2, int spkSolveDegree = 2,
-                           double globalInstrumentPositionAprioriSigma = -1.0,  
-                           double globalInstrumentVelocityAprioriSigma = -1.0,  
-                           double globalInstrumentAccelerationAprioriSigma = -1.0);
-      InstrumentPositionSolveOption instrumentPositionSolveOption() const;
-      bool solveInstrumentPositionOverHermiteSpline() const;
-      int spkDegree() const;
-      int spkSolveDegree() const;
-      double globalInstrumentPositionAprioriSigma() const;
-      double globalInstrumentVelocityAprioriSigma() const;
-      double globalInstrumentAccelerationAprioriSigma() const;
+      int numberSolveSettings() { return m_observationSolveSettings.size(); }
+      BundleObservationSolveSettings* observationSolveSettings(QString instrumentId);
+      BundleObservationSolveSettings* observationSolveSettings(int n)
+      { return m_observationSolveSettings[n]; }
 
-      // Camera Pointing Options
-      /**
-       * This enum defines the options for solving for instrument pointing information (CK). 
-       */
-      enum InstrumentPointingSolveOption {
-        NoPointingFactors,          /**< Solve for none of the pointing factors.*/
-        AnglesOnly,                 /**< Solve for pointing angles: right ascension, declination
-                                         and, optionally, twist.*/
-        AnglesVelocity,             //!< Solve for pointing angles and their angular velocities.
-        AnglesVelocityAcceleration, /**< Solve for pointing angles, their velocities and their 
-                                         accelerations.*/
-        AllPointingCoefficients     /**< Solve for all coefficients in the polynomials fit to the
-                                         pointing angles.*/
-      };
-      static InstrumentPointingSolveOption stringToInstrumentPointingSolveOption(QString option);
-      static QString instrumentPointingSolveOptionToString(InstrumentPointingSolveOption option);
-//      void setInstrumentPointingSolveOptions(InstrumentPointingSolveOption option, 
-//                                              bool solveTwist,  bool fitOverExisting = false,
-//                                              int ckDegree = 2, int ckSolveDegree = 2);
-      void setInstrumentPointingSolveOptions(InstrumentPointingSolveOption option,
-                           bool solveTwist,  bool fitOverExisting = false,
-                           int ckDegree = 2, int ckSolveDegree = 2,
-                           double globalInstrumentPointingAnglesAprioriSigma = -1.0,
-                           double globalInstrumentPointingAngularVelocityAprioriSigma = -1.0,
-                           double globalInstrumentPointingAngularAccelerationAprioriSigma = -1.0);
-      InstrumentPointingSolveOption instrumentPointingSolveOption() const;
-      bool solveTwist() const;
-      bool fitInstrumentPointingPolynomialOverExisting() const;
-      int ckDegree() const;
-      int ckSolveDegree() const;
-      double globalInstrumentPointingAnglesAprioriSigma() const;
-      double globalInstrumentPointingAngularVelocityAprioriSigma() const;
-      double globalInstrumentPointingAngularAccelerationAprioriSigma() const;
 
       // Convergence Criteria
       /**
@@ -191,14 +128,11 @@ namespace Isis {
 //      void setGlobalLatitudeAprioriSigma(double sigma);
 //      void setGlobalLongitudeAprioriSigma(double sigma);
 //      void setGlobalRadiiAprioriSigma(double sigma);
-//      void setGlobalInstrumentPositionAprioriSigma(double sigma);
-//      void setGlobalInstrumentVelocityAprioriSigma(double sigma);
-//      void setGlobalInstrumentAccelerationAprioriSigma(double sigma);
-//      void setGlobalInstrumentPointingAnglesAprioriSigma(double sigma);
-//      void setGlobalInstrumentPointingAngularVelocityAprioriSigma(double sigma);
-//      void setGlobalInstrumentPointingAngularAccelerationAprioriSigma(double sigma);
 
       // Maximum Likelihood Estimation Options
+      /**
+       * This enum defines the options for maximum likelihood estimation. 
+       */
       enum MaximumLikelihoodModel {
         NoMaximumLikelihoodEstimator, /**< Do not use a maximum likelihood model.*/
         Huber,                        /**< Use a Huber maximum likelihood model. This model
@@ -243,36 +177,20 @@ namespace Isis {
       bool m_updateCubeLabel; //!< update cubes (only here for output into bundleout.txt)
       bool m_errorPropagation; //!< to perform error propagation
       bool m_outlierRejection; //!< to perform automatic outlier detection/rejection
-      double m_outlierRejectionMultiplier; //!< outlier rejection multiplier
+      double m_outlierRejectionMultiplier; // multiplier = 1 if rejection = false
+
+      // QVector of observation solve settings
+      QVector<BundleObservationSolveSettings*> m_observationSolveSettings;
+
       // Parameter Uncertainties (Weighting)
       double m_globalLatitudeAprioriSigma;
       double m_globalLongitudeAprioriSigma;
       double m_globalRadiusAprioriSigma;
 
-      // Spacecraft Position Options
-      InstrumentPositionSolveOption m_instrumentPositionSolveOption; //!< spacecraft position solve type (define)
-      int m_spkDegree; //!< spk degree (define)
-      int m_spkSolveDegree; //!< solve spk degree (define)
-      bool m_solvePositionOverHermiteSpline; //!< to fit polynomial over existing Hermite
-      double m_globalInstrumentPositionAprioriSigma;
-      double m_globalInstrumentVelocityAprioriSigma;
-      double m_globalInstrumentAccelerationAprioriSigma;
-
-      // Camera Pointing Options
-      InstrumentPointingSolveOption m_instrumentPointingSolveOption;  //!< cmatrix solve type (define)
-      bool m_solveTwist; //!< to solve for "twist" angle
-      int m_ckDegree;  //!< ck degree (define)
-      int m_ckSolveDegree; //!< solve cad degree (define)
-      bool m_fitInstrumentPointingPolynomialOverExisting; //!< to fit polynomial over existing pointing
-      double m_globalInstrumentPointingAnglesAprioriSigma;
-      double m_globalInstrumentPointingVelocityAprioriSigma;
-      double m_globalInstrumentPointingAccelerationAprioriSigma;
-
       // Convergence Criteria
       ConvergenceCriteria m_convergenceCriteria;
-      double m_convergenceCriteriaThreshold; //!< bundle convergence threshold
-      int m_convergenceCriteriaMaximumIterations; //!< maximum iterations
-
+      double m_convergenceCriteriaThreshold;
+      int m_convergenceCriteriaMaximumIterations;
 
       // Maximum Likelihood Estimation Options
       // model and maxModelCQuantile for each of the three maximum likelihood estimations.
@@ -292,16 +210,3 @@ namespace Isis {
 };
 #endif
 
-
-#if 0 
-moved from bundleadjust - use this documentation
-
-//!< apriori sigmas from user interface
-//!< for points, these override values control-net except
-//!< for "held" & "fixed" points
-double m_dGlobalLatitudeAprioriSigma;  //!< latitude apriori sigma
-double m_dGlobalLongitudeAprioriSigma; //!< longitude apriori sigma
-double m_dGlobalRadiusAprioriSigma;    //!< radius apriori sigma
-std::vector< double > m_dGlobalSpacecraftPositionAprioriSigma; //!< camera position apriori sigmas: size is # camera position coefficients solved
-std::vector< double > m_dGlobalCameraAnglesAprioriSigma; //!< camera angles apriori sigmas: size is # camera angle coefficients solved
-#endif 

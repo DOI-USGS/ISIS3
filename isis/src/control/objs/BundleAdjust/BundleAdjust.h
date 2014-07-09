@@ -36,6 +36,9 @@
 #include <gmm/gmm.h>
 #endif
 
+#include "BundleObservationSolveSettings.h"
+#include "BundleControlPointVector.h"
+#include "BundleObservationVector.h"
 #include "BundleSettings.h"
 #include "BundleStatistics.h"
 #include "Camera.h"
@@ -47,18 +50,13 @@
 #include "Progress.h"
 #include "SerialNumberList.h"
 #include "SparseBlockMatrix.h"
-//#include "SpicePosition.h"
-//#include "SpiceRotation.h"
 #include "Statistics.h"
 
 template< typename T > class QList;
 template< typename A, typename B > class QMap;
 
 namespace Isis {
-  class BasisFunction;
   class BundleResults;
-  class LeastSquares;
-  class StatCumProbDistDynCalc;
 
   /**
    * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
@@ -205,13 +203,13 @@ namespace Isis {
     
       double           solve();
       BundleResults    solveCholeskyBR();
-bool    solveCholesky();
+      bool             solveCholesky();
 
       // accessors
       ControlNet       *controlNet() { return m_pCnet; }
       SerialNumberList *serialNumberList() { return m_pSnList; }
       int              images() const { return m_pSnList->Size(); }
-      int              observations() const;
+//      int              observations() const;
       QString          fileName(int index);
       bool             isHeld(int index);
       Table            cMatrix(int index);
@@ -223,27 +221,16 @@ bool    solveCholesky();
         return m_nIteration;
       }
       //      int HeldPoints() const { return m_nHeldPoints; }
-      int ignoredPoints() const { // move code to cpp ???
-        return m_nIgnoredPoints;
-      }
-      int fixedPoints() const { // move code to cpp ???
-        return m_nFixedPoints;
-      }
+//      int ignoredPoints() const { // move code to cpp ???
+//        return m_nIgnoredPoints;
+//      }
+//      int fixedPoints() const { // move code to cpp ???
+//        return m_nFixedPoints;
+//      }
       bool isConverged();
       QString iterationSummaryGroup() const {
         return m_iterationSummary;
       } // move code to cpp ???
-
-      struct SpacecraftWeights {
-          QString SpacecraftName;
-          QString InstrumentId;
-          std::vector< double > weights;
-      };
-
-
-      int basisColumns();
-      int computeConstrainedParameters();
-      void getSparseParameterCorrections();
 
     private:
 
@@ -255,63 +242,22 @@ bool    solveCholesky();
       // that calls these methods to allow rerun with new params???
       // max likelihood says it may be called multiple times...
       // where does this happen ???
-      void maximumLikelihoodSetUp();
-      void observationModeSetUp();
-      void instrumentPositionSetUp();
-      void instrumentPointingSetUp();
-      void setGlobalAprioriSigmas();
-      void fillPointIndexMap();
-      void computeNumberPartials();
-
-      void computeImageParameterWeights();
-      void setSpaceCraftWeights();
-
-      void addPartials(int nPointIndex);
-      void update(BasisFunction & basis);
-
-      int pointIndex(int i) const;
-      int imageIndex(int i) const;
 
       void applyHeldList();
 
-      // triangulation methods
-      int triangulation(bool bDoApproximation = false);
-      bool approximatePoint_ClosestApproach(const ControlPoint &rpoint, int nIndex);
-      bool triangulatePoint(const ControlPoint &rpoint);
-      bool triangulationPartials();
-
-      bool setParameterWeights();
-      void setPostBundleSigmas();
-
       // output methods
-      void iterationSummary(double avErr, double sigmaXY, double sigmaHat, double sigmaX,
-                            double sigmaY);
-      void specialKIterationSummary();
+      void iterationSummary();
       bool output();
       bool outputHeader(std::ofstream & fp_out);
-      bool outputWithErrorPropagation();
-      bool outputNoErrorPropagation();
+      bool outputText();
       bool outputPointsCSV();
       bool outputImagesCSV();
       bool outputResiduals();
       bool wrapUp();
       BundleResults bundleResults();
-#if 0
-      QString formatPolynomialOutputString(bool paddedTerms,
-                                           int numCoefficients,
-                                           QString coefficientType,
-                                           std::vector< double > coefficientValues,
-                                           std::vector< double > aprioriSigma,
-                                           int imageIndex,
-                                           int startSigmaIndex,
-                                           int startNormalEquationIndex);
-      QString formatPolynomialTermString(bool padded, int coefficientIndex, char strcoeff);
-      double solveMethodSigma(int normalEquationIndex, int sigmaIndex, int imageIndex);
-#endif
+      bool computeBundleStatistics();
 
       void initialize();
-      bool initializePointWeights();
-      void initializePoints();
 
       bool formNormalEquations();
       void applyParameterCorrections();
@@ -321,18 +267,22 @@ bool    solveCholesky();
       // solution, error propagation, and matrix methods for cholmod approach
       bool formNormalEquations_CHOLMOD();
 
-      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double, boost::numeric::ublas::upper > & N22,
+      bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double,
+                                boost::numeric::ublas::upper > & N22,
                                 SparseBlockColumnMatrix & N12,
                                 boost::numeric::ublas::compressed_vector< double > & n1,
                                 boost::numeric::ublas::vector< double > & n2,
                                 boost::numeric::ublas::matrix< double > & coeff_image,
                                 boost::numeric::ublas::matrix< double > & coeff_point3D,
-                                boost::numeric::ublas::vector< double > & coeff_RHS, int nImageIndex);
+                                boost::numeric::ublas::vector< double > & coeff_RHS,
+                                int observationIndex);
 
-      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double, boost::numeric::ublas::upper > & N22,
+      bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double,
+                                boost::numeric::ublas::upper > & N22,
                                 SparseBlockColumnMatrix & N12,
                                 boost::numeric::ublas::vector< double > & n2,
-                                boost::numeric::ublas::vector< double > & nj, int nPointIndex, int i);
+                                boost::numeric::ublas::vector< double > & nj,
+                                BundleControlPoint *point);
 
       bool formNormals3_CHOLMOD(boost::numeric::ublas::compressed_vector< double > & n1,
                                 boost::numeric::ublas::vector< double > & nj);
@@ -354,18 +304,22 @@ bool    solveCholesky();
       // TODO: this may be able to go away if I can verify cholmod behavior for a truly dense matrix
       bool formNormalEquations_SPECIALK();
 
-      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix< double, boost::numeric::ublas::upper > & N22,
+      bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix< double,
+                                 boost::numeric::ublas::upper > & N22,
                                  boost::numeric::ublas::matrix< double > & N12,
                                  boost::numeric::ublas::compressed_vector< double > & n1,
                                  boost::numeric::ublas::vector< double > & n2,
                                  boost::numeric::ublas::matrix< double > & coeff_image,
                                  boost::numeric::ublas::matrix< double > & coeff_point3D,
-                                 boost::numeric::ublas::vector< double > & coeff_RHS, int nImageIndex);
+                                 boost::numeric::ublas::vector< double > & coeff_RHS,
+                                 int nImageIndex);
 
-      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix< double, boost::numeric::ublas::upper > & N22,
+      bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix< double,
+                                 boost::numeric::ublas::upper > & N22,
                                  boost::numeric::ublas::matrix< double > & N12,
                                  boost::numeric::ublas::vector< double > & n2,
-                                 boost::numeric::ublas::vector< double > & nj, int nPointIndex, int i);
+                                 boost::numeric::ublas::vector< double > & nj,
+                                 int nPointIndex, int i);
 
       bool formNormals3_SPECIALK(boost::numeric::ublas::compressed_vector< double > & n1,
                                  boost::numeric::ublas::vector< double > & nj);
@@ -397,10 +351,14 @@ bool    solveCholesky();
                                     boost::numeric::ublas::vector< double > & s,
                                     boost::numeric::ublas::vector< double > & rhs);
 
+//      bool computePartials_DC(boost::numeric::ublas::matrix< double > & coeff_image,
+//                              boost::numeric::ublas::matrix< double > & coeff_point3D,
+//                              boost::numeric::ublas::vector< double > & coeff_RHS,
+//                              const ControlMeasure &measure, const ControlPoint &point);
       bool computePartials_DC(boost::numeric::ublas::matrix< double > & coeff_image,
                               boost::numeric::ublas::matrix< double > & coeff_point3D,
                               boost::numeric::ublas::vector< double > & coeff_RHS,
-                              const ControlMeasure &measure, const ControlPoint &point);
+                              BundleMeasure &measure, BundleControlPoint &point);
 
 //      bool CholeskyUT_NOSQR_BackSub(symmetric_matrix<double,lower>& m, vector<double>& s, vector<double>& rhs);
       double computeResiduals();
@@ -431,85 +389,46 @@ bool    solveCholesky();
       bool cholmod_Inverse();
       bool loadCholmodTriplet();
 
-      // JWB - member data should be reorganized...
-      //       by type possibly? by use probably better???
-      //       !< flags...
+      // JWB - member data should be reorganized... by type possibly? by use
+      //       probably better??? !< flags...
       //       we can probably remove several that are unused ???
-      bool m_bPrintSummary;                  //!< to print summary
-      bool m_bCleanUp;                       //!< for cleanup (i.e. in destructor)
-      bool m_bSimulatedData;                 //!< indicating simulated (i.e. 'perfect' data)
+      bool m_bPrintSummary;                             //!< to print summary
+      bool m_bCleanUp;                                  //!< for cleanup (i.e. in destructor)
       bool m_bLastIteration;
       bool m_bMaxIterationsReached;
 
-      int m_nIteration;                      //!< current iteration
-      int m_nNumImagePartials;               //!< number of image-related partials
-      int m_nNumPointPartials;               //!< number of point-related partials
+      int m_nIteration;                                 //!< current iteration
+      int m_nNumImagePartials;                          //!< number of image-related partials
+      int m_nNumPointPartials;                          //!< number of point-related partials
+      int m_nNumberCamAngleCoefSolved;                  //!< number of camera angle coefficients in solution
+      int m_nNumberCamPosCoefSolved;                    //!< number of camera position coefficients in solution
+      SpicePosition::Source m_nPositionType;            //!< type of SpicePosition interpolation
+      SpiceRotation::Source m_nPointingType;            //!< type of SpiceRotation interpolation
+      std::vector< int > m_nPointIndexMap;              //!< index into normal equations of point parameter positions
+      std::vector< int > m_nImageIndexMap;              //!< index into normal equations of image parameter positions
 
-      int m_nNumberCamAngleCoefSolved;       //!< number of camera angle coefficients in solution
-      int m_nNumberCamPosCoefSolved;         //!< number of camera position coefficients in solution
-      int m_nBasisColumns;                   //!< number of columns (parameters) in normal equations
-      SpicePosition::Source m_nPositionType; //!< type of SpicePosition interpolation
-      SpiceRotation::Source m_nPointingType; //!< type of SpiceRotation interpolation
-      std::vector< int > m_nPointIndexMap;   //!< index into normal equations of point parameter positions
-      std::vector< int > m_nImageIndexMap;   //!< index into normal equations of image parameter positions
-
-      double m_dError;                       //!< error
+      double m_dError;                                  //!< error
 
 
+      BundleObservationVector m_BundleObservations;
+      BundleControlPointVector m_BundleControlPoints;
 
-      //!< apriori sigmas from user interface
-      //!< for points, these override values control-net except
-      //!< for "held" & "fixed" points
-// moved to bundlesettings      double m_dGlobalLatitudeAprioriSigma;  //!< latitude apriori sigma
-// moved to bundlesettings      double m_dGlobalLongitudeAprioriSigma; //!< longitude apriori sigma
-// moved to bundlesettings      double m_dGlobalRadiusAprioriSigma;    //!< radius apriori sigma
+      double m_dRTM;                                    //!< radians to meters conversion factor (body specific)
+      double m_dMTR;                                    //!< meters to radians conversion factor (body specific)
+      Distance m_BodyRadii[3];                          //!< body radii i meters
 
-      std::vector< double > m_dGlobalSpacecraftPositionAprioriSigma; //!< camera position apriori sigmas: size is # camera position coefficients solved
-//      double m_dGlobalSpacecraftPositionAprioriSigma;        //!< spacecraft coordinates apriori sigmas
-//      double m_dGlobalSpacecraftVelocityAprioriSigma;        //!< spacecraft coordinate velocities apriori sigmas
-//      double m_dGlobalSpacecraftAccelerationAprioriSigma;    //!< spacecraft coordinate accelerations apriori sigmas
-
-      std::vector< double > m_dGlobalCameraAnglesAprioriSigma; //!< camera angles apriori sigmas: size is # camera angle coefficients solved
-//      double m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas
-//      double m_dGlobalCameraAngularVelocityAprioriSigma;     //!< camera angular velocities apriori sigmas
-//      double m_dGlobalCameraAngularAccelerationAprioriSigma; //!< camera angular accelerations apriori sigmas
-
-      double m_dGlobalSpacecraftPositionWeight;
-      double m_dGlobalSpacecraftVelocityWeight;
-      double m_dGlobalSpacecraftAccelerationWeight;
-      double m_dGlobalCameraAnglesWeight;
-      double m_dGlobalCameraAngularVelocityWeight;
-      double m_dGlobalCameraAngularAccelerationWeight;
-
-      std::vector< double > m_dImageParameterWeights;
-
-      double m_dRTM;                             //!< radians to meters conversion factor (body specific)
-      double m_dMTR;                             //!< meters to radians conversion factor (body specific)
-      Distance m_BodyRadii[3];                   //!< body radii i meters
-
-      std::vector< double > m_dEpsilons;         //!< vector maintaining total corrections to parameters
-      std::vector< double > m_dParameterWeights; //!< vector of parameter weights
-
-      std::vector< double > m_dxKnowns;
-      std::vector< double > m_dyKnowns;
-
-      QString m_strCnetFileName;                 //!< Control Net file specification
-
-//      QString m_strBinaryFilePath;                  //!< path for binary file for normals inverse matrix
+      QString m_strCnetFileName;                        //!< Control Net file specification
 
       //!< pointers to...
-      LeastSquares *m_pLsq;                      //!< 'LeastSquares' object
-      ControlNet *m_pCnet;                       //!< 'ControlNet' object
-      SerialNumberList *m_pSnList;               //!< list of image serial numbers
-      SerialNumberList *m_pHeldSnList;           //!< list of held image serial numbers
-      ObservationNumberList *m_pObsNumList;      //!< list of observation numbers
+      ControlNet *m_pCnet;                              //!< 'ControlNet' object
+      SerialNumberList *m_pSnList;                      //!< list of image serial numbers
+      SerialNumberList *m_pHeldSnList;                  //!< list of held image serial numbers
 
       // BEYOND THIS PLACE (THERE BE DRAGONS) all refers to the folded bundle solution (referred to
       // as either 'CHOLMOD' (sparse solution) or 'SpecialK' (dense solution - less desirable) in
       // the interim; there is no dependence on the least-squares class.
 
       int m_nRank;
-
 
       boost::numeric::ublas::symmetric_matrix< double, 
                                                boost::numeric::ublas::upper, 
@@ -518,19 +437,8 @@ bool    solveCholesky();
 
       //!< array of Qs   (see Brown, 1976)
       std::vector< boost::numeric::ublas::compressed_matrix< double > > m_Qs_SPECIALK;
-      std::vector< SparseBlockRowMatrix > m_Qs_CHOLMOD;
 
-      //!< array of NICs (see Brown, 1976)
-      std::vector< boost::numeric::ublas::bounded_vector< double, 3 > >  m_NICs;
-
-      boost::numeric::ublas::vector< double > m_imageCorrections;                                  //!< image parameter cumulative correction vector
       boost::numeric::ublas::vector< double > m_imageSolution;                                     //!< image parameter solution vector
-
-      std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_Corrections;         //!< vector of corrections to 3D point parameter
-      std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_AprioriSigmas;       //!< vector of apriori sigmas for 3D point parameters
-      std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > m_Point_Weights;             //!< vector of weights for 3D point parameters
-
-      std::vector< boost::numeric::ublas::vector< double > > m_Image_AdjustedSigmas;                 //!< vector of a posteriori (adjusted image parameter sigmas
 
 
       QString m_iterationSummary;
@@ -544,18 +452,10 @@ bool    solveCholesky();
       SparseBlockMatrix m_SparseNormals;
       cholmod_triplet *m_pTriplet;
 
-
       BundleSettings m_bundleSettings; // pointer ??? then bundle settings method needs copy constructor ???
                                        // or constructors here take a const ref ???
-// unused variable ???      double m_dGlobalSurfaceXAprioriSigma;                  //!< surface point x apriori sigma
-// unused variable ???      double m_dGlobalSurfaceYAprioriSigma;                  //!< surface point y apriori sigma
-// unused variable ???      double m_dGlobalSurfaceZAprioriSigma;                  //!< surface point z apriori sigma
-// unused variable ???      std::vector< SpacecraftWeights >  m_SCWeights;
-
-      int m_nFixedPoints;                    //!< number of 'fixed' (ground) points (define)
-      int m_nIgnoredPoints;                  //!< number of ignored points
-      int m_nHeldImages;                     //!< number of 'held' images (define)
-bool m_bError;
+// unused variable ???      int m_nHeldPoints;                                     //!< number of 'held' points (define)
+// unused variable ???      int m_nHeldObservations;                               //!< number of 'held' observations (define)
 // ??? moved to bundle stats class    //!< vectors for statistical computations...
 Statistics m_Statsx;                       //!<  x errors
 Statistics m_Statsy;                       //!<  y errors
@@ -567,3 +467,4 @@ Statistics m_Statsrxy;                     //!< xy residuals
 }
 
 #endif
+
