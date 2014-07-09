@@ -19,7 +19,7 @@ commands:
 	cnet=$(INPUT)/mocVik.net \
 	onet=$(OUTPUT)/case2OutNet.net \
 	update=yes \
-	method=oldsparse \
+	method=sparse \
 	sigma0=1.e-5  \
 	maxits=10 \
 	spsolve=position > /dev/null;

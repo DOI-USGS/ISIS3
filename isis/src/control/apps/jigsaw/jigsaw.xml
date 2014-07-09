@@ -244,6 +244,70 @@
           *.net
         </filter>
       </parameter>
+
+      <parameter name="USEPVL">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>
+          Enter Camera/Spacecraft parameters using a PVL file
+        </brief>
+        <description>
+          This option indicates that the Camera and Spacecraft parameters are to be
+          obtained from the PVL file specified by SC_PARAMETERS. All of the following
+          parameters must be entered through the PVL file if this option is chosen:
+          CKDEGREE, CKSOLVEDEGREE, CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE,
+          SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE, SPACECRAFT_POSITION_SIGMA,
+          SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA, CAMERA_ANGLES_SIGMA,
+          CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA. An example
+          template is located at $base/templates/jigsaw/SC_Parameters.pvl.
+        </description>
+        <exclusions>
+          <item>CKDEGREE</item>
+          <item>CKSOLVEDEGREE</item>
+          <item>CAMSOLVE</item>
+          <item>TWIST</item>
+          <item>OVEREXISTING</item>
+          <item>SPKDEGREE</item>
+          <item>SPKSOLVEDEGREE</item>
+          <item>SPSOLVE</item>
+          <item>OVERHERMITE</item>
+          <item>SPACECRAFT_POSITION_SIGMA</item>
+          <item>SPACECRAFT_VELOCITY_SIGMA</item>
+          <item>SPACECRAFT_ACCELERATION_SIGMA</item>
+          <item>CAMERA_ANGLES_SIGMA</item>
+          <item>CAMERA_ANGULAR_VELOCITY_SIGMA</item>
+          <item>CAMERA_ANGULAR_ACCELERATION_SIGMA</item>
+        </exclusions>
+        <inclusions>
+          <item>SC_PARAMETERS</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="SC_PARAMETERS">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing Camera/Spacecraft parameters
+        </brief>
+        <description>
+          This file contains the Camera/Spacecraft parameters to use when processing
+          images from different sensors. This file should be in PVL format. It should
+          contain an object called SensorParameters with one group per spacecraft/instrument
+          combination. The SpacecraftName and InstrumentId keywords in the Instrument group
+          of an image file are used to create the name of each group in the PVL file. The
+          group pertaining to each spacecraft/instrument should contain the keywords/value
+          pairs needed to process images taken with that sensor:  CKDEGREE, CKSOLVEDEGREE,
+          CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE, SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE,
+          SPACECRAFT_POSITION_SIGMA, SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA,
+          CAMERA_ANGLES_SIGMA, CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA.
+          If any of these keywords is missing, then their defaults will be used. There is
+          an example template at $base/templates/jigsaw/SensorParameters.pvl that can be
+          used as a guide.
+        </description>
+        <filter>
+          *.pvl
+        </filter>
+      </parameter>
     </group>
 
     <group name="Solve Options">
@@ -324,38 +388,6 @@
             Solve with Cholesky dense decomposition.
             </description>
           </option>
-<!--          <option value="SVD">
-            <brief> Single Value Decomposition</brief>
-            <description>
-                      Solve the matrix using the method of single value
-                      decomposition.  This method is very accurate, but slow.
-            </description>
-          </option>
-          <option value="QRD">
-            <brief> QR Decomposition</brief>
-            <description>
-                      Solve the matrix using the method of QR
-                      decomposition, where Q is an orthogonal matrix such that Q
-                      transpose * Q =I, and R is an upper triangular matrix. 
-            </description>
-          </option>
--->
-          <option value="OLDSPARSE">
-            <brief> Sparse matrix solver</brief>
-            <description> 
-              Solve the matrix using a sparse matrix solver.
-                Note:  Sparse solver will not work on Sun/Solaris, QRD will be 
-                          used.
-            </description>
-             <exclusions>
-               <item>MODEL1</item>
-               <item>MODEL2</item>
-               <item>MODEL3</item>
-               <item>MAX_MODEL1_C_QUANTILE</item>
-               <item>MAX_MODEL2_C_QUANTILE</item>
-               <item>MAX_MODEL3_C_QUANTILE</item>
-            </exclusions>
-          </option>
         </list>
       </parameter>
 
@@ -368,6 +400,14 @@
       <default>
         <item>No</item>
       </default>
+      <exclusions>
+        <item>MODEL1</item>
+        <item>MODEL2</item>
+        <item>MODEL3</item>
+        <item>MAX_MODEL1_C_QUANTILE</item>
+        <item>MAX_MODEL2_C_QUANTILE</item>
+        <item>MAX_MODEL3_C_QUANTILE</item>
+      </exclusions>
       <inclusions>
         <item>REJECTION_MULTIPLIER</item>
      </inclusions>
@@ -687,12 +727,10 @@
                    Adjustments are not applied unless the solution converges and UPDATE is 
                    selected. Solving for angles only is equivalent to using CKSOLVEDEGREE=0.
             </description>
-<!--
-            <exclusions    >
+            <exclusions>
               <item>CKDEGREE</item>
               <item>CKSOLVEDEGREE</item>
             </exclusions>
--->
           </option>
 
           <option value="VELOCITIES">
@@ -702,12 +740,10 @@
                    solution.  Solving for angles and velocities is equivalent to using 
                    CKSOLVEDEGREE=1.
             </description>
-<!--
             <exclusions>
               <item>CKDEGREE</item>
               <item>CKSOLVEDEGREE</item>
             </exclusions>
--->
           </option>
 
           <option value="ACCELERATIONS">
@@ -717,12 +753,10 @@
                    adjusted in the solution.  Solving for angles, angular velocities, and 
                    accelerations is equivalent to using CKSOLVEDEGREE=2.
             </description>
-<!--
             <exclusions>
               <item>CKDEGREE</item>
               <item>CKSOLVEDEGREE</item>
             </exclusions>
--->
           </option>
 
           <option value="ALL">
@@ -830,12 +864,10 @@
                    Spacecraft positions will be adjusted in the solution, but 
                    not the velocity or the acceleration.
             </description>
-<!--
             <exclusions>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
             </exclusions>
--->
           </option>
 
           <option value="VELOCITIES">
@@ -844,12 +876,10 @@
                    Spacecraft positions will be adjusted in the solution, as 
                    well as the velocities of the spacecraft at each instance.
             </description>
-<!--
             <exclusions>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
             </exclusions>
--->
           </option>
 
           <option value="ACCELERATIONS">
@@ -859,12 +889,10 @@
                    as the velocities and accelerations of the spacecraft at each 
                    instance.
             </description>
-<!--
             <exclusions>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
             </exclusions>
--->
           </option>
 
           <option value="ALL">

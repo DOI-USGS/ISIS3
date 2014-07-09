@@ -19,7 +19,7 @@ commands:
 	onet=$(OUTPUT)/case01OutNet.net \
 	observations=yes \
 	update=yes \
-	method=oldsparse \
+	method=sparse \
 	cksolvedegree=3 \
 	camsolve=all \
 	file_pre=t \

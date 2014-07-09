@@ -28,7 +28,7 @@ commands:
 	cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
 	onet=$(OUTPUT)/apollo_specialK_out.net \
 	radius=yes \
-	method=specialk \
+	method=sparse\
 	errorpropagation=yes \
 	spsolve=position \
 	spacecraft_position_sigma=1000.0 \

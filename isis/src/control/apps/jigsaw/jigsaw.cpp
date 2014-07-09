@@ -6,6 +6,7 @@
 
 #include "BundleAdjust.h"
 #include "BundleResults.h"
+#include "BundleObservationSolveSettings.h"
 #include "BundleSettings.h"
 #include "CubeAttribute.h"
 #include "IException.h"
@@ -20,15 +21,27 @@ BundleSettings bundleSettings();
 
 void IsisMain() {
 
-//qDebug() << "jigsaw" << 1;
   // Get the control network and image list
   UserInterface &ui = Application::GetUserInterface();
+
+  // Check to make sure user entered something to adjust... Or can just points be in solution?
+  // YES - we should be able to just TRIANGULATE the points in the control net
+  // right now to do this we have to fake out jigsaw by
+  // 1) solving for both position and pointing but giving them high weights or
+  // 2) solving for either position OR pointing but giving them high weights (the one not solved for
+  //    is effectively "fixed" also)
+  if (ui.GetString("CAMSOLVE") == "NONE"  &&  ui.GetString("SPSOLVE") == "NONE") {
+    string msg = "Must either solve for camera pointing or spacecraft position";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
   QString cnetFile = ui.GetFileName("CNET");
   QString cubeList = ui.GetFileName("FROMLIST");
+  
+  // retrieve settings from jigsaw gui
   BundleSettings settings = bundleSettings();
   BundleAdjust *bundleAdjustment = NULL;
-  
-//qDebug() << "jigsaw" << 2;
+
   // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
   if (ui.WasEntered("HELDLIST")) {
     QString heldList = ui.GetFileName("HELDLIST");
@@ -37,55 +50,18 @@ void IsisMain() {
   else {
     bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
   }
-//qDebug() << "jigsaw" << 3;
-  //build lists of maximum likelihood estimation model strings and quantiles
-  // change params needed QList<QString> maxLikeModels;
-  // change params needed QList<double> maxQuan;
-  // change params needed bundleAdjustment->maximumLikelihoodSetup(maxLikeModels,maxQuan);  //set up maximum likelihood estimater
-
-  // For now don't use SC_SIGMAS.  This is not fully implemented yet.
-  // if (ui.WasEntered("SC_SIGMAS"))
-  //   bundleAdjustment->readSCSigmas(ui.GetFileName("SC_SIGMAS"));
-
-//  if (ui.WasEntered("BINARYFILEPATH")) {
-//    QString binaryfilepath = ui.GetString("BINARYFILEPATH");
-//    QDir dir(binaryfilepath);
-
-//    // verify path exists
-//    if (!dir.exists()) {
-//      QString msg = QString("BINARYFILEPATH [%1] does not exist").arg(binaryfilepath);
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
-//    else
-//      bundleAdjustment->setErrorPropagationBinaryFilePath(binaryfilepath);
-//  }
-
-
-  // Check to make sure user entered something to adjust... Or can just points be in solution?
-  if (ui.GetString("CAMSOLVE") == "NONE"  &&  ui.GetString("SPSOLVE") == "NONE") {
-    string msg = "Must either solve for camera pointing or spacecraft position";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
 
   // Bundle adjust the network
   try {
 
-//qDebug() << "jigsaw" << 4;
-    if (ui.GetString("METHOD") == "OLDSPARSE") {
-      // the Solve method below is the old, LU Sparse routine, not explicitly used
-      // in Jigsaw now, but retained indefinitely as a additional approach to
-      // check against
-      bundleAdjustment->solve();
-    }
-    else {
-      bundleAdjustment->solveCholesky();
-      //bundleAdjustment->solveCholeskyBR();
-    }
+    bundleAdjustment->solveCholesky();
     
-    bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
-    PvlGroup gp("JigsawResults");
+    // write updated control net if bundle has converged
+    if (bundleAdjustment->isConverged())
+      bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
 
-//qDebug() << "jigsaw" << 5;
+    PvlGroup gp("JigsawResults");
+    
     // Update the cube pointing if requested but ONLY if bundle has converged
     if (ui.GetBoolean("UPDATE") ) {
       if ( !bundleAdjustment->isConverged() )
@@ -127,10 +103,9 @@ void IsisMain() {
     else {
       gp += PvlKeyword("Status", "Camera pointing NOT updated");
     }
-
-//qDebug() << "jigsaw" << 6;
     Application::Log(gp);
   }
+
   catch(IException &e) {
     bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
     QString msg = "Unable to bundle adjust network [" + cnetFile + "]";
@@ -142,10 +117,79 @@ void IsisMain() {
 
 BundleSettings bundleSettings() {
 
-  UserInterface  &ui      = Application::GetUserInterface();
+  UserInterface  &ui = Application::GetUserInterface();
   BundleSettings settings;
-  
+
+  //************************************************************************************************
+  QVector<BundleObservationSolveSettings*> observationSolveSettingsVector;
+  bool usePvl = ui.GetBoolean("USEPVL");
+  PvlObject obj;
+  if (usePvl) {
+    ui.GetFileName("SC_PARAMETERS");
+    Pvl scParPvl(FileName(ui.GetFileName("SC_PARAMETERS")).expanded());
+    if (!scParPvl.hasObject("SensorParameters")) {
+      QString msg = "Input SC_PARAMETERS file missing SensorParameters object";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    // loop over parameter groups, read settings for each sensor into a
+    // BundleObservationSolveSettings object, and append to observationSolveSettingsVector
+    obj = scParPvl.findObject("SensorParameters");
+    PvlObject::PvlGroupIterator g;
+    BundleObservationSolveSettings *solveSettings;
+    for(g = obj.beginGroup(); g != obj.endGroup(); ++g) {
+      solveSettings = new BundleObservationSolveSettings();
+      solveSettings->setFromPvl(*g);
+      observationSolveSettingsVector.append(solveSettings);
+    }
+  }
+  else { // we're not using the pvl, so get what will be solve settings for all images from gui
+    BundleObservationSolveSettings *observationSolveSettings = new BundleObservationSolveSettings();
+
+    observationSolveSettings->setCKDegree(ui.GetInteger("CKDEGREE"));
+    observationSolveSettings->setCKSolveDegree(ui.GetInteger("CKSOLVEDEGREE"));
+
+    BundleObservationSolveSettings::InstrumentPointingSolveOption pointingSolveOption =
+        BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(ui.GetString("CAMSOLVE"));
+
+    observationSolveSettings->setInstrumentPointingSolveOption(pointingSolveOption);
+
+    observationSolveSettings->setSolveTwist(ui.GetBoolean("TWIST"));
+    observationSolveSettings->setSolvePolyOverPointing(ui.GetBoolean("OVEREXISTING"));
+
+    if (ui.WasEntered("CAMERA_ANGLES_SIGMA"))
+      observationSolveSettings->setAnglesAprioriSigma(ui.GetDouble("CAMERA_ANGLES_SIGMA"));
+
+    if (ui.WasEntered("CAMERA_ANGULAR_VELOCITY_SIGMA"))
+      observationSolveSettings->setAngularVelocityAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_VELOCITY_SIGMA"));
+
+    if (ui.WasEntered("CAMERA_ANGULAR_ACCELERATION_SIGMA"))
+      observationSolveSettings->setAngularAccelerationAprioriSigma(ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA"));
+
+    observationSolveSettings->setSPKDegree(ui.GetInteger("SPKDEGREE"));
+    observationSolveSettings->setSPKSolveDegree(ui.GetInteger("SPKSOLVEDEGREE"));
+
+    BundleObservationSolveSettings::InstrumentPositionSolveOption positionSolveOption =
+        BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(ui.GetString("SPSOLVE"));
+
+    observationSolveSettings->setInstrumentPositionSolveOption(positionSolveOption);
+    observationSolveSettings->setSolvePolyOverHermite(ui.GetBoolean("OVERHERMITE"));
+
+    if ( ui.WasEntered("SPACECRAFT_POSITION_SIGMA") )
+      observationSolveSettings->setPositionAprioriSigma(ui.GetDouble("SPACECRAFT_POSITION_SIGMA"));
+    if ( ui.WasEntered("SPACECRAFT_VELOCITY_SIGMA") )
+      observationSolveSettings->setVelocityAprioriSigma(ui.GetDouble("SPACECRAFT_VELOCITY_SIGMA"));
+    if ( ui.WasEntered("SPACECRAFT_ACCELERATION_SIGMA") )
+      observationSolveSettings->setAccelerationAprioriSigma(ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA"));
+
+    observationSolveSettingsVector.append(observationSolveSettings);
+  }
+
+  settings.setObservationSolveOptions(observationSolveSettingsVector);
+  //************************************************************************************************
+
   settings.setValidateNetwork(true);
+
   // solve options
   double latitudeSigma  = -1.0;
   double longitudeSigma = -1.0;
@@ -159,57 +203,18 @@ BundleSettings bundleSettings() {
   if (ui.WasEntered("POINT_RADIUS_SIGMA")) {
     radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
   }
-  settings.setSolveOptions(BundleSettings::stringToSolveMethod(ui.GetString("METHOD")), 
+
+  settings.setSolveOptions(BundleSettings::stringToSolveMethod(ui.GetString("METHOD")),
                            ui.GetBoolean("OBSERVATIONS"), ui.GetBoolean("UPDATE"), 
                            ui.GetBoolean("ERRORPROPAGATION"), ui.GetBoolean("RADIUS"),
                            latitudeSigma, longitudeSigma, radiusSigma);
+
   settings.setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
                                ui.GetDouble("REJECTION_MULTIPLIER"));
 
-  // position options
-  double positionSigma     = -1.0;
-  double velocitySigma     = -1.0;
-  double accelerationSigma = -1.0;
-  if (ui.WasEntered("SPACECRAFT_POSITION_SIGMA")) {
-    positionSigma = ui.GetDouble("SPACECRAFT_POSITION_SIGMA");
-  }
-  if (ui.WasEntered("SPACECRAFT_VELOCITY_SIGMA")) {
-    velocitySigma = ui.GetDouble("SPACECRAFT_VELOCITY_SIGMA");
-  }
-  if (ui.WasEntered("SPACECRAFT_ACCELERATION_SIGMA")) {
-    accelerationSigma = ui.GetDouble("SPACECRAFT_ACCELERATION_SIGMA");
-  }
-  settings.setInstrumentPositionSolveOptions(
-      BundleSettings::stringToInstrumentPositionSolveOption(ui.GetString("SPSOLVE")),
-      ui.GetBoolean("OVERHERMITE"),
-      ui.GetInteger("SPKDEGREE"),
-      ui.GetInteger("SPKSOLVEDEGREE"),
-      positionSigma, velocitySigma, accelerationSigma);
-
-  // pointing settings
-  double anglesSigma              = -1.0;
-  double angularVelocitySigma     = -1.0;
-  double angularAccelerationSigma = -1.0;
-  if (ui.WasEntered("CAMERA_ANGLES_SIGMA")) {
-    anglesSigma = ui.GetDouble("CAMERA_ANGLES_SIGMA");
-  }
-  if (ui.WasEntered("CAMERA_ANGULAR_VELOCITY_SIGMA")) {
-    angularVelocitySigma = ui.GetDouble("CAMERA_ANGULAR_VELOCITY_SIGMA");
-  }
-  if (ui.WasEntered("CAMERA_ANGULAR_ACCELERATION_SIGMA")) {
-    angularAccelerationSigma = ui.GetDouble("CAMERA_ANGULAR_ACCELERATION_SIGMA");
-  }
-  settings.setInstrumentPointingSolveOptions(
-      BundleSettings::stringToInstrumentPointingSolveOption(ui.GetString("CAMSOLVE")),
-      ui.GetBoolean("TWIST"),
-      ui.GetBoolean("OVEREXISTING"),
-      ui.GetInteger("CKDEGREE"),
-      ui.GetInteger("CKSOLVEDEGREE"),
-      anglesSigma, angularVelocitySigma, angularAccelerationSigma);
-
   // convergence criteria
-  settings.setConvergenceCriteria(BundleSettings::Sigma0, 
-                                  ui.GetDouble("SIGMA0"), 
+  settings.setConvergenceCriteria(BundleSettings::Sigma0,
+                                  ui.GetDouble("SIGMA0"),
                                   ui.GetInteger("MAXITS"));
 
   // max likelihood estimation
