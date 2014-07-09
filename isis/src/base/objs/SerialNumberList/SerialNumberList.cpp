@@ -157,10 +157,22 @@ namespace Isis {
         msg += SerialNumberList::FileName(sn) + "] and [" + FileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
+
       Pair nextpair;
       nextpair.filename = Isis::FileName(filename).expanded();
       nextpair.serialNumber = sn;
       nextpair.observationNumber = on;
+
+      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      if (cubeObj.hasGroup("Instrument")) {
+        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
+          nextpair.instrumentId = cubeObj.findGroup("Instrument")["InstrumentId"][0];
+        }
+      }
+
       p_pairs.push_back(nextpair);
       p_serialMap.insert(std::pair<QString, int>(sn, (int)(p_pairs.size() - 1)));
       p_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
@@ -238,10 +250,36 @@ namespace Isis {
         msg += SerialNumberList::FileName(serialNumber) + "] and [" + FileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
+
+      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      if (!cubeObj.hasGroup("Instrument")) {
+        QString msg = "Unable to find Instrument group in " + filename;
+        msg += " needed for performing bundle adjustment";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      PvlGroup instGroup = cubeObj.findGroup("Instrument");
+      if (!instGroup.hasKeyword("SpacecraftName") || !instGroup.hasKeyword("InstrumentId")) {
+        QString msg = "Unable to find SpacecraftName or InstrumentId keywords in " + filename;
+        msg += " needed for performing bundle adjustment";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
       Pair nextpair;
       nextpair.filename = Isis::FileName(filename).expanded();
       nextpair.serialNumber = serialNumber;
       nextpair.observationNumber = observationNumber;
+
+      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      if (cubeObj.hasGroup("Instrument")) {
+        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
+          nextpair.instrumentId = cubeObj.findGroup("Instrument")["InstrumentId"][0];
+        }
+      }
+
       p_pairs.push_back(nextpair);
       p_serialMap.insert(std::pair<QString, int>(serialNumber, (int)(p_pairs.size() - 1)));
       p_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
@@ -418,6 +456,47 @@ namespace Isis {
     }
   }
 
+  /**
+   * Return the spacecraftname/instrumentid at the given index
+   *
+   * @param index The index of the desired spacecraftname/instrumentid
+   *
+   * @return QString The spacecraftname/instrumentid at the given index
+   */
+  QString SerialNumberList::SpacecraftInstrumentId(int index) {
+    if(index >= 0 && index < (int) p_pairs.size()) {
+      QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
+      scid.simplified();
+      return scid.replace(" ","");
+    }
+    else {
+      QString num = toString(index);
+      QString msg = "Index [" + num + "] is invalid";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  /**
+   * Return the spacecraftname/instrumentid given a serial number
+   *
+   * @param sn  The serial number of the desired spacecraftname/instrumentid 
+   *
+   * @return QString The spacecraftname/instrumentid matching the input serial
+   *         number
+   */
+  QString SerialNumberList::SpacecraftInstrumentId(const QString &sn) {
+    if(HasSerialNumber(sn)) {
+      int index = p_serialMap.find(sn)->second;
+      QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
+      scid.simplified();
+      return scid.replace(" ","");
+    }
+    else {
+      QString msg = "Requested serial number [" + sn + "] ";
+      msg += "does not exist in the list";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
 
   /**
    * Return possible serial numbers given an observation number

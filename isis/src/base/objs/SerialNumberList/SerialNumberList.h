@@ -105,6 +105,8 @@ namespace Isis {
       QString SerialNumber(const QString &filename);
       QString SerialNumber(int index);
       QString ObservationNumber(int index);
+      QString SpacecraftInstrumentId(int index);
+      QString SpacecraftInstrumentId(const QString &sn);
 
       int SerialNumberIndex(const QString &sn);
       int FileNameIndex(const QString &filename);
@@ -116,6 +118,8 @@ namespace Isis {
         QString filename;
         QString serialNumber;
         QString observationNumber;
+        QString spacecraftName;
+        QString instrumentId;
       };
 
       std::vector<Pair> p_pairs;
