@@ -208,13 +208,14 @@ namespace Isis {
     if (m_ui->accelerationSigmaLineEdit->isModified()) {
       accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
     }
+/*
     settings->setInstrumentPositionSolveOptions(
         BundleSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
         m_ui->hermiteSplineCheckBox->isChecked(),
         m_ui->spkDegreeSpinBox->text().toInt(), 
         m_ui->spkSolveDegreeSpinBox->text().toInt(),
         positionSigma, velocitySigma, accelerationSigma);
-
+*/
     // pointing settings
     double anglesSigma              = -1.0;
     double angularVelocitySigma     = -1.0;
@@ -229,6 +230,7 @@ namespace Isis {
     if (m_ui->pointingAngularAccelerationSigmaLineEdit->isModified()) {
       angularAccelerationSigma = m_ui->pointingAngularAccelerationSigmaLineEdit->text().toDouble();
     }
+/*
     settings->setInstrumentPointingSolveOptions(
         BundleSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
         m_ui->twistCheckBox->isChecked(),
@@ -236,7 +238,7 @@ namespace Isis {
         m_ui->ckDegreeSpinBox->text().toInt(),
         m_ui->ckSolveDegreeSpinBox->text().toInt(),
         anglesSigma, angularVelocitySigma, angularAccelerationSigma);
-
+*/
     // convergence criteria
     settings->setConvergenceCriteria(BundleSettings::Sigma0, 
                                      m_ui->sigma0ThresholdLineEdit->text().toDouble(), 
