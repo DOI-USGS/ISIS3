@@ -109,6 +109,7 @@ namespace Isis {
     void zeroBlocks();
     bool InsertMatrixBlock(int nRowBlock, int nRows, int nCols);
     void copyToBoost(boost::numeric::ublas::compressed_matrix<double>& B);
+    int getLeadingColumnsForBlock(int nblockColumn);
     int numberOfElements();
     void print(std::ostream& outstream);
   };
@@ -158,6 +159,8 @@ namespace Isis {
     int numberOfElements();
     void print(std::ostream& outstream);
     bool write(std::ofstream &fp_out, bool binary=true);
+    int getLeadingColumnsForBlock(int nblockColumn);
+    int getLeadingRowsForBlock(int nblockRow);
   };
 
   // operators to read/write SparseBlockMatrix to/from binary disk file

@@ -497,6 +497,35 @@ namespace Isis {
   }
 
   /**
+     * TODO
+     */
+    int SparseBlockRowMatrix::getLeadingColumnsForBlock(int nblockColumn) {
+
+      if (nblockColumn == 0)
+        return 0;
+
+      int nLeadingColumnsElements = 0;
+
+      int nCol = 0;
+
+      while ( nCol < nblockColumn) {
+        if ( !(*this)[nCol] )
+          continue;
+
+        int ncolumns = (*this)[nCol]->size2();
+
+        if (ncolumns == -1)
+          continue;
+
+        nLeadingColumnsElements += ncolumns;
+
+        nCol++;
+      }
+
+      return nLeadingColumnsElements;
+    }
+
+  /**
    * Writes matrix to binary disk file pointed to by QDataStream stream
    */
   QDataStream &operator<<(QDataStream &stream, const SparseBlockRowMatrix &sbrm) {
@@ -795,6 +824,67 @@ namespace Isis {
         outstream << "NULL column pointer at column[" << IString(i)
                   << "]!" << std::endl;
     }
+  }
+
+  /**
+   * TODO
+   */
+  int SparseBlockMatrix::getLeadingColumnsForBlock(int nblockColumn) {
+
+    if (nblockColumn == 0)
+      return 0;
+
+    int nLeadingColumnsElements = 0;
+
+    int nCol = 0;
+
+    while ( nCol < nblockColumn) {
+      if ( !(*this)[nCol] )
+        continue;
+
+      int ncolumns = (*this)[nCol]->numberOfColumns();
+
+      if (ncolumns == -1)
+        continue;
+
+      nLeadingColumnsElements += ncolumns;
+
+      nCol++;
+    }
+
+    return nLeadingColumnsElements;
+  }
+
+
+  /**
+   * TODO
+   */
+  int SparseBlockMatrix::getLeadingRowsForBlock(int nblockRow) {
+
+    if (nblockRow == 0)
+      return 0;
+
+    int i = 0;
+    int nLeadingRows = 0;
+
+    while (i < nblockRow) {
+      SparseBlockColumnMatrix* column = at(i);
+
+      if ( !column )
+        continue;
+
+      QMapIterator<int, matrix<double>*> it(*column);
+      // iterate to last element in column
+      while (it.hasNext()) {
+        it.next();
+
+        if( it.key() == i )
+          nLeadingRows += it.value()->size1();
+      }
+      i++;
+    }
+
+    return nLeadingRows;
   }
 
 
