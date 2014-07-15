@@ -37,6 +37,10 @@
 #include "Project.h"
 #include "XmlStackedHandlerReader.h"
 
+//////////////////////////////////////////////////////////////////////////////////
+#include "CorrelationMatrix.h"
+//////////////////////////////////////////////////////////////////////////////////
+
 namespace Isis {
   /**
    * Create a work order that will work with the given project.
@@ -179,6 +183,16 @@ namespace Isis {
     return false;
   }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * 
+   *
+   * @param images An image list that this work order should execute on
+   */
+  bool WorkOrder::isExecutable(CorrelationMatrix *correlationMatrix) {
+    return false;
+  }
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /* Re-implement this method if your work order utilizes images for data in order to operate. For
   *   example, "Footprint2DViewWorkOrder" works sometimes on images - the logic in side of
@@ -285,6 +299,10 @@ namespace Isis {
     m_controls = controls;
   }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  void WorkOrder::setData(CorrelationMatrix *correlationMatrix) {
+//     qDebug() << "setData cormat";
+  }
 
   void WorkOrder::setNext(WorkOrder *nextWorkOrder) {
     m_nextWorkOrder = nextWorkOrder;

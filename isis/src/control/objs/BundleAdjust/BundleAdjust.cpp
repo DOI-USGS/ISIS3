@@ -24,6 +24,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
 #include "ControlPoint.h"
+#include "CorrelationMatrix.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -3238,11 +3239,22 @@ namespace Isis {
 
     SparseBlockColumnMatrix sbcMatrix;
 
+      //////////////////////////////////////////////////////////////////// This is where I add stuff
+    // Create unique file name
+    FileName matrixFile;
+    matrixFile = FileName::createTempFile("/tmp/koyama/testData/inverseMatrix.dat");
+    // Create file handle
+    QFile matrixOutput(matrixFile.name()); //"covarianceMatrix.dat");
+    // Open file to write to
+    matrixOutput.open(QIODevice::WriteOnly);
+    QDataStream outStream(&matrixOutput);
+      //////////////////////////////////////////////////////////////////// This is where I add stuff
+
     int i, j, k;
     int nCurrentColumn = 0;
     int ncolsCurrentBlockColumn = 0;
-
     int nBlockColumns = m_SparseNormals.size();
+
     for (i = 0; i < nBlockColumns; i++) {
 
       // columns in this column block
@@ -3314,6 +3326,10 @@ namespace Isis {
         adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleStatistics.sigma0();
       }
 
+      //////////////////////////////////////////////////////////////////// This is where I add stuff
+      outStream << sbcMatrix;
+      //////////////////////////////////////////////////////////////////// This is where I add stuff
+
       // now loop over all object points to sum contributions into 3x3 point covariance matrix
       int nPointIndex = 0;
       for (j = 0; j < nObjectPoints; j++) {
@@ -3376,6 +3392,12 @@ namespace Isis {
         nPointIndex++;
       }
     }
+    ////////////////////////////////////////////////////////////////////// This is where I add stuff
+    // After the for loop, close the file.
+    matrixOutput.close();
+    // Save the location of the "covariance" matrix
+    m_bundleStatistics.correlationMatrix().setCovarianceFileName(matrixFile);
+    ////////////////////////////////////////////////////////////////////// This is where I add stuff
 
     // can free sparse normals now
     m_SparseNormals.wipe();

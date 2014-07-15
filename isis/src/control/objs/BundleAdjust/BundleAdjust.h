@@ -178,6 +178,9 @@ namespace Isis {
    *   @history 2014-05-16 Jeannie Backer - Added BundleSettings object to constructor inputs.
    *                           Cleaned and organized code. Updated to be more compliant with ISIS
    *                           coding standards.
+   *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix. Covariance matrix
+   *                           is now written to a file and the location is saved as part of the
+   *                           CorrelationMatrix object.
    */
   class BundleAdjust {
     public:

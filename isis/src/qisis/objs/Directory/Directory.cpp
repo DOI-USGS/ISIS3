@@ -54,6 +54,8 @@
 #include "ImportImagesWorkOrder.h"
 #include "ImageFileListWidget.h"
 #include "JigsawWorkOrder.h"
+#include "MatrixSceneWidget.h"
+#include "MatrixViewWorkOrder.h"
 #include "MosaicSceneWidget.h"
 #include "OpenProjectWorkOrder.h"
 #include "Project.h"
@@ -71,6 +73,9 @@
 
 namespace Isis {
 
+  /**
+   * Constructor
+   */
   Directory::Directory(QObject *parent) : QObject(parent) {
 
     try {
@@ -82,11 +87,11 @@ namespace Isis {
           _FILEINFO_);
     }
 
-    connect(m_project, SIGNAL(imagesAdded(ImageList *)),
-            this, SLOT(imagesAddedToProject(ImageList *)));
+    connect( m_project, SIGNAL(imagesAdded(ImageList *) ),
+             this, SLOT(imagesAddedToProject(ImageList *) ) );
 
-    connect(m_project, SIGNAL(projectLoaded(Project *)),
-            this, SLOT(updateRecentProjects(Project *)));
+    connect( m_project, SIGNAL(projectLoaded(Project *) ),
+             this, SLOT(updateRecentProjects(Project *) ) );
 
     m_projectTreeWidget = new ProjectTreeWidget(this);
 
@@ -94,6 +99,7 @@ namespace Isis {
       createWorkOrder<CnetEditorViewWorkOrder>();
       createWorkOrder<CubeViewportViewWorkOrder>();
       createWorkOrder<Footprint2DViewWorkOrder>();
+      createWorkOrder<MatrixViewWorkOrder>();
       createWorkOrder<ImageFileListViewWorkOrder>();
       createWorkOrder<ViewControlNet3DWorkOrder>();
 
@@ -117,6 +123,10 @@ namespace Isis {
   }
 
 
+  
+  /**
+   * destructor
+   */
   Directory::~Directory() {
     delete m_projectTreeWidget;
     delete m_project;
@@ -129,26 +139,32 @@ namespace Isis {
   }
 
 
+
+  /**
+   * This method sets up the main menu at the top of the window (File, Settings, ...)
+   *
+   * @param menuBar The menu area to populate.
+   */
   void Directory::populateMainMenu(QMenuBar *menuBar) {
     QMenu *fileMenu = menuBar->findChild<QMenu *>("fileMenu");
     if (fileMenu) {
       QAction *openProjectAction = m_openProjectWorkOrder->clone();
-      openProjectAction->setIcon(QIcon(":open"));
+      openProjectAction->setIcon(QIcon(":open") );
       fileMenu->addAction(openProjectAction);
 
       QMenu *recentProjectsMenu = fileMenu->addMenu("Recent P&rojects");
       int nRecentProjects = m_recentProjects.size();
       for (int i = 0; i < nRecentProjects; i++) {
         FileName projectFileName = m_recentProjects.at(i);
-        if (!projectFileName.fileExists())
+        if (!projectFileName.fileExists() )
           continue;
 
         QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
 
-        openRecentProjectAction->setData(m_recentProjects.at(i));
-        openRecentProjectAction->setText(m_recentProjects.at(i));
+        openRecentProjectAction->setData(m_recentProjects.at(i) );
+        openRecentProjectAction->setText(m_recentProjects.at(i) );
 
-        if (!((OpenRecentProjectWorkOrder*)openRecentProjectAction)->isExecutable(m_recentProjects.at(i)))
+        if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )->isExecutable(m_recentProjects.at(i) ) )
           continue;
 
         recentProjectsMenu->addAction(openRecentProjectAction);
@@ -158,51 +174,63 @@ namespace Isis {
 
       QAction *saveAction = m_saveProjectWorkOrder->clone();
       saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
-      saveAction->setIcon(QIcon(":save"));
+      saveAction->setIcon(QIcon(":save") );
 
-      connect(project()->undoStack(), SIGNAL(cleanChanged(bool)),
-              saveAction, SLOT(setDisabled(bool)));
+      connect( project()->undoStack(), SIGNAL(cleanChanged(bool) ),
+               saveAction, SLOT(setDisabled(bool) ) );
 
       fileMenu->addAction(saveAction);
 
       QAction *addAction = m_saveProjectAsWorkOrder->clone();
-      addAction->setIcon(QIcon(":saveAs"));
+      addAction->setIcon(QIcon(":saveAs") );
       fileMenu->addAction(addAction);
 
       fileMenu->addSeparator();
 
       QMenu *importMenu = fileMenu->addMenu("&Import");
-      importMenu->addAction(m_importControlNetWorkOrder->clone());
-      importMenu->addAction(m_importImagesWorkOrder->clone());
+      importMenu->addAction(m_importControlNetWorkOrder->clone() );
+      importMenu->addAction(m_importImagesWorkOrder->clone() );
 
       QMenu *exportMenu = fileMenu->addMenu("&Export");
 
-      exportMenu->addAction(m_exportControlNetWorkOrder->clone());
-      exportMenu->addAction(m_exportImagesWorkOrder->clone());
+      exportMenu->addAction(m_exportControlNetWorkOrder->clone() );
+      exportMenu->addAction(m_exportImagesWorkOrder->clone() );
 
       fileMenu->addSeparator();
 
-      fileMenu->addAction(m_closeProjectWorkOrder->clone());
+      fileMenu->addAction(m_closeProjectWorkOrder->clone() );
 
       fileMenu->addSeparator();
     }
 
     QMenu *projectMenu = menuBar->findChild<QMenu *>("projectMenu");
     if (projectMenu) {
-      projectMenu->addAction(m_renameProjectWorkOrder->clone());
-      projectMenu->addAction(m_runJigsawWorkOrder->clone());
+      projectMenu->addAction(m_renameProjectWorkOrder->clone() );
+      projectMenu->addAction(m_runJigsawWorkOrder->clone() );
     }
   }
 
 
+
+  /**
+   * Set up the history info in the history dockable widget.
+   * 
+   * @param historyContainer The widget to fill.
+   */
   void Directory::setHistoryContainer(QDockWidget *historyContainer) {
     if (!m_historyTreeWidget) {
-      m_historyTreeWidget = new HistoryTreeWidget(project());
+      m_historyTreeWidget = new HistoryTreeWidget( project() );
     }
     historyContainer->setWidget(m_historyTreeWidget);
   }
 
 
+
+  /**
+   * Set up the warning info in the warning dockable widget.
+   * 
+   * @param warningContainer The widget to fill.
+   */
   void Directory::setWarningContainer(QDockWidget *warningContainer) {
     if (!m_warningTreeWidget) {
       m_warningTreeWidget = new WarningTreeWidget;
@@ -211,13 +239,38 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Add recent projects to the recent projects list.
+   * 
+   * @param recentProjects List of projects to add to list.
+   */
   void Directory::setRecentProjectsList(QStringList recentProjects) {
     m_recentProjects.append(recentProjects);
   }
 
 
+
+  /**
+   * Public accessor for the list of recent projects.
+   * 
+   * @return QStringList List of recent projects.
+   */
+   QStringList Directory::recentProjectsList() {
+     return m_recentProjects;
+  }
+
+
+  
+  /**
+   * Add the widget for the cnet editor view to the window.
+   * 
+   * @param network Control net to edit.
+   *
+   * @return CnetEditorWidget The view to add to the window.
+   */
   CnetEditorWidget *Directory::addCnetEditorView(Control *network) {
-    QString title = tr("Cnet Editor View %1").arg(network->displayProperties()->displayName());
+    QString title = tr("Cnet Editor View %1").arg( network->displayProperties()->displayName() );
 
     FileName configFile("$HOME/.Isis/" + QApplication::applicationName() + "/" + title + ".config");
 
@@ -234,7 +287,7 @@ namespace Isis {
     row++;
 
     CnetEditorWidget *mainWidget =
-        new CnetEditorWidget(network->controlNet(), configFile.expanded());
+        new CnetEditorWidget( network->controlNet(), configFile.expanded() );
     resultLayout->addWidget(mainWidget, row, 0, 1, 2);
     row++;
 
@@ -244,14 +297,14 @@ namespace Isis {
 
     QMap<QString, QMenu *> topLevelMenus;
 
-    while (actionMapIterator.hasNext()) {
+    while ( actionMapIterator.hasNext() ) {
       actionMapIterator.next();
       QAction *actionToAdd = actionMapIterator.key();
       QList< QString > location = actionMapIterator.value();
 
       QMenu *menuToPutActionInto = NULL;
 
-      if (location.count()) {
+      if ( location.count() ) {
         QString topLevelMenuTitle = location.takeFirst();
         if (!topLevelMenus[topLevelMenuTitle]) {
           topLevelMenus[topLevelMenuTitle] = menuBar->addMenu(topLevelMenuTitle);
@@ -262,7 +315,7 @@ namespace Isis {
 
       foreach (QString menuName, location) {
         bool foundSubMenu = false;
-        foreach (QAction *possibleSubMenu, menuToPutActionInto->actions()) {
+        foreach ( QAction *possibleSubMenu, menuToPutActionInto->actions() ) {
           if (!foundSubMenu &&
               possibleSubMenu->menu() && possibleSubMenu->menu()->title() == menuName) {
             foundSubMenu = true;
@@ -279,20 +332,20 @@ namespace Isis {
     }
 
     QTabWidget *treeViews = new QTabWidget;
-    treeViews->addTab(mainWidget->pointTreeView(), tr("Point View"));
-    treeViews->addTab(mainWidget->serialTreeView(), tr("Serial View"));
-    treeViews->addTab(mainWidget->connectionTreeView(), tr("Connection View"));
+    treeViews->addTab( mainWidget->pointTreeView(), tr("Point View") );
+    treeViews->addTab( mainWidget->serialTreeView(), tr("Serial View") );
+    treeViews->addTab( mainWidget->connectionTreeView(), tr("Connection View") );
     resultLayout->addWidget(treeViews, row, 0, 1, 1);
 
     QTabWidget *filterViews = new QTabWidget;
-    filterViews->addTab(mainWidget->pointFilterWidget(), tr("Filter Points and Measures"));
-    filterViews->addTab(mainWidget->serialFilterWidget(), tr("Filter Images and Points"));
-    filterViews->addTab(mainWidget->connectionFilterWidget(), tr("Filter Connections"));
+    filterViews->addTab( mainWidget->pointFilterWidget(), tr("Filter Points and Measures") );
+    filterViews->addTab( mainWidget->serialFilterWidget(), tr("Filter Images and Points") );
+    filterViews->addTab( mainWidget->connectionFilterWidget(), tr("Filter Connections") );
     resultLayout->addWidget(filterViews, row, 1, 1, 1);
     row++;
 
-    connect(result, SIGNAL(destroyed(QObject *)),
-            this, SLOT(cleanupCnetEditorViewWidgets()));
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupCnetEditorViewWidgets() ) );
 
     m_cnetEditorViewWidgets.append(mainWidget);
 
@@ -305,16 +358,21 @@ namespace Isis {
   }
 
 
+  /**
+   * Add the qview workspace to the window.
+   *
+   * @return Workspace The work space to display.
+   */
   Workspace *Directory::addCubeDnView() {
     Workspace *result = new Workspace(true);
 
-    connect(result, SIGNAL(destroyed(QObject *)),
-            this, SLOT(cleanupCubeDnViewWidgets()));
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupCubeDnViewWidgets() ) );
 
     m_cubeDnViewWidgets.append(result);
 
-    result->setWindowTitle(tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count()));
-    result->setObjectName(result->windowTitle());
+    result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
+    result->setObjectName(result->windowTitle() );
 
     emit newWidgetAvailable(result, Qt::RightDockWidgetArea, Qt::Horizontal);
 
@@ -322,16 +380,22 @@ namespace Isis {
   }
 
 
+  /**
+   * Add the qmos view widget to the window
+   *
+   * @return MosaicSceneWidget The view to display.
+   */
   MosaicSceneWidget *Directory::addFootprint2DView() {
     MosaicSceneWidget *result = new MosaicSceneWidget(NULL, true, true, this);
 
-    connect(result, SIGNAL(destroyed(QObject *)),
-            this, SLOT(cleanupFootprint2DViewWidgets()));
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupFootprint2DViewWidgets() ) );
 
     m_footprint2DViewWidgets.append(result);
 
-    result->setWindowTitle(tr("Footprint View %1").arg(m_footprint2DViewWidgets.count()));
+    result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
     result->setObjectName(result->windowTitle());
+    result->setObjectName( result->windowTitle() );
 
     emit newWidgetAvailable(result, Qt::RightDockWidgetArea, Qt::Horizontal);
 
@@ -339,16 +403,45 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Add the matrix view widget to the window.
+   *
+   * @return MatrixSceneWidget The widget to view.
+   */
+  MatrixSceneWidget *Directory::addMatrixView() {
+    MatrixSceneWidget *result = new MatrixSceneWidget(NULL, true, true, this);
+
+//     connect( result, SIGNAL( destroyed(QObject *) ),
+//              this, SLOT( cleanupMatrixViewWidgets() ) );
+
+    m_matrixViewWidgets.append(result);
+
+    result->setWindowTitle( tr("Matrix View %1").arg( m_matrixViewWidgets.count() ) );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result, Qt::RightDockWidgetArea, Qt::Horizontal);
+
+    return result;
+  }
+
+
+
+  /**
+   * Add an imageFileList widget to the window.
+   *
+   * @return ImageFileListWidget The widget to add to the window.
+   */
   ImageFileListWidget *Directory::addImageFileListView() {
     ImageFileListWidget *result = new ImageFileListWidget(this);
 
-    connect(result, SIGNAL(destroyed(QObject *)),
-            this, SLOT(cleanupFileListWidgets()));
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupFileListWidgets() ) );
 
     m_fileListWidgets.append(result);
 
-    result->setWindowTitle(tr("File List %1").arg(m_fileListWidgets.count()));
-    result->setObjectName(result->windowTitle());
+    result->setWindowTitle( tr("File List %1").arg( m_fileListWidgets.count() ) );
+    result->setObjectName( result->windowTitle() );
 
     emit newWidgetAvailable(result, Qt::LeftDockWidgetArea, Qt::Horizontal);
 
@@ -392,8 +485,8 @@ namespace Isis {
 
 
   void Directory::updateRecentProjects(Project *project) {
-    if (!m_recentProjects.contains(project->projectRoot()))
-      m_recentProjects.insert(0, project->projectRoot());
+    if ( !m_recentProjects.contains( project->projectRoot() ) )
+      m_recentProjects.insert( 0, project->projectRoot() );
   }
 
 
@@ -413,6 +506,11 @@ namespace Isis {
   }
 
 
+  /**
+   * Accessor for the list of Workspaces currently available.
+   *
+   * @return QList<Workspace *> The list of Workspaces.
+   */
   QList<Workspace *> Directory::cubeDnViews() {
     QList<Workspace *> results;
 
@@ -424,6 +522,30 @@ namespace Isis {
   }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Accessor for the list of MatrixSceneWidgets currently available.
+   *
+   * @return QList<MatrixSceneWidget *> The list of MatrixSceneWidgets.
+   */
+  QList<MatrixSceneWidget *> Directory::matrixViews() {
+    QList<MatrixSceneWidget *> results;
+
+    foreach (MatrixSceneWidget *widget, m_matrixViewWidgets) {
+      results.append(widget);
+    }
+
+    return results;
+  }
+///////////////////////////////////////////////////////////////////////////////////////////////////
+  
+
+  /**
+   * Accessor for the list of MosaicSceneWidgets currently available.
+   *
+   * @return QList<MosaicSceneWidget *> The list of MosaicSceneWidgets.
+   */
   QList<MosaicSceneWidget *> Directory::footprint2DViews() {
     QList<MosaicSceneWidget *> results;
 
@@ -435,6 +557,12 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Accessor for the list of ImageFileListWidgets currently available.
+   *
+   * @return QList<ImageFileListWidget *> The list of ImageFileListWidgets.
+   */
   QList<ImageFileListWidget *> Directory::imageFileListViews() {
     QList<ImageFileListWidget *> results;
 
@@ -450,6 +578,7 @@ namespace Isis {
     QList<QProgressBar *> result;
     return result;
   }
+
 
 
   void Directory::showWarning(QString text) {
@@ -468,14 +597,14 @@ namespace Isis {
 
 
   void Directory::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
+    xmlReader->pushContentHandler( new XmlHandler(this) );
   }
 
 
   void Directory::save(QXmlStreamWriter &stream, FileName newProjectRoot) const {
     stream.writeStartElement("directory");
 
-    if (!m_fileListWidgets.isEmpty()) {
+    if ( !m_fileListWidgets.isEmpty() ) {
       stream.writeStartElement("fileListWidgets");
 
       foreach (ImageFileListWidget *fileListWidget, m_fileListWidgets) {
@@ -486,7 +615,7 @@ namespace Isis {
     }
 
 
-    if (!m_footprint2DViewWidgets.isEmpty()) {
+    if ( !m_footprint2DViewWidgets.isEmpty() ) {
       stream.writeStartElement("footprintViews");
 
       foreach (MosaicSceneWidget *footprint2DViewWidget, m_footprint2DViewWidgets) {
@@ -515,10 +644,10 @@ namespace Isis {
 
     if (result) {
       if (localName == "footprint2DView") {
-        m_directory->addFootprint2DView()->load(reader());
+        m_directory->addFootprint2DView()->load( reader() );
       }
       else if (localName == "imageFileList") {
-        m_directory->addImageFileListView()->load(reader());
+        m_directory->addImageFileListView()->load( reader() );
       }
     }
 
@@ -601,27 +730,27 @@ namespace Isis {
         if (widgetAction) {
           QString actionText = widgetAction->text();
 
-          restructuredData[actionText].append(qMakePair(widgetTitle, widgetAction));
+          restructuredData[actionText].append( qMakePair(widgetTitle, widgetAction) );
 
-          if (!sortedActionTexts.contains(actionText)) {
+          if ( !sortedActionTexts.contains(actionText) ) {
             sortedActionTexts.append(actionText);
           }
         }
         else {
           // Add separator
-          if (!sortedActionTexts.isEmpty() && !sortedActionTexts.last().isEmpty()) {
+          if ( !sortedActionTexts.isEmpty() && !sortedActionTexts.last().isEmpty() ) {
             sortedActionTexts.append("");
           }
         }
       }
     }
 
-    if (sortedActionTexts.count() && sortedActionTexts.last().isEmpty()) {
+    if ( sortedActionTexts.count() && sortedActionTexts.last().isEmpty() ) {
       sortedActionTexts.removeLast();
     }
 
     foreach (QString actionText, sortedActionTexts) {
-      if (actionText.isEmpty()) {
+      if ( actionText.isEmpty() ) {
         results.append(NULL);
       }
       else {
@@ -633,7 +762,7 @@ namespace Isis {
           QAction *finalAct = actions.first().second;
           QString widgetTitle = actions.first().first;
 
-          finalAct->setText(tr("%1 on %2").arg(actionText).arg(widgetTitle));
+          finalAct->setText( tr("%1 on %2").arg(actionText).arg(widgetTitle) );
           results.append(finalAct);
         }
         else {
@@ -658,7 +787,8 @@ namespace Isis {
           QAction *allAct = new QAction(tr("All"), NULL);
 
           foreach (QAction *actionInMenu, actionsInsideMenu) {
-            connect(allAct, SIGNAL(triggered()), actionInMenu, SIGNAL(triggered()));
+            connect( allAct, SIGNAL( triggered() ),
+                     actionInMenu, SIGNAL( triggered() ) );
             menu->addAction(actionInMenu);
           }
 
@@ -675,6 +805,6 @@ namespace Isis {
 
 
   bool Directory::actionTextLessThan(QAction *lhs, QAction *rhs) {
-    return lhs->text().localeAwareCompare(rhs->text()) < 0;
+    return lhs->text().localeAwareCompare( rhs->text() ) < 0;
   }
 }

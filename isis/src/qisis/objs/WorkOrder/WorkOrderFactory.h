@@ -42,6 +42,7 @@ namespace Isis {
    * @internal
    *   @history 2012-10-19 Steven Lambright - Added tryType() to reduce the chances of programmer
    *                         mistakes and to reduce duplicate code.
+   *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix.
    */
   class WorkOrderFactory {
     public:

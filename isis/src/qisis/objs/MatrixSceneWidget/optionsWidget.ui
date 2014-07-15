@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>matrixOptionsWidget</class>
+ <widget class="QWidget" name="matrixOptionsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>597</width>
+    <height>549</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Matrix Options</string>
+  </property>
+  <widget class="QTabWidget" name="matrixOptionsTabs">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>581</width>
+     <height>391</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="colorOptionsPage">
+    <attribute name="title">
+     <string>Color Options</string>
+    </attribute>
+    <layout class="QGridLayout" name="mainLayout">
+     <item row="0" column="1">
+      <layout class="QHBoxLayout" name="colorPageLayout">
+       <item>
+        <layout class="QVBoxLayout" name="toleranceLayout">
+         <item>
+          <widget class="QRadioButton" name="toleranceRadioButton">
+           <property name="text">
+            <string>Pick Tolerance</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="toleranceOptionsLayout">
+           <item>
+            <widget class="QSlider" name="toleranceSlider">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="toleranceEditsLayout">
+             <item>
+              <layout class="QHBoxLayout" name="badCorrelationLayout">
+               <item>
+                <widget class="QLabel" name="badCorrelationLabel">
+                 <property name="text">
+                  <string>Bad Correlation</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="KColorButton" name="badCorrelationColorButton"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="badTolSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="enterToleranceLayout">
+               <item>
+                <widget class="QLabel" name="toleranceLabel">
+                 <property name="text">
+                  <string>Tolerance:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="toleranceLineEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>100</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="tolGoodSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="goodCorrelationLayout">
+               <item>
+                <widget class="QLabel" name="goodCorrelationLabel">
+                 <property name="text">
+                  <string>Good Correlation</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="KColorButton" name="goodCorrelationColorButton"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="gradientLayout">
+         <item>
+          <widget class="QRadioButton" name="gradientRadioButton">
+           <property name="text">
+            <string>Color Gradient</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="gradientSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="focusOptionsPage">
+    <attribute name="title">
+     <string>Focus Options</string>
+    </attribute>
+    <widget class="QWidget" name="horizontalLayoutWidget_11">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>577</width>
+       <height>351</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="focusPageLayout">
+      <item>
+       <layout class="QHBoxLayout" name="focusPageLayout_2">
+        <item>
+         <layout class="QVBoxLayout" name="focusOptionsLayout">
+          <item>
+           <widget class="QRadioButton" name="bestCorrelationRadioButton">
+            <property name="text">
+             <string>Best Correlation</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="worstCorrelationRadioButton">
+            <property name="text">
+             <string>Worst Correlation</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="specificParametersLayout">
+            <item>
+             <widget class="QRadioButton" name="specificCorrelationRadioButton">
+              <property name="text">
+               <string>Specific Parameters</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="focusParametersLabel1">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Image 1:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="specificParameter1Layout">
+              <item>
+               <widget class="QComboBox" name="image1ComboBox"/>
+              </item>
+              <item>
+               <widget class="QComboBox" name="parameter1ComboBox"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="focusParametersLabel2">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Image 2:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="specificPrameter2Layout">
+              <item>
+               <widget class="QComboBox" name="image2ComboBox"/>
+              </item>
+              <item>
+               <widget class="QComboBox" name="parameter2ComboBox"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="focusToleranceLayout">
+          <item>
+           <widget class="QRadioButton" name="focusToleranceRadioButton">
+            <property name="text">
+             <string>Tolerance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="toleranceEditLayout">
+            <item>
+             <widget class="QLabel" name="focusToleranceLabel">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Tolerance</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="focusToleranceLineEdit"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="elementsLayout">
+            <item>
+             <layout class="QVBoxLayout" name="goodElementsLayout">
+              <item>
+               <widget class="QLabel" name="goodElementsLabel">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
+                <property name="text">
+                 <string>Good Correlations</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="goodElementsSpinBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>900</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="badElementsLayout">
+              <item>
+               <widget class="QLabel" name="badElementsLabel">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Bad Correlations</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="badElementsSpinBox">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>600</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>410</y>
+     <width>581</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="currentElementData">
+    <item>
+     <layout class="QHBoxLayout" name="correlationLayout">
+      <item>
+       <widget class="QLabel" name="correlationLabel">
+        <property name="text">
+         <string>Current Correlation Value:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="currentValue">
+        <property name="text">
+         <string>Current Value</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="image1Layout">
+      <item>
+       <widget class="QLabel" name="image1Name">
+        <property name="text">
+         <string>Image 1 Name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="parameter1Name">
+        <property name="text">
+         <string>Parameter 1 Name</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="image2Layout">
+      <item>
+       <widget class="QLabel" name="image2Name">
+        <property name="text">
+         <string>Image 2 Name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="parameter2Name">
+        <property name="text">
+         <string>Parameter 2 Name</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

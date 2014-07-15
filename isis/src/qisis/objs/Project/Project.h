@@ -42,6 +42,7 @@ class QXmlStreamWriter;
 namespace Isis {
   class Control;
   class ControlList;
+  class CorrelationMatrix;
   class FileName;
   class Image;
   class ImageReader;
@@ -74,6 +75,8 @@ namespace Isis {
    *                           save their project.
    *   @history 2013-05-14 Jeannie Backer - Used return status of c++ system() in the constructor
    *                           to verify that the call was successful.
+   *   @history 2014-07-14 Kimberly Oyama - Updated to better meet programming standards. Added
+   *                           support for correlation matrix.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -94,6 +97,7 @@ namespace Isis {
       Directory *directory() const;
       Image *image(QString id);
       ImageList *imageList(QString name);
+      CorrelationMatrix *correlationMatrix();
       bool isTemporaryProject() const;
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
@@ -126,11 +130,7 @@ namespace Isis {
 
       void addToProject(WorkOrder *);
 
-      template<typename Data>
-      void warn(QString text, Data relevantData) {
-        storeWarning(text, relevantData);
-        directory()->showWarning(text, relevantData);
-      }
+      template<typename Data> void warn(QString text, Data relevantData);
 
       void warn(QString text);
 
@@ -205,6 +205,15 @@ namespace Isis {
       QPointer<Directory> m_directory;
       QList<ImageList *> *m_images;
       QList<ControlList *> *m_controls;
+      /**
+       * This variable will probably go away when we add the bundle results object because it will
+       *  be under:
+       *           BundleResults
+       *                 BundleStatistics
+       *                       CorrelationMatrix
+       */
+      CorrelationMatrix *m_correlationMatrix;
+      
       QMap<QString, Control *> *m_idToControlMap;
       QMap<QString, Image *> *m_idToImageMap;
       QString m_name;

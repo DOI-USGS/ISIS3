@@ -42,6 +42,7 @@ namespace Isis {
   class ControlNet;
   class HistoryTreeWidget;
   class ImageFileListWidget;
+  class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
   class ProjectTreeWidget;
@@ -70,6 +71,8 @@ namespace Isis {
    *                           sorting/smart arranging of the actions that come from the footprint
    *                           views.
    *   @history 2012-10-03 Steven Lambright - Added 'All' option generation in restructureActions()
+   *   @history 2014-07-14 Kimberly Oyama - Updated to better meet programming standards. Added
+   *                           support for correlation matrix.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -83,11 +86,12 @@ namespace Isis {
 
       // TODO
       void setRecentProjectsList(QStringList recentProjects);
-      QStringList recentProjectsList() { return m_recentProjects; }
+      QStringList recentProjectsList();
 
       CnetEditorWidget *addCnetEditorView(Control *network);
       Workspace *addCubeDnView();
       MosaicSceneWidget *addFootprint2DView();
+      MatrixSceneWidget *addMatrixView();
       ImageFileListWidget *addImageFileListView();
       QWidget *projectTreeWidget();
 
@@ -96,6 +100,7 @@ namespace Isis {
       QList<CnetEditorWidget *> cnetEditorViews();
       QList<Workspace *> cubeDnViews();
       QList<MosaicSceneWidget *> footprint2DViews();
+      QList<MatrixSceneWidget *> matrixViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
 
@@ -205,6 +210,7 @@ namespace Isis {
       QList< QPointer<Workspace> > m_cubeDnViewWidgets;
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;
       QList< QPointer<MosaicSceneWidget> > m_footprint2DViewWidgets;
+      QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets;
 
       QList< QPointer<WorkOrder> > m_workOrders;
 

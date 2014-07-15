@@ -39,8 +39,10 @@
 #include <QtDebug>
 #include <QXmlStreamWriter>
 
+#include "BundleResults.h"
 #include "Control.h"
 #include "ControlList.h"
+#include "CorrelationMatrix.h"
 #include "Cube.h"
 #include "Directory.h"
 #include "Environment.h"
@@ -75,6 +77,12 @@ namespace Isis {
 
     m_numImagesCurrentlyReading = 0;
 
+    /////////////////////////////////////////////////////////////////////// Correlation Matrix
+    m_correlationMatrix = NULL;
+    m_correlationMatrix = new CorrelationMatrix();
+    // qDebug() << "In project, got correlationMatrix";
+    /////////////////////////////////////////////////////////////////////// Correlation Matrix
+
     m_mutex = NULL;
     m_imageReadingMutex = NULL;
 
@@ -99,9 +107,10 @@ namespace Isis {
       int otherPid = pidString.toInt();
 
       if (otherPid != 0) {
-        if (!QFile::exists("/proc/" + pidString)) {
+        if ( !QFile::exists("/proc/" + pidString) ) {
           crashedPreviously = true;
-          int status = system( ("rm -rf '" + existingProjectFileName.expanded() + "' &").toAscii().data() );
+          int status = system( ("rm -rf '" +
+                                existingProjectFileName.expanded() + "' &").toAscii().data() );
           if (status != 0) {
             QString msg = "Executing command [rm -rf" + existingProjectFileName.expanded() +
                           "' &] failed with return status [" + toString(status) + "]";
@@ -112,16 +121,17 @@ namespace Isis {
     }
 
     if (crashedPreviously && false) {
-      QMessageBox::information(NULL,
-          QObject::tr("Crashed"),
-          QObject::tr("It appears %1 crashed. We're sorry.").arg(QApplication::applicationName()));
+      QMessageBox::information( NULL,
+                                QObject::tr("Crashed"),
+                                QObject::tr("It appears %1 crashed. We're sorry.").
+                                         arg( QApplication::applicationName() ) );
     }
 
 
     try {
       QString tmpFolder = QDir::temp().absolutePath() + "/"
             + Environment::userName() + "_"
-            + QApplication::applicationName() + "_" + QString::number(getpid());
+            + QApplication::applicationName() + "_" + QString::number( getpid() );
       QDir temp(tmpFolder + "/tmpProject");
       m_projectRoot = new QDir(temp);
 
@@ -133,7 +143,7 @@ namespace Isis {
     catch (std::exception &e) {
       //  e.what()
       throw IException(IException::Programmer,
-          tr("Error creating project folders [%1]").arg(e.what()), _FILEINFO_);
+          tr("Error creating project folders [%1]").arg( e.what() ), _FILEINFO_);
     }
 
     // image reader
@@ -141,7 +151,8 @@ namespace Isis {
 
     m_imageReader = new ImageReader(m_mutex, false);
 
-    connect(m_imageReader, SIGNAL(imagesReady(ImageList)), this, SLOT(imagesReady(ImageList)));
+    connect( m_imageReader, SIGNAL( imagesReady(ImageList) ),
+             this, SLOT( imagesReady(ImageList) ) );
 
     m_images = new QList<ImageList *>;
 
@@ -168,8 +179,8 @@ namespace Isis {
 
       for (int i = undoStackIndex - 1; i >= undoStackCleanIndex; i--) {
         const WorkOrder *currentWorkOrder =
-              dynamic_cast<const WorkOrder *>(m_undoStack.command(i));
-        if (currentWorkOrder && currentWorkOrder->modifiesDiskState()) {
+              dynamic_cast<const WorkOrder *>( m_undoStack.command(i) );
+        if ( currentWorkOrder && currentWorkOrder->modifiesDiskState() ) {
           undoNeededToRestoreDiskState = i;
         }
       }
@@ -233,25 +244,25 @@ namespace Isis {
    */
   void Project::createFolders() {
     QDir dir;
-    if (!dir.mkpath(m_projectRoot->path())) {
+    if ( !dir.mkpath( m_projectRoot->path() ) ) {
       warn("Cannot create project directory.");
       throw IException(IException::Io,
                        tr("Unable to create folder [%1] when trying to initialize project")
-                         .arg(m_projectRoot->path()),
+                         .arg(m_projectRoot->path() ),
                        _FILEINFO_);
     }
 
     try {
-      if (!dir.mkdir(cnetRoot())) {
+      if ( !dir.mkdir( cnetRoot() ) ) {
         QString msg = QString("Unable to create folder [%1] when trying to initialize project")
-                        .arg(cnetRoot());
+                        .arg( cnetRoot() );
         warn(msg);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
-      if (!dir.mkdir(imageDataRoot())) {
+      if ( !dir.mkdir( imageDataRoot() ) ) {
         QString msg = QString("Unable to create folder [%1] when trying to initialize project")
-                        .arg(imageDataRoot());
+                        .arg( imageDataRoot() );
         warn(msg);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -272,8 +283,8 @@ namespace Isis {
       result->setName(name);
       result->setPath(name);
 
-      connect(result, SIGNAL(destroyed(QObject *)),
-              this, SLOT(imageListDeleted(QObject *)));
+      connect( result, SIGNAL( destroyed(QObject *) ),
+               this, SLOT( imageListDeleted(QObject *) ) );
 
       m_images->append(result);
     }
@@ -300,7 +311,7 @@ namespace Isis {
 
     stream.writeAttribute("name", m_name);
 
-    if (!m_controls->isEmpty()) {
+    if ( !m_controls->isEmpty() ) {
       stream.writeStartElement("controlNets");
 
       for (int i = 0; i < m_controls->count(); i++) {
@@ -310,7 +321,7 @@ namespace Isis {
       stream.writeEndElement();
     }
 
-    if (!m_images->isEmpty()) {
+    if ( !m_images->isEmpty() ) {
       stream.writeStartElement("imageLists");
 
       for (int i = 0; i < m_images->count(); i++) {
@@ -422,14 +433,14 @@ namespace Isis {
     QString numberedPrefix;
     do {
       prefixCounter++;
-      numberedPrefix = prefix.arg(QString::number(prefixCounter));
+      numberedPrefix = prefix.arg( QString::number(prefixCounter) );
     }
-    while (cnetFolder.exists(numberedPrefix));
+    while ( cnetFolder.exists(numberedPrefix) );
 
-    if (!cnetFolder.mkpath(numberedPrefix)) {
+    if ( !cnetFolder.mkpath(numberedPrefix) ) {
       throw IException(IException::Io,
           tr("Could not create control network directory [%1] in [%2].")
-            .arg(numberedPrefix).arg(cnetFolder.absolutePath()),
+            .arg(numberedPrefix).arg( cnetFolder.absolutePath() ),
           _FILEINFO_);
     }
 
@@ -448,10 +459,12 @@ namespace Isis {
    */
   void Project::addControl(Control *control) {
 
-    connect(control, SIGNAL(destroyed(QObject *)), this, SLOT(controlClosed(QObject *)));
-    connect(this, SIGNAL(projectRelocated(Project *)), control, SLOT(updateFileName(Project *)));
+    connect( control, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( controlClosed(QObject *) ) );
+    connect( this, SIGNAL( projectRelocated(Project *) ),
+             control, SLOT( updateFileName(Project *) ) );
 
-    createOrRetrieveControlList(FileName(control->fileName()).dir().dirName())->append(control);
+    createOrRetrieveControlList( FileName( control->fileName() ).dir().dirName() )->append(control);
 
     (*m_idToControlMap)[control->id()] = control;
 
@@ -468,8 +481,8 @@ namespace Isis {
       result->setName(name);
       result->setPath(name);
 
-      connect(result, SIGNAL(destroyed(QObject *)),
-              this, SLOT(controlListDeleted(QObject *)));
+      connect( result, SIGNAL( destroyed(QObject *) ),
+               this, SLOT( controlListDeleted(QObject *) ) );
 
       emit controlListAdded(result);
       m_controls->append(result);
@@ -492,14 +505,14 @@ namespace Isis {
     QString numberedPrefix;
     do {
       prefixCounter++;
-      numberedPrefix = prefix.arg(QString::number(prefixCounter));
+      numberedPrefix = prefix.arg( QString::number(prefixCounter) );
     }
-    while (imageFolder.exists(numberedPrefix));
+    while ( imageFolder.exists(numberedPrefix) );
 
-    if (!imageFolder.mkpath(numberedPrefix)) {
+    if ( !imageFolder.mkpath(numberedPrefix) ) {
       throw IException(IException::Io,
           tr("Could not create image directory [%1] in [%2].")
-            .arg(numberedPrefix).arg(imageFolder.absolutePath()),
+            .arg(numberedPrefix).arg( imageFolder.absolutePath() ),
           _FILEINFO_);
     }
 
@@ -560,7 +573,7 @@ namespace Isis {
     QString projectXmlPath = projectPath.toString() + "/project.xml";
     QFile file(projectXmlPath);
 
-    if (!file.open(QFile::ReadOnly)) {
+    if ( !file.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
                          .arg(projectXmlPath),
@@ -571,14 +584,14 @@ namespace Isis {
     *m_projectRoot = projectPath.expanded();
 
     QXmlInputSource xmlInputSource(&file);
-    if (!reader.parse(xmlInputSource)) {
-      warn(tr("Failed to open project [%1]").arg(projectPath.original()));
+    if ( !reader.parse(xmlInputSource) ) {
+      warn( tr("Failed to open project [%1]").arg( projectPath.original() ) );
     }
 
     QString projectXmlHistoryPath = projectPath.toString() + "/history.xml";
     QFile historyFile(projectXmlHistoryPath);
 
-    if (!historyFile.open(QFile::ReadOnly)) {
+    if ( !historyFile.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
                          .arg(projectXmlHistoryPath),
@@ -587,15 +600,15 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlHistoryInputSource(&historyFile);
-    if (!reader.parse(xmlHistoryInputSource)) {
-      warn(tr("Failed to read history from project [%1]").arg(projectPath.original()));
+    if ( !reader.parse(xmlHistoryInputSource) ) {
+      warn( tr("Failed to read history from project [%1]").arg( projectPath.original() ) );
     }
 
     QString projectXmlWarningsPath =
         projectPath.toString() + "/warnings.xml";
     QFile warningsFile(projectXmlWarningsPath);
 
-    if (!warningsFile.open(QFile::ReadOnly)) {
+    if ( !warningsFile.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
                          .arg(projectXmlWarningsPath),
@@ -604,15 +617,15 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlWarningsInputSource(&warningsFile);
-    if (!reader.parse(xmlWarningsInputSource)) {
-      warn(tr("Failed to read warnings from project [%1]").arg(projectPath.original()));
+    if ( !reader.parse(xmlWarningsInputSource) ) {
+      warn( tr("Failed to read warnings from project [%1]").arg(projectPath.original() ) );
     }
 
     QString directoryXmlPath =
         projectPath.toString() + "/directory.xml";
     QFile directoryFile(directoryXmlPath);
 
-    if (!directoryFile.open(QFile::ReadOnly)) {
+    if ( !directoryFile.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
                          .arg(directoryXmlPath),
@@ -621,8 +634,8 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlDirectoryInputSource(&directoryFile);
-    if (!reader.parse(xmlDirectoryInputSource)) {
-      warn(tr("Failed to read GUI state from project [%1]").arg(projectPath.original()));
+    if ( !reader.parse(xmlDirectoryInputSource) ) {
+      warn( tr("Failed to read GUI state from project [%1]").arg( projectPath.original() ) );
     }
 
     emit projectLoaded(this);
@@ -654,6 +667,20 @@ namespace Isis {
   }
 
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Accessor for the correlation matrix.
+   *
+   * @return CorrelationMatrix The current matrix.
+   */
+  CorrelationMatrix *Project::correlationMatrix() {
+    // qDebug() << "got matrix from project";
+    return m_correlationMatrix;
+  }
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+
+  
+
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;
   }
@@ -664,10 +691,10 @@ namespace Isis {
     QListIterator< QPointer<WorkOrder> > it(*m_workOrderHistory);
     it.toBack();
 
-    while (!result && it.hasPrevious()) {
+    while ( !result && it.hasPrevious() ) {
       WorkOrder *workOrder = it.previous();
 
-      if (!workOrder->isUndone() && !workOrder->isUndoing()) {
+      if ( !workOrder->isUndone() && !workOrder->isUndoing() ) {
         result = workOrder;
       }
     }
@@ -689,10 +716,10 @@ namespace Isis {
     QListIterator< QPointer<WorkOrder> > it(*m_workOrderHistory);
     it.toBack();
 
-    while (!result && it.hasPrevious()) {
+    while ( !result && it.hasPrevious() ) {
       WorkOrder *workOrder = it.previous();
 
-      if (!workOrder->isUndone() && !workOrder->isUndoing()) {
+      if ( !workOrder->isUndone() && !workOrder->isUndoing() ) {
         result = workOrder;
       }
     }
@@ -742,8 +769,8 @@ namespace Isis {
 
     foreach (ImageList *imageList, *m_images) {
       QString name = imageList->name();
-      if (!name.contains("Group")) continue;
-      if (maxName.isEmpty()) {
+      if ( !name.contains("Group") ) continue;
+      if ( maxName.isEmpty() ) {
         maxName = name;
       }
       else if (name > maxName) {
@@ -751,7 +778,7 @@ namespace Isis {
       }
     }
 
-    if (maxName.isEmpty()) {
+    if ( maxName.isEmpty() ) {
       newGroupName += QString::number(numLists+1);
     }
     else {
@@ -806,7 +833,7 @@ namespace Isis {
    * @return The path to the root directory of the cnet data.
    */
   QString Project::cnetRoot() const {
-    return cnetRoot(m_projectRoot->path());
+    return cnetRoot( m_projectRoot->path() );
   }
 
 
@@ -847,7 +874,7 @@ namespace Isis {
    * @return The path to the root directory of the image data.
    */
   QString Project::imageDataRoot() const {
-    return imageDataRoot(m_projectRoot->path());
+    return imageDataRoot( m_projectRoot->path() );
   }
 
 
@@ -864,17 +891,17 @@ namespace Isis {
       imagesInAFolder->deleteFromDisk(this);
     }
 
-    if (!m_projectRoot->rmdir(imageDataRoot())) {
-      warn(tr("Did not properly clean up images folder [%1] in project").arg(imageDataRoot()));
+    if ( !m_projectRoot->rmdir( imageDataRoot() ) ) {
+      warn( tr("Did not properly clean up images folder [%1] in project").arg( imageDataRoot() ) );
     }
 
-    if (!m_projectRoot->rmdir(cnetRoot())) {
-      warn(tr("Did not properly clean up control network folder [%1] in project")
-             .arg(cnetRoot()));
+    if ( !m_projectRoot->rmdir( cnetRoot() ) ) {
+      warn( tr("Did not properly clean up control network folder [%1] in project")
+             .arg( cnetRoot() ) );
     }
 
-    if (!m_projectRoot->rmpath(m_projectRoot->path())) {
-      warn(tr("Did not properly clean up project in [%1]").arg(m_projectRoot->path()));
+    if ( !m_projectRoot->rmpath( m_projectRoot->path() ) ) {
+      warn( tr("Did not properly clean up project in [%1]").arg( m_projectRoot->path() ) );
     }
   }
 
@@ -893,10 +920,10 @@ namespace Isis {
   void Project::save() {
     if (m_isTemporaryProject) {
       QString newDestination =
-          QFileDialog::getSaveFileName(NULL, QString("Project Location"), QString("."));
+          QFileDialog::getSaveFileName( NULL, QString("Project Location"), QString(".") );
 
-      if (!newDestination.isEmpty()) {
-        save(QFileInfo(newDestination + "/").absolutePath());
+      if ( !newDestination.isEmpty() ) {
+        save( QFileInfo(newDestination + "/").absolutePath() );
 
         // delete the temporary project
         deleteAllProjectFiles();
@@ -911,28 +938,28 @@ namespace Isis {
 
 
   void Project::save(FileName newPath, bool verifyPathDoesntExist) {
-    if (verifyPathDoesntExist && QFile::exists(newPath.toString())) {
+    if ( verifyPathDoesntExist && QFile::exists( newPath.toString() ) ) {
       throw IException(IException::Io,
           QString("Projects may not be saved to an existing path [%1]; please select a new path or "
                   "delete the current folder")
-            .arg(newPath.original()),
+            .arg( newPath.original() ),
           _FILEINFO_);
     }
 
     QDir dir;
-    if (!dir.mkpath(newPath.toString())) {
+    if ( !dir.mkpath( newPath.toString() ) ) {
       throw IException(IException::Io,
           QString("Unable to save project at [%1] because we could not create the folder")
-            .arg(newPath.original()),
+            .arg( newPath.original() ),
           _FILEINFO_);
     }
 
     QFile projectSettingsFile(newPath.toString() + "/project.xml");
-    if (!projectSettingsFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+    if ( !projectSettingsFile.open(QIODevice::ReadWrite | QIODevice::Truncate) ) {
       throw IException(IException::Io,
           QString("Unable to save project at [%1] because the file [%2] could not be opened for "
                   "writing")
-            .arg(newPath.original()).arg(projectSettingsFile.fileName()),
+            .arg( newPath.original() ).arg( projectSettingsFile.fileName() ),
           _FILEINFO_);
     }
 
@@ -948,11 +975,11 @@ namespace Isis {
     writer.writeEndDocument();
 
     QFile projectHistoryFile(newPath.toString() + "/history.xml");
-    if (!projectHistoryFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+    if ( !projectHistoryFile.open(QIODevice::ReadWrite | QIODevice::Truncate) ) {
       throw IException(IException::Io,
           QString("Unable to save project at [%1] because the file [%2] could not be opened for "
                   "writing")
-            .arg(newPath.original()).arg(projectHistoryFile.fileName()),
+            .arg( newPath.original() ).arg( projectHistoryFile.fileName() ),
           _FILEINFO_);
     }
 
@@ -965,11 +992,11 @@ namespace Isis {
     historyWriter.writeEndDocument();
 
     QFile projectWarningsFile(newPath.toString() + "/warnings.xml");
-    if (!projectWarningsFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+    if ( !projectWarningsFile.open(QIODevice::ReadWrite | QIODevice::Truncate) ) {
       throw IException(IException::Io,
                        QString("Unable to save project at [%1] because the file [%2] could not be "
                                "opened for writing")
-                         .arg(newPath.original()).arg(projectWarningsFile.fileName()),
+                         .arg( newPath.original() ).arg( projectWarningsFile.fileName() ),
                        _FILEINFO_);
     }
 
@@ -981,11 +1008,11 @@ namespace Isis {
     warningsWriter.writeEndDocument();
 
     QFile directoryStateFile(newPath.toString() + "/directory.xml");
-    if (!directoryStateFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+    if ( !directoryStateFile.open(QIODevice::ReadWrite | QIODevice::Truncate) ) {
       throw IException(IException::Io,
                        QString("Unable to save project at [%1] because the file [%2] could not be "
                                "opened for writing")
-                         .arg(newPath.original()).arg(directoryStateFile.fileName()),
+                         .arg( newPath.original() ).arg( directoryStateFile.fileName() ),
                        _FILEINFO_);
     }
 
@@ -1012,13 +1039,13 @@ namespace Isis {
    */
   void Project::addToProject(WorkOrder *workOrder) {
     if (workOrder) {
-      connect(workOrder, SIGNAL(finished(WorkOrder *)),
-              this, SIGNAL(workOrderFinished(WorkOrder *)));
+      connect( workOrder, SIGNAL( finished(WorkOrder *) ),
+               this, SIGNAL( workOrderFinished(WorkOrder *) ) );
 
-      workOrder->setPrevious(lastNotUndoneWorkOrder());
+      workOrder->setPrevious(lastNotUndoneWorkOrder() );
 
-      if (workOrder->execute()) {
-        if (workOrder->previous())
+      if ( workOrder->execute() ) {
+        if ( workOrder->previous() )
           workOrder->previous()->setNext(workOrder);
 
         m_workOrderHistory->append(workOrder);
@@ -1027,7 +1054,7 @@ namespace Isis {
 
         // Work orders that create clean states (save, save as) don't belong on the undo stack.
         //   Instead, we tell the undo stack that we're now clean.
-        if (workOrder->createsCleanState()) {
+        if ( workOrder->createsCleanState() ) {
           m_undoStack.setClean();
         }
         else {
@@ -1046,30 +1073,40 @@ namespace Isis {
   }
 
 
+
+  template<typename Data> void Project::warn(QString text, Data relevantData) {
+    storeWarning(text, relevantData);
+    directory()->showWarning(text, relevantData);
+  }
+
+
+  
   void Project::warn(QString text) {
-    foreach (QString line, text.split("\n")) {
+    foreach ( QString line, text.split("\n") ) {
       storeWarning(line);
       directory()->showWarning(line);
     }
   }
 
+  
 
   void Project::storeWarning(QString text) {
     m_warnings->append(text);
   }
 
 
+  
   void Project::imagesReady(ImageList images) {
     m_numImagesCurrentlyReading -= images.count();
 
     foreach (Image *image, images) {
-      connect(image, SIGNAL(destroyed(QObject *)),
-              this, SLOT(imageClosed(QObject *)));
-      connect(this, SIGNAL(projectRelocated(Project *)),
-              image, SLOT(updateFileName(Project *)));
+      connect( image, SIGNAL( destroyed(QObject *) ),
+               this, SLOT( imageClosed(QObject *) ) );
+      connect( this, SIGNAL( projectRelocated(Project *) ),
+               image, SLOT( updateFileName(Project *) ) );
 
       (*m_idToImageMap)[image->id()] = image;
-      createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName())->append(image);
+      createOrRetrieveImageList( FileName( images[0]->fileName() ).dir().dirName() )->append(image);
     }
 
     // We really can't have all of the cubes in memory before
@@ -1077,109 +1114,115 @@ namespace Isis {
      // Assume cameras are being used in other parts of code since it's
      //   unknown
      QMutexLocker lock(m_mutex);
-     emit imagesAdded(m_images->last());
+     emit imagesAdded( m_images->last() );
 
      Image *openImage;
      foreach (openImage, images) {
        openImage->closeCube();
      }
 
-//     if(m_projectPvl && m_projectPvl->HasObject("MosaicFileList"))
-//       m_fileList->fromPvl(m_projectPvl->FindObject("MosaicFileList"));
+//     if(m_projectPvl && m_projectPvl->HasObject("MosaicFileList") )
+//       m_fileList->fromPvl(m_projectPvl->FindObject("MosaicFileList") );
 
-//     if(m_projectPvl && m_projectPvl->HasObject("MosaicScene"))
-//       m_scene->fromPvl(m_projectPvl->FindObject("MosaicScene"));
+//     if(m_projectPvl && m_projectPvl->HasObject("MosaicScene") )
+//       m_scene->fromPvl(m_projectPvl->FindObject("MosaicScene") );
 
     if (m_numImagesCurrentlyReading == 0) {
       m_imageReadingMutex->unlock();
     }
   }
 
+  
 
   /**
    * An image is being deleted from the project
    */
   void Project::imageClosed(QObject * imageObj) {
     QMutableListIterator<ImageList *> it(*m_images);
-    while (it.hasNext()) {
+    while ( it.hasNext() ) {
       ImageList *list = it.next();
 
-      int foundElement = list->indexOf((Image *)imageObj);
+      int foundElement = list->indexOf( (Image *)imageObj );
 
       if (foundElement != -1) {
         list->removeAt(foundElement);
       }
     }
 
-    m_idToImageMap->remove(m_idToImageMap->key((Image *)imageObj));
+    m_idToImageMap->remove( m_idToImageMap->key( (Image *)imageObj ) );
   }
 
+  
 
   /**
    * A control is being deleted from the project
    */
   void Project::controlClosed(QObject *controlObj) {
     QMutableListIterator<ControlList *> it(*m_controls);
-    while (it.hasNext()) {
+    while ( it.hasNext() ) {
       ControlList *list = it.next();
 
-      int foundElement = list->indexOf((Control *)controlObj);
+      int foundElement = list->indexOf( (Control *)controlObj );
 
       if (foundElement != -1) {
         list->removeAt(foundElement);
       }
     }
 
-    m_idToControlMap->remove(m_idToControlMap->key((Control *)controlObj));
+    m_idToControlMap->remove( m_idToControlMap->key( (Control *)controlObj ) );
   }
 
 
+  
   /**
    * An control list is being deleted from the project.
    */
   void Project::controlListDeleted(QObject *controlListObj) {
-    int indexToRemove = m_controls->indexOf(static_cast<ControlList *>(controlListObj));
+    int indexToRemove = m_controls->indexOf( static_cast<ControlList *>(controlListObj) );
     if (indexToRemove != -1) {
       m_controls->removeAt(indexToRemove);
     }
   }
 
+  
 
   /**
    * An image list is being deleted from the project.
    */
   void Project::imageListDeleted(QObject *imageListObj) {
-    int indexToRemove = m_images->indexOf(static_cast<ImageList *>(imageListObj));
+    int indexToRemove = m_images->indexOf( static_cast<ImageList *>(imageListObj) );
     if (indexToRemove != -1) {
       m_images->removeAt(indexToRemove);
     }
   }
 
+  
 
   Project::XmlHandler::XmlHandler(Project *project) {
     m_project = project;
     m_workOrder = NULL;
   }
 
+  
 
   bool Project::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                          const QString &qName, const QXmlAttributes &atts) {
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+    if ( XmlStackedHandler::startElement(namespaceURI, localName, qName, atts) ) {
 
       if (localName == "project") {
         QString name = atts.value("name");
 
-        if (!name.isEmpty()) {
+        if ( !name.isEmpty() ) {
           m_project->setName(name);
         }
       }
 
       else if (localName == "controlNets") {
-        m_controls.append(new ControlList(m_project, reader()));
+        m_controls.append( new ControlList(m_project, reader() ) );
       }
 
       else if (localName == "imageList") {
-        m_imageLists.append(new ImageList(m_project, reader()));
+        m_imageLists.append( new ImageList( m_project, reader() ) );
       }
 
       else if (localName == "workOrder") {
@@ -1188,24 +1231,25 @@ namespace Isis {
         m_workOrder = WorkOrderFactory::create(m_project, type);
         ASSERT(m_workOrder->metaObject()->className() == type);
 
-        m_workOrder->read(reader());
+        m_workOrder->read( reader() );
       }
       else if (localName == "warning") {
         QString warningText = atts.value("text");
 
-        if (!warningText.isEmpty()) {
+        if ( !warningText.isEmpty() ) {
           m_project->warn(warningText);
         }
       }
 
       else if (localName == "directory") {
-        m_project->directory()->load(reader());
+        m_project->directory()->load( reader() );
       }
     }
 
     return true;
   }
 
+  
 
   bool Project::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                        const QString &qName) {

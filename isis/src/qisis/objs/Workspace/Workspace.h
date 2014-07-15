@@ -24,7 +24,6 @@
 
 
 #include <QMdiArea>
-
 #include <QPointer>
 
 template< class T > class QVector;

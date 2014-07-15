@@ -42,6 +42,9 @@ namespace Isis {
   class Control;
   class Directory;
   class ImageList;
+  ///////////////////////////////////////////////////////////////////
+  class CorrelationMatrix;
+  ///////////////////////////////////////////////////////////////////
   class ProgressBar;
   class Project;
   class XmlStackedHandlerReader;
@@ -50,8 +53,8 @@ namespace Isis {
    * @brief Parent class for anything that performs an action in Project
    *
    * This class should be used for any operation that affects a Project. This provides history,
-   *   undo/redo capabilities (which need implemented correctly), and the ability for the project to
-   *   guarantee a good state on disk.
+   *   undo/redo capabilities (which need to be implemented correctly), and the ability for the
+   *   project to guarantee a good state on disk.
    *
    * State between the end of execute() and the beginning of the redo methods must be saved via
    *   the parent (WorkOrder) class. This is to ensure serializability. State between the redo
@@ -83,6 +86,7 @@ namespace Isis {
    *                           Added listenForImageDestruction() and clearImageList().
    *   @history 2013-04-25 Jeannie Backer - Modified call to qWarning() to prevent compile warnings
    *                           on MAC OS 10.8.2
+   *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix.
    *
    */
   class WorkOrder : public QAction, public QUndoCommand {
@@ -102,7 +106,6 @@ namespace Isis {
         WorkOrderLastStatus = WorkOrderFinished
       };
 
-
       enum Context {
         NoContext,
         ProjectContext
@@ -116,11 +119,13 @@ namespace Isis {
       virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(QString projectFileName);
+      virtual bool isExecutable(CorrelationMatrix *correlationMatrix);
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
       virtual void setData(Context);
       virtual void setData(ImageList *images);
       virtual void setData(QList<Control *> controls);
+      virtual void setData(CorrelationMatrix *correlationMatrix);
       void setNext(WorkOrder *nextWorkOrder);
       void setPrevious(WorkOrder *previousWorkOrder);
 

@@ -22,6 +22,10 @@ namespace Isis {
    *   @history 2012-12-19 Steven Lambright and Stuart Sides - Finished initial implementation of
    *                           rename project use case. Text will now remain in editing mode if the
    *                           project name is invalid.
+   *   @history 2014-07-14 Kimberly Oyama - Added work order for Result tree item. The context menu
+   *                           will only have "View Correlation Matrix" for now. This work order
+   *                           will move when we figure out the rest of the tree structure for the
+   *                           bundle adjust items (settings, results, statistics, etc.).
    */
   class ProjectTreeWidget : public QTreeWidget {
       Q_OBJECT
@@ -36,7 +40,6 @@ namespace Isis {
     public slots:
       void addControlGroup(ControlList *controlList);
       void addControl(Control *control);
-//    void removeControlList(QObject *object);
       void addImageGroup(ImageList *images);
 
     protected:

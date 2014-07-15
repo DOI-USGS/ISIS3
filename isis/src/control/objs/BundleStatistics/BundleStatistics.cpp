@@ -25,7 +25,7 @@ namespace Isis {
 
   BundleStatistics::BundleStatistics() {
 
-    m_correlationMatrix = NULL;
+    m_correlationMatrix = new CorrelationMatrix();
 
     m_numberFixedPoints = 0; // set in BA constructor->init->fillPointIndexMap
     m_numberIgnoredPoints = 0; // set in BA constructor->init->fillPointIndexMap
@@ -1121,6 +1121,7 @@ namespace Isis {
     PvlGroup group(name);
 
     group += PvlKeyword("CorrelationMatrix", toString(bool(m_correlationMatrix != NULL)));
+    //covariance file name and location
     group += PvlKeyword("NumberFixedPoints", toString(m_numberFixedPoints));
     group += PvlKeyword("NumberIgnoredPoints", toString(m_numberIgnoredPoints));
     group += PvlKeyword("NumberHeldImages", toString(m_numberHeldImages));
@@ -1191,6 +1192,17 @@ namespace Isis {
     }
 
     return group;
+  }
+
+
+
+  /**
+   * Accessor for the Correlation Matrix.
+   *
+   * @return The correlation matrix.
+   */
+  CorrelationMatrix BundleStatistics::correlationMatrix() {
+    return *m_correlationMatrix;
   }
 
 

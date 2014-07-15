@@ -18,6 +18,7 @@
 #include "SaveProjectAsWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
 #include "CloseProjectWorkOrder.h"
+#include "MatrixViewWorkOrder.h"
 #include "MoveDownOneSceneWorkOrder.h"
 #include "MoveToBottomSceneWorkOrder.h"
 #include "MoveToTopSceneWorkOrder.h"
@@ -46,6 +47,7 @@ namespace Isis {
     tryType<ImportImagesWorkOrder>(type, project, result);
     tryType<ImportControlNetWorkOrder>(type, project, result);
     tryType<Footprint2DViewWorkOrder>(type, project, result);
+    tryType<MatrixViewWorkOrder>(type, project, result);
     tryType<MoveDownOneSceneWorkOrder>(type, project, result);
     tryType<MoveToBottomSceneWorkOrder>(type, project, result);
     tryType<MoveToTopSceneWorkOrder>(type, project, result);

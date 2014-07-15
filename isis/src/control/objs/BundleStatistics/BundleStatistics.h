@@ -49,6 +49,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-07-01 Jeannie Backer - Original version
+   *   @history 2014-07-14 Kimberly Oyama  Added support for correlation matrix.
    */
   class BundleStatistics {
     public:
@@ -172,6 +173,8 @@ namespace Isis {
                                SerialNumberList *m_pSnList);
 
       PvlGroup pvlGroup(QString name = "BundleStatistics") const;
+
+      CorrelationMatrix correlationMatrix();
 
     private:
       CorrelationMatrix *m_correlationMatrix;

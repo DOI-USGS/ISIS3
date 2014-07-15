@@ -88,6 +88,12 @@ namespace Isis {
     QPair<bool, ImageList *> selectedImageList(false, NULL);
     QList<Control *> selectedControls;
 
+    /*
+     * This variable is temporary. It will be removed when we figure out the tree structure for
+     * the bundle stuff.
+     */
+    bool bundle = false;
+
     foreach (QTreeWidgetItem *item, selected) {
       if (item == m_projectItem) {
         selectedProject = true;
@@ -110,13 +116,11 @@ namespace Isis {
         }
       }
 
-
       ControlTreeWidgetItem *controlItem = dynamic_cast<ControlTreeWidgetItem *>(item);
 
       if (controlItem) {
         selectedControls.append(controlItem->control());
       }
-
 
       ControlGroupTreeWidgetItem *controlGroupItem =
           dynamic_cast<ControlGroupTreeWidgetItem *>(item);
@@ -131,28 +135,45 @@ namespace Isis {
           }
         }
       }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+      if (item == m_resultsParentItem) {
+        bundle = true;
+      }
+    //////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     QList<QAction *> workOrders;
     if (selectedProject) {
+      bundle = false;
       workOrders.append(m_directory->supportedActions(WorkOrder::ProjectContext));
     }
 
     if (selectedImageList.second) {
+      bundle = false;
       workOrders.append(selectedImageList.second->supportedActions(m_directory->project()));
       workOrders.append(NULL);
       workOrders.append(m_directory->supportedActions(selectedImageList.second));
     }
 
     if (selectedControls.count()) {
+      bundle = false;
       workOrders.append(m_directory->supportedActions(selectedControls));
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    if (bundle) {
+      workOrders.append( m_directory->supportedActions(
+                                          m_directory->project()->correlationMatrix() ) );
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////////
     foreach(QAction *action, workOrders) {
-      if (action != NULL)
+      if (action != NULL) {
         contextMenu.addAction(action);
-      else
+      }
+      else {
         contextMenu.addSeparator();
+      }
     }
 
     if (workOrders.count()) {

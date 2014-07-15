@@ -22,18 +22,21 @@
 
 #include "FileName.h"
 
-#include <QString>
+#include <QDebug>
 #include <QList>
-#include <QStringList>
 #include <QMap>
+#include <QString>
+#include <QStringList>
 
-// class QMap<QString, QStringList>;
+#include "boost/numeric/ublas/matrix_sparse.hpp"
+
 template <typename A, typename B> class QMap;
 template <typename A> class QList;
 
 namespace Isis {
-  class MosaicSceneWidget;
   class FileName;
+  class MosaicSceneWidget;
+  class PvlObject;
   class SparseBlockColumnMatrix;
   /**
    * @brief This is a container for the correlation matrix that comes from a bundle adjust
@@ -47,28 +50,66 @@ namespace Isis {
    * @author 2014-05-02 Kimberly Oyama
    *
    * @internal
-   *
-   *  @history
    */
   class CorrelationMatrix {
     public:
       CorrelationMatrix();
+      CorrelationMatrix(PvlObject storedMatrixData);
       CorrelationMatrix(const CorrelationMatrix &other);
       ~CorrelationMatrix();
+      
       CorrelationMatrix &operator=(const CorrelationMatrix &other);
-      // get values given upper and lower corners of range...
-      // display block... when user wants to see one (x,y) we can show whole block for reference.
-      void getCorrelationMatrix(QString fileName);
-      void addToUpperTriangle(SparseBlockColumnMatrix sbcm);
 
+      void computeCorrelationMatrix();
+      void retrieveVisibleElements(int x, int y);
+
+      bool isValid();
+
+      void setCorrelationFileName(FileName correlationFileName);
       void setCovarianceFileName(FileName covarianceFileName);
-      double at(int x, int y) ;
+      void setImagesAndParameters(QMap<QString, QStringList> *imagesAndParameters);
+
+      SparseBlockColumnMatrix correlationMatrixFromFile(QDataStream inStream);
+      //might need something called deleteLater(), called from MatrixTreeWidgetItem constructor.
+
+      //if cov filename is null we need to ask the user to find it.
+
+      FileName correlationFileName();
+      FileName covarianceFileName();
+      QMap<QString, QStringList> *imagesAndParameters();
+
+      void getWholeMatrix();
+      void getThreeVisibleBlocks();
+
+      // Need these for range used to pick colors....
+      QList<SparseBlockColumnMatrix> *visibleBlocks();
+
+      PvlObject pvlObject();
 
     private:
-      QMap<QString, QStringList> m_imagesAndParameters;
-      FileName m_covarianceFileName;
-      FileName m_correlationFileName;
-      QList<double> m_diagonals;
+      //! This map holds the images used to create this matrix and their associated parameters.
+      QMap<QString, QStringList> *m_imagesAndParameters;
+
+      //! This map holds the images and parameters associated with the block in focus.
+      QMap<QString, QStringList> *m_visibleImagesAndParameters;
+
+      //! FileName of the covariance matrix calculated when the bundle was run.
+      FileName *m_covarianceFileName;
+
+      //! FileName of the correlation matrix
+      FileName *m_correlationFileName;
+
+      /**
+       * List of the parameter values. Stored so we don't need to store all the SBCMs when
+       * calculating the correlation values.
+       */
+      QList<double> *m_diagonals;
+
+      /**
+       * This will be the three blocks (or whole matrix depending on size) that apply to
+       * the given area.
+       */
+      QList<SparseBlockColumnMatrix> *m_visibleBlocks;
   };
 };
 
