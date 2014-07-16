@@ -8,6 +8,18 @@ namespace Ui {
 }
 
 namespace Isis {
+  /**
+   * @brief 
+   *  
+   * @ingroup ControlNetworks
+   *
+   * @author 2014-04-21 Ken Edmundson
+   *
+   * @internal
+   *   @history 2014-04-21 Ken Edmundson - Original version.
+   *   @history 2014-07-16 Jeannie Backer - Use MaximumLikelihoodWFunctions
+   *                           static method to convert string to Model enum.
+   */
   class Project;
   class Control;
   class BundleSettings;
