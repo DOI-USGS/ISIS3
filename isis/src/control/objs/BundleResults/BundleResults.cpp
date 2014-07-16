@@ -106,10 +106,8 @@ namespace Isis {
     if (m_controlNetworkFileName != "") {
       pvl += PvlKeyword("OutputControlNetwork", m_controlNetworkFileName);
     }
-    pvl += m_settings->pvlGroup(settingsName);
-    pvl += m_statisticsResults->pvlGroup(statisticsName);
-//    pvl += m_settings.pvlGroup(settingsName);
-//    pvl += m_statisticsResults.pvlGroup(statisticsName);
+    pvl += m_settings->pvlObject(settingsName);
+    pvl += m_statisticsResults->pvlObject(statisticsName);
     return pvl;
 
   }
