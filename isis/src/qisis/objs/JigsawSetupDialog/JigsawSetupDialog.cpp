@@ -3,6 +3,7 @@
 #include "BundleSettings.h"
 #include "Control.h"
 #include "IString.h"
+#include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
 #include "ui_JigsawSetupDialog.h"
 
@@ -248,21 +249,21 @@ namespace Isis {
     if (m_ui->maximumLikelihoodModel1ComboBox->currentText().compare("NONE") != 0) {
       // if model1 is not "NONE", add to the models list with its quantile
       settings->addMaximumLikelihoodEstimatorModel(
-          BundleSettings::stringToMaximumLikelihoodModel(
+          MaximumLikelihoodWFunctions::stringToModel(
               m_ui->maximumLikelihoodModel1ComboBox->currentText()), 
           m_ui->maximumLikelihoodModel1QuantileLineEdit->text().toDouble());
 
       if (m_ui->maximumLikelihoodModel2ComboBox->currentText().compare("NONE") != 0) {
         // if model2 is not "NONE", add to the models list with its quantile
         settings->addMaximumLikelihoodEstimatorModel(
-            BundleSettings::stringToMaximumLikelihoodModel(
+            MaximumLikelihoodWFunctions::stringToModel(
                 m_ui->maximumLikelihoodModel2ComboBox->currentText()), 
             m_ui->maximumLikelihoodModel2QuantileLineEdit->text().toDouble());
 
         if (m_ui->maximumLikelihoodModel3ComboBox->currentText().compare("NONE") != 0) {
           // if model3 is not "NONE", add to the models list with its quantile
           settings->addMaximumLikelihoodEstimatorModel(
-              BundleSettings::stringToMaximumLikelihoodModel(
+              MaximumLikelihoodWFunctions::stringToModel(
                   m_ui->maximumLikelihoodModel3ComboBox->currentText()), 
               m_ui->maximumLikelihoodModel3QuantileLineEdit->text().toDouble());
         }
