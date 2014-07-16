@@ -80,7 +80,11 @@ namespace Isis {
     /////////////////////////////////////////////////////////////////////// Correlation Matrix
     m_correlationMatrix = NULL;
     m_correlationMatrix = new CorrelationMatrix();
-    // qDebug() << "In project, got correlationMatrix";
+    m_correlationMatrix->setCovarianceFileName( FileName("/work/users/koyama/testData/covarianceMatrix2.dat") );
+    m_correlationMatrix->setCorrelationFileName( FileName("/work/users/koyama/testData/correlationMatrix.dat") );
+
+    m_correlationMatrix->computeCorrelationMatrix();
+//     qDebug() << "In project, got correlationMatrix";
     /////////////////////////////////////////////////////////////////////// Correlation Matrix
 
     m_mutex = NULL;
