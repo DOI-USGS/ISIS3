@@ -613,20 +613,21 @@ namespace Isis {
     QPen outlinePen(Qt::black);
     outlinePen.setWidth(0);
 
-    //Make another iterator for the imagesAndParameters qmap and go from there...
-//     QMapIterator<QString, QStringList> img1Iterator( *corrMatrix->imagesAndParameters() );
-//     QMapIterator<QString, QStringList> img2Iterator( *corrMatrix->imagesAndParameters() );
+    // Image and parameters of column
+    QMapIterator<QString, QStringList> colIterator( *corrMatrix->imagesAndParameters() );
+    // Image and parameters of row
+    QMapIterator<QString, QStringList> rowIterator( *corrMatrix->imagesAndParameters() );
     
     foreach ( SparseBlockColumnMatrix blockColumn, *( corrMatrix->visibleBlocks() ) ) {
       QMapIterator<int, matrix<double>*> block(blockColumn);
       bool lastBlock = true;
       block.toBack(); // moves iterator to AFTER the last item
-//       img2Iterator.toBack();
-//       img1Iterator.next();
+      colIterator.next();
+      rowIterator = colIterator;
 
       do {
         block.previous(); // go to last item
-//         img2Iterator.previous();
+        rowIterator.previous();
         for (int row = 0; row < (int)block.value()->size1(); row++) {
           for (int column = 0; column < (int)block.value()->size2(); column++) {
 
@@ -670,15 +671,14 @@ namespace Isis {
             if (draw) {
               rectangle = m_graphicsScene->addRect(x, y,                     // Start Position
                                                    elementSize, elementSize, // Rectangle Size
-                                                   outlinePen, fillBrush);   // outline, fill options
-//               QString img1 = "Image 1: " + img1Iterator.key() + "\n";
-//               QString param1 = "Parameter 1: " + img1Iterator.value().at(row) + "\n";
-//               QString img2 = "Image 2: " + img2Iterator.key() + "\n";
-//               QString param2 = "Parameter 2: " + img2Iterator.value().at(column);
-//               QString toolTip = QString::number( ( *block.value() )(row, column) ) + "\n"
-//                                 + img1 + param1 + img2 + param2;
-              QString toolTip;
-              rectangle->setToolTip(toolTip.setNum( ( *block.value() )(row, column) ) );
+                                                   outlinePen, fillBrush);   // outline/fill options
+              QString img1 = "Image 1       : " + colIterator.key() + "\n";
+              QString param1 = "Parameter 1: " + colIterator.value().at(column) + "\n";
+              QString img2 = "Image 2       : " + rowIterator.key() + "\n";
+              QString param2 = "Parameter 2: " + rowIterator.value().at(row);
+              QString toolTip = "Correlation  : " + QString::number( ( *block.value() )(row, column) )
+                                + "\n" + img1 + param1 + img2 + param2;
+              rectangle->setToolTip(toolTip);
             }
             x += elementSize;
           }
@@ -693,9 +693,6 @@ namespace Isis {
         y = startY - yOffset;
         lastBlock = false;
       } while ( block.hasPrevious() );
-      
-      //reset second img iterator
-//       img2Iterator.toBack();
 
       startX += block.value()->size2() * elementSize;
       startY += block.value()->size1() * elementSize;
