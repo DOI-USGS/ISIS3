@@ -15,7 +15,7 @@
 #include "CorrelationMatrix.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "PvlKeyword.h"
-#include "PvlGroup.h"
+#include "PvlObject.h"
 #include "SerialNumberList.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
@@ -1116,62 +1116,59 @@ namespace Isis {
   }
 
 
-  PvlGroup BundleStatistics::pvlGroup(QString name) const {
+  PvlObject BundleStatistics::pvlObject(QString name) const {
 
-    PvlGroup group(name);
+    PvlObject pvl(name);
 
-    group += PvlKeyword("CorrelationMatrix", toString(bool(m_correlationMatrix != NULL)));
+    pvl += PvlKeyword("CorrelationMatrix", toString(bool(m_correlationMatrix != NULL)));
     //covariance file name and location
-    group += PvlKeyword("NumberFixedPoints", toString(m_numberFixedPoints));
-    group += PvlKeyword("NumberIgnoredPoints", toString(m_numberIgnoredPoints));
-    group += PvlKeyword("NumberHeldImages", toString(m_numberHeldImages));
-    group += PvlKeyword("RMSResidualX", toString(m_rms_rx));
-    group += PvlKeyword("RMSResidualY", toString(m_rms_ry));
-    group += PvlKeyword("RMSResidualXY", toString(m_rms_rxy));
-    group += PvlKeyword("RejectionLimit", toString(m_rejectionLimit));
-    group += PvlKeyword("NumberRejectedObservations", toString(m_numberRejectedObservations));
-    group += PvlKeyword("NumberObservations", toString(m_numberObservations));
-    group += PvlKeyword("NumberImageParameters", toString(m_numberImageParameters));
-    group += PvlKeyword("NumberConstrainedPointParameters", toString(m_numberConstrainedPointParameters));
-    group += PvlKeyword("NumberConstrainedImageParameters", toString(m_numberConstrainedImageParameters));
-    group += PvlKeyword("NumberUnknownParameters", toString(m_numberUnknownParameters));
-    group += PvlKeyword("DegreesOfFreedom", toString(m_degreesOfFreedom));
-    group += PvlKeyword("Sigma0", toString(m_sigma0));
-    group += PvlKeyword("ElapsedTime", toString(m_elapsedTime));
-    group += PvlKeyword("ElapsedTimeErrorProp", toString(m_elapsedTimeErrorProp));
-    group += PvlKeyword("Converged", toString(m_converged));
+    pvl += PvlKeyword("NumberFixedPoints", toString(m_numberFixedPoints));
+    pvl += PvlKeyword("NumberIgnoredPoints", toString(m_numberIgnoredPoints));
+    pvl += PvlKeyword("NumberHeldImages", toString(m_numberHeldImages));
+    pvl += PvlKeyword("RMSResidualX", toString(m_rms_rx));
+    pvl += PvlKeyword("RMSResidualY", toString(m_rms_ry));
+    pvl += PvlKeyword("RMSResidualXY", toString(m_rms_rxy));
+    pvl += PvlKeyword("RejectionLimit", toString(m_rejectionLimit));
+    pvl += PvlKeyword("NumberRejectedObservations", toString(m_numberRejectedObservations));
+    pvl += PvlKeyword("NumberObservations", toString(m_numberObservations));
+    pvl += PvlKeyword("NumberImageParameters", toString(m_numberImageParameters));
+    pvl += PvlKeyword("NumberConstrainedPointParameters", toString(m_numberConstrainedPointParameters));
+    pvl += PvlKeyword("NumberConstrainedImageParameters", toString(m_numberConstrainedImageParameters));
+    pvl += PvlKeyword("NumberUnknownParameters", toString(m_numberUnknownParameters));
+    pvl += PvlKeyword("DegreesOfFreedom", toString(m_degreesOfFreedom));
+    pvl += PvlKeyword("Sigma0", toString(m_sigma0));
+    pvl += PvlKeyword("ElapsedTime", toString(m_elapsedTime));
+    pvl += PvlKeyword("ElapsedTimeErrorProp", toString(m_elapsedTimeErrorProp));
+    pvl += PvlKeyword("Converged", toString(m_converged));
+    // loop through these ???
     // for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
-    //   group += PvlKeyword("// QVector< Statistics > rmsImageSampleResiduals", toString(m_));
+    //   pvl += PvlKeyword("// QVector< Statistics > rmsImageSampleResiduals", toString(m_));
     // }
-    // group += PvlKeyword("// QVector< Statistics > rmsImageLineResiduals", toString(m_));
-    // group += PvlKeyword("// QVector< Statistics > rmsImageResiduals", toString(m_));
-    // group += PvlKeyword("// QVector< Statistics > rmsImageXSigmas", toString(m_));
-    // group += PvlKeyword("// QVector< Statistics > rmsImageYSigmas", toString(m_));
-    // group += PvlKeyword("// QVector< Statistics > rmsImageZSigmas", toString(m_));
-    // group += PvlKeyword("// QVector< Statistics > rmsImageRASigmas", toString(m_));
-    // group += PvlKeyword("// QVector< Statistics > rmsImageDECSigmas", toString(m_));
-    // group += PvlKeyword("// QVector< Statistics > rmsImageTWISTSigmas", toString(m_));
-    group += PvlKeyword("MinSigmaLatitude", toString(m_minSigmaLatitude));
-    group += PvlKeyword("MinSigmaLatitudePointId", m_minSigmaLatitudePointId);
-    group += PvlKeyword("MaxSigmaLatitude", toString(m_maxSigmaLatitude));
-    group += PvlKeyword("MaxSigmaLatitudePointId", m_maxSigmaLatitudePointId);
-    group += PvlKeyword("MinSigmaLongitude", toString(m_minSigmaLongitude));
-    group += PvlKeyword("MinSigmaLongitudePointId", m_minSigmaLongitudePointId);
-    group += PvlKeyword("MaxSigmaLongitude", toString(m_maxSigmaLongitude));
-    group += PvlKeyword("MaxSigmaLongitudePointId", m_maxSigmaLongitudePointId);
-    group += PvlKeyword("MinSigmaRadius", toString(m_minSigmaRadius));
-    group += PvlKeyword("MinSigmaRadiusPointId", m_minSigmaRadiusPointId);
-    group += PvlKeyword("MaxSigmaRadius", toString(m_maxSigmaRadius));
-    group += PvlKeyword("MaxSigmaRadiusPointId", m_maxSigmaRadiusPointId);
-    group += PvlKeyword("RmsSigmaLat", toString(m_rmsSigmaLat));
-    group += PvlKeyword("RmsSigmaLon", toString(m_rmsSigmaLon));
-    group += PvlKeyword("RmsSigmaRad", toString(m_rmsSigmaRad));
-    group += PvlKeyword("NumberMaximumLikelihoodModels", toString(m_numberMaximumLikelihoodModels));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageLineResiduals", toString(m_));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageResiduals", toString(m_));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageXSigmas", toString(m_));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageYSigmas", toString(m_));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageZSigmas", toString(m_));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageRASigmas", toString(m_));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageDECSigmas", toString(m_));
+    // pvl += PvlKeyword("// QVector< Statistics > rmsImageTWISTSigmas", toString(m_));
+    pvl += PvlKeyword("MinSigmaLatitude", toString(m_minSigmaLatitude));
+    pvl += PvlKeyword("MinSigmaLatitudePointId", m_minSigmaLatitudePointId);
+    pvl += PvlKeyword("MaxSigmaLatitude", toString(m_maxSigmaLatitude));
+    pvl += PvlKeyword("MaxSigmaLatitudePointId", m_maxSigmaLatitudePointId);
+    pvl += PvlKeyword("MinSigmaLongitude", toString(m_minSigmaLongitude));
+    pvl += PvlKeyword("MinSigmaLongitudePointId", m_minSigmaLongitudePointId);
+    pvl += PvlKeyword("MaxSigmaLongitude", toString(m_maxSigmaLongitude));
+    pvl += PvlKeyword("MaxSigmaLongitudePointId", m_maxSigmaLongitudePointId);
+    pvl += PvlKeyword("MinSigmaRadius", toString(m_minSigmaRadius));
+    pvl += PvlKeyword("MinSigmaRadiusPointId", m_minSigmaRadiusPointId);
+    pvl += PvlKeyword("MaxSigmaRadius", toString(m_maxSigmaRadius));
+    pvl += PvlKeyword("MaxSigmaRadiusPointId", m_maxSigmaRadiusPointId);
+    pvl += PvlKeyword("RmsSigmaLat", toString(m_rmsSigmaLat));
+    pvl += PvlKeyword("RmsSigmaLon", toString(m_rmsSigmaLon));
+    pvl += PvlKeyword("RmsSigmaRad", toString(m_rmsSigmaRad));
+    pvl += PvlKeyword("NumberMaximumLikelihoodModels", toString(m_numberMaximumLikelihoodModels));
     if (m_numberMaximumLikelihoodModels > 0) {
-
-//      char *modelName = NULL;
-//      m_wFunc[0]->maximumLikelihoodModel(modelName);
-//      PvlKeyword models("MaximumLikelihoodModels", toString(modelName));
 
       PvlKeyword models("MaximumLikelihoodModels",
                         MaximumLikelihoodWFunctions::modelToString(m_wFunc[0]->model()));
@@ -1179,19 +1176,16 @@ namespace Isis {
       PvlKeyword quantiles("MaximumLikelihoodQuantiles", toString(m_maximumLikelihoodQuan[0]));
 
       for (int i = 1; i < m_numberMaximumLikelihoodModels; i++) {
-//        modelName = NULL;
-//        m_wFunc[i]->maximumLikelihoodModel(modelName);
-//        models.addValue(toString(modelName));
         models.addValue(MaximumLikelihoodWFunctions::modelToString(m_wFunc[i]->model()));
         quantiles.addValue(toString(m_maximumLikelihoodQuan[i]));
       }
-      group += models;
-      group += quantiles;
-      group += PvlKeyword("MaximumLikelihoodMedianR2Residuals", 
+      pvl += models;
+      pvl += quantiles;
+      pvl += PvlKeyword("MaximumLikelihoodMedianR2Residuals", 
                           toString(m_maximumLikelihoodMedianR2Residuals));
     }
 
-    return group;
+    return pvl;
   }
 
 

@@ -50,6 +50,7 @@ namespace Isis {
    * @internal
    *   @history 2014-07-01 Jeannie Backer - Original version
    *   @history 2014-07-14 Kimberly Oyama  Added support for correlation matrix.
+   *   @history 2014-07-16 Jeannie Backer - Changed pvlGroup() to pvlObject()
    */
   class BundleStatistics {
     public:
@@ -172,7 +173,7 @@ namespace Isis {
       bool setNumberHeldImages(SerialNumberList m_pHeldSnList,
                                SerialNumberList *m_pSnList);
 
-      PvlGroup pvlGroup(QString name = "BundleStatistics") const;
+      PvlGroup pvlObject(QString name = "BundleStatistics") const;
 
       CorrelationMatrix correlationMatrix();
 
