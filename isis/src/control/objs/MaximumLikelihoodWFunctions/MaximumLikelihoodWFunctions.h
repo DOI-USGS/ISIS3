@@ -52,6 +52,7 @@ namespace Isis {
    *   @history 2014-06-23 Jeannie Backer - Moved method implementation to cpp file and other ISIS
    *                           coding standards fixes.
    *   @history 2014-07-03 Jeannie Backer - Replace member variable m_PI with Isis constant
+   *   @history 2014-07-16 Jeannie Backer - Added enum to QString method and its inverse.
    */
   class MaximumLikelihoodWFunctions {
   public:
@@ -101,6 +102,7 @@ namespace Isis {
       Chen
     };
     static QString modelToString(Model model);
+    static MaximumLikelihoodWFunctions::Model stringToModel(QString modelName);
 
     MaximumLikelihoodWFunctions();
     MaximumLikelihoodWFunctions(Model modelSelection);

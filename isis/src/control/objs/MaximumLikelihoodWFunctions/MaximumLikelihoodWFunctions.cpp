@@ -370,6 +370,28 @@ namespace Isis {
 
 
 
+  MaximumLikelihoodWFunctions::Model MaximumLikelihoodWFunctions::stringToModel(QString modelName) {
+    if (modelName.compare("HUBER", Qt::CaseInsensitive) == 0) {
+      return Huber;
+    }
+    else if (modelName.compare("HUBER_MODIFIED", Qt::CaseInsensitive) == 0) {
+      return HuberModified;
+    }
+    else if (modelName.compare("WELSCH", Qt::CaseInsensitive) == 0) {
+      return Welsch;
+    }
+    else if (modelName.compare("CHEN", Qt::CaseInsensitive) == 0) {
+      return Chen;
+    }
+    else {
+      throw IException(IException::Programmer,
+                       "Unknown maximum likelihood model name" + modelName + ".",
+                       _FILEINFO_);
+    }
+  }
+
+
+
   /** 
    * Method to return a string represtentation of the weighted residual cutoff (if it exists) for 
    * the MaximumLikelihoodWFunctions::Model.  If no cutoff exists, the string "N/A" is returned. 
