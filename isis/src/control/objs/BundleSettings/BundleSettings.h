@@ -29,6 +29,7 @@
 
 #include "BundleObservationSolveSettings.h"
 #include "MaximumLikelihoodWFunctions.h" // why not forward declare???
+#include "PvlObject.h"
 
 namespace Isis {
   class MaximumLikelihoodWFunctions;
@@ -167,7 +168,7 @@ namespace Isis {
       bool createCSVPointsFile() const;
       bool createResidualsFile() const;
 
-      PvlGroup pvlGroup(QString name = "BundleSettings") const;
+      PvlObject pvlObject(QString name = "BundleSettings") const;
 
     private:
       bool m_validateNetwork;

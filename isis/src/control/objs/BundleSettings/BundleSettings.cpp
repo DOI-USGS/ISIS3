@@ -482,37 +482,37 @@ namespace Isis {
     return m_createResidualsFile;
   }
 
-  PvlGroup BundleSettings::pvlGroup(QString name) const {
-    PvlGroup group(name);
+  PvlObject BundleSettings::pvlObject(QString name) const {
+    PvlObject object(name);
 
     // General Solve Options
-    group += PvlKeyword("SolveMethod", solveMethodToString(m_solveMethod));
-    group += PvlKeyword("SolveObservationMode", toString(m_solveObservationMode));
-    group += PvlKeyword("SolveRadius", toString(m_solveRadius));
-    group += PvlKeyword("UpdateCubeLabel", toString(m_updateCubeLabel));
-    group += PvlKeyword("ErrorPropagation", toString(m_errorPropagation));
-    group += PvlKeyword("OutlierRejection", toString(m_outlierRejection));
+    object += PvlKeyword("SolveMethod", solveMethodToString(m_solveMethod));
+    object += PvlKeyword("SolveObservationMode", toString(m_solveObservationMode));
+    object += PvlKeyword("SolveRadius", toString(m_solveRadius));
+    object += PvlKeyword("UpdateCubeLabel", toString(m_updateCubeLabel));
+    object += PvlKeyword("ErrorPropagation", toString(m_errorPropagation));
+    object += PvlKeyword("OutlierRejection", toString(m_outlierRejection));
     if (m_outlierRejection) {
-      group += PvlKeyword("OutlierMultiplier", toString(m_outlierRejectionMultiplier));
+      object += PvlKeyword("OutlierMultiplier", toString(m_outlierRejectionMultiplier));
     }
-    group += PvlKeyword("GlobalLatitudeAprioriSigma", toString(m_globalLatitudeAprioriSigma));
-    group += PvlKeyword("GlobalLongitudeAprioriSigma", toString(m_globalLongitudeAprioriSigma));
+    object += PvlKeyword("GlobalLatitudeAprioriSigma", toString(m_globalLatitudeAprioriSigma));
+    object += PvlKeyword("GlobalLongitudeAprioriSigma", toString(m_globalLongitudeAprioriSigma));
     if (m_solveRadius) {
-      group += PvlKeyword("GlobalRadiiAprioriSigma", toString(m_globalRadiusAprioriSigma));
+      object += PvlKeyword("GlobalRadiiAprioriSigma", toString(m_globalRadiusAprioriSigma));
     }
 
     // Convergence Criteria
-    group += PvlKeyword("ConvergenceCriteria", convergenceCriteriaToString(m_convergenceCriteria));
-    group += PvlKeyword("ConvergenceCriteriaThreshold", toString(m_convergenceCriteriaThreshold));
-    group += PvlKeyword("ConvergenceCriteriaMaximumIterations",
+    object += PvlKeyword("ConvergenceCriteria", convergenceCriteriaToString(m_convergenceCriteria));
+    object += PvlKeyword("ConvergenceCriteriaThreshold", toString(m_convergenceCriteriaThreshold));
+    object += PvlKeyword("ConvergenceCriteriaMaximumIterations",
                         toString(m_convergenceCriteriaMaximumIterations));
 
     // Output Options
-    group += PvlKeyword("CreateBundleOutputFile", toString(m_createBundleOutputFile));
-    group += PvlKeyword("CreateCSVPointsFile", toString(m_createCSVPointsFile));
-    group += PvlKeyword("CreateResidualsFile", toString(m_createResidualsFile));
+    object += PvlKeyword("CreateBundleOutputFile", toString(m_createBundleOutputFile));
+    object += PvlKeyword("CreateCSVPointsFile", toString(m_createCSVPointsFile));
+    object += PvlKeyword("CreateResidualsFile", toString(m_createResidualsFile));
     if (m_createBundleOutputFile || m_createCSVPointsFile || m_createResidualsFile) {
-      group += PvlKeyword("FilePrefix", m_outputFilePrefix);
+      object += PvlKeyword("FilePrefix", m_outputFilePrefix);
     }
 
     // Maximum Likelihood Options
@@ -531,14 +531,14 @@ namespace Isis {
         models.addValue(MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[i].first));
         quantiles.addValue(toString(m_maximumLikelihood[i].second));
       }
-      group += models;
-      group += quantiles;
+      object += models;
+      object += quantiles;
     }
     else {
       models.addValue("None");
     }
 
-    return group;
+    return object;
   }
 
 }

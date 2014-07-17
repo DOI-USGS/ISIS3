@@ -34,6 +34,7 @@
 
 #include "BundleSettings.h"
 #include "MaximumLikelihoodWFunctions.h"
+#include "PvlObject.h"
 #include "Statistics.h" // ???
 
 namespace Isis {
@@ -41,7 +42,6 @@ namespace Isis {
   class CorrelationMatrix;
   class SerialNumberList;
   class StatCumProbDistDynCalc;
-  class PvlGroup;
   /**
    * A utility class containing statistical results from a BundleAdjust solution. 
    *  
@@ -173,7 +173,7 @@ namespace Isis {
       bool setNumberHeldImages(SerialNumberList m_pHeldSnList,
                                SerialNumberList *m_pSnList);
 
-      PvlGroup pvlObject(QString name = "BundleStatistics") const;
+      PvlObject pvlObject(QString name = "BundleStatistics") const;
 
       CorrelationMatrix correlationMatrix();
 

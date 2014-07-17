@@ -474,8 +474,8 @@ namespace Isis {
   bool BundleAdjust::solveCholesky() {
 
     // TODO what are the next two lines doing?
-    PvlGroup g = m_bundleSettings.pvlGroup();
-    cout << g << endl;
+    PvlObject pvlObject = m_bundleSettings.pvlObject();
+    cout << pvlObject << endl;
 
     // throw error if a frame camera is included AND if m_bundleSettings.solveInstrumentPositionOverHermiteSpline()
     // is set to true (can only use for line scan or radar)
@@ -3242,9 +3242,9 @@ namespace Isis {
       //////////////////////////////////////////////////////////////////// This is where I add stuff
     // Create unique file name
     FileName matrixFile;
-    matrixFile = FileName::createTempFile("/tmp/koyama/testData/inverseMatrix.dat");
+    matrixFile = FileName::createTempFile("inverseMatrix.dat");
     // Create file handle
-    QFile matrixOutput(matrixFile.name()); //"covarianceMatrix.dat");
+    QFile matrixOutput(matrixFile.name());
     // Open file to write to
     matrixOutput.open(QIODevice::WriteOnly);
     QDataStream outStream(&matrixOutput);

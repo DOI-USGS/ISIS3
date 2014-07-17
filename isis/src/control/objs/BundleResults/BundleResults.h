@@ -28,14 +28,14 @@
 #include "BundleSettings.h"
 #include "BundleStatistics.h"
 #include "ControlNet.h"
+#include "PvlObject.h"
 
 namespace Isis {
-  class PvlObject;
 
   class BundleResults {
     public:
       BundleResults(BundleSettings inputSettings, ControlNet outputControlNet, 
-                    QString controlNetworkFileName = "");
+                    QString controlNetworkFileName = "");      
       BundleResults(const BundleResults &other);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &other);
