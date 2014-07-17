@@ -1206,7 +1206,7 @@ namespace Isis {
    *
    * @param name Name of the file used to store the covariance matrix.
    */
-   void setCorrMatCovFileName(FileName name) {
+   void BundleStatistics::setCorrMatCovFileName(FileName name) {
      m_correlationMatrix->setCovarianceFileName(name);
    }
 
@@ -1217,7 +1217,7 @@ namespace Isis {
    *
    * @param imgsAndParams The qmap with all the images and parameters used for this bundle.
    */
-   void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams) {
+   void BundleStatistics::setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams) {
      m_correlationMatrix->setImagesAndParameters(imgsAndParams);
    }
    
