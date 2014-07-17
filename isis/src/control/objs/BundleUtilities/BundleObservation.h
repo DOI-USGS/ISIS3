@@ -35,6 +35,15 @@
 
 namespace Isis {
 
+  /**
+   * @author 2014-??-?? Ken Edmundson
+   *
+   * @internal
+   *   @history 2014-07-17 Kimberly Oyama - Added member variables and accessors for the images and
+   *                           parameters in this observation. They will be used for the correlation
+   *                           matrix.
+   *
+   */
   class BundleObservation : public QVector< BundleImage* > {
 
     public:
@@ -84,6 +93,8 @@ namespace Isis {
     bool initializeExteriorOrientation();
 
     QString formatBundleOutputString(bool errorPropagation);
+    QStringList parameterList();
+    QStringList imageNames();
 
     private:
     bool initParameterWeights();
@@ -98,6 +109,8 @@ namespace Isis {
       int m_Index;
 
       QStringList m_serialNumbers; //!< list of all cube serial numbers in observation
+      QStringList m_parameterNamesList; //!< list of all cube parameters
+      QStringList m_imageNames; //!< list of all cube parameters
 
       QString m_instrumentId;      //!< spacecraft instrument id
 

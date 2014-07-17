@@ -34,10 +34,14 @@ namespace Isis {
   class Camera;
 
   /**
+   * This class hold image information that BundleAdjust needs to run correctly.
+   * 
    * @author 2014-05-22 Ken Edmundson
    *
    * @internal
-   *   @history 2014-05-22 Ken Edmundson
+   *   @history 2014-05-22 Ken Edmundson - Original Version
+   *   @history 2014-07-17 Kimberly Oyama - Updated to better meet coding standards.
+   *   
    */
   class BundleImage : QObject {
 
@@ -53,15 +57,14 @@ namespace Isis {
     // copy constructor
     BundleImage(const BundleImage &src);
 
-  public:
-      // mutators
-      void setParentObservation(BundleObservation* parentObservation);
+    // mutators
+    void setParentObservation(BundleObservation* parentObservation);
 
-      // accessors
-      Camera* camera();
-      BundleObservation* parentObservation();
-      QString serialNumber();
-      QString fileName();
+    // accessors
+    Camera* camera();
+    BundleObservation* parentObservation();
+    QString serialNumber();
+    QString fileName();
 
     private:
       Camera* m_camera;

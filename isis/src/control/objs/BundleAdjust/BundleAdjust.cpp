@@ -3244,7 +3244,9 @@ namespace Isis {
     FileName matrixFile;
     matrixFile = FileName::createTempFile("inverseMatrix.dat");
     // Create file handle
-    QFile matrixOutput(matrixFile.name());
+
+    QFile matrixOutput( matrixFile.name() ); //"covarianceMatrix.dat");
+
     // Open file to write to
     matrixOutput.open(QIODevice::WriteOnly);
     QDataStream outStream(&matrixOutput);
@@ -3396,7 +3398,7 @@ namespace Isis {
     // After the for loop, close the file.
     matrixOutput.close();
     // Save the location of the "covariance" matrix
-    m_bundleStatistics.correlationMatrix().setCovarianceFileName(matrixFile);
+    m_bundleStatistics.setCorrMatCovFileName(matrixFile);
     ////////////////////////////////////////////////////////////////////// This is where I add stuff
 
     // can free sparse normals now
@@ -4055,6 +4057,8 @@ namespace Isis {
     sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
     fp_out << buf;
 
+    QMap<QString, QStringList> imagesAndParameters;
+    
     for (int i = 0; i < nObservations; i++) {
 
       //if ( m_bundleStatistics.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
@@ -4080,8 +4084,17 @@ namespace Isis {
       QString observationString =
           observation->formatBundleOutputString(berrorProp);
       fp_out << (const char*)observationString.toAscii().data();
+      
+      foreach ( QString image, observation->imageNames() ) {
+        imagesAndParameters.insert( image, observation->parameterList() );
+      }
     }
-
+    
+////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
+    m_bundleStatistics.setCorrMatImgsAndParams(imagesAndParameters);
+////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     // output point uncertainty statistics if error propagation is on
     if (berrorProp) {
       sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");

@@ -67,7 +67,7 @@ namespace Isis {
 
       void setCorrelationFileName(FileName correlationFileName);
       void setCovarianceFileName(FileName covarianceFileName);
-      void setImagesAndParameters(QMap<QString, QStringList> *imagesAndParameters);
+      void setImagesAndParameters(QMap<QString, QStringList> imagesAndParameters);
 
       SparseBlockColumnMatrix correlationMatrixFromFile(QDataStream inStream);
       //might need something called deleteLater(), called from MatrixTreeWidgetItem constructor.

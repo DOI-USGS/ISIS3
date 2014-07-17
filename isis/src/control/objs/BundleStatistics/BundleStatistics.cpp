@@ -1200,6 +1200,28 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Set the covariance file name for the matrix used to calculate the correlation matrix.
+   *
+   * @param name Name of the file used to store the covariance matrix.
+   */
+   void setCorrMatCovFileName(FileName name) {
+     m_correlationMatrix->setCovarianceFileName(name);
+   }
+
+
+
+  /**
+   * Set the images and their associated parameters.
+   *
+   * @param imgsAndParams The qmap with all the images and parameters used for this bundle.
+   */
+   void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams) {
+     m_correlationMatrix->setImagesAndParameters(imgsAndParams);
+   }
+   
+
   // ??? QList< QPair< MaximumLikelihoodWFunctions, double > >
   // ???     BundleStatistics::maximumLikelihoodModels() const {
   // ??? }

@@ -100,7 +100,6 @@ namespace Isis {
 
     try {
       PvlObject::PvlKeywordIterator imgsIt = storedMatrixData.findGroup("ImagesAndParameters").begin();
-
       while ( imgsIt != storedMatrixData.findGroup("ImagesAndParameters").end() ) {
         QStringList params = (*imgsIt)[0].split(",");
         m_imagesAndParameters->insert(imgsIt->name(), params);
@@ -318,8 +317,8 @@ namespace Isis {
    *
    * @param
    */
-  void CorrelationMatrix::setImagesAndParameters(QMap<QString, QStringList> *imagesAndParameters) {
-    m_imagesAndParameters = imagesAndParameters;
+  void CorrelationMatrix::setImagesAndParameters(QMap<QString, QStringList> imagesAndParameters) {
+    m_imagesAndParameters = &imagesAndParameters;
   }
 
 

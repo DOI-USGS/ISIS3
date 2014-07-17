@@ -40,6 +40,7 @@
 namespace Isis {
   class ControlNet;
   class CorrelationMatrix;
+  class FileName;
   class SerialNumberList;
   class StatCumProbDistDynCalc;
   /**
@@ -176,6 +177,8 @@ namespace Isis {
       PvlObject pvlObject(QString name = "BundleStatistics") const;
 
       CorrelationMatrix correlationMatrix();
+      void setCorrMatCovFileName(FileName name);
+      void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams);
 
     private:
       CorrelationMatrix *m_correlationMatrix;
