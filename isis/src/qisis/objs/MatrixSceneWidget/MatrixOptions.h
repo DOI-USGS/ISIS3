@@ -21,8 +21,11 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Original Version
+   *   @history 2014-07-21 Kimberly Oyama - Connected apply button to scene. The color options are
+   *                           now functional.
    */
-  class MatrixOptions {
+  class MatrixOptions : public QObject {
+      Q_OBJECT
     public:
 
       enum FocusOption {
@@ -75,13 +78,13 @@ namespace Isis {
       void setCurrentParameter2(QString current);
 
       QMap< QString, QStringList> matrixImgsAndParams();
-      
+
+      signals:
+        void optionsUpdated();
 /*
-      public signals:
-        void changedCurrentCorrData();
-        
+
       public slots:
-        void updateCurrentCorrData();*/
+        void updateOptions(QString currentData);*/
       
     private:
 

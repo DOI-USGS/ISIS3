@@ -24,7 +24,7 @@ namespace Isis {
   class FileName;
   class MatrixDisplayTool;
   class MatrixGraphicsView;
-//   class MatrixOptions;
+  class MatrixOptions;
   class ProgressBar;
   class Project;
   class PvlGroup;
@@ -44,6 +44,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Original Version
+   *   @history 2014-07-21 Kimberly Oyama - Added matrix options dialog. Color optins are
+   *                           fucntional.
    */
   class MatrixSceneWidget : public QWidget {
       Q_OBJECT
@@ -67,7 +69,7 @@ namespace Isis {
       QProgressBar *getProgress();
       PvlObject toPvl() const;
       void fromPvl(const PvlObject &);
-      void load(XmlStackedHandlerReader *xmlReader);
+//       void load(XmlStackedHandlerReader *xmlReader);
 
       QRectF elementsBoundingRect() const;
       Directory *directory() const;
@@ -76,7 +78,7 @@ namespace Isis {
       void redrawItems();
 
       void repaintItems(bool colorScheme);
-    
+
       /**
        * Return an empty list of actions for unknown data types
        */
@@ -86,7 +88,7 @@ namespace Isis {
       }
 
     signals:
-// add roll over
+// add roll over?
       void mouseEnter();
       void mouseMove(QPointF);
       void mouseLeave();
@@ -96,44 +98,18 @@ namespace Isis {
       void mouseWheel(QPointF, int delta);
       void rubberBandComplete(QRectF r, Qt::MouseButton s);
       void visibleRectChanged(QRectF);
-
       void elementsChanged();
-
       void queueSelectionChanged();
+
+      void elementClicked(QString);
+
+    public slots:
+      void redrawElements();
 
     protected:
       virtual bool eventFilter(QObject *obj, QEvent *ev);
-
-    private:
-      /**
-       * @author 2014-05-10 Steven Lambright
-       *
-       * @internal
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(MatrixSceneWidget *scene);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          QString m_characterData;
-          MatrixSceneWidget *m_sceneWidget;
-
-          int m_scrollBarXValue;
-          int m_scrollBarYValue;
-      };
       
     private slots:
-      void exportView();
-      void saveList();
 
       void fitInView();
 
@@ -155,7 +131,7 @@ namespace Isis {
 
       ProgressBar *m_progress;
 
-//       MatrixOptions *m_matrixOptions;
+      MatrixOptions *m_matrixOptions;
   };
 }
 

@@ -67,7 +67,11 @@ namespace Isis {
                                            QWidget *parent) : QDialog(parent) {
 
 //     connect( this, SIGNAL( optionsUpdated() ),
-//              parent, SLOT( redrawItems() ) ); 
+//              parent, SLOT( redrawItems() ) );
+
+    connect(parent, SIGNAL( elementClicked(QString) ),
+            this, SLOT( updateCorrelationData(QString) ) );
+                           
     m_options = options;
 
     setWindowTitle("Matrix Options");
@@ -314,41 +318,43 @@ namespace Isis {
     QVBoxLayout *m_currentElementData = new QVBoxLayout();
     m_currentElementData->setContentsMargins(0, 0, 0, 0);
 
-    QHBoxLayout *currentCorrLayout = new QHBoxLayout();
+//     QHBoxLayout *currentCorrLayout = new QHBoxLayout();
     
     QLabel *currentCorrLabel = new QLabel();
-    currentCorrLabel->setText("Current Correlation Value:");
-    currentCorrLayout->addWidget(currentCorrLabel);
+    currentCorrLabel->setText("Current Correlation Info:");
+    m_currentElementData->addWidget(currentCorrLabel);
+//     currentCorrLayout->addWidget(currentCorrLabel);
 
     m_currentValueLabel = new QLabel();
-    m_currentValueLabel->setText("-0.394428");
-    currentCorrLayout->addWidget(m_currentValueLabel);
+    m_currentValueLabel->setText("-");
+    m_currentElementData->addWidget(m_currentValueLabel);
+//     currentCorrLayout->addWidget(m_currentValueLabel);
 
-    m_currentElementData->addLayout(currentCorrLayout);
+//     m_currentElementData->addLayout(currentCorrLayout);
 
-    QHBoxLayout *currentCorrImg1Layout = new QHBoxLayout();
+//     QHBoxLayout *currentCorrImg1Layout = new QHBoxLayout();
     
-    m_image1NameLabel = new QLabel();
-    m_image1NameLabel->setText("Image 1:  Sub4-AS15-M-0585_msk");
-    currentCorrImg1Layout->addWidget(m_image1NameLabel);
+//     m_image1NameLabel = new QLabel();
+//     m_image1NameLabel->setText("Image 1:  Sub4-AS15-M-0585_msk");
+//     currentCorrImg1Layout->addWidget(m_image1NameLabel);
 
-    m_parameter1NameLabel = new QLabel();
-    m_parameter1NameLabel->setText("   Parameter 1: X");
-    currentCorrImg1Layout->addWidget(m_parameter1NameLabel);
+//     m_parameter1NameLabel = new QLabel();
+//     m_parameter1NameLabel->setText("   Parameter 1: X");
+//     currentCorrImg1Layout->addWidget(m_parameter1NameLabel);
 
-    m_currentElementData->addLayout(currentCorrImg1Layout);
+//     m_currentElementData->addLayout(currentCorrImg1Layout);
 
-    QHBoxLayout *currentCorrImg2Layout = new QHBoxLayout();
+//     QHBoxLayout *currentCorrImg2Layout = new QHBoxLayout();
     
-    m_image2NameLabel = new QLabel();
-    m_image2NameLabel->setText("Image 2:  Sub4-AS15-M-0586_msk");
-    currentCorrImg2Layout->addWidget(m_image2NameLabel);
+//     m_image2NameLabel = new QLabel();
+//     m_image2NameLabel->setText("Image 2:  Sub4-AS15-M-0586_msk");
+//     currentCorrImg2Layout->addWidget(m_image2NameLabel);
 
-    m_parameter2NameLabel = new QLabel;
-    m_parameter2NameLabel->setText("   Parameter 2: TWI");
-    currentCorrImg2Layout->addWidget(m_parameter2NameLabel);
+//     m_parameter2NameLabel = new QLabel;
+//     m_parameter2NameLabel->setText("   Parameter 2: TWI");
+//     currentCorrImg2Layout->addWidget(m_parameter2NameLabel);
 
-    m_currentElementData->addLayout(currentCorrImg2Layout);
+//     m_currentElementData->addLayout(currentCorrImg2Layout);
 
     optionsTabs->setCurrentIndex(0);
 
@@ -366,10 +372,6 @@ namespace Isis {
 
     QMetaObject::connectSlotsByName(this);
 
-    // Update current info when user clicks on matrix element
-//     connect( m_options, SIGNAL( changedCurrentCorrData() ),
-//              this, SLOT( updateCorrelationData() ) );
-    
     readOptions();
   }
   
@@ -406,25 +408,25 @@ namespace Isis {
     m_options->setColorTolerance( m_colorToleranceLineEdit->text().toDouble() );
 
     // Focus Options
-    m_options->setFocusValue( m_colorToleranceLineEdit->text().toDouble() );
-
-    QList<double> goodElements, badElements;
-    
-//     m_options->setGoodElements(*m_goodElementsComboBox);
-//     m_options->setBadElements(*m_badElementsComboBox);
-
-    if ( m_bestCorrelationRadioButton->isChecked() )  {
-      m_options->setFocusOption(MatrixOptions::Best);
-    }
-    else if ( m_worstCorrelationRadioButton->isChecked() ) {
-      m_options->setFocusOption(MatrixOptions::Worst);
-    }
-    else if ( m_focusToleranceRadioButton->isChecked() ) {
-      m_options->setFocusOption(MatrixOptions::Tolerance);
-    }
-    else {
-      m_options->setFocusOption(MatrixOptions::Specific);
-    }
+//     m_options->setFocusValue( m_colorToleranceLineEdit->text().toDouble() );
+// 
+//     QList<double> goodElements, badElements;
+//     
+// //     m_options->setGoodElements(*m_goodElementsComboBox);
+// //     m_options->setBadElements(*m_badElementsComboBox);
+// 
+//     if ( m_bestCorrelationRadioButton->isChecked() )  {
+//       m_options->setFocusOption(MatrixOptions::Best);
+//     }
+//     else if ( m_worstCorrelationRadioButton->isChecked() ) {
+//       m_options->setFocusOption(MatrixOptions::Worst);
+//     }
+//     else if ( m_focusToleranceRadioButton->isChecked() ) {
+//       m_options->setFocusOption(MatrixOptions::Tolerance);
+//     }
+//     else {
+//       m_options->setFocusOption(MatrixOptions::Specific);
+//     }
 
     emit optionsUpdated();
   }
@@ -493,14 +495,15 @@ namespace Isis {
    * Update the current correlation information. This slot is called when the m_options signal,
    * changedCurrentCorrData() is emit. This happens when a matrix element is clicked on.
    */
-  void MatrixOptionsDialog::readCorrelationData() {
-    m_currentValueLabel->setText( toString( m_options->currentCorrelation() ) );
+  void MatrixOptionsDialog::updateCorrelationData(QString currentData) {
+    m_currentValueLabel->setText(currentData);
+    //toString( m_options->currentCorrelation() ) );
 
-    m_image1NameLabel->setText( m_options->currentImage1() );
-    m_parameter1NameLabel->setText( m_options->currentParameter1() );
+//     m_image1NameLabel->setText( m_options->currentImage1() );
+//     m_parameter1NameLabel->setText( m_options->currentParameter1() );
 
-    m_image2NameLabel->setText( m_options->currentImage2() );
-    m_parameter2NameLabel->setText( m_options->currentParameter2() );
+//     m_image2NameLabel->setText( m_options->currentImage2() );
+//     m_parameter2NameLabel->setText( m_options->currentParameter2() );
   }
 
 

@@ -27,6 +27,7 @@ class QRadioButton;
    *
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Original Version
+   *   @history 2014-07-21 Kimberly Oyama - Color options are now updated and applied in the scene.
    */
 namespace Isis {
   
@@ -42,7 +43,7 @@ namespace Isis {
     public slots:
       void applyOptions();
       void readOptions();
-      void readCorrelationData();
+      void updateCorrelationData(QString currentData);
       void populateParameterComboBox(int index);
       
     private slots:

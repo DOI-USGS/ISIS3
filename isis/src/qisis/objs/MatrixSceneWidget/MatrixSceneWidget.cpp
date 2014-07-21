@@ -22,7 +22,7 @@
 #include "IString.h"
 #include "MatrixGraphicsScene.h"
 #include "MatrixGraphicsView.h"
-// #include "MatrixOptions.h"
+#include "MatrixOptions.h"
 #include "ProgressBar.h"
 #include "Project.h"
 #include "PvlObject.h"
@@ -62,12 +62,14 @@ namespace Isis {
     m_graphicsView = new MatrixGraphicsView(m_graphicsScene, this);
     m_graphicsView->setScene(m_graphicsScene);
     m_graphicsView->setInteractive(true);
-    
+
+    m_matrixOptions = new MatrixOptions(m_directory->project()->correlationMatrix(), this);
+    connect(m_matrixOptions, SIGNAL( optionsUpdated() ),
+            this, SLOT( redrawElements() ) );
+
     // Draw Initial Matrix
     drawElements( m_directory->project()->correlationMatrix() );
     drawGrid( m_directory->project()->correlationMatrix() );
-
-//     m_matrixOptions = new MatrixOptions(m_directory->project()->correlationMatrix(), this);
     
     m_graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
 
@@ -232,9 +234,9 @@ namespace Isis {
 
 
 
-  void MatrixSceneWidget::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler( new XmlHandler(this) );
-  }
+//   void MatrixSceneWidget::load(XmlStackedHandlerReader *xmlReader) {
+//     xmlReader->pushContentHandler( new XmlHandler(this) );
+//   }
 
 
   QRectF MatrixSceneWidget::elementsBoundingRect() const {
@@ -320,46 +322,6 @@ namespace Isis {
   }
 
 
-  
-  /**
-   * Saves the scene as a png, jpg, or tif file.
-   */
-  void MatrixSceneWidget::exportView() {
-    QString output =
-      QFileDialog::getSaveFileName( (QWidget *)parent(),
-                                    "Choose output file",
-                                    QDir::currentPath() + "/untitled.png",
-                                    QString("MatrixElements (*.png *.jpg *.tif)") );
-    if ( output.isEmpty() ) return;
-
-    // Use png format is the user did not add a suffix to their output filename.
-    if ( QFileInfo(output).suffix().isEmpty() ) {
-      output = output + ".png";
-    }
-
-    QString format = QFileInfo(output).suffix();
-    QPixmap pm = QPixmap::grabWidget( getScene()->views().last() );
-
-    std::string formatString = format.toStdString();
-    if ( !pm.save( output, formatString.c_str() ) ) {
-      QMessageBox::information(this, "Error",
-                               "Unable to save [" + output + "]");
-    }
-  }
-
-
-  void MatrixSceneWidget::saveList() {
-    QString output = QFileDialog::getSaveFileName( (QWidget *)parent(),
-                                                   "Choose output file",
-                                                   QDir::currentPath() + "/files.lis",
-                                                   QString("List File (*.lis);;Text File (*.txt);;"
-                                                           "All Files (*.*)") );
-    if ( output.isEmpty() ) return;
-
-    TextFile file(output, "overwrite");
-  }
-
-
 
   /**
    * This method refits the items in the graphics view.
@@ -413,16 +375,8 @@ namespace Isis {
 
     switch( event->type() ) {
       case QMouseEvent::GraphicsSceneMousePress: {
-
-        emit mouseButtonPress( ( (QGraphicsSceneMouseEvent *)event )->scenePos(),
-                               ( (QGraphicsSceneMouseEvent *)event )->button() );
-
-        // do stuff with getScene()->itemAt(screenPos)
-        m_graphicsScene->itemAt( ( (QGraphicsSceneMouseEvent *)event )->scenePos() )->setSelected(true);
-//         rect->setColor(Qt::red);
-
-        
-
+        emit elementClicked(m_graphicsScene->itemAt(
+                               ( (QGraphicsSceneMouseEvent *)event )->scenePos() )->toolTip() );
         stopProcessingEvent = false;
         break;
       }
@@ -445,14 +399,9 @@ namespace Isis {
         break;
 
       case QMouseEvent::GraphicsSceneMouseMove:
-        // this will chagne the values in the options dialog.
-//         QPointF scenePos = ( (QGraphicsSceneMouseEvent *)event )->scenePos();
-//         QPoint screenPos = getView()->mapFromScene(scenePos);
 
-        // do stuff with getScene()->itemAt(screenPos)
-        
         stopProcessingEvent = false;
-        
+
 
         emit mouseMove( ( (QGraphicsSceneMouseEvent *)event )->scenePos() );
         break;
@@ -495,7 +444,7 @@ namespace Isis {
         }
         break;
       }
-
+      
       default:
         stopProcessingEvent = false;
         break;
@@ -518,73 +467,6 @@ namespace Isis {
    * Refit scene and items when the widget size changes.
    */
   void MatrixSceneWidget::fitInView() {
-  }
-
-
-
-
-/**********************************************************************************************
- * Start XmlHandler Methods
- **********************************************************************************************/
-
-
-  MatrixSceneWidget::XmlHandler::XmlHandler(MatrixSceneWidget *scene) {
-    m_sceneWidget = scene;
-    m_scrollBarXValue = -1;
-    m_scrollBarYValue = -1;
-  }
-
-
-  MatrixSceneWidget::XmlHandler::~XmlHandler() {
-  }
-
-
-  bool MatrixSceneWidget::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-
-    return result;
-  }
-
-
-  bool MatrixSceneWidget::XmlHandler::characters(const QString &ch) {
-    bool result = XmlStackedHandler::characters(ch);
-
-    if (result) {
-      m_characterData += ch;
-    }
-
-    return result;
-  }
-
-
-  bool MatrixSceneWidget::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
-
-    if (result) {
-      if (localName == "viewTransform") {
-        QByteArray hexValues( m_characterData.toAscii() );
-        QDataStream transformStream( QByteArray::fromHex(hexValues) );
-
-        QTransform viewTransform;
-        transformStream >> viewTransform;
-        m_sceneWidget->getView()->show();
-        QCoreApplication::processEvents();
-        m_sceneWidget->getView()->setTransform(viewTransform);
-        m_sceneWidget->getView()->horizontalScrollBar()->setValue(m_scrollBarXValue);
-        m_sceneWidget->getView()->verticalScrollBar()->setValue(m_scrollBarYValue);
-      }
-      else if (localName == "toolData") {
-        PvlObject toolSettings;
-        std::stringstream strStream( m_characterData.toStdString() );
-        strStream >> toolSettings;
-      }
-    }
-    
-    m_characterData = "";
-
-    return result;
   }
 
 
@@ -632,20 +514,21 @@ namespace Isis {
           for (int column = 0; column < (int)block.value()->size2(); column++) {
 
             // The values of this matrix should always be between 1 and -1.
-            double lowerColorValue = fabs( ( *block.value() )(row, column) ) * 255.0;
-            double red = 0;
-            double green = 0;
-
-            if (fabs( ( *block.value() )(row, column) ) < .5) {
-              red = lowerColorValue * 2;
-              green = 255;
+            QColor fillColor;
+            if ( !m_matrixOptions->colorScheme() ) {
+              double red = 0;
+              double green = 0;
+              double lowerColorValue = fabs( ( *block.value() )(row, column) ) * 255.0;
+              if (fabs( ( *block.value() )(row, column) ) < .5) {
+                red = lowerColorValue * 2;
+                green = 255;
+              }
+              else {
+                green = 255 - ( (lowerColorValue - 127.5) * 2 );
+                red = 255;
+              }
+               fillColor = QColor(red, green, 0);
             }
-            else {              
-              green = 255 - ( (lowerColorValue - 127.5) * 2 );
-              red = 255;
-            }
-                            
-            QColor fillColor(red, green, 0);
 
             bool draw = true;
             // Deal with diagonal.
@@ -659,12 +542,32 @@ namespace Isis {
               }
               else {
                 outlinePen.setColor(Qt::black);
-                fillBrush.setColor(fillColor);
+                if ( m_matrixOptions->colorScheme() ) {
+                  if ( ( *block.value() )(row, column) >= m_matrixOptions->colorTolerance() ) {
+                    fillBrush.setColor( m_matrixOptions->badCorrelationColor() );
+                  }
+                  else {
+                    fillBrush.setColor( m_matrixOptions->goodCorrelationColor() );
+                  }
+                }
+                else {
+                  fillBrush.setColor(fillColor);
+                }
               }
             }
             else {
               outlinePen.setColor(Qt::black);
-              fillBrush.setColor(fillColor);
+                if ( m_matrixOptions->colorScheme() ) {
+                  if ( ( *block.value() )(row, column) >= m_matrixOptions->colorTolerance() ) {
+                    fillBrush.setColor( m_matrixOptions->badCorrelationColor() );
+                  }
+                  else {
+                    fillBrush.setColor( m_matrixOptions->goodCorrelationColor() );
+                  }
+                }
+                else {
+                  fillBrush.setColor(fillColor);
+                }
             }
 
             // Should rectangle be a matrix element?
@@ -780,18 +683,9 @@ namespace Isis {
    *
    * @param
    */
-//   void MatrixSceneWidget::redrawElements(newParameters) {
-//     // Create MatrixElements?
-//     // Later this will be called from visibleElements(x, y) and visible elements will be called
-//     // from here...
-//     QList<*MatrixELement> elements = matrix.correlationMatrixFromFile();
-//     // And create MatrixSceneItems and draw in same loop
-//     foreach (MatrixELement *element, elements) {
-//       MatrixSceneItem itemToDraw = MatrixSceneItem(element);
-//       m_matrixSceneItems.append(itemToDraw);
-//       m_graphicsScene->addItem(itemToDraw);
-//     }
-//   }
+  void MatrixSceneWidget::redrawElements() {
+    drawElements( m_directory->project()->correlationMatrix() );
+  }
 
 
 

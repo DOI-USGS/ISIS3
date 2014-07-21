@@ -18,7 +18,7 @@ namespace Isis {
       m_tolerance = false; // if tolerance is false then we use gradient
       m_goodColor = Qt::cyan;
       m_badColor = Qt::magenta;
-      m_colorTolerance = 0.5;
+      m_colorTolerance = 0.2;
 
       // Focus Options
       m_focusOption = MatrixOptions::Tolerance;
@@ -50,7 +50,9 @@ namespace Isis {
       MatrixOptionsDialog *optionsDialog = new MatrixOptionsDialog(this, scene);
       optionsDialog->setAttribute(Qt::WA_DeleteOnClose);
       optionsDialog->show();
-      
+
+      connect(optionsDialog, SIGNAL( optionsUpdated() ),
+              this, SIGNAL( optionsUpdated() ) );
   }
 
 
@@ -367,7 +369,7 @@ namespace Isis {
   /**
    * This slot will be called when a matrix element is clicked on.
    */
-//   void MatrixOptions::updateCurrentCorrData() {
+//   void MatrixOptions::updateCurrentCorrData(QString currentData) {
 //     // update "current" values
 //     emit changedCurrentCorrData();
 //   }
