@@ -105,6 +105,11 @@ namespace Isis {
       void operator +=(const double &secondsToAdd);
       friend iTime operator +(const double &secondsToAdd, iTime time);
 
+      iTime operator -(const double &secondsToSubtract) const;
+      double operator -(const iTime &iTimeToSubtract) const;
+      void operator -=(const double &secondsToSubtract);
+      friend iTime operator -(const double &secondsToSubtract, iTime time);
+
       // Return the year
       QString YearString() const;
       int Year() const;

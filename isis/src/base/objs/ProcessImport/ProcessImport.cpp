@@ -1314,7 +1314,7 @@ namespace Isis {
    * @throws Isis::iException::Message "Cannot read file.
    *             Position[]. Byte count[]"
    */
-  void ProcessImport::ProcessBil(void funct(Isis::Buffer &out)) {
+  void ProcessImport::ProcessBil(void funct(Isis::Buffer &someBuf)) {
 
     // Figure out the number of bytes to read for a single line
     int readBytes = Isis::SizeOf(p_pixelType);
@@ -1354,15 +1354,15 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
-    
     // Construct a line buffer manager
     Isis::Buffer *out = NULL;
 
     if (funct != NULL) {
-      out = new Isis::Buffer(p_ns, p_nl, p_nb, p_pixelType);
+      out = new Isis::Brick(p_ns, p_nl, p_nb, p_ns, 1, 1, p_pixelType, true);
+      ((Isis::Brick *)out)->setpos(0);
     }
     else {
+      OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
       out = new Isis::LineManager(*OutputCubes[0]);
     }
 
@@ -1451,7 +1451,7 @@ namespace Isis {
           }
 
           // Sets out to isis special pixel or leaves it if valid
-          (*out)[samp] = TestPixel((*out)[samp]);
+          (*out)[samp] = TestPixel((*out)[samp]); 
 
           if (Isis::IsValidPixel((*out)[samp])) {
             (*out)[samp] = mult * ((*out)[samp]) + base;
@@ -1459,12 +1459,12 @@ namespace Isis {
         } // End sample loop
 
         if (funct == NULL) {
-          //Set the buffer position and write the line to the output file
           ((Isis::LineManager *)out)->SetLine((band * p_nl) + line + 1);
           OutputCubes[0]->write(*out);
         }
         else {
           funct(*out);
+          (*((Isis::Brick *)out))++;
         }
 
         p_progress->CheckStatus();

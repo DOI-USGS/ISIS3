@@ -1489,4 +1489,20 @@ namespace Isis {
     }
     return;
   }
+
+
+  /**
+   * Process the input file and send data to a method for specialized processing. The method is 
+   * expected to write the data after it has processed it if necessary. 
+   *
+   * @param funct Method that accepts Isis::Buffer as an input
+   *              parameter, processes the image, and has no
+   *              return value.
+   * @throws Isis::iException::Message "File is not a supported
+   *             organization."
+   */
+  void ProcessImportPds::StartProcess(void funct(Isis::Buffer &out)) {
+    ProcessImport::StartProcess(funct);
+    return;
+  }
 }
