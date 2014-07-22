@@ -48,6 +48,10 @@ namespace Isis {
    *   @history 2014-04-15 Tracie Sucharski - Reset defaults for plots to the following:
    *                         SolidLine, Width=1, NoSymbols.  This is a temporary fix until
    *                         the defaults can be saved on a user basis.  Fixes #2062.
+   *   @history 2014-06-20 Janet Barrett - Fixed SpatialPlotTool::getSpatialStatistics to
+   *                         check for length of line used to draw profile to make sure it
+   *                         is greater than zero to avoid divide by zero error. Fixes #1921
+   *                         and #1950.
    */
   class SpatialPlotTool : public AbstractPlotTool {
       Q_OBJECT
