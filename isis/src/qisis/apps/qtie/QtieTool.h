@@ -55,12 +55,15 @@ namespace Isis {
     *                           and into the QtieFileTool class.
     *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
     *                           coding standards. References #972.
-    * @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
+    *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
     *                           #775 and #1114.
-    * @history 2012-11-23 Debbie A. Cook, Removed unnecessary Projection include.  References Mantis
+    *   @history 2012-11-23 Debbie A. Cook, Removed unnecessary Projection include.  References Mantis
     *                           ticket #775. 
-    * @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
+    *   @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
     *                           network immediately print warning and return.  References #1493.
+    *   @history 2014-07-23 Jeannie Backer - Updated to create a BundleSettings and
+    *                           BundleObservationSolveSettings to pass into the BundleAdjust
+    *                           constructor.
     */
   class QtieTool : public Tool {
       Q_OBJECT

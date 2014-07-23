@@ -1,10 +1,13 @@
 Testing failure modes
-Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying a value (as a function of cumulative probability) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying a cumulative probability (as a function of value) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying a nonsense cumulative probability (2.0): **PROGRAMMER ERROR** Argument to StatCumProbDistDynCalc::value(double cumProb) must be on the domain [0,1].
-Querying a nonsense cumulative probability (-1.0): **PROGRAMMER ERROR** Argument to StatCumProbDistDynCalc::value(double cumProb) must be on the domain [0,1].
+Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying a value (as a function of cumulative probability) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying a cumulative probability (as a function of value) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying a nonsense cumulative probability (2.0): **PROGRAMMER ERROR** Invalid cumulative probability [2.0] passed in to StatCumProbDistDynCalc::value(double cumProb). Must be on the domain [0, 1].
+Querying a nonsense cumulative probability (-1.0): **PROGRAMMER ERROR** Invalid cumulative probability [-1.0] passed in to StatCumProbDistDynCalc::value(double cumProb). Must be on the domain [0, 1].
+
+Min = -1.27253
+Max = 9.07652
 
 Testing approximations
 0.25 approximated Quantile: 2.84146
@@ -19,15 +22,15 @@ percent error: 2.49513%
 0.75 theoretical Quantile: 5.34897950039216...
 percent error: -0.612173%
 
-approximated cumprobabilty [-oo,0]: 0.0290357
+approximated cumprobabilty [-oo, 0]: 0.0290357
 theoretical: 0.022750131948179...
 percent error: 27.6285%
 
-approximated cumprobabilty [-oo,2.0]: 0.144109
+approximated cumprobabilty [-oo, 2.0]: 0.144109
 theoretical: 0.158655253931457...
 percent error: -9.16825%
 
-approximate cumprobabilty [-oo,5.0]: 0.691477
+approximate cumprobabilty [-oo, 5.0]: 0.691477
 theoretical: 0.691462461274013...
 percent error: 0.00216297%
 
@@ -35,12 +38,15 @@ percent error: 0.00216297%
 
 reinitiliaze the class and redo the tests
 Testing failure modes
-Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying a value (as a function of cumulative probability) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying a cumulative probability (as a function of value) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added.
-Querying a nonsense cumulative probability (2.0): **PROGRAMMER ERROR** Argument to StatCumProbDistDynCalc::value(double cumProb) must be on the domain [0,1].
-Querying a nonsense cumulative probability (-1.0): **PROGRAMMER ERROR** Argument to StatCumProbDistDynCalc::value(double cumProb) must be on the domain [0,1].
+Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying minimum before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying a value (as a function of cumulative probability) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying a cumulative probability (as a function of value) before the number of observations is greater than or equal to the number of quantiles: **PROGRAMMER ERROR** StatCumDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
+Querying a nonsense cumulative probability (2.0): **PROGRAMMER ERROR** Invalid cumulative probability [2.0] passed in to StatCumProbDistDynCalc::value(double cumProb). Must be on the domain [0, 1].
+Querying a nonsense cumulative probability (-1.0): **PROGRAMMER ERROR** Invalid cumulative probability [-1.0] passed in to StatCumProbDistDynCalc::value(double cumProb). Must be on the domain [0, 1].
+
+Min = -1.27253
+Max = 9.07652
 
 Testing approximations
 0.25 approximated Quantile: 2.84146
@@ -55,15 +61,47 @@ percent error: 2.49513%
 0.75 theoretical Quantile: 5.34897950039216...
 percent error: -0.612173%
 
-approximated cumprobabilty [-oo,0]: 0.0290357
+approximated cumprobabilty [-oo, 0]: 0.0290357
 theoretical: 0.022750131948179...
 percent error: 27.6285%
 
-approximated cumprobabilty [-oo,2.0]: 0.144109
+approximated cumprobabilty [-oo, 2.0]: 0.144109
 theoretical: 0.158655253931457...
 percent error: -9.16825%
 
-approximate cumprobabilty [-oo,5.0]: 0.691477
+approximate cumprobabilty [-oo, 5.0]: 0.691477
 theoretical: 0.691462461274013...
 percent error: 0.00216297%
+
+
+
+Testing serialization... 
+Min = -1.27253
+Max = 9.07652
+
+Testing approximations after serialization
+0.25 approximated Quantile: 2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error: 7.18374%
+
+0.50 approximated Quantile: 4.09981
+0.50 theoretical Quantile: 4.0
+percent error: 2.49513%
+
+0.75 approximated Quantile: 5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error: -0.612173%
+
+approximated cumprobabilty [-oo, 0]: 0.0290357
+theoretical: 0.022750131948179...
+percent error: 27.6285%
+
+approximated cumprobabilty [-oo, 2.0]: 0.144109
+theoretical: 0.158655253931457...
+percent error: -9.16825%
+
+approximate cumprobabilty [-oo, 5.0]: 0.691477
+theoretical: 0.691462461274013...
+percent error: 0.00216297%
+
 

@@ -247,7 +247,7 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
-        BundleObservation* observation =
+        BundleObservation *observation =
             m_BundleObservations.addnew(image, observationNumber, instrumentId, m_bundleSettings);
 
         if (!observation) {
@@ -467,15 +467,21 @@ namespace Isis {
    * @param maxIterations   Maximum iterations, if tolerance is never
    *                        met an iException will be thrown.
    */
+
+
+  // TODO: make solveCholesky return a BundleResults object and delete this placeholder ???
   BundleResults BundleAdjust::solveCholeskyBR() {
     solveCholesky();
     return bundleResults();
   }
+
+
+
   bool BundleAdjust::solveCholesky() {
 
     // TODO what are the next two lines doing?
-    PvlObject pvlObject = m_bundleSettings.pvlObject();
-    cout << pvlObject << endl;
+    PvlObject forTesting = m_bundleSettings.pvlObject();
+    cout << forTesting << endl;
 
     // throw error if a frame camera is included AND if m_bundleSettings.solveInstrumentPositionOverHermiteSpline()
     // is set to true (can only use for line scan or radar)
@@ -639,7 +645,7 @@ namespace Isis {
       // (in unweighted pixels) --so it will be up to date for the next iteration
       if (!m_bundleStatistics.converged()) {
         m_bundleStatistics.initializeResidualsProbabilityDistribution(101);
-      }
+      }// TODO: is this necessary ??? probably all ready initialized to 101 nodes in bundle settings constructor...
 
       iterationSummary();
 
@@ -678,7 +684,7 @@ namespace Isis {
   }
 
   BundleResults BundleAdjust::bundleResults() {
-    BundleResults results(m_bundleSettings, *m_pCnet, m_strCnetFileName);
+    BundleResults results(m_bundleSettings, FileName(m_strCnetFileName));
     results.setOutputStatistics(m_bundleStatistics);
     return results;
   }
@@ -2370,8 +2376,10 @@ namespace Isis {
     coeff_RHS(0) = deltax;
     coeff_RHS(1) = deltay;
 
+    // residual prob distribution is calculated even if there is no maximum likelihood estimation
     double obsValue = deltax / pCamera->PixelPitch();
     m_bundleStatistics.addResidualsProbabilityDistributionObservation(obsValue);
+
     obsValue = deltay / pCamera->PixelPitch();
     m_bundleStatistics.addResidualsProbabilityDistributionObservation(obsValue);
 
@@ -3703,14 +3711,20 @@ namespace Isis {
       sprintf(buf, "\n              ERROR PROPAGATION: OFF");
     fp_out << buf;
 
-    m_bundleSettings.outlierRejection() ?
-      sprintf(buf, "\n              OUTLIER REJECTION: ON"):
-      sprintf(buf, "\n              OUTLIER REJECTION: OFF");
-    fp_out << buf;
+    if (m_bundleSettings.outlierRejection()) {
+      sprintf(buf, "\n              OUTLIER REJECTION: ON");
+      fp_out << buf;
+      sprintf(buf, "\n           REJECTION MULTIPLIER: %lf",
+                                 m_bundleSettings.outlierRejectionMultiplier());// ??? is this correct ???
+      fp_out << buf;
 
-    sprintf(buf, "\n           REJECTION MULTIPLIER: %lf",
-                               m_bundleSettings.outlierRejectionMultiplier());
-    fp_out << buf;
+    }
+    else {
+      sprintf(buf, "\n              OUTLIER REJECTION: OFF");
+      fp_out << buf;
+      sprintf(buf, "\n           REJECTION MULTIPLIER: N/A");// ??? is this correct ???
+      fp_out << buf;
+    }
 
     sprintf(buf, "\n\nMAXIMUM LIKELIHOOD ESTIMATION\n============================\n");
     fp_out << buf;
@@ -3941,6 +3955,9 @@ namespace Isis {
          > 100) {  //if there was enough data to calculate percentiles and box plot data
       sprintf(buf, "\n           Residual Percentiles:\n");
       fp_out << buf;
+
+    // residual prob distribution values are calculated/printed 
+    // even if there is no maximum likelihood estimation
       try {
         for (int bin = 1;bin < 34;bin++) {
           //double quan = 

@@ -181,6 +181,8 @@ namespace Isis {
    *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix. Covariance matrix
    *                           is now written to a file and the location is saved as part of the
    *                           CorrelationMatrix object.
+   *   @history 2014-07-23 Jeannie Backer - Modified to print "N/A" for rejection multiplier if 
+   *                           outlier rejection is turned off.
    */
   class BundleAdjust {
     public:

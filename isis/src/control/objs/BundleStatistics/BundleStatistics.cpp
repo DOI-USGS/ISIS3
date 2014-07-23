@@ -25,6 +25,7 @@ namespace Isis {
 
   BundleStatistics::BundleStatistics() {
 
+    m_correlationMatrix = NULL;
     m_correlationMatrix = new CorrelationMatrix();
 
     m_numberFixedPoints = 0; // set in BA constructor->init->fillPointIndexMap
@@ -110,20 +111,19 @@ namespace Isis {
     m_maximumLikelihoodMedianR2Residuals = 0.0;
     m_wFunc[0] = m_wFunc[1] = m_wFunc[2] = NULL;
     m_maximumLikelihoodQuan[0] = m_maximumLikelihoodQuan[1] = m_maximumLikelihoodQuan[2] = 0.5; // better init value ???
-    // initialize m_cumProRes and m_cumPro
-    // cumulative probability distribution calculators:
-    // set up the cum probibility solver to have a node at every percent of the distribution
-    m_cumPro = new StatCumProbDistDynCalc;           // ??? why are these needed ???
-    initializeProbabilityDistribution(101);          // ??? why are these needed ???
-    m_cumProRes = new StatCumProbDistDynCalc;        // ??? why are these needed ???
-    initializeResidualsProbabilityDistribution(101); // ??? why are these needed ???
+
+
+    // residual prob distribution is calculated even if there is no maximum likelihood estimation
+    // set up the solver to have a node at every percent of the distribution
+    m_cumProRes = new StatCumProbDistDynCalc;
+    initializeResidualsProbabilityDistribution(101);
 
   }
 
 
 
   BundleStatistics::BundleStatistics(const BundleStatistics &other)
-      : // ??? m_correlationMatrix(new CorrelationMatrix(*other.m_correlationMatrix)),
+      : m_correlationMatrix(new CorrelationMatrix(*other.m_correlationMatrix)),
         m_numberFixedPoints(other.m_numberFixedPoints),
         m_numberIgnoredPoints(other.m_numberIgnoredPoints),
         m_numberHeldImages(other.m_numberHeldImages),
@@ -205,7 +205,7 @@ namespace Isis {
 
     if (&other != this) {
       delete m_correlationMatrix;
-//      m_correlationMatrix = new CorrelationMatrix(*other.m_correlationMatrix);
+      m_correlationMatrix = new CorrelationMatrix(*other.m_correlationMatrix);
 
       m_numberFixedPoints = other.m_numberFixedPoints;
       m_numberIgnoredPoints = other.m_numberIgnoredPoints;
@@ -315,8 +315,8 @@ namespace Isis {
    *
    *
    */
-  bool BundleStatistics::computeBundleStatistics(SerialNumberList *m_pSnList, 
-                                                 ControlNet *m_pCnet, 
+  bool BundleStatistics::computeBundleStatistics(SerialNumberList *snList, 
+                                                 ControlNet *cnet, 
                                                  bool errorPropagation,
                                                  bool solveRadius) {
     int    numImages      = m_pSnList->Size();
@@ -484,21 +484,23 @@ namespace Isis {
       }
 
     }
-    
 
     // initialize to NULL
     // JWB - potentially, we could generalize for any size QList
     m_numberMaximumLikelihoodModels = modelsWithQuantiles.size();
 
+    // residual prob distribution is calculated even if there is no maximum likelihood estimation
+    // set up the solver to have a node at every percent of the distribution
+    m_cumProRes = new StatCumProbDistDynCalc;
+    initializeResidualsProbabilityDistribution(101);
+
+    // these values are only set if there will be maximum likelihood estimation...
     if (modelsWithQuantiles.size() != 0) {
       // MaximumLikeliHood Estimation is being used
-      
-      // set up the cum probibility solver to have a node at every percent of the distribution
+
+      // set up the cumulative prob solver to have a node at every percent of the distribution
       m_cumPro = new StatCumProbDistDynCalc;
       initializeProbabilityDistribution(101);
-
-      m_cumProRes = new StatCumProbDistDynCalc;
-      initializeResidualsProbabilityDistribution(101);
 
       // set up the w functions
       for (int i = 0; i < m_numberMaximumLikelihoodModels; i++) {
@@ -969,151 +971,6 @@ namespace Isis {
     return m_maximumLikelihoodQuan[modelIndex];
   }
 
-  /**
-   * Writes matrix to binary disk file pointed to by QDataStream stream
-   */
-#if 0
-  QDataStream&operator<<(QDataStream &stream, const BundleStatistics &bundleStatistics) {
-
-    //??? add operator to CorrelationMatrix ??? stream << *m_correlationMatrix;
-    stream << (qint32)m_numberFixedPoints;
-    stream << (qint32)m_numberIgnoredPoints;
-    stream << (qint32)m_numberHeldImages;
-    stream << m_rms_rx;
-    stream << m_rms_ry;
-    stream << m_rms_rxy;
-    stream << m_rejectionLimit;
-    stream << (qint32)m_numberRejectedObservations;
-    stream << (qint32)m_numberObservations;
-    stream << (qint32)m_numberImageParameters;
-    stream << (qint32)m_numberConstrainedPointParameters;
-    stream << (qint32)m_numberConstrainedImageParameters;
-    stream << (qint32)m_numberUnknownParameters;
-    stream << (qint32)m_degreesOfFreedom;
-    stream << m_sigma0;
-    stream << m_elapsedTime;
-    stream << m_elapsedTimeErrorProp;
-    stream << m_converged;
-    //??? stream << QVector< Statistics >       m_rmsImageSampleResiduals;
-    //??? stream << QVector< Statistics >       m_rmsImageLineResiduals;
-    //??? stream << QVector< Statistics >       m_rmsImageResiduals;
-    //??? stream << QVector< Statistics >       m_rmsImageXSigmas;     // unset and unused ???
-    //??? stream << QVector< Statistics >       m_rmsImageYSigmas;     // unset and unused ???
-    //??? stream << QVector< Statistics >       m_rmsImageZSigmas;     // unset and unused ???
-    //??? stream << QVector< Statistics >       m_rmsImageRASigmas;    // unset and unused ???
-    //??? stream << QVector< Statistics >       m_rmsImageDECSigmas;   // unset and unused ???
-    //??? stream << QVector< Statistics >       m_rmsImageTWISTSigmas; // unset and unused ???
-    stream << m_minSigmaLatitude;
-    stream << m_minSigmaLatitudePointId;
-    stream << m_maxSigmaLatitude;
-    stream << m_maxSigmaLatitudePointId;
-    stream << m_minSigmaLongitude;
-    stream << m_minSigmaLongitudePointId;
-    stream << m_maxSigmaLongitude;
-    stream << m_maxSigmaLongitudePointId;
-    stream << m_minSigmaRadius;
-    stream << m_minSigmaRadiusPointId;
-    stream << m_maxSigmaRadius;
-    stream << m_maxSigmaRadiusPointId;
-    stream << m_rmsSigmaLat;
-    stream << m_rmsSigmaLon;
-    stream << m_rmsSigmaRad;
-    stream << (qint32)m_numberMaximumLikelihoodModels;
-    // ??? MaximumLikelihoodWFunctions *m_wFunc[3];
-    stream << m_maximumLikelihoodQuan[3];
-    // ??? stream << (qint32)m_maximumLikelihoodIndex;
-    // ??? StatCumProbDistDynCalc      *m_cumPro;
-    // ??? StatCumProbDistDynCalc      *m_cumProRes;
-    stream << m_maximumLikelihoodMedianR2Residuals;
-
-    return stream;
-  }
-#endif
-
-
-  /**
-   * Reads matrix from binary disk file pointed to by QDataStream stream
-   */
-  QDataStream&operator>>(QDataStream &stream, BundleStatistics &bundleStatistics) {
-    // CorrelationMatrix *m_correlationMatrix;
-    qint32 numberFixedPoints;
-    qint32 numberIgnoredPoints;
-    qint32 numberHeldImages;
-    double rms_rx;
-    double rms_ry;
-    double rms_rxy;
-    double rejectionLimit;
-    qint32 numberRejectedObservations;
-    qint32 numberObservations;
-    qint32 numberImageParameters;
-    qint32 numberConstrainedPointParameters;
-    qint32 numberConstrainedImageParameters;
-    qint32 numberUnknownParameters;
-    qint32 degreesOfFreedom;
-    double sigma0;
-    double elapsedTime;
-    double elapsedTimeErrorProp;
-    bool converged;
-    // QVector< Statistics > rmsImageSampleResiduals;
-    // QVector< Statistics > rmsImageLineResiduals;
-    // QVector< Statistics > rmsImageResiduals;
-    // QVector< Statistics > rmsImageXSigmas;
-    // QVector< Statistics > rmsImageYSigmas;
-    // QVector< Statistics > rmsImageZSigmas;
-    // QVector< Statistics > rmsImageRASigmas;
-    // QVector< Statistics > rmsImageDECSigmas;
-    // QVector< Statistics > rmsImageTWISTSigmas;
-    double  minSigmaLatitude;
-    QString minSigmaLatitudePointId;
-    double  maxSigmaLatitude;
-    QString maxSigmaLatitudePointId;
-    double  minSigmaLongitude;
-    QString minSigmaLongitudePointId;
-    double  maxSigmaLongitude;
-    QString maxSigmaLongitudePointId;
-    double  minSigmaRadius;
-    QString minSigmaRadiusPointId;
-    double  maxSigmaRadius;
-    QString maxSigmaRadiusPointId;
-    double rmsSigmaLat;
-    double rmsSigmaLon;
-    double rmsSigmaRad;
-    qint32 numberMaximumLikelihoodModels;
-    // MaximumLikelihoodWFunctions *wFunc[3]; 
-    // double maximumLikelihoodQuan[3];
-    qint32 maximumLikelihoodIndex;
-    // StatCumProbDistDynCalc *cumPro;
-    // StatCumProbDistDynCalc *cumProRes;
-    double maximumLikelihoodMedianR2Residuals;
-
-    stream >> numberFixedPoints >> numberIgnoredPoints >> numberHeldImages
-           >> rms_rx >> rms_ry >> rms_rxy >> rejectionLimit >> numberRejectedObservations
-           >> numberObservations >> numberImageParameters
-           >> numberConstrainedPointParameters >> numberConstrainedImageParameters
-           >> numberUnknownParameters >> degreesOfFreedom >> sigma0
-           >> elapsedTime >> elapsedTimeErrorProp >> converged
-           >> minSigmaLatitude >> minSigmaLatitudePointId
-           >> maxSigmaLatitude >> maxSigmaLatitudePointId
-           >> minSigmaLongitude >> minSigmaLongitudePointId
-           >> maxSigmaLongitude >> maxSigmaLongitudePointId
-           >> minSigmaRadius >> minSigmaRadiusPointId
-           >> maxSigmaRadius >> maxSigmaRadiusPointId
-           >> rmsSigmaLat >> rmsSigmaLon >> rmsSigmaRad
-           >> numberMaximumLikelihoodModels >> maximumLikelihoodIndex
-           >> maximumLikelihoodMedianR2Residuals;
-    return stream;
-  }
-
-
-
-  /**
-   * Writes matrix to QDebug stream (dbg)
-   */
-  QDebug operator<<(QDebug dbg, const BundleStatistics &bundleStatistics) {
-      dbg << bundleStatistics;
-
-    return dbg;
-  }
 
 
   PvlObject BundleStatistics::pvlObject(QString name) const {
@@ -1220,7 +1077,112 @@ namespace Isis {
    void BundleStatistics::setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams) {
      m_correlationMatrix->setImagesAndParameters(imgsAndParams);
    }
-   
+
+
+
+  QDataStream &BundleStatistics::write(QDataStream &stream) const {
+    stream << *m_correlationMatrix << (qint32)m_numberFixedPoints << (qint32)m_numberIgnoredPoints
+           << (qint32)m_numberHeldImages << m_rms_rx << m_rms_ry << m_rms_rxy << m_rejectionLimit
+           << (qint32)m_numberRejectedObservations << (qint32)m_numberObservations
+           << (qint32)m_numberImageParameters << (qint32)m_numberConstrainedPointParameters
+           << (qint32)m_numberConstrainedImageParameters << (qint32)m_numberUnknownParameters
+           << (qint32)m_degreesOfFreedom << m_sigma0 << m_elapsedTime << m_elapsedTimeErrorProp
+           << m_converged << m_rmsImageSampleResiduals << m_rmsImageLineResiduals
+           << m_rmsImageResiduals << m_rmsImageXSigmas << m_rmsImageYSigmas << m_rmsImageZSigmas
+           << m_rmsImageRASigmas << m_rmsImageDECSigmas << m_rmsImageTWISTSigmas
+           << m_minSigmaLatitude << m_minSigmaLatitudePointId << m_maxSigmaLatitude
+           << m_maxSigmaLatitudePointId << m_minSigmaLongitude << m_minSigmaLongitudePointId
+           << m_maxSigmaLongitude << m_maxSigmaLongitudePointId << m_minSigmaRadius
+           << m_minSigmaRadiusPointId << m_maxSigmaRadius << m_maxSigmaRadiusPointId
+           << m_rmsSigmaLat << m_rmsSigmaLon << m_rmsSigmaRad
+           << (qint32)m_numberMaximumLikelihoodModels << *m_wFunc[0] << *m_wFunc[1] << *m_wFunc[2]
+           << m_maximumLikelihoodQuan[0] << m_maximumLikelihoodQuan[1]
+           << m_maximumLikelihoodQuan[2] << (qint32)m_maximumLikelihoodIndex << *m_cumPro
+           << *m_cumProRes << m_maximumLikelihoodMedianR2Residuals;
+    return stream;
+  }
+
+
+
+  QDataStream &BundleStatistics::read(QDataStream &stream) {
+    qint32 numberFixedPoints, numberIgnoredPoints, numberHeldImages, numberRejectedObservations,
+           numberObservations, numberImageParameters, numberConstrainedPointParameters,
+           numberConstrainedImageParameters, numberUnknownParameters, degreesOfFreedom,
+           numberMaximumLikelihoodModels, maximumLikelihoodIndex;
+    CorrelationMatrix correlationMatrix;
+    QVector<MaximumLikelihoodWFunctions> wFunc;
+    wFunc.resize(3);
+    StatCumProbDistDynCalc cumPro;
+    StatCumProbDistDynCalc cumProRes;
+    stream >> correlationMatrix >> numberFixedPoints >> numberIgnoredPoints
+           >> numberHeldImages >> m_rms_rx >> m_rms_ry >> m_rms_rxy >> m_rejectionLimit
+           >> numberRejectedObservations >> numberObservations
+           >> numberImageParameters >> numberConstrainedPointParameters
+           >> numberConstrainedImageParameters >> numberUnknownParameters
+           >> degreesOfFreedom >> m_sigma0 >> m_elapsedTime >> m_elapsedTimeErrorProp
+           >> m_converged >> m_rmsImageSampleResiduals >> m_rmsImageLineResiduals
+           >> m_rmsImageResiduals >> m_rmsImageXSigmas >> m_rmsImageYSigmas >> m_rmsImageZSigmas
+           >> m_rmsImageRASigmas >> m_rmsImageDECSigmas >> m_rmsImageTWISTSigmas
+           >> m_minSigmaLatitude >> m_minSigmaLatitudePointId >> m_maxSigmaLatitude
+           >> m_maxSigmaLatitudePointId >> m_minSigmaLongitude >> m_minSigmaLongitudePointId
+           >> m_maxSigmaLongitude >> m_maxSigmaLongitudePointId >> m_minSigmaRadius
+           >> m_minSigmaRadiusPointId >> m_maxSigmaRadius >> m_maxSigmaRadiusPointId
+           >> m_rmsSigmaLat >> m_rmsSigmaLon >> m_rmsSigmaRad
+           >> numberMaximumLikelihoodModels >> wFunc[0] >> wFunc[1] >> wFunc[2]
+           >> m_maximumLikelihoodQuan[0] >> m_maximumLikelihoodQuan[1]
+           >> m_maximumLikelihoodQuan[2] >> maximumLikelihoodIndex >> cumPro
+           >> cumProRes >> m_maximumLikelihoodMedianR2Residuals;
+
+    m_numberFixedPoints                = (int)numberFixedPoints;
+    m_numberIgnoredPoints              = (int)numberIgnoredPoints;
+    m_numberHeldImages                 = (int)numberHeldImages;
+    m_numberRejectedObservations       = (int)numberRejectedObservations;
+    m_numberObservations               = (int)numberObservations;
+    m_numberImageParameters            = (int)numberImageParameters;
+    m_numberConstrainedPointParameters = (int)numberConstrainedPointParameters;
+    m_numberConstrainedImageParameters = (int)numberConstrainedImageParameters;
+    m_numberUnknownParameters          = (int)numberUnknownParameters;
+    m_degreesOfFreedom                 = (int)degreesOfFreedom;
+    m_numberMaximumLikelihoodModels    = (int)numberMaximumLikelihoodModels;
+    m_maximumLikelihoodIndex           = (int)maximumLikelihoodIndex;
+
+    delete m_correlationMatrix;
+    m_correlationMatrix = new CorrelationMatrix(correlationMatrix);
+
+    for (int i = 0; i < m_numberMaximumLikelihoodModels; i++){
+
+      delete m_wFunc[i];
+      m_wFunc[i] = new MaximumLikelihoodWFunctions(wFunc[i]);
+    }
+
+    delete m_cumPro;
+    m_cumPro = new StatCumProbDistDynCalc(cumPro);
+
+    delete m_cumProRes;
+    m_cumProRes = new StatCumProbDistDynCalc(cumProRes);
+    
+    return stream;
+  }
+
+
+
+  QDataStream &operator<<(QDataStream &stream, const BundleStatistics &bundleStatistics) {
+    return bundleStatistics.write(stream);
+  }
+
+
+
+  QDataStream &operator>>(QDataStream &stream, BundleStatistics &bundleStatistics) {
+    return bundleStatistics.read(stream);
+  }   
+
+
+
+  /**
+   * Writes matrix to binary disk file pointed to by QDataStream stream
+   */
+
+
 
   // ??? QList< QPair< MaximumLikelihoodWFunctions, double > >
   // ???     BundleStatistics::maximumLikelihoodModels() const {

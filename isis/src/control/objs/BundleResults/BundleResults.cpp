@@ -1,48 +1,41 @@
 #include "BundleResults.h"
 
+#include <QDataStream>
+#include <QDebug>
+
 #include "BundleSettings.h"
 #include "BundleStatistics.h"
-#include "ControlNet.h"
-#include "PvlGroup.h"
+#include "FileName.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 
 namespace Isis {
 
-  BundleResults::BundleResults(BundleSettings inputSettings, ControlNet outputControlNet, 
-                               QString controlNetworkFileName) {
+  BundleResults::BundleResults(BundleSettings inputSettings, FileName controlNetworkFileName) {
 
-    m_controlNetworkFileName = controlNetworkFileName;
-    m_outputCNet = NULL;
+    m_controlNetworkFileName = NULL;
     m_settings = NULL;
     m_statisticsResults = NULL;
 
-    m_outputCNet = new ControlNet(outputControlNet);
+    m_controlNetworkFileName = new FileName(controlNetworkFileName);
     m_settings = new BundleSettings(inputSettings);
-
-//     m_settings = inputSettings;
-//     m_outputCNet = outputControlNet;
 
   }
 
 
   
   BundleResults::BundleResults(const BundleResults &other)
-      : m_controlNetworkFileName(other.m_controlNetworkFileName),
-        m_outputCNet(new ControlNet(*other.m_outputCNet)),
+      : m_controlNetworkFileName(new FileName(*other.m_controlNetworkFileName)),
         m_settings(new BundleSettings(*other.m_settings)),
         m_statisticsResults(new BundleStatistics(*other.m_statisticsResults)) {
-//    m_outputCNet = other.m_outputCNet;
-//    m_settings = other.m_settings;
-//    m_statisticsResults = other.m_statisticsResults;
   }
 
 
 
   BundleResults::~BundleResults() {
 
-    delete m_outputCNet;
-    m_outputCNet = NULL;
+    delete m_controlNetworkFileName;
+    m_controlNetworkFileName = NULL;
 
     delete m_settings;
     m_settings = NULL;
@@ -58,10 +51,8 @@ namespace Isis {
 
     if (&other != this) {
 
-      m_controlNetworkFileName = other.m_controlNetworkFileName;
-
-      delete m_outputCNet;
-      m_outputCNet = new ControlNet(*other.m_outputCNet);
+      delete m_controlNetworkFileName;
+      m_controlNetworkFileName = new FileName(*other.m_controlNetworkFileName);
 
       delete m_settings;
       m_settings = new BundleSettings(*other.m_settings);
@@ -76,41 +67,68 @@ namespace Isis {
 
 
   void BundleResults::setOutputStatistics(BundleStatistics statisticsResults) {
-    //m_statisticsResults = statisticsResults;
     m_statisticsResults = new BundleStatistics(statisticsResults);
   }
-#if 0 
-  QDataStream&operator<<(QDataStream &stream, const BundleResults &bundleResults) {
-    stream << m_settings;
-    stream << m_statisticsResults;
-    stream << m_outputControlNetwork;
-    return stream;
-  }
-  QDataStream&operator>>(QDataStream &stream, BundleResults &bundleResults) {
-    stream >> settings;
-    stream >> statisticsResults;
-    stream >> outputControlNet;
-    return stream;
-  }
 
 
 
-  QDebug operator<<(QDebug dbg, const BundleResults &bundleResults) {
-  }
-#endif
-
+  
   PvlObject BundleResults::pvlObject(QString resultsName, QString settingsName, 
                                      QString statisticsName) {
 
     PvlObject pvl(resultsName);
-    if (m_controlNetworkFileName != "") {
-      pvl += PvlKeyword("OutputControlNetwork", m_controlNetworkFileName);
+    if (m_controlNetworkFileName->expanded() != "") {
+      pvl += PvlKeyword("OutputControlNetwork", m_controlNetworkFileName->expanded());
     }
     pvl += m_settings->pvlObject(settingsName);
     pvl += m_statisticsResults->pvlObject(statisticsName);
     return pvl;
 
   }
+
+
+
+  QDataStream &BundleResults::write(QDataStream &stream) const {
+    stream << m_controlNetworkFileName->expanded()
+           << *m_settings
+           << *m_statisticsResults;
+    return stream;
+  }
+
+
+
+  QDataStream &BundleResults::read(QDataStream &stream) {
+
+    QString controlNetworkFileName;
+    stream >> controlNetworkFileName;
+    delete m_controlNetworkFileName;
+    m_controlNetworkFileName = new FileName(controlNetworkFileName);
+
+    BundleSettings settings;
+    stream >> settings;
+    delete m_settings;
+    m_settings = new BundleSettings(settings);
+
+    BundleStatistics statisticsResults;
+    stream >> statisticsResults;
+    delete m_statisticsResults;
+    m_statisticsResults = new BundleStatistics(statisticsResults);
+
+    return stream;
+  }
+
+
+
+  QDataStream &operator<<(QDataStream &stream, const BundleResults &bundleResults) {
+    return bundleResults.write(stream);
+  }
+
+
+
+  QDataStream &operator>>(QDataStream &stream, BundleResults &bundleResults) {
+    return bundleResults.read(stream);
+  }
+
 }
 
 

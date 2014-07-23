@@ -218,7 +218,7 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const SparseBlockColumnMatrix &sbcm) {
     // write number of blocks in this column
     int nBlocks = sbcm.size();
-    stream << nBlocks;
+    stream << (qint32)nBlocks;
 
     QMapIterator<int, matrix<double>*> it(sbcm);
      while ( it.hasNext() ) {
@@ -231,7 +231,7 @@ namespace Isis {
        int nCols = it.value()->size2();
 
        // write block number (key); rows (size1); and columns (size2)
-       stream << it.key() << nRows << nCols;
+       stream << it.key() << (qint32)nRows << (qint32)nCols;
 
        double* data = &it.value()->data()[0];
 
@@ -247,7 +247,7 @@ namespace Isis {
    * Reads matrix from binary disk file pointed to by QDataStream stream
    */
   QDataStream &operator>>(QDataStream &stream, SparseBlockColumnMatrix &sbcm) {
-    int nBlocks, nBlockNumber, nRows, nCols;
+    qint32 nBlocks, nBlockNumber, nRows, nCols;
     int i, r, c;
 
     stream >> nBlocks;
@@ -531,7 +531,7 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const SparseBlockRowMatrix &sbrm) {
     // write number of blocks in this column
     int nBlocks = sbrm.size();
-    stream << nBlocks;
+    stream << (qint32)nBlocks;
 
     QMapIterator<int, matrix<double>*> it(sbrm);
      while ( it.hasNext() ) {
@@ -544,7 +544,7 @@ namespace Isis {
        int nCols = it.value()->size2();
 
        // write block number (key); rows (size1); and columns (size2)
-       stream << it.key() << nRows << nCols;
+       stream << it.key() << (qint32)nRows << (qint32)nCols;
 
        double* data = &it.value()->data()[0];
 
@@ -560,7 +560,7 @@ namespace Isis {
    * Reads matrix from binary disk file pointed to by QDataStream stream
    */
   QDataStream &operator>>(QDataStream &stream, SparseBlockRowMatrix &sbrm) {
-    int nBlocks, nBlockNumber, nRows, nCols;
+    qint32 nBlocks, nBlockNumber, nRows, nCols;
     int i, r, c;
 
     stream >> nBlocks;
@@ -894,7 +894,7 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const SparseBlockMatrix &sparseBlockMatrix) {
     int nBlockColumns = sparseBlockMatrix.size();
 
-    stream << nBlockColumns;
+    stream << (qint32)nBlockColumns;
 
     for (int i =0; i < nBlockColumns; i++)
       stream << *sparseBlockMatrix.at(i);
@@ -907,7 +907,7 @@ namespace Isis {
    * Reads matrix from binary disk file pointed to by QDataStream stream
    */
   QDataStream &operator>>(QDataStream &stream, SparseBlockMatrix &sparseBlockMatrix) {
-    int nBlockColumns;
+    qint32 nBlockColumns;
 
     // read and set number of block columns
     stream >> nBlockColumns;

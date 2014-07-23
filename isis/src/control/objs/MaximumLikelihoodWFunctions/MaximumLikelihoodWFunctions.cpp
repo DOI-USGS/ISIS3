@@ -1,5 +1,6 @@
 #include "MaximumLikelihoodWFunctions.h"
 
+#include <QDataStream>
 #include <QString>
 
 #include <math.h>
@@ -173,7 +174,7 @@ namespace Isis {
   /** 
    *  Returns the current tweaking constant
    */
-  double MaximumLikelihoodWFunctions::tweakingConstant() {
+  double MaximumLikelihoodWFunctions::tweakingConstant() const {
     return m_tweakingConstant;
   }
 
@@ -414,8 +415,53 @@ namespace Isis {
    *  
    * @return enum for the maximum likelihood estimation model.
    */
-  MaximumLikelihoodWFunctions::Model MaximumLikelihoodWFunctions::model() {
+  MaximumLikelihoodWFunctions::Model MaximumLikelihoodWFunctions::model() const {
     return m_model;
+  }
+
+
+
+  QDataStream &MaximumLikelihoodWFunctions::write(QDataStream &stream) const {
+    stream << (qint32)m_model
+           << m_tweakingConstant;
+    return stream;
+  }
+
+
+
+  QDataStream &MaximumLikelihoodWFunctions::read(QDataStream &stream) {
+    qint32 model;
+    stream >> model >> m_tweakingConstant;
+    m_model = (MaximumLikelihoodWFunctions::Model)model;
+    return stream;
+  }
+
+
+
+  QDataStream &operator<<(QDataStream &stream, const MaximumLikelihoodWFunctions &mlwf) {
+    return mlwf.write(stream);
+  }
+
+
+
+  QDataStream &operator>>(QDataStream &stream,  MaximumLikelihoodWFunctions &mlwf) {
+    return mlwf.read(stream);
+  }
+
+
+
+  QDataStream &operator<<(QDataStream &stream, const MaximumLikelihoodWFunctions::Model &modelEnum) {
+    stream << (qint32)modelEnum;
+    return stream;
+  }
+
+
+
+  QDataStream &operator>>(QDataStream &stream, MaximumLikelihoodWFunctions::Model &modelEnum) {
+    qint32 modelInteger;
+    stream >> modelInteger;
+    modelEnum = (MaximumLikelihoodWFunctions::Model)modelInteger;
+    return stream;
   }
 
 }// end namespace Isis

@@ -176,6 +176,11 @@
       Added separate group for Error Propagation with option to write inverse matrix to binary
       file. For extremely large networks where memory/time for error propagation is limited.
     </change>
+    <change name="Jeannie Backer" date="2014-07-14">
+      Modified appTests to use SPARSE method only. Commented out bundleout_images.csv references.
+      Created observationSolveSettings() method to create an observation settings object from the user
+      entered values.
+    </change>
   </history>
 
   <groups>

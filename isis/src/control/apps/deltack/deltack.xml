@@ -86,6 +86,9 @@
        Added check for history group in input cube. If it's there, add a new entry. If not, add a
        new history group. Added an app test. Fixes #1350.
     </change>
+    <change name="Jeannie Backer" date="2014-07-23">
+       Modified to create a bundle settings object for the bundle adjustment.
+    </change>
   </history>
 
   <groups>

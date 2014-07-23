@@ -8,6 +8,9 @@ APPNAME = jigsaw
 # 2. remove net filename paths
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
+#
+# 2014-07-23 JWB - Changed method from oldsparse to default (sparse). 
+#                  Commented out references to bundleout_images.csv.  Removed default parameters.
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -19,7 +22,6 @@ commands:
 	onet=$(OUTPUT)/case01OutNet.net \
 	observations=yes \
 	update=yes \
-	method=sparse \
 	cksolvedegree=3 \
 	camsolve=all \
 	file_pre=t \
@@ -31,11 +33,11 @@ commands:
 	  > $(OUTPUT)/bundleout.txt
 	cat t_residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/residuals.csv
-	cat t_bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/bundleout_images.csv
-	$(RM) t_bundleout_images.csv > /dev/null;
+#	cat t_bundleout_images.csv \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+#	  > $(OUTPUT)/bundleout_images.csv
+#	$(RM) t_bundleout_images.csv > /dev/null;
 	$(MV) t_bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) t_bundleout.txt > /dev/null;

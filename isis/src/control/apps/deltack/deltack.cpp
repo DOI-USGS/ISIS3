@@ -1,5 +1,7 @@
 #include "Isis.h"
 
+#include <QList>
+
 #include "BundleAdjust.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
@@ -21,50 +23,53 @@ using namespace std;
 using namespace Isis;
 
 Distance GetRadius(QString filename, Latitude lat, Longitude lon);
+BundleSettings bundleSettings();
 
 void IsisMain() {
-  // Create a serial number list
   UserInterface &ui = Application::GetUserInterface();
-  QString filename = ui.GetFileName("FROM");
-  SerialNumberList serialNumberList;
-  serialNumberList.Add(filename);
+  QString inputFile = ui.GetFileName("FROM");
 
-  // Get the coordinate for updating the camera pointing
-  // We will want to make the camera pointing match the lat/lon at this
-  // line sample
-  double samp1 = ui.GetDouble("SAMP1");
-  double line1 = ui.GetDouble("LINE1");
-  Latitude lat1(ui.GetDouble("LAT1"), Angle::Degrees);
-  Longitude lon1(ui.GetDouble("LON1"), Angle::Degrees);
-  Distance rad1;
-  if(ui.WasEntered("RAD1")) {
-    rad1 = Distance(ui.GetDouble("RAD1"), Distance::Meters);
-  }
-  else {
-    rad1 = GetRadius(ui.GetFileName("FROM"), lat1, lon1);
-  }
-
-  // In order to use the bundle adjustment class we will need a control
-  // network
-  ControlMeasure * m = new ControlMeasure;
-  m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
-  m->SetCoordinate(samp1, line1);
+  try {
+    // Create a serial number list
+    SerialNumberList serialNumberList;
+    serialNumberList.Add(inputFile);
+    
+    // Get the coordinate for updating the camera pointing
+    // We will want to make the camera pointing match the lat/lon at this
+    // line sample
+    double samp1 = ui.GetDouble("SAMP1");
+    double line1 = ui.GetDouble("LINE1");
+    Latitude lat1(ui.GetDouble("LAT1"), Angle::Degrees);
+    Longitude lon1(ui.GetDouble("LON1"), Angle::Degrees);
+    Distance rad1;
+    if(ui.WasEntered("RAD1")) {
+      rad1 = Distance(ui.GetDouble("RAD1"), Distance::Meters);
+    }
+    else {
+      rad1 = GetRadius(ui.GetFileName("FROM"), lat1, lon1);
+    }
+    
+    // In order to use the bundle adjustment class we will need a control
+    // network
+    ControlMeasure * m = new ControlMeasure;
+    m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
+    m->SetCoordinate(samp1, line1);
 //   m->SetType(ControlMeasure::Manual);
-  m->SetType(ControlMeasure::RegisteredPixel);
-
-  ControlPoint * p = new ControlPoint;
-  p->SetAprioriSurfacePoint(SurfacePoint(lat1, lon1, rad1));
-  p->SetId("Point1");
-  p->SetType(ControlPoint::Fixed);
-  p->Add(m);
-
-  ControlNet cnet;
+    m->SetType(ControlMeasure::RegisteredPixel);
+    
+    ControlPoint * p = new ControlPoint;
+    p->SetAprioriSurfacePoint(SurfacePoint(lat1, lon1, rad1));
+    p->SetId("Point1");
+    p->SetType(ControlPoint::Fixed);
+    p->Add(m);
+    
+    ControlNet cnet;
 //  cnet.SetType(ControlNet::ImageToGround);
-  cnet.AddPoint(p);
+    cnet.AddPoint(p);
 
     // We need the target body
     Cube c;
-    c.open(filename, "rw");
+    c.open(inputFile, "rw");
     //check for target name
     if(c.label()->hasKeyword("TargetName", PvlObject::Traverse)) {
 //       c.Label()->findKeyword("TargetName");
@@ -72,89 +77,44 @@ void IsisMain() {
       QString targetName = inst["TargetName"];
       cnet.SetTarget(targetName);
     }
-    c.close();
+    // ??? c.close();
 
-  // See if they wanted to solve for twist
-  if(ui.GetBoolean("TWIST")) {
-    double samp2 = ui.GetDouble("SAMP2");
-    double line2 = ui.GetDouble("LINE2");
-    Latitude lat2(ui.GetDouble("LAT2"), Angle::Degrees);
-    Longitude lon2(ui.GetDouble("LON2"), Angle::Degrees);
-    Distance rad2;
-    if(ui.WasEntered("RAD2")) {
-      rad2 = Distance(ui.GetDouble("RAD2"), Distance::Meters);
+    // See if they wanted to solve for twist
+    if(ui.GetBoolean("TWIST")) {
+      double samp2 = ui.GetDouble("SAMP2");
+      double line2 = ui.GetDouble("LINE2");
+      Latitude lat2(ui.GetDouble("LAT2"), Angle::Degrees);
+      Longitude lon2(ui.GetDouble("LON2"), Angle::Degrees);
+      Distance rad2;
+      if(ui.WasEntered("RAD2")) {
+        rad2 = Distance(ui.GetDouble("RAD2"), Distance::Meters);
+      }
+      else {
+        rad2 = GetRadius(ui.GetFileName("FROM"), lat2, lon2);
+      }
+    
+      ControlMeasure * m = new ControlMeasure;
+      m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
+      m->SetCoordinate(samp2, line2);
+      m->SetType(ControlMeasure::Manual);
+    
+      ControlPoint * p = new ControlPoint;
+      p->SetAprioriSurfacePoint(SurfacePoint(lat2, lon2, rad2));
+      p->SetId("Point2");
+      p->SetType(ControlPoint::Fixed);
+      p->Add(m);
+    
+      cnet.AddPoint(p);
     }
-    else {
-      rad2 = GetRadius(ui.GetFileName("FROM"), lat2, lon2);
-    }
-
-    ControlMeasure * m = new ControlMeasure;
-    m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
-    m->SetCoordinate(samp2, line2);
-    m->SetType(ControlMeasure::Manual);
-
-    ControlPoint * p = new ControlPoint;
-    p->SetAprioriSurfacePoint(SurfacePoint(lat2, lon2, rad2));
-    p->SetId("Point2");
-    p->SetType(ControlPoint::Fixed);
-    p->Add(m);
-
-    cnet.AddPoint(p);
-  }
-
-  // Bundle adjust to solve for new pointing
-  try {
-
-
-
-    // =========================================================================================//
-    // ============= Use the bundle settings to initialize member variables ====================//
-    // =========================================================================================//
-    BundleSettings settings;
-    settings.setValidateNetwork(false);
-
-    // set the following:
-    //     solve observation mode = false
-    //     update cube label      = false
-    //     error propagation      = false
-    //     solve radius           = false
-    //     latitude sigma         = 1000.0
-    //     longitude sigma        = 1000.0
-    //     radius sigma           = -1.0 (since we are not solving for radius)
-    //     outlier rejection = false
-    settings.setSolveOptions(BundleSettings::SpecialK, false, false, false, false,
-                             1000.0, 1000.0, -1.0);
-
-    // NOTE: no need to set position sigmas or solve degrees since we are not solving for any
-    // position factors
-    //       position option sigmas default to -1.0
-    //       spkDegree = spkSolveDegree = 2
-    //       solveOverHermiteSpline = false
-    //       position sigma = velocity sigma = acceleration sigma = -1.0
-    settings.setInstrumentPositionSolveOptions(BundleSettings::NoPositionFactors);
-
-    // use defaults
-    //       pointing option sigmas -1.0
-    //       ckDegree = ckSolveDegree = 2
-    //       fitOverExisting = false
-    //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
-    settings.setInstrumentPointingSolveOptions(BundleSettings::AnglesOnly, ui.GetBoolean("TWIST"));
-
-    settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
-                                    ui.GetDouble("SIGMA0"),
-                                    ui.GetInteger("MAXITS"));
-
-    settings.setOutputFiles("", true, false, true);
-    // ===========================================================================================//
-    // =============== End Bundle Settings =======================================================//
-    // ===========================================================================================//
-
+    
+    // Bundle adjust to solve for new pointing
+    BundleSettings settings = bundleSettings();
     BundleAdjust bundleAdjust(settings, cnet, serialNumberList);
     bundleAdjust.solveCholesky();
 //    bundleAdjust.solveCholeskyBR();
 
-    Cube c;
-    c.open(filename, "rw");
+    // ??? Cube c;
+    // ??? c.open(inputFile, "rw");
 
     //check for existing polygon, if exists delete it
     if(c.label()->hasObject("Polygon")) {
@@ -191,15 +151,15 @@ void IsisMain() {
     Application::Log(gp);
   }
   catch(IException &e) {
-    QString msg = "Unable to update camera pointing for [" + filename + "]";
+    QString msg = "Unable to update camera pointing for [" + inputFile + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
 }
 
 // Compute the radius at the lat/lon
-Distance GetRadius(QString filename, Latitude lat, Longitude lon) {
-  Cube cube(filename, "r");
+Distance GetRadius(QString inputFile, Latitude lat, Longitude lon) {
+  Cube cube(inputFile, "r");
   Sensor sensor(cube);
   sensor.SetGround(SurfacePoint(lat, lon, sensor.LocalRadius(lat, lon)));
   Distance radius = sensor.LocalRadius();
@@ -209,5 +169,65 @@ Distance GetRadius(QString filename, Latitude lat, Longitude lon) {
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   return radius;
+}
+
+
+
+BundleSettings bundleSettings() {
+  UserInterface  &ui = Application::GetUserInterface();
+  BundleSettings settings;
+  // =========================================================================================//
+  // ============= Use the bundle settings to initialize member variables ====================//
+  // =========================================================================================//
+  settings.setValidateNetwork(false);
+  //  set the following:
+  //     solve observation mode = false update cube label      = false error
+  //     propagation      = false solve radius           = false latitude
+  //     sigma         = 1000.0 longitude sigma        = 1000.0 radius sigma
+  //     = -1.0 (since we are not solving for radius) outlier rejection =
+  //     false
+  settings.setSolveOptions(BundleSettings::Sparse, false, false, false, false,
+                           1000.0, 1000.0, -1.0);
+  settings.setOutlierRejection(false);
+
+  // =========================================================================================//
+  // For deltack, we only have one observation solve settings, for now........................//
+  // =========================================================================================//
+  QList<BundleObservationSolveSettings> observationSolveSettingsList;
+  BundleObservationSolveSettings observationSolveSettings;
+
+  // use defaults
+  //       pointing option sigmas -1.0
+  //       ckDegree = ckSolveDegree = 2
+  //       fitOverExisting = false
+  //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
+  observationSolveSettings.setInstrumentPointingSettings(
+      BundleObservationSolveSettings::AnglesOnly, ui.GetBoolean("TWIST"));
+
+  // NOTE: no need to set position sigmas or solve degrees since we are not solving for any
+  // position factors
+  //       position option sigmas default to -1.0
+  //       spkDegree = spkSolveDegree = 2
+  //       solveOverHermiteSpline = false
+  //       position sigma = velocity sigma = acceleration sigma = -1.0
+  observationSolveSettings.setInstrumentPositionSettings(
+      BundleObservationSolveSettings::NoPositionFactors);
+
+  observationSolveSettingsList.append(observationSolveSettings);
+  settings.setObservationSolveOptions(observationSolveSettingsList);
+  // ===========================================================================================//
+  // =============== End Bundle Observation Solve Settings =====================================//
+  // ===========================================================================================//
+
+  settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
+                                  ui.GetDouble("SIGMA0"),
+                                  ui.GetInteger("MAXITS"));
+
+  settings.setOutputFiles("", true, false, true);
+
+
+  //************************************************************************************************
+
+  return settings;
 }
 

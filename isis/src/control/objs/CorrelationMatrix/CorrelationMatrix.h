@@ -28,7 +28,7 @@
 #include <QString>
 #include <QStringList>
 
-#include "boost/numeric/ublas/matrix_sparse.hpp"
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 
 template <typename A, typename B> class QMap;
 template <typename A> class QList;
@@ -50,6 +50,10 @@ namespace Isis {
    * @author 2014-05-02 Kimberly Oyama
    *
    * @internal
+   *   @history 2014-05-02 Kimberly Oyama - Original version.
+   *   @history 2014-07-23 Jeannie Backer - Added QDataStream >> and << operators and read/write
+   *                           methods. Created unitTest. Added new operators to assignments in
+   *                           copy constructor and operator= methods.
    */
   class CorrelationMatrix {
     public:
@@ -86,6 +90,9 @@ namespace Isis {
 
       PvlObject pvlObject();
 
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
+
     private:
       //! This map holds the images used to create this matrix and their associated parameters.
       QMap<QString, QStringList> *m_imagesAndParameters;
@@ -111,6 +118,9 @@ namespace Isis {
        */
       QList<SparseBlockColumnMatrix> *m_visibleBlocks;
   };
+  // operators to read/write CorrelationMatrix to/from binary disk file
+  QDataStream &operator<<(QDataStream &stream, const CorrelationMatrix &matrix);
+  QDataStream &operator>>(QDataStream &stream, CorrelationMatrix &matrix);
 };
 
 #endif

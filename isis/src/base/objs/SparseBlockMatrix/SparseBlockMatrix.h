@@ -23,6 +23,7 @@
 
 #include <QMap>
 #include <QList>
+
 #include <iostream>
 
 #include <boost/numeric/ublas/fwd.hpp>
@@ -41,9 +42,11 @@ namespace Isis {
    * @author 2011-07-29 Ken Edmundson
    *
    * @internal
-   *   @history 2011-07-29 Ken Edmundson Created
+   *   @history 2011-07-29 Ken Edmundson - Original Version
    *   @history 2014-02-25 Ken Edmundson - operators to read/write matrices to binary disk file and
-   *                       to write matrices to QDebug stream.
+   *                           to write matrices to QDebug stream.
+   *   @history 2014-07-23 Jeannie Backer - Modified QDataStream >> and << operators to use qint32,
+   *                           as recommended by Qt documentation.
    */
   class SparseBlockColumnMatrix :
       public QMap< int, boost::numeric::ublas::matrix<double>* > {

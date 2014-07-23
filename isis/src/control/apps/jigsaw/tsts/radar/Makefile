@@ -8,6 +8,8 @@ APPNAME = jigsaw
 # 2. remove net filename paths
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
+#
+# 2014-07-23 JWB - Commented out references to bundleout_images.csv.  Removed default parameters.
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -27,11 +29,11 @@ commands:
 	  > $(OUTPUT)/radar_sparse_poh_bundleout.txt;
 	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/radar_sparse_poh_residuals.csv;
-	cat bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/radar_sparse_poh_bundleout_images.csv;
-	$(RM) bundleout_images.csv > /dev/null;
+#	cat bundleout_images.csv \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+#	  > $(OUTPUT)/radar_sparse_poh_bundleout_images.csv;
+#	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/radar_sparse_poh_bundleout_points.csv > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;
@@ -50,11 +52,11 @@ commands:
 	  > $(OUTPUT)/radar_sparse_bundleout.txt;
 	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/radar_sparse_residuals.csv
-	cat bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/radar_sparse_bundleout_images.csv
-	$(RM) bundleout_images.csv > /dev/null;
+#	cat bundleout_images.csv \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+#	  > $(OUTPUT)/radar_sparse_bundleout_images.csv
+#	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/radar_sparse_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;

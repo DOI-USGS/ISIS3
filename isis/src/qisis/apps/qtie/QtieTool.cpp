@@ -1,32 +1,32 @@
 #include "QtieTool.h"
 
-#include <QDebug>
 #include <QApplication>
+#include <QCheckBox>
+#include <QDebug>
 #include <QDialog>
+#include <QFileDialog>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QList>
 #include <QMenuBar>
 #include <QMenu>
-#include <QToolButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QTabWidget>
-#include <QLineEdit>
-#include <QRadioButton>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QPoint>
-#include <QStringList>
-#include <QSizePolicy>
-#include <QTimer>
 #include <QMessageBox>
-#include <QFileDialog>
+#include <QPoint>
+#include <QRadioButton>
+#include <QSizePolicy>
+#include <QSpinBox>
+#include <QStringList>
+#include <QTabWidget>
+#include <QTimer>
+#include <QToolButton>
+#include <QVBoxLayout>
 #include <QtGui>
-
-#include <vector>
 
 #include "Application.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "BundleAdjust.h"
+#include "BundleObservationSolveSettings.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "ControlMeasure.h"
@@ -800,6 +800,18 @@ namespace Isis {
       //     outlier rejection = false
       settings.setSolveOptions(BundleSettings::SpecialK, false, false, false, false, 
                               1000.0, 1000.0, -1.0);
+  //************************************************************************************************
+      QList<BundleObservationSolveSettings> observationSolveSettingsList;
+      BundleObservationSolveSettings observationSolveSettings;
+
+      //************************************************************************************************
+      // use defaults
+      //       pointing option sigmas -1.0
+      //       ckDegree = ckSolveDegree = 2
+      //       fitOverExisting = false
+      //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
+      observationSolveSettings.setInstrumentPointingSettings(
+          BundleObservationSolveSettings::AnglesOnly, p_twist);
 
       // NOTE: no need to set position sigmas or solve degrees since we are not solving for any
       // position factors
@@ -807,14 +819,12 @@ namespace Isis {
       //       spkDegree = spkSolveDegree = 2
       //       solveOverHermiteSpline = false
       //       position sigma = velocity sigma = acceleration sigma = -1.0
-      settings.setInstrumentPositionSolveOptions(BundleSettings::NoPositionFactors);
+      observationSolveSettings.setInstrumentPositionSettings(
+          BundleObservationSolveSettings::NoPositionFactors);
 
-      // use defaults
-      //       pointing option sigmas -1.0
-      //       ckDegree = ckSolveDegree = 2
-      //       fitOverExisting = false
-      //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
-      settings.setInstrumentPointingSolveOptions(BundleSettings::AnglesOnly, p_twist);
+      observationSolveSettingsList.append(observationSolveSettings);
+
+      settings.setObservationSolveOptions(observationSolveSettingsList);
 
       settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
                                       p_sigma0, p_maxIterations);
@@ -867,7 +877,7 @@ namespace Isis {
 
     }
     catch (IException &e) {
-      QString message = "Bundle Solution failed.\n";
+      QString message = "Unable to bundle adjust. Solution failed.\n";
       QString errors = e.toString();
       message += errors;
 //      message += "\n\nMaximum Error = " + QString::number(net.MaximumResiudal());

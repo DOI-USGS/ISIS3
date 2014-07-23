@@ -13,6 +13,7 @@ APPNAME = jigsaw
 # 2013-11-12 KLE - Modified apollo test input Net "Ames_7-ImageLSTest_USGS_combined.net" by changing point AS15_SocetPAN_45
 #                  from "Constrained" to "Free" but leaving a priori constraints on coordinates. This is to test toggling a
 #                  point between "Constrained" and "Free" while leaving constraints in place.  
+# 2014-07-23 JWB - Commented out specialk test and references to bundleout_images.csv
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -24,30 +25,30 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cube.lis;
-	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
-	cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
-	onet=$(OUTPUT)/apollo_specialK_out.net \
-	radius=yes \
-	method=sparse\
-	errorpropagation=yes \
-	spsolve=position \
-	spacecraft_position_sigma=1000.0 \
-	camera_angles_sigma=2.0 > /dev/null;
-	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/apollo_specialK_bundleout.txt;
-	cat residuals.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  > $(OUTPUT)/apollo_specialK_residuals.csv;
-	cat bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  > $(OUTPUT)/apollo_specialK_bundleout_images.csv;
-	$(RM) bundleout_images.csv > /dev/null;
-	$(MV) bundleout_points.csv $(OUTPUT)/apollo_specialK_bundleout_points.csv > /dev/null;
-	$(RM) bundleout.txt print.prt > /dev/null;
-	$(RM) residuals.csv > /dev/null;
+#	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
+#	cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
+#	onet=$(OUTPUT)/apollo_specialK_out.net \
+#	radius=yes \
+#	method=specialk\
+#	errorpropagation=yes \
+#	spsolve=position \
+#	spacecraft_position_sigma=1000.0 \
+#	camera_angles_sigma=2.0 > /dev/null;
+#	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+#	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+#	  > $(OUTPUT)/apollo_specialK_bundleout.txt;
+#	cat residuals.csv \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  > $(OUTPUT)/apollo_specialK_residuals.csv;
+#	cat bundleout_images.csv \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  > $(OUTPUT)/apollo_specialK_bundleout_images.csv;
+#	$(RM) bundleout_images.csv > /dev/null;
+#	$(MV) bundleout_points.csv $(OUTPUT)/apollo_specialK_bundleout_points.csv > /dev/null;
+#	$(RM) bundleout.txt print.prt > /dev/null;
+#	$(RM) residuals.csv > /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis  \
 	cnet=$(INPUT)/Ames_7-ImageLSTest_USGS_combined.net \
 	onet=$(OUTPUT)/apollo_cholmod_out.net \
@@ -64,10 +65,10 @@ commands:
 	cat residuals.csv \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/apollo_cholmod_residuals.csv;
-	cat bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  > $(OUTPUT)/apollo_cholmod_bundleout_images.csv;
-	$(RM) bundleout_images.csv > /dev/null;
+#	cat bundleout_images.csv \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  > $(OUTPUT)/apollo_cholmod_bundleout_images.csv;
+#	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/apollo_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
 	$(RM) residuals.csv > /dev/null;

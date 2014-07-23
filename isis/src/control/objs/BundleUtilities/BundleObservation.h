@@ -34,6 +34,18 @@
 #include "SpicePosition.h"
 
 namespace Isis {
+  /**
+   * @brief 
+   *  
+   * @ingroup ControlNetworks
+   *
+   * @author 2014-07-09 Ken Edmundson
+   *
+   * @internal
+   *   @history 2014-07-09 Ken Edmundson - Original version.
+   *   @history 2014-07-16 Jeannie Backer - Replaced QVectors with QLists.
+   *  
+   */
 
   /**
    * @author 2014-??-?? Ken Edmundson
@@ -42,6 +54,7 @@ namespace Isis {
    *   @history 2014-07-17 Kimberly Oyama - Added member variables and accessors for the images and
    *                           parameters in this observation. They will be used for the correlation
    *                           matrix.
+   *   @history 2014-07-23 Jeannie Backer - Replaced QVectors with QLists.
    *
    */
   class BundleObservation : public QVector< BundleImage* > {
@@ -65,7 +78,7 @@ namespace Isis {
     // copy method
     void copy(const BundleObservation& src);
 
-    bool setSolveSettings(BundleObservationSolveSettings* solveSettings);
+    bool setSolveSettings(BundleObservationSolveSettings solveSettings);
 
     void setIndex(int n);
     int index();
@@ -85,7 +98,7 @@ namespace Isis {
     boost::numeric::ublas::vector< double >& aprioriSigmas();
     boost::numeric::ublas::vector< double >& adjustedSigmas();
 
-    const BundleObservationSolveSettings* solveSettings() { return m_solveSettings;}
+    const BundleObservationSolveSettings* solveSettings() { return m_solveSettings;} // TODO: implementation needs to be moved to cpp file per ISIS standards
 
 //    QStringList serialNumbers();
 

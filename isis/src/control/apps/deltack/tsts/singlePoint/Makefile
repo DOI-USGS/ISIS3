@@ -1,10 +1,12 @@
 APPNAME = deltack
 #This file tests the single point (don't solve for twist) option
+#
+# 2014-07-23 JWB - Added semicolon to first command.
 
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(CP) $(INPUT)/*.cub $(OUTPUT)
+	$(CP) $(INPUT)/*.cub $(OUTPUT);
 	$(APPNAME) from=$(OUTPUT)/vik.cub \
 	twist=false \
 	maxit=10 \

@@ -1,0 +1,66 @@
+Unit test for BundleUtilities... 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Create a BundleControlPoint object... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Create a BundleControlPointVector object... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Create a BundleImage object... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Create a BundleMeasure object... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Create a BundleObservation object... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Create a BundleObservationSolveSettings object and test mutator methods... 
+Object = TestBundleObservationSolveSettings
+  InstrumentPointingSolveOption       = None
+  SolveTwist                          = Yes
+  CKDegree                            = 1
+  CKSolveDegree                       = -1
+  NumberAngleCoefficientsSolved       = 0
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = Null
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionOnly
+  SPKDegree                           = 6
+  SPKSolveDegree                      = 0
+  NumberPositionCoefficientsSolved    = 1
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = 800.0
+  InstrumentPositionInterpolationType = 3
+End_Object
+
+Write the BundleObservationSolveSettings object to a byte array using a data stream and read into a new object ... 
+Object = TestBundleObservationSolveSettings
+  InstrumentPointingSolveOption       = None
+  SolveTwist                          = Yes
+  CKDegree                            = 1
+  CKSolveDegree                       = -1
+  NumberAngleCoefficientsSolved       = 0
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = Null
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionOnly
+  SPKDegree                           = 6
+  SPKSolveDegree                      = 0
+  NumberPositionCoefficientsSolved    = 1
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = 800.0
+  InstrumentPositionInterpolationType = 3
+End_Object
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Create a BundleObservationVector object... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+

@@ -18,13 +18,16 @@
  *  http://www.usgs.gov/privacy.html.
  */
 
+#include <QString>
+
 #include <float.h>
-#include <string>
+
 #include "Statistics.h"
 #include "IException.h"
 #include "IString.h"
 
 using namespace std;
+
 namespace Isis {
   //! Constructs an IsisStats object with accumulators and counters set to zero.
   Statistics::Statistics() {
@@ -82,7 +85,7 @@ namespace Isis {
    *
    * @param count The number of elements in the data to be removed.
    *
-   * @throws Isis::IException::Message RemoveData is trying to remove data that
+   * @throws IException::Message RemoveData is trying to remove data that
    *    doesn't exist.
    */
   void Statistics::RemoveData(const double *data, const unsigned int count) {
@@ -91,7 +94,7 @@ namespace Isis {
     for(unsigned int i = 0; i < count; i++) {
       p_totalPixels--;
 
-      if(Isis::IsValidPixel(data[i]) && InRange(data[i])) {
+      if(IsValidPixel(data[i]) && InRange(data[i])) {
         p_sum -= data[i];
         p_sumsum -= data[i] * data[i];
         p_validPixels--;
@@ -120,8 +123,8 @@ namespace Isis {
     }
 
     if(p_totalPixels < 0) {
-      string m = "You are removing non-existant data in [Statistics::RemoveData]";
-      throw IException(IException::Programmer, m, _FILEINFO_);
+      QString msg = "You are removing non-existant data in [Statistics::RemoveData]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
@@ -135,10 +138,9 @@ namespace Isis {
 
     if(p_validMaximum < p_validMinimum) {
       // get the min and max DN values in the chosen range
-      IString sMin(minimum);
-      IString sMax(maximum);
-      std::string m = "Invalid Range: Minimum [" + sMin + "] must be less than the Maximum [" + sMax + "]";
-      throw IException(IException::Programmer, m, _FILEINFO_);
+      QString msg = "Invalid Range: Minimum [" + toString(minimum) 
+                    + "] must be less than the Maximum [" + toString(maximum) + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
   /**
@@ -207,8 +209,8 @@ namespace Isis {
    */
   double Statistics::Minimum() const {
     if(p_removedData) {
-      string m = "Minimum is invalid since you removed data";
-      throw IException(IException::Programmer, m, _FILEINFO_);
+      QString msg = "Minimum is invalid since you removed data";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -227,8 +229,8 @@ namespace Isis {
    */
   double Statistics::Maximum() const {
     if(p_removedData) {
-      string m = "Maximum is invalid since you removed data";
-      throw IException(IException::Programmer, m, _FILEINFO_);
+      QString msg = "Maximum is invalid since you removed data";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -353,8 +355,8 @@ namespace Isis {
    */
   double Statistics::ChebyshevMinimum(const double percent) const {
     if((percent <= 0.0) || (percent >= 100.0)) {
-      string m = "Invalid value for percent";
-      throw IException(IException::Programmer, m, _FILEINFO_);
+      QString msg = "Invalid value for percent";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -379,8 +381,8 @@ namespace Isis {
    */
   double Statistics::ChebyshevMaximum(const double percent) const {
     if((percent <= 0.0) || (percent >= 100.0)) {
-      string m = "Invalid value for percent";
-      throw IException(IException::Programmer, m, _FILEINFO_);
+      QString msg = "Invalid value for percent";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(p_validPixels < 1) return Isis::NULL8;
@@ -447,12 +449,72 @@ namespace Isis {
     if(StandardDeviation() == 0) {
       if(value == Maximum()) return 0;
       else {
-        string m = "Undefined Z-score. Standard deviation is zero and";
-        m += " the input value[" + Isis::IString(value) + "] is out of range [" + Isis::IString(Maximum()) + "].";
-        throw IException(IException::Programmer, m, _FILEINFO_);
+        QString msg = "Undefined Z-score. Standard deviation is zero and the input value[" 
+                      + toString(value) + "] is out of range [" + toString(Maximum()) + "].";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
     return (value - Average()) / StandardDeviation();
   }
 
+
+
+  QDataStream &Statistics::write(QDataStream &stream) const {
+    stream << p_sum
+           << p_sumsum
+           << p_minimum
+           << p_maximum
+           << p_validMinimum
+           << p_validMaximum
+           << (qint32)p_totalPixels
+           << (qint32)p_validPixels
+           << (qint32)p_nullPixels
+           << (qint32)p_lrsPixels
+           << (qint32)p_lisPixels
+           << (qint32)p_hrsPixels
+           << (qint32)p_hisPixels
+           << (qint32)p_underRangePixels
+           << (qint32)p_overRangePixels
+           << p_removedData;
+    return stream;
+  }
+
+
+
+  QDataStream &Statistics::read(QDataStream &stream) {
+
+    qint32 totalPixels, validPixels, nullPixels, lrsPixels, lisPixels,
+           hrsPixels, hisPixels, underRangePixels, overRangePixels;
+
+    stream >> p_sum
+           >> p_sumsum
+           >> p_minimum
+           >> p_maximum
+           >> p_validMinimum
+           >> p_validMaximum
+           >> totalPixels
+           >> validPixels
+           >> nullPixels
+           >> lrsPixels
+           >> lisPixels
+           >> hrsPixels
+           >> hisPixels
+           >> underRangePixels
+           >> overRangePixels
+           >> p_removedData;
+
+    return stream;
+  }
+
+
+
+  QDataStream &operator<<(QDataStream &stream, const Statistics &statistics) {
+    return statistics.write(stream);
+  }
+
+
+
+  QDataStream &operator>>(QDataStream &stream, Statistics &statistics) {
+    return statistics.read(stream);
+  }
 } // end namespace isis

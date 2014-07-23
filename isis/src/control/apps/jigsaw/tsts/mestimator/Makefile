@@ -7,7 +7,8 @@ APPNAME = jigsaw
 # 2. remove net filename paths
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
-
+#
+# 2014-07-23 JWB - Commented out references to bundleout_images.csv.  Removed default parameters.
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
@@ -16,10 +17,10 @@ commands:
 	cnet=$(INPUT)/Ames_5-ImageLSTest_USGS_combined.net \
 	onet=$(OUTPUT)/mEstimator_out.net \
 	radius=yes \
-        model1=huber \
-        max_model1_c_quantile=0.6 \
-        model2=chen \
-        max_model2_c_quantile=.98 \
+	model1=huber \
+	max_model1_c_quantile=0.6 \
+	model2=chen \
+	max_model2_c_quantile=.98 \
 	sigma0=1.e-3  \
 	maxits=150 \
 	spsolve=position > /dev/null;
@@ -30,11 +31,12 @@ commands:
 	  > $(OUTPUT)/mEstimator_bundleout.txt;
 	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/mEstimator_residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/mEstimator_bundleout_images.csv
-	$(RM) residuals.csv bundleout_images.csv > /dev/null;
+#	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+#	  > $(OUTPUT)/mEstimator_bundleout_images.csv
+#	$(RM) bundleout_images.csv > /dev/null;
+	$(RM) residuals.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/mEstimator_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
 	$(RM) bundleout.txt > /dev/null

@@ -55,24 +55,22 @@ namespace Isis {
   * @author 2002-05-06 Jeff Anderson
   *
   * @internal
-  * @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best
-  * minimum/maximum methods.
-  * @history 2004-05-11 Jeff Anderson - Moved Reset, AddData and RemoveData
-  * methods into public space.
-  * @history 2004-06-28 Jeff Anderson - Added Sum and SumSquare methods.
-  * @history 2005-02-17 Deborah Lee Soltesz - Modified file to support Doxygen
-  * documentation.
-  * @history 2005-05-23 Jeff Anderson - Changed to support 2GB+ files
-  * @history 2006-02-15 Jacob Danton - Added Valid Range options/methods
-  * @history 2006-03-10 Jacob Danton - Added Z-score method
-  * @history 2007-01-18 Robert Sucharski - Added AddData method
-  *                       for a single double value
-  * @history 2008-05-06 Steven Lambright - Added AboveRange, BelowRange methods
-  * @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange function
-  * @history 2011-06-13 Ken Edmundson - Added Rms method
+  *   @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best minimum/maximum methods.
+  *   @history 2004-05-11 Jeff Anderson - Moved Reset, AddData and RemoveData methods into public
+  *                           space.
+  *   @history 2004-06-28 Jeff Anderson - Added Sum and SumSquare methods.
+  *   @history 2005-02-17 Deborah Lee Soltesz - Modified file to support Doxygen documentation.
+  *   @history 2005-05-23 Jeff Anderson - Changed to support 2GB+ files
+  *   @history 2006-02-15 Jacob Danton - Added Valid Range options/methods
+  *   @history 2006-03-10 Jacob Danton - Added Z-score method
+  *   @history 2007-01-18 Robert Sucharski - Added AddData method for a single double value
+  *   @history 2008-05-06 Steven Lambright - Added AboveRange, BelowRange methods
+  *   @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange function
+  *   @history 2011-06-13 Ken Edmundson - Added Rms method.
+  *   @history 2011-06-23 Jeannie Backer - Added QDataStream read(), write() methods and added
+  *                           QDataStream >> and << operators. Replaced std strings with QStrings.
   *
-  * @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the
-  * class documentation
+  *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
   *
   */
   class Statistics {
@@ -186,6 +184,9 @@ namespace Isis {
         return p_sumsum;
       };
 
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
+
     private:
       double p_sum;           //!< Sum accumulator.
       double p_sumsum;        //!< Sum-squared accumulator.
@@ -205,6 +206,11 @@ namespace Isis {
       bool   p_removedData;   /**< Indicates the RemoveData method was called which implies
                                    p_minimum and p_maximum are invalid. */
   };
+
+  // operators to read/write Statistics to/from binary data
+  QDataStream &operator<<(QDataStream &stream, const Statistics &statistics);
+  QDataStream &operator>>(QDataStream &stream, Statistics &statistics);
+
 } // end namespace isis
 
 #endif

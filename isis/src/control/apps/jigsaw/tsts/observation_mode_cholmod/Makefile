@@ -1,5 +1,7 @@
 APPNAME = jigsaw
 #This test exercises observation mode using the CHOLMOD solution on HiRISE images, with update=yes
+#
+# 2014-07-23 JWB - Commented out references to bundleout_images.csv.  Removed default parameters.
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -26,9 +28,10 @@ commands:
 	# 4. remove date and time
 	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/obsmode_cholmod_residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv
-	$(RM) residuals.csv bundleout_images.csv > /dev/null;
+#	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+#	  > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv
+#	$(RM) bundleout_images.csv > /dev/null;
+	$(RM) residuals.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/obsmode_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) bundleout.txt > /dev/null;

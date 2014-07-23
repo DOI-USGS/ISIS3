@@ -23,19 +23,34 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
 #include <QString>
 
-#include "BundleSettings.h"
-#include "BundleStatistics.h"
-#include "ControlNet.h"
-#include "PvlObject.h"
+class QDataStream;
 
 namespace Isis {
-
+  class FileName;
+  class BundleSettings;
+  class BundleStatistics;
+  class PvlObject;
+  /**
+   * @brief Container class for BundleAdjustment results. 
+   * This class includes the settings used to run the bundle adjustment, the resulting statistics 
+   * values, and the name of the control network used.
+   *  
+   * @ingroup ControlNetworks
+   *
+   * @author 2014-07-08 Jeannie Backer
+   *
+   * @internal
+   *   @history 2014-07-08 Jeannie Backer - Original version.
+   *   @history 2014-07-23 Jeannie Backer - Added implementation for the QDataStream << and >>
+   *                           operators and the read/write methods.
+   *  
+   */
   class BundleResults {
     public:
-      BundleResults(BundleSettings inputSettings, ControlNet outputControlNet, 
-                    QString controlNetworkFileName = "");      
+      BundleResults(BundleSettings inputSettings, FileName controlNetworkFileName);      
       BundleResults(const BundleResults &other);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &other);
@@ -43,17 +58,16 @@ namespace Isis {
       PvlObject pvlObject(QString resultsName = "BundleResults",
                           QString settingsName = "InputSettings",
                           QString statisticsName = "StatisticsResults");
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
     private:
       BundleResults();
-      QString    m_controlNetworkFileName;
-      ControlNet *m_outputCNet;
+      FileName         *m_controlNetworkFileName;
       BundleSettings   *m_settings;
       BundleStatistics *m_statisticsResults;
   };
-  // operators to read/write SparseBlockColumnMatrix to/from binary disk file
-  // operator to write SparseBlockColumnMatrix to QDebug stream
-  QDataStream&operator<<(QDataStream &stream, const BundleResults&);
-  QDataStream&operator>>(QDataStream &stream, BundleResults&);
-  QDebug operator<<(QDebug dbg, const BundleResults &bundleResults);
+  // operators to read/write BundleResults to/from binary data
+  QDataStream &operator<<(QDataStream &stream, const BundleResults &bundleResults);
+  QDataStream &operator>>(QDataStream &stream, BundleResults &bundleResults);
 };
 #endif // BundleResults_h

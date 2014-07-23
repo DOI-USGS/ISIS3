@@ -50,8 +50,12 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-07-01 Jeannie Backer - Original version
-   *   @history 2014-07-14 Kimberly Oyama  Added support for correlation matrix.
+   *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix.
    *   @history 2014-07-16 Jeannie Backer - Changed pvlGroup() to pvlObject()
+   *   @history 2014-07-23 Jeannie Backer - Added QDataStream operators (<< and >>) and read/write
+   *                           methods. Initialize m_cumProRes in the constructor since this
+   *                           variable is used regardless of whether maximum likelihood estimation
+   *                           is used.
    */
   class BundleStatistics {
     public:
@@ -61,8 +65,8 @@ namespace Isis {
       BundleStatistics &operator=(const BundleStatistics &other);
 
       // mutators and computation methods
-      bool computeBundleStatistics(SerialNumberList *m_pSnList, 
-                                   ControlNet *m_pCnet, 
+      bool computeBundleStatistics(SerialNumberList *snList, 
+                                   ControlNet *cnet, 
                                    bool errorPropagation,
                                    bool solveRadius);
       void maximumLikelihoodSetUp(
@@ -180,6 +184,9 @@ namespace Isis {
       void setCorrMatCovFileName(FileName name);
       void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams);
 
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
+
     private:
       CorrelationMatrix *m_correlationMatrix;
 
@@ -279,10 +286,8 @@ namespace Isis {
       double m_maximumLikelihoodMedianR2Residuals; /**< Median of R^2 residuals.*/ 
        
   };
-  // operators to read/write SparseBlockColumnMatrix to/from binary disk file
-  // operator to write SparseBlockColumnMatrix to QDebug stream
-  QDataStream&operator<<(QDataStream &stream, const BundleStatistics&);
-  QDataStream&operator>>(QDataStream &stream, BundleStatistics&);
-  QDebug operator<<(QDebug dbg, const BundleStatistics &bundleStatistics);
+  // operators to read/write BundleStatistics to/from binary disk file
+  QDataStream &operator<<(QDataStream &stream, const BundleStatistics &bundleStatistics);
+  QDataStream &operator>>(QDataStream &stream, BundleStatistics &bundleStatistics);
 };
 #endif // BundleStatistics_h

@@ -18,16 +18,17 @@ namespace Isis {
    * Default Constructor
    */
   CorrelationMatrix::CorrelationMatrix() {
+    m_imagesAndParameters = NULL;
+    m_visibleImagesAndParameters = NULL; // TODO: unused variable ???
     m_covarianceFileName = NULL; // new FileName("/work/users/koyama/testData/covarianceMatrix2.dat");
     m_correlationFileName = NULL; // new FileName("/work/users/koyama/testData/correlationMatrix.dat");
-    m_diagonals = new QList<double>;
+    m_diagonals = NULL;
 //     m_visibleElements = new QList<MatrixElement*>;
     m_visibleBlocks = NULL;
-    m_imagesAndParameters = new QMap<QString, QStringList>;
-
     QStringList param;
     param << "X" << "Y" << "Z" << "RA" << "DEC" << "TWI";
 
+    m_imagesAndParameters = new QMap<QString, QStringList>;
     QString img = "Sub4-AS15-M-0583_msk.cub";
     m_imagesAndParameters->insert(img, param);
     img = "Sub4-AS15-M-0584_msk.cub";
@@ -42,6 +43,8 @@ namespace Isis {
     m_imagesAndParameters->insert(img, param);
     img = "Sub4-AS15-M-1537.cub";
     m_imagesAndParameters->insert(img, param);
+
+    m_diagonals = new QList<double>;
 
 /*    if (m_correlationFileName == NULL) {
       computeCorrelationMatrix(); // Just for the first time.. Once it's created we don't need to do this.
@@ -68,6 +71,12 @@ namespace Isis {
    *
    */
   CorrelationMatrix::CorrelationMatrix(PvlObject storedMatrixData) {
+    m_imagesAndParameters = NULL;
+    m_visibleImagesAndParameters = NULL; // TODO: unused variable ???
+    m_covarianceFileName = NULL;
+    m_correlationFileName = NULL;
+    m_diagonals = NULL;
+    m_visibleBlocks = NULL;
 
     if (storedMatrixData.name() != "CorrelationMatrixData") {
       QString msg = "This Pvl Object does not have the correct correlation information. The Object "
@@ -119,10 +128,13 @@ namespace Isis {
    * @param other The CorrelationMatrix to copy
    */
   CorrelationMatrix::CorrelationMatrix(const CorrelationMatrix &other) {
-    m_imagesAndParameters = other.m_imagesAndParameters;
-    m_covarianceFileName = other.m_covarianceFileName;
-    m_correlationFileName = m_correlationFileName;
-    m_diagonals = m_diagonals;
+    m_imagesAndParameters = new QMap<QString, QStringList>(*other.m_imagesAndParameters);
+    m_visibleImagesAndParameters
+        = new QMap<QString, QStringList>(*other.m_visibleImagesAndParameters); // TODO: unused variable ???
+    m_covarianceFileName = new FileName(*other.m_covarianceFileName);
+    m_correlationFileName = new FileName(*other.m_correlationFileName);
+    m_diagonals = new QList<double>(*other.m_diagonals);
+    m_visibleBlocks = new QList<SparseBlockColumnMatrix>(*other.m_visibleBlocks);
   }
 
 
@@ -131,6 +143,42 @@ namespace Isis {
    * Destructor
    */
   CorrelationMatrix::~CorrelationMatrix() {
+
+    // TODO: Why does this cause seg fault + abort of unitTest??? 
+    // valgrind:
+    // ==13332== Invalid read of size 4
+    // ==13332==    at 0x5265CE8: Isis::CorrelationMatrix::~CorrelationMatrix() (in /scratch/ipce/isis/src/control/objs/CorrelationMatrix/libisis3.4.7.so)
+    // ==13332==    by 0x409300: main (unitTest.cpp:157)
+    // ==13332==  Address 0x101e8458 is 104 bytes inside a block of size 128 free'd
+    // ==13332==    at 0x4A073CC: operator delete(void*) (vg_replace_malloc.c:480)
+    // ==13332==    by 0x40B4F3: QMap<QString, QStringList>::freeData(QMapData*) (qmap.h:655)
+    // ==13332==    by 0x40A74D: QMap<QString, QStringList>::~QMap() (in /scratch/ipce/isis/src/control/objs/CorrelationMatrix/unitTest)
+    // ==13332==    by 0x4092A6: main (unitTest.cpp:157)
+    // ==13332==
+    // ==13332== Invalid free() / delete / delete[] / realloc()
+    // ==13332==    at 0x4A073CC: operator delete(void*) (vg_replace_malloc.c:480)
+    // ==13332==    by 0x5265D06: Isis::CorrelationMatrix::~CorrelationMatrix() (in /scratch/ipce/isis/src/control/objs/CorrelationMatrix/libisis3.4.7.so)
+    // ==13332==    by 0x409300: main (unitTest.cpp:157)
+    // ==13332==  Address 0x7feffef00 is on thread 1's stack
+    // 
+//   delete m_imagesAndParameters;
+//   m_imagesAndParameters = NULL;
+
+    delete m_visibleImagesAndParameters; // TODO: unused variable ???
+    m_visibleImagesAndParameters = NULL; // TODO: unused variable ???
+
+    delete m_covarianceFileName;
+    m_covarianceFileName = NULL;
+
+    delete m_correlationFileName;
+    m_correlationFileName = NULL;
+
+    delete m_diagonals;
+    m_diagonals = NULL;
+
+    delete m_visibleBlocks;
+    m_visibleBlocks = NULL;
+
   }
 
 
@@ -143,11 +191,31 @@ namespace Isis {
    * @param other The matrix to assign to this matrix.
    * @return CorrelationMatrix This new matrix.
    */
-  CorrelationMatrix &CorrelationMatrix::operator = (const CorrelationMatrix &other) {
-    m_imagesAndParameters = other.m_imagesAndParameters;
-    m_covarianceFileName = other.m_covarianceFileName;
-    m_correlationFileName = m_correlationFileName;
-    m_diagonals = m_diagonals;
+  CorrelationMatrix &CorrelationMatrix::operator=(const CorrelationMatrix &other) {
+
+    if (&other != this) {
+
+      delete m_imagesAndParameters;
+      m_imagesAndParameters = new QMap<QString, QStringList>(*other.m_imagesAndParameters);
+  
+      delete m_visibleImagesAndParameters; // TODO: unused variable ???
+      m_visibleImagesAndParameters
+          = new QMap<QString, QStringList>(*other.m_visibleImagesAndParameters); // TODO: unused variable ???
+  
+      delete m_covarianceFileName;
+      m_covarianceFileName = new FileName(*other.m_covarianceFileName);
+  
+      delete m_correlationFileName;
+      m_correlationFileName = new FileName(*other.m_correlationFileName);
+  
+      delete m_diagonals;
+      m_diagonals = new QList<double>(*other.m_diagonals);
+  
+      delete m_visibleBlocks;
+      m_visibleBlocks = new QList<SparseBlockColumnMatrix>(*other.m_visibleBlocks);
+
+    }
+
     return *this;
   }
 
@@ -426,5 +494,68 @@ namespace Isis {
     corrMatInfo += imgsAndParams;
     
     return corrMatInfo;
+  }
+
+
+
+  QDataStream &CorrelationMatrix::write(QDataStream &stream) const {
+    // QMaps
+    stream << *m_imagesAndParameters << *m_visibleImagesAndParameters;
+    // FileNames
+    stream << m_covarianceFileName->expanded() << m_correlationFileName->expanded();
+    // QLists
+    stream << *m_diagonals << *m_visibleBlocks;
+    return stream;
+  }
+
+
+
+  QDataStream &CorrelationMatrix::read(QDataStream &stream) {
+    // QMaps
+    QMap<QString, QStringList> imagesAndParameters;
+    stream >> imagesAndParameters;
+    delete m_imagesAndParameters;
+    m_imagesAndParameters = new QMap<QString, QStringList>(imagesAndParameters);
+
+    QMap<QString, QStringList> visibleImagesAndParameters;
+    stream >> visibleImagesAndParameters;
+    delete m_visibleImagesAndParameters;
+    m_visibleImagesAndParameters = new QMap<QString, QStringList>(visibleImagesAndParameters);
+
+    // FileNames
+    QString covarianceFileName;
+    stream >> covarianceFileName;
+    delete m_covarianceFileName;
+    m_covarianceFileName  = new FileName(covarianceFileName);
+
+    QString correlationFileName;
+    stream >>correlationFileName;
+    delete m_correlationFileName;
+    m_correlationFileName = new FileName(correlationFileName);
+
+    // QLists
+    QList<double> diagonals;
+    stream >> diagonals;
+    delete m_diagonals;
+    m_diagonals = new QList<double>(diagonals);
+
+    QList<SparseBlockColumnMatrix> visibleBlocks;
+    stream << visibleBlocks;
+    delete m_visibleBlocks;
+    m_visibleBlocks = new QList<SparseBlockColumnMatrix>(visibleBlocks);
+
+    return stream;
+  }
+
+
+
+  QDataStream &operator<<(QDataStream &stream, const CorrelationMatrix &matrix) {
+    return matrix.write(stream);
+  }
+
+
+
+  QDataStream &operator>>(QDataStream &stream, CorrelationMatrix &matrix) {
+    return matrix.read(stream);
   }
 }

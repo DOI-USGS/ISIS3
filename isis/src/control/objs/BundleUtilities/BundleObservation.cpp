@@ -14,8 +14,8 @@ namespace Isis {
                                        QString instrumentId) {
     append(image);
 
-    m_serialNumbers.append( image->serialNumber() );
-    m_imageNames.append( image->fileName() );
+    m_serialNumbers.append(image->serialNumber());
+    m_imageNames.append(image->fileName());
     m_observationNumber = observationNumber;
     m_instrumentId = instrumentId;
 
@@ -34,6 +34,9 @@ namespace Isis {
   BundleObservation::~BundleObservation() {
     qDeleteAll(*this);
     clear();
+
+    delete m_solveSettings;
+    m_solveSettings = NULL;
   }
 
 
@@ -57,15 +60,15 @@ namespace Isis {
   /**
    * set solve parameters
    */
-  bool BundleObservation::setSolveSettings(BundleObservationSolveSettings* solveSettings) {
-    m_solveSettings = solveSettings;
+  bool BundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
+    m_solveSettings = new BundleObservationSolveSettings(solveSettings);
 
     // initialize solution parameters for this observation
     int nCameraAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
     int nCameraPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
 
     int nParameters = 3 * nCameraPositionCoefficients + 2 * nCameraAngleCoefficients;
-    if ( nCameraAngleCoefficients >= 1 && m_solveSettings->solveTwist() ) {
+    if (nCameraAngleCoefficients >= 1 && m_solveSettings->solveTwist()) {
       nParameters += nCameraAngleCoefficients;
     }
     // size vectors and set to zero
@@ -79,9 +82,9 @@ namespace Isis {
     m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParameters);
     for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to -1.0
-      m_aprioriSigmas(i) = -1.0;
+      m_aprioriSigmas[i] = -1.0;
 
-    if (!initParameterWeights() ) {
+    if (!initParameterWeights()) {
       // TODO: some message here!!!!!!!!!!!
       return false;
     }
@@ -173,22 +176,22 @@ namespace Isis {
         SpicePosition *spiceposition = image->camera()->instrumentPosition();
 
         if (i > 0) {
-          spiceposition->SetPolynomialDegree( m_solveSettings->spkSolveDegree() );
+          spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
           spiceposition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
-          spiceposition->SetPolynomial( posPoly1, posPoly2, posPoly3,
-                                        m_solveSettings->positionInterpolationType() );
+          spiceposition->SetPolynomial(posPoly1, posPoly2, posPoly3,
+                                       m_solveSettings->positionInterpolationType());
         }
         else {
           // first, set the degree of the spk polynomial to be fit for a priori values
-          spiceposition->SetPolynomialDegree( m_solveSettings->spkDegree() );
+          spiceposition->SetPolynomialDegree(m_solveSettings->spkDegree());
 
           // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
           // function, or polynomial function over constant hermite spline)
           // TODO: verify - I think this actually performs the a priori fit
-          spiceposition->SetPolynomial( m_solveSettings->positionInterpolationType() );
+          spiceposition->SetPolynomial(m_solveSettings->positionInterpolationType());
 
           // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spiceposition->SetPolynomialDegree( m_solveSettings->spkSolveDegree() );
+          spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
 
           positionBaseTime = m_instrumentPosition->GetBaseTime();
           positiontimeScale = m_instrumentPosition->GetTimeScale();
@@ -209,22 +212,22 @@ namespace Isis {
         SpiceRotation *spicerotation = image->camera()->instrumentRotation();
 
         if (i > 0) {
-          spicerotation->SetPolynomialDegree( m_solveSettings->ckSolveDegree() );
+          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
           spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
-          spicerotation->SetPolynomial( anglePoly1, anglePoly2, anglePoly3,
-                                        m_solveSettings->pointingInterpolationType() );
+          spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
+                                       m_solveSettings->pointingInterpolationType());
         }
         else {
           // first, set the degree of the spk polynomial to be fit for a priori values
-          spicerotation->SetPolynomialDegree( m_solveSettings->ckDegree() );
+          spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
 
           // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
           // function, or polynomial function over constant hermite spline)
           // TODO: verify - I think this actually performs the a priori fit
-          spicerotation->SetPolynomial( m_solveSettings->pointingInterpolationType() );
+          spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
 
           // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicerotation->SetPolynomialDegree( m_solveSettings->ckSolveDegree() );
+          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
 
           rotationBaseTime = spicerotation->GetBaseTime();
           rotationtimeScale = spicerotation->GetTimeScale();
@@ -247,15 +250,15 @@ namespace Isis {
         SpicePosition *spiceposition = image->camera()->instrumentPosition();
 
         // first, set the degree of the spk polynomial to be fit for a priori values
-        spiceposition->SetPolynomialDegree( m_solveSettings->spkDegree() );
+        spiceposition->SetPolynomialDegree(m_solveSettings->spkDegree());
 
         // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
         // function, or polynomial function over constant hermite spline)
         // TODO: verify - I think this actually performs the a priori fit
-        spiceposition->SetPolynomial( m_solveSettings->positionInterpolationType() );
+        spiceposition->SetPolynomial(m_solveSettings->positionInterpolationType());
 
         // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spiceposition->SetPolynomialDegree( m_solveSettings->spkSolveDegree() );
+        spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
       }
     }
 
@@ -267,15 +270,15 @@ namespace Isis {
         SpiceRotation *spicerotation = image->camera()->instrumentRotation();
 
         // first, set the degree of the spk polynomial to be fit for a priori values
-        spicerotation->SetPolynomialDegree( m_solveSettings->ckDegree() );
+        spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
 
         // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
         // function, or polynomial function over constant hermite spline)
         // TODO: verify - I think this actually performs the a priori fit
-        spicerotation->SetPolynomial( m_solveSettings->pointingInterpolationType() );
+        spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
 
         // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spicerotation->SetPolynomialDegree( m_solveSettings->ckSolveDegree() );
+        spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
       }
     }
 
@@ -301,13 +304,13 @@ namespace Isis {
     double angvelWeight = 0.0;     // angular velocity
     double angaccWeight = 0.0;     // angular acceleration
 
-    QVector<double> aprioriPointingSigmas = m_solveSettings->aprioriPointingSigmas();
-    QVector<double> aprioriPositionSigmas = m_solveSettings->aprioriPositionSigmas();
+    QList<double> aprioriPointingSigmas = m_solveSettings->aprioriPointingSigmas();
+    QList<double> aprioriPositionSigmas = m_solveSettings->aprioriPositionSigmas();
 
     int nCamPosCoeffsSolved = 3 * m_solveSettings->numberCameraPositionCoefficientsSolved();
 
     int nCamAngleCoeffsSolved;
-    if ( m_solveSettings->solveTwist() ) {
+    if (m_solveSettings->solveTwist()) {
       nCamAngleCoeffsSolved = 3 * m_solveSettings->numberCameraAngleCoefficientsSolved();
     }
     else {
@@ -344,16 +347,16 @@ namespace Isis {
     nspkTerms = m_solveSettings->numberCameraPositionCoefficientsSolved();
     for ( int i = 0; i < nCamPosCoeffsSolved; i++) {
       if (i % nspkTerms == 0) {
-       m_aprioriSigmas(i) = aprioriPositionSigmas.at(0);
-       m_weights(i) = posWeight;
+       m_aprioriSigmas[i] = aprioriPositionSigmas.at(0);
+       m_weights[i] = posWeight;
       }
       if (i % nspkTerms == 1) {
-       m_aprioriSigmas(i) = aprioriPositionSigmas.at(1);
-       m_weights(i) = velWeight;
+       m_aprioriSigmas[i] = aprioriPositionSigmas.at(1);
+       m_weights[i] = velWeight;
       }
       if (i % nspkTerms == 2) {
-       m_aprioriSigmas(i) = aprioriPositionSigmas.at(2);
-       m_weights(i) = accWeight;
+       m_aprioriSigmas[i] = aprioriPositionSigmas.at(2);
+       m_weights[i] = accWeight;
       }
     }
 
@@ -361,21 +364,21 @@ namespace Isis {
     nckTerms = m_solveSettings->numberCameraAngleCoefficientsSolved()    ;
     for ( int i = 0; i < nCamAngleCoeffsSolved; i++) {
       if (i % nckTerms == 0) {
-        m_aprioriSigmas(nCamPosCoeffsSolved+i) = aprioriPointingSigmas.at(0);
-        m_weights(nCamPosCoeffsSolved+i) = angWeight;
+        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(0);
+        m_weights[nCamPosCoeffsSolved + i] = angWeight;
       }
       if (i % nckTerms == 1) {
-        m_aprioriSigmas(nCamPosCoeffsSolved+i) = aprioriPointingSigmas.at(1);
-        m_weights(nCamPosCoeffsSolved+i) = angvelWeight;
+        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(1);
+        m_weights[nCamPosCoeffsSolved + i] = angvelWeight;
       }
       if (i % nckTerms == 2) {
-        m_aprioriSigmas(nCamPosCoeffsSolved+i) = aprioriPointingSigmas.at(2);
-        m_weights(nCamPosCoeffsSolved+i) = angaccWeight;
+        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(2);
+        m_weights[nCamPosCoeffsSolved + i] = angaccWeight;
       }
     }
 
 //    for ( int i = 0; i < (int)m_weights.size(); i++ )
-//      std::cout << m_weights(i) << std::endl;
+//      std::cout << m_weights[i] << std::endl;
 
     return true;
   }
@@ -421,8 +424,8 @@ namespace Isis {
       for (int i = 0; i < size(); i++) {
         BundleImage *image = at(i);
         SpicePosition *spiceposition = image->camera()->instrumentPosition();
-        spiceposition->SetPolynomial( coefX, coefY, coefZ,
-                                      m_solveSettings->positionInterpolationType() );
+        spiceposition->SetPolynomial(coefX, coefY, coefZ,
+                                     m_solveSettings->positionInterpolationType());
       }
     }
 
@@ -447,7 +450,7 @@ namespace Isis {
         index++;
       }
 
-      if ( m_solveSettings->solveTwist() ) {
+      if (m_solveSettings->solveTwist()) {
         // update TWIST coefficient(s)
         for (int i = 0; i < nCameraAngleCoefficients; i++) {
           coefTWI[i] += corrections(index);
@@ -459,8 +462,8 @@ namespace Isis {
       for (int i = 0; i < size(); i++) {
         BundleImage *image = at(i);
         SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-        spicerotation->SetPolynomial( coefRA, coefDEC, coefTWI,
-                                      m_solveSettings->pointingInterpolationType() );
+        spicerotation->SetPolynomial(coefRA, coefDEC, coefTWI,
+                                     m_solveSettings->pointingInterpolationType());
       }
     }
 
@@ -479,9 +482,9 @@ namespace Isis {
   int BundleObservation::numberPointingParameters() {
     int angleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
-    if ( m_solveSettings->solveTwist() )
+    if (m_solveSettings->solveTwist()) {
       return 3.0 * angleCoefficients;
-
+    }
     return 2.0 * angleCoefficients;
   }
 
@@ -593,8 +596,8 @@ namespace Isis {
             arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
             arg(m_corrections(i), 21, 'f', 8).
             arg(finalParameterValues[i], 20, 'f', 8).
-            arg(m_aprioriSigmas(i), 18, 'f', 8).
-            arg(m_adjustedSigmas(i), 18, 'f', 8);
+            arg(m_aprioriSigmas[i], 18, 'f', 8).
+            arg(m_adjustedSigmas[i], 18, 'f', 8);
       }
       else {
         qStr = QString("%1%2%3%4%5%6\n").
@@ -602,7 +605,7 @@ namespace Isis {
             arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
             arg(m_corrections(i), 21, 'f', 8).
             arg(finalParameterValues[i], 20, 'f', 8).
-            arg(m_aprioriSigmas(i), 18, 'f', 8).
+            arg(m_aprioriSigmas[i], 18, 'f', 8).
             arg("N/A", 18);
       }
 
@@ -627,7 +630,7 @@ namespace Isis {
             arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
             arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
             arg(finalParameterValues[i], 20, 'f', 8).
-            arg(m_aprioriSigmas(i), 18, 'f', 8).
+            arg(m_aprioriSigmas[i], 18, 'f', 8).
             arg("N/A", 18);
       }
 

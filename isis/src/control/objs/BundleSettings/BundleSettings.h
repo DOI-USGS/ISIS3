@@ -23,7 +23,6 @@
  */
 
 #include <QList>
-#include <QVector>
 #include <QPair>
 #include <QString>
 
@@ -33,7 +32,7 @@
 
 namespace Isis {
   class MaximumLikelihoodWFunctions;
-  class PvlGroup;
+  class PvlObject;
   /**
    * @brief Container class for BundleAdjustment settings. 
    * This class contains all of the settings needed to run a bundle adjustment. 
@@ -45,6 +44,14 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-05-14 Jeannie Backer - Original version.
+   *   @history 2014-07-16 Jeannie Backer - Removed redundant mutators.  Moved implementation for
+   *                           numberSolveSettings() and observationSolveSettings() to cpp file.
+   *                           Removed static methods to convert MaximumLikelihoodWFunctions::Model
+   *                           enum to QString since these methods now exist in
+   *                           MaximumLikelihoodWFunctions class. Changed pvlGroup() method to
+   *                           pvlObject().  Added unitTest.
+   *   @history 2014-07-23 Jeannie Backer - Added QDataStream >> and << operators and read/write
+   *                           methods. Created unitTest.
    *  
    */
  class BundleSettings {
@@ -85,8 +92,8 @@ namespace Isis {
       void setSolveRadius(bool radius);
       void setUpdateCubeLabel(bool updateCubeLabel);
       void setErrorPropagation(bool errorPropagation);
-      void setOutlierRejection(bool outlierRejection, double multiplier);
-      void setObservationSolveOptions(QVector<BundleObservationSolveSettings*>& observationSolveSettings);
+      void setOutlierRejection(bool outlierRejection, double multiplier = 1.0);
+      void setObservationSolveOptions(QList<BundleObservationSolveSettings> observationSolveSettings);
 
       // accessors
       SolveMethod solveMethod() const;
@@ -100,10 +107,11 @@ namespace Isis {
       double globalLongitudeAprioriSigma() const;
       double globalRadiusAprioriSigma() const;
 
-      int numberSolveSettings() { return m_observationSolveSettings.size(); }
-      BundleObservationSolveSettings* observationSolveSettings(QString instrumentId);
-      BundleObservationSolveSettings* observationSolveSettings(int n)
-      { return m_observationSolveSettings[n]; }
+      int numberSolveSettings() const;
+      BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
+      BundleObservationSolveSettings observationSolveSettings(int n) const;
+//      const BundleObservationSolveSettings &observationSolveSettings(QString instrumentId);
+//      const BundleObservationSolveSettings &observationSolveSettings(int n);               
 
 
       // Convergence Criteria
@@ -149,8 +157,8 @@ namespace Isis {
                                            aggressive model that intentionally removes the largest
                                            few percent of residuals.???? */
       };
-      static MaximumLikelihoodWFunctions::Model stringToMaximumLikelihoodModel(QString model);
-      static QString maximumLikelihoodModelToString(MaximumLikelihoodWFunctions::Model model);
+//      static MaximumLikelihoodWFunctions::Model stringToMaximumLikelihoodModel(QString model);
+//      static QString maximumLikelihoodModelToString(MaximumLikelihoodWFunctions::Model model);
       void addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
                                               double cQuantile);
       QList< QPair< MaximumLikelihoodWFunctions::Model, double > > 
@@ -170,6 +178,9 @@ namespace Isis {
 
       PvlObject pvlObject(QString name = "BundleSettings") const;
 
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
+
     private:
       bool m_validateNetwork;
       SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
@@ -180,13 +191,13 @@ namespace Isis {
       bool m_outlierRejection; //!< to perform automatic outlier detection/rejection
       double m_outlierRejectionMultiplier; // multiplier = 1 if rejection = false
 
-      // QVector of observation solve settings
-      QVector<BundleObservationSolveSettings*> m_observationSolveSettings;
-
       // Parameter Uncertainties (Weighting)
       double m_globalLatitudeAprioriSigma;
       double m_globalLongitudeAprioriSigma;
       double m_globalRadiusAprioriSigma;
+
+      // QList of observation solve settings
+      QList<BundleObservationSolveSettings> m_observationSolveSettings; // TODO: pointer???
 
       // Convergence Criteria
       ConvergenceCriteria m_convergenceCriteria;
@@ -196,18 +207,21 @@ namespace Isis {
       // Maximum Likelihood Estimation Options
       // model and maxModelCQuantile for each of the three maximum likelihood estimations.
       // Note that Welsch and Chen can not be used for the first model.
-      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
+      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; // TODO: pointer???
 
       // Self Calibration ??? (from cnetsuite only)
 
       // Target Body ??? (from cnetsuite only)
 
       // Output Options ??? (from Jigsaw only)
-      QString m_outputFilePrefix; //!< output file prefix
+      QString m_outputFilePrefix; //!< output file prefix  // TODO: pointer???
       bool m_createBundleOutputFile; //!< to print standard bundle output file (bundleout.txt)
       bool m_createCSVPointsFile; //!< to output points and image station data in csv format
       bool m_createResidualsFile; //!< to output residuals in csv format
  };
+  // operators to read/write BundleResults to/from binary data
+  QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings);
+  QDataStream &operator>>(QDataStream &stream, BundleSettings &settings);
 };
 #endif
 

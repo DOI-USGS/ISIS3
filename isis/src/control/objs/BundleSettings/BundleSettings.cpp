@@ -1,16 +1,22 @@
 #include "BundleSettings.h"
 
+#include <QDebug>
+#include <QList>
+#include <QString>
+
 #include "BundleObservationSolveSettings.h"
 #include "IException.h"
 #include "MaximumLikelihoodWFunctions.h"
-#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
 
 namespace Isis {
 
   /**
-   * constructor
+   * Constructs a BundleSettings object with default values.
    */
   BundleSettings::BundleSettings() {
+
     m_validateNetwork = true;
 
     m_solveMethod = Sparse;
@@ -18,19 +24,21 @@ namespace Isis {
     m_solveRadius          = false;
     m_updateCubeLabel      = false;
     m_errorPropagation     = false;
-
     m_outlierRejection     = false;
-    m_outlierRejectionMultiplier = 3.0; // default to rejection = false, i.e. multiplier = 1.0      ???
-
-    // Convergence Criteria
-    m_convergenceCriteria = BundleSettings::Sigma0;
-    m_convergenceCriteriaThreshold = 1.0e-10;
-    m_convergenceCriteriaMaximumIterations = 50;
+    m_outlierRejectionMultiplier = 1.0;
 
     // Parameter Uncertainties (Weighting)
     m_globalLatitudeAprioriSigma = -1.0;
     m_globalLongitudeAprioriSigma = -1.0;
     m_globalRadiusAprioriSigma = -1.0;
+
+    BundleObservationSolveSettings defaultSolveSettings;
+    m_observationSolveSettings.append(defaultSolveSettings);
+
+    // Convergence Criteria
+    m_convergenceCriteria = BundleSettings::Sigma0;
+    m_convergenceCriteriaThreshold = 1.0e-10;
+    m_convergenceCriteriaMaximumIterations = 50;
 
     // Maximum Likelihood Estimation Options no default in the constructor - must be set.
     m_maximumLikelihood.clear();
@@ -85,7 +93,7 @@ namespace Isis {
 
 //    int nSolveSettings = m_observationSolveSettings.size();
 //    for (int i = 0; i < nSolveSettings; i++) {
-//      BundleObservationSolveSettings *settings = m_observationSolveSettings.at(i);
+//      BundleObservationSolveSettings settings = m_observationSolveSettings[i];
 //      delete settings;
 //    }
 //    m_observationSolveSettings.clear();
@@ -125,14 +133,17 @@ namespace Isis {
   }
 
 
+
   void BundleSettings::setValidateNetwork(bool validate) {
     m_validateNetwork = validate;
   }
 
 
+
   bool BundleSettings::validateNetwork() const {
     return m_validateNetwork;
   }
+
 
 
   // =============================================================================================//
@@ -148,7 +159,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Programmer,
-                       "Unknown bundle solve method " + method + ".",
+                       "Unknown bundle solve method [" + method + "].",
                        _FILEINFO_);
     }
   }
@@ -188,44 +199,20 @@ namespace Isis {
 
 
 
-  void BundleSettings::setSolveMethod(SolveMethod method) {
-    m_solveMethod = method;
-  }
-
-
-
-  void BundleSettings::setSolveObservationMode(bool solveObservationMode) {
-    m_solveObservationMode = solveObservationMode;
-  }
-
-
-
-  void BundleSettings::setSolveRadius(bool solveRadius) {
-    m_solveRadius = solveRadius;
-  }
-
-
-
-  void BundleSettings::setUpdateCubeLabel(bool updateCubeLabel) {
-    m_updateCubeLabel = updateCubeLabel;
-  }
-
-
-
-  void BundleSettings::setErrorPropagation(bool errorPropagation) {
-    m_errorPropagation = errorPropagation;
-  }
-
-
-
   void BundleSettings::setOutlierRejection(bool outlierRejection, double multiplier) {
     m_outlierRejection = outlierRejection;
-    m_outlierRejectionMultiplier = multiplier;
+    if (m_outlierRejection) {
+      m_outlierRejectionMultiplier = multiplier;
+    }
+    else {
+      m_outlierRejectionMultiplier = 1.0;
+    }
   }
 
 
 
-  void BundleSettings::setObservationSolveOptions(QVector<BundleObservationSolveSettings*>& observationSolveSettings) {
+  void BundleSettings::setObservationSolveOptions(
+      QList<BundleObservationSolveSettings> observationSolveSettings) {
     m_observationSolveSettings = observationSolveSettings;
   }
 
@@ -289,18 +276,40 @@ namespace Isis {
     return m_globalRadiusAprioriSigma;
   }
 
-  BundleObservationSolveSettings* BundleSettings::observationSolveSettings(QString instrumentId) {
-    int nsolveSettings = m_observationSolveSettings.size();
 
-    for (int i = 0; i < nsolveSettings; i++) {
-      if (m_observationSolveSettings.at(i)->instrumentId() == instrumentId) {
-        return m_observationSolveSettings.at(i);
-        break;
+
+  int BundleSettings::numberSolveSettings() const {
+     return m_observationSolveSettings.size();
+  }
+
+
+
+  BundleObservationSolveSettings 
+      BundleSettings::observationSolveSettings(QString instrumentId) const {
+
+    for (int i = 0; i < numberSolveSettings(); i++) {
+      if (m_observationSolveSettings[i].instrumentId() == instrumentId) {
+        return m_observationSolveSettings[i];
       }
     }
-
-    return NULL;
+    QString msg = "Unable to find BundleObservationSolveSettings with InstrumentId = ["
+                  + instrumentId + "].";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
+
+
+
+  BundleObservationSolveSettings 
+      BundleSettings::observationSolveSettings(int n) const { 
+
+    if (n < numberSolveSettings()) {
+      return m_observationSolveSettings[n]; 
+    }
+    QString msg = "Unable to find BundleObservationSolveSettings with index = ["
+                  + toString(n) + "].";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
 
 
   // =============================================================================================//
@@ -315,7 +324,7 @@ namespace Isis {
       return BundleSettings::ParameterCorrections;
     }
     else throw IException(IException::Programmer,
-                          "Unknown bundle convergence criteria " + criteria + ".",
+                          "Unknown bundle convergence criteria [" + criteria + "].",
                           _FILEINFO_);
   }
 
@@ -383,47 +392,15 @@ namespace Isis {
   // =============================================================================================//
   // ======================== Maximum Likelihood Estimation Options ==============================//
   // =============================================================================================//
-  MaximumLikelihoodWFunctions::Model BundleSettings::stringToMaximumLikelihoodModel(
-      QString model) {
-    if (model.compare("HUBER", Qt::CaseInsensitive) == 0) {
-      return MaximumLikelihoodWFunctions::Huber;
-    }
-    else if (model.compare("HUBER_MODIFIED", Qt::CaseInsensitive) == 0) {
-      return MaximumLikelihoodWFunctions::HuberModified;
-    }
-    else if (model.compare("WELSCH", Qt::CaseInsensitive) == 0) {
-      return MaximumLikelihoodWFunctions::Welsch;
-    }
-    else if (model.compare("CHEN", Qt::CaseInsensitive) == 0) {
-      return MaximumLikelihoodWFunctions::Chen;
-    }
-    else {
-      throw IException(IException::Programmer,
-                       "Unknown bundle maximum likelihood model " + model + ".",
-                       _FILEINFO_);
-    }
-  }
-
-
-
-  QString BundleSettings::maximumLikelihoodModelToString(
-      MaximumLikelihoodWFunctions::Model model) {
-    if (model == MaximumLikelihoodWFunctions::Huber)              return "Huber";
-    else if (model == MaximumLikelihoodWFunctions::HuberModified) return "HuberModified";
-    else if (model == MaximumLikelihoodWFunctions::Welsch)        return "Welsh";
-    else if (model == MaximumLikelihoodWFunctions::Chen)          return "Chen";
-    else  throw IException(IException::Programmer,
-                           "Unknown maximum likelihood model enum [" + toString(model) + "].",
-                           _FILEINFO_);
-  }
 
 
 
   void BundleSettings::addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
                                                           double maxModelCQuantile) {
+
     if (m_maximumLikelihood.size() == 0 && model > MaximumLikelihoodWFunctions::HuberModified) {
       QString msg = "For bundle adjustments with multiple maximum likelihood estimators, the first "
-                    "must be HUBER or HUBER_MODIFIED.";
+                    "model must be of type HUBER or HUBER_MODIFIED.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -483,36 +460,48 @@ namespace Isis {
   }
 
   PvlObject BundleSettings::pvlObject(QString name) const {
-    PvlObject object(name);
+
+    PvlObject pvl(name);
 
     // General Solve Options
-    object += PvlKeyword("SolveMethod", solveMethodToString(m_solveMethod));
-    object += PvlKeyword("SolveObservationMode", toString(m_solveObservationMode));
-    object += PvlKeyword("SolveRadius", toString(m_solveRadius));
-    object += PvlKeyword("UpdateCubeLabel", toString(m_updateCubeLabel));
-    object += PvlKeyword("ErrorPropagation", toString(m_errorPropagation));
-    object += PvlKeyword("OutlierRejection", toString(m_outlierRejection));
+    pvl += PvlKeyword("NetworkValidated", toString(validateNetwork()));
+    pvl += PvlKeyword("SolveMethod", solveMethodToString(solveMethod()));
+    pvl += PvlKeyword("SolveObservationMode", toString(solveObservationMode()));
+    pvl += PvlKeyword("SolveRadius", toString(solveRadius()));
+    pvl += PvlKeyword("UpdateCubeLabel", toString(updateCubeLabel()));
+    pvl += PvlKeyword("ErrorPropagation", toString(errorPropagation()));
+    pvl += PvlKeyword("OutlierRejection", toString(outlierRejection()));
     if (m_outlierRejection) {
-      object += PvlKeyword("OutlierMultiplier", toString(m_outlierRejectionMultiplier));
+      pvl += PvlKeyword("OutlierMultiplier", toString(outlierRejectionMultiplier()));
     }
-    object += PvlKeyword("GlobalLatitudeAprioriSigma", toString(m_globalLatitudeAprioriSigma));
-    object += PvlKeyword("GlobalLongitudeAprioriSigma", toString(m_globalLongitudeAprioriSigma));
+    if (globalLatitudeAprioriSigma() >= 0) {
+      pvl += PvlKeyword("GlobalLatitudeAprioriSigma", toString(globalLatitudeAprioriSigma()));
+    }
+    else {
+      pvl += PvlKeyword("GlobalLatitudeAprioriSigma", "None");
+    }
+    if (globalLongitudeAprioriSigma() >= 0) {
+      pvl += PvlKeyword("GlobalLongitudeAprioriSigma", toString(globalLongitudeAprioriSigma()));
+    }
+    else {
+      pvl += PvlKeyword("GlobalLongitudeAprioriSigma", "None");
+    }
     if (m_solveRadius) {
-      object += PvlKeyword("GlobalRadiiAprioriSigma", toString(m_globalRadiusAprioriSigma));
+      pvl += PvlKeyword("GlobalRadiiAprioriSigma", toString(globalRadiusAprioriSigma()));
     }
 
     // Convergence Criteria
-    object += PvlKeyword("ConvergenceCriteria", convergenceCriteriaToString(m_convergenceCriteria));
-    object += PvlKeyword("ConvergenceCriteriaThreshold", toString(m_convergenceCriteriaThreshold));
-    object += PvlKeyword("ConvergenceCriteriaMaximumIterations",
-                        toString(m_convergenceCriteriaMaximumIterations));
+    pvl += PvlKeyword("ConvergenceCriteria", convergenceCriteriaToString(convergenceCriteria()));
+    pvl += PvlKeyword("ConvergenceCriteriaThreshold", toString(convergenceCriteriaThreshold()));
+    pvl += PvlKeyword("ConvergenceCriteriaMaximumIterations",
+                        toString(convergenceCriteriaMaximumIterations()));
 
     // Output Options
-    object += PvlKeyword("CreateBundleOutputFile", toString(m_createBundleOutputFile));
-    object += PvlKeyword("CreateCSVPointsFile", toString(m_createCSVPointsFile));
-    object += PvlKeyword("CreateResidualsFile", toString(m_createResidualsFile));
-    if (m_createBundleOutputFile || m_createCSVPointsFile || m_createResidualsFile) {
-      object += PvlKeyword("FilePrefix", m_outputFilePrefix);
+    pvl += PvlKeyword("CreateBundleOutputFile", toString(createBundleOutputFile()));
+    pvl += PvlKeyword("CreateCSVPointsFile", toString(createCSVPointsFile()));
+    pvl += PvlKeyword("CreateResidualsFile", toString(createResidualsFile()));
+    if (createBundleOutputFile() || createCSVPointsFile() || createResidualsFile()) {
+      pvl += PvlKeyword("FilePrefix", outputFilePrefix());
     }
 
     // Maximum Likelihood Options
@@ -521,9 +510,6 @@ namespace Isis {
 
       models.addValue(MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[0].first));
 
-//      PvlKeyword models("MaximumLikelihoodModels",
-//                        MaximumLikelihoodWFunctions::modelToString(m_wFunc[0]->model()));
-
       PvlKeyword quantiles("MaximumLikelihoodQuantiles", 
                            toString(m_maximumLikelihood[0].second));
 
@@ -531,14 +517,101 @@ namespace Isis {
         models.addValue(MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihood[i].first));
         quantiles.addValue(toString(m_maximumLikelihood[i].second));
       }
-      object += models;
-      object += quantiles;
+      pvl += models;
+      pvl += quantiles;
     }
     else {
       models.addValue("None");
     }
 
-    return object;
+    pvl += PvlKeyword("NumberObservationSolveSettings", toString(numberSolveSettings()));
+
+    for (int i = 0; i < numberSolveSettings(); i++) {
+// TODO: make this work... ASSERT failure in QList<T>::operator[]: "index out of range"
+// TODO:       BundleObservationSolveSettings boss = m_observationSolveSettings[i];
+// TODO:       BundleObservationSolveSettings boss = observationSolveSettings(i);
+// TODO:      PvlObject bundleObsSolveSettingsPvl = boss.pvlObject();
+// TODO:      pvl += bundleObsSolveSettingsPvl;
+      pvl += PvlKeyword("ObservationSolveSettingsInstrumentId", 
+                        m_observationSolveSettings[i].instrumentId());
+    }
+
+    return pvl;
+  }
+
+
+
+  QDataStream &BundleSettings::write(QDataStream &stream) const {
+
+    stream << m_validateNetwork
+           << (qint32)m_solveMethod
+           << m_solveObservationMode
+           << m_solveRadius
+           << m_updateCubeLabel
+           << m_errorPropagation
+           << m_outlierRejection
+           << m_outlierRejectionMultiplier
+           << m_globalLatitudeAprioriSigma
+           << m_globalLongitudeAprioriSigma
+           << m_globalRadiusAprioriSigma
+           << m_observationSolveSettings
+           << (qint32)m_convergenceCriteria
+           << m_convergenceCriteriaThreshold
+           << (qint32)m_convergenceCriteriaMaximumIterations
+           << m_maximumLikelihood
+           << m_outputFilePrefix
+           << m_createBundleOutputFile
+           << m_createCSVPointsFile
+           << m_createResidualsFile;
+
+    return stream;
+
+  }
+
+
+
+  QDataStream &BundleSettings::read(QDataStream &stream) {
+
+    qint32 solveMethod, convergenceCriteria, convergenceCriteriaMaximumIterations;
+
+    stream >> m_validateNetwork
+           >> solveMethod
+           >> m_solveObservationMode
+           >> m_solveRadius
+           >> m_updateCubeLabel
+           >> m_errorPropagation
+           >> m_outlierRejection
+           >> m_outlierRejectionMultiplier
+           >> m_globalLatitudeAprioriSigma
+           >> m_globalLongitudeAprioriSigma
+           >> m_globalRadiusAprioriSigma
+           >> m_observationSolveSettings
+           >> convergenceCriteria
+           >> m_convergenceCriteriaThreshold
+           >> convergenceCriteriaMaximumIterations
+           >> m_maximumLikelihood
+           >> m_outputFilePrefix
+           >> m_createBundleOutputFile
+           >> m_createCSVPointsFile
+           >> m_createResidualsFile;
+
+    m_solveMethod = (BundleSettings::SolveMethod)solveMethod;
+    m_convergenceCriteria = (BundleSettings::ConvergenceCriteria)convergenceCriteria;
+    m_convergenceCriteriaMaximumIterations = (int)convergenceCriteriaMaximumIterations;
+
+    return stream;
+  }
+
+
+
+  QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings) {
+    return settings.write(stream);
+  }
+
+
+
+  QDataStream &operator>>(QDataStream &stream, BundleSettings &settings) {
+    return settings.read(stream);
   }
 
 }

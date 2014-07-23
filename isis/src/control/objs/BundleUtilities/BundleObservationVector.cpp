@@ -70,7 +70,7 @@ namespace Isis {
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // TODO: problem when using settings from gui that no instrument id is set
       //
-      BundleObservationSolveSettings* solveSettings;
+      BundleObservationSolveSettings solveSettings;
       if ( bundleSettings.numberSolveSettings() == 1) {
         solveSettings = bundleSettings.observationSolveSettings(0);
       }

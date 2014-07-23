@@ -53,6 +53,8 @@ namespace Isis {
    *                           coding standards fixes.
    *   @history 2014-07-03 Jeannie Backer - Replace member variable m_PI with Isis constant
    *   @history 2014-07-16 Jeannie Backer - Added enum to QString method and its inverse.
+   *   @history 2014-07-23 Jeannie Backer - Added QDataStream >> and << operators and read/write
+   *                           methods. Created unitTest.
    */
   class MaximumLikelihoodWFunctions {
   public:
@@ -117,8 +119,8 @@ namespace Isis {
     bool setModel(Model modelSelection, double tweakingConstant);
     bool setTweakingConstant(double tweakingConstant);
 
-    Model model();
-    double tweakingConstant();
+    Model model() const;
+    double tweakingConstant() const;
 
     // the W functions provide an additional weighting factor W which is used
     // to 're-weight' each observation dynamically during an adjustment, the
@@ -134,6 +136,9 @@ namespace Isis {
                                        // the model being employed
 
     QString weightedResidualCutoff();
+
+    QDataStream &write(QDataStream &stream) const;
+    QDataStream &read(QDataStream &stream);
 
   private:
     double weightScaler(double residualZScore); // This directly provides the scaler for the weight
@@ -154,6 +159,13 @@ namespace Isis {
                                    quantile to use as the tweaking constant.*/
 
  };
-}// end namespace Isis
+  // operators to read/write to/from binary data
+  QDataStream &operator<<(QDataStream &stream, const MaximumLikelihoodWFunctions &mlwf);
+  QDataStream &operator>>(QDataStream &stream, MaximumLikelihoodWFunctions &mlwf);
+
+  QDataStream &operator<<(QDataStream &stream, const MaximumLikelihoodWFunctions::Model &modelEnum);
+  QDataStream &operator>>(QDataStream &stream, MaximumLikelihoodWFunctions::Model &modelEnum);
+
+};// end namespace Isis
 
 #endif

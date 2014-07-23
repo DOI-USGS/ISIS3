@@ -7,6 +7,9 @@ APPNAME = jigsaw
 # 2. remove net filename paths
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
+#
+# 2014-07-23 JWB - Changed method from oldsparse to default (sparse).
+#                  Commented out references to bundleout_images.csv.  Removed default parameters.
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -19,7 +22,6 @@ commands:
 	cnet=$(INPUT)/mocVik.net \
 	onet=$(OUTPUT)/case2OutNet.net \
 	update=yes \
-	method=sparse \
 	sigma0=1.e-5  \
 	maxits=10 \
 	spsolve=position > /dev/null;
@@ -31,10 +33,11 @@ commands:
 	cat residuals.csv \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/residuals.csv
-	cat bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  > $(OUTPUT)/bundleout_images.csv
-	$(RM) residuals.csv bundleout_images.csv > /dev/null;
+#	cat bundleout_images.csv \
+#	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+#	  > $(OUTPUT)/bundleout_images.csv
+#	$(RM) bundleout_images.csv > /dev/null;
+	$(RM) residuals.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cub.lis $(OUTPUT)/held.lis $(OUTPUT)/case2OutNet.bin print.prt > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null

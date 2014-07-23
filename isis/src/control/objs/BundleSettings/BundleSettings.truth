@@ -1,0 +1,139 @@
+Unit test for BundleSettings... 
+Printing PVL group with settings from the default constructor... 
+Object = DefaultBundleSettingsObject
+  NetworkValidated                     = Yes
+  SolveMethod                          = Sparse
+  SolveObservationMode                 = No
+  SolveRadius                          = No
+  UpdateCubeLabel                      = No
+  ErrorPropagation                     = No
+  OutlierRejection                     = No
+  GlobalLatitudeAprioriSigma           = None
+  GlobalLongitudeAprioriSigma          = None
+  ConvergenceCriteria                  = Sigma0
+  ConvergenceCriteriaThreshold         = 1.0e-10
+  ConvergenceCriteriaMaximumIterations = 50
+  CreateBundleOutputFile               = Yes
+  CreateCSVPointsFile                  = Yes
+  CreateResidualsFile                  = Yes
+  FilePrefix                           = Null
+  NumberObservationSolveSettings       = 1
+  ObservationSolveSettingsInstrumentId = Null
+End_Object
+
+Testing assignment operator to create a new settings object... 
+Object = AssignedBundleSettingsObject
+  NetworkValidated                     = Yes
+  SolveMethod                          = Sparse
+  SolveObservationMode                 = No
+  SolveRadius                          = No
+  UpdateCubeLabel                      = No
+  ErrorPropagation                     = No
+  OutlierRejection                     = No
+  GlobalLatitudeAprioriSigma           = None
+  GlobalLongitudeAprioriSigma          = None
+  ConvergenceCriteria                  = Sigma0
+  ConvergenceCriteriaThreshold         = 1.0e-10
+  ConvergenceCriteriaMaximumIterations = 50
+  CreateBundleOutputFile               = Yes
+  CreateCSVPointsFile                  = Yes
+  CreateResidualsFile                  = Yes
+  FilePrefix                           = Null
+  NumberObservationSolveSettings       = 1
+  ObservationSolveSettingsInstrumentId = Null
+End_Object
+
+Testing copy constructor to create a new settings object... 
+Object = CopyBundleSettingsObject
+  NetworkValidated                     = Yes
+  SolveMethod                          = Sparse
+  SolveObservationMode                 = No
+  SolveRadius                          = No
+  UpdateCubeLabel                      = No
+  ErrorPropagation                     = No
+  OutlierRejection                     = No
+  GlobalLatitudeAprioriSigma           = None
+  GlobalLongitudeAprioriSigma          = None
+  ConvergenceCriteria                  = Sigma0
+  ConvergenceCriteriaThreshold         = 1.0e-10
+  ConvergenceCriteriaMaximumIterations = 50
+  CreateBundleOutputFile               = Yes
+  CreateCSVPointsFile                  = Yes
+  CreateResidualsFile                  = Yes
+  FilePrefix                           = Null
+  NumberObservationSolveSettings       = 1
+  ObservationSolveSettingsInstrumentId = Null
+End_Object
+
+Testing mutator methods... 
+Object = MutatedBundleSettingsObject
+  NetworkValidated                     = Yes
+  SolveMethod                          = SpecialK
+  SolveObservationMode                 = Yes
+  SolveRadius                          = Yes
+  UpdateCubeLabel                      = Yes
+  ErrorPropagation                     = Yes
+  OutlierRejection                     = Yes
+  OutlierMultiplier                    = 4.0
+  GlobalLatitudeAprioriSigma           = 1000.0
+  GlobalLongitudeAprioriSigma          = 2000.0
+  GlobalRadiiAprioriSigma              = 3000.0
+  ConvergenceCriteria                  = ParameterCorrections
+  ConvergenceCriteriaThreshold         = 0.25
+  ConvergenceCriteriaMaximumIterations = 26
+  CreateBundleOutputFile               = No
+  CreateCSVPointsFile                  = Yes
+  CreateResidualsFile                  = No
+  FilePrefix                           = TestFilePrefix
+  MaximumLikelihoodModels              = (Huber, Welsch, HuberModified, Chen)
+  MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
+  NumberObservationSolveSettings       = 2
+  ObservationSolveSettingsInstrumentId = Instrument1
+  ObservationSolveSettingsInstrumentId = Instrument2
+End_Object
+
+Testing accessor methods... 
+"Huber" "0.27" 
+"Welsch" "28.0" 
+"HuberModified" "29.0" 
+"Chen" "30.0" 
+
+Testing static enum-to-string and string-to-enum methods... 
+"Sparse" 
+"SpecialK" 
+"Sigma0" 
+"ParameterCorrections" 
+
+Testing serialization... 
+Object = BundleSettings
+  NetworkValidated                     = Yes
+  SolveMethod                          = SpecialK
+  SolveObservationMode                 = Yes
+  SolveRadius                          = Yes
+  UpdateCubeLabel                      = Yes
+  ErrorPropagation                     = Yes
+  OutlierRejection                     = Yes
+  OutlierMultiplier                    = 4.0
+  GlobalLatitudeAprioriSigma           = 1000.0
+  GlobalLongitudeAprioriSigma          = 2000.0
+  GlobalRadiiAprioriSigma              = 3000.0
+  ConvergenceCriteria                  = ParameterCorrections
+  ConvergenceCriteriaThreshold         = 0.25
+  ConvergenceCriteriaMaximumIterations = 26
+  CreateBundleOutputFile               = No
+  CreateCSVPointsFile                  = Yes
+  CreateResidualsFile                  = No
+  FilePrefix                           = TestFilePrefix
+  MaximumLikelihoodModels              = (Huber, Welsch, HuberModified, Chen)
+  MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
+  NumberObservationSolveSettings       = 2
+  ObservationSolveSettingsInstrumentId = Instrument1
+  ObservationSolveSettingsInstrumentId = Instrument2
+End_Object
+
+Testing error throws... 
+**PROGRAMMER ERROR** Unknown bundle solve method [Nonsense].
+**PROGRAMMER ERROR** Unknown solve method enum [31].
+**PROGRAMMER ERROR** Unknown bundle convergence criteria [Pickles].
+**PROGRAMMER ERROR** Unknown convergence criteria enum [32].
+**PROGRAMMER ERROR** For bundle adjustments with multiple maximum likelihood estimators, the first model must be of type HUBER or HUBER_MODIFIED.
