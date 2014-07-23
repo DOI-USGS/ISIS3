@@ -926,7 +926,7 @@ namespace Isis {
 
       m_showHideAllCurves->setText("Show All Curves");
       m_showHideAllCurves->setIcon(
-          QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_showCurves.png"));
+          QPixmap(FileName("$base/icons/plot_showCurves.png").expanded()));
 
     }
     else {
@@ -934,7 +934,7 @@ namespace Isis {
 
       m_showHideAllCurves->setText("Hide All Curves");
       m_showHideAllCurves->setIcon(
-          QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_hideCurves.png"));
+          QPixmap(FileName("$base/icons/plot_hideCurves.png").expanded()));
     }
 
     for (int i = 0; i < m_plot->itemList().size(); i ++) {
@@ -968,13 +968,13 @@ namespace Isis {
                                QLabel("  <b>To configure the curve properties</b>  Right click on the legend and select <I>Configure</I> from <br>  the menu"
                                       " or click on the configure icon in the tool bar.");
     QLabel *config = new QLabel();
-    config->setPixmap(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_configure.png"));
+    config->setPixmap(QPixmap(FileName("$base/icons/plot_configure.png").expanded()));
 
     QLabel *tableLabel = new QLabel("<br><U>Table Options:</U>");
     QLabel *tableDirections = new
                               QLabel("  <b>To view the table</b> Click on the File menu and select <I>Show Table</I> or click on the table icon in the <br>   tool bar.");
     QLabel *table = new QLabel();
-    table->setPixmap(QPixmap("/usgs/cpkgs/isis3/data/base/icons/plot_table.png"));
+    table->setPixmap(QPixmap(FileName("$base/icons/plot_table.png").expanded()));
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(zoomLabel);

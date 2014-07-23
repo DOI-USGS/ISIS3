@@ -22,6 +22,9 @@
     <change name="Jeannie Backer" date="2011-08-19">
       Replaced test cube path /tmp/... with $temporary/...
     </change>
+    <change name="Ian Humphrey" date="2014-06-23">
+      Replaced test cube path /ISISROOT/testData/... with $base/... #2054
+    </change>
   </history>
 
   <groups>
@@ -37,7 +40,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>/ISISROOT/testData/base/isisTruth.cub</item></default>
+        <default><item>$base/isisTruth.cub</item></default>
       </parameter>
       <parameter name="TO">
         <type>filename</type>

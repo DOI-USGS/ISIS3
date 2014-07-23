@@ -68,6 +68,8 @@ namespace Isis {
    *                           units.
    *   @history 2013-02-21 Steven Lambright - Added methods requestFillTable(), scheduleFillTable()
    *                           in order to increase performance. References #710.
+   *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to 
+   *                           relative pathnames. Fixes #2054.
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT

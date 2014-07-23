@@ -51,6 +51,9 @@
     <change name="Steven Lambright" date="2008-06-11">
       Changed algorithm and added support for framing and push frame cameras.
     </change>
+    <change name="Ian Humphrey" date="2014-06-23">
+      Cleaned up spacing in pushframe test Makefile
+    </change>
   </history>
 
   <category>

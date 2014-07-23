@@ -549,7 +549,7 @@ namespace Isis {
    */
   void ScatterPlotWindow::colorPlot() {
     if (m_colorize->text().compare("Colorize") == 0) {
-      m_colorize->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/gray.png"));
+      m_colorize->setIcon(QPixmap(FileName("$base/icons/gray.png").expanded()));
       m_colorize->setText("Gray");
       QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::darkCyan, Qt::red);
       colorMap->addColorStop(DBL_EPSILON, Qt::cyan);
@@ -559,7 +559,7 @@ namespace Isis {
       plot()->setCanvasBackground(Qt::darkCyan);
     }
     else {
-      m_colorize->setIcon(QPixmap("/usgs/cpkgs/isis3/data/base/icons/rgb.png"));
+      m_colorize->setIcon(QPixmap(FileName("$base/icons/rgb.png").expanded()));
       m_colorize->setText("Colorize");
       QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::black, Qt::white);
       colorMap->addColorStop(DBL_EPSILON, Qt::darkGray);

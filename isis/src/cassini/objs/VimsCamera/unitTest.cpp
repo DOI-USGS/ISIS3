@@ -46,6 +46,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
  *                         calculated in code-the label keywords for Ir exposure and interline
  *                         delay is incorrect.  The camera model is also now doing calculations
  *                         in x, y, z instead of lat, lon.
+ *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to 
+ *                           relative pathnames. Fixes #2054.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -184,7 +186,7 @@ int main(void) {
 
     //  Test C1465336166_1.ir.cub
     //string file = "/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub";
-    Cube c("/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub", "r");
+    Cube c("$cassini/testData/C1465336166_1.ir.cub", "r");
     Camera *cam = CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
