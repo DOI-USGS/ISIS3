@@ -92,6 +92,7 @@ namespace Isis {
 
     m_idToControlMap = new QMap<QString, Control *>;
     m_idToImageMap = new QMap<QString, Image *>;
+    m_idToBundleResultsMap = new QMap<QString, BundleResults *>;
 
     m_name = "Project";
 
@@ -161,10 +162,17 @@ namespace Isis {
     m_images = new QList<ImageList *>;
 
     m_controls = new QList<ControlList *>;
+
+    m_bundleResults = new QList<BundleResults *>;
+
     m_warnings = new QStringList;
     m_workOrderHistory = new QList< QPointer<WorkOrder> >;
 
     m_imageReadingMutex = new QMutex;
+
+    // TODO: ken testing
+//    m_bundleSettings = NULL;
+//    m_bundleSettings = new BundleSettings();
   }
 
 
@@ -219,11 +227,23 @@ namespace Isis {
       m_controls = NULL;
     }
 
+    if (m_bundleResults) {
+      foreach (BundleResults *bundleResults, *m_bundleResults) {
+        delete bundleResults;
+      }
+
+      delete m_bundleResults;
+      m_bundleResults = NULL;
+    }
+
     delete m_idToControlMap;
     m_idToControlMap = NULL;
 
     delete m_idToImageMap;
     m_idToImageMap = NULL;
+
+    delete m_idToBundleResultsMap;
+    m_idToBundleResultsMap = NULL;
 
     m_directory = NULL;
 
@@ -240,6 +260,9 @@ namespace Isis {
 
     delete m_workOrderHistory;
     m_workOrderHistory = NULL;
+
+    delete m_bundleSettings;
+    m_bundleSettings = NULL;
   }
 
 
@@ -267,6 +290,19 @@ namespace Isis {
       if ( !dir.mkdir( imageDataRoot() ) ) {
         QString msg = QString("Unable to create folder [%1] when trying to initialize project")
                         .arg( imageDataRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      if ( !dir.mkdir( resultsRoot() ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( resultsRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      if ( !dir.mkdir( bundleResultsRoot() ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( bundleResultsRoot() );
         warn(msg);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -331,6 +367,24 @@ namespace Isis {
       for (int i = 0; i < m_images->count(); i++) {
         m_images->at(i)->save(stream, this, newProjectRoot);
       }
+
+      stream.writeEndElement();
+    }
+
+    if ( !m_bundleResults->isEmpty() ) {
+      stream.writeStartElement("bundleResults");
+
+      for (int i = 0; i < m_bundleResults->count(); i++) {
+        m_bundleResults->at(i)->save(stream, this, newProjectRoot);
+      }
+
+      stream.writeEndElement();
+    }
+
+    if ( m_bundleSettings ) {
+      stream.writeStartElement("bundleSettings");
+
+//      m_bundleSettings->save(stream, this, newProjectRoot);
 
       stream.writeEndElement();
     }
@@ -421,6 +475,28 @@ namespace Isis {
    */
   QList<QAction *> Project::userPreferenceActions() {
     return m_imageReader->actions(ImageDisplayProperties::FootprintViewProperties);
+  }
+
+
+  /**
+   * Create and return the name of a folder for placing BundleResults.
+   *
+   * TODO: don't know if sentence below is accurate.
+   * This can be called from multiple threads, but should only be called by one thread at a time.
+   */
+  QDir Project::addBundleResultsFolder(QString folder) {
+    QDir bundleResultsFolder = bundleResultsRoot();
+
+    if ( !bundleResultsFolder.mkpath(folder) ) {
+      throw IException(IException::Io,
+          tr("Could not create bundle results directory [%1] in [%2].")
+            .arg(folder).arg( bundleResultsFolder.absolutePath() ),
+          _FILEINFO_);
+    }
+
+    bundleResultsFolder.cd(folder);
+
+    return bundleResultsFolder;
   }
 
 
@@ -547,6 +623,28 @@ namespace Isis {
 
   Control *Project::control(QString id) {
     return (*m_idToControlMap)[id];
+  }
+
+  /**
+   * Add the given BundleResults to the current project. This will cause the BundleResults to be
+   *   saved/restored from disk, Project-related GUIs to display the BundleResults, and enable
+   *   access to the BundleResults given access to the project.
+   */
+  void Project::addBundleResults(BundleResults *bundleResults) {
+
+    connect( bundleResults, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( bundleResultsClosed(QObject *) ) );
+    connect( this, SIGNAL( projectRelocated(Project *) ),
+             bundleResults, SLOT( updateFileName(Project *) ) );
+
+    // create bundle results folder
+    addBundleResultsFolder(bundleResults->runTime());
+
+    m_bundleResults->append(bundleResults);
+
+    (*m_idToBundleResultsMap)[bundleResults->id()] = bundleResults;
+
+    emit bundleResultsAdded(bundleResults);
   }
 
 
@@ -888,6 +986,51 @@ namespace Isis {
 
 
   /**
+   * Appends the root directory name 'results' to the project.
+   *
+   * @return The path to the root directory of bundleresults data.
+   */
+  QString Project::resultsRoot(QString projectRoot) {
+    return projectRoot + "/results";
+  }
+
+
+  /**
+   * Accessor for the root directory of the results data.
+   *
+   * @return The path to the root directory of the results data.
+   */
+  QString Project::resultsRoot() const {
+    return resultsRoot( m_projectRoot->path() );
+  }
+
+
+  QList<BundleResults *> Project::bundleResults() {
+    return *m_bundleResults;
+  }
+
+
+  /**
+   * Appends the root directory name 'bundle' to the project results directory.
+   *
+   * @return The path to the root directory of bundle results data.
+   */
+  QString Project::bundleResultsRoot(QString projectRoot) {
+    return projectRoot + "/results/bundle";
+  }
+
+
+  /**
+   * Accessor for the root directory of the results data.
+   *
+   * @return The path to the root directory of the results data.
+   */
+  QString Project::bundleResultsRoot() const {
+    return bundleResultsRoot( m_projectRoot->path() );
+  }
+
+
+  /**
    * Delete all of the files, that this project stores, from disk.
    */
   void Project::deleteAllProjectFiles() {
@@ -902,6 +1045,11 @@ namespace Isis {
     if ( !m_projectRoot->rmdir( cnetRoot() ) ) {
       warn( tr("Did not properly clean up control network folder [%1] in project")
              .arg( cnetRoot() ) );
+    }
+
+    if ( !m_projectRoot->rmdir( resultsRoot() ) ) {
+      warn( tr("Did not properly clean up results folder [%1] in project")
+             .arg( resultsRoot() ) );
     }
 
     if ( !m_projectRoot->rmpath( m_projectRoot->path() ) ) {
@@ -1201,6 +1349,25 @@ namespace Isis {
   }
 
   
+  /**
+   * A BundleResults object is being deleted from the project
+   */
+  void Project::bundleResultsClosed(QObject *bundleResultsObj) {
+    QMutableListIterator<BundleResults *> it(*m_bundleResults);
+    while ( it.hasNext() ) {
+      BundleResults *bundleResults = it.next();
+
+      int foundElement = m_bundleResults->indexOf( (BundleResults *)bundleResultsObj );
+
+      if (foundElement != -1) {
+        m_bundleResults->removeAt(foundElement);
+      }
+    }
+
+    m_idToBundleResultsMap->remove(m_idToBundleResultsMap->key((BundleResults *)bundleResultsObj));
+  }
+
+
 
   Project::XmlHandler::XmlHandler(Project *project) {
     m_project = project;
@@ -1248,6 +1415,11 @@ namespace Isis {
       else if (localName == "directory") {
         m_project->directory()->load( reader() );
       }
+
+      else if (localName == "bundleSettings") {
+        BundleSettings *bundleSettings = m_project->bundleSettings();
+//        bundleSettings = new BundleSettings(m_project, reader());
+      }
     }
 
     return true;
@@ -1274,6 +1446,9 @@ namespace Isis {
         delete list;
       }
       m_controls.clear();
+    }
+    else if (localName == "bundleSettings") {
+      // TODO: what to do here????
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

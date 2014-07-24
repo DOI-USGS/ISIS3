@@ -40,6 +40,8 @@ class QXmlStreamWriter;
 #include "XmlStackedHandler.h"
 
 namespace Isis {
+  class BundleResults;
+  class BundleSettings;
   class Control;
   class ControlList;
   class CorrelationMatrix;
@@ -88,11 +90,13 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
+      QDir addBundleResultsFolder(QString folder);
       QDir addCnetFolder(QString prefix);
       void addControl(Control *control);
       QDir addImageFolder(QString prefix);
       void addImages(QStringList imageFiles);
       void addImages(ImageList newImages);
+      void addBundleResults(BundleResults *bundleResults);
       Control *control(QString id);
       Directory *directory() const;
       Image *image(QString id);
@@ -118,8 +122,16 @@ namespace Isis {
       QString imageDataRoot() const;
       QList<ImageList *> images();
 
+      static QString resultsRoot(QString projectRoot);
+      QString resultsRoot() const;
+      static QString bundleResultsRoot(QString projectRoot);
+      QString bundleResultsRoot() const;
+      QList<BundleResults *> bundleResults();
+
       void deleteAllProjectFiles();
       void relocateProjectRoot(QString newRoot);
+
+      BundleSettings *bundleSettings() {return m_bundleSettings;}
 
       QProgressBar *progress();
 
@@ -140,6 +152,7 @@ namespace Isis {
       void controlAdded(Control *control);
       // Emitted when new images are available.
       void imagesAdded(ImageList *images);
+      void bundleResultsAdded(BundleResults *bundleResults);
       void nameChanged(QString newName);
       void projectLoaded(Project *);
       void projectRelocated(Project *);
@@ -155,6 +168,7 @@ namespace Isis {
       void imagesReady(ImageList);
       void imageClosed(QObject *image);
       void imageListDeleted(QObject *imageList);
+      void bundleResultsClosed(QObject *bundleResults);
 
     private:
       Project(const Project &other);
@@ -205,6 +219,10 @@ namespace Isis {
       QPointer<Directory> m_directory;
       QList<ImageList *> *m_images;
       QList<ControlList *> *m_controls;
+      QList<BundleResults *> *m_bundleResults;
+
+      // TODO: kle testing - this will almost certainly be changed
+      BundleSettings *m_bundleSettings;
       /**
        * This variable will probably go away when we add the bundle results object because it will
        *  be under:
@@ -213,9 +231,11 @@ namespace Isis {
        *                       CorrelationMatrix
        */
       CorrelationMatrix *m_correlationMatrix;
-      
+
       QMap<QString, Control *> *m_idToControlMap;
       QMap<QString, Image *> *m_idToImageMap;
+      QMap<QString, BundleResults *> *m_idToBundleResultsMap;
+
       QString m_name;
       QStringList *m_warnings;
       QList< QPointer<WorkOrder> > *m_workOrderHistory;
