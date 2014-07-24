@@ -23,16 +23,26 @@
  */
 
 #include <QList>
+#include <QVector>
 #include <QPair>
 #include <QString>
 
 #include "BundleObservationSolveSettings.h"
+#include "FileName.h"
 #include "MaximumLikelihoodWFunctions.h" // why not forward declare???
 #include "PvlObject.h"
+#include "XmlStackedHandler.h"
+
+class QXmlStreamWriter;
+class QUuid;
 
 namespace Isis {
+  class FileName;
   class MaximumLikelihoodWFunctions;
+  class Project;
   class PvlObject;
+  class XmlStackedHandlerReader;
+
   /**
    * @brief Container class for BundleAdjustment settings. 
    * This class contains all of the settings needed to run a bundle adjustment. 
@@ -54,10 +64,13 @@ namespace Isis {
    *                           methods. Created unitTest.
    *  
    */
- class BundleSettings {
+ class BundleSettings : public QObject {
+   Q_OBJECT
    public:
       BundleSettings();
       BundleSettings(const BundleSettings &other);
+      BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
+      BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
       ~BundleSettings();
 
       // copy constructor
@@ -157,8 +170,6 @@ namespace Isis {
                                            aggressive model that intentionally removes the largest
                                            few percent of residuals.???? */
       };
-//      static MaximumLikelihoodWFunctions::Model stringToMaximumLikelihoodModel(QString model);
-//      static QString maximumLikelihoodModelToString(MaximumLikelihoodWFunctions::Model model);
       void addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Model model, 
                                               double cQuantile);
       QList< QPair< MaximumLikelihoodWFunctions::Model, double > > 
@@ -173,13 +184,40 @@ namespace Isis {
                           bool createCSVPointsFile, bool createResidualsFile);
       QString outputFilePrefix() const;
       bool createBundleOutputFile() const;
-      bool createCSVPointsFile() const;
+      bool createCSVFiles() const;
       bool createResidualsFile() const;
 
       PvlObject pvlObject(QString name = "BundleSettings") const;
 
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+
+   private:
+     /**
+      *
+      * @author 2014-07-21 Ken Edmundson
+      *
+      * @internal
+      */
+     class XmlHandler : public XmlStackedHandler {
+       public:
+         XmlHandler(BundleSettings *bundleSettings, Project *project);
+         XmlHandler(BundleSettings *bundleSettings);
+
+         virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                   const QString &qName, const QXmlAttributes &atts);
+         virtual bool characters(const QString &ch);
+         virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                   const QString &qName);
+
+       private:
+         Q_DISABLE_COPY(XmlHandler);
+
+         BundleSettings *m_bundleSettings;
+         Project *m_project;
+         QString m_characters;
+     };
 
     private:
       bool m_validateNetwork;
@@ -216,8 +254,14 @@ namespace Isis {
       // Output Options ??? (from Jigsaw only)
       QString m_outputFilePrefix; //!< output file prefix  // TODO: pointer???
       bool m_createBundleOutputFile; //!< to print standard bundle output file (bundleout.txt)
-      bool m_createCSVPointsFile; //!< to output points and image station data in csv format
+      bool m_createCSVFiles; //!< to output points and image station data in csv format
       bool m_createResidualsFile; //!< to output residuals in csv format
+
+      /**
+       * A unique ID for this BundleSettings object (useful for others to reference this object
+       *   when saving to disk).
+       */
+      QUuid *m_id;
  };
   // operators to read/write BundleResults to/from binary data
   QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings);

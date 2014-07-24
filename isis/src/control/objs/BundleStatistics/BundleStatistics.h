@@ -57,9 +57,10 @@ namespace Isis {
    *                           variable is used regardless of whether maximum likelihood estimation
    *                           is used.
    */
-  class BundleStatistics {
+  class BundleStatistics  : public QObject{
+    Q_OBJECT
     public:
-      BundleStatistics();
+      BundleStatistics(QObject *parent = 0);
       BundleStatistics(const BundleStatistics &other);
       ~BundleStatistics();
       BundleStatistics &operator=(const BundleStatistics &other);

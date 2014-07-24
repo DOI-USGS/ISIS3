@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QDataStream>
+#include <QObject>
 
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
@@ -23,7 +24,7 @@
 using namespace boost::numeric::ublas;
 namespace Isis {
 
-  BundleStatistics::BundleStatistics() {
+  BundleStatistics::BundleStatistics(QObject *parent) : QObject(parent) {
 
     m_correlationMatrix = NULL;
     m_correlationMatrix = new CorrelationMatrix();
@@ -310,7 +311,7 @@ namespace Isis {
    *  
    *  
    *  Needed:
-   * SerialNumberList *m_pSnList, ControlNet *m_pCnet, bool errorPropagation, 
+   * SerialNumberList *snList, ControlNet *cnet, bool errorPropagation,
    * bool solveRadius 
    *
    *
@@ -319,7 +320,7 @@ namespace Isis {
                                                  ControlNet *cnet, 
                                                  bool errorPropagation,
                                                  bool solveRadius) {
-    int    numImages      = m_pSnList->Size();
+    int    numImages      = snList->Size();
     int    numMeasures    = 0;
     int    imageIndex     = 0;
     double sampleResidual = 0;
@@ -331,11 +332,11 @@ namespace Isis {
 
     // load image coordinate residuals into statistics vectors
     int numObs = 0;
-    int numObjectPoints = m_pCnet->GetNumPoints();
+    int numObjectPoints = cnet->GetNumPoints();
 
     for (int i = 0; i < numObjectPoints; i++) {
 
-      const ControlPoint *point = m_pCnet->GetPoint(i);
+      const ControlPoint *point = cnet->GetPoint(i);
       if (point->IsIgnored()) {
         continue;
       }
@@ -360,7 +361,7 @@ namespace Isis {
         lineResidual = fabs(measure->GetLineResidual());
 
         // Determine the image index
-        imageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+        imageIndex = snList->SerialNumberIndex(measure->GetCubeSerialNumber());
 
         // add residuals to pertinent vector
         m_rmsImageSampleResiduals[imageIndex].AddData(sampleResidual);
@@ -387,10 +388,10 @@ namespace Isis {
 
       double     dSigmaLat, dSigmaLong, dSigmaRadius;
 
-      int        nPoints        = m_pCnet->GetNumPoints();
+      int        nPoints        = cnet->GetNumPoints();
       for (int i = 0; i < nPoints; i++) {
 
-        const ControlPoint *point = m_pCnet->GetPoint(i);
+        const ControlPoint *point = cnet->GetPoint(i);
         if (point->IsIgnored()) {
           continue;
         }
@@ -1196,9 +1197,9 @@ namespace Isis {
 
 #if 0
 void BundleStatistics::setNumberHeldImages(SerialNumberList m_heldSnList,
-                                           SerialNumberList *m_pSnList) {
-  for (int i = 0; i < m_pSnList->Size(); i++) {
-    if (m_heldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))) {
+                                           SerialNumberList *snList) {
+  for (int i = 0; i < snList->Size(); i++) {
+    if (m_heldSnList->HasSerialNumber(snList->SerialNumber(i))) {
       m_heldImages++;
     }
   }
@@ -1220,7 +1221,7 @@ void BundleStatistics::setNumberHeldImages(SerialNumberList m_heldSnList,
  *
  */
 double BundleStatistics::computeResiduals(
-                                          ControlNet *m_pCnet,
+                                          ControlNet *cnet,
                                           std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointWeights,
                                           std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointCorrections,
                                           boost::numeric::ublas::vector< double >imageCorrections,
@@ -1239,10 +1240,10 @@ double BundleStatistics::computeResiduals(
   m_statsrxy.Reset();
 
   // vtpv for image coordinates
-  int numObjectPoints = m_pCnet->GetNumPoints();
+  int numObjectPoints = cnet->GetNumPoints();
 
   for (int i = 0; i < numObjectPoints; i++) {
-    ControlPoint *point = m_pCnet->GetPoint(i);
+    ControlPoint *point = cnet->GetPoint(i);
     if (point->IsIgnored()) {
       continue;
     }
@@ -1282,7 +1283,7 @@ double BundleStatistics::computeResiduals(
   // add vtpv from constrained 3D points
   int nPointIndex = 0;
   for (int i = 0; i < numObjectPoints; i++) {
-    const ControlPoint *point = m_pCnet->GetPoint(i);
+    const ControlPoint *point = cnet->GetPoint(i);
     if (point->IsIgnored()) {
       continue;
     }
@@ -1334,7 +1335,7 @@ double BundleStatistics::computeResiduals(
 * Compute rejection limit.
 *
 */
-double BundleStatistics::computeRejectionLimit(ControlNet *m_pCnet,
+double BundleStatistics::computeRejectionLimit(ControlNet *cnet,
                                                double outlierRejectionMultiplier,
                                                int numObservations) {
 
@@ -1347,10 +1348,10 @@ double BundleStatistics::computeRejectionLimit(ControlNet *m_pCnet,
 
   // load magnitude (squared) of residual vector
   int numObs = 0;
-  int numObjectPoints = m_pCnet->GetNumPoints();
+  int numObjectPoints = cnet->GetNumPoints();
   for (int i = 0; i < numObjectPoints; i++) {
 
-    const ControlPoint *point = m_pCnet->GetPoint(i);
+    const ControlPoint *point = cnet->GetPoint(i);
     if (point->IsIgnored()) {
       continue;
     }
@@ -1421,7 +1422,7 @@ double BundleStatistics::computeRejectionLimit(ControlNet *m_pCnet,
  * Flag outlier measurements.
  *
  */
-bool BundleStatistics::flagOutliers(ControlNet *m_pCnet) {
+bool BundleStatistics::flagOutliers(ControlNet *cnet) {
   double vx, vy;
   int    nRejected;
   int    ntotalrejected      = 0;
@@ -1437,9 +1438,9 @@ bool BundleStatistics::flagOutliers(ControlNet *m_pCnet) {
 
   int    nComingBack         = 0;
 
-  int    numObjectPoints       = m_pCnet->GetNumPoints();
+  int    numObjectPoints       = cnet->GetNumPoints();
   for (int i = 0; i < numObjectPoints; i++) {
-    ControlPoint *point = m_pCnet->GetPoint(i);
+    ControlPoint *point = cnet->GetPoint(i);
     if (point->IsIgnored()) {
       continue;
     }
@@ -1470,7 +1471,7 @@ bool BundleStatistics::flagOutliers(ControlNet *m_pCnet) {
         if (measure->IsRejected()) {
           printf("Coming back in: %s\r", point->GetId().toAscii().data());
           nComingBack++;
-          m_pCnet->DecrementNumberOfRejectedMeasuresInImage(measure->GetCubeSerialNumber());
+          cnet->DecrementNumberOfRejectedMeasuresInImage(measure->GetCubeSerialNumber());
         }
 
         measure->SetRejected(false);
@@ -1511,7 +1512,7 @@ bool BundleStatistics::flagOutliers(ControlNet *m_pCnet) {
     rejected->SetRejected(true);
     nRejected++;
     point->SetNumberOfRejectedMeasures(nRejected);
-    m_pCnet->IncrementNumberOfRejectedMeasuresInImage(rejected->GetCubeSerialNumber());
+    cnet->IncrementNumberOfRejectedMeasuresInImage(rejected->GetCubeSerialNumber());
     ntotalrejected++;
 
     // do we still have sufficient remaining observations for this 3D point?

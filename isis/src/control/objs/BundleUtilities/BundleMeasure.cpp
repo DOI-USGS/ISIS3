@@ -34,7 +34,6 @@ namespace Isis {
     m_parentControlPoint = src.m_parentControlPoint;
     m_parentBundleImage = src.m_parentBundleImage;
     m_parentObservation = src.m_parentObservation;
-
   }
 
 

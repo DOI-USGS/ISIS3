@@ -7,8 +7,12 @@
 #include "BundleObservationSolveSettings.h"
 #include "IException.h"
 #include "MaximumLikelihoodWFunctions.h"
+#include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include <QUuid>
+#include <QXmlStreamWriter>
+#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -16,14 +20,15 @@ namespace Isis {
    * Constructs a BundleSettings object with default values.
    */
   BundleSettings::BundleSettings() {
+    m_id = NULL;
 
     m_validateNetwork = true;
-
     m_solveMethod = Sparse;
     m_solveObservationMode = false;
     m_solveRadius          = false;
     m_updateCubeLabel      = false;
     m_errorPropagation     = false;
+
     m_outlierRejection     = false;
     m_outlierRejectionMultiplier = 1.0;
 
@@ -50,8 +55,33 @@ namespace Isis {
     // Output Options
     m_outputFilePrefix = "";
     m_createBundleOutputFile = true;
-    m_createCSVPointsFile    = true;
+    m_createCSVFiles = true;
     m_createResidualsFile    = true;
+
+    m_id = new QUuid(QUuid::createUuid());
+  }
+
+
+  /**
+   * Construct this BundleSettings object from XML.
+   *
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  BundleSettings::BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader,
+                                 QObject *parent) : QObject(parent) {
+    m_id = NULL;
+
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+  }
+
+
+  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
+//    m_propertiesUsed = 0;
+//    m_propertyValues = new QMap<int, QVariant>;
+
+    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
 
@@ -75,7 +105,7 @@ namespace Isis {
         m_convergenceCriteriaMaximumIterations(other.m_convergenceCriteriaMaximumIterations),
         m_outputFilePrefix(other.m_outputFilePrefix),
         m_createBundleOutputFile(other.m_createBundleOutputFile),
-        m_createCSVPointsFile(other.m_createCSVPointsFile),
+        m_createCSVFiles(other.m_createCSVFiles),
         m_createResidualsFile(other.m_createResidualsFile) {
     
     for (int i = 0; i < other.m_maximumLikelihood.size(); i++) {
@@ -84,16 +114,19 @@ namespace Isis {
 
     m_observationSolveSettings = other.m_observationSolveSettings;
 
-
+//    delete m_id;
+    m_id = new QUuid(other.m_id->toString());
   }
 
 
 
-  BundleSettings::~BundleSettings() {
+  BundleSettings::~BundleSettings() {    
+    delete m_id;
+    m_id = NULL;
 
 //    int nSolveSettings = m_observationSolveSettings.size();
 //    for (int i = 0; i < nSolveSettings; i++) {
-//      BundleObservationSolveSettings settings = m_observationSolveSettings[i];
+//      BundleObservationSolveSettings *settings = m_observationSolveSettings.at(i);
 //      delete settings;
 //    }
 //    m_observationSolveSettings.clear();
@@ -120,7 +153,7 @@ namespace Isis {
       m_convergenceCriteriaMaximumIterations = other.m_convergenceCriteriaMaximumIterations;
       m_outputFilePrefix = other.m_outputFilePrefix;
       m_createBundleOutputFile = other.m_createBundleOutputFile;
-      m_createCSVPointsFile = other.m_createCSVPointsFile;
+      m_createCSVFiles = other.m_createCSVFiles;
       m_createResidualsFile = other.m_createResidualsFile;
 
       for (int i = 0;i < other.m_maximumLikelihood.size();i++) {
@@ -128,6 +161,9 @@ namespace Isis {
       }
 
       m_observationSolveSettings = other.m_observationSolveSettings;
+
+      delete m_id;
+      m_id = new QUuid(other.m_id->toString());
     }
     return *this;
   }
@@ -428,10 +464,10 @@ namespace Isis {
   // ======================== Output Options ??? (from Jigsaw only) ==============================//
   // =============================================================================================//
   void BundleSettings::setOutputFiles(QString outputFilePrefix, bool createBundleOutputFile, 
-                                      bool createCSVPointsFile, bool createResidualsFile) {
+                                      bool createCSVFiles, bool createResidualsFile) {
     m_outputFilePrefix = outputFilePrefix;
     m_createBundleOutputFile = createBundleOutputFile;
-    m_createCSVPointsFile = createCSVPointsFile;
+    m_createCSVFiles = createCSVFiles;
     m_createResidualsFile = createResidualsFile;
   }
 
@@ -449,8 +485,8 @@ namespace Isis {
 
 
 
-  bool BundleSettings::createCSVPointsFile() const {
-    return m_createCSVPointsFile;
+  bool BundleSettings::createCSVFiles() const {
+    return m_createCSVFiles;
   }
 
 
@@ -498,9 +534,9 @@ namespace Isis {
 
     // Output Options
     pvl += PvlKeyword("CreateBundleOutputFile", toString(createBundleOutputFile()));
-    pvl += PvlKeyword("CreateCSVPointsFile", toString(createCSVPointsFile()));
+    pvl += PvlKeyword("CreateCSVFiles", toString(createCSVFiles()));
     pvl += PvlKeyword("CreateResidualsFile", toString(createResidualsFile()));
-    if (createBundleOutputFile() || createCSVPointsFile() || createResidualsFile()) {
+    if (createBundleOutputFile() || createCSVFiles() || createResidualsFile()) {
       pvl += PvlKeyword("FilePrefix", outputFilePrefix());
     }
 
@@ -535,11 +571,252 @@ namespace Isis {
       pvl += PvlKeyword("ObservationSolveSettingsInstrumentId", 
                         m_observationSolveSettings[i].instrumentId());
     }
-
     return pvl;
   }
 
+  /**
+   * Output format:
+   *
+   *
+   * <image id="..." fileName="...">
+   *   ...
+   * </image>
+   *
+   * (fileName attribute is just the base name)
+   */
+  void BundleSettings::save(QXmlStreamWriter &stream, const Project *project,
+                            FileName newProjectRoot) const {
+    QString boolStr;
 
+    stream.writeStartElement("generalSettings");
+
+    stream.writeAttribute("id", m_id->toString());
+
+    m_validateNetwork ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("validateNetwork", boolStr);
+
+    stream.writeAttribute("solveMethod", solveMethodToString(m_solveMethod));
+
+    m_solveObservationMode ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("solveObservationMode", boolStr);
+
+    m_solveRadius ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("solveRadius", boolStr);
+
+    m_updateCubeLabel ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("updateCubeLabel", boolStr);
+
+    m_errorPropagation ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("errorPropagation", boolStr);
+
+    m_outlierRejection ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("outlierRejection", boolStr);
+
+    stream.writeAttribute("outlierRejectionMultiplier",
+                          IString(m_outlierRejectionMultiplier).ToQt());
+    stream.writeAttribute("globalLatitudeAprioriSigma", IString(m_globalLatitudeAprioriSigma).ToQt());
+    stream.writeAttribute("globalLongitudeAprioriSigma", IString(m_globalLongitudeAprioriSigma).ToQt());
+    stream.writeAttribute("globalRadiusAprioriSigma", IString(m_globalRadiusAprioriSigma).ToQt());
+
+    stream.writeAttribute("convergenceCriteria",
+                          convergenceCriteriaToString(m_convergenceCriteria));
+    stream.writeAttribute("convergenceCriteriaThreshold",
+                          IString(m_convergenceCriteriaThreshold).ToQt());
+    stream.writeAttribute("convergenceCriteriaMaximumIterations",
+                          IString(m_convergenceCriteriaMaximumIterations).ToQt());
+
+//    QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
+
+    stream.writeAttribute("m_outputFilePrefix", m_outputFilePrefix);
+
+    m_createBundleOutputFile ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("createBundleOutputFile", boolStr);
+
+    m_createCSVFiles ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("createCSVFiles", boolStr);
+
+    m_createResidualsFile ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("createResidualsFile", boolStr);
+
+    stream.writeEndElement();
+  }
+
+
+  /**
+   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
+   *   BundleSettings::save() for the expected format.
+   *
+   * @param bundleSettings The BundleSettings we're going to be initializing
+   * @param imageFolder The folder that contains the Cube
+   */
+  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings, Project *project) {
+    m_bundleSettings = bundleSettings;
+    m_project = project;
+  }
+
+  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings) {
+    m_bundleSettings = bundleSettings;
+    m_project = NULL;
+  }
+
+  /**
+   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
+   *
+   * @return If we should continue reading the XML (usually true).
+   */
+  bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
+                                       const QString &qName, const QXmlAttributes &atts) {
+    m_characters = "";
+
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+      if (localName == "generalSettings") {
+        QString id = atts.value("id");
+
+        QString validateNetworkStr = atts.value("validateNetwork");
+        QString solveMethodStr = atts.value("solveMethod");
+        QString solveObservationModeStr = atts.value("solveObservationMode");
+        QString solveRadiusStr = atts.value("solveRadius");
+        QString updateCubeLabelStr = atts.value("updateCubeLabel");
+        QString errorPropagationStr = atts.value("errorPropagation");
+        QString outlierRejectionStr = atts.value("outlierRejection");
+        QString outlierRejectionMultiplierStr = atts.value("outlierRejectionMultiplier");
+        QString globalLatitudeAprioriSigmaStr = atts.value("globalLatitudeAprioriSigma");
+        QString globalLongitudeAprioriSigmaStr = atts.value("globalLongitudeAprioriSigma");
+        QString globalRadiusAprioriSigmaStr = atts.value("globalRadiusAprioriSigma");
+        QString convergenceCriteriaStr = atts.value("convergenceCriteria");
+        QString convergenceCriteriaThresholdStr = atts.value("convergenceCriteriaThreshold");
+        QString convergenceCriteriaMaximumIterationsStr = atts.value("convergenceCriteriaMaximumIterations");
+        QString outputFilePrefixStr = atts.value("outputFilePrefix");
+        QString createBundleOutputFileStr = atts.value("createBundleOutputFile");
+        QString createCSVFilesStr = atts.value("createCSVFiles");
+        QString createResidualsFileStr = atts.value("createResidualsFile");
+
+
+        if (!id.isEmpty()) {
+//          delete m_bundleSettings->m_id;
+//          m_bundleSettings->m_id = NULL;
+//          m_bundleSettings->m_id = new QUuid(id.toAscii());
+
+//          int fred=1;
+        }
+
+        if (!validateNetworkStr.isEmpty()) {
+          (validateNetworkStr == "true") ? m_bundleSettings->m_validateNetwork = true : m_bundleSettings->m_validateNetwork = false;
+        }
+
+        if (!solveMethodStr.isEmpty()) {
+          m_bundleSettings->m_solveMethod = stringToSolveMethod(solveMethodStr);
+        }
+
+        if (!solveObservationModeStr.isEmpty()) {
+          (solveObservationModeStr == "true") ?
+                m_bundleSettings->m_solveObservationMode = true : m_bundleSettings->m_solveObservationMode = false;
+        }
+
+        if (!solveRadiusStr.isEmpty()) {
+          (solveRadiusStr == "true") ?
+                m_bundleSettings->m_solveRadius = true : m_bundleSettings->m_solveRadius = false;
+        }
+
+        if (!updateCubeLabelStr.isEmpty()) {
+          (updateCubeLabelStr == "true") ? m_bundleSettings->m_updateCubeLabel = true :
+              m_bundleSettings->m_updateCubeLabel = false;
+        }
+
+        if (!errorPropagationStr.isEmpty()) {
+          (errorPropagationStr == "true") ? m_bundleSettings->m_errorPropagation = true :
+              m_bundleSettings->m_errorPropagation = false;
+        }
+
+        if (!outlierRejectionStr.isEmpty()) {
+          (outlierRejectionStr == "true") ? m_bundleSettings->m_outlierRejection = true :
+              m_bundleSettings->m_outlierRejection = false;
+        }
+
+        if (!outlierRejectionMultiplierStr.isEmpty()) {
+          m_bundleSettings->m_outlierRejectionMultiplier = outlierRejectionMultiplierStr.toDouble();
+        }
+
+        if (!globalLatitudeAprioriSigmaStr.isEmpty()) {
+          m_bundleSettings->m_globalLatitudeAprioriSigma = globalLatitudeAprioriSigmaStr.toDouble();
+        }
+
+        if (!globalLongitudeAprioriSigmaStr.isEmpty()) {
+          m_bundleSettings->m_globalLongitudeAprioriSigma =
+              globalLongitudeAprioriSigmaStr.toDouble();
+        }
+
+        if (!globalRadiusAprioriSigmaStr.isEmpty()) {
+          m_bundleSettings->m_globalRadiusAprioriSigma = globalRadiusAprioriSigmaStr.toDouble();
+        }
+
+        if (!convergenceCriteriaStr.isEmpty()) {
+          m_bundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteriaStr);
+        }
+
+        if (!convergenceCriteriaThresholdStr.isEmpty()) {
+          m_bundleSettings->m_convergenceCriteriaThreshold = convergenceCriteriaThresholdStr.toDouble();
+        }
+
+        if (!convergenceCriteriaMaximumIterationsStr.isEmpty()) {
+          m_bundleSettings->m_convergenceCriteriaMaximumIterations = convergenceCriteriaMaximumIterationsStr.toInt();
+        }
+
+        if (!outputFilePrefixStr.isEmpty()) {
+          m_bundleSettings->m_outputFilePrefix = outputFilePrefixStr;
+        }
+
+        if (!createBundleOutputFileStr.isEmpty()) {
+          (createBundleOutputFileStr == "true") ?
+              m_bundleSettings->m_createBundleOutputFile = true :
+              m_bundleSettings->m_createBundleOutputFile = false;
+        }
+
+        if (!createCSVFilesStr.isEmpty()) {
+          (createCSVFilesStr == "true") ?
+              m_bundleSettings->m_createCSVFiles = true :
+              m_bundleSettings->m_createCSVFiles = false;
+        }
+
+        if (!createResidualsFileStr.isEmpty()) {
+          (createResidualsFileStr == "true") ?
+              m_bundleSettings->m_createResidualsFile = true :
+              m_bundleSettings->m_createResidualsFile = false;
+        }
+
+//      else if (localName == "displayProperties") {
+//        m_image->m_displayProperties = new ImageDisplayProperties(reader());
+//      }
+    }
+  }
+
+    return true;
+  }
+
+
+  bool BundleSettings::XmlHandler::characters(const QString &ch) {
+    m_characters += ch;
+
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+  bool BundleSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                     const QString &qName) {
+//    if (localName == "footprint" && !m_characters.isEmpty()) {
+//      geos::io::WKTReader wktReader(&globalFactory);
+//      m_image->m_footprint = PolygonTools::MakeMultiPolygon(
+//          wktReader.read(m_characters.toStdString()));
+//    }
+//    else if (localName == "image" && !m_image->m_footprint) {
+//      QMutex mutex;
+//      m_image->initFootprint(&mutex);
+//      m_image->closeCube();
+//    }
+
+//    m_characters = "";
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
+  }
 
   QDataStream &BundleSettings::write(QDataStream &stream) const {
 
@@ -561,7 +838,7 @@ namespace Isis {
            << m_maximumLikelihood
            << m_outputFilePrefix
            << m_createBundleOutputFile
-           << m_createCSVPointsFile
+           << m_createCSVFiles
            << m_createResidualsFile;
 
     return stream;
@@ -592,7 +869,7 @@ namespace Isis {
            >> m_maximumLikelihood
            >> m_outputFilePrefix
            >> m_createBundleOutputFile
-           >> m_createCSVPointsFile
+           >> m_createCSVFiles
            >> m_createResidualsFile;
 
     m_solveMethod = (BundleSettings::SolveMethod)solveMethod;

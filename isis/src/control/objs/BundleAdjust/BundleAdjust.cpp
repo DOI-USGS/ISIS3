@@ -3630,7 +3630,7 @@ namespace Isis {
         outputText();
     }
 
-    if (m_bundleSettings.createCSVPointsFile()) {
+    if (m_bundleSettings.createCSVFiles()) {
       outputPointsCSV();
       outputImagesCSV();
     }

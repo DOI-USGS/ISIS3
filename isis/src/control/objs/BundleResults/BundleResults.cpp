@@ -6,12 +6,18 @@
 #include "BundleSettings.h"
 #include "BundleStatistics.h"
 #include "FileName.h"
+#include "ControlNet.h"
+#include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include <QUuid>
+#include <QXmlStreamWriter>
+#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
-  BundleResults::BundleResults(BundleSettings inputSettings, FileName controlNetworkFileName) {
+  BundleResults::BundleResults(BundleSettings inputSettings, FileName controlNetworkFileName, QObject *parent) : QObject(parent) {
+    m_id = NULL;
 
     m_controlNetworkFileName = NULL;
     m_settings = NULL;
@@ -19,6 +25,13 @@ namespace Isis {
 
     m_controlNetworkFileName = new FileName(controlNetworkFileName);
     m_settings = new BundleSettings(inputSettings);
+
+    m_id = new QUuid(QUuid::createUuid());
+
+    m_runTime = "";
+
+//     m_settings = inputSettings;
+//     m_outputCNet = outputControlNet;
 
   }
 
@@ -28,11 +41,16 @@ namespace Isis {
       : m_controlNetworkFileName(new FileName(*other.m_controlNetworkFileName)),
         m_settings(new BundleSettings(*other.m_settings)),
         m_statisticsResults(new BundleStatistics(*other.m_statisticsResults)) {
+
+    delete m_id;
+    m_id = new QUuid(other.m_id->toString());
   }
 
 
 
   BundleResults::~BundleResults() {
+    delete m_id;
+    m_id = NULL;
 
     delete m_controlNetworkFileName;
     m_controlNetworkFileName = NULL;
@@ -42,7 +60,6 @@ namespace Isis {
 
     delete m_statisticsResults;
     m_statisticsResults = NULL;
-
   }
 
 
@@ -53,6 +70,7 @@ namespace Isis {
 
       delete m_controlNetworkFileName;
       m_controlNetworkFileName = new FileName(*other.m_controlNetworkFileName);
+      m_controlNetworkFileName = other.m_controlNetworkFileName;
 
       delete m_settings;
       m_settings = new BundleSettings(*other.m_settings);
@@ -60,6 +78,8 @@ namespace Isis {
       delete m_statisticsResults;
       m_statisticsResults = new BundleStatistics(*other.m_statisticsResults);
 
+      delete m_id;
+      m_id = new QUuid(other.m_id->toString());
     }
     return *this;
   }
@@ -72,7 +92,7 @@ namespace Isis {
 
 
 
-  
+
   PvlObject BundleResults::pvlObject(QString resultsName, QString settingsName, 
                                      QString statisticsName) {
 
@@ -86,7 +106,290 @@ namespace Isis {
 
   }
 
+  /**
+   * Output format:
+   *
+   *
+   * <image id="..." fileName="...">
+   *   ...
+   * </image>
+   *
+   * (fileName attribute is just the base name)
+   */
+  void BundleResults::save(QXmlStreamWriter &stream, const Project *project,
+                            FileName newProjectRoot) const {
 
+    // save settings
+    m_settings->save(stream, project, newProjectRoot);
+
+    // save statistics
+    //m_statisticsResults->save(stream, project, newProjectRoot);
+
+    // save output control network
+
+    // save updated cube labels
+
+    QString boolStr;
+    /*
+
+    stream.writeStartElement("generalSettings");
+
+    stream.writeAttribute("id", m_id->toString());
+
+    m_validateNetwork ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("validateNetwork", boolStr);
+
+    stream.writeAttribute("solveMethod", solveMethodToString(m_solveMethod));
+
+    m_solveObservationMode ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("solveObservationMode", boolStr);
+
+    m_solveRadius ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("solveRadius", boolStr);
+
+    m_updateCubeLabel ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("updateCubeLabel", boolStr);
+
+    m_errorPropagation ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("errorPropagation", boolStr);
+
+    m_outlierRejection ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("outlierRejection", boolStr);
+
+    stream.writeAttribute("outlierRejectionMultiplier",
+                          IString(m_outlierRejectionMultiplier).ToQt());
+    stream.writeAttribute("globalLatitudeAprioriSigma", IString(m_globalLatitudeAprioriSigma).ToQt());
+    stream.writeAttribute("globalLongitudeAprioriSigma", IString(m_globalLongitudeAprioriSigma).ToQt());
+    stream.writeAttribute("globalRadiusAprioriSigma", IString(m_globalRadiusAprioriSigma).ToQt());
+
+    stream.writeAttribute("convergenceCriteria",
+                          convergenceCriteriaToString(m_convergenceCriteria));
+    stream.writeAttribute("convergenceCriteriaThreshold",
+                          IString(m_convergenceCriteriaThreshold).ToQt());
+    stream.writeAttribute("convergenceCriteriaMaximumIterations",
+                          IString(m_convergenceCriteriaMaximumIterations).ToQt());
+
+//    QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
+
+    stream.writeAttribute("m_outputFilePrefix", m_outputFilePrefix);
+
+    m_createBundleOutputFile ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("createBundleOutputFile", boolStr);
+
+    m_createCSVFiles ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("createCSVFiles", boolStr);
+
+    m_createResidualsFile ? boolStr = "true" : boolStr = "false";
+    stream.writeAttribute("createResidualsFile", boolStr);
+*/
+    stream.writeEndElement();
+  }
+
+
+  /**
+   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
+   *   BundleSettings::save() for the expected format.
+   *
+   * @param bundleSettings The image we're going to be initializing
+   * @param imageFolder The folder that contains the Cube
+   */
+  BundleResults::XmlHandler::XmlHandler(BundleResults *bundleResults, Project *project) {
+    m_bundleResults = bundleResults;
+    m_project = project;
+  }
+
+  /**
+   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
+   *
+   * @return If we should continue reading the XML (usually true).
+   */
+  bool BundleResults::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
+                                       const QString &qName, const QXmlAttributes &atts) {
+    m_characters = "";
+
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+
+      if (localName == "generalSettings") {
+        QString id = atts.value("id");
+
+//        QString validateNetworkStr = atts.value("validateNetwork");
+//        QString solveMethodStr = atts.value("solveMethod");
+//        QString solveObservationModeStr = atts.value("solveObservationMode");
+//        QString solveRadiusStr = atts.value("solveRadius");
+//        QString updateCubeLabelStr = atts.value("updateCubeLabel");
+//        QString errorPropagationStr = atts.value("errorPropagation");
+//        QString outlierRejectionStr = atts.value("outlierRejection");
+//        QString outlierRejectionMultiplierStr = atts.value("outlierRejectionMultiplier");
+//        QString globalLatitudeAprioriSigmaStr = atts.value("globalLatitudeAprioriSigma");
+//        QString globalLongitudeAprioriSigmaStr = atts.value("globalLongitudeAprioriSigma");
+//        QString globalRadiusAprioriSigmaStr = atts.value("globalRadiusAprioriSigma");
+//        QString convergenceCriteriaStr = atts.value("convergenceCriteria");
+//        QString convergenceCriteriaThresholdStr = atts.value("convergenceCriteriaThreshold");
+//        QString convergenceCriteriaMaximumIterationsStr = atts.value("convergenceCriteriaMaximumIterations");
+//        QString outputFilePrefixStr = atts.value("outputFilePrefix");
+//        QString createBundleOutputFileStr = atts.value("createBundleOutputFile");
+//        QString createCSVFilesStr = atts.value("createCSVFiles");
+//        QString createResidualsFileStr = atts.value("createResidualsFile");
+
+
+        if (!id.isEmpty()) {
+//          delete m_bundleSettings->m_id;
+//          m_bundleSettings->m_id = NULL;
+//          m_bundleSettings->m_id = new QUuid(id.toAscii());
+
+//          int fred=1;
+        }
+
+//        if (!validateNetworkStr.isEmpty()) {
+//          (validateNetworkStr == "true") ? m_bundleSettings->m_validateNetwork = true : m_bundleSettings->m_validateNetwork = false;
+//        }
+
+//        if (!solveMethodStr.isEmpty()) {
+//          m_bundleSettings->m_solveMethod = stringToSolveMethod(solveMethodStr);
+//        }
+
+//        if (!solveObservationModeStr.isEmpty()) {
+//          (solveObservationModeStr == "true") ?
+//                m_bundleSettings->m_solveObservationMode = true : m_bundleSettings->m_solveObservationMode = false;
+//        }
+
+//        if (!solveRadiusStr.isEmpty()) {
+//          (solveRadiusStr == "true") ?
+//                m_bundleSettings->m_solveRadius = true : m_bundleSettings->m_solveRadius = false;
+//        }
+
+//        if (!updateCubeLabelStr.isEmpty()) {
+//          (updateCubeLabelStr == "true") ? m_bundleSettings->m_updateCubeLabel = true :
+//              m_bundleSettings->m_updateCubeLabel = false;
+//        }
+
+//        if (!errorPropagationStr.isEmpty()) {
+//          (errorPropagationStr == "true") ? m_bundleSettings->m_errorPropagation = true :
+//              m_bundleSettings->m_errorPropagation = false;
+//        }
+
+//        if (!outlierRejectionStr.isEmpty()) {
+//          (outlierRejectionStr == "true") ? m_bundleSettings->m_outlierRejection = true :
+//              m_bundleSettings->m_outlierRejection = false;
+//        }
+
+//        if (!outlierRejectionMultiplierStr.isEmpty()) {
+//          m_bundleSettings->m_outlierRejectionMultiplier = outlierRejectionMultiplierStr.toDouble();
+//        }
+
+//        if (!globalLatitudeAprioriSigmaStr.isEmpty()) {
+//          m_bundleSettings->m_globalLatitudeAprioriSigma = globalLatitudeAprioriSigmaStr.toDouble();
+//        }
+
+//        if (!globalLongitudeAprioriSigmaStr.isEmpty()) {
+//          m_bundleSettings->m_globalLongitudeAprioriSigma =
+//              globalLongitudeAprioriSigmaStr.toDouble();
+//        }
+
+//        if (!globalRadiusAprioriSigmaStr.isEmpty()) {
+//          m_bundleSettings->m_globalRadiusAprioriSigma = globalRadiusAprioriSigmaStr.toDouble();
+//        }
+
+//        if (!convergenceCriteriaStr.isEmpty()) {
+//          m_bundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteriaStr);
+//        }
+
+//        if (!convergenceCriteriaThresholdStr.isEmpty()) {
+//          m_bundleSettings->m_convergenceCriteriaThreshold = convergenceCriteriaThresholdStr.toDouble();
+//        }
+
+//        if (!convergenceCriteriaMaximumIterationsStr.isEmpty()) {
+//          m_bundleSettings->m_convergenceCriteriaMaximumIterations = convergenceCriteriaMaximumIterationsStr.toInt();
+//        }
+
+//        if (!outputFilePrefixStr.isEmpty()) {
+//          m_bundleSettings->m_outputFilePrefix = outputFilePrefixStr;
+//        }
+
+//        if (!createBundleOutputFileStr.isEmpty()) {
+//          (createBundleOutputFileStr == "true") ?
+//              m_bundleSettings->m_createBundleOutputFile = true :
+//              m_bundleSettings->m_createBundleOutputFile = false;
+//        }
+
+//        if (!createCSVFilesStr.isEmpty()) {
+//          (createCSVFilesStr == "true") ?
+//              m_bundleSettings->m_createCSVFiles = true :
+//              m_bundleSettings->m_createCSVFiles = false;
+//        }
+
+//        if (!createResidualsFileStr.isEmpty()) {
+//          (createResidualsFileStr == "true") ?
+//              m_bundleSettings->m_createResidualsFile = true :
+//              m_bundleSettings->m_createResidualsFile = false;
+//        }
+
+      else if (localName == "bundleSettings") {
+        m_bundleResults->m_settings = new BundleSettings(reader());
+      }
+    }
+  }
+
+    return true;
+  }
+
+
+  bool BundleResults::XmlHandler::characters(const QString &ch) {
+    m_characters += ch;
+
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+  bool BundleResults::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                     const QString &qName) {
+//    if (localName == "footprint" && !m_characters.isEmpty()) {
+//      geos::io::WKTReader wktReader(&globalFactory);
+//      m_image->m_footprint = PolygonTools::MakeMultiPolygon(
+//          wktReader.read(m_characters.toStdString()));
+//    }
+//    else if (localName == "image" && !m_image->m_footprint) {
+//      QMutex mutex;
+//      m_image->initFootprint(&mutex);
+//      m_image->closeCube();
+//    }
+
+//    m_characters = "";
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
+  }
+
+
+  /**
+   * Get a unique, identifying string associated with this BundleResults object.
+   *
+   * @return A unique ID for this BundleResults object
+   */
+  QString BundleResults::id() const {
+    return m_id->toString().remove(QRegExp("[{}]"));
+  }
+
+
+  void BundleResults::setRunTime(QString runTime) {
+    m_runTime = runTime;
+  }
+
+
+  QString BundleResults::runTime() const {
+    return m_runTime;
+  }
+
+
+  QString BundleResults::controlNetworkFileName() {
+    return m_controlNetworkFileName->expanded();
+  }
+
+  BundleSettings *BundleResults::bundleSettings() {
+    return m_settings;
+  }
+
+  BundleStatistics *BundleResults::bundleStatistics() {
+    return m_statisticsResults;
+  }
 
   QDataStream &BundleResults::write(QDataStream &stream) const {
     stream << m_controlNetworkFileName->expanded()
@@ -130,9 +433,6 @@ namespace Isis {
   }
 
 }
-
-
-
 
 
 #if 0
