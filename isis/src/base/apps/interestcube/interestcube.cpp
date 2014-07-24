@@ -56,6 +56,7 @@ void IsisMain() {
   p.EndProcess();
 
   delete unvGMap;
+  cube.close();
 }
 
 // Call Operate once per pixel to get the interest for every pixel in the input cube.
