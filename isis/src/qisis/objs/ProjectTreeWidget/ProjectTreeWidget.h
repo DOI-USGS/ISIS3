@@ -7,6 +7,7 @@
 
 
 namespace Isis {
+  class BundleResults;
   class Control;
   class ControlList;
   class Directory;
@@ -41,6 +42,7 @@ namespace Isis {
       void addControlGroup(ControlList *controlList);
       void addControl(Control *control);
       void addImageGroup(ImageList *images);
+      void addBundleResults(BundleResults *bundleResults);
 
     protected:
       void contextMenuEvent(QContextMenuEvent *event);
@@ -63,6 +65,7 @@ namespace Isis {
       QTreeWidgetItem *m_imagesParentItem;
       QTreeWidgetItem *m_shapeParentItem;
       QTreeWidgetItem *m_targetParentItem;
+      QTreeWidgetItem *m_sensorsParentItem;
       QTreeWidgetItem *m_spacecraftParentItem;
       QTreeWidgetItem *m_resultsParentItem;
 

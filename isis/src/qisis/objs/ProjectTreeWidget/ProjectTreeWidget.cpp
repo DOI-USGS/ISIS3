@@ -11,6 +11,12 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 
+#include "BundleResults.h"
+#include "BundleResultsTreeWidgetItem.h"
+#include "BundleSettings.h"
+#include "BundleSettingsTreeWidgetItem.h"
+#include "BundleStatistics.h"
+#include "BundleStatisticsTreeWidgetItem.h"
 #include "Control.h"
 #include "ControlGroupTreeWidgetItem.h"
 #include "ControlList.h"
@@ -41,6 +47,7 @@ namespace Isis {
     m_imagesParentItem = NULL;
     m_shapeParentItem = NULL;
     m_targetParentItem = NULL;
+    m_sensorsParentItem = NULL;
     m_spacecraftParentItem = NULL;
     m_resultsParentItem = NULL;
     m_ignoreEdits = false;
@@ -60,6 +67,8 @@ namespace Isis {
             this, SLOT(addControlGroup(ControlList *)));
     connect(m_directory->project(), SIGNAL(controlAdded(Control *)),
             this, SLOT(addControl(Control *)));
+    connect(m_directory->project(), SIGNAL(bundleResultsAdded(BundleResults *)),
+            this, SLOT(addBundleResults(BundleResults *)));
 
     connect(this, SIGNAL(delayedEnableEditing(QTreeWidgetItem *)),
             this, SLOT(enableEditing(QTreeWidgetItem *)),
@@ -72,6 +81,7 @@ namespace Isis {
     m_imagesParentItem = NULL;
     m_shapeParentItem = NULL;
     m_targetParentItem = NULL;
+    m_sensorsParentItem = NULL;
     m_spacecraftParentItem = NULL;
     m_resultsParentItem = NULL;
     m_projectItem = NULL;
@@ -219,6 +229,13 @@ namespace Isis {
                                  Qt::ItemIsSelectable);
     m_targetParentItem->setExpanded(true);
     m_targetParentItem->setIcon(0, QIcon(":moonPhase"));
+
+    m_sensorsParentItem = new QTreeWidgetItem(m_projectItem);
+    m_sensorsParentItem->setText(0, tr("Sensors"));
+    m_sensorsParentItem->setFlags(Qt::ItemIsEnabled |
+                                     Qt::ItemIsSelectable);
+    m_sensorsParentItem->setExpanded(true);
+    m_sensorsParentItem->setIcon(0, QIcon(":camera"));
 
     m_spacecraftParentItem = new QTreeWidgetItem(m_projectItem);
     m_spacecraftParentItem->setText(0, tr("Spacecraft"));
@@ -370,5 +387,40 @@ namespace Isis {
     }
   }
 
+
+  // TODO - kle - this is hacked, needs to be cleaned up
+  void ProjectTreeWidget::addBundleResults(BundleResults *bundleResults) {
+
+    QString group = bundleResults->id();
+    QList<QTreeWidgetItem *> found = findItems(group, Qt::MatchRecursive, 0);
+
+    QTreeWidgetItem *item = new BundleResultsTreeWidgetItem(bundleResults);
+    m_resultsParentItem->addChild(item);
+
+    QString cnetfname = bundleResults->controlNetworkFileName();
+    Control *newControl = new Control(cnetfname);
+
+    QTreeWidgetItem *controlItem = new ControlTreeWidgetItem(newControl);
+
+    item->addChild(controlItem);
+
+    BundleSettings *bundleSettings = bundleResults->bundleSettings();
+    BundleStatistics *bundleStatistics = bundleResults->bundleStatistics();
+
+    QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(bundleSettings);
+    QTreeWidgetItem *statisticsItem = new BundleStatisticsTreeWidgetItem(bundleStatistics);
+
+    item->addChild(settingsItem);
+    item->addChild(statisticsItem);
+
+    expandItem(item);
+
+
+    //  Create new TreeWidgetItem
+//    if (!found.isEmpty()) {
+//      QTreeWidgetItem *item = new BundleResultsTreeWidgetItem(bundleResults);
+//      found.at(0)->addChild(item);
+//    }
+  }
 
 }
