@@ -6,8 +6,9 @@
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "Control.h"
+#include "iTime.h"
 #include "JigsawSetupDialog.h"
-#include "ui_JigsawDialog.h"
+#include "ui_jigsawdialog.h"
 #include "Project.h"
 
 namespace Isis {
@@ -20,6 +21,7 @@ namespace Isis {
     m_selectedControl = NULL;
     m_bundleSettings = NULL;
 
+    setWindowFlags(Qt::WindowStaysOnTopHint);
   }
 
   JigsawDialog::~JigsawDialog() {
@@ -42,7 +44,6 @@ namespace Isis {
       m_selectedControl = setupdlg.selectedControl();
       m_bundleSettings = setupdlg.bundleSettings();
     }
-
   }
 
 
@@ -59,25 +60,38 @@ namespace Isis {
     // assume defaults or send warning???
     if (m_bundleSettings == NULL) {
     }
+
     SerialNumberList snlist;
 
     QList<ImageList *> imagelists = m_project->images();
 
-    for ( int i = 0; i < imagelists.size(); i++) {
-        ImageList* list = imagelists.at(i);
-        for (int j = 0; j < list->size(); j++) {
-          Image* image = list->at(j);
-          snlist.Add(image->fileName());
-          qDebug() << image->fileName();
-        }
+    for (int i = 0; i < imagelists.size(); i++) {
+      ImageList* list = imagelists.at(i);
+      for (int j = 0; j < list->size(); j++) {
+        Image* image = list->at(j);
+        snlist.Add(image->fileName());
+        qDebug() << image->fileName();
+      }
     }
 
     ControlNet *cnet = m_selectedControl->controlNet();
 
-    BundleAdjust ba(*m_bundleSettings, *cnet, snlist, false);
+//    BundleAdjust ba(*m_bundleSettings, *cnet, snlist, false);
 // run bundle (thread with BundleThread::QThread) - pump output to modeless dialog
     // BundleResults results = ba.solveCholesky();
-    ba.solveCholesky();
+//    ba.solveCholesky();
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // create dummy bundle results and add to project
+    BundleSettings *settings = new BundleSettings();
+    QString fname = m_selectedControl->fileName();
+//    BundleResults *bundleResults = new BundleResults(*settings,*cnet, fname);
+    BundleResults *bundleResults = new BundleResults(*settings, fname);
+    bundleResults->setRunTime(Isis::iTime::CurrentLocalTime().toAscii().data());
+    m_project->addBundleResults(bundleResults);
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   }
 }
