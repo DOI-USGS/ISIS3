@@ -182,6 +182,8 @@ namespace Isis {
    *                           the placement criteria (priority=band). The only way to place
    *                           special or null pixels is to check those options in mapmos or
    *                           automos. Fixes #1620. Fixes #1623.
+   *   @history 2014-07-23 Janet Barrett - Fixed the StartProcess method to allow the overlay of
+   *                           an input file on a pre-existing output file. Fixed #751.
    */
 
   class ProcessMosaic : public Process {
