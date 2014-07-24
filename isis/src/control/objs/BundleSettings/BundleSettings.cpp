@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QList>
 #include <QString>
+#include <QUuid>
+#include <QXmlStreamWriter>
 
 #include "BundleObservationSolveSettings.h"
 #include "IException.h"
@@ -10,8 +12,6 @@
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include <QUuid>
-#include <QXmlStreamWriter>
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -23,6 +23,7 @@ namespace Isis {
     m_id = NULL;
 
     m_validateNetwork = true;
+
     m_solveMethod = Sparse;
     m_solveObservationMode = false;
     m_solveRadius          = false;
@@ -100,22 +101,16 @@ namespace Isis {
         m_globalLatitudeAprioriSigma(other.m_globalLatitudeAprioriSigma),
         m_globalLongitudeAprioriSigma(other.m_globalLongitudeAprioriSigma),
         m_globalRadiusAprioriSigma(other.m_globalRadiusAprioriSigma),
+        m_observationSolveSettings(other.m_observationSolveSettings),
         m_convergenceCriteria(other.m_convergenceCriteria),
         m_convergenceCriteriaThreshold(other.m_convergenceCriteriaThreshold),
         m_convergenceCriteriaMaximumIterations(other.m_convergenceCriteriaMaximumIterations),
+        m_maximumLikelihood(other.m_maximumLikelihood),
         m_outputFilePrefix(other.m_outputFilePrefix),
         m_createBundleOutputFile(other.m_createBundleOutputFile),
         m_createCSVFiles(other.m_createCSVFiles),
-        m_createResidualsFile(other.m_createResidualsFile) {
-    
-    for (int i = 0; i < other.m_maximumLikelihood.size(); i++) {
-      m_maximumLikelihood.append(other.m_maximumLikelihood[i]);
-    }
-
-    m_observationSolveSettings = other.m_observationSolveSettings;
-
-//    delete m_id;
-    m_id = new QUuid(other.m_id->toString());
+        m_createResidualsFile(other.m_createResidualsFile),
+        m_id(new QUuid(*other.m_id)) {
   }
 
 
@@ -123,14 +118,6 @@ namespace Isis {
   BundleSettings::~BundleSettings() {    
     delete m_id;
     m_id = NULL;
-
-//    int nSolveSettings = m_observationSolveSettings.size();
-//    for (int i = 0; i < nSolveSettings; i++) {
-//      BundleObservationSolveSettings *settings = m_observationSolveSettings.at(i);
-//      delete settings;
-//    }
-//    m_observationSolveSettings.clear();
-
   }
 
 
@@ -148,19 +135,15 @@ namespace Isis {
       m_globalLatitudeAprioriSigma = other.m_globalLatitudeAprioriSigma;
       m_globalLongitudeAprioriSigma = other.m_globalLongitudeAprioriSigma;
       m_globalRadiusAprioriSigma = other.m_globalRadiusAprioriSigma;
+      m_observationSolveSettings = other.m_observationSolveSettings;
       m_convergenceCriteria = other.m_convergenceCriteria;
       m_convergenceCriteriaThreshold = other.m_convergenceCriteriaThreshold;
       m_convergenceCriteriaMaximumIterations = other.m_convergenceCriteriaMaximumIterations;
+      m_maximumLikelihood = other.m_maximumLikelihood;
       m_outputFilePrefix = other.m_outputFilePrefix;
       m_createBundleOutputFile = other.m_createBundleOutputFile;
       m_createCSVFiles = other.m_createCSVFiles;
       m_createResidualsFile = other.m_createResidualsFile;
-
-      for (int i = 0;i < other.m_maximumLikelihood.size();i++) {
-        m_maximumLikelihood.append(other.m_maximumLikelihood[i]);
-      }
-
-      m_observationSolveSettings = other.m_observationSolveSettings;
 
       delete m_id;
       m_id = new QUuid(other.m_id->toString());
@@ -571,6 +554,7 @@ namespace Isis {
       pvl += PvlKeyword("ObservationSolveSettingsInstrumentId", 
                         m_observationSolveSettings[i].instrumentId());
     }
+
     return pvl;
   }
 

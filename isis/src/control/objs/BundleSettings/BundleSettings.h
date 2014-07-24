@@ -23,7 +23,6 @@
  */
 
 #include <QList>
-#include <QVector>
 #include <QPair>
 #include <QString>
 
@@ -33,8 +32,8 @@
 #include "PvlObject.h"
 #include "XmlStackedHandler.h"
 
-class QXmlStreamWriter;
 class QUuid;
+class QXmlStreamWriter;
 
 namespace Isis {
   class FileName;
@@ -62,6 +61,7 @@ namespace Isis {
    *                           pvlObject().  Added unitTest.
    *   @history 2014-07-23 Jeannie Backer - Added QDataStream >> and << operators and read/write
    *                           methods. Created unitTest.
+   *   @history 2014-07-25 Jeannie Backer - Improved unitTest coverage to 100% scope/line/function.
    *  
    */
  class BundleSettings : public QObject {

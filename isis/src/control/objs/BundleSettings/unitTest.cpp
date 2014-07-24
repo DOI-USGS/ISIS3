@@ -42,22 +42,27 @@ int main(int argc, char *argv[]) {
     //      bool createCSVPointsFile() const;
     //      bool createResidualsFile() const;
     //      QString outputFilePrefix() const;
-    PvlObject pvl = settings.pvlObject("DefaultBundleSettingsObject");
+    PvlObject pvl = settings.pvlObject("DefaultSettingsObject");
+    cout << pvl << endl << endl;
+
+    qDebug() << "Testing copy constructor...";
+    BundleSettings copySettings(settings);
+    pvl = copySettings.pvlObject("CopySettingsObject");
+    cout << pvl << endl << endl;
+
+    qDebug() << "Testing assignment operator to set this equal to itself...";
+    settings = settings;
+    pvl = settings.pvlObject("SelfAssignedSettingsObject");
     cout << pvl << endl << endl;
 
     qDebug() << "Testing assignment operator to create a new settings object...";
-    const BundleSettings constSettings = settings;
-    //BundleSettings assignmentOpSettings = copySettings;
-    pvl = constSettings.pvlObject("AssignedBundleSettingsObject");
-    cout << pvl << endl << endl;
-
-
-    qDebug() << "Testing copy constructor to create a new settings object...";
-    BundleSettings copySettings(constSettings);
-    pvl = copySettings.pvlObject("CopyBundleSettingsObject");
+    BundleSettings assignmentOpSettings = settings;
+    assignmentOpSettings = settings;
+    pvl = assignmentOpSettings.pvlObject("AssignedSettingsObject");
     cout << pvl << endl << endl;
 
     qDebug() << "Testing mutator methods...";
+    // reset all...
     // validate the network
     settings.setValidateNetwork(true);
     // set the solve options
@@ -73,6 +78,7 @@ int main(int argc, char *argv[]) {
                                         5, 6, true, 7000.0, 8000.0, 9000.0);
     boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors, 
                                         10, 11, true, true, 12.0, 13.0, 14.0);
+    // TODO: why am i getting QList index error???
 //    pvl = boss1.pvlObject();
 //    cout << pvl << endl << endl;
     QList<BundleObservationSolveSettings> observationSolveSettings;
@@ -82,6 +88,7 @@ int main(int argc, char *argv[]) {
                                         15, 16, true, 17000.0, 18000.0, 19000.0);
     boss1.setInstrumentPointingSettings(BundleObservationSolveSettings::AllPointingCoefficients, 
                                         20, 21, true, true, 22.0, 23.0, 24.0);
+    // TODO: why am i getting QList index error???
 //    pvl = boss1.pvlObject();
 //    cout << pvl << endl << endl;
     observationSolveSettings.append(boss1);
@@ -95,15 +102,39 @@ int main(int argc, char *argv[]) {
     settings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::HuberModified, 29); 
     settings.addMaximumLikelihoodEstimatorModel(MaximumLikelihoodWFunctions::Chen, 30); 
     // set output file options
-    settings.setOutputFiles("TestFilePrefix", false, true, false);
-    pvl = settings.pvlObject("MutatedBundleSettingsObject");
+    settings.setOutputFiles("TestFilePrefix", false, false, false);
+    pvl = settings.pvlObject("ResetAllOptions");
     cout << pvl << endl << endl;
 
+    // now for test coverage, call some more resets
+    // SolveObservationMode = UpdateCubeLabel = ErrorPropagation = true and
+    // SolveRadius = OutlierRejection = false
+    settings.setSolveOptions(BundleSettings::stringToSolveMethod("sparse"), 
+                             true, true, true, false);
+    settings.setOutlierRejection(false);
+    settings.setOutputFiles("TestFilePrefix", false, true, false);
+    pvl = settings.pvlObject("ResetSolveOptions");
+    cout << pvl << endl << endl;
+
+    // reset output options - test coverage
+    settings.setOutputFiles("TestFilePrefix", false, false, true);
+    pvl = settings.pvlObject("ResetOutputOptions");
+    cout << pvl << endl << endl;
+
+
     qDebug() << "Testing accessor methods...";
-//    BundleObservationSolveSettings *boss2 = settings.observationSolveSettings("Instrument1");
-//    qDebug() << boss2->instrumentId();
-//    boss2 = settings.observationSolveSettings(2);
-//    qDebug() << boss2->instrumentId();
+    BundleObservationSolveSettings boss2 = settings.observationSolveSettings("Instrument1");
+    qDebug() << boss2.instrumentId();
+    // TODO: why am i getting QList index error???
+    // pvl = boss2.pvlObject();
+    // cout << pvl << endl << endl;
+
+    boss2 = settings.observationSolveSettings(1);
+    qDebug() << boss2.instrumentId();
+    // TODO: why am i getting QList index error???
+    // pvl = boss2.pvlObject();
+    // cout << pvl << endl << endl;
+
     QList< QPair< MaximumLikelihoodWFunctions::Model, double > > models
            = settings.maximumLikelihoodEstimatorModels();
     for (int i = 0; i < models.size(); i++) {
@@ -146,13 +177,25 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     try {
+      settings.observationSolveSettings("NoSuchInstrumentId");
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    try {
+      settings.observationSolveSettings(32);
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    try {
       BundleSettings::stringToConvergenceCriteria("Pickles");
     } 
     catch (IException &e) {
       e.print();
     }
     try {
-      BundleSettings::convergenceCriteriaToString(BundleSettings::ConvergenceCriteria(32));
+      BundleSettings::convergenceCriteriaToString(BundleSettings::ConvergenceCriteria(33));
     } 
     catch (IException &e) {
       e.print();

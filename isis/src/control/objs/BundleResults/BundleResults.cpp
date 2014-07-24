@@ -2,6 +2,8 @@
 
 #include <QDataStream>
 #include <QDebug>
+#include <QUuid>
+#include <QXmlStreamWriter>
 
 #include "BundleSettings.h"
 #include "BundleStatistics.h"
@@ -10,8 +12,6 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-#include <QUuid>
-#include <QXmlStreamWriter>
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -30,9 +30,6 @@ namespace Isis {
 
     m_runTime = "";
 
-//     m_settings = inputSettings;
-//     m_outputCNet = outputControlNet;
-
   }
 
 
@@ -40,10 +37,8 @@ namespace Isis {
   BundleResults::BundleResults(const BundleResults &other)
       : m_controlNetworkFileName(new FileName(*other.m_controlNetworkFileName)),
         m_settings(new BundleSettings(*other.m_settings)),
-        m_statisticsResults(new BundleStatistics(*other.m_statisticsResults)) {
-
-    delete m_id;
-    m_id = new QUuid(other.m_id->toString());
+        m_statisticsResults(new BundleStatistics(*other.m_statisticsResults)),
+        m_id(new QUuid(other.m_id->toString())) {
   }
 
 
