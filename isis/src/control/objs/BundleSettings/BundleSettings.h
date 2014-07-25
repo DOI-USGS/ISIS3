@@ -189,37 +189,38 @@ namespace Isis {
 
       PvlObject pvlObject(QString name = "BundleSettings") const;
 
-      QDataStream &write(QDataStream &stream) const;
-      QDataStream &read(QDataStream &stream);
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
-   private:
-     /**
-      *
-      * @author 2014-07-21 Ken Edmundson
-      *
-      * @internal
-      */
-     class XmlHandler : public XmlStackedHandler {
-       public:
-         XmlHandler(BundleSettings *bundleSettings, Project *project);
-         XmlHandler(BundleSettings *bundleSettings);
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
 
-         virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                   const QString &qName, const QXmlAttributes &atts);
-         virtual bool characters(const QString &ch);
-         virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                   const QString &qName);
-
-       private:
-         Q_DISABLE_COPY(XmlHandler);
-
-         BundleSettings *m_bundleSettings;
-         Project *m_project;
-         QString m_characters;
-     };
 
     private:
+      /**
+       *
+       * @author 2014-07-21 Ken Edmundson
+       *
+       * @internal
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          XmlHandler(BundleSettings *bundleSettings, Project *project);
+          XmlHandler(BundleSettings *bundleSettings);
+   
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool characters(const QString &ch);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName);
+   
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+   
+          BundleSettings *m_bundleSettings;
+          Project *m_project;
+          QString m_characters;
+      };
+
       bool m_validateNetwork;
       SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
       bool m_solveObservationMode; //!< for observation mode (explain this somewhere)

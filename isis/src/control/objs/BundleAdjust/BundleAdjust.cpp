@@ -34,6 +34,7 @@
 #include "SurfacePoint.h"
 
 using namespace boost::numeric::ublas;
+using namespace Isis;
 
 namespace Isis {
 
@@ -96,6 +97,30 @@ namespace Isis {
     m_bundleSettings = bundleSettings;
  
     init(&progress);
+  }
+
+
+  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+                             QString &cnet, 
+                             SerialNumberList &snlist,
+                             bool bPrintSummary) {
+    // initialize m_dConvergenceThreshold ???
+    // ??? deleted keyword ??? m_dConvergenceThreshold = 0.0;    // This is needed for deltack???
+    // ???                                   //JWB - this gets overwritten in Init... move to constructor ???????????????????????????????????????????????????????????????????????
+    // ??? 
+    // initialize constructor dependent settings...
+    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
+    // m_bundleSettings
+    Progress progress;
+    m_bPrintSummary = bPrintSummary;
+    m_bCleanUp = false;
+    m_strCnetFileName = cnet;
+    m_pCnet = new Isis::ControlNet(cnet, &progress);
+    m_pSnList = &snlist;
+    m_pHeldSnList = NULL;
+    m_bundleSettings = bundleSettings;
+
+    init();
   }
 
 
@@ -480,6 +505,7 @@ namespace Isis {
   bool BundleAdjust::solveCholesky() {
 
     // TODO what are the next two lines doing?
+    cout << "cnet = " << m_strCnetFileName << endl;
     PvlObject forTesting = m_bundleSettings.pvlObject();
     cout << forTesting << endl;
 

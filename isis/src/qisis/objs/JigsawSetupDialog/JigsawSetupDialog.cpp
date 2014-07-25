@@ -78,7 +78,7 @@ namespace Isis {
     bool solvePosition                  = (bool) (index > 0);
     bool solveVelocity                  = (bool) (index > 1);
     bool solveAcceleration              = (bool) (index > 2);
-    bool solveAllPolynomialCoefficients = (bool) (index > 3);
+//    bool solveAllPolynomialCoefficients = (bool) (index > 3);
 
     m_ui->hermiteSplineCheckBox->setEnabled(solvePosition);
     m_ui->positionSigmaLabel->setEnabled(solvePosition);
@@ -93,10 +93,10 @@ namespace Isis {
     m_ui->accelerationSigmaLineEdit->setEnabled(solveAcceleration);
     m_ui->accelerationSigmaUnitsLabel->setEnabled(solveAcceleration);
 
-    m_ui->spkDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-    m_ui->spkDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-    m_ui->spkSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-    m_ui->spkSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->spkDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->spkDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->spkSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->spkSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
 
   }
 
@@ -109,15 +109,15 @@ namespace Isis {
     bool solveAngles                    = (bool) (index == 0 || index > 1);
     bool solveAngularVelocity           = (bool) (index > 1);
     bool solveAngularAcceleration       = (bool) (index > 2);
-    bool solveAllPolynomialCoefficients = (bool) (index > 3);
+//    bool solveAllPolynomialCoefficients = (bool) (index > 3);
     
     m_ui->twistCheckBox->setEnabled(solveAngles);
     m_ui->fitOverPointingCheckBox->setEnabled(solveAngles);
 
-    m_ui->ckDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-    m_ui->ckDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-    m_ui->ckSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-    m_ui->ckSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->ckDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->ckDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->ckSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+//    m_ui->ckSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
 
     m_ui->pointingAnglesSigmaLabel->setEnabled(solveAngles);
     m_ui->pointingAnglesSigmaLineEdit->setEnabled(solveAngles);
@@ -196,27 +196,12 @@ namespace Isis {
     settings->setOutlierRejection(m_ui->outlierRejectionCheckBox->isChecked(),
                                   m_ui->outlierRejectionMultiplierLineEdit->text().toDouble());
 
-    // position option
-    double positionSigma     = -1.0;
-    double velocitySigma     = -1.0;
-    double accelerationSigma = -1.0;
-    if (m_ui->positionSigmaLineEdit->isModified()) {
-      positionSigma = m_ui->positionSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->velocitySigmaLineEdit->isModified()) {
-      velocitySigma = m_ui->velocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->accelerationSigmaLineEdit->isModified()) {
-      accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
-    }
-/*
-    settings->setInstrumentPositionSolveOptions(
-        BundleSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
-        m_ui->hermiteSplineCheckBox->isChecked(),
-        m_ui->spkDegreeSpinBox->text().toInt(), 
-        m_ui->spkSolveDegreeSpinBox->text().toInt(),
-        positionSigma, velocitySigma, accelerationSigma);
-*/
+
+
+
+    QList<BundleObservationSolveSettings> observationSolveSettingsList;
+    BundleObservationSolveSettings observationSolveSettings;
+   
     // pointing settings
     double anglesSigma              = -1.0;
     double angularVelocitySigma     = -1.0;
@@ -231,15 +216,36 @@ namespace Isis {
     if (m_ui->pointingAngularAccelerationSigmaLineEdit->isModified()) {
       angularAccelerationSigma = m_ui->pointingAngularAccelerationSigmaLineEdit->text().toDouble();
     }
-/*
-    settings->setInstrumentPointingSolveOptions(
-        BundleSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
+    observationSolveSettings.setInstrumentPointingSettings(
+        BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
         m_ui->twistCheckBox->isChecked(),
-        m_ui->fitOverPointingCheckBox->isChecked(),
         m_ui->ckDegreeSpinBox->text().toInt(),
         m_ui->ckSolveDegreeSpinBox->text().toInt(),
+        m_ui->fitOverPointingCheckBox->isChecked(),
         anglesSigma, angularVelocitySigma, angularAccelerationSigma);
-*/
+   
+    // position option
+    double positionSigma     = -1.0;
+    double velocitySigma     = -1.0;
+    double accelerationSigma = -1.0;
+    if (m_ui->positionSigmaLineEdit->isModified()) {
+      positionSigma = m_ui->positionSigmaLineEdit->text().toDouble();
+    }
+    if (m_ui->velocitySigmaLineEdit->isModified()) {
+      velocitySigma = m_ui->velocitySigmaLineEdit->text().toDouble();
+    }
+    if (m_ui->accelerationSigmaLineEdit->isModified()) {
+      accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
+    }
+    observationSolveSettings.setInstrumentPositionSettings(
+        BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
+        m_ui->spkDegreeSpinBox->text().toInt(), 
+        m_ui->spkSolveDegreeSpinBox->text().toInt(),
+        m_ui->hermiteSplineCheckBox->isChecked(),
+        positionSigma, velocitySigma, accelerationSigma);
+   
+    observationSolveSettingsList.append(observationSolveSettings);
+    settings->setObservationSolveOptions(observationSolveSettingsList);
     // convergence criteria
     settings->setConvergenceCriteria(BundleSettings::Sigma0, 
                                      m_ui->sigma0ThresholdLineEdit->text().toDouble(), 
@@ -284,6 +290,12 @@ namespace Isis {
       Control *selectedControl 
                    = (Control *)(m_ui->controlNetworkComboBox->itemData(nIndex).value< void * >());
       return selectedControl;
+
+  }
+  QString *JigsawSetupDialog::selectedControlName() {
+
+    QString *name = new QString(m_ui->controlNetworkComboBox->currentText());
+      return name;
 
   }
 }

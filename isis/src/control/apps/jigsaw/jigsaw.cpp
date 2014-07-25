@@ -108,14 +108,13 @@ void IsisMain() {
     }
     Application::Log(gp);
   }
-
   catch(IException &e) {
     bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
     QString msg = "Unable to bundle adjust network [" + cnetFile + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
-  delete bundleAdjustment;
+//TODO - WHY DOES THIS MAKE VALGRIND ANGRY???  delete bundleAdjustment;
 }
 
 BundleSettings bundleSettings(UserInterface &ui) {

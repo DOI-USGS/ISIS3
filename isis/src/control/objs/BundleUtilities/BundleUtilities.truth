@@ -35,9 +35,9 @@ Object = TestBundleObservationSolveSettings
   SPKDegree                           = 6
   SPKSolveDegree                      = 0
   NumberPositionCoefficientsSolved    = 1
-  SolvePositionOverHermiteSpline      = No
+  SolvePositionOverHermiteSpline      = Yes
   PositionAprioriSigmas               = 800.0
-  InstrumentPositionInterpolationType = 3
+  InstrumentPositionInterpolationType = 4
 End_Object
 
 Write the BundleObservationSolveSettings object to a byte array using a data stream and read into a new object ... 
@@ -54,9 +54,9 @@ Object = TestBundleObservationSolveSettings
   SPKDegree                           = 6
   SPKSolveDegree                      = 0
   NumberPositionCoefficientsSolved    = 1
-  SolvePositionOverHermiteSpline      = No
+  SolvePositionOverHermiteSpline      = Yes
   PositionAprioriSigmas               = 800.0
-  InstrumentPositionInterpolationType = 3
+  InstrumentPositionInterpolationType = 4
 End_Object
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 

@@ -321,7 +321,7 @@ namespace Isis {
   BundleObservationSolveSettings 
       BundleSettings::observationSolveSettings(int n) const { 
 
-    if (n < numberSolveSettings()) {
+    if (n < numberSolveSettings() && n >= 0) {
       return m_observationSolveSettings[n]; 
     }
     QString msg = "Unable to find BundleObservationSolveSettings with index = ["
@@ -546,13 +546,9 @@ namespace Isis {
     pvl += PvlKeyword("NumberObservationSolveSettings", toString(numberSolveSettings()));
 
     for (int i = 0; i < numberSolveSettings(); i++) {
-// TODO: make this work... ASSERT failure in QList<T>::operator[]: "index out of range"
-// TODO:       BundleObservationSolveSettings boss = m_observationSolveSettings[i];
-// TODO:       BundleObservationSolveSettings boss = observationSolveSettings(i);
-// TODO:      PvlObject bundleObsSolveSettingsPvl = boss.pvlObject();
-// TODO:      pvl += bundleObsSolveSettingsPvl;
-      pvl += PvlKeyword("ObservationSolveSettingsInstrumentId", 
-                        m_observationSolveSettings[i].instrumentId());
+      BundleObservationSolveSettings boss = observationSolveSettings(i);
+      PvlObject bundleObsSolveSettingsPvl = boss.pvlObject();
+      pvl += bundleObsSolveSettingsPvl;
     }
 
     return pvl;
@@ -576,51 +572,32 @@ namespace Isis {
 
     stream.writeAttribute("id", m_id->toString());
 
-    m_validateNetwork ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("validateNetwork", boolStr);
-
-    stream.writeAttribute("solveMethod", solveMethodToString(m_solveMethod));
-
-    m_solveObservationMode ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("solveObservationMode", boolStr);
-
-    m_solveRadius ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("solveRadius", boolStr);
-
-    m_updateCubeLabel ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("updateCubeLabel", boolStr);
-
-    m_errorPropagation ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("errorPropagation", boolStr);
-
-    m_outlierRejection ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("outlierRejection", boolStr);
-
-    stream.writeAttribute("outlierRejectionMultiplier",
-                          IString(m_outlierRejectionMultiplier).ToQt());
-    stream.writeAttribute("globalLatitudeAprioriSigma", IString(m_globalLatitudeAprioriSigma).ToQt());
-    stream.writeAttribute("globalLongitudeAprioriSigma", IString(m_globalLongitudeAprioriSigma).ToQt());
-    stream.writeAttribute("globalRadiusAprioriSigma", IString(m_globalRadiusAprioriSigma).ToQt());
-
-    stream.writeAttribute("convergenceCriteria",
-                          convergenceCriteriaToString(m_convergenceCriteria));
-    stream.writeAttribute("convergenceCriteriaThreshold",
-                          IString(m_convergenceCriteriaThreshold).ToQt());
-    stream.writeAttribute("convergenceCriteriaMaximumIterations",
-                          IString(m_convergenceCriteriaMaximumIterations).ToQt());
-
-//    QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
-
-    stream.writeAttribute("m_outputFilePrefix", m_outputFilePrefix);
-
-    m_createBundleOutputFile ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("createBundleOutputFile", boolStr);
-
-    m_createCSVFiles ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("createCSVFiles", boolStr);
-
-    m_createResidualsFile ? boolStr = "true" : boolStr = "false";
-    stream.writeAttribute("createResidualsFile", boolStr);
+//     stream.writeAttribute("validateNetwork", toString(boolStr));
+// 
+//     stream.writeAttribute("solveMethod", solveMethodToString(m_solveMethod));
+//     stream.writeAttribute("solveObservationMode", toString(boolStr));
+//     stream.writeAttribute("solveRadius", toString(boolStr));
+//     stream.writeAttribute("updateCubeLabel", toString(boolStr));
+//     stream.writeAttribute("errorPropagation", toString(boolStr));
+//     stream.writeAttribute("outlierRejection", toString(boolStr));
+//     stream.writeAttribute("outlierRejectionMultiplier", toString(m_outlierRejectionMultiplier));
+//     stream.writeAttribute("globalLatitudeAprioriSigma", toString(m_globalLatitudeAprioriSigma));
+//     stream.writeAttribute("globalLongitudeAprioriSigma", toString(m_globalLongitudeAprioriSigma));
+//     stream.writeAttribute("globalRadiusAprioriSigma", toString(m_globalRadiusAprioriSigma));
+// 
+//     stream.writeAttribute("convergenceCriteria",
+//                           convergenceCriteriaToString(m_convergenceCriteria));
+//     stream.writeAttribute("convergenceCriteriaThreshold",
+//                           toString(m_convergenceCriteriaThreshold));
+//     stream.writeAttribute("convergenceCriteriaMaximumIterations",
+//                           toString(m_convergenceCriteriaMaximumIterations));
+// 
+// //    QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood;
+// 
+//     stream.writeAttribute("m_outputFilePrefix", m_outputFilePrefix);
+//     stream.writeAttribute("createBundleOutputFile", toString(boolStr));
+//     stream.writeAttribute("createCSVFiles", toString(boolStr));
+//     stream.writeAttribute("createResidualsFile", toString(boolStr));
 
     stream.writeEndElement();
   }
@@ -801,6 +778,8 @@ namespace Isis {
 //    m_characters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
+
+
 
   QDataStream &BundleSettings::write(QDataStream &stream) const {
 

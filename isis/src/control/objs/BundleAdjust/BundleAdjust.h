@@ -196,6 +196,10 @@ namespace Isis {
                    const QString &heldList, 
                    bool printSummary = true);
       BundleAdjust(BundleSettings bundleSettings, 
+                   QString &cnet, 
+                   SerialNumberList &snlist, 
+                   bool printSummary = true);
+      BundleAdjust(BundleSettings bundleSettings, 
                    ControlNet &cnet, 
                    SerialNumberList &snlist, 
                    bool printSummary = true);
@@ -211,18 +215,18 @@ namespace Isis {
       bool             solveCholesky();
 
       // accessors
-      ControlNet       *controlNet() { return m_pCnet; }
-      SerialNumberList *serialNumberList() { return m_pSnList; }
-      int              images() const { return m_pSnList->Size(); }
+      ControlNet       *controlNet() { return m_pCnet; } // TODO: change from pointer to const ref???
+      SerialNumberList *serialNumberList() { return m_pSnList; } // TODO: move implementation to cpp per ISIS standards
+      int              images() const { return m_pSnList->Size(); }// TODO: move implementation to cpp per ISIS standards
 //      int              observations() const;
       QString          fileName(int index);
       bool             isHeld(int index);
       Table            cMatrix(int index);
       Table            spVector(int index);
-      double error() const { // move code to cpp ???
+      double error() const { // TODO: move implementation to cpp per ISIS standards
         return m_dError;
       }
-      double iteration() const { // move code to cpp ???
+      double iteration() const { // TODO: move implementation to cpp per ISIS standards
         return m_nIteration;
       }
       //      int HeldPoints() const { return m_nHeldPoints; }
@@ -235,7 +239,7 @@ namespace Isis {
       bool isConverged();
       QString iterationSummaryGroup() const {
         return m_iterationSummary;
-      } // move code to cpp ???
+      } // TODO: move implementation to cpp per ISIS standards
 
     private:
 

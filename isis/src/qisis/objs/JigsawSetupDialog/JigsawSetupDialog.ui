@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -309,7 +309,7 @@
                <item row="6" column="0">
                 <widget class="QLabel" name="spkDegreeLabel">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="text">
                   <string>SPKDegree</string>
@@ -363,7 +363,7 @@
                <item row="7" column="0">
                 <widget class="QLabel" name="spkSolveDegreeLabel">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="text">
                   <string>SPKSolveDegree</string>
@@ -376,7 +376,7 @@
                <item row="6" column="1">
                 <widget class="QSpinBox" name="spkDegreeSpinBox">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -385,10 +385,10 @@
                   </sizepolicy>
                  </property>
                  <property name="minimum">
-                  <number>3</number>
+                  <number>1</number>
                  </property>
                  <property name="value">
-                  <number>3</number>
+                  <number>2</number>
                  </property>
                 </widget>
                </item>
@@ -444,7 +444,7 @@
                <item row="14" column="1">
                 <widget class="QSpinBox" name="ckSolveDegreeSpinBox">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -453,17 +453,17 @@
                   </sizepolicy>
                  </property>
                  <property name="minimum">
-                  <number>3</number>
+                  <number>1</number>
                  </property>
                  <property name="value">
-                  <number>3</number>
+                  <number>2</number>
                  </property>
                 </widget>
                </item>
                <item row="13" column="0">
                 <widget class="QLabel" name="ckDegreeLabel">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="text">
                   <string>CKDegree</string>
@@ -492,7 +492,7 @@
                <item row="7" column="1">
                 <widget class="QSpinBox" name="spkSolveDegreeSpinBox">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -501,17 +501,17 @@
                   </sizepolicy>
                  </property>
                  <property name="minimum">
-                  <number>3</number>
+                  <number>1</number>
                  </property>
                  <property name="value">
-                  <number>3</number>
+                  <number>2</number>
                  </property>
                 </widget>
                </item>
                <item row="14" column="0">
                 <widget class="QLabel" name="ckSolveDegreeLabel">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="text">
                   <string>CKSolveDegree</string>
@@ -524,7 +524,7 @@
                <item row="13" column="1">
                 <widget class="QSpinBox" name="ckDegreeSpinBox">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -533,10 +533,10 @@
                   </sizepolicy>
                  </property>
                  <property name="minimum">
-                  <number>3</number>
+                  <number>1</number>
                  </property>
                  <property name="value">
-                  <number>3</number>
+                  <number>2</number>
                  </property>
                 </widget>
                </item>

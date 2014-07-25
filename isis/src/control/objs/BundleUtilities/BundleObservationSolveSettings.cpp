@@ -639,7 +639,7 @@ if (option != AllPointingCoefficients) {
                       toString(m_solvePointingPolynomialOverExisting));
 
     PvlKeyword angleSigmas("AngleAprioriSigmas");
-    for (int i = 0; i < m_numberCamAngleCoefSolved; i++) {
+    for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {// m_numberCamAngleCoefSolved != m_anglesAprioriSigma.size()???
       angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
     }
     pvl += angleSigmas;
@@ -654,7 +654,7 @@ if (option != AllPointingCoefficients) {
     pvl += PvlKeyword("SolvePositionOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
 
     PvlKeyword positionSigmas("PositionAprioriSigmas");
-    for (int i = 0; i < m_numberCamPosCoefSolved; i++) {
+    for (int i = 0; i < m_positionAprioriSigma.size(); i++) {// m_numberCamPosCoefSolved != m_positionAprioriSigma.size()???
       positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
     }
     pvl += positionSigmas;

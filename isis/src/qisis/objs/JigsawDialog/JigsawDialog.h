@@ -9,6 +9,8 @@ namespace Ui {
   class JigsawDialog;
 }
 
+class QString;
+
 namespace Isis {
   class BundleSettings;
   class Control;
@@ -32,6 +34,7 @@ namespace Isis {
   protected:
     Project *m_project;
     Control *m_selectedControl;
+    QString *m_selectedControlName;
     BundleSettings *m_bundleSettings;
   };
 };

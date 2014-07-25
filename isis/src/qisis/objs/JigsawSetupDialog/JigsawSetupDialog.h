@@ -19,6 +19,8 @@ namespace Isis {
    *   @history 2014-04-21 Ken Edmundson - Original version.
    *   @history 2014-07-16 Jeannie Backer - Use MaximumLikelihoodWFunctions
    *                           static method to convert string to Model enum.
+   *   @history 2014-07-23 Jeannie Backer - Added selectedControlName(). Commented out degree combo
+   *                           box enable calls.
    */
   class Project;
   class Control;
@@ -31,8 +33,9 @@ namespace Isis {
     explicit JigsawSetupDialog(Project* project, QWidget *parent = 0);
     ~JigsawSetupDialog();
 
-    Control *selectedControl();
-    BundleSettings *bundleSettings();
+    Control *selectedControl();// TODO: return const references ???
+    QString *selectedControlName();// TODO: return const references ???
+    BundleSettings *bundleSettings();// TODO: return const references ???
 
   private slots:
 
