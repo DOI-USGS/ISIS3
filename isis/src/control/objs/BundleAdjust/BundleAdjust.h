@@ -57,6 +57,7 @@ template< typename A, typename B > class QMap;
 
 namespace Isis {
   class BundleResults;
+  class Control;
 
   /**
    * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
@@ -199,6 +200,10 @@ namespace Isis {
                    QString &cnet, 
                    SerialNumberList &snlist, 
                    bool printSummary = true);
+      BundleAdjust(BundleSettings bundleSettings,
+                   Control &cnet,
+                   SerialNumberList &snlist,
+                   bool bPrintSummary);
       BundleAdjust(BundleSettings bundleSettings, 
                    ControlNet &cnet, 
                    SerialNumberList &snlist, 

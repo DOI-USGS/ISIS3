@@ -1,5 +1,6 @@
 #include "JigsawSetupDialog.h"
 
+#include "BundleResults.h"
 #include "BundleSettings.h"
 #include "Control.h"
 #include "IString.h"
@@ -8,9 +9,47 @@
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {
-  JigsawSetupDialog::JigsawSetupDialog(Project *project, QWidget *parent) :
-                                QDialog(parent), m_ui(new Ui::JigsawSetupDialog) {
-    // 
+//  JigsawSetupDialog::JigsawSetupDialog(Project *project, QWidget *parent) :
+//                                QDialog(parent), m_ui(new Ui::JigsawSetupDialog) {
+//    //
+//    // Note: When the ui is set up, all intializations to enabled/disabled
+//    // are taken care of. Also connections between some widgets will be taken
+//    // care of in the ui setup.
+
+//    // For example:
+//    //   radiusCheckBox is connected to pointRadiusSigmaLabel and pointRadiusSigmaLineEdit
+//    //   outlierRejectionCheckBox is connected
+//    //       to outlierRejectionMultiplierLabel and outlierRejectionMultiplierLineEdit
+//    //
+//    // These connections and settings can be found in the JigsawSetupDialog.ui file
+//    // created by QtDesigner and may be edited by opening the ui file in QtDesigner.
+//    //
+//    // More complex connections such as the relationship between positionSolveOption and
+//    // spkDegree are handled in this file by the on_widgetName_signal methods.
+//    m_ui->setupUi(this);
+
+//    m_project = project;
+
+//    // fill control net combo box from project
+//    for (int i = 0; i < project->controls().size(); i++) {
+//      ControlList* conlist = project->controls().at(i);
+//      for (int j = 0; j < conlist->size(); j++) {
+//        Control *control = conlist->at(j);
+
+//        QVariant v = qVariantFromValue((void*)control);
+
+//        m_ui->controlNetworkComboBox->addItem(control->displayProperties()->displayName(), v);
+//      }
+//    }
+
+//    m_ui->JigsawSetup->setCurrentIndex(0);
+//  }
+
+
+  JigsawSetupDialog::JigsawSetupDialog(Project *project, bool useLastSettings, bool readOnly,
+                                       QWidget *parent) : QDialog(parent),
+                                       m_ui(new Ui::JigsawSetupDialog) {
+    //
     // Note: When the ui is set up, all intializations to enabled/disabled
     // are taken care of. Also connections between some widgets will be taken
     // care of in the ui setup.
@@ -19,10 +58,10 @@ namespace Isis {
     //   radiusCheckBox is connected to pointRadiusSigmaLabel and pointRadiusSigmaLineEdit
     //   outlierRejectionCheckBox is connected
     //       to outlierRejectionMultiplierLabel and outlierRejectionMultiplierLineEdit
-    // 
+    //
     // These connections and settings can be found in the JigsawSetupDialog.ui file
     // created by QtDesigner and may be edited by opening the ui file in QtDesigner.
-    // 
+    //
     // More complex connections such as the relationship between positionSolveOption and
     // spkDegree are handled in this file by the on_widgetName_signal methods.
     m_ui->setupUi(this);
@@ -41,9 +80,18 @@ namespace Isis {
       }
     }
 
+    QList<BundleResults *> bundleResults = m_project->bundleResults();
+    if (useLastSettings && bundleResults.size() > 0) {
+     BundleSettings *lastBundleSettings = (bundleResults.last())->bundleSettings();
+     fillFromSettings(lastBundleSettings);
+    }
+
+    if (readOnly) {
+      makeReadOnly();
+    }
+
     m_ui->JigsawSetup->setCurrentIndex(0);
   }
-
 
 
   JigsawSetupDialog::~JigsawSetupDialog() {
@@ -166,6 +214,87 @@ namespace Isis {
 
   }
 
+  void JigsawSetupDialog::fillFromSettings(BundleSettings* settings) {
+
+    BundleObservationSolveSettings observationSolveSettings = settings->observationSolveSettings(0);
+
+    // general tab
+    m_ui->solveMethodComboBox->setCurrentIndex(settings->solveMethod());
+    m_ui->observationModeCheckBox->setChecked(settings->solveObservationMode());
+    m_ui->radiusCheckBox->setChecked(settings->solveRadius());
+    m_ui->updateCubeLabelCheckBox->setChecked(settings->updateCubeLabel());
+    m_ui->errorPropagationCheckBox->setChecked(settings->errorPropagation());
+    m_ui->outlierRejectionCheckBox->setChecked(settings->outlierRejection());
+    m_ui->outlierRejectionMultiplierLineEdit->setText(toString(settings->outlierRejectionMultiplier()));
+    m_ui->sigma0ThresholdLineEdit->setText(toString(settings->convergenceCriteriaThreshold()));
+    m_ui->maximumIterationsLineEdit->setText(toString(settings->convergenceCriteriaMaximumIterations()));
+
+
+    m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
+    m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
+    m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
+    m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
+
+
+    int pointingOption = observationSolveSettings.instrumentPointingSolveOption();
+    if (pointingOption == 0)
+      pointingOption = 1;
+    if (pointingOption == 1)
+      pointingOption = 0;
+
+    if ( pointingOption > 0 )
+      m_ui->twistCheckBox->setEnabled(true);
+    else
+      m_ui->twistCheckBox->setEnabled(true);
+
+    m_ui->pointingComboBox->setCurrentIndex(pointingOption);
+//    m_ui->pointingComboBox->setCurrentIndex(observationSolveSettings.instrumentPointingSolveOption());
+
+
+    m_ui->twistCheckBox->setChecked(observationSolveSettings.solveTwist());
+    m_ui->fitOverPointingCheckBox->setChecked(observationSolveSettings.solvePolyOverPointing());
+    m_ui->ckDegreeSpinBox->setValue(observationSolveSettings.ckDegree());
+    m_ui->ckSolveDegreeSpinBox->setValue(observationSolveSettings.ckSolveDegree());
+
+    // weighting tab
+    if (settings->globalLatitudeAprioriSigma() > 0.0)
+      m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalLatitudeAprioriSigma()));
+    if (settings->globalLongitudeAprioriSigma() > 0.0)
+      m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalLongitudeAprioriSigma()));
+    if (settings->globalRadiusAprioriSigma() > 0.0)
+      m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalRadiusAprioriSigma()));
+
+    QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
+
+    if (aprioriPositionSigmas.size() > 0 && aprioriPositionSigmas.at(0) > 0.0)
+      m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas.at(0)));
+
+    if (aprioriPositionSigmas.size() > 1 && aprioriPositionSigmas.at(1) > 0.0)
+      m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas.at(1)));
+
+    if (aprioriPositionSigmas.size() > 2 && aprioriPositionSigmas.at(2) > 0.0)
+      m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas.at(2)));
+
+    QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
+
+    if (aprioriPointingSigmas.size() > 0 && aprioriPointingSigmas.at(0) > 0.0)
+      m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas.at(0)));
+
+    if (aprioriPointingSigmas.size() > 1 && aprioriPointingSigmas.at(1) > 0.0)
+      m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas.at(1)));
+
+    if (aprioriPointingSigmas.size() > 2 && aprioriPointingSigmas.at(2) > 0.0)
+      m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas.at(2)));
+
+    // maximum liklihood tab
+
+    // self-calibration tab
+
+    // target body tab
+
+    update();
+
+  }
 
 
   BundleSettings *JigsawSetupDialog::bundleSettings() {
@@ -283,19 +412,60 @@ namespace Isis {
   }
 
 
-
   Control *JigsawSetupDialog::selectedControl() {
 
       int nIndex = m_ui->controlNetworkComboBox->currentIndex();
       Control *selectedControl 
                    = (Control *)(m_ui->controlNetworkComboBox->itemData(nIndex).value< void * >());
       return selectedControl;
-
   }
+
+
   QString *JigsawSetupDialog::selectedControlName() {
 
     QString *name = new QString(m_ui->controlNetworkComboBox->currentText());
       return name;
 
+  }
+
+  void JigsawSetupDialog::makeReadOnly() {
+    m_ui->controlNetworkComboBox->setEnabled(false);
+    m_ui->solveMethodComboBox->setEnabled(false);
+    m_ui->observationModeCheckBox->setEnabled(false);
+    m_ui->radiusCheckBox->setEnabled(false);
+    m_ui->updateCubeLabelCheckBox->setEnabled(false);
+    m_ui->errorPropagationCheckBox->setEnabled(false);
+    m_ui->outlierRejectionCheckBox->setEnabled(false);
+    m_ui->outlierRejectionMultiplierLineEdit->setEnabled(false);
+    m_ui->sigma0ThresholdLineEdit->setEnabled(false);
+    m_ui->maximumIterationsLineEdit->setEnabled(false);
+    m_ui->positionComboBox->setEnabled(false);
+    m_ui->hermiteSplineCheckBox->setEnabled(false);
+    m_ui->spkDegreeSpinBox->setEnabled(false);
+    m_ui->spkSolveDegreeSpinBox->setEnabled(false);
+    m_ui->twistCheckBox->setEnabled(false);
+    m_ui->pointingComboBox->setEnabled(false);
+    m_ui->fitOverPointingCheckBox->setEnabled(false);
+    m_ui->ckDegreeSpinBox->setEnabled(false);
+    m_ui->ckSolveDegreeSpinBox->setEnabled(false);
+
+    // weighting tab
+    m_ui->pointLatitudeSigmaLineEdit->setEnabled(false);
+    m_ui->pointLongitudeSigmaLineEdit->setEnabled(false);
+    m_ui->pointRadiusSigmaLineEdit->setEnabled(false);
+    m_ui->positionSigmaLineEdit->setEnabled(false);
+    m_ui->velocitySigmaLineEdit->setEnabled(false);
+    m_ui->accelerationSigmaLineEdit->setEnabled(false);
+    m_ui->pointingAnglesSigmaLineEdit->setEnabled(false);
+    m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(false);
+    m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(false);
+
+    // maximum liklihood tab
+
+    // self-calibration tab
+
+    // target body tab
+
+    update();
   }
 }

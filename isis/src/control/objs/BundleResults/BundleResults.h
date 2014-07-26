@@ -36,6 +36,7 @@ namespace Isis {
   class BundleSettings;
   class BundleStatistics;
   class FileName;
+  class ImageList;
   class Project;
   class PvlObject;
   class XmlStackedHandlerReader;
@@ -109,6 +110,7 @@ namespace Isis {
       FileName         *m_controlNetworkFileName;
       BundleSettings   *m_settings;
       BundleStatistics *m_statisticsResults;
+      QList<ImageList *> *m_images;
 
       /**
        * A unique ID for this BundleResults object (useful for others to reference this object

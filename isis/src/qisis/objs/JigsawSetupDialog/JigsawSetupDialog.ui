@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>icons/jigsaw.png</normaloff>icons/jigsaw.png</iconset>
+    <normaloff>icons/settings.png</normaloff>icons/settings.png</iconset>
   </property>
   <property name="inputMethodHints">
    <set>Qt::ImhNone</set>

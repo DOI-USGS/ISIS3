@@ -8,7 +8,7 @@
 #include "Control.h"
 #include "iTime.h"
 #include "JigsawSetupDialog.h"
-#include "ui_JigsawDialog.h"
+#include "ui_jigsawdialog.h"
 #include "Process.h"
 #include "Project.h"
 
@@ -21,6 +21,11 @@ namespace Isis {
     m_project = project;
     m_selectedControl = NULL;
     m_bundleSettings = NULL;
+
+    QList<BundleResults *> bundleResults = m_project->bundleResults();
+    if (bundleResults.size() <= 0) {
+      m_ui->useLastSettings->setEnabled(false);
+    }
 
     setWindowFlags(Qt::WindowStaysOnTopHint);
   }
@@ -36,7 +41,7 @@ namespace Isis {
 
   void JigsawDialog::on_JigsawSetupButton_pressed() {
 
-    JigsawSetupDialog setupdlg(m_project, this);
+    JigsawSetupDialog setupdlg(m_project, true, false, this);
 
     // if (m_bundleSettings != NULL && setupdlg.useLastSettings()) {
     // }
@@ -63,6 +68,15 @@ namespace Isis {
     if (m_bundleSettings == NULL) {
     }
 
+    QList<BundleResults *> bundleResults = m_project->bundleResults();
+    if (m_ui->useLastSettings->isChecked() && bundleResults.size() > 0) {
+       BundleSettings *lastBundleSettings = (bundleResults.last())->bundleSettings();
+
+       if (lastBundleSettings) {
+         m_bundleSettings = lastBundleSettings;
+       }
+    }
+
     SerialNumberList snlist;
 
     QList<ImageList *> imagelists = m_project->images();
@@ -76,19 +90,26 @@ namespace Isis {
       }
     }
 
-//    ControlNet *cnet = m_selectedControl->controlNet();
 
-//    BundleAdjust bundleAdjustment(*m_bundleSettings, *cnet, snlist, false);
-    BundleAdjust bundleAdjustment(*m_bundleSettings, *m_selectedControlName, snlist, false);
+    BundleAdjust bundleAdjustment(*m_bundleSettings, *m_selectedControl, snlist, false);
     // run bundle (thread with BundleThread::QThread) - pump output to modeless dialog
-    // BundleResults results = bundleAdjustment.solveCholesky();
     bundleAdjustment.solveCholesky();
 
-//     if ( !bundleAdjustment.isConverged() ) {
-//        qDebug() << "Status = Bundle did not converge, camera pointing NOT updated";
-//      }
-//      else {
-//        bundleAdjustment.controlNet()->Write("ONET.net");
+    if ( bundleAdjustment.isConverged() ) {
+      // create BundleResults object
+      // BundleResults results = bundleAdjustment.solveCholesky();
+      // should be returned by BundleAdjustment?
+      QString fname = m_selectedControl->fileName();
+      BundleResults *dummyBundleResults = new BundleResults(*m_bundleSettings, fname);
+      dummyBundleResults->setRunTime(Isis::iTime::CurrentLocalTime().toAscii().data());
+      m_project->addBundleResults(dummyBundleResults);
+
+      // create output control net
+//      bundleAdjustment.controlNet()->Write("ONET.net");
+
+
+
+
 //        for (int i = 0; i < bundleAdjustment.images(); i++) {
 //          Process p;
 //          CubeAttributeInput inAtt;
@@ -119,21 +140,15 @@ namespace Isis {
 //          p.WriteHistory(*c);
 //        }
 //        qDebug() << "Status = Camera pointing updated";
-//      }
+    }
+    else
+      qDebug() << "Status = Bundle did not converge, camera pointing NOT updated";
 
-#if 0
+//#if 0
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // create dummy bundle results and add to project
-    BundleSettings *settings = new BundleSettings();
-    QString fname = m_selectedControl->fileName();
-//    BundleResults *bundleResults = new BundleResults(*settings,*cnet, fname);
-    BundleResults *bundleResults = new BundleResults(*settings, fname);
-    bundleResults->setRunTime(Isis::iTime::CurrentLocalTime().toAscii().data());
-    m_project->addBundleResults(bundleResults);
-
-
+    m_ui->useLastSettings->setEnabled(true);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#endif
+//#endif
   }
 }
 

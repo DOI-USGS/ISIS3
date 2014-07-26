@@ -24,6 +24,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
 #include "ControlPoint.h"
+#include "Control.h"
 #include "CorrelationMatrix.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -116,6 +117,30 @@ namespace Isis {
     m_bCleanUp = false;
     m_strCnetFileName = cnet;
     m_pCnet = new Isis::ControlNet(cnet, &progress);
+    m_pSnList = &snlist;
+    m_pHeldSnList = NULL;
+    m_bundleSettings = bundleSettings;
+
+    init();
+  }
+
+
+  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+                             Control &cnet,
+                             SerialNumberList &snlist,
+                             bool bPrintSummary) {
+    // initialize m_dConvergenceThreshold ???
+    // ??? deleted keyword ??? m_dConvergenceThreshold = 0.0;    // This is needed for deltack???
+    // ???                                   //JWB - this gets overwritten in Init... move to constructor ???????????????????????????????????????????????????????????????????????
+    // ???
+    // initialize constructor dependent settings...
+    // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
+    // m_bundleSettings
+    Progress progress;
+    m_bPrintSummary = bPrintSummary;
+    m_bCleanUp = false;
+    m_strCnetFileName = cnet.fileName();
+    m_pCnet = new Isis::ControlNet(cnet.fileName(), &progress);
     m_pSnList = &snlist;
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;

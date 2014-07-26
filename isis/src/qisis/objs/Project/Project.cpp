@@ -40,6 +40,7 @@
 #include <QXmlStreamWriter>
 
 #include "BundleResults.h"
+#include "BundleSettings.h"
 #include "Control.h"
 #include "ControlList.h"
 #include "CorrelationMatrix.h"
@@ -64,6 +65,7 @@ namespace Isis {
   Project::Project(Directory &directory, QObject *parent) :
       QObject(parent) {
 
+    m_bundleSettings = NULL;
     m_directory = &directory;
     m_projectRoot = NULL;
     m_cnetRoot = NULL;

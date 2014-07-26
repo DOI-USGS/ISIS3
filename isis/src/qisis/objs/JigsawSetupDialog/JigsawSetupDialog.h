@@ -30,7 +30,9 @@ namespace Isis {
     Q_OBJECT
 
   public:
-    explicit JigsawSetupDialog(Project* project, QWidget *parent = 0);
+//    explicit JigsawSetupDialog(Project* project, QWidget *parent = 0);
+    explicit JigsawSetupDialog(Project* project, bool useLastSettings = true,
+                               bool readOnly = false, QWidget *parent = 0);
     ~JigsawSetupDialog();
 
     Control *selectedControl();// TODO: return const references ???
@@ -48,6 +50,10 @@ namespace Isis {
     void on_maximumLikelihoodModel1ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel2ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel3ComboBox_currentIndexChanged(int index);
+
+  private:
+    void makeReadOnly()    ;
+    void fillFromSettings(BundleSettings* settings);
 
   private:
     Ui::JigsawSetupDialog *m_ui;

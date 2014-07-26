@@ -39,24 +39,48 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>10</x>
      <y>10</y>
-     <width>57</width>
-     <height>46</height>
+     <width>114</width>
+     <height>81</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QPushButton" name="JigsawSetupButton">
+      <property name="toolTip">
+       <string>Bundle Settings</string>
+      </property>
       <property name="text">
        <string>&amp;Setup</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/settings.png</normaloff>icons/settings.png</iconset>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QCheckBox" name="useLastSettings">
+      <property name="text">
+       <string>Use Last Settings</string>
       </property>
      </widget>
     </item>
     <item row="1" column="0">
      <widget class="QPushButton" name="JigsawRunButton">
+      <property name="acceptDrops">
+       <bool>false</bool>
+      </property>
+      <property name="toolTip">
+       <string>Run Bundle Adjustment</string>
+      </property>
       <property name="text">
        <string>&amp;Run</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/run.png</normaloff>icons/run.png</iconset>
       </property>
      </widget>
     </item>

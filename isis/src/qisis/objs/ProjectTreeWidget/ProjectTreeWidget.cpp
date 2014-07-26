@@ -97,6 +97,7 @@ namespace Isis {
     bool selectedProject = false;
     QPair<bool, ImageList *> selectedImageList(false, NULL);
     QList<Control *> selectedControls;
+    QList<BundleResults *> selectedBundleResults;
 
     /*
      * This variable is temporary. It will be removed when we figure out the tree structure for
@@ -412,6 +413,13 @@ namespace Isis {
 
     item->addChild(settingsItem);
     item->addChild(statisticsItem);
+
+    QTreeWidgetItem *imagesParentItem = new QTreeWidgetItem(item);
+    imagesParentItem->setText(0, tr("Images"));
+    imagesParentItem->setFlags(Qt::ItemIsEnabled |
+                                 Qt::ItemIsSelectable);
+    imagesParentItem->setExpanded(true);
+    imagesParentItem->setIcon(0, QIcon(":pictures"));
 
     expandItem(item);
 

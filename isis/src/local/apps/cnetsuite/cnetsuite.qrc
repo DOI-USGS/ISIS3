@@ -24,5 +24,6 @@
     <file alias="ice">icons/ice.png</file>
     <file alias="statistics">icons/statistics.png</file>
     <file alias="settings">icons/settings.png</file>
+    <file alias="run">icons/run.png</file>
   </qresource>
 </RCC>
