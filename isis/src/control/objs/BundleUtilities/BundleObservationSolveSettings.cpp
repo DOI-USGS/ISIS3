@@ -24,7 +24,7 @@ namespace Isis {
     // Spacecraft Position Options
     m_instrumentPositionSolveOption = NoPositionFactors;
     m_spkDegree = 2;
-    m_spkSolveDegree = 2;// ??? default to match no position factors is -1
+    m_spkSolveDegree = -1;// ??? default to match no position factors is -1
     m_solvePositionOverHermiteSpline = false;
     m_positionInterpolationType = SpicePosition::PolyFunction;
     m_positionAprioriSigma.clear();
@@ -33,7 +33,7 @@ namespace Isis {
     m_instrumentPointingSolveOption = AnglesOnly;
     m_solveTwist = true;
     m_ckDegree = 2;
-    m_ckSolveDegree = 2; // ??? default to match angles only is 0
+    m_ckSolveDegree = 0; // ??? default to match angles only is 0
     m_solvePointingPolynomialOverExisting = false;
     m_pointingInterpolationType = SpiceRotation::PolyFunction;
     m_numberCamAngleCoefSolved = 1;
@@ -347,9 +347,14 @@ namespace Isis {
 
   
   void BundleObservationSolveSettings::setInstrumentPointingSettings(
-      InstrumentPointingSolveOption option, bool solveTwist, int ckDegree, int ckSolveDegree,
-      bool solvePolynomialOverExisting, double anglesAprioriSigma, 
-      double angularVelocityAprioriSigma, double angularAccelerationAprioriSigma) {
+                                           InstrumentPointingSolveOption option, 
+                                           bool solveTwist, 
+                                           int ckDegree, 
+                                           int ckSolveDegree,
+                                           bool solvePolynomialOverExisting, 
+                                           double anglesAprioriSigma, 
+                                           double angularVelocityAprioriSigma, 
+                                           double angularAccelerationAprioriSigma) {
 
     // automatically set the solve option and ck degree to the user entered values
     m_instrumentPointingSolveOption = option;
@@ -359,29 +364,18 @@ namespace Isis {
     // it matches the appropriate polynomial size. also, we will only solve for polynomial over
     // the existing if we are solving for all coefficients ??? VERIFY
 
-  // ???  if (option == AllPointingCoefficients) {
+    if (option == AllPointingCoefficients) {
       m_ckSolveDegree = ckSolveDegree;
-      m_solvePointingPolynomialOverExisting = solvePolynomialOverExisting;
-  // ???    }
-  // ???    else {
-  // ???      m_ckSolveDegree = ((int) option) - 1;
-  // ???      m_solvePointingPolynomialOverExisting = false;
-  // ???    }
+    }
+    else {
+        m_ckSolveDegree = ((int) option) - 1;
+    }
 
     // we are solving for (solve degree + 1) coefficients
     // this is the maximum number of apriori sigmas allowed
     m_numberCamAngleCoefSolved = m_ckSolveDegree + 1;
 
-
-if (option != AllPointingCoefficients) {
-    m_numberCamAngleCoefSolved = ((int) option);
-
-}
-
-
-
     m_anglesAprioriSigma.clear();
-
     if (m_numberCamAngleCoefSolved > 0) {
       m_anglesAprioriSigma.append(anglesAprioriSigma);
 
@@ -397,27 +391,24 @@ if (option != AllPointingCoefficients) {
     m_solveTwist = solveTwist; // dependent on solve option???
 
     // Set the SpiceRotation interpolation type enum appropriately 
+    m_solvePointingPolynomialOverExisting = solvePolynomialOverExisting;
     if (m_solvePointingPolynomialOverExisting) {
       m_pointingInterpolationType = SpiceRotation::PolyFunctionOverSpice;
     }
     else {
       m_pointingInterpolationType = SpiceRotation::PolyFunction;
     }
-
   
   }
 
 
-    BundleObservationSolveSettings::InstrumentPointingSolveOption
+
+  BundleObservationSolveSettings::InstrumentPointingSolveOption
       BundleObservationSolveSettings::instrumentPointingSolveOption() const {
     return m_instrumentPointingSolveOption;
   }
-  /**
-   * TODO
-   */
-  SpiceRotation::Source BundleObservationSolveSettings::pointingInterpolationType() const {
-    return m_pointingInterpolationType;
-  }
+
+
 
   /**
    * TODO
@@ -427,12 +418,14 @@ if (option != AllPointingCoefficients) {
   }
 
 
+
   /**
    * TODO
    */
   int BundleObservationSolveSettings::ckDegree() const {
     return m_ckDegree;
   }
+
 
 
   /**
@@ -452,12 +445,16 @@ if (option != AllPointingCoefficients) {
   }
 
 
+
   /**
    * TODO
    */
   bool BundleObservationSolveSettings::solvePolyOverPointing() const {
     return m_solvePointingPolynomialOverExisting;
   }
+
+
+
   /**
    * TODO
    */
@@ -465,6 +462,14 @@ if (option != AllPointingCoefficients) {
     return m_anglesAprioriSigma;
   }
 
+
+
+  /**
+   * TODO
+   */
+  SpiceRotation::Source BundleObservationSolveSettings::pointingInterpolationType() const {
+    return m_pointingInterpolationType;
+  }
 
 
   // =============================================================================================//
@@ -512,9 +517,13 @@ if (option != AllPointingCoefficients) {
    * TODO
    */
   void BundleObservationSolveSettings::setInstrumentPositionSettings(
-      InstrumentPositionSolveOption option, int spkDegree, int spkSolveDegree, 
-      bool positionOverHermite, double positionAprioriSigma, double velocityAprioriSigma, 
-      double accelerationAprioriSigma) {
+                                           InstrumentPositionSolveOption option, 
+                                           int spkDegree, 
+                                           int spkSolveDegree, 
+                                           bool positionOverHermite, 
+                                           double positionAprioriSigma, 
+                                           double velocityAprioriSigma, 
+                                           double accelerationAprioriSigma) {
     // automatically set the solve option and spk degree to the user entered values
     m_instrumentPositionSolveOption = option;
     m_spkDegree = spkDegree;
@@ -522,24 +531,16 @@ if (option != AllPointingCoefficients) {
     // the spk solve degree entered is only used if we are solving for all coefficients, otherwise
     // it matches the appropriate polynomial size. also, we will only solve for position over a
     // Hermite spline if we are solving for all coefficients ??? VERIFY
-    // ???  if (option == AllPositionCoefficients) {
+    if (option == AllPositionCoefficients) {
       m_spkSolveDegree = spkSolveDegree;
-  // ???    }
-  // ???    else {
-  // ???      m_spkSolveDegree = ((int) option) - 1;
-  // ???    }
+    }
+    else {
+      m_spkSolveDegree = ((int) option) - 1;
+    }
 
     // we are solving for (solve degree + 1) coefficients
     // this is the maximum number of apriori sigmas allowed
     m_numberCamPosCoefSolved = m_spkSolveDegree + 1;
-
-
-
-    if (option != AllPositionCoefficients) {
-      m_numberCamPosCoefSolved = ((int) option);
-    }
-
-
 
     m_positionAprioriSigma.clear();
     if (m_numberCamPosCoefSolved > 0) {
@@ -553,7 +554,7 @@ if (option != AllPointingCoefficients) {
     }
 
     // Set the SpicePosition interpolation type enum appropriately 
-      m_solvePositionOverHermiteSpline = positionOverHermite;
+    m_solvePositionOverHermiteSpline = positionOverHermite;
     if (m_solvePositionOverHermiteSpline) {
       m_positionInterpolationType = SpicePosition::PolyFunctionOverHermiteConstant;
     }
@@ -568,12 +569,6 @@ if (option != AllPointingCoefficients) {
   BundleObservationSolveSettings::InstrumentPositionSolveOption
       BundleObservationSolveSettings::instrumentPositionSolveOption() const {
     return m_instrumentPositionSolveOption;
-  }
-
-
-
-  SpicePosition::Source BundleObservationSolveSettings::positionInterpolationType() const {
-    return m_positionInterpolationType;
   }
 
 
@@ -614,6 +609,10 @@ if (option != AllPointingCoefficients) {
 
 
 
+  SpicePosition::Source BundleObservationSolveSettings::positionInterpolationType() const {
+    return m_positionInterpolationType;
+  }
+
   // =============================================================================================//
   // =============================================================================================//
   // =============================================================================================//
@@ -631,21 +630,39 @@ if (option != AllPointingCoefficients) {
 
     pvl += PvlKeyword("InstrumentPointingSolveOption", 
                       instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
-    pvl += PvlKeyword("SolveTwist", toString(m_solveTwist));
-    pvl += PvlKeyword("CKDegree", toString(m_ckDegree));
-    pvl += PvlKeyword("CKSolveDegree", toString(m_ckSolveDegree));
+    pvl += PvlKeyword("SolveTwist", toString(m_solveTwist));  // TODO: omit from pvl if pointing option == None ??? 
+    pvl += PvlKeyword("CKDegree", toString(m_ckDegree));  // TODO: omit from pvl if pointing option == None ??? 
+    if (m_instrumentPointingSolveOption != NoPointingFactors) {
+      pvl += PvlKeyword("CKSolveDegree", toString(m_ckSolveDegree));
+    }
+    else {
+      pvl += PvlKeyword("CKSolveDegree", "N/A"); // or omit from pvl ??? 
+    }
     pvl += PvlKeyword("NumberAngleCoefficientsSolved", toString(m_numberCamAngleCoefSolved));
     pvl += PvlKeyword("SolvePointingPolynomialOverExisting", 
-                      toString(m_solvePointingPolynomialOverExisting));
+                      toString(m_solvePointingPolynomialOverExisting));  // TODO: omit from pvl if pointing option == None ??? 
 
-    PvlKeyword angleSigmas("AngleAprioriSigmas");
-    for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {// m_numberCamAngleCoefSolved != m_anglesAprioriSigma.size()???
-      angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
+    PvlKeyword angleSigmas("AngleAprioriSigmas");  // TODO: omit from pvl if pointing option == None ??? 
+    if (m_anglesAprioriSigma.size() > 0) {
+      for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
+        if (m_anglesAprioriSigma[i] > 0) {
+          angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
+        }
+        else {
+          angleSigmas.addValue("N/A");
+        }
+      }
+    }
+    else {
+      angleSigmas.addValue("N/A"); // or omit from pvl ??? 
     }
     pvl += angleSigmas;
 
     pvl += PvlKeyword("InstrumentPointingInterpolationType",
-                      toString((int)m_pointingInterpolationType));
+                      toString((int)m_pointingInterpolationType));  // TODO: omit from pvl if pointing option == None ??? 
+
+    // position
+
     pvl += PvlKeyword("InstrumentPositionSolveOption", 
                       instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
     pvl += PvlKeyword("SPKDegree", toString(m_spkDegree));
@@ -654,8 +671,14 @@ if (option != AllPointingCoefficients) {
     pvl += PvlKeyword("SolvePositionOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
 
     PvlKeyword positionSigmas("PositionAprioriSigmas");
-    for (int i = 0; i < m_positionAprioriSigma.size(); i++) {// m_numberCamPosCoefSolved != m_positionAprioriSigma.size()???
-      positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
+    for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
+      if (m_positionAprioriSigma[i] > 0) {
+        positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
+      }
+      else {
+        angleSigmas.addValue("N/A");
+      }
+
     }
     pvl += positionSigmas;
 
