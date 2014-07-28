@@ -8,7 +8,7 @@
 #include "Control.h"
 #include "iTime.h"
 #include "JigsawSetupDialog.h"
-#include "ui_jigsawdialog.h"
+#include "ui_JigsawDialog.h"
 #include "Process.h"
 #include "Project.h"
 
@@ -92,6 +92,7 @@ namespace Isis {
 
 
     BundleAdjust bundleAdjustment(*m_bundleSettings, *m_selectedControl, snlist, false);
+    // BundleAdjust bundleAdjustment(*m_bundleSettings, *m_selectedControlName,
     // run bundle (thread with BundleThread::QThread) - pump output to modeless dialog
     bundleAdjustment.solveCholesky();
 
@@ -141,8 +142,9 @@ namespace Isis {
 //        }
 //        qDebug() << "Status = Camera pointing updated";
     }
-    else
+    else {
       qDebug() << "Status = Bundle did not converge, camera pointing NOT updated";
+    }
 
 //#if 0
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
