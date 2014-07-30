@@ -97,9 +97,6 @@ namespace Isis {
       //! This map holds the images used to create this matrix and their associated parameters.
       QMap<QString, QStringList> *m_imagesAndParameters;
 
-      //! This map holds the images and parameters associated with the block in focus.
-      QMap<QString, QStringList> *m_visibleImagesAndParameters;
-
       //! FileName of the covariance matrix calculated when the bundle was run.
       FileName *m_covarianceFileName;
 

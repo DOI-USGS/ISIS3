@@ -66,7 +66,6 @@ namespace Isis {
    *         is of type CorrelationMatrix.
    */
   bool MatrixViewWorkOrder::isExecutable(CorrelationMatrix *matrix) {
-    // qDebug() << "MatrixViewWorkOrder::isExecutable";
     return matrix->isValid();
   }
 
@@ -77,7 +76,6 @@ namespace Isis {
    *
    */
   bool MatrixViewWorkOrder::execute() {
-    // qDebug() << "MatrixViewWorkOrder::execute";
     bool success = WorkOrder::execute();
 
     if (success) {
@@ -115,11 +113,8 @@ namespace Isis {
       else if (viewToUse != -1) {
         MatrixSceneWidget *matrixView = existingViews[viewToUse];
 
-
         matrixView->drawGrid( project()->correlationMatrix() );
         matrixView->drawElements( project()->correlationMatrix() );
-
-
       }
 
       QStringList internalData;

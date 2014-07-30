@@ -19,7 +19,6 @@ namespace Isis {
    */
   CorrelationMatrix::CorrelationMatrix() {
     m_imagesAndParameters = NULL;
-    m_visibleImagesAndParameters = NULL; // TODO: unused variable ???
     m_covarianceFileName = NULL; // new FileName("/work/users/koyama/testData/covarianceMatrix2.dat");
     m_correlationFileName = NULL; // new FileName("/work/users/koyama/testData/correlationMatrix.dat");
     m_diagonals = NULL;
@@ -72,7 +71,6 @@ namespace Isis {
    */
   CorrelationMatrix::CorrelationMatrix(PvlObject storedMatrixData) {
     m_imagesAndParameters = NULL;
-    m_visibleImagesAndParameters = NULL; // TODO: unused variable ???
     m_covarianceFileName = NULL;
     m_correlationFileName = NULL;
     m_diagonals = NULL;
@@ -129,8 +127,6 @@ namespace Isis {
    */
   CorrelationMatrix::CorrelationMatrix(const CorrelationMatrix &other) {
     m_imagesAndParameters = new QMap<QString, QStringList>(*other.m_imagesAndParameters);
-    m_visibleImagesAndParameters
-        = new QMap<QString, QStringList>(*other.m_visibleImagesAndParameters); // TODO: unused variable ???
     m_covarianceFileName = new FileName(*other.m_covarianceFileName);
     m_correlationFileName = new FileName(*other.m_correlationFileName);
     m_diagonals = new QList<double>(*other.m_diagonals);
@@ -164,9 +160,6 @@ namespace Isis {
 //   delete m_imagesAndParameters;
 //   m_imagesAndParameters = NULL;
 
-    delete m_visibleImagesAndParameters; // TODO: unused variable ???
-    m_visibleImagesAndParameters = NULL; // TODO: unused variable ???
-
     delete m_covarianceFileName;
     m_covarianceFileName = NULL;
 
@@ -197,10 +190,6 @@ namespace Isis {
 
       delete m_imagesAndParameters;
       m_imagesAndParameters = new QMap<QString, QStringList>(*other.m_imagesAndParameters);
-  
-      delete m_visibleImagesAndParameters; // TODO: unused variable ???
-      m_visibleImagesAndParameters
-          = new QMap<QString, QStringList>(*other.m_visibleImagesAndParameters); // TODO: unused variable ???
   
       delete m_covarianceFileName;
       m_covarianceFileName = new FileName(*other.m_covarianceFileName);
@@ -500,7 +489,7 @@ namespace Isis {
 
   QDataStream &CorrelationMatrix::write(QDataStream &stream) const {
     // QMaps
-    stream << *m_imagesAndParameters << *m_visibleImagesAndParameters;
+    stream << *m_imagesAndParameters;
     // FileNames
     stream << m_covarianceFileName->expanded() << m_correlationFileName->expanded();
     // QLists
@@ -516,11 +505,6 @@ namespace Isis {
     stream >> imagesAndParameters;
     delete m_imagesAndParameters;
     m_imagesAndParameters = new QMap<QString, QStringList>(imagesAndParameters);
-
-    QMap<QString, QStringList> visibleImagesAndParameters;
-    stream >> visibleImagesAndParameters;
-    delete m_visibleImagesAndParameters;
-    m_visibleImagesAndParameters = new QMap<QString, QStringList>(visibleImagesAndParameters);
 
     // FileNames
     QString covarianceFileName;

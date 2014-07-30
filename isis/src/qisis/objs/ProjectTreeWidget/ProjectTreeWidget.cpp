@@ -21,6 +21,8 @@
 #include "ControlGroupTreeWidgetItem.h"
 #include "ControlList.h"
 #include "ControlTreeWidgetItem.h"
+#include "CorrelationMatrix.h"
+#include "CorrMatTreeWidgetItem.h"
 #include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
@@ -98,12 +100,8 @@ namespace Isis {
     QPair<bool, ImageList *> selectedImageList(false, NULL);
     QList<Control *> selectedControls;
     QList<BundleResults *> selectedBundleResults;
+    CorrMatTreeWidgetItem *corrMatItem = NULL;
 
-    /*
-     * This variable is temporary. It will be removed when we figure out the tree structure for
-     * the bundle stuff.
-     */
-    bool bundle = false;
 
     foreach (QTreeWidgetItem *item, selected) {
       if (item == m_projectItem) {
@@ -146,36 +144,29 @@ namespace Isis {
           }
         }
       }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-      if (item == m_resultsParentItem) {
-        bundle = true;
-      }
-    //////////////////////////////////////////////////////////////////////////////////////////////
+      
+      corrMatItem = dynamic_cast<CorrMatTreeWidgetItem *>(item);
     }
 
     QList<QAction *> workOrders;
     if (selectedProject) {
-      bundle = false;
       workOrders.append(m_directory->supportedActions(WorkOrder::ProjectContext));
     }
 
     if (selectedImageList.second) {
-      bundle = false;
       workOrders.append(selectedImageList.second->supportedActions(m_directory->project()));
       workOrders.append(NULL);
       workOrders.append(m_directory->supportedActions(selectedImageList.second));
     }
 
     if (selectedControls.count()) {
-      bundle = false;
       workOrders.append(m_directory->supportedActions(selectedControls));
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
-    if (bundle) {
-      workOrders.append( m_directory->supportedActions(
-                                          m_directory->project()->correlationMatrix() ) );
+    if (corrMatItem) {
+//       CorrelationMatrix *corrMatPtr = new CorrelationMatrix(corrMatItem->correlationMatrix());
+      workOrders.append( m_directory->supportedActions(m_directory->project()->correlationMatrix()));//corrMatPtr) );
     }
     //////////////////////////////////////////////////////////////////////////////////////////////
     foreach(QAction *action, workOrders) {
@@ -407,22 +398,24 @@ namespace Isis {
 
     BundleSettings *bundleSettings = bundleResults->bundleSettings();
     BundleStatistics *bundleStatistics = bundleResults->bundleStatistics();
+//     CorrelationMatrix corrMat = *m_directory->project()->correlationMatrix();//bundleStatistics->correlationMatrix();
 
     QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(bundleSettings);
     QTreeWidgetItem *statisticsItem = new BundleStatisticsTreeWidgetItem(bundleStatistics);
+    QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem(m_directory->project()->correlationMatrix());
+
+    statisticsItem->addChild(corrMatItem);
 
     item->addChild(settingsItem);
     item->addChild(statisticsItem);
 
     QTreeWidgetItem *imagesParentItem = new QTreeWidgetItem(item);
     imagesParentItem->setText(0, tr("Images"));
-    imagesParentItem->setFlags(Qt::ItemIsEnabled |
-                                 Qt::ItemIsSelectable);
+    imagesParentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     imagesParentItem->setExpanded(true);
     imagesParentItem->setIcon(0, QIcon(":pictures"));
 
     expandItem(item);
-
 
     //  Create new TreeWidgetItem
 //    if (!found.isEmpty()) {
