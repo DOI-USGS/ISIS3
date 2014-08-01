@@ -53,7 +53,8 @@ namespace Isis {
                      ~ShowTableMenuOption &
                      ~ClearPlotMenuOption &
                      ~ShowHideMarkersMenuOption &
-                     ~ShowHideCurvesMenuOption)) {
+                     ~ShowHideCurvesMenuOption &
+                     ~ConfigurePlotMenuOption)) {
     m_xAxisCube = xAxisCube;
     m_yAxisCube = yAxisCube;
     m_xAxisCubeBand = xAxisBand;

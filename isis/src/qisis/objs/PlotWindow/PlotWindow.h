@@ -48,6 +48,7 @@ template <typename A, typename B> class QPair;
 namespace Isis {
   class MdiCubeViewport;
   class CubePlotCurve;
+  //class CubePlotCurveConfigureDialog;
   class PvlKeyword;
   class TableMainWindow;
 
@@ -70,6 +71,13 @@ namespace Isis {
    *                           in order to increase performance. References #710.
    *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to 
    *                           relative pathnames. Fixes #2054.
+   *   @history 2014-07-02 Ian Humphrey - Added method configurePlotCurves() to create a configure 
+   *                           tool that allows user to select which curve to configure from a combo
+   *                           box. Added MenuOption ConfigurePlotMenuOption. Fixes #2089.
+   *   @history 2014-07-24 Ian Humphrey - Modified plotCurves() and plotSpectrograms() methods to
+   *                           return a list of curves/spectrograms in the order they appear in
+   *                           the plot (instead of reversed). Used for refactoring. References
+   *                           #2089.
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT
@@ -147,6 +155,12 @@ namespace Isis {
          *   allows the user to create new plot curves.
          */
         LineFitMenuOption          = 8192,
+        
+        /**
+         * This option allows the user to change the curve name, color, style size, and 
+         *   symbol of the curve.
+         */
+        ConfigurePlotMenuOption    = 16384, 
         /**
          * This is all of the available menu options.
          */
@@ -156,7 +170,10 @@ namespace Isis {
                          BackgroundSwitchMenuOption | ShowHideGridMenuOption |
                          RenameLabelsMenuOption | SetDisplayRangeMenuOption |
                          ResetScaleMenuOption | ClearPlotMenuOption |
-                         DefaultHelpMenuOption | LineFitMenuOption
+                         DefaultHelpMenuOption | LineFitMenuOption |
+                         ConfigurePlotMenuOption
+                         
+                          
       };
 
       PlotWindow(QString title, PlotCurve::Units xAxisUnits,
@@ -202,6 +219,7 @@ namespace Isis {
 
     public slots:
       void clearPlot();
+      void configurePlotCurves();
       void createBestFitLine();
       void printPlot();
       void changePlotLabels();

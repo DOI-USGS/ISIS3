@@ -18,6 +18,7 @@
 
 #include "Cube.h"
 #include "CubePlotCurve.h"
+#include "CubePlotCurveConfigureDialog.h" //
 #include "CubeViewport.h"
 #include "FileName.h"
 #include "Interpolator.h"
@@ -52,6 +53,7 @@ namespace Isis {
                          PlotCurve::Units yAxisUnits, QWidget *parent,
                          MenuOptions optionsToProvide) :
         MainWindow(title, parent) {
+          
     m_toolBar = NULL;
     m_menubar = NULL;
     m_tableWindow = NULL;
@@ -314,7 +316,7 @@ namespace Isis {
 
     const QwtPlotItemList &plotItems = m_plot->itemList();
 
-    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+    for (int itemIndex = 0; itemIndex < plotItems.size(); itemIndex++) {  
       QwtPlotItem *item = plotItems[itemIndex];
 
       if (item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
@@ -340,7 +342,7 @@ namespace Isis {
 
     const QwtPlotItemList &plotItems = m_plot->itemList();
 
-    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+    for (int itemIndex = 0; itemIndex < plotItems.size(); itemIndex++) {
       const QwtPlotItem *item = plotItems[itemIndex];
 
       if (item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
@@ -367,7 +369,7 @@ namespace Isis {
 
     const QwtPlotItemList &plotItems = m_plot->itemList();
 
-    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+    for (int itemIndex = 0; itemIndex < plotItems.size(); itemIndex++) {  
       QwtPlotItem *item = plotItems[itemIndex];
 
       if (item->rtti() == QwtPlotItem::Rtti_PlotSpectrogram) {
@@ -395,7 +397,7 @@ namespace Isis {
 
     const QwtPlotItemList &plotItems = m_plot->itemList();
 
-    for (int itemIndex = plotItems.size()- 1; itemIndex >= 0; itemIndex --) {
+    for (int itemIndex = 0; itemIndex < plotItems.size(); itemIndex++) {  
       const QwtPlotItem *item = plotItems[itemIndex];
 
       if (item->rtti() == QwtPlotItem::Rtti_PlotSpectrogram) {
@@ -480,7 +482,26 @@ namespace Isis {
     }
   }
 
+  
+  /**
+   * This method creates a CubePlotCurveConfigureDialog object. When there are no curves in this
+   * PlotWindow, the dialog will not be created.
+   */
+  void PlotWindow::configurePlotCurves() {
+    // make sure that there are CubePlotCurves to configure
+    QList<CubePlotCurve *> curves = plotCurves();
+    // can't configure 0 curves - menu item is deactivated
+    if (curves.size() < 1) {
+      return;
+    }
+    CubePlotCurve *curve = curves.first();
+    CubePlotCurveConfigureDialog *configDialog = new CubePlotCurveConfigureDialog(curve, this);
+    configDialog->exec();
+    
+    emit plotChanged();
+  }
 
+  
   /**
    * This method prompts the user to select the best fit line criterea. The
    *   PlotWindowBestFitDialog will create the best fit line automatically
@@ -491,8 +512,8 @@ namespace Isis {
     PlotWindowBestFitDialog *dialog = new PlotWindowBestFitDialog(this, plot());
     dialog->show();
   }
-
-
+  
+  
   /**
    * This method also clears the plot of all plot items, but does
    * not call the table delete stuff This method is called from
@@ -1007,7 +1028,7 @@ namespace Isis {
     QMenu *fileMenu = new QMenu("&File");
     QMenu *editMenu = new QMenu("&Edit");
     QMenu *optionsMenu = new QMenu("&Options");
-    QMenu *helpMenu = new QMenu("&Help");
+//     QMenu *helpMenu = new QMenu("&Help");
 
     if ((optionsToProvide & SaveMenuOption) == SaveMenuOption) {
       QAction *save = new QAction(m_plot);
@@ -1020,7 +1041,6 @@ namespace Isis {
       fileMenu->addAction(save);
       actions.push_back(save);
     }
-
 
     if ((optionsToProvide & PrintMenuOption) == PrintMenuOption) {
       QAction *prt = new QAction(m_plot);
@@ -1188,11 +1208,25 @@ namespace Isis {
       QString text = "<b>Function:</b>  Calculates a best fit line from an "
                      "existing curve.";
       lineFit->setWhatsThis(text);
-      connect(lineFit, SIGNAL(activated()), this, SLOT(createBestFitLine()));
+      connect(lineFit, SIGNAL(activated()), this, SLOT( createBestFitLine() ) );
       optionsMenu->addAction(lineFit);
       actions.push_back(lineFit);
     }
 
+    if ((optionsToProvide & ConfigurePlotMenuOption) == ConfigurePlotMenuOption) {
+      QAction *configurePlot = new QAction(m_plot);
+      configurePlot->setText("Configure Plot");
+      configurePlot->setIcon( 
+          QPixmap( FileName("$base/icons/plot_configure.png").expanded() ) );
+      QString text = "<b>Function:</b> Change the name, color, style, and vertex symbol of the "
+                     "curves.";
+      configurePlot->setWhatsThis(text);
+      connect( configurePlot, SIGNAL( activated() ),
+               this, SLOT( configurePlotCurves() ) );
+      optionsMenu->addAction(configurePlot);
+      actions.push_back(configurePlot);
+    }
+    
     /*setup menus*/
     m_pasteAct = new QAction(QIcon::fromTheme("edit-paste"),
                              "&Paste Curve", m_plot);
@@ -1201,6 +1235,12 @@ namespace Isis {
     connect(m_pasteAct, SIGNAL(triggered()),
             this, SLOT(pasteCurve()));
     editMenu->addAction(m_pasteAct);
+    
+//     QAction *basicHelp = new QAction(m_plot);
+//     basicHelp->setText("Basic Help");
+//     connect( basicHelp, SIGNAL( activated() ),
+//              this, SLOT( showHelp() ) );
+//     helpMenu->addAction(basicHelp);
 
     menu.push_back(fileMenu);
     menu.push_back(editMenu);
@@ -1213,13 +1253,13 @@ namespace Isis {
       optionsMenu = NULL;
     }
 
-    if (helpMenu->actions().size()) {
-      menu.push_back(helpMenu);
-    }
-    else {
-      delete helpMenu;
-      helpMenu = NULL;
-    }
+//    if (helpMenu->actions().size()) {
+//       menu.push_back(helpMenu);
+//     }
+//     else {
+//       delete helpMenu;
+//       helpMenu = NULL;
+//     }
 
     setMenus(menu, actions);
   }

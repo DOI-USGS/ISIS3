@@ -21,6 +21,10 @@ namespace Isis {
    * @author 2012-01-18 Steven Lambright
    *
    * @internal
+   *   @history 2014-07-24 Ian Humphrey - modified readCurvesFromWindow() to add curves/spectrograms
+   *                           to the dialog's combobox in sequential order (from first to last) as
+   *                           opposed to reverse order. References #2089.
+   *                           
    */
   class PlotWindowBestFitDialog : public QDialog {
       Q_OBJECT

@@ -52,6 +52,8 @@ namespace Isis {
    *                         check for length of line used to draw profile to make sure it
    *                         is greater than zero to avoid divide by zero error. Fixes #1921
    *                         and #1950.
+   *   @history 2014-07-31 Ian Humphrey - Added What's This help for SpatialPlotTool.
+   *                           References #2089.
    */
   class SpatialPlotTool : public AbstractPlotTool {
       Q_OBJECT

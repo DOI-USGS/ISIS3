@@ -62,7 +62,9 @@ namespace Isis {
    *                           necessary. Fixes #688.
    *   @history 2012-03-14 Tracie Sucharski - Added functionality for multiple
    *                           viewports as a source for plots.
-   */
+   *   @history 2014-07-02 Ian Humphrey - Added comment for executing configure dialog. 
+   *                           References #2089.
+   */  
   class CubePlotCurve : public QObject, public PlotCurve {
       Q_OBJECT
 

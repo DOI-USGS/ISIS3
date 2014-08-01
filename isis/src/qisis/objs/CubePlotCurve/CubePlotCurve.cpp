@@ -467,6 +467,8 @@ namespace Isis {
           deleteThisCurve = true;
         }
       }
+      // handle the configure action dialog 
+      // opens the dialog with only the right-clicked CubePlotCurve
       else if (chosenAct == configureAct) {
         CubePlotCurveConfigureDialog configure(this);
         configure.exec();

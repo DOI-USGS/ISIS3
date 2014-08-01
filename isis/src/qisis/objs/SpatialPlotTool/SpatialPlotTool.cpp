@@ -44,9 +44,6 @@ namespace Isis {
    */
   SpatialPlotTool::SpatialPlotTool(QWidget *parent) : AbstractPlotTool(parent),
       m_spatialCurves(new QMap<MdiCubeViewport *, QPointer<CubePlotCurve> >) {
-    m_toolPadAction = new QAction(this);
-    m_toolPadAction->setText("Spatial Plot Tool");
-    m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spatial_plot.png"));
     //connect(m_toolPadAction, SIGNAL(activated()), this, SLOT(showPlotWindow()));
     connect(this, SIGNAL(viewportChanged()), this, SLOT(viewportSelected()));
 
@@ -77,13 +74,18 @@ namespace Isis {
 
 
   /**
+   * This method configures the QAction for this tool
    *
+   * @param toolpad - the ToolPad to add the SpatialPlotTool to
    *
-   * @param toolpad
-   *
-   * @return QAction*
+   * @return QAction* - the QAction that was created for this tool
    */
   QAction *SpatialPlotTool::toolPadAction(ToolPad *toolpad) {
+    m_toolPadAction = new QAction(toolpad);
+    m_toolPadAction->setText("Spatial Plot Tool");
+    m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spatial_plot.png"));
+    QString text = "<b>Function:</b> Create a spatial plot of the selected pixels' DN values.";
+    m_toolPadAction->setWhatsThis(text);
     return m_toolPadAction;
   }
 

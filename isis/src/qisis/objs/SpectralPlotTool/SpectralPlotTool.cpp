@@ -42,12 +42,6 @@ namespace Isis {
       m_stdDev2Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >),
       m_stdErr1Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >),
       m_stdErr2Curves(new QMap< MdiCubeViewport *, QPointer<CubePlotCurve> >) {
-    m_toolPadAction = new QAction(this);
-    m_toolPadAction->setText("Spectral Plot Tool");
-    m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spectral_plot.png"));
-    QString text = "<b>Function:</b> Create a spectral plot using statistics across a spectrum \
-                    (bands).";
-    m_toolPadAction->setWhatsThis(text);
     connect(this, SIGNAL(viewportChanged()), this, SLOT(viewportSelected()));
 
     m_displayCombo = new QComboBox;
@@ -140,13 +134,19 @@ namespace Isis {
 
 
   /**
+   * This method configures the QAction for this tool
    *
+   * @param toolpad - the ToolPad to add the SpectralPlotTool to
    *
-   * @param toolpad
-   *
-   * @return QAction*
+   * @return QAction* - the QAction that was created for this tool
    */
   QAction *SpectralPlotTool::toolPadAction(ToolPad *toolpad) {
+    m_toolPadAction = new QAction(toolpad);
+    m_toolPadAction->setText("Spectral Plot Tool");
+    m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spectral_plot.png"));
+    QString text = "<b>Function:</b> Create a spectral plot using statistics across a spectrum "
+                   "(bands).";
+    m_toolPadAction->setWhatsThis(text);
     return m_toolPadAction;
   }
 
