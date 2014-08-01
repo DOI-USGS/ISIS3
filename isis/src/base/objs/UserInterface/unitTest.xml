@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<application name="hist" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Unit test for IsisUserInterface class
   </brief>
@@ -22,6 +22,10 @@
     <change name="Jeannie Backer" date="2011-08-19">
       Replaced test cube path /tmp/... with $temporary/...
     </change>
+    <change name="Ian Humphrey" date="2014-06-17">
+      Replaced application name="hist" with name="unitTest".
+      Added a new group of parameters to test -HELP=value.
+    </change>
   </history>
 
   <groups>
@@ -32,7 +36,7 @@
           Test cube
         </brief>
         <description>
-          Test cube
+          Test cube, tests pixelType
         </description>
         <filter>
           *.cub
@@ -41,6 +45,7 @@
       </parameter>
       <parameter name="TO">
         <type>filename</type>
+        <pixelType>real</pixelType>
         <brief>
           Test cube
         </brief>
@@ -53,5 +58,112 @@
         <default><item>$temporary/junk.dat</item></default>
       </parameter>
     </group>
+    
+    <group name="UnitTest Parameters">
+      <parameter name="TESTONE">
+        <type>integer</type>
+        <brief>
+          unitTest test 1
+        </brief>
+        <description>
+          Tests inclusive minimum, inclusive maximum, lessThan, lessThanOrEqual, internalDefault
+        </description>
+        <lessThan>
+          <item>TESTTWO</item>
+        </lessThan>
+        <lessThanOrEqual>
+          <item>TESTTHREE</item>
+        </lessThanOrEqual>
+        <minimum inclusive="YES">0</minimum>
+        <maximum inclusive="YES">100</maximum>
+        <default><item>0</item></default>
+        <internalDefault>None</internalDefault>
+      </parameter>
+      
+      <parameter name="TESTTWO">
+        <type>integer</type>
+        <brief>
+          unitTest test 2
+        </brief>
+        <description>
+          Tests noninclusive minimum, noninclusive maximum, odd, greaterThan, greaterThanOrEqual
+        </description>
+        <odd />
+        <greaterThan>
+          <item>TESTONE</item>
+        </greaterThan>
+        <greaterThanOrEqual>
+          <item>TESTTHREE</item>
+        </greaterThanOrEqual>
+        <minimum>0</minimum>
+        <maximum>100</maximum>
+        <default><item>1</item></default>
+      </parameter>
+      
+      <parameter name="TESTTHREE">
+        <type>integer</type>
+        <brief>
+          unitTest test 3
+        </brief>
+        <description>
+          Tests inclusions, exclusions, also used for lessThanOrEqual in TESTONE 
+          and greaterThanOrEqual in TESTTWO
+        </description>
+        <inclusions>
+          <item>FROM</item>
+          <item>TO</item>
+        </inclusions>
+        <exclusions>
+          <item>EXCLUDEDTEST</item>
+        </exclusions>
+        <notEqual>
+          <item>10</item>
+        </notEqual>
+        <default><item>1</item></default>
+      </parameter>
+      
+      <parameter name="LISTTEST">
+        <type>string</type>
+        <default><item>INCLUDEOPT</item></default>
+        <brief> 
+          unitTest list test
+        </brief>
+        <description>
+          Tests list inclusions, exclusions, defaults
+        </description>
+        <list>
+          <option value="INCLUDEOPT">
+            <brief>unitTest list inclusions</brief>
+            <description>
+              Testing inclusions with a list of options
+            </description>
+            <inclusions>
+              <item>FROM</item>
+              <item>TO</item>
+            </inclusions>
+            </option>
+            <option value="EXCLUDEOPT">
+              <brief>unitTest list exclusions</brief>
+              <description>
+                Testing exlusions with a list of options
+              </description>
+              <exclusions>
+                <item>EXCLUDEDTEST</item>
+              </exclusions>
+              </option>
+        </list>
+      </parameter>
+      
+      <parameter name="EXCLUDEDTEST">
+        <type>integer</type>
+        <brief>
+          unitText excluded test
+        </brief>
+        <description>
+          Used for notEqualTo and exclusions in TESTTHREE
+        </description>
+        <default><item>10</item></default>
+      </parameter>
+    </group>  
   </groups>
 </application>

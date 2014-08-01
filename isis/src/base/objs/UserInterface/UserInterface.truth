@@ -40,19 +40,66 @@ TO:
 
 GUI:     0
 
+Testing Escaped Array \(
+FROM:    /ISISROOT/testData/base/isisTruth.cub
+TO:      
+ >> (escaped, argument)
+
+Testing Escaped Array \\(
+FROM:    /ISISROOT/testData/base/isisTruth.cub
+TO:      
+ >> \(escaped, argument)
+
 Testing param = value Format
 FROM:    dog
 TO:      bread
 GUI:     0
 
-Testing Space in Argument Value
+Testing Space in Parameter Value
 FROM:    input file.cub
 TO:      output.cub
 GUI:     0
 
+Testing =value
+**USER ERROR** Unknown parameter [=input.cub].
+
+Testing param =value
+**USER ERROR** Unknown parameter [=bread].
+
+Testing mismatched quotes for array-value
+**USER ERROR** Invalid array format [("hello)].
+
+Testing array-value ending in backslash
+**USER ERROR** Invalid array format [(hello)\].
+
+Testing Invalid Parameter
+**USER ERROR** Invalid command line.
+**USER ERROR** Unknown parameter [bogus].
+
+Testing Invalid Reserved Parameter
+**USER ERROR** Invalid Reserve Parameter Option [-LASTT]. Choices are  [-GUI,-NOGUI,-BATCHLIST,-LAST,-RESTORE,-WEBHELP,-HELP,-ERRLIST,-ONERROR,-SAVE,-INFO,-PREFERENCE,-LOG,-VERBOSE].
+
+Testing Reserved Parameter=Invalid Value
+**USER ERROR** Invalid value for reserve parameter [-VERBOSE].
+
+Testing Unambiguous Reserved Parameter Resolution (-la)
+FROM:    It
+TO:      Worked
+GUI:     0
+
+Testing Ambiguous Reserved Parameter Resolution
+**USER ERROR** Ambiguous Reserve Parameter [-L]. Please clarify.
+
 Testing unitTest v. ./unitTest for GUI
 GUI:     0
 
+GUI:     0
+
+Testing -PID and -GUI
+**ERROR** -GUI and -PID are incompatible arguments.
+
+Testing ParentId() and TheGui()
+Testing -NOGUI
 GUI:     0
 
 Starting Batchlist Test
@@ -88,23 +135,197 @@ GUI:     0
 
 Finished Batchlist Test
 
-Testing =value
-**USER ERROR** Unknown parameter [=input.cub].
+Testing -BATCHLIST with -GUI
+**USER ERROR** -BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, or -LAST.
 
-Testing param =value
-**USER ERROR** Unknown parameter [=bread].
+Testing -BATCHLIST with -SAVE
+**USER ERROR** -BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, or -LAST.
 
-Testing unterminated array-value quote
-**USER ERROR** Invalid array format [("hello)].
+Testing -BATCHLIST with -RESTORE
+**USER ERROR** -BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, or -LAST.
 
-Testing array-value ending in backslash
-**USER ERROR** Invalid array format [(hello)\].
+Testing -BATCHLIST with -LAST
+**USER ERROR** -BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, or -LAST.
 
+Testing -BATCHLIST with nonexistent .lis file
+**USER ERROR** The batchlist file [doesntExist.lis] could not be opened.
+
+Testing -BATCHLIST with empty .lis file
+**USER ERROR** The list file [unitTestEmpty.lis] does not contain any data.
+
+Testing -BATCHLIST with mismatched columns in .lis file
+**USER ERROR** The number of columns must be constant in batchlist.
+
+Testing -ONERROR=CONTINUE
+AbortOnError() returns: 0
+
+Testing -ONERROR=ABORT
+AbortOnError() returns: 1
+
+Testing -ONERROR=badValue
+**USER ERROR** [badValue] is an invalid value for -ONERROR, options are ABORT or CONTINUE.
+
+Testing -ONERROR=CONTINUE without -BATCHLIST
+**USER ERROR** -ERRLIST and -ONERROR=continue cannot be used without  the -BATCHLIST option.
+
+Testing -ERRLIST=value without -BATCHLIST
+**USER ERROR** -ERRLIST and -ONERROR=continue cannot be used without  the -BATCHLIST option.
+
+Testing -ERRLIST with no value
+**USER ERROR** -ERRLIST expects a file name.
+
+Testing -ERRLIST=value
+./unitTest 
+./unitTest 
+./unitTest 
+./unitTest 
+./unitTest 
+./unitTest 
+
+Testing -HELP Priority (invalid parameters present)
+FROM         = /ISISROOT/testData/base/isisTruth.cub
+TO           = $temporary/junk.dat
+TESTONE      = 0
+TESTTWO      = 1
+TESTTHREE    = 1
+LISTTEST     = (*INCLUDEOPT, EXCLUDEOPT)
+EXCLUDEDTEST = 10
+**PROGRAMMER ERROR** Evaluating -HELP should only throw this exception during a unitTest.
+
+Testing -HELP=value ...
+
+Testing pixelType
+ParameterName = TO
+Brief         = "Test cube"
+Type          = filename
+PixelType     = real
+Default       = $temporary/junk.dat
+**PROGRAMMER ERROR** Evaluating -HELP should only throw this exception during a unitTest.
+
+Testing inclusive min and max, lessThan, lessThanOrEqual, internalDefault
+ParameterName      = TESTONE
+Brief              = "unitTest test 1"
+Type               = integer
+InternalDefault    = None
+GreaterThanOrEqual = 0
+LessThanOrEqual    = 100
+LessThan           = TESTTWO
+LessThanOrEqual    = TESTTHREE
+**PROGRAMMER ERROR** Evaluating -HELP should only throw this exception during a unitTest.
+
+Testing odd, noninclusive min and max, greaterThan, greaterThanOrEqual
+ParameterName      = TESTTWO
+Brief              = "unitTest test 2"
+Type               = integer
+Default            = 1
+GreaterThan        = 0
+LessThan           = 100
+GreaterThan        = TESTONE
+GreaterThanOrEqual = TESTTHREE
+Odd                = TRUE
+**PROGRAMMER ERROR** Evaluating -HELP should only throw this exception during a unitTest.
+
+Testing inclusions, exclusions
+ParameterName = TESTTHREE
+Brief         = "unitTest test 3"
+Type          = integer
+Default       = 1
+NotEqual      = 10
+Inclusions    = (FROM, TO)
+Exclusions    = EXCLUDEDTEST
+**PROGRAMMER ERROR** Evaluating -HELP should only throw this exception during a unitTest.
+
+Testing list inclusions, exclusions, defaults
+ParameterName = LISTTEST
+Brief         = "unitTest list test"
+Type          = string
+Default       = INCLUDEOPT
+
+Group = INCLUDEOPT
+  Brief      = "unitTest list inclusions"
+  Inclusions = (FROM, TO)
+End_Group
+
+Group = EXCLUDEOPT
+  Brief      = "unitTest list exclusions"
+  Exclusions = EXCLUDEDTEST
+End_Group
+**PROGRAMMER ERROR** Evaluating -HELP should only throw this exception during a unitTest.
+
+...End testing -HELP=value
+
+Testing -INFO
+GetInfoFlag() returns: 1
+GetInfoFileName() returns: 
+
+Testing -INFO=value
+GetInfoFlag() returns: 1
+GetInfoFileName() returns: debug.log
+
+Testing -LAST
 FROM:    It
 TO:      Worked
 GUI:     0
 
-**USER ERROR** Invalid command line.
-**USER ERROR** Unknown parameter [bogus].
+Testing -LAST with other app parameters
+FROM:    otherParam
+TO:      Worked
+GUI:     0
 
+Testing -LOG
+FileOutput = On
+FileName = print.prt
+
+Testing -LOG=value
+FileOutput = On
+FileName = unitTest.prt
+
+Testing -RESTORE with valid (existing) .par file
+FROM:    It
+TO:      Worked
+GUI:     0
+
+Testing -RESTORE with corrupt .par file
+**USER ERROR** The history file [unitTestCorrupt.par] is corrupt, please fix or delete this file.
+
+Testing -RESTORE with invalid (non-existing) .par file
 **USER ERROR** The history file [junk.par] does not exist.
+
+Testing -RESTORE with an empty .par file
+
+Testing -RESTORE with a more populated .par file
+
+Testing -SAVE with HistoryRecording Off
+
+Starting -SAVE, -PREFERECE, and -RESTORE Test
+Testing -SAVE=value with HistoryRecording On
+FROM:    saveParam
+TO:      works
+GUI:     0
+
+Restoring Saved Parameters:
+FROM:    saveParam
+TO:      works
+GUI:     0
+
+Finished -SAVE, PREFERENCE, and -RESTORE Test
+
+Testing SetBatchList()...
+Testing with param=array-value
+./unitTest from=$peaks.cub to=(out1.txt
+,out1.txtcopy
+) 
+
+Testing with param= 
+./unitTest from=peaks.cub to
+
+...End SetBatchList() Test
+
+Testing SetErrorList() with p_errList == ""
+
+Testing -VERBOSE
+TerminalOutput = On
+
+Testing -WEBHELP
+**PROGRAMMER ERROR** Evaluating -WEBHELP should only throw this exception during a unitTest.
+

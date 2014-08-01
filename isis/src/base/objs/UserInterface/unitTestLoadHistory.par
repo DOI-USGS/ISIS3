@@ -1,0 +1,15 @@
+Group = BogusGroup
+End_Group
+
+Object = unitTest
+  Group = UserParameters
+    From = It
+    To   = Worked
+  End_Group
+End_Object
+
+Object = BogusObject
+End_Object
+
+End
+

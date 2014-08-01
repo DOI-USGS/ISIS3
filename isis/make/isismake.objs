@@ -317,7 +317,7 @@ unitTest: $(OBJS) unitTest.o
 	    $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes                   \
 	      libisis$(ISISLIBVERSION).a.csmes;                                      \
 	  fi;                                                                        \
-	  $(AR) $(ISISARFLAGS) -rs libisis$(ISISLIBVERSION).a $(OBJS);               \
+	  $(AR) $(ISISARFLAGS) -crs libisis$(ISISLIBVERSION).a $(OBJS);               \
 	  $(RANLIB) libisis$(ISISLIBVERSION).a;                                      \
 	  $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                             \
 	      -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISLIBVERSION).a \
