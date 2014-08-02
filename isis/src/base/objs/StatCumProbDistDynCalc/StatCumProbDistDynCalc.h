@@ -61,7 +61,7 @@ namespace Isis {
   *                           methods.
   *
   */
-  class StatCumProbDistDynCalc{
+  class StatCumProbDistDynCalc {
     // class uses the P^2 Algorithim to calculate equiprobability cell histograms from a stream of 
     // data without storing the data 
     //  see "The p^2 Algorithim for Dynamic Calculations of Quantiles and Histograms Without Storing
@@ -71,6 +71,13 @@ namespace Isis {
     ~StatCumProbDistDynCalc(); //empty destructor
 
     void addObs(double obs);
+    void set(int numberCells, 
+             int numberQuantiles, 
+             QList<double> quantiles, 
+             QList<double> idealNum, 
+             QList<int> n, 
+             QVector<double> quantileValues, 
+             int numberObservations);
 
     double cumProb(double value); //given a value return the cumulative probility
     double value(double cumProb); //given a cumulative probibility return a value

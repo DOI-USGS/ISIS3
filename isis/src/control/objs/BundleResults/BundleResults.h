@@ -23,14 +23,15 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
 #include <QObject>
 #include <QString>
 
 #include "XmlStackedHandler.h"
 
 class QDataStream;
-class QXmlStreamWriter;
 class QUuid;
+class QXmlStreamWriter;
 
 namespace Isis {
   class BundleSettings;
@@ -63,20 +64,23 @@ namespace Isis {
       BundleResults(const BundleResults &other);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &other);
+
       void setOutputStatistics(BundleStatistics statisticsResults);
+      void setRunTime(QString runTime);
+
+      QString id() const;
+      QString controlNetworkFileName() const;
+      BundleSettings *bundleSettings();     // TODO: change return value to const reference or copy... unsafe to return pointers to member data???
+      BundleStatistics *bundleStatistics(); // TODO: change return value to const reference or copy... unsafe to return pointers to member data???
+      // ??? const BundleSettings *bundleSettings() const;
+      // ??? const BundleStatistics *bundleStatistics() const;
+      QString runTime() const;
+
       PvlObject pvlObject(QString resultsName = "BundleResults",
                           QString settingsName = "InputSettings",
                           QString statisticsName = "StatisticsResults");
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
-      QString id() const;
-
-      void setRunTime(QString runTime);
-      QString runTime() const;
-
-      QString controlNetworkFileName();
-      BundleSettings *bundleSettings();
-      BundleStatistics *bundleStatistics();
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
@@ -90,12 +94,10 @@ namespace Isis {
       class XmlHandler : public XmlStackedHandler {
         public:
           XmlHandler(BundleResults *bundleResults, Project *project);
+          ~XmlHandler();
 
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
-          virtual bool characters(const QString &ch);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName);
 
         private:
           Q_DISABLE_COPY(XmlHandler);
@@ -107,18 +109,17 @@ namespace Isis {
 
     private:
       BundleResults();
-      FileName         *m_controlNetworkFileName;
-      BundleSettings   *m_settings;
-      BundleStatistics *m_statisticsResults;
-      QList<ImageList *> *m_images;
 
       /**
        * A unique ID for this BundleResults object (useful for others to reference this object
        *   when saving to disk).
        */
-      QUuid *m_id;
-
-      QString m_runTime;
+      QUuid              *m_id;
+      QString             m_runTime;
+      FileName           *m_controlNetworkFileName;
+      BundleSettings     *m_settings;
+      BundleStatistics   *m_statisticsResults;
+      QList<ImageList *> *m_images;
   };
   // operators to read/write BundleResults to/from binary data
   QDataStream &operator<<(QDataStream &stream, const BundleResults &bundleResults);

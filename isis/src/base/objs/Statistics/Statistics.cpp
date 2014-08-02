@@ -35,26 +35,61 @@ namespace Isis {
     Reset();
   }
 
-  //! Reset all accumulators and counters to zero.
-  void Statistics::Reset() {
-    p_sum = 0.0;
-    p_sumsum = 0.0;
-    p_minimum = DBL_MAX;
-    p_maximum = -DBL_MAX;
-    p_totalPixels = 0;
-    p_validPixels = 00;
-    p_nullPixels = 0;
-    p_lisPixels = 0;
-    p_lrsPixels = 0;
-    p_hrsPixels = 0;
-    p_hisPixels = 0;
-    p_overRangePixels = 0;
-    p_underRangePixels = 0;
-    p_removedData = false;
-  }
+
+
 
   //! Destroys the IsisStats object.
-  Statistics::~Statistics() {};
+  Statistics::~Statistics() {
+  }
+
+
+
+  //! Reset all accumulators and counters to zero.
+  void Statistics::Reset() {
+    m_sum = 0.0;
+    m_sumsum = 0.0;
+    m_minimum = DBL_MAX;
+    m_maximum = -DBL_MAX;
+    m_totalPixels = 0;
+    m_validPixels = 00;
+    m_nullPixels = 0;
+    m_lisPixels = 0;
+    m_lrsPixels = 0;
+    m_hrsPixels = 0;
+    m_hisPixels = 0;
+    m_overRangePixels = 0;
+    m_underRangePixels = 0;
+    m_removedData = false;
+  }
+
+
+
+  /** 
+   * This method sets the Statistics class members with known values instead of 
+   * using the AddData() and RemoveData() methods to do so. 
+   */ 
+  void Statistics::set(int validPixels, int nullPixels, int lrsPixels, int lisPixels,
+           int hrsPixels, int hisPixels, int underRangePixels, int overRangePixels,
+           double sum,  double minimum,  double maximum, double validMinimum,
+           double validMaximum, bool removedData) {
+    m_sum              = sum;
+    m_sumsum           = sum*sum;
+    m_minimum          = minimum;
+    m_maximum          = maximum;
+    m_totalPixels      = validPixels + nullPixels + lrsPixels + lisPixels
+                         + hrsPixels + hisPixels + underRangePixels + overRangePixels;
+    m_validPixels      = validPixels;
+    m_nullPixels       = nullPixels;
+    m_lrsPixels        = lrsPixels;
+    m_lisPixels        = lisPixels;
+    m_hrsPixels        = hrsPixels;
+    m_hisPixels        = hisPixels;
+    m_underRangePixels = underRangePixels;
+    m_overRangePixels  = overRangePixels;
+    m_removedData      = removedData;
+  }
+
+
 
   /**
    * Add an array of doubles to the accumulators and counters.
@@ -75,6 +110,50 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Add a double to the accumulators and counters. This method
+   * can be invoked multiple times (for example: once for each
+   * pixel in a cube) before obtaining statistics.
+   *
+   * @param data The data to be added to the data set used for statistical
+   *    calculations.
+   *
+   */
+  void Statistics::AddData(const double data) {
+    m_totalPixels++;
+    if(Isis::IsValidPixel(data) && InRange(data)) {
+      m_sum += data;
+      m_sumsum += data * data;
+      if(data < m_minimum) m_minimum = data;
+      if(data > m_maximum) m_maximum = data;
+      m_validPixels++;
+    }
+    else if(Isis::IsNullPixel(data)) {
+      m_nullPixels++;
+    }
+    else if(Isis::IsHisPixel(data)) {
+      m_hisPixels++;
+    }
+    else if(Isis::IsHrsPixel(data)) {
+      m_hrsPixels++;
+    }
+    else if(Isis::IsLisPixel(data)) {
+      m_lisPixels++;
+    }
+    else if(Isis::IsLrsPixel(data)) {
+      m_lrsPixels++;
+    }
+    else if(AboveRange(data)) {
+      m_overRangePixels++;
+    }
+    else {
+      m_underRangePixels++;
+    }
+  }
+
+
+
   /**
    * Remove an array of doubles from the accumulators and counters.
    * Note that is invalidates the absolute minimum and maximum. They
@@ -89,40 +168,40 @@ namespace Isis {
    *    doesn't exist.
    */
   void Statistics::RemoveData(const double *data, const unsigned int count) {
-    p_removedData = true;
+    m_removedData = true;
 
     for(unsigned int i = 0; i < count; i++) {
-      p_totalPixels--;
+      m_totalPixels--;
 
       if(IsValidPixel(data[i]) && InRange(data[i])) {
-        p_sum -= data[i];
-        p_sumsum -= data[i] * data[i];
-        p_validPixels--;
+        m_sum -= data[i];
+        m_sumsum -= data[i] * data[i];
+        m_validPixels--;
       }
       else if(Isis::IsNullPixel(data[i])) {
-        p_nullPixels--;
+        m_nullPixels--;
       }
       else if(Isis::IsHisPixel(data[i])) {
-        p_hisPixels--;
+        m_hisPixels--;
       }
       else if(Isis::IsHrsPixel(data[i])) {
-        p_hrsPixels--;
+        m_hrsPixels--;
       }
       else if(Isis::IsLisPixel(data[i])) {
-        p_lisPixels--;
+        m_lisPixels--;
       }
       else if(Isis::IsLrsPixel(data[i])) {
-        p_lrsPixels--;
+        m_lrsPixels--;
       }
       else if(AboveRange(data[i])) {
-        p_overRangePixels--;
+        m_overRangePixels--;
       }
       else {
-        p_underRangePixels--;
+        m_underRangePixels--;
       }
     }
 
-    if(p_totalPixels < 0) {
+    if(m_totalPixels < 0) {
       QString msg = "You are removing non-existant data in [Statistics::RemoveData]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -133,10 +212,10 @@ namespace Isis {
   }
 
   void Statistics::SetValidRange(const double minimum, const double maximum) {
-    p_validMinimum = minimum;
-    p_validMaximum = maximum;
+    m_validMinimum = minimum;
+    m_validMaximum = maximum;
 
-    if(p_validMaximum < p_validMinimum) {
+    if(m_validMaximum < m_validMinimum) {
       // get the min and max DN values in the chosen range
       QString msg = "Invalid Range: Minimum [" + toString(minimum) 
                     + "] must be less than the Maximum [" + toString(maximum) + "].";
@@ -150,8 +229,8 @@ namespace Isis {
    * @return The Average
    */
   double Statistics::Average() const {
-    if(p_validPixels < 1) return Isis::NULL8;
-    return p_sum / p_validPixels;
+    if(m_validPixels < 1) return Isis::NULL8;
+    return m_sum / m_validPixels;
   }
 
   /**
@@ -161,7 +240,7 @@ namespace Isis {
    * @return The standard deviation
    */
   double Statistics::StandardDeviation() const {
-    if(p_validPixels <= 1) return Isis::NULL8;
+    if(m_validPixels <= 1) return Isis::NULL8;
     return sqrt(Variance());
   }
 
@@ -176,10 +255,10 @@ namespace Isis {
    *                                     using n*(n-1) instead of n*n.
    */
   double Statistics::Variance() const {
-    if(p_validPixels <= 1) return Isis::NULL8;
-    double temp = p_validPixels * p_sumsum - p_sum * p_sum;
+    if(m_validPixels <= 1) return Isis::NULL8;
+    double temp = m_validPixels * m_sumsum - m_sum * m_sum;
     if(temp < 0.0) temp = 0.0;  // This should happen unless roundoff occurs
-    return temp / ((p_validPixels - 1.0) * p_validPixels);
+    return temp / ((m_validPixels - 1.0) * m_validPixels);
   }
 
   /**
@@ -192,8 +271,8 @@ namespace Isis {
    * @history 2011-06-13 Ken Edmundson.
    */
   double Statistics::Rms() const {
-    if(p_validPixels < 1) return Isis::NULL8;
-    double temp = p_sumsum / p_validPixels;
+    if(m_validPixels < 1) return Isis::NULL8;
+    double temp = m_sumsum / m_validPixels;
     if(temp < 0.0) temp = 0.0;
     return sqrt(temp);
   }
@@ -208,13 +287,13 @@ namespace Isis {
    *    invalid.
    */
   double Statistics::Minimum() const {
-    if(p_removedData) {
+    if(m_removedData) {
       QString msg = "Minimum is invalid since you removed data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(p_validPixels < 1) return Isis::NULL8;
-    return p_minimum;
+    if(m_validPixels < 1) return Isis::NULL8;
+    return m_minimum;
   }
 
   /**
@@ -228,13 +307,13 @@ namespace Isis {
    *    invalid.
    */
   double Statistics::Maximum() const {
-    if(p_removedData) {
+    if(m_removedData) {
       QString msg = "Maximum is invalid since you removed data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(p_validPixels < 1) return Isis::NULL8;
-    return p_maximum;
+    if(m_validPixels < 1) return Isis::NULL8;
+    return m_maximum;
   }
 
   /**
@@ -244,7 +323,7 @@ namespace Isis {
    * @return The number of pixels (data) processed
    */
   BigInt Statistics::TotalPixels() const {
-    return p_totalPixels;
+    return m_totalPixels;
   }
 
   /**
@@ -256,7 +335,7 @@ namespace Isis {
    * @return The number of valid pixels (data) processed
    */
   BigInt Statistics::ValidPixels() const {
-    return p_validPixels;
+    return m_validPixels;
   }
 
   /**
@@ -266,7 +345,7 @@ namespace Isis {
    * @return The number of pixels less than the ValidMaximum() processed
    */
   BigInt Statistics::OverRangePixels() const {
-    return p_overRangePixels;
+    return m_overRangePixels;
   }
 
   /**
@@ -276,7 +355,7 @@ namespace Isis {
    * @return The number of pixels less than the ValidMinimum() processed
    */
   BigInt Statistics::UnderRangePixels() const {
-    return p_underRangePixels;
+    return m_underRangePixels;
   }
 
   /**
@@ -285,7 +364,7 @@ namespace Isis {
    * @return The number of NULL pixels (data) processed
    */
   BigInt Statistics::NullPixels() const {
-    return p_nullPixels;
+    return m_nullPixels;
   }
 
   /**
@@ -295,7 +374,7 @@ namespace Isis {
    * @return The number of LIS pixels (data) processed
    */
   BigInt Statistics::LisPixels() const {
-    return p_lisPixels;
+    return m_lisPixels;
   }
 
   /**
@@ -305,7 +384,7 @@ namespace Isis {
    * @return The number of LRS pixels (data) processed
    */
   BigInt Statistics::LrsPixels() const {
-    return p_lrsPixels;
+    return m_lrsPixels;
   }
 
   /**
@@ -315,7 +394,7 @@ namespace Isis {
    * @return The number of HIS pixels (data) processed
    */
   BigInt Statistics::HisPixels() const {
-    return p_hisPixels;
+    return m_hisPixels;
   }
 
   /**
@@ -325,7 +404,7 @@ namespace Isis {
    * @return The number of HRS pixels (data) processed
    */
   BigInt Statistics::HrsPixels() const {
-    return p_hrsPixels;
+    return m_hrsPixels;
   }
 
   /**
@@ -335,9 +414,12 @@ namespace Isis {
    * @return The number of Out of Range pixels (data) processed
    */
   BigInt Statistics::OutOfRangePixels() const {
-    return p_overRangePixels + p_underRangePixels;
+    return m_overRangePixels + m_underRangePixels;
   }
 
+  bool Statistics::RemovedData() const {
+    return m_removedData;
+  }
   /**
    * This method returns a minimum such that X percent
    * of the data will fall with K standard deviations
@@ -359,7 +441,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(p_validPixels < 1) return Isis::NULL8;
+    if(m_validPixels < 1) return Isis::NULL8;
     double k = sqrt(1.0 / (1.0 - percent / 100.0));
     return Average() - k * StandardDeviation();
   }
@@ -385,7 +467,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(p_validPixels < 1) return Isis::NULL8;
+    if(m_validPixels < 1) return Isis::NULL8;
     double k = sqrt(1.0 / (1.0 - percent / 100.0));
     return Average() + k * StandardDeviation();
   }
@@ -405,7 +487,7 @@ namespace Isis {
    *      Statistics::ChebyshevMinimum
    */
   double Statistics::BestMinimum(const double percent) const {
-    if(p_validPixels < 1) return Isis::NULL8;
+    if(m_validPixels < 1) return Isis::NULL8;
     double min = ChebyshevMinimum(percent);
     if(Minimum() > min) min = Minimum();
     return min;
@@ -427,7 +509,7 @@ namespace Isis {
    *      Statistics::ChebyshevMaximum
    */
   double Statistics::BestMaximum(const double percent) const {
-    if(p_validPixels < 1) return Isis::NULL8;
+    if(m_validPixels < 1) return Isis::NULL8;
     double max = ChebyshevMaximum(percent);
     if(Maximum() < max) max = Maximum();
     return max;
@@ -460,22 +542,22 @@ namespace Isis {
 
 
   QDataStream &Statistics::write(QDataStream &stream) const {
-    stream << p_sum
-           << p_sumsum
-           << p_minimum
-           << p_maximum
-           << p_validMinimum
-           << p_validMaximum
-           << (qint32)p_totalPixels
-           << (qint32)p_validPixels
-           << (qint32)p_nullPixels
-           << (qint32)p_lrsPixels
-           << (qint32)p_lisPixels
-           << (qint32)p_hrsPixels
-           << (qint32)p_hisPixels
-           << (qint32)p_underRangePixels
-           << (qint32)p_overRangePixels
-           << p_removedData;
+    stream << m_sum
+           << m_sumsum
+           << m_minimum
+           << m_maximum
+           << m_validMinimum
+           << m_validMaximum
+           << (qint32)m_totalPixels
+           << (qint32)m_validPixels
+           << (qint32)m_nullPixels
+           << (qint32)m_lrsPixels
+           << (qint32)m_lisPixels
+           << (qint32)m_hrsPixels
+           << (qint32)m_hisPixels
+           << (qint32)m_underRangePixels
+           << (qint32)m_overRangePixels
+           << m_removedData;
     return stream;
   }
 
@@ -486,12 +568,12 @@ namespace Isis {
     qint32 totalPixels, validPixels, nullPixels, lrsPixels, lisPixels,
            hrsPixels, hisPixels, underRangePixels, overRangePixels;
 
-    stream >> p_sum
-           >> p_sumsum
-           >> p_minimum
-           >> p_maximum
-           >> p_validMinimum
-           >> p_validMaximum
+    stream >> m_sum
+           >> m_sumsum
+           >> m_minimum
+           >> m_maximum
+           >> m_validMinimum
+           >> m_validMaximum
            >> totalPixels
            >> validPixels
            >> nullPixels
@@ -501,7 +583,7 @@ namespace Isis {
            >> hisPixels
            >> underRangePixels
            >> overRangePixels
-           >> p_removedData;
+           >> m_removedData;
 
     return stream;
   }

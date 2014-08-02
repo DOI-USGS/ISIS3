@@ -94,6 +94,7 @@ namespace Isis {
   }
 
 
+
   JigsawSetupDialog::~JigsawSetupDialog() {
     // delete/null m_ui since we did "new" this pointers in the constructor
     if (m_ui) {
@@ -412,15 +413,15 @@ namespace Isis {
   }
 
 
+
   Control *JigsawSetupDialog::selectedControl() {
 
       int nIndex = m_ui->controlNetworkComboBox->currentIndex();
       Control *selectedControl 
                    = (Control *)(m_ui->controlNetworkComboBox->itemData(nIndex).value< void * >());
       return selectedControl;
+
   }
-
-
   QString *JigsawSetupDialog::selectedControlName() {
 
     QString *name = new QString(m_ui->controlNetworkComboBox->currentText());

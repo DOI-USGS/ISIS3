@@ -28,8 +28,17 @@
 #include "BundleImage.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
+#include "XmlStackedHandler.h"
+
+class QDataStream;
+class QUuid;
+class QXmlStreamWriter;
 
 namespace Isis {
+  class FileName;
+  class Project;
+  class PvlObject;
+  class XmlStackedHandlerReader;
   /**
    * @brief 
    *  
@@ -49,13 +58,16 @@ namespace Isis {
    *                           Updated documentation. Added QDataStream >> and << operators
    *                           and read/write methods. Added unitTest for BundleUtilities
    *                           BundleObservationSolveSettings class.
+   *   @history 2014-07-25 Jeannie Backer - For enums < 4, set solve degrees one less than
+   *                           enum value.
    *  
    */
 
-  class BundleObservationSolveSettings {
-
+  class BundleObservationSolveSettings : public QObject {
+    Q_OBJECT
     public:
       BundleObservationSolveSettings();
+      BundleObservationSolveSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       BundleObservationSolveSettings(const BundleObservationSolveSettings &other);
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &other);
@@ -70,14 +82,14 @@ namespace Isis {
 
       // Instrument Pointing stuff
       enum InstrumentPointingSolveOption {
-        NoPointingFactors,          /**< Solve for none of the pointing factors.*/
-        AnglesOnly,                 /**< Solve for pointing angles: right ascension, declination
-                                         and, optionally, twist.*/
-        AnglesVelocity,             //!< Solve for pointing angles and their angular velocities.
-        AnglesVelocityAcceleration, /**< Solve for pointing angles, their velocities and their
-                                         accelerations.*/
-        AllPointingCoefficients     /**< Solve for all coefficients in the polynomials fit to the
-                                         pointing angles.*/
+        NoPointingFactors          = 0, /**< Solve for none of the pointing factors.*/
+        AnglesOnly                 = 1, /**< Solve for pointing angles: right ascension, declination
+                                             and, optionally, twist.*/
+        AnglesVelocity             = 2, //!< Solve for pointing angles and their angular velocities.
+        AnglesVelocityAcceleration = 3, /**< Solve for pointing angles, their velocities and their
+                                             accelerations.*/
+        AllPointingCoefficients    = 4 /**< Solve for all coefficients in the polynomials fit to
+                                             the pointing angles.*/
       };
       static InstrumentPointingSolveOption stringToInstrumentPointingSolveOption(QString option);
       static QString instrumentPointingSolveOptionToString(InstrumentPointingSolveOption option);
@@ -90,25 +102,25 @@ namespace Isis {
                                          double angularVelocityAprioriSigma = -1.0, 
                                          double angularAccelerationAprioriSigma = -1.0);
       InstrumentPointingSolveOption instrumentPointingSolveOption() const;
-      SpiceRotation::Source pointingInterpolationType() const;
       bool solveTwist() const;
       int ckDegree() const;
       int ckSolveDegree() const;
       int numberCameraAngleCoefficientsSolved() const;
       bool solvePolyOverPointing() const;
       QList<double> aprioriPointingSigmas() const;
+      SpiceRotation::Source pointingInterpolationType() const;
 
 
 
       // Instrument Position stuff
       enum InstrumentPositionSolveOption {
-        NoPositionFactors,            /**< Solve for none of the position factors.*/
-        PositionOnly,                 /**< Solve for instrument positions only.*/
-        PositionVelocity,             /**< Solve for instrument positions and velocities.*/
-        PositionVelocityAcceleration, /**< Solve for instrument positions, velocities, and
-                                           accelerations.*/
-        AllPositionCoefficients       /**< Solve for all coefficients in the polynomials fit to
-                                           the instrument positions.*/
+        NoPositionFactors            = 0, /**< Solve for none of the position factors.*/
+        PositionOnly                 = 1, /**< Solve for instrument positions only.*/
+        PositionVelocity             = 2, /**< Solve for instrument positions and velocities.*/
+        PositionVelocityAcceleration = 3, /**< Solve for instrument positions, velocities, and
+                                               accelerations.*/
+        AllPositionCoefficients      = 4  /**< Solve for all coefficients in the polynomials fit to
+                                               the instrument positions.*/
       };
       static InstrumentPositionSolveOption stringToInstrumentPositionSolveOption(QString option);
       static QString instrumentPositionSolveOptionToString(InstrumentPositionSolveOption option);
@@ -120,17 +132,49 @@ namespace Isis {
                                          double velocityAprioriSigma = -1.0,
                                          double accelerationAprioriSigma = -1.0);
       InstrumentPositionSolveOption instrumentPositionSolveOption() const;
-      SpicePosition::Source positionInterpolationType() const;
       int spkDegree() const;
       int spkSolveDegree() const;
       int numberCameraPositionCoefficientsSolved() const;
       bool solvePositionOverHermite() const;
       QList<double> aprioriPositionSigmas() const;
+      SpicePosition::Source positionInterpolationType() const;
+
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
     private:
+      /**
+       *
+       * @author 2014-07-28 Jeannie Backer
+       *
+       * @internal
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          XmlHandler(BundleObservationSolveSettings *settings, Project *project);
+          ~XmlHandler();
+   
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool characters(const QString &ch);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName);
+   
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+   
+          BundleObservationSolveSettings *m_settings;
+          Project *m_project;
+          QString m_characters;
+      };
+
+      /**
+       * A unique ID for this BundleSettings object (useful for others to reference this object
+       *   when saving to disk).
+       */
+      QUuid *m_id;
       QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
 
       // pointing related parameters

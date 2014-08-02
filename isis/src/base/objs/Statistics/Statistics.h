@@ -52,7 +52,7 @@ namespace Isis {
   *
   * @ingroup Statistics
   *
-  * @author 2002-05-06 Jeff Anderson
+  * @author 2002-05-06 Jeff Andersonzz
   *
   * @internal
   *   @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best minimum/maximum methods.
@@ -79,66 +79,33 @@ namespace Isis {
       ~Statistics();
 
       void Reset();
+      void set(int validPixels, int nullPixels, int lrsPixels, int lisPixels,
+               int hrsPixels, int hisPixels, int underRangePixels, int overRangePixels,
+               double sum,  double minimum,  double maximum, double validMinimum,
+               double validMaximum, bool removedData);
+
       void AddData(const double *data, const unsigned int count);
-      /**
-       * Add a double to the accumulators and counters. This method
-       * can be invoked multiple times (for example: once for each
-       * pixel in a cube) before obtaining statistics.
-       *
-       * @param data The data to be added to the data set used for statistical
-       *    calculations.
-       *
-       */
-      inline void AddData(const double data) {
-        p_totalPixels++;
-        if(Isis::IsValidPixel(data) && InRange(data)) {
-          p_sum += data;
-          p_sumsum += data * data;
-          if(data < p_minimum) p_minimum = data;
-          if(data > p_maximum) p_maximum = data;
-          p_validPixels++;
-        }
-        else if(Isis::IsNullPixel(data)) {
-          p_nullPixels++;
-        }
-        else if(Isis::IsHisPixel(data)) {
-          p_hisPixels++;
-        }
-        else if(Isis::IsHrsPixel(data)) {
-          p_hrsPixels++;
-        }
-        else if(Isis::IsLisPixel(data)) {
-          p_lisPixels++;
-        }
-        else if(Isis::IsLrsPixel(data)) {
-          p_lrsPixels++;
-        }
-        else if(AboveRange(data)) {
-          p_overRangePixels++;
-        }
-        else {
-          p_underRangePixels++;
-        }
-      }
+      void AddData(const double data);
 
       void RemoveData(const double *data, const unsigned int count);
       void RemoveData(const double data);
+
       void SetValidRange(const double minimum = Isis::ValidMinimum, const double maximum = Isis::ValidMaximum);
 
       double ValidMinimum() const {
-        return p_validMinimum;
+        return m_validMinimum;
       }
       double ValidMaximum() const {
-        return p_validMaximum;
+        return m_validMaximum;
       }
       bool InRange(const double value) {
-        return (value >= p_validMinimum && value <= p_validMaximum);
+        return (value >= m_validMinimum && value <= m_validMaximum);
       }
       bool AboveRange(const double value) {
-        return (value > p_validMaximum);
+        return (value > m_validMaximum);
       }
       bool BelowRange(const double value) {
-        return (value < p_validMinimum);
+        return (value < m_validMinimum);
       }
 
       double Average() const;
@@ -164,6 +131,7 @@ namespace Isis {
       BigInt HisPixels() const;
       BigInt HrsPixels() const;
       BigInt OutOfRangePixels() const;
+      bool RemovedData() const;
 
 
       /**
@@ -172,7 +140,7 @@ namespace Isis {
        * @return The sum of the data
        */
       double Sum() const {
-        return p_sum;
+        return m_sum;
       };
 
       /**
@@ -181,30 +149,30 @@ namespace Isis {
        * @return The sum of the squared data
        */
       double SumSquare() const {
-        return p_sumsum;
+        return m_sumsum;
       };
 
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
     private:
-      double p_sum;           //!< Sum accumulator.
-      double p_sumsum;        //!< Sum-squared accumulator.
-      double p_minimum;       //!< Minimum double value encountered.
-      double p_maximum;       //!< Maximum double value encountered.
-      double p_validMinimum;  //!< Minimum valid pixel value
-      double p_validMaximum;  //!< Maximum valid pixel value
-      BigInt p_totalPixels;   //!< Count of total pixels processed.
-      BigInt p_validPixels;   //!< Count of valid pixels (non-special) processed.
-      BigInt p_nullPixels;    //!< Count of null pixels processed.
-      BigInt p_lrsPixels;     //!< Count of low instrument saturation pixels processed.
-      BigInt p_lisPixels;     //!< Count of low representation saturation pixels processed.
-      BigInt p_hrsPixels;     //!< Count of high instrument saturation pixels processed.
-      BigInt p_hisPixels;     //!< Count of high instrument representation pixels processed.
-      BigInt p_underRangePixels; //!< Count of pixels less than the valid range
-      BigInt p_overRangePixels; //!< Count of pixels greater than the valid range
-      bool   p_removedData;   /**< Indicates the RemoveData method was called which implies
-                                   p_minimum and p_maximum are invalid. */
+      double m_sum;           //!< Sum accumulator.
+      double m_sumsum;        //!< Sum-squared accumulator.
+      double m_minimum;       //!< Minimum double value encountered.
+      double m_maximum;       //!< Maximum double value encountered.
+      double m_validMinimum;  //!< Minimum valid pixel value
+      double m_validMaximum;  //!< Maximum valid pixel value
+      BigInt m_totalPixels;   //!< Count of total pixels processed.
+      BigInt m_validPixels;   //!< Count of valid pixels (non-special) processed.
+      BigInt m_nullPixels;    //!< Count of null pixels processed.
+      BigInt m_lrsPixels;     //!< Count of low instrument saturation pixels processed.
+      BigInt m_lisPixels;     //!< Count of low representation saturation pixels processed.
+      BigInt m_hrsPixels;     //!< Count of high instrument saturation pixels processed.
+      BigInt m_hisPixels;     //!< Count of high instrument representation pixels processed.
+      BigInt m_underRangePixels; //!< Count of pixels less than the valid range
+      BigInt m_overRangePixels; //!< Count of pixels greater than the valid range
+      bool   m_removedData;   /**< Indicates the RemoveData method was called which implies
+                                   m_minimum and m_maximum are invalid. */
   };
 
   // operators to read/write Statistics to/from binary data

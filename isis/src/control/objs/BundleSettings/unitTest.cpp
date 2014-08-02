@@ -3,6 +3,10 @@
 #include <QDebug>
 #include <QList>
 #include <QString>
+#include <QtDebug>
+#include <QXmlStreamWriter>
+#include <QFile>
+#include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
 #include "BundleSettings.h"
@@ -10,10 +14,48 @@
 #include "MaximumLikelihoodWFunctions.h"
 #include "Preference.h"
 #include "PvlObject.h"
+#include "XmlStackedHandlerReader.h"
 
 
 using namespace std;
 using namespace Isis;
+
+namespace Isis {
+  class BundleSettingsXmlHandlerTester : public BundleSettings {
+    public:
+      BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, FileName xmlFile)
+          : BundleSettings(project, reader) {
+
+
+        QString xmlPath(xmlFile.expanded());
+        QFile file(xmlPath);
+
+        if ( !file.open(QFile::ReadOnly) ) {
+          throw IException(IException::Io,
+                           QString("Unable to open [%1] with read access")
+                             .arg(xmlPath),
+                           _FILEINFO_);
+        }
+
+        qDebug() << file.fileName() << " open";
+
+        QXmlInputSource xmlInputSource(&file);
+        bool success = reader->parse(xmlInputSource);
+        if (!success) {
+          QString msg = "Failed to parse xml file."; 
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
+
+qDebug() << "file parsed";
+      }
+
+      ~BundleSettingsXmlHandlerTester() {
+      }
+
+  };
+}
+
+
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
@@ -208,8 +250,37 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
+
+
+
+
+
+
+
+    // write xml 
+    QString string;
+    QXmlStreamWriter stream(&string);
+    stream.setAutoFormatting(true);
+    Project *project = NULL;
+    FileName settingsXml("./BundleSettings.xml");
+    settings.save(stream, project, settingsXml);
+    
+    // read xml    
+    XmlStackedHandlerReader reader;
+    BundleSettingsXmlHandlerTester bsToFill(project, &reader, settingsXml);
+    pvl = bsToFill.pvlObject("filled bs");
+    cout << pvl << endl << endl;
+
   } 
   catch (IException &e) {
     e.print();
   }
 }
+
+
+// stats
+// bundle stats
+// mlwf
+// correlation mat
+// bundle obs
+// bundle adj unit test

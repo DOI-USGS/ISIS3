@@ -64,9 +64,9 @@ namespace Isis {
    *   @history 2014-07-25 Jeannie Backer - Improved unitTest coverage to 100% scope/line/function.
    *  
    */
- class BundleSettings : public QObject {
-   Q_OBJECT
-   public:
+  class BundleSettings : public QObject {
+    Q_OBJECT
+    public:
       BundleSettings();
       BundleSettings(const BundleSettings &other);
       BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
@@ -100,11 +100,6 @@ namespace Isis {
                            double globalLatitudeAprioriSigma = -1.0, 
                            double globalLongitudeAprioriSigma = -1.0, 
                            double globalRadiusAprioriSigma = -1.0);
-      void setSolveMethod(SolveMethod method);
-      void setSolveObservationMode(bool observationMode);
-      void setSolveRadius(bool radius);
-      void setUpdateCubeLabel(bool updateCubeLabel);
-      void setErrorPropagation(bool errorPropagation);
       void setOutlierRejection(bool outlierRejection, double multiplier = 1.0);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> observationSolveSettings);
 
@@ -206,13 +201,13 @@ namespace Isis {
         public:
           XmlHandler(BundleSettings *bundleSettings, Project *project);
           XmlHandler(BundleSettings *bundleSettings);
+          ~XmlHandler();
    
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName);
-   
         private:
           Q_DISABLE_COPY(XmlHandler);
    
@@ -220,6 +215,12 @@ namespace Isis {
           Project *m_project;
           QString m_characters;
       };
+
+      /**
+       * A unique ID for this BundleSettings object (useful for others to reference this object
+       *   when saving to disk).
+       */
+      QUuid *m_id;
 
       bool m_validateNetwork;
       SolveMethod m_solveMethod; //!< Solution method for matrix decomposition.
@@ -258,11 +259,6 @@ namespace Isis {
       bool m_createCSVFiles; //!< to output points and image station data in csv format
       bool m_createResidualsFile; //!< to output residuals in csv format
 
-      /**
-       * A unique ID for this BundleSettings object (useful for others to reference this object
-       *   when saving to disk).
-       */
-      QUuid *m_id;
  };
   // operators to read/write BundleResults to/from binary data
   QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings);

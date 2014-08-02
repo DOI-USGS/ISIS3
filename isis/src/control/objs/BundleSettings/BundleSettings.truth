@@ -18,7 +18,24 @@ Object = DefaultSettingsObject
   CreateResidualsFile                  = Yes
   FilePrefix                           = Null
   NumberObservationSolveSettings       = 1
-  ObservationSolveSettingsInstrumentId = Null
+
+  Object = Null
+    InstrumentPointingSolveOption       = AnglesOnly
+    SolveTwist                          = Yes
+    CKDegree                            = 2
+    CKSolveDegree                       = 0
+    NumberAngleCoefficientsSolved       = 1
+    SolvePointingPolynomialOverExisting = No
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = 3
+    InstrumentPositionSolveOption       = None
+    SPKDegree                           = N/A
+    SPKSolveDegree                      = N/A
+    NumberPositionCoefficientsSolved    = N/A
+    SolvePositionOverHermiteSpline      = N/A
+    PositionAprioriSigmas               = N/A
+    InstrumentPositionInterpolationType = N/A
+  End_Object
 End_Object
 
 Testing copy constructor... 
@@ -40,7 +57,24 @@ Object = CopySettingsObject
   CreateResidualsFile                  = Yes
   FilePrefix                           = Null
   NumberObservationSolveSettings       = 1
-  ObservationSolveSettingsInstrumentId = Null
+
+  Object = Null
+    InstrumentPointingSolveOption       = AnglesOnly
+    SolveTwist                          = Yes
+    CKDegree                            = 2
+    CKSolveDegree                       = 0
+    NumberAngleCoefficientsSolved       = 1
+    SolvePointingPolynomialOverExisting = No
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = 3
+    InstrumentPositionSolveOption       = None
+    SPKDegree                           = N/A
+    SPKSolveDegree                      = N/A
+    NumberPositionCoefficientsSolved    = N/A
+    SolvePositionOverHermiteSpline      = N/A
+    PositionAprioriSigmas               = N/A
+    InstrumentPositionInterpolationType = N/A
+  End_Object
 End_Object
 
 Testing assignment operator to set this equal to itself... 
@@ -62,7 +96,24 @@ Object = SelfAssignedSettingsObject
   CreateResidualsFile                  = Yes
   FilePrefix                           = Null
   NumberObservationSolveSettings       = 1
-  ObservationSolveSettingsInstrumentId = Null
+
+  Object = Null
+    InstrumentPointingSolveOption       = AnglesOnly
+    SolveTwist                          = Yes
+    CKDegree                            = 2
+    CKSolveDegree                       = 0
+    NumberAngleCoefficientsSolved       = 1
+    SolvePointingPolynomialOverExisting = No
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = 3
+    InstrumentPositionSolveOption       = None
+    SPKDegree                           = N/A
+    SPKSolveDegree                      = N/A
+    NumberPositionCoefficientsSolved    = N/A
+    SolvePositionOverHermiteSpline      = N/A
+    PositionAprioriSigmas               = N/A
+    InstrumentPositionInterpolationType = N/A
+  End_Object
 End_Object
 
 Testing assignment operator to create a new settings object... 
@@ -84,7 +135,24 @@ Object = AssignedSettingsObject
   CreateResidualsFile                  = Yes
   FilePrefix                           = Null
   NumberObservationSolveSettings       = 1
-  ObservationSolveSettingsInstrumentId = Null
+
+  Object = Null
+    InstrumentPointingSolveOption       = AnglesOnly
+    SolveTwist                          = Yes
+    CKDegree                            = 2
+    CKSolveDegree                       = 0
+    NumberAngleCoefficientsSolved       = 1
+    SolvePointingPolynomialOverExisting = No
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = 3
+    InstrumentPositionSolveOption       = None
+    SPKDegree                           = N/A
+    SPKSolveDegree                      = N/A
+    NumberPositionCoefficientsSolved    = N/A
+    SolvePositionOverHermiteSpline      = N/A
+    PositionAprioriSigmas               = N/A
+    InstrumentPositionInterpolationType = N/A
+  End_Object
 End_Object
 
 Testing mutator methods... 
@@ -109,8 +177,42 @@ Object = ResetAllOptions
   MaximumLikelihoodModels              = (Huber, Welsch, HuberModified, Chen)
   MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
   NumberObservationSolveSettings       = 2
-  ObservationSolveSettingsInstrumentId = Instrument1
-  ObservationSolveSettingsInstrumentId = Instrument2
+
+  Object = Instrument1
+    InstrumentPointingSolveOption       = None
+    SolveTwist                          = N/A
+    CKDegree                            = N/A
+    CKSolveDegree                       = N/A
+    NumberAngleCoefficientsSolved       = N/A
+    SolvePointingPolynomialOverExisting = N/A
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = N/A
+    InstrumentPositionSolveOption       = AllPolynomialCoefficients
+    SPKDegree                           = 5
+    SPKSolveDegree                      = 6
+    NumberPositionCoefficientsSolved    = 7
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = (7000.0, 8000.0, 9000.0)
+    InstrumentPositionInterpolationType = 4
+  End_Object
+
+  Object = Instrument2
+    InstrumentPointingSolveOption       = AllPolynomialCoefficients
+    SolveTwist                          = Yes
+    CKDegree                            = 21
+    CKSolveDegree                       = 1
+    NumberAngleCoefficientsSolved       = 2
+    SolvePointingPolynomialOverExisting = Yes
+    AngleAprioriSigmas                  = (22.0, 23.0)
+    InstrumentPointingInterpolationType = 4
+    InstrumentPositionSolveOption       = PositionOnly
+    SPKDegree                           = 15
+    SPKSolveDegree                      = 0
+    NumberPositionCoefficientsSolved    = 1
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = 17000.0
+    InstrumentPositionInterpolationType = 4
+  End_Object
 End_Object
 
 Object = ResetSolveOptions
@@ -133,8 +235,42 @@ Object = ResetSolveOptions
   MaximumLikelihoodModels              = (Huber, Welsch, HuberModified, Chen)
   MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
   NumberObservationSolveSettings       = 2
-  ObservationSolveSettingsInstrumentId = Instrument1
-  ObservationSolveSettingsInstrumentId = Instrument2
+
+  Object = Instrument1
+    InstrumentPointingSolveOption       = None
+    SolveTwist                          = N/A
+    CKDegree                            = N/A
+    CKSolveDegree                       = N/A
+    NumberAngleCoefficientsSolved       = N/A
+    SolvePointingPolynomialOverExisting = N/A
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = N/A
+    InstrumentPositionSolveOption       = AllPolynomialCoefficients
+    SPKDegree                           = 5
+    SPKSolveDegree                      = 6
+    NumberPositionCoefficientsSolved    = 7
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = (7000.0, 8000.0, 9000.0)
+    InstrumentPositionInterpolationType = 4
+  End_Object
+
+  Object = Instrument2
+    InstrumentPointingSolveOption       = AllPolynomialCoefficients
+    SolveTwist                          = Yes
+    CKDegree                            = 21
+    CKSolveDegree                       = 1
+    NumberAngleCoefficientsSolved       = 2
+    SolvePointingPolynomialOverExisting = Yes
+    AngleAprioriSigmas                  = (22.0, 23.0)
+    InstrumentPointingInterpolationType = 4
+    InstrumentPositionSolveOption       = PositionOnly
+    SPKDegree                           = 15
+    SPKSolveDegree                      = 0
+    NumberPositionCoefficientsSolved    = 1
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = 17000.0
+    InstrumentPositionInterpolationType = 4
+  End_Object
 End_Object
 
 Object = ResetOutputOptions
@@ -157,8 +293,42 @@ Object = ResetOutputOptions
   MaximumLikelihoodModels              = (Huber, Welsch, HuberModified, Chen)
   MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
   NumberObservationSolveSettings       = 2
-  ObservationSolveSettingsInstrumentId = Instrument1
-  ObservationSolveSettingsInstrumentId = Instrument2
+
+  Object = Instrument1
+    InstrumentPointingSolveOption       = None
+    SolveTwist                          = N/A
+    CKDegree                            = N/A
+    CKSolveDegree                       = N/A
+    NumberAngleCoefficientsSolved       = N/A
+    SolvePointingPolynomialOverExisting = N/A
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = N/A
+    InstrumentPositionSolveOption       = AllPolynomialCoefficients
+    SPKDegree                           = 5
+    SPKSolveDegree                      = 6
+    NumberPositionCoefficientsSolved    = 7
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = (7000.0, 8000.0, 9000.0)
+    InstrumentPositionInterpolationType = 4
+  End_Object
+
+  Object = Instrument2
+    InstrumentPointingSolveOption       = AllPolynomialCoefficients
+    SolveTwist                          = Yes
+    CKDegree                            = 21
+    CKSolveDegree                       = 1
+    NumberAngleCoefficientsSolved       = 2
+    SolvePointingPolynomialOverExisting = Yes
+    AngleAprioriSigmas                  = (22.0, 23.0)
+    InstrumentPointingInterpolationType = 4
+    InstrumentPositionSolveOption       = PositionOnly
+    SPKDegree                           = 15
+    SPKSolveDegree                      = 0
+    NumberPositionCoefficientsSolved    = 1
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = 17000.0
+    InstrumentPositionInterpolationType = 4
+  End_Object
 End_Object
 
 Testing accessor methods... 
@@ -196,8 +366,42 @@ Object = BundleSettings
   MaximumLikelihoodModels              = (Huber, Welsch, HuberModified, Chen)
   MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
   NumberObservationSolveSettings       = 2
-  ObservationSolveSettingsInstrumentId = Instrument1
-  ObservationSolveSettingsInstrumentId = Instrument2
+
+  Object = Instrument1
+    InstrumentPointingSolveOption       = None
+    SolveTwist                          = N/A
+    CKDegree                            = N/A
+    CKSolveDegree                       = N/A
+    NumberAngleCoefficientsSolved       = N/A
+    SolvePointingPolynomialOverExisting = N/A
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = N/A
+    InstrumentPositionSolveOption       = AllPolynomialCoefficients
+    SPKDegree                           = 5
+    SPKSolveDegree                      = 6
+    NumberPositionCoefficientsSolved    = 7
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = (7000.0, 8000.0, 9000.0)
+    InstrumentPositionInterpolationType = 4
+  End_Object
+
+  Object = Instrument2
+    InstrumentPointingSolveOption       = AllPolynomialCoefficients
+    SolveTwist                          = Yes
+    CKDegree                            = 21
+    CKSolveDegree                       = 1
+    NumberAngleCoefficientsSolved       = 2
+    SolvePointingPolynomialOverExisting = Yes
+    AngleAprioriSigmas                  = (22.0, 23.0)
+    InstrumentPointingInterpolationType = 4
+    InstrumentPositionSolveOption       = PositionOnly
+    SPKDegree                           = 15
+    SPKSolveDegree                      = 0
+    NumberPositionCoefficientsSolved    = 1
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = 17000.0
+    InstrumentPositionInterpolationType = 4
+  End_Object
 End_Object
 
 Testing error throws... 
@@ -208,3 +412,61 @@ Testing error throws...
 **PROGRAMMER ERROR** Unknown bundle convergence criteria [Pickles].
 **PROGRAMMER ERROR** Unknown convergence criteria enum [33].
 **PROGRAMMER ERROR** For bundle adjustments with multiple maximum likelihood estimators, the first model must be of type HUBER or HUBER_MODIFIED.
+Object = "filled bs"
+  NetworkValidated                     = Yes
+  SolveMethod                          = Sparse
+  SolveObservationMode                 = Yes
+  SolveRadius                          = No
+  UpdateCubeLabel                      = Yes
+  ErrorPropagation                     = Yes
+  OutlierRejection                     = No
+  GlobalLatitudeAprioriSigma           = None
+  GlobalLongitudeAprioriSigma          = None
+  ConvergenceCriteria                  = ParameterCorrections
+  ConvergenceCriteriaThreshold         = 0.25
+  ConvergenceCriteriaMaximumIterations = 26
+  CreateBundleOutputFile               = No
+  CreateCSVFiles                       = No
+  CreateResidualsFile                  = Yes
+  FilePrefix                           = TestFilePrefix
+  MaximumLikelihoodModels              = (Huber, Welsch, HuberModified, Chen)
+  MaximumLikelihoodQuantiles           = (0.27, 28.0, 29.0, 30.0)
+  NumberObservationSolveSettings       = 2
+
+  Object = Instrument1
+    InstrumentPointingSolveOption       = None
+    SolveTwist                          = N/A
+    CKDegree                            = N/A
+    CKSolveDegree                       = N/A
+    NumberAngleCoefficientsSolved       = N/A
+    SolvePointingPolynomialOverExisting = N/A
+    AngleAprioriSigmas                  = N/A
+    InstrumentPointingInterpolationType = N/A
+    InstrumentPositionSolveOption       = AllPolynomialCoefficients
+    SPKDegree                           = 5
+    SPKSolveDegree                      = 6
+    NumberPositionCoefficientsSolved    = 7
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = (7000.0, 8000.0, 9000.0)
+    InstrumentPositionInterpolationType = 4
+  End_Object
+
+  Object = Instrument2
+    InstrumentPointingSolveOption       = AllPolynomialCoefficients
+    SolveTwist                          = Yes
+    CKDegree                            = 21
+    CKSolveDegree                       = 1
+    NumberAngleCoefficientsSolved       = 2
+    SolvePointingPolynomialOverExisting = Yes
+    AngleAprioriSigmas                  = (22.0, 23.0)
+    InstrumentPointingInterpolationType = 4
+    InstrumentPositionSolveOption       = PositionOnly
+    SPKDegree                           = 15
+    SPKSolveDegree                      = 0
+    NumberPositionCoefficientsSolved    = 1
+    SolvePositionOverHermiteSpline      = Yes
+    PositionAprioriSigmas               = 17000.0
+    InstrumentPositionInterpolationType = 4
+  End_Object
+End_Object
+

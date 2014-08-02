@@ -36,13 +36,21 @@
 #include "MaximumLikelihoodWFunctions.h"
 #include "PvlObject.h"
 #include "Statistics.h" // ???
+#include "XmlStackedHandler.h"
+
+class QDataStream;
+class QUuid;
+class QXmlStreamWriter;
 
 namespace Isis {
   class ControlNet;
   class CorrelationMatrix;
   class FileName;
+  class Project;
+  class PvlObject;
   class SerialNumberList;
   class StatCumProbDistDynCalc;
+  class XmlStackedHandlerReader;
   /**
    * A utility class containing statistical results from a BundleAdjust solution. 
    *  
@@ -61,6 +69,7 @@ namespace Isis {
     Q_OBJECT
     public:
       BundleStatistics(QObject *parent = 0);
+      BundleStatistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       BundleStatistics(const BundleStatistics &other);
       ~BundleStatistics();
       BundleStatistics &operator=(const BundleStatistics &other);
@@ -185,10 +194,43 @@ namespace Isis {
       void setCorrMatCovFileName(FileName name);
       void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams);
 
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+      
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
     private:
+      /**
+       *
+       * @author 2014-07-28 Jeannie Backer
+       *
+       * @internal
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          XmlHandler(BundleStatistics *statistics, Project *project);
+          ~XmlHandler();
+   
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool characters(const QString &ch);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName);
+   
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+   
+          BundleStatistics *m_statistics;
+          Project *m_project;
+          QString m_characters;
+      };
+
+      /**
+       * A unique ID for this BundleSettings object (useful for others to reference this object
+       *   when saving to disk).
+       */
+      QUuid *m_id;
+      QString m_instrumentId;               //!< The spacecraft instrument id for this observation.
       CorrelationMatrix *m_correlationMatrix;
 
 // ???       Statistics m_statsx;                       //!<  x errors

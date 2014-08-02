@@ -3,6 +3,9 @@
 #include <QDebug>
 #include <QDataStream>
 #include <QObject>
+#include <QString>
+#include <QUuid>
+#include <QXmlStreamWriter>
 
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
@@ -20,11 +23,15 @@
 #include "SerialNumberList.h"
 #include "StatCumProbDistDynCalc.h"
 #include "Statistics.h"
+#include "XmlStackedHandlerReader.h"
 
 using namespace boost::numeric::ublas;
 namespace Isis {
 
   BundleStatistics::BundleStatistics(QObject *parent) : QObject(parent) {
+
+    m_id = NULL;
+    m_id = new QUuid(QUuid::createUuid());
 
     m_correlationMatrix = NULL;
     m_correlationMatrix = new CorrelationMatrix();
@@ -123,8 +130,25 @@ namespace Isis {
 
 
 
+  /**
+   * Construct this BundleSettings object from XML.
+   *
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  BundleStatistics::BundleStatistics(Project *project, XmlStackedHandlerReader *xmlReader,
+                                 QObject *parent) : QObject(parent) {
+    m_id = NULL;
+    // ??? initializations ???
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+  }
+
+
+
   BundleStatistics::BundleStatistics(const BundleStatistics &other)
-      : m_correlationMatrix(new CorrelationMatrix(*other.m_correlationMatrix)),
+      : m_id(new QUuid(other.m_id->toString())),
+        m_correlationMatrix(new CorrelationMatrix(*other.m_correlationMatrix)),
         m_numberFixedPoints(other.m_numberFixedPoints),
         m_numberIgnoredPoints(other.m_numberIgnoredPoints),
         m_numberHeldImages(other.m_numberHeldImages),
@@ -184,6 +208,9 @@ namespace Isis {
 
   BundleStatistics::~BundleStatistics() {
     
+    delete m_id;
+    m_id = NULL;
+
     delete m_correlationMatrix;
     m_correlationMatrix = NULL;
 
@@ -205,7 +232,12 @@ namespace Isis {
   BundleStatistics &BundleStatistics::operator=(const BundleStatistics &other) {
 
     if (&other != this) {
+      delete m_id;
+      m_id = NULL;
+      m_id = new QUuid(m_id->toString());
+
       delete m_correlationMatrix;
+      m_correlationMatrix = NULL;
       m_correlationMatrix = new CorrelationMatrix(*other.m_correlationMatrix);
 
       m_numberFixedPoints = other.m_numberFixedPoints;
@@ -252,7 +284,7 @@ namespace Isis {
       m_rmsSigmaRad = other.m_rmsSigmaRad;
       m_numberMaximumLikelihoodModels = other.m_numberMaximumLikelihoodModels;
 
-      for (int i = 0; i < m_numberMaximumLikelihoodModels; i++){
+      for (int i = 0; i < m_numberMaximumLikelihoodModels; i++) {
 
         delete m_wFunc[i];
         m_wFunc[i] = new MaximumLikelihoodWFunctions(*other.m_wFunc[i]);
@@ -1081,31 +1113,688 @@ namespace Isis {
 
 
 
+  void BundleStatistics::save(QXmlStreamWriter &stream, const Project *project, 
+                                            FileName newProjectRoot) const {
+
+    stream.writeTextElement("id", m_id->toString());
+ 
+    stream.writeStartElement("instrumentId");
+    stream.writeCharacters(m_instrumentId);
+    stream.writeEndElement();
+
+    stream.writeStartElement("correlationMatrix");
+    // TODO ??? m_correlationMatrix.save(stream, project, newProjectRoot);
+    stream.writeEndElement();
+    
+    stream.writeStartElement("generalStatisticsValues");
+    stream.writeStartElement("numberFixedPoints");
+    stream.writeCharacters(toString(m_numberFixedPoints));
+    stream.writeEndElement();
+    stream.writeStartElement("numberIgnoredPoints");
+    stream.writeCharacters(toString(m_numberIgnoredPoints));
+    stream.writeEndElement();
+    stream.writeStartElement("numberHeldImages");
+    stream.writeCharacters(toString(m_numberHeldImages));
+    stream.writeEndElement();
+    stream.writeStartElement("rejectionLimit");
+    stream.writeCharacters(toString(m_rejectionLimit));
+    stream.writeEndElement();
+    stream.writeStartElement("numberRejectedObservations");
+    stream.writeCharacters(toString(m_numberRejectedObservations));
+    stream.writeEndElement();
+    stream.writeStartElement("numberObservations");
+    stream.writeCharacters(toString(m_numberObservations));
+    stream.writeEndElement();
+    stream.writeStartElement("numberImageParameters");
+    stream.writeCharacters(toString(m_numberImageParameters));
+    stream.writeEndElement();
+    stream.writeStartElement("numberConstrainedPointParameters");
+    stream.writeCharacters(toString(m_numberConstrainedPointParameters));
+    stream.writeEndElement();
+    stream.writeStartElement("numberConstrainedImageParameters");
+    stream.writeCharacters(toString(m_numberConstrainedImageParameters));
+    stream.writeEndElement();
+    stream.writeStartElement("numberUnknownParameters");
+    stream.writeCharacters(toString(m_numberUnknownParameters));
+    stream.writeEndElement();
+    stream.writeStartElement("degreesOfFreedom");
+    stream.writeCharacters(toString(m_degreesOfFreedom));
+    stream.writeEndElement();
+    stream.writeStartElement("sigma0");
+    stream.writeCharacters(toString(m_sigma0));
+    stream.writeEndElement();
+    stream.writeStartElement("converged");
+    stream.writeCharacters(toString(m_converged));
+    stream.writeEndElement();
+    stream.writeEndElement();
+
+    stream.writeStartElement("rms");
+    stream.writeStartElement("residuals");
+    stream.writeAttribute("x", toString(m_rms_rx)); 
+    stream.writeAttribute("y", toString(m_rms_ry)); 
+    stream.writeAttribute("xy", toString(m_rms_rxy)); 
+    stream.writeEndElement(); // end residuals element
+    stream.writeStartElement("sigmas");
+    stream.writeAttribute("lat", toString(m_rmsSigmaLat)); 
+    stream.writeAttribute("lon", toString(m_rmsSigmaLon)); 
+    stream.writeAttribute("rad", toString(m_rmsSigmaRad)); 
+    stream.writeEndElement(); // end sigmas element
+    stream.writeStartElement("imageResidualsLists");
+    stream.writeStartElement("residualsList");
+    stream.writeAttribute("listSize", toString(m_rmsImageResiduals.size())); 
+    for (int i = 0; i < m_rmsImageResiduals.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageResiduals[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageResiduals[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageResiduals[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageResiduals[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageResiduals[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageResiduals[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageResiduals[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageResiduals[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageResiduals[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageResiduals[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageResiduals[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageResiduals[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageResiduals[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageResiduals[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end residuals list
+    stream.writeStartElement("sampleResidualsList");
+    stream.writeAttribute("listSize", toString(m_rmsImageSampleResiduals.size())); 
+    for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageSampleResiduals[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageSampleResiduals[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageSampleResiduals[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageSampleResiduals[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageSampleResiduals[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageSampleResiduals[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageSampleResiduals[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageSampleResiduals[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageSampleResiduals[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageSampleResiduals[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageSampleResiduals[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageSampleResiduals[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageSampleResiduals[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageSampleResiduals[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end sample residuals list
+    stream.writeStartElement("lineResidualsList");
+    stream.writeAttribute("listSize", toString(m_rmsImageLineResiduals.size())); 
+    for (int i = 0; i < m_rmsImageLineResiduals.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageLineResiduals[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageLineResiduals[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageLineResiduals[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageLineResiduals[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageLineResiduals[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageLineResiduals[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageLineResiduals[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageLineResiduals[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageLineResiduals[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageLineResiduals[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageLineResiduals[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageLineResiduals[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageLineResiduals[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageLineResiduals[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end line residuals list
+    stream.writeEndElement(); // end image residuals lists
+    stream.writeStartElement("imageSigmasLists");
+    stream.writeStartElement("xSigmas");
+    stream.writeAttribute("listSize", toString(m_rmsImageXSigmas.size())); 
+    for (int i = 0; i < m_rmsImageXSigmas.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageXSigmas[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageXSigmas[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageXSigmas[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageXSigmas[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageXSigmas[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageXSigmas[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageXSigmas[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageXSigmas[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageXSigmas[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageXSigmas[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageXSigmas[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageXSigmas[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageXSigmas[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageXSigmas[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end x sigma list
+    stream.writeStartElement("ySigmas");
+    stream.writeAttribute("listSize", toString(m_rmsImageYSigmas.size())); 
+    for (int i = 0; i < m_rmsImageYSigmas.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageYSigmas[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageYSigmas[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageYSigmas[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageYSigmas[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageYSigmas[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageYSigmas[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageYSigmas[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageYSigmas[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageYSigmas[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageYSigmas[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageYSigmas[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageYSigmas[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageYSigmas[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageYSigmas[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end y sigma list
+    stream.writeStartElement("zSigmas");
+    stream.writeAttribute("listSize", toString(m_rmsImageZSigmas.size())); 
+    for (int i = 0; i < m_rmsImageZSigmas.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageZSigmas[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageZSigmas[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageZSigmas[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageZSigmas[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageZSigmas[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageZSigmas[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageZSigmas[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageZSigmas[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageZSigmas[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageZSigmas[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageZSigmas[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageZSigmas[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageZSigmas[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageZSigmas[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end z sigma list
+    stream.writeStartElement("raSigmas");
+    stream.writeAttribute("listSize", toString(m_rmsImageRASigmas.size())); 
+    for (int i = 0; i < m_rmsImageRASigmas.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageRASigmas[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageRASigmas[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageRASigmas[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageRASigmas[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageRASigmas[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageRASigmas[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageRASigmas[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageRASigmas[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageRASigmas[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageRASigmas[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageRASigmas[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageRASigmas[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageRASigmas[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageRASigmas[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end ra sigma list
+    stream.writeStartElement("decSigmas");
+    stream.writeAttribute("listSize", toString(m_rmsImageDECSigmas.size())); 
+    for (int i = 0; i < m_rmsImageDECSigmas.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageDECSigmas[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageDECSigmas[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageDECSigmas[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageDECSigmas[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageDECSigmas[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageDECSigmas[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageDECSigmas[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageDECSigmas[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageDECSigmas[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageDECSigmas[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageDECSigmas[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageDECSigmas[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageDECSigmas[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageDECSigmas[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end dec sigma list
+    stream.writeStartElement("twistSigmas");
+    stream.writeAttribute("listSize", toString(m_rmsImageTWISTSigmas.size())); 
+    for (int i = 0; i < m_rmsImageTWISTSigmas.size(); i++) {
+      stream.writeStartElement("statistics");
+      stream.writeAttribute("validPixels", toString(m_rmsImageTWISTSigmas[i].ValidPixels()));
+      stream.writeAttribute("nullPixels", toString(m_rmsImageTWISTSigmas[i].NullPixels()));
+      stream.writeAttribute("lrsPixels", toString(m_rmsImageTWISTSigmas[i].LrsPixels()));
+      stream.writeAttribute("lisPixels", toString(m_rmsImageTWISTSigmas[i].LisPixels()));
+      stream.writeAttribute("hrsPixels", toString(m_rmsImageTWISTSigmas[i].HrsPixels()));
+      stream.writeAttribute("hisPixels", toString(m_rmsImageTWISTSigmas[i].HisPixels()));
+      stream.writeAttribute("underRangePixels", toString(m_rmsImageTWISTSigmas[i].UnderRangePixels()));
+      stream.writeAttribute("overRangePixels", toString(m_rmsImageTWISTSigmas[i].OverRangePixels()));
+      stream.writeAttribute("sum", toString(m_rmsImageTWISTSigmas[i].Sum()));
+      stream.writeAttribute("minimum", toString(m_rmsImageTWISTSigmas[i].Minimum()));
+      stream.writeAttribute("maximum", toString(m_rmsImageTWISTSigmas[i].Maximum()));
+      stream.writeAttribute("validMinimum", toString(m_rmsImageTWISTSigmas[i].ValidMinimum()));
+      stream.writeAttribute("validMaximum", toString(m_rmsImageTWISTSigmas[i].ValidMaximum()));
+      stream.writeAttribute("removedData", toString(m_rmsImageTWISTSigmas[i].RemovedData()));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement(); // end twist sigma list
+    stream.writeEndElement(); // end sigmas lists
+    stream.writeEndElement(); // end rms
+
+    stream.writeStartElement("elapsedTime");
+    stream.writeAttribute("time", toString(m_elapsedTime)); 
+    stream.writeAttribute("errorProp", toString(m_elapsedTimeErrorProp)); 
+    stream.writeEndElement();
+
+    stream.writeStartElement("minMaxSigmas");
+    stream.writeStartElement("minLat");
+    stream.writeAttribute("value", toString(m_minSigmaLatitude)); 
+    stream.writeAttribute("pointId", m_minSigmaLatitudePointId); 
+    stream.writeEndElement();
+    stream.writeStartElement("maxLat");
+    stream.writeAttribute("value", toString(m_maxSigmaLatitude)); 
+    stream.writeAttribute("pointId", m_maxSigmaLatitudePointId); 
+    stream.writeEndElement();
+    stream.writeStartElement("minLon");
+    stream.writeAttribute("value", toString(m_minSigmaLongitude)); 
+    stream.writeAttribute("pointId", m_minSigmaLongitudePointId); 
+    stream.writeEndElement();
+    stream.writeStartElement("maxLon");
+    stream.writeAttribute("value", toString(m_maxSigmaLongitude)); 
+    stream.writeAttribute("pointId", m_maxSigmaLongitudePointId); 
+    stream.writeEndElement();
+    stream.writeStartElement("minRad");
+    stream.writeAttribute("value", toString(m_minSigmaRadius)); 
+    stream.writeAttribute("pointId", m_minSigmaRadiusPointId); 
+    stream.writeEndElement();
+    stream.writeStartElement("maxRad");
+    stream.writeAttribute("value", toString(m_maxSigmaRadius)); 
+    stream.writeAttribute("pointId", m_maxSigmaRadiusPointId); 
+    stream.writeEndElement();
+    stream.writeEndElement();
+    // call max likelihood setup from startElement to fill the rest of these values... 
+    stream.writeStartElement("maximumLikelihoodEstimation");
+    stream.writeAttribute("numberModels", toString(m_numberMaximumLikelihoodModels)); 
+    stream.writeAttribute("maximumLikelihoodIndex", toString(m_maximumLikelihoodIndex)); 
+    stream.writeAttribute("maximumLikelihoodMedianR2Residuals", toString(m_maximumLikelihoodMedianR2Residuals)); 
+    stream.writeStartElement("cumulativeProbabilityCalculator");
+    // TODO ???  m_cumPro->save(stream, project, newProjectRoot);
+    stream.writeEndElement();
+    stream.writeStartElement("residualsCumulativeProbabilityCalculator");
+    // TODO ???  m_cumProRes->save(stream, project, newProjectRoot);
+    stream.writeEndElement();
+    for (int i = 0; i < m_numberMaximumLikelihoodModels; i++) {
+      stream.writeStartElement("model");
+      stream.writeAttribute("index", toString(i)); 
+      stream.writeAttribute("modelSelection", 
+                          MaximumLikelihoodWFunctions::modelToString(m_wFunc[i]->model()));
+      stream.writeAttribute("tweakingconstant", toString(m_wFunc[i]->tweakingConstant())); 
+      stream.writeAttribute("quantile", toString(m_maximumLikelihoodQuan[i]));
+      stream.writeEndElement();
+    }
+    stream.writeEndElement();
+    
+
+  }
+
+
+
+  BundleStatistics::XmlHandler::XmlHandler(BundleStatistics *statistics, 
+                                                         Project *project) {
+    m_statistics = statistics;
+    m_project = project;
+    m_characters = "";
+  }
+
+
+
+  BundleStatistics::XmlHandler::~XmlHandler() {
+    // ??? compile error ??? delete m_project;
+    m_project = NULL;
+  }
+  
+
+
+  bool BundleStatistics::XmlHandler::startElement(const QString &namespaceURI, 
+                                                                const QString &localName,
+                                                                const QString &qName,
+                                                                const QXmlAttributes &atts) {
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+        
+      if (localName == "correlationMatrix") {
+        // TODO ???  m_statistics->m_correlationMatrix = new CorrelationMatrix(m_project, reader());
+      }
+      else if (localName == "residuals") {
+        
+        QString rx = atts.value("x");
+        if (!rx.isEmpty()) {
+          m_statistics->m_rms_rx = toDouble(rx);
+        }
+
+        QString ry = atts.value("y");
+        if (!ry.isEmpty()) {
+          m_statistics->m_rms_ry = toDouble(ry);
+        }
+
+        QString rxy = atts.value("xy");
+        if (!rxy.isEmpty()) {
+          m_statistics->m_rms_rxy = toDouble(rxy);
+        }
+
+      }
+      else if (localName == "sigmas") {
+
+        QString lat = atts.value("lat");
+        if (!lat.isEmpty()) {
+          m_statistics->m_rmsSigmaLat = toDouble(lat);
+        }
+
+        QString lon = atts.value("lon");
+        if (!lon.isEmpty()) {
+          m_statistics->m_rmsSigmaLon = toDouble(lon);
+        }
+
+        QString rad = atts.value("rad");
+        if (!rad.isEmpty()) {
+          m_statistics->m_rmsSigmaRad = toDouble(rad);
+        }
+
+      }
+      else if (localName == "statisticsResiduals") {
+
+        QString validPixelsStr = atts.value("validPixels");
+        QString nullPixelsStr = atts.value("nullPixels");
+        QString lrsPixelsStr = atts.value("lrsPixels");
+        QString lisPixelsStr = atts.value("lisPixels");
+        QString hrsPixelsStr = atts.value("hrsPixels");
+        QString hisPixelsStr = atts.value("hisPixels");
+        QString underRangePixelsStr = atts.value("underRangePixels");
+        QString overRangePixelsStr = atts.value("overRangePixels");
+        QString sumStr = atts.value("sum");
+        QString minimumStr = atts.value("minimum");
+        QString maximumStr = atts.value("maximum");
+        QString validMinimumStr = atts.value("validMinimum");
+        QString validMaximumStr = atts.value("validMaximum");
+        QString removedDataStr = atts.value("removedData");
+        if (!validPixelsStr.isEmpty() 
+            && !nullPixelsStr.isEmpty()
+            && !lrsPixelsStr.isEmpty()
+            && !lisPixelsStr.isEmpty()
+            && !hrsPixelsStr.isEmpty()
+            && !hisPixelsStr.isEmpty()
+            && !underRangePixelsStr.isEmpty()
+            && !overRangePixelsStr.isEmpty()
+            && !sumStr.isEmpty()
+            && !minimumStr.isEmpty()
+            && !maximumStr.isEmpty()
+            && !validMinimumStr.isEmpty()
+            && !validMaximumStr.isEmpty()
+            && !removedDataStr.isEmpty()
+            ) {
+          int validPixels = toInt(validPixelsStr);
+          int nullPixels = toInt(nullPixelsStr);
+          int lrsPixels = toInt(lrsPixelsStr);
+          int lisPixels = toInt(lisPixelsStr);
+          int hrsPixels = toInt(hrsPixelsStr);
+          int hisPixels = toInt(hisPixelsStr);
+          int underRangePixels = toInt(underRangePixelsStr);
+          int overRangePixels = toInt(overRangePixelsStr);
+          double sum = toDouble(sumStr);
+          double minimum = toDouble(minimumStr);
+          double maximum = toDouble(maximumStr);
+          double validMinimum = toDouble(validMinimumStr);
+          double validMaximum = toDouble(validMaximumStr);
+          bool removedData = toBool(removedDataStr);
+          Statistics statsItem;
+          statsItem.set(validPixels, nullPixels, lrsPixels, lisPixels, hrsPixels, hisPixels,
+                        underRangePixels, overRangePixels, sum, minimum, maximum,
+                        validMinimum, validMaximum, removedData);
+          m_statistics->m_rmsImageResiduals.append(statsItem);
+        }
+
+      }
+      else if (localName == "elapsedTime") {
+
+        QString time = atts.value("time");
+        if (!time.isEmpty()) {
+          m_statistics->m_elapsedTime = toDouble(time);
+        }
+
+        QString errorProp = atts.value("errorProp");
+        if (!errorProp.isEmpty()) {
+          m_statistics->m_elapsedTimeErrorProp = toDouble(errorProp);
+        }
+
+      }
+      else if (localName == "minLat") {
+
+        QString minLat = atts.value("value");
+        if (!minLat.isEmpty()) {
+          m_statistics->m_minSigmaLatitude = toDouble(minLat);
+        }
+
+        QString minLatPointId = atts.value("pointId");
+        if (!minLatPointId.isEmpty()) {
+          m_statistics->m_minSigmaLatitudePointId = minLatPointId;
+        }
+
+      }
+      else if (localName == "maxLat") {
+
+        QString maxLat = atts.value("value");
+        if (!maxLat.isEmpty()) {
+          m_statistics->m_maxSigmaLatitude = toDouble(maxLat);
+        }
+
+        QString maxLatPointId = atts.value("pointId");
+        if (!maxLatPointId.isEmpty()) {
+          m_statistics->m_maxSigmaLatitudePointId = maxLatPointId;
+        }
+
+      }
+      else if (localName == "minLon") {
+
+        QString minLon = atts.value("value");
+        if (!minLon.isEmpty()) {
+          m_statistics->m_minSigmaLongitude = toDouble(minLon);
+        }
+
+        QString minLonPointId = atts.value("pointId");
+        if (!minLonPointId.isEmpty()) {
+          m_statistics->m_minSigmaLongitudePointId = minLonPointId;
+        }
+
+      }
+      else if (localName == "maxLon") {
+
+        QString maxLon = atts.value("value");
+        if (!maxLon.isEmpty()) {
+          m_statistics->m_maxSigmaLongitude = toDouble(maxLon);
+        }
+
+        QString maxLonPointId = atts.value("pointId");
+        if (!maxLonPointId.isEmpty()) {
+          m_statistics->m_maxSigmaLongitudePointId = maxLonPointId;
+        }
+
+      }
+      else if (localName == "minRad") {
+
+        QString minRad = atts.value("value");
+        if (!minRad.isEmpty()) {
+          m_statistics->m_minSigmaRadius = toDouble(minRad);
+        }
+
+        QString minRadPointId = atts.value("pointId");
+        if (!minRadPointId.isEmpty()) {
+          m_statistics->m_minSigmaRadiusPointId = minRadPointId;
+        }
+
+      }
+      else if (localName == "maxRad") {
+
+        QString maxRad = atts.value("value");
+        if (!maxRad.isEmpty()) {
+          m_statistics->m_maxSigmaRadius = toDouble(maxRad);
+        }
+
+        QString maxRadPointId = atts.value("pointId");
+        if (!maxRadPointId.isEmpty()) {
+          m_statistics->m_maxSigmaRadiusPointId = maxRadPointId;
+        }
+
+      }
+      else if (localName == "maximumLikelihoodEstimation") {
+
+        QString numberModels = atts.value("numberModels");
+        if (!numberModels.isEmpty()) {
+          m_statistics->m_numberMaximumLikelihoodModels = toInt(numberModels);
+        }
+
+        QString maximumLikelihoodIndex = atts.value("maximumLikelihoodIndex");
+        if (!maximumLikelihoodIndex.isEmpty()) {
+          m_statistics->m_maximumLikelihoodIndex = toInt(maximumLikelihoodIndex);
+        }
+
+        QString maximumLikelihoodMedianR2Residuals = atts.value("maximumLikelihoodMedianR2Residuals");
+        if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
+          m_statistics->m_maximumLikelihoodMedianR2Residuals = toDouble(maximumLikelihoodMedianR2Residuals);
+        }
+
+      }
+      else if (localName == "cumulativeProbabilityCalculator") {
+        // TODO ???  m_statistics->m_cumPro = new StatCumProbDistDynCalc(m_project, reader());
+      }
+      else if (localName == "residualsCumulativeProbabilityCalculator") {
+        // TODO ???  m_statistics->m_cumProRes = new StatCumProbDistDynCalc(m_project, reader());
+      }
+      else if (localName == "model") {
+
+        QString index = atts.value("index");
+        int i = toInt(index);
+
+        QString model = atts.value("modelSelection");
+        QString tweakingConstant = atts.value("tweakingConstant");
+        if (!model.isEmpty() && !tweakingConstant.isEmpty()) {
+          delete m_statistics->m_wFunc[i];
+          m_statistics->m_wFunc[i] = NULL;
+          m_statistics->m_wFunc[i] = new MaximumLikelihoodWFunctions(
+              MaximumLikelihoodWFunctions::stringToModel(model),
+              toDouble(tweakingConstant));
+        }
+
+        QString quantile = atts.value("quantile");
+        if (!quantile.isEmpty()) {
+          m_statistics->m_maximumLikelihoodQuan[i] = toDouble(quantile);
+          // m_bundleSettings->m_maximumLikelihood.append(
+          //    qMakePair(MaximumLikelihoodWFunctions::stringToModel(type),
+          //              toDouble(quantile)));
+        }
+
+      }
+    }
+    return true;
+  }
+
+
+
+  bool BundleStatistics::XmlHandler::characters(const QString &ch) {
+    m_characters += ch;
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+
+  bool BundleStatistics::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                     const QString &qName) {
+    if (!m_characters.isEmpty()) {
+      if (localName == "id") {
+        delete m_statistics->m_id;
+        m_statistics->m_id = NULL;
+        m_statistics->m_id = new QUuid(m_characters);
+      }
+      if (localName == "instrumentId") {
+        m_statistics->m_instrumentId = m_characters;
+      }
+      if (localName == "numberFixedPoints") {
+        m_statistics->m_numberFixedPoints = toInt(m_characters);
+      }
+      if (localName == "numberIgnoredPoints") {
+        m_statistics->m_numberIgnoredPoints = toInt(m_characters);
+      }
+      if (localName == "numberHeldImages") {
+        m_statistics->m_numberHeldImages = toInt(m_characters);
+      }
+      if (localName == "rejectionLimit") {
+        m_statistics->m_rejectionLimit = toDouble(m_characters);
+      }
+      if (localName == "numberRejectedObservations") {
+        m_statistics->m_numberRejectedObservations = toInt(m_characters);
+      }
+      if (localName == "numberObservations") {
+        m_statistics->m_numberObservations = toInt(m_characters);
+      }
+      if (localName == "numberImageParameters") {
+        m_statistics->m_numberImageParameters = toInt(m_characters);
+      }
+      if (localName == "numberConstrainedPointParameters") {
+        m_statistics->m_numberConstrainedPointParameters = toInt(m_characters);
+      }
+      if (localName == "numberConstrainedImageParameters") {
+        m_statistics->m_numberConstrainedImageParameters = toInt(m_characters);
+      }
+      if (localName == "numberUnknownParameters") {
+        m_statistics->m_numberUnknownParameters = toInt(m_characters);
+      }
+      if (localName == "degreesOfFreedom") {
+        m_statistics->m_degreesOfFreedom = toInt(m_characters);
+      }
+      if (localName == "sigma0") {
+        m_statistics->m_sigma0 = toDouble(m_characters);
+      }
+      if (localName == "converged") {
+        m_statistics->m_converged = toBool(m_characters);
+      }
+      m_characters = "";
+    }
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
+  }
+
+
+
   QDataStream &BundleStatistics::write(QDataStream &stream) const {
-    stream << *m_correlationMatrix << (qint32)m_numberFixedPoints << (qint32)m_numberIgnoredPoints
-           << (qint32)m_numberHeldImages << m_rms_rx << m_rms_ry << m_rms_rxy << m_rejectionLimit
-           << (qint32)m_numberRejectedObservations << (qint32)m_numberObservations
-           << (qint32)m_numberImageParameters << (qint32)m_numberConstrainedPointParameters
-           << (qint32)m_numberConstrainedImageParameters << (qint32)m_numberUnknownParameters
-           << (qint32)m_degreesOfFreedom << m_sigma0 << m_elapsedTime << m_elapsedTimeErrorProp
-           << m_converged << m_rmsImageSampleResiduals << m_rmsImageLineResiduals
-           << m_rmsImageResiduals << m_rmsImageXSigmas << m_rmsImageYSigmas << m_rmsImageZSigmas
+    stream << m_id->toString()
+           << *m_correlationMatrix
+           << (qint32)m_numberFixedPoints
+           << (qint32)m_numberIgnoredPoints
+           << (qint32)m_numberHeldImages
+           << m_rms_rx << m_rms_ry << m_rms_rxy
+           << m_rejectionLimit
+           << (qint32)m_numberRejectedObservations
+           << (qint32)m_numberObservations
+           << (qint32)m_numberImageParameters
+           << (qint32)m_numberConstrainedPointParameters
+           << (qint32)m_numberConstrainedImageParameters
+           << (qint32)m_numberUnknownParameters
+           << (qint32)m_degreesOfFreedom
+           << m_sigma0
+           << m_elapsedTime << m_elapsedTimeErrorProp
+           << m_converged
+           << m_rmsImageSampleResiduals << m_rmsImageLineResiduals
+           << m_rmsImageResiduals
+           << m_rmsImageXSigmas << m_rmsImageYSigmas << m_rmsImageZSigmas
            << m_rmsImageRASigmas << m_rmsImageDECSigmas << m_rmsImageTWISTSigmas
-           << m_minSigmaLatitude << m_minSigmaLatitudePointId << m_maxSigmaLatitude
-           << m_maxSigmaLatitudePointId << m_minSigmaLongitude << m_minSigmaLongitudePointId
-           << m_maxSigmaLongitude << m_maxSigmaLongitudePointId << m_minSigmaRadius
-           << m_minSigmaRadiusPointId << m_maxSigmaRadius << m_maxSigmaRadiusPointId
+           << m_minSigmaLatitude << m_minSigmaLatitudePointId
+           << m_maxSigmaLatitude << m_maxSigmaLatitudePointId
+           << m_minSigmaLongitude << m_minSigmaLongitudePointId
+           << m_maxSigmaLongitude << m_maxSigmaLongitudePointId
+           << m_minSigmaRadius << m_minSigmaRadiusPointId
+           << m_maxSigmaRadius << m_maxSigmaRadiusPointId
            << m_rmsSigmaLat << m_rmsSigmaLon << m_rmsSigmaRad
            << (qint32)m_numberMaximumLikelihoodModels << *m_wFunc[0] << *m_wFunc[1] << *m_wFunc[2]
-           << m_maximumLikelihoodQuan[0] << m_maximumLikelihoodQuan[1]
-           << m_maximumLikelihoodQuan[2] << (qint32)m_maximumLikelihoodIndex << *m_cumPro
-           << *m_cumProRes << m_maximumLikelihoodMedianR2Residuals;
+           << m_maximumLikelihoodQuan[0] << m_maximumLikelihoodQuan[1] << m_maximumLikelihoodQuan[2]
+           << (qint32)m_maximumLikelihoodIndex << *m_cumPro << *m_cumProRes
+           << m_maximumLikelihoodMedianR2Residuals;
     return stream;
   }
 
 
 
   QDataStream &BundleStatistics::read(QDataStream &stream) {
+    QString id;
     qint32 numberFixedPoints, numberIgnoredPoints, numberHeldImages, numberRejectedObservations,
            numberObservations, numberImageParameters, numberConstrainedPointParameters,
            numberConstrainedImageParameters, numberUnknownParameters, degreesOfFreedom,
@@ -1115,25 +1804,41 @@ namespace Isis {
     wFunc.resize(3);
     StatCumProbDistDynCalc cumPro;
     StatCumProbDistDynCalc cumProRes;
-    stream >> correlationMatrix >> numberFixedPoints >> numberIgnoredPoints
-           >> numberHeldImages >> m_rms_rx >> m_rms_ry >> m_rms_rxy >> m_rejectionLimit
-           >> numberRejectedObservations >> numberObservations
-           >> numberImageParameters >> numberConstrainedPointParameters
-           >> numberConstrainedImageParameters >> numberUnknownParameters
-           >> degreesOfFreedom >> m_sigma0 >> m_elapsedTime >> m_elapsedTimeErrorProp
-           >> m_converged >> m_rmsImageSampleResiduals >> m_rmsImageLineResiduals
-           >> m_rmsImageResiduals >> m_rmsImageXSigmas >> m_rmsImageYSigmas >> m_rmsImageZSigmas
+    stream >> id 
+           >> correlationMatrix
+           >> numberFixedPoints
+           >> numberIgnoredPoints
+           >> numberHeldImages
+           >> m_rms_rx >> m_rms_ry >> m_rms_rxy
+           >> m_rejectionLimit
+           >> numberRejectedObservations
+           >> numberObservations
+           >> numberImageParameters
+           >> numberConstrainedPointParameters
+           >> numberConstrainedImageParameters
+           >> numberUnknownParameters
+           >> degreesOfFreedom
+           >> m_sigma0
+           >> m_elapsedTime >> m_elapsedTimeErrorProp
+           >> m_converged
+           >> m_rmsImageSampleResiduals >> m_rmsImageLineResiduals
+           >> m_rmsImageResiduals
+           >> m_rmsImageXSigmas >> m_rmsImageYSigmas >> m_rmsImageZSigmas
            >> m_rmsImageRASigmas >> m_rmsImageDECSigmas >> m_rmsImageTWISTSigmas
-           >> m_minSigmaLatitude >> m_minSigmaLatitudePointId >> m_maxSigmaLatitude
-           >> m_maxSigmaLatitudePointId >> m_minSigmaLongitude >> m_minSigmaLongitudePointId
-           >> m_maxSigmaLongitude >> m_maxSigmaLongitudePointId >> m_minSigmaRadius
-           >> m_minSigmaRadiusPointId >> m_maxSigmaRadius >> m_maxSigmaRadiusPointId
+           >> m_minSigmaLatitude >> m_minSigmaLatitudePointId
+           >> m_maxSigmaLatitude >> m_maxSigmaLatitudePointId
+           >> m_minSigmaLongitude >> m_minSigmaLongitudePointId
+           >> m_maxSigmaLongitude >> m_maxSigmaLongitudePointId
+           >> m_minSigmaRadius >> m_minSigmaRadiusPointId
+           >> m_maxSigmaRadius >> m_maxSigmaRadiusPointId
            >> m_rmsSigmaLat >> m_rmsSigmaLon >> m_rmsSigmaRad
            >> numberMaximumLikelihoodModels >> wFunc[0] >> wFunc[1] >> wFunc[2]
-           >> m_maximumLikelihoodQuan[0] >> m_maximumLikelihoodQuan[1]
-           >> m_maximumLikelihoodQuan[2] >> maximumLikelihoodIndex >> cumPro
-           >> cumProRes >> m_maximumLikelihoodMedianR2Residuals;
+           >> m_maximumLikelihoodQuan[0] >> m_maximumLikelihoodQuan[1] >> m_maximumLikelihoodQuan[2]
+           >> maximumLikelihoodIndex
+           >> cumPro >> cumProRes
+           >> m_maximumLikelihoodMedianR2Residuals;
 
+    m_id = new QUuid(id);
     m_numberFixedPoints                = (int)numberFixedPoints;
     m_numberIgnoredPoints              = (int)numberIgnoredPoints;
     m_numberHeldImages                 = (int)numberHeldImages;

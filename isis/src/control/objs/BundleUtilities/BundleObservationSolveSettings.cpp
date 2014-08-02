@@ -4,12 +4,17 @@
 #include <QDebug>
 #include <QList>
 #include <QString>
+#include <QUuid>
+#include <QXmlStreamWriter>
 
 #include "BundleImage.h"
 #include "Camera.h"
+#include "FileName.h"
+#include "IException.h"
+#include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
-
+#include "XmlStackedHandlerReader.h"
 
 
 namespace Isis {
@@ -19,6 +24,9 @@ namespace Isis {
    */
   BundleObservationSolveSettings::BundleObservationSolveSettings() {
 
+    m_id = NULL;
+    m_id = new QUuid(QUuid::createUuid());
+    
     m_instrumentId = "";
 
     // Spacecraft Position Options
@@ -43,10 +51,29 @@ namespace Isis {
 
 
   /**
+   * Construct this BundleSettings object from XML.
+   *
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  BundleObservationSolveSettings::BundleObservationSolveSettings(Project *project, XmlStackedHandlerReader *xmlReader,
+                                 QObject *parent) : QObject(parent) {
+    m_id = NULL;
+    // ??? initializations ???
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+  }
+
+
+
+  /**
    * Copy constructor.
    */
   BundleObservationSolveSettings::
       BundleObservationSolveSettings(const BundleObservationSolveSettings &other) {
+
+    m_id = NULL;
+    m_id = new QUuid(other.m_id->toString());
 
     m_instrumentId = other.m_instrumentId;
 
@@ -76,6 +103,8 @@ namespace Isis {
    * Destructor.
    */
   BundleObservationSolveSettings::~BundleObservationSolveSettings() {
+      delete m_id;
+      m_id = NULL;
   }
 
 
@@ -84,6 +113,10 @@ namespace Isis {
   BundleObservationSolveSettings 
       &BundleObservationSolveSettings::operator=(const BundleObservationSolveSettings &other) {
     if (&other != this) {
+      delete m_id;
+      m_id = NULL;
+      m_id = new QUuid(other.m_id->toString());
+      
       m_instrumentId = other.m_instrumentId;
       
       // position related
@@ -630,68 +663,316 @@ namespace Isis {
 
     pvl += PvlKeyword("InstrumentPointingSolveOption", 
                       instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
-    pvl += PvlKeyword("SolveTwist", toString(m_solveTwist));  // TODO: omit from pvl if pointing option == None ??? 
-    pvl += PvlKeyword("CKDegree", toString(m_ckDegree));  // TODO: omit from pvl if pointing option == None ??? 
-    if (m_instrumentPointingSolveOption != NoPointingFactors) {
+    if (m_instrumentPointingSolveOption > NoPointingFactors) {
+      pvl += PvlKeyword("SolveTwist", toString(m_solveTwist));
+      pvl += PvlKeyword("CKDegree", toString(m_ckDegree));
       pvl += PvlKeyword("CKSolveDegree", toString(m_ckSolveDegree));
-    }
-    else {
-      pvl += PvlKeyword("CKSolveDegree", "N/A"); // or omit from pvl ??? 
-    }
-    pvl += PvlKeyword("NumberAngleCoefficientsSolved", toString(m_numberCamAngleCoefSolved));
-    pvl += PvlKeyword("SolvePointingPolynomialOverExisting", 
-                      toString(m_solvePointingPolynomialOverExisting));  // TODO: omit from pvl if pointing option == None ??? 
-
-    PvlKeyword angleSigmas("AngleAprioriSigmas");  // TODO: omit from pvl if pointing option == None ??? 
-    if (m_anglesAprioriSigma.size() > 0) {
-      for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
-        if (m_anglesAprioriSigma[i] > 0) {
-          angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
-        }
-        else {
-          angleSigmas.addValue("N/A");
+      pvl += PvlKeyword("NumberAngleCoefficientsSolved", toString(m_numberCamAngleCoefSolved));
+      pvl += PvlKeyword("SolvePointingPolynomialOverExisting", 
+                        toString(m_solvePointingPolynomialOverExisting)); 
+      PvlKeyword angleSigmas("AngleAprioriSigmas");
+      if (m_anglesAprioriSigma.size() > 0) {
+        for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
+          if (m_anglesAprioriSigma[i] > 0) {
+            angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
+          }
+          else {
+            angleSigmas.addValue("N/A");
+          }
         }
       }
+      else {
+        angleSigmas.addValue("N/A");
+      }
+      pvl += angleSigmas;
+      
+      pvl += PvlKeyword("InstrumentPointingInterpolationType",
+                      toString((int)m_pointingInterpolationType));  // TODO: omit from pvl if pointing option == None ??? 
     }
     else {
-      angleSigmas.addValue("N/A"); // or omit from pvl ??? 
+      pvl += PvlKeyword("SolveTwist", "N/A");  // TODO: omit from pvl if pointing option == None ??? 
+      pvl += PvlKeyword("CKDegree", "N/A");  // TODO: omit from pvl if pointing option == None ??? 
+      pvl += PvlKeyword("CKSolveDegree", "N/A"); // or omit from pvl ??? 
+      pvl += PvlKeyword("NumberAngleCoefficientsSolved", "N/A");
+      pvl += PvlKeyword("SolvePointingPolynomialOverExisting", "N/A");
+      pvl += PvlKeyword("AngleAprioriSigmas", "N/A");  // TODO: omit from pvl if pointing option == None ??? 
+      pvl += PvlKeyword("InstrumentPointingInterpolationType", "N/A");
     }
-    pvl += angleSigmas;
 
-    pvl += PvlKeyword("InstrumentPointingInterpolationType",
-                      toString((int)m_pointingInterpolationType));  // TODO: omit from pvl if pointing option == None ??? 
 
     // position
 
     pvl += PvlKeyword("InstrumentPositionSolveOption", 
                       instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
-    pvl += PvlKeyword("SPKDegree", toString(m_spkDegree));
-    pvl += PvlKeyword("SPKSolveDegree", toString(m_spkSolveDegree));
-    pvl += PvlKeyword("NumberPositionCoefficientsSolved", toString(m_numberCamPosCoefSolved));
-    pvl += PvlKeyword("SolvePositionOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
-
-    PvlKeyword positionSigmas("PositionAprioriSigmas");
-    for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
-      if (m_positionAprioriSigma[i] > 0) {
-        positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
+    if (m_instrumentPositionSolveOption != NoPositionFactors) {
+      pvl += PvlKeyword("SPKDegree", toString(m_spkDegree));
+      pvl += PvlKeyword("SPKSolveDegree", toString(m_spkSolveDegree));
+      pvl += PvlKeyword("NumberPositionCoefficientsSolved", toString(m_numberCamPosCoefSolved));
+      pvl += PvlKeyword("SolvePositionOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
+    
+      PvlKeyword positionSigmas("PositionAprioriSigmas");
+      for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
+        if (m_positionAprioriSigma[i] > 0) {
+          positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
+        }
+        else {
+          positionSigmas.addValue("N/A");
+        }
+    
       }
-      else {
-        angleSigmas.addValue("N/A");
-      }
-
+      pvl += positionSigmas;
+    
+      pvl += PvlKeyword("InstrumentPositionInterpolationType",
+                        toString((int)m_positionInterpolationType));
     }
-    pvl += positionSigmas;
-
-    pvl += PvlKeyword("InstrumentPositionInterpolationType",
-                      toString((int)m_positionInterpolationType));
+    else {
+      pvl += PvlKeyword("SPKDegree", "N/A");
+      pvl += PvlKeyword("SPKSolveDegree", "N/A");
+      pvl += PvlKeyword("NumberPositionCoefficientsSolved", "N/A");
+      pvl += PvlKeyword("SolvePositionOverHermiteSpline", "N/A");
+      pvl += PvlKeyword("PositionAprioriSigmas", "N/A");
+      pvl += PvlKeyword("InstrumentPositionInterpolationType", "N/A");
+    }
     return pvl;
+  }
+
+
+
+  void BundleObservationSolveSettings::save(QXmlStreamWriter &stream, const Project *project, 
+                                            FileName newProjectRoot) const {
+
+    stream.writeStartElement("id");
+    stream.writeCharacters(m_id->toString());
+    stream.writeEndElement();
+ 
+    stream.writeStartElement("instrumentId");
+    stream.writeCharacters(m_instrumentId);
+    stream.writeEndElement();
+
+    // pointing related
+    stream.writeStartElement("instrumentPointingOptions");
+    stream.writeAttribute("solveOption", 
+                           instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
+    stream.writeAttribute("solveTwist", toString(m_solveTwist));
+    stream.writeAttribute("degree", toString(m_ckDegree));
+    stream.writeAttribute("solveDegree", toString(m_ckSolveDegree));
+    stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
+    stream.writeAttribute("solveOverExisting", toString(m_solvePointingPolynomialOverExisting));
+    stream.writeAttribute("interpolationType", toString(m_pointingInterpolationType));
+    stream.writeStartElement("aprioriSigmas");
+    if (m_anglesAprioriSigma.size() > 0) {
+      stream.writeAttribute("angles", toString(m_anglesAprioriSigma[0]));
+    }
+    else {
+      stream.writeAttribute("angles", "N/A");
+    }
+    if (m_anglesAprioriSigma.size() > 1) {
+      stream.writeAttribute("velocity", toString(m_anglesAprioriSigma[1]));
+    }
+    else {
+      stream.writeAttribute("velocity", "N/A");
+    }
+    if (m_anglesAprioriSigma.size() > 2) {
+      stream.writeAttribute("acceleration", toString(m_anglesAprioriSigma[2]));
+    }
+    else {
+      stream.writeAttribute("acceleration", "N/A");
+    }
+    stream.writeEndElement();
+    stream.writeEndElement();
+
+    // position related
+    stream.writeStartElement("instrumentPositionOptions");
+    stream.writeAttribute("solveOption", 
+                           instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
+    stream.writeAttribute("degree", toString(m_spkDegree));
+    stream.writeAttribute("solveDegree", toString(m_spkSolveDegree));
+    stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
+    stream.writeAttribute("solveOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
+    stream.writeAttribute("interpolationType", toString(m_positionInterpolationType));
+    stream.writeStartElement("aprioriSigmas");
+    if (m_positionAprioriSigma.size() > 0) {
+      stream.writeAttribute("position", toString(m_positionAprioriSigma[0]));
+    }
+    else {
+      stream.writeAttribute("position", "N/A");
+    }
+    if (m_positionAprioriSigma.size() > 1) {
+      stream.writeAttribute("velocity", toString(m_positionAprioriSigma[1]));
+    }
+    else {
+      stream.writeAttribute("velocity", "N/A");
+    }
+    if (m_positionAprioriSigma.size() > 2) {
+      stream.writeAttribute("acceleration", toString(m_positionAprioriSigma[2]));
+    }
+    else {
+      stream.writeAttribute("acceleration", "N/A");
+    }
+    stream.writeEndElement();
+    stream.writeEndElement();
+
+  }
+
+
+
+  BundleObservationSolveSettings::XmlHandler::XmlHandler(BundleObservationSolveSettings *settings, 
+                                                         Project *project) {
+    m_settings = settings;
+    m_project = project;
+    m_characters = "";
+  }
+
+
+
+  BundleObservationSolveSettings::XmlHandler::~XmlHandler() {
+    delete m_project;
+    m_project = NULL;
+  }
+  
+
+
+  bool BundleObservationSolveSettings::XmlHandler::startElement(const QString &namespaceURI, 
+                                                                const QString &localName,
+                                                                const QString &qName,
+                                                                const QXmlAttributes &atts) {
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+      if (localName == "instrumentPointingOptions") {
+        
+        QString pointingSolveOption = atts.value("solveOption");
+        if (!pointingSolveOption.isEmpty()) {
+          m_settings->m_instrumentPointingSolveOption
+              = stringToInstrumentPointingSolveOption(pointingSolveOption);
+        }
+
+        QString solveTwist = atts.value("solveTwist");
+        if (!solveTwist.isEmpty()) {
+          m_settings->m_solveTwist = toBool(solveTwist);
+        }
+
+        QString ckDegree = atts.value("degree");
+        if (!ckDegree.isEmpty()) {
+          m_settings->m_ckDegree = toInt(ckDegree);
+        }
+
+        QString ckSolveDegree = atts.value("solveDegree");
+        if (!ckSolveDegree.isEmpty()) {
+          m_settings->m_ckSolveDegree = toInt(ckSolveDegree);
+        }
+
+        QString numberCoefSolved = atts.value("numberCoefSolved");
+        if (!numberCoefSolved.isEmpty()) {
+          m_settings->m_numberCamAngleCoefSolved = toInt(numberCoefSolved);
+        }
+
+        QString solveOverExisting = atts.value("solveOverExisting");
+        if (!solveOverExisting.isEmpty()) {
+          m_settings->m_solvePointingPolynomialOverExisting = toBool(solveOverExisting);
+        }
+
+        QString interpolationType = atts.value("interpolationType");
+        if (!interpolationType.isEmpty()) {
+          m_settings->m_pointingInterpolationType = SpiceRotation::Source(toInt(interpolationType));
+        }
+
+        QString anglesSigma = atts.value("angles");
+        if (!anglesSigma.isEmpty() && anglesSigma != "N/A") {
+          m_settings->m_anglesAprioriSigma.append(toDouble(anglesSigma));
+        }
+
+        QString velocitySigma = atts.value("velocity");
+        if (!velocitySigma.isEmpty() && velocitySigma != "N/A") {
+          m_settings->m_anglesAprioriSigma.append(toDouble(velocitySigma));
+        }
+
+        QString accelerationSigma = atts.value("acceleration");
+        if (!accelerationSigma.isEmpty() && accelerationSigma != "N/A") {
+          m_settings->m_anglesAprioriSigma.append(toDouble(accelerationSigma));
+        }
+      }
+      else if (localName == "instrumentPositionOptions") {
+        
+        QString positionSolveOption = atts.value("solveOption");
+        if (!positionSolveOption.isEmpty()) {
+          m_settings->m_instrumentPositionSolveOption
+              = stringToInstrumentPositionSolveOption(positionSolveOption);
+        }
+
+        QString spkDegree = atts.value("degree");
+        if (!spkDegree.isEmpty()) {
+          m_settings->m_spkDegree = toInt(spkDegree);
+        }
+
+        QString spkSolveDegree = atts.value("solveDegree");
+        if (!spkSolveDegree.isEmpty()) {
+          m_settings->m_spkSolveDegree = toInt(spkSolveDegree);
+        }
+
+        QString numberCoefSolved = atts.value("numberCoefSolved");
+        if (!numberCoefSolved.isEmpty()) {
+          m_settings->m_numberCamPosCoefSolved = toInt(numberCoefSolved);
+        }
+
+        QString solveOverHermiteSpline = atts.value("solveOverHermiteSpline");
+        if (!solveOverHermiteSpline.isEmpty()) {
+          m_settings->m_solvePositionOverHermiteSpline = toBool(solveOverHermiteSpline);
+        }
+
+        QString interpolationType = atts.value("interpolationType");
+        if (!interpolationType.isEmpty()) {
+          m_settings->m_positionInterpolationType = SpicePosition::Source(toInt(interpolationType));
+        }
+
+        QString positionSigma = atts.value("position");
+        if (!positionSigma.isEmpty() && positionSigma != "N/A") {
+          m_settings->m_positionAprioriSigma.append(toDouble(positionSigma));
+        }
+
+        QString velocitySigma = atts.value("velocity");
+        if (!velocitySigma.isEmpty() && velocitySigma != "N/A") {
+          m_settings->m_positionAprioriSigma.append(toDouble(velocitySigma));
+        }
+
+        QString accelerationSigma = atts.value("acceleration");
+        if (!accelerationSigma.isEmpty() && accelerationSigma != "N/A") {
+          m_settings->m_positionAprioriSigma.append(toDouble(accelerationSigma));
+        }
+      }
+    }
+    return true;
+  }
+
+
+
+  bool BundleObservationSolveSettings::XmlHandler::characters(const QString &ch) {
+    m_characters += ch;
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+
+  bool BundleObservationSolveSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                     const QString &qName) {
+    if (!m_characters.isEmpty()) {
+      if (localName == "id") {
+        delete m_settings->m_id;
+        m_settings->m_id = NULL;
+        m_settings->m_id = new QUuid(m_characters);
+      }
+      if (localName == "instrumentId") {
+        m_settings->m_instrumentId = m_characters;
+      }
+      m_characters = "";
+    }
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 
 
   QDataStream &BundleObservationSolveSettings::write(QDataStream &stream) const {
 
-    stream << m_instrumentId
+    stream << m_id->toString()
+           << m_instrumentId
            << (qint32)m_instrumentPointingSolveOption
            << m_solveTwist
            << (qint32)m_ckDegree
@@ -716,10 +997,12 @@ namespace Isis {
 
   QDataStream &BundleObservationSolveSettings::read(QDataStream &stream) {
 
+    QString id;
     qint32 anglesSolveOption, ckDegree, ckSolveDegree, numCamAngleCoefSolved, anglesInterpType,
            positionSolveOption, spkDegree, spkSolveDegree, numCamPosCoefSolved, positionInterpType;
 
-    stream >> m_instrumentId
+    stream >> id 
+           >> m_instrumentId
            >> anglesSolveOption
            >> m_solveTwist
            >> ckDegree
@@ -736,6 +1019,7 @@ namespace Isis {
            >> m_positionAprioriSigma
            >> positionInterpType;
 
+    m_id = new QUuid(id);
     m_instrumentPointingSolveOption = (InstrumentPointingSolveOption)anglesSolveOption;
     m_ckDegree = (int)ckDegree;
     m_ckSolveDegree = (int)ckSolveDegree;
