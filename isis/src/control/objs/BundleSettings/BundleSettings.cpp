@@ -985,8 +985,8 @@ qDebug() << "handler pushed";
       // option 2
       if (localName == "id") {
         delete m_bundleSettings->m_id;
-        m_bundleSettings->m_id = NULL;//.toAscii()); // ??? is the toAscii needed here ??? we pass in QString in copy constructor...
-        m_bundleSettings->m_id = new QUuid(m_characters);//.toAscii()); // ??? is the toAscii needed here ??? we pass in QString in copy constructor...
+        m_bundleSettings->m_id = NULL;
+        m_bundleSettings->m_id = new QUuid(m_characters);
       }
       else if (localName == "validateNetwork") {
         m_bundleSettings->m_validateNetwork = toBool(m_characters);
