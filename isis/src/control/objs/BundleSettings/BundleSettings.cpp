@@ -1,14 +1,15 @@
 #include "BundleSettings.h"
 
+#include <QDataStream>
 #include <QDebug>
 #include <QList>
 #include <QString>
 #include <QUuid>
-#include <QtDebug>
 #include <QXmlStreamWriter>
 
 #include "BundleObservationSolveSettings.h"
 #include "IException.h"
+#include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
 #include "PvlKeyword.h"
@@ -20,7 +21,7 @@ namespace Isis {
   /**
    * Constructs a BundleSettings object with default values.
    */
-  BundleSettings::BundleSettings() {
+  BundleSettings::BundleSettings(QObject *parent) : QObject(parent) {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
 
@@ -72,20 +73,19 @@ namespace Isis {
    * @param parent The Qt-relationship parent
    */
   BundleSettings::BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
+                                 QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
     m_id = NULL;
     // what about the rest of the member data ??? should we set defaults ???
-qDebug() << "parent constructor";
+
     xmlReader->pushContentHandler(new XmlHandler(this, project));
-qDebug() << "handler pushed";
+    xmlReader->setErrorHandler(new XmlHandler(this, project));
   }
 
 
   BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
- //    m_propertiesUsed = 0;
- //    m_propertyValues = new QMap<int, QVariant>; 
     m_id = NULL;
     xmlReader->pushContentHandler(new XmlHandler(this));
+    xmlReader->setErrorHandler(new XmlHandler(this));
   }
 
 
@@ -568,21 +568,15 @@ qDebug() << "handler pushed";
    *
    * (fileName attribute is just the base name)
    */
-  void BundleSettings::save(QXmlStreamWriter &stream, const Project *project,
-                            FileName newProjectRoot) const {
+  void BundleSettings::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
 //#if 0
     // option 2
-    stream.writeStartDocument("1.0");
-    //stream.writeStartDocument("BundleSettingsOption2");
+    stream.writeStartElement("bundleSettings");
+
     stream.writeStartElement("globalSettings");
 
-    stream.writeStartElement("id");
-    stream.writeCharacters(m_id->toString());
-    stream.writeEndElement();
-    
-    stream.writeStartElement("validateNetwork");
-    stream.writeCharacters(toString(validateNetwork()));
-    stream.writeEndElement();
+    stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("validateNetwork", toString(validateNetwork()));
     
     stream.writeStartElement("solveOptions");
     stream.writeAttribute("solveMethod", solveMethodToString(solveMethod()));
@@ -644,9 +638,7 @@ qDebug() << "handler pushed";
     stream.writeStartElement("observationSolveSettingsList");
     stream.writeAttribute("listSize", toString(numberSolveSettings()));
     for (int i = 0; i < m_observationSolveSettings.size(); i++) {
-      stream.writeStartElement("observationSolveSettings");
-      m_observationSolveSettings[i].save(stream, project, newProjectRoot);
-      stream.writeEndElement();
+      m_observationSolveSettings[i].save(stream, project);   // TODO: does xml stuff need project???
     }
     stream.writeEndElement();
 //#endif
@@ -659,75 +651,42 @@ qDebug() << "handler pushed";
     //stream.writeStartDocument("BundleSettingsOption3");
     stream.writeStartElement("globalSettings");
 
-    stream.writeStartElement("id");
-    stream.writeCharacters(m_id->toString());
-    stream.writeEndElement();
-    
-    stream.writeStartElement("validateNetwork");
-    stream.writeCharacters(toString(validateNetwork()));
-    stream.writeEndElement();
+    stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("validateNetwork", toString(validateNetwork()));
     
     stream.writeStartElement("solveOptions");
-    stream.writeStartElement("solveMethod");
-    stream.writeCharacters(solveMethodToString(solveMethod()));
-    stream.writeEndElement();
-    stream.writeStartElement("solveObservationMode");
-    stream.writeCharacters(toString(solveObservationMode()));
-    stream.writeEndElement();
-    stream.writeStartElement("solveRadius");
-    stream.writeCharacters(toString(solveRadius()));
-    stream.writeEndElement();
-    stream.writeStartElement("updateCubeLabel");
-    stream.writeCharacters(toString(updateCubeLabel()));
-    stream.writeEndElement();
-    stream.writeStartElement("errorPropagation");
-    stream.writeCharacters(toString(errorPropagation()));
-    stream.writeEndElement();
+    stream.writeTextElement("solveMethod", solveMethodToString(solveMethod()));
+    stream.writeTextElement("solveObservationMode", toString(solveObservationMode()));
+    stream.writeTextElement("solveRadius", toString(solveRadius()));
+    stream.writeTextElement("updateCubeLabel", toString(updateCubeLabel()));
+    stream.writeTextElement("errorPropagation", toString(errorPropagation()));
     stream.writeEndElement();
 
     stream.writeStartElement("aprioriSigmas");
-    stream.writeStartElement("latitude");
-    stream.writeCharacters(toString(globalLatitudeAprioriSigma()));
-    stream.writeEndElement();
-    stream.writeStartElement("longitude");
-    stream.writeCharacters(toString(globalLongitudeAprioriSigma()));
-    stream.writeEndElement();
+    stream.writeTextElement("latitude", toString(globalLatitudeAprioriSigma()));
+    stream.writeTextElement("longitude", toString(globalLongitudeAprioriSigma()));
     if (solveRadius()) {
-      stream.writeStartElement("radius");
-      stream.writeCharacters(toString(globalRadiusAprioriSigma()));
+      stream.writeTextElement("radius", toString(globalRadiusAprioriSigma()));
     }
     else {
-      stream.writeStartElement("radius");
-      stream.writeCharacters("N/A");
+      stream.writeTextElement("radius", "N/A");
     }
-    stream.writeEndElement();
     stream.writeEndElement();
     
     stream.writeStartElement("outlierRejectionOptions");
-    stream.writeStartElement("rejection");
-    stream.writeCharacters(toString(outlierRejection()));
-    stream.writeEndElement();
+    stream.writeTextElement("rejection", toString(outlierRejection()));
     if (outlierRejection()) {
-      stream.writeStartElement("multiplier");
-      stream.writeCharacters(toString(outlierRejectionMultiplier()));
+      stream.writeTextElement("multiplier", toString(outlierRejectionMultiplier()));
     }
     else {
-      stream.writeStartElement("multiplier");
-      stream.writeCharacters("N/A");
+      stream.writeTextElement("multiplier", "N/A");
     }
-    stream.writeEndElement();
     stream.writeEndElement();
     
     stream.writeStartElement("convergenceCriteriaOptions");
-    stream.writeStartElement("convergenceCriteria");
-    stream.writeCharacters(convergenceCriteriaToString(convergenceCriteria()));
-    stream.writeEndElement();
-    stream.writeStartElement("threshold");
-    stream.writeCharacters(toString(convergenceCriteriaThreshold()));
-    stream.writeEndElement();
-    stream.writeStartElement("maximumIterations");
-    stream.writeCharacters(toString(convergenceCriteriaMaximumIterations()));
-    stream.writeEndElement();
+    stream.writeTextElement("convergenceCriteria", convergenceCriteriaToString(convergenceCriteria()));
+    stream.writeTextElement("threshold", toString(convergenceCriteriaThreshold()));
+    stream.writeTextElement("maximumIterations", toString(convergenceCriteriaMaximumIterations()));
     stream.writeEndElement();
     
     stream.writeStartElement("maximumLikelihoodEstimation");
@@ -741,18 +700,10 @@ qDebug() << "handler pushed";
     stream.writeEndElement();
     
     stream.writeStartElement("outputFileOptions");
-    stream.writeStartElement("fileNamePrefix");
-    stream.writeCharacters(outputFilePrefix());
-    stream.writeEndElement();
-    stream.writeStartElement("createBundleOutputFile");
-    stream.writeCharacters(toString(createBundleOutputFile()));
-    stream.writeEndElement();
-    stream.writeStartElement("createCSVFiles");
-    stream.writeCharacters(toString(createCSVFiles()));
-    stream.writeEndElement();
-    stream.writeStartElement("createResidualsFile");
-    stream.writeCharacters(toString(createResidualsFile()));
-    stream.writeEndElement();
+    stream.writeTextElement("fileNamePrefix", outputFilePrefix());
+    stream.writeTextElement("createBundleOutputFile", toString(createBundleOutputFile()));
+    stream.writeTextElement("createCSVFiles", toString(createCSVFiles()));
+    stream.writeTextElement("createResidualsFile", toString(createResidualsFile()));
     stream.writeEndElement();
     
     stream.writeEndElement(); // end global settings
@@ -761,13 +712,14 @@ qDebug() << "handler pushed";
     stream.writeAttribute("listSize", toString(numberSolveSettings()));
     for (int i = 0; i < m_observationSolveSettings.size(); i++) {
       stream.writeStartElement("observationSolveSettings");
-      m_observationSolveSettings[i].save(stream, project, newProjectRoot);
+      m_observationSolveSettings[i].save(stream, project);  // TODO: does xml stuff need project???
       stream.writeEndElement();
     }
     stream.writeEndElement();
 #endif
-    stream.writeEndDocument();
+    stream.writeEndElement();
   }
+
 
 
   /**
@@ -777,9 +729,9 @@ qDebug() << "handler pushed";
    * @param bundleSettings The BundleSettings we're going to be initializing
    * @param imageFolder The folder that contains the Cube
    */
-  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings, Project *project) {
+  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings, Project *project) {  // TODO: does xml stuff need project???
     m_bundleSettings = bundleSettings;
-    m_project = project;
+    m_project = project;  // TODO: does xml stuff need project???
     m_characters = "";
   }
 
@@ -794,14 +746,14 @@ qDebug() << "handler pushed";
    */
   BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings) {
     m_bundleSettings = bundleSettings;
-    m_project = NULL;
+    m_project = NULL;  // TODO: does xml stuff need project???
     m_characters = "";
   }
 
 
 
   BundleSettings::XmlHandler::~XmlHandler() {
-    delete m_project;
+    delete m_project;  // TODO: does xml stuff need project???
     m_project = NULL;
   }
 
@@ -817,8 +769,8 @@ qDebug() << "handler pushed";
    */
   bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                        const QString &qName, const QXmlAttributes &atts) {
+    m_characters = "";
 
-    qDebug() << "startElement(" << namespaceURI << localName << qName << "atts)";
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
 //#if 0
@@ -936,12 +888,12 @@ qDebug() << "handler pushed";
           m_bundleSettings->m_createResidualsFile = toBool(createResidualsFileStr);
         }
       }
-      else if (localName == "observationSolveSettings") {
+      else if (localName == "observationSolveSettingsList") {
         QString numberObservationSolveSettings = atts.value("listSize");
         int observationSolveSettingsSize = toInt(numberObservationSolveSettings);
         for (int i = 0; i < observationSolveSettingsSize; i++) {
           m_bundleSettings->m_observationSolveSettings.append(
-              BundleObservationSolveSettings(m_project, reader()));
+              BundleObservationSolveSettings(m_project, reader()));   // TODO: does xml stuff need project???
         }
       }
 //#endif
@@ -961,7 +913,7 @@ qDebug() << "handler pushed";
         int observationSolveSettingsSize = toInt(numberObservationSolveSettings);
         for (int i = 0; i < observationSolveSettingsSize; i++) {
           m_bundleSettings->m_observationSolveSettings.append(
-              BundleObservationSolveSettings(m_project, reader()));
+              BundleObservationSolveSettings(m_project, reader()));   // TODO: does xml stuff need project???
         }
       }
 #endif
@@ -1074,6 +1026,15 @@ qDebug() << "handler pushed";
 
 
 
+  bool BundleSettings::XmlHandler::fatalError(const QXmlParseException &exception) {
+    qDebug() << "Parse error at line " << exception.lineNumber()
+             << ", " << "column " << exception.columnNumber() << ": "
+             << qPrintable(exception.message());
+    return false;
+  }
+
+
+
   QDataStream &BundleSettings::write(QDataStream &stream) const {
 
     stream << m_id->toString()
@@ -1131,7 +1092,10 @@ qDebug() << "handler pushed";
            >> m_createCSVFiles
            >> m_createResidualsFile;
 
+    delete m_id;
+    m_id = NULL;
     m_id = new QUuid(id);
+
     m_solveMethod = (BundleSettings::SolveMethod)solveMethod;
     m_convergenceCriteria = (BundleSettings::ConvergenceCriteria)convergenceCriteria;
     m_convergenceCriteriaMaximumIterations = (int)convergenceCriteriaMaximumIterations;

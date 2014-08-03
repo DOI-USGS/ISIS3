@@ -20,11 +20,19 @@
  *  http://www.usgs.gov/privacy.html.
  */
 
+#include <QObject>
 
-#include "SpecialPixel.h"
 #include "Constants.h"
+#include "SpecialPixel.h"
+#include "XmlStackedHandler.h"
+
+class QDataStream;
+class QUuid;
+class QXmlStreamWriter;
 
 namespace Isis {
+  class Project;// ??? does xml stuff need project???
+  class XmlStackedHandlerReader;
   /**
   * @brief This class is used to accumulate statistics on double arrays.
   *
@@ -73,16 +81,16 @@ namespace Isis {
   *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
   *
   */
-  class Statistics {
+  class Statistics : public QObject {
+    Q_OBJECT
     public:
-      Statistics();
+      Statistics(QObject *parent = 0);
+      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   // TODO: does xml stuff need project???
+      Statistics(const Statistics &other);
       ~Statistics();
+      Statistics &operator=(const Statistics &other);
 
       void Reset();
-      void set(int validPixels, int nullPixels, int lrsPixels, int lisPixels,
-               int hrsPixels, int hisPixels, int underRangePixels, int overRangePixels,
-               double sum,  double minimum,  double maximum, double validMinimum,
-               double validMaximum, bool removedData);
 
       void AddData(const double *data, const unsigned int count);
       void AddData(const double data);
@@ -152,27 +160,56 @@ namespace Isis {
         return m_sumsum;
       };
 
+      void save(QXmlStreamWriter &stream, const Project *project) const;   // TODO: does xml stuff need project???
+    
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
     private:
-      double m_sum;           //!< Sum accumulator.
-      double m_sumsum;        //!< Sum-squared accumulator.
-      double m_minimum;       //!< Minimum double value encountered.
-      double m_maximum;       //!< Maximum double value encountered.
-      double m_validMinimum;  //!< Minimum valid pixel value
-      double m_validMaximum;  //!< Maximum valid pixel value
-      BigInt m_totalPixels;   //!< Count of total pixels processed.
-      BigInt m_validPixels;   //!< Count of valid pixels (non-special) processed.
-      BigInt m_nullPixels;    //!< Count of null pixels processed.
-      BigInt m_lrsPixels;     //!< Count of low instrument saturation pixels processed.
-      BigInt m_lisPixels;     //!< Count of low representation saturation pixels processed.
-      BigInt m_hrsPixels;     //!< Count of high instrument saturation pixels processed.
-      BigInt m_hisPixels;     //!< Count of high instrument representation pixels processed.
+      /**
+       *
+       * @author 2014-07-28 Jeannie Backer
+       *
+       * @internal
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          XmlHandler(Statistics *statistics, Project *project);   // TODO: does xml stuff need project???
+          ~XmlHandler();
+   
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool characters(const QString &ch);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName);
+   
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+   
+          Statistics *m_statistics;
+          Project *m_project;   // TODO: does xml stuff need project???
+          QString m_characters;
+      };
+
+      QUuid *m_id; /**< A unique ID for this object (useful for others to reference
+                        this object when saving to disk).*/
+      double m_sum;              //!< Sum accumulator.
+      double m_sumsum;           //!< Sum-squared accumulator.
+      double m_minimum;          //!< Minimum double value encountered.
+      double m_maximum;          //!< Maximum double value encountered.
+      double m_validMinimum;     //!< Minimum valid pixel value
+      double m_validMaximum;     //!< Maximum valid pixel value
+      BigInt m_totalPixels;      //!< Count of total pixels processed.
+      BigInt m_validPixels;      //!< Count of valid pixels (non-special) processed.
+      BigInt m_nullPixels;       //!< Count of null pixels processed.
+      BigInt m_lrsPixels;        //!< Count of low instrument saturation pixels processed.
+      BigInt m_lisPixels;        //!< Count of low representation saturation pixels processed.
+      BigInt m_hrsPixels;        //!< Count of high instrument saturation pixels processed.
+      BigInt m_hisPixels;        //!< Count of high instrument representation pixels processed.
       BigInt m_underRangePixels; //!< Count of pixels less than the valid range
-      BigInt m_overRangePixels; //!< Count of pixels greater than the valid range
-      bool   m_removedData;   /**< Indicates the RemoveData method was called which implies
-                                   m_minimum and m_maximum are invalid. */
+      BigInt m_overRangePixels;  //!< Count of pixels greater than the valid range
+      bool   m_removedData;      /**< Indicates the RemoveData method was called which implies
+                                      m_minimum and m_maximum are invalid. */
   };
 
   // operators to read/write Statistics to/from binary data

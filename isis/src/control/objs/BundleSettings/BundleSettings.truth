@@ -412,6 +412,8 @@ Testing error throws...
 **PROGRAMMER ERROR** Unknown bundle convergence criteria [Pickles].
 **PROGRAMMER ERROR** Unknown convergence criteria enum [33].
 **PROGRAMMER ERROR** For bundle adjustments with multiple maximum likelihood estimators, the first model must be of type HUBER or HUBER_MODIFIED.
+
+Testing XML write/read... 
 Object = "filled bs"
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse

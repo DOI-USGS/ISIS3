@@ -18,8 +18,13 @@
  *  http://www.usgs.gov/privacy.html.
  */
 
+#include "StatCumProbDistDynCalc.h"
+
+#include <QDataStream>
 #include <QDebug>
 #include <QList>
+#include <QUuid>
+#include <QXmlStreamWriter>
 
 #include <float.h>
 #include <math.h>
@@ -27,7 +32,8 @@
 
 #include "IException.h"
 #include "IString.h"
-#include "StatCumProbDistDynCalc.h"
+#include "Project.h"
+#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
@@ -38,9 +44,30 @@ namespace Isis {
    * @param [in] unsigned int nodes -- this is the number of specific evenly spaced quantiles that
    *                 will be dynamically tracked
    */
-  StatCumProbDistDynCalc::StatCumProbDistDynCalc(unsigned int nodes) {
+  StatCumProbDistDynCalc::StatCumProbDistDynCalc(unsigned int nodes, QObject *parent) : QObject(parent) {
 
     initialize(nodes);
+  }
+
+
+
+  StatCumProbDistDynCalc::StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
+    m_id = NULL;
+    // ??? initializations ???
+    xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
+  }
+
+
+
+  StatCumProbDistDynCalc::StatCumProbDistDynCalc(const StatCumProbDistDynCalc &other)
+    : m_id(new QUuid(other.m_id->toString())),
+      m_numberCells(other.m_numberCells),      
+      m_numberQuantiles(other.m_numberQuantiles),  
+      m_quantiles(other.m_quantiles),        
+      m_idealNum(other.m_idealNum),         
+      m_n(other.m_n),                
+      m_quantileValues(other.m_quantileValues),   
+      m_numberObservations(other.m_numberObservations) {
   }
 
 
@@ -49,7 +76,30 @@ namespace Isis {
    * Destroys StatCumProbDistDynCalc object.
    */ 
   StatCumProbDistDynCalc::~StatCumProbDistDynCalc() { 
-  } //empty destructor
+    delete m_id;
+    m_id = NULL;
+  }
+
+
+
+  StatCumProbDistDynCalc &StatCumProbDistDynCalc::operator=(const StatCumProbDistDynCalc &other) {
+
+    if (&other != this) {
+      delete m_id;
+      m_id = NULL;
+      m_id = new QUuid(m_id->toString());
+
+      m_numberCells        = other.m_numberCells;
+      m_numberQuantiles    = other.m_numberQuantiles;
+      m_quantiles          = other.m_quantiles;
+      m_idealNum           = other.m_idealNum;
+      m_n                  = other.m_n;
+      m_quantileValues     = other.m_quantileValues;
+      m_numberObservations = other.m_numberObservations;
+    }
+    return *this;
+
+  }
 
 
 
@@ -96,14 +146,15 @@ namespace Isis {
    * Returns the maximum observation so far included in the dynamic calculation
    *
    * @return double -- the maximum observation so far included in the dynamic calculation
-   * @throw  IsisProgrammerError -- StatCumDistDynCalc will return no data until 
-   *             the number of observations added matches the number of
-   *             quantiles (i.e. number of nodes) selected.
+   * @throw  IsisProgrammerError -- StatCumProbDistDynCalc will return 
+   *             no data until the number of observations added matches
+   *             the number of quantiles (i.e. number of nodes)
+   *             selected.
    */
   double StatCumProbDistDynCalc::max() {
      //if there isn't even as much data as there are quantiles to track return DBL_MAX
      if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumDistDynCalc will return no data until the number of observations added"
+       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
                      " [" + toString(m_numberObservations) + "] matches the number of quantiles"
                      " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
        throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -119,14 +170,15 @@ namespace Isis {
    * Returns the maximum observation so far included in the dynamic calculation
    *
    * @return double -- the maximum observation so far included in the dynamic calculation
-   * @throw  IsisProgrammerError -- StatCumDistDynCalc will return no data until 
-   *             the number of observations added matches the number of
-   *             quantiles (i.e. number of nodes) selected.
+   * @throw  IsisProgrammerError -- StatCumProbDistDynCalc will return 
+   *             no data until the number of observations added matches
+   *             the number of quantiles (i.e. number of nodes)
+   *             selected.
    */
    double StatCumProbDistDynCalc::min() { 
      //if there isn't even as much data as there are quantiles to track return -DBL_MAX
      if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumDistDynCalc will return no data until the number of observations added"
+       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
                      " [" + toString(m_numberObservations) + "] matches the number of quantiles"
                      " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
        throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -145,7 +197,7 @@ namespace Isis {
    * @param [in] double -- cumlative probability domain [0.1]
    * @return double -- the vaule of the variable that has the cumulative probility (according the 
    *             current estimate of cumulative probility function)
-   * @throw  IsisProgrammerError -- StatCumDistDynCalc will return no data until 
+   * @throw  IsisProgrammerError -- StatCumProbDistDynCalc will return no data until 
    *             the number of observations added matches the number of
    *             quantiles (i.e. number of nodes) selected.
    * @throw  IsisProgrammerError -- Invalid cumulative probability passed in to 
@@ -159,7 +211,7 @@ namespace Isis {
 
      //if there isn't even as much data as there are quantiles to track return DBL_MAX
      if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumDistDynCalc will return no data until the number of observations added"
+       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
                      " [" + toString(m_numberObservations) + "] matches the number of quantiles"
                      " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
        throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -265,14 +317,14 @@ namespace Isis {
    * @return    double -- the cumulative probility, that is, the proportion of the distribution 
    *                that is less than or equal to the value given (according the current
    *                estimate of cumulative probility function).
-   * @throw     IsisProgrammerError -- StatCumDistDynCalc will return no data until there has been 
+   * @throw     IsisProgrammerError -- StatCumProbDistDynCalc will return no data until there has been 
    *                at least m_numberQuantiles observations added
    */
    double StatCumProbDistDynCalc::cumProb(double value) {
      //given a value return the cumulative probility
 
      if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumDistDynCalc will return no data until the number of observations added"
+       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
                      " [" + toString(m_numberObservations) + "] matches the number of quantiles"
                      " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
        throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -437,6 +489,121 @@ namespace Isis {
         m_n[i] += d; //the position of the quantile (in terms of the number of observations <= quantile) is also adjusted
       }
     }
+  }
+
+
+
+  void StatCumProbDistDynCalc::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
+
+    stream.writeStartElement("statCumProbDistDynCalc");
+    stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("numberCells", toString(m_numberCells));
+    stream.writeTextElement("numberObservations", toString(m_numberObservations));
+
+    stream.writeStartElement("quantiles");
+    for (int i = 0; i < m_quantiles.size(); i++) {
+      stream.writeTextElement("value", toString(m_quantiles[i]));
+    }
+    stream.writeEndElement();
+
+    stream.writeStartElement("idealNum");
+    for (int i = 0; i < m_idealNum.size(); i++) {
+      stream.writeTextElement("value", toString(m_idealNum[i]));
+    }
+    stream.writeEndElement();
+    
+    stream.writeStartElement("n");
+    for (int i = 0; i < m_n.size(); i++) {
+      stream.writeTextElement("value", toString(m_n[i]));
+    }
+    stream.writeEndElement();
+
+    stream.writeStartElement("quantileValues");
+    for (int i = 0; i < m_quantileValues.size(); i++) {
+      stream.writeTextElement("value", toString(m_quantileValues[i]));
+    }
+    stream.writeEndElement();
+    stream.writeEndElement();
+
+  }
+
+
+
+  StatCumProbDistDynCalc::XmlHandler::XmlHandler(StatCumProbDistDynCalc *probabilityCalc, Project *project) {   // TODO: does xml stuff need project???
+    m_probabilityCalc = probabilityCalc;
+    m_project = project;   // TODO: does xml stuff need project???
+    m_characters = "";
+  }
+
+
+
+  StatCumProbDistDynCalc::XmlHandler::~XmlHandler() {
+    // ??? compile error ??? delete m_project;    // TODO: does xml stuff need project???
+    m_project = NULL;
+  }
+
+
+
+  bool StatCumProbDistDynCalc::XmlHandler::startElement(const QString &namespaceURI, 
+                                                                const QString &localName,
+                                                                const QString &qName,
+                                                                const QXmlAttributes &atts) {
+    m_characters = "";
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+      // no element attibutes to evaluate
+    }
+    return true;
+  }
+
+
+
+  bool StatCumProbDistDynCalc::XmlHandler::characters(const QString &ch) {
+    m_characters += ch;
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+
+  bool StatCumProbDistDynCalc::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                     const QString &qName) {
+    if (!m_characters.isEmpty()) {
+      if (localName == "id") {
+        delete m_probabilityCalc->m_id;
+        m_probabilityCalc->m_id = NULL;
+        m_probabilityCalc->m_id = new QUuid(m_characters);
+      }
+      if (localName == "numberCells") {
+        m_probabilityCalc->m_numberCells = toInt(m_characters);
+      }
+      if (localName == "numberObservations") {
+        m_probabilityCalc->m_numberObservations = toInt(m_characters);
+      }
+//
+//    stream.writeStartElement("quantileValue");
+//    for (int i = 0; i < m_quantiles.size(); i++) {
+//      stream.writeTextElement("value", toString(m_quantiles[i]));
+//    }
+//    stream.writeEndElement();
+//
+//    stream.writeStartElement("idealNum");
+//    for (int i = 0; i < m_idealNum.size(); i++) {
+//      stream.writeTextElement("value", toString(m_idealNum[i]));
+//    }
+//    stream.writeEndElement();
+//    
+//    stream.writeStartElement("n");
+//    for (int i = 0; i < m_n.size(); i++) {
+//      stream.writeTextElement("value", toString(m_n[i]));
+//    }
+//    stream.writeEndElement();
+//
+//    stream.writeStartElement("quantileValues");
+//    for (int i = 0; i < m_quantileValues.size(); i++) {
+//      stream.writeTextElement("value", toString(m_quantileValues[i]));
+
+      m_characters = "";
+    }
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 

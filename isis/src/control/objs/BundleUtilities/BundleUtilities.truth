@@ -24,13 +24,13 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Create a BundleObservationSolveSettings object and test mutator methods... 
 Object = TestBundleObservationSolveSettings
   InstrumentPointingSolveOption       = None
-  SolveTwist                          = Yes
-  CKDegree                            = 1
-  CKSolveDegree                       = -1
-  NumberAngleCoefficientsSolved       = 0
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = Null
-  InstrumentPointingInterpolationType = 3
+  SolveTwist                          = N/A
+  CKDegree                            = N/A
+  CKSolveDegree                       = N/A
+  NumberAngleCoefficientsSolved       = N/A
+  SolvePointingPolynomialOverExisting = N/A
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = N/A
   InstrumentPositionSolveOption       = PositionOnly
   SPKDegree                           = 6
   SPKSolveDegree                      = 0
@@ -43,13 +43,13 @@ End_Object
 Write the BundleObservationSolveSettings object to a byte array using a data stream and read into a new object ... 
 Object = TestBundleObservationSolveSettings
   InstrumentPointingSolveOption       = None
-  SolveTwist                          = Yes
-  CKDegree                            = 1
-  CKSolveDegree                       = -1
-  NumberAngleCoefficientsSolved       = 0
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = Null
-  InstrumentPointingInterpolationType = 3
+  SolveTwist                          = N/A
+  CKDegree                            = N/A
+  CKSolveDegree                       = N/A
+  NumberAngleCoefficientsSolved       = N/A
+  SolvePointingPolynomialOverExisting = N/A
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = N/A
   InstrumentPositionSolveOption       = PositionOnly
   SPKDegree                           = 6
   SPKSolveDegree                      = 0

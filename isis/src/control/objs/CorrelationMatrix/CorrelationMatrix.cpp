@@ -18,15 +18,14 @@ namespace Isis {
    * Default Constructor
    */
   CorrelationMatrix::CorrelationMatrix() {
-    m_imagesAndParameters = NULL;
     m_covarianceFileName = NULL; // new FileName("/work/users/koyama/testData/covarianceMatrix2.dat");
     m_correlationFileName = NULL; // new FileName("/work/users/koyama/testData/correlationMatrix.dat");
-    m_diagonals = NULL;
 //     m_visibleElements = new QList<MatrixElement*>;
     m_visibleBlocks = NULL;
+
+    m_imagesAndParameters = NULL;
     QStringList param;
     param << "X" << "Y" << "Z" << "RA" << "DEC" << "TWI";
-
     m_imagesAndParameters = new QMap<QString, QStringList>;
     QString img = "Sub4-AS15-M-0583_msk.cub";
     m_imagesAndParameters->insert(img, param);
@@ -43,6 +42,7 @@ namespace Isis {
     img = "Sub4-AS15-M-1537.cub";
     m_imagesAndParameters->insert(img, param);
 
+    m_diagonals = NULL;
     m_diagonals = new QList<double>;
 
 /*    if (m_correlationFileName == NULL) {
@@ -157,8 +157,8 @@ namespace Isis {
     // ==13332==    by 0x409300: main (unitTest.cpp:157)
     // ==13332==  Address 0x7feffef00 is on thread 1's stack
     // 
-//   delete m_imagesAndParameters;
-//   m_imagesAndParameters = NULL;
+   delete m_imagesAndParameters;
+   m_imagesAndParameters = NULL;
 
     delete m_covarianceFileName;
     m_covarianceFileName = NULL;
@@ -189,18 +189,23 @@ namespace Isis {
     if (&other != this) {
 
       delete m_imagesAndParameters;
+      m_imagesAndParameters = NULL;
       m_imagesAndParameters = new QMap<QString, QStringList>(*other.m_imagesAndParameters);
   
       delete m_covarianceFileName;
+      m_covarianceFileName = NULL;
       m_covarianceFileName = new FileName(*other.m_covarianceFileName);
   
       delete m_correlationFileName;
+      m_correlationFileName = NULL;
       m_correlationFileName = new FileName(*other.m_correlationFileName);
   
       delete m_diagonals;
+      m_diagonals = NULL;
       m_diagonals = new QList<double>(*other.m_diagonals);
   
       delete m_visibleBlocks;
+      m_visibleBlocks = NULL;
       m_visibleBlocks = new QList<SparseBlockColumnMatrix>(*other.m_visibleBlocks);
 
     }
@@ -222,6 +227,8 @@ namespace Isis {
                     "setCorrelationFileName(FileName) before calling computeCorrelationMatrix().";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    delete m_visibleBlocks;
+    m_visibleBlocks = NULL;
     m_visibleBlocks = new QList<SparseBlockColumnMatrix>;
 
     // Create file handle
@@ -504,28 +511,33 @@ namespace Isis {
     QMap<QString, QStringList> imagesAndParameters;
     stream >> imagesAndParameters;
     delete m_imagesAndParameters;
+    m_imagesAndParameters = NULL;
     m_imagesAndParameters = new QMap<QString, QStringList>(imagesAndParameters);
 
     // FileNames
     QString covarianceFileName;
     stream >> covarianceFileName;
     delete m_covarianceFileName;
+    m_covarianceFileName = NULL;
     m_covarianceFileName  = new FileName(covarianceFileName);
 
     QString correlationFileName;
     stream >>correlationFileName;
     delete m_correlationFileName;
+    m_correlationFileName = NULL;
     m_correlationFileName = new FileName(correlationFileName);
 
     // QLists
     QList<double> diagonals;
     stream >> diagonals;
     delete m_diagonals;
+    m_diagonals = NULL;
     m_diagonals = new QList<double>(diagonals);
 
     QList<SparseBlockColumnMatrix> visibleBlocks;
     stream << visibleBlocks;
     delete m_visibleBlocks;
+    m_visibleBlocks = NULL;
     m_visibleBlocks = new QList<SparseBlockColumnMatrix>(visibleBlocks);
 
     return stream;

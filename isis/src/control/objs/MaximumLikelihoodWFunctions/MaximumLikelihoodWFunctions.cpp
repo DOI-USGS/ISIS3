@@ -378,6 +378,9 @@ namespace Isis {
     else if (modelName.compare("HUBER_MODIFIED", Qt::CaseInsensitive) == 0) {
       return HuberModified;
     }
+    else if (modelName.compare("HUBERMODIFIED", Qt::CaseInsensitive) == 0) {
+      return HuberModified;
+    }
     else if (modelName.compare("WELSCH", Qt::CaseInsensitive) == 0) {
       return Welsch;
     }
@@ -386,7 +389,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Programmer,
-                       "Unknown maximum likelihood model name" + modelName + ".",
+                       "Unknown maximum likelihood model name " + modelName + ".",
                        _FILEINFO_);
     }
   }

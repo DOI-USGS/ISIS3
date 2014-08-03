@@ -24,6 +24,7 @@
  */
 
 #include <QList>
+#include <QObject>
 
 #include "BundleImage.h"
 #include "SpicePosition.h"
@@ -35,8 +36,7 @@ class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
-  class FileName;
-  class Project;
+  class Project;  // TODO: does xml stuff need project???
   class PvlObject;
   class XmlStackedHandlerReader;
   /**
@@ -66,8 +66,8 @@ namespace Isis {
   class BundleObservationSolveSettings : public QObject {
     Q_OBJECT
     public:
-      BundleObservationSolveSettings();
-      BundleObservationSolveSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
+      BundleObservationSolveSettings(QObject *parent = 0);
+      BundleObservationSolveSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);  // TODO: does xml stuff need project???
       BundleObservationSolveSettings(const BundleObservationSolveSettings &other);
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &other);
@@ -139,7 +139,7 @@ namespace Isis {
       QList<double> aprioriPositionSigmas() const;
       SpicePosition::Source positionInterpolationType() const;
 
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+      void save(QXmlStreamWriter &stream, const Project *project) const;  // TODO: does xml stuff need project???
 
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
@@ -153,7 +153,7 @@ namespace Isis {
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(BundleObservationSolveSettings *settings, Project *project);
+          XmlHandler(BundleObservationSolveSettings *settings, Project *project);  // TODO: does xml stuff need project???
           ~XmlHandler();
    
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
@@ -166,12 +166,12 @@ namespace Isis {
           Q_DISABLE_COPY(XmlHandler);
    
           BundleObservationSolveSettings *m_settings;
-          Project *m_project;
+          Project *m_project;  // TODO: does xml stuff need project???
           QString m_characters;
       };
 
       /**
-       * A unique ID for this BundleSettings object (useful for others to reference this object
+       * A unique ID for this object (useful for others to reference this object
        *   when saving to disk).
        */
       QUuid *m_id;

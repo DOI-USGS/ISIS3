@@ -24,9 +24,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QDataStream>
 #include <QList>
 #include <QPair>
+#include <QObject>
 #include <QString>
 #include <QVector>
 
@@ -46,7 +46,7 @@ namespace Isis {
   class ControlNet;
   class CorrelationMatrix;
   class FileName;
-  class Project;
+  class Project;// ??? does xml stuff need project???
   class PvlObject;
   class SerialNumberList;
   class StatCumProbDistDynCalc;
@@ -65,11 +65,11 @@ namespace Isis {
    *                           variable is used regardless of whether maximum likelihood estimation
    *                           is used.
    */
-  class BundleStatistics  : public QObject{
+  class BundleStatistics : public QObject {
     Q_OBJECT
     public:
       BundleStatistics(QObject *parent = 0);
-      BundleStatistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
+      BundleStatistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   // TODO: does xml stuff need project???
       BundleStatistics(const BundleStatistics &other);
       ~BundleStatistics();
       BundleStatistics &operator=(const BundleStatistics &other);
@@ -194,7 +194,7 @@ namespace Isis {
       void setCorrMatCovFileName(FileName name);
       void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams);
 
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+      void save(QXmlStreamWriter &stream, const Project *project) const;   // TODO: does xml stuff need project???
       
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
@@ -208,7 +208,7 @@ namespace Isis {
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(BundleStatistics *statistics, Project *project);
+          XmlHandler(BundleStatistics *statistics, Project *project);   // TODO: does xml stuff need project???
           ~XmlHandler();
    
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
@@ -221,12 +221,12 @@ namespace Isis {
           Q_DISABLE_COPY(XmlHandler);
    
           BundleStatistics *m_statistics;
-          Project *m_project;
+          Project *m_project;   // TODO: does xml stuff need project???
           QString m_characters;
       };
 
       /**
-       * A unique ID for this BundleSettings object (useful for others to reference this object
+       * A unique ID for this object (useful for others to reference this object
        *   when saving to disk).
        */
       QUuid *m_id;

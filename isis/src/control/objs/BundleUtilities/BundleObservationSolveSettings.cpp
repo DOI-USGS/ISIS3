@@ -9,8 +9,8 @@
 
 #include "BundleImage.h"
 #include "Camera.h"
-#include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
@@ -22,7 +22,7 @@ namespace Isis {
   /**
    * Constructor with default parameter initializations.
    */
-  BundleObservationSolveSettings::BundleObservationSolveSettings() {
+  BundleObservationSolveSettings::BundleObservationSolveSettings(QObject *parent) : QObject(parent) {
 
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
@@ -62,6 +62,7 @@ namespace Isis {
     m_id = NULL;
     // ??? initializations ???
     xmlReader->pushContentHandler(new XmlHandler(this, project));
+    xmlReader->setErrorHandler(new XmlHandler(this, project));
   }
 
 
@@ -738,16 +739,11 @@ namespace Isis {
 
 
 
-  void BundleObservationSolveSettings::save(QXmlStreamWriter &stream, const Project *project, 
-                                            FileName newProjectRoot) const {
+  void BundleObservationSolveSettings::save(QXmlStreamWriter &stream, const Project *project) const {  // TODO: does xml stuff need project???
 
-    stream.writeStartElement("id");
-    stream.writeCharacters(m_id->toString());
-    stream.writeEndElement();
- 
-    stream.writeStartElement("instrumentId");
-    stream.writeCharacters(m_instrumentId);
-    stream.writeEndElement();
+    stream.writeStartElement("bundleObservationSolveSettings");
+    stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("instrumentId", m_instrumentId);
 
     // pointing related
     stream.writeStartElement("instrumentPointingOptions");
@@ -778,8 +774,8 @@ namespace Isis {
     else {
       stream.writeAttribute("acceleration", "N/A");
     }
-    stream.writeEndElement();
-    stream.writeEndElement();
+    stream.writeEndElement();// end aprioriPointingSigmas
+    stream.writeEndElement();// end instrumentPointingOptions
 
     // position related
     stream.writeStartElement("instrumentPositionOptions");
@@ -809,24 +805,25 @@ namespace Isis {
     else {
       stream.writeAttribute("acceleration", "N/A");
     }
-    stream.writeEndElement();
-    stream.writeEndElement();
+    stream.writeEndElement();// end aprioriPositionSigmas
+    stream.writeEndElement(); // end instrumentPositionOptions
+    stream.writeEndElement(); // end bundleObservationSolveSettings
 
   }
 
 
 
   BundleObservationSolveSettings::XmlHandler::XmlHandler(BundleObservationSolveSettings *settings, 
-                                                         Project *project) {
+                                                         Project *project) {  // TODO: does xml stuff need project???
     m_settings = settings;
-    m_project = project;
+    m_project = project;  // TODO: does xml stuff need project???
     m_characters = "";
   }
 
 
 
   BundleObservationSolveSettings::XmlHandler::~XmlHandler() {
-    delete m_project;
+    delete m_project;  // TODO: does xml stuff need project???
     m_project = NULL;
   }
   
@@ -836,6 +833,7 @@ namespace Isis {
                                                                 const QString &localName,
                                                                 const QString &qName,
                                                                 const QXmlAttributes &atts) {
+    m_characters = "";
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       if (localName == "instrumentPointingOptions") {
         
@@ -1019,7 +1017,10 @@ namespace Isis {
            >> m_positionAprioriSigma
            >> positionInterpType;
 
+    delete m_id;
+    m_id = NULL;
     m_id = new QUuid(id);
+
     m_instrumentPointingSolveOption = (InstrumentPointingSolveOption)anglesSolveOption;
     m_ckDegree = (int)ckDegree;
     m_ckSolveDegree = (int)ckSolveDegree;

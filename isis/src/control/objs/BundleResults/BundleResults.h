@@ -38,7 +38,7 @@ namespace Isis {
   class BundleStatistics;
   class FileName;
   class ImageList;
-  class Project;
+  class Project;  // TODO: does xml stuff need project???
   class PvlObject;
   class XmlStackedHandlerReader;
 
@@ -61,6 +61,7 @@ namespace Isis {
     Q_OBJECT
     public:
       BundleResults(BundleSettings inputSettings, FileName controlNetworkFileName, QObject *parent = 0);
+      BundleResults(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);  // TODO: does xml stuff need project???
       BundleResults(const BundleResults &other);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &other);
@@ -79,10 +80,12 @@ namespace Isis {
       PvlObject pvlObject(QString resultsName = "BundleResults",
                           QString settingsName = "InputSettings",
                           QString statisticsName = "StatisticsResults");
+
+      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;  // TODO: does xml stuff need project and newRoot???
+      void save(QXmlStreamWriter &stream, const Project *project) const;  // TODO: does xml stuff need project???
+
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
-
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
     private:
       /**
@@ -93,7 +96,7 @@ namespace Isis {
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(BundleResults *bundleResults, Project *project);
+          XmlHandler(BundleResults *bundleResults, Project *project);  // TODO: does xml stuff need project???
           ~XmlHandler();
 
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
@@ -103,7 +106,7 @@ namespace Isis {
           Q_DISABLE_COPY(XmlHandler);
 
           BundleResults *m_bundleResults;
-          Project *m_project;
+          Project *m_project;  // TODO: does xml stuff need project???
           QString m_characters;
       };
 

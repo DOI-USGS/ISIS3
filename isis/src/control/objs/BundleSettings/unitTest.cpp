@@ -10,6 +10,7 @@
 
 #include "BundleObservationSolveSettings.h"
 #include "BundleSettings.h"
+#include "FileName.h"
 #include "IException.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Preference.h"
@@ -23,30 +24,26 @@ using namespace Isis;
 namespace Isis {
   class BundleSettingsXmlHandlerTester : public BundleSettings {
     public:
-      BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, FileName xmlFile)
-          : BundleSettings(project, reader) {
-
+      BundleSettingsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
+                                     FileName xmlFile) : BundleSettings(project, reader) {
 
         QString xmlPath(xmlFile.expanded());
         QFile file(xmlPath);
 
-        if ( !file.open(QFile::ReadOnly) ) {
+        if (!file.open(QFile::ReadOnly) ) {
           throw IException(IException::Io,
-                           QString("Unable to open [%1] with read access")
-                             .arg(xmlPath),
+                           QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
                            _FILEINFO_);
         }
-
-        qDebug() << file.fileName() << " open";
 
         QXmlInputSource xmlInputSource(&file);
         bool success = reader->parse(xmlInputSource);
         if (!success) {
-          QString msg = "Failed to parse xml file."; 
-          throw IException(IException::Unknown, msg, _FILEINFO_);
+          throw IException(IException::Unknown, 
+                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                            _FILEINFO_);
         }
 
-qDebug() << "file parsed";
       }
 
       ~BundleSettingsXmlHandlerTester() {
@@ -250,25 +247,30 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
+    qDebug();
 
-
-
-
-
-
-
+    qDebug() << "Testing XML write/read...";
     // write xml 
-    QString string;
-    QXmlStreamWriter stream(&string);
-    stream.setAutoFormatting(true);
+    FileName xmlFile("./BundleSettings.xml");
+    QString xmlPath = xmlFile.expanded();
+    QFile qXmlFile(xmlPath);
+    if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
+                       _FILEINFO_);
+    }
+    QXmlStreamWriter writer(&qXmlFile);
+    writer.setAutoFormatting(true);
+    writer.writeStartDocument();
     Project *project = NULL;
-    FileName settingsXml("./BundleSettings.xml");
-    settings.save(stream, project, settingsXml);
-    
+    FileName settingsXml();
+    settings.save(writer, project);
+    writer.writeEndDocument();
+    qXmlFile.close();
     // read xml    
     XmlStackedHandlerReader reader;
-    BundleSettingsXmlHandlerTester bsToFill(project, &reader, settingsXml);
-    pvl = bsToFill.pvlObject("filled bs");
+    BundleSettingsXmlHandlerTester bsToFill(project, &reader, xmlFile);
+    pvl = bsToFill.pvlObject("BundleSettingsFromXml");
     cout << pvl << endl << endl;
 
   } 

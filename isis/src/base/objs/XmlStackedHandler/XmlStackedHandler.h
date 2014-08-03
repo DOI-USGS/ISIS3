@@ -5,6 +5,7 @@
 
 template <typename T> class QStack;
 
+class QXmlParseException;
 namespace Isis {
   class XmlStackedHandlerReader;
 
@@ -60,6 +61,7 @@ namespace Isis {
     protected:
       XmlStackedHandlerReader *reader();
       const XmlStackedHandlerReader *reader() const;
+      bool fatalError(const QXmlParseException &exception);
 
     private:
       Q_DISABLE_COPY(XmlStackedHandler);

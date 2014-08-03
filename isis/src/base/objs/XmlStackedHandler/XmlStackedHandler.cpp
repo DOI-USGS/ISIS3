@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QStack>
+#include <QXmlParseException>
 
 #include "XmlStackedHandlerReader.h"
 
@@ -64,4 +65,13 @@ namespace Isis {
   const XmlStackedHandlerReader *XmlStackedHandler::reader() const {
     return m_reader;
   }
+
+
+  bool XmlStackedHandler::fatalError(const QXmlParseException &exception) {
+    qDebug() << "Parse error at line " << exception.lineNumber()
+             << ", " << "column " << exception.columnNumber() << ": "
+             << qPrintable(exception.message());
+    return false;
+  }
+
 }

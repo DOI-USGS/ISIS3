@@ -17,29 +17,97 @@
  *  http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *  http://www.usgs.gov/privacy.html.
  */
+#include "Statistics.h"
 
+#include <QDataStream>
+#include <QDebug>
 #include <QString>
+#include <QUuid>
+#include <QXmlStreamWriter>
 
 #include <float.h>
 
-#include "Statistics.h"
 #include "IException.h"
 #include "IString.h"
+#include "Project.h"
+#include "XmlStackedHandlerReader.h"
 
 using namespace std;
 
 namespace Isis {
   //! Constructs an IsisStats object with accumulators and counters set to zero.
-  Statistics::Statistics() {
+  Statistics::Statistics(QObject *parent) : QObject(parent) {
     SetValidRange();
     Reset();
   }
 
 
 
+  Statistics::Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
+    m_id = NULL;
+    // ??? initializations ???
+    xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
+  }
+
+
+
+
+  Statistics::Statistics(const Statistics &other)
+    : m_id(new QUuid(other.m_id->toString())),
+      m_sum(other.m_sum),
+      m_sumsum(other.m_sumsum),
+      m_minimum(other.m_minimum),
+      m_maximum(other.m_maximum),
+      m_validMinimum(other.m_validMinimum),
+      m_validMaximum(other.m_validMaximum),
+      m_totalPixels(other.m_totalPixels),
+      m_validPixels(other.m_validPixels),
+      m_nullPixels(other.m_nullPixels),
+      m_lrsPixels(other.m_lrsPixels),
+      m_lisPixels(other.m_lisPixels),
+      m_hrsPixels(other.m_hrsPixels),
+      m_hisPixels(other.m_hisPixels),
+      m_underRangePixels(other.m_underRangePixels),
+      m_overRangePixels(other.m_overRangePixels),
+      m_removedData(other.m_removedData) {
+  }
+
+
 
   //! Destroys the IsisStats object.
   Statistics::~Statistics() {
+    delete m_id;
+    m_id = NULL;
+  }
+
+
+
+  Statistics &Statistics::operator=(const Statistics &other) {
+
+    if (&other != this) {
+      delete m_id;
+      m_id = NULL;
+      m_id = new QUuid(m_id->toString());
+
+      m_sum = other.m_sum;
+      m_sumsum = other.m_sumsum;
+      m_minimum = other.m_minimum;
+      m_maximum = other.m_maximum;
+      m_validMinimum = other.m_validMinimum;
+      m_validMaximum = other.m_validMaximum;
+      m_totalPixels = other.m_totalPixels;
+      m_validPixels = other.m_validPixels;
+      m_nullPixels = other.m_nullPixels;
+      m_lrsPixels = other.m_lrsPixels;
+      m_lisPixels = other.m_lisPixels;
+      m_hrsPixels = other.m_hrsPixels;
+      m_hisPixels = other.m_hisPixels;
+      m_underRangePixels = other.m_underRangePixels;
+      m_overRangePixels = other.m_overRangePixels;
+      m_removedData = other.m_removedData;
+    }
+    return *this;
+
   }
 
 
@@ -60,33 +128,6 @@ namespace Isis {
     m_overRangePixels = 0;
     m_underRangePixels = 0;
     m_removedData = false;
-  }
-
-
-
-  /** 
-   * This method sets the Statistics class members with known values instead of 
-   * using the AddData() and RemoveData() methods to do so. 
-   */ 
-  void Statistics::set(int validPixels, int nullPixels, int lrsPixels, int lisPixels,
-           int hrsPixels, int hisPixels, int underRangePixels, int overRangePixels,
-           double sum,  double minimum,  double maximum, double validMinimum,
-           double validMaximum, bool removedData) {
-    m_sum              = sum;
-    m_sumsum           = sum*sum;
-    m_minimum          = minimum;
-    m_maximum          = maximum;
-    m_totalPixels      = validPixels + nullPixels + lrsPixels + lisPixels
-                         + hrsPixels + hisPixels + underRangePixels + overRangePixels;
-    m_validPixels      = validPixels;
-    m_nullPixels       = nullPixels;
-    m_lrsPixels        = lrsPixels;
-    m_lisPixels        = lisPixels;
-    m_hrsPixels        = hrsPixels;
-    m_hisPixels        = hisPixels;
-    m_underRangePixels = underRangePixels;
-    m_overRangePixels  = overRangePixels;
-    m_removedData      = removedData;
   }
 
 
@@ -537,6 +578,135 @@ namespace Isis {
       }
     }
     return (value - Average()) / StandardDeviation();
+  }
+
+
+
+  void Statistics::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
+
+    stream.writeStartElement("statistics");
+    stream.writeTextElement("id", m_id->toString());
+ 
+    stream.writeTextElement("sum", toString(m_sum));
+
+    stream.writeStartElement("range");
+    stream.writeTextElement("minimum", toString(m_minimum));
+    stream.writeTextElement("maximum", toString(m_maximum));
+    stream.writeTextElement("validMinimum", toString(m_validMinimum));
+    stream.writeTextElement("validMaximum", toString(m_validMaximum));
+    stream.writeEndElement();
+    
+    stream.writeStartElement("pixelCounts");
+    stream.writeTextElement("totalPixels", toString(m_totalPixels));
+    stream.writeTextElement("validPixels", toString(m_validPixels));
+    stream.writeTextElement("nullPixels", toString(m_nullPixels));
+    stream.writeTextElement("lisPixels", toString(m_lisPixels));
+    stream.writeTextElement("lrsPixels", toString(m_lrsPixels));
+    stream.writeTextElement("hisPixels", toString(m_hisPixels));
+    stream.writeTextElement("hrsPixels", toString(m_hrsPixels));
+    stream.writeTextElement("underRangePixels", toString(m_underRangePixels));
+    stream.writeTextElement("overRangePixels", toString(m_overRangePixels));
+    stream.writeEndElement();
+    
+    stream.writeTextElement("removedData", toString(m_removedData));
+    stream.writeEndElement();
+
+  }
+
+
+
+  Statistics::XmlHandler::XmlHandler(Statistics *statistics, Project *project) {   // TODO: does xml stuff need project???
+    m_statistics = statistics;
+    m_project = project;   // TODO: does xml stuff need project???
+    m_characters = "";
+  }
+
+
+
+  Statistics::XmlHandler::~XmlHandler() {
+    // ??? compile error ??? delete m_project;    // TODO: does xml stuff need project???
+    m_project = NULL;
+  }
+
+
+
+  bool Statistics::XmlHandler::startElement(const QString &namespaceURI, 
+                                                                const QString &localName,
+                                                                const QString &qName,
+                                                                const QXmlAttributes &atts) {
+    m_characters = "";
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+      // no element attibutes to evaluate
+    }
+    return true;
+  }
+
+
+
+  bool Statistics::XmlHandler::characters(const QString &ch) {
+    m_characters += ch;
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+
+  bool Statistics::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                     const QString &qName) {
+    if (!m_characters.isEmpty()) {
+      if (localName == "id") {
+        delete m_statistics->m_id;
+        m_statistics->m_id = NULL;
+        m_statistics->m_id = new QUuid(m_characters);
+      }
+      if (localName == "sum") {
+        m_statistics->m_sum = toDouble(m_characters);
+        m_statistics->m_sumsum = m_statistics->m_sum * m_statistics->m_sum;
+      }
+      if (localName == "minimum") {
+        m_statistics->m_minimum = toDouble(m_characters);
+      }
+      if (localName == "maximum") {
+        m_statistics->m_maximum = toInt(m_characters);
+      }
+      if (localName == "validMinimum") {
+        m_statistics->m_validMinimum = toInt(m_characters);
+      }
+      if (localName == "validMaximum") {
+        m_statistics->m_validMaximum = toDouble(m_characters);
+      }
+      if (localName == "totalPixels") {
+        m_statistics->m_totalPixels = toBigInt(m_characters);
+      }
+      if (localName == "validPixels") {
+        m_statistics->m_validPixels = toBigInt(m_characters);
+      }
+      if (localName == "nullPixels") {
+        m_statistics->m_nullPixels = toBigInt(m_characters);
+      }
+      if (localName == "lisPixels") {
+        m_statistics->m_lisPixels = toBigInt(m_characters);
+      }
+      if (localName == "lrsPixels") {
+        m_statistics->m_lrsPixels = toBigInt(m_characters);
+      }
+      if (localName == "hisPixels") {
+        m_statistics->m_hisPixels = toBigInt(m_characters);
+      }
+      if (localName == "hrsPixels") {
+        m_statistics->m_hrsPixels = toBigInt(m_characters);
+      }
+      if (localName == "underRangePixels") {
+        m_statistics->m_underRangePixels = toBigInt(m_characters);
+      }
+      if (localName == "overRangePixels") {
+        m_statistics->m_overRangePixels = toBigInt(m_characters);
+      }
+      if (localName == "removedData") {
+        m_statistics->m_removedData = toBool(m_characters);
+      }
+      m_characters = "";
+    }
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 

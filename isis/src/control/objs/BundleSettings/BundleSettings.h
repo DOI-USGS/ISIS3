@@ -24,21 +24,21 @@
 
 #include <QList>
 #include <QPair>
+#include <QObject>
 #include <QString>
 
 #include "BundleObservationSolveSettings.h"
-#include "FileName.h"
 #include "MaximumLikelihoodWFunctions.h" // why not forward declare???
 #include "PvlObject.h"
 #include "XmlStackedHandler.h"
 
+class DataStream;
 class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
-  class FileName;
   class MaximumLikelihoodWFunctions;
-  class Project;
+  class Project;  // TODO: does xml stuff need project???
   class PvlObject;
   class XmlStackedHandlerReader;
 
@@ -67,10 +67,10 @@ namespace Isis {
   class BundleSettings : public QObject {
     Q_OBJECT
     public:
-      BundleSettings();
+      BundleSettings(QObject *parent = 0);
       BundleSettings(const BundleSettings &other);
-      BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
-      BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL);
+      BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);  // TODO: does xml stuff need project???
+      BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL); // parent = 0 or NULL ???
       ~BundleSettings();
 
       // copy constructor
@@ -184,7 +184,7 @@ namespace Isis {
 
       PvlObject pvlObject(QString name = "BundleSettings") const;
 
-      void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+      void save(QXmlStreamWriter &stream, const Project *project) const;
 
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
@@ -208,11 +208,13 @@ namespace Isis {
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName);
+          bool fatalError(const QXmlParseException &exception);
+
         private:
           Q_DISABLE_COPY(XmlHandler);
    
           BundleSettings *m_bundleSettings;
-          Project *m_project;
+          Project *m_project; // TODO: does xml stuff need project???
           QString m_characters;
       };
 

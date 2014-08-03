@@ -1,8 +1,7 @@
 #include "BundleStatistics.h"
 
-#include <QDebug>
 #include <QDataStream>
-#include <QObject>
+#include <QDebug>
 #include <QString>
 #include <QUuid>
 #include <QXmlStreamWriter>
@@ -17,7 +16,10 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "CorrelationMatrix.h"
+#include "FileName.h"
+#include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
+#include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
@@ -113,7 +115,6 @@ namespace Isis {
     // m_wFunc, m_cumPro, m_maxLikelihoodIndex, m_maxLikelihoodQuan,
     // m_maxLikelihoodMedianR2Residuals
     m_cumPro = NULL;
-    m_cumProRes = NULL;
     m_numberMaximumLikelihoodModels = 0;
     m_maximumLikelihoodIndex = 0;
     m_maximumLikelihoodMedianR2Residuals = 0.0;
@@ -123,6 +124,7 @@ namespace Isis {
 
     // residual prob distribution is calculated even if there is no maximum likelihood estimation
     // set up the solver to have a node at every percent of the distribution
+    m_cumProRes = NULL;
     m_cumProRes = new StatCumProbDistDynCalc;
     initializeResidualsProbabilityDistribution(101);
 
@@ -138,10 +140,10 @@ namespace Isis {
    * @param parent The Qt-relationship parent
    */
   BundleStatistics::BundleStatistics(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
+                                 QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
     m_id = NULL;
     // ??? initializations ???
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
+    xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
   }
 
 
@@ -287,6 +289,7 @@ namespace Isis {
       for (int i = 0; i < m_numberMaximumLikelihoodModels; i++) {
 
         delete m_wFunc[i];
+        m_wFunc[i] = NULL;
         m_wFunc[i] = new MaximumLikelihoodWFunctions(*other.m_wFunc[i]);
 
         m_maximumLikelihoodQuan[i] = other.m_maximumLikelihoodQuan[i];
@@ -295,9 +298,11 @@ namespace Isis {
       m_maximumLikelihoodIndex = other.m_maximumLikelihoodIndex;
 
       delete m_cumPro;
+      m_cumPro = NULL;
       m_cumPro = new StatCumProbDistDynCalc(*other.m_cumPro);
 
       delete m_cumProRes;
+      m_cumProRes = NULL;
       m_cumProRes = new StatCumProbDistDynCalc(*other.m_cumProRes);
 
       m_maximumLikelihoodMedianR2Residuals = other.m_maximumLikelihoodMedianR2Residuals;
@@ -497,24 +502,12 @@ namespace Isis {
       QList< QPair< MaximumLikelihoodWFunctions::Model, double > > modelsWithQuantiles) {
 
     // reinitialize variables if this setup has already been called
-    if (m_numberMaximumLikelihoodModels > 0) {
+    if (m_numberMaximumLikelihoodModels > 0) { // TODO?? would this ever be needed ???
 
       m_numberMaximumLikelihoodModels = 0;
       m_maximumLikelihoodIndex = 0;
       m_maximumLikelihoodMedianR2Residuals = 0.0;
       m_maximumLikelihoodQuan[0] = m_maximumLikelihoodQuan[1] = m_maximumLikelihoodQuan[2] = 0.5; // better init value ???
-
-      delete m_cumPro;
-      m_cumPro = NULL;
-
-      delete m_cumProRes;
-      m_cumProRes = NULL;
-
-
-      for (int i = 0;i < m_numberMaximumLikelihoodModels;i++) {
-        delete m_wFunc[i];
-        m_wFunc[i] = NULL;
-      }
 
     }
 
@@ -524,6 +517,8 @@ namespace Isis {
 
     // residual prob distribution is calculated even if there is no maximum likelihood estimation
     // set up the solver to have a node at every percent of the distribution
+    delete m_cumProRes;
+    m_cumProRes = NULL;
     m_cumProRes = new StatCumProbDistDynCalc;
     initializeResidualsProbabilityDistribution(101);
 
@@ -532,12 +527,16 @@ namespace Isis {
       // MaximumLikeliHood Estimation is being used
 
       // set up the cumulative prob solver to have a node at every percent of the distribution
+      delete m_cumPro;
+      m_cumPro = NULL;
       m_cumPro = new StatCumProbDistDynCalc;
       initializeProbabilityDistribution(101);
 
       // set up the w functions
       for (int i = 0; i < m_numberMaximumLikelihoodModels; i++) {
 
+        delete m_wFunc[i];
+        m_wFunc[i] = NULL;
         m_wFunc[i] = new MaximumLikelihoodWFunctions;
         m_wFunc[i]->setModel(modelsWithQuantiles[i].first);
 
@@ -1113,59 +1112,32 @@ namespace Isis {
 
 
 
-  void BundleStatistics::save(QXmlStreamWriter &stream, const Project *project, 
-                                            FileName newProjectRoot) const {
+  void BundleStatistics::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
 
+    stream.writeStartElement("bundleStatistics");
     stream.writeTextElement("id", m_id->toString());
  
-    stream.writeStartElement("instrumentId");
-    stream.writeCharacters(m_instrumentId);
-    stream.writeEndElement();
+    stream.writeTextElement("instrumentId", m_instrumentId);
 
     stream.writeStartElement("correlationMatrix");
-    // TODO ??? m_correlationMatrix.save(stream, project, newProjectRoot);
+    stream.writeAttribute("correlationFileName", m_correlationMatrix->correlationFileName().expanded()); 
+    stream.writeAttribute("covarianceFileName", m_correlationMatrix->covarianceFileName().expanded()); 
     stream.writeEndElement();
     
     stream.writeStartElement("generalStatisticsValues");
-    stream.writeStartElement("numberFixedPoints");
-    stream.writeCharacters(toString(m_numberFixedPoints));
-    stream.writeEndElement();
-    stream.writeStartElement("numberIgnoredPoints");
-    stream.writeCharacters(toString(m_numberIgnoredPoints));
-    stream.writeEndElement();
-    stream.writeStartElement("numberHeldImages");
-    stream.writeCharacters(toString(m_numberHeldImages));
-    stream.writeEndElement();
-    stream.writeStartElement("rejectionLimit");
-    stream.writeCharacters(toString(m_rejectionLimit));
-    stream.writeEndElement();
-    stream.writeStartElement("numberRejectedObservations");
-    stream.writeCharacters(toString(m_numberRejectedObservations));
-    stream.writeEndElement();
-    stream.writeStartElement("numberObservations");
-    stream.writeCharacters(toString(m_numberObservations));
-    stream.writeEndElement();
-    stream.writeStartElement("numberImageParameters");
-    stream.writeCharacters(toString(m_numberImageParameters));
-    stream.writeEndElement();
-    stream.writeStartElement("numberConstrainedPointParameters");
-    stream.writeCharacters(toString(m_numberConstrainedPointParameters));
-    stream.writeEndElement();
-    stream.writeStartElement("numberConstrainedImageParameters");
-    stream.writeCharacters(toString(m_numberConstrainedImageParameters));
-    stream.writeEndElement();
-    stream.writeStartElement("numberUnknownParameters");
-    stream.writeCharacters(toString(m_numberUnknownParameters));
-    stream.writeEndElement();
-    stream.writeStartElement("degreesOfFreedom");
-    stream.writeCharacters(toString(m_degreesOfFreedom));
-    stream.writeEndElement();
-    stream.writeStartElement("sigma0");
-    stream.writeCharacters(toString(m_sigma0));
-    stream.writeEndElement();
-    stream.writeStartElement("converged");
-    stream.writeCharacters(toString(m_converged));
-    stream.writeEndElement();
+    stream.writeTextElement("numberFixedPoints", toString(m_numberFixedPoints));
+    stream.writeTextElement("numberIgnoredPoints", toString(m_numberIgnoredPoints));
+    stream.writeTextElement("numberHeldImages", toString(m_numberHeldImages));
+    stream.writeTextElement("rejectionLimit", toString(m_rejectionLimit));
+    stream.writeTextElement("numberRejectedObservations", toString(m_numberRejectedObservations));
+    stream.writeTextElement("numberObservations", toString(m_numberObservations));
+    stream.writeTextElement("numberImageParameters", toString(m_numberImageParameters));
+    stream.writeTextElement("numberConstrainedPointParameters", toString(m_numberConstrainedPointParameters));
+    stream.writeTextElement("numberConstrainedImageParameters", toString(m_numberConstrainedImageParameters));
+    stream.writeTextElement("numberUnknownParameters", toString(m_numberUnknownParameters));
+    stream.writeTextElement("degreesOfFreedom", toString(m_degreesOfFreedom));
+    stream.writeTextElement("sigma0", toString(m_sigma0));
+    stream.writeTextElement("converged", toString(m_converged));
     stream.writeEndElement();
 
     stream.writeStartElement("rms");
@@ -1179,196 +1151,70 @@ namespace Isis {
     stream.writeAttribute("lon", toString(m_rmsSigmaLon)); 
     stream.writeAttribute("rad", toString(m_rmsSigmaRad)); 
     stream.writeEndElement(); // end sigmas element
+
     stream.writeStartElement("imageResidualsLists");
     stream.writeStartElement("residualsList");
     stream.writeAttribute("listSize", toString(m_rmsImageResiduals.size())); 
     for (int i = 0; i < m_rmsImageResiduals.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageResiduals[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageResiduals[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageResiduals[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageResiduals[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageResiduals[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageResiduals[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageResiduals[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageResiduals[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageResiduals[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageResiduals[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageResiduals[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageResiduals[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageResiduals[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageResiduals[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageResiduals[i].save(stream, project);
     }
     stream.writeEndElement(); // end residuals list
-    stream.writeStartElement("sampleResidualsList");
+
+    stream.writeStartElement("sampleList");
     stream.writeAttribute("listSize", toString(m_rmsImageSampleResiduals.size())); 
     for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageSampleResiduals[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageSampleResiduals[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageSampleResiduals[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageSampleResiduals[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageSampleResiduals[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageSampleResiduals[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageSampleResiduals[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageSampleResiduals[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageSampleResiduals[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageSampleResiduals[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageSampleResiduals[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageSampleResiduals[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageSampleResiduals[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageSampleResiduals[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageSampleResiduals[i].save(stream, project);
     }
     stream.writeEndElement(); // end sample residuals list
-    stream.writeStartElement("lineResidualsList");
+
+    stream.writeStartElement("lineList");
     stream.writeAttribute("listSize", toString(m_rmsImageLineResiduals.size())); 
     for (int i = 0; i < m_rmsImageLineResiduals.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageLineResiduals[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageLineResiduals[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageLineResiduals[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageLineResiduals[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageLineResiduals[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageLineResiduals[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageLineResiduals[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageLineResiduals[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageLineResiduals[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageLineResiduals[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageLineResiduals[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageLineResiduals[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageLineResiduals[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageLineResiduals[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageLineResiduals[i].save(stream, project);
     }
     stream.writeEndElement(); // end line residuals list
     stream.writeEndElement(); // end image residuals lists
+
     stream.writeStartElement("imageSigmasLists");
     stream.writeStartElement("xSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageXSigmas.size())); 
     for (int i = 0; i < m_rmsImageXSigmas.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageXSigmas[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageXSigmas[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageXSigmas[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageXSigmas[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageXSigmas[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageXSigmas[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageXSigmas[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageXSigmas[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageXSigmas[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageXSigmas[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageXSigmas[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageXSigmas[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageXSigmas[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageXSigmas[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageXSigmas[i].save(stream, project);
     }
     stream.writeEndElement(); // end x sigma list
+
     stream.writeStartElement("ySigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageYSigmas.size())); 
     for (int i = 0; i < m_rmsImageYSigmas.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageYSigmas[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageYSigmas[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageYSigmas[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageYSigmas[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageYSigmas[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageYSigmas[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageYSigmas[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageYSigmas[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageYSigmas[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageYSigmas[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageYSigmas[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageYSigmas[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageYSigmas[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageYSigmas[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageYSigmas[i].save(stream, project);
     }
     stream.writeEndElement(); // end y sigma list
+
     stream.writeStartElement("zSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageZSigmas.size())); 
     for (int i = 0; i < m_rmsImageZSigmas.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageZSigmas[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageZSigmas[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageZSigmas[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageZSigmas[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageZSigmas[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageZSigmas[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageZSigmas[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageZSigmas[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageZSigmas[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageZSigmas[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageZSigmas[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageZSigmas[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageZSigmas[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageZSigmas[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageZSigmas[i].save(stream, project);
     }
     stream.writeEndElement(); // end z sigma list
+
     stream.writeStartElement("raSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageRASigmas.size())); 
     for (int i = 0; i < m_rmsImageRASigmas.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageRASigmas[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageRASigmas[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageRASigmas[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageRASigmas[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageRASigmas[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageRASigmas[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageRASigmas[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageRASigmas[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageRASigmas[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageRASigmas[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageRASigmas[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageRASigmas[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageRASigmas[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageRASigmas[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageRASigmas[i].save(stream, project);
     }
     stream.writeEndElement(); // end ra sigma list
+
     stream.writeStartElement("decSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageDECSigmas.size())); 
     for (int i = 0; i < m_rmsImageDECSigmas.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageDECSigmas[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageDECSigmas[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageDECSigmas[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageDECSigmas[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageDECSigmas[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageDECSigmas[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageDECSigmas[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageDECSigmas[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageDECSigmas[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageDECSigmas[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageDECSigmas[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageDECSigmas[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageDECSigmas[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageDECSigmas[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageDECSigmas[i].save(stream, project);
     }
     stream.writeEndElement(); // end dec sigma list
+
     stream.writeStartElement("twistSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageTWISTSigmas.size())); 
     for (int i = 0; i < m_rmsImageTWISTSigmas.size(); i++) {
-      stream.writeStartElement("statistics");
-      stream.writeAttribute("validPixels", toString(m_rmsImageTWISTSigmas[i].ValidPixels()));
-      stream.writeAttribute("nullPixels", toString(m_rmsImageTWISTSigmas[i].NullPixels()));
-      stream.writeAttribute("lrsPixels", toString(m_rmsImageTWISTSigmas[i].LrsPixels()));
-      stream.writeAttribute("lisPixels", toString(m_rmsImageTWISTSigmas[i].LisPixels()));
-      stream.writeAttribute("hrsPixels", toString(m_rmsImageTWISTSigmas[i].HrsPixels()));
-      stream.writeAttribute("hisPixels", toString(m_rmsImageTWISTSigmas[i].HisPixels()));
-      stream.writeAttribute("underRangePixels", toString(m_rmsImageTWISTSigmas[i].UnderRangePixels()));
-      stream.writeAttribute("overRangePixels", toString(m_rmsImageTWISTSigmas[i].OverRangePixels()));
-      stream.writeAttribute("sum", toString(m_rmsImageTWISTSigmas[i].Sum()));
-      stream.writeAttribute("minimum", toString(m_rmsImageTWISTSigmas[i].Minimum()));
-      stream.writeAttribute("maximum", toString(m_rmsImageTWISTSigmas[i].Maximum()));
-      stream.writeAttribute("validMinimum", toString(m_rmsImageTWISTSigmas[i].ValidMinimum()));
-      stream.writeAttribute("validMaximum", toString(m_rmsImageTWISTSigmas[i].ValidMaximum()));
-      stream.writeAttribute("removedData", toString(m_rmsImageTWISTSigmas[i].RemovedData()));
-      stream.writeEndElement();
+      m_rmsImageTWISTSigmas[i].save(stream, project);
     }
     stream.writeEndElement(); // end twist sigma list
     stream.writeEndElement(); // end sigmas lists
@@ -1411,10 +1257,10 @@ namespace Isis {
     stream.writeAttribute("maximumLikelihoodIndex", toString(m_maximumLikelihoodIndex)); 
     stream.writeAttribute("maximumLikelihoodMedianR2Residuals", toString(m_maximumLikelihoodMedianR2Residuals)); 
     stream.writeStartElement("cumulativeProbabilityCalculator");
-    // TODO ???  m_cumPro->save(stream, project, newProjectRoot);
+    m_cumPro->save(stream, project);
     stream.writeEndElement();
     stream.writeStartElement("residualsCumulativeProbabilityCalculator");
-    // TODO ???  m_cumProRes->save(stream, project, newProjectRoot);
+    m_cumProRes->save(stream, project);
     stream.writeEndElement();
     for (int i = 0; i < m_numberMaximumLikelihoodModels; i++) {
       stream.writeStartElement("model");
@@ -1426,36 +1272,52 @@ namespace Isis {
       stream.writeEndElement();
     }
     stream.writeEndElement();
-    
-
+    stream.writeEndElement();
   }
 
 
 
-  BundleStatistics::XmlHandler::XmlHandler(BundleStatistics *statistics, 
-                                                         Project *project) {
+  BundleStatistics::XmlHandler::XmlHandler(BundleStatistics *statistics, Project *project) {   // TODO: does xml stuff need project???
     m_statistics = statistics;
-    m_project = project;
+    m_project = project;   // TODO: does xml stuff need project???
     m_characters = "";
   }
 
 
 
   BundleStatistics::XmlHandler::~XmlHandler() {
-    // ??? compile error ??? delete m_project;
+    // ??? compile error ??? delete m_project;    // TODO: does xml stuff need project???
     m_project = NULL;
   }
   
 
 
   bool BundleStatistics::XmlHandler::startElement(const QString &namespaceURI, 
-                                                                const QString &localName,
-                                                                const QString &qName,
-                                                                const QXmlAttributes &atts) {
+                                                  const QString &localName,
+                                                  const QString &qName,
+                                                  const QXmlAttributes &atts) {
+    m_characters = "";
+
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
         
       if (localName == "correlationMatrix") {
-        // TODO ???  m_statistics->m_correlationMatrix = new CorrelationMatrix(m_project, reader());
+
+        delete m_statistics->m_correlationMatrix;
+        m_statistics->m_correlationMatrix = NULL;
+        m_statistics->m_correlationMatrix = new CorrelationMatrix();
+
+        QString correlationFileName = atts.value("correlationFileName");
+        if (!correlationFileName.isEmpty()) {
+          FileName correlationFile(correlationFileName);
+          m_statistics->m_correlationMatrix->setCorrelationFileName(correlationFile);
+        }
+
+        QString covarianceFileName = atts.value("covarianceFileName");
+        if (!covarianceFileName.isEmpty()) {
+          FileName covarianceFile(covarianceFileName);
+          m_statistics->m_correlationMatrix->setCovarianceFileName(covarianceFile);
+        }
+
       }
       else if (localName == "residuals") {
         
@@ -1493,56 +1355,102 @@ namespace Isis {
         }
 
       }
-      else if (localName == "statisticsResiduals") {
+      else if (localName == "residualsList") {
 
-        QString validPixelsStr = atts.value("validPixels");
-        QString nullPixelsStr = atts.value("nullPixels");
-        QString lrsPixelsStr = atts.value("lrsPixels");
-        QString lisPixelsStr = atts.value("lisPixels");
-        QString hrsPixelsStr = atts.value("hrsPixels");
-        QString hisPixelsStr = atts.value("hisPixels");
-        QString underRangePixelsStr = atts.value("underRangePixels");
-        QString overRangePixelsStr = atts.value("overRangePixels");
-        QString sumStr = atts.value("sum");
-        QString minimumStr = atts.value("minimum");
-        QString maximumStr = atts.value("maximum");
-        QString validMinimumStr = atts.value("validMinimum");
-        QString validMaximumStr = atts.value("validMaximum");
-        QString removedDataStr = atts.value("removedData");
-        if (!validPixelsStr.isEmpty() 
-            && !nullPixelsStr.isEmpty()
-            && !lrsPixelsStr.isEmpty()
-            && !lisPixelsStr.isEmpty()
-            && !hrsPixelsStr.isEmpty()
-            && !hisPixelsStr.isEmpty()
-            && !underRangePixelsStr.isEmpty()
-            && !overRangePixelsStr.isEmpty()
-            && !sumStr.isEmpty()
-            && !minimumStr.isEmpty()
-            && !maximumStr.isEmpty()
-            && !validMinimumStr.isEmpty()
-            && !validMaximumStr.isEmpty()
-            && !removedDataStr.isEmpty()
-            ) {
-          int validPixels = toInt(validPixelsStr);
-          int nullPixels = toInt(nullPixelsStr);
-          int lrsPixels = toInt(lrsPixelsStr);
-          int lisPixels = toInt(lisPixelsStr);
-          int hrsPixels = toInt(hrsPixelsStr);
-          int hisPixels = toInt(hisPixelsStr);
-          int underRangePixels = toInt(underRangePixelsStr);
-          int overRangePixels = toInt(overRangePixelsStr);
-          double sum = toDouble(sumStr);
-          double minimum = toDouble(minimumStr);
-          double maximum = toDouble(maximumStr);
-          double validMinimum = toDouble(validMinimumStr);
-          double validMaximum = toDouble(validMaximumStr);
-          bool removedData = toBool(removedDataStr);
-          Statistics statsItem;
-          statsItem.set(validPixels, nullPixels, lrsPixels, lisPixels, hrsPixels, hisPixels,
-                        underRangePixels, overRangePixels, sum, minimum, maximum,
-                        validMinimum, validMaximum, removedData);
-          m_statistics->m_rmsImageResiduals.append(statsItem);
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageResiduals.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "sampleList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageSampleResiduals.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "lineList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageLineResiduals.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "xSigmasList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageXSigmas.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "ySigmasList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageYSigmas.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "zSigmasList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageZSigmas.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "raSigmasList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageRASigmas.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "decSigmasList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageDECSigmas.append(Statistics(m_project, reader()));
+          }
+        }
+
+      }
+      else if (localName == "twistSigmasList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          int listSize = toInt(listSizeStr);
+          for (int i = 0; i < listSize; i++) {
+            m_statistics->m_rmsImageTWISTSigmas.append(Statistics(m_project, reader()));
+          }
         }
 
       }
@@ -1656,10 +1564,14 @@ namespace Isis {
 
       }
       else if (localName == "cumulativeProbabilityCalculator") {
-        // TODO ???  m_statistics->m_cumPro = new StatCumProbDistDynCalc(m_project, reader());
+        delete m_statistics->m_cumPro;
+        m_statistics->m_cumPro = NULL;
+        m_statistics->m_cumPro = new StatCumProbDistDynCalc(m_project, reader());   // TODO: does xml stuff need project???
       }
       else if (localName == "residualsCumulativeProbabilityCalculator") {
-        // TODO ???  m_statistics->m_cumProRes = new StatCumProbDistDynCalc(m_project, reader());
+        delete m_statistics->m_cumProRes;
+        m_statistics->m_cumProRes = NULL;
+        m_statistics->m_cumProRes = new StatCumProbDistDynCalc(m_project, reader());   // TODO: does xml stuff need project???
       }
       else if (localName == "model") {
 
@@ -1838,7 +1750,10 @@ namespace Isis {
            >> cumPro >> cumProRes
            >> m_maximumLikelihoodMedianR2Residuals;
 
+    delete m_id;
+    m_id = NULL;
     m_id = new QUuid(id);
+
     m_numberFixedPoints                = (int)numberFixedPoints;
     m_numberIgnoredPoints              = (int)numberIgnoredPoints;
     m_numberHeldImages                 = (int)numberHeldImages;
@@ -1853,18 +1768,22 @@ namespace Isis {
     m_maximumLikelihoodIndex           = (int)maximumLikelihoodIndex;
 
     delete m_correlationMatrix;
+    m_correlationMatrix = NULL;
     m_correlationMatrix = new CorrelationMatrix(correlationMatrix);
 
     for (int i = 0; i < m_numberMaximumLikelihoodModels; i++){
 
       delete m_wFunc[i];
+      m_wFunc[i] = NULL;
       m_wFunc[i] = new MaximumLikelihoodWFunctions(wFunc[i]);
     }
 
     delete m_cumPro;
+    m_cumPro = NULL;
     m_cumPro = new StatCumProbDistDynCalc(cumPro);
 
     delete m_cumProRes;
+    m_cumProRes = NULL;
     m_cumProRes = new StatCumProbDistDynCalc(cumProRes);
     
     return stream;

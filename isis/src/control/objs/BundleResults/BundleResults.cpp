@@ -10,6 +10,7 @@
 #include "ControlNet.h"
 #include "FileName.h"
 #include "ImageList.h"
+#include "IString.h"
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
@@ -128,22 +129,19 @@ namespace Isis {
   void BundleResults::save(QXmlStreamWriter &stream, const Project *project,
                             FileName newProjectRoot) const {
 
+    stream.writeStartElement("bundleResults");
     // save ID, cnet file name, and run time to stream
     stream.writeStartElement("generalAttributes");
-    stream.writeAttribute("id", m_id->toString());
-    stream.writeAttribute("runTime", m_runTime);
-    stream.writeAttribute("fileName", m_controlNetworkFileName->expanded());
-    stream.writeEndElement();
+    stream.writeTextElement("id", m_id->toString());
+    stream.writeTextElement("runTime", m_runTime);
+    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
+    stream.writeEndElement(); // end general attributes
 
     // save settings to stream
-    stream.writeStartElement("bundleSettings");
-    m_settings->save(stream, project, newProjectRoot);
-    stream.writeEndElement();
+    m_settings->save(stream, project);
 
     // save statistics to stream
-    stream.writeStartElement("bundleStatistics");
-    //m_statisticsResults->save(stream, project, newProjectRoot);
-    stream.writeEndElement();
+    m_statisticsResults->save(stream, project);
 
     // save image lists to stream
     stream.writeStartElement("images");
@@ -151,8 +149,9 @@ namespace Isis {
     for (int i = 0; i < m_images->size(); i++) {
       m_images->at(i)->save(stream, project, newProjectRoot);
     }
-    stream.writeEndElement();
+    stream.writeEndElement(); // end images
 
+    stream.writeEndElement(); //end bundleResults
   }
 
 
@@ -212,12 +211,12 @@ namespace Isis {
       else if (localName == "bundleSettings") {
         delete m_bundleResults->m_settings;
         m_bundleResults->m_settings = NULL;
-        m_bundleResults->m_settings = new BundleSettings(reader());
+        m_bundleResults->m_settings = new BundleSettings(m_project, reader());
       }
       else if (localName == "bundleStatistics") {
         delete m_bundleResults->m_statisticsResults;
         m_bundleResults->m_statisticsResults = NULL;
-//        m_bundleResults->m_statisticsResults = new BundleStatistics(reader()); //TODO: need to add constructor for this???
+        m_bundleResults->m_statisticsResults = new BundleStatistics(m_project, reader()); //TODO: need to add constructor for this???
       }
       else if (localName == "images") {
         QString numberImageLists = atts.value("numberImageLists");

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundleSettings>
+    <globalSettings>
+        <id>{5847126a-62ce-406e-9971-e03c32174086}</id>
+        <validateNetwork>Yes</validateNetwork>
+        <solveOptions solveMethod="Sparse" solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes"/>
+        <aprioriSigmas latitude="-1.0" longitude="-1.0" radius="N/A"/>
+        <outlierRejectionOptions reject="No" multiplier="N/A"/>
+        <convergenceCriteriaOptions convergenceCriteria="ParameterCorrections" threshold="0.25" maximumIterations="26"/>
+        <maximumLikelihoodEstimation>
+            <model type="Huber" quantile="0.27"/>
+            <model type="Welsch" quantile="28.0"/>
+            <model type="HuberModified" quantile="29.0"/>
+            <model type="Chen" quantile="30.0"/>
+        </maximumLikelihoodEstimation>
+        <outputFileOptions fileNamePrefix="TestFilePrefix" createBundleOutputFile="No" createCSVFiles="No" createResidualsFile="Yes"/>
+    </globalSettings>
+    <observationSolveSettingsList listSize="2">
+        <bundleObservationSolveSettings>
+            <id>{0d87dd47-9c8a-4d46-a1c7-4be59bc1b82c}</id>
+            <instrumentId>Instrument1</instrumentId>
+            <instrumentPointingOptions solveOption="None" solveTwist="Yes" degree="11" solveDegree="-1" numberCoefSolved="0" solveOverExisting="Yes" interpolationType="4">
+                <aprioriSigmas angles="N/A" velocity="N/A" acceleration="N/A"/>
+            </instrumentPointingOptions>
+            <instrumentPositionOptions solveOption="AllPolynomialCoefficients" degree="5" solveDegree="6" numberCoefSolved="7" solveOverHermiteSpline="Yes" interpolationType="4">
+                <aprioriSigmas position="7000.0" velocity="8000.0" acceleration="9000.0"/>
+            </instrumentPositionOptions>
+        </bundleObservationSolveSettings>
+        <bundleObservationSolveSettings>
+            <id>{0d87dd47-9c8a-4d46-a1c7-4be59bc1b82c}</id>
+            <instrumentId>Instrument2</instrumentId>
+            <instrumentPointingOptions solveOption="AllPolynomialCoefficients" solveTwist="Yes" degree="21" solveDegree="1" numberCoefSolved="2" solveOverExisting="Yes" interpolationType="4">
+                <aprioriSigmas angles="22.0" velocity="23.0" acceleration="N/A"/>
+            </instrumentPointingOptions>
+            <instrumentPositionOptions solveOption="PositionOnly" degree="15" solveDegree="0" numberCoefSolved="1" solveOverHermiteSpline="Yes" interpolationType="4">
+                <aprioriSigmas position="17000.0" velocity="N/A" acceleration="N/A"/>
+            </instrumentPositionOptions>
+        </bundleObservationSolveSettings>
+    </observationSolveSettingsList>
+</bundleSettings>
