@@ -25,6 +25,7 @@
 
 #include <QList>
 #include <QObject>
+#include <QString>
 
 #include "BundleImage.h"
 #include "SpicePosition.h"
@@ -36,6 +37,7 @@ class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
+  class FileName;
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;
   class XmlStackedHandlerReader;
@@ -67,10 +69,17 @@ namespace Isis {
     Q_OBJECT
     public:
       BundleObservationSolveSettings(QObject *parent = 0);
-      BundleObservationSolveSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);  // TODO: does xml stuff need project???
+      BundleObservationSolveSettings(Project *project, 
+                                     XmlStackedHandlerReader *xmlReader, 
+                                     QObject *parent = 0);  // TODO: does xml stuff need project???
+      BundleObservationSolveSettings(FileName xmlFile, 
+                                     Project *project, 
+                                     XmlStackedHandlerReader *xmlReader, 
+                                     QObject *parent = 0);  // TODO: does xml stuff need project???
       BundleObservationSolveSettings(const BundleObservationSolveSettings &other);
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &other);
+      void initialize();
 
       bool setFromPvl(PvlGroup& scParameterGroup);
       PvlObject pvlObject(QString name = "") const; // default name is instrument ID
@@ -165,7 +174,7 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
    
-          BundleObservationSolveSettings *m_settings;
+          BundleObservationSolveSettings *m_observationSettings;
           Project *m_project;  // TODO: does xml stuff need project???
           QString m_characters;
       };

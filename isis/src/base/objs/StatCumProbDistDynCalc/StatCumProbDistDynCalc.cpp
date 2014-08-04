@@ -110,6 +110,9 @@ namespace Isis {
    *                 will be dynamically tracked
    */
   void StatCumProbDistDynCalc::initialize(unsigned int nodes) {
+    m_id = NULL;
+    m_id = new QUuid(QUuid::createUuid());
+
     m_quantiles.clear();
     m_idealNum.clear();
     m_n.clear();
@@ -502,27 +505,26 @@ namespace Isis {
 
     stream.writeStartElement("quantiles");
     for (int i = 0; i < m_quantiles.size(); i++) {
-      stream.writeTextElement("value", toString(m_quantiles[i]));
+      stream.writeTextElement("quantile", toString(m_quantiles[i]));
     }
     stream.writeEndElement();
-
-    stream.writeStartElement("idealNum");
+  
+    stream.writeStartElement("idealNumObsBelowEachQuantile");
     for (int i = 0; i < m_idealNum.size(); i++) {
-      stream.writeTextElement("value", toString(m_idealNum[i]));
+      stream.writeTextElement("idealNumObsBelowQuantile", toString(m_idealNum[i]));
     }
     stream.writeEndElement();
     
-    stream.writeStartElement("n");
+    stream.writeStartElement("numObsBelowEachQuantile");
     for (int i = 0; i < m_n.size(); i++) {
-      stream.writeTextElement("value", toString(m_n[i]));
+      stream.writeTextElement("numObsBelowQuantile", toString(m_n[i]));
     }
     stream.writeEndElement();
-
+  
     stream.writeStartElement("quantileValues");
     for (int i = 0; i < m_quantileValues.size(); i++) {
       stream.writeTextElement("value", toString(m_quantileValues[i]));
     }
-    stream.writeEndElement();
     stream.writeEndElement();
 
   }
@@ -538,7 +540,7 @@ namespace Isis {
 
 
   StatCumProbDistDynCalc::XmlHandler::~XmlHandler() {
-    // ??? compile error ??? delete m_project;    // TODO: does xml stuff need project???
+    delete m_project;    // TODO: does xml stuff need project???
     m_project = NULL;
   }
 
@@ -568,39 +570,28 @@ namespace Isis {
                                      const QString &qName) {
     if (!m_characters.isEmpty()) {
       if (localName == "id") {
-        delete m_probabilityCalc->m_id;
         m_probabilityCalc->m_id = NULL;
         m_probabilityCalc->m_id = new QUuid(m_characters);
       }
-      if (localName == "numberCells") {
+      else if (localName == "numberCells") {
         m_probabilityCalc->m_numberCells = toInt(m_characters);
       }
-      if (localName == "numberObservations") {
+      else if (localName == "numberObservations") {
         m_probabilityCalc->m_numberObservations = toInt(m_characters);
       }
-//
-//    stream.writeStartElement("quantileValue");
-//    for (int i = 0; i < m_quantiles.size(); i++) {
-//      stream.writeTextElement("value", toString(m_quantiles[i]));
-//    }
-//    stream.writeEndElement();
-//
-//    stream.writeStartElement("idealNum");
-//    for (int i = 0; i < m_idealNum.size(); i++) {
-//      stream.writeTextElement("value", toString(m_idealNum[i]));
-//    }
-//    stream.writeEndElement();
-//    
-//    stream.writeStartElement("n");
-//    for (int i = 0; i < m_n.size(); i++) {
-//      stream.writeTextElement("value", toString(m_n[i]));
-//    }
-//    stream.writeEndElement();
-//
-//    stream.writeStartElement("quantileValues");
-//    for (int i = 0; i < m_quantileValues.size(); i++) {
-//      stream.writeTextElement("value", toString(m_quantileValues[i]));
-
+      else if (localName == "quantile") {
+        m_probabilityCalc->m_quantiles.append(toDouble(m_characters));
+      }
+      else if (localName == "idealNumObsBelowQuantile") {
+        m_probabilityCalc->m_idealNum.append(toDouble(m_characters));
+      }
+      else if (localName == "numObsBelowQuantile") {
+        m_probabilityCalc->m_n.append(toInt(m_characters));
+      }
+      else if (localName == "value") {
+        m_probabilityCalc->m_quantileValues.append(toDouble(m_characters));
+      }
+                                           
       m_characters = "";
     }
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
@@ -609,7 +600,8 @@ namespace Isis {
 
 
   QDataStream &StatCumProbDistDynCalc::write(QDataStream &stream) const {
-    stream << (qint32)m_numberCells
+    stream << m_id->toString()
+           << (qint32)m_numberCells
            << (qint32)m_numberQuantiles 
            << m_quantiles
            << m_idealNum
@@ -622,14 +614,21 @@ namespace Isis {
 
 
   QDataStream &StatCumProbDistDynCalc::read(QDataStream &stream) {
+    QString id;
     qint32 numCells, numQuantiles, numObservations;
-    stream >> numCells
+    stream >> id
+           >> numCells
            >> numQuantiles
            >> m_quantiles
            >> m_idealNum
            >> m_n
            >> m_quantileValues
            >> numObservations;
+
+    delete m_id;
+    m_id = NULL;
+    m_id = new QUuid(id);
+
     m_numberCells = (unsigned int)numCells;
     m_numberQuantiles  = (unsigned int)numQuantiles;
     m_numberObservations   = (unsigned int)numObservations;

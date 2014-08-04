@@ -265,8 +265,8 @@ namespace Isis {
   }
 
   QDataStream &BundleResults::write(QDataStream &stream) const {
-    // TODO: add m_id???
-    stream << m_controlNetworkFileName->expanded()
+    stream << m_id->toString()
+           << m_controlNetworkFileName->expanded()
            << *m_settings
            << *m_statisticsResults;
     // TODO: add m_images???
@@ -278,7 +278,11 @@ namespace Isis {
 
   QDataStream &BundleResults::read(QDataStream &stream) {
 
-    // TODO: add m_id???
+    QString id;
+    stream >> id;
+    delete m_id;
+    m_id = NULL;
+    m_id = new QUuid(id);
 
     QString controlNetworkFileName;
     stream >> controlNetworkFileName;

@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QIODevice>
 #include <QString>
+#include <QXmlInputSource>
+#include <QXmlStreamWriter>
 
 #include "BundleControlPoint.h"
 #include "BundleControlPointVector.h"
@@ -12,13 +14,48 @@
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 #include "PvlObject.h"
+#include "XmlStackedHandlerReader.h"
 
 
 using namespace std;
 using namespace Isis;
+
+
+
+namespace Isis {
+  class XmlHandlerTester : public BundleObservationSolveSettings {
+    public:
+      XmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, FileName xmlFile)
+          : BundleObservationSolveSettings(project, reader) {
+
+        QString xmlPath(xmlFile.expanded());
+        QFile file(xmlPath);
+
+        if (!file.open(QFile::ReadOnly) ) {
+          throw IException(IException::Io,
+                           QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                           _FILEINFO_);
+        }
+
+        QXmlInputSource xmlInputSource(&file);
+        bool success = reader->parse(xmlInputSource);
+        if (!success) {
+          throw IException(IException::Unknown, 
+                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                            _FILEINFO_);
+        }
+
+      }
+
+      ~XmlHandlerTester() {
+      }
+
+  };
+}
 
 
 
@@ -56,7 +93,7 @@ int main(int argc, char *argv[]) {
   // default constructor
   BundleObservationSolveSettings boss;
   boss.setInstrumentId("TestBundleObservationSolveSettings");
-  boss.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors, true, 1, 2,
+  boss.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesVelocity, true, 1, 2,
                                      false, 3.0, 4.0, 5.0);
   boss.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionOnly, 6, 7,
                                      true, 800.0, 900.0, 1000.0);
@@ -73,8 +110,7 @@ int main(int argc, char *argv[]) {
 //  in >> newBoss;
 
   qDebug();
-  qDebug() << "Write the BundleObservationSolveSettings object to a byte array using a data stream "
-              "and read into a new object ...";
+  qDebug() << "Testing QDataStream write/read...";
   QByteArray byteArray;
   QDataStream outputData(&byteArray, QIODevice::WriteOnly);
   outputData << boss;
@@ -83,6 +119,32 @@ int main(int argc, char *argv[]) {
   inputData >> newBoss;
   pvl = newBoss.pvlObject();
   cout << pvl << endl;
+
+  qDebug();
+  qDebug() << "Testing XML write/read...";
+  // write xml 
+  FileName xmlFile("./BundleObservationSolveSettings.xml");
+  QString xmlPath = xmlFile.expanded();
+  QFile qXmlFile(xmlPath);
+  if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
+    throw IException(IException::Io,
+                     QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
+                     _FILEINFO_);
+  }
+  QXmlStreamWriter writer(&qXmlFile);
+  writer.setAutoFormatting(true);
+  writer.writeStartDocument();
+  Project *project = NULL;
+  FileName settingsXml();
+  boss.save(writer, project);
+  writer.writeEndDocument();
+  qXmlFile.close();
+  // read xml    
+  XmlStackedHandlerReader reader;
+//  XmlHandlerTester bossToFill(project, &reader, xmlFile);
+  BundleObservationSolveSettings bossToFill(xmlFile, project, &reader);
+  pvl = bossToFill.pvlObject("FromXml");
+  cout << pvl << endl << endl;
 
 #if 0
   qDebug();

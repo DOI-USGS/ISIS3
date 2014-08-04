@@ -23,14 +23,14 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 Create a BundleObservationSolveSettings object and test mutator methods... 
 Object = TestBundleObservationSolveSettings
-  InstrumentPointingSolveOption       = None
-  SolveTwist                          = N/A
-  CKDegree                            = N/A
-  CKSolveDegree                       = N/A
-  NumberAngleCoefficientsSolved       = N/A
-  SolvePointingPolynomialOverExisting = N/A
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = N/A
+  InstrumentPointingSolveOption       = AnglesAndVelocity
+  SolveTwist                          = Yes
+  CKDegree                            = 1
+  CKSolveDegree                       = 1
+  NumberAngleCoefficientsSolved       = 2
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = (3.0, 4.0)
+  InstrumentPointingInterpolationType = 3
   InstrumentPositionSolveOption       = PositionOnly
   SPKDegree                           = 6
   SPKSolveDegree                      = 0
@@ -40,16 +40,16 @@ Object = TestBundleObservationSolveSettings
   InstrumentPositionInterpolationType = 4
 End_Object
 
-Write the BundleObservationSolveSettings object to a byte array using a data stream and read into a new object ... 
+Testing QDataStream write/read... 
 Object = TestBundleObservationSolveSettings
-  InstrumentPointingSolveOption       = None
-  SolveTwist                          = N/A
-  CKDegree                            = N/A
-  CKSolveDegree                       = N/A
-  NumberAngleCoefficientsSolved       = N/A
-  SolvePointingPolynomialOverExisting = N/A
-  AngleAprioriSigmas                  = N/A
-  InstrumentPointingInterpolationType = N/A
+  InstrumentPointingSolveOption       = AnglesAndVelocity
+  SolveTwist                          = Yes
+  CKDegree                            = 1
+  CKSolveDegree                       = 1
+  NumberAngleCoefficientsSolved       = 2
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = (3.0, 4.0)
+  InstrumentPointingInterpolationType = 3
   InstrumentPositionSolveOption       = PositionOnly
   SPKDegree                           = 6
   SPKSolveDegree                      = 0
@@ -58,6 +58,26 @@ Object = TestBundleObservationSolveSettings
   PositionAprioriSigmas               = 800.0
   InstrumentPositionInterpolationType = 4
 End_Object
+
+Testing XML write/read... 
+Object = FromXml
+  InstrumentPointingSolveOption       = AnglesAndVelocity
+  SolveTwist                          = Yes
+  CKDegree                            = 1
+  CKSolveDegree                       = 1
+  NumberAngleCoefficientsSolved       = 2
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = (3.0, 4.0)
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionOnly
+  SPKDegree                           = 6
+  SPKSolveDegree                      = 0
+  NumberPositionCoefficientsSolved    = 1
+  SolvePositionOverHermiteSpline      = Yes
+  PositionAprioriSigmas               = 800.0
+  InstrumentPositionInterpolationType = 4
+End_Object
+
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 

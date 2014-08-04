@@ -2,13 +2,16 @@
 
 #include <QDataStream>
 #include <QDebug>
+#include <QFile>
 #include <QList>
 #include <QString>
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlInputSource>
 
 #include "BundleImage.h"
 #include "Camera.h"
+#include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
@@ -22,30 +25,9 @@ namespace Isis {
   /**
    * Constructor with default parameter initializations.
    */
-  BundleObservationSolveSettings::BundleObservationSolveSettings(QObject *parent) : QObject(parent) {
-
-    m_id = NULL;
-    m_id = new QUuid(QUuid::createUuid());
-    
-    m_instrumentId = "";
-
-    // Spacecraft Position Options
-    m_instrumentPositionSolveOption = NoPositionFactors;
-    m_spkDegree = 2;
-    m_spkSolveDegree = -1;// ??? default to match no position factors is -1
-    m_solvePositionOverHermiteSpline = false;
-    m_positionInterpolationType = SpicePosition::PolyFunction;
-    m_positionAprioriSigma.clear();
-
-    // Camera Pointing Options
-    m_instrumentPointingSolveOption = AnglesOnly;
-    m_solveTwist = true;
-    m_ckDegree = 2;
-    m_ckSolveDegree = 0; // ??? default to match angles only is 0
-    m_solvePointingPolynomialOverExisting = false;
-    m_pointingInterpolationType = SpiceRotation::PolyFunction;
-    m_numberCamAngleCoefSolved = 1;
-    m_anglesAprioriSigma.clear();
+  BundleObservationSolveSettings::BundleObservationSolveSettings(QObject *parent)
+      : QObject(parent) {
+    initialize();
   }
 
 
@@ -57,10 +39,11 @@ namespace Isis {
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
    * @param parent The Qt-relationship parent
    */
-  BundleObservationSolveSettings::BundleObservationSolveSettings(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {
-    m_id = NULL;
-    // ??? initializations ???
+  BundleObservationSolveSettings::BundleObservationSolveSettings(Project *project, 
+                                                                 XmlStackedHandlerReader *xmlReader,
+                                                                 QObject *parent)
+      : QObject(parent) {
+    initialize();
     xmlReader->pushContentHandler(new XmlHandler(this, project));
     xmlReader->setErrorHandler(new XmlHandler(this, project));
   }
@@ -68,34 +51,84 @@ namespace Isis {
 
 
   /**
+   * Construct this BundleSettings object from XML.
+   *
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  BundleObservationSolveSettings::BundleObservationSolveSettings(FileName xmlFile,
+                                                                 Project *project, 
+                                                                 XmlStackedHandlerReader *xmlReader,
+                                                                 QObject *parent)
+      : QObject(parent) {
+
+    initialize();
+    QString xmlPath = xmlFile.expanded();
+    QFile qXmlFile(xmlPath);
+    if (!qXmlFile.open(QFile::ReadOnly) ) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                       _FILEINFO_);
+    }
+
+    QXmlInputSource xmlInputSource(&qXmlFile);
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+    xmlReader->setErrorHandler(new XmlHandler(this, project));
+    bool success = xmlReader->parse(xmlInputSource);
+    if (!success) {
+      throw IException(IException::Unknown, 
+                       QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                        _FILEINFO_);
+    }
+  }
+
+
+
+  /**
    * Copy constructor.
    */
-  BundleObservationSolveSettings::
-      BundleObservationSolveSettings(const BundleObservationSolveSettings &other) {
+//  BundleObservationSolveSettings::BundleObservationSolveSettings(const BundleObservationSolveSettings &other)
+//      : m_id(new QUuid(other.m_id->toString())),
+//        m_instrumentId(other.m_instrumentId),
+//        m_instrumentPointingSolveOption(other.m_instrumentPointingSolveOption),
+//        m_solveTwist(other.m_solveTwist),
+//        m_ckDegree(other.m_ckDegree),
+//        m_ckSolveDegree(other.m_ckSolveDegree),
+//        m_numberCamAngleCoefSolved(other.m_numberCamAngleCoefSolved),
+//        m_solvePointingPolynomialOverExisting(other.m_solvePointingPolynomialOverExisting),
+//        m_anglesAprioriSigma(other.m_anglesAprioriSigma),
+//        m_pointingInterpolationType(other.m_pointingInterpolationType),
+//        m_instrumentPositionSolveOption(other.m_instrumentPositionSolveOption),
+//        m_spkDegree(other.m_spkDegree),
+//        m_spkSolveDegree(other.m_spkSolveDegree),
+//        m_numberCamPosCoefSolved(other.m_numberCamPosCoefSolved),
+//        m_solvePositionOverHermiteSpline(other.m_solvePositionOverHermiteSpline),
+//        m_positionAprioriSigma(other.m_positionAprioriSigma),
+//        m_positionInterpolationType(other.m_positionInterpolationType) {
+//  }
+  BundleObservationSolveSettings::BundleObservationSolveSettings(const BundleObservationSolveSettings &other) {
 
     m_id = NULL;
     m_id = new QUuid(other.m_id->toString());
+     // TODO: add check to all copy constructors (verify other.xxx is not null) and operator= ??? or intit all variables in all constructors
 
     m_instrumentId = other.m_instrumentId;
-
-    // position related
-    m_instrumentPositionSolveOption = other.m_instrumentPositionSolveOption;
-    m_spkDegree = other.m_spkDegree;
-    m_spkSolveDegree = other.m_spkSolveDegree;
-    m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
-    m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
-    m_positionInterpolationType = other.m_positionInterpolationType;
-    m_positionAprioriSigma = other.m_positionAprioriSigma;
-
-    // pointing related
     m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
     m_solveTwist = other.m_solveTwist;
     m_ckDegree = other.m_ckDegree;
     m_ckSolveDegree = other.m_ckSolveDegree;
     m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
     m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
-    m_pointingInterpolationType = other.m_pointingInterpolationType;
     m_anglesAprioriSigma = other.m_anglesAprioriSigma;
+    m_pointingInterpolationType = other.m_pointingInterpolationType;
+    m_instrumentPositionSolveOption = other.m_instrumentPositionSolveOption;
+    m_spkDegree = other.m_spkDegree;
+    m_spkSolveDegree = other.m_spkSolveDegree;
+    m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
+    m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
+    m_positionAprioriSigma = other.m_positionAprioriSigma;
+    m_positionInterpolationType = other.m_positionInterpolationType;
   }
 
 
@@ -104,8 +137,10 @@ namespace Isis {
    * Destructor.
    */
   BundleObservationSolveSettings::~BundleObservationSolveSettings() {
-      delete m_id;
-      m_id = NULL;
+
+    delete m_id;
+    m_id = NULL;
+
   }
 
 
@@ -142,6 +177,33 @@ namespace Isis {
 
     return *this;
 
+  }
+
+
+
+  void BundleObservationSolveSettings::initialize() {
+    m_id = NULL;
+    m_id = new QUuid(QUuid::createUuid());
+    
+    m_instrumentId = "";
+
+    // Spacecraft Position Options
+    m_instrumentPositionSolveOption = NoPositionFactors;
+    m_spkDegree = 2;
+    m_spkSolveDegree = -1;// ??? default to match no position factors is -1
+    m_solvePositionOverHermiteSpline = false;
+    m_positionInterpolationType = SpicePosition::PolyFunction;
+    m_positionAprioriSigma.clear();
+
+    // Camera Pointing Options
+    m_instrumentPointingSolveOption = AnglesOnly;
+    m_solveTwist = true;
+    m_ckDegree = 2;
+    m_ckSolveDegree = 0; // ??? default to match angles only is 0
+    m_solvePointingPolynomialOverExisting = false;
+    m_pointingInterpolationType = SpiceRotation::PolyFunction;
+    m_numberCamAngleCoefSolved = 1;
+    m_anglesAprioriSigma.clear();
   }
 
 
@@ -344,16 +406,31 @@ namespace Isis {
     if (option.compare("NONE", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::NoPointingFactors;
     }
+    else if (option.compare("NoPointingFactors", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::NoPointingFactors;
+    }
     else if (option.compare("ANGLES", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::AnglesOnly;
+    }
+    else if (option.compare("AnglesOnly", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::AnglesOnly;
     }
     else if (option.compare("VELOCITIES", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::AnglesVelocity;
     }
+    else if (option.compare("AnglesAndVelocity", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::AnglesVelocity;
+    }
     else if (option.compare("ACCELERATIONS", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::AnglesVelocityAcceleration;
     }
+    else if (option.compare("AnglesVelocityAndAcceleration", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::AnglesVelocityAcceleration;
+    }
     else if (option.compare("ALL", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::AllPointingCoefficients;
+    }
+    else if (option.compare("AllPolynomialCoefficients", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::AllPointingCoefficients;
     }
     else {
@@ -514,16 +591,31 @@ namespace Isis {
     if (option.compare("NONE", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::NoPositionFactors;
     }
+    else if (option.compare("NoPositionFactors", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::NoPositionFactors;
+    }
     else if (option.compare("POSITIONS", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::PositionOnly;
+    }
+    else if (option.compare("PositionOnly", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::PositionOnly;
     }
     else if (option.compare("VELOCITIES", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::PositionVelocity;
     }
+    else if (option.compare("PositionAndVelocity", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::PositionVelocity;
+    }
     else if (option.compare("ACCELERATIONS", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::PositionVelocityAcceleration;
     }
+    else if (option.compare("PositionVelocityAndAcceleration", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::PositionVelocityAcceleration;
+    }
     else if (option.compare("ALL", Qt::CaseInsensitive) == 0) {
+      return BundleObservationSolveSettings::AllPositionCoefficients;
+    }
+    else if (option.compare("AllPolynomialCoefficients", Qt::CaseInsensitive) == 0) {
       return BundleObservationSolveSettings::AllPositionCoefficients;
     }
     else {
@@ -755,7 +847,7 @@ namespace Isis {
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
     stream.writeAttribute("solveOverExisting", toString(m_solvePointingPolynomialOverExisting));
     stream.writeAttribute("interpolationType", toString(m_pointingInterpolationType));
-    stream.writeStartElement("aprioriSigmas");
+    stream.writeStartElement("aprioriPointingSigmas");
     if (m_anglesAprioriSigma.size() > 0) {
       stream.writeAttribute("angles", toString(m_anglesAprioriSigma[0]));
     }
@@ -763,16 +855,16 @@ namespace Isis {
       stream.writeAttribute("angles", "N/A");
     }
     if (m_anglesAprioriSigma.size() > 1) {
-      stream.writeAttribute("velocity", toString(m_anglesAprioriSigma[1]));
+      stream.writeAttribute("angularVelocity", toString(m_anglesAprioriSigma[1]));
     }
     else {
-      stream.writeAttribute("velocity", "N/A");
+      stream.writeAttribute("angularVelocity", "N/A");
     }
     if (m_anglesAprioriSigma.size() > 2) {
-      stream.writeAttribute("acceleration", toString(m_anglesAprioriSigma[2]));
+      stream.writeAttribute("angularAcceleration", toString(m_anglesAprioriSigma[2]));
     }
     else {
-      stream.writeAttribute("acceleration", "N/A");
+      stream.writeAttribute("angularAcceleration", "N/A");
     }
     stream.writeEndElement();// end aprioriPointingSigmas
     stream.writeEndElement();// end instrumentPointingOptions
@@ -786,7 +878,7 @@ namespace Isis {
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
     stream.writeAttribute("solveOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
     stream.writeAttribute("interpolationType", toString(m_positionInterpolationType));
-    stream.writeStartElement("aprioriSigmas");
+    stream.writeStartElement("aprioriPositionSigmas");
     if (m_positionAprioriSigma.size() > 0) {
       stream.writeAttribute("position", toString(m_positionAprioriSigma[0]));
     }
@@ -815,7 +907,7 @@ namespace Isis {
 
   BundleObservationSolveSettings::XmlHandler::XmlHandler(BundleObservationSolveSettings *settings, 
                                                          Project *project) {  // TODO: does xml stuff need project???
-    m_settings = settings;
+    m_observationSettings = settings;
     m_project = project;  // TODO: does xml stuff need project???
     m_characters = "";
   }
@@ -839,101 +931,105 @@ namespace Isis {
         
         QString pointingSolveOption = atts.value("solveOption");
         if (!pointingSolveOption.isEmpty()) {
-          m_settings->m_instrumentPointingSolveOption
+          m_observationSettings->m_instrumentPointingSolveOption
               = stringToInstrumentPointingSolveOption(pointingSolveOption);
         }
 
         QString solveTwist = atts.value("solveTwist");
         if (!solveTwist.isEmpty()) {
-          m_settings->m_solveTwist = toBool(solveTwist);
+          m_observationSettings->m_solveTwist = toBool(solveTwist);
         }
 
         QString ckDegree = atts.value("degree");
         if (!ckDegree.isEmpty()) {
-          m_settings->m_ckDegree = toInt(ckDegree);
+          m_observationSettings->m_ckDegree = toInt(ckDegree);
         }
 
         QString ckSolveDegree = atts.value("solveDegree");
         if (!ckSolveDegree.isEmpty()) {
-          m_settings->m_ckSolveDegree = toInt(ckSolveDegree);
+          m_observationSettings->m_ckSolveDegree = toInt(ckSolveDegree);
         }
 
         QString numberCoefSolved = atts.value("numberCoefSolved");
         if (!numberCoefSolved.isEmpty()) {
-          m_settings->m_numberCamAngleCoefSolved = toInt(numberCoefSolved);
+          m_observationSettings->m_numberCamAngleCoefSolved = toInt(numberCoefSolved);
         }
 
         QString solveOverExisting = atts.value("solveOverExisting");
         if (!solveOverExisting.isEmpty()) {
-          m_settings->m_solvePointingPolynomialOverExisting = toBool(solveOverExisting);
+          m_observationSettings->m_solvePointingPolynomialOverExisting = toBool(solveOverExisting);
         }
 
         QString interpolationType = atts.value("interpolationType");
         if (!interpolationType.isEmpty()) {
-          m_settings->m_pointingInterpolationType = SpiceRotation::Source(toInt(interpolationType));
+          m_observationSettings->m_pointingInterpolationType = SpiceRotation::Source(toInt(interpolationType));
         }
 
+      }
+      else if (localName == "aprioriPointingSigmas") {
         QString anglesSigma = atts.value("angles");
         if (!anglesSigma.isEmpty() && anglesSigma != "N/A") {
-          m_settings->m_anglesAprioriSigma.append(toDouble(anglesSigma));
+          m_observationSettings->m_anglesAprioriSigma.append(toDouble(anglesSigma));
         }
 
-        QString velocitySigma = atts.value("velocity");
+        QString velocitySigma = atts.value("angularVelocity");
         if (!velocitySigma.isEmpty() && velocitySigma != "N/A") {
-          m_settings->m_anglesAprioriSigma.append(toDouble(velocitySigma));
+          m_observationSettings->m_anglesAprioriSigma.append(toDouble(velocitySigma));
         }
 
-        QString accelerationSigma = atts.value("acceleration");
+        QString accelerationSigma = atts.value("angularAcceleration");
         if (!accelerationSigma.isEmpty() && accelerationSigma != "N/A") {
-          m_settings->m_anglesAprioriSigma.append(toDouble(accelerationSigma));
+          m_observationSettings->m_anglesAprioriSigma.append(toDouble(accelerationSigma));
         }
       }
       else if (localName == "instrumentPositionOptions") {
         
         QString positionSolveOption = atts.value("solveOption");
         if (!positionSolveOption.isEmpty()) {
-          m_settings->m_instrumentPositionSolveOption
+          m_observationSettings->m_instrumentPositionSolveOption
               = stringToInstrumentPositionSolveOption(positionSolveOption);
         }
 
         QString spkDegree = atts.value("degree");
         if (!spkDegree.isEmpty()) {
-          m_settings->m_spkDegree = toInt(spkDegree);
+          m_observationSettings->m_spkDegree = toInt(spkDegree);
         }
 
         QString spkSolveDegree = atts.value("solveDegree");
         if (!spkSolveDegree.isEmpty()) {
-          m_settings->m_spkSolveDegree = toInt(spkSolveDegree);
+          m_observationSettings->m_spkSolveDegree = toInt(spkSolveDegree);
         }
 
         QString numberCoefSolved = atts.value("numberCoefSolved");
         if (!numberCoefSolved.isEmpty()) {
-          m_settings->m_numberCamPosCoefSolved = toInt(numberCoefSolved);
+          m_observationSettings->m_numberCamPosCoefSolved = toInt(numberCoefSolved);
         }
 
         QString solveOverHermiteSpline = atts.value("solveOverHermiteSpline");
         if (!solveOverHermiteSpline.isEmpty()) {
-          m_settings->m_solvePositionOverHermiteSpline = toBool(solveOverHermiteSpline);
+          m_observationSettings->m_solvePositionOverHermiteSpline = toBool(solveOverHermiteSpline);
         }
 
         QString interpolationType = atts.value("interpolationType");
         if (!interpolationType.isEmpty()) {
-          m_settings->m_positionInterpolationType = SpicePosition::Source(toInt(interpolationType));
+          m_observationSettings->m_positionInterpolationType = SpicePosition::Source(toInt(interpolationType));
         }
+      }
+      else if (localName == "aprioriPositionSigmas") {
 
         QString positionSigma = atts.value("position");
         if (!positionSigma.isEmpty() && positionSigma != "N/A") {
-          m_settings->m_positionAprioriSigma.append(toDouble(positionSigma));
+          m_observationSettings->m_positionAprioriSigma.append(toDouble(positionSigma));
         }
 
         QString velocitySigma = atts.value("velocity");
         if (!velocitySigma.isEmpty() && velocitySigma != "N/A") {
-          m_settings->m_positionAprioriSigma.append(toDouble(velocitySigma));
+          m_observationSettings->m_positionAprioriSigma.append(toDouble(velocitySigma));
         }
 
         QString accelerationSigma = atts.value("acceleration");
         if (!accelerationSigma.isEmpty() && accelerationSigma != "N/A") {
-          m_settings->m_positionAprioriSigma.append(toDouble(accelerationSigma));
+          m_observationSettings->m_positionAprioriSigma.append(toDouble(accelerationSigma));
         }
       }
     }
@@ -951,17 +1047,18 @@ namespace Isis {
 
   bool BundleObservationSolveSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
-    if (!m_characters.isEmpty()) {
-      if (localName == "id") {
-        delete m_settings->m_id;
-        m_settings->m_id = NULL;
-        m_settings->m_id = new QUuid(m_characters);
-      }
-      if (localName == "instrumentId") {
-        m_settings->m_instrumentId = m_characters;
-      }
-      m_characters = "";
+    if (localName == "id") {
+      m_observationSettings->m_id = NULL;
+      m_observationSettings->m_id = new QUuid(m_characters);
     }
+    else if (localName == "instrumentId") {
+      m_observationSettings->m_instrumentId = m_characters;
+    }
+    else if (localName == "bundleObservationSolveSettings") {
+      // end tag for this entire class... how to get out??? 
+      // call parse, as in Control List???
+    }
+    m_characters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 

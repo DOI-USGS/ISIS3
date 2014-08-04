@@ -37,6 +37,8 @@ using namespace std;
 namespace Isis {
   //! Constructs an IsisStats object with accumulators and counters set to zero.
   Statistics::Statistics(QObject *parent) : QObject(parent) {
+    m_id = NULL;
+    m_id = new QUuid(QUuid::createUuid());
     SetValidRange();
     Reset();
   }
@@ -654,7 +656,6 @@ namespace Isis {
                                      const QString &qName) {
     if (!m_characters.isEmpty()) {
       if (localName == "id") {
-        delete m_statistics->m_id;
         m_statistics->m_id = NULL;
         m_statistics->m_id = new QUuid(m_characters);
       }
@@ -712,7 +713,8 @@ namespace Isis {
 
 
   QDataStream &Statistics::write(QDataStream &stream) const {
-    stream << m_sum
+    stream << m_id->toString()
+           << m_sum
            << m_sumsum
            << m_minimum
            << m_maximum
@@ -735,10 +737,12 @@ namespace Isis {
 
   QDataStream &Statistics::read(QDataStream &stream) {
 
+    QString id;
     qint32 totalPixels, validPixels, nullPixels, lrsPixels, lisPixels,
            hrsPixels, hisPixels, underRangePixels, overRangePixels;
 
-    stream >> m_sum
+    stream >> id
+           >> m_sum
            >> m_sumsum
            >> m_minimum
            >> m_maximum
@@ -754,6 +758,21 @@ namespace Isis {
            >> underRangePixels
            >> overRangePixels
            >> m_removedData;
+
+    delete m_id;
+    m_id = NULL;
+    m_id = new QUuid(id);
+
+    m_totalPixels      = (BigInt)totalPixels;
+    m_validPixels      = (BigInt)validPixels;
+    m_nullPixels       = (BigInt)nullPixels;
+    m_lrsPixels        = (BigInt)lrsPixels;
+    m_lisPixels        = (BigInt)lisPixels;
+    m_hrsPixels        = (BigInt)hrsPixels;
+    m_hisPixels        = (BigInt)hisPixels;
+    m_underRangePixels = (BigInt)underRangePixels;
+    m_overRangePixels  = (BigInt)overRangePixels;
+    
 
     return stream;
   }

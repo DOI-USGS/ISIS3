@@ -2,12 +2,15 @@
 
 #include <QDataStream>
 #include <QDebug>
+#include <QFile>
 #include <QList>
 #include <QString>
 #include <QUuid>
 #include <QXmlStreamWriter>
+#include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
+#include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
@@ -41,7 +44,7 @@ namespace Isis {
     m_globalLongitudeAprioriSigma = -1.0;
     m_globalRadiusAprioriSigma = -1.0;
 
-    BundleObservationSolveSettings defaultSolveSettings;
+    BundleObservationSolveSettings defaultSolveSettings(NULL);
     m_observationSolveSettings.append(defaultSolveSettings);
 
     // Convergence Criteria
@@ -65,6 +68,7 @@ namespace Isis {
   }
 
 
+
   /**
    * Construct this BundleSettings object from XML.
    *
@@ -72,14 +76,60 @@ namespace Isis {
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
    * @param parent The Qt-relationship parent
    */
-  BundleSettings::BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
+  BundleSettings::BundleSettings(Project *project, 
+                                 XmlStackedHandlerReader *xmlReader,
+                                 QObject *parent)
+      : QObject(parent) {   // TODO: does xml stuff need project???
     m_id = NULL;
-    // what about the rest of the member data ??? should we set defaults ???
+    // what about the rest of the member data ??? should we set defaults ??? CREATE INITIALIZE METHOD
 
     xmlReader->pushContentHandler(new XmlHandler(this, project));
     xmlReader->setErrorHandler(new XmlHandler(this, project));
+
   }
+
+
+
+  /**
+   * Construct this BundleSettings object from XML.
+   *
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  BundleSettings::BundleSettings(FileName xmlFile,
+                                 Project *project, 
+                                 XmlStackedHandlerReader *xmlReader,
+                                 QObject *parent)
+      : QObject(parent) {   // TODO: does xml stuff need project???
+
+
+    m_id = NULL;
+    // what about the rest of the member data ??? should we set defaults ???
+
+    QString xmlPath = xmlFile.expanded();
+    QFile qXmlFile(xmlPath);
+    if (!qXmlFile.open(QFile::ReadOnly) ) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                       _FILEINFO_);
+    }
+
+    QXmlInputSource xmlInputSource(&qXmlFile);
+
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+    xmlReader->setErrorHandler(new XmlHandler(this, project));
+    bool success = xmlReader->parse(xmlInputSource);
+    if (!success) {
+      throw IException(IException::Unknown, 
+                       QString("BundleSettings failed to parse xml file"),
+                        _FILEINFO_);
+//      throw IException(IException::Unknown, 
+//                       QString("Failed to parse xml file, [%1]").arg(xmlPath),
+//                        _FILEINFO_);
+    }
+  }
+
 
 
   BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
@@ -635,12 +685,16 @@ namespace Isis {
     
     stream.writeEndElement(); // end global settings
 
-    stream.writeStartElement("observationSolveSettingsList");
-    stream.writeAttribute("listSize", toString(numberSolveSettings()));
-    for (int i = 0; i < m_observationSolveSettings.size(); i++) {
-      m_observationSolveSettings[i].save(stream, project);   // TODO: does xml stuff need project???
+    if (!m_observationSolveSettings.isEmpty()) {
+      stream.writeStartElement("observationSolveSettingsList");
+      for (int i = 0; i < m_observationSolveSettings.size(); i++) {
+        m_observationSolveSettings[i].save(stream, project);   // TODO: does xml stuff need project???
+      }
+      stream.writeEndElement();
     }
-    stream.writeEndElement();
+    else {
+      // throw error??? should not write if no observation settings... 
+    }
 //#endif
 
 
@@ -730,9 +784,10 @@ namespace Isis {
    * @param imageFolder The folder that contains the Cube
    */
   BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings, Project *project) {  // TODO: does xml stuff need project???
-    m_bundleSettings = bundleSettings;
-    m_project = project;  // TODO: does xml stuff need project???
-    m_characters = "";
+    m_xmlHandlerBundleSettings = bundleSettings;
+    m_xmlHandlerProject = project;  // TODO: does xml stuff need project???
+    m_xmlHandlerCharacters = "";
+    m_xmlHandlerObservationSettings.clear();
   }
 
 
@@ -745,16 +800,17 @@ namespace Isis {
    * @param imageFolder The folder that contains the Cube
    */
   BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings) {
-    m_bundleSettings = bundleSettings;
-    m_project = NULL;  // TODO: does xml stuff need project???
-    m_characters = "";
+    m_xmlHandlerBundleSettings = bundleSettings;
+    m_xmlHandlerProject = NULL;  // TODO: does xml stuff need project???
+    m_xmlHandlerCharacters = "";
+    m_xmlHandlerObservationSettings.clear();
   }
 
 
 
   BundleSettings::XmlHandler::~XmlHandler() {
-    delete m_project;  // TODO: does xml stuff need project???
-    m_project = NULL;
+    delete m_xmlHandlerProject;  // TODO: does xml stuff need project???
+    m_xmlHandlerProject = NULL;
   }
 
 
@@ -769,7 +825,7 @@ namespace Isis {
    */
   bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                        const QString &qName, const QXmlAttributes &atts) {
-    m_characters = "";
+    m_xmlHandlerCharacters = "";
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
@@ -779,65 +835,65 @@ namespace Isis {
         
         QString solveMethodStr = atts.value("solveMethod");
         if (!solveMethodStr.isEmpty()) {
-          m_bundleSettings->m_solveMethod = stringToSolveMethod(solveMethodStr);
+          m_xmlHandlerBundleSettings->m_solveMethod = stringToSolveMethod(solveMethodStr);
         }
 
         QString solveObservationModeStr = atts.value("solveObservationMode");
         if (!solveObservationModeStr.isEmpty()) {
-          m_bundleSettings->m_solveObservationMode = toBool(solveObservationModeStr);
+          m_xmlHandlerBundleSettings->m_solveObservationMode = toBool(solveObservationModeStr);
         }
 
         QString solveRadiusStr = atts.value("solveRadius");
         if (!solveRadiusStr.isEmpty()) {
-          m_bundleSettings->m_solveRadius = toBool(solveRadiusStr);
+          m_xmlHandlerBundleSettings->m_solveRadius = toBool(solveRadiusStr);
         }
 
         QString updateCubeLabelStr = atts.value("updateCubeLabel");
         if (!updateCubeLabelStr.isEmpty()) {
-          m_bundleSettings->m_updateCubeLabel = toBool(updateCubeLabelStr);
+          m_xmlHandlerBundleSettings->m_updateCubeLabel = toBool(updateCubeLabelStr);
         }
 
         QString errorPropagationStr = atts.value("errorPropagation");
         if (!errorPropagationStr.isEmpty()) {
-          m_bundleSettings->m_errorPropagation = toBool(errorPropagationStr);
+          m_xmlHandlerBundleSettings->m_errorPropagation = toBool(errorPropagationStr);
         }
       }
       else if (localName == "aprioriSigmas") {
 
         QString globalLatitudeAprioriSigmaStr = atts.value("latitude");
         if (!globalLatitudeAprioriSigmaStr.isEmpty()) {
-          m_bundleSettings->m_globalLatitudeAprioriSigma = toDouble(globalLatitudeAprioriSigmaStr);
+          m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = toDouble(globalLatitudeAprioriSigmaStr);
         }
 
         QString globalLongitudeAprioriSigmaStr = atts.value("longitude");
         if (!globalLongitudeAprioriSigmaStr.isEmpty()) {
-          m_bundleSettings->m_globalLongitudeAprioriSigma =
+          m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma =
               toDouble(globalLongitudeAprioriSigmaStr);
         }
 
         QString globalRadiusAprioriSigmaStr = atts.value("radius");
         if (!globalRadiusAprioriSigmaStr.isEmpty()) {
           if (globalRadiusAprioriSigmaStr != "N/A") {
-            m_bundleSettings->m_globalRadiusAprioriSigma = toDouble(globalRadiusAprioriSigmaStr);
+            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = toDouble(globalRadiusAprioriSigmaStr);
           }
           else {
-            m_bundleSettings->m_globalRadiusAprioriSigma = -1.0;
+            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = -1.0;
           }
         }
       }
       else if (localName == "outlierRejectionOptions") {
         QString outlierRejectionStr = atts.value("rejection");
         if (!outlierRejectionStr.isEmpty()) {
-          m_bundleSettings->m_outlierRejection = toBool(outlierRejectionStr);
+          m_xmlHandlerBundleSettings->m_outlierRejection = toBool(outlierRejectionStr);
         }
 
         QString outlierRejectionMultiplierStr = atts.value("multiplier");
         if (!outlierRejectionMultiplierStr.isEmpty()) {
           if (outlierRejectionMultiplierStr != "N/A") {
-            m_bundleSettings->m_outlierRejectionMultiplier = toDouble(outlierRejectionMultiplierStr);
+            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = toDouble(outlierRejectionMultiplierStr);
           }
           else {
-            m_bundleSettings->m_outlierRejectionMultiplier = 1.0; 
+            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0; 
           }
         }
       }
@@ -845,24 +901,24 @@ namespace Isis {
 
         QString convergenceCriteriaStr = atts.value("convergenceCriteria");
         if (!convergenceCriteriaStr.isEmpty()) {
-          m_bundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteriaStr);
+          m_xmlHandlerBundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteriaStr);
         }
 
         QString convergenceCriteriaThresholdStr = atts.value("threshold");
         if (!convergenceCriteriaThresholdStr.isEmpty()) {
-          m_bundleSettings->m_convergenceCriteriaThreshold = toDouble(convergenceCriteriaThresholdStr);
+          m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold = toDouble(convergenceCriteriaThresholdStr);
         }
 
         QString convergenceCriteriaMaximumIterationsStr = atts.value("maximumIterations");
         if (!convergenceCriteriaMaximumIterationsStr.isEmpty()) {
-          m_bundleSettings->m_convergenceCriteriaMaximumIterations = toInt(convergenceCriteriaMaximumIterationsStr);
+          m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations = toInt(convergenceCriteriaMaximumIterationsStr);
         }
       }
       else if (localName == "model") {
         QString type = atts.value("type");
         QString quantile = atts.value("quantile");
         if (!type.isEmpty() && !quantile.isEmpty()) {
-        m_bundleSettings->m_maximumLikelihood.append(
+        m_xmlHandlerBundleSettings->m_maximumLikelihood.append(
               qMakePair(MaximumLikelihoodWFunctions::stringToModel(type),
                         toDouble(quantile)));
         }
@@ -870,31 +926,27 @@ namespace Isis {
       else if (localName == "outputFileOptions") {
         QString outputFilePrefixStr = atts.value("fileNamePrefix");
         if (!outputFilePrefixStr.isEmpty()) {
-          m_bundleSettings->m_outputFilePrefix = outputFilePrefixStr;
+          m_xmlHandlerBundleSettings->m_outputFilePrefix = outputFilePrefixStr;
         }
 
         QString createBundleOutputFileStr = atts.value("createBundleOutputFile");
         if (!createBundleOutputFileStr.isEmpty()) {
-          m_bundleSettings->m_createBundleOutputFile = toBool(createBundleOutputFileStr);
+          m_xmlHandlerBundleSettings->m_createBundleOutputFile = toBool(createBundleOutputFileStr);
         }
 
         QString createCSVFilesStr = atts.value("createCSVFiles");
         if (!createCSVFilesStr.isEmpty()) {
-          m_bundleSettings->m_createCSVFiles = toBool(createCSVFilesStr);
+          m_xmlHandlerBundleSettings->m_createCSVFiles = toBool(createCSVFilesStr);
         }
 
         QString createResidualsFileStr = atts.value("createResidualsFile");
         if (!createResidualsFileStr.isEmpty()) {
-          m_bundleSettings->m_createResidualsFile = toBool(createResidualsFileStr);
+          m_xmlHandlerBundleSettings->m_createResidualsFile = toBool(createResidualsFileStr);
         }
       }
-      else if (localName == "observationSolveSettingsList") {
-        QString numberObservationSolveSettings = atts.value("listSize");
-        int observationSolveSettingsSize = toInt(numberObservationSolveSettings);
-        for (int i = 0; i < observationSolveSettingsSize; i++) {
-          m_bundleSettings->m_observationSolveSettings.append(
-              BundleObservationSolveSettings(m_project, reader()));   // TODO: does xml stuff need project???
-        }
+      else if (localName == "bundleObservationSolveSettings") {
+        m_xmlHandlerObservationSettings.append(
+            new BundleObservationSolveSettings(m_xmlHandlerProject, reader()));
       }
 //#endif
 #if 0
@@ -903,18 +955,14 @@ namespace Isis {
         QString type = atts.value("type");
         QString quantile = atts.value("quantile");
         if (!type.isEmpty() && !quantile.isEmpty()) {
-        m_bundleSettings->m_maximumLikelihood.append(
+        m_xmlHandlerBundleSettings->m_maximumLikelihood.append(
               qMakePair(MaximumLikelihoodWFunctions::stringToModel(type),
                         toDouble(quantile)));
         }
       }
-      else if (localName == "observationSolveSettings") {
-        QString numberObservationSolveSettings = atts.value("listSize");
-        int observationSolveSettingsSize = toInt(numberObservationSolveSettings);
-        for (int i = 0; i < observationSolveSettingsSize; i++) {
-          m_bundleSettings->m_observationSolveSettings.append(
-              BundleObservationSolveSettings(m_project, reader()));   // TODO: does xml stuff need project???
-        }
+      else if (localName == "bundleObservationSolveSettings") {
+        m_xmlHandlerObservationSettings.append(
+            new BundleObservationSolveSettings(m_xmlHandlerProject, reader()));
       }
 #endif
     }
@@ -924,7 +972,7 @@ namespace Isis {
 
 
   bool BundleSettings::XmlHandler::characters(const QString &ch) {
-    m_characters += ch;
+    m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
 
@@ -932,95 +980,97 @@ namespace Isis {
 
   bool BundleSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
-    if (!m_characters.isEmpty()) {
 //#if 0
       // option 2
-      if (localName == "id") {
-        delete m_bundleSettings->m_id;
-        m_bundleSettings->m_id = NULL;
-        m_bundleSettings->m_id = new QUuid(m_characters);
+    if (localName == "id") {
+      m_xmlHandlerBundleSettings->m_id = NULL;
+      m_xmlHandlerBundleSettings->m_id = new QUuid(m_xmlHandlerCharacters);
+    }
+    else if (localName == "validateNetwork") {
+      m_xmlHandlerBundleSettings->m_validateNetwork = toBool(m_xmlHandlerCharacters);
+    }
+    else if (localName == "observationSolveSettingsList") {
+      for (int i = 0; i < m_xmlHandlerObservationSettings.size(); i++) {
+        m_xmlHandlerBundleSettings->m_observationSolveSettings.append(*m_xmlHandlerObservationSettings[i]);
       }
-      else if (localName == "validateNetwork") {
-        m_bundleSettings->m_validateNetwork = toBool(m_characters);
-      }
+      m_xmlHandlerObservationSettings.clear();
+    }
 
 //#endif
 #if 0
       // option 3
       if (localName == "id") {
-        delete m_bundleSettings->m_id;
-        m_bundleSettings->m_id = NULL;//.toAscii()); // ??? is the toAscii needed here ??? we pass in QString in copy constructor...
-        m_bundleSettings->m_id = new QUuid(m_characters);//.toAscii()); // ??? is the toAscii needed here ??? we pass in QString in copy constructor...
+        delete m_xmlHandlerBundleSettings->m_id; // ??? delete these ???
+        m_xmlHandlerBundleSettings->m_id = NULL;
+        m_xmlHandlerBundleSettings->m_id = new QUuid(m_xmlHandlerCharacters);
       }
       else if (localName == "validateNetwork") {
-        m_bundleSettings->m_validateNetwork = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_validateNetwork = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "solveMethod") {
-        m_bundleSettings->m_solveMethod = stringToSolveMethod(m_characters);
+        m_xmlHandlerBundleSettings->m_solveMethod = stringToSolveMethod(m_xmlHandlerCharacters);
       }
       else if (localName == "solveObservationMode") {
-        m_bundleSettings->m_solveObservationMode = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_solveObservationMode = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "solveRadius") {
-        m_bundleSettings->m_solveRadius = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_solveRadius = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "updateCubeLabel") {
-        m_bundleSettings->m_updateCubeLabel = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_updateCubeLabel = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "errorPropagation") {
-        m_bundleSettings->m_errorPropagation = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_errorPropagation = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "latitude") {
-        m_bundleSettings->m_globalLatitudeAprioriSigma = toDouble(m_characters);
+        m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = toDouble(m_xmlHandlerCharacters);
       }
       else if (localName == "longitude") {
-        m_bundleSettings->m_globalLongitudeAprioriSigma =
-            toDouble(m_characters);
+        m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma =
+            toDouble(m_xmlHandlerCharacters);
       }
       else if (localName == "radius") {
-        if (m_characters != "N/A") {
-          m_bundleSettings->m_globalRadiusAprioriSigma = toDouble(m_characters);
+        if (m_xmlHandlerCharacters != "N/A") {
+          m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = toDouble(m_xmlHandlerCharacters);
         }
         else {
-          m_bundleSettings->m_globalRadiusAprioriSigma = -1.0;
+          m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = -1.0;
         }
       }
       else if (localName == "rejection") {
-        m_bundleSettings->m_outlierRejection = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_outlierRejection = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "multiplier") {
-        if (m_characters != "N/A") {
-          m_bundleSettings->m_outlierRejectionMultiplier = toDouble(m_characters);
+        if (m_xmlHandlerCharacters != "N/A") {
+          m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = toDouble(m_xmlHandlerCharacters);
         }
         else {
-          m_bundleSettings->m_outlierRejectionMultiplier = 1.0;
+          m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0;
         }
       }
       else if (localName == "convergenceCriteria") {
-        m_bundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(m_characters);
+        m_xmlHandlerBundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(m_xmlHandlerCharacters);
       }
       else if (localName == "threshold") {
-        m_bundleSettings->m_convergenceCriteriaThreshold = toDouble(m_characters);
+        m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold = toDouble(m_xmlHandlerCharacters);
       }
       else if (localName == "maximumIterations") {
-        m_bundleSettings->m_convergenceCriteriaMaximumIterations = toInt(m_characters);
+        m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations = toInt(m_xmlHandlerCharacters);
       }
       else if (localName == "outputFilePrefix") {
-        m_bundleSettings->m_outputFilePrefix = m_characters;
+        m_xmlHandlerBundleSettings->m_outputFilePrefix = m_xmlHandlerCharacters;
       }
       else if (localName == "createBundleOutputFile") {
-        m_bundleSettings->m_createBundleOutputFile = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_createBundleOutputFile = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "createCSVFiles") {
-        m_bundleSettings->m_createCSVFiles = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_createCSVFiles = toBool(m_xmlHandlerCharacters);
       }
       else if (localName == "createResidualsFile") {
-        m_bundleSettings->m_createResidualsFile = toBool(m_characters);
+        m_xmlHandlerBundleSettings->m_createResidualsFile = toBool(m_xmlHandlerCharacters);
       }
 #endif
-      m_characters = "";
-    }
-
+    m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 

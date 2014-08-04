@@ -1614,7 +1614,6 @@ namespace Isis {
                                      const QString &qName) {
     if (!m_characters.isEmpty()) {
       if (localName == "id") {
-        delete m_statistics->m_id;
         m_statistics->m_id = NULL;
         m_statistics->m_id = new QUuid(m_characters);
       }

@@ -414,7 +414,7 @@ Testing error throws...
 **PROGRAMMER ERROR** For bundle adjustments with multiple maximum likelihood estimators, the first model must be of type HUBER or HUBER_MODIFIED.
 
 Testing XML write/read... 
-Object = "filled bs"
+Object = BundleSettingsFromXml
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
   SolveObservationMode                 = Yes

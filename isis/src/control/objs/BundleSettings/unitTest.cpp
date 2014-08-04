@@ -61,7 +61,8 @@ int main(int argc, char *argv[]) {
   try {
     qDebug() << "Unit test for BundleSettings...";
     qDebug() << "Printing PVL group with settings from the default constructor...";
-    BundleSettings settings;
+    QObject *parent = NULL;
+    BundleSettings settings(parent);
     // tested fully by call to pvlObject()
     //      bool validateNetwork() const;
     //      SolveMethod solveMethod() const;
@@ -269,7 +270,8 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml    
     XmlStackedHandlerReader reader;
-    BundleSettingsXmlHandlerTester bsToFill(project, &reader, xmlFile);
+    //BundleSettingsXmlHandlerTester bsToFill(project, &reader, xmlFile);
+    BundleSettings bsToFill(xmlFile, project, &reader);
     pvl = bsToFill.pvlObject("BundleSettingsFromXml");
     cout << pvl << endl << endl;
 
@@ -278,11 +280,3 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 }
-
-
-// stats
-// bundle stats
-// mlwf
-// correlation mat
-// bundle obs
-// bundle adj unit test

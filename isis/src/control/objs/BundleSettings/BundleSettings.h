@@ -32,11 +32,12 @@
 #include "PvlObject.h"
 #include "XmlStackedHandler.h"
 
-class DataStream;
+class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
+  class FileName;
   class MaximumLikelihoodWFunctions;
   class Project;  // TODO: does xml stuff need project???
   class PvlObject;
@@ -69,7 +70,13 @@ namespace Isis {
     public:
       BundleSettings(QObject *parent = 0);
       BundleSettings(const BundleSettings &other);
-      BundleSettings(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);  // TODO: does xml stuff need project???
+      BundleSettings(Project *project, 
+                     XmlStackedHandlerReader *xmlReader, 
+                     QObject *parent = 0);  // TODO: does xml stuff need project???
+      BundleSettings(FileName xmlFile,
+                     Project *project, 
+                     XmlStackedHandlerReader *xmlReader, 
+                     QObject *parent = 0);  // TODO: does xml stuff need project???
       BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent = NULL); // parent = 0 or NULL ???
       ~BundleSettings();
 
@@ -213,9 +220,10 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
    
-          BundleSettings *m_bundleSettings;
-          Project *m_project; // TODO: does xml stuff need project???
-          QString m_characters;
+          BundleSettings *m_xmlHandlerBundleSettings ;
+          Project *m_xmlHandlerProject; // TODO: does xml stuff need project???
+          QString m_xmlHandlerCharacters;
+          QList<BundleObservationSolveSettings *> m_xmlHandlerObservationSettings;
       };
 
       /**
