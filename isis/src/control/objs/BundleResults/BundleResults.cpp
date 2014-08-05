@@ -2,6 +2,7 @@
 
 #include <QDataStream>
 #include <QDebug>
+#include <QList>
 #include <QUuid>
 #include <QXmlStreamWriter>
 
@@ -22,6 +23,7 @@ namespace Isis {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
 
+    m_runTime = "";
 
     m_controlNetworkFileName = NULL;
     m_controlNetworkFileName = new FileName(controlNetworkFileName);
@@ -31,19 +33,18 @@ namespace Isis {
 
     m_statisticsResults = NULL;
 
-    m_runTime = "";
-
+    m_images = NULL;
   }
 
 
   
   BundleResults::BundleResults(const BundleResults &other)
       : m_id(new QUuid(other.m_id->toString())),
+        m_runTime(other.m_runTime),
         m_controlNetworkFileName(new FileName(other.m_controlNetworkFileName->expanded())),
         m_settings(new BundleSettings(*other.m_settings)),
-        m_statisticsResults(new BundleStatistics(*other.m_statisticsResults)) {
-    // TODO: add m_images???
-    // TODO: add m_runTime???
+        m_statisticsResults(new BundleStatistics(*other.m_statisticsResults)),
+        m_images(new QList<ImageList *>(*other.m_images)) { // is this correct???
 
   }
 
@@ -61,6 +62,9 @@ namespace Isis {
 
     delete m_statisticsResults;
     m_statisticsResults = NULL;
+
+    delete m_images;
+    m_images = NULL;
   }
 
 
@@ -73,6 +77,8 @@ namespace Isis {
       m_id = NULL;
       m_id = new QUuid(other.m_id->toString());
 
+      m_runTime = other.m_runTime;
+
       delete m_controlNetworkFileName;
       m_controlNetworkFileName = NULL;
       m_controlNetworkFileName = new FileName(other.m_controlNetworkFileName->expanded());
@@ -84,8 +90,10 @@ namespace Isis {
       delete m_statisticsResults;
       m_statisticsResults = NULL;
       m_statisticsResults = new BundleStatistics(*other.m_statisticsResults);
-    // TODO: add m_images???
-    // TODO: add m_runTime???
+
+      delete m_images;
+      m_images = NULL;
+      m_images = new QList<ImageList *>(*other.m_images);
     }
     return *this;
   }
@@ -105,11 +113,12 @@ namespace Isis {
                                      QString statisticsName) {
 
     PvlObject pvl(resultsName);
+    pvl += PvlKeyword("RunTime", runTime());
     if (m_controlNetworkFileName->expanded() != "") {
-      pvl += PvlKeyword("OutputControlNetwork", m_controlNetworkFileName->expanded());
+      pvl += PvlKeyword("OutputControlNetwork", controlNetworkFileName());
     }
-    pvl += m_settings->pvlObject(settingsName);
-    pvl += m_statisticsResults->pvlObject(statisticsName);
+    pvl += bundleSettings()->pvlObject(settingsName);
+    pvl += bundleStatistics()->pvlObject(statisticsName);
     return pvl;
 
   }
@@ -144,13 +153,15 @@ namespace Isis {
     m_statisticsResults->save(stream, project);
 
     // save image lists to stream
-    stream.writeStartElement("images");
-    stream.writeAttribute("numberImageLists", toString(m_images->size()));
-    for (int i = 0; i < m_images->size(); i++) {
-      m_images->at(i)->save(stream, project, newProjectRoot);
-    }
-    stream.writeEndElement(); // end images
+    if ( !m_images->isEmpty() ) {
+      stream.writeStartElement("imageLists");
 
+      for (int i = 0; i < m_images->count(); i++) {
+        m_images->at(i)->save(stream, project, "");
+      }
+
+      stream.writeEndElement();
+    }
     stream.writeEndElement(); //end bundleResults
   }
 
@@ -164,15 +175,36 @@ namespace Isis {
    * @param imageFolder The folder that contains the Cube
    */
   BundleResults::XmlHandler::XmlHandler(BundleResults *bundleResults, Project *project) {
-    m_bundleResults = bundleResults;
-    m_project = project;
+    m_xmlHandlerBundleResults = NULL;
+    m_xmlHandlerBundleResults = new BundleResults(*bundleResults);
+    m_xmlHandlerProject = NULL;
+    m_xmlHandlerProject = project;
+    m_xmlHandlerCharacters = "";
+    m_xmlHandlerImages = NULL;
+    m_xmlHandlerBundleSettings = NULL;
+    m_xmlHandlerBundleStatistics = NULL;
   }
 
 
 
   BundleResults::XmlHandler::~XmlHandler() {
-    delete m_project;
-    m_project = NULL;
+    // bundleResults passed in is "this" delete+null will cause problems,no?
+//    delete m_xmlHandlerBundleResults;
+//    m_xmlHandlerBundleResults = NULL;
+
+    // we do not delete this pointer since it was set to a passed in pointer in constructor and we
+    // don't own it... is that right???
+//    delete m_xmlHandlerProject;
+    m_xmlHandlerProject = NULL;
+
+    delete m_xmlHandlerImages;
+    m_xmlHandlerImages = NULL;
+
+    delete m_xmlHandlerBundleSettings;
+    m_xmlHandlerBundleSettings = NULL;
+
+    delete m_xmlHandlerBundleStatistics;
+    m_xmlHandlerBundleStatistics = NULL;
   }
 
 
@@ -184,50 +216,67 @@ namespace Isis {
    */
   bool BundleResults::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                        const QString &qName, const QXmlAttributes &atts) {
-    m_characters = "";
+    m_xmlHandlerCharacters = "";
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
-      if (localName == "generalAttributes") {
-        QString identification = atts.value("id");
-        if (!identification.isEmpty()) {
-          delete m_bundleResults->m_id;
-          m_bundleResults->m_id = NULL;
-          m_bundleResults->m_id = new QUuid(identification);
-        }
-
-        QString dateTime = atts.value("runTime");
-        if (!dateTime.isEmpty()) {
-          m_bundleResults->m_runTime = dateTime; // TODO: is this necessary for qstrings???
-        }
-
-        QString name = atts.value("fileName");
-        if (!name.isEmpty()) {
-          delete m_bundleResults->m_controlNetworkFileName;
-          m_bundleResults->m_controlNetworkFileName = NULL;
-          m_bundleResults->m_controlNetworkFileName = new FileName(name);
-        }
-      }
-      else if (localName == "bundleSettings") {
-        delete m_bundleResults->m_settings;
-        m_bundleResults->m_settings = NULL;
-        m_bundleResults->m_settings = new BundleSettings(m_project, reader());
+      if (localName == "bundleSettings") {
+        delete m_xmlHandlerBundleSettings;
+        m_xmlHandlerBundleSettings = NULL;
+        m_xmlHandlerBundleSettings = new BundleSettings(m_xmlHandlerProject, reader());
       }
       else if (localName == "bundleStatistics") {
-        delete m_bundleResults->m_statisticsResults;
-        m_bundleResults->m_statisticsResults = NULL;
-        m_bundleResults->m_statisticsResults = new BundleStatistics(m_project, reader()); //TODO: need to add constructor for this???
+        delete m_xmlHandlerBundleStatistics;
+        m_xmlHandlerBundleStatistics = NULL;
+        m_xmlHandlerBundleStatistics = new BundleStatistics(m_xmlHandlerProject, reader()); //TODO: need to add constructor for this???
       }
-      else if (localName == "images") {
-        QString numberImageLists = atts.value("numberImageLists");
-        int listSize = toInt(numberImageLists);
-        m_bundleResults->m_images->clear();
-        for (int i = 0; i < listSize; i++) {
-          m_bundleResults->m_images->append(new ImageList(m_project, reader())); 
-        }
+      else if (localName == "imageList") {
+        m_xmlHandlerImages->append(new ImageList(m_xmlHandlerProject, reader()));
       }
     }
     return true;
+  }
+
+
+
+  bool BundleResults::XmlHandler::characters(const QString &ch) {
+    m_xmlHandlerCharacters += ch;
+    return XmlStackedHandler::characters(ch);
+  }
+
+
+
+  bool BundleResults::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
+                                             const QString &qName) {
+    if (localName == "id") {
+      m_xmlHandlerBundleResults->m_id = NULL;
+      m_xmlHandlerBundleResults->m_id = new QUuid(m_xmlHandlerCharacters);
+    }
+    else if (localName == "runTime") {
+      m_xmlHandlerBundleResults->m_runTime = m_xmlHandlerCharacters;
+    }
+    else if (localName == "fileName") {
+      m_xmlHandlerBundleResults->m_controlNetworkFileName = NULL;
+      m_xmlHandlerBundleResults->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
+    }
+    else if (localName == "bundleSettings") {
+      m_xmlHandlerBundleResults->m_settings = new BundleSettings(*m_xmlHandlerBundleSettings);
+      delete m_xmlHandlerBundleSettings;
+      m_xmlHandlerBundleSettings = NULL;
+    }
+    else if (localName == "bundleStatistics") {
+      m_xmlHandlerBundleResults->m_statisticsResults = new BundleStatistics(*m_xmlHandlerBundleStatistics);
+      delete m_xmlHandlerBundleStatistics;
+      m_xmlHandlerBundleStatistics = NULL;
+    }
+    if (localName == "imageLists") {
+      for (int i = 0; i < m_xmlHandlerImages->size(); i++) {
+        m_xmlHandlerBundleResults->m_images->append(m_xmlHandlerImages->at(i));
+      }
+      m_xmlHandlerImages->clear();
+    }
+    m_xmlHandlerCharacters = "";
+    return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
 
@@ -266,11 +315,12 @@ namespace Isis {
 
   QDataStream &BundleResults::write(QDataStream &stream) const {
     stream << m_id->toString()
+           << m_runTime
            << m_controlNetworkFileName->expanded()
            << *m_settings
            << *m_statisticsResults;
-    // TODO: add m_images???
-    // TODO: add m_runTime???
+  // TODO: add this capability to Image and ImageList
+  //          << *m_images;
     return stream;
   }
 
@@ -283,6 +333,8 @@ namespace Isis {
     delete m_id;
     m_id = NULL;
     m_id = new QUuid(id);
+
+    stream >> m_runTime;
 
     QString controlNetworkFileName;
     stream >> controlNetworkFileName;
@@ -302,8 +354,13 @@ namespace Isis {
     m_statisticsResults = NULL;
     m_statisticsResults = new BundleStatistics(statisticsResults);
 
-    // TODO: add m_images???
-    // TODO: add m_runTime???
+    // TODO: add this capability to Image and ImageList
+    // QList<ImageList*> imageLists;
+    // stream >> imageLists;
+    // delete m_images;
+    // m_images = NULL;
+    // m_images = new QList<ImageList *>(imageLists);
+
     return stream;
   }
 

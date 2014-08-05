@@ -178,6 +178,7 @@ namespace Isis {
       Angle m_phaseAngle;
       double m_sampleResolution;
   };
+  // TODO: add QDataStream >> and << ???
 }
 
 #endif

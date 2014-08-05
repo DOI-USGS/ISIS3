@@ -50,7 +50,7 @@ namespace Isis {
   }
 
 
-
+// TODO: should project be const ???
   StatCumProbDistDynCalc::StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
     m_id = NULL;
     // ??? initializations ???
@@ -531,17 +531,19 @@ namespace Isis {
 
 
 
+// TODO: should project be const ???
   StatCumProbDistDynCalc::XmlHandler::XmlHandler(StatCumProbDistDynCalc *probabilityCalc, Project *project) {   // TODO: does xml stuff need project???
-    m_probabilityCalc = probabilityCalc;
-    m_project = project;   // TODO: does xml stuff need project???
-    m_characters = "";
+    m_xmlHandlerCumProbCalc = probabilityCalc;
+    m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
+    m_xmlHandlerCharacters = "";
   }
 
 
 
   StatCumProbDistDynCalc::XmlHandler::~XmlHandler() {
-    delete m_project;    // TODO: does xml stuff need project???
-    m_project = NULL;
+    // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
+//    delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
+    m_xmlHandlerProject = NULL;
   }
 
 
@@ -550,7 +552,7 @@ namespace Isis {
                                                                 const QString &localName,
                                                                 const QString &qName,
                                                                 const QXmlAttributes &atts) {
-    m_characters = "";
+    m_xmlHandlerCharacters = "";
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       // no element attibutes to evaluate
     }
@@ -560,7 +562,7 @@ namespace Isis {
 
 
   bool StatCumProbDistDynCalc::XmlHandler::characters(const QString &ch) {
-    m_characters += ch;
+    m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
 
@@ -568,31 +570,31 @@ namespace Isis {
 
   bool StatCumProbDistDynCalc::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
-    if (!m_characters.isEmpty()) {
+    if (!m_xmlHandlerCharacters.isEmpty()) {
       if (localName == "id") {
-        m_probabilityCalc->m_id = NULL;
-        m_probabilityCalc->m_id = new QUuid(m_characters);
+        m_xmlHandlerCumProbCalc->m_id = NULL;
+        m_xmlHandlerCumProbCalc->m_id = new QUuid(m_xmlHandlerCharacters);
       }
       else if (localName == "numberCells") {
-        m_probabilityCalc->m_numberCells = toInt(m_characters);
+        m_xmlHandlerCumProbCalc->m_numberCells = toInt(m_xmlHandlerCharacters);
       }
       else if (localName == "numberObservations") {
-        m_probabilityCalc->m_numberObservations = toInt(m_characters);
+        m_xmlHandlerCumProbCalc->m_numberObservations = toInt(m_xmlHandlerCharacters);
       }
       else if (localName == "quantile") {
-        m_probabilityCalc->m_quantiles.append(toDouble(m_characters));
+        m_xmlHandlerCumProbCalc->m_quantiles.append(toDouble(m_xmlHandlerCharacters));
       }
       else if (localName == "idealNumObsBelowQuantile") {
-        m_probabilityCalc->m_idealNum.append(toDouble(m_characters));
+        m_xmlHandlerCumProbCalc->m_idealNum.append(toDouble(m_xmlHandlerCharacters));
       }
       else if (localName == "numObsBelowQuantile") {
-        m_probabilityCalc->m_n.append(toInt(m_characters));
+        m_xmlHandlerCumProbCalc->m_n.append(toInt(m_xmlHandlerCharacters));
       }
       else if (localName == "value") {
-        m_probabilityCalc->m_quantileValues.append(toDouble(m_characters));
+        m_xmlHandlerCumProbCalc->m_quantileValues.append(toDouble(m_xmlHandlerCharacters));
       }
                                            
-      m_characters = "";
+      m_xmlHandlerCharacters = "";
     }
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }

@@ -174,9 +174,9 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
    
-          BundleObservationSolveSettings *m_observationSettings;
-          Project *m_project;  // TODO: does xml stuff need project???
-          QString m_characters;
+          BundleObservationSolveSettings *m_xmlHandlerObservationSettings;
+          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
+          QString m_xmlHandlerCharacters;
       };
 
       /**

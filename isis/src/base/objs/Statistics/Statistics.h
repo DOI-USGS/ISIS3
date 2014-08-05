@@ -186,9 +186,9 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
    
-          Statistics *m_statistics;
-          Project *m_project;   // TODO: does xml stuff need project???
-          QString m_characters;
+          Statistics *m_xmlHandlerStatistics;
+          Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
+          QString m_xmlHandlerCharacters;
       };
 
       QUuid *m_id; /**< A unique ID for this object (useful for others to reference

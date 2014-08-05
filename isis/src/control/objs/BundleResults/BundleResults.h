@@ -24,6 +24,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QList>
 #include <QObject>
 #include <QString>
 
@@ -101,13 +102,19 @@ namespace Isis {
 
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
+          virtual bool characters(const QString &ch);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName);
 
         private:
           Q_DISABLE_COPY(XmlHandler);
 
-          BundleResults *m_bundleResults;
-          Project *m_project;  // TODO: does xml stuff need project???
-          QString m_characters;
+          BundleResults *m_xmlHandlerBundleResults;
+          Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
+          QString m_xmlHandlerCharacters;
+          QList<ImageList *> *m_xmlHandlerImages;
+          BundleSettings *m_xmlHandlerBundleSettings;
+          BundleStatistics *m_xmlHandlerBundleStatistics;
       };
 
     private:

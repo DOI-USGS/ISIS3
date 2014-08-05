@@ -1,11 +1,11 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <QDebug>
+#include <QFile>
 #include <QList>
 #include <QString>
 #include <QtDebug>
 #include <QXmlStreamWriter>
-#include <QFile>
 #include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
@@ -270,8 +270,8 @@ int main(int argc, char *argv[]) {
     qXmlFile.close();
     // read xml    
     XmlStackedHandlerReader reader;
-    //BundleSettingsXmlHandlerTester bsToFill(project, &reader, xmlFile);
-    BundleSettings bsToFill(xmlFile, project, &reader);
+    BundleSettingsXmlHandlerTester bsToFill(project, &reader, xmlFile);
+    //BundleSettings bsToFill(xmlFile, project, &reader);
     pvl = bsToFill.pvlObject("BundleSettingsFromXml");
     cout << pvl << endl << endl;
 

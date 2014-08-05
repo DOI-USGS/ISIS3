@@ -220,9 +220,20 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
    
-          BundleStatistics *m_statistics;
-          Project *m_project;   // TODO: does xml stuff need project???
-          QString m_characters;
+          BundleStatistics *m_xmlHandlerBundleStatistics;
+          Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
+          QString m_xmlHandlerCharacters;
+          int m_xmlHandlerResidualsListSize;
+          int m_xmlHandlerSampleResidualsListSize;
+          int m_xmlHandlerLineResidualsListSize;
+          int m_xmlHandlerXSigmasListSize;
+          int m_xmlHandlerYSigmasListSize;
+          int m_xmlHandlerZSigmasListSize;
+          int m_xmlHandlerRASigmasListSize;
+          int m_xmlHandlerDECSigmasListSize;
+          int m_xmlHandlerTWISTSigmasListSize;
+          QList< Statistics *> m_xmlHandlerStatisticsList;
+          StatCumProbDistDynCalc *m_xmlHandlerCumProCalc;
       };
 
       /**

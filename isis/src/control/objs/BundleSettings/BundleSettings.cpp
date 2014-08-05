@@ -809,7 +809,9 @@ namespace Isis {
 
 
   BundleSettings::XmlHandler::~XmlHandler() {
-    delete m_xmlHandlerProject;  // TODO: does xml stuff need project???
+    // do not delete these pointers...
+    // we don't own them, do we??? project passed into StatCumProbDistDynCalc constructor as pointer and bundleSettings = this
+    // delete m_xmlHandlerProject;   TODO: does xml stuff need project???
     m_xmlHandlerProject = NULL;
   }
 

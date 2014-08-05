@@ -618,16 +618,17 @@ namespace Isis {
 
 
   Statistics::XmlHandler::XmlHandler(Statistics *statistics, Project *project) {   // TODO: does xml stuff need project???
-    m_statistics = statistics;
-    m_project = project;   // TODO: does xml stuff need project???
-    m_characters = "";
+    m_xmlHandlerStatistics = statistics;
+    m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
+    m_xmlHandlerCharacters = "";
   }
 
 
 
   Statistics::XmlHandler::~XmlHandler() {
-    // ??? compile error ??? delete m_project;    // TODO: does xml stuff need project???
-    m_project = NULL;
+    // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
+    // delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
+    m_xmlHandlerProject = NULL;
   }
 
 
@@ -636,7 +637,7 @@ namespace Isis {
                                                                 const QString &localName,
                                                                 const QString &qName,
                                                                 const QXmlAttributes &atts) {
-    m_characters = "";
+    m_xmlHandlerCharacters = "";
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       // no element attibutes to evaluate
     }
@@ -646,7 +647,7 @@ namespace Isis {
 
 
   bool Statistics::XmlHandler::characters(const QString &ch) {
-    m_characters += ch;
+    m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
 
@@ -654,58 +655,58 @@ namespace Isis {
 
   bool Statistics::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
-    if (!m_characters.isEmpty()) {
+    if (!m_xmlHandlerCharacters.isEmpty()) {
       if (localName == "id") {
-        m_statistics->m_id = NULL;
-        m_statistics->m_id = new QUuid(m_characters);
+        m_xmlHandlerStatistics->m_id = NULL;
+        m_xmlHandlerStatistics->m_id = new QUuid(m_xmlHandlerCharacters);
       }
       if (localName == "sum") {
-        m_statistics->m_sum = toDouble(m_characters);
-        m_statistics->m_sumsum = m_statistics->m_sum * m_statistics->m_sum;
+        m_xmlHandlerStatistics->m_sum = toDouble(m_xmlHandlerCharacters);
+        m_xmlHandlerStatistics->m_sumsum = m_xmlHandlerStatistics->m_sum * m_xmlHandlerStatistics->m_sum;
       }
       if (localName == "minimum") {
-        m_statistics->m_minimum = toDouble(m_characters);
+        m_xmlHandlerStatistics->m_minimum = toDouble(m_xmlHandlerCharacters);
       }
       if (localName == "maximum") {
-        m_statistics->m_maximum = toInt(m_characters);
+        m_xmlHandlerStatistics->m_maximum = toInt(m_xmlHandlerCharacters);
       }
       if (localName == "validMinimum") {
-        m_statistics->m_validMinimum = toInt(m_characters);
+        m_xmlHandlerStatistics->m_validMinimum = toInt(m_xmlHandlerCharacters);
       }
       if (localName == "validMaximum") {
-        m_statistics->m_validMaximum = toDouble(m_characters);
+        m_xmlHandlerStatistics->m_validMaximum = toDouble(m_xmlHandlerCharacters);
       }
       if (localName == "totalPixels") {
-        m_statistics->m_totalPixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_totalPixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "validPixels") {
-        m_statistics->m_validPixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_validPixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "nullPixels") {
-        m_statistics->m_nullPixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_nullPixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "lisPixels") {
-        m_statistics->m_lisPixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_lisPixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "lrsPixels") {
-        m_statistics->m_lrsPixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_lrsPixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "hisPixels") {
-        m_statistics->m_hisPixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_hisPixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "hrsPixels") {
-        m_statistics->m_hrsPixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_hrsPixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "underRangePixels") {
-        m_statistics->m_underRangePixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_underRangePixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "overRangePixels") {
-        m_statistics->m_overRangePixels = toBigInt(m_characters);
+        m_xmlHandlerStatistics->m_overRangePixels = toBigInt(m_xmlHandlerCharacters);
       }
       if (localName == "removedData") {
-        m_statistics->m_removedData = toBool(m_characters);
+        m_xmlHandlerStatistics->m_removedData = toBool(m_xmlHandlerCharacters);
       }
-      m_characters = "";
+      m_xmlHandlerCharacters = "";
     }
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }

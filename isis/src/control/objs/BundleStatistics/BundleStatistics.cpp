@@ -1155,22 +1155,36 @@ namespace Isis {
     stream.writeStartElement("imageResidualsLists");
     stream.writeStartElement("residualsList");
     stream.writeAttribute("listSize", toString(m_rmsImageResiduals.size())); 
-    for (int i = 0; i < m_rmsImageResiduals.size(); i++) {
-      m_rmsImageResiduals[i].save(stream, project);
+    if (!m_rmsImageResiduals.isEmpty()) {
+      for (int i = 0; i < m_rmsImageResiduals.size(); i++) {
+        m_rmsImageResiduals[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end residuals list
-
     stream.writeStartElement("sampleList");
     stream.writeAttribute("listSize", toString(m_rmsImageSampleResiduals.size())); 
-    for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
-      m_rmsImageSampleResiduals[i].save(stream, project);
+    if (!m_rmsImageSampleResiduals.isEmpty()) {
+      for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
+        m_rmsImageSampleResiduals[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end sample residuals list
 
     stream.writeStartElement("lineList");
     stream.writeAttribute("listSize", toString(m_rmsImageLineResiduals.size())); 
-    for (int i = 0; i < m_rmsImageLineResiduals.size(); i++) {
-      m_rmsImageLineResiduals[i].save(stream, project);
+    if (!m_rmsImageLineResiduals.isEmpty()) {
+      for (int i = 0; i < m_rmsImageLineResiduals.size(); i++) {
+        m_rmsImageLineResiduals[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end line residuals list
     stream.writeEndElement(); // end image residuals lists
@@ -1178,43 +1192,73 @@ namespace Isis {
     stream.writeStartElement("imageSigmasLists");
     stream.writeStartElement("xSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageXSigmas.size())); 
-    for (int i = 0; i < m_rmsImageXSigmas.size(); i++) {
-      m_rmsImageXSigmas[i].save(stream, project);
+    if (!m_rmsImageXSigmas.isEmpty()) {
+      for (int i = 0; i < m_rmsImageXSigmas.size(); i++) {
+        m_rmsImageXSigmas[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end x sigma list
 
     stream.writeStartElement("ySigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageYSigmas.size())); 
-    for (int i = 0; i < m_rmsImageYSigmas.size(); i++) {
-      m_rmsImageYSigmas[i].save(stream, project);
+    if (!m_rmsImageYSigmas.isEmpty()) {
+      for (int i = 0; i < m_rmsImageYSigmas.size(); i++) {
+        m_rmsImageYSigmas[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end y sigma list
 
     stream.writeStartElement("zSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageZSigmas.size())); 
-    for (int i = 0; i < m_rmsImageZSigmas.size(); i++) {
-      m_rmsImageZSigmas[i].save(stream, project);
+    if (!m_rmsImageZSigmas.isEmpty()) {
+      for (int i = 0; i < m_rmsImageZSigmas.size(); i++) {
+        m_rmsImageZSigmas[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end z sigma list
 
     stream.writeStartElement("raSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageRASigmas.size())); 
-    for (int i = 0; i < m_rmsImageRASigmas.size(); i++) {
-      m_rmsImageRASigmas[i].save(stream, project);
+    if (!m_rmsImageRASigmas.isEmpty()) {
+      for (int i = 0; i < m_rmsImageRASigmas.size(); i++) {
+        m_rmsImageRASigmas[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end ra sigma list
 
     stream.writeStartElement("decSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageDECSigmas.size())); 
-    for (int i = 0; i < m_rmsImageDECSigmas.size(); i++) {
-      m_rmsImageDECSigmas[i].save(stream, project);
+    if (!m_rmsImageDECSigmas.isEmpty()) {
+      for (int i = 0; i < m_rmsImageDECSigmas.size(); i++) {
+        m_rmsImageDECSigmas[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end dec sigma list
 
     stream.writeStartElement("twistSigmas");
     stream.writeAttribute("listSize", toString(m_rmsImageTWISTSigmas.size())); 
-    for (int i = 0; i < m_rmsImageTWISTSigmas.size(); i++) {
-      m_rmsImageTWISTSigmas[i].save(stream, project);
+    if (!m_rmsImageTWISTSigmas.isEmpty()) {
+      for (int i = 0; i < m_rmsImageTWISTSigmas.size(); i++) {
+        m_rmsImageTWISTSigmas[i].save(stream, project);
+      }
+    }
+    else {
+      stream.writeCharacters("None");
     }
     stream.writeEndElement(); // end twist sigma list
     stream.writeEndElement(); // end sigmas lists
@@ -1278,16 +1322,39 @@ namespace Isis {
 
 
   BundleStatistics::XmlHandler::XmlHandler(BundleStatistics *statistics, Project *project) {   // TODO: does xml stuff need project???
-    m_statistics = statistics;
-    m_project = project;   // TODO: does xml stuff need project???
-    m_characters = "";
+    m_xmlHandlerBundleStatistics = NULL;
+    m_xmlHandlerProject = NULL;
+
+    m_xmlHandlerBundleStatistics = statistics;
+    m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
+    m_xmlHandlerCharacters = "";
+
+    m_xmlHandlerResidualsListSize = 0;
+    m_xmlHandlerSampleResidualsListSize = 0;
+    m_xmlHandlerLineResidualsListSize = 0;
+    m_xmlHandlerXSigmasListSize = 0;
+    m_xmlHandlerYSigmasListSize = 0;
+    m_xmlHandlerZSigmasListSize = 0;
+    m_xmlHandlerRASigmasListSize = 0;
+    m_xmlHandlerDECSigmasListSize = 0;
+    m_xmlHandlerTWISTSigmasListSize = 0;
+    m_xmlHandlerStatisticsList.clear();
+
+    m_xmlHandlerCumProCalc = NULL;
   }
 
 
 
   BundleStatistics::XmlHandler::~XmlHandler() {
-    // ??? compile error ??? delete m_project;    // TODO: does xml stuff need project???
-    m_project = NULL;
+    // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
+    // delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
+    m_xmlHandlerProject = NULL;
+    
+    // delete m_xmlHandlerBundleStatistics;
+    // m_xmlHandlerBundleStatistics = NULL;
+    
+    delete m_xmlHandlerCumProCalc;
+    m_xmlHandlerCumProCalc = NULL;
   }
   
 
@@ -1296,26 +1363,26 @@ namespace Isis {
                                                   const QString &localName,
                                                   const QString &qName,
                                                   const QXmlAttributes &atts) {
-    m_characters = "";
+    m_xmlHandlerCharacters = "";
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
         
       if (localName == "correlationMatrix") {
 
-        delete m_statistics->m_correlationMatrix;
-        m_statistics->m_correlationMatrix = NULL;
-        m_statistics->m_correlationMatrix = new CorrelationMatrix();
+        delete m_xmlHandlerBundleStatistics->m_correlationMatrix;
+        m_xmlHandlerBundleStatistics->m_correlationMatrix = NULL;
+        m_xmlHandlerBundleStatistics->m_correlationMatrix = new CorrelationMatrix();
 
         QString correlationFileName = atts.value("correlationFileName");
         if (!correlationFileName.isEmpty()) {
           FileName correlationFile(correlationFileName);
-          m_statistics->m_correlationMatrix->setCorrelationFileName(correlationFile);
+          m_xmlHandlerBundleStatistics->m_correlationMatrix->setCorrelationFileName(correlationFile);
         }
 
         QString covarianceFileName = atts.value("covarianceFileName");
         if (!covarianceFileName.isEmpty()) {
           FileName covarianceFile(covarianceFileName);
-          m_statistics->m_correlationMatrix->setCovarianceFileName(covarianceFile);
+          m_xmlHandlerBundleStatistics->m_correlationMatrix->setCovarianceFileName(covarianceFile);
         }
 
       }
@@ -1323,17 +1390,17 @@ namespace Isis {
         
         QString rx = atts.value("x");
         if (!rx.isEmpty()) {
-          m_statistics->m_rms_rx = toDouble(rx);
+          m_xmlHandlerBundleStatistics->m_rms_rx = toDouble(rx);
         }
 
         QString ry = atts.value("y");
         if (!ry.isEmpty()) {
-          m_statistics->m_rms_ry = toDouble(ry);
+          m_xmlHandlerBundleStatistics->m_rms_ry = toDouble(ry);
         }
 
         QString rxy = atts.value("xy");
         if (!rxy.isEmpty()) {
-          m_statistics->m_rms_rxy = toDouble(rxy);
+          m_xmlHandlerBundleStatistics->m_rms_rxy = toDouble(rxy);
         }
 
       }
@@ -1341,17 +1408,17 @@ namespace Isis {
 
         QString lat = atts.value("lat");
         if (!lat.isEmpty()) {
-          m_statistics->m_rmsSigmaLat = toDouble(lat);
+          m_xmlHandlerBundleStatistics->m_rmsSigmaLat = toDouble(lat);
         }
 
         QString lon = atts.value("lon");
         if (!lon.isEmpty()) {
-          m_statistics->m_rmsSigmaLon = toDouble(lon);
+          m_xmlHandlerBundleStatistics->m_rmsSigmaLon = toDouble(lon);
         }
 
         QString rad = atts.value("rad");
         if (!rad.isEmpty()) {
-          m_statistics->m_rmsSigmaRad = toDouble(rad);
+          m_xmlHandlerBundleStatistics->m_rmsSigmaRad = toDouble(rad);
         }
 
       }
@@ -1359,10 +1426,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageResiduals.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerResidualsListSize = toInt(listSizeStr);
         }
 
       }
@@ -1370,10 +1434,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageSampleResiduals.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerSampleResidualsListSize = toInt(listSizeStr);
         }
 
       }
@@ -1381,10 +1442,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageLineResiduals.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerLineResidualsListSize = toInt(listSizeStr);
         }
 
       }
@@ -1392,10 +1450,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageXSigmas.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerXSigmasListSize = toInt(listSizeStr);
         }
 
       }
@@ -1403,10 +1458,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageYSigmas.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerYSigmasListSize = toInt(listSizeStr);
         }
 
       }
@@ -1414,10 +1466,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageZSigmas.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerZSigmasListSize = toInt(listSizeStr);
         }
 
       }
@@ -1425,10 +1474,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageRASigmas.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerRASigmasListSize = toInt(listSizeStr);
         }
 
       }
@@ -1436,10 +1482,7 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageDECSigmas.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerDECSigmasListSize = toInt(listSizeStr);
         }
 
       }
@@ -1447,23 +1490,24 @@ namespace Isis {
 
         QString listSizeStr = atts.value("listSize");
         if (!listSizeStr.isEmpty()) {
-          int listSize = toInt(listSizeStr);
-          for (int i = 0; i < listSize; i++) {
-            m_statistics->m_rmsImageTWISTSigmas.append(Statistics(m_project, reader()));
-          }
+          m_xmlHandlerTWISTSigmasListSize = toInt(listSizeStr);
         }
 
+      }
+      else if (localName == "statistics") { // add statistics object to the xml handler's current statistics list.
+        m_xmlHandlerStatisticsList.append(
+            new Statistics(m_xmlHandlerProject, reader()));
       }
       else if (localName == "elapsedTime") {
 
         QString time = atts.value("time");
         if (!time.isEmpty()) {
-          m_statistics->m_elapsedTime = toDouble(time);
+          m_xmlHandlerBundleStatistics->m_elapsedTime = toDouble(time);
         }
 
         QString errorProp = atts.value("errorProp");
         if (!errorProp.isEmpty()) {
-          m_statistics->m_elapsedTimeErrorProp = toDouble(errorProp);
+          m_xmlHandlerBundleStatistics->m_elapsedTimeErrorProp = toDouble(errorProp);
         }
 
       }
@@ -1471,12 +1515,12 @@ namespace Isis {
 
         QString minLat = atts.value("value");
         if (!minLat.isEmpty()) {
-          m_statistics->m_minSigmaLatitude = toDouble(minLat);
+          m_xmlHandlerBundleStatistics->m_minSigmaLatitude = toDouble(minLat);
         }
 
         QString minLatPointId = atts.value("pointId");
         if (!minLatPointId.isEmpty()) {
-          m_statistics->m_minSigmaLatitudePointId = minLatPointId;
+          m_xmlHandlerBundleStatistics->m_minSigmaLatitudePointId = minLatPointId;
         }
 
       }
@@ -1484,12 +1528,12 @@ namespace Isis {
 
         QString maxLat = atts.value("value");
         if (!maxLat.isEmpty()) {
-          m_statistics->m_maxSigmaLatitude = toDouble(maxLat);
+          m_xmlHandlerBundleStatistics->m_maxSigmaLatitude = toDouble(maxLat);
         }
 
         QString maxLatPointId = atts.value("pointId");
         if (!maxLatPointId.isEmpty()) {
-          m_statistics->m_maxSigmaLatitudePointId = maxLatPointId;
+          m_xmlHandlerBundleStatistics->m_maxSigmaLatitudePointId = maxLatPointId;
         }
 
       }
@@ -1497,12 +1541,12 @@ namespace Isis {
 
         QString minLon = atts.value("value");
         if (!minLon.isEmpty()) {
-          m_statistics->m_minSigmaLongitude = toDouble(minLon);
+          m_xmlHandlerBundleStatistics->m_minSigmaLongitude = toDouble(minLon);
         }
 
         QString minLonPointId = atts.value("pointId");
         if (!minLonPointId.isEmpty()) {
-          m_statistics->m_minSigmaLongitudePointId = minLonPointId;
+          m_xmlHandlerBundleStatistics->m_minSigmaLongitudePointId = minLonPointId;
         }
 
       }
@@ -1510,12 +1554,12 @@ namespace Isis {
 
         QString maxLon = atts.value("value");
         if (!maxLon.isEmpty()) {
-          m_statistics->m_maxSigmaLongitude = toDouble(maxLon);
+          m_xmlHandlerBundleStatistics->m_maxSigmaLongitude = toDouble(maxLon);
         }
 
         QString maxLonPointId = atts.value("pointId");
         if (!maxLonPointId.isEmpty()) {
-          m_statistics->m_maxSigmaLongitudePointId = maxLonPointId;
+          m_xmlHandlerBundleStatistics->m_maxSigmaLongitudePointId = maxLonPointId;
         }
 
       }
@@ -1523,12 +1567,12 @@ namespace Isis {
 
         QString minRad = atts.value("value");
         if (!minRad.isEmpty()) {
-          m_statistics->m_minSigmaRadius = toDouble(minRad);
+          m_xmlHandlerBundleStatistics->m_minSigmaRadius = toDouble(minRad);
         }
 
         QString minRadPointId = atts.value("pointId");
         if (!minRadPointId.isEmpty()) {
-          m_statistics->m_minSigmaRadiusPointId = minRadPointId;
+          m_xmlHandlerBundleStatistics->m_minSigmaRadiusPointId = minRadPointId;
         }
 
       }
@@ -1536,12 +1580,12 @@ namespace Isis {
 
         QString maxRad = atts.value("value");
         if (!maxRad.isEmpty()) {
-          m_statistics->m_maxSigmaRadius = toDouble(maxRad);
+          m_xmlHandlerBundleStatistics->m_maxSigmaRadius = toDouble(maxRad);
         }
 
         QString maxRadPointId = atts.value("pointId");
         if (!maxRadPointId.isEmpty()) {
-          m_statistics->m_maxSigmaRadiusPointId = maxRadPointId;
+          m_xmlHandlerBundleStatistics->m_maxSigmaRadiusPointId = maxRadPointId;
         }
 
       }
@@ -1549,29 +1593,19 @@ namespace Isis {
 
         QString numberModels = atts.value("numberModels");
         if (!numberModels.isEmpty()) {
-          m_statistics->m_numberMaximumLikelihoodModels = toInt(numberModels);
+          m_xmlHandlerBundleStatistics->m_numberMaximumLikelihoodModels = toInt(numberModels);
         }
 
         QString maximumLikelihoodIndex = atts.value("maximumLikelihoodIndex");
         if (!maximumLikelihoodIndex.isEmpty()) {
-          m_statistics->m_maximumLikelihoodIndex = toInt(maximumLikelihoodIndex);
+          m_xmlHandlerBundleStatistics->m_maximumLikelihoodIndex = toInt(maximumLikelihoodIndex);
         }
 
         QString maximumLikelihoodMedianR2Residuals = atts.value("maximumLikelihoodMedianR2Residuals");
         if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
-          m_statistics->m_maximumLikelihoodMedianR2Residuals = toDouble(maximumLikelihoodMedianR2Residuals);
+          m_xmlHandlerBundleStatistics->m_maximumLikelihoodMedianR2Residuals = toDouble(maximumLikelihoodMedianR2Residuals);
         }
 
-      }
-      else if (localName == "cumulativeProbabilityCalculator") {
-        delete m_statistics->m_cumPro;
-        m_statistics->m_cumPro = NULL;
-        m_statistics->m_cumPro = new StatCumProbDistDynCalc(m_project, reader());   // TODO: does xml stuff need project???
-      }
-      else if (localName == "residualsCumulativeProbabilityCalculator") {
-        delete m_statistics->m_cumProRes;
-        m_statistics->m_cumProRes = NULL;
-        m_statistics->m_cumProRes = new StatCumProbDistDynCalc(m_project, reader());   // TODO: does xml stuff need project???
       }
       else if (localName == "model") {
 
@@ -1581,21 +1615,26 @@ namespace Isis {
         QString model = atts.value("modelSelection");
         QString tweakingConstant = atts.value("tweakingConstant");
         if (!model.isEmpty() && !tweakingConstant.isEmpty()) {
-          delete m_statistics->m_wFunc[i];
-          m_statistics->m_wFunc[i] = NULL;
-          m_statistics->m_wFunc[i] = new MaximumLikelihoodWFunctions(
+          delete m_xmlHandlerBundleStatistics->m_wFunc[i];
+          m_xmlHandlerBundleStatistics->m_wFunc[i] = NULL;
+          m_xmlHandlerBundleStatistics->m_wFunc[i] = new MaximumLikelihoodWFunctions(
               MaximumLikelihoodWFunctions::stringToModel(model),
               toDouble(tweakingConstant));
         }
 
         QString quantile = atts.value("quantile");
         if (!quantile.isEmpty()) {
-          m_statistics->m_maximumLikelihoodQuan[i] = toDouble(quantile);
+          m_xmlHandlerBundleStatistics->m_maximumLikelihoodQuan[i] = toDouble(quantile);
           // m_bundleSettings->m_maximumLikelihood.append(
           //    qMakePair(MaximumLikelihoodWFunctions::stringToModel(type),
           //              toDouble(quantile)));
         }
 
+      }
+      else if (localName == "statCumProDistDynCalc") {
+        delete m_xmlHandlerCumProCalc;
+        m_xmlHandlerCumProCalc = NULL;
+        m_xmlHandlerCumProCalc = new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());   // TODO: does xml stuff need project???
       }
     }
     return true;
@@ -1604,7 +1643,7 @@ namespace Isis {
 
 
   bool BundleStatistics::XmlHandler::characters(const QString &ch) {
-    m_characters += ch;
+    m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
 
@@ -1612,55 +1651,154 @@ namespace Isis {
 
   bool BundleStatistics::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
-    if (!m_characters.isEmpty()) {
-      if (localName == "id") {
-        m_statistics->m_id = NULL;
-        m_statistics->m_id = new QUuid(m_characters);
-      }
-      if (localName == "instrumentId") {
-        m_statistics->m_instrumentId = m_characters;
-      }
-      if (localName == "numberFixedPoints") {
-        m_statistics->m_numberFixedPoints = toInt(m_characters);
-      }
-      if (localName == "numberIgnoredPoints") {
-        m_statistics->m_numberIgnoredPoints = toInt(m_characters);
-      }
-      if (localName == "numberHeldImages") {
-        m_statistics->m_numberHeldImages = toInt(m_characters);
-      }
-      if (localName == "rejectionLimit") {
-        m_statistics->m_rejectionLimit = toDouble(m_characters);
-      }
-      if (localName == "numberRejectedObservations") {
-        m_statistics->m_numberRejectedObservations = toInt(m_characters);
-      }
-      if (localName == "numberObservations") {
-        m_statistics->m_numberObservations = toInt(m_characters);
-      }
-      if (localName == "numberImageParameters") {
-        m_statistics->m_numberImageParameters = toInt(m_characters);
-      }
-      if (localName == "numberConstrainedPointParameters") {
-        m_statistics->m_numberConstrainedPointParameters = toInt(m_characters);
-      }
-      if (localName == "numberConstrainedImageParameters") {
-        m_statistics->m_numberConstrainedImageParameters = toInt(m_characters);
-      }
-      if (localName == "numberUnknownParameters") {
-        m_statistics->m_numberUnknownParameters = toInt(m_characters);
-      }
-      if (localName == "degreesOfFreedom") {
-        m_statistics->m_degreesOfFreedom = toInt(m_characters);
-      }
-      if (localName == "sigma0") {
-        m_statistics->m_sigma0 = toDouble(m_characters);
-      }
-      if (localName == "converged") {
-        m_statistics->m_converged = toBool(m_characters);
-      }
-      m_characters = "";
+    if (localName == "id") {
+      m_xmlHandlerBundleStatistics->m_id = NULL;
+      m_xmlHandlerBundleStatistics->m_id = new QUuid(m_xmlHandlerCharacters);
     }
+    else if (localName == "instrumentId") {
+      m_xmlHandlerBundleStatistics->m_instrumentId = m_xmlHandlerCharacters;
+    }
+    else if (localName == "numberFixedPoints") {
+      m_xmlHandlerBundleStatistics->m_numberFixedPoints = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberIgnoredPoints") {
+      m_xmlHandlerBundleStatistics->m_numberIgnoredPoints = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberHeldImages") {
+      m_xmlHandlerBundleStatistics->m_numberHeldImages = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "rejectionLimit") {
+      m_xmlHandlerBundleStatistics->m_rejectionLimit = toDouble(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberRejectedObservations") {
+      m_xmlHandlerBundleStatistics->m_numberRejectedObservations = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberObservations") {
+      m_xmlHandlerBundleStatistics->m_numberObservations = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberImageParameters") {
+      m_xmlHandlerBundleStatistics->m_numberImageParameters = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberConstrainedPointParameters") {
+      m_xmlHandlerBundleStatistics->m_numberConstrainedPointParameters = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberConstrainedImageParameters") {
+      m_xmlHandlerBundleStatistics->m_numberConstrainedImageParameters = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "numberUnknownParameters") {
+      m_xmlHandlerBundleStatistics->m_numberUnknownParameters = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "degreesOfFreedom") {
+      m_xmlHandlerBundleStatistics->m_degreesOfFreedom = toInt(m_xmlHandlerCharacters);
+    }
+    else if (localName == "sigma0") {
+      m_xmlHandlerBundleStatistics->m_sigma0 = toDouble(m_xmlHandlerCharacters);
+    }
+    else if (localName == "converged") {
+      m_xmlHandlerBundleStatistics->m_converged = toBool(m_xmlHandlerCharacters);
+    }
+    // copy the xml handler's statistics list to the appropriate bundle statistics list
+    else if (localName == "residualsList") {
+      if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid residualsList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageResiduals.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "sampleList") {
+      if (m_xmlHandlerSampleResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid sampleList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageSampleResiduals.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "lineList") {
+      if (m_xmlHandlerLineResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid lineList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageLineResiduals.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "xSigmasList") {
+      if (m_xmlHandlerXSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid xSigmasList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageXSigmas.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "ySigmasList") {
+      if (m_xmlHandlerYSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid ySigmasList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageYSigmas.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "zSigmasList") {
+      if (m_xmlHandlerZSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid zSigmasList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageZSigmas.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "raSigmasList") {
+      if (m_xmlHandlerRASigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid raSigmasList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageRASigmas.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "decSigmasList") {
+      if (m_xmlHandlerDECSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid decSigmasList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageDECSigmas.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "twistSigmasList") {
+      if (m_xmlHandlerTWISTSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        throw IException(IException::Unknown, 
+                         "Unable to read xml file. Invalid twistSigmasList", _FILEINFO_);
+      }
+      for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+        m_xmlHandlerBundleStatistics->m_rmsImageTWISTSigmas.append(m_xmlHandlerStatisticsList[i]);
+      }
+      m_xmlHandlerStatisticsList.clear();
+    }
+    else if (localName == "cumulativeProbabilityCalculator") {
+      m_xmlHandlerBundleStatistics->m_cumPro = m_xmlHandlerCumProCalc;
+      delete m_xmlHandlerCumProCalc;
+      m_xmlHandlerCumProCalc = NULL;
+    }
+    else if (localName == "residualsCumulativeProbabilityCalculator") {
+      m_xmlHandlerBundleStatistics->m_cumProRes = m_xmlHandlerCumProCalc;
+      delete m_xmlHandlerCumProCalc;
+      m_xmlHandlerCumProCalc = NULL;
+    }
+    m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
