@@ -85,6 +85,14 @@
       Changed the order in which the keywords are output to the csv, not the pvl, so it no longer
       depends on the coordinate system of the input cube. Fixes #1614.
     </change>
+    <change name="Janet Barrett" date="2014-08-04">
+      Added new parameter, ALLOWOUTSIDE, to control the reporting of latitude/longitude 
+      and line/sample information that falls outside the boundaries of the image. Also 
+      added a message to the output results if the line,sample falls outside the image
+      boundaries, regardless of the setting of the ALLOWOUTSIDE parameter. This will
+      help the user detect results that fall outside the image even if they are allowing
+      for it. Fixes #1929.
+    </change>
   </history>
 
   <groups>
@@ -298,6 +306,32 @@
           This is the y coordinate value used to compute the other coordinate values.  It
            will be a projection Y value in meters.
         </description>
+      </parameter>
+
+      <parameter name="ALLOWOUTSIDE">
+        <type>boolean</type>
+        <brief>
+          Allow sample/line values outside the image to be reported
+        </brief>
+        <description>
+          The Allowoutside parameter influences how <i>mappt</i> will report
+          resulting latitude/longitude and sample/line coordinates that fall
+          outside the input cube pixel boundaries.
+          <p>
+          The default is set to True, which allows <i>mappt</i> to return
+          the values that are outside the cube pixel boundaries, For example,
+          a given latitude/longitude might return a sample location of -1.0
+          (a single whole pixel coordinate off the left side of the image).
+          This is a feature of the ISIS camera models.
+          </p>
+          <p>
+          When set to False, if a returned coordinate is off the image,
+          <i>mappt</i> will fail.  This failure can be indicated and ignored
+          within a batch script when only coordinates that fall within the
+          image cube pixel boundaries are desired.
+          </p>
+        </description>
+        <default><item>true</item></default>
       </parameter>
     </group>
 
