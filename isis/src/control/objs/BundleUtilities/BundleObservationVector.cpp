@@ -1,5 +1,7 @@
 #include "BundleObservationVector.h"
 
+#include <QDebug>
+
 #include "BundleObservation.h"
 #include "BundleSettings.h"
 #include "IException.h"
@@ -30,7 +32,6 @@ namespace Isis {
                                                      QString observationNumber,
                                                      QString instrumentId,
                                                      BundleSettings& bundleSettings) {
-
     BundleObservation* bundleObservation;
     bool bAddToExisting = false;
 
@@ -38,8 +39,9 @@ namespace Isis {
         m_observationNumberToObservationMap.contains(observationNumber)) {
       bundleObservation = m_observationNumberToObservationMap.value(observationNumber);
 
-      if (bundleObservation->instrumentId() == instrumentId)
+      if (bundleObservation->instrumentId() == instrumentId){
         bAddToExisting = true;
+      }
     }
 
     if (bAddToExisting) {
@@ -66,7 +68,6 @@ namespace Isis {
       }
 
       bundleImage->setParentObservation(bundleObservation);
-
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // TODO: problem when using settings from gui that no instrument id is set
       //
@@ -74,8 +75,10 @@ namespace Isis {
       if ( bundleSettings.numberSolveSettings() == 1) {
         solveSettings = bundleSettings.observationSolveSettings(0);
       }
-      else
+      else {
         solveSettings = bundleSettings.observationSolveSettings(instrumentId);
+      }
+
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       bundleObservation->setSolveSettings(solveSettings);

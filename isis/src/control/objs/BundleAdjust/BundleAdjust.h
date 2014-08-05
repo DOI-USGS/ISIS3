@@ -185,7 +185,8 @@ namespace Isis {
    *   @history 2014-07-23 Jeannie Backer - Modified to print "N/A" for rejection multiplier if 
    *                           outlier rejection is turned off.
    */
-  class BundleAdjust {
+  class BundleAdjust : public QObject {
+      Q_OBJECT
     public:
       BundleAdjust(BundleSettings bundleSettings, 
                    const QString &cnetFile, 
@@ -246,6 +247,13 @@ namespace Isis {
         return m_iterationSummary;
       } // TODO: move implementation to cpp per ISIS standards
 
+    signals:
+      void statusUpdate(QString status);
+      void bundleConvergence(bool converged);
+
+    public slots:
+      void outputBundleStatus(QString status);
+      
     private:
 
       void init(Progress *progress = 0);

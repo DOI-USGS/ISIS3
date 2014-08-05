@@ -258,7 +258,6 @@ namespace Isis {
 
     // should we initialize objects m_Statsx, m_Statsy, m_Statsrx, m_Statsry, m_Statsrxy
 
-
     // (must be a smarter way)
     // get target body radii and body specific conversion factors between radians and meters.
     // need validity checks and different conversion factors for lat and long
@@ -299,7 +298,7 @@ namespace Isis {
 
         BundleObservation *observation =
             m_BundleObservations.addnew(image, observationNumber, instrumentId, m_bundleSettings);
-
+            
         if (!observation) {
           QString msg = "In BundleAdjust::init(): observation " + observationNumber + "is null" + "\n";
           throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -384,7 +383,7 @@ namespace Isis {
    *                        well as no measures.
    */
   bool BundleAdjust::validateNetwork() {
-    printf("Validating network...\n");
+    emit statusUpdate("Validating network...");
 
     // verify measures exist for all images
     int nimagesWithInsufficientMeasures = 0;
@@ -404,7 +403,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    printf("Validation complete!...\n");
+    emit statusUpdate("Validation complete!...");
 
     return true;
   }
@@ -473,7 +472,7 @@ namespace Isis {
 
     // size of reduced normals matrix
     m_nRank = m_BundleObservations.numberParameters();
-    
+
     int n3DPoints = m_BundleControlPoints.size();
 
     if ( m_bundleSettings.solveMethod() == BundleSettings::SpecialK ) {
@@ -547,10 +546,10 @@ namespace Isis {
 //    }
 
     initialize();
-    
+
     // Compute the apriori lat/lons for each nonheld point
     m_pCnet->ComputeApriori(); // original location
-      
+
     m_nIteration = 1;
     double dvtpv = 0.0;
     double dSigma0_previous = 0.0;
@@ -559,7 +558,7 @@ namespace Isis {
     clock_t t1 = clock();
 
     for (;;) {
-      printf("starting iteration %d\n", m_nIteration);
+      emit statusUpdate( QString("\n starting iteration %1 \n").arg(m_nIteration) );
       clock_t iterationclock1 = clock();
 
       // send notification to UI indicating "new iteration"
@@ -625,23 +624,32 @@ namespace Isis {
       // variance of unit weight (also reference variance, variance factor, etc.)
       m_bundleStatistics.computeSigma0(dvtpv, m_bundleSettings.convergenceCriteria());
 
-      printf("Iteration: %d\nSigma0: %20.10lf\n", m_nIteration, m_bundleStatistics.sigma0());
-      printf("Observations: %d\nConstrained Parameters:%d\nUnknowns: %d\nDegrees of Freedom: %d\n",
-             m_bundleStatistics.numberObservations(), 
-             m_bundleStatistics.numberConstrainedPointParameters(), 
-             m_bundleStatistics.numberUnknownParameters(), 
-             m_bundleStatistics.degreesOfFreedom());
+      emit statusUpdate(QString("Iteration: %1").arg(m_nIteration) );
+
+      emit statusUpdate(QString("Sigma0: %1").arg(m_bundleStatistics.sigma0() ) );
+
+      emit statusUpdate( QString("Observations: %1").arg(
+               m_bundleStatistics.numberObservations() ) );
+
+      emit statusUpdate( QString("Constrained Parameters:%1").arg(
+               m_bundleStatistics.numberConstrainedPointParameters() ) );
+
+      emit statusUpdate( QString("Unknowns: %1").arg(
+               m_bundleStatistics.numberUnknownParameters() ) );
+
+      emit statusUpdate( QString("Degrees of Freedom: %1").arg(
+               m_bundleStatistics.degreesOfFreedom() ) );
 
       // check for convergence
       if (m_bundleSettings.convergenceCriteria() == BundleSettings::Sigma0) {
-        if (fabs(dSigma0_previous - m_bundleStatistics.sigma0()) 
-              <= m_bundleSettings.convergenceCriteriaThreshold()) { // convergeance detected 
+        if (fabs(dSigma0_previous - m_bundleStatistics.sigma0())
+              <= m_bundleSettings.convergenceCriteriaThreshold()) { // convergeance detected
           // if maximum likelihood tiers are being processed, check to see if there's another tier
           //convergeance detected
           if (m_bundleStatistics.maximumLikelihoodModelIndex()
                  < m_bundleStatistics.numberMaximumLikelihoodModels() - 1
-              && m_bundleStatistics.maximumLikelihoodModelIndex() 
-                   < 2) { // is this second condition redundant??? 
+              && m_bundleStatistics.maximumLikelihoodModelIndex()
+                   < 2) { // is this second condition redundant???
                                                                     // should bundlestats require num models <= 3, so num models - 1 <= 2
             // to go, then continue with the next maximum likelihood model.
             if (m_bundleStatistics.numberMaximumLikelihoodModels()
@@ -653,7 +661,8 @@ namespace Isis {
           else {  // otherwise iterations are complete
             m_bLastIteration = true;
             m_bundleStatistics.setConverged(true);
-            printf("Bundle has converged\n");
+            emit statusUpdate("\n Bundle has converged");
+            emit bundleConvergence(true);
             break;
           }
         }
@@ -672,7 +681,8 @@ namespace Isis {
         if ( nconverged == numimgparam ) {
           m_bundleStatistics.setConverged(true);
           m_bLastIteration = true;
-          printf("Bundle has converged\n");
+          emit statusUpdate("Bundle has converged");
+          emit bundleConvergence(true);
           break;
         }
       }
@@ -681,7 +691,8 @@ namespace Isis {
       m_bundleStatistics.printMaximumLikelihoodTierInformation();
       clock_t iterationclock2 = clock();
       double dIterationTime = ((iterationclock2 - iterationclock1) / (double)CLOCKS_PER_SEC);
-      printf("End of Iteration %d\nElapsed Time: %20.10lf\n", m_nIteration, dIterationTime);
+      emit statusUpdate( QString("End of Iteration %1").arg(m_nIteration) );
+      emit statusUpdate( QString("Elapsed Time: %1").arg(dIterationTime) );
 
       // send notification to UI indicating "new iteration"
       // UI.Notify(BundleEvent.END_ITERATION);
@@ -707,9 +718,9 @@ namespace Isis {
 
     if (m_bundleStatistics.converged() && m_bundleSettings.errorPropagation()) {
       clock_t terror1 = clock();
-      printf("\nStarting Error Propagation");
+      emit statusUpdate("Starting Error Propagation");
       errorPropagation();
-      printf("\n\nError Propagation Complete\n");
+      emit statusUpdate("Error Propagation Complete");
       clock_t terror2 = clock();
       m_bundleStatistics.setElapsedTimeErrorProp((terror2 - terror1) / (double)CLOCKS_PER_SEC);
     }
@@ -719,10 +730,10 @@ namespace Isis {
 
     wrapUp();
 
-    printf("\nGenerating report files\n");
+    emit statusUpdate("\n Generating report files");
     output();
 
-    printf("\nBundle complete\n");
+    emit statusUpdate("\n Bundle Complete");
     
     iterationSummary();
 
@@ -3303,9 +3314,7 @@ namespace Isis {
     FileName matrixFile;
     matrixFile = FileName::createTempFile("inverseMatrix.dat");
     // Create file handle
-
-    QFile matrixOutput( matrixFile.name() ); //"covarianceMatrix.dat");
-
+    QFile matrixOutput(matrixFile.name());
     // Open file to write to
     matrixOutput.open(QIODevice::WriteOnly);
     QDataStream outStream(&matrixOutput);
@@ -3626,49 +3635,49 @@ namespace Isis {
    */
   void BundleAdjust::iterationSummary() {
     QString itlog;
-    if (m_bundleStatistics.converged()) 
+    if ( m_bundleStatistics.converged() ) 
         itlog = "Iteration" + toString(m_nIteration) + ": Final";
     else
         itlog = "Iteration" + toString(m_nIteration);
     PvlGroup gp(itlog);
 
-    gp += PvlKeyword("Sigma0", 
-                     toString(m_bundleStatistics.sigma0()));
-    gp += PvlKeyword("Observations", 
-                     toString(m_bundleStatistics.numberObservations()));
-    gp += PvlKeyword("Constrained_Point_Parameters", 
-                     toString(m_bundleStatistics.numberConstrainedPointParameters()));
-    gp += PvlKeyword("Constrained_Image_Parameters", 
-                     toString(m_bundleStatistics.numberConstrainedImageParameters()));
-    gp += PvlKeyword("Unknown_Parameters", 
-                     toString(m_bundleStatistics.numberUnknownParameters()));
-    gp += PvlKeyword("Degrees_of_Freedom", 
-                     toString(m_bundleStatistics.degreesOfFreedom()));
-    gp += PvlKeyword("Rejected_Measures", 
-                     toString(m_bundleStatistics.numberRejectedObservations()/2));
+    gp += PvlKeyword( "Sigma0", 
+                      toString( m_bundleStatistics.sigma0() ) );
+    gp += PvlKeyword( "Observations", 
+                      toString( m_bundleStatistics.numberObservations() ) );
+    gp += PvlKeyword( "Constrained_Point_Parameters", 
+                      toString( m_bundleStatistics.numberConstrainedPointParameters() ) );
+    gp += PvlKeyword( "Constrained_Image_Parameters", 
+                      toString( m_bundleStatistics.numberConstrainedImageParameters() ) );
+    gp += PvlKeyword( "Unknown_Parameters", 
+                      toString( m_bundleStatistics.numberUnknownParameters() ) );
+    gp += PvlKeyword( "Degrees_of_Freedom", 
+                      toString( m_bundleStatistics.degreesOfFreedom() ) );
+    gp += PvlKeyword( "Rejected_Measures", 
+                      toString( m_bundleStatistics.numberRejectedObservations()/2) );
 
-    if (m_bundleStatistics.numberMaximumLikelihoodModels() 
-             > m_bundleStatistics.maximumLikelihoodModelIndex()) {
+    if ( m_bundleStatistics.numberMaximumLikelihoodModels() >
+         m_bundleStatistics.maximumLikelihoodModelIndex() ) {
       // if maximum likelihood estimation is being used
-      gp += PvlKeyword("Maximum_Likelihood_Tier: ", 
-                       toString(m_bundleStatistics.maximumLikelihoodModelIndex()));
-      gp += PvlKeyword("Median_of_R^2_residuals: ", 
-                       toString(m_bundleStatistics.maximumLikelihoodMedianR2Residuals()));
+      gp += PvlKeyword( "Maximum_Likelihood_Tier: ", 
+                        toString( m_bundleStatistics.maximumLikelihoodModelIndex() ) );
+      gp += PvlKeyword( "Median_of_R^2_residuals: ", 
+                        toString( m_bundleStatistics.maximumLikelihoodMedianR2Residuals() ) );
     }
 
-    if (m_bundleStatistics.converged()) {
+    if ( m_bundleStatistics.converged() ) {
       gp += PvlKeyword("Converged", "TRUE");
-      gp += PvlKeyword("TotalElapsedTime", toString(m_bundleStatistics.elapsedTime()));
+      gp += PvlKeyword( "TotalElapsedTime", toString( m_bundleStatistics.elapsedTime() ) );
 
       if (m_bundleSettings.errorPropagation()) {
-        gp += PvlKeyword("ErrorPropagationElapsedTime",
-                         toString(m_bundleStatistics.elapsedTimeErrorProp()));
+        gp += PvlKeyword( "ErrorPropagationElapsedTime",
+                         toString( m_bundleStatistics.elapsedTimeErrorProp() ) );
       }
     }
 
     std::ostringstream ostr;
-    ostr<<gp<<endl;
-    m_iterationSummary += QString::fromStdString(ostr.str());
+    ostr << gp << endl;
+    m_iterationSummary += QString::fromStdString( ostr.str() );
     if (m_bPrintSummary) Application::Log(gp);
   }
 
@@ -4125,8 +4134,6 @@ namespace Isis {
     sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
     fp_out << buf;
 
-    QMap<QString, QStringList> imagesAndParameters;
-    
     for (int i = 0; i < nObservations; i++) {
 
       //if ( m_bundleStatistics.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
@@ -4152,17 +4159,8 @@ namespace Isis {
       QString observationString =
           observation->formatBundleOutputString(berrorProp);
       fp_out << (const char*)observationString.toAscii().data();
-      
-      foreach ( QString image, observation->imageNames() ) {
-        imagesAndParameters.insert( image, observation->parameterList() );
-      }
     }
-    
-////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
-    m_bundleStatistics.setCorrMatImgsAndParams(imagesAndParameters);
-////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     // output point uncertainty statistics if error propagation is on
     if (berrorProp) {
       sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
@@ -5050,5 +5048,15 @@ namespace Isis {
 #endif
   bool BundleAdjust::isConverged() {
     return m_bundleStatistics.converged();
+  }
+
+
+
+  /**
+   * Slot for deltack and jigsaw to output the bundle status.
+   */
+  void BundleAdjust::outputBundleStatus(QString status) {
+    status += "\n";
+    printf(status.toStdString().c_str());
   }
 }

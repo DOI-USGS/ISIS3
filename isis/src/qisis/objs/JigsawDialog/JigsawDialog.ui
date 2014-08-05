@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>520</width>
     <height>300</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>170</x>
      <y>260</y>
      <width>341</width>
      <height>32</height>
@@ -39,24 +39,24 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>320</x>
      <y>10</y>
-     <width>114</width>
-     <height>81</height>
+     <width>189</width>
+     <height>94</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QPushButton" name="JigsawSetupButton">
-      <property name="toolTip">
-       <string>Bundle Settings</string>
-      </property>
       <property name="text">
        <string>&amp;Setup</string>
       </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/settings.png</normaloff>icons/settings.png</iconset>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="JigsawRunButton">
+      <property name="text">
+       <string>&amp;Run</string>
       </property>
      </widget>
     </item>
@@ -67,21 +67,39 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="JigsawRunButton">
-      <property name="acceptDrops">
-       <bool>false</bool>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>301</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="statusUpdatesLayout">
+    <item row="0" column="0">
+     <widget class="QScrollArea" name="statusUpdateScrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
       </property>
-      <property name="toolTip">
-       <string>Run Bundle Adjustment</string>
-      </property>
-      <property name="text">
-       <string>&amp;Run</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/run.png</normaloff>icons/run.png</iconset>
-      </property>
+      <widget class="QLabel" name="statusUpdatesLabel">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>293</width>
+         <height>233</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Welcome to Jigsaw</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>

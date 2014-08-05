@@ -109,8 +109,10 @@ void IsisMain() {
     
     // Bundle adjust to solve for new pointing
     BundleSettings settings = bundleSettings();
-    BundleAdjust bundleAdjust(settings, cnet, serialNumberList);
-    bundleAdjust.solveCholesky();
+    BundleAdjust *bundleAdjust = new BundleAdjust(settings, cnet, serialNumberList);
+    QObject::connect( bundleAdjust, SIGNAL( statusUpdate(QString) ),
+                      bundleAdjust, SLOT( outputBundleStatus(QString) ) );
+    bundleAdjust->solveCholesky();
 //    bundleAdjust.solveCholeskyBR();
 
     // ??? Cube c;
@@ -121,7 +123,7 @@ void IsisMain() {
       c.label()->deleteObject("Polygon");
     }
 
-    Table cmatrix = bundleAdjust.cMatrix(0);
+    Table cmatrix = bundleAdjust->cMatrix(0);
 
     // Write out a description in the spice table
     QString deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();

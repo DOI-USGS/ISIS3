@@ -1,6 +1,7 @@
 #include "Isis.h"
 
 #include <QDir>
+#include <QObject>
 #include <QList>
 
 #include "BundleAdjust.h"
@@ -55,6 +56,8 @@ void IsisMain() {
   // Bundle adjust the network
   try {
 
+    QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
+                      bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
     bundleAdjustment->solveCholesky();
     
     // write updated control net if bundle has converged
