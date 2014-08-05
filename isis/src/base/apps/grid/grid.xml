@@ -154,6 +154,10 @@
     <change name="Ella Mae Lee" date="2013-07-18">
       Updated the documentation and added examples. Fixes #178.
     </change>
+    <change name="Janet Barrett" date="2014-06-23">
+      Modified so that the output cube characteristics are obtained from the input cube
+      and/or cube characteristics specified on the command line. Fixes #2063.
+    </change>
   </history>
 
   <groups>

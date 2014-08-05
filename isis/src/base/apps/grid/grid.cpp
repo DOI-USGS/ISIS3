@@ -108,9 +108,7 @@ void IsisMain() {
   }
   // Lat/Lon based grid
   else {
-    CubeAttributeOutput oatt("+32bit");
-    p.SetOutputCube(ui.GetFileName("TO"), oatt, icube->sampleCount(),
-                    icube->lineCount(), icube->bandCount());
+    p.SetOutputCube("TO");
 
     UniversalGroundMap *gmap = new UniversalGroundMap(*icube,
         UniversalGroundMap::ProjectionFirst);
