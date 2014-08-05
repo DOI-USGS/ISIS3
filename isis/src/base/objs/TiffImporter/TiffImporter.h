@@ -25,9 +25,17 @@
  */
 
 #include "ImageImporter.h"
+
+#include "geotiff.h"
+#include "xtiffio.h"
 #include "tiffio.h"
 
+#include "PvlGroup.h"
+
 namespace Isis {
+
+  class Pvl;
+
   /**
    * @brief Imports TIFF images as Isis cubes.
    *
@@ -43,13 +51,19 @@ namespace Isis {
    * @internal
    *   @todo Read chunks of the image into memory at a time, not the entire
    *         image.
+   *   @todo Add all ISIS projection to the convertProjection member.
+   *  
    *   @history 2012-03-28 Travis Addair - Added documentation.
+   *   @history 2013-12-11 Stuart Sides - Added new member convterProjection. This is for converting
+   *                            GeoTiff projection tags to standard ISIS Mapping lables.
    *
    */
   class TiffImporter : public ImageImporter {
     public:
       TiffImporter(FileName inputName);
       virtual ~TiffImporter();
+
+      virtual PvlGroup convertProjection() const;
 
       virtual bool isGrayscale() const;
       virtual bool isRgb() const;
@@ -79,6 +93,17 @@ namespace Isis {
 
       //! The number of "samples" (bands in Isis terms) in the input image.
       uint16 m_samplesPerPixel;
+
+      //! GeoTiff hanele
+      GTIF *m_geotiff;
+
+      //! ISIS Mapping group
+      PvlGroup m_map;
+
+      Pvl gdalItems(const Pvl &outPvl) const;
+      Pvl upperLeftXY(const Pvl &inLab) const;
+      Pvl resolution(const Pvl &inLab) const;
+
   };
 };
 

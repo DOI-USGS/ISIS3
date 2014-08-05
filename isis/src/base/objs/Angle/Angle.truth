@@ -52,3 +52,9 @@ Testing protected methods
   Radian wrap value = 6.28318531
   Degree angle set to 60
   Radian angle set to 0.5
+-70.258368055556 degrees
+70.503055555556 degrees
+**PROGRAMMER ERROR** [100] is not a vaid input to Angle. It needs to be of the form: "dd mm ss.ss".
+**PROGRAMMER ERROR** [70 11] is not a vaid input to Angle. It needs to be of the form: "dd mm ss.ss".
+**PROGRAMMER ERROR** [this 79 should 00 fail 0.111] is not a vaid input to Angle. It needs to be of the form: "dd mm ss.ss".
+100.0 degrees

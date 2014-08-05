@@ -149,9 +149,23 @@ XERCESLIB    = -lxerces-c
 XALAN        = $(ISIS3OPT)/bin/Xalan
 
 #---------------------------------------------------------------------------
+# Set up for GeoTiff
+#---------------------------------------------------------------------------
+GEOTIFFINCDIR = -I$(ISIS3OPT)/include
+GEOTIFFLIBDIR = -L$(ISIS3OPT)/lib
+GEOTIFFLIB    = -lgeotiff
+
+#---------------------------------------------------------------------------
+# Set up for proj (Needed on Macs for geotiff)
+#---------------------------------------------------------------------------
+PROJINCDIR = -I$(ISIS3OPT)/include
+PROJLIBDIR = -L$(ISIS3OPT)/lib
+PROJLIB    = -lproj
+
+#---------------------------------------------------------------------------
 # Set up for Tiff
 #---------------------------------------------------------------------------
-TIFFINCDIR = -I$(ISIS3OPT)/include/tiff
+TIFFINCDIR = -I$(ISIS3OPT)/include
 TIFFLIBDIR = -L$(ISIS3OPT)/lib
 TIFFLIB    = -ltiff
 
@@ -284,6 +298,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiconv*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxerces-c*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgeotiff*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtiff*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/liblzma*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgsl*.dylib"
@@ -311,6 +326,9 @@ THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicuuc*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicudata*.dylib"
+
+# libgeotiff depends on these libraries
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libproj*.dylib"
 
 #  Plugins
 THIRDPARTYPLUGINS +=  "$(ISIS3OPT)/share/qt4/plugins/"
