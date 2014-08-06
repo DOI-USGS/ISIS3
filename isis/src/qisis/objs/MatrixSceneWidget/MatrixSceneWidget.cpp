@@ -328,15 +328,15 @@ namespace Isis {
    *
    */
 //   void MatrixSceneWidget::refit() {
-//     QRectF sceneRect = elementsBoundingRect();
+//     QRectF sceneRect = m_graphicsScene->itemsBoundingRect();
 // 
 //     if ( sceneRect.isEmpty() )
 //       return;
 // 
-//     double xPadding = sceneRect.width() * 0.10;
-//     double yPadding = sceneRect.height() * 0.10;
-// 
-//     sceneRect.adjust(-xPadding, -yPadding, xPadding, yPadding);
+// //     double xPadding = sceneRect.width() * 0.10;
+// //     double yPadding = sceneRect.height() * 0.10;
+// // 
+// //     sceneRect.adjust(-xPadding, -yPadding, xPadding, yPadding);
 //     getView()->fitInView(sceneRect, Qt::KeepAspectRatio);
 //   }
 
@@ -372,76 +372,15 @@ namespace Isis {
    */
   bool MatrixSceneWidget::eventFilter(QObject *obj, QEvent *event) {
     bool stopProcessingEvent = true;
+    qDebug() << "event type:" << event->type();
 
     switch( event->type() ) {
       case QMouseEvent::GraphicsSceneMousePress: {
-        emit elementClicked(m_graphicsScene->itemAt(
-                               ( (QGraphicsSceneMouseEvent *)event )->scenePos() )->toolTip() );
-        stopProcessingEvent = false;
-        break;
-      }
-
-      case QMouseEvent::GraphicsSceneMouseRelease: {
-        bool signalEmitted = false;
-
-        if (!signalEmitted) {
-          stopProcessingEvent = false;
-          emit mouseButtonRelease( ( (QGraphicsSceneMouseEvent *)event )->scenePos(),
-                                   ( (QGraphicsSceneMouseEvent *)event )->button() );
+        if (m_graphicsScene->itemAt( ( (QGraphicsSceneMouseEvent *)event )->scenePos() ) ) {
+          emit elementClicked(m_graphicsScene->itemAt(
+                                ( (QGraphicsSceneMouseEvent *)event )->scenePos() )->toolTip() );
         }
-        break;
-      }
-
-      case QMouseEvent::GraphicsSceneMouseDoubleClick:
-        // Do the same lowerColorValue as single click
-        emit mouseDoubleClick( ( (QGraphicsSceneMouseEvent *)event )->scenePos() );
         stopProcessingEvent = false;
-        break;
-
-      case QMouseEvent::GraphicsSceneMouseMove:
-
-        stopProcessingEvent = false;
-
-
-        emit mouseMove( ( (QGraphicsSceneMouseEvent *)event )->scenePos() );
-        break;
-
-      case QEvent::GraphicsSceneWheel:
-        emit mouseWheel( ( (QGraphicsSceneWheelEvent *)event )->scenePos(),
-                         ( (QGraphicsSceneWheelEvent *)event )->delta() );
-        event->accept();
-        stopProcessingEvent = true;
-        break;
-
-      case QMouseEvent::Enter:
-        emit mouseEnter();
-        stopProcessingEvent = false;
-        break;
-
-      case QMouseEvent::Leave:
-        emit mouseLeave();
-        stopProcessingEvent = false;
-        break;
-
-      case QEvent::GraphicsSceneHelp: {
-        setToolTip("");
-        bool toolTipFound = false;
-
-        QGraphicsItem *sceneItem;
-        foreach(sceneItem, getScene()->items() ) {
-          if (!toolTipFound) {
-            if (sceneItem->contains( ( (QGraphicsSceneHelpEvent*)event )->scenePos() ) &&
-                sceneItem->toolTip().size() > 0) {
-              setToolTip( sceneItem->toolTip() );
-              toolTipFound = true;
-            }
-          }
-        }
-
-        if (toolTipFound) {
-          stopProcessingEvent = true;
-          QToolTip::showText( ( (QGraphicsSceneHelpEvent*)event )->screenPos(), toolTip() );
-        }
         break;
       }
       
@@ -463,11 +402,11 @@ namespace Isis {
   }
 
 
-  /**
-   * Refit scene and items when the widget size changes.
-   */
-  void MatrixSceneWidget::fitInView() {
-  }
+//   /**
+//    * Refit scene and items when the widget size changes.
+//    */
+//   void MatrixSceneWidget::fitInView() {
+//   }
 
 
   /**
@@ -694,7 +633,7 @@ namespace Isis {
    *
    * @param colorScheme True if using tolerance. False if using gradient.
    */
-  void MatrixSceneWidget::repaintItems(bool colorScheme) {
+//   void MatrixSceneWidget::repaintItems(bool colorScheme) {
 //     if (colorScheme) {
 //       // dont actually use this. just redo the colors?
 //       drawElements( m_directory->project()->correlationMatrix() );
@@ -709,5 +648,5 @@ namespace Isis {
 //         }
 //       }
 //     }
-  }
+//   }
 }

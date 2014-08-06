@@ -76,8 +76,9 @@ namespace Isis {
       QList<QAction *> getViewActions();
       QList<QAction *> supportedActions(CorrelationMatrix *matrix);
       void redrawItems();
+//       void refit();
 
-      void repaintItems(bool colorScheme);
+//       void repaintItems(bool colorScheme);
 
       /**
        * Return an empty list of actions for unknown data types
@@ -111,7 +112,7 @@ namespace Isis {
       
     private slots:
 
-      void fitInView();
+//       void fitInView();
 
       void sendVisibleRectChanged();
       
