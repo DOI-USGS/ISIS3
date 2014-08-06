@@ -156,6 +156,7 @@ namespace Isis {
       void cleanupCubeDnViewWidgets();
       void cleanupFileListWidgets();
       void cleanupFootprint2DViewWidgets();
+      void cleanupMatrixViewWidgets();
       void imagesAddedToProject(ImageList *images);
       void updateRecentProjects(Project *);
 

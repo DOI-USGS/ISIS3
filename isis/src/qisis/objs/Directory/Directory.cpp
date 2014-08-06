@@ -412,8 +412,8 @@ namespace Isis {
   MatrixSceneWidget *Directory::addMatrixView() {
     MatrixSceneWidget *result = new MatrixSceneWidget(NULL, true, true, this);
 
-//     connect( result, SIGNAL( destroyed(QObject *) ),
-//              this, SLOT( cleanupMatrixViewWidgets() ) );
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupMatrixViewWidgets() ) );
 
     m_matrixViewWidgets.append(result);
 
@@ -479,6 +479,11 @@ namespace Isis {
   }
 
 
+  void Directory::cleanupMatrixViewWidgets() {
+    m_matrixViewWidgets.removeAll(NULL);
+  }
+
+
   void Directory::imagesAddedToProject(ImageList *imageList) {
     m_projectTreeWidget->addImageGroup(imageList);
   }
@@ -523,7 +528,6 @@ namespace Isis {
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
   /**
    * Accessor for the list of MatrixSceneWidgets currently available.
    *
@@ -538,7 +542,7 @@ namespace Isis {
 
     return results;
   }
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
   
 
   /**

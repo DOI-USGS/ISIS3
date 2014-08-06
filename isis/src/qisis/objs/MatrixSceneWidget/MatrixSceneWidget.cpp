@@ -278,46 +278,6 @@ namespace Isis {
   QList<QAction *> MatrixSceneWidget::supportedActions(CorrelationMatrix *matrix) {
     QList<QAction *> results;
 
-//     bool allMatrixElementsInView = !matrix->visibleElements().isEmpty();
-
-    // Add visible elements to scene
-    
-//     foreach (MatrixElement *element, *elements) {
-//       allMatrixElementsInView = allMatrixElementsInView && (elementToMatrix(element) != NULL);
-//     }
-
-    // Add actions to return list
-//     if (allMatrixElementsInView) {
-//       MoveToTopSceneWorkOrder *moveToTopAct =
-//           new MoveToTopSceneWorkOrder( this, m_directory->project() );
-//       moveToTopAct->setData(elements);
-//       results.append(moveToTopAct);
-// 
-//       MoveUpOneSceneWorkOrder *moveUpOneAct =
-//           new MoveUpOneSceneWorkOrder( this, m_directory->project() );
-//       moveUpOneAct->setData(elements);
-//       results.append(moveUpOneAct);
-// 
-//       MoveToBottomSceneWorkOrder *moveToBottomAct =
-//           new MoveToBottomSceneWorkOrder( this, m_directory->project() );
-//       moveToBottomAct->setData(elements);
-//       results.append(moveToBottomAct);
-// 
-//       MoveDownOneSceneWorkOrder *moveDownOneAct =
-//           new MoveDownOneSceneWorkOrder( this, m_directory->project() );
-//       moveDownOneAct->setData(elements);
-//       results.append(moveDownOneAct);
-
-      // Add separator to contect menu
-//       results.append(NULL);
-/*
-      QAction *zoomFitAct = new QAction(tr("Zoom Fit"), this);
-      zoomFitAct->setData( qVariantFromValue( matrix->visibleElements() ) );
-      connect( zoomFitAct, SIGNAL( triggered() ),
-               this, SLOT( fitInView() ) );
-      results.append(zoomFitAct);*/
-//     }
-
     return results;
   }
 
@@ -372,7 +332,6 @@ namespace Isis {
    */
   bool MatrixSceneWidget::eventFilter(QObject *obj, QEvent *event) {
     bool stopProcessingEvent = true;
-    qDebug() << "event type:" << event->type();
 
     switch( event->type() ) {
       case QMouseEvent::GraphicsSceneMousePress: {
@@ -383,6 +342,13 @@ namespace Isis {
         stopProcessingEvent = false;
         break;
       }
+
+      case QMouseEvent::GraphicsSceneMouseDoubleClick:
+        emit mouseDoubleClick(
+              ((QGraphicsSceneMouseEvent *)event)->scenePos());
+        m_graphicsView->fitInView(m_graphicsScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+        stopProcessingEvent = false;
+        break;
       
       default:
         stopProcessingEvent = false;
