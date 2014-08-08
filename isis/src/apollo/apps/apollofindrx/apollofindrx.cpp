@@ -8,6 +8,7 @@
 #include "Progress.h"
 #include "IException.h"
 #include "Apollo.h"
+#include "History.h"
 
 using namespace std;
 using namespace Isis;
@@ -156,6 +157,15 @@ void IsisMain ()
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
+    // Record apollofindrx history to the cube
+    // create a History Blob with value found in the History PvlObject's Name keyword
+    PvlObject &histObj = cube.label()->findObject("History");
+    Isis::History histBlob( (QString)histObj["Name"] );
+    // read cube's History PvlObject data into the History Blob
+    cube.read(histBlob);
+    // add apollofindrx History PvlObject into the History Blob and write to cube
+    histBlob.AddEntry();
+    cube.write(histBlob);
     cube.close();
 }
 

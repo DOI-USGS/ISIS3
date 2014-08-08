@@ -61,6 +61,37 @@ namespace Isis {
 
 
   /**
+   * Constructs an angle object with units of Angle::Degrees from 
+   * a QString of the general form "dd mm ss.ss" (there can be more than 2 digits per piece.)
+   *  
+   * @param angle The value of the angle in degrees, as a QString of the form: "dd mm ss.ss"
+   */
+  Angle::Angle(QString angle) {
+    QString::SectionFlag flag = QString::SectionSkipEmpty;
+    bool degreesSucceeded, minutesSucceeded, secondsSucceeded; 
+
+    double degrees = angle.section(' ', 0, 0, flag).toDouble(&degreesSucceeded);
+    double minutes = angle.section(' ', 1, 1, flag).toDouble(&minutesSucceeded);
+    double seconds = angle.section(' ', 2, 2, flag).toDouble(&secondsSucceeded);
+
+    if (!(degreesSucceeded && minutesSucceeded && secondsSucceeded) ) {
+      QString msg = QObject::tr("[%1] is not a vaid input to Angle. It needs to be of the form: "
+                    "\"dd mm ss.ss\"").arg(angle);
+      throw IException(IException::Programmer, msg, _FILEINFO_); 
+    }
+
+    //if the first digit is '-', everything should be negative
+    if (degrees < 0) { 
+      minutes = -minutes;
+      seconds = -seconds; 
+    }
+
+    double decimalDegrees = degrees + minutes/60.0 + seconds/3600.0;
+    setAngle(decimalDegrees, Angle::Degrees);
+  }
+
+
+  /**
    * Destroys the angle object
    *
    */

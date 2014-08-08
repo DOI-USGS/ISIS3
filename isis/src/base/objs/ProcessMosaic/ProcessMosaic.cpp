@@ -277,7 +277,6 @@ namespace Isis {
     if (m_trackingEnabled) {
       //Get the last band set aside for "Origin" 1 based
       iOriginBand = OutputCubes[0]->bandCount();
-      m_onb--;
       iChanged = 0;
 
       // For mosaic creation, the input is copied onto mosaic by default

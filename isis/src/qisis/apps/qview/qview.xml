@@ -139,5 +139,15 @@
       Changed the character that is used as a token when parsing the list of file names used when
       the socket is already open. Fixes #1551.
     </change>
+    <change name="Ian Humphrey" date="2014-07-30">
+      Modified spectral plot tool to more accurately compute statistics for rectangular and 
+      polygonal selections. Fixes #2071.
+    </change>
+    <change name="Ian Humphrey" date="2014-07-31">
+      Added configurePlotCurves() method to PlotWindow. User can activate configure dialog on 
+      single curve with right-click or activate dialog with combo box of all curves using the 
+      toolbar button. Added What's This for SpatialPlotTool and removed the configure toolbar button
+      for ScatterPlotWindow. Fixes #2089.
+    </change>
   </history>
 </application>

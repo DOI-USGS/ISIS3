@@ -1216,6 +1216,12 @@ namespace Isis {
    */
   Histogram *Cube::histogram(const int &band, const double &validMin,
                                 const double &validMax, QString msg) {
+    // Make sure cube is open
+    if ( !isOpen() ) {
+      QString msg = "Cannot create histogram object for an unopened cube";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     // Make sure band is valid
     if ((band < 0) || (band > bandCount())) {
       QString msg = "Invalid band in [CubeInfo::Histogram]";
@@ -1431,6 +1437,12 @@ namespace Isis {
    */
   Statistics *Cube::statistics(const int &band, const double &validMin,
                                      const double &validMax, QString msg) {
+    // Make sure cube is open
+    if ( !isOpen() ) {
+      QString msg = "Cannot create statistics object for an unopened cube";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     // Make sure band is valid
     if ((band < 0) || (band > bandCount())) {
       string msg = "Invalid band in [CubeInfo::Statistics]";

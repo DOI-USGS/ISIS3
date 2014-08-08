@@ -206,7 +206,19 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-
+    
+    // Check error for histogram object on a closed cube
+    try {
+      // out has already been closed
+      out.histogram(0);
+    }
+    catch (IException &e)
+    {
+      e.print();
+    }
+    
+    cerr << endl;
+    
     // Test statistics object on a single band, 1 by default
     cerr << "Testing statistics method, band 1 ... " << endl;
     Statistics *bandOneStats = in.statistics();
@@ -234,6 +246,16 @@ int main(int argc, char *argv[]) {
       in.statistics(-1);
     }
     catch (IException &e) {
+      e.print();
+    }
+    
+    // Check error for statistics object on a closed cube
+    try {
+      // out has already been closed
+      out.statistics(0);
+    }
+    catch (IException &e)
+    {
       e.print();
     }
 

@@ -144,6 +144,9 @@
     <change name="Debbie A. Cook" date="2012-12-10">
       Changed to use TProjection instead of Projection.  References #775
     </change>
+    <change name="Janet Barrett" date="2014-08-04">
+      Modified so that the program can be run on a mosaic file. Fixes #2158.
+    </change>
   </history>
   
   <groups>

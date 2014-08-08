@@ -1,0 +1,30 @@
+Group = UserParameters
+  FROM         = saveParam
+  TO           = works
+  TESTONE      = 0
+  TESTTWO      = 1
+  TESTTHREE    = 1
+  LISTTEST     = INCLUDEOPT
+  EXCLUDEDTEST = 10
+End_Group
+
+Group = UserParameters
+  FROM         = saveParam
+  TO           = works
+  TESTONE      = 0
+  TESTTWO      = 1
+  TESTTHREE    = 1
+  LISTTEST     = INCLUDEOPT
+  EXCLUDEDTEST = 10
+End_Group
+
+Group = UserParameters
+  FROM         = saveParam
+  TO           = works
+  TESTONE      = 0
+  TESTTWO      = 1
+  TESTTHREE    = 1
+  LISTTEST     = INCLUDEOPT
+  EXCLUDEDTEST = 10
+End_Group
+End

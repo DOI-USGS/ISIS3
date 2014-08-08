@@ -83,3 +83,18 @@ Unit test for iTime
   Test of iTime operator== member
     94781765.307363 == 94781765.307363 = 1
     94781765.307363 == 94781765.307413 = 0
+
+  Test of iTime operator+(double) member
+    1.01
+
+  Test of iTime operator+=(double) member
+    1.01
+
+  Test of iTime operator-(double) member
+    -1.01
+
+  Test of iTime operator-=(double) member
+    -1.01
+
+  Test of double operator-(iTIme) member
+    -100.001

@@ -243,6 +243,7 @@ namespace Isis {
       // definitions should be used.
       using ProcessImport::StartProcess;
       void StartProcess();
+      void StartProcess(void funct(Isis::Buffer &out));
       void EndProcess();
       void Finalize();
     private:

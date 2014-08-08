@@ -116,6 +116,13 @@ XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
 XERCESLIB    = -lxerces-c
 
 #---------------------------------------------------------------------------
+# Set up for geotiff 
+#---------------------------------------------------------------------------
+GEOTIFFINCDIR = -I$(ISIS3LOCAL)/include/geotiff
+GEOTIFFLIBDIR = -L$(ISIS3LOCAL)/lib
+GEOTIFFLIB    = -lgeotiff
+
+#---------------------------------------------------------------------------
 # Set up for Tiff 
 #---------------------------------------------------------------------------
 TIFFINCDIR = -I$(ISIS3LOCAL)/include/tiff/tiff-4.0.1
@@ -299,6 +306,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas*.so*"
 THIRDPARTYLIBS    += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeotiff*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtiff*.so*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libicuuc.so*"

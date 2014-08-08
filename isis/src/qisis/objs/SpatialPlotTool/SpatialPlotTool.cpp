@@ -44,9 +44,6 @@ namespace Isis {
    */
   SpatialPlotTool::SpatialPlotTool(QWidget *parent) : AbstractPlotTool(parent),
       m_spatialCurves(new QMap<MdiCubeViewport *, QPointer<CubePlotCurve> >) {
-    m_toolPadAction = new QAction(this);
-    m_toolPadAction->setText("Spatial Plot Tool");
-    m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spatial_plot.png"));
     //connect(m_toolPadAction, SIGNAL(activated()), this, SLOT(showPlotWindow()));
     connect(this, SIGNAL(viewportChanged()), this, SLOT(viewportSelected()));
 
@@ -77,13 +74,18 @@ namespace Isis {
 
 
   /**
+   * This method configures the QAction for this tool
    *
+   * @param toolpad - the ToolPad to add the SpatialPlotTool to
    *
-   * @param toolpad
-   *
-   * @return QAction*
+   * @return QAction* - the QAction that was created for this tool
    */
   QAction *SpatialPlotTool::toolPadAction(ToolPad *toolpad) {
+    m_toolPadAction = new QAction(toolpad);
+    m_toolPadAction->setText("Spatial Plot Tool");
+    m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spatial_plot.png"));
+    QString text = "<b>Function:</b> Create a spatial plot of the selected pixels' DN values.";
+    m_toolPadAction->setWhatsThis(text);
     return m_toolPadAction;
   }
 
@@ -361,48 +363,55 @@ namespace Isis {
           }
         }
 
-        for(int index = 0; index <= lineLength; index++) {
-          // % across * delta x + initial = x position of point (sample)
-          double sample = (index / (double)lineLength) * (endSample - startSample) +
-                     startSample;
-          // move back for interpolation
-          sample -= (interp.Samples() / 2.0 - 0.5);
+        if (lineLength > 0) {
+          for(int index = 0; index <= lineLength; index++) {
+            // % across * delta x + initial = x position of point (sample)
+            double sample = (index / (double)lineLength) * (endSample - startSample) +
+                       startSample;
+            // move back for interpolation
+            sample -= (interp.Samples() / 2.0 - 0.5);
 
-          double line = (index / (double)lineLength) * (endLine - startLine) +
-                     startLine;
-          line -= (interp.Lines() / 2.0 - 0.5);
+            double line = (index / (double)lineLength) * (endLine - startLine) +
+                       startLine;
+            line -= (interp.Lines() / 2.0 - 0.5);
 
-          dataReader.SetPosition(sample, line, band);
-          cvp->cube()->read(dataReader);
+            dataReader.SetPosition(sample, line, band);
+            cvp->cube()->read(dataReader);
 
-          double result = interp.Interpolate(sample + 0.5, line + 0.5, dataReader.DoubleBuffer());
+            double result = interp.Interpolate(sample + 0.5, line + 0.5, dataReader.DoubleBuffer());
 
-          if (!IsSpecial(result)) {
-            double plotXValue = index + 1;
+            if (!IsSpecial(result)) {
+              double plotXValue = index + 1;
 
-            if (targetUnits != PlotCurve::PixelNumber) {
-              plotXValue = sample;
+              if (targetUnits != PlotCurve::PixelNumber) {
+                plotXValue = sample;
+ 
+                if (groundMap->SetImage(sample, line)) {
+                  Distance xDistance = startPoint.GetDistanceToPoint(resultToSurfacePoint(groundMap));
 
-              if (groundMap->SetImage(sample, line)) {
-                Distance xDistance = startPoint.GetDistanceToPoint(resultToSurfacePoint(groundMap));
+                  if (targetUnits == PlotCurve::Meters)
+                    plotXValue = xDistance.meters();
+                  else if (targetUnits == PlotCurve::Kilometers)
+                    plotXValue = xDistance.kilometers();
+                }
+                else {
+                  QMessageBox::warning(qobject_cast<QWidget *>(parent()),
+                      tr("Failed to project points along line"),
+                      tr("Failed to project (calculate a latitude, longitude, and radius) for a "
+                         "point along the line (sample [%1], line [%2]).")
+                        .arg(startSample).arg(startLine));
+                  return data;
+                }
+              }  
 
-                if (targetUnits == PlotCurve::Meters)
-                  plotXValue = xDistance.meters();
-                else if (targetUnits == PlotCurve::Kilometers)
-                  plotXValue = xDistance.kilometers();
-              }
-              else {
-                QMessageBox::warning(qobject_cast<QWidget *>(parent()),
-                    tr("Failed to project points along line"),
-                    tr("Failed to project (calculate a latitude, longitude, and radius) for a "
-                       "point along the line (sample [%1], line [%2]).")
-                      .arg(startSample).arg(startLine));
-                return data;
-              }
+              data.append(QPointF(plotXValue, result));
             }
-
-            data.append(QPointF(plotXValue, result));
           }
+        }
+        else {
+          QMessageBox::information(NULL, "Error",
+                                   "The selected Area contains no valid pixels",
+                                   QMessageBox::Ok);
         }
       }
       else if (rubberBandTool()->currentMode() == RubberBandTool::RotatedRectangleMode) {

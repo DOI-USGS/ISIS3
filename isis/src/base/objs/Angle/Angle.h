@@ -52,6 +52,8 @@ namespace Isis {
    *                           this change. References #604.
    *   @history 2013-02-01 Steven Lambright - Added QDebug() printout capabilities.
    *                           References #1060.
+   *   @history 2014-07-28 Kristin Berry - Added a constructor which accepts a Qstring of the form:
+   *                           "dd mm ss.ss" for angles provided in this format. 
    */
   class Angle {
 
@@ -77,6 +79,7 @@ namespace Isis {
     Angle();
     Angle(double angle, Units unit);
     Angle(const Angle& angle);
+    Angle(QString angle);
 
     virtual ~Angle();
 

@@ -49,6 +49,10 @@ namespace Isis {
    *   @history 2014-04-03 Tracie Sucharski - Reset defaults for plots to the following:
    *                         SolidLine, Width=1, NoSymbols.  This is a temporary fix until
    *                         the defaults can be saved on a user basis.  Fixes #2062.
+   *   @history 2014-07-30 Ian Humphrey - Modified getSpectralStatistics() to compute statistics
+   *                           more accurately. Right-to-left selections now select pixels
+   *                           correctly. Polygon selection now selects pixels more accurately
+   *                           for statistics. Added What's This help. Fixes #2071. 
    */
   class SpectralPlotTool : public AbstractPlotTool {
       Q_OBJECT

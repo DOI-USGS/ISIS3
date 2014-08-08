@@ -13,6 +13,8 @@ class QWidget;
 
 namespace Isis {
   class CubePlotCurve;
+  class PlotWindow;
+
 
   /**
    * This should be an inner class for CubePlotCurve, but Qt doesn't support
@@ -23,6 +25,10 @@ namespace Isis {
    * @internal
    *   @history 2012-01-20 Steven Lambright and Jai Rideout - Completed
    *                           documentation.
+   *   @history 2014-07-25 Ian Humphrey - Added configure tool menu item. This allows user to 
+   *                           right-click a curve (as previously) or select  configure tool menu 
+   *                           item to configure a plot curve's color, symbol, line style, etc.
+   *                           Fixes #2089.
    */
   class CubePlotCurveConfigureDialog : public QDialog {
       Q_OBJECT
@@ -35,6 +41,8 @@ namespace Isis {
     public slots:
       void applySettingsToCurve();
       void readSettingsFromCurve();
+      void updateComboIndex(int selected);
+      void updateCurvesList();
 
     private slots:
       void askUserForColor();
@@ -58,19 +66,26 @@ namespace Isis {
           const CubePlotCurveConfigureDialog &other);
 
     private:
+      //! The selection/combo box for the cube plot curve
+      QPointer<QComboBox>   m_curvesCombo;
       //! The line edit containing the cube plot curve's name
       QPointer<QLineEdit>   m_nameEdit;
       //! The button for changing the cube plot curve's color
       QPointer<QPushButton> m_colorButton;
+      //! The parent widget of the configuration dialog
+      QPointer<QWidget> m_parent;
+      //! The current plot curve to configure
+      QPointer<CubePlotCurve> m_plotCurve;
+      //! The list of plot curves to configure
+      QList<CubePlotCurve *> m_plotCurvesList;
+      //! The index of the selected curve in m_curvesCombo
+      int m_selectedCurve;
       //! The selection/combo box for the cube plot curve's size/thickness
       QPointer<QComboBox>   m_sizeCombo;
       //! The selection/combo box for the cube plot curve's line style
       QPointer<QComboBox>   m_styleCombo;
       //! The selection/combo box for the cube plot curve's marker style
       QPointer<QComboBox>   m_symbolCombo;
-
-      //! The plot curve we are configuring.
-      QPointer<CubePlotCurve> m_plotCurve;
   };
 }
 

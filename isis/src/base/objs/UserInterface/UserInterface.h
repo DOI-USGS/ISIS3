@@ -22,10 +22,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "IsisAml.h"
-#include "PvlTokenizer.h"
 #include "FileName.h"
 #include "Gui.h"
+#include "IsisAml.h"
+#include "PvlTokenizer.h"
 
 class Gui;
 
@@ -125,6 +125,26 @@ namespace Isis {
    *                           $base, $mro, etc. Now when -batchlist does not
    *                           understand a variable it preserves it in the
    *                           parameter list. Fixes #365.
+   *   @history 2014-06-09 Ian Humphrey - Added PreProcess() and ResolveParameter()
+   *                           functions to replace redundant code in LoadCommandLine().
+   *                           These functions evaulate -HELP and -WEBHELP flags regardless
+   *                           of errors on commandline. Fixes #552. 
+   *   @history 2014-06-10 Ian Humphrey - Fixed issue causing parameter name values 
+   *                           on the -HELP flag to only evaluate if uppercase. Fixes #1735.
+   *                           Reorganized header and cpp layout. Renamed private member functions
+   *                           to follow code convention. Began modifying unitTest.cpp.
+   *   @history 2014-06-11 Ian Humphrey - Added throws to evaluateOption() so that if the parameter 
+   *                           is -HELP or -WEBHELP unitTest.cpp can catch and continue running.
+   *   @history 2014-06-12 Ian Humphrey - Modified logic in loadCommandLine() throw statements so
+   *                           an exception is thrown when -BATCHLIST is used with -GUI, -SAVE,
+   *                           -LAST, or -RESTORE options. Added bool usedDashRestore.
+   *   @history 2014-06-17 Ian Humphrey - Added to unitTest.xml to test -HELP=value. Renamed 
+   *                           application name from 'hist' to 'unitTest'. Modified logic of
+   *                           resolveParameter() to give appropriate error message to user
+   *                           when using an invalid reserved parameter (e.g. -x).
+   *   @history 2014-06-18 Ian Humphrey - Finished developing unitTest.cpp and reorganized. 
+   *                           Added lacking [at]throws documentation to UserInterface.cpp.                         
+   *                           
    */
 
   class UserInterface : public IsisAml {
@@ -132,6 +152,26 @@ namespace Isis {
       UserInterface(const QString &xmlfile, int &argc, char *argv[]);
       ~UserInterface();
 
+      /**
+       * Returns true if the program should abort on error, and false if it
+       * should continue
+       *
+       * @return bool True for abort, False for continue
+       */
+      bool AbortOnError() {
+        return p_abortOnError;
+      };    
+      
+      /**
+       * Returns the size of the batchlist.  If there is no batchlist, it will
+       * return 0
+       *
+       * @return int The size of the batchlist
+       */
+      int BatchListSize() {
+        return p_batchList.size();
+      };
+      
       /**
        * Indicates if the Isis Graphical User Interface is operating.
        *
@@ -142,78 +182,66 @@ namespace Isis {
       };
 
       /**
-       * @return the Gui
-       */
-      Gui *TheGui() {
-        return p_gui;
-      };
-
-
-      /**
-       * Returns the size of the batchlist.  If there is no batchlist, it will
-       * return 0
-       *
-       * @return int The size of the batchlist
-       */
-      int BatchListSize() {
-        return p_batchList.size();
-      };
-
-      /**
        * Returns the parent id
        *
        * @return int The parent id
        */
       int ParentId() {
         return p_parentId;
-      };
-
+      };  
+      
       /**
-       * Returns true if the program should abort on error, and false if it
-       * should continue
-       *
-       * @return bool True for abort, False for continue
+       * @return the Gui
        */
-      bool AbortOnError() {
-        return p_abortOnError;
+      Gui *TheGui() {
+        return p_gui;
       };
 
-      void SaveHistory();
+      QString GetInfoFileName();
+      bool GetInfoFlag();
+      
       void SetBatchList(int i);
       void SetErrorList(int i);
-
-      bool GetInfoFlag();
-      QString GetInfoFileName();
+      
+      void SaveHistory();
 
     private:
-      std::vector<char *> p_cmdline; /**< This variable will contain argv.*/
-      int p_parentId;               /**< This is a status to indicate if the GUI
-                                        is running or not.*/
+      void loadBatchList(const QString file);
+      void loadCommandLine(int argc, char *argv[]);
+      void loadHistory(const QString file);
+      
+      void evaluateOption(const QString name, const QString value);
+      void getNextParameter(unsigned int &curPos, 
+                            QString &unresolvedParam, 
+                            std::vector<QString> &value);
+      void preProcess(QString fullReservedName, std::vector<QString> &reservedParams);
+      std::vector<QString> readArray(QString arrayString);
+      QString resolveParameter(QString &name, 
+                               std::vector<QString> &reservedParams,
+                               bool handleNoMatches = true);
 
-      void LoadCommandLine(int argc, char *argv[]);
-      void LoadBatchList(const QString file);
-      void LoadHistory(const QString file);
-      void EvaluateOption(const QString name, const QString value);
-      void GetNextParameter(unsigned int &curPos,
-                            QString &name, std::vector<QString> &value);
-      std::vector<QString> ReadArray(QString arrayString);
-
-      //! Boolean value representing whether to abort or continue on error
+      //! Boolean value representing whether to abort or continue on error.
       bool p_abortOnError;
-      QString p_saveFile;        //!< FileName to save last history to
-      QString p_progName;        //!< Name of program to run
-
-      //!FileName to write batchlist line that caused error on
-      QString p_errList;
-
-      //!Vector of batchlist data
+      //! Vector of batchlist data.
       std::vector<std::vector<QString> > p_batchList;
-
-      bool p_interactive;  /**< Boolean value representing whether the
-                                program is interactive or not.*/
-      bool p_info;  //!< Boolean value representing if its in debug mode.
-      QString p_infoFileName;  //!< FileName to save debugging info
-      Gui *p_gui;                  //!< Pointer to the gui object
+      //! This variable will contain argv.
+      std::vector<char *> p_cmdline; 
+      //! FileName to write batchlist line that caused error on.
+      QString p_errList;
+      //! Pointer to the gui object.
+      Gui *p_gui;                  
+      //! Boolean value representing if it's in debug mode.
+      bool p_info;  
+      //! FileName to save debugging info.
+      QString p_infoFileName;  
+      //! Boolean value representing whether the program is interactive or not.
+      bool p_interactive;  
+      //! This is a status to indicate if the GUI is running or not.                         
+      int p_parentId;               
+      //! Name of program to run.                                  
+      QString p_progName;        
+      //! FileName to save last history to.
+      QString p_saveFile;          
   };
 };
 

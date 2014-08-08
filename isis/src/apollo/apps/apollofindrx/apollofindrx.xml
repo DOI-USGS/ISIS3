@@ -30,6 +30,9 @@
     <change name="Kristin Berry" date="2014-05-23">
       Updated to fix string conversion error. References #2043
     </change>
+    <change name="Ian Humphrey" date="2014-06-25">
+      Added history recording. Fixes #2096.
+    </change>
   </history>
 
   <groups>

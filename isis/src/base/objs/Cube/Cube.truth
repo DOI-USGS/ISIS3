@@ -102,6 +102,8 @@ Total Pixels:   60000
 Null Pixels:    0
 
 **PROGRAMMER ERROR** Invalid band in [CubeInfo::Histogram].
+**PROGRAMMER ERROR** Cannot create histogram object for an unopened cube.
+
 Testing statistics method, band 1 ... 
 Gathering statistics
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
@@ -119,6 +121,7 @@ Total Pixels:   60000
 Null Pixels:    0
 
 **PROGRAMMER ERROR** Invalid band in [CubeInfo::Statistics].
+**PROGRAMMER ERROR** Cannot create statistics object for an unopened cube.
 
 Virtual band tests
 Nbands = 2

@@ -184,7 +184,7 @@ namespace Isis {
 
 
   void iTime::operator +=(const double &secondsToAdd) {
-    if(!IsSpecial(secondsToAdd) && !IsSpecial(p_et) && (p_et != 0.0))
+    if(!IsSpecial(secondsToAdd) && !IsSpecial(p_et))
       p_et += secondsToAdd;
   }
 
@@ -193,6 +193,36 @@ namespace Isis {
     time += secondsToAdd;
     return time;
   }
+
+
+
+
+  iTime iTime::operator -(const double &secondsToSubtract) const {
+    iTime tmp(*this);
+    tmp -= secondsToSubtract;
+    return tmp;
+  }
+
+
+  double iTime::operator -(const iTime &iTimeToSubtract) const {
+    return p_et - iTimeToSubtract.p_et;
+  }
+
+
+  void iTime::operator -=(const double &secondsToSubtract) {
+    if (!IsSpecial(secondsToSubtract) && !IsSpecial(p_et))
+      p_et -= secondsToSubtract;
+  }
+
+
+  iTime operator -(const double &secondsToSubtract, iTime time) {
+    time -= secondsToSubtract;
+    return time;
+  }
+
+
+
+
 
 
   /**
