@@ -163,12 +163,10 @@ namespace Isis {
       workOrders.append(m_directory->supportedActions(selectedControls));
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////
     if (corrMatItem) {
-//       CorrelationMatrix *corrMatPtr = new CorrelationMatrix(corrMatItem->correlationMatrix());
-      workOrders.append( m_directory->supportedActions(m_directory->project()->correlationMatrix()));//corrMatPtr) );
+      workOrders.append( m_directory->supportedActions( corrMatItem->correlationMatrix() ) );
     }
-    //////////////////////////////////////////////////////////////////////////////////////////////
+    
     foreach(QAction *action, workOrders) {
       if (action != NULL) {
         contextMenu.addAction(action);
@@ -372,19 +370,19 @@ namespace Isis {
     }
 
     if (!existsAlready) {
-      ImageGroupTreeWidgetItem *item =
-          new ImageGroupTreeWidgetItem(imageList);
-
+      ImageGroupTreeWidgetItem *item = new ImageGroupTreeWidgetItem(imageList);
       m_imagesParentItem->addChild(item);
     }
   }
 
+  
 
   // TODO - kle - this is hacked, needs to be cleaned up
+  // This isn't working anymore...
   void ProjectTreeWidget::addBundleResults(BundleResults *bundleResults) {
 
-    QString group = bundleResults->id();
-    QList<QTreeWidgetItem *> found = findItems(group, Qt::MatchRecursive, 0);
+//     QString group = bundleResults->id();
+//     QList<QTreeWidgetItem *> found = findItems(group, Qt::MatchRecursive, 0);
 
     QTreeWidgetItem *item = new BundleResultsTreeWidgetItem(bundleResults);
     m_resultsParentItem->addChild(item);
@@ -398,25 +396,34 @@ namespace Isis {
 
     BundleSettings *bundleSettings = bundleResults->bundleSettings();
     BundleStatistics *bundleStatistics = bundleResults->bundleStatistics();
-//     CorrelationMatrix corrMat = *m_directory->project()->correlationMatrix();//bundleStatistics->correlationMatrix();
+      QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem( bundleStatistics->correlationMatrix() );
 
     QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(bundleSettings);
     QTreeWidgetItem *statisticsItem = new BundleStatisticsTreeWidgetItem(bundleStatistics);
-    QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem(m_directory->project()->correlationMatrix());
+      statisticsItem->addChild(corrMatItem);
 
-    statisticsItem->addChild(corrMatItem);
+    /*
+     * At this point the covariance (actually the inverse) matrix may exist but the correlation
+     * matrix shouldn't have been created yet. The correlation matrix will be created when
+     * "View Correlation Matrix" is selected in the context menu of the following tree item.
+     */
+    if ( bundleStatistics->correlationMatrix().hasCovMat() ) {
+      qDebug() << "CovMatFileName:" << bundleStatistics->correlationMatrix().covarianceFileName().name();
+      qDebug() << "imgs and parmas:" << bundleStatistics->correlationMatrix().imagesAndParameters()->size();
+    }
 
     item->addChild(settingsItem);
     item->addChild(statisticsItem);
 
     QTreeWidgetItem *imagesParentItem = new QTreeWidgetItem(item);
-    imagesParentItem->setText(0, tr("Images"));
+    imagesParentItem->setText( 0, tr("Images") );
     imagesParentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     imagesParentItem->setExpanded(true);
-    imagesParentItem->setIcon(0, QIcon(":pictures"));
+    imagesParentItem->setIcon( 0, QIcon(":pictures") );
 
     expandItem(item);
-
+//     m_resultsParentItem->addChild(item);
+qDebug() << "Done adding bundleResults";
     //  Create new TreeWidgetItem
 //    if (!found.isEmpty()) {
 //      QTreeWidgetItem *item = new BundleResultsTreeWidgetItem(bundleResults);

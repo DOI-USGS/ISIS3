@@ -63,8 +63,8 @@ namespace Isis {
 
       bool contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-      void drawGrid(CorrelationMatrix *matrix);
-      void drawElements(CorrelationMatrix *matrix);
+      void drawGrid(CorrelationMatrix corrMatrix);
+      void drawElements(CorrelationMatrix corrMatrix);
 
       QProgressBar *getProgress();
       PvlObject toPvl() const;
@@ -79,6 +79,7 @@ namespace Isis {
 //       void refit();
 
 //       void repaintItems(bool colorScheme);
+      void setUpOptions(CorrelationMatrix corrMat);
 
       /**
        * Return an empty list of actions for unknown data types

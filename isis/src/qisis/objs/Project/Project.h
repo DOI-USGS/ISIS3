@@ -101,7 +101,7 @@ namespace Isis {
       Directory *directory() const;
       Image *image(QString id);
       ImageList *imageList(QString name);
-      CorrelationMatrix *correlationMatrix();
+//       CorrelationMatrix *correlationMatrix();
       bool isTemporaryProject() const;
       WorkOrder *lastNotUndoneWorkOrder();
       const WorkOrder *lastNotUndoneWorkOrder() const;
@@ -230,7 +230,7 @@ namespace Isis {
        *                 BundleStatistics
        *                       CorrelationMatrix
        */
-      CorrelationMatrix *m_correlationMatrix;
+//       CorrelationMatrix *m_correlationMatrix;
 
       QMap<QString, Control *> *m_idToControlMap;
       QMap<QString, Image *> *m_idToImageMap;

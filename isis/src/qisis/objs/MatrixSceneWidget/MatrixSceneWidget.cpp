@@ -63,13 +63,24 @@ namespace Isis {
     m_graphicsView->setScene(m_graphicsScene);
     m_graphicsView->setInteractive(true);
 
-    m_matrixOptions = new MatrixOptions(m_directory->project()->correlationMatrix(), this);
-    connect(m_matrixOptions, SIGNAL( optionsUpdated() ),
-            this, SLOT( redrawElements() ) );
+//     try {
+//     m_matrixOptions = new MatrixOptions(
+//         m_directory->project()->lastNotUndoneWorkOrder()->correlationMatrix(), this);
+//     connect(m_matrixOptions, SIGNAL( optionsUpdated() ),
+//             this, SLOT( redrawElements() ) );
+//     }
+//     catch (IException &e) {
+//       throw IException(e, IException::Unknown, "bad workorder", _FILEINFO_);
+//     }
 
     // Draw Initial Matrix
-    drawElements( m_directory->project()->correlationMatrix() );
-    drawGrid( m_directory->project()->correlationMatrix() );
+//     try {
+//     drawElements( m_directory->project()->lastNotUndoneWorkOrder()->correlationMatrix() );
+//     drawGrid( m_directory->project()->lastNotUndoneWorkOrder()->correlationMatrix() );
+//     }
+//     catch (IException &e) {
+//       throw IException(e, IException::Unknown, "bad workorder", _FILEINFO_);
+//     }
     
     m_graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
 
@@ -384,7 +395,7 @@ namespace Isis {
    *
    * @param corrMatrix The matrix that belongs to the project.
    */
-  void MatrixSceneWidget::drawElements(CorrelationMatrix *corrMatrix) {
+  void MatrixSceneWidget::drawElements(CorrelationMatrix corrMatrix) {
     int elementSize = 10;
     int startX = 20;
     int x = 20;
@@ -401,11 +412,11 @@ namespace Isis {
     outlinePen.setWidth(0);
 
     // Image and parameters of column
-    QMapIterator<QString, QStringList> colIterator( *corrMatrix->imagesAndParameters() );
+    QMapIterator<QString, QStringList> colIterator( *corrMatrix.imagesAndParameters() );
     // Image and parameters of row
-    QMapIterator<QString, QStringList> rowIterator( *corrMatrix->imagesAndParameters() );
+    QMapIterator<QString, QStringList> rowIterator( *corrMatrix.imagesAndParameters() );
     
-    foreach ( SparseBlockColumnMatrix blockColumn, *( corrMatrix->visibleBlocks() ) ) {
+    foreach ( SparseBlockColumnMatrix blockColumn, *( corrMatrix.visibleBlocks() ) ) {
       QMapIterator<int, matrix<double>*> block(blockColumn);
       bool lastBlock = true;
       block.toBack(); // moves iterator to AFTER the last item
@@ -448,7 +459,8 @@ namespace Isis {
               else {
                 outlinePen.setColor(Qt::black);
                 if ( m_matrixOptions->colorScheme() ) {
-                  if ( ( *block.value() )(row, column) >= m_matrixOptions->colorTolerance() ) {
+                  if ( fabs( ( *block.value() )(row, column) ) >=
+                       m_matrixOptions->colorTolerance() ) {
                     fillBrush.setColor( m_matrixOptions->badCorrelationColor() );
                   }
                   else {
@@ -463,7 +475,8 @@ namespace Isis {
             else {
               outlinePen.setColor(Qt::black);
                 if ( m_matrixOptions->colorScheme() ) {
-                  if ( ( *block.value() )(row, column) >= m_matrixOptions->colorTolerance() ) {
+                  if ( fabs( ( *block.value() )(row, column) ) >=
+                       m_matrixOptions->colorTolerance() ) {
                     fillBrush.setColor( m_matrixOptions->badCorrelationColor() );
                   }
                   else {
@@ -517,7 +530,7 @@ namespace Isis {
    *
    * @param matrix 
    */
-  void MatrixSceneWidget::drawGrid(CorrelationMatrix *corrMatrix) {
+  void MatrixSceneWidget::drawGrid(CorrelationMatrix corrMatrix) {
     int startVX = 20;
     int startVY = 20;
     int startHX = 20;
@@ -528,7 +541,7 @@ namespace Isis {
     QList<int> segments;
     int segmentLength = 0;
 
-    QMapIterator<QString, QStringList> it( *corrMatrix->imagesAndParameters() );
+    QMapIterator<QString, QStringList> it( *corrMatrix.imagesAndParameters() );
     // get list of segment lengths1
     while ( it.hasNext() ) {
       it.next();
@@ -589,7 +602,7 @@ namespace Isis {
    * @param
    */
   void MatrixSceneWidget::redrawElements() {
-    drawElements( m_directory->project()->correlationMatrix() );
+    drawElements( *m_matrixOptions->parentMatrix() );
   }
 
 
@@ -615,4 +628,11 @@ namespace Isis {
 //       }
 //     }
 //   }
+
+
+  void MatrixSceneWidget::setUpOptions(CorrelationMatrix corrMat) {
+    m_matrixOptions = new MatrixOptions(corrMat, this);
+    connect(m_matrixOptions, SIGNAL( optionsUpdated() ),
+            this, SLOT( redrawElements() ) );
+  }
 }

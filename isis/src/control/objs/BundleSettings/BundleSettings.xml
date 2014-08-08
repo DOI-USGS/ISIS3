@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bundleSettings>
     <globalSettings>
-        <id>{5de1e0bc-fa14-4d5f-aada-1cc44d4a3ea0}</id>
+        <id>{2c061cb7-4d6c-4cc4-a2de-fd1c1fb0b6c5}</id>
         <validateNetwork>Yes</validateNetwork>
         <solveOptions solveMethod="Sparse" solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes"/>
         <aprioriSigmas latitude="-1.0" longitude="-1.0" radius="N/A"/>
@@ -17,7 +17,7 @@
     </globalSettings>
     <observationSolveSettingsList>
         <bundleObservationSolveSettings>
-            <id>{69568a42-fa20-4c4d-a2ba-e91a21199de8}</id>
+            <id>{d032748a-7f65-475b-b11b-099eed78f2fb}</id>
             <instrumentId>Instrument1</instrumentId>
             <instrumentPointingOptions solveOption="None" solveTwist="Yes" degree="11" solveDegree="-1" numberCoefSolved="0" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas angles="N/A" angularVelocity="N/A" angularAcceleration="N/A"/>
@@ -27,7 +27,7 @@
             </instrumentPositionOptions>
         </bundleObservationSolveSettings>
         <bundleObservationSolveSettings>
-            <id>{69568a42-fa20-4c4d-a2ba-e91a21199de8}</id>
+            <id>{d032748a-7f65-475b-b11b-099eed78f2fb}</id>
             <instrumentId>Instrument2</instrumentId>
             <instrumentPointingOptions solveOption="AllPolynomialCoefficients" solveTwist="Yes" degree="21" solveDegree="1" numberCoefSolved="2" solveOverExisting="Yes" interpolationType="4">
                 <aprioriPointingSigmas angles="22.0" angularVelocity="23.0" angularAcceleration="N/A"/>

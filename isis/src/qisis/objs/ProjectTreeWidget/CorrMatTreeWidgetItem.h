@@ -19,10 +19,10 @@ namespace Isis {
   class CorrMatTreeWidgetItem : public QObject, public QTreeWidgetItem {
     Q_OBJECT
     public:
-      CorrMatTreeWidgetItem(CorrelationMatrix *correlationMatrix, QTreeWidget *parent = 0);
+      CorrMatTreeWidgetItem(CorrelationMatrix correlationMatrix, QTreeWidget *parent = 0);
       virtual ~CorrMatTreeWidgetItem();
 
-      CorrelationMatrix correlationMatrix();
+      CorrelationMatrix *correlationMatrix();
       void selectionChanged();
 
     private:

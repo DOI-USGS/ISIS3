@@ -43,6 +43,7 @@ namespace Isis {
 
   MatrixViewWorkOrder::MatrixViewWorkOrder(const MatrixViewWorkOrder &other) :
       WorkOrder(other) {
+        qDebug() << "matrix good?";
   }
 
 
@@ -51,9 +52,7 @@ namespace Isis {
 
 
   MatrixViewWorkOrder *MatrixViewWorkOrder::clone() const {
-
     return new MatrixViewWorkOrder(*this);
-
   }
 
 
@@ -93,8 +92,8 @@ namespace Isis {
       viewOptions.append( tr("New Matrix View") );
 
       if (viewOptions.count() > 1) {
-        QString selected = QInputDialog::getItem(NULL, tr("View to see matrixs in"),
-            tr("Which view would you like your\nimage's matrixs to be put into?"),
+        QString selected = QInputDialog::getItem(NULL, tr("View to see matrix in"),
+            tr("Which view would you like your\nmatrix to be put into?"),
             viewOptions, viewOptions.count() - 1, false, &success);
 
         viewToUse = viewOptions.indexOf(selected);
@@ -113,8 +112,12 @@ namespace Isis {
       else if (viewToUse != -1) {
         MatrixSceneWidget *matrixView = existingViews[viewToUse];
 
-        matrixView->drawGrid( project()->correlationMatrix() );
-        matrixView->drawElements( project()->correlationMatrix() );
+        // Do we need this? If the view alread exists has this already been done?
+        CorrelationMatrix corrMat = correlationMatrix();
+        corrMat.computeCorrelationMatrix();
+        matrixView->setUpOptions(corrMat);
+        matrixView->drawElements(corrMat);
+        matrixView->drawGrid(corrMat);
       }
 
       QStringList internalData;
@@ -137,6 +140,15 @@ namespace Isis {
 
   void MatrixViewWorkOrder::syncRedo() {
     MatrixSceneWidget *matrixViewToUse = project()->directory()->addMatrixView();
+    CorrelationMatrix corrMat = correlationMatrix();
+    /*
+     * Since computing the correlation matrix is potentially time consuming we only want to
+     * do it if the user wants to see it.
+     */
+    corrMat.computeCorrelationMatrix();
+    matrixViewToUse->setUpOptions(corrMat);
+    matrixViewToUse->drawElements(corrMat);
+    matrixViewToUse->drawGrid(corrMat);
     if (matrixViewToUse == NULL) {
       QString msg = "The Correlation Matrix for this bundle could not be displayed";
       throw IException(IException::Programmer, msg, _FILEINFO_);

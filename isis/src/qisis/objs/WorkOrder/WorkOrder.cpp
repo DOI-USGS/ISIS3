@@ -31,15 +31,13 @@
 #include <QTimer>
 #include <QXmlStreamWriter>
 
+#include "CorrelationMatrix.h"
 #include "IException.h"
 #include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
 #include "XmlStackedHandlerReader.h"
 
-//////////////////////////////////////////////////////////////////////////////////
-#include "CorrelationMatrix.h"
-//////////////////////////////////////////////////////////////////////////////////
 
 namespace Isis {
   /**
@@ -112,6 +110,7 @@ namespace Isis {
     m_context = other.m_context;
     m_imageIds = other.m_imageIds;
     m_images = new ImageList(*other.m_images);
+    m_correlationMatrix = other.m_correlationMatrix;
     m_controls = other.m_controls;
     m_internalData = other.m_internalData;
 
@@ -183,16 +182,14 @@ namespace Isis {
     return false;
   }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
   /**
    * 
    *
-   * @param images An image list that this work order should execute on
+   * @param 
    */
   bool WorkOrder::isExecutable(CorrelationMatrix *correlationMatrix) {
     return false;
   }
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /* Re-implement this method if your work order utilizes images for data in order to operate. For
   *   example, "Footprint2DViewWorkOrder" works sometimes on images - the logic in side of
@@ -299,9 +296,8 @@ namespace Isis {
     m_controls = controls;
   }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
   void WorkOrder::setData(CorrelationMatrix *correlationMatrix) {
-//     qDebug() << "setData cormat";
+    m_correlationMatrix = correlationMatrix;
   }
 
   void WorkOrder::setNext(WorkOrder *nextWorkOrder) {
@@ -338,6 +334,11 @@ namespace Isis {
     }
 
     return m_images;
+  }
+
+
+  CorrelationMatrix WorkOrder::correlationMatrix() {
+    return *m_correlationMatrix;
   }
 
 

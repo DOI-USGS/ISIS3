@@ -190,6 +190,7 @@ namespace Isis {
 
       PvlObject pvlObject(QString name = "BundleStatistics") const;
 
+      // Correlation Matrix accessors for cnetsuite and mutators for bundle adjust.
       CorrelationMatrix correlationMatrix();
       void setCorrMatCovFileName(FileName name);
       void setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams);

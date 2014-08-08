@@ -19,7 +19,9 @@
 
 namespace Isis {
 
-  BundleResults::BundleResults(BundleSettings inputSettings, FileName controlNetworkFileName, QObject *parent) : QObject(parent) {
+  BundleResults::BundleResults(BundleSettings inputSettings,
+                               FileName controlNetworkFileName,
+                               QObject *parent) : QObject(parent) {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
 
@@ -32,8 +34,10 @@ namespace Isis {
     m_settings = new BundleSettings(inputSettings);
 
     m_statisticsResults = NULL;
+    m_statisticsResults = new BundleStatistics;
 
     m_images = NULL;
+    m_images = new QList<ImageList *>;
   }
 
 

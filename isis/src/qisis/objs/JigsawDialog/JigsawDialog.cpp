@@ -87,7 +87,6 @@ namespace Isis {
       for (int j = 0; j < list->size(); j++) {
         Image* image = list->at(j);
         snlist.Add(image->fileName());
-        qDebug() << image->fileName();
       }
     }
 
@@ -96,54 +95,15 @@ namespace Isis {
 
     connect( &bundleAdjustment, SIGNAL( statusUpdate(QString) ),
              this, SLOT( outputBundleStatus(QString) ) );
-    connect( &bundleAdjustment, SIGNAL( bundleConvergence(bool) ),
-             this, SLOT( updateConvergenceStatus(bool) ) );
     
-    bundleAdjustment.solveCholesky();
-
-//     if (m_ui->convergenceStatusLabel->text() != "Bundle converged, camera pointing updated") {
-//       bundleConvergence(false);
-//     }
+    BundleResults br = bundleAdjustment.solveCholeskyBR();
     
-//#if 0
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    m_ui->useLastSettings->setEnabled(true);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//#endif
-  }
-
-
-  
-  /**
-   * Update the label or text edit area with the most recent status update by appending to
-   * list and refreshing.
-   *
-   * @param status Current status of bundle.
-   */
-  void JigsawDialog::outputBundleStatus(QString status) {
-    QString update = "\n" + status;
-    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(update) );
-  }
-
-
-
-  /**
-   * This slot will be called if the bundle converges.
-   *
-   * maybe give the dialog a convergence status label that will say
-   *   "Bundle has not converged. Camera pointing not updated."
-   * until the bundle is done.
-   */
-  void JigsawDialog::updateConvergenceStatus(bool converged) {
-    if (converged) {
-      // create BundleResults object
-      // BundleResults results = bundleAdjustment.solveCholesky();
-      // should be returned by BundleAdjustment?
-      QString fname = m_selectedControl->fileName();
-      BundleResults *dummyBundleResults = new BundleResults(*m_bundleSettings, fname);
-      dummyBundleResults->setRunTime(Isis::iTime::CurrentLocalTime().toAscii().data());
-      m_project->addBundleResults(dummyBundleResults);
-
+    if ( br.bundleStatistics()->converged() ) {
+      br.setRunTime( Isis::iTime::CurrentLocalTime().toAscii().data() );
+      m_project->addBundleResults(new BundleResults(br));
+      
+      //TODO: move correlation matrix to correct position in project directory
+/*
       // create output control net
   //     bundleAdjustment.controlNet()->Write("ONET.net");
   //
@@ -176,13 +136,35 @@ namespace Isis {
   //         c->write(spvector);
   //         p.WriteHistory(*c);
   //       }
-
+*/
   //       m_ui->convergenceStatusLabel->setText("Bundle converged, camera pointing updated");
     }
     else {
+      //TODO: delete correlation matrix cov file...
+      //TODO: delete bundle results object
+
 //       m_ui->convergenceStatusLabel->setText("Bundle did not converge, camera pointing NOT updated");
     }
 
+
+//#if 0
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    m_ui->useLastSettings->setEnabled(true);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//#endif
+  }
+
+
+
+  /**
+   * Update the label or text edit area with the most recent status update by appending to
+   * list and refreshing.
+   *
+   * @param status Current status of bundle.
+   */
+  void JigsawDialog::outputBundleStatus(QString status) {
+    QString update = "\n" + status;
+    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(update) );
   }
 }
 

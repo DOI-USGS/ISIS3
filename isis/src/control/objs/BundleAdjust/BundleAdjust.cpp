@@ -662,7 +662,6 @@ namespace Isis {
             m_bLastIteration = true;
             m_bundleStatistics.setConverged(true);
             emit statusUpdate("\n Bundle has converged");
-            emit bundleConvergence(true);
             break;
           }
         }
@@ -682,7 +681,6 @@ namespace Isis {
           m_bundleStatistics.setConverged(true);
           m_bLastIteration = true;
           emit statusUpdate("Bundle has converged");
-          emit bundleConvergence(true);
           break;
         }
       }
@@ -3309,7 +3307,6 @@ namespace Isis {
 
     SparseBlockColumnMatrix sbcMatrix;
 
-      //////////////////////////////////////////////////////////////////// This is where I add stuff
     // Create unique file name
     FileName matrixFile;
     matrixFile = FileName::createTempFile("inverseMatrix.dat");
@@ -3318,7 +3315,6 @@ namespace Isis {
     // Open file to write to
     matrixOutput.open(QIODevice::WriteOnly);
     QDataStream outStream(&matrixOutput);
-      //////////////////////////////////////////////////////////////////// This is where I add stuff
 
     int i, j, k;
     int nCurrentColumn = 0;
@@ -3396,9 +3392,8 @@ namespace Isis {
         adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleStatistics.sigma0();
       }
 
-      //////////////////////////////////////////////////////////////////// This is where I add stuff
+      // Output inverse matrix to the open file.
       outStream << sbcMatrix;
-      //////////////////////////////////////////////////////////////////// This is where I add stuff
 
       // now loop over all object points to sum contributions into 3x3 point covariance matrix
       int nPointIndex = 0;
@@ -3462,12 +3457,10 @@ namespace Isis {
         nPointIndex++;
       }
     }
-    ////////////////////////////////////////////////////////////////////// This is where I add stuff
-    // After the for loop, close the file.
+    // Close the file.
     matrixOutput.close();
     // Save the location of the "covariance" matrix
     m_bundleStatistics.setCorrMatCovFileName(matrixFile);
-    ////////////////////////////////////////////////////////////////////// This is where I add stuff
 
     // can free sparse normals now
     m_SparseNormals.wipe();
@@ -4134,6 +4127,8 @@ namespace Isis {
     sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
     fp_out << buf;
 
+    QMap<QString, QStringList> imagesAndParameters;
+    
     for (int i = 0; i < nObservations; i++) {
 
       //if ( m_bundleStatistics.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
@@ -4159,7 +4154,15 @@ namespace Isis {
       QString observationString =
           observation->formatBundleOutputString(berrorProp);
       fp_out << (const char*)observationString.toAscii().data();
+
+      // Build list of images and parameters for correlation matrix.
+      foreach ( QString image, observation->imageNames() ) {
+        imagesAndParameters.insert( image, observation->parameterList() );
+      }
     }
+        
+    // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
+    m_bundleStatistics.setCorrMatImgsAndParams(imagesAndParameters);
 
     // output point uncertainty statistics if error propagation is on
     if (berrorProp) {

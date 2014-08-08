@@ -42,9 +42,7 @@ namespace Isis {
   class Control;
   class Directory;
   class ImageList;
-  ///////////////////////////////////////////////////////////////////
   class CorrelationMatrix;
-  ///////////////////////////////////////////////////////////////////
   class ProgressBar;
   class Project;
   class XmlStackedHandlerReader;
@@ -190,6 +188,8 @@ namespace Isis {
       ImageList *imageList();
       const ImageList *imageList() const;
 
+      CorrelationMatrix correlationMatrix();
+      
       QList<Control *> controlList();
 
       virtual bool dependsOn(WorkOrder *other) const;
@@ -285,6 +285,7 @@ namespace Isis {
       Context m_context;
       QStringList m_imageIds;
       QPointer<ImageList> m_images;
+      CorrelationMatrix *m_correlationMatrix;
       QList<Control *> m_controls;
       QStringList m_internalData;
       QPointer<WorkOrder> m_nextWorkOrder;

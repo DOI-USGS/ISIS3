@@ -3,9 +3,6 @@
 
 #include <QDialog>
 
-// #include "JigsawSetupDialog.h"
-// #include "ui_JigsawDialog.h"
-
 namespace Ui {
   class JigsawDialog;
 }
@@ -26,7 +23,6 @@ namespace Isis {
 
   public slots:
     void outputBundleStatus(QString status);
-    void updateConvergenceStatus(bool converged);
     
   protected:
     Project *m_project;

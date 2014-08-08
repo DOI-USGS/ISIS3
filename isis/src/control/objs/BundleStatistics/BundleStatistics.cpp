@@ -115,10 +115,12 @@ namespace Isis {
     // m_wFunc, m_cumPro, m_maxLikelihoodIndex, m_maxLikelihoodQuan,
     // m_maxLikelihoodMedianR2Residuals
     m_cumPro = NULL;
+    m_cumPro = new StatCumProbDistDynCalc;
     m_numberMaximumLikelihoodModels = 0;
     m_maximumLikelihoodIndex = 0;
     m_maximumLikelihoodMedianR2Residuals = 0.0;
     m_wFunc[0] = m_wFunc[1] = m_wFunc[2] = NULL;
+    m_wFunc[0] = m_wFunc[1] = m_wFunc[2] = new MaximumLikelihoodWFunctions;
     m_maximumLikelihoodQuan[0] = m_maximumLikelihoodQuan[1] = m_maximumLikelihoodQuan[2] = 0.5; // better init value ???
 
 
@@ -1102,7 +1104,7 @@ namespace Isis {
 
 
   /**
-   * Set the images and their associated parameters.
+   * Set the images and their associated parameters of the correlation matrix.
    *
    * @param imgsAndParams The qmap with all the images and parameters used for this bundle.
    */

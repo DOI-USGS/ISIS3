@@ -35,7 +35,7 @@ namespace Isis {
         Tolerance
       };
 //       MatrixOptions(); // give parent? MatrixSceneWidget
-      MatrixOptions(CorrelationMatrix *parent, MatrixSceneWidget *scene); // give parent? MatrixSceneWidget
+      MatrixOptions(CorrelationMatrix parent, MatrixSceneWidget *scene); // give parent? MatrixSceneWidget
       ~MatrixOptions();
 
       // Color Options
@@ -79,6 +79,7 @@ namespace Isis {
 
       QMap< QString, QStringList> matrixImgsAndParams();
 
+      CorrelationMatrix *parentMatrix();
       signals:
         void optionsUpdated();
 /*

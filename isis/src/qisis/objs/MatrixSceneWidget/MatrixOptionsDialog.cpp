@@ -398,10 +398,10 @@ namespace Isis {
   void MatrixOptionsDialog::applyOptions() {
     // Color Options
     QPalette colorPalette( m_goodCorrelationColorButton->palette() );
-    m_options->setBadCorrelationColor( colorPalette.color(QPalette::Button) );
+    m_options->setGoodCorrelationColor( colorPalette.color(QPalette::Button) );
     
     colorPalette = m_badCorrelationColorButton->palette();
-    m_options->setGoodCorrelationColor( colorPalette.color(QPalette::Button) );
+    m_options->setBadCorrelationColor( colorPalette.color(QPalette::Button) );
 
     m_options->setColorScheme( m_colorToleranceRadioButton->isChecked() );
 

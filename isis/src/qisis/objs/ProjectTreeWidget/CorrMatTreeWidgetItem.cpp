@@ -14,28 +14,26 @@ namespace Isis {
    *
    * @param parent
    */
-  CorrMatTreeWidgetItem::CorrMatTreeWidgetItem(CorrelationMatrix *correlationMatrix,
+  CorrMatTreeWidgetItem::CorrMatTreeWidgetItem(CorrelationMatrix correlationMatrix,
                                                QTreeWidget *parent) :
       QTreeWidgetItem(parent, UserType) {
 
-    m_correlationMatrix = correlationMatrix;
+    m_correlationMatrix = new CorrelationMatrix(correlationMatrix);
 
     setText( 0, "Correlation Matrix");
     setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     setIcon( 0, QIcon(":pointReg") );
-
-//     connect( m_correlationMatrix, SIGNAL( destroyed(QObject *) ),
-//              this, SLOT( deleteLater() ) );
   }
 
 
   CorrMatTreeWidgetItem::~CorrMatTreeWidgetItem() {
+    delete m_correlationMatrix;
     m_correlationMatrix = NULL;
   }
 
 
-  CorrelationMatrix CorrMatTreeWidgetItem::correlationMatrix() {
-    return *m_correlationMatrix;
+  CorrelationMatrix *CorrMatTreeWidgetItem::correlationMatrix() {
+    return m_correlationMatrix;
   }
 
 

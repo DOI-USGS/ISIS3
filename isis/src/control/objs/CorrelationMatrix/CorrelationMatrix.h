@@ -68,6 +68,8 @@ namespace Isis {
       void retrieveVisibleElements(int x, int y);
 
       bool isValid();
+      bool hasCovMat();
+//       const bool hasCovMat() const;
 
       void setCorrelationFileName(FileName correlationFileName);
       void setCovarianceFileName(FileName covarianceFileName);

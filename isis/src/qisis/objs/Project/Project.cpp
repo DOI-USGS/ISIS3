@@ -80,12 +80,12 @@ namespace Isis {
     m_numImagesCurrentlyReading = 0;
 
     /////////////////////////////////////////////////////////////////////// Correlation Matrix
-    m_correlationMatrix = NULL;
-    m_correlationMatrix = new CorrelationMatrix();
-    m_correlationMatrix->setCovarianceFileName( FileName("/work/users/koyama/testData/covarianceMatrix2.dat") );
-    m_correlationMatrix->setCorrelationFileName( FileName("/work/users/koyama/testData/correlationMatrix.dat") );
-
-    m_correlationMatrix->computeCorrelationMatrix();
+//     m_correlationMatrix = NULL;
+//     m_correlationMatrix = new CorrelationMatrix();
+//     m_correlationMatrix->setCovarianceFileName( FileName("/work/users/koyama/testData/covarianceMatrix2.dat") );
+//     m_correlationMatrix->setCorrelationFileName( FileName("/work/users/koyama/testData/correlationMatrix.dat") );
+// 
+//     m_correlationMatrix->computeCorrelationMatrix();
 //     qDebug() << "In project, got correlationMatrix";
     /////////////////////////////////////////////////////////////////////// Correlation Matrix
 
@@ -770,20 +770,6 @@ namespace Isis {
     return result;
   }
 
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////
-  /**
-   * Accessor for the correlation matrix.
-   *
-   * @return CorrelationMatrix The current matrix.
-   */
-  CorrelationMatrix *Project::correlationMatrix() {
-    // qDebug() << "got matrix from project";
-    return m_correlationMatrix;
-  }
-  /////////////////////////////////////////////////////////////////////////////////////////////////
-
-  
 
   bool Project::isTemporaryProject() const {
     return m_isTemporaryProject;

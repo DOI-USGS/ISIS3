@@ -18,36 +18,11 @@ namespace Isis {
    * Default Constructor
    */
   CorrelationMatrix::CorrelationMatrix() {
-    m_covarianceFileName = NULL; // new FileName("/work/users/koyama/testData/covarianceMatrix2.dat");
-    m_correlationFileName = NULL; // new FileName("/work/users/koyama/testData/correlationMatrix.dat");
-//     m_visibleElements = new QList<MatrixElement*>;
-    m_visibleBlocks = NULL;
-
-    m_imagesAndParameters = NULL;
-    QStringList param;
-    param << "X" << "Y" << "Z" << "RA" << "DEC" << "TWI";
-    m_imagesAndParameters = new QMap<QString, QStringList>;
-    QString img = "Sub4-AS15-M-0583_msk.cub";
-    m_imagesAndParameters->insert(img, param);
-    img = "Sub4-AS15-M-0584_msk.cub";
-    m_imagesAndParameters->insert(img, param);
-    img = "Sub4-AS15-M-0585_msk.cub";
-    m_imagesAndParameters->insert(img, param);
-    img = "Sub4-AS15-M-0586_msk.cub";
-    m_imagesAndParameters->insert(img, param);
-    img = "Sub4-AS15-M-0587_msk.cub";
-    m_imagesAndParameters->insert(img, param);
-    img = "Sub4-AS15-M-1423.cub";
-    m_imagesAndParameters->insert(img, param);
-    img = "Sub4-AS15-M-1537.cub";
-    m_imagesAndParameters->insert(img, param);
-
-    m_diagonals = NULL;
-    m_diagonals = new QList<double>;
-
-/*    if (m_correlationFileName == NULL) {
-      computeCorrelationMatrix(); // Just for the first time.. Once it's created we don't need to do this.
-    }*/    
+    m_covarianceFileName = new FileName(""); 
+    m_correlationFileName = new FileName(""); 
+    m_visibleBlocks = new QList<SparseBlockColumnMatrix>();
+    m_imagesAndParameters = new QMap<QString, QStringList>();
+    m_diagonals = new QList<double>();
   }
 
 
@@ -83,8 +58,8 @@ namespace Isis {
     }
 
     try {
-      m_covarianceFileName = new FileName(storedMatrixData.
-                                              findKeyword("CovarianceMatrixFileName")[0]);
+      m_covarianceFileName =
+          new FileName(storedMatrixData.findKeyword("CovarianceMatrixFileName")[0]);
     }
     catch (IException &e) {
       QString msg = "Could not find the Covariance Matrix .dat file name.";
@@ -94,10 +69,10 @@ namespace Isis {
     try {
       QString corrFileName = storedMatrixData.findKeyword("CorrelationMatrixFileName")[0];
       if(corrFileName == "NULL") {
-        m_correlationFileName = NULL;
+        m_correlationFileName = new FileName;
       }
       else {
-        m_correlationFileName= new FileName(corrFileName);
+        m_correlationFileName = new FileName(corrFileName);
       }
     }
     catch (IException &e) {
@@ -139,26 +114,8 @@ namespace Isis {
    * Destructor
    */
   CorrelationMatrix::~CorrelationMatrix() {
-
-    // TODO: Why does this cause seg fault + abort of unitTest??? 
-    // valgrind:
-    // ==13332== Invalid read of size 4
-    // ==13332==    at 0x5265CE8: Isis::CorrelationMatrix::~CorrelationMatrix() (in /scratch/ipce/isis/src/control/objs/CorrelationMatrix/libisis3.4.7.so)
-    // ==13332==    by 0x409300: main (unitTest.cpp:157)
-    // ==13332==  Address 0x101e8458 is 104 bytes inside a block of size 128 free'd
-    // ==13332==    at 0x4A073CC: operator delete(void*) (vg_replace_malloc.c:480)
-    // ==13332==    by 0x40B4F3: QMap<QString, QStringList>::freeData(QMapData*) (qmap.h:655)
-    // ==13332==    by 0x40A74D: QMap<QString, QStringList>::~QMap() (in /scratch/ipce/isis/src/control/objs/CorrelationMatrix/unitTest)
-    // ==13332==    by 0x4092A6: main (unitTest.cpp:157)
-    // ==13332==
-    // ==13332== Invalid free() / delete / delete[] / realloc()
-    // ==13332==    at 0x4A073CC: operator delete(void*) (vg_replace_malloc.c:480)
-    // ==13332==    by 0x5265D06: Isis::CorrelationMatrix::~CorrelationMatrix() (in /scratch/ipce/isis/src/control/objs/CorrelationMatrix/libisis3.4.7.so)
-    // ==13332==    by 0x409300: main (unitTest.cpp:157)
-    // ==13332==  Address 0x7feffef00 is on thread 1's stack
-    // 
-   delete m_imagesAndParameters;
-   m_imagesAndParameters = NULL;
+    delete m_imagesAndParameters;
+    m_imagesAndParameters = NULL;
 
     delete m_covarianceFileName;
     m_covarianceFileName = NULL;
@@ -171,7 +128,6 @@ namespace Isis {
 
     delete m_visibleBlocks;
     m_visibleBlocks = NULL;
-
   }
 
 
@@ -338,7 +294,21 @@ namespace Isis {
    * @return true if the correlation matrix has already been set.
    */
   bool CorrelationMatrix::isValid() {
-    return !(m_correlationFileName == NULL || m_covarianceFileName == NULL); 
+    return !(m_correlationFileName->name() == "" || m_covarianceFileName->name() == "");
+  }
+
+
+
+  /**
+   * This is used to make sure the covariance matrix exists. If it doesn't this class is not
+   * valid.
+   *
+   * If this file exists, we can compute the correlation matrix.
+   *
+   * @return bool True if the covariance matrix has been created.
+   */
+  bool CorrelationMatrix::hasCovMat() {
+    return !(m_covarianceFileName->name() == "");
   }
 
 
@@ -354,7 +324,7 @@ namespace Isis {
       m_correlationFileName = new FileName(correlationFileName);
     }
     else {
-      m_correlationFileName = &correlationFileName;
+      *m_correlationFileName = correlationFileName;
     }
   }
 
@@ -370,8 +340,12 @@ namespace Isis {
       m_covarianceFileName = new FileName(covarianceFileName);
     }
     else {
-      m_covarianceFileName = &covarianceFileName;
+      *m_covarianceFileName = covarianceFileName;
     }
+    //Make the correlation matrix file name match the covariance matrix file name.
+    QString fName = covarianceFileName.expanded().replace( QString("inverse"),
+                                                           QString("correlation") );
+    setCorrelationFileName( FileName(fName) );
   }
 
 
@@ -382,7 +356,12 @@ namespace Isis {
    * @param
    */
   void CorrelationMatrix::setImagesAndParameters(QMap<QString, QStringList> imagesAndParameters) {
-    m_imagesAndParameters = &imagesAndParameters;
+    if (m_imagesAndParameters == NULL) {
+      m_imagesAndParameters = new QMap<QString, QStringList>(imagesAndParameters);
+    }
+    else {
+      *m_imagesAndParameters = imagesAndParameters;
+    }      
   }
 
 

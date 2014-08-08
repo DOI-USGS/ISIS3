@@ -12,8 +12,8 @@ namespace Isis {
   /**
    * Default Constructor
    */
-  MatrixOptions::MatrixOptions(CorrelationMatrix *parent, MatrixSceneWidget *scene) { // give parent? MatrixSceneWidget
-      m_parentMatrix = parent;
+  MatrixOptions::MatrixOptions(CorrelationMatrix parent, MatrixSceneWidget *scene) { // give parent? MatrixSceneWidget
+      m_parentMatrix = new CorrelationMatrix(parent);
       //Color Options
       m_tolerance = false; // if tolerance is false then we use gradient
       m_goodColor = Qt::cyan;
@@ -382,5 +382,15 @@ namespace Isis {
    */
   QMap< QString, QStringList> MatrixOptions::matrixImgsAndParams() {
     return *m_parentMatrix->imagesAndParameters();
+  }
+
+
+
+  /**
+   *
+   *
+   */
+  CorrelationMatrix *MatrixOptions::parentMatrix() {
+    return m_parentMatrix;
   }
 };
