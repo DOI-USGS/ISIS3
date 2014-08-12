@@ -23,25 +23,25 @@ int main() {
 
   qDebug() << "Test Copy Constructor";
 
-// TODO: why is this causing abort?  try {
-// TODO: why is this causing abort?    CorrelationMatrix corrMat2(corrMat);
-// TODO: why is this causing abort?  }
-// TODO: why is this causing abort?  catch(IException &e) {
-// TODO: why is this causing abort?    throw IException(IException::Unknown,
-// TODO: why is this causing abort?                     "Failed to create object with copy constructor",
-// TODO: why is this causing abort?                     _FILEINFO_);
-// TODO: why is this causing abort?  }
+  try {
+    CorrelationMatrix corrMat2(corrMat);
+  }
+  catch(IException &e) {
+    throw IException(IException::Unknown,
+                     "Failed to create object with copy constructor",
+                     _FILEINFO_);
+  }
   
   qDebug() << "Test Equal Operator ( = )";
   
-// TODO: figure out why this is aborting  try {
-// TODO: figure out why this is aborting    CorrelationMatrix corrMat3 = corrMat;
-// TODO: figure out why this is aborting  }
-// TODO: figure out why this is aborting  catch(IException &e) {
-// TODO: figure out why this is aborting    throw IException(IException::Unknown,
-// TODO: figure out why this is aborting                     "Failed to copy object using equal operator",
-// TODO: figure out why this is aborting                     _FILEINFO_);
-// TODO: figure out why this is aborting  }
+  try {
+    CorrelationMatrix corrMat3 = corrMat;
+  }
+  catch(IException &e) {
+    throw IException(IException::Unknown,
+                     "Failed to copy object using equal operator",
+                     _FILEINFO_);
+  }
 
   qDebug() << "Does the matrix exist?" << corrMat.isValid();
 
@@ -107,7 +107,7 @@ int main() {
   qDebug();
   qDebug() << "***Correlation Matrix Information***";
   qDebug();
-  qDebug() << "Covariance File Name:" << corrMat.correlationFileName().expanded();
+  qDebug() << "Covariance File Name:" << corrMat.covarianceFileName().expanded();
   qDebug() << "Correlation File Name:" << corrMat.correlationFileName().expanded();
   qDebug() << "Images and Parameters:";
   QMapIterator<QString, QStringList> imgIt( *corrMat.imagesAndParameters() );

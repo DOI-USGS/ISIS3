@@ -35,7 +35,7 @@ Does the matrix exist? true
 
 ***Correlation Matrix Information*** 
 
-Covariance File Name: "corrMat.dat" 
+Covariance File Name: "covMat.dat" 
 Correlation File Name: "corrMat.dat" 
 Images and Parameters: 
 	 "Image1" 

@@ -343,9 +343,11 @@ namespace Isis {
       *m_covarianceFileName = covarianceFileName;
     }
     //Make the correlation matrix file name match the covariance matrix file name.
-    QString fName = covarianceFileName.expanded().replace( QString("inverse"),
-                                                           QString("correlation") );
-    setCorrelationFileName( FileName(fName) );
+    if (!isValid()) {
+      QString fName = covarianceFileName.expanded().replace( QString("inverse"),
+                                                            QString("correlation") );
+      setCorrelationFileName( FileName(fName) );
+    }
   }
 
 
