@@ -108,6 +108,10 @@ void translateLabels(Pvl &fitsLabel, Cube *ocube) {
     inst.addKeyword(PvlKeyword("TargetName", "Sky"), PvlGroup::Replace);
   }
 
+  if (inst.hasKeyword("TdiRate")) {
+    inst.findKeyword("TdiRate").setUnits("hz");
+  }
+
   //  Create StartTime (UTC) from the SpacecraftClockStartCount.  Need to load the leapsecond
   //  and spacecraft clock kernels to calculate time.
   NaifStatus::CheckErrors();
