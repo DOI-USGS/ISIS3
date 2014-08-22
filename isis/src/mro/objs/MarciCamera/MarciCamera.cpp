@@ -69,7 +69,7 @@ namespace Isis {
     QString stime = inst["SpacecraftClockCount"];
     et = getClockTime(stime).Et();
     p_etStart = et - ((p_exposureDur / 1000.0) / 2.0);
-    p_nframelets = ParentLines() / sumMode;
+    p_nframelets = (int) (ParentLines() / sumMode);
 
     // These numbers came from "MARCI_CTX_Cal_Report_v1.5.pdf" page 7 (Bandpasses & downlinked detector rows)
     map<QString, int> filterToDetectorOffset;
@@ -123,11 +123,11 @@ namespace Isis {
       new PushFrameCameraDetectorMap(this, p_etStart, frameletRate, 16);
     dmap->SetDetectorSampleSumming(sumMode);
     dmap->SetDetectorLineSumming(sumMode);
-    dmap->SetGeometricallyFlippedFramelets(false);
+    dmap->SetFrameletsGeometricallyFlipped(false);
 
     int numFramelets = ParentLines() / (16 / sumMode);
     bool flippedFramelets = (int)inst["DataFlipped"] != 0;
-    dmap->SetFlippedFramelets(flippedFramelets, numFramelets);
+    dmap->SetFrameletOrderReversed(flippedFramelets, numFramelets);
 
     // Setup focal plane map
     new CameraFocalPlaneMap(this, -74400);
@@ -168,6 +168,14 @@ namespace Isis {
     }
   }
 
+
+
+  //! Destroys the Themis Vis Camera object
+  MarciCamera::~MarciCamera() {
+  }
+
+
+
   /**
    * Sets the band in the camera model
    *
@@ -183,6 +191,54 @@ namespace Isis {
     MarciDistortionMap *distmap = (MarciDistortionMap *)DistortionMap();
     distmap->SetFilter(p_filterNumbers[vband-1]);
   }
+
+
+
+  /**
+   * The camera model is band dependent, so this method returns false
+   *
+   * @return bool False
+   */
+  bool MarciCamera::IsBandIndependent() {
+    return false;
+  }
+
+
+
+  /**
+   * CK frame ID -  - Instrument Code from spacit run on CK
+   *  
+   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   *         Kernel Frame ID
+   */
+  int MarciCamera::CkFrameId() const {
+    return (-74000);
+  }
+
+
+
+  /** 
+   * CK Reference ID - MRO_MME_OF_DATE
+   * 
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Reference ID
+   */
+  int MarciCamera::CkReferenceId() const {
+    return (-74900);
+  }
+
+
+
+  /** 
+   *  SPK Reference ID - J2000
+   *  
+   * @return @b int The appropriate instrument code for the Spacecraft 
+   *         Kernel Reference ID
+   */
+  int MarciCamera::SpkReferenceId() const {
+    return (1);
+  }
+
 }
 
 

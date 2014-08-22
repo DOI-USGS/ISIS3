@@ -21,6 +21,9 @@
 
 #include <iomanip>
 
+#include <QDebug>
+#include <QString>
+
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
 #include "iTime.h"
@@ -55,9 +58,11 @@ namespace Isis {
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+
     // make sure it is a themis vis image
     if(inst["InstrumentId"][0] != "THEMIS_VIS") {
-      string msg = "The image does not appear to be a Themis Vis Image";
+      QString msg = "Unable to create Themis VIS camera model from an image with InstrumentId ["
+                   +  inst["InstrumentId"][0] + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -77,17 +82,25 @@ namespace Isis {
 
     // Get the keywords from labels
     PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
-    PvlKeyword &orgBand = bandBin["OriginalBand"];
-    for(int i = 0; i < orgBand.size(); i++) {
-      p_originalBand.push_back(toInt(orgBand[i]));
+
+    PvlKeyword &filterNumbers = bandBin["FilterNumber"];
+    for (int i = 0; i < filterNumbers.size(); i++) {
+      p_filterNumber.append(toInt(filterNumbers[i]));
     }
+
 
     // Setup detector map
     double frameRate = p_interframeDelay;
+    //int frameletHeight = 192;
+    int frameletHeight = (int) (ParentLines() / ((double) p_nframes / (double) sumMode)); // = 192
     PushFrameCameraDetectorMap *dmap =
-      new PushFrameCameraDetectorMap(this, p_etStart, frameRate, 192);
+      new PushFrameCameraDetectorMap(this, p_etStart, frameRate, frameletHeight);
     dmap->SetDetectorSampleSumming(sumMode);
     dmap->SetDetectorLineSumming(sumMode);
+    dmap->SetFrameletOrderReversed(false, p_nframes); // these framelets are in time ascending order
+                                                      //(i.e. the order is not reversed)
+    // dmap->SetFrameletsGeometricallyFlipped(true); this is not set... looks like it defaults to true???
+    // We do not want to set the exposure duration in the detector map, let it default to 0.0...
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
@@ -104,6 +117,13 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+  
+
+
+  ThemisVisCamera::~ThemisVisCamera() {
+  }
+
+
 
   /**
    * Sets the band in the camera model
@@ -114,13 +134,16 @@ namespace Isis {
     Camera::SetBand(vband);
 
     // Set the et
-    setTime(p_etStart + BandEphemerisTimeOffset(vband));
+    double et = p_etStart + BandEphemerisTimeOffset(vband);
+    setTime(et);
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *)this->DetectorMap();
-    dmap->SetStartTime(p_etStart + BandEphemerisTimeOffset(vband));
+    dmap->SetStartTime(et);
   }
 
+
+
   /**
-   * Calculates time offset for the given band.
+   * Calculates time offset for the given cube band number.
    *
    * @param vband The band number.
    *
@@ -128,28 +151,90 @@ namespace Isis {
    *
    */
   double ThemisVisCamera::BandEphemerisTimeOffset(int vband) {
-    int waveToTimeBand[] = {2, 5, 3, 4, 1};
-    int visBandFirstRow[] = {4, 203, 404, 612, 814};
+    // Lookup the time band corresponding to this ISIS cube band
+    // number based on the FilterNumber keyword in the BandBin group.
+    // Filter numbers indicate the physical location of the band in
+    // the detector array.  They are numbered by ascending times.
+    // (filter number = time band)
+    int timeBand = p_filterNumber[vband - 1];
 
-    // Lookup the original band from the band bin group.  Unless there is
-    // a reference band which means the data has all been aligned in the
-    // band dimension
-    int band = p_originalBand[vband-1];
-    if(HasReferenceBand()) {
-      band = ReferenceBand();
+    if (HasReferenceBand()) {
+    // If there is a reference band, the data has all been aligned in the band dimension
+
+    // VIS BandNumbers (including the reference band) are numbered by ascending filter
+    // wavelength. Convert the wavelength band to a time band (filter number).
+      int wavelengthToTimeBand[] = { 2, 5, 3, 4, 1 };
+      timeBand = wavelengthToTimeBand[ReferenceBand() - 1];
     }
-
-    // convert wavelength band the time band
-    band = waveToTimeBand[band-1];
-
-    // Compute the time offset for this detector line
-    p_bandTimeOffset = ((band - 1) * p_interframeDelay) -
-                       ((p_exposureDur / 1000.0) / 2.0);
-
+    
+    // Compute the time offset for this detector line.
+    // Subtract 1 from the time band then multiply by the interframe delay then
+    // subtract half the exposure duration, in seconds.
+    // 
+    // Subtracting 1 from the time band number calculates the appropriate
+    // number of interframe delay multiples for this filter number (recall this
+    // corresponds to a location on the ccd)
+    p_bandTimeOffset = ((timeBand - 1) * p_interframeDelay) - ((p_exposureDur / 1000.0) / 2.0);
+    
+    // Set the detector first line for this band on the ccd.
+    // The VIS band first row values are 1-based detector row numbers
+    // used for the beginning (bottom) of the 192-row framelet for the various bands.
+    // These row values correspond directly to the filter numbers (time bands) {1, 2, 3, 4, 5}.
+    // Obtained from the NAIF instrument kernel.
+    // Note that row 1 is the first detector row to see an area of the ground.
+    int visBandFirstRow[] = { 4, 203, 404, 612, 814 };
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *)this->DetectorMap();
-    dmap->SetBandFirstDetectorLine(visBandFirstRow[band-1]);
+    dmap->SetBandFirstDetectorLine(visBandFirstRow[timeBand - 1]);
 
     return p_bandTimeOffset;
+  }
+
+
+
+  /**
+   * The camera model is band dependent (i.e. not band independent), so this
+   * method returns false 
+   *
+   * @return @b bool This will always return False.
+   */
+  bool ThemisVisCamera::IsBandIndependent() {
+    return false;
+  }
+
+
+
+  /**
+   * CK frame ID -  - Instrument Code from spacit run on CK
+   *  
+   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   *         Kernel Frame ID
+   */
+  int ThemisVisCamera::CkFrameId() const {
+    return -53000;
+  }
+
+
+
+  /** 
+   * CK Reference ID - MARSIAU
+   * 
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Reference ID
+   */
+  int ThemisVisCamera::CkReferenceId() const {
+    return 16;
+  }
+
+
+
+  /** 
+   * SPK Reference ID - J2000
+   * 
+   * @return @b int The appropriate instrument code for the Spacecraft
+   *         Kernel Reference ID
+   */
+  int ThemisVisCamera::SpkReferenceId() const {
+    return 1;
   }
 }
 

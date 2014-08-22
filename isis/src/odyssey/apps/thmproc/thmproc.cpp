@@ -17,7 +17,7 @@ void IsisMain() {
   if(ui.GetBoolean("INGESTION")) {
     Pvl labels(ui.GetFileName("FROM"));
 
-    if((QString)labels["DETECTOR_ID"][0] == "VIS") {
+    if((QString)labels["DETECTOR_ID"][0] == "VIS") { // JWB - can we process vis without ingestion?
       if(((QString)labels["DATA_SET_ID"]).contains("RDR")) {
         ProcessVis(true);
       }
@@ -93,7 +93,7 @@ void ProcessVis(bool isRdr) {
   p.Application("automos").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputList, false);
   p.Application("automos").SetOutputParameter("MOSAIC", "mos");
 
-  if(ui.GetBoolean("INGESTION")) {
+  if(ui.GetBoolean("INGESTION")) { // JWB - inconsistent with call in main
     p.SetFirstApplication("thm2isis");
   }
   else {

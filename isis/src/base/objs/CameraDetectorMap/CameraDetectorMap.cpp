@@ -34,7 +34,7 @@ namespace Isis {
     p_detectorSampleSumming = 1.0;
     p_detectorLineSumming = 1.0;
     Compute();
-    if(parent != 0) {
+    if (parent != 0) {
       p_camera->SetDetectorMap(this);
     }
   }
@@ -51,9 +51,9 @@ namespace Isis {
    */
   bool CameraDetectorMap::SetDetector(const double sample, const double line) {
     p_detectorSample = sample;
-    p_detectorLine = line;
-    p_parentSample = (p_detectorSample - p_ss) / p_detectorSampleSumming + 1.0;
-    p_parentLine   = (p_detectorLine   - p_sl) / p_detectorLineSumming   + 1.0;
+    p_detectorLine   = line;
+    p_parentSample   = (p_detectorSample - p_ss) / p_detectorSampleSumming + 1.0;
+    p_parentLine     = (p_detectorLine   - p_sl) / p_detectorLineSumming   + 1.0;
     return true;
   }
 

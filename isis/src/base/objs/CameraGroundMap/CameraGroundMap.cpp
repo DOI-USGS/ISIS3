@@ -22,6 +22,8 @@
  */
 #include "CameraGroundMap.h"
 
+#include <QDebug>
+
 #include <iostream>
 
 #include "NaifStatus.h"
@@ -105,8 +107,8 @@ namespace Isis {
     p_camera->Sensor::LookDirection(lookC);
 
     //Get the fl as the z coordinate to handle instruments looking down the -z axis 2013-02-22.
-    double fl = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
-    double scale = fl / lookC[2];
+    double focalLength = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
+    double scale = focalLength / lookC[2];
 
     p_focalPlaneX = lookC[0] * scale;
     p_focalPlaneY = lookC[1] * scale;

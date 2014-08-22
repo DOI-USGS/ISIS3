@@ -315,7 +315,7 @@ namespace Isis {
     // Do we have a camera model?
     if(cvp->camera() != NULL) {
       if(cvp->camera()->SetImage(sample, line)) {
-        // Write columns ocentric lat/lon, and radius
+        // Write columns ocentric lat/lon, and radius, only if set image succeeds
         double lat = cvp->camera()->UniversalLatitude();
         double lon = cvp->camera()->UniversalLongitude();
 
@@ -328,7 +328,7 @@ namespace Isis {
         p_tableWin->table()->item(row, EAST_LON_180)->
                              setText(QString::number(TProjection::To180Domain(lon), 'f', 15));
 
-        // Write out the planetographic and positive west values
+        // Write out the planetographic and positive west values, only if set image succeeds
         lon = -lon;
         while(lon < 0.0) lon += 360.0;
         Distance radii[3];
@@ -341,26 +341,32 @@ namespace Isis {
         p_tableWin->table()->item(row, WEST_LON_180)->setText(
                                   QString::number(TProjection::To180Domain(lon), 'f', 15));
 
-        // Next write out columns, the x/y/z position of the lat/lon
+        // Next write out columns, the x/y/z position of the lat/lon, only if set image succeeds
         double pos[3];
         cvp->camera()->Coordinate(pos);
         p_tableWin->table()->item(row, POINT_X)->setText(QString::number(pos[0]));
         p_tableWin->table()->item(row, POINT_Y)->setText(QString::number(pos[1]));
         p_tableWin->table()->item(row, POINT_Z)->setText(QString::number(pos[2]));
 
-        // Write out columns resolution
-        double res = cvp->camera()->PixelResolution();
-        p_tableWin->table()->item(row, RESOLUTION)->setText(QString::number(res));
+        // Write out columns resolution, only if set image succeeds
+        if (cvp->camera()->PixelResolution() != -1.0) {
+          double res = cvp->camera()->PixelResolution();
+          p_tableWin->table()->item(row, RESOLUTION)->setText(QString::number(res));
+        }
+        else {
+          p_tableWin->table()->item(row, RESOLUTION)->setText("");
+        }
 
-        // Write out columns phase, incidence, emission
+        // Write out columns photometric angle values, only if set image succeeds
         double phase = cvp->camera()->PhaseAngle();
-        double incidence = cvp->camera()->IncidenceAngle();
-        double emission = cvp->camera()->EmissionAngle();
         p_tableWin->table()->item(row, PHASE)->setText(QString::number(phase));
+        double incidence = cvp->camera()->IncidenceAngle();
         p_tableWin->table()->item(row, INCIDENCE)->setText(QString::number(incidence));
+        double emission = cvp->camera()->EmissionAngle();
         p_tableWin->table()->item(row, EMISSION)->setText(QString::number(emission));
 
-        // Write out columns local incidence and emission
+        // Write out columns local incidence and emission, only if set image
+        // succeeds.  This might fail if there are holes in the DEM.
         // Calculates the angles local to the slope for the DEMs, compare against
         // the incidence and emission angles calculated for the sphere
         Angle phaseAngle, incidenceAngle, emissionAngle;
@@ -373,46 +379,57 @@ namespace Isis {
                                setText(QString::number(emissionAngle.degrees()));
         }
         else {
-          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText("NA");
-          p_tableWin->table()->item(row, LOCAL_EMISSION)->setText("NA");
+          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText("");
+          p_tableWin->table()->item(row, LOCAL_EMISSION)->setText("");
         }
 
-        // Write out columns north azimuth, sun azimuth, solar longitude
-        if (cvp->camera()->target()->shape()->name() != "Plane") {
+        // If set image succeeds, write out columns north azimuth, sun azimuth, solar longitude
+        // north azimuth is meaningless for ring plane projections
+        if (cvp->camera()->target()->shape()->name() != "Plane"
+            && Isis::IsValidPixel(cvp->camera()->NorthAzimuth())) {
           double northAzi = cvp->camera()->NorthAzimuth();
           p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
         }
         else { // north azimuth is meaningless for ring plane projections
-          p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText("N/A");
+          p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText("");
         }
-        double sunAzi   = cvp->camera()->SunAzimuth();
+        if (Isis::IsValidPixel(cvp->camera()->SunAzimuth())) {
+          double sunAzi   = cvp->camera()->SunAzimuth();
+          p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
+        }
+        else { // sun azimuth is null
+          p_tableWin->table()->item(row, SUN_AZIMUTH)->setText("");
+        }
+        if (Isis::IsValidPixel(cvp->camera()->SpacecraftAzimuth())) {
+          double spacecraftAzi = cvp->camera()->SpacecraftAzimuth();
+          p_tableWin->table()->item(row, SPACECRAFT_AZIMUTH)->setText(QString::number(spacecraftAzi));
+        }
+        else { // spacecraft azimuth is null
+          p_tableWin->table()->item(row, SPACECRAFT_AZIMUTH)->setText("");
+        }
+        
+        // Write out columns solar lon, slant distance, local solar time
         double solarLon = cvp->camera()->solarLongitude().degrees();
-        p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));
-
-        // Write out columns spacecraft azimuth, slant distance,
-        // et, local solar time, and UTC
-        double spacecraftAzi = cvp->camera()->SpacecraftAzimuth();
         double slantDistance = cvp->camera()->SlantDistance();
-        double lst = cvp->camera()->LocalSolarTime();
-        p_tableWin->table()->item(row, SPACECRAFT_AZIMUTH)->setText(QString::number(spacecraftAzi));
         p_tableWin->table()->item(row, SLANT)->setText(QString::number(slantDistance));
+        double lst = cvp->camera()->LocalSolarTime();
         p_tableWin->table()->item(row, SOLAR_TIME)->setText(QString::number(lst));
-      }
+      } // end if set image succeeds
 
-      // Always write out columns ra/dec;
+      // Always write out columns ra/dec, regardless of whether set image succeeds
       double ra = cvp->camera()->RightAscension();
-      double dec = cvp->camera()->Declination();
       p_tableWin->table()->item(row, RIGHT_ASCENSION)->setText(QString::number(ra));
+      double dec = cvp->camera()->Declination();
       p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(dec));
 
-      // Always write out columns et and utc
+      // Always write out columns et and utc, regardless of whether set image succeeds
       iTime time(cvp->camera()->time());
       p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(time.Et(), 'f', 15));
       QString time_utc = time.UTC();
       p_tableWin->table()->item(row, UTC)->setText(time_utc);
 
-      // Always out columns spacecraft position
+      // Always out columns spacecraft position, regardless of whether set image succeeds
       double pos[3];
       cvp->camera()->instrumentPosition(pos);
       p_tableWin->table()->item(row, SPACECRAFT_X)->setText(QString::number(pos[0]));

@@ -172,18 +172,22 @@ namespace Isis {
       //cout << "alpha cube: " << parentSample << " " << parentLine << endl; //debug
       //cout.precision(15);
       //cout << "Time: " << Time().Et() << endl;
+      bool success = false;
+      success = p_detectorMap->SetParent(parentSample, parentLine);
       // Convert from parent to detector
-      if (p_detectorMap->SetParent(parentSample, parentLine)) {
+      if (success) {
         double detectorSample = p_detectorMap->DetectorSample();
         double detectorLine   = p_detectorMap->DetectorLine();
-        //cout << "detector: " << detectorSample << " " << detectorLine << endl;  //debug
+        // cout << "detector: " << detectorSample << " " << detectorLine << endl;  //debug
+        success = p_focalPlaneMap->SetDetector(detectorSample, detectorLine);
         // Now Convert from detector to distorted focal plane
-        if (p_focalPlaneMap->SetDetector(detectorSample, detectorLine)) {
+        if (success) {
           double focalPlaneX = p_focalPlaneMap->FocalPlaneX();
           double focalPlaneY = p_focalPlaneMap->FocalPlaneY();
-          //cout << "focal plane: " << focalPlaneX << " " << focalPlaneY << endl; //debug
+          // cout << "focal plane: " << focalPlaneX << " " << focalPlaneY << endl; //debug
+          success = p_distortionMap->SetFocalPlane(focalPlaneX, focalPlaneY);
           // Remove optical distortion
-          if (p_distortionMap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
+          if (success) {
             // Map to the ground
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
@@ -358,21 +362,23 @@ namespace Isis {
     //cout.precision(15);
     //cout << "Backward Time: " << Time().Et() << endl;
     // Convert undistorted x/y to distorted x/y
-    if (p_distortionMap->SetUndistortedFocalPlane(ux, uy)) {
+    bool success = p_distortionMap->SetUndistortedFocalPlane(ux, uy);
+    if (success) {
       double focalPlaneX = p_distortionMap->FocalPlaneX();
       double focalPlaneY = p_distortionMap->FocalPlaneY();
       //cout << "focal plane: " << focalPlaneX << " " << focalPlaneY << endl; //debug
       // Convert distorted x/y to detector position
-      if (p_focalPlaneMap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
+      success = p_focalPlaneMap->SetFocalPlane(focalPlaneX, focalPlaneY);
+      if (success) {
         double detectorSample = p_focalPlaneMap->DetectorSample();
         double detectorLine = p_focalPlaneMap->DetectorLine();
         //cout << "detector: " << detectorSample << " " << detectorLine << endl;
         // Convert detector to parent position
-        if (p_detectorMap->SetDetector(detectorSample, detectorLine)) {
+        success = p_detectorMap->SetDetector(detectorSample, detectorLine);
+        if (success) {
           double parentSample = p_detectorMap->ParentSample();
           double parentLine = p_detectorMap->ParentLine();
           //cout << "cube: " << parentSample << " " << parentLine << endl; //debug
-
           if (p_projection == NULL || p_ignoreProjection) {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);
@@ -389,7 +395,7 @@ namespace Isis {
               return true;
             }
           }
-          else  if (p_projection->projectionType() == Projection::Triaxial) { 
+          else  if (p_projection->projectionType() == Projection::Triaxial) {
             if (p_projection->SetUniversalGround(UniversalLatitude(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
@@ -433,10 +439,9 @@ namespace Isis {
   bool Camera::SetUniversalGround(const double latitude, const double longitude,
                                   const double radius) {
     // Convert lat/lon to undistorted focal plane x/y
-    if (p_groundMap->SetGround(
-        SurfacePoint(Latitude(latitude, Angle::Degrees),
-                     Longitude(longitude, Angle::Degrees),
-                     Distance(radius, Distance::Meters)))) {
+    if (p_groundMap->SetGround(SurfacePoint(Latitude(latitude, Angle::Degrees),
+                                            Longitude(longitude, Angle::Degrees),
+                                            Distance(radius, Distance::Meters)))) {
       return RawFocalPlanetoImage();  // sets p_hasIntersection
     }
 
@@ -577,7 +582,7 @@ namespace Isis {
             }
             if ((line != 1) && (line != p_lines + 1)) break;
           }
-        }
+        } // end loop through samples
 
         //We've already checked the first and last lines.
         if (line == 1) continue;
@@ -607,7 +612,7 @@ namespace Isis {
             }
           }
         }
-      }
+      } // end loop through lines
 
       // Test at the sub-spacecraft point to see if we have a
       // better resolution
@@ -616,6 +621,7 @@ namespace Isis {
       subSpacecraftPoint(lat, lon);
       Latitude latitude(lat, Angle::Degrees);
       Longitude longitude(lon, Angle::Degrees);
+      // get the local radius for the subspacecraft point
       Distance radius(LocalRadius(latitude, longitude));
       SurfacePoint testPoint;
 
@@ -633,11 +639,12 @@ namespace Isis {
             }
           }
         }
-      }
+      } // end valid local (subspacecraft) radius
 
       // Special test for ground range to see if either pole is in the image
       latitude = Latitude(90, Angle::Degrees);
       longitude = Longitude(0.0, Angle::Degrees);
+      // get radius for north pole
       radius = LocalRadius(latitude, longitude);
 
       if (radius.isValid()) {
@@ -654,9 +661,10 @@ namespace Isis {
             p_maxlon180 = 180.0;
           }
         }
-      }
+      } // end valid north polar radius
 
       latitude = Latitude(-90, Angle::Degrees);
+      // get radius for south pole
       radius = LocalRadius(latitude, longitude);
 
       if (radius.isValid()) {
@@ -672,37 +680,36 @@ namespace Isis {
             p_maxlon180 = 180.0;
           }
         }
-      }
+      } // end valid south polar radius
 
       // Another special test for ground range as we could have the
       // 0-360 seam running right through the image so
       // test it as well (the increment may not be fine enough !!!)
-      for(Latitude lat = Latitude(p_minlat, Angle::Degrees);
-                   lat <= Latitude(p_maxlat, Angle::Degrees);
-                   lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
-        if(SetGround(lat, Longitude(0.0, Angle::Degrees))) {
-          if(Sample() >= 0.5 && Line() >= 0.5 &&
+      for (Latitude lat = Latitude(p_minlat, Angle::Degrees);
+                    lat <= Latitude(p_maxlat, Angle::Degrees);
+                    lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
+        if (SetGround(lat, Longitude(0.0, Angle::Degrees))) {
+          if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlon = 0.0;
             p_maxlon = 360.0;
             break;
           }
-        }
+        } // end if set ground (lat, 0)
 
         // Another special test for ground range as we could have the
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        if(SetGround(lat, Longitude(180.0, Angle::Degrees))) {
-          if(Sample() >= 0.5 && Line() >= 0.5 &&
+        if (SetGround(lat, Longitude(180.0, Angle::Degrees))) {
+          if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
             p_minlon180 = -180.0;
             p_maxlon180 = 180.0;
             break;
           }
-        }
-      }
-
-    }
+        } // end if set ground (lat, 180)
+      } // end for loop (latitudes from min to max)
+    } // end for loop through bands
 
     SetBand(originalBand);
 
@@ -1677,83 +1684,109 @@ namespace Isis {
   }
 
   /**
-   * Computes the azimuth value from your current position (origin) to a
-   * point of interest specified by the lat/lon input to this method. All
-   * azimuths are measured the same way regardless of the image level (level1
-   * or level2) and the shape model being used. The azimuth is an angle
-   * measured along the ground from the current postion (origin point) to a
-   * point of interest. The azimuth is measured in a positive clockwise
-   * direction from a reference line. The reference line is formed by drawing
-   * a line horizontally from the origin point to the right side of the image.
-   * This is usually called the 3 o'clock reference line because the image
-   * can be viewed as a clock face and the origin point as the center of the
-   * clock face with the hand of the clock pointing at 3 o'clock. The azimuth
-   * is measured in a positive clockwise direction because images have
-   * lines that increase downward. If lines increased upward, then the azimuth
-   * would be measure in a positive counterclockwise direction.
+   * Computes the image azimuth value from your current position (origin) to a point of interest 
+   * specified by the lat/lon input to this method. (NOTE: This azimuth is different from a Ground 
+   * Azimuth) 
+   *  
+   * All azimuths are measured the same way regardless of the image level (level1 or level2) and 
+   * the shape model being used. 
+   *  
+   * The azimuth is an angle formed by a reference vector and a point of interest vector. The 
+   * current position is the vertex of the angle, i.e. the origin of the coordinate system on which 
+   * this angle will be measured. The azimuth is measured in a positive clockwise direction from the 
+   * reference vector (i.e. the initial ray of the angle) to the point of interest vector (i.e. the
+   * terminal ray of the angle). 
+   *  
+   * The azimuth is measured in a positive clockwise direction because images have lines that 
+   * increase downward. If lines increased upward, then the azimuth would be measure in a positive 
+   * counterclockwise direction. 
    *
-   * The algorithm works by getting the body-fixed (x,y,z) of the origin point
-   * and the body-fixed (x,y,z) of the point of interest. The vector from the
-   * origin point to the point of interest is then determined. The perpendicular
-   * component of this new vector to the origin vector is determined. This gives
-   * a vector that is tangent to the planet surface at the origin point and that
-   * is in the direction of the point of interest. The tangent vector is then
-   * scaled to be within a pixel in size. A new body-fixed vector from the
-   * center of the planet to the head of the tangent vector is determined.
-   * The body-fixed (x,y,z) of the new vector is used to get line,sample. So,
-   * we now have the line,sample of the origin point and the line,sample of
-   * a point in the direction of the point of interest and within a pixel's
-   * distance from the origin point. The arctangent of (newline-originline)/
-   * (newsample-originsample) is used to acquire the azimuth value.
+   *  
+   * The reference vector is the vector from the origin to the right side of the image. This is 
+   * usually called the 3 o'clock reference vector because the image can be viewed as a clock face 
+   * and the origin point as the center of the clock face with the hand of the clock pointing at 3 
+   * o'clock. 
+   *  
+   * The point of interest vector is the vector along the surface of the body from the origin to 
+   * the point of interest. In order to calculate the azimuth, this vector is projected into the 
+   * reference plane (the plane containing the reference vector that is tangent to the surface). The 
+   * point of interest vector is also unitzed to 1 km in length and then scaled even further to 
+   * within a pixel of the azimuth's origin. 
+   *  
+   * The algorithm works by 
+   *   1.  Getting the body-fixed (x,y,z) of the azimuth's origin point and the body-fixed (x,y,z)
+   *       of the point of interest. These coordinate also represent vectors from the center of the 
+   *       body-fixed system to the coordinate.
+   *   2.  The vector from the origin point to the point of interest is then determined by vector
+   *       subtraction.
+   *   3.  The perpendicular component of this new vector to the origin vector is determined by
+   *       vector subtraction. This gives a vector that is tangent to the planet surface at the
+   *       origin point and that is in the direction of the point of interest.
+   *   4.  The tangent vector is then unitized so that we may use pixel resolution to scale the
+   *       point of interest vector to be within a pixel in size. This is done so that when we
+   *       determine the new sample/line values, the original local radius can be used and the image
+   *       coordinates are not thrown off by the curvature of the body
+   *   5.  A new body-fixed vector from the center of the planet to the head of the tangent vector
+   *       is determined.
+   *   6.  The body-fixed (x,y,z) of the new vector is used to get ground coordinates (lat,lon) of
+   *       the tail of the adjusted point of interest vector.
+   *   7.  The (lat, lon) is used to get a  (line,sample) for the tail of the adjusted point of
+   *       interest vector. So, we now have the line,sample of the origin point and the line,sample
+   *       of a point in the direction of the point of interest and within a pixel's distance from
+   *       the origin point.
+   *   8.  The arctangent of (newline-originline)/ (newsample-originsample) is used to acquire the
+   *       azimuth value.
    *
-   * NOTE: All vectors in this method are body-fixed and use the radius of the
-   * shape model at the origin point for doing calculations. By using the radius
-   * of the shape model at the origin, we avoid problems where the DEM does
-   * not completely cover the planet.
+   * NOTE: All vectors in this method are body-fixed and use the radius of the shape model at the 
+   * origin point for doing calculations. By using the radius of the shape model at the origin, we 
+   * avoid problems where the DEM does not completely cover the planet. 
    *
+   * Note: This image azimuth algorithm is different from the ground azimuth algorithm used in 
+   * GroundAzimuth(). For ground azimuths, the initial ray of the angle is the vector from 
+   * the selected ground point to the north pole. For image azimuths, the initial ray is the vector 
+   * from the selected image location to the right, horizontally.    * 
+   *  
    * @param radius The Radius
    * @param lat The Latitude
    * @param lon The Longitude
    *
    * @return @b double Azimuth value
+   * @internal
+   *   @history 2009-09-23 Tracie Sucharski - Convert negative longitudes coming out of reclat.
+   *   @history 2010-09-28 Janet Barrett - Added Randy's updated method for calculating the azimuth.
+   *   @history 2011-02-11 Janet Barrett - Added documentation.
+   *   @history 2011_02-11 Janet Barrett - There were some problems with calculating azimuths when a
+   *                           DEM shape model was specified. One problem occurred when the DEM did
+   *                           not cover the poles. The LocalRadius was returning a NULL for the
+   *                           radius value in places that the DEM did not cover (such as the
+   *                           poles). This was fixed by using the radius of the origin point when
+   *                           determining the x,y,z location of the point of interest. The radius
+   *                           is not important because we just need to know the direction of the
+   *                           point of interest from the origin point. Another problem was also
+   *                           found with the call to SetUniversalGround when the new point
+   *                           (new point = point within a pixel of the origin point and in the
+   *                           direction of the point of interest) was being determined. The new
+   *                           point should be at the same radius as the origin point, but this was
+   *                           not happening. The call to SetUniversalGround was changed to use the
+   *                           radius of the origin point when determining the line,sample of the
+   *                           new point. Another problem was that the vector pointing from
+   *                           the origin point to the point of interest was being unitized before
+   *                           its perpendicular component was being calculated. This has been
+   *                           fixed.
+   *   @history 2012-06-04 Janet Barrett - Removed redundant calls to Sample(), Line(),
+   *                           and SetImage().
+   *   @history 2014-04-17 Jeannie Backer - Modified ComputeAzimuth() to return an Isis::Null if the
+   *                           method fails (instead of -1.0). Add a check in ComputeAzimuth() to
+   *                           make sure the "SetUniversalGround()" call succeeds, if not, reset to
+   *                           the original sample/line and return Null.
    *
-   * @history 2009-09-23  Tracie Sucharski - Convert negative
-   *                         longitudes coming out of reclat.
-   * @history 2010-09-28  Janet Barrett - Added Randy's updated method
-   *                         for calculating the azimuth.
-   * @history 2011-02-11  Janet Barrett - Added documentation.
-   * @history 2011_02-11  Janet Barrett - There were some problems with
-   *                         calculating azimuths when a DEM shape model was
-   *                         specified. One problem occurred when the DEM did
-   *                         not cover the poles. The LocalRadius was returning
-   *                         a NULL for the radius value in places that the DEM
-   *                         did not cover (such as the poles). This was fixed
-   *                         by using the radius of the origin point when
-   *                         determining the x,y,z location of the point of
-   *                         interest. The radius is not important because we just
-   *                         need to know the direction of the point of interest
-   *                         from the origin point. Another problem was also found
-   *                         with the call to SetUniversalGround when the new point
-   *                         (new point = point within a pixel of the origin point
-   *                         and in the direction of the point of interest) was being
-   *                         determined. The new point should be at the same radius as
-   *                         the origin point, but this was not happening. The call to
-   *                         SetUniversalGround was changed to use the radius of the
-   *                         origin point when determining the line,sample of the new
-   *                         point. Another problem was that the vector pointing from
-   *                         the origin point to the point of interest was being
-   *                         unitized before its perpendicular component was being
-   *                         calculated. This has been fixed.
-   * @history 2012-06-04  Janet Barrett - Removed redundant calls to Sample(), Line(),
-   *                         and SetImage().
-   *
-   * @todo Write PushState and PopState method to ensure the
-   * internals of the class are set based on SetImage or SetGround
+   *   @todo Write PushState and PopState method to ensure the internals of the class are set based
+   *         on SetImage or SetGround
    */
   double Camera::ComputeAzimuth(Distance radius,
                                 const double lat, const double lon) {
-    // Make sure we are on the planet
-    if (!HasSurfaceIntersection()) return -1.0;
+    // Make sure we are on the planet, if not, north azimuth is meaningless
+    if (!HasSurfaceIntersection()) return Isis::Null;
 
     // Need to save the "state" of the camera so we can restore it when the
     // method is done
@@ -1761,88 +1794,137 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
 
-    // Get the origin point and its radius
-    SpiceDouble oB[3];
-    Coordinate(oB);
+    // Get the azimuth's origin point (the current position) and its radius
+    SpiceDouble azimuthOrigin[3];
+    Coordinate(azimuthOrigin);
     Distance originRadius = LocalRadius();
     if (!originRadius.isValid()) {
-      return -1.0;
+      return Isis::Null;
     }
 
-    // Convert the point of interest to x/y/z in body-fixed and use the origin radius
-    // to avoid the situation where the DEM does not cover the entire planet
-    SpiceDouble pB[3];
+    // Convert the point of interest to rectangular coordinates (x,y,z) in the
+    // body-fixed coordinate system and use the azimuth's origin radius to avoid the
+    // situation where the DEM does not cover the entire planet
+    SpiceDouble pointOfInterestFromBodyCenter[3];
     latrec_c(originRadius.kilometers(), lon * PI / 180.0,
-             lat * PI / 180.0, pB);
+             lat * PI / 180.0, pointOfInterestFromBodyCenter);
 
-    // Get the difference vector poB=pB-oB with its tail at oB and its head at pB
-    SpiceDouble poB[3],upoB[3];
-    vsub_c(pB, oB, poB);
+    // Get the difference vector with its tail at the azimuth origin and its
+    // head at the point of interest by subtracting vectors the vectors that
+    // originate at the body center
+    // 
+    // pointOfInterest = pointOfInterestFromBodyCenter - azimuthOriginFromBodyCenter
+    // 
+    SpiceDouble pointOfInterest[3];
+    vsub_c(pointOfInterestFromBodyCenter, azimuthOrigin, pointOfInterest);
 
+    // Get the component of the difference vector pointOfInterestFromAzimuthOrigin that is
+    // perpendicular to the origin point (i.e. project perpendicularly onto the reference plane).
+    // This will result in a point of interest vector that is in the plane tangent to the surface at
+    // the origin point
+    SpiceDouble pointOfInterestProj[3];
+    vperp_c(pointOfInterest, azimuthOrigin, pointOfInterestProj);
+
+    // Unitize the tangent vector to a 1 km length vector
+    SpiceDouble pointOfInterestProjUnit[3];
+    vhat_c(pointOfInterestProj, pointOfInterestProjUnit);
+
+    // Scale the vector to within a pixel of the azimuth's origin point.
     // Get pixel scale in km/pixel and divide by 2 to insure that we stay within
     // a pixel of the origin point
     double scale = (PixelResolution() / 1000.0) / 2.0;
+    SpiceDouble pointOfInterestProjUnitScaled[3];
+    vscl_c(scale, pointOfInterestProjUnit, pointOfInterestProjUnitScaled);
 
-    SpiceDouble hpoB[3];
-    SpiceDouble spoB[3];
-    // Get the component of the difference vector poB that is perpendicular to the origin
-    // point; this will result in a vector that is tangent to the surface at the origin
-    // point and is in the direction of the point of interest
-    vperp_c(poB, oB, hpoB);
-    // Unitize the tangent vector and then scale it to within a pixel of the origin point
-    vhat_c(hpoB, upoB);
-    vscl_c(scale, upoB, spoB);
-
-    // Compute the new point in body fixed.  This point will be within a pixel of the
-    // origin but in the same direction as the requested lat/lon of the point of interest
-    SpiceDouble nB[3];
-    vadd_c(oB, spoB, nB);
+    // Compute the adjusted point of interest vector from the body center. This point
+    // will be within a pixel of the origin and in the same direction as the requested
+    // raw point of interest vector
+    SpiceDouble adjustedPointOfInterestFromBodyCenter[3];
+    vadd_c(azimuthOrigin, pointOfInterestProjUnitScaled, adjustedPointOfInterestFromBodyCenter);
 
     // Get the origin image coordinate
-    double osample = Sample();
-    double oline = Line();
+    double azimuthOriginSample = Sample();
+    double azimuthOriginLine = Line();
 
     // Convert the point to a lat/lon and find out its image coordinate
-    double nrad, nlon, nlat;
-    reclat_c(nB, &nrad, &nlon, &nlat);
-    nlat = nlat * 180.0 / PI;
-    nlon = nlon * 180.0 / PI;
-    if (nlon < 0) nlon += 360.0;
+    double adjustedPointOfInterestRad, adjustedPointOfInterestLon, adjustedPointOfInterestLat;
+    reclat_c(adjustedPointOfInterestFromBodyCenter, 
+             &adjustedPointOfInterestRad, 
+             &adjustedPointOfInterestLon, 
+             &adjustedPointOfInterestLat);
+    adjustedPointOfInterestLat = adjustedPointOfInterestLat * 180.0 / PI;
+    adjustedPointOfInterestLon = adjustedPointOfInterestLon * 180.0 / PI;
+    if (adjustedPointOfInterestLon < 0) adjustedPointOfInterestLon += 360.0;
 
-    // Use the radius of the origin point to avoid the effects of topography on the
-    // calculation
-    SetUniversalGround(nlat, nlon, originRadius.meters());
-    double nsample = Sample();
-    double nline = Line();
+    // Use the radius of the azimuth's origin point
+    // (rather than that of the adjusted point of interest location)
+    // to avoid the effects of topography on the calculation
+    bool success = SetUniversalGround(adjustedPointOfInterestLat, 
+                                      adjustedPointOfInterestLon, 
+                                      originRadius.meters());
+    if (!success) {
+      // if the adjusted lat/lon values for the point of origin fail to be set, we can not compute
+      // an azimuth. reset to the original sample/line and return null.
+      SetImage(azimuthOriginSample, azimuthOriginLine);
+      return Isis::Null;
+    }
+
+    double adjustedPointOfInterestSample = Sample();
+    double adjustedPointOfInterestLine   = Line();
 
     // TODO:  Write PushState and PopState method to ensure the
     // internals of the class are set based on SetImage or SetGround
 
     // We now have the information needed to calculate an arctangent
-    double deltaSample = nsample - osample;
-    double deltaLine = nline - oline;
-
-    // Compute the angle; the azimuth is the arctangent of the line difference
-    // divided by the sample difference; the atan2 function is used because it
-    // determines which quadrant we are in based on the sign of the 2 arguments;
-    // the arctangent is measured in a positive clockwise direction because the
-    // lines in the image increase downward; the arctangent uses the 3 o'clock
-    // axis (positive sample direction) as its reference line (line of zero degrees);
-    // a good place to read about the atan2 function is at http://en.wikipedia.org/wiki/Atan2
+    // 
+    // 
+    //         point of interest
+    //                  |\       |
+    //                  | \      |
+    //                  |  \     |                      tan(A) = (delta line) / (delta sample)
+    //    delta line    |   \    |                      A  = arctan( (delta line) / (delta sample) )
+    //                  |    \   |
+    //                  |     \  |
+    //                  |      \ |
+    //       ___________|_____A_\|_______________
+    //              delta sample |origin point
+    //                           |
+    //                           |
+    //                           |
+    //                           |
+    //                           |
+    //
+    // in this example, the azimuth is the angle indicated by the A plus 180 degrees, since we begin
+    // the angle rotation at the positive x-axis
+    // This quadrant issue (i.e.need to add 180 degrees) is handled by the atan2 program
+    // 
+    double deltaSample = adjustedPointOfInterestSample - azimuthOriginSample;
+    double deltaLine = adjustedPointOfInterestLine - azimuthOriginLine;
+    
+    // Compute the angle; the azimuth is the arctangent of the line difference divided by the
+    // sample difference; the atan2 function is used because it determines which quadrant we
+    // are in based on the sign of the 2 arguments; the arctangent is measured in a positive
+    // clockwise direction because the lines in the image increase downward; the arctangent
+    // uses the 3 o'clock axis (positive sample direction) as its reference line (line of
+    // zero degrees); a good place to read about the atan2 function is at
+    // http://en.wikipedia.org/wiki/Atan2
     double azimuth = 0.0;
     if (deltaSample != 0.0 || deltaLine != 0.0) {
       azimuth = atan2(deltaLine, deltaSample);
       azimuth *= 180.0 / PI;
     }
+
     // Azimuth is limited to the range of 0 to 360
     if (azimuth < 0.0) azimuth += 360.0;
     if (azimuth > 360.0) azimuth -= 360.0;
 
     NaifStatus::CheckErrors();
 
-    // Reset "state" of camera
+    // computed is true if the sample/line or lat/lon were reset in this method
+    // to find the location of the point of interest
+    // If so, reset "state" of camera to the original sample/line
     if (computed) {
-      SetImage(osample, oline);
+      SetImage(azimuthOriginSample, azimuthOriginLine);
     }
     else {
       p_pointComputed = false;
@@ -1881,9 +1963,15 @@ namespace Isis {
    * another point of interest, such as the subspacecraft point or the
    * subsolar point. The ground azimuth is the clockwise angle on the
    * ground between a line drawn from the ground point to the North pole
-   * of the body and a line drawn from the ground point to the point of
-   * interest (such as the subsolar point or the subspacecraft point).
-   *
+   * of the body and a line drawn from the selected point on the surface 
+   * to some point of interest on the surface (such as the subsolar point
+   * or the subspacecraft point). 
+   *  
+   * Note: This is different from the image azimuth algorithm used in ComputeAzimuth(). 
+   * For ground azimuths, the initial ray of the angle is the vector from the selected ground point 
+   * to the north pole. For image azimuths, the initial ray is the vector from the selected image 
+   * location to the right, horizontally. 
+   *  
    * @param glat The latitude of the ground point
    * @param glon The longitude of the ground point
    * @param slat The latitude of the subspacecraft or subsolar point

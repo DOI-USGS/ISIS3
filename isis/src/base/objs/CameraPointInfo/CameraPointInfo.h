@@ -82,6 +82,10 @@ namespace Isis {
    *                           and cube(). Added m_ prefix to member variables. Made
    *                           GetPointInfo() virtual so it can be redefined in child classes.
    *                           References #775.
+   *   @history 2014-04-17 Jeannie Backer - Added check for valid azimuth values.  If
+   *                           not, print "NULL" to be consistent with caminfo's CamTools.cpp.
+   *                           Replaced local variable names with more descriptive names.
+   *                           References #1659.
    */
   class CameraPointInfo {
 

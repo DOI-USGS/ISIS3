@@ -36,9 +36,8 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    QString msg = "This program is intended for use on THEMIS VIS images only. [";
-    msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
-    throw IException(e, IException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, 
+                     "Unable to run thmvistrim with the given input cube.", _FILEINFO_);
   }
 
   frameletSize = 192 / toInt(icube->group("Instrument")["SpatialSumming"][0]);

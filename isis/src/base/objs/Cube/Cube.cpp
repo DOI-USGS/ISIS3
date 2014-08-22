@@ -507,11 +507,12 @@ namespace Isis {
    */
   void Cube::open(const QString &cubeFileName, QString access) {
     // Already opened?
+
     if (isOpen()) {
       string msg = "You already have a cube opened";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
     initLabelFromFile(cubeFileName, (access == "rw"));
 
     // Figure out the name of the data file
@@ -557,7 +558,7 @@ namespace Isis {
       cleanUp(false);
       throw;
     }
-
+    
     if (access == "r") {
       if (!m_labelFile->open(QIODevice::ReadOnly)) {
         QString msg = "Failed to open [" + m_labelFile->fileName() + "] with "
@@ -604,7 +605,7 @@ namespace Isis {
       cleanUp(false);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
     initCoreFromLabel(*m_label);
 
     // Determine the number of bytes in the label
@@ -614,7 +615,7 @@ namespace Isis {
     else {
       m_labelBytes = labelSize(true);
     }
-
+    
     QPair<bool, Pvl *> dataLabel = qMakePair(false, m_label);
     if (!m_storesDnData) {
       dataLabel = qMakePair(true, new Pvl(m_dataFileName->expanded()));
@@ -629,12 +630,12 @@ namespace Isis {
       m_ioHandler = new CubeTileHandler(dataFile(), m_virtualBandList,
           realDataFileLabel(), true);
     }
-
+    
     if (dataLabel.first) {
       delete dataLabel.second;
       dataLabel.second = NULL;
     }
-
+    
     applyVirtualBandsToLabel();
   }
 
@@ -1639,11 +1640,11 @@ namespace Isis {
     // Prune the band bin group if it exists
     if (m_label->findObject("IsisCube").hasGroup("BandBin")) {
       PvlGroup &bandBin = m_label->findObject("IsisCube").findGroup("BandBin");
-      for(int k = 0; k < bandBin.keywords(); k++) {
+      for (int k = 0;k < bandBin.keywords();k++) {
         if (bandBin[k].size() == m_bands && m_virtualBandList) {
           PvlKeyword temp = bandBin[k];
           bandBin[k].clear();
-          for(int i = 0; i < m_virtualBandList->size(); i++) {
+          for (int i = 0;i < m_virtualBandList->size();i++) {
             int physicalBand = m_virtualBandList->at(i) - 1;
             bandBin[k].addValue(temp[physicalBand], temp.unit(physicalBand));
           }
@@ -1652,8 +1653,7 @@ namespace Isis {
     }
 
     // Change the number of bands in the labels of the cube
-    if (m_virtualBandList && core.hasGroup("Dimensions"))
-      core.findGroup("Dimensions")["Bands"] = toString(m_virtualBandList->size());
+    if (m_virtualBandList && core.hasGroup("Dimensions")) core.findGroup("Dimensions")["Bands"] = toString(m_virtualBandList->size());
   }
 
 

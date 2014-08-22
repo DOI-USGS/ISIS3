@@ -108,7 +108,8 @@ namespace Isis {
    * @returns True if we have a legitimate angle value, false if not initialized
    */
   bool Angle::isValid() const {
-    return m_radians != Null;
+    return m_radians != Isis::Null; // returns false if the value is Null or any other special value
+//    return IsValidPixel(m_radians); // returns false if the value is Null or any other special value
   }
 
 

@@ -15,12 +15,12 @@ void IsisMain() {
   CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
   Cube icube;
 
-  if(inAtt.bands().size() != 0) {
+  if (inAtt.bands().size() != 0) {
     icube.setVirtualBands(inAtt.bands());
   }
 
   icube.open(FileName(ui.GetFileName("FROM")).expanded());
-
+  
   // Make sure it is a Themis EDR/RDR
   FileName inFileName = ui.GetFileName("FROM");
   try {
@@ -35,7 +35,7 @@ void IsisMain() {
     msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
-
+  
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
   int summing = toInt(icube.group("Instrument")["SpatialSumming"][0]);
@@ -116,7 +116,7 @@ void IsisMain() {
 
     prog.CheckStatus();
   }
-  while(!ocubeMgr.end());
+  while (!ocubeMgr.end());
 
   // Propagate labels and objects (in case of spice data)
   PvlObject &inCubeObj = icube.label()->findObject("IsisCube");

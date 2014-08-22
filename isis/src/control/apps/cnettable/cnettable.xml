@@ -122,6 +122,9 @@
       Made the software output all of the log values in addition to the normal
       output of the software.
     </change>
+    <change name="Jeannie Backer" date="2014-08-22">
+      Updated truth data due to modifications, printing NULL instead of N/A. References #1659.
+    </change>
   </history>
 
   <category>

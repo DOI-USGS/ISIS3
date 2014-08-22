@@ -35,67 +35,38 @@ namespace Isis {
    * @author 2008-10-23 Steven Lambright
    *
    * @internal
-   *   @history 2008-11-19 Steven Lambright - Added distortion model, made VIS
-   *                      bands other than orange work
-   *   @history 2008-11-25 Steven Lambright - The coloroffset now works properly;
-   *            if an offset is supplied in marci2isis the cube will still project
-   *            properly.
+   *   @history 2008-11-19 Steven Lambright - Added distortion model, made VIS bands other than
+   *                           orange work
+   *   @history 2008-11-25 Steven Lambright - The coloroffset now works properly; if an offset is
+   *                           supplied in marci2isis the cube will still project properly.
    *   @history 2009-03-17 Steven Lambright - Fixed UV to work with the distortion
-   *            model correctly
-   *   @history 2009-05-21 Steven Lambright - Fixed GeometricTilingHint for summed
-   *            images
-   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *            inherit directly from Camera
-   *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
-   *            methods. Updated documentation. Removed Mro namespace wrap
-   *            inside Isis namespace. Added Isis Disclaimer to files. Added
-   *            NAIF error check to constructor.
+   *                           model correctly
+   *   @history 2009-05-21 Steven Lambright - Fixed GeometricTilingHint for summed images
+   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer inherit directly from
+   *                           Camera
+   *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new methods. Updated
+   *                           documentation. Removed Mro namespace wrap inside Isis namespace.
+   *                           Added Isis Disclaimer to files. Added NAIF error
+   *                           check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2014-04-17 Jeannie Backer - Updated due to method name change in
+   *                           PushFrameCameraDetectorMap. Moved method implementations to cpp file.
+   *                           References #1659
    */
   class MarciCamera : public PushFrameCamera {
     public:
       // constructor
       MarciCamera(Cube &cube);
-
-      //! Destroys the Themis Vis Camera object
-      ~MarciCamera() {};
+      ~MarciCamera();
 
       // Sets the band to the band number given
       void SetBand(const int band);
+      bool IsBandIndependent();
 
-      /**
-       * The camera model is band dependent, so this method returns false
-       *
-       * @return bool False
-       */
-      bool IsBandIndependent() {
-        return false;
-      };
-
-      /**
-       * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
-       *         Kernel Frame ID
-       */
-      virtual int CkFrameId() const { return (-74000); }
-
-      /** 
-       * CK Reference ID - MRO_MME_OF_DATE
-       * 
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Reference ID
-       */
-      virtual int CkReferenceId() const { return (-74900); }
-
-      /** 
-       *  SPK Reference ID - J2000
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
-       *         Kernel Reference ID
-       */
-      virtual int SpkReferenceId() const { return (1); }
+      virtual int CkFrameId() const;
+      virtual int CkReferenceId() const;
+      virtual int SpkReferenceId() const;
 
     private:
       void StoreCoefficients(int naifIkCode);

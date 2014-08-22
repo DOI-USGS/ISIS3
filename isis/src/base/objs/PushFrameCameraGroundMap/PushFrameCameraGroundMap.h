@@ -43,8 +43,10 @@ namespace Isis {
    *   @history 2008-06-18 Steven Lambright Fixed documentation
    *   @history 2008-10-23 Steven Lambright Added optimizations, fixed misc bugs
    *   @history 2009-11-19 Steven Lambright Removed linear search offset
-   *   @history 2009-12-07 Steven Lambright Increased liklihood that our
-   *            spacecraft distance correctly minimizes for LRO
+   *   @history 2009-12-07 Steven Lambright Increased liklihood that our spacecraft distance
+   *                           correctly minimizes for LRO
+   *   @history 2014-04-17 Jeannie Backer - Added padding to bring closer to ISIS coding standards.
+   *                           References #1659.
    */
   class PushFrameCameraGroundMap : public CameraGroundMap {
     public:
