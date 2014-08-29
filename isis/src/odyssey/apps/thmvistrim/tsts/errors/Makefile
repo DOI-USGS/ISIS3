@@ -10,5 +10,5 @@ commands:
 	TO=$(OUTPUT)/I00831002RDR.trimmed.cub 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 
 	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
-	$(RM) $(OUTPUT)/I00831002RDR.trimmed.cube;
-	$(RM) $(OUTPUT)/error_temp.txt;
+	$(RM) $(OUTPUT)/I00831002RDR.trimmed.cube 2> /dev/null;
+	$(RM) $(OUTPUT)/error_temp.txt 2> /dev/null;

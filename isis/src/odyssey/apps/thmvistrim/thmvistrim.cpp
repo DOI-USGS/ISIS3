@@ -23,13 +23,13 @@ void IsisMain() {
   // Grab the file to import
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
+
   Cube *icube = p.SetInputCube("FROM");
-  p.SetOutputCube("TO");
 
   // Make sure it is a Themis EDR/RDR
-  FileName inFileName = ui.GetFileName("FROM");
   try {
     if(icube->group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+      FileName inFileName = ui.GetFileName("FROM");
       QString msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -39,6 +39,8 @@ void IsisMain() {
     throw IException(e, IException::User, 
                      "Unable to run thmvistrim with the given input cube.", _FILEINFO_);
   }
+
+  p.SetOutputCube("TO");
 
   frameletSize = 192 / toInt(icube->group("Instrument")["SpatialSumming"][0]);
   frameletTopTrimSize = ui.GetInteger("TOPTRIM");
