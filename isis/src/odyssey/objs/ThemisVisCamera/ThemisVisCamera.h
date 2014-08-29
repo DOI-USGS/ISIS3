@@ -58,9 +58,13 @@ namespace Isis {
    *                           unitTest to test for new methods.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                           coding standards. References #972.
-   *   @history 2014-08-22 Jeannie Backer - Improved test coverage to 80/96/90 %. Plugins are
-   *                           not tested by unitTests. The other lines lacking test coverage are
-   *                           addressed in the todo below. References #1659
+   *   @history 2014-08-22 Jeannie Backer - Fixed bug in camera model to used the FilterNumber
+   *                           rather than the OriginalBand to determine the appropriate filter
+   *                           for this band.  Moved source code from header to cpp file. Improved
+   *                           documentation and ISIS 3 Standards. Improved test coverage to
+   *                           80/96/90 %. Plugins are not tested by unitTests. The other lines
+   *                           lacking test coverage are addressed in the todo below. References
+   *                           #1659
    *  
    *  
    *  
