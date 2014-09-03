@@ -508,6 +508,56 @@ namespace Isis {
     p_saveDataPost = true;
   };
 
+
+  /**
+   * This method returns the number of file header bytes
+   */ 
+  int ProcessImport::FileHeaderBytes() const {
+    return p_fileHeaderBytes;
+  }
+
+
+  /**
+   * This method returns the number of file trailer bytes 
+   */ 
+  int ProcessImport::FileTrailerBytes() const {
+    return p_fileTrailerBytes;
+  }
+
+
+  /**
+   * This method returns the number of data header bytes 
+   */ 
+  int ProcessImport::DataHeaderBytes() const {
+    return p_dataHeaderBytes;
+  }
+
+
+  /**
+   * This method returns the number of data trailer bytes
+   */ 
+  int ProcessImport::DataTrailerBytes() const {
+    return p_fileTrailerBytes;
+  }
+
+
+  /**
+   * This method returns the number of data prefix bytes 
+   */ 
+  int ProcessImport::DataPrefixBytes() const {
+    return p_dataPreBytes;
+  }
+
+
+  /**
+   * This method returns the number of data duffix bytes 
+   */ 
+  int ProcessImport::DataSuffixBytes() const {
+    return p_dataPostBytes;
+  }
+
+
+
   /**
    * This method returns a pointer to the file header.  A file
    * header is a block of non-image data at the beginning of the entire
@@ -1050,6 +1100,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
+
 
   /**
    * Process the import data as a band sequential file.
@@ -1976,5 +2027,24 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
+
+
+  /**
+   * Sets the name of the input file to be read in the import StartProcess
+   * method and verifies its existance.
+   *
+   * @param file The name of the input file to import.
+   *
+   * @throws Isis::iException::Message "File does not exist."
+   */
+  QString ProcessImport::InputFile() {
+    if (p_inFile.size() <= 0) {
+      QString msg = "No input file has been set";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return p_inFile;
+  }
+
+  
 }
 

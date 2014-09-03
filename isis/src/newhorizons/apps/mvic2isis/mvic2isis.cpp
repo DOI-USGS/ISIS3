@@ -41,7 +41,7 @@ void IsisMain() {
   Pvl fitsLabel;
   fitsLabel.addGroup(importFits.fitsLabel(0));
 
-  // Make sure this is a New Horizons MVIC image Fits formatted file
+  // Make sure this is a New Horizons MVIC image FITS formatted file
   bool mvic = true;
   if (fitsLabel.hasKeyword("MISSION", Pvl::Traverse)) {
     QString mission = fitsLabel.findKeyword("MISSION", Pvl::Traverse);
@@ -64,6 +64,8 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+  importFits.SetDataPrefixBytes(4 * 12);
+  importFits.SetDataSuffixBytes(4 * 12);
   importFits.setProcessFileStructure(0);
 
   // Set up the output cube

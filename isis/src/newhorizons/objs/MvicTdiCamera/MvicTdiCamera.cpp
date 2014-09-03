@@ -80,7 +80,7 @@ namespace Isis {
     // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
 //  MvicCameraFocalPlaneMap *focalMap = new MvicCameraFocalPlaneMap(this, naifIkCode());
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    focalMap->SetDetectorOrigin(2512.5, -16.5);  // NOTE:   THIS WORKS
+    focalMap->SetDetectorOrigin(2500.5, -16.5);  // NOTE:   THIS WORKS
 
 
 //   05-16- 2014   NOTE:     THE FOLLOWING DID NOT WORK - WAS NOT ABLE TO INTERSECT THE PLANET AT THE

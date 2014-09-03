@@ -63,18 +63,18 @@ int main(void) {
 
     // Test four pixels to make sure the conversions are right
     cout << "For upper left  ..." << endl;
-    TestLineSamp(cam, 2496.0, 310.0);
+    TestLineSamp(cam, 2484.0, 310.0);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, 2540.0, 310.0);
+    TestLineSamp(cam, 2528.0, 310.0);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 2496.0, 350.0);
+    TestLineSamp(cam, 2484.0, 350.0);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 2540.0, 350.0);
+    TestLineSamp(cam, 2528.0, 350.0);
 
-    double samp = 2515.0;
+    double samp = 2503.0;
     double line = 330.0;
     cout << "For center pixel position ..." << endl;
 

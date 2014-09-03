@@ -61,7 +61,8 @@ namespace Isis {
 
 
   /**
-   * Extract all the FITS labels from the file. This includes the main and all extensions
+   * Extract all the FITS labels from the file. This includes the labels for the main and each 
+   * extensions 
    *
    */
   void ProcessImportFits::extractFitsLabels() {
@@ -273,14 +274,25 @@ namespace Isis {
 
 
   /**
-   * Sets the Process file structure parameters based on the FITS labels of choice 
+   * Sets the Process file structure parameters based on the FITS labels of choice. NOTE: The 
+   * (DataPrefixBytes + DataSuffixByte) / PixelSize is subtracted from the number of samples before 
+   * the output file is created. 
    *  
-   * @param labelNumber FITS label number. zero (0) is the first/main label
+   * @param labelNumber FITS label number. zero (0) is the first/main label. one (1) is the first 
+   * extension, ... 
    * 
    */
   void ProcessImportFits::setProcessFileStructure(int labelNumber) {
 
+    if (labelNumber >= m_fitsLabels->size()) {
+      QString msg = QObject::tr("The requested label number, [%1], from file [%2] is "
+                                "past the last image in this FITS file [%3]").arg(labelNumber).
+                                arg(InputFile()).arg(m_fitsLabels->size()-1);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     PvlGroup label = *(*m_fitsLabels)[labelNumber];
+//    std::cout << label << std::endl;
 
     SetFileHeaderBytes((*m_headerSizes)[labelNumber] * 2880);
     SaveFileHeader();
@@ -299,16 +311,15 @@ namespace Isis {
         msg = "Signed 32 bit integer (int) pixel type is not supported at this time";
         throw IException(IException::User, msg, _FILEINFO_);
         break;
+      case -32:
+        type = Isis::Real;
+        break;
       case 64:
         msg = "Signed 64 bit integer (long) pixel type is not supported at this time";
         throw IException(IException::User, msg, _FILEINFO_);
         break;
-      case -32:
-        type = Isis::Real;
-        break;
       case -64:
-        msg = "64 bit floating point (double) pixel type is not supported at this time";
-        throw IException(IException::User, msg, _FILEINFO_);
+        type = Isis::Double;
         break;
       default:
         msg = "Unknown pixel type [" + label["BITPIX"][0] + "] is not supported for imported";
@@ -319,13 +330,19 @@ namespace Isis {
     SetPixelType(type);
 
     // It is possible to have a NAXIS value of 0 meaning no data, the file could include
-    // xtensions with data, however, those aren't supported yet
+    // xtensions with data, however, those aren't supported because we need the code to know
+    // how to skip over them.
+    // NOTE: FITS files, at least the ones seen till now, do not specify a line prefix or suffix
+    // data byte count. Some FITS files do have them and ISIS needs to remove them so it is not
+    // considered part of the DNs. So, use the parent class' prefix/suffix byte count to reduce
+    // the number of samples.
     if (toInt(label["NAXIS"][0]) == 2) {
-      SetDimensions(toInt(label["NAXIS1"][0]), toInt(label["NAXIS2"][0]), 1);
+      SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                    toInt(label["NAXIS2"][0]), 1);
     }
     else if (toInt(label["NAXIS"][0]) == 3) {
-      SetDimensions(toInt(label["NAXIS1"][0]), toInt(label["NAXIS2"][0]),
-                    toInt(label["NAXIS3"][0]));
+      SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                    toInt(label["NAXIS2"][0]), toInt(label["NAXIS3"][0]));
     }
     else {
       QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
