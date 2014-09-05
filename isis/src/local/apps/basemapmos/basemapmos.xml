@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="basemapmos">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>Creates a flattened mosaic using a list of map projected cubes</brief>
+
+  <description>
+    This program uses a text-based list of cubes, all in the same map projection
+    and equivalent projection parameters (PixelResolution, CenterLongitude,
+    LatitudeSystem, etc), to generate a flattened mosaic.   The size of the 
+    mosaic will be determined automatically unless specified by the user.  In 
+    addition, this final mosaic will be trimmed as a final step.  This trim will 
+    be determined automatically unless specified by the user.
+  </description>
+
+  <category>
+    <categoryItem>Mosaicking</categoryItem>
+  </category>
+
+  <history>
+    <change name="Christopher Austin" date="2008-01-03">
+      Original version
+    </change>
+    <change name="Christopher Austin" date="2008-01-10">
+      Added a maptrim execution to the final product.
+    </change>
+    <change name="Christopher Austin" date="2008-01-30">
+      Added the Priority parameter.
+    </change>
+    <change name="Steven Lambright" date="2008-04-30">
+      Fixed handling of temporary files
+    </change>
+  </history>
+
+  <groups>
+
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of cubes to mosaic
+        </brief>
+        <description>
+          A list of map projected cubes to mosaic and flatten.  The Mapping
+          groups must match in order to mosaic the cubes.  Also, this list 
+          should be in the same directory as the input cubes listed by the list.
+        </description>
+        <filter>
+          *.txt *.lis *.lst
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Mosaic output cube
+        </brief>
+        <description>
+          The trimmed flattened mosaic cube which is created from the cubes 
+          listed by the input list.
+        </description>
+        <filter>
+        *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="PRIORITY">
+        <type>string</type>
+        <default>
+          <item>ONTOP</item>
+        </default>
+        <brief>The priority of pixel placement</brief>
+        <description>
+          This parameter is used to select one of two ways to mosaic the
+          pixels in areas of overlap.
+        </description>
+        <list>
+          <option value="ONTOP">
+            <brief> Input cube will be placed on top of the mosaic </brief>
+            <description>
+              When the input pixel is not NULL, the input
+              pixel value will be written to the output cube. Otherwise the
+              output is unchanged.
+            </description>
+          </option>
+          <option value="BENEATH">
+            <brief>Input cube will be placed beneath the mosaic </brief>
+            <description>
+              When the mosaic pixel is not NULL it will be left
+              unchanged. If the mosaic pixel is NULL
+              the input pixel will be written to the output cube.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+    </group>
+  
+    <group name="Filter Sizes">
+      <parameter name="HNS1">
+        <type>integer</type>
+        <default><item>101</item></default>
+        <brief>
+              Number of samples in the first high frequency data boxcar
+        </brief>
+        <description> This is the total number of samples in the first high frequency data 
+          boxcar. It must be odd and can not exceed twice the number of samples 
+          in the input cubes.  In general, the size of the boxcar should be specified and does not cause 
+          the program to operate significantly slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+      <parameter name="HNL1">
+        <type>integer</type>
+        <default><item>101</item></default>
+        <brief>
+                Number of lines in the first high frequency data boxcar
+        </brief>
+        <description> This is the total number of lines in the second high 
+           frequency data boxcar. It must be odd and can not exceed twice the 
+           number of lines in the input cubes.  In general, the size of the 
+           boxcar should be specified and does not cause the program to operate 
+           significantly slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>should be specified and 
+      </parameter>
+      <parameter name="HNS2">
+        <type>integer</type>
+        <default><item>501</item></default>
+        <brief> Number of samples in the second high frequency data boxcar
+        </brief>
+        <description> This is the total number of samples in the second high 
+          frequency data boxcar. It must be odd and can not exceed twice the 
+          number of samples in the input cubes.  In general, the size of the 
+          boxcar should be specified and does not cause the program to operate significantly slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+      <parameter name="HNL2">
+        <type>integer</type>
+        <default><item>501</item></default>
+        <brief>
+                Number of lines in the second high frequency data boxcar
+        </brief>
+        <description> This is the total number of lines in the second high 
+           frequency data boxcar. It must be odd and can not exceed twice the 
+           number of lines in the input cubes.  In general, the size of the 
+           boxcar should be specified and does not cause the program to operate significantly slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+      <parameter name="LNS">
+        <type>integer</type>
+        <default><item>101</item></default>
+        <brief>
+                Number of samples in low frequency data boxcar
+        </brief>
+        <description> 
+          This is the total number of samples in the low frequency data boxcar.
+          It must be odd and can not exceed twice the number of samples in the
+          output mosaic.  In general, the size of the boxcar should be specified 
+          and does not cause the program to operate significantly slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+      <parameter name="LNL">
+        <type>integer</type>
+        <default><item>101</item></default>
+        <brief>
+                Number of lines in low frequency data boxcar
+        </brief>
+        <description>
+          This is the total number of lines in the low frequency data boxcar. It
+          must be odd and can not exceed twice the number of lines in the output
+          mosaic.  In general, the size of the boxcar should be specified and
+          does not cause the program to operate significantly slower.
+        </description>
+        <odd />
+        <minimum inclusive="yes">1</minimum>
+      </parameter>
+    </group>
+  
+    <group name="Ground Range">
+      <parameter name="GRANGE">
+      <type>string</type>
+      <default><item>AUTO</item></default>
+      <brief>Ground Range Options</brief>
+      <description>
+        The ground range can either be calculated automatically or entered by the user.  
+        If the USER option is selected, values must be entered for the MINLAT, MAXLAT, 
+        MINLON, and MAXLON parameters.  AUTO is the default for this parameter.
+      </description>
+      <list>
+        <option value="AUTO">
+          <brief>Automatically Calculate Range</brief>
+          <description>
+            The program will automatically calculate the groundrange for the
+            mosaic by examining all the cubes in the FROMLIST.  This is the 
+            default option.
+          </description>
+          <exclusions>
+            <item>MINLAT</item>
+            <item>MAXLAT</item>
+            <item>MINLON</item>
+            <item>MAXLON</item>
+          </exclusions>
+        </option>
+        <option value="USER">
+          <brief>User Entered Range</brief>
+          <description>
+            The program will use the user entered ground range values for
+            the mosaic.  
+          </description>
+          <inclusions>
+            <item>MINLAT</item>
+            <item>MAXLAT</item>
+            <item>MINLON</item>
+            <item>MAXLON</item>
+          </inclusions>
+        </option>
+      </list>
+      </parameter>
+      <parameter name="MINLAT">
+        <type>double</type>
+        <brief>Minimum Latitude</brief>
+        <description>
+            The minimum latitude value to use in the mosaic.
+        </description>
+      </parameter>
+      <parameter name="MAXLAT">
+        <type>double</type>
+        <brief>Maximum Latitude</brief>
+        <description>
+            The maximum latitude value to use in the mosaic.
+        </description>
+      </parameter>
+      <parameter name="MINLON">
+        <type>double</type>
+        <brief>Minimum Longitude</brief>
+        <description>
+            The minimum longitude value to use in the mosaic.
+        </description>
+      </parameter>
+      <parameter name="MAXLON">
+        <type>double</type>
+        <brief>Maximum Longitude</brief>
+        <description>
+          The maximum longitude value to use in the mosaic.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="BandBin Option">
+      <parameter name="MATCHBANDBIN">
+        <type>boolean</type>
+        <default><item>TRUE</item></default>
+        <brief>Enforce BandBin Group Match</brief>
+        <description>
+          This option causes the application to fail if the input bandbin group does not 
+          match the mosaic bandbin group. <p />NOTE: In the case of failure,
+          intermediate data may not be removed.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Intermediate Data">
+      <parameter name="REMOVETEMP ">
+        <type>boolean</type>
+        <default>
+          <item>TRUE</item>
+        </default>
+        <brief>
+                Destroy intermediate data
+        </brief>
+        <description> 
+          Multiple cube images as well as lists are created durring the 
+          production of the final flattened mosaic.  If this parameter is 
+          changed to false, those temporary cubes and lists will not be removed.  
+          REMOVETEMP should only be set to false when your current directory 
+          contains the input list as well as all of the input cubes.  Otherwise, 
+          all intermediate lists will be created in the current directory, and 
+          all of the intermediate cubes will be created in the same directory as 
+          the input cubes.
+        </description>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+
+    <example>
+      <brief>Basemapmos Result</brief>
+            <description>
+                This example shows how basemapmos works upon a small mosaic.
+            </description>
+
+            <terminalInterface>
+                <commandLine>FROMLIST=cubes.lis
+                  TO=final.cub HNS1=73 HNL1=73 HNS2=103 HNL2=103 LNS=83 
+                  LNL=83</commandLine>
+                <description>
+                    Runs basemapmos with the first highpass filter being 73x73, 
+                    the second highpass filter being 103x103, and a 83x83 
+                    lowpass filter.
+                </description>
+            </terminalInterface> 
+
+            <dataFiles>
+              <dataFile path="assets/cubes.lis">
+                <brief>cubes.lis</brief>
+                <description>
+                 This is a simple file that lists all of the cubes to mosaic.  
+                 This list as well as the cubes to be mosaiced should 
+                  be within the current directory when noseam is executed.
+                </description>
+                <parameterName>FROMLIST</parameterName>
+              </dataFile>
+            </dataFiles>
+
+            <inputImages>
+                <image src="assets/images/cube1.jpg" width="204" height="550">
+                    <brief>First listed cube</brief>
+                    <description> 
+                        This is the first cube listed in cubes.lis
+                    </description>
+                    <thumbnail caption="cube1.cub" src="assets/images/cube1.jpg" width="74" height="200"/>
+                </image>
+                <image src="assets/images/cube2.jpg" width="223" height="550">
+                    <brief>Second listed cube</brief>
+                    <description> 
+                        This is the second cube listed in cubes.lis
+                    </description>
+                    <thumbnail caption="cube2.cub" src="assets/images/cube2.jpg" width="81" height="200"/>
+                </image>
+                <image src="assets/images/cube3.jpg" width="241" height="550">
+                    <brief>Third listed cube</brief>
+                    <description> 
+                        This is the third cube listed in cubes.lis
+                    </description>
+                    <thumbnail caption="cube3.cub" src="assets/images/cube3.jpg" width="87" height="200"/>
+                </image>
+            </inputImages> 
+
+            <outputImages>
+              <image src="assets/images/basemapresult.jpg" width="404" height="550">
+                    <brief>The resulting mosaic</brief>
+                    <description> 
+                        This is the resulting mosaic final.cub.
+                    </description>
+                    <thumbnail caption="final.cub" src="assets/thumbs/basemapresultthumb.jpg" width="147" height="200"/>
+                    <parameterName>TO</parameterName>
+                </image>
+            </outputImages>
+      
+    </example>
+
+  </examples>
+  
+</application>
