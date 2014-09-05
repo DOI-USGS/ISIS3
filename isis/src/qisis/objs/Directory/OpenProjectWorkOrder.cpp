@@ -37,6 +37,7 @@ namespace Isis {
 
   OpenProjectWorkOrder::OpenProjectWorkOrder(Project *project) :
       WorkOrder(project) {
+    //qDebug()<<"OpenProjectWorkOrder::OpenProjectWorkOrder";
     QAction::setText(tr("&Open Project"));
 
     setCreatesCleanState(true);
@@ -44,9 +45,10 @@ namespace Isis {
     QStringList args = QCoreApplication::arguments();
 
     if (args.count() == 2) {
-      connect(this, SIGNAL(openProjectFromCommandLine(QString)),
-              project, SLOT(open(QString)), Qt::QueuedConnection);
-      emit openProjectFromCommandLine(args.last());
+//    connect(this, SIGNAL(openProjectFromCommandLine(QString)),
+//            project, SLOT(open(QString)), Qt::QueuedConnection);
+//    emit openProjectFromCommandLine(args.last());
+//    project->open(args.last());
     }
   }
 
@@ -67,6 +69,7 @@ namespace Isis {
 
 
   bool OpenProjectWorkOrder::execute() {
+    //qDebug()<<"OpenProjectWorkOrder::execute()";
     bool success = WorkOrder::execute();
 
     // We dislike the progress bar

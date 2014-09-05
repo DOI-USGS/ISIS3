@@ -88,6 +88,7 @@ namespace Isis {
       ImageDisplayProperties *displayProperties();
       const ImageDisplayProperties *displayProperties() const;
       QString fileName() const;
+      QString serialNumber();
       geos::geom::MultiPolygon *footprint();
       const geos::geom::MultiPolygon *footprint() const;
       void setId(QString id);

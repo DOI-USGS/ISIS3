@@ -22,6 +22,8 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <QtDebug>
+
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -40,6 +42,8 @@ class QTabWidget;
 namespace Isis {
   class CnetEditorWidget;
   class ControlNet;
+  class ControlNetEditor;
+  class ControlPointEditWidget;
   class HistoryTreeWidget;
   class ImageFileListWidget;
   class MatrixSceneWidget;
@@ -84,15 +88,19 @@ namespace Isis {
       void setHistoryContainer(QDockWidget *historyContainer);
       void setWarningContainer(QDockWidget *warningContainer);
 
+// <<<<<<< .mine
+// =======
       // TODO
       void setRecentProjectsList(QStringList recentProjects);
       QStringList recentProjectsList();
 
+// >>>>>>> .r5959
       CnetEditorWidget *addCnetEditorView(Control *network);
       Workspace *addCubeDnView();
       MosaicSceneWidget *addFootprint2DView();
       MatrixSceneWidget *addMatrixView();
       ImageFileListWidget *addImageFileListView();
+      void addControlPointEditor(ControlNet *cnet, QString cnetFilename);
       QWidget *projectTreeWidget();
 
       Project *project() const;
@@ -103,6 +111,8 @@ namespace Isis {
       QList<MatrixSceneWidget *> matrixViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
+      ControlPointEditWidget *controlPointEditorView();
+      ControlNetEditor *controlNetEditor();
 
       template <typename DataType>
       QList<QAction *> supportedActions(DataType data) {
@@ -120,7 +130,7 @@ namespace Isis {
         if (!results.isEmpty()) {
           results.append(NULL);
         }
-
+        //qDebug()<<"Directory.h::supportedActions  #workorders = "<<m_workOrders.size();
         foreach (WorkOrder *workOrder, m_workOrders) {
           if (workOrder->isExecutable(data)) {
             WorkOrder *clone = workOrder->clone();
@@ -156,9 +166,15 @@ namespace Isis {
       void cleanupCubeDnViewWidgets();
       void cleanupFileListWidgets();
       void cleanupFootprint2DViewWidgets();
+// <<<<<<< .mine
+      void cleanupControlPointEditorWidget();
+// =======
       void cleanupMatrixViewWidgets();
+// >>>>>>> .r5959
       void imagesAddedToProject(ImageList *images);
-      void updateRecentProjects(Project *);
+      void updateControlNetEditConnections();
+
+      void updateRecentProjects(Project *project);
 
     private:
       /**
@@ -211,10 +227,14 @@ namespace Isis {
       QList< QPointer<Workspace> > m_cubeDnViewWidgets;
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;
       QList< QPointer<MosaicSceneWidget> > m_footprint2DViewWidgets;
+// <<<<<<< .mine
+      QPointer<ControlPointEditWidget> m_controlPointEditWidget;
+// =======
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets;
+// >>>>>>> .r5959
 
       QList< QPointer<WorkOrder> > m_workOrders;
-
+      
       QStringList m_recentProjects;
 
       // We only need to store the work orders that go into menus uniquely... all work orders
@@ -229,8 +249,13 @@ namespace Isis {
       QPointer<WorkOrder> m_openRecentProjectWorkOrder;
       QPointer<WorkOrder> m_closeProjectWorkOrder;
 
-      QPointer<WorkOrder> m_renameProjectWorkOrder;
       QPointer<WorkOrder> m_runJigsawWorkOrder;
+      QPointer<WorkOrder> m_renameProjectWorkOrder;
+
+
+      ////////// TODO: This is test code. It will be deleted.
+//    void testControlNetEditor();
+      QPointer<ControlNetEditor> m_cnetEditor;
   };
 }
 

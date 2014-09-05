@@ -243,7 +243,8 @@ namespace Isis {
         }
       }
 
-      setFlag(QGraphicsItem::ItemIsSelectable);
+      setFlag(QGraphicsItem::ItemIsSelectable, true);
+      setFlag(QGraphicsItem::ItemIsFocusable, true);
 
       QGraphicsPolygonItem *polyItem = NULL;
 
@@ -476,6 +477,7 @@ namespace Isis {
       return QGraphicsObject::sceneEvent(event);
     }
     else {
+//    //qDebug()<<"MosaicSceneItem::sceneEvent  Ignore event";
       event->ignore();
       return true;
     }

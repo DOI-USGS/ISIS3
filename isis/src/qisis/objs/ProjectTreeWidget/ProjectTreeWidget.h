@@ -67,6 +67,7 @@ namespace Isis {
       QTreeWidgetItem *m_targetParentItem;
       QTreeWidgetItem *m_sensorsParentItem;
       QTreeWidgetItem *m_spacecraftParentItem;
+//       QTreeWidgetItem *m_sensorsParentItem;
       QTreeWidgetItem *m_resultsParentItem;
 
       bool m_ignoreEdits;

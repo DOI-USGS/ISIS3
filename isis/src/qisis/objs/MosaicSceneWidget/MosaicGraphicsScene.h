@@ -2,6 +2,7 @@
 #define MosaicGraphicsScene_H
 
 #include <QGraphicsView>
+#include <QPointer>
 
 namespace Isis {
   class MosaicSceneWidget;
@@ -27,6 +28,9 @@ namespace Isis {
     protected:
       virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent);
       virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+
+    private:
+      QPointer<MosaicSceneWidget> m_parent;
   };
 }
 

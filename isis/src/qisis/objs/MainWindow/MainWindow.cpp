@@ -14,6 +14,7 @@ namespace Isis {
    */
   MainWindow::MainWindow(QString title, QWidget *parent, Qt::WFlags flags) :
       QMainWindow(parent, flags) {
+    //qDebug()<<"MainWindow::MainWindow";
     setWindowTitle(title);
   }
 
@@ -77,6 +78,7 @@ namespace Isis {
    *
    */
   void MainWindow::readSettings(QSize defaultSize) {
+    //qDebug()<<"MainWindow::readSettings";
     QSettings settings(settingsFileName(), QSettings::NativeFormat);
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
@@ -108,7 +110,7 @@ namespace Isis {
     QDir programSettings =
         QDir(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path());
     QString windowSettings = programSettings.filePath(objectName() + ".config");
-
+    //qDebug()<<"MainWindow::settingsFileName windowSettings = "<<windowSettings;
     return windowSettings;
   }
 
@@ -120,6 +122,7 @@ namespace Isis {
    *
    */
   void MainWindow::writeSettings() const {
+    //qDebug()<<"MainWindow::writeSettings";
     QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
     settings.setValue("geometry", saveGeometry());

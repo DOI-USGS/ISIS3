@@ -11,8 +11,10 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QMenu>
+#include <QPoint>
 #include <QScrollArea>
 #include <QSettings>
+#include <QSize>
 #include <QXmlStreamWriter>
 
 #include "Directory.h"
@@ -164,32 +166,6 @@ namespace Isis {
 
   void ImageFileListWidget::load(XmlStackedHandlerReader *xmlReader) {
     xmlReader->pushContentHandler(new XmlHandler(this));
-  }
-
-
-  void ImageFileListWidget::save(QXmlStreamWriter &stream, Project *project,
-                                 FileName newProjectRoot) const {
-    stream.writeStartElement("imageFileList");
-
-    ImageTreeWidgetItem::TreeColumn col =
-        ImageTreeWidgetItem::FootprintColumn;
-    while(col < ImageTreeWidgetItem::BlankColumn) {
-      bool visible = !m_tree->isColumnHidden(col);
-      bool sorted = (m_tree->sortColumn() == col);
-
-      stream.writeStartElement("column");
-      stream.writeAttribute("name", ImageTreeWidgetItem::treeColumnToString(col));
-      stream.writeAttribute("visible", (visible? "true" : "false"));
-      stream.writeAttribute("sorted", (sorted? "true" : "false"));
-      stream.writeEndElement();
-
-      col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
-    }
-
-    // Now store groups and the cubes that are in those groups
-    save(stream, NULL);
-
-    stream.writeEndElement();
   }
 
 
@@ -425,54 +401,6 @@ namespace Isis {
   }
 
 
-  void ImageFileListWidget::save(QXmlStreamWriter &stream, QTreeWidgetItem *itemToWrite) const {
-    bool done = false;
-
-    // Start the element - image or group with attributes
-    if (!itemToWrite) {
-      stream.writeStartElement("treeLayout");
-    }
-    else if(itemToWrite->type() == QTreeWidgetItem::UserType) {
-      ImageTreeWidgetItem *imageItemToWrite = (ImageTreeWidgetItem *)itemToWrite;
-
-      stream.writeStartElement("image");
-      stream.writeAttribute("id", imageItemToWrite->image()->id());
-    }
-    else {
-      bool groupIsImageList =
-            (itemToWrite->data(0, Qt::UserRole).toInt() == ImageTreeWidget::ImageListNameType);
-
-      stream.writeStartElement("group");
-      stream.writeAttribute("name", itemToWrite->text(ImageTreeWidgetItem::NameColumn));
-      stream.writeAttribute("expanded", itemToWrite->isExpanded() ? "true" : "false");
-      stream.writeAttribute("isImageList", groupIsImageList? "true" : "false");
-    }
-
-    // Write any child XML elements (groups in groups)
-    int i = 0;
-    while (!done) {
-      QTreeWidgetItem *childItemToWrite = NULL;
-
-      if (itemToWrite == NULL && i < m_tree->topLevelItemCount()) {
-        childItemToWrite = m_tree->topLevelItem(i);
-      }
-      else if (itemToWrite != NULL && i < itemToWrite->childCount()) {
-        childItemToWrite = itemToWrite->child(i);
-      }
-
-      if (childItemToWrite) {
-        save(stream, childItemToWrite);
-      }
-
-      done = (childItemToWrite == NULL);
-      i++;
-    }
-
-    // Close the initial image or group element
-    stream.writeEndElement();
-  }
-
-
   ImageTreeWidget::ImagePosition ImageFileListWidget::find(const Image *image) const {
     QString id = image->id();
 
@@ -545,6 +473,108 @@ namespace Isis {
   }
 
 
+  void ImageFileListWidget::save(QXmlStreamWriter &stream, Project *project,
+                                 FileName newProjectRoot) const {
+    stream.writeStartElement("imageFileList");
+
+    // Write QSettings
+    stream.writeStartElement("widgetGeometry");
+//  QString geom = saveGeometry();
+//  //qDebug()<<"ImageFileListWidget::save   geometry = "<<geom;
+//  stream.writeAttribute("value", saveGeometry());
+//  stream.writeEndElement();
+
+//  stream.writeStartElement("geometry");
+//  //qDebug()<<"ImageFileListWidget::save   Geometry = "<<geometry();
+//  //qDebug()<<"ImageFileListWidget::save   saveGeometry = "<<saveGeometry();
+//  stream.writeAttribute("x", QString::number(pos().x()));
+//  stream.writeAttribute("y", QString::number(pos().y()));
+//  stream.writeEndElement();
+//
+//  stream.writeStartElement("position");
+//  //qDebug()<<"ImageFileListWidget::save   Position = "<<QVariant(pos()).toString();
+//  stream.writeAttribute("x", QString::number(pos().x()));
+//  stream.writeAttribute("y", QString::number(pos().y()));
+//  stream.writeEndElement();
+//
+//  stream.writeStartElement("size");
+//  //qDebug()<<"ImageFileListWidget::save   Size = "<<size();
+//  stream.writeAttribute("width", QString::number(size().width()));
+//  stream.writeAttribute("height", QString::number(size().height()));
+//  stream.writeEndElement();
+//  stream.writeEndElement();
+
+
+    ImageTreeWidgetItem::TreeColumn col =
+        ImageTreeWidgetItem::FootprintColumn;
+    while(col < ImageTreeWidgetItem::BlankColumn) {
+      bool visible = !m_tree->isColumnHidden(col);
+      bool sorted = (m_tree->sortColumn() == col);
+
+      stream.writeStartElement("column");
+      stream.writeAttribute("name", ImageTreeWidgetItem::treeColumnToString(col));
+      stream.writeAttribute("visible", (visible? "true" : "false"));
+      stream.writeAttribute("sorted", (sorted? "true" : "false"));
+      stream.writeEndElement();
+
+      col = (ImageTreeWidgetItem::TreeColumn)(col + 1);
+    }
+
+    // Now store groups and the cubes that are in those groups
+    save(stream, NULL);
+
+    stream.writeEndElement();
+  }
+
+
+  void ImageFileListWidget::save(QXmlStreamWriter &stream, QTreeWidgetItem *itemToWrite) const {
+    bool done = false;
+
+    // Start the element - image or group with attributes
+    if (!itemToWrite) {
+      stream.writeStartElement("treeLayout");
+    }
+    else if(itemToWrite->type() == QTreeWidgetItem::UserType) {
+      ImageTreeWidgetItem *imageItemToWrite = (ImageTreeWidgetItem *)itemToWrite;
+
+      stream.writeStartElement("image");
+      stream.writeAttribute("id", imageItemToWrite->image()->id());
+    }
+    else {
+      bool groupIsImageList =
+            (itemToWrite->data(0, Qt::UserRole).toInt() == ImageTreeWidget::ImageListNameType);
+
+      stream.writeStartElement("group");
+      stream.writeAttribute("name", itemToWrite->text(ImageTreeWidgetItem::NameColumn));
+      stream.writeAttribute("expanded", itemToWrite->isExpanded() ? "true" : "false");
+      stream.writeAttribute("isImageList", groupIsImageList? "true" : "false");
+    }
+
+    // Write any child XML elements (groups in groups)
+    int i = 0;
+    while (!done) {
+      QTreeWidgetItem *childItemToWrite = NULL;
+
+      if (itemToWrite == NULL && i < m_tree->topLevelItemCount()) {
+        childItemToWrite = m_tree->topLevelItem(i);
+      }
+      else if (itemToWrite != NULL && i < itemToWrite->childCount()) {
+        childItemToWrite = itemToWrite->child(i);
+      }
+
+      if (childItemToWrite) {
+        save(stream, childItemToWrite);
+      }
+
+      done = (childItemToWrite == NULL);
+      i++;
+    }
+
+    // Close the initial image or group element
+    stream.writeEndElement();
+  }
+
+
   ImageFileListWidget::XmlHandler::XmlHandler(ImageFileListWidget *fileList) {
     m_fileList = fileList;
     m_currentImageList = NULL;
@@ -562,7 +592,23 @@ namespace Isis {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
 
     if (result) {
-      if (localName == "column") {
+
+//    if (localName == "geometry") {
+//      QByteArray
+//      restoreGeometry(atts.value("value").toAscii());
+//    }
+
+      if (localName == "position") {
+        QPoint pos = QPoint(atts.value("x").toInt(), atts.value("y").toInt());
+        //qDebug()<<"     ::startElement  pos = "<<pos;
+        m_fileList->move(pos);
+      }
+      else if (localName == "size") {
+        QSize size = QSize(atts.value("width").toInt(), atts.value("height").toInt());
+        //qDebug()<<"     ::startElement  size = "<<size;
+        m_fileList->resize(size);
+      }
+      else if (localName == "column") {
         QString colName = atts.value("name");
         QString colVisibleStr = atts.value("visible");
         QString colSortedStr = atts.value("sorted");

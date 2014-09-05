@@ -1,5 +1,5 @@
-#ifndef ControlPointEdit_h
-#define ControlPointEdit_h
+#ifndef ControlMeasureEditWidget_h
+#define ControlMeasureEditWidget_h
 
 // This is the only include allowed in this file!
 #include <QWidget>
@@ -130,18 +130,19 @@ namespace Isis {
     *   @history 2013-12-30 Kimberly Oyama and Stuart Sides - In saveChips(), added single quotes
     *                           around the file names in case there are spaces or other special
     *                           characters in them. Fixes #1551.
+    *   @history 2014-07-03 Tracie Sucharski - Renamed from ControlPointEdit. 
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
     *                          should this be put somewhere else.
     */
-  class ControlPointEdit : public QWidget {
+  class ControlMeasureEditWidget : public QWidget {
       Q_OBJECT
 
     public:
-      ControlPointEdit(ControlNet * cnet, QWidget *parent = 0,
-                       bool allowLeftMouse = false, bool useGeometry = true);
-      ~ControlPointEdit();
+      ControlMeasureEditWidget(QWidget *parent = 0, bool allowLeftMouse = false,
+                               bool useGeometry = true);
+      ~ControlMeasureEditWidget();
       QString templateFileName() {
         return p_templateFileName;
       };
@@ -187,7 +188,7 @@ namespace Isis {
       void updateBlink();
 
     private:
-      void createPointEditor(QWidget *parent);
+      void createMeasureEditor(QWidget *parent);
 
       bool p_allowLeftMouse;
       bool p_useGeometry;

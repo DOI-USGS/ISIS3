@@ -10,6 +10,8 @@ class QPushButton;
 namespace Isis {
   class ControlNet;
   class ControlNetGraphicsItem;
+  class ControlPoint;
+//   class ControlPointEdit;
   class Image;
   class ImageList;
 
@@ -84,7 +86,14 @@ namespace Isis {
       static QString toString(MovementColorSource);
       static MovementColorSource fromMovementColorSourceString(QString);
 
+    signals:
+      void controlPointSelected(ControlPoint *);
+      void deleteControlPoint(QString controlPointId);
+
     public slots:
+      void displayNewControlPoint(QString pointId);
+      void displayChangedControlPoint(QString pointId);
+      void displayUponControlPointDeletion();
 
     protected:
       QAction *getPrimaryAction();
@@ -95,8 +104,8 @@ namespace Isis {
       void configMovement();
       void updateTool();
       void openControlNet();
-      void displayConnectivity();
       void displayControlNet();
+      void displayConnectivity();
       void closeNetwork();
       void loadNetwork();
       void randomizeColors();
@@ -119,6 +128,7 @@ namespace Isis {
       ControlNetGraphicsItem *m_controlNetGraphics;
       QLabel *m_controlNetFileLabel;
       QString m_controlNetFile;
+//       ControlPointEdit *m_pointEditor;
 
       //! This defines the drawing mode of the apriori to adjusted arrows
       MovementColorSource m_movementArrowColorSource;

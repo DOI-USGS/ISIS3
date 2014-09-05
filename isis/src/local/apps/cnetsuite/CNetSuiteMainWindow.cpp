@@ -23,6 +23,7 @@
 #include "CNetSuiteMainWindow.h"
 
 #include <QtGui>
+#include <QSettings>
 
 #include "Directory.h"
 #include "FileName.h"
@@ -42,7 +43,6 @@ namespace Isis {
   CNetSuiteMainWindow::CNetSuiteMainWindow(QWidget *parent) :
       QMainWindow(parent) {
     m_maxThreadCount = -1;
-    m_maxRecentProjectFiles = 5;
 
     QWidget *centralWidget = new QWidget;
 //  centralWidget->hide();
@@ -55,30 +55,47 @@ namespace Isis {
 //          this, SLOT(removeCentralWidgetTab(int)));
 
     setCentralWidget(centralWidget);
-    setDockNestingEnabled(true);
+
+    // TLS 2013-07-23 Comment out to see if the behaviour improves
+//  setDockNestingEnabled(true);
 
     try {
+      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before create Directory";
       m_directory = new Directory(this);
+      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  after create Directory";
       connect(m_directory,
               SIGNAL(newWidgetAvailable(QWidget *, Qt::DockWidgetArea, Qt::Orientation)),
-              this,
-              SLOT(addDock(QWidget *, Qt::DockWidgetArea, Qt::Orientation)));
+              this, SLOT(addDock(QWidget *, Qt::DockWidgetArea, Qt::Orientation)));
+      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow before projectLoaded connection";
+      connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
+              this, SLOT(readSettings(Project *)));
+      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow after projectLoaded connection";
+//    connect(m_directory->project(), SIGNAL(restoreWindow(
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
           "Could not create Directory.", _FILEINFO_);
     }
 
-    readSettings();
+    QStringList args = QCoreApplication::arguments();
 
+    if (args.count() == 2) {
+//    connect(this, SIGNAL(openProjectFromCommandLine(QString)),
+//            project, SLOT(open(QString)), Qt::QueuedConnection);
+//    emit openProjectFromCommandLine(args.last());
+      m_directory->project()->open(args.last());
+    }
+
+    //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before createMenus";
     createMenus();
 
+    //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before docks";
     QDockWidget *projectDock = new QDockWidget("Project", this, Qt::SubWindow);
     projectDock->setObjectName("projectDock");
     projectDock->setFeatures(QDockWidget::DockWidgetMovable |
                               QDockWidget::DockWidgetFloatable);
     projectDock->setWidget(m_directory->projectTreeWidget());
-    addDockWidget(Qt::LeftDockWidgetArea, projectDock);
+    addDockWidget(Qt::LeftDockWidgetArea, projectDock, Qt::Horizontal);
 
     QDockWidget *warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
     warningsDock->setObjectName("warningsDock");
@@ -110,8 +127,9 @@ namespace Isis {
     tabifyDockWidget(historyDock, progressDock);
 
     warningsDock->raise();
+    //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  after docks";
 
-//    readSettings();
+//  readSettings();
 
     statusBar()->showMessage("Ready");
     statusBar()->addWidget(m_directory->project()->progress());
@@ -119,8 +137,6 @@ namespace Isis {
     foreach (QProgressBar *progressBar, m_directory->progressBars()) {
       statusBar()->addWidget(progressBar);
     }
-
-    setAnimated(false);
   }
 
 
@@ -129,6 +145,7 @@ namespace Isis {
 
     QDockWidget *dock = new QDockWidget(newWidgetForDock->windowTitle());
     dock->setWidget(newWidgetForDock);
+    //qDebug()<<"CNetSuiteMainWindow::addDock objectName = "<<newWidgetForDock->objectName();
     dock->setObjectName(newWidgetForDock->objectName());
 
     // This needs to eventually be a work order...
@@ -177,8 +194,8 @@ namespace Isis {
     m_directory->populateMainMenu(menuBar());
 
     QAction *exitAction = fileMenu->addAction(tr("E&xit"));
-    exitAction->setIcon(QIcon(":close"));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+
 
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->setObjectName("editMenu");
@@ -209,8 +226,7 @@ namespace Isis {
         QPixmap(FileName("$base/icons/contexthelp.png").expanded()));
     activateWhatsThisAct->setToolTip("Activate What's This and click on parts "
         "this program to see more information about them");
-    connect(activateWhatsThisAct, SIGNAL(activated()),
-            this, SLOT(enterWhatsThisMode()));
+    connect(activateWhatsThisAct, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
 
     helpMenu->addAction(activateWhatsThisAct);
   }
@@ -223,21 +239,20 @@ namespace Isis {
    * The config file used is $HOME/.Isis/$APPNAME/$APPNAME.config
    */
   void CNetSuiteMainWindow::writeSettings() {
+    //qDebug()<<"CNetSuiteMainwindow::writeSettings";
     QString appName = QApplication::applicationName();
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + ".config")
           .expanded(),
         QSettings::NativeFormat);
 
-    settings.beginGroup("MainWindow");
+//    settings.beginGroup("MainWindow");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
+    settings.setValue("size", size());
+    settings.setValue("pos", pos());
 
     settings.setValue("maxThreadCount", m_maxThreadCount);
-
-    settings.setValue("maxRecentProjectFiles", m_maxRecentProjectFiles);
-
-    settings.setValue("recentProjectFilesList", m_directory->recentProjectsList());
   }
 
 
@@ -246,24 +261,27 @@ namespace Isis {
    *
    * The config file read is $HOME/.Isis/$APPNAME/$APPNAME.config
    */
-  void CNetSuiteMainWindow::readSettings() {
+  void CNetSuiteMainWindow::readSettings(Project *) {
+    //qDebug()<<"CNetSuiteMainwindow::readSettings";
     QString appName = QApplication::applicationName();
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + ".config")
           .expanded(),
         QSettings::NativeFormat);
 
-    settings.beginGroup("MainWindow");
+//    settings.beginGroup("MainWindow");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
 
+    // The geom/state isn't enough for main windows to correctly remember
+    //   their position and size, so let's restore those on top of
+    //   the geom and state.
+    if (!settings.value("pos").toPoint().isNull())
+      move(settings.value("pos").toPoint());
+
+    resize(settings.value("size", QSize(800, 600)).toSize());
     m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
     applyMaxThreadCount();
-
-    m_maxRecentProjectFiles = settings.value("maxRecentProjectFiles", m_maxRecentProjectFiles).toInt();
-    QStringList recentFiles = settings.value("recentProjectFilesList").toStringList();
-    if (recentFiles.size() > 0)
-      m_directory->setRecentProjectsList(recentFiles);
   }
 
 
@@ -272,13 +290,14 @@ namespace Isis {
    *   forwarding the event to the QMainWindow.
    */
   void CNetSuiteMainWindow::closeEvent(QCloseEvent *event) {
+    //qDebug()<<"CNetSuiteMainWindow::closeEvent";
     writeSettings();
     QMainWindow::closeEvent(event);
   }
 
 
   /**
-   * Ask the user how many threads to use in this program. This includes the GUI thread.
+   * Ask te user how many threads to use in this program. This includes the GUI thread.
    */
   void CNetSuiteMainWindow::configureThreadLimit() {
     bool ok = false;

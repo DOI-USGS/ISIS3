@@ -9,6 +9,7 @@
 #include "Image.h"
 #include "ImageDisplayProperties.h"
 #include "ImageListActionWorkOrder.h"
+#include "SerialNumberList.h"
 #include "WorkOrder.h"
 #include "XmlStackedHandler.h"
 
@@ -24,7 +25,8 @@ namespace Isis {
    *
    * @internal 
    * @history 2014-01-08 Tracie Sucharski - Added layer re-ordering connections to all images 
-   *                         in list instead of just the first image.  Fixes #1755. 
+   *                         in list instead of just the first image.  Fixes #1755.
+   * @history 2014-06-13 Tracie Sucharski - Added serialNumberList method.
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT
@@ -40,6 +42,8 @@ namespace Isis {
       explicit ImageList(QStringList &);
       ImageList(const ImageList &);
       ~ImageList();
+
+      SerialNumberList serialNumberList();
 
       // These are overridden (-ish) in order to add notifications to the list changing
       void append(Image * const & value);

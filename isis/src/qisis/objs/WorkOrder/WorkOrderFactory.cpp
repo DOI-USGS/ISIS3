@@ -11,19 +11,15 @@
 #include "IString.h"
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
-#include "JigsawWorkOrder.h"
 #include "OpenProjectWorkOrder.h"
-#include "OpenRecentProjectWorkOrder.h"
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectAsWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
-#include "CloseProjectWorkOrder.h"
 #include "MatrixViewWorkOrder.h"
 #include "MoveDownOneSceneWorkOrder.h"
 #include "MoveToBottomSceneWorkOrder.h"
 #include "MoveToTopSceneWorkOrder.h"
 #include "MoveUpOneSceneWorkOrder.h"
-#include "ViewControlNet3DWorkOrder.h"
 
 namespace Isis {
   /**
@@ -53,13 +49,9 @@ namespace Isis {
     tryType<MoveToTopSceneWorkOrder>(type, project, result);
     tryType<MoveUpOneSceneWorkOrder>(type, project, result);
     tryType<OpenProjectWorkOrder>(type, project, result);
-    tryType<OpenRecentProjectWorkOrder>(type, project, result);
     tryType<RenameProjectWorkOrder>(type, project, result);
     tryType<SaveProjectWorkOrder>(type, project, result);
     tryType<SaveProjectAsWorkOrder>(type, project, result);
-    tryType<CloseProjectWorkOrder>(type, project, result);
-    tryType<JigsawWorkOrder>(type, project, result);
-    tryType<ViewControlNet3DWorkOrder>(type, project, result);
 
     if (!result) {
       throw IException(IException::Unknown,

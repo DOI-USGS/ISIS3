@@ -44,13 +44,13 @@ namespace Isis {
 
     m_origPoint = new QPointF(apriori);
 
-    if(cp->IsIgnored())
+    if (cp->IsIgnored())
       setPen(QPen(Qt::red));
-    else if(cp->IsEditLocked())
+    else if (cp->IsEditLocked())
       setPen(QPen(Qt::magenta));
-    else if(cp->GetType() == ControlPoint::Fixed)
+    else if (cp->GetType() == ControlPoint::Fixed)
       setPen(QPen(Qt::green));
-    else if(cp->GetType() == ControlPoint::Constrained)
+    else if (cp->GetType() == ControlPoint::Constrained)
       setPen(QPen(Qt::darkGreen));
     else // Free
       setPen(QPen(Qt::blue));
@@ -60,18 +60,22 @@ namespace Isis {
     setToolTip(makeToolTip(snList));
 
     setRect(calcRect());
-    setFiltersChildEvents(true);
+
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
+
+//  setFiltersChildEvents(true);
 //  installEventFilter(this);
   }
 
 
   ControlPointGraphicsItem::~ControlPointGraphicsItem() {
-    if(m_centerPoint) {
+    if (m_centerPoint) {
       delete m_centerPoint;
       m_centerPoint = NULL;
     }
 
-    if(m_origPoint) {
+    if (m_origPoint) {
       delete m_origPoint;
       m_origPoint = NULL;
     }
@@ -85,10 +89,10 @@ namespace Isis {
     QRectF fullRect = calcRect();
     QRectF crosshairRect = calcCrosshairRect();
 
-    if(crosshairRect.isNull())
+    if (crosshairRect.isNull())
       return;
 
-    if(rect() != fullRect) {
+    if (rect() != fullRect) {
       setRect(fullRect);
     }
     else {
@@ -105,7 +109,7 @@ namespace Isis {
       painter->drawLine(centerLeft, centerRight);
       painter->drawLine(centerTop, centerBottom);
 
-      if(!m_origPoint->isNull() && *m_origPoint != *m_centerPoint
+      if (!m_origPoint->isNull() && *m_origPoint != *m_centerPoint
          && m_showArrow) {
 
         if (!m_colorByMeasureCount && !m_colorByResidualMagnitude) {
@@ -173,41 +177,42 @@ namespace Isis {
 
     QAction *selected = menu.exec(event->screenPos());
 
-    if(selected == infoAction) {
+    if (selected == infoAction) {
       QMessageBox::information(m_mosaicScene, "Control Point Information",
           toolTip());
     }
   }
-//
-//
-//void ControlPointGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-//  qDebug()<<"ControlPointGraphicsItem::mouseReleaseEvent pointId = "<<QString::fromStdString(m_controlPoint->GetId());
-//}
+
+
+  void ControlPointGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+    //qDebug()<<"ControlPointGraphicsItem::mouseReleaseEvent pointId = "<<m_controlPoint->GetId();
+//  emit newControlPointSelected(m_controlPoint);
+  }
 
 
   QRectF ControlPointGraphicsItem::calcRect() const {
     QRectF pointRect(calcCrosshairRect());
 
-    if(!m_origPoint->isNull() && pointRect.isValid()) {
+    if (!m_origPoint->isNull() && pointRect.isValid()) {
       // Make the rect contain the orig point
-      if(pointRect.left() > m_origPoint->x()) {
+      if (pointRect.left() > m_origPoint->x()) {
         pointRect.setLeft(m_origPoint->x());
       }
-      else if(pointRect.right() < m_origPoint->x()) {
+      else if (pointRect.right() < m_origPoint->x()) {
         pointRect.setRight(m_origPoint->x());
       }
 
-      if(pointRect.top() > m_origPoint->y()) {
+      if (pointRect.top() > m_origPoint->y()) {
         pointRect.setTop(m_origPoint->y());
       }
-      else if(pointRect.bottom() < m_origPoint->y()) {
+      else if (pointRect.bottom() < m_origPoint->y()) {
         pointRect.setBottom(m_origPoint->y());
       }
     }
 
     QPolygonF arrowHead = calcArrowHead();
 
-    if(arrowHead.size() > 2) {
+    if (arrowHead.size() > 2) {
       pointRect = pointRect.united(arrowHead.boundingRect());
     }
 
@@ -218,7 +223,7 @@ namespace Isis {
   QRectF ControlPointGraphicsItem::calcCrosshairRect() const {
     QRectF pointRect;
 
-    if(m_centerPoint && !m_centerPoint->isNull() && m_mosaicScene) {
+    if (m_centerPoint && !m_centerPoint->isNull() && m_mosaicScene) {
       static const int size = 12;
       QPoint findSpotScreen =
           m_mosaicScene->getView()->mapFromScene(*m_centerPoint);
@@ -238,7 +243,7 @@ namespace Isis {
   QPolygonF ControlPointGraphicsItem::calcArrowHead() const {
     QPolygonF arrowHead;
 
-    if(m_showArrow && !m_origPoint->isNull() &&
+    if (m_showArrow && !m_origPoint->isNull() &&
        *m_origPoint != *m_centerPoint) {
       QRectF crosshairRect = calcCrosshairRect();
       double headSize = crosshairRect.width() * 4.0 / 5.0;
@@ -280,7 +285,7 @@ namespace Isis {
 
     toolTip += "<br />";
 
-    if(snList == NULL) {
+    if (snList == NULL) {
       toolTip += QStringList(m_controlPoint->getCubeSerialNumbers()).join("\n");
     }
     else {
@@ -289,10 +294,10 @@ namespace Isis {
       for(int snIndex = 0; snIndex < serialNums.size(); snIndex ++) {
         QString serialNum = serialNums[snIndex];
 
-        if(snIndex > 0)
+        if (snIndex > 0)
           toolTip += "<br />";
 
-        if(snList->HasSerialNumber(serialNum)) {
+        if (snList->HasSerialNumber(serialNum)) {
           toolTip +=
               FileName(snList->FileName(serialNum)).name();
           toolTip += " (" + serialNum + ")";
@@ -314,7 +319,8 @@ namespace Isis {
   }
 
 
-//bool MosaicSceneWidget::eventFilter(QObject *obj, QEvent *event) {
+//bool MosaicSceneWidget::
+//(QObject *obj, QEvent *event) {
 //
 //  switch(event->type()) {
 //    case QMouseEvent::GraphicsSceneMousePress: {

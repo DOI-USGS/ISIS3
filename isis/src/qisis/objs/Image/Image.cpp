@@ -25,6 +25,7 @@
 #include "ImagePolygon.h"
 #include "PolygonTools.h"
 #include "Project.h"
+#include "SerialNumber.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -242,7 +243,12 @@ namespace Isis {
    */
   Cube *Image::cube() {
     if (!m_cube) {
-      m_cube = new Cube(m_fileName);
+      try {
+        m_cube = new Cube(m_fileName); 
+      }
+      catch (IException &e) {
+        throw IException(e, IException::Programmer, "Cube cannot be created", _FILEINFO_);
+      }
     }
 
     return m_cube;
@@ -291,6 +297,14 @@ namespace Isis {
     return m_fileName;
   }
 
+
+  /**
+   * Get the serial number. 
+   * @return SerialNumber The cube's serial number. 
+   */
+  QString Image::serialNumber() {
+    return SerialNumber::Compose(*(cube()));
+  }
 
   /**
    * Get the footprint of this image (if available).

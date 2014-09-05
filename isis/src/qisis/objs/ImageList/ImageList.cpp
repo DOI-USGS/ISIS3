@@ -123,6 +123,20 @@ namespace Isis {
 
 
   /**
+   * Create SerialNumberList from list
+   */
+  SerialNumberList ImageList::serialNumberList() {
+
+    SerialNumberList result;
+
+    for (int i = 0; i < count(); i++) {
+      result.Add((*this)[i]->fileName());
+    }
+    return result;
+  }
+
+
+  /**
    * @see QList<Image *>::append()
    */
   void ImageList::append(Image * const & value) {

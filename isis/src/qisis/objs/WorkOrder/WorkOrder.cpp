@@ -191,17 +191,6 @@ namespace Isis {
     return false;
   }
 
-  /* Re-implement this method if your work order utilizes images for data in order to operate. For
-  *   example, "Footprint2DViewWorkOrder" works sometimes on images - the logic in side of
-  *   Footprint2DViewWorkOrder::isExecutable(ImageList) determines whethere or not a user is
-  *   prompted with this work order as a possibility.
-  *
-  * @param images An image list that this work order should execute on
-  */
- bool WorkOrder::isExecutable(QString projectFileName) {
-   return false;
- }
-
   /**
    * Read this work order's data from disk.
    */

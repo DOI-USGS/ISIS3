@@ -18,6 +18,7 @@ class QToolBar;
 class QToolButton;
 
 namespace Isis {
+  class ControlPoint;
   class Directory;
   class Image;
   class MosaicGraphicsView;
@@ -106,6 +107,7 @@ namespace Isis {
    *                           Removed unused private member, m_projectionFootprint.  The
    *                           uninitialized values were causing the qmos selection tool to not
    *                           work properly.  Fixes #1742.
+   *   @history 2014-07-18 Kimberly Oyama and Tracie Sucharski - Added selectedCubes() and  .
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -157,10 +159,13 @@ namespace Isis {
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
+//    QPointF currentLatLonPosition();
       QRectF cubesBoundingRect() const;
       QStringList cubeFileNames();
       Directory *directory() const;
+
       ImageList images();
+      ImageList selectedImages();
 
       QList<QAction *> getExportActions();
       QList<QAction *> getViewActions();
@@ -169,15 +174,18 @@ namespace Isis {
       double moveDownOne(MosaicSceneItem *);
       double moveDownOne(Image *);
       QList<double> moveDownOne(ImageList *);
+
       double moveToBottom(MosaicSceneItem *);
       double moveToBottom(Image *);
       QList<double> moveToBottom(ImageList *);
-      double moveToTop(MosaicSceneItem *);
-      double moveToTop(Image *);
-      QList<double> moveToTop(ImageList *);
+
       double moveUpOne(MosaicSceneItem *);
       double moveUpOne(Image *);
       QList<double> moveUpOne(ImageList *);
+
+      double moveToTop(MosaicSceneItem *);
+      double moveToTop(Image *);
+      QList<double> moveToTop(ImageList *);
 
       double moveZ(MosaicSceneItem *sceneItem, double newZ, bool newZValueMightExist = true);
       double moveZ(Image *image, double newZ, bool newZValueMightExist = true);
@@ -189,6 +197,8 @@ namespace Isis {
       QList<QAction *> supportedActions(DataType) {
         return QList<QAction *>();
       }
+
+      bool isControlNetToolActive();
 
       static QWidget *getControlNetHelp(QWidget *cnetToolContainer = NULL);
       static QWidget *getGridHelp(QWidget *gridToolContainer = NULL);
@@ -211,6 +221,14 @@ namespace Isis {
       void cubesChanged();
 
       void queueSelectionChanged();
+
+      void controlPointSelected(ControlPoint *);
+
+      void controlPointChanged(QString pointId);
+      void controlPointAdded(QString pointId);
+
+      void deleteControlPoint(QString pointId);
+      void controlPointDeleted();
 
     public slots:
       void addImages(ImageList);
@@ -254,8 +272,6 @@ namespace Isis {
       PvlGroup createInitialProjection(Image *cube);
 
       MosaicSceneItem *cubeToMosaic(DisplayProperties *props);
-
-      ImageList getSelectedCubes() const;
 
       static bool zOrderGreaterThan(MosaicSceneItem *first,
                                     MosaicSceneItem *second);

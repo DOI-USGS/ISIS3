@@ -37,7 +37,9 @@ namespace Isis {
     p_chipCube = NULL;
     p_matchChip = NULL;
     p_matchChipCube = NULL;
-    p_image = NULL;
+//  p_image = NULL;
+    p_image = new QImage(512, 512, QImage::Format_RGB32);
+    p_image->fill(Qt::black);
     p_controlNet = NULL;
     p_stretchLocked = false;
     p_stretch = NULL;
@@ -222,7 +224,8 @@ namespace Isis {
    *                          this cube, return.
    */
   void ChipViewport::paintEvent(QPaintEvent *e) {
-    QPainter painter(this);
+
+    QPainter painter(this); 
 
     if (p_tempView != NULL) {
       painter.drawImage(0, 0, *(p_tempView->p_image));

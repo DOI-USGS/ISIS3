@@ -29,6 +29,7 @@
 
 namespace Isis {
   class Directory;
+  class Project;
 
   /**
    * @author 2012-??-?? Steven Lambright and Stuart Sides
@@ -55,6 +56,7 @@ namespace Isis {
     public slots:
       void addDock(QWidget *newWidgetForDock, Qt::DockWidgetArea area,
                    Qt::Orientation orientation);
+      void readSettings(Project *);
 
     protected:
       void closeEvent(QCloseEvent *event);
@@ -70,7 +72,6 @@ namespace Isis {
       void applyMaxThreadCount();
       void createMenus();
       void writeSettings();
-      void readSettings();
 
     private:
       /**
@@ -86,12 +87,6 @@ namespace Isis {
        *   should perform a best-guess for best perfomance.
        */
       int m_maxThreadCount;
-
-      /**
-       * Maximum number of recently opened projects
-       *   This number and any recently opened projects should be stored in application settings
-       */
-      int m_maxRecentProjectFiles;
   };
 }
 

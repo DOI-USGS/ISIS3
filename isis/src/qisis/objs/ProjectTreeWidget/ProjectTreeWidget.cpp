@@ -51,6 +51,7 @@ namespace Isis {
     m_targetParentItem = NULL;
     m_sensorsParentItem = NULL;
     m_spacecraftParentItem = NULL;
+    m_sensorsParentItem = NULL;
     m_resultsParentItem = NULL;
     m_ignoreEdits = false;
 
@@ -85,6 +86,7 @@ namespace Isis {
     m_targetParentItem = NULL;
     m_sensorsParentItem = NULL;
     m_spacecraftParentItem = NULL;
+    m_sensorsParentItem = NULL;
     m_resultsParentItem = NULL;
     m_projectItem = NULL;
   }
@@ -189,6 +191,7 @@ namespace Isis {
                            Qt::ItemIsSelectable);
     m_projectItem->setExpanded(true);
     m_projectItem->setIcon(0, QIcon(":data"));
+//  m_projectItem->setToolTip(
     onProjectNameChanged();
     insertTopLevelItem(0, m_projectItem);
 
@@ -233,6 +236,13 @@ namespace Isis {
                                      Qt::ItemIsSelectable);
     m_spacecraftParentItem->setExpanded(true);
     m_spacecraftParentItem->setIcon(0, QIcon(":spacecraft"));
+
+    m_sensorsParentItem = new QTreeWidgetItem(m_projectItem);
+    m_sensorsParentItem->setText(0, tr("Sensors"));
+    m_sensorsParentItem->setFlags(Qt::ItemIsEnabled |
+                             Qt::ItemIsSelectable);
+    m_sensorsParentItem->setExpanded(true);
+    m_sensorsParentItem->setIcon(0, QIcon(":camera"));
 
     m_resultsParentItem = new QTreeWidgetItem(m_projectItem);
     m_resultsParentItem->setText(0, tr("Results"));
@@ -283,6 +293,7 @@ namespace Isis {
   void ProjectTreeWidget::onProjectNameChanged() {
     m_ignoreEdits = true;
     m_projectItem->setText(0, m_directory->project()->name());
+    m_projectItem->setToolTip(0, m_directory->project()->projectRoot());
     m_ignoreEdits = false;
   }
 
@@ -408,8 +419,8 @@ namespace Isis {
      * "View Correlation Matrix" is selected in the context menu of the following tree item.
      */
     if ( bundleStatistics->correlationMatrix().hasCovMat() ) {
-      qDebug() << "CovMatFileName:" << bundleStatistics->correlationMatrix().covarianceFileName().name();
-      qDebug() << "imgs and parmas:" << bundleStatistics->correlationMatrix().imagesAndParameters()->size();
+      //qDebug() << "CovMatFileName:" << bundleStatistics->correlationMatrix().covarianceFileName().name();
+      //qDebug() << "imgs and parmas:" << bundleStatistics->correlationMatrix().imagesAndParameters()->size();
     }
 
     item->addChild(settingsItem);
@@ -423,7 +434,7 @@ namespace Isis {
 
     expandItem(item);
 //     m_resultsParentItem->addChild(item);
-qDebug() << "Done adding bundleResults";
+//qDebug() << "Done adding bundleResults";
     //  Create new TreeWidgetItem
 //    if (!found.isEmpty()) {
 //      QTreeWidgetItem *item = new BundleResultsTreeWidgetItem(bundleResults);

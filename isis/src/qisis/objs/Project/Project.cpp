@@ -64,7 +64,7 @@ namespace Isis {
    */
   Project::Project(Directory &directory, QObject *parent) :
       QObject(parent) {
-
+    //qDebug()<<"Project::Project";
     m_bundleSettings = NULL;
     m_directory = &directory;
     m_projectRoot = NULL;
@@ -78,16 +78,6 @@ namespace Isis {
     m_isTemporaryProject = true;
 
     m_numImagesCurrentlyReading = 0;
-
-    /////////////////////////////////////////////////////////////////////// Correlation Matrix
-//     m_correlationMatrix = NULL;
-//     m_correlationMatrix = new CorrelationMatrix();
-//     m_correlationMatrix->setCovarianceFileName( FileName("/work/users/koyama/testData/covarianceMatrix2.dat") );
-//     m_correlationMatrix->setCorrelationFileName( FileName("/work/users/koyama/testData/correlationMatrix.dat") );
-// 
-//     m_correlationMatrix->computeCorrelationMatrix();
-//     qDebug() << "In project, got correlationMatrix";
-    /////////////////////////////////////////////////////////////////////// Correlation Matrix
 
     m_mutex = NULL;
     m_imageReadingMutex = NULL;
@@ -141,7 +131,7 @@ namespace Isis {
             + QApplication::applicationName() + "_" + QString::number( getpid() );
       QDir temp(tmpFolder + "/tmpProject");
       m_projectRoot = new QDir(temp);
-
+      //qDebug()<<"          Create temp project";
       createFolders();
     }
     catch (IException &e) {
@@ -171,10 +161,14 @@ namespace Isis {
     m_workOrderHistory = new QList< QPointer<WorkOrder> >;
 
     m_imageReadingMutex = new QMutex;
+// <<<<<<< .mine
+    //qDebug()<<"Project::Project    End";
+// =======
 
     // TODO: ken testing
 //    m_bundleSettings = NULL;
 //    m_bundleSettings = new BundleSettings();
+// >>>>>>> .r5959
   }
 
 
@@ -318,7 +312,6 @@ namespace Isis {
 
   ImageList *Project::createOrRetrieveImageList(QString name) {
     ImageList *result = imageList(name);
-
     if (!result) {
       result = new ImageList;
 
@@ -327,10 +320,10 @@ namespace Isis {
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( imageListDeleted(QObject *) ) );
-
-      m_images->append(result);
+      //TODO  07-29-14  Kim & Tracie commented this out.  Didn't seem like it was necessary.
+      //      If problems, need to understand this code better.
+   m_images->append(result);
     }
-
     return result;
   }
 
@@ -353,7 +346,12 @@ namespace Isis {
 
     stream.writeAttribute("name", m_name);
 
+// <<<<<<< .mine
+
+//     if (!m_controls->isEmpty()) {
+// =======
     if ( !m_controls->isEmpty() ) {
+// >>>>>>> .r5959
       stream.writeStartElement("controlNets");
 
       for (int i = 0; i < m_controls->count(); i++) {
@@ -373,6 +371,21 @@ namespace Isis {
       stream.writeEndElement();
     }
 
+// <<<<<<< .mine
+
+
+
+
+    //  Write general look of gui, including docked widges
+//  QVariant geo_data = saveGeometry();
+//  QVariant layout_data = saveState();
+//
+//  stream.writeStartElement("dockRestore");
+//  stream.writeAttribute("geometry", geo_data.toString());
+//  stream.writeAttribute("state", layout_data.toString());
+
+
+// =======
     if ( !m_bundleResults->isEmpty() ) {
       stream.writeStartElement("bundleResults");
 
@@ -391,6 +404,7 @@ namespace Isis {
       stream.writeEndElement();
     }
 
+// >>>>>>> .r5959
     stream.writeEndElement();
   }
 
@@ -665,6 +679,7 @@ namespace Isis {
    * Open the project at the given path.
    */
   void Project::open(QString projectPathStr) {
+    //qDebug()<<"Project::open    projectPathStr = "<<projectPathStr;
     m_isTemporaryProject = false;
 
     FileName projectPath(projectPathStr);
@@ -676,7 +691,7 @@ namespace Isis {
 
     QString projectXmlPath = projectPath.toString() + "/project.xml";
     QFile file(projectXmlPath);
-
+//qDebug()<<"Project::open     before opening project.xml";
     if ( !file.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
@@ -688,9 +703,16 @@ namespace Isis {
     *m_projectRoot = projectPath.expanded();
 
     QXmlInputSource xmlInputSource(&file);
+// <<<<<<< .mine
+//qDebug()<<"Project::open     before parsing project.xml";
+//     if (!reader.parse(xmlInputSource)) {
+//       warn(tr("Failed to open project [%1]").arg(projectPath.original()));
+// =======
     if ( !reader.parse(xmlInputSource) ) {
       warn( tr("Failed to open project [%1]").arg( projectPath.original() ) );
+// >>>>>>> .r5959
     }
+//qDebug()<<"Project::open     before opening history.xml";
 
     QString projectXmlHistoryPath = projectPath.toString() + "/history.xml";
     QFile historyFile(projectXmlHistoryPath);
@@ -704,15 +726,26 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlHistoryInputSource(&historyFile);
+// <<<<<<< .mine
+//qDebug()<<"Project::open     before parsing history.xml";
+//     if (!reader.parse(xmlHistoryInputSource)) {
+//       warn(tr("Failed to read history from project [%1]").arg(projectPath.original()));
+// =======
     if ( !reader.parse(xmlHistoryInputSource) ) {
       warn( tr("Failed to read history from project [%1]").arg( projectPath.original() ) );
+// >>>>>>> .r5959
     }
 
     QString projectXmlWarningsPath =
         projectPath.toString() + "/warnings.xml";
     QFile warningsFile(projectXmlWarningsPath);
 
+// <<<<<<< .mine
+//qDebug()<<"Project::open     before opening warnings.xml";
+//     if (!warningsFile.open(QFile::ReadOnly)) {
+// =======
     if ( !warningsFile.open(QFile::ReadOnly) ) {
+// >>>>>>> .r5959
       throw IException(IException::Io,
                        QString("Unable to open [%1] with read access")
                          .arg(projectXmlWarningsPath),
@@ -721,13 +754,19 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlWarningsInputSource(&warningsFile);
+// <<<<<<< .mine
+//qDebug()<<"Project::open     before parsing warnings.xml";
+//     if (!reader.parse(xmlWarningsInputSource)) {
+//       warn(tr("Failed to read warnings from project [%1]").arg(projectPath.original()));
+// =======
     if ( !reader.parse(xmlWarningsInputSource) ) {
       warn( tr("Failed to read warnings from project [%1]").arg(projectPath.original() ) );
+// >>>>>>> .r5959
     }
-
     QString directoryXmlPath =
         projectPath.toString() + "/directory.xml";
     QFile directoryFile(directoryXmlPath);
+//qDebug()<<"Project::open      before opening directory.xml";
 
     if ( !directoryFile.open(QFile::ReadOnly) ) {
       throw IException(IException::Io,
@@ -738,11 +777,19 @@ namespace Isis {
 
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlDirectoryInputSource(&directoryFile);
+// <<<<<<< .mine
+    //qDebug()<<"Project::open  Before parsing xml";
+//     if (!reader.parse(xmlDirectoryInputSource)) {
+//       warn(tr("Failed to read GUI state from project [%1]").arg(projectPath.original()));
+// =======
     if ( !reader.parse(xmlDirectoryInputSource) ) {
       warn( tr("Failed to read GUI state from project [%1]").arg( projectPath.original() ) );
+// >>>>>>> .r5959
     }
 
+    //qDebug()<<"Project::open   Before emit projectLoaded";
     emit projectLoaded(this);
+    //qDebug()<<"Project::open   After emit projectLoaded";
   }
 
 
@@ -1160,7 +1207,9 @@ namespace Isis {
     directoryStateWriter.setAutoFormatting(true);
 
     directoryStateWriter.writeStartDocument();
+    //qDebug()<<"Project::save Before save Directory";
     m_directory->save(directoryStateWriter, newPath);
+    //qDebug()<<"Project::save After save Directory";
     directoryStateWriter.writeEndDocument();
   }
 
@@ -1237,6 +1286,7 @@ namespace Isis {
 
   
   void Project::imagesReady(ImageList images) {
+
     m_numImagesCurrentlyReading -= images.count();
 
     foreach (Image *image, images) {
@@ -1246,7 +1296,13 @@ namespace Isis {
                image, SLOT( updateFileName(Project *) ) );
 
       (*m_idToImageMap)[image->id()] = image;
+// <<<<<<< .mine
+//       ImageList *result = createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName());
+//       result->append(image);
+//       m_images->append(result);
+// =======
       createOrRetrieveImageList( FileName( images[0]->fileName() ).dir().dirName() )->append(image);
+// >>>>>>> .r5959
     }
 
     // We really can't have all of the cubes in memory before
@@ -1403,11 +1459,20 @@ namespace Isis {
       else if (localName == "directory") {
         m_project->directory()->load( reader() );
       }
+// <<<<<<< .mine
+      else if (localName == "dockRestore") {
+//      QVariant geo_data = QVariant(atts.value("geometry"));
+//      restoreGeometry(geo_data);
+//      QVariant layout_data = QVariant(atts.value("state"));
+//      restoreState(layout_data);
+      }
+// =======
 
       else if (localName == "bundleSettings") {
         BundleSettings *bundleSettings = m_project->bundleSettings();
 //        bundleSettings = new BundleSettings(m_project, reader());
       }
+// >>>>>>> .r5959
     }
 
     return true;

@@ -42,6 +42,8 @@ namespace Isis {
       void paint(QPainter *, const QStyleOptionGraphicsItem *,
                  QWidget * widget = 0);
 
+      ControlPoint *controlPoint() { return m_controlPoint; }
+
       void setArrowVisible(bool visible, bool colorByMeasureCount, int measureCount,
                            bool colorByResidualMagnitude, double residualMagnitude) {
         m_showArrow = visible;
@@ -53,9 +55,12 @@ namespace Isis {
         update();
       }
 
+//  signals:
+//    void newControlPointSelected(ControlPoint *controlPoint);
+
     protected:
       void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
-//    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+      virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 //    virtual bool eventFilter(QObject *obj, QEvent *ev);
 
     private:
