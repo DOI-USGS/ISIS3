@@ -54,21 +54,22 @@ void IsisMain() {
   fitsLabel.addGroup(importFits.fitsLabel(0));
 
   // add in label processing later
-  /*
+  
   // Create an Instrument group
-  FileName insTransFile(transDir + "leisaInstrument_fit.trn");// /s/lorri/leisa
+//  FileName insTransFile(transDir + "leisaInstrument_fit.trn");//need to create this file
+  FileName insTransFile("./leisaInstrument_fit.trn");//need to create this file
   PvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
   insXlater.Auto(outLabel);
 
   // Modify/add Instument group keywords not handled by the translater
-  PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
-  QString target = (QString)inst["TargetName"];
-  if (target.startsWith("RADEC=")) {
-    inst.addKeyword(PvlKeyword("TargetName", "Sky"), PvlGroup::Replace);
-  }
+//  PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
+//  QString target = (QString)inst["TargetName"];
+//  if (target.startsWith("RADEC=")) {
+//    inst.addKeyword(PvlKeyword("TargetName", "Sky"), PvlGroup::Replace);
+//  }
 
   output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
-
+/*
   // Create a Band Bin group
   FileName bandTransFile(transDir + "leisaBandBin_fit.trn");
   PvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
@@ -80,13 +81,13 @@ void IsisMain() {
   PvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
-
+*/
   // Create a Kernels group
-  FileName kernelsTransFile(transDir + "leisaKernels_fit.trn");
+//  FileName kernelsTransFile(transDir + "leisaKernels_fit.trn");
+  FileName kernelsTransFile("./leisaKernels_fit.trn");
   PvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
-  */
 
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
