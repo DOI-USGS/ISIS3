@@ -26,7 +26,7 @@
   </seeAlso>
 
   <category>
-    <categoryItem>New Horizons</categoryItem>
+    <missionItem>New Horizons</missionItem>
   </category>
 
   <groups>
@@ -42,7 +42,7 @@
           MVIC file to be converted to a cube. This is expected to be a FITS formatted file. 
         </description>
         <filter>
-          *.fits
+          *.fit
         </filter>
       </parameter>
 
@@ -59,6 +59,55 @@
           *.cub
         </filter>
       </parameter>
+
+      <parameter name="UNDISTORTED">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the Error image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons MVIC Undistorted image in ISIS 
+          format. The Undistorted image must be in the first  FITS extension (i.e., second image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="ERROR">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the Error image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons MVIC Error image in ISIS 
+          format. The Error image must be in the second  FITS extension (i.e.,third image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="QUALITY">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the Quality image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons MVICI Quality image in ISIS 
+          format. The Quality image must be in the third FITS extension (i.e., fourth image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
     </group>
   </groups>
 

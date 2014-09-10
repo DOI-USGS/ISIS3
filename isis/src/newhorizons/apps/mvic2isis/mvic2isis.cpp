@@ -27,17 +27,12 @@ void flip(Buffer &in);
 
 void IsisMain() {
 
-  // NOTE: 
-  // Still to be done/considered
-  //   Process the other FITS channels. One of them contains pixel quality info
-  //   May want to set special pixel values using this channel
-
   UserInterface &ui = Application::GetUserInterface();
 
   ProcessImportFits importFits;
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
 
-  // Get the FITS label
+  // Get the primary FITS label
   Pvl fitsLabel;
   fitsLabel.addGroup(importFits.fitsLabel(0));
 
@@ -57,6 +52,7 @@ void IsisMain() {
   else {
     mvic = false;
   }
+
   if (!mvic) {
     FileName in = ui.GetFileName("FROM");
     QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
@@ -64,23 +60,229 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  importFits.SetDataPrefixBytes(4 * 12);
-  importFits.SetDataSuffixBytes(4 * 12);
+  if (!fitsLabel.hasKeyword("BITPIX", Pvl::Traverse)) {
+    FileName in = ui.GetFileName("FROM");
+    QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
+                  "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+
+  // Check to see if the undistorted image was requested from the FITS file and it has the 
+  // corresponding extension and keywords
+  if (ui.WasEntered("UNDISTORTED")) {
+    PvlGroup undistortedLabel = importFits.fitsLabel(1);
+    if (!undistortedLabel.hasKeyword("XTENSION") || !undistortedLabel.hasKeyword("COMMENT") ||
+        undistortedLabel["XTENSION"][0] != "IMAGE" || 
+        !undistortedLabel["COMMENT"][0].startsWith("This is the bias-subtracted, flattened, distortion-removed image cube.")) {
+
+      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Undistorted image. "
+                                "FITS label value for EXTNAME is [%2]").
+                             arg(ui.GetFileName("FROM")).arg(undistortedLabel["EXTNAME"][0]);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if (!undistortedLabel.hasKeyword("BITPIX")) {
+      FileName in = ui.GetFileName("FROM");
+      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
+                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing from label [1].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+  // Check to see if the error image was requested from the FITS file and it has the 
+  // corresponding extension and keywords
+  if (ui.WasEntered("ERROR")) {
+    PvlGroup errorLabel = importFits.fitsLabel(2);
+    if (!errorLabel.hasKeyword("XTENSION") || !errorLabel.hasKeyword("COMMENT") ||
+        errorLabel["XTENSION"][0] != "IMAGE" || 
+        errorLabel["COMMENT"][0] != "1-sigma error per pixel for the image in extension 1.") {
+
+      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Error image. "
+                                "FITS label value for EXTNAME is [%2]").
+                    arg(ui.GetFileName("FROM")).arg(errorLabel["EXTNAME"][0]);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if (!errorLabel.hasKeyword("BITPIX")) {
+      FileName in = ui.GetFileName("FROM");
+      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
+                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing from label [2].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+  // Check to see if the quality image was requested from the FITS file and it has the 
+  // corresponding extension and keywords
+  if (ui.WasEntered("QUALITY")) {
+    PvlGroup qualityLabel = importFits.fitsLabel(3);
+    if (!qualityLabel.hasKeyword("XTENSION") || !qualityLabel.hasKeyword("COMMENT") ||
+        qualityLabel["XTENSION"][0] != "IMAGE" || 
+        qualityLabel["COMMENT"][0] != "Data quality flag for the image in extension 1.") {
+
+      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Quality image. "
+                                "FITS label value for EXTNAME is [%2]").
+                    arg(ui.GetFileName("FROM")).arg(qualityLabel["EXTNAME"][0]);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if (!qualityLabel.hasKeyword("BITPIX")) {
+      FileName in = ui.GetFileName("FROM");
+      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
+                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing from label [3].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+
+  // Start converting images
+
+  QString bitpix = fitsLabel.findKeyword("BITPIX", Pvl::Traverse);
+  int bytesPerPix = abs(toInt(bitpix)) / 8;
+  importFits.SetDataPrefixBytes(bytesPerPix * 12);
+  importFits.SetDataSuffixBytes(bytesPerPix * 12);
   importFits.setProcessFileStructure(0);
 
   // Set up the output cube
   Cube *output = importFits.SetOutputCube("TO");
 
-  Pvl isisLabel;
-  translateLabels(fitsLabel, output);
+  translateLabels(fitsLabel, output); // Results are put directly into the cube label (output)
 
-  // Save the input FITS label in the Cube original labels
+  // Save the input FITS label in the output cube original labels
   OriginalLabel originals(fitsLabel);
   output->write(originals);
 
-  // Import the file and then translate labels
+  // Import the file
+  importFits.Progress()->SetText("Importing main MVIC image");
   importFits.StartProcess();
   importFits.EndProcess();
+
+
+  // Convert the bias-subtracted, flattened, distortion removed image. It is currently assumed 
+  // to be the 2rd image in the FITS file (i.e., 1st extension)
+  if (ui.WasEntered("UNDISTORTED")) {
+    PvlGroup undistortedLabel = importFits.fitsLabel(1);
+//    if (!undistortedLabel.hasKeyword("XTENSION") || !undistortedLabel.hasKeyword("COMMENT") ||
+//        undistortedLabel["XTENSION"][0] != "IMAGE" || 
+//        !undistortedLabel["COMMENT"][0].startsWith("This is the bias-subtracted, flattened, distortion-removed image cube.")) {
+
+//      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Undistorted image "
+//                                "Input file label value for EXTNAME is [%2]").
+//                             arg(ui.GetFileName("FROM")).arg(undistortedLabel["COMMENT"][0]);
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+
+//    if (!undistortedLabel.hasKeyword("BITPIX")) {
+//      FileName in = ui.GetFileName("FROM");
+//      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
+//                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+
+    QString bitpix = undistortedLabel.findKeyword("BITPIX");
+    int bytesPerPix = abs(toInt(bitpix)) / 8;
+    importFits.SetDataPrefixBytes(bytesPerPix * 12);
+    importFits.SetDataSuffixBytes(bytesPerPix * 12);
+    importFits.setProcessFileStructure(0);
+    importFits.setProcessFileStructure(1);
+
+    Cube *outputError = importFits.SetOutputCube("UNDISTORTED");
+
+    // Save the input FITS label in the Cube original labels
+    Pvl pvlError;
+    pvlError += undistortedLabel;
+    OriginalLabel originals(pvlError);
+    outputError->write(originals);
+
+    // Convert the main image data
+    importFits.Progress()->SetText("Importing MVIC Undistorted image");
+    importFits.StartProcess();
+    importFits.ClearCubes();
+  }
+
+
+  // Convert the Error image. It is currently assumed to be the 3rd image in the FITS file
+  if (ui.WasEntered("ERROR")) {
+    // Get the label of the Error image and make sure this is a New Horizons MVIC Error image
+    PvlGroup errorLabel = importFits.fitsLabel(2);
+//    if (!errorLabel.hasKeyword("XTENSION") || !errorLabel.hasKeyword("COMMENT") ||
+//        errorLabel["XTENSION"][0] != "IMAGE" || 
+//        errorLabel["COMMENT"][0] != "1-sigma error per pixel for the image in extension 1.") {
+
+//      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Error image "
+//                                "Input file label value for EXTNAME is [%2]").
+//                    arg(ui.GetFileName("FROM")).arg(errorLabel["COMMENT"][0]);
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+
+//    if (!errorLabel.hasKeyword("BITPIX")) {
+//      FileName in = ui.GetFileName("FROM");
+//      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
+//                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+    QString bitpix = errorLabel.findKeyword("BITPIX");
+    int bytesPerPix = abs(toInt(bitpix)) / 8;
+    importFits.SetDataPrefixBytes(bytesPerPix * 12);
+    importFits.SetDataSuffixBytes(bytesPerPix * 12);
+    importFits.setProcessFileStructure(0);
+    importFits.setProcessFileStructure(2);
+
+    Cube *outputError = importFits.SetOutputCube("ERROR");
+
+    // Save the input FITS label in the Cube original labels
+    Pvl pvlError;
+    pvlError += errorLabel;
+    OriginalLabel originals(pvlError);
+    outputError->write(originals);
+
+    // Convert the main image data
+    importFits.Progress()->SetText("Importing MVIC Error image");
+    importFits.StartProcess();
+    importFits.ClearCubes();
+  }
+
+
+  // Convert the Quality image. It is currently assumed to be the 4th image in the FITS file
+  if (ui.WasEntered("QUALITY")) {
+    // Get the label of the Error image and make sure this is a New Horizons MVIC Quality image
+    PvlGroup qualityLabel = importFits.fitsLabel(3);
+//    if (!qualityLabel.hasKeyword("XTENSION") || !qualityLabel.hasKeyword("COMMENT") ||
+//        qualityLabel["XTENSION"][0] != "IMAGE" || 
+//        qualityLabel["COMMENT"][0] != "Data quality flag for the image in extension 1.") {
+
+//      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Quality image "
+//                                "Input file label value for EXTNAME is [%2]").
+//                    arg(ui.GetFileName("FROM")).arg(qualityLabel["COMMENT"][0]);
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+
+//    if (!qualityLabel.hasKeyword("BITPIX")) {
+//      FileName in = ui.GetFileName("FROM");
+//      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
+//                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+    QString bitpix = qualityLabel.findKeyword("BITPIX");
+    int bytesPerPix = abs(toInt(bitpix)) / 8;
+    importFits.SetDataPrefixBytes(bytesPerPix * 12);
+    importFits.SetDataSuffixBytes(bytesPerPix * 12);
+    importFits.setProcessFileStructure(0);
+    importFits.setProcessFileStructure(3);
+
+    Cube *outputError = importFits.SetOutputCube("QUALITY");
+
+    // Save the input FITS label in the Cube original labels
+    Pvl pvlError;
+    pvlError += qualityLabel;
+    OriginalLabel originals(pvlError);
+    outputError->write(originals);
+
+    // Convert the main image data
+    importFits.Progress()->SetText("Importing MVIC Quality image");
+    importFits.StartProcess();
+    importFits.ClearCubes();
+  }
 }
 
 

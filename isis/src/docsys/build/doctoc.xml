@@ -177,6 +177,26 @@
 </files>
 </document>
 <document>
+<title>Installing ISIS</title>
+<brief>Downloading and installing ISIS 3</brief>
+<description>
+      This document describes how to download and install a
+      binary version of ISIS.
+    </description>
+<category>
+<categoryItem>technicaldoc</categoryItem>
+</category>
+<audience>
+<target>administrator</target>
+</audience>
+<files>
+<file hidden="" primary="true">
+<type>HTML</type>
+<source>../documents/InstallGuide/index.html</source>
+</file>
+</files>
+</document>
+<document>
 <title>ISIS 2 User Documentation</title>
 <brief>Links to ISIS 2 User Documents</brief>
 <description>List of links to documents covering general topics for users of ISIS 2.1</description>
@@ -214,6 +234,30 @@
 <file hidden="" primary="">
 <type>HTML</type>
 <source>../documents/HowToApplicationExamples/index.html</source>
+</file>
+</files>
+</document>
+<document>
+<title>ISIS 3 Coding Standards and Style Guide</title>
+<brief>Coding standards for ISIS 3 developers (effective February 1, 2012).</brief>
+<description>
+      This document will describe the coding standards for maintaining 
+      ISIS 3 source code.  It was created to ensure that the 
+      ISIS 3 package is programmed for consistency, readability and ease
+      of future maintenance. This document does not attempt to address every
+      possible issue. However, the guidelines that have been outlined should not
+      be deviated from, except under special situations.
+    </description>
+<category>
+<categoryItem>reference</categoryItem>
+</category>
+<audience>
+<target>intermediate</target>
+</audience>
+<files>
+<file hidden="" primary="">
+<type>HTML</type>
+<source>../documents/CodingStandards/CodingStandards.html</source>
 </file>
 </files>
 </document>
@@ -417,26 +461,6 @@
 </files>
 </document>
 <document>
-<title>Installing ISIS</title>
-<brief>Downloading and installing ISIS 3</brief>
-<description>
-      This document describes how to download and install a
-      binary version of ISIS.
-    </description>
-<category>
-<categoryItem>technicaldoc</categoryItem>
-</category>
-<audience>
-<target>administrator</target>
-</audience>
-<files>
-<file hidden="" primary="true">
-<type>HTML</type>
-<source>../documents/InstallGuide/index.html</source>
-</file>
-</files>
-</document>
-<document>
 <title>ISIS 2 Tutorials</title>
 <brief>Links to ISIS 2 tutorials, procedures, and how-to's</brief>
 <description>List of links to ISIS 2 tutorials, procedures, and how-to's.</description>
@@ -522,30 +546,6 @@
 <type>HTML</type>
 <subtitle>HTML Quick Reference</subtitle>
 <source>../documents/DocStyle/HTMLQuickRef.html</source>
-</file>
-</files>
-</document>
-<document>
-<title>ISIS 3 Coding Standards and Style Guide</title>
-<brief>Coding standards for ISIS 3 developers (effective February 1, 2012).</brief>
-<description>
-      This document will describe the coding standards for maintaining 
-      ISIS 3 source code.  It was created to ensure that the 
-      ISIS 3 package is programmed for consistency, readability and ease
-      of future maintenance. This document does not attempt to address every
-      possible issue. However, the guidelines that have been outlined should not
-      be deviated from, except under special situations.
-    </description>
-<category>
-<categoryItem>reference</categoryItem>
-</category>
-<audience>
-<target>intermediate</target>
-</audience>
-<files>
-<file hidden="" primary="">
-<type>HTML</type>
-<source>../documents/CodingStandards/CodingStandards.html</source>
 </file>
 </files>
 </document>

@@ -47,6 +47,7 @@ namespace Isis {
   ProcessImportFits::ProcessImportFits() {
     m_fitsLabels = NULL;
     m_headerSizes = NULL;
+    m_dataStarts = NULL;
   }
 
 
@@ -56,6 +57,7 @@ namespace Isis {
   ProcessImportFits::~ProcessImportFits() {
     delete m_fitsLabels;
     delete m_headerSizes;
+    delete m_dataStarts;
     m_file.close();
   }
 
@@ -69,6 +71,7 @@ namespace Isis {
 
     m_fitsLabels = new QList< PvlGroup * >;
     m_headerSizes = new QList < int >;
+    m_dataStarts = new QList < int >;
 
     // Process each FITS label area. Storing each in its own PvlGroup
     char readBuf[81];
@@ -146,14 +149,16 @@ namespace Isis {
       m_headerSizes->push_back((int)ceil(place / 2880.0));
 
       // The file pointer should be pointing at the end of the record that contained "END"
-      // Move the file pointer past the padding after the "END"
+      // Move the file pointer past the padding after the "END" (i.e., points to start of data)
       std::streamoff jump;
       jump = m_headerSizes->last() * 2880 - place;
       m_file.seekg(jump, std::ios_base::cur);
 
+      m_dataStarts->push_back(m_file.tellg());
+
       // NOTE: For now we only handle image data (i.e., keywords BITPIX & NAXIS & NAXISx must exist)
       // Does this look like a label for a FITS image? Stop after the first label that does not
-      // because we don't know how to move the file pointer past a non-image data.
+      // because we don't know how to move the file pointer past a non-image data extension.
       if (fitsLabel->hasKeyword("BITPIX") && fitsLabel->hasKeyword("NAXIS") && 
           fitsLabel->hasKeyword("NAXIS1")) {
 
@@ -183,6 +188,7 @@ namespace Isis {
       else if (m_fitsLabels->size() > 1) {
         m_fitsLabels->pop_back();
         m_headerSizes->pop_back();
+        m_dataStarts->pop_back();
         break;
       }
       else {
@@ -201,6 +207,14 @@ namespace Isis {
    * @return PvlGroup version of a FITS label corrisponding to requested label number
    */
   PvlGroup ProcessImportFits::fitsLabel(int labelNumber) const {
+
+    if (labelNumber >= m_fitsLabels->size()) {
+      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
+                                "past the last image in this FITS file. Image count is [%3]").arg(labelNumber).
+                                arg(m_name.expanded()).arg(m_fitsLabels->size()-1);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     if (!m_fitsLabels) {
       QString msg = QObject::tr("The FITS label has not been initialized, call setFitsFile first");
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -249,6 +263,8 @@ namespace Isis {
    * @param fitsFile Name of the FITS file to open
    */
   void ProcessImportFits::setFitsFile(FileName fitsFile) {
+    m_name = fitsFile;
+
     SetInputFile(fitsFile.toString()); // Make sure the file exists
 
     m_file.open(fitsFile.expanded().toLocal8Bit().constData(), std::ios::in  | std::ios::binary);
@@ -285,17 +301,18 @@ namespace Isis {
   void ProcessImportFits::setProcessFileStructure(int labelNumber) {
 
     if (labelNumber >= m_fitsLabels->size()) {
-      QString msg = QObject::tr("The requested label number, [%1], from file [%2] is "
+      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
                                 "past the last image in this FITS file [%3]").arg(labelNumber).
                                 arg(InputFile()).arg(m_fitsLabels->size()-1);
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     PvlGroup label = *(*m_fitsLabels)[labelNumber];
-//    std::cout << label << std::endl;
 
-    SetFileHeaderBytes((*m_headerSizes)[labelNumber] * 2880);
-    SaveFileHeader();
+    // Set the ProcessImport to skip over all the previous images and their labels and the label for
+    // this image. Don't save this info (think memory)
+    SetFileHeaderBytes((*m_dataStarts)[labelNumber]);
+    //SaveFileHeader();
 
     // Find pixel type. NOTE: There are several unsupported possiblites
     Isis::PixelType type;
