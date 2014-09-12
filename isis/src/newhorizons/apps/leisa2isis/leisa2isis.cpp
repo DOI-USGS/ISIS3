@@ -10,6 +10,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "UserInterface.h"
+#include "iTime.h"
 
 #include <fstream>
 #include <iostream>
@@ -91,6 +92,29 @@ void IsisMain() {
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
 
+
+  // Modify/add Instument group keywords not handled by the translater
+  Pvl *isisLabel = output->label();
+  PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
+
+  //Add StartTime & EndTime
+  QString midTime = inst["MidObservationTime"];
+  iTime midTimeBetter(midTime.toDouble());
+
+  QString obsDuration = inst["ObservationDuration"];
+  double obsSeconds = obsDuration.toDouble();
+
+  //do stuff with Isis time class to calculate startTime
+  iTime startTime = midTimeBetter - obsSeconds/2.0;
+  iTime endTime = midTimeBetter + obsSeconds/2.0;
+  inst.addKeyword(PvlKeyword("StartTime", startTime.UTC()), PvlGroup::Replace);
+  inst.addKeyword(PvlKeyword("EndTime", endTime.UTC()), PvlGroup::Replace);
+
+  //Add FrameRate
+  QString exposureTime = inst["ExposureDuration"];
+  double frameRate = 1.0/exposureTime.toDouble(); //in Hz!
+  inst.addKeyword(PvlKeyword("FrameRate", QString::number(frameRate)), PvlGroup::Replace); 
+  inst.findKeyword("FrameRate").setUnits("Hz");
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
   pvl += importFits.fitsLabel(0);

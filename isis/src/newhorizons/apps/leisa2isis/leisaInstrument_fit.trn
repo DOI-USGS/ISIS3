@@ -12,16 +12,6 @@ Group = SpacecraftName
   Translation    = ("NEW HORIZONS", "NEW HORIZONS")
 End_Group
 
-Group = SpacecraftClockStartCount
- Auto
- InputKey = SPCSCLK0
- InputPosition = FITSLABELS
- OutputName  = SpacecraftClockStartCount
- OutputPosition = (Object, IsisCube, Group, Instrument)
- Translation = (*, *)
-End_Group
-
-
 Group = InstrumentId
   Auto
   InputKey       = INSTRU
@@ -49,9 +39,18 @@ End_Group
 
 Group = MidObservationTime
   Auto
-  InputKey       = SPCUTCAL
+  InputKey       = SPCSCET
   InputPosition  = FITSLABELS
   OutputName     = MidObservationTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ObservationDuration
+  Auto
+  InputKey       = DURMET
+  InputPosition  = FITSLABELS
+  OutputName     = ObservationDuration
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
@@ -87,16 +86,6 @@ End_Group
 #  Translation    = (*, *)
 #End_Group
 
-#### This is WRONG! Put in temporarily for test. 
-Group = StartTime
-  Auto
-  InputKey       = SPCUTCAL
-  InputPosition  = FITSLABELS
-  OutputName     = StartTime
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
 Group = ExposureDuration
   Auto
   InputKey       = RALPHEXP
@@ -120,15 +109,6 @@ Group = ScanType
   InputKey       = SCANTYPE
   InputPosition  = FITSLABELS
   OutputName     = ScanType
-  OutputPosition = (Object, IsisCube, Group, Instrument)
-  Translation    = (*, *)
-End_Group
-
-Group = RalphExposureDuration
-  Auto
-  InputKey       = RALPHEXP
-  InputPosition  = FITSLABELS
-  OutputName     = RalphExposureDuration
   OutputPosition = (Object, IsisCube, Group, Instrument)
   Translation    = (*, *)
 End_Group
