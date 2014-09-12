@@ -23,7 +23,7 @@ using namespace std;
 using namespace Isis;
 
 void translateLabels(Pvl &fitsLabel, Cube *ocube);
-void flip(Buffer &in);
+//void flip(Buffer &in);
 
 void IsisMain() {
 
@@ -459,9 +459,9 @@ void translateLabels(Pvl &fitsLabel, Cube *ocube) {
 }
 
 
-void flip(Buffer &in) {
-  for(int i = 0; i < in.size() / 2; i++) {
-    swap(in[i], in[in.size() - i - 1]);
-  }
-}
+//void flip(Buffer &in) {
+//  for(int i = 0; i < in.size() / 2; i++) {
+//    swap(in[i], in[in.size() - i - 1]);
+//  }
+//}
 

@@ -248,6 +248,7 @@ namespace Isis {
                                   all bands.*/
       };
       void SetOrganization(const ProcessImport::Interleave org);
+      Interleave Organization() const;
 
       void SetBase(const double base);
       void SetMultiplier(const double mult);

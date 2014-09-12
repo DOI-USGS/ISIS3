@@ -353,17 +353,34 @@ namespace Isis {
     // data byte count. Some FITS files do have them and ISIS needs to remove them so it is not
     // considered part of the DNs. So, use the parent class' prefix/suffix byte count to reduce
     // the number of samples.
-    if (toInt(label["NAXIS"][0]) == 2) {
-      SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
-                    toInt(label["NAXIS2"][0]), 1);
+    if (Organization() == BSQ) {
+      if (toInt(label["NAXIS"][0]) == 2) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      toInt(label["NAXIS2"][0]), 1);
+      }
+      else if (toInt(label["NAXIS"][0]) == 3) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      toInt(label["NAXIS2"][0]), toInt(label["NAXIS3"][0]));
+      }
+      else {
+        QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
-    else if (toInt(label["NAXIS"][0]) == 3) {
-      SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
-                    toInt(label["NAXIS2"][0]), toInt(label["NAXIS3"][0]));
-    }
-    else {
-      QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
-      throw IException(IException::User, msg, _FILEINFO_);
+
+    if (Organization() == BIL) {
+      if (toInt(label["NAXIS"][0]) == 2) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      1, toInt(label["NAXIS2"][0]));
+      }
+      else if (toInt(label["NAXIS"][0]) == 3) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      toInt(label["NAXIS3"][0]), toInt(label["NAXIS2"][0]));
+      }
+      else {
+        QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
 
     // Base and multiplier

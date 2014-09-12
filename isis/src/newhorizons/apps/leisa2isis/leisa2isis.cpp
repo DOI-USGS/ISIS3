@@ -28,7 +28,8 @@ void IsisMain() {
 
   // Get the first label and make sure this is a New Horizons LEISA file
   PvlGroup mainLabel = importFits.fitsLabel(0);
-  if (mainLabel["MISSION"][0] != "New Horizons" || mainLabel["INSTRU"][0] != "lei") {
+  if (!mainLabel.hasKeyword("MISSION") || !mainLabel.hasKeyword("INSTRU") ||
+      mainLabel["MISSION"][0] != "New Horizons" || mainLabel["INSTRU"][0] != "lei") {
     QString msg = QObject::tr("Input file [%1] does not appear to be a New Horizons LEISA FITS "
                               "file. Input file label value for MISSION is [%2], "
                               "INSTRU is [%3]").
@@ -37,7 +38,8 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  //This is a seven-extension fits file. Only import the primary image for now.
+  // This is a seven-extension fits file. Only import the primary image for now.
+  importFits.SetOrganization(ProcessImport::BIL);
   importFits.setProcessFileStructure(0);
 
   Cube *output = importFits.SetOutputCube("TO");
