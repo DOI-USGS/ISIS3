@@ -44,8 +44,8 @@ namespace Isis {
    */
   class MvicFrameCameraDistortionMap : public CameraDistortionMap {
     public:
-      MvicFrameCameraDistortionMap(Camera *parent, vector<double> xdistcoeffs,
-                                   vector<double> ydistcoeffs, double borex, double borey);
+      MvicFrameCameraDistortionMap(Camera *parent, vector<double> xDistortionCoeffs,
+                                   vector<double> yDistortionCoeffs);
 
       ~MvicFrameCameraDistortionMap();
 
@@ -53,20 +53,19 @@ namespace Isis {
 
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
-      bool outputdeltas();
+      bool outputDeltas(); // for debugging
 
-  private:
+    private:
       bool computeDistortionCorrections(const double xscaled, const double yscaled, double &deltax,
                                         double &deltay);
 
     private:
-      std::vector<double> m_distCoefX;
-      std::vector<double> m_distCoefY;
-      double m_boreX, m_boreY;
-      int m_numDistCoef;
+      std::vector<double> m_xDistortionCoeffs; //!< distortion coefficients in x and y as determined
+      std::vector<double> m_yDistortionCoeffs; //!< by Keith Harrison (Interface Control Document
+                                               //!< section 10.3.1.2)
 
-      double m_detectorHalf_x;
-      double m_detectorHalf_y;
+      double m_focalPlaneHalf_x;               //!< half of focal plane x and y dimensions in mm
+      double m_focalPlaneHalf_y;
   };
 };
 #endif

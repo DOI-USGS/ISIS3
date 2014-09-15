@@ -38,7 +38,7 @@ using namespace std;
 namespace Isis {
   /**
    * Constructs a New Horizons MVIC Framing Camera object. The MVIC push-frame camera operates 
-   * in "starring" mode, so it has been implemented as a framing camera rather than a push-frame. 
+   * in "staring" mode, so it has been implemented as a framing camera rather than a push-frame.
    * The test images show the same part of the planet in each framelet, so the push-frame 
    * implementation will not work since the same lat/lon values are located in possibly every 
    * framelet. 
@@ -88,7 +88,7 @@ namespace Isis {
     // Setup focal plane map. The class will read data from the instrument addendum kernel to pull
     // out the affine transforms from detector samp,line to focal plane x,y.
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    focalMap->SetDetectorOrigin(2512.5, 64.5);
+    focalMap->SetDetectorOrigin(2500.5, 64.5);
 
     // Read distortion coefficients and boresight offsets from the instrument kernels. Then
     // construct the distortion map.
@@ -98,20 +98,13 @@ namespace Isis {
     QString naifppKey = "INS-98900_PP_OFFSET";
     vector<double> distCoefX;
     vector<double> distCoefY;
-    double boreX, boreY;
 
     for (int i=0; i < 20; i++) {
       distCoefX.push_back(getDouble(naifXKey,i));
       distCoefY.push_back(getDouble(naifYKey,i));
     }
 
-    // Read boresight. Typically referred to as principal point offset (photogrammetry). Boresights
-    // in the ik are based on -X boresight.  In Isis, the boresight needs to be in Z or -Z.
-
-    boreX = getDouble(naifppKey,0);
-    boreY = getDouble(naifppKey,1);
-
-    new MvicFrameCameraDistortionMap(this, distCoefX, distCoefY, boreX, boreY);
+    new MvicFrameCameraDistortionMap(this, distCoefX, distCoefY);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
