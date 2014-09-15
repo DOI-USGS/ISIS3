@@ -22,8 +22,7 @@
 
 #include <QDebug>
 
-#include "MvicCameraDistortionMap.h"
-#include "MvicCameraFocalPlaneMap.h"
+#include "MvicTdiCameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
 #include "iTime.h"
@@ -44,9 +43,10 @@ namespace Isis {
   MvicTdiCamera::MvicTdiCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
 
-    // Set the detector size
+    // Set the pixel pitch, focal length and row offset from Mvic frame transfer array
     SetPixelPitch();
     SetFocalLength();
+//    SetRowOffset();
 
 //  qDebug()<<"NaifId = "<<naifIkCode()<<"  FocalLength = "<<FocalLength()<<"  PixelPitch = "<<PixelPitch();
 
@@ -78,20 +78,39 @@ namespace Isis {
 
     // The focal plane map tells us how to go from detector position
     // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
-//  MvicCameraFocalPlaneMap *focalMap = new MvicCameraFocalPlaneMap(this, naifIkCode());
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    focalMap->SetDetectorOrigin(2500.5, -16.5);  // NOTE:   THIS WORKS
+//    focalMap->SetDetectorOrigin(2512.5, 0.5);
+    focalMap->SetDetectorOrigin(2500.5, -16.5); // NOTE: TRACIE says this works...
 
+    // Read legendre polynomial distortion coefficients and boresight offsets from the instrument
+    // kernels. Then construct the distortion map.
 
-//   05-16- 2014   NOTE:     THE FOLLOWING DID NOT WORK - WAS NOT ABLE TO INTERSECT THE PLANET AT THE
-//                FJORGYNN FEATURE ON mc0_0034942918_0x536_sci_1.cub (samp:2900   line=322)
-//  focalMap->SetDetectorOrigin(2512.5, 0.0);
-//  focalMap->SetDetectorOffset(0.0, -16.5);
+    // read legendre polynomial distortion coefs from the NAIF Kernels
+    QString naifXKey = "INS-98900_DISTORTION_COEF_X";
+    QString naifYKey = "INS-98900_DISTORTION_COEF_Y";
+    QString naifppKey = "INS-98900_PP_OFFSET";
+    vector<double> distCoefX;
+    vector<double> distCoefY;
+    vector<double> residualColumnDistCoefs;
+    vector<double> residualRowDistCoefs;
 
+    for (int i=0; i < 20; i++) {
+      distCoefX.push_back(getDouble(naifXKey,i));
+      distCoefY.push_back(getDouble(naifYKey,i));
+    }
 
-//  MvicCameraDistortionMap *distortionMap = new MvicCameraDistortionMap(this, 1);
-//  distortionMap->SetDistortion(naifIkCode());
-    new CameraDistortionMap(this);
+    // read residual polynomial distortion coefs from the NAIF Kernels
+    int code = naifIkCode();
+    QString naifCOLKey = "INS" + toString(code) + "_RESIDUAL_COL_DIST_COEF";
+    QString naifROWKey = "INS" + toString(code) + "_RESIDUAL_ROW_DIST_COEF";
+
+    for (int i=0; i < 6; i++) {
+      residualColumnDistCoefs.push_back(getDouble(naifCOLKey,i));
+      residualRowDistCoefs.push_back(getDouble(naifROWKey,i));
+    }
+
+    new MvicTdiCameraDistortionMap(this, distCoefX, distCoefY, residualColumnDistCoefs,
+                                   residualRowDistCoefs);
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
@@ -100,6 +119,7 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+
 }
 
 
