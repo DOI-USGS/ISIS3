@@ -1,0 +1,448 @@
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+#include <cmath>
+#include <iostream>
+
+#include <boost/math/special_functions/legendre.hpp>
+
+#include "Camera.h"
+#include "Constants.h"
+#include "FunctionTools.h"
+#include "IString.h"
+#include "LineScanCameraDetectorMap.h"
+#include "MvicTdiCameraDistortionMap.h"
+
+#include <QDebug>
+
+
+
+using namespace boost::math;
+using namespace std;
+using namespace Isis;
+
+namespace Isis {
+  /** Camera distortion map constructor
+   *
+   * Create a camera distortion map.  This class maps between distorted
+   * and undistorted focal plane x/y's.  The default mapping is the
+   * identity, that is, the focal plane x/y and undistorted focal plane
+   * x/y will be identical.
+   *
+   * @param parent                 the parent camera that will use this distortion map
+   * @param zDirection             the direction of the focal plane Z-axis
+   *                               (either 1 or -1)
+   *
+   * @param xDistortionCoeffs      distortion coefficients in x
+   * @param yDistortionCoeffs      distortion coefficients in y
+   * @param residualColDistCoeffs
+   * @param residualRowDistCoeffs
+   *
+   */
+  MvicTdiCameraDistortionMap::MvicTdiCameraDistortionMap(Camera *parent,
+                                                         vector<double> xDistortionCoeffs,
+                                                         vector<double> yDistortionCoeffs,
+                                                         vector<double> residualColDistCoeffs,
+                                                         vector<double> residualRowDistCoeffs) :
+    CameraDistortionMap(parent, 1.0) {
+
+    m_xDistortionCoeffs = xDistortionCoeffs;
+    m_yDistortionCoeffs = yDistortionCoeffs;
+
+    m_residualColDistCoeffs = residualColDistCoeffs;
+    m_residualRowDistCoeffs = residualRowDistCoeffs;
+
+    // half of detector in x is 32.5 mm
+    m_focalPlaneHalf_x = 0.5 * p_camera->Samples() * p_camera->PixelPitch();
+  }
+
+
+  /** Destructor
+   */
+  MvicTdiCameraDistortionMap::~MvicTdiCameraDistortionMap() {
+  }
+
+
+  /** Compute undistorted focal plane x/y
+   *
+   * Compute undistorted focal plane x given a distorted focal plane x
+   *
+   * Distortion in line direction currently not considered (MVIC TDI is treated as line scan sensor)
+   *
+   * @param dx distorted focal plane x in millimeters
+   * @param dy distorted focal plane y in millimeters
+   *
+   * @return if the conversion was successful
+   * @see SetDistortion
+   */
+  bool MvicTdiCameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
+
+    p_focalPlaneX = dx;
+    p_focalPlaneY = dy;
+
+    // if x lies outside of the detector, do NOT apply distortion
+    // set undistorted focal plane values to be identical to raw values
+    if ((fabs(dx) > m_focalPlaneHalf_x)) {
+      p_undistortedFocalPlaneX = dx;
+      p_undistortedFocalPlaneY = dy;
+
+      return true;
+    }
+
+    // scale x and y to lie in the range -1.0 to +1.0
+    // this is requirement for Legendre Polynomials, man
+    double xscaled = -dx/m_focalPlaneHalf_x;
+
+    if (fabs(xscaled) > 1.0) {
+      string msg = "MvicTdiCameraDistortionMap::SetFocalPlane - value not in range -1.0 to +1.0 required for Legendre Polynomials";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // compute distortion corrections in x and y using Legendre Polynomials
+    // these corrections are also in the -1.0 to +1.0 range
+    double deltax, deltay;
+    computeDistortionCorrections(xscaled, 0.0, deltax, deltay);
+
+    // apply the corrections
+    xscaled += deltax;
+
+    // now compute residual distortion corrections (per Jason Cook)
+    // TODO: implementation not complete
+//    computeResidualDistortionCorrections(dx, dy, deltax, deltay);
+
+    // scale back from range of '-1.0 to +1.0' to the detector, '-32.5 to 32.5 mm'
+    p_undistortedFocalPlaneX = -xscaled * m_focalPlaneHalf_x;
+    p_undistortedFocalPlaneY = p_focalPlaneY;
+
+    return true;
+  }
+
+
+  /** Compute distorted focal plane x/y
+   *
+   * Compute distorted focal plane x/y given an undistorted focal plane x/y.
+   *
+   * This is an iterative procedure as computing the inverse of the distortion equations used by New
+   * Horizons MVIC is difficult.
+   *
+   * @param ux undistorted focal plane x in millimeters
+   * @param uy undistorted focal plane y in millimeters
+   *
+   * @return if the conversion was successful
+   * @see SetDistortion
+   */
+  bool MvicTdiCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
+
+    // image coordinates prior to introducing distortion
+    p_undistortedFocalPlaneX = ux;
+    p_undistortedFocalPlaneY = uy;
+
+    // scale undistorted coordinates to range of -1.0 to +1.0
+    double xtScaled = -ux/m_focalPlaneHalf_x;
+    double uxScaled = xtScaled;
+    double xScaledDistortion, yScaledDistortion;
+    double xScaledPrevious = 1000000.0;
+    double tolerance = 0.000001;
+
+    bool bConverged = false;
+
+    // iterating to introduce distortion...
+    // we stop when the difference between distorted coordinates
+    // in successive iterations is at or below the given tolerance
+    for( int i = 0; i < 50; i++ ) {
+
+      if (fabs(xtScaled) > 1.0) {
+//        continue;
+        string msg = "value not in range -1.0 to +1.0 required for Legendre Polynomials";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      // compute distortion in x and y (scaled to -1.0 - +1.0) using Legendre Polynomials
+    if (!computeDistortionCorrections(xtScaled, 0.0, xScaledDistortion, yScaledDistortion) )
+      return false;
+
+      // update scaled image coordinates
+      xtScaled = uxScaled - xScaledDistortion;
+
+      // check for convergence
+      if((fabs(xtScaled - xScaledPrevious) <= tolerance)) {
+        bConverged = true;
+        break;
+      }
+
+      xScaledPrevious = xtScaled;
+    }
+
+    if (bConverged) {
+      // scale x coordinate back to detector (-32.5 to +32.5)
+      // xtScaled *= -m_focalPlaneHalf_x;
+
+      // set distorted coordinates
+      p_focalPlaneX = -xtScaled * m_focalPlaneHalf_x;
+      p_focalPlaneY = p_undistortedFocalPlaneY;
+
+
+    }
+
+    return bConverged;
+  }
+
+
+  /** Compute distorted focal plane x/y
+   *
+   * Compute distorted focal plane x/y given an undistorted focal plane x/y.
+   *
+   * This is an iterative procedure as computing the inverse of the distortion equations used by New
+   * Horizons MVIC is difficult.
+   *
+   * @param ux undistorted focal plane x in millimeters
+   * @param uy undistorted focal plane y in millimeters
+   *
+   * @return if the conversion was successful
+   * @see SetDistortion
+   */
+/*
+  bool MvicTdiCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
+
+    // image coordinates prior to introducing distortion
+    p_undistortedFocalPlaneX = ux;
+    p_undistortedFocalPlaneY = uy;
+
+    double xScaledDistortion, yScaledDistortion;
+
+    // scale undistorted coordinates to range of -1.0 to +1.0
+    double xtScaled = ux/m_focalPlaneHalf_x;
+//  double ytScaled = uy/m_focalPlaneHalf_y;
+    double ytScaled = 0.0;
+
+    double uxScaled = xtScaled;
+    double uyScaled = ytScaled;
+
+    double xScaledPrevious = 1000000.0;
+    double yScaledPrevious = 1000000.0;
+
+    double tolerance = 0.000001;
+
+    bool bConverged = false;
+
+    // iterating to introduce distortion...
+    // we stop when the difference between distorted coordinates
+    // in successive iterations is at or below the given tolerance
+    for( int i = 0; i < 50; i++ ) {
+
+//      if (fabs(xtScaled) > 1.0 || fabs(ytScaled) > 1.0) {
+//        continue;
+//        string msg = "value not in range -1.0 to +1.0 required for Legendre Polynomials";
+//        throw IException(IException::Programmer, msg, _FILEINFO_);
+//      }
+
+      // compute distortion in x and y (scaled to -1.0 - +1.0) using Legendre Polynomials
+//    if (!computeDistortionCorrections(xtScaled, ytScaled, xScaledDistortion, yScaledDistortion) )
+    if (!computeDistortionCorrections(xtScaled, 0.0, xScaledDistortion, yScaledDistortion) )
+        return false;
+
+      // update scaled image coordinates
+      xtScaled = uxScaled - xScaledDistortion;
+//      ytScaled = uyScaled - yScaledDistortion;
+      ytScaled = 0.0;
+
+      // check for convergence
+      if((fabs(xtScaled - xScaledPrevious) <= tolerance) && (fabs(ytScaled - yScaledPrevious) <= tolerance)) {
+        bConverged = true;
+        break;
+      }
+
+      xScaledPrevious = xtScaled;
+      yScaledPrevious = ytScaled;
+    }
+
+    if (bConverged) {
+      // scale coordinates back to detector (-32.656 to +32.656)
+      xtScaled *= m_focalPlaneHalf_x;
+//    ytScaled *= m_focalPlaneHalf_y;
+
+      // set distorted coordinates
+      p_focalPlaneX = xtScaled;
+      p_focalPlaneY = ytScaled;
+
+//      p_focalPlaneY = uy;
+    }
+
+    return bConverged;
+  }
+*/
+
+  /** Compute distortion corrections in x and y direction
+   *
+   * For Legendre Polynomials, see ...
+   *
+   * http://mathworld.wolfram.com/LegendrePolynomial.html
+   * http://www.boost.org/doc/libs/1_36_0/libs/math/doc/sf_and_dist/html/math_toolkit/special/sf_poly/legendre.html
+   *
+   * @param xscaled focal plane x scaled to range of 1- to 1 for Legendre Polynomials
+   * @param yscaled focal plane y scaled to range of 1- to 1 for Legendre Polynomials
+   * @param deltax focal plane distortion correction to x in millimeters
+   * @param deltay focal plane distortion correction to y in millimeters
+   *
+   * @return if successful
+   */
+  bool MvicTdiCameraDistortionMap::computeDistortionCorrections(const double xscaled,
+                                                             const double yscaled, double &deltax,
+                                                             double &deltay) {
+
+    double lpx0, lpx1, lpx2, lpx3, lpx4, lpx5;
+    double lpy0, lpy1, lpy2, lpy3, lpy4, lpy5;
+
+    // Legendre polynomials
+    try {
+      lpx0 = legendre_p(0,xscaled);
+      lpx1 = legendre_p(1,xscaled);
+      lpx2 = legendre_p(2,xscaled);
+      lpx3 = legendre_p(3,xscaled);
+      lpx4 = legendre_p(4,xscaled);
+      lpx5 = legendre_p(5,xscaled);
+      lpy0 = legendre_p(0,yscaled);
+      lpy1 = legendre_p(1,yscaled);
+      lpy2 = legendre_p(2,yscaled);
+      lpy3 = legendre_p(3,yscaled);
+      lpy4 = legendre_p(4,yscaled);
+      lpy5 = legendre_p(5,yscaled);
+    }
+    catch (const std::exception& e) {
+      return false;
+    }
+
+    deltax =
+       m_xDistortionCoeffs[0] * lpx0  * lpy1 +
+       m_xDistortionCoeffs[1] * lpx1 * lpy0 +
+       m_xDistortionCoeffs[2] * lpx0 * lpy2 +
+       m_xDistortionCoeffs[3] * lpx1 * lpy1 +
+       m_xDistortionCoeffs[4] * lpx2 * lpy0 +
+       m_xDistortionCoeffs[5] * lpx0 * lpy3 +
+       m_xDistortionCoeffs[6] * lpx1 * lpy2 +
+       m_xDistortionCoeffs[7] * lpx2 * lpy1 +
+       m_xDistortionCoeffs[8] * lpx3 * lpy0 +
+       m_xDistortionCoeffs[9] * lpx0 * lpy4 +
+      m_xDistortionCoeffs[10] * lpx1 * lpy3 +
+      m_xDistortionCoeffs[11] * lpx2 * lpy2 +
+      m_xDistortionCoeffs[12] * lpx3 * lpy1 +
+      m_xDistortionCoeffs[13] * lpx4 * lpy0 +
+      m_xDistortionCoeffs[14] * lpx0 * lpy5 +
+      m_xDistortionCoeffs[15] * lpx1 * lpy4 +
+      m_xDistortionCoeffs[16] * lpx2 * lpy3 +
+      m_xDistortionCoeffs[17] * lpx3 * lpy2 +
+      m_xDistortionCoeffs[18] * lpx4 * lpy1 +
+      m_xDistortionCoeffs[19] * lpx5 * lpy0;
+
+    deltay = 0.0;
+
+//    deltay =
+//      m_distCoefY[0] * lpx0 * lpy1 +
+//      m_distCoefY[1] * lpx1 * lpy0 +
+//      m_distCoefY[2] * lpx0 * lpy2 +
+//      m_distCoefY[3] * lpx1 * lpy1 +
+//      m_distCoefY[4] * lpx2 * lpy0 +
+//      m_distCoefY[5] * lpx0 * lpy3 +
+//      m_distCoefY[6] * lpx1 * lpy2 +
+//      m_distCoefY[7] * lpx2 * lpy1 +
+//      m_distCoefY[8] * lpx3 * lpy0 +
+//      m_distCoefY[9] * lpx0 * lpy4 +
+//     m_distCoefY[10] * lpx1 * lpy3 +
+//     m_distCoefY[11] * lpx2 * lpy2 +
+//     m_distCoefY[12] * lpx3 * lpy1 +
+//     m_distCoefY[13] * lpx4 * lpy0 +
+//     m_distCoefY[14] * lpx0 * lpy5 +
+//     m_distCoefY[15] * lpx1 * lpy4 +
+//     m_distCoefY[16] * lpx2 * lpy3 +
+//     m_distCoefY[17] * lpx3 * lpy2 +
+//     m_distCoefY[18] * lpx4 * lpy1 +
+//     m_distCoefY[19] * lpx5 * lpy0;
+
+    return true;
+  }
+
+
+  /** Compute residual distortion corrections in row and column direction
+   *  TODO: Implementation not complete
+   *
+   * @param dx
+   * @param dy
+   * @param residualDeltax
+   * @param residualDeltay
+   *
+   * @return if successful
+   */
+  bool MvicTdiCameraDistortionMap::computeResidualDistortionCorrections(const double dx,
+                                                             const double dy,
+                                                             double &residualDeltax,
+                                                             double &residualDeltay) {
+
+    double sample = p_camera->Sample();
+    double line = p_camera->Line();
+
+    double residualColDelta, residualRowDelta;
+
+    residualColDelta = sample * m_residualColDistCoeffs[1] +
+                       pow(sample,2) * m_residualColDistCoeffs[2] +
+                       pow(sample,3) * m_residualColDistCoeffs[3] +
+                       pow(sample,4) * m_residualColDistCoeffs[4] +
+                       pow(sample,5) * m_residualColDistCoeffs[5];
+
+    residualRowDelta = line * m_residualRowDistCoeffs[1] +
+                       pow(line,2) * m_residualRowDistCoeffs[2] +
+                       pow(line,3) * m_residualRowDistCoeffs[3] +
+                       pow(line,4) * m_residualRowDistCoeffs[4] +
+                       pow(line,5) * m_residualRowDistCoeffs[5];
+
+    return true;
+  }
+
+
+  /**
+   * Testing method to output corrections in x and y at pixel centers for entire focal plane.
+   * Output in csv format for viewing/plotting in Excel.
+   */
+  bool MvicTdiCameraDistortionMap::outputResidualDeltas() {
+
+    QString ofname("mvic_tdi_residual_deltas.csv");
+    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    if (!fp_out)
+      return false;
+
+    char buf[1056];
+
+    double residualColDelta;
+
+    for (int s=0; s <= 5000; s++) {  // loop in sample direction
+      residualColDelta =            m_residualColDistCoeffs[0] +
+                                s * m_residualColDistCoeffs[1] +
+                         pow(s,2) * m_residualColDistCoeffs[2] +
+                         pow(s,3) * m_residualColDistCoeffs[3] +
+                         pow(s,4) * m_residualColDistCoeffs[4] +
+                         pow(s,5) * m_residualColDistCoeffs[5];
+      sprintf(buf, "%d,%lf\n", s, residualColDelta);
+      fp_out << buf;
+    }
+
+    fp_out.close();
+
+    return true;
+  }
+
+}
