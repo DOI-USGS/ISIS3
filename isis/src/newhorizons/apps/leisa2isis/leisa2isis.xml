@@ -58,7 +58,42 @@
           *.cub
         </filter>
       </parameter>
-    </group>
+
+      <parameter name="ERRORMAP">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the error image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons LEISA error extension data 
+          as an cube in ISIS format. The error extension image must be in the fifth FITS
+          extension (i.e., sixth image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="QUALITY">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the quality image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons LEISA quality extension data 
+          as an cube in ISIS format. The quality extension image must be in the sixth FITS
+          extension (i.e., seventh image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      </group>
   </groups>
 
 </application>

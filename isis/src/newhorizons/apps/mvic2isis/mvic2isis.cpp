@@ -33,16 +33,16 @@ void IsisMain() {
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
 
   // Get the primary FITS label
-  Pvl fitsLabel;
-  fitsLabel.addGroup(importFits.fitsLabel(0));
+  Pvl primaryLabel;
+  primaryLabel.addGroup(importFits.fitsLabel(0));
 
   // Make sure this is a New Horizons MVIC image FITS formatted file
   bool mvic = true;
-  if (fitsLabel.hasKeyword("MISSION", Pvl::Traverse)) {
-    QString mission = fitsLabel.findKeyword("MISSION", Pvl::Traverse);
+  if (primaryLabel.hasKeyword("MISSION", Pvl::Traverse)) {
+    QString mission = primaryLabel.findKeyword("MISSION", Pvl::Traverse);
     if (!mission.contains("New Horizons")) mvic = false;
-    if (fitsLabel.hasKeyword("INSTRU", Pvl::Traverse)) {
-      QString instrument = fitsLabel.findKeyword("INSTRU", Pvl::Traverse);
+    if (primaryLabel.hasKeyword("INSTRU", Pvl::Traverse)) {
+      QString instrument = primaryLabel.findKeyword("INSTRU", Pvl::Traverse);
       if (!instrument.contains("mvi")) mvic = false;
     }
     else {
@@ -60,7 +60,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (!fitsLabel.hasKeyword("BITPIX", Pvl::Traverse)) {
+  if (!primaryLabel.hasKeyword("BITPIX", Pvl::Traverse)) {
     FileName in = ui.GetFileName("FROM");
     QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
                   "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
@@ -68,7 +68,7 @@ void IsisMain() {
   }
 
 
-  // Check to see if the undistorted image was requested from the FITS file and it has the 
+  // Check to see if the undistorted image was requested from the FITS file and that it has the 
   // corresponding extension and keywords
   if (ui.WasEntered("UNDISTORTED")) {
     PvlGroup undistortedLabel = importFits.fitsLabel(1);
@@ -135,9 +135,8 @@ void IsisMain() {
   }
 
 
-  // Start converting images
-
-  QString bitpix = fitsLabel.findKeyword("BITPIX", Pvl::Traverse);
+  // Convert the primary image 
+  QString bitpix = primaryLabel.findKeyword("BITPIX", Pvl::Traverse);
   int bytesPerPix = abs(toInt(bitpix)) / 8;
   importFits.SetDataPrefixBytes(bytesPerPix * 12);
   importFits.SetDataSuffixBytes(bytesPerPix * 12);
@@ -146,10 +145,10 @@ void IsisMain() {
   // Set up the output cube
   Cube *output = importFits.SetOutputCube("TO");
 
-  translateLabels(fitsLabel, output); // Results are put directly into the cube label (output)
+  translateLabels(primaryLabel, output); // Results are put directly into the cube label (output)
 
   // Save the input FITS label in the output cube original labels
-  OriginalLabel originals(fitsLabel);
+  OriginalLabel originals(primaryLabel);
   output->write(originals);
 
   // Import the file
@@ -162,28 +161,11 @@ void IsisMain() {
   // to be the 2rd image in the FITS file (i.e., 1st extension)
   if (ui.WasEntered("UNDISTORTED")) {
     PvlGroup undistortedLabel = importFits.fitsLabel(1);
-//    if (!undistortedLabel.hasKeyword("XTENSION") || !undistortedLabel.hasKeyword("COMMENT") ||
-//        undistortedLabel["XTENSION"][0] != "IMAGE" || 
-//        !undistortedLabel["COMMENT"][0].startsWith("This is the bias-subtracted, flattened, distortion-removed image cube.")) {
-
-//      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Undistorted image "
-//                                "Input file label value for EXTNAME is [%2]").
-//                             arg(ui.GetFileName("FROM")).arg(undistortedLabel["COMMENT"][0]);
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
-
-//    if (!undistortedLabel.hasKeyword("BITPIX")) {
-//      FileName in = ui.GetFileName("FROM");
-//      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
-//                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
 
     QString bitpix = undistortedLabel.findKeyword("BITPIX");
     int bytesPerPix = abs(toInt(bitpix)) / 8;
     importFits.SetDataPrefixBytes(bytesPerPix * 12);
     importFits.SetDataSuffixBytes(bytesPerPix * 12);
-    importFits.setProcessFileStructure(0);
     importFits.setProcessFileStructure(1);
 
     Cube *outputError = importFits.SetOutputCube("UNDISTORTED");
@@ -205,27 +187,10 @@ void IsisMain() {
   if (ui.WasEntered("ERROR")) {
     // Get the label of the Error image and make sure this is a New Horizons MVIC Error image
     PvlGroup errorLabel = importFits.fitsLabel(2);
-//    if (!errorLabel.hasKeyword("XTENSION") || !errorLabel.hasKeyword("COMMENT") ||
-//        errorLabel["XTENSION"][0] != "IMAGE" || 
-//        errorLabel["COMMENT"][0] != "1-sigma error per pixel for the image in extension 1.") {
-
-//      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Error image "
-//                                "Input file label value for EXTNAME is [%2]").
-//                    arg(ui.GetFileName("FROM")).arg(errorLabel["COMMENT"][0]);
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
-
-//    if (!errorLabel.hasKeyword("BITPIX")) {
-//      FileName in = ui.GetFileName("FROM");
-//      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
-//                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
     QString bitpix = errorLabel.findKeyword("BITPIX");
     int bytesPerPix = abs(toInt(bitpix)) / 8;
     importFits.SetDataPrefixBytes(bytesPerPix * 12);
     importFits.SetDataSuffixBytes(bytesPerPix * 12);
-    importFits.setProcessFileStructure(0);
     importFits.setProcessFileStructure(2);
 
     Cube *outputError = importFits.SetOutputCube("ERROR");
@@ -247,27 +212,10 @@ void IsisMain() {
   if (ui.WasEntered("QUALITY")) {
     // Get the label of the Error image and make sure this is a New Horizons MVIC Quality image
     PvlGroup qualityLabel = importFits.fitsLabel(3);
-//    if (!qualityLabel.hasKeyword("XTENSION") || !qualityLabel.hasKeyword("COMMENT") ||
-//        qualityLabel["XTENSION"][0] != "IMAGE" || 
-//        qualityLabel["COMMENT"][0] != "Data quality flag for the image in extension 1.") {
-
-//      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Quality image "
-//                                "Input file label value for EXTNAME is [%2]").
-//                    arg(ui.GetFileName("FROM")).arg(qualityLabel["COMMENT"][0]);
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
-
-//    if (!qualityLabel.hasKeyword("BITPIX")) {
-//      FileName in = ui.GetFileName("FROM");
-//      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
-//                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
-//      throw IException(IException::User, msg, _FILEINFO_);
-//    }
     QString bitpix = qualityLabel.findKeyword("BITPIX");
     int bytesPerPix = abs(toInt(bitpix)) / 8;
     importFits.SetDataPrefixBytes(bytesPerPix * 12);
     importFits.SetDataSuffixBytes(bytesPerPix * 12);
-    importFits.setProcessFileStructure(0);
     importFits.setProcessFileStructure(3);
 
     Cube *outputError = importFits.SetOutputCube("QUALITY");
@@ -287,7 +235,7 @@ void IsisMain() {
 
 
 
-void translateLabels(Pvl &fitsLabel, Cube *ocube) {
+void translateLabels(Pvl &label, Cube *ocube) {
 
   // Get the directory where the New Horizons translation tables are.
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
@@ -296,7 +244,7 @@ void translateLabels(Pvl &fitsLabel, Cube *ocube) {
   Pvl *isisLabel = ocube->label();
   // Create an Instrument group
   FileName insTransFile(transDir + "mvicInstrument_fit.trn");
-  PvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
+  PvlTranslationManager insXlater(label, insTransFile.expanded());
   insXlater.Auto(*(isisLabel));
 
   // Modify/add Instument group keywords not handled by the translater
@@ -332,8 +280,8 @@ void translateLabels(Pvl &fitsLabel, Cube *ocube) {
   furnsh_c(sclkName.expanded().toAscii().data());
 
   SpiceInt sclkCode;
-  if (fitsLabel.hasKeyword("SPCSCID", Pvl::Traverse)) {
-    sclkCode = fitsLabel.findKeyword("SPCSCID", Pvl::Traverse);
+  if (label.hasKeyword("SPCSCID", Pvl::Traverse)) {
+    sclkCode = label.findKeyword("SPCSCID", Pvl::Traverse);
   }
   else {
     QString msg = "Input file is missing the spacecraft Naif Id.";
@@ -348,7 +296,7 @@ void translateLabels(Pvl &fitsLabel, Cube *ocube) {
   inst.addKeyword(PvlKeyword("StartTime", QString(utc)));
   // Create a Band Bin group
   FileName bandTransFile(transDir + "mvicBandBin_fit.trn");
-  PvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
+  PvlTranslationManager bandBinXlater(label, bandTransFile.expanded());
   bandBinXlater.Auto(*(isisLabel));
   // Add units and OriginalBand keyword
   PvlGroup &bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
@@ -371,25 +319,25 @@ void translateLabels(Pvl &fitsLabel, Cube *ocube) {
       bandBin.findKeyword("Width").addValue(width, "nanometers");
       bandBin.findKeyword("OriginalBand").addValue(QString::number(i+1));
       QString fitsKey = QString("UTCMID%1").arg(i, 2, 10, QChar('0'));
-      QString fitsVal = fitsLabel.findKeyword(fitsKey, Pvl::Traverse);
+      QString fitsVal = label.findKeyword(fitsKey, Pvl::Traverse);
       bandBin.findKeyword("UtcTime").addValue(fitsVal);
     }
   }
 
   // Create an Archive group
   FileName archiveTransFile(transDir + "mvicArchive_fit.trn");
-  PvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
+  PvlTranslationManager archiveXlater(label, archiveTransFile.expanded());
   archiveXlater.Auto(*(isisLabel));
 
   // Create a Kernels group
   FileName kernelsTransFile(transDir + "mvicKernels_fit.trn");
-  PvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
+  PvlTranslationManager kernelsXlater(label, kernelsTransFile.expanded());
   kernelsXlater.Auto(*(isisLabel));
   
   // If Level 2 product, Create a RadiometricCalibration group
-  if (fitsLabel.hasKeyword("SOCL2VER", Pvl::Traverse)) {
+  if (label.hasKeyword("SOCL2VER", Pvl::Traverse)) {
     FileName calibrationTransFile(transDir + "mvicCalibration_fit.trn"); 
-    PvlTranslationManager calibrationXlater(fitsLabel, calibrationTransFile.expanded());
+    PvlTranslationManager calibrationXlater(label, calibrationTransFile.expanded());
     calibrationXlater.Auto(*(isisLabel));
 
     //  Add comments to calibration keywords.  This is done by hand because the translation tables
