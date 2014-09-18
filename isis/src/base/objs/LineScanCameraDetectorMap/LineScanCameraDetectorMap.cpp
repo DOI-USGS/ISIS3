@@ -27,6 +27,7 @@
 #include "iTime.h"
 
 namespace Isis {
+
   /** Compute parent position from a detector coordinate
    *
    * This method will compute a parent sample given a
@@ -38,13 +39,13 @@ namespace Isis {
    *
    * @return conversion successful
    */
-  bool LineScanCameraDetectorMap::SetDetector(const double sample,
-      const double line) {
+  bool LineScanCameraDetectorMap::SetDetector(const double sample, const double line) {
     if(!CameraDetectorMap::SetDetector(sample, line)) return false;
     double etDiff = p_camera->time().Et() - p_etStart;
     p_parentLine = etDiff / p_lineRate + 0.5;
     return true;
   }
+
 
   /** Compute detector position from a parent image coordinate
    *
@@ -57,14 +58,14 @@ namespace Isis {
    *
    * @return conversion successful
    */
-  bool LineScanCameraDetectorMap::SetParent(const double sample,
-      const double line) {
+  bool LineScanCameraDetectorMap::SetParent(const double sample, const double line) {
     if(!CameraDetectorMap::SetParent(sample, line)) return false;
     p_detectorLine = p_camera->FocalPlaneMap()->DetectorLineOffset();
     double etLine = p_etStart + p_lineRate * (line - 0.5);
     p_camera->setTime(etLine);
     return true;
   }
+
 
   //! Return the starting time at the top edge of the first line in the parent image
   double LineScanCameraDetectorMap::StartTime() const {

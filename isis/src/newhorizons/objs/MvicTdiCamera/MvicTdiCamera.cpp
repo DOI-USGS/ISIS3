@@ -46,31 +46,13 @@ namespace Isis {
     // Set the pixel pitch, focal length and row offset from Mvic frame transfer array
     SetPixelPitch();
     SetFocalLength();
-//    SetRowOffset();
-
-//  qDebug()<<"NaifId = "<<naifIkCode()<<"  FocalLength = "<<FocalLength()<<"  PixelPitch = "<<PixelPitch();
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
-//  stime = "1/0034948318:06600"; // Jupiter Spacecraft clock timestamp (SPCSCLK0)
-//  stime = "1/0034948341:03300"; // Jupiter mid-observ
-//  stime = "1/0034829038:06600"; // Io  Spacecraft clock timestamp (SPCSCLK0)
-//  stime = "1/0034829043:28300"; // Io mid-observ
-//  qDebug()<<"sclk = "<<stime;
 
     m_etStart = getClockTime(stime).Et();
-//  qDebug()<<"et = "<<QString::number(m_etStart, 'f', 12);
-//  iTime time(m_etStart);
-//  qDebug()<<"utc = "<<time.UTC();
-//  SpiceChar jd[30];
-//  et2utc_c(m_etStart, "J", 7, 30, jd);
-//  qDebug()<<"jd = "<<jd;
-
-//  m_lineRate = (double)inst["ExposureDuration"];
-//  m_lineRate = (double)inst["ExposureDuration"] / 32.0;
     m_lineRate = 1.0 / (double)inst["TdiRate"];
-//  qDebug()<<"Line rate = "<<m_lineRate;
 
     // The detector map tells us how to convert from image coordinates to
     // detector coordinates.  In our case, a (sample,line) to a (sample,time)
@@ -79,8 +61,9 @@ namespace Isis {
     // The focal plane map tells us how to go from detector position
     // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-//    focalMap->SetDetectorOrigin(2512.5, 0.5);
-    focalMap->SetDetectorOrigin(2500.5, -16.5); // NOTE: TRACIE says this works...
+
+    // This origin does not use 5024/2 because we strip off the leading and trailing 12 pixels
+    focalMap->SetDetectorOrigin(2500.5, -16.5);
 
     // Read legendre polynomial distortion coefficients and boresight offsets from the instrument
     // kernels. Then construct the distortion map.

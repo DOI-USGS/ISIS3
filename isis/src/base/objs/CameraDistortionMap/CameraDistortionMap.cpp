@@ -42,6 +42,7 @@ namespace Isis {
     p_zDirection = zDirection;
   }
 
+
   /** Load distortion coefficients
    *
    * This method loads the distortion coefficients from the instrument
@@ -63,10 +64,11 @@ namespace Isis {
    */
   void CameraDistortionMap::SetDistortion(int naifIkCode) {
     QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
-    for(int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
       p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));
     }
   }
+
 
   /** Compute undistorted focal plane x/y
    *
@@ -89,7 +91,7 @@ namespace Isis {
     p_focalPlaneY = dy;
 
     // No coefficients == no distortion
-    if(p_odk.size() <= 0) {
+    if (p_odk.size() <= 0) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
       return true;
@@ -98,7 +100,7 @@ namespace Isis {
     // Get the distance from the focal plane center and if we are close
     // then skip the distortion
     double r2 = (dx * dx) + (dy * dy);
-    if(r2 <= 1.0E-6) {
+    if (r2 <= 1.0E-6) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
       return true;
@@ -110,6 +112,7 @@ namespace Isis {
     p_undistortedFocalPlaneY = dy - (drOverR * dy);
     return true;
   }
+
 
   /** Compute distorted focal plane x/y
    *
@@ -135,7 +138,7 @@ namespace Isis {
     p_undistortedFocalPlaneY = uy;
 
     // No coefficients == nodistortion
-    if(p_odk.size() <= 0) {
+    if (p_odk.size() <= 0) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
       return true;
@@ -144,7 +147,7 @@ namespace Isis {
     // Compute the distance from the focal plane center and if we are
     // close to the center then no distortion is required
     double rp2 = (ux * ux) + (uy * uy);
-    if(rp2 <= 1.0E-6) {
+    if (rp2 <= 1.0E-6) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
       return true;
@@ -161,12 +164,12 @@ namespace Isis {
     double tolMilliMeters = p_camera->PixelPitch() / 100.0;
     int iteration = 0;
     do {
-      // Don't get in a end-less loop.  This algorithm should
+      // Don't get in an end-less loop.  This algorithm should
       // converge quickly.  If not then we are probably way outside
       // of the focal plane.  Just set the distorted position to the
       // undistorted position. Also, make sure the focal plane is less
       // than 1km, it is unreasonable for it to grow larger than that.
-      if(iteration >= 15 || r > 1E9) {
+      if (iteration >= 15 || r > 1E9) {
         drOverR = 0.0;
         break;
       }
@@ -180,17 +183,19 @@ namespace Isis {
       r = rp + (drOverR * r_prev);  // Compute new estimate of r
       iteration++;
     }
-    while(fabs(r - r_prev) > tolMilliMeters);
+    while (fabs(r - r_prev) > tolMilliMeters);
 
     p_focalPlaneX = ux / (1.0 - drOverR);
     p_focalPlaneY = uy / (1.0 - drOverR);
     return true;
   }
 
+
   //! Return optical distortion polynomial coefficients
   std::vector<double> CameraDistortionMap::OpticalDistortionCoefficients() const {
     return p_odk;
   }
+
 
   //! Return the direction of the focal plane Z-axis
   double CameraDistortionMap::ZDirection() const {

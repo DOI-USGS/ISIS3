@@ -393,22 +393,22 @@ namespace Isis {
                                                              double &residualDeltax,
                                                              double &residualDeltay) {
 
-    double sample = p_camera->Sample();
-    double line = p_camera->Line();
-
-    double residualColDelta, residualRowDelta;
-
-    residualColDelta = sample * m_residualColDistCoeffs[1] +
-                       pow(sample,2) * m_residualColDistCoeffs[2] +
-                       pow(sample,3) * m_residualColDistCoeffs[3] +
-                       pow(sample,4) * m_residualColDistCoeffs[4] +
-                       pow(sample,5) * m_residualColDistCoeffs[5];
-
-    residualRowDelta = line * m_residualRowDistCoeffs[1] +
-                       pow(line,2) * m_residualRowDistCoeffs[2] +
-                       pow(line,3) * m_residualRowDistCoeffs[3] +
-                       pow(line,4) * m_residualRowDistCoeffs[4] +
-                       pow(line,5) * m_residualRowDistCoeffs[5];
+//    double sample = p_camera->Sample();
+//    double line = p_camera->Line();
+//
+//    double residualColDelta, residualRowDelta;
+//
+//    residualColDelta = sample * m_residualColDistCoeffs[1] +
+//                       pow(sample,2) * m_residualColDistCoeffs[2] +
+//                       pow(sample,3) * m_residualColDistCoeffs[3] +
+//                       pow(sample,4) * m_residualColDistCoeffs[4] +
+//                       pow(sample,5) * m_residualColDistCoeffs[5];
+//
+//    residualRowDelta = line * m_residualRowDistCoeffs[1] +
+//                       pow(line,2) * m_residualRowDistCoeffs[2] +
+//                       pow(line,3) * m_residualRowDistCoeffs[3] +
+//                       pow(line,4) * m_residualRowDistCoeffs[4] +
+//                       pow(line,5) * m_residualRowDistCoeffs[5];
 
     return true;
   }

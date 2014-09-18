@@ -40,6 +40,7 @@ namespace Isis {
     Init(parent, naifIkCode);
   }
 
+
   /** Construct mapping between detectors and focal plane x/y
    *
    * @param naifIkCode  code of the naif instrument for reading coefficients
@@ -48,18 +49,21 @@ namespace Isis {
   CameraFocalPlaneMap::CameraFocalPlaneMap(const int naifIkCode) {
     Init(0, naifIkCode);
   }
+
+
   CameraFocalPlaneMap::~CameraFocalPlaneMap(){
   }
 
-/**
- * Added new method to allow programmer to pass in affine coefficients
- * 
- * @author janderson (3/25/2014)
- * 
- * @param parent Parent camera
- * @param affine Affine transform containing the coefficients for both 
- *               transforms to (samp,line) to (x,y) and reverse
- */
+
+ /**
+  * Added new method to allow programmer to pass in affine coefficients
+  * 
+  * @author janderson (3/25/2014)
+  * 
+  * @param parent Parent camera
+  * @param affine Affine transform containing the coefficients for both 
+  *               transforms to (samp,line) to (x,y) and reverse
+  */
   CameraFocalPlaneMap::CameraFocalPlaneMap(Camera *parent, Affine &affine) {
     p_detectorSampleOrigin = 0.0;
     p_detectorLineOrigin = 0.0;
@@ -126,7 +130,8 @@ namespace Isis {
     }
   }
 
-  /** Compute detector position from focal plane coordinate
+
+  /** Compute detector position (sample,line) from focal plane coordinates
    *
    * This method will compute both the centered and normal detector position
    * given a distorted focal plane coordinate.
@@ -140,15 +145,14 @@ namespace Isis {
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
 
-    p_centeredDetectorSample = p_itranss[0] + (p_itranss[1] * dx)
-                               + (p_itranss[2] * dy);
-    p_centeredDetectorLine   = p_itransl[0] + (p_itransl[1] * dx)
-                               + (p_itransl[2] * dy);
+    p_centeredDetectorSample = p_itranss[0] + (p_itranss[1] * dx) + (p_itranss[2] * dy);
+    p_centeredDetectorLine   = p_itransl[0] + (p_itransl[1] * dx) + (p_itransl[2] * dy);
     ComputeUncentered();
     return true;
   }
 
-  /** Compute distorted focal plane coordinate from detector position
+
+  /** Compute distorted focal plane coordinate from detector position (sampel,line)
    *
    * This method will compute both the distorted focal plane x/y and centered
    * detector position given a detector position
@@ -162,12 +166,11 @@ namespace Isis {
     p_detectorSample = sample;
     p_detectorLine = line;
     ComputeCentered();
-    p_focalPlaneX = p_transx[0] + (p_transx[1] * p_centeredDetectorSample)
-                    + (p_transx[2] * p_centeredDetectorLine) ;
-    p_focalPlaneY = p_transy[0] + (p_transy[1] * p_centeredDetectorSample)
-                    + (p_transy[2] * p_centeredDetectorLine) ;
+    p_focalPlaneX = p_transx[0] + (p_transx[1] * p_centeredDetectorSample) + (p_transx[2] * p_centeredDetectorLine) ;
+    p_focalPlaneY = p_transy[0] + (p_transy[1] * p_centeredDetectorSample) + (p_transy[2] * p_centeredDetectorLine) ;
     return true;
   }
+
 
   /** Return the focal plane x dependency variable
    *
@@ -209,7 +212,6 @@ namespace Isis {
   }
 
 
-
   /** Return the sign of the p_transy coefficient with the greatest magnitude
    *
    * This method returns a +1 or -1 based on the sign of the p_transy
@@ -231,35 +233,42 @@ namespace Isis {
     }
   }
 
-    //! Return distorted focal plane x
+
+  //! Return distorted focal plane x
   double CameraFocalPlaneMap::FocalPlaneX() const {
     return p_focalPlaneX;
   }
+
 
   //! Return distorted focal plane y
   double CameraFocalPlaneMap::FocalPlaneY() const {
     return p_focalPlaneY;
   }
 
+
   //! Return detector sample
   double CameraFocalPlaneMap::DetectorSample() const {
     return p_detectorSample;
   }
+
 
   //! Return detector line
   double CameraFocalPlaneMap::DetectorLine() const {
     return p_detectorLine;
   }
 
+
   //! Return centered detector sample
   double CameraFocalPlaneMap::CenteredDetectorSample() const {
     return p_centeredDetectorSample;
   }
 
+
   //! Return centered detector line
   double CameraFocalPlaneMap::CenteredDetectorLine() const {
     return p_centeredDetectorLine;
   }
+
 
   /** Set the detector origin
    *
@@ -275,15 +284,18 @@ namespace Isis {
     p_detectorLineOrigin = line;
   }
 
+
   //! Return detector line origin
   double CameraFocalPlaneMap::DetectorLineOrigin() const {
     return p_detectorLineOrigin;
   }
 
+
   //! Return detector sample origin
   double CameraFocalPlaneMap::DetectorSampleOrigin() const {
     return p_detectorSampleOrigin;
   }
+
 
   /** Set the detector offset
    *
@@ -300,33 +312,45 @@ namespace Isis {
     p_detectorLineOffset = lineOffset;
   }
 
+
   //! Return detector line offset
   double CameraFocalPlaneMap::DetectorLineOffset() const {
     return p_detectorLineOffset;
   }
+
 
   //! Return detector sample offset
   double CameraFocalPlaneMap::DetectorSampleOffset() const {
     return p_detectorSampleOffset;
   }
 
+
   const double *CameraFocalPlaneMap::TransX() const{
     return p_transx;
   }
+
+
   const double *CameraFocalPlaneMap::TransY() const{
     return p_transy;
   }
+
+
   const double *CameraFocalPlaneMap::TransS() const{
     return p_itranss;
   }
+
+
   const double *CameraFocalPlaneMap::TransL() const{
     return p_itransl;
   }
+
+
   //! Convenience method to center detector origin (use when inheriting)
   void CameraFocalPlaneMap::ComputeCentered() {
     p_centeredDetectorSample = p_detectorSample - p_detectorSampleOrigin;
     p_centeredDetectorLine   = p_detectorLine   - p_detectorLineOrigin;
   }
+
 
   //! Convenience method to center detector origin (use when inheriting)
   void CameraFocalPlaneMap::ComputeUncentered() {

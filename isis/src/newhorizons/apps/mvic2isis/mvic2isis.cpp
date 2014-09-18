@@ -294,6 +294,7 @@ void translateLabels(Pvl &label, Cube *ocube) {
   SpiceChar utc[30];
   et2utc_c(et, "ISOC", 3, 30, utc);
   inst.addKeyword(PvlKeyword("StartTime", QString(utc)));
+
   // Create a Band Bin group
   FileName bandTransFile(transDir + "mvicBandBin_fit.trn");
   PvlTranslationManager bandBinXlater(label, bandTransFile.expanded());
