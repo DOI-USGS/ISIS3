@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QMutex>
 
 #include <iomanip>
 #include <iostream>
@@ -26,6 +27,7 @@
 #include "ControlPoint.h"
 #include "Control.h"
 #include "CorrelationMatrix.h"
+#include "ImageList.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -61,7 +63,7 @@ namespace Isis {
 
 
   BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
-                             const QString &cnetFile, 
+                             const QString &cnetFile,
                              const QString &cubeList,
                              bool bPrintSummary) {
     Progress progress;
@@ -75,13 +77,13 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
-
+    
     init(&progress);
   }
 
 
   BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
-                             const QString &cnetFile, 
+                             const QString &cnetFile,
                              const QString &cubeList,
                              const QString &heldList,
                              bool bPrintSummary) {
@@ -96,19 +98,19 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = new Isis::SerialNumberList(heldList);
     m_bundleSettings = bundleSettings;
- 
+
     init(&progress);
   }
 
 
   BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
-                             QString &cnet, 
+                             QString &cnet,
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
     // initialize m_dConvergenceThreshold ???
     // ??? deleted keyword ??? m_dConvergenceThreshold = 0.0;    // This is needed for deltack???
     // ???                                   //JWB - this gets overwritten in Init... move to constructor ???????????????????????????????????????????????????????????????????????
-    // ??? 
+    // ???
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
@@ -150,13 +152,13 @@ namespace Isis {
 
 
   BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
-                             Isis::ControlNet &cnet, 
-                             Isis::SerialNumberList &snlist,
+                             ControlNet &cnet,
+                             SerialNumberList &snlist,
                              bool bPrintSummary) {
     // initialize m_dConvergenceThreshold ???
     // ??? deleted keyword ??? m_dConvergenceThreshold = 0.0;    // This is needed for deltack???
     // ???                                   //JWB - this gets overwritten in Init... move to constructor ???????????????????????????????????????????????????????????????????????
-    // ??? 
+    // ???
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
@@ -170,6 +172,37 @@ namespace Isis {
 
     init();
   }
+
+
+  ////////////////////////////////////////////////////////////////////////////////////My Constructor
+  /**
+   * Thread safe constructor.
+   */
+  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+                             Control &control,
+                             QList<ImageList *> imgLists,
+                             bool bPrintSummary) {
+    m_bundleSettings = bundleSettings;
+
+    Progress progress;
+    m_pCnet = new Isis::ControlNet(control.fileName(), &progress);
+
+    m_pSnList = new SerialNumberList;
+    foreach (ImageList *imgList, imgLists) {
+      foreach (Image *image, *imgList) {
+        m_pSnList->Add(image->fileName());
+      }
+    }
+
+    m_bPrintSummary = bPrintSummary;
+
+    m_pHeldSnList = NULL;
+    m_bCleanUp = false;
+    m_strCnetFileName = control.fileName();
+    
+    init();
+  }
+  ////////////////////////////////////////////////////////////////////////////////////My Constructor
 
 
   BundleAdjust::~BundleAdjust() {
@@ -203,8 +236,8 @@ namespace Isis {
 //printf("BOOST_UBLAS_CHECK_ENABLE = %d\n", BOOST_UBLAS_CHECK_ENABLE);
 //printf("BOOST_UBLAS_TYPE_CHECK = %d\n", BOOST_UBLAS_TYPE_CHECK);
 
-    // initialize 
-    // 
+    // initialize
+    //
     // JWB
     // - some of these not originally initialized.. better values???
     m_bLastIteration = false;
@@ -336,7 +369,7 @@ namespace Isis {
     // ===========================================================================================//
     // ==== Use the bundle settings to initialize more member variables and set up solutions =====//
     // ===========================================================================================//
-    
+
     // TODO:  Need to have some validation code to make sure everything is
     // on the up-and-up with the control network.  Add checks for multiple
     // networks, images without any points, and points on images removed from
@@ -355,12 +388,12 @@ namespace Isis {
     // resizes m_dGlobalCameraAnglesAprioriSigma and initializes with
     // -1.0s;
 //    instrumentPointingSetUp();
-    
+
     // SetUp method initializes m_dGlobalLatitudeAprioriSigma,
     // m_dGlobalLongitudeAprioriSigma, m_dGlobalRadiusAprioriSigma;
     // resets m_dGlobalSpacecraftPositionAprioriSigma, m_dGlobalCameraAnglesAprioriSigma
 //    setGlobalAprioriSigmas();
-  
+
     // initializes m_nFixedPoints, m_nIgnoredPoints;
     // fills m_nPointIndexMap vector
 //    fillPointIndexMap();
@@ -527,10 +560,16 @@ namespace Isis {
 
 
   bool BundleAdjust::solveCholesky() {
+//     QMutex mux;
+//     mux.lock();
+
+//     emit statusUpdate(QString("Begin solve: %1").arg(m_pSnList->Size()));
 
     // TODO what are the next two lines doing?
-    cout << "cnet = " << m_strCnetFileName << endl;
     PvlObject forTesting = m_bundleSettings.pvlObject();
+    
+//     emit statusUpdate(QString("before cout: %1").arg(m_pSnList->Size()));
+    
     cout << forTesting << endl;
 
     // throw error if a frame camera is included AND if m_bundleSettings.solveInstrumentPositionOverHermiteSpline()
@@ -545,7 +584,14 @@ namespace Isis {
 //      }
 //    }
 
+//     SerialNumberList myList = *m_pSnList;
+
+
+//     emit statusUpdate(QString("before initialize: %1").arg(m_pSnList->Size()));
+    
     initialize();
+
+//     emit statusUpdate(QString("before apriori: %1").arg(m_pSnList->Size()));
 
     // Compute the apriori lat/lons for each nonheld point
     m_pCnet->ComputeApriori(); // original location
@@ -556,9 +602,13 @@ namespace Isis {
 
     // start the clock
     clock_t t1 = clock();
+    
+//     emit statusUpdate(QString("after clock: %1").arg(m_pSnList->Size()));
 
     for (;;) {
+
       emit statusUpdate( QString("\n starting iteration %1 \n").arg(m_nIteration) );
+
       clock_t iterationclock1 = clock();
 
       // send notification to UI indicating "new iteration"
@@ -661,7 +711,9 @@ namespace Isis {
           else {  // otherwise iterations are complete
             m_bLastIteration = true;
             m_bundleStatistics.setConverged(true);
+
             emit statusUpdate("\n Bundle has converged");
+
             break;
           }
         }
@@ -692,6 +744,7 @@ namespace Isis {
       emit statusUpdate( QString("End of Iteration %1").arg(m_nIteration) );
       emit statusUpdate( QString("Elapsed Time: %1").arg(dIterationTime) );
 
+//       emit statusUpdate( QString("\tsnlist before wrapup: %1").arg(m_pSnList->Size()) );
       // send notification to UI indicating "new iteration"
       // UI.Notify(BundleEvent.END_ITERATION);
 
@@ -732,9 +785,12 @@ namespace Isis {
     output();
 
     emit statusUpdate("\n Bundle Complete");
-    
+    BundleResults *results = new BundleResults(bundleResults());
+    emit resultsReady(results);
+
     iterationSummary();
 
+//     mux.unlock();
     return true;
 
     QString msg = "Need to return something here, or just change the whole darn thing? [";
@@ -908,7 +964,7 @@ namespace Isis {
     static symmetric_matrix<double, upper> N11(nImagePartials);
     N11.resize(nImagePartials);
     N11.clear();
-    
+
 //    std::cout << "image" << std::endl << coeff_image << std::endl;
 //    std::cout << "point" << std::endl << coeff_point3D << std::endl;
 //    std::cout << "rhs" << std::endl << coeff_RHS << std::endl;
@@ -924,7 +980,7 @@ namespace Isis {
       BundleObservation *observation = m_BundleObservations.at(a);
       t += observation->numberParameters();
     }
-    
+
     // insert submatrix at column, row
     m_SparseNormals.InsertMatrixBlock(observationIndex, observationIndex, nImagePartials,
                                       nImagePartials);
@@ -958,7 +1014,7 @@ namespace Isis {
     n1_image = prod(trans(coeff_image), coeff_RHS);
 
 //    std::cout << "n1_image" << std::endl << n1_image << std::endl;
-    
+
     // insert n1_image into n1
     for (i = 0; i < nImagePartials; i++) {
       n1(i + t) += n1_image(i);
@@ -1084,7 +1140,7 @@ namespace Isis {
     m_bundleStatistics.resetNumberConstrainedImageParameters();
 
     int n = 0;
-    
+
     for ( int i = 0; i < m_SparseNormals.size(); i++ ) {
       matrix<double>* diagonalBlock = m_SparseNormals.getBlock(i,i);
       if ( !diagonalBlock )
@@ -2796,7 +2852,7 @@ namespace Isis {
    *
    * @history 2012-01-18 Debbie A. Cook - Fixed the computation of vx
    *                            and vy to make sure they are focal
-   *                            plane x and y residuals instead of 
+   *                            plane x and y residuals instead of
    *                            image sample and line residuals.
    *
    */
@@ -2933,6 +2989,7 @@ namespace Isis {
 
       point->ComputeResiduals();
     }
+//     emit statusUpdate(QString("SerialNumberList in wrapUp") + QString::number(m_pSnList->Size()));
     m_bundleStatistics.computeBundleStatistics(m_pSnList,
                                                m_pCnet,
                                                m_bundleSettings.errorPropagation(),
@@ -3528,7 +3585,7 @@ namespace Isis {
    */
 /*
   int BundleAdjust::imageIndex(int i) const {
-    if (!m_bundleSettings.solveObservationMode()) 
+    if (!m_bundleSettings.solveObservationMode())
       return m_nImageIndexMap[i] * m_nNumImagePartials;
     else
       return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
@@ -3541,6 +3598,7 @@ namespace Isis {
    */
   // TODO: probably don't need this, can get from BundleObservation
   QString BundleAdjust::fileName(int i) {
+//     emit statusUpdate(QString("SerialNumberList in fileName(i):") + QString::number(m_pSnList->Size()));
     return m_pSnList->FileName(i);
   }
 
@@ -3550,6 +3608,7 @@ namespace Isis {
    *
    */
   bool BundleAdjust::isHeld(int i) {
+//     emit statusUpdate(QString("SerialNumberList in isHeld(i):") + QString::number(m_pSnList->Size()));
     if ( m_bundleStatistics.numberHeldImages() > 0 )
          if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))))
            return true;
@@ -3628,33 +3687,37 @@ namespace Isis {
    */
   void BundleAdjust::iterationSummary() {
     QString itlog;
+
     if ( m_bundleStatistics.converged() ) 
         itlog = "Iteration" + toString(m_nIteration) + ": Final";
     else
         itlog = "Iteration" + toString(m_nIteration);
+
     PvlGroup gp(itlog);
 
-    gp += PvlKeyword( "Sigma0", 
+    gp += PvlKeyword( "Sigma0",
                       toString( m_bundleStatistics.sigma0() ) );
-    gp += PvlKeyword( "Observations", 
+    gp += PvlKeyword( "Observations",
                       toString( m_bundleStatistics.numberObservations() ) );
-    gp += PvlKeyword( "Constrained_Point_Parameters", 
+    gp += PvlKeyword( "Constrained_Point_Parameters",
                       toString( m_bundleStatistics.numberConstrainedPointParameters() ) );
-    gp += PvlKeyword( "Constrained_Image_Parameters", 
+    gp += PvlKeyword( "Constrained_Image_Parameters",
                       toString( m_bundleStatistics.numberConstrainedImageParameters() ) );
-    gp += PvlKeyword( "Unknown_Parameters", 
+    gp += PvlKeyword( "Unknown_Parameters",
                       toString( m_bundleStatistics.numberUnknownParameters() ) );
-    gp += PvlKeyword( "Degrees_of_Freedom", 
+    gp += PvlKeyword( "Degrees_of_Freedom",
                       toString( m_bundleStatistics.degreesOfFreedom() ) );
-    gp += PvlKeyword( "Rejected_Measures", 
+    gp += PvlKeyword( "Rejected_Measures",
                       toString( m_bundleStatistics.numberRejectedObservations()/2) );
+
 
     if ( m_bundleStatistics.numberMaximumLikelihoodModels() >
          m_bundleStatistics.maximumLikelihoodModelIndex() ) {
       // if maximum likelihood estimation is being used
-      gp += PvlKeyword( "Maximum_Likelihood_Tier: ", 
+
+      gp += PvlKeyword( "Maximum_Likelihood_Tier: ",
                         toString( m_bundleStatistics.maximumLikelihoodModelIndex() ) );
-      gp += PvlKeyword( "Median_of_R^2_residuals: ", 
+      gp += PvlKeyword( "Median_of_R^2_residuals: ",
                         toString( m_bundleStatistics.maximumLikelihoodMedianR2Residuals() ) );
     }
 
@@ -3710,7 +3773,7 @@ namespace Isis {
     int nValidPoints = m_pCnet->GetNumValidPoints();
     int nInnerConstraints = 0;
     int nDistanceConstraints = 0;
-    int nDegreesOfFreedom = m_bundleStatistics.numberObservations() 
+    int nDegreesOfFreedom = m_bundleStatistics.numberObservations()
                             + m_bundleStatistics.numberConstrainedPointParameters()
                             + m_bundleStatistics.numberConstrainedImageParameters()
                             - m_bundleStatistics.numberUnknownParameters(); // ??? same as bstat dof ???
@@ -3721,7 +3784,7 @@ namespace Isis {
 
     sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
     fp_out << buf;
-    sprintf(buf, "\n                       Run Time: %s", 
+    sprintf(buf, "\n                       Run Time: %s",
                                            Isis::iTime::CurrentLocalTime().toAscii().data());
     fp_out << buf;
     sprintf(buf, "\n               Network Filename: %s", m_strCnetFileName.toAscii().data());
@@ -3754,7 +3817,7 @@ namespace Isis {
       sprintf(buf, "\n                         UPDATE: NO");
     fp_out << buf;
 
-    sprintf(buf, "\n                  SOLUTION TYPE: %s", 
+    sprintf(buf, "\n                  SOLUTION TYPE: %s",
             BundleSettings::solveMethodToString(
                 m_bundleSettings.solveMethod()).toUpper().toAscii().data());
     fp_out << buf;
@@ -3786,14 +3849,14 @@ namespace Isis {
       if (tier < m_bundleStatistics.numberMaximumLikelihoodModels()) { // replace number of models variable with settings models.size()???
         sprintf(buf, "\n                         Tier %d Enabled: TRUE", tier);
         fp_out << buf;
-        sprintf(buf, "\n               Maximum Likelihood Model: %s", 
+        sprintf(buf, "\n               Maximum Likelihood Model: %s",
                 MaximumLikelihoodWFunctions::modelToString(
                     m_bundleStatistics.maximumLikelihoodModelWFunc(tier).model()).toAscii().data());
         fp_out << buf;
-        sprintf(buf, "\n    Quantile used for tweaking constant: %lf", 
+        sprintf(buf, "\n    Quantile used for tweaking constant: %lf",
                             m_bundleStatistics.maximumLikelihoodModelQuantile(tier));
         fp_out << buf;
-        sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf", 
+        sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",
                            m_bundleStatistics.maximumLikelihoodModelWFunc(tier).tweakingConstant());
         fp_out << buf;
         sprintf(buf, "\n       Approx. weighted Residual cutoff: %s",
@@ -3933,8 +3996,8 @@ namespace Isis {
     sprintf(buf, "\n                         Points: %6d",nValidPoints);
     fp_out << buf;
 
-    sprintf(buf, "\n                 Total Measures: %6d", 
-                                     (m_bundleStatistics.numberObservations() 
+    sprintf(buf, "\n                 Total Measures: %6d",
+                                     (m_bundleStatistics.numberObservations()
                                       + m_bundleStatistics.numberRejectedObservations()) / 2);
     fp_out << buf;
 
@@ -3951,13 +4014,13 @@ namespace Isis {
     fp_out << buf;
 
     if (m_bundleStatistics.numberConstrainedPointParameters() > 0) {
-      sprintf(buf, "\n   Constrained Point Parameters: %6d", 
+      sprintf(buf, "\n   Constrained Point Parameters: %6d",
                          m_bundleStatistics.numberConstrainedPointParameters());
       fp_out << buf;
     }
 
     if (m_bundleStatistics.numberConstrainedImageParameters() > 0) {
-      sprintf(buf, "\n   Constrained Image Parameters: %6d", 
+      sprintf(buf, "\n   Constrained Image Parameters: %6d",
                          m_bundleStatistics.numberConstrainedImageParameters());
       fp_out << buf;
     }
@@ -4001,7 +4064,7 @@ namespace Isis {
     sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",
                    m_bundleStatistics.elapsedTimeErrorProp());
     fp_out << buf;
-    sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n", 
+    sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",
                                m_bundleStatistics.elapsedTime());
     fp_out << buf;
     if (m_bundleStatistics.numberObservations() + m_bundleStatistics.numberRejectedObservations()
@@ -4009,24 +4072,24 @@ namespace Isis {
       sprintf(buf, "\n           Residual Percentiles:\n");
       fp_out << buf;
 
-    // residual prob distribution values are calculated/printed 
+    // residual prob distribution values are calculated/printed
     // even if there is no maximum likelihood estimation
       try {
         for (int bin = 1;bin < 34;bin++) {
-          //double quan = 
+          //double quan =
           //    m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(double(bin)/100);
           double cumProb = double(bin) / 100.0;
-          double resValue = 
+          double resValue =
                m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb);
-          double resValue33 = 
+          double resValue33 =
               m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb + 0.33);
-          double resValue66 = 
+          double resValue66 =
               m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb + 0.66);
           sprintf(buf, "                 Percentile %3d: %+8.3lf"
                        "                 Percentile %3d: %+8.3lf"
-                       "                 Percentile %3d: %+8.3lf\n", 
+                       "                 Percentile %3d: %+8.3lf\n",
                                          bin,      resValue,
-                                         bin + 33, resValue33, 
+                                         bin + 33, resValue33,
                                          bin + 66, resValue66);
           fp_out << buf;
         }
@@ -4038,19 +4101,19 @@ namespace Isis {
       try {
         sprintf(buf, "\n              Residual Box Plot:");
         fp_out << buf;
-        sprintf(buf, "\n                        minimum: %+8.3lf", 
+        sprintf(buf, "\n                        minimum: %+8.3lf",
                 m_bundleStatistics.residualsCumulativeProbabilityDistribution().min());
         fp_out << buf;
-        sprintf(buf, "\n                     Quartile 1: %+8.3lf", 
+        sprintf(buf, "\n                     Quartile 1: %+8.3lf",
                 m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.25));
         fp_out << buf;
-        sprintf(buf, "\n                         Median: %+8.3lf", 
+        sprintf(buf, "\n                         Median: %+8.3lf",
                 m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.50));
         fp_out << buf;
-        sprintf(buf, "\n                     Quartile 3: %+8.3lf", 
+        sprintf(buf, "\n                     Quartile 3: %+8.3lf",
                 m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.75));
         fp_out << buf;
-        sprintf(buf, "\n                        maximum: %+8.3lf\n", 
+        sprintf(buf, "\n                        maximum: %+8.3lf\n",
                 m_bundleStatistics.residualsCumulativeProbabilityDistribution().max());
         fp_out << buf;
       }
@@ -4085,7 +4148,7 @@ namespace Isis {
                 m_pSnList->FileName(i).toAscii().data(),
                 (nMeasures-nRejectedMeasures), nMeasures,
                 rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
-      } 
+      }
       else {
         sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
                 m_pSnList->FileName(i).toAscii().data(),
@@ -4094,7 +4157,7 @@ namespace Isis {
       }
       fp_out << buf;
     }
-
+// emit statusUpdate(QString("SerialNumberList in outputHeader:") + QString::number(m_pSnList->Size()));
     return true;
   }
 
@@ -4128,7 +4191,7 @@ namespace Isis {
     fp_out << buf;
 
     QMap<QString, QStringList> imagesAndParameters;
-    
+
     for (int i = 0; i < nObservations; i++) {
 
       //if ( m_bundleStatistics.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
@@ -4161,6 +4224,9 @@ namespace Isis {
       }
     }
         
+    // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
+    m_bundleStatistics.setCorrMatImgsAndParams(imagesAndParameters);
+
     // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
     m_bundleStatistics.setCorrMatImgsAndParams(imagesAndParameters);
 
@@ -4339,15 +4405,15 @@ namespace Isis {
 
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
                      "%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures, 
-                nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, dSigmaLat, dSigmaLong, 
+                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures,
+                nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, dSigmaLat, dSigmaLong,
                 dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
       }
       else
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
                      "%16.8lf,%16.8lf\n",
-                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures, 
-                nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, cor_lat_m, cor_lon_m, 
+                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures,
+                nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, cor_lat_m, cor_lon_m,
                 cor_rad_m, dX, dY, dZ);
 
       fp_out << buf;
@@ -4403,33 +4469,33 @@ namespace Isis {
         Camera *pCamera = measure->Camera();
         if (!pCamera)
           continue;
-
+// emit statusUpdate(QString("SerialNumberList in outputResiduals:") + QString::number(m_pSnList->Size()));
         // Determine the image index
         nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
 
         if (measure->IsRejected())
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-                  point->GetId().toAscii().data(), 
-                  m_pSnList->FileName(nImageIndex).toAscii().data(), 
+                  point->GetId().toAscii().data(),
+                  m_pSnList->FileName(nImageIndex).toAscii().data(),
                   m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
-                  measure->GetFocalPlaneMeasuredX(), 
-                  measure->GetFocalPlaneMeasuredY(), 
+                  measure->GetFocalPlaneMeasuredX(),
+                  measure->GetFocalPlaneMeasuredY(),
                   measure->GetSample(),
-                  measure->GetLine(), 
-                  measure->GetSampleResidual(), 
+                  measure->GetLine(),
+                  measure->GetSampleResidual(),
                   measure->GetLineResidual(),
                   measure->GetResidualMagnitude());
         else
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                  point->GetId().toAscii().data(), 
-                  m_pSnList->FileName(nImageIndex).toAscii().data(), 
+                  point->GetId().toAscii().data(),
+                  m_pSnList->FileName(nImageIndex).toAscii().data(),
                   m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
-                  measure->GetFocalPlaneMeasuredX(), 
-                  measure->GetFocalPlaneMeasuredY(), 
+                  measure->GetFocalPlaneMeasuredX(),
+                  measure->GetFocalPlaneMeasuredY(),
                   measure->GetSample(),
-                  measure->GetLine(), 
-                  measure->GetSampleResidual(), 
-                  measure->GetLineResidual(), 
+                  measure->GetLine(),
+                  measure->GetSampleResidual(),
+                  measure->GetLineResidual(),
                   measure->GetResidualMagnitude());
         fp_out << buf;
       }
@@ -4702,8 +4768,8 @@ namespace Isis {
       //  Image(i)
       nIndex = imageIndex(i) ;
 
-      if (m_bundleSettings.errorPropagation() 
-          && m_bundleStatistics.converged() 
+      if (m_bundleSettings.errorPropagation()
+          && m_bundleStatistics.converged()
           && m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
         vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
       }
@@ -4987,7 +5053,7 @@ namespace Isis {
         QString str = output_columns.at(i);
 
         if (i < ncolumns- 1) {
-          sprintf(buf, "%s,", (const char*)str.toAscii().data()); 
+          sprintf(buf, "%s,", (const char*)str.toAscii().data());
         }
         else {
           sprintf(buf, "%s", (const char*)str.toAscii().data());

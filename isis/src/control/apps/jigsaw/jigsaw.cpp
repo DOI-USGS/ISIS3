@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QObject>
 #include <QList>
+#include <QObject>
 
 #include "BundleAdjust.h"
 #include "BundleResults.h"

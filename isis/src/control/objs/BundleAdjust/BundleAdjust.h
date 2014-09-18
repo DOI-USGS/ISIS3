@@ -39,6 +39,7 @@
 #include "BundleObservationSolveSettings.h"
 #include "BundleControlPointVector.h"
 #include "BundleObservationVector.h"
+#include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleStatistics.h"
 #include "Camera.h"
@@ -56,8 +57,8 @@ template< typename T > class QList;
 template< typename A, typename B > class QMap;
 
 namespace Isis {
-  class BundleResults;
   class Control;
+  class ImageList;
 
   /**
    * @author 2006-05-30 Jeff Anderson, Debbie A. Cook, and Tracie Sucharski
@@ -184,6 +185,8 @@ namespace Isis {
    *                           CorrelationMatrix object.
    *   @history 2014-07-23 Jeannie Backer - Modified to print "N/A" for rejection multiplier if 
    *                           outlier rejection is turned off.
+   *   @history 2014-09-18 Kimberly Oyama - Added a constructor for running the bunlde in a
+   *                           separate thread.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -214,12 +217,18 @@ namespace Isis {
                    SerialNumberList &snlist, 
                    SerialNumberList &heldsnlist, 
                    bool printSummary = true);
+      BundleAdjust(BundleSettings bundleSettings,
+                   Control &control,
+                   QList<ImageList *> imgList,
+                   bool bPrintSummary);
       ~BundleAdjust();
     
       double           solve();
       BundleResults    solveCholeskyBR();
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    public slots:
       bool             solveCholesky();
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
       // accessors
       ControlNet       *controlNet() { return m_pCnet; } // TODO: change from pointer to const ref???
       SerialNumberList *serialNumberList() { return m_pSnList; } // TODO: move implementation to cpp per ISIS standards
@@ -248,8 +257,8 @@ namespace Isis {
       } // TODO: move implementation to cpp per ISIS standards
 
     signals:
-      void statusUpdate(QString status);
-      void bundleConvergence(bool converged);
+      void statusUpdate(QString);
+      void resultsReady(BundleResults *bundleResults);
 
     public slots:
       void outputBundleStatus(QString status);
@@ -435,6 +444,7 @@ namespace Isis {
       BundleObservationVector m_BundleObservations;
       BundleControlPointVector m_BundleControlPoints;
 
+//       BundleObservationSolveSettings m_boss;
       double m_dRTM;                                    //!< radians to meters conversion factor (body specific)
       double m_dMTR;                                    //!< meters to radians conversion factor (body specific)
       Distance m_BodyRadii[3];                          //!< body radii i meters

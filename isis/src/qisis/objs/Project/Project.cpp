@@ -1208,6 +1208,11 @@ namespace Isis {
 
     directoryStateWriter.writeStartDocument();
     //qDebug()<<"Project::save Before save Directory";
+    /*
+     * TODO: Does Project need to know about Directory?
+     * This is the only place that project uses m_directory. This makes me wonder if it is
+     * necessary for project to have a Directory member variable.
+     */
     m_directory->save(directoryStateWriter, newPath);
     //qDebug()<<"Project::save After save Directory";
     directoryStateWriter.writeEndDocument();

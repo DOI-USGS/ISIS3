@@ -1,6 +1,7 @@
 #include "JigsawDialog.h"
 
 #include <QDebug>
+#include <QThread>
 
 #include "JigsawSetupDialog.h"
 #include "ui_JigsawDialog.h"
@@ -8,10 +9,12 @@
 #include "BundleAdjust.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
+#include "JigsawSetupDialog.h"
 #include "Control.h"
 #include "iTime.h"
 #include "Process.h"
 #include "Project.h"
+#include "ui_JigsawDialog.h"
 
 namespace Isis {
 
@@ -78,6 +81,7 @@ namespace Isis {
        }
     }
 
+    // Non threaded *************************************************************
     SerialNumberList snlist;
 
     QList<ImageList *> imagelists = m_project->images();
@@ -90,20 +94,78 @@ namespace Isis {
       }
     }
 
-
     BundleAdjust bundleAdjustment(*m_bundleSettings, *m_selectedControl, snlist, false);
 
     connect( &bundleAdjustment, SIGNAL( statusUpdate(QString) ),
              this, SLOT( outputBundleStatus(QString) ) );
-    
+
     BundleResults br = bundleAdjustment.solveCholeskyBR();
+
+    bundleFinished(&br);
+    // **************************************************************************
     
-    if ( br.bundleStatistics()->converged() ) {
-      br.setRunTime( Isis::iTime::CurrentLocalTime().toAscii().data() );
-      m_project->addBundleResults(new BundleResults(br));
-      
+    // Threaded *****************************************************************
+//     QThread *bundleThread = new QThread;
+// 
+//     // Takes too long to copy/recreate the serial number list
+//     BundleAdjust *ba = new BundleAdjust(*m_bundleSettings,
+//                                         *m_selectedControl,
+//                                         m_project->images(),
+//                                         false);
+//     ba->moveToThread(bundleThread);
+// 
+//     connect( ba, SIGNAL( statusUpdate(QString) ),
+//              this, SLOT( outputBundleStatus(QString) ) );
+// 
+//     connect( bundleThread, SIGNAL( started() ),
+//              ba, SLOT( solveCholesky() ) );
+// 
+//     connect( ba, SIGNAL( resultsReady(BundleResults *) ),
+//              this, SLOT( bundleFinished(BundleResults *) ) );
+// 
+//     connect( bundleThread, SIGNAL( finished() ),
+//              bundleThread, SLOT( deleteLater() ) );
+// 
+//     bundleThread->start();
+    // **************************************************************************
+
+//#if 0
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    m_ui->useLastSettings->setEnabled(true);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//#endif
+  }
+
+
+  
+  /**
+   * Update the label or text edit area with the most recent status update by appending to
+   * list and refreshing.
+   *
+   * @param status Current status of bundle.
+   */
+  void JigsawDialog::outputBundleStatus(QString status) {
+    QString update = "\n" + status;
+    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(update) );
+  }
+
+
+  /**
+   * This method will be called when the bundle is complete. This method will only be used when the
+   * bundle is threaded. It can be used when the bundle is not threaded but we don't need it
+   * because we have solveCholeskyBR().
+   *
+   *
+   *
+   * @param bundleResults The results of the bundle run.
+   */
+  void JigsawDialog::bundleFinished(BundleResults *bundleResults) {
+    if ( bundleResults->bundleStatistics()->converged() ) {
+      bundleResults->setRunTime( Isis::iTime::CurrentLocalTime().toAscii().data() );
+      m_project->addBundleResults( new BundleResults(*bundleResults) );
+
       //TODO: move correlation matrix to correct position in project directory
-/*
+      
       // create output control net
   //     bundleAdjustment.controlNet()->Write("ONET.net");
   //
@@ -136,35 +198,19 @@ namespace Isis {
   //         c->write(spvector);
   //         p.WriteHistory(*c);
   //       }
-*/
   //       m_ui->convergenceStatusLabel->setText("Bundle converged, camera pointing updated");
-    }
-    else {
-      //TODO: delete correlation matrix cov file...
-      //TODO: delete bundle results object
+  }
+  else {
+    //This bundle was bad so we should delete all remenants.
+    
+    //TODO: delete correlation matrix cov file...
+    //TODO: delete bundle results object
 
 //       m_ui->convergenceStatusLabel->setText("Bundle did not converge, camera pointing NOT updated");
-    }
-
-
-//#if 0
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    m_ui->useLastSettings->setEnabled(true);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//#endif
   }
 
-
-
-  /**
-   * Update the label or text edit area with the most recent status update by appending to
-   * list and refreshing.
-   *
-   * @param status Current status of bundle.
-   */
-  void JigsawDialog::outputBundleStatus(QString status) {
-    QString update = "\n" + status;
-    m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(update) );
-  }
+  // TODO: Give user the option to keep or throw away the bundle. Even if the bundle converged it
+  //       coulde still be worthless.
+  }  
 }
 
