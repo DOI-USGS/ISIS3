@@ -97,11 +97,6 @@ void IsisMain() {
     }
   }
 
-
-
-
-
-
   // Import the primary image (LEISA raw/calibrated)
   importFits.SetOrganization(ProcessImport::BIL);
   importFits.setProcessFileStructure(0);
@@ -124,7 +119,7 @@ void IsisMain() {
   PvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
   insXlater.Auto(outLabel);
 
-  // Modify/add Instument group keywords not handled by the translater
+// Modify/add Instument group keywords not handled by the translater
 //  PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 //  QString target = (QString)inst["TargetName"];
 //  if (target.startsWith("RADEC=")) {
@@ -132,22 +127,23 @@ void IsisMain() {
 //  }
 
   output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
-/*
-  // Create a Band Bin group
-  FileName bandTransFile(transDir + "leisaBandBin_fit.trn");
-  PvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
-  bandBinXlater.Auto(outLabel);
-  output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
 
+  /*
   // Create an Archive group
   FileName archiveTransFile(transDir + "leisaArchive_fit.trn");
   PvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
-*/
+  */
+
+  //Create a Band Bin Group
+  FileName bandTransFile(transDir + "leisaBandBin_fit.trn");
+  PvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
+  bandBinXlater.Auto(outLabel);
+  output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
+
   // Create a Kernels group
   FileName kernelsTransFile(transDir + "leisaKernels_fit.trn");
-//  FileName kernelsTransFile("./leisaKernels_fit.trn");
   PvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
   kernelsXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
@@ -158,23 +154,26 @@ void IsisMain() {
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
 
   //Add StartTime & EndTime
-  QString midTime = inst["MidObservationTime"];
-  iTime midTimeBetter(midTime.toDouble());
+  QString midTimeStr = inst["MidObservationTime"];
+  iTime midTime(midTimeStr.toDouble());
 
   QString obsDuration = inst["ObservationDuration"];
   double obsSeconds = obsDuration.toDouble();
 
-  //do stuff with Isis time class to calculate startTime
-  iTime startTime = midTimeBetter - obsSeconds/2.0;
-  iTime endTime = midTimeBetter + obsSeconds/2.0;
-  inst.addKeyword(PvlKeyword("StartTime", startTime.UTC()), PvlGroup::Replace);
-  inst.addKeyword(PvlKeyword("EndTime", endTime.UTC()), PvlGroup::Replace);
+  iTime startTime = midTime - obsSeconds/2.0;
+  iTime endTime = midTime + obsSeconds/2.0;
+//  inst.addKeyword(PvlKeyword("StartTime", startTime.EtString()), PvlGroup::Replace);
+//  inst.addKeyword(PvlKeyword("StopTime", endTime.EtString()), PvlGroup::Replace);
 
-  //Add FrameRate
+  //Need to make sure these times are correct. UTC != ET
+  inst.addKeyword(PvlKeyword("StartTime", startTime.UTC()), PvlGroup::Replace);
+  inst.addKeyword(PvlKeyword("StopTime", endTime.UTC()), PvlGroup::Replace);
+
   QString exposureTime = inst["ExposureDuration"];
-  double frameRate = 1.0/exposureTime.toDouble(); //in Hz!
+  double frameRate = 1.0/exposureTime.toDouble();
   inst.addKeyword(PvlKeyword("FrameRate", QString::number(frameRate)), PvlGroup::Replace); 
   inst.findKeyword("FrameRate").setUnits("Hz");
+
   // Save the input FITS label in the Cube original labels
   Pvl pvl;
   pvl += importFits.fitsLabel(0);
