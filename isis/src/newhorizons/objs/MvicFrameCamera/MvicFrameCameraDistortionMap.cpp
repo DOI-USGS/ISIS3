@@ -127,12 +127,14 @@ namespace Isis {
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
 
+    // in case of failures, initialize undistorted focal plane coordinates to the distorted
+    // coordinate values
+    p_undistortedFocalPlaneX = dx;
+    p_undistortedFocalPlaneY = dy;
+
     // if x and/or y lie outside of the detector, do NOT apply distortion
     // set undistorted focal plane values to be identical to raw values
     if ((fabs(dx) > m_focalPlaneHalf_x) || (fabs(dy) > m_focalPlaneHalf_y)) {
-      p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = dy;
-
       return true;
     }
 
@@ -147,8 +149,12 @@ namespace Isis {
 
     // compute distortion corrections in x and y using Legendre Polynomials
     // these corrections are also in the -1.0 to +1.0 range
+    // if Legendre computations fail, we set undistorted focal plane x and y
+    // to be identical to distorted x and y and return true
     double deltax, deltay;
-    computeDistortionCorrections(xscaled, yscaled, deltax, deltay);
+    if (!computeDistortionCorrections(xscaled, yscaled, deltax, deltay)) {
+      return true;
+    }
 
     // apply the corrections to original x,y
     xscaled += deltax;
