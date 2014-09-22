@@ -59,11 +59,9 @@ namespace Isis {
       bool outputResidualDeltas(); // for debugging
 
   private:
-      bool computeDistortionCorrections(const double xscaled, const double yscaled, double &deltax,
-                                        double &deltay);
-      bool computeResidualDistortionCorrections(const double dx, const double dy,
-                                                double &residualDeltax, double &residualDeltay);
-
+      bool computeDistortionCorrections(const double xscaled, const double yscaled, double &deltax);
+      void computeResidualDistortionCorrections(const double dx, double &residualDeltax,
+                                                double &residualDeltay);
 
     private:
       std::vector<double> m_xDistortionCoeffs; //!< distortion coefficients in x and y as determined
