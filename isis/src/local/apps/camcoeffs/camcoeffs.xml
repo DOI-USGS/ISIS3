@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="camcoeffs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
+  <brief>
+    This program calculates TRANSX,TRANSY from TRANSS, TRANSL for iak kernels
+  </brief>
+
+  <description>
+      This program outputs the exact IAK Kernel keywords that should be added to the kernel. The
+      TRANSX,TRANSY keywords are the result of the input (no processing done, this should be known information).
+      These values were provides as parameters to this program. The TRANSS,TRANSL keywords are calculated based on
+      the TRANSX,TRANSY keywords and are the result of this program. The keywords can be copied directly into the
+      pertinent IAK kernel.
+  </description>
+
+  <category>
+    <categoryItem>System</categoryItem>
+  </category>
+
+  <history>
+    <change name="Steven Lambright" date="2008-07-16">
+      Original Version
+    </change>
+  </history>
+
+  <groups>
+    <group name="IAK">
+      <parameter name="IAKCODE">
+        <type>string</type>
+        <internalDefault>Output Equations</internalDefault>
+        <brief>
+          The IAK code of the TRANS values
+        </brief>
+        <description>
+          This IAK code of the TRANS values, a negative number (such as -41210) is expected.
+        </description>
+      </parameter>
+    </group>
+    <group name="Coefficients">
+      <parameter name="XCONSTCOEF">
+        <type>double</type>
+        <brief>
+          Focal Plane X Constant Coefficient
+        </brief>
+        <description>
+          This is the first value in the TRANSY keyword, which represents the focal plane X constant coefficient.
+        </description>
+      </parameter>
+      <parameter name="XSAMPLECOEF">
+        <type>double</type>
+        <brief>
+          Focal Plane X Sample Coefficient
+        </brief>
+        <description>
+          This is the second value in the TRANSY keyword, which represents the focal plane X sample coefficient.
+        </description>
+      </parameter>
+      <parameter name="XLINECOEF">
+        <type>double</type>
+        <brief>
+          Focal Plane X Line Coefficient
+        </brief>
+        <description>
+          This is the third value in the TRANSY keyword, which represents the focal plane X line coefficient.
+        </description>
+      </parameter>
+      <parameter name="YCONSTCOEF">
+        <type>double</type>
+        <brief>
+          Focal Plane Y Constant Coefficient
+        </brief>
+        <description>
+          This is the first value in the TRANSY keyword, which represents the focal plane Y constant coefficient.
+        </description>
+      </parameter>
+      <parameter name="YSAMPLECOEF">
+        <type>double</type>
+        <brief>
+          Focal Plane Y Sample Coefficient
+        </brief>
+        <description>
+          This is the second value in the TRANSY keyword, which represents the focal plane Y sample coefficient.
+        </description>
+      </parameter>
+      <parameter name="YLINECOEF">
+        <type>double</type>
+        <brief>
+          Focal Plane Y Line Coefficient
+        </brief>
+        <description>
+          This is the third value in the TRANSY keyword, which represents the focal plane Y line coefficient.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Getting the TRANSX,TRANSY keywords for an IAK Kernel</brief>  
+      <description>
+        This example shows how to get the TRANSX,TRANSY keywords for an IAK 
+        Kernel when given the TRANSS, TRANSL keywords
+      </description>
+      <terminalInterface>
+        <commandLine>
+          iakcode=-41219 xc=0.2589180702 xs=-0.0069999992 xl=0.0000033598 yc=-59.9867757282 ys=0.0000033598 yl=-0.0069999992
+        </commandLine>
+        <description>
+          This is a typical run
+        </description>
+      </terminalInterface>
+      <dataFiles>
+        <dataFile path="assets/output.txt">
+          <brief>The Output</brief>
+          <description>
+            This program outputs the exact IAK Kernel keywords that should be added to the kernel. The
+            TRANSX,TRANSY keywords are the result of the input (no processing done, this should be known information).
+            These values were provides as parameters to this program. The TRANSS,TRANSL keywords are calculated based on
+            the TRANSX,TRANSY keywords and are the result of this program. The keywords can be copied directly into the
+            pertinent IAK kernel.
+          </description>
+        </dataFile>
+      </dataFiles>
+    </example>
+  </examples>
+</application>

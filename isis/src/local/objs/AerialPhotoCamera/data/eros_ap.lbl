@@ -1,0 +1,278 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 1
+#    ^Core       = eros_ap.cub
+    ^Core       = /dev/zero
+    Format      = Tile
+    TileSamples = 390
+    TileLines   = 271
+
+    Group = Dimensions
+      Samples = 3900
+      Lines   = 3523
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName                    = Aircraft
+    InstrumentId                      = AerialPhoto
+    TargetName                        = Earth
+    StartTime                         = 1999-06-12T12:05
+    EphemerisTime                     = -17538835.815374 <seconds>
+    EstimatedAltitude                 = 6096.0 <meters>
+    EstimatedCenterLatitude           = 39.9363 <degrees>
+    EstimatedCenterLongitude          = 255.285823 <degrees>
+    FocalLength                       = 152.818 <millimeters>
+    FiducialX                         = (-106.0, -0.003, 105.999, -110.005,
+                                         109.999, -106.008, -0.003,
+                                         105.998) <millimeters>
+    FiducialY                         = (106.000, 109.999, 105.994, 0.002,
+                                         0.002, -105.999, -110.004,
+                                         -105.999) <millimeters>
+    FiducialSample                    = (574, 2040, 3500, 513, 3562, 578,
+                                         2039, 3497)
+    FiducialLine                      = (255, 194, 261, 1721, 1721, 3182,
+                                         3245, 3180)
+    RadialDistortionCoefficients      = (1.27485E-05, 3.73255E-09,
+                                         -6.95721E-13, 2.3884E-17, 0.0)
+    DecenteringDistortionCoefficients = (0, 0, 0, 0)
+    XCalibratedPrincipalPoint         = -0.004 <millimeters>
+    YCalibratedPrincipalPoint         = 0.0 <millimeters>
+    XIndicatedPrincipalPoint          = -0.002 <millimeters>
+    YIndicatedPrincipalPoint          = 0.001 <millimeters>
+  End_Group
+
+  Group = Archive
+    RollNumber         = Unknown
+    FrameNumber        = Unknown
+    CameraSerialNumber = Unknown
+    LenseSerialNumber  = Unknown
+    CalibrationReport  = Unknown
+  End_Group
+
+  Group = BandBin
+    Name = Gray
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode             = -2000001
+    LeapSecond                = $base/kernels/lsk/naif0010.tls
+    TargetAttitudeShape       = $base/kernels/pck/pck00009.tpc
+    TargetPosition            = (Table, $base/kernels/spk/de405.bsp)
+    InstrumentPointing        = Table
+    Instrument                = Null
+    SpacecraftClock           = Null
+    InstrumentPosition        = Table
+    InstrumentAddendum        = Null
+#    ShapeModel                = dtm.cub
+    ShapeModel                = Null
+    InstrumentPositionQuality = Predict
+    InstrumentPointingQuality = Predict
+    CameraVersion             = 1
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name                = BodyRotation
+  StartByte           = 1
+  Bytes               = 128
+  Records             = 2
+  ByteOrder           = Lsb
+  TimeDependentFrames = (10013, 1)
+  CkTableStartTime    = -17538836.815374
+  CkTableEndTime      = -17538834.815374
+  CkTableOriginalSize = 2
+  Description         = "Created by apinit"
+  Kernels             = ($base/kernels/spk/de405.bsp,
+                         $base/kernels/pck/pck00009.tpc)
+  SolarLongitude      = -9999
+  ^Table              = data/eros_ap.Table.BodyRotation
+
+  Group = Field
+    Name = J2000Q0
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Q3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = AV3
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = Table
+  Name                 = SunPosition
+  StartByte            = 1
+  Bytes                = 112
+  Records              = 2
+  ByteOrder            = Lsb
+  CacheType            = Linear
+  SpkTableStartTime    = -17538836.815374
+  SpkTableEndTime      = -17538834.815374
+  SpkTableOriginalSize = 2.0
+  Description          = "Created by apinit"
+  Kernels              = Null
+  ^Table               = data/eros_ap.Table.SunPosition
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+# Jigged = 2014-03-28T17:09:51
+Object = Table
+  Name      = InstrumentPosition
+  StartByte = 1
+  Bytes     = 96
+  Records   = 4
+  ByteOrder = Lsb
+  CacheType = PolyFunction
+  ^Table    = data/eros_ap.Table.InstrumentPosition
+
+  Group = Field
+    Name = J2000SVX
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000SVY
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000SVZ
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+# Jigged = 2014-03-28T17:09:51
+Object = Table
+  Name                = InstrumentPointing
+  StartByte           = 1
+  Bytes               = 96
+  Records             = 4
+  ByteOrder           = Lsb
+  TimeDependentFrames = (-2000001, 1)
+  ^Table              = data/eros_ap.Table.InstrumentPointing
+
+  Group = Field
+    Name = J2000Ang1
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Ang2
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Ang3
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 1
+  Bytes     = 4784
+  ^History  = data/eros_ap.History.IsisCube
+End_Object
+
+Object = NaifKeywords
+  BODY_FRAME_CODE = 10013
+  BODY399_RADII   = (6378.14, 6378.14, 6356.75) <kilometers>
+End_Object
+End

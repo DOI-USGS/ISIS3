@@ -1,0 +1,115 @@
+Object = ControlNetwork
+  NetworkId    = ApTest 
+  NetworkType  = ImageToGround
+  TargetName   = Earth
+  UserName     = janderson
+  Created      = 2014-03-27T08:20:55
+  LastModified = Null
+  Description  = "Test using hand made control points"
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = jigTest01
+    Latitude  = 39.896561
+    Longitude = 255.313117
+    Radius    = 6378140
+
+    Group = ControlMeasure
+      SerialNumber   = Aircraft/AerialPhoto/-17538835.815374
+      MeasureType    = Estimated
+      Sample         = 3465 
+      Line           = 868 
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-01-03T15:20:26
+      ChooserName    = "Handmade"
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = jigTest02
+    Latitude  = 39.958793
+    Longitude = 255.244731
+    Radius    = 6378140
+
+    Group = ControlMeasure
+      SerialNumber   = Aircraft/AerialPhoto/-17538835.815374
+      MeasureType    = Estimated
+      Sample         = 1270
+      Line           = 2695
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-01-03T15:20:26
+      ChooserName    = "Handmade"
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = jigTest03
+    Latitude  = 39.972394
+    Longitude = 255.302624
+    Radius    = 6378140
+
+    Group = ControlMeasure
+      SerialNumber   = Aircraft/AerialPhoto/-17538835.815374
+      MeasureType    = Estimated
+      Sample         = 808
+      Line           = 1144
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-01-03T15:20:26
+      ChooserName    = "Handmade"
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = jigTest04
+    Latitude  = 39.967181
+    Longitude = -104.700273
+    Radius    = 6378140
+
+    Group = ControlMeasure
+      SerialNumber   = Aircraft/AerialPhoto/-17538835.815374
+      MeasureType    = Estimated
+      Sample         = 991
+      Line           = 1212
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-01-03T15:20:26
+      ChooserName    = "Handmade"
+      Reference      = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType = Ground
+    PointId   = jigTest05
+    Latitude  = 39.907384
+    Longitude = -104.761052
+    Radius    = 6378140
+
+    Group = ControlMeasure
+      SerialNumber   = Aircraft/AerialPhoto/-17538835.815374
+      MeasureType    = Estimated
+      Sample         = 3068
+      Line           = 2873
+      ErrorLine      = 0.0
+      ErrorSample    = 0.0
+      ErrorMagnitude = 0.0
+      DateTime       = 2008-01-03T15:20:26
+      ChooserName    = "Handmade"
+      Reference      = True
+    End_Group
+  End_Object
+End_Object
+End
