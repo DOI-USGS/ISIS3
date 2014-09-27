@@ -22,6 +22,8 @@
 
 #include "LineScanCamera.h"
 
+#include <QVector>
+
 namespace Isis {
   /**
    * This is the camera model for LEISA, New Hoirzon's infrared 
@@ -66,6 +68,19 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); } //can get from spacit S on spk
+
+
+      void SetBand(const int vband);
+
+
+
+    private:
+      QVector<int> m_originalBand; //!< Stores the band bin OriginalBand keyword values
+
+      QVector<double> m_origTransx;  //!< The original tarnsx affine coefficients from the iak
+      QVector<double> m_origTransy;  //!< The original tarnsy affine coefficients from the iak
+      QVector<double> m_origTranss; //!< The original tarnss affine coefficients from the iak
+      QVector<double> m_origTransl; //!< The original tarnsl affine coefficients from the iak
   };
 };
 #endif

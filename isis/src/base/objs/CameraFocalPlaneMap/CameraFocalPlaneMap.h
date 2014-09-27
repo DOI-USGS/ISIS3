@@ -23,8 +23,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+template<class T> class QVector;
 
 namespace Isis {
+ 
   class Affine;
   class Camera;
   /** Convert between distorted focal plane and detector coordinates
@@ -118,10 +120,16 @@ namespace Isis {
                                     const double lineOffset);
       double DetectorLineOffset() const;
       double DetectorSampleOffset() const;
+
+      void SetTransL(const QVector<double> transL);
+      void SetTransS(const QVector<double> transS);
+      void SetTransX(const QVector<double> transX);
+      void SetTransY(const QVector<double> transY);
+
+      const double *TransL() const;
+      const double *TransS() const;
       const double *TransX() const;
       const double *TransY() const;
-      const double *TransS() const;
-      const double *TransL() const;
 
       /**
        * Focal plane x dependency indicates whether the x value of the focal 

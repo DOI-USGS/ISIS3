@@ -128,13 +128,11 @@ void IsisMain() {
 
   output->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
 
-  /*
   // Create an Archive group
   FileName archiveTransFile(transDir + "leisaArchive_fit.trn");
   PvlTranslationManager archiveXlater(fitsLabel, archiveTransFile.expanded());
   archiveXlater.Auto(outLabel);
   output->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
-  */
 
   //Create a Band Bin Group
   FileName bandTransFile(transDir + "leisaBandBin_fit.trn");
@@ -152,12 +150,13 @@ void IsisMain() {
   // Modify/add Instument group keywords not handled by the translater
   Pvl *isisLabel = output->label();
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
+  PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);
 
   //Add StartTime & EndTime
-  QString midTimeStr = inst["MidObservationTime"];
+  QString midTimeStr = archive["MidObservationTime"];
   iTime midTime(midTimeStr.toDouble());
 
-  QString obsDuration = inst["ObservationDuration"];
+  QString obsDuration = archive["ObservationDuration"];
   double obsSeconds = obsDuration.toDouble();
 
   iTime startTime = midTime - obsSeconds/2.0;
