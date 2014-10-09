@@ -461,7 +461,159 @@ int main(int argc, char *argv[]) {
     }
     cerr << endl;
     boundaryTestCube.close();
+    
+    
+    // Test cube where its chunk size is the same as its buffer shape
+    cerr << "Testing one line BSQ cube (where chunk dimensions == buffer shape) ... " << endl;
+    cerr << "Constructing cube ... " << endl << endl;
+    Cube bsqOneLineTestCube;
+    bsqOneLineTestCube.setDimensions(3, 1, 3);
+    bsqOneLineTestCube.setFormat(Cube::Bsq);
+    bsqOneLineTestCube.create("IsisCube_bsqOneLine");
+    Report(bsqOneLineTestCube);
+    LineManager oneLine(bsqOneLineTestCube);
+    
+    // our cube will be 1, 2, 3
+    //                  2, 3, 4
+    //                  3, 4, 5
+    for (oneLine.begin(); !oneLine.end(); oneLine++) {
+      for (int i = 0; i < oneLine.size(); i++) {
+        oneLine[i] = 1 * i + oneLine.Band();
+      }
+      bsqOneLineTestCube.write(oneLine);
+    }
+    bsqOneLineTestCube.close();
+    
+    // Simulate reading of an S x 1 x B cube
+    Brick readLineBrick(3, 1, 1, bsqOneLineTestCube.pixelType());
+    
+    // Test reading repeated ascending virtual bands
+    cerr << "Testing reading ascending repeating virtual bands (1, 2, 2, 3)... " << endl;
+    virtualBands.clear();
+    virtualBands.push_back("1");
+    virtualBands.push_back("2");
+    virtualBands.push_back("2");
+    virtualBands.push_back("3");
+    bsqOneLineTestCube.setVirtualBands(virtualBands);
+    bsqOneLineTestCube.open("IsisCube_bsqOneLine");
+    for (int sb = 1; sb <= virtualBands.size(); sb++) {
+      readLineBrick.SetBasePosition(1, 1, sb);
+      bsqOneLineTestCube.read(readLineBrick);
+      for (int i = 0; i < readLineBrick.size(); i++) {
+        if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
+          cerr << "Virtual bands accessed incorrectly at brick band " 
+               << readLineBrick.Band() << endl;
+          return 1;
+        }
+      }
+    }
+    cerr << endl;
+    bsqOneLineTestCube.close();
+    
+     // Test reading skipped ascending virtual bands
+    cerr << "Testing reading skipped ascending virtual bands (1, 3, 3)... " << endl;
+    virtualBands.clear();
+    virtualBands.push_back("1");
+    virtualBands.push_back("3");
+    virtualBands.push_back("3");
+    bsqOneLineTestCube.setVirtualBands(virtualBands);
+    bsqOneLineTestCube.open("IsisCube_bsqOneLine");
+    for (int sb = 1; sb <= virtualBands.size(); sb++) {
+      readLineBrick.SetBasePosition(1, 1, sb);
+      bsqOneLineTestCube.read(readLineBrick);
+      for (int i = 0; i < readLineBrick.size(); i++) {
+        if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
+          cerr << "Virtual bands accessed incorrectly at virtual band " 
+               << virtualBands[readLineBrick.Band() - 1] << endl;
+          return 1;
+        }
+      }
+    }
+    cerr << endl;
+    bsqOneLineTestCube.close();
+    
+     // Test reading outside boundaries
+    cerr << "Testing reading outside of cube boundaries with virtual bands (1, 5)... " << endl;
+    virtualBands.clear();
+    virtualBands.push_back("1");
+    virtualBands.push_back("5");
+    bsqOneLineTestCube.setVirtualBands(virtualBands);
+    bsqOneLineTestCube.open("IsisCube_bsqOneLine");
+    for (int sb = 1; sb <= virtualBands.size(); sb++) {
+      readLineBrick.SetBasePosition(1, 1, sb);
+      bsqOneLineTestCube.read(readLineBrick);
+      for (int i = 0; i < readLineBrick.size(); i++) {
+        if (readLineBrick.Band() == 1) {
+          if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
+            cerr << "Virtual bands accessed incorrectly at virtual band " 
+                 << virtualBands[readLineBrick.Band() - 1] << endl;
+            return 1;
+          }
+        }
+        else {
+          if (readLineBrick[i] != Null) {
+            cerr << "Value outside cube boundary at virtual band " 
+                 << virtualBands[readLineBrick.Band() - 1] << endl;
+          }
+        }
+      }
+    }
+    cerr << endl;
+    bsqOneLineTestCube.close();
+    
+    // Test reading descending bands
+    cerr << "Testing reading descending virtual bands (3, 1, 3)... " << endl;
+    virtualBands.clear();
+    virtualBands.push_back("3");
+    virtualBands.push_back("1");
+    virtualBands.push_back("3");
+    bsqOneLineTestCube.setVirtualBands(virtualBands);
+    bsqOneLineTestCube.open("IsisCube_bsqOneLine");
+    for (int sb = 1; sb <= virtualBands.size(); sb++) {
+      readLineBrick.SetBasePosition(1, 1, sb);
+      bsqOneLineTestCube.read(readLineBrick);
+      for (int i = 0; i < readLineBrick.size(); i++) {
+        if (readLineBrick[i] != (i + virtualBands[readLineBrick.Band()-1].toInt())) {
+          cerr << "Virtual bands accessed incorrectly at virtual band " 
+               << virtualBands[readLineBrick.Band() - 1] << endl;
+          return 1;
+        }
+      }
+    }
+    cerr << endl;
+    bsqOneLineTestCube.close();
+    
+    
+    // Test creating a bsq cube that exceeds 1GB sample size limit to test CubeBsqHandler
+    cerr << "Testing creating large BSQ where samples exceed 1GB chunk size limit ... " << endl;
+    cerr << "Constructing cube ... " << endl << endl;
+    Cube largebsqTestCube;
+    // 2^28 x 2 x 1 cube -> 2^28 + 1 > 2^30 / (4*2^28), exceeds limit
+    int limitExceeded = (1 << 28) + 1;
+    largebsqTestCube.setDimensions(limitExceeded, 2, 1);
+    largebsqTestCube.setFormat(Cube::Bsq);
+    largebsqTestCube.create("IsisCube_largebsq");
+    Report(largebsqTestCube);
 
+    cerr << endl;
+    largebsqTestCube.close();
+    
+    
+    // Test bsq cube that has a linecount > maximum chunk line size to test CubeBsqHandler
+    cerr << "Testing creating BSQ cube where size of sample pixels exceeds cube's lineCount ... " 
+         << endl;
+    cerr << "Constructing cube ... " << endl << endl;
+    Cube bsqTestCube;
+    // maxLineSize = 2^30 / (4 * 15000) = 17895 < 18000
+    bsqTestCube.setDimensions(15000, 18000, 1);
+    bsqTestCube.setFormat(Cube::Bsq);
+    bsqTestCube.create("IsisCube_bsq");
+    Report(bsqTestCube);
+    
+    cerr << endl;
+    bsqTestCube.close();
+    
+    
     // Check errors
     cerr << "Testing errors ... " << endl;
     try {
@@ -788,6 +940,9 @@ int main(int argc, char *argv[]) {
   remove("IsisCube_04.cub");
   remove("IsisCube_05.cub");
   remove("IsisCube_boundary.cub");
+  remove("IsisCube_bsq.cub");
+  remove("IsisCube_bsqOneLine.cub");
+  remove("IsisCube_largebsq.cub");
   remove("isisTruth_external.ecub");
   remove("isisTruth_external2.ecub");
   remove("isisTruth_external3.ecub");

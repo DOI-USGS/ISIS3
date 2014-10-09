@@ -211,6 +211,67 @@ Reading completely outside virtual band boundaries ...
 Reading partially within virtual band boundaries ... 
 Comparing results ... 
 
+Testing one line BSQ cube (where chunk dimensions == buffer shape) ... 
+Constructing cube ... 
+
+File   = IsisCube_bsqOneLine.cub
+Samps  = 3
+Lines  = 1
+Bands  = 3
+Base   = 0
+Mult   = 1
+Type   = 7
+Atchd  = 1
+Format = 0
+Open   = 1
+R/O    = 0
+R/W    = 1
+Lbytes = 65536
+
+Testing reading ascending repeating virtual bands (1, 2, 2, 3)... 
+
+Testing reading skipped ascending virtual bands (1, 3, 3)... 
+
+Testing reading outside of cube boundaries with virtual bands (1, 5)... 
+
+Testing reading descending virtual bands (3, 1, 3)... 
+
+Testing creating large BSQ where samples exceed 1GB chunk size limit ... 
+Constructing cube ... 
+
+File   = IsisCube_largebsq.cub
+Samps  = 268435457
+Lines  = 2
+Bands  = 1
+Base   = 0
+Mult   = 1
+Type   = 7
+Atchd  = 1
+Format = 0
+Open   = 1
+R/O    = 0
+R/W    = 1
+Lbytes = 65536
+
+
+Testing creating BSQ cube where size of sample pixels exceeds cube's lineCount ... 
+Constructing cube ... 
+
+File   = IsisCube_bsq.cub
+Samps  = 15000
+Lines  = 18000
+Bands  = 1
+Base   = 0
+Mult   = 1
+Type   = 7
+Atchd  = 1
+Format = 0
+Open   = 1
+R/O    = 0
+R/W    = 1
+Lbytes = 65536
+
+
 Testing errors ... 
 **PROGRAMMER ERROR** You already have a cube opened.
 **PROGRAMMER ERROR** You already have a cube opened.

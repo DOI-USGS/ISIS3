@@ -49,27 +49,24 @@ namespace Isis {
    */
   CubeBsqHandler::CubeBsqHandler(QFile * dataFile,
       const QList<int> *virtualBandList, const Pvl &labels, bool alreadyOnDisk)
-      : CubeIoHandler(dataFile, virtualBandList, labels, alreadyOnDisk) {
+    : CubeIoHandler(dataFile, virtualBandList, labels, alreadyOnDisk) {
     int numSamplesInChunk = sampleCount();
     int numLinesInChunk = 1;
-
-    // The chunk size must evenly divide into the cube size...
-    if(lineCount() < 1024)
-      numLinesInChunk = lineCount();
-    else {
-      int attemptedSize = 1024;
-
-      while(numLinesInChunk == 1 && attemptedSize > 1) {
-        if(lineCount() % attemptedSize == 0)
-          numLinesInChunk = attemptedSize;
-        else
-          attemptedSize /= 2;
-      }
-    }
-
+    QList<int> primeFactors;
+    
+    // we want our chunk sizes to be less than 1GB
+    int sizeLimit = 1024 * 1024 * 1024;
+    int maxNumLines = (sizeLimit) / (SizeOf(pixelType()) * numSamplesInChunk);
+    
+    // we've exceed our sizeLimit; increase our limit so we can process an entire line
+    if (maxNumLines == 0) 
+      maxNumLines = 1;
+    
+    numLinesInChunk = findGoodSize(maxNumLines, lineCount());
+    
     setChunkSizes(numSamplesInChunk, numLinesInChunk, 1);
   }
-
+  
 
   /**
    * The destructor writes all cached data to disk.
@@ -132,6 +129,33 @@ namespace Isis {
           "] bytes at position [" + QString::number(startByte) + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
+  }
+
+  
+  /**
+   * This method attempts to compute a good chunk line size. Chunk band size is
+   * always 1 and chunk sample size is always number of samples in the cube for this format.
+   * 
+   * @param maxSize The largest allowed size of a chunk dimension
+   * @param dimensionSize The cube's size for the chunk size we are trying to calculate
+   *     (number of lines)
+   * @return The calculated chunk size for the dimension given
+   */
+  int CubeBsqHandler::findGoodSize(int maxSize, int dimensionSize) const {
+    int chunkDimensionSize;
+    
+    if (dimensionSize <= maxSize) {
+      chunkDimensionSize = dimensionSize;
+    }
+    else {
+      // find largest divisor of dimension size so chunks fit into cube uniformly
+      int greatestDivisor = maxSize;
+      while (dimensionSize % greatestDivisor > 0) {
+        greatestDivisor--;
+      }
+      chunkDimensionSize = greatestDivisor;
+    }
+    return chunkDimensionSize;
   }
 
 
