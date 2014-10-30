@@ -346,10 +346,10 @@ namespace Isis {
     for (int s=0; s <= 5000; s++) {  // loop in sample direction
       residualColDelta =            m_residualColDistCoeffs[0] +
                                 s * m_residualColDistCoeffs[1] +
-                         pow(s,2) * m_residualColDistCoeffs[2] +
-                         pow(s,3) * m_residualColDistCoeffs[3] +
-                         pow(s,4) * m_residualColDistCoeffs[4] +
-                         pow(s,5) * m_residualColDistCoeffs[5];
+                         pow(double(s),2) * m_residualColDistCoeffs[2] +
+                         pow(double(s),3) * m_residualColDistCoeffs[3] +
+                         pow(double(s),4) * m_residualColDistCoeffs[4] +
+                         pow(double(s),5) * m_residualColDistCoeffs[5];
       sprintf(buf, "%d,%lf\n", s, residualColDelta);
       fp_out << buf;
     }
