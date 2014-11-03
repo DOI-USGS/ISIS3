@@ -6,13 +6,27 @@
 #include "Progress.h"
 #include "Camera.h"
 #include "Constants.h"
+#include "Preference.h"
 #include "Statistics.h"
 #include "TextFile.h"
 #include "Stretch.h"
 #include "iTime.h"
 
+#include <QProcess>
+#include <QDebug>
+
 using namespace Isis;
 using namespace std;
+
+const QString knownFilters[] = {
+  "NIR",
+  "RED",
+  "ORANGE",
+  "GREEN",
+  "BLUE",
+  "LONG_UV",
+  "SHORT_UV"
+};
 
 Stretch stretch;
 
@@ -121,6 +135,8 @@ void IsisMain() {
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
   int summing = toInt(icube.group("Instrument")["SummingMode"][0]);
+  double ifdelay = toDouble(icube.group("Instrument")["InterframeDelay"][0]) * 1000.0;
+  int flipped = toInt(icube.group("Instrument")["DataFlipped"][0]);
 
   // Read in the flat files
   for(int band = 0; band < 7; band++) {
@@ -179,7 +195,8 @@ void IsisMain() {
   filterNameToFilterIndex.insert(pair<QString, int>("SHORT_UV", 6));
   filterNameToFilterIndex.insert(pair<QString, int>("LONG_UV",  7));
 
-  PvlKeyword &filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];;
+  PvlKeyword &filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];
+  int numFilters = filtNames.size();
   for(int i = 0; i < filtNames.size(); i++) {
     if(filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
@@ -188,6 +205,74 @@ void IsisMain() {
       QString msg = "Unrecognized filter name [" + QString(filtNames[i]) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+  }
+
+  PvlKeyword &sumMode = icube.label()->findGroup("Instrument", Pvl::Traverse)["SummingMode"];
+  int summingMode = toInt(sumMode[0]);
+  int filterHeight = 16 / summingMode;
+  std::vector<int> padding;
+  padding.resize(numFilters);
+  PvlKeyword &colOff = icube.label()->findGroup("Instrument", Pvl::Traverse)["ColorOffset"];
+  int colorOffset = toInt(colOff[0]);
+
+  for(int filter = 0; filter < numFilters; filter++) {
+    if(colorOffset > 0) {
+      // find the filter num
+      int filtNum = 0;
+      int numKnownFilters = sizeof(knownFilters) / sizeof(QString);
+      
+      while(filtNum < numKnownFilters &&
+            (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][filter] != knownFilters[filtNum]) {
+        filtNum ++;
+      }
+      
+      padding[filter] = (colorOffset * filterHeight) * filtNum;
+    }
+    else {
+      padding[filter] = 0;
+    }
+  }
+
+  int maxOffset = *max_element(padding.begin(),padding.end());
+
+  QString prodId = icube.label()->findGroup("Archive", Pvl::Traverse)["ProductId"][0];
+  prodId = prodId.toUpper();
+  QString prodIdRight = prodId.right(7);
+  QString prodIdLeft = prodId.left(15);
+
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QString command = "grep " + prodIdLeft + " " + env.value("ISIS3DATA") + "/mro/calibration/marci/varexp.tab";
+  QProcess filesearch;
+  QByteArray result;
+  filesearch.start(command);
+
+  filesearch.waitForFinished();
+  QTextStream rsyncStdoutStream(filesearch.readAllStandardOutput());
+  vector<int> frameseq;
+  vector<double> exptime;
+  while (true) {
+    QString line = rsyncStdoutStream.readLine();
+    if (line.isNull()) {
+      break;
+    }
+    else {
+      if (line.contains(prodIdRight)) {
+        QStringList results = line.split(",",QString::SkipEmptyParts);
+        frameseq.push_back(results.at(1).toInt());
+        exptime.push_back(results.at(2).toDouble());
+      }
+    }
+  }
+
+  if (flipped && exptime.size() > 0) {
+    reverse(frameseq.begin(),frameseq.end());
+    reverse(exptime.begin(),exptime.end());
+  }
+
+  if (exptime.size() == 0) {
+    PvlGroup missing("NoExposureTimeDataFound");
+    missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodIdLeft), Pvl::Replace);
+    Application::Log(missing);
   }
 
   bool iof = ui.GetBoolean("IOF");
@@ -211,12 +296,68 @@ void IsisMain() {
 
   Statistics stats;
 
+  int band = 0;
+  int frame = 0;
+  int line = 0;
+  int seqno = 0;
   do {
     icube.read(icubeMgr);
     ocube.read(ocubeMgr);
 
     int fcubeIndex = filter[ocubeMgr.Band()-1] - 1;
+    if (band != ocubeMgr.Band()) {
+      band = ocubeMgr.Band();
+      line = 0;
+      if (!flipped) {
+        frame = 0;
+        exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+      } 
+      else {
+        maxOffset = padding[band-1];
+        frame = (icube.lineCount() - maxOffset) / filterHeight - 1;
+        exposure = exptime[0];
+      }
+      seqno = 0;
+    }
+
     flatcubes[fcubeIndex]->read((*fcubeMgrs[fcubeIndex]));
+
+    line++;
+    if (line > padding[band-1] || flipped) {
+      if (!flipped) {
+        frame = (int)((line-padding[band-1]-1)/filterHeight);
+      }
+      else {
+        frame = (icube.lineCount() - maxOffset) / filterHeight - 1 - (int)((line-1)/filterHeight);
+      }
+      if (!flipped) {
+        if (seqno < (int)frameseq.size()) {
+          if (frame >= frameseq[seqno]) {
+            exposure = exptime[seqno];
+            if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
+                 (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
+              exposure = ifdelay - 57.763 - exposure;
+            }
+            seqno++;
+          }
+        }
+      }
+      else {
+        if (seqno < (int)frameseq.size()) {
+          if (frame < frameseq[seqno]) {
+            seqno++;
+            exposure = exptime[seqno];
+            if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
+                (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
+              exposure = ifdelay - 57.763 - exposure;
+            }
+          }
+        }
+        else {
+          exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+        }
+      }
+    }
 
     for(int i = 0; i < ocubeMgr.size(); i++) {
       if(IsSpecial((*fcubeMgrs[fcubeIndex])[i]) || (*fcubeMgrs[fcubeIndex])[i] == 0.0) {
