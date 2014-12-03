@@ -45,6 +45,11 @@ namespace Isis {
       //! Destroys the NewHorizonsLeisaCamera object
       ~NewHorizonsLeisaCamera() {};
 
+      //! Flag that NewHorizonsLeisaCamera is band-dependent. 
+      bool IsBandIndependent() {
+        return false;
+      };
+
        /**
        * CK frame ID -  - Instrument Code from spacit run on CK
        *  
@@ -77,10 +82,10 @@ namespace Isis {
     private:
       QVector<int> m_originalBand; //!< Stores the band bin OriginalBand keyword values
 
-      QVector<double> m_origTransx;  //!< The original tarnsx affine coefficients from the iak
-      QVector<double> m_origTransy;  //!< The original tarnsy affine coefficients from the iak
-      QVector<double> m_origTranss; //!< The original tarnss affine coefficients from the iak
-      QVector<double> m_origTransl; //!< The original tarnsl affine coefficients from the iak
+      QVector<double> m_origTransx;  //!< The original transx affine coefficients from the iak
+      QVector<double> m_origTransy;  //!< The original transy affine coefficients from the iak
+      QVector<double> m_origTranss; //!< The original transs affine coefficients from the iak
+      QVector<double> m_origTransl; //!< The original transl affine coefficients from the iak
   };
 };
 #endif

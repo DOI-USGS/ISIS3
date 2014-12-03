@@ -30,8 +30,16 @@ Angle latInc, lonInc;
 double lineValue;
 bool image;
 double bkgndValue;
+void changeBand(int band);
+Cube *icube; 
+UniversalGroundMap *gmap; 
+int currentBand = 0;
+bool recalculateForEachBand = false; 
+bool walkBoundary = false; 
+Latitude minLat, maxLat;
+Longitude minLon, maxLon;
 
-int inputSamples, inputLines;
+int inputSamples, inputLines, inputBands;
 GroundGrid *latLonGrid;
 
 void IsisMain() {
@@ -39,7 +47,7 @@ void IsisMain() {
 
   // We will be processing by line
   ProcessByLine p;
-  Cube *icube = p.SetInputCube("FROM");
+  icube = p.SetInputCube("FROM");
 
   UserInterface &ui = Application::GetUserInterface();
   QString mode = ui.GetString("MODE");
@@ -95,6 +103,7 @@ void IsisMain() {
 
   inputSamples = icube->sampleCount();
   inputLines   = icube->lineCount();
+  inputBands = icube->bandCount();
 
   // Line & sample based grid
   if (mode == "IMAGE") {
@@ -110,8 +119,14 @@ void IsisMain() {
   else {
     p.SetOutputCube("TO");
 
-    UniversalGroundMap *gmap = new UniversalGroundMap(*icube,
-        UniversalGroundMap::ProjectionFirst);
+    //if > 1 input band and IsBandIndependent = false, need to regenerate grid for 
+    // each band
+    if ( (inputBands >= 2) && !(icube->camera()->IsBandIndependent()) ) {
+      recalculateForEachBand = true; 
+    }
+
+    gmap = new UniversalGroundMap(*icube, UniversalGroundMap::ProjectionFirst);
+
     latLonGrid = new GroundGrid(gmap, ticks, icube->sampleCount(), icube->lineCount());
 
     baseLat = Latitude(ui.GetDouble("BASELAT"),
@@ -124,8 +139,6 @@ void IsisMain() {
     Progress progress;
     progress.SetText("Calculating Grid");
 
-    Latitude minLat, maxLat;
-
     if (ui.WasEntered("MINLAT"))
       minLat = Latitude(ui.GetDouble("MINLAT"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
@@ -133,8 +146,6 @@ void IsisMain() {
     if (ui.WasEntered("MAXLAT"))
       maxLat = Latitude(ui.GetDouble("MAXLAT"),
         *latLonGrid->GetMappingGroup(), Angle::Degrees);
-
-    Longitude minLon, maxLon;
 
     if (ui.WasEntered("MINLON"))
       minLon = Longitude(ui.GetDouble("MINLON"),
@@ -150,6 +161,7 @@ void IsisMain() {
 
     if (ui.GetBoolean("BOUNDARY"))
       latLonGrid->WalkBoundary();
+      walkBoundary = true;
 
     p.StartProcess(groundGrid);
     p.EndProcess();
@@ -288,8 +300,40 @@ bool groundDrawPoint(int samp, int line, bool latGrid = true) {
   return drawPoint;
 }
 
+//If camera is band-dependent, need to re-calculate the grid when changing bands
+
+void changeBand(int band){ 
+  Progress progress;
+
+  // change band of UniversalGroundMap
+  gmap->SetBand(band);
+
+  //update latLonGrid to use new UniversalGroundMap
+  latLonGrid = new GroundGrid(gmap, ticks, icube->sampleCount(), icube->lineCount());
+
+  //re-set old ground limits from GUI
+  latLonGrid->SetGroundLimits(minLat, minLon, maxLat, maxLon);
+
+  QString progressMessage = QString("Recalculating grid for band %1").arg(band);
+  progress.SetText(progressMessage);
+
+  //re-set lat/lon base/in from GUI
+  latLonGrid->CreateGrid(baseLat, baseLon, latInc, lonInc, &progress);
+
+  if (walkBoundary)
+    latLonGrid->WalkBoundary();
+
+}
+
 // Line processing routine
 void groundGrid(Buffer &in, Buffer &out) {
+
+  //check to see if we're in the same band: 
+  if ( (currentBand != in.Band()) && recalculateForEachBand ) {
+    currentBand = in.Band(); 
+    changeBand(currentBand); 
+  }
+
   for (int samp = 1; samp <= in.SampleDimension(); samp++) {
     if (!ticks) {
       if (groundDrawPoint(samp, in.Line())) {
