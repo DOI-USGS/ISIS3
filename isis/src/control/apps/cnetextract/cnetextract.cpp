@@ -60,6 +60,8 @@ void IsisMain() {
   bool noSingleMeasure   = ui.GetBoolean("NOSINGLEMEASURES");
   bool reference         = ui.GetBoolean("REFERENCE");
   bool fixed             = ui.GetBoolean("FIXED");
+  bool constrained       = ui.GetBoolean("CONSTRAINED");
+  bool editLocked        = ui.GetBoolean("EDITLOCKED");
   bool noTolerancePoints = ui.GetBoolean("TOLERANCE");
   bool pointsEntered     = ui.WasEntered("POINTLIST");
   bool cubePoints        = ui.GetBoolean("CUBES");
@@ -67,10 +69,10 @@ void IsisMain() {
   bool retainReference   = ui.GetBoolean("RETAIN_REFERENCE");
   bool latLon            = ui.GetBoolean("LATLON");
 
-  if(!(noIgnore || noMeasureless || noSingleMeasure || reference || fixed ||
-       noTolerancePoints || pointsEntered || cubePoints || latLon)) {
+  if(!(noIgnore || noMeasureless || noSingleMeasure || editLocked || reference || fixed ||
+       noTolerancePoints || pointsEntered || cubePoints || constrained || latLon)) {
     QString msg = "At least one filter must be selected [";
-    msg += "NOIGNORE,NOMEASURELESS,NOSINGLEMEASURE,REFERENCE,FIXED,TOLERANCE,";
+    msg += "NOIGNORE,NOMEASURELESS,NOSINGLEMEASURE,REFERENCE,FIXED,CONSTRAINED,EDITLOCKED,TOLERANCE,";
     msg += "POINTLIST,CUBES,LATLON]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -112,6 +114,8 @@ void IsisMain() {
   QVector<QString> tolerancePoints;
   QVector<QString> nonReferenceMeasures;
   QVector<QString> nonFixedPoints;
+  QVector<QString> nonConstrainedPoints;
+  QVector<QString> nonEditLockedPoints;
   QVector<QString> nonCubePoints;
   QVector<QString> noCubeMeasures;
 // This is commented out since this does not correspond to any filters or the
@@ -161,6 +165,12 @@ void IsisMain() {
       omit(outNet, cp);
       continue;
     }
+    if(constrained && !(controlpt->GetType() == ControlPoint::Constrained)) {
+      nonConstrainedPoints.append(controlpt->GetId());
+      omit(outNet, cp);
+      continue;
+    }
+
 
     if(noSingleMeasure) {
       bool invalidPoint = false;
@@ -172,6 +182,11 @@ void IsisMain() {
         omit(outNet, cp);
         continue;
       }
+    }
+    if (editLocked && !(controlpt->IsEditLocked())){
+      nonEditLockedPoints.append(controlpt->GetId());
+      omit(outNet, cp);
+      continue;
     }
 
     // Change the current point into a new point by manipulation of its control measures
