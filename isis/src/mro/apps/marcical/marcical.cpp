@@ -6,13 +6,154 @@
 #include "Progress.h"
 #include "Camera.h"
 #include "Constants.h"
+#include "Preference.h"
 #include "Statistics.h"
 #include "TextFile.h"
 #include "Stretch.h"
 #include "iTime.h"
+#include "CSVReader.h"
+#include "FileName.h"
+#include "IString.h"
+
+#include <QProcess>
+#include <QDebug>
+#include <QRegExp>
+#include <string>
+#include <vector>
+#include <cmath>
 
 using namespace Isis;
 using namespace std;
+
+
+/*
+
+PDS_VERSION_ID      = PDS3
+LABEL_REVISION_NOTE = "2007-05-16, K. Supulver;
+                       2007-11-07, K. Supulver;
+                       2009-07-13, K. Supulver"
+RECORD_TYPE         = STREAM
+
+OBJECT              = TEXT
+ PUBLICATION_DATE   = 2007-05-25
+ NOTE               = "Description of MARCI calibration process"
+END_OBJECT          = TEXT
+END
+
+
+The following explanation of the MARCI calibration process assumes
+0-relative indexing; e.g. the first pixel of any given line has
+index 0.  File lines and dataset lines are also numbered starting
+with 0.
+
+There are eight input ancillary data files required for this process:
+the decompanding table (marcidec.txt) and the per-band flattening
+tables (vis1flat.ddd - vis5flat.ddd, uv6flat.ddd - uv7flat.ddd).
+The decompanding table is a simple ASCII file; the flattening tables
+are big-endian binary files.
+
+Note:  All seven per-band flattening tables were updated starting
+with volume MROM_0033.
+
+0) Read the decompanding table file, marcidec.txt.  marcidec.txt
+contains 256 lines, one line for each possible byte value [0, 255].
+There is one value per line, namely the decompanded value
+corresponding to the line number.
+
+1) Read the flattening table file corresponding to the given MARCI
+band.  The visible band flattening tables contain 16 1024-byte rows,
+preceded by a 1024-byte header.  The UV flattening tables contain
+2 128-floating point rows, preceded by a 1024-byte header.
+
+The 1024-byte header has the following structure (big-endian):
+
+0-rel byte offset   value
+         0          32-bit integer magic number
+         4          32-bit integer number of image lines
+         8          32-bit integer number of bytes per image line
+        12          32-bit integer number of bits per image elements
+        16          32-bit integer currently unused
+        20          32-bit integer currently unused
+        24          ASCII label up to 1000 characters long
+                    The label is NUL-terminated
+
+The first word of the label contains the normalization factor for the
+flattening table.  For UV flats, this factor is 1.; for VIS flats, we
+currently have
+                    201.66 norm band 1
+                    211.30 norm band 2
+                    202.42 norm band 3
+                    198.74 norm band 4
+                    208.89 norm band 5
+
+2) Align the flattening table with the given MARCI band frame.  This
+is only necessary when the visible band summing is not one; in this
+case, the flattening table has to be averaged down so it has the same
+width and height as the MARCI band frame.  For example, if the visible
+band summing is 2, then the new flat has 8 512-element rows:
+
+    new flat[i][j] = (flat[2i  ,2j] + flat[2i  ,2j+1]
+                      flat[2i+1,2j] + flat[2i+1,2j+1])/4
+
+3) Convert the flattening table to a numerator flat, e.g.,
+
+    flat[i][j] = (flat[i][j] < 0.25) ? 0. : 1/flat[i][j]
+
+4) For every frame for a given MARCI band, decompand the data and
+apply the numerator flat:
+
+    flattened value = raw decompanded value * numerator flat value
+
+5) Convert the flattened data to radiance I/F using the following
+formula:
+
+   I = DN / Exposure Time / Summing / Response Coefficient
+
+   F = Solar Irradiance / Pi / Solar Distance^2
+
+   where DN is the flattened value
+
+   Exposure Time is in milliseconds
+
+   Solar Distance is in Astronomical Units (AU)
+
+   # band   coeff     rms   solar_irradiance(1 AU)
+     1      0.793     0.014    1798.4
+     2      1.124     0.009    1875.7
+     3      0.751     0.005    1742.7
+     4      0.882     0.006    1580.7
+     5      0.777     0.007    1360.3
+     6      0.0101    0.00026  132.08
+     7      0.0250    0.0004   755.64
+
+   For UV band 7, summing should be multiplied by
+   (1 - decimation_factor) when calculating I.
+   decimation_factor = 0 for images acquired before
+   2006-11-06T21:30:00 SCET and 0.75 for images acquired
+   after that time.
+
+   Note:  The UV coefficients (bands 6 and 7) were updated
+   starting with volume MROM_0033.
+
+   Starting with volume MROM_0049, the exposure time may have
+   varied over the course of a single MARCI image.  See
+   varexp.lbl in the index subdirectory of MROM_0049 and
+   subsequent volumes for details.
+
+*/
+
+void loadMarciExpDur(const QString &fname, QString prodId, std::vector<int> &frame, 
+                  std::vector<double> &exptime);
+
+const QString knownFilters[] = {
+  "NIR",
+  "RED",
+  "ORANGE",
+  "GREEN",
+  "BLUE",
+  "LONG_UV",
+  "SHORT_UV"
+};
 
 Stretch stretch;
 
@@ -121,6 +262,8 @@ void IsisMain() {
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
   int summing = toInt(icube.group("Instrument")["SummingMode"][0]);
+  double ifdelay = toDouble(icube.group("Instrument")["InterframeDelay"][0]) * 1000.0;
+  int flipped = toInt(icube.group("Instrument")["DataFlipped"][0]);
 
   // Read in the flat files
   for(int band = 0; band < 7; band++) {
@@ -179,7 +322,8 @@ void IsisMain() {
   filterNameToFilterIndex.insert(pair<QString, int>("SHORT_UV", 6));
   filterNameToFilterIndex.insert(pair<QString, int>("LONG_UV",  7));
 
-  PvlKeyword &filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];;
+  PvlKeyword &filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];
+  int numFilters = filtNames.size();
   for(int i = 0; i < filtNames.size(); i++) {
     if(filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
@@ -188,6 +332,55 @@ void IsisMain() {
       QString msg = "Unrecognized filter name [" + QString(filtNames[i]) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+  }
+
+  PvlKeyword &sumMode = icube.label()->findGroup("Instrument", Pvl::Traverse)["SummingMode"];
+  int summingMode = toInt(sumMode[0]);
+  int filterHeight = 16 / summingMode;
+  std::vector<int> padding;
+  padding.resize(numFilters);
+  PvlKeyword &colOff = icube.label()->findGroup("Instrument", Pvl::Traverse)["ColorOffset"];
+  int colorOffset = toInt(colOff[0]);
+
+  for(int filter = 0; filter < numFilters; filter++) {
+    if(colorOffset > 0) {
+      // find the filter num
+      int filtNum = 0;
+      int numKnownFilters = sizeof(knownFilters) / sizeof(QString);
+      
+      while(filtNum < numKnownFilters &&
+            (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][filter] != knownFilters[filtNum]) {
+        filtNum ++;
+      }
+      
+      padding[filter] = (colorOffset * filterHeight) * filtNum;
+    }
+    else {
+      padding[filter] = 0;
+    }
+  }
+
+  int maxOffset = *max_element(padding.begin(),padding.end());
+
+
+  QString prodId = icube.label()->findGroup("Archive", Pvl::Traverse)["ProductId"][0];
+  prodId = prodId.toUpper();
+  vector<int> frameseq;
+  vector<double> exptime;
+  QString varExpFile = "$mro/calibration/marci/varexp.tab";
+  
+  // Load the MARCI exposure duration calibration tables.
+  loadMarciExpDur(varExpFile, prodId, frameseq, exptime);
+
+  if (flipped && exptime.size() > 0) {
+    reverse(frameseq.begin(),frameseq.end());
+    reverse(exptime.begin(),exptime.end());
+  }
+
+  if (exptime.size() == 0) {
+    PvlGroup missing("NoExposureTimeDataFound");
+    missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
+    Application::Log(missing);
   }
 
   bool iof = ui.GetBoolean("IOF");
@@ -211,12 +404,68 @@ void IsisMain() {
 
   Statistics stats;
 
+  int band = 0;
+  int frame = 0;
+  int line = 0;
+  int seqno = 0;
   do {
     icube.read(icubeMgr);
     ocube.read(ocubeMgr);
 
     int fcubeIndex = filter[ocubeMgr.Band()-1] - 1;
+    if (band != ocubeMgr.Band()) {
+      band = ocubeMgr.Band();
+      line = 0;
+      if (!flipped) {
+        frame = 0;
+        exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+      } 
+      else {
+        maxOffset = padding[band-1];
+        frame = (icube.lineCount() - maxOffset) / filterHeight - 1;
+        exposure = exptime[0];
+      }
+      seqno = 0;
+    }
+
     flatcubes[fcubeIndex]->read((*fcubeMgrs[fcubeIndex]));
+
+    line++;
+    if (line > padding[band-1] || flipped) {
+      if (!flipped) {
+        frame = (int)((line-padding[band-1]-1)/filterHeight);
+      }
+      else {
+        frame = (icube.lineCount() - maxOffset) / filterHeight - 1 - (int)((line-1)/filterHeight);
+      }
+      if (!flipped) {
+        if (seqno < (int)frameseq.size()) {
+          if (frame >= frameseq[seqno]) {
+            exposure = exptime[seqno];
+            if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
+                 (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
+              exposure = ifdelay - 57.763 - exposure;
+            }
+            seqno++;
+          }
+        }
+      }
+      else {
+        if (seqno < (int)frameseq.size()) {
+          if (frame < frameseq[seqno]) {
+            seqno++;
+            exposure = exptime[seqno];
+            if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
+                (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
+              exposure = ifdelay - 57.763 - exposure;
+            }
+          }
+        }
+        else {
+          exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+        }
+      }
+    }
 
     for(int i = 0; i < ocubeMgr.size(); i++) {
       if(IsSpecial((*fcubeMgrs[fcubeIndex])[i]) || (*fcubeMgrs[fcubeIndex])[i] == 0.0) {
@@ -295,3 +544,145 @@ void IsisMain() {
   flatcubes.clear();
 }
 
+// Function to read in exposure duration data from MARCI observation table.
+// @param fname - filename that contains the exposure duration values.
+// @param prodId - Product ID from the image cube label.
+// @param frame - Framelet vector at which the new line times take effect.
+// @param exptime - Vector of new line times.
+
+/*
+   From the MARCI calibration report, Bell et al., 2009, 
+   Mars Reconnaissance Orbiter Mars Color Imager (MARCI):
+   Instrument description, calibration, and performance, JGR, 114 E08S92
+   doi:10.1029/2008JE003315
+
+   It is also important to note that in order to maximize
+SNR during each orbit track, the exposure times of MARCI
+image sequences may vary over the course of individual
+MARCI raw images acquired after 28 April 2007 (when this
+strategy was implemented). For example, the visible band
+exposure time may have initially been set to a low value for
+imaging beginning over the bright south polar cap, then
+reset to a higher value for imaging over darker midlatitude
+and equatorial terrain, then reset to a lower value for imaging
+over the bright north polar cap. A text-formatted table called
+varexp.tab is provided in the ‘‘index’’ subdirectory associated
+with each MARCI PDS data volume release after that date,
+and this table describes these exposure time changes.
+  Specifically, each table entry lists the file for which an
+exposure time change occurs, the first frame (in a zero-based
+counting system) having a new exposure time, as well as that
+new visible band exposure time itself, in milliseconds. The
+corresponding UV filter exposure time can be derived from
+the visible exposure time using equation (3) above. If the
+exposure time was changed more than once during an
+image, that image will have multiple entries in the table.
+A text file called varexp.lbl is also available in the PDS
+release that provides more details on the exposure time
+change table. More generally, additional details of the
+MARCI calibration pipeline process are described within
+the document marcical.txt that is stored online within the
+calib subdirectory associated with each MARCI PDS data
+volume release.
+
+
+PDS varexp.lbl description:
+
+PDS_VERSION_ID                 = PDS3
+RECORD_TYPE                    = FIXED_LENGTH
+RECORD_BYTES                   = 45
+FILE_RECORDS                   = 12644
+^TABLE                         = "VAREXP.TAB"
+DATA_SET_ID                    = "MRO-M-MARCI-2-EDR-L0-V1.0"
+SPACECRAFT_NAME                = "MARS RECONNAISSANCE ORBITER"
+INSTRUMENT_NAME                = "MARS COLOR IMAGER"
+TARGET_NAME                    = MARS
+MISSION_PHASE_NAME             = "N/A"
+PRODUCT_CREATION_TIME          = 2007-10-31T19:00:00
+
+OBJECT                         = TABLE
+ INTERCHANGE_FORMAT            = ASCII
+ ROWS                          = 12644
+ COLUMNS                       = 3
+ ROW_BYTES                     = 45
+ INDEX_TYPE                    = CUMULATIVE
+
+OBJECT = COLUMN
+NAME = PRODUCT_ID
+COLUMN_NUMBER = 1
+DATA_TYPE = CHARACTER
+START_BYTE = 2
+BYTES = 26
+FORMAT = "A26"
+DESCRIPTION = "product id"
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = FRAME_SEQUENCE_NUMBER
+COLUMN_NUMBER = 2
+DATA_TYPE = ASCII_INTEGER
+START_BYTE = 30
+BYTES = 5
+FORMAT = "I5"
+DESCRIPTION = "The first frame (0-based) of this image for which
+the visible frame exposure time was changed to the given
+LINE_EXPOSURE_DURATION.  The associated UV frame exposure time
+(in milliseconds) is
+INTERFRAME_DELAY - 57.763 - LINE_EXPOSURE_DURATION."
+END_OBJECT = COLUMN
+
+OBJECT = COLUMN
+NAME = LINE_EXPOSURE_DURATION
+COLUMN_NUMBER = 3
+DATA_TYPE = ASCII_REAL
+START_BYTE = 36
+BYTES = 8
+FORMAT = "F8.4"
+DESCRIPTION = "frame exposure time in milliseconds"
+END_OBJECT = COLUMN
+
+END_OBJECT                     = TABLE
+
+END 
+ 
+  */
+void loadMarciExpDur(const QString &fname, QString prodId, std::vector<int> &frame, 
+                  std::vector<double> &exptime) {
+    //  Open the CSV file
+    bool header=false;
+    int skip=0;
+    FileName csvfile(fname);
+    
+    CSVReader csv(csvfile.expanded(), header, skip);
+    // There may be multiple entries in the file for this productID,
+    // so we *must* loop through the entire file.
+    for(int i = 0 ; i < csv.rows() ; i++) {
+      CSVReader::CSVAxis row = csv.getRow(i);
+      // The productId in the file is encapsulated by double quotes.
+      QString fileProdId = row[0];
+      //This is garbage code, but my compiler isn't allowing me to escape the double quotes
+      // to remove them using either regex or QString's own remove method.
+      int prodIdLastIndex = fileProdId.size() - 1 ;
+      fileProdId.remove(prodIdLastIndex,1);
+      fileProdId.remove(0,1);
+      if(fileProdId == prodId ) {
+        if((row.dim1() - 1) != 2) {
+          QString msg = "This appears to be a malformed calibration file."; 
+                  msg += " There are not enough columns in the CSV";
+                  msg += " file to perform the exposure time correction.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        // Build the two vectors, exptime and frame. We'll relate those to each other
+        // back in main(). Remember that a productID may have multiple entries.
+        frame.push_back(toInt(row[1]));
+        exptime.push_back(toDouble(row[2]));
+      }
+    }
+    if ((frame.size() < 1) || (exptime.size() < 1)) {
+        // If it reaches here, the filter was not found
+        std::ostringstream msg;
+        msg << "MARCI Observation ID " << prodId<<  ", not found in file "
+             << fname << " !";
+        throw IException(IException::User, msg.str(), _FILEINFO_);
+    }
+}
