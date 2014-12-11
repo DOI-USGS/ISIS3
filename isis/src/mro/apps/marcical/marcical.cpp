@@ -142,7 +142,7 @@ formula:
 
 */
 
-void loadMarciExpDur(const QString &fname, QString prodId, std::vector<int> &frame, 
+void loadMarciExpDur(const QString fname, QString prodId, std::vector<int> &frame, 
                   std::vector<double> &exptime);
 
 const QString knownFilters[] = {
@@ -646,7 +646,7 @@ END_OBJECT                     = TABLE
 END 
  
   */
-void loadMarciExpDur(const QString &fname, QString prodId, std::vector<int> &frame, 
+void loadMarciExpDur(const QString fname, QString prodId, std::vector<int> &frame, 
                   std::vector<double> &exptime) {
     //  Open the CSV file
     bool header=false;
@@ -673,16 +673,19 @@ void loadMarciExpDur(const QString &fname, QString prodId, std::vector<int> &fra
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // Build the two vectors, exptime and frame. We'll relate those to each other
-        // back in main(). Remember that a productID may have multiple entries.
+        // back in main(). Remember that a productID may have multiple entries in the table.
         frame.push_back(toInt(row[1]));
         exptime.push_back(toDouble(row[2]));
       }
     }
-    if ((frame.size() < 1) || (exptime.size() < 1)) {
+    //Not sure this is required. Maybe don't want to fail if the file's not in the exposure time
+    //table. May just want to use the default values.
+/*    if ((frame.size() < 1) || (exptime.size() < 1)) {
         // If it reaches here, the filter was not found
         std::ostringstream msg;
         msg << "MARCI Observation ID " << prodId<<  ", not found in file "
              << fname << " !";
         throw IException(IException::User, msg.str(), _FILEINFO_);
     }
+*/
 }
