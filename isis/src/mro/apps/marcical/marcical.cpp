@@ -142,9 +142,6 @@ formula:
 
 */
 
-void loadMarciExpDur(const QString fname, QString prodId, std::vector<int> &frame, 
-                  std::vector<double> &exptime);
-
 const QString knownFilters[] = {
   "NIR",
   "RED",
@@ -248,7 +245,7 @@ void IsisMain() {
 
   // Read it, make sure it's ordered
   for(int obj = 0; obj < calibrationData.objects(); obj ++) {
-    PvlObject &calObj = calibrationData.object(obj);
+    PvlObject calObj = calibrationData.object(obj);
 
     if((int)calObj["FilterNumber"] != obj + 1) {
       QString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
@@ -290,7 +287,7 @@ void IsisMain() {
     fcube->open(flatFile.expanded());
     flatcubes.push_back(fcube);
 
-    LineManager *fcubeMgr = new LineManager(*fcube);
+    LineManager * fcubeMgr = new LineManager(*fcube);
     fcubeMgr->SetLine(1, 1);
     fcubeMgrs.push_back(fcubeMgr);
   }
@@ -322,7 +319,7 @@ void IsisMain() {
   filterNameToFilterIndex.insert(pair<QString, int>("SHORT_UV", 6));
   filterNameToFilterIndex.insert(pair<QString, int>("LONG_UV",  7));
 
-  PvlKeyword &filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];
+  PvlKeyword filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];
   int numFilters = filtNames.size();
   for(int i = 0; i < filtNames.size(); i++) {
     if(filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
@@ -370,7 +367,35 @@ void IsisMain() {
   QString varExpFile = "$mro/calibration/marci/varexp.tab";
   
   // Load the MARCI exposure duration calibration tables.
-  loadMarciExpDur(varExpFile, prodId, frameseq, exptime);
+  bool header=false;
+  int skip=0;
+  FileName csvfile(varExpFile);
+    
+  CSVReader csv(csvfile.expanded(), header, skip);
+    // There may be multiple entries in the file for this productID,
+    // so we *must* loop through the entire file.
+  for(int i = 0 ; i < csv.rows() ; i++) {
+      CSVReader::CSVAxis row = csv.getRow(i);
+      // The productId in the file is encapsulated by double quotes.
+      QString fileProdId = row[0];
+      //This is garbage code, but my compiler isn't allowing me to escape the double quotes
+      int prodIdLastIndex = fileProdId.size() - 1 ;
+      fileProdId.remove(prodIdLastIndex,1);
+      fileProdId.remove(0,1);
+      // Now, compare product ids from the input image and from the calibration table.
+      if(fileProdId == prodId ) {
+        if((row.dim1() - 1) != 2) {
+          QString msg = "This appears to be a malformed calibration file."; 
+                  msg += " There are not enough columns in the CSV";
+                  msg += " file to perform the exposure time correction.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        // Build the two vectors, exptime and frame. We'll relate those to each other
+        // back in main(). Remember that a productID may have multiple entries in the table.
+        frameseq.push_back(toInt(row[1]));
+        exptime.push_back(toDouble(row[2]));
+      }
+  }
 
   if (flipped && exptime.size() > 0) {
     reverse(frameseq.begin(),frameseq.end());
@@ -408,6 +433,7 @@ void IsisMain() {
   int frame = 0;
   int line = 0;
   int seqno = 0;
+  int fsize = frameseq.size();
   do {
     icube.read(icubeMgr);
     ocube.read(ocubeMgr);
@@ -439,7 +465,7 @@ void IsisMain() {
         frame = (icube.lineCount() - maxOffset) / filterHeight - 1 - (int)((line-1)/filterHeight);
       }
       if (!flipped) {
-        if (seqno < (int)frameseq.size()) {
+        if (seqno < fsize) {
           if (frame >= frameseq[seqno]) {
             exposure = exptime[seqno];
             if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
@@ -451,10 +477,10 @@ void IsisMain() {
         }
       }
       else {
-        if (seqno < (int)frameseq.size()) {
+        if (seqno < fsize) {
           if (frame < frameseq[seqno]) {
-            seqno++;
             exposure = exptime[seqno];
+            seqno++;
             if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
                 (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
               exposure = ifdelay - 57.763 - exposure;
@@ -529,9 +555,6 @@ void IsisMain() {
     }
   }
 
-  icube.close();
-  ocube.close();
-
   // The cube still owns this
   cam = NULL;
 
@@ -540,15 +563,13 @@ void IsisMain() {
     delete flatcubes[i];
   }
 
+  // Clean up.
   fcubeMgrs.clear();
   flatcubes.clear();
-}
 
-// Function to read in exposure duration data from MARCI observation table.
-// @param fname - filename that contains the exposure duration values.
-// @param prodId - Product ID from the image cube label.
-// @param frame - Framelet vector at which the new line times take effect.
-// @param exptime - Vector of new line times.
+  icube.close();
+  ocube.close();
+}
 
 /*
    From the MARCI calibration report, Bell et al., 2009, 
@@ -646,46 +667,3 @@ END_OBJECT                     = TABLE
 END 
  
   */
-void loadMarciExpDur(const QString fname, QString prodId, std::vector<int> &frame, 
-                  std::vector<double> &exptime) {
-    //  Open the CSV file
-    bool header=false;
-    int skip=0;
-    FileName csvfile(fname);
-    
-    CSVReader csv(csvfile.expanded(), header, skip);
-    // There may be multiple entries in the file for this productID,
-    // so we *must* loop through the entire file.
-    for(int i = 0 ; i < csv.rows() ; i++) {
-      CSVReader::CSVAxis row = csv.getRow(i);
-      // The productId in the file is encapsulated by double quotes.
-      QString fileProdId = row[0];
-      //This is garbage code, but my compiler isn't allowing me to escape the double quotes
-      // to remove them using either regex or QString's own remove method.
-      int prodIdLastIndex = fileProdId.size() - 1 ;
-      fileProdId.remove(prodIdLastIndex,1);
-      fileProdId.remove(0,1);
-      if(fileProdId == prodId ) {
-        if((row.dim1() - 1) != 2) {
-          QString msg = "This appears to be a malformed calibration file."; 
-                  msg += " There are not enough columns in the CSV";
-                  msg += " file to perform the exposure time correction.";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-        // Build the two vectors, exptime and frame. We'll relate those to each other
-        // back in main(). Remember that a productID may have multiple entries in the table.
-        frame.push_back(toInt(row[1]));
-        exptime.push_back(toDouble(row[2]));
-      }
-    }
-    //Not sure this is required. Maybe don't want to fail if the file's not in the exposure time
-    //table. May just want to use the default values.
-/*    if ((frame.size() < 1) || (exptime.size() < 1)) {
-        // If it reaches here, the filter was not found
-        std::ostringstream msg;
-        msg << "MARCI Observation ID " << prodId<<  ", not found in file "
-             << fname << " !";
-        throw IException(IException::User, msg.str(), _FILEINFO_);
-    }
-*/
-}
