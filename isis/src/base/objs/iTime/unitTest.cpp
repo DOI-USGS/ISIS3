@@ -223,9 +223,66 @@ int main(int argc, char *argv[]) {
     error.print();
   }
 
+  try {
+    cout << endl;
+    cout << setprecision(9);
+    cout << "  Test of iTime operator+(double) member" << endl;
+    iTime t1(0.0);
+    t1 = t1 + 1.01;
+    cout << "    " << t1.EtString() << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
 
+  try {
+    cout << endl;
+    cout << setprecision(9);
+    cout << "  Test of iTime operator+=(double) member" << endl;
+    iTime t1(0.0);
+    t1 += 1.01;
+    cout << "    " << t1.EtString() << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
 
+  try {
+    cout << endl;
+    cout << setprecision(9);
+    cout << "  Test of iTime operator-(double) member" << endl;
+    iTime t1(0.0);
+    t1 = t1 - 1.01;
+    cout << "    " << t1.EtString() << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
 
+  try {
+    cout << endl;
+    cout << setprecision(9);
+    cout << "  Test of iTime operator-=(double) member" << endl;
+    iTime t1(0.0);
+    t1 -= 1.01;
+    cout << "    " << t1.EtString() << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
+
+  try {
+    cout << endl;
+    cout << setprecision(9);
+    cout << "  Test of double operator-(iTIme) member" << endl;
+    iTime t1(0.0);
+    iTime t2 = 100.001;
+    double interval = t1 - t2;
+    cout << "    " << interval << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
 
 }
 

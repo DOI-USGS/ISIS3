@@ -22,6 +22,10 @@ namespace Isis {
    * @author ????-??-?? Stacy Alley
    *
    * @internal
+   *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to 
+   *                           relative pathnames. Fixes #2054.
+   *   @history 2014-07-31 Ian Humphrey - Removed ConfigurePlotMenuOption for scatter plot window.
+   *                           References #2089.
    */
   class ScatterPlotWindow : public PlotWindow {
       Q_OBJECT

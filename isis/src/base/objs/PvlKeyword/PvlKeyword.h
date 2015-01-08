@@ -49,53 +49,51 @@ namespace Isis {
    * @author 2002-10-11 Jeff Anderson
    *
    * @internal
-   *  @history 2005-04-08 Leah Dahmer - wrote class documentation.
-   *  @history 2005-04-08 Leah Dahmer - added the writeWithWrap() method so
-   *                                    keyword values will now be wrapped when
-   *                                    the length exceeds 80 characters.
-   *  @history 2005-05-18 Jeff Anderson - Fixed minor problems with wrapping code
-   *  @history 2006-04-05 Elizabeth Miller - Added
-   *           AddCommentWrapped method
-   *  @history 2006-09-05 Stuart Sides - Added ability to format keywords in
-   *                                     different ways using the PvlFormat class
-   *  @history 2007-08-20 Brendan George - Added checking to ensure Keyword Name
-   *                                       contains no whitespace
-   *  @history 2008-02-08 Christopher Austin - Altered
-   *           WriteWithWrap to not bomb when 2 or more single
-   *           statement lines in a row are over 78 characters
-   *           long.
-   *  @history 2008-07-03 Steven Lambright - Added const functionality
-   *  @history 2008-07-10 Steven Lambright - stringEqual is now static, all
-   *           AddComments methods are public
-   *  @history 2008-09-30 Christopher Austin - replaced all std::endl in the <<
-   *           operator as well as writeWithWrap() with PvlFormat.FormatEOL(), and
-   *           formatted wraps accordingly
-   *  @history 2009-08-18 Eric Hyer - Added both SetUnits methods and ASSERT macro
-   *  @history 2009-09-09 Steven Lambright - Removed ASSERT macro, fixed
-   *           formatting of error in SetUnits, and fixed text wrapping when a
-   *           single array element needed split up into multiple lines.
-   *  @history 2009-12-07 Steven Lambright - Added stream input operator for
-   *           reading
-   *  @history 2010-01-19 Travis Addair - Added SetCharLimit
-   *           method allowing users to set the point at which a
-   *           keyword value is output to the next line down.
-   *  @history 2010-02-04 Travis Addair - Moved the SetCharLimit
-   *           method to PvlFormat class
-   *  @history 2010-04-13 Eric Hyer - Added copy constructor
-   *                                  Added assignment operator
-   *  @history 2010-06-25 Steven Lambright - NULLs ('\0') now count as binary
-   *  @history 2010-09-27 Sharmila Prasad - API to Validate a Keyword for type and values
-   *  @history 2010-10-18 Sharmila Prasad - Added more options for the keyword validation
-   *  @history 2011-04-12 Steven Lambright - Lessened the memory footprint by
-   *            changing m_comments and m_units to pointers, m_values to a
-   *            QVarLengthArray and m_name to a char *.
+   *  @history 2005-04-08 Leah Dahmer - Wrote class documentation.
+   *  @history 2005-04-08 Leah Dahmer - Added the writeWithWrap() method so keyword values will now
+   *                          be wrapped when the length exceeds 80 characters.
+   *  @history 2005-05-18 Jeff Anderson - Fixed minor problems with wrapping code.
+   *  @history 2006-04-05 Elizabeth Miller - Added AddCommentWrapped() method.
+   *  @history 2006-09-05 Stuart Sides - Added ability to format keywords in different ways using
+   *                          the PvlFormat class.
+   *  @history 2007-08-20 Brendan George - Added checking to ensure Keyword Name contains no
+   *                          whitespace.
+   *  @history 2008-02-08 Christopher Austin - Altered WriteWithWrap to not bomb when 2 or more
+   *                          single statement lines in a row are over 78 characters long.
+   *  @history 2008-07-03 Steven Lambright - Added const functionality. 
+   *  @history 2008-07-10 Steven Lambright - stringEqual is now static, all AddComments methods are
+   *                          public.
+   *  @history 2008-09-30 Christopher Austin - replaced all std::endl in the << operator as well as
+   *                          writeWithWrap() with PvlFormat.FormatEOL(), and formatted wraps
+   *                          accordingly.
+   *  @history 2009-08-18 Eric Hyer - Added both SetUnits methods and ASSERT macro.
+   *  @history 2009-09-09 Steven Lambright - Removed ASSERT macro, fixed formatting of error in
+   *                          SetUnits, and fixed text wrapping when a single array element needed
+   *                          split up into multiple lines.
+   *  @history 2009-12-07 Steven Lambright - Added stream input operator for reading.
+   *  @history 2010-01-19 Travis Addair - Added SetCharLimit method allowing users to set the point
+   *                          at which a keyword value is output to the next line down.
+   *  @history 2010-02-04 Travis Addair - Moved the SetCharLimit method to PvlFormat class.
+   *  @history 2010-04-13 Eric Hyer - Added copy constructor. Added assignment operator.
+   *  @history 2010-06-25 Steven Lambright - NULLs ('\0') now count as binary.
+   *  @history 2010-09-27 Sharmila Prasad - API to Validate a Keyword for type and values.
+   *  @history 2010-10-18 Sharmila Prasad - Added more options for the keyword validation.
+   *  @history 2011-04-12 Steven Lambright - Lessened the memory footprint by changing m_comments
+   *                          and m_units to pointers, m_values to a QVarLengthArray and m_name
+   *                          to a char *.
    *  @history 2011-07-07 Sharmila Prasad - While validating keyword, display appropriate
-   *                 error msg when converting string to integer which has a double value.
+   *                          error msg when converting string to integer which has a double value.
    *  @history 2013-03-11 Steven Lambright and Mathew Eis - Brought method names and member variable
    *                          names up to the current Isis 3 coding standards. Fixes #1533.
    *  @history 2013-06-05 Tracie Sucharski - When splitting keywords make sure the continuation
    *                          lines does not start with "//" since Isis Pvl considers that a
    *                          comment.  Fixes #1230.
+   *  @history 2014-05-13 Jeannie Backer - Changed operator[] error message to construct a
+   *                          QString from the m_name char* instead of using the toString() method.
+   *                          The call to this method was using toString(bool) and always printing
+   *                          the QString "Yes" instead of the keyword name. Added padding on
+   *                          control statements to bring the code closer to ISIS Coding Standards.
+   *                          References #1659.
    */
   class PvlKeyword {
     public:

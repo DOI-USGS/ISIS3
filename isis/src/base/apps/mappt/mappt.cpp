@@ -35,11 +35,20 @@ void IsisMain() {
 
   // Get the coordinate
   UserInterface &ui = Application::GetUserInterface();
+  bool outsideAllowed = ui.GetBoolean("ALLOWOUTSIDE");
+  int cubeLineLimit = icube->lineCount() + .5;
+  int cubeSampleLimit = icube->sampleCount() + .5;
 
   // Get the sample/line position if we have an image point
   if(ui.GetString("TYPE") == "IMAGE") {
     double samp = ui.GetDouble("SAMPLE");
     double line = ui.GetDouble("LINE");
+    if (!outsideAllowed) {
+      if (samp < .5 || line < .5 || samp > cubeSampleLimit || line > cubeLineLimit) {
+        QString error = "Requested line,sample is not on the image";
+        throw IException(IException::Unknown, error, _FILEINFO_);
+      }
+    }
     proj->SetWorld(samp, line);
   }
 
@@ -132,6 +141,18 @@ void IsisMain() {
     proj->SetCoordinate(x, y);
   }
 
+  PvlGroup results("Results");
+  if (proj->WorldX() < .5 || proj->WorldY() < .5 || proj->WorldX() > cubeSampleLimit ||
+      proj->WorldY() > cubeLineLimit) {
+    if (!outsideAllowed) {
+      QString error = "Resulting line,sample is not on the image";
+      throw IException(IException::Unknown, error, _FILEINFO_);
+    }
+    else {
+      results += PvlKeyword("OutsideOfImage", "Requested point falls outside of image boundaries");
+    }
+  }
+
   // Create Brick on samp, line to get the dn value of the pixel
   Brick b(1, 1, 1, icube->pixelType());
   int intSamp = (int)(proj->WorldX() + 0.5);
@@ -141,7 +162,6 @@ void IsisMain() {
 
   // Log the position
   if(proj->IsGood()) {
-    PvlGroup results("Results");
     results += PvlKeyword("Filename",
                           FileName(ui.GetFileName("FROM")).expanded());
     results += PvlKeyword("Sample", toString(proj->WorldX()));

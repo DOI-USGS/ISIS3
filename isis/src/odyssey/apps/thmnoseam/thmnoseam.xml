@@ -19,6 +19,10 @@
     <change name="Steven Lambright" date="2010-08-31">
       Original version
     </change>
+    <change name="Jeannie Backer" date="2014-08-22">
+      Updated truth data due to a modified in the THEMIS VIS distortion map. Added errors test.
+      Test coverage 75/83/81 %. References #1659.
+    </change>
   </history>
 
   <category>

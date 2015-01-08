@@ -142,6 +142,10 @@ namespace Isis {
    *   @history 2012-12-31 Steven Lambright - Removed 'get' prefix from accessors. Fixes #1356.
    *   @history 2014-06-20 Ian Humphrey - Added checks to statistics() and histogram() to throw
    *                           an error if the cube is unopened. Fixes #2085.
+   *   @history 2014-10-06 Ian Humphrey - Added case to unittest when chunk dimensions are the same
+   *                           as the buffer shape to ensure virtual bands accessed correctly.
+   *                           Added cases to test creating bsq and large bsq cubes.
+   *                           References #1689.
    */
   class Cube {
     public:

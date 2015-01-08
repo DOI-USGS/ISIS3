@@ -271,6 +271,7 @@ namespace Isis {
     int bufferLineCount = bufferToFill.LineDimension();
     int bufferBandCount = bufferToFill.BandDimension();
 
+    // our chunk dimensions are same as buffer shape dimensions
     if (bufferSampleCount == m_samplesInChunk &&
         bufferLineCount == m_linesInChunk &&
         bufferBandCount == m_bandsInChunk) {
@@ -281,12 +282,17 @@ namespace Isis {
       int bufferEndSample = bufferStartSample + bufferSampleCount - 1;
       int bufferEndLine = bufferStartLine + bufferLineCount - 1;
       int bufferEndBand = bufferStartBand + bufferBandCount - 1;
+    
+      // make sure we access the correct band
+      int startBand = bufferStartBand - 1;
+      if (m_virtualBands)
+        startBand = m_virtualBands->at(bufferStartBand - 1);
 
       int expectedChunkIndex =
           ((bufferStartSample - 1) / getSampleCountInChunk()) +
           ((bufferStartLine - 1) / getLineCountInChunk()) *
             getChunkCountInSampleDimension() +
-          ((bufferStartBand - 1) / getBandCountInChunk()) *
+          ((startBand - 1) / getBandCountInChunk()) *
             getChunkCountInSampleDimension() *
             getChunkCountInLineDimension();
 

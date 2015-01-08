@@ -1,8 +1,12 @@
 #include "Isis.h"
 
+#include <math.h>
+
 #include <QDebug>
 #include <QString>
 
+#include "BoxcarCachingAlgorithm.h"
+#include "Brick.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
@@ -14,12 +18,16 @@
 #include "ProcessByLine.h"
 #include "ProcessBySample.h"
 #include "ProcessImportPds.h"
+#include "Progress.h"
 #include "Pvl.h"
 #include "Table.h"
 #include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
+
+void writeCube(Buffer &in);
+void writeCubeWithDroppedLines(Buffer &in);
 
 void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType);
 void translateChandrayaan1M3Labels(Pvl &pdsLabel, Cube *ocube, Table &utcTable,
@@ -28,21 +36,38 @@ void flip(Buffer &in);
 void flipUtcTable(Table &utcTable);
 
 
+Cube *g_oCube;
+Brick *g_oBuff;
+int g_totalLinesAdded;
+double g_expectedLineRate;
+Table *g_utcTable;
+PvlGroup g_results("Results");
+
 void IsisMain() {
+  g_results.clear();
   importImage("TO", (ProcessImportPds::PdsFileType)(ProcessImportPds::Rdn|ProcessImportPds::L0));
+  Application::Log(g_results);
   importImage("LOC", ProcessImportPds::Loc);
   importImage("OBS", ProcessImportPds::Obs);
 }
 
 
 void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType) {
+
   // We should be processing a PDS file
   UserInterface &ui = Application::GetUserInterface();
   if (!ui.WasEntered(outputParamName)) {
     return;
   }
 
+  g_oCube = NULL;
+  g_oBuff = NULL;
+  g_totalLinesAdded = 0;
+  g_utcTable = NULL;
+
   ProcessImportPds importPds;
+  importPds.Progress()->SetText((QString)"Writing " + outputParamName + " file");
+
   FileName in = ui.GetFileName("FROM");
 
   Pvl pdsLabel(in.expanded());
@@ -55,6 +80,7 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
       fileType = ProcessImportPds::Rdn;
     }
   }
+
   // Convert the pds file to a cube
   try {
     importPds.SetPdsFile(in.expanded(), "", pdsLabel, fileType);
@@ -84,33 +110,92 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
     linesNeedFlipped = (limbDirection == "ASCENDING");
   }
 
-  // The following 2 lines are for testing purposes, No flipping will be done with these lines 
-  // uncommented i.e. north is always up, lons always pos east to the right.
-  //  samplesNeedFlipped = false;
-  //  linesNeedFlipped = false;
+  // The following 2 commented lines can be used for testing purposes, No flipping will be done with 
+  // these lines uncommented i.e. north is always up, lons always pos east to the right.
+  //    samplesNeedFlipped = false;
+  //    linesNeedFlipped = false;
 
   {
-    Cube *importCube = importPds.SetOutputCube(outputParamName);
+    // Calculate the number of output lines that should be present from the start and end times 
+    // in the UTC table.
+    int outputLines;
+    if (fileType == ProcessImportPds::Rdn || fileType == ProcessImportPds::Loc ||
+        fileType == ProcessImportPds::Obs) {
+      g_utcTable = &(importPds.ImportTable("UTC_FILE"));
 
-    Table *utcTable = NULL;
+      if (g_utcTable->Records() >= 1) {
+
+        QString instMode = (QString) pdsLabel["INSTRUMENT_MODE_ID"];
+        // Initialize to the value for a GLOBAL mode observation
+        g_expectedLineRate = .10176;
+        if (instMode == "TARGET") {
+          g_expectedLineRate = .05088;
+        }
+
+        iTime firstEt((QString)(*g_utcTable)[0]["UtcTime"]);
+        iTime lastEt((QString)(*g_utcTable)[importPds.Lines()-1]["UtcTime"]);
+
+        outputLines = ceil(fabs(lastEt - firstEt) / g_expectedLineRate + 1.0);
+      }
+      else {
+        QString msg = "Input file [" + in.expanded() +
+                     "] does not appear to have any records in the UTC_FILE table";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+    }
+    else {
+      outputLines = importPds.Lines();
+    }
+
+    // Since the output cube possibly has more lines then the input PDS image, due to dropped 
+    // lines, we have to write the output cube instead of letting ProcessImportPds do it for us.
+    g_oCube = new Cube();
+    if (fileType == ProcessImportPds::L0) {
+      g_oCube->setPixelType(importPds.PixelType());
+    }
+    g_oCube->setDimensions(importPds.Samples(), outputLines, importPds.Bands());
+    g_oCube->create(ui.GetFileName(outputParamName));
+    g_oCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+
+    g_oBuff = new Isis::Brick(importPds.Samples(), outputLines, importPds.Bands(),
+                              importPds.Samples(), 1, 1, importPds.PixelType(), true);
+    g_oBuff->setpos(0);
+
+    if (fileType == ProcessImportPds::L0) {
+      importPds.StartProcess(writeCube);
+    }
+    else {
+      importPds.StartProcess(writeCubeWithDroppedLines);
+      g_results += PvlKeyword("LinesAdded", toString(g_totalLinesAdded));
+      g_results += PvlKeyword("LinesFlipped", toString(linesNeedFlipped));
+      g_results += PvlKeyword("SamplesFlipped", toString(samplesNeedFlipped));
+    }
+
+    delete g_oBuff;
+
+    // If the image lines need flipped then so does the UTC table, if it exists.
     if (fileType != ProcessImportPds::L0) {
-      utcTable = &(importPds.ImportTable("UTC_FILE"));
-      //  If lines are flipped, need to flip times also
       if (linesNeedFlipped) {
-        flipUtcTable(*utcTable);
+        flipUtcTable(*g_utcTable);
       }
     }
 
-    importPds.StartProcess();
+    translateChandrayaan1M3Labels(pdsLabel, g_oCube, *g_utcTable, fileType); 
 
-    translateChandrayaan1M3Labels(pdsLabel, importCube, *utcTable, fileType);
-    if (fileType != ProcessImportPds::L0) importCube->write(*utcTable);
+    if (fileType != ProcessImportPds::L0) g_oCube->write(*g_utcTable);
+
+    importPds.WriteHistory(*g_oCube);
     importPds.Finalize();
+
+    g_oCube->close();
+    delete g_oCube;
+
   }
 
   CubeAttributeInput inAttribute;
   if (linesNeedFlipped) {
     ProcessBySample flipLines;
+    flipLines.Progress()->SetText("Flipping Lines");
     Cube *cube = flipLines.SetInputCube(ui.GetFileName(outputParamName), inAttribute);
     cube->reopen("rw");
     flipLines.ProcessCubeInPlace(flip, false);
@@ -118,11 +203,76 @@ void importImage(QString outputParamName, ProcessImportPds::PdsFileType fileType
 
   if (samplesNeedFlipped) {
     ProcessByLine flipSamples;
+    flipSamples.Progress()->SetText("Flipping Samples");
     Cube *cube = flipSamples.SetInputCube(ui.GetFileName(outputParamName), inAttribute);
     cube->reopen("rw");
     flipSamples.ProcessCubeInPlace(flip, false);
   }
 }
+
+
+void writeCube(Buffer &in) {
+
+  for (int i = 0; i < in.size(); i++) {
+    (*g_oBuff)[i] = in[i];
+  }
+
+  g_oCube->write(*g_oBuff);
+  (*g_oBuff)++;
+}
+
+
+
+void writeCubeWithDroppedLines(Buffer &in) {
+
+  // Always write the current line to the output cube first
+  for (int i = 0; i < in.size(); i++) {
+    (*g_oBuff)[i] = in[i];
+  }
+
+  g_oCube->write(*g_oBuff);
+  (*g_oBuff)++;
+
+  // Now check the UTC_TIME table and see if there is a gap (missing lines) after the TIME record
+  // for the current line. If there are, add as many line as are necessary to fill the gap. 
+  // Since the PDS files are in BIL order we are writeing to the ISIS cube in that order, so we 
+  // do not need to write NULL lines to fill a gap until we have written the last band of line N,
+  // and we don't have to check for gaps after the last lines of the PDS file. 
+
+  if (in.Band() == g_oCube->bandCount() && in.Line() < g_utcTable->Records()) {
+    iTime thisEt((QString)(*g_utcTable)[in.Line() - 1]["UtcTime"]);
+    iTime nextEt((QString)(*g_utcTable)[in.Line()]["UtcTime"]);
+
+    double delta = fabs(nextEt - thisEt);
+
+    double linesToAdd = (delta / g_expectedLineRate) - 1.0;
+
+    if (linesToAdd > 0.9) {
+
+      // Create a NULL line
+      for (int i = 0; i < in.size(); i++) {
+        (*g_oBuff)[i] = Null;
+      }
+
+//      qDebug() << "Lines to Add for this gap -----------------------------  " << linesToAdd;
+//      qDebug() << qSetRealNumberPrecision(14) << "  ETs:  " << thisEt.Et() << nextEt.Et();
+//      qDebug() << "  in buf pos: " << in.Sample() << in.Line() << in.Band();
+//      qDebug() << "  obuf pos:   " << g_oBuff->Sample() << g_oBuff->Line() << g_oBuff->Band();
+
+      while (linesToAdd > 0.9) {
+
+        for (int band = 0; band < g_oCube->bandCount(); band++) {
+          g_oCube->write(*g_oBuff); 
+          (*g_oBuff)++;
+        }
+        linesToAdd--;
+        g_totalLinesAdded++;
+      }
+    }
+  }
+}
+
+
 
 
 void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
@@ -146,50 +296,7 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
   PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
   ocube->putGroup(inst);
 
-  QString instMode = inst["InstrumentModeId"];
-  // Initialize to GLOBAL value
-  double expectedLineRate = .10176;
-  if (instMode == "TARGET") {
-    expectedLineRate = .05088;
-  }
-
-  //  Insure line rate is expected value and constant through the cube
-  if (fileType == ProcessImportPds::Rdn) {
-    if (utcTable.Records() > 1) {
-      bool hasExpectedLineRate = true;
-      bool lineRateConstant = true;
-      double row0Ddoy = toDouble((QString)utcTable[0]["Ddoy"]);
-      double row1Ddoy = toDouble((QString)utcTable[1]["Ddoy"]);
-      double firstDdoyDiff = abs(row1Ddoy - row0Ddoy);
-      double firstLineRate = firstDdoyDiff * 24 * 3600;
-      if ((expectedLineRate - firstLineRate) > 1e-5) {
-        hasExpectedLineRate = false;
-      }
-      double minDdoy = row0Ddoy;
-      for (int i = 1; i < utcTable.Records(); i++) {
-        minDdoy = qMin(minDdoy, toDouble((QString)utcTable[i]["Ddoy"]));
-        double newDiff = abs(toDouble((QString)utcTable[i]["Ddoy"]) -
-                         toDouble((QString)utcTable[i - 1]["Ddoy"]));
-
-        if ((firstDdoyDiff - newDiff) > 1e-11) {
-          lineRateConstant = false;
-        }
-      }
-
-      if (!hasExpectedLineRate) {
-        PvlGroup msg("Messages");
-        msg += PvlKeyword("Warning", "Line scan rate of " + toString(firstLineRate) +
-                          " not expected value of " + toString(expectedLineRate));
-        Application::Log(msg);
-      }
-      if (!lineRateConstant) {
-        PvlGroup msg("Messages");
-        msg += PvlKeyword("Warning", "Line scan rate not constant.");
-        Application::Log(msg);
-      }
-    }
-  }
-
+ 
   if (fileType == ProcessImportPds::L0 || fileType == ProcessImportPds::Rdn) {
     // Setup the band bin group
     QString bandFile = "$chandrayaan1/bandBin/bandBin.pvl";
@@ -257,7 +364,6 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
 
 
 void flip(Buffer &in) {
-
   for(int i = 0; i < in.size() / 2; i++) {
     swap(in[i], in[in.size() - i - 1]);
   }

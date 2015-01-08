@@ -297,6 +297,56 @@ int main(int argc, char *argv[]) {
   catch(Isis::IException &e) {
     e.print();
   }
+
+  //Test Angle::Angle(QString):
+  try {
+    Angle angle(QString("-70 15 30.125"));
+    cerr << angle.toString() << endl;
+  } 
+  catch (Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle(QString("  +70  30 11     "));
+    cerr << angle.toString() << endl;
+  } 
+  catch (Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle(QString("100"));
+    cerr << angle.toString() << endl;
+  } 
+  catch (Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle(QString("70 11"));
+    cerr << angle.toString() << endl;
+  } 
+  catch (Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle(QString("this 79 should 00 fail 0.111"));
+    cerr << angle.toString() << endl;
+  } 
+  catch (Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle(QString("100 00 00"));
+    cerr << angle.toString() << endl;
+  } 
+  catch (Isis::IException &e) {
+    e.print();
+  }
+
 }
 
 

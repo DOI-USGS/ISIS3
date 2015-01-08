@@ -29,6 +29,9 @@
       Create a universal ground map of the input cube to be passed onto the 
       Interest Operator to calculate the Emission Angle
     </change>
+    <change name="Ian Humphrey" date="2014-06-03">
+      Closed the open cube to prevent errors from running sequential data in GUI. Fixes #1002.
+    </change>
   </history>
 
   <category>

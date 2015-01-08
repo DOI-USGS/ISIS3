@@ -145,6 +145,9 @@
     <change name="Steven Koechle" date="2008-12-04">
       Removed hard coded flatfile, now searchs for highest version
     </change>
+    <change name="Ian Humphrey" date="2014-06-23">
+      Modified hard coded flatfile in app tests to relative paths using $ISIS3DATA. Fixes #2054.
+    </change>
   </history>
 
   <category>

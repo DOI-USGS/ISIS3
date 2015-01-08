@@ -9,6 +9,7 @@
 #include "JP2Decoder.h"
 #include "JP2Importer.h"
 #include "ProcessByLine.h"
+#include "PvlGroup.h"
 #include "QtImporter.h"
 #include "SpecialPixel.h"
 #include "TiffImporter.h"
@@ -47,6 +48,18 @@ namespace Isis {
 
     delete m_outCube;
     m_outCube = NULL;
+  }
+
+
+  /**
+   * Pure virtual method for converting projection information in the file being imported to an 
+   * ISIS Mapping group. 
+   *  
+   * @return An ISIS Mapping group
+   */
+  PvlGroup ImageImporter::convertProjection() const {
+    PvlGroup map("Mapping");
+    return map;
   }
 
 
@@ -130,8 +143,14 @@ namespace Isis {
           _FILEINFO_);
     }
     bandBin += name;
-    label->findObject("IsisCube").addGroup(bandBin);
-  
+    PvlObject &cubeObj = label->findObject("IsisCube");
+    cubeObj.addGroup(bandBin);
+
+    PvlGroup mapping = convertProjection();
+    if (mapping.keywords() > 0) {
+      cubeObj.addGroup(mapping);
+    }
+
     p.SetInputCube(cube);
     p.WriteHistory(*cube);
     p.SetProcessingDirection(ProcessByBrick::BandsFirst);

@@ -322,17 +322,30 @@ void DoWrap(Buffer &in) {
 
   // Write top pad?
   if (topPad == 1 && in.Line() == 1) {
-    double average = inputLineStats.Average();
+    double average = inputLineStats.Average(); //may be Isis::NULL8
     for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
       int inputIndex = outputIndex - leftPad;
-      if(inputIndex < 0) {
-        outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
-      }
-      else if(inputIndex < inputSize) {
-        outMan[outputIndex] = 2.0 * average - in[inputIndex];
+      if (average == Isis::NULL8) {
+        if(inputIndex < 0) {
+          outMan[outputIndex] = in[inputIndex + inputSize];
+        }
+        else if(inputIndex < inputSize) {
+          outMan[outputIndex] = in[inputIndex];
+        }
+        else {
+          outMan[outputIndex] = in[inputIndex - inputSize];
+        }
       }
       else {
-        outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
+        if(inputIndex < 0) {
+          outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
+        }
+        else if(inputIndex < inputSize) {
+          outMan[outputIndex] = 2.0 * average - in[inputIndex];
+        }
+        else {
+          outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
+        }
       }
     }
     outMan.SetLine(1);
@@ -361,17 +374,30 @@ void DoWrap(Buffer &in) {
 
   // Write bottom pad?
   if (bottomPad == 1 && in.Line() == inl) {
-    double average = inputLineStats.Average();
-    for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
-      int inputIndex = outputIndex - leftPad;
-      if(inputIndex < 0) {
-        outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
-      }
-      else if(inputIndex < inputSize) {
-        outMan[outputIndex] = 2.0 * average - in[inputIndex];
+    double average = inputLineStats.Average(); //may be Isis::NULL8
+    for (int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
+    int inputIndex = outputIndex - leftPad;
+      if (average == Isis::NULL8) {
+        if(inputIndex < 0) {
+          outMan[outputIndex] = in[inputIndex + inputSize];
+        }
+        else if(inputIndex < inputSize) {
+          outMan[outputIndex] = in[inputIndex];
+        }
+        else {
+          outMan[outputIndex] = in[inputIndex - inputSize];
+        }
       }
       else {
-        outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
+        if(inputIndex < 0) {
+          outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
+        }
+        else if(inputIndex < inputSize) {
+          outMan[outputIndex] = 2.0 * average - in[inputIndex];
+        }
+        else {
+          outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
+        }
       }
     }
     outMan.SetLine(inl + topPad + bottomPad);

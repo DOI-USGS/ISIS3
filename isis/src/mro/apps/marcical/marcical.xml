@@ -36,6 +36,14 @@ K.D. Supulver, and P.C. Thomas
       Fixed a problem where segmentation faults would occur if run 
       with the option "IOF=false"
     </change>
+    <change name="Janet Barrett" date="2014-07-01">
+      Added code to obtain exposure times from $mro/calibration/marci/varexp.tab
+      so they can be used when calibrating the input image. Also had to handle
+      images that have been flipped by marci2isis. Fixes #1860.
+    </change>
+    <change name="Moses Milazzo" date="2014-12-08">
+      Fixed a bug in exposure time accounting. Fixes #1860.
+    </change>
   </history>
 
   <groups>

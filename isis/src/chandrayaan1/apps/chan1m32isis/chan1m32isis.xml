@@ -8,16 +8,28 @@
 
  <description>
     This program imports Chandrayaan-1 Moon Mineralogy Mapper (M3) Level 1B (L1B) or Level 0 (L0) PDS
-    products into ISIS cubes. 
+    products into ISIS cubes.
+    <p>
+      The level 1B PDS data files have been processed to have north up and east to the right. This processing
+      is removed during the import of the data into ISIS. If the level 1B file is missing lines, the program will add 
+      lines of data containing the special pixel value NULL to pad the image to the correct number of lines. The
+      location of missing lines is determined by looking for time differences between adjacent records of the 
+      UTC_TIME table greater than the exposture duration. 
+    </p>
     <p>
       Chandrayaan-1 M3 L1B PDS data products consist of:
       <ul>
-        <li> An detached PDS label file </li> 
+        <li> A detached PDS label file </li> 
         <li> A multiple-band image file containing the calibrated spectral radiance image data in units 
       of (W/m^2/µm/sr)</li>
         <li> A 3-band image file containing pixel location data </li>
         <li> A 10 band image file containing observation geometry </li>
       </ul>
+    </p>
+    <p>
+      The level 0 PDS data files were not flipped or mirrored from the orientation they were in when collected. The level
+      0 files are missing the same lines as the level 1B files, but they do not contain the necessary information to add
+      NULL lines as do the level 1B products.
     </p>
     <p>
       Chandrayaan-1 M3 L0 PDS data products consist of:
@@ -35,6 +47,9 @@
     </change>
     <change name="Stuart Sides" date="2014-04-03">
       Updated documentation after reviews
+    </change>
+    <change name="Stuart Sides" date="2014-04-18">
+      Added missing line detection and correction based on the TIM table for level 1B products.
     </change>
   </history>
 
@@ -128,26 +143,6 @@
            *.cub
          </filter>
        </parameter>
-       <!--parameter name="ATTACHTIMING">
-         <type>boolean</type>
-         <default><item>TRUE</item></default>
-         <brief>
-           Attach the UTC timing to cube as binary table
-         </brief>
-         <description>
-           This option will attach the UTC timing information to the output cube as a binary table.  The timing data consists of the mid-time
-           for each image frame and are derived by decoding the spacecraft timing data, as supplied in the SPICE SCLK kernels, and then 
-           converting them from Ephemeris Time to UTC and Decimal Day of Year.  This table contains four columns of data:
-           <ol>
-             <li>Cube line number</li>
-             <li>Corresponding UTC time for the middle of the integration period for each cube line, formatted as YYYY-MM-DDTHH:MM:SS.SSSSSS</li>
-             <li>Year reference of decimal day of year extracted from earliest time of each line, formatted as YYYY</li>
-             <li>Decimal day of year representing the number of days elapsed since 00:00 UTC of January 1 of the year associated with time stamp
-                   of first image line, formatted as DDD.dddddddddddd where DDD represents the integer number of days and dddddddddddd represent the
-                   fractional part of the day of year value</li>
-           </ol>
-         </description>
-       </parameter-->
     </group>
   </groups>
 </application>

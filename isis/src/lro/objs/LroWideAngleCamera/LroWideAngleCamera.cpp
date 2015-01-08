@@ -95,7 +95,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    p_nframelets = ParentLines() / (frameletSize / sumMode);
+    p_nframelets = (int) (ParentLines() / (frameletSize / sumMode));
 
     // Setup the line detector offset map for each filter
     int nbands = (int) lab.findKeyword("Bands", PvlObject::Traverse);
@@ -175,8 +175,8 @@ namespace Isis {
 
     // flipping disabled if already flipped
     bool flippedFramelets = dataflipped;
-    dmap->SetFlippedFramelets(flippedFramelets, p_nframelets);
-    dmap->SetGeometricallyFlippedFramelets(false);
+    dmap->SetFrameletOrderReversed(flippedFramelets, p_nframelets);
+    dmap->SetFrameletsGeometricallyFlipped(false);
 
     //  get instrument-specific sample offset
     QString instModeId = inst["InstrumentModeId"][0].toUpper();
@@ -219,6 +219,14 @@ namespace Isis {
     }
   }
 
+
+
+  //! Destroys the LroWideAngleCamera object
+  LroWideAngleCamera::~LroWideAngleCamera() {
+  }
+
+
+
   /**
    * Sets the band in the camera model
    *
@@ -255,6 +263,8 @@ namespace Isis {
     return;
   }
 
+
+
   /**
    * @param key
    * @return @b int Pool key size
@@ -267,6 +277,8 @@ namespace Isis {
     if (!found) n = 0;
     return (n);
   }
+
+
 
   /**
    * @param key
@@ -293,6 +305,53 @@ namespace Isis {
     }
 
     return (parms);
+  }
+
+
+
+  /**
+   * The camera model is band dependent, so this method returns false
+   *
+   * @return bool False
+   */
+  bool LroWideAngleCamera::IsBandIndependent() {
+    return false;
+  }
+
+
+
+  /**
+   * CK frame ID -  - Instrument Code from spacit run on CK
+   *  
+   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   *         Kernel Frame ID
+   */
+  int LroWideAngleCamera::CkFrameId() const {
+    return (-85000);
+  }
+
+
+
+  /** 
+   * CK Reference ID - J2000
+   * 
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Reference ID
+   */
+  int LroWideAngleCamera::CkReferenceId() const {
+    return (1);
+  }
+
+
+
+  /** 
+   *  SPK Reference ID - J2000
+   *  
+   * @return @b int The appropriate instrument code for the Spacecraft 
+   *         Kernel Reference ID
+   */
+  int LroWideAngleCamera::SpkReferenceId() const {
+    return (1);
   }
 
 }

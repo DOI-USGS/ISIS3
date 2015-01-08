@@ -30,6 +30,7 @@ namespace Isis {
   class CubeAttributeOutput;
   class FileName;
   class ImageImporter;
+  class PvlGroup;
 
   /**
    * @brief Imports images with standard formats into Isis as cubes.
@@ -74,6 +75,15 @@ namespace Isis {
       int bands() const;
 
       FileName filename() const;
+
+
+      /**
+       * Pure virtual method for converting projection information in the file being imported to an 
+       * ISIS Mapping group. 
+       *  
+       * @return An ISIS Mapping group
+       */
+      virtual PvlGroup convertProjection() const;
 
       /**
        * Pure virtual method for returning true if the image is grayscale.

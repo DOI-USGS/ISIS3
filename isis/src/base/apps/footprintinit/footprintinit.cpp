@@ -17,14 +17,18 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
   cube.open(ui.GetFileName("FROM"), "rw");
+  bool testXY = ui.GetBoolean("TESTXY");
 
   // Make sure cube has been run through spiceinit
   try {
     cube.camera();
   }
   catch(IException &e) {
-    string msg = "Spiceinit must be run before initializing the polygon";
-    throw IException(e, IException::User, msg, _FILEINFO_);
+    if (!cube.projection()) {
+      string msg = "Spiceinit must be run before initializing the polygon";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    testXY = false;
   }
 
   Progress prog;
@@ -73,7 +77,7 @@ void IsisMain() {
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
-  if(ui.GetBoolean("TESTXY")) {
+  if(testXY) {
     Pvl cubeLab(ui.GetFileName("FROM"));
     PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
     QString target = inst["TargetName"];

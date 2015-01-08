@@ -1,29 +1,74 @@
-Unit Test for ThemisVisCamera...
-FileName: V14093008RDR.even.cub
-CK Frame: -53032
+Unit Test for ThemisVisCamera... 
 
-Kernel IDs: 
-CK Frame ID = -53000
-CK Reference ID = 16
-SPK Target ID = -53
-SPK Reference ID = 1
+FileName:  "V14093008RDR.even.cub" 
+CK Frame:  -53032 
 
-For upper left corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+Kernel IDs:  
+CK Frame ID      =  -53000 
+CK Reference ID  =  16 
+SPK Target ID    =  -53 
+SPK Reference ID =  1 
 
-For upper right corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+Is Band Independent:  false 
 
-For lower left corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+For upper left corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
 
-For lower right corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+For upper right corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
 
-For center pixel position ...
-Latitude OK
-Longitude OK
+For lower left corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+For lower right corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+For center framelet 14 pixel position ... 
+Latitude:     OK 
+Longitude:    OK 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+
+
+
+FileName:  "V14093008RDR.odd.cub" 
+CK Frame:  -53032 
+
+Kernel IDs:  
+CK Frame ID      =  -53000 
+CK Reference ID  =  16 
+SPK Target ID    =  -53 
+SPK Reference ID =  1 
+
+For upper left corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+For upper right corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+For lower left corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+For lower right corner ... 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+For center framelet 13 pixel position ... 
+Latitude:     OK 
+Longitude:    OK 
+DeltaSample:  OK 
+DeltaLine:    OK 
+
+
+
+
+Testing errors 
+**USER ERROR** Unable to create Themis VIS camera model from an image with InstrumentId [THEMIS_IR].

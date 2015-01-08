@@ -37,21 +37,23 @@ namespace Isis {
    * @author 2010-10-09 Debbie A. Cook
    *
    * @internal
-   *   @history 2010-11-01 Steven Lambright - Added methods setRadians and
-   *                           SetDegrees
-   *   @history 2012-02-16 Steven Lambright - Brought up to method and member
-   *                           naming standards.
+   *   @history 2010-11-01 Steven Lambright - Added methods setRadians and SetDegrees
+   *   @history 2012-02-16 Steven Lambright - Brought up to method and member naming standards.
    *   @history 2012-03-22 Steven Lambright - Renamed text() to toString().
-   *   @history 2012-06-29 Steven Lambright and Kimberly Oyama - Removed duplicate
-   *                           code from the contstructor. Added the fullRotation()
-   *                           method which creates an angle of 360 degrees and
-   *                           modified the unit test to exercise this. References #958.
+   *   @history 2012-06-29 Steven Lambright and Kimberly Oyama - Removed duplicate code from the
+   *                           contstructor. Added the fullRotation() method which creates
+   *                           an angle of 360 degrees and modified the unit test to
+   *                           exercise this. References #958.
    *   @history 2012-07-26 Steven Lambright and Kimberly Oyama - Modified the < and >
    *                           operators to make sure they do not return true if the
    *                           two operands are the same. Updated the unitTest to exercise
    *                           this change. References #604.
    *   @history 2013-02-01 Steven Lambright - Added QDebug() printout capabilities.
    *                           References #1060.
+   *   @history 2014-07-28 Kristin Berry - Added a constructor which accepts a Qstring of the form:
+   *                           "dd mm ss.ss" for angles provided in this format. 
+   *   @history 2014-08-21 Jeannie Backer - Modified isValid to utilize the IsValidPixel()
+   *                           method in the SpecialPixel header. References #1659.
    */
   class Angle {
 
@@ -77,6 +79,7 @@ namespace Isis {
     Angle();
     Angle(double angle, Units unit);
     Angle(const Angle& angle);
+    Angle(QString angle);
 
     virtual ~Angle();
 

@@ -147,13 +147,13 @@ wwwdoc: wwwschema
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "BEGIN SYNC: docs to public server"
-	rsync -vlHrt --delete --progress --rsh=ssh --exclude 'Schemas/*' --cvs-exclude $(ISISROOT)/doc/ $(USER)@jane-d:/www/sites/isis/htdocs/
+	rsync -vlHrt --delete --progress --rsh=ssh --exclude 'Schemas/*' --cvs-exclude $(ISISROOT)/doc/ $(USER)@isis-d:/var/www/html/htdocs/
 
 devdoc:  
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "BEGIN SYNC: docs to development server"
-	rsync -vlHrt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/ $(USERDEV)@astrodev:/www/sites/Isis/htdocs/
+	rsync -vlHrt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/ $(USERDEV)@astrodev:/var/www/html/htdocs/
 
 # copy Schemas to public www
 
@@ -161,8 +161,8 @@ wwwschema: schemas
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "SYNC: schemas to public server"
-	rsync -vlHrt --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/Schemas/ $(USER)@jane-d:/www/sites/isis/htdocs/Schemas/
-	rsync -vlHprt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/assets $(USER)@jane-d:/www/sites/isis/htdocs/
+	rsync -vlHrt --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/Schemas/ $(USER)@isis-d:/var/www/html/htdocs/Schemas/
+	rsync -vlHprt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/assets $(USER)@isis-d:/var/www/html/htdocs/
 
 
 

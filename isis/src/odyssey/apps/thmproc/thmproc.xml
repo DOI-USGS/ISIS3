@@ -76,6 +76,11 @@
     <change name="Steven Lambright" date="2008-08-04">
       Updated to use new pipeline class.
     </change>
+    <change name="Jeannie Backer" date="2014-08-22">
+      Updated vis test truth data for the RDR cube due to a modified in the THEMIS VIS distortion 
+      map. Added vis test for EDR data with MAPPING=true. Added error test. Improved test coverage 
+      to 95/98/100%. References #1659.
+    </change>
   </history>
 
   <category>

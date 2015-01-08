@@ -101,6 +101,9 @@ End_Group
       Added appTests.  Test coverage 79% scope, 91% line, 100% function covers all but 
       CameraRingsPointInfo::GetPointInfo() with allowErrors=true.
     </change>
+    <change name="Jeannie Backer" date="2014-08-22">
+      Updated truth data. References #1659.
+    </change>
   </history>
 
   <groups>

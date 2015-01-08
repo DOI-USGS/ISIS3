@@ -77,7 +77,11 @@ namespace Isis {
    *   @history 2013-03-27 Jeannie Backer - Added comment in code.
    *                           References #1248.
    *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection.  References #775.
-   *   @history 2013-04-08 Debbie A. Cook - Extended CameraPointInfo to CameraRingsPointInfo.  References #775
+   *   @history 2013-04-08 Debbie A. Cook - Extended CameraPointInfo to CameraRingsPointInfo.
+   *                           References #775
+   *   @history 2014-04-17 Jeannie Backer - Added check for valid azimuth values.  If
+   *                           not, print "NULL" to be consistent with caminfo's
+   *                           CamTools.cpp. References #1659
    */
   class CameraRingsPointInfo : public CameraPointInfo {
 

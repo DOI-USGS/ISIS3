@@ -22,8 +22,11 @@
  */
 #include "PushFrameCameraGroundMap.h"
 
+#include <QDebug>
+
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
+#include "Distance.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "PushFrameCameraDetectorMap.h"
@@ -48,12 +51,12 @@ namespace Isis {
     int startFramelet = 1;
     double startDist = FindSpacecraftDistance(1, surfacePoint);
 
-    int endFramelet = detectorMap->TotalFramelets();
-    double endDist = FindSpacecraftDistance(endFramelet, surfacePoint);
+    int    endFramelet = detectorMap->TotalFramelets();
+    double endDist     = FindSpacecraftDistance(endFramelet, surfacePoint);
 
     bool minimizedSpacecraftDist = false;
 
-    for(int j = 0; j < 30 && !minimizedSpacecraftDist; j++) {
+    for (int j = 0; j < 30 && !minimizedSpacecraftDist;j++) {
       int deltaX = abs(startFramelet - endFramelet) / 2;
 
       // start + deltaX = middle framelet.
@@ -65,7 +68,7 @@ namespace Isis {
       //  we dont overshoot it.
       double biasFactor = startDist / endDist;
 
-      if(biasFactor < 1.0) {
+      if (biasFactor < 1.0) {
         biasFactor = -1.0 / biasFactor;
         biasFactor = -(biasFactor + 1) / biasFactor;
 
@@ -82,9 +85,9 @@ namespace Isis {
       int middleFramelet = startFramelet + (int)(deltaX + biasFactor * deltaX);
       double middleDist = FindSpacecraftDistance(middleFramelet, surfacePoint);
 
-      if(startDist > endDist) {
+      if (startDist > endDist) {
         // This makes sure we don't get stuck halfway between framelets
-        if(startFramelet == middleFramelet) middleFramelet++;
+        if (startFramelet == middleFramelet) middleFramelet++;
         startFramelet = middleFramelet;
         startDist = middleDist;
       }
@@ -93,12 +96,12 @@ namespace Isis {
         endDist = middleDist;
       }
 
-      if(startFramelet == endFramelet) {
+      if (startFramelet == endFramelet) {
         minimizedSpacecraftDist = true;
       }
     }
 
-    if(!minimizedSpacecraftDist) {
+    if (!minimizedSpacecraftDist) {
       return false;
     }
 
@@ -107,31 +110,31 @@ namespace Isis {
     bool timeAscendingFramelets = detectorMap->timeAscendingFramelets();
 
     // Do we need to find a neighboring framelet? Get the closest (minimize distance)
-    if((timeAscendingFramelets && frameletEven != p_evenFramelets) ||
+    if ((timeAscendingFramelets && frameletEven != p_evenFramelets) ||
         (!timeAscendingFramelets && frameletEven == p_evenFramelets)) {
-      realFramelet ++; // this direction doesnt really matter... it's simply a guess
+      realFramelet++; // this direction doesnt really matter... it's simply a guess
     }
 
     int direction = 2;
 
     double realDist = FindDistance(realFramelet, surfacePoint);
-    int guessFramelet = realFramelet + direction;
-    double guessDist = FindDistance(guessFramelet, surfacePoint);
+    int    guessFramelet = realFramelet + direction;
+    double guessDist     = FindDistance(guessFramelet, surfacePoint);
 
-    if(guessDist > realDist) {
+    if (guessDist > realDist) {
       direction = -1 * direction; // reverse the search direction
       guessFramelet = realFramelet + direction;
       guessDist = FindDistance(guessFramelet, surfacePoint);
     }
 
-    for(int j = 0; (realDist >= guessDist) && (j < 30); j++) {
+    for (int j = 0; (realDist >= guessDist) && (j < 30);j++) {
       realFramelet = guessFramelet;
       realDist = guessDist;
 
       guessFramelet = realFramelet + direction;
       guessDist = FindDistance(guessFramelet, surfacePoint);
 
-      if(realFramelet <= 0 || realFramelet > detectorMap->TotalFramelets()) {
+      if (realFramelet <= 0 || realFramelet > detectorMap->TotalFramelets()) {
         return false;
       }
     }
