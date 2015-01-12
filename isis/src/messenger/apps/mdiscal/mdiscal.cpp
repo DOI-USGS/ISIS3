@@ -97,8 +97,8 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
   PvlGroup& inst = icube->group("Instrument");
   isNarrowAngleCamera = ((QString)inst["InstrumentId"] == "MDIS-NAC");
-  exposureDuration = inst["ExposureDuration"];
-  exposureDuration /= 1000.0;  //  Convert ms to sec
+  exposureDuration = inst["ExposureDuration"] ;
+  exposureDuration /= 1000.0;
 
   // Determine dark columns
   int fpuBin = inst["FpuBinningMode"];
@@ -521,13 +521,17 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
   Buffer& imageIn   = *in[0];
   Buffer& flatField = *in[1];
   Buffer& imageOut  = *out[0];
+  double t2 = smearComponent / imageIn.SampleDimension();
+  //exposureDuration is in seconds, but we need to work in ms.
+  double exposureTime = exposureDuration * 1000.0;
 
   if (imageIn.Line() == 1) {
     prevLineData.resize(imageIn.SampleDimension());
     smearData.resize(imageIn.SampleDimension());
+    double added = 16.0*t2/exposureTime;
 
     for (unsigned int i = 0; i < prevLineData.size(); i++) {
-      prevLineData[i] = 0.0;
+      prevLineData[i] = added;
       smearData[i] = 0.0;
     }
   }
@@ -582,10 +586,8 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
 
       // Step 3: Readout Smear Correction (ms -> seconds)
-      double t2 = smearComponent / imageIn.SampleDimension() / 1000.0;
-
-      if (exposureDuration > 0.0 && imageIn.Line() > 1) {
-        smearData[i] += t2 / exposureDuration * prevLineData[i];
+      if (exposureTime > 0.0) {
+        smearData[i] += t2 / exposureTime * prevLineData[i];
         imageOut[i] -= smearData[i];
       }
 
@@ -595,6 +597,9 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       imageOut[i] /= flatField[i]; // divide by flat field
 
       // Step 5: Absolute coefficient
+      // Using exposureDuration (in seconds). This gives ~ the same results
+      // as the previous version of mdiscal did. Using exposureTime gives
+      // a factor of 1000 smaller value, as one would expect. 
       if (exposureDuration > 0.0) {
         imageOut[i] = imageOut[i] / exposureDuration * abs_coef;
       }

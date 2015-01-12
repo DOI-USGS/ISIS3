@@ -65,7 +65,10 @@
     Accumulation  of signal continues during the finite duration of frame 
     transfer, inducing a  streak or frame-transfer smear in the wake of an 
     illuminated object in the  field of view, parallel to the direction of frame 
-    transfer.<br /><br />
+    transfer. Note that the frame transfer occurs in the calibration pixels as
+    well as on the imaging pixels. mdiscal accounts for the frame transfer smear
+    contributed from the 16 calibration lines (removed from the PDS-archived images).
+    <br /><br />
     Uniformity Correction:<br />
     Response uniformity, or flat field, is a measure of pixel-to-pixel
     variations  in responsivity. Measurements of response uniformity of the WAC 
@@ -94,279 +97,303 @@
       on this process
     </p>
     <PRE>
-Raw units are of DN converted to the physical units
-of radiance or I/F, following the calibration equation:
+        USAGE
+        =====
 
-L(x,y,f,T,t,b) = Lin[DN(x,y,f,T,t,b,MET) - Dk(x,y,T,t,b,MET) -
-Sm(x,y,t,b)] / [Flat(x,y,f,b) * t * Resp(f,b,T)]
+        Raw units are of DN converted to the physical units
+        of radiance or I/F, following the calibration equation:
 
-where:
+        L(x,y,f,T,t,b) = Lin[DN(x,y,f,T,t,b,MET) - Dk(x,y,T,t,b,MET) - 
+        Sm(x,y,t,b)] / {Flat(x,y,f,b) * t * [Resp(f,b,T)/Correct(f,MET)]}
 
-L(x,y,f,T,t,b) is radiance in units of W / (m**-2 microns**-1 sr**-1),
-measured by the pixel in column x, row y, through filter f, at CCD
-temperature T and exposure time t, for binning mode b,
+        where:
 
-DN(x,y,f,T,t,b,MET) is the raw DN measured by the pixel in column x, row
-y, through filter f, at CCD temperature T and exposure time t, for binning
-mode b, and Mission Elapsed Time (MET),
+        L(x,y,f,T,t,b) is radiance in units of W / (m**-2 microns**-1 sr**-1),
+        measured by the pixel in column x, row y, through filter f, at CCD
+        temperature T and exposure time t, for binning mode b,
 
-Dk(x,y,T,t,b,MET) is the dark level in a given pixel, derived from
-a model based on exposure time and CCD temperature,
+        DN(x,y,f,T,t,b,MET) is the raw DN measured by the pixel in column x, row
+        y, through filter f, at CCD temperature T and exposure time t, for binning
+        mode b, and Mission Elapsed Time (MET),
 
-Sm(x,y,t,b) is the scene-dependent frame transfer smear for the pixel,
+        Dk(x,y,T,t,b,MET) is the dark level in a given pixel, derived from
+        a model based on exposure time and CCD temperature,
 
-Lin is a function that corrects small nonlinearity of detector response,
+        Sm(x,y,t,b) is the scene-dependent frame transfer smear for the pixel,
 
-Flat(x,y,f,b) is the non-uniformity or 'flat-field' correction,
+        Lin is a function that corrects small nonlinearity of detector response,
 
-Resp(f,b,T) is the responsivity, relating dark-, flat-, and
-smear-corrected DN per unit exposure time to radiance,
+        Flat(x,y,f,b) is the non-uniformity or 'flat-field' correction,
 
-and
+        Resp(f,b,T) is the responsivity, relating dark-, flat-, and
+        smear-corrected DN per unit exposure time to radiance,
 
-t is the exposure time in milliseconds.
+        Correct(f,MET) is a time-variable correction to responsivity
+        describing a sudden decrease in transmission of the WAC optics
+        on 24 May 2011 and subsequent recovery to normal values, 
+        interpreted as due to contamination associated with MESSENGER's
+        first periapse season over Mercury's hot pole and the subsequent
+        bake-off of the contaminant, 
 
-The above equation assumes that data are in the native 12-bit format in
-which they were read off the CCD, and that onboard application of 12-to-8
-bit lookup tables (LUTs) has been inverted.
+        and
 
-This correction is done step-wise using the calibration tables and
-images in this directory as follows:
+        t is the exposure time.
 
-(1) Inversion of 12 to 8 bit Compression
-========================================
+        The above equation assumes that data are in the native 12-bit format in
+        which they were read off the CCD, and that onboard application of 12-to-8
+        bit lookup tables (LUTs) has been inverted.
 
-8-to-12 bit inversion of DN values is required when the value of
-MESS:COMP12_8 is 1 (when the data are 8-bit). There are 8 inverse lookup
-tables (LUTs). The table to use is indicated by the value of MESS:COMP_ALG
-from 0 through 7. An 8-bit value (in a row of the table) is inverted by
-replacing it with the 12-bit value in the column corresponding to a
-particular LUT.
+        This correction is done step-wise using the calibration tables and
+        images in this directory as follows.
 
-The inversion tables are given in the product MDISLUTINV_0.
 
+        (1) Inversion of 12 to 8 bit Compression
+        ========================================
 
-(2) Subtraction of modeled dark level
-=====================================
+        8-to-12 bit inversion of DN values is required when the value of
+        MESS:COMP12_8 is 1 (when the data are 8-bit). There are 8 inverse lookup
+        tables (LUTs). The table to use is indicated by the value of MESS:COMP_ALG
+        from 0 through 7. An 8-bit value (in a row of the table) is inverted by
+        replacing it with the 12-bit value in the column corresponding to a
+        particular LUT.
 
-There are four separate models of dark level (dark current plus
-electronics bias), for the MDIS-WAC and MDIS-NAC (as indicated by the
-keyword INSTRUMENT_ID), and for each camera, without pixel binning turned
-on (MESS:FPU_BIN = 0) or with pixel binning turned on (MESS:FPU_BIN = 1).
-The models estimates the dark level Dk(x,y,t,T) as a function of column
-position x, row position y, exposure time t (as indicated by the keyword
-MESS:EXPOSURE or EXPOSURE_DURATION), and CCD temperature T (as indicated
-by the keyword MESS:CCD_TEMP):
+        The inversion tables are given in the product MDISLUTINV_0.
 
-Dk(x,y,t,T) = C(T) + D(T) + [E(T) + F(T) * t] * y + {O(T) + P(T) * t +
- [Q(T) + S(T) * t] * y} * x
 
-Variables C(T), D(T), E(T), F(T), O(T), P(T), Q(T), and S(T) are all
-third-order functions of CCD temperature, for example:
+        (2) Subtraction of modeled dark level
+        =====================================
 
-C(T) = H0 + H1 * T + H2 * T**2 + H3 * T**3
+        Two methods are used for subtraction of the dark level, one for 
+        exposure times greater than 1 sec and one for exposure times less than 1 sec.
 
-In all cases x or y is in the range 0-1023 for a not-binned image (as
-indicated by the keyword MESS:FPU_BIN = 0) or 0-511 for a binned image (as
-indicated by the keyword MESS:FPU_BIN = 1). t is in units of milliseconds,
-and T is in UNCALIBRATED raw counts of CCD temperature.
+        In the method for exposure times less than 1 sec, the DN values are valid
+        columns in the masked 'dark strip' at the edge of the CCD are fitted
+        linearly as a function of line in the image. Then the fits are subtracted
+        from the pixels in each line of the CCD.
 
-For each pixel in column x and row y of an image, application of the
-correction is:
+        In the method for exposure times greater than 1 sec, a model is used which accounts
+        for variations in column (sample) in the image, which the previous 
+        method cannot do. However if the model were applied to longer exposures,
+        it would yield larger residuals than the previous method.
 
-DN_dark(x,y,t,T) = DN(x,y,t,T) - Dk(x,y,t,T)
+        There are four separate models of dark level (dark current plus
+        electronics bias), for the MDIS-WAC and MDIS-NAC (as indicated by the
+        keyword INSTRUMENT_ID), and for each camera, without pixel binning turned
+        on (MESS:FPU_BIN = 0) or with pixel binning turned on (MESS:FPU_BIN = 1).
+        The models estimates the dark level Dk(x,y,t,T) as a function of column
+        position x, row position y, exposure time t in milliseconds (as indicated 
+        by the keyword MESS:EXPOSURE or EXPOSURE_DURATION), and CCD temperature T 
+        (as indicated by the keyword MESS:CCD_TEMP):
 
-where
+        Dk(x,y,t,T) = C(T) + D(T) + [E(T) + F(T) * t] * y + {O(T) + P(T) * t +
+         [Q(T) + S(T) * t] * y} * x
 
-DN(x,y,t,T) is DN in 12-bit format,
+        Variables C(T), D(T), E(T), F(T), O(T), P(T), Q(T), and S(T) are all
+        third-order functions of CCD temperature, for example:
 
-Dk(x,y,t,T) is the predicted DN level from the dark modeldark model, and
+        C(T) = H0 + H1 * T + H2 * T**2 + H3 * T**3
 
-DN_dark(x,y,t,T) is dark-corrected DN.
+        In all cases x or y is in the range 0-1023 for a not-binned image (as
+        indicated by the keyword MESS:FPU_BIN = 0) or 0-511 for a binned image (as
+        indicated by the keyword MESS:FPU_BIN = 1). t is in units of milliseconds,
+        and T is in UNCALIBRATED raw counts of CCD temperature.
 
-The eight sets of coefficients for the WAC not-binned, WAC binned, NAC
-not-binned, and NAC binned dark models are given in the products
-MDISWAC_NOTBIN_DARKMODEL_0, MDISWAC_BINNED_DARKMODEL_0,
-MDISNAC_NOTBIN_DARKMODEL_0, and MDISNAC_BINNED_DARKMODEL_0 respectively.
+        For each pixel in column x and row y of an image, application of the
+        correction is:
 
+        DN_dark(x,y,t,T) = DN(x,y,t,T) - Dk(x,y,t,T)
 
-(3) Frame Transfer Smear Correction
-===================================
+        where
 
-Accumulation of signal continues during the finite duration
-of frame transfer induces a streak or frame-transfer smear in the wake
-of an illuminated object in the field of view, parallel to the direction
-of frame transfer. This smear is approximated as:
+        DN(x,y,t,T) is DN in 12-bit format,
 
-Sm(x,y,t,b,f) = SUMM(1,y-1) { t2/t * [DN_dark(x,y,t,b) -
-Sm(x,y,t,b,f)] / Flat(x,y,b,f)}
+        Dk(x,y,t,T) is the predicted DN level from the dark modeldark model, and
 
-where
+        DN_dark(x,y,t,T) is dark-corrected DN.
 
-Sm(x,y,t,b,f) is the smear in column x and row y at exposure time t
-in binning mode b and filter f,
+        The eight sets of coefficients for the WAC not-binned, WAC binned, NAC
+        not-binned, and NAC binned dark models are given in the products
+        MDISWAC_NOTBIN_DARKMODEL_0, MDISWAC_BINNED_DARKMODEL_0,
+        MDISNAC_NOTBIN_DARKMODEL_0, and MDISNAC_BINNED_DARKMODEL_0 respectively.
 
-Dk_dark (x,y,t,b) is dark-corrected DN in column x and row y at
-exposure time t and temperature T in binning mode b,
+        (3) Frame Transfer Smear Correction
+        ===================================
 
-Flat(x,y,b,f) is the flat-field correction in column x and row y in
-binning mode b and filter f,
+        Accumulation of signal continues during the finite duration
+        of frame transfer induces a streak or frame-transfer smear in the wake
+        of an illuminated object in the field of view, parallel to the direction
+        of frame transfer. This smear is approximated as:
 
-t is exposure time in ms, and
+        Sm(x,y,t,b,f) = SUMM(1,y-1) { t2/t * [DN_dark(x,y,t,b) -
+        Sm(x,y,t,b,f)] / Flat(x,y,b,f)}
 
-t2 is the time for frame transfer (about 3.4 ms) divided by the number of
-lines in the image in the direction of frame transfer, 1024 for
-full-frame images (when MESS:FPU_BIN = 0) or 512 for binned images (when
-MESS:FPU_BIN = 1).
+        where
 
-For each pixel in column x and row y of an image, application of the
-correction is :
+        Sm(x,y,t,b,f) is the smear in column x and row y at exposure time t
+        in binning mode b and filter f,
 
-DN_dark_smear(x,y,t,b,f) = DN_dark(x,y,t,b,f) - Sm(x,y,t,b,f)
+        Dk_dark (x,y,t,b) is dark-corrected DN in column x and row y at
+        exposure time t and temperature T in binning mode b,
 
-where
+        Flat(x,y,b,f) is the flat-field correction in column x and row y in
+        binning mode b and filter f,
 
-DN_dark_smear(x,y,t,b,f) is dark- and smear- corrected DN,
+        t is exposure time in milliseconds, and
 
-DN_dark(x,y,t,b,f) is dark-corrected DN, and
+        t2 is the time for frame transfer (about 3.4 ms) divided by the number of
+        lines in the image in the direction of frame transfer, 1024 for
+        full-frame images (when MESS:FPU_BIN = 0) or 512 for binned images (when
+        MESS:FPU_BIN = 1).
 
-Sm(x,y,t,b,f) is the smear calculated as shown above.
+        For each pixel in column x and row y of an image, application of the
+        correction is :
 
+        DN_dark_smear(x,y,t,b,f) = DN_dark(x,y,t,b,f) - Sm(x,y,t,b,f)
 
-(4) Correction for CCD non-linearity
-====================================
+        where
 
-To remove effects of nonlinearity in WAC image data, the following
-corrections should be applied after correction of dark current, bias,
-and smear.
+        DN_dark_smear(x,y,t,b,f) is dark- and smear- corrected DN,
 
-For DN_dark_smear &gt; 1 
- DN_lin = DN_dark_smear/[0.008760 * Ln(DN_dark_smear) + 0.936321]
+        DN_dark(x,y,t,b,f) is dark-corrected DN, and
 
-For DN_dark_smear &lt;= 1 
- DN_lin = DN_dark_smear/0.936321
+        Sm(x,y,t,b,f) is the smear calculated as shown above.
 
-To remove effects of nonlinearity in NAC image data, the following
-procedure should be applied after correction of dark current, bias,
-and smear.
 
-For DN_dark_smear &gt; 1 
- DN_lin = DN_dark_smear/[0.011844 * Ln(DN_dark_smear) +
-0.912031]
+        (4) Correction for CCD non-linearity
+        ====================================
 
-For DN_dark_smear &lt;= 1
- DN_lin = DN_dark_smear/0.912031
+        To remove effects of nonlinearity in WAC image data, the following
+        corrections should be applied after correction of dark current, bias,
+        and smear.
 
-where
+        For DN_dark_smear > 1
+        DN_lin = DN_dark_smear/[0.008760 * Ln(DN_dark_smear) + 0.936321]
 
-DN_dark_smear is the input dark- and smear-corrected DN, and
+        For DN_dark_smear less than or equal to 1
+        DN_lin = DN_dark_smear/0.936321
 
-DN_lin is linearized dark- and smear-corrected DN.
+        To remove effects of nonlinearity in NAC image data, the following
+        procedure should be applied after correction of dark current, bias,
+        and smear.
 
+        For DN_dark_smear > 1
+        DN_lin = DN_dark_smear/[0.011844 * Ln(DN_dark_smear) + 0.912031]
 
-(5) Flat-field correction
-=========================
+        For DN_dark_smear less than or equal to 1
+        DN_lin = DN_dark_smear/0.912031
 
-The flat field correction removes pixel to pixel differences in detector
-responsivity, so that the responsivity coefficients can be expressed as
-scalars for each filter. There is a separate flat-field image for MDIS-WAC
-and MDIS-NAC (as indicated by the keyword INSTRUMENT_ID), without pixel
-binning turned on (MESS:FPU_BIN = 0) or with pixel binning turned on
-(MESS:FPU_BIN = 1), for each separate filter (as indicated by the keyword
-FILTER_NUMBER). All of the files are in the 'FLAT' directory.
+        where
 
-For each pixel in column x and row y of an image, application of the
-correction is
+        DN_dark_smear is the input dark- and smear-corrected DN, and
 
-DN_flat(x,y,f,b) = DN_lin(x,y,f,b) / Flat(x,y,f,b)
+        DN_lin is linearized dark- and smear-corrected DN.
 
-where
 
-DN_flat(x,y,f,b) is flat-fielded, linearized, dark- and smear-corrected
-DN,
+        (5) Flat-field correction
+        =========================
 
-DN_lin(x,y,f,b) is linearized dark- and smear-corrected DN, and
+        The flat field correction removes pixel to pixel differences in detector
+        responsivity, so that the responsivity coefficients can be expressed as
+        scalars for each filter. There is a separate flat-field image for MDIS-WAC
+        and MDIS-NAC (as indicated by the keyword INSTRUMENT_ID), without pixel
+        binning turned on (MESS:FPU_BIN = 0) or with pixel binning turned on
+        (MESS:FPU_BIN = 1), for each separate filter (as indicated by the keyword
+        FILTER_NUMBER). All of the files are in the 'FLAT' directory.
 
-Flat(x,y,f,b) is the value in the appropriate flat-field image.
+        For each pixel in column x and row y of an image, application of the
+        correction is
 
+        DN_flat(x,y,f,b) = DN_lin(x,y,f,b) / Flat(x,y,f,b)
 
-(6) Conversion from DNs to radiance 
- ===================================
-The value that relates corrected DN's measured per unit time to radianceis the
-responsivity. Responsivity is modeled as a function of which camera is being
-used (MDIS-WAC or MDIS-NAC as indicated by the keyword INSTRUMENT_ID), its
-binning state (as indicated by the keyword MESS:FPU_BIN), and in the case of the
-WAC the filter number (as indicated by the keyword FILTER_NUMBER). The
-coefficients used to calculate the responsivity are in the 'RESPONSIVITY'
-directory. For a camera, binning state, and filter, the responsivity is
-calculated from uncalibrated CCD temperature (as indicated by the keyword
-MESS:CCD_TEMP) as follows:
- 
-Resp(T,b) = R(t=-30.3C,b) * [correction_offset(b) + T(CCD) * correction_coef1(b)
-+ T(CCD)^2 * correction_coef2(b)]
+        where
 
-where
+        DN_flat(x,y,f,b) is flat-fielded, linearized, dark- and smear-corrected
+        DN,
 
-Resp(T,b) is responsivity at CCD temperature T in binning state b,
+        DN_lin(x,y,f,b) is linearized dark- and smear-corrected DN, and
 
-T(CCD) is raw CCD temperature in units of DNs,
+        Flat(x,y,f,b) is the value in the appropriate flat-field image.
 
-R(t=-30.3C,b) is responsivity in binning state b at CCD temperature of 1060 DN
-(-30.3C),
 
-correction_offset(b) is the camera-dependent temperature correction offset for
-binning state b,
+        (6) Conversion from DNs to radiance
+        ===================================
 
-correction_coef1(b) is the camera-dependent temperature correction first-order
-coefficient for binning state b.
+        The value that relates corrected DN's measured per unit time to radiance
+        is the responsivity. Responsivity is modeled as a function of which camera
+        is being used (MDIS-WAC or MDIS-NAC as indicated by the keyword
+        INSTRUMENT_ID), its binning state (as indicated by the keyword
+        MESS:FPU_BIN), and in the case of the WAC the filter number (as indicated
+        by the keyword FILTER_NUMBER). The coefficients used to calculate the
+        responsivity are in the 'RESPONSIVITY' directory. For a camera, binning
+        state, and filter, the responsivity is calculated from uncalibrated CCD
+        temperature (as indicated by the keyword MESS:CCD_TEMP) as follows:
 
-correction_coef2(b) is the camera-dependent temperature correction second-order
-coefficient for binning state b.
+        Resp(f,T,b) = R(f,t=-30.3C,b) * [correction_offset(f,b) + T(CCD) * 
+        correction_coef1(f,b) + T(CCD)^2 * correction_coef2(f,b)]
 
-The temperature correction defaults to unity at CCD temperature of 1060 DN
-(-30.3C).
+        where 
 
-To apply responsivity to obtain radiance L, the expression is
+        Resp(f,T,b) is responsivity in filter f at CCD temperature T in binning 
+        state b, 
 
-L = DN_flat / (t * Resp(T,b))
+        T(CCD) is raw CCD temperature in units of DNs, 
 
-where
+        R(f,t=-30.3C,b) is responsivity in filter f in binning state b at CCD 
+        temperature of 1060 DN (-30.3C), 
 
-L is radiance in units of W / (m**2 microns**1 sr**1),
+        correction_offset(f,b) is camera- and filter-dependent temperature 
+        correction offset for filter f and binning state b, 
 
-DN_flat is dark-, smear-, linearity-, and flat field-corrected DN,
+        correction_coef1(f,b) is the camera- and filter-dependent temperature 
+        correction first-order coefficient for filter f and binning state b.
 
-t is the exposure time in milliseconds, and
+        correction_coef2(f,b) is the camera- and filter-dependent temperature 
+        correction second-order coefficient for filter f and binning state b.
 
-Resp(f,T,b) is the responsivity in filter f at CCD temperature T and
-binning state b.
+        To apply responsivity to obtain radiance L, the expression is
 
+        L(f) = DN_flat(f) / (t * Resp(f,T,b) * Correct(f, MET))
 
-(7) Conversion from radiance to I/F
-===================================
+        where
 
-To convert from radiance to I/F (also known as radiance factor, the ratio
-of measured radiance to that which would be measured from a white
-perfectly Lambertian surface), the following expression should be applied:
+        L is radiance in units of W / (m**2 microns**1 sr**1),
 
-I_over_F(f) = L(f) * pi * (SOLAR_DISTANCE/149597870.691)**2 / F(f)
+        DN_flat is dark-, smear-, linearity-, and flat field-corrected DN,
 
-where
+        t is the exposure time in seconds, 
 
-L(f) is calibrated radiance calculated as described above for some filter
-f,
+        Resp(f,T,b) is the responsivity in filter f at CCD temperature T and
+        binning state b, and 
 
-SOLAR_DISTANCE is that value for distance of the target object from the
-center of the sun in kilometers (as indicated by the keyword
-SOLAR_DISTANCE)
+        Correct(f, MET) is the temporal correction to responsivity for 
+        filter f at time MET.
 
-149597870.691 is the number of kilometers in 1 AU
 
-F(f) is effective average solar irradiance sampled under the filter
-bandpass.
+        (7) Conversion from radiance to I/F
+        ===================================
 
-The effective average solar radiance for each camera and bandpass is given
-in the SOLAR directory.
+        To convert from radiance to I/F (also known as radiance factor, the ratio
+        of measured radiance to that which would be measured from a white
+        perfectly Lambertian surface), the following expression should be applied:
+
+        I_over_F(f) = L(f) * pi * (SOLAR_DISTANCE/149597870.691)**2 / F(f)
+
+        where
+
+        L(f) is calibrated radiance calculated as described above for some filter
+        f,
+
+        SOLAR_DISTANCE is that value for distance of the target object from the
+        center of the sun in kilometers (as indicated by the keyword
+        SOLAR_DISTANCE)
+
+        149597870.691 is the number of kilometers in 1 AU
+
+        F(f) is effective average solar irradiance sampled under the filter
+        bandpass.
+
+        The effective average solar radiance for each camera and bandpass is given
+        in the SOLAR directory.
     </PRE>
 
     <p>
@@ -493,6 +520,12 @@ in the SOLAR directory.
    <change name="Kris Becker" date="2012-10-24">
      Incremented the CDR version number from 3 to 4 per the request by the
      MESSENGER team.
+   </change>
+   <change name="Moses Milazzo" date="2014-11-14">
+     Updated the smear correction to account for the 16 lines of calibration data
+     that are not on the PDS images but still contribute to frame transfer smearing.
+     Also updated the calibration tables (MDISWAC_FRAME_TRANSFER_??.TAB) with the 
+     correct frame transfer speed. Documentation was updated as well.
    </change>
   </history>
 
