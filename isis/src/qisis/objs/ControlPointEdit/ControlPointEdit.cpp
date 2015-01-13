@@ -84,7 +84,7 @@ namespace Isis {
 
 
 
-  ControlPointEdit::~ControlPointEdit () {
+  ControlPointEdit::~ControlPointEdit() {
 
     delete p_leftChip;
     p_leftChip = NULL;
@@ -861,7 +861,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Find point from left ChipViewport in the right ChipViewport
    *
@@ -896,37 +895,38 @@ namespace Isis {
 
   }
 
+  
   /**
    * Sub-pixel register point in right chipViewport with point in
    * left.
    * @internal
-   *   @history 2008-15-2008  Jeannie Walldren - Throw and catch
-   *            error before creating QMessageBox
-   *   @history 2009-03-23  Tracie Sucharski - Added private p_autoRegAttempted
-   *                             for the SaveChips method.
-   *   @history 2010-02-16  Tracie Sucharski- If autoreg fails,
-   *                             print registration stats.
-   *   @history 2010-02-18  Tracie Sucharski - Registration stats wasn't the
-   *                             correct info to print.  Instead, check
-   *                             registrationStatus and print separate errors
-   *                             for each possibility.
-   *   @history 2010-02-22  Tracie Sucharski - Added more info for registration
-   *                             failures.
-   *   @history 2010-06-08  Jeannie Walldren - Catch error and
-   *                             warn user if unable to load
-   *                             pattern (left) or search (right)
-   *                             chip
-   *   @history 2010-10-12  Tracie Sucharski - Clean up try/catch blocks.
-   *   @history 2011-06-27  Tracie Sucharski - If un-doing registration, change
-   *                             save button back to black.  If registration
-   *                             successful, change save button to red.
-   *   @history 2011-10-21  Tracie Sucharski - Add try/catch around registration
-   *                             to catch errors thrown from autoreg class.
+   *   @history 2008-15-2008 Jeannie Walldren - Throw and catch
+   *                           error before creating QMessageBox
+   *   @history 2009-03-23 Tracie Sucharski - Added private p_autoRegAttempted
+   *                           for the SaveChips method.
+   *   @history 2010-02-16 Tracie Sucharski- If autoreg fails,
+   *                           print registration stats.
+   *   @history 2010-02-18 Tracie Sucharski - Registration stats wasn't the
+   *                           correct info to print.  Instead, check
+   *                           registrationStatus and print separate errors
+   *                           for each possibility.
+   *   @history 2010-02-22 Tracie Sucharski - Added more info for registration
+   *                           failures.
+   *   @history 2010-06-08 Jeannie Walldren - Catch error and
+   *                           warn user if unable to load
+   *                           pattern (left) or search (right)
+   *                           chip
+   *   @history 2010-10-12 Tracie Sucharski - Clean up try/catch blocks.
+   *   @history 2011-06-27 Tracie Sucharski - If un-doing registration, change
+   *                           save button back to black.  If registration
+   *                           successful, change save button to red.
+   *   @history 2011-10-21 Tracie Sucharski - Add try/catch around registration
+   *                           to catch errors thrown from autoreg class.
    *
    */
 
   void ControlPointEdit::registerPoint() {
-
+        
     if ( p_autoRegShown ) {
       //  Undo Registration
       p_autoRegShown = false;
@@ -1048,40 +1048,42 @@ namespace Isis {
     p_autoReg->setText("Undo Registration");
   }
 
+  
   /**
    * Save control measure under the crosshair in right ChipViewport
    * @internal
-   *   @history 2008-12-30 Jeannie Walldren - Modified to update
-   *                          user (chooser) name and date when
-   *                          point is saved
+   *   @history 2008-12-30 Jeannie Walldren - Modified to update user (chooser) name and date when
+   *                           point is saved
    *   @history 2010-11-19 Tracie Sucharski - Renamed from savePoint.
    *   @history 2011-03-04 Tracie Sucharski - If auto reg info is shown, save
-   *                          the GoodnessOfFit value to the right
-   *                          ControlMeasure log entry.  Changed the way
-   *                          the left viewport is updated if the left and
-   *                          right measure are the same.  Simply copy the
-   *                          right measure into the left and re-load the left
-   *                          measure.  If measure currently has type of
-   *                          subPixelRegistered, but the new position has
-   *                          not be sub-pixel registered, change measure type
-   *                          and get rid of goodness of fit.
+   *                           the GoodnessOfFit value to the right
+   *                           ControlMeasure log entry.  Changed the way
+   *                           the left viewport is updated if the left and
+   *                           right measure are the same.  Simply copy the
+   *                           right measure into the left and re-load the left
+   *                           measure.  If measure currently has type of
+   *                           subPixelRegistered, but the new position has
+   *                           not be sub-pixel registered, change measure type
+   *                           and get rid of goodness of fit.
    *   @history 2011-06-14 Tracie Sucharski - Change Save Measure button text
-   *                          back to black.
+   *                           back to black.
    *   @history 2011-07-19 Tracie Sucharski - Updated for new functionality
-   *                          of registration pixel shift.  ControlMeasure
-   *                          will now calculate based on aprioriSample/Line
-   *                          and current coordinate.  If autoreg has been
-   *                          calculated, save coordinate to apriori before
-   *                          updating to subpixel registered coordinate.
+   *                           of registration pixel shift.  ControlMeasure
+   *                           will now calculate based on aprioriSample/Line
+   *                           and current coordinate.  If autoreg has been
+   *                           calculated, save coordinate to apriori before
+   *                           updating to subpixel registered coordinate.
    *   @history 2013-11-07 Tracie Sucharski - Moved error checking on edit locked measures from
-   *                          QnetTool::measureSaved to ::saveMeasure.  The error checking now
-   *                          forces the edit lock check box to be unchecked before the measure
-   *                          can be saved.
-   *
+   *                           QnetTool::measureSaved to ::saveMeasure.  The error checking now
+   *                           forces the edit lock check box to be unchecked before the measure
+   *                           can be saved.
+   *   @history 2014-01-09 Ian Humphrey - Modified to prevent segmentation fault that arises when
+   *                           registering, opening a template file, and saving the measure.
+   *                           Fixes #2041.
    */
   void ControlPointEdit::saveMeasure() {
 
-    if ( p_rightMeasure != NULL ) {
+    if (p_rightMeasure != NULL) {
 
       if (p_rightMeasure->IsEditLocked()) {
         QString message = "The right measure is locked.  You must first unlock the measure by ";
@@ -1090,7 +1092,30 @@ namespace Isis {
         return;
       }
 
-      if ( p_autoRegShown ) {
+      if (p_autoRegShown) {
+        try {
+          //  Save  autoreg parameters to the right measure log entry
+          //  Eccentricity may be invalid, check before writing.
+          p_rightMeasure->SetLogData(ControlMeasureLogData(
+                                     ControlMeasureLogData::GoodnessOfFit,
+                                     p_autoRegFact->GoodnessOfFit()));
+          double minZScore, maxZScore;
+          p_autoRegFact->ZScores(minZScore,maxZScore);
+          p_rightMeasure->SetLogData(ControlMeasureLogData(
+                                     ControlMeasureLogData::MinimumPixelZScore,
+                                     minZScore));
+          p_rightMeasure->SetLogData(ControlMeasureLogData(
+                                     ControlMeasureLogData::MaximumPixelZScore,
+                                     maxZScore));
+        } 
+        // need to handle exception that SetLogData throws if our data is invalid -
+        // unhandled exceptions thrown in Qt signal and slot connections produce undefined behavior
+        catch (IException &e) {
+          QString message = e.toString();
+          QMessageBox::critical((QWidget *)parent(), "Error", message);
+          return;
+        }
+        
         //  Reset AprioriSample/Line to the current coordinate, before the
         //  coordinate is updated with the registered coordinate.
         p_rightMeasure->SetAprioriSample(p_rightMeasure->GetSample());
@@ -1098,19 +1123,6 @@ namespace Isis {
 
         p_rightMeasure->SetChooserName("Application qnet");
         p_rightMeasure->SetType(ControlMeasure::RegisteredSubPixel);
-        //  Save  autoreg parameters to the right measure log entry
-        //  Eccentricity may be invalid, check before writing.
-        p_rightMeasure->SetLogData(ControlMeasureLogData(
-                               ControlMeasureLogData::GoodnessOfFit,
-                               p_autoRegFact->GoodnessOfFit()));
-        double minZScore, maxZScore;
-        p_autoRegFact->ZScores(minZScore,maxZScore);
-        p_rightMeasure->SetLogData(ControlMeasureLogData(
-                                 ControlMeasureLogData::MinimumPixelZScore,
-                                 minZScore));
-        p_rightMeasure->SetLogData(ControlMeasureLogData(
-                                 ControlMeasureLogData::MaximumPixelZScore,
-                                 maxZScore));
 
         p_autoRegShown = false;
         p_autoRegExtension->hide();
@@ -1134,8 +1146,8 @@ namespace Isis {
 
     }
 
-    if ( p_allowLeftMouse ) {
-      if ( p_leftMeasure != NULL ) {
+    if (p_allowLeftMouse) {
+      if (p_leftMeasure != NULL) {
         if (p_leftMeasure->IsEditLocked()) {
           QString message = "The left measure is locked.  You must first unlock the measure by ";
           message += "clicking the check box above labeled \"Edit Lock Measure\".";
@@ -1152,8 +1164,8 @@ namespace Isis {
 
     //  If the right chip is the same as the left chip, copy right into left and
     //  re-load the left.
-    if ( p_rightMeasure->GetCubeSerialNumber() ==
-         p_leftMeasure->GetCubeSerialNumber() ) {
+    if (p_rightMeasure->GetCubeSerialNumber() ==
+        p_leftMeasure->GetCubeSerialNumber()) {
 
       *p_leftMeasure = *p_rightMeasure;
       setLeftMeasure(p_leftMeasure,p_leftCube,p_pointId);
@@ -1167,18 +1179,16 @@ namespace Isis {
   }
 
 
-
   /**
    * Slot to update the geomed right ChipViewport for zoom
    * operations
    * @internal
    *   @history 2008-15-2008  Jeannie Walldren - Added error string to
-   *                            iException::Message before
-   *                            creating QMessageBox
+   *                              iException::Message before creating QMessageBox
    */
   void ControlPointEdit::updateRightGeom() {
 
-    if ( p_geomIt ) {
+    if (p_geomIt) {
       try {
         p_rightView->geomChip(p_leftChip, p_leftCube);
 
@@ -1265,13 +1275,12 @@ namespace Isis {
    *
    * @internal
    *   @history  2007-06-15 Tracie Sucharski - Grey out zoom buttons
-   *   @history 2008-15-2008 Jeannie Walldren - Added error string to
-   *                            iException::Message before
-   *                            creating QMessageBox
+   *   @history 2008-15-2008 Jeannie Walldren - Added error string to iException::Message before
+   *                             creating QMessageBox
    **/
   void ControlPointEdit::setGeom() {
 
-    if ( p_geomIt == true ) return;
+    if (p_geomIt == true) return;
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1465,6 +1474,8 @@ namespace Isis {
    *                          only allow the template file to be modified if
    *                          registration is successfull, otherwise the
    *                          original template file is kept.
+   *   @history 2014-12-11 Ian Humphrey - Modified code so opening a template file will undo 
+   *                           registration if a point is already registered. Fixes #2041.
    */
   bool ControlPointEdit::setTemplateFile(QString fn) {
 
@@ -1485,6 +1496,12 @@ namespace Isis {
       p_autoRegFact = reg;
 
       p_templateFileName = fn;
+      
+      // undo registration if a point is already registered
+      // this prevents the user from saving a measure with invalid data
+      if (p_autoRegShown)
+        registerPoint();
+      
       return true;
     }
     catch (IException &e) {
