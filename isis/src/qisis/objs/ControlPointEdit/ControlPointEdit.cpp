@@ -1077,9 +1077,11 @@ namespace Isis {
    *                           QnetTool::measureSaved to ::saveMeasure.  The error checking now
    *                           forces the edit lock check box to be unchecked before the measure
    *                           can be saved.
-   *   @history 2014-01-09 Ian Humphrey - Modified to prevent segmentation fault that arises when
-   *                           registering, opening a template file, and saving the measure.
-   *                           Fixes #2041.
+   *   @history 2015-01-09 Ian Humphrey - Modified to prevent segmentation fault that arises when
+   *                           registering, opening a template file, and saving the measure. This
+   *                           was caused by not handling the exception thrown by 
+   *                           ControlMeasure::SetLogData(), which produces undefined behavior
+   *                           within the Qt signal-slot connection mechanism.
    */
   void ControlPointEdit::saveMeasure() {
 
@@ -1475,7 +1477,7 @@ namespace Isis {
    *                          registration is successfull, otherwise the
    *                          original template file is kept.
    *   @history 2014-12-11 Ian Humphrey - Modified code so opening a template file will undo 
-   *                           registration if a point is already registered. Fixes #2041.
+   *                           registration if a point is already registered.
    */
   bool ControlPointEdit::setTemplateFile(QString fn) {
 
