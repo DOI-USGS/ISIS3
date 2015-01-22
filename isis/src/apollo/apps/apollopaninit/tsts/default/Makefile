@@ -1,10 +1,12 @@
 APPNAME = apollopaninit
 
+apolloPanImageOutput.cub.TOLERANCE = .000001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	cp $(INPUT)/apolloPanImage.cub $(OUTPUT)/ > /dev/null;
-	$(APPNAME) from = $(OUTPUT)/apolloPanImage.cub \
+	cp $(INPUT)/apolloPanImage.cub $(OUTPUT)/apolloPanImageOutput.cub> /dev/null;
+	$(APPNAME) from = $(OUTPUT)/apolloPanImageOutput.cub \
 		Mission = "APOLLO15" \
 		Microns = 50 \
 		GMT = "1971-08-04 16:28:25.829" \
@@ -16,5 +18,10 @@ commands:
 		VEL_AZM = 292.6602745 \
 		VEL_HORIZ = 1.6212918 \
 		VEL_RADIAL = -0.0056892 > /dev/null;
-	catlab from=$(OUTPUT)/apolloPanImage.cub to=$(OUTPUT)/label.pvl > /dev/null;
-	$(RM) $(OUTPUT)/apolloPanImage.cub > /dev/null;
+	catlab from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/label.pvl > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/BodyRotationTable.txt name=BodyRotation > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/SunPositionTable.txt name=InstrumentPointing > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/InstrumentPositionTable.txt name=InstrumentPointing > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/InstrumentPointingTable.txt name=InstrumentPointing > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/FiducialMeasurementTable.txt name=InstrumentPointing > /dev/null;
+	rm $(OUTPUT)/apolloPanImageOutput.cub > /dev/null;
