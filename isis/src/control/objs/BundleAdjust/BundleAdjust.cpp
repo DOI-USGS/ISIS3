@@ -1149,9 +1149,9 @@ namespace Isis {
       if (!m_bConverged)
         m_cumProRes->initialize(101);
 
-      // if we're still going, release cholmod_factor (if we don't, memory leaks will occur),
+      // if we're using CHOLMOD and still going, release cholmod_factor (if we don't, memory leaks will occur),
       // otherwise we need it for error propagation
-      if (!m_bDeltack) {
+      if ( m_decompositionMethod == CHOLMOD ) {
         if (!m_bConverged || (m_bConverged && !m_bErrorPropagation))
           cholmod_free_factor(&m_L, &m_cm);
       }
