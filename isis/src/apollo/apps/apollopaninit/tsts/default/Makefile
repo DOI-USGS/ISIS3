@@ -19,9 +19,9 @@ commands:
 		VEL_HORIZ = 1.6212918 \
 		VEL_RADIAL = -0.0056892 > /dev/null;
 	catlab from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/label.pvl > /dev/null;
-	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/BodyRotationTable.txt name=BodyRotation > /dev/null;
-	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/SunPositionTable.txt name=InstrumentPointing > /dev/null;
-	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/InstrumentPositionTable.txt name=InstrumentPointing > /dev/null;
-	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/InstrumentPointingTable.txt name=InstrumentPointing > /dev/null;
-	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/FiducialMeasurementTable.txt name=InstrumentPointing > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/BodyRotationTable.csv name=BodyRotation > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/SunPositionTable.csv name=SunPosition > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/InstrumentPositionTable.csv name=InstrumentPosition > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/InstrumentPointingTable.csv name=InstrumentPointing > /dev/null;
+	tabledump from=$(OUTPUT)/apolloPanImageOutput.cub to=$(OUTPUT)/FiducialMeasurementTable.csv name="Fiducial Measurement" > /dev/null;
 	rm $(OUTPUT)/apolloPanImageOutput.cub > /dev/null;
