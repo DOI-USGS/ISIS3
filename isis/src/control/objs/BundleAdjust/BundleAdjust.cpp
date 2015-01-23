@@ -1090,7 +1090,7 @@ namespace Isis {
       // check for convergence
       if ( !m_bDeltack ) {
         if (fabs(dSigma0_previous - m_dSigma0) <= m_dConvergenceThreshold) {
-          //convergeance detected
+          //convergence detected
           if (m_maxLikelihoodIndex+1 < 3 && m_maxLikelihoodFlag[m_maxLikelihoodIndex+1]) {  //if maximum likelihood tiers are being processed check to see if there's another tier to go //if there's another tier to go check the flag to see if it's enabled
             m_maxLikelihoodIndex++;  //if there's another tier to go then continue with the next maximum likelihood model
           }
@@ -1145,8 +1145,16 @@ namespace Isis {
         break;
       }
 
-      //restart the dynamic calculation of the cumulative probility distribution of residuals (in unweighted pixels) --so it will be up to date for the next iteration
-      if (!m_bConverged) m_cumProRes->initialize(101);
+      // restart the dynamic calculation of the cumulative probility distribution of residuals (in unweighted pixels) --so it will be up to date for the next iteration
+      if (!m_bConverged)
+        m_cumProRes->initialize(101);
+
+      // if we're still going, release cholmod_factor (if we don't, memory leaks will occur),
+      // otherwise we need it for error propagation
+      if (!m_bDeltack) {
+        if (!m_bConverged || (m_bConverged && !m_bErrorPropagation))
+          cholmod_free_factor(&m_L, &m_cm);
+      }
 
       SpecialKIterationSummary();
 

@@ -165,6 +165,9 @@ namespace Isis {
    *                         the number of valid (Ignore= False) measures.
    *   @history 2014-02-25 Ken Edmundson - Speed up and memory improvements to error propagation.
    *                         References #2031.
+   *   @history 2014-11-05 Ken Edmundson - Fixed memory bug. Wasn't releasing cholmod_factor m_L
+   *                         every iteration. Now release every iteration but the last since we
+   *                         need m_L for error propagation. References #2189.
    */
   class BundleAdjust {
     public:
