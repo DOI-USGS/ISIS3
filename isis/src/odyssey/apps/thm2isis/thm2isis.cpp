@@ -198,17 +198,41 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
 
   // Create the Band bin Group
   PvlGroup bandBin("BandBin");
+
+  // The original band is the original ISIS cube band number upon ingestion
   PvlKeyword originalBand("OriginalBand");
   for(int i = 1; i <= numBands; i++) {
     originalBand.addValue(toString(i));
   }
   bandBin += originalBand;
+
   bandBin += sqube.findGroup("BandBin")["BandBinCenter"];
-  bandBin += sqube.findGroup("BandBin")["BandBinWidth"];
-  bandBin += sqube.findGroup("BandBin")["BandBinFilterNumber"];
   bandBin["BandBinCenter"].setName("Center");
+
+  bandBin += sqube.findGroup("BandBin")["BandBinWidth"];
   bandBin["BandBinWidth"].setName("Width");
+
+  // The FilterNumber keyword is a list indicating the time-ordered filter number of the
+  // corresponding ISIS band. These values also indicate the physical order of the bands in the
+  // detector array. They are numbered by ascending times (or starting detector lines).
+  bandBin += sqube.findGroup("BandBin")["BandBinFilterNumber"];
   bandBin["BandBinFilterNumber"].setName("FilterNumber");
+
+  // The BandNumber keyword is a list of wavelength-ordered band
+  // numbers corresponding to filter numbers for each ISIS band.
+  //
+  // For IR, BandNumber always matches filter number since the filters are found
+  // on the ccd in ascending wavelength order.
+  //
+  // For VIS, we have the following one to one correspondence of these keywords:
+  // BandNumber   {1, 2, 3, 4, 5}
+  // FilterNumber {2, 5, 3, 4, 1}
+  // 
+  // Note that the BandNumber will match the OriginalBand only if the image
+  // to be imported contains band number 1 and is not missing consecutive band numbers.
+  bandBin += sqube.findGroup("BandBin")["BandBinBandNumber"];
+  bandBin["BandBinBandNumber"].setName("BandNumber");
+
   isis3.addGroup(bandBin);
 
   // Create the archive Group

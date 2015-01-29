@@ -130,6 +130,10 @@ namespace Isis {
     *   @history 2013-12-30 Kimberly Oyama and Stuart Sides - In saveChips(), added single quotes
     *                           around the file names in case there are spaces or other special
     *                           characters in them. Fixes #1551.
+    *   @history 2015-01-13 Ian Humphrey - Modified setTemplateFile() so opening a template file 
+    *                           will undo registration if a point is already registered. Modified
+    *                           saveMeasure() to handle exception thrown by
+    *                           ControlMeasure::SetLogData(). Fixes #2041.
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but

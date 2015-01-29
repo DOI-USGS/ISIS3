@@ -103,10 +103,12 @@ namespace Isis {
    *                           which is slow for every read.  Now the cache is
    *                           only mimimized if it changed in size.  
    *                           Reference #894.
-   *    @history 2014-04-07 Kimberly Oyama and Stuart Sides - Modified the findCubeChunks,
+   *   @history 2014-04-07 Kimberly Oyama and Stuart Sides - Modified the findCubeChunks,
    *                            writeIntoDouble, and writeIntoRaw methods to handle
    *                            repeating virtual bands. Fixes #1927.
-   *   
+   *   @history 2014-09-30 Ian Humphrey - Modified read method to correctly access virtual bands
+   *                           when cube dimensions and buffer shape are same size. Fixes #1689.
+   *
    */
   class CubeIoHandler {
     public:

@@ -48,6 +48,6 @@ commands:
 	to=$(OUTPUT)/output.cub 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 
 	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
-	rm -f $(OUTPUT)/error_temp.txt;
-	rm -f $(OUTPUT)/input.cub;
-	rm -f $(OUTPUT)/output.cub;
+	$(RM) $(OUTPUT)/error_temp.txt;
+	$(RM) $(OUTPUT)/input.cub;
+	$(RM) $(OUTPUT)/output.cub;

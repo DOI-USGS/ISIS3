@@ -214,7 +214,7 @@ namespace Isis {
        *
        * @param funct()  Name of your processing function
        */
-      void StartProcess(void funct()) {
+      virtual void StartProcess(void funct()) {
         funct();
       };
       virtual void EndProcess();

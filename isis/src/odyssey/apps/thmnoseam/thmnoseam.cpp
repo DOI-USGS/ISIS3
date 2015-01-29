@@ -88,39 +88,40 @@ void IsisMain() {
   // Make sure it is a Themis EDR/RDR
   try {
     if(evenCube->group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
-      throw IException(IException::User, "", _FILEINFO_);
+      QString msg = "This program is intended for use on THEMIS VIS images only";
+      msg += " [" + ui.GetFileName("INEVEN") + "] does not appear to be a ";
+      msg += "THEMIS VIS image.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    if (evenCube->group("Instrument")["Framelets"][0] != "Even") {
+      QString msg = "The image [" + ui.GetFileName("INEVEN") + "] does not appear "
+          "to contain the EVEN framelets of a Themis VIS cube";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  catch(IException &) {
-    QString msg = "This program is intended for use on THEMIS VIS images only";
-    msg += " [" + ui.GetFileName("INEVEN") + "] does not appear to be a ";
-    msg += "THEMIS VIS image.";
-    throw IException(IException::User, msg, _FILEINFO_);
+  catch(IException &e) {
+    throw IException(e, IException::User, 
+                     "Unable to run thmnoseam with the given even input cube.", _FILEINFO_);
   }
 
   try {
     if(oddCube->group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
-      throw IException(IException::User, "", _FILEINFO_);
+      QString msg = "This program is intended for use on THEMIS VIS images only";
+      msg += " [" + ui.GetFileName("INODD") + "] does not appear to be a ";
+      msg += "THEMIS VIS image.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    if (oddCube->group("Instrument")["Framelets"][0] != "Odd") {
+      QString msg = "The image [" + ui.GetFileName("INODD") + "] does not appear "
+          "to contain the ODD framelets of a Themis VIS cube";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    QString msg = "This program is intended for use on THEMIS VIS images only";
-    msg += " [" + ui.GetFileName("INODD") + "] does not appear to be a ";
-    msg += "THEMIS VIS image.";
-    throw IException(IException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, 
+                     "Unable to run thmnoseam with the given odd input cube.", _FILEINFO_);
   }
 
-  if (evenCube->group("Instrument")["Framelets"][0] != "Even") {
-    QString msg = "The image [" + ui.GetFileName("INEVEN") + "] does not appear "
-        "to contain the EVEN framelets of a Themis VIS cube";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
-
-  if (oddCube->group("Instrument")["Framelets"][0] != "Odd") {
-    QString msg = "The image [" + ui.GetFileName("ODDEVEN") + "] does not appear "
-        "to contain the ODD framelets of a Themis VIS cube";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
 
   PvlGroup &inputInstrumentGrp = evenCube->group("Instrument");
   PvlKeyword &spatialSumming = inputInstrumentGrp["SpatialSumming"];

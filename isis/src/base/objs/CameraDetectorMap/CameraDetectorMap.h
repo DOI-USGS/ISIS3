@@ -51,6 +51,8 @@ namespace Isis {
    *                           These are tested by application socetlinescankeywords
    *                           since no unitTest exists. Fixed indentation
    *                           of history entries.  References #1490.
+   *   @history 2014-04-17 Jeannie Backer - Added padding for ISIS coding standards
+   *                           compliance. References #1659.
    *
    */
   class CameraDetectorMap {

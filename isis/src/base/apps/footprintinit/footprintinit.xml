@@ -147,6 +147,9 @@
     <change name="Janet Barrett" date="2014-08-04">
       Modified so that the program can be run on a mosaic file. Fixes #2158.
     </change>
+    <change name="Jeannie Backer" date="2014-08-22">
+      Updated pushframe truth data due to modification of THEMIS VIS distortion model. References #1659.
+    </change>
   </history>
   
   <groups>

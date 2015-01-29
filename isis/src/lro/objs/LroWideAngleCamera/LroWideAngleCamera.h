@@ -53,35 +53,37 @@ namespace Isis {
    *
    * @internal
    *   @history 2009-07-15 Steven Lambright - Added support for COLOROFFSET
-   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *            inherit directly from Camera
+   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer inherit directly from
+   *                           Camera
    *   @history 2009-09-09 Steven Lambright - Updated wavelengths
    *   @history 2009-11-06 Steven Lambright - FilterName keyword is now Center
    *   @history 2010-03-15 Steven Lambright - Tiling hint now set to a safe
-   *            value regardless of output projection resolution. Also
-   *            incorporated ASU's changes for new modes.
-   *   @history 2010-05-12 Kris Becker - Added checks for number of bands to
-   *            match number of values in BandBin/Center keyword and insure a
-   *            valid band is selected in SetBand() method;  Rewrote the
-   *            camera distortion model that also requires negative
-   *            coefficients in IK kernel.
+   *                           value regardless of output projection resolution. Also
+   *                           incorporated ASU's changes for new modes.
+   *   @history 2010-05-12 Kris Becker - Added checks for number of bands to match number of values
+   *                           in BandBin/Center keyword and insure a valid band is selected in
+   *                           SetBand() method;  Rewrote the camera distortion model that also
+   *                           requires negative coefficients in IK kernel.
    *   @history 2010-08-21 Kris Becker - Reworked the camera model to
-   *          utilize the contents of the IK, which is new. The LRO/LROC IK
-   *          lro_lroc_v14.ti and higher contain the appropriate parameters to
-   *          coincide with the code changes made here. IMPORTANT:  This
-   *          results in Version = 2 of the LroWideAngleCamera as depicted in
-   *          the Camera.plugin for both WAC-UV and WAC-VIS.
+   *                           utilize the contents of the IK, which is new. The LRO/LROC IK
+   *                           lro_lroc_v14.ti and higher contain the appropriate parameters to
+   *                           coincide with the code changes made here. IMPORTANT:  This
+   *                           results in Version = 2 of the LroWideAngleCamera as depicted in
+   *                           the Camera.plugin for both WAC-UV and WAC-VIS.
    *   @history 2010-10-04 Kris Becker - Modified the frame kernel code to use
-   *            the instrument code instead of the WAC ID.  This change was
-   *            brought about with the release of frames kernel
-   *            lro_frames_2010214_v01.tf (actually used version 2010277 that
-   *            contains updated angles for VIS and UV).
+   *                           the instrument code instead of the WAC ID.  This change was
+   *                           brought about with the release of frames kernel
+   *                           lro_frames_2010214_v01.tf (actually used version 2010277 that
+   *                           contains updated angles for VIS and UV).
    *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
-   *            methods. Updated documentation. Removed Lro namespace wrap
-   *            inside Isis namespace wrap. Added Isis Disclaimer to files.
-   *            Added NAIF error check to constructor.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *            coding standards. References #972.
+   *                           methods. Updated documentation. Removed Lro namespace wrap
+   *                           inside Isis namespace wrap. Added Isis Disclaimer to files.
+   *                           Added NAIF error check to constructor.
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with
+   *                           Isis coding standards. References #972.
+   *   @history 2014-04-17 Jeannie Backer - Updated due to method name change in
+   *                           PushFrameCameraDetectorMap. Moved method implementations to cpp file.
+   *                           References #1659
    *   @history 2013-03-05 Kris Becker - added band dependent parameters as
    *            determined by the ASU LROC team.
    *  
@@ -90,45 +92,15 @@ namespace Isis {
     public:
       // constructor
       LroWideAngleCamera(Cube &cube);
-
-      //! Destroys the LroWideAngleCamera object
-      ~LroWideAngleCamera() {};
+      ~LroWideAngleCamera();
 
       // Sets the band to the band number given
       void SetBand(const int band);
+      bool IsBandIndependent();
 
-      /**
-       * The camera model is band dependent, so this method returns false
-       *
-       * @return bool False
-       */
-      bool IsBandIndependent() {
-        return false;
-      };
-
-      /**
-       * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
-       *         Kernel Frame ID
-       */
-      virtual int CkFrameId() const { return (-85000); }
-
-      /** 
-       * CK Reference ID - J2000
-       * 
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Reference ID
-       */
-      virtual int CkReferenceId() const { return (1); }
-
-      /** 
-       *  SPK Reference ID - J2000
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
-       *         Kernel Reference ID
-       */
-      virtual int SpkReferenceId() const { return (1); }
+      virtual int CkFrameId() const;
+      virtual int CkReferenceId() const;
+      virtual int SpkReferenceId() const;
 
     private:
       typedef QVector<int>    IntParameterList;

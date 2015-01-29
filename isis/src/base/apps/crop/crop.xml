@@ -309,6 +309,9 @@ End_Group
      <change name="Ella Mae Lee" date="2014-04-02">
       Updated the documentation, fixes #1622 and #1688.
     </change>
+    <change name="Jeffrey Covington" date="2015-01-15">
+      Removed unreachable code.
+    </change>
   </history>
 
   <oldName>

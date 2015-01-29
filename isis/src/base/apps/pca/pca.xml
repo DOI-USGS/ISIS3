@@ -6,7 +6,16 @@
 
   <description>
       This programs converts a cube into principal component space or
-        converts a cube back from principal component space.
+        reverses a cube from principal component space. The principal component analysis (PCA) is performed over all bands of the input cube. The <b>n x n</b> transformation matrix used for this conversion is attached to the output cube as a table, where <b>n</b> is the number of bands of the input cube. Each vertical column in the transformation matrix is an eigenvector. 
+     <br /> <br /> 
+    To run the program, you must provide an input cube, specify an output cube name, and select either Transform or Inverse as your transformation mode of choice
+    <br /><br />
+     The transformation matrix can be extracted by using the following command:
+    <p>
+     <blockquote>
+        tabledump from=[cube name].cub name="Transform Matrix"
+     </blockquote>
+    </p>
   </description>
 
   <category>
@@ -30,6 +39,9 @@
     </change>
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
+    </change>
+    <change name="Kristin Berry" date="2014-09-18">
+      Improved documentation      
     </change>
   </history>
 

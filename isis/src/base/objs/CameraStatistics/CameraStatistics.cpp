@@ -217,8 +217,10 @@ namespace Isis {
       m_incidenceStat->AddData(cam->IncidenceAngle());
       m_localSolarTimeStat->AddData(cam->LocalSolarTime());
       m_localRaduisStat->AddData(cam->LocalRadius().meters());
+      // if IsValid
       m_northAzimuthStat->AddData(cam->NorthAzimuth());
-
+      
+      // if resolution not equal to -1.0
       double aspectRatio = cam->LineResolution() / cam->SampleResolution();
       m_aspectRatioStat->AddData(aspectRatio);
     }

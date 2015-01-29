@@ -65,9 +65,12 @@ namespace Isis {
    *                          coding standards. References #972.
    *  @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                          References #775.
-   *  @history 2012-04-24 Jeannie Backer - Modified to print "N/A" for NorthAzimuth if projection
-   *                          is not triaxial since this value is meaningless for ring plane
-   *                          projections. References #775.
+   *  @history 2013-04-24 Jeannie Backer - Modified to print "N/A" for NorthAzimuth if
+   *                          projection is not triaxial since this value is meaningless for
+   *                          ring plane projections. References #775.
+   *  @history 2014-06-17 Jeannie Backer - Modified to print set value to empty strings for
+   *                          photometric angles, azimuths, resolutions if not valid.
+   *                          References #1659.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT

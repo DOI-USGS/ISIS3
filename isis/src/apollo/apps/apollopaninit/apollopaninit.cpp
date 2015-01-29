@@ -345,10 +345,11 @@ void IsisMain() {
   //  The local normal cross the selenogrpahic z gives northPN (normal to the plane containing all 
   //  the north/south directions), that is, the plane containing the origin, the z axis, and the 
   //  primary point of intersection.
-  crossp(northPN,norm,northL);   
+  crossp(norm, zDir, northPN); 
+  
   //The normal to the plane containing all the north/south directions cross the local normal 
   //  direction gives the local north/south direction in the local normal plane
-  crossp(norm, zDir, northPN); 
+  crossp(northPN,norm,northL);   
   if (northL[2] < 0) {  //if by chance we got the south direction change the signs
     northL[0] = -northL[0];
     northL[1] = -northL[1];

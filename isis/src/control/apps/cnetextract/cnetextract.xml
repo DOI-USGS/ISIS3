@@ -107,6 +107,16 @@
           <td align="left"><code>These points are not fixed.</code></td>
         </tr>
         <tr>
+          <td align="center"><code>[PREFIX]NonConstrainedPoints.txt</code></td>
+          <td align="center"><code>CONSTRAINED</code></td>
+          <td align="left"><code>These points are not constrained.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]NonEditLockedPoints.txt</code></td>
+          <td align="center"><code>EDITLOCKED</code></td>
+          <td align="left"><code>These points are not editlocked.</code></td>
+        </tr>
+        <tr>
           <td align="center"><code>[PREFIX]TolerancePoints.txt</code></td>
           <td align="center"><code>TOLERANCE</code></td>
           <td align="left">
@@ -257,6 +267,9 @@
     </change>
     <change name="Debbie A. Cook" date="2012-11-30">
       Changed to use TProjection instead of Projection.  References #775.
+    </change>
+    <change name="Moses P. Milazzo" date="2014-11-13">
+      Added EditLocked and Constrained filters. References #255.
     </change>
   </history>
 
@@ -501,6 +514,46 @@
 
           <p>
             When option PREFIX is used, report file [PREFIX]NonFixedPoints.txt will also be
+            created. Each Control Point it lists was not
+            extracted due to this filter.
+          </p>
+        </description>
+      </parameter>
+
+      <parameter name="CONSTRAINED">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Only extract constrained Control Points
+        </brief>
+        <description>
+          <p>
+            When selected, only constrained Control Points will be extracted into the
+            output Control Network file.
+          </p>
+
+          <p>
+            When option PREFIX is used, report file [PREFIX]NonConstrainedPoints.txt will also be
+            created. Each Control Point it lists was not
+            extracted due to this filter.
+          </p>
+        </description>
+      </parameter>
+
+      <parameter name="EDITLOCKED">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Only extract editlocked Control Points
+        </brief>
+        <description>
+          <p>
+            When selected, only editlocked Control Points will be extracted into the
+            output Control Network file.
+          </p>
+
+          <p>
+            When option PREFIX is used, report file [PREFIX]NonEditLockedPoints.txt will also be
             created. Each Control Point it lists was not
             extracted due to this filter.
           </p>

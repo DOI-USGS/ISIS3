@@ -72,6 +72,9 @@
     <change name="Ian Humphrey" date="2014-05-16">
       Added history to output cubes. Fixes #1683.
     </change>
+    <change name="Jeannie Backer" date="2014-04-17">
+      Added BAND_BIN_BAND_NUMBER keyword to the BandBin group of the imported cube, named BandNumber. Fixes #1659.
+    </change>
   </history>
 
 <!--
