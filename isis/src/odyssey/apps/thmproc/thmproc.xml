@@ -81,6 +81,9 @@
       map. Added vis test for EDR data with MAPPING=true. Added error test. Improved test coverage 
       to 95/98/100%. References #1659.
     </change>
+    <change name="Jeffrey Covington" date="2015-01-27">
+      Removed unreachable code.
+    </change>
   </history>
 
   <category>
