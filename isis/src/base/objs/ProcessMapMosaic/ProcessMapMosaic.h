@@ -89,7 +89,12 @@ namespace Isis {
    *                           SetOutputCube method so that valid lat/lon values are checked
    *                           for in the input files that make up a mosaic. This change was
    *                           needed to handle input files that are missing the min/max lat/lon
-   *                           keywords (such as those that were cropped). Fixes #1500. 
+   *                           keywords (such as those that were cropped). Fixes #1500.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                            functions to ensure successful 
+   *                                            inheritance between Process and its
+   *                                            child classes. Made destructor virtual.
+   *                                            References #2215.
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
    *                          example to class documentation
@@ -101,19 +106,19 @@ namespace Isis {
 
       ProcessMapMosaic();
 
-      ~ProcessMapMosaic();
+      virtual ~ProcessMapMosaic();
 
       // SetOutputCube() is not virtual in the Process class nor in the
       // ProcessMosaic class, so the following definitions for this method are
       // the only ones that are allowed for ProcessMapMosaic objects and child
       // objects  
-      Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
+      virtual Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
                                 const QString &mosaicFile);
 
       Isis::Cube *RingsSetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
                                 const QString &mosaicFile);
 
-      Isis::Cube *SetOutputCube(FileList &propagationCubes,
+      virtual Isis::Cube *SetOutputCube(FileList &propagationCubes,
                                 double slat, double elat, double slon, double elon,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
@@ -121,7 +126,7 @@ namespace Isis {
                                 double srad, double erad, double saz, double eaz,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
-      Isis::Cube *SetOutputCube(const QString &inputFile,
+      virtual Isis::Cube *SetOutputCube(const QString &inputFile,
                                 double xmin, double xmax, double ymin, double ymax,
                                 double slat, double elat, double slon, double elon, int nbands,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile,
@@ -132,7 +137,7 @@ namespace Isis {
                                 double srad, double erad, double saz, double eaz, int nbands,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
-      Isis::Cube *SetOutputCube(const QString &inputFile, PvlGroup mapping,
+      virtual Isis::Cube *SetOutputCube(const QString &inputFile, PvlGroup mapping,
                                 CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
       Isis::Cube *RingsSetOutputCube(const QString &inputFile, PvlGroup mapping,
@@ -142,9 +147,9 @@ namespace Isis {
 
       Isis::Cube *RingsSetOutputCube(const QString &mosaicFile);
 
-      Isis::Cube *SetInputCube();
+      virtual Isis::Cube *SetInputCube();
 
-      bool StartProcess(QString inputFile);
+      virtual bool StartProcess(QString inputFile);
 
     private:
       static void FillNull(Buffer &data);

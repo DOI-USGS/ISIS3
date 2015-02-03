@@ -101,6 +101,11 @@ namespace Isis {
    *                           InitProcess() with accessor methods for
    *                           OutputNull(), et al. Changed local variable names
    *                           in ProcessCubes for clarity. References #1380.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                            functions to ensure successful 
+   *                                            inheritance between Process and its
+   *                                            child classes.  Added virtual keyword
+   *                                            to destructor.  References #2215. 
    *  
    *  
    *  @todo 2005-02-09 Stuart Sides - write documentation for CreateWorldFile
@@ -121,10 +126,10 @@ namespace Isis {
       };
 
       ProcessExport();
-      ~ProcessExport();
-      void StartProcess(void funct(Isis::Buffer &in));
-      void StartProcess(void funct(std::vector<Isis::Buffer *> &in));
-      void StartProcess(std::ofstream &fout);
+      virtual ~ProcessExport();
+      virtual void StartProcess(void funct(Isis::Buffer &in));
+      virtual void StartProcess(void funct(std::vector<Isis::Buffer *> &in));
+      virtual void StartProcess(std::ofstream &fout);
       void SetOutputRange(const double minimum, const double maximum);
       void SetOutputNull(const double value);
       void SetOutputLis(const double value);

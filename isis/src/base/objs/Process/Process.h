@@ -143,6 +143,10 @@ namespace Isis {
    *                          being propagated.
    *  @history 2012-02-24 Steven Lambright - Added Finalize() method and
    *                          deprecated EndProcess()
+   *  @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                           functions to ensure successful 
+   *                                           inheritance between Process and its
+   *                                           child classes.  Fixes #2215.
    */
   class Process {
     protected:
@@ -214,24 +218,24 @@ namespace Isis {
        *
        * @param funct()  Name of your processing function
        */
-      void StartProcess(void funct()) {
+      virtual void StartProcess(void funct()) {
         funct();
       };
       virtual void EndProcess();
       virtual void Finalize();
 
-      Isis::Cube *SetInputCube(const QString &parameter,
+      virtual Isis::Cube *SetInputCube(const QString &parameter,
                                const int requirements = 0);
-      Isis::Cube *SetInputCube(const QString &fname,
+      virtual Isis::Cube *SetInputCube(const QString &fname,
                                const Isis::CubeAttributeInput &att,
                                int requirements = 0);
-      void SetInputCube(Isis::Cube *inCube);
+      virtual void SetInputCube(Isis::Cube *inCube);
 
 
-      Isis::Cube *SetOutputCube(const QString &parameter);
-      Isis::Cube *SetOutputCube(const QString &parameter, const int nsamps,
+      virtual Isis::Cube *SetOutputCube(const QString &parameter);
+      virtual Isis::Cube *SetOutputCube(const QString &parameter, const int nsamps,
                                 const int nlines, const int nbands = 1);
-      Isis::Cube *SetOutputCube(const QString &fname,
+      virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 const Isis::CubeAttributeOutput &att,
                                 const int nsamps, const int nlines,
                                 const int nbands = 1);

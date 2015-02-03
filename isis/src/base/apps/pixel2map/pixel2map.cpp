@@ -277,7 +277,7 @@ void IsisMain() {
   Pvl pvl;
   pvl.addGroup(userGrp);
   pvl.addGroup(bandBinGrp);
-  g_pgp.SetOutputCube("TO", pvl, g_bands);
+  g_pgp.SetStatCubes("TO", pvl, g_bands);
   bool useCenter = true;
   if (ui.GetString("METHOD") == "CENTER") {
     useCenter = true;

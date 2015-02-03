@@ -200,7 +200,7 @@ namespace Isis {
    * @param outAtts
    * @param cube
    */
-  void ProcessGroundPolygons::SetOutputCube(const QString &avgFileName,
+  void ProcessGroundPolygons::SetStatCubes(const QString &avgFileName,
       const QString &countFileName,
       Isis::CubeAttributeOutput &outAtts,
       QString &cubeStr) {
@@ -229,13 +229,13 @@ namespace Isis {
   /**
    * This is a method that is called directly from the
    * application.  Using the "TO" parameter we also create a
-   * count cube name.  The we call the overloaded SetOutputCube
+   * count cube name.  The we call the overloaded SetStatCubes
    * method above.
    *
    * @param parameter
    * @param cube
    */
-  void ProcessGroundPolygons::SetOutputCube(const QString &parameter,
+  void ProcessGroundPolygons::SetStatCubes(const QString &parameter,
       QString &cube) {
 
     QString avgString =
@@ -248,7 +248,7 @@ namespace Isis {
     QString filename = file.baseName();
     QString countString = path + "/" + filename + "-count-";
 
-    SetOutputCube(avgString, countString, atts, cube);
+    SetStatCubes(avgString, countString, atts, cube);
 
   }
 
@@ -260,7 +260,7 @@ namespace Isis {
    * @param map
    * @param bands
    */
-  void ProcessGroundPolygons::SetOutputCube(const QString &parameter,
+  void ProcessGroundPolygons::SetStatCubes(const QString &parameter,
       Isis::Pvl &map, int bands) {
 
     QString avgString =
@@ -273,7 +273,7 @@ namespace Isis {
     QString filename = file.baseName();
     QString countString = path + "/" + filename + "-count-";
 
-    SetOutputCube(avgString, countString, atts, map, bands);
+    SetStatCubes(avgString, countString, atts, map, bands);
 
   }
 
@@ -287,7 +287,7 @@ namespace Isis {
    * @param map
    * @param bands
    */
-  void ProcessGroundPolygons::SetOutputCube(const QString &avgFileName,
+  void ProcessGroundPolygons::SetStatCubes(const QString &avgFileName,
       const QString &countFileName,
       Isis::CubeAttributeOutput &atts,
       Isis::Pvl &map, int bands) {
@@ -296,7 +296,7 @@ namespace Isis {
     Projection *proj = ProjectionFactory::CreateForCube(map, samples, lines,
                        false);
 
-    this->ProcessPolygons::SetOutputCube(avgFileName, countFileName, atts,
+    this->ProcessPolygons::SetStatCubes(avgFileName, countFileName, atts,
                                          samples, lines, bands);
 
     OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());

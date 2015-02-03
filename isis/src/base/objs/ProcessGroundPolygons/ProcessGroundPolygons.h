@@ -26,6 +26,10 @@ namespace Isis {
    *                           References #1248.
    *   @history 2013-09-10 Stuart Sides, Tracie Sucharski - Cleaned up and removed extraneous code.
    *                           References #1604.
+   *   @history 2015-01-19 Sasha Brownsberger - Changed name of SetOutputCube function to SetStatCubes 
+   *                                            function to better reflect the command functionality 
+   *                                            and to avoid conflicts with Process::SetOutputCube 
+   *                                            virtual function.  References #2215.
    */
   class ProcessGroundPolygons : public ProcessPolygons {
     public:
@@ -37,16 +41,16 @@ namespace Isis {
       // and child objects
 
       //Cube is an existing camera cube or projection cube
-      void SetOutputCube(const QString &parameter, QString &cube);
+      void SetStatCubes(const QString &parameter, QString &cube);
 
       //Determine cube size from the projection map
-      void SetOutputCube(const QString &parameter, Isis::Pvl &map, int bands);
+      void SetStatCubes(const QString &parameter, Isis::Pvl &map, int bands);
 
-      void SetOutputCube(const QString &avgFileName, const QString
+      void SetStatCubes(const QString &avgFileName, const QString
                          &countFileName, Isis::CubeAttributeOutput &atts,
                          QString &cube);
 
-      void SetOutputCube(const QString &avgFileName, const QString
+      void SetStatCubes(const QString &avgFileName, const QString
                          &countFileName, Isis::CubeAttributeOutput &atts,
                          Isis::Pvl &map, int bands);
 

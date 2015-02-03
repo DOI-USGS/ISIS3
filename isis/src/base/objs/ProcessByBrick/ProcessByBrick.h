@@ -84,6 +84,11 @@ namespace Isis {
    *   @history 2013-03-27 Jeannie Backer - Modified SetBrickSize() code to call
    *                           existing methods rather than duplicating code.
    *                           Added SetOutputCube() method.References #1248.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                            functions to ensure successful 
+   *                                            inheritance between Process and its
+   *                                            child classes.  Also made destructor
+   *                                            virtual.  Fixes #2215.
    */
   class ProcessByBrick : public Process {
     public:
@@ -91,7 +96,7 @@ namespace Isis {
       ProcessByBrick();
 
       //! Destroys the ProcessByBrick object
-      ~ProcessByBrick();
+      virtual ~ProcessByBrick();
 
       enum ProcessingDirection {
         LinesFirst,
@@ -121,7 +126,7 @@ namespace Isis {
       // Any other calls to this method will use the prototypes found in the
       //process class due to the using statement below. 
       using Process::SetOutputCube;
-      Cube *SetOutputCube(const QString &fname,
+      virtual Cube *SetOutputCube(const QString &fname,
                           const CubeAttributeOutput &att);
 
       void SetProcessingDirection(ProcessingDirection direction);
@@ -130,9 +135,9 @@ namespace Isis {
       void SetWrap(bool wrap);
       bool Wraps();
 
-      void StartProcess(void funct(Buffer &in));
-      void StartProcess(void funct(Buffer &in, Buffer &out));
-      void StartProcess(void funct(std::vector<Buffer *> &in,
+      virtual void StartProcess(void funct(Buffer &in));
+      virtual void StartProcess(void funct(Buffer &in, Buffer &out));
+      virtual void StartProcess(void funct(std::vector<Buffer *> &in,
                                    std::vector<Buffer *> &out));
       void EndProcess();// Depricated. Please use Finalize
       void Finalize();
@@ -361,7 +366,7 @@ namespace Isis {
           /**
            * Destructor
            */
-          ~ProcessCubeInPlaceFunctor() {
+          virtual ~ProcessCubeInPlaceFunctor() {
             m_cube = NULL;
             m_templateBrick = NULL;
           }
@@ -486,7 +491,7 @@ namespace Isis {
           /**
            * Destructor
            */
-          ~ProcessCubeFunctor() {
+          virtual ~ProcessCubeFunctor() {
             m_inputTemplateBrick = NULL;
             m_outputTemplateBrick = NULL;
           }
@@ -620,7 +625,7 @@ namespace Isis {
           /**
            * Destructor
            */
-          ~ProcessCubesFunctor() {
+          virtual ~ProcessCubesFunctor() {
           }
 
 
@@ -747,7 +752,7 @@ namespace Isis {
         public:
           ProcessIterator(int position);
           ProcessIterator(const ProcessIterator &other);
-          ~ProcessIterator();
+          virtual ~ProcessIterator();
 
           ProcessIterator &operator++();
 
