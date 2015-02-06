@@ -60,10 +60,13 @@ namespace Isis {
    *                          etc
    *  @history 2012-02-09 Jeff Anderson - Modified to conform to
    *                          ISIS coding standards
+   *  @history 2015-01-30 Ian Humphrey - Removed unused variable m_data. Deallocated
+   *                          unfreed dynamic memory. Added destructor. Fixes #2082.
    */
   class CubeCalculator : Calculator {
     public:
       CubeCalculator();
+      ~CubeCalculator();
 
       /**
        * This method completely resets the calculator. The prepared
@@ -115,7 +118,8 @@ namespace Isis {
        * will push (constants), along with placeholders for simplicity to
        * keep synchronized with the data definitions.
        */
-      QVector< QVector<double> > *m_data;
+      // m_data is never used anywhere
+//       QVector< QVector<double> > *m_data;
 
       /**
        * This defines what kind of data RunCalculations(...) will push
