@@ -526,6 +526,7 @@
      that are not on the PDS images but still contribute to frame transfer smearing.
      Also updated the calibration tables (MDISWAC_FRAME_TRANSFER_??.TAB) with the 
      correct frame transfer speed. Documentation was updated as well.
+     Software version number is now 1.5.
    </change>
   </history>
 
