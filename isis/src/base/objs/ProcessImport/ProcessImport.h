@@ -139,22 +139,27 @@ namespace Isis {
    *                           documentation. Changed parameter name from
    *                           "parameter" to "fname" in SetOutputCube() method.
    *                           References #1248.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                            functions to ensure successful 
+   *                                            inheritance between Process and its
+   *                                            child classes.  Added virtual keyword
+   *                                            to destructor.  References #2215. 
    *
    */
 
   class ProcessImport : public Isis::Process {
     public:
       ProcessImport();
-      ~ProcessImport();
-      void StartProcess();
-      void StartProcess(void funct(Isis::Buffer &out));
+      virtual ~ProcessImport();
+      virtual void StartProcess();
+      virtual void StartProcess(void funct(Isis::Buffer &out));
       void SetInputFile(const QString &file);
 
       // SetOutputCube() is not virtual in the Process class, so the following
       // definitions for this method are the only ones that are allowed for
       // ProcessImport objects and child objects
       Isis::Cube *SetOutputCube(const QString &parameter);
-      Isis::Cube *SetOutputCube(const QString &fname,
+      virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 Isis::CubeAttributeOutput &att);
       void SetPixelType(const Isis::PixelType type);
       /**

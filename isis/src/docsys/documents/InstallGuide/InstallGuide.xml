@@ -32,7 +32,6 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
          <li>RHEL</li>
          <li>Debian</li>
          <li>Fedora</li>
-         <li>SUSE</li>
          <li>MacOSX</li>
         </ul>
          <p>It does not run on MS Windows.</p>
@@ -196,7 +195,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
                As operating systems and hardware age security flaws are no longer patched and new APIs are not upgraded, which stunts the growth of ISIS on those systems.
                Therefore we no longer build ISIS on the following platforms:
                <pre>
-                 Linux SuSE 9.X, 10.X
+                 Linux SUSE 9.X, 10.X, 11.X, SLES 11
                  RedHat Enterprise 3, 4, 5
                  Mac OSX with the Power PC processor
                  Mac OSX 10.4, 10.5
@@ -305,13 +304,6 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 <pre>
         <b>
-        <u>Example for SUSE Linux Enterprise Server 11 Linux x86 64-bit Intel compatible systems:</u>
-        </b>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_SUSE11/isis .
-</pre>
-
-<pre>
-        <b>
         <u>Example for Ubuntu 12.04 Linux x86 64-bit Intel compatible systems:</u>
         </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_UBUNTU/isis .
@@ -326,7 +318,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 <pre>
         <b>
-        <u>Example for RHEL 6.4 Linux x86 64-bit Intel compatible systems:</u>
+        <u>Example for RHEL 6.5 Linux x86 64-bit Intel compatible systems:</u>
         </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
 </pre>
@@ -639,6 +631,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <change name="Steven Lambright and Mathew Eis" date="2013-01-09">Updated Mac OSX support to reflect new versions: 10.7 and 10.8</change>
     <change name="Steven Lambright" date="2013-02-12">Updated Fedora support to reflect version upgrade: 16 to 18</change>
     <change name="Stuart Sides" date="2013-06-23">Updated for latest OSX, RHEL, and Debian versoins</change>
+    <change name="Kristin Berry" date="2014-01-19">Updated for latest RHEL version and removed references to SUSE and SLES support. </change>
   </history>
 
   <bibliography>

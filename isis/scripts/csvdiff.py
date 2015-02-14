@@ -98,8 +98,9 @@ if len(sys.argv) >= 4:
   # Break each line into a column part for each CSV and a tolerance component
   tolerances = tolerance_file.readlines()
   for line in tolerances:
-    column, tolerance = line.strip().upper().split("=")
-    tolerance_map[column] = float(tolerance)
+    if line.strip() != '':
+      column, tolerance = line.strip().upper().split("=")
+      tolerance_map[column] = float(tolerance)
 
   # Close the file
   tolerance_file.close()

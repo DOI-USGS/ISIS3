@@ -693,9 +693,8 @@ namespace Isis {
       // check for convergence
       if (m_bundleSettings.convergenceCriteria() == BundleSettings::Sigma0) {
         if (fabs(dSigma0_previous - m_bundleStatistics.sigma0())
-              <= m_bundleSettings.convergenceCriteriaThreshold()) { // convergeance detected
+              <= m_bundleSettings.convergenceCriteriaThreshold()) { // convergence detected
           // if maximum likelihood tiers are being processed, check to see if there's another tier
-          //convergeance detected
           if (m_bundleStatistics.maximumLikelihoodModelIndex()
                  < m_bundleStatistics.numberMaximumLikelihoodModels() - 1
               && m_bundleStatistics.maximumLikelihoodModelIndex()
@@ -759,6 +758,14 @@ namespace Isis {
       if (!m_bundleStatistics.converged()) {
         m_bundleStatistics.initializeResidualsProbabilityDistribution(101);
       }// TODO: is this necessary ??? probably all ready initialized to 101 nodes in bundle settings constructor...
+
+      // if we're using CHOLMOD and still going, release cholmod_factor (if we don't, memory leaks will occur),
+      // otherwise we need it for error propagation
+      if ( m_bundleSettings.solveMethod() == BundleSettings::Sparse ) {
+        if (!m_bundleStatistics.converged() || !m_bundleSettings.errorPropagation())
+          cholmod_free_factor(&m_L, &m_cm);
+      }
+
 
       iterationSummary();
 

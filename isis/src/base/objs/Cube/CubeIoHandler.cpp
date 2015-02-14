@@ -229,8 +229,9 @@ namespace Isis {
 
     delete m_lastProcessByLineChunks;
     m_lastProcessByLineChunks = NULL;
-
-    m_dataFile = NULL;
+    
+    delete m_writeThreadMutex;
+    m_writeThreadMutex = NULL;
   }
 
 

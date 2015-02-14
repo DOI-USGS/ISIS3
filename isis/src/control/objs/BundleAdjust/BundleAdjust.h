@@ -187,6 +187,9 @@ namespace Isis {
    *                           outlier rejection is turned off.
    *   @history 2014-09-18 Kimberly Oyama - Added a constructor for running the bunlde in a
    *                           separate thread.
+   *   @history 2014-11-05 Ken Edmundson - Fixed memory bug. Wasn't releasing cholmod_factor m_L
+   *                         every iteration. Now release every iteration but the last since we
+   *                         need m_L for error propagation. References #2189.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

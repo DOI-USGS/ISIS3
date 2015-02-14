@@ -184,6 +184,11 @@ namespace Isis {
    *                           automos. Fixes #1620. Fixes #1623.
    *   @history 2014-07-23 Janet Barrett - Fixed the StartProcess method to allow the overlay of
    *                           an input file on a pre-existing output file. Fixed #751.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                            functions to ensure successful 
+   *                                            inheritance between Process and its
+   *                                            child classes.  Made destructor virtual.
+   *                                            References #2215.
    */
 
   class ProcessMosaic : public Process {
@@ -211,17 +216,17 @@ namespace Isis {
       ProcessMosaic();
 
       //  Destroys the Mosaic object. It will close all opened cubes.
-      ~ProcessMosaic();
+      virtual ~ProcessMosaic();
 
       // Line Processing method for one input and output cube
-      void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
+      virtual void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
 
       // Accessor for the placed images.
       PvlObject imagePositions();
 
       // Set input cube to specified image name at the starting and count of
       // samples, lines, bands
-      Isis::Cube *SetInputCube(const QString &parameter,
+      virtual Isis::Cube *SetInputCube(const QString &parameter,
                                const int ss = 1, const int sl = 1,
                                const int sb = 1,
                                const int ns = -1, const int nl = -1,
@@ -229,7 +234,7 @@ namespace Isis {
 
       // Set input cube to specified image name with specified attributes at the
       // starting and count of samples, lines, bands
-      Isis::Cube *SetInputCube(const QString &fname,
+      virtual Isis::Cube *SetInputCube(const QString &fname,
                                Isis::CubeAttributeInput &att,
                                const int ss = 1, const int sl = 1,
                                const int sb = 1,

@@ -31,6 +31,10 @@ namespace Isis {
    *                           checks for valid polygons, added option to check for either input
    *                           pixel intersecting the center of the output pixel or any part of the
    *                           output pixel.  References #1604.
+   *   @history 2015-01-19 Sasha Brownsberger - Changed name of SetOutputCube function to SetStatCubes 
+   *                                            function to better reflect the command functionality 
+   *                                            and to avoid conflicts with Process::SetOutputCube 
+   *                                            virtual function.  References #2215.
    *                          
    */
   class ProcessPolygons : public Isis::Process {
@@ -38,14 +42,10 @@ namespace Isis {
     public:
       ProcessPolygons();
 
-      // SetOutputCube() is not virtual in the Process class, so the following
-      // definitions for this method are the only ones that are allowed for
-      // ProcessPolygons objects and child objects, unless redifined in the
-      // child class
-      void SetOutputCube(const QString &parameter, const int nsamps,
+      void SetStatCubes(const QString &parameter, const int nsamps,
                          const int nlines, int nbands = 1);
 
-      void SetOutputCube(const QString &avgFileName, const QString
+      void SetStatCubes(const QString &avgFileName, const QString
                          &countFileName, Isis::CubeAttributeOutput &atts,
                          const int nsamps, const int nlines, int nbands = 1);
       void SetIntersectAlgorithm(const bool useCenter);

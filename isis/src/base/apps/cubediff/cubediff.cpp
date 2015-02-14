@@ -72,6 +72,7 @@ void IsisMain() {
 
   // Compare the cubes
   filesEqual = true;
+  firstDifferenceFound = false;
   spCount = 0;
   stats.Reset();
   colWidth = 0;
@@ -182,8 +183,8 @@ void compare(vector<Buffer *> &in, vector<Buffer *> &out) {
       unsigned int accuracy = 0;
 
       // Check positive/negative and ensure both positive
-      if((input1[index] < 0 && input2[index] > 0) ||
-          (input1[index] > 0 && input2[index] < 0)) {
+      if((input1[index] < 0.0 && input2[index] > 0.0) ||
+          (input1[index] > 0.0 && input2[index] < 0.0)) {
         accuracy = 1;
       }
       else {
@@ -193,7 +194,7 @@ void compare(vector<Buffer *> &in, vector<Buffer *> &out) {
         int in2log = (int)floor(log10(in2));
 
         // Check for zeros
-        if(input1[index] == 0 || input2[index] == 0) {
+        if(input1[index] == 0.0 || input2[index] == 0.0) {
           accuracy = 0;
         }
         // Check for different decimal places

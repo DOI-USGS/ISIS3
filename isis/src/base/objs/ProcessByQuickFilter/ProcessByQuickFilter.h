@@ -69,13 +69,17 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *   @history 2012-02-24 Steven Lambright - Added ProcessCube()
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to StartProcess 
+   *                                            function to ensure successful 
+   *                                            inheritance between Process and its
+   *                                            child classes.  References #2215.
    */
   class ProcessByQuickFilter : public Isis::Process {
 
     public:
       ProcessByQuickFilter();
 
-      void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out, 
+      virtual void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out, 
                                    Isis::QuickFilter &filter));
       void ProcessCube(void funct(Isis::Buffer &in, Isis::Buffer &out, 
                                   Isis::QuickFilter &filter)) {

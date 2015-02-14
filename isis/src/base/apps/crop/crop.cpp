@@ -85,8 +85,8 @@ void IsisMain() {
   ns = ceil((double)(es - ss + 1) / sinc);
   nl = ceil((double)(el - sl + 1) / linc);
   nb = eb;
-  if (ns == 0) ns = 1;
-  if (nl == 0) nl = 1;
+  //if (ns == 0) ns = 1;
+  //if (nl == 0) nl = 1;
   es = ss + (ns - 1) * sinc;
   el = sl + (nl - 1) * linc;
 

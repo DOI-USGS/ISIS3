@@ -45,6 +45,11 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *   @history 2012-02-24 Steven Lambright - Added Finalize() and ProcessCube()
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                           functions to ensure successful 
+   *                                           inheritance between Process and its
+   *                                           child classes.  Also made destructor
+   *                                           virtual.  References #2215.
    */
 
   class ProcessByBoxcar : public Isis::Process {
@@ -63,11 +68,11 @@ namespace Isis {
       };
 
       //! Destroys the ProcessByBoxcar object.
-      ~ProcessByBoxcar() {};
+      virtual ~ProcessByBoxcar() {};
 
       void SetBoxcarSize(const int ns, const int nl);
 
-      void StartProcess(void funct(Isis::Buffer &in, double &out));
+      virtual void StartProcess(void funct(Isis::Buffer &in, double &out));
       void ProcessCube(void funct(Isis::Buffer &in, double &out)) {
         StartProcess(funct);
       }

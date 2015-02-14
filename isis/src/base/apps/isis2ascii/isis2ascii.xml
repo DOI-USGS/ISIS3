@@ -62,6 +62,9 @@
     <change name="Steven Lambright" date="2008-05-12">
       Removed references to CubeInfo 
     </change>
+    <change name="Makayla Shepherd" date="2015-01-30">
+      Increased precision of the DNs in the output text file from 6 to 7
+    </change>
   </history>
 
 
@@ -100,7 +103,6 @@
         </default>
       </parameter>
     </group>
-
   </groups>
 
   <liens>
@@ -111,17 +113,20 @@
 
     <example>
       <brief> Header default </brief>
-      <description> Demonstrate the isis2ascii application with header
+      <description> 
+	Demonstrate the isis2ascii application with header
       </description>
       <terminalInterface>
         <commandLine> f=../IN/f332s28.cub t=OUT/isis2ascii.txt </commandLine>
-        <description> Convert Viking ISIS image to ascii file.  Let header default to yes.
+        <description> 
+	  Convert Viking ISIS image to ascii file.  Let header default to yes.
         </description>
       </terminalInterface>
       <inputImages>
         <image src="assets/image/f332s28.jpg" width="500" height="439">
           <brief> Input image for isis2ascii</brief>
-          <description>This is the input image f332s28.cub to be converted to ascii.
+          <description>
+	    This is the input image f332s28.cub to be converted to ascii.
           </description>
           <thumbnail caption=" Input image" src="assets/thumb/f332s28.jpg" width="200" height="175"/>
           <parameterName>FROM</parameterName>
@@ -130,7 +135,8 @@
       <outputImages>
         <image src="assets/image/isis2asciiTxt.jpg" width="500" height="523">
           <brief> Example output ascii text from isis2ascii run</brief>
-          <description> This is the output ascii text file isis2ascii.txt with the header.
+          <description> 
+	    This is the output ascii text file isis2ascii.txt with the header.
           </description>
           <thumbnail caption="Output image showing results of the isis2ascii application." src="assets/thumb/isis2asciiTxt.jpg" width="200" height="209"/>
           <parameterName>TO</parameterName>
@@ -141,8 +147,9 @@
         <guiInterface>
           <image width="455" height="247" src="assets/image/isis2asciiGui.jpg">
             <brief>Example GUI</brief>
-            <description>Screenshot of GUI with parameters filled in to perform
-the isis2ascii application</description>
+            <description>
+	      Screenshot of GUI with parameters filled in to perform
+	      the isis2ascii application</description>
             <thumbnail width="200" height="109" caption="isis2ascii GUI" src="assets/thumb/isis2asciiGui.jpg"/>
           </image>
         </guiInterface>

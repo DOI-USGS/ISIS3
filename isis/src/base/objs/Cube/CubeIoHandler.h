@@ -108,6 +108,8 @@ namespace Isis {
    *                            repeating virtual bands. Fixes #1927.
    *   @history 2014-09-30 Ian Humphrey - Modified read method to correctly access virtual bands
    *                           when cube dimensions and buffer shape are same size. Fixes #1689.
+   *   @history 2015-01-30 Ian Humphrey - Modified destructor to free m_writThreadMutex to 
+   *                           prevent memory leaks upon destruction. Fixes #2082.
    *
    */
   class CubeIoHandler {

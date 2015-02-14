@@ -203,10 +203,12 @@ namespace Isis {
    *                          Process::Finalize on
    *                          ProcessImportPds objects. Marked
    *                          EndProcess as deprecated.
+   *  @history 2015-01-19 Sasha Brownsberger - Made destructor virtual. References #2215.
    *                     
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
+  
    */
   class ProcessImportPds : public ProcessImport {
 
@@ -222,7 +224,7 @@ namespace Isis {
         All = Image | Qube | SpectralQube | L0 | Rdn | Loc | Obs
       };
       ProcessImportPds();
-      ~ProcessImportPds();
+      virtual ~ProcessImportPds();
       void SetPdsFile(const QString &pdsLabelFile, const QString &pdsDataFile,
                       Pvl &pdsLabel, PdsFileType allowedTypes = All);
       void SetPdsFile(const Pvl &pdsLabelPvl, const QString &pdsDataFile,

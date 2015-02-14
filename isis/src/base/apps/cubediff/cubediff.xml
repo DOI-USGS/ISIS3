@@ -5,8 +5,94 @@
   </brief>
 
   <description>
-    This program compares two cube files pixel by pixel,  with results written
-    to the log and/or user specified output file.
+    <p>
+      This program compares two cube files pixel by pixel,  with results written
+      to the log and/or user specified output file.
+    </p>
+
+    <h4>
+      Output:
+    </h4> 
+
+    <table border = "1">
+      <tr>
+        <th>Label</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Compare</td>
+        <td>The files are <b>different</b> if any pair of pixels is different, otherwise the files are <b>identical</b>.</td>
+      </tr>
+      <tr>
+        <td>Sample</td>
+        <td>The sample of the first pair of pixels that is different</td>
+      </tr>
+      <tr>
+        <td>Line</td>
+        <td>The line of the first pair of pixels that is different</td>
+      </tr>
+      <tr>
+        <td>Band</td>
+        <td>The band of the first pair of pixels that is different</td>
+      </tr>
+      <tr>
+        <td>AverageDifference</td>
+        <td>The average absolute value of the differences of all pairs of pixels</td>
+      </tr>
+      <tr>
+        <td>StandardDeviation</td>
+        <td>The standard deviation of the absolute value of the differences of all pairs of pixels</td>
+      </tr>
+      <tr>
+        <td>Variance</td>
+        <td>The variance of the absolute value of the differences of all pairs of pixels</td>
+      </tr>
+      <tr>
+        <td>MinimumDifference</td>
+        <td>The smallest absolute value of the differences of all pairs of pixels</td>
+      </tr>
+      <tr>
+        <td>MaximumDifference</td>
+        <td>The largest absolute value of the differences of all pairs of pixels</td>
+      </tr>
+      <tr>
+        <td>MaxDifferenceSample</td>
+        <td>The sample of the pair of pixels with the largest difference</td>
+      </tr>
+       <tr>
+        <td>MaxDifferenceLine</td>
+        <td>The line of the pair of pixels with the largest difference</td>
+      </tr>
+      <tr>
+        <td>MaxDifferenceBand</td>
+        <td>The band of the pair of pixels with the largest difference</td>
+      </tr>
+      <tr>
+        <td>ValidPixelDifferences</td>
+        <td>The number of pairs of nonspecial pixels that are different</td>
+      </tr>
+      <tr>
+        <td>SpecialPixelDifferences</td>
+        <td>The number of pairs of pixels that are different where at least one pixel is special</td>
+      </tr>
+      <tr>
+        <td>SigFigAccuracy</td>
+        <td>The minimum value of the approximate number of significant figures of the differences of all pairs of pixels. The approximation is given by floor(log10(in1)) - floor(log10(abs(in1 - in2)) where in1 and in2 are the pair of pixels.</td>
+      </tr>
+      <tr>
+        <td>SigFigMaxDifferenceSample</td>
+        <td>The sample of the first pair of pixels where SigFigAccuracy in minimized</td>
+      </tr>
+      <tr>
+        <td>SigFigMaxDifferenceLine</td>
+        <td>The line of the first pair of pixels where SigFigAccuracy in minimized</td>
+      </tr>
+      <tr>
+        <td>SigFigMaxDifferenceBand</td>
+        <td>The band of the first pair of pixels where SigFigAccuracy in minimized</td>
+      </tr>
+    </table>
+
   </description>
 
   <category>
@@ -95,9 +181,15 @@
         Changed output, if no valid pixel differences, output zero instead of 
         NULL8
     </change> 
-      <change name="Sharmila Prasad" date="2010-02-26">
+    <change name="Sharmila Prasad" date="2010-02-26">
         Incuded keywords MaxDifference Line, Sample and Band in the output to 
         indicate the line, sample, band where the max cube difference occured
+    </change>
+    <change name="Jeffrey Covington" date="2015-01-09">
+	Added descriptions for each label of the output
+    </change>
+    <change name="Jeffrey Covington" date="2015-01-13">
+	Fixed output when run multiple times in the GUI
     </change>
   </history>
 
@@ -241,11 +333,11 @@
       </inputImages>
 
       <outputImages>
-        <image src="assets/images/compareLog.jpg" width="448" height="550">
+        <image src="assets/images/compareLog.jpg" width="370" height="350">
           <brief>The output log</brief>
           <description> This is the default output compare log.  Use the TO parameter for a text file output.
           </description>
-          <thumbnail caption="Display of Output compare log showing results of the compare application." src="assets/thumbs/compareLog.jpg" width="200" height="170"/>
+          <thumbnail caption="Display of Output compare log showing results of the compare application." src="assets/thumbs/compareLog.jpg" width="200" height="189"/>
         </image>
       </outputImages>
 
