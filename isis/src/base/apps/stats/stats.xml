@@ -6,14 +6,54 @@
 
   <description>
     <p>
-      This program computes statistics for the pixels in each selected <def link="Band">band</def>
-      of an image <def link="Cube">cube</def>, and output the results. By default, all bands are 
+      This program computes a set of statistics for the pixels in each selected <def link="Band">band</def>
+      of an image <def link="Cube">cube</def>, and outputs the results of each band. By default, all bands are 
       processed. The <i>stats</i> program generates statistics that will help you find new insights 
       in your data to make more accurate predictions and achieve better outcomes.
     </p>
 
+    
     <h4>
-      How to Specify a Band:
+      Output:
+    </h4>
+
+    <p>
+      The statistics are output to both the screen and the print.prt file in PVL format. Additionally,
+      if the user specifies a file using the TO parameter, the statistics are written to that file in
+      PVL format (default) or as a comma delimited text file (FLAT file), as specified by the FORMAT parameter. 
+      For multi-band images, each band has its own statistics information that will be appended to the 
+      output file.  The contents of the PVL file can be read using the <i>getkey</i> program. The 
+      comma delimited text file can be imported into Excel or other applications.  The statistics
+      calculated and reported are as follows:
+    </p>
+
+    <pre>
+Average                 Total pixels
+
+Standard deviation      Valid pixels
+
+Variance                Over valid maximum pixels
+
+Median                  Under valid minimum pixels
+
+Mode                    Null pixels
+
+Skew                    Low representation saturation (LRS) pixels
+
+Minimum                 High representation saturation (HRS) pixels
+
+Maximum                 Low instrument saturation (LIS) pixels
+
+Sum                     High instrument saturation (HIS) pixels
+    </pre>
+    
+    <p>
+      If the output file exists and the APPEND parameter is set to "no," the contents will be
+      overwritten.
+    </p>
+
+    <h4>
+      How to Specify Bands:
     </h4>
 
     <p>
@@ -24,38 +64,6 @@
       following example: peaks.cub+2,4-6.
     </p>
 
-    <h4>
-      Output:
-    </h4>
-
-    <p>
-      The statistics are output to the display screen. Additionally, if the user specifies a file
-      using the TO parameter, the statistics are written to a file in the standard label format
-      (<def>PVL</def>) or a comma delimited text file. For multi-band images, each band has its 
-      own statistics information that will be appended to the output file.  The contents of the 
-      PVL file can be read using the <i>getkey</i> program. The comma delimited text file can 
-      be imported into Excel or other applications.  The statistics calculated and reported are 
-      as follows:
-    </p>
-
-    <pre>
-
-Average        Standard deviation        Null pixels
-
-Minimum        Variance 	         Low representation saturation pixels
-
-Maximum        Skew                      High representation saturation pixels
-
-Median         Valid pixels              Low instrument saturation pixels
-
-Mode           Total pixels              High instrument saturation pixels 
-
-    </pre>
-    
-    <p>
-      If the output file exists and the APPEND parameter is set to "no," the contents will be
-      overwritten.
-    </p>
   </description>
 
   <category>
@@ -127,6 +135,11 @@ Mode           Total pixels              High instrument saturation pixels
       Fixed spelling error in FORMAT=FLAT brief. Documentation updated
       and reviewed.  Fixes #1681.
     </change>
+    <change name="Jeffrey Covington" date="2015-02-19">
+      Updated documentation of FORMAT and APPEND parameters as well as
+      general edits for clarity. Also added undocumented output statistics
+      to the list in the description.
+    </change>
   </history>
 
   <oldName>
@@ -151,9 +164,8 @@ Mode           Total pixels              High instrument saturation pixels
         </brief>
         <description>
   	  This specifies the input <def link="Cube">cube</def>. The default is 
-	  to calculate statistics for all bands in the input cube, but can be 
-	  overridden using the band specifier (e.g., file.cub+3).  The 
-	  statistics are calculated for all the bands or each selected band.
+	  to calculate statistics for each band in the input cube, but this can be 
+	  overridden using the band specifier (e.g., file.cub+3).
         </description>
         <filter>
           *.cub
@@ -171,10 +183,10 @@ Mode           Total pixels              High instrument saturation pixels
         </internalDefault>
         <description>
           This text file will contain the statistics for each individual band. 
-	  If it is written in PVL format, the values can be read using the 
-	  <i>getkey</i> program. This is useful for developing scripts. In 
-	  order to generate an output file, an output filename must be entered 
-	  along with the preferred format.
+	  If it is written in PVL format (default), the values can be read using the 
+	  <i>getkey</i> program. This is useful for developing scripts. If it is
+          written as a comma delimited text file (FLAT) the output can be easily
+          imported into spreadsheet applications like Excel.
         </description>
         <filter>
           *.txt
@@ -184,29 +196,31 @@ Mode           Total pixels              High instrument saturation pixels
        <parameter name="FORMAT">
         <type>string</type>
         <brief>
-          Output format (PVL or FLAT)
+          Output file format (PVL or comma delimited text)
         </brief>
         <description>
-          This is the format type for the output file.  PVL format is the 
+          This is the format type for the output file. <def>PVL</def> format is the 
 	  default. The format is ignored unless the TO parameter is specified.
         </description>  
         <default><item>PVL</item></default>
         <list>
           <option value="PVL">
             <brief>
-              Format the output file as PVL.
+              Format the output file specified by TO as PVL.
             </brief>
             <description>
-              Output the results to a PVL formatted file.
+              Output the results to a PVL formatted file specified by TO. This format
+              can be read using the <i>getkey</i> program.
             </description>
           </option>
           <option value="FLAT">
             <brief>
-              Format the output as a comma delimited text file.
+              Format the output file specified by TO as a comma delimited text file.
             </brief>
             <description>
-              Output the results to a comma delimited text file.  This file 
-	      format can easily be imported into the Excel application. 
+              Output the results to a comma delimited text file specified by TO. 
+              This file format can easily be imported into spreadsheet applications
+              like Excel.
             </description>
           </option>
         </list>
@@ -215,13 +229,19 @@ Mode           Total pixels              High instrument saturation pixels
       <parameter name="APPEND">
         <type>boolean</type>
         <brief>
-          Append results to output file
+          Append results to output file specified by TO.
         </brief>
         <description>
-          If this option is not selected, the output from the <i>stats</i> 
-	  application is appended to the output file. If this option is
-	  set to "NO" or "FALSE," any information in the TO file is 
-	  overwritten. 
+          <p>
+            If this option is not selected, the output from the <i>stats</i> 
+	    application is appended to the output file. If this option is
+	    set to "NO" or "FALSE," any information in the TO file is 
+	    overwritten.
+          </p>
+          <p>
+            Note: This will append the formatted results to the end of the TO 
+            file without regard to the formatting of the current contents.
+          </p> 
         </description>
         <default><item>TRUE</item></default>
       </parameter>
