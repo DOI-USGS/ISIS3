@@ -127,9 +127,9 @@ BundleSettings bundleSettings(UserInterface &ui) {
   settings.setValidateNetwork(true);
 
   // solve options
-  double latitudeSigma  = -1.0;
-  double longitudeSigma = -1.0;
-  double radiusSigma    = -1.0;
+  double latitudeSigma  = Isis::Null;
+  double longitudeSigma = Isis::Null;
+  double radiusSigma    = Isis::Null;
   if (ui.WasEntered("POINT_LATITUDE_SIGMA")) {
     latitudeSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
   }
@@ -220,7 +220,7 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
             ui.GetString("CAMSOLVE"));
 
     double anglesAprioriSigma, angularVelocityAprioriSigma, angularAccelerationAprioriSigma;
-    anglesAprioriSigma = angularVelocityAprioriSigma = angularAccelerationAprioriSigma = -1.0;
+    anglesAprioriSigma = angularVelocityAprioriSigma = angularAccelerationAprioriSigma = Isis::Null;
     if (ui.WasEntered("CAMERA_ANGLES_SIGMA")) {
       anglesAprioriSigma = ui.GetDouble("CAMERA_ANGLES_SIGMA");
     }
@@ -245,7 +245,8 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
             ui.GetString("SPSOLVE"));
 
     double positionAprioriSigma, positionVelocityAprioriSigma, positionAccelerationAprioriSigma;
-    positionAprioriSigma = positionVelocityAprioriSigma = positionAccelerationAprioriSigma = -1.0;
+    positionAprioriSigma = positionVelocityAprioriSigma = positionAccelerationAprioriSigma
+                         = Isis::Null;
     if ( ui.WasEntered("SPACECRAFT_POSITION_SIGMA") ) {
       positionAprioriSigma = ui.GetDouble("SPACECRAFT_POSITION_SIGMA");
     }
