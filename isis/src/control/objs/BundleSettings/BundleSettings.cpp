@@ -9,6 +9,10 @@
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
 
+#include <H5Cpp.h>
+#include <hdf5_hl.h>
+#include <hdf5.h>
+
 #include "BundleObservationSolveSettings.h"
 #include "FileName.h"
 #include "IException.h"
@@ -17,6 +21,7 @@
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include "SpecialPixel.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -40,9 +45,9 @@ namespace Isis {
     m_outlierRejectionMultiplier = 1.0;
 
     // Parameter Uncertainties (Weighting)
-    m_globalLatitudeAprioriSigma = -1.0;
-    m_globalLongitudeAprioriSigma = -1.0;
-    m_globalRadiusAprioriSigma = -1.0;
+    m_globalLatitudeAprioriSigma  = Isis::Null;
+    m_globalLongitudeAprioriSigma = Isis::Null;
+    m_globalRadiusAprioriSigma    = Isis::Null;
 
     BundleObservationSolveSettings defaultSolveSettings(NULL);
     m_observationSolveSettings.append(defaultSolveSettings);
@@ -78,8 +83,7 @@ namespace Isis {
    */
   BundleSettings::BundleSettings(Project *project, 
                                  XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent)
-      : QObject(parent) {   // TODO: does xml stuff need project???
+                                 QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
     m_id = NULL;
     // what about the rest of the member data ??? should we set defaults ??? CREATE INITIALIZE METHOD
 
@@ -90,80 +94,77 @@ namespace Isis {
 
 
 
-  /**
-   * Construct this BundleSettings object from XML.
-   *
-   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
-   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent
-   */
-  BundleSettings::BundleSettings(FileName xmlFile,
-                                 Project *project, 
-                                 XmlStackedHandlerReader *xmlReader,
-                                 QObject *parent)
-      : QObject(parent) {   // TODO: does xml stuff need project???
-
-
-    m_id = NULL;
-    // what about the rest of the member data ??? should we set defaults ???
-
-    QString xmlPath = xmlFile.expanded();
-    QFile qXmlFile(xmlPath);
-    if (!qXmlFile.open(QFile::ReadOnly) ) {
-      throw IException(IException::Io,
-                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
-                       _FILEINFO_);
-    }
-
-    QXmlInputSource xmlInputSource(&qXmlFile);
-
-    xmlReader->pushContentHandler(new XmlHandler(this, project));
-    xmlReader->setErrorHandler(new XmlHandler(this, project));
-    bool success = xmlReader->parse(xmlInputSource);
-    if (!success) {
-      throw IException(IException::Unknown, 
-                       QString("BundleSettings failed to parse xml file"),
-                        _FILEINFO_);
+//  /**
+//   * Construct this BundleSettings object from XML.
+//   *
+//   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+//   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+//   * @param parent The Qt-relationship parent
+//   */
+//  BundleSettings::BundleSettings(FileName xmlFile,
+//                                 Project *project, 
+//                                 XmlStackedHandlerReader *xmlReader,
+//                                 QObject *parent)
+//      : QObject(parent) {   // TODO: does xml stuff need project???
+//
+//
+//    m_id = NULL;
+//    // what about the rest of the member data ??? should we set defaults ???
+//
+//    QString xmlPath = xmlFile.expanded();
+//    QFile qXmlFile(xmlPath);
+//    if (!qXmlFile.open(QFile::ReadOnly) ) {
+//      throw IException(IException::Io,
+//                       QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+//                       _FILEINFO_);
+//    }
+//
+//    QXmlInputSource xmlInputSource(&qXmlFile);
+//
+//    xmlReader->pushContentHandler(new XmlHandler(this, project));
+//    xmlReader->setErrorHandler(new XmlHandler(this, project));
+//    bool success = xmlReader->parse(xmlInputSource);
+//    if (!success) {
 //      throw IException(IException::Unknown, 
 //                       QString("Failed to parse xml file, [%1]").arg(xmlPath),
 //                        _FILEINFO_);
-    }
-  }
+//    }
+//  }
 
 
 
-  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
-    m_id = NULL;
-    xmlReader->pushContentHandler(new XmlHandler(this));
-    xmlReader->setErrorHandler(new XmlHandler(this));
-  }
+//  BundleSettings::BundleSettings(XmlStackedHandlerReader *xmlReader, QObject *parent) {
+//    m_id = NULL;
+//    xmlReader->pushContentHandler(new XmlHandler(this));
+//    xmlReader->setErrorHandler(new XmlHandler(this));
+//  }
 
 
   /**
    * copy constructor
    */
-  BundleSettings::BundleSettings(const BundleSettings &other)
-      : m_id(new QUuid(other.m_id->toString())),
-        m_validateNetwork(other.m_validateNetwork),
-        m_solveMethod(other.m_solveMethod),
-        m_solveObservationMode(other.m_solveObservationMode),
-        m_solveRadius(other.m_solveRadius),
-        m_updateCubeLabel(other.m_updateCubeLabel),
-        m_errorPropagation(other.m_errorPropagation),
-        m_outlierRejection(other.m_outlierRejection),
-        m_outlierRejectionMultiplier(other.m_outlierRejectionMultiplier),
-        m_globalLatitudeAprioriSigma(other.m_globalLatitudeAprioriSigma),
-        m_globalLongitudeAprioriSigma(other.m_globalLongitudeAprioriSigma),
-        m_globalRadiusAprioriSigma(other.m_globalRadiusAprioriSigma),
-        m_observationSolveSettings(other.m_observationSolveSettings),
-        m_convergenceCriteria(other.m_convergenceCriteria),
-        m_convergenceCriteriaThreshold(other.m_convergenceCriteriaThreshold),
-        m_convergenceCriteriaMaximumIterations(other.m_convergenceCriteriaMaximumIterations),
-        m_maximumLikelihood(other.m_maximumLikelihood),
-        m_outputFilePrefix(other.m_outputFilePrefix),
-        m_createBundleOutputFile(other.m_createBundleOutputFile),
-        m_createCSVFiles(other.m_createCSVFiles),
-        m_createResidualsFile(other.m_createResidualsFile) {
+  BundleSettings::BundleSettings(const BundleSettings &src)
+      : m_id(new QUuid(src.m_id->toString())),
+        m_validateNetwork(src.m_validateNetwork),
+        m_solveMethod(src.m_solveMethod),
+        m_solveObservationMode(src.m_solveObservationMode),
+        m_solveRadius(src.m_solveRadius),
+        m_updateCubeLabel(src.m_updateCubeLabel),
+        m_errorPropagation(src.m_errorPropagation),
+        m_outlierRejection(src.m_outlierRejection),
+        m_outlierRejectionMultiplier(src.m_outlierRejectionMultiplier),
+        m_globalLatitudeAprioriSigma(src.m_globalLatitudeAprioriSigma),
+        m_globalLongitudeAprioriSigma(src.m_globalLongitudeAprioriSigma),
+        m_globalRadiusAprioriSigma(src.m_globalRadiusAprioriSigma),
+        m_observationSolveSettings(src.m_observationSolveSettings),
+        m_convergenceCriteria(src.m_convergenceCriteria),
+        m_convergenceCriteriaThreshold(src.m_convergenceCriteriaThreshold),
+        m_convergenceCriteriaMaximumIterations(src.m_convergenceCriteriaMaximumIterations),
+        m_maximumLikelihood(src.m_maximumLikelihood),
+        m_outputFilePrefix(src.m_outputFilePrefix),
+        m_createBundleOutputFile(src.m_createBundleOutputFile),
+        m_createCSVFiles(src.m_createCSVFiles),
+        m_createResidualsFile(src.m_createResidualsFile) {
   }
 
 
@@ -175,32 +176,32 @@ namespace Isis {
 
 
 
-  BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
-    if (&other != this) {
+  BundleSettings &BundleSettings::operator=(const BundleSettings &src) {
+    if (&src != this) {
       delete m_id;
       m_id = NULL;
-      m_id = new QUuid(other.m_id->toString());
+      m_id = new QUuid(src.m_id->toString());
 
-      m_validateNetwork = other.m_validateNetwork;
-      m_solveMethod = other.m_solveMethod;
-      m_solveObservationMode = other.m_solveObservationMode;
-      m_solveRadius = other.m_solveRadius;
-      m_updateCubeLabel = other.m_updateCubeLabel;
-      m_errorPropagation = other.m_errorPropagation;
-      m_outlierRejection = other.m_outlierRejection;
-      m_outlierRejectionMultiplier = other.m_outlierRejectionMultiplier;
-      m_globalLatitudeAprioriSigma = other.m_globalLatitudeAprioriSigma;
-      m_globalLongitudeAprioriSigma = other.m_globalLongitudeAprioriSigma;
-      m_globalRadiusAprioriSigma = other.m_globalRadiusAprioriSigma;
-      m_observationSolveSettings = other.m_observationSolveSettings;
-      m_convergenceCriteria = other.m_convergenceCriteria;
-      m_convergenceCriteriaThreshold = other.m_convergenceCriteriaThreshold;
-      m_convergenceCriteriaMaximumIterations = other.m_convergenceCriteriaMaximumIterations;
-      m_maximumLikelihood = other.m_maximumLikelihood;
-      m_outputFilePrefix = other.m_outputFilePrefix;
-      m_createBundleOutputFile = other.m_createBundleOutputFile;
-      m_createCSVFiles = other.m_createCSVFiles;
-      m_createResidualsFile = other.m_createResidualsFile;
+      m_validateNetwork = src.m_validateNetwork;
+      m_solveMethod = src.m_solveMethod;
+      m_solveObservationMode = src.m_solveObservationMode;
+      m_solveRadius = src.m_solveRadius;
+      m_updateCubeLabel = src.m_updateCubeLabel;
+      m_errorPropagation = src.m_errorPropagation;
+      m_outlierRejection = src.m_outlierRejection;
+      m_outlierRejectionMultiplier = src.m_outlierRejectionMultiplier;
+      m_globalLatitudeAprioriSigma = src.m_globalLatitudeAprioriSigma;
+      m_globalLongitudeAprioriSigma = src.m_globalLongitudeAprioriSigma;
+      m_globalRadiusAprioriSigma = src.m_globalRadiusAprioriSigma;
+      m_observationSolveSettings = src.m_observationSolveSettings;
+      m_convergenceCriteria = src.m_convergenceCriteria;
+      m_convergenceCriteriaThreshold = src.m_convergenceCriteriaThreshold;
+      m_convergenceCriteriaMaximumIterations = src.m_convergenceCriteriaMaximumIterations;
+      m_maximumLikelihood = src.m_maximumLikelihood;
+      m_outputFilePrefix = src.m_outputFilePrefix;
+      m_createBundleOutputFile = src.m_createBundleOutputFile;
+      m_createCSVFiles = src.m_createCSVFiles;
+      m_createResidualsFile = src.m_createResidualsFile;
     }
     return *this;
   }
@@ -266,7 +267,7 @@ namespace Isis {
       m_globalRadiusAprioriSigma = globalRadiusAprioriSigma;
     }
     else {
-      m_globalRadiusAprioriSigma = -1.0;
+      m_globalRadiusAprioriSigma = Isis::Null;
     }
   }
 
@@ -375,7 +376,7 @@ namespace Isis {
   BundleObservationSolveSettings 
       BundleSettings::observationSolveSettings(int n) const { 
 
-    if (n < numberSolveSettings() && n >= 0) {
+    if (n >= 0 && n < numberSolveSettings()) {
       return m_observationSolveSettings[n]; 
     }
     QString msg = "Unable to find BundleObservationSolveSettings with index = ["
@@ -648,7 +649,7 @@ namespace Isis {
     stream.writeEndElement();
     
     stream.writeStartElement("outlierRejectionOptions");
-    stream.writeAttribute("reject", toString(outlierRejection()));
+    stream.writeAttribute("rejection", toString(outlierRejection()));
     if (outlierRejection()) {
       stream.writeAttribute("multiplier", toString(outlierRejectionMultiplier()));
     }
@@ -792,19 +793,19 @@ namespace Isis {
 
 
 
-  /**
-   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
-   *   BundleSettings::save() for the expected format.
-   *
-   * @param bundleSettings The BundleSettings we're going to be initializing
-   * @param imageFolder The folder that contains the Cube
-   */
-  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings) {
-    m_xmlHandlerBundleSettings = bundleSettings;
-    m_xmlHandlerProject = NULL;  // TODO: does xml stuff need project???
-    m_xmlHandlerCharacters = "";
-    m_xmlHandlerObservationSettings.clear();
-  }
+//  /**
+//   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
+//   *   BundleSettings::save() for the expected format.
+//   *
+//   * @param bundleSettings The BundleSettings we're going to be initializing
+//   * @param imageFolder The folder that contains the Cube
+//   */
+//  BundleSettings::XmlHandler::XmlHandler(BundleSettings *bundleSettings) {
+//    m_xmlHandlerBundleSettings = bundleSettings;
+//    m_xmlHandlerProject = NULL;  // TODO: does xml stuff need project???
+//    m_xmlHandlerCharacters = "";
+//    m_xmlHandlerObservationSettings.clear();
+//  }
 
 
 
@@ -831,8 +832,6 @@ namespace Isis {
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
-//#if 0
-      // option 2
       if (localName == "solveOptions") {
         
         QString solveMethodStr = atts.value("solveMethod");
@@ -879,7 +878,7 @@ namespace Isis {
             m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = toDouble(globalRadiusAprioriSigmaStr);
           }
           else {
-            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = -1.0;
+            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = Isis::Null;
           }
         }
       }
@@ -950,23 +949,6 @@ namespace Isis {
         m_xmlHandlerObservationSettings.append(
             new BundleObservationSolveSettings(m_xmlHandlerProject, reader()));
       }
-//#endif
-#if 0
-      // option 3
-      if (localName == "model") {
-        QString type = atts.value("type");
-        QString quantile = atts.value("quantile");
-        if (!type.isEmpty() && !quantile.isEmpty()) {
-        m_xmlHandlerBundleSettings->m_maximumLikelihood.append(
-              qMakePair(MaximumLikelihoodWFunctions::stringToModel(type),
-                        toDouble(quantile)));
-        }
-      }
-      else if (localName == "bundleObservationSolveSettings") {
-        m_xmlHandlerObservationSettings.append(
-            new BundleObservationSolveSettings(m_xmlHandlerProject, reader()));
-      }
-#endif
     }
     return true;
   }
@@ -982,97 +964,23 @@ namespace Isis {
 
   bool BundleSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
-//#if 0
-      // option 2
-    if (localName == "id") {
-      m_xmlHandlerBundleSettings->m_id = NULL;
-      m_xmlHandlerBundleSettings->m_id = new QUuid(m_xmlHandlerCharacters);
-    }
-    else if (localName == "validateNetwork") {
-      m_xmlHandlerBundleSettings->m_validateNetwork = toBool(m_xmlHandlerCharacters);
-    }
-    else if (localName == "observationSolveSettingsList") {
-      for (int i = 0; i < m_xmlHandlerObservationSettings.size(); i++) {
-        m_xmlHandlerBundleSettings->m_observationSolveSettings.append(*m_xmlHandlerObservationSettings[i]);
-      }
-      m_xmlHandlerObservationSettings.clear();
-    }
-
-//#endif
-#if 0
-      // option 3
+    if (!m_xmlHandlerCharacters.isEmpty()) {
       if (localName == "id") {
-        delete m_xmlHandlerBundleSettings->m_id; // ??? delete these ???
         m_xmlHandlerBundleSettings->m_id = NULL;
         m_xmlHandlerBundleSettings->m_id = new QUuid(m_xmlHandlerCharacters);
       }
       else if (localName == "validateNetwork") {
         m_xmlHandlerBundleSettings->m_validateNetwork = toBool(m_xmlHandlerCharacters);
       }
-      else if (localName == "solveMethod") {
-        m_xmlHandlerBundleSettings->m_solveMethod = stringToSolveMethod(m_xmlHandlerCharacters);
-      }
-      else if (localName == "solveObservationMode") {
-        m_xmlHandlerBundleSettings->m_solveObservationMode = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "solveRadius") {
-        m_xmlHandlerBundleSettings->m_solveRadius = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "updateCubeLabel") {
-        m_xmlHandlerBundleSettings->m_updateCubeLabel = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "errorPropagation") {
-        m_xmlHandlerBundleSettings->m_errorPropagation = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "latitude") {
-        m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = toDouble(m_xmlHandlerCharacters);
-      }
-      else if (localName == "longitude") {
-        m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma =
-            toDouble(m_xmlHandlerCharacters);
-      }
-      else if (localName == "radius") {
-        if (m_xmlHandlerCharacters != "N/A") {
-          m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = toDouble(m_xmlHandlerCharacters);
+      else if (localName == "observationSolveSettingsList") {
+        for (int i = 0; i < m_xmlHandlerObservationSettings.size(); i++) {
+          m_xmlHandlerBundleSettings->m_observationSolveSettings.append(*m_xmlHandlerObservationSettings[i]);
         }
-        else {
-          m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = -1.0;
-        }
+        m_xmlHandlerObservationSettings.clear();
       }
-      else if (localName == "rejection") {
-        m_xmlHandlerBundleSettings->m_outlierRejection = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "multiplier") {
-        if (m_xmlHandlerCharacters != "N/A") {
-          m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = toDouble(m_xmlHandlerCharacters);
-        }
-        else {
-          m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0;
-        }
-      }
-      else if (localName == "convergenceCriteria") {
-        m_xmlHandlerBundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(m_xmlHandlerCharacters);
-      }
-      else if (localName == "threshold") {
-        m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold = toDouble(m_xmlHandlerCharacters);
-      }
-      else if (localName == "maximumIterations") {
-        m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations = toInt(m_xmlHandlerCharacters);
-      }
-      else if (localName == "outputFilePrefix") {
-        m_xmlHandlerBundleSettings->m_outputFilePrefix = m_xmlHandlerCharacters;
-      }
-      else if (localName == "createBundleOutputFile") {
-        m_xmlHandlerBundleSettings->m_createBundleOutputFile = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "createCSVFiles") {
-        m_xmlHandlerBundleSettings->m_createCSVFiles = toBool(m_xmlHandlerCharacters);
-      }
-      else if (localName == "createResidualsFile") {
-        m_xmlHandlerBundleSettings->m_createResidualsFile = toBool(m_xmlHandlerCharacters);
-      }
-#endif
-    m_xmlHandlerCharacters = "";
+  
+      m_xmlHandlerCharacters = "";
+    }
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
@@ -1167,4 +1075,217 @@ namespace Isis {
     return settings.read(stream);
   }
 
+  void BundleSettings::savehdf5(hid_t fileId, H5::Group settingsGroup) const {
+    //
+    //
+    //// Try block to detect exceptions raised by any of the calls inside it
+    //try {
+    //  /*
+    //   * Turn off the auto-printing when failure occurs so that we can
+    //   * handle the errors appropriately
+    //   */
+    //  H5::Exception::dontPrint();
+    //  /*
+    //   * Create a new file using H5F_ACC_TRUNC access,
+    //   * default file creation properties, and default file
+    //   * access properties.
+    //   */
+    //  H5::H5File hdfFile = H5::H5File( hdfFileName, H5F_ACC_TRUNC ); // does this append or overwrite ???
+    //  hid_t fileId = hdfFile.getId();
+    //  H5::Group bundleSettingsGroup = H5::Group(hdfFile.createGroup("/BundleSettings"));
+    //
+    //  hsize_t dims[2];              // dataset dimensions
+    //
+    //  //TODO: finish Correlation Matrix
+    //  //Create a dataset with compression
+    //  H5::Group correlationMatrixGroup
+    //      = H5::Group(hdfFile.createGroup("/BundleSettings/CorrelationMatrix"));
+    //  H5LTset_attribute_string(fileId, "/BundleSettings/CorrelationMatrix", "correlationFileName", 
+    //                           correlationMatrix().correlationFileName().expanded());
+    //  H5LTset_attribute_string(fileId, "/BundleSettings/CorrelationMatrix", "covarianceFileName", 
+    //                           correlationMatrix().covarianceFileName().expanded());
+    //  // TODO: jb - how do we add
+    //  // correlationMatrix().imagesAndParameters()???
+    //  // QMapIterator<QString, QStringList> a list of images with their
+    //  // corresponding parameters...
+    //
+    //  
+    //  // H5::Group generalStatsInfoGroup = H5::Group(hdfFile.createGroup("/GeneralStatisticsInfo"));
+    //  const int numFixedPoints = numberFixedPoints();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberFixedPoints", &numFixedPoints, 1);
+    //  const int numIgnoredPoints = numberIgnoredPoints();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberIgnoredPoints", &numIgnoredPoints, 1);
+    //  const int numHeldImages = numberHeldImages();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberHeldImages", &numHeldImages, 1);
+    //  const double rejectionLimit = rejectionLimit();
+    //  H5LTset_attribute_double(fileId, "/BundleSettings", "rejectionLimit", &rejectionLimit, 1);
+    //  const int numRejectedObservations = numberRejectedObservations();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberRejectedObservations", &numRejectedObservations, 1);
+    //  const int numObservations = numberObservations();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberObservations", &numObservations, 1);
+    //  const int numImageParameters = numberImageParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberImageParameters", &numImageParameters, 1);
+    //  const int numConstrainedPointParameters = numberConstrainedPointParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberConstrainedPointParameters", 
+    //                        &numConstrainedPointParameters, 1);
+    //  const int numConstrainedImageParameters = numberConstrainedImageParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberConstrainedImageParameters", 
+    //                        &numConstrainedImageParameters, 1);
+    //  const int numUnknownParameters = numberUnknownParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberUnknownParameters", &numUnknownParameters, 1);
+    //  const int degreesOfFreedom = degreesOfFreedom();
+    //  H5LTset_attribute_int(fileId, "/BundleSettings", "degreesOfFreedom", &degreesOfFreedom, 1);
+    //  const double sigma0 = sigma0();
+    //  H5LTset_attribute_double(fileId, "/BundleSettings", "sigma0", &sigma0, 1);
+    //  bool converged = converged();// ???
+    //  H5LTset_attribute_string(fileId, "/BundleSettings", "converged", toString(converged), 1);
+    //  
+    //  
+    //  // Create an RMS group in the file
+    //  H5::Group rms = H5::Group(hdfFile.createGroup("/RMS"));
+    //  H5::Group rms = H5::Group(hdfFile.createGroup("/RMS/residuals"));
+    //  // RMS and Sigma Scalars
+    //  H5LTset_attribute_double(fileId, "/RMS/residuals", "x", rmsRx(), 1);
+    //  H5LTset_attribute_double(fileId, "/RMS/residuals", "y", rmsRy(), 1);
+    //  H5LTset_attribute_double(fileId, "/RMS/residuals", "xy", rmsRxy(), 1);
+    //  H5::Group rms = H5::Group(hdfFile.createGroup("/RMS/sigmas"));
+    //  const double sigmas [3] = {rmsSigmaLat(), rmsSigmaLon(), rmsSigmaRad()};
+    //  H5LTset_attribute_double(fileId, "/RMS/sigmas", "latitude", rmsSigmaLat(), 1);
+    //  H5LTset_attribute_double(fileId, "/RMS/sigmas", "longitude", rmsSigmaLon(), 1);
+    //  H5LTset_attribute_double(fileId, "/RMS/sigmas", "radius", rmsSigmaRad(), 1);
+    //  // RMS and Sigma Vectors - This is a ton of duplicate code where I would rather use a list of functions - are functions first class objects?
+    //  const hsize_t residualsArraySize = rmsImageResiduals.size();
+    //  H5::DataSpace residualDataspace(1, &residualsArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/ResidualsList", H5::PredType::NATIVE_FLOAT, residualDataspace));
+    //  dataset.write(m_rmsImageResiduals, H5::PredType::NATIVE_FLOAT);
+    //  // Write the residual vector
+    //  const hsize_t sampleArraySize = rmsImageSampleResiduals.size();
+    //  H5::DataSpace sampleDataspace(1, &sampleArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/SampleList", H5::PredType::NATIVE_FLOAT, sampleDataspace));
+    //  dataset.write(m_rmsImageSampleResiduals, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t lineArraySize = rmsImageLineResiduals.size();
+    //  H5::DataSpace lineDataSpace(1,&lineArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/LineList", H5::PredType::NATIVE_FLOAT, lineDataSpace));
+    //  dataset.write(m_rmsImageLineResiduals, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t xSigmasArraySize = rmsImageXSigmas.size();
+    //  H5::DataSpace xSigmaDataspace(1, &xSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/xSigmas", H5::PredType::NATIVE_FLOAT, xSigmaDataspace));
+    //  dataset.write(m_rmsImageXSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t ySigmasArraySize = rmsImageYSigmas.size();
+    //  H5::DataSpace ySigmaDataspace(1, &ySigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/ySigmas", H5::PredType::NATIVE_FLOAT, ySigmaDataspace));
+    //  dataset.write(m_rmsImageYSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t zSigmasArraySize = rmsImageZSigmas.size();
+    //  H5::DataSpace zSigmaDataspace(1, &zSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/zSigmas", H5::PredType::NATIVE_FLOAT, zSigmaDataspace));
+    //  dataset.write(m_rmsImageZSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t raSigmasArraySize = rmsImageRASigmas.size();
+    //  H5::DataSpace raSigmaDataspace(1, &raSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/raSigmas", H5::PredType::NATIVE_FLOAT, raSigmaDataspace));
+    //  dataset.write(m_rmsImageRASigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t decSigmasArraySize = rmsImageDECSigmas.size();
+    //  H5::DataSpace decSigmaDataspace(1, &decSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/decSigmas", H5::PredType::NATIVE_FLOAT, decSigmaDataspace));
+    //  dataset.write(m_rmsImageDECSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t twistSigmasArraySize = rmsImageTWISTSigmas.size();
+    //  H5::DataSpace twistSigmaDataspace(1, &twistSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/twistSigmas", H5::PredType::NATIVE_FLOAT, twistSigmaDataspace));
+    //  dataset.write(m_rmsImageTWISTSigmas, H5::PredType::NATIVE_FLOAT);
+    //  
+    //  //Write elapsed time and error prop as attirbutes tagged to the root
+    //  const double elapsedTime = elapsedTime();
+    //  H5LTset_attribute_double(fileId, "/BundleSettings", "elapsedTime", &elapsedTime, 1);
+    //  const double errorProp = lapsedTimeErrorProp();
+    //  H5LTset_attribute_double(fileId, "/BundleSettings", "elapsedTimeErrorProp", &errorProp, 1);
+    //  
+    //  //Write a sigmas table
+    //  static m_sigmaTable sigmatable[6] = { // JB - why static???
+    //      {"minLat", minSigmaLatitudePointId(), minSigmaLatitude()},
+    //      {"maxLat", maxSigmaLatitudePointId(), maxSigmaLatitude()},
+    //      {"minLon", minSigmaLongitudePointId(), minSigmaLongitude()},
+    //      {"MaxLon", maxSigmaLongitudePointId(), maxSigmaLongitude()},
+    //      {"minRad", minSigmaRadiusPointId(), minSigmaRadius()},
+    //      {"maxRad", maxSigmaRadiusPointId(), maxSigmaRadius()}
+    //  };
+    //  
+    //  const int nfields = 3; //How many columns and their types - must be const so that field names can be created
+    //  
+    //  size_t part_offset[nfields] = {HOFFSET(m_sigmaTable, type),
+    //      HOFFSET(m_sigmaTable, pid),
+    //      HOFFSET(m_sigmaTable, value)};
+    //  
+    //  //Field names and types
+    //  hid_t field_type[nfields];  //Setup for a string type for the pid
+    //  hid_t string_type = H5Tcopy(H5T_C_S1);
+    //  H5Tset_size(string_type, (size_t)64);
+    //  field_type[0] = string_type;  //type
+    //  field_type[1] = string_type; //pid
+    //  field_type[2] = H5T_NATIVE_FLOAT;
+    //  
+    //  //How many rows?
+    //  int nrecords = 6;
+    //  // Field names
+    //  const char *fieldnames[nfields] = {"valuetype", "pid", "value"};
+    //  
+    //  hsize_t chunksize = 10;
+    //  int *filldata = NULL;
+    //  int compress = 0;
+    //  
+    //  H5TBmake_table("MinMaxSigma",fileId, "minmaxsigma", (hsize_t)nfields, (hsize_t)nrecords, sizeof(m_sigmaTable), fieldnames, part_offset, field_type, chunksize, filldata, compress, sigmatable);
+    //  
+    //  
+    //  H5::Group mlestatistics = H5::Group(hdfFile.createGroup("/MLEstimation"));
+    //  //TODO: ML Estimation Items
+    //  //The existing code iterates through - is this stored as a matrix somewhere?
+    //  // Dimensions
+    //  dims[1] = 4;
+    //  dims[0]  = 100;
+    //  
+    //  H5::DataSpace cumProbDataspace( RANK, dims );
+    //  H5::DataSet dataset = H5::DataSet(hdfFile.createDataSet("/MLEstimation/cumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, cumProbDataspace));
+    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
+    //  
+    //  
+    //  dims[1] = 4;
+    //  dims[0] = 100;
+    //  H5::DataSpace resCumProbdataspace(RANK, dims);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/MLEstimation/residualsCumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, resCumProbdataspace));
+    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
+    //  
+    //}  // end of try block
+    //// catch failure caused by the H5File operations
+    //catch( H5::FileIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a file error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //// catch failure caused by the DataSet operations
+    //catch( H5::DataSetIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a data set error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //// catch failure caused by the DataSpace operations
+    //catch( H5::DataSpaceIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a data space error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //// catch failure caused by the DataSpace operations
+    //catch( H5::DataTypeIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a data type error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //return;
+      
+  }
 }

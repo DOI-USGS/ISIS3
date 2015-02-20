@@ -27,6 +27,10 @@
 #include <QObject>
 #include <QString>
 
+#include <H5Cpp.h>
+#include <hdf5_hl.h>
+#include <hdf5.h>
+
 #include "BundleObservationSolveSettings.h"
 #include "MaximumLikelihoodWFunctions.h" // why not forward declare???
 #include "PvlObject.h"
@@ -35,6 +39,9 @@
 class QDataStream;
 class QUuid;
 class QXmlStreamWriter;
+
+using namespace H5;
+using namespace Isis;
 
 namespace Isis {
   class FileName;
@@ -63,13 +70,21 @@ namespace Isis {
    *   @history 2014-07-23 Jeannie Backer - Added QDataStream >> and << operators and read/write
    *                           methods. Created unitTest.
    *   @history 2014-07-25 Jeannie Backer - Improved unitTest coverage to 100% scope/line/function.
+   *   @history 2014-11-17 Jeannie Backer - Added xml read/write capabilities. XmlHandler
+   *                           constructor/destructor is not shown as covered by unitTest. Current
+   *                           test code coverage is (scope 98.79%, line 98.698%, function 96.0%).
+   *   @history 2015-02-20 Jeannie Backer - Changed apriori sigma defaults from -1.0 to Isis::Null.
+   *                           Added hdf5 includes.
+   *  
+   *   @todo Determine whether xml stuff needs a Project pointer
+   *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *  
    */
   class BundleSettings : public QObject {
     Q_OBJECT
     public:
       BundleSettings(QObject *parent = 0);
-      BundleSettings(const BundleSettings &other);
+      BundleSettings(const BundleSettings &src);
       BundleSettings(Project *project, 
                      XmlStackedHandlerReader *xmlReader, 
                      QObject *parent = 0);  // TODO: does xml stuff need project???
@@ -88,7 +103,8 @@ namespace Isis {
 
       // Solve Options
       /**
-       * This enum defines the types of solve methods.
+       * This enum defines the types of matrix decomposition methods for solving
+       * the bundle. 
        */
       enum SolveMethod {
         Sparse,   //!< Cholesky model sparse normal equations matrix. (Uses the cholmod library).
@@ -99,7 +115,7 @@ namespace Isis {
       static QString solveMethodToString(SolveMethod solveMethod);
 
       // mutators
-      void setSolveOptions(SolveMethod method, 
+      void setSolveOptions(SolveMethod method = Sparse, 
                            bool solveObservationMode = false,
                            bool updateCubeLabel = false, 
                            bool errorPropagation = false,
@@ -125,9 +141,6 @@ namespace Isis {
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
       BundleObservationSolveSettings observationSolveSettings(int n) const;
-//      const BundleObservationSolveSettings &observationSolveSettings(QString instrumentId);
-//      const BundleObservationSolveSettings &observationSolveSettings(int n);               
-
 
       // Convergence Criteria
       /**
@@ -196,6 +209,7 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
+      void savehdf5(hid_t fileId, H5::Group settingsGroup) const;
 
     private:
       /**
