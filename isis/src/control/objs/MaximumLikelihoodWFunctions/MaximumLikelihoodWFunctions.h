@@ -43,6 +43,7 @@ namespace Isis {
    *              Chen, "Robust Regression with Projection Based M-estimators"
    *
    * @ingroup ControlNetwork
+   * @ingroup Math
    *
    * @author 2012-03-23 Orrin Thomas
    *
@@ -54,7 +55,9 @@ namespace Isis {
    *   @history 2014-07-03 Jeannie Backer - Replace member variable m_PI with Isis constant
    *   @history 2014-07-16 Jeannie Backer - Added enum to QString method and its inverse.
    *   @history 2014-07-23 Jeannie Backer - Added QDataStream >> and << operators and read/write
-   *                           methods. Created unitTest.
+   *                           methods.
+   *   @history 2014-09-19 Jeannie Backer - Removed bugs. Added documentation. Cleaned
+   *                           duplicate code.
    */
   class MaximumLikelihoodWFunctions {
   public:
@@ -113,11 +116,11 @@ namespace Isis {
     ~MaximumLikelihoodWFunctions();
     MaximumLikelihoodWFunctions &operator=(const MaximumLikelihoodWFunctions &other);
 
-    bool setModel(Model modelSelection); // uses default tweaking constant
-    bool setTweakingConstantDefault();
+    void setModel(Model modelSelection); // uses default tweaking constant
+    void setTweakingConstantDefault();
 
-    bool setModel(Model modelSelection, double tweakingConstant);
-    bool setTweakingConstant(double tweakingConstant);
+    void setModel(Model modelSelection, double tweakingConstant);
+    void setTweakingConstant(double tweakingConstant);
 
     Model model() const;
     double tweakingConstant() const;

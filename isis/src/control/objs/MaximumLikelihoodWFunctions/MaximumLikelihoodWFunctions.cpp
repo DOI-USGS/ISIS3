@@ -10,7 +10,10 @@
 #include "IString.h"
 
 namespace Isis {
-  
+  /** 
+   * Sets up a maximumlikelihood estimation function with Huber model and default tweaking
+   * constant
+   */  
   MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions() {
     this->setModel(Huber);
   } // choose Model and define the tweaking constant
@@ -45,17 +48,13 @@ namespace Isis {
   MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(Model modelSelection, 
                                                            double tweakingConstant) {
     // choose Model and define the tweaking constant
-    m_model = modelSelection;
-    if (tweakingConstant <= 0.0) {
-      IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    m_tweakingConstant = tweakingConstant;
+    setModel(modelSelection, tweakingConstant);
   }
 
   MaximumLikelihoodWFunctions::MaximumLikelihoodWFunctions(
       const MaximumLikelihoodWFunctions &other)
-      : m_model(other.m_model), m_tweakingConstant(other.m_tweakingConstant) {
+      : m_model(other.m_model), 
+        m_tweakingConstant(other.m_tweakingConstant) {
   }
 
 
@@ -77,11 +76,10 @@ namespace Isis {
    * @Param[in] enum Model modelSelection,  the model to be used
    *                                        (see documentation for enum Model)
    */
-  bool MaximumLikelihoodWFunctions::setModel(Model modelSelection) {
+  void MaximumLikelihoodWFunctions::setModel(Model modelSelection) {
     // choose Model and use default tweaking constant
     m_model = modelSelection;
     this->setTweakingConstantDefault();
-    return true;
   }
 
 
@@ -89,21 +87,21 @@ namespace Isis {
   /** 
    * Sets default tweaking constants based on the maximum likelihood estimation model being used.
    */
-  bool MaximumLikelihoodWFunctions::setTweakingConstantDefault() {
+  void MaximumLikelihoodWFunctions::setTweakingConstantDefault() {
     // default tweaking constants for the various likelihood models
     switch (m_model) {
       case Huber:
-        m_tweakingConstant = 1.345; // "95% asymptotice efficiecy on the standard normal distribution"
+        m_tweakingConstant = 1.345; // "95% asymptotic efficiecy on the standard normal distribution"
                                     // is obtained with this constant, 
                                     // see Zhang's "Parameter Estimation"
         break;
       case HuberModified:
-        m_tweakingConstant = 1.2107;// "95% asymptotice efficiecy on the standard normal distribution"
+        m_tweakingConstant = 1.2107;// "95% asymptotic efficiecy on the standard normal distribution"
                                     // is obtained with this constant,
                                     // see Zhang's "Parameter Estimation"
         break;
       case Welsch:
-        m_tweakingConstant = 2.9846;// "95% asymptotice efficiecy on the standard normal distribution"
+        m_tweakingConstant = 2.9846;// "95% asymptotic efficiecy on the standard normal distribution"
                                     // is obtained with this constant,
                                     // see Zhang's "Parameter Estimation"
         break;
@@ -114,9 +112,7 @@ namespace Isis {
       default:
         m_tweakingConstant = 1;     // default, though at the time of writing this class,
                                     // this value should never actually be used
-        break;
     }
-    return true;
   }
 
 
@@ -126,22 +122,16 @@ namespace Isis {
  *
  * @param[in] enum Model modelSelection,  the model to be used
  *                                        (see documentation for enum Model)
- * @param[in] double tweaking constant,  exact meaning varies by model, but generally the
+ * @param[in] tweakingConstant,  exact meaning varies by model, but generally the
  *                                       larger the value the more influence larger resiudals
  *                                       have on the solution. As well as possibly the more
  *                                       measures are included in the solution.
  * @throws IsisProgrammerError if tweakingConstant <= 0.0
  */
-  bool MaximumLikelihoodWFunctions::setModel(Model modelSelection, double tweakingConstant) { 
+  void MaximumLikelihoodWFunctions::setModel(Model modelSelection, double tweakingConstant) { 
     // choose Model and define the tweaking constant
     m_model = modelSelection;
-    if (tweakingConstant <= 0.0) {
-      IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-      return false;
-    }
-    m_tweakingConstant = tweakingConstant;
-    return true;
+    setTweakingConstant(tweakingConstant);
   }
 
 
@@ -149,24 +139,19 @@ namespace Isis {
   /** 
    * Allows the tweaking constant to be changed without changing the maximum likelihood function
    *
-   * @param[in] double tweaking constant,  exact meaning varies by model, but generally the larger
-   * the value the more influence larger resiudals have on the solution. As well as possiblely the
+   * @param[in] tweakingConstant,  exact meaning varies by model, but generally the larger
+   * the value the more influence larger resiudals have on the solution. As well as possiblly the
    * more measures are included in the solution.
    * 
    * @throws IsisProgrammerError if tweakingConstant <= 0.0
    */
-  bool MaximumLikelihoodWFunctions::setTweakingConstant(double tweakingConstant) { 
+  void MaximumLikelihoodWFunctions::setTweakingConstant(double tweakingConstant) { 
     // leave model type unaltered and change tweaking constant
-    if (tweakingConstant <= 0.0) {
-      return false;  // the constant must be positive
-    }
     if (tweakingConstant <= 0.0) {
       IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
       throw IException(IException::Programmer, msg, _FILEINFO_);
-      return false;
     }
     m_tweakingConstant = tweakingConstant;
-    return true;
   }
 
 
