@@ -49,7 +49,7 @@ namespace Isis {
   }
 
 
-
+#if 0
   /**
    * Construct this BundleSettings object from XML.
    *
@@ -82,7 +82,7 @@ namespace Isis {
                         _FILEINFO_);
     }
   }
-
+#endif
 
 
   /**
@@ -92,17 +92,17 @@ namespace Isis {
 //      : m_id(new QUuid(other.m_id->toString())),
 //        m_instrumentId(other.m_instrumentId),
 //        m_instrumentPointingSolveOption(other.m_instrumentPointingSolveOption),
-//        m_solveTwist(other.m_solveTwist),
+//        m_numberCamAngleCoefSolved(other.m_numberCamAngleCoefSolved),
 //        m_ckDegree(other.m_ckDegree),
 //        m_ckSolveDegree(other.m_ckSolveDegree),
-//        m_numberCamAngleCoefSolved(other.m_numberCamAngleCoefSolved),
+//        m_solveTwist(other.m_solveTwist),
 //        m_solvePointingPolynomialOverExisting(other.m_solvePointingPolynomialOverExisting),
 //        m_anglesAprioriSigma(other.m_anglesAprioriSigma),
 //        m_pointingInterpolationType(other.m_pointingInterpolationType),
 //        m_instrumentPositionSolveOption(other.m_instrumentPositionSolveOption),
+//        m_numberCamPosCoefSolved(other.m_numberCamPosCoefSolved),
 //        m_spkDegree(other.m_spkDegree),
 //        m_spkSolveDegree(other.m_spkSolveDegree),
-//        m_numberCamPosCoefSolved(other.m_numberCamPosCoefSolved),
 //        m_solvePositionOverHermiteSpline(other.m_solvePositionOverHermiteSpline),
 //        m_positionAprioriSigma(other.m_positionAprioriSigma),
 //        m_positionInterpolationType(other.m_positionInterpolationType) {
@@ -115,17 +115,17 @@ namespace Isis {
 
     m_instrumentId = other.m_instrumentId;
     m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
-    m_solveTwist = other.m_solveTwist;
+    m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
     m_ckDegree = other.m_ckDegree;
     m_ckSolveDegree = other.m_ckSolveDegree;
-    m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
+    m_solveTwist = other.m_solveTwist;
     m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
     m_anglesAprioriSigma = other.m_anglesAprioriSigma;
     m_pointingInterpolationType = other.m_pointingInterpolationType;
     m_instrumentPositionSolveOption = other.m_instrumentPositionSolveOption;
+    m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
     m_spkDegree = other.m_spkDegree;
     m_spkSolveDegree = other.m_spkSolveDegree;
-    m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
     m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
     m_positionAprioriSigma = other.m_positionAprioriSigma;
     m_positionInterpolationType = other.m_positionInterpolationType;
@@ -155,24 +155,25 @@ namespace Isis {
       
       m_instrumentId = other.m_instrumentId;
       
+      // pointing related
+      m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
+      m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
+      m_ckDegree = other.m_ckDegree;
+      m_ckSolveDegree = other.m_ckSolveDegree;
+      m_solveTwist = other.m_solveTwist;
+      m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
+      m_pointingInterpolationType = other.m_pointingInterpolationType;
+      m_anglesAprioriSigma = other.m_anglesAprioriSigma;
+
       // position related
       m_instrumentPositionSolveOption = other.m_instrumentPositionSolveOption;
+      m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
       m_spkDegree = other.m_spkDegree;
       m_spkSolveDegree = other.m_spkSolveDegree;
-      m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
       m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
       m_positionInterpolationType = other.m_positionInterpolationType;
       m_positionAprioriSigma = other.m_positionAprioriSigma;
       
-      // pointing related
-      m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
-      m_solveTwist = other.m_solveTwist;
-      m_ckDegree = other.m_ckDegree;
-      m_ckSolveDegree = other.m_ckSolveDegree;
-      m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
-      m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
-      m_pointingInterpolationType = other.m_pointingInterpolationType;
-      m_anglesAprioriSigma = other.m_anglesAprioriSigma;
     }
 
     return *this;
@@ -187,23 +188,29 @@ namespace Isis {
     
     m_instrumentId = "";
 
-    // Spacecraft Position Options
-    m_instrumentPositionSolveOption = NoPositionFactors;
-    m_spkDegree = 2;
-    m_spkSolveDegree = -1;// ??? default to match no position factors is -1
-    m_solvePositionOverHermiteSpline = false;
-    m_positionInterpolationType = SpicePosition::PolyFunction;
-    m_positionAprioriSigma.clear();
-
     // Camera Pointing Options
-    m_instrumentPointingSolveOption = AnglesOnly;
-    m_solveTwist = true;
-    m_ckDegree = 2;
-    m_ckSolveDegree = 0; // ??? default to match angles only is 0
-    m_solvePointingPolynomialOverExisting = false;
-    m_pointingInterpolationType = SpiceRotation::PolyFunction;
-    m_numberCamAngleCoefSolved = 1;
-    m_anglesAprioriSigma.clear();
+    // Defaults: 
+    //     m_instrumentPointingSolveOption = AnglesOnly;
+    //     m_numberCamAngleCoefSolved = 1; // AnglesOnly;
+    //     m_ckDegree = 2;
+    //     m_ckSolveDegree = 2;
+    //     m_solveTwist = true;
+    //     m_solvePointingPolynomialOverExisting = false;
+    //     m_pointingInterpolationType = SpiceRotation::PolyFunction;
+    //     m_anglesAprioriSigma.append(-1.0); // num cam angle coef = 1
+    setInstrumentPointingSettings(AnglesOnly, true, 2, 2, false);
+
+    // Spacecraft Position Options
+    // Defaults:
+    //     m_instrumentPositionSolveOption = NoPositionFactors;
+    //     m_numberCamPosCoefSolved = 0; // NoPositionFactors;
+    //     m_spkDegree = 2;
+    //     m_spkSolveDegree = 2;
+    //     m_solvePositionOverHermiteSpline = false;
+    //     m_positionInterpolationType = SpicePosition::PolyFunction;
+    //     m_positionAprioriSigma.clear();
+    setInstrumentPositionSettings(NoPositionFactors, 2, 2, false);
+
   }
 
 
@@ -217,164 +224,136 @@ namespace Isis {
   /**
    * set bundle solve parameters for an observation
    */
-  bool BundleObservationSolveSettings::setFromPvl(PvlGroup& scParameterGroup) {
+  bool BundleObservationSolveSettings::setFromPvl(PvlGroup &scParameterGroup) {
+    // reset defaults
+    initialize();
 
+    try {
+      // group name must be instrument id
+      setInstrumentId((QString)scParameterGroup.nameKeyword());
 
+      // set up pointing settings
+      InstrumentPointingSolveOption pointingOption
+         = stringToInstrumentPointingSolveOption(scParameterGroup.findKeyword("CAMSOLVE")[0]);
 
-//??? use new setters
-
-
-
-
-    // group name must be instrument id
-    m_instrumentId = (QString)scParameterGroup.nameKeyword();
-
-    // If CKDEGREE is not specified, then a default of 2 is used
-    if (scParameterGroup.hasKeyword("CKDEGREE")) {
-      m_ckDegree = (int)(scParameterGroup.findKeyword("CKDEGREE"));
-    }
-
-    // If CKSOLVEDEGREE is not specified, then a default of 2 is used -------jwb----- why ??? why not match camsolve option ???
-    if (scParameterGroup.hasKeyword("CKSOLVEDEGREE")) {
-      m_ckSolveDegree = (int) (scParameterGroup.findKeyword("CKSOLVEDEGREE"));
-    }
-
-    // do we solve for No pointing, ANGLES only, ANGLES+ANGULAR VELOCITY, ANGLES+ANGULAR VELOCITY+
-    // ANGULAR ACCELERATION, or a higher order polynomial
-    QString csolve = "NONE";
-    csolve = (QString)scParameterGroup.findKeyword("CAMSOLVE");
-    csolve = csolve.toUpper();
-    if (csolve == "NONE") {
-      m_instrumentPointingSolveOption = NoPointingFactors;
-      m_numberCamAngleCoefSolved = 0;
-    }
-    else if (csolve == "ANGLES") {
-      m_instrumentPointingSolveOption = AnglesOnly;
-      m_numberCamAngleCoefSolved = 1;
-    }
-    else if (csolve == "VELOCITIES") {
-      m_instrumentPointingSolveOption = AnglesVelocity;
-      m_numberCamAngleCoefSolved = 2;
-    }
-    else if (csolve == "ACCELERATIONS") {
-      m_instrumentPointingSolveOption = AnglesVelocityAcceleration;
-      m_numberCamAngleCoefSolved = 3;
-    }
-    else if (csolve == "ALL"){
-      m_instrumentPointingSolveOption = AllPointingCoefficients;
-      m_numberCamAngleCoefSolved = m_ckSolveDegree + 1;
-    }
-
-    m_anglesAprioriSigma.clear();
-
-    // If OVEREXISTING is not specified, then a default of NO is used
-    if (scParameterGroup.hasKeyword("OVEREXISTING")) {
-      QString parval = (QString)scParameterGroup.findKeyword("OVEREXISTING");
-      parval = parval.toUpper();
-      if (parval == "TRUE" || parval == "YES") {
-        m_solvePointingPolynomialOverExisting = true;
-        m_pointingInterpolationType = SpiceRotation::PolyFunctionOverSpice;
+      // If CKDEGREE is not specified, then a default of 2 is used
+      int ckDegree = 2;
+      if (scParameterGroup.hasKeyword("CKDEGREE")) {
+        ckDegree = (int)(scParameterGroup.findKeyword("CKDEGREE"));
       }
-      else if (parval == "FALSE" || parval == "NO") {
-        m_solvePointingPolynomialOverExisting = false;
-        m_pointingInterpolationType = SpiceRotation::PolyFunction;
+
+      // If CKSOLVEDEGREE is not specified, then a default of 2 is used
+      int ckSolveDegree = 2;
+      if (scParameterGroup.hasKeyword("CKSOLVEDEGREE")) {
+        ckSolveDegree = (int) (scParameterGroup.findKeyword("CKSOLVEDEGREE"));
       }
-      else {
-        QString msg = "The OVEREXISTING parameter must be set to TRUE or FALSE; YES or NO";
-        throw IException(IException::User, msg, _FILEINFO_);
+
+      // If TWIST is not specified, then a default of YES is used
+      bool solveTwist = true;
+      if (scParameterGroup.hasKeyword("TWIST")) {
+        try {
+          solveTwist = toBool(scParameterGroup.findKeyword("TWIST")[0]);
+        } 
+        catch (IException &e) {
+          QString msg = "The TWIST parameter must be a valid boolean value.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
-    }
 
-    // If SPKDEGREE is not specified, then a default of 2 is used
-    if (scParameterGroup.hasKeyword("SPKDEGREE"))
-      m_spkDegree = (int)(scParameterGroup.findKeyword("SPKDEGREE"));
-
-    // If SPKSOLVEDEGREE is not specified, then a default of 2 is used
-    if (scParameterGroup.hasKeyword("SPKSOLVEDEGREE"))
-      m_spkSolveDegree = (int)(scParameterGroup.findKeyword("SPKSOLVEDEGREE"));
-
-    // do we solve for No position, POSITION only, POSITION+VELOCITY, POSITION+VELOCITY+
-    // ACCELERATION, or a higher order polynomial
-    QString ssolve = "NONE";
-    ssolve = (QString)scParameterGroup.findKeyword("SPSOLVE");
-    ssolve = ssolve.toUpper();
-    if (ssolve == "NONE") {
-      m_instrumentPositionSolveOption = NoPositionFactors;
-      m_numberCamPosCoefSolved = 0;
-    }
-    else if (ssolve == "POSITION") {
-      m_instrumentPositionSolveOption = PositionOnly;
-      m_numberCamPosCoefSolved = 1;
-    }
-    else if (ssolve == "VELOCITIES") {
-      m_instrumentPositionSolveOption = PositionVelocity;
-      m_numberCamPosCoefSolved = 2;
-    }
-    else if (ssolve == "ACCELERATIONS") {
-      m_instrumentPositionSolveOption = PositionVelocityAcceleration;
-      m_numberCamPosCoefSolved = 3;
-    }
-    else if (csolve == "ALL"){
-      m_instrumentPositionSolveOption = AllPositionCoefficients;
-      m_numberCamPosCoefSolved = m_spkSolveDegree + 1;
-    }
-
-    m_positionAprioriSigma.clear();
-
-    // If TWIST is not specified, then a default of YES is used
-    if (scParameterGroup.hasKeyword("TWIST")) {
-      QString parval = (QString)scParameterGroup.findKeyword("TWIST");
-      parval = parval.toUpper();
-      if (parval == "TRUE" || parval == "YES") { // is this necessary ??? i think pvl and toString can handle it...
-        m_solveTwist = true;
+      // If OVEREXISTING is not specified, then a default of NO is used
+      bool solvePolynomialOverExisting = false;
+      if (scParameterGroup.hasKeyword("OVEREXISTING")) {
+        try {
+          solvePolynomialOverExisting = toBool(scParameterGroup.findKeyword("OVEREXISTING")[0]);
+        } 
+        catch (IException &e) {
+          QString msg = "OVEREXISTING parameter must be a valid boolean value.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
       }
-      else if (parval == "FALSE" || parval == "NO") {
-        m_solveTwist = false;
-      }
-      else {
-        QString msg = "The TWIST parameter must be set to TRUE or FALSE; YES or NO";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-    }
 
-    // If OVERHERMITE is not specified, then a default of NO is used
-    if (scParameterGroup.hasKeyword("OVERHERMITE")) {
-      QString parval = (QString)scParameterGroup.findKeyword("OVERHERMITE");
-      parval = parval.toUpper();
-      if (parval == "TRUE" || parval == "YES") {
-        m_solvePositionOverHermiteSpline = true;
-        m_positionInterpolationType = SpicePosition::PolyFunctionOverHermiteConstant;
+      double anglesAprioriSigma = -1.0;
+      double angularVelocityAprioriSigma = -1.0;
+      double angularAccelerationAprioriSigma = -1.0;
+      if (pointingOption != NoPointingFactors) {
+        if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA")) {
+          anglesAprioriSigma = (double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA"));
+        }
+        if (pointingOption != AnglesOnly) {
+          if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA")) {
+            angularVelocityAprioriSigma = 
+                (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA"));
+          }
+          if (pointingOption != AnglesVelocity) {
+            if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA")) {
+              angularAccelerationAprioriSigma = 
+                  (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA"));
+            }
+          }
+        }
       }
-      else if (parval == "FALSE" || parval == "NO") {
-        m_solvePositionOverHermiteSpline = false;
-        m_positionInterpolationType = SpicePosition::PolyFunction;
+
+      setInstrumentPointingSettings(pointingOption, solveTwist, ckDegree, ckSolveDegree, 
+                                    solvePolynomialOverExisting, anglesAprioriSigma, 
+                                    angularVelocityAprioriSigma, angularAccelerationAprioriSigma);
+
+      // Now set up position settings
+      InstrumentPositionSolveOption positionOption
+         = stringToInstrumentPositionSolveOption(scParameterGroup.findKeyword("SPSOLVE")[0]);
+
+      //  If SPKDEGREE is not specified, then a default of 2 is used
+      int spkDegree = 2;
+      if (scParameterGroup.hasKeyword("SPKDEGREE")) {
+        spkDegree = (int)(scParameterGroup.findKeyword("SPKDEGREE"));
       }
-      else {
-        QString msg = "The OVERHERMITE parameter must be set to TRUE or FALSE; YES or NO";
-        throw IException(IException::User, msg, _FILEINFO_);
+
+      // If SPKSOLVEDEGREE is not specified, then a default of 2 is used
+      int spkSolveDegree = 2;
+      if (scParameterGroup.hasKeyword("SPKSOLVEDEGREE")) {
+        spkSolveDegree = (int)(scParameterGroup.findKeyword("SPKSOLVEDEGREE"));
       }
-    }
 
-    if (csolve != "NONE") {
-      if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA"))
-        m_anglesAprioriSigma.append((double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA")));
-      if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA"))
-        m_anglesAprioriSigma.append(
-            (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_VELOCITY_SIGMA")));
-      if (scParameterGroup.hasKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA"))
-        m_anglesAprioriSigma.append(
-            (double)(scParameterGroup.findKeyword("CAMERA_ANGULAR_ACCELERATION_SIGMA")));
-    }
+      // If OVERHERMITE is not specified, then a default of NO is used
+      bool positionOverHermite = false;
+      if (scParameterGroup.hasKeyword("OVERHERMITE")) {
+        try {
+          positionOverHermite = toBool(scParameterGroup.findKeyword("OVERHERMITE")[0]);
+        } 
+        catch (IException &e) {
+          QString msg = "The OVERHERMITE parameter must be a valid boolean value.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+      }
 
-    if (ssolve != "NONE") {
-      if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA"))
-        m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_POSITION_SIGMA")));
-      if (scParameterGroup.hasKeyword("SPACECRAFT_VELOCITY_SIGMA"))
-        m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_VELOCITY_SIGMA")));
-      if (scParameterGroup.hasKeyword("SPACECRAFT_ACCELERATION_SIGMA"))
-        m_positionAprioriSigma.append((double)(scParameterGroup.findKeyword("SPACECRAFT_ACCELERATION_SIGMA")));
+      double positionAprioriSigma = -1.0;
+      double velocityAprioriSigma = -1.0;
+      double accelerationAprioriSigma = -1.0;
+      if (positionOption != NoPositionFactors) {
+        if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA")) {
+          positionAprioriSigma
+             = (double)(scParameterGroup.findKeyword("SPACECRAFT_POSITION_SIGMA"));
+        }
+        if (positionOption != PositionOnly) {
+          if (scParameterGroup.hasKeyword("SPACECRAFT_VELOCITY_SIGMA")) {
+            velocityAprioriSigma = 
+                (double)(scParameterGroup.findKeyword("SPACECRAFT_VELOCITY_SIGMA"));
+          }
+          if (positionOption != PositionVelocity) {
+            if (scParameterGroup.hasKeyword("SPACECRAFT_ACCELERATION_SIGMA")) {
+              accelerationAprioriSigma = 
+                  (double)(scParameterGroup.findKeyword("SPACECRAFT_ACCELERATION_SIGMA"));
+            }
+          }
+        }
+      }
+      setInstrumentPositionSettings(positionOption, spkDegree, spkSolveDegree,
+                                    positionOverHermite, positionAprioriSigma,
+                                    velocityAprioriSigma, accelerationAprioriSigma);
+    } 
+    catch (IException &e) {
+      QString msg = "Unable to set bundle adjust options from the given PVL.";
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
-
     return true;
   }
 
@@ -434,7 +413,7 @@ namespace Isis {
       return BundleObservationSolveSettings::AllPointingCoefficients;
     }
     else {
-      throw IException(IException::Programmer,
+      throw IException(IException::Unknown,
                        "Unknown bundle instrument pointing solve option " + option + ".",
                        _FILEINFO_);
     }
@@ -469,22 +448,26 @@ namespace Isis {
 
     // automatically set the solve option and ck degree to the user entered values
     m_instrumentPointingSolveOption = option;
-    m_ckDegree = ckDegree;
 
-    // the ck solve degree entered is only used if we are solving for all coefficients, otherwise
-    // it matches the appropriate polynomial size. also, we will only solve for polynomial over
-    // the existing if we are solving for all coefficients ??? VERIFY
-
+    // the ck solve degree entered is only used if we are solving for all coefficients
+    // otherwise it defaults to 2.
     if (option == AllPointingCoefficients) {
+      // update spkDegree and spkSolveDegree
+      m_ckDegree = ckDegree;
       m_ckSolveDegree = ckSolveDegree;
+
+      // we are solving for (solve degree + 1) coefficients
+      // this is the maximum number of apriori sigmas allowed
+      m_numberCamAngleCoefSolved = m_ckSolveDegree + 1;
     }
     else {
-        m_ckSolveDegree = ((int) option) - 1;
+      // let spkDegree and spkSolveDegree default to 2, 2
+      m_ckDegree = 2;
+      m_ckSolveDegree = 2;
+      
+      // solve for the appropriate number of coefficients, based on solve option enum
+      m_numberCamAngleCoefSolved = ((int) option);
     }
-
-    // we are solving for (solve degree + 1) coefficients
-    // this is the maximum number of apriori sigmas allowed
-    m_numberCamAngleCoefSolved = m_ckSolveDegree + 1;
 
     m_anglesAprioriSigma.clear();
     if (m_numberCamAngleCoefSolved > 0) {
@@ -619,7 +602,7 @@ namespace Isis {
       return BundleObservationSolveSettings::AllPositionCoefficients;
     }
     else {
-      throw IException(IException::Programmer,
+      throw IException(IException::Unknown,
                           "Unknown bundle instrument position solve option " + option + ".",
                           _FILEINFO_);
     }
@@ -652,21 +635,25 @@ namespace Isis {
                                            double accelerationAprioriSigma) {
     // automatically set the solve option and spk degree to the user entered values
     m_instrumentPositionSolveOption = option;
-    m_spkDegree = spkDegree;
 
-    // the spk solve degree entered is only used if we are solving for all coefficients, otherwise
-    // it matches the appropriate polynomial size. also, we will only solve for position over a
-    // Hermite spline if we are solving for all coefficients ??? VERIFY
+    // the spk solve degree entered is only used if we are solving for all coefficients
+    // otherwise it defaults to 2.
     if (option == AllPositionCoefficients) {
+      // update spkDegree and spkSolveDegree
+      m_spkDegree = spkDegree;
       m_spkSolveDegree = spkSolveDegree;
+      // we are solving for (solve degree + 1) coefficients
+      // this is the maximum number of apriori sigmas allowed
+      m_numberCamPosCoefSolved = m_spkSolveDegree + 1;
     }
     else {
-      m_spkSolveDegree = ((int) option) - 1;
-    }
+      // let spkDegree and spkSolveDegree default to 2, 2
+      m_spkDegree = 2;
+      m_spkSolveDegree = 2;
 
-    // we are solving for (solve degree + 1) coefficients
-    // this is the maximum number of apriori sigmas allowed
-    m_numberCamPosCoefSolved = m_spkSolveDegree + 1;
+      // solve for the appropriate number of coefficients, based on solve option enum
+      m_numberCamPosCoefSolved = ((int) option);
+    }
 
     m_positionAprioriSigma.clear();
     if (m_numberCamPosCoefSolved > 0) {
@@ -747,7 +734,7 @@ namespace Isis {
 
     QString pvlName = "";;
     if (name == "") {
-      pvlName = m_instrumentId;
+      pvlName = instrumentId();
     }
     else {
       pvlName = name;
@@ -755,40 +742,36 @@ namespace Isis {
     PvlObject pvl(pvlName);
 
     pvl += PvlKeyword("InstrumentPointingSolveOption", 
-                      instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
-    if (m_instrumentPointingSolveOption > NoPointingFactors) {
-      pvl += PvlKeyword("SolveTwist", toString(m_solveTwist));
-      pvl += PvlKeyword("CKDegree", toString(m_ckDegree));
-      pvl += PvlKeyword("CKSolveDegree", toString(m_ckSolveDegree));
-      pvl += PvlKeyword("NumberAngleCoefficientsSolved", toString(m_numberCamAngleCoefSolved));
+                      instrumentPointingSolveOptionToString(instrumentPointingSolveOption()));
+    if (instrumentPointingSolveOption() > NoPointingFactors) {
+      pvl += PvlKeyword("NumberAngleCoefficientsSolved", 
+                        toString(numberCameraAngleCoefficientsSolved()));
+      pvl += PvlKeyword("CKDegree", toString(ckDegree()));
+      pvl += PvlKeyword("CKSolveDegree", toString(ckSolveDegree()));
+      pvl += PvlKeyword("SolveTwist", toString(solveTwist()));
       pvl += PvlKeyword("SolvePointingPolynomialOverExisting", 
-                        toString(m_solvePointingPolynomialOverExisting)); 
+                        toString(solvePolyOverPointing())); 
       PvlKeyword angleSigmas("AngleAprioriSigmas");
-      if (m_anglesAprioriSigma.size() > 0) {
-        for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
-          if (m_anglesAprioriSigma[i] > 0) {
-            angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
-          }
-          else {
-            angleSigmas.addValue("N/A");
-          }
+      for (int i = 0; i < aprioriPointingSigmas().size(); i++) {
+        if (m_anglesAprioriSigma[i] > 0) {
+          angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
         }
-      }
-      else {
-        angleSigmas.addValue("N/A");
+        else {
+          angleSigmas.addValue("N/A");
+        }
       }
       pvl += angleSigmas;
       
       pvl += PvlKeyword("InstrumentPointingInterpolationType",
-                      toString((int)m_pointingInterpolationType));  // TODO: omit from pvl if pointing option == None ??? 
+                      toString((int)pointingInterpolationType()));  // TODO: omit from pvl if pointing option == None ??? 
     }
     else {
-      pvl += PvlKeyword("SolveTwist", "N/A");  // TODO: omit from pvl if pointing option == None ??? 
-      pvl += PvlKeyword("CKDegree", "N/A");  // TODO: omit from pvl if pointing option == None ??? 
-      pvl += PvlKeyword("CKSolveDegree", "N/A"); // or omit from pvl ??? 
       pvl += PvlKeyword("NumberAngleCoefficientsSolved", "N/A");
+      pvl += PvlKeyword("CKDegree", "N/A");
+      pvl += PvlKeyword("CKSolveDegree", "N/A");
+      pvl += PvlKeyword("SolveTwist", "N/A");
       pvl += PvlKeyword("SolvePointingPolynomialOverExisting", "N/A");
-      pvl += PvlKeyword("AngleAprioriSigmas", "N/A");  // TODO: omit from pvl if pointing option == None ??? 
+      pvl += PvlKeyword("AngleAprioriSigmas", "N/A");
       pvl += PvlKeyword("InstrumentPointingInterpolationType", "N/A");
     }
 
@@ -796,32 +779,32 @@ namespace Isis {
     // position
 
     pvl += PvlKeyword("InstrumentPositionSolveOption", 
-                      instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
-    if (m_instrumentPositionSolveOption != NoPositionFactors) {
-      pvl += PvlKeyword("SPKDegree", toString(m_spkDegree));
-      pvl += PvlKeyword("SPKSolveDegree", toString(m_spkSolveDegree));
-      pvl += PvlKeyword("NumberPositionCoefficientsSolved", toString(m_numberCamPosCoefSolved));
-      pvl += PvlKeyword("SolvePositionOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
+                      instrumentPositionSolveOptionToString(instrumentPositionSolveOption()));
+    if (instrumentPositionSolveOption() > NoPositionFactors) {
+      pvl += PvlKeyword("NumberPositionCoefficientsSolved", 
+                        toString(numberCameraPositionCoefficientsSolved()));
+      pvl += PvlKeyword("SPKDegree", toString(spkDegree()));
+      pvl += PvlKeyword("SPKSolveDegree", toString(spkSolveDegree()));
+      pvl += PvlKeyword("SolvePositionOverHermiteSpline", toString(solvePositionOverHermite()));
     
       PvlKeyword positionSigmas("PositionAprioriSigmas");
-      for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
+      for (int i = 0; i < aprioriPositionSigmas().size(); i++) {
         if (m_positionAprioriSigma[i] > 0) {
           positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
         }
         else {
           positionSigmas.addValue("N/A");
         }
-    
       }
       pvl += positionSigmas;
     
       pvl += PvlKeyword("InstrumentPositionInterpolationType",
-                        toString((int)m_positionInterpolationType));
+                        toString((int)positionInterpolationType()));
     }
     else {
+      pvl += PvlKeyword("NumberPositionCoefficientsSolved", "N/A");
       pvl += PvlKeyword("SPKDegree", "N/A");
       pvl += PvlKeyword("SPKSolveDegree", "N/A");
-      pvl += PvlKeyword("NumberPositionCoefficientsSolved", "N/A");
       pvl += PvlKeyword("SolvePositionOverHermiteSpline", "N/A");
       pvl += PvlKeyword("PositionAprioriSigmas", "N/A");
       pvl += PvlKeyword("InstrumentPositionInterpolationType", "N/A");
@@ -835,36 +818,22 @@ namespace Isis {
 
     stream.writeStartElement("bundleObservationSolveSettings");
     stream.writeTextElement("id", m_id->toString());
-    stream.writeTextElement("instrumentId", m_instrumentId);
+    stream.writeTextElement("instrumentId", instrumentId());
 
     // pointing related
     stream.writeStartElement("instrumentPointingOptions");
     stream.writeAttribute("solveOption", 
                            instrumentPointingSolveOptionToString(m_instrumentPointingSolveOption));
-    stream.writeAttribute("solveTwist", toString(m_solveTwist));
+    stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
     stream.writeAttribute("degree", toString(m_ckDegree));
     stream.writeAttribute("solveDegree", toString(m_ckSolveDegree));
-    stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
+    stream.writeAttribute("solveTwist", toString(m_solveTwist));
     stream.writeAttribute("solveOverExisting", toString(m_solvePointingPolynomialOverExisting));
     stream.writeAttribute("interpolationType", toString(m_pointingInterpolationType));
+
     stream.writeStartElement("aprioriPointingSigmas");
-    if (m_anglesAprioriSigma.size() > 0) {
-      stream.writeAttribute("angles", toString(m_anglesAprioriSigma[0]));
-    }
-    else {
-      stream.writeAttribute("angles", "N/A");
-    }
-    if (m_anglesAprioriSigma.size() > 1) {
-      stream.writeAttribute("angularVelocity", toString(m_anglesAprioriSigma[1]));
-    }
-    else {
-      stream.writeAttribute("angularVelocity", "N/A");
-    }
-    if (m_anglesAprioriSigma.size() > 2) {
-      stream.writeAttribute("angularAcceleration", toString(m_anglesAprioriSigma[2]));
-    }
-    else {
-      stream.writeAttribute("angularAcceleration", "N/A");
+    for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
+      stream.writeTextElement("sigma", toString(m_anglesAprioriSigma[i]));
     }
     stream.writeEndElement();// end aprioriPointingSigmas
     stream.writeEndElement();// end instrumentPointingOptions
@@ -873,32 +842,19 @@ namespace Isis {
     stream.writeStartElement("instrumentPositionOptions");
     stream.writeAttribute("solveOption", 
                            instrumentPositionSolveOptionToString(m_instrumentPositionSolveOption));
+    stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
     stream.writeAttribute("degree", toString(m_spkDegree));
     stream.writeAttribute("solveDegree", toString(m_spkSolveDegree));
-    stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
     stream.writeAttribute("solveOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
     stream.writeAttribute("interpolationType", toString(m_positionInterpolationType));
+
     stream.writeStartElement("aprioriPositionSigmas");
-    if (m_positionAprioriSigma.size() > 0) {
-      stream.writeAttribute("position", toString(m_positionAprioriSigma[0]));
-    }
-    else {
-      stream.writeAttribute("position", "N/A");
-    }
-    if (m_positionAprioriSigma.size() > 1) {
-      stream.writeAttribute("velocity", toString(m_positionAprioriSigma[1]));
-    }
-    else {
-      stream.writeAttribute("velocity", "N/A");
-    }
-    if (m_positionAprioriSigma.size() > 2) {
-      stream.writeAttribute("acceleration", toString(m_positionAprioriSigma[2]));
-    }
-    else {
-      stream.writeAttribute("acceleration", "N/A");
+    for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
+      stream.writeTextElement("sigma", toString(m_positionAprioriSigma[i]));
     }
     stream.writeEndElement();// end aprioriPositionSigmas
     stream.writeEndElement(); // end instrumentPositionOptions
+
     stream.writeEndElement(); // end bundleObservationSolveSettings
 
   }
@@ -936,9 +892,9 @@ namespace Isis {
               = stringToInstrumentPointingSolveOption(pointingSolveOption);
         }
 
-        QString solveTwist = atts.value("solveTwist");
-        if (!solveTwist.isEmpty()) {
-          m_xmlHandlerObservationSettings->m_solveTwist = toBool(solveTwist);
+        QString numberCoefSolved = atts.value("numberCoefSolved");
+        if (!numberCoefSolved.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_numberCamAngleCoefSolved = toInt(numberCoefSolved);
         }
 
         QString ckDegree = atts.value("degree");
@@ -951,9 +907,9 @@ namespace Isis {
           m_xmlHandlerObservationSettings->m_ckSolveDegree = toInt(ckSolveDegree);
         }
 
-        QString numberCoefSolved = atts.value("numberCoefSolved");
-        if (!numberCoefSolved.isEmpty()) {
-          m_xmlHandlerObservationSettings->m_numberCamAngleCoefSolved = toInt(numberCoefSolved);
+        QString solveTwist = atts.value("solveTwist");
+        if (!solveTwist.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_solveTwist = toBool(solveTwist);
         }
 
         QString solveOverExisting = atts.value("solveOverExisting");
@@ -968,20 +924,7 @@ namespace Isis {
 
       }
       else if (localName == "aprioriPointingSigmas") {
-        QString anglesSigma = atts.value("angles");
-        if (!anglesSigma.isEmpty() && anglesSigma != "N/A") {
-          m_xmlHandlerObservationSettings->m_anglesAprioriSigma.append(toDouble(anglesSigma));
-        }
-
-        QString velocitySigma = atts.value("angularVelocity");
-        if (!velocitySigma.isEmpty() && velocitySigma != "N/A") {
-          m_xmlHandlerObservationSettings->m_anglesAprioriSigma.append(toDouble(velocitySigma));
-        }
-
-        QString accelerationSigma = atts.value("angularAcceleration");
-        if (!accelerationSigma.isEmpty() && accelerationSigma != "N/A") {
-          m_xmlHandlerObservationSettings->m_anglesAprioriSigma.append(toDouble(accelerationSigma));
-        }
+        m_xmlHandlerAprioriSigmas.clear();
       }
       else if (localName == "instrumentPositionOptions") {
         
@@ -989,6 +932,11 @@ namespace Isis {
         if (!positionSolveOption.isEmpty()) {
           m_xmlHandlerObservationSettings->m_instrumentPositionSolveOption
               = stringToInstrumentPositionSolveOption(positionSolveOption);
+        }
+
+        QString numberCoefSolved = atts.value("numberCoefSolved");
+        if (!numberCoefSolved.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_numberCamPosCoefSolved = toInt(numberCoefSolved);
         }
 
         QString spkDegree = atts.value("degree");
@@ -999,11 +947,6 @@ namespace Isis {
         QString spkSolveDegree = atts.value("solveDegree");
         if (!spkSolveDegree.isEmpty()) {
           m_xmlHandlerObservationSettings->m_spkSolveDegree = toInt(spkSolveDegree);
-        }
-
-        QString numberCoefSolved = atts.value("numberCoefSolved");
-        if (!numberCoefSolved.isEmpty()) {
-          m_xmlHandlerObservationSettings->m_numberCamPosCoefSolved = toInt(numberCoefSolved);
         }
 
         QString solveOverHermiteSpline = atts.value("solveOverHermiteSpline");
@@ -1017,21 +960,7 @@ namespace Isis {
         }
       }
       else if (localName == "aprioriPositionSigmas") {
-
-        QString positionSigma = atts.value("position");
-        if (!positionSigma.isEmpty() && positionSigma != "N/A") {
-          m_xmlHandlerObservationSettings->m_positionAprioriSigma.append(toDouble(positionSigma));
-        }
-
-        QString velocitySigma = atts.value("velocity");
-        if (!velocitySigma.isEmpty() && velocitySigma != "N/A") {
-          m_xmlHandlerObservationSettings->m_positionAprioriSigma.append(toDouble(velocitySigma));
-        }
-
-        QString accelerationSigma = atts.value("acceleration");
-        if (!accelerationSigma.isEmpty() && accelerationSigma != "N/A") {
-          m_xmlHandlerObservationSettings->m_positionAprioriSigma.append(toDouble(accelerationSigma));
-        }
+        m_xmlHandlerAprioriSigmas.clear();
       }
     }
     return true;
@@ -1048,18 +977,37 @@ namespace Isis {
 
   bool BundleObservationSolveSettings::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
-    if (localName == "id") {
-      m_xmlHandlerObservationSettings->m_id = NULL;
-      m_xmlHandlerObservationSettings->m_id = new QUuid(m_xmlHandlerCharacters);
+    if (!m_xmlHandlerCharacters.isEmpty()) {
+      if (localName == "id") {
+        m_xmlHandlerObservationSettings->m_id = NULL;
+        m_xmlHandlerObservationSettings->m_id = new QUuid(m_xmlHandlerCharacters);
+      }
+      else if (localName == "instrumentId") {
+        m_xmlHandlerObservationSettings->setInstrumentId(m_xmlHandlerCharacters);
+      }
+//    else if (localName == "bundleObservationSolveSettings") {
+//      // end tag for this entire class... how to get out???
+//      // call parse, as in Control List???
+//    }
+      else if (localName == "sigma") {
+        m_xmlHandlerAprioriSigmas.append(m_xmlHandlerCharacters);
+      }
+      else if (localName == "aprioriPointingSigmas") {
+        m_xmlHandlerObservationSettings->m_anglesAprioriSigma.clear();
+        for (int i = 0; i < m_xmlHandlerAprioriSigmas.size(); i++) {
+          m_xmlHandlerObservationSettings->m_anglesAprioriSigma.append(
+                                                 toDouble(m_xmlHandlerAprioriSigmas[i]));
+        }
+      }
+      else if (localName == "aprioriPositionSigmas") {
+        m_xmlHandlerObservationSettings->m_positionAprioriSigma.clear();
+        for (int i = 0; i < m_xmlHandlerAprioriSigmas.size(); i++) {
+          m_xmlHandlerObservationSettings->m_positionAprioriSigma.append(
+                                                 toDouble(m_xmlHandlerAprioriSigmas[i]));
+        }
+      }
+      m_xmlHandlerCharacters = "";
     }
-    else if (localName == "instrumentId") {
-      m_xmlHandlerObservationSettings->m_instrumentId = m_xmlHandlerCharacters;
-    }
-    else if (localName == "bundleObservationSolveSettings") {
-      // end tag for this entire class... how to get out??? 
-      // call parse, as in Control List???
-    }
-    m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 
@@ -1070,17 +1018,17 @@ namespace Isis {
     stream << m_id->toString()
            << m_instrumentId
            << (qint32)m_instrumentPointingSolveOption
-           << m_solveTwist
+           << (qint32)m_numberCamAngleCoefSolved
            << (qint32)m_ckDegree
            << (qint32)m_ckSolveDegree
-           << (qint32)m_numberCamAngleCoefSolved
+           << m_solveTwist
            << m_solvePointingPolynomialOverExisting
            << m_anglesAprioriSigma
            << (qint32)m_pointingInterpolationType
            << (qint32)m_instrumentPositionSolveOption
+           << (qint32)m_numberCamPosCoefSolved 
            << (qint32)m_spkDegree
            << (qint32)m_spkSolveDegree
-           << (qint32)m_numberCamPosCoefSolved 
            << m_solvePositionOverHermiteSpline
            << m_positionAprioriSigma
            << (qint32)m_positionInterpolationType;
@@ -1100,17 +1048,17 @@ namespace Isis {
     stream >> id 
            >> m_instrumentId
            >> anglesSolveOption
-           >> m_solveTwist
+           >> numCamAngleCoefSolved
            >> ckDegree
            >> ckSolveDegree
-           >> numCamAngleCoefSolved
+           >> m_solveTwist
            >> m_solvePointingPolynomialOverExisting
            >> m_anglesAprioriSigma
            >> anglesInterpType
            >> positionSolveOption
+           >> numCamPosCoefSolved
            >> spkDegree
            >> spkSolveDegree
-           >> numCamPosCoefSolved
            >> m_solvePositionOverHermiteSpline
            >> m_positionAprioriSigma
            >> positionInterpType;

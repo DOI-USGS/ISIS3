@@ -62,7 +62,14 @@ namespace Isis {
    *                           BundleObservationSolveSettings class.
    *   @history 2014-07-25 Jeannie Backer - For enums < 4, set solve degrees one less than
    *                           enum value.
+   *   @history 2014-12-02 Jeannie Backer - Undo last modification. While it makes sense, it
+   *                           was causing jigsaw to fail. Brought test coverage of this
+   *                           class to 99.403% scope.
    *  
+   *  
+   *   @todo Figure out why solve degree and num coefficients does not match solve option.
+   *   @todo Determine whether xml stuff needs a Project pointer
+   *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    */
 
   class BundleObservationSolveSettings : public QObject {
@@ -76,12 +83,12 @@ namespace Isis {
                                      Project *project, 
                                      XmlStackedHandlerReader *xmlReader, 
                                      QObject *parent = 0);  // TODO: does xml stuff need project???
-      BundleObservationSolveSettings(const BundleObservationSolveSettings &other);
+      BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
       ~BundleObservationSolveSettings();
-      BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &other);
+      BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);
       void initialize();
 
-      bool setFromPvl(PvlGroup& scParameterGroup);
+      bool setFromPvl(PvlGroup &scParameterGroup);
       PvlObject pvlObject(QString name = "") const; // default name is instrument ID
 
       void setInstrumentId(QString instrumentId);
@@ -177,6 +184,7 @@ namespace Isis {
           BundleObservationSolveSettings *m_xmlHandlerObservationSettings;
           Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
           QString m_xmlHandlerCharacters;
+          QStringList m_xmlHandlerAprioriSigmas;
       };
 
       /**
@@ -188,10 +196,10 @@ namespace Isis {
 
       // pointing related parameters
       InstrumentPointingSolveOption m_instrumentPointingSolveOption;
-      bool m_solveTwist;                          //!< Solve for "twist" angle.
+      int m_numberCamAngleCoefSolved;             /**< The number of camera angle coefficients in solution.*/
       int m_ckDegree;                             //!< ck degree (define)
       int m_ckSolveDegree;                        //!< solve ck degree (define)
-      int m_numberCamAngleCoefSolved;             /**< The number of camera angle coefficients in solution.*/
+      bool m_solveTwist;                          //!< Solve for "twist" angle.
       bool m_solvePointingPolynomialOverExisting; /**< The polynomial will be fit over the existing 
                                                        pointing polynomial.*/
       QList<double> m_anglesAprioriSigma; /**< The image position a priori sigmas.The size of the
@@ -210,10 +218,10 @@ namespace Isis {
 
       // position related parameters
       InstrumentPositionSolveOption m_instrumentPositionSolveOption;
-      int m_spkDegree;                       //!< spk degree (define)
-      int m_spkSolveDegree;                  //!< solve spk degree (define)
       int m_numberCamPosCoefSolved;          /**< The number of camera position coefficients in the
                                                   solution.*/
+      int m_spkDegree;                       //!< spk degree (define)
+      int m_spkSolveDegree;                  //!< solve spk degree (define)
       bool m_solvePositionOverHermiteSpline; /**< The polynomial will be fit over an existing
                                                   Hermite spline.*/
       QList<double> m_positionAprioriSigma; /**< The instrument pointing a priori sigmas. The
