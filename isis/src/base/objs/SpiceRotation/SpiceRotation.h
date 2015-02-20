@@ -183,6 +183,7 @@ namespace Isis {
    *                           New Horizons which had ck's with both type 2 and type 3 segments.
    *   @history 2014-03-11 Stuart Sides - Programmers notes - Fixed a bug in the copy constructor
    *                           that was going out of array bounds.
+   *   @history 2015-02-20 Jeannie Backer - Improved error messages.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */

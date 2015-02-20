@@ -1201,7 +1201,10 @@ namespace Isis {
       derivative = 1;
     }
     else {
-      Isis::IString msg = "Coeff index, " + Isis::IString(coeffIndex) + " exceeds degree of polynomial";
+      QString msg = "Unable to evaluate the derivative of the SPICE rotation fit polynomial for "
+                    "the given coefficient index [" + toString(coeffIndex) + "]. "
+                    "Index is negative or exceeds degree of polynomial ["
+                    + toString(p_degree) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return derivative;

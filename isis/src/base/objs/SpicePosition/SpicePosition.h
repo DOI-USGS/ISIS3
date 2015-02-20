@@ -170,6 +170,7 @@ namespace Isis {
    *                           matrix on radar data.  The bug was in the method VelocityPartial and 
    *                           occurred when the et = baseTime and the coeffIndex was 0.  This caused
    *                           the derivative equation to be 0 * 0 ** -1.  This update fixes issue #1582.
+   *   @history 2015-02-20 Jeannie Backer - Improved error messages.
    */
   class SpicePosition {
     public:
