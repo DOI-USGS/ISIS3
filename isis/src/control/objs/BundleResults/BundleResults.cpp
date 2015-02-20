@@ -2,240 +2,1529 @@
 
 #include <QDataStream>
 #include <QDebug>
-#include <QList>
+#include <QString>
 #include <QUuid>
 #include <QXmlStreamWriter>
 
-#include "BundleSettings.h"
-#include "BundleStatistics.h"
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
+#include <H5Cpp.h>
+#include <hdf5_hl.h>
+#include <hdf5.h>
+
+#include "Camera.h"
+#include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "ControlPoint.h"
+#include "CorrelationMatrix.h"
+#include "Distance.h"
 #include "FileName.h"
-#include "ImageList.h"
 #include "IString.h"
+#include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include "SerialNumberList.h"
+#include "StatCumProbDistDynCalc.h"
+#include "Statistics.h"
 #include "XmlStackedHandlerReader.h"
+
+using namespace boost::numeric::ublas;
 
 namespace Isis {
 
-  BundleResults::BundleResults(BundleSettings inputSettings,
-                               FileName controlNetworkFileName,
-                               QObject *parent) : QObject(parent) {
-    m_id = NULL;
+  BundleResults::BundleResults(QObject *parent) : QObject(parent) {
+
+    initialize();
+
     m_id = new QUuid(QUuid::createUuid());
+    m_correlationMatrix = new CorrelationMatrix();
+    m_cumPro = new StatCumProbDistDynCalc;
+    m_cumProRes = new StatCumProbDistDynCalc;
 
-    m_runTime = "";
+    // residual prob distribution is calculated even if there is no maximum likelihood estimation.
+    // so set up the solver to have a node at every percent of the distribution
+    initializeResidualsProbabilityDistribution(101);
 
-    m_controlNetworkFileName = NULL;
-    m_controlNetworkFileName = new FileName(controlNetworkFileName);
-
-    m_settings = NULL;
-    m_settings = new BundleSettings(inputSettings);
-
-    m_statisticsResults = NULL;
-    m_statisticsResults = new BundleStatistics;
-
-    m_images = NULL;
-    m_images = new QList<ImageList *>;
   }
 
 
-  
-  BundleResults::BundleResults(const BundleResults &other)
-      : m_id(new QUuid(other.m_id->toString())),
-        m_runTime(other.m_runTime),
-        m_controlNetworkFileName(new FileName(other.m_controlNetworkFileName->expanded())),
-        m_settings(new BundleSettings(*other.m_settings)),
-        m_statisticsResults(new BundleStatistics(*other.m_statisticsResults)),
-        m_images(new QList<ImageList *>(*other.m_images)) { // is this correct???
+
+  /**
+   * Construct this BundleSettings object from XML.
+   *
+   * @param bundleSettingsFolder Where this settings XML resides - /work/.../projectRoot/images/import1
+   * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
+   * @param parent The Qt-relationship parent
+   */
+  BundleResults::BundleResults(Project *project, XmlStackedHandlerReader *xmlReader,
+                                 QObject *parent) : QObject(parent) {   // TODO: does xml stuff need project???
+
+    initialize();
+
+    xmlReader->pushContentHandler(new XmlHandler(this, project));
+    xmlReader->setErrorHandler(new XmlHandler(this, project));
+
+  }
+
+
+
+  BundleResults::BundleResults(const BundleResults &src)
+      : m_id(new QUuid(src.m_id->toString())),
+        m_correlationMatrix(new CorrelationMatrix(*src.m_correlationMatrix)),
+        m_numberFixedPoints(src.m_numberFixedPoints),
+        m_numberIgnoredPoints(src.m_numberIgnoredPoints),
+        m_numberHeldImages(src.m_numberHeldImages),
+        m_rms_rx(src.m_rms_rx),
+        m_rms_ry(src.m_rms_ry),
+        m_rms_rxy(src.m_rms_rxy),
+        m_rejectionLimit(src.m_rejectionLimit),
+        m_numberObservations(src.m_numberObservations),
+        m_numberRejectedObservations(src.m_numberRejectedObservations),
+        m_numberUnknownParameters(src.m_numberUnknownParameters),
+        m_numberImageParameters(src.m_numberImageParameters),
+        m_numberConstrainedImageParameters(src.m_numberConstrainedImageParameters),
+        m_numberConstrainedPointParameters(src.m_numberConstrainedPointParameters),
+        m_degreesOfFreedom(src.m_degreesOfFreedom),
+        m_sigma0(src.m_sigma0),
+        m_elapsedTime(src.m_elapsedTime),
+        m_elapsedTimeErrorProp(src.m_elapsedTimeErrorProp),
+        m_converged(src.m_converged),
+        m_rmsImageSampleResiduals(src.m_rmsImageSampleResiduals),
+        m_rmsImageLineResiduals(src.m_rmsImageLineResiduals),
+        m_rmsImageResiduals(src.m_rmsImageResiduals),
+        m_rmsImageXSigmas(src.m_rmsImageXSigmas),    
+        m_rmsImageYSigmas(src.m_rmsImageYSigmas),    
+        m_rmsImageZSigmas(src.m_rmsImageZSigmas),    
+        m_rmsImageRASigmas(src.m_rmsImageRASigmas),   
+        m_rmsImageDECSigmas(src.m_rmsImageDECSigmas),  
+        m_rmsImageTWISTSigmas(src.m_rmsImageTWISTSigmas),
+        m_minSigmaLatitudeDistance(src.m_minSigmaLatitudeDistance),
+        m_maxSigmaLatitudeDistance(src.m_maxSigmaLatitudeDistance),
+        m_minSigmaLongitudeDistance(src.m_minSigmaLongitudeDistance),
+        m_maxSigmaLongitudeDistance(src.m_maxSigmaLongitudeDistance),
+        m_minSigmaRadiusDistance(src.m_minSigmaRadiusDistance),
+        m_maxSigmaRadiusDistance(src.m_maxSigmaRadiusDistance),
+        m_minSigmaLatitudePointId(src.m_minSigmaLatitudePointId),
+        m_maxSigmaLatitudePointId(src.m_maxSigmaLatitudePointId),
+        m_minSigmaLongitudePointId(src.m_minSigmaLongitudePointId),
+        m_maxSigmaLongitudePointId(src.m_maxSigmaLongitudePointId),
+        m_minSigmaRadiusPointId(src.m_minSigmaRadiusPointId),
+        m_maxSigmaRadiusPointId(src.m_maxSigmaRadiusPointId),
+        m_sigmaLatStatsRms(src.m_sigmaLatStatsRms),
+        m_sigmaLonStatsRms(src.m_sigmaLonStatsRms),
+        m_sigmaRadStatsRms(src.m_sigmaRadStatsRms),
+        m_maximumLikelihoodFunctions(src.m_maximumLikelihoodFunctions),
+        m_maximumLikelihoodIndex(src.m_maximumLikelihoodIndex),
+        m_cumPro(new StatCumProbDistDynCalc(*src.m_cumPro)),
+        m_cumProRes(new StatCumProbDistDynCalc(*src.m_cumProRes)), 
+        m_maximumLikelihoodMedianR2Residuals(src.m_maximumLikelihoodMedianR2Residuals) {
 
   }
 
 
 
   BundleResults::~BundleResults() {
+    
     delete m_id;
     m_id = NULL;
 
-    delete m_controlNetworkFileName;
-    m_controlNetworkFileName = NULL;
+    delete m_correlationMatrix;
+    m_correlationMatrix = NULL;
 
-    delete m_settings;
-    m_settings = NULL;
+    delete m_cumPro;
+    m_cumPro = NULL;
 
-    delete m_statisticsResults;
-    m_statisticsResults = NULL;
+    delete m_cumProRes;
+    m_cumProRes = NULL;
 
-    delete m_images;
-    m_images = NULL;
   }
 
-
   
-  BundleResults &BundleResults::operator=(const BundleResults &other) {
 
-    if (&other != this) {
+  BundleResults &BundleResults::operator=(const BundleResults &src) {
 
+    if (&src != this) {
       delete m_id;
       m_id = NULL;
-      m_id = new QUuid(other.m_id->toString());
+      m_id = new QUuid(src.m_id->toString());
 
-      m_runTime = other.m_runTime;
+      delete m_correlationMatrix;
+      m_correlationMatrix = NULL;
+      m_correlationMatrix = new CorrelationMatrix(*src.m_correlationMatrix);
 
-      delete m_controlNetworkFileName;
-      m_controlNetworkFileName = NULL;
-      m_controlNetworkFileName = new FileName(other.m_controlNetworkFileName->expanded());
+      m_numberFixedPoints = src.m_numberFixedPoints;
+      m_numberIgnoredPoints = src.m_numberIgnoredPoints;
+      m_numberHeldImages = src.m_numberHeldImages;
+      m_rms_rx = src.m_rms_rx;
+      m_rms_ry = src.m_rms_ry;
+      m_rms_rxy = src.m_rms_rxy;
+      m_rejectionLimit = src.m_rejectionLimit;
+      m_numberObservations = src.m_numberObservations;
+      m_numberRejectedObservations = src.m_numberRejectedObservations;
+      m_numberUnknownParameters = src.m_numberUnknownParameters;
+      m_numberImageParameters = src.m_numberImageParameters;
+      m_numberConstrainedImageParameters = src.m_numberConstrainedImageParameters;
+      m_numberConstrainedPointParameters = src.m_numberConstrainedPointParameters;
+      m_degreesOfFreedom = src.m_degreesOfFreedom;
+      m_sigma0 = src.m_sigma0;
+      m_elapsedTime = src.m_elapsedTime;
+      m_elapsedTimeErrorProp = src.m_elapsedTimeErrorProp;
+      m_converged = src.m_converged;
+      m_rmsImageSampleResiduals = src.m_rmsImageSampleResiduals;
+      m_rmsImageLineResiduals = src.m_rmsImageLineResiduals;
+      m_rmsImageResiduals = src.m_rmsImageResiduals;
+      m_rmsImageXSigmas = src.m_rmsImageXSigmas;
+      m_rmsImageYSigmas = src.m_rmsImageYSigmas;
+      m_rmsImageZSigmas = src.m_rmsImageZSigmas;
+      m_rmsImageRASigmas = src.m_rmsImageRASigmas;
+      m_rmsImageDECSigmas = src.m_rmsImageDECSigmas;
+      m_rmsImageTWISTSigmas = src.m_rmsImageTWISTSigmas;
+      m_minSigmaLatitudeDistance = src.m_minSigmaLatitudeDistance;
+      m_maxSigmaLatitudeDistance = src.m_maxSigmaLatitudeDistance;
+      m_minSigmaLongitudeDistance = src.m_minSigmaLongitudeDistance;
+      m_maxSigmaLongitudeDistance = src.m_maxSigmaLongitudeDistance;
+      m_minSigmaRadiusDistance = src.m_minSigmaRadiusDistance;
+      m_maxSigmaRadiusDistance = src.m_maxSigmaRadiusDistance;
+      m_minSigmaLatitudePointId = src.m_minSigmaLatitudePointId;
+      m_maxSigmaLatitudePointId = src.m_maxSigmaLatitudePointId;
+      m_minSigmaLongitudePointId = src.m_minSigmaLongitudePointId;
+      m_maxSigmaLongitudePointId = src.m_maxSigmaLongitudePointId;
+      m_minSigmaRadiusPointId = src.m_minSigmaRadiusPointId;
+      m_maxSigmaRadiusPointId = src.m_maxSigmaRadiusPointId;
+      m_sigmaLatStatsRms = src.m_sigmaLatStatsRms;
+      m_sigmaLonStatsRms = src.m_sigmaLonStatsRms;
+      m_sigmaRadStatsRms = src.m_sigmaRadStatsRms;
+      m_maximumLikelihoodFunctions = src.m_maximumLikelihoodFunctions;
+      m_maximumLikelihoodIndex = src.m_maximumLikelihoodIndex;
 
-      delete m_settings;
-      m_settings = NULL;
-      m_settings = new BundleSettings(*other.m_settings);
+      delete m_cumPro;
+      m_cumPro = NULL;
+      m_cumPro = new StatCumProbDistDynCalc(*src.m_cumPro);
 
-      delete m_statisticsResults;
-      m_statisticsResults = NULL;
-      m_statisticsResults = new BundleStatistics(*other.m_statisticsResults);
+      delete m_cumProRes;
+      m_cumProRes = NULL;
+      m_cumProRes = new StatCumProbDistDynCalc(*src.m_cumProRes);
 
-      delete m_images;
-      m_images = NULL;
-      m_images = new QList<ImageList *>(*other.m_images);
+      m_maximumLikelihoodMedianR2Residuals = src.m_maximumLikelihoodMedianR2Residuals;
     }
     return *this;
   }
 
 
+  void BundleResults::initialize() {
+    m_id = NULL;
+    m_correlationMatrix = NULL;
 
-  void BundleResults::setOutputStatistics(BundleStatistics statisticsResults) {
-    delete m_statisticsResults;
-    m_statisticsResults = NULL;
-    m_statisticsResults = new BundleStatistics(statisticsResults);
+    m_numberFixedPoints = 0; // set in BA constructor->init->fillPointIndexMap
+    m_numberIgnoredPoints = 0; // set in BA constructor->init->fillPointIndexMap
+
+
+    // set in BundleAdjust init()
+    m_numberHeldImages = 0;
+
+    // members set while computing bundle stats
+    m_rmsImageSampleResiduals.clear();
+    m_rmsImageLineResiduals.clear();
+    m_rmsImageResiduals.clear();
+    m_rmsImageXSigmas.clear();
+    m_rmsImageYSigmas.clear();
+    m_rmsImageZSigmas.clear();
+    m_rmsImageRASigmas.clear();
+    m_rmsImageDECSigmas.clear();
+    m_rmsImageTWISTSigmas.clear();
+
+    // initialize lat/lon/rad boundaries
+    m_minSigmaLatitudeDistance.setMeters(1.0e+12);
+    m_maxSigmaLatitudeDistance.setMeters(0.0);
+    m_minSigmaLongitudeDistance.setMeters(1.0e+12);
+    m_maxSigmaLongitudeDistance.setMeters(0.0);;
+    m_minSigmaRadiusDistance.setMeters(1.0e+12);
+    m_maxSigmaRadiusDistance.setMeters(0.0);
+    m_minSigmaLatitudePointId = "";
+    m_maxSigmaLatitudePointId = "";
+    m_minSigmaLongitudePointId = "";
+    m_maxSigmaLongitudePointId = "";
+    m_minSigmaRadiusPointId = "";
+    m_maxSigmaRadiusPointId = "";
+
+    m_sigmaLatStatsRms = 0.0;
+    m_sigmaLonStatsRms = 0.0;
+    m_sigmaRadStatsRms = 0.0;
+
+
+    // set by compute residuals
+    m_rms_rx = 0.0;
+    m_rms_ry = 0.0;
+    m_rms_rxy = 0.0;
+
+    // set by compute rejection limit
+    m_rejectionLimit = 0.0;
+    
+    // set by flag outliers    
+    m_numberRejectedObservations = 0;
+
+    // set by formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
+    m_numberObservations = 0;
+    m_numberImageParameters = 0; 
+
+// ??? unused variable ???    m_numberHeldPoints = 0;
+
+    // set by formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or
+    // setParameterWeights (i.e. solve)
+    m_numberConstrainedPointParameters = 0;
+    m_numberConstrainedImageParameters = 0;
+
+    // set by initialize, formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
+    m_numberUnknownParameters = 0;
+
+    // solve and solve cholesky
+    m_degreesOfFreedom = -1;
+    m_sigma0 = 0.0;
+    m_elapsedTime = 0.0;
+    m_elapsedTimeErrorProp = 0.0;
+    m_converged = false; // or initialze method
+
+    m_cumPro = NULL;
+    m_maximumLikelihoodIndex = 0;
+    m_maximumLikelihoodMedianR2Residuals = 0.0;
+    m_maximumLikelihoodFunctions.clear();
+    m_cumProRes = NULL;
+
   }
 
 
 
+  void BundleResults::resizeSigmaStatisticsVectors(int numberImages) {
+      m_rmsImageXSigmas.resize(numberImages);
+      m_rmsImageYSigmas.resize(numberImages);
+      m_rmsImageZSigmas.resize(numberImages);
+      m_rmsImageRASigmas.resize(numberImages);
+      m_rmsImageDECSigmas.resize(numberImages);
+      m_rmsImageTWISTSigmas.resize(numberImages);
+  }
 
-  PvlObject BundleResults::pvlObject(QString resultsName, QString settingsName, 
-                                     QString statisticsName) {
 
-    PvlObject pvl(resultsName);
-    pvl += PvlKeyword("RunTime", runTime());
-    if (m_controlNetworkFileName->expanded() != "") {
-      pvl += PvlKeyword("OutputControlNetwork", controlNetworkFileName());
-    }
-    pvl += bundleSettings()->pvlObject(settingsName);
-    pvl += bundleStatistics()->pvlObject(statisticsName);
-    return pvl;
+#if 0
+  void BundleResults::setRmsImageResidualLists(QVector<Statistics> rmsImageLineResiduals,
+                                                  QVector<Statistics> rmsImageSampleResiduals,
+                                                  QVector<Statistics> rmsImageResiduals) {
+    m_rmsImageLineResiduals = rmsImageLineResiduals.toList();// QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range",
+    m_rmsImageSampleResiduals = rmsImageSampleResiduals.toList();
+    m_rmsImageResiduals = rmsImageResiduals.toList();
+  }
+#endif
 
+
+  void BundleResults::setRmsImageResidualLists(QList<Statistics> rmsImageLineResiduals,
+                                                  QList<Statistics> rmsImageSampleResiduals,
+                                                  QList<Statistics> rmsImageResiduals) {
+    m_rmsImageLineResiduals = rmsImageLineResiduals;
+    m_rmsImageSampleResiduals = rmsImageSampleResiduals;
+    m_rmsImageResiduals = rmsImageResiduals;
   }
 
 
 
-  /**
-   * Output format:
-   *
-   *
-   * <image id="..." fileName="...">
-   *   ...
-   * </image>
-   *
-   * (fileName attribute is just the base name)
-   */
-  void BundleResults::save(QXmlStreamWriter &stream, const Project *project,
-                            FileName newProjectRoot) const {
+  void BundleResults::setSigmaLatitudeRange(Distance minLatDist, Distance maxLatDist,
+                                               QString minLatPointId, QString maxLatPointId) {
+    m_minSigmaLatitudeDistance = minLatDist;
+    m_maxSigmaLatitudeDistance = maxLatDist;
+    m_minSigmaLatitudePointId  = minLatPointId;
+    m_maxSigmaLatitudePointId  = maxLatPointId;
+  }
 
-    stream.writeStartElement("bundleResults");
-    // save ID, cnet file name, and run time to stream
-    stream.writeStartElement("generalAttributes");
-    stream.writeTextElement("id", m_id->toString());
-    stream.writeTextElement("runTime", m_runTime);
-    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
-    stream.writeEndElement(); // end general attributes
 
-    // save settings to stream
-    m_settings->save(stream, project);
 
-    // save statistics to stream
-    m_statisticsResults->save(stream, project);
+  void BundleResults::setSigmaLongitudeRange(Distance minLonDist, Distance maxLonDist,
+                                                QString minLonPointId, QString maxLonPointId) {
+    m_minSigmaLongitudeDistance = minLonDist;
+    m_maxSigmaLongitudeDistance = maxLonDist;
+    m_minSigmaLongitudePointId  = minLonPointId;
+    m_maxSigmaLongitudePointId  = maxLonPointId;
+  }
 
-    // save image lists to stream
-    if ( !m_images->isEmpty() ) {
-      stream.writeStartElement("imageLists");
 
-      for (int i = 0; i < m_images->count(); i++) {
-        m_images->at(i)->save(stream, project, "");
+
+  void BundleResults::setSigmaRadiusRange(Distance minRadDist, Distance maxRadDist,
+                                             QString minRadPointId, QString maxRadPointId) {
+    m_minSigmaRadiusDistance = minRadDist;
+    m_maxSigmaRadiusDistance = maxRadDist;
+    m_minSigmaRadiusPointId  = minRadPointId;
+    m_maxSigmaRadiusPointId  = maxRadPointId;
+  }
+
+
+
+  void BundleResults::setRmsFromSigmaStatistics(double rmsFromSigmaLatStats,
+                                                   double rmsFromSigmaLonStats,
+                                                   double rmsFromSigmaRadStats) {
+    m_sigmaLatStatsRms = rmsFromSigmaLatStats;
+    m_sigmaLonStatsRms = rmsFromSigmaLonStats;
+    m_sigmaRadStatsRms = rmsFromSigmaRadStats;
+  }
+
+
+
+  /** 
+  * This method steps up the maximum likelihood estimation solution.  Up to three successive
+  * solutions models are available.
+  */
+  void BundleResults::maximumLikelihoodSetUp(
+      QList< QPair< MaximumLikelihoodWFunctions::Model, double > > modelsWithQuantiles) {
+
+
+    // reinitialize variables if this setup has already been called
+    m_maximumLikelihoodIndex = 0;
+    m_maximumLikelihoodMedianR2Residuals = 0.0;
+
+    // residual prob distribution is calculated even if there is no maximum likelihood estimation.
+    // set up the solver to have a node at every percent of the distribution
+    m_cumProRes = NULL;
+    m_cumProRes = new StatCumProbDistDynCalc;
+    initializeResidualsProbabilityDistribution(101);
+
+    // if numberMaximumLikelihoodModels > 0, then MaximumLikeliHood Estimation is being used.
+    for (int i = 0; i < modelsWithQuantiles.size(); i++) {
+
+      // if maximum likelihood is being used, the cum prob calculator is initialized.
+      if (i == 0) {
+        m_cumPro = NULL;
+        m_cumPro = new StatCumProbDistDynCalc;
+        // set up the solver to have a node at every percent of the distribution
+        initializeProbabilityDistribution(101);
       }
 
-      stream.writeEndElement();
+      // set up the w functions for the maximum likelihood estimation
+      m_maximumLikelihoodFunctions.append(
+          qMakePair(MaximumLikelihoodWFunctions(modelsWithQuantiles[i].first), 
+                    modelsWithQuantiles[i].second));
+
     }
-    stream.writeEndElement(); //end bundleResults
+    
+
+    //maximum likelihood estimation tiered solutions requiring multiple convergeances are support,
+    // this index keeps track of which tier the solution is in
+    m_maximumLikelihoodIndex = 0;
+  }
+
+
+
+  void BundleResults::printMaximumLikelihoodTierInformation() {
+    printf("Maximum Likelihood Tier: %d\n", m_maximumLikelihoodIndex);
+    if (numberMaximumLikelihoodModels() > m_maximumLikelihoodIndex) {
+      // if maximum likelihood estimation is being used
+      // at the end of every iteration
+      // reset the tweaking contant to the desired quantile of the |residual| distribution
+      double quantile = m_maximumLikelihoodFunctions[m_maximumLikelihoodIndex].second;
+      double tc = m_cumPro->value(quantile);
+      m_maximumLikelihoodFunctions[m_maximumLikelihoodIndex].first.setTweakingConstant(tc);
+      //  print meadians of residuals
+      m_maximumLikelihoodMedianR2Residuals = m_cumPro->value(0.5);
+      printf("Median of R^2 residuals:  %lf\n", m_maximumLikelihoodMedianR2Residuals);
+
+      //restart the dynamic calculation of the cumulative probility distribution of |R^2 residuals| --so it will be up to date for the next iteration
+      initializeProbabilityDistribution(101);
+    }
+  }
+
+
+
+  void BundleResults::initializeProbabilityDistribution(unsigned int nodes) {
+    m_cumPro->setQuantiles(nodes);
+  }
+
+
+
+  void BundleResults::initializeResidualsProbabilityDistribution(unsigned int nodes) {
+    m_cumProRes->setQuantiles(nodes);
+  }
+
+
+
+  void BundleResults::addProbabilityDistributionObservation(double observationValue) {
+    m_cumPro->addObs(observationValue);
+  }
+
+
+
+  void BundleResults::addResidualsProbabilityDistributionObservation(double observationValue) {
+    m_cumProRes->addObs(observationValue);
+  }
+
+
+
+  void BundleResults::incrementMaximumLikelihoodModelIndex() {
+    m_maximumLikelihoodIndex++;
+  }
+
+
+
+  void BundleResults::incrementFixedPoints() {
+    m_numberFixedPoints++;
+  }
+
+
+
+  int BundleResults::numberFixedPoints() const {
+    return m_numberFixedPoints;
+  }
+
+
+
+  void BundleResults::incrementHeldImages() {
+    m_numberHeldImages++;
+  }
+
+
+
+  int BundleResults::numberHeldImages() const {
+    return m_numberHeldImages;
+  }
+
+
+
+  void BundleResults::incrementIgnoredPoints() {
+    m_numberIgnoredPoints++;
+  }
+
+
+  int BundleResults::numberIgnoredPoints() const {
+    return m_numberIgnoredPoints;
+  }
+
+
+
+  void BundleResults::setRmsXYResiduals(double rx, double ry, double rxy) {
+    m_rms_rx = rx;
+    m_rms_ry = ry;
+    m_rms_rxy = rxy;
+  }
+
+
+
+  void BundleResults::setRejectionLimit(double rejectionLimit) {
+    m_rejectionLimit = rejectionLimit;
+  }
+
+
+
+  void BundleResults::setNumberRejectedObservations(int numberRejectedObservations) {
+    m_numberRejectedObservations = numberRejectedObservations;
+  }
+
+
+
+  void BundleResults::setNumberObservations(int numberObservations) {
+    m_numberObservations = numberObservations;
+  }
+
+
+
+  void BundleResults::setNumberImageParameters(int numberParameters) {
+    m_numberImageParameters = numberParameters;
+  }
+
+
+
+  void BundleResults::resetNumberConstrainedPointParameters() {
+    m_numberConstrainedPointParameters = 0;
+  }
+
+
+
+  void BundleResults::incrementNumberConstrainedPointParameters(int incrementAmount) {
+    m_numberConstrainedPointParameters += incrementAmount;
+  }
+
+
+
+  void BundleResults::resetNumberConstrainedImageParameters() {
+    m_numberConstrainedImageParameters = 0;
+  }
+
+
+
+  void BundleResults::incrementNumberConstrainedImageParameters(int incrementAmount) {
+    m_numberConstrainedImageParameters += incrementAmount;
+  }
+
+
+
+  void BundleResults::setNumberUnknownParameters(int numberParameters) {
+    m_numberUnknownParameters = numberParameters;
+  }
+
+
+
+  void BundleResults::computeDegreesOfFreedom() {
+    m_degreesOfFreedom = m_numberObservations
+                         + m_numberConstrainedPointParameters
+                         + m_numberConstrainedImageParameters
+                         - m_numberUnknownParameters;
+  }
+
+
+
+  void BundleResults::computeSigma0(double dvtpv, BundleSettings::ConvergenceCriteria criteria) {
+    computeDegreesOfFreedom();
+
+    if (m_degreesOfFreedom > 0) {
+      m_sigma0 = dvtpv / m_degreesOfFreedom;
+    }
+    else if (m_degreesOfFreedom == 0 && criteria == BundleSettings::ParameterCorrections) {
+      m_sigma0 = dvtpv;
+    }
+    else {
+      QString msg = "Computed degrees of freedom [" + toString(m_degreesOfFreedom)
+                    + "] is invalid.";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
+    m_sigma0 = sqrt(m_sigma0);
+  }
+
+
+
+  void BundleResults::setDegreesOfFreedom(double degreesOfFreedom) { // old sparse
+    m_degreesOfFreedom = degreesOfFreedom;
+  }
+
+
+
+  void BundleResults::setSigma0(double sigma0) { // old sparse
+    m_sigma0 = sigma0;
+  }
+
+
+
+  void BundleResults::setElapsedTime(double time) {
+    m_elapsedTime = time;
+  }
+
+
+
+  void BundleResults::setElapsedTimeErrorProp(double time) {
+    m_elapsedTimeErrorProp = time;
+  }
+
+
+
+  void BundleResults::setConverged(bool converged) {
+    m_converged = converged;
+  }
+
+
+
+  //************************* Accessors **********************************************************//
+  QList<Statistics> BundleResults::rmsImageSampleResiduals() const {
+    return m_rmsImageSampleResiduals;
+  }
+
+
+
+  QList<Statistics> BundleResults::rmsImageLineResiduals() const {
+    return m_rmsImageLineResiduals;
+  }
+
+
+
+  QList<Statistics> BundleResults::rmsImageResiduals() const {
+    return m_rmsImageResiduals;
+  }
+
+
+
+  QVector<Statistics> BundleResults::rmsImageXSigmas() const {
+    return m_rmsImageXSigmas;
+  }
+
+
+
+  QVector<Statistics> BundleResults::rmsImageYSigmas() const {
+    return m_rmsImageYSigmas;
+  }
+
+
+
+  QVector<Statistics> BundleResults::rmsImageZSigmas() const {
+    return m_rmsImageZSigmas;
+  }
+
+
+
+  QVector<Statistics> BundleResults::rmsImageRASigmas() const {
+    return m_rmsImageRASigmas;
+  }
+
+
+
+  QVector<Statistics> BundleResults::rmsImageDECSigmas() const {
+    return m_rmsImageDECSigmas;
+  }
+
+
+
+  QVector<Statistics> BundleResults::rmsImageTWISTSigmas() const {
+    return m_rmsImageTWISTSigmas;
+  }
+
+
+
+  Distance BundleResults::minSigmaLatitudeDistance() const {
+    return m_minSigmaLatitudeDistance;
+  }
+
+
+
+  Distance BundleResults::maxSigmaLatitudeDistance() const {
+    return m_maxSigmaLatitudeDistance;
+  }
+
+
+
+  Distance BundleResults::minSigmaLongitudeDistance() const {
+    return m_minSigmaLongitudeDistance;
+  }
+
+
+
+  Distance BundleResults::maxSigmaLongitudeDistance() const {
+    return m_maxSigmaLongitudeDistance;
+  }
+
+
+
+  Distance BundleResults::minSigmaRadiusDistance() const {
+    return m_minSigmaRadiusDistance;
+  }
+
+
+
+  Distance BundleResults::maxSigmaRadiusDistance() const {
+    return m_maxSigmaRadiusDistance;
+  }
+
+
+
+  QString BundleResults::minSigmaLatitudePointId() const {
+    return m_minSigmaLatitudePointId;
+  }
+
+
+
+  QString BundleResults::maxSigmaLatitudePointId() const {
+    return m_maxSigmaLatitudePointId;
+  }
+
+
+
+  QString BundleResults::minSigmaLongitudePointId() const {
+    return m_minSigmaLongitudePointId;
+  }
+
+
+
+  QString BundleResults::maxSigmaLongitudePointId() const {
+    return m_maxSigmaLongitudePointId;
+  }
+
+
+
+  QString BundleResults::minSigmaRadiusPointId() const {
+    return m_minSigmaRadiusPointId;
+  }
+
+
+
+  QString BundleResults::maxSigmaRadiusPointId() const {
+    return m_maxSigmaRadiusPointId;
+  }
+
+
+
+  double BundleResults::sigmaLatitudeStatisticsRms() const {
+    return m_sigmaLatStatsRms;
+  }
+
+
+
+  double BundleResults::sigmaLongitudeStatisticsRms() const {
+    return m_sigmaLonStatsRms;
+  }
+
+
+
+  double BundleResults::sigmaRadiusStatisticsRms() const {
+    return m_sigmaRadStatsRms;
+  }
+
+
+
+  double BundleResults::rmsRx() const {
+    return m_rms_rx;
+  }
+
+
+
+  double BundleResults::rmsRy() const {
+    return m_rms_ry;
+  }
+
+
+
+  double BundleResults::rmsRxy() const {
+    return m_rms_rxy;
+  }
+
+
+
+  double BundleResults::rejectionLimit() const {
+    return m_rejectionLimit;
+  }
+
+
+
+  int BundleResults::numberRejectedObservations() const {
+    return m_numberRejectedObservations;
+  }
+
+
+
+  int BundleResults::numberObservations() const {
+    return m_numberObservations;
+  }
+
+
+
+  int BundleResults::numberImageParameters() const {
+    return m_numberImageParameters;
+  }
+
+
+
+  int BundleResults::numberConstrainedPointParameters() const {
+    return m_numberConstrainedPointParameters;
+  }
+
+
+
+  int BundleResults::numberConstrainedImageParameters() const {
+    return m_numberConstrainedImageParameters;
+  }
+
+
+
+  int BundleResults::numberUnknownParameters() const {
+    return m_numberUnknownParameters;
+  }
+
+
+
+  int BundleResults::degreesOfFreedom() const {
+    return m_degreesOfFreedom;
+  }
+
+
+
+  double BundleResults::sigma0() const {
+    return m_sigma0;
+  }
+
+
+
+  double BundleResults::elapsedTime() const {
+    return m_elapsedTime;
+  }
+
+
+
+  double BundleResults::elapsedTimeErrorProp() const {
+    return m_elapsedTimeErrorProp;
+  }
+
+
+
+  bool BundleResults::converged() const {
+    return m_converged;
+  }
+
+
+
+  int BundleResults::numberMaximumLikelihoodModels() const {
+    return m_maximumLikelihoodFunctions.size();
+  }
+
+
+
+  int BundleResults::maximumLikelihoodModelIndex() const {
+    return m_maximumLikelihoodIndex;
+  }
+
+
+
+  StatCumProbDistDynCalc BundleResults::cumulativeProbabilityDistribution() const {
+    return *m_cumPro;
+  }
+
+
+
+  StatCumProbDistDynCalc BundleResults::residualsCumulativeProbabilityDistribution() const {
+    return *m_cumProRes;
+  }
+
+
+
+  double BundleResults::maximumLikelihoodMedianR2Residuals() const {
+    return m_maximumLikelihoodMedianR2Residuals;
+  }
+
+
+
+  MaximumLikelihoodWFunctions BundleResults::maximumLikelihoodModelWFunc(int modelIndex) const {
+    return m_maximumLikelihoodFunctions[modelIndex].first;
+  }
+
+
+
+  double BundleResults::maximumLikelihoodModelQuantile(int modelIndex) const {
+    return m_maximumLikelihoodFunctions[modelIndex].second;
+  }
+
+
+
+//  QList< QPair< MaximumLikelihoodWFunctions, double > >
+//      BundleResults::maximumLikelihoodModels() const {
+//    return m_maximumLikelihoodFunctions;
+//  }
+
+
+
+  PvlObject BundleResults::pvlObject(QString name) const {
+
+    PvlObject pvl(name);
+
+    pvl += correlationMatrix().pvlObject();
+
+    pvl += PvlKeyword("NumberFixedPoints", toString(numberFixedPoints()));
+    pvl += PvlKeyword("NumberIgnoredPoints", toString(numberIgnoredPoints()));
+    pvl += PvlKeyword("NumberHeldImages", toString(numberHeldImages()));
+    pvl += PvlKeyword("RMSResidualX", toString(rmsRx()));
+    pvl += PvlKeyword("RMSResidualY", toString(rmsRy()));
+    pvl += PvlKeyword("RMSResidualXY", toString(rmsRxy()));
+    pvl += PvlKeyword("RejectionLimit", toString(rejectionLimit()));
+    pvl += PvlKeyword("NumberRejectedObservations", toString(numberRejectedObservations()));
+    pvl += PvlKeyword("NumberObservations", toString(numberObservations()));
+    pvl += PvlKeyword("NumberImageParameters", toString(numberImageParameters()));
+    pvl += PvlKeyword("NumberConstrainedPointParameters", toString(numberConstrainedPointParameters()));
+    pvl += PvlKeyword("NumberConstrainedImageParameters", toString(numberConstrainedImageParameters()));
+    pvl += PvlKeyword("NumberUnknownParameters", toString(numberUnknownParameters()));
+    pvl += PvlKeyword("DegreesOfFreedom", toString(degreesOfFreedom()));
+    pvl += PvlKeyword("Sigma0", toString(sigma0()));
+    pvl += PvlKeyword("ElapsedTime", toString(elapsedTime()));
+    pvl += PvlKeyword("ElapsedTimeErrorProp", toString(elapsedTimeErrorProp()));
+    pvl += PvlKeyword("Converged", toString(converged()));
+#if 0
+    // loop through these ??? what value to store???
+    pvl += PvlKeyword("RmsImageSampleResidualsSize", toString(m_rmsImageSampleResiduals.size());
+    pvl += PvlKeyword("RmsImageLineResidualsSize",   toString(m_rmsImageLineResiduals.size());
+    pvl += PvlKeyword("RmsImageResidualsSize",       toString(m_rmsImageResiduals.size());
+    pvl += PvlKeyword("RmsImageXSigmasSize",         toString(m_rmsImageXSigmas.size());
+    pvl += PvlKeyword("RmsImageYSigmasSize",         toString(m_rmsImageYSigmas.size());
+    pvl += PvlKeyword("RmsImageZSigmasSize",         toString(m_rmsImageZSigmas.size());
+    pvl += PvlKeyword("RmsImageRASigmasSize",        toString(m_rmsImageRASigmas.size());
+    pvl += PvlKeyword("RmsImageDECSigmasSize",       toString(m_rmsImageDECSigmas.size());
+    pvl += PvlKeyword("RmsImageTWISTSigmasSize",     toString(m_rmsImageTWISTSigmas.size());
+#endif 
+    pvl += PvlKeyword("MinSigmaLatitude", toString(minSigmaLatitudeDistance().meters()));
+    pvl += PvlKeyword("MinSigmaLatitudePointId", minSigmaLatitudePointId());
+    pvl += PvlKeyword("MaxSigmaLatitude", toString(maxSigmaLatitudeDistance().meters()));
+    pvl += PvlKeyword("MaxSigmaLatitudePointId", maxSigmaLatitudePointId());
+    pvl += PvlKeyword("MinSigmaLongitude", toString(minSigmaLongitudeDistance().meters()));
+    pvl += PvlKeyword("MinSigmaLongitudePointId", minSigmaLongitudePointId());
+    pvl += PvlKeyword("MaxSigmaLongitude", toString(maxSigmaLongitudeDistance().meters()));
+    pvl += PvlKeyword("MaxSigmaLongitudePointId", maxSigmaLongitudePointId());
+    pvl += PvlKeyword("MinSigmaRadius", toString(minSigmaRadiusDistance().meters()));
+    pvl += PvlKeyword("MinSigmaRadiusPointId", minSigmaRadiusPointId());
+    pvl += PvlKeyword("MaxSigmaRadius", toString(maxSigmaRadiusDistance().meters()));
+    pvl += PvlKeyword("MaxSigmaRadiusPointId", maxSigmaRadiusPointId());
+    pvl += PvlKeyword("RmsSigmaLat", toString(sigmaLatitudeStatisticsRms()));
+    pvl += PvlKeyword("RmsSigmaLon", toString(sigmaLongitudeStatisticsRms()));
+    pvl += PvlKeyword("RmsSigmaRad", toString(sigmaRadiusStatisticsRms()));
+    pvl += PvlKeyword("NumberMaximumLikelihoodModels", toString(numberMaximumLikelihoodModels()));
+    if (numberMaximumLikelihoodModels() > 0) {
+
+      PvlKeyword models("MaximumLikelihoodModels");
+      PvlKeyword quantiles("MaximumLikelihoodQuantiles"); 
+      
+      for (int i = 0; i < m_maximumLikelihoodFunctions.size(); i++) {
+        models.addValue(MaximumLikelihoodWFunctions::modelToString(
+                            m_maximumLikelihoodFunctions[i].first.model()));
+        quantiles.addValue(toString(m_maximumLikelihoodFunctions[i].second));
+      }
+      pvl += models;
+      pvl += quantiles;
+      pvl += PvlKeyword("MaximumLikelihoodMedianR2Residuals", 
+                          toString(m_maximumLikelihoodMedianR2Residuals));
+    }
+
+    return pvl;
   }
 
 
 
   /**
-   * Create an XML Handler (reader) that can populate the BundleSettings class data. See
-   *   BundleSettings::save() for the expected format.
+   * Accessor for the Correlation Matrix.
    *
-   * @param bundleSettings The image we're going to be initializing
-   * @param imageFolder The folder that contains the Cube
+   * @return The correlation matrix.
    */
-  BundleResults::XmlHandler::XmlHandler(BundleResults *bundleResults, Project *project) {
+  CorrelationMatrix BundleResults::correlationMatrix() const {
+    return *m_correlationMatrix;
+  }
+
+
+
+  /**
+   * Set the covariance file name for the matrix used to calculate the correlation matrix.
+   *
+   * @param name Name of the file used to store the covariance matrix.
+   */
+  void BundleResults::setCorrMatCovFileName(FileName name) {
+    m_correlationMatrix->setCovarianceFileName(name);
+  }
+
+
+
+  /**
+   * Set the images and their associated parameters of the correlation matrix.
+   *
+   * @param imgsAndParams The qmap with all the images and parameters used for this bundle.
+   */
+  void BundleResults::setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams) {
+    m_correlationMatrix->setImagesAndParameters(imgsAndParams);
+  }
+
+
+
+  void BundleResults::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
+
+    stream.writeStartElement("bundleResults");
+    stream.writeTextElement("id", m_id->toString());
+ 
+//    stream.writeTextElement("instrumentId", m_instrumentId);
+
+    stream.writeStartElement("correlationMatrix");
+    stream.writeAttribute("correlationFileName", correlationMatrix().correlationFileName().expanded()); 
+    stream.writeAttribute("covarianceFileName", correlationMatrix().covarianceFileName().expanded()); 
+    stream.writeStartElement("imagesAndParameters");
+    QMapIterator<QString, QStringList> imgParamIt(*correlationMatrix().imagesAndParameters());
+    while (imgParamIt.hasNext()) {
+      imgParamIt.next();
+      stream.writeStartElement("image"); 
+      stream.writeAttribute("id", imgParamIt.key());
+      QStringList parameters = imgParamIt.value();
+      for (int i = 0; i < parameters.size(); i++) {
+        stream.writeTextElement("parameter", parameters[i]);
+      }
+      stream.writeEndElement(); // end image
+      
+    }
+    stream.writeEndElement(); // end images and parameters
+    stream.writeEndElement(); // end correlationMatrix
+    
+    stream.writeStartElement("generalStatisticsValues");
+    stream.writeTextElement("numberFixedPoints", toString(numberFixedPoints()));
+    stream.writeTextElement("numberIgnoredPoints", toString(numberIgnoredPoints()));
+    stream.writeTextElement("numberHeldImages", toString(numberHeldImages()));
+    stream.writeTextElement("rejectionLimit", toString(rejectionLimit()));
+    stream.writeTextElement("numberRejectedObservations", toString(numberRejectedObservations()));
+    stream.writeTextElement("numberObservations", toString(numberObservations()));
+    stream.writeTextElement("numberImageParameters", toString(numberImageParameters()));
+    stream.writeTextElement("numberConstrainedPointParameters", toString(numberConstrainedPointParameters()));
+    stream.writeTextElement("numberConstrainedImageParameters", toString(numberConstrainedImageParameters()));
+    stream.writeTextElement("numberUnknownParameters", toString(numberUnknownParameters()));
+    stream.writeTextElement("degreesOfFreedom", toString(degreesOfFreedom()));
+    stream.writeTextElement("sigma0", toString(sigma0()));
+    stream.writeTextElement("converged", toString(converged()));
+    stream.writeEndElement(); // end generalStatisticsValues
+
+    stream.writeStartElement("rms");
+    stream.writeStartElement("residuals");
+    stream.writeAttribute("x", toString(rmsRx())); 
+    stream.writeAttribute("y", toString(rmsRy())); 
+    stream.writeAttribute("xy", toString(rmsRxy())); 
+    stream.writeEndElement(); // end residuals element
+    stream.writeStartElement("sigmas");
+    stream.writeAttribute("lat", toString(sigmaLatitudeStatisticsRms())); 
+    stream.writeAttribute("lon", toString(sigmaLongitudeStatisticsRms())); 
+    stream.writeAttribute("rad", toString(sigmaRadiusStatisticsRms())); 
+    stream.writeEndElement(); // end sigmas element
+
+    stream.writeStartElement("imageResidualsLists");
+    stream.writeStartElement("residualsList");
+    stream.writeAttribute("listSize", toString(rmsImageResiduals().size())); 
+    for (int i = 0; i < m_rmsImageResiduals.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageResiduals[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end residuals list
+    stream.writeStartElement("sampleList");
+    stream.writeAttribute("listSize", toString(rmsImageSampleResiduals().size())); 
+    for (int i = 0; i < m_rmsImageSampleResiduals.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageSampleResiduals[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end sample residuals list
+
+    stream.writeStartElement("lineList");
+    stream.writeAttribute("listSize", toString(rmsImageLineResiduals().size())); 
+    for (int i = 0; i < m_rmsImageLineResiduals.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageLineResiduals[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end line residuals list
+    stream.writeEndElement(); // end image residuals lists
+
+    stream.writeStartElement("imageSigmasLists");
+    stream.writeStartElement("xSigmas");
+    stream.writeAttribute("listSize", toString(rmsImageXSigmas().size())); 
+    for (int i = 0; i < m_rmsImageXSigmas.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageXSigmas[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    
+    stream.writeEndElement(); // end x sigma list
+
+    stream.writeStartElement("ySigmas");
+    stream.writeAttribute("listSize", toString(rmsImageYSigmas().size())); 
+    for (int i = 0; i < m_rmsImageYSigmas.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageYSigmas[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end y sigma list
+
+    stream.writeStartElement("zSigmas");
+    stream.writeAttribute("listSize", toString(rmsImageZSigmas().size())); 
+    for (int i = 0; i < m_rmsImageZSigmas.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageZSigmas[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end z sigma list
+
+    stream.writeStartElement("raSigmas");
+    stream.writeAttribute("listSize", toString(rmsImageRASigmas().size())); 
+    for (int i = 0; i < m_rmsImageRASigmas.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageRASigmas[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end ra sigma list
+
+    stream.writeStartElement("decSigmas");
+    stream.writeAttribute("listSize", toString(rmsImageDECSigmas().size())); 
+    for (int i = 0; i < m_rmsImageDECSigmas.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageDECSigmas[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end dec sigma list
+
+    stream.writeStartElement("twistSigmas");
+    stream.writeAttribute("listSize", toString(rmsImageTWISTSigmas().size())); 
+    for (int i = 0; i < m_rmsImageTWISTSigmas.size(); i++) {
+      stream.writeStartElement("statisticsItem");
+      m_rmsImageTWISTSigmas[i].save(stream, project);
+      stream.writeEndElement(); // end statistics item
+    }
+    stream.writeEndElement(); // end twist sigma list
+    stream.writeEndElement(); // end sigmas lists
+    stream.writeEndElement(); // end rms
+
+    stream.writeStartElement("elapsedTime");
+    stream.writeAttribute("time", toString(elapsedTime())); 
+    stream.writeAttribute("errorProp", toString(elapsedTimeErrorProp())); 
+    stream.writeEndElement(); // end elapsed time
+
+    stream.writeStartElement("minMaxSigmas");
+    stream.writeStartElement("minLat");
+    stream.writeAttribute("value", toString(minSigmaLatitudeDistance().meters())); 
+    stream.writeAttribute("pointId", minSigmaLatitudePointId()); 
+    stream.writeEndElement();
+    stream.writeStartElement("maxLat");
+    stream.writeAttribute("value", toString(maxSigmaLatitudeDistance().meters())); 
+    stream.writeAttribute("pointId", maxSigmaLatitudePointId()); 
+    stream.writeEndElement();
+    stream.writeStartElement("minLon");
+    stream.writeAttribute("value", toString(minSigmaLongitudeDistance().meters())); 
+    stream.writeAttribute("pointId", minSigmaLongitudePointId()); 
+    stream.writeEndElement();
+    stream.writeStartElement("maxLon");
+    stream.writeAttribute("value", toString(maxSigmaLongitudeDistance().meters())); 
+    stream.writeAttribute("pointId", maxSigmaLongitudePointId()); 
+    stream.writeEndElement();
+    stream.writeStartElement("minRad");
+    stream.writeAttribute("value", toString(minSigmaRadiusDistance().meters())); 
+    stream.writeAttribute("pointId", minSigmaRadiusPointId()); 
+    stream.writeEndElement();
+    stream.writeStartElement("maxRad");
+    stream.writeAttribute("value", toString(maxSigmaRadiusDistance().meters())); 
+    stream.writeAttribute("pointId", maxSigmaRadiusPointId()); 
+    stream.writeEndElement();
+    stream.writeEndElement(); // end minMaxSigmas
+
+    // call max likelihood setup from startElement to fill the rest of these values... 
+    stream.writeStartElement("maximumLikelihoodEstimation");
+    stream.writeAttribute("numberModels", toString(numberMaximumLikelihoodModels())); 
+    stream.writeAttribute("maximumLikelihoodIndex", toString(maximumLikelihoodModelIndex())); 
+    stream.writeAttribute("maximumLikelihoodMedianR2Residuals", toString(maximumLikelihoodMedianR2Residuals())); 
+
+    stream.writeStartElement("cumulativeProbabilityCalculator");
+    cumulativeProbabilityDistribution().save(stream, project);
+    stream.writeEndElement(); // end cumulativeProbabilityCalculator
+
+    stream.writeStartElement("residualsCumulativeProbabilityCalculator");
+    residualsCumulativeProbabilityDistribution().save(stream, project);
+    stream.writeEndElement(); // end residualsCumulativeProbabilityCalculator
+
+    for (int i = 0; i < numberMaximumLikelihoodModels(); i++) {
+      stream.writeStartElement("model");
+      stream.writeAttribute("modelNumber", toString(i+1)); 
+      stream.writeAttribute("modelSelection", 
+                          MaximumLikelihoodWFunctions::modelToString(m_maximumLikelihoodFunctions[i].first.model()));
+      stream.writeAttribute("tweakingConstant", toString(m_maximumLikelihoodFunctions[i].first.tweakingConstant())); 
+      stream.writeAttribute("quantile", toString(m_maximumLikelihoodFunctions[i].second));
+      stream.writeEndElement(); // end this model
+    }
+    stream.writeEndElement(); // end maximumLikelihoodEstimation
+    stream.writeEndElement(); // end bundleResults
+  }
+
+
+
+  BundleResults::XmlHandler::XmlHandler(BundleResults *statistics, Project *project) {   // TODO: does xml stuff need project???
     m_xmlHandlerBundleResults = NULL;
-    m_xmlHandlerBundleResults = new BundleResults(*bundleResults);
     m_xmlHandlerProject = NULL;
-    m_xmlHandlerProject = project;
+
+    m_xmlHandlerBundleResults = statistics;
+    m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
     m_xmlHandlerCharacters = "";
-    m_xmlHandlerImages = NULL;
-    m_xmlHandlerBundleSettings = NULL;
-    m_xmlHandlerBundleStatistics = NULL;
+
+    m_xmlHandlerResidualsListSize = 0;
+    m_xmlHandlerSampleResidualsListSize = 0;
+    m_xmlHandlerLineResidualsListSize = 0;
+    m_xmlHandlerXSigmasListSize = 0;
+    m_xmlHandlerYSigmasListSize = 0;
+    m_xmlHandlerZSigmasListSize = 0;
+    m_xmlHandlerRASigmasListSize = 0;
+    m_xmlHandlerDECSigmasListSize = 0;
+    m_xmlHandlerTWISTSigmasListSize = 0;
+    m_xmlHandlerStatisticsList.clear();
+
   }
 
 
 
   BundleResults::XmlHandler::~XmlHandler() {
-    // bundleResults passed in is "this" delete+null will cause problems,no?
-//    delete m_xmlHandlerBundleResults;
-//    m_xmlHandlerBundleResults = NULL;
-
-    // we do not delete this pointer since it was set to a passed in pointer in constructor and we
-    // don't own it... is that right???
-//    delete m_xmlHandlerProject;
+    // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
+    // delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
     m_xmlHandlerProject = NULL;
-
-    delete m_xmlHandlerImages;
-    m_xmlHandlerImages = NULL;
-
-    delete m_xmlHandlerBundleSettings;
-    m_xmlHandlerBundleSettings = NULL;
-
-    delete m_xmlHandlerBundleStatistics;
-    m_xmlHandlerBundleStatistics = NULL;
+    
+    // delete m_xmlHandlerBundleResults;
+    // m_xmlHandlerBundleResults = NULL;
+    
   }
+  
 
 
-
-  /**
-   * Handle an XML start element. This expects <image/> and <displayProperties/> elements.
-   *
-   * @return If we should continue reading the XML (usually true).
-   */
-  bool BundleResults::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                       const QString &qName, const QXmlAttributes &atts) {
+  bool BundleResults::XmlHandler::startElement(const QString &namespaceURI, 
+                                                  const QString &localName,
+                                                  const QString &qName,
+                                                  const QXmlAttributes &atts) {
     m_xmlHandlerCharacters = "";
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+        
+      if (qName == "correlationMatrix") {
 
-      if (localName == "bundleSettings") {
-        delete m_xmlHandlerBundleSettings;
-        m_xmlHandlerBundleSettings = NULL;
-        m_xmlHandlerBundleSettings = new BundleSettings(m_xmlHandlerProject, reader());
+        m_xmlHandlerBundleResults->m_correlationMatrix = NULL;
+        m_xmlHandlerBundleResults->m_correlationMatrix = new CorrelationMatrix();
+
+        QString correlationFileName = atts.value("correlationFileName");
+        if (!correlationFileName.isEmpty()) {
+          FileName correlationFile(correlationFileName);
+          m_xmlHandlerBundleResults->m_correlationMatrix->setCorrelationFileName(correlationFile);
+        }
+
+        QString covarianceFileName = atts.value("covarianceFileName");
+        if (!covarianceFileName.isEmpty()) {
+          FileName covarianceFile(covarianceFileName);
+          m_xmlHandlerBundleResults->m_correlationMatrix->setCovarianceFileName(covarianceFile);
+        }
+
       }
-      else if (localName == "bundleStatistics") {
-        delete m_xmlHandlerBundleStatistics;
-        m_xmlHandlerBundleStatistics = NULL;
-        m_xmlHandlerBundleStatistics = new BundleStatistics(m_xmlHandlerProject, reader()); //TODO: need to add constructor for this???
+      else if (qName == "image") {
+        QString correlationMatrixImageId = atts.value("id");
+        if (!correlationMatrixImageId.isEmpty()) {
+          m_xmlHandlerCorrelationImageId = correlationMatrixImageId;
+        }
       }
-      else if (localName == "imageList") {
-        m_xmlHandlerImages->append(new ImageList(m_xmlHandlerProject, reader()));
+      else if (qName == "residuals") {
+        
+        QString rx = atts.value("x");
+        if (!rx.isEmpty()) {
+          m_xmlHandlerBundleResults->m_rms_rx = toDouble(rx);
+        }
+
+        QString ry = atts.value("y");
+        if (!ry.isEmpty()) {
+          m_xmlHandlerBundleResults->m_rms_ry = toDouble(ry);
+        }
+
+        QString rxy = atts.value("xy");
+        if (!rxy.isEmpty()) {
+          m_xmlHandlerBundleResults->m_rms_rxy = toDouble(rxy);
+        }
+
+      }
+      else if (qName == "sigmas") {
+
+        QString lat = atts.value("lat");
+        if (!lat.isEmpty()) {
+          m_xmlHandlerBundleResults->m_sigmaLatStatsRms = toDouble(lat);
+        }
+
+        QString lon = atts.value("lon");
+        if (!lon.isEmpty()) {
+          m_xmlHandlerBundleResults->m_sigmaLonStatsRms = toDouble(lon);
+        }
+
+        QString rad = atts.value("rad");
+        if (!rad.isEmpty()) {
+          m_xmlHandlerBundleResults->m_sigmaRadStatsRms = toDouble(rad);
+        }
+
+      }
+      else if (qName == "residualsList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerResidualsListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "sampleList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerSampleResidualsListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "lineList") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerLineResidualsListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "xSigmas") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerXSigmasListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "ySigmas") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerYSigmasListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "zSigmas") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerZSigmasListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "raSigmas") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerRASigmasListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "decSigmas") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerDECSigmasListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "twistSigmas") {
+
+        QString listSizeStr = atts.value("listSize");
+        if (!listSizeStr.isEmpty()) {
+          m_xmlHandlerTWISTSigmasListSize = toInt(listSizeStr);
+        }
+
+      }
+      else if (qName == "statisticsItem") {
+        // add statistics object to the xml handler's current statistics list.
+        m_xmlHandlerStatisticsList.append(
+            new Statistics(m_xmlHandlerProject, reader()));
+      }
+      else if (qName == "elapsedTime") {
+
+        QString time = atts.value("time");
+        if (!time.isEmpty()) {
+          m_xmlHandlerBundleResults->m_elapsedTime = toDouble(time);
+        }
+
+        QString errorProp = atts.value("errorProp");
+        if (!errorProp.isEmpty()) {
+          m_xmlHandlerBundleResults->m_elapsedTimeErrorProp = toDouble(errorProp);
+        }
+
+      }
+// ???      else if (qName == "minMaxSigmaDistances") {
+// ???        QString units = atts.value("units");
+// ???        if (!QString::compare(units, "meters", Qt::CaseInsensitive)) {
+// ???          QString msg = "Unable to read BundleResults xml. Sigma distances must be "
+// ???                        "provided in meters.";
+// ???          throw IException(IException::Io, msg, _FILEINFO_);
+// ???        }
+// ???      }
+      else if (qName == "minLat") {
+
+        QString minLat = atts.value("value");
+        if (!minLat.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaLatitudeDistance.setMeters(toDouble(minLat));
+        }
+
+        QString minLatPointId = atts.value("pointId");
+        if (!minLatPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaLatitudePointId = minLatPointId;
+        }
+
+      }
+      else if (qName == "maxLat") {
+
+        QString maxLat = atts.value("value");
+        if (!maxLat.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaLatitudeDistance.setMeters(toDouble(maxLat));
+        }
+
+        QString maxLatPointId = atts.value("pointId");
+        if (!maxLatPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaLatitudePointId = maxLatPointId;
+        }
+
+      }
+      else if (qName == "minLon") {
+
+        QString minLon = atts.value("value");
+        if (!minLon.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaLongitudeDistance.setMeters(toDouble(minLon));
+        }
+
+        QString minLonPointId = atts.value("pointId");
+        if (!minLonPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaLongitudePointId = minLonPointId;
+        }
+
+      }
+      else if (qName == "maxLon") {
+
+        QString maxLon = atts.value("value");
+        if (!maxLon.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaLongitudeDistance.setMeters(toDouble(maxLon));
+        }
+
+        QString maxLonPointId = atts.value("pointId");
+        if (!maxLonPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaLongitudePointId = maxLonPointId;
+        }
+
+      }
+      else if (qName == "minRad") {
+
+        QString minRad = atts.value("value");
+        if (!minRad.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaRadiusDistance.setMeters(toDouble(minRad));
+        }
+
+        QString minRadPointId = atts.value("pointId");
+        if (!minRadPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_minSigmaRadiusPointId = minRadPointId;
+        }
+
+      }
+      else if (qName == "maxRad") {
+
+        QString maxRad = atts.value("value");
+        if (!maxRad.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaRadiusDistance.setMeters(toDouble(maxRad));
+        }
+
+        QString maxRadPointId = atts.value("pointId");
+        if (!maxRadPointId.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maxSigmaRadiusPointId = maxRadPointId;
+        }
+
+      }
+      else if (qName == "maximumLikelihoodEstimation") {
+
+        QString maximumLikelihoodIndex = atts.value("maximumLikelihoodIndex");
+        if (!maximumLikelihoodIndex.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maximumLikelihoodIndex = toInt(maximumLikelihoodIndex);
+        }
+
+        QString maximumLikelihoodMedianR2Residuals = atts.value("maximumLikelihoodMedianR2Residuals");
+        if (!maximumLikelihoodMedianR2Residuals.isEmpty()) {
+          m_xmlHandlerBundleResults->m_maximumLikelihoodMedianR2Residuals = toDouble(maximumLikelihoodMedianR2Residuals);
+        }
+
+      }
+      else if (qName == "model") {
+        QString model = atts.value("modelSelection");
+        QString tweakingConstant = atts.value("tweakingConstant");
+        QString quantile = atts.value("quantile");
+        bool validModel = true;
+        if (model.isEmpty())            validModel = false;
+        if (tweakingConstant.isEmpty()) validModel = false;
+        if (quantile.isEmpty())         validModel = false;
+        if (validModel) {
+          m_xmlHandlerBundleResults->m_maximumLikelihoodFunctions.append(
+              qMakePair(MaximumLikelihoodWFunctions(
+                            MaximumLikelihoodWFunctions::stringToModel(model),
+                            toDouble(tweakingConstant)),
+                        toDouble(quantile)));
+        }
+      }
+      else if (qName == "cumulativeProbabilityCalculator") {
+        m_xmlHandlerBundleResults->m_cumPro = NULL;
+        m_xmlHandlerBundleResults->m_cumPro = new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());
+      }
+      else if (qName == "residualsCumulativeProbabilityCalculator") {
+        m_xmlHandlerBundleResults->m_cumProRes = NULL;
+        m_xmlHandlerBundleResults->m_cumProRes = new StatCumProbDistDynCalc(m_xmlHandlerProject, reader());
       }
     }
     return true;
@@ -251,33 +1540,166 @@ namespace Isis {
 
 
   bool BundleResults::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                             const QString &qName) {
-    if (localName == "id") {
-      m_xmlHandlerBundleResults->m_id = NULL;
-      m_xmlHandlerBundleResults->m_id = new QUuid(m_xmlHandlerCharacters);
-    }
-    else if (localName == "runTime") {
-      m_xmlHandlerBundleResults->m_runTime = m_xmlHandlerCharacters;
-    }
-    else if (localName == "fileName") {
-      m_xmlHandlerBundleResults->m_controlNetworkFileName = NULL;
-      m_xmlHandlerBundleResults->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
-    }
-    else if (localName == "bundleSettings") {
-      m_xmlHandlerBundleResults->m_settings = new BundleSettings(*m_xmlHandlerBundleSettings);
-      delete m_xmlHandlerBundleSettings;
-      m_xmlHandlerBundleSettings = NULL;
-    }
-    else if (localName == "bundleStatistics") {
-      m_xmlHandlerBundleResults->m_statisticsResults = new BundleStatistics(*m_xmlHandlerBundleStatistics);
-      delete m_xmlHandlerBundleStatistics;
-      m_xmlHandlerBundleStatistics = NULL;
-    }
-    if (localName == "imageLists") {
-      for (int i = 0; i < m_xmlHandlerImages->size(); i++) {
-        m_xmlHandlerBundleResults->m_images->append(m_xmlHandlerImages->at(i));
+                                     const QString &qName) {
+
+    if (!m_xmlHandlerCharacters.isEmpty()) {
+      if (qName == "id") {
+        m_xmlHandlerBundleResults->m_id = NULL;
+        m_xmlHandlerBundleResults->m_id = new QUuid(m_xmlHandlerCharacters);
       }
-      m_xmlHandlerImages->clear();
+//      else if (qName == "instrumentId") {
+//        m_xmlHandlerBundleResults->m_instrumentId = m_xmlHandlerCharacters;
+//      }
+      if (qName == "parameter") {
+        // add the parameter to the current list
+        m_xmlHandlerCorrelationParameterList.append(m_xmlHandlerCharacters);
+      }
+      if (qName == "image") {
+        // add this image and its parameters to the map
+        if (m_xmlHandlerCorrelationImageId != "") {
+          m_xmlHandlerCorrelationMap.insert(m_xmlHandlerCorrelationImageId, 
+                                            m_xmlHandlerCorrelationParameterList);
+        }
+        m_xmlHandlerCorrelationImageId = "";
+        m_xmlHandlerCorrelationParameterList.clear();
+
+      }
+      if (qName == "imagesAndParameters") {
+        // set the map after all images and parameters have been added
+        if (!m_xmlHandlerCorrelationMap.isEmpty()) {
+          m_xmlHandlerBundleResults->setCorrMatImgsAndParams(m_xmlHandlerCorrelationMap);
+        }
+      }
+      else if (qName == "numberFixedPoints") {
+        m_xmlHandlerBundleResults->m_numberFixedPoints = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberIgnoredPoints") {
+        m_xmlHandlerBundleResults->m_numberIgnoredPoints = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberHeldImages") {
+        m_xmlHandlerBundleResults->m_numberHeldImages = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "rejectionLimit") {
+        m_xmlHandlerBundleResults->m_rejectionLimit = toDouble(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberRejectedObservations") {
+        m_xmlHandlerBundleResults->m_numberRejectedObservations = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberObservations") {
+        m_xmlHandlerBundleResults->m_numberObservations = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberImageParameters") {
+        m_xmlHandlerBundleResults->m_numberImageParameters = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberConstrainedPointParameters") {
+        m_xmlHandlerBundleResults->m_numberConstrainedPointParameters = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberConstrainedImageParameters") {
+        m_xmlHandlerBundleResults->m_numberConstrainedImageParameters = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberUnknownParameters") {
+        m_xmlHandlerBundleResults->m_numberUnknownParameters = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "degreesOfFreedom") {
+        m_xmlHandlerBundleResults->m_degreesOfFreedom = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "sigma0") {
+        m_xmlHandlerBundleResults->m_sigma0 = toDouble(m_xmlHandlerCharacters);
+      }
+      else if (qName == "converged") {
+        m_xmlHandlerBundleResults->m_converged = toBool(m_xmlHandlerCharacters);
+      }
+      // copy the xml handler's statistics list to the appropriate bundle statistics list
+      else if (qName == "residualsList") {
+        // ??? if (m_xmlHandlerResidualsListSize != m_xmlHandlerStatisticsList.size()) { // do this check or assume the xml is valid???
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid residualsList", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageResiduals.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "sampleList") {
+        // ??? if (m_xmlHandlerSampleResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid sampleList", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageSampleResiduals.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "lineList") {
+        // ??? if (m_xmlHandlerLineResidualsListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid lineList", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageLineResiduals.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "xSigmas") {
+        // ??? if (m_xmlHandlerXSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid xSigmas", _FILEINFO_); ???
+        // }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageXSigmas.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "ySigmas") {
+        // ??? if (m_xmlHandlerYSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid ySigmas", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageYSigmas.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "zSigmas") {
+        // ??? if (m_xmlHandlerZSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid zSigmas", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageZSigmas.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "raSigmas") {
+        // ??? if (m_xmlHandlerRASigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid raSigmas", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageRASigmas.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "decSigmas") {
+        // ??? if (m_xmlHandlerDECSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid decSigmas", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageDECSigmas.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
+      else if (qName == "twistSigmas") {
+        // ??? if (m_xmlHandlerTWISTSigmasListSize != m_xmlHandlerStatisticsList.size()) {
+        // ???   throw IException(IException::Unknown, 
+        // ???                    "Unable to read xml file. Invalid twistSigmas", _FILEINFO_);
+        // ??? }
+        for (int i = 0; i < m_xmlHandlerStatisticsList.size(); i++) {
+          m_xmlHandlerBundleResults->m_rmsImageTWISTSigmas.append(m_xmlHandlerStatisticsList[i]);
+        }
+        m_xmlHandlerStatisticsList.clear();
+      }
     }
     m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
@@ -285,86 +1707,131 @@ namespace Isis {
 
 
 
-  /**
-   * Get a unique, identifying string associated with this BundleResults object.
-   *
-   * @return A unique ID for this BundleResults object
-   */
-  QString BundleResults::id() const {
-    return m_id->toString().remove(QRegExp("[{}]"));
-  }
-
-
-  void BundleResults::setRunTime(QString runTime) {
-    m_runTime = runTime;
-  }
-
-
-  QString BundleResults::runTime() const {
-    return m_runTime;
-  }
-
-
-  QString BundleResults::controlNetworkFileName() const {
-    return m_controlNetworkFileName->expanded();
-  }
-
-  BundleSettings *BundleResults::bundleSettings() {
-    return m_settings;
-  }
-
-  BundleStatistics *BundleResults::bundleStatistics() {
-    return m_statisticsResults;
-  }
-
   QDataStream &BundleResults::write(QDataStream &stream) const {
     stream << m_id->toString()
-           << m_runTime
-           << m_controlNetworkFileName->expanded()
-           << *m_settings
-           << *m_statisticsResults;
-  // TODO: add this capability to Image and ImageList
-  //          << *m_images;
+           << *m_correlationMatrix
+           << (qint32)m_numberFixedPoints
+           << (qint32)m_numberIgnoredPoints
+           << (qint32)m_numberHeldImages
+           << m_rms_rx << m_rms_ry << m_rms_rxy
+           << m_rejectionLimit
+           << (qint32)m_numberObservations
+           << (qint32)m_numberRejectedObservations
+           << (qint32)m_numberUnknownParameters
+           << (qint32)m_numberImageParameters
+           << (qint32)m_numberConstrainedImageParameters
+           << (qint32)m_numberConstrainedPointParameters
+           << (qint32)m_degreesOfFreedom
+           << m_sigma0
+           << m_elapsedTime << m_elapsedTimeErrorProp
+           << m_converged
+           << m_rmsImageSampleResiduals << m_rmsImageLineResiduals
+           << m_rmsImageResiduals
+           << m_rmsImageXSigmas << m_rmsImageYSigmas << m_rmsImageZSigmas
+           << m_rmsImageRASigmas << m_rmsImageDECSigmas << m_rmsImageTWISTSigmas
+           << m_minSigmaLatitudeDistance.meters()
+           << m_maxSigmaLatitudeDistance.meters()
+           << m_minSigmaLongitudeDistance.meters()
+           << m_maxSigmaLongitudeDistance.meters()
+           << m_minSigmaRadiusDistance.meters()
+           << m_maxSigmaRadiusDistance.meters()
+           << m_minSigmaLatitudePointId        
+           << m_maxSigmaLatitudePointId        
+           << m_minSigmaLongitudePointId       
+           << m_maxSigmaLongitudePointId       
+           << m_minSigmaRadiusPointId          
+           << m_maxSigmaRadiusPointId          
+           << m_sigmaLatStatsRms << m_sigmaLonStatsRms << m_sigmaRadStatsRms
+           << m_maximumLikelihoodFunctions
+           << (qint32)m_maximumLikelihoodIndex << *m_cumPro << *m_cumProRes
+           << m_maximumLikelihoodMedianR2Residuals;
     return stream;
   }
 
 
 
   QDataStream &BundleResults::read(QDataStream &stream) {
-
     QString id;
+    CorrelationMatrix correlationMatrix;
+    qint32 numberFixedPoints, numberIgnoredPoints, numberHeldImages, numberRejectedObservations,
+           numberObservations, numberImageParameters, numberConstrainedPointParameters,
+           numberConstrainedImageParameters, numberUnknownParameters, degreesOfFreedom,
+           maximumLikelihoodIndex;
+    double minSigmaLatitudeDistance, maxSigmaLatitudeDistance, minSigmaLongitudeDistance,
+           maxSigmaLongitudeDistance, minSigmaRadiusDistance, maxSigmaRadiusDistance;   
+    StatCumProbDistDynCalc cumPro;
+    StatCumProbDistDynCalc cumProRes;
+
     stream >> id;
-    delete m_id;
+    stream >> correlationMatrix;
+    stream >> numberFixedPoints;
+    stream >> numberIgnoredPoints;
+    stream >> numberHeldImages;
+    stream >> m_rms_rx >> m_rms_ry >> m_rms_rxy;
+    stream >> m_rejectionLimit;
+    stream >> numberObservations;
+    stream >> numberRejectedObservations;
+    stream >> numberUnknownParameters;
+    stream >> numberImageParameters;
+    stream >> numberConstrainedImageParameters;
+    stream >> numberConstrainedPointParameters;
+    stream >> degreesOfFreedom;
+    stream >> m_sigma0;
+    stream >> m_elapsedTime >> m_elapsedTimeErrorProp;
+    stream >> m_converged;
+    stream >> m_rmsImageSampleResiduals >> m_rmsImageLineResiduals;
+    stream >> m_rmsImageResiduals;
+    stream >> m_rmsImageXSigmas >> m_rmsImageYSigmas >> m_rmsImageZSigmas;
+    stream >> m_rmsImageRASigmas >> m_rmsImageDECSigmas >> m_rmsImageTWISTSigmas;
+    stream >> minSigmaLatitudeDistance;
+    stream >> maxSigmaLatitudeDistance;
+    stream >> minSigmaLongitudeDistance;
+    stream >> maxSigmaLongitudeDistance;
+    stream >> minSigmaRadiusDistance;
+    stream >> maxSigmaRadiusDistance;
+    stream >> m_minSigmaLatitudePointId;   
+    stream >> m_maxSigmaLatitudePointId;   
+    stream >> m_minSigmaLongitudePointId;  
+    stream >> m_maxSigmaLongitudePointId;  
+    stream >> m_minSigmaRadiusPointId;     
+    stream >> m_maxSigmaRadiusPointId;     
+    stream >> m_sigmaLatStatsRms >> m_sigmaLonStatsRms >> m_sigmaRadStatsRms;
+    stream >> m_maximumLikelihoodFunctions;
+    stream >> maximumLikelihoodIndex;
+    stream >> cumPro >> cumProRes;
+    stream >> m_maximumLikelihoodMedianR2Residuals;
+
     m_id = NULL;
     m_id = new QUuid(id);
 
-    stream >> m_runTime;
+    m_correlationMatrix = NULL;
+    m_correlationMatrix = new CorrelationMatrix(correlationMatrix);
 
-    QString controlNetworkFileName;
-    stream >> controlNetworkFileName;
-    delete m_controlNetworkFileName;
-    m_controlNetworkFileName = NULL;
-    m_controlNetworkFileName = new FileName(controlNetworkFileName);
+    m_numberFixedPoints                = (int)numberFixedPoints;
+    m_numberIgnoredPoints              = (int)numberIgnoredPoints;
+    m_numberHeldImages                 = (int)numberHeldImages;
+    m_numberRejectedObservations       = (int)numberRejectedObservations;
+    m_numberObservations               = (int)numberObservations;
+    m_numberImageParameters            = (int)numberImageParameters;
+    m_numberConstrainedPointParameters = (int)numberConstrainedPointParameters;
+    m_numberConstrainedImageParameters = (int)numberConstrainedImageParameters;
+    m_numberUnknownParameters          = (int)numberUnknownParameters;
+    m_degreesOfFreedom                 = (int)degreesOfFreedom;
+    m_maximumLikelihoodIndex           = (int)maximumLikelihoodIndex;
 
-    BundleSettings settings;
-    stream >> settings;
-    delete m_settings;
-    m_settings = NULL;
-    m_settings = new BundleSettings(settings);
+    m_minSigmaLatitudeDistance.setMeters(minSigmaLatitudeDistance); 
+    m_maxSigmaLatitudeDistance.setMeters(maxSigmaLatitudeDistance); 
+    m_minSigmaLongitudeDistance.setMeters(minSigmaLongitudeDistance);
+    m_maxSigmaLongitudeDistance.setMeters(maxSigmaLongitudeDistance);
+    m_minSigmaRadiusDistance.setMeters(minSigmaRadiusDistance);   
+    m_maxSigmaRadiusDistance.setMeters(maxSigmaRadiusDistance);   
 
-    BundleStatistics statisticsResults;
-    stream >> statisticsResults;
-    delete m_statisticsResults;
-    m_statisticsResults = NULL;
-    m_statisticsResults = new BundleStatistics(statisticsResults);
+    m_cumPro = NULL;
+    m_cumPro = new StatCumProbDistDynCalc(cumPro);
 
-    // TODO: add this capability to Image and ImageList
-    // QList<ImageList*> imageLists;
-    // stream >> imageLists;
-    // delete m_images;
-    // m_images = NULL;
-    // m_images = new QList<ImageList *>(imageLists);
-
+    m_cumProRes = NULL;
+    m_cumProRes = new StatCumProbDistDynCalc(cumProRes);
+    
     return stream;
   }
 
@@ -378,2276 +1845,226 @@ namespace Isis {
 
   QDataStream &operator>>(QDataStream &stream, BundleResults &bundleResults) {
     return bundleResults.read(stream);
+  } 
+  
+  
+    
+  /**
+   * Saves an hdf5 file to disk containing the bundle results
+   */  
+  void BundleResults::savehdf5(hid_t fileId, H5::Group settingsGroup) const {
+    //const H5std_string  hdfFileName(outputfilename.expanded()); //Is this the right way to have a dynamic file name?  What about PATH?
+    //
+    //
+    //// Try block to detect exceptions raised by any of the calls inside it
+    //try {
+    //  /*
+    //   * Turn off the auto-printing when failure occurs so that we can
+    //   * handle the errors appropriately
+    //   */
+    //  H5::Exception::dontPrint();
+    //  /*
+    //   * Create a new file using H5F_ACC_TRUNC access,
+    //   * default file creation properties, and default file
+    //   * access properties.
+    //   */
+    //  H5::H5File hdfFile = H5::H5File( hdfFileName, H5F_ACC_TRUNC ); // does this append or overwrite ???
+    //  hid_t fileId = hdfFile.getId();
+    //
+    //  hsize_t dims[2];              // dataset dimensions
+    //
+    //  //TODO: finish Correlation Matrix
+    //  //Create a dataset with compression
+    //  H5::Group correlationMatrixGroup = H5::Group(hdfFile.createGroup("/BundleResults/CorrelationMatrix"));
+    //  H5LTset_attribute_string(fileId, "/BundleResults/CorrelationMatrix", "correlationFileName", 
+    //                           correlationMatrix().correlationFileName().expanded());
+    //  H5LTset_attribute_string(fileId, "/BundleResults/CorrelationMatrix", "covarianceFileName", 
+    //                           correlationMatrix().covarianceFileName().expanded());
+    //  // TODO: jb - how do we add
+    //  // correlationMatrix().imagesAndParameters()???
+    //  // QMapIterator<QString, QStringList> a list of images with their
+    //  // corresponding parameters...
+    //
+    //  
+    //  // H5::Group generalStatsInfoGroup = H5::Group(hdfFile.createGroup("/BundleResults/GeneralStatisticsInfo"));
+    //  const int numFixedPoints = numberFixedPoints();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberFixedPoints", &numFixedPoints, 1);
+    //  const int numIgnoredPoints = numberIgnoredPoints();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberIgnoredPoints", &numIgnoredPoints, 1);
+    //  const int numHeldImages = numberHeldImages();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberHeldImages", &numHeldImages, 1);
+    //  const double rejectionLimit = rejectionLimit();
+    //  H5LTset_attribute_double(fileId, "/BundleResults", "rejectionLimit", &rejectionLimit, 1);
+    //  const int numRejectedObservations = numberRejectedObservations();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberRejectedObservations", &numRejectedObservations, 1);
+    //  const int numObservations = numberObservations();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberObservations", &numObservations, 1);
+    //  const int numImageParameters = numberImageParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberImageParameters", &numImageParameters, 1);
+    //  const int numConstrainedPointParameters = numberConstrainedPointParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberConstrainedPointParameters", 
+    //                        &numConstrainedPointParameters, 1);
+    //  const int numConstrainedImageParameters = numberConstrainedImageParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberConstrainedImageParameters", 
+    //                        &numConstrainedImageParameters, 1);
+    //  const int numUnknownParameters = numberUnknownParameters();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberUnknownParameters", &numUnknownParameters, 1);
+    //  const int degreesOfFreedom = degreesOfFreedom();
+    //  H5LTset_attribute_int(fileId, "/BundleResults", "degreesOfFreedom", &degreesOfFreedom, 1);
+    //  const double sigma0 = sigma0();
+    //  H5LTset_attribute_double(fileId, "/BundleResults", "sigma0", &sigma0, 1);
+    //  bool converged = converged();// ???
+    //  H5LTset_attribute_string(fileId, "/BundleResults", "converged", toString(converged), 1);
+    //  
+    //  
+    //  // Create an RMS group in the file
+    //  H5::Group rms = H5::Group(hdfFile.createGroup("/BundleResults/RMS"));
+    //  H5::Group rms = H5::Group(hdfFile.createGroup("/BundleResults/RMS/residuals"));
+    //  // RMS and Sigma Scalars
+    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/residuals", "x", rmsRx(), 1);
+    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/residuals", "y", rmsRy(), 1);
+    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/residuals", "xy", rmsRxy(), 1);
+    //  H5::Group rms = H5::Group(hdfFile.createGroup("/BundleResults/RMS/sigmas"));
+    //  const double sigmas [3] = {rmsSigmaLat(), rmsSigmaLon(), rmsSigmaRad()};
+    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/sigmas", "latitude", rmsSigmaLat(), 1);
+    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/sigmas", "longitude", rmsSigmaLon(), 1);
+    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/sigmas", "radius", rmsSigmaRad(), 1);
+    //  // RMS and Sigma Vectors - This is a ton of duplicate code where I would rather use a list of functions - are functions first class objects?
+    //  const hsize_t residualsArraySize = rmsImageResiduals.size();
+    //  H5::DataSpace residualDataspace(1, &residualsArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/ResidualsList", H5::PredType::NATIVE_FLOAT, residualDataspace));
+    //  dataset.write(m_rmsImageResiduals, H5::PredType::NATIVE_FLOAT);
+    //  // Write the residual vector
+    //  const hsize_t sampleArraySize = rmsImageSampleResiduals.size();
+    //  H5::DataSpace sampleDataspace(1, &sampleArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/SampleList", H5::PredType::NATIVE_FLOAT, sampleDataspace));
+    //  dataset.write(m_rmsImageSampleResiduals, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t lineArraySize = rmsImageLineResiduals.size();
+    //  H5::DataSpace lineDataSpace(1,&lineArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/LineList", H5::PredType::NATIVE_FLOAT, lineDataSpace));
+    //  dataset.write(m_rmsImageLineResiduals, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t xSigmasArraySize = rmsImageXSigmas.size();
+    //  H5::DataSpace xSigmaDataspace(1, &xSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/xSigmas", H5::PredType::NATIVE_FLOAT, xSigmaDataspace));
+    //  dataset.write(m_rmsImageXSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t ySigmasArraySize = rmsImageYSigmas.size();
+    //  H5::DataSpace ySigmaDataspace(1, &ySigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/ySigmas", H5::PredType::NATIVE_FLOAT, ySigmaDataspace));
+    //  dataset.write(m_rmsImageYSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t zSigmasArraySize = rmsImageZSigmas.size();
+    //  H5::DataSpace zSigmaDataspace(1, &zSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/zSigmas", H5::PredType::NATIVE_FLOAT, zSigmaDataspace));
+    //  dataset.write(m_rmsImageZSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t raSigmasArraySize = rmsImageRASigmas.size();
+    //  H5::DataSpace raSigmaDataspace(1, &raSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/raSigmas", H5::PredType::NATIVE_FLOAT, raSigmaDataspace));
+    //  dataset.write(m_rmsImageRASigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t decSigmasArraySize = rmsImageDECSigmas.size();
+    //  H5::DataSpace decSigmaDataspace(1, &decSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/decSigmas", H5::PredType::NATIVE_FLOAT, decSigmaDataspace));
+    //  dataset.write(m_rmsImageDECSigmas, H5::PredType::NATIVE_FLOAT);
+    //  const hsize_t twistSigmasArraySize = rmsImageTWISTSigmas.size();
+    //  H5::DataSpace twistSigmaDataspace(1, &twistSigmasArraySize);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/twistSigmas", H5::PredType::NATIVE_FLOAT, twistSigmaDataspace));
+    //  dataset.write(m_rmsImageTWISTSigmas, H5::PredType::NATIVE_FLOAT);
+    //  
+    //  //Write elapsed time and error prop as attirbutes tagged to the root
+    //  const double elapsedTime = elapsedTime();
+    //  H5LTset_attribute_double(fileId, "/BundleResults", "elapsedTime", &elapsedTime, 1);
+    //  const double errorProp = lapsedTimeErrorProp();
+    //  H5LTset_attribute_double(fileId, "/BundleResults", "elapsedTimeErrorProp", &errorProp, 1);
+    //  
+    //  //Write a sigmas table
+    //  static m_sigmaTable sigmatable[6] = { // JB - why static???
+    //      {"minLat", minSigmaLatitudePointId(), minSigmaLatitude()},
+    //      {"maxLat", maxSigmaLatitudePointId(), maxSigmaLatitude()},
+    //      {"minLon", minSigmaLongitudePointId(), minSigmaLongitude()},
+    //      {"MaxLon", maxSigmaLongitudePointId(), maxSigmaLongitude()},
+    //      {"minRad", minSigmaRadiusPointId(), minSigmaRadius()},
+    //      {"maxRad", maxSigmaRadiusPointId(), maxSigmaRadius()}
+    //  };
+    //  
+    //  const int nfields = 3; //How many columns and their types - must be const so that field names can be created
+    //  
+    //  size_t part_offset[nfields] = {HOFFSET(m_sigmaTable, type),
+    //      HOFFSET(m_sigmaTable, pid),
+    //      HOFFSET(m_sigmaTable, value)};
+    //  
+    //  //Field names and types
+    //  hid_t field_type[nfields];  //Setup for a string type for the pid
+    //  hid_t string_type = H5Tcopy(H5T_C_S1);
+    //  H5Tset_size(string_type, (size_t)64);
+    //  field_type[0] = string_type;  //type
+    //  field_type[1] = string_type; //pid
+    //  field_type[2] = H5T_NATIVE_FLOAT;
+    //  
+    //  //How many rows?
+    //  int nrecords = 6;
+    //  // Field names
+    //  const char *fieldnames[nfields] = {"valuetype", "pid", "value"};
+    //  
+    //  hsize_t chunksize = 10;
+    //  int *filldata = NULL;
+    //  int compress = 0;
+    //  
+    //  H5TBmake_table("MinMaxSigma",fileId, "minmaxsigma", (hsize_t)nfields, (hsize_t)nrecords, sizeof(m_sigmaTable), fieldnames, part_offset, field_type, chunksize, filldata, compress, sigmatable);
+    //  
+    //  
+    //  H5::Group mlestatistics = H5::Group(hdfFile.createGroup("/BundleResults/MLEstimation"));
+    //  //TODO: ML Estimation Items
+    //  //The existing code iterates through - is this stored as a matrix somewhere?
+    //  // Dimensions
+    //  dims[1] = 4;
+    //  dims[0]  = 100;
+    //  
+    //  H5::DataSpace cumProbDataspace( RANK, dims );
+    //  H5::DataSet dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/MLEstimation/cumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, cumProbDataspace));
+    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
+    //  
+    //  
+    //  dims[1] = 4;
+    //  dims[0] = 100;
+    //  H5::DataSpace resCumProbdataspace(RANK, dims);
+    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/MLEstimation/residualsCumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, resCumProbdataspace));
+    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
+    //  
+    //}  // end of try block
+    //// catch failure caused by the H5File operations
+    //catch( H5::FileIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a file error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //// catch failure caused by the DataSet operations
+    //catch( H5::DataSetIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a data set error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //// catch failure caused by the DataSpace operations
+    //catch( H5::DataSpaceIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a data space error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //// catch failure caused by the DataSpace operations
+    //catch( H5::DataTypeIException error ) {
+    //  QString msg = QString(error.getCDetailMsg());
+    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
+    //  msg = "Unable to save BundleResults to hpf5 file. "
+    //        "H5 exception handler has detected a data type error.";
+    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    //}
+    //return;
+      
   }
-
-}
-
-
-#if 0
-
-/**
- * Output bundle results to file.
- */
-bool BundleAdjust::output(int numberIterations, double radiansToMetersBodyConversion, ) {
-  if (m_bundleSettings.createBundleOutputFile()) {
-    if (m_bundleStatistics.converged() && m_bundleSettings.errorPropagation()) {
-      outputWithErrorPropagation(numberIterations, radiansToMetersBodyConversion);
-    }
-    else {
-      outputNoErrorPropagation(numberIterations, radiansToMetersBodyConversion);
-    }
-  }
-
-  if (m_bundleSettings.createCSVPointsFile()) {
-    outputPointsCSV(radiansToMetersBodyConversion, );
-    outputImagesCSV();
-  }
-
-  if (m_bundleSettings.createResidualsFile()) {
-    outputResiduals();
-  }
-
-  return true;
-}
-
-
-/**
- * Output header for bundle results file.
- *
- */
-bool BundleAdjust::outputHeader(std::ofstream &fp_out, int numberIterations) {
-  if (!fp_out) return false;
-
-  char buf[1056];
-  int nImages              = images();
-  int nValidPoints         = m_pCnet->GetNumValidPoints();
-  int nInnerConstraints    = 0;
-  int nDistanceConstraints = 0;
-  int nDegreesOfFreedom    = m_bundleStatistics.numberObservations()
-                          + m_bundleStatistics.numberConstrainedPointParameters()
-                          + m_bundleStatistics.numberConstrainedImageParameters()
-                          - m_bundleStatistics.numberUnknownParameters(); // ??? same as bstat dof ???
-                                                                          //??? m_bundleStatistics.computeDegreesOfFreedom();
-                                                                          //??? int nDegreesOfFreedom = m_bundleStatistics.degreesOfFreedom();
-
-  int nConvergenceCriteria = 1;
-
-  sprintf(buf, "JIGSAW: BUNDLE ADJUSTMENT\n=========================\n");
-  fp_out << buf;
-  sprintf(buf, "\n                       Run Time: %s",
-          Isis::iTime::CurrentLocalTime().toAscii().data());
-  fp_out << buf;
-  sprintf(buf, "\n               Network Filename: %s", m_strCnetFileName.toAscii().data());
-  fp_out << buf;
-  sprintf(buf, "\n                     Network Id: %s", m_pCnet->GetNetworkId().toAscii().data());
-  fp_out << buf;
-  sprintf(buf, "\n            Network Description: %s", m_pCnet->Description().toAscii().data());
-  fp_out << buf;
-  sprintf(buf, "\n                         Target: %s", m_pCnet->GetTarget().toAscii().data());
-  fp_out << buf;
-  sprintf(buf, "\n\n                   Linear Units: kilometers");
-  fp_out << buf;
-  sprintf(buf, "\n                  Angular Units: decimal degrees");
-  fp_out << buf;
-  sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
-  fp_out << buf;
-
-  m_bundleSettings.solveObservationMode() ?
-      sprintf(buf, "\n                   OBSERVATIONS: ON") :
-      sprintf(buf, "\n                   OBSERVATIONS: OFF");
-  fp_out << buf;
-
-  m_bundleSettings.solveRadius() ?
-      sprintf(buf, "\n                         RADIUS: ON") :
-      sprintf(buf, "\n                         RADIUS: OFF");
-  fp_out << buf;
-
-  m_bundleSettings.updateCubeLabel() ?
-      sprintf(buf, "\n                         UPDATE: YES") :
-      sprintf(buf, "\n                         UPDATE: NO");
-  fp_out << buf;
-
-  sprintf(buf, "\n                  SOLUTION TYPE: %s",
-          BundleSettings::solveMethodToString(
-              m_bundleSettings.solveMethod()).toUpper().toAscii().data());
-  fp_out << buf;
-
-  m_bundleSettings.errorPropagation() ?
-      sprintf(buf, "\n              ERROR PROPAGATION: ON") :
-      sprintf(buf, "\n              ERROR PROPAGATION: OFF");
-  fp_out << buf;
-
-  m_bundleSettings.outlierRejection() ?
-      sprintf(buf, "\n              OUTLIER REJECTION: ON") :
-      sprintf(buf, "\n              OUTLIER REJECTION: OFF");
-  fp_out << buf;
-
-  sprintf(buf, "\n           REJECTION MULTIPLIER: %lf",
-          m_bundleSettings.outlierRejectionMultiplier());
-  fp_out << buf;
-
-  sprintf(buf, "\n\nMAXIMUM LIKELIHOOD ESTIMATION\n============================\n");
-  fp_out << buf;
-
-  for (int tier = 0;tier < 3;tier++) {
-    if (tier < m_bundleStatistics.numberMaximumLikelihoodModels()) { // replace number of models variable with settings models.size()???
-      sprintf(buf, "\n                         Tier %d Enabled: TRUE", tier);
-      fp_out << buf;
-      sprintf(buf, "\n               Maximum Likelihood Model: %s",
-              MaximumLikelihoodWFunctions::modelToString(
-                  m_bundleStatistics.maximumLikelihoodModelWFunc(tier).model()).toAscii().data()); // use bundle settings ???
-//        sprintf(buf, "\n               Maximum Likelihood Model: %s",
-//                BundleSettings::maximumLikelihoodModelToString(
-//                    m_bundleStatistics.maximumLikelihoodModelWFunc(tier).model()).toAscii().data());
-//        sprintf(buf, "\n               Maximum Likelihood Model: ");
-//        fp_out << buf;
-//        m_bundleStatistics.maximumLikelihoodModelWFunc(tier).maximumLikelihoodModel(buf);
-//        fp_out << buf;
-      sprintf(buf, "\n    Quantile used for tweaking constant: %lf",
-              m_bundleStatistics.maximumLikelihoodModelQuantile(tier));
-      fp_out << buf;
-      sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",
-              m_bundleStatistics.maximumLikelihoodModelWFunc(tier).tweakingConstant());
-      fp_out << buf;
-      sprintf(buf, "\n       Approx. weighted Residual cutoff: ");
-      fp_out << buf;
-      m_bundleStatistics.maximumLikelihoodModelWFunc(tier).weightedResidualCutoff(buf);
-      fp_out << buf;
-      if (tier != 2) fp_out << "\n";
-    }
-    else {
-      sprintf(buf, "\n                         Tier %d Enabled: FALSE", tier);
-      fp_out << buf;
-    }
-  }
-
-  sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
-  fp_out << buf;
-  sprintf(buf, "\n                         SIGMA0: %e",
-          m_bundleSettings.convergenceCriteriaThreshold());
-  fp_out << buf;
-  sprintf(buf, "\n             MAXIMUM ITERATIONS: %d",
-          m_bundleSettings.convergenceCriteriaMaximumIterations());
-  fp_out << buf;
-  sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
-  fp_out << buf;
-
-  //??? this line could replace the switch/case below...   sprintf(buf, "\n                          CAMSOLVE: %s", BundleSettings::instrumentPointingSolveOptionToString(m_bundleSettings.instrumentPointingSolveOption()).toUpper().toAscii().data();
-  switch (m_bundleSettings.instrumentPointingSolveOption()) {
-    case BundleSettings::AnglesOnly:
-      sprintf(buf, "\n                          CAMSOLVE: ANGLES");
-      break;
-    case BundleSettings::AnglesVelocity:
-      sprintf(buf, "\n                          CAMSOLVE: ANGLES, VELOCITIES");
-      break;
-    case BundleSettings::AnglesVelocityAcceleration:
-      sprintf(buf, "\n                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
-      break;
-    case BundleSettings::AllPointingCoefficients:
-      sprintf(buf, "\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
-              m_bundleSettings.ckSolveDegree());
-      break;
-    case BundleSettings::NoPointingFactors:
-      sprintf(buf, "\n                          CAMSOLVE: NONE");
-      break;
-    default:
-      break;
-  }
-  fp_out << buf;
-
-  m_bundleSettings.solveTwist() ?
-      sprintf(buf, "\n                             TWIST: ON") :
-      sprintf(buf, "\n                             TWIST: OFF");
-  fp_out << buf;
-
-  m_bundleSettings.fitInstrumentPointingPolynomialOverExisting() ?
-      sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON") :
-      sprintf(buf, "\nPOLYNOMIAL OVER EXISTING POINTING : OFF");
-  fp_out << buf;
-
-  sprintf(buf, "\n\nINPUT: SPACECRAFT OPTIONS\n=========================\n");
-  fp_out << buf;
-
-//??? this line could replace the switch/case below...    sprintf(buf, "\n                          SPSOLVE: %s", BundleSettings::instrumentPositionSolveOptionToString(m_bundleSettings.instrumentPositionSolveOption()).toUpper().toAscii().data();
-  switch (m_bundleSettings.instrumentPositionSolveOption()) {
-    case BundleSettings::NoPositionFactors:
-      sprintf(buf, "\n                        SPSOLVE: NONE");
-      break;
-    case BundleSettings::PositionOnly:
-      sprintf(buf, "\n                        SPSOLVE: POSITION");
-      break;
-    case BundleSettings::PositionVelocity:
-      sprintf(buf, "\n                        SPSOLVE: POSITION, VELOCITIES");
-      break;
-    case BundleSettings::PositionVelocityAcceleration:
-      sprintf(buf, "\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
-      break;
-    case BundleSettings::AllPositionCoefficients:
-      sprintf(buf, "\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",
-              m_bundleSettings.spkSolveDegree());
-      break;
-    default:
-      break;
-  }
-  fp_out << buf;
-
-  m_bundleSettings.solveInstrumentPositionOverHermiteSpline() ?
-      sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON") :
-      sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
-  fp_out << buf;
-
-  sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES"
-          "\n===========================================\n");
-  fp_out << buf;
-
-  (m_bundleSettings.globalLatitudeAprioriSigma() == -1) ?
-      sprintf(buf, "\n               POINT LATITUDE SIGMA: N/A") :
-      sprintf(buf, "\n               POINT LATITUDE SIGMA: %lf (meters)",
-              m_bundleSettings.globalLatitudeAprioriSigma());
-  fp_out << buf;
-
-  (m_bundleSettings.globalLongitudeAprioriSigma() == -1) ?
-      sprintf(buf, "\n              POINT LONGITUDE SIGMA: N/A") :
-      sprintf(buf, "\n              POINT LONGITUDE SIGMA: %lf (meters)",
-              m_bundleSettings.globalLongitudeAprioriSigma());
-  fp_out << buf;
-
-  (m_bundleSettings.globalRadiusAprioriSigma() == -1) ?
-      sprintf(buf, "\n                 POINT RADIUS SIGMA: N/A") :
-      sprintf(buf, "\n                 POINT RADIUS SIGMA: %lf (meters)",
-              m_bundleSettings.globalRadiusAprioriSigma());
-  fp_out << buf;
-
-  if (m_nNumberCamPosCoefSolved < 1
-      || m_bundleSettings.globalInstrumentPositionAprioriSigma() == -1) {
-    sprintf(buf, "\n          SPACECRAFT POSITION SIGMA: N/A");
-  }
-  else {
-    sprintf(buf, "\n          SPACECRAFT POSITION SIGMA: %lf (meters)",
-            m_bundleSettings.globalInstrumentPositionAprioriSigma());
-  }
-  fp_out << buf;
-
-  if (m_nNumberCamPosCoefSolved < 2
-      || m_bundleSettings.globalInstrumentVelocityAprioriSigma() == -1) {
-    sprintf(buf, "\n          SPACECRAFT VELOCITY SIGMA: N/A");
-  }
-  else {
-    sprintf(buf, "\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",
-            m_bundleSettings.globalInstrumentVelocityAprioriSigma());
-  }
-  fp_out << buf;
-
-  if (m_nNumberCamPosCoefSolved < 3
-      || m_bundleSettings.globalInstrumentAccelerationAprioriSigma() == -1) {
-    sprintf(buf, "\n      SPACECRAFT ACCELERATION SIGMA: N/A");
-  }
-  else {
-    sprintf(buf, "\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",
-            m_bundleSettings.globalInstrumentAccelerationAprioriSigma());
-  }
-  fp_out << buf;
-
-  if (m_nNumberCamAngleCoefSolved < 1
-      || m_bundleSettings.globalInstrumentPointingAnglesAprioriSigma() == -1) {
-    sprintf(buf, "\n                CAMERA ANGLES SIGMA: N/A");
-  }
-  else {
-    sprintf(buf, "\n                CAMERA ANGLES SIGMA: %lf (dd)",
-            m_bundleSettings.globalInstrumentPointingAnglesAprioriSigma());
-  }
-  fp_out << buf;
-
-  if (m_nNumberCamAngleCoefSolved < 2
-      || m_bundleSettings.globalInstrumentPointingAngularVelocityAprioriSigma() == -1) {
-    sprintf(buf, "\n      CAMERA ANGULAR VELOCITY SIGMA: N/A");
-  }
-  else {
-    sprintf(buf, "\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",
-            m_bundleSettings.globalInstrumentPointingAngularVelocityAprioriSigma());
-  }
-  fp_out << buf;
-
-  if (m_nNumberCamAngleCoefSolved < 3
-      || m_bundleSettings.globalInstrumentPointingAngularAccelerationAprioriSigma() == -1) {
-    sprintf(buf, "\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A");
-  }
-  else {
-    sprintf(buf, "\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",
-            m_bundleSettings.globalInstrumentPointingAngularAccelerationAprioriSigma());
-  }
-  fp_out << buf;
-
-  sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");
-  fp_out << buf;
-  sprintf(buf, "\n                         Images: %6d", nImages);
-  fp_out << buf;
-  sprintf(buf, "\n                         Points: %6d", nValidPoints);
-  fp_out << buf;
-
-  sprintf(buf, "\n                 Total Measures: %6d",
-          (m_bundleStatistics.numberObservations()
-           + m_bundleStatistics.numberRejectedObservations()) / 2);
-  fp_out << buf;
-
-  sprintf(buf, "\n             Total Observations: %6d",
-          m_bundleStatistics.numberObservations()
-          + m_bundleStatistics.numberRejectedObservations());
-  fp_out << buf;
-
-  sprintf(buf, "\n              Good Observations: %6d", m_bundleStatistics.numberObservations());
-  fp_out << buf;
-
-  sprintf(buf, "\n          Rejected Observations: %6d",
-          m_bundleStatistics.numberRejectedObservations());
-  fp_out << buf;
-
-  if (m_bundleStatistics.numberConstrainedPointParameters() > 0) {
-    sprintf(buf, "\n   Constrained Point Parameters: %6d",
-            m_bundleStatistics.numberConstrainedPointParameters());
-    fp_out << buf;
-  }
-
-  if (m_bundleStatistics.numberConstrainedImageParameters() > 0) {
-    sprintf(buf, "\n   Constrained Image Parameters: %6d",
-            m_bundleStatistics.numberConstrainedImageParameters());
-    fp_out << buf;
-  }
-
-  sprintf(buf, "\n                       Unknowns: %6d",
-          m_bundleStatistics.numberUnknownParameters());
-  fp_out << buf;
-
-  if (nInnerConstraints > 0) {
-    sprintf(buf, "\n      Inner Constraints: %6d", nInnerConstraints);
-    fp_out << buf;
-  }
-
-  if (nDistanceConstraints > 0) {
-    sprintf(buf, "\n   Distance Constraints: %d", nDistanceConstraints);
-    fp_out << buf;
-  }
-
-  sprintf(buf, "\n             Degrees of Freedom: %6d", nDegreesOfFreedom);
-  fp_out << buf;
-
-  sprintf(buf, "\n           Convergence Criteria: %6.3g",
-          m_bundleSettings.convergenceCriteriaThreshold());
-  fp_out << buf;
-
-  if (nConvergenceCriteria == 1) {
-    sprintf(buf, "(Sigma0)");
-    fp_out << buf;
-  }
-
-  sprintf(buf, "\n                     Iterations: %6d", numberIterations);
-  fp_out << buf;
-
-  if (numberIterations >= m_bundleSettings.convergenceCriteriaMaximumIterations()) {
-    sprintf(buf, "(Maximum reached)");
-    fp_out << buf;
-  }
-
-  sprintf(buf, "\n                         Sigma0: %30.20lf\n", m_bundleStatistics.sigma0());
-  fp_out << buf;
-  sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",
-          m_bundleStatistics.elapsedTimeErrorProp());
-  fp_out << buf;
-  sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",
-          m_bundleStatistics.elapsedTime());
-  fp_out << buf;
-  if (m_bundleStatistics.numberObservations() + m_bundleStatistics.numberRejectedObservations()
-      > 100) {  //if there was enough data to calculate percentiles and box plot data
-    sprintf(buf, "\n           Residual Percentiles:\n");
-    fp_out << buf;
-    try {
-      for (int bin = 1;bin < 34;bin++) {
-        //double quan =
-        //    m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(double(bin)/100);
-        double cumProb  = double(bin) / 100.0;
-        double resValue =
-                          m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb);
-        double resValue33 =
-                            m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb + 0.33);
-        double resValue66 =
-                            m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb + 0.66);
-        sprintf(buf, "                 Percentile %3d: %+8.3lf"
-                "                 Percentile %3d: %+8.3lf"
-                "                 Percentile %3d: %+8.3lf\n",
-                bin,      resValue,
-                bin + 33, resValue33,
-                bin + 66, resValue66);
-        fp_out << buf;
-      }
-    }
-    catch (IException &e) {
-      QString msg = "Faiiled to output residual percentiles for bundleout";
-      throw IException(e, IException::Io, msg, _FILEINFO_);
-    }
-    try {
-      sprintf(buf, "\n              Residual Box Plot:");
-      fp_out << buf;
-      sprintf(buf, "\n                        minimum: %+8.3lf",
-              m_bundleStatistics.residualsCumulativeProbabilityDistribution().min());
-      fp_out << buf;
-      sprintf(buf, "\n                     Quartile 1: %+8.3lf",
-              m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.25));
-      fp_out << buf;
-      sprintf(buf, "\n                         Median: %+8.3lf",
-              m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.50));
-      fp_out << buf;
-      sprintf(buf, "\n                     Quartile 3: %+8.3lf",
-              m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.75));
-      fp_out << buf;
-      sprintf(buf, "\n                        maximum: %+8.3lf\n",
-              m_bundleStatistics.residualsCumulativeProbabilityDistribution().max());
-      fp_out << buf;
-    }
-    catch (IException &e) {
-      QString msg = "Faiiled to output residual box plot for bundleout";
-      throw IException(e, IException::Io, msg, _FILEINFO_);
-    }
-  }
-
-  sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
-  fp_out << buf;
-
-  int nMeasures;
-  int nRejectedMeasures;
-  int nUsed;
-
-  for (int i = 0;i < nImages;i++) {
-    // imageIndex(i) retrieves index into the normal equations matrix
-    // for Image(i)
-    double rmsSampleResiduals = m_bundleStatistics.rmsImageSampleResiduals()[i].Rms();
-    double rmsLineResiduals   = m_bundleStatistics.rmsImageLineResiduals()[i].Rms();
-    double rmsLandSResiduals  = m_bundleStatistics.rmsImageResiduals()[i].Rms();
-
-    nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
-    nRejectedMeasures =
-                        m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
-
-    nUsed = nMeasures - nRejectedMeasures;
-
-    if (nUsed == nMeasures) {
-      sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-              m_pSnList->FileName(i).toAscii().data(),
-              (nMeasures - nRejectedMeasures), nMeasures,
-              rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
-    }
-    else {
-      sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-              m_pSnList->FileName(i).toAscii().data(),
-              (nMeasures - nRejectedMeasures), nMeasures,
-              rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
-    }
-    fp_out << buf;
-  }
-
-  return true;
-}
-
-
-/**
- * output bundle results to file with error propagation
- */
-bool BundleAdjust::outputWithErrorPropagation(int numberIterations, 
-                                              double radiansToMetersBodyConversion) {
-
-  QString ofname("bundleout.txt");
-  if ( m_bundleSettings.outputFilePrefix().length() != 0 )
-  ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
-
-  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-  if (!fp_out)
-  return false;
-
-  char buf[1056];
-  std::vector<double> coefX(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefY(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
-  std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
-  std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
-  std::vector<double> angles;
-  Camera *pCamera = NULL;
-  SpicePosition *pSpicePosition = NULL;
-  SpiceRotation *pSpiceRotation = NULL;
-
-  int nImages = images();
-  double dSigma= 0;
-  int nIndex = 0;
-
-  gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
-
-  if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-    lsqCovMatrix = m_pLsq->GetCovarianceMatrix();  // get reference to the covariance matrix
-                                                   // from the least-squares object
-  }
-
-  // data structure to contain adjusted image parameter sigmas for CHOLMOD error propagation only
-  vector<double> vImageAdjustedSigmas;
-
-  outputHeader(fp_out);
-
-  sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
-  fp_out << buf;
-
-  for (int i = 0; i < nImages; i++) {
-
-    //if ( m_bundleStatistics.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
-    //    bHeld = true;
-
-    pCamera = m_pCnet->Camera(i);
-    if (!pCamera) {
-      continue;
-    }
-
-    // imageIndex(i) retrieves index into the normal equations matrix for Image(i)
-    nIndex = imageIndex(i);
-
-    if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-      vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
-    }
-
-    pSpicePosition = pCamera->instrumentPosition();
-    if (!pSpicePosition) {
-      continue;
-    }
-
-    pSpiceRotation = pCamera->instrumentRotation();
-    if (!pSpiceRotation) {
-      continue;
-    }
-
-    // for frame cameras we directly retrieve the Exterior Pointing (i.e. position
-    // and orientation angles). For others (linescan, radar) we retrieve the polynomial
-    // coefficients from which the Exterior Pointing parameters are derived.
-    if (m_bundleSettings.instrumentPositionSolveOption() > 0) {
-      pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
-    }
-    else { // not solving for position
-      std::vector <double> coordinate(3);
-      coordinate = pSpicePosition->GetCenterCoordinate();
-      coefX.push_back(coordinate[0]);
-      coefY.push_back(coordinate[1]);
-      coefZ.push_back(coordinate[2]);
-    }
-
-    if (m_bundleSettings.instrumentPointingSolveOption() > 0) {
-      pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
-    }
-    //          else { // frame camera
-    else { // m_bundleSettings.instrumentPointingSolveOption() = BundleSettings::NoPointingFactors
-           // and no polynomial fit has occurred
-      angles = pSpiceRotation->GetCenterAngles();
-      coefRA.push_back(angles.at(0));
-      coefDEC.push_back(angles.at(1));
-      coefTWI.push_back(angles.at(2));
-    }
-
-    sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).toAscii().data());
-    fp_out << buf;
-    sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).toAscii().data());
-    fp_out << buf;
-    sprintf(buf, "\n    Image         Initial              Total               "
-            "Final             Initial           Final\n"
-            "Parameter         Value              Correction            "
-            "Value             Accuracy          Accuracy\n");
-    fp_out << buf;
-
-    int nSigmaIndex = 0;
-
-    if (m_nNumberCamPosCoefSolved > 0) {
-      char strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-      std::ostringstream ostr;
-      // ??? QString coefficientString = formatPolynomialOutputString(true,
-      // ???                                                          m_nNumberCamPosCoefSolved,
-      // ???                                                          "X",
-      // ???                                                          coefX,
-      // ???                                                          m_dGlobalSpacecraftPositionAprioriSigma,
-      // ???                                                          nIndex,
-      // ???                                                          nSigmaIndex,
-      // ???                                                          i);
-      // ??? nIndex += m_nNumberCamPosCoefSolved;
-      // ??? nSigmaIndex += m_nNumberCamPosCoefSolved;
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) { // ack!!! this is already inside another loop with i ???
-
-        if (j == 0) {                                                                             // method??? repeated 6 times...
-          ostr << "  " << strcoeff;                                                               // method??? repeated 6 times...
-        }                                                                                         // method??? repeated 6 times...
-        else if (j == 1) {                                                                        // method??? repeated 6 times...
-          ostr << " " << strcoeff << "t";                                                         // method??? repeated 6 times...
-        }                                                                                         // method??? repeated 6 times...
-        else {                                                                                    // method??? repeated 6 times...
-          ostr << strcoeff << "t" << j;                                                           // method??? repeated 6 times...
-        }                                                                                         // method??? repeated 6 times...
-
-        if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {                                                                       // this piece of code is repeated 12 times... method???
-          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));                                  // this piece of code is repeated 12 times... method???
-        }                                                                                         // this piece of code is repeated 12 times... method???
-        else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {                               // this piece of code is repeated 12 times... method???
-          dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();                           // this piece of code is repeated 12 times... method???
-        }                                                                                         // this piece of code is repeated 12 times... method???
-        else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {                             // this piece of code is repeated 12 times... method???
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();                         // this piece of code is repeated 12 times... method???
-        }
-
-        if (j == 0) {
-          sprintf(buf, "  X (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(), coefX[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefX[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], dSigma);
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(), coefX[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefX[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], dSigma);
-        }
-
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-        nSigmaIndex++;
-      }
-      // ??? coefficientString += formatPolynomialOutputString(true,
-      // ???                                                          m_nNumberCamPosCoefSolved,
-      // ???                                                          "Y",
-      // ???                                               coefY,
-      // ???                                               m_dGlobalSpacecraftPositionAprioriSigma,
-      // ???                                               nIndex,
-      // ???                                               nSigmaIndex,
-      // ???                                               i);
-      // ??? nIndex += m_nNumberCamPosCoefSolved;
-      // ??? nSigmaIndex += m_nNumberCamPosCoefSolved;
-      strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-
-        if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-          dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-        }
-
-        if (j == 0) {
-          sprintf(buf, "  Y (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(), coefY[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefY[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], dSigma);
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(), coefY[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefY[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], dSigma);
-        }
-
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-        nSigmaIndex++;
-      }
-      // ??? coefficientString += formatPolynomialOutputString(true,
-      // ???                                                          m_nNumberCamPosCoefSolved,
-      // ???                                                          "Z",
-      // ???                                               coefZ,
-      // ???                                               m_dGlobalSpacecraftPositionAprioriSigma,
-      // ???                                               nIndex,
-      // ???                                               nSigmaIndex,
-      // ???                                               i);
-      // ??? nIndex += m_nNumberCamPosCoefSolved;
-      // ??? nSigmaIndex += m_nNumberCamPosCoefSolved;
-      strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-
-        if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-          dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-        }
-
-        if (j == 0) {
-          sprintf(buf, "  Z (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(), coefZ[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefZ[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], dSigma);
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(), coefZ[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefZ[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], dSigma);
-        }
-
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-        nSigmaIndex++;
-      }
-      // ??? fp_out << coefficientString.toAscii().data();
-    }
-    else {
-      sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefX[0], 0.0, coefX[0], 0.0, "N/A");
-      fp_out << buf;
-      sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefY[0], 0.0, coefY[0], 0.0, "N/A");
-      fp_out << buf;
-      sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefZ[0], 0.0, coefZ[0], 0.0, "N/A");
-      fp_out << buf;
-    }
-
-    if (m_nNumberCamAngleCoefSolved > 0) {
-      char strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-      std::ostringstream ostr;
-      for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-
-        if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-          dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-        }
-
-        if (j == 0) {
-          sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(),(coefRA[j] - m_imageCorrections(nIndex)) * RAD2DEG,
-                  m_imageCorrections(nIndex) * RAD2DEG, coefRA[j] * RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], dSigma * RAD2DEG);
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(),(coefRA[j] - m_imageCorrections(nIndex)) * RAD2DEG,
-                  m_imageCorrections(nIndex) * RAD2DEG, coefRA[j] * RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], dSigma * RAD2DEG);
-        }
-
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-        nSigmaIndex++;
-      }
-      strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-      for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-
-        if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-          dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-          dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-          dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-        }
-
-        if (j == 0) {
-          sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(),(coefDEC[j] - m_imageCorrections(nIndex))*RAD2DEG,
-                  m_imageCorrections(nIndex)*RAD2DEG, coefDEC[j]*RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], dSigma * RAD2DEG);
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                  ostr.str().c_str(),(coefDEC[j] - m_imageCorrections(nIndex))*RAD2DEG,
-                  m_imageCorrections(nIndex)*RAD2DEG, coefDEC[j]*RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], dSigma * RAD2DEG);
-        }
-
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-        nSigmaIndex++;
-      }
-
-      if (!m_bundleSettings.solveTwist()) {
-        sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
-      }
-      else {
-        strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-        for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-
-          if (j == 0) {
-            ostr << "  " << strcoeff;
-          }
-          else if (j == 1) {
-            ostr << " " << strcoeff << "t";
-          }
-          else {
-            ostr << strcoeff << "t" << j;
-          }
-
-          if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-          }
-
-          if (j == 0) {
-            sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                    ostr.str().c_str(),(coefTWI[j] - m_imageCorrections(nIndex))*RAD2DEG,
-                    m_imageCorrections(nIndex)*RAD2DEG, coefTWI[j]*RAD2DEG,
-                    m_dGlobalCameraAnglesAprioriSigma[j], dSigma * RAD2DEG);
-          }
-          else {
-            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                    ostr.str().c_str(),(coefTWI[j] - m_imageCorrections(nIndex))*RAD2DEG,
-                    m_imageCorrections(nIndex)*RAD2DEG, coefTWI[j]*RAD2DEG,
-                    m_dGlobalCameraAnglesAprioriSigma[j], dSigma * RAD2DEG);
-          }
-
-          fp_out << buf;
-          ostr.str("");
-          strcoeff--;
-          nIndex++;
-          nSigmaIndex++;
-        }
-      }
-    }
-
-    else {
-      sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
-      fp_out << buf;
-      sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
-      fp_out << buf;
-      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-      fp_out << buf;
-    }
-  }
-
-  // output point data
-  sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
-  fp_out << buf;
-  sprintf(buf, " RMS Sigma Latitude(m)%20.8lf\n", m_bundleStatistics.rmsSigmaLat());
-  fp_out << buf;
-  sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
-          m_bundleStatistics.minSigmaLatitude(),
-          m_bundleStatistics.minSigmaLatitudePointId().toAscii().data());
-  fp_out << buf;
-  sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
-          m_bundleStatistics.maxSigmaLatitude(),
-          m_bundleStatistics.maxSigmaLatitudePointId().toAscii().data());
-  fp_out << buf;
-  sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n", m_bundleStatistics.rmsSigmaLon());
-  fp_out << buf;
-  sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
-          m_bundleStatistics.minSigmaLongitude(),
-          m_bundleStatistics.minSigmaLongitudePointId().toAscii().data());
-  fp_out << buf;
-  sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
-          m_bundleStatistics.maxSigmaLongitude(),
-          m_bundleStatistics.maxSigmaLongitudePointId().toAscii().data());
-  fp_out << buf;
-  if (m_bundleSettings.solveRadius()) {
-    sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n", m_bundleStatistics.rmsSigmaRad());
-    fp_out << buf;
-    sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
-            m_bundleStatistics.minSigmaRadius(),
-            m_bundleStatistics.minSigmaRadiusPointId().toAscii().data());
-    fp_out << buf;
-    sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
-            m_bundleStatistics.maxSigmaRadius(),
-            m_bundleStatistics.maxSigmaRadiusPointId().toAscii().data());
-    fp_out << buf;
-  }
-  else {
-    sprintf(buf, "   RMS Sigma Radius(m)                 N/A\n");
-    fp_out << buf;
-    sprintf(buf, "   MIN Sigma Radius(m)                 N/A\n");
-    fp_out << buf;
-    sprintf(buf, "   MAX Sigma Radius(m)                 N/A\n");
-    fp_out << buf;
-  }
-
-  // output point data
-  sprintf(buf, "\n\nPOINTS SUMMARY\n==============\n"
-          "%103sSigma          Sigma              Sigma\n"
-          "           Label         Status     Rays    RMS"
-          "        Latitude       Longitude          Radius"
-          "        Latitude       Longitude          Radius\n", "");
-  fp_out << buf;
-
-  int nRays = 0;
-  double dLat, dLon, dRadius;
-  double dSigmaLat, dSigmaLong, dSigmaRadius;
-  double cor_lat_dd, cor_lon_dd, cor_rad_m;
-  double cor_lat_m, cor_lon_m;
-  double dLatInit, dLonInit, dRadiusInit;
-  int nGoodRays;
-  double dResidualRms;
-  QString strStatus;
-  int nPointIndex = 0;
-
-  int nPoints = m_pCnet->GetNumPoints();
-  for (int i = 0; i < nPoints; i++) {
-
-    const ControlPoint *point = m_pCnet->GetPoint(i);
-    if (point->IsIgnored())
-    continue;
-
-    nRays = point->GetNumMeasures();
-    dResidualRms = point->GetResidualRms();
-    dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
-    dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
-    dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
-    dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
-    nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-    if (point->GetType() == ControlPoint::Fixed)
-    strStatus = "FIXED";
-    else if (point->GetType() == ControlPoint::Constrained)
-    strStatus = "CONSTRAINED";
-    else if (point->GetType() == ControlPoint::Free)
-    strStatus = "FREE";
-    else
-    strStatus = "UNKNOWN";
-
-    sprintf(buf, "%16s%15s%5d of %d%6.2lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-            point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays,
-            dResidualRms, dLat, dLon, dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
-    fp_out << buf;
-    nPointIndex++;
-  }
-
-  // output point data
-  sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
-  fp_out << buf;
-
-  nPointIndex = 0;
-  for (int i = 0; i < nPoints; i++) {
-
-    const ControlPoint *point = m_pCnet->GetPoint(i);
-    if ( point->IsIgnored() )
-    continue;
-
-    nRays = point->GetNumMeasures();
-    dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
-    dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
-    dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
-    dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
-    nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-    // point corrections and initial sigmas
-    bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
-    bounded_vector<double, 3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
-
-    cor_lat_dd = corrections[0] * Isis::RAD2DEG;
-    cor_lon_dd = corrections[1] * Isis::RAD2DEG;
-    cor_rad_m  = corrections[2] * 1000.0;
-
-    cor_lat_m = corrections[0] * radiansToMetersBodyConversion;
-    cor_lon_m = corrections[1] * radiansToMetersBodyConversion * cos(dLat*Isis::DEG2RAD);
-
-    dLatInit = dLat - cor_lat_dd;
-    dLonInit = dLon - cor_lon_dd;
-    dRadiusInit = dRadius - (corrections[2] * 1000.0);
-
-    if (point->GetType() == ControlPoint::Fixed)
-    strStatus = "FIXED";
-    else if (point->GetType() == ControlPoint::Constrained)
-    strStatus = "CONSTRAINED";
-    else if (point->GetType() == ControlPoint::Free)
-    strStatus = "FREE";
-    else
-    strStatus = "UNKNOWN";
-
-    sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-            point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays);
-    fp_out << buf;
-
-    sprintf(buf, "\n     Point         Initial               Total               "
-            "Total              Final             Initial             Final\n"
-            "Coordinate          Value             Correction          "
-            "Correction            Value             Accuracy          Accuracy\n"
-            "                 (dd/dd/km)           (dd/dd/km)           (Meters)"
-            "           (dd/dd/km)          (Meters)          (Meters)\n");
-    fp_out << buf;
-
-    sprintf(buf, "  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
-            dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], dSigmaLat);
-    fp_out << buf;
-
-    sprintf(buf, " LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n",
-            dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], dSigmaLong);
-    fp_out << buf;
-
-    sprintf(buf, "    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18.8lf\n\n",
-            dRadiusInit * 0.001, corrections[2], cor_rad_m, dRadius * 0.001,
-            apriorisigmas[2], dSigmaRadius);
-
-    fp_out << buf;
-    nPointIndex++;
-  }
-
-  fp_out.close();
-
-  return true;
 }
 
 
 
-/**
- * output bundle results to file with no error propagation
- *
- * @internal
- * @history 2011-05-22 Debbie A. Cook - Added commas to make csv header lines
- *                      consistent for comparer
- * @history 2011-06-05 Debbie A. Cook - Fixed output of spacecraft position
- *                      when it is not part of the bundle
- * @history 2011-07-26 Debbie A. Cook - Omitted output of camera angles for
- *                      radar, which only has spacecraft position
- */
-bool BundleAdjust::outputNoErrorPropagation(int numberIterations, 
-                                              double radiansToMetersBodyConversion) {
-
-  QString ofname("bundleout.txt");
-  if (!m_bundleSettings.outputFilePrefix().isEmpty())
-  ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
-
-  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-  if (!fp_out)
-  return false;
-
-  char buf[1056];
-
-  //bool bHeld = false;
-  std::vector<double> coefX(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefY(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
-  std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
-  std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
-  std::vector<double> angles;
-  Camera *pCamera = NULL;
-  SpicePosition *pSpicePosition = NULL;
-  SpiceRotation *pSpiceRotation = NULL;
-  int nIndex = 0;
-  int nImages = images();
-
-  outputHeader(fp_out);
-
-  sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION ***J2000***"
-          "\n======================================\n");
-  fp_out << buf;
-
-  for (int i = 0; i < nImages; i++) {
-    //if (m_bundleStatistics.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))
-    //  bHeld = true;
-
-    pCamera = m_pCnet->Camera(i);
-    if (!pCamera)
-    continue;
-
-    nIndex = imageIndex(i);
-
-    pSpicePosition = pCamera->instrumentPosition();
-    if (!pSpicePosition)
-    continue;
-
-    pSpiceRotation = pCamera->instrumentRotation();
-    if (!pSpiceRotation)
-    continue;
-
-    // for frame cameras we directly retrieve the Exterior Pointing (i.e. position
-    // and orientation angles). For others (linescan, radar) we retrieve the polynomial
-    // coefficients from which the Exterior Pointing paramters are derived.
-    // This is incorrect...Correction below
-    // For all instruments we retrieve the polynomial coefficients from which the
-    // Exterior Pointing parameters are derived.  For framing cameras, a single
-    // coefficient for each coordinate is returned.
-    if (m_bundleSettings.instrumentPositionSolveOption() > 0)
-    pSpicePosition->GetPolynomial(coefX,coefY,coefZ);
-    //      else { // frame camera
-    else { // This is for m_bundleSettings.instrumentPositionSolveOption() = BundleSettings::None and no polynomial fit has occurred
-      std::vector <double> coordinate(3);
-      coordinate = pSpicePosition->GetCenterCoordinate();
-      coefX.push_back(coordinate[0]);
-      coefY.push_back(coordinate[1]);
-      coefZ.push_back(coordinate[2]);
-    }
-
-    if (m_bundleSettings.instrumentPointingSolveOption() > 0) {
-//          angles = pSpiceRotation->Angles(3,1,3);
-      pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
-    }
-    else { // frame camera
-      angles = pSpiceRotation->GetCenterAngles();
-      coefRA.push_back(angles.at(0));
-      coefDEC.push_back(angles.at(1));
-      coefTWI.push_back(angles.at(2));
-    }
-
-    sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).toAscii().data());
-    fp_out << buf;
-    sprintf(buf, "\n Image Serial Number: %s\n", m_pSnList->SerialNumber(i).toAscii().data());
-    fp_out << buf;
-    sprintf(buf, "\n    Image         Initial              Total               "
-            "Final             Initial           Final\n"
-            "Parameter         Value              Correction            "
-            "Value             Accuracy          Accuracy\n");
-    fp_out << buf;
-
-    if (m_nNumberCamPosCoefSolved > 0) {
-      char strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-      std::ostringstream ostr;
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-        if (j == 0) {
-          sprintf(buf, "  X (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(), coefX[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefX[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], "N/A");
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(), coefX[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefX[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], "N/A");
-        }
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-      }
-      strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-        if (j == 0) {
-          sprintf(buf, "  Y (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(), coefY[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefY[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], "N/A");
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(), coefY[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefY[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], "N/A");
-        }
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-      }
-      strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-        if (j == 0) {
-          sprintf(buf, "  Z (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(), coefZ[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefZ[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], "N/A");
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(), coefZ[j] - m_imageCorrections(nIndex),
-                  m_imageCorrections(nIndex), coefZ[j],
-                  m_dGlobalSpacecraftPositionAprioriSigma[j], "N/A");
-        }
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-      }
-    }
-    else {
-      sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18s%18s\n",
-              coefX[0], 0.0, coefX[0], "N/A", "N/A");
-      fp_out << buf;
-      sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18s%18s\n",
-              coefY[0], 0.0, coefY[0], "N/A", "N/A");
-      fp_out << buf;
-      sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18s%18s\n",
-              coefZ[0], 0.0, coefZ[0], "N/A", "N/A");
-      fp_out << buf;
-    }
-
-    if (m_nNumberCamAngleCoefSolved > 0) {
-      char strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-      std::ostringstream ostr;
-      for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-        if (j == 0) {
-          sprintf(buf, " RA (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(),(coefRA[j] - m_imageCorrections(nIndex)) * RAD2DEG,
-                  m_imageCorrections(nIndex) * RAD2DEG, coefRA[j] * RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], "N/A");
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(),(coefRA[j] - m_imageCorrections(nIndex)) * RAD2DEG,
-                  m_imageCorrections(nIndex) * RAD2DEG, coefRA[j] * RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], "N/A");
-        }
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-      }
-      strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-      for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-        if (j == 0) {
-          ostr << "  " << strcoeff;
-        }
-        else if (j == 1) {
-          ostr << " " << strcoeff << "t";
-        }
-        else {
-          ostr << strcoeff << "t" << j;
-        }
-        if (j == 0) {
-          sprintf(buf, "DEC (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(), (coefDEC[j] - m_imageCorrections(nIndex)) * RAD2DEG,
-                  m_imageCorrections(nIndex) * RAD2DEG, coefDEC[j] * RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], "N/A");
-        }
-        else {
-          sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                  ostr.str().c_str(),(coefDEC[j] - m_imageCorrections(nIndex))*RAD2DEG,
-                  m_imageCorrections(nIndex)*RAD2DEG, coefDEC[j]*RAD2DEG,
-                  m_dGlobalCameraAnglesAprioriSigma[j], "N/A");
-        }
-        fp_out << buf;
-        ostr.str("");
-        strcoeff--;
-        nIndex++;
-      }
-      if (!m_bundleSettings.solveTwist()) {
-        sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-        fp_out << buf;
-      }
-      else {
-        strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-        for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-          if (j == 0) {
-            ostr << "  " << strcoeff;
-          }
-          else if (j == 1) {
-            ostr << " " << strcoeff << "t";
-          }
-          else {
-            ostr << strcoeff << "t" << j;
-          }
-          if (j == 0) {
-            sprintf(buf, "TWI (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                    ostr.str().c_str(), (coefTWI[j] - m_imageCorrections(nIndex)) * RAD2DEG,
-                    m_imageCorrections(nIndex) * RAD2DEG, coefTWI[j] * RAD2DEG,
-                    m_dGlobalCameraAnglesAprioriSigma[j], "N/A");
-          }
-          else {
-            sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                    ostr.str().c_str(),(coefTWI[j] - m_imageCorrections(nIndex))*RAD2DEG,
-                    m_imageCorrections(nIndex)*RAD2DEG, coefTWI[j]*RAD2DEG,
-                    m_dGlobalCameraAnglesAprioriSigma[j], "N/A");
-          }
-          fp_out << buf;
-          ostr.str("");
-          strcoeff--;
-          nIndex++;
-        }
-      }
-    }
-    else {
-      sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
-      fp_out << buf;
-      sprintf(buf, "      DEC%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefDEC[0]*RAD2DEG, 0.0, coefDEC[0]*RAD2DEG, 0.0, "N/A");
-      fp_out << buf;
-      sprintf(buf, "    TWIST%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-              coefTWI[0]*RAD2DEG, 0.0, coefTWI[0]*RAD2DEG, 0.0, "N/A");
-      fp_out << buf;
-    }
-  }
-
-  fp_out << "\n\n\n";
-
-  // output point data
-  sprintf(buf, "\nPOINTS SUMMARY\n==============\n%99sSigma           Sigma           Sigma\n"
-          "           Label      Status     Rays   RMS"
-          "        Latitude       Longitude          Radius"
-          "        Latitude        Longitude       Radius\n", "");
-  fp_out << buf;
-
-  int nRays = 0;
-  double dResidualRms;
-  double dLat,dLon,dRadius;
-  double cor_lat_dd,cor_lon_dd,cor_rad_m;
-  double cor_lat_m,cor_lon_m;
-  double dLatInit,dLonInit,dRadiusInit;
-  int nGoodRays;
-
-  QString strStatus;
-
-  int nPoints = m_pCnet->GetNumPoints();
-  for (int i = 0; i < nPoints; i++) {
-
-    const ControlPoint* point = m_pCnet->GetPoint(i);
-    if (point->IsIgnored())
-    continue;
-
-    nRays = point->GetNumMeasures();
-    dResidualRms = point->GetResidualRms();
-    dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
-    nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-    if (point->GetType() == ControlPoint::Fixed)
-    strStatus = "FIXED";
-    else if (point->GetType() == ControlPoint::Constrained)
-    strStatus = "CONSTRAINED";
-    else if (point->GetType() == ControlPoint::Free)
-    strStatus = "FREE";
-    else
-    strStatus = "UNKNOWN";
-
-    sprintf(buf, "%16s%12s%4d of %d%6.2lf%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
-            point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays,
-            dResidualRms, dLat, dLon, dRadius * 0.001, "N/A", "N/A", "N/A");
-
-    fp_out << buf;
-  }
-
-  sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
-  fp_out << buf;
-
-  int nPointIndex = 0;
-  for (int i = 0; i < nPoints; i++) {
-
-    const ControlPoint* point = m_pCnet->GetPoint(i);
-    if (point->IsIgnored())
-    continue;
-
-    nRays = point->GetNumMeasures();
-    dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().meters();
-    nGoodRays = nRays - point->GetNumberOfRejectedMeasures();
-
-    // point corrections and initial sigmas
-    bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
-    bounded_vector<double,3>& apriorisigmas = m_Point_AprioriSigmas[nPointIndex];
-
-    cor_lat_dd = corrections[0]*Isis::RAD2DEG;
-    cor_lon_dd = corrections[1]*Isis::RAD2DEG;
-    cor_rad_m  = corrections[2]*1000.0;
-
-    cor_lat_m = corrections[0]*radiansToMetersBodyConversion;
-    cor_lon_m = corrections[1]*radiansToMetersBodyConversion*cos(dLat*Isis::DEG2RAD);
-
-    dLatInit = dLat-cor_lat_dd;
-    dLonInit = dLon-cor_lon_dd;
-    dRadiusInit = dRadius-(corrections[2]*1000.0);
-
-    if (point->GetType() == ControlPoint::Fixed)
-    strStatus = "FIXED";
-    else if (point->GetType() == ControlPoint::Constrained)
-    strStatus = "CONSTRAINED";
-    else if (point->GetType() == ControlPoint::Free)
-    strStatus = "FREE";
-    else
-    strStatus = "UNKNOWN";
-
-    sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-            point->GetId().toAscii().data(),strStatus.toAscii().data(),nGoodRays,nRays);
-    fp_out << buf;
-
-    sprintf(buf, "\n     Point         Initial               Total               "
-            "Total              Final             Initial             Final\n"
-            "Coordinate          Value             Correction          "
-            "Correction            Value             Accuracy          Accuracy\n"
-            "                 (dd/dd/km)           (dd/dd/km)           (Meters)"
-            "           (dd/dd/km)          (Meters)          (Meters)\n");
-    fp_out << buf;
-
-    sprintf(buf, "  LATITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
-            dLatInit, cor_lat_dd, cor_lat_m, dLat, apriorisigmas[0], "N/A");
-    fp_out << buf;
-
-    sprintf(buf, " LONGITUDE%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n",
-            dLonInit, cor_lon_dd, cor_lon_m, dLon, apriorisigmas[1], "N/A");
-    fp_out << buf;
-
-    sprintf(buf, "    RADIUS%17.8lf%21.8lf%20.8lf%20.8lf%18.8lf%18s\n\n",
-            dRadiusInit*0.001, corrections[2], cor_rad_m, dRadius*0.001, apriorisigmas[2], "N/A");
-
-    fp_out << buf;
-
-    nPointIndex++;
-  }
-
-  fp_out.close();
-
-  return true;
-}
-
-
-/**
- * output point data to csv file
- */
-bool BundleAdjust::outputPointsCSV(double radiansToMetersBodyConversion) {
-  char buf[1056];
-
-  QString ofname("bundleout_points.csv");
-  if (!m_bundleSettings.outputFilePrefix().isEmpty())
-  ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
-
-  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-  if (!fp_out)
-  return false;
-
-  int nPoints = m_pCnet->GetNumPoints();
-
-  double dLat, dLon, dRadius;
-  double dX, dY, dZ;
-  double dSigmaLat, dSigmaLong, dSigmaRadius;
-  QString strStatus;
-  double cor_lat_m;
-  double cor_lon_m;
-  double cor_rad_m;
-  int nMeasures, nRejectedMeasures;
-  double dResidualRms;
-
-  // print column headers
-  if (m_bundleSettings.errorPropagation()) {
-    sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,Sigma,"
-            "Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
-            "Coordinate,Coordinate\nID,,,,,Latitude,Longitude,Radius,"
-            "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
-            "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),"
-            "(m),(m),(m),(km),(km),(km)\n");
-  }
-  else {
-    sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,"
-            "Correction,Correction,Correction,Coordinate,Coordinate,"
-            "Coordinate\n,,,,,Latitude,Longitude,Radius,Latitude,"
-            "Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,"
-            "RMS,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
-  }
-  fp_out << buf;
-
-  int nPointIndex = 0;
-  for (int i = 0; i < nPoints; i++) {
-    const ControlPoint *point = m_pCnet->GetPoint(i);
-
-    if (!point) {
-      continue;
-    }
-
-    if (point->IsIgnored() || point->IsRejected()) {
-      continue;
-    }
-
-    dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    dRadius = point->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
-    dX = point->GetAdjustedSurfacePoint().GetX().kilometers();
-    dY = point->GetAdjustedSurfacePoint().GetY().kilometers();
-    dZ = point->GetAdjustedSurfacePoint().GetZ().kilometers();
-    nMeasures = point->GetNumMeasures();
-    nRejectedMeasures = point->GetNumberOfRejectedMeasures();
-    dResidualRms = point->GetResidualRms();
-
-    // point corrections and initial sigmas
-    bounded_vector<double,3>& corrections = m_Point_Corrections[nPointIndex];
-    cor_lat_m = corrections[0]*radiansToMetersBodyConversion;
-    cor_lon_m = corrections[1]*radiansToMetersBodyConversion*cos(dLat*Isis::DEG2RAD);
-    cor_rad_m  = corrections[2]*1000.0;
-
-    if (point->GetType() == ControlPoint::Fixed) {
-      strStatus = "FIXED";
-    }
-    else if (point->GetType() == ControlPoint::Constrained) {
-      strStatus = "CONSTRAINED";
-    }
-    else if (point->GetType() == ControlPoint::Free) {
-      strStatus = "FREE";
-    }
-    else {
-      strStatus = "UNKNOWN";
-    }
-
-    if (m_bundleSettings.errorPropagation()) {
-      dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
-      dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
-      dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
-
-      sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
-              "%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-              point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures,
-              nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, dSigmaLat, dSigmaLong,
-              dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
-    }
-    else
-    sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
-            "%16.8lf,%16.8lf\n",
-            point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures,
-            nRejectedMeasures, dResidualRms, dLat, dLon, dRadius, cor_lat_m, cor_lon_m,
-            cor_rad_m, dX, dY, dZ);
-
-    fp_out << buf;
-
-    nPointIndex++;
-  }
-
-  fp_out.close();
-
-  return true;
-}
-
-
-/**
- * output image coordinate residuals to comma-separated-value
- * file
- */
-bool BundleAdjust::outputResiduals() {
-  char buf[1056];
-
-  QString ofname("residuals.csv");
-  if (!m_bundleSettings.outputFilePrefix().isEmpty())
-  ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
-
-  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-  if (!fp_out)
-  return false;
-
-  // output column headers
-  sprintf(buf, ",,,x image,y image,Measured,Measured,sample,line,Residual Vector\n");
-  fp_out << buf;
-  sprintf(buf, "Point,Image,Image,coordinate,coordinate,"
-          "Sample,Line,residual,residual,Magnitude\n");
-  fp_out << buf;
-  sprintf(buf, "Label,Filename,Serial Number,(mm),(mm),"
-          "(pixels),(pixels),(pixels),(pixels),(pixels),Rejected\n");
-  fp_out << buf;
-
-  int nImageIndex;
-
-  // printf("output residuals!!!\n");
-
-  int nObjectPoints = m_pCnet->GetNumPoints();
-  for (int i = 0; i < nObjectPoints; i++) {
-    const ControlPoint *point = m_pCnet->GetPoint(i);
-    if (point->IsIgnored())
-    continue;
-
-    int nObservations = point->GetNumMeasures();
-    for (int j = 0; j < nObservations; j++) {
-      const ControlMeasure *measure = point->GetMeasure(j);
-      if (measure->IsIgnored())
-      continue;
-
-      Camera *pCamera = measure->Camera();
-      if (!pCamera)
-      continue;
-
-      // Determine the image index
-      nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
-
-      if (measure->IsRejected())
-      sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-              point->GetId().toAscii().data(),
-              m_pSnList->FileName(nImageIndex).toAscii().data(),
-              m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
-              measure->GetFocalPlaneMeasuredX(),
-              measure->GetFocalPlaneMeasuredY(),
-              measure->GetSample(),
-              measure->GetLine(),
-              measure->GetSampleResidual(),
-              measure->GetLineResidual(),
-              measure->GetResidualMagnitude());
-      else
-      sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-              point->GetId().toAscii().data(),
-              m_pSnList->FileName(nImageIndex).toAscii().data(),
-              m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
-              measure->GetFocalPlaneMeasuredX(),
-              measure->GetFocalPlaneMeasuredY(),
-              measure->GetSample(),
-              measure->GetLine(),
-              measure->GetSampleResidual(),
-              measure->GetLineResidual(),
-              measure->GetResidualMagnitude());
-      fp_out << buf;
-    }
-  }
-
-  fp_out.close();
-
-  return true;
-}
-
-/**
- * output image data to csv file
- */
-bool BundleAdjust::outputImagesCSV() {
-  char buf[1056];
-
-  QString ofname("bundleout_images.csv");
-  if (!m_bundleSettings.outputFilePrefix().isEmpty())
-  ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
-
-  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-  if (!fp_out)
-  return false;
-
-  // setup column headers
-  std::vector<QString> output_columns;
-
-  output_columns.push_back("Image,");
-
-  output_columns.push_back("rms,");
-  output_columns.push_back("rms,");
-  output_columns.push_back("rms,");
-
-  char strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-  std::ostringstream ostr;
-  int ncoeff = 1;
-  if (m_nNumberCamPosCoefSolved > 0)
-  ncoeff = m_nNumberCamPosCoefSolved;
-
-  for (int i = 0; i < ncoeff; i++) {
-    if (i == 0) {
-      ostr << strcoeff;
-    }
-    else if (i == 1) {
-      ostr << strcoeff << "t";
-    }
-    else {
-      ostr << strcoeff << "t" << i;
-    }
-    for (int j = 0; j < 5; j++) {
-      if (ncoeff == 1)
-      output_columns.push_back("X,");
-      else {
-        QString str = "X(";
-        str += ostr.str().c_str();
-        str += "),";
-        output_columns.push_back(str);
-      }
-    }
-    ostr.str("");
-    strcoeff--;
-  }
-  strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-  for (int i = 0; i < ncoeff; i++) {
-    if (i == 0) {
-      ostr << strcoeff;
-    }
-    else if (i == 1) {
-      ostr << strcoeff << "t";
-    }
-    else {
-      ostr << strcoeff << "t" << i;
-    }
-    for (int j = 0; j < 5; j++) {
-      if (ncoeff == 1)
-      output_columns.push_back("Y,");
-      else {
-        QString str = "Y(";
-        str += ostr.str().c_str();
-        str += "),";
-        output_columns.push_back(str);
-      }
-    }
-    ostr.str("");
-    strcoeff--;
-  }
-  strcoeff = 'a' + m_nNumberCamPosCoefSolved - 1;
-  for (int i = 0; i < ncoeff; i++) {
-    if (i == 0) {
-      ostr << strcoeff;
-    }
-    else if (i == 1) {
-      ostr << strcoeff << "t";
-    }
-    else {
-      ostr << strcoeff << "t" << i;
-    }
-    for (int j = 0; j < 5; j++) {
-      if (ncoeff == 1) {
-        output_columns.push_back("Z,");
-      }
-      else {
-        QString str = "Z(";
-        str += ostr.str().c_str();
-        str += "),";
-        output_columns.push_back(str);
-      }
-    }
-    ostr.str("");
-    strcoeff--;
-    if (!m_bundleSettings.solveTwist()) {
-      break;
-    }
-  }
-
-  strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-  for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
-    if (i == 0) {
-      ostr << strcoeff;
-    }
-    else if (i == 1) {
-      ostr << strcoeff << "t";
-    }
-    else {
-      ostr << strcoeff << "t" << i;
-    }
-    for (int j = 0; j < 5; j++) {
-      if (m_nNumberCamAngleCoefSolved == 1)
-      output_columns.push_back("RA,");
-      else {
-        QString str = "RA(";
-        str += ostr.str().c_str();
-        str += "),";
-        output_columns.push_back(str);
-      }
-    }
-    ostr.str("");
-    strcoeff--;
-  }
-  strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-  for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
-    if (i == 0) {
-      ostr << strcoeff;
-    }
-    else if (i == 1) {
-      ostr << strcoeff << "t";
-    }
-    else {
-      ostr << strcoeff << "t" << i;
-    }
-    for (int j = 0; j < 5; j++) {
-      if (m_nNumberCamAngleCoefSolved == 1)
-      output_columns.push_back("DEC,");
-      else {
-        QString str = "DEC(";
-        str += ostr.str().c_str();
-        str += "),";
-        output_columns.push_back(str);
-      }
-    }
-    ostr.str("");
-    strcoeff--;
-  }
-  strcoeff = 'a' + m_nNumberCamAngleCoefSolved - 1;
-  for (int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
-    if (i == 0) {
-      ostr << strcoeff;
-    }
-    else if (i == 1) {
-      ostr << strcoeff << "t";
-    }
-    else {
-      ostr << strcoeff << "t" << i;
-    }
-    for (int j = 0; j < 5; j++) {
-      if (m_nNumberCamAngleCoefSolved == 1 || !m_bundleSettings.solveTwist()) {
-        output_columns.push_back("TWIST,");
-      }
-      else {
-        QString str = "TWIST(";
-        str += ostr.str().c_str();
-        str += "),";
-        output_columns.push_back(str);
-      }
-    }
-    ostr.str("");
-    strcoeff--;
-    if (!m_bundleSettings.solveTwist())
-    break;
-  }
-
-  // print first column header to buffer and output to file
-  int ncolumns = output_columns.size();
-  for (int i = 0; i < ncolumns; i++) {
-    QString str = output_columns.at(i);
-    sprintf(buf, "%s", (const char*)str.toAscii().data());
-    fp_out << buf;
-  }
-  sprintf(buf, "\n");
-  fp_out << buf;
-
-  output_columns.clear();
-  output_columns.push_back("Filename,");
-
-  output_columns.push_back("sample res,");
-  output_columns.push_back("line res,");
-  output_columns.push_back("total res,");
-
-  int nparams = 3;
-  if (m_nNumberCamPosCoefSolved)
-  nparams = 3 * m_nNumberCamPosCoefSolved;
-
-  int numCameraAnglesSolved = 2;
-  if (m_bundleSettings.solveTwist()) numCameraAnglesSolved++;
-  nparams += numCameraAnglesSolved*m_nNumberCamAngleCoefSolved;
-  if (!m_bundleSettings.solveTwist()) nparams += 1; // Report on twist only
-  for (int i = 0; i < nparams; i++) {
-    output_columns.push_back("Initial,");
-    output_columns.push_back("Correction,");
-    output_columns.push_back("Final,");
-    output_columns.push_back("Apriori Sigma,");
-    output_columns.push_back("Adj Sigma,");
-  }
-
-  // print second column header to buffer and output to file
-  ncolumns = output_columns.size();
-  for (int i = 0; i < ncolumns; i++) {
-    QString str = output_columns.at(i);
-    sprintf(buf, "%s", (const char*)str.toAscii().data());
-    fp_out << buf;
-  }
-  sprintf(buf, "\n");
-  fp_out << buf;
-
-  Camera *pCamera = NULL;
-  SpicePosition *pSpicePosition = NULL;
-  SpiceRotation *pSpiceRotation = NULL;
-
-  int nImages = images();
-  double dSigma = 0.;
-  int nIndex = 0;
-  //bool bHeld = false;
-  std::vector<double> coefX(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefY(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
-  std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
-  std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
-  std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
-  std::vector<double> angles;
-
-  output_columns.clear();
-
-  gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
-  if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse
-      && m_bundleSettings.errorPropagation()) {
-    // Get reference to the covariance matrix from the least-squares object
-    lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
-  }
-
-  // data structure to contain adjusted image parameter sigmas for CHOLMOD error propagation only
-  vector<double> vImageAdjustedSigmas;
-
-  std::vector<double> BFP(3);
-
-  for (int i = 0; i < nImages; i++) {
-
-    //if (m_bundleStatistics.numberHeldImages() > 0 &&
-    //    m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
-    //  bHeld = true;
-
-    pCamera = m_pCnet->Camera(i);
-    if (!pCamera)
-    continue;
-
-    // imageIndex(i) retrieves index into the normal equations matrix for
-    //  Image(i)
-    nIndex = imageIndex(i);
-
-    if (m_bundleSettings.errorPropagation()
-        && m_bundleStatistics.converged()
-        && m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-      vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
-    }
-
-    pSpicePosition = pCamera->instrumentPosition();
-    if (!pSpicePosition) {
-      continue;
-    }
-
-    pSpiceRotation = pCamera->instrumentRotation();
-    if (!pSpiceRotation) {
-      continue;
-    }
-
-    // for frame cameras we directly retrieve the J2000 Exterior Pointing
-    // (i.e. position and orientation angles). For others (linescan, radar)
-    //  we retrieve the polynomial coefficients from which the Exterior
-    // Pointing parameters are derived.
-    if (m_bundleSettings.instrumentPositionSolveOption() > 0) {
-      pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
-    }
-    else { // not solving for position so report state at center of image
-      std::vector <double> coordinate(3);
-      coordinate = pSpicePosition->GetCenterCoordinate();
-
-      coefX.push_back(coordinate[0]);
-      coefY.push_back(coordinate[1]);
-      coefZ.push_back(coordinate[2]);
-    }
-
-    if (m_bundleSettings.instrumentPointingSolveOption() > 0)
-    pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
-//          else { // frame camera
-    else if (pCamera->GetCameraType() != 3) {
-// This is for m_bundleSettings.instrumentPointingSolveOption() = BundleSettings::NoPointingFactors (except Radar which
-// has no pointing) and no polynomial fit has occurred
-      angles = pSpiceRotation->GetCenterAngles();
-      coefRA.push_back(angles.at(0));
-      coefDEC.push_back(angles.at(1));
-      coefTWI.push_back(angles.at(2));
-    }
-
-    // clear column vector
-    output_columns.clear();
-
-    // add filename
-    output_columns.push_back(m_pSnList->FileName(i).toAscii().data());
-
-    // add rms of sample, line, total image coordinate residuals
-    output_columns.push_back(
-                             toString(m_bundleStatistics.rmsImageSampleResiduals()[i].Rms()));
-    output_columns.push_back(
-                             toString(m_bundleStatistics.rmsImageLineResiduals()[i].Rms()));
-    output_columns.push_back(
-                             toString(m_bundleStatistics.rmsImageResiduals()[i].Rms()));
-
-    int nSigmaIndex = 0;
-    if (m_nNumberCamPosCoefSolved > 0) {
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-
-          if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-          }
-        }
-
-        output_columns.push_back(toString(coefX[0] - m_imageCorrections(nIndex)));
-        output_columns.push_back(toString(m_imageCorrections(nIndex)));
-        output_columns.push_back(toString(coefX[j]));
-        output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          output_columns.push_back(toString(dSigma));
-        }
-        else {
-          output_columns.push_back("N/A");
-        }
-        nIndex++;
-        nSigmaIndex++;
-      }
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-          }
-        }
-
-        output_columns.push_back(toString(coefY[0] - m_imageCorrections(nIndex)));
-        output_columns.push_back(toString(m_imageCorrections(nIndex)));
-        output_columns.push_back(toString(coefY[j]));
-        output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          output_columns.push_back(
-                                   toString(dSigma));
-        }
-        else {
-          output_columns.push_back("N/A");
-        }
-        nIndex++;
-        nSigmaIndex++;
-      }
-      for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-          }
-        }
-
-        output_columns.push_back(toString(coefZ[0] - m_imageCorrections(nIndex)));
-        output_columns.push_back(toString(m_imageCorrections(nIndex)));
-        output_columns.push_back(toString(coefZ[j]));
-        output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          output_columns.push_back(toString(dSigma));
-        }
-        else {
-          output_columns.push_back("N/A");
-        }
-        nIndex++;
-        nSigmaIndex++;
-      }
-    }
-    else {
-      output_columns.push_back(toString(coefX[0]));
-      output_columns.push_back(toString(0));
-      output_columns.push_back(toString(coefX[0]));
-      output_columns.push_back(toString(0));
-      output_columns.push_back("N/A");
-      output_columns.push_back(toString(coefY[0]));
-      output_columns.push_back(toString(0));
-      output_columns.push_back(toString(coefY[0]));
-      output_columns.push_back(toString(0));
-      output_columns.push_back("N/A");
-      output_columns.push_back(toString(coefZ[0]));
-      output_columns.push_back(toString(0));
-      output_columns.push_back(toString(coefZ[0]));
-      output_columns.push_back(toString(0));
-      output_columns.push_back("N/A");
-    }
-
-    if (m_nNumberCamAngleCoefSolved > 0) {
-      for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-          }
-        }
-
-        output_columns.push_back(toString((coefRA[j] - m_imageCorrections(nIndex)) * RAD2DEG));
-        output_columns.push_back(toString(m_imageCorrections(nIndex) * RAD2DEG));
-        output_columns.push_back(toString(coefRA[j] * RAD2DEG));
-        output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          output_columns.push_back(toString(dSigma * RAD2DEG));
-        }
-        else {
-          output_columns.push_back("N/A");
-        }
-        nIndex++;
-        nSigmaIndex++;
-      }
-      for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-            dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-            dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-          }
-          else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-            dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-          }
-        }
-
-        output_columns.push_back(toString((coefDEC[j] - m_imageCorrections(nIndex)) * RAD2DEG));
-        output_columns.push_back(toString(m_imageCorrections(nIndex) * RAD2DEG));
-        output_columns.push_back(toString(coefDEC[j] * RAD2DEG));
-        output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
-
-        if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-          output_columns.push_back(toString(dSigma * RAD2DEG));
-        }
-        else {
-          output_columns.push_back("N/A");
-        }
-        nIndex++;
-        nSigmaIndex++;
-      }
-      if (!m_bundleSettings.solveTwist()) {
-        output_columns.push_back(toString(coefTWI[0]*RAD2DEG));
-        output_columns.push_back(toString(0.0));
-        output_columns.push_back(toString(coefTWI[0]*RAD2DEG));
-        output_columns.push_back(toString(0.0));
-        output_columns.push_back("N/A");
-      }
-      else {
-        for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
-
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-            if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
-            }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
-            }
-          }
-
-          output_columns.push_back(toString((coefTWI[j] - m_imageCorrections(nIndex)) * RAD2DEG));
-          output_columns.push_back(toString(m_imageCorrections(nIndex) * RAD2DEG));
-          output_columns.push_back(toString(coefTWI[j] * RAD2DEG));
-          output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
-
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
-            output_columns.push_back(toString(dSigma * RAD2DEG));
-          }
-          else {
-            output_columns.push_back("N/A");
-          }
-          nIndex++;
-          nSigmaIndex++;
-        }
-      }
-    }
-
-    else if (pCamera->GetCameraType() != 3) {
-      output_columns.push_back(toString(coefRA[0]*RAD2DEG));
-      output_columns.push_back(toString(0.0));
-      output_columns.push_back(toString(coefRA[0]*RAD2DEG));
-      output_columns.push_back(toString(0.0));
-      output_columns.push_back("N/A");
-      output_columns.push_back(toString(coefDEC[0]*RAD2DEG));
-      output_columns.push_back(toString(0.0));
-      output_columns.push_back(toString(coefDEC[0]*RAD2DEG));
-      output_columns.push_back(toString(0.0));
-      output_columns.push_back("N/A");
-      output_columns.push_back(toString(coefTWI[0]*RAD2DEG));
-      output_columns.push_back(toString(0.0));
-      output_columns.push_back(toString(coefTWI[0]*RAD2DEG));
-      output_columns.push_back(toString(0.0));
-      output_columns.push_back("N/A");
-    }
-
-    // print column vector to buffer and output to file
-    int ncolumns = output_columns.size();
-    for (int i = 0; i < ncolumns; i++) {
-      QString str = output_columns.at(i);
-
-      if (i < ncolumns- 1) {
-        sprintf(buf, "%s,", (const char*)str.toAscii().data());
-      }
-      else {
-        sprintf(buf, "%s", (const char*)str.toAscii().data());
-      }
-      fp_out << buf;
-    }
-    sprintf(buf, "\n");
-    fp_out << buf;
-  }
-
-  fp_out.close();
-
-  return true;
-}
-
-#endif
