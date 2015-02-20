@@ -74,7 +74,7 @@ namespace Isis {
    *                           constructor/destructor is not shown as covered by unitTest. Current
    *                           test code coverage is (scope 98.79%, line 98.698%, function 96.0%).
    *   @history 2015-02-20 Jeannie Backer - Changed apriori sigma defaults from -1.0 to Isis::Null.
-   *                           Added hdf5 includes.
+   *                           Updated xml methods. Added hdf5 includes.
    *  
    *   @todo Determine whether xml stuff needs a Project pointer
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -96,7 +96,7 @@ namespace Isis {
       ~BundleSettings();
 
       // copy constructor
-      BundleSettings &operator=(const BundleSettings &other);
+      BundleSettings &operator=(const BundleSettings &src);
 
       void setValidateNetwork(bool validate);
       bool validateNetwork() const;
