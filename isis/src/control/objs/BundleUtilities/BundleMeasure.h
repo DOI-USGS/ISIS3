@@ -26,6 +26,18 @@
 #include <QObject>
 
 namespace Isis {
+  /**
+   * @brief 
+   *  
+   * @ingroup ControlNetworks
+   *
+   * @author 2014-07-09 Ken Edmundson
+   *
+   * @internal
+   *   @history 2015-02-20 Jeannie Backer - Added assignment operator. Brought closer to Isis coding
+   *                           standards.
+   *
+   */
 
   class BundleControlPoint;
   class BundleImage;
@@ -42,12 +54,13 @@ namespace Isis {
       // constructor
       BundleMeasure(ControlMeasure *controlMeasure, BundleControlPoint *bundleControlPoint);
 
-      // destructor
-      ~BundleMeasure();
-
       // copy constructor
       BundleMeasure(const BundleMeasure &src);
 
+      // destructor
+      ~BundleMeasure();
+
+      BundleMeasure &operator=(const BundleMeasure &src);
       void setParentObservation(BundleObservation *observation);
 
       bool isRejected();

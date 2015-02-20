@@ -41,6 +41,8 @@ namespace Isis {
    * @internal
    *   @history 2014-05-22 Ken Edmundson - Original Version
    *   @history 2014-07-17 Kimberly Oyama - Updated to better meet coding standards.
+   *   @history 2014-02-20 Jeannie Backer - Added assignment operator. Updated
+   *                           to better meet coding standards.
    *   
    */
   class BundleImage : QObject {
@@ -49,26 +51,28 @@ namespace Isis {
 
   public:
     // constructor
-    BundleImage(Camera* camera, QString serialNumber, QString fileName);
-
-    // destructor
-   ~BundleImage();
+    BundleImage(Camera *camera, QString serialNumber, QString fileName);
 
     // copy constructor
     BundleImage(const BundleImage &src);
 
+    // destructor
+   ~BundleImage();
+
+    BundleImage &operator=(const BundleImage &src);
+
     // mutators
-    void setParentObservation(BundleObservation* parentObservation);
+    void setParentObservation(BundleObservation *parentObservation);
 
     // accessors
-    Camera* camera();
-    BundleObservation* parentObservation();
+    Camera *camera();
+    BundleObservation *parentObservation();
     QString serialNumber();
     QString fileName();
 
     private:
-      Camera* m_camera;
-      BundleObservation* m_parentObservation; //!< parent BundleObservation
+      Camera *m_camera;
+      BundleObservation *m_parentObservation; //!< parent BundleObservation
       QString m_serialNumber;
       QString m_fileName;      
   };

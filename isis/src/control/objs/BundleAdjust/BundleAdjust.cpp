@@ -18,7 +18,7 @@
 #include "BundleObservationSolveSettings.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
-#include "BundleStatistics.h"
+#include "BundleSolutionInfo.h"
 #include "Camera.h"
 #include "CameraGroundMap.h"
 #include "CameraDetectorMap.h"
@@ -27,6 +27,7 @@
 #include "ControlPoint.h"
 #include "Control.h"
 #include "CorrelationMatrix.h"
+#include "Distance.h"
 #include "ImageList.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -77,7 +78,7 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
-    
+
     init(&progress);
   }
 
@@ -211,7 +212,7 @@ namespace Isis {
       delete m_pCnet;
       delete m_pSnList;
 
-      if (m_bundleStatistics.numberHeldImages() > 0) {
+      if (m_bundleResults.numberHeldImages() > 0) {
         delete m_pHeldSnList;
       }
 
@@ -267,7 +268,7 @@ namespace Isis {
       // Get a count of held images too
       for (int i = 0; i < nImages; i++) {
         if (m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))) {
-          m_bundleStatistics.incrementHeldImages();
+          m_bundleResults.incrementHeldImages();
         }
       }
     }
@@ -294,16 +295,16 @@ namespace Isis {
     // (must be a smarter way)
     // get target body radii and body specific conversion factors between radians and meters.
     // need validity checks and different conversion factors for lat and long
-    // initialize m_BodyRadii
-    m_BodyRadii[0] = m_BodyRadii[1] = m_BodyRadii[2] = Distance();
+    // initialize m_bodyRadii
+    m_bodyRadii[0] = m_bodyRadii[1] = m_bodyRadii[2] = Distance();
     Camera *pCamera = m_pCnet->Camera(0);
     if (pCamera) {
-      pCamera->radii(m_BodyRadii);  // meters
+      pCamera->radii(m_bodyRadii);  // meters
 
-//      printf("radii: %lf %lf %lf\n",m_BodyRadii[0],m_BodyRadii[1],m_BodyRadii[2]);
+//      printf("radii: %lf %lf %lf\n",m_bodyRadii[0],m_bodyRadii[1],m_bodyRadii[2]);
 
-      if (m_BodyRadii[0] >= Distance(0, Distance::Meters)) {
-        m_dMTR = 0.001 / m_BodyRadii[0].kilometers(); // at equator
+      if (m_bodyRadii[0] >= Distance(0, Distance::Meters)) {
+        m_dMTR = 0.001 / m_bodyRadii[0].kilometers(); // at equator
         m_dRTM = 1.0 / m_dMTR;
       }
 //      printf("MTR: %lf\nRTM: %lf\n",m_dMTR,m_dRTM);
@@ -330,7 +331,7 @@ namespace Isis {
         }
 
         BundleObservation *observation =
-            m_BundleObservations.addnew(image, observationNumber, instrumentId, m_bundleSettings);
+            m_bundleObservations.addnew(image, observationNumber, instrumentId, m_bundleSettings);
             
         if (!observation) {
           QString msg = "In BundleAdjust::init(): observation " + observationNumber + "is null" + "\n";
@@ -339,7 +340,7 @@ namespace Isis {
       }
 
       // initialize exterior orientation (spice) for all BundleImages in all BundleObservations
-      m_BundleObservations.initializeExteriorOrientation();
+      m_bundleObservations.initializeExteriorOrientation();
 
       // set up vector of BundleControlPoints
       int nControlPoints = m_pCnet->GetNumPoints();
@@ -348,7 +349,7 @@ namespace Isis {
         if (point->IsIgnored())
           continue;
 
-        BundleControlPoint* bundleControlPoint = m_BundleControlPoints.addControlPoint(point);
+        BundleControlPoint* bundleControlPoint = m_bundleControlPoints.addControlPoint(point);
 
         bundleControlPoint->setWeights(&m_bundleSettings, m_dMTR);
 
@@ -360,7 +361,7 @@ namespace Isis {
           QString cubeSerialNumber = measure->cubeSerialNumber();
 
           BundleObservation *observation =
-              m_BundleObservations.getObservationByCubeSerialNumber(cubeSerialNumber);
+              m_bundleObservations.getObservationByCubeSerialNumber(cubeSerialNumber);
 
           measure->setParentObservation(observation);
         }
@@ -379,7 +380,7 @@ namespace Isis {
     if (m_bundleSettings.validateNetwork()) {
       validateNetwork();
     }
-    m_bundleStatistics.maximumLikelihoodSetUp(m_bundleSettings.maximumLikelihoodEstimatorModels());
+    m_bundleResults.maximumLikelihoodSetUp(m_bundleSettings.maximumLikelihoodEstimatorModels());
     // SetUp method initializes m_nNumberCamPosCoefSolved, m_nPositionType
     // resizes m_dGlobalSpacecraftPositionAprioriSigma and initializes with -1.0s
 //    instrumentPositionSetUp();
@@ -462,7 +463,7 @@ namespace Isis {
       m_cm.method[0].ordering = CHOLMOD_AMD;
 
       // set size of sparse block normal equations matrix
-      m_SparseNormals.setNumberOfColumns(m_BundleObservations.size());
+      m_SparseNormals.setNumberOfColumns(m_bundleObservations.size());
 
       return true;
   }
@@ -504,9 +505,9 @@ namespace Isis {
   void BundleAdjust::initialize() { // ??? rename this method, maybe call it in the init() method if Sparse
 
     // size of reduced normals matrix
-    m_nRank = m_BundleObservations.numberParameters();
+    m_nRank = m_bundleObservations.numberParameters();
 
-    int n3DPoints = m_BundleControlPoints.size();
+    int n3DPoints = m_bundleControlPoints.size();
 
     if ( m_bundleSettings.solveMethod() == BundleSettings::SpecialK ) {
       m_Normals.resize(m_nRank);           // set size of reduced normals matrix
@@ -514,7 +515,7 @@ namespace Isis {
       m_Qs_SPECIALK.resize(n3DPoints);
     }
 
-    m_bundleStatistics.setNumberUnknownParameters(m_nRank + 3 * n3DPoints);
+    m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * n3DPoints);
 
     m_imageSolution.resize(m_nRank);
 
@@ -551,25 +552,19 @@ namespace Isis {
    */
 
 
-  // TODO: make solveCholesky return a BundleResults object and delete this placeholder ???
-  BundleResults BundleAdjust::solveCholeskyBR() {
+  // TODO: make solveCholesky return a BundleSolutionInfo object and delete this placeholder ???
+  BundleSolutionInfo BundleAdjust::solveCholeskyBR() {
     solveCholesky();
-    return bundleResults();
+    return bundleSolveInformation();
   }
 
 
 
   bool BundleAdjust::solveCholesky() {
-//     QMutex mux;
-//     mux.lock();
-
-//     emit statusUpdate(QString("Begin solve: %1").arg(m_pSnList->Size()));
 
     // TODO what are the next two lines doing?
+    cout << "cnet = " << m_strCnetFileName << endl;
     PvlObject forTesting = m_bundleSettings.pvlObject();
-    
-//     emit statusUpdate(QString("before cout: %1").arg(m_pSnList->Size()));
-    
     cout << forTesting << endl;
 
     // throw error if a frame camera is included AND if m_bundleSettings.solveInstrumentPositionOverHermiteSpline()
@@ -584,14 +579,7 @@ namespace Isis {
 //      }
 //    }
 
-//     SerialNumberList myList = *m_pSnList;
-
-
-//     emit statusUpdate(QString("before initialize: %1").arg(m_pSnList->Size()));
-    
     initialize();
-
-//     emit statusUpdate(QString("before apriori: %1").arg(m_pSnList->Size()));
 
     // Compute the apriori lat/lons for each nonheld point
     m_pCnet->ComputeApriori(); // original location
@@ -602,8 +590,6 @@ namespace Isis {
 
     // start the clock
     clock_t t1 = clock();
-    
-//     emit statusUpdate(QString("after clock: %1").arg(m_pSnList->Size()));
 
     for (;;) {
 
@@ -629,7 +615,7 @@ namespace Isis {
 //      printf("starting FormNormals\n");
 
       if (!formNormalEquations()) {
-        m_bundleStatistics.setConverged(false);
+        m_bundleResults.setConverged(false);
         break;
       }
 //      clock_t formNormalsclock2 = clock();
@@ -642,7 +628,7 @@ namespace Isis {
 
       if (!solveSystem()) {
         printf("solve failed!\n");
-        m_bundleStatistics.setConverged(false);
+        m_bundleResults.setConverged(false);
         break;
       }
 
@@ -672,44 +658,44 @@ namespace Isis {
       }
 
       // variance of unit weight (also reference variance, variance factor, etc.)
-      m_bundleStatistics.computeSigma0(dvtpv, m_bundleSettings.convergenceCriteria());
+      m_bundleResults.computeSigma0(dvtpv, m_bundleSettings.convergenceCriteria());
 
       emit statusUpdate(QString("Iteration: %1").arg(m_nIteration) );
 
-      emit statusUpdate(QString("Sigma0: %1").arg(m_bundleStatistics.sigma0() ) );
+      emit statusUpdate(QString("Sigma0: %1").arg(m_bundleResults.sigma0() ) );
 
       emit statusUpdate( QString("Observations: %1").arg(
-               m_bundleStatistics.numberObservations() ) );
+               m_bundleResults.numberObservations() ) );
 
       emit statusUpdate( QString("Constrained Parameters:%1").arg(
-               m_bundleStatistics.numberConstrainedPointParameters() ) );
+               m_bundleResults.numberConstrainedPointParameters() ) );
 
       emit statusUpdate( QString("Unknowns: %1").arg(
-               m_bundleStatistics.numberUnknownParameters() ) );
+               m_bundleResults.numberUnknownParameters() ) );
 
       emit statusUpdate( QString("Degrees of Freedom: %1").arg(
-               m_bundleStatistics.degreesOfFreedom() ) );
+               m_bundleResults.degreesOfFreedom() ) );
 
       // check for convergence
       if (m_bundleSettings.convergenceCriteria() == BundleSettings::Sigma0) {
-        if (fabs(dSigma0_previous - m_bundleStatistics.sigma0())
+        if (fabs(dSigma0_previous - m_bundleResults.sigma0())
               <= m_bundleSettings.convergenceCriteriaThreshold()) { // convergence detected
           // if maximum likelihood tiers are being processed, check to see if there's another tier
-          if (m_bundleStatistics.maximumLikelihoodModelIndex()
-                 < m_bundleStatistics.numberMaximumLikelihoodModels() - 1
-              && m_bundleStatistics.maximumLikelihoodModelIndex()
+          if (m_bundleResults.maximumLikelihoodModelIndex()
+                 < m_bundleResults.numberMaximumLikelihoodModels() - 1
+              && m_bundleResults.maximumLikelihoodModelIndex()
                    < 2) { // is this second condition redundant???
                                                                     // should bundlestats require num models <= 3, so num models - 1 <= 2
             // to go, then continue with the next maximum likelihood model.
-            if (m_bundleStatistics.numberMaximumLikelihoodModels()
-                    > m_bundleStatistics.maximumLikelihoodModelIndex() + 1) {
+            if (m_bundleResults.numberMaximumLikelihoodModels()
+                    > m_bundleResults.maximumLikelihoodModelIndex() + 1) {
               // we will increment the index if there is another model after this one
-              m_bundleStatistics.incrementMaximumLikelihoodModelIndex();
+              m_bundleResults.incrementMaximumLikelihoodModelIndex();
             }
           }
           else {  // otherwise iterations are complete
             m_bLastIteration = true;
-            m_bundleStatistics.setConverged(true);
+            m_bundleResults.setConverged(true);
 
             emit statusUpdate("\n Bundle has converged");
 
@@ -729,7 +715,7 @@ namespace Isis {
         }
 
         if ( nconverged == numimgparam ) {
-          m_bundleStatistics.setConverged(true);
+          m_bundleResults.setConverged(true);
           m_bLastIteration = true;
           emit statusUpdate("Bundle has converged");
           break;
@@ -737,13 +723,12 @@ namespace Isis {
       }
 
 
-      m_bundleStatistics.printMaximumLikelihoodTierInformation();
+      m_bundleResults.printMaximumLikelihoodTierInformation();
       clock_t iterationclock2 = clock();
       double dIterationTime = ((iterationclock2 - iterationclock1) / (double)CLOCKS_PER_SEC);
       emit statusUpdate( QString("End of Iteration %1").arg(m_nIteration) );
       emit statusUpdate( QString("Elapsed Time: %1").arg(dIterationTime) );
 
-//       emit statusUpdate( QString("\tsnlist before wrapup: %1").arg(m_pSnList->Size()) );
       // send notification to UI indicating "new iteration"
       // UI.Notify(BundleEvent.END_ITERATION);
 
@@ -755,14 +740,14 @@ namespace Isis {
 
       // restart the dynamic calculation of the cumulative probility distribution of residuals
       // (in unweighted pixels) --so it will be up to date for the next iteration
-      if (!m_bundleStatistics.converged()) {
-        m_bundleStatistics.initializeResidualsProbabilityDistribution(101);
+      if (!m_bundleResults.converged()) {
+        m_bundleResults.initializeResidualsProbabilityDistribution(101);
       }// TODO: is this necessary ??? probably all ready initialized to 101 nodes in bundle settings constructor...
 
       // if we're using CHOLMOD and still going, release cholmod_factor (if we don't, memory leaks will occur),
       // otherwise we need it for error propagation
       if ( m_bundleSettings.solveMethod() == BundleSettings::Sparse ) {
-        if (!m_bundleStatistics.converged() || !m_bundleSettings.errorPropagation())
+        if (!m_bundleResults.converged() || !m_bundleSettings.errorPropagation())
           cholmod_free_factor(&m_L, &m_cm);
       }
 
@@ -771,20 +756,20 @@ namespace Isis {
 
       m_nIteration++;
 
-      dSigma0_previous = m_bundleStatistics.sigma0();
+      dSigma0_previous = m_bundleResults.sigma0();
     }
 
-    if (m_bundleStatistics.converged() && m_bundleSettings.errorPropagation()) {
+    if (m_bundleResults.converged() && m_bundleSettings.errorPropagation()) {
       clock_t terror1 = clock();
       emit statusUpdate("Starting Error Propagation");
       errorPropagation();
       emit statusUpdate("Error Propagation Complete");
       clock_t terror2 = clock();
-      m_bundleStatistics.setElapsedTimeErrorProp((terror2 - terror1) / (double)CLOCKS_PER_SEC);
+      m_bundleResults.setElapsedTimeErrorProp((terror2 - terror1) / (double)CLOCKS_PER_SEC);
     }
 
     clock_t t2 = clock();
-    m_bundleStatistics.setElapsedTime((t2 - t1) / (double)CLOCKS_PER_SEC);
+    m_bundleResults.setElapsedTime((t2 - t1) / (double)CLOCKS_PER_SEC);
 
     wrapUp();
 
@@ -792,12 +777,11 @@ namespace Isis {
     output();
 
     emit statusUpdate("\n Bundle Complete");
-    BundleResults *results = new BundleResults(bundleResults());
+    BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
     emit resultsReady(results);
 
     iterationSummary();
 
-//     mux.unlock();
     return true;
 
     QString msg = "Need to return something here, or just change the whole darn thing? [";
@@ -806,9 +790,9 @@ namespace Isis {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  BundleResults BundleAdjust::bundleResults() {
-    BundleResults results(m_bundleSettings, FileName(m_strCnetFileName));
-    results.setOutputStatistics(m_bundleStatistics);
+  BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
+    BundleSolutionInfo results(m_bundleSettings, FileName(m_strCnetFileName), m_bundleResults);
+    results.setRunTime("");
     return results;
   }
 
@@ -848,8 +832,8 @@ namespace Isis {
   bool BundleAdjust::formNormalEquations_CHOLMOD() {
     bool bStatus = false;
 
-    m_bundleStatistics.setNumberObservations(0);// ???
-    m_bundleStatistics.resetNumberConstrainedPointParameters();//???
+    m_bundleResults.setNumberObservations(0);// ???
+    m_bundleResults.resetNumberConstrainedPointParameters();//???
 
     static matrix<double> coeff_image;
     static matrix<double> coeff_point3D(2, 3);
@@ -876,7 +860,7 @@ namespace Isis {
     int nGood3DPoints = 0;
     int nRejected3DPoints = 0;
     int nPointIndex = 0;
-    int n3DPoints = m_BundleControlPoints.size();
+    int n3DPoints = m_bundleControlPoints.size();
 
 //  char buf[1056];
 //  sprintf(buf,"\n\t                      Points:%10d\n", n3DPoints);
@@ -887,11 +871,11 @@ namespace Isis {
 
     for (int i = 0; i < n3DPoints; i++) {
 
-      BundleControlPoint *point = m_BundleControlPoints.at(i);
+      BundleControlPoint *point = m_bundleControlPoints.at(i);
 
       if (point->isRejected()) {
         nRejected3DPoints++;
-//            sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_bundleStatistics.rejectionLimit());
+//            sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_bundleResults.rejectionLimit());
 //      m_fp_log << buf;
 
         nPointIndex++;
@@ -928,8 +912,8 @@ namespace Isis {
           continue;
 
         // update number of observations
-        int numObs = m_bundleStatistics.numberObservations();
-        m_bundleStatistics.setNumberObservations(numObs + 2);
+        int numObs = m_bundleResults.numberObservations();
+        m_bundleResults.setNumberObservations(numObs + 2);
         formNormals1_CHOLMOD(N22, N12, n1, n2, coeff_image, coeff_point3D, coeff_RHS,
                              measure->observationIndex());
       } // end loop over this points measures
@@ -945,7 +929,7 @@ namespace Isis {
     formNormals3_CHOLMOD(n1, m_nj);
 
     // update number of unknown parameters
-    m_bundleStatistics.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
+    m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
 
     return bStatus;
 }
@@ -955,9 +939,9 @@ namespace Isis {
    * Forming first set of auxiliary matrices for normal equations matrix via cholmod.
    */
   bool BundleAdjust::formNormals1_CHOLMOD(symmetric_matrix<double, upper>&N22,
-      SparseBlockColumnMatrix& N12, compressed_vector<double>& n1,
-      vector<double>& n2, matrix<double>& coeff_image,
-      matrix<double>& coeff_point3D, vector<double>& coeff_RHS, int observationIndex) {
+      SparseBlockColumnMatrix &N12, compressed_vector<double> &n1,
+      vector<double> &n2, matrix<double> &coeff_image,
+      matrix<double> &coeff_point3D, vector<double> &coeff_RHS, int observationIndex) {
 
     int i;
 
@@ -984,7 +968,7 @@ namespace Isis {
     int t = 0;
     //testing
     for (int a = 0; a < observationIndex; a++) {
-      BundleObservation *observation = m_BundleObservations.at(a);
+      BundleObservation *observation = m_bundleObservations.at(a);
       t += observation->numberParameters();
     }
 
@@ -1045,19 +1029,19 @@ namespace Isis {
    * Forming second set of auxiliary matrices for normal equations matrix via cholmod.
    */
   bool BundleAdjust::formNormals2_CHOLMOD(symmetric_matrix<double, upper>&N22,
-      SparseBlockColumnMatrix& N12, vector<double>& n2, vector<double>& nj,
+      SparseBlockColumnMatrix &N12, vector<double> &n2, vector<double> &nj,
       BundleControlPoint *bundleControlPoint) {
 
-    bounded_vector<double, 3>& NIC = bundleControlPoint->nicVector();
-    SparseBlockRowMatrix& Q = bundleControlPoint->cholmod_QMatrix();
+    bounded_vector<double, 3> NIC = bundleControlPoint->nicVector();
+    SparseBlockRowMatrix Q = bundleControlPoint->cholmod_QMatrix();
 
     NIC.clear();
     Q.zeroBlocks();
 
     // weighting of 3D point parameters
 //    const ControlPoint *point = m_pCnet->GetPoint(i);
-    bounded_vector<double, 3>& weights = bundleControlPoint->weights();
-    bounded_vector<double, 3>& corrections = bundleControlPoint->corrections();
+    bounded_vector<double, 3> weights = bundleControlPoint->weights();
+    bounded_vector<double, 3> corrections = bundleControlPoint->corrections();
 
 //    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
 
@@ -1066,19 +1050,19 @@ namespace Isis {
     if (weights(0) > 0.0) {
       N22(0,0) += weights(0);
       n2(0) += (-weights(0) * corrections(0));
-      m_bundleStatistics.incrementNumberConstrainedPointParameters(1);
+      m_bundleResults.incrementNumberConstrainedPointParameters(1);
     }
 
     if (weights(1) > 0.0) {
       N22(1,1) += weights(1);
       n2(1) += (-weights(1) * corrections(1));
-      m_bundleStatistics.incrementNumberConstrainedPointParameters(1);
+      m_bundleResults.incrementNumberConstrainedPointParameters(1);
     }
 
     if (weights(2) > 0.0) {
       N22(2,2) += weights(2);
       n2(2) += (-weights(2) * corrections(2));
-      m_bundleStatistics.incrementNumberConstrainedPointParameters(1);
+      m_bundleResults.incrementNumberConstrainedPointParameters(1);
     }
 
  //   std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
@@ -1141,10 +1125,10 @@ namespace Isis {
    * Apply weighting for spacecraft position, velocity, acceleration and camera angles, angular
    * velocities, angular accelerations if so stipulated (legalese).
    */
-  bool BundleAdjust::formNormals3_CHOLMOD(compressed_vector<double>& n1,
-                                  vector<double>& nj) {
+  bool BundleAdjust::formNormals3_CHOLMOD(compressed_vector<double> &n1,
+                                  vector<double> &nj) {
 
-    m_bundleStatistics.resetNumberConstrainedImageParameters();
+    m_bundleResults.resetNumberConstrainedImageParameters();
 
     int n = 0;
 
@@ -1154,7 +1138,7 @@ namespace Isis {
         continue;
 
       // get parameter weights for this observation
-      BundleObservation *observation = m_BundleObservations.at(i);
+      BundleObservation *observation = m_bundleObservations.at(i);
       boost::numeric::ublas::vector< double > weights = observation->parameterWeights();
       boost::numeric::ublas::vector< double > corrections = observation->parameterCorrections();
 
@@ -1163,7 +1147,7 @@ namespace Isis {
         if (weights(j) > 0.0) {
           (*diagonalBlock)(j,j) += weights(j);
           m_nj[n] -= weights(j) * corrections(j);
-          m_bundleStatistics.incrementNumberConstrainedImageParameters(1);
+          m_bundleResults.incrementNumberConstrainedImageParameters(1);
         }
         n++;
       }
@@ -1190,8 +1174,8 @@ namespace Isis {
 
     bool bStatus = false;
 /*
-    m_bundleStatistics.setNumberObservations(0); // ??? necessary???
-    m_bundleStatistics.resetNumberConstrainedPointParameters();
+    m_bundleResults.setNumberObservations(0); // ??? necessary???
+    m_bundleResults.resetNumberConstrainedPointParameters();
 
     static matrix<double> coeff_image;
     static matrix<double> coeff_point3D(2, 3);
@@ -1222,7 +1206,7 @@ namespace Isis {
     int nRejected3DPoints = 0;
     int nPointIndex = 0;
     int nImageIndex;
-    int n3DPoints = m_BundleControlPoints.size();
+    int n3DPoints = m_bundleControlPoints.size();
 
 //    char buf[1056];
 //    sprintf(buf,"\n\t                      Points:%10d\n", n3DPoints);
@@ -1230,11 +1214,11 @@ namespace Isis {
 //    printf("%s", buf);
 
     for (int i = 0; i < n3DPoints; i++) {
-      BundleControlPoint *point = m_BundleControlPoints.at(i);
+      BundleControlPoint *point = m_bundleControlPoints.at(i);
 
       if ( point->isRejected() ) {
         nRejected3DPoints++;
-//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_bundleStatistics.rejectionLimit());
+//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_bundleResults.rejectionLimit());
 //      m_fp_log << buf;
 
         nPointIndex++;
@@ -1275,8 +1259,8 @@ namespace Isis {
         }
 
         // update number of observations
-        int numObs = m_bundleStatistics.numberObservations();
-        m_bundleStatistics.setNumberObservations(numObs + 2);
+        int numObs = m_bundleResults.numberObservations();
+        m_bundleResults.setNumberObservations(numObs + 2);
 
 
         formNormals1_SPECIALK(N22, N12, n1, n2, coeff_image, coeff_point3D,
@@ -1300,7 +1284,7 @@ namespace Isis {
 //  m_SparseNormals.print();
 
     // update number of unknown parameters
-    m_bundleStatistics.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
+    m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
 */
     return bStatus;
   }
@@ -1310,9 +1294,9 @@ namespace Isis {
    * Forming first set of auxiliary matrices for normal equations matrix via specialK.
    */
   bool BundleAdjust::formNormals1_SPECIALK(symmetric_matrix<double, upper>&N22,
-      matrix<double>& N12, compressed_vector<double>& n1, vector<double>& n2,
-      matrix<double>& coeff_image, matrix<double>& coeff_point3D,
-      vector<double>& coeff_RHS, int nImageIndex) {
+      matrix<double> &N12, compressed_vector<double> &n1, vector<double> &n2,
+      matrix<double> &coeff_image, matrix<double> &coeff_point3D,
+      vector<double> &coeff_RHS, int nImageIndex) {
 /*
     int i, j;
 
@@ -1389,11 +1373,11 @@ namespace Isis {
    * Forming second set of auxiliary matrices for normal equations matrix via specialK.
    */
   bool BundleAdjust::formNormals2_SPECIALK(symmetric_matrix<double, upper>&N22,
-      matrix<double>& N12, vector<double>& n2, vector<double>& nj,
+      matrix<double> &N12, vector<double> &n2, vector<double> &nj,
       int nPointIndex, int i) {
 /*
-      bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
-      compressed_matrix<double>& Q = m_Qs_SPECIALK[nPointIndex];
+      bounded_vector<double, 3> &NIC = m_NICs[nPointIndex];
+      compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
 
       NIC.clear();
       Q.clear();
@@ -1402,8 +1386,8 @@ namespace Isis {
   //    const ControlPoint *point = m_pCnet->GetPoint(i);
       ControlPoint *point = m_pCnet->GetPoint(i); //TODO: what about this const business, regarding SetAdjustedSurfacePoint below???
 
-      bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
-      bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+      bounded_vector<double, 3> &weights = m_Point_Weights[nPointIndex];
+      bounded_vector<double, 3> &corrections = m_Point_Corrections[nPointIndex];
 
   //    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
 
@@ -1412,19 +1396,19 @@ namespace Isis {
       if (weights[0] > 0.0) {
         N22(0, 0) += weights[0];
         n2(0) += (-weights[0] * corrections(0));
-        m_bundleStatistics.incrementNumberConstrainedPointParameters(1);
+        m_bundleResults.incrementNumberConstrainedPointParameters(1);
       }
 
       if (weights[1] > 0.0) {
         N22(1, 1) += weights[1];
         n2(1) += (-weights[1] * corrections(1));
-        m_bundleStatistics.incrementNumberConstrainedPointParameters(1);
+        m_bundleResults.incrementNumberConstrainedPointParameters(1);
       }
 
       if (weights[2] > 0.0) {
         N22(2, 2) += weights[2];
         n2(2) += (-weights[2] * corrections(2));
-        m_bundleStatistics.incrementNumberConstrainedPointParameters(1);
+        m_bundleResults.incrementNumberConstrainedPointParameters(1);
       }
 
   //    std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
@@ -1487,12 +1471,12 @@ namespace Isis {
    * apply weighting for spacecraft position, velocity, acceleration and camera angles, angular
    * velocities, angular accelerations if so stipulated (legalese).
    */
-  bool BundleAdjust::formNormals3_SPECIALK(compressed_vector<double>& n1,
+  bool BundleAdjust::formNormals3_SPECIALK(compressed_vector<double> &n1,
                                            vector< double > &nj) {
 /*
   //  std::cout << m_dImageParameterWeights << std::endl;
 
-    m_bundleStatistics.resetNumberConstrainedImageParameters();
+    m_bundleResults.resetNumberConstrainedImageParameters();
 
     int n = 0;
     do {
@@ -1500,7 +1484,7 @@ namespace Isis {
         if (m_dImageParameterWeights[j] > 0.0) {
           m_Normals(n, n) += m_dImageParameterWeights[j];
           m_nj[n] -= m_dImageParameterWeights[j] * m_imageCorrections[n];
-          m_bundleStatistics.incrementNumberConstrainedImageParameters(1);
+          m_bundleResults.incrementNumberConstrainedImageParameters(1);
         }
 
         n++;
@@ -1521,8 +1505,8 @@ namespace Isis {
    *
    * TODO: Define.
    */
-  void BundleAdjust::product_AV(double alpha, bounded_vector<double,3>& v2,
-      SparseBlockRowMatrix& Q, vector< double >& v1) {
+  void BundleAdjust::product_AV(double alpha, bounded_vector<double,3> &v2,
+      SparseBlockRowMatrix &Q, vector< double > &v1) {
 
     QMapIterator<int, matrix<double>*> iQ(Q);
 
@@ -1549,8 +1533,8 @@ namespace Isis {
    *     C is a SparseBlockRowMatrix
    *     each block of B and C are boost matrices
    */
-  bool BundleAdjust::product_ATransB(symmetric_matrix <double,upper>& N22,
-      SparseBlockColumnMatrix& N12, SparseBlockRowMatrix& Q) {
+  bool BundleAdjust::product_ATransB(symmetric_matrix <double,upper> &N22,
+      SparseBlockColumnMatrix &N12, SparseBlockRowMatrix &Q) {
 
     QMapIterator<int, matrix<double>*> iN12(N12);
 
@@ -1577,7 +1561,7 @@ namespace Isis {
    * NOTE: A = N12, B = Q
    */
   void BundleAdjust::AmultAdd_CNZRows_CHOLMOD(double alpha,
-      SparseBlockColumnMatrix& N12, SparseBlockRowMatrix& Q) {
+      SparseBlockColumnMatrix &N12, SparseBlockRowMatrix &Q) {
 
     if (alpha == 0.0) {
       return;
@@ -1621,8 +1605,8 @@ namespace Isis {
    * TODO: Define.
    *
    */
-  void BundleAdjust::AmultAdd_CNZRows_SPECIALK(double alpha, matrix<double>& A, compressed_matrix<double>& B,
-                                      symmetric_matrix<double, upper, column_major>& C) {
+  void BundleAdjust::AmultAdd_CNZRows_SPECIALK(double alpha, matrix<double> &A, compressed_matrix<double> &B,
+                                      symmetric_matrix<double, upper, column_major> &C) {
 /*
     if (alpha == 0.0) {
       return;
@@ -1671,7 +1655,7 @@ namespace Isis {
    * TODO: Define.
    */
   void BundleAdjust::transA_NZ_multAdd_CHOLMOD(double alpha,
-      SparseBlockRowMatrix& Q, vector<double>& n2, vector<double>& m_nj) {
+      SparseBlockRowMatrix &Q, vector<double> &n2, vector<double> &m_nj) {
 
     if (alpha == 0.0)
       return;
@@ -1686,10 +1670,10 @@ namespace Isis {
 
       vector<double> v = prod(trans(*m),n2);
 
-      //testing - should ask m_BundleObservations for this???
+      //testing - should ask m_bundleObservations for this???
       int t=0;
       for (int a = 0; a < nrow; a++) {
-        BundleObservation *observation = m_BundleObservations.at(a);
+        BundleObservation *observation = m_bundleObservations.at(a);
         t += observation->numberParameters();
       }
 
@@ -1704,8 +1688,8 @@ namespace Isis {
    *
    * TODO: Define.
    */
-  void BundleAdjust::transA_NZ_multAdd_SPECIALK(double alpha, compressed_matrix<double>& A,
-                                                vector<double>& B, vector<double>& C) {
+  void BundleAdjust::transA_NZ_multAdd_SPECIALK(double alpha, compressed_matrix<double> &A,
+                                                vector<double> &B, vector<double> &C) {
 /*
     if (alpha == 0.0)
       return;
@@ -1748,8 +1732,8 @@ namespace Isis {
    *
    * TODO: Define.
    */
-  void BundleAdjust::AmulttransBNZ(matrix<double>& A,
-      compressed_matrix<double>& B, matrix<double> &C, double alpha) {
+  void BundleAdjust::AmulttransBNZ(matrix<double> &A,
+      compressed_matrix<double> &B, matrix<double> &C, double alpha) {
 
     if ( alpha == 0.0 ) {
       return;
@@ -1799,9 +1783,9 @@ namespace Isis {
    *
    * TODO: Define.
    */
-  void BundleAdjust::ANZmultAdd(compressed_matrix<double>& A,
-      symmetric_matrix<double, upper, column_major>& B,
-      matrix<double>& C, double alpha) {
+  void BundleAdjust::ANZmultAdd(compressed_matrix<double> &A,
+      symmetric_matrix<double, upper, column_major> &B,
+      matrix<double> &C, double alpha) {
 
     if ( alpha == 0.0 )
       return;
@@ -2166,8 +2150,8 @@ namespace Isis {
    * Backsubstitution for above square-root free cholesky method.
    *
    */
-  bool BundleAdjust::CholeskyUT_NOSQR_BackSub(symmetric_matrix<double, upper, column_major>& m,
-                                              vector<double>& s, vector<double>& rhs) {
+  bool BundleAdjust::CholeskyUT_NOSQR_BackSub(symmetric_matrix<double, upper, column_major> &m,
+                                              vector<double> &s, vector<double> &rhs) {
     int i, j;
     double sum;
     double d1, d2;
@@ -2313,7 +2297,7 @@ namespace Isis {
    *
    * TODO: belongs in matrix class or wrapper.
    */
-  bool BundleAdjust::Invert_3x3(symmetric_matrix<double, upper>& m) {
+  bool BundleAdjust::Invert_3x3(symmetric_matrix<double, upper> &m) {
     double det;
     double den;
 
@@ -2344,8 +2328,8 @@ namespace Isis {
   /**
    * compute partials for measure
    */
-  bool BundleAdjust::computePartials_DC(matrix<double>& coeff_image, matrix<double>& coeff_point3D,
-                                        vector<double>& coeff_RHS, BundleMeasure &measure,
+  bool BundleAdjust::computePartials_DC(matrix<double> &coeff_image, matrix<double> &coeff_point3D,
+                                        vector<double> &coeff_RHS, BundleMeasure &measure,
                                         BundleControlPoint &point) {
 
     // additional vectors
@@ -2501,26 +2485,26 @@ namespace Isis {
 
     // residual prob distribution is calculated even if there is no maximum likelihood estimation
     double obsValue = deltax / pCamera->PixelPitch();
-    m_bundleStatistics.addResidualsProbabilityDistributionObservation(obsValue);
+    m_bundleResults.addResidualsProbabilityDistributionObservation(obsValue);
 
     obsValue = deltay / pCamera->PixelPitch();
-    m_bundleStatistics.addResidualsProbabilityDistributionObservation(obsValue);
+    m_bundleResults.addResidualsProbabilityDistributionObservation(obsValue);
 
     dObservationSigma = 1.4 * pCamera->PixelPitch();
     dObservationWeight = 1.0 / dObservationSigma;
 
-    if (m_bundleStatistics.numberMaximumLikelihoodModels()
-          > m_bundleStatistics.maximumLikelihoodModelIndex()) {
+    if (m_bundleResults.numberMaximumLikelihoodModels()
+          > m_bundleResults.maximumLikelihoodModelIndex()) {
       // if maximum likelihood estimation is being used
       double residualR2ZScore
                  = sqrt(deltax * deltax + deltay * deltay) / dObservationSigma / sqrt(2.0);
-      m_bundleStatistics.addProbabilityDistributionObservation(residualR2ZScore);  //dynamically build the cumulative probability distribution of the R^2 residual Z Scores
-                                                                                   //double tempScaler = m_wFunc[m_bundleStatistics.maximumLikelihoodModelIndex()]->sqrtWeightScaler(residualR2ZScore);
+      m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);  //dynamically build the cumulative probability distribution of the R^2 residual Z Scores
+                                                                                   //double tempScaler = m_wFunc[m_bundleResults.maximumLikelihoodModelIndex()]->sqrtWeightScaler(residualR2ZScore);
                                                                                    //if ( tempScaler == 0.0) printf("ZeroScaler\n");
                                                                                    //if ( tempScaler < 0.0)  printf("NegativeScaler\n");
 
-      int currentModelIndex = m_bundleStatistics.maximumLikelihoodModelIndex();
-      dObservationWeight *= m_bundleStatistics.maximumLikelihoodModelWFunc(currentModelIndex)
+      int currentModelIndex = m_bundleResults.maximumLikelihoodModelIndex();
+      dObservationWeight *= m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
                             .sqrtWeightScaler(residualR2ZScore);
     }
 
@@ -2564,9 +2548,9 @@ namespace Isis {
     int t = 0;
 
     // Update spice for each BundleObservation
-    int nobservations = m_BundleObservations.size();
+    int nobservations = m_bundleObservations.size();
     for (int i = 0; i < nobservations; i++) {
-      BundleObservation *observation = m_BundleObservations.at(i);
+      BundleObservation *observation = m_bundleObservations.at(i);
 
       int nParameters = observation->numberParameters();
 
@@ -2583,9 +2567,9 @@ namespace Isis {
     // Update lat/lon for each control point
     double dLatCorr, dLongCorr, dRadCorr;
     int nPointIndex = 0;
-    int nControlPoints = m_BundleControlPoints.size();
+    int nControlPoints = m_bundleControlPoints.size();
     for (int i = 0; i < nControlPoints; i++) {
-      BundleControlPoint *point = m_BundleControlPoints.at(i);
+      BundleControlPoint *point = m_bundleControlPoints.at(i);
 
       if (point->isRejected()) {
           nPointIndex++;
@@ -2593,9 +2577,9 @@ namespace Isis {
       }
 
       // get NIC, Q, and correction vector for this point
-      bounded_vector<double, 3>& NIC = point->nicVector();
-      SparseBlockRowMatrix& Q = point->cholmod_QMatrix();
-      bounded_vector<double, 3>& corrections = point->corrections();
+      bounded_vector<double, 3> NIC = point->nicVector();
+      SparseBlockRowMatrix Q = point->cholmod_QMatrix();
+      bounded_vector<double, 3> corrections = point->corrections();
 
 //      printf("Q\n");
 //      std::cout << Q << std::endl;
@@ -2678,7 +2662,7 @@ namespace Isis {
       int nImages = images();
       for (int i = 0; i < nImages; i++) {
 
-          if ( m_bundleStatistics.numberHeldImages() > 0 ) {
+          if ( m_bundleResults.numberHeldImages() > 0 ) {
               if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))) {
                   continue;
               }
@@ -2777,9 +2761,9 @@ namespace Isis {
       }
 
       // get NIC, Q, and correction vector for this point
-      bounded_vector<double, 3>& NIC = m_NICs[nPointIndex];
-      compressed_matrix<double>& Q = m_Qs_SPECIALK[nPointIndex];
-      bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
+      bounded_vector<double, 3> &NIC = m_NICs[nPointIndex];
+      compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
+      bounded_vector<double, 3> &corrections = m_Point_Corrections[nPointIndex];
 
 //      printf("Q\n");
 //      std::cout << Q << std::endl;
@@ -2875,16 +2859,16 @@ namespace Isis {
     m_Statsry.Reset();
     m_Statsrxy.Reset();
 
-//    m_bundleStatistics.setRmsXYResiduals(sqrt(m_Statsrx.SumSquare()/(m_bundleStatistics.numberObservations()/2),
-//                                         sqrt(m_Statsry.SumSquare()/(m_bundleStatistics.numberObservations()/2),
-//                                         sqrt(m_Statsrxy.SumSquare()/m_bundleStatistics.numberObservations()));
+//    m_bundleResults.setRmsXYResiduals(sqrt(m_Statsrx.SumSquare()/(m_bundleResults.numberObservations()/2),
+//                                         sqrt(m_Statsry.SumSquare()/(m_bundleResults.numberObservations()/2),
+//                                         sqrt(m_Statsrxy.SumSquare()/m_bundleResults.numberObservations()));
 
     // vtpv for image coordinates
-    int nObjectPoints = m_BundleControlPoints.size();
+    int nObjectPoints = m_bundleControlPoints.size();
 
     for (int i = 0; i < nObjectPoints; i++) {
 
-      BundleControlPoint *bundleControlPoint = m_BundleControlPoints.at(i);
+      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
       ControlPoint* point = bundleControlPoint->getRawControlPoint();
 
       point->ComputeResiduals();
@@ -2925,11 +2909,11 @@ namespace Isis {
     // add vtpv from constrained 3D points
     int nPointIndex = 0;
     for (int i = 0; i < nObjectPoints; i++) {
-      BundleControlPoint *bundleControlPoint = m_BundleControlPoints.at(i);
+      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
 
       // get weight and correction vector for this point
-      bounded_vector<double, 3>& weights = bundleControlPoint->weights();
-      bounded_vector<double, 3>& corrections = bundleControlPoint->corrections();
+      bounded_vector<double, 3> weights = bundleControlPoint->weights();
+      bounded_vector<double, 3> corrections = bundleControlPoint->corrections();
 
       //printf("Point: %s PointIndex: %d Loop(i): %d\n",point->GetId().toAscii().data(),nPointIndex,i);
       //std::cout << weights << std::endl;
@@ -2951,12 +2935,12 @@ namespace Isis {
 //    std::cout << "vtpv control = " << vtpv_control << std::endl;
 
     // add vtpv from constrained image parameters
-    for (int i = 0; i < m_BundleObservations.size(); i++) {
-      BundleObservation *observation = m_BundleObservations.at(i);
+    for (int i = 0; i < m_bundleObservations.size(); i++) {
+      BundleObservation *observation = m_bundleObservations.at(i);
 
       // get weight and correction vector for this observation
-      vector<double>& weights = observation->parameterWeights();
-      vector<double>& corrections = observation->parameterCorrections();
+      vector<double> &weights = observation->parameterWeights();
+      vector<double> &corrections = observation->parameterCorrections();
 
       for (int j = 0; j < (int)corrections.size(); j++) {
         if (weights(j) > 0.0) {
@@ -2973,7 +2957,7 @@ namespace Isis {
 
     // Compute rms for all image coordinate residuals
     // separately for x, y, then x and y together
-    m_bundleStatistics.setRmsXYResiduals(m_Statsrx.Rms(), m_Statsry.Rms(), m_Statsrxy.Rms());
+    m_bundleResults.setRmsXYResiduals(m_Statsrx.Rms(), m_Statsry.Rms(), m_Statsrxy.Rms());
 
     return vtpv;
   }
@@ -2996,11 +2980,8 @@ namespace Isis {
 
       point->ComputeResiduals();
     }
-//     emit statusUpdate(QString("SerialNumberList in wrapUp") + QString::number(m_pSnList->Size()));
-    m_bundleStatistics.computeBundleStatistics(m_pSnList,
-                                               m_pCnet,
-                                               m_bundleSettings.errorPropagation(),
-                                               m_bundleSettings.solveRadius());
+    computeBundleStatistics();
+//     m_bundleResults.computeBundleStatistics(m_pSnList, m_pCnet, m_bundleSettings.errorPropagation(), m_bundleSettings.solveRadius());
 
 
     return true;
@@ -3014,11 +2995,11 @@ namespace Isis {
   bool BundleAdjust::computeRejectionLimit() { // ??? i believe this should be in bundle stats...
       double vx, vy;
 
-      int nResiduals = m_bundleStatistics.numberObservations() / 2;
+      int nResiduals = m_bundleResults.numberObservations() / 2;
 
-//      std::cout << "total observations: " << m_bundleStatistics.numberObservations() << std::endl;
-//      std::cout << "rejected observations: " << m_bundleStatistics.numberRejectedObservations() << std::endl;
-//      std::cout << "good observations: " << m_bundleStatistics.numberObservations()-m_bundleStatistics.numberRejectedObservations() << std::endl;
+//      std::cout << "total observations: " << m_bundleResults.numberObservations() << std::endl;
+//      std::cout << "rejected observations: " << m_bundleResults.numberRejectedObservations() << std::endl;
+//      std::cout << "good observations: " << m_bundleResults.numberObservations()-m_bundleResults.numberRejectedObservations() << std::endl;
 
       std::vector<double> resvectors;
 
@@ -3113,9 +3094,9 @@ namespace Isis {
 //      std::cout << "reject range: \n" << dLow << " " << dHigh << std::endl;
 //      std::cout << "Rejection multipler: \n" << m_bundleSettings.rejectionMultiplier() << std::endl;
 
-      m_bundleStatistics.setRejectionLimit(median + m_bundleSettings.outlierRejectionMultiplier() * mad);
+      m_bundleResults.setRejectionLimit(median + m_bundleSettings.outlierRejectionMultiplier() * mad);
 
-//      std::cout << "Rejection Limit: " << m_bundleStatistics.rejectionLimit() << std::endl;
+//      std::cout << "Rejection Limit: " << m_bundleResults.rejectionLimit() << std::endl;
 
       return true;
   }
@@ -3133,9 +3114,9 @@ namespace Isis {
     int nIndexMaxResidual;
     double dMaxResidual;
     double dSumSquares;
-    double dUsedRejectionLimit = m_bundleStatistics.rejectionLimit();
+    double dUsedRejectionLimit = m_bundleResults.rejectionLimit();
 
-//    if ( m_bundleStatistics.rejectionLimit() < 0.05 )
+//    if ( m_bundleResults.rejectionLimit() < 0.05 )
 //        dUsedRejectionLimit = 0.14;
     //        dUsedRejectionLimit = 0.05;
 
@@ -3235,7 +3216,7 @@ namespace Isis {
 
     printf("\n\t       Rejected Observations:%10d (Rejection Limit:%12.5lf\n",
            numberRejectedObservations, dUsedRejectionLimit);
-    m_bundleStatistics.setNumberRejectedObservations(numberRejectedObservations);
+    m_bundleResults.setNumberRejectedObservations(numberRejectedObservations);
 
     std::cout << "Measures that came back: " << nComingBack << std::endl;
 
@@ -3272,7 +3253,7 @@ namespace Isis {
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     double t;
 
-    double dSigma02 = m_bundleStatistics.sigma0() * m_bundleStatistics.sigma0();
+    double dSigma02 = m_bundleResults.sigma0() * m_bundleResults.sigma0();
 
     int nPointIndex = 0;
     int nObjectPoints = m_pCnet->GetNumPoints();
@@ -3290,7 +3271,7 @@ namespace Isis {
         QS.clear();
 
         // get corresponding Q matrix
-        compressed_matrix<double>& Q = m_Qs_SPECIALK[nPointIndex];
+        compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
 
         // form QS
         QS = prod(Q, m_Normals);
@@ -3349,9 +3330,9 @@ namespace Isis {
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     double t;
 
-    double dSigma02 = m_bundleStatistics.sigma0() * m_bundleStatistics.sigma0();
+    double dSigma02 = m_bundleResults.sigma0() * m_bundleResults.sigma0();
 
-    int nObjectPoints = m_BundleControlPoints.size();
+    int nObjectPoints = m_bundleControlPoints.size();
 
     std::string strTime = Isis::iTime::CurrentLocalTime().toAscii().data();
     printf("     Time: %s\n\n", strTime.c_str());
@@ -3448,12 +3429,12 @@ namespace Isis {
       }
 
       // save adjusted image sigmas
-      BundleObservation *observation = m_BundleObservations.at(i);
-      vector< double >& adjustedSigmas = observation->adjustedSigmas();
+      BundleObservation *observation = m_bundleObservations.at(i);
+      vector< double > &adjustedSigmas = observation->adjustedSigmas();
       matrix<double>* imageCovMatrix = sbcMatrix.value(i);
       for ( int z = 0; z < ncolsCurrentBlockColumn; z++) {
 //        adjustedSigmas[z] = (*imageCovMatrix)(z,z);
-        adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleStatistics.sigma0();
+        adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleResults.sigma0();
       }
 
       // Output inverse matrix to the open file.
@@ -3463,7 +3444,7 @@ namespace Isis {
       int nPointIndex = 0;
       for (j = 0; j < nObjectPoints; j++) {
 
-        BundleControlPoint *point = m_BundleControlPoints.at(nPointIndex);
+        BundleControlPoint *point = m_bundleControlPoints.at(nPointIndex);
         if ( point->isRejected() )
           continue;
 
@@ -3474,12 +3455,12 @@ namespace Isis {
         }
 
         // get corresponding Q matrix
-        SparseBlockRowMatrix& Q = point->cholmod_QMatrix();
+        SparseBlockRowMatrix Q = point->cholmod_QMatrix();
 
         T.clear();
 
         // get corresponding point covariance matrix
-        symmetric_matrix<double>& cv = point_covs[nPointIndex];
+        symmetric_matrix<double> &cv = point_covs[nPointIndex];
 
         // get qT - index i is the key into Q for qT
         matrix<double>* qT = Q.value(i);
@@ -3524,7 +3505,7 @@ namespace Isis {
     // Close the file.
     matrixOutput.close();
     // Save the location of the "covariance" matrix
-    m_bundleStatistics.setCorrMatCovFileName(matrixFile);
+    m_bundleResults.setCorrMatCovFileName(matrixFile);
 
     // can free sparse normals now
     m_SparseNormals.wipe();
@@ -3541,7 +3522,7 @@ namespace Isis {
     int nPointIndex = 0;
     for (j = 0; j < nObjectPoints; j++) {
 
-      BundleControlPoint *point = m_BundleControlPoints.at(nPointIndex);
+      BundleControlPoint *point = m_bundleControlPoints.at(nPointIndex);
 
       if ( point->isRejected() )
         continue;
@@ -3552,7 +3533,7 @@ namespace Isis {
       }
 
       // get corresponding point covariance matrix
-      symmetric_matrix<double>& cv = point_covs[nPointIndex];
+      symmetric_matrix<double> &cv = point_covs[nPointIndex];
 
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO
@@ -3605,7 +3586,6 @@ namespace Isis {
    */
   // TODO: probably don't need this, can get from BundleObservation
   QString BundleAdjust::fileName(int i) {
-//     emit statusUpdate(QString("SerialNumberList in fileName(i):") + QString::number(m_pSnList->Size()));
     return m_pSnList->FileName(i);
   }
 
@@ -3615,8 +3595,7 @@ namespace Isis {
    *
    */
   bool BundleAdjust::isHeld(int i) {
-//     emit statusUpdate(QString("SerialNumberList in isHeld(i):") + QString::number(m_pSnList->Size()));
-    if ( m_bundleStatistics.numberHeldImages() > 0 )
+    if ( m_bundleResults.numberHeldImages() > 0 )
          if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))))
            return true;
     return false;
@@ -3645,7 +3624,7 @@ namespace Isis {
 //  int BundleAdjust::observations() const {
 //    if (!m_bundleSettings.solveObservationMode()) {
 //      return m_pSnList->Size();
-//      //    return m_pSnList->Size() - m_bundleStatistics.numberHeldImages();
+//      //    return m_pSnList->Size() - m_bundleResults.numberHeldImages();
 //    }
 //    else {
 //      return m_pObsNumList->ObservationSize();
@@ -3695,7 +3674,7 @@ namespace Isis {
   void BundleAdjust::iterationSummary() {
     QString itlog;
 
-    if ( m_bundleStatistics.converged() ) 
+    if ( m_bundleResults.converged() ) 
         itlog = "Iteration" + toString(m_nIteration) + ": Final";
     else
         itlog = "Iteration" + toString(m_nIteration);
@@ -3703,38 +3682,38 @@ namespace Isis {
     PvlGroup gp(itlog);
 
     gp += PvlKeyword( "Sigma0",
-                      toString( m_bundleStatistics.sigma0() ) );
+                      toString( m_bundleResults.sigma0() ) );
     gp += PvlKeyword( "Observations",
-                      toString( m_bundleStatistics.numberObservations() ) );
+                      toString( m_bundleResults.numberObservations() ) );
     gp += PvlKeyword( "Constrained_Point_Parameters",
-                      toString( m_bundleStatistics.numberConstrainedPointParameters() ) );
+                      toString( m_bundleResults.numberConstrainedPointParameters() ) );
     gp += PvlKeyword( "Constrained_Image_Parameters",
-                      toString( m_bundleStatistics.numberConstrainedImageParameters() ) );
+                      toString( m_bundleResults.numberConstrainedImageParameters() ) );
     gp += PvlKeyword( "Unknown_Parameters",
-                      toString( m_bundleStatistics.numberUnknownParameters() ) );
+                      toString( m_bundleResults.numberUnknownParameters() ) );
     gp += PvlKeyword( "Degrees_of_Freedom",
-                      toString( m_bundleStatistics.degreesOfFreedom() ) );
+                      toString( m_bundleResults.degreesOfFreedom() ) );
     gp += PvlKeyword( "Rejected_Measures",
-                      toString( m_bundleStatistics.numberRejectedObservations()/2) );
+                      toString( m_bundleResults.numberRejectedObservations()/2) );
 
 
-    if ( m_bundleStatistics.numberMaximumLikelihoodModels() >
-         m_bundleStatistics.maximumLikelihoodModelIndex() ) {
+    if ( m_bundleResults.numberMaximumLikelihoodModels() >
+         m_bundleResults.maximumLikelihoodModelIndex() ) {
       // if maximum likelihood estimation is being used
 
       gp += PvlKeyword( "Maximum_Likelihood_Tier: ",
-                        toString( m_bundleStatistics.maximumLikelihoodModelIndex() ) );
+                        toString( m_bundleResults.maximumLikelihoodModelIndex() ) );
       gp += PvlKeyword( "Median_of_R^2_residuals: ",
-                        toString( m_bundleStatistics.maximumLikelihoodMedianR2Residuals() ) );
+                        toString( m_bundleResults.maximumLikelihoodMedianR2Residuals() ) );
     }
 
-    if ( m_bundleStatistics.converged() ) {
+    if ( m_bundleResults.converged() ) {
       gp += PvlKeyword("Converged", "TRUE");
-      gp += PvlKeyword( "TotalElapsedTime", toString( m_bundleStatistics.elapsedTime() ) );
+      gp += PvlKeyword( "TotalElapsedTime", toString( m_bundleResults.elapsedTime() ) );
 
       if (m_bundleSettings.errorPropagation()) {
         gp += PvlKeyword( "ErrorPropagationElapsedTime",
-                         toString( m_bundleStatistics.elapsedTimeErrorProp() ) );
+                         toString( m_bundleResults.elapsedTimeErrorProp() ) );
       }
     }
 
@@ -3770,7 +3749,7 @@ namespace Isis {
    * Output header for bundle results file.
    *
    */
-  bool BundleAdjust::outputHeader(std::ofstream& fp_out) {
+  bool BundleAdjust::outputHeader(std::ofstream &fp_out) {
 
     if (!fp_out)
       return false;
@@ -3780,12 +3759,12 @@ namespace Isis {
     int nValidPoints = m_pCnet->GetNumValidPoints();
     int nInnerConstraints = 0;
     int nDistanceConstraints = 0;
-    int nDegreesOfFreedom = m_bundleStatistics.numberObservations()
-                            + m_bundleStatistics.numberConstrainedPointParameters()
-                            + m_bundleStatistics.numberConstrainedImageParameters()
-                            - m_bundleStatistics.numberUnknownParameters(); // ??? same as bstat dof ???
-    //??? m_bundleStatistics.computeDegreesOfFreedom();
-    //??? int nDegreesOfFreedom = m_bundleStatistics.degreesOfFreedom();
+    int nDegreesOfFreedom = m_bundleResults.numberObservations()
+                            + m_bundleResults.numberConstrainedPointParameters()
+                            + m_bundleResults.numberConstrainedImageParameters()
+                            - m_bundleResults.numberUnknownParameters(); // ??? same as bstat dof ???
+    //??? m_bundleResults.computeDegreesOfFreedom();
+    //??? int nDegreesOfFreedom = m_bundleResults.degreesOfFreedom();
 
     int nConvergenceCriteria = 1;
 
@@ -3853,21 +3832,21 @@ namespace Isis {
     fp_out << buf;
 
     for (int tier = 0; tier < 3; tier++) {
-      if (tier < m_bundleStatistics.numberMaximumLikelihoodModels()) { // replace number of models variable with settings models.size()???
+      if (tier < m_bundleResults.numberMaximumLikelihoodModels()) { // replace number of models variable with settings models.size()???
         sprintf(buf, "\n                         Tier %d Enabled: TRUE", tier);
         fp_out << buf;
         sprintf(buf, "\n               Maximum Likelihood Model: %s",
                 MaximumLikelihoodWFunctions::modelToString(
-                    m_bundleStatistics.maximumLikelihoodModelWFunc(tier).model()).toAscii().data());
+                    m_bundleResults.maximumLikelihoodModelWFunc(tier).model()).toAscii().data());
         fp_out << buf;
         sprintf(buf, "\n    Quantile used for tweaking constant: %lf",
-                            m_bundleStatistics.maximumLikelihoodModelQuantile(tier));
+                            m_bundleResults.maximumLikelihoodModelQuantile(tier));
         fp_out << buf;
         sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",
-                           m_bundleStatistics.maximumLikelihoodModelWFunc(tier).tweakingConstant());
+                           m_bundleResults.maximumLikelihoodModelWFunc(tier).tweakingConstant());
         fp_out << buf;
         sprintf(buf, "\n       Approx. weighted Residual cutoff: %s",
-                               m_bundleStatistics.maximumLikelihoodModelWFunc(tier)
+                               m_bundleResults.maximumLikelihoodModelWFunc(tier)
                                    .weightedResidualCutoff().toAscii().data());
         fp_out << buf;
         if (tier != 2) fp_out << "\n";
@@ -3950,47 +3929,47 @@ namespace Isis {
 
     sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
     fp_out << buf;
-    (m_dGlobalLatitudeAprioriSigma == -1) ? sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
+    (m_dGlobalLatitudeAprioriSigma == Isis::Null) ? sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
         sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)", m_dGlobalLatitudeAprioriSigma);
     fp_out << buf;
-    (m_dGlobalLongitudeAprioriSigma == -1) ? sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
+    (m_dGlobalLongitudeAprioriSigma == Isis::Null) ? sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
         sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)", m_dGlobalLongitudeAprioriSigma);
     fp_out << buf;
-    (m_dGlobalRadiusAprioriSigma == -1) ? sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
+    (m_dGlobalRadiusAprioriSigma == Isis::Null) ? sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
         sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)", m_dGlobalRadiusAprioriSigma);
     fp_out << buf;
 
-    if (m_nNumberCamPosCoefSolved < 1 || m_dGlobalSpacecraftPositionAprioriSigma[0] == -1)
+    if (m_nNumberCamPosCoefSolved < 1 || m_dGlobalSpacecraftPositionAprioriSigma[0] == Isis::Null)
       sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A");
     else
       sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma[0]);
     fp_out << buf;
 
-    if (m_nNumberCamPosCoefSolved < 2 || m_dGlobalSpacecraftPositionAprioriSigma[1] == -1)
+    if (m_nNumberCamPosCoefSolved < 2 || m_dGlobalSpacecraftPositionAprioriSigma[1] == Isis::Null)
       sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A");
     else
       sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftPositionAprioriSigma[1]);
     fp_out << buf;
 
-    if (m_nNumberCamPosCoefSolved < 3 || m_dGlobalSpacecraftPositionAprioriSigma[2] == -1)
+    if (m_nNumberCamPosCoefSolved < 3 || m_dGlobalSpacecraftPositionAprioriSigma[2] == Isis::Null)
       sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A");
     else
       sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftPositionAprioriSigma[2]);
     fp_out << buf;
 
-    if (m_nNumberCamAngleCoefSolved < 1 || m_dGlobalCameraAnglesAprioriSigma[0] == -1)
+    if (m_nNumberCamAngleCoefSolved < 1 || m_dGlobalCameraAnglesAprioriSigma[0] == Isis::Null)
       sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A");
     else
       sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",m_dGlobalCameraAnglesAprioriSigma[0]);
     fp_out << buf;
 
-    if (m_nNumberCamAngleCoefSolved < 2 || m_dGlobalCameraAnglesAprioriSigma[1] == -1)
+    if (m_nNumberCamAngleCoefSolved < 2 || m_dGlobalCameraAnglesAprioriSigma[1] == Isis::Null)
       sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A");
     else
       sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",m_dGlobalCameraAnglesAprioriSigma[1]);
     fp_out << buf;
 
-    if (m_nNumberCamAngleCoefSolved < 3 || m_dGlobalCameraAnglesAprioriSigma[2] == -1)
+    if (m_nNumberCamAngleCoefSolved < 3 || m_dGlobalCameraAnglesAprioriSigma[2] == Isis::Null)
       sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A");
     else
       sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
@@ -4004,36 +3983,36 @@ namespace Isis {
     fp_out << buf;
 
     sprintf(buf, "\n                 Total Measures: %6d",
-                                     (m_bundleStatistics.numberObservations()
-                                      + m_bundleStatistics.numberRejectedObservations()) / 2);
+                                     (m_bundleResults.numberObservations()
+                                      + m_bundleResults.numberRejectedObservations()) / 2);
     fp_out << buf;
 
     sprintf(buf, "\n             Total Observations: %6d",
-                                 m_bundleStatistics.numberObservations()
-                                 + m_bundleStatistics.numberRejectedObservations());
+                                 m_bundleResults.numberObservations()
+                                 + m_bundleResults.numberRejectedObservations());
     fp_out << buf;
 
-    sprintf(buf, "\n              Good Observations: %6d", m_bundleStatistics.numberObservations());
+    sprintf(buf, "\n              Good Observations: %6d", m_bundleResults.numberObservations());
     fp_out << buf;
 
     sprintf(buf, "\n          Rejected Observations: %6d",
-                              m_bundleStatistics.numberRejectedObservations());
+                              m_bundleResults.numberRejectedObservations());
     fp_out << buf;
 
-    if (m_bundleStatistics.numberConstrainedPointParameters() > 0) {
+    if (m_bundleResults.numberConstrainedPointParameters() > 0) {
       sprintf(buf, "\n   Constrained Point Parameters: %6d",
-                         m_bundleStatistics.numberConstrainedPointParameters());
+                         m_bundleResults.numberConstrainedPointParameters());
       fp_out << buf;
     }
 
-    if (m_bundleStatistics.numberConstrainedImageParameters() > 0) {
+    if (m_bundleResults.numberConstrainedImageParameters() > 0) {
       sprintf(buf, "\n   Constrained Image Parameters: %6d",
-                         m_bundleStatistics.numberConstrainedImageParameters());
+                         m_bundleResults.numberConstrainedImageParameters());
       fp_out << buf;
     }
 
     sprintf(buf, "\n                       Unknowns: %6d",
-                                           m_bundleStatistics.numberUnknownParameters());
+                                           m_bundleResults.numberUnknownParameters());
     fp_out << buf;
 
     if (nInnerConstraints > 0) {
@@ -4066,15 +4045,15 @@ namespace Isis {
       fp_out << buf;
     }
 
-    sprintf(buf, "\n                         Sigma0: %30.20lf\n", m_bundleStatistics.sigma0());
+    sprintf(buf, "\n                         Sigma0: %30.20lf\n", m_bundleResults.sigma0());
     fp_out << buf;
     sprintf(buf, " Error Propagation Elapsed Time: %6.4lf (seconds)\n",
-                   m_bundleStatistics.elapsedTimeErrorProp());
+                   m_bundleResults.elapsedTimeErrorProp());
     fp_out << buf;
     sprintf(buf, "             Total Elapsed Time: %6.4lf (seconds)\n",
-                               m_bundleStatistics.elapsedTime());
+                               m_bundleResults.elapsedTime());
     fp_out << buf;
-    if (m_bundleStatistics.numberObservations() + m_bundleStatistics.numberRejectedObservations()
+    if (m_bundleResults.numberObservations() + m_bundleResults.numberRejectedObservations()
          > 100) {  //if there was enough data to calculate percentiles and box plot data
       sprintf(buf, "\n           Residual Percentiles:\n");
       fp_out << buf;
@@ -4084,14 +4063,14 @@ namespace Isis {
       try {
         for (int bin = 1;bin < 34;bin++) {
           //double quan =
-          //    m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(double(bin)/100);
+          //    m_bundleResults.residualsCumulativeProbabilityDistribution().value(double(bin)/100);
           double cumProb = double(bin) / 100.0;
           double resValue =
-               m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb);
+               m_bundleResults.residualsCumulativeProbabilityDistribution().value(cumProb);
           double resValue33 =
-              m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb + 0.33);
+              m_bundleResults.residualsCumulativeProbabilityDistribution().value(cumProb + 0.33);
           double resValue66 =
-              m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(cumProb + 0.66);
+              m_bundleResults.residualsCumulativeProbabilityDistribution().value(cumProb + 0.66);
           sprintf(buf, "                 Percentile %3d: %+8.3lf"
                        "                 Percentile %3d: %+8.3lf"
                        "                 Percentile %3d: %+8.3lf\n",
@@ -4109,19 +4088,19 @@ namespace Isis {
         sprintf(buf, "\n              Residual Box Plot:");
         fp_out << buf;
         sprintf(buf, "\n                        minimum: %+8.3lf",
-                m_bundleStatistics.residualsCumulativeProbabilityDistribution().min());
+                m_bundleResults.residualsCumulativeProbabilityDistribution().min());
         fp_out << buf;
         sprintf(buf, "\n                     Quartile 1: %+8.3lf",
-                m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.25));
+                m_bundleResults.residualsCumulativeProbabilityDistribution().value(0.25));
         fp_out << buf;
         sprintf(buf, "\n                         Median: %+8.3lf",
-                m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.50));
+                m_bundleResults.residualsCumulativeProbabilityDistribution().value(0.50));
         fp_out << buf;
         sprintf(buf, "\n                     Quartile 3: %+8.3lf",
-                m_bundleStatistics.residualsCumulativeProbabilityDistribution().value(0.75));
+                m_bundleResults.residualsCumulativeProbabilityDistribution().value(0.75));
         fp_out << buf;
         sprintf(buf, "\n                        maximum: %+8.3lf\n",
-                m_bundleStatistics.residualsCumulativeProbabilityDistribution().max());
+                m_bundleResults.residualsCumulativeProbabilityDistribution().max());
         fp_out << buf;
       }
       catch (IException &e) {
@@ -4140,9 +4119,9 @@ namespace Isis {
     for (int i = 0; i < nImages; i++) {
       // imageIndex(i) retrieves index into the normal equations matrix
       // for Image(i)
-      double rmsSampleResiduals = m_bundleStatistics.rmsImageSampleResiduals()[i].Rms();
-      double rmsLineResiduals = m_bundleStatistics.rmsImageLineResiduals()[i].Rms();
-      double rmsLandSResiduals = m_bundleStatistics.rmsImageResiduals()[i].Rms();
+      double rmsSampleResiduals = m_bundleResults.rmsImageSampleResiduals()[i].Rms();
+      double rmsLineResiduals = m_bundleResults.rmsImageLineResiduals()[i].Rms();
+      double rmsLandSResiduals = m_bundleResults.rmsImageResiduals()[i].Rms();
 
       nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
       nRejectedMeasures =
@@ -4164,7 +4143,7 @@ namespace Isis {
       }
       fp_out << buf;
     }
-// emit statusUpdate(QString("SerialNumberList in outputHeader:") + QString::number(m_pSnList->Size()));
+
     return true;
   }
 
@@ -4185,12 +4164,12 @@ namespace Isis {
     char buf[1056];
     BundleObservation *observation = NULL;
 
-    int nObservations = m_BundleObservations.size();
+    int nObservations = m_bundleObservations.size();
 
     outputHeader(fp_out);
 
     bool berrorProp = false;
-    if (m_bundleStatistics.converged() && m_bundleSettings.errorPropagation())
+    if (m_bundleResults.converged() && m_bundleSettings.errorPropagation())
       berrorProp = true;
 
     // output image exterior orientation header
@@ -4201,10 +4180,10 @@ namespace Isis {
 
     for (int i = 0; i < nObservations; i++) {
 
-      //if ( m_bundleStatistics.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+      //if ( m_bundleResults.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
       //    bHeld = true;
 
-      observation = m_BundleObservations.at(i);
+      observation = m_bundleObservations.at(i);
       if (!observation)
         continue;
 
@@ -4232,48 +4211,48 @@ namespace Isis {
     }
         
     // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
-    m_bundleStatistics.setCorrMatImgsAndParams(imagesAndParameters);
+    m_bundleResults.setCorrMatImgsAndParams(imagesAndParameters);
 
     // Save list of images and their associated parameters for CorrelationMatrix to use in ice.
-    m_bundleStatistics.setCorrMatImgsAndParams(imagesAndParameters);
+    m_bundleResults.setCorrMatImgsAndParams(imagesAndParameters);
 
     // output point uncertainty statistics if error propagation is on
     if (berrorProp) {
       sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
       fp_out << buf;
       sprintf(buf, " RMS Sigma Latitude(m)%20.8lf\n",
-              m_bundleStatistics.rmsSigmaLat());
+              m_bundleResults.sigmaLatitudeStatisticsRms());
       fp_out << buf;
       sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
-              m_bundleStatistics.minSigmaLatitude(),
-              m_bundleStatistics.minSigmaLatitudePointId().toAscii().data());
+              m_bundleResults.minSigmaLatitudeDistance().meters(),
+              m_bundleResults.minSigmaLatitudePointId().toAscii().data());
       fp_out << buf;
       sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
-              m_bundleStatistics.maxSigmaLatitude(),
-              m_bundleStatistics.maxSigmaLatitudePointId().toAscii().data());
+              m_bundleResults.maxSigmaLatitudeDistance().meters(),
+              m_bundleResults.maxSigmaLatitudePointId().toAscii().data());
       fp_out << buf;
       sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n",
-              m_bundleStatistics.rmsSigmaLon());
+              m_bundleResults.sigmaLongitudeStatisticsRms());
       fp_out << buf;
       sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
-              m_bundleStatistics.minSigmaLongitude(),
-              m_bundleStatistics.minSigmaLongitudePointId().toAscii().data());
+              m_bundleResults.minSigmaLongitudeDistance().meters(),
+              m_bundleResults.minSigmaLongitudePointId().toAscii().data());
       fp_out << buf;
       sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
-              m_bundleStatistics.maxSigmaLongitude(),
-              m_bundleStatistics.maxSigmaLongitudePointId().toAscii().data());
+              m_bundleResults.maxSigmaLongitudeDistance().meters(),
+              m_bundleResults.maxSigmaLongitudePointId().toAscii().data());
       fp_out << buf;
       if ( m_bundleSettings.solveRadius() ) {
         sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n",
-                m_bundleStatistics.rmsSigmaRad());
+                m_bundleResults.sigmaRadiusStatisticsRms());
         fp_out << buf;
         sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
-                m_bundleStatistics.minSigmaRadius(),
-                m_bundleStatistics.minSigmaRadiusPointId().toAscii().data());
+                m_bundleResults.minSigmaRadiusDistance().meters(),
+                m_bundleResults.minSigmaRadiusPointId().toAscii().data());
         fp_out << buf;
         sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
-                m_bundleStatistics.maxSigmaRadius(),
-                m_bundleStatistics.maxSigmaRadiusPointId().toAscii().data());
+                m_bundleResults.maxSigmaRadiusDistance().meters(),
+                m_bundleResults.maxSigmaRadiusPointId().toAscii().data());
         fp_out << buf;
       }
       else {
@@ -4292,9 +4271,9 @@ namespace Isis {
             "        Latitude       Longitude          Radius\n", "");
     fp_out << buf;
 
-    int nPoints = m_BundleControlPoints.size();
+    int nPoints = m_bundleControlPoints.size();
     for (int i = 0; i < nPoints; i++) {
-      BundleControlPoint *bundleControlPoint = m_BundleControlPoints.at(i);
+      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
 
       QString pointSummaryString =
           bundleControlPoint->formatBundleOutputSummaryString(berrorProp);
@@ -4306,7 +4285,7 @@ namespace Isis {
     fp_out << buf;
 
     for (int i = 0; i < nPoints; i++) {
-      BundleControlPoint *bundleControlPoint = m_BundleControlPoints.at(i);
+      BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
 
       QString pointDetailString =
           bundleControlPoint->formatBundleOutputDetailString(berrorProp, m_dRTM);
@@ -4333,7 +4312,7 @@ namespace Isis {
     if (!fp_out)
       return false;
 
-    int nPoints = m_BundleControlPoints.size();
+    int nPoints = m_bundleControlPoints.size();
 
     double dLat, dLon, dRadius;
     double dX, dY, dZ;
@@ -4364,7 +4343,7 @@ namespace Isis {
     fp_out << buf;
 
     for (int i = 0; i < nPoints; i++) {
-      BundleControlPoint *bundlecontrolpoint = m_BundleControlPoints.at(i);
+      BundleControlPoint *bundlecontrolpoint = m_bundleControlPoints.at(i);
 
       const ControlPoint *point = bundlecontrolpoint->getRawControlPoint();
 
@@ -4387,7 +4366,7 @@ namespace Isis {
       dResidualRms = point->GetResidualRms();
 
       // point corrections and initial sigmas
-      bounded_vector<double,3>& corrections = bundlecontrolpoint->corrections();
+      bounded_vector<double,3> corrections = bundlecontrolpoint->corrections();
       cor_lat_m = corrections[0]*m_dRTM;
       cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
       cor_rad_m  = corrections[2]*1000.0;
@@ -4476,7 +4455,7 @@ namespace Isis {
         Camera *pCamera = measure->Camera();
         if (!pCamera)
           continue;
-// emit statusUpdate(QString("SerialNumberList in outputResiduals:") + QString::number(m_pSnList->Size()));
+
         // Determine the image index
         nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
 
@@ -4763,7 +4742,7 @@ namespace Isis {
 
     for (int i = 0; i < nImages; i++) {
 
-      //if (m_bundleStatistics.numberHeldImages() > 0 &&
+      //if (m_bundleResults.numberHeldImages() > 0 &&
       //    m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
       //  bHeld = true;
 
@@ -4776,7 +4755,7 @@ namespace Isis {
       nIndex = imageIndex(i) ;
 
       if (m_bundleSettings.errorPropagation()
-          && m_bundleStatistics.converged()
+          && m_bundleResults.converged()
           && m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
         vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
       }
@@ -4827,26 +4806,26 @@ namespace Isis {
 
       // add rms of sample, line, total image coordinate residuals
       output_columns.push_back(
-          toString(m_bundleStatistics.rmsImageSampleResiduals()[i].Rms()));
+          toString(m_bundleResults.rmsImageSampleResiduals()[i].Rms()));
       output_columns.push_back(
-          toString(m_bundleStatistics.rmsImageLineResiduals()[i].Rms()));
+          toString(m_bundleResults.rmsImageLineResiduals()[i].Rms()));
       output_columns.push_back(
-          toString(m_bundleStatistics.rmsImageResiduals()[i].Rms()));
+          toString(m_bundleResults.rmsImageResiduals()[i].Rms()));
 
       int nSigmaIndex = 0;
       if (m_nNumberCamPosCoefSolved > 0) {
         for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
 
             if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
 
@@ -4855,7 +4834,7 @@ namespace Isis {
           output_columns.push_back(toString(coefX[j]));
           output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma));
           }
           else {
@@ -4866,15 +4845,15 @@ namespace Isis {
         }
         for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
 
@@ -4883,7 +4862,7 @@ namespace Isis {
           output_columns.push_back(toString(coefY[j]));
           output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(
                 toString(dSigma));
           }
@@ -4895,15 +4874,15 @@ namespace Isis {
         }
         for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
 
@@ -4912,7 +4891,7 @@ namespace Isis {
           output_columns.push_back(toString(coefZ[j]));
           output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma));
           }
           else {
@@ -4943,15 +4922,15 @@ namespace Isis {
       if (m_nNumberCamAngleCoefSolved > 0) {
         for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
 
@@ -4960,7 +4939,7 @@ namespace Isis {
           output_columns.push_back(toString(coefRA[j] * RAD2DEG));
           output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma * RAD2DEG));
           }
           else {
@@ -4971,15 +4950,15 @@ namespace Isis {
         }
         for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
+              dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
             else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
+              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
 
@@ -4988,7 +4967,7 @@ namespace Isis {
           output_columns.push_back(toString(coefDEC[j] * RAD2DEG));
           output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma * RAD2DEG));
           }
           else {
@@ -5007,15 +4986,15 @@ namespace Isis {
         else {
           for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
 
-            if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+            if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
               if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
                 dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
               }
               else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-                dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleStatistics.sigma0();
+                dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
               }
               else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleStatistics.sigma0();
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
               }
             }
 
@@ -5024,7 +5003,7 @@ namespace Isis {
             output_columns.push_back(toString(coefTWI[j] * RAD2DEG));
             output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
 
-            if (m_bundleSettings.errorPropagation() && m_bundleStatistics.converged()) {
+            if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
               output_columns.push_back(toString(dSigma * RAD2DEG));
             }
             else {
@@ -5114,16 +5093,16 @@ namespace Isis {
     }
     else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
       vector <double> imageAdjustedSigmas = m_Image_AdjustedSigmas.at(imageIndex);
-      sigma = sqrt(imageAdjustedSigmas[sigmaIndex]) * m_bundleStatistics.sigma0();
+      sigma = sqrt(imageAdjustedSigmas[sigmaIndex]) * m_bundleResults.sigma0();
     }
     else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-      sigma = sqrt((double)(m_Normals(normalEquationIndex, normalEquationIndex))) * m_bundleStatistics.sigma0();
+      sigma = sqrt((double)(m_Normals(normalEquationIndex, normalEquationIndex))) * m_bundleResults.sigma0();
     }
     return sigma;
   }
 #endif
   bool BundleAdjust::isConverged() {
-    return m_bundleStatistics.converged();
+    return m_bundleResults.converged();
   }
 
 
@@ -5135,4 +5114,218 @@ namespace Isis {
     status += "\n";
     printf(status.toStdString().c_str());
   }
+
+
+
+  /**
+   * Compute Bundle statistics. 
+   *  
+   * Sets: 
+   * m_rmsImageSampleResiduals 
+   * m_rmsImageLineResiduals 
+   * m_rmsImageResiduals 
+   * 
+   * m_rmsImageXSigmas     UNUSED???
+   * m_rmsImageYSigmas     UNUSED???
+   * m_rmsImageZSigmas     UNUSED???
+   * m_rmsImageRASigmas    UNUSED???
+   * m_rmsImageDECSigmas   UNUSED???
+   * m_rmsImageTWISTSigmas UNUSED???
+   *  
+   * m_maxSigmaLatitude 
+   * m_maxSigmaLatitudePointId 
+   * m_maxSigmaLongitude 
+   * m_maxSigmaLongitudePointId 
+   * m_maxSigmaRadius 
+   * m_maxSigmaRadiusPointId
+   *                       
+   * m_minSigmaLatitude   
+   * m_minSigmaLatitudePointId  
+   * m_minSigmaLongitude  
+   * m_minSigmaLongitudePointId 
+   * m_minSigmaRadius     
+   * m_minSigmaRadiusPointId    
+   *  
+   * m_rmsSigmaLat
+   * m_rmsSigmaLon
+   * m_rmsSigmaRad
+   *  
+   *  
+   *  Needed:
+   * SerialNumberList *snList, ControlNet *cnet, bool errorPropagation,
+   * bool solveRadius 
+   *
+   *
+   */
+  bool BundleAdjust::computeBundleStatistics() {
+
+    // use qvectors so that we can set the size.
+    // this will be useful later when adding data.
+    // data may added out of index order
+    int numberImages = m_pSnList->Size();
+    QVector<Statistics> rmsImageSampleResiduals(numberImages);
+    QVector<Statistics> rmsImageLineResiduals(numberImages);
+    QVector<Statistics> rmsImageResiduals(numberImages);
+
+    int numObjectPoints = m_pCnet->GetNumPoints();
+    for (int i = 0; i < numObjectPoints; i++) {
+
+      const ControlPoint *point = m_pCnet->GetPoint(i);
+      if (point->IsIgnored()) {
+        continue;
+      }
+
+      if (point->IsRejected()) {
+        continue;
+      }
+
+      int numMeasures = point->GetNumMeasures();
+      for (int j = 0; j < numMeasures; j++) {
+
+        const ControlMeasure *measure = point->GetMeasure(j);
+        if (measure->IsIgnored()) {
+          continue;
+        }
+
+        if (measure->IsRejected()) {
+          continue;
+        }
+
+        double sampleResidual = fabs(measure->GetSampleResidual());
+        double lineResidual = fabs(measure->GetLineResidual());
+
+        // Determine the index for this measure's serial number
+        int imageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+
+        // add residual data to the statistics object at the appropriate serial number index
+        rmsImageSampleResiduals[imageIndex].AddData(sampleResidual);
+        rmsImageLineResiduals[imageIndex].AddData(lineResidual);
+        rmsImageResiduals[imageIndex].AddData(lineResidual);
+        rmsImageResiduals[imageIndex].AddData(sampleResidual);
+      }
+    }
+
+
+    if (m_bundleSettings.errorPropagation()) {
+
+      // initialize lat/lon/rad boundaries
+      Distance minSigmaLatDist;
+      QString  minSigmaLatPointId = "";
+      
+      Distance maxSigmaLatDist;
+      QString  maxSigmaLatPointId = "";
+      
+      Distance minSigmaLonDist;
+      QString  minSigmaLonPointId = "";
+      
+      Distance maxSigmaLonDist;
+      QString  maxSigmaLonPointId = "";
+      
+      Distance minSigmaRadDist;
+      QString  minSigmaRadPointId = "";
+      
+      Distance maxSigmaRadDist;
+      QString  maxSigmaRadPointId = "";
+      
+      // compute stats for point sigmas
+      Statistics sigmaLatStats;
+      Statistics sigmaLonStats;
+      Statistics sigmaRadStats;
+
+      Distance sigmaLatDist, sigmaLonDist, sigmaRadDist;
+
+      int nPoints = m_pCnet->GetNumPoints();
+      for (int i = 0; i < nPoints; i++) {
+
+        const ControlPoint *point = m_pCnet->GetPoint(i);
+        if (point->IsIgnored()) {
+          continue;
+        }
+
+        sigmaLatDist = point->GetAdjustedSurfacePoint().GetLatSigmaDistance();
+        sigmaLonDist = point->GetAdjustedSurfacePoint().GetLonSigmaDistance();
+        sigmaRadDist = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma();
+
+        sigmaLatStats.AddData(sigmaLatDist.meters());
+        sigmaLonStats.AddData(sigmaLonDist.meters());
+        sigmaRadStats.AddData(sigmaRadDist.meters());
+
+        if (i == 0) {
+          // initialize min/max to current dist
+
+          maxSigmaLatDist = sigmaLatDist;
+          minSigmaLatDist = sigmaLatDist;
+
+          maxSigmaLonDist = sigmaLonDist;
+          minSigmaLonDist = sigmaLonDist;
+
+          QString initialPointId = point->GetId();
+          maxSigmaLatPointId = initialPointId;
+          maxSigmaLonPointId = initialPointId;
+          minSigmaLatPointId = initialPointId;
+          minSigmaLonPointId = initialPointId;
+
+          if (m_bundleSettings.solveRadius()) {
+            maxSigmaRadDist = sigmaRadDist;
+            minSigmaRadDist = sigmaRadDist;
+
+            maxSigmaRadPointId = initialPointId;
+            minSigmaRadPointId = initialPointId;
+          }
+        }
+        else {
+          if (sigmaLatDist > maxSigmaLatDist) {
+            maxSigmaLatDist = sigmaLatDist;
+            maxSigmaLatPointId = point->GetId();
+          }
+          if (sigmaLonDist > maxSigmaLonDist) {
+            maxSigmaLonDist = sigmaLonDist;
+            maxSigmaLonPointId = point->GetId();
+          }
+          if (m_bundleSettings.solveRadius()) {
+            if (sigmaRadDist > maxSigmaRadDist) {
+              maxSigmaRadDist = sigmaRadDist;
+              maxSigmaRadPointId = point->GetId();
+            }
+          }
+          if (sigmaLatDist < minSigmaLatDist) {
+            minSigmaLatDist = sigmaLatDist;
+            minSigmaLatPointId = point->GetId();
+          }
+          if (sigmaLonDist < minSigmaLonDist) {
+            minSigmaLonDist = sigmaLonDist;
+            minSigmaLonPointId = point->GetId();
+          }
+          if (m_bundleSettings.solveRadius()) {
+            if (sigmaRadDist < minSigmaRadDist) {
+              minSigmaRadDist = sigmaRadDist;
+              minSigmaRadPointId = point->GetId();
+            }
+          }
+        }
+      }
+
+      // update bundle results 
+      m_bundleResults.resizeSigmaStatisticsVectors(numberImages);
+
+      m_bundleResults.setSigmaLatitudeRange(minSigmaLatDist, maxSigmaLatDist,
+                                               minSigmaLatPointId, maxSigmaLatPointId);
+
+      m_bundleResults.setSigmaLongitudeRange(minSigmaLonDist, maxSigmaLonDist,
+                                                minSigmaLonPointId, maxSigmaLonPointId);
+
+      m_bundleResults.setSigmaRadiusRange(minSigmaRadDist, maxSigmaRadDist,
+                                             minSigmaRadPointId, maxSigmaRadPointId);
+
+      m_bundleResults.setRmsFromSigmaStatistics(sigmaLatStats.Rms(),
+                                                sigmaLonStats.Rms(),
+                                                sigmaRadStats.Rms());
+    }
+    m_bundleResults.setRmsImageResidualLists(rmsImageLineResiduals.toList(),
+                                                rmsImageSampleResiduals.toList(),
+                                                rmsImageResiduals.toList());
+
+    return true;
+  }
+
 }

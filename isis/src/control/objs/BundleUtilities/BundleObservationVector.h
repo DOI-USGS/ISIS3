@@ -32,21 +32,30 @@ namespace Isis {
 
   class BundleObservation;
   class BundleSettings;
+  /**
+   * @author 2014-05-22 Ken Edmundson
+   *
+   * @internal
+   *   @history 2014-05-22 Ken Edmundson - Original version.
+   *   @history 2015-02-20 Jeannie Backer - Brought closer to ISIS coding standards.
+   */
 
-  class BundleObservationVector : public QVector < BundleObservation* > {
+  class BundleObservationVector : public QVector < BundleObservation *> {
 
     public:
       BundleObservationVector();
+      BundleObservationVector(const BundleObservationVector &src);
       ~BundleObservationVector();
 
-      BundleObservation* addnew(BundleImage* image, QString observationNumber,
-                                QString instrumentId, BundleSettings& bundleSettings);
+      BundleObservationVector &operator=(const BundleObservationVector &src);
+      BundleObservation *addnew(BundleImage *image, QString observationNumber,
+                                QString instrumentId, BundleSettings &bundleSettings);
 
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
 
-      BundleObservation* getObservationByCubeSerialNumber(QString cubeSerialNumber);
+      BundleObservation *getObservationByCubeSerialNumber(QString cubeSerialNumber);
 
       bool initializeExteriorOrientation();
 

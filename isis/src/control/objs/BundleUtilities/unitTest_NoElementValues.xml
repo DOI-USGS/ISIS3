@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundleObservationSolveSettings>
+    <id></id>
+    <instrumentId></instrumentId>
+    <instrumentPointingOptions>
+        <aprioriPointingSigmas/>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions>
+        <aprioriPositionSigmas/>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings>

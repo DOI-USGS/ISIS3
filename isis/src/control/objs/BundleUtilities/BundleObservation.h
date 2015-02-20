@@ -44,73 +44,67 @@ namespace Isis {
    * @internal
    *   @history 2014-07-09 Ken Edmundson - Original version.
    *   @history 2014-07-16 Jeannie Backer - Replaced QVectors with QLists.
-   *  
-   */
-
-  /**
-   * @author 2014-??-?? Ken Edmundson
-   *
-   * @internal
    *   @history 2014-07-17 Kimberly Oyama - Added member variables and accessors for the images and
    *                           parameters in this observation. They will be used for the correlation
    *                           matrix.
    *   @history 2014-07-23 Jeannie Backer - Replaced QVectors with QLists.
+   *   @history 2015-02-20 Jeannie Backer - Brought closer to Isis coding standards.
    *
    */
-  class BundleObservation : public QVector< BundleImage* > {
+  class BundleObservation : public QVector< BundleImage  *> {
 
     public:
       // default constructor
       BundleObservation();
 
       // constructor
-      BundleObservation(BundleImage* image, QString observationNumber, QString instrumentId);
+      BundleObservation(BundleImage *image, QString observationNumber, QString instrumentId);
+
+      // copy constructor
+      BundleObservation(const BundleObservation &src);
 
       // destructor
       ~BundleObservation();
-
-    // copy constructor
-    BundleObservation(const BundleObservation& src);
-
-    // equals operator
-    BundleObservation& operator=(const BundleObservation &src);
-
-    // copy method
-    void copy(const BundleObservation& src);
-
-    bool setSolveSettings(BundleObservationSolveSettings solveSettings);
-
-    void setIndex(int n);
-    int index();
-
-    int numberPositionParameters();
-    int numberPointingParameters();
-    int numberParameters();
-
-    QString instrumentId();
-
-    SpiceRotation* spiceRotation();
-    SpicePosition* spicePosition();
-
-    boost::numeric::ublas::vector< double >& parameterWeights();
-    boost::numeric::ublas::vector< double >& parameterCorrections();
-    boost::numeric::ublas::vector< double >& parameterSolution();
-    boost::numeric::ublas::vector< double >& aprioriSigmas();
-    boost::numeric::ublas::vector< double >& adjustedSigmas();
-
-    const BundleObservationSolveSettings* solveSettings() { return m_solveSettings;} // TODO: implementation needs to be moved to cpp file per ISIS standards
+      
+      // equals operator
+      BundleObservation &operator=(const BundleObservation &src);
+      
+      // copy method
+      void copy(const BundleObservation &src);
+      
+      bool setSolveSettings(BundleObservationSolveSettings solveSettings);
+      
+      void setIndex(int n);
+      int index();
+      
+      int numberPositionParameters();
+      int numberPointingParameters();
+      int numberParameters();
+      
+      QString instrumentId();
+      
+      SpiceRotation *spiceRotation();
+      SpicePosition *spicePosition();
+      
+      boost::numeric::ublas::vector< double > &parameterWeights();
+      boost::numeric::ublas::vector< double > &parameterCorrections();
+      boost::numeric::ublas::vector< double > &parameterSolution();
+      boost::numeric::ublas::vector< double > &aprioriSigmas();
+      boost::numeric::ublas::vector< double > &adjustedSigmas();
+      
+      const BundleObservationSolveSettings *solveSettings();
 
 //    QStringList serialNumbers();
 
-    bool applyParameterCorrections(boost::numeric::ublas::vector<double> corrections);
-    bool initializeExteriorOrientation();
-
-    QString formatBundleOutputString(bool errorPropagation);
-    QStringList parameterList();
-    QStringList imageNames();
+      bool applyParameterCorrections(boost::numeric::ublas::vector<double> corrections);
+      bool initializeExteriorOrientation();
+      
+      QString formatBundleOutputString(bool errorPropagation);
+      QStringList parameterList();
+      QStringList imageNames();
 
     private:
-    bool initParameterWeights();
+      bool initParameterWeights();
 
     private:
       QString m_observationNumber; //!< this is typically equivalent to serial number
@@ -127,11 +121,12 @@ namespace Isis {
 
       QString m_instrumentId;      //!< spacecraft instrument id
 
-      BundleObservationSolveSettings* m_solveSettings; //!< solve settings for this observation
+      BundleObservationSolveSettings *m_solveSettings; //!< solve settings for this observation
 
-      SpiceRotation* m_instrumentRotation;   //!< Instrument spice rotation (in primary image)
-      SpicePosition* m_instrumentPosition;   //!< Instrument spice position (in primary image)
+      SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image)
+      SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image)
 
+    // TODO??? change these to LinearAlgebra vectors...
       boost::numeric::ublas::vector< double > m_weights;            //!< parameter weights
       boost::numeric::ublas::vector< double > m_corrections;        //!< cumulative parameter correction vector
       boost::numeric::ublas::vector< double > m_solution;           //!< parameter solution vector

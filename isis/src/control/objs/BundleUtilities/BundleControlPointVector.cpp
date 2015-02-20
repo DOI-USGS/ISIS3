@@ -30,9 +30,9 @@ namespace Isis {
   /**
    * add new BundleControlPoint method
    */
-  BundleControlPoint* BundleControlPointVector::addControlPoint(ControlPoint* point) {
+  BundleControlPoint *BundleControlPointVector::addControlPoint(ControlPoint *point) {
 
-    BundleControlPoint* bundleControlPoint = new BundleControlPoint(point);
+    BundleControlPoint *bundleControlPoint = new BundleControlPoint(point);
 
     append(bundleControlPoint);
 

@@ -503,7 +503,7 @@ namespace Isis {
     m_covarianceFileName  = new FileName(covarianceFileName);
 
     QString correlationFileName;
-    stream >>correlationFileName;
+    stream >> correlationFileName;
     delete m_correlationFileName;
     m_correlationFileName = NULL;
     m_correlationFileName = new FileName(correlationFileName);
@@ -516,7 +516,7 @@ namespace Isis {
     m_diagonals = new QList<double>(diagonals);
 
     QList<SparseBlockColumnMatrix> visibleBlocks;
-    stream << visibleBlocks;
+    stream >> visibleBlocks;
     delete m_visibleBlocks;
     m_visibleBlocks = NULL;
     m_visibleBlocks = new QList<SparseBlockColumnMatrix>(visibleBlocks);

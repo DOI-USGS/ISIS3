@@ -1,86 +1,862 @@
 Unit test for BundleUtilities... 
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Create a BundleControlPoint object... 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Testing BundleObservationSolveSettings... 
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Create a BundleControlPointVector object... 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Create a BundleImage object... 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Create a BundleMeasure object... 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Create a BundleObservation object... 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Create a BundleObservationSolveSettings object and test mutator methods... 
-Object = TestBundleObservationSolveSettings
-  InstrumentPointingSolveOption       = AnglesAndVelocity
+Printing PVL group with settings from the default constructor... 
+Object = DefaultBundleObservationSolveSettings
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
   SolveTwist                          = Yes
-  CKDegree                            = 1
-  CKSolveDegree                       = 1
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+Testing copy constructor... 
+Object = CopySettingsObject
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+Testing assignment operator to set this equal to itself... 
+Object = SelfAssignedSettingsObject
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+Testing assignment operator to create a new settings object... 
+Object = AssignedSettingsObject
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+Testing mutator methods... 
+setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings() 
+Object = MyInstrumentId
+  InstrumentPointingSolveOption       = AnglesAndVelocity
   NumberAngleCoefficientsSolved       = 2
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
   SolvePointingPolynomialOverExisting = No
   AngleAprioriSigmas                  = (3.0, 4.0)
   InstrumentPointingInterpolationType = 3
   InstrumentPositionSolveOption       = PositionOnly
-  SPKDegree                           = 6
-  SPKSolveDegree                      = 0
   NumberPositionCoefficientsSolved    = 1
+  SPKDegree                           = 2
+  SPKSolveDegree                      = 2
   SolvePositionOverHermiteSpline      = Yes
   PositionAprioriSigmas               = 800.0
   InstrumentPositionInterpolationType = 4
 End_Object
 
-Testing QDataStream write/read... 
-Object = TestBundleObservationSolveSettings
-  InstrumentPointingSolveOption       = AnglesAndVelocity
+setFromPvl() 
+Object = SettingsFromPvlGroup-SolveForNone
+  InstrumentPointingSolveOption       = None
+  NumberAngleCoefficientsSolved       = N/A
+  CKDegree                            = N/A
+  CKSolveDegree                       = N/A
+  SolveTwist                          = N/A
+  SolvePointingPolynomialOverExisting = N/A
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = N/A
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+Object = SettingsFromPvlGroup-SolveForAnglesPositions
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
   SolveTwist                          = Yes
-  CKDegree                            = 1
-  CKSolveDegree                       = 1
-  NumberAngleCoefficientsSolved       = 2
   SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = (3.0, 4.0)
+  AngleAprioriSigmas                  = N/A
   InstrumentPointingInterpolationType = 3
   InstrumentPositionSolveOption       = PositionOnly
-  SPKDegree                           = 6
-  SPKSolveDegree                      = 0
   NumberPositionCoefficientsSolved    = 1
+  SPKDegree                           = 2
+  SPKSolveDegree                      = 2
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = 3
+End_Object
+
+Object = SettingsFromPvlGroup-SolveForVelocities
+  InstrumentPointingSolveOption       = AnglesAndVelocity
+  NumberAngleCoefficientsSolved       = 2
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = (N/A, N/A)
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionAndVelocity
+  NumberPositionCoefficientsSolved    = 2
+  SPKDegree                           = 2
+  SPKSolveDegree                      = 2
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = (N/A, N/A)
+  InstrumentPositionInterpolationType = 3
+End_Object
+
+Object = SettingsFromPvlGroup-SolveForAccelerations
+  InstrumentPointingSolveOption       = AnglesVelocityAndAcceleration
+  NumberAngleCoefficientsSolved       = 3
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = (N/A, N/A, N/A)
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionVelocityAndAcceleration
+  NumberPositionCoefficientsSolved    = 3
+  SPKDegree                           = 2
+  SPKSolveDegree                      = 2
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = (N/A, N/A, N/A)
+  InstrumentPositionInterpolationType = 3
+End_Object
+
+Object = SettingsFromPvlGroup-SolveForAllCoefficients
+  InstrumentPointingSolveOption       = AllPolynomialCoefficients
+  NumberAngleCoefficientsSolved       = 6
+  CKDegree                            = 4
+  CKSolveDegree                       = 5
+  SolveTwist                          = No
+  SolvePointingPolynomialOverExisting = Yes
+  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
+  InstrumentPointingInterpolationType = 4
+  InstrumentPositionSolveOption       = AllPolynomialCoefficients
+  NumberPositionCoefficientsSolved    = 8
+  SPKDegree                           = 6
+  SPKSolveDegree                      = 7
   SolvePositionOverHermiteSpline      = Yes
-  PositionAprioriSigmas               = 800.0
+  PositionAprioriSigmas               = (8.0, 9.0, N/A)
   InstrumentPositionInterpolationType = 4
 End_Object
 
-Testing XML write/read... 
+Testing static unused enum-to-string and string-to-enum methods... 
+"None" 
+"AnglesOnly" 
+"AnglesAndVelocity" 
+"AnglesVelocityAndAcceleration" 
+"AllPolynomialCoefficients" 
+"None" 
+"PositionOnly" 
+"PositionAndVelocity" 
+"PositionVelocityAndAcceleration" 
+"AllPolynomialCoefficients" 
+
+Testing serialization... 
+Object = SerializedSettings
+  InstrumentPointingSolveOption       = AllPolynomialCoefficients
+  NumberAngleCoefficientsSolved       = 6
+  CKDegree                            = 4
+  CKSolveDegree                       = 5
+  SolveTwist                          = No
+  SolvePointingPolynomialOverExisting = Yes
+  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
+  InstrumentPointingInterpolationType = 4
+  InstrumentPositionSolveOption       = AllPolynomialCoefficients
+  NumberPositionCoefficientsSolved    = 8
+  SPKDegree                           = 6
+  SPKSolveDegree                      = 7
+  SolvePositionOverHermiteSpline      = Yes
+  PositionAprioriSigmas               = (8.0, 9.0, N/A)
+  InstrumentPositionInterpolationType = 4
+End_Object
+
+Testing XML: write XML from BundleObservationSolveSettings object... 
+Testing XML: read XML to BundleObservationSolveSettings object... 
+Object = FromXml-1
+  InstrumentPointingSolveOption       = None
+  NumberAngleCoefficientsSolved       = N/A
+  CKDegree                            = N/A
+  CKSolveDegree                       = N/A
+  SolveTwist                          = N/A
+  SolvePointingPolynomialOverExisting = N/A
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = N/A
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+Testing XML: read XML to BundleObservationSolveSettings object... 
+Object = FromXml-2
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionOnly
+  NumberPositionCoefficientsSolved    = 1
+  SPKDegree                           = 2
+  SPKSolveDegree                      = 2
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = 3
+End_Object
+
+Testing XML: read XML to BundleObservationSolveSettings object... 
+Object = FromXml-3
+  InstrumentPointingSolveOption       = AnglesAndVelocity
+  NumberAngleCoefficientsSolved       = 2
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = (N/A, N/A)
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionAndVelocity
+  NumberPositionCoefficientsSolved    = 2
+  SPKDegree                           = 2
+  SPKSolveDegree                      = 2
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = (N/A, N/A)
+  InstrumentPositionInterpolationType = 3
+End_Object
+
+Testing XML: read XML to BundleObservationSolveSettings object... 
+Object = FromXml-4
+  InstrumentPointingSolveOption       = AnglesVelocityAndAcceleration
+  NumberAngleCoefficientsSolved       = 3
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = (N/A, N/A, N/A)
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = PositionVelocityAndAcceleration
+  NumberPositionCoefficientsSolved    = 3
+  SPKDegree                           = 2
+  SPKSolveDegree                      = 2
+  SolvePositionOverHermiteSpline      = No
+  PositionAprioriSigmas               = (N/A, N/A, N/A)
+  InstrumentPositionInterpolationType = 3
+End_Object
+
+Testing XML: read XML to BundleObservationSolveSettings object... 
 Object = FromXml
-  InstrumentPointingSolveOption       = AnglesAndVelocity
-  SolveTwist                          = Yes
-  CKDegree                            = 1
-  CKSolveDegree                       = 1
-  NumberAngleCoefficientsSolved       = 2
-  SolvePointingPolynomialOverExisting = No
-  AngleAprioriSigmas                  = (3.0, 4.0)
-  InstrumentPointingInterpolationType = 3
-  InstrumentPositionSolveOption       = PositionOnly
+  InstrumentPointingSolveOption       = AllPolynomialCoefficients
+  NumberAngleCoefficientsSolved       = 6
+  CKDegree                            = 4
+  CKSolveDegree                       = 5
+  SolveTwist                          = No
+  SolvePointingPolynomialOverExisting = Yes
+  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
+  InstrumentPointingInterpolationType = 4
+  InstrumentPositionSolveOption       = AllPolynomialCoefficients
+  NumberPositionCoefficientsSolved    = 8
   SPKDegree                           = 6
-  SPKSolveDegree                      = 0
-  NumberPositionCoefficientsSolved    = 1
+  SPKSolveDegree                      = 7
   SolvePositionOverHermiteSpline      = Yes
-  PositionAprioriSigmas               = 800.0
+  PositionAprioriSigmas               = (8.0, 9.0, N/A)
   InstrumentPositionInterpolationType = 4
 End_Object
 
+Testing XML: read XML with no attributes or values to object... 
+Object = DefaultSettingsFromEmptyXml
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+Testing error throws... 
+**ERROR** Unknown bundle instrument pointing solve option Nonsense.
+**PROGRAMMER ERROR** Unknown pointing solve option enum [-1].
+**ERROR** Unknown bundle instrument position solve option Nonsense.
+**PROGRAMMER ERROR** Unknown position solve option enum [-2].
+**USER ERROR** Unable to set bundle adjust options from the given PVL.
+**USER ERROR** The OVERHERMITE parameter must be a valid boolean value.
+**USER ERROR** Unable to set bundle adjust options from the given PVL.
+**USER ERROR** OVEREXISTING parameter must be a valid boolean value.
+**USER ERROR** Unable to set bundle adjust options from the given PVL.
+**USER ERROR** The TWIST parameter must be a valid boolean value.
+
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Create a BundleObservationVector object... 
+Testing BundleImage... 
+Constructing BundleImage object from null camera... 
+setting null parentBundleObservation to BundleImage... 
+Access camera and parentObservation ... 
+serial number =  "TestImageSerialNumber" 
+file name     =  "TestImageFileName" 
+Testing copy constructor... 
+serial number =  "TestImageSerialNumber" 
+file name     =  "TestImageFileName" 
+Testing assignment operator to set this equal to itself... 
+serial number =  "TestImageSerialNumber" 
+file name     =  "TestImageFileName" 
+Testing assignment operator to create a new object... 
+serial number =  "TestImageSerialNumber" 
+file name     =  "TestImageFileName" 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Testing BundleObservation... 
+Constructing empty BundleObservation object... 
+Constructing BundleObservation object from BundleImage... 
+Testing assignment operator to set this equal to itself... 
+Testing assignment operator to create a new object... 
+Testing copy constructor... 
+Testing mutators and accessors... 
+    Set/get solve settings using with CAMESOLVE=NONE... 
+Object = NoCamAngles
+  InstrumentPointingSolveOption       = None
+  NumberAngleCoefficientsSolved       = N/A
+  CKDegree                            = N/A
+  CKSolveDegree                       = N/A
+  SolveTwist                          = N/A
+  SolvePointingPolynomialOverExisting = N/A
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = N/A
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+    output bundle observation... 
+"" 
+"" 
+    Set solve settings using with TWIST=FALSE... 
+Object = NoTwist
+  InstrumentPointingSolveOption       = AllPolynomialCoefficients
+  NumberAngleCoefficientsSolved       = 6
+  CKDegree                            = 4
+  CKSolveDegree                       = 5
+  SolveTwist                          = No
+  SolvePointingPolynomialOverExisting = Yes
+  AngleAprioriSigmas                  = (1.0, N/A, 3.0)
+  InstrumentPointingInterpolationType = 4
+  InstrumentPositionSolveOption       = AllPolynomialCoefficients
+  NumberPositionCoefficientsSolved    = 8
+  SPKDegree                           = 6
+  SPKSolveDegree                      = 7
+  SolvePositionOverHermiteSpline      = Yes
+  PositionAprioriSigmas               = (8.0, 9.0, N/A)
+  InstrumentPositionInterpolationType = 4
+End_Object
+
+    output bundle observation... 
+"  X  (t0)       0.00000000           0.00000000          0.00000000        8.00000000        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000        9.00000000        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t6)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t7)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+  Y  (t0)       0.00000000           0.00000000          0.00000000        8.00000000        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000        9.00000000        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t6)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t7)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+  Z  (t0)       0.00000000           0.00000000          0.00000000        8.00000000        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000        9.00000000        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t6)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t7)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+ RA  (t0)       0.00000000           0.00000000          0.00000000        1.00000000        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000        3.00000000        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+DEC  (t0)       0.00000000           0.00000000          0.00000000        1.00000000        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000        3.00000000        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+" 
+"  X  (t0)       0.00000000           0.00000000          0.00000000        8.00000000               N/A
+     (t1)       0.00000000           0.00000000          0.00000000        9.00000000               N/A
+     (t2)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t6)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t7)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+  Y  (t0)       0.00000000           0.00000000          0.00000000        8.00000000               N/A
+     (t1)       0.00000000           0.00000000          0.00000000        9.00000000               N/A
+     (t2)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t6)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t7)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+  Z  (t0)       0.00000000           0.00000000          0.00000000        8.00000000               N/A
+     (t1)       0.00000000           0.00000000          0.00000000        9.00000000               N/A
+     (t2)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t6)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t7)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+ RA  (t0)       0.00000000           0.00000000          0.00000000        1.00000000               N/A
+     (t1)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t2)       0.00000000           0.00000000          0.00000000        3.00000000               N/A
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+DEC  (t0)       0.00000000           0.00000000          0.00000000        1.00000000               N/A
+     (t1)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t2)       0.00000000           0.00000000          0.00000000        3.00000000               N/A
+     (t3)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t4)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+     (t5)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+" 
+    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE... 
+Object = SettingsFromBundleObservation
+  InstrumentPointingSolveOption       = AnglesOnly
+  NumberAngleCoefficientsSolved       = 1
+  CKDegree                            = 2
+  CKSolveDegree                       = 2
+  SolveTwist                          = Yes
+  SolvePointingPolynomialOverExisting = No
+  AngleAprioriSigmas                  = N/A
+  InstrumentPointingInterpolationType = 3
+  InstrumentPositionSolveOption       = None
+  NumberPositionCoefficientsSolved    = N/A
+  SPKDegree                           = N/A
+  SPKSolveDegree                      = N/A
+  SolvePositionOverHermiteSpline      = N/A
+  PositionAprioriSigmas               = N/A
+  InstrumentPositionInterpolationType = N/A
+End_Object
+
+index =  "1" 
+instrument id =  "InstrumentId2" 
+number parameters =      "3" 
+number position param =  "0" 
+number pointing param =  "3" 
+parameter list:  () 
+image names:     () 
+"parameter weights :     0.0     0.0     0.0     
+parameter corrections : 0.0     0.0     0.0     
+parameter solution    : 0.0     0.0     0.0     
+apriori sigmas :        -1.0     -1.0     -1.0     
+adjusted sigmas :       0.0     0.0     0.0     " 
+    output bundle observation... 
+" RA  (t0)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+DEC  (t0)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+TWI  (t0)       0.00000000           0.00000000          0.00000000       -1.00000000               N/A
+" 
+" RA  (t0)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+DEC  (t0)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+TWI  (t0)       0.00000000           0.00000000          0.00000000       -1.00000000        0.00000000
+" 
+init exterior orientiation successful?   "Yes" 
+apply param corrections successful?      "Yes" 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Testing BundleObservationVector... 
+
+number of position parameters:  "0" 
+number of pointing parameters:  "0" 
+number of parameters:  "0" 
+init exterior orientiation successful?   "Yes" 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Testing BundleControlPoint... 
+Create FreePoint with free point containing 2 measures... 
+"       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
+" 
+" Label: FreePoint
+Status: FREE
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE             Null           0.00000000          0.00000000                Null               N/A               N/A
+ LONGITUDE             Null           0.00000000          0.00000000                Null               N/A               N/A
+    RADIUS             Null           0.00000000          0.00000000                Null               N/A               N/A
+
+" 
+"       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
+" 
+" Label: FreePoint
+Status: FREE
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE             Null           0.00000000          0.00000000                Null               N/A               N/A
+ LONGITUDE             Null           0.00000000          0.00000000                Null               N/A               N/A
+    RADIUS             Null           0.00000000          0.00000000                Null               N/A               N/A
+
+" 
+
+Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure() 
+"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FreePoint
+Status: FREE
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+Modify FreePoint - setWeights() - solveRadius=false 
+"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FreePoint
+Status: FREE
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+aprioriSigmas:   0 0 0 
+weights:         0 0 1e+50 
+corrections:     0 0 0 
+adjustedSigmas:  0 0 0 
+nicVector:       0 0 0 
+qMatrix: 
+ New Block 
+
+
+Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0 
+"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FreePoint
+Status: FREE
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+aprioriSigmas:   0 0 0 
+weights:         0 0 1e+50 
+
+Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0 
+"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FreePoint
+Status: FREE
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000        2.00000000               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000        3.00000000               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
+
+" 
+aprioriSigmas:   2 3 4 
+weights:         25 11.1111 62500 
+
+Raw control point equal to original?     "Yes" 
+Raw control point is rejected?           "No" 
+Adjusted SurfacePoint (Lat, Lon, Rad) =  "0.0" "0.0" "10.0" 
+
+Create FixedPoint from empty fixed point, adjusted surface point (90, 180, 10)... 
+"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FixedPoint
+Status: FIXED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      90.00000000           0.00000000          0.00000000         90.00000000               N/A               N/A
+ LONGITUDE     180.00000000           0.00000000          0.00000000        180.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+Modify FixedPoint - setWeights() 
+"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FixedPoint
+Status: FIXED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      90.00000000           0.00000000          0.00000000         90.00000000               N/A               N/A
+ LONGITUDE     180.00000000           0.00000000          0.00000000        180.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+aprioriSigmas:   0 0 0 
+weights:         1e+50 1e+50 1e+50 
+
+Create ConstrainedPoint from empty constrained point, surface point (0, 0, 10)... 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: ConstrainedPoint
+Status: CONSTRAINED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+Modify ConstrainedPoint - setWeights() - solveRadius=false 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: ConstrainedPoint
+Status: CONSTRAINED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+aprioriSigmas:   0 0 0 
+weights:         0 0 1e+50 
+
+Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad <= 0 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: ConstrainedPoint
+Status: CONSTRAINED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+aprioriSigmas:   0 0 0 
+weights:         0 0 1e+50 
+
+Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad > 0 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: ConstrainedPoint
+Status: CONSTRAINED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000        2.00000000               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000        3.00000000               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
+
+" 
+aprioriSigmas:   2 3 4 
+weights:         25 11.1111 62500 
+
+
+Create ConstrainedPoint from constrained point with adjusted surface point (32, 120, 1000)... 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+" 
+" Label: ConstrainedPoint
+Status: CONSTRAINED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000               N/A       28.65696503
+ LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000               N/A       36.78815890
+    RADIUS       1.00000000           0.00000000          0.00000000          1.00000000               N/A       38.45488734
+
+" 
+Modify ConstrainedPoint - setWeights() - solveRadius=t, lat/lon/rad constrained 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+" 
+" Label: ConstrainedPoint
+Status: CONSTRAINED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000       28.65696495       28.65696503
+ LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000       36.78815884       36.78815890
+    RADIUS       1.00000000           0.00000000          0.00000000          1.00000000       38.45488734       38.45488734
+
+" 
+aprioriSigmas:   28.657 36.7882 38.4549 
+weights:         1217.7 1027.41 676.234 
+
+Create copy of FreePoint using copy constructor... 
+"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FreePoint
+Status: FREE
+  Rays: 2 of 2
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE       0.00000000           0.00000000          0.00000000          0.00000000        2.00000000               N/A
+ LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000        3.00000000               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
+
+" 
+
+Overwrite existing object with FixedPoint information... 
+"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+" 
+" Label: FixedPoint
+Status: FIXED
+  Rays: 0 of 0
+
+     Point         Initial               Total               Total              Final             Initial             Final
+Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
+                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
+  LATITUDE      90.00000000           0.00000000          0.00000000         90.00000000               N/A               N/A
+ LONGITUDE     180.00000000           0.00000000          0.00000000        180.00000000               N/A               N/A
+    RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
+
+" 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Testing BundleControlPointVector... 
+FreePoint 
+"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+" 
+FixedPoint 
+"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+" 
+"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+" 
+ConstrainedPoint 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+" 
+"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+" 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Testing BundleMeasure... 
+rejected? "No" 
+measure sample  "0.0" 
+measure line    "0.0" 
+measure serial number "Ignored" 
+focal x "-1.79769313486231e+308" 
+focal y "-1.79769313486231e+308" 
+observation index "0" 
+
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 

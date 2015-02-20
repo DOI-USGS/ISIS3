@@ -41,7 +41,7 @@
 #include "BundleObservationVector.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
-#include "BundleStatistics.h"
+#include "BundleSolutionInfo.h"
 #include "Camera.h"
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
@@ -166,12 +166,12 @@ namespace Isis {
    *   @history 2013-11-12 Ken Edmundson - Programmers Note. References #813, #1521, #1653
    *                           #813 - Info echoed to screen when using Maximum Likelihood
    *                                  methods are now printed to print.prt file.
-   *                          #1521 - The cout debug statements that appear on screen when updating
-   *                                  images were removed from SpiceRotation.cpp
-   *                          #1653 - Constraints were being applied for "Free" points that have
-   *                                  constrained coordinates. Also found that a priori coordinates
-   *                                  for these points were not being computed in
-   *                                  ControlPoint::ComputeApriori, this has also been fixed.
+   *                           #1521 - The cout debug statements that appear on screen when updating
+   *                                   images were removed from SpiceRotation.cpp
+   *                           #1653 - Constraints were being applied for "Free" points that have
+   *                                   constrained coordinates. Also found that a priori coordinates
+   *                                   for these points were not being computed in
+   *                                   ControlPoint::ComputeApriori, this has also been fixed.
    *   @history 2013-12-18 Tracie Sucharski - The ControlNet::GetNumberOfMeasuresInImage was
    *                           renamed to ControlNet::GetNumberOfValidMeasuresInImage and only
    *                           returns the number of valid (Ignore= False) measures.
@@ -188,8 +188,8 @@ namespace Isis {
    *   @history 2014-09-18 Kimberly Oyama - Added a constructor for running the bunlde in a
    *                           separate thread.
    *   @history 2014-11-05 Ken Edmundson - Fixed memory bug. Wasn't releasing cholmod_factor m_L
-   *                         every iteration. Now release every iteration but the last since we
-   *                         need m_L for error propagation. References #2189.
+   *                           every iteration. Now release every iteration but the last since we
+   *   @history 2015-02-20 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -227,7 +227,7 @@ namespace Isis {
       ~BundleAdjust();
     
       double           solve();
-      BundleResults    solveCholeskyBR();
+      BundleSolutionInfo    solveCholeskyBR();
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     public slots:
       bool             solveCholesky();
@@ -261,7 +261,7 @@ namespace Isis {
 
     signals:
       void statusUpdate(QString);
-      void resultsReady(BundleResults *bundleResults);
+      void resultsReady(BundleSolutionInfo *bundleSolveInformation);
 
     public slots:
       void outputBundleStatus(QString status);
@@ -282,13 +282,13 @@ namespace Isis {
       // output methods
       void iterationSummary();
       bool output();
-      bool outputHeader(std::ofstream & fp_out);
+      bool outputHeader(std::ofstream  &fp_out);
       bool outputText();
       bool outputPointsCSV();
       bool outputImagesCSV();
       bool outputResiduals();
       bool wrapUp();
-      BundleResults bundleResults();
+      BundleSolutionInfo bundleSolveInformation();
       bool computeBundleStatistics();
 
       void initialize();
@@ -302,24 +302,24 @@ namespace Isis {
       bool formNormalEquations_CHOLMOD();
 
       bool formNormals1_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double,
-                                boost::numeric::ublas::upper > & N22,
-                                SparseBlockColumnMatrix & N12,
-                                boost::numeric::ublas::compressed_vector< double > & n1,
-                                boost::numeric::ublas::vector< double > & n2,
-                                boost::numeric::ublas::matrix< double > & coeff_image,
-                                boost::numeric::ublas::matrix< double > & coeff_point3D,
-                                boost::numeric::ublas::vector< double > & coeff_RHS,
+                                boost::numeric::ublas::upper >  &N22,
+                                SparseBlockColumnMatrix  &N12,
+                                boost::numeric::ublas::compressed_vector< double >  &n1,
+                                boost::numeric::ublas::vector< double >  &n2,
+                                boost::numeric::ublas::matrix< double >  &coeff_image,
+                                boost::numeric::ublas::matrix< double >  &coeff_point3D,
+                                boost::numeric::ublas::vector< double >  &coeff_RHS,
                                 int observationIndex);
 
       bool formNormals2_CHOLMOD(boost::numeric::ublas::symmetric_matrix< double,
-                                boost::numeric::ublas::upper > & N22,
-                                SparseBlockColumnMatrix & N12,
-                                boost::numeric::ublas::vector< double > & n2,
-                                boost::numeric::ublas::vector< double > & nj,
+                                boost::numeric::ublas::upper >  &N22,
+                                SparseBlockColumnMatrix  &N12,
+                                boost::numeric::ublas::vector< double >  &n2,
+                                boost::numeric::ublas::vector< double >  &nj,
                                 BundleControlPoint *point);
 
-      bool formNormals3_CHOLMOD(boost::numeric::ublas::compressed_vector< double > & n1,
-                                boost::numeric::ublas::vector< double > & nj);
+      bool formNormals3_CHOLMOD(boost::numeric::ublas::compressed_vector< double >  &n1,
+                                boost::numeric::ublas::vector< double >  &nj);
 
       bool solveSystem_CHOLMOD();
 
@@ -339,24 +339,24 @@ namespace Isis {
       bool formNormalEquations_SPECIALK();
 
       bool formNormals1_SPECIALK(boost::numeric::ublas::symmetric_matrix< double,
-                                 boost::numeric::ublas::upper > & N22,
-                                 boost::numeric::ublas::matrix< double > & N12,
-                                 boost::numeric::ublas::compressed_vector< double > & n1,
-                                 boost::numeric::ublas::vector< double > & n2,
-                                 boost::numeric::ublas::matrix< double > & coeff_image,
-                                 boost::numeric::ublas::matrix< double > & coeff_point3D,
-                                 boost::numeric::ublas::vector< double > & coeff_RHS,
+                                 boost::numeric::ublas::upper >  &N22,
+                                 boost::numeric::ublas::matrix< double >  &N12,
+                                 boost::numeric::ublas::compressed_vector< double >  &n1,
+                                 boost::numeric::ublas::vector< double >  &n2,
+                                 boost::numeric::ublas::matrix< double >  &coeff_image,
+                                 boost::numeric::ublas::matrix< double >  &coeff_point3D,
+                                 boost::numeric::ublas::vector< double >  &coeff_RHS,
                                  int nImageIndex);
 
       bool formNormals2_SPECIALK(boost::numeric::ublas::symmetric_matrix< double,
-                                 boost::numeric::ublas::upper > & N22,
-                                 boost::numeric::ublas::matrix< double > & N12,
-                                 boost::numeric::ublas::vector< double > & n2,
-                                 boost::numeric::ublas::vector< double > & nj,
+                                 boost::numeric::ublas::upper >  &N22,
+                                 boost::numeric::ublas::matrix< double >  &N12,
+                                 boost::numeric::ublas::vector< double >  &n2,
+                                 boost::numeric::ublas::vector< double >  &nj,
                                  int nPointIndex, int i);
 
-      bool formNormals3_SPECIALK(boost::numeric::ublas::compressed_vector< double > & n1,
-                                 boost::numeric::ublas::vector< double > & nj);
+      bool formNormals3_SPECIALK(boost::numeric::ublas::compressed_vector< double >  &n1,
+                                 boost::numeric::ublas::vector< double >  &nj);
 
       bool solveSystem_SPECIALK();
 
@@ -381,37 +381,37 @@ namespace Isis {
       bool CholeskyUT_NOSQR_BackSub(
                                     boost::numeric::ublas::symmetric_matrix< double,
                                     boost::numeric::ublas::upper,
-                                    boost::numeric::ublas::column_major > & m,
-                                    boost::numeric::ublas::vector< double > & s,
-                                    boost::numeric::ublas::vector< double > & rhs);
+                                    boost::numeric::ublas::column_major >  &m,
+                                    boost::numeric::ublas::vector< double >  &s,
+                                    boost::numeric::ublas::vector< double >  &rhs);
 
-//      bool computePartials_DC(boost::numeric::ublas::matrix< double > & coeff_image,
-//                              boost::numeric::ublas::matrix< double > & coeff_point3D,
-//                              boost::numeric::ublas::vector< double > & coeff_RHS,
+//      bool computePartials_DC(boost::numeric::ublas::matrix< double >  &coeff_image,
+//                              boost::numeric::ublas::matrix< double >  &coeff_point3D,
+//                              boost::numeric::ublas::vector< double >  &coeff_RHS,
 //                              const ControlMeasure &measure, const ControlPoint &point);
-      bool computePartials_DC(boost::numeric::ublas::matrix< double > & coeff_image,
-                              boost::numeric::ublas::matrix< double > & coeff_point3D,
-                              boost::numeric::ublas::vector< double > & coeff_RHS,
+      bool computePartials_DC(boost::numeric::ublas::matrix< double >  &coeff_image,
+                              boost::numeric::ublas::matrix< double >  &coeff_point3D,
+                              boost::numeric::ublas::vector< double >  &coeff_RHS,
                               BundleMeasure &measure, BundleControlPoint &point);
 
-//      bool CholeskyUT_NOSQR_BackSub(symmetric_matrix<double,lower>& m, vector<double>& s, vector<double>& rhs);
+//      bool CholeskyUT_NOSQR_BackSub(symmetric_matrix<double,lower> &m, vector<double> &s, vector<double> &rhs);
       double computeResiduals();
 
       // dedicated matrix functions
-      void AmulttransBNZ(boost::numeric::ublas::matrix< double > & A,
-                         boost::numeric::ublas::compressed_matrix< double > & B,
-                         boost::numeric::ublas::matrix< double > & C, double alpha = 1.0);
-      void ANZmultAdd(boost::numeric::ublas::compressed_matrix< double > & A,
+      void AmulttransBNZ(boost::numeric::ublas::matrix< double >  &A,
+                         boost::numeric::ublas::compressed_matrix< double >  &B,
+                         boost::numeric::ublas::matrix< double >  &C, double alpha = 1.0);
+      void ANZmultAdd(boost::numeric::ublas::compressed_matrix< double >  &A,
                       boost::numeric::ublas::symmetric_matrix< double,
-                      boost::numeric::ublas::upper, boost::numeric::ublas::column_major > & B,
-                      boost::numeric::ublas::matrix< double > & C, double alpha = 1.0);
+                      boost::numeric::ublas::upper, boost::numeric::ublas::column_major >  &B,
+                      boost::numeric::ublas::matrix< double >  &C, double alpha = 1.0);
 
       bool Invert_3x3(boost::numeric::ublas::symmetric_matrix< double,
-                      boost::numeric::ublas::upper > & m);
+                      boost::numeric::ublas::upper >  &m);
 
       bool product_ATransB(boost::numeric::ublas::symmetric_matrix< double,
-                           boost::numeric::ublas::upper > & N22, SparseBlockColumnMatrix & N12,
-                           SparseBlockRowMatrix & Q);
+                           boost::numeric::ublas::upper >  &N22, SparseBlockColumnMatrix  &N12,
+                           SparseBlockRowMatrix  &Q);
       void product_AV(double alpha, boost::numeric::ublas::bounded_vector< double, 3 > &v2,
                       SparseBlockRowMatrix &Q, boost::numeric::ublas::vector< double > &v1);
 
@@ -444,13 +444,13 @@ namespace Isis {
       double m_dError;                                  //!< error
 
 
-      BundleObservationVector m_BundleObservations;
-      BundleControlPointVector m_BundleControlPoints;
+      BundleObservationVector m_bundleObservations;
+      BundleControlPointVector m_bundleControlPoints;
 
 //       BundleObservationSolveSettings m_boss;
       double m_dRTM;                                    //!< radians to meters conversion factor (body specific)
       double m_dMTR;                                    //!< meters to radians conversion factor (body specific)
-      Distance m_BodyRadii[3];                          //!< body radii i meters
+      Distance m_bodyRadii[3];                          //!< body radii i meters
 
       QString m_strCnetFileName;                        //!< Control Net file specification
 
@@ -497,7 +497,8 @@ Statistics m_Statsy;                       //!<  y errors
 Statistics m_Statsrx;                      //!<  x residuals
 Statistics m_Statsry;                      //!<  y residuals
 Statistics m_Statsrxy;                     //!< xy residuals
-    BundleStatistics m_bundleStatistics;
+    BundleResults m_bundleResults;
+//    BundleSolutionInfo m_bundleSolveInformation;
   };
 }
 

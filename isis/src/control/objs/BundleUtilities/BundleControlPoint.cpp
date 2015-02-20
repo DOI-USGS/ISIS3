@@ -1,11 +1,14 @@
 #include "BundleControlPoint.h"
 
+#include <QDebug>
+
 #include "BundleMeasure.h"
 #include "BundleSettings.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
 
@@ -16,11 +19,12 @@ namespace Isis {
     m_controlPoint = controlPoint;
 
     // setup vector of BundleMeasures for this control point
-    int nMeasures = controlPoint->GetNumMeasures();
-    for (int i = 0; i < nMeasures; i++) {
-      ControlMeasure* controlMeasure = controlPoint->GetMeasure(i);
-      if (controlMeasure->IsIgnored())
+    int numMeasures = controlPoint->GetNumMeasures();
+    for (int i = 0; i < numMeasures; i++) {
+      ControlMeasure *controlMeasure = controlPoint->GetMeasure(i);
+      if (controlMeasure->IsIgnored()) {
         continue;
+      }
 
       addMeasure(controlMeasure);      
     }
@@ -37,7 +41,7 @@ namespace Isis {
   /**
    * copy constructor
    */
-  BundleControlPoint::BundleControlPoint(const BundleControlPoint& src) {
+  BundleControlPoint::BundleControlPoint(const BundleControlPoint &src) {
     copy(src);
   }
 
@@ -54,7 +58,7 @@ namespace Isis {
   /**
    * copy method
    */
-  void BundleControlPoint::copy(const BundleControlPoint& src) {
+  void BundleControlPoint::copy(const BundleControlPoint &src) {
 
     // sanity check
     qDeleteAll(*this);
@@ -62,16 +66,16 @@ namespace Isis {
 
     m_controlPoint = src.m_controlPoint;
 
-    int nMeasures = src.size();
+    int numMeasures = src.size();
 
-    for(int i = 0; i < nMeasures; i++)
+    for(int i = 0; i < numMeasures; i++)
       append(new BundleMeasure(*(src.at(i))));
 
     m_corrections = src.m_corrections;
     m_aprioriSigmas = src.m_aprioriSigmas;
     m_adjustedSigmas = src.m_adjustedSigmas;
     m_weights = src.m_weights;
-    m_nicVector = m_nicVector;
+    m_nicVector = src.m_nicVector;
   }
 
 
@@ -85,29 +89,10 @@ namespace Isis {
   }
 
 
-  bool BundleControlPoint::isRejected() {
-    return m_controlPoint->IsRejected();
-  }
-
-
-  int BundleControlPoint::numberMeasures() {
-    return m_controlPoint->GetNumMeasures();
-  }
-
-
-  SurfacePoint BundleControlPoint::getAdjustedSurfacePoint() const {
-    return m_controlPoint->GetAdjustedSurfacePoint();
-  }
-
-
   void BundleControlPoint::setAdjustedSurfacePoint(SurfacePoint surfacePoint) {
     m_controlPoint->SetAdjustedSurfacePoint(surfacePoint);
   }
 
-
-  QString BundleControlPoint::getId() const {
-    return m_controlPoint->GetId();
-  }
 
   void BundleControlPoint::setWeights(const BundleSettings *settings, double metersToRadians) {
 
@@ -121,20 +106,23 @@ namespace Isis {
       m_weights[0] = 1.0e+50;
       m_weights[1] = 1.0e+50;
       m_weights[2] = 1.0e+50;
+      // m_aprioriSigmas = 0.0 ???
     }
-    else if (m_controlPoint->GetType() == ControlPoint::Free) {
+    if (m_controlPoint->GetType() == ControlPoint::Free) {
       if ( globalLatitudeAprioriSigma > 0.0 ) {
         m_aprioriSigmas[0] = globalLatitudeAprioriSigma;
         d = globalLatitudeAprioriSigma*metersToRadians;
         m_weights[0] = 1.0/(d*d);
-      }
+      } // else m_aprioriSigmas = m_weights = 0.0 ???
       if ( globalLongitudeAprioriSigma > 0.0 ) {
         m_aprioriSigmas[1] = globalLongitudeAprioriSigma;
         d = globalLongitudeAprioriSigma*metersToRadians;
         m_weights[1] = 1.0/(d*d);
-      }
-      if (!settings->solveRadius())
+      } // else m_aprioriSigmas = m_weights = 0.0 ???
+      if (!settings->solveRadius()) {
+        // m_aprioriSigmas = 0.0 ???
         m_weights[2] = 1.0e+50;
+      }
       else {
         if ( globalRadiusAprioriSigma > 0.0 ) {
           m_aprioriSigmas[2] = globalRadiusAprioriSigma;
@@ -143,7 +131,7 @@ namespace Isis {
         }
       }
     }
-    else if (m_controlPoint->GetType() == ControlPoint::Constrained) {
+    if (m_controlPoint->GetType() == ControlPoint::Constrained) {
       if ( m_controlPoint->IsLatitudeConstrained() ) {
         m_aprioriSigmas[0] = m_controlPoint->GetAprioriSurfacePoint().GetLatSigmaDistance().meters();
         m_weights[0] = m_controlPoint->GetAprioriSurfacePoint().GetLatWeight();
@@ -152,7 +140,7 @@ namespace Isis {
         m_aprioriSigmas[0] = globalLatitudeAprioriSigma;
         d = globalLatitudeAprioriSigma*metersToRadians;
         m_weights[0] = 1.0/(d*d);
-      }
+      } // else not constrained and global sigma is Null, then  m_aprioriSigmas = m_weights = 0.0 ???
 
       if ( m_controlPoint->IsLongitudeConstrained() ) {
         m_aprioriSigmas[1] = m_controlPoint->GetAprioriSurfacePoint().GetLonSigmaDistance().meters();
@@ -162,10 +150,12 @@ namespace Isis {
         m_aprioriSigmas[1] = globalLongitudeAprioriSigma;
         d = globalLongitudeAprioriSigma*metersToRadians;
         m_weights[1] = 1.0/(d*d);
-      }
+      } // else not constrained and global sigma is Null, then  m_aprioriSigmas = m_weights = 0.0 ???
 
-      if (!settings->solveRadius())
+      if (!settings->solveRadius()) {
+        // m_aprioriSigmas = 0.0 ???
         m_weights[2] = 1.0e+50;
+      }
       else {
         if ( m_controlPoint->IsRadiusConstrained() ) {
           m_aprioriSigmas[2] = m_controlPoint->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters();
@@ -175,192 +165,286 @@ namespace Isis {
           m_aprioriSigmas[2] = globalRadiusAprioriSigma;
           d = globalRadiusAprioriSigma*0.001;
           m_weights[2] = 1.0/(d*d);
-        }
+        } // else not constrained and global sigma is Null, then  m_aprioriSigmas = m_weights = 0.0 ???
       }
     }
   }
 
-  boost::numeric::ublas::bounded_vector< double, 3 >& BundleControlPoint::corrections() {
+
+
+  ControlPoint *BundleControlPoint::getRawControlPoint() const {
+    return m_controlPoint;
+  }
+
+
+
+  bool BundleControlPoint::isRejected() const {
+    return m_controlPoint->IsRejected();
+  }
+
+
+
+  int BundleControlPoint::numberMeasures() const {
+    return m_controlPoint->GetNumMeasures();
+  }
+
+
+
+  SurfacePoint BundleControlPoint::getAdjustedSurfacePoint() const {
+    return m_controlPoint->GetAdjustedSurfacePoint();
+  }
+
+
+
+  QString BundleControlPoint::getId() const {
+    return m_controlPoint->GetId();
+  }
+
+
+
+  // ??? why bounded vector ??? can we use linear algebra vector ??? 
+  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::corrections() const {
     return m_corrections;
   }
 
-  boost::numeric::ublas::bounded_vector< double, 3 >& BundleControlPoint::aprioriSigmas() {
+
+
+  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() const {
     return m_aprioriSigmas;
 
   }
 
-  boost::numeric::ublas::bounded_vector< double, 3 >& BundleControlPoint::weights() {
+
+
+  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() const {
+    return m_adjustedSigmas;
+  }
+
+
+
+  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() const {
     return m_weights;
   }
 
-  ControlPoint *BundleControlPoint::getRawControlPoint() {
-    return m_controlPoint;
+
+
+  const boost::numeric::ublas::bounded_vector<double, 3> &BundleControlPoint::nicVector() const {
+    return m_nicVector;
   }
 
-  QString BundleControlPoint::formatBundleOutputSummaryString(bool errorPropagation) {
 
-    int nRays           = m_controlPoint->GetNumMeasures();
-    int nGoodRays       = nRays - m_controlPoint->GetNumberOfRejectedMeasures();
-    double dResidualRms = m_controlPoint->GetResidualRms();
-    double dLat         = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    double dLon         = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    double dRadius      = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().meters();
 
-    QString typeString = m_controlPoint->GetPointTypeString().toUpper();
-
-    QString qStr = QString("%1%2%3 of %4%5%6%7%8%9%10%11\n").
-        arg(m_controlPoint->GetId(), 16).
-        arg(typeString, 15).
-        arg(nGoodRays, 5).
-        arg(nRays).
-        arg(dResidualRms, 6, 'f', 2).
-        arg(dLat, 16, 'f', 8).
-        arg(dLon, 16, 'f', 8).
-        arg(dRadius * 0.001, 16, 'f', 8).
-        arg(formatLatitudeAdjustedSigmaString(16,8,errorPropagation)).
-        arg(formatLongitudeAdjustedSigmaString(16,8,errorPropagation)).
-        arg(formatRadiusAdjustedSigmaString(16,8,errorPropagation));
-
-    return qStr;
+  const SparseBlockRowMatrix &BundleControlPoint::cholmod_QMatrix() const {
+    return m_cholmod_QMatrix;
   }
+
+
+
+  QString BundleControlPoint::formatBundleOutputSummaryString(bool errorPropagation) const {
+
+    int numRays        = numberMeasures(); // should this depend on the raw point, as written, or this->size()???
+    int numGoodRays    = numRays - m_controlPoint->GetNumberOfRejectedMeasures();
+    double residualRms = m_controlPoint->GetResidualRms();
+    double lat         = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
+    double lon         = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
+    double rad         = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
+
+    QString pointType = m_controlPoint->GetPointTypeString().toUpper();
+
+    QString output = QString("%1%2%3 of %4%5%6%7%8%9%10%11\n")
+                             .arg(getId(), 16)
+                             .arg(pointType, 15)
+                             .arg(numGoodRays, 5)
+                             .arg(numRays)
+                             .arg(formatValue(residualRms, 6, 2))
+                             .arg(formatValue(lat, 16, 8)) // deg
+                             .arg(formatValue(lon, 16, 8)) // deg
+                             .arg(formatValue(rad, 16, 8)) // km
+                             .arg(formatLatitudeAdjustedSigmaString(16,8,errorPropagation))  // m
+                             .arg(formatLongitudeAdjustedSigmaString(16,8,errorPropagation)) // m
+                             .arg(formatRadiusAdjustedSigmaString(16,8,errorPropagation));   // m
+
+    return output;
+  }
+
 
 
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
-                                                             double RTM) {
+                                                             double RTM) const {
 
-    int nRays           = m_controlPoint->GetNumMeasures();
-    int nGoodRays       = nRays - m_controlPoint->GetNumberOfRejectedMeasures();
-    double dLat         = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    double dLon         = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    double dRadius      = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().meters();
+    int numRays     = numberMeasures();
+    int numGoodRays = numRays - m_controlPoint->GetNumberOfRejectedMeasures();
+    double lat      = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
+    double lon      = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
+    double rad      = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
 
+    // ??? corrections is always zero ??? never set in this class ???
     // point corrections and initial sigmas
     double cor_lat_dd = m_corrections(0) * RAD2DEG;                // lat correction, decimal degs
     double cor_lon_dd = m_corrections(1) * RAD2DEG;                // lon correction, decimal degs
     double cor_rad_m  = m_corrections(2) * 1000.0;                 // radius correction, meters
 
+
     double cor_lat_m = m_corrections(0) * RTM;                     // lat correction, meters
-    double cor_lon_m = m_corrections(1) * RTM * cos(dLat*DEG2RAD); // lon correction, meters
+    double cor_lon_m = m_corrections(1) * RTM * cos(lat*DEG2RAD);  // lon correction, meters
 
-    double dLatInit = dLat - cor_lat_dd;
-    double dLonInit = dLon - cor_lon_dd;
-    double dRadiusInit = dRadius - (m_corrections(2) * 1000.0);
+    double latInit = Isis::Null;
+    if (!IsSpecial(lat)) {
+      latInit = lat - cor_lat_dd;
+    }
 
-    QString typeString = m_controlPoint->GetPointTypeString().toUpper();
 
-    QString finalqStr;
+    double lonInit = Isis::Null;
+    if (!IsSpecial(lon)) {
+      lonInit = lon - cor_lon_dd;
+    }
 
-    finalqStr = QString(" Label: %1\nStatus: %2\n  Rays: %3 of %4\n").arg(m_controlPoint->GetId()).
-        arg(typeString).
-        arg(nGoodRays).
-        arg(nRays);
+    double radInit = Isis::Null;
+    if (!IsSpecial(rad)) {
+      radInit = rad - m_corrections(2); // km
+    }
 
-    QString qStr = "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
-            "Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy\n"
-            "                 (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)\n";
-    finalqStr += qStr;
+    QString pointType = m_controlPoint->GetPointTypeString().toUpper();
 
-    finalqStr += QString("  LATITUDE%1%2%3%4%5%6\n").arg(dLatInit, 17, 'f', 8).
-        arg(cor_lat_dd, 21, 'f', 8).
-        arg(cor_lat_m, 20, 'f', 8).
-        arg(dLat, 20, 'f', 8).
-        arg(formatLatitudeAprioriSigmaString(18,8)).
-        arg(formatLatitudeAdjustedSigmaString(18,8,errorPropagation));
+    QString output;
 
-    finalqStr += QString(" LONGITUDE%1%2%3%4%5%6\n").arg(dLonInit, 17, 'f', 8).
-        arg(cor_lon_dd, 21, 'f', 8).
-        arg(cor_lon_m, 20, 'f', 8).
-        arg(dLon, 20, 'f', 8).
-        arg(formatLongitudeAprioriSigmaString(18,8)).
-        arg(formatLongitudeAdjustedSigmaString(18,8,errorPropagation));
+    output = QString(" Label: %1\nStatus: %2\n  Rays: %3 of %4\n")
+                        .arg(getId())
+                        .arg(pointType)
+                        .arg(numGoodRays)
+                        .arg(numRays);
 
-    finalqStr += QString("    RADIUS%1%2%3%4%5%6\n\n").arg(dRadiusInit * 0.001, 17, 'f', 8).
-        arg(m_corrections(2), 21, 'f', 8).
-        arg(cor_rad_m, 20, 'f', 8).
-        arg(dRadius * 0.001, 20, 'f', 8).
-        arg(formatRadiusAprioriSigmaString(18,8)).
-        arg(formatRadiusAdjustedSigmaString(18,8,errorPropagation));
+    QString labels = "\n     Point         Initial               Total               Total        "
+                     "      Final             Initial             Final\n"
+                     "Coordinate          Value             Correction          Correction        "
+                     "    Value             Accuracy          Accuracy\n"
+                     "                 (dd/dd/km)           (dd/dd/km)           (Meters)         "
+                     "  (dd/dd/km)          (Meters)          (Meters)\n";
+    output += labels;
 
-    return finalqStr;
+    output += QString("  LATITUDE%1%2%3%4%5%6\n")
+                      .arg(formatValue(latInit, 17, 8))                               // deg
+                      .arg(formatValue(cor_lat_dd, 21, 8))                            // deg
+                      .arg(formatValue(cor_lat_m, 20, 8))                             // m 
+                      .arg(formatValue(lat, 20, 8))                                   // deg
+                      .arg(formatLatitudeAprioriSigmaString(18,8))                    // m 
+                      .arg(formatLatitudeAdjustedSigmaString(18,8,errorPropagation)); // m 
+
+    output += QString(" LONGITUDE%1%2%3%4%5%6\n")
+                      .arg(formatValue(lonInit, 17, 8))                                // deg
+                      .arg(formatValue(cor_lon_dd, 21, 8))                             // deg
+                      .arg(formatValue(cor_lon_m, 20, 8))                              // m
+                      .arg(formatValue(lon, 20, 8))                                    // deg
+                      .arg(formatLongitudeAprioriSigmaString(18,8))                    // m
+                      .arg(formatLongitudeAdjustedSigmaString(18,8,errorPropagation)); // m
+
+    output += QString("    RADIUS%1%2%3%4%5%6\n\n")
+                      .arg(formatValue(radInit, 17, 8))                             // km
+                      .arg(formatValue(m_corrections(2), 21, 8))                    // km
+                      .arg(formatValue(cor_rad_m, 20, 8))                           // m
+                      .arg(formatValue(rad, 20, 8))                                 // km
+                      .arg(formatRadiusAprioriSigmaString(18,8))                    // m
+                      .arg(formatRadiusAdjustedSigmaString(18,8,errorPropagation)); // m
+
+    return output;
   }
 
 
-  QString BundleControlPoint::formatLatitudeAprioriSigmaString(int fieldWidth, int precision) {
-    QString qLatAprioriSigmaStr;
-    if (m_aprioriSigmas(0) == 0.0)
-      qLatAprioriSigmaStr = QString("%1").arg("N/A",fieldWidth);
-    else
-      qLatAprioriSigmaStr = QString("%1").arg(m_aprioriSigmas(0), fieldWidth, 'f', precision);
 
-    return qLatAprioriSigmaStr;
+  QString BundleControlPoint::formatValue(double value, int fieldWidth, int precision) const {
+    QString output;
+    IsNullPixel(value) ? 
+      output = QString("%1").arg("Null", fieldWidth) :
+      output = QString("%1").arg(value, fieldWidth, 'f', precision);
+    return output;
   }
 
 
-  QString BundleControlPoint::formatLongitudeAprioriSigmaString(int fieldWidth, int precision) {
-    QString qLonAprioriSigmaStr;
-    if (m_aprioriSigmas(1) == 0.0)
-      qLonAprioriSigmaStr = QString("%1").arg("N/A",fieldWidth);
-    else
-      qLonAprioriSigmaStr = QString("%1").arg(m_aprioriSigmas(1), fieldWidth, 'f', precision);
 
-    return qLonAprioriSigmaStr;
+  QString BundleControlPoint::formatAprioriSigmaString(int type, int fieldWidth, 
+                                                       int precision) const {
+    QString aprioriSigmaStr;
+    double sigma = m_aprioriSigmas[type];
+    if (sigma == 0) { // if globalAprioriSigma <= 0 (including Isis::NUll), then m_aprioriSigmas = 0 
+      aprioriSigmaStr = QString("%1").arg("N/A", fieldWidth);
+    }
+    else {
+      aprioriSigmaStr = QString("%1").arg(sigma, fieldWidth, 'f', precision);
+    }
+    return aprioriSigmaStr;
   }
 
 
-  QString BundleControlPoint::formatRadiusAprioriSigmaString(int fieldWidth, int precision) {
-    QString qRadAprioriSigmaStr;
-    if (m_aprioriSigmas(2) == 0.0)
-      qRadAprioriSigmaStr = QString("%1").arg("N/A",fieldWidth);
-    else
-      qRadAprioriSigmaStr = QString("%1").arg(m_aprioriSigmas(2), fieldWidth, 'f', precision);
 
-    return qRadAprioriSigmaStr;
+  QString BundleControlPoint::formatLatitudeAprioriSigmaString(int fieldWidth, 
+                                                               int precision) const {
+    return formatAprioriSigmaString(0, fieldWidth, precision);
   }
+
+
+
+  QString BundleControlPoint::formatLongitudeAprioriSigmaString(int fieldWidth, 
+                                                                int precision) const {
+    return formatAprioriSigmaString(1, fieldWidth, precision);
+  }
+
+
+
+  QString BundleControlPoint::formatRadiusAprioriSigmaString(int fieldWidth, int precision) const {
+    return formatAprioriSigmaString(2, fieldWidth, precision);
+  }
+
+
+
+  QString BundleControlPoint::formatAdjustedSigmaString(int type, int fieldWidth, int precision,
+                                                        bool errorPropagation) const {
+    QString adjustedSigmaStr;
+
+    if (!errorPropagation) {
+      adjustedSigmaStr = QString("%1").arg("N/A",fieldWidth);
+    }
+    else {
+      double sigma = Isis::Null;
+      if (type == 0) {
+        sigma = m_controlPoint->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
+      }
+      if (type == 1) {
+        sigma = m_controlPoint->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
+      }
+      if (type == 2) {
+        sigma = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
+      }
+      if (IsNullPixel(sigma)) {
+        adjustedSigmaStr = QString("%1").arg("N/A",fieldWidth);
+      }
+      else {
+        adjustedSigmaStr = QString("%1").arg(sigma, fieldWidth, 'f', precision);
+      }
+    }
+
+    return adjustedSigmaStr;
+  }
+
 
 
   QString BundleControlPoint::formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
-                                                                bool errorPropagation) {
-    QString qLatAdjustedSigmaStr;
-
-    if (!errorPropagation)
-      qLatAdjustedSigmaStr = QString("%1").arg("N/A",fieldWidth);
-    else {
-      double dSigmaLat = m_controlPoint->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
-      qLatAdjustedSigmaStr = QString("%1").arg(dSigmaLat, fieldWidth, 'f', precision);
-    }
-
-    return qLatAdjustedSigmaStr;
+                                                                bool errorPropagation) const {
+    return formatAdjustedSigmaString(0, fieldWidth, precision, errorPropagation);
   }
+
 
 
   QString BundleControlPoint::formatLongitudeAdjustedSigmaString(int fieldWidth, int precision,
-                                                                 bool errorPropagation) {
-    QString qLonAdjustedSigmaStr;
-
-    if (!errorPropagation)
-      qLonAdjustedSigmaStr = QString("%1").arg("N/A",fieldWidth);
-    else {
-      double dSigmaLon = m_controlPoint->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
-      qLonAdjustedSigmaStr = QString("%1").arg(dSigmaLon, fieldWidth, 'f', precision);
-    }
-
-    return qLonAdjustedSigmaStr;
+                                                                 bool errorPropagation) const {
+    return formatAdjustedSigmaString(1, fieldWidth, precision, errorPropagation);
   }
 
 
+
   // TODO: what do we do if we're not solving for radius, how do we know that here?????????????????
-  // TODO: dSigmaRad is not == 0.0, if not solving for radius it's like something crazy e-22
+  // TODO: sigma is not == 0.0, if not solving for radius it's like something crazy e-22
   QString BundleControlPoint::formatRadiusAdjustedSigmaString(int fieldWidth, int precision,
-                                                              bool errorPropagation) {
-    QString qRadAdjustedSigmaStr;
-    double dSigmaRad = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
-
-    if (!errorPropagation)
-      qRadAdjustedSigmaStr = QString("%1").arg("N/A",fieldWidth);
-    else {
-      qRadAdjustedSigmaStr = QString("%1").arg(dSigmaRad, fieldWidth, 'f', precision);
-    }
-
-    return qRadAdjustedSigmaStr;
+                                                              bool errorPropagation) const {
+    return formatAdjustedSigmaString(2, fieldWidth, precision, errorPropagation);
   }
 }

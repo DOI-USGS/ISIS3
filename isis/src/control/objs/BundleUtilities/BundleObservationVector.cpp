@@ -28,11 +28,11 @@ namespace Isis {
   /**
    * add new BundleObservation method
    */
-  BundleObservation* BundleObservationVector::addnew(BundleImage* bundleImage,
+  BundleObservation *BundleObservationVector::addnew(BundleImage *bundleImage,
                                                      QString observationNumber,
                                                      QString instrumentId,
-                                                     BundleSettings& bundleSettings) {
-    BundleObservation* bundleObservation;
+                                                     BundleSettings &bundleSettings) {
+    BundleObservation *bundleObservation;
     bool bAddToExisting = false;
 
     if (bundleSettings.solveObservationMode() &&
@@ -105,7 +105,7 @@ namespace Isis {
     int positionParameters = 0;
 
     for (int i = 0; i < size(); i++) {
-      BundleObservation* observation = at(i);
+      BundleObservation *observation = at(i);
       positionParameters += observation->numberPositionParameters();
     }
 
@@ -120,7 +120,7 @@ namespace Isis {
     int pointingParameters = 0;
 
     for (int i = 0; i < size(); i++) {
-      BundleObservation* observation = at(i);
+      BundleObservation *observation = at(i);
       pointingParameters += observation->numberPointingParameters();
     }
 
@@ -138,7 +138,7 @@ namespace Isis {
   /**
    * TODO
    */
-  BundleObservation* BundleObservationVector::
+  BundleObservation *BundleObservationVector::
       getObservationByCubeSerialNumber(QString cubeSerialNumber) {
 
     if (m_imageSerialToObservationMap.contains(cubeSerialNumber))

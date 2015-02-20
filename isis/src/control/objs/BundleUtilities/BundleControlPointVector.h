@@ -31,14 +31,25 @@
 
 namespace Isis {
   class ControlPoint;
+  /**
+   * @author 2014-05-22 Ken Edmundson
+   *
+   * @internal
+   *   @history 2014-05-22 Ken Edmundson - Original version.
+   *   @history 2015-02-20 Jeannie Backer - Added copy constructor and
+   *            assignment operator. Brought closer to ISIS coding standards.
+   */
 
-  class BundleControlPointVector : public QVector < BundleControlPoint* > {
+  class BundleControlPointVector : public QVector < BundleControlPoint *> {
 
     public:
       BundleControlPointVector();
+      BundleControlPointVector(const BundleControlPointVector &src);
       ~BundleControlPointVector();
 
-      BundleControlPoint* addControlPoint(ControlPoint* point);
+      BundleControlPointVector &operator=(const BundleControlPointVector &src);
+
+      BundleControlPoint *addControlPoint(ControlPoint *point);
   };
 }
 

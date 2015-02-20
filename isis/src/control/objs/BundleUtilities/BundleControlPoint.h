@@ -39,53 +39,58 @@ namespace Isis {
    * @author 2014-05-22 Ken Edmundson
    *
    * @internal
-   *   @history 2014-05-22 Ken Edmundson
+   *   @history 2014-05-22 Ken Edmundson - Original version.
+   *   @history 2015-02-20 Jeannie Backer - Added unitTest.  Reformatted output
+   *                           strings. Brought closer to ISIS coding standards.
    */
   class BundleControlPoint : public QVector<BundleMeasure*> {
 
     public:
-      BundleControlPoint(ControlPoint* point); // default constructor
+      BundleControlPoint(ControlPoint *point); // default constructor
+      BundleControlPoint(const BundleControlPoint &src);
       ~BundleControlPoint();
 
-      // copy constructor
-      BundleControlPoint(const BundleControlPoint& src);
+      // copy
+      BundleControlPoint &operator=(const BundleControlPoint &src);// ??? not implemented
+      void copy(const BundleControlPoint &src);
 
-      BundleControlPoint& operator=(const BundleControlPoint& src);
-
-      void copy(const BundleControlPoint& src);
-
+      // mutators
       BundleMeasure *addMeasure(ControlMeasure *controlMeasure);
       void setWeights(const BundleSettings *settings, double metersToRadians);
-
       void setAdjustedSurfacePoint(SurfacePoint surfacePoint);
 
-      ControlPoint *getRawControlPoint();
+      // accessors
+      ControlPoint *getRawControlPoint() const; // TODO: Rename this method without "get" to meet coding standards
+      bool isRejected() const;
+      int numberMeasures() const;
+      SurfacePoint getAdjustedSurfacePoint() const; // TODO: Rename this method without "get" to meet coding standards
+      QString getId() const; // TODO: Rename this method without "get" to meet coding standards
+      const boost::numeric::ublas::bounded_vector< double, 3 > &corrections() const;
+      const boost::numeric::ublas::bounded_vector< double, 3 > &aprioriSigmas() const;
+      const boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas() const;
+      const boost::numeric::ublas::bounded_vector< double, 3 > &weights() const;
+      const boost::numeric::ublas::bounded_vector<double, 3> &nicVector() const;         //!< array of NICs (see Brown, 1976)
+      const SparseBlockRowMatrix &cholmod_QMatrix() const;
 
       // string format methods
-      QString formatBundleOutputSummaryString(bool errorPropagation);
-      QString formatBundleOutputDetailString(bool errorPropagation, double RTM);
-      QString formatLatitudeAprioriSigmaString(int fieldWidth, int precision);
-      QString formatLongitudeAprioriSigmaString(int fieldWidth, int precision);
-      QString formatRadiusAprioriSigmaString(int fieldWidth, int precision);
+      QString formatBundleOutputSummaryString(bool errorPropagation) const;
+      QString formatBundleOutputDetailString(bool errorPropagation, double RTM) const;
+      QString formatValue(double value, int fieldWidth, int precision) const;
+      QString formatAprioriSigmaString(int type, int fieldWidth, int precision) const;
+      QString formatLatitudeAprioriSigmaString(int fieldWidth, int precision) const;
+      QString formatLongitudeAprioriSigmaString(int fieldWidth, int precision) const;
+      QString formatRadiusAprioriSigmaString(int fieldWidth, int precision) const;
+      QString formatAdjustedSigmaString(int type, int fieldWidth, int precision,
+                                        bool errorPropagation) const;
       QString formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
-                                                bool errorPropagation);
+                                                bool errorPropagation) const;
       QString formatLongitudeAdjustedSigmaString(int fieldWidth, int precision,
-                                                 bool errorPropagation);
-      QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, bool errorPropagation);
-
-      bool isRejected();
-      int numberMeasures();
-      SurfacePoint getAdjustedSurfacePoint() const;
-      QString getId() const;
-      boost::numeric::ublas::bounded_vector< double, 3 >& corrections();
-      boost::numeric::ublas::bounded_vector< double, 3 >& aprioriSigmas();
-      boost::numeric::ublas::bounded_vector< double, 3 >& adjustedSigmas() { return m_adjustedSigmas; }
-      boost::numeric::ublas::bounded_vector< double, 3 >& weights();
-      boost::numeric::ublas::bounded_vector<double, 3>& nicVector() { return m_nicVector; }         //!< array of NICs (see Brown, 1976)
-      SparseBlockRowMatrix& cholmod_QMatrix() { return m_cholmod_QMatrix; }
+                                                 bool errorPropagation) const;
+      QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, 
+                                              bool errorPropagation) const;
 
     private:
-      ControlPoint* m_controlPoint;
+      ControlPoint *m_controlPoint;
 
       boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;                             //!< corrections to point parameters
       boost::numeric::ublas::bounded_vector< double, 3 > m_aprioriSigmas;                           //!< apriori sigmas for point parameters
