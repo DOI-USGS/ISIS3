@@ -35,6 +35,9 @@
 #include "Project.h"
 #include "XmlStackedHandlerReader.h"
 
+#include "Pvl.h"
+#include <iostream>
+
 namespace Isis {
 
 
@@ -44,16 +47,18 @@ namespace Isis {
    * @param [in] unsigned int nodes -- this is the number of specific evenly spaced quantiles that
    *                 will be dynamically tracked
    */
-  StatCumProbDistDynCalc::StatCumProbDistDynCalc(unsigned int nodes, QObject *parent) : QObject(parent) {
-
-    initialize(nodes);
+  StatCumProbDistDynCalc::StatCumProbDistDynCalc(unsigned int nodes, QObject *parent)
+      : QObject(parent) {
+    initialize();
+    setQuantiles(nodes);
   }
 
 
 // TODO: should project be const ???
-  StatCumProbDistDynCalc::StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
-    m_id = NULL;
-    // ??? initializations ???
+  StatCumProbDistDynCalc::StatCumProbDistDynCalc(Project *project, 
+                                                 XmlStackedHandlerReader *xmlReader, 
+                                                 QObject *parent) {   // TODO: does xml stuff need project???
+    initialize();
     xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
   }
 
@@ -63,11 +68,11 @@ namespace Isis {
     : m_id(new QUuid(other.m_id->toString())),
       m_numberCells(other.m_numberCells),      
       m_numberQuantiles(other.m_numberQuantiles),  
+      m_numberObservations(other.m_numberObservations),
       m_quantiles(other.m_quantiles),        
-      m_idealNum(other.m_idealNum),         
-      m_n(other.m_n),                
-      m_quantileValues(other.m_quantileValues),   
-      m_numberObservations(other.m_numberObservations) {
+      m_observationValues(other.m_observationValues),   
+      m_idealNumObsBelowQuantile(other.m_idealNumObsBelowQuantile),         
+      m_numObsBelowQuantile(other.m_numObsBelowQuantile) {
   }
 
 
@@ -87,15 +92,15 @@ namespace Isis {
     if (&other != this) {
       delete m_id;
       m_id = NULL;
-      m_id = new QUuid(m_id->toString());
+      m_id = new QUuid(other.m_id->toString());
 
-      m_numberCells        = other.m_numberCells;
-      m_numberQuantiles    = other.m_numberQuantiles;
-      m_quantiles          = other.m_quantiles;
-      m_idealNum           = other.m_idealNum;
-      m_n                  = other.m_n;
-      m_quantileValues     = other.m_quantileValues;
-      m_numberObservations = other.m_numberObservations;
+      m_numberCells              = other.m_numberCells;
+      m_numberQuantiles          = other.m_numberQuantiles;
+      m_numberObservations       = other.m_numberObservations;
+      m_quantiles                = other.m_quantiles;
+      m_observationValues        = other.m_observationValues;
+      m_idealNumObsBelowQuantile = other.m_idealNumObsBelowQuantile;
+      m_numObsBelowQuantile      = other.m_numObsBelowQuantile;
     }
     return *this;
 
@@ -109,24 +114,29 @@ namespace Isis {
    * @param [in] unsigned int nodes -- this is the number of specific evenly spaced quantiles that 
    *                 will be dynamically tracked
    */
-  void StatCumProbDistDynCalc::initialize(unsigned int nodes) {
+  void StatCumProbDistDynCalc::initialize() {
     m_id = NULL;
+    m_numberCells = m_numberQuantiles = m_numberObservations = 0;
+    m_quantiles.clear();
+    m_observationValues.clear();
+    m_idealNumObsBelowQuantile.clear();
+    m_numObsBelowQuantile.clear();
+  }
+
+
+
+  void StatCumProbDistDynCalc::setQuantiles(unsigned int nodes) {
+    initialize();
     m_id = new QUuid(QUuid::createUuid());
 
-    m_quantiles.clear();
-    m_idealNum.clear();
-    m_n.clear();
-    m_quantileValues.clear();
-    m_numberObservations = 0;
-
     if (nodes < 3) {
-      m_numberQuantiles = 3; //there is one more border value then there are cells
+      m_numberQuantiles = 3; 
     }
     else {
-      m_numberQuantiles = nodes; //there is one more border value then there are cells
+      m_numberQuantiles = nodes;
     }
 
-    m_numberCells = m_numberQuantiles - 1;
+    m_numberCells = m_numberQuantiles - 1; // there is one more border value then there are cells
 
     double stepSize = 1.0 / (double)m_numberCells;
     for (unsigned int i = 0; i < m_numberQuantiles; i++) {
@@ -136,11 +146,10 @@ namespace Isis {
       else {
         m_quantiles.append( m_quantiles[i-1] + stepSize );
       } // essentially the same as i/numCells without having to cast i every time...
-      m_idealNum.append(i+1);
-      m_n.append(i+1);
+      m_idealNumObsBelowQuantile.append(i+1);
+      m_numObsBelowQuantile.append(i+1);
     }
 
-    m_quantileValues.resize(m_numberQuantiles);  //these will be the first m_numberQuantiles observations sorted from smallest to largest
   }
 
 
@@ -154,17 +163,10 @@ namespace Isis {
    *             the number of quantiles (i.e. number of nodes)
    *             selected.
    */
-  double StatCumProbDistDynCalc::max() {
-     //if there isn't even as much data as there are quantiles to track return DBL_MAX
-     if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
-                     " [" + toString(m_numberObservations) + "] matches the number of quantiles"
-                     " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
-       throw IException(IException::Programmer, msg, _FILEINFO_);
-       return DBL_MAX;
-     } 
+   double StatCumProbDistDynCalc::max() {
+     validate(); 
      //return the largest value so far
-     return m_quantileValues[m_numberCells];
+     return m_observationValues[m_numberCells];
    }
 
 
@@ -179,16 +181,9 @@ namespace Isis {
    *             selected.
    */
    double StatCumProbDistDynCalc::min() { 
-     //if there isn't even as much data as there are quantiles to track return -DBL_MAX
-     if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
-                     " [" + toString(m_numberObservations) + "] matches the number of quantiles"
-                     " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
-       throw IException(IException::Programmer, msg, _FILEINFO_);
-       return -DBL_MAX;
-     }
+     validate();
      //return the smallest value so far
-     return m_quantileValues[0];
+     return m_observationValues[0];
    }
 
 
@@ -197,7 +192,7 @@ namespace Isis {
    * Provides the value of the variable that has the given cumulative probility
    * (according the current estimate of cumulative probility function)
    *
-   * @param [in] double -- cumlative probability domain [0.1]
+   * @param [in] cumProb -- cumlative probability, domain [0, 1]
    * @return double -- the vaule of the variable that has the cumulative probility (according the 
    *             current estimate of cumulative probility function)
    * @throw  IsisProgrammerError -- StatCumProbDistDynCalc will return no data until 
@@ -208,73 +203,70 @@ namespace Isis {
    *             the domain [0, 1].
    */
    double StatCumProbDistDynCalc::value(double cumProb) {
+     validate(); 
      //given a cumProbability return the associate value
-
-     int i;
-
-     //if there isn't even as much data as there are quantiles to track return DBL_MAX
-     if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
-                     " [" + toString(m_numberObservations) + "] matches the number of quantiles"
-                     " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
-       throw IException(IException::Programmer, msg, _FILEINFO_);
-       return DBL_MAX;
-     }
 
      //if the requested cumProb is outside [0,1] return DBL_MAX
      if (cumProb < 0.0 || cumProb > 1.0) {
        IString msg = "Invalid cumulative probability [" + toString(cumProb) + "] passed in to "
                      "StatCumProbDistDynCalc::value(double cumProb). Must be on the domain [0, 1].";
        throw IException(IException::Programmer, msg, _FILEINFO_);
-       return DBL_MAX;
      }
 
      //if the requested quantile is 0.0 return the lowest value
      if (cumProb == 0.0) {
-       return m_quantileValues[0];
+       return m_observationValues[0];
      }
 
      //if the requested quantile is 1.0 return the largest value
      if (cumProb == 1.0) {
-       return m_quantileValues[m_numberCells];
+       return m_observationValues[m_numberCells];
      }
 
-     //otherwise find the the node nearest the value
-     double temp = fabs(m_quantiles[0] - cumProb);
+     // otherwise find the the node nearest the value
+     double minDistance = fabs(m_quantiles[0] - cumProb); // distance from first quantile 
+                                                          // to the given probability
      unsigned int index = 0;
-     for (i = 1; i < int(m_numberQuantiles); i++) {
-       if ( fabs(m_quantiles[i] - cumProb) < temp) {
-         temp = fabs(m_quantiles[i] - cumProb);
+     for (int i = 1; i < int(m_numberQuantiles); i++) {
+        // if the given probability is closer to this quantile than the currently saved 
+        // min distance, then replace
+       double dist = fabs(m_quantiles[i] - cumProb);
+//       if ( dist < minDistance || qFuzzyCompare(dist, minDistance)) { 
+       if ( dist < minDistance ) { 
+         minDistance = fabs(m_quantiles[i] - cumProb);
          index = i;
        }
-     }
+       else { 
+         break; // we are getting farther from the given value
+       }
+     }// TODO: must be a better way to write this???
 
      //get the coordinates of the three closest nodes, value as a function of cumProb
-     double x[3]; //m_quantileValues values
-     double y[3]; //cumlative probilities
+     double x[3]; // m_observationValues values
+     double y[3]; // cumlative probilities
 
-     if (index ==0) {
-       y[0] = m_quantileValues[0];
-       y[1] = m_quantileValues[1];
-       y[2] = m_quantileValues[2];
+     if (index == 0) { // the given prob is closest to the first quantile
+       y[0] = m_observationValues[0];
+       y[1] = m_observationValues[1];
+       y[2] = m_observationValues[2];
 
        x[0] = m_quantiles[0];
        x[1] = m_quantiles[1];
        x[2] = m_quantiles[2];
      }
-     else if (index == m_numberCells) {
-       y[0] = m_quantileValues[index-2];
-       y[1] = m_quantileValues[index-1];
-       y[2] = m_quantileValues[index  ];
+     else if (index == m_numberCells) { // the given prob is closest to the last quantile
+       y[0] = m_observationValues[index-2];
+       y[1] = m_observationValues[index-1];
+       y[2] = m_observationValues[index  ];
 
        x[0] = m_quantiles[index-2];
        x[1] = m_quantiles[index-1];
        x[2] = m_quantiles[index  ];
      }
      else {
-       y[0] = m_quantileValues[index-1];
-       y[1] = m_quantileValues[index  ];
-       y[2] = m_quantileValues[index+1];
+       y[0] = m_observationValues[index-1];
+       y[1] = m_observationValues[index  ];
+       y[2] = m_observationValues[index+1];
 
        x[0] = m_quantiles[index-1];
        x[1] = m_quantiles[index  ];
@@ -282,28 +274,32 @@ namespace Isis {
      }
 
      if ( x[0] == x[1] || x[0] == x[2] || x[1] == x[2]) {
-       return m_quantileValues[index];  //this should never happen, but just in case return the value of the nearest node
+       return m_observationValues[index];  // this should never happen,
+                                        // but just in case return the value of the nearest node
      }
 
-     //try quadratic interpolation
-     temp = (cumProb-x[1]) * (cumProb-x[2]) / (x[0]-x[1]) / (x[0]-x[2]) * y[0]
-            + (cumProb-x[0]) * (cumProb-x[2]) / (x[1]-x[0]) / (x[1]-x[2]) * y[1]
-            + (cumProb-x[0]) * (cumProb-x[1]) / (x[2]-x[0]) / (x[2]-x[1]) * y[2];
+     // try quadratic interpolation
+     double interp =   (cumProb-x[1]) * (cumProb-x[2]) / (x[0]-x[1]) / (x[0]-x[2]) * y[0]
+                     + (cumProb-x[0]) * (cumProb-x[2]) / (x[1]-x[0]) / (x[1]-x[2]) * y[1]
+                     + (cumProb-x[0]) * (cumProb-x[1]) / (x[2]-x[0]) / (x[2]-x[1]) * y[2];
 
-     //check for reasonability of the quadratice interpolation
+     // check for reasonability of the quadratic interpolation
+
+     // TODO: better way to write this???
+     int i;
      for (i = 0; i < 3; i++) {
        if ( x[i] <= cumProb && x[i+1] >= cumProb) { // find the nodes on both sides of cumProb
          break;
        }
      }
 
-     if (y[i] <= temp && y[i+1] >= temp) {//make sure things are strickly increasing
-       return temp;
+     // make sure things are strictly increasing
+     if (y[i] <= interp && y[i+1] >= interp) {
+       return interp;
      }
-
-     //if the quadratice wasn't reasonable return the linear interpolation
      else {
-       return ((x[i] - cumProb)*y[i+1] + (x[i+1]-cumProb)*y[i])/(x[i]-x[i+1]);
+       // if the quadratic wasn't reasonable return the linear interpolation
+       return ( (x[i] - cumProb) * y[i+1] + (x[i+1] - cumProb) * y[i] ) / (x[i] - x[i+1]);
      }
 
    }
@@ -315,70 +311,67 @@ namespace Isis {
    * distribution that is less than or equal to the value given (according the
    * current estimate of cumulative probility function).
    *
-   * @param [in] double -- value, the upper bound of values considered in the cumlative 
+   * @param [in] value -- the upper bound of values considered in the cumlative 
    *                probility calculation
    * @return    double -- the cumulative probility, that is, the proportion of the distribution 
    *                that is less than or equal to the value given (according the current
    *                estimate of cumulative probility function).
-   * @throw     IsisProgrammerError -- StatCumProbDistDynCalc will return no data until there has been 
-   *                at least m_numberQuantiles observations added
+   * @throw     IsisProgrammerError -- StatCumProbDistDynCalc will return no data until there has 
+   *                been at least m_numberQuantiles observations added
    */
    double StatCumProbDistDynCalc::cumProb(double value) {
+     validate(); 
      //given a value return the cumulative probility
 
-     if (m_numberObservations < m_numberQuantiles) {
-       IString msg = "StatCumProbDistDynCalc will return no data until the number of observations added"
-                     " [" + toString(m_numberObservations) + "] matches the number of quantiles"
-                     " [" + toString(m_numberQuantiles) + "] (i.e. number of nodes) selected.";
-       throw IException(IException::Programmer, msg, _FILEINFO_);
-       return DBL_MAX;
+     if (value <= m_observationValues[0]) {
+       return 0.0; // if the value is less than or equal to the the current min, 
+                   // the best estimate is 0.0
+     }
+     else if (value >= m_observationValues[m_numberCells]) {
+       return 1.0;  // if the value is greater than or equal to the current max,
+                    // the best estimate is 1.0
      }
 
-     if (value <= m_quantileValues[0]) {
-       return 0.0; //if the value is less than or equal to the the current min, the best estimate is 0.0
-     }
-     else if (value >= m_quantileValues[m_numberCells]) {
-       return 1.0;  //if the value is greater than or equal to the current max, the best estimate is 1.0
-     }
-
-     int i;
-
-     //otherwise find the the node nearest the value
-     double temp = fabs(m_quantileValues[0]-value);
+     // otherwise, find the the node nearest to the given value
+     double minDistance = fabs(m_observationValues[0]-value);
      unsigned int index = 0;
-     for (i = 1; i < int(m_numberQuantiles); i++) {
-       if ( fabs(m_quantileValues[i]-value) < temp) {
-         temp = fabs(m_quantileValues[i]-value);
+     for (unsigned int i = 1; i < m_numberQuantiles; i++) {
+       double dist = fabs(m_observationValues[i]-value);
+       if ( dist < minDistance) {
+         minDistance = fabs(m_observationValues[i]-value);
          index = i;
        }
-     }
+       else { 
+         break; // we are getting farther from the given value
+       }
+     }// TODO: must be a better way to write this???
 
      //get the coordinates of the three closest nodes cumProb as a function of value
-     double x[3]; //m_quantileValues values
-     double y[3]; //cumlative probilities
+     double x[3]; // m_observationValues values
+     double y[3]; // cumlative probilities
 
-     if (index ==0) {
-       x[0] = m_quantileValues[0];
-       x[1] = m_quantileValues[1];
-       x[2] = m_quantileValues[2];
+     if (index == 0) {
+       x[0] = m_observationValues[0];
+       x[1] = m_observationValues[1];
+       x[2] = m_observationValues[2];
 
        y[0] = m_quantiles[0];
        y[1] = m_quantiles[1];
        y[2] = m_quantiles[2];
      }
      else if (index == m_numberCells) {
-       x[0] = m_quantileValues[index  ];
-       x[1] = m_quantileValues[index-1];
-       x[2] = m_quantileValues[index-2];
+       x[0] = m_observationValues[index-2];
+       x[1] = m_observationValues[index-1];
+       x[2] = m_observationValues[index  ];
 
-       y[0] = m_quantiles[index  ];
+       y[0] = m_quantiles[index-2];
        y[1] = m_quantiles[index-1];
-       y[2] = m_quantiles[index-2];
+       y[2] = m_quantiles[index  ];
      }
      else {
-       x[0] = m_quantileValues[index-1];
-       x[1] = m_quantileValues[index  ];
-       x[2] = m_quantileValues[index+1];
+       x[0] = m_observationValues[index-1];
+       x[1] = m_observationValues[index  ];
+       x[2] = m_observationValues[index+1];
 
        y[0] = m_quantiles[index-1];
        y[1] = m_quantiles[index  ];
@@ -386,25 +379,28 @@ namespace Isis {
      }
 
      if ( x[0] == x[1] || x[0] == x[2] || x[1] == x[2]) {
-       return m_quantiles[index];  //this should never happen, but just in case return the cumProb of the nearest node
+       return m_quantiles[index];  // this should never happen, 
+                                   // but just in case return the cumProb of the nearest node
      }
 
      //do a parabolic interpolation to find the probability at value
-     temp = (value-x[1]) * (value-x[2]) / (x[0]-x[1]) / (x[0]-x[2]) * y[0]
-            + (value-x[0]) * (value-x[2]) / (x[1]-x[0]) / (x[1]-x[2]) * y[1]
-            + (value-x[0]) * (value-x[1]) / (x[2]-x[0]) / (x[2]-x[1]) * y[2];
+     double interp =   (value-x[1]) * (value-x[2]) / (x[0]-x[1]) / (x[0]-x[2]) * y[0]
+                     + (value-x[0]) * (value-x[2]) / (x[1]-x[0]) / (x[1]-x[2]) * y[1]
+                     + (value-x[0]) * (value-x[1]) / (x[2]-x[0]) / (x[2]-x[1]) * y[2];
 
-     //check for reasonability of the quadratice interpolation
+     //check for reasonability of the quadratic interpolation
+     // TODO: better way to write this???
+     int i;
      for (i = 0; i < 3; i++) {
        if ( x[i] <= value && x[i+1] >= value) //find the nodes on both sides of cumProb
          break;
      }
 
-     if (y[i] <= temp && y[i+1] >= temp) //make sure things are strickly increasing
-       return temp;
-     //if the quadratice wasn't reasonable return the linear interpolation
+     if (y[i] <= interp && y[i+1] >= interp) //make sure things are strictly increasing
+       return interp;
+     //if the quadratic wasn't reasonable return the linear interpolation
      else {
-       return ((x[i] - value)*y[i+1] + (x[i+1]-value)*y[i])/(x[i]-x[i+1]);
+       return ((x[i] - value) * y[i+1] + (x[i+1] - value) * y[i]) / (x[i] - x[i+1]);
      }
 
    }
@@ -419,77 +415,96 @@ namespace Isis {
    *                dynamically readjust the cumulative probility distribution
    */
   void StatCumProbDistDynCalc::addObs(double obs) {
-    unsigned int i,j = 0;
     double temp = 0.0;
 
-    if (m_numberObservations < m_numberQuantiles) {  //in this phase the algorithm is getting initial values
-      m_quantileValues[m_numberObservations] = obs;
+    if (m_numberObservations < m_numberQuantiles) {
+      // in this phase, the algorithm is getting initial values
+      m_observationValues.append(obs);
       m_numberObservations++;
-      if (m_numberObservations == m_numberQuantiles) {  //if there are now m_numberQuantiles observations sort them from smallest to greatest
-        for (i = 0; i < m_numberQuantiles-1; i++)  {
-          for (j = i+1; j < m_numberQuantiles; j++) {
-            if (m_quantileValues[j] < m_quantileValues[i]) {
-              temp = m_quantileValues[i];
-              m_quantileValues[i] = m_quantileValues[j];
-              m_quantileValues[j] = temp;
-            }
+
+      // if there are now m_numberQuantiles observations, then sort them from smallest to greatest
+      if (m_numberObservations == m_numberQuantiles) {
+        qSort(m_observationValues.begin(),  m_observationValues.end(),  qLess<double>());
+      }
+    }
+    else { // m_numberObservations >= m_numberQuantiles 
+
+      //incrementing the number of observations
+      m_numberObservations++;
+      m_numObsBelowQuantile[m_numberQuantiles-1] = m_numberObservations;
+
+      // replace min or max with this observation, if appropriate
+      if (obs > m_observationValues[m_numberQuantiles-1]) {
+        m_observationValues[m_numberQuantiles-1] = obs;
+      }
+      if (obs < m_observationValues[0]) {
+        m_observationValues[0] = obs;
+        temp = 1.0;
+      }
+
+      //estimated quantile positions are increased if obs <= estimated quantile value
+      for (int i = 1; i < (int)m_numberQuantiles-1; i++) {
+        if (obs <= m_observationValues[i]) {
+          for (; i < (int)m_numberQuantiles-1; i++) {
+            m_numObsBelowQuantile[i]++; // all m_n's above the first >= obs get incremented
           }
         }
       }
-      return;
-    }
 
-    //incrementing the number of observations
-    m_numberObservations++;
-    m_n[m_numberQuantiles-1] = m_numberObservations;
-
-    //keep the min and max up to date
-    if (obs > m_quantileValues[m_numberQuantiles-1]) {
-      m_quantileValues[m_numberQuantiles-1] = obs;
-    }
-    if (obs < m_quantileValues[0]) {
-      m_quantileValues[0] = obs;
-      temp = 1;
-    }
-
-    //estimated quantile positions are increased if obs <= estimated quantile value
-    for (i = 1; i < m_numberQuantiles-1; i++) {
-      if (obs <= m_quantileValues[i]) for (; i < m_numberQuantiles-1; i++) m_n[i]++; //all m_n's above the first >= obs get incremented
-    }
-
-    for (i = 1; i < m_numberQuantiles; i++) {
-      m_idealNum[i] += m_quantiles[i];
-    }
-
-    //calculate corrections to node positions (m_n) and values (m_quantileValues)
-    int d;
-    for (i = 1; i < m_numberCells; i++) {  //note that the loop does not edit the first or last positions
-      //calculation of d[i] it is either 1, -1, or 0
-      temp = m_idealNum[i] - m_n[i];
-      if (fabs(temp)>1 && temp > 0.0) {
-        d = 1;
-      }
-      else if (fabs(temp)>1 && temp < 0.0) {
-        d = -1;
-      } 
-      else {
-        continue;
+      for (int i = 1; i < (int)m_numberQuantiles; i++) {
+        m_idealNumObsBelowQuantile[i] += m_quantiles[i];
       }
 
-      if ( (d ==1 && m_n[i+1]-m_n[i] > 1) || (d ==-1 && m_n[i-1]-m_n[i] < -1) ) { //if the node can be moved by d without stepping on another node
-        //calculate a new quantile value for the node from the parabolic formula
-        temp = m_quantileValues[i] + double(d)/(m_n[i+1] - m_n[i-1])
-                        *( (m_n[i]-m_n[i-1]+d)*(m_quantileValues[i+1]-m_quantileValues[i])/(m_n[i+1]-m_n[i])
-                            + (m_n[i+1]-m_n[i]-d)*(m_quantileValues[i]-m_quantileValues[i-1])/(m_n[i]-m_n[i-1]) );
-
-        if ( m_quantileValues[i-1] < temp && temp < m_quantileValues[i+1]) { // it is necessary that the values of the quantiles be strickly increasing, if the parabolic formula perserves this so be ti
-          m_quantileValues[i] = temp;
+      //calculate corrections to node positions (m_n) and values (m_observationValues)
+      int d;
+      // note that the loop does not edit the first or last positions
+      for (int i = 1; i < (int)m_numberCells; i++) {
+        //calculation of d[i] it is either 1, -1, or 0
+        temp = m_idealNumObsBelowQuantile[i] - m_numObsBelowQuantile[i];
+        if (fabs(temp)>1 && temp > 0.0) {
+          d = 1;
         }
+        else if (fabs(temp)>1 && temp < 0.0) {
+          d = -1;
+        } 
         else {
-          m_quantileValues[i] = m_quantileValues[i] + double(d)*(m_quantileValues[i+d]-m_quantileValues[i])/(m_n[i+d]-m_n[i]); //if the parabolic formula does not maintain that the values of the quantiles be strickly increasing then use linear interpolation
+          continue;
         }
 
-        m_n[i] += d; //the position of the quantile (in terms of the number of observations <= quantile) is also adjusted
+         // if the node can be moved by d without stepping on another node
+        if ( ( (d == 1) 
+                && (m_numObsBelowQuantile[i+1] - m_numObsBelowQuantile[i] > 1) )
+             || ( (d == -1)
+                   && (m_numObsBelowQuantile[i-1] - m_numObsBelowQuantile[i] < -1) ) ) {
+          //calculate a new quantile value for the node from the parabolic formula
+          temp = m_observationValues[i]
+                 + double(d) / (m_numObsBelowQuantile[i+1] - m_numObsBelowQuantile[i-1])
+                   * ( (m_numObsBelowQuantile[i] - m_numObsBelowQuantile[i-1] + d)
+                       * (m_observationValues[i+1] - m_observationValues[i])
+                       / (m_numObsBelowQuantile[i+1] - m_numObsBelowQuantile[i])
+                       + (m_numObsBelowQuantile[i+1] - m_numObsBelowQuantile[i] - d)
+                       * (m_observationValues[i] - m_observationValues[i-1])
+                       / (m_numObsBelowQuantile[i] - m_numObsBelowQuantile[i-1]) );
+
+          // it is necessary that the values of the quantiles be strictly increasing,
+          // if the parabolic formula perserves this so be it
+          if ( m_observationValues[i-1] < temp && temp < m_observationValues[i+1]) {// use qSort???
+            m_observationValues[i] = temp;
+          }
+          else {
+             // if the parabolic formula does not maintain
+             //  that the values of the quantiles be strictly increasing,
+             //  then use linear interpolation
+            m_observationValues[i] = m_observationValues[i]
+                                  + double(d)
+                                  * (m_observationValues[i+d] - m_observationValues[i]) 
+                                  / (m_numObsBelowQuantile[i+d] - m_numObsBelowQuantile[i]);
+          }
+
+          // the position of the quantile 
+          // (in terms of the number of observations <= quantile) is also adjusted
+          m_numObsBelowQuantile[i] += d;
+        }
       }
     }
   }
@@ -501,38 +516,30 @@ namespace Isis {
     stream.writeStartElement("statCumProbDistDynCalc");
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("numberCells", toString(m_numberCells));
+    stream.writeTextElement("numberQuantiles", toString(m_numberQuantiles));
     stream.writeTextElement("numberObservations", toString(m_numberObservations));
 
-    stream.writeStartElement("quantiles");
-    for (int i = 0; i < m_quantiles.size(); i++) {
-      stream.writeTextElement("quantile", toString(m_quantiles[i]));
+    stream.writeStartElement("distributionData");
+    for (unsigned int i = 0; i < m_numberQuantiles; i++) {
+      stream.writeStartElement("quantileInfo");
+       // we need to write out high precision for minDistance calculations in value() and cumProb()
+      stream.writeAttribute("quantile", toString(m_quantiles[i], 17));
+      stream.writeAttribute("dataValue", toString(m_observationValues[i], 17));
+      stream.writeAttribute("idealNumObsBelowQuantile", 
+                            toString(m_idealNumObsBelowQuantile[i]));
+      stream.writeAttribute("actualNumObsBelowQuantile", toString(m_numObsBelowQuantile[i]));
+      stream.writeEndElement(); // end observation
     }
-    stream.writeEndElement();
-  
-    stream.writeStartElement("idealNumObsBelowEachQuantile");
-    for (int i = 0; i < m_idealNum.size(); i++) {
-      stream.writeTextElement("idealNumObsBelowQuantile", toString(m_idealNum[i]));
-    }
-    stream.writeEndElement();
-    
-    stream.writeStartElement("numObsBelowEachQuantile");
-    for (int i = 0; i < m_n.size(); i++) {
-      stream.writeTextElement("numObsBelowQuantile", toString(m_n[i]));
-    }
-    stream.writeEndElement();
-  
-    stream.writeStartElement("quantileValues");
-    for (int i = 0; i < m_quantileValues.size(); i++) {
-      stream.writeTextElement("value", toString(m_quantileValues[i]));
-    }
-    stream.writeEndElement();
+    stream.writeEndElement(); // end observationData
+    stream.writeEndElement(); // end statCumProbDistDynCalc
 
   }
 
 
 
 // TODO: should project be const ???
-  StatCumProbDistDynCalc::XmlHandler::XmlHandler(StatCumProbDistDynCalc *probabilityCalc, Project *project) {   // TODO: does xml stuff need project???
+  StatCumProbDistDynCalc::XmlHandler::XmlHandler(StatCumProbDistDynCalc *probabilityCalc, 
+                                                 Project *project) {   // TODO: does xml stuff need project???
     m_xmlHandlerCumProbCalc = probabilityCalc;
     m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
     m_xmlHandlerCharacters = "";
@@ -552,9 +559,25 @@ namespace Isis {
                                                                 const QString &localName,
                                                                 const QString &qName,
                                                                 const QXmlAttributes &atts) {
+
     m_xmlHandlerCharacters = "";
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      // no element attibutes to evaluate
+      if (qName == "quantileInfo") {
+
+        QString quantile  = atts.value("quantile");
+        QString obsValue  = atts.value("dataValue");
+        QString idealObs  = atts.value("idealNumObsBelowQuantile");
+        QString actualObs = atts.value("actualNumObsBelowQuantile");
+
+        if (!quantile.isEmpty() && !obsValue.isEmpty()
+            && !idealObs.isEmpty() && !actualObs.isEmpty()) {
+          m_xmlHandlerCumProbCalc->m_quantiles.append(toDouble(quantile));
+          m_xmlHandlerCumProbCalc->m_observationValues.append(toDouble(obsValue));
+          m_xmlHandlerCumProbCalc->m_idealNumObsBelowQuantile.append(toDouble(idealObs));
+          m_xmlHandlerCumProbCalc->m_numObsBelowQuantile.append(toDouble(actualObs));
+        }
+      }
+      
     }
     return true;
   }
@@ -568,30 +591,22 @@ namespace Isis {
 
 
 
-  bool StatCumProbDistDynCalc::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
-                                     const QString &qName) {
+  bool StatCumProbDistDynCalc::XmlHandler::endElement(const QString &namespaceURI, 
+                                                      const QString &localName,
+                                                      const QString &qName) {
     if (!m_xmlHandlerCharacters.isEmpty()) {
-      if (localName == "id") {
+      if (qName == "id") {
         m_xmlHandlerCumProbCalc->m_id = NULL;
         m_xmlHandlerCumProbCalc->m_id = new QUuid(m_xmlHandlerCharacters);
       }
-      else if (localName == "numberCells") {
+      else if (qName == "numberCells") {
         m_xmlHandlerCumProbCalc->m_numberCells = toInt(m_xmlHandlerCharacters);
       }
-      else if (localName == "numberObservations") {
+      else if (qName == "numberQuantiles") {
+        m_xmlHandlerCumProbCalc->m_numberQuantiles = toInt(m_xmlHandlerCharacters);
+      }
+      else if (qName == "numberObservations") {
         m_xmlHandlerCumProbCalc->m_numberObservations = toInt(m_xmlHandlerCharacters);
-      }
-      else if (localName == "quantile") {
-        m_xmlHandlerCumProbCalc->m_quantiles.append(toDouble(m_xmlHandlerCharacters));
-      }
-      else if (localName == "idealNumObsBelowQuantile") {
-        m_xmlHandlerCumProbCalc->m_idealNum.append(toDouble(m_xmlHandlerCharacters));
-      }
-      else if (localName == "numObsBelowQuantile") {
-        m_xmlHandlerCumProbCalc->m_n.append(toInt(m_xmlHandlerCharacters));
-      }
-      else if (localName == "value") {
-        m_xmlHandlerCumProbCalc->m_quantileValues.append(toDouble(m_xmlHandlerCharacters));
       }
                                            
       m_xmlHandlerCharacters = "";
@@ -605,11 +620,11 @@ namespace Isis {
     stream << m_id->toString()
            << (qint32)m_numberCells
            << (qint32)m_numberQuantiles 
+           << (qint32)m_numberObservations
            << m_quantiles
-           << m_idealNum
-           << m_n
-           << m_quantileValues
-           << (qint32)m_numberObservations;
+           << m_observationValues
+           << m_idealNumObsBelowQuantile
+           << m_numObsBelowQuantile;
     return stream;
   }
 
@@ -621,11 +636,11 @@ namespace Isis {
     stream >> id
            >> numCells
            >> numQuantiles
+           >> numObservations
            >> m_quantiles
-           >> m_idealNum
-           >> m_n
-           >> m_quantileValues
-           >> numObservations;
+           >> m_observationValues
+           >> m_idealNumObsBelowQuantile
+           >> m_numObsBelowQuantile;
 
     delete m_id;
     m_id = NULL;
@@ -649,4 +664,22 @@ namespace Isis {
     return scpddc.read(stream);
   }
 
+  void StatCumProbDistDynCalc::validate() {
+    // if quantiles have not been set
+    if (m_numberQuantiles == 0) {
+      QString msg = "StatCumProbDistDynCalc will return no data until the quantiles have been set. "
+                    "Number of cells = [" + toString(m_numberCells) + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    } 
+
+    //if there isn't even as much data as there are quantiles to track
+    if (m_numberObservations < m_numberQuantiles) {
+      QString msg = "StatCumProbDistDynCalc will return no data until the number of observations "
+                    "added [" + toString(m_numberObservations) + "] matches the number of "
+                    "quantiles [" + toString(m_numberQuantiles)
+                    + "] (i.e. number of nodes) selected.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    } 
+
+  }
 }// end namespace Isis

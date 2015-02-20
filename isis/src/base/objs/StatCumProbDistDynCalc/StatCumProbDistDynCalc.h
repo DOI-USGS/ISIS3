@@ -60,6 +60,7 @@ namespace Isis {
   *
   *
   *
+  * @ingroup Math
   * @ingroup Statistics
   *
   * @author 2012-03-23 Orrin Thomas
@@ -69,6 +70,10 @@ namespace Isis {
   *   @history 2014-07-19 Jeannie Backer - Added QDataStream >> and << operator methods. Brought
   *                           code closer to ISIS standards. Updated unitTest to include these
   *                           methods.
+  *   @history 2014-09-11 Jeannie Backer - Added xml write/read capabilities. Fixed bug in cumPro()
+  *                           method for previously untested lines (case where the given value is
+  *                           closest to the last quantile value). Renamed member variables for
+  *                           clarity.
   *
   */
   class StatCumProbDistDynCalc : public QObject {
@@ -79,25 +84,22 @@ namespace Isis {
     //  Observations"
     public:
       StatCumProbDistDynCalc(unsigned int nodes=20, QObject *parent = 0);  //individual qunatile value to be calculated
-      StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   // TODO: does xml stuff need project???
+      StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, 
+                             QObject *parent = 0);   // TODO: does xml stuff need project???
       StatCumProbDistDynCalc(const StatCumProbDistDynCalc &other);
       ~StatCumProbDistDynCalc();
       StatCumProbDistDynCalc &operator=(const StatCumProbDistDynCalc &other);
     
+      void initialize(); // clears the member lists and initializes the rest of the member data to 0 
+      void setQuantiles(unsigned int nodes); // initializes/resets the class to start new calculation
+
+      void validate();
       void addObs(double obs);
-      void set(int numberCells, 
-               int numberQuantiles, 
-               QList<double> quantiles, 
-               QList<double> idealNum, 
-               QList<int> n, 
-               QVector<double> quantileValues, 
-               int numberObservations);
     
       double cumProb(double value); //given a value return the cumulative probility
       double value(double cumProb); //given a cumulative probibility return a value
       double max(); //return the largest value so far
       double min(); //return the smallest values so far
-      void initialize(unsigned int nodes=20); //resets the class to start a new dynamic calculation
     
       void save(QXmlStreamWriter &stream, const Project *project) const;   // TODO: does xml stuff need project???
     
@@ -130,34 +132,33 @@ namespace Isis {
           QString m_xmlHandlerCharacters;
       };
 
-      QUuid *m_id; /**< A unique ID for this object (useful for others to reference
-                        this object when saving to disk).*/
+      QUuid *m_id; /**< A unique ID for this object (useful for others to reference this object when
+                                      saving to disk).*/
+
       unsigned int m_numberCells; /**< The number of cells or histogram bins that are being used to
-                                       model the probility density function.*/
+                                      model the probility density function.*/
       
       unsigned int m_numberQuantiles; /**< The number of quantiles being used to model the probility
-                                           density function. This value is one more than the number of
-                                           cells, (i.e. m_numberQuantiles=m_cells+1).*/
-      
-      QList<double> m_quantiles; /**< The target quantiles being modeled, between 0 and 1.*/
-      
-      QList<double> m_idealNum; /**< The ideal number of observations that should be less than or
-                                     equal to the value of the corresponding quantiles, note this is
-                                     dynamically changing as observations are added.*/
-      
-      QList<int> m_n; /**< The actual number of observations that are less than or equal to the value
-                           of the corresponding quantiles, note this is dynamically changing as
-                           observations are added.*/
-      
-      QVector<double> m_quantileValues; /**< The calculated values of the quantiles, note this is
-                                             dynamically changing as observations are added.*/
-      // TODO: figure out how to change this to QList... 
-      //       Problem: resized in constructor, but not initialized.
-      //       Values are set in addObs() using operator=, not  append()
-      //       method. So size must already be set
+                                      density function. This value is one more than the number of
+                                      cells, (i.e. m_numberQuantiles=m_cells+1).*/
       
       unsigned int m_numberObservations; /**< The number of observations, note this is dynamically
-                                            changing as observations are added.*/
+                                      changing as observations are added.*/
+
+      QList<double> m_quantiles; /**< The target quantiles being modeled, between 0 and 1.*/
+      
+      QList<double> m_observationValues; /**< The calculated values of the quantiles, note this is
+                                      dynamically changing as observations are added.*/
+
+      QList<double> m_idealNumObsBelowQuantile; /**< The ideal number of observations that
+                                      should be less than or equal to the value of the corresponding
+                                      quantiles, note this is dynamically changing as observations
+                                      are added.*/
+      
+      QList<int> m_numObsBelowQuantile; /**< The actual number of observations that are less
+                                      than or equal to the value of the corresponding quantiles,
+                                      note this is dynamically changing as observations are added.*/
+            
   };
 
   // operators to read/write StatCumProbDistDynCalc to/from binary data
