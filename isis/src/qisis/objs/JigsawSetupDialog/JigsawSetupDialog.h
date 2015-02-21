@@ -21,6 +21,9 @@ namespace Isis {
    *                           static method to convert string to Model enum.
    *   @history 2014-07-23 Jeannie Backer - Added selectedControlName(). Commented out degree combo
    *                           box enable calls.
+   *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
+   *                           BundleSolutionInfo and BundleStatistics references with BundleResults
+   *                           due to class name changes.
    */
   class Project;
   class Control;

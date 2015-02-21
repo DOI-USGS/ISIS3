@@ -19,7 +19,7 @@ namespace Isis {
     m_bundleResults = bundleResults;
 
 //  setText(0, m_control->displayProperties()->displayName());
-    setText(0, m_bundleResults->runTime());
+    setText(0, "Results");
     setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     setIcon(0, QIcon(":results"));
 

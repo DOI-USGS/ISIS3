@@ -10,7 +10,7 @@ namespace Ui {
 class QString;
 
 namespace Isis {
-  class BundleResults;
+  class BundleSolutionInfo;
   class BundleSettings;
   class Control;
   class Project;
@@ -24,6 +24,9 @@ namespace Isis {
    * @internal
    *   @history 2014-09-18 Kimberly Oyama - Added code to thread the bundle run. It is currently
    *                           commented out but it works. 
+   *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
+   *                           BundleSolutionInfo and BundleStatistics references with BundleResults
+   *                           due to class name changes.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
@@ -34,7 +37,7 @@ namespace Isis {
 
   public slots:
     void outputBundleStatus(QString status);
-    void bundleFinished(BundleResults *bundleResults);
+    void bundleFinished(BundleSolutionInfo *bundleSolutionInfo);
     
   protected:
     Project *m_project;

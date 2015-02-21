@@ -7,7 +7,7 @@
 
 
 namespace Isis {
-  class BundleResults;
+  class BundleSolutionInfo;
   class Control;
   class ControlList;
   class Directory;
@@ -27,6 +27,9 @@ namespace Isis {
    *                           will only have "View Correlation Matrix" for now. This work order
    *                           will move when we figure out the rest of the tree structure for the
    *                           bundle adjust items (settings, results, statistics, etc.).
+   *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
+   *                           BundleSolutionInfo and BundleStatistics references with BundleResults
+   *                           due to class name changes.
    */
   class ProjectTreeWidget : public QTreeWidget {
       Q_OBJECT
@@ -42,7 +45,7 @@ namespace Isis {
       void addControlGroup(ControlList *controlList);
       void addControl(Control *control);
       void addImageGroup(ImageList *images);
-      void addBundleResults(BundleResults *bundleResults);
+      void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
 
     protected:
       void contextMenuEvent(QContextMenuEvent *event);

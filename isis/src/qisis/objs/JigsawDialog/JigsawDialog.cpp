@@ -7,7 +7,7 @@
 #include "ui_JigsawDialog.h"
 
 #include "BundleAdjust.h"
-#include "BundleResults.h"
+#include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
 #include "JigsawSetupDialog.h"
 #include "Control.h"
@@ -26,8 +26,8 @@ namespace Isis {
     m_selectedControl = NULL;
     m_bundleSettings = NULL;
 
-    QList<BundleResults *> bundleResults = m_project->bundleResults();
-    if (bundleResults.size() <= 0) {
+    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
+    if (bundleSolutionInfo.size() <= 0) {
       m_ui->useLastSettings->setEnabled(false);
     }
 
@@ -72,9 +72,9 @@ namespace Isis {
     if (m_bundleSettings == NULL) {
     }
 
-    QList<BundleResults *> bundleResults = m_project->bundleResults();
-    if (m_ui->useLastSettings->isChecked() && bundleResults.size() > 0) {
-       BundleSettings *lastBundleSettings = (bundleResults.last())->bundleSettings();
+    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
+    if (m_ui->useLastSettings->isChecked() && bundleSolutionInfo.size() > 0) {
+       BundleSettings *lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
 
        if (lastBundleSettings) {
          m_bundleSettings = lastBundleSettings;
@@ -99,7 +99,7 @@ namespace Isis {
     connect( &bundleAdjustment, SIGNAL( statusUpdate(QString) ),
              this, SLOT( outputBundleStatus(QString) ) );
 
-    BundleResults br = bundleAdjustment.solveCholeskyBR();
+    BundleSolutionInfo br = bundleAdjustment.solveCholeskyBR();
 
     bundleFinished(&br);
     // **************************************************************************
@@ -120,8 +120,8 @@ namespace Isis {
 //     connect( bundleThread, SIGNAL( started() ),
 //              ba, SLOT( solveCholesky() ) );
 // 
-//     connect( ba, SIGNAL( resultsReady(BundleResults *) ),
-//              this, SLOT( bundleFinished(BundleResults *) ) );
+//     connect( ba, SIGNAL( resultsReady(BundleSolutionInfo *) ),
+//              this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
 // 
 //     connect( bundleThread, SIGNAL( finished() ),
 //              bundleThread, SLOT( deleteLater() ) );
@@ -157,12 +157,12 @@ namespace Isis {
    *
    *
    *
-   * @param bundleResults The results of the bundle run.
+   * @param bundleSolutionInfo The results of the bundle run.
    */
-  void JigsawDialog::bundleFinished(BundleResults *bundleResults) {
-    if ( bundleResults->bundleStatistics()->converged() ) {
-      bundleResults->setRunTime( Isis::iTime::CurrentLocalTime().toAscii().data() );
-      m_project->addBundleResults( new BundleResults(*bundleResults) );
+  void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
+    if ( bundleSolutionInfo->bundleResults()->converged() ) {
+      bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toAscii().data() );
+      m_project->addBundleSolutionInfo( new BundleSolutionInfo(*bundleSolutionInfo) );
 
       //TODO: move correlation matrix to correct position in project directory
       

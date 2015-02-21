@@ -11,12 +11,12 @@
 #include <QTreeWidgetItem>
 #include <QTreeWidgetItemIterator>
 
-#include "BundleResults.h"
-#include "BundleResultsTreeWidgetItem.h"
+#include "BundleSolutionInfo.h"
+#include "BundleSolutionInfoTreeWidgetItem.h"
 #include "BundleSettings.h"
 #include "BundleSettingsTreeWidgetItem.h"
-#include "BundleStatistics.h"
-#include "BundleStatisticsTreeWidgetItem.h"
+#include "BundleResults.h"
+#include "BundleResultsTreeWidgetItem.h"
 #include "Control.h"
 #include "ControlGroupTreeWidgetItem.h"
 #include "ControlList.h"
@@ -70,8 +70,8 @@ namespace Isis {
             this, SLOT(addControlGroup(ControlList *)));
     connect(m_directory->project(), SIGNAL(controlAdded(Control *)),
             this, SLOT(addControl(Control *)));
-    connect(m_directory->project(), SIGNAL(bundleResultsAdded(BundleResults *)),
-            this, SLOT(addBundleResults(BundleResults *)));
+    connect(m_directory->project(), SIGNAL(bundleSolutionInfoAdded(BundleSolutionInfo *)),
+            this, SLOT(addBundleSolutionInfo(BundleSolutionInfo *)));
 
     connect(this, SIGNAL(delayedEnableEditing(QTreeWidgetItem *)),
             this, SLOT(enableEditing(QTreeWidgetItem *)),
@@ -101,7 +101,7 @@ namespace Isis {
     bool selectedProject = false;
     QPair<bool, ImageList *> selectedImageList(false, NULL);
     QList<Control *> selectedControls;
-    QList<BundleResults *> selectedBundleResults;
+    QList<BundleSolutionInfo *> selectedBundleSolutionInfo;
     CorrMatTreeWidgetItem *corrMatItem = NULL;
 
 
@@ -390,27 +390,27 @@ namespace Isis {
 
   // TODO - kle - this is hacked, needs to be cleaned up
   // This isn't working anymore...
-  void ProjectTreeWidget::addBundleResults(BundleResults *bundleResults) {
+  void ProjectTreeWidget::addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
 
-//     QString group = bundleResults->id();
+//     QString group = bundleSolutionInfo->id();
 //     QList<QTreeWidgetItem *> found = findItems(group, Qt::MatchRecursive, 0);
 
-    QTreeWidgetItem *item = new BundleResultsTreeWidgetItem(bundleResults);
+    QTreeWidgetItem *item = new BundleSolutionInfoTreeWidgetItem(bundleSolutionInfo);
     m_resultsParentItem->addChild(item);
 
-    QString cnetfname = bundleResults->controlNetworkFileName();
+    QString cnetfname = bundleSolutionInfo->controlNetworkFileName();
     Control *newControl = new Control(cnetfname);
 
     QTreeWidgetItem *controlItem = new ControlTreeWidgetItem(newControl);
 
     item->addChild(controlItem);
 
-    BundleSettings *bundleSettings = bundleResults->bundleSettings();
-    BundleStatistics *bundleStatistics = bundleResults->bundleStatistics();
-      QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem( bundleStatistics->correlationMatrix() );
+    BundleSettings *bundleSettings = bundleSolutionInfo->bundleSettings();
+    BundleResults *bundleResults = bundleSolutionInfo->bundleResults();
+      QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem( bundleResults->correlationMatrix() );
 
     QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(bundleSettings);
-    QTreeWidgetItem *statisticsItem = new BundleStatisticsTreeWidgetItem(bundleStatistics);
+    QTreeWidgetItem *statisticsItem = new BundleResultsTreeWidgetItem(bundleResults);
       statisticsItem->addChild(corrMatItem);
 
     /*
@@ -418,9 +418,9 @@ namespace Isis {
      * matrix shouldn't have been created yet. The correlation matrix will be created when
      * "View Correlation Matrix" is selected in the context menu of the following tree item.
      */
-    if ( bundleStatistics->correlationMatrix().hasCovMat() ) {
-      //qDebug() << "CovMatFileName:" << bundleStatistics->correlationMatrix().covarianceFileName().name();
-      //qDebug() << "imgs and parmas:" << bundleStatistics->correlationMatrix().imagesAndParameters()->size();
+    if ( bundleResults->correlationMatrix().hasCovMat() ) {
+      //qDebug() << "CovMatFileName:" << bundleResults->correlationMatrix().covarianceFileName().name();
+      //qDebug() << "imgs and parmas:" << bundleResults->correlationMatrix().imagesAndParameters()->size();
     }
 
     item->addChild(settingsItem);
@@ -434,10 +434,10 @@ namespace Isis {
 
     expandItem(item);
 //     m_resultsParentItem->addChild(item);
-//qDebug() << "Done adding bundleResults";
+//qDebug() << "Done adding bundleSolutionInfo";
     //  Create new TreeWidgetItem
 //    if (!found.isEmpty()) {
-//      QTreeWidgetItem *item = new BundleResultsTreeWidgetItem(bundleResults);
+//      QTreeWidgetItem *item = new BundleSolutionInfoTreeWidgetItem(bundleSolutionInfo);
 //      found.at(0)->addChild(item);
 //    }
   }

@@ -40,7 +40,7 @@ class QXmlStreamWriter;
 #include "XmlStackedHandler.h"
 
 namespace Isis {
-  class BundleResults;
+  class BundleSolutionInfo;
   class BundleSettings;
   class Control;
   class ControlList;
@@ -79,6 +79,9 @@ namespace Isis {
    *                           to verify that the call was successful.
    *   @history 2014-07-14 Kimberly Oyama - Updated to better meet programming standards. Added
    *                           support for correlation matrix.
+   *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
+   *                           BundleSolutionInfo and BundleStatistics references with BundleResults
+   *                           due to class name changes.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -90,13 +93,13 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
-      QDir addBundleResultsFolder(QString folder);
+      QDir addBundleSolutionInfoFolder(QString folder);
       QDir addCnetFolder(QString prefix);
       void addControl(Control *control);
       QDir addImageFolder(QString prefix);
       void addImages(QStringList imageFiles);
       void addImages(ImageList newImages);
-      void addBundleResults(BundleResults *bundleResults);
+      void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       Control *control(QString id);
       Directory *directory() const;
       Image *image(QString id);
@@ -124,9 +127,9 @@ namespace Isis {
 
       static QString resultsRoot(QString projectRoot);
       QString resultsRoot() const;
-      static QString bundleResultsRoot(QString projectRoot);
-      QString bundleResultsRoot() const;
-      QList<BundleResults *> bundleResults();
+      static QString bundleSolutionInfoRoot(QString projectRoot);
+      QString bundleSolutionInfoRoot() const;
+      QList<BundleSolutionInfo *> bundleSolutionInfo();
 
       void deleteAllProjectFiles();
       void relocateProjectRoot(QString newRoot);
@@ -152,7 +155,7 @@ namespace Isis {
       void controlAdded(Control *control);
       // Emitted when new images are available.
       void imagesAdded(ImageList *images);
-      void bundleResultsAdded(BundleResults *bundleResults);
+      void bundleSolutionInfoAdded(BundleSolutionInfo *bundleSolutionInfo);
       void nameChanged(QString newName);
       void projectLoaded(Project *);
       void projectRelocated(Project *);
@@ -168,7 +171,7 @@ namespace Isis {
       void imagesReady(ImageList);
       void imageClosed(QObject *image);
       void imageListDeleted(QObject *imageList);
-      void bundleResultsClosed(QObject *bundleResults);
+      void bundleSolutionInfoClosed(QObject *bundleSolutionInfo);
 
     private:
       Project(const Project &other);
@@ -219,22 +222,22 @@ namespace Isis {
       QPointer<Directory> m_directory;
       QList<ImageList *> *m_images;
       QList<ControlList *> *m_controls;
-      QList<BundleResults *> *m_bundleResults;
+      QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 
       // TODO: kle testing - this will almost certainly be changed
       BundleSettings *m_bundleSettings;
       /**
        * This variable will probably go away when we add the bundle results object because it will
        *  be under:
-       *           BundleResults
-       *                 BundleStatistics
+       *           BundleSolutionInfo
+       *                 BundleResults
        *                       CorrelationMatrix
        */
 //       CorrelationMatrix *m_correlationMatrix;
 
       QMap<QString, Control *> *m_idToControlMap;
       QMap<QString, Image *> *m_idToImageMap;
-      QMap<QString, BundleResults *> *m_idToBundleResultsMap;
+      QMap<QString, BundleSolutionInfo *> *m_idToBundleSolutionInfoMap;
 
       QString m_name;
       QStringList *m_warnings;

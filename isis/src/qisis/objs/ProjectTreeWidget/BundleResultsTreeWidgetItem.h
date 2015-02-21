@@ -13,9 +13,10 @@ namespace Isis {
    *
    * This class visualizes a BundleResults * from the project in the project tree widget.
    *
-   * @author 2014-07-22 Ken Edmundson
+   * @author 2014-07-23 Ken Edmundson
    *
    * @internal
+   *   @history 2015-02-20 Jeannie Backer - Name changed from BundleStatistics to BundleResults.
    */
   class BundleResultsTreeWidgetItem : public QObject, public QTreeWidgetItem {
     Q_OBJECT

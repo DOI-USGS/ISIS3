@@ -1,6 +1,6 @@
 #include "JigsawSetupDialog.h"
 
-#include "BundleResults.h"
+#include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
 #include "Control.h"
 #include "IString.h"
@@ -80,9 +80,9 @@ namespace Isis {
       }
     }
 
-    QList<BundleResults *> bundleResults = m_project->bundleResults();
-    if (useLastSettings && bundleResults.size() > 0) {
-     BundleSettings *lastBundleSettings = (bundleResults.last())->bundleSettings();
+    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
+    if (useLastSettings && bundleSolutionInfo.size() > 0) {
+     BundleSettings *lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
      fillFromSettings(lastBundleSettings);
     }
 
