@@ -1,151 +1,500 @@
+#include <QDebug>
+#include <QXmlStreamWriter>
+#include <QXmlInputSource>
+
 #include <iostream>
-#include "Statistics.h"
+
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
+#include "Statistics.h"
+#include "XmlStackedHandlerReader.h"
 
 using namespace std;
+using namespace Isis;
+
+/**
+ * @author 2002-05-06 Jeff Anderson
+ *
+ * @internal
+ *   @history 2014-09-05 Jeannie Backer - Added xml read/write tests. Improved coverage of
+ *                           existing code.
+ *
+ *
+ */
+namespace Isis {
+  class StatisticsXmlHandlerTester : public Statistics {
+    public:
+      StatisticsXmlHandlerTester(Project *project, XmlStackedHandlerReader *reader, 
+                                     FileName xmlFile) : Statistics(project, reader) {
+
+        QString xmlPath(xmlFile.expanded());
+        QFile file(xmlPath);
+
+        if (!file.open(QFile::ReadOnly) ) {
+          throw IException(IException::Io,
+                           QString("Unable to open xml file, [%1],  with read access").arg(xmlPath),
+                           _FILEINFO_);
+        }
+
+        QXmlInputSource xmlInputSource(&file);
+        bool success = reader->parse(xmlInputSource);
+        if (!success) {
+          throw IException(IException::Unknown, 
+                           QString("Failed to parse xml file, [%1]").arg(xmlPath),
+                            _FILEINFO_);
+        }
+
+      }
+
+      ~StatisticsXmlHandlerTester() {
+      }
+
+  };
+}
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
-
-  Isis::Statistics s;
-  s.SetValidRange(1.0, 6.0);
-
-  s.AddData(5.0);
-  s.AddData(5.0);
-  s.Average();
-  cout << "Average:        " << s.Average() << endl;
-  s.Reset();
-
-  double a[10];
-  a[0] = 1.0;
-  a[1] = 2.0;
-  a[2] = 3.0;
-  a[3] = Isis::NULL8;
-  a[4] = Isis::HIGH_REPR_SAT8;
-  a[5] = Isis::LOW_REPR_SAT8;
-  a[6] = Isis::HIGH_INSTR_SAT8;
-  a[7] = Isis::LOW_INSTR_SAT8;
-  a[8] = 10.0;
-  a[9] = -1.0;
-
-  s.AddData(a, 8);
-  cout << "Average:        " << s.Average() << endl;
-  cout << "Variance:       " << s.Variance() << endl;
-  cout << "Rms:            " << s.Rms() << endl;
-  cout << "Std Deviation:  " << s.StandardDeviation() << endl;
-  cout << "Minimum:        " << s.Minimum() << endl;
-  cout << "Maximum:        " << s.Maximum() << endl;
-  cout << "ChebyShev Min:  " << s.ChebyshevMinimum() << endl;
-  cout << "ChebyShev Max:  " << s.ChebyshevMaximum() << endl;
-  cout << "Best Minimum:   " << s.BestMinimum() << endl;
-  cout << "Best Maximum:   " << s.BestMaximum() << endl;
-  cout << "Total Pixels:   " << s.TotalPixels() << endl;
-  cout << "Valid Pixels:   " << s.ValidPixels() << endl;
-  cout << "Null Pixels:    " << s.NullPixels() << endl;
-  cout << "Lis Pixels:     " << s.LisPixels() << endl;
-  cout << "Lrs Pixels:     " << s.LrsPixels() << endl;
-  cout << "His Pixels:     " << s.HisPixels() << endl;
-  cout << "Hrs Pixels:     " << s.HrsPixels() << endl;
-  cout << "Sum:            " << s.Sum() << endl;
-  cout << "SumSquare:      " << s.SumSquare() << endl;
-  cout << endl;
-
-  double b[4];
-  b[0] = 4.0;
-  b[1] = 5.0;
-  b[2] = 6.0;
-  b[3] = Isis::NULL8;
-
-  s.AddData(b, 4);
-  cout << "Average:        " << s.Average() << endl;
-  cout << "Variance:       " << s.Variance() << endl;
-  cout << "Rms:            " << s.Rms() << endl;
-  cout << "Std Deviation:  " << s.StandardDeviation() << endl;
-  cout << "Minimum:        " << s.Minimum() << endl;
-  cout << "Maximum:        " << s.Maximum() << endl;
-  cout << "ChebyShev Min:  " << s.ChebyshevMinimum() << endl;
-  cout << "ChebyShev Max:  " << s.ChebyshevMaximum() << endl;
-  cout << "Best Minimum:   " << s.BestMinimum() << endl;
-  cout << "Best Maximum:   " << s.BestMaximum() << endl;
-  cout << "Total Pixels:   " << s.TotalPixels() << endl;
-  cout << "Valid Pixels:   " << s.ValidPixels() << endl;
-  cout << "Null Pixels:    " << s.NullPixels() << endl;
-  cout << "Lis Pixels:     " << s.LisPixels() << endl;
-  cout << "Lrs Pixels:     " << s.LrsPixels() << endl;
-  cout << "His Pixels:     " << s.HisPixels() << endl;
-  cout << "Hrs Pixels:     " << s.HrsPixels() << endl;
-  cout << "Sum:            " << s.Sum() << endl;
-  cout << "SumSquare:      " << s.SumSquare() << endl;
-  cout << endl;
-
-  s.RemoveData(a, 3);
-  cout << "Average:        " << s.Average() << endl;
-  cout << "Variance:       " << s.Variance() << endl;
-  cout << "Rms:            " << s.Rms() << endl;
-  cout << "Std Deviation:  " << s.StandardDeviation() << endl;
-  cout << "ChebyShev Min:  " << s.ChebyshevMinimum() << endl;
-  cout << "ChebyShev Max:  " << s.ChebyshevMaximum() << endl;
-  cout << "Total Pixels:   " << s.TotalPixels() << endl;
-  cout << "Valid Pixels:   " << s.ValidPixels() << endl;
-  cout << "Null Pixels:    " << s.NullPixels() << endl;
-  cout << "Lis Pixels:     " << s.LisPixels() << endl;
-  cout << "Lrs Pixels:     " << s.LrsPixels() << endl;
-  cout << "His Pixels:     " << s.HisPixels() << endl;
-  cout << "Hrs Pixels:     " << s.HrsPixels() << endl;
-  cout << "Sum:            " << s.Sum() << endl;
-  cout << "SumSquare:      " << s.SumSquare() << endl;
-  cout << endl;
-
-  s.Reset();
-  cout << "Average:        " << s.Average() << endl;
-  cout << "Variance:       " << s.Variance() << endl;
-  cout << "Rms:            " << s.Rms() << endl;
-  cout << "Std Deviation:  " << s.StandardDeviation() << endl;
-  cout << "ChebyShev Min:  " << s.ChebyshevMinimum() << endl;
-  cout << "ChebyShev Max:  " << s.ChebyshevMaximum() << endl;
-  cout << "Total Pixels:   " << s.TotalPixels() << endl;
-  cout << "Valid Pixels:   " << s.ValidPixels() << endl;
-  cout << "Null Pixels:    " << s.NullPixels() << endl;
-  cout << "Lis Pixels:     " << s.LisPixels() << endl;
-  cout << "Lrs Pixels:     " << s.LrsPixels() << endl;
-  cout << "His Pixels:     " << s.HisPixels() << endl;
-  cout << "Hrs Pixels:     " << s.HrsPixels() << endl;
-  cout << "Sum:            " << s.Sum() << endl;
-  cout << "SumSquare:      " << s.SumSquare() << endl;
-  cout << endl;
-
   try {
-    s.RemoveData(a, 8);
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
+    Preference::Preferences(true);
+    qDebug() << "Unit test for Statistics...";
 
-  try {
-    s.Minimum();
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
+    Statistics s;
+    s.AddData(5.0);
+    s.AddData(5.0);
+    s.Average();
+    qDebug() << "For data set:    5, 5";
+    qDebug() << "Average:        " << s.Average();
+    qDebug() << "ZScore(5.0):    " << s.ZScore(5.0);
+    qDebug();
 
-  try {
-    s.Maximum();
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
+    qDebug() << "Testing Reset...";
+    s.Reset();
+    qDebug() << "Average:             " << s.Average();
+    qDebug() << "Variance:            " << s.Variance();
+    qDebug() << "Rms:                 " << s.Rms();
+    qDebug() << "Std Deviation:       " << s.StandardDeviation();
+    qDebug() << "Minimum:             " << s.Minimum();
+    qDebug() << "Maximum:             " << s.Maximum();
+    qDebug() << "ChebyShev Min:       " << s.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << s.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << s.BestMinimum();
+    qDebug() << "Best Maximum:        " << s.BestMaximum();
+    qDebug() << "Valid Minimum:       " << s.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << s.ValidMaximum();
+    qDebug() << "Total Pixels:        " << s.TotalPixels();
+    qDebug() << "Valid Pixels:        " << s.ValidPixels();
+    qDebug() << "Null Pixels:         " << s.NullPixels();
+    qDebug() << "Lis Pixels:          " << s.LisPixels();
+    qDebug() << "Lrs Pixels:          " << s.LrsPixels();
+    qDebug() << "His Pixels:          " << s.HisPixels();
+    qDebug() << "Hrs Pixels:          " << s.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << s.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << s.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << s.UnderRangePixels();
+    qDebug() << "Sum:                 " << s.Sum();
+    qDebug() << "SumSquare:           " << s.SumSquare();
+    qDebug() << "Removed Data?        " << s.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
+    qDebug();
 
-  try {
-    s.ChebyshevMinimum(0.0);
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
+    double a[10];
+    a[0] = 1.0;
+    a[1] = 2.0;
+    a[2] = 3.0;
+    a[3] = NULL8;
+    a[4] = HIGH_REPR_SAT8;
+    a[5] = LOW_REPR_SAT8;
+    a[6] = HIGH_INSTR_SAT8;
+    a[7] = LOW_INSTR_SAT8;
+    a[8] = 10.0;
+    a[9] = -1.0;
 
-  try {
-    s.ChebyshevMaximum(100.0);
+    qDebug() << "SetValidRange(1, 6) and AddData( 1, 2, 3, Null, HRS, LRS, HIS, LIS, 10, -1)";
+    s.SetValidRange(1.0, 6.0);
+    s.AddData(a, 10);
+    qDebug() << "InRange(0.0)?        " << s.InRange(0.0);
+    qDebug() << "InRange(2.0)?        " << s.InRange(2.0);
+    qDebug() << "InRange(7.0)?        " << s.InRange(7.0);
+    qDebug() << "Average:             " << s.Average();
+    qDebug() << "Variance:            " << s.Variance();
+    qDebug() << "Rms:                 " << s.Rms();
+    qDebug() << "Std Deviation:       " << s.StandardDeviation();
+    qDebug() << "Minimum:             " << s.Minimum();
+    qDebug() << "Maximum:             " << s.Maximum();
+    qDebug() << "ChebyShev Min:       " << s.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << s.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << s.BestMinimum();
+    qDebug() << "Best Maximum:        " << s.BestMaximum();
+    qDebug() << "Valid Minimum:       " << s.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << s.ValidMaximum();
+    qDebug() << "Total Pixels:        " << s.TotalPixels();
+    qDebug() << "Valid Pixels:        " << s.ValidPixels();
+    qDebug() << "Null Pixels:         " << s.NullPixels();
+    qDebug() << "Lis Pixels:          " << s.LisPixels();
+    qDebug() << "Lrs Pixels:          " << s.LrsPixels();
+    qDebug() << "His Pixels:          " << s.HisPixels();
+    qDebug() << "Hrs Pixels:          " << s.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << s.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << s.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << s.UnderRangePixels();
+    qDebug() << "Sum:                 " << s.Sum();
+    qDebug() << "SumSquare:           " << s.SumSquare();
+    qDebug() << "Removed Data?        " << s.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
+    qDebug();
+
+    double b[4];
+    b[0] = 4.0;
+    b[1] = 5.0;
+    b[2] = 6.0;
+    b[3] = NULL8;
+
+    qDebug() << "AddData( 4, 5, 6, Null)";
+    s.AddData(b, 4);
+    qDebug() << "Average:             " << s.Average();
+    qDebug() << "Variance:            " << s.Variance();
+    qDebug() << "Rms:                 " << s.Rms();
+    qDebug() << "Std Deviation:       " << s.StandardDeviation();
+    qDebug() << "Minimum:             " << s.Minimum();
+    qDebug() << "Maximum:             " << s.Maximum();
+    qDebug() << "ChebyShev Min:       " << s.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << s.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << s.BestMinimum();
+    qDebug() << "Best Maximum:        " << s.BestMaximum();
+    qDebug() << "Valid Minimum:       " << s.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << s.ValidMaximum();
+    qDebug() << "Total Pixels:        " << s.TotalPixels();
+    qDebug() << "Valid Pixels:        " << s.ValidPixels();
+    qDebug() << "Null Pixels:         " << s.NullPixels();
+    qDebug() << "Lis Pixels:          " << s.LisPixels();
+    qDebug() << "Lrs Pixels:          " << s.LrsPixels();
+    qDebug() << "His Pixels:          " << s.HisPixels();
+    qDebug() << "Hrs Pixels:          " << s.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << s.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << s.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << s.UnderRangePixels();
+    qDebug() << "Sum:                 " << s.Sum();
+    qDebug() << "SumSquare:           " << s.SumSquare();
+    qDebug() << "Removed Data?        " << s.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
+    qDebug();
+
+    qDebug() << "Testing copy constructor...";
+    Statistics copyStats(s);
+    qDebug() << "Average:             " << copyStats.Average();
+    qDebug() << "Variance:            " << copyStats.Variance();
+    qDebug() << "Rms:                 " << copyStats.Rms();
+    qDebug() << "Std Deviation:       " << copyStats.StandardDeviation();
+    qDebug() << "Minimum:             " << copyStats.Minimum();
+    qDebug() << "Maximum:             " << copyStats.Maximum();
+    qDebug() << "ChebyShev Min:       " << copyStats.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << copyStats.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << copyStats.BestMinimum();
+    qDebug() << "Best Maximum:        " << copyStats.BestMaximum();
+    qDebug() << "Valid Minimum:       " << copyStats.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << copyStats.ValidMaximum();
+    qDebug() << "Total Pixels:        " << copyStats.TotalPixels();
+    qDebug() << "Valid Pixels:        " << copyStats.ValidPixels();
+    qDebug() << "Null Pixels:         " << copyStats.NullPixels();
+    qDebug() << "Lis Pixels:          " << copyStats.LisPixels();
+    qDebug() << "Lrs Pixels:          " << copyStats.LrsPixels();
+    qDebug() << "His Pixels:          " << copyStats.HisPixels();
+    qDebug() << "Hrs Pixels:          " << copyStats.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << copyStats.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << copyStats.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << copyStats.UnderRangePixels();
+    qDebug() << "Sum:                 " << copyStats.Sum();
+    qDebug() << "SumSquare:           " << copyStats.SumSquare();
+    qDebug() << "Removed Data?        " << copyStats.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << copyStats.ZScore(1.0);
+    qDebug();
+
+    qDebug() << "Testing assignment operator=...";
+    s = s;
+    qDebug() << "Average:             " << s.Average();
+    qDebug() << "Variance:            " << s.Variance();
+    qDebug() << "Rms:                 " << s.Rms();
+    qDebug() << "Std Deviation:       " << s.StandardDeviation();
+    qDebug() << "Minimum:             " << s.Minimum();
+    qDebug() << "Maximum:             " << s.Maximum();
+    qDebug() << "ChebyShev Min:       " << s.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << s.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << s.BestMinimum();
+    qDebug() << "Best Maximum:        " << s.BestMaximum();
+    qDebug() << "Valid Minimum:       " << s.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << s.ValidMaximum();
+    qDebug() << "Total Pixels:        " << s.TotalPixels();
+    qDebug() << "Valid Pixels:        " << s.ValidPixels();
+    qDebug() << "Null Pixels:         " << s.NullPixels();
+    qDebug() << "Lis Pixels:          " << s.LisPixels();
+    qDebug() << "Lrs Pixels:          " << s.LrsPixels();
+    qDebug() << "His Pixels:          " << s.HisPixels();
+    qDebug() << "Hrs Pixels:          " << s.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << s.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << s.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << s.UnderRangePixels();
+    qDebug() << "Sum:                 " << s.Sum();
+    qDebug() << "SumSquare:           " << s.SumSquare();
+    qDebug() << "Removed Data?        " << s.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
+    qDebug();
+    Statistics assignedStats;
+    assignedStats = s;
+    qDebug() << "Average:             " << assignedStats.Average();
+    qDebug() << "Variance:            " << assignedStats.Variance();
+    qDebug() << "Rms:                 " << assignedStats.Rms();
+    qDebug() << "Std Deviation:       " << assignedStats.StandardDeviation();
+    qDebug() << "Minimum:             " << assignedStats.Minimum();
+    qDebug() << "Maximum:             " << assignedStats.Maximum();
+    qDebug() << "ChebyShev Min:       " << assignedStats.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << assignedStats.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << assignedStats.BestMinimum();
+    qDebug() << "Best Maximum:        " << assignedStats.BestMaximum();
+    qDebug() << "Valid Minimum:       " << assignedStats.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << assignedStats.ValidMaximum();
+    qDebug() << "Total Pixels:        " << assignedStats.TotalPixels();
+    qDebug() << "Valid Pixels:        " << assignedStats.ValidPixels();
+    qDebug() << "Null Pixels:         " << assignedStats.NullPixels();
+    qDebug() << "Lis Pixels:          " << assignedStats.LisPixels();
+    qDebug() << "Lrs Pixels:          " << assignedStats.LrsPixels();
+    qDebug() << "His Pixels:          " << assignedStats.HisPixels();
+    qDebug() << "Hrs Pixels:          " << assignedStats.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << assignedStats.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << assignedStats.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << assignedStats.UnderRangePixels();
+    qDebug() << "Sum:                 " << assignedStats.Sum();
+    qDebug() << "SumSquare:           " << assignedStats.SumSquare();
+    qDebug() << "Removed Data?        " << assignedStats.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << assignedStats.ZScore(1.0);
+    qDebug();
+
+    qDebug() << "Testing RemoveData(3, Null, HRS, LRS, HIS, LIS, 10, -1)";
+    s.RemoveData(&a[2], 8);
+    qDebug() << "Average:             " << s.Average();
+    qDebug() << "Variance:            " << s.Variance();
+    qDebug() << "Rms:                 " << s.Rms();
+    qDebug() << "Std Deviation:       " << s.StandardDeviation();
+    qDebug() << "ChebyShev Min:       " << s.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << s.ChebyshevMaximum();
+    qDebug() << "Total Pixels:        " << s.TotalPixels();
+    qDebug() << "Valid Pixels:        " << s.ValidPixels();
+    qDebug() << "Null Pixels:         " << s.NullPixels();
+    qDebug() << "Lis Pixels:          " << s.LisPixels();
+    qDebug() << "Lrs Pixels:          " << s.LrsPixels();
+    qDebug() << "His Pixels:          " << s.HisPixels();
+    qDebug() << "Hrs Pixels:          " << s.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << s.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << s.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << s.UnderRangePixels();
+    qDebug() << "Sum:                 " << s.Sum();
+    qDebug() << "SumSquare:           " << s.SumSquare();
+    qDebug() << "Removed Data?        " << s.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << s.ZScore(1.0);
+    qDebug();
+
+    qDebug() << "Testing serialization from copy constructor object...";
+    QByteArray byteArray;
+    QDataStream outputData(&byteArray, QIODevice::WriteOnly);
+    outputData << copyStats;
+    QDataStream inputData(byteArray);
+    Statistics serializedStats;
+    inputData >> serializedStats;
+    qDebug() << "Average:             " << serializedStats.Average();
+    qDebug() << "Variance:            " << serializedStats.Variance();
+    qDebug() << "Rms:                 " << serializedStats.Rms();
+    qDebug() << "Std Deviation:       " << serializedStats.StandardDeviation();
+    qDebug() << "Minimum:             " << serializedStats.Minimum();
+    qDebug() << "Maximum:             " << serializedStats.Maximum();
+    qDebug() << "ChebyShev Min:       " << serializedStats.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << serializedStats.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << serializedStats.BestMinimum();
+    qDebug() << "Best Maximum:        " << serializedStats.BestMaximum();
+    qDebug() << "Valid Minimum:       " << serializedStats.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << serializedStats.ValidMaximum();
+    qDebug() << "Total Pixels:        " << serializedStats.TotalPixels();
+    qDebug() << "Valid Pixels:        " << serializedStats.ValidPixels();
+    qDebug() << "Null Pixels:         " << serializedStats.NullPixels();
+    qDebug() << "Lis Pixels:          " << serializedStats.LisPixels();
+    qDebug() << "Lrs Pixels:          " << serializedStats.LrsPixels();
+    qDebug() << "His Pixels:          " << serializedStats.HisPixels();
+    qDebug() << "Hrs Pixels:          " << serializedStats.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << serializedStats.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << serializedStats.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << serializedStats.UnderRangePixels();
+    qDebug() << "Sum:                 " << serializedStats.Sum();
+    qDebug() << "SumSquare:           " << serializedStats.SumSquare();
+    qDebug() << "Removed Data?        " << serializedStats.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << serializedStats.ZScore(1.0);
+    qDebug();
+
+    // write xml 
+    qDebug() << "Testing XML: write XML from Statistics object...";
+    FileName xmlFile("./Statistics.xml");
+    QString xmlPath = xmlFile.expanded();
+    QFile qXmlFile(xmlPath);
+    if (!qXmlFile.open(QIODevice::WriteOnly|QIODevice::Text)) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
+                       _FILEINFO_);
+    }
+    QXmlStreamWriter writer(&qXmlFile);
+    writer.setAutoFormatting(true);
+    writer.writeStartDocument();
+    Project *project = NULL;
+    assignedStats.save(writer, project);
+    writer.writeEndDocument();
+    qXmlFile.close();
+    // read xml    
+    qDebug() << "Testing XML: read XML to Statistics object...";
+    XmlStackedHandlerReader reader;
+    StatisticsXmlHandlerTester statsFromXml(project, &reader, xmlFile);
+    qDebug() << "Average:             " << statsFromXml.Average();
+    qDebug() << "Variance:            " << statsFromXml.Variance();
+    qDebug() << "Rms:                 " << statsFromXml.Rms();
+    qDebug() << "Std Deviation:       " << statsFromXml.StandardDeviation();
+    qDebug() << "Minimum:             " << statsFromXml.Minimum();
+    qDebug() << "Maximum:             " << statsFromXml.Maximum();
+    qDebug() << "ChebyShev Min:       " << statsFromXml.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << statsFromXml.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << statsFromXml.BestMinimum();
+    qDebug() << "Best Maximum:        " << statsFromXml.BestMaximum();
+    qDebug() << "Valid Minimum:       " << statsFromXml.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << statsFromXml.ValidMaximum();
+    qDebug() << "Total Pixels:        " << statsFromXml.TotalPixels();
+    qDebug() << "Valid Pixels:        " << statsFromXml.ValidPixels();
+    qDebug() << "Null Pixels:         " << statsFromXml.NullPixels();
+    qDebug() << "Lis Pixels:          " << statsFromXml.LisPixels();
+    qDebug() << "Lrs Pixels:          " << statsFromXml.LrsPixels();
+    qDebug() << "His Pixels:          " << statsFromXml.HisPixels();
+    qDebug() << "Hrs Pixels:          " << statsFromXml.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << statsFromXml.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << statsFromXml.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << statsFromXml.UnderRangePixels();
+    qDebug() << "Sum:                 " << statsFromXml.Sum();
+    qDebug() << "SumSquare:           " << statsFromXml.SumSquare();
+    qDebug() << "Removed Data?        " << statsFromXml.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << statsFromXml.ZScore(1.0);
+    qDebug();
+
+    // read xml with no attributes or values
+    qDebug() << "Testing XML: read XML with no attributes or values to Statistics object...";
+    FileName emptyXmlFile("./unitTest_NoElementValues.xml");
+    StatisticsXmlHandlerTester statsFromEmptyXml(project, &reader, emptyXmlFile);
+    qDebug() << "Average:             " << statsFromEmptyXml.Average();
+    qDebug() << "Variance:            " << statsFromEmptyXml.Variance();
+    qDebug() << "Rms:                 " << statsFromEmptyXml.Rms();
+    qDebug() << "Std Deviation:       " << statsFromEmptyXml.StandardDeviation();
+    qDebug() << "Minimum:             " << statsFromEmptyXml.Minimum();
+    qDebug() << "Maximum:             " << statsFromEmptyXml.Maximum();
+    qDebug() << "ChebyShev Min:       " << statsFromEmptyXml.ChebyshevMinimum();
+    qDebug() << "ChebyShev Max:       " << statsFromEmptyXml.ChebyshevMaximum();
+    qDebug() << "Best Minimum:        " << statsFromEmptyXml.BestMinimum();
+    qDebug() << "Best Maximum:        " << statsFromEmptyXml.BestMaximum();
+    qDebug() << "Valid Minimum:       " << statsFromEmptyXml.ValidMinimum();
+    qDebug() << "Valid Maximum:       " << statsFromEmptyXml.ValidMaximum();
+    qDebug() << "Total Pixels:        " << statsFromEmptyXml.TotalPixels();
+    qDebug() << "Valid Pixels:        " << statsFromEmptyXml.ValidPixels();
+    qDebug() << "Null Pixels:         " << statsFromEmptyXml.NullPixels();
+    qDebug() << "Lis Pixels:          " << statsFromEmptyXml.LisPixels();
+    qDebug() << "Lrs Pixels:          " << statsFromEmptyXml.LrsPixels();
+    qDebug() << "His Pixels:          " << statsFromEmptyXml.HisPixels();
+    qDebug() << "Hrs Pixels:          " << statsFromEmptyXml.HrsPixels();
+    qDebug() << "Out of Range Pixels: " << statsFromEmptyXml.OutOfRangePixels();
+    qDebug() << "Over Range Pixels:   " << statsFromEmptyXml.OverRangePixels();
+    qDebug() << "Under Range Pixels:  " << statsFromEmptyXml.UnderRangePixels();
+    qDebug() << "Sum:                 " << statsFromEmptyXml.Sum();
+    qDebug() << "SumSquare:           " << statsFromEmptyXml.SumSquare();
+    qDebug() << "Removed Data?        " << statsFromEmptyXml.RemovedData();
+    qDebug() << "Z-Score at 1.0       " << statsFromEmptyXml.ZScore(1.0);
+    qDebug();
+
+    qDebug() << "Testing error throws...";
+    try {
+      // You are removing non-existant data in [Statistics::RemoveData]
+      s.RemoveData(a, 8);
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    try {
+      // Minimum is invalid since you removed data
+      s.Minimum();
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    try {
+      // Maximum is invalid since you removed data
+      s.Maximum();
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    try {
+      // Invalid value for percent
+      s.ChebyshevMinimum(0.0);
+    }
+    catch(IException &e) {
+      e.print();
+    }
+    try {
+      // Invalid value for percent
+      s.ChebyshevMinimum(100.0);
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    try {
+      // Invalid value for percent
+      s.ChebyshevMaximum(0.0);
+    }
+    catch(IException &e) {
+      e.print();
+    }
+    try {
+      // Invalid value for percent
+      s.ChebyshevMaximum(100.0);
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    try {
+      // Invalid range
+      s.SetValidRange(100.0, 0.0);
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    try {
+      // Invalid z value
+      s.Reset();
+      s.SetValidRange(1, 100);
+      s.AddData(5.0);
+      s.AddData(5.0);
+      s.ZScore(0.0);
+    }
+    catch(IException &e) {
+      e.print();
+    }
+
+    bool deleted = qXmlFile.remove();
+    if (!deleted) {
+      QString msg = "Unit Test failed. XML file [" + xmlPath + "not deleted.";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
   }
-  catch(Isis::IException &e) {
+  catch (IException &e) {
     e.print();
   }
 }
+
+#if 0
+need test coverage for
+BelowRange(value)
+#endif

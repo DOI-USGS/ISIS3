@@ -33,7 +33,7 @@ class QXmlStreamWriter;
 namespace Isis {
   class Project;// ??? does xml stuff need project???
   class XmlStackedHandlerReader;
-  /**
+ /**
   * @brief This class is used to accumulate statistics on double arrays.
   *
   * This class is used to accumulate statistics on double arrays. In
@@ -58,9 +58,10 @@ namespace Isis {
   * Histogram object (inherits from Statistics) and the stats application,
   * stats.cpp (uses the Statistics child class Histogram).
   *
+  * @ingroup Math
   * @ingroup Statistics
   *
-  * @author 2002-05-06 Jeff Andersonzz
+  * @author 2002-05-06 Jeff Anderson
   *
   * @internal
   *   @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best minimum/maximum methods.
@@ -77,6 +78,9 @@ namespace Isis {
   *   @history 2011-06-13 Ken Edmundson - Added Rms method.
   *   @history 2011-06-23 Jeannie Backer - Added QDataStream read(), write() methods and added
   *                           QDataStream >> and << operators. Replaced std strings with QStrings.
+  *   @history 2014-09-05 Jeannie Backer - Added xml read/write capabilities.  Moved method
+  *                           implementation to cpp file. Improved coverage of unitTest. Brought
+  *                           code closer to standards.
   *
   *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
   *
@@ -85,7 +89,8 @@ namespace Isis {
     Q_OBJECT
     public:
       Statistics(QObject *parent = 0);
-      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   // TODO: does xml stuff need project???
+      Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   
+      // TODO: does xml read/write stuff need Project input???
       Statistics(const Statistics &other);
       ~Statistics();
       Statistics &operator=(const Statistics &other);
@@ -98,27 +103,20 @@ namespace Isis {
       void RemoveData(const double *data, const unsigned int count);
       void RemoveData(const double data);
 
-      void SetValidRange(const double minimum = Isis::ValidMinimum, const double maximum = Isis::ValidMaximum);
+      void SetValidRange(const double minimum = Isis::ValidMinimum, 
+                         const double maximum = Isis::ValidMaximum);
 
-      double ValidMinimum() const {
-        return m_validMinimum;
-      }
-      double ValidMaximum() const {
-        return m_validMaximum;
-      }
-      bool InRange(const double value) {
-        return (value >= m_validMinimum && value <= m_validMaximum);
-      }
-      bool AboveRange(const double value) {
-        return (value > m_validMaximum);
-      }
-      bool BelowRange(const double value) {
-        return (value < m_validMinimum);
-      }
+      double ValidMinimum() const;
+      double ValidMaximum() const;
+      bool InRange(const double value);
+      bool AboveRange(const double value);
+      bool BelowRange(const double value);
 
       double Average() const;
       double StandardDeviation() const;
       double Variance() const;
+      double Sum() const;
+      double SumSquare() const;
       double Rms() const;
 
       double Minimum() const;
@@ -141,26 +139,8 @@ namespace Isis {
       BigInt OutOfRangePixels() const;
       bool RemovedData() const;
 
-
-      /**
-       * Returns the sum of all the data
-       *
-       * @return The sum of the data
-       */
-      double Sum() const {
-        return m_sum;
-      };
-
-      /**
-       * Returns the sum of all the squared data
-       *
-       * @return The sum of the squared data
-       */
-      double SumSquare() const {
-        return m_sumsum;
-      };
-
-      void save(QXmlStreamWriter &stream, const Project *project) const;   // TODO: does xml stuff need project???
+      void save(QXmlStreamWriter &stream, const Project *project) const;
+      // TODO: does xml stuff need project???
     
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
@@ -174,7 +154,8 @@ namespace Isis {
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(Statistics *statistics, Project *project);   // TODO: does xml stuff need project???
+          XmlHandler(Statistics *statistics, Project *project);
+          // TODO: does xml stuff need project???
           ~XmlHandler();
    
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
@@ -187,7 +168,8 @@ namespace Isis {
           Q_DISABLE_COPY(XmlHandler);
    
           Statistics *m_xmlHandlerStatistics;
-          Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
+          Project *m_xmlHandlerProject;
+          // TODO: does xml stuff need project???
           QString m_xmlHandlerCharacters;
       };
 
