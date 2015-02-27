@@ -204,6 +204,11 @@
       (or crop) feature which provides necessary elements for the AMICA camera 
       model to work properly.  Fixes #2056.
     </change>
+    <change name="Kris Becker" date="2015-02-26">
+      Removed AlphaCube usage to favor more flexible implementation in the 
+      AMICA camera model. Output of the image data is now in real format.
+      Fixes #2180 and #2193.
+    </change>
   </history>
 
   <category>
@@ -231,8 +236,7 @@
       
       <parameter name="TO">
          <type>cube</type>
-<!--   Uncomment the pixelType statement to get 32-bit output -->
-<!--         <pixelType>real</pixelType> -->
+         <pixelType>real</pixelType>
          <fileMode>output</fileMode>
          <brief>Output ISIS3 cube filename</brief>
          <description>

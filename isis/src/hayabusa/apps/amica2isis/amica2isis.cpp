@@ -145,6 +145,7 @@ void IsisMain ()
   OriginalLabel oldLabel(label);
   outcube->write(oldLabel);
 
+#if 0
   // Check for subimage and create an AlphaCube that describes thes subarea and
   // update the cube labels. DO NOT adjust for scale.  Camera model will handle
   // that. Coordinates in label are 0-based.
@@ -162,6 +163,7 @@ void IsisMain ()
 
      subarea.UpdateGroup(*outcube);
   }
+#endif
 
   //  All done...
    p.EndProcess();
