@@ -33,6 +33,8 @@ namespace Isis {
    *
    * @internal 
    *   @history 2013-11-27 Kris Becker - Original version
+   *   @history 2015-02-26 Kris Becker - Implement starting detector specs; add
+   *                         summing and AlphaCube support.
    */
   class AmicaCamera : public FramingCamera {
     public:
