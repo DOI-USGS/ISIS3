@@ -9,6 +9,6 @@ commands:
 	append=false \
 	> /dev/null;
 	cat $(OUTPUT)/output.pvl | \
-	  sed 's/\([0-9]*\.[0-9]\{9\}\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/temp.txt;
+	sed 's/\([0-9]*\.[0-9]\{9\}\)\([0-9]*\)/\1/g' \
+	> $(OUTPUT)/temp.txt;
 	$(MV) $(OUTPUT)/temp.txt $(OUTPUT)/output.pvl;
