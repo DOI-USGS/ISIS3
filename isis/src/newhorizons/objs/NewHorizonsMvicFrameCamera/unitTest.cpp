@@ -22,7 +22,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "MvicFrameCamera.h"
+#include "NewHorizonsMvicFrameCamera.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -39,7 +39,7 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-  cout << "Unit Test for MvicFrameCamera..." << endl;
+  cout << "Unit Test for NewHorizonsMvicFrameCamera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
@@ -48,7 +48,7 @@ int main(void) {
     double knownLon =  7.5037820678308149;
 
     Cube c("$newhorizons/testData/mpf_0035126517_0x539_sci_1.cub", "r");
-    MvicFrameCamera *cam = (MvicFrameCamera *) CameraFactory::Create(c);
+    NewHorizonsMvicFrameCamera *cam = (NewHorizonsMvicFrameCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
@@ -106,6 +106,17 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+
+    // Test the throw in SetBand
+    try {
+      cam->SetImage(1, 1);
+      cam->SetBand(10);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+
+
   }
   catch (IException &e) {
     e.print();

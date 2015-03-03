@@ -82,7 +82,7 @@ void IsisMain() {
   QString output1 = "ProcessGroundPolygonsTest.cub";
   QString output2 = "ProcessGroundPolygonsTest_count.cub";
 
-  p.SetOutputCube(output1 , output2 , out_atts, vimsPvl, 2);
+  p.SetStatCubes(output1 , output2 , out_atts, vimsPvl, 2);
 
   for(int f = 0; f < vimsCubes.size(); f++) {
     Cube vimsCube(vimsCubes[f], "r");

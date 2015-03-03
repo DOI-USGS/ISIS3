@@ -930,6 +930,11 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
+    // need to deallocate our copied cube
+    copiedCube->close();
+    delete copiedCube;
+    copiedCube = NULL;
+    
   }
 
   remove("IsisCube_00.cub");

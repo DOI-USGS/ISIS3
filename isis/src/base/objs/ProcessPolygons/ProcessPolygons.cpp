@@ -308,7 +308,7 @@ namespace Isis {
    * @param nlines
    * @param nbands
    */
-  void ProcessPolygons::SetOutputCube(const QString &avgFileName, const
+  void ProcessPolygons::SetStatCubes(const QString &avgFileName, const
                                       QString &countFileName,
                                       Isis::CubeAttributeOutput &atts,
                                       const int nsamps, const int nlines,
@@ -346,7 +346,7 @@ namespace Isis {
    * @param nlines
    * @param nbands
    */
-  void ProcessPolygons::SetOutputCube(const QString &parameter,
+  void ProcessPolygons::SetStatCubes(const QString &parameter,
                                       const int nsamps, const int nlines,
                                       const int nbands) {
 
@@ -360,7 +360,7 @@ namespace Isis {
     QString path = file->path();
     QString filename = file->baseName();
     QString countString = path + "/" + filename + "-count";
-    SetOutputCube(avgString, countString, atts, nsamps, nlines, nbands);
+    SetStatCubes(avgString, countString, atts, nsamps, nlines, nbands);
 
   }
 

@@ -216,6 +216,9 @@
     <change name="Janet Richie, Ella Lee" date="2013-11-21">
       Updated documentation.
     </change>
+    <change name="Sasha Brownsberger" date="2015-01-19">
+      Updated function calls to reflect changes to ProcessGroundPolygons object.
+    </change>
   </history>
 
   <groups>

@@ -28,7 +28,7 @@
 #include "FunctionTools.h"
 #include "IString.h"
 #include "LineScanCameraDetectorMap.h"
-#include "MvicTdiCameraDistortionMap.h"
+#include "NewHorizonsMvicTdiCameraDistortionMap.h"
 
 #include <QDebug>
 
@@ -55,11 +55,12 @@ namespace Isis {
    * @param residualRowDistCoeffs
    *
    */
-  MvicTdiCameraDistortionMap::MvicTdiCameraDistortionMap(Camera *parent,
-                                                         vector<double> xDistortionCoeffs,
-                                                         vector<double> yDistortionCoeffs,
-                                                         vector<double> residualColDistCoeffs,
-                                                         vector<double> residualRowDistCoeffs) :
+  NewHorizonsMvicTdiCameraDistortionMap::NewHorizonsMvicTdiCameraDistortionMap(
+      Camera *parent,
+      vector<double> xDistortionCoeffs,
+      vector<double> yDistortionCoeffs,
+      vector<double> residualColDistCoeffs,
+      vector<double> residualRowDistCoeffs) :
     CameraDistortionMap(parent, 1.0) {
 
     m_xDistortionCoeffs = xDistortionCoeffs;
@@ -75,7 +76,7 @@ namespace Isis {
 
   /** Destructor
    */
-  MvicTdiCameraDistortionMap::~MvicTdiCameraDistortionMap() {
+  NewHorizonsMvicTdiCameraDistortionMap::~NewHorizonsMvicTdiCameraDistortionMap() {
   }
 
 
@@ -96,7 +97,7 @@ namespace Isis {
    * @see SetDistortion
    */
   // TODO: Don't really like this - we always return true, even in event of failures
-  bool MvicTdiCameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
+  bool NewHorizonsMvicTdiCameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
 
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
@@ -155,7 +156,7 @@ namespace Isis {
    * @return if the conversion was successful
    * @see SetDistortion
    */
-  bool MvicTdiCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
+  bool NewHorizonsMvicTdiCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
 
     // image coordinates prior to introducing distortion
     p_undistortedFocalPlaneX = ux;
@@ -186,7 +187,7 @@ namespace Isis {
     // iterating to introduce distortion...
     // we stop when the difference between distorted coordinates
     // in successive iterations is at or below the given tolerance
-    for( int i = 0; i < 50; i++ ) {
+    for ( int i = 0; i < 50; i++ ) {
 
       xtScaled = -xt/m_focalPlaneHalf_x;
 
@@ -206,7 +207,7 @@ namespace Isis {
       yt = uy - deltay2;
 
       // check for convergenceyScaledDistortion
-      if((fabs(xt - xprevious) <= tolerance) && (fabs(yt - yprevious) <= tolerance)) {
+      if ((fabs(xt - xprevious) <= tolerance) && (fabs(yt - yprevious) <= tolerance)) {
         bConverged = true;
         break;
       }
@@ -242,9 +243,10 @@ namespace Isis {
    *
    * @return success/failure
    */
-  bool MvicTdiCameraDistortionMap::computeDistortionCorrections(const double xscaled,
-                                                                const double yscaled,
-                                                                double &deltax) {
+  bool NewHorizonsMvicTdiCameraDistortionMap::computeDistortionCorrections(
+      const double xscaled,
+      const double yscaled,
+      double &deltax) {
 
     double lpx0, lpx1, lpx2, lpx3, lpx4, lpx5;
     double lpy0, lpy1, lpy2, lpy3, lpy4, lpy5;
@@ -304,7 +306,7 @@ namespace Isis {
    *
    * @return success/failure
    */
-  void MvicTdiCameraDistortionMap::computeResidualDistortionCorrections(const double dx,
+  void NewHorizonsMvicTdiCameraDistortionMap::computeResidualDistortionCorrections(const double dx,
                                                              double &residualDeltax,
                                                              double &residualDeltay) {
 
@@ -328,35 +330,35 @@ namespace Isis {
   }
 
 
-  /**
-   * Testing method to output corrections in x and y at pixel centers for entire focal plane.
-   * Output in csv format for viewing/plotting in Excel.
-   */
-  bool MvicTdiCameraDistortionMap::outputResidualDeltas() {
-
-    QString ofname("mvic_tdi_residual_deltas.csv");
-    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-    if (!fp_out)
-      return false;
-
-    char buf[1056];
-
-    double residualColDelta;
-
-    for (int s=0; s <= 5000; s++) {  // loop in sample direction
-      residualColDelta =            m_residualColDistCoeffs[0] +
-                                s * m_residualColDistCoeffs[1] +
-                         pow(double(s),2) * m_residualColDistCoeffs[2] +
-                         pow(double(s),3) * m_residualColDistCoeffs[3] +
-                         pow(double(s),4) * m_residualColDistCoeffs[4] +
-                         pow(double(s),5) * m_residualColDistCoeffs[5];
-      sprintf(buf, "%d,%lf\n", s, residualColDelta);
-      fp_out << buf;
-    }
-
-    fp_out.close();
-
-    return true;
-  }
+///**
+// * Testing method to output corrections in x and y at pixel centers for entire focal plane.
+// * Output in csv format for viewing/plotting in Excel.
+// */
+//bool NewHorizonsMvicTdiCameraDistortionMap::outputResidualDeltas() {
+//
+//  QString ofname("mvic_tdi_residual_deltas.csv");
+//  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+//  if (!fp_out)
+//    return false;
+//
+//  char buf[1056];
+//
+//  double residualColDelta;
+//
+//  for (int s=0; s <= 5000; s++) {  // loop in sample direction
+//    residualColDelta =            m_residualColDistCoeffs[0] +
+//                              s * m_residualColDistCoeffs[1] +
+//                       pow(double(s),2) * m_residualColDistCoeffs[2] +
+//                       pow(double(s),3) * m_residualColDistCoeffs[3] +
+//                       pow(double(s),4) * m_residualColDistCoeffs[4] +
+//                       pow(double(s),5) * m_residualColDistCoeffs[5];
+//    sprintf(buf, "%d,%lf\n", s, residualColDelta);
+//    fp_out << buf;
+//  }
+//
+//  fp_out.close();
+//
+//  return true;
+//}
 
 }

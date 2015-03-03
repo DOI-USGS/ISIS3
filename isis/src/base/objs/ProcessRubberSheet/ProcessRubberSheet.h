@@ -106,6 +106,11 @@ namespace Isis {
    *                           a smaller patch. The 99% produced unpredictable
    *                           results on different machines due to double
    *                           rounding error. References #604.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to StartProcess
+   *                                            function to ensure successful 
+   *                                            inheritance between Process and its
+   *                                            child classes.  Made destructor virtual.
+   *                                            References #2215.
    *  
    *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
    *                        implementation example to class documentation
@@ -116,10 +121,10 @@ namespace Isis {
       ProcessRubberSheet(int startSize = 128, int endSize = 8);
 
       //! Destroys the RubberSheet object.
-      ~ProcessRubberSheet() {};
+      virtual ~ProcessRubberSheet() {};
 
       // Output driven processing method for one input and output cube
-      void StartProcess(Transform &trans, Interpolator &interp);
+      virtual void StartProcess(Transform &trans, Interpolator &interp);
 
       // Input driven processing method for one input and output cube
       void processPatchTransform(Transform &trans, Interpolator &interp);

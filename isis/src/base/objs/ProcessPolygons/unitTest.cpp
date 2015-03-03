@@ -31,7 +31,7 @@ void IsisMain() {
 
   QString output1 = "processPolygonsTest.cub";
   QString output2 = "processPolygonsTest_count.cub";
-  p.SetOutputCube(output1 , output2 , out_atts, 4, 4, 2);
+  p.SetStatCubes(output1 , output2 , out_atts, 4, 4, 2);
 
   samples.clear();
   lines.clear();

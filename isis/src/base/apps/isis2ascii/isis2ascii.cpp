@@ -1,7 +1,10 @@
 #include "Isis.h"
+
+#include <iomanip>
+
+#include "FileName.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -28,7 +31,9 @@ void IsisMain() {
     fout << "Samples:Lines:Bands:  " << icube->sampleCount() << ":" <<
          icube->lineCount() << ":" << icube->bandCount() << endl;
   }
-
+  
+  fout << std::setprecision(7);
+  
   // List the cube
   p.StartProcess(isis2ascii);
   p.EndProcess();

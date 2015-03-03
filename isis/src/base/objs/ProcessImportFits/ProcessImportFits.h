@@ -41,13 +41,14 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-06-06 Stuart Sides - Added ability to read and process the FITS extension
+   *   @history 2015-01-15 Sasha Brownsberger - Made destructor virtual.  References #2215.
    */
 
   class ProcessImportFits : public ProcessImport {
 
     public:
       ProcessImportFits();
-      ~ProcessImportFits();
+      virtual ~ProcessImportFits();
 
       PvlGroup standardInstrumentGroup(PvlGroup fitsLabel) const;
       PvlGroup fitsLabel(int labelNumber) const;

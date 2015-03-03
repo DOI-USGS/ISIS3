@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="center" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Compute the center of mass of a single-band cube
+  </brief>
+
+  <description>
+    This program computes the sample and line of the center of mass (weighted
+    by pixel value) of a single-band cube. The sample and line of the centroid,
+    as well as the offset from the image center, are output in PVL. In addition
+    if the TO parameter is specified this program will ouput a single-band cube
+    of the same size with the center of mass of the input cube at the center of
+    the image frame. 
+
+    The primary purpose of this program is to align multiple images of an object for
+    a movie, such as images taken on approach. This program is best used with
+    objects against a dark background.
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2014-12-25">
+      Original version
+    </change>
+    <change name="Jeffrey Covington" date="2015-02-19">
+      Added more documentation and restricted center to single-band cubes.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>coreg</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube/image to center
+        </brief>
+        <description>
+          Use this parameter to select the filename. Only one band is allowed 
+          in the input cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+       <internalDefault>None</internalDefault> 
+        <inclusions> <item>INTERP</item> </inclusions>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          If specified this file will contain the results of the centered cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+        <parameter name="INTERP">
+            <type>string</type>
+            <brief>
+                Interpolation used for Transformation
+            </brief>
+            <description>
+                This will be the interpolation type used to get the output file 
+                in either the translate or warp application.  Defaults to 
+                CUBICCONVOLUTION.
+            </description>
+            <default><item>CUBICCONVOLUTION</item></default>
+            <list>
+                <option value="NEARESTNEIGHBOR">
+                    <brief>
+                        Nearest Neighbor Interpolation
+                    </brief>
+                    <description>
+                        Nearest Neighbor Interpolation will be used in the transformation
+                        to create the output file.
+                    </description>
+                </option>
+                <option value="BILINEAR">
+                    <brief>
+                        Bilinear Interpolation
+                    </brief>
+                    <description>
+                        Bilinear Interpolation will be used in the transformation to create
+                        the output file.
+                    </description>
+                </option>
+                <option value="CUBICCONVOLUTION">
+                    <brief>
+                        Cubic Convolution Interpolation
+                    </brief>
+                    <description>
+                        Cubic Convolution Interpolation will be used in the tranformation
+                        to create the output file.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <internalDefault>ValidMin</internalDefault>
+        <brief>
+          Minimum DN value to consider
+        </brief>
+        <description>
+          Minimum DN in the image to consider for computation of the center of 
+          mass.  This can be helpful to eliminate background data.
+        </description>
+        <lessThan>
+          <item>MAXIMUM</item>
+        </lessThan>
+      </parameter>
+
+      <parameter name="MAXIMUM">
+        <type>double</type>
+        <internalDefault>ValidMax</internalDefault>
+        <brief>
+          Maximum DN to consider in computation
+        </brief>
+        <description>
+          Maximum DN to consider in computation of center of mass.  This can be 
+          used to eliminate high saturation that would otherwise bias the 
+          centroid calculation.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+  
+  <examples>
+    <example>
+      <brief> Centering object against dark background. </brief>
+      <description>
+        This example shows centering a body against a dark background.
+      </description>
+      <terminalInterface>
+        <commandLine> center from=EN0131836960M_iof.cub to=centered.cub
+        </commandLine>
+        <description>
+        Center the input image about the center of mass using the default interpolation.
+        </description>
+      </terminalInterface>
+
+      <inputImages>
+        <image src="assets/image/EN0131836960M_iof.jpg" width="512" height="512">
+          <brief> Input image for center</brief>
+          <description>This is the 512 by 512 input image for the center example.
+          </description>
+          <thumbnail caption="Input image" src="assets/thumb/EN0131836960M_iof.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+
+      <outputImages>
+        <image src="assets/image/centered.jpg" width="512" height="512">
+          <brief> Output image for mirror</brief>
+          <description> This is the 512 by 512 output image that results.
+          </description>
+          <thumbnail caption="Output image showing results of the center application." src="assets/thumb/centered.jpg" width="200" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="720" height="1150" src="assets/image/CenterGui.jpg">
+            <brief>Example Gui</brief>
+            <description>Screenshot of GUI with parameters filled in to perform
+              a center operation on the input image.
+            </description>
+            <thumbnail width="200" height="319" caption="Mirror Gui" src="assets/thumb/CenterGui.jpg" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
+</application>

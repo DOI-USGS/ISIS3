@@ -125,7 +125,9 @@ namespace Isis {
 
     // Lookup the original band from the band bin group.
     if (vband > (int) m_originalBand.size()) {
-      string msg = "Band number out of array bounds in NewHorizonsLeisaCamera";
+     QString msg = QObject::tr("Band number out of array bounds in NewHorizonsLeisaCamera::SetBand legal "
+                                "bands are [1-%1], input was [%2]").
+                    arg(m_originalBand.size()).arg(vband);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     int band;

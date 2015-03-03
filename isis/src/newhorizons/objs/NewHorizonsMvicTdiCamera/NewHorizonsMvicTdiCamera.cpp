@@ -18,11 +18,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "MvicTdiCamera.h"
+#include "NewHorizonsMvicTdiCamera.h"
 
 #include <QDebug>
 
-#include "MvicTdiCameraDistortionMap.h"
+#include "NewHorizonsMvicTdiCameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
 #include "iTime.h"
@@ -40,7 +40,7 @@ namespace Isis {
    *
    * @internal
    */
-  MvicTdiCamera::MvicTdiCamera(Cube &cube) : LineScanCamera(cube) {
+  NewHorizonsMvicTdiCamera::NewHorizonsMvicTdiCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
 
     // Set the pixel pitch, focal length and row offset from Mvic frame transfer array
@@ -92,7 +92,7 @@ namespace Isis {
       residualRowDistCoefs.push_back(getDouble(naifROWKey,i));
     }
 
-    new MvicTdiCameraDistortionMap(this, distCoefX, distCoefY, residualColumnDistCoefs,
+    new NewHorizonsMvicTdiCameraDistortionMap(this, distCoefX, distCoefY, residualColumnDistCoefs,
                                    residualRowDistCoefs);
 
     // Setup the ground and sky map
@@ -110,13 +110,13 @@ namespace Isis {
 // Plugin
 /**
  * This is the function that is called in order to instantiate a
- * MvicTdiCamera object.
+ * NewHorizonsMvicTdiCamera object.
  *
  * @param lab Cube labels
  *
- * @return Isis::Camera* MvicTdiCamera
+ * @return Isis::Camera* NewHorizonsMvicTdiCamera
  * @internal
  */
-extern "C" Isis::Camera *MvicTdiCameraPlugin(Isis::Cube &cube) {
-  return new Isis::MvicTdiCamera(cube);
+extern "C" Isis::Camera *NewHorizonsMvicTdiCameraPlugin(Isis::Cube &cube) {
+  return new Isis::NewHorizonsMvicTdiCamera(cube);
 }

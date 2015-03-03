@@ -22,7 +22,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "MvicTdiCamera.h"
+#include "NewHorizonsMvicTdiCamera.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -39,16 +39,16 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-  cout << "Unit Test for MvicFrameCamera..." << endl;
+  cout << "Unit Test for New HorizonsMvicTdiFrameCamera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -12.1377865382142698;
-    double knownLon = 339.1875224195596275;
+    double knownLat = -10.1772088449130020;
+    double knownLon = 339.7338889883354796;
 
     Cube c("$newhorizons/testData/mc0_0034942918_0x536_sci_1.cub", "r");
-    MvicTdiCamera *cam = (MvicTdiCamera *) CameraFactory::Create(c);
+    NewHorizonsMvicTdiCamera *cam = (NewHorizonsMvicTdiCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);

@@ -146,6 +146,7 @@ namespace Isis {
    *                           as the buffer shape to ensure virtual bands accessed correctly.
    *                           Added cases to test creating bsq and large bsq cubes.
    *                           References #1689.
+   *   @history 2015-01-30 Ian Humphrey - Deallocated copied cubes in unittest. References #2082.
    */
   class Cube {
     public:

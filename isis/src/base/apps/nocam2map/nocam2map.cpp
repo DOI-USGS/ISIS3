@@ -1,5 +1,6 @@
 #define GUIHELPERS
 
+
 #include "Isis.h"
 #include "Constants.h"
 #include "naif/SpiceUsr.h"
@@ -14,6 +15,12 @@
 #include "TextFile.h"
 #include "nocam2map.h"
 
+#include <QList>
+#include <QString>
+#include <QStringList>
+#include <QVector>
+#include <algorithm>
+
 using namespace std;
 using namespace Isis;
 
@@ -22,6 +29,7 @@ void ComputePixRes();
 void LoadMapRes();
 void ComputeInputRange();
 void LoadMapRange();
+void DeleteTables(Pvl *label, PvlGroup kernels);
 
 map <QString, void *> GuiHelpers() {
   map <QString, void *> helper;
@@ -451,6 +459,20 @@ void IsisMain() {
                                   inCube->bandCount());
     oCube->putGroup(mapGrp);
 
+    
+    PvlGroup kernels;
+    Pvl *label=oCube->label();
+    //std::cout<<*label<<std::endl;
+    if ( oCube->hasGroup("Kernels") ) {
+      kernels=oCube->group("Kernels");
+      DeleteTables(label, kernels);
+      oCube->deleteGroup("Kernels");
+    }
+    if ( label->hasObject("NaifKeywords") ) {
+      label->deleteObject("NaifKeywords");
+    } 
+    
+
     //Determine which interpolation to use
     Interpolator *interp = NULL;
     if(ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
@@ -692,6 +714,65 @@ bool nocam2map::Xform(double &inSample, double &inLine,
   inLine = line_guess;
   return true;
 }
+
+
+// Function to delete unwanted tables in header
+void DeleteTables(Pvl *label, PvlGroup kernels) {
+  //Delete any tables in header corresponding to the Kernel
+  const QString tableStr("Table");
+  const QString nameStr("Name");
+
+
+  //Setup a list of tables to delete with predetermined values and any tables in the kernel.
+  //If additional tables need to be removed, they can be added to the list of tables that
+  //detine the 'tmpTablesToDelete' QString array directly below.  
+  QString tmpTablesToDelete[] = {"SunPosition","BodyRotation","InstrumentPointing",
+                                                              "InstrumentPosition"};
+  std::vector<QString> tablesToDelete;
+  int sizeOfTablesToDelete = (int) sizeof(tmpTablesToDelete)/sizeof(*tmpTablesToDelete);
+  for (int i = 0; i < sizeOfTablesToDelete; i++) {
+    tablesToDelete.push_back( tmpTablesToDelete[i] );
+  }
+  for (int j=0; j < kernels.keywords(); j++) {   
+    if (kernels[j].operator[](0) == tableStr)  {
+      bool newTableToDelete=true;
+      for (int k = 0; k<sizeOfTablesToDelete; k++) {
+        if ( tablesToDelete[k] == kernels[j].name() ) {
+          newTableToDelete=false;
+          break;
+        }
+      }
+      if (newTableToDelete) {
+        tablesToDelete.push_back( kernels[j].name() );
+        sizeOfTablesToDelete++;
+      }
+    }
+  } 
+  int tablesToDeleteSize = (int) tablesToDelete.size();
+  //Now go through and find all entries in the label corresponding to our unwanted keywords
+  std::vector<int> indecesToDelete;
+  int indecesToDeleteSize=0;
+  for (int k=0; k < label->objects(); k++) {
+    PvlObject &currentObject=(*label).object(k);
+    if (currentObject.name() == tableStr) {
+      PvlKeyword &nameKeyword = currentObject.findKeyword(nameStr);
+      for(int l=0; l < tablesToDeleteSize; l++) {
+        if ( nameKeyword[0] == tablesToDelete[l] ) {
+          indecesToDelete.push_back(k-indecesToDeleteSize);
+          indecesToDeleteSize++;
+          //(*label).deleteObject(k);
+          //tableDeleted = true;
+          break;
+        }
+      }
+    }
+  }
+  //Now go through and delete the corresponding tables
+  for (int k=0; k < indecesToDeleteSize; k++) {
+    (*label).deleteObject(indecesToDelete[k]);
+  }
+}
+
 
 int nocam2map::OutputSamples() const {
   return p_outputSamples;

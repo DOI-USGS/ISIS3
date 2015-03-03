@@ -1,5 +1,5 @@
-#ifndef MvicFrameCameraDistortionMap_h
-#define MvicFrameCameraDistortionMap_h
+#ifndef NewHorizonsMvicTdiCameraDistortionMap_h
+#define NewHorizonsMvicTdiCameraDistortionMap_h
 /** 
  * @file 
  *  
@@ -28,10 +28,10 @@ using namespace std;
 namespace Isis {
 
   /** 
-   *  Distort/undistort focal plane coordinates for New Horizons/MVIC frame sensor
+   *  Distort/undistort focal plane coordinates for New Horizons/MVIC
    *
    * Creates a map for adding/removing optical distortions
-   * from the focal plane of a camera for the New Horizons/MVIC frame sensor.
+   * from the focal plane of a camera for the New Horizons/MVIC instrument.
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Mvic
@@ -42,30 +42,36 @@ namespace Isis {
    * @internal
    *   @history 2014-05-02 Ken Edmundson - Original Version
    */
-  class MvicFrameCameraDistortionMap : public CameraDistortionMap {
+  class NewHorizonsMvicTdiCameraDistortionMap : public CameraDistortionMap {
     public:
-      MvicFrameCameraDistortionMap(Camera *parent, vector<double> xDistortionCoeffs,
-                                   vector<double> yDistortionCoeffs);
+    NewHorizonsMvicTdiCameraDistortionMap(Camera *parent,
+                               vector<double> xDistortionCoeffs,
+                               vector<double> yDistortionCoeffs,
+                               vector<double> residualColDistCoeffs,
+                               vector<double> residualRowDistCoeffs);
 
-      ~MvicFrameCameraDistortionMap();
+      ~NewHorizonsMvicTdiCameraDistortionMap();
 
       virtual bool SetFocalPlane(const double dx, const double dy);
 
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
-      bool outputDeltas(); // for debugging
+//      bool outputResidualDeltas(); // for debugging
 
-    private:
-      bool computeDistortionCorrections(const double xscaled, const double yscaled, double &deltax,
-                                        double &deltay);
+  private:
+      bool computeDistortionCorrections(const double xscaled, const double yscaled, double &deltax);
+      void computeResidualDistortionCorrections(const double dx, double &residualDeltax,
+                                                double &residualDeltay);
 
     private:
       std::vector<double> m_xDistortionCoeffs; //!< distortion coefficients in x and y as determined
       std::vector<double> m_yDistortionCoeffs; //!< by Keith Harrison (Interface Control Document
                                                //!< section 10.3.1.2)
 
+      vector<double> m_residualColDistCoeffs;  //!< residual distortion coefficients as determined
+      vector<double> m_residualRowDistCoeffs;  //!< by Jason Cook, SWRI (MVIC Distortion)
+
       double m_focalPlaneHalf_x;               //!< half of focal plane x and y dimensions in mm
-      double m_focalPlaneHalf_y;
   };
 };
 #endif

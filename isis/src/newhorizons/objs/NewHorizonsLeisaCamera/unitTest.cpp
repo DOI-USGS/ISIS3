@@ -42,10 +42,10 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables. -- in progress
-    double knownLat = 0;
-    double knownLon = 0; 
+    double knownLat = 12.5782232447537350;
+    double knownLon = 23.5337593470261517; 
 
-    Cube c("jupiterTest.cub", "r");//get a test cube!
+    Cube c("$newhorizons/testData/lsb_0034933739_0x53c_sci_1.cub", "r");
     NewHorizonsLeisaCamera *cam = (NewHorizonsLeisaCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -59,27 +59,35 @@ int main(void) {
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
-    // Test all four corners to make sure the conversions are right
-    //Where do these numbers come from?
-    cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 1.0, 1.0);
+    double uLLine = 194.0;
+    double uRLine = 60.0;
+    double lLLine = 800.0;
+    double lRLine = 900.0;
+    for (int i = 0; i < 256; i++) {
+      // Test four corners to make sure the conversions are right. The test image doesn't have target
+      // data in the corners, so values were specifically choosen.
+      cout << "Test forward and backward line/samp to lat/lon delta for Band #" << i+1 << endl;
+      cout << "  For upper left corner (1.0, " << uLLine + i << ") ..." << endl;
+      cam->SetBand(i+1);
+      TestLineSamp(cam, 1.0, uLLine + i);
 
-    cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, 257.0, 1.0);
+      cout << "  For upper right corner (256.0, " << uRLine + i << ") ..." << endl;
+      TestLineSamp(cam, 256.0, uRLine + i);
 
-    cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 1.0, 257.0);
+      cout << "  For lower left corner (1.0, " << lLLine + i << ") ..." << endl;
+      TestLineSamp(cam, 1.0, lLLine + i);
 
-    cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 257.0, 257.0);
+      cout << "  For lower right corner (256.0, " << lRLine + i << ") ..." << endl;
+      TestLineSamp(cam, 256.0, lRLine + i);
+    }
 
-    double samp = 257.0/2.0;
-    double line = 257.0/2.0;
+    double samp = 256.0/2.0;
+    double line = 677;
+    cam->SetBand(1);
     cout << "For center pixel position ..." << endl;
 
     if (!cam->SetImage(samp, line)) {
-      cout << "ERROR" << endl;
-//      return 0;
+      cout << "ERROR call SetImage "<< samp << " " << line << endl;
     }
 
     if (abs(cam->UniversalLatitude() - knownLat) < 6E-14) {
@@ -90,36 +98,51 @@ int main(void) {
     }
 
     if (abs(cam->UniversalLongitude() - knownLon) < 6E-14) {
-      cout << "Longitude OK" << endl;
+      cout << "Longitude OK" << endl << endl;
     }
     else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+      cout << setprecision(16) << "Longitude off by: " << 
+              cam->UniversalLongitude() - knownLon << endl << endl;
     }
-    
+
+    // Test the band dependent flag getter
+    cout << "The bands of this camera have different gemometry for each band = " << 
+            !cam->IsBandIndependent() << endl << endl;
+
+
+    // Test trying to set an illeagal band number
+    try {
+      cam->SetBand(257);
+    }
+    catch (IException &e) {
+      e.print();
+      cout << endl << endl;
+    }
   }
   catch (IException &e) {
     e.print();
   }
 }
 
+
 void TestLineSamp(Camera *cam, double samp, double line) {
-  bool success = cam->SetImage(samp, line);
 
-  if (success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
-  }
-
-  if (success) {
-    double deltaSamp = samp - cam->Sample();
-    double deltaLine = line - cam->Line();
-    if (fabs(deltaSamp) < 0.001) deltaSamp = 0.0;
-    if (fabs(deltaLine) < 0.001) deltaLine = 0.0;
-    cout << "DeltaSample = " << deltaSamp << endl;
-    cout << "DeltaLine = " << deltaLine << endl << endl;
+  if (cam->SetImage(samp, line)) {
+    if (cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude())) {
+      double deltaSamp = samp - cam->Sample();
+      double deltaLine = line - cam->Line();
+      if (fabs(deltaSamp) < 0.001) deltaSamp = 0.0;
+      if (fabs(deltaLine) < 0.001) deltaLine = 0.0;
+      cout << "  DeltaSample = " << deltaSamp << endl;
+      cout << "  DeltaLine = " << deltaLine << endl << endl;
+    }
+    else {
+      cout << "  DeltaSample = ERROR" << endl;
+      cout << "  DeltaLine = ERROR" << endl << endl;
+    }
   }
   else {
-    cout << "DeltaSample = ERROR" << endl;
-    cout << "DeltaLine = ERROR" << endl << endl;
+    cout << "  Error in SetImage (" << samp << ", " << line << ")" << endl << endl;
   }
 }
 

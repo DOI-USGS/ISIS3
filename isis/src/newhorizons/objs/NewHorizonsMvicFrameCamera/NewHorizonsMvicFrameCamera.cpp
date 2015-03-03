@@ -18,7 +18,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "MvicFrameCamera.h"
+#include "NewHorizonsMvicFrameCamera.h"
 
 #include <QDebug>
 
@@ -30,12 +30,13 @@
 #include "CameraSkyMap.h"
 #include "IString.h"
 #include "iTime.h"
-#include "MvicFrameCameraDistortionMap.h"
+#include "NewHorizonsMvicFrameCameraDistortionMap.h"
 #include "NaifStatus.h"
 
 using namespace std;
 
 namespace Isis {
+
   /**
    * Constructs a New Horizons MVIC Framing Camera object. The MVIC push-frame camera operates 
    * in "staring" mode, so it has been implemented as a framing camera rather than a push-frame.
@@ -48,8 +49,7 @@ namespace Isis {
    * @author Tracie Sucharski
    * @internal
    */
-
-  MvicFrameCamera::MvicFrameCamera(Cube &cube) : FramingCamera(cube) {
+  NewHorizonsMvicFrameCamera::NewHorizonsMvicFrameCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
 
     SetFocalLength();
@@ -76,7 +76,6 @@ namespace Isis {
     PvlKeyword &origBand = bandBin["OriginalBand"];
     PvlKeyword &utcTime = bandBin["UtcTime"];
     for(int i = 0; i < origBand.size(); i++) {
-//    qDebug()<<"Constructor   origBand = "<<origBand[i];
       m_originalBand.push_back(toInt(origBand[i]));
       m_utcTime.push_back(utcTime[i]);
     }
@@ -104,7 +103,7 @@ namespace Isis {
       distCoefY.push_back(getDouble(naifYKey,i));
     }
 
-    new MvicFrameCameraDistortionMap(this, distCoefX, distCoefY);
+    new NewHorizonsMvicFrameCameraDistortionMap(this, distCoefX, distCoefY);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -121,24 +120,20 @@ namespace Isis {
    *
    * @param band The band number to set
    */
-  void MvicFrameCamera::SetBand(const int vband) {
+  void NewHorizonsMvicFrameCamera::SetBand(const int vband) {
 
     if(vband > (int) m_originalBand.size()) {
-      string msg = "Band number out of array bounds in MvicFrameCamera";
+      QString msg = QObject::tr("Band number out of array bounds in NewHorizonsMvicFrameCamera::SetBand legal "
+                                "bands are [1-%1], input was [%2]").
+                    arg(m_originalBand.size()).arg(vband);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-//  qDebug()<<"::SetBand origBand Size = "<<m_originalBand.size();
-//  qDebug()<<"          vband = "<<vband;
-//  int band = m_originalBand[vband-1];
-//  qDebug()<<"          Band = "<<band;
 
     iTime time(m_utcTime[vband-1]);
     double et = time.Et();
-//  qDebug()<<"et = "<<QString::number(et,'f',12);
    
     SpiceChar utc[30];
     et2utc_c(et, "ISOC", 3, 30, utc);
-//  qDebug()<<"          utc (et) = "<<utc;
     Camera::setTime(et);
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, m_exposure);
 
@@ -146,7 +141,6 @@ namespace Isis {
     Camera::SetBand(vband);
     
   }
-
 
 
   /**
@@ -166,27 +160,24 @@ namespace Isis {
    * @return @b pair < @b iTime, @b iTime > The first value is the shutter
    *         open time and the second is the shutter close time.
    *
-   * @author 2011-05-03 Jeannie Walldren
-   * @internal
-   *   @history 2011-05-03 Jeannie Walldren - Original version.
+   * @author 2014-01-01 Tracie Sucharski
    */
-  pair<iTime, iTime> MvicFrameCamera::ShutterOpenCloseTimes(double time, double exposureDuration) {
+  pair<iTime, iTime> NewHorizonsMvicFrameCamera::ShutterOpenCloseTimes(double time, double exposureDuration) {
 
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
 }
 
 
-
 /**
- * This is the function that is called in order to instantiate a MvicFrameCamera
+ * This is the function that is called in order to instantiate a NewHorizonsMvicFrameCamera
  * object.
  *
  * @param lab Cube labels
  *
- * @return Isis::Camera* MvicFrameCamera
+ * @return Isis::Camera* NewHorizonsMvicFrameCamera
  * @internal
  */
-extern "C" Isis::Camera *MvicFrameCameraPlugin(Isis::Cube &cube) {
-  return new Isis::MvicFrameCamera(cube);
+extern "C" Isis::Camera *NewHorizonsMvicFrameCameraPlugin(Isis::Cube &cube) {
+  return new Isis::NewHorizonsMvicFrameCamera(cube);
 }

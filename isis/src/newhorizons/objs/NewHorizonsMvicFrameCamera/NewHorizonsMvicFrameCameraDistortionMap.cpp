@@ -26,7 +26,7 @@
 #include "Constants.h"
 #include "FunctionTools.h"
 #include "IString.h"
-#include "MvicFrameCameraDistortionMap.h"
+#include "NewHorizonsMvicFrameCameraDistortionMap.h"
 
 #include "CameraFocalPlaneMap.h"
 
@@ -51,7 +51,7 @@ namespace Isis {
    * @param xDistortionCoeffs   distortion coefficients in x
    * @param yDistortionCoeffs   distortion coefficients in y
    */
-  MvicFrameCameraDistortionMap::MvicFrameCameraDistortionMap(Camera *parent,
+  NewHorizonsMvicFrameCameraDistortionMap::NewHorizonsMvicFrameCameraDistortionMap(Camera *parent,
                                                              vector<double> xDistortionCoeffs,
                                                              vector<double> yDistortionCoeffs) :
     CameraDistortionMap(parent, 1.0) {
@@ -68,48 +68,48 @@ namespace Isis {
 
   /** Destructor
    */
-  MvicFrameCameraDistortionMap::~MvicFrameCameraDistortionMap() {
+  NewHorizonsMvicFrameCameraDistortionMap::~NewHorizonsMvicFrameCameraDistortionMap() {
   }
 
 
-  /**
-   * Testing method to output corrections in x and y at pixel centers for entire focal plane.
-   * Output in csv format for viewing/plotting in Excel.
-   */
-  bool MvicFrameCameraDistortionMap::outputDeltas() {
-
-    QString ofname("mvic_frame_deltas.csv");
-    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-    if (!fp_out)
-      return false;
-
-    char buf[1056];
-
-    double deltax, deltay;
-
-    for (double line = 0.5; line <= 128.5; line += 1.0) {    // loop in y direction
-      for (double sample=0.5; sample <= 5000.5; sample += 1.0) {      // loop in x direction
-
-        p_camera->FocalPlaneMap()->SetDetector(sample,line);
-
-        double fplanex = p_camera->FocalPlaneMap()->FocalPlaneX();
-        double fplaney = p_camera->FocalPlaneMap()->FocalPlaneY();
-
-        SetFocalPlane(fplanex,fplaney);
-
-        deltax = fplanex - p_undistortedFocalPlaneX;
-        deltay = fplaney - p_undistortedFocalPlaneY;
-
-        sprintf(buf, "%lf,%lf,%lf,%lf\n", sample, deltax/0.013, line, deltay/0.013);
-
-        fp_out << buf;
-      }
-    }
-
-    fp_out.close();
-
-    return true;
-  }
+//  /**
+//   * Testing method to output corrections in x and y at pixel centers for entire focal plane.
+//   * Output in csv format for viewing/plotting in Excel.
+//   */
+//bool NewHorizonsMvicFrameCameraDistortionMap::outputDeltas() {
+//
+//  QString ofname("mvic_frame_deltas.csv");
+//  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+//  if (!fp_out)
+//    return false;
+//
+//  char buf[1056];
+//
+//  double deltax, deltay;
+//
+//  for (double line = 0.5; line <= 128.5; line += 1.0) {    // loop in y direction
+//    for (double sample=0.5; sample <= 5000.5; sample += 1.0) {      // loop in x direction
+//
+//      p_camera->FocalPlaneMap()->SetDetector(sample,line);
+//
+//      double fplanex = p_camera->FocalPlaneMap()->FocalPlaneX();
+//      double fplaney = p_camera->FocalPlaneMap()->FocalPlaneY();
+//
+//      SetFocalPlane(fplanex,fplaney);
+//
+//      deltax = fplanex - p_undistortedFocalPlaneX;
+//      deltay = fplaney - p_undistortedFocalPlaneY;
+//
+//      sprintf(buf, "%lf,%lf,%lf,%lf\n", sample, deltax/0.013, line, deltay/0.013);
+//
+//      fp_out << buf;
+//    }
+//  }
+//
+//  fp_out.close();
+//
+//  return true;
+//}
 
 
   /** Compute undistorted focal plane x/y
@@ -122,7 +122,7 @@ namespace Isis {
    * @return if the conversion was successful
    * @see SetDistortion
    */
-  bool MvicFrameCameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
+  bool NewHorizonsMvicFrameCameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
 
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
@@ -166,7 +166,9 @@ namespace Isis {
 
     return true;
   }
-//  bool MvicFrameCameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
+
+
+//  bool NewHorizonsMvicFrameCameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
 
 //    p_focalPlaneX = dx;
 //    p_focalPlaneY = dy;
@@ -214,7 +216,7 @@ namespace Isis {
    * @return if the conversion was successful
    * @see SetDistortion
    */
-  bool MvicFrameCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
+  bool NewHorizonsMvicFrameCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
 
     // image coordinates prior to introducing distortion
     p_undistortedFocalPlaneX = ux;
@@ -270,7 +272,7 @@ namespace Isis {
 
     return bConverged;
   }
-//  bool MvicFrameCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
+//  bool NewHorizonsMvicFrameCameraDistortionMap::SetUndistortedFocalPlane(const double ux, const double uy) {
 
 //    // image coordinates prior to introducing distortion
 //    p_undistortedFocalPlaneX = ux;
@@ -342,9 +344,9 @@ namespace Isis {
    *
    * @return if successful
    */
-  bool MvicFrameCameraDistortionMap::computeDistortionCorrections(const double xscaled,
-                                                             const double yscaled, double &deltax,
-                                                             double &deltay) {
+  bool NewHorizonsMvicFrameCameraDistortionMap::computeDistortionCorrections(const double xscaled,
+                                                                  const double yscaled, 
+                                                                  double &deltax, double &deltay) {
 
     double lpx0, lpx1, lpx2, lpx3, lpx4, lpx5;
     double lpy0, lpy1, lpy2, lpy3, lpy4, lpy5;
@@ -366,6 +368,7 @@ namespace Isis {
       lpy4 = legendre_p(4,yscaled);
       lpy5 = legendre_p(5,yscaled);
     }
+    // TESTING NOTE: Could not find a way to cause this error. If one is found a test should be added
     catch (const std::exception& e) {
       return false;
     }

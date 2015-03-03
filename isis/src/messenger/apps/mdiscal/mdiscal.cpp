@@ -67,7 +67,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
 void IsisMain() {
 
   const QString mdiscal_program = "mdiscal";
-  const QString mdiscal_version = "1.4";
+  const QString mdiscal_version = "1.5";
   const QString mdiscal_revision = "$Revision$";
   QString mdiscal_runtime = Application::DateTime();
 

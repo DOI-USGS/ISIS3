@@ -37,7 +37,8 @@ namespace Isis {
   CubeCalculator::CubeCalculator() {
     m_calculations    = NULL;
     m_methods         = NULL;
-    m_data            = NULL;
+    // m_data was never used anywhere
+//     m_data            = NULL;
     m_dataDefinitions = NULL;
     m_cubeStats       = NULL;
     m_cubeCameras     = NULL;
@@ -45,7 +46,8 @@ namespace Isis {
 
     m_calculations    = new QVector<Calculations>();
     m_methods         = new QVector<void (Calculator:: *)(void)>();
-    m_data            = new QVector<QVector<double> >();
+    // m_data was never used anywhere
+//     m_data            = new QVector<QVector<double> >();
     m_dataDefinitions = new QVector<DataValue>();
     m_cubeStats       = new QVector<Statistics *>();
     m_cubeCameras     = new QVector<Camera *>();
@@ -54,6 +56,25 @@ namespace Isis {
     m_outputSamples = 0;
   }
 
+  
+  //! Destroys the CubeCalculator object
+  CubeCalculator::~CubeCalculator() {
+    delete m_calculations;
+    delete m_methods;
+    delete m_dataDefinitions;
+    delete m_cubeStats;
+    delete m_cubeCameras;
+    delete m_cameraBuffers;
+    
+    m_calculations = NULL;
+    m_methods = NULL;
+    m_dataDefinitions = NULL;
+    m_cubeStats = NULL;
+    m_cubeCameras = NULL;
+    m_cameraBuffers = NULL;
+  }
+  
+  
   void CubeCalculator::Clear() {
     Calculator::Clear();
 
@@ -65,15 +86,20 @@ namespace Isis {
       m_methods->clear();
     }
 
-    if (m_data) {
-      m_data->clear();
-    }
+//     if (m_data) {
+//       m_data->clear();
+//     }
 
     if (m_dataDefinitions) {
       m_dataDefinitions->clear();
     }
 
+    // m_cubeStats contains pointers to dynamic memory - need to free
     if (m_cubeStats) {
+      for (int i = 0; i < m_cubeStats->size(); i++) {
+        delete (*m_cubeStats)[i];
+        (*m_cubeStats)[i] = NULL;
+      }
       m_cubeStats->clear();
     }
 
@@ -81,11 +107,17 @@ namespace Isis {
       m_cubeCameras->clear();
     }
 
+    // m_cameraBuffers contains pointers to dynamic memory - need to free
     if (m_cameraBuffers) {
+      for (int i = 0; i < m_cameraBuffers->size(); i++) {
+        delete (*m_cameraBuffers)[i];
+        (*m_cameraBuffers)[i] = NULL;
+      }
       m_cameraBuffers->clear();
     }
   }
 
+  
   /**
    * This method will execute the calculations built up when PrepareCalculations was called.
    *

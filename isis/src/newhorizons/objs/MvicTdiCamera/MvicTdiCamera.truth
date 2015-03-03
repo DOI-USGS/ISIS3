@@ -1,3 +1,0 @@
-Unit Test for MvicFrameCamera...
-**ERROR** Unable to initialize camera model from group [Instrument].
-**ERROR** The camera is requesting spice data [INS-98900_DISTORTION_COEF_X] that was not attached, please re-run spiceinit.
