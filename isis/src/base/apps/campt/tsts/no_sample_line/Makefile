@@ -9,6 +9,7 @@ commands:
 	> $(OUTPUT)/noSampleLineTruth.txt;
 	cat $(OUTPUT)/noSampleLineTruth.txt | \
 	$(SED) 's/\([0-9]*\.[0-9]\{5\}\)[0-9]*/\1/g' | \
+	$(SED) '/Filename.*/ { N; N; N; N; s/-\n[ ]*//g; }' | \
 	$(SED) 's/\(.*= \).*\(ab102401.cub\)/\1\2/' \
 	>& $(OUTPUT)/noSampleLineTruthtmp.txt;
 	$(MV) $(OUTPUT)/noSampleLineTruthtmp.txt \

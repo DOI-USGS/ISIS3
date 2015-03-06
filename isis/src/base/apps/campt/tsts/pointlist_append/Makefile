@@ -12,6 +12,7 @@ commands:
 	to=$(OUTPUT)/pointlistAppendTruth.pvl \
 	coordtype=IMAGE > /dev/null;
 	cat $(OUTPUT)/pointlistAppendTruth.pvl | \
+	$(SED) '/Filename.*/ { N; N; N; N; s/-\n[ ]*//g; }' | \
 	$(SED) 's/\(.*= \).*\(ab102401.cub\)/\1\2/g' \
 	> $(OUTPUT)/pointlistAppendTruthtmp.pvl;
 	$(MV) $(OUTPUT)/pointlistAppendTruthtmp.pvl \
