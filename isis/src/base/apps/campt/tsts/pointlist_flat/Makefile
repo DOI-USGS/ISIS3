@@ -5,8 +5,11 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) from=$(INPUT)/ab102401.cub \
 	coordlist=$(INPUT)/image.lis \
-	to=$(OUTPUT)/temp.csv \
+	to=$(OUTPUT)/pointlistFlatTruth.csv \
 	format=FLAT coordtype=IMAGE \
 	append=false > /dev/null;
-	cut -d , -f 2- $(OUTPUT)/temp.csv >& $(OUTPUT)/pointlistFlatTruth.csv;
-	rm $(OUTPUT)/temp.csv;
+	cat $(OUTPUT)/pointlistFlatTruth.csv | \
+	$(SED) 's/^.*\(ab102401.cub\)\(.*\)/\1\2/g' \
+	> $(OUTPUT)/pointlistFlatTruthtmp.csv;
+	$(MV) $(OUTPUT)/pointlistFlatTruthtmp.csv \
+	$(OUTPUT)/pointlistFlatTruth.csv;

@@ -8,7 +8,8 @@ commands:
 	to=$(OUTPUT)/onlySampleTruth.pvl \
 	sample=10 > /dev/null;
 	cat $(OUTPUT)/onlySampleTruth.pvl | \
-	sed 's/\([0-9]*\.[0-9]\{5\}\)[0-9]*/\1/g' \
+	$(SED) 's/\([0-9]*\.[0-9]\{5\}\)[0-9]*/\1/g' | \
+	$(SED) 's/\(.*= \).*\(ab102401.cub\)/\1\2/' \
 	> $(OUTPUT)/onlySampleTruthtmp.pvl;
 	$(MV) $(OUTPUT)/onlySampleTruthtmp.pvl \
 	$(OUTPUT)/onlySampleTruth.pvl;
@@ -16,7 +17,8 @@ commands:
 	to=$(OUTPUT)/onlyLineTruth.pvl \
 	line=10 > /dev/null;
 	cat $(OUTPUT)/onlyLineTruth.pvl | \
-	sed 's/\([0-9]*\.[0-9]\{5\}\)[0-9]*/\1/g' \
+	$(SED) 's/\([0-9]*\.[0-9]\{5\}\)[0-9]*/\1/g' | \
+	$(SED) 's/\(.*= \).*\(ab102401.cub\)/\1\2/' \
 	> $(OUTPUT)/onlyLineTruthtmp.pvl;
 	$(MV) $(OUTPUT)/onlyLineTruthtmp.pvl \
 	$(OUTPUT)/onlyLineTruth.pvl;
