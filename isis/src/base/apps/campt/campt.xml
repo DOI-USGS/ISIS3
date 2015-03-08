@@ -8,9 +8,9 @@
   <description>
     <p>
     Campt computes geometric and photometric information at a given pixel 
-    location in the input image <def link="Cube">cube</def>. The program computes 
-    spacecraft and instrument related information, and other types of coordinates 
-    as described later in this document. The user will have a choice of coordinates 
+    location or list of pixel locations in the input image <def link="Cube">cube</def>. 
+    The program computes spacecraft and instrument related information, and other types of 
+    coordinates as described later in this document. The user will have a choice of coordinates 
     in which to output the information as well as a choice in the output format of the 
     information acquired. 
     </p>
@@ -24,12 +24,13 @@
     </p>
     <p>
     The point of interest in the image can be entered as <def>Latitude</def>/<def>Longitude</def>
-    coordinates or <def>Line</def>/<def>Sample</def> coordinates. Keep in mind 
+    coordinates or <def>Sample</def>/<def>Line</def> coordinates. Keep in mind 
     that the input <def>Latitude</def> and <def>Longitude</def> values entered 
     will be interpreted as <def link="Universal Coordinate">Universal 
     Coordinates</def> (ISIS default) regardless of the target body. In the 
     output, all positions are in <def link="Body Fixed Coordinate">Body-Fixed</def>
-    Coordinates.    
+    Coordinates. Multiple points of interest may be specified by providing a comma-delimited 
+    flatfile of coordinates.    
     </p>
     <p> 
     The following is a partial list of coordinates computed in the <i>campt</i> application:<br />
@@ -56,7 +57,7 @@
     such as Microsoft Excel. Below is an example of <i>campt</i> output in <def>PVL</def>
     format. You can skim the left column of this PVL-formatted output file for 
     a thorough listing of the types of coordinates, sun and instrument-related 
-    information computed when using <i>campt</i>.
+    information computed when using <i>campt</i>. 
     </p>
     
     <pre>
@@ -106,8 +107,16 @@ Group = GroundPoint
   <def>UTC</def>                        = 1997-10-20T10:58:37.6570806
   LocalSolarTime             = 17.089704420784 &lt;hour&gt;
   <def link="Solar Longitude">SolarLongitude</def>             = 201.83159041209
+  Error                      = NULL
 End_Group
     </pre>
+    
+    <p>
+    Note: The "Error" keyword will only appear when using a coordinate list. The value of
+    "Error" will be NULL unless an error occurs during the processing of a coordinate in the 
+    <a href="#FilesCOORDLIST">coordinate list</a>. Then, the value of this keyword will be the error
+    message.
+    </p>
   </description>
 
   <category>
@@ -153,7 +162,7 @@ End_Group
     </change>
     <change name="Steven Koechle" date="2008-08-19">
       Removed unnecessary duplicate cube creation
-     </change>
+    </change>
     <change name="Janet Barrett" date="2008-11-15">
       Added SubSolarGroundAzimuth and SubSpacecraftGroundAzimuth
       to PVL output. The SubSolarGroundAzimuth is the clockwise
@@ -182,7 +191,14 @@ End_Group
       Removed links to applications imbedded in text and replaced with 
       italicized application name.  Added application links to the 
       "Related Objects and Documents" section of the documentation.
-       Fixes mantis ticket #1525.
+      Fixes mantis ticket #1525.
+    </change>
+    <change name="Ian Humphrey" date="2014-11-05">
+      Added new parameters, USECOORDLIST, COORDLIST, and COORDTYPE for processing a list of
+      points as input. Reorganized campt. Fixes #1449.
+    </change>
+    <change name="Ian Humphrey" date="2015-03-03">
+      Updated documentation. References #1449.
     </change>
   </history>
 
@@ -210,13 +226,107 @@ End_Group
         </brief>
         <description>
           Input image, which requires <def>SPICE</def> (see <i>spiceinit</i>)
-	  and must be a <def>Level0</def> or a <def>Level1</def> ISIS cube.
+          and must be a <def>Level0</def> or a <def>Level1</def> ISIS cube.
         </description>
         <filter>
           *.cub
         </filter>
       </parameter>
-
+      
+      <parameter name = "USECOORDLIST">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Enable coordinate list parameters in the GUI
+        </brief>
+        <description>
+          Selecting this parameter will enable the 'COORDLIST' and 'COORDTYPE' parameters in the 
+          GUI. 
+          <p>
+            Note that this parameter is optional when running <i>campt</i> on the 
+            command line.
+          </p>
+        </description>
+        <inclusions>
+          <item>COORDLIST</item>
+          <item>COORDTYPE</item>
+        </inclusions>
+        <exclusions>
+          <item>TYPE</item>
+          <item>SAMPLE</item>
+          <item>LINE</item>
+          <item>LATITUDE</item>
+          <item>LONGITUDE</item>
+        </exclusions>
+      </parameter>
+            
+      <parameter name="COORDLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input comma-delimited file of image or ground coordinates
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          An input comma-delimited flatfile of image coordinates or ground coordinates.
+          This allows the program to process multiple coordinates in a single run of <i>campt</i>, 
+          and output the results to the specified output file.
+          <p>
+            Expected order for image coordinates: sample, line<br/>
+            Expected order for ground coordinates: latitude, longitude
+          </p>
+          <p>
+            The "Error" keyword will only appear when using a coordinate list. The value of "Error"
+            will then be NULL unless an error occurs during the processing of a coordinate in the 
+            coordinate list. Then, the value of this keyword will be the error message. This allows
+            for <i>campt</i> to continue processing the remaining coordinates in the coordinate
+            list.
+          </p> 
+          <p>
+            For the input of Latitude and Longitude, campt expects 
+            <def>Planetocentric Latitude</def> (within -90 to 90 boundary) and 
+            <def>Positive East Longitude</def> (with 0-360 boundary) to find the location in the
+            input camera image.
+          </p>
+        </description>
+        <exclusions>
+          <item>TYPE</item>
+          <item>SAMPLE</item>
+          <item>LINE</item>
+          <item>LATITUDE</item>
+          <item>LONGITUDE</item>
+        </exclusions>
+      </parameter>
+      
+      <parameter name="COORDTYPE">
+        <type>string</type>
+        <brief>Coordinate type selection (Image or Ground) for 'COORDLIST'</brief>
+        <list>
+          <option value="IMAGE">
+            <brief>Interprets coordinates in 'COORDLIST' as sample/line</brief>
+            <description>
+              This option interprets the coordinates provided in the input coordinate list file
+              as sample/line and will compute latitude/longitude and Projection x/y.
+            </description>
+          </option>
+          <option value="GROUND">
+            <brief>Interprets the coordinates in 'COORDLIST' as latitude/longitude</brief>
+            <description>
+              This option interprets the coordinates provided in the input coordinate list file
+              as latitude/longitude and will compute sample/line and Projection x/y.
+            </description>
+          </option>
+        </list>
+        <description>
+          This parameter is used to select the type of coordinates entered in the coordinate list
+          file, which will be used to determine the method to compute the geometric
+          and photometric information.
+        </description>
+  <exclusions>
+    <item>TYPE</item>
+  </exclusions>
+      </parameter>
+      
       <parameter name="TO">
         <type>filename</type>
         <fileMode>output</fileMode>
@@ -230,7 +340,7 @@ End_Group
           scripts.
         </description>
       </parameter>
-
+      
       <parameter name="FORMAT">
         <type>string</type>
         <brief>
@@ -255,7 +365,7 @@ End_Group
             </brief>
             <description>
               Output file will be a comma-delimited flatfile.  This file format
-	      can easily be imported into <i>Excel</i>.
+              can easily be imported into <i>Excel</i>.
             </description>
           </option>
         </list>
@@ -268,8 +378,34 @@ End_Group
         </brief>
         <description>
           If this option is selected, the output from the application will be 
-	  appended to the output file.  If it is not selected, any information 
-	  in the 'TO' file will be overwritten.
+          appended to the output file.  If it is not selected, any information 
+          in the 'TO' file will be overwritten.
+        </description>
+        <default><item>TRUE</item></default>
+      </parameter>
+      
+      <parameter name="ALLOWOUTSIDE">
+        <type>boolean</type>
+        <brief>
+          Allow sample/line values outside the image to be reported
+        </brief>
+        <description>
+          The Allowoutside parameter influences how <i>campt</i> will report 
+          resulting latitude/longitude and sample/line coordinates that fall 
+          outside the input cube pixel boundaries.  
+          <p>
+          The default is set to True, which allows <i>campt</i> to return 
+          the values that are outside the cube pixel boundaries. For example,
+          a given latitude/longitude might return a sample location of -1.0 
+          (a single whole pixel coordinate off the left side of the image).
+          This is a feature of the ISIS camera models.
+          </p>
+          <p>
+          When set to False, if a returned coordinate is off the image, 
+          <i>campt</i> will fail.  This failure can be indicated and ignored 
+          within a batch script when only coordinates that fall within the 
+          image cube pixel boundaries are desired.
+          </p>
         </description>
         <default><item>TRUE</item></default>
       </parameter>
@@ -296,7 +432,7 @@ End_Group
             <brief>Interprets the coordinates as latitude/longitude</brief>
             <description>
               This option interprets the coordinate as latitude/longitude and 
-	      will compute sample/line and Projection x/y.
+              will compute sample/line and Projection x/y.
             </description>
             <exclusions>
               <item>LINE</item>
@@ -306,8 +442,8 @@ End_Group
         </list>
         <description>
           This parameter is used to select the type of coordinate entered, 
-	  which will be used to determine the method to compute the geometric
-	  and photometric information.
+          which will be used to determine the method to compute the geometric
+          and photometric information.
         </description>
       </parameter>
 
@@ -319,7 +455,7 @@ End_Group
         <internalDefault>Center sample</internalDefault>
         <description>
             This is the <def>Sample</def> position used to compute information 
-	    about the input cube at the pixel.
+            at a given pixel location in the input image cube.
         </description>
       </parameter>
 
@@ -329,10 +465,10 @@ End_Group
         <brief>
           Line position to report
         </brief>
-       <internalDefault>Center line</internalDefault>
+      <internalDefault>Center line</internalDefault>
         <description>
             This is the <def>Line</def> position used to compute information 
-	    about the input cube at the pixel.
+            at a given pixel location in the input image cube.
         </description>
       </parameter>
 
@@ -343,9 +479,9 @@ End_Group
         </brief>
         <description>
             This is the <def>Planetocentric Latitude</def> (within -90 to 90 
-	    boundary) used to find the location in the input camera image.
+            boundary) used to find the location in the input camera image.
             <p>
-               Refer to <def>Latitude Type</def>.
+              Refer to <def>Latitude Type</def>.
             </p>
         </description>
         <minimum inclusive="yes">-90.0</minimum>
@@ -359,40 +495,14 @@ End_Group
         </brief>
         <description>
             This is the <def>Positive East Longitude</def> (with 0-360 boundary)
-	    used to find the location in the input camera image.
+            used to find the location in the input camera image.
             <p>
               Refer to <def>Longitude Direction</def> and 
-	      <def>Longitude Domain</def>.
+              <def>Longitude Domain</def>.
             </p>
         </description>
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">360.0</maximum>
-      </parameter>
-
-      <parameter name="ALLOWOUTSIDE">
-        <type>boolean</type>
-        <brief>
-          Allow sample/line values outside the image to be reported
-        </brief>
-        <description>
-          The Allowoutside parameter influences how <i>campt</i> will report 
-	  resulting latitude/longitude and sample/line coordinates that fall 
-	  outside the input cube pixel boundaries.  
-          <p>
-            The default is set to True, which allows <i>campt</i> to return 
-	    the values that are outside the cube pixel boundaries, For example,
-	    a given latitude/longitude might return a sample location of -1.0 
-	    (a single whole pixel coordinate off the left side of the image).
-            This is a feature of the ISIS camera models.
-          </p>
-          <p>
-            When set to False, if a returned coordinate is off the image, 
-	    <i>campt</i> will fail.  This failure can be indicated and ignored 
-	    within a batch script when only coordinates that fall within the 
-	    image cube pixel boundaries are desired.
-          </p>
-        </description>
-        <default><item>true</item></default>
       </parameter>
     </group>
   </groups>
