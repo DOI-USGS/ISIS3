@@ -4,7 +4,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	# Tests for when a calibrated file does not have some of the expected keys
-	$(SED) \
+	LC_CTYPE=C && LANG=C && $(SED) \
 	  -e 's+PIXSIZE+PIX-IZE+' \
 	  -e 's+PIXFOV+PIX-OV+' \
 	  -e 's+GAIN+GA-N+' \
