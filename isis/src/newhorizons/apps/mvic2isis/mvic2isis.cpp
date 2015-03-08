@@ -60,32 +60,16 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (!primaryLabel.hasKeyword("BITPIX", Pvl::Traverse)) {
-    FileName in = ui.GetFileName("FROM");
-    QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
-                  "in New Horizons/MVIC FITS format. BITPIX keyword is missing.";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
-
-
   // Check to see if the undistorted image was requested from the FITS file and that it has the 
   // corresponding extension and keywords
   if (ui.WasEntered("UNDISTORTED")) {
     PvlGroup undistortedLabel = importFits.fitsLabel(1);
-    if (!undistortedLabel.hasKeyword("XTENSION") || !undistortedLabel.hasKeyword("COMMENT") ||
-        undistortedLabel["XTENSION"][0] != "IMAGE" || 
-        !undistortedLabel["COMMENT"][0].startsWith("This is the bias-subtracted, flattened, distortion-removed image cube.")) {
+    if (!undistortedLabel.hasKeyword("COMMENT") ||
+        !undistortedLabel["COMMENT"][0].startsWith("This is the bias-subtracted, "
+                                                   "flattened, distortion-removed image cube.")) {
 
-      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Undistorted image. "
-                                "FITS label value for EXTNAME is [%2]").
-                             arg(ui.GetFileName("FROM")).arg(undistortedLabel["EXTNAME"][0]);
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    if (!undistortedLabel.hasKeyword("BITPIX")) {
-      FileName in = ui.GetFileName("FROM");
-      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
-                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing from label [1].";
+      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC undistorted "
+                                "image in XTENSION [2]").arg(ui.GetFileName("FROM"));
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -94,20 +78,11 @@ void IsisMain() {
   // corresponding extension and keywords
   if (ui.WasEntered("ERROR")) {
     PvlGroup errorLabel = importFits.fitsLabel(2);
-    if (!errorLabel.hasKeyword("XTENSION") || !errorLabel.hasKeyword("COMMENT") ||
-        errorLabel["XTENSION"][0] != "IMAGE" || 
+    if (!errorLabel.hasKeyword("COMMENT") ||
         errorLabel["COMMENT"][0] != "1-sigma error per pixel for the image in extension 1.") {
 
-      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Error image. "
-                                "FITS label value for EXTNAME is [%2]").
-                    arg(ui.GetFileName("FROM")).arg(errorLabel["EXTNAME"][0]);
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    if (!errorLabel.hasKeyword("BITPIX")) {
-      FileName in = ui.GetFileName("FROM");
-      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
-                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing from label [2].";
+      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Error image "
+                                "in the XTENSION [3]").arg(ui.GetFileName("FROM"));
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -116,24 +91,14 @@ void IsisMain() {
   // corresponding extension and keywords
   if (ui.WasEntered("QUALITY")) {
     PvlGroup qualityLabel = importFits.fitsLabel(3);
-    if (!qualityLabel.hasKeyword("XTENSION") || !qualityLabel.hasKeyword("COMMENT") ||
-        qualityLabel["XTENSION"][0] != "IMAGE" || 
+    if (!qualityLabel.hasKeyword("COMMENT") ||
         qualityLabel["COMMENT"][0] != "Data quality flag for the image in extension 1.") {
 
-      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Quality image. "
-                                "FITS label value for EXTNAME is [%2]").
-                    arg(ui.GetFileName("FROM")).arg(qualityLabel["EXTNAME"][0]);
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    if (!qualityLabel.hasKeyword("BITPIX")) {
-      FileName in = ui.GetFileName("FROM");
-      QString msg = "Input file [" + in.expanded() + "] does not appear to be " +
-                    "in New Horizons/MVIC FITS format. BITPIX keyword is missing from label [3].";
+      QString msg = QObject::tr("Input file [%1] does not appear to contain an MVIC Quality image "
+                                "in extension [3]").arg(ui.GetFileName("FROM"));
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-
 
   // Convert the primary image 
   QString bitpix = primaryLabel.findKeyword("BITPIX", Pvl::Traverse);
@@ -255,6 +220,7 @@ void translateLabels(Pvl &label, Cube *ocube) {
   instId = instId + "_" + scanType;
   inst.addKeyword(PvlKeyword("InstrumentId", instId), PvlGroup::Replace);
 
+  // Not tested because we didn't have any files that do this at the time the test were done
   QString target = (QString)inst["TargetName"];
   if (target.startsWith("RADEC=")) {
     inst.addKeyword(PvlKeyword("TargetName", "Sky"), PvlGroup::Replace);
@@ -359,51 +325,23 @@ void translateLabels(Pvl &label, Cube *ocube) {
     if (calibration.hasKeyword("TdiRate")) {
       calibration.findKeyword("TdiRate").setUnits("hz");
     }
-    if (calibration.hasKeyword("SolarSpectrumResolved")) {
-      calibration.findKeyword("SolarSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("SolarSpectrumUnresolved")) {
-      calibration.findKeyword("SolarSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("PholusSpectrumResolved")) {
-      calibration.findKeyword("PholusSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("PholusSpectrumUnresolved")) {
-      calibration.findKeyword("PholusSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("CharonSpectrumResolved")) {
-      calibration.findKeyword("CharonSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("CharonSpectrumUnresolved")) {
-      calibration.findKeyword("CharonSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("JupiterSpectrumResolved")) {
-      calibration.findKeyword("JupiterSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("JupiterSpectrumUnresolved")) {
-      calibration.findKeyword("JupiterSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("PlutoSpectrumResolved")) {
-      calibration.findKeyword("PlutoSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("PlutoSpectrumUnresolved")) {
-      calibration.findKeyword("PlutoSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
-    }
-    if (calibration.hasKeyword("SolarPivotWavelength")) {
-      calibration.findKeyword("SolarPivotWavelength").setUnits("cm");
-    }
-    if (calibration.hasKeyword("JupiterPivotWavelength")) {
-      calibration.findKeyword("JupiterPivotWavelength").setUnits("cm");
-    }
-    if (calibration.hasKeyword("PholusPivotWavelength")) {
-      calibration.findKeyword("PholusPivotWavelength").setUnits("cm");
-    }
-    if (calibration.hasKeyword("PlutoPivotWavelength")) {
-      calibration.findKeyword("PlutoPivotWavelength").setUnits("cm");
-    }
-    if (calibration.hasKeyword("CharonPivotWavelength")) {
-      calibration.findKeyword("CharonPivotWavelength").setUnits("cm");
-    }
+    // The following do not need hasKeyword tests because the translater creats them everytime
+    // due to them having default values if none is in the FITS file.
+    calibration.findKeyword("SolarSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("SolarSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("PholusSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("PholusSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("CharonSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("CharonSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("JupiterSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("JupiterSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("PlutoSpectrumResolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("PlutoSpectrumUnresolved").setUnits("(erg/cm^2/s/sr)/(DN/s/pix)");
+    calibration.findKeyword("SolarPivotWavelength").setUnits("cm");
+    calibration.findKeyword("JupiterPivotWavelength").setUnits("cm");
+    calibration.findKeyword("PholusPivotWavelength").setUnits("cm");
+    calibration.findKeyword("PlutoPivotWavelength").setUnits("cm");
+    calibration.findKeyword("CharonPivotWavelength").setUnits("cm");
   }
 }
 

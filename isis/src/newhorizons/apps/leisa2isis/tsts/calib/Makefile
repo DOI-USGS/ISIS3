@@ -20,4 +20,76 @@ commands:
 	  > /dev/null;
 	catlab from=$(OUTPUT)/lsb_0034933739_0x53c_sci_1_Quality.cub > \
 	  $(OUTPUT)/lsb_0034933739_0x53c_sci_1_Quality.pvl;
+	# Test for the calibration error image name
+	$(SED) 's+XTENSION+XTEN-ION+g' \
+	$(INPUT)/lsb_0034933739_0x53c_sci_1.fit > $(OUTPUT)/temp.fit
+	if [ `$(APPNAME) \
+	  from=$(OUTPUT)/temp.fit \
+	  to=$(OUTPUT)/junk.cub \
+	  errormap=true \
+	  >& $(OUTPUT)/temp.txt` ]; then \
+	  true; \
+	fi;
+	$(SED) 's/\[.*\/\(temp.fit\)\]/[\1]/' < $(OUTPUT)/temp.txt > $(OUTPUT)/error_error-xtension-key.txt;
+	$(RM) $(OUTPUT)/temp.txt $(OUTPUT)/temp.fit;
+	# Test for the calibration error image extension name
+	$(SED) 's+EXTNAME+EXzNAME+g' \
+	$(INPUT)/lsb_0034933739_0x53c_sci_1.fit > $(OUTPUT)/temp.fit
+	if [ `$(APPNAME) \
+	  from=$(OUTPUT)/temp.fit \
+	  to=$(OUTPUT)/junk.cub \
+	  errormap=true \
+	  >& $(OUTPUT)/temp.txt` ]; then \
+	  true; \
+	fi;
+	$(SED) 's/\[.*\/\(temp.fit\)\]/[\1]/' < $(OUTPUT)/temp.txt > $(OUTPUT)/error_error-extname-key.txt;
+	$(RM) $(OUTPUT)/temp.txt $(OUTPUT)/temp.fit;
+	# Test for the calibration error image extension name incorrect
+	$(SED) 's+EXTNAME = '"'"'ERRORMAP+EXTNAME = '"'"'ERRxRMAP+g' \
+	$(INPUT)/lsb_0034933739_0x53c_sci_1.fit > $(OUTPUT)/temp.fit
+	if [ `$(APPNAME) \
+	  from=$(OUTPUT)/temp.fit \
+	  to=$(OUTPUT)/junk.cub \
+	  errormap=true \
+	  >& $(OUTPUT)/temp.txt` ]; then \
+	  true; \
+	fi;
+	$(SED) 's/\[.*\/\(temp.fit\)\]/[\1]/' < $(OUTPUT)/temp.txt > $(OUTPUT)/error_error-extname-value.txt;
+	$(RM) $(OUTPUT)/temp.txt $(OUTPUT)/temp.fit;
+	# Test for the calibration quality image name
+	$(SED) 's+XTENSION+XTEN-ION+g' \
+	$(INPUT)/lsb_0034933739_0x53c_sci_1.fit > $(OUTPUT)/temp.fit
+	if [ `$(APPNAME) \
+	  from=$(OUTPUT)/temp.fit \
+	  to=$(OUTPUT)/junk.cub \
+	  quality=true \
+	  >& $(OUTPUT)/temp.txt` ]; then \
+	  true; \
+	fi;
+	$(SED) 's/\[.*\/\(temp.fit\)\]/[\1]/' < $(OUTPUT)/temp.txt > $(OUTPUT)/error_quality-xtension-key.txt;
+	$(RM) $(OUTPUT)/temp.txt $(OUTPUT)/temp.fit;
+	# Test for the calibration quality image extension name
+	$(SED) 's+EXTNAME+EXzNAME+g' \
+	$(INPUT)/lsb_0034933739_0x53c_sci_1.fit > $(OUTPUT)/temp.fit
+	if [ `$(APPNAME) \
+	  from=$(OUTPUT)/temp.fit \
+	  to=$(OUTPUT)/junk.cub \
+	  quality=true \
+	  >& $(OUTPUT)/temp.txt` ]; then \
+	  true; \
+	fi;
+	$(SED) 's/\[.*\/\(temp.fit\)\]/[\1]/' < $(OUTPUT)/temp.txt > $(OUTPUT)/error_quality-extname-key.txt;
+	$(RM) $(OUTPUT)/temp.txt $(OUTPUT)/temp.fit;
+	# Test for the calibration quality image extension name incorrect
+	$(SED) 's+EXTNAME = '"'"'QUALITY+EXTNAME = '"'"'QUAxITY+g' \
+	$(INPUT)/lsb_0034933739_0x53c_sci_1.fit > $(OUTPUT)/temp.fit
+	if [ `$(APPNAME) \
+	  from=$(OUTPUT)/temp.fit \
+	  to=$(OUTPUT)/junk.cub \
+	  quality=true \
+	  >& $(OUTPUT)/temp.txt` ]; then \
+	  true; \
+	fi;
+	$(SED) 's/\[.*\/\(temp.fit\)\]/[\1]/' < $(OUTPUT)/temp.txt > $(OUTPUT)/error_quality-extname-value.txt;
+	$(RM) $(OUTPUT)/temp.txt $(OUTPUT)/temp.fit;
 

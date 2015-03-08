@@ -29,72 +29,85 @@ void IsisMain() {
   mainLabel = importFits.fitsLabel(0);
 
   // Get the first label and make sure this is a New Horizons LEISA file
-  if (!mainLabel.hasKeyword("MISSION") || !mainLabel.hasKeyword("INSTRU") ||
-      mainLabel["MISSION"][0] != "New Horizons" || mainLabel["INSTRU"][0] != "lei") {
+  if (!mainLabel.hasKeyword("MISSION") || !mainLabel.hasKeyword("INSTRU")) {
     QString msg = QObject::tr("Input file [%1] does not appear to be a New Horizons LEISA FITS "
-                              "file. Input file label value for MISSION is [%2], "
-                              "INSTRU is [%3]").
+                              "file. Input file label key MISSION or INSTRU is missing").
+                  arg(ui.GetFileName("FROM"));
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+  else if (mainLabel["MISSION"][0] != "New Horizons" || mainLabel["INSTRU"][0] != "lei") {
+    QString msg = QObject::tr("Input file [%1] does not appear to be a New Horizons LEISA FITS "
+                              "file. Input file label value for MISSION is [%2], INSTRU is [%3]").
                   arg(ui.GetFileName("FROM")).arg(mainLabel["MISSION"][0]).
                   arg(mainLabel["INSTRU"][0]);
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  // Check to see if the error image was requested from the FITS file and 
+  // Check to see if the calibration error image was requested from the FITS file and 
   // that it has the corresponding extension
   if (ui.WasEntered("ERRORMAP")) {
-    PvlGroup extensionLabel = importFits.fitsLabel(5); 
+    PvlGroup extensionLabel; 
     try {
-      extensionLabel = importFits.fitsLabel(5); 
+      extensionLabel = importFits.fitsLabel(5);
+      if (!extensionLabel.hasKeyword("XTENSION")) {
+        QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
+                      "LEISA FITS file. XTENSION keyword is missing in the fifth extension.")
+                      .arg(ui.GetFileName("FROM"));
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      if (!extensionLabel.hasKeyword("EXTNAME")) {
+        QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
+                      "calibrated image. FITS label keyword EXTNAME is missing in the fifth extension").
+                      arg(ui.GetFileName("FROM"));
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      else if (extensionLabel["EXTNAME"][0] != "ERRORMAP") {
+        QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
+                                  "calibrated image. FITS label value for EXTNAME is [%2]").
+                               arg(ui.GetFileName("FROM")).arg(extensionLabel["EXTNAME"][0]);
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
     catch (IException &e) {
-      QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
-                                "LEISA FITS file. There is no errormap "
-                                "extension").arg(ui.GetFileName("FROM"));
-
+      QString msg = QObject::tr("Unable to find errormap extension in [%1]").arg(ui.GetFileName("FROM"));
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
-    if (!extensionLabel.hasKeyword("EXTNAME")) {
-      QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
-                                "calibrated image. FITS label keyword EXTNAME is missing").
-                             arg(ui.GetFileName("FROM"));
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    else if (extensionLabel["EXTNAME"][0] != "ERRORMAP") {
-      QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
-                                "calibrated image. FITS label value for EXTNAME is [%2]").
-                             arg(ui.GetFileName("FROM")).arg(extensionLabel["EXTNAME"][0]);
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
   }
 
   // Check to see if the quality image was requested from the FITS file and 
   // that it has the corresponding extension
   if (ui.WasEntered("QUALITY")) {
-    PvlGroup  extensionLabel = importFits.fitsLabel(6); 
+    PvlGroup  extensionLabel; 
     try {
       extensionLabel = importFits.fitsLabel(6); 
+      if (!extensionLabel.hasKeyword("XTENSION")) {
+        QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
+                      "LEISA FITS file. XTENSION keyword is missing in the sixth extension.")
+                      .arg(ui.GetFileName("FROM"));
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      if (!extensionLabel.hasKeyword("EXTNAME")) {
+        QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
+                      "calibrated image. FITS label keyword EXTNAME is missing in the sixth extension").
+                      arg(ui.GetFileName("FROM"));
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      else if (extensionLabel["EXTNAME"][0] != "QUALITY") {
+        QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
+                                  "calibrated image. FITS label value for EXTNAME is [%2]").
+                               arg(ui.GetFileName("FROM")).arg(extensionLabel["EXTNAME"][0]);
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
     catch (IException &e) {
-      QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
-                                "LEISA FITS file. There is no quality "
-                                "extension").arg(ui.GetFileName("FROM"));
-
+      QString msg = QObject::tr("Unable to find quality extension in [%1]").arg(ui.GetFileName("FROM"));
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
 
-    if (!extensionLabel.hasKeyword("EXTNAME")) {
-      QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
-                                "calibrated image. FITS label keyword EXTNAME is missing").
-                             arg(ui.GetFileName("FROM"));
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    else if (extensionLabel["EXTNAME"][0] != "QUALITY") {
-      QString msg = QObject::tr("Input file [%1] does not appear to contain a New Horizons LEISA "
-                                "calibrated image. FITS label value for EXTNAME is [%2]").
-                             arg(ui.GetFileName("FROM")).arg(extensionLabel["EXTNAME"][0]);
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
+
   }
 
   // Import the primary image (LEISA raw/calibrated)
