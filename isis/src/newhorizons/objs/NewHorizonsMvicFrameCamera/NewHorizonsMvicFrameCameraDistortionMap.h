@@ -1,5 +1,5 @@
-#ifndef MvicFrameCameraDistortionMap_h
-#define MvicFrameCameraDistortionMap_h
+#ifndef NewHorizonsMvicFrameCameraDistortionMap_h
+#define NewHorizonsMvicFrameCameraDistortionMap_h
 /** 
  * @file 
  *  
@@ -42,31 +42,30 @@ namespace Isis {
    * @internal
    *   @history 2014-05-02 Ken Edmundson - Original Version
    */
-  class MvicFrameCameraDistortionMap : public CameraDistortionMap {
+  class NewHorizonsMvicFrameCameraDistortionMap : public CameraDistortionMap {
     public:
-      MvicFrameCameraDistortionMap(Camera *parent, vector<double> xdistcoeffs,
-                                   vector<double> ydistcoeffs, double borex, double borey);
+      NewHorizonsMvicFrameCameraDistortionMap(Camera *parent, vector<double> xDistortionCoeffs,
+                                   vector<double> yDistortionCoeffs);
 
-      ~MvicFrameCameraDistortionMap();
+      ~NewHorizonsMvicFrameCameraDistortionMap();
 
       virtual bool SetFocalPlane(const double dx, const double dy);
 
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
-      bool outputdeltas();
+      bool outputDeltas(); // for debugging
 
-  private:
+    private:
       bool computeDistortionCorrections(const double xscaled, const double yscaled, double &deltax,
                                         double &deltay);
 
     private:
-      std::vector<double> m_distCoefX;
-      std::vector<double> m_distCoefY;
-      double m_boreX, m_boreY;
-      int m_numDistCoef;
+      std::vector<double> m_xDistortionCoeffs; //!< distortion coefficients in x and y as determined
+      std::vector<double> m_yDistortionCoeffs; //!< by Keith Harrison (Interface Control Document
+                                               //!< section 10.3.1.2)
 
-      double m_detectorHalf_x;
-      double m_detectorHalf_y;
+      double m_focalPlaneHalf_x;               //!< half of focal plane x and y dimensions in mm
+      double m_focalPlaneHalf_y;
   };
 };
 #endif

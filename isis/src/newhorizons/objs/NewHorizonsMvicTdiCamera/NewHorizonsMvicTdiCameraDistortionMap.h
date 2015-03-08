@@ -1,5 +1,5 @@
-#ifndef MvicCameraDistortionMap_h
-#define MvicCameraDistortionMap_h
+#ifndef NewHorizonsMvicTdiCameraDistortionMap_h
+#define NewHorizonsMvicTdiCameraDistortionMap_h
 /** 
  * @file 
  *  
@@ -23,6 +23,8 @@
 #include <vector>
 #include "CameraDistortionMap.h"
 
+using namespace std;
+
 namespace Isis {
 
   /** 
@@ -40,23 +42,36 @@ namespace Isis {
    * @internal
    *   @history 2014-05-02 Ken Edmundson - Original Version
    */
-  class MvicCameraDistortionMap : public CameraDistortionMap {
+  class NewHorizonsMvicTdiCameraDistortionMap : public CameraDistortionMap {
     public:
-      MvicCameraDistortionMap(Camera *parent);
+    NewHorizonsMvicTdiCameraDistortionMap(Camera *parent,
+                               vector<double> xDistortionCoeffs,
+                               vector<double> yDistortionCoeffs,
+                               vector<double> residualColDistCoeffs,
+                               vector<double> residualRowDistCoeffs);
 
-      //! Destroys the MvicMiCameraDistortionMap object.
-      ~MvicCameraDistortionMap();
-
-      void SetDistortion(const int naifIkCode);
+      ~NewHorizonsMvicTdiCameraDistortionMap();
 
       virtual bool SetFocalPlane(const double dx, const double dy);
 
       virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
+
+//      bool outputResidualDeltas(); // for debugging
+
+  private:
+      bool computeDistortionCorrections(const double xscaled, const double yscaled, double &deltax);
+      void computeResidualDistortionCorrections(const double dx, double &residualDeltax,
+                                                double &residualDeltay);
+
     private:
-      std::vector<double> m_distCoefX;
-      std::vector<double> m_distCoefY;
-      double m_boreX, m_boreY;
-      int m_numDistCoef;
+      std::vector<double> m_xDistortionCoeffs; //!< distortion coefficients in x and y as determined
+      std::vector<double> m_yDistortionCoeffs; //!< by Keith Harrison (Interface Control Document
+                                               //!< section 10.3.1.2)
+
+      vector<double> m_residualColDistCoeffs;  //!< residual distortion coefficients as determined
+      vector<double> m_residualRowDistCoeffs;  //!< by Jason Cook, SWRI (MVIC Distortion)
+
+      double m_focalPlaneHalf_x;               //!< half of focal plane x and y dimensions in mm
   };
 };
 #endif

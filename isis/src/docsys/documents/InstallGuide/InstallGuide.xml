@@ -490,10 +490,16 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
         </pre>
 <p>
-  Odyssey Mission (kernels can be excluded):
+  Mars Odyssey Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
+        </pre>
+<p>
+  New Horizons Mission (kernels can be excluded):
+</p>
+        <pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/newhorizons data/
         </pre>
 <p>
   Rolo Mission (kernels can be excluded):

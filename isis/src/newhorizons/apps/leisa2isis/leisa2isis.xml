@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="leisa2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  
+  <brief>
+    Import New Horizons LEISA files into ISIS format
+  </brief>
+  <description>
+    <p>
+      This program will import FITS (Flexible Image Transport System) formatted files from the 
+      New Horizons LEISA instument into the ISIS format. 
+    </p>
+  </description>
+  
+  <history>
+    <change name="Kristin Berry" date="2014-08-28">
+       Adapted from lorri2isis.
+    </change> 
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>fits2isis</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <missionItem>New Horizons</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A New Horizons LEISA FITS file to be converted to an ISIS cube
+        </brief>
+        <description>
+          Use this parameter to select the filename of a New Horizons
+          LEISA file to be converted to a cube. This is expected to be a FITS formatted file. The associated PDS label file must be located in the same directory.
+        </description>
+        <filter>
+          *.fit
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS cube file for the main image
+        </brief>
+        <description>
+          The output cube file that will contain the New Horizons LEISA image in ISIS format. 
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="ERRORMAP">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the error image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons LEISA error extension data 
+          as an cube in ISIS format. The error extension image must be in the fifth FITS
+          extension (i.e., sixth image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="QUALITY">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <internalDefault>Optional</internalDefault>
+        <brief>
+          Output ISIS cube file for the quality image
+        </brief>
+        <description>
+          The output cube file that will containing the New Horizons LEISA quality extension data 
+          as an cube in ISIS format. The quality extension image must be in the sixth FITS
+          extension (i.e., seventh image).
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      </group>
+  </groups>
+
+</application>

@@ -24,7 +24,7 @@ void IsisMain() {
   ProcessImportFits pfits;
 
   pfits.setFitsFile(FileName(ui.GetFileName("FROM")));
-  pfits.setProcessFileStructure(0);
+  pfits.setProcessFileStructure(ui.GetInteger("IMAGENUMBER"));
 
   Cube *output = pfits.SetOutputCube("TO");
 

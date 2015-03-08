@@ -1,5 +1,5 @@
-#ifndef MvicFrameCamera_h
-#define MvicFrameCamera_h
+#ifndef NewHorizonsMvicFrameCamera_h
+#define NewHorizonsMvicFrameCamera_h
 /**
  * @file
  *
@@ -34,30 +34,32 @@ namespace Isis {
    * @internal 
    *  
    */
-  class MvicFrameCamera : public FramingCamera {
+  class NewHorizonsMvicFrameCamera : public FramingCamera {
     public:
-      //! Create a MvicFrameCamera object
-      MvicFrameCamera(Cube &cube);
+      //! Create a NewHorizonsMvicFrameCamera object
+      NewHorizonsMvicFrameCamera(Cube &cube);
 
-      //! Destroys the MvicFrameCamera object
-      ~MvicFrameCamera() {};
+
+      //! Destroys the NewHorizonsMvicFrameCamera object
+      ~NewHorizonsMvicFrameCamera() {};
+
 
       // Sets the band to the band number given
       void SetBand(const int vband);
 
-      /**
-       * The camera model is band dependent, so this method returns false
-       *
-       * @return bool False
-       */
-      bool IsBandIndependent() {
-        return false;
-      };
+
+//      /**
+//       * The camera model is band dependent, so this method returns false
+//       *
+//       * @return bool False
+//       */
+////    bool IsBandIndependent() {
+////      return false;
+////    };
+
 
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
                                                              double exposureDuration);
-
-
 
 
       /**
@@ -68,6 +70,7 @@ namespace Isis {
        */
       virtual int CkFrameId() const { return (-98000); }
 
+
       /** 
        * CK Reference ID - J2000
        * 
@@ -75,6 +78,7 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int CkReferenceId() const { return (1); }
+
 
       /** 
        * SPK Reference ID - J2000

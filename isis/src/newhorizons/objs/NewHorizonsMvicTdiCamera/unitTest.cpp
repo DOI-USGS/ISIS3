@@ -22,7 +22,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "MvicFrameCamera.h"
+#include "NewHorizonsMvicTdiCamera.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -39,16 +39,16 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-  cout << "Unit Test for MvicFrameCamera..." << endl;
+  cout << "Unit Test for New HorizonsMvicTdiFrameCamera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -6.0432183248466513;
-    double knownLon =  7.5037820678308149;
+    double knownLat = -10.1772088449130020;
+    double knownLon = 339.7338889883354796;
 
-    Cube c("$newhorizons/testData/mpf_0035126517_0x539_sci_1.cub", "r");
-    MvicFrameCamera *cam = (MvicFrameCamera *) CameraFactory::Create(c);
+    Cube c("$newhorizons/testData/mc0_0034942918_0x536_sci_1.cub", "r");
+    NewHorizonsMvicTdiCamera *cam = (NewHorizonsMvicTdiCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
@@ -61,31 +61,21 @@ int main(void) {
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
 
-    // Test Shutter Open/Close 
-    const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
-    double exposureDuration = ((double) inst["ExposureDuration"])/1000;
-    QString stime = inst["StartTime"];
-    double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.toAscii().data(), &et);
-    pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
-    cout << "Shutter open = " << shuttertimes.first.Et() << endl;
-    cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
-
-    // Test all four corners to make sure the conversions are right
-    cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 2510.0, 32.0);
+    // Test four pixels to make sure the conversions are right
+    cout << "For upper left  ..." << endl;
+    TestLineSamp(cam, 2484.0, 310.0);
 
     cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, 2536.0, 32.0);
+    TestLineSamp(cam, 2528.0, 310.0);
 
     cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 2512.0, 57.0);
+    TestLineSamp(cam, 2484.0, 350.0);
 
     cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 2536.0, 57.0);
+    TestLineSamp(cam, 2528.0, 350.0);
 
-    double samp = 2523.0;
-    double line = 46.0;
+    double samp = 2503.0;
+    double line = 330.0;
     cout << "For center pixel position ..." << endl;
 
     if (!cam->SetImage(samp, line)) {

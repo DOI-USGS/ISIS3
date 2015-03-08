@@ -1,4 +1,4 @@
-Unit Test for MvicFrameCamera...
+Unit Test for NewHorizonsMvicFrameCamera...
 FileName: mpf_0035126517_0x539_sci_1.cub
 CK Frame: -98903
 
@@ -16,17 +16,18 @@ DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For upper right corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+DeltaSample = ERROR
+DeltaLine = ERROR
 
 For lower left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For lower right corner ...
-DeltaSample = 0.000000000
-DeltaLine = 0.000000000
+DeltaSample = ERROR
+DeltaLine = ERROR
 
 For center pixel position ...
-Latitude OK
-Longitude OK
+Latitude off by: 36.4971027901168554
+Longitude off by: -4.0083142273843686
+**PROGRAMMER ERROR** Band number out of array bounds in NewHorizonsMvicFrameCamera::SetBand legal bands are [1-9], input was [10].

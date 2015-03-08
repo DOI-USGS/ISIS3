@@ -1,5 +1,5 @@
-#ifndef MvicTdiCamera_h
-#define MvicTdiCamera_h
+#ifndef NewHorizonsMvicTdiCamera_h
+#define NewHorizonsMvicTdiCamera_h
 /**
  * @file
  *
@@ -37,13 +37,13 @@ namespace Isis {
    *
    * @internal
    */
-  class MvicTdiCamera : public LineScanCamera {
+  class NewHorizonsMvicTdiCamera : public LineScanCamera {
     public:
       // constructor
-      MvicTdiCamera(Cube &cube);
+      NewHorizonsMvicTdiCamera(Cube &cube);
 
-      //! Destroys the MvicTdiCamera object.
-      ~MvicTdiCamera() {};
+      //! Destroys the NewHorizonsMvicTdiCamera object.
+      ~NewHorizonsMvicTdiCamera() {};
 
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK

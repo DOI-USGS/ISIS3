@@ -40,10 +40,13 @@
     <def link="Level2">level2</def> <def link="Cube">cubes</def>, or mosaics.  
     The mapping information in the labels will be used to draw grid lines on mosaics 
     and Level2 images.  If the
-    latitude and longitde information cannot be calculated or extracted using the image 
+    latitude and longitude information cannot be calculated or extracted using the image 
     label contents, then use the IMAGE mode.<br/><br/>
     
-    <b>Example Parameter Settings for Grids:</b><br/> <br/>
+     For Cubes with an associated band-dependent camera model (latitude, longitude coordinates do not correspond to the same sample, line coordinates 
+     in each band,) the grid is recalculated for each band.<br/><br/>    
+						     
+    <b>Example Parameter Settings for Grids:</b><br/> 
     Example 1: Superimpose a basic latitude/longitude graticule with grid lines drawn
     every 10 degrees based on zero: <br/> 
     MODE=GROUND BASELAT=0 BASELON=0 LATINC=10 LONINC=10<br/><br/>
@@ -157,6 +160,11 @@
     <change name="Janet Barrett" date="2014-06-23">
       Modified so that the output cube characteristics are obtained from the input cube
       and/or cube characteristics specified on the command line. Fixes #2063.
+    </change>
+    <change name="Kristin Berry" date="2014-11-25">
+      Modified to work on Cubes with associated band-dependent camera models. Now 
+      when MODE="GROUND" on a Cube with a band-dependent camera model, the grid will 
+      be re-calculated for each band. Fixes #2191.
     </change>
   </history>
 

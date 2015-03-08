@@ -88,15 +88,17 @@ ISIS supports many missions that require various data such as SPICE kernels or c
 <pre style="padding-left:4em;">
 Group = DataDirectory
   Base      = $ISIS3DATA/base
+  Galileo   = $ISIS3DATA/galileo
+  Cassini   = $ISIS3DATA/cassini
+  Chadrayaan1   = $ISIS3DATA/chandrayaan1
+  Messenger = $ISIS3DATA/messenger
+  Mgs       = $ISIS3DATA/mgs
+  Mro       = $ISIS3DATA/mro
+  NewHorizons = $ISIS3DATA/newhorizons
+  Odyssey   = $ISIS3DATA/odyssey
   Viking1   = $ISIS3DATA/viking1
   Viking2   = $ISIS3DATA/viking2
   Voyager   = $ISIS3DATA/voyager
-  Mgs       = $ISIS3DATA/mgs
-  Galileo   = $ISIS3DATA/galileo
-  Cassini   = $ISIS3DATA/cassini
-  Odyssey   = $ISIS3DATA/odyssey
-  Mro       = $ISIS3DATA/mro
-  Messenger = $ISIS3DATA/messenger
   Temporary = .
 EndGroup
 </pre>

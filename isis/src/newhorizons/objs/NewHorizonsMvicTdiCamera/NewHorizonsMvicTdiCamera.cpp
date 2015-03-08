@@ -18,12 +18,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "MvicTdiCamera.h"
+#include "NewHorizonsMvicTdiCamera.h"
 
 #include <QDebug>
 
-#include "MvicCameraDistortionMap.h"
-#include "MvicCameraFocalPlaneMap.h"
+#include "NewHorizonsMvicTdiCameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
 #include "iTime.h"
@@ -41,36 +40,19 @@ namespace Isis {
    *
    * @internal
    */
-  MvicTdiCamera::MvicTdiCamera(Cube &cube) : LineScanCamera(cube) {
+  NewHorizonsMvicTdiCamera::NewHorizonsMvicTdiCamera(Cube &cube) : LineScanCamera(cube) {
     NaifStatus::CheckErrors();
 
-    // Set the detector size
+    // Set the pixel pitch, focal length and row offset from Mvic frame transfer array
     SetPixelPitch();
     SetFocalLength();
-
-//  qDebug()<<"NaifId = "<<naifIkCode()<<"  FocalLength = "<<FocalLength()<<"  PixelPitch = "<<PixelPitch();
 
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["SpacecraftClockStartCount"];
-//  stime = "1/0034948318:06600"; // Jupiter Spacecraft clock timestamp (SPCSCLK0)
-//  stime = "1/0034948341:03300"; // Jupiter mid-observ
-//  stime = "1/0034829038:06600"; // Io  Spacecraft clock timestamp (SPCSCLK0)
-//  stime = "1/0034829043:28300"; // Io mid-observ
-//  qDebug()<<"sclk = "<<stime;
 
     m_etStart = getClockTime(stime).Et();
-//  qDebug()<<"et = "<<QString::number(m_etStart, 'f', 12);
-//  iTime time(m_etStart);
-//  qDebug()<<"utc = "<<time.UTC();
-//  SpiceChar jd[30];
-//  et2utc_c(m_etStart, "J", 7, 30, jd);
-//  qDebug()<<"jd = "<<jd;
-
-//  m_lineRate = (double)inst["ExposureDuration"];
-//  m_lineRate = (double)inst["ExposureDuration"] / 32.0;
     m_lineRate = 1.0 / (double)inst["TdiRate"];
-//  qDebug()<<"Line rate = "<<m_lineRate;
 
     // The detector map tells us how to convert from image coordinates to
     // detector coordinates.  In our case, a (sample,line) to a (sample,time)
@@ -78,20 +60,40 @@ namespace Isis {
 
     // The focal plane map tells us how to go from detector position
     // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
-//  MvicCameraFocalPlaneMap *focalMap = new MvicCameraFocalPlaneMap(this, naifIkCode());
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    focalMap->SetDetectorOrigin(2512.5, -16.5);  // NOTE:   THIS WORKS
 
+    // This origin does not use 5024/2 because we strip off the leading and trailing 12 pixels
+    focalMap->SetDetectorOrigin(2500.5, -16.5);
 
-//   05-16- 2014   NOTE:     THE FOLLOWING DID NOT WORK - WAS NOT ABLE TO INTERSECT THE PLANET AT THE
-//                FJORGYNN FEATURE ON mc0_0034942918_0x536_sci_1.cub (samp:2900   line=322)
-//  focalMap->SetDetectorOrigin(2512.5, 0.0);
-//  focalMap->SetDetectorOffset(0.0, -16.5);
+    // Read legendre polynomial distortion coefficients and boresight offsets from the instrument
+    // kernels. Then construct the distortion map.
 
+    // read legendre polynomial distortion coefs from the NAIF Kernels
+    QString naifXKey = "INS-98900_DISTORTION_COEF_X";
+    QString naifYKey = "INS-98900_DISTORTION_COEF_Y";
+    QString naifppKey = "INS-98900_PP_OFFSET";
+    vector<double> distCoefX;
+    vector<double> distCoefY;
+    vector<double> residualColumnDistCoefs;
+    vector<double> residualRowDistCoefs;
 
-//  MvicCameraDistortionMap *distortionMap = new MvicCameraDistortionMap(this, 1);
-//  distortionMap->SetDistortion(naifIkCode());
-    new CameraDistortionMap(this);
+    for (int i=0; i < 20; i++) {
+      distCoefX.push_back(getDouble(naifXKey,i));
+      distCoefY.push_back(getDouble(naifYKey,i));
+    }
+
+    // read residual polynomial distortion coefs from the NAIF Kernels
+    int code = naifIkCode();
+    QString naifCOLKey = "INS" + toString(code) + "_RESIDUAL_COL_DIST_COEF";
+    QString naifROWKey = "INS" + toString(code) + "_RESIDUAL_ROW_DIST_COEF";
+
+    for (int i=0; i < 6; i++) {
+      residualColumnDistCoefs.push_back(getDouble(naifCOLKey,i));
+      residualRowDistCoefs.push_back(getDouble(naifROWKey,i));
+    }
+
+    new NewHorizonsMvicTdiCameraDistortionMap(this, distCoefX, distCoefY, residualColumnDistCoefs,
+                                   residualRowDistCoefs);
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
@@ -100,6 +102,7 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+
 }
 
 
@@ -107,13 +110,13 @@ namespace Isis {
 // Plugin
 /**
  * This is the function that is called in order to instantiate a
- * MvicTdiCamera object.
+ * NewHorizonsMvicTdiCamera object.
  *
  * @param lab Cube labels
  *
- * @return Isis::Camera* MvicTdiCamera
+ * @return Isis::Camera* NewHorizonsMvicTdiCamera
  * @internal
  */
-extern "C" Isis::Camera *MvicTdiCameraPlugin(Isis::Cube &cube) {
-  return new Isis::MvicTdiCamera(cube);
+extern "C" Isis::Camera *NewHorizonsMvicTdiCameraPlugin(Isis::Cube &cube) {
+  return new Isis::NewHorizonsMvicTdiCamera(cube);
 }

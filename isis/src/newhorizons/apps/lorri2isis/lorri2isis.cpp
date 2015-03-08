@@ -38,11 +38,32 @@ void IsisMain() {
   PvlGroup mainLabel = importFits.fitsLabel(0);
   if (mainLabel["MISSION"][0] != "New Horizons" || mainLabel["INSTRU"][0] != "lor") {
     QString msg = QObject::tr("Input file [%1] does not appear to be a New Horizons LORRI FITS "
-                              "file. Input file label value for MISSION is [%2], "
-                              "INSTRU is [%3]").
-                  arg(ui.GetFileName("FROM")).arg(mainLabel["MISSION"][0]).
-                  arg(mainLabel["INSTRU"][0]);
+    "file. Input file label value for MISSION is [%2] and INSTRU is [%3]").
+    arg(ui.GetFileName("FROM")).arg(mainLabel["MISSION"][0]).arg(mainLabel["INSTRU"][0]);
     throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  // Get the label of extension #1 and make sure this is a New Horizons LORRI Error image
+  if (ui.WasEntered("ERROR")) {
+    PvlGroup errorLabel = importFits.fitsLabel(1);
+    if (errorLabel["XTENSION"][0] != "IMAGE" || errorLabel["EXTNAME"][0] != "LORRI Error image") {
+      QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Error image. "
+          "Input file label value for EXTNAME is [%2] and XTENSION is [%3]").
+          arg(ui.GetFileName("FROM")).arg(errorLabel["EXTNAME"][0]).arg(errorLabel["XTENSION"][0]);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+  // Get the label of extension #2 and make sure this is a New Horizons LORRI Quality image
+  if (ui.WasEntered("QUALITY")) {
+    PvlGroup qualityLabel = importFits.fitsLabel(2);
+    if (qualityLabel["XTENSION"][0] != "IMAGE" || 
+        qualityLabel["EXTNAME"][0] != "LORRI Quality flag image") {
+      QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Quality image. "
+          "Input file label value for EXTNAME is [%2] and XTENSION is [%3]").
+          arg(ui.GetFileName("FROM")).arg(qualityLabel["EXTNAME"][0]).arg(qualityLabel["XTENSION"][0]);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
   }
 
   importFits.setProcessFileStructure(0);
@@ -106,14 +127,6 @@ void IsisMain() {
 
   // Convert the Error image. It is currently assumed to be the second image in the FITS file
   if (ui.WasEntered("ERROR")) {
-    // Get the label of the Error image and make sure this is a New Horizons LORRI Error image
-    PvlGroup errorLabel = importFits.fitsLabel(1);
-    if (errorLabel["XTENSION"][0] != "IMAGE" || errorLabel["EXTNAME"][0] != "LORRI Error image") {
-      QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Error image "
-                                "Input file label value for EXTNAME is [%2]").
-                    arg(ui.GetFileName("FROM")).arg(mainLabel["EXTNAME"][0]);
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
 
     importFits.setProcessFileStructure(1);
 
@@ -134,15 +147,6 @@ void IsisMain() {
 
   // Convert the Quality image. It is currently assumed to be the third image in the FITS file
   if (ui.WasEntered("QUALITY")) {
-    // Get the label of the Quality image and make sure this is a New Horizons LORRI Quality image
-    PvlGroup errorLabel = importFits.fitsLabel(2);
-    if (errorLabel["XTENSION"][0] != "IMAGE" || 
-        errorLabel["EXTNAME"][0] != "LORRI Quality flag image") {
-      QString msg = QObject::tr("Input file [%1] does not appear to contain a LORRI Quality image "
-                                "Input file label value for EXTNAME is [%2]").
-                    arg(ui.GetFileName("FROM")).arg(mainLabel["EXTNAME"][0]);
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
 
     importFits.setProcessFileStructure(2);
 
@@ -173,9 +177,9 @@ void IsisMain() {
 }
 
 
-void flip(Buffer &in) {
-  for(int i = 0; i < in.size() / 2; i++) {
-    swap(in[i], in[in.size() - i - 1]);
-  }
-}
+//void flip(Buffer &in) {
+//  for(int i = 0; i < in.size() / 2; i++) {
+//    swap(in[i], in[in.size() - i - 1]);
+//  }
+//}
 
