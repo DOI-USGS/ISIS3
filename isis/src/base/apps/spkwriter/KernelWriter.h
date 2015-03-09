@@ -25,11 +25,12 @@
  *   $Id$
  */
 #include <string>
-#include "IException.h"
-#include "Commentor.h"
-#include "NaifStatus.h"
 
-#include "naif/SpiceUsr.h"
+#include <SpiceUsr.h>
+
+#include "Commentor.h"
+#include "IException.h"
+#include "NaifStatus.h"
 
 namespace Isis {
 

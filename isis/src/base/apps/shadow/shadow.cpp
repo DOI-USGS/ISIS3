@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 #include "Application.h"
 #include "Distance.h"

@@ -2,8 +2,13 @@
 
 #include <cstdio>
 #include <fstream>
+#include <iostream>
+#include <iomanip>
+
 #include <QFile>
 #include <QString>
+
+#include <SpiceUsr.h>
 
 #include "FileName.h"
 #include "IException.h"
@@ -15,11 +20,6 @@
 #include "PvlGroup.h"
 #include "PvlTranslationManager.h"
 #include "UserInterface.h"
-
-#include "naif/SpiceUsr.h"
-
-#include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Isis;

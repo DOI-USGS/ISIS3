@@ -170,11 +170,11 @@ TIFFLIBDIR = -L$(ISIS3OPT)/lib
 TIFFLIB    = -ltiff
 
 #---------------------------------------------------------------------------
-# Set up for naif
+# Set up for naif dsk and cspice libraries
 #---------------------------------------------------------------------------
-NAIFINCDIR = -I$(ISIS3LOCAL)/include
+NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/dsklib -I$(ISIS3LOCAL)/include/naif/
 NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
-NAIFLIB    = -lcspice
+NAIFLIB    = -ldsklib -lcspice
 
 #---------------------------------------------------------------------------
 # Set up for TNT
@@ -293,6 +293,7 @@ THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebKit.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtOpenGL.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtTest.framework"
 THIRDPARTYLIBS    += "$(QWTFRAMES)/qwt.framework"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsklib*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"

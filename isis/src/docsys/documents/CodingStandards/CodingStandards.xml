@@ -853,7 +853,7 @@
             <font color="olive"><b>#include</b></font> &lt;QList&gt;
             <font color="olive"><b>#include</b></font> &lt;QPair&gt;
 
-            <font color="olive"><b>#include</b></font> &lt;naif/SpiceUser.h&gt;
+            <font color="olive"><b>#include</b></font> &lt;SpiceUser.h&gt;
 
             <font color="olive"><b>#include</b></font> "Constants.h"
             <font color="olive"><b>#include</b></font> "Displacement.h"

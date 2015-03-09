@@ -24,24 +24,24 @@
 #include "MdisGeometry.h"
 
 #include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 #include "CameraFactory.h"
 #include "IException.h"
 #include "IString.h"
 #include "OriginalLabel.h"
-#include "TProjection.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "SpiceManager.h"
 #include "Target.h"
+#include "TProjection.h"
 
 using namespace std;
 

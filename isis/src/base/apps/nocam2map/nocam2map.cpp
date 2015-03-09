@@ -1,25 +1,28 @@
 #define GUIHELPERS
 
-
 #include "Isis.h"
-#include "Constants.h"
-#include "naif/SpiceUsr.h"
-#include "Brick.h"
-#include "PolynomialBivariate.h"
-#include "LeastSquares.h"
-#include "ProcessRubberSheet.h"
-#include "IString.h"
-#include "TProjection.h"
-#include "ProjectionFactory.h"
-#include "Statistics.h"
-#include "TextFile.h"
-#include "nocam2map.h"
+
+#include <algorithm>
 
 #include <QList>
 #include <QString>
 #include <QStringList>
 #include <QVector>
-#include <algorithm>
+
+#include <SpiceUsr.h>
+
+#include "Brick.h"
+#include "Constants.h"
+#include "Cube.h"
+#include "IString.h"
+#include "LeastSquares.h"
+#include "nocam2map.h"
+#include "PolynomialBivariate.h"
+#include "ProcessRubberSheet.h"
+#include "ProjectionFactory.h"
+#include "Statistics.h"
+#include "TextFile.h"
+#include "TProjection.h"
 
 using namespace std;
 using namespace Isis;

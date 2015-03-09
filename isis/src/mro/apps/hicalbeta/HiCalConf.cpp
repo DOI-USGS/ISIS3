@@ -21,23 +21,25 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <QString>
-#include <vector>
-#include <numeric>
-#include <iostream>
-#include <sstream>
 
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <vector>
+
+#include <QString>
+
+#include <SpiceUsr.h>
+
+#include "Brick.h"
+#include "Cube.h"
+#include "FileName.h"
 #include "HiCalConf.h"
 #include "HiCalUtil.h"
-#include "Pvl.h"
-#include "FileName.h"
-#include "Cube.h"
-#include "Brick.h"
-#include "SpecialPixel.h"
 #include "IString.h"
 #include "IException.h"
-
-#include "naif/SpiceUsr.h"
+#include "Pvl.h"
+#include "SpecialPixel.h"
 
 using namespace std;
 

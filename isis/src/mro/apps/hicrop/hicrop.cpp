@@ -5,7 +5,7 @@
 #include <QString>
 
 // naif library includes
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 // Isis includes
 #include "Buffer.h"

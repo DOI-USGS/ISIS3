@@ -22,18 +22,19 @@
 
 #include "VikingCamera.h"
 
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
+
 #include "CameraDetectorMap.h"
-#include "ReseauDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "FileName.h"
 #include "IString.h"
 #include "iTime.h"
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
 #include "NaifStatus.h"
+#include "ReseauDistortionMap.h"
 
 using namespace std;
 

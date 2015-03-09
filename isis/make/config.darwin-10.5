@@ -135,11 +135,11 @@ TIFFLIBDIR = -L$(ISIS3OPT)/lib
 TIFFLIB    = -ltiff
 
 #---------------------------------------------------------------------------
-# Set up for naif
+# Set up for naif dsk and cspice libraries
 #---------------------------------------------------------------------------
-NAIFINCDIR = -I$(ISIS3LOCAL)/include
+NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif/dsklib -I$(ISIS3LOCAL)/include/naif/
 NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
-NAIFLIB    = -lcspice
+NAIFLIB    = -ldsklib -lcspice
 
 #---------------------------------------------------------------------------
 # Set up for TNT
@@ -248,8 +248,9 @@ THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtSvg.framework"
 THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtWebKit.framework"
 THIRDPARTYLIBS    += "$(QTDIR)/libexec/qt4-mac/lib/QtOpenGL.framework"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libqwt.*dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsklib*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
-#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"
+#THIRDPARTYLIBS   += "$(ISIS3LOCAL)/lib/libsuperlu_3.0.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libprotobuf*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libiconv*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxerces-c*.dylib"

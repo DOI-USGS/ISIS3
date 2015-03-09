@@ -21,29 +21,30 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <QString>
-#include <QStringList>
-#include <vector>
-#include <numeric>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 #include <algorithm>
 #include <functional>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <vector>
+
+#include <QString>
+#include <QStringList>
 
 #include <boost/foreach.hpp>
 
-#include "SpiceSegment.h"
-#include "IString.h"
-#include "FileName.h"
-#include "Cube.h"
+#include <SpiceUsr.h>
+
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Table.h"
-#include "NaifStatus.h"
+#include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
-
-#include "naif/SpiceUsr.h"
+#include "IString.h"
+#include "NaifStatus.h"
+#include "SpiceSegment.h"
+#include "Table.h"
 
 using namespace std;
 

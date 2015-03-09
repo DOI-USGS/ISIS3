@@ -24,11 +24,11 @@
 
 #include <vector>
 
-#include <naif/SpiceUsr.h>
-#include <naif/SpiceZfc.h>
-#include <naif/SpiceZmc.h>
-
 #include <QString>
+
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
 #include "PolynomialUnivariate.h"
 

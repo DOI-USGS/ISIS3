@@ -21,23 +21,23 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 
-#include "SpiceSegment.h"
-#include "IString.h"
-#include "FileName.h"
-#include "Cube.h"
+#include <SpiceUsr.h>
+
 #include "Camera.h"
+#include "Cube.h"
+#include "FileName.h"
+#include "IException.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
-#include "IException.h"
-
-#include "naif/SpiceUsr.h"
+#include "SpiceSegment.h"
 
 using namespace std;
 
