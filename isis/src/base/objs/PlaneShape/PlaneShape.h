@@ -21,19 +21,19 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "ShapeModel.h"
 
 #include <string>
 #include <vector>
 
 #include <QVector>
 
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
-#include "ShapeModel.h"
-#include "SurfacePoint.h"
 #include "Pvl.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
   /**

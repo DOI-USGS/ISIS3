@@ -37,22 +37,16 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-10-31 - Ken Edmundson - Implemented plane shape
-   *   @history 2014-01-14 - Jeannie Backer - Improved error message. Fixes
-   *            #1957.
+   *   @history 2014-01-14 - Jeannie Backer - Improved error message. Fixes #1957.
+   *   @history 2015-03-08 - Jeannie Backer - Added implementation for NAIF DSK
+   *                             models. References #2035.
    */
   class ShapeModelFactory {
     public:
     static ShapeModel *create(Target *target, Pvl &pvl);
 
     private:
-      /**
-       * Constructor is private to avoid instantiating the class.  Use the Create method.
-       * 
-       * @author dcook (7/29/2010)
-       */
       ShapeModelFactory() {};
-
-      //! Destructor
       ~ShapeModelFactory() {};
 
       // Supported shape models

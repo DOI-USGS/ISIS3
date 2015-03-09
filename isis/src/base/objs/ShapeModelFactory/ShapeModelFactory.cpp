@@ -32,6 +32,8 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "NaifDskShape.h"
+#include "NaifStatus.h"
 #include "PlaneShape.h"
 #include "Projection.h"
 #include "Pvl.h"
@@ -41,7 +43,23 @@
 using namespace std;
 
 namespace Isis {
+  /**
+   * Constructor is private to avoid instantiating the class.  Use the Create method.
+   * 
+   * @author dcook (7/29/2010)
+   */
+  ShapeModelFactory::ShapeModelFactory() {}
 
+
+
+  //! Destructor
+  ShapeModelFactory::~ShapeModelFactory() {}
+
+
+
+  /**
+   *
+   */
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
     
     // get kernels and instrument Pvl groups
@@ -77,15 +95,76 @@ namespace Isis {
 
     // TODO: If there is no shape model filename, the shape model type defaults to an
     // ellipsoid (should it?).
+
+    // This exception will be thrown at the end of this method if no shape model is constructed.
+    // More specific exceptions will be appended before throwing this error.
+    IException finalError(IException::Programmer, 
+                          "Unable to create a shape model from given target and pvl.", 
+                          _FILEINFO_);
+
     if (shapeModelFilenames == "") {
-      shapeModel = new EllipsoidShape(target);
+      // No file name given.  If EllipsoidShape throws an error or returns null, the following
+      // exception will be appended to the finalError.
+      QString msg = "Unable to construct an Ellipsoid shape model.";
+
+      try {
+        shapeModel = new EllipsoidShape(target);
+      } 
+      catch (IException &e) {
+        // No file name given and ellipsoid fails. Append e to new exception
+        // with above message. Append this to finalError and throw.
+        finalError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
+        throw finalError;
+      }
+      // in case no error was thrown, but constructor returned NULL
+      finalError.append(IException(IException::Unknown, msg, _FILEINFO_));
     }
     else if (shapeModelFilenames == "RingPlane") {
-      shapeModel = new PlaneShape(target, pvl);
-    }
-    else {
+      // No file name given, RingPlane indicated.  If PlaneShape throws an error or returns
+      // null, the following exception will be appended to the finalError.
+      QString msg = "Unable to construct a RingPlane shape model.";
+
       try {
-        // Is the shape model an Isis DEM?
+        shapeModel = new PlaneShape(target, pvl);
+      } 
+      catch (IException &e) {
+        // No file name given, RingPlane specified. Append a message to the finalError and throw it.
+        finalError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
+        throw finalError;
+      }
+      // in case no error was thrown, but constructor returned NULL
+      finalError.append(IException(IException::Unknown, msg, _FILEINFO_));
+    }
+    else { // assume shape model given is a NAIF DSK or DEM cube file name
+
+      // A file error message will be appened to the finalError, if no shape model is constructed.
+      QString fileErrorMsg = "Invalid shape model file ["
+                             + shapeModelFilenames + "] in Kernels group.";
+      IException fileError(IException::Io, fileErrorMsg, _FILEINFO_);
+
+      //-------------- Is the shape model a NAIF DSK? ------------------------------//
+
+      // If NaifDskShape throws an error or returns null and DEM construction is
+      // unsuccessful, the following exception will be appended to the fileError.
+      QString msg = "The given shape model file is not a valid NAIF DSK file. "
+                    "Unable to construct a NAIF DSK shape model.";
+      IException dskError(IException::Unknown, msg, _FILEINFO_);
+
+      try {
+        // try to create a NaifDskShape object
+        shapeModel = new NaifDskShape(target, pvl);
+      }
+      catch (IException &e) {
+        // append a message to the fileError, but don't throw it.
+        // We will make sure it's not a DEM before throwing the error.
+        dskError.append(e);
+      }
+
+      if (shapeModel == NULL) {
+        // in case no error was thrown, but constructor returned NULL
+        fileError.append(dskError);
+
+        //-------------- Is the shape model an ISIS DEM? ------------------------------// 
         // TODO Deal with stacks -- this could be a list of DEMs
         Isis::Cube shapeModelCube;
         try {
@@ -93,9 +172,12 @@ namespace Isis {
           shapeModelCube.open(FileName(shapeModelFilenames).expanded(), "r" );
         }
         catch (IException &e) {
-          IString msg = "Shape file " + shapeModelFilenames 
-                        + " does not exist or is not an Isis cube.";
-          throw IException(e, IException::Unknown, msg, _FILEINFO_);
+          // The file is neither a valid DSK nor an ISIS cube. Append a message and throw the error.
+          QString msg = "The given shape model file is not a valid ISIS DEM. "
+                        "Unable to open as an ISIS cube.";
+          fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
+          finalError.append(fileError);
+          throw finalError;
         }
         
         Projection *projection = NULL;
@@ -103,37 +185,62 @@ namespace Isis {
           // get projection of shape model cube
           projection = shapeModelCube.projection();
         }
-        catch (IException &projectionException) {
-          QString msg = "Shape model cube must be an Isis DEM file, meaning it must "
-              "be map-projected. This cube is NOT map projected.";
-          throw IException(projectionException, IException::User, msg, _FILEINFO_);
+        catch (IException &e) {
+          // The file is neither a valid DSK nor a valid ISIS DEM. Append message and throw the error.
+          QString msg = "The given shape model file is not a valid ISIS DEM cube. "
+                        "It is not map-projected.";
+          fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
+          finalError.append(fileError);
+          throw finalError;
         }
 
-        try {
-          // Next, check if ISIS DEM cube is an equatorial cylindrical projection
-          if (projection->IsEquatorialCylindrical()) {
+        if (projection->IsEquatorialCylindrical()) {
+          // If the EquatorialCylindricalShape constructor throws an error or returns null, the
+          // following exception will be appended to the fileError. (Later added to the finalError)
+          QString msg = "Unable to construct a DEM shape model from the given "
+                        "EquatorialCylindrical projected ISIS cube.";
+
+          try {
             shapeModel = new EquatorialCylindricalShape(target, pvl);
+          } 
+          catch (IException &e) {
+            // The file is an equatorial cylindrical ISIS cube. Append fileError and throw.
+            fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
+            finalError.append(fileError);
+            throw finalError;
           }
-          else {
+          // in case no error was thrown, but constructor returned NULL
+          fileError.append(IException(IException::Unknown, msg, _FILEINFO_));
+        }
+        else {
+          // If the DemShape constructor throws an error or returns null, the following
+          // exception will be appended to the fileError. (Later added to the finalError)
+          QString msg = "Unable to construct a DEM shape model "
+                        "from the given projected ISIS cube file.";
+
+          try {
             shapeModel = new DemShape(target, pvl);
+          } 
+          catch (IException &e) {
+            // The file is projected ISIS cube (assumed to be DEM). Append fileError and throw.
+            fileError.append(IException(e, IException::Unknown, msg, _FILEINFO_));
+            finalError.append(fileError);
+            throw finalError;
           }
+          // in case no error was thrown, but constructor returned NULL
+          fileError.append(IException(IException::Unknown, msg, _FILEINFO_));
         }
-        catch (IException &shapeModelException) {
-          QString msg = "Unable to create shape model from the given Isis DEM file.";
-          throw IException(shapeModelException, IException::User, msg, _FILEINFO_);
-        }
+
       }
-      catch (IException &e) {
-        IString msg = "Failed opening shape file " + shapeModelFilenames;
-        throw IException(e, IException::Unknown, msg, _FILEINFO_);
-      }
+
+      // in case no error was thrown, but DSK, Equatorial, or DEM constructor returned NULL
+      finalError.append(fileError);
     }
 
     // TODO Add Naif DSK shape and stack?
 
     if (shapeModel == NULL) {
-      IString msg = "Unsupported shape model type";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+      throw finalError;
     }
 
     return shapeModel;

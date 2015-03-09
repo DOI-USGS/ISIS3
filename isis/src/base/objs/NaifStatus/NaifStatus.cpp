@@ -20,12 +20,15 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "NaifStatus.h"
-#include "naif/SpiceUsr.h"
+
+#include <iostream>
+
+#include <SpiceUsr.h>
+
 #include "IException.h"
 #include "IString.h"
 #include "Pvl.h"
 #include "PvlTranslationManager.h"
-#include <iostream>
 
 namespace Isis {
   bool NaifStatus::initialized = false;

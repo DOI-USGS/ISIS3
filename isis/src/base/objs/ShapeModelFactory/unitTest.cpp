@@ -20,196 +20,240 @@
 using namespace std;
 using namespace Isis;
 
+/**
+ *  
+ * @internal 
+ *   @history 2015-02-25 Jeannie Backer - Added test for Null ElevationModel. Added test for DSK Shape Model.
+ *                           Code coverage: 81.818% scope, 84.058% line and 100% function.
+ *  
+ *   @todo code coverage - need RingPlane shape that passes
+ *   @todo code coverage - need RingPlane shape that throws error on construction
+ *   @todo code coverage - need Null shape that throws error on EllipsoidShape construction
+ *   @todo code coverage - need DEM file (not Equatorial Cylindrical) that throws error on
+ *                           construction
+ *   @todo code coverage - need constructor (EllipsoidShape, PlaneShape, EquatorialCylindricalShape,
+ *                           or DemShape to return null shape.
+ */
 int main() {
-  Isis::Preference::Preferences(true);
-
-  cout << "Unit test for Isis::ShapeModel" << endl;
-
-  // Test sky target
-  // Build label for sky target test
-  PvlGroup inst1("Instrument");
-  inst1 += PvlKeyword("TargetName", "Sky");
-  PvlGroup inst2("Instrument");
-  inst2 += PvlKeyword("TargetName", "Mars");
-  PvlGroup kern1("Kernels");
-  FileName f("$base/testData/kernels");
-  FileName f2("$base/dems");
-  FileName f3("$mgs/testData");
-  QString dir = f.expanded() + "/";
-  QString dir2 = f2.expanded() + "/";
-  QString dir3 = f3.expanded() + "/";
-  kern1 += PvlKeyword("NaifFrameCode", toString(-94031));
-  kern1 += PvlKeyword("LeapSecond", dir + "naif0007.tls");
-  kern1 += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
-  kern1 += PvlKeyword("TargetPosition", dir + "de405.bsp");
-  kern1 += PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
-  kern1 += PvlKeyword("Instrument", dir + "mocSpiceUnitTest.ti");
-  kern1 += PvlKeyword("InstrumentAddendum", dir + "mocAddendum.ti");
-  kern1 += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
-  kern1 += PvlKeyword("InstrumentPointing", dir + "moc.bc");
-  kern1 += PvlKeyword("Frame", "");
-  kern1 += PvlKeyword("NaifBodyCode", toString(499));
-  // Time Setup
-  double startTime = -69382819.0;
-  double endTime = -69382512.0;
-  double slope = (endTime - startTime) / (10 - 1);
-
-  kern1 += PvlKeyword("StartPadding", toString(slope));
-  kern1 += PvlKeyword("EndPadding", toString(slope));
-
-  Pvl lab1;
-  lab1.addGroup(inst1);
-  lab1.addGroup(kern1);
-
-  // Test ShapeModel keyword
-  cout << endl << "  Testing ShapeModel keyword..." << endl;
-  PvlGroup kern2 = kern1;
-  kern2 += PvlKeyword("ShapeModel", dir2  + "molaMarsPlanetaryRadius0005.cub");
-  Pvl lab2;
-  lab2.addGroup(inst2);
-  lab2.addGroup(kern2);
-  Target targSh(NULL, lab2);
-  ShapeModel *smSh = ShapeModelFactory::create(&targSh, lab2);
-  cout << "    Successfully created shape " << smSh->name() << endl;
-  delete smSh;
-
-  // Test ElevationModel keyword with value
-  cout << endl << "  Testing ElevationModel keyword..." << endl;
-  PvlGroup kern3 = kern1;
-  kern3 += PvlKeyword("ElevationModel", dir2  + "molaMarsPlanetaryRadius0005.cub");
-  Pvl lab3;
-  lab3.addGroup(inst2);
-  lab3.addGroup(kern3);
-  Target targEl(NULL, lab3);
-  ShapeModel *smEl = ShapeModelFactory::create(&targEl, lab3);
-  cout << "    Successfully created shape " << smEl->name() << endl;
-  delete smEl;
-
-  // Test ElevationModel keyword with Null value
-  cout << endl << "  Testing ElevationModel keyword Null..." << endl;
-  PvlGroup kern4 = kern1;;
-  kern4 += PvlKeyword("ShapeModel", "Null");
-  Pvl lab4;
-  lab4.addGroup(inst2);
-  lab4.addGroup(kern4);
-  Target targElNull(NULL, lab4);
-  ShapeModel *smElNull = ShapeModelFactory::create(&targElNull, lab4);
-  cout << "    Successfully created shape " << smElNull->name() << endl;
-  delete smElNull;
-
-  // Create Spice and Target objects for sky test
-  Target skyTarget(NULL, lab1);
-  ShapeModel *skyShape = ShapeModelFactory::create(&skyTarget,  lab1);
-  cout << endl << "  Testing Sky target..." << endl << "    Shape model is " << skyShape->name() << endl;
-
   try {
-  // Test ShapeModel file that does not exist
-  cout << endl << "  Testing nonexistent file for shape model dem" << endl;
-  PvlGroup kern5 = kern1;
-  kern5 += PvlKeyword("ShapeModel", "NotAFile");
-  Pvl lab5;
-  lab5.addGroup(inst2);
-  lab5.addGroup(kern5);
-  Target targBadFile(NULL, lab5);
-  ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
-  cout << "    Successfully created shape " << smBadFile->name() << endl;
-  delete smBadFile;
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
+    Isis::Preference::Preferences(true);
 
-  try {
-  // Test ShapeModel that's not a valid Isis map projection
-  cout << endl << "  Testing Isis cube file for dem that is not map projected" << endl;
-  PvlGroup kern5 = kern1;
-  kern5 += PvlKeyword("ShapeModel", dir3 + "ab102401.cub");
-  Pvl lab5;
-  lab5.addGroup(inst2);
-  lab5.addGroup(kern5);
-  Target targBadFile(NULL, lab5);
-  ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
-  cout << "    Successfully created shape " << smBadFile->name() << endl;
-  delete smBadFile;
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
+    cout << "Unit test for Isis::ShapeModel" << endl;
 
-  try {
-  // Test ShapeModel dem that's not Equatorial Cylindrical 
-  cout << endl << "  Testing a dem that's not equatorial cylindrical" << endl;
-  PvlGroup kern5 = kern1;
-  kern5 += PvlKeyword("ShapeModel", dir3 + "ab102402.lev2.cub");
-  Pvl lab5;
-  lab5.addGroup(inst2);
-  lab5.addGroup(kern5);
-  Target targDem(NULL, lab5);
-  ShapeModel *smDem = ShapeModelFactory::create(&targDem, lab5);
-  cout << "    Successfully created shape " << smDem->name() << endl;
-  delete smDem;
-  }
-  catch(Isis::IException &e) {
-    e.print();
-  }
+    // Test sky target
+    // Build label for sky target test
+    PvlGroup inst1("Instrument");
+    inst1 += PvlKeyword("TargetName", "Sky");
+    PvlGroup inst2("Instrument");
+    inst2 += PvlKeyword("TargetName", "Mars");
+    PvlGroup kern1("Kernels");
+    FileName f("$base/testData/kernels");
+    FileName f2("$base/dems");
+    FileName f3("$mgs/testData");
+    QString dir = f.expanded() + "/";
+    QString dir2 = f2.expanded() + "/";
+    QString dir3 = f3.expanded() + "/";
+    kern1 += PvlKeyword("NaifFrameCode", toString(-94031));
+    kern1 += PvlKeyword("LeapSecond", dir + "naif0007.tls");
+    kern1 += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
+    kern1 += PvlKeyword("TargetPosition", dir + "de405.bsp");
+    kern1 += PvlKeyword("TargetAttitudeShape", dir + "pck00006.tpc");
+    kern1 += PvlKeyword("Instrument", dir + "mocSpiceUnitTest.ti");
+    kern1 += PvlKeyword("InstrumentAddendum", dir + "mocAddendum.ti");
+    kern1 += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
+    kern1 += PvlKeyword("InstrumentPointing", dir + "moc.bc");
+    kern1 += PvlKeyword("Frame", "");
+    kern1 += PvlKeyword("NaifBodyCode", toString(499));
+    // Time Setup
+    double startTime = -69382819.0;
+    double endTime = -69382512.0;
+    double slope = (endTime - startTime) / (10 - 1);
 
-  try {
-    // Test ShapeModel without shape model statistics
-    cout << endl << "  Testing Isis cube file for dem that is missing shape model statistics" << endl;
+    kern1 += PvlKeyword("StartPadding", toString(slope));
+    kern1 += PvlKeyword("EndPadding", toString(slope));
+
+    Pvl lab1;
+    lab1.addGroup(inst1);
+    lab1.addGroup(kern1);
+
+    // Test ShapeModel keyword
+    cout << endl << "  Testing ShapeModel keyword (EquatorialCylindrical DEM)..." << endl;
+    PvlGroup kern2 = kern1;
+    kern2 += PvlKeyword("ShapeModel", dir2 + "molaMarsPlanetaryRadius0005.cub");
+    Pvl lab2;
+    lab2.addGroup(inst2);
+    lab2.addGroup(kern2);
+    Target targSh(NULL, lab2);
+    ShapeModel *smSh = ShapeModelFactory::create(&targSh, lab2);
+    cout << "    Successfully created shape " << smSh->name() << endl;
+    delete smSh;
+
+    // Test ElevationModel keyword with value
+    cout << endl << "  Testing ElevationModel keyword (EquatorialCylindrical DEM)..." << endl;
+    PvlGroup kern3 = kern1;
+    kern3 += PvlKeyword("ElevationModel", dir2 + "molaMarsPlanetaryRadius0005.cub");
+    Pvl lab3;
+    lab3.addGroup(inst2);
+    lab3.addGroup(kern3);
+    Target targEl(NULL, lab3);
+    ShapeModel *smEl = ShapeModelFactory::create(&targEl, lab3);
+    cout << "    Successfully created shape " << smEl->name() << endl;
+    delete smEl;
+
+    // Test ShapeModel keyword with Null value
+    cout << endl << "  Testing ShapeModel keyword (Null)..." << endl;
+    PvlGroup kern4 = kern1;
+    kern4 += PvlKeyword("ShapeModel", "Null");
+    Pvl lab4;
+    lab4.addGroup(inst2);
+    lab4.addGroup(kern4);
+    Target targShNull(NULL, lab4);
+    ShapeModel *smShNull = ShapeModelFactory::create(&targShNull, lab4);
+    cout << "    Successfully created shape " << smShNull->name() << endl;
+    delete smShNull;
+
+    // Test ElevationModel keyword with Null value
+    cout << endl << "  Testing ElevationModel keyword (Null)..." << endl;
     PvlGroup kern5 = kern1;
-    kern5 += PvlKeyword("ShapeModel", "unitTestDemNoShapeModelStats.pvl");
+    kern5 += PvlKeyword("ElevationModel", "Null");
     Pvl lab5;
     lab5.addGroup(inst2);
     lab5.addGroup(kern5);
-    Target targBadFile(NULL, lab5);
-    ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
-    cout << "    Successfully created shape " << smBadFile->name() << endl;
-    delete smBadFile;
+    Target targElNull(NULL, lab5);
+    ShapeModel *smElNull = ShapeModelFactory::create(&targElNull, lab5);
+    cout << "    Successfully created shape " << smElNull->name() << endl;
+    delete smElNull;
+
+    // Test ShapeModel dem that's not Equatorial Cylindrical 
+    cout << endl << "  Testing DEM not equatorial cylindrical" << endl;
+    PvlGroup kern6 = kern1;
+    kern6 += PvlKeyword("ShapeModel", dir3 + "ab102402.lev2.cub");
+    Pvl lab6;
+    lab6.addGroup(inst2);
+    lab6.addGroup(kern6);
+    Target targDem(NULL, lab6);
+    ShapeModel *smDem = ShapeModelFactory::create(&targDem, lab6);
+    cout << "    Successfully created shape " << smDem->name() << endl;
+    delete smDem;
+
+    // Test ShapeModel keyword with DSK 
+    cout << endl << "  Testing DSK file..." << endl;
+    PvlGroup kern7 = kern1;
+    FileName f7("$hayabusa/kernels/dsk");
+    QString dir7 = f7.expanded() + "/";
+    kern7 += PvlKeyword("ShapeModel", dir7 + "hay_a_amica_5_itokawashape_v1_0_512q.bds");
+    Pvl lab7;
+    lab7.addGroup(inst2);
+    lab7.addGroup(kern7);
+    Target targShDsk(NULL, lab7);
+    ShapeModel *smShDsk = ShapeModelFactory::create(&targShDsk, lab7);
+    cout << "    Successfully created shape " << smShDsk->name() << endl;
+    delete smShDsk;
+
+    // Create Spice and Target objects for sky test
+    Target skyTarget(NULL, lab1);
+    ShapeModel *skyShape = ShapeModelFactory::create(&skyTarget,  lab1);
+    cout << endl << "  Testing Sky target..." << endl;
+    cout << "    Shape model is " << skyShape->name() << endl;
+
+    // Test demshape with ShapeModel keyword
+    cout << endl << "  Testing DEM shape..." << endl;
+    QString inputFile = "$ISIS3DATA/mgs/testData/ab102401.cub";
+    Cube cube;
+    cube.open(inputFile);
+    Camera *c = cube.camera();
+    vector<Distance> radii(3,Distance());
+    radii = c->target()->radii();
+    Pvl pvl = *cube.label();
+    Target targ(NULL, pvl);
+    targ.setRadii(radii);
+    ShapeModel *sm = ShapeModelFactory::create(&targ, pvl);
+    cout << "    Successfully created shape " << sm->name() << endl;
+    delete sm;
+    cube.close();
+
+    // Test ellipsoid shape (ShapeModel = Null)
+    cout << endl << "  Testing Ellipsoid shape..." << endl;
+    inputFile = "$ISIS3DATA/galileo/testData/1213r.cub";
+    cube.open(inputFile);
+    c = cube.camera();
+    radii = c->target()->radii();
+    pvl = *cube.label();
+    Target targ2(NULL, pvl);
+    targ2.setRadii(radii);
+    sm = ShapeModelFactory::create(&targ2, pvl);
+    cout << "    Successfully created shape " << sm->name() << endl;
+    delete sm;
+    cube.close();
+
+    // Test plane shape  TBD
+    // inputFile = "$ISIS3DATA/;
+    // cube.open(inputFile);
+    // c = cube.camera();
+    // radii = c->target()->radii();
+    // pvl = *cube.label();
+    // Target targ2(pvl);
+    // targ3.setRadii(radii);
+    // sm = ShapeModelFactory::Create(&targ3, pvl);
+    // cout << "Successfully created shape " << sm->name() << endl;
+    // delete sm;
+    // cube.close();
+
+    cout << endl << "=========================== Testing Errors ===========================" << endl;
+    try {
+      // Test ShapeModel file that does not exist
+      cout << endl << "  Testing nonexistent file for shape model dem" << endl;
+      PvlGroup kernError = kern1;
+      kernError += PvlKeyword("ShapeModel", "NotAFile");
+      Pvl labError;
+      labError.addGroup(inst2);
+      labError.addGroup(kernError);
+      Target targBadFile(NULL, labError);
+      ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
+      cout << "    Successfully created shape " << smBadFile->name() << endl;
+      delete smBadFile;
+    }
+    catch(Isis::IException &e) {
+      e.print();
+    }
+
+    try {
+      // Test ShapeModel that's not a valid Isis map projection
+      cout << endl << "  Testing Isis cube file for dem that is not map projected" << endl;
+      PvlGroup kernError = kern1;
+      kernError += PvlKeyword("ShapeModel", dir3 + "ab102401.cub");
+      Pvl labError;
+      labError.addGroup(inst2);
+      labError.addGroup(kernError);
+      Target targBadFile(NULL, labError);
+      ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
+      cout << "    Successfully created shape " << smBadFile->name() << endl;
+      delete smBadFile;
+    }
+    catch(Isis::IException &e) {
+      e.print();
+    }
+
+    try {
+      // Test ShapeModel without shape model statistics
+      cout << endl << "  Testing Isis cube file for dem that is missing shape model statistics" << endl;
+      PvlGroup kernError = kern1;
+      kernError += PvlKeyword("ShapeModel", "unitTestDemNoShapeModelStats.pvl");
+      Pvl labError;
+      labError.addGroup(inst2);
+      labError.addGroup(kernError);
+      Target targBadFile(NULL, labError);
+      ShapeModel *smBadFile = ShapeModelFactory::create(&targBadFile, lab4);
+      cout << "    Successfully created shape " << smBadFile->name() << endl;
+      delete smBadFile;
+    }
+    catch (Isis::IException &e) {
+      e.print();
+    }
+  } 
+  catch (IException &e) {
+    IException(e, IException::Programmer,
+              "\n\n\n------------Unit Test Failed.------------",
+              _FILEINFO_).print();
   }
-  catch (Isis::IException &e) {
-    e.print();
-  }
-
-  // Test demshape with ShapeModel keyword
-  cout << endl << "  Testing dem shape..." << endl;
-  QString inputFile = "$ISIS3DATA/mgs/testData/ab102401.cub";
-  Cube cube;
-  cube.open(inputFile);
-  Camera *c = cube.camera();
-  vector<Distance> radii(3,Distance());
-  radii = c->target()->radii();
-  Pvl pvl = *cube.label();
-  Target targ(NULL, pvl);
-  targ.setRadii(radii);
-  ShapeModel *sm = ShapeModelFactory::create(&targ, pvl);
-  cout << "    Successfully created shape " << sm->name() << endl;
-  delete sm;
-  cube.close();
-
-  // Test ellipsoid shape (ShapeModel = Null)
-  cout << endl << "  Testing ellipsoid shape..." << endl;
-  inputFile = "$ISIS3DATA/galileo/testData/1213r.cub";
-  cube.open(inputFile);
-  c = cube.camera();
-  radii = c->target()->radii();
-  pvl = *cube.label();
-  Target targ2(NULL, pvl);
-  targ2.setRadii(radii);
-  sm = ShapeModelFactory::create(&targ2, pvl);
-  cout << "    Successfully created shape " << sm->name() << endl;
-  delete sm;
-  cube.close();
-
-  // Test plane shape  TBD
-  // inputFile = "$ISIS3DATA/;
-  // cube.open(inputFile);
-  // c = cube.camera();
-  // radii = c->target()->radii();
-  // pvl = *cube.label();
-  // Target targ2(pvl);
-  // targ3.setRadii(radii);
-  // sm = ShapeModelFactory::Create(&targ3, pvl);
-  // cout << "Successfully created shape " << sm->name() << endl;
-  // delete sm;
-  // cube.close();
 }

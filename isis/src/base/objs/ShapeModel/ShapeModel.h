@@ -138,6 +138,7 @@ namespace Isis {
       // Intersect ellipse
       bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
                               const std::vector<double> &observerLookVectorToTarget);
+      bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
       double resolution();

@@ -29,12 +29,13 @@
 
 #include <QString>
 
+#include <SpiceZdf.h>
+
 #include "IException.h"
 #include "IString.h"
 #include "Kernels.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "naif/SpiceZdf.h"
 #include "NaifStatus.h"
 #include "Spice.h"
 

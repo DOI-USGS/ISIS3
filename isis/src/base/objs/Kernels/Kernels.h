@@ -24,15 +24,15 @@
  *   http://www.usgs.gov/privacy.html.                                    
  */                                                                       
 
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
-#include "Pvl.h"
-#include "Cube.h"
 #include "Camera.h"
+#include "Cube.h"
 #include "CollectorMap.h"
 #include "IException.h"
+#include "Pvl.h"
 
 namespace Isis {
 
@@ -103,6 +103,8 @@ namespace Isis {
    *                                     management state is set to unmanaged
    *   @history 2011-03-27 Kris Becker - Added copy constructor and assignment
    *                                     operator
+   *   @history 2015-03-05 Kris Becker - Added support for DSK and meta kernels
+   *                                     types. References #2035
    */
 class Kernels {
     public:

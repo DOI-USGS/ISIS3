@@ -12,9 +12,9 @@
 #include <vector>
 
 // naif third party includes
-#include <naif/SpiceUsr.h>
-#include <naif/SpiceZfc.h>
-#include <naif/SpiceZmc.h>
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
 #include "Cube.h"
 #include "CubeManager.h"

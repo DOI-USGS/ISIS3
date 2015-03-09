@@ -1,0 +1,197 @@
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+#include <QDebug>
+
+#include "Angle.h"
+#include "FileName.h"
+#include "IException.h"
+#include "Intercept.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "NaifDskApi.h"
+#include "NaifDskPlateModel.h"
+#include "Preference.h"
+#include "SurfacePoint.h"
+
+using namespace Isis;
+
+/** 
+ *  
+ * @internal 
+ *   @history 2015-02-25 Jeannie Backer - Original version.
+ *                           Code coverage: 91.667% scope, 95.960% line, and 100% function.
+ *                           Unable to create circumstances for missing coverage.
+ *  
+ *   @todo - Test coverage - Constructor error throw - get dsk file openDSK returns NULL
+ *   @todo - Test coverage - openDSK error throw - get dsk file with no segments
+ *
+ */
+int main(int argc, char *argv[]) {
+  try {
+    Preference::Preferences(true);
+    qDebug() << "Unit test for NaifDskPlateModel.";
+    qDebug();
+
+    qDebug() << "Default constructor.";
+    NaifDskPlateModel naifPlateModel;
+    qDebug() << "default object is valid?" << naifPlateModel.isValid();
+    qDebug() << "File name:          " << naifPlateModel.filename();
+    qDebug() << "Number of Plates:   " << naifPlateModel.numberPlates();
+    qDebug() << "Number of Vertices: " << naifPlateModel.numberVertices();
+    qDebug();
+
+    qDebug() << "Construct NaifDskPlateModel object from NAIF DSK file and retrieve basic info.";
+    FileName dskFile("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
+    NaifDskPlateModel naifPlateModelFromDSK(dskFile.expanded());
+    qDebug() << "object is valid? " << naifPlateModelFromDSK.isValid();
+    FileName file(naifPlateModelFromDSK.filename());
+    qDebug() << "File name:          " << file.baseName();
+    qDebug() << "Size:               " << naifPlateModelFromDSK.size();
+    qDebug() << "Number of plates:   " << naifPlateModelFromDSK.numberPlates();
+    qDebug() << "Number of vertices: " << naifPlateModelFromDSK.numberVertices();
+    qDebug();
+
+    qDebug() << "Look for surface point at equator, lon 0.0";
+    Latitude lat(0.0, Angle::Degrees);
+    Longitude lon(0.0, Angle::Degrees);
+    SurfacePoint *sp = naifPlateModelFromDSK.point(lat, lon);
+    qDebug() << "Surface point at pole is null?     " << toString(sp == NULL);
+    qDebug() << "Surface point: " << sp->GetX().meters()
+                                  << sp->GetY().meters()
+                                  << sp->GetZ().meters()
+                                  << " meters";
+    qDebug();
+
+    qDebug() << "Look for intercept with obsever position and look direction ray:";
+    NaifVertex obsPos(3);
+    NaifVector rayDir(3);
+    NaifVertex xpoint(3);
+    obsPos[0] = 0.0;   obsPos[1] = 0.0;   obsPos[2] = 0.0;
+    rayDir[0] = 1.0;   rayDir[1] = 1.0;   rayDir[2] = 1.0;
+    xpoint[0] = 2.0;   xpoint[1] = 2.0;   xpoint[2] = 2.0;
+    Intercept *intercept = naifPlateModelFromDSK.intercept(obsPos, rayDir);
+    qDebug() << "Ray Dir:            " << rayDir;
+    qDebug() << "Observer:           " << obsPos;
+    qDebug() << "Intercept is null?  " << toString(intercept == NULL);
+    qDebug() << "intercept plateID?  " 
+             << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
+
+    // Find obs/rayDir with valid intercept
+    obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
+    rayDir[0] = -1.0;  rayDir[1] = 0.0;  rayDir[2] = 0.0;
+    intercept = naifPlateModelFromDSK.intercept(obsPos, rayDir);
+    qDebug() << "Ray Dir:            " << rayDir;
+    qDebug() << "Observer:           " << obsPos;
+    qDebug() << "Intercept is null?  " << toString(intercept == NULL);
+    qDebug() << "intercept plate name                 = " << intercept->shape()->name();
+    qDebug() << "intercept vertex (obsPos position) = " << intercept->observer();
+    qDebug() << "intercept vector (look direction)    = " << intercept->lookDirectionRay();
+    SurfacePoint xp = intercept->location();
+    xpoint[0] = xp.GetX().meters();
+    xpoint[1] = xp.GetY().meters();
+    xpoint[2] = xp.GetZ().meters();
+    qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
+    qDebug() << "intercept plateID                    =  " 
+             << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
+    qDebug();
+
+    qDebug() << "Get plate info from id:";
+    qDebug() << "Is plate ID = 0 valid? " << naifPlateModelFromDSK.isPlateIdValid(0);
+    qDebug() << "Is plate ID = 1 valid? " << naifPlateModelFromDSK.isPlateIdValid(1);
+    qDebug() << "Is plate ID = 1 valid for invalid NaifDskPlateModel? " 
+             << naifPlateModel.isPlateIdValid(1);
+    qDebug() << "Triangular Plate for ID = 1:";
+    qDebug() << naifPlateModelFromDSK.plate(1);
+    qDebug();
+
+    // currently there is a clone() method prototype, but no implementation.
+    // the following is a test if the method is ever implemented...
+    // NaifDskPlateModel *clonePlateModel = naifPlateModelFromDSK.clone();
+    // qDebug() << clonePlateModel->isValid();
+    // qDebug() << clonePlateModel->filename();
+    // qDebug() << clonePlateModel->size();
+    // qDebug() << clonePlateModel->numberPlates();
+    // qDebug() << clonePlateModel->numberVertices();
+    // qDebug();
+
+    qDebug() << "================================= Error Throws ==================================";
+//  qDebug() << "Thrown from Constructor: Create object where openDSK() returns NULL.";
+//    try {
+//      FileName junkFile("");
+//      NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
+//    } 
+//    catch (IException &e) {
+//      e.print();
+//    }
+//    qDebug();
+    qDebug() << "Thrown from plateIdOfIntercept(): Get plate ID of intercept with invalid obsPos.";
+    try {
+      NaifVertex badObs(2);
+      badObs[0] = 0.0; badObs[1] = 0.0;
+      naifPlateModelFromDSK.plateIdOfIntercept(badObs, rayDir, xpoint);
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+    qDebug() << "Thrown from plate(): Get plate from invalid plate ID.";
+    try {
+      naifPlateModelFromDSK.plate(0);
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+    qDebug() << "Thrown from openDSK(): Open DSK file that doesn't exist.";
+    try {
+      FileName junkFile("./junk.bds");
+      NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+//    qDebug() << "Thrown from openDSK(): Open DSK file with no segments.";
+//    try {
+//      FileName noSegmentsFile("");
+//      NaifDskPlateModel junkmodel(noSegmentsFile.expanded());
+//    } 
+//    catch (IException &e) {
+//      e.print();
+//    }
+//    qDebug();
+    qDebug() << "~NaifDskDescriptor(): Unknown NAIF error has occured.";
+    try {
+      FileName junkFile("$base/kernels/spk/de405.bsp");
+      NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+ 
+  }
+  catch (IException &e) {
+    qDebug();
+    qDebug();
+    IException(e, IException::Programmer,
+              "\n------------Unit Test Failed.------------",
+              _FILEINFO_).print();
+  }
+}

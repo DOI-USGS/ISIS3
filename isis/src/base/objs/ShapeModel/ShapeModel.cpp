@@ -6,9 +6,9 @@
 
 #include <cmath>
 
-#include <naif/SpiceUsr.h>
-#include <naif/SpiceZfc.h>
-#include <naif/SpiceZmc.h>
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
 #include "Distance.h"
 #include "SurfacePoint.h"
@@ -85,7 +85,7 @@ namespace Isis {
     // Jeff and Stuart respond.
 
     if (!surfaceIntersection()->Valid() || !m_hasIntersection) {
-     IString msg = "A valid intersection must be defined before computing the surface normal";
+     QString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
    }
 
@@ -299,19 +299,29 @@ namespace Isis {
       return m_normal;
     }
     else {
-      IString message = "The local normal has not been computed.";
+      QString message = "The local normal has not been computed.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
   }
 
 
+  bool ShapeModel::hasValidTarget() const {
+    return (m_target != NULL);
+  }
+
   /**
    * Returns the radii of the body in km. The radii are obtained from the
    * target.
    */
   std::vector<Distance> ShapeModel::targetRadii() const {
-    return m_target->radii();
+    if (hasValidTarget()) {
+      return m_target->radii();
+    }
+    else {
+      QString message = "Unable to find target radii for ShapeModel. Target is NULL. ";
+      throw IException(IException::Programmer, message, _FILEINFO_);
+     }
   }
 
 
@@ -324,7 +334,7 @@ namespace Isis {
       m_hasNormal = true;
     }
     else {
-      IString message = "No intersection point in known.  A normal can not be set.";
+      QString message = "No intersection point in known.  A normal can not be set.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -341,7 +351,7 @@ namespace Isis {
       m_hasNormal = true;
     }
     else {
-      IString message = "No intersection point in known.  A normal can not be set.";
+      QString message = "No intersection point in known.  A normal can not be set.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -397,11 +407,11 @@ namespace Isis {
    *
    */
   double ShapeModel::resolution() {
-    if (m_hasIntersection) {
+    if (m_hasIntersection && hasValidTarget()) {
       return m_target->spice()->resolution();
     }
     else {
-      IString message = "No valid intersection point for computing resolution.";
+      QString message = "No valid intersection point for computing resolution.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
   }

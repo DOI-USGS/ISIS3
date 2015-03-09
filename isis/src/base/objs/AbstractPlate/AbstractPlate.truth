@@ -1,0 +1,8 @@
+Unit test for Abstract Plate. 
+Virtual class... first create a child 
+plate name =  "AbstractPlate" 
+Construct intercept from vertex (0,0,0), vector(1,1,1), and surface point(2,2,2). 
+intercept plate name                 =  "AbstractPlate" 
+intercept vertex (observer position) =  "( 0.0, 0.0, 0.0 )"
+intercept vector (look direction)    =  "( 1.0, 1.0, 1.0 )"
+intercept surface point (location)   =  2 2 2  meters 

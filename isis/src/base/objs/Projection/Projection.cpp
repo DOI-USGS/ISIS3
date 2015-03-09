@@ -29,7 +29,7 @@
 #include <sstream>
 #include <vector>
 
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 #include "Constants.h"
 #include "Displacement.h"

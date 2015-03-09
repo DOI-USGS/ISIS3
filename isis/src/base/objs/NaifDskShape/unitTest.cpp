@@ -1,0 +1,222 @@
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+#include <QDebug>
+#include <QVector>
+
+#include "Angle.h"
+#include "Cube.h"
+#include "Distance.h"
+#include "FileName.h"
+#include "IException.h"
+#include "Intercept.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "NaifDskApi.h"
+#include "NaifDskPlateModel.h"
+#include "NaifDskShape.h"
+#include "Preference.h"
+#include "Pvl.h"
+#include "Spice.h"
+#include "SurfacePoint.h"
+#include "Target.h"
+
+using namespace Isis;
+
+/**
+ *  
+ * @internal 
+ *   @history 2015-02-25 Jeannie Backer - Original version.
+ *                           Code coverage: 88.889% scope, 93.671% line, and 100% function.
+ *                           Unable to create circumstances for missing coverage.
+ *  
+ *  
+ *   @todo - Test coverage - localRadius(lat,lon) creates null surface point
+ *   @todo - Test coverage - calculateLocalNormal() intercept valid,
+ *                                                  intercept shape does() not have intercept
+ *   @todo - Test coverage - calculateLocalNormal() intercept not valid,
+ *                                                  passes second intercept attempt
+ *
+ */
+int main(int argc, char *argv[]) {
+  try {
+    Preference::Preferences(true);
+    qDebug() << "Unit test for NaifDskShape.";
+    qDebug();
+
+    qDebug() << "Default constructor.";
+    NaifDskShape shapeModel;
+    qDebug();
+
+    qDebug() << "Construct NaifDskShape object from a plate model.";    
+    FileName dskFile("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
+    NaifDskPlateModel plateModel(dskFile.expanded());
+    NaifDskShape shapeModelFromPlate(plateModel);
+    qDebug() << "Try to intersect surface at obsPos (0,0,0) and lookDir (1,1,1)";
+    std::vector<double> obsPos; 
+    std::vector<double> lookDir; 
+    obsPos.push_back(0.0);   obsPos.push_back(0.0);   obsPos.push_back(0.0);
+    lookDir.push_back(1.0);  lookDir.push_back(1.0);  lookDir.push_back(1.0);
+    bool success = shapeModelFromPlate.intersectSurface(obsPos, lookDir);
+    qDebug() << "Intersection successful? " << toString(success);
+    qDebug();
+     
+    qDebug() << "Construct NaifDskShape object from cube labels with ShapeModel=DSK file.";
+    Pvl pvlWithShape("./st_2530292409_v_DskShapeModel.lbl");
+    Target targetSh(NULL, pvlWithShape);
+    NaifDskShape shapeModelFromPvlShape(&targetSh, pvlWithShape);
+    qDebug() << "Try to intersect surface at obsPos (0,0,1000) and lookDir (0,-1,-1)";
+    obsPos[0]  = 0.0;  obsPos[1]  = 0.0;   obsPos[2]  = 1000.0;
+    lookDir[0] = 0.0;  lookDir[1] = -1.0;  lookDir[2] = -1.0;
+    success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
+    qDebug() << "Intersection successful?     " << toString(success);
+
+    qDebug();
+    qDebug() << "Construct NaifDskShape object from cube labels with ElevationModel=DSK file.";    
+    Pvl pvlWithElevation("./st_2530292409_v_DskElevationModel.lbl");
+    Target targetEl(NULL, pvlWithElevation);
+    Distance meter(1, Distance::Meters);
+    std::vector<Distance> radii;
+    radii.push_back(meter);
+    radii.push_back(meter);
+    radii.push_back(meter);
+    targetEl.setRadii(radii);
+    NaifDskShape shapeModelFromPvlElevation(&targetEl, pvlWithElevation);
+    qDebug() << "Try to intersect surface at obsPos (1000,0,0) and lookDir (-1,0,0)";
+    obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
+    lookDir[0] = -1.0;  lookDir[1] = 0.0;  lookDir[2] = 0.0;
+    success = shapeModelFromPvlElevation.intersectSurface(obsPos, lookDir);
+    qDebug() << "Intersection successful?     " << toString(success);
+    qDebug() << "Intersection valid? " << shapeModelFromPvlElevation.surfaceIntersection()->Valid();
+
+    const Intercept *intercept = shapeModelFromPvlElevation.intercept();
+    qDebug() << "Intercept is null?  " << toString(intercept == NULL);
+    SurfacePoint xp = intercept->location();
+    NaifVertex xpoint(3);
+    xpoint[0] = xp.GetX().meters();
+    xpoint[1] = xp.GetY().meters();
+    xpoint[2] = xp.GetZ().meters();
+    qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
+    qDebug();
+
+    qDebug() << "Find local radius given lat/lon";
+    Latitude lat(0, Angle::Degrees);
+    Longitude lon(0, Angle::Degrees);
+    Distance rad = shapeModelFromPvlElevation.localRadius(lat, lon);
+    qDebug() << "Local radius at (" << lat.degrees() << ", " 
+                                    << lon.degrees() << ") is valid? " << rad.isValid();
+    qDebug() << "Local radius:                " << rad.meters() << "meters";
+    qDebug();
+
+    qDebug() << "Access the associated NaifDskPlateModel.";
+    NaifDskPlateModel plateModelFromShape = shapeModelFromPvlElevation.model();
+    qDebug() << "Plate is valid?              " << plateModelFromShape.isValid();
+    FileName file(plateModelFromShape.filename());
+    qDebug() << "Plate file name:             " << file.baseName();
+    qDebug() << "Plate size:                  " << plateModelFromShape.size();
+    qDebug() << "Number of plates:            " << plateModelFromShape.numberPlates();
+    qDebug() << "Number of vertices:          " << plateModelFromShape.numberVertices();
+    qDebug();
+
+
+    qDebug() << "Try to calculate norms";
+    shapeModelFromPvlElevation.setLocalNormalFromIntercept();
+    qDebug() << "Normal set from Intercept:           "
+             << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
+    // no need to call calculateSurfaceNormal() or ellipsoidNormal()
+    // directly. these methods are called by calculateDefaultNormal()
+    shapeModelFromPvlElevation.calculateDefaultNormal(); 
+    qDebug() << "Default normal:                      "
+             << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
+
+    QVector <double *> cornerNeighborPoints;
+    double point[3];
+    point[0] = 1.0;    point[1] = 0.0;    point[2] = 0.0;
+    cornerNeighborPoints.push_back(point);
+    shapeModelFromPvlElevation.calculateLocalNormal(cornerNeighborPoints); 
+    qDebug() << "Local normal from neighbor points:   "
+             << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
+    qDebug();
+
+
+    qDebug() << "================================= Error Throws ==================================";
+    qDebug() << "Construct NaifDskShape object from cube labels with ShapeModel=Null.";    
+    try {
+      Pvl pvlNullShape("./st_2530292409_v_NullShapeModel.lbl");
+      NaifDskShape shapeModelFromPvlNull(&targetSh, pvlNullShape);
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+    qDebug() << "Thrown by setLocalNormalFromIntercept() - Failed to find intercept. ";
+    try {
+      shapeModelFromPvlShape.setLocalNormalFromIntercept();
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+    qDebug() << "Thrown by calculateLocalNormal() - Failed to find intercept for normal vector. ";
+    try {
+      shapeModel.calculateLocalNormal(cornerNeighborPoints);
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+    qDebug() << "Thrown by ellipsoidNormal() - No intersection. ";
+    try {
+      shapeModel.ellipsoidNormal();
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+    qDebug() << "Thrown by ellipsoidNormal() - Invalid intersection. ";
+    try {
+      // if the surface point is accidentally reset to an invalid point, but hasIntercept still 
+      // set to true.
+      shapeModelFromPvlElevation.setSurfacePoint(SurfacePoint());
+      shapeModelFromPvlElevation.ellipsoidNormal();
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+    qDebug();
+    qDebug() << "Thrown by ellipsoidNormal() - Invalid target. ";
+    try {
+      // get valid intersection
+      shapeModelFromPlate.intersectSurface(obsPos, lookDir);
+      // model with invalid target
+      shapeModelFromPlate.ellipsoidNormal();
+    } 
+    catch (IException &e) {
+      e.print();
+    }
+
+  }
+  catch (IException &e) {
+    qDebug();
+    qDebug();
+    IException(e, IException::Programmer,
+              "\n------------Unit Test Failed.------------",
+              _FILEINFO_).print();
+  }
+}

@@ -27,14 +27,14 @@
 #include <iostream>
 #include <iomanip>
 
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
+
 #include "Camera.h"
 #include "TProjection.h"
 #include "SpecialPixel.h"
 #include "Stereo.h"
-
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
 
 namespace Isis {
 
