@@ -46,8 +46,8 @@ namespace Isis {
     static ShapeModel *create(Target *target, Pvl &pvl);
 
     private:
-      ShapeModelFactory() {};
-      ~ShapeModelFactory() {};
+      ShapeModelFactory();
+      ~ShapeModelFactory();
 
       // Supported shape models
       enum {
