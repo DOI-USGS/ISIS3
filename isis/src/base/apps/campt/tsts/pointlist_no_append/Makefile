@@ -28,7 +28,6 @@ commands:
 	to=$(OUTPUT)/pointlistNoAppendTruth.csv \
 	append=FALSE > /dev/null;
 	cat $(OUTPUT)/pointlistNoAppendTruth.csv | \
-	$(SED) '/Filename.*/ { N; N; N; N; s/-\n[ ]*//g; }' | \
 	$(SED) 's/^.*\(ab102401.cub\)\(.*\)/\1\2/g' \
 	> $(OUTPUT)/pointlistNoAppendTruthtmp.csv;
 	$(MV) $(OUTPUT)/pointlistNoAppendTruthtmp.csv \
