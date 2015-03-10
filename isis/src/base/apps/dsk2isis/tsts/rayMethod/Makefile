@@ -1,5 +1,7 @@
 APPNAME = dsk2isis
 
+itokawa.truth.cub.TOLERANCE = 0.00002
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
