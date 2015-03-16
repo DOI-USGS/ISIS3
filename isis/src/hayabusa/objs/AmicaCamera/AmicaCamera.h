@@ -35,6 +35,9 @@ namespace Isis {
    *   @history 2013-11-27 Kris Becker - Original version
    *   @history 2015-02-26 Kris Becker - Implement starting detector specs; add
    *                         summing and AlphaCube support.
+   *   @history 2015-03-11 Kris Becker - Fixed timing error - was using the
+   *                         UTC StartTime rather than the
+   *                         SpacecraftClockStartCount. References #2180.
    */
   class AmicaCamera : public FramingCamera {
     public:

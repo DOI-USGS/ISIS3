@@ -56,13 +56,11 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
-    double time = iTime((QString)inst["StartTime"]).Et();
+    QString stime = inst["SpacecraftClockStartCount"];
+    iTime etStart = getClockTime(stime);
 
-    // Exposure duration keyword is in seconds
     double exposureDuration = ((double) inst["ExposureDuration"]);
-    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(time, exposureDuration);
-
-    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
+    iTime centerTime  = etStart + (exposureDuration / 2.0);
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
