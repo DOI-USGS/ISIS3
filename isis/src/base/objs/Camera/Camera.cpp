@@ -1235,116 +1235,132 @@ namespace Isis {
 
 
   /**
-   * Sets the passed in vector to be the local normal which is calculated using
-   * the DEM
+   * This method will find the local normal at the current (sample, line) and 
+   * set it to the passed in array. 
    *
-   * @param normal - local normal vector to be set
+   * @param [out] normal The local normal vector to be calculated.
    *
    */
   void Camera::GetLocalNormal(double normal[3]) {
-    // TODO ** Can the logic here be simplified???
 
-    // As documented in the doxygen above, the goal of this method is to
-    // calculate a normal vector to the surface using the 4 corner surrounding points.
-    double samp = Sample();
-    double line = Line();
-
-    // order of points in vector is top, bottom, left, right
-    QList< QPair< double, double > > surroundingPoints;
-    surroundingPoints.append(qMakePair(samp, line - 0.5));
-    surroundingPoints.append(qMakePair(samp, line + 0.5));
-    surroundingPoints.append(qMakePair(samp - 0.5, line));
-    surroundingPoints.append(qMakePair(samp + 0.5, line));
-
-    // save input state to be restored on return
-    bool computed = p_pointComputed;
-    double originalSample = samp;
-    double originalLine = line;
-
-    // now we have all four points in the image, so find the same points on the surface
-    QVector<double *> cornerNeighborPoints(4);
-
-    for (int i = 0; i < cornerNeighborPoints.size(); i++)
-      cornerNeighborPoints[i] = new double[3];
-
-    Latitude lat;
-    Longitude lon;
-    Distance radius;
     ShapeModel *shapeModel = target()->shape();
-
-    for (int i = 0; i < cornerNeighborPoints.size(); i++) {
-      // If a surrounding point fails, set it to the original point
-      if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
-        surroundingPoints[i].first = samp;
-        surroundingPoints[i].second = line;
-
-        // If the original point fails too, we can't get a normal.  Clean up and return.
-        if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
-          normal[0] = 0.;
-          normal[1] = 0.;
-          normal[2] = 0.;
-
-          // restore input state
-          if (computed) {
-            SetImage(originalSample, originalLine);
-          } 
-          else {
-            p_pointComputed = false;
-          }
-
-          // free memory
-          for (int i = 0; i < cornerNeighborPoints.size(); i++)
-            delete [] cornerNeighborPoints[i];
-
-          return;
-        }
-      }
-
-      SurfacePoint surfacePoint = GetSurfacePoint();
-      lat = surfacePoint.GetLatitude();
-      lon = surfacePoint.GetLongitude();
-      radius = LocalRadius(lat, lon);
-
-      latrec_c(radius.kilometers(), lon.radians(),
-               lat.radians(), cornerNeighborPoints[i]);
+    if ( !shapeModel->hasIntersection()) {
+      // if the shape is not intersected, then clearly there is no normal
+      normal[0] = normal[1] = normal[2] = 0.0;
+      return;
     }
 
-    // if the first 2 surrounding points match or the last 2 surrounding points match, 
-    // we can't get a normal.  Clean up and return. 
-    if ((surroundingPoints[0].first == surroundingPoints[1].first &&
-        surroundingPoints[0].second == surroundingPoints[1].second) ||
-       (surroundingPoints[2].first == surroundingPoints[3].first &&
-        surroundingPoints[2].second == surroundingPoints[3].second)) {
-      normal[0] = 0.;
-      normal[1] = 0.;
-      normal[2] = 0.;
+    QVector<double *> cornerNeighborPoints(4);
+    bool computed = p_pointComputed;
+    if (QString::compare(shapeModel->name(), "DemShape", Qt::CaseInsensitive) == 0) {
+      // If the shape model is not DEM, we don't use the neighbor points.
+      // So, to avoid the potetially expesive SetImage() calls used to find the neighbors,
+      // just pass in empty vector to shape model's calculateLocalNormal() method
+      shapeModel->calculateLocalNormal(cornerNeighborPoints);
+    }
+    else { // attempt to find local normal for DEM shapes using 4 surrounding points on the image
 
-      // restore input state
-      if (!computed) {
-        SetImage(originalSample, originalLine);
-      } 
-      else {
-        p_pointComputed = false;
+      // As documented in the doxygen above, the goal of this method is to
+      // calculate a normal vector to the surface using the 4 corner surrounding points.
+      double samp = Sample();
+      double line = Line();
+
+      // order of points in vector is top, bottom, left, right
+      QList< QPair< double, double > > surroundingPoints;
+      surroundingPoints.append(qMakePair(samp, line - 0.5));
+      surroundingPoints.append(qMakePair(samp, line + 0.5));
+      surroundingPoints.append(qMakePair(samp - 0.5, line));
+      surroundingPoints.append(qMakePair(samp + 0.5, line));
+
+      // save input state to be restored on return
+      double originalSample = samp;
+      double originalLine = line;
+
+      // now we have all four points in the image, so find the same points on the surface
+      for (int i = 0; i < cornerNeighborPoints.size(); i++) {
+        cornerNeighborPoints[i] = new double[3];
       }
+
+      Latitude lat;
+      Longitude lon;
+      Distance radius;
+
+      // if this is a dsk, we only need to use the existing intercept point (plate) normal then return 
+      for (int i = 0; i < cornerNeighborPoints.size(); i++) {
+        // If a surrounding point fails, set it to the original point
+        if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
+          surroundingPoints[i].first = samp;
+          surroundingPoints[i].second = line;
+
+          // If the original point fails too, we can't get a normal.  Clean up and return.
+          if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
+            normal[0] = 0.;
+            normal[1] = 0.;
+            normal[2] = 0.;
+
+            // restore input state
+            if (computed) {
+              SetImage(originalSample, originalLine);
+            } 
+            else {
+              p_pointComputed = false;
+            }
+
+            // free memory
+            for (int i = 0; i < cornerNeighborPoints.size(); i++) {
+              delete [] cornerNeighborPoints[i];
+            }
+
+            return;
+          }
+        }
+
+        SurfacePoint surfacePoint = GetSurfacePoint();
+        lat = surfacePoint.GetLatitude();
+        lon = surfacePoint.GetLongitude();
+        radius = LocalRadius(lat, lon);
+
+        latrec_c(radius.kilometers(), lon.radians(), lat.radians(), cornerNeighborPoints[i]);
+      }
+
+      // if the first 2 surrounding points match or the last 2 surrounding points match, 
+      // we can't get a normal.  Clean up and return. 
+      if ((surroundingPoints[0].first == surroundingPoints[1].first &&
+          surroundingPoints[0].second == surroundingPoints[1].second) ||
+         (surroundingPoints[2].first == surroundingPoints[3].first &&
+          surroundingPoints[2].second == surroundingPoints[3].second)) {
+        normal[0] = 0.;
+        normal[1] = 0.;
+        normal[2] = 0.;
+
+        // restore input state
+        if (!computed) {
+          SetImage(originalSample, originalLine);
+        } 
+        else {
+          p_pointComputed = false;
+        }
+
+        // free memory
+        for (int i = 0; i < cornerNeighborPoints.size(); i++)
+          delete [] cornerNeighborPoints[i];
+
+        return;
+      }
+
+      // Restore input state to original point before calculating normal
+      SetImage(originalSample, originalLine);
+      shapeModel->calculateLocalNormal(cornerNeighborPoints);
 
       // free memory
       for (int i = 0; i < cornerNeighborPoints.size(); i++)
         delete [] cornerNeighborPoints[i];
-
-      return;
+   
     }
 
-    // Restore input state to original point before calculating normal
-    SetImage(originalSample, originalLine);
-    shapeModel->calculateLocalNormal(cornerNeighborPoints);
-
-    // free memory
-    for (int i = 0; i < cornerNeighborPoints.size(); i++)
-      delete [] cornerNeighborPoints[i];
- 
     // restore input state if calculation failed and clean up.
     if (!shapeModel->hasNormal()) {
-       p_pointComputed = false;
+      p_pointComputed = false;
       return;
     }
 

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="dsk2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Converts NAIF DSK plate model to ISIS format
+  </brief>
+
+  <description>
+      This application will convert a NAIF DSK plate model to an ISIS cube.  
+      Users must  provide a valid map file to use for allocation of the ISIS 
+      cube.  The scale and type of projection determine the size of the output 
+      cube.
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2014-02-19">
+        Original Version
+    </change>
+    <change name="Jeannie Backer" date="2015-03-08">
+        Wrote tests. Added application to ISIS trunk. References #2035
+    </change>
+    <change name="Kris Becker" date="2015-03-11">
+        Process data tiles instead of a pixel at a time; Test for
+        valid output map coordinate at every map pixel. References #2035
+    </change>
+</history>
+
+  <category>
+    <categoryItem>Map Projection</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>Name of NAIF DSK DEM file</brief>
+        <description>
+          This parameter provides the name of the NAIF DSK file to convert to 
+          ISIS format.  It is assumed to be in body fixed coordinates from which 
+          intersections for each output map grid point will be computed using 
+          NAIF's DSK toolkit.
+        </description>
+        <filter>
+          *.bds
+        </filter>
+      </parameter>
+
+      <parameter name="MAP">
+          <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>Name of file containing map description</brief>
+        <description>
+            This paramter provides the name of a file containing a valid map 
+            projection defintion. One can use the ISIS maptemplate application 
+            to create a map template.
+        </description>
+        <filter>
+          *.map
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+       <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cube
+        </brief>
+        <description>
+          Name of the output ISIS file created by this application containing 
+          the rendering of the DSK DEM into and ISIS compatible DEM for use in 
+          the ISIS system.
+        </description>
+      </parameter>
+
+        <parameter name="METHOD">
+            <type>string</type>
+            <brief>
+                DEM intersection method used
+            </brief>
+            <description>
+              <p>
+                This parameter provides two different methods to compute the 
+                output radius value for a given latitude, longitude map grid 
+                point.
+              </p>
+            </description>
+            <default><item>RAY</item></default>
+            <list>
+                <option value="RAY">
+                    <brief>
+                        Ray intersection from image pixel location to DEM 
+                    </brief>
+                    <description>
+                        Calculates an intercept location on the (irregularly                     
+                        shaped) body from the observer point (i.e., image pixel 
+                        location) and look (or ray) direction 
+                    </description>
+                </option>
+                <option value="GRID">
+                    <brief>
+                        Calculate using surface point latitude, longitude grid 
+                        point  
+                    </brief>
+                    <description>
+                         The radius value of the DEM is determined at the 
+                         intercept point of the triaxial ellipsoid from the 
+                         center of the body. This method extends the surface (x, 
+                         y, z) body fixed coordinate of the ellisoid by 
+                         extending the vector by a factor of 1.5.  This creates 
+                         the obsever point.  The direction vector is then the 
+                         negation of the observer point.  From this, a DEM 
+                         surface intercept point is determined.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+    </group>
+  </groups>
+</application>
