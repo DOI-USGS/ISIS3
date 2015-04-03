@@ -83,14 +83,17 @@ namespace Isis {
   /**
    * Export the Isis cube channels to the given standard image.  If supported by
    * the specific exporter child, will also produce an image with the given
-   * scaled quality.  This will do a black-box export using a ProcessExport
-   * routine.  After the export is completed, a world file will also be created
-   * if a map projection exists.
+   * scaled quality. Will also use the selected compression algorithm if
+   * supported by the image format. This will do a black-box export using a
+   * ProcessExport routine. After the export is completed, a world file will
+   * also be created if a map projection exists.
    *
    * @param outputName The filename of the output cube
    * @param quality The quality of the output from 0 to 100, defaults to 100
+   * @param compression The compression algorithm used. Image format specific.
    */
-  void ImageExporter::write(FileName outputName, int quality) {
+  void ImageExporter::write(FileName outputName, int quality,
+                            QString compression) {
     ProcessExport &p = process();
     if (!p.HasInputRange()) p.SetInputRange();
     p.ProcessCubes(*this);

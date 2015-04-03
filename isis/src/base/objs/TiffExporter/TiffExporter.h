@@ -49,6 +49,9 @@ namespace Isis {
    *                         References #579.
    *   @history 2013-06-05 Jeannie Backer - Removed "get" prefix from ImageExporter
    *                           method calls. References #1380.
+   *   @history 2015-02-10 Jeffrey Covington - Changed default compression to no
+   *                         compression. Added compression parameter to write()
+   *                         method. Fixes #1745.
    *
    */
   class TiffExporter : public StreamExporter {
@@ -56,7 +59,8 @@ namespace Isis {
       TiffExporter();
       virtual ~TiffExporter();
 
-      virtual void write(FileName outputName, int quality=100);
+      virtual void write(FileName outputName, int quality=100,
+                         QString compression="none");
 
       static bool canWriteFormat(QString format);
 

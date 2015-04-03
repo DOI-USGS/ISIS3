@@ -53,8 +53,10 @@ namespace Isis {
    *
    * @param outputName The filename of the output cube
    * @param quality The quality of the output, not used for JPEG 2000
+   * @param compression The compression algorithm used. Not used for JPEG 2000
    */
-  void JP2Exporter::write(FileName outputName, int quality) {
+  void JP2Exporter::write(FileName outputName, int quality,
+                          QString compression) {
     PixelType type = pixelType();
     m_encoder = new JP2Encoder(
         outputName.expanded(), samples(), lines(), bands(), type);
