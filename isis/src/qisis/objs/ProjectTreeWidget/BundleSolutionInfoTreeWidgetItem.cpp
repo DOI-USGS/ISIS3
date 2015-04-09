@@ -14,15 +14,14 @@ namespace Isis {
    *
    * @param parent
    */
-  BundleSolutionInfoTreeWidgetItem::BundleSolutionInfoTreeWidgetItem(
-      BundleSolutionInfo *bundleSolutionInfo, QTreeWidget *parent)
-      : QTreeWidgetItem(parent, UserType) {
+  BundleSolutionInfoTreeWidgetItem::BundleSolutionInfoTreeWidgetItem(BundleSolutionInfo *bundleSolutionInfo,
+      QTreeWidget *parent) : QTreeWidgetItem(parent, UserType) {
     m_bundleSolutionInfo = bundleSolutionInfo;
 
 //  setText(0, m_control->displayProperties()->displayName());
-    setText(0, "BundleSolution");
+    setText(0, m_bundleSolutionInfo->runTime());
     setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    setIcon(0, QIcon(":info"));
+    setIcon(0, QIcon(":results"));
 
     connect(m_bundleSolutionInfo, SIGNAL(destroyed(QObject *)), this, SLOT(deleteLater()));
   }

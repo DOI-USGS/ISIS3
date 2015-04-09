@@ -13,7 +13,7 @@ namespace Isis {
    *
    * This class visualizes a BundleSolutionInfo * from the project in the project tree widget.
    *
-   * @author 2014-07-23 Ken Edmundson
+   * @author 2014-07-22 Ken Edmundson
    *
    * @internal
    *   @history 2015-02-20 Jeannie Backer - Name changed from BundleResults to
