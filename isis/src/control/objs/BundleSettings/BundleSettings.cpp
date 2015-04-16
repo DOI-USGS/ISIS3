@@ -1076,35 +1076,31 @@ namespace Isis {
   }
 
   void BundleSettings::savehdf5(hid_t fileId, H5::Group settingsGroup) const {
-    //
-    //
-    //// Try block to detect exceptions raised by any of the calls inside it
-    //try {
-    //  /*
-    //   * Turn off the auto-printing when failure occurs so that we can
-    //   * handle the errors appropriately
-    //   */
-    //  H5::Exception::dontPrint();
-    //  /*
-    //   * Create a new file using H5F_ACC_TRUNC access,
-    //   * default file creation properties, and default file
-    //   * access properties.
-    //   */
-    //  H5::H5File hdfFile = H5::H5File( hdfFileName, H5F_ACC_TRUNC ); // does this append or overwrite ???
-    //  hid_t fileId = hdfFile.getId();
-    //  H5::Group bundleSettingsGroup = H5::Group(hdfFile.createGroup("/BundleSettings"));
-    //
-    //  hsize_t dims[2];              // dataset dimensions
-    //
-    //  //TODO: finish Correlation Matrix
-    //  //Create a dataset with compression
-    //  H5::Group correlationMatrixGroup
-    //      = H5::Group(hdfFile.createGroup("/BundleSettings/CorrelationMatrix"));
-    //  H5LTset_attribute_string(fileId, "/BundleSettings/CorrelationMatrix", "correlationFileName", 
-    //                           correlationMatrix().correlationFileName().expanded());
-    //  H5LTset_attribute_string(fileId, "/BundleSettings/CorrelationMatrix", "covarianceFileName", 
-    //                           correlationMatrix().covarianceFileName().expanded());
-    //  // TODO: jb - how do we add
+  }
+  void BundleSettings::savehdf5(hid_t settingsGroupId, QString objectName) const {
+  #if 0
+    
+    // Try block to detect exceptions raised by any of the calls inside it
+    try {
+      /*
+       * Turn off the auto-printing when failure occurs so that we can
+       * handle the errors appropriately
+       */
+      H5::Exception::dontPrint();
+
+    // passed in
+    //   H5::Group bundleSettingsGroup = H5::Group(hdfFile.createGroup("/BundleSettings"));
+      hsize_t dims[2];              // dataset dimensions
+
+      //TODO: finish Correlation Matrix
+      //Create a dataset with compression
+      hid_t correlationGroupId = H5Gcreate(settingsGroupId, "/BundleSolutionInfo/BundleSettings/CorrelationMatrix", 0);//??? 
+      QString location = objectName + "/CorrelationMatrix";
+      H5LTset_attribute_string(correlationGroupId, location.toAscii(), "correlationFileName", 
+                               correlationMatrix().correlationFileName().expanded());
+      H5LTset_attribute_string(correlationGroupId, location.toAscii(), "covarianceFileName", 
+                               correlationMatrix().covarianceFileName().expanded());
+      //  // TODO: jb - how do we add
     //  // correlationMatrix().imagesAndParameters()???
     //  // QMapIterator<QString, QStringList> a list of images with their
     //  // corresponding parameters...
@@ -1252,40 +1248,41 @@ namespace Isis {
     //  dataset = H5::DataSet(hdfFile.createDataSet("/MLEstimation/residualsCumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, resCumProbdataspace));
     //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
     //  
-    //}  // end of try block
-    //// catch failure caused by the H5File operations
-    //catch( H5::FileIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a file error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //// catch failure caused by the DataSet operations
-    //catch( H5::DataSetIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a data set error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //// catch failure caused by the DataSpace operations
-    //catch( H5::DataSpaceIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a data space error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //// catch failure caused by the DataSpace operations
-    //catch( H5::DataTypeIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a data type error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //return;
+    }  // end of try block
+    // catch failure caused by the H5File operations
+    catch( H5::FileIException error ) {
+      QString msg = QString(error.getCDetailMsg());
+      IException hpfError(IException::Unknown, msg, _FILEINFO_);
+      msg = "Unable to save BundleResults to hpf5 file. "
+            "H5 exception handler has detected a file error.";
+      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    }
+    // catch failure caused by the DataSet operations
+    catch( H5::DataSetIException error ) {
+      QString msg = QString(error.getCDetailMsg());
+      IException hpfError(IException::Unknown, msg, _FILEINFO_);
+      msg = "Unable to save BundleResults to hpf5 file. "
+            "H5 exception handler has detected a data set error.";
+      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    }
+    // catch failure caused by the DataSpace operations
+    catch( H5::DataSpaceIException error ) {
+      QString msg = QString(error.getCDetailMsg());
+      IException hpfError(IException::Unknown, msg, _FILEINFO_);
+      msg = "Unable to save BundleResults to hpf5 file. "
+            "H5 exception handler has detected a data space error.";
+      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    }
+    // catch failure caused by the DataSpace operations
+    catch( H5::DataTypeIException error ) {
+      QString msg = QString(error.getCDetailMsg());
+      IException hpfError(IException::Unknown, msg, _FILEINFO_);
+      msg = "Unable to save BundleResults to hpf5 file. "
+            "H5 exception handler has detected a data type error.";
+      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+    }
+    return;
       
+#endif
   }
 }

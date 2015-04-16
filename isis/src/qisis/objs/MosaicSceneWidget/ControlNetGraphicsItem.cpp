@@ -314,6 +314,9 @@ namespace Isis {
   void ControlNetGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     //qDebug()<<"ControlNetGraphicsItem::mouseReleaseEvent";
     ControlPointGraphicsItem *cpItem = (ControlPointGraphicsItem *) m_mosaicScene->getScene()->focusItem();
+    if (!cpItem) {
+      // throw error???
+    }
     //qDebug()<<"ControlNetGraphicsItem::mouseReleaseEvent  cpItem = "<<cpItem->controlPoint()->GetId();
 //  emit newControlPointSelected(m_controlPoint);
   }

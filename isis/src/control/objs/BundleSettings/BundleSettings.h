@@ -210,6 +210,7 @@ namespace Isis {
       QDataStream &read(QDataStream &stream);
 
       void savehdf5(hid_t fileId, H5::Group settingsGroup) const;
+      void savehdf5(hid_t settingsGroupId, QString objectName) const;
 
     private:
       /**

@@ -463,13 +463,18 @@ namespace Isis {
       H5::H5File hdfFile = H5::H5File( hdfFileName, H5F_ACC_EXCL );
       hid_t fileId = hdfFile.getId();
 
-      H5LTset_attribute_string(fileId, "/BundleSolutionInfo", "runTime", m_runTime.toAscii());
-      H5LTset_attribute_string(fileId, "/BundleSolutionInfo", "controlNetworkFileName", 
+      QString objectName = "/BundleSolutionInfo";
+      H5LTset_attribute_string(fileId, objectName.toAscii(), "runTime", m_runTime.toAscii());
+      H5LTset_attribute_string(fileId, objectName.toAscii(), "controlNetworkFileName", 
                                m_controlNetworkFileName->expanded().toAscii());
 
-      H5::Group settingsGroup = H5::Group(hdfFile.createGroup("/BundleSolutionInfo/BundleSettings"));
-      m_settings->savehdf5(fileId, settingsGroup);
-      H5::Group resultsGroup  = H5::Group(hdfFile.createGroup("/BundleSolutionInfo/BundleResults"));
+      //??? H5::Group settingsGroup = H5::Group(hdfFile.createGroup("/BundleSolutionInfo/BundleSettings"));//???
+      //???H5::Group settingsGroup = hdfFile.createGroup("/BundleSolutionInfo/BundleSettings"); 
+      QString groupName = objectName + "/BundleSettings"; 
+      hid_t groupId = H5Gcreate(fileId, groupName.toAscii(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      m_settings->savehdf5(groupId, groupName.toAscii());
+      groupName = objectName + "/BundleResults"; 
+      H5::Group resultsGroup  = H5::Group(hdfFile.createGroup(groupName.toAscii()));
       m_statisticsResults->savehdf5(fileId, resultsGroup);
       
     }

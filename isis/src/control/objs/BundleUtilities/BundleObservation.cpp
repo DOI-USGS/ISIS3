@@ -574,12 +574,12 @@ namespace Isis {
       // update corrections
       m_corrections += corrections;
 
-      return true;
     } 
     catch (IException &e) {
       QString msg = "Unable to apply parameter corrections to BundleObservation.";
       IException(e, IException::Unknown, msg, _FILEINFO_);
     }
+    return true;
   }
 
 

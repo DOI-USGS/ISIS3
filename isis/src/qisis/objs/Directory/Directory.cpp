@@ -542,6 +542,9 @@ namespace Isis {
 
   void Directory::cleanupFileListWidgets() {
     int numRemoved = m_fileListWidgets.removeAll(NULL);
+    if (numRemoved < 0) {
+      // why do we need this variable??? just for the print statement???
+    }
     //qDebug()<<"Directory::cleanupFileListWidgets  numRemoved = "<<numRemoved;
   }
 
@@ -551,12 +554,12 @@ namespace Isis {
   }
 
 
-// <<<<<<< .mine
   void Directory::cleanupControlPointEditorWidget() {
     delete m_controlPointEditWidget;
     m_controlPointEditWidget = NULL;
   }
-// =======
+
+
   void Directory::cleanupMatrixViewWidgets() {
     m_matrixViewWidgets.removeAll(NULL);
   }

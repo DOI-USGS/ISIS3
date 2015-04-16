@@ -1405,6 +1405,9 @@ namespace Isis {
     QMutableListIterator<BundleSolutionInfo *> it(*m_bundleSolutionInfo);
     while ( it.hasNext() ) {
       BundleSolutionInfo *bundleSolutionInfo = it.next();
+      if (!bundleSolutionInfo) {
+        // throw error???
+      }
 
       int foundElement = m_bundleSolutionInfo->indexOf( (BundleSolutionInfo *)bundleSolutionInfoObj );
 
@@ -1464,20 +1467,20 @@ namespace Isis {
       else if (localName == "directory") {
         m_project->directory()->load( reader() );
       }
-// <<<<<<< .mine
       else if (localName == "dockRestore") {
 //      QVariant geo_data = QVariant(atts.value("geometry"));
 //      restoreGeometry(geo_data);
 //      QVariant layout_data = QVariant(atts.value("state"));
 //      restoreState(layout_data);
       }
-// =======
 
       else if (localName == "bundleSettings") {
         BundleSettings *bundleSettings = m_project->bundleSettings();
+        if (!bundleSettings) {
+          // throw error???
+        }
 //        bundleSettings = new BundleSettings(m_project, reader());
       }
-// >>>>>>> .r5959
     }
 
     return true;
