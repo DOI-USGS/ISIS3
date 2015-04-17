@@ -203,38 +203,38 @@ namespace Isis {
 
 
   // ??? why bounded vector ??? can we use linear algebra vector ??? 
-  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::corrections() const {
+  boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::corrections() {
     return m_corrections;
   }
 
 
 
-  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() const {
+  boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() {
     return m_aprioriSigmas;
 
   }
 
 
 
-  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() const {
+  boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() {
     return m_adjustedSigmas;
   }
 
 
 
-  const boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() const {
+  boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() {
     return m_weights;
   }
 
 
 
-  const boost::numeric::ublas::bounded_vector<double, 3> &BundleControlPoint::nicVector() const {
+  boost::numeric::ublas::bounded_vector<double, 3> &BundleControlPoint::nicVector() {
     return m_nicVector;
   }
 
 
 
-  const SparseBlockRowMatrix &BundleControlPoint::cholmod_QMatrix() const {
+  SparseBlockRowMatrix &BundleControlPoint::cholmod_QMatrix() {
     return m_cholmod_QMatrix;
   }
 

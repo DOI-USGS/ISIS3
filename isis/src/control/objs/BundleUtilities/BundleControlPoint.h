@@ -65,12 +65,12 @@ namespace Isis {
       int numberMeasures() const;
       SurfacePoint getAdjustedSurfacePoint() const; // TODO: Rename this method without "get" to meet coding standards
       QString getId() const; // TODO: Rename this method without "get" to meet coding standards
-      const boost::numeric::ublas::bounded_vector< double, 3 > &corrections() const;
-      const boost::numeric::ublas::bounded_vector< double, 3 > &aprioriSigmas() const;
-      const boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas() const;
-      const boost::numeric::ublas::bounded_vector< double, 3 > &weights() const;
-      const boost::numeric::ublas::bounded_vector<double, 3> &nicVector() const;         //!< array of NICs (see Brown, 1976)
-      const SparseBlockRowMatrix &cholmod_QMatrix() const;
+      boost::numeric::ublas::bounded_vector< double, 3 > &corrections();
+      boost::numeric::ublas::bounded_vector< double, 3 > &aprioriSigmas();
+      boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas();
+      boost::numeric::ublas::bounded_vector< double, 3 > &weights();
+      boost::numeric::ublas::bounded_vector<double, 3> &nicVector();         //!< array of NICs (see Brown, 1976)
+      SparseBlockRowMatrix &cholmod_QMatrix();
 
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
