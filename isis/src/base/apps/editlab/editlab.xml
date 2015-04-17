@@ -4,12 +4,13 @@
   <brief>Modifies cube labels</brief>
 
   <description>
-    This program will allow the user to modify cube file labels.  Modifications include adding, deleting or modifying
-    keywords in a group, adding and deleting entire groups, and adding template files.  Adding a
-    group will add a new, empty group to the label, and you will have to rerun the program to add any keywords
-    you want in the group individually.  A way around this is creating a template file of groups and keywords you
-    would like to add and then adding the template file to the label.  When a group is deleted, all the keywords
-    inside the group are deleted also.
+      This program is designed to make modifications to various objects and groups found in ISIS
+      cube labels, but a .pvl file can also be used. When a PVL is used, an interim processing file
+      will be created, which you can later remove. Using either file type, you can add/delete or
+      modify keywords in a group (e.g.: 2, 3, 5), or add or remove entire groups (e.g.: 1, 6) within
+      the labels. For simplicity's sake, use a template (e.g.: 4) to modify labels, as this makes it
+      unnecessary to run the program multiple times when adding new groups. Examples can be found at
+      the end of this document.
   </description>
 
   <category>
@@ -50,6 +51,13 @@
        Modified to update history in the labels and show appropriate files 
        in the dialog box for choosing FROM parameter filenames.
        Fixes #655. Fixes #1084
+    </change>
+    <change name="Andrew Stebenne" date="2015-04-03">
+        Modified the description to indicate that editlab always adds a blank cube to a pvl if one
+        isn't present.
+    </change>
+    <change name="Andrew Stebenne" date="2015-04-24">
+        Reworked documentation for clarity.
     </change>
   </history>
 
