@@ -1032,16 +1032,16 @@ namespace Isis {
       SparseBlockColumnMatrix &N12, vector<double> &n2, vector<double> &nj,
       BundleControlPoint *bundleControlPoint) {
 
-    bounded_vector<double, 3> NIC = bundleControlPoint->nicVector();
-    SparseBlockRowMatrix Q = bundleControlPoint->cholmod_QMatrix();
+    bounded_vector<double, 3> &NIC = bundleControlPoint->nicVector();
+    SparseBlockRowMatrix &Q = bundleControlPoint->cholmod_QMatrix();
 
     NIC.clear();
     Q.zeroBlocks();
 
     // weighting of 3D point parameters
 //    const ControlPoint *point = m_pCnet->GetPoint(i);
-    bounded_vector<double, 3> weights = bundleControlPoint->weights();
-    bounded_vector<double, 3> corrections = bundleControlPoint->corrections();
+    bounded_vector<double, 3> &weights = bundleControlPoint->weights();
+    bounded_vector<double, 3> &corrections = bundleControlPoint->corrections();
 
 //    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
 
@@ -2577,9 +2577,9 @@ namespace Isis {
       }
 
       // get NIC, Q, and correction vector for this point
-      bounded_vector<double, 3> NIC = point->nicVector();
-      SparseBlockRowMatrix Q = point->cholmod_QMatrix();
-      bounded_vector<double, 3> corrections = point->corrections();
+      bounded_vector<double, 3> &NIC = point->nicVector();
+      SparseBlockRowMatrix &Q = point->cholmod_QMatrix();
+      bounded_vector<double, 3> &corrections = point->corrections();
 
 //      printf("Q\n");
 //      std::cout << Q << std::endl;
@@ -2869,7 +2869,7 @@ namespace Isis {
     for (int i = 0; i < nObjectPoints; i++) {
 
       BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
-      ControlPoint* point = bundleControlPoint->getRawControlPoint();
+      ControlPoint* point = bundleControlPoint->rawControlPoint();
 
       point->ComputeResiduals();
 
@@ -4345,7 +4345,7 @@ namespace Isis {
     for (int i = 0; i < nPoints; i++) {
       BundleControlPoint *bundlecontrolpoint = m_bundleControlPoints.at(i);
 
-      const ControlPoint *point = bundlecontrolpoint->getRawControlPoint();
+      const ControlPoint *point = bundlecontrolpoint->rawControlPoint();
 
       if (!point) {
         continue;
