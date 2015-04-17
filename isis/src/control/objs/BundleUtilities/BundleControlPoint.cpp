@@ -172,7 +172,7 @@ namespace Isis {
 
 
 
-  ControlPoint *BundleControlPoint::getRawControlPoint() const {
+  ControlPoint *BundleControlPoint::rawControlPoint() const {
     return m_controlPoint;
   }
 

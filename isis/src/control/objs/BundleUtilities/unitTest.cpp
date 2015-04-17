@@ -631,7 +631,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug();
 
-    ControlPoint *cp = bcp1.getRawControlPoint();
+    ControlPoint *cp = bcp1.rawControlPoint();
     qDebug() << "Raw control point equal to original?    " << toString(*cp == *freePoint);
     qDebug() << "Raw control point is rejected?          " << toString(bcp1.isRejected());
     SurfacePoint sp = bcp1.getAdjustedSurfacePoint();

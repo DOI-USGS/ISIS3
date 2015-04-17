@@ -60,7 +60,7 @@ namespace Isis {
       void setAdjustedSurfacePoint(SurfacePoint surfacePoint);
 
       // accessors
-      ControlPoint *getRawControlPoint() const; // TODO: Rename this method without "get" to meet coding standards
+      ControlPoint *rawControlPoint() const;
       bool isRejected() const;
       int numberMeasures() const;
       SurfacePoint getAdjustedSurfacePoint() const; // TODO: Rename this method without "get" to meet coding standards
