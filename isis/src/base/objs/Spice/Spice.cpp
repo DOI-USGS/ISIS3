@@ -934,7 +934,9 @@ namespace Isis {
 
     if (storedClockTime.isNull()) {
       SpiceDouble timeOutput;
+      NaifStatus::CheckErrors();
       scs2e_c(sclkCode, clockValue.toAscii().data(), &timeOutput);
+      NaifStatus::CheckErrors();
       storedClockTime = timeOutput;
       storeResult(key, SpiceDoubleType, timeOutput);
     }

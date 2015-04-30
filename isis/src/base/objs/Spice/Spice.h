@@ -264,6 +264,8 @@ namespace Isis {
    *                           relative to the ascending node of the ring plane.  Fixes #1757.
    *   @history 2013-12-17 Janet Barrett - Added the instrumentBodyFixedPosition and
    *                           instrumentBodyFixedVelocity methods. Fixes #1684.
+   *   @history 2015-04-30 Stuart - Added an error check around the NAIF SPICE call scs2e_c in
+   *                           getClockTime. Avoids a segfault. Fixes #2247.
    *                           
    */
   class Spice {
