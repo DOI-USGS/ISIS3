@@ -5235,6 +5235,35 @@ namespace Isis {
       Distance sigmaLatDist, sigmaLonDist, sigmaRadDist;
 
       int nPoints = m_pCnet->GetNumPoints();
+      // initialize max and min values to those from first valid point
+      for (int i = 0; i < nPoints; i++) {
+
+        const ControlPoint *point = m_pCnet->GetPoint(i);
+        if (point->IsIgnored()) {
+          continue;
+        }
+
+        maxSigmaLatDist = point->GetAdjustedSurfacePoint().GetLatSigmaDistance();;
+        minSigmaLatDist = maxSigmaLatDist;
+
+        maxSigmaLonDist = point->GetAdjustedSurfacePoint().GetLonSigmaDistance();;
+        minSigmaLonDist = maxSigmaLonDist;
+
+        maxSigmaLatPointId = point->GetId();
+        maxSigmaLonPointId = maxSigmaLatPointId;
+        minSigmaLatPointId = maxSigmaLatPointId;
+        minSigmaLonPointId = maxSigmaLatPointId;
+
+        if (m_bundleSettings.solveRadius()) {
+          maxSigmaRadDist = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma();
+          minSigmaRadDist = maxSigmaRadDist;
+
+          maxSigmaRadPointId = maxSigmaLatPointId;
+          minSigmaRadPointId = maxSigmaLatPointId;
+        }
+        break;
+      }
+
       for (int i = 0; i < nPoints; i++) {
 
         const ControlPoint *point = m_pCnet->GetPoint(i);
@@ -5250,57 +5279,32 @@ namespace Isis {
         sigmaLonStats.AddData(sigmaLonDist.meters());
         sigmaRadStats.AddData(sigmaRadDist.meters());
 
-        if (i == 0) {
-          // initialize min/max to current dist
-
+        if (sigmaLatDist > maxSigmaLatDist) {
           maxSigmaLatDist = sigmaLatDist;
-          minSigmaLatDist = sigmaLatDist;
-
+          maxSigmaLatPointId = point->GetId();
+        }
+        if (sigmaLonDist > maxSigmaLonDist) {
           maxSigmaLonDist = sigmaLonDist;
-          minSigmaLonDist = sigmaLonDist;
-
-          QString initialPointId = point->GetId();
-          maxSigmaLatPointId = initialPointId;
-          maxSigmaLonPointId = initialPointId;
-          minSigmaLatPointId = initialPointId;
-          minSigmaLonPointId = initialPointId;
-
-          if (m_bundleSettings.solveRadius()) {
+          maxSigmaLonPointId = point->GetId();
+        }
+        if (m_bundleSettings.solveRadius()) {
+          if (sigmaRadDist > maxSigmaRadDist) {
             maxSigmaRadDist = sigmaRadDist;
-            minSigmaRadDist = sigmaRadDist;
-
-            maxSigmaRadPointId = initialPointId;
-            minSigmaRadPointId = initialPointId;
+            maxSigmaRadPointId = point->GetId();
           }
         }
-        else {
-          if (sigmaLatDist > maxSigmaLatDist) {
-            maxSigmaLatDist = sigmaLatDist;
-            maxSigmaLatPointId = point->GetId();
-          }
-          if (sigmaLonDist > maxSigmaLonDist) {
-            maxSigmaLonDist = sigmaLonDist;
-            maxSigmaLonPointId = point->GetId();
-          }
-          if (m_bundleSettings.solveRadius()) {
-            if (sigmaRadDist > maxSigmaRadDist) {
-              maxSigmaRadDist = sigmaRadDist;
-              maxSigmaRadPointId = point->GetId();
-            }
-          }
-          if (sigmaLatDist < minSigmaLatDist) {
-            minSigmaLatDist = sigmaLatDist;
-            minSigmaLatPointId = point->GetId();
-          }
-          if (sigmaLonDist < minSigmaLonDist) {
-            minSigmaLonDist = sigmaLonDist;
-            minSigmaLonPointId = point->GetId();
-          }
-          if (m_bundleSettings.solveRadius()) {
-            if (sigmaRadDist < minSigmaRadDist) {
-              minSigmaRadDist = sigmaRadDist;
-              minSigmaRadPointId = point->GetId();
-            }
+        if (sigmaLatDist < minSigmaLatDist) {
+          minSigmaLatDist = sigmaLatDist;
+          minSigmaLatPointId = point->GetId();
+        }
+        if (sigmaLonDist < minSigmaLonDist) {
+          minSigmaLonDist = sigmaLonDist;
+          minSigmaLonPointId = point->GetId();
+        }
+        if (m_bundleSettings.solveRadius()) {
+          if (sigmaRadDist < minSigmaRadDist) {
+            minSigmaRadDist = sigmaRadDist;
+            minSigmaRadPointId = point->GetId();
           }
         }
       }
