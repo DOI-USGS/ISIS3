@@ -84,7 +84,7 @@ namespace Isis {
     // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
     // Jeff and Stuart respond.
 
-    if (!surfaceIntersection()->Valid() || !m_hasIntersection) {
+    if (!m_hasIntersection || !surfaceIntersection()->Valid()) {
      QString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
    }
@@ -407,7 +407,7 @@ namespace Isis {
    *
    */
   double ShapeModel::resolution() {
-    if (m_hasIntersection && hasValidTarget()) {
+    if (hasValidTarget() && m_hasIntersection) {
       return m_target->spice()->resolution();
     }
     else {

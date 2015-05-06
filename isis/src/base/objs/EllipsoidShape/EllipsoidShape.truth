@@ -4,10 +4,14 @@ Begin testing Ellipsoid Shape Model class....
     Shape1  name is Ellipsoid
     Shape2  name is Ellipsoid
     Shape3  name is Ellipsoid
+    Shape is DEM type?No
 
   Testing method intersectSurface with failure...
     Do we have an intersection? 0
     Intersection failed 
+
+  Testing method calculateLocalNormal with intersection failure...
+**PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
 
 Testing method intersectSurface...
     Do we have an intersection? 0

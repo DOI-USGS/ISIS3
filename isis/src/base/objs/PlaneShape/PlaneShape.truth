@@ -4,6 +4,7 @@ Begin testing Plane Shape Model class....
     Shape1  name is Plane
     Shape2  name is Plane
     Shape3  name is Plane
+    Shape is DEM type? No
 
   Testing method intersectSurface with failure...
     Do we have an intersection? 0

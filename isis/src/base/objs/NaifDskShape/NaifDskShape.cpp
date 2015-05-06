@@ -209,6 +209,18 @@ namespace Isis {
   }
   
   
+  /** 
+   * Indicates that this shape model is not from a DEM. Since this method 
+   * returns false for this class, the Camera class will not calculate the 
+   * local normal using neighbor points. 
+   *  
+   * @return bool Indicates that this is not a DEM shape model. 
+   */ 
+  bool NaifDskShape::isDEM() const { 
+    return false;
+  }
+  
+    
   /**
    * @brief Compute the normal for a local region of surface points 
    *  
@@ -245,7 +257,8 @@ namespace Isis {
     setLocalNormalFromIntercept();
     return;
   }
-  
+
+
   /** Return the surface normal of the ellipsoid as the default */
   void NaifDskShape::calculateDefaultNormal() {
     // ShapeModel (parent class) throws error if no intersection

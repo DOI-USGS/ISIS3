@@ -39,7 +39,8 @@
 
 using namespace Isis;
 
-/**
+/** 
+ * Unit test for NAIF DSK shape model 
  *  
  * @internal 
  *   @history 2015-02-25 Jeannie Backer - Original version.
@@ -48,8 +49,12 @@ using namespace Isis;
  *   @history 2015-03-14 Jeannie Backer - Added checks for has local normal. Updated truth data.
  *                           Removing lines of code in calcualteLocalNormal() method resulted in
  *                           coverage improvement: 94.595% scope, 98.077% line, and 100% function.
+  *   @history 2015-04-30 Jeannie Backer - Added a test for calculateLocalNormal() with
+  *                           empty neighbor points and a test for isDEM(). References #2243.
  *  
  *   @todo - Test coverage - localRadius(lat,lon) creates null surface point
+ *  
+ *   testcoverage 2015-04-30 - 94.737% scope, 98.148% line, 100% function
  *
  */
 int main(int argc, char *argv[]) {
@@ -60,6 +65,9 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Default constructor.";
     NaifDskShape shapeModel;
+    qDebug() << "Shape name is " << shapeModel.name();
+    qDebug() << "Shape is DEM type? " << toString(shapeModel.isDEM());
+
     qDebug();
 
     qDebug() << "Construct NaifDskShape object from a plate model.";    
@@ -216,8 +224,7 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     qDebug();
     qDebug();
-    IException(e, IException::Programmer,
-              "\n------------Unit Test Failed.------------",
-              _FILEINFO_).print();
+    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }

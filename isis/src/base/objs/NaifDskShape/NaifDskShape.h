@@ -47,6 +47,7 @@ namespace Isis {
    *   @history 2015-03-14 Jeannie Backer - Modified calculateLocalNormal() to simply call
    *                           setLocalNormalFromIntercept() rather than trying to
    *                           interpolate based on the neighbor values. References #2035
+   *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
    *  
    *   @todo Remove Model from name to match other derived classes
    */
@@ -66,6 +67,8 @@ namespace Isis {
 
       // Calculate the default normal of the current intersection point
       void calculateDefaultNormal(); 
+
+      bool isDEM() const;
 
       // Calculate the surface normal of the current intersection point
       void setLocalNormalFromIntercept();

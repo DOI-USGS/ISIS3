@@ -39,8 +39,7 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     qDebug();
     qDebug();
-    IException(e, IException::Programmer,
-              "\n------------Unit Test Failed.------------",
-              _FILEINFO_).print();
+    QString msg = "**************** UNIT TEST FAILED! **************** ";
+    IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
 }

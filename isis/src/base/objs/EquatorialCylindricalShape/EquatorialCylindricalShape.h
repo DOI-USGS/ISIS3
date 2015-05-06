@@ -38,8 +38,8 @@ namespace Isis {
    *
    * @internal
    *  @history 2012-12-19 Debbie A. Cook Added a check for an invalid radius in
-   *                      the intersectSurface method, that was causing applications to
-   *                      hang.  Also return a false if no ellipsoid itersection is found.
+   *                          the intersectSurface method, that was causing applications to
+   *                          hang.  Also return a false if no ellipsoid itersection is found.
    */
   class EquatorialCylindricalShape : public DemShape {
     public:

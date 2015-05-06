@@ -238,12 +238,14 @@ namespace Isis {
    *                           default camera offsets will be half of the pixel pitch in both the x
    *                           and y directions.  References #1604.
    *   @history 2014-04-17 Jeannie Backer - Modified ComputeAzimuth() to return an Isis::Null if the
-   *                         method fails (instead of -1.0). Add a check in ComputeAzimuth() to make
-   *                         sure the "SetUniversalGround()" call succeeds, if not, reset to the
-   *                         original sample/line and return Null. References #1659.
+   *                           method fails (instead of -1.0). Add a check in ComputeAzimuth() to make
+   *                           sure the "SetUniversalGround()" call succeeds, if not, reset to the
+   *                           original sample/line and return Null. References #1659.
    *   @history 2015-03-14 Jeannie Backer - Modified GetLocalNormal() to call non-DEM shapes'
-   *                         calculateLocalNormal() with an empty vector of neighbors since only
-   *                         DemShape uses this vector. References #2035.
+   *                           calculateLocalNormal() with an empty vector of neighbors since only
+   *                           DemShape uses this vector. References #2035.
+   *   @history 2015-04-30 Jeannie Backer - Fixed bug in GetLocalNormal() introduced in prior
+   *                           check-in. Fixes #2243.
    */
 
   class Camera : public Sensor {

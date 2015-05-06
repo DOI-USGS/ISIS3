@@ -1,6 +1,8 @@
 Unit test for NaifDskShape. 
 
 Default constructor. 
+Shape name is  "DSK" 
+Shape is DEM type?  "No" 
 
 Construct NaifDskShape object from a plate model. 
 Try to intersect surface at obsPos (0,0,0) and lookDir (1,1,1) 

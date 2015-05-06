@@ -1250,15 +1250,24 @@ namespace Isis {
       return;
     }
 
-    QVector<double *> cornerNeighborPoints(4);
+    // The DEM shape model (and it's child classes) will use 4 surrounding neighbor
+    // points to find the local normal. The SetImage() calls used to find the
+    // neighbors is potentially expensive, so we will not calculate the neighbors
+    // for shape models whose calculateLocalNormal() method won't use them.
     bool computed = p_pointComputed;
-    if (QString::compare(shapeModel->name(), "DemShape", Qt::CaseInsensitive) == 0) {
-      // If the shape model is not DEM, we don't use the neighbor points.
-      // So, to avoid the potetially expesive SetImage() calls used to find the neighbors,
-      // just pass in empty vector to shape model's calculateLocalNormal() method
-      shapeModel->calculateLocalNormal(cornerNeighborPoints);
+    if (!shapeModel->isDEM()) {
+      // Non-DEM case: Ellipsoid, NAIF DSK, or Plane --
+      // Pass in a vector where all of the "neighbors" are the origin (shape model center).
+      // We do this so that if the implementation of the calculateLocalNormal() method in
+      // any of the non-DEM shape model classes is modified to use this vector, then an error
+      // should be thrown instead of a segmentation fault.
+      QVector<double *> unusedNeighborPoints(4);
+      double origin[3] = {0, 0, 0};
+      unusedNeighborPoints.fill(origin);
+      shapeModel->calculateLocalNormal(unusedNeighborPoints);
     }
     else { // attempt to find local normal for DEM shapes using 4 surrounding points on the image
+      QVector<double *> cornerNeighborPoints(4);
 
       // As documented in the doxygen above, the goal of this method is to
       // calculate a normal vector to the surface using the 4 corner surrounding points.
@@ -1294,9 +1303,8 @@ namespace Isis {
 
           // If the original point fails too, we can't get a normal.  Clean up and return.
           if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
-            normal[0] = 0.;
-            normal[1] = 0.;
-            normal[2] = 0.;
+
+            normal[0] = normal[1] = normal[2] = 0.0;
 
             // restore input state
             if (computed) {
@@ -1329,9 +1337,8 @@ namespace Isis {
           surroundingPoints[0].second == surroundingPoints[1].second) ||
          (surroundingPoints[2].first == surroundingPoints[3].first &&
           surroundingPoints[2].second == surroundingPoints[3].second)) {
-        normal[0] = 0.;
-        normal[1] = 0.;
-        normal[2] = 0.;
+
+        normal[0] = normal[1] = normal[2] = 0.0;
 
         // restore input state
         if (!computed) {
@@ -1353,8 +1360,9 @@ namespace Isis {
       shapeModel->calculateLocalNormal(cornerNeighborPoints);
 
       // free memory
-      for (int i = 0; i < cornerNeighborPoints.size(); i++)
+      for (int i = 0; i < cornerNeighborPoints.size(); i++) {
         delete [] cornerNeighborPoints[i];
+      }
    
     }
 

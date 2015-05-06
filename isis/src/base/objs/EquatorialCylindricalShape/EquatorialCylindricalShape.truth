@@ -1,5 +1,6 @@
 Begin testing Dem Shape Model class....
 Shape name is EquatorialCylindricalShape
+Shape is DEM type? Yes
 
 Testing method intersectSurface...
   Do we have an intersection? 0

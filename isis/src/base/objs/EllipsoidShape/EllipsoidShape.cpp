@@ -76,6 +76,18 @@ namespace Isis {
   }
 
 
+  /** 
+   * Indicates that this shape model is not from a DEM. Since this method 
+   * returns false for this class, the Camera class will not calculate the 
+   * local normal using neighbor points. 
+   *  
+   * @return bool Indicates that this is not a DEM shape model. 
+   */ 
+  bool EllipsoidShape::isDEM() const { 
+    return false;
+  }
+
+
   /** Calculate local normal
    *
    */
@@ -105,7 +117,11 @@ namespace Isis {
   }
 
 
-  /** get local radius
+  /** 
+   * Gets the local radius for the given latitude/longitude coordinate.
+   * 
+   * @return Distance The distance from the center of the ellipsoid to its
+   *         surface at the given lat/lon location.
    *
    */
   Distance EllipsoidShape::localRadius(const Latitude &lat, const Longitude &lon) {
@@ -126,4 +142,5 @@ namespace Isis {
 
     return Distance(radius, Distance::Kilometers);
   }
+
 }

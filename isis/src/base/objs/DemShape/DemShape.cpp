@@ -287,12 +287,35 @@ namespace Isis {
 
 
   /** 
+   * Indicates that this shape model is from a DEM. Since this method returns
+   * true for this class, the Camera class will calculate the local normal 
+   * using neighbor points. This method is pure virtual and must be 
+   * implemented by all DemShape classes. This parent implementation returns 
+   * true. 
+   *  
+   * @return bool Indicates that this is a DEM shape model. 
+   */ 
+  bool DemShape::isDEM() const { 
+    return true;
+  }
+
+
+  /** 
    * This method calculates the local surface normal of the current intersection 
    * point. 
    *  
    * @param neighborPoints
    */
   void DemShape::calculateLocalNormal(QVector<double *> neighborPoints) {
+
+    std::vector<SpiceDouble> normal(3);
+    if (neighborPoints.isEmpty()) {
+      normal[0] = normal[1] = normal[2] = 0.0;
+      setNormal(normal);
+      setHasNormal(false);
+      return;
+    }
+
     // subtract bottom from top and left from right and store results
     double topMinusBottom[3];
     vsub_c(neighborPoints[0], neighborPoints[1], topMinusBottom);
@@ -300,7 +323,6 @@ namespace Isis {
     vsub_c(neighborPoints[3], neighborPoints [2], rightMinusLeft);
 
     // take cross product of subtraction results to get normal
-    std::vector<SpiceDouble> normal(3);
     ucrss_c(topMinusBottom, rightMinusLeft, (SpiceDouble *) &normal[0]);
 
     // unitize normal (and do sanity check for magnitude)
@@ -308,9 +330,8 @@ namespace Isis {
     unorm_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0], &mag);
 
     if (mag == 0.0) {
-      normal[0] = 0.;
-      normal[1] = 0.;
-      normal[2] = 0.;
+      normal[0] = normal[1] = normal[2] = 0.0;
+      setNormal(normal);
       setHasNormal(false);
       return;
    }
@@ -327,8 +348,9 @@ namespace Isis {
     surfaceIntersection()->ToNaifArray(pB);
     unorm_c(pB, centerLookVect, &mag);
     double dotprod = vdot_c((SpiceDouble *) &normal[0], centerLookVect);
-    if (dotprod < 0.0)
+    if (dotprod < 0.0) {
       vminus_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
+    }
   
     setNormal(normal);
   }
