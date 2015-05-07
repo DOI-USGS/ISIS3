@@ -74,7 +74,7 @@
           Denominator cube
         </brief>
         <description>
-          The denominator cube.  The number of bands in this cube must
+          The denominator cube.  The number of bands in this cube must 
           match the numerator cube or be exactly one.  In the former case,
           a band-by-band division occurs.  In the later, each numerator
           band is divided by the single denominator band.
