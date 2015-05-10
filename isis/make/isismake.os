@@ -7,6 +7,51 @@ HOST_ARCH := $(shell uname -s)
 HOST_MACH := $(shell uname -m)
 HOST_PROC := $(shell uname -p)
 
+#--------------------------------------------------------------------------
+# Setup the general tools needed by other parts of the make system
+#--------------------------------------------------------------------------
+include $(ISISROOT)/make/isismake.utils
+
+#---------------------------------------------------------------------------
+#  Set up ISIS versioning
+#---------------------------------------------------------------------------
+#ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | sed 's/\#.*//' | sed 's/ *$$//')
+#ISISMAJOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f1)
+#ISISMINOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f2)
+#ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
+#ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
+#ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
+#ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
+#ISISLOCALVERSION     ?= $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
+#ISISRELEASE          := REL_0_0
+
+# set up HOST_OS
+testFile = $(wildcard /etc/os-release)
+ifeq ($(testFile), /etc/os-release)
+#  HOST_OS = $(shell cut -d ' ' -f 1,2,3,7 /etc/redhat-release | sed 's/release//' | sed 's/ //g' | sed 's/\./_/g')
+  HOST_OS := $(strip $(shell $(GREP) '^NAME=' /etc/os-release | $(CUT) -s -d '=' -f 2))$(strip $(shell $(GREP) '^VERSION_ID=' /etc/os-release | $(CUT) -s -d '=' -f 2))
+else
+  testFile = $(wildcard /usr/bin/sw_vers)
+  ifeq ($(testFile), /usr/bin/sw_vers)
+    HOST_OS := $(shell sw_vers -productVersion | $(CUT) -d '.' -f1,2 | $(SED) 's/\./_/g')
+    HOST_OS := MacOSX$(HOST_OS)
+  else
+    testFile = $(wildcard /etc/lsb-release)
+    ifeq ($(testFile), /etc/lsb-release)
+      HOST_OS = $(shell $(GREP) DESCRIPTION /etc/lsb-release | $(SED) 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | $(SED) 's/\.[^\.]* LTS//' | $(SED) 's/ //g' | $(SED) 's/\./_/g')
+    else
+      testFile = $(wildcard /etc/debian_version)
+      ifeq ($(testFile), /etc/debian_version)
+        HOST_OS := $(shell $(CAT) /etc/debian_version | $(SED) 's/\./_/g' | $(SED) 's/\//_/g')
+        HOST_OS := Debian$(HOST_OS)
+      endif
+    endif
+  endif
+endif
+
+#---------------------------------------------------------------------------
+# Do any OS specific setup
+#---------------------------------------------------------------------------
 empty:=
 space:=$(empty) $(empty)
 
@@ -28,48 +73,6 @@ endif
 
 ifndef ISISCPPFLAGS
   $(error Unsupported platform, can not make for $(HOST_ARCH))
-endif
-
-#---------------------------------------------------------------------------
-#  Set up ISIS versioning
-#---------------------------------------------------------------------------
-ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | sed 's/\#.*//' | sed 's/ *$$//')
-ISISMAJOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f1)
-ISISMINOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f2)
-ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
-ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
-ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
-ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
-ISISLOCALVERSION     ?= $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
-ISISRELEASE          := REL_0_0
-
-# set up HOST_OS
-testFile = $(wildcard /etc/SuSE-release)
-ifeq ($(testFile), /etc/SuSE-release)
-  HOST_OS := $(shell grep VERSION /etc/SuSE-release | sed 's/.*= *//g' | sed 's/\./_/g')
-  HOST_OS := SUSE$(HOST_OS)
-else
-  testFile = $(wildcard /etc/redhat-release)
-  ifeq ($(testFile), /etc/redhat-release)
-    HOST_OS = $(shell cut -d ' ' -f 1,2,3,7 /etc/redhat-release | sed 's/release//' | sed 's/ //g' | sed 's/\./_/g')
-  else
-    testFile = $(wildcard /usr/bin/sw_vers)
-    ifeq ($(testFile), /usr/bin/sw_vers)
-      HOST_OS := $(shell sw_vers -productVersion | cut -d '.' -f1,2 | sed 's/\./_/g')
-      HOST_OS := MacOSX$(HOST_OS)
-    else
-      testFile = $(wildcard /etc/lsb-release)
-      ifeq ($(testFile), /etc/lsb-release)
-        HOST_OS = $(shell grep DESCRIPTION /etc/lsb-release | sed 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | sed 's/\.[^\.]* LTS//' | sed 's/ //g' | sed 's/\./_/g')
-      else
-        testFile = $(wildcard /etc/debian_version)
-        ifeq ($(testFile), /etc/debian_version)
-          HOST_OS := $(shell cat /etc/debian_version | sed 's/\./_/g' | sed 's/\//_/g')
-          HOST_OS := Debian$(HOST_OS)
-        endif
-      endif
-    endif
-  endif
 endif
 
 # Set up Xalan's command-line option names. Some version of Xalan use different
@@ -170,5 +173,5 @@ ALLLIBS += $(KAKADULIB)
 ALLLIBS += $(CHOLMODLIB)
 ALLLIBS += $(SUPERLULIB)
 
-include $(ISISROOT)/make/isismake.utils
+#include $(ISISROOT)/make/isismake.utils
 

@@ -1,0 +1,329 @@
+#---------------------------------------------------------------------------
+# Overide the ISISLOCALVERSION 
+# NOTE: This should be remove and done correctly
+#---------------------------------------------------------------------------
+ISISLOCALVERSION ?= v004
+
+#---------------------------------------------------------------------------
+# Compiler options
+#---------------------------------------------------------------------------
+
+ISISCPPFLAGS  = -Wall
+ISISCPPFLAGS += -ansi
+ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
+ISISCPPFLAGS += -fPIC
+ISISCPPFLAGS += -DGMM_USES_SUPERLU
+
+ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+  ISISCPPFLAGS += -g 
+  ISISCPPFLAGS += -O0
+  ISISCPPFLAGS += -DDEBUG
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    ISISCPPFLAGS += -DCWDEBUG -DLIBCWD_THREAD_SAFE -D_REENTRANT
+    ifeq (,$(findstring MEMCHECK, $(MODE)))
+      ISISCPPFLAGS += -DNOMEMCHECK
+    endif
+  endif
+else
+  ISISCPPFLAGS += -O1
+endif
+
+ISISCFLAGS = 
+
+#---------------------------------------------------------------------------
+# Linker options
+#---------------------------------------------------------------------------
+RANLIB          = /bin/true
+SHAREDLIBEXT    = so
+
+ISISLDFLAGS  = -Wl,-E -Xlinker '-z' -Xlinker 'origin'
+ISISLDFLAGS += -Xlinker "-rpath" -Xlinker "${ISISROOT}/lib:${ISISROOT}/3rdParty/lib"
+ISISSYSLIBS = -pthread 
+ISISSTATIC  = -Wl,-Bstatic
+ISISDYNAMIC = -Wl,-Bdynamic
+
+ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+  ifeq ($(findstring CWD, $(MODE)),CWD)
+    ISISSYSLIBS += -lcwd_r
+  endif
+endif
+
+#---------------------------------------------------------------------------
+# Shared library options
+#---------------------------------------------------------------------------
+ISISSHAREDFLAGS = $(ISISLDFLAGS) -shared 
+ISISSHAREDON    = -Wl,-whole-archive
+ISISSHAREDOFF   = -Wl,-no-whole-archive
+ISISARFLAGS     =
+
+#---------------------------------------------------------------------------
+# Set up local library designations
+#---------------------------------------------------------------------------
+ISIS3SYSINC ?= /usr/include
+#ISIS3SYSLIB ?= /usr/lib64
+ISIS3SYSLIB ?= $(shell if [ -d /usr/lib64 ]; then echo "/usr/lib64"; else echo "/usr/lib"; fi;)
+ISIS3ALTSYSLIB ?= $(shell if [ -f /usr/lib/x86_64-linux-gnu/libgfortran.so.3 ]; then \
+    echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi;)
+ISIS3LOCAL  ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
+
+#---------------------------------------------------------------------------
+# Set up for cwd
+#---------------------------------------------------------------------------
+#CWDINCDIR =
+#CWDLIBDIR =
+#CWDLIB    =
+
+#ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
+#  ifeq ($(findstring CWD, $(MODE)),CWD)
+#    CWDINCDIR = -I$(ISIS3LOCAL)/include/libcwd/libcwd-1.0.4
+#    CWDLIBDIR = -L$(ISIS3LOCAL)/lib
+#    CWDLIB    = -lcwd_r
+#  endif
+#endif
+
+#---------------------------------------------------------------------------
+# Set up for Qt
+#---------------------------------------------------------------------------
+QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt4.8.6
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/Qt
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtCore
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtAssistant
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtGui
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtNetwork
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtOpenGL
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtScript
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtScriptTools
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtSql
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtSvg
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtTest
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtWebKit
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtXml
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.6/QtXmlPatterns
+QTLIBDIR = -L$(ISIS3LOCAL)/lib
+QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest -lQtOpenGL -lQtWebKit -lQtDBus
+
+UIC      = $(ISIS3LOCAL)/bin/uic
+MOC      = $(ISIS3LOCAL)/bin/moc
+RCC      = $(ISIS3LOCAL)/bin/rcc
+PATCHELF = $(ISIS3LOCAL)/bin/patchelf
+
+#---------------------------------------------------------------------------
+# Set up for Qwt
+#---------------------------------------------------------------------------
+QWTINCDIR = -I$(ISIS3LOCAL)/include/qwt/qwt6.0.1
+QWTLIBDIR = -L$(ISIS3LOCAL)/lib
+QWTLIB    = -lqwt 
+
+#---------------------------------------------------------------------------
+# Set up for Xerces 
+#---------------------------------------------------------------------------
+XERCESINCDIR = -I$(ISIS3LOCAL)/include/xercesc/xercesc-3.1.1
+XERCESLIBDIR = -L$(ISIS3LOCAL)/lib
+XERCESLIB    = -lxerces-c
+
+#---------------------------------------------------------------------------
+# Set up for geotiff 
+#---------------------------------------------------------------------------
+GEOTIFFINCDIR = -I$(ISIS3LOCAL)/include/geotiff
+GEOTIFFLIBDIR = -L$(ISIS3LOCAL)/lib
+GEOTIFFLIB    = -lgeotiff
+
+#---------------------------------------------------------------------------
+# Set up for Tiff 
+#---------------------------------------------------------------------------
+TIFFINCDIR = -I$(ISIS3LOCAL)/include/tiff/tiff-4.0.1
+TIFFLIBDIR = -L$(ISIS3LOCAL)/lib
+TIFFLIB    = -ltiff
+
+#---------------------------------------------------------------------------
+# Set up for naif dsk and cspice libraries
+#---------------------------------------------------------------------------
+NAIFINCDIR = -I$(ISIS3LOCAL)/include/naif
+NAIFLIBDIR = -L$(ISIS3LOCAL)/lib
+NAIFLIB    = -ldsk -lcspice
+
+#---------------------------------------------------------------------------
+# Set up for TNT
+#---------------------------------------------------------------------------
+TNTINCDIR = -I$(ISIS3LOCAL)/include/tnt/tnt126 -I$(ISIS3LOCAL)/include/tnt/tnt126/tnt
+TNTLIBDIR =
+TNTLIB    = 
+
+#---------------------------------------------------------------------------
+# Set up for JAMA
+#---------------------------------------------------------------------------
+JAMAINCDIR = -I$(ISIS3LOCAL)/include/jama/jama125
+JAMALIBDIR =
+JAMALIB    = 
+
+#---------------------------------------------------------------------------
+# Set up for GEOS
+#---------------------------------------------------------------------------
+GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.4.2
+GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
+GEOSLIB    = -lgeos-3.4.2
+
+#---------------------------------------------------------------------------
+# Set up for the GNU Scientific Library (GSL).  Note that this setup
+# suppports include patterns such as <gsl/gsl_errno.h>.  With this
+# format, any other include spec that points to the general include
+# directory, such as GEOS, will suffice.  Therefore, an explicit
+# include directive is ommitted but provided as an empty reference
+# in cases where it may be located elsewhere.  This also goes for the
+# library reference.
+#---------------------------------------------------------------------------
+GSLINCDIR = 
+GSLLIBDIR = 
+GSLLIB    = -lgsl -lgslcblas
+
+#---------------------------------------------------------------------------
+# Set up for X11
+#---------------------------------------------------------------------------
+X11INCDIR = 
+X11LIBDIR = 
+X11LIB    = -lX11
+
+#---------------------------------------------------------------------------
+# Set up for GMM
+#---------------------------------------------------------------------------
+GMMINCDIR = -I$(ISIS3LOCAL)/include/gmm/gmm-4.1 -I$(ISIS3LOCAL)/include/gmm/gmm-4.1/gmm
+GMMLIBDIR =
+GMMLIB    = 
+
+#---------------------------------------------------------------------------
+# Set up for SuperLU
+#---------------------------------------------------------------------------
+SUPERLUINCDIR = -I$(ISIS3LOCAL)/include/superlu/superlu4.3
+SUPERLULIBDIR = -L$(ISIS3LOCAL)/lib
+SUPERLULIB    = -lsuperlu_4.3 -lblas -lgfortran
+
+#---------------------------------------------------------------------------
+# Set up for Google Protocol Buffers (ProtoBuf)
+#---------------------------------------------------------------------------
+PROTOBUFINCDIR = -I$(ISIS3LOCAL)/include/google-protobuf/protobuf2.4.1
+PROTOBUFLIBDIR = -L$(ISIS3LOCAL)/lib
+PROTOBUFLIB    = -lprotobuf
+PROTOC         = $(ISIS3LOCAL)/bin/protoc
+
+#---------------------------------------------------------------------------
+# Set up for kakadu
+# The Kakadu library is proprietary. The source files cannot be distributed
+# with ISIS3. If you need to rebuild ISIS3 on your system, then you will
+# need to modify the lines below that pertain to the location of the
+# header files and library on your system. The compilation flag, ENABLEJP2K,
+# should be set to true if you are building with the Kakadu library and
+# you want to use the JPEG2000 specific code in the ISIS3 system. Otherwise,
+# set the ENABLEJP2K flag to false.
+#
+#  Added abililty to automatically detect the existance of the Kakadu include
+#  directory.  One can set the environment variable JP2KFLAG with a 1 or 0
+#  depending upon need.  Developers can define appropriate enviroment variables
+#  for the complete JP2K environment.  Just redefine them based upon the usage
+#  below (i.e., be sure to add -I, -L and -l to the variables for KAKADUINCDIR,
+#  KAKADULIBDIR and KAKADULIB, respectively).
+#---------------------------------------------------------------------------
+KAKADUINCDIR ?= -I$(ISIS3LOCAL)/include/kakadu/v6_3-00967N
+KAKADULIBDIR ?= -L$(ISIS3LOCAL)/lib
+KAKADULIB    ?= -lkdu_a63R
+#  Strip -I from Kakadu include directory macro and check for existance
+JP2KFLAG ?= $(shell if [ -d $(subst -I,,$(KAKADUINCDIR)) ]; then echo "1"; else echo "0"; fi;)
+ISISCPPFLAGS += -DENABLEJP2K=$(JP2KFLAG)
+
+#---------------------------------------------------------------------------
+# Set up for BOOST
+#---------------------------------------------------------------------------
+BOOSTINCDIR = -I$(ISIS3LOCAL)/include/boost/boost1.48.0
+BOOSTLIBDIR = 
+BOOSTLIB    = 
+#BOOSTLIBDIR = -L$(ISIS3LOCAL)/lib
+#BOOSTLIB    = -lboost_date_time -lboost_filesystem -lboost_graph -lboost_math_c99f \
+#              -lboost_math_c99l -lboost_math_c99 -lboost_math_tr1f -lboost_math_tr1l \
+#              -lboost_math_tr1 -lboost_prg_exec_monitor -lboost_program_options \
+#              -lboost_regex -lboost_serialization -lboost_signals -lboost_system \
+#              -lboost_thread -lboost_unit_test_framework -lboost_wave -lboost_wserialization
+
+#---------------------------------------------------------------------------
+# Set up for Cholmod libraries 
+#---------------------------------------------------------------------------
+CHOLMODINCDIR = -I$(ISIS3LOCAL)/include/CHOLMOD/CHOLMOD1.7.3
+CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
+CHOLMODLIB    = -lcholmod -lamd -lcolamd -llapack
+
+#---------------------------------------------------------------------------
+#  Define the third party distribution libraries (patterns)
+#---------------------------------------------------------------------------
+
+#  Libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXmlPatterns.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXmlPatterns.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXmlPatterns.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXml.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXml.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXml.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so.4.9*[^g]" # Qt4.8's webkit is named 4.9
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libprotobuf.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos-*.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos_c.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsk.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_4.3.a"
+#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
+THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas*.so*"
+THIRDPARTYLIBS    += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeotiff*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtiff*.so*"
+THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"
+#THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libicuuc.so*"
+#THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libicudata.so*"
+#THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libpq.so*"
+#THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libmysqlclient_r.so*"
+#THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libssl.so*"
+#THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libcrypto.so*"
+#THIRDPARTYLIBS    += "/lib64/libreadline.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.so*"
+
+#  Plugins
+THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"

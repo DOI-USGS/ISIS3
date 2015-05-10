@@ -56,6 +56,7 @@ DATE           ?= /bin/date
 PRINTF         ?= /usr/bin/printf
 ECHO           ?= /bin/echo
 CUT            ?= /usr/bin/cut
+HEAD           ?= /usr/bin/head
 PATCHELF       ?= patchelf
 
 CURTIMESTAMP   ?= "[`date +'%Y-%m-%d %H:%M:%S'`]"
@@ -84,6 +85,19 @@ else
   DOXYGEN     ?= doxygen
   LATEX       ?= latex
 endif
+
+#---------------------------------------------------------------------------
+#  Set up ISIS versioning
+#---------------------------------------------------------------------------
+ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | sed 's/\#.*//' | sed 's/ *$$//')
+ISISMAJOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f1)
+ISISMINOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f2)
+ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
+ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
+ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
+ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
+ISISLOCALVERSION     ?= $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
+ISISRELEASE          := REL_0_0
 
 #---------------------------------------------------------------------------
 # Set up the Isis include and library directories
