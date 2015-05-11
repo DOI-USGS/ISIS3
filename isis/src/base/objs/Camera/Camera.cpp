@@ -1255,7 +1255,8 @@ namespace Isis {
     // neighbors is potentially expensive, so we will not calculate the neighbors
     // for shape models whose calculateLocalNormal() method won't use them.
     bool computed = p_pointComputed;
-    if (!shapeModel->isDEM()) {
+    if ((QString::compare(shapeModel->name(), "DemShape", Qt::CaseInsensitive) != 0) &&
+        (QString::compare(shapeModel->name(), "EquatorialCylindricalShape", Qt::CaseInsensitive) != 0)) {
       // Non-DEM case: Ellipsoid, NAIF DSK, or Plane --
       // Pass in a vector where all of the "neighbors" are the origin (shape model center).
       // We do this so that if the implementation of the calculateLocalNormal() method in
