@@ -20,6 +20,3 @@ commands:
 	  recondir=$(INPUT) \
 	  reconfilter=\("M3*.bsp"\) \
 	  lsk=\$$base/kernels/lsk/naif0008.tls > /dev/null; \
-	grep "M3" $(OUTPUT)/kernel.db.pvl > $(OUTPUT)/kernelFileNamesWithPath.txt;
-	$(SED) s+.*/++ $(OUTPUT)/kernelFileNamesWithPath.txt > $(OUTPUT)/orderedKernelFileNames.txt;
-	$(RM) $(OUTPUT)/kernelFileNamesWithPath.txt;
