@@ -3,15 +3,15 @@ include $(ISISROOT)/make/isismake.utils
 #---------------------------------------------------------------------------
 #  Set up ISIS versioning
 #---------------------------------------------------------------------------
-#ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | sed 's/\#.*//' | sed 's/ *$$//')
-#ISISMAJOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f1)
-#ISISMINOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f2)
-#ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
-#ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
-#ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
-#ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
-#ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
-#ISISRELEASE          := REL_0_0
+ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | sed 's/\#.*//' | sed 's/ *$$//')
+ISISMAJOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f1)
+ISISMINOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f2)
+ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
+ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
+ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
+ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
+ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
+ISISRELEASE          := REL_0_0
 
 .NOTPARALLEL:
 
@@ -222,7 +222,7 @@ coverage:
 #
 # This target cleans the entire Isis system enough for a recompile.  It cleans ".o" files and
 # binary executables from the source tree.  It also, clears the running
-# areas under $ISISROOT (inc, doc, bin, bin/xml, and lib)
+# areas under $ISISROOT (inc, doc, bini, bin/xml, and lib)
 #
 # Target = quickclean 
 # Dependencies = none
@@ -328,16 +328,4 @@ thirdParty: config
 	echo $(CURTIMESTAMP) "Finished installing 3rdParty libraries"
 	echo $(CURTIMESTAMP) " "
 
-
-#----------------------------------------------------------------------------
-# Use to see values of variables
-#  Example: make print-HOST_OS
-#  Will print the make variable HOST_OS
-#----------------------------------------------------------------------------
-print-%  :
-	@echo '$* = $($*)'
-
-#----------------------------------------------------------------------------
-# Standard make FORCE target. Do not remove unless you know what you are doing
-#----------------------------------------------------------------------------
 FORCE:

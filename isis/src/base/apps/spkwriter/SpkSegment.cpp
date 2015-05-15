@@ -87,7 +87,7 @@ SpkSegment::SpkSegment(Cube &cube, const int spkType) : SpiceSegment(cube) {
  *                           This will need to be an option in the future.
  */
 void SpkSegment::import(Cube &cube) {
-// Removed for G++ 4.9.2  typedef std::vector<QString>  StrList;
+  typedef std::vector<QString>  StrList;
 
   //  Extract ISIS SPK blob and transform to requested content
   NaifStatus::CheckErrors();
