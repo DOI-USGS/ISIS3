@@ -267,24 +267,15 @@ void phocube(Buffer &out) {
       int index = i * 64 + j + skipDN;
       double samp = out.Sample(index);
       double line = out.Line(index);
-      if (noCamera) {
-        proj->SetWorld(samp, line);
-      }
-      else {
-        cam->SetImage(samp, line);
-      }
 
       bool isGood=false;
       if (noCamera) {
-        if (proj->IsGood()) {
-          isGood = true;
-        }
+        isGood = proj->SetWorld(samp, line);
       }
       else {
-        if (cam->HasSurfaceIntersection()) {
-          isGood = true;
-        }
+        isGood = cam->SetImage(samp, line);
       }
+
       if (isGood) {
         if(phase) {
           out[index] = cam->PhaseAngle();
