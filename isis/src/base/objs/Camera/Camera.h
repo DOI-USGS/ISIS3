@@ -246,6 +246,9 @@ namespace Isis {
    *                           DemShape uses this vector. References #2035.
    *   @history 2015-04-30 Jeannie Backer - Fixed bug in GetLocalNormal() introduced in prior
    *                           check-in. Fixes #2243.
+   *   @history 2015-05-15 Kris Becker - Set ShapeModel state in SetImage() to
+   *                           reflect no intersection before attempting to map
+   *                           to surface. Fixes #2252.
    */
 
   class Camera : public Sensor {

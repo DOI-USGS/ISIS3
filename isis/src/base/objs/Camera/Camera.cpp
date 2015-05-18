@@ -162,6 +162,7 @@ namespace Isis {
     // get shape
     // TODO: we need to validate this pointer (somewhere)
     ShapeModel *shape = target()->shape();
+    shape->clearSurfacePoint();  // Set initial condition for ShapeModel 
 
     // Case of no map projection
     if (p_projection == NULL || p_ignoreProjection) {
