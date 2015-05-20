@@ -9,4 +9,4 @@ commands:
 	  minimum=-20 \
 	  maximum=10 \
 	  preserve=outside \
-	  spixels=none > /dev/null;
+	  spixels=none > /dev/null ;
