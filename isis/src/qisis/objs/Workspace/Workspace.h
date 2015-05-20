@@ -70,6 +70,10 @@ namespace Isis {
   *                           This allows us to show a work space without handling the tool and
   *                           status areas externally. No longer inherits from QMdiArea because
   *                           of the need to place widgets around the mdi area.
+  *   @hisotyr 2015-05-13 Ian Humphrey - Modified addCubeViewport(QString) to handle any exceptions
+  *                           that are thrown within the slot. This prevents undefined behavior 
+  *                           when an exception is not handled within a connected slot. 
+  *                           References #2210.
   */
   class Workspace : public QWidget {
       Q_OBJECT

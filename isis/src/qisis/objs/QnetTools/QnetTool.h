@@ -213,6 +213,10 @@ namespace Isis {
    *                          need to be called from setPointType.  This avoids reloading the point
    *                          in case the ignored flag has been changed, but measure has not been
    *                          saved.  References #1603.
+   * @history 2015-05-13 Ian Humphrey and Makayla Shepherd - Modified mouseButtonRelease to 
+   *                         correctly handle expections thrown when find the closest control point.
+   *                         Updated the message displayed to user to be more informative. 
+   *                         Fixes #2210.
    */
   class QnetTool : public Tool {
     Q_OBJECT

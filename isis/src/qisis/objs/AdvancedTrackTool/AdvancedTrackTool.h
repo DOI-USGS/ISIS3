@@ -71,6 +71,8 @@ namespace Isis {
    *  @history 2014-06-17 Jeannie Backer - Modified to print set value to empty strings for
    *                          photometric angles, azimuths, resolutions if not valid.
    *                          References #1659.
+   *  @history 2015-05-13 Makayla Shepherd - Modified to improve handling of undefined slot behavior.
+   *                          References #2210.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT

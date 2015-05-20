@@ -1486,7 +1486,10 @@ namespace Isis {
    * @history 2013-12-17 Tracie Sucharski - Check for valid serial number at beginning.  This 
    *                          prevents seg fault if user opens a new cube list but clicks on a
    *                          cube that was open from a previous list.
-   *
+   * @history 2015-05-13 Ian Humphrey and Makayla Shepherd - Add try/catch when trying to find 
+   *                          closest control point. Since FindClosest() can throw exceptions, 
+   *                          we need to handle them within this connected slot to avoid undefined
+   *                          behavior.
    */
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
@@ -1527,10 +1530,20 @@ namespace Isis {
 
       //  Find closest control point in network
       QString sn = m_serialNumberList->SerialNumber(file);
-      ControlPoint *point = m_controlNet->FindClosest(sn, samp, line);
-
-      modifyPoint(point);
+      
+      // since we are in a connected slot, we need to handle exceptions thrown by FindClosest
+      try {
+        ControlPoint *point = m_controlNet->FindClosest(sn, samp, line);
+        modifyPoint(point);
+      }
+      catch (IException &ie) {
+        QString message = "No points exist for editing. Create points using the right mouse";
+        message += " button.";
+        QMessageBox::warning(m_qnetTool, "Warning", message);
+        return;
+      }
     }
+    
     else if (s == Qt::MidButton) {
       if (!m_controlNet || m_controlNet->GetNumPoints() == 0) {
         QString message = "No points exist for deleting.  Create points ";
@@ -3616,6 +3629,7 @@ namespace Isis {
     m_groundOpen = true;
 
     m_workspace->addCubeViewport(m_groundCube.data());
+    
     //  Get viewport so connect can be made when ground source viewport closed to clean up
     // ground source
     MdiCubeViewport *vp;
