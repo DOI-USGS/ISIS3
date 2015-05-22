@@ -8,15 +8,15 @@
 
   <description>
   <p>
-    Phocube creates backplane bands that contain photometric, geometric, and 
+    This program, phocube, creates backplane bands that contain photometric, geometric, and 
     spacecraft instrument information for an image file.  The parameter options
     range from photometric angles (incidence, emission, and phase) to various 
     <def line="Azimuth">azimuth</def> angles, and options based on spatial 
     (latitude, longitude, and resolution) information. This program will
     not work on <def>Level1</def> images without a camera model, or on mosaics.  
     The input image pixels are not propagated to the output file unless the 
-    user selects the "DN" option.  The following is a partial list of how 
-    users have made use of band output:
+    user selects the "DN" option. The following is a partial list of how users have made use of 
+    band output:
     <ul>
       <li>Evaluate the individual bands in order to establish subsequent 
           image processing steps</li> 
@@ -25,16 +25,26 @@
       <li>Determine how the images are mosaicked together after the 
           Level2 images are created from the Level1 images with backplanes </li>
     </ul>
-    </p>
-    <p>
+  </p>
+  <p>
     All ISIS3 applications default to the following geometric reference if a camera model exists:
     <ul>
       <li>Longitude Domain = 360, longitude range reported from 0 to 360</li>
       <li>Latitude System = Ocentric</li>
       <li>Longitude Direction = East, longitude increases to the east</li>
     </ul>
-    </p>
-    <p>
+  </p>
+  <p>
+    There are instances where the local emission angle and the local incidence angle will have 
+    values over 90 degrees.  ISIS allows the computation of emission and incidence angles greater 
+    than 90 degrees.   This feature allows representation of viewing and illumination conditions 
+    where there is actual target body surface data beyond the limb or deep terminator boundary 
+    areas.  Applications such as photomet that applies photometric functions honor the 90 degree 
+    boundary.    Applications such as photrim can be applied to the phocube output to replace the 
+    angle values above 90 degrees to NULL.  There are certain processes that need these data, 
+    therefore it is allowed. 
+  </p>
+  <p>
     This program requires a <def>Level1</def> file that has a successful 
     "<i>spiceinit</i>" applied to it, or a <def>Level2</def> image 
     cube file.  For every valid input pixel, an output pixel is computed 
@@ -101,7 +111,7 @@
   </p>
   <p>
     The BandBin group keywords are updated in the labels of the output cube 
-    file; see the example below.   The keyword "Name" within the BandBin group,
+    file. The keyword "Name" within the BandBin group,
     shown below, is populated with the name of each option selected by the 
     user as bands.  These bands can be referenced by their names in 
     applications such as 
@@ -194,13 +204,13 @@
       Fixed a bug with switched samples and lines.
     </change>
     <change name="Elizabeth Miller" date="2005-10-05">
-        Moved into Photometry and Radiometry category.
+      Moved into Photometry and Radiometry category.
     </change>
     <change name="Elizabeth Miller" date="2006-05-23">
       Modified to use ProcessByBrick instead of ProcessByLine to make faster.
     </change>
     <change name="Brendan George" date="2006-09-21">
-        Documentation fixes.
+      Documentation fixes.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo.
@@ -270,11 +280,8 @@
       The error thrown when the input is a projected image was misleading. It has been fixed to 
       be more helpful for the user. Fixes #923.
     </change>
-    <change name="Kris Becker" date="2015-05-15">
-      Corrected tests for valid line/sample geometry for a given pixel. Rather
-      than test the state of the DEM, test the result of the initial attempt
-      to intersect body. Camera class was also changed to set initial state of
-      DEM properly. Fixes #2252.
+    <change name="Makayla Shepherd" date="2015-02-06">
+      Updated documentation. Fixes #1001.
     </change>
   </history>
 
@@ -402,7 +409,9 @@
           If this parameter is true, the <def>Emission Angle</def> will be 
 	  computed  for every pixel and placed in a band in the output cube.  
 	  The output cube labels will contain "Emission Angle" in the BandBin
-	  group, in band sequence of the output file.  Emission angles are in degrees.
+	  group, in band sequence of the output file.  Emission angles are in degrees. There are 
+	  certain cases where the emission angle is over 90 degrees. This is allowed as there 
+	  are processes that need these data. See main description for details.
         </description>
       </parameter>
       <parameter name="INCIDENCE">
@@ -413,7 +422,9 @@
           If this parameter is true, the <def>Incidence Angle</def> will be 
 	  computed for every pixel and placed in a band in the output cube.  
 	  The output cube labels will contain "Incidence Angle" in the BandBin
-	  group, in band sequence of the output file.  Incidence angles are in degrees.
+	  group, in band sequence of the output file.  Incidence angles are in degrees. There are 
+	  certain cases where the incidence angle is over 90 degrees. This is allowed as there 
+	  are processes that need these data. See main description for details.
         </description>
       </parameter>
       <parameter name="LOCALEMISSION">
@@ -425,7 +436,9 @@
 	  >Local Emission Angle</def>  will be computed for every pixel 
 	  and placed in a band in the output cube.  The output cube labels 
 	  will contain "Local Emission Angle" in the BandBin group, in band
-	  sequence of the output file.  LocalEmissionAngle is in degrees.
+	  sequence of the output file.  LocalEmissionAngle is in degrees. There are certain
+	  cases where the local emission angle is over 90 degrees. This is allowed as there 
+	  are processes that need these data. See main description for details.
         </description>
       </parameter>
       <parameter name="LOCALINCIDENCE">
@@ -437,7 +450,9 @@
 	  Incidence Angle</def> will be computed for every pixel and placed in 
 	  a band in the output cube.  The output cube labels will contain 
 	  "Local Incidence Angle" in the BandBin group, in band sequence  
-	  of the output file.  LocalIncidenceAngle is in degrees.
+	  of the output file.  LocalIncidenceAngle is in degrees. There are certain
+	  cases where the local incidence angle is over 90 degrees. This is allowed as there 
+	  are processes that need these data. See main description for details.
          </description>
       </parameter>
       <parameter name="LATITUDE">
