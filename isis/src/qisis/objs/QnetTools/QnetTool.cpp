@@ -1053,7 +1053,6 @@ namespace Isis {
 
 
 
-
   /**
    * Set the point type
    * @param pointType int Index from point type combo box
@@ -1063,6 +1062,10 @@ namespace Isis {
    * @internal 
    *   @history 2013-12-06 Tracie Sucharski - If changing point type to constrained or fixed make
    *                           sure reference measure is not ignored.
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - When changing a ground point between
+   *                           fixed and constrained and vice versa, the ground measure will not be
+   *                           reloaded (otherwise m_editPoint->Add() will throw an exception 
+   *                           within a connected slot).
    */
   void QnetTool::setPointType (int pointType) {
     if (m_editPoint == NULL) return;
@@ -1082,6 +1085,9 @@ namespace Isis {
     if (m_editPoint->GetType() != ControlPoint::Free && pointType == ControlPoint::Free) 
       unloadGround = true;
 
+    // save the old point's type
+    int temp = m_editPoint->GetType();
+    
     ControlPoint::Status status = m_editPoint->SetType((ControlPoint::PointType) pointType);
     if (status == ControlPoint::PointLocked) {
       m_pointType->setCurrentIndex((int) m_editPoint->GetType());
@@ -1092,8 +1098,10 @@ namespace Isis {
       return;
     }
 
-    //  If ground loaded, read temporary ground measure to the point
-    if (pointType != ControlPoint::Free && m_groundOpen) {
+    // If ground loaded and changing from Free to ground point,
+    // read temporary ground measure to the point
+    // Note: changing between Fixed and Constrained will not reload the ground measure
+    if (pointType != ControlPoint::Free && temp == ControlPoint::Free && m_groundOpen) {
       loadGroundMeasure();
       m_pointEditor->colorizeSaveButton();
     }
@@ -1121,54 +1129,22 @@ namespace Isis {
    *
    * @internal 
    *   @history 2013-12-06 Tracie Sucharski - Original version.
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to 
+   *                           findPointLocation() and createTemporaryGroundMeasure().
    *
    */
   void QnetTool::loadGroundMeasure () {
 
     if (!m_groundOpen) return;
 
-    // Use apriori surface point to find location on ground source.  If
-    // apriori surface point does not exist use reference measure
-    double lat = 0.;
-    double lon = 0.;
-    if (m_editPoint->HasAprioriCoordinates()) {
-      SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
-      lat = sPt.GetLatitude().degrees();
-      lon = sPt.GetLongitude().degrees();
-    }
-    else {
-      ControlMeasure m = *(m_editPoint->GetRefMeasure());
-      int camIndex = m_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
-      Camera *cam;
-      cam = m_controlNet->Camera(camIndex);
-      cam->SetImage(m.GetSample(),m.GetLine());
-      lat = cam->UniversalLatitude();
-      lon = cam->UniversalLongitude();
-    }
-
-    //  Try to locate point position on current ground source,
-    //  TODO ???if doesn't exist,???
-    if (!m_groundGmap->SetUniversalGround(lat,lon)) {
-      QString message = "This point does not exist on the ground source.\n";
-      message += "Latitude = " + QString::number(lat);
-      message += "  Longitude = " + QString::number(lon);
-      message += "\n A ground measure will not be created.";
-      QMessageBox::warning(m_qnetTool, "Warning", message);
-    }
-    else {
-      // Create a temporary measure to hold the ground point info for ground source
-      // This measure will be deleted when the ControlPoint is saved to the
-      // ControlNet.
-      ControlMeasure *groundMeasure = new ControlMeasure;
-      groundMeasure->SetCubeSerialNumber(m_groundSN);
-      groundMeasure->SetType(ControlMeasure::Candidate);
-      groundMeasure->SetCoordinate(m_groundGmap->Sample(),m_groundGmap->Line());
-      m_editPoint->Add(groundMeasure);
-
+    if (findPointLocation()) {
+      ControlMeasure *groundMeasure = createTemporaryGroundMeasure();
+      
       // Add to measure combo boxes
       QString file = m_serialNumberList->FileName(groundMeasure->GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
+      
       m_leftCombo->addItem(tempFileName);
       m_rightCombo->addItem(tempFileName);
       int rightIndex = m_rightCombo->findText((QString)m_groundFile);
@@ -2121,6 +2097,76 @@ namespace Isis {
     m_savePoint->setPalette(m_saveDefaultPalette);
   }
 
+  
+  /**
+   * @brief Attempt to find the control point's location on the ground source
+   * 
+   * @return bool true if the location is found on the ground source
+   * 
+   * @internal
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Orignal version adapted from
+   *                           loadPoint() to encapsulate duplicated code in loadGroundMeasure().
+   */
+  bool QnetTool::findPointLocation() {
+    bool located = true;
+    
+    // Use apriori surface point to find location on ground source.  If
+      // apriori surface point does not exist use reference measure
+      double lat = 0.;
+      double lon = 0.;
+      if (m_editPoint->HasAprioriCoordinates()) {
+        SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
+        lat = sPt.GetLatitude().degrees();
+        lon = sPt.GetLongitude().degrees();
+      }
+      else {
+        ControlMeasure m = *(m_editPoint->GetRefMeasure());
+        int camIndex = m_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
+        Camera *cam;
+        cam = m_controlNet->Camera(camIndex);
+        cam->SetImage(m.GetSample(),m.GetLine());
+        lat = cam->UniversalLatitude();
+        lon = cam->UniversalLongitude();
+      }
+
+      //  Try to locate point position on current ground source,
+      //  TODO ???if doesn't exist,???
+      if (!m_groundGmap->SetUniversalGround(lat,lon)) {
+        bool located = false;
+        QString message = "This point does not exist on the ground source.\n";
+        message += "Latitude = " + QString::number(lat);
+        message += "  Longitude = " + QString::number(lon);
+        message += "\n A ground measure will not be created.";
+        QMessageBox::warning(m_qnetTool, "Warning", message);
+      }
+      
+      return located;
+  }
+  
+  
+  /**
+   * @brief Create a temporary measure to hold the ground point info for ground source
+   * 
+   * @return ControlMeasure* the created ground measure
+   * 
+   * @internal
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - Original version adapted from
+   *                           loadPoint() to encapsulate duplicated code in loadGroundMeasure().
+   */
+  ControlMeasure *QnetTool::createTemporaryGroundMeasure() {
+     
+     // This measure will be deleted when the ControlPoint is saved to the
+     // ControlNet.
+     ControlMeasure *groundMeasure = new ControlMeasure;
+     groundMeasure->SetCubeSerialNumber(m_groundSN);
+     groundMeasure->SetType(ControlMeasure::Candidate);
+     groundMeasure->SetCoordinate(m_groundGmap->Sample(),m_groundGmap->Line());
+     m_editPoint->Add(groundMeasure);
+     
+     return groundMeasure;
+  }
+  
+  
   /**
    * @brief Load point into QnetTool.
    * @internal
@@ -2139,6 +2185,8 @@ namespace Isis {
    *                          fileName, not the serial number.  The ground source serial number
    *                          will not be the fileName if the Instrument group is retained in the
    *                          labels.  Fixes #1018
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to 
+   *                           findPointLocation() and createTemporaryGroundMeasure().
    */
   void QnetTool::loadPoint () {
 
@@ -2180,46 +2228,12 @@ namespace Isis {
     //  the ground source, load reference on left, ground source on right
     if (m_groundOpen && (m_editPoint->GetType() != ControlPoint::Free)) {
 
-      // TODO:  Does open ground source match point ground source
-
-
-      // Use apriori surface point to find location on ground source.  If
-      // apriori surface point does not exist use reference measure
-      double lat = 0.;
-      double lon = 0.;
-      if (m_editPoint->HasAprioriCoordinates()) {
-        SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
-        lat = sPt.GetLatitude().degrees();
-        lon = sPt.GetLongitude().degrees();
-      }
-      else {
-        ControlMeasure m = *(m_editPoint->GetRefMeasure());
-        int camIndex = m_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
-        Camera *cam;
-        cam = m_controlNet->Camera(camIndex);
-        cam->SetImage(m.GetSample(),m.GetLine());
-        lat = cam->UniversalLatitude();
-        lon = cam->UniversalLongitude();
-      }
-
-      //  Try to locate point position on current ground source,
-      //  TODO ???if doesn't exist,???
-      if (!m_groundGmap->SetUniversalGround(lat,lon)) {
-        QString message = "This point does not exist on the ground source.\n";
-        message += "Latitude = " + QString::number(lat);
-        message += "  Longitude = " + QString::number(lon);
-        message += "\n A ground measure will not be created.";
-        QMessageBox::warning(m_qnetTool, "Warning", message);
-      }
-      else {
+      if (findPointLocation()) {
         // Create a temporary measure to hold the ground point info for ground source
         // This measure will be deleted when the ControlPoint is saved to the
         // ControlNet.
-        ControlMeasure *groundMeasure = new ControlMeasure;
-        groundMeasure->SetCubeSerialNumber(m_groundSN);
-        groundMeasure->SetType(ControlMeasure::Candidate);
-        groundMeasure->SetCoordinate(m_groundGmap->Sample(),m_groundGmap->Line());
-        m_editPoint->Add(groundMeasure);
+        // TODO:  Does open ground source match point ground source
+        createTemporaryGroundMeasure();
       }
     }
 
