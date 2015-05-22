@@ -453,24 +453,27 @@ PIPELINE -------> unitTest5 <------- PIPELINE
 *** Continue option ***
 input=$ISIS3DATA/odyssey/testData/I00831002RDR.cub
 PIPELINE -------> unitTest6 <------- PIPELINE
-mask FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.mask.cub" MINIMUM="-3.40282245226481e+38" MAXIMUM="3.40282346638529e+38" PRESERVE="INSIDE" SPIXELS="NONE"
-lowpass FROM="./out.mask.cub" TO="./out.cub" SAMPLES="3" LINES="3"
-rm ./out.mask.cub
+noisefilter FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="0" LINES="0"
+lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3"
 PIPELINE -------> unitTest6 <------- PIPELINE
+
 unittest: unitTest6
-**ERROR** Running Isis program [mask] failed with return status [2].
-**USER ERROR** No mask was performed-the output file is the same as the input file.
+0% Processedunittest: Running noisefilter
+0% Processed**ERROR** Running Isis program [noisefilter] failed with return status [2].
+**USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
 unittest: Running lowpass
-
+0% Processed
 *** Application level continue option ***
 PIPELINE -------> unitTest7 <------- PIPELINE
-mask FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.mask1.cub" MINIMUM="-3.40282245226481e+38" MAXIMUM="3.40282346638529e+38" PRESERVE="INSIDE" SPIXELS="NONE"
-lowpass FROM="./out.mask1.cub" TO="./out.cub" SAMPLES="3" LINES="3"
-rm ./out.mask1.cub
+noisefilter FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="0" LINES="0"
+lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3"
 PIPELINE -------> unitTest7 <------- PIPELINE
+
 unittest: unitTest7
-**ERROR** Running Isis program [mask] failed with return status [2].
-**USER ERROR** No mask was performed-the output file is the same as the input file.
+0% Processedunittest: Running noisefilter
+0% Processed**ERROR** Running Isis program [noisefilter] failed with return status [2].
+**USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
 unittest: Running lowpass
+0% Processed
