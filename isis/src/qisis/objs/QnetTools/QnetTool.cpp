@@ -2132,7 +2132,7 @@ namespace Isis {
       //  Try to locate point position on current ground source,
       //  TODO ???if doesn't exist,???
       if (!m_groundGmap->SetUniversalGround(lat,lon)) {
-        bool located = false;
+        located = false;
         QString message = "This point does not exist on the ground source.\n";
         message += "Latitude = " + QString::number(lat);
         message += "  Longitude = " + QString::number(lon);
