@@ -115,9 +115,7 @@ namespace Isis {
    *   @history  2013-05-14 Tracie Sucharski - Add Qt::UniqueConnection to the connect statements
    *                          in ::resetList to prevent multiple connections between the ListWidget
    *                          and edit point slot and load cube slot.  Fixes #1655.
-   *   @history 2015-05-20 Makayla Shepherd and Ian Humphrey - Modified connection on m_listCombo
-   *                          from resetList() to filterList(), so changing the navigation type 
-   *                          does not reapply filters. Fixes #2144.
+   *
    *
    */
   class QnetNavTool : public Tool {
@@ -196,7 +194,8 @@ namespace Isis {
       void createNavigationDialog(QWidget *parent);
       void createFilters();
 //      void listLockedPoints();
-      
+
+
       QDialog *m_navDialog;
       QPushButton *m_filter;
       bool m_filtered;

@@ -51,7 +51,7 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Constructs the Navigation Tool window
+   * Consructs the Navigation Tool window
    *
    * @param parent The parent widget for the navigation tool
    *
@@ -84,7 +84,7 @@ namespace Isis {
   /**
    * Creates and shows the dialog box for the navigation tool
    *
-   * @param parent The parent widget for the navigation dialog
+   * @param parent The parent widget for the navigation dialopg
    *
    * @internal
    *   @history  2008-10-29 Tracie Sucharski - Added filter count
@@ -110,7 +110,7 @@ namespace Isis {
     connect(m_listCombo, SIGNAL(activated(int)),
         m_filterStack, SLOT(setCurrentIndex(int)));
     connect(m_listCombo, SIGNAL(activated(int)),
-        this, SLOT(filterList()));
+        this, SLOT(resetList()));
     connect(m_listCombo, SIGNAL(activated(int)),
         this, SLOT(enableButtons()));
 
@@ -586,6 +586,7 @@ namespace Isis {
    *     @history  2008-12-09 Tracie Sucharski - Slot to refresh the ListBox
    */
   void QnetNavTool::refreshList() {
+
     if (m_filtered) {
       filter();
     }
@@ -624,11 +625,6 @@ namespace Isis {
 
     // We are dealing with points so output the point numbers
     if (m_listCombo->currentIndex() == Points) {
-      disconnect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(load(QListWidgetItem *)));
-      connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(editPoint(QListWidgetItem *)), Qt::UniqueConnection);
-      
       for (int i = 0; i < m_filteredPoints.size(); i++) {
         QString cNetId = (*controlNet())[m_filteredPoints[i]]->GetId();
         QString itemString = cNetId;
@@ -642,10 +638,6 @@ namespace Isis {
     }
     // We are dealing with images so write out the cube names
     else if (m_listCombo->currentIndex() == Cubes) {
-      disconnect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(editPoint(QListWidgetItem *)));
-      connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-          this, SLOT(load(QListWidgetItem *)), Qt::UniqueConnection);
       for (int i = 0; i < m_filteredImages.size(); i++) {
         FileName filename = FileName(serialNumberList()->FileName(m_filteredImages[i]));
         QString tempFileName = filename.name();
@@ -1014,7 +1006,7 @@ namespace Isis {
    *
    */
   void QnetNavTool::filter() {
-    
+
     m_filtered = true;
     QApplication::setOverrideCursor(Qt::WaitCursor);
     m_filter->setEnabled(false);
