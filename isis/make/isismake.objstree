@@ -1,4 +1,4 @@
-include $(ISISROOT)/make/isismake.utils
+include $(ISISROOT)/make/isismake.os
 
 DIRONLY = $(subst /,,$(shell ls -d */))
 CVS := CVS

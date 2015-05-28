@@ -3,13 +3,23 @@
 # Compiler options
 #---------------------------------------------------------------------------
 #  Build architecture now automatically determined at build time via isis.conf
-include $(ISISROOT)/make/isis.conf
+#include $(ISISROOT)/make/isis.conf
+
+MAC_ARCH=-arch x86_64
+MAC_XARCH=-Xarch_x86_64
+MAC_OS_MIN=-mmacosx-version-min=10.8
+QTDEFINES=-DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED
+ISIS_ARCH=x86_64
+ISIS_MACOSX_TARGET=10.8
+ISIS_CXXFLAGS=-arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.8 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED
+ISIS_LFLAGS=-headerpad_max_install_names -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.8
+
 
 MAC_ARCH_FLAGS = $(MAC_ARCH) $(MAC_XARCH) $(MAC_OS_MIN)
 
 #  Basically is GNU g++/gcc
-CXX           = c++
-CC            = cc
+CXX           = g++
+CC            = gcc
 
 ISISCPPFLAGS  = -Wall
 ISISCPPFLAGS += -ansi
@@ -63,13 +73,13 @@ ISISARFLAGS     =
 #  Set ISIS Dev Kit (IDK) paths.  This setting of ISISLOCALVERSION here will 
 #  override this macro set in isismake.os (KJB 2013-12-12)
 #---------------------------------------------------------------------------
-ISISLOCALVERSION ?= v003
+ISISLOCALVERSION := v003
 IDK_ROOT         ?= /opt/usgs/$(ISISLOCALVERSION)
 ISIS3OPT         ?= $(IDK_ROOT)/ports
 ISIS3LOCAL       ?= $(IDK_ROOT)/3rdparty
 ISIS3PROP        ?= $(IDK_ROOT)/proprietary
 
-#  Set up paths to needed apps
+#  Set up paths to needed for doxygen
 DOXYGEN     = $(ISIS3OPT)/bin/doxygen
 DOT_PATH    = $(ISIS3OPT)/bin 
 LATEX       = $(ISIS3OPT)/bin/latex

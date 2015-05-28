@@ -82,3 +82,10 @@ clean:
 	  fi \
 	done;
 	
+#----------------------------------------------------------------------------
+# Use to see values of variables
+#  Example: make print-HOST_OS
+#  Will print the make variable HOST_OS
+#----------------------------------------------------------------------------
+print-%  :
+	@echo '$* = $($*)'

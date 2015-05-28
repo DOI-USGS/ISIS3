@@ -1,4 +1,4 @@
-include $(ISISROOT)/make/isismake.utils
+include $(ISISROOT)/make/isismake.os
 
 # Although we're capable of parallel builds at this level, let's not for the
 # sake of the logs - keep apps & objects under the correct package.

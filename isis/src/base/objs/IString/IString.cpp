@@ -961,7 +961,7 @@ namespace Isis {
     if(ksize > 0) {
       if(str[idx] == separator) idx++;
       while((idx2 = str.find(separator, idx)) != string::npos) {
-        if((idx2 == idx)) {
+        if(idx2 == idx) {
           if(allowEmptyEntries) tokens.push_back("");
         }
         else {

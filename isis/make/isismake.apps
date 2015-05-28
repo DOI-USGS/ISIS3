@@ -275,3 +275,4 @@ help:
 	echo "                                    reports"
 	echo "make test MODE=NOCLEAN          : Run test and print result, leave output"
 
+include $(ISISROOT)/make/isismake.print

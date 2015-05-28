@@ -2,12 +2,12 @@
 #  Determine MacOSX Architecture.  Ensure the host architecture is set
 #  and then determine machine type
 #---------------------------------------------------------------------------
-include $(ISISROOT)/make/isis.conf
+#include $(ISISROOT)/make/isis.conf
 
 HOST_ARCH ?= $(shell uname -s)
 HOST_MACH := $(shell uname -m)
 NODE_NAME := $(shell uname -n)
 
 ifeq ($(HOST_ARCH),Darwin)
-  include $(ISISROOT)/make/config.darwin-$(ISIS_MACOSX_TARGET)
+  include $(ISISROOT)/make/config.darwin-$(HOST_OS)
 endif

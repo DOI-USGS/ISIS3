@@ -28,6 +28,6 @@ commands:
 	  > /dev/null;
 	catlab from=$(OUTPUT)/wacMosaic.cub \
 	  to=$(OUTPUT)/wacMosaic.pvl > /dev/null;
-	$(SED) 's+/.*input/+input/+' $(OUTPUT)/tolist.txt > $(OUTPUT)/toList.txt 
+	$(SED) 's+/.*input/+input/+' $(OUTPUT)/tolist.txt > $(OUTPUT)/tolist_mod.txt 
 	$(RM) $(OUTPUT)/fromlist.lis;
 	$(RM) $(OUTPUT)/tolist.txt;
