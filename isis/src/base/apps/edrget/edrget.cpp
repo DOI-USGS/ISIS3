@@ -14,7 +14,7 @@
 using namespace Isis;
 using namespace std;
 
-void IsisMain Bad code here to make it fail cpp 2015-05-28 () {
+void IsisMain() {
 
   // Get the file name from the GUI
   UserInterface &ui = Application::GetUserInterface();
