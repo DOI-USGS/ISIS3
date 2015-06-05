@@ -221,6 +221,10 @@ namespace Isis {
    *                           duplicate code. Modified logic for changing a ground point between 
    *                           fixed and constrained (or vice versa) to prevent adding a duplicate 
    *                           ground measure, so no error is encountered. Fixes #2060.
+   *   @history 2015-06-05 Makayla Shepherd and Ian Humphrey - Modified checkReference() and 
+   *                           measureSaved() so that when the user selects no on the dialog box 
+   *                           when changing the reference, the action is properly canceled (as 
+   *                           intended). Fixes #2172.
    *                           
    */
   class QnetTool : public Tool {
@@ -317,7 +321,7 @@ namespace Isis {
       void updateRightMeasureInfo ();
 
       void measureSaved();
-      void checkReference();
+      bool checkReference();
       void updateGroundPosition();
       void savePoint();
       void colorizeSaveButton();
