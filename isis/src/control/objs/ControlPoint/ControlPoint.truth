@@ -18,7 +18,7 @@ Object = ControlNetwork
     EditLock                 = True
     Ignore                   = True
     AprioriXYZSource         = Basemap
-    AprioriXYZSourceFile     = /work1/tsucharski/basemap.cub
+    AprioriXYZSourceFile     = ./dummy.cub
     AprioriRadiusSource      = DEM
     AprioriRadiusSourceFile  = $base/dems/molaMarsPlanetaryRadius0003.cub
 
@@ -88,7 +88,7 @@ Object = ControlNetwork
     EditLock                 = True
     Ignore                   = True
     AprioriXYZSource         = Basemap
-    AprioriXYZSourceFile     = /work1/tsucharski/basemap.cub
+    AprioriXYZSourceFile     = ./dummy.cub
     AprioriRadiusSource      = DEM
     AprioriRadiusSourceFile  = $base/dems/molaMarsPlanetaryRadius0003.cub
 
@@ -177,7 +177,7 @@ Object = ControlNetwork
     EditLock                 = True
     Ignore                   = True
     AprioriXYZSource         = Basemap
-    AprioriXYZSourceFile     = /work1/tsucharski/basemap.cub
+    AprioriXYZSourceFile     = ./dummy.cub
     AprioriRadiusSource      = DEM
     AprioriRadiusSourceFile  = $base/dems/molaMarsPlanetaryRadius0003.cub
 
@@ -262,7 +262,7 @@ Object = ControlNetwork
     DateTime                 = 2005-05-03T00:00:00
     Ignore                   = True
     AprioriXYZSource         = Basemap
-    AprioriXYZSourceFile     = /work1/tsucharski/basemap.cub
+    AprioriXYZSourceFile     = ./dummy.cub
     AprioriRadiusSource      = DEM
     AprioriRadiusSourceFile  = $base/dems/molaMarsPlanetaryRadius0003.cub
 
@@ -348,7 +348,7 @@ Object = ControlNetwork
     EditLock                 = True
     Ignore                   = True
     AprioriXYZSource         = Basemap
-    AprioriXYZSourceFile     = /work1/tsucharski/basemap.cub
+    AprioriXYZSourceFile     = ./dummy.cub
     AprioriRadiusSource      = DEM
     AprioriRadiusSourceFile  = $base/dems/molaMarsPlanetaryRadius0003.cub
 

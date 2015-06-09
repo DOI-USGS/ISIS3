@@ -1,0 +1,95 @@
+SHELL=bash
+
+#---------------------------------------------------------------------------
+# This include is designed to be run before any others in the ISIS make 
+# system.
+#---------------------------------------------------------------------------
+
+ifeq ($(findstring LOUD, $(MODE)),LOUD)
+else
+.SILENT:
+endif
+
+empty:=
+space:=$(empty) $(empty)
+
+#---------------------------------------------------------------------------
+# Get the machine type and setup its environment
+#---------------------------------------------------------------------------
+HOST_ARCH := $(shell uname -s)
+HOST_MACH := $(shell uname -m)
+HOST_PROC := $(shell uname -p)
+
+
+#---------------------------------------------------------------------------
+# Set up some basic shell commands OS specific includes can override 
+# these later. These are often necessary to remove any user aliases
+#---------------------------------------------------------------------------
+
+AR             := ar
+AWK            := awk
+CAT            := /bin/cat
+CP             := /bin/cp
+CUT            := /usr/bin/cut
+DATE           := /bin/date
+DD             := dd
+DIFF           := /usr/bin/diff
+DOXYGEN        := doxygen
+ECHO           := /bin/echo
+EVAL           := eval
+GREP           := grep
+HEAD           := head
+LATEX          := latex
+LN             := ln -s
+LS             := /bin/ls
+MKDIR          := mkdir -p
+MOC            := moc
+MV             := mv
+PRINTF         := /usr/bin/printf
+PROTOC         := protoc
+RANLIB         := /usr/bin/true
+RM             := /bin/rm -f
+RMDIR          := rmdir -p
+RSYNC          := rsync
+SED            := sed
+TAIL           := tail
+UIC            := uic
+WHICH          := which
+XALAN          := Xalan
+
+#---------------------------------------------------------------------------
+# Set up some aliases. These can also be overidden later in the OS specific
+# areas.
+#---------------------------------------------------------------------------
+
+CC             := gcc
+CXX            := g++
+INSTALL3P      := $(RSYNC)
+INSTALL3POPTS  := -aq
+LDSHARED       := $(CXX)
+PATCHELF       := patchelf
+
+CURTIMESTAMP   := "[`date +'%Y-%m-%d %H:%M:%S'`]"
+
+#---------------------------------------------------------------------------
+#  Set up some / change some settings based on using the code coverage tools
+#---------------------------------------------------------------------------
+
+ifeq ($(findstring TC, $(MODE)),TC)
+  CODE_COVERAGE_BIN_DIR := $(shell if [ -d /opt/SquishCoco/bin ]; then echo "/opt/SquishCoco/bin"; else echo "$$HOME/SquishCoco/bin"; fi;)
+  CODE_COVERAGE_PATH_DIR := $(shell if [ -d /opt/SquishCoco/wrapper/bin ]; then echo "/opt/SquishCoco/wrapper/bin"; else echo "$$HOME/SquishCoco/wrapper/bin"; fi;)
+endif
+
+ifdef CODE_COVERAGE_BIN_DIR
+  CXX            = $(CODE_COVERAGE_BIN_DIR)/csg++ --cs-on --cs-exclude-path=$(ISISROOT)/inc --cs-exclude-file-wildcard='/usgs/pkgs/local/*'
+  CC             = $(CODE_COVERAGE_BIN_DIR)/csgcc --cs-on --cs-exclude-path=$(ISISROOT)/inc --cs-exclude-file-wildcard='/usgs/pkgs/local/*'
+  AR             = $(CODE_COVERAGE_BIN_DIR)/csar
+endif
+
+#---------------------------------------------------------------------------
+# Set up the Isis include and library directories
+#---------------------------------------------------------------------------
+ISISINCDIR = -I$(ISISROOT)/inc 
+ISISLIBDIR = -L$(ISISROOT)/lib 
+ISISLIB    = -lisis$(ISISLIBVERSION)
+

@@ -112,6 +112,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+
   /**
    * Change the THEMIS IR camera parameters based on the band
    * number

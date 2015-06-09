@@ -21,6 +21,8 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "Kernels.h"
+
 #include <string>
 #include <vector>
 #include <numeric>
@@ -31,13 +33,13 @@
 
 #include <QVector>
 
-#include "Kernels.h"
+#include <SpiceUsr.h>
+
 #include "FileName.h"
+#include "IException.h"
+#include "NaifStatus.h"
 #include "PvlKeyword.h"
 #include "Pvl.h"
-#include "IException.h"
-#include "naif/SpiceUsr.h"
-#include "NaifStatus.h"
 
 using namespace std;
 
@@ -645,6 +647,7 @@ namespace Isis {
    * FK
    * SCLK
    * IAK  (ISIS specific)
+   * DSK
    *
    * Kernel types are determined by inspecting the first 8 characters of a
    * kernel file and extracting the contents there.  The actual type is the
@@ -1168,6 +1171,8 @@ namespace Isis {
    * .bc          = CK - C-kernel
    * .bsp         = SPK - spacecraft position kernel
    * .bes         = EK - event kernels
+   * .bds         = DSK - NAIF DSK shape model kernel
+   * .meta        = META - NAIF meta kernels file
    *
    * If none of these file extensions or condition are found, then the value of
    * the parameter iktype is returned as the default type.
@@ -1221,7 +1226,12 @@ namespace Isis {
     else if (ext == "bes") {
       ktype = "EK";
     }
-
+    else if (ext == "bds") {
+      ktype = "DSK";
+    }
+    else if (ext == "meta") {
+      ktype = "META";
+    }
     return (ktype);
   }
 

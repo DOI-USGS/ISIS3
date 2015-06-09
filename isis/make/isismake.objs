@@ -360,3 +360,7 @@ ostruthdata: unitTest
 	else \
 	  ./unitTest >& `basename $(CURDIR)`_$(HOST_ARCH)_$(HOST_MACH)_$(HOST_OS).truth; \
 	fi
+
+include $(ISISROOT)/make/isismake.print
+
+

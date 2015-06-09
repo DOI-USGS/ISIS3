@@ -22,17 +22,16 @@
  */
 #include "CamTools.h"
 
+#include <algorithm>
 #include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <algorithm>
 
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Geometry.h>
@@ -40,15 +39,15 @@
 
 #include "CameraFactory.h"
 #include "Distance.h"
-#include "Pvl.h"
-#include "SpecialPixel.h"
-#include "iTime.h"
-#include "IString.h"
 #include "IException.h"
+#include "IString.h"
+#include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "PolygonTools.h"
 #include "ProjectionFactory.h"
+#include "Pvl.h"
+#include "SpecialPixel.h"
 #include "Statistics.h"
 #include "SurfacePoint.h"
 #include "Target.h"

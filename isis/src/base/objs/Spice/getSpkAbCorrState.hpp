@@ -1,12 +1,15 @@
 
 
 // These includes are needed for the 
-#include "Kernels.h"
 #include <string>
+
+#include <QString>
+
+#include <SpiceZdf.h>
+
+#include "Kernels.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "naif/SpiceZdf.h"
-#include <QString>
 
 
 namespace Isis {

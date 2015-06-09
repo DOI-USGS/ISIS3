@@ -148,7 +148,7 @@ namespace Isis {
     m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParameters);
     for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to -1.0
-      m_aprioriSigmas[i] = -1.0;
+      m_aprioriSigmas[i] = Isis::Null;
 
     if (!initParameterWeights()) {
       // TODO: some message here!!!!!!!!!!!
@@ -702,11 +702,14 @@ namespace Isis {
     }
 
     m_parameterNamesList = parameterNamesList;
-    QString finalqStr;
-    QString qStr;
+    QString finalqStr = "";
+    QString qStr = "";
+    QString sigma = "";
 
     // position parameters
     for (int i = 0; i < nPositionParameters; i++) {
+
+      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
 
       if (errorPropagation) {
         qStr = QString("%1%2%3%4%5%6\n").
@@ -714,7 +717,7 @@ namespace Isis {
             arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
             arg(m_corrections(i), 21, 'f', 8).
             arg(finalParameterValues[i], 20, 'f', 8).
-            arg(m_aprioriSigmas[i], 18, 'f', 8).
+            arg(sigma, 18).
             arg(m_adjustedSigmas[i], 18, 'f', 8);
       }
       else {
@@ -723,7 +726,7 @@ namespace Isis {
             arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
             arg(m_corrections(i), 21, 'f', 8).
             arg(finalParameterValues[i], 20, 'f', 8).
-            arg(m_aprioriSigmas[i], 18, 'f', 8).
+            arg(sigma, 18).
             arg("N/A", 18);
       }
 
@@ -733,14 +736,16 @@ namespace Isis {
     // pointing parameters
     for (int i = nPositionParameters; i < nParameters; i++) {
 
+      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
+
       if (errorPropagation) {
         qStr = QString("%1%2%3%4%5%6\n").
             arg( parameterNamesList.at(i) ).
             arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
             arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
             arg(finalParameterValues[i], 20, 'f', 8).
-            arg(m_aprioriSigmas(i), 18, 'f', 8).
-            arg(m_adjustedSigmas(i) * RAD2DEG, 18, 'f', 8);
+            arg(sigma, 18).
+            arg(m_adjustedSigmas[i] * RAD2DEG, 18, 'f', 8);
       }
       else {
         qStr = QString("%1%2%3%4%5%6\n").
@@ -748,7 +753,7 @@ namespace Isis {
             arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
             arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
             arg(finalParameterValues[i], 20, 'f', 8).
-            arg(m_aprioriSigmas[i], 18, 'f', 8).
+            arg(sigma, 18).
             arg("N/A", 18);
       }
 

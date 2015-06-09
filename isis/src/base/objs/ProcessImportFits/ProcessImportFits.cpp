@@ -47,6 +47,7 @@ namespace Isis {
   ProcessImportFits::ProcessImportFits() {
     m_fitsLabels = NULL;
     m_headerSizes = NULL;
+    m_dataStarts = NULL;
   }
 
 
@@ -56,18 +57,21 @@ namespace Isis {
   ProcessImportFits::~ProcessImportFits() {
     delete m_fitsLabels;
     delete m_headerSizes;
+    delete m_dataStarts;
     m_file.close();
   }
 
 
   /**
-   * Extract all the FITS labels from the file. This includes the main and all extensions
+   * Extract all the FITS labels from the file. This includes the labels for the main and each 
+   * extensions 
    *
    */
   void ProcessImportFits::extractFitsLabels() {
 
     m_fitsLabels = new QList< PvlGroup * >;
     m_headerSizes = new QList < int >;
+    m_dataStarts = new QList < int >;
 
     // Process each FITS label area. Storing each in its own PvlGroup
     char readBuf[81];
@@ -145,14 +149,16 @@ namespace Isis {
       m_headerSizes->push_back((int)ceil(place / 2880.0));
 
       // The file pointer should be pointing at the end of the record that contained "END"
-      // Move the file pointer past the padding after the "END"
+      // Move the file pointer past the padding after the "END" (i.e., points to start of data)
       std::streamoff jump;
       jump = m_headerSizes->last() * 2880 - place;
       m_file.seekg(jump, std::ios_base::cur);
 
+      m_dataStarts->push_back(m_file.tellg());
+
       // NOTE: For now we only handle image data (i.e., keywords BITPIX & NAXIS & NAXISx must exist)
       // Does this look like a label for a FITS image? Stop after the first label that does not
-      // because we don't know how to move the file pointer past a non-image data.
+      // because we don't know how to move the file pointer past a non-image data extension.
       if (fitsLabel->hasKeyword("BITPIX") && fitsLabel->hasKeyword("NAXIS") && 
           fitsLabel->hasKeyword("NAXIS1")) {
 
@@ -182,6 +188,7 @@ namespace Isis {
       else if (m_fitsLabels->size() > 1) {
         m_fitsLabels->pop_back();
         m_headerSizes->pop_back();
+        m_dataStarts->pop_back();
         break;
       }
       else {
@@ -200,6 +207,14 @@ namespace Isis {
    * @return PvlGroup version of a FITS label corrisponding to requested label number
    */
   PvlGroup ProcessImportFits::fitsLabel(int labelNumber) const {
+
+    if (labelNumber >= m_fitsLabels->size()) {
+      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
+                                "past the last image in this FITS file. Image count is [%3]").arg(labelNumber).
+                                arg(m_name.expanded()).arg(m_fitsLabels->size()-1);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     if (!m_fitsLabels) {
       QString msg = QObject::tr("The FITS label has not been initialized, call setFitsFile first");
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -248,6 +263,8 @@ namespace Isis {
    * @param fitsFile Name of the FITS file to open
    */
   void ProcessImportFits::setFitsFile(FileName fitsFile) {
+    m_name = fitsFile;
+
     SetInputFile(fitsFile.toString()); // Make sure the file exists
 
     m_file.open(fitsFile.expanded().toLocal8Bit().constData(), std::ios::in  | std::ios::binary);
@@ -273,17 +290,29 @@ namespace Isis {
 
 
   /**
-   * Sets the Process file structure parameters based on the FITS labels of choice 
+   * Sets the Process file structure parameters based on the FITS labels of choice. NOTE: The 
+   * (DataPrefixBytes + DataSuffixByte) / PixelSize is subtracted from the number of samples before 
+   * the output file is created. 
    *  
-   * @param labelNumber FITS label number. zero (0) is the first/main label
+   * @param labelNumber FITS label number. zero (0) is the first/main label. one (1) is the first 
+   * extension, ... 
    * 
    */
   void ProcessImportFits::setProcessFileStructure(int labelNumber) {
 
+    if (labelNumber >= m_fitsLabels->size()) {
+      QString msg = QObject::tr("The requested label number [%1], from file [%2] is "
+                                "past the last image in this FITS file [%3]").arg(labelNumber).
+                                arg(InputFile()).arg(m_fitsLabels->size()-1);
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     PvlGroup label = *(*m_fitsLabels)[labelNumber];
 
-    SetFileHeaderBytes((*m_headerSizes)[labelNumber] * 2880);
-    SaveFileHeader();
+    // Set the ProcessImport to skip over all the previous images and their labels and the label for
+    // this image. Don't save this info (think memory)
+    SetFileHeaderBytes((*m_dataStarts)[labelNumber]);
+    //SaveFileHeader();
 
     // Find pixel type. NOTE: There are several unsupported possiblites
     Isis::PixelType type;
@@ -299,16 +328,15 @@ namespace Isis {
         msg = "Signed 32 bit integer (int) pixel type is not supported at this time";
         throw IException(IException::User, msg, _FILEINFO_);
         break;
+      case -32:
+        type = Isis::Real;
+        break;
       case 64:
         msg = "Signed 64 bit integer (long) pixel type is not supported at this time";
         throw IException(IException::User, msg, _FILEINFO_);
         break;
-      case -32:
-        type = Isis::Real;
-        break;
       case -64:
-        msg = "64 bit floating point (double) pixel type is not supported at this time";
-        throw IException(IException::User, msg, _FILEINFO_);
+        type = Isis::Double;
         break;
       default:
         msg = "Unknown pixel type [" + label["BITPIX"][0] + "] is not supported for imported";
@@ -319,17 +347,40 @@ namespace Isis {
     SetPixelType(type);
 
     // It is possible to have a NAXIS value of 0 meaning no data, the file could include
-    // xtensions with data, however, those aren't supported yet
-    if (toInt(label["NAXIS"][0]) == 2) {
-      SetDimensions(toInt(label["NAXIS1"][0]), toInt(label["NAXIS2"][0]), 1);
+    // xtensions with data, however, those aren't supported because we need the code to know
+    // how to skip over them.
+    // NOTE: FITS files, at least the ones seen till now, do not specify a line prefix or suffix
+    // data byte count. Some FITS files do have them and ISIS needs to remove them so it is not
+    // considered part of the DNs. So, use the parent class' prefix/suffix byte count to reduce
+    // the number of samples.
+    if (Organization() == BSQ) {
+      if (toInt(label["NAXIS"][0]) == 2) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      toInt(label["NAXIS2"][0]), 1);
+      }
+      else if (toInt(label["NAXIS"][0]) == 3) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      toInt(label["NAXIS2"][0]), toInt(label["NAXIS3"][0]));
+      }
+      else {
+        QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
-    else if (toInt(label["NAXIS"][0]) == 3) {
-      SetDimensions(toInt(label["NAXIS1"][0]), toInt(label["NAXIS2"][0]),
-                    toInt(label["NAXIS3"][0]));
-    }
-    else {
-      QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
-      throw IException(IException::User, msg, _FILEINFO_);
+
+    if (Organization() == BIL) {
+      if (toInt(label["NAXIS"][0]) == 2) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      1, toInt(label["NAXIS2"][0]));
+      }
+      else if (toInt(label["NAXIS"][0]) == 3) {
+        SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
+                      toInt(label["NAXIS3"][0]), toInt(label["NAXIS2"][0]));
+      }
+      else {
+        QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
 
     // Base and multiplier

@@ -1,11 +1,13 @@
 #include "Isis.h"
 
+#include <vector>
+
 #include <QDate>
 #include <QString>
 
-#include <naif/SpiceUsr.h>
-#include <naif/SpiceZfc.h>
-#include <naif/SpiceZmc.h>
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
 #include "Brick.h"
 #include "Cube.h"
@@ -22,8 +24,6 @@
 #include "SpiceRotation.h"
 #include "Table.h"
 #include "TProjection.h"
-
-#include <vector>
 
 using namespace Isis;
 using namespace std;

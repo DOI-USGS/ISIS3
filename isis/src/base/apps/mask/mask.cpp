@@ -5,6 +5,8 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "IException.h"
+#include "SessionLog.h"
+#include "Pvl.h"
 
 using namespace std;
 using namespace Isis;
@@ -15,14 +17,16 @@ void mask(vector<Buffer *> &in,
 enum which_special {NONE, NULLP, ALL} spixels;
 enum range_preserve {INSIDE, OUTSIDE} preserve;
 
-double minimum, maximum;
-bool masked;
+double g_minimum, g_maximum;
+bool g_masked;
+double g_pixelsMasked;
 
 void IsisMain() {
   // We will be processing by line
   ProcessByLine p;
 
-  masked = false;
+  g_masked = false;
+  g_pixelsMasked = 0;
 
   // Setup the input and output cubes
   UserInterface &ui = Application::GetUserInterface();
@@ -43,10 +47,10 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   //  Get min/max info
-  minimum = VALID_MIN8;
-  maximum = VALID_MAX8;
-  if(ui.WasEntered("MINIMUM")) minimum = ui.GetDouble("MINIMUM");
-  if(ui.WasEntered("MAXIMUM")) maximum = ui.GetDouble("MAXIMUM");
+  g_minimum = VALID_MIN8;
+  g_maximum = VALID_MAX8;
+  if(ui.WasEntered("MINIMUM")) g_minimum = ui.GetDouble("MINIMUM");
+  if(ui.WasEntered("MAXIMUM")) g_maximum = ui.GetDouble("MAXIMUM");
 
   //  Will we preserve inside or outside of min/max range
   preserve = INSIDE;
@@ -64,13 +68,23 @@ void IsisMain() {
   // Start the processing
   p.StartProcess(mask);
   p.EndProcess();
+  
+  // Add an entry to print.prt to indicate whether this file was masked.
+  // Pvl maskedPvl;
+  PvlGroup results("Results");
 
-  //  Report if no masking occurred
-  if(!masked) {
-    QString message = "No mask was performed-the output file is the same as ";
-    message += "the input file.";
-    throw IException(IException::User, message, _FILEINFO_);
+  if(g_masked == true) {
+      results += PvlKeyword("PixelsMasked", toString(g_pixelsMasked));
   }
+  else {
+      PvlKeyword pm("PixelsMasked", toString(g_pixelsMasked));
+      pm.addComment( "No pixels were masked for this image");
+      results += pm;
+  }
+
+  // maskedPvl.addGroup(results);
+
+  Application::Log(results);
 
 }
 
@@ -87,11 +101,13 @@ void mask(vector<Buffer *> &in,
     if(IsSpecial(mask[i])) {
       if(spixels == ALL) {
         outp[i] = NULL8;
-        masked = true;
+        g_masked = true;
+        g_pixelsMasked++;
       }
       else if(spixels == NULLP && mask[i] == NULL8) {
         outp[i] = NULL8;
-        masked = true;
+        g_masked = true;
+        g_pixelsMasked++;
       }
       else {
         outp[i] = inp[i];
@@ -99,13 +115,14 @@ void mask(vector<Buffer *> &in,
     }
 
     else {
-      if(preserve == INSIDE && (mask[i] >= minimum && mask[i] <= maximum))
+      if(preserve == INSIDE && (mask[i] >= g_minimum && mask[i] <= g_maximum))
         outp[i] = inp[i];
-      else if(preserve == OUTSIDE && (mask[i] < minimum || mask[i] > maximum))
+      else if(preserve == OUTSIDE && (mask[i] < g_minimum || mask[i] > g_maximum))
         outp[i] = inp[i];
       else {
         outp[i] = NULL8;
-        masked = true;
+        g_masked = true;
+        g_pixelsMasked++;
       }
     }
   }

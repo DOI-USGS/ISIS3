@@ -64,6 +64,8 @@ namespace Isis {
    *                           pixel type. Added pure virtual initialize() method to be called in
    *                           the setGrayscale(), setRgb(), and setRgba() methods. References
    *                           #1380.
+   *  @history 2015-02-12 Jeffrey Covington - Added optional parameter to virtual method write()
+   *                           to choose a compression algorithm. Fixes #1745.
    */
   class ImageExporter {
     public:
@@ -72,7 +74,8 @@ namespace Isis {
 
       void operator()(vector<Buffer *> &in) const;
 
-      virtual void write(FileName outputName, int quality=100);
+      virtual void write(FileName outputName, int quality=100,
+                         QString compression="none");
 
       int samples() const;
       int lines() const;

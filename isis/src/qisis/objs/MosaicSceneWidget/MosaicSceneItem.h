@@ -38,7 +38,10 @@ namespace Isis {
    *                      footprint is now gathered from the
    *                      CubeDisplayProperties so duplicate work is not done.
    *  @history 2011-05-17 Steven Lambright Labels auto-rotate by 90 degrees
-   *                      once again 
+   *                      once again
+   *  @history 2015-05-27 Kristin Berry Updated to work with
+   *                      longitude domain = 180 correctly. Fixes
+   *                      #2208.
    */
   class MosaicSceneItem : public QGraphicsObject {
       Q_OBJECT

@@ -38,6 +38,12 @@
           parameters.</li>
       </ol>
     </p>
+    <p>
+      Note that due to the way masking works, an output file will be created regardless of whether
+      or not the mask was applied to the corresponding input. To determine the degree to which an
+      input cube was masked, look for the "PixelsMasked" group in print.prt . If no pixels were
+      masked, there will be a comment present which reads "No pixels were masked in this image".
+    </p>
   </description>
   <history>
     <change name="Kris Becker" date="1990-12-03">
@@ -64,6 +70,11 @@
     <change name="Kimberly Oyama" date="2014-03-03">
       Made default MASK parameter work when FROM cube has multiple bands. Updated Documentation.
       Added examples. Fixes #1871.
+    </change>
+    <change name="Andrew Stebenne" date="2015-03-22">
+      Specify that an output cube will be created whether or not the mask was applied. Add an output
+      group to print.prt to indicate how many pixels were masked in the output image. Implements
+      recommendation #898. 
     </change>
   </history>
   <category>

@@ -50,8 +50,41 @@ commands:
 #	  stretch=linear > /dev/null;
 #	std2isis FROM=$(OUTPUT)/isis2stdTruth_gray_s16bit.tif \
 #	  TO=$(OUTPUT)/isis2stdTruth_gray_s16bit.cub > /dev/null;
+
+	$(APPNAME) from=$(INPUT)/isisTruth.cub+1 \
+	  to=$(OUTPUT)/isis2stdTruth_packbits.tif \
+	  mode=grayscale \
+	  format=tiff \
+	  compression=packbits \
+	  stretch=linear > /dev/null;
+	std2isis FROM=$(OUTPUT)/isis2stdTruth_packbits.tif \
+	  TO=$(OUTPUT)/isis2stdTruth_packbits.cub > /dev/null;
+	$(APPNAME) from=$(INPUT)/isisTruth.cub+1 \
+	  to=$(OUTPUT)/isis2stdTruth_lzw.tif \
+	  mode=grayscale \
+	  format=tiff \
+	  compression=lzw \
+	  stretch=linear > /dev/null;
+	std2isis FROM=$(OUTPUT)/isis2stdTruth_lzw.tif \
+	  TO=$(OUTPUT)/isis2stdTruth_lzw.cub > /dev/null;
+	$(APPNAME) from=$(INPUT)/isisTruth.cub+1 \
+	  to=$(OUTPUT)/isis2stdTruth_deflate.tif \
+	  mode=grayscale \
+	  format=tiff \
+	  compression=deflate \
+	  stretch=linear > /dev/null;
+	std2isis FROM=$(OUTPUT)/isis2stdTruth_deflate.tif \
+	  TO=$(OUTPUT)/isis2stdTruth_deflate.cub > /dev/null;
 	$(RM) $(OUTPUT)/isis2stdTruth_gray.tif;
 	$(RM) $(OUTPUT)/isis2stdTruth_rgb.tfw;
 	$(RM) $(OUTPUT)/isis2stdTruth_rgb.tif;
 	$(RM) $(OUTPUT)/isis2stdTruth_gray_u16bit.tif;
 #	$(RM) $(OUTPUT)/isis2stdTruth_gray_s16bit.tif;
+	$(RM) $(OUTPUT)/isis2stdTruth_packbits.tif
+	$(RM) $(OUTPUT)/isis2stdTruth_lzw.tif
+	$(RM) $(OUTPUT)/isis2stdTruth_deflate.tif
+
+
+
+
+

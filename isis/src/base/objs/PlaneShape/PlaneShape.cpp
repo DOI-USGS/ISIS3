@@ -53,6 +53,13 @@ namespace Isis {
   }
 
 
+  /** 
+   * Destructor
+   */
+  PlaneShape::~PlaneShape() {
+  }
+
+
   /** Find the intersection point
    *
    * @param observerPos: observer (likely a spacecraft) position in Body-Fixed
@@ -109,6 +116,39 @@ namespace Isis {
     surfaceIntersection()->FromNaifArray(xpt);
 
     return true;
+  }
+
+
+  /** 
+   * Indicates that this shape model is not from a DEM. Since this method 
+   * returns false for this class, the Camera class will not calculate the 
+   * local normal using neighbor points. 
+   *  
+   * @return bool Indicates that this is not a DEM shape model. 
+   */ 
+  bool PlaneShape::isDEM() const { 
+    return false;
+  }
+
+
+  /** 
+   * There is no implementation for this method. 
+   */ 
+  void PlaneShape::calculateSurfaceNormal() {
+  }
+
+
+  /** 
+   * There is no implementation for this method. 
+   */ 
+  void PlaneShape::calculateDefaultNormal() {
+  }
+
+
+  /** 
+   * There is no implementation for this method. 
+   */ 
+  void PlaneShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
   }
 
 
@@ -221,9 +261,15 @@ namespace Isis {
 
     return acos(angle) * RAD2DEG;
   }
-
-
-  /** get local radius
+  
+    
+  /** 
+   * Gets the local radius for the given latitude/longitude coordinate. For the 
+   * plane shape model, this is calculated by finding the distance of the 
+   * surface intersection point from the plane's origin.
+   * 
+   * @return Distance The distance from the center of the body to its surface at
+   *         the given lat/lon location.
    *
    */
   // TODO: what should this do in the case of a ring plane (or any other plane

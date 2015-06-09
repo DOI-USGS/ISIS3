@@ -8,12 +8,12 @@
 
   <description>
     <p>
-      This program will export an ISIS cube to one of several popular standard
+      This program exports an ISIS cube to one of several popular standard image
       formats.  The current supported formats are BMP,  GIF, JPEG, JP2, PNG, and TIFF.  
     </p>
     <p>
-      This program depends on TrollTech's version of the Qt Library to export BMP, 
-      GIF and JPEG formated output images. For these format types, due to limitations of Qt, the
+      This program uses TrollTech's version of the Qt Library to export BMP, 
+      GIF and JPEG formatted output images. For these format types, due to limitations of Qt, the
       input file size must not exceed 2 gigabytes and the only valid output bit type is 8BIT. 
     </p>
     <p>
@@ -24,7 +24,7 @@
       convert the file.  It is recommended that large images are exported to JP2  or TIFF format. 
       For some output image types, users may specify a value for the level of compression 
       represented as a percentage using the QUALITY parameter. The default is no compression 
-      (i.e. QUALITY = 100%).
+      (i.e. QUALITY = 100%). For the TIFF format a compression algorithm can be selected.
     </p>
     <p>
       Each of the input cube parameters (FROM, ALPHA, RED, GREEN, and BLUE) requires a single band 
@@ -36,8 +36,8 @@
     <p>
       In addition, if the cube has Mapping labels, the program will produce a world file for use 
       in Arc and/or other GIS packages.  The file will have an extension that uses the first and 
-      last letters for the image extenstion and a "w". For example, tif produces a world file 
-      extension of tfw.
+      last letters for the image extention and a "w". For example, .tif produces a world file 
+      extension of .tfw.
     </p>
     <p>
       To ensure acceptable contrast in the output file, the user may select from three stretch
@@ -114,6 +114,11 @@
       names, where needed. Added test for ARGB parameter. Added xml example. Added appTests to 
       improve coverage for isis2std program and the ImageExporter and its derived classes. 
       Fixes #1380.
+    </change>
+    <change name="Jeffrey Covington" date="2015-02-12">
+      Changed default compression of TIFF format images to no compression. Added COMPRESSION parameter to
+      choose the compression algorithm for TIFF format images. Fixes #1745
+      
     </change>
   </history>
   <category>
@@ -311,6 +316,7 @@
             </description>
             <exclusions>
               <item>BITTYPE</item>
+              <item>COMPRESSION</item>
             </exclusions>
           </option>
           <option value="BMP">
@@ -321,6 +327,7 @@
             </description>
             <exclusions>
               <item>BITTYPE</item>
+              <item>COMPRESSION</item>
             </exclusions>
           </option>
           <option value="GIF">
@@ -331,6 +338,7 @@
             </description>
             <exclusions>
               <item>BITTYPE</item>
+              <item>COMPRESSION</item>
             </exclusions>
           </option>
           <option value="TIFF">
@@ -348,6 +356,7 @@
             </description>
             <exclusions>
               <item>BITTYPE</item>
+              <item>COMPRESSION</item>
             </exclusions>
           </option>
           <option value="JP2">
@@ -358,6 +367,7 @@
             </description>
             <exclusions>
               <item>QUALITY</item>
+              <item>COMPRESSION</item>
             </exclusions>
           </option>
         </list>
@@ -383,7 +393,7 @@
         </default>
         <brief>Bit type of output file</brief>
         <description>
-          This parameter allows the user to set the bit type of the output image.
+          This parameter allows the userPackBits is also known as Macintosh RLE. to set the bit type of the output image.
           Some FORMAT values will only allow 8BIT outputs.
           16 bit signed (-32767=black, 32768=white)
         </description>
@@ -406,6 +416,50 @@
             <description>
               Pixel values are in 16-bit signed integer data range -32768 to 32767. This option is 
               not available for some output formats.
+            </description>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="COMPRESSION">
+        <type>string</type>
+        <default>
+          <item>NONE</item>
+        </default>
+        <brief>The compression algorithm for TIFF format</brief>
+        <description>
+          The compression algorithm used to compress an output TIFF format image. Only used if the format
+          is set to TIFF. The default is no compression. PACKBITS is the most widely supported compression
+          algorithm for the TIFF format.
+        </description>
+        <list>
+          <option value="NONE">
+            <brief>Use no compression</brief>
+            <description>
+              Use no compression on the output TIFF image.
+            </description>
+          </option>
+          <option value="PACKBITS">
+            <brief>Use PackBits compression</brief>
+            <description>
+              Use PackBits compression on the output TIFF format image. PackBits is also known as Macintosh RLE.
+              This compression algorithm should be supported by all TIFF readers that conform to the
+              Baseline TIFF specification. 
+            </description>
+          </option>
+          <option value="LZW">
+            <brief>Use LZW compression</brief>
+            <description>
+              Use Lempel-Ziv-Welch(LZW) compression on the output TIFF format image.
+            </description>
+          </option>
+          <option value="DEFLATE">
+            <brief>Use Deflate compression</brief>
+            <description>
+              Use Deflate compression on the output TIFF format image.
+
+              Note: This uses the official version of Deflate for TIFF images described in the
+              TIFF Specification Supplement 2. Other versions of deflate for TIFF images are considered
+              obsolete.
             </description>
           </option>
         </list>

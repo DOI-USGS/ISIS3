@@ -235,7 +235,7 @@ namespace Isis {
       for (unsigned int j = 0; j < pts->getSize(); j++) {
         lat = pts->getY(j);
         lon = pts->getX(j);
-        if (proj->SetUniversalGround(lat, lon)) {
+        if (proj->SetGround(lat, lon)) {
           double x = proj->XCoord();
           double y = -1 * (proj->YCoord());
 

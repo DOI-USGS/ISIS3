@@ -1,0 +1,31 @@
+Unit test for Intercept. 
+
+Default constructor. 
+default object is valid? false 
+
+Construct Intercept object from  
+     observer position (0,0,0), 
+     look dir (1,1,1), 
+     surface point (2,2,2), 
+     triangle [ (1,0,0), (0,1,0), (0,0,1) ]. 
+constructed object is valid? true 
+shape    =  "TriangularPlate" 
+observer =  "( 0.0, 0.0, 0.0 )"
+look dir =  "( 1.0, 1.0, 1.0 )"
+location =  2 2 2  meters 
+normal   =  "( 0.577350269189626, 0.577350269189626, 0.577350269189626 )"
+emission =  3.14159 <radians> (180 <degrees>) 
+sepAngle =  0 <radians> (0 <degrees>) 
+
+================================= Error Throws ================================== 
+Invalid because observer(empty) is not valid NaifVertex: 
+**PROGRAMMER ERROR** Unable to return Intercept location. Invalid/undefined Intercept point.
+
+Invalid because look direction(empty) is not valid NaifVector: 
+**PROGRAMMER ERROR** Unable to return Intercept normal. Invalid/undefined Intercept point.
+
+Invalid because surface point is null: 
+**PROGRAMMER ERROR** Unable to return Intercept emission angle. Invalid/undefined Intercept point.
+
+Invalid because shape is null: 
+**PROGRAMMER ERROR** Unable to return Intercept emission angle. Invalid/undefined Intercept point.

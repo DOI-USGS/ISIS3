@@ -21,26 +21,25 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <string>
-#include <vector>
-#include <numeric>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 #include <algorithm>
 #include <functional>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <vector>
 
+#include <SpiceUsr.h>
 
-#include "SpkSegment.h"
-#include "IString.h"
-#include "FileName.h"
-#include "Cube.h"
 #include "Camera.h"
-#include "Table.h"
-#include "NaifStatus.h"
+#include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
-
-#include "naif/SpiceUsr.h"
+#include "IString.h"
+#include "NaifStatus.h"
+#include "SpkSegment.h"
+#include "Table.h"
 
 using namespace std;
 
@@ -88,7 +87,7 @@ SpkSegment::SpkSegment(Cube &cube, const int spkType) : SpiceSegment(cube) {
  *                           This will need to be an option in the future.
  */
 void SpkSegment::import(Cube &cube) {
-  typedef std::vector<QString>  StrList;
+  //typedef std::vector<QString>  StrList;
 
   //  Extract ISIS SPK blob and transform to requested content
   NaifStatus::CheckErrors();

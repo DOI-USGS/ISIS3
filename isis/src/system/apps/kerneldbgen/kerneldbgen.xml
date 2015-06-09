@@ -144,6 +144,10 @@
       Added the EXTRA option. Also, added basic support for kerneldb files being specified for
       SCLK/LSK parameters. Fixes #1023.
     </change>
+    <change name="Stuart Sides" date="2015-03-29">
+      Added three additional decimal places to the output of the TIME keyword in output
+      kernel database file.  Fixes #2236.
+    </change>
   </history>
 
   <groups>

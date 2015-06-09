@@ -154,6 +154,7 @@ namespace Isis {
       virtual void StartProcess();
       virtual void StartProcess(void funct(Isis::Buffer &out));
       void SetInputFile(const QString &file);
+      QString InputFile();
 
       // SetOutputCube() is not virtual in the Process class, so the following
       // definitions for this method are the only ones that are allowed for
@@ -217,6 +218,14 @@ namespace Isis {
       void SaveDataTrailer();
       void SaveDataPrefix();
       void SaveDataSuffix();
+
+      int FileHeaderBytes() const;
+      int FileTrailerBytes() const;
+      int DataHeaderBytes() const;
+      int DataTrailerBytes() const;
+      int DataPrefixBytes() const;
+      int DataSuffixBytes() const;
+
       char *FileHeader();
       char *FileTrailer();
       std::vector<char *> DataHeader();
@@ -244,6 +253,7 @@ namespace Isis {
                                   all bands.*/
       };
       void SetOrganization(const ProcessImport::Interleave org);
+      Interleave Organization() const;
 
       void SetBase(const double base);
       void SetMultiplier(const double mult);

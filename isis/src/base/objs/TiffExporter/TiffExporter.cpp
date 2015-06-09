@@ -61,8 +61,11 @@ namespace Isis {
    *
    * @param outputName The filename of the output cube
    * @param quality The quality of the output, not used for TIFF
+   * @param compression The compression algorithm used. Currenly supports
+   *                         "packbits", "lzw", "deflate", and "none". 
    */
-  void TiffExporter::write(FileName outputName, int quality) {
+  void TiffExporter::write(FileName outputName, int quality,
+                           QString compression) {
     // Open the output image
     m_image = TIFFOpen(outputName.expanded().toAscii().data(), "w");
 
@@ -74,9 +77,23 @@ namespace Isis {
     TIFFSetField(m_image, TIFFTAG_IMAGEWIDTH, samples());
     TIFFSetField(m_image, TIFFTAG_IMAGELENGTH, lines());
     TIFFSetField(m_image, TIFFTAG_ROWSPERSTRIP, 1);
-    TIFFSetField(m_image, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
+    if (compression == "packbits") {
+      TIFFSetField(m_image, TIFFTAG_COMPRESSION, COMPRESSION_PACKBITS);
+    }
+    else if (compression == "lzw") {
+      TIFFSetField(m_image, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
+    }
+    else if (compression == "deflate") {
+      TIFFSetField(m_image, TIFFTAG_COMPRESSION, COMPRESSION_ADOBE_DEFLATE);
+    }
+    else if (compression == "none") {
+      TIFFSetField(m_image, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+    }
+    else {
+      QString msg = "Invalid TIFF compression algorithm: " + compression;
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     TIFFSetField(m_image, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-
     TIFFSetField(m_image, TIFFTAG_PHOTOMETRIC,
         bands() == 1 ? PHOTOMETRIC_MINISBLACK : PHOTOMETRIC_RGB);
 

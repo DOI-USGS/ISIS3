@@ -43,10 +43,10 @@ namespace Isis {
    *
    * @internal 
    *   @history 2010-07-30 - Debbie A. Cook - Original version.
-   *   @history 2012-10-25 - Jeannie Backer - Changed call to
-   *                             Spice::resolution() method to lower camel case.
-   *                             Added documentation. Ordered includes.
+   *   @history 2012-10-25 - Jeannie Backer - Changed call to Spice::resolution() method
+   *                             to lower camel case. Added documentation. Ordered includes.
    *                             References #1181.
+   *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
    */
   class DemShape : public ShapeModel {
     public:
@@ -71,6 +71,9 @@ namespace Isis {
       // Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal(); 
 
+      // implement pure virtual method from ShapeModel class
+      bool isDEM() const;
+
       // To compute the surface normal, you must call setLocalAreaPoint on top,
       // bottom, left, and right surrounding points in the image.  Then call
       // calculateSurfaceNormal and directSurfaceNormal to calculate the normal.
@@ -78,7 +81,7 @@ namespace Isis {
       // example, or use its GetLocalNormal method.
       
       // Calculate the surface normal of the current intersection point
-     void calculateLocalNormal(QVector<double *> cornerNeighborPoints) ; 
+     void calculateLocalNormal(QVector<double *> cornerNeighborPoints); 
      void calculateSurfaceNormal(); 
 
     protected:

@@ -22,6 +22,8 @@
 
 #include "VoyagerCamera.h"
 
+#include <SpiceUsr.h>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -29,7 +31,6 @@
 #include "FileName.h"
 #include "IString.h"
 #include "iTime.h"
-#include "naif/SpiceUsr.h"
 #include "NaifStatus.h"
 #include "ReseauDistortionMap.h"
 #include "Spice.h"

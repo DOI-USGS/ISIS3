@@ -1,6 +1,6 @@
 #include "SurfacePoint.h"
 
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 #include "IException.h"
 #include "IString.h"

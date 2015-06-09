@@ -10,6 +10,16 @@
 using namespace std;
 using namespace Isis;
 
+/**
+ *  
+ * @internal 
+ *   @history 2015-02-25 Jeannie Backer - Added hayabusa test for DSK support. Unable to test
+ *                           resolveTypeByExt() for DSK files. NAIF is expected to be able to
+ *                           determine type from the file itself.
+ *                           Current Code coverage: 67% scope, 81% line, and 80% function.
+ *
+ */
+
 QString stripPath(QString input) {
   QString result = input.replace(
       QRegExp("(.*/)([^/]*/[^/]*/[^/]*/[^/]*$)"),
@@ -20,7 +30,7 @@ QString stripPath(QString input) {
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  QString inputFile = "$ISIS3DATA/mgs/testData/ab102401.lev2.cub";
+  QString inputFile = "$mgs/testData/ab102401.lev2.cub";
   if (--argc == 1) { inputFile = argv[1]; }
 
   cout << "\n\nTesting Kernels class using file " << inputFile << "\n";
@@ -190,10 +200,75 @@ int main(int argc, char *argv[]) {
   transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << kloaded.join("\n") << endl;
 
+  //  Clear the pool and start fresh.  Clear all instances and reinitialize NAIF
+  clone.Clear();
+  query.Clear();
+  myKernels.Clear();
+  myKernels.InitializeNaifKernelPool();
+
+  // Left two kernels open, ensure we have none left
+  query.Discover();
+  cout << "\n\nEnsure clean pool...Count: " << query.size() << "\n";
+
+
+  // Now add a set be hand
+  myKernels.Add("$base/kernels/lsk/naif0009.tls");
+  myKernels.Add("$base/kernels/pck/pck00009.tpc");
+  myKernels.Add("$hayabusa/kernels/pck/itokawa_gaskell_n3.tpc");
+  myKernels.Add("$hayabusa/kernels/tspk/de403s.bsp");
+  myKernels.Add("$hayabusa/kernels/tspk/sb_25143_140.bsp");
+  myKernels.Add("$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp");
+  myKernels.Add("$hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp");
+  myKernels.Add("$hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n.bc");
+  myKernels.Add("$hayabusa/kernels/fk/hayabusa_hp.tf");
+  myKernels.Add("$hayabusa/kernels/fk/itokawa_fixed.tf");
+  myKernels.Add("$hayabusa/kernels/ik/amica31.ti");
+  myKernels.Add("$hayabusa/kernels/iak/amicaAddendum001.ti");
+  myKernels.Add("$hayabusa/kernels/sclk/hayabusa.tsc");
+  myKernels.Add("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
+
+  cout << "\n\nAdd DSK Kernels directly - Count: " << myKernels.size() 
+       << ", Missing: "<< myKernels.Missing() << "\n";
+  cout << "\nList of kernels in object..\n";
+  kfiles = myKernels.getKernelList();
+  transform(kfiles.begin(), kfiles.end(), kfiles.begin(), &stripPath);
+  cout << kfiles.join("\n") << endl;
+
+  cout << "\nList of kernel types\n";
+  ktypes = myKernels.getKernelTypes();
+  cout << ktypes.join("\n") << endl;
+
+  // Find unknown types
+  kfiles = myKernels.getKernelList("UNKNOWN");
+  cout << "\nUnknown kernels in list: " << kfiles.size() << "\n";
+  cout << kfiles.join("\n") << endl;
+
+
+  // Load them all
+  myKernels.Load();
+  kloaded = myKernels.getLoadedList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
+  cout << "\nLoading all, total loaded: " << kloaded.size() << "\n";
+  cout << kloaded.join("\n") << endl;
+
+  //  Now double check list
+  query.Discover();
+  cout << "\nCheck Load Status = " << query.size() << "\n";
+  kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
+  cout << kloaded.join("\n") << endl;
+
+  // Unload SPK and CKs
+  myKernels.UnLoad("SPK,CK");
+  query.Discover();
+  cout << "\nUnload SPK,CK - Loaded: " << query.size() << "\n";
+  kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
+  cout << kloaded.join("\n") << endl;
+
   myKernels.UnLoad();
   query.Discover();
   cout << "\n\nAll Done - Should be 0 discovered: " << query.size() << "\n";
   // All done...
-
   return (0);
 }

@@ -17,12 +17,21 @@ int boxcarLines, boxcarSamples;
 UniversalGroundMap *unvGMap;
 
 void IsisMain() {
-  // We will be processing by line
+  // We will be processing by brick
   ProcessByBrick p;
   p.SetBrickSize(1, 1, 1);
   p.SetOutputBrickSize(1, 1, 1);
   UserInterface &ui = Application::GetUserInterface();
-
+  
+  //initialize the global variables
+  iop = NULL;
+  boxcarLines = 0;
+  boxcarSamples = 0;
+  unvGMap = NULL;
+  if (cube.isOpen()) {
+    cube.close();
+  }
+  
   // Basic settings
   p.SetInputCube("FROM");
   p.SetOutputCube("TO");
@@ -40,10 +49,13 @@ void IsisMain() {
     op["DeltaSamp"] = "0";
     op["MinimumInterest"] = "0.0";
     Application::Log(op);
+    
   }
   catch(IException &e) {
+    cube.close();
     QString msg = "Improper format for InterestOperator PVL [" + pvl.fileName() + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
+    
   }
 
   iop = InterestOperatorFactory::Create(pvl);

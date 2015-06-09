@@ -9,7 +9,7 @@ Line: 453, Sample: 534
 Lat: 18.221, Lon: 226.671
 RightAscension: 347.016, Declination: -51.2677
 
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 
 NorthAzimuth: 269.544
 SunAzimuth: 168.17
@@ -220,7 +220,7 @@ Point = -2225 -2359 1068
 Test Forward/Reverse Camera Calculations At Center Of Image...
 Sample = 480
 Line = 702
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Latitude = 22.6
 Longitude = 228
 Radius = 3.4e+06
@@ -262,7 +262,7 @@ Longitude Range: -180 to 180
 Test Forward/Reverse Camera Calculations At Center Of Image...
 Sample = 192
 Line = 144
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Latitude = 89.18
 Longitude = 13.54
 Radius = 1.736e+06
@@ -278,7 +278,7 @@ Flat DEM Surface...
 Camera* from: $base/testData/f319b18_ideal_flat.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = 0.03228, 0.1276, -0.9913
 Phase = 57.32
 Emission = 59.59
@@ -288,7 +288,7 @@ Incidence = 2.835
 Camera* from: $base/testData/f319b18_ideal_45left.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = 0.7105, -0.08428, -0.6986
 Phase = 57.32
 Emission = 60.94
@@ -298,7 +298,7 @@ Incidence = 46.41
 Camera* from: $base/testData/f319b18_ideal_45top.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = 0.1945, 0.7705, -0.607
 Phase = 57.32
 Emission = 17.41
@@ -308,7 +308,7 @@ Incidence = 42.49
 Camera* from: $base/testData/f319b18_ideal_45right.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = -0.6648, 0.264, -0.6988
 Phase = 57.32
 Emission = 76.84
@@ -318,7 +318,7 @@ Incidence = 44.07
 Camera* from: $base/testData/f319b18_ideal_45bottom.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = -0.1491, -0.5904, -0.7932
 Phase = 57.32
 Emission = 103.8
@@ -328,7 +328,7 @@ Incidence = 47.67
 Camera* from: $base/testData/f319b18_ideal_80left.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = 0.9617, -0.2209, -0.1622
 Phase = 57.32
 Emission = 74.77
@@ -338,7 +338,7 @@ Incidence = 81.75
 Camera* from: $base/testData/f319b18_ideal_80top.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = 0.2423, 0.9696, -0.03452
 Phase = 57.32
 Emission = 23.84
@@ -348,7 +348,7 @@ Incidence = 77.87
 Camera* from: $base/testData/f319b18_ideal_80right.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = -0.9512, 0.2624, -0.1626
 Phase = 57.32
 Emission = 95.57
@@ -358,7 +358,7 @@ Incidence = 79.42
 Camera* from: $base/testData/f319b18_ideal_80bottom.cub
 Sample = 625
 Line = 575
-SetImage (sample, line): 1
+SetImage (sample, line): Yes
 Normal = -0.231, -0.9267, -0.2965
 Phase = 57.32
 Emission = 138.2
@@ -368,9 +368,19 @@ Point Does Not Intersect DEM...
 Camera* from: $base/testData/f319b18_ideal_flat.cub
 Sample = 1
 Line = 1
-SetImage (sample, line): 0
+SetImage (sample, line): No
 Normal = 0, 0, 0
 Angles could not be calculated.
+
+Cube with Ellipsoidal Shape Model...
+Camera* from: $base/testData/CM_1515945709_1.ir.cub
+Sample = 20
+Line = 20
+SetImage (sample, line): Yes
+Normal = -0.4343, -0.2875, -0.8536
+Phase = 35.54
+Emission = 48.1
+Incidence = 59.11
 
 
 Testing non-square pixel Ifov using Hires vims cube

@@ -59,14 +59,16 @@ bool ptXLessThan(const QList<double> l1, const QList<double> l2);
 class LineOffsetFunctor : 
   public std::unary_function<double, double > {
   public:
+
     LineOffsetFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt) {
       m_camera = camera;
       surfacePoint = surPt;
     }
+
+
     ~LineOffsetFunctor() {}
-            
-         
-       
+
+
     /** Compute the number of lines between the current line (i.e., the line imaged at the et as set
      *  in the camera model) and the line number where the argument et would hit the focal
      *  plane.
@@ -107,7 +109,7 @@ class LineOffsetFunctor :
 
 
       // This was replaced with the code below to get Chandrayaan M3 to work.
-      // SetUndistortedFocalPlane was failing a majority of the time, causing most SetGround call
+      // SetUndistortedFocalPlane was failing a majority of the time, causing most SetGround calls
       // to fail. Even when it did succeed, it was producing non-continous return values.
         // Set the undistorted focal plane coordinates
 //        if (!m_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
@@ -161,14 +163,17 @@ class LineOffsetFunctor :
  */
 class SensorSurfacePointDistanceFunctor : 
   public std::unary_function<double, double > {
+
   public:
     SensorSurfacePointDistanceFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt) {
       m_camera = camera;
       surfacePoint = surPt;
     }
+
+
     ~SensorSurfacePointDistanceFunctor() {}
-            
-                
+
+
     double operator()(double et) {
       double s[3], p[3];
 
@@ -243,7 +248,7 @@ namespace Isis {
    */
   bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint, const int &approxLine) {
     FindFocalPlaneStatus status = FindFocalPlane(approxLine, surfacePoint);
-    if(status == Success) return true;
+    if (status == Success) return true;
     //if(status == Failure) return false;
     return false;
   }
@@ -258,7 +263,7 @@ namespace Isis {
   bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
     FindFocalPlaneStatus status = FindFocalPlane(-1, surfacePoint);
 
-    if(status == Success) return true;
+    if (status == Success) return true;
 
     return false;
   }

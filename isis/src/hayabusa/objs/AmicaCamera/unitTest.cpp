@@ -42,8 +42,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = 7.1947879130674721;
-    double knownLon = 38.6322075033570158;
+    double knownLat = 7.1916683215196819;
+    double knownLon = 38.6275886424948496;
 
     Cube c("$hayabusa/testData/st_2530292409_v.cub", "r");
     AmicaCamera *cam = (AmicaCamera *) CameraFactory::Create(c);

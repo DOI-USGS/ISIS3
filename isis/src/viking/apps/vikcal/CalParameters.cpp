@@ -19,19 +19,21 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <vector>
+
+#include <QString>
+
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
 #include "CalParameters.h"
-#include "IString.h"
-#include "TextFile.h"
 #include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 #include "LeastSquares.h"
 #include "Pvl.h"
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
-#include <QString>
-#include <vector>
+#include "TextFile.h"
 
 using namespace std;
 namespace Isis {

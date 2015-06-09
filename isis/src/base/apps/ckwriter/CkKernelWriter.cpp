@@ -21,24 +21,24 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 
 #include <QFile>
 
-#include "CkKernelWriter.h"
-#include "SpiceSegment.h"
-#include "FileName.h"
-#include "TextFile.h"
-#include "Pvl.h"
-#include "IString.h"
-#include "IException.h"
+#include <SpiceUsr.h>
 
-#include "naif/SpiceUsr.h"
+#include "CkKernelWriter.h"
+#include "FileName.h"
+#include "IException.h"
+#include "IString.h"
 #include "NaifStatus.h"
+#include "Pvl.h"
+#include "SpiceSegment.h"
+#include "TextFile.h"
 
 using namespace std;
 

@@ -25,7 +25,7 @@
 #include <cfloat>
 #include <cmath>
 
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 #include "Constants.h"
 #include "IException.h"

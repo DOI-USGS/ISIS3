@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QMenu>
+#include <QMessageBox>
 #include <QSize>
 
 #include "Angle.h"
@@ -534,54 +535,59 @@ namespace Isis {
   void AdvancedTrackTool::TrackMosaicOrigin(MdiCubeViewport *cvp, int piLine,
       int piSample, int &piOrigin, QString &psSrcFileName,
       QString &psSrcSerialNum) {
-    Cube *cCube = cvp->cube();
-    int iTrackBand = -1;
-
-    if(cCube->hasTable(TABLE_MOSAIC_SRC)) {
-      Pvl *cPvl = cCube->label();
-      PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
-      PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
-      for(int i = 0; i < cGrpBandBin.keywords(); i++) {
-        PvlKeyword &cKeyTrackBand = cGrpBandBin[i];
-        for(int j = 0; j < cKeyTrackBand.size(); j++) {
-          if(cKeyTrackBand[j] == "TRACKING") {
-            iTrackBand = j;
-            break;
+      try {
+        Cube *cCube = cvp->cube(); 
+        int iTrackBand = -1;
+        
+        if(cCube->hasTable(TABLE_MOSAIC_SRC)) {
+          Pvl *cPvl = cCube->label();
+          PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
+          PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
+          for(int i = 0; i < cGrpBandBin.keywords(); i++) {
+            PvlKeyword &cKeyTrackBand = cGrpBandBin[i];
+            for(int j = 0; j < cKeyTrackBand.size(); j++) {
+              if(cKeyTrackBand[j] == "TRACKING") {
+                iTrackBand = j;
+                break;
+              }
+            }
+          }
+          
+          if(iTrackBand > 0 && iTrackBand <= cCube->bandCount()) {
+            Portal cOrgPortal(cCube->sampleCount(), 1,
+                              cCube->pixelType());
+            cOrgPortal.SetPosition(piSample, piLine, iTrackBand + 1); // 1 based
+            cCube->read(cOrgPortal);
+            piOrigin = (int)cOrgPortal[0];
+            switch(SizeOf(cCube->pixelType())) {
+              case 1:
+                piOrigin -= VALID_MIN1;
+                break;
+                
+              case 2:
+                piOrigin -= VALID_MIN2;
+                break;
+                
+              case 4:
+                piOrigin -= FLOAT_MIN;
+                break;
+            }
+            
+            // Get the input file name and serial number
+            Table cFileTable(TABLE_MOSAIC_SRC);
+            cCube->read(cFileTable);
+            int iRecs =   cFileTable.Records();
+            if(piOrigin >= 0 && piOrigin < iRecs) {
+              psSrcFileName = QString(cFileTable[piOrigin][0]);
+              psSrcSerialNum = QString(cFileTable[piOrigin][1]);
+            }
           }
         }
+      } 
+      catch (IException &e) {
+          QMessageBox::warning((QWidget *)parent(), "Warning", e.toString());
       }
-
-      if(iTrackBand > 0 && iTrackBand <= cCube->bandCount()) {
-        Portal cOrgPortal(cCube->sampleCount(), 1,
-                                cCube->pixelType());
-        cOrgPortal.SetPosition(piSample, piLine, iTrackBand + 1); // 1 based
-        cCube->read(cOrgPortal);
-
-        piOrigin = (int)cOrgPortal[0];
-        switch(SizeOf(cCube->pixelType())) {
-          case 1:
-            piOrigin -= VALID_MIN1;
-            break;
-
-          case 2:
-            piOrigin -= VALID_MIN2;
-            break;
-
-          case 4:
-            piOrigin -= FLOAT_MIN;
-            break;
-        }
-
-        // Get the input file name and serial number
-        Table cFileTable(TABLE_MOSAIC_SRC);
-        cCube->read(cFileTable);
-        int iRecs =   cFileTable.Records();
-        if(piOrigin >= 0 && piOrigin < iRecs) {
-          psSrcFileName = QString(cFileTable[piOrigin][0]);
-          psSrcSerialNum = QString(cFileTable[piOrigin][1]);
-        }
-      }
-    }
+      
   }
 
 

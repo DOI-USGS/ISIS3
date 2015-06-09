@@ -80,6 +80,7 @@ namespace Isis {
     p_fileTrailer = NULL;
   }
 
+
   //!  Destroys the Import object
   ProcessImport::~ProcessImport() {
     if (p_fileHeader) {
@@ -159,6 +160,7 @@ namespace Isis {
     }
   };
 
+
   /**
    * Sets the byte order of the input file. This must be invoked prior to
    * SetOutputCube.
@@ -168,6 +170,7 @@ namespace Isis {
   void ProcessImport::SetByteOrder(const Isis::ByteOrder order) {
     p_byteOrder = order;
   };
+
 
   /**
    * This method sets the number of bytes in the header of a file.
@@ -199,6 +202,7 @@ namespace Isis {
     }
   };
 
+
   /**
   * This method sets the number of bytes in the trailer of a file.
   * The trailer is a block of non-image data at the end of the
@@ -228,6 +232,7 @@ namespace Isis {
     }
   };
 
+
   /**
    * This method sets the number of bytes in the header of each
    * datablock of a file. A data header is a block of non-image
@@ -255,6 +260,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
+
 
   /**
    * This method sets the number of bytes in the trailer of each
@@ -286,6 +292,7 @@ namespace Isis {
     }
   };
 
+
   /**
    * This method sets the number of bytes at the beginning of each
    * data record of a file. A data prefix is a block of non-image
@@ -314,6 +321,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
+
 
   /**
    * This method sets the number of bytes at the end of each
@@ -344,6 +352,7 @@ namespace Isis {
     }
   };
 
+
   /**
   * This method marks the file header to be saved.  A file
   * header is a block of non-image data at the beginning of the
@@ -369,6 +378,7 @@ namespace Isis {
     }
     p_saveFileHeader = true;
   };
+
 
   /**
    * This method marks the file trailer to be saved.  A file
@@ -396,6 +406,7 @@ namespace Isis {
     }
     p_saveFileTrailer = true;
   };
+
 
   /**
    * This method marks the data block headers to be saved. A data
@@ -425,6 +436,7 @@ namespace Isis {
     p_saveDataHeader = true;
   };
 
+
   /**
    * This method marks the data block trailers to be saved. A data
    * trailer is a block of non-image data at the end of each data
@@ -453,6 +465,7 @@ namespace Isis {
     p_saveDataTrailer = true;
   };
 
+
   /**
    * This method marks the data prefix to be saved.  A data prefix
    * is a block of non-image data at the beginning of each data
@@ -479,6 +492,7 @@ namespace Isis {
     }
     p_saveDataPre = true;
   };
+
 
   /**
    * This method marks the data suffix to be saved.  A data
@@ -508,6 +522,55 @@ namespace Isis {
     p_saveDataPost = true;
   };
 
+
+  /**
+   * This method returns the number of file header bytes
+   */ 
+  int ProcessImport::FileHeaderBytes() const {
+    return p_fileHeaderBytes;
+  }
+
+
+  /**
+   * This method returns the number of file trailer bytes 
+   */ 
+  int ProcessImport::FileTrailerBytes() const {
+    return p_fileTrailerBytes;
+  }
+
+
+  /**
+   * This method returns the number of data header bytes 
+   */ 
+  int ProcessImport::DataHeaderBytes() const {
+    return p_dataHeaderBytes;
+  }
+
+
+  /**
+   * This method returns the number of data trailer bytes
+   */ 
+  int ProcessImport::DataTrailerBytes() const {
+    return p_fileTrailerBytes;
+  }
+
+
+  /**
+   * This method returns the number of data prefix bytes 
+   */ 
+  int ProcessImport::DataPrefixBytes() const {
+    return p_dataPreBytes;
+  }
+
+
+  /**
+   * This method returns the number of data duffix bytes 
+   */ 
+  int ProcessImport::DataSuffixBytes() const {
+    return p_dataPostBytes;
+  }
+
+
   /**
    * This method returns a pointer to the file header.  A file
    * header is a block of non-image data at the beginning of the entire
@@ -533,6 +596,7 @@ namespace Isis {
     QString msg = "File header was not saved.  Use SaveFileHeader().";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   };
+
 
   /**
    * This method returns a pointer to the file trailer.  A file
@@ -587,6 +651,7 @@ namespace Isis {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   };
 
+
   /**
    * This method returns a pointer to the data trailer.  A data
    * trailer is a block of non-image data at the end each data
@@ -613,6 +678,7 @@ namespace Isis {
     QString msg = "Data trailer was not saved.  Use SaveDataTrailer()";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   };
+
 
   /**
    *  This method returns a pointer to the data prefix.  A data
@@ -641,6 +707,7 @@ namespace Isis {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   };
 
+
   /**
    * This method returns a pointer to the data suffix.  A data
    * suffix is a block of non-image data at the end of each data
@@ -668,6 +735,7 @@ namespace Isis {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   };
 
+
   /**
    * Sets the organization of the input cube. If not invoked it is assumed
    * Isis::Import::Bsq.
@@ -679,6 +747,16 @@ namespace Isis {
     p_organization = org;
   };
 
+
+  /**
+   * Gets the organization of the input cube. 
+   *
+   */
+  ProcessImport::Interleave ProcessImport::Organization() const {
+    return p_organization;
+  };
+
+
   /**
    * Sets the core base of the input cube. Defaults to zero if not invoked.
    *
@@ -689,6 +767,7 @@ namespace Isis {
     p_base.push_back(base);
   };
 
+
   /**
    * Sets band dependent core base
    *
@@ -697,6 +776,7 @@ namespace Isis {
   void ProcessImport::SetBase(const std::vector<double> base) {
     p_base = base;
   };
+
 
   /**
    * Sets the core multiplier of the input cube. Defaults to one if not invoked.
@@ -708,6 +788,7 @@ namespace Isis {
     p_mult.push_back(mult);
   };
 
+
   /**
    * Sets band dependent core multiplier
    *
@@ -716,6 +797,7 @@ namespace Isis {
   void ProcessImport::SetMultiplier(const std::vector<double> mult) {
     p_mult = mult;
   };
+
 
   /**
    * Sets a mapping of input pixel values to output special pixel values.
@@ -745,6 +827,7 @@ namespace Isis {
     SetHIS(his, his);
   };
 
+
   /**
   * Sets the range that will be considered Isis::Null
   *
@@ -760,6 +843,7 @@ namespace Isis {
     p_null_min = null_min;
     p_null_max = null_max;
   }
+
 
   /**
   * Sets the range that will be considered Isis::Null
@@ -777,6 +861,7 @@ namespace Isis {
     p_lrs_max = lrs_max;
   }
 
+
   /**
   * Sets the range that will be considered Isis::Null
   *
@@ -793,6 +878,7 @@ namespace Isis {
     p_lis_max = lis_max;
   }
 
+
   /**
   * Sets the range that will be considered Isis::Null
   *
@@ -808,6 +894,7 @@ namespace Isis {
     p_hrs_min = hrs_min;
     p_hrs_max = hrs_max;
   }
+
 
   /**
   * Sets the range that will be considered Isis::Null
@@ -892,6 +979,7 @@ namespace Isis {
 
   }
 
+
   /**
   * Tests the pixel. If it is valid it will return the dn value,
   * otherwise it will return the Isis special pixel value that
@@ -923,6 +1011,7 @@ namespace Isis {
       return pixel;
     }
   }
+
 
   /**
    * Create the output file. Note that all the appropiate calls to at least
@@ -981,6 +1070,7 @@ namespace Isis {
 
     return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
   }
+
 
   /**
    * Create the output file. Note that all the appropiate calls to at least
@@ -1050,6 +1140,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
+
 
   /**
    * Process the import data as a band sequential file.
@@ -1976,5 +2067,24 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
+
+
+  /**
+   * Sets the name of the input file to be read in the import StartProcess
+   * method and verifies its existance.
+   *
+   * @param file The name of the input file to import.
+   *
+   * @throws Isis::iException::Message "File does not exist."
+   */
+  QString ProcessImport::InputFile() {
+    if (p_inFile.size() <= 0) {
+      QString msg = "No input file has been set";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return p_inFile;
+  }
+
+  
 }
 

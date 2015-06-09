@@ -21,19 +21,19 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "ShapeModel.h"
 
 #include <string>
 #include <vector>
 
 #include <QVector>
 
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
-#include "ShapeModel.h"
-#include "SurfacePoint.h"
 #include "Pvl.h"
+#include "SurfacePoint.h"
 
 namespace Isis {
   /**
@@ -48,6 +48,8 @@ namespace Isis {
    * @author 2012-07-30 Ken Edmundson
    *
    * @internal
+   *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
+   *                           Moved method implementation to cpp file. 
    */
   class PlaneShape : public Isis::ShapeModel {
     public:
@@ -57,16 +59,18 @@ namespace Isis {
       PlaneShape();
 
       // Destructor
-      ~PlaneShape() {};
+      ~PlaneShape();
 
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
       
+      bool isDEM() const;
+
       // Calculate the surface normal of the current intersection point
-      void calculateSurfaceNormal() {};
-      void calculateDefaultNormal() {};
-      void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {};
+      void calculateSurfaceNormal();
+      void calculateDefaultNormal();
+      void calculateLocalNormal(QVector<double *> cornerNeighborPoints);
 
       double emissionAngle(const std::vector<double> & sB);
       double incidenceAngle(const std::vector<double> &uB);

@@ -21,19 +21,20 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <numeric>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 
-#include "SpiceManager.h"
+#include <SpiceUsr.h>
+
 #include "FileName.h"
+#include "IException.h"
 #include "PvlKeyword.h"
 #include "Pvl.h"
-#include "IException.h"
-#include "naif/SpiceUsr.h"
+#include "SpiceManager.h"
 
 using namespace std;
 

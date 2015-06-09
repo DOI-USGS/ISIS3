@@ -51,6 +51,9 @@
     <change name="Stuart Sides" date="2014-04-18">
       Added missing line detection and correction based on the TIM table for level 1B products.
     </change>
+    <change name="Stuart Sides" date="2015-03-25">
+      Recalculted the STARTTIME and STOPTIMeE keywords from the clock counts.
+    </change>
   </history>
 
   <category>

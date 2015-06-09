@@ -317,7 +317,9 @@ namespace Isis {
    *           since this was causing a segfault and this
    *           deallocation is already taking place in
    *           addCubeViewport(cube).
-   *
+   *  @history 2015-05-13 Ian Humphrey - Caught exception now handled by sending a QMessageBox
+   *                          to the Workspace. This prevents undefined behavior caused by not 
+   *                          handling an exception within a connected slot.
    */
   void Workspace::addCubeViewport(QString cubename) {
     Cube *cube = new Cube;
@@ -330,17 +332,24 @@ namespace Isis {
     cube->setVirtualBands(bands);
     cube->open(cubename);
 
-    MdiCubeViewport *cvp = addCubeViewport(cube);
+    // this slot is connected to FileTool fileSelected signal
+    try {
+      MdiCubeViewport *cvp = addCubeViewport(cube);
 
-    // Check for RGB format (#R,#G,#B)
-    if(bands.size() == 3) {
-      IString st = IString(bands.at(0));
-      int index_red = st.ToInteger();
-      st = IString(bands.at(1));
-      int index_green = st.ToInteger();
-      st = IString(bands.at(2));
-      int index_blue = st.ToInteger();
-      cvp->viewRGB(index_red, index_green, index_blue);
+      // Check for RGB format (#R,#G,#B)
+      if(bands.size() == 3) {
+        IString st = IString(bands.at(0));
+        int index_red = st.ToInteger();
+        st = IString(bands.at(1));
+        int index_green = st.ToInteger();
+        st = IString(bands.at(2));
+        int index_blue = st.ToInteger();
+        cvp->viewRGB(index_red, index_green, index_blue);
+      }
+    }
+    catch (IException &e) {
+      QMessageBox::critical((QWidget *)parent(), "Error", e.toString());
+      return;
     }
   }
 

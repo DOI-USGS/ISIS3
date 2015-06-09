@@ -187,9 +187,11 @@ namespace Isis {
    * then save the image to disk.
    *
    * @param outputName The filename of the output cube
-   * @param quality The quality of the output, not used for TIFF
+   * @param quality The quality of the output.
+   * @param compression The compression algorithm used. Not supported for Qt.
    */
-  void QtExporter::write(FileName outputName, int quality) {
+  void QtExporter::write(FileName outputName, int quality,
+                         QString compression) {
     ImageExporter::write(outputName, quality);
 
     // The return status is wrong for JPEG images, so the code will always

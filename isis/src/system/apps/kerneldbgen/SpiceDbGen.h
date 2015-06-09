@@ -28,7 +28,7 @@
 
 #include <QStringList>
 
-#include <naif/SpiceUsr.h>
+#include <SpiceUsr.h>
 
 #include "FileName.h"
 #include "IException.h"

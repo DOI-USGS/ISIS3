@@ -47,18 +47,19 @@ namespace Isis {
    * @author 2010-07-30 Debbie A. Cook
    *
    * @internal
-   *   @history 2010-07-30 - Debbie A. Cook - Original version.
-   *   @history 2012-10-25 - Jeannie Backer - Changed resolution() method and
-   *                             call to Spice::resolution() method to lower
-   *                             camel case. Added resolution() method test to
-   *                             improve unitTest code coverage. References
-   *                             #1181.
-   *   @history 2012-10-31 - Ken Edmundson - Added another SetNormal method and fixed original to 
-   *                             set the m_hasNormal to true.
-   *   @history 2012-11-14 - Jeannie Backer - Removed cout lines left in while
-   *                             testing code. References #1181.
-   *   @history 2012-12-21 - Debbie A. Cook - Added new members m_hasEllipsoidIntersection
-   *                             and method hasEllipsoidIntersection().   Fixes Mantis ticket #1343
+   *   @history 2010-07-30 Debbie A. Cook - Original version.
+   *   @history 2012-10-25 Jeannie Backer - Changed resolution() method and call to
+   *                           Spice::resolution() method to lower camel case.
+   *                           Added resolution() method test to improve unitTest code coverage.
+   *                           References #1181.
+   *   @history 2012-10-31 Ken Edmundson - Added another SetNormal method and
+   *                           fixed original to set the m_hasNormal to true.
+   *   @history 2012-11-14 Jeannie Backer - Removed cout lines left in while testing code.
+   *                           References #1181.
+   *   @history 2012-12-21 Debbie A. Cook - Added new members m_hasEllipsoidIntersection
+   *                           and method hasEllipsoidIntersection().
+   *                           Fixes Mantis ticket #1343
+   *   @history 2015-04-30 Jeannie Backer - Added pure virtual isDEM() method. References #2243.
    */
   class ShapeModel {
     public:
@@ -111,6 +112,16 @@ namespace Isis {
       // Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
+      /** 
+       * Indicates whether this shape model is from a DEM. This method is used to 
+       * determine whether the Camera class will calculate the local normal using 
+       * neighbor points. This method is pure virtual and must be implemented by 
+       * all ShapeModel classes.  The parent implementation returns false. 
+       *  
+       * @return bool Indicates whether this is a DEM shape model. 
+       */ 
+      virtual bool isDEM() const = 0;
+
       // Get shape name
       QString name() const;
 
@@ -138,6 +149,7 @@ namespace Isis {
       // Intersect ellipse
       bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
                               const std::vector<double> &observerLookVectorToTarget);
+      bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
       double resolution();

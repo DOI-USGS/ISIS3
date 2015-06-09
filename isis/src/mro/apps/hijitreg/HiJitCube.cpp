@@ -20,18 +20,18 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
-#include "naif/SpiceUsr.h"
+#include <SpiceUsr.h>
 
+#include "FileName.h"
 #include "HiJitCube.h"
 #include "IException.h"
 #include "Instrument.hh"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "FileName.h"
 
 using namespace UA::HiRISE;
 using std::endl;

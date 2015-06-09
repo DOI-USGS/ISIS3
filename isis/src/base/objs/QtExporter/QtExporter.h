@@ -56,6 +56,8 @@ namespace Isis {
    *   @history 2013-06-05 Jeannie Backer - Added initialize() method and replaced call to
    *                           setInput(). Changed ImageExporter calls to new method names, where
    *                           needed. References #1380.
+   *   @history 2015-02-12 Jeffrey Covington - Added compression parameter to write() method.
+   *                           Fixes #1745.
    *
    */
   class QtExporter : public ImageExporter {
@@ -67,7 +69,8 @@ namespace Isis {
       virtual void setRgb(ExportDescription &desc);
       virtual void setRgba(ExportDescription &desc);
 
-      virtual void write(FileName outputName, int quality=100);
+      virtual void write(FileName outputName, int quality=100,
+                         QString compression="none");
 
       static bool canWriteFormat(QString format);
 

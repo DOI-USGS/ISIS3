@@ -1,6 +1,6 @@
 
 
-Testing Kernels class using file $ISIS3DATA/mgs/testData/ab102401.lev2.cub
+Testing Kernels class using file $mgs/testData/ab102401.lev2.cub
 
 List of kernels found - Total: 9
 $base/kernels/spk/de405.bsp
@@ -127,6 +127,82 @@ $base/kernels/lsk/naif0009.tls
 $clementine1/kernels/fk/clem_v11.tf
 $clementine1/kernels/sclk/dspse002.tsc
 $clementine1/kernels/iak/uvvisAddendum003.ti
+
+
+Ensure clean pool...Count: 0
+
+
+Add DSK Kernels directly - Count: 14, Missing: 0
+
+List of kernels in object..
+$base/kernels/lsk/naif0009.tls
+$base/kernels/pck/pck00009.tpc
+$hayabusa/kernels/pck/itokawa_gaskell_n3.tpc
+$hayabusa/kernels/tspk/de403s.bsp
+$hayabusa/kernels/tspk/sb_25143_140.bsp
+$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp
+$hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp
+$hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n.bc
+$hayabusa/kernels/fk/hayabusa_hp.tf
+$hayabusa/kernels/fk/itokawa_fixed.tf
+$hayabusa/kernels/ik/amica31.ti
+$hayabusa/kernels/iak/amicaAddendum001.ti
+$hayabusa/kernels/sclk/hayabusa.tsc
+$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds
+
+List of kernel types
+CK
+DSK
+FK
+IAK
+IK
+LSK
+PCK
+SCLK
+SPK
+
+Unknown kernels in list: 0
+
+
+Loading all, total loaded: 13
+$base/kernels/lsk/naif0009.tls
+$base/kernels/pck/pck00009.tpc
+$hayabusa/kernels/pck/itokawa_gaskell_n3.tpc
+$hayabusa/kernels/tspk/de403s.bsp
+$hayabusa/kernels/tspk/sb_25143_140.bsp
+$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp
+$hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp
+$hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n.bc
+$hayabusa/kernels/fk/hayabusa_hp.tf
+$hayabusa/kernels/fk/itokawa_fixed.tf
+$hayabusa/kernels/ik/amica31.ti
+$hayabusa/kernels/iak/amicaAddendum001.ti
+$hayabusa/kernels/sclk/hayabusa.tsc
+
+Check Load Status = 13
+$base/kernels/lsk/naif0009.tls
+$base/kernels/pck/pck00009.tpc
+$hayabusa/kernels/pck/itokawa_gaskell_n3.tpc
+$hayabusa/kernels/tspk/de403s.bsp
+$hayabusa/kernels/tspk/sb_25143_140.bsp
+$hayabusa/kernels/spk/hay_jaxa_050916_051119_v1n.bsp
+$hayabusa/kernels/spk/hay_osbj_050911_051118_v1n.bsp
+$hayabusa/kernels/ck/hayabusa_itokawarendezvous_v02n.bc
+$hayabusa/kernels/fk/hayabusa_hp.tf
+$hayabusa/kernels/fk/itokawa_fixed.tf
+$hayabusa/kernels/ik/amica31.ti
+$hayabusa/kernels/iak/amicaAddendum001.ti
+$hayabusa/kernels/sclk/hayabusa.tsc
+
+Unload SPK,CK - Loaded: 8
+$base/kernels/lsk/naif0009.tls
+$base/kernels/pck/pck00009.tpc
+$hayabusa/kernels/pck/itokawa_gaskell_n3.tpc
+$hayabusa/kernels/fk/hayabusa_hp.tf
+$hayabusa/kernels/fk/itokawa_fixed.tf
+$hayabusa/kernels/ik/amica31.ti
+$hayabusa/kernels/iak/amicaAddendum001.ti
+$hayabusa/kernels/sclk/hayabusa.tsc
 
 
 All Done - Should be 0 discovered: 0

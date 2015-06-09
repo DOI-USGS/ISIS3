@@ -32,7 +32,7 @@ using namespace std;
 using namespace Isis;
 
 
-const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
+const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.###### TDB ::TDB";
 /**
  * Constructs a new SpiceDbGen.
  *
@@ -65,6 +65,9 @@ SpiceDbGen::SpiceDbGen(QString type) {
  *   @history 2010-04-27 Stuart Sides Changed to work with vector of filters
  *   instead of a single filter
  *
+ *   @history 2015-03-27 Stuart Sides Changed the number of decimal places
+ *   written to the Time keyword for kernel.###.db files from three to six
+ *
  * @throws Isis::iException::Message
 */
 PvlObject SpiceDbGen::Direct(QString quality, QString location,
@@ -72,20 +75,20 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
   PvlObject result;
   QString type = "none";
 
-  for(unsigned int i = 0; i < filter.size(); ++i) {
+  for (unsigned int i = 0; i < filter.size(); ++i) {
     //Create a list of all of the files matching the current filter
     QStringList files = GetFiles(FileName(location), filter[i]);
     PvlObject pvlKernel("change");
 
     // Throw an error if no files are being added to this database for
     // this filter/regex
-    if(files.size() == 0) {
+    if (files.size() == 0) {
       QString message = "Your filter [" + location + "/" + filter[i] + "]"
                        + "has not detected any " + quality + " kernels";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
-    for(int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
+    for (int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
       FileName currFile((QString) location + "/" + files[fileNum]);
       PvlGroup selection = AddSelection(currFile);
       selection += PvlKeyword("Type", quality);
@@ -93,19 +96,20 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
     }
   }
 
-  //check each group to make sure it is the same type as others
+  // Check each group to make sure it is the same type as others
   PvlObject::PvlGroupIterator grp = result.beginGroup();
-  while(grp != result.endGroup()) {
+
+  while (grp != result.endGroup()) {
     // The kernel did not have any time coverage, so ignore it
-    if(grp->name() == "No coverage" || grp->name() == "Null") {
+    if (grp->name() == "No coverage" || grp->name() == "Null") {
       result.deleteGroup(grp->name());
     }
     // This is used for the first time thru the while loop
     // DO NOT increment grp here
-    else if(type == "none") {
+    else if (type == "none") {
       type = grp->name();
     }
-    else if(grp->name() == type) {
+    else if (grp->name() == type) {
       grp->setName("Selection");
       grp++;
     }
@@ -116,10 +120,10 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
     }
   }
 
-  if(type == "SPK") {
+  if (type == "SPK") {
     result.setName("SpacecraftPosition");
   }
-  else if(type == "CK") {
+  else if (type == "CK") {
     result.setName("SpacecraftPointing");
   }
 
@@ -184,13 +188,13 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
   //select which spice coverage routine to use. If a text kernel is detected, it
   //will be returned here and weeded out at the end of Direct(). This helps
   //to protect the user from inadvertently adding "." and ".." to their filters
-  if(currFile == "SPK") {
+  if (currFile == "SPK") {
     spkobj_c(tmp.toAscii().data(), &currCell);
   }
-  else if(currFile == "CK") {
+  else if (currFile == "CK") {
     ckobj_c(tmp.toAscii().data(), &currCell);
   }
-  else if(currFile == "TEXT") {
+  else if (currFile == "TEXT") {
     return PvlGroup("No coverage");
   }
 
@@ -203,11 +207,11 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
     //only provide coverage for negative NAIF codes
     //(Positive codes indicate planetary bodies, negatives indicate
     // spacecraft and instruments)
-    if(body < 0) {
+    if (body < 0) {
       NaifStatus::CheckErrors();
 
       //find the correct coverage window
-      if(currFile == "SPK") {
+      if (currFile == "SPK") {
         //  2000 is the max coverage window size for an SPK kernel
         SPICEDOUBLE_CELL(cover, 2000);
         ssize_c(0, &cover);
@@ -218,7 +222,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
 
         result = FormatIntervals(cover, currFile);
       }
-      else if(currFile == "CK") {
+      else if (currFile == "CK") {
         //  200,000 is the max coverage window size for a CK kernel
         SPICEDOUBLE_CELL(cover, 200000);
         ssize_c(0, &cover);
@@ -248,7 +252,7 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
   NaifStatus::CheckErrors();
 
   PvlGroup result(type);
-  SpiceChar begStr[32], endStr[32];
+  SpiceChar begStr[35], endStr[35];
   //Get the number of intervals in the object.
   int niv = card_c(&coverage) / 2;
   //Convert the coverage interval start and stop times to TDB
@@ -257,8 +261,8 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
     //Get the endpoints of the jth interval.
     wnfetd_c(&coverage, j, &begin, &end);
     //Convert the endpoints to TDB calendar
-    timout_c(begin, calForm, 32, begStr);
-    timout_c(end, calForm, 32, endStr);
+    timout_c(begin, calForm, 35, begStr);
+    timout_c(end, calForm, 35, endStr);
     result += PvlKeyword("Time", "(\"" + (QString)begStr +
                          "\", \"" + (QString)endStr + "\")");
   }

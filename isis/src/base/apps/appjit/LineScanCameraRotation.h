@@ -25,18 +25,17 @@
 #include <string>
 #include <vector>
 
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
-#include "SpiceRotation.h"
-#include "SpicePosition.h"
-#include "Table.h"
-#include "Quaternion.h"
-#include "PolynomialUnivariate.h"
 #include "PixelOffset.h"
+#include "PolynomialUnivariate.h"
+#include "Quaternion.h"
 #include "Spice.h"
-
+#include "SpicePosition.h"
+#include "SpiceRotation.h"
+#include "Table.h"
 
 namespace Isis {
   /**

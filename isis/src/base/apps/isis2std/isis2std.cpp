@@ -58,7 +58,18 @@ void IsisMain() {
 
   FileName outputName = ui.GetFileName("TO");
   int quality = ui.GetInteger("QUALITY");
-  exporter->write(outputName, quality);
+
+
+  QString compression;
+  if (format == "TIFF") {
+    compression = ui.GetString("COMPRESSION").toLower();
+
+  }
+  else {
+    compression = "none";
+  }
+
+  exporter->write(outputName, quality, compression);
 
   if (mode != "GRAYSCALE" && ui.GetString("STRETCH") != "MANUAL") {
     ui.Clear("MINIMUM");

@@ -32,6 +32,10 @@
     <change name="Ian Humphrey" date="2014-06-03">
       Closed the open cube to prevent errors from running sequential data in GUI. Fixes #1002.
     </change>
+    <change name="Makayla Shepherd" date="2015-02-06">
+      Initialized the global variables and changed the catch in IsisMain in order to 
+      close the cube before the exception is thrown. Fixes #2124, 2125.
+    </change>
   </history>
 
   <category>
@@ -87,7 +91,7 @@
       Using interestcube with forstner operator
       </brief>
       <description>
-        The use of Interst to ingest an Isis 3 cube and output a cube with interest values. 
+        The use of Interest to ingest an Isis 3 cube and output a cube with interest values. 
       </description>
       <terminalInterface>
         <commandLine>
@@ -321,7 +325,10 @@
       </description>
       <terminalInterface>
         <commandLine>
-	  from= ab102401.cub
+	  from= ab102401.cub<change name="Makayla Shepherd" date="2015-02-06">
+      Initialized the global variables and changed the catch in IsisMain in order to 
+      close the cube before the exception is thrown. Fixes #2124 and #2125.
+    </change>
       pvl= input.pvl
 	  to= out.cub
         </commandLine>

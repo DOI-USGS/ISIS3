@@ -23,18 +23,18 @@
  */                                                                       
 #include <cmath>
 #include <cstdlib>
-#include <sstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
+
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
 
 #include "Camera.h"
-#include "TProjection.h"
 #include "SpecialPixel.h"
 #include "Stereo.h"
-
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
+#include "TProjection.h"
 
 namespace Isis {
 

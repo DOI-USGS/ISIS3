@@ -1,0 +1,26 @@
+#---------------------------------------------------------------------------
+# This can be added to the bottom of most Makefiles to assist in debugging
+# Example: include $(ISISROOT)/make/isismake.print
+#---------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# Use to see individual values of variables
+#  Example: make print-HOST_OS
+#  Will print the make variable HOST_OS
+#----------------------------------------------------------------------------
+.PHONY: print-%
+print-%  :
+	@echo '$* = $($*)'
+
+#----------------------------------------------------------------------------
+# Use to dump all make variables
+#  Example: make printAll
+#  Will print all the make variables to stdout
+#----------------------------------------------------------------------------
+.PHONY: printAll
+printAll :
+	$(foreach v,$(sort $(.VARIABLES)), \
+	  $(if $(filter-out environ% default automatic, $(orgin $v)), \
+	    $(origin $v)),$(info $v=$($v) ($value $v))))) \
+    
+

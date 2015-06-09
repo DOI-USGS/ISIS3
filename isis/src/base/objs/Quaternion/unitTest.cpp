@@ -4,13 +4,14 @@
 #include <iomanip>
 #include <cmath>
 
-#include "Spice.h"
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
-#include "Quaternion.h"
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
+
 #include "IException.h"
+#include "Quaternion.h"
 #include "Preference.h"
+#include "Spice.h"
 
 using namespace std;
 

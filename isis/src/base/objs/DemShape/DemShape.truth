@@ -3,12 +3,16 @@ Begin testing Dem Shape Model class....
   Testing constructors...
     Shape name is DemShape
     Shape name is DemShape
+    Shape is DEM type? Yes
 
   Testing method intersectSurface...
     Do we have an intersection? 0
     Set a pixel in the image and check again.
     Do we have an intersection? 1
     surface point = (-2123.36, -2380.37, 1194.68
+
+  Testing class method calculateLocalNormal with no neighbor points
+    has normal? No
 
   Testing class method calculateLocalNormal with correction for inward pointing vector
     local normal = (-0.58374, -0.701835, 0.408259

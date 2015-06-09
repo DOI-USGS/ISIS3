@@ -24,24 +24,28 @@
  * object or application.
  *
  */
+
 /**
  * \namespace Galileo
  *
  * Namespace for all %Isis Galileo mission objects
  *
  */
+
 /**
  * \namespace Isis::Mgs
  *
  * Namespace for all %Isis Mars Global Surveyor mission objects
  *
  */
+
 /**
  * \namespace Isis::Mro
  *
  * Namespace for all %Isis Mars Reconnaissance Orbiter mission objects
  *
  */
+
 /**
  * \namespace Isis::Odyssey
  *
@@ -55,6 +59,7 @@
  * Namespace for all %Isis Lunar Orbiter mission objects
  *
  */
+
 /**
  * \namespace Isis::Lro
  *
@@ -62,13 +67,13 @@
  *
  */
 
-
 /**
  * \namespace Qisis
  *
  * Namespace for the %Isis visualazation objects
  *
  */
+
 /**
  * \namespace std
  *
@@ -433,6 +438,23 @@
            * Mission site: http://nssdc.gsfc.nasa.gov/nmc/masterCatalog.do?sc=1996-008A
            *
            */
+
+
+          // New Horizons
+          /**
+           * \defgroup  NewHorizons                   New Horizons
+           *
+           * These objects provide functionality for manipulating data from the
+           * New Horizons mission. New Horizons is part of NASA's New Frontiers
+           * Program.
+           * New Horizons launced January 19, 2006 and is expected to spend five months studying 
+           * Pluto durring the summer of 2015.
+           *
+           * Mission site: http://www.nasa.gov/mission_pages/newhorizons/main/#.VA4QY8NuH4I
+           *
+           *
+           */
+
 
           // VIKING
           /**

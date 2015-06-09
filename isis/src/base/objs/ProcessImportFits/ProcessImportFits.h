@@ -67,8 +67,11 @@ namespace Isis {
       //! The stream used to read the FITS file
       std::ifstream m_file;
 
-      //! The number of 2880 byte header records before each data section
+      //! The number/count of 2880 byte header records for each header section
       QList<int> *m_headerSizes;
+
+      //! The starting byte of the data for each image
+      QList<int> *m_dataStarts;
   };
 };
 

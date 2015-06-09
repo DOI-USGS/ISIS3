@@ -26,23 +26,24 @@
  */                                                                       
 
 #include <cmath>
-#include <string>
-#include <vector>
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <QString>
 #include <QVector>
 
-#include <naif/SpiceZdf.h>
+#include <SpiceZdf.h>
+
 #include <tnt/tnt_array1d.h>
 #include <tnt/tnt_array1d_utils.h>
 #include <tnt/tnt_array2d.h>
 #include <tnt/tnt_array2d_utils.h>
 
 #include "Kernels.h"
-#include "IString.h"
 #include "IException.h"
+#include "IString.h"
 
 
 namespace Isis {

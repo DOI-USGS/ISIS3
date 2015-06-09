@@ -1,0 +1,56 @@
+Unit test for NaifDskPlateModel. 
+
+Default constructor. 
+default object is valid? false 
+File name:           "" 
+Number of Plates:    0 
+Number of Vertices:  0 
+
+Construct NaifDskPlateModel object from NAIF DSK file and retrieve basic info. 
+object is valid?  true 
+File name:           "hay_a_amica_5_itokawashape_v1_0_512q" 
+Size:                3145728 
+Number of plates:    3145728 
+Number of vertices:  1579014 
+
+Look for surface point at equator, lon 0.0 
+Surface point at pole is null?      "No" 
+Surface point:  289.11 0 0  meters 
+
+Look for intercept with obsever position and look direction ray: 
+Ray Dir:             "( 1.0, 1.0, 1.0 )"
+Observer:            "( 0.0, 0.0, 0.0 )"
+Intercept is null?   "Yes" 
+intercept plateID?   0 
+Ray Dir:             "( -1.0, 0.0, 0.0 )"
+Observer:            "( 1000.0, 0.0, 0.0 )"
+Intercept is null?   "No" 
+intercept plate name                 =  "TriangularPlate" 
+intercept vertex (obsPos position) =  "( 1000.0, 0.0, 0.0 )"
+intercept vector (look direction)    =  "( -1.0, 0.0, 0.0 )"
+intercept surface point (location)   =  "( 289.110306976744, 0.0, 0.0 )" meters
+intercept plateID                    =   2349576 
+
+Get plate info from id: 
+Is plate ID = 0 valid?  false 
+Is plate ID = 1 valid?  true 
+Is plate ID = 1 valid for invalid NaifDskPlateModel?  false 
+Triangular Plate for ID = 1: 
+    "-0.15146"     "0.08178"     "0.07502"     
+    "-0.15085"     "0.08153"     "0.07531"     
+    "-0.15091"     "0.08185"     "0.07513"     
+
+
+================================= Error Throws ================================== 
+Thrown from plateIdOfIntercept(): Get plate ID of intercept with invalid obsPos. 
+**PROGRAMMER ERROR** Invalid point source data to determine intercept.
+**PROGRAMMER ERROR** Invalid/bad dimensions on intercept source point.
+
+Thrown from plate(): Get plate from invalid plate ID. 
+**PROGRAMMER ERROR** Plateid = 0 is invalid.
+
+Thrown from openDSK(): Open DSK file that doesn't exist. 
+**USER ERROR** NAIF DSK file [./junk.bds] does not exist.
+
+~NaifDskDescriptor(): Unknown NAIF error has occured. 
+**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(FILARCHMISMATCH)]. The Naif error is [A request to load the DAF file, /usgs/cpkgs/isis3/data/base/kernels/spk/de405.bsp, has been made by the DAS system.  This operation is not permitted.].

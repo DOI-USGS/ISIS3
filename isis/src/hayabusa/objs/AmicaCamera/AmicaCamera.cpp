@@ -56,16 +56,11 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
-    double time = iTime((QString)inst["StartTime"]).Et();
+    QString stime = inst["SpacecraftClockStartCount"];
+    iTime etStart = getClockTime(stime);
 
-    // Exposure duration keyword is in seconds
     double exposureDuration = ((double) inst["ExposureDuration"]);
-    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(time, exposureDuration);
-
-    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
-
-    // Setup detector map
-    new CameraDetectorMap(this);
+    iTime centerTime  = etStart + (exposureDuration / 2.0);
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
@@ -75,6 +70,16 @@ namespace Isis {
                        "_BORESIGHT_SAMPLE"),
       Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_LINE"));
+
+    // Setup detector map
+    CameraDetectorMap *detMap =  new CameraDetectorMap(this);
+    detMap->SetStartingDetectorSample((int) inst["FirstSample"] + 1);
+    detMap->SetStartingDetectorLine((int) inst["FirstLine"] + 1);
+     
+    // Handle summing
+    int binning = inst["Binning"];
+    detMap->SetDetectorLineSumming(binning);
+    detMap->SetDetectorSampleSumming(binning);
 
     // Setup distortion map
     CameraDistortionMap *dmap = new CameraDistortionMap(this);

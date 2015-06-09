@@ -21,28 +21,28 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <vector>
+
 #include <QString>
 #include <QStringList>
 
-#include <vector>
-#include <numeric>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <functional>
+#include <SpiceUsr.h>
 
-#include "SpiceKernel.h"
-#include "CkKernelWriter.h"
-#include "FileName.h"
-#include "Pvl.h"
-#include "Cube.h"
-#include "IString.h"
-#include "TextFile.h"
 #include "Application.h"
-#include "NaifStatus.h"
+#include "CkKernelWriter.h"
+#include "Cube.h"
+#include "FileName.h"
 #include "IException.h"
-
-#include "naif/SpiceUsr.h"
+#include "IString.h"
+#include "NaifStatus.h"
+#include "Pvl.h"
+#include "SpiceKernel.h"
+#include "TextFile.h"
 
 using namespace std;
 

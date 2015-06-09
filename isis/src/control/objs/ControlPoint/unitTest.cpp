@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 
-#include "boost/numeric/ublas/symmetric.hpp"
+#include <boost/numeric/ublas/symmetric.hpp>
 
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -26,10 +26,12 @@ void printPoint(ControlPoint &p);
   * @history 2010-08-12  Tracie Sucharski,  Keywords changed AGAIN.. Added many
   *                         more tests for conversions between lat/lon/radius
   *                         and x/y/z and between simgas and covariance matrices.
-  *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
+  * @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
   *                         Ground ------> Fixed
   *                         Tie----------> Free
-  *
+  * @history 2015-02-17  Andrew Stebenne, changed a reference to a local filesystem to a dummy file 
+  *                         (dummy.cub) to make it clearer that the .cub file being referenced
+  *                         wasn't necessary.
   */
 int main() {
   Preference::Preferences(true);
@@ -41,7 +43,8 @@ int main() {
   cp.SetType(ControlPoint::Fixed);
   cp.SetIgnored(true);
   cp.SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
-  cp.SetAprioriSurfacePointSourceFile("/work1/tsucharski/basemap.cub");
+  // dummy.cub does not exist: reference provided for testing.
+  cp.SetAprioriSurfacePointSourceFile("./dummy.cub");
   cp.SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
   cp.SetAprioriRadiusSourceFile("$base/dems/molaMarsPlanetaryRadius0003.cub");
 

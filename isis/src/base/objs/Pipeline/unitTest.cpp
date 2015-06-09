@@ -341,14 +341,12 @@ void PipeContinue(void)
   pc1.SetContinue(true);
   pc1.KeepTemporaryFiles(false);
   
-  pc1.AddToPipeline("mask");
-  //p.Application("mask").SetContinue(true);
-  pc1.Application("mask").SetInputParameter("FROM",     false);
-  pc1.Application("mask").SetOutputParameter("TO",      "mask");
-  pc1.Application("mask").AddConstParameter("MINIMUM",  toString(VALID_MIN4));
-  pc1.Application("mask").AddConstParameter("MAXIMUM",  toString(VALID_MAX4));
-  pc1.Application("mask").AddConstParameter("PRESERVE", "INSIDE");
-  pc1.Application("mask").AddConstParameter("SPIXELS",  "NONE");
+  pc1.AddToPipeline("noisefilter");
+  // Intentionally broken parameters
+  pc1.Application("noisefilter").SetInputParameter("FROM",     false);
+  pc1.Application("noisefilter").SetOutputParameter("TO",      "");
+  pc1.Application("noisefilter").AddConstParameter("SAMPLES",  "0");
+  pc1.Application("noisefilter").AddConstParameter("LINES",    "0");
   
   pc1.AddToPipeline("lowpass");
   pc1.Application("lowpass").SetInputParameter ("FROM", false);
@@ -356,7 +354,7 @@ void PipeContinue(void)
   pc1.Application("lowpass").AddConstParameter ("SAMPLES", "3");
   pc1.Application("lowpass").AddConstParameter ("LINES", "3");
   
-  cout << pc1;
+  cout << pc1 << endl;
   
   pc1.Run();
   
@@ -367,15 +365,14 @@ void PipeContinue(void)
   pc2.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
   pc2.SetOutputFile("TO");
   pc2.KeepTemporaryFiles(false);
-  
-  pc2.AddToPipeline("mask", "mask1");
-  pc2.Application("mask1").SetContinue(true);
-  pc2.Application("mask1").SetInputParameter("FROM",     false);
-  pc2.Application("mask1").SetOutputParameter("TO",      "mask1");
-  pc2.Application("mask1").AddConstParameter("MINIMUM",  toString(VALID_MIN4));
-  pc2.Application("mask1").AddConstParameter("MAXIMUM",  toString(VALID_MAX4));
-  pc2.Application("mask1").AddConstParameter("PRESERVE", "INSIDE");
-  pc2.Application("mask1").AddConstParameter("SPIXELS",  "NONE");
+
+  pc2.AddToPipeline("noisefilter", "nf1");
+  pc2.Application("nf1").SetContinue(true);
+  // Intentionally broken parameters
+  pc2.Application("nf1").SetInputParameter("FROM",     false);
+  pc2.Application("nf1").SetOutputParameter("TO",      "");
+  pc2.Application("nf1").AddConstParameter("SAMPLES",  "0");
+  pc2.Application("nf1").AddConstParameter("LINES",    "0");
   
   pc2.AddToPipeline("lowpass", "lpf1");
   pc2.Application("lpf1").SetInputParameter ("FROM", false);
@@ -383,7 +380,7 @@ void PipeContinue(void)
   pc2.Application("lpf1").AddConstParameter ("SAMPLES", "3");
   pc2.Application("lpf1").AddConstParameter ("LINES", "3");
   
-  cout << pc2;
+  cout << pc2 << endl;
   
   pc2.Run();
   remove("./out.cub");

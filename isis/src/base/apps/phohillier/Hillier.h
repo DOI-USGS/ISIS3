@@ -23,13 +23,13 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 
-#include "IString.h"
 #include "Camera.h"
 #include "DbProfile.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
