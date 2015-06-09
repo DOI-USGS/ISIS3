@@ -43,6 +43,16 @@
     Keep in mind that sparse increments assigned to LINC and SINC are 
     susceptible to an adverse effect on the accuracy of the statistics.
     </p>
+    <p>
+    The statistics are output both to the screen and to the print.prt file in PVL format.
+    Additionally, if the user specifies a file using the TO parameter, the statistics are written to
+    that file in PVL format (default) or as a comma-separated-value text file (FLAT file), depending
+    on the FORMAT parameter.
+    </p>
+    <p>
+    If the output file exists and the APPEND parameter is set to "no", the contents will be
+    overwritten.
+    </p>
   </description>
 
   <history>
@@ -53,23 +63,23 @@
       Added an application test.
     </change>
     <change name="Kris Becker" date="2008-02-27"> 
-        Check for special pixel values and write them as NULL values in keywords 
-        and the flat text file.
+      Check for special pixel values and write them as NULL values in keywords 
+      and the flat text file.
     </change>
-     <change name="Steven Lambright" date="2008-05-12">
-          Removed references to CubeInfo .
-     </change>
-     <change name="Christopher Austin" date="2008-06-11">
-       Added the ATTACH option.
-     </change>
+    <change name="Steven Lambright" date="2008-05-12">
+      Removed references to CubeInfo .
+    </change>
+    <change name="Christopher Austin" date="2008-06-11">
+      Added the ATTACH option.
+    </change>
     <change name="Steven Koechle" date="2008-11-12">
-       Camstats now outputs history to the cube when it finishes execution.
-     </change>
+      Camstats now outputs history to the cube when it finishes execution.
+    </change>
     <change name="Tammy Becker" date="2012-01-19">
-       Modified documentation and added Glossary links.
-     </change>
+      Modified documentation and added Glossary links.
+    </change>
     <change name="Janet Richie, Ella Mae Lee" date="2012-11-20">
-       Modified documentation, fixes #1174.
+      Modified documentation, fixes #1174.
     </change>
     <change name="Lynn Weller" date="2013-02-25">
       Removed links to applications imbedded in text and replaced with
@@ -81,7 +91,11 @@
       Updated FORMAT and APPEND documentation to be more clear. Made general
       edits for clarity.
     </change>
-      
+    <change name="Andrew Stebenne" date="2015-04-03">
+      Removed the filter on the TO parameter so that any file can be used for output. Updated
+      documentation to clarify the existence and functioning of a few quirks. Addresses redmine
+      ticket #175.
+    </change>
   </history>
 
   <category>
@@ -141,13 +155,11 @@
 	  with the <i>getkey</i> application to pass the results to other programs
           when developing scripts.  
           <p>
-             Alternatively, the output can be written to a text file format, 
-	     see the "FORMAT" parameter for more information.
+          Alternatively, the output can be written to a text file format, 
+          see the "FORMAT" parameter for more information.
           </p>
+          The format is ignored unless the "TO" parameter is specified.
         </description>
-        <filter>
-          *.txt *.TXT
-        </filter>
       </parameter>
       <parameter name="FORMAT">
         <type>string</type>
