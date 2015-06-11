@@ -48,6 +48,13 @@ namespace Isis {
     if(Isis::FileName(file).fileExists()) {
       pvl.read(file);
     }
+    else {
+      // Throw an exception if the preference file isn't found
+      throw IException(IException::User,
+                       QString("The preference file %1 was not found or does not exist").arg(file),
+                       _FILEINFO_);
+    }
+
 
     // Override parameters each time load is called
     for(int i = 0; i < pvl.groups(); i++) {

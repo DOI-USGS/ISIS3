@@ -56,5 +56,15 @@ int main() {
     error.print();
   }
 
+  // Now test without a preference file to see if the expected exception is thrown
+  try {
+    Isis::Preference::Preferences(true);
+    Isis::Preference::Preferences(true).Load("dummyPrefs");
+  }
+  // Expect to see: "The preference file dummyPrefs was not found or does not exist."
+  catch(Isis::IException &error) {
+    error.print();
+  }
+
   return 0;
 }
