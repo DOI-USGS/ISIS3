@@ -631,6 +631,9 @@
     <change name="Sharmila Prasad" date="2011-12-29">Updated GoodnessOfFit 
      Filter and added ControlNet stats for ControlMeasureLogData. Fixes Mantis #652 
     </change>
+    <change name="Kristin Berry" date="2015-06-04">Updated ControlNetStatistics to throw 
+     errors when output files cannot be opened or successfully written to. Fixes #996.
+   </change>
     </history>
       
   <groups>
