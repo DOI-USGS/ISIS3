@@ -70,6 +70,11 @@ namespace Isis {
    *                           computation. Minor refactoring but needs a lot more. References #619
    *                           because fixing the order of the cnet caused us to fix some cnet graph
    *                           node bugs which caused the convex hull tests to fail.
+   *  @history 2015-06-04 Kristin Berry - Now throws an error when
+   *                           unable to open an output file or
+   *                           finish writing to an output file.
+   *                           Fixes #996.
+   *  
    */
   class ControlNetStatistics {
     public:

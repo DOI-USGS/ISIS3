@@ -676,7 +676,9 @@ namespace Isis {
    *                          reference measure could not be changed and there was no warning
    *                          printed.
    *   @history 2013-12-05 Tracie Sucharski - If saving measure on fixed or constrained point and
-   *                        reference measure is ignored, print warning and return.
+   *                          reference measure is ignored, print warning and return.
+   *   @history 2015-06-05 Makayla Shepherd and Ian Humphery - Modified to return out of the
+   *                          method when checkReference returns false.
    */
   void QnetTool::measureSaved() {
     // Read original measures from the network for comparison with measures
@@ -735,7 +737,10 @@ namespace Isis {
         QMessageBox::warning(m_qnetTool, "Point Locked", message);
         return;
       }
-      checkReference();
+      // If user does not want to change the reference then don't update the measure
+      if (!checkReference()) {
+        return;
+      }
     }
     else if (m_leftMeasure->GetCubeSerialNumber() != m_groundSN) {
       m_editPoint->SetRefMeasure(m_leftMeasure->GetCubeSerialNumber());
@@ -800,17 +805,23 @@ namespace Isis {
 
 
 
-  /*
-  * Change which measure is the reference.
-  *  
-  * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
-  *
-  * @internal
-  *   @history 2012-06-12 Tracie Sucharski - Moved check for ground loaded on left from the
-  *                          measureSaved method.
-  */
-  void QnetTool::checkReference() {
-
+  /**
+   * Change which measure is the reference.
+   *  
+   * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
+   * 
+   * @return bool If false reset reference ChipViewport to original value.
+   *
+   * @internal
+   *   @history 2012-06-12 Tracie Sucharski - Moved check for ground loaded on left from the
+   *                          measureSaved method.
+   *   @history 2015-06-01 Makayla Shepherd and Ian Humphrey - Modified to return a boolean 
+   *                          value to indicate if the user wants to update the reference or not
+   *                          and modified the case when the user clicks no to reload the left and
+   *                          right ChipViewports to reset back to the previous locations.
+   */
+  bool QnetTool::checkReference() {
+    
     // Check if ControlPoint has reference measure, if reference Measure is
     // not the same measure that is on the left chip viewport, set left
     // measure as reference.
@@ -862,14 +873,15 @@ namespace Isis {
                                    message, "&Yes", "&No", 0, 0)){
         // Yes:  Save measure
         case 0:
-          break;
-        // No:  keep original reference, return without saving
+          return true;
+        // No:  keep original reference, return ChipViewports to previous states
         case 1:
-          loadPoint();
-          return;
+          selectRightMeasure(m_rightCombo->currentIndex());
+          selectLeftMeasure(m_leftCombo->currentIndex());
+          return false;
       }
     }
-
+    return true;
   }
 
 
@@ -2705,7 +2717,6 @@ namespace Isis {
    *                          namespace std"
    */
   void QnetTool::selectRightMeasure(int index) {
-
     QString file = m_pointFiles[index];
 
     QString serial = m_serialNumberList->SerialNumber(file);
@@ -2720,10 +2731,10 @@ namespace Isis {
     //  Find measure for each file
     *m_rightMeasure = *((*m_editPoint)[serial]);
 
-    //  If m_leftCube is not null, delete before creating new one
+    //  If m_rightCube is not null, delete before creating new one
     m_rightCube.reset(new Cube(file, "r"));
 
-    //  Update left measure of pointEditor
+    //  Update right measure of pointEditor
     m_pointEditor->setRightMeasure (m_rightMeasure, m_rightCube.data(),
                                     m_editPoint->GetId());
     updateRightMeasureInfo ();

@@ -329,6 +329,11 @@ namespace Isis {
     QString outName(outFile.expanded());
     ostm.open(outName.toAscii().data(), std::ios::out);
 
+    if ( ostm.fail() ) {
+      QString msg = QObject::tr("Cannot open file [%1]").arg(psImageFile);
+      throw IException(IException::Io, msg, _FILEINFO_);
+     }
+
     //map< QString, vector<double> >::iterator it;
     map<QString, bool>::iterator it;
     // imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
@@ -350,7 +355,12 @@ namespace Isis {
           ostm << "0, 0, 0, 0, 0, 0, 0" << endl;
         }
     }
-    ostm.close();
+
+    if (!ostm) {
+      QString msg = QObject::tr("Error writing to file: [%1]").arg(psImageFile);
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+    ostm.close(); 
   }
 
 
@@ -383,6 +393,12 @@ namespace Isis {
     ofstream ostm;
     QString outName(outFile.expanded());
     ostm.open(outName.toAscii().data(), std::ios::out);
+
+    if ( ostm.fail() ) {
+      QString msg = QObject::tr("Cannot open file [%1]").arg(psPointFile);
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
     ostm << " PointId, PointType, PointIgnore, PointEditLock, TotalMeasures, MeasuresValid, MeasuresIgnore, MeasuresEditLock," << endl;
 
     int iNumPoints = mCNet->GetNumPoints();
@@ -409,6 +425,12 @@ namespace Isis {
       if (mProgress != NULL)
         mProgress->CheckStatus();
     }
+
+    if (!ostm) {
+      QString msg = QObject::tr("Error writing to file: [%1]").arg(psPointFile);
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
     ostm.close();
   }
 

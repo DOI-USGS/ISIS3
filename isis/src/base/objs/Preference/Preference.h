@@ -67,8 +67,12 @@ namespace Isis {
    *                           TestPreferences file
    *   @history 2012-02-24 Steven Lambright - This class now sets the thread
    *                           limit in the Qt global thread pool.
-   *  @history 2013-03-27 Jeannie Backer - Added Near mission to DataDirectory
-   *                          group to TestPreferences file. References #1248.
+   *   @history 2013-03-27 Jeannie Backer - Added Near mission to DataDirectory
+   *                           group to TestPreferences file. References #1248.
+   *   @history 2015-05-27 Andrew Stebenne - Backwards Compatibility Issue:
+   *                           Preference now throws an exception when Preference.Load()
+   *                           is called on a nonexistent preference file. This may cause issues
+   *                           for anyone who has been using a nonexistent preference file.
    */
   class Preference : public Pvl {
 
