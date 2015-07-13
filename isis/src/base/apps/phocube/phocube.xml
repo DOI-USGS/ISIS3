@@ -100,6 +100,8 @@
      <li>SUBSOLARGROUNDAZIMUTH</li>
      <li>MORPHOLOGY</li>
      <li>ALBEDO</li>
+     <li>RADEC</li>
+     <li>BODYFIXED</li>
      </ul>
 	The following options are available for Level2 images:
      <ul>
@@ -283,6 +285,10 @@
     <change name="Makayla Shepherd" date="2015-02-06">
       Updated documentation. Fixes #1001.
     </change>
+    <change name="Makayla Shepherd" date="2015-07-02">
+      Added Ra/Dec and Body Fixed Coordinates options to help create new camera models and help 
+      with mission team operations. References #2277."
+    </change>
   </history>
 
   <category>
@@ -371,6 +377,8 @@
               <item>MORPHOLOGY</item>
               <item>ALBEDO</item>
               <item>NORTHAZIMUTH</item>
+              <item>RADEC</item>
+              <item>BODYFIXED</item>
             </exclusions>
           </option>
         </list>
@@ -657,6 +665,30 @@
           </p>
         </description>
       </parameter>
+      <parameter name="RADEC">
+         <type>boolean</type>
+         <default><item>FALSE</item></default>
+         <brief>Create bands for Right Ascention and Declination</brief>
+         <description>
+	   If this parameter is true, the <def>Right Ascension</def>, and the 
+	   <def>Declination</def> will be calculated for every pixel and each will be placed into
+	   their respective bands in the output cube. The output cube labels will contain 
+	   "Right Ascension" and "Declination" in the BandBin group, in the band sequence of the 
+	   output file. Right Ascension and Declination are in degrees.
+	 </description>
+       </parameter>
+      <parameter name="BODYFIXED">
+         <type>boolean</type>
+         <default><item>FALSE</item></default>
+         <brief>Create bands for the X, Y, and Z Body Fixed Coordinates</brief>
+         <description>
+	   If this parameter is true, the <def>Body Fixed Coordinates</def> will be calculated for
+	   every pixel and the values for X, Y, and Z will each be placed into their own bands in 
+	   the output cube. The output cube labels will contain "Body Fixed X", "Body Fixed Y", 
+	   and "Body Fixed Z" in the BandBin group, in the band sequence of the output file. 
+	   Body Fixed Coordinates are in kilometers.
+	 </description>
+       </parameter>
     </group>
   </groups>
   

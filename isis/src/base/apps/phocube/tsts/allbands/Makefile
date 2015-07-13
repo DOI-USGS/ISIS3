@@ -27,4 +27,6 @@ commands:
 	  subspacecraftgroundazimuth=true \
 	  subsolargroundazimuth=true \
 	  morphology=true \
-	  albedo=true > /dev/null;  
+	  albedo=true \
+	  radec=true \
+	  bodyfixed=true> /dev/null;  
