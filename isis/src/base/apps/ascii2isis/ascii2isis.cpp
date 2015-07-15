@@ -15,6 +15,7 @@ double TestSpecial(const double pixel);
 void ascii2isis(Buffer &out);
 ifstream fin;
 QString order;
+QString from;
 //Initialize values to make special pixels invalid
 double null_min = DBL_MAX;
 double null_max = DBL_MIN;
@@ -24,10 +25,15 @@ double lrs_min = DBL_MAX;
 double lrs_max = DBL_MIN;
 
 void IsisMain() {
+  //initialize fin
+  if (fin.is_open()) {
+    fin.close();
+  }
 
   //  Open input text file
   UserInterface &ui = Application::GetUserInterface();
-  QString from = ui.GetFileName("FROM");
+  from = ui.GetFileName("FROM");
+  
   // Get storage order of data
   order = ui.GetString("ORDER");
 
@@ -39,49 +45,56 @@ void IsisMain() {
 
   //  Setup output cube
   CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-
+  
   // Set special pixel ranges
-  if(ui.GetBoolean("SETNULLRANGE")) {
+  if (ui.GetBoolean("SETNULLRANGE")) {
     null_min = ui.GetDouble("NULLMIN");
     null_max = ui.GetDouble("NULLMAX");
   }
-  if(ui.GetBoolean("SETHRSRANGE")) {
+  
+  if (ui.GetBoolean("SETHRSRANGE")) {
     hrs_min = ui.GetDouble("HRSMIN");
     hrs_max = ui.GetDouble("HRSMAX");
   }
-  if(ui.GetBoolean("SETLRSRANGE")) {
+  if (ui.GetBoolean("SETLRSRANGE")) {
     lrs_min = ui.GetDouble("LRSMIN");
     lrs_max = ui.GetDouble("LRSMAX");
   }
 
+  
   fin.open(from.toAscii().data(), std::ios::in);
-  if(!fin.is_open()) {
+  if (!fin.is_open()) {
     QString msg = "Cannot open input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
+  
   //  Skip header information if it exists
   fin.seekg(skip, std::ios::beg);
 
+  
   //  Set up process depending on order
-  if(order == "BSQ") {
+  if (order == "BSQ") {
     ProcessByLine p;
 
+    
     p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }
-  if(order == "BIL") {
+  if (order == "BIL") {
     ProcessBySpectra p(Isis::ProcessBySpectra::ByLine);
 
+    
     // Set Special Pixel ranges
     p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }
-  if(order == "BIP") {
+  if (order == "BIP") {
     ProcessBySpectra p(Isis::ProcessBySpectra::PerPixel);
 
+    
     p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
@@ -93,13 +106,22 @@ void IsisMain() {
 void ascii2isis(Buffer &out) {
   //Define all legal characters for the beginning of a number
   const string legal = ".0123456789+-";
-  for(int i = 0; i < out.size(); i++) {
-    fin >> out[i];
-    out[i] = TestSpecial(out[i]);
+
+    
+  for (int i = 0; i < out.size(); i++) {
+    
     //Discard all nonlegal characters
-    while((legal.find(fin.peek()) == string::npos) && !fin.eof()) {
+    while ((legal.find(fin.peek()) == string::npos) && !fin.eof()) {
       fin.ignore();
+    }  
+    
+    fin >> out[i];
+    if (!fin && fin.eof()) {
+      QString msg = "End of file reached. There is not enough data in [" + from;
+      msg += "] to fill the output cube.";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
+    out[i] = TestSpecial(out[i]);
   }
 }
 
@@ -115,13 +137,13 @@ void ascii2isis(Buffer &out) {
   *         special pixel.
   */
 double TestSpecial(const double pixel) {
-  if(pixel <= null_max && pixel >= null_min) {
+  if (pixel <= null_max && pixel >= null_min) {
     return Isis::NULL8;
   }
-  else if(pixel <= hrs_max && pixel >= hrs_min) {
+  else if (pixel <= hrs_max && pixel >= hrs_min) {
     return Isis::HIGH_REPR_SAT8;
   }
-  else if(pixel <= lrs_max && pixel >= lrs_min) {
+  else if (pixel <= lrs_max && pixel >= lrs_min) {
     return Isis::LOW_REPR_SAT8;
   }
   else {
