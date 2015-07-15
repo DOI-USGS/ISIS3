@@ -84,6 +84,10 @@
     <change name="Jeffrey Covington" date="2015-01-27">
       Removed unreachable code.
     </change>
+    <change name="Makayla Shepherd and Andrew Stebenne" date="2015-07-14">
+      Updated to fix a crash that occurs when invalid files are passed in as parameters. 
+      Fixes #1025.
+    </change>
   </history>
 
   <category>
