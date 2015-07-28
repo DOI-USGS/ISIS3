@@ -27,19 +27,69 @@ void IsisMain() {
   Process p;
   UserInterface &ui = Application::GetUserInterface();
   FileList cubeList(ui.GetFileName("FROMLIST"));
+  FileList newcubeList; //cubes with at least 1 non-TRACKING band
+  QList<vector<QString> > newVirtualBands; //non-TRACKING bands to propagate
+
+  //Results group to contain information about unpropagated TRACKING bands
+  PvlGroup results("Results"); 
 
   // Loop through the list
   int nsamps(0), nlines(0), nbands(0);
   PvlGroup outBandBin("BandBin");
   try {
     for(int i = 0; i < cubeList.size(); i++) {
+      vector<QString> newBands; 
       Cube cube;
       CubeAttributeInput inatt(cubeList[i].original()); 
       vector<QString> bands = inatt.bands();
       cube.setVirtualBands(bands);
-      cube.open(cubeList[i].toString());
+      cube.open(cubeList[i].toString()); 
 
-      if(i == 0) {
+      if( cube.hasTable("InputImages") ) {
+        //search through band bin group of input cube for "TRACKING"
+        PvlObject cubeLabel =cube.label()->findObject("IsisCube");
+        PvlGroup bandbin = cubeLabel.findGroup("BandBin");
+
+        //Different cubes use either FilterName or FilterNumber in the BandBin group
+        //to refer to the same thing: a list of the numbers/names of each band, in order
+        PvlKeyword filterName; 
+        if( bandbin.hasKeyword("FilterName") ){
+          filterName = bandbin.findKeyword("FilterName"); 
+        }
+        else if ( bandbin.hasKeyword("FilterNumber")) {
+          filterName = bandbin.findKeyword("FilterNumber"); 
+        } 
+        else {
+            QString msg = "The BandBin group of a cube with tracking information [" +
+                        cubeList[i].toString() + "] does not have a FilterName or a FilterNumber.";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
+
+        for (int j = 0; j < filterName.size(); j++) {
+          if (filterName[j] != "TRACKING") {
+            newBands.push_back(QString::number(j+1)); 
+          } 
+          else {
+            QString msg = "TRACKING band not propagated from " + cubeList[i].toString();
+            results += PvlKeyword("UnpropagatedBand", msg);
+          }
+        }
+
+        //if there are some bands that aren't TRACKING, set the cube to use those
+        if (newBands.size() > 0) {
+          cube.close(); 
+          cube.setVirtualBands(newBands); 
+          cube.open(cubeList[i].toString()); 
+        }
+        //if the only provided bands are TRACKING, don't use this cube at all
+        else {
+          cube.close(); 
+          continue;
+        }
+      }
+
+      //initialize ns, nl, nb if we're at our first non-tracking cube
+      if(newcubeList.size() == 0) { 
         nsamps = cube.sampleCount();
         nlines = cube.lineCount();
         nbands = cube.bandCount();
@@ -73,11 +123,23 @@ void IsisMain() {
         }
       }
       cube.close();
+      newVirtualBands.append(newBands); 
+      newcubeList.append(cubeList[i]);
+    }
+    //Only write out results group if we added something to it. 
+    if (results.hasKeyword("UnpropagatedBand")) {
+      Application::Log(results); 
     }
   }
   catch(IException &e) {
     QString msg = "Invalid cube in list file [" + ui.GetFileName("FROMLIST") + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
+  }
+
+  //if literally everything is a TRACKING band, throw an error, since we don't prop. TRACKING bands
+  if (newcubeList.size() == 0) {
+    QString msg = "Only TRACKING bands supplied in [" + ui.GetFileName("FROMLIST") + "]";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Setup to propagate from the first input cube
@@ -102,7 +164,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  p2.SetInputCube(cubeList[index].toString(), inatt);
+  p2.SetInputCube(newcubeList[index].toString(), inatt);
 
   // Create the output cube
   Cube *ocube = p2.SetOutputCube("TO", nsamps, nlines, nbands);
@@ -115,25 +177,51 @@ void IsisMain() {
   if(outBandBin.keywords() > 0) {
     ocube->putGroup(outBandBin);
   }
-  p2.EndProcess();
 
-  // Now loop and mosaic in each cube
+  // Delete any tracking tables from the input label if necessary
+  if (ocube->hasTable("InputImages")) {
+    ocube->deleteBlob("Table", "InputImages"); 
+  }
+
+  p2.EndProcess(); 
+  
+ // Now loop and mosaic in each cube
   int sband = 1;
-  for(int i = 0; i < cubeList.size(); i++) {
+  for(int i = 0; i < newcubeList.size(); i++) {
     ProcessMosaic m;
     m.SetBandBinMatch(false);
 
     Progress *prog = m.Progress();
-    prog->SetText("Adding band " + toString((int)i + 1) +
-                  " of " + toString(nbands));
+    prog->SetText("Adding bands from Cube " + toString((int)i + 1) +
+                  " of " + toString(newcubeList.size()));
     m.SetOutputCube("TO");
-    CubeAttributeInput attrib(cubeList[i].original()); 
-    Cube *icube = m.SetInputCube(cubeList[i].toString(), attrib);
+
+    //update attributes to the input cube
+    CubeAttributeInput attrib; 
+
+    if (newVirtualBands.at(i).size() == 0) {
+      
+      attrib.addAttributes(newcubeList[i]);
+
+    } else {
+
+      for(unsigned k=0; k < newVirtualBands.at(i).size(); k++) {
+        attrib.addAttribute(newVirtualBands.at(i)[k]); 
+      }
+    }
+ 
+    Cube *icube = m.SetInputCube(newcubeList[i].toString(), attrib);
+
+    // Delete any tracking tables from the input cube if necessary
+    if (icube->hasTable("InputImages")) {
+      icube->deleteBlob("Table", "InputImages"); 
+    }
+    
     m.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
     m.StartProcess(1, 1, sband);
     sband += icube->bandCount();
     m.EndProcess();
-  }
+  } 
 }
 
 // Line processing routine
@@ -154,3 +242,5 @@ void helperButtonLog() {
     Application::GuiLog(line);
   }
 }
+
+
