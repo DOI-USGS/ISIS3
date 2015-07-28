@@ -36,7 +36,7 @@ commands:
 
 #    Remove Paths
 	$(SED) 's+\[/.*/input/+\[input/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error_temp2.txt;
-	$(SED) 's+\[/.*/output/+\[output/+' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
+	$(SED) 's+\[/.*/output/+\[output/+' $(OUTPUT)/error_temp2.txt > $(OUTPUT)/error.txt;
 
 #    Cleanup
 	$(RM) $(OUTPUT)/error_temp.txt; 
