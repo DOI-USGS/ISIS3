@@ -11,8 +11,12 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
-   *   @history 2011-04-25 Steven Lambright Fixed a problem where 1 too few
+   *   @history 2011-04-25 Steven Lambright - Fixed a problem where 1 too few
    *                       lines were being read
+   *   @history 2015-06-30 Makayla Shepherd and Ian Humphrey - Modified stop() to keep the viewport
+   *                       buffer object from reading an extra line at the bottom of the viewport 
+   *                       rectangle. This could potentially cause a crash from reading outside of 
+   *                       the bounds. Fixes #2171.
    */
   class ViewportBufferFill : public ViewportBufferAction {
     public:

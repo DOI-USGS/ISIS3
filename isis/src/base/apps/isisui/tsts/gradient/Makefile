@@ -7,4 +7,5 @@ commands:
 	$(APPNAME) gradient \
 	  from=$(INPUT)/isisTruth.cub \
 	  to=isisTruthSample.cub \
-	  gradtype=sobel  > $(OUTPUT)/standardOutTruth2.pvl;
+	  gradtype=sobel \
+	  method=approximate  > $(OUTPUT)/standardOutTruth2.pvl;

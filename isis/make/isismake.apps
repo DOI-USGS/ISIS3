@@ -121,9 +121,9 @@ quickclean:  localclean
 clean:  localclean
 	$(RM) $(OBJS) $(BINS) $(PROTOSGEN) $(MOCGEN) `basename $(CURDIR)`.html \
 	  $(UIHEADERS) $(QTRESOURCEFILES) *.csexe *.csmes;                     \
-	$(RM) -r scopecoverage scopecoverage.html                              \
-	         linecoverage linecoverage.html                                \
-	         functioncoverage functioncoverage.html;                       \
+	$(RM) -r scopecoverage scopecoverage.html scopecoverage_html           \
+	         linecoverage linecoverage.html linecoverage_html              \
+	         functioncoverage functioncoverage.html functioncoverage_html; \
 	if [ -d "tsts" ];                                                      \
 	then                                                                   \
 	  if [ -f "tsts/Makefile" ];                                           \

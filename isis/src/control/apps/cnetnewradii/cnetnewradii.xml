@@ -79,6 +79,10 @@
       Skip edit locked points, keep count for summary.  Added appTest for edit 
       locked points.
     </change>
+    <change name="David L Miller" date="2015-06-29">
+      Updated Makefile to be closer to new Isis coding standards and fixed bug where test data
+      coming from directories that don't start with "/usgs/" would not be found.
+    </change>
   </history>
 
   <groups>

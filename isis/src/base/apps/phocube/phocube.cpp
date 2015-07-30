@@ -42,6 +42,11 @@ bool subSpacecraftGroundAzimuth;
 bool subSolarGroundAzimuth;
 bool morphology;
 bool albedo;
+bool ra;
+bool declination;
+bool bodyFixedX;
+bool bodyFixedY;
+bool bodyFixedZ;
 
 void phocubeDN(Buffer &in, Buffer &out);
 void phocube(Buffer &out);
@@ -122,23 +127,33 @@ void IsisMain() {
   morphology = false;
   albedo = false;
   northAzimuth = false;
+  ra = false;
+  declination = false;
+  bodyFixedX = false;
+  bodyFixedY = false;
+  bodyFixedZ = false;
   if (!noCamera) {
-    if((phase = ui.GetBoolean("PHASE"))) nbands++;
-    if((emission = ui.GetBoolean("EMISSION"))) nbands++;
-    if((incidence = ui.GetBoolean("INCIDENCE"))) nbands++;
-    if((localEmission = ui.GetBoolean("LOCALEMISSION"))) nbands++;
-    if((localIncidence = ui.GetBoolean("LOCALINCIDENCE"))) nbands++;
-    if((lineResolution = ui.GetBoolean("LINERESOLUTION"))) nbands++;
-    if((sampleResolution = ui.GetBoolean("SAMPLERESOLUTION"))) nbands++;
-    if((detectorResolution = ui.GetBoolean("DETECTORRESOLUTION"))) nbands++;
-    if((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
-    if((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
-    if((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
-    if((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
-    if((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
+    if ((phase = ui.GetBoolean("PHASE"))) nbands++;
+    if ((emission = ui.GetBoolean("EMISSION"))) nbands++;
+    if ((incidence = ui.GetBoolean("INCIDENCE"))) nbands++;
+    if ((localEmission = ui.GetBoolean("LOCALEMISSION"))) nbands++;
+    if ((localIncidence = ui.GetBoolean("LOCALINCIDENCE"))) nbands++;
+    if ((lineResolution = ui.GetBoolean("LINERESOLUTION"))) nbands++;
+    if ((sampleResolution = ui.GetBoolean("SAMPLERESOLUTION"))) nbands++;
+    if ((detectorResolution = ui.GetBoolean("DETECTORRESOLUTION"))) nbands++;
+    if ((sunAzimuth = ui.GetBoolean("SUNAZIMUTH"))) nbands++;
+    if ((spacecraftAzimuth = ui.GetBoolean("SPACECRAFTAZIMUTH"))) nbands++;
+    if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
+    if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
+    if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
     if ((morphology = ui.GetBoolean("MORPHOLOGY"))) nbands++; 
     if ((albedo = ui.GetBoolean("ALBEDO"))) nbands++; 
     if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++; 
+    if ((ra = ui.GetBoolean("RADEC"))) nbands++;
+    if ((declination = ui.GetBoolean("RADEC"))) nbands++;
+    if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
+    if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
+    if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
   }
   if((dn = ui.GetBoolean("DN"))) nbands++;
   if((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
@@ -167,25 +182,30 @@ void IsisMain() {
   // Create a bandbin group for the output label
   PvlKeyword name("Name");
   if (dn) name += bname;
-  if(phase) name += "Phase Angle";
-  if(emission) name += "Emission Angle";
-  if(incidence) name += "Incidence Angle";
-  if(localEmission) name += "Local Emission Angle";
-  if(localIncidence) name += "Local Incidence Angle";
-  if(latitude) name += "Latitude";
-  if(longitude) name += "Longitude";
-  if(pixelResolution) name += "Pixel Resolution";
-  if(lineResolution) name += "Line Resolution";
-  if(sampleResolution) name += "Sample Resolution";
-  if(detectorResolution) name += "Detector Resolution";
-  if(northAzimuth) name += "North Azimuth";
-  if(sunAzimuth) name += "Sun Azimuth";
-  if(spacecraftAzimuth) name += "Spacecraft Azimuth";
-  if(offnadirAngle) name += "OffNadir Angle";
-  if(subSpacecraftGroundAzimuth) name += "Sub Spacecraft Ground Azimuth";
-  if(subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
+  if (phase) name += "Phase Angle";
+  if (emission) name += "Emission Angle";
+  if (incidence) name += "Incidence Angle";
+  if (localEmission) name += "Local Emission Angle";
+  if (localIncidence) name += "Local Incidence Angle";
+  if (latitude) name += "Latitude";
+  if (longitude) name += "Longitude";
+  if (pixelResolution) name += "Pixel Resolution";
+  if (lineResolution) name += "Line Resolution";
+  if (sampleResolution) name += "Sample Resolution";
+  if (detectorResolution) name += "Detector Resolution";
+  if (northAzimuth) name += "North Azimuth";
+  if (sunAzimuth) name += "Sun Azimuth";
+  if (spacecraftAzimuth) name += "Spacecraft Azimuth";
+  if (offnadirAngle) name += "OffNadir Angle";
+  if (subSpacecraftGroundAzimuth) name += "Sub Spacecraft Ground Azimuth";
+  if (subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
   if (morphology) name += "Morphology";
   if (albedo) name += "Albedo";
+  if (ra) name += "Right Ascension";
+  if (declination) name += "Declination";
+  if (bodyFixedX) name += "Body Fixed X";
+  if (bodyFixedY) name += "Body Fixed Y";
+  if (bodyFixedZ) name += "Body Fixed Z";
 
 
   // Create the output cube.  Note we add the input cube to expedite propagation
@@ -390,7 +410,36 @@ void phocube(Buffer &out) {
           out[index] = mosd.m_albedo;
           index += 64 * 64;
         }
-
+        
+        if (ra) {
+          out[index] = cam->RightAscension();
+          index += 64 * 64;
+        }
+        
+        if (declination) {
+          out[index] = cam->Declination();
+          index += 64 * 64;
+        }
+        
+        
+        if (!noCamera) {
+          double pB[3];
+          cam->Coordinate(pB);
+          if (bodyFixedX) {
+          out[index] = pB[0];
+          index += 64 * 64;
+          }
+        
+          if (bodyFixedY) {
+            out[index] = pB[1];
+            index += 64 * 64;
+          }
+          if (bodyFixedZ) {
+            out[index] = pB[2];
+            index += 64 * 64;
+          }
+        }
+        
       }
       // Trim outerspace
       else {

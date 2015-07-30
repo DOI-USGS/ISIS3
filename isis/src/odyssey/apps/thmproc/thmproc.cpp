@@ -14,6 +14,43 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+  if(ui.WasEntered("PCK")) {
+    FileName pckPreference = ui.GetFileName("PCK");
+    if(!pckPreference.fileExists()){
+      QString msg = "Please provide a valid PCK preference file.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+  
+  if(ui.WasEntered("CK")) {
+    FileName ckPreference = ui.GetFileName("CK");
+    if(!ckPreference.fileExists()){
+      QString msg = "Please provide a valid CK preference file.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+  
+  if(ui.WasEntered("SPK")) {
+    FileName spkPreference = ui.GetFileName("SPK");
+    if(!spkPreference.fileExists()){
+      QString msg = "Please provide a valid SPK preference file.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+  if(ui.WasEntered("MAP")) {
+    FileName mapPreference = ui.GetFileName("MAP");
+    if(!mapPreference.fileExists()){
+      QString msg = "Please provide a valid MAP preference file.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+  if(ui.WasEntered("MODEL")) {
+    FileName modelPreference = ui.GetFileName("MODEL");
+    if(!modelPreference.fileExists()){
+      QString msg = "Please provide a valid MODEL preference file.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
   if(ui.GetBoolean("INGESTION")) {
     Pvl labels(ui.GetFileName("FROM"));
 
@@ -40,6 +77,8 @@ void ProcessVis(bool isRdr) {
 
   p.SetInputFile("FROM", "BANDS");
   p.SetOutputFile("TO");
+  // Set continue to false so that we know if something fails
+  p.SetContinue(false);
   p.KeepTemporaryFiles(!ui.GetBoolean("REMOVE"));
 
   p.AddToPipeline("thm2isis");
@@ -113,6 +152,8 @@ void ProcessIr() {
   p.SetOutputFile("TO");
 
   p.KeepTemporaryFiles(!ui.GetBoolean("REMOVE"));
+  // Set continue to false so that we know if something fails
+  p.SetContinue(false);
 
   p.AddToPipeline("thm2isis");
   p.Application("thm2isis").SetInputParameter("FROM", false);

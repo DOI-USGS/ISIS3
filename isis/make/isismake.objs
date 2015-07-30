@@ -231,9 +231,9 @@ clean:  localclean
 	  $(UIHEADERS) $(ARCHIVELIB) $(SHAREDLIB) libisis$(ISISLIBVERSION).a  \
 	  libisis$(ISISLIBVERSION).so libisis$(ISISLIBVERSION).dylib          \
 	  unitTest.output;                                                    \
-	$(RM) -rf html scopecoverage scopecoverage.html                       \
-	  linecoverage linecoverage.html functioncoverage                     \
-	  functioncoverage.html .objs *.csexe *.csmes
+	$(RM) -rf html scopecoverage scopecoverage.html scopecoverage_html    \
+	  linecoverage linecoverage.html linecoverage_html functioncoverage   \
+	  functioncoverage.html functioncoverage_html .objs *.csexe *.csmes
 
 localclean:
 	if [ "$(findstring cleanlocal,$(shell $(GREP) cleanlocal Makefile))" = "cleanlocal" ]; \

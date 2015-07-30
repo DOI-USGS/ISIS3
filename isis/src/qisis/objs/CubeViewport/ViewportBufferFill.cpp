@@ -96,7 +96,7 @@ namespace Isis {
    * Cancels the current operation. Stops filling ASAP.
    */
   void ViewportBufferFill::stop() {
-    p_rect->setBottom(p_requestPosition);
+    p_rect->setBottom(p_requestPosition - 1);
   }
 
 

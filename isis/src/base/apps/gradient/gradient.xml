@@ -8,15 +8,18 @@
 
   <description>
     This program will apply a Sobel or Roberts gradient filter to a cube.
-    These gradient filters will highlight edges of the image.  The output
-    contains the estimated, absolute magnitude of the spatial gradient of the
-    input cube.
-    NOTE: Any time a calculation must be done where one or more values are
-    special pixels, the output will simply be NULL. If this causes unexpected
-    results, you may need to run stretch to change input special pixels to 
-    something that is appropriate for calculation. For example, if the image
-    contains a number of HIS values, you may want to stretch these to 255
-    prior to running the gradient filter.
+    These gradient filters will highlight edges of an image. Gradient filters typically are used
+    to highlight the differences in the brightness of adjacent pixels in a cube, and also the 
+    edges of the transitions in the image data.
+    The output will contain the calculated magnitude of the spatial graident of the input cube.
+    The calculation method can be set to either exact or approximate and can be 
+    specified with the 'METHOD' parameter. 
+    NOTE: When a calculation must be done where one or more values are
+    special pixels, the output will be NULL. If this causes unexpected
+    results, you can run <i>stretch</i> to change ithe input special pixel(s) to 
+    a <def link="Digital Number">Digital Number (DN)</def> that is appropriate for calculation. 
+    For example, if the image contains <def link="HIS">High Instrument Saturation (HIS)</def> 
+    values, you may choose to stretch these to 255 prior to running the gradient filter.
   </description>
 
   <history>
@@ -37,6 +40,11 @@
     </change>
     <change name="Brendan George" date="2005-11-07">
       Modified to handle Special Pixels
+    </change>
+    <change name="Ian Humphrey" date="2015-05-18">
+      Added METHOD parameter to allow for either exact or approximate 
+      calculation of the gradient magnitude. Updated and added tests.
+      Updated documentation. Fixes #1741.
     </change>
   </history>
 
@@ -69,13 +77,13 @@
           Output cube
         </brief>
         <description>
-          This file will contain the estimated absolute magnitude of the
-	  gradient.
+          This file will contain the estimated or exact absolute magnitude of 
+          the gradient.
         </description>
       </parameter>
     </group>
 
-    <group name="Gradient Type">
+    <group name="Gradient Settings">
       <parameter name="GRADTYPE">
         <type>string</type>
         <brief>Type of gradient (Sobel, Roberts)</brief>
@@ -84,53 +92,96 @@
         </default>
         <description>
           This chooses the gradient type.  The possibilities
-          are: Sobel which uses a 3 x 3 kernal or Roberts which uses a
-	  2 x 2 kernel.
+          are Sobel, which uses a 3 x 3 boxcar to calculate the gradient magnitude, 
+          or Roberts, which uses a 2 x 2 boxcar to calculate the gradient magnitudes.
         </description>
         <list>
           <option value="SOBEL">
             <brief>Sobel gradient (3x3)</brief>
             <description>
-              <!--pre>
-            The Sobel gradient uses a 3 x 3 kernel which makes it slower,
-            but less susceptible to noise, and it will also create higher
-            output for edges than the Roberts gradient.
+            The Sobel gradient uses a 3 x 3 boxcar that makes the gradient calculation slow 
+            but less susceptible to noise. It will also create higher output for edges than 
+            the Roberts gradient.
+            <!--pre>
 
-            Equation for Sobel gradient based on these input pixels:
-                                                IP1 IP2 IP3
-                   Input (3x3 boxcar):  IP4 IP5 IP6
-                                                IP7 IP8 IP9
-
-              out = |(IP1 + (2*IP2) + IP3) - (IP7 + (2*IP8) + IP9)|
-                          + |(IP3 + (2*IP6) + IP9) - (IP1 + (2*IP4) + IP7)|
-
-              Uses the following 3x3 kernels to calculate the gradient.
+            The following 3x3 boxcars estimate the gradient magnitudes in the vertical and 
+            horizontal directions for each point in the image: 
 
                       -1  0  1             1  2  1
-                Gx =  -2  0  2       Gy =  0  0  0
-                          -1  0  1            -1 -2 -1
+                G<sub>x</sub> =  -2  0  2       G<sub>y</sub> =  0  0  0
+                      -1  0  1            -1 -2 -1
+
+            These estimated gradient magnitudes can then be used to calculate the gradient
+            magnitude for each point in the image:
+           
+                G = sqrt(G<sub>x</sub><sup>2</sup> + G<sub>y</sub><sup>2</sup>)  (EXACT)
+                G = |G<sub>x</sub> + G<sub>y</sub>|        (APPROXIMATE)
+
+            Here is an equation for an approximate Sobel gradient based on the following input pixels:
+
+                                             P<sub>1</sub> P<sub>2</sub> P<sub>3</sub>
+                Input (3x3 boxcar):          P<sub>4</sub> <strong>P<sub>5</sub></strong> P<sub>6</sub>
+                                             P<sub>7</sub> P<sub>8</sub> P<sub>9</sub>
+
+                out(<strong>P<sub>5</sub></strong>) = |(P<sub>1</sub> + (2*P<sub>2</sub>) + P<sub>3</sub>) - (P<sub>7</sub> + (2*P<sub>8</sub>) + P<sub>9</sub>)|
+                        + |(P<sub>3</sub> + (2*P<sub>6</sub>) + P<sub>9</sub>) - (P<sub>1</sub> + (2*P<sub>4</sub>) + P<sub>7</sub>)|
               </pre-->
             </description>
           </option>
           <option value="ROBERTS">
             <brief>Roberts gradient (2x2)</brief>
             <description>
-              <!--pre>
-            The Roberts gradient uses a 2 x 2 kernel which makes it fast,
-            but sensitive to noise.  It also works best on sharp, obvious
-            edges.
+            The Roberts gradient uses a 2 x 2 boxcar that makes the gradient caluclation fast
+            but sensitive to noise.  It also works best on sharp, obvious edges.
 
+            <!--pre>
                     Equation for Roberts gradient based on these input pixels:
                                                 IP1 IP2
                    Input (3x3 boxcar):  IP3 IP4
 
                       out = |IP1 - IP4| + |IP2 - IP3|
 
-                Uses the following 2x2 kernels to calculate the gradient.
+                Uses the following 2x2 boxcars to calculate the gradient.
 
                     Gx =  1  0         Gy =  0  1
                                   0 -1              -1  0
-                  </pre-->
+            </pre-->
+            </description>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="METHOD">
+        <type>string</type>
+        <brief>Method for calculating the gradient (Approximate, Exact)</brief>
+        <default>
+          <item>APPROXIMATE</item>
+        </default>
+        <description>
+          This specifies how the gradient magnitudes are calculated. The possibilities are
+          exact, which uses the square root of the sum of squares, or approximate, which
+          uses the sum of absolutes.
+        </description>
+        <list>
+          <option value="APPROXIMATE">
+            <brief>Approximate the gradient magnitudes</brief>
+            <description>
+              An approximate calculation can be achieved using the sum of absolute values of the 
+              gradient components. This method is a bit faster than the exact calculation method. 
+              The approximate gradient magnitude is calculated as follows:
+              <pre>
+              G = |G<sub>x</sub>| + |G<sub>y</sub>|
+              </pre>
+            </description>
+          </option>
+          <option value="EXACT">
+            <brief>Calculate the exact values of the  gradient magnitudes</brief>
+            <description>
+              An exact calculation can be achieved using the square root of the sum of the squares
+              of the gradient components. This method is slower than the approximate calculation method.
+              The exact gradient magnitude is calculated as follows:
+              <pre>
+              G = sqrt(G<sub>x</sub><sup>2</sup> + G<sub>y</sub><sup>2</sup>)
+              </pre> 
             </description>
           </option>
         </list>

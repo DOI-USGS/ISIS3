@@ -115,6 +115,10 @@ namespace Isis {
    *   @history  2013-05-14 Tracie Sucharski - Add Qt::UniqueConnection to the connect statements
    *                          in ::resetList to prevent multiple connections between the ListWidget
    *                          and edit point slot and load cube slot.  Fixes #1655.
+   *   @history 2015-05-28 Makayla Shepherd and Ian Humphrey - When changing navigation types from
+   *                          Points to Cubes, and vice versa, and then back to the original type, 
+   *                          the filtered data is saved rather than forcing the user to refilter
+   *                          the data. Fixes #2144.
    *
    *
    */

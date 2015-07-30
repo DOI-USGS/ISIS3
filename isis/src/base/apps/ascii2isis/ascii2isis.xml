@@ -26,6 +26,10 @@
     <change name="Steven Koechle" date="2008-08-30">
         Added ability to change special pixel ranges. Added example.
     </change>
+    <change name="Makayla Shepherd" data="2015-07-15">
+        Fixed a problem with non-numeric cahracters in the file which resulted ascii2isis
+        hanging. Fixes #2066.
+    </change>
   </history>
 
 
