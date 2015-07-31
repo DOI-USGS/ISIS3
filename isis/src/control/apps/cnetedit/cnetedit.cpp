@@ -150,7 +150,7 @@ void IsisMain() {
     cubeSnl = new SerialNumberList(ignorelistFileName);
   }
 
-  // List has Cube file names
+  // List has measurelist file names
   bool processMeasures = false;
   QMap< QString, QSet<QString> * > *editMeasures = NULL;
   if (ui.WasEntered("MEASURELIST") && cnet.GetNumPoints() > 0) {
@@ -217,12 +217,12 @@ void IsisMain() {
       else {
         for (int cm = point->GetNumMeasures() - 1; cm >= 0; cm--) {
           if (point->GetMeasure(cm)->IsIgnored()) {
-            if (cm == point->IndexOfRefMeasure()) {
-              // If the reference is ignored, the point must ignored too
+            if (cm == point->IndexOfRefMeasure() && ignoreAll) {
+              // If the reference is ignored and IgnoreAll is set, the point must ignored too
               ignorePoint(cnet, point, "Reference measure ignored");
             }
             else {
-              // Can't delete the reference without deleting the whole point
+              // Can't delete the reference without deleting the whole point when ignoreAll is true
               deleteMeasure(point, cm);
             }
           }
@@ -503,8 +503,7 @@ void populateLog(ControlNet &cnet, bool ignore) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
       if (measure->IsIgnored()) {
-        if (cm == point->IndexOfRefMeasure()) {
-          // If the reference is ignored, the point must be ignored too
+        if (cm == point->IndexOfRefMeasure() && ignoreAll) {
           if (ignore && !point->IsIgnored()) {
             ignorePoint(cnet, point, "Reference measure ignored");
           }
@@ -561,7 +560,7 @@ void ignorePoints(ControlNet &cnet, ControlPointList &cpList) {
 
     if (deleteIgnored) {
       //look for previously ignored control points
-      if (point->IsIgnored() || point->GetRefMeasure()->IsIgnored()) {
+      if (point->IsIgnored()) {
         deletePoint(cnet, cp);
       }
       else {
@@ -661,15 +660,14 @@ void ignoreCubes(ControlNet &cnet, SerialNumberList &snl) {
         else if (!measure->IsIgnored() || cm == point->IndexOfRefMeasure()) {
           ignoreMeasure(cnet, point, measure, cause);
 
-          if (cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
+          if (cm == point->IndexOfRefMeasure() && !point->IsIgnored() && ignoreAll) {
             ignorePoint(cnet, point, "Reference measure ignored");
           }
         }
       }
 
       //also look for previously ignored control measures
-      if (deleteIgnored && measure->IsIgnored() &&
-          cm != point->IndexOfRefMeasure()) {
+      if (deleteIgnored && measure->IsIgnored()) {
         deleteMeasure(point, cm);
       }
     }
@@ -768,7 +766,7 @@ void ignoreMeasures(ControlNet &cnet,
           else if (!measure->IsIgnored() || cm == point->IndexOfRefMeasure()) {
             ignoreMeasure(cnet, point, measure, cause);
 
-            if (cm == point->IndexOfRefMeasure() && !point->IsIgnored()) {
+            if (cm == point->IndexOfRefMeasure() && !point->IsIgnored() && ignoreAll) {
               ignorePoint(cnet, point, "Reference measure ignored");
             }
           }
@@ -885,7 +883,7 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
           else {
             ignoreMeasure(cnet, point, measure, cause);
 
-            if (measure == point->GetRefMeasure()) {
+            if (measure == point->GetRefMeasure() && ignoreAll) {
               ignorePoint(cnet, point, "Reference measure ignored");
             }
           }
@@ -904,8 +902,7 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
       // Also look for previously ignored control measures
-      if (deleteIgnored && measure->IsIgnored() &&
-          measure != point->GetRefMeasure()) {
+      if (deleteIgnored && measure->IsIgnored()) { //got rid of "never delete ref measures"
         deleteMeasure(point, cm);
       }
     }
