@@ -902,7 +902,7 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
       // Also look for previously ignored control measures
-      if (deleteIgnored && measure->IsIgnored()) { //got rid of "never delete ref measures"
+      if (deleteIgnored && measure->IsIgnored()) {
         deleteMeasure(point, cm);
       }
     }
