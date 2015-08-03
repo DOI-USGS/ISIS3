@@ -14,7 +14,7 @@
 #include "PolynomialUnivariate.h"
 #include "IString.h"
 #include "IException.h"
-
+#include "NaifStatus.h"
 
 namespace Isis {
   /**
@@ -306,9 +306,11 @@ namespace Isis {
 
     std::vector<double> TC(9);
 
+    NaifStatus::CheckErrors();
     eul2m_c((SpiceDouble) 0., (SpiceDouble) angle2, (SpiceDouble) angle1,
             3,                    2,                    1,
             (SpiceDouble( *) [3]) &TC[0]);
+    NaifStatus::CheckErrors();
 
     return (TC);
   }

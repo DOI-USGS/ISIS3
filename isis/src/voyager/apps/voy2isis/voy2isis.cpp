@@ -126,6 +126,7 @@ void ConvertComments(FileName file) {
  * @param ocube Pointer to output cube
  * @internal
  *   @history 2009-03-11 Jeannie Walldren - Original Version
+ *   @history 2015-07-22 Kristin Berry - Added NaifStatus::CheckErrors()
  */
 void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Get the directory where the Voyager translation tables are
@@ -397,5 +398,6 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
                     + ".template.cub");
   res += PvlKeyword("Status", "Nominal");
   ocube->putGroup(res);
+  NaifStatus::CheckErrors();   
 }
 

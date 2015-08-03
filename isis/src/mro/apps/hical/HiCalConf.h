@@ -88,6 +88,8 @@ namespace Isis {
    *          acceptable distances
    * @history 2010-04-16 Kris Becker Added abstracted method, getChannelIndex(),
    *          to compute the new CcdChannelIndex keyword.
+   * @history 2015-07-31 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors 
+   *          were signaled. References #2248. 
    */
   class HiCalConf : public DbAccess { 
     public:

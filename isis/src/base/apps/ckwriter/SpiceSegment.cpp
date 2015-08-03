@@ -436,7 +436,9 @@ bool SpiceSegment::getFrameChains(Table &table, const int &leftBase,
 
 QString SpiceSegment::getFrameName(int frameid) const {
   SpiceChar frameBuf[40];
+  NaifStatus::CheckErrors();
   frmnam_c ( (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
+  NaifStatus::CheckErrors();
   return (QString(frameBuf));
 }
 
@@ -548,7 +550,9 @@ SpiceSegment::SMatrix SpiceSegment::computeChainRotation(
      QString CtoId = getFrameName(toId);
 //     cout << "FromFrame: " << CfromId << ", ToFrame: " << CtoId << "\n";
      SMatrix left = computeStateRotation(CtoId, CfromId, etTime);
+     NaifStatus::CheckErrors();
      mxmg_c(left[0], state[0], 6, 6, 6, state[0]);
+     NaifStatus::CheckErrors();
      toId = fromId;
    }
   }
@@ -615,6 +619,7 @@ SpiceSegment::SVector SpiceSegment::convertTimes(
                                           int sclkCode,
                                           const SpiceSegment::SVector &etTimes
                                                 ) {
+  NaifStatus::CheckErrors();
   SVector sclks(size(etTimes));
   for ( int i  = 0 ; i < size(etTimes) ; i++ ) {
     sce2c_c(sclkCode, etTimes[i], &sclks[i]);
@@ -629,6 +634,7 @@ SpiceSegment::SVector SpiceSegment::convertTimes(
   _utcStartTime = toUTC(startTime());
   _utcEndTime   = toUTC(endTime());
 
+  NaifStatus::CheckErrors();
   return (sclks);
 }
 
@@ -659,6 +665,7 @@ void SpiceSegment::convert(const SpiceSegment::SMatrix &quats,
       avOut = ckAvvs[i];
     }
 
+    NaifStatus::CheckErrors();
     // Convert quaternion to rotation and then to state matrix
     q2m_c(quats[i], m);
     rav2xf_c(m, avIn, xform);
@@ -670,6 +677,7 @@ void SpiceSegment::convert(const SpiceSegment::SMatrix &quats,
     // Transform to output format
     xf2rav_c(xform, m, avOut);  // Transfers AV to output ckAvvs
     m2q_c(m, ckQuats[i]);       // Transfers quaternion
+    NaifStatus::CheckErrors();
   }
   return;
 }
@@ -866,20 +874,32 @@ SpiceSegment::SVector SpiceSegment::expand(int ntop, int nbot,
 
 double SpiceSegment::SCLKtoET(SpiceInt scCode, double sclk) const {
   SpiceDouble et;
+
+  NaifStatus::CheckErrors();
   sct2e_c(scCode, sclk, &et);
+  NaifStatus::CheckErrors();
+
   return (et);
 }
 
 double SpiceSegment::ETtoSCLK(SpiceInt scCode, double et) const {
   SpiceDouble sclk;
+
+  NaifStatus::CheckErrors();
   sce2c_c(scCode, et, &sclk);
+  NaifStatus::CheckErrors();
+
   return (sclk);
 }
 
 QString SpiceSegment::toUTC(const double &et) const {
   const int UTCLEN = 80;
   char utcout[UTCLEN];
+
+  NaifStatus::CheckErrors();
   et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
+  NaifStatus::CheckErrors();
+
   return (QString(utcout));
 }
 

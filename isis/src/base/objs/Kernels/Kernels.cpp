@@ -252,6 +252,7 @@ namespace Isis {
   int Kernels::Discover() {
     _kernels.clear();
     SpiceInt count;
+    NaifStatus::CheckErrors();
     ktotal_c("ALL", &count);
     int nfound(0);
     for (int i = 0 ; i < count ; i++) {
@@ -267,6 +268,7 @@ namespace Isis {
         nfound++;
       }
     }
+    NaifStatus::CheckErrors();
     return (nfound);
   }
 
@@ -346,7 +348,9 @@ namespace Isis {
    *
    */
   void Kernels::InitializeNaifKernelPool() {
+    NaifStatus::CheckErrors();
     kclear_c();
+    NaifStatus::CheckErrors();
     for (unsigned int i = 0 ; i < _kernels.size() ; i++) {
       _kernels[i].loaded = false;
     }
@@ -510,8 +514,12 @@ namespace Isis {
         SpiceChar source[128];
         SpiceInt  handle;
         SpiceBoolean found;
+
+        NaifStatus::CheckErrors();
         kinfo_c(_kernels[i].fullpath.toAscii().data(), sizeof(ktype), sizeof(source),
                  ktype,source, &handle, &found);
+        NaifStatus::CheckErrors();
+
         if (found == SPICETRUE) {
           if (!_kernels[i].loaded) nchanged++;
           _kernels[i].loaded = true;
@@ -1073,8 +1081,12 @@ namespace Isis {
         SpiceChar source[128];
         SpiceInt  handle;
         SpiceBoolean found;
+
+        NaifStatus::CheckErrors();
         kinfo_c(kf.fullpath.toAscii().data(), sizeof(ktype), sizeof(source), ktype,
                 source, &handle, &found);
+        NaifStatus::CheckErrors();
+
         if (found == SPICETRUE) {
           kf.loaded = true;
           kf.managed = false;

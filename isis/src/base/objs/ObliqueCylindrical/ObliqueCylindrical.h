@@ -76,6 +76,8 @@ namespace Isis {
    *                           standards. References #928.
    *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                           References #775.
+   *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                           were signaled. References #2248.
    */
   class ObliqueCylindrical : public Isis::TProjection {
     public:

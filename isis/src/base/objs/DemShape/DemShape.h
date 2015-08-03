@@ -47,6 +47,8 @@ namespace Isis {
    *                             to lower camel case. Added documentation. Ordered includes.
    *                             References #1181.
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
+   *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                             were signaled. References #2248.
    */
   class DemShape : public ShapeModel {
     public:

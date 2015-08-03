@@ -43,6 +43,8 @@ namespace Isis {
    * @internal
    *   @history 2005-11-15 Elizabeth Miller - Fixed problems caused by the split
    *                                          of the viking data area
+   *   @history 2015-07-22 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                                          were signaled. References #2248
    *
    */
   class CalParameters {

@@ -156,6 +156,7 @@ namespace Isis {
 
     double tol2 = tol * tol;
 
+    NaifStatus::CheckErrors();
     while (!done) {
         
       if (it > maxit) {
@@ -218,6 +219,7 @@ namespace Isis {
 
       it ++;
     } // end of while loop
+    NaifStatus::CheckErrors();
 
     return hasIntersection();
   }

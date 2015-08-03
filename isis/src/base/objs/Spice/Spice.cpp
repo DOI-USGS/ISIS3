@@ -1001,6 +1001,7 @@ namespace Isis {
       }
 
       storeValue(key, index, type, result);
+      NaifStatus::CheckErrors();
     }
     else {
       // Read from PvlObject that is our naif keywords

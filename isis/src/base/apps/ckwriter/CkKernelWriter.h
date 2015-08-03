@@ -54,7 +54,9 @@ class SpiceSegment;
  *
  * @author 2010-11-25 Kris Becker
  *
- * @internal
+ * @internal 
+ *     @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+ *          were signaled. References #2248.
  */
 class CkKernelWriter {
   public:

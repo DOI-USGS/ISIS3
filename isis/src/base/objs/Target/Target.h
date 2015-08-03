@@ -43,6 +43,8 @@ namespace Isis {
    * @author 2012-03-20 Debbie A. Cook
    *
    * @internal
+   *  @history 2015-07-31 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if any
+   *           NAIF errors were signaled. References #2248.
    */
   class Target {
     public:

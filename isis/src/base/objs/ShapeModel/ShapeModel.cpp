@@ -206,9 +206,10 @@ namespace Isis {
     // check if observer look vector intersects the target
     SpiceDouble intersectionPoint[3];
     SpiceBoolean intersected = false;
+
+    NaifStatus::CheckErrors();
     surfpt_c((SpiceDouble *) &observerBodyFixedPosition[0], lookB, a, b, c,
              intersectionPoint, &intersected);
-
     NaifStatus::CheckErrors();
     
     if (intersected) {

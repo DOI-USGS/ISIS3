@@ -43,6 +43,9 @@
     <change name="Stuart Sides" date="2012-05-05">
       Added Center and Width keywords to the BandBin group. 
     </change>
+    <change name="Kristin Berry" date="2015-07-22">
+      Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248
+    </change>
   </history>
 
   <category>

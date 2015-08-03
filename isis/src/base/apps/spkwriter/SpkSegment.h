@@ -60,7 +60,8 @@ class PvlObject;
  *                          References #1739.
  *   @history 2014-03-26 Kris Becker Added overlap() method to compare time
  *                          ranges of another SPK segment. References #1739.
- * 
+ *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors 
+ *                          were signaled. References #2248.
  */
 class SpkSegment : public SpiceSegment {
   public:

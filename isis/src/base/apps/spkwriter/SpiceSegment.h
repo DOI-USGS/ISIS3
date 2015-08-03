@@ -59,7 +59,8 @@ namespace Isis {
  * @history 2010-12-09 Kris Becker Added more documentation
  * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
  *                          coding standards. References #972.
- * 
+ * @history 2015-07-22 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors 
+ *                          were signaled. References #2248.
  */
 class SpiceSegment {
   public:

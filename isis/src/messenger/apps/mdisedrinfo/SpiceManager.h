@@ -53,6 +53,8 @@ namespace Isis {
    * @author 2007-08-19 Kris Becker
    *
    * @internal
+   * @history 2015-07-22 Kristin Berry -  Added NaifStatus::CheckErrors() to see if any NAIF errors 
+   *                       were signaled. References #2248.
    */
   class SpiceManager {
     public:

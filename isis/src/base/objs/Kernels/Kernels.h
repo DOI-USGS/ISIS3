@@ -105,6 +105,8 @@ namespace Isis {
    *                                     operator
    *   @history 2015-03-05 Kris Becker - Added support for DSK and meta kernels
    *                                     types. References #2035
+   *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                                     were signaled. References #2248.
    */
 class Kernels {
     public:

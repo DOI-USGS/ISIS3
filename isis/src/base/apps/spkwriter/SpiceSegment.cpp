@@ -355,6 +355,8 @@ void SpiceSegment::setEndTime(double et) {
  */
 QString SpiceSegment::getNaifName(int naifid) const {
   SpiceChar naifBuf[40];
+
+  NaifStatus::CheckErrors();
   frmnam_c ( (SpiceInt) naifid, sizeof(naifBuf), naifBuf);
   string cframe(naifBuf);
 
@@ -373,7 +375,7 @@ QString SpiceSegment::getNaifName(int naifid) const {
   //  throw iException::Message(iException::User, mess.c_str(), _FILEINFO_);
   }
 
-
+  NaifStatus::CheckErrors();
   return (cframe.c_str());
 }
 
@@ -381,14 +383,22 @@ QString SpiceSegment::getNaifName(int naifid) const {
 QString SpiceSegment::toUTC(const double &et) const {
   const int UTCLEN = 80;
   char utcout[UTCLEN];
+
+  NaifStatus::CheckErrors();
   et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
+  NaifStatus::CheckErrors();
+
   return (QString(utcout));
 }
 
 /** Converts a UTC time string to ET  */
 double SpiceSegment::UTCtoET(const QString &utc) const {
   SpiceDouble et;
+
+  NaifStatus::CheckErrors();
   utc2et_c(utc.toAscii().data(), &et);
+  NaifStatus::CheckErrors();
+
   return (et);
 }
 

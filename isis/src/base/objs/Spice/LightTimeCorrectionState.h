@@ -55,6 +55,9 @@ namespace Isis {
  * @history 2012-11-01 Kris Becker - Fixed isLightTimeCorrected() as it was
  *          returning exactly opposite what it should be.  References #1136.
  * @history 2012-12-04 Kris Becker - Corrected documentation 
+ * @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors 
+ *          were signaled. References #2248.
+ *                          
  */
   class LightTimeCorrectionState  {
     public:

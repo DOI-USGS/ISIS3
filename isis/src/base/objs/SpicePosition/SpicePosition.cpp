@@ -1874,6 +1874,7 @@ namespace Isis {
                                          double &lightTime) const {
 
     // First try getting the entire state (including the velocity vector)
+    NaifStatus::CheckErrors();
     hasVelocity = true;
     lightTime = 0.0;
     spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.toAscii().data(), 
@@ -1890,7 +1891,7 @@ namespace Isis {
       spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.toAscii().data(), 
                abcorr.toAscii().data(), (SpiceInt) observer, state, &lightTime);
     }
-
+    NaifStatus::CheckErrors();
     return;
   }
 

@@ -1090,8 +1090,8 @@ namespace Isis {
                                     const std::vector<double>& coeffAng3,
                                     const Source type) {
 
-     NaifStatus::CheckErrors();
-   Isis::PolynomialUnivariate function1(p_degree);
+    NaifStatus::CheckErrors();
+    Isis::PolynomialUnivariate function1(p_degree);
     Isis::PolynomialUnivariate function2(p_degree);
     Isis::PolynomialUnivariate function3(p_degree);
 
@@ -1120,8 +1120,8 @@ namespace Isis {
     p_et = -DBL_MAX;
     SetEphemerisTime(et);
 
-     NaifStatus::CheckErrors();
-   return;
+    NaifStatus::CheckErrors();
+    return;
   }
 
 
@@ -1804,9 +1804,11 @@ namespace Isis {
    *  @return Time-based rotation quaternion, CJ
    */
   std::vector<double> SpiceRotation::TimeBasedRotation() {
+    NaifStatus::CheckErrors();
     std::vector<double> q;
     q.resize(4);
     m2q_c((SpiceDouble( *)[3]) &p_CJ[0], &q[0]);
+    NaifStatus::CheckErrors();
     return q;
   }
 
@@ -2027,6 +2029,7 @@ namespace Isis {
 
    void SpiceRotation::SetEphemerisTimeMemcache() {
     // If the cache has only one rotation, set it
+    NaifStatus::CheckErrors();
 
     if (p_cache.size() == 1) {
       /*        p_quaternion = p_cache[0];*/
@@ -2081,6 +2084,7 @@ namespace Isis {
         vadd_c(v1, v2, (SpiceDouble *) &p_av[0]);
       }
     }
+    NaifStatus::CheckErrors();
    }
 
 
@@ -2091,6 +2095,7 @@ namespace Isis {
    //      spkez call.
 
    // Make sure the constant frame is loaded.  This method also does the frame trace.
+   NaifStatus::CheckErrors();
    if (p_timeFrames.size() == 0) InitConstantRotation(p_et);
 
    SpiceDouble stateJ[6];  // Position and velocity vector in J2000
@@ -2108,10 +2113,12 @@ namespace Isis {
             svJ,
             p_axisV,
             (SpiceDouble( *)[3]) &p_CJ[0]);
+   NaifStatus::CheckErrors();
   }
 
 
   void SpiceRotation::SetEphemerisTimeSpice() {
+   NaifStatus::CheckErrors();
    SpiceInt j2000 = J2000Code;
 
    SpiceDouble time = p_et + p_timeBias;
@@ -2191,6 +2198,8 @@ namespace Isis {
 
 
   void SpiceRotation::SetEphemerisTimePolyFunction() {
+   NaifStatus::CheckErrors();
+
    Isis::PolynomialUnivariate function1(p_degree);
    Isis::PolynomialUnivariate function2(p_degree);
    Isis::PolynomialUnivariate function3(p_degree);
@@ -2224,10 +2233,12 @@ namespace Isis {
      else
        ComputeAv();
    }
+   NaifStatus::CheckErrors();
   }
 
 
   void SpiceRotation::SetEphemerisTimePolyFunctionOverSpice() {
+    NaifStatus::CheckErrors();
     SetEphemerisTimeMemcache();
     std::vector<double> cacheAngles(3);
     std::vector<double> cacheVelocity(3);
@@ -2264,6 +2275,7 @@ namespace Isis {
    eul2m_c((SpiceDouble) angles[2], (SpiceDouble) angles[1], (SpiceDouble) angles[0],
            p_axis3,             p_axis2,              p_axis1,
            (SpiceDouble( *)[3]) &p_CJ[0]);
+   NaifStatus::CheckErrors();
   }
 
 

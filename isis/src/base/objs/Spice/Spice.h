@@ -266,6 +266,8 @@ namespace Isis {
    *                           instrumentBodyFixedVelocity methods. Fixes #1684.
    *   @history 2015-04-30 Stuart - Added an error check around the NAIF SPICE call scs2e_c in
    *                           getClockTime. Avoids a segfault. Fixes #2247.
+   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if any
+   *                           NAIF errors were signaled. References #2248.
    *                           
    */
   class Spice {

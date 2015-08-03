@@ -42,6 +42,7 @@
 #include "SpiceManager.h"
 #include "Target.h"
 #include "TProjection.h"
+#include "NaifStatus.h"
 
 using namespace std;
 
@@ -113,7 +114,11 @@ namespace Isis {
     PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
     SpiceInt tcode;
     SpiceBoolean found;
+
+    NaifStatus::CheckErrors(); 
     (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
+    NaifStatus::CheckErrors(); 
+
     if(found) return (true);
 
     if(makeValid) {
@@ -717,6 +722,8 @@ namespace Isis {
     SpiceInt scCode(-236), targCode(0);
     SpiceBoolean found;
     QString target(_camera->target()->name());
+
+    NaifStatus::CheckErrors();
     (void) bodn2c_c("MESSENGER", &scCode, &found);
     (void) bodn2c_c(target.toAscii().data(), &targCode, &found);
     if(!found) {
@@ -847,6 +854,8 @@ namespace Isis {
 
     //  Compute the norm and azimuth angle
     smear_magnitude = vnormg_c(smear, 2);
+    NaifStatus::CheckErrors();
+
     if(smear_magnitude == 0.0) {
       smear_azimuth = 0.0;
     }
@@ -960,6 +969,7 @@ namespace Isis {
     // Get NAIF body codes
     SpiceInt sc(-236), sun(10);
     SpiceBoolean found;
+    NaifStatus::CheckErrors(); 
     (void) bodn2c_c("MESSENGER", &sc, &found);
     (void) bodn2c_c("SUN", &sun, &found);
 
@@ -968,6 +978,7 @@ namespace Isis {
     SpiceDouble stateJ[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
     spkez_c(sc , rotate->EphemerisTime(), "J2000", "LT+S", sun, stateJ, &lt);
+    NaifStatus::CheckErrors(); 
 
     // Stage result and negate as it needs to be relative to Messenger
     vector<double> scvel;

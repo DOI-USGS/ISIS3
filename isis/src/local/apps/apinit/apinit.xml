@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<application name="apinit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="apinit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://137.227.237.157/Schemas/Application/application.xsd">
   <brief>
     Initialize aerial photo with interior and exterior orientation information.
   </brief>
@@ -26,6 +25,9 @@
   <history>
     <change name="Jeff Anderson" date="2013-11-15">
       Original Version
+    </change>
+    <change name="Kristin Berry" date="2015-07-22">
+       Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248.
     </change>
   </history>
 

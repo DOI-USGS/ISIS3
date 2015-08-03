@@ -34,6 +34,7 @@
 #include "LeastSquares.h"
 #include "Pvl.h"
 #include "TextFile.h"
+#include "NaifStatus.h"
 
 using namespace std;
 namespace Isis {
@@ -377,6 +378,7 @@ namespace Isis {
    * @param t iTime
    */
   void CalParameters::CalcSunDist(QString t) {
+    NaifStatus::CheckErrors();
     double sunv[3];
     SpiceDouble lt, et;
     FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
@@ -388,6 +390,7 @@ namespace Isis {
     utc2et_c(t.toAscii().data(), &et);
     spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
     p_dist1 = sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
+    NaifStatus::CheckErrors();
   }
 
 } // end namespace isis

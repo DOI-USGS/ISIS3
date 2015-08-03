@@ -60,6 +60,8 @@ namespace Isis {
    *                           and method hasEllipsoidIntersection().
    *                           Fixes Mantis ticket #1343
    *   @history 2015-04-30 Jeannie Backer - Added pure virtual isDEM() method. References #2243.
+   *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *            were signaled. References #2248.
    */
   class ShapeModel {
     public:

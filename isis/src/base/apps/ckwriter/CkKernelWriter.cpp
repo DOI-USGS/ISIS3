@@ -91,6 +91,7 @@ namespace Isis {
 
  void CkKernelWriter::open(const QString &kfile,
                            const QString &intCkName) {
+   NaifStatus::CheckErrors();
    FileName kf(kfile);
    if ( kf.fileExists() ) {
      QString full_kf = kf.expanded();
@@ -99,6 +100,8 @@ namespace Isis {
    SpiceInt  myHandle;
    ckopn_c(kf.expanded().toAscii().data(), intCkName.toAscii().data(), _comSize, &myHandle);
    _handle = myHandle;
+
+   NaifStatus::CheckErrors();
    return;
  }
 
@@ -164,7 +167,9 @@ namespace Isis {
  /** Close an opened kernel file */
  void CkKernelWriter::close() {
    if ( _handle != 0 ) {
+     NaifStatus::CheckErrors();
      ckcls_c(_handle);
+     NaifStatus::CheckErrors();
      _handle = 0;
    }
    return;

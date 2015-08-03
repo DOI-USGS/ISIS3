@@ -228,11 +228,13 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
   QString j2000 = getNaifName(1);  // ISIS stores in J2000
   if (j2000 != m_refFrame) {
     // cout << "FromFrame = " << j2000 << ", TOFrame = " << _refFrame << "\n";
+    NaifStatus::CheckErrors();
     for (int n = 0 ; n < nrecs ; n++) {
       SpiceDouble xform[6][6];
       sxform_c(j2000.toAscii().data(), m_refFrame.toAscii().data(), epochs[n], xform);
       mxvg_c(xform, states[n], 6, 6, states[n]);
     }
+    NaifStatus::CheckErrors();
   }
 
   return;
