@@ -753,17 +753,17 @@ namespace Isis {
     PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
     QString lonDir = isisLonDir[0];
     lonDir = lonDir.toUpper();
-    if(lonDir == "POSITIVEEAST") {
+    if (inputMapping.hasKeyword("MaximumLongitude") && inputMapping.hasKeyword("MinimumLongitude")) {
       double maxLon = inputMapping.findKeyword("MaximumLongitude");
-      pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(maxLon));
       double minLon = inputMapping.findKeyword("MinimumLongitude");
-      pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(minLon));
-    }
-    else {
-      double minLon = inputMapping.findKeyword("MinimumLongitude");
-      pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(minLon));
-      double maxLon = inputMapping.findKeyword("MaximumLongitude");
-      pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(maxLon));
+      if(lonDir == "POSITIVEEAST") {
+        pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(maxLon));
+        pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(minLon));
+      }
+      else {
+        pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(minLon));
+        pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(maxLon));
+      }
     }
 
     // Add the LINE_PROJECTION_OFFSET and SAMPLE_PROJECTION_OFFSET keywords
