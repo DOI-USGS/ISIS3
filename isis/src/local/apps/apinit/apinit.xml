@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application name="apinit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="http://137.227.237.157/Schemas/Application/application.xsd">
+<application name="apinit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Initialize aerial photo with interior and exterior orientation information.
   </brief>
@@ -18,7 +18,7 @@
     georeferencing/orthorectification.   There will be an error in attitude because there is not enough user information to determine the twist/yaw of the aircraft.  Instead run 
     "findfeatures" to automatically generate a ground control network and then jigsaw to solve for the actual aircraft position and attitude.
   </description>
-    <category>
+  <category>
     <categoryItem>Aerial Photos</categoryItem>
   </category>
 

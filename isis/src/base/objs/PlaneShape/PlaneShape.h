@@ -50,8 +50,8 @@ namespace Isis {
    * @internal
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
    *                           Moved method implementation to cpp file.
-   *   @history 2015-07-31 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors 
-   *                           were signaled. References #2248.
+   *   @history 2015-07-31 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF
+   *                           errors were signaled. References #2248.
    */
   class PlaneShape : public Isis::ShapeModel {
     public:
