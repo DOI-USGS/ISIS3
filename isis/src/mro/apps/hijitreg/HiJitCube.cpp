@@ -32,6 +32,7 @@
 #include "Instrument.hh"
 #include "Pvl.h"
 #include "PvlGroup.h"
+#include "NaifStatus.h"
 
 using namespace UA::HiRISE;
 using std::endl;
@@ -158,6 +159,7 @@ namespace Isis {
       sclk = sclk.highestVersion();
 
 //  Load the kernels
+      NaifStatus::CheckErrors();
       QString lsk = leapseconds.expanded();
       QString sClock = sclk.expanded();
       furnsh_c(lsk.toAscii().data());
@@ -181,6 +183,7 @@ namespace Isis {
     if(!jdata.scStartTime.isEmpty()) {
       QString scStartTimeString = jdata.scStartTime;
       scs2e_c(-74999, scStartTimeString.toAscii().data(), &jdata.obsStartTime);
+      NaifStatus::CheckErrors();
       // Adjust the start time so that it is the effective time for
       // the first line in the image file
       jdata.obsStartTime -= (jdata.unBinnedRate * (((double(jdata.tdiMode / 2.0)

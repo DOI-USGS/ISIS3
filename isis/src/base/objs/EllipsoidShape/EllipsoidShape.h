@@ -44,6 +44,8 @@ namespace Isis {
    *   @history 2012-12-21 - Debbie A. Cook - Cleaned up intersectSurface method to
    *                             reflect changes made to ShapeModel class.  References #1343.
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
+   *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                             were signaled. References #2248.
    */
   class EllipsoidShape : public Isis::ShapeModel {
     public:

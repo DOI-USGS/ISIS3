@@ -56,6 +56,8 @@ namespace Isis {
    *           added on each end should be the start and end time of the
    *           observation.  The added points are linearly interpolated from
    *           the beginning and final 2 points of input data.
+   *  @history 2015-07-31 Kristin Berry Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *           were signaled. References #2248.
    */
   class PixelOffset {
     public:

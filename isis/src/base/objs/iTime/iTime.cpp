@@ -29,6 +29,7 @@
 #include "IString.h"
 #include "iTime.h"
 #include "SpecialPixel.h"
+#include "NaifStatus.h"
 
 using namespace std;
 namespace Isis {
@@ -54,11 +55,13 @@ namespace Isis {
   iTime::iTime(const QString &time) {
     LoadLeapSecondKernel();
 
+    NaifStatus::CheckErrors();
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
     str2et_c(time.toAscii().data(), &et);
 
     p_et = et;
+    NaifStatus::CheckErrors();
 
     UnloadLeapSecondKernel();
   }
@@ -76,26 +79,29 @@ namespace Isis {
    */
   void iTime::operator=(const QString &time) {
     LoadLeapSecondKernel();
-
+    
+    NaifStatus::CheckErrors();
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
     str2et_c(time.toAscii().data(), &et);
 
     p_et = et;
+    NaifStatus::CheckErrors();
 
     UnloadLeapSecondKernel();
   }
 
   // Overload of "=" with a c string
   void iTime::operator=(const char *time) {
-
     LoadLeapSecondKernel();
 
+    NaifStatus::CheckErrors();
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
     str2et_c(time, &et);
 
     p_et = et;
+    NaifStatus::CheckErrors();
 
     UnloadLeapSecondKernel();
   }
@@ -240,10 +246,12 @@ namespace Isis {
    * @return int
    */
   int iTime::Year() const {
+    NaifStatus::CheckErrors();
     SpiceChar out[5];
 
     // Populate the private year member
     timout_c(p_et, "YYYY", 5, out);
+    NaifStatus::CheckErrors();
     return IString(out).ToInteger();
   }
 
@@ -262,10 +270,12 @@ namespace Isis {
    * @return int
    */
   int iTime::Month() const {
+    NaifStatus::CheckErrors();
     SpiceChar out[3];
 
     // Populate the private year member
     timout_c(p_et, "MM", 3, out);
+    NaifStatus::CheckErrors();
     return IString(out).ToInteger();
   }
 
@@ -284,10 +294,12 @@ namespace Isis {
    * @return int
    */
   int iTime::Day() const {
+    NaifStatus::CheckErrors();
     SpiceChar out[3];
 
     // Populate the private year member
     timout_c(p_et, "DD", 3, out);
+    NaifStatus::CheckErrors();
     return IString(out).ToInteger();
   }
 
@@ -306,10 +318,12 @@ namespace Isis {
    * @return int
    */
   int iTime::Hour() const {
+    NaifStatus::CheckErrors();
     SpiceChar out[3];
 
     // Populate the private year member
     timout_c(p_et, "HR", 3, out);
+    NaifStatus::CheckErrors();
     return IString(out).ToInteger();
   }
 
@@ -328,10 +342,12 @@ namespace Isis {
    * @return int
    */
   int iTime::Minute() const {
+    NaifStatus::CheckErrors();
     SpiceChar out[3];
 
     // Populate the private year member
     timout_c(p_et, "MN", 3, out);
+    NaifStatus::CheckErrors();
     return IString(out).ToInteger();
   }
 
@@ -358,10 +374,12 @@ namespace Isis {
    * @return double
    */
   double iTime::Second() const {
+    NaifStatus::CheckErrors();
     SpiceChar out[256];
 
     // Populate the private year member
     timout_c(p_et, "SC.#######::RND", 256, out);
+    NaifStatus::CheckErrors();
     return IString(out).ToDouble();
   }
 
@@ -380,10 +398,12 @@ namespace Isis {
    * @return int
    */
   int iTime::DayOfYear() const {
+    NaifStatus::CheckErrors();
     SpiceChar out[4];
 
     // Populate the private year member
     timout_c(p_et, "DOY", 4, out);
+    NaifStatus::CheckErrors();
     return IString(out).ToInteger();
   }
 
@@ -430,11 +450,13 @@ namespace Isis {
   }
 
   void iTime::setUtc(QString utcString) {
+    NaifStatus::CheckErrors();
     LoadLeapSecondKernel();
 
     double et;
     utc2et_c(utcString.toAscii().data(), &et);
     setEt(et);
+    NaifStatus::CheckErrors();
   }
 
   //---------------------------------------------------
@@ -454,8 +476,10 @@ namespace Isis {
     baseDir += "/kernels/lsk/";
     FileName leapSecond(baseDir + "naif????.tls");
 
+    NaifStatus::CheckErrors();
     QString leapSecondName(leapSecond.highestVersion().expanded());
     furnsh_c(leapSecondName.toAscii().data());
+    NaifStatus::CheckErrors();
 
     p_lpInitialized = true;
   }

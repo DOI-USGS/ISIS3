@@ -35,6 +35,7 @@
 #include "PvlKeyword.h"
 #include "Pvl.h"
 #include "SpiceManager.h"
+#include "NaifStatus.h"
 
 using namespace std;
 
@@ -185,6 +186,7 @@ namespace Isis {
    * @brief Unloads all kernels if they were loaded when found
    */
   void SpiceManager::Unload() {
+    NaifStatus::CheckErrors();
     if(_furnish) {
       for(unsigned int i = 0 ; i < _kernlist.size() ; i++) {
         /**
@@ -198,6 +200,7 @@ namespace Isis {
       }
     }
     _kernlist.clear();
+    NaifStatus::CheckErrors();
     return;
   }
 
@@ -216,6 +219,7 @@ namespace Isis {
    * @see  loadKernelFromTable()
    */
   void SpiceManager::loadKernel(PvlKeyword &key) {
+    NaifStatus::CheckErrors(); 
     for(int i = 0; i < key.size(); i++) {
       if(key[i] == "") continue;
       if(IString(key[i]).UpCase() == "NULL") continue;
@@ -230,6 +234,7 @@ namespace Isis {
       if(_furnish) furnsh_c(fileName.toAscii().data());
       addKernelName((QString)key[i]);
     }
+    NaifStatus::CheckErrors(); 
   }
 
   /**

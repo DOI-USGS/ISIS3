@@ -149,6 +149,9 @@
     <change name="Steven Lambright" date= "2013-02-28">
       Original version.
     </change>
+    <change name="Kristin Berry" date="2015-07-22">
+     Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248.
+    </change>
   </history>
 
   <groups>

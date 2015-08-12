@@ -12,6 +12,7 @@
 #include "Quaternion.h"
 #include "Preference.h"
 #include "Spice.h"
+#include "NaifStatus.h"      
 
 using namespace std;
 
@@ -154,4 +155,6 @@ int main() {
 
   cout << "my qxv output = " << myVecOut[0] << " " << myVecOut[1] << " "
        << myVecOut[2]  << endl;
+
+  Isis::NaifStatus::CheckErrors(); //make sure none of the SPICE calls caused an error
 }

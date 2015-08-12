@@ -40,6 +40,7 @@
 #include "IException.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
+#include "NaifStatus.h"
 
 using namespace std;
 
@@ -311,6 +312,7 @@ bool HiCalConf::_naifLoaded = false;
    * @return double Distance in AU between Sun and observed body
    */
   double HiCalConf::sunDistanceAU() {
+    NaifStatus::CheckErrors();
     loadNaifTiming();
 
     QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
@@ -329,6 +331,7 @@ bool HiCalConf::_naifLoaded = false;
     (void) spkpos_c(targetName.toAscii().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
     double sunkm = vnorm_c(sunv);
+    NaifStatus::CheckErrors(); 
     //  Return in AU units
     return (sunkm/1.49597870691E8);
   }
@@ -404,6 +407,7 @@ bool HiCalConf::_naifLoaded = false;
  * body ephemerides to support time and relative positions of planet bodies.
  */
 void HiCalConf::loadNaifTiming( ) {
+  NaifStatus::CheckErrors();
   if (!_naifLoaded) {
 //  Load the NAIF kernels to determine timing data
     Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
@@ -422,6 +426,7 @@ void HiCalConf::loadNaifTiming( ) {
     furnsh_c(lsk.toAscii().data());
     furnsh_c(sClock.toAscii().data());
     furnsh_c(pConstants.toAscii().data());
+    NaifStatus::CheckErrors(); 
 
 //  Ensure it is loaded only once
     _naifLoaded = true;

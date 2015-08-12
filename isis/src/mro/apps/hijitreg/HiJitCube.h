@@ -51,6 +51,8 @@ namespace Isis {
    * @internal
    *   @history 2012-09-25 Steven Lambright - Pixel pitch value can now come from either the
    *                           instrument group or the naif keywords group. References #1094.
+   *   @history 2015-07-31 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *            were signaled. References #2248.
    */
   class HiJitCube : public Cube {
     public:

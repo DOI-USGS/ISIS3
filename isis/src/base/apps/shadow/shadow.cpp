@@ -79,6 +79,7 @@ void IsisMain() {
       unload_c(FileName(kernelFile).expanded().toAscii().data());
     }
 
+    NaifStatus::CheckErrors();
     functor.setSunPosition(sunPosition);
   }
 

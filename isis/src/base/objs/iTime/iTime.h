@@ -68,6 +68,8 @@ namespace Isis {
    *           fields, etc...)
    *  @history 2011-05-25 Janet Barrett and Steven Lambright - Added setUtc,
    *           setEt and addition operators
+   *  @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *           were signaled. References #2248.
    */
   class iTime {
     public:

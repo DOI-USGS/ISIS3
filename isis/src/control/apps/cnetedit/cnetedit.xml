@@ -132,6 +132,10 @@
     <change name="Steven Lambright" date="2012-05-03">
       Added "IGNOREALL" option. Fixes #293.
     </change>
+    <change name="Kristin Berry" date="2015-07-30"> 
+      Updated so that behavior is consistent with documentation. Now when a reference
+      measure is removed, the whole point is only removed if IGNOREALL is true. 
+    </change>
   </history>
 
   <category>

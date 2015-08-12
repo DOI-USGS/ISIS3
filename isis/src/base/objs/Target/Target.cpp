@@ -157,6 +157,7 @@ namespace Isis {
    *
    */
   SpiceInt Target::lookupNaifBodyCode() const {
+    NaifStatus::CheckErrors();
     SpiceInt code;
     SpiceBoolean found;
     bodn2c_c(m_name->toAscii().data(), &code, &found);
@@ -165,7 +166,7 @@ namespace Isis {
                    "] to NAIF code";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-
+    NaifStatus::CheckErrors();
     return  code;
   }
 

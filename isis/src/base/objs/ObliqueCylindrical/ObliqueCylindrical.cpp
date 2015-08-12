@@ -33,6 +33,7 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "NaifStatus.h"
 
 using namespace std;
 namespace Isis {
@@ -125,7 +126,9 @@ namespace Isis {
         double longitudeAngle = (360.0 - m_poleLongitude) * (PI / 180.0);
         double pvec[3][3];
 
+        NaifStatus::CheckErrors();
         eul2m_c(rotationAngle, latitudeAngle, longitudeAngle, 3, 2, 3, pvec);
+        NaifStatus::CheckErrors();
 
         // Reset the vector keywords
         if (mapGroup.hasKeyword("XAxisVector")) {

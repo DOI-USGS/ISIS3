@@ -116,28 +116,31 @@ void IsisMain() {
     mapping.findKeyword("C_AXIS_RADIUS").setUnits("KM");
   }
   else if (mapping["MAP_PROJECTION_TYPE"][0] == "POLAR STEREOGRAPHIC") {
-    double clat = ((toDouble(mapping["MAXIMUM_LATITUDE"][0]) -
-                  toDouble(mapping["MINIMUM_LATITUDE"][0]) ) / 2) +
-                  toDouble(mapping["MINIMUM_LATITUDE"][0]) ;
-    double clon = ((toDouble(mapping["EASTERNMOST_LONGITUDE"][0])  -
-                  toDouble(mapping["WESTERNMOST_LONGITUDE"][0]) ) / 2) +
-                  toDouble(mapping["WESTERNMOST_LONGITUDE"][0]) ;
-    isEquirectangular = false;
+    if (mapping.hasKeyword("MAXIMUM_LATITUDE") && mapping.hasKeyword("MAXIMUM_LATITUDE") &&
+        mapping.hasKeyword("EASTERNMOST_LONGITUDE") && mapping.hasKeyword("WESTERNMOST_LONGITUDE")) {
+      double clat = ((toDouble(mapping["MAXIMUM_LATITUDE"][0]) -
+                    toDouble(mapping["MINIMUM_LATITUDE"][0]) ) / 2) +
+                    toDouble(mapping["MINIMUM_LATITUDE"][0]) ;
+      double clon = ((toDouble(mapping["EASTERNMOST_LONGITUDE"][0])  -
+                    toDouble(mapping["WESTERNMOST_LONGITUDE"][0]) ) / 2) +
+                    toDouble(mapping["WESTERNMOST_LONGITUDE"][0]) ;
+      isEquirectangular = false;
 
-    // North polar case
-    if (clat > 0.0 && clon < 270.0) {
-      northAzimuth = 270.00 - clon;
-    }
-    else if (clat > 0.0 && clon >= 270.0) {
-      northAzimuth = 360.00 + (270.00 - clon);
-    }
+      // North polar case
+      if (clat > 0.0 && clon < 270.0) {
+        northAzimuth = 270.00 - clon;
+      }
+      else if (clat > 0.0 && clon >= 270.0) {
+        northAzimuth = 360.00 + (270.00 - clon);
+      }
 
-    // South polar case
-    if (clat < 0.0 && clon < 90.0) {
-      northAzimuth = 270.00 + clon;
-    }
-    else if (clat < 0.0 && clon >= 90.0) {
-      northAzimuth = -(360.00 - (270.00 + clon));
+      // South polar case
+      if (clat < 0.0 && clon < 90.0) {
+        northAzimuth = 270.00 + clon;
+      }
+      else if (clat < 0.0 && clon >= 90.0) {
+        northAzimuth = -(360.00 - (270.00 + clon));
+      }
     }
   }
   // Unsupported projection

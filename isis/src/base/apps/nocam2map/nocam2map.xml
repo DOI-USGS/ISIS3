@@ -126,6 +126,9 @@
     <change name="Sasha Browsnberger" date="2015-02-12">
       If it exists, certain camera model information is removed from the label in the output image.
     </change>
+    <change name="Kristin Berry" date="2015-07-22">
+      Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248
+    </change>
   </history>
 
   <groups>

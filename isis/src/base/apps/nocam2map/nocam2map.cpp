@@ -23,6 +23,7 @@
 #include "Statistics.h"
 #include "TextFile.h"
 #include "TProjection.h"
+#include "NaifStatus.h"
 
 using namespace std;
 using namespace Isis;
@@ -239,6 +240,7 @@ void IsisMain() {
 
       QString pckFileName = pckFile.expanded();
 
+      NaifStatus::CheckErrors();
       furnsh_c(pckFileName.toAscii().data());
 
       QString target = targetName[0];
@@ -246,6 +248,7 @@ void IsisMain() {
       SpiceBoolean found;
 
       bodn2c_c(target.toAscii().data(), &code, &found);
+      NaifStatus::CheckErrors();
 
       if(!found) {
         QString msg = "Could not convert Target [" + target +
@@ -907,6 +910,7 @@ void ComputeInputRange() {
 
       QString pckFileName = pckFile.expanded();
 
+      NaifStatus::CheckErrors();
       furnsh_c(pckFileName.toAscii().data());
 
       QString target;
@@ -926,6 +930,7 @@ void ComputeInputRange() {
       SpiceBoolean found;
 
       bodn2c_c(target.toAscii().data(), &code, &found);
+      NaifStatus::CheckErrors();
 
       if(!found) {
         QString msg = "Could not convert Target [" + target +

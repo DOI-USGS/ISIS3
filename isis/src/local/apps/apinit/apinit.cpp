@@ -24,6 +24,7 @@
 #include "SpiceRotation.h"
 #include "Table.h"
 #include "TProjection.h"
+#include "NaifStatus.h"
 
 using namespace Isis;
 using namespace std;
@@ -113,6 +114,8 @@ void IsisMain() {
   instrumentGroup.addKeyword(keyword);
 
   FileName lsk("$base/kernels/lsk/naif0010.tls");
+
+  NaifStatus::CheckErrors(); 
   furnsh_c(lsk.expanded().toAscii().constData());
 
   double et;
@@ -400,6 +403,7 @@ void IsisMain() {
 
   SpiceDouble quat[4];
   m2q_c(CJ, quat);
+  NaifStatus::CheckErrors(); 
 
   TableField q0("J2000Q0", TableField::Double);
   TableField q1("J2000Q1", TableField::Double);

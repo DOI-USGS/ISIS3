@@ -71,7 +71,10 @@ namespace Isis {
    *                       coding standards.  References #972..
    * @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
    *                       #775 and #1114.
-   * @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.  References #775.
+   * @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                       References #775.
+   * @history 2015-07-22 Kristin Berry -  Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                       were signaled. References #2248.
    */
   class MdisGeometry {
     public:

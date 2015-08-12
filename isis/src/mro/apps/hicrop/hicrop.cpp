@@ -361,10 +361,11 @@ void IsisMain() {
     // Write the results to the log
     Application::Log(results);
       // Unfurnishes kernel files to prevent file table overflow
+    NaifStatus::CheckErrors();
     unload_c(ckFileName.c_str());
     unload_c(sclkFileName.c_str());
     unload_c(lskFileName.c_str());
-
+    NaifStatus::CheckErrors();
   }
   catch (IException &e) {
     IString msg = "Unable to crop the given cube [" + inputFileName 

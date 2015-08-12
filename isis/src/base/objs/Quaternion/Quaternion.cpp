@@ -33,6 +33,7 @@
 
 #include "IException.h"
 #include "IString.h"
+#include "NaifStatus.h"
 
 namespace Isis {
   /**
@@ -71,7 +72,9 @@ namespace Isis {
   void Quaternion::Set(std::vector<double> rotation) {
 
     if(rotation.size() == 9) {        // Matrix initialization
+      NaifStatus::CheckErrors();
       m2q_c(&rotation[0], &p_quaternion[0]);
+      NaifStatus::CheckErrors();
     }
     else if(rotation.size() == 4) {   //quaternion initialization
       p_quaternion = rotation;
@@ -273,8 +276,10 @@ namespace Isis {
   std::vector<double> Quaternion::ToAngles(int axis3, int axis2, int axis1) {
     std::vector<double> rotationMatrix = ToMatrix();
     SpiceDouble ang1, ang2, ang3;
+    NaifStatus::CheckErrors();
     m2eul_c((SpiceDouble *) &rotationMatrix[0], axis3, axis2, axis1,
             &ang3, &ang2, &ang1);
+    NaifStatus::CheckErrors();
     std::vector<double> angles;
     angles.push_back(ang1);
     angles.push_back(ang2);

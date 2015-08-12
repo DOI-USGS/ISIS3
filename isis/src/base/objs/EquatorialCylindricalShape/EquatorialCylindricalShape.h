@@ -40,6 +40,8 @@ namespace Isis {
    *  @history 2012-12-19 Debbie A. Cook Added a check for an invalid radius in
    *                          the intersectSurface method, that was causing applications to
    *                          hang.  Also return a false if no ellipsoid itersection is found.
+   *  @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                          were signaled. References #2248.
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
