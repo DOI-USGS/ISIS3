@@ -219,7 +219,7 @@ void IsisMain() {
           if (point->GetMeasure(cm)->IsIgnored()) {
             if (cm == point->IndexOfRefMeasure() && ignoreAll) {
               // If the reference is ignored and IgnoreAll is set, the point must ignored too
-              ignorePoint(cnet, point, "Reference measure ignored"); //why not just skip to delete point? 
+              ignorePoint(cnet, point, "Reference measure ignored");
             }
             else {
               deleteMeasure(point, cm);
@@ -657,7 +657,7 @@ void ignoreCubes(ControlNet &cnet, SerialNumberList &snl) {
           logResult(retainedReferences, point->GetId(), cause);
         }
         else if (!measure->IsIgnored() || cm == point->IndexOfRefMeasure()) {
-          ignoreMeasure(cnet, point, measure, cause); //THIS triggers the ignoring of all measures in the point.
+          ignoreMeasure(cnet, point, measure, cause);
 
           if (cm == point->IndexOfRefMeasure() && !point->IsIgnored() && ignoreAll) {
             ignorePoint(cnet, point, "Reference measure ignored");
