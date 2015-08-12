@@ -2,6 +2,7 @@
 
 #include <QHBoxLayout>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QPixmap>
 #include <QSizePolicy>
 #include <QToolBar>
@@ -790,9 +791,16 @@ namespace Isis {
    *
    */
   void StretchTool::stretchRegional(CubeViewport *cvp) {
-    QRect rect(0, 0, cvp->viewport()->width(), cvp->viewport()->height());
+    try {
+      QRect rect(0, 0, cvp->viewport()->width(), cvp->viewport()->height());
 
-    stretchRect(cvp, rect);
+      stretchRect(cvp, rect);
+    }
+    catch (IException &e) {
+      QString message = "Cannot stretch while the cube is still loading";
+      QMessageBox::warning((QWidget *)parent(), "Warning", message);
+      return;
+    }
   }
 
 

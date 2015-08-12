@@ -91,6 +91,10 @@ namespace Isis {
    *                          between viewports, and another that caused the stretch
    *                          to be copied the new viewport if the advanced stretch
    *                          dialog is active. Fixes #771.
+   *  @history 2015-08-07 Makayla Shepherd - No longer crashes when the user attempts 
+   *                          to apply a stretch while the cube is still loading. This
+   *                          crash was caused by an unhandled exception being thrown 
+   *                          in a connected slot. Fixes #2117.
    */
   class StretchTool : public Tool {
       Q_OBJECT

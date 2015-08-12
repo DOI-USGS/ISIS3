@@ -222,7 +222,6 @@ void IsisMain() {
               ignorePoint(cnet, point, "Reference measure ignored");
             }
             else {
-              // Can't delete the reference without deleting the whole point when ignoreAll is true
               deleteMeasure(point, cm);
             }
           }
@@ -773,8 +772,7 @@ void ignoreMeasures(ControlNet &cnet,
         }
 
         //also look for previously ignored control measures
-        if (deleteIgnored && measure->IsIgnored() &&
-            cm != point->IndexOfRefMeasure()) {
+        if (deleteIgnored && measure->IsIgnored()) {
           deleteMeasure(point, cm);
         }
       }

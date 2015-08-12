@@ -118,8 +118,7 @@ void IsisMain() {
       outMappingGrp.deleteKeyword("PixelResolution");
     }
 
-    if(fromMappingGrp.hasKeyword("Scale"));
-    {
+    if(fromMappingGrp.hasKeyword("Scale")) {
       fromMappingGrp.deleteKeyword("Scale");
     }
 

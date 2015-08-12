@@ -41,8 +41,7 @@
     <p>
       Additional options include the ability to preserve points with less than a
       single valid measure, ability to retain the <def link="Reference
-        Measure">reference</def> (even if not validated or exists in an ignore
-      list), and the ability to print detailed logging results to a text file.
+        Measure">reference</def>, and the ability to print detailed logging results to a text file.
     </p>
   </description>
 
@@ -135,6 +134,7 @@
     <change name="Kristin Berry" date="2015-07-30"> 
       Updated so that behavior is consistent with documentation. Now when a reference
       measure is removed, the whole point is only removed if IGNOREALL is true. 
+      Fixes #2238.
     </change>
   </history>
 
@@ -272,8 +272,7 @@
           Ignore listed points and measures
         </brief>
         <description>
-          Any listed point or measure will be ignored.  Ignoring a point does
-          not automatically ignore its measurements, except for the reference.
+          Any listed point or measure will be ignored. 
           Ignoring can sometimes fail, for example, if the point or measure is
           edit locked, and the UNLOCK operation is not enabled.
         </description>
@@ -398,38 +397,37 @@
         <type>boolean</type>
         <default><item>FALSE</item></default>
         <brief>
-          Preserve points with only one remaining measure
+          Do not delete points with only one remaining measure
         </brief>
         <description>
-          This option will prevent the DELETE operation from removing control
-          points that only have one control measure remaining at the end of the
-          deletion process.
+          PRESERVE is only applied when DELETE=YES. This option will prevent the DELETE operation from removing control
+          points that only have one measure remaining at the end of the deletion process.
         </description>
       </parameter>
       <parameter name="RETAIN_REFERENCE">
         <type>boolean</type>
         <default><item>False</item></default>
         <brief>
-          Never delete a reference measure unless the entire point is removed
+          Never ignore a reference measure unless the entire point is removed
         </brief>
         <description>
-          When enabled, the DELETE operation will retain reference measures
-          under all circumstances.  Consequently, if a reference measure is
-          ignored, in an edit list, or invalidated, it will still show up in the
-          output network.
+          RETAIN_REFERENCE is only applied when DELETE=YES. This option will prevent reference measures from being ignored 
+          when they are included in the MEASURELIST, CUBELIST, or determined to be invalid when CHECKVALID is used. It does 
+          not prevent them from being deleted if they are already ignored prior to running cnetedit. Note: After the deletion process, 
+          if the RETAIN_REFERENCE=YES and the reference measure is the only remaining single measure of a point and PRESERVE=NO,
+          the entire point will be deleted. In order to gurarntee retaining a reference in this case, set both PRESERVE=YES 
+          and RETAIN_REFERENCE=YES.
         </description>
       </parameter>
       <parameter name="IGNOREALL">
         <type>boolean</type>
         <default><item>False</item></default>
         <brief>
-          Ignore all measures in the point when the reference measure is ignored
+          Ignore the whole point when the reference measure is ignored
         </brief>
         <description>
-          When enabled, any time a point or the reference measure is ignored the remaining measures
-          in a point will also be ignored. Occassionally the reference measure has the highest error
-          and we don't want to retain it, but the rest of the measures are also unreliable so it's
-          helpful to ignore them also.
+          If a reference measure is ignored, the whole point is ignored. If DELETE=yes, 
+          then the whole point will be deleted. 
         </description>
       </parameter>
     </group>
