@@ -68,7 +68,7 @@ namespace Isis {
    *                           class to 99.403% scope.
    *   @history 2015-07-31 Jeannie Backer - Changed defaults for global a priori sigmas
    *                           from -1.0 to Isis::Null to be consistent with other bundle
-   *                           classes. Brought coded closer to ISIS coding standards.
+   *                           classes. Brought code closer to ISIS coding standards.
    *  
    *  
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
