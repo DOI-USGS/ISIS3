@@ -44,10 +44,7 @@ int main(int argc, char *argv[]) {
 
     CNetSuiteMainWindow *mainWindow = new CNetSuiteMainWindow();
 
-    qDebug()<<"   BEFORE SHOW";
     mainWindow->show();
-    qDebug()<<"   AFTER SHOW";
-
     int status = app->exec();
 
     delete mainWindow;
