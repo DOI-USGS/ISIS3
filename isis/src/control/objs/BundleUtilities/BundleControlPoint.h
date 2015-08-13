@@ -42,6 +42,9 @@ namespace Isis {
    *   @history 2014-05-22 Ken Edmundson - Original version.
    *   @history 2015-02-20 Jeannie Backer - Added unitTest.  Reformatted output
    *                           strings. Brought closer to ISIS coding standards.
+   *   @history 2015-08-13 Jeannie Backer - Added some documentation to class variables.
+   *                           Changed intitial value of aprioriSigmas to be Null instead of
+   *                           zero to be consistent with other ISIS bundle classes.
    */
   class BundleControlPoint : public QVector<BundleMeasure*> {
 
@@ -69,7 +72,7 @@ namespace Isis {
       boost::numeric::ublas::bounded_vector< double, 3 > &aprioriSigmas();
       boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas();
       boost::numeric::ublas::bounded_vector< double, 3 > &weights();
-      boost::numeric::ublas::bounded_vector<double, 3> &nicVector();         //!< array of NICs (see Brown, 1976)
+      boost::numeric::ublas::bounded_vector<double, 3> &nicVector(); // array of NICs (see Brown, 1976)
       SparseBlockRowMatrix &cholmod_QMatrix();
 
       // string format methods
@@ -92,12 +95,17 @@ namespace Isis {
     private:
       ControlPoint *m_controlPoint;
 
-      boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;                             //!< corrections to point parameters
-      boost::numeric::ublas::bounded_vector< double, 3 > m_aprioriSigmas;                           //!< apriori sigmas for point parameters
-      boost::numeric::ublas::bounded_vector< double, 3 > m_adjustedSigmas;                          //!< adjusted sigmas for point parameters
-      boost::numeric::ublas::bounded_vector< double, 3 > m_weights;                                 //!< weights for point parameters
+      boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;    /**< corrections to point
+                                                                                parameters.*/
+      boost::numeric::ublas::bounded_vector< double, 3 > m_aprioriSigmas;  /**< a priori sigmas for
+                                                                                point parameters.*/
+      boost::numeric::ublas::bounded_vector< double, 3 > m_adjustedSigmas; /**< adjusted sigmas for
+                                                                                point parameters.*/
+      boost::numeric::ublas::bounded_vector< double, 3 > m_weights;        /**< weights for point
+                                                                                parameters.*/
 
-      boost::numeric::ublas::bounded_vector<double, 3> m_nicVector;
+      boost::numeric::ublas::bounded_vector<double, 3> m_nicVector;// array of NICs (see Brown, 1976)
+
       SparseBlockRowMatrix m_cholmod_QMatrix;
   };
 }

@@ -49,6 +49,7 @@ namespace Isis {
    *                           matrix.
    *   @history 2014-07-23 Jeannie Backer - Replaced QVectors with QLists.
    *   @history 2015-02-20 Jeannie Backer - Brought closer to Isis coding standards.
+   *   @history 2015-08-13 Jeannie Backer - Brought closer to Isis coding standards.
    *
    */
   class BundleObservation : public QVector< BundleImage  *> {
@@ -86,13 +87,19 @@ namespace Isis {
       SpiceRotation *spiceRotation();
       SpicePosition *spicePosition();
       
-      boost::numeric::ublas::vector< double > &parameterWeights();
-      boost::numeric::ublas::vector< double > &parameterCorrections();
-      boost::numeric::ublas::vector< double > &parameterSolution();
-      boost::numeric::ublas::vector< double > &aprioriSigmas();
-      boost::numeric::ublas::vector< double > &adjustedSigmas();
+      const boost::numeric::ublas::vector< double > &parameterWeights();
+      const boost::numeric::ublas::vector< double > &parameterCorrections();
+      const boost::numeric::ublas::vector< double > &parameterSolution();
+      const boost::numeric::ublas::vector< double > &aprioriSigmas();
+      const boost::numeric::ublas::vector< double > &adjustedSigmas();
       
-      const BundleObservationSolveSettings *solveSettings();
+      void setParameterWeights(boost::numeric::ublas::vector< double > weights); // initParameterWeights
+      void setParameterCorrections(boost::numeric::ublas::vector< double > corrections);// applyParameterCorrections
+      void setParameterSolution(boost::numeric::ublas::vector< double > solution);    
+      void setAprioriSigmas(boost::numeric::ublas::vector< double > sigmas);    
+      void setAdjustedSigmas(boost::numeric::ublas::vector< double > sigmas);    
+
+      const BundleObservationSolveSettings* solveSettings();
 
 //    QStringList serialNumbers();
 
@@ -130,7 +137,7 @@ namespace Isis {
       boost::numeric::ublas::vector< double > m_weights;            //!< parameter weights
       boost::numeric::ublas::vector< double > m_corrections;        //!< cumulative parameter correction vector
       boost::numeric::ublas::vector< double > m_solution;           //!< parameter solution vector
-      boost::numeric::ublas::vector< double > m_aprioriSigmas;      //!< a posteriori (adjusted) parameter sigmas
+      boost::numeric::ublas::vector< double > m_aprioriSigmas;      //!< a priori parameter sigmas
       boost::numeric::ublas::vector< double > m_adjustedSigmas;     //!< a posteriori (adjusted) parameter sigmas
   };
 }

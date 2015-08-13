@@ -9,6 +9,11 @@
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
 
+#include <hdf5.h>
+#include <hdf5_hl.h> // in the hdf5 library
+#include <hdf5.h>
+#include <H5Cpp.h>
+
 #include "BundleImage.h"
 #include "Camera.h"
 #include "FileName.h"
@@ -197,7 +202,8 @@ namespace Isis {
     //     m_solveTwist = true;
     //     m_solvePointingPolynomialOverExisting = false;
     //     m_pointingInterpolationType = SpiceRotation::PolyFunction;
-    //     m_anglesAprioriSigma.append(-1.0); // num cam angle coef = 1
+    //     m_anglesAprioriSigma.append(Isis::Null); // num cam angle
+    //     coef = 1
     setInstrumentPointingSettings(AnglesOnly, true, 2, 2, false);
 
     // Spacecraft Position Options
@@ -272,9 +278,9 @@ namespace Isis {
         }
       }
 
-      double anglesAprioriSigma = -1.0;
-      double angularVelocityAprioriSigma = -1.0;
-      double angularAccelerationAprioriSigma = -1.0;
+      double anglesAprioriSigma = Isis::Null;
+      double angularVelocityAprioriSigma = Isis::Null;
+      double angularAccelerationAprioriSigma = Isis::Null;
       if (pointingOption != NoPointingFactors) {
         if (scParameterGroup.hasKeyword("CAMERA_ANGLES_SIGMA")) {
           anglesAprioriSigma = (double)(scParameterGroup.findKeyword("CAMERA_ANGLES_SIGMA"));
@@ -325,9 +331,9 @@ namespace Isis {
         }
       }
 
-      double positionAprioriSigma = -1.0;
-      double velocityAprioriSigma = -1.0;
-      double accelerationAprioriSigma = -1.0;
+      double positionAprioriSigma = Isis::Null;
+      double velocityAprioriSigma = Isis::Null;
+      double accelerationAprioriSigma = Isis::Null;
       if (positionOption != NoPositionFactors) {
         if (scParameterGroup.hasKeyword("SPACECRAFT_POSITION_SIGMA")) {
           positionAprioriSigma
@@ -471,13 +477,28 @@ namespace Isis {
 
     m_anglesAprioriSigma.clear();
     if (m_numberCamAngleCoefSolved > 0) {
-      m_anglesAprioriSigma.append(anglesAprioriSigma);
+      if (anglesAprioriSigma > 0.0) {
+        m_anglesAprioriSigma.append(anglesAprioriSigma);
+      }
+      else {
+        m_anglesAprioriSigma.append(Isis::Null);
+      }
 
       if (m_numberCamAngleCoefSolved > 1) {
-        m_anglesAprioriSigma.append(angularVelocityAprioriSigma);
+        if (angularVelocityAprioriSigma > 0.0) {
+          m_anglesAprioriSigma.append(angularVelocityAprioriSigma);
+        }
+        else {
+          m_anglesAprioriSigma.append(Isis::Null);
+        }
 
         if (m_numberCamAngleCoefSolved > 2) {
-          m_anglesAprioriSigma.append(angularAccelerationAprioriSigma);
+          if (angularAccelerationAprioriSigma > 0.0) {
+            m_anglesAprioriSigma.append(angularAccelerationAprioriSigma);
+          }
+          else {
+            m_anglesAprioriSigma.append(Isis::Null);
+          }
         }
       }
     }
@@ -657,11 +678,28 @@ namespace Isis {
 
     m_positionAprioriSigma.clear();
     if (m_numberCamPosCoefSolved > 0) {
-      m_positionAprioriSigma.append(positionAprioriSigma);
+      if (positionAprioriSigma > 0.0) {
+        m_positionAprioriSigma.append(positionAprioriSigma);
+      }
+      else {
+        m_positionAprioriSigma.append(Isis::Null);
+      }
+
       if (m_numberCamPosCoefSolved > 1) {
-        m_positionAprioriSigma.append(velocityAprioriSigma);
+        if (velocityAprioriSigma > 0.0) {
+          m_positionAprioriSigma.append(velocityAprioriSigma);
+        }
+        else {
+          m_positionAprioriSigma.append(Isis::Null);
+        }
+
         if (m_numberCamPosCoefSolved > 2) {
-          m_positionAprioriSigma.append(accelerationAprioriSigma);
+          if (accelerationAprioriSigma > 0.0) {
+            m_positionAprioriSigma.append(accelerationAprioriSigma);
+          }
+          else {
+            m_positionAprioriSigma.append(Isis::Null);
+          }
         }
       }
     }
@@ -753,11 +791,11 @@ namespace Isis {
                         toString(solvePolyOverPointing())); 
       PvlKeyword angleSigmas("AngleAprioriSigmas");
       for (int i = 0; i < aprioriPointingSigmas().size(); i++) {
-        if (m_anglesAprioriSigma[i] > 0) {
-          angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
+        if (IsNullPixel(m_anglesAprioriSigma[i])) {
+          angleSigmas.addValue("N/A");
         }
         else {
-          angleSigmas.addValue("N/A");
+          angleSigmas.addValue(toString(m_anglesAprioriSigma[i]));
         }
       }
       pvl += angleSigmas;
@@ -789,11 +827,11 @@ namespace Isis {
     
       PvlKeyword positionSigmas("PositionAprioriSigmas");
       for (int i = 0; i < aprioriPositionSigmas().size(); i++) {
-        if (m_positionAprioriSigma[i] > 0) {
-          positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
+        if (IsNullPixel(m_positionAprioriSigma[i])) {
+          positionSigmas.addValue("N/A");
         }
         else {
-          positionSigmas.addValue("N/A");
+          positionSigmas.addValue(toString(m_positionAprioriSigma[i]));
         }
       }
       pvl += positionSigmas;
@@ -833,7 +871,12 @@ namespace Isis {
 
     stream.writeStartElement("aprioriPointingSigmas");
     for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
-      stream.writeTextElement("sigma", toString(m_anglesAprioriSigma[i]));
+      if (IsNullPixel(m_anglesAprioriSigma[i])) {
+        stream.writeTextElement("sigma", "N/A");
+      }
+      else {
+        stream.writeTextElement("sigma", toString(m_anglesAprioriSigma[i]));
+      }
     }
     stream.writeEndElement();// end aprioriPointingSigmas
     stream.writeEndElement();// end instrumentPointingOptions
@@ -850,7 +893,12 @@ namespace Isis {
 
     stream.writeStartElement("aprioriPositionSigmas");
     for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
-      stream.writeTextElement("sigma", toString(m_positionAprioriSigma[i]));
+      if (IsNullPixel(m_positionAprioriSigma[i])) {
+        stream.writeTextElement("sigma", "N/A");
+      }
+      else {
+        stream.writeTextElement("sigma", toString(m_positionAprioriSigma[i]));
+      }
     }
     stream.writeEndElement();// end aprioriPositionSigmas
     stream.writeEndElement(); // end instrumentPositionOptions
@@ -995,15 +1043,25 @@ namespace Isis {
       else if (localName == "aprioriPointingSigmas") {
         m_xmlHandlerObservationSettings->m_anglesAprioriSigma.clear();
         for (int i = 0; i < m_xmlHandlerAprioriSigmas.size(); i++) {
-          m_xmlHandlerObservationSettings->m_anglesAprioriSigma.append(
-                                                 toDouble(m_xmlHandlerAprioriSigmas[i]));
+          if (m_xmlHandlerAprioriSigmas[i] == "N/A") {
+            m_xmlHandlerObservationSettings->m_anglesAprioriSigma.append(Isis::Null);
+          }
+          else {
+            m_xmlHandlerObservationSettings->m_anglesAprioriSigma.append(
+                toDouble(m_xmlHandlerAprioriSigmas[i]));
+          }
         }
       }
       else if (localName == "aprioriPositionSigmas") {
         m_xmlHandlerObservationSettings->m_positionAprioriSigma.clear();
         for (int i = 0; i < m_xmlHandlerAprioriSigmas.size(); i++) {
-          m_xmlHandlerObservationSettings->m_positionAprioriSigma.append(
-                                                 toDouble(m_xmlHandlerAprioriSigmas[i]));
+          if (m_xmlHandlerAprioriSigmas[i] == "N/A") {
+            m_xmlHandlerObservationSettings->m_positionAprioriSigma.append(Isis::Null);
+          }
+          else {
+            m_xmlHandlerObservationSettings->m_positionAprioriSigma.append(
+                                                   toDouble(m_xmlHandlerAprioriSigmas[i]));
+          }
         }
       }
       m_xmlHandlerCharacters = "";
@@ -1094,4 +1152,66 @@ namespace Isis {
     return settings.read(stream);
   }
 
+#if 0
+  /** 
+   *  H5 compound data type uses the offesets from the QDataStream returned by
+   *  the write(QDataStream &stream) method.
+   */
+  H5::CompType BundleObservationSolveSettings::compoundH5DataType() {
+
+    H5::CompType compoundDataType((size_t)   );
+
+    size_t offset = 0;
+
+    compoundDataType.insertMember("InstrumentId", offset, H5::PredType::C_S1);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("InstrumentPointingSolveOption", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("NumCamAngleCoefSolved", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("CkDegree", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("CkSolveDegree", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("SolveTwist", offset, H5::PredType::NATIVE_HBOOL);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("SolvePointingPolynomialOverExisting", offset, H5::PredType::NATIVE_HBOOL);
+
+    offset += sizeof(m_instrumentId);
+???    compoundDataType.insertMember("AnglesAprioriSigma", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("PointingInterpolationType", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("InstrumentPositionSolveOption", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_instrumentId);
+    compoundDataType.insertMember("NumCamPosCoefSolved", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_numberCamPosCoefSolved);
+    compoundDataType.insertMember("SpkDegree", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_spkDegree);
+    compoundDataType.insertMember("SpkSolveDegree", offset, H5::PredType::NATIVE_INT);
+
+    offset += sizeof(m_spkSolveDegree);
+    compoundDataType.insertMember("SolvePositionOverHermiteSpline", offset, H5::PredType::NATIVE_HBOOL);
+
+    offset += sizeof(m_solvePositionOverHermiteSpline);
+???    compoundDataType.insertMember("PositionAprioriSigma", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_positionAprioriSigma);
+    compoundDataType.insertMember("PositionInterpolationType", offset, H5::PredType::NATIVE_INT);
+
+    return compoundDataType;
+
+  }
+#endif
 }

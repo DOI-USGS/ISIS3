@@ -388,8 +388,8 @@ int main(int argc, char *argv[]) {
     BundleObservation *parentObservation = NULL;
     bi.setParentObservation(parentObservation);
     qDebug() << "Access camera and parentObservation ...";
-    Camera *cam = bi.camera();
-    BundleObservation *parent = bi.parentObservation();
+//    Camera *cam = bi.camera();
+//    BundleObservation *parent = bi.parentObservation();
     qDebug() << "serial number = " << bi.serialNumber();
     qDebug() << "file name     = " << bi.fileName();
     qDebug() << "Testing copy constructor...";
@@ -461,9 +461,18 @@ int main(int argc, char *argv[]) {
     qDebug() << "number parameters =     " << toString(bo3.numberParameters());
     qDebug() << "number position param = " << toString(bo3.numberPositionParameters());
     qDebug() << "number pointing param = " << toString(bo3.numberPointingParameters());
+    //???BundleObservationSolveSettings bossFromBo = *bo3.solveSettings();
+    //???pvl = bossFromBo.pvlObject("SettingsFromBundleObservation");
+    //???cout << pvl << endl << endl;
     qDebug() << "parameter list: " << bo3.parameterList();
     qDebug() << "image names:    " << bo3.imageNames();
 
+    #if 0
+// seg fault   qDebug() << bo3.formatBundleOutputString(true);
+// seg fault   qDebug() << bo3.formatBundleOutputString(false);
+    SpiceRotation sr = *bo3.spiceRotation();
+    SpicePosition sp = *bo3.spicePosition();
+    #endif
     boost::numeric::ublas::vector< double > paramWts = bo3.parameterWeights();
     boost::numeric::ublas::vector< double > paramCor = bo3.parameterCorrections();
     boost::numeric::ublas::vector< double > paramSol = bo3.parameterSolution();
@@ -495,13 +504,14 @@ int main(int argc, char *argv[]) {
       vectors.append("     ");
     }
     qDebug() << vectors;
+    //???qDebug() << "apply param corrections successful?     " << toString(bo3.applyParameterCorrections(paramCor));
     qDebug() << "    output bundle observation...";
     qDebug() << bo3.formatBundleOutputString(false);
     qDebug() << bo3.formatBundleOutputString(true);
     qDebug() << "init exterior orientiation successful?  " << toString(bo3.initializeExteriorOrientation());
     qDebug() << "apply param corrections successful?     " << toString(bo3.applyParameterCorrections(paramCor));
-    SpiceRotation *spicePos = bo3.spiceRotation();
-    SpicePosition *spiceRot = bo3.spicePosition();
+//    SpiceRotation *spicePos = bo3.spiceRotation();
+//    SpicePosition *spiceRot = bo3.spicePosition();
     qDebug();
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug();
@@ -544,10 +554,51 @@ int main(int argc, char *argv[]) {
 //    BundleObservation obs1 = *bov.getObservationByCubeSerialNumber("obs1");
     #endif
     BundleObservationVector bov;
+    #if 0
+    BundleImage *bundleImage = new BundleImage();
+    BundleSettings bundleSettings;
+    BundleObservation obs1 = *bov.addnew(bundleImage, "obs1", "InstrumentIdBOV", bundleSettings);
+    qDebug() << obs1.formatBundleOutputString(true);
+    BundleObservation obs2 = *bov.addnew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
+    qDebug() << obs2.formatBundleOutputString(true);
+#endif
     qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
     qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
+    
+#if 0
+    BundleObservation obs1b = *bov.getObservationByCubeSerialNumber("obs1");
+    qDebug() << "same observation?" << toString((obs1 == obs1b));
+    qDebug() << obs1b.formatBundleOutputString(true);
+#endif
     qDebug() << "init exterior orientiation successful?  " << toString(bov.initializeExteriorOrientation());
+    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    qDebug();
+    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    qDebug() << "Testing BundleMeasure...";
+    #if 0
+    Move test after BundleObservation to setObs
+    // constructor
+    BundleMeasure(ControlMeasure *controlMeasure, BundleControlPoint *bundleControlPoint);
+    // copy constructor
+    BundleMeasure(const BundleMeasure &src);
+    bundleMeasure.setParentObservation(BundleObservation *observation);
+    BundleObservation  *parentObs = parentBundleObservation();
+    BundleControlPoint *parentBCP = parentControlPoint();
+    BundleImage        *parentImage = parentBundleImage();
+
+    BundleObservationSolveSettings solveSettings = observationSolveSettings();
+    Camera *cam = bundleMeasure.camera();
+
+    qDebug() << "rejected?" << toString(bundleMeasure.isRejected());
+    qDebug() << "measure sample " << toString(bundleMeasure.sample());
+    qDebug() << "measure line   " << toString(bundleMeasure.line());
+    qDebug() << "measure serial number" << bundleMeasure.cubeSerialNumber();
+    qDebug() << "focal x" << toString(bundleMeasure.focalPlaneMeasuredX());
+    qDebug() << "focal y" << toString(bundleMeasure.focalPlaneMeasuredY());
+    qDebug() << "focal z" << toString(bundleMeasure.observationIndex());
+    #endif
+    qDebug();    
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug();
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
@@ -790,9 +841,9 @@ int main(int argc, char *argv[]) {
     BundleMeasure bundleMeasure(cm1, bcp3);
     BundleMeasure bundleMeasureCopy(bcm);
     bundleMeasure.setParentObservation(&bo);
-    BundleObservation  *parentObs = bundleMeasure.parentBundleObservation();
-    BundleControlPoint *parentBCP = bundleMeasure.parentControlPoint();
-    BundleImage        *parentImage = bundleMeasure.parentBundleImage();
+//    BundleObservation  *parentObs = bundleMeasure.parentBundleObservation();
+//    BundleControlPoint *parentBCP = bundleMeasure.parentControlPoint();
+//    BundleImage        *parentImage = bundleMeasure.parentBundleImage();
     qDebug() << "rejected?" << toString(bundleMeasure.isRejected());
     qDebug() << "measure sample " << toString(bundleMeasure.sample());
     qDebug() << "measure line   " << toString(bundleMeasure.line());
