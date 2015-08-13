@@ -8,9 +8,10 @@
 #include "IException.h"
 #include "ImageFileListViewWorkOrder.h"
 #include "ImageListActionWorkOrder.h"
-#include "IString.h"
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
+#include "IString.h"
+#include "JigsawWorkOrder.h"
 #include "OpenProjectWorkOrder.h"
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectAsWorkOrder.h"
@@ -26,7 +27,7 @@ namespace Isis {
    * This instantiates a work order given a project and a type name (class name in a string).
    *
    * Ownership is passed to the caller. The work orders are QObject's so please be mindful of which
-   *   thread they are in.
+   * thread they are in.
    *
    * @param project The project to give to the work order constructor
    * @param type The work order type (class name) - for example "Isis::ImportImagesWorkOrder"
@@ -42,6 +43,7 @@ namespace Isis {
     tryType<ImageListActionWorkOrder>(type, project, result);
     tryType<ImportImagesWorkOrder>(type, project, result);
     tryType<ImportControlNetWorkOrder>(type, project, result);
+    tryType<JigsawWorkOrder>(type, project, result);
     tryType<Footprint2DViewWorkOrder>(type, project, result);
     tryType<MatrixViewWorkOrder>(type, project, result);
     tryType<MoveDownOneSceneWorkOrder>(type, project, result);
