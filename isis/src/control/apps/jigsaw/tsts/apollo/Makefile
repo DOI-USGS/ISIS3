@@ -1,19 +1,26 @@
 APPNAME = jigsaw
 # These tests exercise the bundle adjustment of images from the Apollo frame camera.
-# Test 1: specialk (dense cholesky) method, solving for position, angles (with twist), and radius; with error propagation.
-# Test 2: sparse (cholmod) method, solving for position, angles (with twist), and radius; with error propagation.
+# Test 1: specialk (dense cholesky) method, solving for position, angles (with twist), and radius; 
+#         with error propagation.
+# Test 2: sparse (cholmod) method, solving for position, angles (with twist), and radius; 
+#         with error propagation.
 #
-# 2013-04-02 KLE - added weights for spacecraft position and angles to test. This reduced the precision of the adjusted
-#                  point covariance matrices in the output netfiles. To compensate I reduced the tolerance in the corresponding
-#                  DIFF files to 0.00003. We should find out why this is happening. Without these weights, a tolerance of
-#                  0.000000003 was sufficient. 
-# 2013-04-02 DAC - The values in bundleout.txt were working with 5 places across all systems.  With the above change
-#                  they are only good to 4 places now.  Also added tolerance for AprioriX in the control nets and changed the 
-#                  covariance tolerance  to 0.00006 for the specialK test.
-# 2013-11-12 KLE - Modified apollo test input Net "Ames_7-ImageLSTest_USGS_combined.net" by changing point AS15_SocetPAN_45
-#                  from "Constrained" to "Free" but leaving a priori constraints on coordinates. This is to test toggling a
-#                  point between "Constrained" and "Free" while leaving constraints in place.  
-# 2014-07-23 JWB - Commented out specialk test and references to bundleout_images.csv
+# 2013-04-02 Ken Edmundson - added weights for spacecraft position and angles to test. This reduced 
+#                the precision of the adjusted point covariance matrices in the output netfiles.
+#                To compensate I reduced the tolerance in the corresponding DIFF files to 0.00003.
+#                We should find out why this is happening. Without these weights, a tolerance of
+#                0.000000003 was sufficient. 
+# 2013-04-02 Debbie Cook - The values in bundleout.txt were working with 5 places across all
+#                systems.  With the above change they are only good to 4 places now.  Also added
+#                tolerance for AprioriX in the control nets and changed the covariance tolerance 
+#                to 0.00006 for the specialK test.
+# 2013-11-12 Ken Edmundson - Modified apollo test input Net "Ames_7-ImageLSTest_USGS_combined.net"
+#                by changing point AS15_SocetPAN_45 from "Constrained" to "Free" but leaving 
+#                a priori constraints on coordinates. This is to test toggling a point between
+#                "Constrained" and "Free" while leaving constraints in place.  
+# 2014-07-23 Jeannie Backer - Commented out specialk test and references to bundleout_images.csv
+# 2015-07-30 Jeannie Backer - Added command to remove inverseMatrix.dat file since error propagation
+#                is turned on and we do not have a way to compare this file type.
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -72,4 +79,5 @@ commands:
 	$(MV) bundleout_points.csv $(OUTPUT)/apollo_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
 	$(RM) residuals.csv > /dev/null;
+	$(RM) inverseMatrix.dat > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;

@@ -1,7 +1,7 @@
 APPNAME = jigsaw
 
 # This test exercises the bundle adjustment of images from the HiRISE camera onboard MRO.
-# oldsparse method with observation mode; solving for angles (3rd degree polynomial).
+# sparse method with observation mode; solving for angles (3rd degree polynomial).
 
 # The "cat t_bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -9,8 +9,10 @@ APPNAME = jigsaw
 # 3. remove digits beyond the fifth decimal place of decimal numbers
 # 4. remove date and time
 #
-# 2014-07-23 JWB - Changed method from oldsparse to default (sparse). 
-#                  Commented out references to bundleout_images.csv.  Removed default parameters.
+# 2014-07-23 Jeannie Backer - Changed method from oldsparse to default (sparse). 
+#                Commented out references to bundleout_images.csv.  Removed default parameters.
+# 2015-07-30 Jeannie Backer - Changed file_prefix from "t" to "t_" since BundleAdjust no longer adds
+#                the underscore. 
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -24,7 +26,7 @@ commands:
 	update=yes \
 	cksolvedegree=3 \
 	camsolve=all \
-	file_pre=t \
+	file_pre=t_ \
 	twist=no > /dev/null;
 	cat t_bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
