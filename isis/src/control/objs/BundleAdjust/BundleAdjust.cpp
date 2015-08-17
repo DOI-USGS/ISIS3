@@ -42,8 +42,10 @@ using namespace Isis;
 
 namespace Isis {
 
-  static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
-      const char* message) {
+  static void cholmod_error_handler(int nStatus, 
+                                    const char* file, 
+                                    int nLineNo, 
+                                    const char* message) {
 
     QString errlog;
 
@@ -835,13 +837,13 @@ namespace Isis {
     m_bundleResults.setNumberObservations(0);// ???
     m_bundleResults.resetNumberConstrainedPointParameters();//???
 
-    static matrix<double> coeff_image;
-    static matrix<double> coeff_point3D(2, 3);
-    static vector<double> coeff_RHS(2);
-    static symmetric_matrix<double, upper> N22(3);                // 3x3 upper triangular
+    static boost::numeric::ublas::matrix<double> coeff_image;
+    static boost::numeric::ublas::matrix<double> coeff_point3D(2, 3);
+    static boost::numeric::ublas::vector<double> coeff_RHS(2);
+    static boost::numeric::ublas::symmetric_matrix<double, upper> N22(3);                // 3x3 upper triangular
     SparseBlockColumnMatrix N12;
-    static vector<double> n2(3);                                  // 3x1 vector
-    compressed_vector<double> n1(m_nRank);                        // image parameters x 1
+    static boost::numeric::ublas::vector<double> n2(3);                                  // 3x1 vector
+    boost::numeric::ublas::compressed_vector<double> n1(m_nRank);                        // image parameters x 1
 
     m_nj.resize(m_nRank);
 
@@ -923,7 +925,7 @@ namespace Isis {
 
       nGood3DPoints++;
 
-  } // end loop over 3D points
+    } // end loop over 3D points
 
     // finally, form the reduced normal equations
     formNormals3_CHOLMOD(n1, m_nj);
@@ -932,27 +934,31 @@ namespace Isis {
     m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
 
     return bStatus;
-}
+  }
 
 
   /**
    * Forming first set of auxiliary matrices for normal equations matrix via cholmod.
    */
   bool BundleAdjust::formNormals1_CHOLMOD(symmetric_matrix<double, upper>&N22,
-      SparseBlockColumnMatrix &N12, compressed_vector<double> &n1,
-      vector<double> &n2, matrix<double> &coeff_image,
-      matrix<double> &coeff_point3D, vector<double> &coeff_RHS, int observationIndex) {
+                                          SparseBlockColumnMatrix &N12, 
+                                          compressed_vector<double> &n1,
+                                          vector<double> &n2,
+                                          matrix<double> &coeff_image,
+                                          matrix<double> &coeff_point3D,
+                                          vector<double> &coeff_RHS,
+                                          int observationIndex) {
 
     int i;
 
     int nImagePartials = coeff_image.size2();
 
-    static vector<double> n1_image(nImagePartials);
+    static boost::numeric::ublas::vector<double> n1_image(nImagePartials);
     n1_image.resize(nImagePartials);
     n1_image.clear();
 
     // form N11 (normals for photo)
-    static symmetric_matrix<double, upper> N11(nImagePartials);
+    static boost::numeric::ublas::symmetric_matrix< double, upper > N11(nImagePartials);
     N11.resize(nImagePartials);
     N11.clear();
 
@@ -983,7 +989,7 @@ namespace Isis {
 //    std::cout << (*(*m_SparseNormals[observationIndex])[observationIndex]) << std::endl;
 
     // form N12_Image
-    static matrix<double> N12_Image(nImagePartials, 3);
+    static boost::numeric::ublas::matrix< double > N12_Image(nImagePartials, 3);
     N12_Image.resize(nImagePartials, 3);
     N12_Image.clear();
 
@@ -1029,10 +1035,12 @@ namespace Isis {
    * Forming second set of auxiliary matrices for normal equations matrix via cholmod.
    */
   bool BundleAdjust::formNormals2_CHOLMOD(symmetric_matrix<double, upper>&N22,
-      SparseBlockColumnMatrix &N12, vector<double> &n2, vector<double> &nj,
-      BundleControlPoint *bundleControlPoint) {
+                                          SparseBlockColumnMatrix &N12,
+                                          vector<double> &n2,
+                                          vector<double> &nj,
+                                          BundleControlPoint *bundleControlPoint) {
 
-    bounded_vector<double, 3> &NIC = bundleControlPoint->nicVector();
+    boost::numeric::ublas::bounded_vector< double, 3 > &NIC = bundleControlPoint->nicVector();
     SparseBlockRowMatrix &Q = bundleControlPoint->cholmod_QMatrix();
 
     NIC.clear();
@@ -1040,8 +1048,9 @@ namespace Isis {
 
     // weighting of 3D point parameters
 //    const ControlPoint *point = m_pCnet->GetPoint(i);
-    bounded_vector<double, 3> &weights = bundleControlPoint->weights();
-    bounded_vector<double, 3> &corrections = bundleControlPoint->corrections();
+    boost::numeric::ublas::bounded_vector<double, 3> &weights = bundleControlPoint->weights();
+    boost::numeric::ublas::bounded_vector<double, 3> &corrections
+        = bundleControlPoint->corrections();
 
 //    std::cout << "Point" << point->GetId() << "weights" << std::endl << weights << std::endl;
 
@@ -1126,14 +1135,14 @@ namespace Isis {
    * velocities, angular accelerations if so stipulated (legalese).
    */
   bool BundleAdjust::formNormals3_CHOLMOD(compressed_vector<double> &n1,
-                                  vector<double> &nj) {
+                                          vector<double> &nj) {
 
     m_bundleResults.resetNumberConstrainedImageParameters();
 
     int n = 0;
 
     for ( int i = 0; i < m_SparseNormals.size(); i++ ) {
-      matrix<double>* diagonalBlock = m_SparseNormals.getBlock(i,i);
+      boost::numeric::ublas::matrix< double > *diagonalBlock = m_SparseNormals.getBlock(i, i);
       if ( !diagonalBlock )
         continue;
 
@@ -1294,9 +1303,13 @@ namespace Isis {
    * Forming first set of auxiliary matrices for normal equations matrix via specialK.
    */
   bool BundleAdjust::formNormals1_SPECIALK(symmetric_matrix<double, upper>&N22,
-      matrix<double> &N12, compressed_vector<double> &n1, vector<double> &n2,
-      matrix<double> &coeff_image, matrix<double> &coeff_point3D,
-      vector<double> &coeff_RHS, int nImageIndex) {
+                                           matrix<double> &N12,
+                                           compressed_vector<double> &n1,
+                                           vector<double> &n2,
+                                           matrix<double> &coeff_image,
+                                           matrix<double> &coeff_point3D,
+                                           vector<double> &coeff_RHS,
+                                           int nImageIndex) {
 /*
     int i, j;
 
@@ -1373,8 +1386,11 @@ namespace Isis {
    * Forming second set of auxiliary matrices for normal equations matrix via specialK.
    */
   bool BundleAdjust::formNormals2_SPECIALK(symmetric_matrix<double, upper>&N22,
-      matrix<double> &N12, vector<double> &n2, vector<double> &nj,
-      int nPointIndex, int i) {
+                                           matrix<double> &N12,
+                                           vector<double> &n2,
+                                           vector<double> &nj,
+                                           int nPointIndex,
+                                           int i) {
 /*
       bounded_vector<double, 3> &NIC = m_NICs[nPointIndex];
       compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
@@ -1506,9 +1522,10 @@ namespace Isis {
    * TODO: Define.
    */
   void BundleAdjust::product_AV(double alpha, bounded_vector<double,3> &v2,
-      SparseBlockRowMatrix &Q, vector< double > &v1) {
+                                SparseBlockRowMatrix &Q,
+                                vector< double > &v1) {
 
-    QMapIterator<int, matrix<double>*> iQ(Q);
+    QMapIterator< int, boost::numeric::ublas::matrix< double > * > iQ(Q);
 
     // subrange start, end
     int srStart, srEnd;
@@ -1534,9 +1551,10 @@ namespace Isis {
    *     each block of B and C are boost matrices
    */
   bool BundleAdjust::product_ATransB(symmetric_matrix <double,upper> &N22,
-      SparseBlockColumnMatrix &N12, SparseBlockRowMatrix &Q) {
+                                     SparseBlockColumnMatrix &N12,
+                                     SparseBlockRowMatrix &Q) {
 
-    QMapIterator<int, matrix<double>*> iN12(N12);
+    QMapIterator< int, boost::numeric::ublas::matrix< double > * > iN12(N12);
 
     while ( iN12.hasNext() ) {
       iN12.next();
@@ -1561,22 +1579,23 @@ namespace Isis {
    * NOTE: A = N12, B = Q
    */
   void BundleAdjust::AmultAdd_CNZRows_CHOLMOD(double alpha,
-      SparseBlockColumnMatrix &N12, SparseBlockRowMatrix &Q) {
+                                              SparseBlockColumnMatrix &N12,
+                                              SparseBlockRowMatrix &Q) {
 
     if (alpha == 0.0) {
       return;
     }
 
     // iterators for N12 and Q
-    QMapIterator<int, matrix<double>*> iN12(N12);
-    QMapIterator<int, matrix<double>*> iQ(Q);
+    QMapIterator<int, boost::numeric::ublas::matrix<double>*> iN12(N12);
+    QMapIterator<int, boost::numeric::ublas::matrix<double>*> iQ(Q);
 
     // now multiply blocks and subtract from m_SparseNormals
     while ( iN12.hasNext() ) {
       iN12.next();
 
       int nrow = iN12.key();
-      matrix<double> *in12 = iN12.value();
+      boost::numeric::ublas::matrix< double > *in12 = iN12.value();
 
       while ( iQ.hasNext() ) {
         iQ.next();
@@ -1586,7 +1605,7 @@ namespace Isis {
         if ( nrow > ncol )
           continue;
 
-        matrix<double> *iq = iQ.value();
+        boost::numeric::ublas::matrix< double > *iq = iQ.value();
 
         // insert submatrix at column, row
         m_SparseNormals.InsertMatrixBlock(ncol, nrow,
@@ -1605,8 +1624,10 @@ namespace Isis {
    * TODO: Define.
    *
    */
-  void BundleAdjust::AmultAdd_CNZRows_SPECIALK(double alpha, matrix<double> &A, compressed_matrix<double> &B,
-                                      symmetric_matrix<double, upper, column_major> &C) {
+  void BundleAdjust::AmultAdd_CNZRows_SPECIALK(double alpha, 
+                                               matrix<double> &A,
+                                               compressed_matrix<double> &B,
+                                               symmetric_matrix<double, upper, column_major> &C) {
 /*
     if (alpha == 0.0) {
       return;
@@ -1655,20 +1676,22 @@ namespace Isis {
    * TODO: Define.
    */
   void BundleAdjust::transA_NZ_multAdd_CHOLMOD(double alpha,
-      SparseBlockRowMatrix &Q, vector<double> &n2, vector<double> &m_nj) {
+                                               SparseBlockRowMatrix &Q,
+                                               vector<double> &n2,
+                                               vector<double> &m_nj) {
 
     if (alpha == 0.0)
       return;
 
-    QMapIterator<int, matrix<double>*> iQ(Q);
+    QMapIterator< int, boost::numeric::ublas::matrix< double > * > iQ(Q);
 
     while ( iQ.hasNext() ) {
       iQ.next();
 
       int nrow = iQ.key();
-      matrix<double>* m = iQ.value();
+      boost::numeric::ublas::matrix< double > *m = iQ.value();
 
-      vector<double> v = prod(trans(*m),n2);
+      boost::numeric::ublas::vector< double > v = prod(trans(*m), n2);
 
       //testing - should ask m_bundleObservations for this???
       int t=0;
@@ -1689,7 +1712,8 @@ namespace Isis {
    * TODO: Define.
    */
   void BundleAdjust::transA_NZ_multAdd_SPECIALK(double alpha, compressed_matrix<double> &A,
-                                                vector<double> &B, vector<double> &C) {
+                                                vector<double> &B,
+                                                vector<double> &C) {
 /*
     if (alpha == 0.0)
       return;
@@ -1733,7 +1757,9 @@ namespace Isis {
    * TODO: Define.
    */
   void BundleAdjust::AmulttransBNZ(matrix<double> &A,
-      compressed_matrix<double> &B, matrix<double> &C, double alpha) {
+                                   compressed_matrix<double> &B,
+                                   matrix<double> &C,
+                                   double alpha) {
 
     if ( alpha == 0.0 ) {
       return;
@@ -1747,8 +1773,8 @@ namespace Isis {
     // create array of non-zero indices of matrix B
     std::vector<int> nz(B.nnz() / nRowsB);
 
-    typedef compressed_matrix<double>::iterator1 it_row;
-    typedef compressed_matrix<double>::iterator2 it_col;
+    typedef boost::numeric::ublas::compressed_matrix<double>::iterator1 it_row;
+    typedef boost::numeric::ublas::compressed_matrix<double>::iterator2 it_col;
 
     it_row itr = B.begin1();
     int nIndex = 0;
@@ -1784,8 +1810,9 @@ namespace Isis {
    * TODO: Define.
    */
   void BundleAdjust::ANZmultAdd(compressed_matrix<double> &A,
-      symmetric_matrix<double, upper, column_major> &B,
-      matrix<double> &C, double alpha) {
+                                symmetric_matrix<double, upper, column_major> &B,
+                                matrix<double> &C,
+                                double alpha) {
 
     if ( alpha == 0.0 )
       return;
@@ -1798,8 +1825,8 @@ namespace Isis {
     // create array of non-zero indices of matrix A
     std::vector<int> nz(A.nnz() /nRowsA);
 
-    typedef compressed_matrix<double>::iterator1 it_row;
-    typedef compressed_matrix<double>::iterator2 it_col;
+    typedef boost::numeric::ublas::compressed_matrix<double>::iterator1 it_row;
+    typedef boost::numeric::ublas::compressed_matrix<double>::iterator2 it_col;
 
     it_row itr = A.begin1();
     int nIndex = 0;
@@ -1959,7 +1986,7 @@ namespace Isis {
 
       int nLeadingColumns = m_SparseNormals.getLeadingColumnsForBlock(ncol);
 
-      QMapIterator<int, matrix<double>*> it(*sbc);
+      QMapIterator< int, boost::numeric::ublas::matrix< double > * > it(*sbc);
 
       while ( it.hasNext() ) {
         it.next();
@@ -1968,7 +1995,7 @@ namespace Isis {
 
         int nLeadingRows = m_SparseNormals.getLeadingRowsForBlock(nrow);
 
-        matrix<double>* m = it.value();
+        boost::numeric::ublas::matrix< double > *m = it.value();
         if ( !m ) {
           printf("matrix block retrieval failure at column %d, row %d", ncol,nrow);
           printf("Total # of block columns: %d", nblockcolumns);
@@ -2151,7 +2178,8 @@ namespace Isis {
    *
    */
   bool BundleAdjust::CholeskyUT_NOSQR_BackSub(symmetric_matrix<double, upper, column_major> &m,
-                                              vector<double> &s, vector<double> &rhs) {
+                                              vector<double> &s,
+                                              vector<double> &rhs) {
     int i, j;
     double sum;
     double d1, d2;
@@ -2196,14 +2224,14 @@ namespace Isis {
     double colk, tmpkj, tmpkk;
 
     // create temporary copy, inverse will be stored in m_Normals
-    symmetric_matrix<double, upper, column_major> tmp = m_Normals;
+    boost::numeric::ublas::symmetric_matrix< double, upper, column_major > tmp = m_Normals;
 //    symmetric_matrix<double,lower> tmp = m_Normals;
 
     // solution vector
-    vector<double> s(m_nRank);
+    boost::numeric::ublas::vector< double > s(m_nRank);
 
     // initialize column vector
-    vector<double> column(m_nRank);
+    boost::numeric::ublas::vector< double > column(m_nRank);
     column.clear();
     column(0) = 1.0;
 
@@ -2301,7 +2329,7 @@ namespace Isis {
     double det;
     double den;
 
-    symmetric_matrix<double, upper> c = m;
+    boost::numeric::ublas::symmetric_matrix< double, upper > c = m;
 
     den = m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1))
           - m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0))
@@ -2328,8 +2356,10 @@ namespace Isis {
   /**
    * compute partials for measure
    */
-  bool BundleAdjust::computePartials_DC(matrix<double> &coeff_image, matrix<double> &coeff_point3D,
-                                        vector<double> &coeff_RHS, BundleMeasure &measure,
+  bool BundleAdjust::computePartials_DC(matrix<double> &coeff_image,
+                                        matrix<double> &coeff_point3D,
+                                        vector<double> &coeff_RHS,
+                                        BundleMeasure &measure,
                                         BundleControlPoint &point) {
 
     // additional vectors
@@ -2577,9 +2607,9 @@ namespace Isis {
       }
 
       // get NIC, Q, and correction vector for this point
-      bounded_vector<double, 3> &NIC = point->nicVector();
+      boost::numeric::ublas::bounded_vector< double, 3 > &NIC = point->nicVector();
       SparseBlockRowMatrix &Q = point->cholmod_QMatrix();
-      bounded_vector<double, 3> &corrections = point->corrections();
+      boost::numeric::ublas::bounded_vector< double, 3 > &corrections = point->corrections();
 
 //      printf("Q\n");
 //      std::cout << Q << std::endl;
@@ -2912,8 +2942,8 @@ namespace Isis {
       BundleControlPoint *bundleControlPoint = m_bundleControlPoints.at(i);
 
       // get weight and correction vector for this point
-      bounded_vector<double, 3> weights = bundleControlPoint->weights();
-      bounded_vector<double, 3> corrections = bundleControlPoint->corrections();
+      boost::numeric::ublas::bounded_vector<double, 3> weights = bundleControlPoint->weights();
+      boost::numeric::ublas::bounded_vector<double, 3> corrections = bundleControlPoint->corrections();
 
       //printf("Point: %s PointIndex: %d Loop(i): %d\n",point->GetId().toAscii().data(),nPointIndex,i);
       //std::cout << weights << std::endl;
@@ -2939,13 +2969,13 @@ namespace Isis {
       BundleObservation *observation = m_bundleObservations.at(i);
 
       // get weight and correction vector for this observation
-      vector<double> &weights = observation->parameterWeights();
-      vector<double> &corrections = observation->parameterCorrections();
+      const boost::numeric::ublas::vector<double> &weights = observation->parameterWeights();
+      const boost::numeric::ublas::vector<double> &corrections = observation->parameterCorrections();
 
       for (int j = 0; j < (int)corrections.size(); j++) {
-        if (weights(j) > 0.0) {
-          v = corrections(j);
-          vtpv_image += v * v * weights(j);
+        if (weights[j] > 0.0) {
+          v = corrections[j];
+          vtpv_image += v * v * weights[j];
         }
       }
 
@@ -3248,8 +3278,8 @@ namespace Isis {
     if ( !CholeskyUT_NOSQR_Inverse() )
         return false;
 
-    matrix<double> T(3, 3);
-    matrix<double> QS(3, m_nRank);
+    boost::numeric::ublas::matrix<double> T(3, 3);
+    boost::numeric::ublas::matrix<double> QS(3, m_nRank);
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     double t;
 
@@ -3271,7 +3301,7 @@ namespace Isis {
         QS.clear();
 
         // get corresponding Q matrix
-        compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
+        boost::numeric::ublas::compressed_matrix< double > &Q = m_Qs_SPECIALK[nPointIndex];
 
         // form QS
         QS = prod(Q, m_Normals);
@@ -3326,7 +3356,7 @@ namespace Isis {
     cholmod_free_triplet(&m_pTriplet, &m_cm);
     cholmod_free_sparse(&m_N, &m_cm);
 
-    matrix<double> T(3, 3);
+    boost::numeric::ublas::matrix< double > T(3, 3);
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     double t;
 
@@ -3412,7 +3442,7 @@ namespace Isis {
 
         // store solution in corresponding column of inverse
         for ( k = 0; k < sbcMatrix.size(); k++ ) {
-          matrix<double>* matrix = sbcMatrix.value(k);
+          boost::numeric::ublas::matrix< double > *matrix = sbcMatrix.value(k);
 
           int sz1 = matrix->size1();
 
@@ -3430,12 +3460,13 @@ namespace Isis {
 
       // save adjusted image sigmas
       BundleObservation *observation = m_bundleObservations.at(i);
-      vector< double > &adjustedSigmas = observation->adjustedSigmas();
-      matrix<double>* imageCovMatrix = sbcMatrix.value(i);
+      boost::numeric::ublas::vector<double> adjustedSigmas(ncolsCurrentBlockColumn);
+      boost::numeric::ublas::matrix< double > *imageCovMatrix = sbcMatrix.value(i);
       for ( int z = 0; z < ncolsCurrentBlockColumn; z++) {
 //        adjustedSigmas[z] = (*imageCovMatrix)(z,z);
         adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleResults.sigma0();
       }
+      observation->setAdjustedSigmas(adjustedSigmas);
 
       // Output inverse matrix to the open file.
       outStream << sbcMatrix;
@@ -3460,10 +3491,10 @@ namespace Isis {
         T.clear();
 
         // get corresponding point covariance matrix
-        symmetric_matrix<double> &cv = point_covs[nPointIndex];
+        boost::numeric::ublas::symmetric_matrix< double > &cv = point_covs[nPointIndex];
 
         // get qT - index i is the key into Q for qT
-        matrix<double>* qT = Q.value(i);
+        boost::numeric::ublas::matrix< double > *qT = Q.value(i);
         if (!qT) {
           nPointIndex++;
           continue;
@@ -3471,7 +3502,7 @@ namespace Isis {
 
         // iterate over Q
         // q is current map value
-        QMapIterator<int, matrix<double>*> it(Q);
+        QMapIterator< int, boost::numeric::ublas::matrix< double > * > it(Q);
          while ( it.hasNext() ) {
            it.next();
 
@@ -3480,12 +3511,12 @@ namespace Isis {
            if (it.key() > i)
              break;
 
-           matrix<double>* q = it.value();
+           boost::numeric::ublas::matrix< double > *q = it.value();
 
            if ( !q ) // should never be NULL
              continue;
 
-           matrix<double>* nI = sbcMatrix.value(it.key());
+           boost::numeric::ublas::matrix< double > *nI = sbcMatrix.value(it.key());
 
            if ( !nI ) // should never be NULL
              continue;
@@ -3533,7 +3564,7 @@ namespace Isis {
       }
 
       // get corresponding point covariance matrix
-      symmetric_matrix<double> &cv = point_covs[nPointIndex];
+      boost::numeric::ublas::symmetric_matrix< double > &cv = point_covs[nPointIndex];
 
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO
@@ -4366,7 +4397,7 @@ namespace Isis {
       dResidualRms = point->GetResidualRms();
 
       // point corrections and initial sigmas
-      bounded_vector<double,3> corrections = bundlecontrolpoint->corrections();
+      boost::numeric::ublas::bounded_vector< double, 3 > corrections = bundlecontrolpoint->corrections();
       cor_lat_m = corrections[0]*m_dRTM;
       cor_lon_m = corrections[1]*m_dRTM*cos(dLat*Isis::DEG2RAD);
       cor_rad_m  = corrections[2]*1000.0;

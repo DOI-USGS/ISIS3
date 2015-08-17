@@ -190,6 +190,7 @@ namespace Isis {
    *   @history 2014-11-05 Ken Edmundson - Fixed memory bug. Wasn't releasing cholmod_factor m_L
    *                           every iteration. Now release every iteration but the last since we
    *   @history 2015-02-20 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
+   *   @history 2015-08-17 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
