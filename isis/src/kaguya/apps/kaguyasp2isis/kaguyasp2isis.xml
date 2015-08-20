@@ -32,17 +32,10 @@
       from a Kaguya Spectral Profiler file and puts the 
       data into a tab delimited table.
     </change>
-    <change name="Tyler Wilson" date="2015-08-19">
-      Changed the line:  <categoryItem>Utility</categoryItem>
-      to <missionItem>Kaguya</missionItem> so that this
-      app does not appear under a list of Core ISIS programs,
-      but instead appears with kaguyami2isis and kaguyac2isis
-      under Mission Specific programs in the documentation.	
-    </change>	
   </history>
 
   <category>
-    <missionItem>Kaguya</missionItem>
+    <categoryItem>Utility</categoryItem>
   </category>
 
   <groups>
