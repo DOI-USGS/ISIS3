@@ -63,4 +63,80 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < (int)cubes.size(); i++) {
     std::cout << "  Cube " << i + 1 << " | " << cubes[i]->bandCount() << std::endl;
   }
+  std::cout << std::endl;
+
+  // Test CleanUp() methods
+ 
+  // Try cleaning up a cube that isn't managed by CubeManager
+  CubeManager::CleanUp("unmanagedCube.cub");
+
+  // Clean up one of the managed cubes
+  CubeManager::CleanUp("$base/testData/blobTruth.cub");
+
+  // Print Cube FileNames to verify that we have cleaned isisTruth cubes correctly
+  std::cout << "Verify blobTruth cubes have been cleaned" << std::endl;
+  std::cout << "Cube FileNames: " << std::endl;
+
+  for (int i = 0; i < (int)cubes.size(); i++) {
+    std::cout << "  " << i + 1 << " : " << FileName(cubes[i]->fileName()).baseName() << std::endl;
+  }
+  std::cout << std::endl;
+
+  // Clean up remaining cubes
+  CubeManager::CleanUp();
+
+  // Print Cube FileNames to verify that we have cleaned remaining cubes correctly
+  std::cout << "Verify remaining cubes have been cleaned" << std::endl;
+  std::cout << "Cube FileNames: " << std::endl;
+
+  for (int i = 0; i < (int)cubes.size(); i++) {
+    std::cout << "  " << i + 1 << " : " << FileName(cubes[i]->fileName()).baseName() << std::endl;
+  }
+  std::cout << std::endl;
+
+  // Create a CubeManager instance (implicitly test destructor)
+  QVector<Cube *> cubes2;
+  CubeManager mgr;
+  cubes2.push_back(mgr.OpenCube("$base/testData/isisTruth.cub"));
+  cubes2.push_back(mgr.OpenCube("$base/testData/blobTruth.cub"));
+
+  // Test setting an opened cube limit
+  mgr.SetNumOpenCubes(2);
+  std::cout << "Set number of open cubes to 2" << std::endl;
+  std::cout << endl;
+
+  // Print Cube FileNames to verify the currently managed cubes
+  std::cout << "Currently managed cubes:" << std::endl;
+  for (int i = 0; i < (int)cubes2.size(); i++) {
+    std::cout << "  " << i + 1 << " : " << FileName(cubes2[i]->fileName()).baseName() << std::endl;
+  }
+  std::cout << std::endl;
+
+  // This will test the cleanup in OpenCube(const QString &)
+  cubes2.push_back(mgr.OpenCube("$base/testData/isisTruth2.cub"));
+  // we pop the front because OpenCube should dequeue and clean 1 item to enforce limit
+  cubes2.pop_front();
+  std::cout << "Opened isisTruth2.cub." << std::endl;
+  std::cout << "Verify isisTruth2.cub is now managed and limit of 2 is enforced:" << std::endl;
+  for (int i = 0; i < (int)cubes2.size(); i++) {
+    std::cout << "  " << i + 1 << " : " << FileName(cubes2[i]->fileName()).baseName() << std::endl;
+  }
+  std::cout << std::endl;
+
+  // Cleanup
+  mgr.CleanCubes();
+
+  // Set a open cube limit that exceeds the system open file limit
+  std::cout << "Setting number of open cubes > 60 percent of system open file limit" << std::endl;
+  mgr.SetNumOpenCubes(1000000);
+  std::cout << std::endl;
+  
+  // Open a cube that DNE
+  std::cout << "Attempting to open a file that does not exist:" << std::endl;
+  try {
+    mgr.OpenCube("dne.cub");
+  } catch (IException &e) {
+    std::cout << "  " << e.what() << std::endl;
+  }
+
 }
