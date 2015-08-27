@@ -109,7 +109,7 @@ namespace Isis {
   /**
    * This method removes a cube from memory, if it exists. If the cube is not
    * loaded into memory, nothing happens. This will cause any pointers to this
-   * cube, obtained via OpenCube, to be invalid.
+   * cube, obtained via OpenCube, to be NULL.
    *
    * @param cubeFileName The filename of the cube to remove from memory
    */
@@ -122,22 +122,22 @@ namespace Isis {
       return;
     }
 
-    (*searchResult)->close();
-    delete *searchResult;
+    delete searchResult.value();
+    searchResult.value() = NULL;
     p_cubes.erase(searchResult);
   }
 
 
   /**
    * This method removes all cubes from memory. All pointers returned via OpenCube
-   * will be invalid.
+   * will be NULL.
    */
   void CubeManager::CleanCubes() {
     QMap<QString, Cube *>::iterator pos = p_cubes.begin();
 
     while (pos != p_cubes.end()) {
-      (*pos)->close();
-      delete *pos;
+      delete pos.value();
+      pos.value() = NULL;
       pos ++;
     }
 

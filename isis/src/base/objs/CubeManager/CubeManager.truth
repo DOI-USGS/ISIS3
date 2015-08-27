@@ -30,19 +30,10 @@ Verify blobTruth cubes have been cleaned
 Cube FileNames: 
   1 : isisTruth
   2 : isisTruth
-  3 : 
-  4 : 
+  3 : (cleaned)
+  4 : (cleaned)
   5 : isisTruth
   6 : isisTruth
-
-Verify remaining cubes have been cleaned
-Cube FileNames: 
-  1 : 
-  2 : 
-  3 : 
-  4 : 
-  5 : 
-  6 : 
 
 Set number of open cubes to 2
 
