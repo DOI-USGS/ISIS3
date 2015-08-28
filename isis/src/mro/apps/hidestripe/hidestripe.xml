@@ -177,11 +177,11 @@
       <brief> Additive correction </brief>
       <description>
         This example shows the default additive correction applied to a binned
-		  1 image in an image that is mixed and includes binning modes 1 and 4
+		  0 image in an image that is mixed and includes binning modes 0 and 1
       </description>
       <terminalInterface>
         <commandLine> 
-		    from=HiRISE/cubs/RED5_bin1.cub to=HIRISE/cubs/RED5_bin1_corrected.cub
+		    from=HiRISE/cubs/PSP_RED5_bin0.cub to=HIRISE/cubs/PSP_RED5_bin0_corrected.cub
         </commandLine>
         <description>
 		    Note that the defaults are not changed, and thus the additive 
@@ -190,38 +190,37 @@
       </terminalInterface>
 
       <inputImages>
-        <image src="assets/image/in1.jpg" width="500" height="500">
+        <image src="assets/image/destripe_input.png" width="541" height="629">
           <brief> Input image before hidestripe</brief>
           <description>
-			   The image before the correction is applied. Note the horizontal 
-				stripes.
+			   The image before the correction is applied. Note the stripes.
           </description>
-          <thumbnail caption="Before correction" src="assets/thumb/in1.jpg" width="200" height="200"/>
+          <thumbnail caption="Before correction" src="assets/thumb/destripe_input.png" width="200" height="200"/>
           <parameterName>FROM</parameterName>
         </image>
       </inputImages>
 
       <outputImages>
-        <image src="assets/image/out1.jpg" width="500" height="500">
+        <image src="assets/image/destripe_output.png" width="541" height="629">
           <brief> Output image after hidestripe</brief>
           <description>
-			   The same image has now been smoothed such that the horizontal
-				stripes are removed.
+			   The same image has now been smoothed such that the stripes 
+               are removed.
           </description>
-          <thumbnail caption="After correction" src="assets/thumb/out1.jpg" width="200" height="200"/>
+          <thumbnail caption="After correction" src="assets/thumb/destripe_output.png" width="200" height="200"/>
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
 
       <guiInterfaces>
         <guiInterface>
-          <image width="441" height="221" src="assets/image/gui1.jpg">
+          <image width="715" height="501" src="assets/image/destripe_gui.png">
             <brief>Example Gui</brief>
             <description>
 				  Parameters set to perform additive correction. No options have
 				  been changed from their defaults (though required TO/FROM have).
             </description>
-            <thumbnail width="200" height="100" caption="Default Gui" src="assets/thumb/gui1.jpg" />
+            <thumbnail width="200" height="153" caption="Default Gui" src="assets/thumb/destripe_gui.png" />
           </image>
         </guiInterface>
       </guiInterfaces>
