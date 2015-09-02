@@ -20,6 +20,8 @@
 
 #include "Chandrayaan1M3Camera.h"
 
+#include <QString>
+
 #include "Chandrayaan1M3DistortionMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -45,6 +47,11 @@ namespace Isis {
    *   @history 2013-08-18 Stuart Sides - Original version.
    */
   Chandrayaan1M3Camera::Chandrayaan1M3Camera(Cube &cube) : LineScanCamera(cube) {
+    m_instrumentNameLong = "Moon Mineralogy Mapper";
+    m_instrumentNameShort = "M3";
+    m_spacecraftNameLong = "Chandrayaan 1";
+    m_spacecraftNameShort = "Chan1";
+
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
@@ -97,7 +104,48 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString Chandrayaan1M3Camera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString Chandrayaan1M3Camera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString Chandrayaan1M3Camera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString Chandrayaan1M3Camera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate an Chandrayaan1M3Camera object. 

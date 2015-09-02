@@ -82,6 +82,12 @@ int main(void) {
       cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
       cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
       cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+      
+      // Test name methods
+      cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
 
       // Test Shutter Open/Close 
       const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
@@ -130,6 +136,11 @@ int main(void) {
       }
       cout << endl << "--------------------------------------------" << endl;
     }
+    
+    // Test exception: camera is not a supported Kaguya camera
+    cout << endl << "Testing exceptions:" << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    Mariner10Camera mCam(test);
   }
   catch(IException &e) {
     e.print();

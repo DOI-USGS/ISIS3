@@ -22,6 +22,8 @@
 
 #include "LineScanCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief LRO Narrow Angle Camera Model
@@ -37,13 +39,14 @@ namespace Isis {
    * @internal
    *   @history 2009-02-20  Jacob Danton, Original Object
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *            inherit directly from Camera
+   *                           inherit directly from Camera
    *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
-   *            methods. Updated documentation. Removed Lro namespace wrap
-   *            inside Isis namespace wrap. Added Isis Disclaimer to files.
-   *            Added NAIF error check to constructor.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           methods. Updated documentation. Removed Lro namespace wrap
+   *                           inside Isis namespace wrap. Added Isis Disclaimer to files.
+   *                           Added NAIF error check to constructor.
+   *   @history 2015-08-14 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           added methods and added test data for LRO NACL.
    */
   class LroNarrowAngleCamera : public LineScanCamera {
     public:
@@ -75,6 +78,17 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+
+    private:
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

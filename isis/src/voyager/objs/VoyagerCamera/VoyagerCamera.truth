@@ -30,3 +30,30 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+Testing name methods
+
+Spacecraft Name Long: Voyager 1
+Spacecraft Name Short: Voyager1
+Instrument Name Long: Narrow Angle Camera
+Instrument Name Short: NAC
+
+Spacecraft Name Long: Voyager 1
+Spacecraft Name Short: Voyager1
+Instrument Name Long: Wide Angle Camera
+Instrument Name Short: WAC
+
+Spacecraft Name Long: Voyager 2
+Spacecraft Name Short: Voyager2
+Instrument Name Long: Narrow Angle Camera
+Instrument Name Short: NAC
+
+Spacecraft Name Long: Voyager 2
+Spacecraft Name Short: Voyager2
+Instrument Name Long: Wide Angle Camera
+Instrument Name Short: WAC
+
+
+Testing exceptions:
+
+**USER ERROR** File does not appear to be a Voyager image. SpacecraftName [HAYABUSA] is invalid Voyager value.

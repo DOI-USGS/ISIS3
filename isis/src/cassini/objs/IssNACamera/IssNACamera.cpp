@@ -20,6 +20,8 @@
 // $Id: IssNACamera.cpp,v 1.6 2009/08/31 15:12:29 slambright Exp $
 #include "IssNACamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -42,6 +44,11 @@ namespace Isis {
    *                          to ShutterOpenCloseTimes() method.
    */
   IssNACamera::IssNACamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Imaging Science Subsystem Narrow Angle";
+    m_instrumentNameShort = "ISSNA";
+    m_spacecraftNameLong = "Cassini Huygens";
+    m_spacecraftNameShort = "Cassini";
+    
     Pvl &lab = *cube.label();
 
     // Get the filter wheels positions dependent focal length.
@@ -143,7 +150,48 @@ namespace Isis {
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString IssNACamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString IssNACamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString IssNACamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString IssNACamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a IssNACamera

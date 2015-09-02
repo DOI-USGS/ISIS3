@@ -26,6 +26,7 @@
 
 #include <QList>
 #include <QPointF>
+#include <QString>
 
 #include "Cube.h"
 #include "Interpolator.h"
@@ -187,14 +188,16 @@ namespace Isis {
    *                           with no dimensions in the label. 
    *   @history 2012-10-10 Debbie A. Cook - Moved the functionality related to the shape model into 
    *                           new classes:  ShapeModel, EllipsoidShape, DemShape, and 
-   *                           EquatorialCylindricalShape.  Also modified to use new Target class.  References 
-   *                           #775 and #1114
+   *                           EquatorialCylindricalShape.  Also modified to use new Target class.  
+   *                           References #775 and #1114
    *   @history 2012-10-25 Jeannie Backer - Changed resolution() method to lower
    *                           camel case. References #1181.
    *   @history 2012-03-04 Tracie Sucharski - Added new method, PixelIfovOffsets, which will return
    *                           the ifov offsets from the center of the pixel in mm.  This is a
    *                           virtual method and if not implemented in the specific instrument
    *                           camera, this class will throw an error.  References #1604.
+   *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added pure virtual methods to return
+   *                           the long and short spacecraft and instrument names.
    */
   class Sensor : public Spice {
     public:
@@ -256,6 +259,11 @@ namespace Isis {
       void IgnoreElevationModel(bool ignore);
 
       virtual QList<QPointF> PixelIfovOffsets();
+
+      virtual QString instrumentNameLong() const = 0;
+      virtual QString instrumentNameShort() const = 0;
+      virtual QString spacecraftNameLong() const = 0;
+      virtual QString spacecraftNameShort() const = 0;
 
     private:
       // This version of DemRadius is for SetLookDirection ONLY. Do not call.

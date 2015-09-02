@@ -26,6 +26,8 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -71,6 +73,8 @@ namespace Isis {
     if(spacecraft == "VIKING_ORBITER_1") {
       p_ckFrameId = -27000;
       p_spkTargetId = -27;
+      m_spacecraftNameLong = "Viking Orbiter 1";
+      m_spacecraftNameShort = "Viking1";
 
       spn = 1;
       altinstcode = -27999;
@@ -80,6 +84,8 @@ namespace Isis {
         crosscone = -0.707350;
         cone = -0.007580;
         raster = 89.735690;
+        m_instrumentNameLong = "Visual Imaging Subsystem Camera A";
+        m_instrumentNameShort = "VISA";
       }
       else if(instId == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B") {
         cam = "1b";
@@ -87,6 +93,8 @@ namespace Isis {
         crosscone = 0.681000;
         cone = -0.032000;
         raster = 90.022800;
+        m_instrumentNameLong = "Visual Imaging Subsystem Camera B";
+        m_instrumentNameShort = "VISB";
       }
       else {
         QString msg = "File does not appear to be a Viking image. InstrumentId ["
@@ -97,6 +105,8 @@ namespace Isis {
     else if(spacecraft == "VIKING_ORBITER_2") {
       p_ckFrameId = -30000;
       p_spkTargetId = -30;
+      m_spacecraftNameLong = "Viking Orbiter 2";
+      m_spacecraftNameShort = "Viking2";
 
       spn = 2;
       altinstcode = -30999;
@@ -106,6 +116,8 @@ namespace Isis {
         crosscone = -0.679330;
         cone = -0.023270;
         raster = 89.880691;
+        m_instrumentNameLong = "Visual Imaging Subsystem Camera A";
+        m_instrumentNameShort = "VISA";
       }
       else if(instId == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_B") {
         cam = "2b";
@@ -113,6 +125,8 @@ namespace Isis {
         crosscone = 0.663000;
         cone = -0.044000;
         raster = 89.663790;
+        m_instrumentNameLong = "Visual Imaging Subsystem Camera B";
+        m_instrumentNameShort = "VISB";
       }
       else {
         QString msg = "File does not appear to be a Viking image. InstrumentId ["
@@ -187,6 +201,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times. The user should pass in the
    * ExposureDuration keyword value and the SpacecraftClockCount keyword value,
@@ -223,6 +238,46 @@ namespace Isis {
     shuttertimes.first = time + offset1 + offset2;
     shuttertimes.second = shuttertimes.first.Et() + exposureDuration;
     return shuttertimes;
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString VikingCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString VikingCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString VikingCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString VikingCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

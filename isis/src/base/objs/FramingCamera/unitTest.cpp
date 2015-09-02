@@ -59,6 +59,12 @@ class MyCamera : public FramingCamera {
       string msg = "SPK Reference ID is unique to mission-specific cameras";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
+    
+    // These are pure virtual within Sensor that must be overriden
+    virtual QString instrumentNameLong() const { return QString("Framing"); }
+    virtual QString instrumentNameShort() const { return QString("F"); }
+    virtual QString spacecraftNameLong() const { return QString("Framing 1"); }
+    virtual QString spacecraftNameShort() const { return QString("F1"); }
 
     /**
      * This is a pure virtual method from the FramingCamera class and must be

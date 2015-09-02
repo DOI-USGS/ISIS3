@@ -27,3 +27,11 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Mars Odyssey
+Spacecraft Name Short: Odyssey
+Instrument Name Long: Thermal Emission Imaging System Infrared
+Instrument Name Short: Themis-IR
+

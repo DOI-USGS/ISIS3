@@ -22,6 +22,8 @@
 
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * This is the camera model for the Hayabusa AMICA camera.
@@ -34,10 +36,13 @@ namespace Isis {
    * @internal 
    *   @history 2013-11-27 Kris Becker - Original version
    *   @history 2015-02-26 Kris Becker - Implement starting detector specs; add
-   *                         summing and AlphaCube support.
+   *                           summing and AlphaCube support.
    *   @history 2015-03-11 Kris Becker - Fixed timing error - was using the
-   *                         UTC StartTime rather than the
-   *                         SpacecraftClockStartCount. References #2180.
+   *                           UTC StartTime rather than the
+   *                           SpacecraftClockStartCount. References #2180.
+   *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these added methods.
    */
   class AmicaCamera : public FramingCamera {
     public:
@@ -70,6 +75,18 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+   
+    private:
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
+    
   };
 };
 #endif

@@ -23,6 +23,8 @@
 
 #include "PushFrameCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Marci Camera Model
@@ -53,6 +55,10 @@ namespace Isis {
    *   @history 2014-04-17 Jeannie Backer - Updated due to method name change in
    *                           PushFrameCameraDetectorMap. Moved method implementations to cpp file.
    *                           References #1659
+   *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods.
+
    */
   class MarciCamera : public PushFrameCamera {
     public:
@@ -67,6 +73,11 @@ namespace Isis {
       virtual int CkFrameId() const;
       virtual int CkReferenceId() const;
       virtual int SpkReferenceId() const;
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
     private:
       void StoreCoefficients(int naifIkCode);
@@ -80,6 +91,11 @@ namespace Isis {
       std::vector<int> p_detectorStartLines;
       std::vector<int> p_filterNumbers;
       std::vector<int> p_frameletOffsets;
+      
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

@@ -21,6 +21,8 @@
  */
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Cassini ISS Narrow Angle Camera Model
@@ -62,6 +64,9 @@ namespace Isis {
    *   @history 2012-09-12 Stuart C. Sides -  Added ability for the camera to use the default
    *                           focal length if the observation was taken using a filter
    *                           combination not supported in the calibration report. Fixes #837.
+   *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods.
    */
   class IssNACamera : public FramingCamera {
     public:
@@ -102,6 +107,17 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+   
+    private:
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

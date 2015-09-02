@@ -20,6 +20,9 @@
 #include <iomanip>
 #include <iostream>
 
+#include <QList>
+#include <QString>
+
 #include "ApolloMetricCamera.h"
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -106,6 +109,27 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+    
+    // Test name methods
+    QList<QString> files;
+    files.append("$apollo15/testData/AS15-M-0533.cropped.cub");
+    files.append("$apollo16/testData/AS16-M-0533.reduced.cub");
+    files.append("$apollo17/testData/AS17-M-0543.reduced.cub");
+    
+    cout << endl << endl << "Testing name methods ..." << endl;
+    for (int i = 0; i < files.size(); i++) {
+      Cube n(files[i], "r");
+      ApolloMetricCamera *nCam = (ApolloMetricCamera *) CameraFactory::Create(n);
+      cout << "Spacecraft Name Long: " << nCam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << nCam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << nCam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << nCam->instrumentNameShort() << endl << endl;
+    }
+    
+    // Test exception
+    cout << endl << "Testing exceptions:" << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    ApolloMetricCamera mCam(test);
   }
   catch(IException &e) {
     e.print();

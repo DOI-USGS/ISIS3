@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -98
 SPK Reference ID = 1
 
+Spacecraft Name Long: New Horizons
+Spacecraft Name Short: NewHorizons
+Instrument Name Long: Multispectral Visible Imaging TDI Camera
+Instrument Name Short: MVIC TDI
+
 For upper left  ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000

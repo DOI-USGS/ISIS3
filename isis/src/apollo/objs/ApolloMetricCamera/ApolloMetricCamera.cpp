@@ -21,6 +21,8 @@
 
 #include "ApolloMetricDistortionMap.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -47,7 +49,47 @@ namespace Isis {
    */
   ApolloMetricCamera::ApolloMetricCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
+    
+    m_instrumentNameLong = "Metric Camera";
+    m_instrumentNameShort = "Metric";
 
+    Pvl &lab = *cube.label();
+    const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+
+    // The Spacecraft Name should be either Apollo 15, 16, or 17.  The name
+    // itself could be formatted any number of ways, but the number contained
+    // in the name should be unique between the missions
+    // We use the naifIkCode instead now
+    //QString spacecraft = inst.findKeyword("SpacecraftName")[0];
+    // Apollo 15 Pan naif code = -917240
+    if (naifIkCode() == -915240) {
+      p_ckFrameId = -915240;
+      p_ckReferenceId = 1;
+      p_spkTargetId = -915;
+      m_spacecraftNameLong = "Apollo 15";
+      m_spacecraftNameShort = "Apollo15";
+    }
+    // Apollo 16 Pan naif code = -917240
+    else if (naifIkCode() == -916240) {
+      p_ckFrameId = -916240;
+      p_ckReferenceId = 1;
+      p_spkTargetId = -916;
+      m_spacecraftNameLong = "Apollo 16";
+      m_spacecraftNameShort = "Apollo16";
+    }
+    // Apollo 17 Pan naif code = -917240
+    else if (naifIkCode() == -917240) {
+      p_ckFrameId = -917240;
+      p_ckReferenceId = 1;
+      p_spkTargetId = -917;
+      m_spacecraftNameLong = "Apollo 17";
+      m_spacecraftNameShort = "Apollo17";
+    }
+    else {
+      QString msg = "File does not appear to be an Apollo image";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    
     // Get the camera characteristics
     SetFocalLength();
     SetPixelPitch();
@@ -72,33 +114,6 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    Pvl &lab = *cube.label();
-    const PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
-
-    // The Spacecraft Name should be either Apollo 15, 16, or 17.  The name
-    // itself could be formatted any number of ways, but the number contained
-    // in the name should be unique between the missions
-    QString spacecraft = inst.findKeyword("SpacecraftName")[0];
-    if (spacecraft.contains("15")) {
-      p_ckFrameId = -915240;
-      p_ckReferenceId = 1;
-      p_spkTargetId = -915;
-    }
-    else if (spacecraft.contains("16")) {
-      p_ckFrameId = -916240;
-      p_ckReferenceId = 1;
-      p_spkTargetId = -916;
-    }
-    else if (spacecraft.contains("17")) {
-      p_ckFrameId = -917240;
-      p_ckReferenceId = 1;
-      p_spkTargetId = -917;
-    }
-    else {
-      QString msg = "File does not appear to be an Apollo image";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
     // Create a cache and grab spice info since it does not change for
     // a framing camera (fixed spacecraft position and pointing)
     // Convert the start time to et
@@ -107,6 +122,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times. The user should pass in the
    * exposure duration in seconds and the StartTime keyword value, converted to
@@ -137,7 +153,48 @@ namespace Isis {
     shuttertimes.second = time + (exposureDuration / 2.0);
     return shuttertimes;
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString ApolloMetricCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString ApolloMetricCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString ApolloMetricCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString ApolloMetricCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 } // End Apollo namespace
+
 
 /**
  * This is the function that is called in order to instantiate an

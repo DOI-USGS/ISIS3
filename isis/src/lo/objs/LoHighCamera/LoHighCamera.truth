@@ -1,4 +1,42 @@
 Unit Test for LoHighCamera...
+FileName: 3133_h1.cropped.cub
+CK Frame: -533001
+
+Kernel IDs: 
+CK Frame ID = -533000
+CK Reference ID = 1
+SPK Target ID = -533
+SPK Reference ID = 1
+
+Spacecraft Name Long: Lunar Orbiter 3
+Spacecraft Name Short: LO3
+Instrument Name Long: High Resolution Camera
+Instrument Name Short: High
+
+Shutter open = -1037072690.254770160
+Shutter close = -1037072690.154770255
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+--------------------------------------------
 FileName: 4164H_Full_mirror.cub
 CK Frame: -534001
 
@@ -7,6 +45,11 @@ CK Frame ID = -534000
 CK Reference ID = 1
 SPK Target ID = -534
 SPK Reference ID = 1
+
+Spacecraft Name Long: Lunar Orbiter 4
+Spacecraft Name Short: LO4
+Instrument Name Long: High Resolution Camera
+Instrument Name Short: High
 
 Shutter open = -1029127593.054901719
 Shutter close = -1029127592.954901814
@@ -30,3 +73,47 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+--------------------------------------------
+FileName: 5006_high_res_1.cropped.cub
+CK Frame: -535001
+
+Kernel IDs: 
+CK Frame ID = -535000
+CK Reference ID = 1
+SPK Target ID = -535
+SPK Reference ID = 1
+
+Spacecraft Name Long: Lunar Orbiter 5
+Spacecraft Name Short: LO5
+Instrument Name Long: High Resolution Camera
+Instrument Name Short: High
+
+Shutter open = -1022632633.546864033
+Shutter close = -1022632633.446864128
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+--------------------------------------------
+
+Testing exceptions:
+
+**PROGRAMMER ERROR** File does not appear to be a Lunar Orbiter image: -130102 is not a supported instrument kernel code for Lunar Orbiter.

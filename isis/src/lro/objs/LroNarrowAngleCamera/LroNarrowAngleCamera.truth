@@ -27,3 +27,20 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Lunar Reconnaissance Orbiter
+Spacecraft Name Short: LRO
+Instrument Name Long: Narrow Angle Camera Right
+Instrument Name Short: NACR
+
+Spacecraft Name Long: Lunar Reconnaissance Orbiter
+Spacecraft Name Short: LRO
+Instrument Name Long: Narrow Angle Camera Left
+Instrument Name Short: NACL
+
+
+Testing exceptions:
+
+**PROGRAMMER ERROR** File does not appear to be a Lunar Reconnaissance Orbiter Image: -130102 is not a supported instrument kernel code for Lunar Reconnaissance Orbiter.

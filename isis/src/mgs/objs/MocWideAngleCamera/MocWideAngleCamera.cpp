@@ -22,6 +22,8 @@
 #include "MocWideAngleDistortionMap.h"
 #include "MocLabels.h"
 
+#include <QString>
+
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
 #include "iTime.h"
@@ -44,6 +46,11 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   MocWideAngleCamera::MocWideAngleCamera(Cube &cube) : LineScanCamera(cube) {
+    m_instrumentNameLong = "Mars Orbiter Camera Wide Angle";
+    m_instrumentNameShort = "MOC-WA";
+    m_spacecraftNameLong = "Mars Global Surveyor";
+    m_spacecraftNameShort = "MGS";
+    
     NaifStatus::CheckErrors();
     // See if we have a moc camera
     Pvl &lab = *cube.label();
@@ -99,7 +106,48 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString MocWideAngleCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString MocWideAngleCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString MocWideAngleCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString MocWideAngleCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a

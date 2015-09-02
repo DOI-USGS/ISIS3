@@ -24,6 +24,8 @@
 
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Viking Camera Model
@@ -41,25 +43,29 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-11-15 Elizabeth Miller - Fixed problems caused by viking
-   *                          data area split
+   *                           data area split
    *   @history 2006-05-17 Elizabeth Miller - Depricated CameraManager to
-   *                          CameraFactory
+   *                           CameraFactory
    *   @history 2006-06-14 Elizabeth Miller - Changed format of unitTest to
-   *                          fix problems with minor naif changes
+   *                           fix problems with minor naif changes
    *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...)
-   *                          method instead of CreateCache(...).
+   *                           method instead of CreateCache(...).
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *                          inherit directly from Camera
+   *                           inherit directly from Camera
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
-   *                          pure virtual in Camera, implemented in mission
-   *                          specific cameras.
+   *                           pure virtual in Camera, implemented in mission
+   *                           specific cameras.
    *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
    *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes()
-   *                          method. Updated unitTest to test for new methods.
-   *                          Updated documentation. Added Isis Disclaimer to
-   *                          files. Added NAIF error check to constructor.
+   *                           method. Updated unitTest to test for new methods.
+   *                           Updated documentation. Added Isis Disclaimer to
+   *                           files. Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2015-08-14 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods and added data for Viking1 VISA, Viking1 VISB, and
+   *                           Viking2 VISA.
    *  
    */
   class VikingCamera : public FramingCamera {
@@ -110,10 +116,19 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (2); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
     private:
       int p_ckFrameId;       //!< "Camera-matrix" Kernel Frame ID
       int p_spkTargetId;     //!< Spacecraft Kernel Target ID
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

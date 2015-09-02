@@ -18,10 +18,12 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "NewHorizonsLeisaCamera.h"
+
 #include <QDebug>
+#include <QString>
 #include <QVector>
 
-#include "NewHorizonsLeisaCamera.h"
 #include "NaifStatus.h"
 #include "iTime.h"
 #include "LineScanCameraGroundMap.h"
@@ -47,7 +49,11 @@ namespace Isis {
    * @internal
    */
   NewHorizonsLeisaCamera::NewHorizonsLeisaCamera(Cube &cube) : LineScanCamera(cube) {
-
+    m_instrumentNameLong = "Linear Etalon Imaging Spectral Array";
+    m_instrumentNameShort = "LEISA";
+    m_spacecraftNameLong = "New Horizons";
+    m_spacecraftNameShort = "NewHorizons";
+    
     // Override the SPICE error process for SPICE calls 
     NaifStatus::CheckErrors(); 
 
@@ -161,6 +167,46 @@ namespace Isis {
     temp.append(m_origTransy[2]);
     this->FocalPlaneMap()->SetTransY(temp);
 
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsLeisaCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsLeisaCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString NewHorizonsLeisaCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsLeisaCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

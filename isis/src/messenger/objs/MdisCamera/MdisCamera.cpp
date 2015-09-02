@@ -22,6 +22,7 @@
 
 #include <cmath>
 
+#include <QString>
 #include <QVariant>
 
 #include "MdisCamera.h"
@@ -61,11 +62,29 @@ namespace Isis {
    *
    */
   MdisCamera::MdisCamera(Cube &cube) : FramingCamera(cube) {
+    m_spacecraftNameLong = "Messenger";
+    m_spacecraftNameShort = "Messenger";
+    
     NaifStatus::CheckErrors();
+    
     // Set up detector constants
     const int MdisWac(-236800);
-    // const int MdisNac(-236820);
-
+    const int MdisNac(-236820);
+    
+    if (naifIkCode() == MdisNac) {
+      m_instrumentNameLong = "Mercury Dual Imaging System Narrow Angle Camera";
+      m_instrumentNameShort = "MDIS-NAC";
+    }
+    else if (naifIkCode() == MdisWac) {
+      m_instrumentNameLong = "Mercury Dual Imaging System Wide Angle Camera";
+      m_instrumentNameShort = "MDIS-WAC";
+    }
+    else {
+      QString msg = QString::number(naifIkCode());
+      msg += " is not a supported instrument kernel code for Messenger.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
 
@@ -251,6 +270,47 @@ namespace Isis {
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString MdisCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString MdisCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString MdisCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString MdisCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
+  
 
 /**
  * @brief Computes temperature-dependent focal length 

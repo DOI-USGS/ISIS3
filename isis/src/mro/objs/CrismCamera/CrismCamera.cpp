@@ -24,6 +24,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QString>
+
 //#include "CrismCameraGroundMap.h"
 //#include "CrismDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -52,6 +54,10 @@ namespace Isis {
    */
   CrismCamera::CrismCamera(Cube &cube) : LineScanCamera(cube), m_lineRates(),
                                        m_isBandDependent(true) {
+    m_instrumentNameLong = "Compact Reconnaissance Imaging Spectrometer for Mars";
+    m_instrumentNameShort = "CRISM";
+    m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
+    m_spacecraftNameShort = "MRO";
     NaifStatus::CheckErrors();
 
     Pvl &lab = *cube.label();
@@ -200,6 +206,45 @@ namespace Isis {
     return (getClockTime(sclk, -74999).Et());
   }
 
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString CrismCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString CrismCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString CrismCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString CrismCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
 
 

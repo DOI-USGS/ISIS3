@@ -30,3 +30,10 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Clementine 1
+Spacecraft Name Short: Clementine1
+Instrument Name Long: Ultraviolet Visible Camera
+Instrument Name Short: UVVIS

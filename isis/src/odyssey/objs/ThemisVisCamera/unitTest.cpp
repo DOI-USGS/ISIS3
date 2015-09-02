@@ -171,8 +171,16 @@ int main(void) {
     TestSampLine(oddCam, samp, line);
 
     qDebug();
+    
+    // Test name methods
+    qDebug() << "Testing name methods ...";
+    qDebug() << "Spacecraft Name Long: " << evenCam->spacecraftNameLong();
+    qDebug() << "Spacecraft Name Short: " << evenCam->spacecraftNameShort();
+    qDebug() << "Instrument Name Long: " << evenCam->instrumentNameLong();
+    qDebug() << "Instrument Name Short: " << evenCam->instrumentNameShort();
     qDebug();
     qDebug();
+    
     qDebug() << "Testing errors";
     try {
       Cube irCube("$odyssey/testData/I00831002RDR.cub", "r");

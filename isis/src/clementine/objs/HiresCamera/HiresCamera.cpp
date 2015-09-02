@@ -20,6 +20,8 @@
 
 #include "HiresCamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -45,6 +47,11 @@ namespace Isis {
    *                          models. 
    */
   HiresCamera::HiresCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "High Resolution Camera";
+    m_instrumentNameShort = "HiRES";
+    m_spacecraftNameLong = "Clementine 1";
+    m_spacecraftNameShort = "Clementine1";
+    
     NaifStatus::CheckErrors();
     Pvl &lab = *cube.label();
     // Get the camera characteristics
@@ -124,6 +131,46 @@ namespace Isis {
   pair<iTime, iTime> HiresCamera::ShutterOpenCloseTimes(double time,
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString HiresCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString HiresCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString HiresCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString HiresCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

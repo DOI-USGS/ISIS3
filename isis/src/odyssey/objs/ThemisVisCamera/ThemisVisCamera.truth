@@ -68,6 +68,11 @@ DeltaSample:  OK
 DeltaLine:    OK 
 
 
+Testing name methods ... 
+Spacecraft Name Long:  "Mars Odyssey" 
+Spacecraft Name Short:  "Odyssey" 
+Instrument Name Long:  "Thermal Emission Imaging System Visual" 
+Instrument Name Short:  "Themis-VIS" 
 
 
 Testing errors 

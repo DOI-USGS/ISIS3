@@ -111,6 +111,13 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+    
+    // Test name methods
+    cout << endl << endl << "Test name methods ..." << endl;
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl;
   }
   catch(IException &e) {
     e.print();

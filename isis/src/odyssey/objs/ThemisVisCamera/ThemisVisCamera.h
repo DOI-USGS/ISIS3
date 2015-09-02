@@ -23,6 +23,8 @@
 
 #include "PushFrameCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief THEMIS VIS Camera Model
@@ -65,6 +67,9 @@ namespace Isis {
    *                           80/96/90 %. Plugins are not tested by unitTests. The other lines
    *                           lacking test coverage are addressed in the todo below. References
    *                           #1659
+   *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to
+   *                           test these methods.
    *  
    *  
    *  
@@ -94,6 +99,11 @@ namespace Isis {
       virtual int CkReferenceId() const;
       virtual int SpkReferenceId() const;
 
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+
     private:
       double p_etStart;           //!< Ephemeris Start iTime
       double p_bandTimeOffset;    //!< Offset iTime for Band
@@ -104,6 +114,10 @@ namespace Isis {
                                        group that correspond to each band in the cube. Filter 
                                        numbers indicate the physical location of the band in the 
                                        detector array.  They are numbered by ascending times.*/
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 

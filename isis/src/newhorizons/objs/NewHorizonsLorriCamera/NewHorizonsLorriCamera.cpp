@@ -20,6 +20,8 @@
 
 #include "NewHorizonsLorriCamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -47,6 +49,11 @@ namespace Isis {
    */
 
   NewHorizonsLorriCamera::NewHorizonsLorriCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Long Range Reconnaissance Imager";
+    m_instrumentNameShort = "LORRI";
+    m_spacecraftNameLong = "New Horizons";
+    m_spacecraftNameShort = "NewHorizons";
+    
     NaifStatus::CheckErrors();
 
     // The LORRI focal length is fixed and is designed not to change throught the operational 
@@ -130,8 +137,46 @@ namespace Isis {
   }
 
 
-
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsLorriCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsLorriCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString NewHorizonsLorriCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsLorriCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a NewHorizonsLorriCamera

@@ -46,6 +46,12 @@ class MyCamera : public LineScanCamera {
       string msg = "SPK Reference ID is unique to mission-specific cameras";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
+    
+    // These are pure virtual within Sensor that must be overriden
+    virtual QString instrumentNameLong() const { return QString("Line Scan"); }
+    virtual QString instrumentNameShort() const { return QString("LS"); }
+    virtual QString spacecraftNameLong() const { return QString("Line Scan 1"); }
+    virtual QString spacecraftNameShort() const { return QString("LS1"); }
 };
 
 int main() {

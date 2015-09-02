@@ -113,10 +113,25 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << camM->UniversalLongitude() - knownLon << endl;
     }
+    
+    //TODO - test name methods for Apollo16 and 17 Panoramic
+    // Test name methods
+    cout << endl << endl << "Testing name methods ..." << endl;
+    cout << "Spacecraft Name Long: " << camM->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << camM->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << camM->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << camM->instrumentNameShort() << endl << endl;
+    
+    // Test exception: camera is not a supported Kaguya camera
+    cout << endl << "Testing exceptions:" << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    ApolloPanoramicCamera pCam(test);
+    
   }
   catch(IException &e) {
     e.print();
   }
+  
 }
 
 void TestLineSamp(Camera *cam, double samp, double line) {

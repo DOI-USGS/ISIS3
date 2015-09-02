@@ -110,6 +110,21 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+    
+    // Testing name methods
+    cout << endl << endl << "Testing name methods ..." << endl;
+    QList<QString> files;
+    files.append("$messenger/testData/EW0089570936I.cub");
+    files.append("$messenger/testData/DN0163645629M_DE_0.reduced.cub");
+    
+    for (int i = 0; i < files.size(); i++) {
+      Cube m(files[i], "r");
+      MdisCamera *mCam = (MdisCamera *) CameraFactory::Create(m);
+      cout << "Spacecraft Name Long: " << mCam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << mCam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << mCam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << mCam->instrumentNameShort() << endl << endl;
+    }
   }
   catch(IException &e) {
     e.print();

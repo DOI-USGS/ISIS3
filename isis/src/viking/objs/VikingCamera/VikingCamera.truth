@@ -30,3 +30,32 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+--------------------------------------------
+
+Testing name methods:
+
+Spacecraft Name Long: Viking Orbiter 2
+Spacecraft Name Short: Viking2
+Instrument Name Long: Visual Imaging Subsystem Camera B
+Instrument Name Short: VISB
+
+Spacecraft Name Long: Viking Orbiter 1
+Spacecraft Name Short: Viking1
+Instrument Name Long: Visual Imaging Subsystem Camera A
+Instrument Name Short: VISA
+
+Spacecraft Name Long: Viking Orbiter 1
+Spacecraft Name Short: Viking1
+Instrument Name Long: Visual Imaging Subsystem Camera B
+Instrument Name Short: VISB
+
+Spacecraft Name Long: Viking Orbiter 2
+Spacecraft Name Short: Viking2
+Instrument Name Long: Visual Imaging Subsystem Camera A
+Instrument Name Short: VISA
+
+
+Testing exceptions:
+
+**USER ERROR** File does not appear to be a Viking image. SpacecraftName [HAYABUSA] is invalid Viking value.

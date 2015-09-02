@@ -20,6 +20,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "MiniRF.h"
+
+#include <QString>
+
 #include "IString.h"
 #include "iTime.h"
 #include "IException.h"
@@ -47,6 +50,25 @@ namespace Isis {
    *          value to pass into Spice::CreateCache() method.
    */
   MiniRF::MiniRF(Isis::Cube &cube) : Isis::RadarCamera(cube) {
+    
+    // LRO MiniRF naif instrument code = -85700
+    if (naifIkCode() == -85700) {
+      m_instrumentNameLong = "Miniature Radio Frequency";
+      m_instrumentNameShort = "Mini-RF";
+      m_spacecraftNameLong = "Lunar Reconnaissance Orbiter";
+      m_spacecraftNameShort = "LRO";
+    }
+    // Chandrayaan Mini-SAR instrument code = -86001
+    else if (naifIkCode() == -86001) {
+      m_instrumentNameLong = "Miniature Synthetic Aperture Radar";
+      m_instrumentNameShort = "Mini-SAR";
+      m_spacecraftNameLong = "Chandrayaan 1";
+      m_spacecraftNameShort = "Chan1";
+    }
+    else {
+      QString msg = "Cube does not appear to be a mini RF image";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
     // Get the ground range resolution (ScaledPixelHeight and ScaledPixelWidth
     // are expected to be equal - mrf2isis checks for this)
@@ -185,6 +207,46 @@ namespace Isis {
   int MiniRF::CkReferenceId() const {
     std::string msg = "Cannot generate CK for MiniRF";
     throw IException(IException::User, msg, _FILEINFO_);
+  }
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString MiniRF::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString MiniRF::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString MiniRF::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString MiniRF::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

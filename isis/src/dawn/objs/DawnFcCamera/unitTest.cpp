@@ -58,6 +58,13 @@ int main(void) {
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+    
+    // Test name methods
+    // TODO - test an FC1 image when data can be found.
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
 
     // Test Shutter Open/Close 
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
@@ -104,6 +111,11 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+    
+    // Test exception
+    cout << endl << "Testing exceptions ..." << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    DawnFcCamera dCam(test);
   }
   catch(IException &e) {
     e.print();

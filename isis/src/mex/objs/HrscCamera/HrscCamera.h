@@ -23,6 +23,9 @@
  */
 
 #include "LineScanCamera.h"
+
+#include <QString>
+
 #include "VariableLineScanCameraDetectorMap.h"
 
 namespace Isis {
@@ -40,17 +43,20 @@ namespace Isis {
    *
    * @internal
    *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
-   *            change. Also, now using the new LoadCache(...) method instead of
-   *            createCache(...). Increased the delta line/samp tolerance in the
-   *            unit test.
+   *                           change. Also, now using the new LoadCache(...) method instead of
+   *                           createCache(...). Increased the delta line/samp tolerance in the
+   *                           unit test.
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *            inherit directly from Camera
+   *                           inherit directly from Camera
    *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test
-   *            for new methods. Updated documentation. Removed Mex
-   *            namespace wrap inside Isis namespace. Added Isis Disclaimer to
-   *            files. Added NAIF error check to constructor.
+   *                           for new methods. Updated documentation. Removed Mex
+   *                           namespace wrap inside Isis namespace. Added Isis Disclaimer to
+   *                           files. Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods.
    */
   class HrscCamera : public LineScanCamera {
     public:
@@ -83,11 +89,21 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
     private:
       void ReadLineRates(QString filename);
 
       std::vector<LineRateChange> p_lineRates;
+      
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

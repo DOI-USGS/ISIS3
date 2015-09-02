@@ -60,6 +60,7 @@ int main(void) {
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+    
 
     // Test Shutter Open/Close 
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
@@ -88,6 +89,13 @@ int main(void) {
     double line = cam->Lines() / 2.0 + 0.5;
     cout << "\nFor center pixel position ..." << endl;
     TestLineSamp(cam, samp, line);
+    
+    // Test name methods
+    cout << endl << endl << "Testing name methods ..." << endl;
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
   }
   catch(IException &e) {
     e.print();

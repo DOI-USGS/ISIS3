@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -93
 SPK Reference ID = 1
 
+Spacecraft Name Long: Near Earth Asteroid Rendezvous
+Spacecraft Name Short: NEAR
+Instrument Name Long: Multi-Spectral Imager
+Instrument Name Short: MSI
+
 Shutter open = 33743204.872642480
 Shutter close = 33743204.888642482
 

@@ -21,6 +21,7 @@
 #include "NewHorizonsMvicFrameCamera.h"
 
 #include <QDebug>
+#include <QString>
 
 #include "Camera.h"
 #include "CameraDetectorMap.h"
@@ -50,6 +51,11 @@ namespace Isis {
    * @internal
    */
   NewHorizonsMvicFrameCamera::NewHorizonsMvicFrameCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Multispectral Visible Imaging Framing Camera";
+    m_instrumentNameShort = "MVIC FRAMING";
+    m_spacecraftNameLong = "New Horizons";
+    m_spacecraftNameShort = "NewHorizons";
+    
     NaifStatus::CheckErrors();
 
     SetFocalLength();
@@ -165,6 +171,46 @@ namespace Isis {
   pair<iTime, iTime> NewHorizonsMvicFrameCamera::ShutterOpenCloseTimes(double time, double exposureDuration) {
 
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsMvicFrameCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsMvicFrameCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString NewHorizonsMvicFrameCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsMvicFrameCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

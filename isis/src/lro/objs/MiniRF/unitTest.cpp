@@ -42,14 +42,14 @@ int main(void) {
     // and "Longitude off by: " values directly into these variables.
     double knownLat = 85.5973879396895398;
     double knownLon = 264.7361454607174664;
-
+    
     Cube c("$chan1/testData/FSR_CDR_LV1_01801_0R.cub", "r");
     Camera *cam = Isis::CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
-
+    
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
     TestLineSamp(cam, 1.0, 1.0);
@@ -85,6 +85,21 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+    
+    Cube c2("$lro/testData/LSZ_04970_1CD_XKU_71S272_V1.reduced.cub", "r");
+    Camera *cam2 = CameraFactory::Create(c2);
+    
+    // Test name methods
+    cout << endl << endl << "Testing name methods ..." << endl;
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
+    
+    cout << "Spacecraft Name Long: " << cam2->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam2->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam2->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam2->instrumentNameShort() << endl << endl;
 
     // Test kernel ID messages
     cout << endl << "Kernel ID error messages: " << endl;

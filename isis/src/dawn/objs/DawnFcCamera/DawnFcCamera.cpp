@@ -21,6 +21,8 @@
 #include "DawnFcCamera.h"
 #include "DawnFcDistortionMap.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -47,6 +49,23 @@ namespace Isis {
   DawnFcCamera::DawnFcCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
 
+    m_spacecraftNameLong = "Dawn";
+    m_spacecraftNameShort = "Dawn";
+    
+    if (naifIkCode() == -203110) {
+      m_instrumentNameLong = "Framing Camera 1";
+      m_instrumentNameShort = "FC1";
+    }
+    else if (naifIkCode() == -203120) {
+      m_instrumentNameLong = "Framing Camera 2";
+      m_instrumentNameShort = "FC2";
+    }
+    else {
+      QString msg = "File does not appear to be a Dawn Framing Camera image. ";
+      msg += "(" + QString::number(naifIkCode()) + " is not a Dawn FC instrument code)";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     // The focal length is dependent on wave length.  The NAIF code set
     // in the ISIS labels will read the correct focal length from the
     // Instrument kernel (IK)
@@ -121,6 +140,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
@@ -146,7 +166,48 @@ namespace Isis {
                                                          double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString DawnFcCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString DawnFcCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString DawnFcCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString DawnFcCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a DawnFcCamera

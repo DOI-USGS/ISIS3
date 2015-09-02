@@ -8,6 +8,11 @@ CK Reference ID = -2000000
 SPK Target ID = -2000
 SPK Reference ID = 1
 
+Spacecraft Name Long: Aircraft
+Spacecraft Name Short: Aircraft
+Instrument Name Long: Aerial Photo
+Instrument Name Short: Aerial
+
 Shutter open = -17538835.815374449
 Shutter close = -17538835.815374449
 Focal Length = 152.818000000

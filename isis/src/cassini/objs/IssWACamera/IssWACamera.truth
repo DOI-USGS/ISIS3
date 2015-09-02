@@ -34,3 +34,11 @@ For center pixel position ...
 Line, Sample: 256.500000000, 256.500000000
 Lat, Long:    33.764083075, 344.557493425
 WestLon:      15.442506575
+
+
+Testing name methods ...
+Spacecraft Name Long: Cassini Huygens
+Spacecraft Name Short: Cassini
+Instrument Name Long: Imaging Science Subsystem Wide Angle
+Instrument Name Short: ISSWA
+

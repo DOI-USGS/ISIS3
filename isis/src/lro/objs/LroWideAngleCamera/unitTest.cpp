@@ -24,6 +24,7 @@
 #include "CameraFactory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "LroWideAngleCamera.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -80,6 +81,12 @@ int main(void) {
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+    
+    // Test name methods
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
 
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
@@ -116,6 +123,20 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+    
+    Cube c2("$lro/testData/out.uv.even.cub", "r");
+    Camera *cam2 = CameraFactory::Create(c2);
+    // Test name methods for WAC-UV
+    cout << endl << endl << "Testing name methods ..." << endl;
+    cout << "Spacecraft Name Long: " << cam2->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam2->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam2->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam2->instrumentNameShort() << endl << endl;
+    
+    // Test exceptions for determining names
+    cout << endl << "Testing exceptions ..." << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    LroWideAngleCamera lCam(test);
   }
   catch(IException &e) {
     e.print();

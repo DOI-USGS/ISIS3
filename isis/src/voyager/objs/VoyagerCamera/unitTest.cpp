@@ -20,6 +20,9 @@
 #include <iomanip>
 #include <iostream>
 
+#include <QList>
+#include <QString>
+
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "FileName.h"
@@ -48,23 +51,23 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -1.0309814869702094;
+    double knownLat = -1.03098148697020941;
     double knownLon = 82.0423364316989279;
-
+    
     Cube c("$voyager1/testData/c1639118.imq.cub", "r");
     VoyagerCamera *cam = (VoyagerCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
-
+    
     // Test kernel IDs
     cout << "Kernel IDs: " << endl;
     cout << "CK Frame ID = " << cam->CkFrameId() << endl;
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-
+    
     // Test Shutter Open/Close 
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
@@ -74,43 +77,68 @@ int main(void) {
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
     cout << "Shutter open = " << shuttertimes.first.Et() << endl;
     cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
-
+    
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
     TestLineSamp(cam, 1.0, 1.0);
-
+    
     cout << "For upper right corner ..." << endl;
     TestLineSamp(cam, cam->Samples() - 5.0, 16.0);
-
+    
     cout << "For lower left corner ..." << endl;
     TestLineSamp(cam, 12.0, cam->Lines() - 12.0);
-
+    
     cout << "For lower right corner ..." << endl;
     TestLineSamp(cam, cam->Samples() - 4.0, cam->Lines());
-
+    
     double samp = cam->Samples() / 2;
     double line = cam->Lines() / 2;
     cout << "For center pixel position ..." << endl;
-
+    
     if(!cam->SetImage(samp, line)) {
       cout << "ERROR" << endl;
       return 0;
     }
-
+    
     if(abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
       cout << "Latitude OK" << endl;
     }
     else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
+      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat 
+           << endl;
     }
-
+    
     if(abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
       cout << "Longitude OK" << endl;
     }
     else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon
+           << endl;
     }
+    
+    // Test name methods
+    cout << endl << "Testing name methods" << endl << endl;
+    QList<QString> files;
+    files.append("$voyager1/testData/c1639118.imq.cub"); // Voyager1 NAC
+    files.append("$voyager1/testData/c1639241.cropped.cub"); // Voyager1 WAC
+    files.append("$voyager2/testData/c2065022.cropped.cub"); // Voyager2 NAC
+    files.append("$voyager2/testData/c4397840.cropped.cub"); // Voyager2 WAC
+  
+    for (int i = 0; i < files.size(); i++) {
+      Cube cu(files[i], "r");
+      VoyagerCamera *vCam = (VoyagerCamera *) CameraFactory::Create(cu);
+      cout << "Spacecraft Name Long: " << vCam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << vCam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << vCam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << vCam->instrumentNameShort() << endl << endl;
+    }
+    
+    // Test exception: camera is not a supported Kaguya camera
+    cout << endl << "Testing exceptions:" << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    VoyagerCamera testCam(test);
   }
+  
   catch(IException &e) {
     e.print();
   }

@@ -20,6 +20,8 @@
 
 #include "CTXCamera.h"
 
+#include <QString>
+
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
@@ -41,6 +43,11 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   CTXCamera::CTXCamera(Cube &cube) : LineScanCamera(cube) {
+    m_instrumentNameLong = "Context Camera";
+    m_instrumentNameShort = "CTX";
+    m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
+    m_spacecraftNameShort = "MRO";
+    
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
@@ -88,6 +95,46 @@ namespace Isis {
 
     LoadCache();
     NaifStatus::CheckErrors();
+  }
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString CTXCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString CTXCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString CTXCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString CTXCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

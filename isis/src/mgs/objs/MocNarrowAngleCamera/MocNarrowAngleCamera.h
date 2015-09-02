@@ -23,6 +23,8 @@
 
 #include "LineScanCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief MOC Narrow Angle Camera Model
@@ -37,17 +39,20 @@ namespace Isis {
    *
    * @internal
    *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...)
-   *            method instead of CreateCache(...).
+   *                           method instead of CreateCache(...).
    *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute
-   *            CameraDetectorMap methods
+   *                           CameraDetectorMap methods
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *            inherit directly from Camera
+   *                           inherit directly from Camera
    *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test
-   *            for new methods. Updated documentation. Removed Mgs namespace
-   *            wrap inside Isis namespace. Added Isis Disclaimer to files.
-   *            Added NAIF error check to constructor.
+   *                           for new methods. Updated documentation. Removed Mgs namespace
+   *                           wrap inside Isis namespace. Added Isis Disclaimer to files.
+   *                           Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *            coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods.
    */
   class MocNarrowAngleCamera : public LineScanCamera {
     public:
@@ -79,6 +84,17 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+
+    private:
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

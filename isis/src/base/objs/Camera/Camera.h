@@ -249,6 +249,8 @@ namespace Isis {
    *   @history 2015-05-15 Kris Becker - Set ShapeModel state in SetImage() to
    *                           reflect no intersection before attempting to map
    *                           to surface. Fixes #2252.
+   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
+   *                           Sensor's pure virtual methods.
    */
 
   class Camera : public Sensor {

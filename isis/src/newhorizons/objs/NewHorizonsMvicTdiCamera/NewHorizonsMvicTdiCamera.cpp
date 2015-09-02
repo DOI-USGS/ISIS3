@@ -21,6 +21,7 @@
 #include "NewHorizonsMvicTdiCamera.h"
 
 #include <QDebug>
+#include <QString>
 
 #include "NewHorizonsMvicTdiCameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -41,6 +42,11 @@ namespace Isis {
    * @internal
    */
   NewHorizonsMvicTdiCamera::NewHorizonsMvicTdiCamera(Cube &cube) : LineScanCamera(cube) {
+    m_instrumentNameLong = "Multispectral Visible Imaging TDI Camera";
+    m_instrumentNameShort = "MVIC TDI";
+    m_spacecraftNameLong = "New Horizons";
+    m_spacecraftNameShort = "NewHorizons";
+    
     NaifStatus::CheckErrors();
 
     // Set the pixel pitch, focal length and row offset from Mvic frame transfer array
@@ -102,9 +108,48 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsMvicTdiCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsMvicTdiCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString NewHorizonsMvicTdiCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString NewHorizonsMvicTdiCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 
 }
-
 
 
 // Plugin

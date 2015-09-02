@@ -2,6 +2,11 @@ Unit Test for IdealCamera...
 FileName: ab102401_ideal.cub
 CK Frame: -94032
 
+Spacecraft Name Long: Ideal Spacecraft
+Spacecraft Name Short: Ideal
+Instrument Name Long: Ideal Camera
+Instrument Name Short: Ideal
+
 For upper left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
@@ -25,6 +30,11 @@ Longitude OK
 --------------------------------------------
 FileName: f319b18_ideal.cub
 CK Frame: -30002
+
+Spacecraft Name Long: Ideal Spacecraft
+Spacecraft Name Short: Ideal
+Instrument Name Long: Ideal Camera
+Instrument Name Short: Ideal
 
 For upper left corner ...
 DeltaSample = 0.000000000

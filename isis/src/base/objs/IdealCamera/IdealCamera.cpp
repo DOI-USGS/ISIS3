@@ -26,6 +26,7 @@
 #include <string>
 
 #include <QDebug>
+#include <QString>
 
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -74,6 +75,13 @@ namespace Isis {
    */
   IdealCamera::IdealCamera(Cube &cube) : Camera(cube) {
     NaifStatus::CheckErrors();
+    
+    // Since this is an ideal camera, we'll call it Ideal Spacecraft
+    m_spacecraftNameLong = "Ideal Spacecraft";
+    m_spacecraftNameShort = "Ideal";
+    m_instrumentNameLong = "Ideal Camera";
+    m_instrumentNameShort = "Ideal";
+    
     // Get required keywords from instrument group
     PvlGroup &inst = cube.label()->findGroup("Instrument", Pvl::Traverse);
 
@@ -236,6 +244,7 @@ namespace Isis {
     }
   }
 
+  
   //! Destroys the IdealCamera object
   IdealCamera::~IdealCamera() {}
 
@@ -263,6 +272,7 @@ namespace Isis {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+  
   /**
    * SPK Target ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
@@ -274,6 +284,7 @@ namespace Isis {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+  
   /**
    * SPK Center ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
@@ -285,6 +296,7 @@ namespace Isis {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+  
   /**
    * SPK Reference ID.  This is an overridden method for the Camera class pure
    * virtual method. It will always throw an error for Ideal Camera models.
@@ -295,7 +307,48 @@ namespace Isis {
     string msg = "No SPK Reference ID for Ideal Camera class";
     throw IException(IException::User, msg, _FILEINFO_);
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString IdealCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString IdealCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString IdealCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString IdealCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * @brief External C function for createing the camera plugin

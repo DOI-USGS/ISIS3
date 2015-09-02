@@ -3,6 +3,8 @@
 #include "ApolloPanIO.h"
 #include "ApolloPanoramicDetectorMap.h"
 
+#include <QString>
+
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
@@ -32,7 +34,30 @@ namespace Isis {
               additionalPreroll = 0.0,
               additiveLineTimeError = 0.0,
               multiplicativeLineTimeError = 0.0;
-
+              
+      // Set up naming info
+      m_instrumentNameLong = "Panoramic Camera";
+      m_instrumentNameShort = "Pan";
+      
+      // Apollo15 Pan naif code = -915230
+      if (naifIkCode() == -915230) {
+        m_spacecraftNameLong = "Apollo 15";
+        m_spacecraftNameShort = "Apollo15";
+      }
+      // Apollo16 Pan naif code = -916230
+      else if (naifIkCode() == -916230) {
+        m_spacecraftNameLong = "Apollo 16";
+        m_spacecraftNameShort = "Apollo16";
+      }
+      // Apollo17 Pan naif code = -917230
+      else if (naifIkCode() == -917230) {
+        m_spacecraftNameLong = "Apollo 17";
+        m_spacecraftNameShort = "Apollo17";
+      }
+      else {
+        QString msg = "File does not appear to be an Apollo image";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
 
       //following keywords in InstrumentAddendum file
       QString ikernKey = "INS" + toString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
@@ -107,7 +132,48 @@ namespace Isis {
 
       LoadCache();
     }
+    
+    
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString ApolloPanoramicCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString ApolloPanoramicCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString ApolloPanoramicCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString ApolloPanoramicCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }// end Isis namespace
+
 
 /**
  * This is the function that is called in order to instantiate an

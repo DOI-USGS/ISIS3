@@ -86,6 +86,9 @@
        Added check for history group in input cube. If it's there, add a new entry. If not, add a
        new history group. Added an app test. Fixes #1350.
     </change>
+    <change name="Ian Humphrey and Makayla Shepherd" date="2015-09-01">
+        Changed code to accommodate changes in Sensor and Camera relationships.
+    </change>
   </history>
 
   <groups>

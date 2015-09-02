@@ -23,6 +23,8 @@
 
 #include "LineScanCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief MRO CTX Camera Model
@@ -41,28 +43,32 @@ namespace Isis {
    *
    *   @history 2006-08-03  Tracie Sucharski, Added Scale method
    *   @history 2007-07-12  Debbie A. Cook, Added methods Coefficients and
-   *            InverseCoefficients
+   *                          InverseCoefficients
    *   @history 2008-02-21 Steven Lambright Boresight, focal length, pixel pitch
-   *            keywords now loaded from kernels instead of being hard-coded.
-   *            The distortion map is now being used.
+   *                          keywords now loaded from kernels instead of being hard-coded.
+   *                          The distortion map is now being used.
    *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
-   *            change. Also, now using the new LoadCache(...) method instead of
-   *            createCache(...).
+   *                          change. Also, now using the new LoadCache(...) method instead of
+   *                          createCache(...).
    *   @history 2009-03-07 Debbie A. Cook Removed obsolute CameraDetectorMap methods
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *            inherit directly from Camera
+   *                           inherit directly from Camera
    *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
-   *            methods. Updated documentation. Removed Mro namespace wrap
-   *            inside Isis namespace. Added Isis Disclaimer to files. Added
-   *            NAIF error check to constructor.
+   *                           methods. Updated documentation. Removed Mro namespace wrap
+   *                           inside Isis namespace. Added Isis Disclaimer to files. Added
+   *                           NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *            coding standards. References #972.
+   *                           coding standards. References #972.
    *   @history 2012-12-27 Tracie Sucharski, Fixed bug for images with a SpatialSumming=2.
-   *            The images were compressed in the y-direction.  There was a line of code commented
-   *            out, "lineRate *= csum;".  From the MRO_ctx_pds_sis.pdf, "Note that CTX implements
-   *            downtrack summing by increasing the line time; for example, a 2X2 summed image has
-   *            an actual line time twice that given by this field.".  Uncommenting the line fixed
-   *            the y-direction scale problem.  Fixes #826.
+   *                           The images were compressed in the y-direction.  There was a line of 
+   *                           code commented out, "lineRate *= csum;".  From the 
+   *                           MRO_ctx_pds_sis.pdf, "Note that CTX implements downtrack summing by 
+   *                           increasing the line time; for example, a 2X2 summed image has an 
+   *                           actual line time twice that given by this field.".  Uncommenting 
+   *                           the line fixed the y-direction scale problem.  Fixes #826.
+   *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods.
    */
   class CTXCamera : public LineScanCamera {
     public:
@@ -94,6 +100,17 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+      
+    private:
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif
