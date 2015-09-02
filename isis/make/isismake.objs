@@ -229,8 +229,8 @@ html: force
 clean:  localclean
 	$(RM) $(OBJS) $(PROTOSGEN) $(MOCGEN) unitTest.o unitTest print.prt    \
 	  $(UIHEADERS) $(ARCHIVELIB) $(SHAREDLIB) libisis$(ISISLIBVERSION).a  \
-	  libisis$(ISISLIBVERSION).so libisis$(ISISLIBVERSION).dylib          \
-	  unitTest.output;                                                    \
+	  libisis$(ISISLIBVERSION).so libisis?.?.?.so                         \
+          libisis$(ISISLIBVERSION).dylib unitTest.output;                     \
 	$(RM) -rf html scopecoverage scopecoverage.html scopecoverage_html    \
 	  linecoverage linecoverage.html linecoverage_html functioncoverage   \
 	  functioncoverage.html functioncoverage_html .objs *.csexe *.csmes
