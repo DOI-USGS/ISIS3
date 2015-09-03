@@ -22,6 +22,14 @@
 using namespace std;
 using namespace Isis;
 
+
+/**
+ * This class is needed to test the xml read/write methods.
+ * @author 2015-??-?? Jeannie Backer
+ *
+ * @internal
+ *   @history 2015-??-?? Jeannie Backer - Original version.
+ */
 namespace Isis {
   class BundleSolutionInfoXmlHandlerTester : public BundleSolutionInfo {
     public:
@@ -54,6 +62,13 @@ namespace Isis {
 }
 
 
+/**
+ * Unit Test for BundleSolutionInfo class.
+ *
+ * @internal
+ *   @history 2015-09-03 Jeannie Backer - Commented out xml code test until we determine whether
+ *                           we will keep this code.
+ */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
@@ -62,10 +77,12 @@ int main(int argc, char *argv[]) {
   try {
     qDebug() << "Unit test for BundleSolutionInfo...";
     qDebug() << "Printing PVL group with results from the settings/cnet/statistics constructor...";
+
     // create default settings and statistics objects to pass into results object
     BundleSettings settings;
     FileName cnetFile("cnetfile.net");
     BundleResults statistics;
+
     QObject *parent = NULL;
     BundleSolutionInfo results(settings, cnetFile, statistics, parent);
 
@@ -73,6 +90,7 @@ int main(int argc, char *argv[]) {
     cout << pvl << endl << endl;
 
     qDebug() << "Testing copy constructor...";
+
     BundleSolutionInfo copySolutionInfo(results);
     pvl = copySolutionInfo.pvlObject("CopySolutionInfoObject");
     cout << pvl << endl << endl;
@@ -83,6 +101,7 @@ int main(int argc, char *argv[]) {
     cout << pvl << endl << endl;
 
     qDebug() << "Testing assignment operator to create a new results object...";
+
     BundleSolutionInfo assignmentOpSolutionInfo = results;
     assignmentOpSolutionInfo = results;
     pvl = assignmentOpSolutionInfo.pvlObject("AssignedSolutionInfoObject");
@@ -91,12 +110,12 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing mutator methods...";
     statistics.setRejectionLimit(0.5);
     results.setOutputStatistics(statistics);
-    results.setRunTime("xxx");//???
+    results.setRunTime("xxx"); //???
     pvl = results.pvlObject("MutatorTest");
     cout << pvl << endl << endl;
 
     qDebug() << "Testing accessor methods...";
-    // Can't print this value out since it changes for every run, 
+    // Can't print this value out since it changes for every run,
     // qDebug() << "quuid = ";
     // but we will call the method for test coverage
     results.id();
@@ -105,14 +124,15 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing error throws...";
     try {
-    } 
+    }
     catch (IException &e) {
       e.print();
     }
     qDebug();
 
     qDebug() << "Testing XML write/read...";
-    // write xml 
+    // write xml
+#if 0
     FileName xmlFile("./BundleSolutionInfo.xml");
     QString xmlPath = xmlFile.expanded();
     QFile qXmlFile(xmlPath);
@@ -128,13 +148,15 @@ int main(int argc, char *argv[]) {
     results.save(writer, project);
     writer.writeEndDocument();
     qXmlFile.close();
-    // read xml    
+    // read xml
     XmlStackedHandlerReader reader;
 // ???     BundleSolutionInfoXmlHandlerTester brToFill(project, &reader, xmlFile);
 // ???     pvl = bsToFill.pvlObject("BundleSolutionInfoFromXml");
 // ???     cout << pvl << endl << endl;
+#endif
+    qDebug();
 
-  } 
+  }
   catch (IException &e) {
     e.print();
   }

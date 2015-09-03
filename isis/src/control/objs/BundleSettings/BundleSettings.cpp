@@ -261,14 +261,28 @@ namespace Isis {
     m_solveRadius = solveRadius;
     m_updateCubeLabel = updateCubeLabel;
     m_errorPropagation = errorPropagation;
-    m_globalLatitudeAprioriSigma = globalLatitudeAprioriSigma;
-    m_globalLongitudeAprioriSigma = globalLongitudeAprioriSigma;
-    if (m_solveRadius) {
+
+    if (globalLatitudeAprioriSigma > 0.0) { // otherwise, we leave as default Isis::Null
+      m_globalLatitudeAprioriSigma = globalLatitudeAprioriSigma;
+    }
+    else {
+      m_globalLatitudeAprioriSigma = Isis::Null;
+    }
+
+    if (globalLongitudeAprioriSigma > 0.0) {
+      m_globalLongitudeAprioriSigma = globalLongitudeAprioriSigma;
+    }
+    else {
+      m_globalLongitudeAprioriSigma = Isis::Null;
+    }
+
+    if (m_solveRadius && globalRadiusAprioriSigma > 0.0) {
       m_globalRadiusAprioriSigma = globalRadiusAprioriSigma;
     }
     else {
       m_globalRadiusAprioriSigma = Isis::Null;
     }
+
   }
 
 
@@ -548,20 +562,25 @@ namespace Isis {
     if (m_outlierRejection) {
       pvl += PvlKeyword("OutlierMultiplier", toString(outlierRejectionMultiplier()));
     }
-    if (globalLatitudeAprioriSigma() >= 0) {
+    if ( !IsNullPixel(globalLatitudeAprioriSigma()) ) {
       pvl += PvlKeyword("GlobalLatitudeAprioriSigma", toString(globalLatitudeAprioriSigma()));
     }
     else {
       pvl += PvlKeyword("GlobalLatitudeAprioriSigma", "None");
     }
-    if (globalLongitudeAprioriSigma() >= 0) {
+    if (!IsNullPixel(globalLongitudeAprioriSigma())) {
       pvl += PvlKeyword("GlobalLongitudeAprioriSigma", toString(globalLongitudeAprioriSigma()));
     }
     else {
       pvl += PvlKeyword("GlobalLongitudeAprioriSigma", "None");
     }
     if (m_solveRadius) {
+      if ( !IsNullPixel(globalLongitudeAprioriSigma()) ) {
       pvl += PvlKeyword("GlobalRadiiAprioriSigma", toString(globalRadiusAprioriSigma()));
+      }
+      else {
+        pvl += PvlKeyword("GlobalRadiiAprioriSigma", "None");
+      }
     }
 
     // Convergence Criteria
@@ -638,13 +657,23 @@ namespace Isis {
     stream.writeEndElement();
 
     stream.writeStartElement("aprioriSigmas");
-    stream.writeAttribute("latitude", toString(globalLatitudeAprioriSigma()));
-    stream.writeAttribute("longitude", toString(globalLongitudeAprioriSigma()));
-    if (solveRadius()) {
-      stream.writeAttribute("radius", toString(globalRadiusAprioriSigma()));
+    if (IsNullPixel(globalLatitudeAprioriSigma())) {
+      stream.writeAttribute("latitude", "N/A");
     }
     else {
+      stream.writeAttribute("latitude", toString(globalLatitudeAprioriSigma()));
+    }
+    if (IsNullPixel(globalLongitudeAprioriSigma())) {
+      stream.writeAttribute("longitude", "N/A");
+    }
+    else {
+      stream.writeAttribute("longitude", toString(globalLongitudeAprioriSigma()));
+    }
+    if (IsNullPixel(globalRadiusAprioriSigma())) {
       stream.writeAttribute("radius", "N/A");
+    }
+    else {
+      stream.writeAttribute("radius", toString(globalRadiusAprioriSigma()));
     }
     stream.writeEndElement();
     
@@ -823,124 +852,136 @@ namespace Isis {
    * handle the read when the startElement with the name localName has been found.
    * 
    * @param qName The qualified name of the tag.
-   * @param atts The list of attributes for the tag.
+   * @param attributes The list of attributes for the tag.
    * @return If we should continue reading the XML (usually true).
    */
   bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
-                                       const QString &qName, const QXmlAttributes &atts) {
+                                                const QString &qName, const QXmlAttributes &attributes) {
     m_xmlHandlerCharacters = "";
 
-    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
+    if (XmlStackedHandler::startElement(namespaceURI, localName, qName, attributes)) {
 
       if (localName == "solveOptions") {
-        
-        QString solveMethodStr = atts.value("solveMethod");
+
+        QString solveMethodStr = attributes.value("solveMethod");
         if (!solveMethodStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_solveMethod = stringToSolveMethod(solveMethodStr);
         }
 
-        QString solveObservationModeStr = atts.value("solveObservationMode");
+        QString solveObservationModeStr = attributes.value("solveObservationMode");
         if (!solveObservationModeStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_solveObservationMode = toBool(solveObservationModeStr);
         }
 
-        QString solveRadiusStr = atts.value("solveRadius");
+        QString solveRadiusStr = attributes.value("solveRadius");
         if (!solveRadiusStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_solveRadius = toBool(solveRadiusStr);
         }
 
-        QString updateCubeLabelStr = atts.value("updateCubeLabel");
+        QString updateCubeLabelStr = attributes.value("updateCubeLabel");
         if (!updateCubeLabelStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_updateCubeLabel = toBool(updateCubeLabelStr);
         }
 
-        QString errorPropagationStr = atts.value("errorPropagation");
+        QString errorPropagationStr = attributes.value("errorPropagation");
         if (!errorPropagationStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_errorPropagation = toBool(errorPropagationStr);
         }
       }
       else if (localName == "aprioriSigmas") {
 
-        QString globalLatitudeAprioriSigmaStr = atts.value("latitude");
+        QString globalLatitudeAprioriSigmaStr = attributes.value("latitude");
         if (!globalLatitudeAprioriSigmaStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = toDouble(globalLatitudeAprioriSigmaStr);
-        }
-
-        QString globalLongitudeAprioriSigmaStr = atts.value("longitude");
-        if (!globalLongitudeAprioriSigmaStr.isEmpty()) {
-          m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma =
-              toDouble(globalLongitudeAprioriSigmaStr);
-        }
-
-        QString globalRadiusAprioriSigmaStr = atts.value("radius");
-        if (!globalRadiusAprioriSigmaStr.isEmpty()) {
-          if (globalRadiusAprioriSigmaStr != "N/A") {
-            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = toDouble(globalRadiusAprioriSigmaStr);
+          if (globalLatitudeAprioriSigmaStr == "N/A") {
+            m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma = Isis::Null;
           }
           else {
+            m_xmlHandlerBundleSettings->m_globalLatitudeAprioriSigma
+                = toDouble(globalLatitudeAprioriSigmaStr);
+          }
+        }
+
+        QString globalLongitudeAprioriSigmaStr = attributes.value("longitude");
+        if (!globalLongitudeAprioriSigmaStr.isEmpty()) {
+          if (globalLongitudeAprioriSigmaStr == "N/A") {
+            m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma = Isis::Null;
+          }
+          else {
+            m_xmlHandlerBundleSettings->m_globalLongitudeAprioriSigma
+                = toDouble(globalLongitudeAprioriSigmaStr);
+          }
+        }
+
+        QString globalRadiusAprioriSigmaStr = attributes.value("radius");
+        if (!globalRadiusAprioriSigmaStr.isEmpty()) {
+          if (globalRadiusAprioriSigmaStr == "N/A") {
             m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma = Isis::Null;
+          }
+          else {
+            m_xmlHandlerBundleSettings->m_globalRadiusAprioriSigma
+                = toDouble(globalRadiusAprioriSigmaStr);
           }
         }
       }
       else if (localName == "outlierRejectionOptions") {
-        QString outlierRejectionStr = atts.value("rejection");
+        QString outlierRejectionStr = attributes.value("rejection");
         if (!outlierRejectionStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_outlierRejection = toBool(outlierRejectionStr);
         }
 
-        QString outlierRejectionMultiplierStr = atts.value("multiplier");
+        QString outlierRejectionMultiplierStr = attributes.value("multiplier");
         if (!outlierRejectionMultiplierStr.isEmpty()) {
           if (outlierRejectionMultiplierStr != "N/A") {
             m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = toDouble(outlierRejectionMultiplierStr);
           }
           else {
-            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0; 
+            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0;
           }
         }
       }
       else if (localName == "convergenceCriteriaOptions") {
 
-        QString convergenceCriteriaStr = atts.value("convergenceCriteria");
+        QString convergenceCriteriaStr = attributes.value("convergenceCriteria");
         if (!convergenceCriteriaStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_convergenceCriteria = stringToConvergenceCriteria(convergenceCriteriaStr);
         }
 
-        QString convergenceCriteriaThresholdStr = atts.value("threshold");
+        QString convergenceCriteriaThresholdStr = attributes.value("threshold");
         if (!convergenceCriteriaThresholdStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_convergenceCriteriaThreshold = toDouble(convergenceCriteriaThresholdStr);
         }
 
-        QString convergenceCriteriaMaximumIterationsStr = atts.value("maximumIterations");
+        QString convergenceCriteriaMaximumIterationsStr = attributes.value("maximumIterations");
         if (!convergenceCriteriaMaximumIterationsStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_convergenceCriteriaMaximumIterations = toInt(convergenceCriteriaMaximumIterationsStr);
         }
       }
       else if (localName == "model") {
-        QString type = atts.value("type");
-        QString quantile = atts.value("quantile");
+        QString type = attributes.value("type");
+        QString quantile = attributes.value("quantile");
         if (!type.isEmpty() && !quantile.isEmpty()) {
-        m_xmlHandlerBundleSettings->m_maximumLikelihood.append(
+          m_xmlHandlerBundleSettings->m_maximumLikelihood.append(
               qMakePair(MaximumLikelihoodWFunctions::stringToModel(type),
                         toDouble(quantile)));
         }
       }
       else if (localName == "outputFileOptions") {
-        QString outputFilePrefixStr = atts.value("fileNamePrefix");
+        QString outputFilePrefixStr = attributes.value("fileNamePrefix");
         if (!outputFilePrefixStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_outputFilePrefix = outputFilePrefixStr;
         }
 
-        QString createBundleOutputFileStr = atts.value("createBundleOutputFile");
+        QString createBundleOutputFileStr = attributes.value("createBundleOutputFile");
         if (!createBundleOutputFileStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_createBundleOutputFile = toBool(createBundleOutputFileStr);
         }
 
-        QString createCSVFilesStr = atts.value("createCSVFiles");
+        QString createCSVFilesStr = attributes.value("createCSVFiles");
         if (!createCSVFilesStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_createCSVFiles = toBool(createCSVFilesStr);
         }
 
-        QString createResidualsFileStr = atts.value("createResidualsFile");
+        QString createResidualsFileStr = attributes.value("createResidualsFile");
         if (!createResidualsFileStr.isEmpty()) {
           m_xmlHandlerBundleSettings->m_createResidualsFile = toBool(createResidualsFileStr);
         }

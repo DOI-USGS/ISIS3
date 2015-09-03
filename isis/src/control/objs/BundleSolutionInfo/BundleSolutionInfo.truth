@@ -27,8 +27,8 @@ Object = DefaultSolutionInfoObject
       InstrumentPointingSolveOption       = AnglesOnly
       NumberAngleCoefficientsSolved       = 1
       CKDegree                            = 2
+      CKSolveDegree                       = 2
       SolveTwist                          = Yes
-      CKSolveDegree                       = 0
       SolvePointingPolynomialOverExisting = No
       AngleAprioriSigmas                  = N/A
       InstrumentPointingInterpolationType = 3
@@ -43,7 +43,6 @@ Object = DefaultSolutionInfoObject
   End_Object
 
   Object = StatisticsResults
-    CorrelationMatrix                = Yes
     NumberFixedPoints                = 0
     NumberIgnoredPoints              = 0
     NumberHeldImages                 = 0
@@ -78,6 +77,14 @@ Object = DefaultSolutionInfoObject
     RmsSigmaLon                      = 0.0
     RmsSigmaRad                      = 0.0
     NumberMaximumLikelihoodModels    = 0
+
+    Object = CorrelationMatrixData
+      CovarianceMatrixFileName  = Null
+      CorrelationMatrixFileName = Null
+
+      Group = ImagesAndParameters
+      End_Group
+    End_Object
   End_Object
 End_Object
 
@@ -109,8 +116,8 @@ Object = CopySolutionInfoObject
       InstrumentPointingSolveOption       = AnglesOnly
       NumberAngleCoefficientsSolved       = 1
       CKDegree                            = 2
+      CKSolveDegree                       = 2
       SolveTwist                          = Yes
-      CKSolveDegree                       = 0
       SolvePointingPolynomialOverExisting = No
       AngleAprioriSigmas                  = N/A
       InstrumentPointingInterpolationType = 3
@@ -125,7 +132,6 @@ Object = CopySolutionInfoObject
   End_Object
 
   Object = StatisticsResults
-    CorrelationMatrix                = Yes
     NumberFixedPoints                = 0
     NumberIgnoredPoints              = 0
     NumberHeldImages                 = 0
@@ -160,6 +166,14 @@ Object = CopySolutionInfoObject
     RmsSigmaLon                      = 0.0
     RmsSigmaRad                      = 0.0
     NumberMaximumLikelihoodModels    = 0
+
+    Object = CorrelationMatrixData
+      CovarianceMatrixFileName  = Null
+      CorrelationMatrixFileName = Null
+
+      Group = ImagesAndParameters
+      End_Group
+    End_Object
   End_Object
 End_Object
 
@@ -191,8 +205,8 @@ Object = SelfAssignedSolutionInfoObject
       InstrumentPointingSolveOption       = AnglesOnly
       NumberAngleCoefficientsSolved       = 1
       CKDegree                            = 2
+      CKSolveDegree                       = 2
       SolveTwist                          = Yes
-      CKSolveDegree                       = 0
       SolvePointingPolynomialOverExisting = No
       AngleAprioriSigmas                  = N/A
       InstrumentPointingInterpolationType = 3
@@ -207,7 +221,6 @@ Object = SelfAssignedSolutionInfoObject
   End_Object
 
   Object = StatisticsResults
-    CorrelationMatrix                = Yes
     NumberFixedPoints                = 0
     NumberIgnoredPoints              = 0
     NumberHeldImages                 = 0
@@ -242,6 +255,14 @@ Object = SelfAssignedSolutionInfoObject
     RmsSigmaLon                      = 0.0
     RmsSigmaRad                      = 0.0
     NumberMaximumLikelihoodModels    = 0
+
+    Object = CorrelationMatrixData
+      CovarianceMatrixFileName  = Null
+      CorrelationMatrixFileName = Null
+
+      Group = ImagesAndParameters
+      End_Group
+    End_Object
   End_Object
 End_Object
 
@@ -273,8 +294,8 @@ Object = AssignedSolutionInfoObject
       InstrumentPointingSolveOption       = AnglesOnly
       NumberAngleCoefficientsSolved       = 1
       CKDegree                            = 2
+      CKSolveDegree                       = 2
       SolveTwist                          = Yes
-      CKSolveDegree                       = 0
       SolvePointingPolynomialOverExisting = No
       AngleAprioriSigmas                  = N/A
       InstrumentPointingInterpolationType = 3
@@ -289,7 +310,6 @@ Object = AssignedSolutionInfoObject
   End_Object
 
   Object = StatisticsResults
-    CorrelationMatrix                = Yes
     NumberFixedPoints                = 0
     NumberIgnoredPoints              = 0
     NumberHeldImages                 = 0
@@ -324,6 +344,14 @@ Object = AssignedSolutionInfoObject
     RmsSigmaLon                      = 0.0
     RmsSigmaRad                      = 0.0
     NumberMaximumLikelihoodModels    = 0
+
+    Object = CorrelationMatrixData
+      CovarianceMatrixFileName  = Null
+      CorrelationMatrixFileName = Null
+
+      Group = ImagesAndParameters
+      End_Group
+    End_Object
   End_Object
 End_Object
 
@@ -353,10 +381,10 @@ Object = MutatorTest
 
     Object = Null
       InstrumentPointingSolveOption       = AnglesOnly
+      NumberAngleCoefficientsSolved       = 1
       CKDegree                            = 2
       CKSolveDegree                       = 2
       SolveTwist                          = Yes
-      CKSolveDegree                       = 0
       SolvePointingPolynomialOverExisting = No
       AngleAprioriSigmas                  = N/A
       InstrumentPointingInterpolationType = 3
@@ -371,7 +399,6 @@ Object = MutatorTest
   End_Object
 
   Object = StatisticsResults
-    CorrelationMatrix                = Yes
     NumberFixedPoints                = 0
     NumberIgnoredPoints              = 0
     NumberHeldImages                 = 0
@@ -406,6 +433,14 @@ Object = MutatorTest
     RmsSigmaLon                      = 0.0
     RmsSigmaRad                      = 0.0
     NumberMaximumLikelihoodModels    = 0
+
+    Object = CorrelationMatrixData
+      CovarianceMatrixFileName  = Null
+      CorrelationMatrixFileName = Null
+
+      Group = ImagesAndParameters
+      End_Group
+    End_Object
   End_Object
 End_Object
 
@@ -415,3 +450,4 @@ runTime =  "xxx"
 Testing error throws... 
 
 Testing XML write/read... 
+

@@ -34,6 +34,7 @@
 #include "BundleObservationSolveSettings.h"
 #include "MaximumLikelihoodWFunctions.h" // why not forward declare???
 #include "PvlObject.h"
+#include "SpecialPixel.h"
 #include "XmlStackedHandler.h"
 
 class QDataStream;
@@ -73,8 +74,7 @@ namespace Isis {
    *   @history 2014-11-17 Jeannie Backer - Added xml read/write capabilities. XmlHandler
    *                           constructor/destructor is not shown as covered by unitTest. Current
    *                           test code coverage is (scope 98.79%, line 98.698%, function 96.0%).
-   *   @history 2015-02-20 Jeannie Backer - Changed apriori sigma defaults from -1.0 to Isis::Null.
-   *                           Updated xml methods. Added hdf5 includes.
+   *   @history 2015-09-03 Jeannie Backer - Changed a priori sigma defaults from -1.0 to Isis::Null.
    *  
    *   @todo Determine whether xml stuff needs a Project pointer
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -120,9 +120,9 @@ namespace Isis {
                            bool updateCubeLabel = false, 
                            bool errorPropagation = false,
                            bool solveRadius = false, 
-                           double globalLatitudeAprioriSigma = -1.0, 
-                           double globalLongitudeAprioriSigma = -1.0, 
-                           double globalRadiusAprioriSigma = -1.0);
+                           double globalLatitudeAprioriSigma = Isis::Null, 
+                           double globalLongitudeAprioriSigma = Isis::Null, 
+                           double globalRadiusAprioriSigma = Isis::Null);
       void setOutlierRejection(bool outlierRejection, double multiplier = 1.0);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> observationSolveSettings);
 
@@ -270,8 +270,13 @@ namespace Isis {
       int m_convergenceCriteriaMaximumIterations;
 
       // Maximum Likelihood Estimation Options
-      // model and maxModelCQuantile for each of the three maximum likelihood estimations.
-      // Note that Welsch and Chen can not be used for the first model.
+      /**
+       * Model and C-Quantile for each of the three maximum likelihood 
+       * estimations. The C-Quantile is the quantile of the residual used 
+       * to compute the tweaking constant. Note that this is an ordered 
+       * list and that the Welsch and Chen models can not be used for the 
+       * first model.
+       */
       QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; // TODO: pointer???
 
       // Self Calibration ??? (from cnetsuite only)
@@ -279,7 +284,7 @@ namespace Isis {
       // Target Body ??? (from cnetsuite only)
 
       // Output Options ??? (from Jigsaw only)
-      QString m_outputFilePrefix; //!< output file prefix  // TODO: pointer???
+      QString m_outputFilePrefix; //!< output file prefix
       bool m_createBundleOutputFile; //!< to print standard bundle output file (bundleout.txt)
       bool m_createCSVFiles; //!< to output points and image station data in csv format
       bool m_createResidualsFile; //!< to output residuals in csv format
