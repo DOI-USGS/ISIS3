@@ -191,6 +191,11 @@ namespace Isis {
    *                           every iteration. Now release every iteration but the last since we
    *   @history 2015-02-20 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
    *   @history 2015-08-17 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
+   *   @history 2015-09-03 Jeannie Backer - Removed the underscore that was added to file name when
+   *                           BundleSettings::outputFilePrefix() is not empty. This will allow
+   *                           users to use the outputFilePrefix to specify a file path without
+   *                           adding an underscore to the file name. If the underscore is wanted,
+   *                           it should be added to the prefix when entered by the user.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

@@ -4184,9 +4184,8 @@ namespace Isis {
    */
   bool BundleAdjust::outputText() {
 
-   QString ofname("bundleout.txt");
-    if ( m_bundleSettings.outputFilePrefix().length() != 0 )
-        ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
+    QString ofname = "bundleout.txt";
+    ofname = m_bundleSettings.outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
@@ -4335,9 +4334,8 @@ namespace Isis {
   bool BundleAdjust::outputPointsCSV() {
     char buf[1056];
 
-    QString ofname("bundleout_points.csv");
-    if (!m_bundleSettings.outputFilePrefix().isEmpty())
-      ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
+    QString ofname = "bundleout_points.csv";
+    ofname = m_bundleSettings.outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
@@ -4449,9 +4447,8 @@ namespace Isis {
   bool BundleAdjust::outputResiduals() {
     char buf[1056];
 
-    QString ofname("residuals.csv");
-    if (!m_bundleSettings.outputFilePrefix().isEmpty())
-      ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
+    QString ofname = "residuals.csv";
+    ofname = m_bundleSettings.outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
@@ -4530,9 +4527,8 @@ namespace Isis {
 /*
     char buf[1056];
 
-    QString ofname("bundleout_images.csv");
-    if (!m_bundleSettings.outputFilePrefix().isEmpty())
-      ofname = m_bundleSettings.outputFilePrefix() + "_" + ofname;
+    QString ofname = "bundleout_images.csv";
+    ofname = m_bundleSettings.outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
