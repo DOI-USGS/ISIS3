@@ -75,6 +75,7 @@ namespace Isis {
    *                           constructor/destructor is not shown as covered by unitTest. Current
    *                           test code coverage is (scope 98.79%, line 98.698%, function 96.0%).
    *   @history 2015-09-03 Jeannie Backer - Changed a priori sigma defaults from -1.0 to Isis::Null.
+   *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
    *  
    *   @todo Determine whether xml stuff needs a Project pointer
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -209,8 +210,13 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
-      void savehdf5(hid_t fileId, H5::Group settingsGroup) const;
-      void savehdf5(hid_t settingsGroupId, QString objectName) const;
+      void createH5Group(hid_t locationId, QString locationName) const; //delete
+      void parseH5Group(hid_t locationId, QString locationName);        //delete
+
+      void createH5Group(H5::CommonFG &locationObject, QString locationName) const;
+      H5::Group createH5Group2(H5::Group locationGroup, QString locationName);
+      void openH5Group(H5::CommonFG &locationObject, QString locationName);
+      BundleSettings(H5::CommonFG &locationObject, QString locationName);
 
     private:
       /**
@@ -239,6 +245,17 @@ namespace Isis {
           Project *m_xmlHandlerProject; // TODO: does xml stuff need project???
           QString m_xmlHandlerCharacters;
           QList<BundleObservationSolveSettings *> m_xmlHandlerObservationSettings;
+      };
+
+      /** 
+       * This struct is needed to write the m_maximumLikelihood variable as an 
+       * HDF5 table. Each table record has 3 field values: index, name, and 
+       * quantile. 
+       */
+      struct MaximumLikelihoodModelTableRecord {
+          unsigned int indexFieldValue;
+          QString nameFieldValue;
+          double quantileFieldValue;
       };
 
       /**

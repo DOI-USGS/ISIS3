@@ -6,6 +6,7 @@
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
+#include "SpecialPixel.h"
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {
@@ -82,8 +83,8 @@ namespace Isis {
 
     QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
     if (useLastSettings && bundleSolutionInfo.size() > 0) {
-     BundleSettings *lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
-     fillFromSettings(lastBundleSettings);
+     BundleSettings lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+     fillFromSettings(&lastBundleSettings);
     }
 
     if (readOnly) {
@@ -238,15 +239,19 @@ namespace Isis {
 
 
     int pointingOption = observationSolveSettings.instrumentPointingSolveOption();
-    if (pointingOption == 0)
+    if (pointingOption == 0) {
       pointingOption = 1;
-    if (pointingOption == 1)
+    }
+    if (pointingOption == 1) {
       pointingOption = 0;
+    }
 
-    if ( pointingOption > 0 )
+    if ( pointingOption > 0 ) {
       m_ui->twistCheckBox->setEnabled(true);
-    else
+    }
+    else {
       m_ui->twistCheckBox->setEnabled(true);
+    }
 
     m_ui->pointingComboBox->setCurrentIndex(pointingOption);
 //    m_ui->pointingComboBox->setCurrentIndex(observationSolveSettings.instrumentPointingSolveOption());
@@ -258,34 +263,43 @@ namespace Isis {
     m_ui->ckSolveDegreeSpinBox->setValue(observationSolveSettings.ckSolveDegree());
 
     // weighting tab
-    if (settings->globalLatitudeAprioriSigma() > 0.0)
+    if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
       m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalLatitudeAprioriSigma()));
-    if (settings->globalLongitudeAprioriSigma() > 0.0)
+    }
+    if ( !IsNullPixel(settings->globalLongitudeAprioriSigma()) ) {
       m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalLongitudeAprioriSigma()));
-    if (settings->globalRadiusAprioriSigma() > 0.0)
+    }
+    if ( !IsNullPixel(settings->globalRadiusAprioriSigma()) ) {
       m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalRadiusAprioriSigma()));
+    }
 
     QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
 
-    if (aprioriPositionSigmas.size() > 0 && aprioriPositionSigmas.at(0) > 0.0)
-      m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas.at(0)));
+    if ( aprioriPositionSigmas.size() > 0 && !IsNullPixel(aprioriPositionSigmas[0]) ) {
+      m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas[0]));
+    }
 
-    if (aprioriPositionSigmas.size() > 1 && aprioriPositionSigmas.at(1) > 0.0)
-      m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas.at(1)));
+    if ( aprioriPositionSigmas.size() > 1 && !IsNullPixel(aprioriPositionSigmas[1]) ) {
+      m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas[1]));
+    }
 
-    if (aprioriPositionSigmas.size() > 2 && aprioriPositionSigmas.at(2) > 0.0)
-      m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas.at(2)));
+    if ( aprioriPositionSigmas.size() > 2 && !IsNullPixel(aprioriPositionSigmas[2]) ) {
+      m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas[2]));
+    }
 
     QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
 
-    if (aprioriPointingSigmas.size() > 0 && aprioriPointingSigmas.at(0) > 0.0)
-      m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas.at(0)));
+    if ( aprioriPointingSigmas.size() > 0 && !IsNullPixel(aprioriPointingSigmas[0]) ) {
+      m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas[0]));
+    }
 
-    if (aprioriPointingSigmas.size() > 1 && aprioriPointingSigmas.at(1) > 0.0)
-      m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas.at(1)));
+    if ( aprioriPointingSigmas.size() > 1 && !IsNullPixel(aprioriPointingSigmas[1]) ) {
+      m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas[1]));
+    }
 
-    if (aprioriPointingSigmas.size() > 2 && aprioriPointingSigmas.at(2) > 0.0)
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas.at(2)));
+    if ( aprioriPointingSigmas.size() > 2 && !IsNullPixel(aprioriPointingSigmas[2]) ) {
+      m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas[2]));
+    }
 
     // maximum liklihood tab
 
@@ -406,8 +420,8 @@ namespace Isis {
       }
     }
 
-     // output options
-//???     settings->setOutputFiles("", false, false, false);
+    // output options
+    //???     settings->setOutputFiles("", false, false, false);
 
     return settings;
   }

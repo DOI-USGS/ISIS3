@@ -315,7 +315,7 @@ namespace Isis {
       // TESTING
       // code below should go into a separate method
       // set up BundleObservations and assign solve settings for each from BundleSettings class
-      for (int i = 0; i < nImages; i++ ) {
+      for (int i = 0; i < nImages; i++) {
 
         Camera* camera = m_pCnet->Camera(i);
         QString observationNumber = m_pSnList->ObservationNumber(i);
@@ -786,17 +786,20 @@ namespace Isis {
 
     return true;
 
-    QString msg = "Need to return something here, or just change the whole darn thing? [";
+    QString msg = "Need to return something here, or just change the whole darn thing? [";//??? already returned true
 //    msg += IString(tol) + "] in less than [";
 //    msg += IString(m_bundleSettings.convergenceCriteriaMaximumIterations()) + "] iterations";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+
   BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
     BundleSolutionInfo results(m_bundleSettings, FileName(m_strCnetFileName), m_bundleResults);
+    //results.setRunTime(Isis::iTime::CurrentLocalTime().toAscii().data());
     results.setRunTime("");
     return results;
   }
+
 
   /**
    * Forming the least-squares normal equations matrix.
@@ -989,7 +992,7 @@ namespace Isis {
 //    std::cout << (*(*m_SparseNormals[observationIndex])[observationIndex]) << std::endl;
 
     // form N12_Image
-    static boost::numeric::ublas::matrix< double > N12_Image(nImagePartials, 3);
+    static boost::numeric::ublas::matrix<double> N12_Image(nImagePartials, 3);
     N12_Image.resize(nImagePartials, 3);
     N12_Image.clear();
 
@@ -1080,8 +1083,6 @@ namespace Isis {
    // std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
 
     // save upper triangular covariance matrix for error propagation
-    // TODO:  The following method does not exist yet (08-13-2010)
-//    SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
     SurfacePoint SurfacePoint = bundleControlPoint->getAdjustedSurfacePoint();
     SurfacePoint.SetSphericalMatrix(N22);
     bundleControlPoint->setAdjustedSurfacePoint(SurfacePoint);
@@ -1141,15 +1142,15 @@ namespace Isis {
 
     int n = 0;
 
-    for ( int i = 0; i < m_SparseNormals.size(); i++ ) {
-      boost::numeric::ublas::matrix< double > *diagonalBlock = m_SparseNormals.getBlock(i, i);
+    for (int i = 0; i < m_SparseNormals.size(); i++) {
+      boost::numeric::ublas::matrix<double> *diagonalBlock = m_SparseNormals.getBlock(i, i);
       if ( !diagonalBlock )
         continue;
 
       // get parameter weights for this observation
       BundleObservation *observation = m_bundleObservations.at(i);
-      boost::numeric::ublas::vector< double > weights = observation->parameterWeights();
-      boost::numeric::ublas::vector< double > corrections = observation->parameterCorrections();
+      boost::numeric::ublas::vector<double> weights = observation->parameterWeights();
+      boost::numeric::ublas::vector<double> corrections = observation->parameterCorrections();
 
       int blockSize = diagonalBlock->size1();
       for (int j = 0; j < blockSize; j++) {
@@ -1188,10 +1189,10 @@ namespace Isis {
 
     static matrix<double> coeff_image;
     static matrix<double> coeff_point3D(2, 3);
-    static vector<double> coeff_RHS(2);
+    static boost::numeric::ublas::vector<double> coeff_RHS(2);
     static symmetric_matrix<double, upper> N22(3);     // 3x3 upper triangular
     static matrix< double> N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
-    static vector<double> n2(3);                       // 3x1 vector
+    static boost::numeric::ublas::vector<double> n2(3);                       // 3x1 vector
     compressed_vector<double> n1(m_nRank);             // image parameters x 1
 
     m_nj.resize(m_nRank);
@@ -1434,10 +1435,10 @@ namespace Isis {
 
       // save upper triangular covariance matrix for error propagation
       // TODO:  The following method does not exist yet (08-13-2010)
-      SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
+      SurfacePoint SurfacePoint = point->getAdjustedSurfacePoint();
       SurfacePoint.SetSphericalMatrix(N22);
-      point->SetAdjustedSurfacePoint(SurfacePoint);
-  //    point->GetAdjustedSurfacePoint().SetSphericalMatrix(N22);
+      point->setAdjustedSurfacePoint(SurfacePoint);
+  //    point->getAdjustedSurfacePoint().setSphericalMatrix(N22);
 
   // TODO  Test to make sure spherical matrix is truly set.  Try to read it back
 
@@ -1523,9 +1524,9 @@ namespace Isis {
    */
   void BundleAdjust::product_AV(double alpha, bounded_vector<double,3> &v2,
                                 SparseBlockRowMatrix &Q,
-                                vector< double > &v1) {
+                                vector<double> &v1) {
 
-    QMapIterator< int, boost::numeric::ublas::matrix< double > * > iQ(Q);
+    QMapIterator< int, boost::numeric::ublas::matrix<double> * > iQ(Q);
 
     // subrange start, end
     int srStart, srEnd;
@@ -1554,7 +1555,7 @@ namespace Isis {
                                      SparseBlockColumnMatrix &N12,
                                      SparseBlockRowMatrix &Q) {
 
-    QMapIterator< int, boost::numeric::ublas::matrix< double > * > iN12(N12);
+    QMapIterator< int, boost::numeric::ublas::matrix<double> * > iN12(N12);
 
     while ( iN12.hasNext() ) {
       iN12.next();
@@ -1595,7 +1596,7 @@ namespace Isis {
       iN12.next();
 
       int nrow = iN12.key();
-      boost::numeric::ublas::matrix< double > *in12 = iN12.value();
+      boost::numeric::ublas::matrix<double> *in12 = iN12.value();
 
       while ( iQ.hasNext() ) {
         iQ.next();
@@ -1605,7 +1606,7 @@ namespace Isis {
         if ( nrow > ncol )
           continue;
 
-        boost::numeric::ublas::matrix< double > *iq = iQ.value();
+        boost::numeric::ublas::matrix<double> *iq = iQ.value();
 
         // insert submatrix at column, row
         m_SparseNormals.InsertMatrixBlock(ncol, nrow,
@@ -1683,15 +1684,15 @@ namespace Isis {
     if (alpha == 0.0)
       return;
 
-    QMapIterator< int, boost::numeric::ublas::matrix< double > * > iQ(Q);
+    QMapIterator< int, boost::numeric::ublas::matrix<double> * > iQ(Q);
 
     while ( iQ.hasNext() ) {
       iQ.next();
 
       int nrow = iQ.key();
-      boost::numeric::ublas::matrix< double > *m = iQ.value();
+      boost::numeric::ublas::matrix<double> *m = iQ.value();
 
-      boost::numeric::ublas::vector< double > v = prod(trans(*m), n2);
+      boost::numeric::ublas::vector<double> v = prod(trans(*m),n2);
 
       //testing - should ask m_bundleObservations for this???
       int t=0;
@@ -1700,8 +1701,9 @@ namespace Isis {
         t += observation->numberParameters();
       }
 
-      for ( unsigned i = 0; i < v.size(); i++ )
+      for (unsigned i = 0; i < v.size(); i++) {
         m_nj(t+i) += alpha*v(i);
+      }
     }
   }
 
@@ -1788,7 +1790,7 @@ namespace Isis {
     int nRowsA = A.size1();
     int nColsC = C.size2();
 
-    for ( i = 0; i < nRowsA; ++i ) {
+    for (i = 0; i < nRowsA; ++i) {
       for (j = 0; j < nColsC; ++j) {
         d = 0;
 
@@ -1838,11 +1840,11 @@ namespace Isis {
     int nzlength = nz.size();
 
     int nColsC = C.size2();
-    for ( i = 0; i < nRowsA; ++i ) {
-      for ( j = 0; j < nColsC; ++j ) {
+    for (i = 0; i < nRowsA; ++i) {
+      for (j = 0; j < nColsC; ++j) {
         d = 0;
 
-        for ( k = 0; k < nzlength; ++k ) {
+        for (k = 0; k < nzlength; ++k) {
           kk = nz[k];
           d += A(i, kk) * B(kk, j);
         }
@@ -1975,7 +1977,7 @@ namespace Isis {
     int nentries = 0;
 
     int nblockcolumns = m_SparseNormals.size();
-    for ( int ncol = 0; ncol < nblockcolumns; ncol++ ) {
+    for (int ncol = 0; ncol < nblockcolumns; ncol++) {
 
       SparseBlockColumnMatrix* sbc = m_SparseNormals[ncol];
 
@@ -1986,7 +1988,7 @@ namespace Isis {
 
       int nLeadingColumns = m_SparseNormals.getLeadingColumnsForBlock(ncol);
 
-      QMapIterator< int, boost::numeric::ublas::matrix< double > * > it(*sbc);
+      QMapIterator< int, boost::numeric::ublas::matrix<double> * > it(*sbc);
 
       while ( it.hasNext() ) {
         it.next();
@@ -1995,7 +1997,7 @@ namespace Isis {
 
         int nLeadingRows = m_SparseNormals.getLeadingRowsForBlock(nrow);
 
-        boost::numeric::ublas::matrix< double > *m = it.value();
+        boost::numeric::ublas::matrix<double> *m = it.value();
         if ( !m ) {
           printf("matrix block retrieval failure at column %d, row %d", ncol,nrow);
           printf("Total # of block columns: %d", nblockcolumns);
@@ -2004,7 +2006,7 @@ namespace Isis {
         }
 
         if ( ncol == nrow )  {   // diagonal block (upper-triangular)
-          for ( unsigned ii = 0; ii < m->size1(); ii++ ) {
+          for (unsigned ii = 0; ii < m->size1(); ii++) {
             for (unsigned jj = ii; jj < m->size2(); jj++) {
               d = m->at_element(ii,jj);
               int ncolindex = jj+nLeadingColumns;
@@ -2025,8 +2027,8 @@ namespace Isis {
 //          printf("\n");
         }
         else {                // off-diagonal block (square)
-          for ( unsigned ii = 0; ii < m->size1(); ii++ ) {
-            for ( unsigned jj = 0; jj < m->size2(); jj++ ) {
+          for (unsigned ii = 0; ii < m->size1(); ii++) {
+            for (unsigned jj = 0; jj < m->size2(); jj++) {
               d = m->at_element(ii,jj);
               int ncolindex = jj+nLeadingColumns;
               int nrowindex = ii+nLeadingRows;
@@ -2099,8 +2101,8 @@ namespace Isis {
 
     int nRows = m_Normals.size1();
 //    comment here
-//        for ( i = 0; i < nRows; i++ ) {
-//          for ( j = i; j < nRows; j++ ) {
+//        for (i = 0; i < nRows; i++) {
+//          for (j = i; j < nRows; j++) {
 //            printf("%lf ",m_Normals(i,j));
 //          }
 //          printf("\n");
@@ -2228,10 +2230,10 @@ namespace Isis {
 //    symmetric_matrix<double,lower> tmp = m_Normals;
 
     // solution vector
-    boost::numeric::ublas::vector< double > s(m_nRank);
+    boost::numeric::ublas::vector<double> s(m_nRank);
 
     // initialize column vector
-    boost::numeric::ublas::vector< double > column(m_nRank);
+    boost::numeric::ublas::vector<double> column(m_nRank);
     column.clear();
     column(0) = 1.0;
 
@@ -2292,7 +2294,7 @@ namespace Isis {
 
     double* px = NULL;
 
-    for ( i = 0; i < m_nRank; i++ ) {
+    for (i = 0; i < m_nRank; i++) {
       if ( i > 0 ) {
         pb[i-1] = 0.0;
       }
@@ -2711,7 +2713,7 @@ namespace Isis {
 
           if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
             SpicePosition         *pInstPos = pCamera->instrumentPosition();
-            std::vector< double > coefX(m_nNumberCamPosCoefSolved),
+            std::vector<double> coefX(m_nNumberCamPosCoefSolved),
                 coefY(m_nNumberCamPosCoefSolved),
                 coefZ(m_nNumberCamPosCoefSolved);
             pInstPos->GetPolynomial(coefX, coefY, coefZ);
@@ -2744,7 +2746,7 @@ namespace Isis {
 
       if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
         SpiceRotation         *pInstRot = pCamera->instrumentRotation();
-        std::vector< double > coefRA(m_nNumberCamAngleCoefSolved),
+        std::vector<double> coefRA(m_nNumberCamAngleCoefSolved),
             coefDEC(m_nNumberCamAngleCoefSolved),
             coefTWI(m_nNumberCamAngleCoefSolved);
         pInstRot->GetPolynomial(coefRA, coefDEC, coefTWI);
@@ -3301,7 +3303,7 @@ namespace Isis {
         QS.clear();
 
         // get corresponding Q matrix
-        boost::numeric::ublas::compressed_matrix< double > &Q = m_Qs_SPECIALK[nPointIndex];
+        boost::numeric::ublas::compressed_matrix<double> &Q = m_Qs_SPECIALK[nPointIndex];
 
         // form QS
         QS = prod(Q, m_Normals);
@@ -3356,7 +3358,7 @@ namespace Isis {
     cholmod_free_triplet(&m_pTriplet, &m_cm);
     cholmod_free_sparse(&m_N, &m_cm);
 
-    boost::numeric::ublas::matrix< double > T(3, 3);
+    boost::numeric::ublas::matrix<double> T(3, 3);
     double dSigmaLat, dSigmaLong, dSigmaRadius;
     double t;
 
@@ -3369,8 +3371,9 @@ namespace Isis {
 
     // create and initialize array of 3x3 matrices for all object points
     std::vector< symmetric_matrix<double> > point_covs(nObjectPoints,symmetric_matrix<double>(3));
-    for (int d = 0; d < nObjectPoints; d++)
+    for (int d = 0; d < nObjectPoints; d++) {
       point_covs[d].clear();
+    }
 
     cholmod_dense *x;        // solution vector
     cholmod_dense *b;        // right-hand side (column vectors of identity)
@@ -3383,10 +3386,11 @@ namespace Isis {
     SparseBlockColumnMatrix sbcMatrix;
 
     // Create unique file name
-    FileName matrixFile;
-    matrixFile = FileName::createTempFile("inverseMatrix.dat");
+    FileName matrixFile(m_bundleSettings.outputFilePrefix() + "inverseMatrix.dat");
+    //???FileName matrixFile = FileName::createTempFile(m_bundleSettings.outputFilePrefix() 
+    //???                                               + "inverseMatrix.dat");
     // Create file handle
-    QFile matrixOutput(matrixFile.name());
+    QFile matrixOutput(matrixFile.expanded());
     // Open file to write to
     matrixOutput.open(QIODevice::WriteOnly);
     QDataStream outStream(&matrixOutput);
@@ -3441,8 +3445,8 @@ namespace Isis {
         int rp = 0;
 
         // store solution in corresponding column of inverse
-        for ( k = 0; k < sbcMatrix.size(); k++ ) {
-          boost::numeric::ublas::matrix< double > *matrix = sbcMatrix.value(k);
+        for (k = 0; k < sbcMatrix.size(); k++) {
+          boost::numeric::ublas::matrix<double> *matrix = sbcMatrix.value(k);
 
           int sz1 = matrix->size1();
 
@@ -3461,8 +3465,8 @@ namespace Isis {
       // save adjusted image sigmas
       BundleObservation *observation = m_bundleObservations.at(i);
       boost::numeric::ublas::vector<double> adjustedSigmas(ncolsCurrentBlockColumn);
-      boost::numeric::ublas::matrix< double > *imageCovMatrix = sbcMatrix.value(i);
-      for ( int z = 0; z < ncolsCurrentBlockColumn; z++) {
+      boost::numeric::ublas::matrix<double> *imageCovMatrix = sbcMatrix.value(i);
+      for (int z = 0; z < ncolsCurrentBlockColumn; z++) {
 //        adjustedSigmas[z] = (*imageCovMatrix)(z,z);
         adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleResults.sigma0();
       }
@@ -3481,8 +3485,8 @@ namespace Isis {
 
         // only update point every 100 points
         if (j%100 == 0) {
-            printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", i+1,
-                   nBlockColumns,  j+1, nObjectPoints);
+            printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", 
+                   i+1, nBlockColumns,  j+1, nObjectPoints);
         }
 
         // get corresponding Q matrix
@@ -3491,10 +3495,10 @@ namespace Isis {
         T.clear();
 
         // get corresponding point covariance matrix
-        boost::numeric::ublas::symmetric_matrix< double > &cv = point_covs[nPointIndex];
+        boost::numeric::ublas::symmetric_matrix<double> &cv = point_covs[nPointIndex];
 
         // get qT - index i is the key into Q for qT
-        boost::numeric::ublas::matrix< double > *qT = Q.value(i);
+        boost::numeric::ublas::matrix<double> *qT = Q.value(i);
         if (!qT) {
           nPointIndex++;
           continue;
@@ -3502,34 +3506,37 @@ namespace Isis {
 
         // iterate over Q
         // q is current map value
-        QMapIterator< int, boost::numeric::ublas::matrix< double > * > it(Q);
-         while ( it.hasNext() ) {
-           it.next();
+        QMapIterator< int, boost::numeric::ublas::matrix<double> * > it(Q);
+        while ( it.hasNext() ) {
+          it.next();
 
-           int nKey = it.key();
+          int nKey = it.key();
 
-           if (it.key() > i)
-             break;
+          if (it.key() > i) {
+            break;
+          }
 
-           boost::numeric::ublas::matrix< double > *q = it.value();
+          boost::numeric::ublas::matrix<double> *q = it.value();
 
-           if ( !q ) // should never be NULL
-             continue;
+          if ( !q ) {// should never be NULL
+            continue;
+          }
 
-           boost::numeric::ublas::matrix< double > *nI = sbcMatrix.value(it.key());
+          boost::numeric::ublas::matrix<double> *nI = sbcMatrix.value(it.key());
 
-           if ( !nI ) // should never be NULL
-             continue;
+          if ( !nI ) {// should never be NULL
+            continue;
+          }
 
-           T = prod(*nI, trans(*qT));
-           T = prod(*q,T);
+          T = prod(*nI, trans(*qT));
+          T = prod(*q,T);
 
-           if (nKey != i)
-             T += trans(T);
+          if (nKey != i) {
+            T += trans(T);
+          }
 
-           cv += T;
-         }
-
+          cv += T;
+        }
         nPointIndex++;
       }
     }
@@ -3559,12 +3566,12 @@ namespace Isis {
         continue;
 
       if (j%100 == 0) {
-        printf("\rError Propagation: Filling point covariance matrices %8d of %8d",j+1,
+        printf("\rError Propagation: Filling point covariance matrices %8d of %8d\r",j+1,
                nObjectPoints);
       }
 
       // get corresponding point covariance matrix
-      boost::numeric::ublas::symmetric_matrix< double > &cv = point_covs[nPointIndex];
+      boost::numeric::ublas::symmetric_matrix<double> &cv = point_covs[nPointIndex];
 
       // Ask Ken what is happening here...Setting just the sigmas is not very accurate
       // Shouldn't we be updating and setting the matrix???  TODO
@@ -3705,10 +3712,12 @@ namespace Isis {
   void BundleAdjust::iterationSummary() {
     QString itlog;
 
-    if ( m_bundleResults.converged() ) 
+    if ( m_bundleResults.converged() ) {
         itlog = "Iteration" + toString(m_nIteration) + ": Final";
-    else
+    }
+    else {
         itlog = "Iteration" + toString(m_nIteration);
+    }
 
     PvlGroup gp(itlog);
 
@@ -3760,7 +3769,7 @@ namespace Isis {
    */
   bool BundleAdjust::output() {
     if (m_bundleSettings.createBundleOutputFile()) {
-        outputText();
+      outputText();
     }
 
     if (m_bundleSettings.createCSVFiles()) {
@@ -3782,8 +3791,9 @@ namespace Isis {
    */
   bool BundleAdjust::outputHeader(std::ofstream &fp_out) {
 
-    if (!fp_out)
+    if (!fp_out) {
       return false;
+    }
 
     char buf[1056];
     int nImages = images();
@@ -4188,8 +4198,9 @@ namespace Isis {
     ofname = m_bundleSettings.outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-    if (!fp_out)
+    if (!fp_out) {
       return false;
+    }
 
     char buf[1056];
     BundleObservation *observation = NULL;
@@ -4199,8 +4210,9 @@ namespace Isis {
     outputHeader(fp_out);
 
     bool berrorProp = false;
-    if (m_bundleResults.converged() && m_bundleSettings.errorPropagation())
+    if (m_bundleResults.converged() && m_bundleSettings.errorPropagation()) {
       berrorProp = true;
+    }
 
     // output image exterior orientation header
     sprintf(buf, "\nIMAGE EXTERIOR ORIENTATION\n==========================\n");
@@ -4214,8 +4226,9 @@ namespace Isis {
       //    bHeld = true;
 
       observation = m_bundleObservations.at(i);
-      if (!observation)
+      if (!observation) {
         continue;
+      }
 
       int nImages = observation->size();
       for (int j = 0; j < nImages; j++) {
@@ -4338,8 +4351,9 @@ namespace Isis {
     ofname = m_bundleSettings.outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-    if (!fp_out)
+    if (!fp_out) {
       return false;
+    }
 
     int nPoints = m_bundleControlPoints.size();
 
@@ -4451,8 +4465,9 @@ namespace Isis {
     ofname = m_bundleSettings.outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
-    if (!fp_out)
+    if (!fp_out) {
       return false;
+    }
 
     // output column headers
     sprintf(buf, ",,,x image,y image,Measured,Measured,sample,line,Residual Vector\n");
@@ -4471,23 +4486,26 @@ namespace Isis {
     int nObjectPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nObjectPoints; i++) {
       const ControlPoint *point = m_pCnet->GetPoint(i);
-      if (point->IsIgnored())
+      if (point->IsIgnored()) {
         continue;
+      }
 
       int nObservations = point->GetNumMeasures();
       for (int j = 0; j < nObservations; j++) {
         const ControlMeasure *measure = point->GetMeasure(j);
-        if (measure->IsIgnored())
+        if (measure->IsIgnored()) {
           continue;
+        }
 
         Camera *pCamera = measure->Camera();
-        if (!pCamera)
+        if (!pCamera) {
           continue;
+        }
 
         // Determine the image index
         nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
 
-        if (measure->IsRejected())
+        if (measure->IsRejected()) {
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
                   point->GetId().toAscii().data(),
                   m_pSnList->FileName(nImageIndex).toAscii().data(),
@@ -4499,7 +4517,8 @@ namespace Isis {
                   measure->GetSampleResidual(),
                   measure->GetLineResidual(),
                   measure->GetResidualMagnitude());
-        else
+        }
+        else {
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
                   point->GetId().toAscii().data(),
                   m_pSnList->FileName(nImageIndex).toAscii().data(),
@@ -4511,6 +4530,7 @@ namespace Isis {
                   measure->GetSampleResidual(),
                   measure->GetLineResidual(),
                   measure->GetResidualMagnitude());
+        }
         fp_out << buf;
       }
     }
@@ -4763,7 +4783,7 @@ namespace Isis {
     output_columns.clear();
 
     // data structure to contain adjusted image parameter sigmas for CHOLMOD error propagation only
-    vector<double> vImageAdjustedSigmas;
+    boost::numeric::ublas::vector<double> vImageAdjustedSigmas;
 
     std::vector<double> BFP(3);
 
@@ -5115,11 +5135,11 @@ namespace Isis {
   double BundleAdjust::solveMethodSigma(int normalEquationIndex, int sigmaIndex, int imageIndex) {
     double sigma = 0.0;
     if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-      gmm::row_matrix< gmm::rsvector< double > > lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
+      gmm::row_matrix< gmm::rsvector<double> > lsqCovMatrix = m_pLsq->covarianceMatrix();
       sigma = sqrt((double)(lsqCovMatrix(normalEquationIndex, normalEquationIndex)));
     }
     else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-      vector <double> imageAdjustedSigmas = m_Image_AdjustedSigmas.at(imageIndex);
+      boost::numeric::ublas::vector <double> imageAdjustedSigmas = m_Image_AdjustedSigmas.at(imageIndex);
       sigma = sqrt(imageAdjustedSigmas[sigmaIndex]) * m_bundleResults.sigma0();
     }
     else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {

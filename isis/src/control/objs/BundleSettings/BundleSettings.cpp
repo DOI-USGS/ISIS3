@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QList>
 #include <QString>
+#include <QtGlobal> // qMax()
 #include <QUuid>
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
@@ -139,6 +140,9 @@ namespace Isis {
 //    xmlReader->setErrorHandler(new XmlHandler(this));
 //  }
 
+  BundleSettings::BundleSettings(H5::CommonFG &locationObject, QString locationName) {
+    openH5Group(locationObject, locationName);
+  }
 
   /**
    * copy constructor
@@ -1116,214 +1120,378 @@ namespace Isis {
     return settings.read(stream);
   }
 
-  void BundleSettings::savehdf5(hid_t fileId, H5::Group settingsGroup) const {
-  }
-  void BundleSettings::savehdf5(hid_t settingsGroupId, QString objectName) const {
-  #if 0
-    
-    // Try block to detect exceptions raised by any of the calls inside it
+
+  void BundleSettings::createH5Group(H5::CommonFG &locationObject, QString locationName) const {
     try {
-      /*
-       * Turn off the auto-printing when failure occurs so that we can
-       * handle the errors appropriately
-       */
-      H5::Exception::dontPrint();
+      // Try block to detect exceptions raised by any of the calls inside it
+      try {
+        /*
+         * Turn off the auto-printing when failure occurs so that we can
+         * handle the errors appropriately
+         */
+//        H5::Exception::dontPrint();
 
-    // passed in
-    //   H5::Group bundleSettingsGroup = H5::Group(hdfFile.createGroup("/BundleSettings"));
-      hsize_t dims[2];              // dataset dimensions
+        // create a settings group to add to the given H5 object
+        QString settingsGroupName = locationName + "/BundleSettings"; 
+        H5::Group settingsGroup = locationObject.createGroup(settingsGroupName.toAscii());
 
-      //TODO: finish Correlation Matrix
-      //Create a dataset with compression
-      hid_t correlationGroupId = H5Gcreate(settingsGroupId, "/BundleSolutionInfo/BundleSettings/CorrelationMatrix", 0);//??? 
-      QString location = objectName + "/CorrelationMatrix";
-      H5LTset_attribute_string(correlationGroupId, location.toAscii(), "correlationFileName", 
-                               correlationMatrix().correlationFileName().expanded());
-      H5LTset_attribute_string(correlationGroupId, location.toAscii(), "covarianceFileName", 
-                               correlationMatrix().covarianceFileName().expanded());
-      //  // TODO: jb - how do we add
-    //  // correlationMatrix().imagesAndParameters()???
-    //  // QMapIterator<QString, QStringList> a list of images with their
-    //  // corresponding parameters...
-    //
-    //  
-    //  // H5::Group generalStatsInfoGroup = H5::Group(hdfFile.createGroup("/GeneralStatisticsInfo"));
-    //  const int numFixedPoints = numberFixedPoints();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberFixedPoints", &numFixedPoints, 1);
-    //  const int numIgnoredPoints = numberIgnoredPoints();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberIgnoredPoints", &numIgnoredPoints, 1);
-    //  const int numHeldImages = numberHeldImages();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberHeldImages", &numHeldImages, 1);
-    //  const double rejectionLimit = rejectionLimit();
-    //  H5LTset_attribute_double(fileId, "/BundleSettings", "rejectionLimit", &rejectionLimit, 1);
-    //  const int numRejectedObservations = numberRejectedObservations();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberRejectedObservations", &numRejectedObservations, 1);
-    //  const int numObservations = numberObservations();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberObservations", &numObservations, 1);
-    //  const int numImageParameters = numberImageParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberImageParameters", &numImageParameters, 1);
-    //  const int numConstrainedPointParameters = numberConstrainedPointParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberConstrainedPointParameters", 
-    //                        &numConstrainedPointParameters, 1);
-    //  const int numConstrainedImageParameters = numberConstrainedImageParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberConstrainedImageParameters", 
-    //                        &numConstrainedImageParameters, 1);
-    //  const int numUnknownParameters = numberUnknownParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "numberUnknownParameters", &numUnknownParameters, 1);
-    //  const int degreesOfFreedom = degreesOfFreedom();
-    //  H5LTset_attribute_int(fileId, "/BundleSettings", "degreesOfFreedom", &degreesOfFreedom, 1);
-    //  const double sigma0 = sigma0();
-    //  H5LTset_attribute_double(fileId, "/BundleSettings", "sigma0", &sigma0, 1);
-    //  bool converged = converged();// ???
-    //  H5LTset_attribute_string(fileId, "/BundleSettings", "converged", toString(converged), 1);
-    //  
-    //  
-    //  // Create an RMS group in the file
-    //  H5::Group rms = H5::Group(hdfFile.createGroup("/RMS"));
-    //  H5::Group rms = H5::Group(hdfFile.createGroup("/RMS/residuals"));
-    //  // RMS and Sigma Scalars
-    //  H5LTset_attribute_double(fileId, "/RMS/residuals", "x", rmsRx(), 1);
-    //  H5LTset_attribute_double(fileId, "/RMS/residuals", "y", rmsRy(), 1);
-    //  H5LTset_attribute_double(fileId, "/RMS/residuals", "xy", rmsRxy(), 1);
-    //  H5::Group rms = H5::Group(hdfFile.createGroup("/RMS/sigmas"));
-    //  const double sigmas [3] = {rmsSigmaLat(), rmsSigmaLon(), rmsSigmaRad()};
-    //  H5LTset_attribute_double(fileId, "/RMS/sigmas", "latitude", rmsSigmaLat(), 1);
-    //  H5LTset_attribute_double(fileId, "/RMS/sigmas", "longitude", rmsSigmaLon(), 1);
-    //  H5LTset_attribute_double(fileId, "/RMS/sigmas", "radius", rmsSigmaRad(), 1);
-    //  // RMS and Sigma Vectors - This is a ton of duplicate code where I would rather use a list of functions - are functions first class objects?
-    //  const hsize_t residualsArraySize = rmsImageResiduals.size();
-    //  H5::DataSpace residualDataspace(1, &residualsArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/ResidualsList", H5::PredType::NATIVE_FLOAT, residualDataspace));
-    //  dataset.write(m_rmsImageResiduals, H5::PredType::NATIVE_FLOAT);
-    //  // Write the residual vector
-    //  const hsize_t sampleArraySize = rmsImageSampleResiduals.size();
-    //  H5::DataSpace sampleDataspace(1, &sampleArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/SampleList", H5::PredType::NATIVE_FLOAT, sampleDataspace));
-    //  dataset.write(m_rmsImageSampleResiduals, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t lineArraySize = rmsImageLineResiduals.size();
-    //  H5::DataSpace lineDataSpace(1,&lineArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/LineList", H5::PredType::NATIVE_FLOAT, lineDataSpace));
-    //  dataset.write(m_rmsImageLineResiduals, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t xSigmasArraySize = rmsImageXSigmas.size();
-    //  H5::DataSpace xSigmaDataspace(1, &xSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/xSigmas", H5::PredType::NATIVE_FLOAT, xSigmaDataspace));
-    //  dataset.write(m_rmsImageXSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t ySigmasArraySize = rmsImageYSigmas.size();
-    //  H5::DataSpace ySigmaDataspace(1, &ySigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/ySigmas", H5::PredType::NATIVE_FLOAT, ySigmaDataspace));
-    //  dataset.write(m_rmsImageYSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t zSigmasArraySize = rmsImageZSigmas.size();
-    //  H5::DataSpace zSigmaDataspace(1, &zSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/zSigmas", H5::PredType::NATIVE_FLOAT, zSigmaDataspace));
-    //  dataset.write(m_rmsImageZSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t raSigmasArraySize = rmsImageRASigmas.size();
-    //  H5::DataSpace raSigmaDataspace(1, &raSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/raSigmas", H5::PredType::NATIVE_FLOAT, raSigmaDataspace));
-    //  dataset.write(m_rmsImageRASigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t decSigmasArraySize = rmsImageDECSigmas.size();
-    //  H5::DataSpace decSigmaDataspace(1, &decSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/decSigmas", H5::PredType::NATIVE_FLOAT, decSigmaDataspace));
-    //  dataset.write(m_rmsImageDECSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t twistSigmasArraySize = rmsImageTWISTSigmas.size();
-    //  H5::DataSpace twistSigmaDataspace(1, &twistSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/RMS/twistSigmas", H5::PredType::NATIVE_FLOAT, twistSigmaDataspace));
-    //  dataset.write(m_rmsImageTWISTSigmas, H5::PredType::NATIVE_FLOAT);
-    //  
-    //  //Write elapsed time and error prop as attirbutes tagged to the root
-    //  const double elapsedTime = elapsedTime();
-    //  H5LTset_attribute_double(fileId, "/BundleSettings", "elapsedTime", &elapsedTime, 1);
-    //  const double errorProp = lapsedTimeErrorProp();
-    //  H5LTset_attribute_double(fileId, "/BundleSettings", "elapsedTimeErrorProp", &errorProp, 1);
-    //  
-    //  //Write a sigmas table
-    //  static m_sigmaTable sigmatable[6] = { // JB - why static???
-    //      {"minLat", minSigmaLatitudePointId(), minSigmaLatitude()},
-    //      {"maxLat", maxSigmaLatitudePointId(), maxSigmaLatitude()},
-    //      {"minLon", minSigmaLongitudePointId(), minSigmaLongitude()},
-    //      {"MaxLon", maxSigmaLongitudePointId(), maxSigmaLongitude()},
-    //      {"minRad", minSigmaRadiusPointId(), minSigmaRadius()},
-    //      {"maxRad", maxSigmaRadiusPointId(), maxSigmaRadius()}
-    //  };
-    //  
-    //  const int nfields = 3; //How many columns and their types - must be const so that field names can be created
-    //  
-    //  size_t part_offset[nfields] = {HOFFSET(m_sigmaTable, type),
-    //      HOFFSET(m_sigmaTable, pid),
-    //      HOFFSET(m_sigmaTable, value)};
-    //  
-    //  //Field names and types
-    //  hid_t field_type[nfields];  //Setup for a string type for the pid
-    //  hid_t string_type = H5Tcopy(H5T_C_S1);
-    //  H5Tset_size(string_type, (size_t)64);
-    //  field_type[0] = string_type;  //type
-    //  field_type[1] = string_type; //pid
-    //  field_type[2] = H5T_NATIVE_FLOAT;
-    //  
-    //  //How many rows?
-    //  int nrecords = 6;
-    //  // Field names
-    //  const char *fieldnames[nfields] = {"valuetype", "pid", "value"};
-    //  
-    //  hsize_t chunksize = 10;
-    //  int *filldata = NULL;
-    //  int compress = 0;
-    //  
-    //  H5TBmake_table("MinMaxSigma",fileId, "minmaxsigma", (hsize_t)nfields, (hsize_t)nrecords, sizeof(m_sigmaTable), fieldnames, part_offset, field_type, chunksize, filldata, compress, sigmatable);
-    //  
-    //  
-    //  H5::Group mlestatistics = H5::Group(hdfFile.createGroup("/MLEstimation"));
-    //  //TODO: ML Estimation Items
-    //  //The existing code iterates through - is this stored as a matrix somewhere?
-    //  // Dimensions
-    //  dims[1] = 4;
-    //  dims[0]  = 100;
-    //  
-    //  H5::DataSpace cumProbDataspace( RANK, dims );
-    //  H5::DataSet dataset = H5::DataSet(hdfFile.createDataSet("/MLEstimation/cumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, cumProbDataspace));
-    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
-    //  
-    //  
-    //  dims[1] = 4;
-    //  dims[0] = 100;
-    //  H5::DataSpace resCumProbdataspace(RANK, dims);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/MLEstimation/residualsCumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, resCumProbdataspace));
-    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
-    //  
-    }  // end of try block
-    // catch failure caused by the H5File operations
-    catch( H5::FileIException error ) {
-      QString msg = QString(error.getCDetailMsg());
-      IException hpfError(IException::Unknown, msg, _FILEINFO_);
-      msg = "Unable to save BundleResults to hpf5 file. "
-            "H5 exception handler has detected a file error.";
-      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+        // use H5S_SCALAR data space type for single valued spaces
+        H5::DataSpace spc;
+        Attribute att;
+        #if 0
+        hsize_t dims[1] = {2};
+        H5::DataSpace simple1x2Space(1, dims);
+        dims[0] = 1;
+        H5::DataSpace simple1DSpace(1, dims);
+
+        hsize_t dims2D[2] = {{2}, {2}};
+        H5::DataSpace simple2x2Space(2, dims);
+        dims2D[2] = {1, 1};
+        H5::DataSpace simple2x1Space(2, dims);
+        #endif
+
+        /*
+         * Add bool attributes as predefined data type PredType::NATIVE_HBOOL
+         */ 
+        int intFromBool = (int)m_validateNetwork;
+        att = settingsGroup.createAttribute("validateNetwork", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_solveObservationMode;
+        att = settingsGroup.createAttribute("solveObservationMode", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_solveRadius;
+        att = settingsGroup.createAttribute("solveRadius", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_updateCubeLabel;
+        att = settingsGroup.createAttribute("updateCubeLabel", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_errorPropagation;
+        att = settingsGroup.createAttribute("errorPropagation", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_outlierRejection;
+        att = settingsGroup.createAttribute("outlierRejection", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_createBundleOutputFile;
+        att = settingsGroup.createAttribute("createBundleOutputFile", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_createCSVFiles;
+        att = settingsGroup.createAttribute("createCSVFiles", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        intFromBool = (int)m_createResidualsFile;
+        att = settingsGroup.createAttribute("createResidualsFile", PredType::NATIVE_HBOOL, spc);
+        att.write(PredType::NATIVE_HBOOL, &intFromBool);
+
+        /* 
+         * Add enum attributes as predefined data type PredType::C_S1 (string)
+         */ 
+        QString enumToStringValue = "";
+        int stringSize = 0;
+        H5::StrType strDataType;
+
+        enumToStringValue = solveMethodToString(m_solveMethod);
+        stringSize = enumToStringValue.length();
+        strDataType = H5::StrType(PredType::C_S1, stringSize); 
+        att = settingsGroup.createAttribute("solveMethod", strDataType, spc);
+        att.write(strDataType, enumToStringValue.toStdString());
+
+        enumToStringValue = convergenceCriteriaToString(m_convergenceCriteria);
+        stringSize = enumToStringValue.length();
+        strDataType = H5::StrType(PredType::C_S1, stringSize); 
+        att = settingsGroup.createAttribute("convergenceCriteria", strDataType, spc);
+        att.write(strDataType, enumToStringValue.toStdString());
+
+        /* 
+         * Add string attributes as predefined data type PredType::C_S1 (string)
+         */ 
+        stringSize = qMax(m_outputFilePrefix.length(), 1); // if empty string, set size to 1
+        strDataType = H5::StrType(PredType::C_S1, stringSize); 
+        att = settingsGroup.createAttribute("outputFilePrefix", strDataType, spc);
+        att.write(strDataType, m_outputFilePrefix.toStdString());
+
+        /* 
+         * Add double attributes as predefined data type PredType::NATIVE_DOUBLE
+         */ 
+        att = settingsGroup.createAttribute("outlierRejectionMultiplier",
+                                            PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(PredType::NATIVE_DOUBLE, &m_outlierRejectionMultiplier);
+
+        att = settingsGroup.createAttribute("globalLatitudeAprioriSigma", 
+                                            PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(PredType::NATIVE_DOUBLE, &m_globalLatitudeAprioriSigma);
+
+        att = settingsGroup.createAttribute("globalLongitudeAprioriSigma", 
+                                            PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(PredType::NATIVE_DOUBLE, &m_globalLongitudeAprioriSigma);
+
+        att = settingsGroup.createAttribute("globalRadiusAprioriSigma", 
+                                            PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(PredType::NATIVE_DOUBLE, &m_globalRadiusAprioriSigma);
+
+        att = settingsGroup.createAttribute("convergenceCriteriaThreshold", 
+                                            PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(PredType::NATIVE_DOUBLE, &m_convergenceCriteriaThreshold);
+
+        /* 
+         * Add integer attributes as predefined data type PredType::NATIVE_INT
+         */ 
+        att = settingsGroup.createAttribute("convergenceCriteriaMaximumIterations", 
+                                            PredType::NATIVE_INT,
+                                            spc);
+        att.write(PredType::NATIVE_INT, &m_convergenceCriteriaMaximumIterations);
+
+        // Data sets??? tables???
+        // ??? QList<BundleObservationSolveSettings> m_observationSolveSettings; // TODO: pointer???
+        // ??? QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; // TODO: pointer???
+//        return locationObject; 
+      }
+      // catch failure caused by the Attribute operations
+      catch( H5::AttributeIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 ATTRIBUTE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataSet operations
+      catch( H5::DataSetIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA SET exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataSpace operations
+      catch( H5::DataSpaceIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA SPACE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataType operations
+      catch( H5::DataTypeIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA TYPE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the H5File operations
+      catch( H5::FileIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 FILE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the Group operations
+      catch( H5::GroupIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 GROUP exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      catch (H5::Exception error) {  //??? how to improve printed msg using major/minor error codes?
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 GENERAL exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+    } 
+    catch (IException &e) {
+      throw IException(e,
+                       IException::Unknown, 
+                       "Unable to save bundle settings information to an HDF5 group.",
+                       _FILEINFO_);
     }
-    // catch failure caused by the DataSet operations
-    catch( H5::DataSetIException error ) {
-      QString msg = QString(error.getCDetailMsg());
-      IException hpfError(IException::Unknown, msg, _FILEINFO_);
-      msg = "Unable to save BundleResults to hpf5 file. "
-            "H5 exception handler has detected a data set error.";
-      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    }
-    // catch failure caused by the DataSpace operations
-    catch( H5::DataSpaceIException error ) {
-      QString msg = QString(error.getCDetailMsg());
-      IException hpfError(IException::Unknown, msg, _FILEINFO_);
-      msg = "Unable to save BundleResults to hpf5 file. "
-            "H5 exception handler has detected a data space error.";
-      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    }
-    // catch failure caused by the DataSpace operations
-    catch( H5::DataTypeIException error ) {
-      QString msg = QString(error.getCDetailMsg());
-      IException hpfError(IException::Unknown, msg, _FILEINFO_);
-      msg = "Unable to save BundleResults to hpf5 file. "
-            "H5 exception handler has detected a data type error.";
-      throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    }
-    return;
-      
-#endif
   }
+
+
+  void BundleSettings::openH5Group(H5::CommonFG &locationObject, QString locationName) {
+    try {
+      // Try block to detect exceptions raised by any of the calls inside it
+      try {
+        /*
+         * Turn off the auto-printing when failure occurs so that we can
+         * handle the errors appropriately
+         */
+//        H5::Exception::dontPrint();
+
+        // create a settings group to add to the given H5 object
+        QString settingsGroupName = locationName + "/BundleSettings"; 
+        H5::Group settingsGroup = locationObject.openGroup(settingsGroupName.toAscii());
+
+        Attribute att;
+
+        /* 
+         * read bool attributes as predefined data type PredType::NATIVE_HBOOL
+         */ 
+        int boolAttValue = 0;
+        att = settingsGroup.openAttribute("validateNetwork");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_validateNetwork = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("solveObservationMode");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_solveObservationMode = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("solveRadius");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_solveRadius = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("updateCubeLabel");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_updateCubeLabel = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("errorPropagation");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_errorPropagation = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("outlierRejection");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_outlierRejection = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("createBundleOutputFile");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_createBundleOutputFile = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("createCSVFiles");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_createCSVFiles = (bool)boolAttValue;
+
+        att = settingsGroup.openAttribute("createResidualsFile");
+        att.read(PredType::NATIVE_HBOOL, &boolAttValue);
+        m_createResidualsFile = (bool)boolAttValue;
+
+        /* 
+         * read enum attributes as predefined data type PredType::C_S1 (string)
+         */ 
+        H5std_string strAttValue;
+        H5::StrType strDataType;
+
+        att = settingsGroup.openAttribute("solveMethod");
+        strDataType = H5::StrType(PredType::C_S1, att.getStorageSize());
+        att.read(strDataType, strAttValue);
+        m_solveMethod = stringToSolveMethod(QString::fromStdString(strAttValue));
+
+        att = settingsGroup.openAttribute("convergenceCriteria");
+        strDataType = H5::StrType(PredType::C_S1, att.getStorageSize());
+        att.read(strDataType, strAttValue);
+        m_convergenceCriteria = stringToConvergenceCriteria(QString::fromStdString(strAttValue));
+
+        /* 
+         * read string attributes as predefined data type PredType::C_S1 (string)
+         */ 
+        att = settingsGroup.openAttribute("outputFilePrefix");
+        strDataType = H5::StrType(PredType::C_S1, att.getStorageSize());
+        att.read(strDataType, strAttValue);
+        m_outputFilePrefix = QString::fromStdString(strAttValue);
+
+        /* 
+         * read double attributes as predefined data type PredType::NATIVE_DOUBLE
+         */ 
+        att = settingsGroup.openAttribute("outlierRejectionMultiplier");
+        att.read(PredType::NATIVE_DOUBLE, &m_outlierRejectionMultiplier);
+
+        att = settingsGroup.openAttribute("globalLatitudeAprioriSigma");
+        att.read(PredType::NATIVE_DOUBLE, &m_globalLatitudeAprioriSigma);
+
+        att = settingsGroup.openAttribute("globalLongitudeAprioriSigma");
+        att.read(PredType::NATIVE_DOUBLE, &m_globalLongitudeAprioriSigma);
+
+        att = settingsGroup.openAttribute("globalRadiusAprioriSigma");
+        att.read(PredType::NATIVE_DOUBLE, &m_globalRadiusAprioriSigma);
+
+        att = settingsGroup.openAttribute("convergenceCriteriaThreshold");
+        att.read(PredType::NATIVE_DOUBLE, &m_convergenceCriteriaThreshold);
+
+        /* 
+         * read int attributes as predefined data type PredType::NATIVE_INT
+         */ 
+        att = settingsGroup.openAttribute("convergenceCriteriaMaximumIterations");
+        att.read(PredType::NATIVE_INT, &m_convergenceCriteriaMaximumIterations);
+
+        // Data sets??? tables???
+        // ??? QList<BundleObservationSolveSettings> m_observationSolveSettings; // TODO: pointer???
+        // ??? QList< QPair< MaximumLikelihoodWFunctions::Model, double > > m_maximumLikelihood; // TODO: pointer???
+      }
+      // catch failure caused by the Attribute operations
+      catch( H5::AttributeIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 ATTRIBUTE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataSet operations
+      catch( H5::DataSetIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA SET exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataSpace operations
+      catch( H5::DataSpaceIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA SPACE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataType operations
+      catch( H5::DataTypeIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA TYPE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the H5File operations
+      catch( H5::FileIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 FILE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the Group operations
+      catch( H5::GroupIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 GROUP exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      catch (H5::Exception error) {  //??? how to improve printed msg using major/minor error codes?
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 GENERAL exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+    } 
+    catch (IException &e) {
+      throw IException(e,
+                       IException::Unknown, 
+                       "Unable to read bundle settings information from an HDF5 group.",
+                       _FILEINFO_);
+    }
+  }
+
 }

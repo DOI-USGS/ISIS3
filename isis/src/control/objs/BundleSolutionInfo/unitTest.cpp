@@ -130,6 +130,81 @@ int main(int argc, char *argv[]) {
     }
     qDebug();
 
+
+
+    Statistics rmsStats;
+    rmsStats.SetValidRange(0, 100);
+    rmsStats.AddData(0);
+    rmsStats.AddData(1);
+    rmsStats.AddData(2);
+    rmsStats.AddData(3);
+    rmsStats.AddData(Isis::Null);// 1 NULL
+    rmsStats.AddData(Isis::Lrs); // 2 LRS
+    rmsStats.AddData(Isis::Lrs);
+    rmsStats.AddData(Isis::Lis); // 3 LIS
+    rmsStats.AddData(Isis::Lis);
+    rmsStats.AddData(Isis::Lis);
+    rmsStats.AddData(Isis::Hrs); // 4 HRS
+    rmsStats.AddData(Isis::Hrs);
+    rmsStats.AddData(Isis::Hrs);
+    rmsStats.AddData(Isis::Hrs);
+    rmsStats.AddData(Isis::His); // 5 HIS
+    rmsStats.AddData(Isis::His);
+    rmsStats.AddData(Isis::His);
+    rmsStats.AddData(Isis::His);
+    rmsStats.AddData(Isis::His);
+    rmsStats.AddData(-1);        // 1 below range
+    rmsStats.AddData(1000);      // 2 above range
+    rmsStats.AddData(1001);
+    // 6, 14, 0, 3, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, false 
+     
+    QList<Statistics> rmsImageLineResiduals;
+    rmsImageLineResiduals += rmsStats;
+    rmsStats.AddData(4);
+    // 10, 30, 0, 4, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, false 
+    rmsImageLineResiduals += rmsStats;
+    rmsStats.AddData(5);
+    rmsStats.RemoveData(5);
+    // 10, 30, 0, 5, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, true 
+    rmsImageLineResiduals += rmsStats;
+
+    QList<Statistics> rmsImageSampleResiduals = rmsImageLineResiduals;
+    rmsImageSampleResiduals[0].RemoveData(0);
+    rmsImageSampleResiduals[0].AddData(4);
+    rmsImageSampleResiduals[2].RemoveData(2);
+    // 10, 30, 0, 3, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, true
+    // 10, 30, 0, 4, 0, 100, 23, 5, 1, 2, 3, 4, 5, 1, 2, false 
+    // 8, 26, 0, 5, 0, 100, 22, 4, 1, 2, 3, 4, 5, 1, 2, true 
+
+    QList<Statistics> rmsImageResiduals = rmsImageSampleResiduals;
+    rmsImageResiduals[0].AddData(0);
+    rmsImageResiduals[0].AddData(1);
+    rmsImageResiduals[0].AddData(2);
+    rmsImageResiduals[0].AddData(3);
+    rmsImageResiduals[1].AddData(0);
+    rmsImageResiduals[1].AddData(1);
+    rmsImageResiduals[1].AddData(2);
+    rmsImageResiduals[1].AddData(3);
+    rmsImageResiduals[2].AddData(0);
+    rmsImageResiduals[2].AddData(1);
+    rmsImageResiduals[2].AddData(2);
+    rmsImageResiduals[2].AddData(3);
+    // 16, 44, 0, 3, 0, 100, 26, 8, 1, 2, 3, 4, 5, 1, 2, true
+    // 16, 44, 0, 4, 0, 100, 27, 9, 1, 2, 3, 4, 5, 1, 2, false
+    // 14, 40, 0, 5, 0, 100, 26, 8, 1, 2, 3, 4, 5, 1, 2, true 
+
+    statistics.setRmsImageResidualLists(rmsImageLineResiduals,
+                                        rmsImageSampleResiduals,
+                                        rmsImageResiduals);
+    results.setOutputStatistics(statistics);
+
+
+
+
+
+
+
+
     qDebug() << "Testing XML write/read...";
     // write xml
 #if 0
@@ -155,6 +230,18 @@ int main(int argc, char *argv[]) {
 // ???     cout << pvl << endl << endl;
 #endif
     qDebug();
+
+    qDebug() << "Testing HDF5 write/read...";
+    // write hdf
+    FileName hdfFile("./BundleSolutionInfo.hdf");
+    if (hdfFile.fileExists()) {
+       QFile::remove(hdfFile.expanded());
+    }
+    results.createH5File(hdfFile);
+    BundleSolutionInfo fromHDF(hdfFile);
+    pvl = fromHDF.pvlObject("BundleSolutionInfoFromHDF");
+    cout << pvl << endl << endl;
+//    QFile::remove(hdfFile.expanded());
 
   }
   catch (IException &e) {

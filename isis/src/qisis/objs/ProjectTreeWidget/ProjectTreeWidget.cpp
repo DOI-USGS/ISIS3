@@ -405,22 +405,22 @@ namespace Isis {
 
     item->addChild(controlItem);
 
-    BundleSettings *bundleSettings = bundleSolutionInfo->bundleSettings();
-    BundleResults *bundleResults = bundleSolutionInfo->bundleResults();
-      QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem( bundleResults->correlationMatrix() );
+    BundleSettings bundleSettings = bundleSolutionInfo->bundleSettings();
+    BundleResults bundleResults = bundleSolutionInfo->bundleResults();
+    QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem( bundleResults.correlationMatrix() );
 
-    QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(bundleSettings);
-    QTreeWidgetItem *statisticsItem = new BundleResultsTreeWidgetItem(bundleResults);
-      statisticsItem->addChild(corrMatItem);
+    QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(&bundleSettings);
+    QTreeWidgetItem *statisticsItem = new BundleResultsTreeWidgetItem(&bundleResults);
+    statisticsItem->addChild(corrMatItem);
 
     /*
      * At this point the covariance (actually the inverse) matrix may exist but the correlation
      * matrix shouldn't have been created yet. The correlation matrix will be created when
      * "View Correlation Matrix" is selected in the context menu of the following tree item.
      */
-    if ( bundleResults->correlationMatrix().hasCovMat() ) {
-      //qDebug() << "CovMatFileName:" << bundleResults->correlationMatrix().covarianceFileName().name();
-      //qDebug() << "imgs and parmas:" << bundleResults->correlationMatrix().imagesAndParameters()->size();
+    if ( bundleResults.correlationMatrix().hasCovMat() ) {
+      //qDebug() << "CovMatFileName:" << bundleResults.correlationMatrix().covarianceFileName().name();
+      //qDebug() << "imgs and parmas:" << bundleResults.correlationMatrix().imagesAndParameters()->size();
     }
 
     item->addChild(settingsItem);

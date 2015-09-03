@@ -30,6 +30,8 @@ namespace Isis {
    *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
    *                           BundleSolutionInfo and BundleStatistics references with BundleResults
    *                           due to class name changes.
+   *   @history 2015-09-03 Jeannie Backer - Replaced BundleSettings and BundleResults pointers
+   *                           in addBundleSolutionInfo() method with objects.
    */
   class ProjectTreeWidget : public QTreeWidget {
       Q_OBJECT

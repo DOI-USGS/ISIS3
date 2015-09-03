@@ -45,9 +45,21 @@ namespace Isis {
 
   void JigsawDialog::on_JigsawSetupButton_pressed() {
 
-    JigsawSetupDialog setupdlg(m_project, true, false, this);
+    // Each time the SetUp button is pressed, create JigsawSetupDialog object with
+    // project,
+    // useLastSettings = matches check box
+    // readOnly = false,
+    // parent = this
+    JigsawSetupDialog setupdlg(m_project, 
+                               m_ui->useLastSettings->isChecked(), 
+                               false, 
+                               this);
 
+    // how to set up default settings object if last is not used or doesnt exist ???
     // if (m_bundleSettings != NULL && setupdlg.useLastSettings()) {
+    // }
+    // if (m_bundleSettings == NULL) {
+    //   m_bundleSettings = setupdlg.bundleSettings();
     // }
 
     if (setupdlg.exec() == QDialog::Accepted) {
@@ -65,6 +77,7 @@ namespace Isis {
     if (m_selectedControl == NULL) {
     }
 
+    // what if there are no images ???
     if (m_project->images().size() == 0) {
     }
 
@@ -74,11 +87,8 @@ namespace Isis {
 
     QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
     if (m_ui->useLastSettings->isChecked() && bundleSolutionInfo.size() > 0) {
-       BundleSettings *lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
-
-       if (lastBundleSettings) {
-         m_bundleSettings = lastBundleSettings;
-       }
+       BundleSettings lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+       m_bundleSettings = new BundleSettings(lastBundleSettings);
     }
 
     // Non threaded *************************************************************
@@ -94,12 +104,21 @@ namespace Isis {
       }
     }
 
+    // Use the run time to create a uniquely named directory in the results
+    // directory. This run time directory will contain the output files for
+    // this run (along with correlation matrix and serialized bundle
+    // information files).
+    QString runTime = Isis::iTime::CurrentLocalTime().toAscii().data();
+    QDir cwd = m_project->addBundleSolutionInfoFolder(runTime);
+    QString path = cwd.absolutePath() + "/";
+    m_bundleSettings->setOutputFiles(path, true, true, true);
     BundleAdjust bundleAdjustment(*m_bundleSettings, *m_selectedControl, snlist, false);
 
     connect( &bundleAdjustment, SIGNAL( statusUpdate(QString) ),
              this, SLOT( outputBundleStatus(QString) ) );
 
     BundleSolutionInfo br = bundleAdjustment.solveCholeskyBR();
+    br.setRunTime(runTime);
 
     bundleFinished(&br);
     // **************************************************************************
@@ -160,9 +179,9 @@ namespace Isis {
    * @param bundleSolutionInfo The results of the bundle run.
    */
   void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
-    if ( bundleSolutionInfo->bundleResults()->converged() ) {
-      bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toAscii().data() );
-      m_project->addBundleSolutionInfo( new BundleSolutionInfo(*bundleSolutionInfo) );
+    if (bundleSolutionInfo->bundleResults().converged()) {
+      //bundleSolutionInfo->setRunTime(Isis::iTime::CurrentLocalTime().toAscii().data());
+      m_project->addBundleSolutionInfo(new BundleSolutionInfo(*bundleSolutionInfo)); //??? ask user if they want to accept results???
 
       //TODO: move correlation matrix to correct position in project directory
       

@@ -451,3 +451,92 @@ Testing error throws...
 
 Testing XML write/read... 
 
+Testing HDF5 write/read... 
+Object = BundleSolutionInfoFromHDF
+  RunTime              = xxx
+  OutputControlNetwork = cnetfile.net
+
+  Object = InputSettings
+    NetworkValidated                     = Yes
+    SolveMethod                          = Sparse
+    SolveObservationMode                 = No
+    SolveRadius                          = No
+    UpdateCubeLabel                      = No
+    ErrorPropagation                     = No
+    OutlierRejection                     = No
+    GlobalLatitudeAprioriSigma           = None
+    GlobalLongitudeAprioriSigma          = None
+    ConvergenceCriteria                  = Sigma0
+    ConvergenceCriteriaThreshold         = 1.0e-10
+    ConvergenceCriteriaMaximumIterations = 50
+    CreateBundleOutputFile               = Yes
+    CreateCSVFiles                       = Yes
+    CreateResidualsFile                  = Yes
+    FilePrefix                           = Null
+    NumberObservationSolveSettings       = 1
+
+    Object = Null
+      InstrumentPointingSolveOption       = AnglesOnly
+      NumberAngleCoefficientsSolved       = 1
+      CKDegree                            = 2
+      CKSolveDegree                       = 2
+      SolveTwist                          = Yes
+      SolvePointingPolynomialOverExisting = No
+      AngleAprioriSigmas                  = N/A
+      InstrumentPointingInterpolationType = 3
+      InstrumentPositionSolveOption       = None
+      NumberPositionCoefficientsSolved    = N/A
+      SPKDegree                           = N/A
+      SPKSolveDegree                      = N/A
+      SolvePositionOverHermiteSpline      = N/A
+      PositionAprioriSigmas               = N/A
+      InstrumentPositionInterpolationType = N/A
+    End_Object
+  End_Object
+
+  Object = StatisticsResults
+    NumberFixedPoints                = 0
+    NumberIgnoredPoints              = 0
+    NumberHeldImages                 = 0
+    RMSResidualX                     = 0.0
+    RMSResidualY                     = 0.0
+    RMSResidualXY                    = 0.0
+    RejectionLimit                   = 0.5
+    NumberRejectedObservations       = 0
+    NumberObservations               = 0
+    NumberImageParameters            = 0
+    NumberConstrainedPointParameters = 0
+    NumberConstrainedImageParameters = 0
+    NumberUnknownParameters          = 0
+    DegreesOfFreedom                 = -1
+    Sigma0                           = 0.0
+    ElapsedTime                      = 0.0
+    ElapsedTimeErrorProp             = 0.0
+    Converged                        = No
+    MinSigmaLatitude                 = 1000000000000.0
+    MinSigmaLatitudePointId          = Null
+    MaxSigmaLatitude                 = 0.0
+    MaxSigmaLatitudePointId          = Null
+    MinSigmaLongitude                = 1000000000000.0
+    MinSigmaLongitudePointId         = Null
+    MaxSigmaLongitude                = 0.0
+    MaxSigmaLongitudePointId         = Null
+    MinSigmaRadius                   = 1000000000000.0
+    MinSigmaRadiusPointId            = Null
+    MaxSigmaRadius                   = 0.0
+    MaxSigmaRadiusPointId            = Null
+    RmsSigmaLat                      = 0.0
+    RmsSigmaLon                      = 0.0
+    RmsSigmaRad                      = 0.0
+    NumberMaximumLikelihoodModels    = 0
+
+    Object = CorrelationMatrixData
+      CovarianceMatrixFileName  = Null
+      CorrelationMatrixFileName = Null
+
+      Group = ImagesAndParameters
+      End_Group
+    End_Object
+  End_Object
+End_Object
+

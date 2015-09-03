@@ -22,6 +22,10 @@
 
 #include <QObject>
 
+#include <H5Cpp.h>
+#include <hdf5_hl.h>
+#include <hdf5.h>
+
 #include "Constants.h"
 #include "SpecialPixel.h"
 #include "XmlStackedHandler.h"
@@ -33,58 +37,63 @@ class QXmlStreamWriter;
 namespace Isis {
   class Project;// ??? does xml stuff need project???
   class XmlStackedHandlerReader;
- /**
-  * @brief This class is used to accumulate statistics on double arrays.
-  *
-  * This class is used to accumulate statistics on double arrays. In
-  * particular, it is highly useful for obtaining statistics on cube data.
-  * Parameters which can be computed are 1) @b average, 2) @b standard
-  * @b deviation, 3) @b variance, 4) @b minimum, 5) @b maximum and 6)
-  * @b various @b counts of valid and/or special pixels.
-  *
-  * The following example shows a simple set up and usage of the Statistics
-  * class to calculate the average of a set of values:
-  *
-  * @code
-  *   Statistics myStats ;
-  *   double myData [] = { 1.0, 3.0, 2.4, 7.5 } ;
-  *
-  *   myStats.AddData (myData, 4) ;
-  *   double myAverage = myStats.Average () ;
-  *   cout << "The average of the data is " << myAverage << endl ;
-  * @endcode
-  *
-  * For an example of how the Statistics object is used in %Isis, see the
-  * Histogram object (inherits from Statistics) and the stats application,
-  * stats.cpp (uses the Statistics child class Histogram).
-  *
-  * @ingroup Math
-  * @ingroup Statistics
-  *
-  * @author 2002-05-06 Jeff Anderson
-  *
-  * @internal
-  *   @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best minimum/maximum methods.
-  *   @history 2004-05-11 Jeff Anderson - Moved Reset, AddData and RemoveData methods into public
-  *                           space.
-  *   @history 2004-06-28 Jeff Anderson - Added Sum and SumSquare methods.
-  *   @history 2005-02-17 Deborah Lee Soltesz - Modified file to support Doxygen documentation.
-  *   @history 2005-05-23 Jeff Anderson - Changed to support 2GB+ files
-  *   @history 2006-02-15 Jacob Danton - Added Valid Range options/methods
-  *   @history 2006-03-10 Jacob Danton - Added Z-score method
-  *   @history 2007-01-18 Robert Sucharski - Added AddData method for a single double value
-  *   @history 2008-05-06 Steven Lambright - Added AboveRange, BelowRange methods
-  *   @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange function
-  *   @history 2011-06-13 Ken Edmundson - Added Rms method.
-  *   @history 2011-06-23 Jeannie Backer - Added QDataStream read(), write() methods and added
-  *                           QDataStream >> and << operators. Replaced std strings with QStrings.
-  *   @history 2014-09-05 Jeannie Backer - Added xml read/write capabilities.  Moved method
-  *                           implementation to cpp file. Improved coverage of unitTest. Brought
-  *                           code closer to standards.
-  *
-  *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
-  *
-  */
+  /**
+   * @brief This class is used to accumulate statistics on double arrays.
+   *
+   * This class is used to accumulate statistics on double arrays. In
+   * particular, it is highly useful for obtaining statistics on cube data.
+   * Parameters which can be computed are 1) @b average, 2) @b standard
+   * @b deviation, 3) @b variance, 4) @b minimum, 5) @b maximum and 6)
+   * @b various @b counts of valid and/or special pixels.
+   *
+   * The following example shows a simple set up and usage of the Statistics
+   * class to calculate the average of a set of values:
+   *
+   * @code
+   *   Statistics myStats ;
+   *   double myData [] = { 1.0, 3.0, 2.4, 7.5 } ;
+   *
+   *   myStats.AddData (myData, 4) ;
+   *   double myAverage = myStats.Average () ;
+   *   cout << "The average of the data is " << myAverage << endl ;
+   * @endcode
+   *
+   * For an example of how the Statistics object is used in %Isis, see the
+   * Histogram object (inherits from Statistics) and the stats application,
+   * stats.cpp (uses the Statistics child class Histogram).
+   *
+   * @ingroup Math
+   * @ingroup Statistics
+   *
+   * @author 2002-05-06 Jeff Anderson
+   *
+   * @internal
+   *   @history 2002-05-08 Jeff Anderson - Added Chebyshev and Best minimum/maximum methods.
+   *   @history 2004-05-11 Jeff Anderson - Moved Reset, AddData and RemoveData methods into public
+   *                           space.
+   *   @history 2004-06-28 Jeff Anderson - Added Sum and SumSquare methods.
+   *   @history 2005-02-17 Deborah Lee Soltesz - Modified file to support Doxygen documentation.
+   *   @history 2005-05-23 Jeff Anderson - Changed to support 2GB+ files
+   *   @history 2006-02-15 Jacob Danton - Added Valid Range options/methods
+   *   @history 2006-03-10 Jacob Danton - Added Z-score method
+   *   @history 2007-01-18 Robert Sucharski - Added AddData method for a single double value
+   *   @history 2008-05-06 Steven Lambright - Added AboveRange, BelowRange methods
+   *   @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange
+   *                           function
+   *   @history 2011-06-13 Ken Edmundson - Added Rms method.
+   *   @history 2011-06-23 Jeannie Backer - Added QDataStream read(), write() methods and added
+   *                           QDataStream >> and << operators. Replaced std strings with QStrings.
+   *   @history 2014-09-05 Jeannie Backer - Added xml read/write capabilities.  Moved method
+   *                           implementation to cpp file. Improved coverage of unitTest. Brought
+   *                           code closer to standards.
+   *   @history 2015-09-03 Jeannie Backer - Added hdf5 read/write capabilities by adding
+   *                           compoundH5DataType() static method.
+   *
+   *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
+   *   @todo 2015-08-13 Jeannie Backer - Clean up header and implementation files once
+   *                        serialization is implemented. (Remove xml, data stream, hdf, etc)
+   *
+   */
   class Statistics : public QObject {
     Q_OBJECT
     public:
@@ -145,6 +154,8 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
+      static H5::CompType compoundH5DataType();
+
     private:
       /**
        *
@@ -173,10 +184,11 @@ namespace Isis {
           QString m_xmlHandlerCharacters;
       };
 
-      QUuid *m_id; /**< A unique ID for this object (useful for others to reference
-                        this object when saving to disk).*/
-      double m_sum;              //!< Sum accumulator.
-      double m_sumsum;           //!< Sum-squared accumulator.
+//      QUuid *m_id; /**< A unique ID for this object (useful for others to reference
+//                        this object when saving to disk).*/
+      double m_sum;              //!< The sum accumulator, i.e. the sum of added data values.
+      double m_sumsum;           /**< The sum-squared accumulator, i.e. the sum of the squares
+                                      of the  data values.*/
       double m_minimum;          //!< Minimum double value encountered.
       double m_maximum;          //!< Maximum double value encountered.
       double m_validMinimum;     //!< Minimum valid pixel value

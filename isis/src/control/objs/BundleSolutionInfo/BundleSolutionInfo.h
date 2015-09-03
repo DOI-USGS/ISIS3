@@ -57,6 +57,7 @@ namespace Isis {
    *   @history 2014-07-23 Jeannie Backer - Added implementation for the QDataStream << and >>
    *                           operators and the read/write methods.
    *   @history 2014-12-04 Jeannie Backer - Renamed from BundleResults to BundleSolutionInfo.
+   *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
    *  
    */
   class BundleSolutionInfo : public QObject {
@@ -69,6 +70,7 @@ namespace Isis {
       BundleSolutionInfo(Project *project, 
                     XmlStackedHandlerReader *xmlReader, 
                     QObject *parent = 0);  // TODO: does xml stuff need project???
+      BundleSolutionInfo(FileName bundleSolutionInfoFile);
       BundleSolutionInfo(const BundleSolutionInfo &src);
       ~BundleSolutionInfo();
       BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
@@ -78,10 +80,8 @@ namespace Isis {
 
       QString id() const;
       QString controlNetworkFileName() const;
-      BundleSettings *bundleSettings();     // TODO: change return value to const reference or copy... unsafe to return pointers to member data???
-      BundleResults *bundleResults(); // TODO: change return value to const reference or copy... unsafe to return pointers to member data???
-      // ??? const BundleSettings *bundleSettings() const;
-      // ??? const BundleResults *bundleResults() const;
+      BundleSettings bundleSettings();
+      BundleResults  bundleResults();
       QString runTime() const;
 
       PvlObject pvlObject(QString resultsName = "BundleSolutionInfo",
@@ -94,7 +94,12 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
-      void savehdf5(FileName outputfilename) const;
+      void writeH5File(FileName outputFileName) const;
+      void readH5File(FileName outputFileName) const;
+
+      void createH5File(FileName outputFileName) const;
+      void openH5File(FileName outputFileName);
+//      BundleSolutionInfo(FileName bundleSolutionInfoFile);
 
     private:
       /**
@@ -136,11 +141,16 @@ namespace Isis {
       QString             m_runTime;
       FileName           *m_controlNetworkFileName;
       BundleSettings     *m_settings;
-      BundleResults   *m_statisticsResults;
+      BundleResults      *m_statisticsResults;
       QList<ImageList *> *m_images;
-  };
+  }; // end BundleSolutionInfo class
+
   // operators to read/write BundleSolutionInfo to/from binary data
   QDataStream &operator<<(QDataStream &stream, const BundleSolutionInfo &bundleSolutionInfo);
   QDataStream &operator>>(QDataStream &stream, BundleSolutionInfo &bundleSolutionInfo);
-};
+
+  void setStringAttribute(int locationId, QString locationName, 
+                          QString attributeName, QString attributeValue);
+  QString getStringAttribute(int locationId, QString locationName, QString attributeName);
+}; // end namespace Isis
 #endif // BundleSolutionInfo_h

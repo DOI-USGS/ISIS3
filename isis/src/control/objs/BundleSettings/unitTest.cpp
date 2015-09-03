@@ -319,13 +319,17 @@ int main(int argc, char *argv[]) {
     BundleSettingsXmlHandlerTester bsFromEmptyXml(project, &reader, emptyXmlFile);
     pvl = bsFromEmptyXml.pvlObject("DefaultBundleSettingsFromEmptyXml");
     cout << pvl << endl << endl;
-
-    //bool deleted = qXmlFile.remove();
-    //if (!deleted) {
-    //  QString msg = "Unit Test failed. XML file [" + xmlPath + "not deleted.";
-    //  throw IException(IException::Io, msg, _FILEINFO_);
-    //}
-
+    
+    qDebug() << "Testing HDF5 write/read...";
+    FileName hdfFile("./BundleSettings.hdf");
+    if (hdfFile.fileExists()) {
+      QFile::remove(hdfFile.expanded());
+    }
+//    newSettings.createH5Group(hdfFile, "/");
+//    BundleSettings fromHDF(hdfFile);
+//    pvl = fromHDF.pvlObject("BundleSolutionInfoFromHDF");
+//    cout << pvl << endl << endl;
+//    QFile::remove(hdfFile.expanded());
 
   } 
   catch (IException &e) {

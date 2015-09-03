@@ -1,8 +1,9 @@
-#include "BundleResults.h"
+  #include "BundleResults.h"
+  #include <QDataStream>
 
-#include <QDataStream>
 #include <QDebug>
 #include <QString>
+#include <QtGlobal> // qMax()
 #include <QUuid>
 #include <QXmlStreamWriter>
 
@@ -41,7 +42,7 @@ namespace Isis {
     initialize();
 
     m_id = new QUuid(QUuid::createUuid());
-    m_correlationMatrix = new CorrelationMatrix();
+    m_correlationMatrix = new CorrelationMatrix;
     m_cumPro = new StatCumProbDistDynCalc;
     m_cumProRes = new StatCumProbDistDynCalc;
 
@@ -71,6 +72,10 @@ namespace Isis {
   }
 
 
+  BundleResults::BundleResults(H5::CommonFG &locationObject, QString locationName) {
+    openH5Group(locationObject, locationName);
+  }
+
 
   BundleResults::BundleResults(const BundleResults &src)
       : m_id(new QUuid(src.m_id->toString())),
@@ -78,10 +83,10 @@ namespace Isis {
         m_numberFixedPoints(src.m_numberFixedPoints),
         m_numberIgnoredPoints(src.m_numberIgnoredPoints),
         m_numberHeldImages(src.m_numberHeldImages),
-        m_rms_rx(src.m_rms_rx),
-        m_rms_ry(src.m_rms_ry),
-        m_rms_rxy(src.m_rms_rxy),
-        m_rejectionLimit(src.m_rejectionLimit),
+        m_rmsXResiduals(src.m_rmsXResiduals),
+        m_rmsYResiduals(src.m_rmsYResiduals),
+        m_rmsXYResiduals(src.m_rmsXYResiduals),
+        m_rejectionLimit(src.m_rejectionLimit), 
         m_numberObservations(src.m_numberObservations),
         m_numberRejectedObservations(src.m_numberRejectedObservations),
         m_numberUnknownParameters(src.m_numberUnknownParameters),
@@ -114,9 +119,9 @@ namespace Isis {
         m_maxSigmaLongitudePointId(src.m_maxSigmaLongitudePointId),
         m_minSigmaRadiusPointId(src.m_minSigmaRadiusPointId),
         m_maxSigmaRadiusPointId(src.m_maxSigmaRadiusPointId),
-        m_sigmaLatStatsRms(src.m_sigmaLatStatsRms),
-        m_sigmaLonStatsRms(src.m_sigmaLonStatsRms),
-        m_sigmaRadStatsRms(src.m_sigmaRadStatsRms),
+        m_rmsSigmaLatitudeStats(src.m_rmsSigmaLatitudeStats),
+        m_rmsSigmaLongitudeStats(src.m_rmsSigmaLongitudeStats),
+        m_rmsSigmaRadiusStats(src.m_rmsSigmaRadiusStats),
         m_maximumLikelihoodFunctions(src.m_maximumLikelihoodFunctions),
         m_maximumLikelihoodIndex(src.m_maximumLikelihoodIndex),
         m_cumPro(new StatCumProbDistDynCalc(*src.m_cumPro)),
@@ -159,9 +164,9 @@ namespace Isis {
       m_numberFixedPoints = src.m_numberFixedPoints;
       m_numberIgnoredPoints = src.m_numberIgnoredPoints;
       m_numberHeldImages = src.m_numberHeldImages;
-      m_rms_rx = src.m_rms_rx;
-      m_rms_ry = src.m_rms_ry;
-      m_rms_rxy = src.m_rms_rxy;
+      m_rmsXResiduals = src.m_rmsXResiduals;
+      m_rmsYResiduals = src.m_rmsYResiduals;
+      m_rmsXYResiduals = src.m_rmsXYResiduals;
       m_rejectionLimit = src.m_rejectionLimit;
       m_numberObservations = src.m_numberObservations;
       m_numberRejectedObservations = src.m_numberRejectedObservations;
@@ -195,9 +200,9 @@ namespace Isis {
       m_maxSigmaLongitudePointId = src.m_maxSigmaLongitudePointId;
       m_minSigmaRadiusPointId = src.m_minSigmaRadiusPointId;
       m_maxSigmaRadiusPointId = src.m_maxSigmaRadiusPointId;
-      m_sigmaLatStatsRms = src.m_sigmaLatStatsRms;
-      m_sigmaLonStatsRms = src.m_sigmaLonStatsRms;
-      m_sigmaRadStatsRms = src.m_sigmaRadStatsRms;
+      m_rmsSigmaLatitudeStats = src.m_rmsSigmaLatitudeStats;
+      m_rmsSigmaLongitudeStats = src.m_rmsSigmaLongitudeStats;
+      m_rmsSigmaRadiusStats = src.m_rmsSigmaRadiusStats;
       m_maximumLikelihoodFunctions = src.m_maximumLikelihoodFunctions;
       m_maximumLikelihoodIndex = src.m_maximumLikelihoodIndex;
 
@@ -251,15 +256,15 @@ namespace Isis {
     m_minSigmaRadiusPointId = "";
     m_maxSigmaRadiusPointId = "";
 
-    m_sigmaLatStatsRms = 0.0;
-    m_sigmaLonStatsRms = 0.0;
-    m_sigmaRadStatsRms = 0.0;
+    m_rmsSigmaLatitudeStats = 0.0;
+    m_rmsSigmaLongitudeStats = 0.0;
+    m_rmsSigmaRadiusStats = 0.0;
 
 
     // set by compute residuals
-    m_rms_rx = 0.0;
-    m_rms_ry = 0.0;
-    m_rms_rxy = 0.0;
+    m_rmsXResiduals = 0.0;
+    m_rmsYResiduals = 0.0;
+    m_rmsXYResiduals = 0.0;
 
     // set by compute rejection limit
     m_rejectionLimit = 0.0;
@@ -362,9 +367,9 @@ namespace Isis {
   void BundleResults::setRmsFromSigmaStatistics(double rmsFromSigmaLatStats,
                                                    double rmsFromSigmaLonStats,
                                                    double rmsFromSigmaRadStats) {
-    m_sigmaLatStatsRms = rmsFromSigmaLatStats;
-    m_sigmaLonStatsRms = rmsFromSigmaLonStats;
-    m_sigmaRadStatsRms = rmsFromSigmaRadStats;
+    m_rmsSigmaLatitudeStats = rmsFromSigmaLatStats;
+    m_rmsSigmaLongitudeStats = rmsFromSigmaLonStats;
+    m_rmsSigmaRadiusStats = rmsFromSigmaRadStats;
   }
 
 
@@ -499,9 +504,9 @@ namespace Isis {
 
 
   void BundleResults::setRmsXYResiduals(double rx, double ry, double rxy) {
-    m_rms_rx = rx;
-    m_rms_ry = ry;
-    m_rms_rxy = rxy;
+    m_rmsXResiduals = rx;
+    m_rmsYResiduals = ry;
+    m_rmsXYResiduals = rxy;
   }
 
 
@@ -747,37 +752,37 @@ namespace Isis {
 
 
   double BundleResults::sigmaLatitudeStatisticsRms() const {
-    return m_sigmaLatStatsRms;
+    return m_rmsSigmaLatitudeStats;
   }
 
 
 
   double BundleResults::sigmaLongitudeStatisticsRms() const {
-    return m_sigmaLonStatsRms;
+    return m_rmsSigmaLongitudeStats;
   }
 
 
 
   double BundleResults::sigmaRadiusStatisticsRms() const {
-    return m_sigmaRadStatsRms;
+    return m_rmsSigmaRadiusStats;
   }
 
 
 
   double BundleResults::rmsRx() const {
-    return m_rms_rx;
+    return m_rmsXResiduals;
   }
 
 
 
   double BundleResults::rmsRy() const {
-    return m_rms_ry;
+    return m_rmsYResiduals;
   }
 
 
 
   double BundleResults::rmsRxy() const {
-    return m_rms_rxy;
+    return m_rmsXYResiduals;
   }
 
 
@@ -907,8 +912,6 @@ namespace Isis {
 
     PvlObject pvl(name);
 
-    pvl += correlationMatrix().pvlObject();
-
     pvl += PvlKeyword("NumberFixedPoints", toString(numberFixedPoints()));
     pvl += PvlKeyword("NumberIgnoredPoints", toString(numberIgnoredPoints()));
     pvl += PvlKeyword("NumberHeldImages", toString(numberHeldImages()));
@@ -971,6 +974,13 @@ namespace Isis {
                           toString(m_maximumLikelihoodMedianR2Residuals));
     }
 
+    if (m_correlationMatrix) {
+      pvl += correlationMatrix().pvlObject();
+    }
+    else {
+      pvl += PvlKeyword("CorrelationMatrix", "None");
+    }
+
     return pvl;
   }
 
@@ -982,7 +992,14 @@ namespace Isis {
    * @return The correlation matrix.
    */
   CorrelationMatrix BundleResults::correlationMatrix() const {
-    return *m_correlationMatrix;
+    if (m_correlationMatrix) {
+      return *m_correlationMatrix;
+    }
+    else {
+      throw IException(IException::Unknown, 
+                       "Correlation matrix for this bundle is NULL.",
+                       _FILEINFO_);
+    }
   }
 
 
@@ -993,6 +1010,7 @@ namespace Isis {
    * @param name Name of the file used to store the covariance matrix.
    */
   void BundleResults::setCorrMatCovFileName(FileName name) {
+    correlationMatrix();// throw error if null
     m_correlationMatrix->setCovarianceFileName(name);
   }
 
@@ -1004,6 +1022,7 @@ namespace Isis {
    * @param imgsAndParams The qmap with all the images and parameters used for this bundle.
    */
   void BundleResults::setCorrMatImgsAndParams(QMap<QString, QStringList> imgsAndParams) {
+    correlationMatrix();// throw error if null
     m_correlationMatrix->setImagesAndParameters(imgsAndParams);
   }
 
@@ -1281,17 +1300,17 @@ namespace Isis {
         
         QString rx = atts.value("x");
         if (!rx.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rms_rx = toDouble(rx);
+          m_xmlHandlerBundleResults->m_rmsXResiduals = toDouble(rx);
         }
 
         QString ry = atts.value("y");
         if (!ry.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rms_ry = toDouble(ry);
+          m_xmlHandlerBundleResults->m_rmsYResiduals = toDouble(ry);
         }
 
         QString rxy = atts.value("xy");
         if (!rxy.isEmpty()) {
-          m_xmlHandlerBundleResults->m_rms_rxy = toDouble(rxy);
+          m_xmlHandlerBundleResults->m_rmsXYResiduals = toDouble(rxy);
         }
 
       }
@@ -1299,17 +1318,17 @@ namespace Isis {
 
         QString lat = atts.value("lat");
         if (!lat.isEmpty()) {
-          m_xmlHandlerBundleResults->m_sigmaLatStatsRms = toDouble(lat);
+          m_xmlHandlerBundleResults->m_rmsSigmaLatitudeStats = toDouble(lat);
         }
 
         QString lon = atts.value("lon");
         if (!lon.isEmpty()) {
-          m_xmlHandlerBundleResults->m_sigmaLonStatsRms = toDouble(lon);
+          m_xmlHandlerBundleResults->m_rmsSigmaLongitudeStats = toDouble(lon);
         }
 
         QString rad = atts.value("rad");
         if (!rad.isEmpty()) {
-          m_xmlHandlerBundleResults->m_sigmaRadStatsRms = toDouble(rad);
+          m_xmlHandlerBundleResults->m_rmsSigmaRadiusStats = toDouble(rad);
         }
 
       }
@@ -1713,7 +1732,7 @@ namespace Isis {
            << (qint32)m_numberFixedPoints
            << (qint32)m_numberIgnoredPoints
            << (qint32)m_numberHeldImages
-           << m_rms_rx << m_rms_ry << m_rms_rxy
+           << m_rmsXResiduals << m_rmsYResiduals << m_rmsXYResiduals
            << m_rejectionLimit
            << (qint32)m_numberObservations
            << (qint32)m_numberRejectedObservations
@@ -1741,7 +1760,7 @@ namespace Isis {
            << m_maxSigmaLongitudePointId       
            << m_minSigmaRadiusPointId          
            << m_maxSigmaRadiusPointId          
-           << m_sigmaLatStatsRms << m_sigmaLonStatsRms << m_sigmaRadStatsRms
+           << m_rmsSigmaLatitudeStats << m_rmsSigmaLongitudeStats << m_rmsSigmaRadiusStats
            << m_maximumLikelihoodFunctions
            << (qint32)m_maximumLikelihoodIndex << *m_cumPro << *m_cumProRes
            << m_maximumLikelihoodMedianR2Residuals;
@@ -1767,7 +1786,7 @@ namespace Isis {
     stream >> numberFixedPoints;
     stream >> numberIgnoredPoints;
     stream >> numberHeldImages;
-    stream >> m_rms_rx >> m_rms_ry >> m_rms_rxy;
+    stream >> m_rmsXResiduals >> m_rmsYResiduals >> m_rmsXYResiduals;
     stream >> m_rejectionLimit;
     stream >> numberObservations;
     stream >> numberRejectedObservations;
@@ -1795,7 +1814,7 @@ namespace Isis {
     stream >> m_maxSigmaLongitudePointId;  
     stream >> m_minSigmaRadiusPointId;     
     stream >> m_maxSigmaRadiusPointId;     
-    stream >> m_sigmaLatStatsRms >> m_sigmaLonStatsRms >> m_sigmaRadStatsRms;
+    stream >> m_rmsSigmaLatitudeStats >> m_rmsSigmaLongitudeStats >> m_rmsSigmaRadiusStats;
     stream >> m_maximumLikelihoodFunctions;
     stream >> maximumLikelihoodIndex;
     stream >> cumPro >> cumProRes;
@@ -1850,221 +1869,573 @@ namespace Isis {
   
     
   /**
-   * Saves an hdf5 file to disk containing the bundle results
+   * Saves an hdf5 group
    */  
-  void BundleResults::savehdf5(hid_t fileId, H5::Group settingsGroup) const {
-    //const H5std_string  hdfFileName(outputfilename.expanded()); //Is this the right way to have a dynamic file name?  What about PATH?
-    //
-    //
-    //// Try block to detect exceptions raised by any of the calls inside it
-    //try {
-    //  /*
-    //   * Turn off the auto-printing when failure occurs so that we can
-    //   * handle the errors appropriately
-    //   */
-    //  H5::Exception::dontPrint();
-    //  /*
-    //   * Create a new file using H5F_ACC_TRUNC access,
-    //   * default file creation properties, and default file
-    //   * access properties.
-    //   */
-    //  H5::H5File hdfFile = H5::H5File( hdfFileName, H5F_ACC_TRUNC ); // does this append or overwrite ???
-    //  hid_t fileId = hdfFile.getId();
-    //
-    //  hsize_t dims[2];              // dataset dimensions
-    //
-    //  //TODO: finish Correlation Matrix
-    //  //Create a dataset with compression
-    //  H5::Group correlationMatrixGroup = H5::Group(hdfFile.createGroup("/BundleResults/CorrelationMatrix"));
-    //  H5LTset_attribute_string(fileId, "/BundleResults/CorrelationMatrix", "correlationFileName", 
-    //                           correlationMatrix().correlationFileName().expanded());
-    //  H5LTset_attribute_string(fileId, "/BundleResults/CorrelationMatrix", "covarianceFileName", 
-    //                           correlationMatrix().covarianceFileName().expanded());
-    //  // TODO: jb - how do we add
-    //  // correlationMatrix().imagesAndParameters()???
-    //  // QMapIterator<QString, QStringList> a list of images with their
-    //  // corresponding parameters...
-    //
-    //  
-    //  // H5::Group generalStatsInfoGroup = H5::Group(hdfFile.createGroup("/BundleResults/GeneralStatisticsInfo"));
-    //  const int numFixedPoints = numberFixedPoints();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberFixedPoints", &numFixedPoints, 1);
-    //  const int numIgnoredPoints = numberIgnoredPoints();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberIgnoredPoints", &numIgnoredPoints, 1);
-    //  const int numHeldImages = numberHeldImages();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberHeldImages", &numHeldImages, 1);
-    //  const double rejectionLimit = rejectionLimit();
-    //  H5LTset_attribute_double(fileId, "/BundleResults", "rejectionLimit", &rejectionLimit, 1);
-    //  const int numRejectedObservations = numberRejectedObservations();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberRejectedObservations", &numRejectedObservations, 1);
-    //  const int numObservations = numberObservations();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberObservations", &numObservations, 1);
-    //  const int numImageParameters = numberImageParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberImageParameters", &numImageParameters, 1);
-    //  const int numConstrainedPointParameters = numberConstrainedPointParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberConstrainedPointParameters", 
-    //                        &numConstrainedPointParameters, 1);
-    //  const int numConstrainedImageParameters = numberConstrainedImageParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberConstrainedImageParameters", 
-    //                        &numConstrainedImageParameters, 1);
-    //  const int numUnknownParameters = numberUnknownParameters();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "numberUnknownParameters", &numUnknownParameters, 1);
-    //  const int degreesOfFreedom = degreesOfFreedom();
-    //  H5LTset_attribute_int(fileId, "/BundleResults", "degreesOfFreedom", &degreesOfFreedom, 1);
-    //  const double sigma0 = sigma0();
-    //  H5LTset_attribute_double(fileId, "/BundleResults", "sigma0", &sigma0, 1);
-    //  bool converged = converged();// ???
-    //  H5LTset_attribute_string(fileId, "/BundleResults", "converged", toString(converged), 1);
-    //  
-    //  
-    //  // Create an RMS group in the file
-    //  H5::Group rms = H5::Group(hdfFile.createGroup("/BundleResults/RMS"));
-    //  H5::Group rms = H5::Group(hdfFile.createGroup("/BundleResults/RMS/residuals"));
-    //  // RMS and Sigma Scalars
-    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/residuals", "x", rmsRx(), 1);
-    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/residuals", "y", rmsRy(), 1);
-    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/residuals", "xy", rmsRxy(), 1);
-    //  H5::Group rms = H5::Group(hdfFile.createGroup("/BundleResults/RMS/sigmas"));
-    //  const double sigmas [3] = {rmsSigmaLat(), rmsSigmaLon(), rmsSigmaRad()};
-    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/sigmas", "latitude", rmsSigmaLat(), 1);
-    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/sigmas", "longitude", rmsSigmaLon(), 1);
-    //  H5LTset_attribute_double(fileId, "/BundleResults/RMS/sigmas", "radius", rmsSigmaRad(), 1);
-    //  // RMS and Sigma Vectors - This is a ton of duplicate code where I would rather use a list of functions - are functions first class objects?
-    //  const hsize_t residualsArraySize = rmsImageResiduals.size();
-    //  H5::DataSpace residualDataspace(1, &residualsArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/ResidualsList", H5::PredType::NATIVE_FLOAT, residualDataspace));
-    //  dataset.write(m_rmsImageResiduals, H5::PredType::NATIVE_FLOAT);
-    //  // Write the residual vector
-    //  const hsize_t sampleArraySize = rmsImageSampleResiduals.size();
-    //  H5::DataSpace sampleDataspace(1, &sampleArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/SampleList", H5::PredType::NATIVE_FLOAT, sampleDataspace));
-    //  dataset.write(m_rmsImageSampleResiduals, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t lineArraySize = rmsImageLineResiduals.size();
-    //  H5::DataSpace lineDataSpace(1,&lineArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/LineList", H5::PredType::NATIVE_FLOAT, lineDataSpace));
-    //  dataset.write(m_rmsImageLineResiduals, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t xSigmasArraySize = rmsImageXSigmas.size();
-    //  H5::DataSpace xSigmaDataspace(1, &xSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/xSigmas", H5::PredType::NATIVE_FLOAT, xSigmaDataspace));
-    //  dataset.write(m_rmsImageXSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t ySigmasArraySize = rmsImageYSigmas.size();
-    //  H5::DataSpace ySigmaDataspace(1, &ySigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/ySigmas", H5::PredType::NATIVE_FLOAT, ySigmaDataspace));
-    //  dataset.write(m_rmsImageYSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t zSigmasArraySize = rmsImageZSigmas.size();
-    //  H5::DataSpace zSigmaDataspace(1, &zSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/zSigmas", H5::PredType::NATIVE_FLOAT, zSigmaDataspace));
-    //  dataset.write(m_rmsImageZSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t raSigmasArraySize = rmsImageRASigmas.size();
-    //  H5::DataSpace raSigmaDataspace(1, &raSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/raSigmas", H5::PredType::NATIVE_FLOAT, raSigmaDataspace));
-    //  dataset.write(m_rmsImageRASigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t decSigmasArraySize = rmsImageDECSigmas.size();
-    //  H5::DataSpace decSigmaDataspace(1, &decSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/decSigmas", H5::PredType::NATIVE_FLOAT, decSigmaDataspace));
-    //  dataset.write(m_rmsImageDECSigmas, H5::PredType::NATIVE_FLOAT);
-    //  const hsize_t twistSigmasArraySize = rmsImageTWISTSigmas.size();
-    //  H5::DataSpace twistSigmaDataspace(1, &twistSigmasArraySize);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/RMS/twistSigmas", H5::PredType::NATIVE_FLOAT, twistSigmaDataspace));
-    //  dataset.write(m_rmsImageTWISTSigmas, H5::PredType::NATIVE_FLOAT);
-    //  
-    //  //Write elapsed time and error prop as attirbutes tagged to the root
-    //  const double elapsedTime = elapsedTime();
-    //  H5LTset_attribute_double(fileId, "/BundleResults", "elapsedTime", &elapsedTime, 1);
-    //  const double errorProp = lapsedTimeErrorProp();
-    //  H5LTset_attribute_double(fileId, "/BundleResults", "elapsedTimeErrorProp", &errorProp, 1);
-    //  
-    //  //Write a sigmas table
-    //  static m_sigmaTable sigmatable[6] = { // JB - why static???
-    //      {"minLat", minSigmaLatitudePointId(), minSigmaLatitude()},
-    //      {"maxLat", maxSigmaLatitudePointId(), maxSigmaLatitude()},
-    //      {"minLon", minSigmaLongitudePointId(), minSigmaLongitude()},
-    //      {"MaxLon", maxSigmaLongitudePointId(), maxSigmaLongitude()},
-    //      {"minRad", minSigmaRadiusPointId(), minSigmaRadius()},
-    //      {"maxRad", maxSigmaRadiusPointId(), maxSigmaRadius()}
-    //  };
-    //  
-    //  const int nfields = 3; //How many columns and their types - must be const so that field names can be created
-    //  
-    //  size_t part_offset[nfields] = {HOFFSET(m_sigmaTable, type),
-    //      HOFFSET(m_sigmaTable, pid),
-    //      HOFFSET(m_sigmaTable, value)};
-    //  
-    //  //Field names and types
-    //  hid_t field_type[nfields];  //Setup for a string type for the pid
-    //  hid_t string_type = H5Tcopy(H5T_C_S1);
-    //  H5Tset_size(string_type, (size_t)64);
-    //  field_type[0] = string_type;  //type
-    //  field_type[1] = string_type; //pid
-    //  field_type[2] = H5T_NATIVE_FLOAT;
-    //  
-    //  //How many rows?
-    //  int nrecords = 6;
-    //  // Field names
-    //  const char *fieldnames[nfields] = {"valuetype", "pid", "value"};
-    //  
-    //  hsize_t chunksize = 10;
-    //  int *filldata = NULL;
-    //  int compress = 0;
-    //  
-    //  H5TBmake_table("MinMaxSigma",fileId, "minmaxsigma", (hsize_t)nfields, (hsize_t)nrecords, sizeof(m_sigmaTable), fieldnames, part_offset, field_type, chunksize, filldata, compress, sigmatable);
-    //  
-    //  
-    //  H5::Group mlestatistics = H5::Group(hdfFile.createGroup("/BundleResults/MLEstimation"));
-    //  //TODO: ML Estimation Items
-    //  //The existing code iterates through - is this stored as a matrix somewhere?
-    //  // Dimensions
-    //  dims[1] = 4;
-    //  dims[0]  = 100;
-    //  
-    //  H5::DataSpace cumProbDataspace( RANK, dims );
-    //  H5::DataSet dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/MLEstimation/cumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, cumProbDataspace));
-    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
-    //  
-    //  
-    //  dims[1] = 4;
-    //  dims[0] = 100;
-    //  H5::DataSpace resCumProbdataspace(RANK, dims);
-    //  dataset = H5::DataSet(hdfFile.createDataSet("/BundleResults/MLEstimation/residualsCumulativeProbabilityCalculator", H5::PredType::NATIVE_FLOAT, resCumProbdataspace));
-    //  //dataset.write(data, H5::PredType::NATIVE_FLAOT);
-    //  
-    //}  // end of try block
-    //// catch failure caused by the H5File operations
-    //catch( H5::FileIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a file error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //// catch failure caused by the DataSet operations
-    //catch( H5::DataSetIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a data set error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //// catch failure caused by the DataSpace operations
-    //catch( H5::DataSpaceIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a data space error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //// catch failure caused by the DataSpace operations
-    //catch( H5::DataTypeIException error ) {
-    //  QString msg = QString(error.getCDetailMsg());
-    //  IException hpfError(IException::Unknown, msg, _FILEINFO_);
-    //  msg = "Unable to save BundleResults to hpf5 file. "
-    //        "H5 exception handler has detected a data type error.";
-    //  throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
-    //}
-    //return;
+  void BundleResults::createH5Group(H5::CommonFG &locationObject, QString locationName) const {
+    try {
+      // Try block to detect exceptions raised by any of the calls inside it
+      try {
+        /*
+         * Turn off the auto-printing when failure occurs so that we can
+         * handle the errors appropriately
+         */
+  //      H5::Exception::dontPrint();
+
+        // create a results group to add to the given H5 object
+        QString resultsGroupName = locationName + "/BundleResults"; 
+        H5::Group resultsGroup = locationObject.createGroup(resultsGroupName.toAscii());
+
+        // use H5S_SCALAR data space type for single valued spaces
+        H5::DataSpace spc(H5S_SCALAR);
+        Attribute att;
+
+        /* 
+         * Add string attributes as predefined data type H5::PredType::C_S1 (string)
+         */ 
+        H5::StrType strDataType;
+        int stringSize = 0; 
+
+        //TODO: finish Correlation Matrix
+        //Create a dataset with compression
+  //    m_correlationMatrix->createH5Group(resultsGroup, resultsGroupName);
+        QString correlationFileName = correlationMatrix().correlationFileName().expanded();
+        stringSize = qMax(correlationFileName.length(), 1);
+        strDataType = H5::StrType(H5::PredType::C_S1, stringSize); 
+        att = resultsGroup.createAttribute("correlationFileName", strDataType, spc);
+        att.write(strDataType, correlationFileName.toStdString());
+
+        QString covarianceFileName = correlationMatrix().covarianceFileName().expanded();
+        stringSize = qMax(covarianceFileName.length(), 1);
+        strDataType = H5::StrType(H5::PredType::C_S1, stringSize); 
+        att = resultsGroup.createAttribute("covarianceFileName", strDataType, spc);
+        att.write(strDataType, covarianceFileName.toStdString());
+        // TODO: table???
+        // correlationMatrix().imagesAndParameters()???
+        // QMapIterator<QString, QStringList> a list of images with their
+        // corresponding parameters...
+
+
+        /* 
+         * Add integer attributes as predefined data type H5::PredType::NATIVE_INT
+         */ 
+        att = resultsGroup.createAttribute("numberFixedPoints", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberFixedPoints);
+
+        att = resultsGroup.createAttribute("numberIgnoredPoints", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberIgnoredPoints);
+
+        att = resultsGroup.createAttribute("numberHeldImages", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberHeldImages);
+
+        att = resultsGroup.createAttribute("numberObservations", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberObservations);
+
+        att = resultsGroup.createAttribute("numberRejectedObservations", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberRejectedObservations);
+
+        att = resultsGroup.createAttribute("numberImageParameters", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberImageParameters);
+
+        att = resultsGroup.createAttribute("numberConstrainedPointParameters", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberConstrainedPointParameters);
+
+        att = resultsGroup.createAttribute("numberConstrainedImageParameters", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberConstrainedImageParameters);
+
+        att = resultsGroup.createAttribute("numberUnknownParameters", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_numberUnknownParameters);
+
+        att = resultsGroup.createAttribute("degreesOfFreedom", 
+                                            H5::PredType::NATIVE_INT,
+                                            spc);
+        att.write(H5::PredType::NATIVE_INT, &m_degreesOfFreedom);
+
+        /* 
+         * Add double attributes as predefined data type H5::PredType::NATIVE_DOUBLE
+         */ 
+        att = resultsGroup.createAttribute("rejectionLimit", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_rejectionLimit);
+
+        att = resultsGroup.createAttribute("sigma0", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_sigma0);
+
+        att = resultsGroup.createAttribute("elapsedTime", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_elapsedTime);
+
+        att = resultsGroup.createAttribute("elapsedTimeErrorProp", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_elapsedTimeErrorProp);
+
+        // todo: put rms in their own table/dataset/group???
+        att = resultsGroup.createAttribute("rmsXResiduals", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_rmsXResiduals);
+
+        att = resultsGroup.createAttribute("rmsYResiduals", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_rmsYResiduals);
+
+        att = resultsGroup.createAttribute("rmsXYResiduals", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_rmsXYResiduals);
+
+        att = resultsGroup.createAttribute("rmsSigmaLatitudeStats", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_rmsSigmaLatitudeStats);
+
+        att = resultsGroup.createAttribute("rmsSigmaLongitudeStats", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_rmsSigmaLongitudeStats);
+
+        att = resultsGroup.createAttribute("rmsSigmaRadiusStats", 
+                                            H5::PredType::NATIVE_DOUBLE,
+                                            spc);
+        att.write(H5::PredType::NATIVE_DOUBLE, &m_rmsSigmaRadiusStats);
+
+        /*
+         * Add bool attributes as predefined data type H5::PredType::NATIVE_HBOOL
+         */ 
+        att = resultsGroup.createAttribute("converged", 
+                                            H5::PredType::NATIVE_HBOOL,
+                                            spc);
+        int converged = (int)m_converged;
+        att.write(H5::PredType::NATIVE_HBOOL, &converged);
+        /*
+         * Add Statistics lists as data sets
+         */ 
+        QString dataSetName;
+        H5::DataSet dataSet;
+        hsize_t dims[1];
+        H5::CompType compoundDataType = Statistics::compoundH5DataType();
+
+
+        // IMAGE LINE RESIDUALS LIST
+        {
+          int listLength = 1;
+          if (!m_rmsImageLineResiduals.isEmpty()) {
+            listLength = m_rmsImageLineResiduals.size();
+          }
+
+          // Set the data space dimension to be the number of Statistics elements in this data set
+          dims[0] = (hsize_t)listLength;
+          H5::DataSpace dataSetSpace(1, dims);
+
+          dataSetName = resultsGroupName + "/RmsImageLineResidualsStatistics"; 
+          dataSet = resultsGroup.createDataSet(dataSetName.toAscii(),
+                                               compoundDataType,
+                                               dataSetSpace);
+
+          QByteArray byteArray;
+          QDataStream stream(&byteArray, QIODevice::WriteOnly);
+          stream.setByteOrder(QDataStream::LittleEndian);
+          for (int i = 0; i < listLength; i++) {
+            stream << m_rmsImageLineResiduals[i];
+          }
+          char *buf = byteArray.data();
+          dataSet.write(buf, compoundDataType);
+          dataSet.close();
+        }
+
+        // IMAGE SAMPLE RESIDUALS LIST
+        {
+          int listLength = 1;
+          if (!m_rmsImageSampleResiduals.isEmpty()) {
+            listLength = m_rmsImageSampleResiduals.size();
+          }
+
+          // Set the data space dimension to be the number of Statistics elements in this data set
+          dims[0] = (hsize_t)listLength;
+          H5::DataSpace dataSetSpace(1, dims);
+
+          dataSetName = resultsGroupName + "/RmsImageSampleResidualsStatistics"; 
+          dataSet = resultsGroup.createDataSet(dataSetName.toAscii(),
+                                               compoundDataType,
+                                               dataSetSpace);
+
+          QByteArray byteArray;
+          QDataStream stream(&byteArray, QIODevice::WriteOnly);
+          stream.setByteOrder(QDataStream::LittleEndian);
+          for (int i = 0; i < listLength; i++) {
+            stream << m_rmsImageSampleResiduals[i];
+          }
+          char *buf = byteArray.data();
+          dataSet.write(buf, compoundDataType);
+          dataSet.close();
+        }
+
+        // IMAGE RESIDUALS LIST
+        {
+          int listLength = 1;
+          if (!m_rmsImageResiduals.isEmpty()) {
+            listLength = m_rmsImageResiduals.size();
+          }
+
+          // Set the data space dimension to be the number of Statistics elements in this data set
+          dims[0] = (hsize_t)listLength;
+          H5::DataSpace dataSetSpace(1, dims);
+
+          dataSetName = resultsGroupName + "/RmsImageResidualsStatistics"; 
+          dataSet = resultsGroup.createDataSet(dataSetName.toAscii(),
+                                               compoundDataType,
+                                               dataSetSpace);
+
+          QByteArray byteArray;
+          QDataStream stream(&byteArray, QIODevice::WriteOnly);
+          stream.setByteOrder(QDataStream::LittleEndian);
+          for (int i = 0; i < listLength; i++) {
+            stream << m_rmsImageResiduals[i];
+          }
+          char *buf = byteArray.data();
+          dataSet.write(buf, compoundDataType);
+          dataSet.close();
+        }
+
+      }  // end of try block
+      // catch failure caused by the Attribute operations
+      catch( H5::AttributeIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 ATTRIBUTE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataSet operations
+      catch( H5::DataSetIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA SET exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataSpace operations
+      catch( H5::DataSpaceIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA SPACE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the DataType operations
+      catch( H5::DataTypeIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 DATA TYPE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the H5File operations
+      catch( H5::FileIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 FILE exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      // catch failure caused by the Group operations
+      catch( H5::GroupIException error ) {
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 GROUP exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+      catch (H5::Exception error) {  //??? how to improve printed msg using major/minor error codes?
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 GENERAL exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+    }
+    catch (IException &e) {
+      throw IException(e,
+                       IException::Unknown, 
+                       "Unable to save bundle results information to an HDF5 group.",
+                       _FILEINFO_);
+    }
       
   }
+
+  void BundleResults::openH5Group(H5::CommonFG &locationObject, QString locationName) {
+    try {
+      // Try block to detect exceptions raised by any of the calls inside it
+      try {
+        /*
+         * Turn off the auto-printing when failure occurs so that we can
+         * handle the errors appropriately
+         */
+  //      H5::Exception::dontPrint();
+
+        // create a results group to add to the given H5 object
+        QString resultsGroupName = locationName + "/BundleResults"; 
+        H5::Group resultsGroup = locationObject.openGroup(resultsGroupName.toAscii());
+
+        Attribute att;
+
+        //TODO: finish Correlation Matrix
+        //Create a dataset with compression
+  //    m_correlationMatrix->openH5Group(resultsGroup, resultsGroupName);
+
+        /* 
+         * read string atts as predefined data type H5::PredType::C_S1 (string)
+         */ 
+        H5::StrType strDataType;
+        H5std_string strAttValue;
+
+        att = resultsGroup.openAttribute("correlationFileName");
+        strDataType = H5::StrType(H5::PredType::C_S1, att.getStorageSize());
+        att.read(strDataType, strAttValue);
+        m_correlationMatrix->setCorrelationFileName(QString::fromStdString(strAttValue));
+
+        att = resultsGroup.openAttribute("covarianceFileName");
+        strDataType = H5::StrType(H5::PredType::C_S1, att.getStorageSize());
+        att.read(strDataType, strAttValue);
+        m_correlationMatrix->setCovarianceFileName(QString::fromStdString(strAttValue));
+
+        // TODO: table??? data set???
+        // correlationMatrix().imagesAndParameters()???
+        // QMapIterator<QString, QStringList> a list of images with their
+        // corresponding parameters...
+
+
+        /* 
+         * read int attributes as predefined data type H5::PredType::NATIVE_INT
+         */ 
+        att = resultsGroup.openAttribute("numberFixedPoints");
+        att.read(H5::PredType::NATIVE_INT, &m_numberFixedPoints);
+
+        att = resultsGroup.openAttribute("numberIgnoredPoints");
+        att.read(H5::PredType::NATIVE_INT, &m_numberIgnoredPoints);
+
+        att = resultsGroup.openAttribute("numberHeldImages");
+        att.read(H5::PredType::NATIVE_INT, &m_numberHeldImages);
+
+        att = resultsGroup.openAttribute("numberObservations");
+        att.read(H5::PredType::NATIVE_INT, &m_numberObservations);
+
+        att = resultsGroup.openAttribute("numberRejectedObservations");
+        att.read(H5::PredType::NATIVE_INT, &m_numberRejectedObservations);
+
+        att = resultsGroup.openAttribute("numberImageParameters");
+        att.read(H5::PredType::NATIVE_INT, &m_numberImageParameters);
+
+        att = resultsGroup.openAttribute("numberConstrainedImageParameters");
+        att.read(H5::PredType::NATIVE_INT, &m_numberConstrainedImageParameters);
+
+        att = resultsGroup.openAttribute("numberConstrainedPointParameters");
+        att.read(H5::PredType::NATIVE_INT, &m_numberConstrainedPointParameters);
+
+        att = resultsGroup.openAttribute("numberUnknownParameters");
+        att.read(H5::PredType::NATIVE_INT, &m_numberUnknownParameters);
+
+        att = resultsGroup.openAttribute("degreesOfFreedom");
+        att.read(H5::PredType::NATIVE_INT, &m_degreesOfFreedom);
+
+        /* 
+         * read double attributes as predefined data type H5::PredType::NATIVE_DOUBLE
+         */ 
+        att = resultsGroup.openAttribute("rejectionLimit");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_rejectionLimit);
+
+        att = resultsGroup.openAttribute("sigma0");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_sigma0);
+
+        att = resultsGroup.openAttribute("elapsedTime");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_elapsedTime);
+
+        att = resultsGroup.openAttribute("elapsedTimeErrorProp");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_elapsedTimeErrorProp);
+
+        // todo: put rms in their own table/dataset/group???
+        att = resultsGroup.openAttribute("rmsXResiduals");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_rmsXResiduals);
+
+        att = resultsGroup.openAttribute("rmsYResiduals");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_rmsYResiduals);
+
+        att = resultsGroup.openAttribute("rmsXYResiduals");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_rmsXYResiduals);
+
+        att = resultsGroup.openAttribute("rmsSigmaLatitudeStats");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_rmsSigmaLatitudeStats);
+
+        att = resultsGroup.openAttribute("rmsSigmaLongitudeStats");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_rmsSigmaLongitudeStats);
+
+        att = resultsGroup.openAttribute("rmsSigmaRadiusStats");
+        att.read(H5::PredType::NATIVE_DOUBLE, &m_rmsSigmaRadiusStats);
+
+        /* 
+         * read bool attributes as predefined data type H5::PredType::NATIVE_HBOOL
+         */ 
+        int boolAttValue = 0;
+        att = resultsGroup.openAttribute("converged");
+        att.read(H5::PredType::NATIVE_HBOOL, &boolAttValue);
+        m_converged = (bool)boolAttValue;
+
+        /*
+         * read data sets of Statistics objects
+         */ 
+        QString dataSetName = "";
+        H5::DataSet dataSet;
+        H5::CompType compoundDataType = Statistics::compoundH5DataType();
+
+        // IMAGE LINE RESIDUALS LIST
+        {
+          dataSetName = resultsGroupName + "/RmsImageLineResidualsStatistics";
+          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toAscii(), 0, NULL);
+          if (status != 0) {
+            // group DNE...
+            qDebug() << "didn't find or couldn't read stats list.";//???
+          }
+          try {
+
+            // if this doesn't throw an error, then the group exists???
+            H5G_stat_t info;
+            resultsGroup.getObjinfo(dataSetName.toAscii(), info);
+
+            dataSet = resultsGroup.openDataSet(dataSetName.toAscii());
+            H5::DataSpace dataSetSpace = dataSet.getSpace();
+
+            char statsList[dataSet.getStorageSize()];
+            dataSet.read(statsList, compoundDataType);
+    
+            int listLength = dataSetSpace.getSimpleExtentNpoints();
+            int statsSize = compoundDataType.getSize();
+            for (int i = 0; i < listLength; i++) {
+              QByteArray byteArray(&(statsList[i*statsSize]), statsSize);
+              QDataStream stream(&byteArray, QIODevice::ReadOnly);
+              stream.setByteOrder(QDataStream::LittleEndian);
+      
+              Statistics tempStats;
+              stream >> tempStats;
+              m_rmsImageLineResiduals.append(tempStats);
+            }
+    
+          } 
+          catch (H5::GroupIException groupError) {
+            // don't do anything???
+          }
+        }
+          
+        // IMAGE SAMPLE RESIDUALS LIST
+        {
+          dataSetName = resultsGroupName + "/RmsImageSampleResidualsStatistics"; 
+          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toAscii(), 0, NULL);
+          if (status != 0) {
+            // group DNE...
+            qDebug() << "didn't find or couldn't read stats list.";
+          }
+          try {
+
+            // if this doesn't throw an error, then the group exists???
+            H5G_stat_t info;
+            resultsGroup.getObjinfo(dataSetName.toAscii(), info);
+
+            dataSet = resultsGroup.openDataSet(dataSetName.toAscii());
+            H5::DataSpace dataSetSpace = dataSet.getSpace();
+
+            char statsList[dataSet.getStorageSize()];
+            dataSet.read(statsList, compoundDataType);
+    
+            int listLength = dataSetSpace.getSimpleExtentNpoints();
+            int statsSize = compoundDataType.getSize();
+            for (int i = 0; i < listLength; i++) {
+              QByteArray byteArray(&(statsList[i*statsSize]), statsSize);
+              QDataStream stream(&byteArray, QIODevice::ReadOnly);
+              stream.setByteOrder(QDataStream::LittleEndian);
+      
+              Statistics tempStats;
+              stream >> tempStats;
+              m_rmsImageLineResiduals.append(tempStats);
+            }
+    
+          } 
+          catch (H5::GroupIException groupError) {
+            // don't do anything???
+          }
+        }
+        // IMAGE RESIDUALS LIST
+        {
+          dataSetName = resultsGroupName + "/RmsImageResidualsStatistics"; 
+          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toAscii(), 0, NULL);
+          if (status != 0) {
+            // group DNE...
+            qDebug() << "didn't find or couldn't read stats list.";//???
+          }
+          try {
+
+            // if this doesn't throw an error, then the group exists???
+            H5G_stat_t info;
+            resultsGroup.getObjinfo(dataSetName.toAscii(), info);
+
+            dataSet = resultsGroup.openDataSet(dataSetName.toAscii());
+            H5::DataSpace dataSetSpace = dataSet.getSpace();
+
+            char statsList[dataSet.getStorageSize()];
+            dataSet.read(statsList, compoundDataType);
+    
+            int listLength = dataSetSpace.getSimpleExtentNpoints();
+            int statsSize = compoundDataType.getSize();
+            for (int i = 0; i < listLength; i++) {
+              QByteArray byteArray(&(statsList[i*statsSize]), statsSize);
+              QDataStream stream(&byteArray, QIODevice::ReadOnly);
+              stream.setByteOrder(QDataStream::LittleEndian);
+      
+              Statistics tempStats;
+              stream >> tempStats;
+              m_rmsImageLineResiduals.append(tempStats);
+            }
+    
+          } 
+          catch (H5::GroupIException groupError) {
+            // don't do anything???
+          }
+        }
+      }
+      catch (H5::Exception error) {  //??? how to improve printed msg using major/minor error codes?
+        QString msg = "H5 Exception Message: " + QString::fromStdString(error.getDetailMsg());
+        IException hpfError(IException::Unknown, msg, _FILEINFO_);
+        msg = "H5 GENERAL exception handler has detected an error when invoking the function " 
+              + QString::fromStdString(error.getFuncName()) + ".";
+        throw IException(hpfError, IException::Unknown, msg, _FILEINFO_);
+      }
+    }
+    catch (IException &e) {
+      throw IException(e,
+                       IException::Unknown, 
+                       "Unable to read bundle results information to an HDF5 group.",
+                       _FILEINFO_);
+    }
+  }
 }
-
-
-

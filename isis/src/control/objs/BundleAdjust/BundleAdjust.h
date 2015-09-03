@@ -196,6 +196,12 @@ namespace Isis {
    *                           users to use the outputFilePrefix to specify a file path without
    *                           adding an underscore to the file name. If the underscore is wanted,
    *                           it should be added to the prefix when entered by the user.
+   *   @history 2015-09-03 Jeannie Backer - Changed the name of the output correlation matrix file
+   *                           from ["inverseMatrix" + random unique code + ".dat"] to
+   *                           [BundleSettings::outputFilePrefix() + "inverseMatrix.dat"]. So that
+   *                           the prefix can be used to specify the path of the location where the
+   *                           matrix file should be written. Some improvements made to comply with
+   *                           coding standards.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -486,15 +492,19 @@ namespace Isis {
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables for cholmod
-      cholmod_common m_cm;
+      cholmod_common  m_cm;
       cholmod_factor *m_L;
       cholmod_sparse *m_N;
 
       SparseBlockMatrix m_SparseNormals;
-      cholmod_triplet *m_pTriplet;
+      cholmod_triplet  *m_pTriplet;
 
       BundleSettings m_bundleSettings; // pointer ??? then bundle settings method needs copy constructor ???
                                        // or constructors here take a const ref ???
+      BundleResults  m_bundleResults;
+//    BundleSolutionInfo m_bundleSolveInformation;
+
+
 // unused variable ???      int m_nHeldPoints;                                     //!< number of 'held' points (define)
 // unused variable ???      int m_nHeldObservations;                               //!< number of 'held' observations (define)
 // ??? moved to bundle stats class    //!< vectors for statistical computations...
@@ -503,8 +513,6 @@ Statistics m_Statsy;                       //!<  y errors
 Statistics m_Statsrx;                      //!<  x residuals
 Statistics m_Statsry;                      //!<  y residuals
 Statistics m_Statsrxy;                     //!< xy residuals
-    BundleResults m_bundleResults;
-//    BundleSolutionInfo m_bundleSolveInformation;
   };
 }
 

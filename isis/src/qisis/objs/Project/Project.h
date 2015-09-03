@@ -82,6 +82,9 @@ namespace Isis {
    *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
    *                           BundleSolutionInfo and BundleStatistics references with BundleResults
    *                           due to class name changes.
+   *   @history 2015-09-03 Jeannie Backer - Removed svn merge conflict comment lines. Removed call
+   *                           to save BundleSolutionInfo as an xml file. Added hdf5 preliminary
+   *                           serialization calls. Some ISIS coding standards improvements.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -100,6 +103,7 @@ namespace Isis {
       void addImages(QStringList imageFiles);
       void addImages(ImageList newImages);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
+      void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       Control *control(QString id);
       Directory *directory() const;
       Image *image(QString id);

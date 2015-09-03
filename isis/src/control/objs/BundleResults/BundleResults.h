@@ -70,6 +70,8 @@ namespace Isis {
    *                           methods. Initialize m_cumProRes in the constructor since this
    *                           variable is used regardless of whether maximum likelihood estimation
    *                           is used.
+   *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities. Renamed
+   *                           member variables to make names more descriptive.
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -121,7 +123,7 @@ namespace Isis {
 #endif
       void setRejectionLimit(double rejectionLimit);
 #if 0
-      double computeResiduals(ControlNet *m_pCnet,
+      double computeResiduals(ControlNet *pCnet,
                               std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointWeights,
                               std::vector< boost::numeric::ublas::bounded_vector< double, 3 > > pointCorrections,
                               boost::numeric::ublas::vector< double > image_Corrections,
@@ -131,7 +133,7 @@ namespace Isis {
 #endif
       void setRmsXYResiduals(double rx, double ry, double rxy);
 #if 0
-      bool flagOutliers(ControlNet *m_pCnet);
+      bool flagOutliers(ControlNet *pCnet);
 #endif
       void setNumberRejectedObservations(int numberObservations);
       void setNumberObservations(int numberObservations);
@@ -201,8 +203,8 @@ namespace Isis {
 
       QList< QPair< MaximumLikelihoodWFunctions, double > > maximumLikelihoodModels() const;
 
-      bool setNumberHeldImages(SerialNumberList m_pHeldSnList,
-                               SerialNumberList *m_pSnList);
+      bool setNumberHeldImages(SerialNumberList pHeldSnList,
+                               SerialNumberList *pSnList);
 
       PvlObject pvlObject(QString name = "BundleResults") const;
 
@@ -216,17 +218,14 @@ namespace Isis {
       QDataStream &write(QDataStream &stream) const;
       QDataStream &read(QDataStream &stream);
 
-      void savehdf5(hid_t fileId, H5::Group settingsGroup) const;
+      void createH5Group(hid_t locationId, QString locationName) const;// delete these
+      void parseH5Group(hid_t locationId, QString locationName);       // delete these
+
+      void createH5Group(H5::CommonFG &locationObject, QString locationName) const;
+      void openH5Group(H5::CommonFG &locationObject, QString locationName);
+      BundleResults(H5::CommonFG &locationObject, QString locationName);
 
     private:
-      // Used for hdf5 method...
-      // Struct that is used to pack the sigma table
-      typedef struct sigma {
-          char    type[64];
-          char    pid[64];
-          float   value;
-      } m_sigmaTable;
-
       /**
        *
        * @author 2014-07-28 Jeannie Backer
@@ -284,13 +283,11 @@ namespace Isis {
       int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
       int m_numberIgnoredPoints;              //!< number of ignored points                  // currently set but unused ???
       int m_numberHeldImages;                 //!< number of 'held' images (define)          
+
+      double m_rmsXResiduals;  // set but unused ???                   //!< rms of x residuals
+      double m_rmsYResiduals;  // set but unused ???                   //!< rms of y residuals
+      double m_rmsXYResiduals; // set but unused ???                   //!< rms of all x and y residuals
       
-      
-      
-            
-      double m_rms_rx;  // set but unused ???                   //!< rms of x residuals
-      double m_rms_ry;  // set but unused ???                   //!< rms of y residuals
-      double m_rms_rxy; // set but unused ???                   //!< rms of all x and y residuals
       double m_rejectionLimit;                //!< current rejection limit
       // TODO:??? reorder read/write data stream, init, copy constructor, operator= 
       int m_numberObservations;               //!< number of image coordinate observations
@@ -308,10 +305,15 @@ namespace Isis {
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables set in computeBundleResults()
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      QList<Statistics> m_rmsImageSampleResiduals;// QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range",
-      QList<Statistics> m_rmsImageLineResiduals;
-      QList<Statistics> m_rmsImageResiduals;
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      // QList??? jigsaw apptest gives - ASSERT failure in QList<T>::operator[]: "index out of range", 
+      QList<Statistics> m_rmsImageSampleResiduals;/**< List of RMS image sample residual statistics
+                                                       for each image in the bundle  */
+      QList<Statistics> m_rmsImageLineResiduals;  /**< List of RMS image line residual statistics
+                                                       for each image in the bundle  */
+      QList<Statistics> m_rmsImageResiduals;      /**< RMS image sample and line residual statistics 
+                                                       for each image in the bundle  */
+
       QVector<Statistics> m_rmsImageXSigmas;     // unset and unused ???
       QVector<Statistics> m_rmsImageYSigmas;     // unset and unused ???
       QVector<Statistics> m_rmsImageZSigmas;     // unset and unused ???
@@ -333,9 +335,9 @@ namespace Isis {
       QString m_minSigmaRadiusPointId;
       QString m_maxSigmaRadiusPointId;
 
-      double m_sigmaLatStatsRms;               //!< rms of adjusted Latitude sigmas
-      double m_sigmaLonStatsRms;               //!< rms of adjusted Longitude sigmas
-      double m_sigmaRadStatsRms;               //!< rms of adjusted Radius sigmas
+      double m_rmsSigmaLatitudeStats;               //!< rms of adjusted Latitude sigmas
+      double m_rmsSigmaLongitudeStats;               //!< rms of adjusted Longitude sigmas
+      double m_rmsSigmaRadiusStats;               //!< rms of adjusted Radius sigmas
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // variables for maximum likelihood estimation

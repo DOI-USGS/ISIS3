@@ -27,6 +27,11 @@ namespace Isis {
    *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
    *                           BundleSolutionInfo and BundleStatistics references with BundleResults
    *                           due to class name changes.
+   *   @history 2015-09-03 Jeannie Backer - Modified to create JigsawSetupDialog object using the
+   *                           value for the useLastSettings checkbox. When the Run button is
+   *                           clicked, the run time will now be used to create a uniquely named
+   *                           directory to contain the output files for the bundle solution.
+
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT

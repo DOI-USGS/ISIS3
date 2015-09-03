@@ -24,6 +24,10 @@ namespace Isis {
    *   @history 2015-02-20 Jeannie Backer - Replaced BundleResults references with
    *                           BundleSolutionInfo and BundleStatistics references with BundleResults
    *                           due to class name changes.
+   *   @history 2015-09-03 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
+   *                           Changed condition of if-statements for QLineEdit::setText for the
+   *                           global a priori sigma variables from less than zero to !IsNullPixel
+   *                           for consistency with bundle classes.
    */
   class Project;
   class Control;

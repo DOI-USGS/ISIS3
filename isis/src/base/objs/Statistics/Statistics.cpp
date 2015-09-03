@@ -27,6 +27,10 @@
 
 #include <float.h>
 
+#include <H5Cpp.h>
+#include <hdf5_hl.h>
+#include <hdf5.h>
+
 #include "IException.h"
 #include "IString.h"
 #include "Project.h"
@@ -37,27 +41,23 @@ using namespace std;
 namespace Isis {
   //! Constructs an IsisStats object with accumulators and counters set to zero.
   Statistics::Statistics(QObject *parent) : QObject(parent) {
-    m_id = NULL;
-    m_id = new QUuid(QUuid::createUuid());
+//    m_id = NULL;
+//    m_id = new QUuid(QUuid::createUuid());
     SetValidRange();
     Reset(); // initialize
   }
 
 
-
   Statistics::Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent) {   // TODO: does xml stuff need project???
-    m_id = NULL;
+//    m_id = NULL;
     SetValidRange();
     Reset(); // initialize
     xmlReader->pushContentHandler(new XmlHandler(this, project));   // TODO: does xml stuff need project???
   }
 
 
-
-
   Statistics::Statistics(const Statistics &other)
-    : m_id(new QUuid(other.m_id->toString())),
-      m_sum(other.m_sum),
+    : m_sum(other.m_sum),
       m_sumsum(other.m_sumsum),
       m_minimum(other.m_minimum),
       m_maximum(other.m_maximum),
@@ -74,23 +74,22 @@ namespace Isis {
       m_overRangePixels(other.m_overRangePixels),
       m_removedData(other.m_removedData) {
   }
-
+   // : m_id(new QUuid(other.m_id->toString())),
 
 
   //! Destroys the IsisStats object.
   Statistics::~Statistics() {
-    delete m_id;
-    m_id = NULL;
+//    delete m_id;
+//    m_id = NULL;
   }
-
 
 
   Statistics &Statistics::operator=(const Statistics &other) {
 
     if (&other != this) {
-      delete m_id;
-      m_id = NULL;
-      m_id = new QUuid(other.m_id->toString());
+//      delete m_id;
+//      m_id = NULL;
+//      m_id = new QUuid(other.m_id->toString());
 
       m_sum = other.m_sum;
       m_sumsum = other.m_sumsum;
@@ -114,7 +113,6 @@ namespace Isis {
   }
 
 
-
   //! Reset all accumulators and counters to zero.
   void Statistics::Reset() {
     m_sum = 0.0;
@@ -134,7 +132,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Add an array of doubles to the accumulators and counters.
    * This method can be invoked multiple times (for example: once
@@ -151,7 +148,6 @@ namespace Isis {
       AddData(value);
     }
   }
-
 
 
   /**
@@ -198,7 +194,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Remove an array of doubles from the accumulators and counters.
    * Note that is invalidates the absolute minimum and maximum. They
@@ -213,7 +208,6 @@ namespace Isis {
    *    doesn't exist.
    */
   void Statistics::RemoveData(const double *data, const unsigned int count) {
-    m_removedData = true;
 
     for(unsigned int i = 0; i < count; i++) {
       double value = data[i];
@@ -222,7 +216,9 @@ namespace Isis {
 
   }
 
+
   void Statistics::RemoveData(const double data) {
+    m_removedData = true;
     m_totalPixels--;
 
     if (Isis::IsNullPixel(data)) {
@@ -256,7 +252,9 @@ namespace Isis {
       QString msg = "You are removing non-existant data in [Statistics::RemoveData]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    // what happens to saved off min/max???
   }
+
 
   void Statistics::SetValidRange(const double minimum, const double maximum) {
     m_validMinimum = minimum;
@@ -268,8 +266,8 @@ namespace Isis {
                     + "] must be less than the Maximum [" + toString(maximum) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    //??? throw exception if data has already been added???
   }
-
 
 
   double Statistics::ValidMinimum() const {
@@ -277,11 +275,9 @@ namespace Isis {
   }
 
 
-
   double Statistics::ValidMaximum() const {
     return m_validMaximum;
   }
-
 
 
   bool Statistics::InRange(const double value) {
@@ -289,17 +285,14 @@ namespace Isis {
   }
 
 
-
   bool Statistics::AboveRange(const double value) {
     return (value > m_validMaximum);
   }
 
 
-
   bool Statistics::BelowRange(const double value) {
     return (value < m_validMinimum);
   }
-
 
 
   /**
@@ -313,6 +306,7 @@ namespace Isis {
     return m_sum / m_validPixels;
   }
 
+
   /**
    * Computes and returns the standard deviation.
    * If there are no valid pixels, then NULL8 is returned.
@@ -323,6 +317,7 @@ namespace Isis {
     if (m_validPixels <= 1) return Isis::NULL8;
     return sqrt(Variance());
   }
+
 
   /**
    * Computes and returns the variance.
@@ -342,7 +337,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Returns the sum of all the data
    *
@@ -353,7 +347,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Returns the sum of all the squared data
    *
@@ -362,7 +355,6 @@ namespace Isis {
   double Statistics::SumSquare() const {
     return m_sumsum;
   }
-
 
 
   /**
@@ -380,6 +372,7 @@ namespace Isis {
     if (temp < 0.0) temp = 0.0;
     return sqrt(temp);
   }
+
 
   /**
    * Returns the absolute minimum double found in all data passed through the
@@ -399,6 +392,7 @@ namespace Isis {
     if (m_validPixels < 1) return Isis::NULL8;
     return m_minimum;
   }
+
 
   /**
    * Returns the absolute maximum double found in all
@@ -420,6 +414,7 @@ namespace Isis {
     return m_maximum;
   }
 
+
   /**
    * Returns the total number of pixels processed
    * (valid and invalid).
@@ -429,6 +424,7 @@ namespace Isis {
   BigInt Statistics::TotalPixels() const {
     return m_totalPixels;
   }
+
 
   /**
    * Returns the total number of valid pixels processed.
@@ -442,6 +438,7 @@ namespace Isis {
     return m_validPixels;
   }
 
+
   /**
    * Returns the total number of pixels over the valid range
    *   encountered.
@@ -451,6 +448,7 @@ namespace Isis {
   BigInt Statistics::OverRangePixels() const {
     return m_overRangePixels;
   }
+
 
   /**
    * Returns the total number of pixels under the valid range
@@ -462,6 +460,7 @@ namespace Isis {
     return m_underRangePixels;
   }
 
+
   /**
    * Returns the total number of NULL pixels encountered.
    *
@@ -470,6 +469,7 @@ namespace Isis {
   BigInt Statistics::NullPixels() const {
     return m_nullPixels;
   }
+
 
   /**
    * Returns the total number of low instrument
@@ -481,6 +481,7 @@ namespace Isis {
     return m_lisPixels;
   }
 
+
   /**
    * Returns the total number of low representation
    * saturation (LRS) pixels encountered.
@@ -490,6 +491,7 @@ namespace Isis {
   BigInt Statistics::LrsPixels() const {
     return m_lrsPixels;
   }
+
 
   /**
    * Returns the total number of high instrument
@@ -501,6 +503,7 @@ namespace Isis {
     return m_hisPixels;
   }
 
+
   /**
    * Returns the total number of high representation
    * saturation (HRS) pixels encountered.
@@ -510,6 +513,7 @@ namespace Isis {
   BigInt Statistics::HrsPixels() const {
     return m_hrsPixels;
   }
+
 
   /**
    * Returns the total number of pixels outside of
@@ -521,9 +525,12 @@ namespace Isis {
     return m_overRangePixels + m_underRangePixels;
   }
 
+
   bool Statistics::RemovedData() const {
     return m_removedData;
   }
+
+
   /**
    * This method returns a minimum such that X percent
    * of the data will fall with K standard deviations
@@ -549,6 +556,7 @@ namespace Isis {
     double k = sqrt(1.0 / (1.0 - percent / 100.0));
     return Average() - k * StandardDeviation();
   }
+
 
   /**
    * This method returns a maximum such that
@@ -576,6 +584,7 @@ namespace Isis {
     return Average() + k * StandardDeviation();
   }
 
+
   /**
    * This method returns the better of the absolute
    * minimum or the Chebyshev minimum. The better
@@ -596,6 +605,7 @@ namespace Isis {
     if (Minimum() > min) min = Minimum();
     return min;
   }
+
 
   /**
    *
@@ -618,6 +628,7 @@ namespace Isis {
     if (Maximum() < max) max = Maximum();
     return max;
   }
+
 
   /**
    *
@@ -644,11 +655,10 @@ namespace Isis {
   }
 
 
-
   void Statistics::save(QXmlStreamWriter &stream, const Project *project) const {   // TODO: does xml stuff need project???
 
     stream.writeStartElement("statistics");
-    stream.writeTextElement("id", m_id->toString());
+//    stream.writeTextElement("id", m_id->toString());
  
     stream.writeTextElement("sum", toString(m_sum));
     stream.writeTextElement("sumSquares", toString(m_sumsum));
@@ -678,7 +688,6 @@ namespace Isis {
   }
 
 
-
   Statistics::XmlHandler::XmlHandler(Statistics *statistics, Project *project) {   // TODO: does xml stuff need project???
     m_xmlHandlerStatistics = statistics;
     m_xmlHandlerProject = project;   // TODO: does xml stuff need project???
@@ -686,13 +695,11 @@ namespace Isis {
   }
 
 
-
   Statistics::XmlHandler::~XmlHandler() {
     // do not delete this pointer... we don't own it, do we??? passed into StatCumProbDistDynCalc constructor as pointer
     // delete m_xmlHandlerProject;    // TODO: does xml stuff need project???
     m_xmlHandlerProject = NULL;
   }
-
 
 
   bool Statistics::XmlHandler::startElement(const QString &namespaceURI, 
@@ -707,20 +714,18 @@ namespace Isis {
   }
 
 
-
   bool Statistics::XmlHandler::characters(const QString &ch) {
     m_xmlHandlerCharacters += ch;
     return XmlStackedHandler::characters(ch);
   }
 
 
-
   bool Statistics::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                      const QString &qName) {
     if (!m_xmlHandlerCharacters.isEmpty()) {
       if (localName == "id") {
-        m_xmlHandlerStatistics->m_id = NULL;
-        m_xmlHandlerStatistics->m_id = new QUuid(m_xmlHandlerCharacters);
+//        m_xmlHandlerStatistics->m_id = NULL;
+//        m_xmlHandlerStatistics->m_id = new QUuid(m_xmlHandlerCharacters);
       }
       if (localName == "sum") {
         m_xmlHandlerStatistics->m_sum = toDouble(m_xmlHandlerCharacters);
@@ -776,38 +781,43 @@ namespace Isis {
   }
 
 
-
+  /** 
+   * Order saved must match the offsets in the static compoundH5DataType() 
+   * method. 
+   */ 
   QDataStream &Statistics::write(QDataStream &stream) const {
-    stream << m_id->toString()
-           << m_sum
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream << m_sum
            << m_sumsum
            << m_minimum
            << m_maximum
            << m_validMinimum
            << m_validMaximum
-           << (qint32)m_totalPixels
-           << (qint32)m_validPixels
-           << (qint32)m_nullPixels
-           << (qint32)m_lrsPixels
-           << (qint32)m_lisPixels
-           << (qint32)m_hrsPixels
-           << (qint32)m_hisPixels
-           << (qint32)m_underRangePixels
-           << (qint32)m_overRangePixels
-           << m_removedData;
+           << (qint64)m_totalPixels
+           << (qint64)m_validPixels
+           << (qint64)m_nullPixels
+           << (qint64)m_lrsPixels
+           << (qint64)m_lisPixels
+           << (qint64)m_hrsPixels
+           << (qint64)m_hisPixels
+           << (qint64)m_underRangePixels
+           << (qint64)m_overRangePixels
+           << (qint32)m_removedData;
     return stream;
+//    stream << m_id->toString()
   }
-
 
 
   QDataStream &Statistics::read(QDataStream &stream) {
 
-    QString id;
-    qint32 totalPixels, validPixels, nullPixels, lrsPixels, lisPixels,
+//    QString id;
+    qint64 totalPixels, validPixels, nullPixels, lrsPixels, lisPixels,
            hrsPixels, hisPixels, underRangePixels, overRangePixels;
+    qint32 removedData;
 
-    stream >> id
-           >> m_sum
+    stream.setByteOrder(QDataStream::LittleEndian);
+//    stream >> id
+    stream >> m_sum
            >> m_sumsum
            >> m_minimum
            >> m_maximum
@@ -822,11 +832,11 @@ namespace Isis {
            >> hisPixels
            >> underRangePixels
            >> overRangePixels
-           >> m_removedData;
+           >> removedData;
 
-    delete m_id;
-    m_id = NULL;
-    m_id = new QUuid(id);
+//    delete m_id;
+//    m_id = NULL;
+//    m_id = new QUuid(id);
 
     m_totalPixels      = (BigInt)totalPixels;
     m_validPixels      = (BigInt)validPixels;
@@ -837,11 +847,10 @@ namespace Isis {
     m_hisPixels        = (BigInt)hisPixels;
     m_underRangePixels = (BigInt)underRangePixels;
     m_overRangePixels  = (BigInt)overRangePixels;
+    m_removedData      = (bool)removedData;
     
-
     return stream;
   }
-
 
 
   QDataStream &operator<<(QDataStream &stream, const Statistics &statistics) {
@@ -849,8 +858,67 @@ namespace Isis {
   }
 
 
-
   QDataStream &operator>>(QDataStream &stream, Statistics &statistics) {
     return statistics.read(stream);
+  }
+
+
+  /** 
+   *  H5 compound data type uses the offesets from the QDataStream returned by
+   *  the write(QDataStream &stream) method.
+   */
+  H5::CompType Statistics::compoundH5DataType() {
+
+    H5::CompType compoundDataType((size_t)124);
+
+    size_t offset = 0;
+    compoundDataType.insertMember("Sum", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_sum);
+    compoundDataType.insertMember("SumSquared", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_sumsum);
+    compoundDataType.insertMember("Minimum", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_minimum);
+    compoundDataType.insertMember("Maximum", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_maximum);
+    compoundDataType.insertMember("ValidMinimum", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_validMinimum);
+    compoundDataType.insertMember("ValidMaximum", offset, H5::PredType::NATIVE_DOUBLE);
+
+    offset += sizeof(m_validMaximum);
+    compoundDataType.insertMember("TotalPixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_totalPixels);
+    compoundDataType.insertMember("ValidPixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_validPixels);
+    compoundDataType.insertMember("NullPixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_nullPixels);
+    compoundDataType.insertMember("LRSPixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_lrsPixels);
+    compoundDataType.insertMember("LISPixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_lisPixels);
+    compoundDataType.insertMember("HRSPixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_hrsPixels);
+    compoundDataType.insertMember("HISPixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_hisPixels);
+    compoundDataType.insertMember("UnderRangePixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_underRangePixels);
+    compoundDataType.insertMember("OverRangePixels", offset, H5::PredType::NATIVE_INT64);
+
+    offset += sizeof(m_overRangePixels);
+    compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_HBOOL);
+
+    return compoundDataType;
   }
 } // end namespace isis
