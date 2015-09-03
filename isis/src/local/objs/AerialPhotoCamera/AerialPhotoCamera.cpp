@@ -19,6 +19,9 @@
  */
 #include "AerialPhotoCamera.h"
 
+#include <QDebug>
+#include <QString>
+
 #include "Affine.h"
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
@@ -30,8 +33,6 @@
 #include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
-
-#include <QDebug>
 
 using namespace std;
 namespace Isis {
@@ -45,6 +46,11 @@ namespace Isis {
    */
   AerialPhotoCamera::AerialPhotoCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
+    
+    m_instrumentNameLong = "Aerial Photo";
+    m_instrumentNameShort = "Aerial";
+    m_spacecraftNameLong = "Aircraft";
+    m_spacecraftNameShort = "Aircraft";
 
     // Prep for getting information from cube labels
     Pvl &lab = *cube.label();
@@ -162,7 +168,48 @@ namespace Isis {
     shuttertimes.second = time + (exposureDuration / 2.0);
     return shuttertimes;
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString AerialPhotoCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString AerialPhotoCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString AerialPhotoCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString AerialPhotoCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 } 
+
 
 /**
  * This is the function that is called in order to instantiate an

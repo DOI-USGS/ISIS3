@@ -1,9 +1,11 @@
 #ifndef CubeManager_h
 #define CubeManager_h
 
-#include <QString>
+#include "IException.h"
+
 #include <QMap>
 #include <QQueue>
+#include <QString>
 
 /*
  *   Unless noted otherwise, the portions of Isis written by the
@@ -47,11 +49,18 @@ namespace Isis {
    *            cube attributes (input) when opening cubes.
    *   @history 2011-06-08 Steven Lambright - Better handles the case when a
    *                Cube fails to open, fixes #161.
+   *   @history 2015-07-15 Ian Humphrey - Added private member variable to store the max number
+   *                           files opened (60% of the system's limitations). Modified 
+   *                           SetNumOpenCubes to set the maximum number of open cubes to
+   *                           60% of the system's file limits if the passed value exceeds this
+   *                           60% limitations. Modified OpenCube to always clean excess cubes. 
+   *                           Updated unit test for better test coverage. Fixes #1951. 
    */
   class CubeManager  {
     public:
       CubeManager();
       ~CubeManager();
+
 
       /**
        * This method calls the method OpenCube() on the static instance
@@ -66,6 +75,7 @@ namespace Isis {
         return p_instance.OpenCube(cubeFileName);
       }
 
+
       /**
        * This method calls CleanCubes(const QString &cubeFileName)  on the static
        * instance
@@ -78,6 +88,7 @@ namespace Isis {
         p_instance.CleanCubes(cubeFileName);
       }
 
+
       /**
        * This method calls CleanCubes() on the static instance
        *
@@ -87,21 +98,33 @@ namespace Isis {
         p_instance.CleanCubes();
       };
 
+
       void CleanCubes(const QString &cubeFileName);
       void CleanCubes();
 
+
       Cube *OpenCube(const QString &cubeFileName);
+
 
       /**
        * This sets the maximum number of opened cubes for this instance of
        * CubeManager. The last "maxCubes" opened cubes are guaranteed to be
        * valid as long as one of the CleanCubes(...) are not called.
+       * If the maximum number of open cubes specified exceeds 60% of system limitations,
+       * the maximum number of opened cubes will be set to a 60% of the 
+       * system's open file limitation (this considers files used by the current process).
        *
        * @param numCubes Maximum number of open cubes
        */
       void SetNumOpenCubes(unsigned int numCubes) {
-        p_minimumCubes = numCubes;
+
+        // check to see if numCubes exceeds the number of open files limitations
+        if (numCubes > p_maxOpenFiles) {
+          p_currentLimit = p_maxOpenFiles;
+        }
+        p_currentLimit = numCubes;
       }
+
 
     protected:
       //! There is always at least one instance of CubeManager around
@@ -109,11 +132,15 @@ namespace Isis {
 
       //! This keeps track of the open cubes
       QMap<QString, Cube *> p_cubes;
+
       //! This keeps track of cubes that have been opened
       QQueue<QString> p_opened;
 
-      //! At least this many cubes must be allowed in memory, more can be cleaned up, 0 means no limit
-      unsigned int p_minimumCubes;
+      //! The current limit regarding number of open files allowed
+      unsigned int p_currentLimit;
+
+      //! 60% of the maximum number of open files allowed by system resources
+      unsigned int p_maxOpenFiles;
   };
 }
 

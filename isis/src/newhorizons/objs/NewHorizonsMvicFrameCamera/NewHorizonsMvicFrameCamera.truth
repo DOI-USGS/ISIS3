@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -98
 SPK Reference ID = 1
 
+Spacecraft Name Long: New Horizons
+Spacecraft Name Short: NewHorizons
+Instrument Name Long: Multispectral Visible Imaging Framing Camera
+Instrument Name Short: MVIC FRAMING
+
 Shutter open = 226092664.866396815
 Shutter close = 226092664.866646826
 

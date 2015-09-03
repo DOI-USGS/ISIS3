@@ -54,6 +54,10 @@ namespace Isis {
     PushFrameCamera(cube) {
 
     NaifStatus::CheckErrors();
+    
+    m_spacecraftNameLong = "Lunar Reconnaissance Orbiter";
+    m_spacecraftNameShort = "LRO";
+    
     // Set up the camera characteristics
     instrumentRotation()->SetFrame(naifIkCode());
     SetFocalLength();
@@ -83,11 +87,15 @@ namespace Isis {
       sumMode = 4;
       frameletSize = 16;
       filterIKBase = 15 - 1; //  New UV IK code = filterIKBase + BANDID
+      m_instrumentNameLong = "Wide Angle Camera Ultra Violet";
+      m_instrumentNameShort = "WAC-UV";
     }
     else if (instId == "WAC-VIS") {
       sumMode = 1;
       frameletSize = 14;
       filterIKBase = 10 - 3; //  New VIS IK code = filterIKBase + BANDID
+      m_instrumentNameLong = "Wide Angle Camera Visual";
+      m_instrumentNameShort = "WAC-VIS";
     }
     else {
       QString msg = "Invalid value [" + instId
@@ -353,7 +361,50 @@ namespace Isis {
   int LroWideAngleCamera::SpkReferenceId() const {
     return (1);
   }
-
+  
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString LroWideAngleCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString LroWideAngleCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString LroWideAngleCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString LroWideAngleCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
 
 

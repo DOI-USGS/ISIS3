@@ -22,6 +22,7 @@
 
 #include "LineScanCamera.h"
 
+#include <QString>
 #include <QVector>
 
 namespace Isis {
@@ -34,7 +35,10 @@ namespace Isis {
    *
    * @author 2014-09-02 Kristin Berry
    *
-   * @internal 
+   * @internal
+   *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           name methods.
    *  
    */
   class NewHorizonsLeisaCamera : public LineScanCamera {
@@ -77,8 +81,11 @@ namespace Isis {
 
       void SetBand(const int vband);
 
-
-
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+   
     private:
       QVector<int> m_originalBand; //!< Stores the band bin OriginalBand keyword values
 
@@ -86,6 +93,11 @@ namespace Isis {
       QVector<double> m_origTransy;  //!< The original transy affine coefficients from the iak
       QVector<double> m_origTranss; //!< The original transs affine coefficients from the iak
       QVector<double> m_origTransl; //!< The original transl affine coefficients from the iak
+      
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

@@ -23,6 +23,7 @@
 #include "CameraFactory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "KaguyaMiCamera.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -45,9 +46,10 @@ int main(int argc, char *argv[]) {
     // and "Longitude off by: " values directly into these variables.
     double knownLat[2] = { -12.0400820752276996, 47.7445483329470406 };
     double knownLon[2] = { 355.7272261079595523, 42.9611485167199660 };
+
     char files[2][1024] = { "$kaguya/testData/MI_VIS.cub", "$kaguya/testData/MI_NIR.cub" };
  
-    for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
+    for (unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
       Cube c(files[i], "r");
       Camera *cam = CameraFactory::Create(c);
       cout << "FileName: " << FileName(c.fileName()).name() << endl;
@@ -61,6 +63,12 @@ int main(int argc, char *argv[]) {
       cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
       cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
       cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+      
+      // Test name methods
+      cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
 
       // Test all four corners to make sure the conversions are right
       cout << "For upper left corner ..." << endl;
@@ -101,6 +109,11 @@ int main(int argc, char *argv[]) {
       }
       cout << endl << "--------------------------------------------" << endl;
     }
+    
+    // Test exception: camera is not a supported Kaguya camera
+    cout << endl << "Testing exceptions:" << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    KaguyaMiCamera kCam(test);
   }
   catch(IException &e) {
     e.print();

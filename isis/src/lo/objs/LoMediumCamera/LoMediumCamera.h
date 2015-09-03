@@ -22,6 +22,8 @@
 
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Defines the Lunar Orbiter Medium Resolution camera class
@@ -38,27 +40,30 @@ namespace Isis {
    *   @history 2007-07-17 Debbie A. Cook - Original Version
    *   @history 2008-04-07 Debbie A. Cook - Set x/y axis directions for jigsaw
    *   @history 2008-08-08 Steven Lambright Made the unit test work with a
-   *                          Sensor change. Also, now using the new
-   *                          LoadCache(...) method instead of CreateCache(...).
+   *                           Sensor change. Also, now using the new
+   *                           LoadCache(...) method instead of CreateCache(...).
    *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute
-   *                          CameraDetectorMap methods
+   *                           CameraDetectorMap methods
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *                          inherit directly from Camera
+   *                           inherit directly from Camera
    *   @history 2010-09-16 Steven Lambright - Updated unitTest to not use a DEM.
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
-   *                          pure virtual in Camera, implemented in mission
-   *                          specific cameras.
+   *                           pure virtual in Camera, implemented in mission
+   *                           specific cameras.
    *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
    *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes()
-   *                          method. Updated unitTest to test for new methods.
-   *                          Updated documentation. Removed Lo namespace wrap
-   *                          inside Isis namespace wrap. Added Isis Disclaimer
-   *                          to files. Added NAIF error check to constructor.
+   *                           method. Updated unitTest to test for new methods.
+   *                           Updated documentation. Removed Lo namespace wrap
+   *                           inside Isis namespace wrap. Added Isis Disclaimer
+   *                           to files. Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
    *   @history 2014-01-17 Kris Becker Corrected CkFrameId reference to
-   *                          properly define LO 3,4,5 at runtime for generation
-   *                          of CKs using ckwriter. References #1737.  
+   *                           properly define LO 3,4,5 at runtime for generation
+   *                           of CKs using ckwriter. References #1737.  
+   *   @history 2015-08-24 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test for these
+   *                           methods and added data for LO4 and LO5.
    */
   class LoMediumCamera : public FramingCamera {
     public:
@@ -99,9 +104,19 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
     private:
-      int m_ckFrameId;                        // LO 3,4,5 CK frame id
+      int m_ckFrameId;                        //!< LO 3,4,5 CK frame id
+      QString m_instrumentNameLong;   //!< Full instrument name
+      QString m_instrumentNameShort;  //!< Shortened instrument name
+      QString m_spacecraftNameLong;   //!< Full spacecraft name
+      QString m_spacecraftNameShort;  //!< Shortened spacecraft name
+      
   };
 };
 #endif

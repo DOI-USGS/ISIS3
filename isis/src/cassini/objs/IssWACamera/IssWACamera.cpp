@@ -20,6 +20,8 @@
 // $Id: IssWACamera.cpp,v 1.6 2009/08/31 15:12:29 slambright Exp $
 #include "IssWACamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -42,6 +44,11 @@ namespace Isis {
    *                          to ShutterOpenCloseTimes() method.
    */
   IssWACamera::IssWACamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Imaging Science Subsystem Wide Angle";
+    m_instrumentNameShort = "ISSWA";
+    m_spacecraftNameLong = "Cassini Huygens";
+    m_spacecraftNameShort = "Cassini";
+    
     NaifStatus::CheckErrors();
     Pvl &lab = *cube.label();
     PvlGroup &bandBin = lab.findGroup("BandBin", Pvl::Traverse);
@@ -92,6 +99,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
@@ -119,7 +127,48 @@ namespace Isis {
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString IssWACamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString IssWACamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString IssWACamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString IssWACamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a IssWACamera

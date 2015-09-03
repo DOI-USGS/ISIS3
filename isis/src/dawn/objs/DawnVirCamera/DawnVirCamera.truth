@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -203
 SPK Reference ID = 1
 
+Spacecraft Name Long: Dawn
+Spacecraft Name Short: Dawn
+Instrument Name Long: Visual and Infrared Spectrometer
+Instrument Name Short: VIR
+
 Start Time: 362681635.867317557
 End Time:   362682561.867271602
 For upper left corner ...

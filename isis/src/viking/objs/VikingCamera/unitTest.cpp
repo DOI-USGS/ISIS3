@@ -20,6 +20,9 @@
 #include <iomanip>
 #include <iostream>
 
+#include <QList>
+#include <QString>
+
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "FileName.h"
@@ -49,70 +52,95 @@ int main(void) {
     // double knownLat = -24.27445959155795;
     // double knownLon = 180.6234165504677;
     // new lat/lon values used due to change in LeastSquares class (this changes ReseauDistortionMap
-    double knownLat = -24.2744713106319;
-    double knownLon = 180.6234120834806;
+    double knownLat[1] = { -24.2744713106319 };
+    double knownLon[1] = { 180.6234120834806 };
+    QList<QString> files;
+    files.append("$viking2/testData/f348b26.cub"); // Viking2 VISB
 
-    Cube c("$viking2/testData/f348b26.cub", "r");
-    VikingCamera *cam = (VikingCamera *) CameraFactory::Create(c);
-    cout << "FileName: " << FileName(c.fileName()).name() << endl;
-    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
-    cout.setf(std::ios::fixed);
-    cout << setprecision(9);
-
-    // Test kernel IDs
-    cout << "Kernel IDs: " << endl;
-    cout << "CK Frame ID = " << cam->CkFrameId() << endl;
-    cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
-    cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
-    cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-
-    // Test Shutter Open/Close 
-    const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
-    double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
-    QString stime = inst["StartTime"];
-    double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.toAscii().data(), &et);
-    pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
-    cout << "Shutter open = " << shuttertimes.first.Et() << endl;
-    cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
-
-    // Test all four corners to make sure the conversions are right
-    cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 1.0, 1.0);
-
-    cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, cam->Samples(), 1.0);
-
-    cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 1.0, cam->Lines());
-
-    cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, cam->Samples(), cam->Lines());
-
-    double samp = cam->Samples() / 2;
-    double line = cam->Lines() / 2;
-    cout << "For center pixel position ..." << endl;
-
-    if(!cam->SetImage(samp, line)) {
-      cout << "ERROR" << endl;
-      return 0;
+    for (int i = 0; i < files.size(); i++) {
+      Cube c(files[i], "r");
+      VikingCamera *cam = (VikingCamera *) CameraFactory::Create(c);
+      cout << "FileName: " << FileName(c.fileName()).name() << endl;
+      cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
+      cout.setf(std::ios::fixed);
+      cout << setprecision(9);
+      
+      // Test kernel IDs
+      cout << "Kernel IDs: " << endl;
+      cout << "CK Frame ID = " << cam->CkFrameId() << endl;
+      cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
+      cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
+      cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+            
+      
+      // Test Shutter Open/Close 
+      const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
+      double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
+      QString stime = inst["StartTime"];
+      double et; // StartTime keyword is the center exposure time
+      str2et_c(stime.toAscii().data(), &et);
+      pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
+      cout << "Shutter open = " << shuttertimes.first.Et() << endl;
+      cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
+      
+      // Test all four corners to make sure the conversions are right
+      cout << "For upper left corner ..." << endl;
+      TestLineSamp(cam, 1.0, 1.0);
+      
+      cout << "For upper right corner ..." << endl;
+      TestLineSamp(cam, cam->Samples(), 1.0);
+      
+      cout << "For lower left corner ..." << endl;
+      TestLineSamp(cam, 1.0, cam->Lines());
+      
+      cout << "For lower right corner ..." << endl;
+      TestLineSamp(cam, cam->Samples(), cam->Lines());
+      
+      double samp = cam->Samples() / 2;
+      double line = cam->Lines() / 2;
+      cout << "For center pixel position ..." << endl;
+      
+      if(!cam->SetImage(samp, line)) {
+        cout << "ERROR" << endl;
+        return 0;
+      }
+      
+      // changed tolerance to allow hiclops to pass
+      if(abs(cam->UniversalLatitude() - knownLat[i]) < 1.18E-05) {
+        cout << "Latitude OK" << endl;
+      }
+      else {
+        cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat[i] << endl;
+      }
+      
+      // changed tolerance to allow hiclops to pass
+      if(abs(cam->UniversalLongitude() - knownLon[i]) < 4.47E-6) {
+        cout << "Longitude OK" << endl;
+      }
+      else {
+        cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i] << endl;
+      }
+      cout << endl << "--------------------------------------------" << endl;
     }
-
-    // changed tolerance to allow hiclops to pass
-    if(abs(cam->UniversalLatitude() - knownLat) < 1.18E-05) {
-      cout << "Latitude OK" << endl;
+    
+    // Test the name methods
+    cout << endl << "Testing name methods:" << endl << endl;
+    files.append("$viking1/testData/f006a03.cropped.cub"); // Viking1 VISA
+    files.append("$viking1/testData/f387a06.cropped.cub"); // Viking1 VISB
+    files.append("$viking2/testData/f004b33.cropped.cub"); // Viking2 VISA
+    for (int i = 0; i < files.size(); i++) {
+      Cube c(files[i], "r");
+      VikingCamera *cam = (VikingCamera *) CameraFactory::Create(c);
+      cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
     }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
-    }
-
-    // changed tolerance to allow hiclops to pass
-    if(abs(cam->UniversalLongitude() - knownLon) < 4.47E-6) {
-      cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
-    }
+    
+    // Test exception: camera is not a supported Kaguya camera
+    cout << endl << "Testing exceptions:" << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    VikingCamera vCam(test);
   }
   catch(IException &e) {
     e.print();

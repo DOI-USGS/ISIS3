@@ -20,6 +20,8 @@
 
 #include "UvvisCamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -42,6 +44,11 @@ namespace Isis {
    *                          call to ShutterOpenCloseTimes() method.
    */
   UvvisCamera::UvvisCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Ultraviolet Visible Camera";
+    m_instrumentNameShort = "UVVIS";
+    m_spacecraftNameLong = "Clementine 1";
+    m_spacecraftNameShort = "Clementine1";
+    
     NaifStatus::CheckErrors();
     // Get the camera characteristics
     SetFocalLength();
@@ -109,6 +116,46 @@ namespace Isis {
   pair<iTime, iTime> UvvisCamera::ShutterOpenCloseTimes(double time,
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString UvvisCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString UvvisCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString UvvisCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString UvvisCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

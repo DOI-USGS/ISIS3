@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -533
 SPK Reference ID = 1
 
+Spacecraft Name Long: Lunar Orbiter 3
+Spacecraft Name Short: LO3
+Instrument Name Long: Medium Resolution Camera
+Instrument Name Short: Medium
+
 Shutter open = -1037285391.254818916
 Shutter close = -1037285391.154819012
 
@@ -30,3 +35,85 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+--------------------------------------------
+FileName: 4008_med_res.cropped.cub
+CK Frame: -534002
+
+Kernel IDs: 
+CK Frame ID = -534000
+CK Reference ID = 1
+SPK Target ID = -534
+SPK Reference ID = 1
+
+Spacecraft Name Long: Lunar Orbiter 4
+Spacecraft Name Short: LO4
+Instrument Name Long: Medium Resolution Camera
+Instrument Name Short: Medium
+
+Shutter open = -1030133550.654679060
+Shutter close = -1030133550.554679155
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+--------------------------------------------
+FileName: 5072_med_res.cropped.cub
+CK Frame: -535002
+
+Kernel IDs: 
+CK Frame ID = -535000
+CK Reference ID = 1
+SPK Target ID = -535
+SPK Reference ID = 1
+
+Spacecraft Name Long: Lunar Orbiter 5
+Spacecraft Name Short: LO5
+Instrument Name Long: Medium Resolution Camera
+Instrument Name Short: Medium
+
+Shutter open = -1022086152.257010460
+Shutter close = -1022086152.157010555
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+--------------------------------------------
+
+Testing exceptions:
+
+**PROGRAMMER ERROR** File does not appear to be a Lunar Orbiter image: -130102 is not a supported instrument kernel code for Lunar Orbiter.

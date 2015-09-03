@@ -48,6 +48,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
  *                         in x, y, z instead of lat, lon.
  *   @history 2014-06-23 Ian Humphrey - Modified hard coded /usgs/cpkgs/ paths to 
  *                           relative pathnames. Fixes #2054.
+ *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added tests for spacecraft and 
+ *                           instrument name methods.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -231,6 +233,13 @@ int main(void) {
     }
 
     cout << endl;
+    
+    // Test name methods
+    cout << endl << "Testing name methods ..." << endl;
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
   }
   catch(IException &e) {
     e.print();

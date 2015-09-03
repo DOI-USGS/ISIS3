@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -85
 SPK Reference ID = 1
 
+Spacecraft Name Long: Lunar Reconnaissance Orbiter
+Spacecraft Name Short: LRO
+Instrument Name Long: Wide Angle Camera Visual
+Instrument Name Short: WAC-VIS
+
 For upper left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
@@ -27,3 +32,15 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Lunar Reconnaissance Orbiter
+Spacecraft Name Short: LRO
+Instrument Name Long: Wide Angle Camera Ultra Violet
+Instrument Name Short: WAC-UV
+
+
+Testing exceptions ...
+
+**USER ERROR** Invalid value [AMICA] for keyword [InstrumentId].

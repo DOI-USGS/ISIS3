@@ -20,6 +20,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QString>
+
 #include "Angle.h"
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -69,9 +71,15 @@ class MyCamera : public Camera {
       return Framing;
     }
 
+    // These are pure virtual within Camera that must be overriden.
     virtual int CkFrameId() const { return (-94000); }
     virtual int CkReferenceId() const { return (1); }
     virtual int SpkReferenceId() const { return (1); }
+    // These are pure virtual within Sensor that must be overriden
+    virtual QString instrumentNameLong() const { return QString("My Camera"); }
+    virtual QString instrumentNameShort() const { return QString("MyCam"); }
+    virtual QString spacecraftNameLong() const { return QString("My Camera 1"); }
+    virtual QString spacecraftNameShort() const { return QString("MyCam1"); }
 };
 
 int main() {

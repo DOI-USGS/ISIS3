@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QList>
 #include <QPointF>
+#include <QString>
 
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
@@ -59,6 +60,11 @@ namespace Isis {
    *
    */
   VimsCamera::VimsCamera(Cube &cube) : Camera(cube) {
+    m_instrumentNameLong = "Visible and Infrared Mapping Spectrometer";
+    m_instrumentNameShort = "VIMS";
+    m_spacecraftNameLong = "Cassini Huygens";
+    m_spacecraftNameShort = "Cassini";
+    
     NaifStatus::CheckErrors();
 
     Pvl &lab = *cube.label();
@@ -209,6 +215,46 @@ namespace Isis {
 
      return offsets;
    }
+   
+   
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString VimsCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString VimsCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString VimsCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString VimsCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
 
 // Plugin

@@ -19,6 +19,8 @@
  */
 #include "MocNarrowAngleCamera.h"
 
+#include <QString>
+
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
@@ -40,6 +42,11 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   MocNarrowAngleCamera::MocNarrowAngleCamera(Cube &cube) : LineScanCamera(cube) {
+    m_instrumentNameLong = "Mars Orbiter Camera Narrow Angle";
+    m_instrumentNameShort = "MOC-NA";
+    m_spacecraftNameLong = "Mars Global Surveyor";
+    m_spacecraftNameShort = "MGS";
+    
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
     //      LoadEulerMounting();
@@ -83,7 +90,48 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString MocNarrowAngleCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString MocNarrowAngleCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString MocNarrowAngleCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString MocNarrowAngleCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a MocNarrowAngleCamera object. 

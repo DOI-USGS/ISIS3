@@ -48,6 +48,11 @@ namespace Isis {
    *   @history 2010-08-04 Jeannie Walldren - Added NAIF error check.
    */
   ThemisVisCamera::ThemisVisCamera(Cube &cube) : PushFrameCamera(cube) {
+    m_instrumentNameLong = "Thermal Emission Imaging System Visual";
+    m_instrumentNameShort = "Themis-VIS";
+    m_spacecraftNameLong = "Mars Odyssey";
+    m_spacecraftNameShort = "Odyssey";
+    
     NaifStatus::CheckErrors();
     // Set up the camera characteristics
     // LoadFrameMounting("M01_SPACECRAFT","M01_THEMIS_VIS");
@@ -118,7 +123,6 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
   
-
 
   ThemisVisCamera::~ThemisVisCamera() {
   }
@@ -235,6 +239,46 @@ namespace Isis {
    */
   int ThemisVisCamera::SpkReferenceId() const {
     return 1;
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString ThemisVisCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString ThemisVisCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString ThemisVisCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString ThemisVisCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

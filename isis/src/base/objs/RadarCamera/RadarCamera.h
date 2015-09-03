@@ -37,8 +37,9 @@ namespace Isis {
    * @author 2009-08-26 Steven Lambright
    *
    * @internal
-   *   @history 2011-05-03 Jeannie Walldren - Added documentation and Isis
-   *            Disclaimer to files.
+   *   @history 2011-05-03 Jeannie Walldren - Added documentation and Isis Disclaimer to files.
+   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
+   *                           Sensor's pure virtual methods.
    *  
    *   @todo Implement more functionality in this class and abstract away from the children
    */

@@ -25,6 +25,8 @@
 #include <string>
 #include <iomanip>
 
+#include <QString>
+
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "iTime.h"
@@ -43,6 +45,11 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   HiriseCamera::HiriseCamera(Cube &cube) : LineScanCamera(cube) {
+    m_instrumentNameLong = "High Resolution Imaging Science Experiment";
+    m_instrumentNameShort = "HiRISE";
+    m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
+    m_spacecraftNameShort = "MRO";
+    
     NaifStatus::CheckErrors();
     // Setup camera characteristics from instrument and frame kernel
     SetFocalLength();
@@ -130,6 +137,46 @@ namespace Isis {
 
   //! Destroys the HiriseCamera object
   HiriseCamera::~HiriseCamera() {}
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString HiriseCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString HiriseCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString HiriseCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString HiriseCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
 
 

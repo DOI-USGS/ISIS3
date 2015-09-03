@@ -24,11 +24,14 @@
 #include "LoHighDistortionMap.h"
 #include "LoCameraFiducialMap.h"
 
+#include <QString>
+
 #include "Affine.h"
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
+#include "IException.h"
 #include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
@@ -48,6 +51,32 @@ namespace Isis {
    */
   LoHighCamera::LoHighCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
+    
+    m_instrumentNameLong = "High Resolution Camera";
+    m_instrumentNameShort = "High";
+    
+    // LO3 High instrument kernel code = -533001
+    if (naifIkCode() == -533001) {
+      m_spacecraftNameLong = "Lunar Orbiter 3";
+      m_spacecraftNameShort = "LO3";
+    }
+    // L04 High instrument kernel code = -534001
+    else if (naifIkCode() == -534001) {
+      m_spacecraftNameLong = "Lunar Orbiter 4";
+      m_spacecraftNameShort = "LO4";
+    }
+    // LO5 High instrument kernel code = -535001
+    else if (naifIkCode() == -535001) {
+      m_spacecraftNameLong = "Lunar Orbiter 5";
+      m_spacecraftNameShort = "LO5";
+    }
+    else {
+      QString msg = "File does not appear to be a Lunar Orbiter image: ";
+      msg += QString::number(naifIkCode());
+      msg += " is not a supported instrument kernel code for Lunar Orbiter.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     // Get the Instrument label information needed to define the camera for this frame
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -102,6 +131,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times. The user should pass in the
    * exposure duration in seconds and the StartTime keyword value, converted to
@@ -133,7 +163,48 @@ namespace Isis {
     shuttertimes.second = time + (exposureDuration / 2);
     return shuttertimes;
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString LoHighCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString LoHighCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString LoHighCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString LoHighCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a LoHighCamera

@@ -42,7 +42,26 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   LroNarrowAngleCamera::LroNarrowAngleCamera(Cube &cube) : LineScanCamera(cube) {
+    m_spacecraftNameLong = "Lunar Reconnaissance Orbiter";
+    m_spacecraftNameShort = "LRO";
+    // NACL instrument kernel code = -85600
+    if (naifIkCode() == -85600) {
+      m_instrumentNameLong = "Narrow Angle Camera Left";
+      m_instrumentNameShort = "NACL";
+    }
+    // NACR instrument kernel code = -85610
+    else if (naifIkCode() == -85610) {
+      m_instrumentNameLong = "Narrow Angle Camera Right";
+      m_instrumentNameShort = "NACR";
+    }
+    else {
+      QString msg = "File does not appear to be a Lunar Reconnaissance Orbiter Image: ";
+      msg += QString::number(naifIkCode());
+      msg += " is not a supported instrument kernel code for Lunar Reconnaissance Orbiter.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     NaifStatus::CheckErrors();
+
     // Set up the camera info from ik/iak kernels
     SetFocalLength();
     SetPixelPitch();
@@ -118,6 +137,46 @@ namespace Isis {
 
     LoadCache();
     NaifStatus::CheckErrors();
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString LroNarrowAngleCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString LroNarrowAngleCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString LroNarrowAngleCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString LroNarrowAngleCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

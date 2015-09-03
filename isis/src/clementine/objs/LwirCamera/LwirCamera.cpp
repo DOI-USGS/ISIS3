@@ -20,6 +20,8 @@
 
 #include "LwirCamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -46,6 +48,11 @@ namespace Isis {
    *                          models.
    */
   LwirCamera::LwirCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Long Wave Infrared Camera";
+    m_instrumentNameShort = "LWIR";
+    m_spacecraftNameLong = "Clementine 1";
+    m_spacecraftNameShort = "Clementine1";
+
     NaifStatus::CheckErrors();
 
     // Get the camera characteristics
@@ -127,6 +134,46 @@ namespace Isis {
   pair<iTime, iTime> LwirCamera::ShutterOpenCloseTimes(double time,
                                                        double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString LwirCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString LwirCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString LwirCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString LwirCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

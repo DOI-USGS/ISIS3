@@ -158,3 +158,10 @@ Sample:3.0121    Line:4.39113
 Latitude OK
 Longitude OK
 
+
+Testing name methods ...
+Spacecraft Name Long: Cassini Huygens
+Spacecraft Name Short: Cassini
+Instrument Name Long: Visible and Infrared Mapping Spectrometer
+Instrument Name Short: VIMS
+

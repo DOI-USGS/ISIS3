@@ -21,6 +21,8 @@
 #include "ThemisIrCamera.h"
 #include "ThemisIrDistortionMap.h"
 
+#include <QString>
+
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
 #include "iTime.h"
@@ -40,6 +42,11 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   ThemisIrCamera::ThemisIrCamera(Cube &cube) : LineScanCamera(cube) {
+    m_instrumentNameLong = "Thermal Emission Imaging System Infrared";
+    m_instrumentNameShort = "Themis-IR";
+    m_spacecraftNameLong = "Mars Odyssey";
+    m_spacecraftNameShort = "Odyssey";
+    
     NaifStatus::CheckErrors();
     // Set the detector size
     SetPixelPitch(0.05);
@@ -199,6 +206,46 @@ namespace Isis {
     ThemisIrDistortionMap *distMap =
       (ThemisIrDistortionMap *) DistortionMap();
     distMap->SetBand(band);
+  }
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString ThemisIrCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString ThemisIrCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString ThemisIrCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString ThemisIrCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

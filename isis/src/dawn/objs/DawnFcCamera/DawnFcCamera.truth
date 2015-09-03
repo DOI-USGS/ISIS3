@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -203
 SPK Reference ID = 1
 
+Spacecraft Name Long: Dawn
+Spacecraft Name Short: Dawn
+Instrument Name Long: Framing Camera 2
+Instrument Name Short: FC2
+
 Shutter open = 288188598.789185643
 Shutter close = 288188598.849185646
 
@@ -30,3 +35,7 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+Testing exceptions ...
+
+**PROGRAMMER ERROR** File does not appear to be a Dawn Framing Camera image. (-130102 is not a Dawn FC instrument code).

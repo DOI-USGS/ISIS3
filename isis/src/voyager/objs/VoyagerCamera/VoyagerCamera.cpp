@@ -24,6 +24,8 @@
 
 #include <SpiceUsr.h>
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -79,14 +81,20 @@ namespace Isis {
     if (spacecraft == "VOYAGER_1") {
       p_ckFrameId = -31100;
       p_spkTargetId = -31;
+      m_spacecraftNameLong = "Voyager 1";
+      m_spacecraftNameShort = "Voyager1";
 
       reseauFileName += "1/reseaus/vg1";
 
       if (instId == "NARROW_ANGLE_CAMERA") {
         reseauFileName += "na";
+        m_instrumentNameLong = "Narrow Angle Camera";
+        m_instrumentNameShort = "NAC";
       }
       else if (instId == "WIDE_ANGLE_CAMERA") {
         reseauFileName += "wa";
+        m_instrumentNameLong = "Wide Angle Camera";
+        m_instrumentNameShort = "WAC";
       }
       else {
         QString msg = "File does not appear to be a Voyager image. InstrumentId ["
@@ -97,14 +105,20 @@ namespace Isis {
     else if (spacecraft == "VOYAGER_2") {
       p_ckFrameId = -32100;
       p_spkTargetId = -32;
+      m_spacecraftNameLong = "Voyager 2";
+      m_spacecraftNameShort = "Voyager2";
 
       reseauFileName += "2/reseaus/vg2";
 
       if (instId == "NARROW_ANGLE_CAMERA") {
         reseauFileName += "na";
+        m_instrumentNameLong = "Narrow Angle Camera";
+        m_instrumentNameShort = "NAC";
       }
       else if (instId == "WIDE_ANGLE_CAMERA") {
         reseauFileName += "wa";
+        m_instrumentNameLong = "Wide Angle Camera";
+        m_instrumentNameShort = "WAC";
       }
       else {
         QString msg = "File does not appear to be a Voyager image. InstrumentId ["
@@ -162,6 +176,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times. The user should pass in the
    * ExposureDuration keyword value and the StartTime keyword value, converted
@@ -192,6 +207,46 @@ namespace Isis {
     // To get shutter start (open) time, take off the exposure duration from the end time.
     shuttertimes.first = shuttertimes.second.Et() - exposureDuration;
     return shuttertimes;
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString VoyagerCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString VoyagerCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString VoyagerCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString VoyagerCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

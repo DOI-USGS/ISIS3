@@ -21,6 +21,8 @@
  */
 #include "SsiCamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -47,6 +49,11 @@ namespace Isis {
    *                          to ShutterOpenCloseTimes() method.
    */
   SsiCamera::SsiCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Solid State Imaging System";
+    m_instrumentNameShort = "SSI";
+    m_spacecraftNameLong = "Galileo Orbiter";
+    m_spacecraftNameShort = "Galileo";
+    
     NaifStatus::CheckErrors();
     // Get the camera characteristics
     double k1;
@@ -140,7 +147,48 @@ namespace Isis {
     shuttertimes.second = time + (exposureDuration / 2.0);
     return shuttertimes;
   }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString SsiCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString SsiCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString SsiCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString SsiCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
+
 
 /**
  * This is the function that is called in order to instantiate a SsiCamera

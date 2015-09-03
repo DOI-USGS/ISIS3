@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -98
 SPK Reference ID = 1
 
+Spacecraft Name Long: New Horizons
+Spacecraft Name Short: NewHorizons
+Instrument Name Long: Linear Etalon Imaging Spectral Array
+Instrument Name Short: LEISA
+
 Test forward and backward line/samp to lat/lon delta for Band #1
   For upper left corner (1.0, 194.000000000) ...
   DeltaSample = 0.000000000

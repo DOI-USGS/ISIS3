@@ -381,3 +381,9 @@ Solar Distance      = 1.4234234
 
 Test Bad ground point using ShapeModel=$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub
 Has Intersection    = 0
+Test name methods ...
+Spacecraft Name Long: My Spacecraft
+Spacecraft Name Short: MySpacecraft
+Instrument Name Long: My Sensor
+Instrument Name Short: MySensor
+

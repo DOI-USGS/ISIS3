@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -76
 SPK Reference ID = 1
 
+Spacecraft Name Long: Mariner 10
+Spacecraft Name Short: Mariner10
+Instrument Name Long: Mariner 10 Vidicon A
+Instrument Name Short: VIDICON A
+
 Shutter open = -812916168.429748774
 Shutter close = -812916168.406948805
 
@@ -41,6 +46,11 @@ CK Reference ID = 1
 SPK Target ID = -76
 SPK Reference ID = 1
 
+Spacecraft Name Long: Mariner 10
+Spacecraft Name Short: Mariner10
+Instrument Name Long: Mariner 10 Vidicon B
+Instrument Name Short: VIDICON B
+
 Shutter open = -797710216.329613090
 Shutter close = -797710216.329613090
 
@@ -65,3 +75,7 @@ Latitude OK
 Longitude OK
 
 --------------------------------------------
+
+Testing exceptions:
+
+**USER ERROR** File does not appear to be a Mariner10 image. InstrumentId [AMICA] is invalid Mariner 10 value.

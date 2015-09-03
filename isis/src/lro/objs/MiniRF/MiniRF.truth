@@ -22,6 +22,19 @@ For center pixel position ...
 Latitude OK
 Longitude OK
 
+
+Testing name methods ...
+Spacecraft Name Long: Chandrayaan 1
+Spacecraft Name Short: Chan1
+Instrument Name Long: Miniature Synthetic Aperture Radar
+Instrument Name Short: Mini-SAR
+
+Spacecraft Name Long: Lunar Reconnaissance Orbiter
+Spacecraft Name Short: LRO
+Instrument Name Long: Miniature Radio Frequency
+Instrument Name Short: Mini-RF
+
+
 Kernel ID error messages: 
 **USER ERROR** Cannot generate CK for MiniRF.
 **USER ERROR** Cannot generate CK for MiniRF.

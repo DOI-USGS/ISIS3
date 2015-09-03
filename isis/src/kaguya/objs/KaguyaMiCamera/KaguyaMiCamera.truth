@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -131
 SPK Reference ID = 1
 
+Spacecraft Name Long: Kaguya
+Spacecraft Name Short: Kaguya
+Instrument Name Long: Multi Band Imager Visible
+Instrument Name Short: MI-VIS
+
 For upper left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
@@ -38,6 +43,11 @@ CK Reference ID = 1
 SPK Target ID = -131
 SPK Reference ID = 1
 
+Spacecraft Name Long: Kaguya
+Spacecraft Name Short: Kaguya
+Instrument Name Long: Multi Band Imager Infrared
+Instrument Name Short: MI-NIR
+
 For upper left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
@@ -59,3 +69,7 @@ Latitude OK
 Longitude OK
 
 --------------------------------------------
+
+Testing exceptions:
+
+**PROGRAMMER ERROR** -130102 is not a supported instrument kernel code for Kaguya.

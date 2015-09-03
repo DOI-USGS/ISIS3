@@ -54,6 +54,13 @@ int main(void) {
       cam = CameraFactory::Create(cube);
       cout << "FileName: " << FileName(files[i]).name() << endl;
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
+      
+      // Test name methods
+      cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
+      
       cout.setf(std::ios::fixed);
       cout << setprecision(9);
 

@@ -31,3 +31,16 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Messenger
+Spacecraft Name Short: Messenger
+Instrument Name Long: Mercury Dual Imaging System Wide Angle Camera
+Instrument Name Short: MDIS-WAC
+
+Spacecraft Name Long: Messenger
+Spacecraft Name Short: Messenger
+Instrument Name Long: Mercury Dual Imaging System Narrow Angle Camera
+Instrument Name Short: MDIS-NAC
+

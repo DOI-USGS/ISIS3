@@ -30,3 +30,25 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Apollo 15
+Spacecraft Name Short: Apollo15
+Instrument Name Long: Metric Camera
+Instrument Name Short: Metric
+
+Spacecraft Name Long: Apollo 16
+Spacecraft Name Short: Apollo16
+Instrument Name Long: Metric Camera
+Instrument Name Short: Metric
+
+Spacecraft Name Long: Apollo 17
+Spacecraft Name Short: Apollo17
+Instrument Name Long: Metric Camera
+Instrument Name Short: Metric
+
+
+Testing exceptions:
+
+**USER ERROR** File does not appear to be an Apollo image.

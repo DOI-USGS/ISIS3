@@ -29,6 +29,8 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -56,6 +58,9 @@ namespace Isis {
    */
   Mariner10Camera::Mariner10Camera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
+    
+    m_spacecraftNameLong = "Mariner 10";
+    m_spacecraftNameShort = "Mariner10";
 
     //  Turn off the aberration corrections for instrument position object
     instrumentPosition()->SetAberrationCorrection("NONE");
@@ -94,9 +99,13 @@ namespace Isis {
     QString cam;
     if(instId == "M10_VIDICON_A") {
       cam = "a";
+      m_instrumentNameLong = "Mariner 10 Vidicon A";
+      m_instrumentNameShort = "VIDICON A";
     }
     else if(instId == "M10_VIDICON_B") {
       cam = "b";
+      m_instrumentNameLong = "Mariner 10 Vidicon B";
+      m_instrumentNameShort = "VIDICON B";
     }
     else {
       QString msg = "File does not appear to be a Mariner10 image. InstrumentId ["
@@ -123,6 +132,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
@@ -152,6 +162,46 @@ namespace Isis {
     // To get shutter end (close) time, add half exposure duration
     shuttertimes.second = time + (exposureDuration / 2.0);
     return shuttertimes;
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString Mariner10Camera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString Mariner10Camera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString Mariner10Camera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString Mariner10Camera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

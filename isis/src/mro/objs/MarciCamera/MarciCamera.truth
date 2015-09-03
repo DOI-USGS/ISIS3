@@ -8,6 +8,11 @@ CK Reference ID = -74900
 SPK Target ID = -74
 SPK Reference ID = 1
 
+Spacecraft Name Long: Mars Reconnaissance Orbiter
+Spacecraft Name Short: MRO
+Instrument Name Long: Mars Color Imager
+Instrument Name Short: MARCI
+
 For upper left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000

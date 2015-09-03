@@ -27,3 +27,10 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Test name methods ...
+Spacecraft Name Long: Mars Global Surveyor
+Spacecraft Name Short: MGS
+Instrument Name Long: Mars Orbiter Camera Wide Angle
+Instrument Name Short: MOC-WA

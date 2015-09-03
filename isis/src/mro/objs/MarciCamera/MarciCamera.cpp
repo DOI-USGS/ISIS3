@@ -22,6 +22,8 @@
 #include "MarciCamera.h"
 #include "MarciDistortionMap.h"
 
+#include <QString>
+
 #include "CameraFocalPlaneMap.h"
 #include "CameraSkyMap.h"
 #include "IException.h"
@@ -44,6 +46,11 @@ namespace Isis {
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
    */
   MarciCamera::MarciCamera(Cube &cube) : PushFrameCamera(cube) {
+    m_instrumentNameLong = "Mars Color Imager";
+    m_instrumentNameShort = "MARCI";
+    m_spacecraftNameLong = "Mars Reconnaissance Orbiter";
+    m_spacecraftNameShort = "MRO";
+
     NaifStatus::CheckErrors();
     Pvl &lab = *cube.label();
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -238,7 +245,47 @@ namespace Isis {
   int MarciCamera::SpkReferenceId() const {
     return (1);
   }
-
+  
+  
+  
+   /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString MarciCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString MarciCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString MarciCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString MarciCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
+  }
 }
 
 

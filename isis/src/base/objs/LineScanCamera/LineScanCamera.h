@@ -43,6 +43,8 @@ namespace Isis {
    *   @history 2010-08-04 Jeannie Walldren - Fixed the \#ifndef identifier to
    *                          define PushFrameCamera_h.  Updated documentation.
    *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
+   *                           Sensor's pure virtual methods.
    *  
    *   @todo Implement more functionality in this class and abstract away from the children
    */

@@ -35,19 +35,21 @@ void TestLineSamp(Camera *cam, double samp, double line);
 /**
  * @internal
  *   @history 2009-08-03 Jeannie Walldren - Changed known lat
- *            and lon.
+ *                           and lon.
  *   @history 2009-08-06 Jeannie Walldren - Added cmath include
- *            and changed calls to abs() to fabs() since the
- *            abs() function takes integer values while the
- *            fabs() takes floats. Changed Center Lat tolerance
- *            from 1E-10 to 2E-10 since the difference on Darwin powerpc
- *            was 1.93E-10.  Changed Center Lon tolerance from
- *            1E-10 to 1.1E-10 since the difference on Darwin powerpc
- *            was 1.03E-10.
+ *                           and changed calls to abs() to fabs() since the
+ *                           abs() function takes integer values while the
+ *                           fabs() takes floats. Changed Center Lat tolerance
+ *                           from 1E-10 to 2E-10 since the difference on Darwin powerpc
+ *                           was 1.93E-10.  Changed Center Lon tolerance from
+ *                           1E-10 to 1.1E-10 since the difference on Darwin powerpc
+ *                           was 1.03E-10.
  *   @history 2010-02-24 Christopher Austin - Changed the knowLat/Lon
- *            in accordence with the system changes
+ *                           in accordence with the system changes
  *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test
- *            for new methods. Added Isis Disclaimer to file.
+ *                           for new methods. Added Isis Disclaimer to file.
+ *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added tests for spacecraft and 
+ *                           instrument name methods.
  */
 
 int main(void) {
@@ -120,6 +122,13 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+    
+    // Test name methods
+    cout << endl << endl << "Testing name methods ..." << endl;
+    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl;
   }
   catch(IException &e) {
     e.print();

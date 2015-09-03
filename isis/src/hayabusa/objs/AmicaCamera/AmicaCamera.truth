@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -130
 SPK Reference ID = 1
 
+Spacecraft Name Long: Hayabusa
+Spacecraft Name Short: Hayabusa
+Instrument Name Long: Amica
+Instrument Name Short: Amica
+
 Shutter open = 184747466.182630032
 Shutter close = 184747466.182673544
 

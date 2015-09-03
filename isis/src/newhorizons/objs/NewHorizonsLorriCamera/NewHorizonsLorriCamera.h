@@ -22,6 +22,8 @@
 
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * This is the camera model for the Dawn Framing Camera 
@@ -32,6 +34,9 @@ namespace Isis {
    * @author 2013-11-12 Stuart Sides
    *
    * @internal 
+   *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test 
+   *                           added methods.
    *  
    */
   class NewHorizonsLorriCamera : public FramingCamera {
@@ -78,6 +83,17 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
+   
+    private:
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

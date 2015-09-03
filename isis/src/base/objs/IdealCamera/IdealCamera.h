@@ -24,6 +24,8 @@
 
 #include "Camera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Ideal Camera Model
@@ -64,7 +66,9 @@ namespace Isis {
    *                           method (legacy attached spice) works by pushing the keywords on the
    *                           fly into the NaifKeywords object (kernels won't need to be
    *                           furnished). The third method works automatically. References #1094.
-   *  
+   *  @history 2015-08-25 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods.
    */
   class IdealCamera : public Camera {
     public:
@@ -89,9 +93,17 @@ namespace Isis {
       virtual int SpkTargetId() const;
       virtual int SpkCenterId() const;
       virtual int SpkReferenceId() const;
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
     private:
       bool p_framing; //!< true if framing camera
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 

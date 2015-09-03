@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -41
 SPK Reference ID = 1
 
+Spacecraft Name Long: Mars Express
+Spacecraft Name Short: MEX
+Instrument Name Long: High Resolution Stereo Camera
+Instrument Name Short: HRSC
+
 For upper left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000

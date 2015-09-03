@@ -21,9 +21,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "LineScanCamera.h"
+
 #include <QString>
 
-#include "LineScanCamera.h"
 #include "VariableLineScanCameraDetectorMap.h"
 
 namespace Isis {
@@ -43,6 +44,9 @@ namespace Isis {
    * @internal
    *
    *   @history 2013-02-21 Kris Becker Original version
+   *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           these methods.
    *
    */
   class CrismCamera : public LineScanCamera {
@@ -87,14 +91,24 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
   private:
     std::vector<LineRateChange> m_lineRates;
     bool m_isBandDependent;
 
 
-     double getEtTime(const QString &sclk);
-
+    double getEtTime(const QString &sclk);
+   
+   
+    QString m_instrumentNameLong; //!< Full instrument name
+    QString m_instrumentNameShort; //!< Shortened instrument name
+    QString m_spacecraftNameLong; //!< Full spacecraft name
+    QString m_spacecraftNameShort; //!< Shortened spacecraft name
      
 
   };

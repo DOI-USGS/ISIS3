@@ -20,10 +20,13 @@
 #include <iomanip>
 #include <iostream>
 
+#include <QStringList>
+
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "LroNarrowAngleCamera.h"
 #include "Preference.h"
 #include "Pvl.h"
 #include "iTime.h"
@@ -43,59 +46,40 @@ int main(void) {
    */
   cout << "Unit Test for LroNarrowAngleCamera..." << endl;
   try {
-    // Support different camera model versions thusly...
+    double knownLat = -83.2598150072595899;
+    double knownLon = 353.9497987082821737;
     Cube c("$lro/testData/M111607830RE_crop.cub", "r");
-    int cmVersion = CameraFactory::CameraVersion(c);
-
-    // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
-    // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
-    // and "Longitude off by: " values directly into these variables.
-    double knownLat, knownLon;
-
-    // Camera Version 1's test is provided here for easy testing with an old version of the camera,
-    //   this is generally not executed
-    if (cmVersion == 1) {
-      knownLat = -83.229473272165;
-      knownLon = 353.93153626711;
-      c.close();
-      c.open("$lro/testData/M111607830RE_crop.cub.cv1", "r");
-    }
-    else {
-      knownLat = -83.2598150072595899;
-      knownLon = 353.9497987082821737;
-    }
-
     Camera *cam = CameraFactory::Create(c);
     
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
-
+    
     // Test kernel IDs
     cout << "Kernel IDs: " << endl;
     cout << "CK Frame ID = " << cam->CkFrameId() << endl;
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-
+    
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;
     TestLineSamp(cam, 1.0, 1.0);
-
+    
     cout << "For upper right corner ..." << endl;
     TestLineSamp(cam, cam->Samples(), 1.0);
-
+    
     cout << "For lower left corner ..." << endl;
     TestLineSamp(cam, 1.0, cam->Lines());
-
+    
     cout << "For lower right corner ..." << endl;
     TestLineSamp(cam, cam->Samples(), cam->Lines());
-
+    
     double samp = cam->Samples() / 2;
     double line = cam->Lines() / 2;
     cout << "For center pixel position ..." << endl;
-
+    
     if(!cam->SetImage(samp, line)) {
       cout << "ERROR" << endl;
       return 0;
@@ -107,13 +91,32 @@ int main(void) {
     else {
       cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
     }
-
+    
     if(abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
       cout << "Longitude OK" << endl;
     }
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+    }    
+    // Test name methods
+    cout << endl << endl << "Testing name methods ..." << endl;
+    QStringList files;
+    files.append("$lro/testData/M111607830RE_crop.cub");
+    files.append("$lro/testData/M1153718003LE.reduced.cub");
+    
+    for (int i = 0; i < files.size(); i++) {
+      Cube n(files[i], "r");
+      Camera *nCam = CameraFactory::Create(n);
+      cout << "Spacecraft Name Long: " << nCam->spacecraftNameLong() << endl;
+      cout << "Spacecraft Name Short: " << nCam->spacecraftNameShort() << endl;
+      cout << "Instrument Name Long: " << nCam->instrumentNameLong() << endl;
+      cout << "Instrument Name Short: " << nCam->instrumentNameShort() << endl << endl;
     }
+    
+    // Test exception: camera is not a supported Kaguya camera
+    cout << endl << "Testing exceptions:" << endl << endl;
+    Cube test("$hayabusa/testData/st_2530292409_v.cub", "r");
+    LroNarrowAngleCamera testCam(test);
   }
   catch(IException &e) {
     e.print();

@@ -22,6 +22,8 @@
 #include "LoMediumDistortionMap.h"
 #include "LoCameraFiducialMap.h"
 
+#include <QString>
+
 #include "Affine.h"
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
@@ -49,6 +51,32 @@ namespace Isis {
    */
   LoMediumCamera::LoMediumCamera(Cube &cube) : FramingCamera(cube) {
     NaifStatus::CheckErrors();
+    
+    m_instrumentNameLong = "Medium Resolution Camera";
+    m_instrumentNameShort = "Medium";
+    
+    // L03 Medium instrument kernel code = -533002
+    if (naifIkCode() == -533002) {
+      m_spacecraftNameLong = "Lunar Orbiter 3";
+      m_spacecraftNameShort = "LO3";
+    }
+    // LO4 Medium instrument kernel code = -534002
+    else if (naifIkCode() == -534002) {
+      m_spacecraftNameLong = "Lunar Orbiter 4";
+      m_spacecraftNameShort = "LO4";
+    }
+    // LO5 Medium instrument kernel code = -535002
+    else if (naifIkCode() == -535002) {
+      m_spacecraftNameLong = "Lunar Orbiter 5";
+      m_spacecraftNameShort = "LO5";
+    }
+    else {
+      QString msg = "File does not appear to be a Lunar Orbiter image: ";
+      msg += QString::number(naifIkCode());
+      msg += " is not a supported instrument kernel code for Lunar Orbiter.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     // Get the Instrument label information needed to define the camera for this frame
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
@@ -125,6 +153,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+  
   /**
    * Returns the shutter open and close times. The user should pass in the
    * exposure duration in seconds and the StartTime keyword value, converted to
@@ -155,6 +184,46 @@ namespace Isis {
     // To get shutter end (close) time, add half the exposure duration to the center time
     shuttertimes.second = time + (exposureDuration / 2);
     return shuttertimes;
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString LoMediumCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString LoMediumCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString LoMediumCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString LoMediumCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

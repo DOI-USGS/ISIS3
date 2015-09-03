@@ -30,3 +30,11 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Galileo Orbiter
+Spacecraft Name Short: Galileo
+Instrument Name Long: Solid State Imaging System
+Instrument Name Short: SSI
+

@@ -2,6 +2,9 @@
 #define DawnVirCamera_h
 
 #include "LineScanCamera.h"
+
+#include <QString>
+
 #include "VariableLineScanCameraDetectorMap.h"
 
 #include "tnt/tnt_array2d.h"
@@ -51,6 +54,9 @@ namespace Isis {
      *            FRAME_PARAMETER[2] value.
      *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
      *            coding standards. References #972.
+     *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+     *                           to get spacecraft and instrument names. Extended unit test to test
+     *                           these methods.
      */
     class DawnVirCamera : public LineScanCamera {
       public:
@@ -66,6 +72,11 @@ namespace Isis {
 
         /** SPK Reference ID - J2000 */
         virtual int SpkReferenceId() const;
+        
+        virtual QString instrumentNameLong() const;
+        virtual QString instrumentNameShort() const;
+        virtual QString spacecraftNameLong() const;
+        virtual QString spacecraftNameShort() const;
 
       private:
         typedef TNT::Array2D<SpiceDouble> SMatrix;       //!<  2-D buffer
@@ -84,6 +95,11 @@ namespace Isis {
         double m_exposureTime;   ///!< Line exposure time
         int    m_summing;        ///!< Summing/binnning mode
         double m_scanRate;       ///!< Line scan rate
+        
+        QString m_instrumentNameLong; //!< Full instrument name
+        QString m_instrumentNameShort; //!< Shortened instrument name
+        QString m_spacecraftNameLong; //!< Full spacecraft name
+        QString m_spacecraftNameShort; //!< Shortened spacecraft name
 
         std::vector<LineRateChange> m_lineRates;
         std::vector<ScanMirrorInfo> m_mirrorData;

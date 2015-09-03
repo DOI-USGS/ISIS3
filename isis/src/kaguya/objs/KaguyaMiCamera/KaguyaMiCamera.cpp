@@ -21,6 +21,8 @@
 
 #include <iomanip>
 
+#include <QString>
+
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
 #include "IString.h"
@@ -42,6 +44,24 @@ namespace Isis {
    *   @history 2012-06-14 Orrin Thomas - original version
    */
   KaguyaMiCamera::KaguyaMiCamera(Cube &cube) : LineScanCamera(cube) {
+    m_spacecraftNameLong = "Kaguya";
+    m_spacecraftNameShort = "Kaguya";
+    // MI-VIS instrument kernel code = -131335
+    if (naifIkCode() == -131335) {
+      m_instrumentNameLong = "Multi Band Imager Visible";
+      m_instrumentNameShort = "MI-VIS";
+    }
+    // MI-NIR instrument kernel code = -131341
+    else if (naifIkCode() == -131341) {
+      m_instrumentNameLong = "Multi Band Imager Infrared";
+      m_instrumentNameShort = "MI-NIR";
+    }
+    else {
+      QString msg = QString::number(naifIkCode());
+      msg += " is not a supported instrument kernel code for Kaguya.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     NaifStatus::CheckErrors();
     // Set up the camera info from ik/iak kernels
 
@@ -98,6 +118,46 @@ namespace Isis {
     LoadCache();
 
     NaifStatus::CheckErrors();
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString KaguyaMiCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString KaguyaMiCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString KaguyaMiCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString KaguyaMiCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

@@ -20,6 +20,8 @@
 
 #include "AmicaCamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -40,6 +42,11 @@ namespace Isis {
    * @internal
    */
   AmicaCamera::AmicaCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Amica";
+    m_instrumentNameShort = "Amica";
+    m_spacecraftNameLong = "Hayabusa";
+    m_spacecraftNameShort = "Hayabusa";
+
     NaifStatus::CheckErrors();
     Pvl &lab = *cube.label();
     // Get the camera characteristics
@@ -119,6 +126,46 @@ namespace Isis {
   pair<iTime, iTime> AmicaCamera::ShutterOpenCloseTimes(double time,
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+
+
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString AmicaCamera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString AmicaCamera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString AmicaCamera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString AmicaCamera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 }
 

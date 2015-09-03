@@ -45,3 +45,11 @@ DeltaLine = 0.0001
 
 Latitude OK
 Longitude OK
+
+
+Testing name methods ...
+Spacecraft Name Long: Mars Reconnaissance Orbiter
+Spacecraft Name Short: MRO
+Instrument Name Long: Compact Reconnaissance Imaging Spectrometer for Mars
+Instrument Name Short: CRISM
+

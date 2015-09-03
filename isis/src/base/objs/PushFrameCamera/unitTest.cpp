@@ -44,6 +44,11 @@ class MyCamera : public PushFrameCamera {
       string msg = "SPK Reference ID is unique to mission-specific cameras";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
+    // These are pure virtual within Sensor that must be overriden
+    virtual QString instrumentNameLong() const { return QString("Push Frame"); }
+    virtual QString instrumentNameShort() const { return QString("PF"); }
+    virtual QString spacecraftNameLong() const { return QString("Push Frame 1"); }
+    virtual QString spacecraftNameShort() const { return QString("PF1"); }
 };
 
 int main() {

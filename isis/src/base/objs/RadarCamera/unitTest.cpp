@@ -46,6 +46,12 @@ class MyCamera : public RadarCamera {
       string msg = "SPK Reference ID is unique to mission-specific cameras";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
+    
+    // These are pure virtual within Sensor that must be overriden
+    virtual QString instrumentNameLong() const { return QString("Radar Camera"); }
+    virtual QString instrumentNameShort() const { return QString("RC"); }
+    virtual QString spacecraftNameLong() const { return QString("Radar Camera 1"); }
+    virtual QString spacecraftNameShort() const { return QString("RC1"); }
 };
 
 int main() {

@@ -8,6 +8,11 @@ CK Reference ID = 1
 SPK Target ID = -86
 SPK Reference ID = 1
 
+Spacecraft Name Long: Chandrayaan 1
+Spacecraft Name Short: Chan1
+Instrument Name Long: Moon Mineralogy Mapper
+Instrument Name Short: M3
+
 For upper left corner ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000

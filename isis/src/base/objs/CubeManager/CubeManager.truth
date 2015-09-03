@@ -25,3 +25,28 @@ Verify cube attributes have been taken into account
   Cube 4 | 1
   Cube 5 | 1
   Cube 6 | 1
+
+Verify blobTruth cubes have been cleaned
+Cube FileNames: 
+  1 : isisTruth
+  2 : isisTruth
+  3 : (cleaned)
+  4 : (cleaned)
+  5 : isisTruth
+  6 : isisTruth
+
+Set number of open cubes to 2
+
+Currently managed cubes:
+  1 : isisTruth
+  2 : blobTruth
+
+Opened isisTruth2.cub.
+Verify isisTruth2.cub is now managed and limit of 2 is enforced:
+  1 : blobTruth
+  2 : isisTruth2
+
+Setting number of open cubes > 60 percent of system open file limit
+
+Attempting to open a file that does not exist:
+  **I/O ERROR** Unable to open [dne.cub].

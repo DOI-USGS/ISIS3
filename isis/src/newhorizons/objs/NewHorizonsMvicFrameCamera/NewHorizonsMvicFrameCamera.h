@@ -22,6 +22,8 @@
 
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * This is the camera model for the New Horizons MVIC Frame mode Camera 
@@ -32,7 +34,9 @@ namespace Isis {
    * @author 2014-03-31 Tracie Sucharski
    *
    * @internal 
-   *  
+   *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test
+   *                           added methods.
    */
   class NewHorizonsMvicFrameCamera : public FramingCamera {
     public:
@@ -88,12 +92,21 @@ namespace Isis {
        */
       virtual int SpkReferenceId() const { return (1); }
 
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
     private:
       QList<int> m_originalBand;
       QList<QString> m_utcTime;
       double m_etStart;
       double m_exposure;
+      
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

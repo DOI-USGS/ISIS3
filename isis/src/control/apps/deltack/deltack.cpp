@@ -5,6 +5,7 @@
 #include "BundleAdjust.h"
 #include "BundleResults.h"
 #include "BundleSettings.h"
+#include "CameraFactory.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -15,7 +16,6 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Process.h"
-#include "Sensor.h"
 #include "SerialNumberList.h"
 #include "Table.h"
 
@@ -162,9 +162,9 @@ void IsisMain() {
 // Compute the radius at the lat/lon
 Distance GetRadius(QString inputFile, Latitude lat, Longitude lon) {
   Cube cube(inputFile, "r");
-  Sensor sensor(cube);
-  sensor.SetGround(SurfacePoint(lat, lon, sensor.LocalRadius(lat, lon)));
-  Distance radius = sensor.LocalRadius();
+  Camera *sensor = CameraFactory::Create(cube);
+  sensor->SetGround(SurfacePoint(lat, lon, sensor->LocalRadius(lat, lon)));
+  Distance radius = sensor->LocalRadius();
   if(!radius.isValid()) {
     QString msg = "Could not determine radius from DEM at lat/lon [";
     msg += toString(lat.degrees()) + "," + toString(lon.degrees()) + "]";

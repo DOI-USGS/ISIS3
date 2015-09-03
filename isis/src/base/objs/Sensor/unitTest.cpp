@@ -20,6 +20,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <QString>
+
 #include "Angle.h"
 #include "Distance.h"
 #include "FileName.h"
@@ -41,7 +43,20 @@ using namespace std;
  * @history 2009-03-24  Tracie Sucharski - Replace obsolete keywords
  *          SpacecraftPosition and SpacecraftPointing with InstrumentPosition
  *          and InstrumentPointing.
+ * @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Added MySensor class to allow
+ *                         Sensor object instantiation.
  */
+
+class MySensor : public Sensor {
+  public:
+    MySensor(Cube &cube) : Sensor(cube) { }
+    // implement Sensor's pure virtual methods as necessary
+    virtual QString instrumentNameLong() const { return QString("My Sensor"); }
+    virtual QString instrumentNameShort() const { return QString("MySensor"); }
+    virtual QString spacecraftNameLong() const { return QString("My Spacecraft"); }
+    virtual QString spacecraftNameShort() const { return QString("MySpacecraft"); }
+};
+
 int main(int argc, char *argv[]) {
 
   Preference::Preferences(true);
@@ -79,7 +94,7 @@ int main(int argc, char *argv[]) {
     double startTime = -69382819.0;
     double endTime = -69382512.0;
     double slope = (endTime - startTime) / (10 - 1);
-    Sensor spi(dummyCube);
+    MySensor spi(dummyCube);
     spi.instrumentRotation()->SetTimeBias(-1.15);
 
     double v[3] = { 0.0, 0.0, 1.0 };
@@ -213,7 +228,7 @@ int main(int argc, char *argv[]) {
     lab.addGroup(kern);
 
     // Setup
-    Sensor spi2(dummyCube);
+    MySensor spi2(dummyCube);
     spi2.instrumentRotation()->SetTimeBias(-1.15);
 
     // Testing Set Look Direction
@@ -321,6 +336,14 @@ int main(int argc, char *argv[]) {
          << endl;
     spi2.SetUniversalGround(11.57143551329, 43.328646604);
     cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
+    
+    // Test name methods
+    cerr << "Test name methods ..." << endl;
+    MySensor s(dummyCube);
+    cout << "Spacecraft Name Long: " << s.spacecraftNameLong() << endl;
+    cout << "Spacecraft Name Short: " << s.spacecraftNameShort() << endl;
+    cout << "Instrument Name Long: " << s.instrumentNameLong() << endl;
+    cout << "Instrument Name Short: " << s.instrumentNameShort() << endl << endl;
   }
   catch(IException &e) {
     e.print();

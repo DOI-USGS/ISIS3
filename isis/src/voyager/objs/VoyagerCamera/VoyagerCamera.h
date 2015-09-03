@@ -24,6 +24,8 @@
 
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**                                                                       
    * @brief Voyager Camera Model                
@@ -46,15 +48,19 @@ namespace Isis {
    * @internal 
    *   @history 2010-07-19 Mackenzie Boyd - Original Version
    *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
-   *                          pure virtual in Camera, implemented in mission
-   *                          specific cameras.
+   *                           pure virtual in Camera, implemented in mission
+   *                           specific cameras.
    *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
    *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes()
-   *                          method. Updated unitTest to test for new methods.
-   *                          Updated documentation. Added Isis Disclaimer to
-   *                          files. Added NAIF error check to constructor.
+   *                           method. Updated unitTest to test for new methods.
+   *                           Updated documentation. Added Isis Disclaimer to
+   *                           files. Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2015-08-14 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test for
+   *                           name methods and added new data for Voyager1 WAC, Voyager2 NAC and
+   *                           and WAC.
    *  
    */                                                                       
   class VoyagerCamera : public FramingCamera {
@@ -99,10 +105,19 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+      
+      virtual QString instrumentNameLong() const;
+      virtual QString instrumentNameShort() const;
+      virtual QString spacecraftNameLong() const;
+      virtual QString spacecraftNameShort() const;
 
     private:
       int p_ckFrameId;       //!< "Camera-matrix" Kernel Frame ID
       int p_spkTargetId;     //!< Spacecraft Kernel Target ID
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif
