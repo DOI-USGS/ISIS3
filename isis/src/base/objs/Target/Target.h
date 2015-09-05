@@ -23,6 +23,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QSharedPointer>
+
 #include <vector>
 
 #include <SpiceUsr.h>
@@ -32,6 +34,7 @@
 class QString;
 
 namespace Isis {
+  class Angle;
   class Distance;
   class Pvl;
   class ShapeModel;
@@ -47,6 +50,7 @@ namespace Isis {
    *           NAIF errors were signaled. References #2248.
    */
   class Target {
+
     public:
       // constructors
       Target(Spice *spice, Pvl &label);
@@ -58,7 +62,9 @@ namespace Isis {
       void init();
       bool isSky() const;
       SpiceInt naifBodyCode() const;
+      SpiceInt naifPlanetSystemCode() const;
       QString name() const;
+      QString systemName() const;
       std::vector<Distance> radii() const;
       void restoreShape();
       void setShapeEllipsoid();
@@ -66,24 +72,42 @@ namespace Isis {
       ShapeModel *shape() const;
       Spice *spice() const;
 
+      std::vector<Angle> poleRaCoefs();
+      std::vector<Angle> poleDecCoefs();
+      std::vector<Angle> pmCoefs();
+
+      std::vector<double> poleRaNutPrecCoefs();
+      std::vector<double> poleDecNutPrecCoefs();
+
+      std::vector<double> pmNutPrecCoefs();
+
+      std::vector<Angle> sysNutPrecConstants();
+      std::vector<Angle> sysNutPrecCoefs();
 
     private:
       SpiceInt lookupNaifBodyCode() const;
-      SpiceInt *m_bodyCode;    /**< The NaifBodyCode value, if it exists in the
-                                    labels. Otherwise, if the target is sky,
-                                    it's the SPK code and if not sky then it's
-                                    calculated by the NaifBodyCode() method.*/
-      QString *m_name;   //!< Name of the target
-      std::vector<Distance> m_radii; //!< The radii of the target
-      ShapeModel *m_originalShape; //!< The shape model of the target
-      ShapeModel *m_shape; //!< The shape model of the target
-      bool m_sky; //!< Indicates whether the target of the observation is the sky
+      SpiceInt *m_bodyCode;          /**< The NaifBodyCode value, if it exists in the
+                                       labels. Otherwise, if the target is sky,
+                                       it's the SPK code and if not sky then it's
+                                       calculated by the NaifBodyCode() method.*/
+      SpiceInt *m_systemCode;        /**< The NaifBodyCode of the targets planetary system
+                                       If the target is sky, then what should this be???*/
+      QString *m_name;               //!< target name
+      QString *m_systemName;         //!< name of the planetary system of the target
+      std::vector<Distance> m_radii; //!< target radii
+      ShapeModel *m_originalShape;   //!< target original shape model
+      ShapeModel *m_shape;           //!< target shape model
+      bool m_sky;                    //!< flag indicating target is the sky
+
       // TODO should this be an enum(ring, sky, or naifBody), created Naif body for sky, or ???
       // TODO should the target body kernels go in here too bodyRotation and position??? I don't
       //           think so.  They are SPICE kernels and belong in the Spice class (DAC).  What do others
       //           think.
-      Spice *m_spice;     //!< The parent Spice object.  This is needed to get pixel resolution in ShapeModels
+      Spice *m_spice;                /**< parent Spice object, needed to get pixel resolution in
+                                       ShapeModels*/
   };
-};
+
+  typedef QSharedPointer<Target> TargetQsp;
+}
 
 #endif

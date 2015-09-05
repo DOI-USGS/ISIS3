@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     CNetSuiteMainWindow *mainWindow = new CNetSuiteMainWindow();
 
-    mainWindow->show();
+    mainWindow->showMaximized();
     int status = app->exec();
 
     delete mainWindow;

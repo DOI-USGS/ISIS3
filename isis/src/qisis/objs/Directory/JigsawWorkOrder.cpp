@@ -24,6 +24,7 @@
 
 #include <QtDebug>
 
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -63,13 +64,25 @@ namespace Isis {
 
   bool JigsawWorkOrder::execute() {
     bool success = WorkOrder::execute();
-
+/*
     if (success) {
         JigsawDialog* bundledlg = new JigsawDialog(project());
         bundledlg->setAttribute(Qt::WA_DeleteOnClose);
         bundledlg->show();
 //      QUndoCommand::setText(tr("&Bundle Adjustment")
 //          .arg(controlList().first()->displayProperties()->displayName()));
+    }
+*/
+    if (success) {
+//      QDockWidget* dock = new QDockWidget();
+//      dock->setMinimumWidth(525);
+//      dock->setMinimumHeight(325);
+//      dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+      JigsawDialog* bundledlg = new JigsawDialog(project());
+      bundledlg->setAttribute(Qt::WA_DeleteOnClose);
+      bundledlg->show();
+//      dock->setWidget(bundledlg);
+//      dock->show();
     }
 
     return success;
@@ -83,7 +96,14 @@ namespace Isis {
 
 
   void JigsawWorkOrder::syncRedo() {
-    //project()->directory()->addCnetEditorView(controlList().first());
+//    TargetInfoWidget *targetInfoWidget =
+//        project()->directory()->addTargetInfoView(targetBody());
+
+
+//    if (!targetInfoWidget) {
+//      QString msg = "error displaying target info";
+//      throw IException(IException::Programmer, msg, _FILEINFO_);
+//    }
   }
 
 

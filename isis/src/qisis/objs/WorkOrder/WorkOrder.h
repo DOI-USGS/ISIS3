@@ -41,10 +41,12 @@ class QXmlStreamWriter;
 namespace Isis {
   class Control;
   class Directory;
+  class GuiCamera;
   class ImageList;
   class CorrelationMatrix;
   class ProgressBar;
   class Project;
+  class TargetBody;
   class XmlStackedHandlerReader;
 
   /**
@@ -85,6 +87,7 @@ namespace Isis {
    *   @history 2013-04-25 Jeannie Backer - Modified call to qWarning() to prevent compile warnings
    *                           on MAC OS 10.8.2
    *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix.
+   *   @history 2015-06-12 Ken Edmundson - Added support for target body.
    *
    */
   class WorkOrder : public QAction, public QUndoCommand {
@@ -117,12 +120,16 @@ namespace Isis {
       virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(ImageList *images);
       virtual bool isExecutable(CorrelationMatrix *correlationMatrix);
+      virtual bool isExecutable(GuiCamera* guiCamera);
+      virtual bool isExecutable(TargetBody* targetBody);
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
       virtual void setData(Context);
       virtual void setData(ImageList *images);
       virtual void setData(QList<Control *> controls);
       virtual void setData(CorrelationMatrix *correlationMatrix);
+      virtual void setData(GuiCamera *camera);
+      virtual void setData(TargetBody *targetBody);
       void setNext(WorkOrder *nextWorkOrder);
       void setPrevious(WorkOrder *previousWorkOrder);
 
@@ -190,6 +197,10 @@ namespace Isis {
       CorrelationMatrix correlationMatrix();
       
       QList<Control *> controlList();
+
+      TargetBody* targetBody();
+
+      GuiCamera* guiCamera();
 
       virtual bool dependsOn(WorkOrder *other) const;
 
@@ -286,6 +297,8 @@ namespace Isis {
       QPointer<ImageList> m_images;
       CorrelationMatrix *m_correlationMatrix;
       QList<Control *> m_controls;
+      GuiCamera* m_guiCamera;
+      TargetBody* m_targetBody;
       QStringList m_internalData;
       QPointer<WorkOrder> m_nextWorkOrder;
       QPointer<WorkOrder> m_previousWorkOrder;

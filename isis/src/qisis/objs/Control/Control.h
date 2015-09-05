@@ -102,6 +102,10 @@ namespace Isis {
       ControlNet *m_controlNet;
       ControlDisplayProperties *m_displayProperties;
       QString m_fileName; //! File name of the control net associated with this control.
+
+      /**
+       * A unique ID for this Control (useful for others to reference this Control when saving to disk).
+       */
       QUuid *m_id;
   };
 }

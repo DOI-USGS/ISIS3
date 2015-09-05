@@ -24,6 +24,8 @@
 
 #include <QtDebug>
 
+#include <QMessageBox>
+
 #include <QAction>
 #include <QApplication>
 #include <QDockWidget>
@@ -66,6 +68,10 @@
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
 #include "SaveProjectAsWorkOrder.h"
+#include "SensorGetInfoWorkOrder.h"
+#include "SensorInfoWidget.h"
+#include "TargetInfoWidget.h"
+#include "TargetGetInfoWorkOrder.h"
 #include "WarningTreeWidget.h"
 #include "WorkOrder.h"
 #include "Workspace.h"
@@ -94,7 +100,13 @@ namespace Isis {
     connect( m_project, SIGNAL(imagesAdded(ImageList *) ),
              this, SLOT(imagesAddedToProject(ImageList *) ) );
 
-// <<<<<<< .mine
+    connect( m_project, SIGNAL(targetsAdded(TargetBodyList *) ),
+             this, SLOT(targetsAddedToProject(TargetBodyList *) ) );
+
+    connect( m_project, SIGNAL(guiCamerasAdded(GuiCameraList *) ),
+             this, SLOT(guiCamerasAddedToProject(GuiCameraList *) ) );
+
+    // <<<<<<< .mine
 // =======
 //     connect( m_project, SIGNAL(projectLoaded(Project *) ),
 //              this, SLOT(updateRecentProjects(Project *) ) );
@@ -107,6 +119,8 @@ namespace Isis {
       createWorkOrder<CubeViewportViewWorkOrder>();
       createWorkOrder<Footprint2DViewWorkOrder>();
       createWorkOrder<MatrixViewWorkOrder>();
+      createWorkOrder<SensorGetInfoWorkOrder>();
+      createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<ImageFileListViewWorkOrder>();
 
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
@@ -465,6 +479,51 @@ namespace Isis {
   }
 
 
+  /**
+   * Add target body data view widget to the window.
+   *
+   * @return TargetInfoWidget* The widget to view.
+   */
+  TargetInfoWidget *Directory::addTargetInfoView(TargetBody *target) {
+    TargetInfoWidget *result = new TargetInfoWidget(target, this);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupTargetInfoWidgets() ) );
+
+    m_targetInfoWidgets.append(result);
+
+    result->setWindowTitle( tr("%1").arg(target->displayProperties()->displayName() ) );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result, Qt::RightDockWidgetArea, Qt::Horizontal,
+                            Qt::RightDockWidgetArea);
+
+    return result;
+  }
+
+
+  /**
+   * Add sensor data view widget to the window.
+   *
+   * @return SensorInfoWidget* The widget to view.
+   */
+  SensorInfoWidget *Directory::addSensorInfoView(GuiCamera *camera) {
+    SensorInfoWidget *result = new SensorInfoWidget(camera, this);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupSensorInfoWidgets() ) );
+
+    m_sensorInfoWidgets.append(result);
+
+    result->setWindowTitle( tr("%1").arg(camera->displayProperties()->displayName() ) );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result, Qt::RightDockWidgetArea, Qt::Horizontal,
+                            Qt::RightDockWidgetArea);
+
+    return result;
+  }
+
 
   /**
    * Add an imageFileList widget to the window.
@@ -565,21 +624,33 @@ namespace Isis {
   }
 
 
-  void Directory::imagesAddedToProject(ImageList *imageList) {
-    m_projectTreeWidget->addImageGroup(imageList);
-// >>>>>>> .r5959
+  void Directory::cleanupSensorInfoWidgets() {
+    m_sensorInfoWidgets.removeAll(NULL);
   }
 
 
-// <<<<<<< .mine
-//   void Directory::imagesAddedToProject(ImageList *imageList) {
-//     m_projectTreeWidget->addImageGroup(imageList);
-//   }
-// =======
+  void Directory::cleanupTargetInfoWidgets() {
+    m_targetInfoWidgets.removeAll(NULL);
+  }
+
+
+  void Directory::imagesAddedToProject(ImageList *imageList) {
+    m_projectTreeWidget->addImageGroup(imageList);
+  }
+
+  void Directory::targetsAddedToProject(TargetBodyList *targets) {
+    m_projectTreeWidget->addTargets(targets);
+  }
+
+
+  void Directory::guiCamerasAddedToProject(GuiCameraList *guiCameras) {
+    m_projectTreeWidget->addGuiCameras(guiCameras);
+  }
+
+
   void Directory::updateRecentProjects(Project *project) {
     if ( !m_recentProjects.contains( project->projectRoot() ) )
       m_recentProjects.insert( 0, project->projectRoot() );
-// >>>>>>> .r5959
   }
 
 
@@ -632,6 +703,39 @@ namespace Isis {
   }
 
   
+
+  /**
+   * Accessor for the list of SensorInfoWidgets currently available.
+   *
+   * @return QList<SensorInfoWidget *> The list of SensorInfoWidgets.
+   */
+  QList<SensorInfoWidget *> Directory::sensorInfoViews() {
+    QList<SensorInfoWidget *> results;
+
+    foreach (SensorInfoWidget *widget, m_sensorInfoWidgets) {
+      results.append(widget);
+    }
+
+    return results;
+  }
+
+
+  /**
+   * Accessor for the list of TargetInfoWidgets currently available.
+   *
+   * @return QList<TargetInfoWidget *> The list of TargetInfoWidgets.
+   */
+  QList<TargetInfoWidget *> Directory::targetInfoViews() {
+    QList<TargetInfoWidget *> results;
+
+    foreach (TargetInfoWidget *widget, m_targetInfoWidgets) {
+      results.append(widget);
+    }
+
+    return results;
+  }
+
+
 
   /**
    * Accessor for the list of MosaicSceneWidgets currently available.

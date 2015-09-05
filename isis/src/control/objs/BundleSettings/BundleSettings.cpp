@@ -63,14 +63,18 @@ namespace Isis {
 
     // Self Calibration ??? (from cnetsuite only)
 
-    // Target Body ??? (from cnetsuite only)
+    // Target Body
+    m_solveTargetBody = false;
+//    m_solveTargetBodyPolePosition = false;
+//    m_solveTargetBodyZeroMeridian = false;
+//    m_solveTargetBodyRotationRate = false;
+//    m_solveTargetBodyRadiusMethod = None;
 
     // Output Options
     m_outputFilePrefix = "";
     m_createBundleOutputFile = true;
     m_createCSVFiles = true;
     m_createResidualsFile    = true;
-
   }
 
 
@@ -165,6 +169,8 @@ namespace Isis {
         m_convergenceCriteriaThreshold(src.m_convergenceCriteriaThreshold),
         m_convergenceCriteriaMaximumIterations(src.m_convergenceCriteriaMaximumIterations),
         m_maximumLikelihood(src.m_maximumLikelihood),
+        m_solveTargetBody(src.m_solveTargetBody),
+        m_bundleTargetBody(src.m_bundleTargetBody),
         m_outputFilePrefix(src.m_outputFilePrefix),
         m_createBundleOutputFile(src.m_createBundleOutputFile),
         m_createCSVFiles(src.m_createCSVFiles),
@@ -201,6 +207,8 @@ namespace Isis {
       m_convergenceCriteria = src.m_convergenceCriteria;
       m_convergenceCriteriaThreshold = src.m_convergenceCriteriaThreshold;
       m_convergenceCriteriaMaximumIterations = src.m_convergenceCriteriaMaximumIterations;
+      m_solveTargetBody = src.m_solveTargetBody;
+      m_bundleTargetBody = src.m_bundleTargetBody;
       m_maximumLikelihood = src.m_maximumLikelihood;
       m_outputFilePrefix = src.m_outputFilePrefix;
       m_createBundleOutputFile = src.m_createBundleOutputFile;
@@ -210,6 +218,15 @@ namespace Isis {
     return *this;
   }
 
+
+  void BundleSettings::setBundleTargetBody(BundleTargetBodyQsp bundleTargetBody) {
+    m_bundleTargetBody = bundleTargetBody;
+  }
+
+
+  QSharedPointer<BundleTargetBody> BundleSettings::getBundleTargetBody() {
+    return m_bundleTargetBody;
+  }
 
 
   void BundleSettings::setValidateNetwork(bool validate) {
@@ -221,7 +238,6 @@ namespace Isis {
   bool BundleSettings::validateNetwork() const {
     return m_validateNetwork;
   }
-
 
 
   // =============================================================================================//
@@ -286,7 +302,6 @@ namespace Isis {
     else {
       m_globalRadiusAprioriSigma = Isis::Null;
     }
-
   }
 
 
@@ -307,6 +322,134 @@ namespace Isis {
       QList<BundleObservationSolveSettings> observationSolveSettings) {
     m_observationSolveSettings = observationSolveSettings;
   }
+
+
+
+  bool BundleSettings::solveTargetBody() {
+    if (!m_bundleTargetBody)
+      return false;
+
+    else if (m_bundleTargetBody->numberParameters() > 0)
+      return true;
+
+    return false;
+  }
+
+
+  int BundleSettings::numberTargetBodyParameters() {
+    if (!m_bundleTargetBody)
+      return 0;
+
+    return m_bundleTargetBody->numberParameters();
+  }
+
+
+  bool BundleSettings::solvePoleRA() {
+    return m_bundleTargetBody->solvePoleRA();
+  }
+
+
+  bool BundleSettings::solvePoleRAVelocity() {
+    return m_bundleTargetBody->solvePoleRAVelocity();
+  }
+
+
+  bool BundleSettings::solvePoleDec() {
+    return m_bundleTargetBody->solvePoleDec();
+  }
+
+
+  bool BundleSettings::solvePoleDecVelocity() {
+    return m_bundleTargetBody->solvePoleDecVelocity();
+  }
+
+
+  bool BundleSettings::solvePM() {
+    return m_bundleTargetBody->solvePM();
+  }
+
+
+  bool BundleSettings::solvePMVelocity() {
+    return m_bundleTargetBody->solvePMVelocity();
+  }
+
+
+//  BundleSettings::TargetRadiiSolveMethod BundleSettings::stringToTargetRadiiOption(QString method) {
+
+//    if (method.compare("NONE", Qt::CaseInsensitive) == 0) {
+//      return BundleSettings::None;
+//    }
+//    else if (method.compare("MEANRADIUS", Qt::CaseInsensitive) == 0) {
+//      return BundleSettings::MeanRadius;
+//    }
+//    else if (method.compare("RADII", Qt::CaseInsensitive) == 0) {
+//      return BundleSettings::Radii;
+//    }
+//    else {
+//      throw IException(IException::Programmer,
+//                       "Unknown target body radius solution method [" + method + "].",
+//                       _FILEINFO_);
+//    }
+//  }
+
+
+//  QString BundleSettings::targetRadiiOptionToString(TargetRadiiSolveMethod method) {
+//    if (method == None)
+//      return "None";
+//    else if (method == MeanRadius)
+//      return "MeanRadius";
+//    else if (method == Radii)
+//      return "Radiii";
+//    else throw IException(IException::Programmer,
+//                          "Unknown target body radius solve method enum [" + toString(method) + "].",
+//                          _FILEINFO_);
+//  }
+
+
+
+//  void BundleSettings::setTargetBodySolveOptions(bool solveTargetBodyPolePosition,
+//                                                 double aprioriRaPole, double sigmaRaPole,
+//                                                 double aprioriDecPole, double sigmaDecPole,
+//                                                 bool solveTargetBodyZeroMeridian,
+//                                                 double aprioriW0, double sigmaW0,
+//                                                 bool solveTargetBodyRotationRate,
+//                                                 double aprioriWDot, double sigmaWDot,
+//                                                 TargetRadiiSolveMethod solveRadiiMethod,
+//                                                 double aprioriRadiusA, double sigmaRadiusA,
+//                                                 double aprioriRadiusB, double sigmaRadiusB,
+//                                                 double aprioriRadiusC, double sigmaRadiusC,
+//                                                 double aprioriMeanRadius, double sigmaMeanRadius) {
+
+
+//    m_solveTargetBody = true;
+//    m_solveTargetBodyPolePosition = solveTargetBodyPolePosition;
+//    m_aprioriRaPole = aprioriRaPole;
+//    m_sigmaRaPole = sigmaRaPole;
+//    m_aprioriDecPole = aprioriDecPole;
+//    m_sigmaDecPole = sigmaDecPole;
+//    m_solveTargetBodyZeroMeridian =solveTargetBodyZeroMeridian;
+//    m_aprioriW0 = aprioriW0;
+//    m_sigmaW0 = sigmaW0;
+//    m_solveTargetBodyRotationRate = solveTargetBodyRotationRate;
+//    m_aprioriWDot = aprioriWDot;
+//    m_sigmaWDot = sigmaWDot;
+//    m_solveTargetBodyRadiusMethod = solveRadiiMethod;
+//    m_aprioriRadiusA = aprioriRadiusA;
+//    m_sigmaRadiusA = sigmaRadiusA;
+//    m_aprioriRadiusB = aprioriRadiusB;
+//    m_sigmaRadiusB = sigmaRadiusB;
+//    m_aprioriRadiusC = aprioriRadiusC;
+//    m_sigmaRadiusC = sigmaRadiusC;
+//    m_aprioriMeanRadius = aprioriMeanRadius;
+//    m_sigmaMeanRadius = sigmaMeanRadius;
+
+//    m_bundleTargetBody->setSolveSettings(solveTargetBodyPolePosition, aprioriRaPole, sigmaRaPole,
+//                                         aprioriDecPole, sigmaDecPole, solveTargetBodyZeroMeridian,
+//                                         aprioriW0, sigmaW0, solveTargetBodyRotationRate,
+//                                         aprioriWDot, sigmaWDot, solveRadiiMethod, aprioriRadiusA,
+//                                         sigmaRadiusA, aprioriRadiusB, sigmaRadiusB, aprioriRadiusC,
+//                                         sigmaRadiusC, aprioriMeanRadius, sigmaMeanRadius);
+//  }
 
 
 
@@ -367,6 +510,12 @@ namespace Isis {
   double BundleSettings::globalRadiusAprioriSigma() const {
     return m_globalRadiusAprioriSigma;
   }
+
+
+
+//  bool BundleSettings::solveTargetBodyPolePosition() const {
+//    return m_solveTargetBodyPolePosition;
+//  }
 
 
 
@@ -1493,5 +1642,4 @@ namespace Isis {
                        _FILEINFO_);
     }
   }
-
 }

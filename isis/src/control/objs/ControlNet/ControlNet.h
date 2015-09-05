@@ -27,6 +27,7 @@
 #include <QMetaType>
 
 #include <QObject> // parent class
+#include <QSharedPointer>
 
 #include <map>
 #include <vector>
@@ -415,6 +416,8 @@ namespace Isis {
 
       bool p_invalid;  //!< If the Control Network is currently invalid
   };
+
+  typedef QSharedPointer<ControlNet> ControlNetQsp;
 }
 
 //! This allows ControlNet *'s to be stored in a QVariant.

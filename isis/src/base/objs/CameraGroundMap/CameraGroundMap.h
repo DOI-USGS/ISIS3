@@ -65,15 +65,18 @@ namespace Isis {
    *  @history 2011-02-09 Steven Lambright SetGround now uses the Latitude,
    *                       Longitude and SurfacePoint classes.
    *  @history 2011-03-18 Debbie A. Cook Added reference to surface point in GetXY
-   *  @history 2012-07-06 Debbie A. Cook Updated Spice members to be more compliant with Isis 
-   *                       coding standards. References #972.
+   *  @history 2012-07-06 Debbie A. Cook Updated Spice members to be more 
+   *                       compliant with Isis coding standards. References #972.
    *  @history 2012-10-10 Debbie A. Cook Modified to use new Target class.
    *                        References Mantis ticket #775 and #1114.
-   *  @history 2013-02-22 Debbie A. Cook Fixed LookCtoFocalPlaneXY method to properly handle
-   *                        instruments with a look direction along the negative z axis.
-   *                        Fixes Mantis ticket #1524
+   *  @history 2013-02-22 Debbie A. Cook Fixed LookCtoFocalPlaneXY method 
+   *                        to properly handle instruments with a look direction along 
+   *                        the negative z axis.  Fixes Mantis ticket #1524
    *   @history 2014-04-17 Jeannie Backer - Replaced local variable names with more
    *                           descriptive names. References #1659.
+   *  @history 2015-07-24 Debbie A. Cook Added new methods GetdXYdTOrientation, 
+   *                        EllipsoidPartial, and MeanRadiusPartial along with new member 
+   *                        p_lookB.   References Mantis ticket TBD.
    *
    */
   class CameraGroundMap {
@@ -89,7 +92,10 @@ namespace Isis {
       enum PartialType {
         WRT_Latitude,
         WRT_Longitude,
-        WRT_Radius
+        WRT_Radius,
+        WRT_MajorAxis,
+        WRT_MinorAxis,
+        WRT_PolarAxis
       };
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
@@ -103,9 +109,14 @@ namespace Isis {
       virtual bool GetdXYdOrientation(const SpiceRotation::PartialType varType,
                                       int coefIndex,
                                       double *cudx, double *cudy);
+      virtual bool GetdXYdTOrientation(const SpiceRotation::PartialType varType,
+                                      int coefIndex,
+                                      double *cudx, double *cudy);
       virtual bool GetdXYdPoint(std::vector<double> d_lookB,
                                 double *cudx, double *cudy);
       std::vector<double> PointPartial(SurfacePoint spoint, PartialType wrt);
+      std::vector<double> EllipsoidPartial(SurfacePoint spoint, PartialType raxis);
+      std::vector<double> MeanRadiusPartial(SurfacePoint spoint, Distance meanRadius);
       double DQuotient(std::vector<double> &look, std::vector<double> &dlook,
                        int index);
 
@@ -125,8 +136,9 @@ namespace Isis {
       double p_focalPlaneY;
 
     private:
-      void LookCtoFocalPlaneXY();  //!< Calculate focalplane x/y from lookvector in camera
-      std::vector<double> p_lookJ;    //!< Look vector in J2000 calculated from ground coordinates in GetXY and used for partials
+      void LookCtoFocalPlaneXY();     //!< Calculate focalplane x/y from lookvector in camera
+      std::vector<double> p_pB;  //!< Surface point calculated from ground coordinates in GetXY and used for partials
+      std::vector<double> p_lookJ;   //!< Look vector in J2000 calculated from ground coordinates in GetXY and used for partials
   };
 };
 #endif

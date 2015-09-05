@@ -28,7 +28,6 @@
 #include <QString>
 
 #include "BundleImage.h"
-#include "SpecialPixel.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
 #include "XmlStackedHandler.h"
@@ -66,9 +65,6 @@ namespace Isis {
    *   @history 2014-12-02 Jeannie Backer - Undo last modification. While it makes sense, it
    *                           was causing jigsaw to fail. Brought test coverage of this
    *                           class to 99.403% scope.
-   *   @history 2015-07-31 Jeannie Backer - Changed defaults for global a priori sigmas
-   *                           from -1.0 to Isis::Null to be consistent with other bundle
-   *                           classes. Brought code closer to ISIS coding standards.
    *  
    *  
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
@@ -76,8 +72,10 @@ namespace Isis {
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    */
 
-  class BundleObservationSolveSettings : public QObject {
+class BundleObservationSolveSettings : public QObject {
+
     Q_OBJECT
+
     public:
       BundleObservationSolveSettings(QObject *parent = 0);
       BundleObservationSolveSettings(Project *project, 
@@ -118,9 +116,9 @@ namespace Isis {
                                          int ckDegree = 2, 
                                          int ckSolveDegree = 2,
                                          bool solvePolynomialOverExisting = false, 
-                                         double anglesAprioriSigma = Isis::Null,
-                                         double angularVelocityAprioriSigma = Isis::Null, 
-                                         double angularAccelerationAprioriSigma = Isis::Null);
+                                         double anglesAprioriSigma = -1.0,
+                                         double angularVelocityAprioriSigma = -1.0, 
+                                         double angularAccelerationAprioriSigma = -1.0);
       InstrumentPointingSolveOption instrumentPointingSolveOption() const;
       bool solveTwist() const;
       int ckDegree() const;
@@ -148,9 +146,9 @@ namespace Isis {
                                          int spkDegree = 2,
                                          int spkSolveDegree = 2,
                                          bool positionOverHermite = false,
-                                         double positionAprioriSigma = Isis::Null,
-                                         double velocityAprioriSigma = Isis::Null, 
-                                         double accelerationAprioriSigma = Isis::Null);
+                                         double positionAprioriSigma = -1.0,
+                                         double velocityAprioriSigma = -1.0,
+                                         double accelerationAprioriSigma = -1.0);
       InstrumentPositionSolveOption instrumentPositionSolveOption() const;
       int spkDegree() const;
       int spkSolveDegree() const;

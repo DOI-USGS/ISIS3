@@ -25,12 +25,15 @@
 #include "CorrMatTreeWidgetItem.h"
 #include "Directory.h"
 #include "FileName.h"
+#include "GuiCameraTreeWidgetItem.h"
 #include "IException.h"
 #include "ImageGroupTreeWidgetItem.h"
 #include "ImageList.h"
 #include "IString.h"
 #include "Project.h"
 #include "RenameProjectWorkOrder.h"
+#include "TargetBody.h"
+#include "TargetBodyTreeWidgetItem.h"
 
 namespace Isis {
 
@@ -51,7 +54,6 @@ namespace Isis {
     m_targetParentItem = NULL;
     m_sensorsParentItem = NULL;
     m_spacecraftParentItem = NULL;
-    m_sensorsParentItem = NULL;
     m_resultsParentItem = NULL;
     m_ignoreEdits = false;
 
@@ -82,12 +84,11 @@ namespace Isis {
   ProjectTreeWidget::~ProjectTreeWidget() {
     m_cnetsParentItem = NULL;
     m_imagesParentItem = NULL;
-    m_shapeParentItem = NULL;
-    m_targetParentItem = NULL;
-    m_sensorsParentItem = NULL;
-    m_spacecraftParentItem = NULL;
-    m_sensorsParentItem = NULL;
     m_resultsParentItem = NULL;
+    m_sensorsParentItem = NULL;
+    m_shapeParentItem = NULL;
+    m_spacecraftParentItem = NULL;
+    m_targetParentItem = NULL;
     m_projectItem = NULL;
   }
 
@@ -103,6 +104,8 @@ namespace Isis {
     QList<Control *> selectedControls;
     QList<BundleSolutionInfo *> selectedBundleSolutionInfo;
     CorrMatTreeWidgetItem *corrMatItem = NULL;
+    GuiCameraTreeWidgetItem *guiCameraItem = NULL;
+    TargetBodyTreeWidgetItem *targetBodyItem = NULL;
 
 
     foreach (QTreeWidgetItem *item, selected) {
@@ -148,6 +151,10 @@ namespace Isis {
       }
       
       corrMatItem = dynamic_cast<CorrMatTreeWidgetItem *>(item);
+
+      guiCameraItem = dynamic_cast<GuiCameraTreeWidgetItem *>(item);
+
+      targetBodyItem = dynamic_cast<TargetBodyTreeWidgetItem *>(item);
     }
 
     QList<QAction *> workOrders;
@@ -169,6 +176,15 @@ namespace Isis {
       workOrders.append( m_directory->supportedActions( corrMatItem->correlationMatrix() ) );
     }
     
+    if (guiCameraItem) {
+      workOrders.append( m_directory->supportedActions(guiCameraItem->guiCamera().data()));
+    }
+
+
+    if (targetBodyItem) {
+      workOrders.append( m_directory->supportedActions(targetBodyItem->targetBody().data()));
+    }
+
     foreach(QAction *action, workOrders) {
       if (action != NULL) {
         contextMenu.addAction(action);
@@ -386,7 +402,25 @@ namespace Isis {
     }
   }
 
-  
+  void ProjectTreeWidget::addTargets(TargetBodyList *targets) {
+
+    m_targetParentItem->takeChildren();
+    foreach (TargetBodyQsp newTarget, *targets) {
+      QTreeWidgetItem *item = new TargetBodyTreeWidgetItem(newTarget);
+      m_targetParentItem->addChild(item);
+    }
+  }
+
+
+  void ProjectTreeWidget::addGuiCameras(GuiCameraList *guiCameras) {
+
+    m_sensorsParentItem->takeChildren();
+    foreach (GuiCameraQsp newGuiCamera, *guiCameras) {
+      QTreeWidgetItem *item = new GuiCameraTreeWidgetItem(newGuiCamera);
+      m_sensorsParentItem->addChild(item);
+    }
+  }
+
 
   // TODO - kle - this is hacked, needs to be cleaned up
   // This isn't working anymore...
@@ -405,11 +439,11 @@ namespace Isis {
 
     item->addChild(controlItem);
 
-    BundleSettings bundleSettings = bundleSolutionInfo->bundleSettings();
+    BundleSettingsQsp bundleSettings = bundleSolutionInfo->bundleSettings();
     BundleResults bundleResults = bundleSolutionInfo->bundleResults();
     QTreeWidgetItem *corrMatItem = new CorrMatTreeWidgetItem( bundleResults.correlationMatrix() );
 
-    QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(&bundleSettings);
+    QTreeWidgetItem *settingsItem = new BundleSettingsTreeWidgetItem(bundleSettings);
     QTreeWidgetItem *statisticsItem = new BundleResultsTreeWidgetItem(&bundleResults);
     statisticsItem->addChild(corrMatItem);
 

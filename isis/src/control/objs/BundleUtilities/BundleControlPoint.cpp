@@ -3,7 +3,6 @@
 #include <QDebug>
 
 #include "BundleMeasure.h"
-#include "BundleSettings.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Latitude.h"
@@ -29,17 +28,12 @@ namespace Isis {
       addMeasure(controlMeasure);      
     }
 
-    // we should initialize these to Null like a priori sigmas? 
+    // initialize to 0.0
     m_corrections.clear();
+    m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
     m_weights.clear();
     m_nicVector.clear();
-    
-    // initialize to Null for consistency with other bundle classes...
-    m_aprioriSigmas.clear();
-    m_aprioriSigmas[0] = Isis::Null;
-    m_aprioriSigmas[1] = Isis::Null;
-    m_aprioriSigmas[2] = Isis::Null;
   }
 
 
@@ -99,75 +93,66 @@ namespace Isis {
   }
 
 
-  void BundleControlPoint::setWeights(const BundleSettings *settings, double metersToRadians) {
+  void BundleControlPoint::setWeights(const BundleSettingsQsp settings, double metersToRadians) {
 
     double d;
 
-    double globalLatitudeAprioriSigma  = settings->globalLatitudeAprioriSigma();
-    double globalLongitudeAprioriSigma = settings->globalLongitudeAprioriSigma();
-    double globalRadiusAprioriSigma    = settings->globalRadiusAprioriSigma();
+    double globalLatitudeAprioriSigma = settings->globalLatitudeAprioriSigma();
+    double globalLongitudeAprioriSigma =settings->globalLongitudeAprioriSigma();
+    double globalRadiusAprioriSigma = settings->globalRadiusAprioriSigma();
 
     if (m_controlPoint->GetType() == ControlPoint::Fixed) {
       m_weights[0] = 1.0e+50;
       m_weights[1] = 1.0e+50;
       m_weights[2] = 1.0e+50;
-      // m_aprioriSigmas = Isis::Null by default
+      // m_aprioriSigmas = 0.0 ???
     }
-
     if (m_controlPoint->GetType() == ControlPoint::Free) {
-
-      if (!IsNullPixel(globalLatitudeAprioriSigma)) {
+      if ( globalLatitudeAprioriSigma > 0.0 ) {
         m_aprioriSigmas[0] = globalLatitudeAprioriSigma;
-        d = globalLatitudeAprioriSigma * metersToRadians;
-        m_weights[0] = 1.0 / (d * d);
-      } // else m_aprioriSigma = Isis::Null
-        // m_weights = 0.0
-      
-      if (!IsNullPixel(globalLongitudeAprioriSigma)) {
+        d = globalLatitudeAprioriSigma*metersToRadians;
+        m_weights[0] = 1.0/(d*d);
+      } // else m_aprioriSigmas = m_weights = 0.0 ???
+      if ( globalLongitudeAprioriSigma > 0.0 ) {
         m_aprioriSigmas[1] = globalLongitudeAprioriSigma;
-        d = globalLongitudeAprioriSigma * metersToRadians;
-        m_weights[1] = 1.0 / (d * d);
-      } // else m_aprioriSigma = Isis::Null
-        // m_weights = 0.0
-      
+        d = globalLongitudeAprioriSigma*metersToRadians;
+        m_weights[1] = 1.0/(d*d);
+      } // else m_aprioriSigmas = m_weights = 0.0 ???
       if (!settings->solveRadius()) {
+        // m_aprioriSigmas = 0.0 ???
         m_weights[2] = 1.0e+50;
       }
       else {
-        if (!IsNullPixel(globalRadiusAprioriSigma)) {
+        if ( globalRadiusAprioriSigma > 0.0 ) {
           m_aprioriSigmas[2] = globalRadiusAprioriSigma;
-          d = globalRadiusAprioriSigma * 0.001;
-          m_weights[2] = 1.0 / (d * d);
+          d = globalRadiusAprioriSigma*0.001;
+          m_weights[2] = 1.0/(d*d);
         }
       }
     }
-
     if (m_controlPoint->GetType() == ControlPoint::Constrained) {
-      
       if ( m_controlPoint->IsLatitudeConstrained() ) {
         m_aprioriSigmas[0] = m_controlPoint->GetAprioriSurfacePoint().GetLatSigmaDistance().meters();
         m_weights[0] = m_controlPoint->GetAprioriSurfacePoint().GetLatWeight();
       }
-      else if (!IsNullPixel(globalLatitudeAprioriSigma)) {
+      else if ( globalLatitudeAprioriSigma > 0.0 ) {
         m_aprioriSigmas[0] = globalLatitudeAprioriSigma;
-        d = globalLatitudeAprioriSigma * metersToRadians;
-        m_weights[0] = 1.0 / (d * d);
-      } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
-        // m_weights = 0.0
-      
+        d = globalLatitudeAprioriSigma*metersToRadians;
+        m_weights[0] = 1.0/(d*d);
+      } // else not constrained and global sigma is Null, then  m_aprioriSigmas = m_weights = 0.0 ???
+
       if ( m_controlPoint->IsLongitudeConstrained() ) {
         m_aprioriSigmas[1] = m_controlPoint->GetAprioriSurfacePoint().GetLonSigmaDistance().meters();
         m_weights[1] = m_controlPoint->GetAprioriSurfacePoint().GetLonWeight();
       }
-      else if (!IsNullPixel(globalLongitudeAprioriSigma)) {
+      else if ( globalLongitudeAprioriSigma > 0.0 ) {
         m_aprioriSigmas[1] = globalLongitudeAprioriSigma;
-        d = globalLongitudeAprioriSigma * metersToRadians;
-        m_weights[1] = 1.0 / (d * d);
-      } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
-        // m_weights = 0.0
-      
+        d = globalLongitudeAprioriSigma*metersToRadians;
+        m_weights[1] = 1.0/(d*d);
+      } // else not constrained and global sigma is Null, then  m_aprioriSigmas = m_weights = 0.0 ???
+
       if (!settings->solveRadius()) {
-        // m_aprioriSigmas = Isis::Null
+        // m_aprioriSigmas = 0.0 ???
         m_weights[2] = 1.0e+50;
       }
       else {
@@ -175,15 +160,15 @@ namespace Isis {
           m_aprioriSigmas[2] = m_controlPoint->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters();
           m_weights[2] = m_controlPoint->GetAprioriSurfacePoint().GetLocalRadiusWeight();
         }
-        else if (!IsNullPixel(globalRadiusAprioriSigma)) {
+        else if ( globalRadiusAprioriSigma > 0.0 ) {
           m_aprioriSigmas[2] = globalRadiusAprioriSigma;
-          d = globalRadiusAprioriSigma * 0.001;
-          m_weights[2] = 1.0 / (d * d);
-        } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
-          // m_weights = 0.0
+          d = globalRadiusAprioriSigma*0.001;
+          m_weights[2] = 1.0/(d*d);
+        } // else not constrained and global sigma is Null, then  m_aprioriSigmas = m_weights = 0.0 ???
       }
     }
   }
+
 
 
   ControlPoint *BundleControlPoint::rawControlPoint() const {
@@ -191,9 +176,11 @@ namespace Isis {
   }
 
 
+
   bool BundleControlPoint::isRejected() const {
     return m_controlPoint->IsRejected();
   }
+
 
 
   int BundleControlPoint::numberMeasures() const {
@@ -201,14 +188,17 @@ namespace Isis {
   }
 
 
+
   SurfacePoint BundleControlPoint::getAdjustedSurfacePoint() const {
     return m_controlPoint->GetAdjustedSurfacePoint();
   }
 
 
+
   QString BundleControlPoint::getId() const {
     return m_controlPoint->GetId();
   }
+
 
 
   // ??? why bounded vector ??? can we use linear algebra vector ??? 
@@ -217,10 +207,12 @@ namespace Isis {
   }
 
 
+
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() {
     return m_aprioriSigmas;
 
   }
+
 
 
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() {
@@ -228,9 +220,11 @@ namespace Isis {
   }
 
 
+
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() {
     return m_weights;
   }
+
 
 
   boost::numeric::ublas::bounded_vector<double, 3> &BundleControlPoint::nicVector() {
@@ -238,9 +232,11 @@ namespace Isis {
   }
 
 
+
   SparseBlockRowMatrix &BundleControlPoint::cholmod_QMatrix() {
     return m_cholmod_QMatrix;
   }
+
 
 
   QString BundleControlPoint::formatBundleOutputSummaryString(bool errorPropagation) const {
@@ -269,6 +265,7 @@ namespace Isis {
 
     return output;
   }
+
 
 
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
@@ -352,6 +349,7 @@ namespace Isis {
   }
 
 
+
   QString BundleControlPoint::formatValue(double value, int fieldWidth, int precision) const {
     QString output;
     IsNullPixel(value) ? 
@@ -361,12 +359,12 @@ namespace Isis {
   }
 
 
+
   QString BundleControlPoint::formatAprioriSigmaString(int type, int fieldWidth, 
                                                        int precision) const {
     QString aprioriSigmaStr;
     double sigma = m_aprioriSigmas[type];
-    if (IsNullPixel(sigma)) {
-//    if (sigma <= 0) { // if globalAprioriSigma <= 0 (including IsNullPixel(sigma)), then m_aprioriSigmas = 0
+    if (sigma == 0) { // if globalAprioriSigma <= 0 (including Isis::NUll), then m_aprioriSigmas = 0 
       aprioriSigmaStr = QString("%1").arg("N/A", fieldWidth);
     }
     else {
@@ -376,10 +374,12 @@ namespace Isis {
   }
 
 
+
   QString BundleControlPoint::formatLatitudeAprioriSigmaString(int fieldWidth, 
                                                                int precision) const {
     return formatAprioriSigmaString(0, fieldWidth, precision);
   }
+
 
 
   QString BundleControlPoint::formatLongitudeAprioriSigmaString(int fieldWidth, 
@@ -388,9 +388,11 @@ namespace Isis {
   }
 
 
+
   QString BundleControlPoint::formatRadiusAprioriSigmaString(int fieldWidth, int precision) const {
     return formatAprioriSigmaString(2, fieldWidth, precision);
   }
+
 
 
   QString BundleControlPoint::formatAdjustedSigmaString(int type, int fieldWidth, int precision,
@@ -412,8 +414,7 @@ namespace Isis {
         sigma = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
       }
       if (IsNullPixel(sigma)) {
-//    if (sigma <= 0) { // if globalAprioriSigma <= 0 (including IsNullPixel(sigma)), then m_aprioriSigmas = 0
-        adjustedSigmaStr = QString("%1").arg("N/A", fieldWidth);
+        adjustedSigmaStr = QString("%1").arg("N/A",fieldWidth);
       }
       else {
         adjustedSigmaStr = QString("%1").arg(sigma, fieldWidth, 'f', precision);
@@ -424,10 +425,12 @@ namespace Isis {
   }
 
 
+
   QString BundleControlPoint::formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
                                                                 bool errorPropagation) const {
     return formatAdjustedSigmaString(0, fieldWidth, precision, errorPropagation);
   }
+
 
 
   QString BundleControlPoint::formatLongitudeAdjustedSigmaString(int fieldWidth, int precision,
@@ -436,7 +439,8 @@ namespace Isis {
   }
 
 
-  // TODO: what do we do if we're not solving for radius, how do we know that here??????????????
+
+  // TODO: what do we do if we're not solving for radius, how do we know that here?????????????????
   // TODO: sigma is not == 0.0, if not solving for radius it's like something crazy e-22
   QString BundleControlPoint::formatRadiusAdjustedSigmaString(int fieldWidth, int precision,
                                                               bool errorPropagation) const {

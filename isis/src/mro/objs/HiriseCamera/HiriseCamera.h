@@ -64,6 +64,9 @@ namespace Isis {
       // Destroys the HiriseCamera object
       ~HiriseCamera();
 
+      //QString name();
+      //void setName(QString name);
+
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK
        *  

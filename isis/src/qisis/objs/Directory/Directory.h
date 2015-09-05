@@ -28,7 +28,9 @@
 #include <QPointer>
 #include <QString>
 
+#include "GuiCameraList.h"
 #include "ImageList.h"
+#include "TargetBodyList.h"
 #include "MosaicSceneWidget.h"
 #include "WorkOrder.h"
 
@@ -50,6 +52,9 @@ namespace Isis {
   class MosaicSceneWidget;
   class Project;
   class ProjectTreeWidget;
+  class SensorInfoWidget;
+  class TargetBody;
+  class TargetInfoWidget;
   class WarningTreeWidget;
   class WorkOrder;
   class Workspace;
@@ -99,6 +104,8 @@ namespace Isis {
       Workspace *addCubeDnView();
       MosaicSceneWidget *addFootprint2DView();
       MatrixSceneWidget *addMatrixView();
+      TargetInfoWidget *addTargetInfoView(TargetBody *target);
+      SensorInfoWidget *addSensorInfoView(GuiCamera *camera);
       ImageFileListWidget *addImageFileListView();
       void addControlPointEditor(ControlNet *cnet, QString cnetFilename);
       QWidget *projectTreeWidget();
@@ -109,6 +116,8 @@ namespace Isis {
       QList<Workspace *> cubeDnViews();
       QList<MosaicSceneWidget *> footprint2DViews();
       QList<MatrixSceneWidget *> matrixViews();
+      QList<SensorInfoWidget *> sensorInfoViews();
+      QList<TargetInfoWidget *> targetInfoViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
       ControlPointEditWidget *controlPointEditorView();
@@ -158,20 +167,22 @@ namespace Isis {
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
 
     signals:
-      void newWidgetAvailable(
-          QWidget *newWidget, Qt::DockWidgetArea area, Qt::Orientation orientation);
+      void newWidgetAvailable(QWidget *newWidget, Qt::DockWidgetArea area,
+                              Qt::Orientation orientation,
+                              Qt::DockWidgetArea allowedAreas=Qt::AllDockWidgetAreas);
 
     public slots:
       void cleanupCnetEditorViewWidgets();
       void cleanupCubeDnViewWidgets();
       void cleanupFileListWidgets();
       void cleanupFootprint2DViewWidgets();
-// <<<<<<< .mine
       void cleanupControlPointEditorWidget();
-// =======
       void cleanupMatrixViewWidgets();
-// >>>>>>> .r5959
+      void cleanupSensorInfoWidgets();
+      void cleanupTargetInfoWidgets();
       void imagesAddedToProject(ImageList *images);
+      void targetsAddedToProject(TargetBodyList *targets);
+      void guiCamerasAddedToProject(GuiCameraList *guiCameras);
       void updateControlNetEditConnections();
 
       void updateRecentProjects(Project *project);
@@ -227,11 +238,10 @@ namespace Isis {
       QList< QPointer<Workspace> > m_cubeDnViewWidgets;
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;
       QList< QPointer<MosaicSceneWidget> > m_footprint2DViewWidgets;
-// <<<<<<< .mine
       QPointer<ControlPointEditWidget> m_controlPointEditWidget;
-// =======
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets;
-// >>>>>>> .r5959
+      QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets;
+      QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets;
 
       QList< QPointer<WorkOrder> > m_workOrders;
       

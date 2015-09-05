@@ -41,6 +41,7 @@
 
 #include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
+#include "Camera.h"
 #include "Control.h"
 #include "ControlList.h"
 #include "CorrelationMatrix.h"
@@ -48,11 +49,15 @@
 #include "Directory.h"
 #include "Environment.h"
 #include "FileName.h"
+#include "GuiCamera.h"
+#include "GuiCameraList.h"
 #include "IException.h"
 #include "ImageList.h"
 #include "ImageReader.h"
 #include "IException.h"
 #include "ProgressBar.h"
+#include "Target.h"
+#include "TargetBodyList.h"
 #include "WorkOrder.h"
 #include "WorkOrderFactory.h"
 #include "XmlStackedHandlerReader.h"
@@ -71,6 +76,8 @@ namespace Isis {
     m_cnetRoot = NULL;
     m_idToControlMap = NULL;
     m_idToImageMap = NULL;
+    m_idToTargetBodyMap = NULL;
+    m_idToGuiCameraMap = NULL;
     m_images = NULL;
     m_imageReader = NULL;
     m_warnings = NULL;
@@ -84,6 +91,8 @@ namespace Isis {
 
     m_idToControlMap = new QMap<QString, Control *>;
     m_idToImageMap = new QMap<QString, Image *>;
+    m_idToTargetBodyMap = new QMap<QString, TargetBody *>;
+    m_idToGuiCameraMap = new QMap<QString, GuiCamera *>;
     m_idToBundleSolutionInfoMap = new QMap<QString, BundleSolutionInfo *>;
 
     m_name = "Project";
@@ -151,9 +160,19 @@ namespace Isis {
     connect( m_imageReader, SIGNAL( imagesReady(ImageList) ),
              this, SLOT( imagesReady(ImageList) ) );
 
+    connect( this, SIGNAL(imagesAdded(ImageList *) ),
+             this, SLOT(addTargetsFromImportedImagesToProject(ImageList *) ) );
+
+    connect( this, SIGNAL(imagesAdded(ImageList *) ),
+             this, SLOT(addCamerasFromImportedImagesToProject(ImageList *) ) );
+
     m_images = new QList<ImageList *>;
 
     m_controls = new QList<ControlList *>;
+
+    m_targets = new TargetBodyList;
+
+    m_guiCameras = new GuiCameraList;
 
     m_bundleSolutionInfo = new QList<BundleSolutionInfo *>;
 
@@ -161,7 +180,6 @@ namespace Isis {
     m_workOrderHistory = new QList< QPointer<WorkOrder> >;
 
     m_imageReadingMutex = new QMutex;
-    //qDebug()<<"Project::Project    End";
 
     // TODO: ken testing
 //    m_bundleSettings = NULL;
@@ -234,6 +252,12 @@ namespace Isis {
 
     delete m_idToImageMap;
     m_idToImageMap = NULL;
+
+    delete m_idToTargetBodyMap;
+    m_idToTargetBodyMap = NULL;
+
+    delete m_idToGuiCameraMap;
+    m_idToGuiCameraMap = NULL;
 
     delete m_idToBundleSolutionInfoMap;
     m_idToBundleSolutionInfoMap = NULL;
@@ -1015,6 +1039,31 @@ namespace Isis {
 
 
   /**
+   * Appends the root directory name 'targets' to the project .
+   *
+   * @return The path to the root directory of the target body data.
+   */
+  QString Project::targetBodyRoot(QString projectRoot) {
+    return projectRoot + "/targets";
+  }
+
+
+  /**
+   * Accessor for the root directory of the target body data.
+   *
+   * @return The path to the root directory of the target body data.
+   */
+  QString Project::targetBodyRoot() const {
+    return targetBodyRoot( m_projectRoot->path() );
+  }
+
+
+  TargetBodyList Project::targetBodies() {
+    return *m_targets;
+  }
+
+
+  /**
    * Appends the root directory name 'results' to the project.
    *
    * @return The path to the root directory of bundleresults data.
@@ -1290,13 +1339,7 @@ namespace Isis {
               image, SLOT(updateFileName(Project *)));
 
       (*m_idToImageMap)[image->id()] = image;
-// <<<<<<< .mine
-//       ImageList *result = createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName());
-//       result->append(image);
-//       m_images->append(result);
-// =======
       createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName())->append(image);
-// >>>>>>> .r5959
     }
 
     // We really can't have all of the cubes in memory before
@@ -1320,6 +1363,84 @@ namespace Isis {
     if (m_numImagesCurrentlyReading == 0) {
       m_imageReadingMutex->unlock();
     }
+  }
+
+
+  void Project::addTargetsFromImportedImagesToProject(ImageList *imageList) {
+
+    bool found = false;
+    foreach (Image *image, *imageList) {
+
+      // TODO - I'm a bit worried about being sure the cube is still open at this point (Ken)
+      Target *target = image->cube()->camera()->target();
+
+      // construct TargetBody QSharedPointer from this images cameras Target
+      TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
+
+      foreach (TargetBodyQsp tb, *m_targets) {
+        if (*tb == *targetBody) {
+          found = true;
+          break;
+        }
+      }
+
+      // if this TargetBody is not already in the project, add it
+      // below is how it probably should work, would have to I think
+      // override the ::contains() method in the TargetBodyList class
+//      if (!m_targets->contains(targetBody))
+//        m_targets->append(targetBody);
+
+      if (!found) {
+        m_targets->append(targetBody);
+        connect( targetBody.data(), SIGNAL( destroyed(QObject *) ),
+                 this, SLOT( targetBodyClosed(QObject *) ) );
+//      connect( this, SIGNAL( projectRelocated(Project *) ),
+//               targetBody.data(), SLOT( updateFileName(Project *) ) );
+
+        (*m_idToTargetBodyMap)[targetBody->id()] = targetBody.data();
+      }
+    }
+
+    emit targetsAdded(m_targets);
+  }
+
+  
+
+  void Project::addCamerasFromImportedImagesToProject(ImageList *imageList) {
+    bool found = false;
+    foreach (Image *image, *imageList) {
+
+      // TODO - I'm a bit worried about being sure the cube is still open at this point (Ken)
+      Camera *camera = image->cube()->camera();
+
+      // construct guiCamera QSharedPointer from this images cameras Target
+      GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
+
+      foreach (GuiCameraQsp gc, *m_guiCameras) {
+        if (*gc == *guiCamera) {
+          found = true;
+          break;
+        }
+      }
+
+      // if this guiCamera is not already in the project, add it
+      // below is how it probably should work, would have to I think
+      // override the ::contains() method in the GuiCameraList class
+//      if (!m_guiCameras->contains(guiCamera))
+//        m_guiCameras->append(guiCamera);
+
+      if (!found) {
+        m_guiCameras->append(guiCamera);
+        connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
+                 this, SLOT( guiCameraClosed(QObject *) ) );
+        connect( this, SIGNAL( projectRelocated(Project *) ),
+                 guiCamera.data(), SLOT( updateFileName(Project *) ) );
+
+        (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
+      }
+    }
+
+    emit guiCamerasAdded(m_guiCameras);
   }
 
 
@@ -1407,6 +1528,31 @@ namespace Isis {
   }
 
 
+  /**
+   * A target body is being deleted from the project.
+   * TODO: should prevent deleting a target body if there are currently images in the project with
+   *       this target?
+   */
+  void Project::targetBodyClosed(QObject *targetBodyObj) {
+//    QMutableListIterator<TargetBody *> it(*m_targets);
+//    while ( it.hasNext() ) {
+//      TargetBody *targetBody = it.next();
+//      if (!targetBody) {
+//        // throw error???
+//      }
+
+//      int foundElement = m_targets->indexOf( (TargetBody *)targetBodyObj );
+
+//      if (foundElement != -1) {
+//        m_targets->removeAt(foundElement);
+//      }
+//    }
+
+//    m_idToTargetBodyMap->remove(m_idToTargetBodyMap->key((TargetBody *)targetBodyObj));
+  }
+
+
+
   Project::XmlHandler::XmlHandler(Project *project) {
     m_project = project;
     m_workOrder = NULL;
@@ -1424,15 +1570,12 @@ namespace Isis {
           m_project->setName(name);
         }
       }
-
       else if (localName == "controlNets") {
         m_controls.append(new ControlList(m_project, reader()));
       }
-
       else if (localName == "imageList") {
         m_imageLists.append(new ImageList(m_project, reader()));
       }
-
       else if (localName == "workOrder") {
         QString type = atts.value("type");
 
@@ -1448,7 +1591,6 @@ namespace Isis {
           m_project->warn(warningText);
         }
       }
-
       else if (localName == "directory") {
         m_project->directory()->load(reader());
       }

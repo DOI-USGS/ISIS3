@@ -21,6 +21,7 @@
  */
 #include "Target.h"
 
+#include "Angle.h"
 #include "Distance.h"
 #include "EllipsoidShape.h"
 #include "IException.h"
@@ -51,6 +52,7 @@ namespace Isis {
     // Initialize members
     init();
     m_bodyCode = new SpiceInt;
+    m_systemCode = new SpiceInt;
     m_radii.resize(3, Distance());
     m_spice = spice;
 
@@ -61,7 +63,11 @@ namespace Isis {
     m_name = new QString;
     *m_name = inst["TargetName"][0];
     QString trykey = "NaifIkCode";
-    if (kernels.hasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
+
+    m_systemName = new QString;
+
+    if (kernels.hasKeyword("NaifFrameCode"))
+      trykey = "NaifFrameCode";
 
     if (name().toUpper() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
@@ -71,10 +77,23 @@ namespace Isis {
       // Check for override in kernel group
       if (kernels.hasKeyword("NaifSpkCode"))
         *m_bodyCode = (int) kernels["NaifSpkCode"];
+
+      *m_systemCode = -1;
+      (*m_systemName).append("THE COSMOS");
+
     }
     else {
       *m_bodyCode = lookupNaifBodyCode();
       m_sky = false;
+
+      *m_systemCode = (*m_bodyCode/100)*100 + 99;
+
+      SpiceChar naifBuf[40];
+      SpiceBoolean found;
+      bodc2n_c((SpiceInt) *m_systemCode, sizeof(naifBuf), naifBuf, &found);
+      string s(naifBuf);
+      (*m_systemName).append(s.c_str());
+
       // IString radiiKey = "BODY" + IString((BigInt) naifBodyCode()) + "_RADII";
       // m_radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
       // m_radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
@@ -83,6 +102,7 @@ namespace Isis {
     // Override it if it exists in the labels
     if (kernels.hasKeyword("NaifBodyCode"))
       *m_bodyCode = (int) kernels["NaifBodyCode"];
+
     m_shape = ShapeModelFactory::create(this, lab);
   }
 
@@ -95,10 +115,11 @@ namespace Isis {
    * @internal
    * @history 2012-08-29 Debbie A. Cook - Original version
    */
-
   Target::Target() {
     m_bodyCode = NULL;
+    m_systemCode = NULL;
     m_name = NULL;
+    m_systemName = NULL;
     m_spice = NULL;
     init();
  }
@@ -119,7 +140,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Destroys the Target object
    */
@@ -129,8 +149,14 @@ namespace Isis {
     delete m_bodyCode;
     m_bodyCode = NULL;
 
+    delete m_systemCode;
+    m_systemCode = NULL;
+
     delete m_name;
     m_name = NULL;
+
+    delete m_systemName;
+    m_systemName = NULL;
 
     if (m_radii.size() != 0) {
       m_radii.clear();
@@ -182,9 +208,28 @@ namespace Isis {
   }
 
 
+  /**
+   * This returns the NAIF planet system body code of the target
+   *
+   * @return @b SpiceInt NAIF system body code
+   *
+   * e.g. Enceladus is in the Saturn system
+   *
+   */
+  SpiceInt Target::naifPlanetSystemCode() const {
+    return *m_systemCode;
+  }
+
+
   //! Return target name
   QString Target::name() const {
     return *m_name;
+  }
+
+
+  //! Return planet system name
+  QString Target::systemName() const {
+    return *m_systemName;
   }
 
 
@@ -195,6 +240,46 @@ namespace Isis {
    */
   std::vector<Distance> Target::radii() const {
     return m_radii;
+  }
+
+
+  std::vector<Angle> Target::poleRaCoefs() {
+    return spice()->bodyRotation()->poleRaCoefs();
+  }
+
+
+  std::vector<Angle> Target::poleDecCoefs() {
+    return spice()->bodyRotation()->poleDecCoefs();
+  }
+
+
+  std::vector<Angle> Target::pmCoefs() {
+    return spice()->bodyRotation()->pmCoefs();
+  }
+
+
+  std::vector<double> Target::poleRaNutPrecCoefs() {
+    return spice()->bodyRotation()->poleRaNutPrecCoefs();
+  }
+
+
+  std::vector<double> Target::poleDecNutPrecCoefs() {
+    return spice()->bodyRotation()->poleDecNutPrecCoefs();
+  }
+
+
+  std::vector<double> Target::pmNutPrecCoefs() {
+    return spice()->bodyRotation()->pmNutPrecCoefs();
+  }
+
+
+  std::vector<Angle> Target::sysNutPrecConstants() {
+    return spice()->bodyRotation()->sysNutPrecConstants();
+  }
+
+
+  std::vector<Angle> Target::sysNutPrecCoefs() {
+    return spice()->bodyRotation()->sysNutPrecCoefs();
   }
 
 

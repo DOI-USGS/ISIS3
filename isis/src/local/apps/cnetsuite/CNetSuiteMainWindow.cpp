@@ -33,6 +33,7 @@
 #include "ProgressWidget.h"
 #include "Project.h"
 #include "ProjectTreeWidget.h"
+#include "TargetInfoWidget.h"
 
 namespace Isis {
   /**
@@ -57,15 +58,20 @@ namespace Isis {
     setCentralWidget(centralWidget);
 
     // TLS 2013-07-23 Comment out to see if the behaviour improves
-//  setDockNestingEnabled(true);
+    setDockNestingEnabled(true);
 
     try {
       //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before create Directory";
       m_directory = new Directory(this);
       //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  after create Directory";
+//      connect(m_directory,
+//              SIGNAL(newWidgetAvailable(QWidget *, Qt::DockWidgetArea, Qt::Orientation)),
+//              this, SLOT(addDock(QWidget *, Qt::DockWidgetArea, Qt::Orientation)));
       connect(m_directory,
-              SIGNAL(newWidgetAvailable(QWidget *, Qt::DockWidgetArea, Qt::Orientation)),
-              this, SLOT(addDock(QWidget *, Qt::DockWidgetArea, Qt::Orientation)));
+              SIGNAL(newWidgetAvailable(QWidget *, Qt::DockWidgetArea, Qt::Orientation,
+                                        Qt::DockWidgetArea)),
+              this, SLOT(addDock(QWidget *, Qt::DockWidgetArea, Qt::Orientation,
+                                 Qt::DockWidgetArea)));
       //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow before projectLoaded connection";
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
@@ -90,12 +96,13 @@ namespace Isis {
     createMenus();
 
     //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before docks";
-    QDockWidget *projectDock = new QDockWidget("Project", this, Qt::SubWindow);
-    projectDock->setObjectName("projectDock");
-    projectDock->setFeatures(QDockWidget::DockWidgetMovable |
+//    QDockWidget *projectDock = new QDockWidget("Project", this, Qt::SubWindow);
+    m_projectDock = new QDockWidget("Project", this, Qt::SubWindow);
+    m_projectDock->setObjectName("projectDock");
+    m_projectDock->setFeatures(QDockWidget::DockWidgetMovable |
                               QDockWidget::DockWidgetFloatable);
-    projectDock->setWidget(m_directory->projectTreeWidget());
-    addDockWidget(Qt::LeftDockWidgetArea, projectDock, Qt::Horizontal);
+    m_projectDock->setWidget(m_directory->projectTreeWidget());
+    addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
     QDockWidget *warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
     warningsDock->setObjectName("warningsDock");
@@ -141,20 +148,36 @@ namespace Isis {
 
 
   void CNetSuiteMainWindow::addDock(QWidget *newWidgetForDock, Qt::DockWidgetArea area,
-                                    Qt::Orientation orientation) {
+                                    Qt::Orientation orientation,
+                                    Qt::DockWidgetArea allowedAreas) {
 
     QDockWidget *dock = new QDockWidget(newWidgetForDock->windowTitle());
+
     dock->setWidget(newWidgetForDock);
+
     //qDebug()<<"CNetSuiteMainWindow::addDock objectName = "<<newWidgetForDock->objectName();
     dock->setObjectName(newWidgetForDock->objectName());
 
     // This needs to eventually be a work order...
     dock->setAttribute(Qt::WA_DeleteOnClose);
 
+//    dock->setAllowedAreas(allowedAreas);
+
+
+    // TODO ken testing
+    dock->setMinimumWidth(newWidgetForDock->minimumWidth());
+
+    splitDockWidget(m_projectDock, dock, Qt::Vertical);
+
+
+    //dock->setMaximumWidth(newWidgetForDock->maximumWidth());
+    // TODO ken testing
+
+
     connect(newWidgetForDock, SIGNAL(destroyed(QObject *)),
             dock, SLOT(deleteLater()));
 
-    addDockWidget(area, dock, orientation);
+    //addDockWidget(area, dock, orientation);
   }
 
 

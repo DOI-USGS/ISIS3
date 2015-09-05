@@ -44,8 +44,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2014-07-14 Kimberly Oyama - Original Version
-   *   @history 2014-07-21 Kimberly Oyama - Added matrix options dialog. Color optins are
-   *                           fucntional.
+   *   @history 2014-07-21 Kimberly Oyama - Added matrix options dialog. Color options are
+   *                           functional.
    */
   class MatrixSceneWidget : public QWidget {
       Q_OBJECT

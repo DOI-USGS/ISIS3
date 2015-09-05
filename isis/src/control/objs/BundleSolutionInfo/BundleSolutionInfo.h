@@ -28,6 +28,8 @@
 #include <QObject>
 #include <QString>
 
+#include "BundleSettings.h"
+
 #include "XmlStackedHandler.h"
 
 class QDataStream;
@@ -35,7 +37,6 @@ class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
-  class BundleSettings;
   class BundleResults;
   class FileName;
   class ImageList;
@@ -63,7 +64,7 @@ namespace Isis {
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
     public:
-      BundleSolutionInfo(BundleSettings inputSettings, 
+      BundleSolutionInfo(BundleSettingsQsp inputSettings,
                     FileName controlNetworkFileName, 
                     BundleResults outputStatistics, 
                     QObject *parent = 0);
@@ -80,8 +81,8 @@ namespace Isis {
 
       QString id() const;
       QString controlNetworkFileName() const;
-      BundleSettings bundleSettings();
-      BundleResults  bundleResults();
+      BundleSettingsQsp bundleSettings();
+      BundleResults bundleResults();
       QString runTime() const;
 
       PvlObject pvlObject(QString resultsName = "BundleSolutionInfo",
@@ -126,7 +127,7 @@ namespace Isis {
           Project *m_xmlHandlerProject;  // TODO: does xml stuff need project???
           QString m_xmlHandlerCharacters;
           QList<ImageList *> *m_xmlHandlerImages;
-          BundleSettings *m_xmlHandlerBundleSettings;
+          BundleSettingsQsp m_xmlHandlerBundleSettings;
           BundleResults *m_xmlHandlerBundleResults;
       };
 
@@ -140,7 +141,7 @@ namespace Isis {
       QUuid              *m_id;
       QString             m_runTime;
       FileName           *m_controlNetworkFileName;
-      BundleSettings     *m_settings;
+      BundleSettingsQsp   m_settings;
       BundleResults      *m_statisticsResults;
       QList<ImageList *> *m_images;
   }; // end BundleSolutionInfo class

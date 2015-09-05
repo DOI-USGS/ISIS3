@@ -201,6 +201,39 @@ namespace Isis {
 
 
   /**
+   * Prints matrix blocks to std output stream out for debugging.
+   */
+  void SparseBlockColumnMatrix::printClean(std::ostream& outstream) {
+    if ( size() == 0 ) {
+      outstream << "Empty SparseBlockColumnMatrix..." << std::endl;
+      return;
+    }
+
+    QMapIterator<int, matrix<double>*> it(*this);
+     while (it.hasNext()) {
+         it.next();
+
+         matrix<double>* m = it.value();
+
+         int rows = m->size1();
+         int cols = m->size2();
+
+         for (int i = 0; i < rows; i++) {
+           for (int j = 0; j < cols; j++) {
+             double d = m->at_element(i,j);
+             if (j == cols-1)
+               outstream << std::setprecision(12) << d << std::endl;
+             else
+               outstream << std::setprecision(12) << d << ",";
+           }
+         }
+
+     }
+     outstream << std::endl;
+  }
+
+
+  /**
    * Sets all elements of all matrix blocks to zero.
    */
   void SparseBlockColumnMatrix::zeroBlocks() {
@@ -452,6 +485,38 @@ namespace Isis {
      }
   }
 
+  /**
+   * Prints matrix blocks to std output stream out for debugging.
+   */
+  void SparseBlockRowMatrix::printClean(std::ostream& outstream) {
+    if ( size() == 0 ) {
+      outstream << "Empty SparseBlockRowMatrix..." << std::endl;
+      return;
+    }
+
+    QMapIterator<int, matrix<double>*> it(*this);
+     while (it.hasNext()) {
+         it.next();
+
+         matrix<double>* m = it.value();
+
+         int rows = m->size1();
+         int cols = m->size2();
+
+         for (int i = 0; i < rows; i++) {
+           for (int j = 0; j < cols; j++) {
+             double d = m->at_element(i,j);
+             if (j == cols-1)
+               outstream << std::setprecision(9) << d << std::endl;
+             else
+               outstream << std::setprecision(9) << d << ",";
+           }
+         }
+
+     }
+     outstream << std::endl;
+  }
+
 
   /**
    * Sets all elements of all matrix blocks to zero.
@@ -509,8 +574,10 @@ namespace Isis {
       int nCol = 0;
 
       while ( nCol < nblockColumn) {
-        if ( !(*this)[nCol] )
+        if ( !(*this)[nCol] ) {
+          nCol++;
           continue;
+        }
 
         int ncolumns = (*this)[nCol]->size2();
 
@@ -825,6 +892,28 @@ namespace Isis {
                   << "]!" << std::endl;
     }
   }
+
+
+  /**
+   * Prints matrix blocks to std output stream out for debugging.
+   */
+  void SparseBlockMatrix::printClean(std::ostream& outstream) {
+    if ( size() == 0 ) {
+      outstream << "Empty SparseBlockMatrix..." << std::endl;
+      return;
+    }
+
+    for( int i = 0; i < size(); i++ ) {
+      SparseBlockColumnMatrix* column = at(i);
+
+      if ( column )
+        column->printClean(outstream);
+      else
+        outstream << "NULL column pointer at column[" << IString(i)
+                  << "]!" << std::endl;
+    }
+  }
+
 
   /**
    * TODO

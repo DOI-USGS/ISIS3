@@ -42,6 +42,7 @@
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
+#include "BundleTargetBody.h"
 #include "Camera.h"
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
@@ -143,7 +144,7 @@ namespace Isis {
    *                           single ControlPoint and ControlMeasure.
    *   @history 2011-08-08 Tracie Sucharski - Added method to return the iteration summary to be
    *                           used in qtie which does not have a log file. In SetImages, clear the
-   *                           cameraMap and cameraList.  Added this back in (was originally added
+   *                           cameraMavtpv_targetBodyp and cameraList.  Added this back in (was originally added
    *                           on 2011-01-19), was deleted somewhere along the line.
    *   @history 2011-09-28 Debbie A. Cook - Renamed SPARSE solve method to OLDSPARSE and CHOLMOD to
    *                           SPARSE. 
@@ -191,11 +192,6 @@ namespace Isis {
    *                           every iteration. Now release every iteration but the last since we
    *   @history 2015-02-20 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
    *   @history 2015-08-17 Jeannie Backer - Updated to be more compliant with ISIS coding standards.
-   *   @history 2015-09-03 Jeannie Backer - Removed the underscore that was added to file name when
-   *                           BundleSettings::outputFilePrefix() is not empty. This will allow
-   *                           users to use the outputFilePrefix to specify a file path without
-   *                           adding an underscore to the file name. If the underscore is wanted,
-   *                           it should be added to the prefix when entered by the user.
    *   @history 2015-09-03 Jeannie Backer - Changed the name of the output correlation matrix file
    *                           from ["inverseMatrix" + random unique code + ".dat"] to
    *                           [BundleSettings::outputFilePrefix() + "inverseMatrix.dat"]. So that
@@ -206,24 +202,24 @@ namespace Isis {
   class BundleAdjust : public QObject {
       Q_OBJECT
     public:
-      BundleAdjust(BundleSettings bundleSettings, 
+      BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile, 
                    const QString &cubeList,
                    bool printSummary = true);
-      BundleAdjust(BundleSettings bundleSettings, 
+      BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile, 
                    const QString &cubeList,
                    const QString &heldList, 
                    bool printSummary = true);
-      BundleAdjust(BundleSettings bundleSettings, 
+      BundleAdjust(BundleSettingsQsp bundleSettings,
                    QString &cnet, 
                    SerialNumberList &snlist, 
                    bool printSummary = true);
-      BundleAdjust(BundleSettings bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,
                    Control &cnet,
                    SerialNumberList &snlist,
                    bool bPrintSummary);
-      BundleAdjust(BundleSettings bundleSettings, 
+      BundleAdjust(BundleSettingsQsp bundleSettings,
                    ControlNet &cnet, 
                    SerialNumberList &snlist, 
                    bool printSummary = true);
@@ -232,7 +228,7 @@ namespace Isis {
                    SerialNumberList &snlist, 
                    SerialNumberList &heldsnlist, 
                    bool printSummary = true);
-      BundleAdjust(BundleSettings bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,
                    Control &control,
                    QList<ImageList *> imgList,
                    bool bPrintSummary);
@@ -243,6 +239,7 @@ namespace Isis {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     public slots:
       bool             solveCholesky();
+      void             abortBundle();
 ///////////////////////////////////////////////////////////////////////////////////////////////////
       // accessors
       ControlNet       *controlNet() { return m_pCnet; } // TODO: change from pointer to const ref???
@@ -259,13 +256,7 @@ namespace Isis {
       double iteration() const { // TODO: move implementation to cpp per ISIS standards
         return m_nIteration;
       }
-      //      int HeldPoints() const { return m_nHeldPoints; }
-//      int ignoredPoints() const { // move code to cpp ???
-//        return m_nIgnoredPoints;
-//      }
-//      int fixedPoints() const { // move code to cpp ???
-//        return m_nFixedPoints;
-//      }
+
       bool isConverged();
       QString iterationSummaryGroup() const {
         return m_iterationSummary;
@@ -273,15 +264,22 @@ namespace Isis {
 
     signals:
       void statusUpdate(QString);
+      void error(QString);
+      void iterationUpdate(int, double);
+      void bundleException(QString);
       void resultsReady(BundleSolutionInfo *bundleSolveInformation);
+      void finished();
 
     public slots:
       void outputBundleStatus(QString status);
-      
+
     private:
 
-      void init(Progress *progress = 0);
-      void checkHeldList();
+      void init(Progress *progress = 0); // combine all initializations?
+      void initialize();
+
+      void checkHeldList(); // unnecessary?
+
       bool validateNetwork();
       // use bundle settings to initialize more variables
       // JWB - should I make a public method resetBundle(BundleSettings bundleSettings);
@@ -303,8 +301,6 @@ namespace Isis {
       BundleSolutionInfo bundleSolveInformation();
       bool computeBundleStatistics();
 
-      void initialize();
-
       bool formNormalEquations();
       void applyParameterCorrections();
       bool errorPropagation();
@@ -318,6 +314,7 @@ namespace Isis {
                                 SparseBlockColumnMatrix  &N12,
                                 boost::numeric::ublas::compressed_vector< double >  &n1,
                                 boost::numeric::ublas::vector< double >  &n2,
+                                boost::numeric::ublas::matrix< double >  &coeff_target,
                                 boost::numeric::ublas::matrix< double >  &coeff_image,
                                 boost::numeric::ublas::matrix< double >  &coeff_point3D,
                                 boost::numeric::ublas::vector< double >  &coeff_RHS,
@@ -401,7 +398,8 @@ namespace Isis {
 //                              boost::numeric::ublas::matrix< double >  &coeff_point3D,
 //                              boost::numeric::ublas::vector< double >  &coeff_RHS,
 //                              const ControlMeasure &measure, const ControlPoint &point);
-      bool computePartials_DC(boost::numeric::ublas::matrix< double >  &coeff_image,
+      bool computePartials_DC(boost::numeric::ublas::matrix< double >  &coeff_target,
+                              boost::numeric::ublas::matrix< double >  &coeff_image,
                               boost::numeric::ublas::matrix< double >  &coeff_point3D,
                               boost::numeric::ublas::vector< double >  &coeff_RHS,
                               BundleMeasure &measure, BundleControlPoint &point);
@@ -438,10 +436,9 @@ namespace Isis {
       // JWB - member data should be reorganized... by type possibly? by use
       //       probably better??? !< flags...
       //       we can probably remove several that are unused ???
+      bool m_abort;                                     //!< to abort threaded bundle
       bool m_bPrintSummary;                             //!< to print summary
       bool m_bCleanUp;                                  //!< for cleanup (i.e. in destructor)
-      bool m_bLastIteration;
-      bool m_bMaxIterationsReached;
 
       int m_nIteration;                                 //!< current iteration
       int m_nNumImagePartials;                          //!< number of image-related partials
@@ -450,16 +447,13 @@ namespace Isis {
       int m_nNumberCamPosCoefSolved;                    //!< number of camera position coefficients in solution
       SpicePosition::Source m_nPositionType;            //!< type of SpicePosition interpolation
       SpiceRotation::Source m_nPointingType;            //!< type of SpiceRotation interpolation
-      std::vector< int > m_nPointIndexMap;              //!< index into normal equations of point parameter positions
-      std::vector< int > m_nImageIndexMap;              //!< index into normal equations of image parameter positions
 
       double m_dError;                                  //!< error
 
-
       BundleObservationVector m_bundleObservations;
       BundleControlPointVector m_bundleControlPoints;
+      BundleTargetBodyQsp m_bundleTargetBody;
 
-//       BundleObservationSolveSettings m_boss;
       double m_dRTM;                                    //!< radians to meters conversion factor (body specific)
       double m_dMTR;                                    //!< meters to radians conversion factor (body specific)
       Distance m_bodyRadii[3];                          //!< body radii i meters
@@ -499,14 +493,12 @@ namespace Isis {
       SparseBlockMatrix m_SparseNormals;
       cholmod_triplet  *m_pTriplet;
 
-      BundleSettings m_bundleSettings; // pointer ??? then bundle settings method needs copy constructor ???
-                                       // or constructors here take a const ref ???
+      BundleSettingsQsp m_bundleSettings;
+
       BundleResults  m_bundleResults;
 //    BundleSolutionInfo m_bundleSolveInformation;
 
 
-// unused variable ???      int m_nHeldPoints;                                     //!< number of 'held' points (define)
-// unused variable ???      int m_nHeldObservations;                               //!< number of 'held' observations (define)
 // ??? moved to bundle stats class    //!< vectors for statistical computations...
 Statistics m_Statsx;                       //!<  x errors
 Statistics m_Statsy;                       //!<  y errors

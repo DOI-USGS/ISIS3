@@ -66,6 +66,9 @@ namespace Isis {
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
                                                              double exposureDuration);
 
+      //QString name();
+      //void setName(QString name);
+
       /**
        * CK frame ID -
        * Apollo 15 instrument code (A15_METRIC) = -915240

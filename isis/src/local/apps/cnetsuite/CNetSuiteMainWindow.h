@@ -54,8 +54,8 @@ namespace Isis {
       ~CNetSuiteMainWindow();
 
     public slots:
-      void addDock(QWidget *newWidgetForDock, Qt::DockWidgetArea area,
-                   Qt::Orientation orientation);
+      void addDock(QWidget *newWidgetForDock, Qt::DockWidgetArea area, Qt::Orientation orientation,
+                   Qt::DockWidgetArea allowedAreas = Qt::AllDockWidgetAreas);
       void readSettings(Project *);
 
     protected:
@@ -79,6 +79,8 @@ namespace Isis {
        *   drives most of the functionality.
        */
       QPointer<Directory> m_directory;
+
+      QDockWidget *m_projectDock;
 
       /**
        * This is the "goal" or "estimated" maximum number of active threads running in this program

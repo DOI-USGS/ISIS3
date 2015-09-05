@@ -41,7 +41,7 @@ namespace Isis {
    *   @history 2012-02-16 Steven Lambright - Brought up to method and member naming standards.
    *   @history 2012-03-22 Steven Lambright - Renamed text() to toString().
    *   @history 2012-06-29 Steven Lambright and Kimberly Oyama - Removed duplicate code from the
-   *                           contstructor. Added the fullRotation() method which creates
+   *                           constructor. Added the fullRotation() method which creates
    *                           an angle of 360 degrees and modified the unit test to
    *                           exercise this. References #958.
    *   @history 2012-07-26 Steven Lambright and Kimberly Oyama - Modified the < and >

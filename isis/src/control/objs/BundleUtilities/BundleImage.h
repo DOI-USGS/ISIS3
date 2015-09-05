@@ -25,6 +25,7 @@
  */
 
 #include <QObject>
+#include <QSharedPointer>
 
 #include "SerialNumber.h"
 
@@ -47,7 +48,7 @@ namespace Isis {
    */
   class BundleImage : QObject {
 
-    Q_OBJECT
+  Q_OBJECT
 
   public:
     // constructor
@@ -76,6 +77,8 @@ namespace Isis {
       QString m_serialNumber;
       QString m_fileName;      
   };
+
+  typedef QSharedPointer<BundleImage> BundleImageQsp;
 }
 
 #endif // BundleImage_h

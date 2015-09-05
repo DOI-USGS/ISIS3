@@ -13,6 +13,10 @@
     <file alias="fileServer">icons/file_server.png</file>
     <file alias="layers">icons/layers.png</file>
     <file alias="moonPhase">icons/moon_phase_full.png</file>
+    <file alias="enceladus">icons/enceladus.png</file>
+    <file alias="moon">icons/moon.png</file>
+    <file alias="mars">icons/mars.png</file>
+    <file alias="titan">icons/titan.png</file>
     <file alias="dem">icons/DEM.png</file>
     <file alias="open">icons/open.png</file>
     <file alias="save">icons/save.png</file>
@@ -25,5 +29,14 @@
     <file alias="statistics">icons/statistics.png</file>
     <file alias="settings">icons/settings.png</file>
     <file alias="run">icons/run.png</file>
+    <file alias="enceladus-large">images/enceladus-large.png</file>
+    <file alias="enceladus-saturn">images/enceladus-saturn.png</file>
+    <file alias="europa-large">images/europa-large.png</file>
+    <file alias="moon-large">images/moon-large.png</file>
+    <file alias="mars-large">images/mars-large.png</file>
+    <file alias="titan-large">images/titan-large.png</file>
+    <file alias="hirise-camera">images/hirise-camera.png</file>
+    <file alias="apollo-metric-camera">images/apollo-metric-camera.png</file>
+    <file alias="cassini-iss-nac">images/cassini-iss-nac.png</file>
   </qresource>
 </RCC>

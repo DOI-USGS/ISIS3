@@ -32,6 +32,10 @@
 #include "FileName.h"
 #include "XmlStackedHandler.h"
 
+#include <SpiceUsr.h>
+#include <SpiceZfc.h>
+#include <SpiceZmc.h>
+
 class QUuid;
 class QMutex;
 class QXmlStreamWriter;
@@ -147,6 +151,13 @@ namespace Isis {
       Image(const Image &other);
       Image &operator=(const Image &rhs);
 
+      SpiceInt *m_bodyCode;    /**< The NaifBodyCode value, if it exists in the
+                                    labels. Otherwise, if the target is sky,
+                                    it's the SPK code and if not sky then it's
+                                    calculated by the NaifBodyCode() method.*/
+//    QString *m_name;   //!< Name of the target
+
+
       /**
        * The cube associated with this Image. This is usually NULL once the image is done
        *   initializing because no more than a thousand of these should ever be open at once.
@@ -160,6 +171,14 @@ namespace Isis {
        * The on-disk file name of the cube associated with this Image.
        */
       QString m_fileName;
+      /**
+       * Instrument id associated with this Image.
+       */
+      QString m_instrumentId;
+      /**
+       * Spacecraft name associated with this Image.
+       */
+      QString m_spacecraftName;
       /**
        * A 0-360 ocentric lon,lat degrees footprint of this Image.
        */

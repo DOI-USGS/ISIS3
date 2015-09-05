@@ -929,6 +929,49 @@
       </parameter>
       </group>
 
+    <group name="Target Body">
+      <parameter name="SOLVETARGETBODY">
+        <type>boolean</type>
+        <default><item>false</item></default>
+        <brief>Enter target body parameters and a priori values using a PVL file</brief>
+        <description>
+        This option indicates that target body parameters are to be input via the PVL file specified
+        by TB_PARAMETERS. All of the following must be in the PVL file- values for coefficients of:
+        body pole RA and DEC; prime meridian; triaxial radii and/or mean radius. An example template
+        PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl.
+        </description>
+        <exclusions>
+        </exclusions>
+        <inclusions>
+          <item>TB_PARAMETERS</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="TB_PARAMETERS">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          File containing target body parameters to solve and a priori values
+        </brief>
+        <description>
+          This file contains target body parameters to use and solve for in the bundle adjustment.
+          File must be in PVL format. It should contain an object called TargetParameters.The
+          SpacecraftName and InstrumentId keywords in the Instrument group
+          of an image file are used to create the name of each group in the PVL file. The
+          group pertaining to each spacecraft/instrument should contain the keywords/value
+          pairs needed to process images taken with that sensor:  CKDEGREE, CKSOLVEDEGREE,
+          CAMSOLVE, TWIST, OVEREXISTING, SPKDEGREE, SPKSOLVEDEGREE, SPSOLVE, OVERHERMITE,
+          SPACECRAFT_POSITION_SIGMA, SPACECRAFT_VELOCITY_SIGMA, SPACECRAFT_ACCELERATION_SIGMA,
+          CAMERA_ANGLES_SIGMA, CAMERA_ANGULAR_VELOCITY_SIGMA, CAMERA_ANGULAR_ACCELERATION_SIGMA.
+          If any of these keywords is missing, then their defaults will be used. An example template
+          PVL file is located at $base/templates/jigsaw/TargetBodyParameters.pvl.
+        </description>
+        <filter>
+          *.pvl
+        </filter>
+      </parameter>
+    </group>
+
       <group name="Parameter Uncertainties">
         <parameter name="POINT_LATITUDE_SIGMA">
           <brief> Global latitude uncertainty for all points (meters)

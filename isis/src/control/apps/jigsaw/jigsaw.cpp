@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <QObject>
+#include <QSharedPointer>
 
 #include "BundleAdjust.h"
 #include "BundleResults.h"
@@ -19,7 +20,7 @@
 using namespace std;
 using namespace Isis;
 
-BundleSettings bundleSettings(UserInterface &ui);
+BundleSettingsQsp bundleSettings(UserInterface &ui);
 QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui);
 
 void IsisMain() {
@@ -42,7 +43,7 @@ void IsisMain() {
   QString cubeList = ui.GetFileName("FROMLIST");
   
   // retrieve settings from jigsaw gui
-  BundleSettings settings = bundleSettings(ui);
+  BundleSettingsQsp settings = bundleSettings(ui);
   BundleAdjust *bundleAdjustment = NULL;
 
   // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
@@ -118,13 +119,15 @@ void IsisMain() {
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
-//TODO - WHY DOES THIS MAKE VALGRIND ANGRY???  delete bundleAdjustment;
+//TODO - WHY DOES THIS MAKE VALGRIND ANGRY???
+  delete bundleAdjustment;
 }
 
-BundleSettings bundleSettings(UserInterface &ui) {
-  BundleSettings settings;
+BundleSettingsQsp bundleSettings(UserInterface &ui) {
+//  BundleSettings settings;
+  BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
 
-  settings.setValidateNetwork(true);
+  settings->setValidateNetwork(true);
 
   // solve options
   double latitudeSigma  = Isis::Null;
@@ -140,41 +143,66 @@ BundleSettings bundleSettings(UserInterface &ui) {
     radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
   }
 
-  settings.setSolveOptions(BundleSettings::stringToSolveMethod(ui.GetString("METHOD")),
+  settings->setSolveOptions(BundleSettings::stringToSolveMethod(ui.GetString("METHOD")),
                            ui.GetBoolean("OBSERVATIONS"), ui.GetBoolean("UPDATE"), 
                            ui.GetBoolean("ERRORPROPAGATION"), ui.GetBoolean("RADIUS"),
                            latitudeSigma, longitudeSigma, radiusSigma);
 
-  settings.setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
+  settings->setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
                                ui.GetDouble("REJECTION_MULTIPLIER"));
 
   QList<BundleObservationSolveSettings> solveSettingsList = observationSolveSettings(ui);
-  settings.setObservationSolveOptions(solveSettingsList);
+  settings->setObservationSolveOptions(solveSettingsList);
   // convergence criteria
-  settings.setConvergenceCriteria(BundleSettings::Sigma0,
+  settings->setConvergenceCriteria(BundleSettings::Sigma0,
                                   ui.GetDouble("SIGMA0"),
                                   ui.GetInteger("MAXITS"));
 
   // max likelihood estimation
   if (ui.GetString("MODEL1").compare("NONE") != 0) {
     // if model1 is not "NONE", add to the models list with its quantile
-    settings.addMaximumLikelihoodEstimatorModel(
+    settings->addMaximumLikelihoodEstimatorModel(
         MaximumLikelihoodWFunctions::stringToModel(ui.GetString("MODEL1")),
             ui.GetDouble("MAX_MODEL1_C_QUANTILE"));
 
     if (ui.GetString("MODEL2").compare("NONE") != 0) {
       // if model2 is not "NONE", add to the models list with its quantile
-      settings.addMaximumLikelihoodEstimatorModel(
+      settings->addMaximumLikelihoodEstimatorModel(
           MaximumLikelihoodWFunctions::stringToModel(ui.GetString("MODEL2")),
               ui.GetDouble("MAX_MODEL2_C_QUANTILE"));
 
       if (ui.GetString("MODEL3").compare("NONE") != 0) {
         // if model3 is not "NONE", add to the models list with its quantile
-        settings.addMaximumLikelihoodEstimatorModel(
+        settings->addMaximumLikelihoodEstimatorModel(
             MaximumLikelihoodWFunctions::stringToModel(ui.GetString("MODEL3")),
                 ui.GetDouble("MAX_MODEL3_C_QUANTILE"));
       }
     }
+  }
+
+  // target body options
+  if (ui.GetBoolean("SOLVETARGETBODY") == true) {
+    PvlObject obj;
+    ui.GetFileName("TB_PARAMETERS");
+    Pvl tbParPvl(FileName(ui.GetFileName("TB_PARAMETERS")).expanded());
+    if (!tbParPvl.hasObject("Target")) {
+      QString msg = "Input Target parameters file missing main Target object";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    // read target body pvl file into BundleTargetBody object
+    BundleTargetBodyQsp bundleTargetBody = BundleTargetBodyQsp(new BundleTargetBody);
+
+    obj = tbParPvl.findObject("Target");
+    bundleTargetBody->readFromPvl(obj);
+
+    // ensure user entered something to adjust
+    if (bundleTargetBody->numberParameters() == 0) {
+      string msg = "Must solve for at least one target body option";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    settings->setBundleTargetBody(bundleTargetBody);
   }
 
   // output options
@@ -182,7 +210,7 @@ BundleSettings bundleSettings(UserInterface &ui) {
   if (ui.WasEntered("FILE_PREFIX"))  {
     outputfileprefix = ui.GetString("FILE_PREFIX");
   }
-  settings.setOutputFiles(outputfileprefix, ui.GetBoolean("BUNDLEOUT_TXT"),
+  settings->setOutputFiles(outputfileprefix, ui.GetBoolean("BUNDLEOUT_TXT"),
                           ui.GetBoolean("OUTPUT_CSV"), ui.GetBoolean("RESIDUALS_CSV"));
 
   return settings;

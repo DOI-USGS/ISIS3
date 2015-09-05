@@ -23,7 +23,7 @@ using namespace std;
 using namespace Isis;
 
 Distance GetRadius(QString filename, Latitude lat, Longitude lon);
-BundleSettings bundleSettings();
+BundleSettingsQsp bundleSettings();
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -108,7 +108,7 @@ void IsisMain() {
     }
     
     // Bundle adjust to solve for new pointing
-    BundleSettings settings = bundleSettings();
+    BundleSettingsQsp settings = bundleSettings();
     BundleAdjust *bundleAdjust = new BundleAdjust(settings, cnet, serialNumberList);
     QObject::connect( bundleAdjust, SIGNAL( statusUpdate(QString) ),
                       bundleAdjust, SLOT( outputBundleStatus(QString) ) );
@@ -175,22 +175,22 @@ Distance GetRadius(QString inputFile, Latitude lat, Longitude lon) {
 
 
 
-BundleSettings bundleSettings() {
+BundleSettingsQsp bundleSettings() {
   UserInterface  &ui = Application::GetUserInterface();
-  BundleSettings settings;
+  BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
   // =========================================================================================//
   // ============= Use the bundle settings to initialize member variables ====================//
   // =========================================================================================//
-  settings.setValidateNetwork(false);
+  settings->setValidateNetwork(false);
   //  set the following:
   //     solve observation mode = false update cube label      = false error
   //     propagation      = false solve radius           = false latitude
   //     sigma         = 1000.0 longitude sigma        = 1000.0 radius sigma
   //     = -1.0 (since we are not solving for radius) outlier rejection =
   //     false
-  settings.setSolveOptions(BundleSettings::Sparse, false, false, false, false,
+  settings->setSolveOptions(BundleSettings::Sparse, false, false, false, false,
                            1000.0, 1000.0, -1.0);
-  settings.setOutlierRejection(false);
+  settings->setOutlierRejection(false);
 
   // =========================================================================================//
   // For deltack, we only have one observation solve settings, for now........................//
@@ -216,16 +216,16 @@ BundleSettings bundleSettings() {
       BundleObservationSolveSettings::NoPositionFactors);
 
   observationSolveSettingsList.append(observationSolveSettings);
-  settings.setObservationSolveOptions(observationSolveSettingsList);
+  settings->setObservationSolveOptions(observationSolveSettingsList);
   // ===========================================================================================//
   // =============== End Bundle Observation Solve Settings =====================================//
   // ===========================================================================================//
 
-  settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
+  settings->setConvergenceCriteria(BundleSettings::ParameterCorrections,
                                   ui.GetDouble("SIGMA0"),
                                   ui.GetInteger("MAXITS"));
 
-  settings.setOutputFiles("", true, false, true);
+  settings->setOutputFiles("", true, false, true);
 
 
   //************************************************************************************************

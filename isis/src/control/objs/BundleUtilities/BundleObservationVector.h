@@ -24,14 +24,16 @@
  */
 
 #include <QMap>
+#include <QSharedPointer>
 #include <QVector>
+
+#include "BundleSettings.h"
 
 #include "BundleImage.h"
 
 namespace Isis {
 
   class BundleObservation;
-  class BundleSettings;
   /**
    * @author 2014-05-22 Ken Edmundson
    *
@@ -49,7 +51,7 @@ namespace Isis {
 
       BundleObservationVector &operator=(const BundleObservationVector &src);
       BundleObservation *addnew(BundleImage *image, QString observationNumber,
-                                QString instrumentId, BundleSettings &bundleSettings);
+                                QString instrumentId, BundleSettingsQsp bundleSettings);
 
       int numberPositionParameters();
       int numberPointingParameters();
@@ -58,6 +60,7 @@ namespace Isis {
       BundleObservation *getObservationByCubeSerialNumber(QString cubeSerialNumber);
 
       bool initializeExteriorOrientation();
+      bool initializeBodyRotation();
 
   private:
       QMap<QString, BundleObservation*> m_observationNumberToObservationMap; //!< map between

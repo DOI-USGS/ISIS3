@@ -112,7 +112,7 @@ namespace Isis {
       else if (viewToUse != -1) {
         MatrixSceneWidget *matrixView = existingViews[viewToUse];
 
-        // Do we need this? If the view alread exists has this already been done?
+        // Do we need this? If the view already exists has this already been done?
         CorrelationMatrix corrMat = correlationMatrix();
         corrMat.computeCorrelationMatrix();
         matrixView->setUpOptions(corrMat);

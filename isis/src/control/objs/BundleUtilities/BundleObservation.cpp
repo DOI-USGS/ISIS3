@@ -11,7 +11,7 @@ using namespace boost::numeric::ublas;
 namespace Isis {
 
   /**
-   * TODO
+   * default constructor
    */
   BundleObservation::BundleObservation() {
     m_serialNumbers.clear();
@@ -25,10 +25,9 @@ namespace Isis {
     m_Index = 0;
     m_weights.clear();
     m_corrections.clear();
-    m_solution.clear();
+//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
-
   }
 
 
@@ -36,7 +35,7 @@ namespace Isis {
    * constructor
    */
   BundleObservation::BundleObservation(BundleImage *image, QString observationNumber,
-                                       QString instrumentId) {
+                                       QString instrumentId, BundleTargetBodyQsp bundleTargetBody) {
     m_serialNumbers.clear();
     m_imageNames.clear();
     m_parameterNamesList.clear();
@@ -48,12 +47,14 @@ namespace Isis {
     m_Index = 0;
     m_weights.clear();
     m_corrections.clear();
-    m_solution.clear();
+//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
 
     m_observationNumber = observationNumber;
     m_instrumentId = instrumentId;
+
+    m_bundleTargetBody = bundleTargetBody;
 
     if (image) {
       append(image);
@@ -72,15 +73,21 @@ namespace Isis {
                                    image->camera()->instrumentRotation() : NULL)
                                 : NULL);
 
+      // set the observations target body spice rotation object from the primary image in the
+      // observation (this is, by design at the moment, the first image added to the observation)
+      // if the image, camera, or instrument position/orientation is null, then set to null
+//      m_bodyRotation = (image->camera() ?
+//                           (image->camera()->bodyRotation() ?
+//                             image->camera()->bodyRotation() : NULL)
+//                           : NULL);
     }
   }
 
 
   /**
-   *  constructor
+   *  copy constructor
    */
   BundleObservation::BundleObservation(const BundleObservation &src) {
-
     m_serialNumbers = src.m_serialNumbers;
 
     m_observationNumber = src.m_observationNumber;
@@ -105,10 +112,7 @@ namespace Isis {
   }
 
 
-  /**
-   * TODO
-   */
-  BundleObservation& BundleObservation::operator = (const BundleObservation &src) {
+  BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
       m_serialNumbers = src.m_serialNumbers;
 
@@ -138,27 +142,18 @@ namespace Isis {
     if (nCameraAngleCoefficients >= 1 && m_solveSettings->solveTwist()) {
       nParameters += nCameraAngleCoefficients;
     }
-
-    // resize boost::numeric::ublas::vectors to the number of parameters and clear them
-    // (i.e. set all elements to zero)
+    // size vectors and set to zero
     m_weights.resize(nParameters);
     m_weights.clear();
-
-    m_corrections.resize(nParameters);// ??? += operator used when set by applyParameterCorrections
+    m_corrections.resize(nParameters);
     m_corrections.clear();
-
-    m_solution.resize(nParameters);// where set???
-    m_solution.clear();
-
-    m_adjustedSigmas.resize(nParameters);// set in bundle adjust
+//    m_solution.resize(nParameters);
+//    m_solution.clear();
+    m_adjustedSigmas.resize(nParameters);
     m_adjustedSigmas.clear();
-    
-    // resize boost::numeric::ublas::vector to the number of parameters and set all elements to Null
     m_aprioriSigmas.resize(nParameters);
-    for ( int i = 0; i < nParameters; i++) {
-      // initialize apriori sigmas to Null
+    for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to -1.0
       m_aprioriSigmas[i] = Isis::Null;
-    }
 
     if (!initParameterWeights()) {
       // TODO: some message here!!!!!!!!!!!
@@ -197,7 +192,7 @@ namespace Isis {
   /**
    * TODO
    */
-  const boost::numeric::ublas::vector< double >& BundleObservation::parameterWeights() {
+  vector< double > &BundleObservation::parameterWeights() {
     return m_weights;
   }
 
@@ -205,25 +200,23 @@ namespace Isis {
   /**
    * TODO
    */
-  const boost::numeric::ublas::vector< double > &BundleObservation::parameterCorrections() {
+  vector< double > &BundleObservation::parameterCorrections() {
     return m_corrections;
-
   }
 
 
   /**
    * TODO
    */
-  const boost::numeric::ublas::vector< double > &BundleObservation::parameterSolution() {
-    return m_solution;
-
-  }
+//  vector< double > &BundleObservation::parameterSolution() {
+//    return m_solution;
+//  }
 
 
   /**
    * TODO
    */
-  const boost::numeric::ublas::vector< double > &BundleObservation::aprioriSigmas() {
+  vector< double > &BundleObservation::aprioriSigmas() {
     return m_aprioriSigmas;
   }
 
@@ -231,56 +224,12 @@ namespace Isis {
   /**
    * TODO
    */
-  const boost::numeric::ublas::vector< double > &BundleObservation::adjustedSigmas() {
+  vector< double > &BundleObservation::adjustedSigmas() {
     return m_adjustedSigmas;
   }
 
 
-  /**
-   * TODO
-   */
-  void BundleObservation::setParameterWeights(boost::numeric::ublas::vector< double > weights) {
-    m_weights = weights;
-  }
-
-
-  /**
-   * TODO
-   */
-  void BundleObservation::setParameterCorrections(
-      boost::numeric::ublas::vector< double > corrections) {
-    m_corrections = corrections;
-  }
-
-
-  /**
-   * TODO
-   */
-  void BundleObservation::setParameterSolution(boost::numeric::ublas::vector< double > solution) {
-    m_solution = solution;
-  }
-
-
-  /**
-   * TODO
-   */
-  void BundleObservation::setAprioriSigmas(boost::numeric::ublas::vector< double > sigmas) {
-    m_aprioriSigmas = sigmas;
-  }
-
-
-  /**
-   * TODO
-   */
-  void BundleObservation::setAdjustedSigmas(boost::numeric::ublas::vector< double > sigmas) {
-    m_adjustedSigmas = sigmas;
-  }
-
-
-  /**
-   * TODO
-   */
-  const BundleObservationSolveSettings* BundleObservation::solveSettings() {
+  const BundleObservationSolveSettings *BundleObservation::solveSettings() { 
     return m_solveSettings;
   }
 
@@ -368,6 +317,36 @@ namespace Isis {
   }
 
 
+  /**
+   * TODO
+   */
+  void BundleObservation::initializeBodyRotation() {
+    std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
+    std::vector<Angle> decCoefs = m_bundleTargetBody->poleDecCoefs();
+    std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
+
+    for (int i = 0; i < size(); i++) {
+      BundleImage *image = at(i);
+      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);      
+    }
+  }
+
+
+  /**
+   * TODO
+   */
+  void BundleObservation::updateBodyRotation() {
+    std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
+    std::vector<Angle> decCoefs = m_bundleTargetBody->poleDecCoefs();
+    std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
+
+    for (int i = 0; i < size(); i++) {
+      BundleImage *image = at(i);
+      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
+    }
+  }
+
+
 /*
   bool BundleObservation::initializeExteriorOrientation() {
 
@@ -420,7 +399,7 @@ namespace Isis {
    * TODO
    * Don't like this, don't like this, don't like this, don't like this, don't like this.
    * By the way, this seems klunky to me, would like to come up with a better way.
-   * Also, apriori sigmas are in two place, the BundleObservationSolveSettings AND in the
+   * Also, apriori sigmas are in two places, the BundleObservationSolveSettings AND in the
    * the BundleObservation class too - this is unnecessary should only be in the
    * BundleObservationSolveSettings. But, they are split into position and pointing.
    */
@@ -447,29 +426,29 @@ namespace Isis {
       nCamAngleCoeffsSolved = 2  *m_solveSettings->numberCameraAngleCoefficientsSolved();
     }
 
-    if (aprioriPositionSigmas.size() >= 1 && aprioriPositionSigmas[0] > 0.0) {
-      posWeight = aprioriPositionSigmas[0];
+    if (aprioriPositionSigmas.size() >= 1 && aprioriPositionSigmas.at(0) > 0.0) {
+      posWeight = aprioriPositionSigmas.at(0);
       posWeight = 1.0 / (posWeight  *posWeight * 1.0e-6);
     }
-    if (aprioriPositionSigmas.size() >= 2 && aprioriPositionSigmas[1] > 0.0) {
-      velWeight = aprioriPositionSigmas[1];
+    if (aprioriPositionSigmas.size() >= 2 && aprioriPositionSigmas.at(1) > 0.0) {
+      velWeight = aprioriPositionSigmas.at(1);
       velWeight = 1.0 / (velWeight  *velWeight * 1.0e-6);
     }
-    if (aprioriPositionSigmas.size() >= 3 && aprioriPositionSigmas[2] > 0.0) {
-      accWeight = aprioriPositionSigmas[2];
+    if (aprioriPositionSigmas.size() >= 3 && aprioriPositionSigmas.at(2) > 0.0) {
+      accWeight = aprioriPositionSigmas.at(2);
       accWeight = 1.0 / (accWeight  *accWeight * 1.0e-6);
     }
 
-    if (aprioriPointingSigmas.size() >= 1 && aprioriPointingSigmas[0] > 0.0) {
-      angWeight = aprioriPointingSigmas[0];
+    if (aprioriPointingSigmas.size() >= 1 && aprioriPointingSigmas.at(0) > 0.0) {
+      angWeight = aprioriPointingSigmas.at(0);
       angWeight = 1.0 / (angWeight  *angWeight * DEG2RAD * DEG2RAD);
     }
-    if (aprioriPointingSigmas.size() >= 2 && aprioriPointingSigmas[1] > 0.0) {
-      angvelWeight = aprioriPointingSigmas[1];
+    if (aprioriPointingSigmas.size() >= 2 && aprioriPointingSigmas.at(1) > 0.0) {
+      angvelWeight = aprioriPointingSigmas.at(1);
       angvelWeight = 1.0 / (angvelWeight * angvelWeight * DEG2RAD * DEG2RAD);
     }
-    if (aprioriPointingSigmas.size() >= 3 && aprioriPointingSigmas[2] > 0.0) {
-      angaccWeight = aprioriPointingSigmas[2];
+    if (aprioriPointingSigmas.size() >= 3 && aprioriPointingSigmas.at(2) > 0.0) {
+      angaccWeight = aprioriPointingSigmas.at(2);
       angaccWeight = 1.0 / (angaccWeight * angaccWeight * DEG2RAD * DEG2RAD);
     }
 
@@ -477,15 +456,15 @@ namespace Isis {
     nspkTerms = m_solveSettings->numberCameraPositionCoefficientsSolved();
     for ( int i = 0; i < nCamPosCoeffsSolved; i++) {
       if (i % nspkTerms == 0) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas[0];
+       m_aprioriSigmas[i] = aprioriPositionSigmas.at(0);
        m_weights[i] = posWeight;
       }
       if (i % nspkTerms == 1) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas[1];
+       m_aprioriSigmas[i] = aprioriPositionSigmas.at(1);
        m_weights[i] = velWeight;
       }
       if (i % nspkTerms == 2) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas[2];
+       m_aprioriSigmas[i] = aprioriPositionSigmas.at(2);
        m_weights[i] = accWeight;
       }
     }
@@ -494,15 +473,15 @@ namespace Isis {
     nckTerms = m_solveSettings->numberCameraAngleCoefficientsSolved()    ;
     for ( int i = 0; i < nCamAngleCoeffsSolved; i++) {
       if (i % nckTerms == 0) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas[0];
+        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(0);
         m_weights[nCamPosCoeffsSolved + i] = angWeight;
       }
       if (i % nckTerms == 1) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas[1];
+        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(1);
         m_weights[nCamPosCoeffsSolved + i] = angvelWeight;
       }
       if (i % nckTerms == 2) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas[2];
+        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(2);
         m_weights[nCamPosCoeffsSolved + i] = angaccWeight;
       }
     }
@@ -543,19 +522,19 @@ namespace Isis {
 
         // update X coordinate coefficient(s) and sum parameter correction
         for (int i = 0; i < nCameraPositionCoefficients; i++) {
-          coefX[i] += corrections[index];
+          coefX[i] += corrections(index);
           index++;
         }
 
         // update Y coordinate coefficient(s) and sum parameter correction
         for (int i = 0; i < nCameraPositionCoefficients; i++) {
-          coefY[i] += corrections[index];
+          coefY[i] += corrections(index);
           index++;
         }
 
         // update Z coordinate coefficient(s) and sum parameter correction
         for (int i = 0; i < nCameraPositionCoefficients; i++) {
-          coefZ[i] += corrections[index];
+          coefZ[i] += corrections(index);
           index++;
         }
 
@@ -587,20 +566,20 @@ namespace Isis {
 
         // update RA coefficient(s)
         for (int i = 0; i < nCameraAngleCoefficients; i++) {
-          coefRA[i] += corrections[index];
+          coefRA[i] += corrections(index);
           index++;
         }
 
         // update DEC coefficient(s)
         for (int i = 0; i < nCameraAngleCoefficients; i++) {
-          coefDEC[i] += corrections[index];
+          coefDEC[i] += corrections(index);
           index++;
         }
 
         if (m_solveSettings->solveTwist()) {
           // update TWIST coefficient(s)
           for (int i = 0; i < nCameraAngleCoefficients; i++) {
-            coefTWI[i] += corrections[index];
+            coefTWI[i] += corrections(index);
             index++;
           }
         }
@@ -626,17 +605,11 @@ namespace Isis {
   }
 
 
-  /**
-   * TODO
-   */
   int BundleObservation::numberPositionParameters() {
     return 3.0 * m_solveSettings->numberCameraPositionCoefficientsSolved();
   }
 
 
-  /**
-   * TODO
-   */
   int BundleObservation::numberPointingParameters() {
     int angleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
@@ -647,33 +620,21 @@ namespace Isis {
   }
 
 
-  /**
-   * TODO
-   */
   int BundleObservation::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
   }
 
 
-  /**
-   * TODO
-   */
   void BundleObservation::setIndex(int n) {
     m_Index = n;
   }
 
 
-  /**
-   * TODO
-   */
   int BundleObservation::index() {
     return m_Index;
   }
 
 
-  /**
-   * TODO
-   */
   QString BundleObservation::formatBundleOutputString(bool errorPropagation) {
     std::vector<double> coefX;
     std::vector<double> coefY;
@@ -711,116 +672,104 @@ namespace Isis {
     if (nPositionCoefficients > 0) {
       for (int i = 0; i < nPositionCoefficients; i++) {
         finalParameterValues.push_back(coefX[i]);
-        if (i == 0) {
-          parameterNamesList.append(str.arg("  X  ").arg("0"));
-        }
-        else {
-          parameterNamesList.append(str.arg("     ").arg(i));
-        }
+        if (i == 0)
+          parameterNamesList.append( str.arg("  X  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
       }
-      for (int i = 0;i < nPositionCoefficients;i++) {
+      for (int i = 0; i < nPositionCoefficients; i++) {
         finalParameterValues.push_back(coefY[i]);
-        if (i == 0) {
-          parameterNamesList.append(str.arg("  Y  ").arg("0"));
-        }
-        else {
-          parameterNamesList.append(str.arg("     ").arg(i));
-        }
+        if (i == 0)
+          parameterNamesList.append( str.arg("  Y  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
       }
-      for (int i = 0;i < nPositionCoefficients;i++) {
+      for (int i = 0; i < nPositionCoefficients; i++) {
         finalParameterValues.push_back(coefZ[i]);
-        if (i == 0) {
-          parameterNamesList.append(str.arg("  Z  ").arg("0"));
-        }
-        else {
-          parameterNamesList.append(str.arg("     ").arg(i));
-        }
+        if (i == 0)
+          parameterNamesList.append( str.arg("  Z  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
       }
     }
     if (nPointingCoefficients > 0) {
-      for (int i = 0;i < nPointingCoefficients;i++) {
+      for (int i = 0; i < nPointingCoefficients; i++) {
         finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-        if (i == 0) {
-          parameterNamesList.append(str.arg(" RA  ").arg("0"));
-        }
-        else {
-          parameterNamesList.append(str.arg("     ").arg(i));
-        }
+        if (i == 0)
+          parameterNamesList.append( str.arg(" RA  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
       }
-      for (int i = 0;i < nPointingCoefficients;i++) {
+      for (int i = 0; i < nPointingCoefficients; i++) {
         finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-        if (i == 0) {
-          parameterNamesList.append(str.arg("DEC  ").arg("0"));
-        }
-        else {
-          parameterNamesList.append(str.arg("     ").arg(i));
-        }
+        if (i == 0)
+          parameterNamesList.append( str.arg("DEC  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
       }
-      for (int i = 0;i < nPointingCoefficients;i++) {
+      for (int i = 0; i < nPointingCoefficients; i++) {
         finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-        if (i == 0) {
-          parameterNamesList.append(str.arg("TWI  ").arg("0"));
-        }
-        else {
-          parameterNamesList.append(str.arg("     ").arg(i));
-        }
+        if (i == 0)
+          parameterNamesList.append( str.arg("TWI  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
       }
     }
 
     m_parameterNamesList = parameterNamesList;
     QString finalqStr = "";
-    QString qStr  = "";
+    QString qStr = "";
     QString sigma = "";
 
     // position parameters
     for (int i = 0; i < nPositionParameters; i++) {
 
-      sigma = (IsNullPixel(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8));
+      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
 
       if (errorPropagation) {
         qStr = QString("%1%2%3%4%5%6\n").
-               arg(parameterNamesList.at(i)).
-               arg(finalParameterValues[i] - m_corrections[i], 17, 'f', 8).
-               arg(m_corrections[i], 21, 'f', 8).
-               arg(finalParameterValues[i], 20, 'f', 8).
-               arg(sigma, 18).
-               arg(m_adjustedSigmas[i], 18, 'f', 8);
+            arg( parameterNamesList.at(i) ).
+            arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
+            arg(m_corrections(i), 21, 'f', 8).
+            arg(finalParameterValues[i], 20, 'f', 8).
+            arg(sigma, 18).
+            arg(m_adjustedSigmas[i], 18, 'f', 8);
       }
       else {
         qStr = QString("%1%2%3%4%5%6\n").
-               arg(parameterNamesList.at(i)).
-               arg(finalParameterValues[i] - m_corrections[i], 17, 'f', 8).
-               arg(m_corrections[i], 21, 'f', 8).
-               arg(finalParameterValues[i], 20, 'f', 8).
-               arg(sigma, 18).
-               arg("N/A", 18);
+            arg( parameterNamesList.at(i) ).
+            arg(finalParameterValues[i] - m_corrections(i), 17, 'f', 8).
+            arg(m_corrections(i), 21, 'f', 8).
+            arg(finalParameterValues[i], 20, 'f', 8).
+            arg(sigma, 18).
+            arg("N/A", 18);
       }
 
       finalqStr += qStr;
     }
 
     // pointing parameters
-    for (int i = nPositionParameters;i < nParameters;i++) {
+    for (int i = nPositionParameters; i < nParameters; i++) {
 
-      sigma = (IsNullPixel(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8));
+      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "N/A" : toString(m_aprioriSigmas[i], 8) );
 
       if (errorPropagation) {
         qStr = QString("%1%2%3%4%5%6\n").
-               arg(parameterNamesList.at(i)).
-               arg((finalParameterValues[i] - m_corrections[i] * RAD2DEG), 17, 'f', 8).
-               arg(m_corrections[i] * RAD2DEG, 21, 'f', 8).
-               arg(finalParameterValues[i], 20, 'f', 8).
-               arg(sigma, 18).
-               arg(m_adjustedSigmas[i] * RAD2DEG, 18, 'f', 8);
+            arg( parameterNamesList.at(i) ).
+            arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
+            arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
+            arg(finalParameterValues[i], 20, 'f', 8).
+            arg(sigma, 18).
+            arg(m_adjustedSigmas[i] * RAD2DEG, 18, 'f', 8);
       }
       else {
         qStr = QString("%1%2%3%4%5%6\n").
-               arg(parameterNamesList.at(i)).
-               arg((finalParameterValues[i] - m_corrections[i] * RAD2DEG), 17, 'f', 8).
-               arg(m_corrections[i] * RAD2DEG, 21, 'f', 8).
-               arg(finalParameterValues[i], 20, 'f', 8).
-               arg(sigma, 18).
-               arg("N/A", 18);
+            arg( parameterNamesList.at(i) ).
+            arg((finalParameterValues[i] - m_corrections(i) * RAD2DEG), 17, 'f', 8).
+            arg(m_corrections(i) * RAD2DEG, 21, 'f', 8).
+            arg(finalParameterValues[i], 20, 'f', 8).
+            arg(sigma, 18).
+            arg("N/A", 18);
       }
 
       finalqStr += qStr;
@@ -844,5 +793,4 @@ namespace Isis {
   QStringList BundleObservation::imageNames() {
     return m_imageNames;
   }
-
 }

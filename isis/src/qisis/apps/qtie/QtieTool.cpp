@@ -787,8 +787,8 @@ namespace Isis {
       // =========================================================================================//
       // ============= Use the bundle settings to initialize member variables ====================//
       // =========================================================================================//
-      BundleSettings settings;
-      settings.setValidateNetwork(false);
+      BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+      settings->setValidateNetwork(false);
       // set the following:
       //     solve observation mode = false
       //     update cube label      = false
@@ -798,7 +798,7 @@ namespace Isis {
       //     longitude sigma        = 1000.0
       //     radius sigma           = -1.0 (since we are not solving for radius)
       //     outlier rejection = false
-      settings.setSolveOptions(BundleSettings::SpecialK, false, false, false, false, 
+      settings->setSolveOptions(BundleSettings::SpecialK, false, false, false, false, 
                               1000.0, 1000.0, -1.0);
   //************************************************************************************************
       QList<BundleObservationSolveSettings> observationSolveSettingsList;
@@ -824,11 +824,11 @@ namespace Isis {
 
       observationSolveSettingsList.append(observationSolveSettings);
 
-      settings.setObservationSolveOptions(observationSolveSettingsList);
+      settings->setObservationSolveOptions(observationSolveSettingsList);
 
-      settings.setConvergenceCriteria(BundleSettings::ParameterCorrections,
+      settings->setConvergenceCriteria(BundleSettings::ParameterCorrections,
                                       p_sigma0, p_maxIterations);
-      settings.setOutputFiles("", false, false, false);
+      settings->setOutputFiles("", false, false, false);
       // =========================================================================================//
       // =============== End Bundle Settings =====================================================//
       // =========================================================================================//

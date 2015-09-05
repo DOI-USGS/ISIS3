@@ -11,7 +11,9 @@ namespace Isis {
   class Control;
   class ControlList;
   class Directory;
+  class GuiCameraList;
   class ImageList;
+  class TargetBodyList;
 
   /**
    *
@@ -47,6 +49,8 @@ namespace Isis {
       void addControlGroup(ControlList *controlList);
       void addControl(Control *control);
       void addImageGroup(ImageList *images);
+      void addTargets(TargetBodyList *targets);
+      void addGuiCameras(GuiCameraList *guiCameras);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
 
     protected:
@@ -72,7 +76,6 @@ namespace Isis {
       QTreeWidgetItem *m_targetParentItem;
       QTreeWidgetItem *m_sensorsParentItem;
       QTreeWidgetItem *m_spacecraftParentItem;
-//       QTreeWidgetItem *m_sensorsParentItem;
       QTreeWidgetItem *m_resultsParentItem;
 
       bool m_ignoreEdits;

@@ -1,4 +1,4 @@
-#include "DisplayProperties.h"
+    #include "DisplayProperties.h"
 
 #include <QBuffer>
 #include <QXmlStreamWriter>

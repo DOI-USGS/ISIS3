@@ -477,7 +477,7 @@ namespace Isis {
 
 
   /**
-   * Set surface point in spherical body-fixed coordinates (lat/lon/radius) wtih
+   * Set surface point in spherical body-fixed coordinates (lat/lon/radius) with
    *   its variance/covariance matrix in radians squared.
    *
    * @param lat  Body-fixed latitude of surface point

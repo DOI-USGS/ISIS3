@@ -4,9 +4,10 @@
 #include <QObject>
 #include <QTreeWidgetItem>
 
+#include "BundleSettings.h"
+
 
 namespace Isis {
-  class BundleSettings;
 
   /**
    * @brief A control in the project tree widget
@@ -20,14 +21,14 @@ namespace Isis {
   class BundleSettingsTreeWidgetItem : public QObject, public QTreeWidgetItem {
     Q_OBJECT
     public:
-      BundleSettingsTreeWidgetItem(BundleSettings *bundleSettings, QTreeWidget *parent = 0);
+      BundleSettingsTreeWidgetItem(BundleSettingsQsp bundleSettings, QTreeWidget *parent = 0);
       virtual ~BundleSettingsTreeWidgetItem();
 
-      BundleSettings *bundleSettings();
+      BundleSettingsQsp bundleSettings();
       void selectionChanged();
 
     private:
-      BundleSettings *m_bundleSettings;
+      BundleSettingsQsp m_bundleSettings;
   };
 }
 

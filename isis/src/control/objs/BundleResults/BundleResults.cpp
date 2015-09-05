@@ -93,6 +93,7 @@ namespace Isis {
         m_numberImageParameters(src.m_numberImageParameters),
         m_numberConstrainedImageParameters(src.m_numberConstrainedImageParameters),
         m_numberConstrainedPointParameters(src.m_numberConstrainedPointParameters),
+        m_numberConstrainedTargetParameters(src.m_numberConstrainedTargetParameters),
         m_degreesOfFreedom(src.m_degreesOfFreedom),
         m_sigma0(src.m_sigma0),
         m_elapsedTime(src.m_elapsedTime),
@@ -174,6 +175,7 @@ namespace Isis {
       m_numberImageParameters = src.m_numberImageParameters;
       m_numberConstrainedImageParameters = src.m_numberConstrainedImageParameters;
       m_numberConstrainedPointParameters = src.m_numberConstrainedPointParameters;
+      m_numberConstrainedTargetParameters = src.m_numberConstrainedTargetParameters;
       m_degreesOfFreedom = src.m_degreesOfFreedom;
       m_sigma0 = src.m_sigma0;
       m_elapsedTime = src.m_elapsedTime;
@@ -282,6 +284,7 @@ namespace Isis {
     // setParameterWeights (i.e. solve)
     m_numberConstrainedPointParameters = 0;
     m_numberConstrainedImageParameters = 0;
+    m_numberConstrainedTargetParameters = 0;
 
     // set by initialize, formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
     m_numberUnknownParameters = 0;
@@ -559,6 +562,18 @@ namespace Isis {
 
 
 
+  void BundleResults::resetNumberConstrainedTargetParameters() {
+    m_numberConstrainedTargetParameters = 0;
+  }
+
+
+
+  void BundleResults::incrementNumberConstrainedTargetParameters(int incrementAmount) {
+    m_numberConstrainedTargetParameters += incrementAmount;
+  }
+
+
+
   void BundleResults::setNumberUnknownParameters(int numberParameters) {
     m_numberUnknownParameters = numberParameters;
   }
@@ -569,6 +584,7 @@ namespace Isis {
     m_degreesOfFreedom = m_numberObservations
                          + m_numberConstrainedPointParameters
                          + m_numberConstrainedImageParameters
+                         + m_numberConstrainedTargetParameters
                          - m_numberUnknownParameters;
   }
 
@@ -823,6 +839,12 @@ namespace Isis {
 
 
 
+  int BundleResults::numberConstrainedTargetParameters() const {
+    return m_numberConstrainedTargetParameters;
+  }
+
+
+
   int BundleResults::numberUnknownParameters() const {
     return m_numberUnknownParameters;
   }
@@ -924,6 +946,7 @@ namespace Isis {
     pvl += PvlKeyword("NumberImageParameters", toString(numberImageParameters()));
     pvl += PvlKeyword("NumberConstrainedPointParameters", toString(numberConstrainedPointParameters()));
     pvl += PvlKeyword("NumberConstrainedImageParameters", toString(numberConstrainedImageParameters()));
+    pvl += PvlKeyword("NumberConstrainedTargetParameters", toString(numberConstrainedTargetParameters()));
     pvl += PvlKeyword("NumberUnknownParameters", toString(numberUnknownParameters()));
     pvl += PvlKeyword("DegreesOfFreedom", toString(degreesOfFreedom()));
     pvl += PvlKeyword("Sigma0", toString(sigma0()));
@@ -1064,6 +1087,7 @@ namespace Isis {
     stream.writeTextElement("numberImageParameters", toString(numberImageParameters()));
     stream.writeTextElement("numberConstrainedPointParameters", toString(numberConstrainedPointParameters()));
     stream.writeTextElement("numberConstrainedImageParameters", toString(numberConstrainedImageParameters()));
+    stream.writeTextElement("numberConstrainedTargetParameters", toString(numberConstrainedTargetParameters()));
     stream.writeTextElement("numberUnknownParameters", toString(numberUnknownParameters()));
     stream.writeTextElement("degreesOfFreedom", toString(degreesOfFreedom()));
     stream.writeTextElement("sigma0", toString(sigma0()));
@@ -1616,6 +1640,9 @@ namespace Isis {
       else if (qName == "numberConstrainedImageParameters") {
         m_xmlHandlerBundleResults->m_numberConstrainedImageParameters = toInt(m_xmlHandlerCharacters);
       }
+      else if (qName == "numberConstrainedTargetParameters") {
+        m_xmlHandlerBundleResults->m_numberConstrainedTargetParameters = toInt(m_xmlHandlerCharacters);
+      }
       else if (qName == "numberUnknownParameters") {
         m_xmlHandlerBundleResults->m_numberUnknownParameters = toInt(m_xmlHandlerCharacters);
       }
@@ -1740,6 +1767,7 @@ namespace Isis {
            << (qint32)m_numberImageParameters
            << (qint32)m_numberConstrainedImageParameters
            << (qint32)m_numberConstrainedPointParameters
+           << (qint32)m_numberConstrainedTargetParameters
            << (qint32)m_degreesOfFreedom
            << m_sigma0
            << m_elapsedTime << m_elapsedTimeErrorProp
@@ -1774,8 +1802,8 @@ namespace Isis {
     CorrelationMatrix correlationMatrix;
     qint32 numberFixedPoints, numberIgnoredPoints, numberHeldImages, numberRejectedObservations,
            numberObservations, numberImageParameters, numberConstrainedPointParameters,
-           numberConstrainedImageParameters, numberUnknownParameters, degreesOfFreedom,
-           maximumLikelihoodIndex;
+           numberConstrainedImageParameters, numberConstrainedTargetParameters,
+           numberUnknownParameters, degreesOfFreedom, maximumLikelihoodIndex;
     double minSigmaLatitudeDistance, maxSigmaLatitudeDistance, minSigmaLongitudeDistance,
            maxSigmaLongitudeDistance, minSigmaRadiusDistance, maxSigmaRadiusDistance;   
     StatCumProbDistDynCalc cumPro;
@@ -1794,6 +1822,7 @@ namespace Isis {
     stream >> numberImageParameters;
     stream >> numberConstrainedImageParameters;
     stream >> numberConstrainedPointParameters;
+    stream >> numberConstrainedTargetParameters;
     stream >> degreesOfFreedom;
     stream >> m_sigma0;
     stream >> m_elapsedTime >> m_elapsedTimeErrorProp;
@@ -1826,17 +1855,18 @@ namespace Isis {
     m_correlationMatrix = NULL;
     m_correlationMatrix = new CorrelationMatrix(correlationMatrix);
 
-    m_numberFixedPoints                = (int)numberFixedPoints;
-    m_numberIgnoredPoints              = (int)numberIgnoredPoints;
-    m_numberHeldImages                 = (int)numberHeldImages;
-    m_numberRejectedObservations       = (int)numberRejectedObservations;
-    m_numberObservations               = (int)numberObservations;
-    m_numberImageParameters            = (int)numberImageParameters;
-    m_numberConstrainedPointParameters = (int)numberConstrainedPointParameters;
-    m_numberConstrainedImageParameters = (int)numberConstrainedImageParameters;
-    m_numberUnknownParameters          = (int)numberUnknownParameters;
-    m_degreesOfFreedom                 = (int)degreesOfFreedom;
-    m_maximumLikelihoodIndex           = (int)maximumLikelihoodIndex;
+    m_numberFixedPoints                 = (int)numberFixedPoints;
+    m_numberIgnoredPoints               = (int)numberIgnoredPoints;
+    m_numberHeldImages                  = (int)numberHeldImages;
+    m_numberRejectedObservations        = (int)numberRejectedObservations;
+    m_numberObservations                = (int)numberObservations;
+    m_numberImageParameters             = (int)numberImageParameters;
+    m_numberConstrainedPointParameters  = (int)numberConstrainedPointParameters;
+    m_numberConstrainedImageParameters  = (int)numberConstrainedImageParameters;
+    m_numberConstrainedTargetParameters = (int)numberConstrainedTargetParameters;
+    m_numberUnknownParameters           = (int)numberUnknownParameters;
+    m_degreesOfFreedom                  = (int)degreesOfFreedom;
+    m_maximumLikelihoodIndex            = (int)maximumLikelihoodIndex;
 
     m_minSigmaLatitudeDistance.setMeters(minSigmaLatitudeDistance); 
     m_maxSigmaLatitudeDistance.setMeters(maxSigmaLatitudeDistance); 

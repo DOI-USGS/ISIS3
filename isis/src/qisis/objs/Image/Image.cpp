@@ -26,6 +26,7 @@
 #include "PolygonTools.h"
 #include "Project.h"
 #include "SerialNumber.h"
+#include "Target.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -36,6 +37,7 @@ namespace Isis {
    * @param parent The Qt-relationship parent
    */
   Image::Image(QString imageFileName, QObject *parent) : QObject(parent) {
+    m_bodyCode = NULL;
     m_cube = NULL;
     m_displayProperties = NULL;
     m_footprint = NULL;
@@ -73,6 +75,7 @@ namespace Isis {
   Image::Image(Cube *imageCube, QObject *parent) : QObject(parent) {
     m_fileName = imageCube->fileName();
 
+    m_bodyCode = NULL;
     m_cube = imageCube;
     m_displayProperties = NULL;
     m_footprint = NULL;
@@ -106,6 +109,7 @@ namespace Isis {
    */
   Image::Image(FileName imageFolder, XmlStackedHandlerReader *xmlReader, QObject *parent) :
       QObject(parent) {
+    m_bodyCode = NULL;
     m_cube = NULL;
     m_displayProperties = NULL;
     m_footprint = NULL;
@@ -124,6 +128,9 @@ namespace Isis {
    * Clean up this image. If you haven't saved this image, all of its settings will be lost.
    */
   Image::~Image() {
+    delete m_bodyCode;
+    m_bodyCode = NULL;
+
     delete m_cube;
     m_cube = NULL;
 
@@ -549,6 +556,8 @@ namespace Isis {
 
     stream.writeAttribute("id", m_id->toString());
     stream.writeAttribute("fileName", FileName(m_fileName).name());
+    stream.writeAttribute("instrumentId", m_instrumentId);
+    stream.writeAttribute("spacecraftName", m_spacecraftName);
 
     if (!IsSpecial(m_aspectRatio)) {
       stream.writeAttribute("aspectRatio", IString(m_aspectRatio).ToQt());
@@ -647,7 +656,7 @@ namespace Isis {
   }
 
 
-  void Image::initCamStats() {
+  void Image::initCamStats() {    
     bool hasCamStats = false;
 
     Pvl &label = *cube()->label();
@@ -706,6 +715,23 @@ namespace Isis {
         }
       }
     }
+
+    for (int i = 0; i < label.objects(); i++) {
+      PvlObject &obj = label.object(i);
+      try {
+        if (obj.hasGroup("Instrument")) {
+          PvlGroup instGroup = obj.findGroup("Instrument");
+
+          if (instGroup.hasKeyword("SpacecraftName"))
+            m_spacecraftName = obj.findGroup("Instrument")["SpacecraftName"][0];
+
+          if (instGroup.hasKeyword("InstrumentId"))
+            m_instrumentId = obj.findGroup("Instrument")["InstrumentId"][0];
+        }
+      }
+      catch (IException &) {
+      }
+    }
   }
 
 
@@ -742,6 +768,8 @@ namespace Isis {
       if (localName == "image") {
         QString id = atts.value("id");
         QString fileName = atts.value("fileName");
+        QString instrumentId = atts.value("instrumentId");
+        QString spacecraftName = atts.value("spacecraftName");
 
         QString aspectRatioStr = atts.value("aspectRatio");
         QString resolutionStr = atts.value("resolution");
@@ -761,6 +789,14 @@ namespace Isis {
 
         if (!fileName.isEmpty()) {
           m_image->m_fileName = m_imageFolder.expanded() + "/" + fileName;
+        }
+
+        if (!instrumentId.isEmpty()) {
+          m_image->m_instrumentId = m_imageFolder.expanded() + "/" + instrumentId;
+        }
+
+        if (!spacecraftName.isEmpty()) {
+          m_image->m_spacecraftName = m_imageFolder.expanded() + "/" + spacecraftName;
         }
 
         if (!aspectRatioStr.isEmpty()) {

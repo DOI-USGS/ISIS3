@@ -2,7 +2,11 @@
 #define JigsawDialog_h
 
 #include <QDialog>
-  
+#include <QWidget>
+
+#include "BundleSettings.h"
+#include "IException.h"
+
 namespace Ui {
   class JigsawDialog;
 }
@@ -10,9 +14,10 @@ namespace Ui {
 class QString;
 
 namespace Isis {
+  class BundleAdjust;
   class BundleSolutionInfo;
-  class BundleSettings;
   class Control;
+  class Directory;
   class Project;
 
   /**
@@ -38,17 +43,26 @@ namespace Isis {
 
   public:
     explicit JigsawDialog(Project *project, QWidget *parent = 0);
+
     ~JigsawDialog();
 
   public slots:
     void outputBundleStatus(QString status);
+    void errorString(QString error);
+    void reportException(QString exception);
+    void updateIterationSigma0(int iteration, double sigma0);
     void bundleFinished(BundleSolutionInfo *bundleSolutionInfo);
-    
+    void notifyThreadFinished();
+
   protected:
+    BundleAdjust *m_bundleAdjust;
     Project *m_project;
     Control *m_selectedControl;
     QString *m_selectedControlName;
-    BundleSettings *m_bundleSettings;
+    BundleSettingsQsp m_bundleSettings;
+
+  private:
+    bool m_bRunning;
     
   private slots:
     void on_JigsawSetupButton_pressed();

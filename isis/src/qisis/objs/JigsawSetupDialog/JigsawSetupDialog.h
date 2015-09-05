@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "BundleSettings.h"
+
 namespace Ui {
   class JigsawSetupDialog;
 }
@@ -31,7 +33,6 @@ namespace Isis {
    */
   class Project;
   class Control;
-  class BundleSettings;
 
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT
@@ -44,27 +45,52 @@ namespace Isis {
 
     Control *selectedControl();// TODO: return const references ???
     QString *selectedControlName();// TODO: return const references ???
-    BundleSettings *bundleSettings();// TODO: return const references ???
+    BundleSettingsQsp bundleSettings();// TODO: return const references ???
 
   private slots:
 
-    //void on_radiusCheckBox_toggled(bool checked);
+    void on_radiusCheckBox_toggled(bool checked);
     //void on_outlierRejectionCheckBox_toggled(bool checked);
 
+    // general tab
     void on_positionComboBox_currentIndexChanged(int index);
     void on_pointingComboBox_currentIndexChanged(int index);
 
+    // maximum liklihood tab
     void on_maximumLikelihoodModel1ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel2ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel3ComboBox_currentIndexChanged(int index);
 
-  private:
+    // target body tab
+    void on_poleRaCheckBox_stateChanged(int arg1);
+    void on_poleRaVelocityCheckBox_stateChanged(int arg1);
+    void on_poleDecCheckBox_stateChanged(int arg1);
+    void on_poleDecVelocityCheckBox_stateChanged(int arg1);
+    void on_spinRateCheckBox_stateChanged(int arg1);
+    void on_primeMeridianOffsetCheckBox_stateChanged(int arg1);
+    void on_radiiButtonGroupClicked(int arg1);
+    void on_aRadiusLineEdit_textChanged(const QString &arg1);
+    void on_targetBodyComboBox_currentIndexChanged(int index);
+    void on_spkSolveDegreeSpinBox_2_valueChanged(int arg1);
+    void on_rightAscensionLineEdit_textChanged(const QString &arg1);
+    void on_declinationLineEdit_textChanged(const QString &arg1);
+    void on_rightAscensionVelocityLineEdit_textChanged(const QString &arg1);
+    void on_declinationVelocityLineEdit_textChanged(const QString &arg1);
+    void on_spinRateLineEdit_textChanged(const QString &arg1);
+    void on_primeMeridianOffsetLineEdit_textChanged(const QString &arg1);
+
+    public slots:
+    void slotTextChanged(const QString &text);
+    void checkIsValid();
+
+
+    private:
     void makeReadOnly()    ;
-    void fillFromSettings(BundleSettings* settings);
+    void fillFromSettings(BundleSettingsQsp settings);
 
   private:
     Ui::JigsawSetupDialog *m_ui;
-    Project * m_project;
+    Project *m_project;
   };
 };
 #endif // JigsawSetupDialog_h

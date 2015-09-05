@@ -2,7 +2,6 @@
 
 #include <QDebug>
 
-#include "BundleSettings.h"
 //#include "BundleResultsDisplayProperties.h"
 
 namespace Isis {
@@ -14,7 +13,7 @@ namespace Isis {
    *
    * @param parent
    */
-  BundleSettingsTreeWidgetItem::BundleSettingsTreeWidgetItem(BundleSettings *bundleSettings,
+  BundleSettingsTreeWidgetItem::BundleSettingsTreeWidgetItem(BundleSettingsQsp bundleSettings,
       QTreeWidget *parent) : QTreeWidgetItem(parent, UserType) {
     m_bundleSettings = bundleSettings;
 
@@ -22,16 +21,15 @@ namespace Isis {
     setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     setIcon(0, QIcon(":settings"));
 
-    connect(m_bundleSettings, SIGNAL(destroyed(QObject *)), this, SLOT(deleteLater()));
+//    connect(m_bundleSettings, SIGNAL(destroyed(QObject *)), this, SLOT(deleteLater()));
   }
 
 
   BundleSettingsTreeWidgetItem::~BundleSettingsTreeWidgetItem() {
-    m_bundleSettings = NULL;
   }
 
 
-  BundleSettings *BundleSettingsTreeWidgetItem::bundleSettings() {
+  BundleSettingsQsp BundleSettingsTreeWidgetItem::bundleSettings() {
     return m_bundleSettings;
   }
 

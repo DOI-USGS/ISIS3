@@ -10,7 +10,6 @@
 #include <hdf5.h>
 #include <H5Cpp.h>
 
-#include "BundleSettings.h"
 #include "BundleResults.h"
 #include "ControlNet.h"
 #include "FileName.h"
@@ -23,7 +22,7 @@
 
 namespace Isis {
 
-  BundleSolutionInfo::BundleSolutionInfo(BundleSettings inputSettings,
+  BundleSolutionInfo::BundleSolutionInfo(BundleSettingsQsp inputSettings,
                                          FileName controlNetworkFileName,
                                          BundleResults outputStatistics, 
                                          QObject *parent) : QObject(parent) {
@@ -35,8 +34,7 @@ namespace Isis {
     m_controlNetworkFileName = NULL;
     m_controlNetworkFileName = new FileName(controlNetworkFileName);
 
-    m_settings = NULL;
-    m_settings = new BundleSettings(inputSettings);
+    m_settings = inputSettings;
 
     m_statisticsResults = NULL;
     m_statisticsResults = new BundleResults(outputStatistics);
@@ -61,9 +59,6 @@ namespace Isis {
   BundleSolutionInfo::BundleSolutionInfo(FileName bundleSolutionInfoFile) {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
-
-    m_settings = NULL;
-    m_settings = new BundleSettings();
 
     m_statisticsResults = NULL;
     m_statisticsResults = new BundleResults();
@@ -100,9 +95,6 @@ namespace Isis {
     delete m_controlNetworkFileName;
     m_controlNetworkFileName = NULL;
 
-    delete m_settings;
-    m_settings = NULL;
-
     delete m_statisticsResults;
     m_statisticsResults = NULL;
 
@@ -126,9 +118,7 @@ namespace Isis {
       m_controlNetworkFileName = NULL;
       m_controlNetworkFileName = new FileName(src.m_controlNetworkFileName->expanded());
 
-      delete m_settings;
-      m_settings = NULL;
-      m_settings = new BundleSettings(*src.m_settings);
+      m_settings = src.m_settings;
 
       delete m_statisticsResults;
       m_statisticsResults = NULL;
@@ -160,7 +150,7 @@ namespace Isis {
     if (m_controlNetworkFileName->expanded() != "") {
       pvl += PvlKeyword("OutputControlNetwork", controlNetworkFileName());
     }
-    pvl += bundleSettings().pvlObject(settingsName);
+    pvl += bundleSettings()->pvlObject(settingsName);
     pvl += bundleResults().pvlObject(statisticsName);
     return pvl;
 
@@ -255,7 +245,6 @@ namespace Isis {
     m_xmlHandlerProject = project;
     m_xmlHandlerCharacters = "";
     m_xmlHandlerImages = NULL;
-    m_xmlHandlerBundleSettings = NULL;
     m_xmlHandlerBundleResults = NULL;
   }
 
@@ -273,9 +262,6 @@ namespace Isis {
 
     delete m_xmlHandlerImages;
     m_xmlHandlerImages = NULL;
-
-    delete m_xmlHandlerBundleSettings;
-    m_xmlHandlerBundleSettings = NULL;
 
     delete m_xmlHandlerBundleResults;
     m_xmlHandlerBundleResults = NULL;
@@ -297,9 +283,8 @@ namespace Isis {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
       if (localName == "bundleSettings") {
-        delete m_xmlHandlerBundleSettings;
-        m_xmlHandlerBundleSettings = NULL;
-        m_xmlHandlerBundleSettings = new BundleSettings(m_xmlHandlerProject, reader());
+        m_xmlHandlerBundleSettings =
+            BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
       }
       else if (localName == "bundleResults") {
         delete m_xmlHandlerBundleResults;
@@ -337,9 +322,8 @@ namespace Isis {
       m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
     }
     else if (localName == "bundleSettings") {
-      m_xmlHandlerBundleSolutionInfo->m_settings = new BundleSettings(*m_xmlHandlerBundleSettings);
-      delete m_xmlHandlerBundleSettings;
-      m_xmlHandlerBundleSettings = NULL;
+      m_xmlHandlerBundleSolutionInfo->m_settings =
+          BundleSettingsQsp(new BundleSettings(*m_xmlHandlerBundleSettings));
     }
     else if (localName == "bundleResults") {
       m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(*m_xmlHandlerBundleResults);
@@ -391,15 +375,8 @@ namespace Isis {
     return m_controlNetworkFileName->expanded();
   }
 
-  BundleSettings BundleSolutionInfo::bundleSettings() {
-    if (m_settings) {
-      return *m_settings;
-    }
-    else {
-      throw IException(IException::Unknown, 
-                       "Settings for this bundle is NULL.",
-                       _FILEINFO_);
-    }
+  BundleSettingsQsp BundleSolutionInfo::bundleSettings() {
+    return m_settings;
   }
 
   BundleResults BundleSolutionInfo::bundleResults() {
@@ -444,9 +421,7 @@ namespace Isis {
 
     BundleSettings settings;
     stream >> settings;
-    delete m_settings;
-    m_settings = NULL;
-    m_settings = new BundleSettings(settings);
+    m_settings = BundleSettingsQsp(new BundleSettings(settings));
 
     BundleResults statisticsResults;
     stream >> statisticsResults;

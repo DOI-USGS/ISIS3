@@ -36,7 +36,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="jigsawButtonsLayoutWidget">
    <property name="geometry">
     <rect>
      <x>320</x>
@@ -89,8 +89,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>293</width>
-         <height>233</height>
+         <width>297</width>
+         <height>237</height>
         </rect>
        </property>
        <property name="text">
@@ -100,6 +100,67 @@
         <bool>true</bool>
        </property>
       </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="iterationLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>321</x>
+     <y>110</y>
+     <width>188</width>
+     <height>59</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="iterationSigma0Layout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="iterationLabel">
+      <property name="text">
+       <string>Iteration</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::PlainText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="sigma0Label">
+      <property name="text">
+       <string>sigma0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLCDNumber" name="iterationLcdNumber">
+      <property name="minimumSize">
+       <size>
+        <width>90</width>
+        <height>35</height>
+       </size>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLCDNumber" name="sigma0LcdNumber">
+      <property name="minimumSize">
+       <size>
+        <width>90</width>
+        <height>35</height>
+       </size>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
      </widget>
     </item>
    </layout>

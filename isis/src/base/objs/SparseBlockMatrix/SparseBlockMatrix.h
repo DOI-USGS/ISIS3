@@ -69,6 +69,7 @@ namespace Isis {
     int numberOfRows();
     int numberOfColumns();
     void print(std::ostream& outstream);
+    void printClean(std::ostream& outstream);
   };
 
   // operators to read/write SparseBlockColumnMatrix to/from binary disk file
@@ -115,6 +116,7 @@ namespace Isis {
     int getLeadingColumnsForBlock(int nblockColumn);
     int numberOfElements();
     void print(std::ostream& outstream);
+    void printClean(std::ostream& outstream);
   };
 
   // operators to read/write SparseBlockRowMatrix to/from binary disk file
@@ -161,6 +163,7 @@ namespace Isis {
     int numberOfOffDiagonalBlocks();
     int numberOfElements();
     void print(std::ostream& outstream);
+    void printClean(std::ostream& outstream);
     bool write(std::ofstream &fp_out, bool binary=true);
     int getLeadingColumnsForBlock(int nblockColumn);
     int getLeadingRowsForBlock(int nblockRow);

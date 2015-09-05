@@ -36,6 +36,7 @@
 #include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
+#include "TargetBody.h"
 #include "XmlStackedHandlerReader.h"
 
 
@@ -112,6 +113,8 @@ namespace Isis {
     m_images = new ImageList(*other.m_images);
     m_correlationMatrix = other.m_correlationMatrix;
     m_controls = other.m_controls;
+    m_guiCamera = other.m_guiCamera;
+    m_targetBody = other.m_targetBody;
     m_internalData = other.m_internalData;
 
     m_createsCleanState = other.m_createsCleanState;
@@ -190,6 +193,27 @@ namespace Isis {
   bool WorkOrder::isExecutable(CorrelationMatrix *correlationMatrix) {
     return false;
   }
+
+
+  /**
+   *
+   *
+   * @param
+   */
+  bool WorkOrder::isExecutable(GuiCamera *guiCamera) {
+    return false;
+  }
+
+
+  /**
+   *
+   *
+   * @param
+   */
+  bool WorkOrder::isExecutable(TargetBody *targetBody) {
+    return false;
+  }
+
 
   /**
    * Read this work order's data from disk.
@@ -285,9 +309,21 @@ namespace Isis {
     m_controls = controls;
   }
 
+
   void WorkOrder::setData(CorrelationMatrix *correlationMatrix) {
     m_correlationMatrix = correlationMatrix;
   }
+
+
+  void WorkOrder::setData(GuiCamera *guiCamera) {
+    m_guiCamera = guiCamera;
+  }
+
+
+  void WorkOrder::setData(TargetBody *targetBody) {
+    m_targetBody = targetBody;
+  }
+
 
   void WorkOrder::setNext(WorkOrder *nextWorkOrder) {
     m_nextWorkOrder = nextWorkOrder;
@@ -342,9 +378,20 @@ namespace Isis {
   }
 
 
+  TargetBody* WorkOrder::targetBody() {
+    return m_targetBody;
+  }
+
+
+  GuiCamera* WorkOrder::guiCamera() {
+    return m_guiCamera;
+  }
+
+
   bool WorkOrder::dependsOn(WorkOrder *) const {
     return true;
   }
+
 
 
   QString WorkOrder::bestText() const {

@@ -25,6 +25,7 @@
 #include <QList>
 #include <QPair>
 #include <QObject>
+#include <QSharedPointer>
 #include <QString>
 
 #include <H5Cpp.h>
@@ -32,6 +33,7 @@
 #include <hdf5.h>
 
 #include "BundleObservationSolveSettings.h"
+#include "BundleTargetBody.h"
 #include "MaximumLikelihoodWFunctions.h" // why not forward declare???
 #include "PvlObject.h"
 #include "SpecialPixel.h"
@@ -109,7 +111,7 @@ namespace Isis {
        */
       enum SolveMethod {
         Sparse,   //!< Cholesky model sparse normal equations matrix. (Uses the cholmod library).
-        SpecialK, //!< Dense normal equations matrix.
+        SpecialK  //!< Dense normal equations matrix.
       };
       // converter
       static SolveMethod stringToSolveMethod(QString solveMethod);
@@ -138,6 +140,7 @@ namespace Isis {
       double globalLatitudeAprioriSigma() const;
       double globalLongitudeAprioriSigma() const;
       double globalRadiusAprioriSigma() const;
+//      bool solveTargetBodyPolePosition() const;
 
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
@@ -193,7 +196,21 @@ namespace Isis {
 
       // Self Calibration ??? (from cnetsuite only)
 
-      // Target Body ??? (from cnetsuite only)
+      // Target Body
+      void setBundleTargetBody(QSharedPointer<BundleTargetBody> bundleTargetBody);
+      QSharedPointer<BundleTargetBody> getBundleTargetBody();
+
+//      static TargetRadiiSolveMethod stringToTargetRadiiOption(QString option);
+//      static QString targetRadiiOptionToString(TargetRadiiSolveMethod targetRadiiSolveMethod);
+
+      bool solveTargetBody();
+      int numberTargetBodyParameters();
+      bool solvePoleRA();
+      bool solvePoleRAVelocity();
+      bool solvePoleDec();
+      bool solvePoleDecVelocity();
+      bool solvePM();
+      bool solvePMVelocity();
 
       // Output Options ??? (from Jigsaw only)
       void setOutputFiles(QString outputFilePrefix, bool createBundleOutputFile, 
@@ -298,15 +315,19 @@ namespace Isis {
 
       // Self Calibration ??? (from cnetsuite only)
 
-      // Target Body ??? (from cnetsuite only)
+      // Target Body
+      bool m_solveTargetBody;
+      BundleTargetBodyQsp m_bundleTargetBody;
 
       // Output Options ??? (from Jigsaw only)
       QString m_outputFilePrefix; //!< output file prefix
       bool m_createBundleOutputFile; //!< to print standard bundle output file (bundleout.txt)
       bool m_createCSVFiles; //!< to output points and image station data in csv format
       bool m_createResidualsFile; //!< to output residuals in csv format
-
  };
+  // typedefs
+  typedef QSharedPointer<BundleSettings> BundleSettingsQsp;
+
   // operators to read/write BundleResults to/from binary data
   QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings);
   QDataStream &operator>>(QDataStream &stream, BundleSettings &settings);

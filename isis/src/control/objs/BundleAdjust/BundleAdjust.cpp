@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QMutex>
+#include <QCoreApplication>
 
 #include <iomanip>
 #include <iostream>
@@ -19,6 +20,7 @@
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
+#include "BundleTargetBody.h"
 #include "Camera.h"
 #include "CameraGroundMap.h"
 #include "CameraDetectorMap.h"
@@ -36,6 +38,7 @@
 #include "SpecialPixel.h"
 #include "StatCumProbDistDynCalc.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace boost::numeric::ublas;
 using namespace Isis;
@@ -44,9 +47,8 @@ namespace Isis {
 
   static void cholmod_error_handler(int nStatus, 
                                     const char* file, 
-                                    int nLineNo, 
+                                    int nLineNo,
                                     const char* message) {
-
     QString errlog;
 
     errlog = "SPARSE: ";
@@ -58,17 +60,19 @@ namespace Isis {
     gp += PvlKeyword("Line_Number", toString(nLineNo));
     gp += PvlKeyword("Status", toString(nStatus));
 
-    Application::Log(gp);
+//    Application::Log(gp);
 
     errlog += ". (See print.prt for details)";
-    throw IException(IException::Unknown, errlog, _FILEINFO_);
+
+//    throw IException(IException::Unknown, errlog, _FILEINFO_);
   }
 
 
-  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              const QString &cnetFile,
                              const QString &cubeList,
                              bool bPrintSummary) {
+    m_abort = false;
     Progress progress;
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
@@ -80,16 +84,18 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
+    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
 
     init(&progress);
   }
 
 
-  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              const QString &cnetFile,
                              const QString &cubeList,
                              const QString &heldList,
                              bool bPrintSummary) {
+    m_abort = false;
     Progress progress;
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
@@ -101,12 +107,13 @@ namespace Isis {
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = new Isis::SerialNumberList(heldList);
     m_bundleSettings = bundleSettings;
+    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
 
     init(&progress);
   }
 
 
-  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              QString &cnet,
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
@@ -117,6 +124,7 @@ namespace Isis {
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
+    m_abort = false;
     Progress progress;
     m_bPrintSummary = bPrintSummary;
     m_bCleanUp = false;
@@ -125,12 +133,13 @@ namespace Isis {
     m_pSnList = &snlist;
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
+    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
 
     init();
   }
 
 
-  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              Control &cnet,
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
@@ -141,6 +150,7 @@ namespace Isis {
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
+    m_abort = false;
     Progress progress;
     m_bPrintSummary = bPrintSummary;
     m_bCleanUp = false;
@@ -149,12 +159,13 @@ namespace Isis {
     m_pSnList = &snlist;
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
+    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
 
     init();
   }
 
 
-  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              ControlNet &cnet,
                              SerialNumberList &snlist,
                              bool bPrintSummary) {
@@ -165,6 +176,7 @@ namespace Isis {
     // initialize constructor dependent settings...
     // m_bPrintSummary, m_bCleanUp, m_strCnetFileName, m_pCnet, m_pSnList, m_pHeldSnList,
     // m_bundleSettings
+    m_abort = false;
     m_bPrintSummary = bPrintSummary;
     m_bCleanUp = false;
     m_strCnetFileName = "";
@@ -172,30 +184,37 @@ namespace Isis {
     m_pSnList = &snlist;
     m_pHeldSnList = NULL;
     m_bundleSettings = bundleSettings;
+    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
 
     init();
   }
 
 
-  ////////////////////////////////////////////////////////////////////////////////////My Constructor
   /**
    * Thread safe constructor.
    */
-  BundleAdjust::BundleAdjust(BundleSettings bundleSettings,
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              Control &control,
                              QList<ImageList *> imgLists,
                              bool bPrintSummary) {
     m_bundleSettings = bundleSettings;
 
+    m_abort = false;
     Progress progress;
     m_pCnet = new Isis::ControlNet(control.fileName(), &progress);
 
+    // this is too slow and we need to get rid of the serial number list anyway
+    // should be unnecessary as Image class has serial number
+    // could hang on to image list until creating BundleObservations?
     m_pSnList = new SerialNumberList;
     foreach (ImageList *imgList, imgLists) {
       foreach (Image *image, *imgList) {
         m_pSnList->Add(image->fileName());
+//      m_pSnList->Add(image->serialNumber(), image->fileName());
       }
     }
+
+    m_bundleTargetBody = bundleSettings->getBundleTargetBody();
 
     m_bPrintSummary = bPrintSummary;
 
@@ -205,7 +224,6 @@ namespace Isis {
     
     init();
   }
-  ////////////////////////////////////////////////////////////////////////////////////My Constructor
 
 
   BundleAdjust::~BundleAdjust() {
@@ -220,7 +238,7 @@ namespace Isis {
 
     }
 
-    if ( m_bundleSettings.solveMethod() == BundleSettings::Sparse ) {
+    if ( m_bundleSettings->solveMethod() == BundleSettings::Sparse ) {
       freeCHOLMODLibraryVariables();
     }
 
@@ -238,22 +256,21 @@ namespace Isis {
   void BundleAdjust::init(Progress *progress) {
 //printf("BOOST_UBLAS_CHECK_ENABLE = %d\n", BOOST_UBLAS_CHECK_ENABLE);
 //printf("BOOST_UBLAS_TYPE_CHECK = %d\n", BOOST_UBLAS_TYPE_CHECK);
-
     // initialize
     //
     // JWB
     // - some of these not originally initialized.. better values???
-    m_bLastIteration = false;
-    m_bMaxIterationsReached = false;
     m_nIteration = 0;
     m_dError = DBL_MAX;
     m_dRTM = 0.0;
     m_dMTR = 0.0;
-//    m_pObsNumList = NULL;
-    m_nRank = 0; // ??? this is the same value an m_nImageParameters
+    m_nRank = 0;
     m_iterationSummary = "";
 
     // Get the cameras set up for all images
+    // NOTE - THIS IS NOT THE SAME AS "setImage" as called in BundleAdjust::computePartials_DC
+    // this call only does initializations; sets measure's camera pointer, etc
+    // RENAME????????????
     m_pCnet->SetImages(*m_pSnList, progress);
 
     // clear JigsawRejected flags
@@ -262,21 +279,15 @@ namespace Isis {
     // initialize held variables
     int nImages = m_pSnList->Size();
 
-    // fill m_nImageIndexMap
+    // get count of held image and ensure they're in the control net
     if (m_pHeldSnList != NULL) {
-      //Check to make sure held images are in the control net
       checkHeldList();
 
-      // Get a count of held images too
       for (int i = 0; i < nImages; i++) {
         if (m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))) {
           m_bundleResults.incrementHeldImages();
         }
       }
-    }
-    // fill m_nImageIndexMap
-    for (int i = 0; i < nImages; i++) {
-      m_nImageIndexMap.push_back(i);
     }
 
     // matrix stuff
@@ -290,7 +301,6 @@ namespace Isis {
     m_L = NULL;
     m_N = NULL;
     m_pTriplet = NULL;
-
 
     // should we initialize objects m_Statsx, m_Statsy, m_Statsrx, m_Statsry, m_Statsrxy
 
@@ -313,7 +323,7 @@ namespace Isis {
      }
 
       // TESTING
-      // code below should go into a separate method
+      // code below should go into a separate method?
       // set up BundleObservations and assign solve settings for each from BundleSettings class
       for (int i = 0; i < nImages; i++) {
 
@@ -334,7 +344,7 @@ namespace Isis {
 
         BundleObservation *observation =
             m_bundleObservations.addnew(image, observationNumber, instrumentId, m_bundleSettings);
-            
+
         if (!observation) {
           QString msg = "In BundleAdjust::init(): observation " + observationNumber + "is null" + "\n";
           throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -342,7 +352,11 @@ namespace Isis {
       }
 
       // initialize exterior orientation (spice) for all BundleImages in all BundleObservations
+      // TODO!!!! - should these initializations just be done when we add the new observation above?
       m_bundleObservations.initializeExteriorOrientation();
+
+      if (m_bundleSettings->solveTargetBody())
+        m_bundleObservations.initializeBodyRotation();
 
       // set up vector of BundleControlPoints
       int nControlPoints = m_pCnet->GetNumPoints();
@@ -353,7 +367,7 @@ namespace Isis {
 
         BundleControlPoint* bundleControlPoint = m_bundleControlPoints.addControlPoint(point);
 
-        bundleControlPoint->setWeights(&m_bundleSettings, m_dMTR);
+        bundleControlPoint->setWeights(m_bundleSettings, m_dMTR);
 
         // set parent observation for each BundleMeasure
 
@@ -379,27 +393,10 @@ namespace Isis {
     // the control net (when we start adding software to remove points with high
     // residuals) and ?.  For "deltack" a single measure on a point is allowed
     // so skip the test.
-    if (m_bundleSettings.validateNetwork()) {
+    if (m_bundleSettings->validateNetwork()) {
       validateNetwork();
     }
-    m_bundleResults.maximumLikelihoodSetUp(m_bundleSettings.maximumLikelihoodEstimatorModels());
-    // SetUp method initializes m_nNumberCamPosCoefSolved, m_nPositionType
-    // resizes m_dGlobalSpacecraftPositionAprioriSigma and initializes with -1.0s
-//    instrumentPositionSetUp();
-
-    // SetUp method initializes m_nNumberCamAngleCoefSolved, m_nPointingType;
-    // resizes m_dGlobalCameraAnglesAprioriSigma and initializes with
-    // -1.0s;
-//    instrumentPointingSetUp();
-
-    // SetUp method initializes m_dGlobalLatitudeAprioriSigma,
-    // m_dGlobalLongitudeAprioriSigma, m_dGlobalRadiusAprioriSigma;
-    // resets m_dGlobalSpacecraftPositionAprioriSigma, m_dGlobalCameraAnglesAprioriSigma
-//    setGlobalAprioriSigmas();
-
-    // initializes m_nFixedPoints, m_nIgnoredPoints;
-    // fills m_nPointIndexMap vector
-//    fillPointIndexMap();
+    m_bundleResults.maximumLikelihoodSetUp(m_bundleSettings->maximumLikelihoodEstimatorModels());
 
     // ===========================================================================================//
     // =============== End Bundle Settings =======================================================//
@@ -421,20 +418,24 @@ namespace Isis {
   bool BundleAdjust::validateNetwork() {
     emit statusUpdate("Validating network...");
 
-    // verify measures exist for all images
     int nimagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
-    int nImages = m_pSnList->Size();
-    for (int i = 0; i < nImages; i++) {
-      int nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
 
-      if ( nMeasures > 1 ) {
-        continue;
+    int nObservations = m_bundleObservations.size();
+    for (int i = 0; i < nObservations; i++) {
+      int nImages = m_bundleObservations.at(i)->size();
+      for (int j = 0; j < nImages; j++) {
+        BundleImage *bundleImage = m_bundleObservations.at(i)->at(j);
+        int nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
+
+        if (nMeasures > 1)
+          continue;
+
+        nimagesWithInsufficientMeasures++;
+        msg += bundleImage->fileName() + ": " + toString(nMeasures) + "\n";
       }
-
-      nimagesWithInsufficientMeasures++;
-      msg += m_pSnList->FileName(i) + ": " + toString(nMeasures) + "\n";
     }
+
     if ( nimagesWithInsufficientMeasures > 0 ) {
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -465,7 +466,10 @@ namespace Isis {
       m_cm.method[0].ordering = CHOLMOD_AMD;
 
       // set size of sparse block normal equations matrix
-      m_SparseNormals.setNumberOfColumns(m_bundleObservations.size());
+      if (m_bundleSettings->solveTargetBody())
+        m_SparseNormals.setNumberOfColumns(m_bundleObservations.size()+1);
+      else
+        m_SparseNormals.setNumberOfColumns(m_bundleObservations.size());
 
       return true;
   }
@@ -507,11 +511,20 @@ namespace Isis {
   void BundleAdjust::initialize() { // ??? rename this method, maybe call it in the init() method if Sparse
 
     // size of reduced normals matrix
+
+    // TODO
+    // this should be determined from BundleSettings
+    // m_nRank will be the sum of observation, target, and self-cal parameters
+    // TODO
     m_nRank = m_bundleObservations.numberParameters();
+
+    if (m_bundleSettings->solveTargetBody())
+      m_nRank += m_bundleSettings->numberTargetBodyParameters();
+//    m_nRank = m_bundleSettings->sizeReducedNormalEquationsMatrix();
 
     int n3DPoints = m_bundleControlPoints.size();
 
-    if ( m_bundleSettings.solveMethod() == BundleSettings::SpecialK ) {
+    if ( m_bundleSettings->solveMethod() == BundleSettings::SpecialK ) {
       m_Normals.resize(m_nRank);           // set size of reduced normals matrix
       m_Normals.clear();                   // zero all elements
       m_Qs_SPECIALK.resize(n3DPoints);
@@ -526,34 +539,21 @@ namespace Isis {
     for (int i = 0; i < n3DPoints; i++) {
 
       // TODO_CHOLMOD: is this needed with new cholmod implementation?
-      if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+      if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
         m_Qs_SPECIALK[i].clear();
       }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // initializations for cholmod
-    if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
       initializeCHOLMODLibraryVariables();
     }
   }
 
   /**
-   * TODO - rewrite this crap
-   * The solve method is a least squares solution for updating the camera pointing, etc. It is
-   * iterative as the equations are non-linear. If it doesn't iterate to a solution in maxIterations
-   * it will throw an error. During each iteration it is updating portions of the control net, as
-   * well as the instrument pointing in the camera. An error is thrown if it does not converge
-   * within the maximum iterations. However, even if an error is thrown the control network will
-   * contain the errors (residuals) for each control measure.
-   *
-   * @param tol             Maximum pixel error for any control network
-   *                        measurement
-   * @param maxIterations   Maximum iterations, if tolerance is never
-   *                        met an iException will be thrown.
+   * Least squares bundle adjustment solution using Cholesky decomposition.
    */
-
-
   // TODO: make solveCholesky return a BundleSolutionInfo object and delete this placeholder ???
   BundleSolutionInfo BundleAdjust::solveCholeskyBR() {
     solveCholesky();
@@ -561,251 +561,316 @@ namespace Isis {
   }
 
 
-
-  bool BundleAdjust::solveCholesky() {
-
-    // TODO what are the next two lines doing?
-    cout << "cnet = " << m_strCnetFileName << endl;
-    PvlObject forTesting = m_bundleSettings.pvlObject();
-    cout << forTesting << endl;
-
-    // throw error if a frame camera is included AND if m_bundleSettings.solveInstrumentPositionOverHermiteSpline()
-    // is set to true (can only use for line scan or radar)
-//    if (m_bundleSettings.solveInstrumentPositionOverHermiteSpline() == true) {
-//      int nImages = images();
-//      for (int i = 0; i < nImages; i++) {
-//        if (m_pCnet->Camera(i)->GetCameraType() == 0) {
-//          QString msg = "At least one sensor is a frame camera. Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
-//          throw IException(IException::User, msg, _FILEINFO_);
-//        }
-//      }
-//    }
-
-    initialize();
-
-    // Compute the apriori lat/lons for each nonheld point
-    m_pCnet->ComputeApriori(); // original location
-
-    m_nIteration = 1;
-    double dvtpv = 0.0;
-    double dSigma0_previous = 0.0;
-
-    // start the clock
-    clock_t t1 = clock();
-
-    for (;;) {
-
-      emit statusUpdate( QString("\n starting iteration %1 \n").arg(m_nIteration) );
-
-      clock_t iterationclock1 = clock();
-
-      // send notification to UI indicating "new iteration"
-      // UI.Notify(BundleEvent.NEW_ITERATION);
-
-      // zero normals (after iteration 0)
-      if (m_nIteration != 1) {
-        if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
-          m_Normals.clear();
-        }
-        else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-          m_SparseNormals.zeroBlocks();
-        }
-      }
-
-      // form normal equations
-//      clock_t formNormalsclock1 = clock();
-//      printf("starting FormNormals\n");
-
-      if (!formNormalEquations()) {
-        m_bundleResults.setConverged(false);
-        break;
-      }
-//      clock_t formNormalsclock2 = clock();
-//      double dFormNormalsTime = ((formNormalsclock2-formNormalsclock1)/(double)CLOCKS_PER_SEC);
-//      printf("FormNormals Elapsed Time: %20.10lf\n",dFormNormalsTime);
-
-      // solve system
-//      clock_t Solveclock1 = clock();
-//      printf("Starting Solve System\n");
-
-      if (!solveSystem()) {
-        printf("solve failed!\n");
-        m_bundleResults.setConverged(false);
-        break;
-      }
-
-//      clock_t Solveclock2 = clock();
-//      double dSolveTime = ((Solveclock2-Solveclock1)/(double)CLOCKS_PER_SEC);
-//      printf("Solve Elapsed Time: %20.10lf\n",dSolveTime);
-
-      // apply parameter corrections
-//      clock_t Correctionsclock1 = clock();
-      applyParameterCorrections();
-//      clock_t Correctionsclock2 = clock();
-//      double dCorrectionsTime = ((Correctionsclock2-Correctionsclock1)/(double)CLOCKS_PER_SEC);
-//      printf("Corrections Elapsed Time: %20.10lf\n",dCorrectionsTime);
-
-      // compute residuals
-//      clock_t Residualsclock1 = clock();
-
-      dvtpv = computeResiduals();
-//      clock_t Residualsclock2 = clock();
-//      double dResidualsTime = ((Residualsclock2-Residualsclock1)/(double)CLOCKS_PER_SEC);
-//      printf("Residuals Elapsed Time: %20.10lf\n",dResidualsTime);
-
-      // flag outliers
-      if ( m_bundleSettings.outlierRejection() ) {
-        computeRejectionLimit();
-        flagOutliers();
-      }
-
-      // variance of unit weight (also reference variance, variance factor, etc.)
-      m_bundleResults.computeSigma0(dvtpv, m_bundleSettings.convergenceCriteria());
-
-      emit statusUpdate(QString("Iteration: %1").arg(m_nIteration) );
-
-      emit statusUpdate(QString("Sigma0: %1").arg(m_bundleResults.sigma0() ) );
-
-      emit statusUpdate( QString("Observations: %1").arg(
-               m_bundleResults.numberObservations() ) );
-
-      emit statusUpdate( QString("Constrained Parameters:%1").arg(
-               m_bundleResults.numberConstrainedPointParameters() ) );
-
-      emit statusUpdate( QString("Unknowns: %1").arg(
-               m_bundleResults.numberUnknownParameters() ) );
-
-      emit statusUpdate( QString("Degrees of Freedom: %1").arg(
-               m_bundleResults.degreesOfFreedom() ) );
-
-      // check for convergence
-      if (m_bundleSettings.convergenceCriteria() == BundleSettings::Sigma0) {
-        if (fabs(dSigma0_previous - m_bundleResults.sigma0())
-              <= m_bundleSettings.convergenceCriteriaThreshold()) { // convergence detected
-          // if maximum likelihood tiers are being processed, check to see if there's another tier
-          if (m_bundleResults.maximumLikelihoodModelIndex()
-                 < m_bundleResults.numberMaximumLikelihoodModels() - 1
-              && m_bundleResults.maximumLikelihoodModelIndex()
-                   < 2) { // is this second condition redundant???
-                                                                    // should bundlestats require num models <= 3, so num models - 1 <= 2
-            // to go, then continue with the next maximum likelihood model.
-            if (m_bundleResults.numberMaximumLikelihoodModels()
-                    > m_bundleResults.maximumLikelihoodModelIndex() + 1) {
-              // we will increment the index if there is another model after this one
-              m_bundleResults.incrementMaximumLikelihoodModelIndex();
-            }
-          }
-          else {  // otherwise iterations are complete
-            m_bLastIteration = true;
-            m_bundleResults.setConverged(true);
-
-            emit statusUpdate("\n Bundle has converged");
-
-            break;
-          }
-        }
-      }
-      else { // bundleSettings.convergenceCriteria() == BundleSettings::ParameterCorrections
-        int nconverged = 0;
-        int numimgparam = m_imageSolution.size();
-        for (int ij = 0; ij < numimgparam; ij++) {
-          if (fabs(m_imageSolution(ij)) > m_bundleSettings.convergenceCriteriaThreshold()) {
-            break;
-          }
-          else
-            nconverged++;
-        }
-
-        if ( nconverged == numimgparam ) {
-          m_bundleResults.setConverged(true);
-          m_bLastIteration = true;
-          emit statusUpdate("Bundle has converged");
-          break;
-        }
-      }
-
-
-      m_bundleResults.printMaximumLikelihoodTierInformation();
-      clock_t iterationclock2 = clock();
-      double dIterationTime = ((iterationclock2 - iterationclock1) / (double)CLOCKS_PER_SEC);
-      emit statusUpdate( QString("End of Iteration %1").arg(m_nIteration) );
-      emit statusUpdate( QString("Elapsed Time: %1").arg(dIterationTime) );
-
-      // send notification to UI indicating "new iteration"
-      // UI.Notify(BundleEvent.END_ITERATION);
-
-      // check for maximum iterations
-      if (m_nIteration >= m_bundleSettings.convergenceCriteriaMaximumIterations()) {
-        m_bMaxIterationsReached = true;
-        break;
-      }
-
-      // restart the dynamic calculation of the cumulative probility distribution of residuals
-      // (in unweighted pixels) --so it will be up to date for the next iteration
-      if (!m_bundleResults.converged()) {
-        m_bundleResults.initializeResidualsProbabilityDistribution(101);
-      }// TODO: is this necessary ??? probably all ready initialized to 101 nodes in bundle settings constructor...
-
-      // if we're using CHOLMOD and still going, release cholmod_factor (if we don't, memory leaks will occur),
-      // otherwise we need it for error propagation
-      if ( m_bundleSettings.solveMethod() == BundleSettings::Sparse ) {
-        if (!m_bundleResults.converged() || !m_bundleSettings.errorPropagation())
-          cholmod_free_factor(&m_L, &m_cm);
-      }
-
-
-      iterationSummary();
-
-      m_nIteration++;
-
-      dSigma0_previous = m_bundleResults.sigma0();
-    }
-
-    if (m_bundleResults.converged() && m_bundleSettings.errorPropagation()) {
-      clock_t terror1 = clock();
-      emit statusUpdate("Starting Error Propagation");
-      errorPropagation();
-      emit statusUpdate("Error Propagation Complete");
-      clock_t terror2 = clock();
-      m_bundleResults.setElapsedTimeErrorProp((terror2 - terror1) / (double)CLOCKS_PER_SEC);
-    }
-
-    clock_t t2 = clock();
-    m_bundleResults.setElapsedTime((t2 - t1) / (double)CLOCKS_PER_SEC);
-
-    wrapUp();
-
-    emit statusUpdate("\n Generating report files");
-    output();
-
-    emit statusUpdate("\n Bundle Complete");
-    BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
-    emit resultsReady(results);
-
-    iterationSummary();
-
-    return true;
-
-    QString msg = "Need to return something here, or just change the whole darn thing? [";//??? already returned true
-//    msg += IString(tol) + "] in less than [";
-//    msg += IString(m_bundleSettings.convergenceCriteriaMaximumIterations()) + "] iterations";
-    throw IException(IException::User, msg, _FILEINFO_);
+  /**
+   * Flag to abort when bundle is threaded. Flag is set outside the bundle thread, typically by the
+   * gui thread.
+   */
+  void BundleAdjust::abortBundle() {
+    m_abort = true;
   }
 
+
+  /**
+   * Least squares bundle adjustment solution using Cholesky decomposition.
+   */
+  bool BundleAdjust::solveCholesky() {
+    try {
+
+      // throw error if a frame camera is included AND if m_bundleSettings->solveInstrumentPositionOverHermiteSpline()
+      // is set to true (can only use for line scan or radar)
+  //    if (m_bundleSettings->solveInstrumentPositionOverHermiteSpline() == true) {
+  //      int nImages = images();
+  //      for (int i = 0; i < nImages; i++) {
+  //        if (m_pCnet->Camera(i)->GetCameraType() == 0) {
+  //          QString msg = "At least one sensor is a frame camera. Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
+  //          throw IException(IException::User, msg, _FILEINFO_);
+  //        }
+  //      }
+  //    }
+
+      initialize();
+
+      // Compute the apriori lat/lons for each nonheld point
+      m_pCnet->ComputeApriori(); // original location
+
+      // ken testing - if solving for target mean radius, set point radius to current mean radius
+      // if solving for triaxial radii, set point radius to local radius
+      if (m_bundleTargetBody && m_bundleTargetBody->solveMeanRadius()) {
+        int nControlPoints = m_bundleControlPoints.size();
+        for (int i = 0; i < nControlPoints; i++) {
+          ControlPoint *point = m_bundleControlPoints.at(i)->rawControlPoint();
+          SurfacePoint surfacepoint = point->GetAdjustedSurfacePoint();
+
+          surfacepoint.ResetLocalRadius(m_bundleTargetBody->meanRadius());
+
+          point->SetAdjustedSurfacePoint(surfacepoint);
+        }
+      }
+
+      if (m_bundleTargetBody && m_bundleTargetBody->solveTriaxialRadii()) {
+        int nControlPoints = m_bundleControlPoints.size();
+        for (int i = 0; i < nControlPoints; i++) {
+          ControlPoint *point = m_bundleControlPoints.at(i)->rawControlPoint();
+          SurfacePoint surfacepoint = point->GetAdjustedSurfacePoint();
+
+          Distance localRadius = m_bundleTargetBody->localRadius(surfacepoint.GetLatitude(),
+                                                                 surfacepoint.GetLongitude());
+          surfacepoint.ResetLocalRadius(localRadius);
+
+          point->SetAdjustedSurfacePoint(surfacepoint);
+        }
+      }
+
+      m_nIteration = 1;
+      double dvtpv = 0.0;
+      double dSigma0_previous = 0.0;
+
+      // start the clock
+      clock_t t1 = clock();
+
+      for (;;) {
+
+        emit iterationUpdate(m_nIteration, m_bundleResults.sigma0());
+
+        // testing
+        if (m_abort) {
+          m_bundleResults.setConverged(false);
+          emit statusUpdate("\n aborting...");
+          emit finished();
+          return false;
+        }
+        // testing
+
+        emit statusUpdate( QString("\n starting iteration %1 \n").arg(m_nIteration) );
+
+        clock_t iterationclock1 = clock();
+
+        // zero normals (after iteration 0)
+        if (m_nIteration != 1) {
+          if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
+            m_Normals.clear();
+          }
+          else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
+            m_SparseNormals.zeroBlocks();
+          }
+        }
+
+        // form normal equations
+  //      clock_t formNormalsclock1 = clock();
+  //      printf("starting FormNormals\n");
+
+        if (!formNormalEquations()) {
+          m_bundleResults.setConverged(false);
+          break;
+        }
+
+        // testing
+        if (m_abort) {
+          m_bundleResults.setConverged(false);
+          emit statusUpdate("\n aborting...");
+          emit finished();
+          return false;
+        }
+        // testing
+
+  //      clock_t formNormalsclock2 = clock();
+  //      double dFormNormalsTime = ((formNormalsclock2-formNormalsclock1)/(double)CLOCKS_PER_SEC);
+  //      printf("FormNormals Elapsed Time: %20.10lf\n",dFormNormalsTime);
+
+        // solve system
+  //      clock_t Solveclock1 = clock();
+  //      printf("Starting Solve System\n");
+
+        if (!solveSystem()) {
+          printf("solve failed!\n");
+          m_bundleResults.setConverged(false);
+          break;
+        }
+
+        // testing
+        if (m_abort) {
+          m_bundleResults.setConverged(false);
+          emit statusUpdate("\n aborting...");
+          emit finished();
+          return false;
+        }
+        // testing
+
+  //      clock_t Solveclock2 = clock();
+  //      double dSolveTime = ((Solveclock2-Solveclock1)/(double)CLOCKS_PER_SEC);
+  //      printf("Solve Elapsed Time: %20.10lf\n",dSolveTime);
+
+        // apply parameter corrections
+  //      clock_t Correctionsclock1 = clock();
+        applyParameterCorrections();
+  //      clock_t Correctionsclock2 = clock();
+  //      double dCorrectionsTime = ((Correctionsclock2-Correctionsclock1)/(double)CLOCKS_PER_SEC);
+  //      printf("Corrections Elapsed Time: %20.10lf\n",dCorrectionsTime);
+
+        // testing
+        if (m_abort) {
+          m_bundleResults.setConverged(false);
+          emit statusUpdate("\n aborting...");
+          emit finished();
+          return false;
+        }
+        // testing
+
+        // compute residuals
+  //      clock_t Residualsclock1 = clock();
+
+        dvtpv = computeResiduals();
+  //      clock_t Residualsclock2 = clock();
+  //      double dResidualsTime = ((Residualsclock2-Residualsclock1)/(double)CLOCKS_PER_SEC);
+  //      printf("Residuals Elapsed Time: %20.10lf\n",dResidualsTime);
+
+        // flag outliers
+        if ( m_bundleSettings->outlierRejection() ) {
+          computeRejectionLimit();
+          flagOutliers();
+        }
+
+        // testing
+        if (m_abort) {
+          m_bundleResults.setConverged(false);
+          emit statusUpdate("\n aborting...");
+          emit finished();
+          return false;
+        }
+        // testing
+
+        // variance of unit weight (also reference variance, variance factor, etc.)
+        m_bundleResults.computeSigma0(dvtpv, m_bundleSettings->convergenceCriteria());
+
+        emit statusUpdate(QString("Iteration: %1").arg(m_nIteration));
+        emit statusUpdate(QString("Sigma0: %1").arg(m_bundleResults.sigma0()));
+        emit statusUpdate(QString("Observations: %1").arg(m_bundleResults.numberObservations()));
+        emit statusUpdate(QString("Constrained Parameters:%1").arg(
+                          m_bundleResults.numberConstrainedPointParameters()));
+        emit statusUpdate(QString("Unknowns: %1").arg(m_bundleResults.numberUnknownParameters()));
+        emit statusUpdate( QString("Degrees of Freedom: %1").arg(m_bundleResults.degreesOfFreedom()));
+        emit iterationUpdate(m_nIteration, m_bundleResults.sigma0());
+
+        // check for convergence
+        if (m_bundleSettings->convergenceCriteria() == BundleSettings::Sigma0) {
+          if (fabs(dSigma0_previous - m_bundleResults.sigma0())
+                <= m_bundleSettings->convergenceCriteriaThreshold()) { // convergence detected
+            // if maximum likelihood tiers are being processed, check to see if there's another tier
+            if (m_bundleResults.maximumLikelihoodModelIndex()
+                   < m_bundleResults.numberMaximumLikelihoodModels() - 1
+                && m_bundleResults.maximumLikelihoodModelIndex()
+                     < 2) { // is this second condition redundant???
+                                                                      // should bundlestats require num models <= 3, so num models - 1 <= 2
+              // to go, then continue with the next maximum likelihood model.
+              if (m_bundleResults.numberMaximumLikelihoodModels()
+                      > m_bundleResults.maximumLikelihoodModelIndex() + 1) {
+                // we will increment the index if there is another model after this one
+                m_bundleResults.incrementMaximumLikelihoodModelIndex();
+              }
+            }
+            else {  // otherwise iterations are complete
+              m_bundleResults.setConverged(true);
+              emit statusUpdate("\n Bundle has converged");
+              break;
+            }
+          }
+        }
+        else { // bundleSettings.convergenceCriteria() == BundleSettings::ParameterCorrections
+          int nconverged = 0;
+          int numimgparam = m_imageSolution.size();
+          for (int ij = 0; ij < numimgparam; ij++) {
+            if (fabs(m_imageSolution(ij)) > m_bundleSettings->convergenceCriteriaThreshold()) {
+              break;
+            }
+            else
+              nconverged++;
+          }
+
+          if ( nconverged == numimgparam ) {
+            m_bundleResults.setConverged(true);
+            emit statusUpdate("Bundle has converged");
+            break;
+          }
+        }
+
+        m_bundleResults.printMaximumLikelihoodTierInformation();
+        clock_t iterationclock2 = clock();
+        double dIterationTime = ((iterationclock2 - iterationclock1) / (double)CLOCKS_PER_SEC);
+        emit statusUpdate( QString("End of Iteration %1").arg(m_nIteration) );
+        emit statusUpdate( QString("Elapsed Time: %1").arg(dIterationTime) );
+
+        // check for maximum iterations
+        if (m_nIteration >= m_bundleSettings->convergenceCriteriaMaximumIterations()) {
+          break;
+        }
+
+        // restart the dynamic calculation of the cumulative probility distribution of residuals
+        // (in unweighted pixels) --so it will be up to date for the next iteration
+        if (!m_bundleResults.converged()) {
+          m_bundleResults.initializeResidualsProbabilityDistribution(101);
+        }// TODO: is this necessary ??? probably all ready initialized to 101 nodes in bundle settings constructor...
+
+        // if we're using CHOLMOD and still going, release cholmod_factor (if we don't, memory leaks will occur),
+        // otherwise we need it for error propagation
+        if ( m_bundleSettings->solveMethod() == BundleSettings::Sparse ) {
+          if (!m_bundleResults.converged() || !m_bundleSettings->errorPropagation())
+            cholmod_free_factor(&m_L, &m_cm);
+        }
+
+
+        iterationSummary();
+
+        m_nIteration++;
+
+        dSigma0_previous = m_bundleResults.sigma0();
+      }
+
+      if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
+        clock_t terror1 = clock();
+        emit statusUpdate("Starting Error Propagation");
+        errorPropagation();
+        emit statusUpdate("Error Propagation Complete");
+        clock_t terror2 = clock();
+        m_bundleResults.setElapsedTimeErrorProp((terror2 - terror1) / (double)CLOCKS_PER_SEC);
+      }
+
+      clock_t t2 = clock();
+      m_bundleResults.setElapsedTime((t2 - t1) / (double)CLOCKS_PER_SEC);
+
+      wrapUp();
+
+      emit statusUpdate("\n Generating report files");
+      output();
+
+      emit statusUpdate("\n Bundle Complete");
+      BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
+      emit resultsReady(results);
+
+      iterationSummary();
+    }
+    catch (IException &e) {
+      QString exceptionStr = e.what();
+      emit bundleException(exceptionStr);
+      m_bundleResults.setConverged(false);
+      emit statusUpdate("\n aborting...");
+      emit finished();
+      return false;
+    }
+
+    return true;
+  }
 
   BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
     BundleSolutionInfo results(m_bundleSettings, FileName(m_strCnetFileName), m_bundleResults);
-    //results.setRunTime(Isis::iTime::CurrentLocalTime().toAscii().data());
     results.setRunTime("");
     return results;
   }
-
 
   /**
    * Forming the least-squares normal equations matrix.
    */
   bool BundleAdjust::formNormalEquations() {
-    if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
       return formNormalEquations_CHOLMOD();
     }
     else {
@@ -820,7 +885,7 @@ namespace Isis {
    * Solve normal equations system.
    */
   bool BundleAdjust::solveSystem() {
-    if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
       return solveSystem_CHOLMOD();
     }
     else {
@@ -840,6 +905,7 @@ namespace Isis {
     m_bundleResults.setNumberObservations(0);// ???
     m_bundleResults.resetNumberConstrainedPointParameters();//???
 
+    static boost::numeric::ublas::matrix<double> coeff_target;
     static boost::numeric::ublas::matrix<double> coeff_image;
     static boost::numeric::ublas::matrix<double> coeff_point3D(2, 3);
     static boost::numeric::ublas::vector<double> coeff_RHS(2);
@@ -849,6 +915,14 @@ namespace Isis {
     boost::numeric::ublas::compressed_vector<double> n1(m_nRank);                        // image parameters x 1
 
     m_nj.resize(m_nRank);
+
+    // if solving for target body parameters, set size of coeff_target (note this size will not
+    // change through the adjustment
+    if (m_bundleSettings->solveTargetBody()) {
+      int numTargetBodyParameters = m_bundleSettings->numberTargetBodyParameters();
+      // TODO make sure numTargetBodyParameters is greater than 0
+      coeff_target.resize(2,numTargetBodyParameters);
+    }
 
     // clear N12, n1, and nj
     N12.clear();
@@ -901,7 +975,6 @@ namespace Isis {
       // loop over measures for this point
       int nMeasures = point->size();
       for (int j = 0; j < nMeasures; j++) {
-
         BundleMeasure *measure = point->at(j);
 
         // flagged as "JigsawFail" implies this measure has been rejected
@@ -911,7 +984,21 @@ namespace Isis {
 
         // printf("   Processing Measure %d of %d\n", j,nMeasures);
 
-        bStatus = computePartials_DC(coeff_image, coeff_point3D, coeff_RHS, *measure, *point);
+        bStatus = computePartials_DC(coeff_target, coeff_image, coeff_point3D, coeff_RHS, *measure,
+                                     *point);
+
+
+//        std::cout << "observation index" << measure->observationIndex() << std::endl;
+//std::cout << coeff_target(0,0) << "," << coeff_target(0,1) << ",";
+//        std::cout << std::setprecision(12) << coeff_target(0,0) << ",";
+//        std::cout << coeff_image(0,0) << "," << coeff_image(0,1) << ",";
+//        std::cout << coeff_point3D(0,0) << "," << coeff_point3D(0,1) << "," << coeff_point3D(0,2) << ",";
+//        std::cout << coeff_RHS[0] << std::endl;
+//std::cout << coeff_target(1,0) << "," << coeff_target(1,1) << ",";
+//        std::cout << coeff_target(1,0) << ",";
+//        std::cout << coeff_image(1,0) << "," << coeff_image(1,1) << ",";
+//        std::cout << coeff_point3D(1,0) << "," << coeff_point3D(1,1) << "," << coeff_point3D(1,2) << ",";
+//        std::cout << coeff_RHS[1] << std::endl;
 
         if (!bStatus)      // this measure should be flagged as rejected
           continue;
@@ -919,40 +1006,111 @@ namespace Isis {
         // update number of observations
         int numObs = m_bundleResults.numberObservations();
         m_bundleResults.setNumberObservations(numObs + 2);
-        formNormals1_CHOLMOD(N22, N12, n1, n2, coeff_image, coeff_point3D, coeff_RHS,
+        formNormals1_CHOLMOD(N22, N12, n1, n2, coeff_target, coeff_image, coeff_point3D, coeff_RHS,
                              measure->observationIndex());
       } // end loop over this points measures
 
       formNormals2_CHOLMOD(N22, N12, n2, m_nj, point);
+
+//m_SparseNormals.printClean(std::cout);
+
       nPointIndex++;
 
       nGood3DPoints++;
 
-    } // end loop over 3D points
+  } // end loop over 3D points
 
-    // finally, form the reduced normal equations
-    formNormals3_CHOLMOD(n1, m_nj);
+//m_SparseNormals.printClean(std::cout);
 
-    // update number of unknown parameters
-    m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
+  // finally, form the reduced normal equations
+//std::cout << "nj" << std::endl << m_nj << std::endl;
 
-    return bStatus;
-  }
+  formNormals3_CHOLMOD(n1, m_nj);
+
+//m_SparseNormals.printClean(std::cout);
+
+  // update number of unknown parameters
+  m_bundleResults.setNumberUnknownParameters(m_nRank + 3 * nGood3DPoints);
+
+  return bStatus;
+}
 
 
   /**
    * Forming first set of auxiliary matrices for normal equations matrix via cholmod.
    */
   bool BundleAdjust::formNormals1_CHOLMOD(symmetric_matrix<double, upper>&N22,
-                                          SparseBlockColumnMatrix &N12, 
-                                          compressed_vector<double> &n1,
-                                          vector<double> &n2,
-                                          matrix<double> &coeff_image,
-                                          matrix<double> &coeff_point3D,
-                                          vector<double> &coeff_RHS,
-                                          int observationIndex) {
+      SparseBlockColumnMatrix &N12, compressed_vector<double> &n1,
+      vector<double> &n2, matrix<double> &coeff_target, matrix<double> &coeff_image,
+      matrix<double> &coeff_point3D, vector<double> &coeff_RHS, int observationIndex) {
 
-    int i;
+    static symmetric_matrix<double, upper> N11;
+    static matrix<double> NTargetImage;
+
+    int blockIndex = observationIndex;
+
+    // if we are solving for target body parameters
+    int nTargetPartials = coeff_target.size2();
+    if (m_bundleSettings->solveTargetBody()) {
+      blockIndex++;
+
+      static vector<double> n1_target(nTargetPartials);
+      n1_target.resize(nTargetPartials);
+      n1_target.clear();
+
+      // form N11 (normals for target body)
+      N11.resize(nTargetPartials);
+      N11.clear();
+
+//std::cout << "target" << std::endl << coeff_target << std::endl;
+//std::cout << "point" << std::endl << coeff_point3D << std::endl;
+//std::cout << "rhs" << std::endl << coeff_RHS << std::endl;
+
+      N11 = prod(trans(coeff_target), coeff_target);
+
+      // insert submatrix at column, row
+      m_SparseNormals.InsertMatrixBlock(0, 0, nTargetPartials, nTargetPartials);
+
+//std::cout << "SparseNormals: " << 0 << std::endl << N11 << std::endl;
+
+      (*(*m_SparseNormals[0])[0]) += N11;
+
+//std::cout << (*(*m_SparseNormals[0])[0]) << std::endl;
+
+      // form portion of N11 between target and image
+      NTargetImage.resize(nTargetPartials, coeff_image.size2());
+      NTargetImage.clear();
+      NTargetImage = prod(trans(coeff_target),coeff_image);
+
+      m_SparseNormals.InsertMatrixBlock(observationIndex+1, 0, nTargetPartials, coeff_image.size2());
+      (*(*m_SparseNormals[observationIndex+1])[0]) += NTargetImage;
+
+      // form N12_Target
+      static matrix<double> N12_Target(nTargetPartials, 3);
+      N12_Target.clear();
+
+      N12_Target = prod(trans(coeff_target), coeff_point3D);
+
+//printf("N12_Target before insert\n");
+//std::cout << N12_Target << std::endl;
+
+      // insert N12_Target into N12
+      N12.InsertMatrixBlock(0, nTargetPartials, 3);
+      *N12[0] += N12_Target;
+
+      // form n1
+      n1_target = prod(trans(coeff_target), coeff_RHS);
+
+      // insert n1_target into n1
+      for (int i = 0; i < nTargetPartials; i++) {
+        n1(i) += n1_target(i);
+      }
+    }
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ below is ok (2015-06-03)
+// TODO - if solving for target (and/or self-cal) have to use not observationIndex below but
+// observationIndex plus 1 or 2
 
     int nImagePartials = coeff_image.size2();
 
@@ -961,17 +1119,17 @@ namespace Isis {
     n1_image.clear();
 
     // form N11 (normals for photo)
-    static boost::numeric::ublas::symmetric_matrix< double, upper > N11(nImagePartials);
+//    static boost::numeric::ublas::symmetric_matrix<double, upper> N11(nImagePartials);
     N11.resize(nImagePartials);
     N11.clear();
 
-//    std::cout << "image" << std::endl << coeff_image << std::endl;
-//    std::cout << "point" << std::endl << coeff_point3D << std::endl;
-//    std::cout << "rhs" << std::endl << coeff_RHS << std::endl;
+//std::cout << "image" << std::endl << coeff_image << std::endl;
+//std::cout << "point" << std::endl << coeff_point3D << std::endl;
+//std::cout << "rhs" << std::endl << coeff_RHS << std::endl;
 
     N11 = prod(trans(coeff_image), coeff_image);
 
-//  std::cout << "N11" << std::endl << N11 << std::endl;
+//std::cout << "N11" << std::endl << N11 << std::endl;
 
 //  int t = nImagePartials * observationIndex;
     int t = 0;
@@ -980,55 +1138,60 @@ namespace Isis {
       BundleObservation *observation = m_bundleObservations.at(a);
       t += observation->numberParameters();
     }
+    // account for target parameters
+    t += nTargetPartials;
 
     // insert submatrix at column, row
-    m_SparseNormals.InsertMatrixBlock(observationIndex, observationIndex, nImagePartials,
+    m_SparseNormals.InsertMatrixBlock(blockIndex, blockIndex, nImagePartials,
                                       nImagePartials);
 
-//    std::cout << "SparseNormals: " << observationIndex << std::endl << N11 << std::endl;
+//std::cout << "SparseNormals: " << blockIndex << std::endl << N11 << std::endl;
 
-    (*(*m_SparseNormals[observationIndex])[observationIndex]) += N11;
+    (*(*m_SparseNormals[blockIndex])[blockIndex]) += N11;
 
-//    std::cout << (*(*m_SparseNormals[observationIndex])[observationIndex]) << std::endl;
+//std::cout << (*(*m_SparseNormals[blockIndex])[blockIndex]) << std::endl;
 
     // form N12_Image
-    static boost::numeric::ublas::matrix<double> N12_Image(nImagePartials, 3);
+    static matrix<double> N12_Image(nImagePartials, 3);
     N12_Image.resize(nImagePartials, 3);
     N12_Image.clear();
 
     N12_Image = prod(trans(coeff_image), coeff_point3D);
 
-//    printf("N12 before insert\n");
-//    N12.print(std::cout);
+//printf("N12_Image before insert\n");
+//N12.print(std::cout);
 
-//    std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
+//std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
 
     // insert N12_Image into N12
-    N12.InsertMatrixBlock(observationIndex, nImagePartials, 3);
-    *N12[observationIndex] += N12_Image;
+    N12.InsertMatrixBlock(blockIndex, nImagePartials, 3);
+    *N12[blockIndex] += N12_Image;
 
-//    printf("N12\n");
-//    N12.print(std::cout);
+//printf("N12\n");
+//N12.print(std::cout);
 
     // form n1
     n1_image = prod(trans(coeff_image), coeff_RHS);
 
-//    std::cout << "n1_image" << std::endl << n1_image << std::endl;
+//std::cout << "n1_image" << std::endl << n1_image << std::endl;
 
     // insert n1_image into n1
-    for (i = 0; i < nImagePartials; i++) {
+    // TODO - MUST ACCOUNT FOR TARGET BODY PARAMETERS
+    // WHEN INSERTING INTO n1 HERE!!!!!
+    for (int i = 0; i < nImagePartials; i++) {
       n1(i + t) += n1_image(i);
     }
+//std::cout << "n1" << std::endl << n1 << std::endl;
 
     // form N22
     N22 += prod(trans(coeff_point3D), coeff_point3D);
 
-//    std::cout << "N22" << std::endl << N22 << std::endl;
+//std::cout << "N22" << std::endl << N22 << std::endl;
 
     // form n2
     n2 += prod(trans(coeff_point3D), coeff_RHS);
 
-//    std::cout << "n2" << std::endl << n2 << std::endl;
+//std::cout << "n2" << std::endl << n2 << std::endl;
 
     return true;
   }
@@ -1043,7 +1206,9 @@ namespace Isis {
                                           vector<double> &nj,
                                           BundleControlPoint *bundleControlPoint) {
 
-    boost::numeric::ublas::bounded_vector< double, 3 > &NIC = bundleControlPoint->nicVector();
+//N12.printClean(std::cout);
+
+    boost::numeric::ublas::bounded_vector<double, 3> &NIC = bundleControlPoint->nicVector();
     SparseBlockRowMatrix &Q = bundleControlPoint->cholmod_QMatrix();
 
     NIC.clear();
@@ -1051,7 +1216,8 @@ namespace Isis {
 
     // weighting of 3D point parameters
 //    const ControlPoint *point = m_pCnet->GetPoint(i);
-    boost::numeric::ublas::bounded_vector<double, 3> &weights = bundleControlPoint->weights();
+    boost::numeric::ublas::bounded_vector<double, 3> &weights
+        = bundleControlPoint->weights();
     boost::numeric::ublas::bounded_vector<double, 3> &corrections
         = bundleControlPoint->corrections();
 
@@ -1077,12 +1243,14 @@ namespace Isis {
       m_bundleResults.incrementNumberConstrainedPointParameters(1);
     }
 
- //   std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
+    //std::cout << "N22 before inverse" << std::endl << N22 << std::endl;
     // invert N22
     Invert_3x3(N22);
    // std::cout << "N22 after inverse" << std::endl << N22 << std::endl;
 
     // save upper triangular covariance matrix for error propagation
+    // TODO:  The following method does not exist yet (08-13-2010)
+//    SurfacePoint SurfacePoint = point->GetAdjustedSurfacePoint();
     SurfacePoint SurfacePoint = bundleControlPoint->getAdjustedSurfacePoint();
     SurfacePoint.SetSphericalMatrix(N22);
     bundleControlPoint->setAdjustedSurfacePoint(SurfacePoint);
@@ -1125,7 +1293,7 @@ namespace Isis {
 //    double dAccumnjTime = ((Accum_nj_2-Accum_nj_1)/(double)CLOCKS_PER_SEC);
 //    printf("Accum nj Elapsed Time: %20.10lf\n",dAccumnjTime);
 
-//    std::cout << "nj" << std::endl << m_nj << std::endl;
+//std::cout << "nj" << std::endl << m_nj << std::endl;
 
     return true;
   }
@@ -1136,7 +1304,7 @@ namespace Isis {
    * velocities, angular accelerations if so stipulated (legalese).
    */
   bool BundleAdjust::formNormals3_CHOLMOD(compressed_vector<double> &n1,
-                                          vector<double> &nj) {
+                                  vector<double> &nj) {
 
     m_bundleResults.resetNumberConstrainedImageParameters();
 
@@ -1147,24 +1315,54 @@ namespace Isis {
       if ( !diagonalBlock )
         continue;
 
-      // get parameter weights for this observation
-      BundleObservation *observation = m_bundleObservations.at(i);
-      boost::numeric::ublas::vector<double> weights = observation->parameterWeights();
-      boost::numeric::ublas::vector<double> corrections = observation->parameterCorrections();
+      if (m_bundleSettings->solveTargetBody() && i == 0) {
+        m_bundleResults.resetNumberConstrainedTargetParameters();
 
-      int blockSize = diagonalBlock->size1();
-      for (int j = 0; j < blockSize; j++) {
-        if (weights(j) > 0.0) {
-          (*diagonalBlock)(j,j) += weights(j);
-          m_nj[n] -= weights(j) * corrections(j);
-          m_bundleResults.incrementNumberConstrainedImageParameters(1);
+        // get parameter weights for target body
+        vector<double> weights = m_bundleTargetBody->parameterWeights();
+        vector<double> corrections = m_bundleTargetBody->parameterCorrections();
+
+        int blockSize = diagonalBlock->size1();
+        for (int j = 0; j < blockSize; j++) {
+          if (weights[j] > 0.0) {
+            (*diagonalBlock)(j,j) += weights[j];
+            m_nj[n] -= weights[j] * corrections(j);
+            m_bundleResults.incrementNumberConstrainedTargetParameters(1);
+          }
+          n++;
         }
-        n++;
+      }
+      else {
+        BundleObservation *observation;
+
+        // get parameter weights for this observation
+        if (m_bundleSettings->solveTargetBody())
+          observation = m_bundleObservations.at(i-1);
+        else
+          observation = m_bundleObservations.at(i);
+
+        boost::numeric::ublas::vector< double > weights = observation->parameterWeights();
+        boost::numeric::ublas::vector< double > corrections = observation->parameterCorrections();
+
+        int blockSize = diagonalBlock->size1();
+        for (int j = 0; j < blockSize; j++) {
+          if (weights(j) > 0.0) {
+            (*diagonalBlock)(j,j) += weights(j);
+            m_nj[n] -= weights(j) * corrections(j);
+            m_bundleResults.incrementNumberConstrainedImageParameters(1);
+          }
+          n++;
+        }
       }
     }
 
     // add n1 to nj
     m_nj += n1;
+
+//    std::cout << "m_nj" << std::endl;
+//    for (int i = 0; i < m_nj.size(); i++)
+//      printf("%lf\n",m_nj(i));
+//    std::cout << endl;
 
     return true;
   }
@@ -1187,13 +1385,13 @@ namespace Isis {
     m_bundleResults.setNumberObservations(0); // ??? necessary???
     m_bundleResults.resetNumberConstrainedPointParameters();
 
-    static matrix<double> coeff_image;
-    static matrix<double> coeff_point3D(2, 3);
+    static boost::numeric::ublas::matrix<double> coeff_image;
+    static boost::numeric::ublas::matrix<double> coeff_point3D(2, 3);
     static boost::numeric::ublas::vector<double> coeff_RHS(2);
-    static symmetric_matrix<double, upper> N22(3);     // 3x3 upper triangular
-    static matrix< double> N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
+    static boost::numeric::ublas::symmetric_matrix<double, upper> N22(3);     // 3x3 upper triangular
+    static boost::numeric::ublas::matrix< double> N12(m_nRank, 3);            // image parameters x 3 (should this be compressed? We only make one, so probably not)
     static boost::numeric::ublas::vector<double> n2(3);                       // 3x1 vector
-    compressed_vector<double> n1(m_nRank);             // image parameters x 1
+    boost::numeric::ublas::compressed_vector<double> n1(m_nRank);             // image parameters x 1
 
     m_nj.resize(m_nRank);
 
@@ -1684,7 +1882,9 @@ namespace Isis {
     if (alpha == 0.0)
       return;
 
-    QMapIterator< int, boost::numeric::ublas::matrix<double> * > iQ(Q);
+    int nTargetParameters = m_bundleSettings->numberTargetBodyParameters();
+
+    QMapIterator<int, boost::numeric::ublas::matrix<double>*> iQ(Q);
 
     while ( iQ.hasNext() ) {
       iQ.next();
@@ -1695,10 +1895,21 @@ namespace Isis {
       boost::numeric::ublas::vector<double> v = prod(trans(*m),n2);
 
       //testing - should ask m_bundleObservations for this???
+//      int n = Q.getLeadingColumnsForBlock(nrow);
       int t=0;
       for (int a = 0; a < nrow; a++) {
-        BundleObservation *observation = m_bundleObservations.at(a);
-        t += observation->numberParameters();
+        if (nTargetParameters > 0 && a == 0)
+          t += nTargetParameters;
+        else {
+          if (nTargetParameters > 0 ) {
+            BundleObservation *observation = m_bundleObservations.at(a-1);
+            t += observation->numberParameters();
+          }
+          else {
+            BundleObservation *observation = m_bundleObservations.at(a);
+           t += observation->numberParameters();
+          }
+        }
       }
 
       for (unsigned i = 0; i < v.size(); i++) {
@@ -1891,9 +2102,11 @@ namespace Isis {
 
     // check for "matrix not positive definite" error
     if (m_cm.status == CHOLMOD_NOT_POSDEF) {
-      QString msg = "matrix NOT positive-definite: failure at column "
-          + m_L->minor;
-      throw IException(IException::User, msg, _FILEINFO_);
+      QString msg = QString("matrix NOT positive-definite: failure at column %1").arg(m_L->minor);
+//    throw IException(IException::User, msg, _FILEINFO_);
+      error(msg);
+      emit(finished());
+      return false;
     }
 
 //      FILE * pFile2;
@@ -1907,6 +2120,8 @@ namespace Isis {
 
     // initialize right-hand side vector
     b = cholmod_zeros(m_N->nrow, 1, m_N->xtype, &m_cm);
+
+//std::cout << "nj" << std::endl << m_nj << std::endl;
 
     // copy right-hand side vector into b
     double *px = (double*)b->x;
@@ -1937,6 +2152,8 @@ namespace Isis {
       m_imageSolution[i] = sx[i];
     }
 
+//std::cout << "solution vector" << std::endl << m_imageSolution << std::endl;
+
     // free cholmod structures
     cholmod_free_sparse(&m_N, &m_cm); // necessary?
     cholmod_free_dense(&b, &m_cm);
@@ -1954,7 +2171,8 @@ namespace Isis {
     double d;
 
 //    std::cout << "Sparse Normals" << std::endl;
-//    m_SparseNormals.print(std::cout);
+//    qDebug() << m_SparseNormals;
+//    m_SparseNormals.printClean(std::cout);
 
     if ( m_nIteration == 1 ) {
       int nelements = m_SparseNormals.numberOfElements();
@@ -2277,7 +2495,7 @@ namespace Isis {
 
 
   /**
-   * Computate inverse of normal equations matrix for CHOLMOD.
+   * Compute inverse of normal equations matrix for CHOLMOD.
    *
    */
   bool BundleAdjust::cholmod_Inverse() {
@@ -2358,10 +2576,11 @@ namespace Isis {
   /**
    * compute partials for measure
    */
-  bool BundleAdjust::computePartials_DC(matrix<double> &coeff_image,
-                                        matrix<double> &coeff_point3D,
+  bool BundleAdjust::computePartials_DC(matrix<double> &coeff_target, 
+                                        matrix<double> &coeff_image,
+                         matrix<double> &coeff_point3D,
                                         vector<double> &coeff_RHS,
-                                        BundleMeasure &measure,
+                         BundleMeasure &measure,
                                         BundleControlPoint &point) {
 
     // additional vectors
@@ -2388,6 +2607,9 @@ namespace Isis {
     coeff_image.resize(2,nImagePartials);
 
     // clear partial derivative matrices and vectors
+    if (m_bundleSettings->solveTargetBody())
+      coeff_target.clear();
+
     coeff_image.clear();
     coeff_point3D.clear();
     coeff_RHS.clear();
@@ -2424,6 +2646,85 @@ namespace Isis {
 //  std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
 
     int nIndex = 0;
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRA()) {
+      pCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 0,
+                                              &coeff_target(0, nIndex),
+                                              &coeff_target(1, nIndex));
+      nIndex++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRAVelocity()) {
+      pCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_RightAscension, 1,
+                                              &coeff_target(0, nIndex),
+                                              &coeff_target(1, nIndex));
+      nIndex++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDec()) {
+      pCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 0,
+                                              &coeff_target(0, nIndex),
+                                              &coeff_target(1, nIndex));
+      nIndex++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleDecVelocity()) {
+      pCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Declination, 1,
+                                              &coeff_target(0, nIndex),
+                                              &coeff_target(1, nIndex));
+      nIndex++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePM()) {
+      pCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 0,
+                                              &coeff_target(0, nIndex),
+                                              &coeff_target(1, nIndex));
+      nIndex++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePMVelocity()) {
+      pCamera->GroundMap()->GetdXYdTOrientation(SpiceRotation::WRT_Twist, 1,
+                                              &coeff_target(0, nIndex),
+                                              &coeff_target(1, nIndex));
+      nIndex++;
+    }
+      
+    if (m_bundleSettings->solveTargetBody() && m_bundleTargetBody->solveMeanRadius()) {
+      std::vector<double> d_lookB_WRT_MEANRADIUS =
+          pCamera->GroundMap()->MeanRadiusPartial(surfacePoint, m_bundleTargetBody->meanRadius());
+
+      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_MEANRADIUS, &coeff_target(0, nIndex),
+                                         &coeff_target(1, nIndex));
+      nIndex++;
+    }
+
+    if (m_bundleSettings->solveTargetBody() && m_bundleTargetBody->solveTriaxialRadii()) {
+//      std::vector<Distance> triaxialRadii = m_bundleTargetBody->radii();
+
+      std::vector<double> d_lookB_WRT_RADIUSA =
+          pCamera->GroundMap()->EllipsoidPartial(surfacePoint, CameraGroundMap::WRT_MajorAxis);
+
+      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RADIUSA, &coeff_target(0, nIndex),
+                                         &coeff_target(1, nIndex));
+      nIndex++;
+
+      std::vector<double> d_lookB_WRT_RADIUSB =
+          pCamera->GroundMap()->EllipsoidPartial(surfacePoint, CameraGroundMap::WRT_MinorAxis);
+
+      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RADIUSB, &coeff_target(0, nIndex),
+                                         &coeff_target(1, nIndex));
+      nIndex++;
+
+      std::vector<double> d_lookB_WRT_RADIUSC =
+          pCamera->GroundMap()->EllipsoidPartial(surfacePoint, CameraGroundMap::WRT_PolarAxis);
+
+      pCamera->GroundMap()->GetdXYdPoint(d_lookB_WRT_RADIUSC, &coeff_target(0, nIndex),
+                                         &coeff_target(1, nIndex));
+      nIndex++;
+    }
+
+//  std::cout << coeff_target << std::endl;
+
+    nIndex = 0;
 
     if (observationSolveSettings->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
@@ -2552,6 +2853,9 @@ namespace Isis {
     coeff_point3D *= dObservationWeight;
     coeff_RHS *= dObservationWeight;
 
+    if (m_bundleSettings->solveTargetBody())
+      coeff_target *= dObservationWeight;
+
     m_Statsx.AddData(deltax);
     m_Statsy.AddData(deltay);
 
@@ -2563,7 +2867,7 @@ namespace Isis {
    * apply parameter corrections
    */
   void BundleAdjust::applyParameterCorrections() {
-    if ( m_bundleSettings.solveMethod() == BundleSettings::Sparse ) {
+    if ( m_bundleSettings->solveMethod() == BundleSettings::Sparse ) {
       applyParameterCorrections_CHOLMOD();
     }
     else { //??? does a check belong here ??? what if it's not special k
@@ -2579,6 +2883,19 @@ namespace Isis {
 
     int t = 0;
 
+//std::cout << m_imageSolution << std::endl;
+
+    // TODO - update target body parameters if in solution
+    // note these come before BundleObservation parameters in normal equations matrix
+    if (m_bundleSettings->solveTargetBody()) {
+      int ntargetBodyParameters = m_bundleTargetBody->numberParameters();
+
+      m_bundleTargetBody->applyParameterCorrections(subrange(m_imageSolution,0,
+                                                            ntargetBodyParameters));
+
+      t += ntargetBodyParameters;
+    }
+
     // Update spice for each BundleObservation
     int nobservations = m_bundleObservations.size();
     for (int i = 0; i < nobservations; i++) {
@@ -2587,6 +2904,9 @@ namespace Isis {
       int nParameters = observation->numberParameters();
 
       observation->applyParameterCorrections(subrange(m_imageSolution,t,t+nParameters));
+
+      if (m_bundleSettings->solveTargetBody())
+        observation->updateBodyRotation();
 
       t += nParameters;
     }
@@ -2666,9 +2986,28 @@ namespace Isis {
 
 //      std::cout << corrections << std::endl;
 
-      surfacepoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
-                                           Longitude(dLon, Angle::Degrees),
-                                           Distance(dRad, Distance::Meters));
+      // ken testing - if solving for target body mean radius, set radius to current
+      // mean radius value
+      if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
+          || m_bundleTargetBody->solveTriaxialRadii())) {
+        if (m_bundleTargetBody->solveMeanRadius()) {
+          surfacepoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
+                                               Longitude(dLon, Angle::Degrees),
+                                               m_bundleTargetBody->meanRadius());
+        }
+        else if (m_bundleTargetBody->solveTriaxialRadii()) {
+            Distance localRadius = m_bundleTargetBody->localRadius(Latitude(dLat, Angle::Degrees),
+                                                                   Longitude(dLon, Angle::Degrees));
+            surfacepoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
+                                                 Longitude(dLon, Angle::Degrees),
+                                                 localRadius);
+        }
+      }
+      else {
+        surfacepoint.SetSphericalCoordinates(Latitude(dLat, Angle::Degrees),
+                                             Longitude(dLon, Angle::Degrees),
+                                             Distance(dRad, Distance::Meters));
+      }
 
       point->setAdjustedSurfacePoint(surfacepoint);
 
@@ -2711,7 +3050,7 @@ namespace Isis {
 
           currentindex = index;
 
-          if (m_bundleSettings.instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
+          if (m_bundleSettings->instrumentPositionSolveOption() != BundleSettings::NoPositionFactors) {
             SpicePosition         *pInstPos = pCamera->instrumentPosition();
             std::vector<double> coefX(m_nNumberCamPosCoefSolved),
                 coefY(m_nNumberCamPosCoefSolved),
@@ -2744,7 +3083,7 @@ namespace Isis {
             pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
           }
 
-      if (m_bundleSettings.instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
+      if (m_bundleSettings->instrumentPointingSolveOption() != BundleSettings::NoPointingFactors) {
         SpiceRotation         *pInstRot = pCamera->instrumentRotation();
         std::vector<double> coefRA(m_nNumberCamAngleCoefSolved),
             coefDEC(m_nNumberCamAngleCoefSolved),
@@ -2765,7 +3104,7 @@ namespace Isis {
           index++;
         }
 
-        if (m_bundleSettings.solveTwist()) {
+        if (m_bundleSettings->solveTwist()) {
           // Update twist coefficient(s)
           for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
             coefTWI[icoef] += m_imageSolution(index);
@@ -2980,12 +3319,19 @@ namespace Isis {
           vtpv_image += v * v * weights[j];
         }
       }
-
     }
 
 //    std::cout << "vtpv_image = " << vtpv_image << std::endl;
 
-    vtpv = vtpv + vtpv_control + vtpv_image;
+    // TODO - add vtpv from constrained target body parameters
+    double vtpv_targetBody = 0.0;
+    if ( m_bundleTargetBody) {
+      vtpv_targetBody = m_bundleTargetBody->vtpv();
+    }
+
+//    std::cout << "vtpv_targetBody" = " << vtpv_targetBody << std::endl;
+
+   vtpv = vtpv + vtpv_control + vtpv_image + vtpv_targetBody;
 
     // Compute rms for all image coordinate residuals
     // separately for x, y, then x and y together
@@ -3013,7 +3359,7 @@ namespace Isis {
       point->ComputeResiduals();
     }
     computeBundleStatistics();
-//     m_bundleResults.computeBundleStatistics(m_pSnList, m_pCnet, m_bundleSettings.errorPropagation(), m_bundleSettings.solveRadius());
+//     m_bundleResults.computeBundleStatistics(m_pSnList, m_pCnet, m_bundleSettings->errorPropagation(), m_bundleSettings->solveRadius());
 
 
     return true;
@@ -3120,13 +3466,13 @@ namespace Isis {
 
       std::cout << "mad: " << mad << std::endl;
 
-//      double dLow = median - m_bundleSettings.rejectionMultiplier() * mad;
-//      double dHigh = median + m_bundleSettings.rejectionMultiplier() * mad;
+//      double dLow = median - m_bundleSettings->rejectionMultiplier() * mad;
+//      double dHigh = median + m_bundleSettings->rejectionMultiplier() * mad;
 
 //      std::cout << "reject range: \n" << dLow << " " << dHigh << std::endl;
-//      std::cout << "Rejection multipler: \n" << m_bundleSettings.rejectionMultiplier() << std::endl;
+//      std::cout << "Rejection multipler: \n" << m_bundleSettings->rejectionMultiplier() << std::endl;
 
-      m_bundleResults.setRejectionLimit(median + m_bundleSettings.outlierRejectionMultiplier() * mad);
+      m_bundleResults.setRejectionLimit(median + m_bundleSettings->outlierRejectionMultiplier() * mad);
 
 //      std::cout << "Rejection Limit: " << m_bundleResults.rejectionLimit() << std::endl;
 
@@ -3260,7 +3606,7 @@ namespace Isis {
    * error propagation.
    */
   bool BundleAdjust::errorPropagation() {
-    if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+    if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
       return errorPropagation_CHOLMOD();
     }
     else {
@@ -3385,8 +3731,10 @@ namespace Isis {
 
     SparseBlockColumnMatrix sbcMatrix;
 
+    QString str;
+
     // Create unique file name
-    FileName matrixFile(m_bundleSettings.outputFilePrefix() + "inverseMatrix.dat");
+    FileName matrixFile(m_bundleSettings->outputFilePrefix() + "inverseMatrix.dat");
     //???FileName matrixFile = FileName::createTempFile(m_bundleSettings.outputFilePrefix() 
     //???                                               + "inverseMatrix.dat");
     // Create file handle
@@ -3462,15 +3810,28 @@ namespace Isis {
         cholmod_free_dense(&x,&m_cm);
       }
 
-      // save adjusted image sigmas
-      BundleObservation *observation = m_bundleObservations.at(i);
-      boost::numeric::ublas::vector<double> adjustedSigmas(ncolsCurrentBlockColumn);
-      boost::numeric::ublas::matrix<double> *imageCovMatrix = sbcMatrix.value(i);
-      for (int z = 0; z < ncolsCurrentBlockColumn; z++) {
-//        adjustedSigmas[z] = (*imageCovMatrix)(z,z);
-        adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleResults.sigma0();
+      // save adjusted target body sigmas if solving for target
+      if (m_bundleSettings->solveTargetBody() && i == 0) {
+        vector< double > &adjustedSigmas = m_bundleTargetBody->adjustedSigmas();
+        matrix<double>* targetCovMatrix = sbcMatrix.value(i);
+
+        for ( int z = 0; z < ncolsCurrentBlockColumn; z++)
+          adjustedSigmas[z] = sqrt((*targetCovMatrix)(z,z))*m_bundleResults.sigma0();
       }
-      observation->setAdjustedSigmas(adjustedSigmas);
+      // save adjusted image sigmas
+      else {
+        BundleObservation *observation;
+        if (m_bundleSettings->solveTargetBody())
+          observation = m_bundleObservations.at(i-1);
+        else
+          observation = m_bundleObservations.at(i);
+        vector< double > &adjustedSigmas = observation->adjustedSigmas();
+        matrix<double>* imageCovMatrix = sbcMatrix.value(i);
+        for ( int z = 0; z < ncolsCurrentBlockColumn; z++) {
+          adjustedSigmas[z] = sqrt((*imageCovMatrix)(z,z))*m_bundleResults.sigma0();
+        }
+      }
+
 
       // Output inverse matrix to the open file.
       outStream << sbcMatrix;
@@ -3611,7 +3972,7 @@ namespace Isis {
    */
 /*
   int BundleAdjust::imageIndex(int i) const {
-    if (!m_bundleSettings.solveObservationMode())
+    if (!m_bundleSettings->solveObservationMode())
       return m_nImageIndexMap[i] * m_nNumImagePartials;
     else
       return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
@@ -3660,7 +4021,7 @@ namespace Isis {
    *
    */
 //  int BundleAdjust::observations() const {
-//    if (!m_bundleSettings.solveObservationMode()) {
+//    if (!m_bundleSettings->solveObservationMode()) {
 //      return m_pSnList->Size();
 //      //    return m_pSnList->Size() - m_bundleResults.numberHeldImages();
 //    }
@@ -3729,6 +4090,8 @@ namespace Isis {
                       toString( m_bundleResults.numberConstrainedPointParameters() ) );
     gp += PvlKeyword( "Constrained_Image_Parameters",
                       toString( m_bundleResults.numberConstrainedImageParameters() ) );
+    gp += PvlKeyword( "Constrained_Target_Parameters",
+                      toString( m_bundleResults.numberConstrainedTargetParameters() ) );
     gp += PvlKeyword( "Unknown_Parameters",
                       toString( m_bundleResults.numberUnknownParameters() ) );
     gp += PvlKeyword( "Degrees_of_Freedom",
@@ -3751,7 +4114,7 @@ namespace Isis {
       gp += PvlKeyword("Converged", "TRUE");
       gp += PvlKeyword( "TotalElapsedTime", toString( m_bundleResults.elapsedTime() ) );
 
-      if (m_bundleSettings.errorPropagation()) {
+      if (m_bundleSettings->errorPropagation()) {
         gp += PvlKeyword( "ErrorPropagationElapsedTime",
                          toString( m_bundleResults.elapsedTimeErrorProp() ) );
       }
@@ -3768,17 +4131,17 @@ namespace Isis {
    * Output bundle results to file.
    */
   bool BundleAdjust::output() {
-    if (m_bundleSettings.createBundleOutputFile()) {
-      outputText();
+    if (m_bundleSettings->createBundleOutputFile()) {
+        outputText();
     }
 
-    if (m_bundleSettings.createCSVFiles()) {
+    if (m_bundleSettings->createCSVFiles()) {
       outputPointsCSV();
-      outputImagesCSV();
+//    outputImagesCSV();
     }
 
-    if (m_bundleSettings.createResidualsFile()) {
-      outputResiduals();
+    if (m_bundleSettings->createResidualsFile()) {
+//    outputResiduals();
     }
 
     return true;
@@ -3803,6 +4166,7 @@ namespace Isis {
     int nDegreesOfFreedom = m_bundleResults.numberObservations()
                             + m_bundleResults.numberConstrainedPointParameters()
                             + m_bundleResults.numberConstrainedImageParameters()
+                            + m_bundleResults.numberConstrainedTargetParameters()
                             - m_bundleResults.numberUnknownParameters(); // ??? same as bstat dof ???
     //??? m_bundleResults.computeDegreesOfFreedom();
     //??? int nDegreesOfFreedom = m_bundleResults.degreesOfFreedom();
@@ -3829,36 +4193,41 @@ namespace Isis {
     sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
     fp_out << buf;
 
-    m_bundleSettings.solveObservationMode() ?
+    m_bundleSettings->solveObservationMode() ?
       sprintf(buf, "\n                   OBSERVATIONS: ON"):
       sprintf(buf, "\n                   OBSERVATIONS: OFF");
     fp_out << buf;
 
-    m_bundleSettings.solveRadius() ?
+    m_bundleSettings->solveRadius() ?
       sprintf(buf, "\n                         RADIUS: ON"):
       sprintf(buf, "\n                         RADIUS: OFF");
     fp_out << buf;
 
-    m_bundleSettings.updateCubeLabel() ?
+    m_bundleSettings->solveTargetBody() ?
+      sprintf(buf, "\n                    TARGET BODY: ON"):
+      sprintf(buf, "\n                    TARGET BODY: OFF");
+    fp_out << buf;
+
+    m_bundleSettings->updateCubeLabel() ?
       sprintf(buf, "\n                         UPDATE: YES"):
       sprintf(buf, "\n                         UPDATE: NO");
     fp_out << buf;
 
     sprintf(buf, "\n                  SOLUTION TYPE: %s",
             BundleSettings::solveMethodToString(
-                m_bundleSettings.solveMethod()).toUpper().toAscii().data());
+                m_bundleSettings->solveMethod()).toUpper().toAscii().data());
     fp_out << buf;
 
-    m_bundleSettings.errorPropagation() ?
+    m_bundleSettings->errorPropagation() ?
       sprintf(buf, "\n              ERROR PROPAGATION: ON"):
       sprintf(buf, "\n              ERROR PROPAGATION: OFF");
     fp_out << buf;
 
-    if (m_bundleSettings.outlierRejection()) {
+    if (m_bundleSettings->outlierRejection()) {
       sprintf(buf, "\n              OUTLIER REJECTION: ON");
       fp_out << buf;
       sprintf(buf, "\n           REJECTION MULTIPLIER: %lf",
-                                 m_bundleSettings.outlierRejectionMultiplier());// ??? is this correct ???
+                                 m_bundleSettings->outlierRejectionMultiplier());// ??? is this correct ???
       fp_out << buf;
 
     }
@@ -3901,16 +4270,16 @@ namespace Isis {
     sprintf(buf, "\n\nINPUT: CONVERGENCE CRITERIA\n===========================\n");
     fp_out << buf;
     sprintf(buf, "\n                         SIGMA0: %e",
-                                             m_bundleSettings.convergenceCriteriaThreshold());
+                                             m_bundleSettings->convergenceCriteriaThreshold());
     fp_out << buf;
     sprintf(buf, "\n             MAXIMUM ITERATIONS: %d",
-                                 m_bundleSettings.convergenceCriteriaMaximumIterations());
+                                 m_bundleSettings->convergenceCriteriaMaximumIterations());
     fp_out << buf;
     sprintf(buf, "\n\nINPUT: CAMERA POINTING OPTIONS\n==============================\n");
     fp_out << buf;
 /*
-    //??? this line could replace the switch/case below...   sprintf(buf, "\n                          CAMSOLVE: %s", BundleSettings::instrumentPointingSolveOptionToString(m_bundleSettings.instrumentPointingSolveOption()).toUpper();
-    switch (m_bundleSettings.instrumentPointingSolveOption()) {
+    //??? this line could replace the switch/case below...   sprintf(buf, "\n                          CAMSOLVE: %s", BundleSettings::instrumentPointingSolveOptionToString(m_bundleSettings->instrumentPointingSolveOption()).toUpper();
+    switch (m_bundleSettings->instrumentPointingSolveOption()) {
       case BundleSettings::AnglesOnly:
         sprintf(buf,"\n                          CAMSOLVE: ANGLES");
         break;
@@ -3921,7 +4290,7 @@ namespace Isis {
         sprintf(buf,"\n                          CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
         break;
       case BundleSettings::AllPointingCoefficients:
-        sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_bundleSettings.ckSolveDegree());
+        sprintf(buf,"\n                          CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_bundleSettings->ckSolveDegree());
         break;
       case BundleSettings::NoPointingFactors:
         sprintf(buf,"\n                          CAMSOLVE: NONE");
@@ -3930,11 +4299,11 @@ namespace Isis {
       break;
     }
     fp_out << buf;
-    m_bundleSettings.solveTwist() ? sprintf(buf, "\n                             TWIST: ON"):
+    m_bundleSettings->solveTwist() ? sprintf(buf, "\n                             TWIST: ON"):
         sprintf(buf, "\n                             TWIST: OFF");
     fp_out << buf;
 
-    m_bundleSettings.fitInstrumentPointingPolynomialOverExisting() ? sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
+    m_bundleSettings->fitInstrumentPointingPolynomialOverExisting() ? sprintf(buf, "\n POLYNOMIAL OVER EXISTING POINTING: ON"):
         sprintf(buf, "\nPOLYNOMIAL OVER EXISTING POINTING : OFF");
     fp_out << buf;
 
@@ -3942,8 +4311,8 @@ namespace Isis {
     fp_out << buf;
 
 
-//??? this line could replace the switch/case below...    sprintf(buf, "\n                          SPSOLVE: %s", BundleSettings::instrumentPositionSolveOptionToString(m_bundleSettings.instrumentPositionSolveOption()).toUpper();
-    switch (m_bundleSettings.instrumentPositionSolveOption()) {
+//??? this line could replace the switch/case below...    sprintf(buf, "\n                          SPSOLVE: %s", BundleSettings::instrumentPositionSolveOptionToString(m_bundleSettings->instrumentPositionSolveOption()).toUpper();
+    switch (m_bundleSettings->instrumentPositionSolveOption()) {
       case BundleSettings::NoPositionFactors:
         sprintf(buf,"\n                        SPSOLVE: NONE");
         break;
@@ -3957,14 +4326,14 @@ namespace Isis {
         sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
         break;
       case BundleSettings::AllPositionCoefficients:
-        sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_bundleSettings.spkSolveDegree());
+        sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_bundleSettings->spkSolveDegree());
         break;
       default:
         break;
     }
     fp_out << buf;
 
-    m_bundleSettings.solveInstrumentPositionOverHermiteSpline() ? sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
+    m_bundleSettings->solveInstrumentPositionOverHermiteSpline() ? sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
         sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
     fp_out << buf;
 
@@ -4016,6 +4385,54 @@ namespace Isis {
       sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
     fp_out << buf;
 */
+
+    fp_out << buf;
+    if (m_bundleSettings->solveTargetBody()) {
+      sprintf(buf, "\n\nINPUT: TARGET BODY OPTIONS\n==============================\n");
+      fp_out << buf;
+
+      if (m_bundleTargetBody->solvePoleRA() && m_bundleTargetBody->solvePoleDec()) {
+        sprintf(buf,"\n                             POLE: RIGHT ASCENSION");
+        fp_out << buf;
+        sprintf(buf,"\n                                 : DECLINATION\n");
+        fp_out << buf;
+      }
+      else if (m_bundleTargetBody->solvePoleRA()) {
+        sprintf(buf,"\n                             POLE: RIGHT ASCENSION\n");
+        fp_out << buf;
+      }
+      else if (m_bundleTargetBody->solvePoleDec()) {
+        sprintf(buf,"\n                             POLE: DECLINATION\n");
+        fp_out << buf;
+      }
+
+      if (m_bundleTargetBody->solvePM() || m_bundleTargetBody->solvePMVelocity()
+          || m_bundleTargetBody->solvePMAcceleration()) {
+        sprintf(buf,"\n                   PRIME MERIDIAN: W0 (OFFSET)");
+        fp_out << buf;
+
+        if (m_bundleTargetBody->solvePMVelocity()) {
+          sprintf(buf,"\n                                 : WDOT (SPIN RATE)");
+          fp_out << buf;
+        }
+        if (m_bundleTargetBody->solvePMAcceleration()) {
+          sprintf(buf,"\n                               :W ACCELERATION");
+          fp_out << buf;
+        }
+      }
+
+      if (m_bundleTargetBody->solveTriaxialRadii() || m_bundleTargetBody->solveMeanRadius()) {
+        if (m_bundleTargetBody->solveMeanRadius()) {
+          sprintf(buf,"\n                          RADII: MEAN");
+          fp_out << buf;
+        }
+        else if (m_bundleTargetBody->solveTriaxialRadii()) {
+          sprintf(buf,"\n                          RADII: TRIAXIAL");
+          fp_out << buf;
+        }
+      }
+    }
+
     sprintf(buf, "\n\nJIGSAW: RESULTS\n===============\n");
     fp_out << buf;
     sprintf(buf, "\n                         Images: %6d",nImages);
@@ -4052,6 +4469,12 @@ namespace Isis {
       fp_out << buf;
     }
 
+    if (m_bundleResults.numberConstrainedTargetParameters() > 0) {
+      sprintf(buf, "\n  Constrained Target Parameters: %6d",
+                         m_bundleResults.numberConstrainedTargetParameters());
+      fp_out << buf;
+    }
+
     sprintf(buf, "\n                       Unknowns: %6d",
                                            m_bundleResults.numberUnknownParameters());
     fp_out << buf;
@@ -4070,7 +4493,7 @@ namespace Isis {
     fp_out << buf;
 
     sprintf(buf, "\n           Convergence Criteria: %6.3g",
-                               m_bundleSettings.convergenceCriteriaThreshold());
+                               m_bundleSettings->convergenceCriteriaThreshold());
     fp_out << buf;
 
     if (nConvergenceCriteria == 1) {
@@ -4081,7 +4504,7 @@ namespace Isis {
     sprintf(buf, "\n                     Iterations: %6d", m_nIteration);
     fp_out << buf;
 
-    if (m_nIteration >= m_bundleSettings.convergenceCriteriaMaximumIterations()) {
+    if (m_nIteration >= m_bundleSettings->convergenceCriteriaMaximumIterations()) {
       sprintf(buf, "(Maximum reached)");
       fp_out << buf;
     }
@@ -4195,7 +4618,7 @@ namespace Isis {
   bool BundleAdjust::outputText() {
 
     QString ofname = "bundleout.txt";
-    ofname = m_bundleSettings.outputFilePrefix() + ofname;
+    ofname = m_bundleSettings->outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out) {
@@ -4210,8 +4633,22 @@ namespace Isis {
     outputHeader(fp_out);
 
     bool berrorProp = false;
-    if (m_bundleResults.converged() && m_bundleSettings.errorPropagation()) {
+    if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
       berrorProp = true;
+    }
+
+    // output target body header if solving for target
+    if (m_bundleSettings->solveTargetBody()) {
+      sprintf(buf, "\nTARGET BODY\n==========================\n");
+      fp_out << buf;
+
+      sprintf(buf, "\n   Target         Initial              Total               Final             Initial           Final\n"
+              "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
+      fp_out << buf;
+
+      QString targetString =
+          m_bundleTargetBody->formatBundleOutputString(berrorProp);
+      fp_out << (const char*)targetString.toAscii().data();
     }
 
     // output image exterior orientation header
@@ -4219,6 +4656,10 @@ namespace Isis {
     fp_out << buf;
 
     QMap<QString, QStringList> imagesAndParameters;
+
+    if (m_bundleSettings->solveTargetBody()) {
+      imagesAndParameters.insert( "target", m_bundleTargetBody->parameterList() );
+    }
 
     for (int i = 0; i < nObservations; i++) {
 
@@ -4285,7 +4726,7 @@ namespace Isis {
               m_bundleResults.maxSigmaLongitudeDistance().meters(),
               m_bundleResults.maxSigmaLongitudePointId().toAscii().data());
       fp_out << buf;
-      if ( m_bundleSettings.solveRadius() ) {
+      if ( m_bundleSettings->solveRadius() ) {
         sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n",
                 m_bundleResults.sigmaRadiusStatisticsRms());
         fp_out << buf;
@@ -4348,7 +4789,7 @@ namespace Isis {
     char buf[1056];
 
     QString ofname = "bundleout_points.csv";
-    ofname = m_bundleSettings.outputFilePrefix() + ofname;
+    ofname = m_bundleSettings->outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out) {
@@ -4368,7 +4809,7 @@ namespace Isis {
     double dResidualRms;
 
     // print column headers
-    if (m_bundleSettings.errorPropagation()) {
+    if (m_bundleSettings->errorPropagation()) {
       sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,Sigma,"
               "Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
               "Coordinate,Coordinate\nID,,,,,Latitude,Longitude,Radius,"
@@ -4427,7 +4868,7 @@ namespace Isis {
         strStatus = "UNKNOWN";
       }
 
-      if (m_bundleSettings.errorPropagation()) {
+      if (m_bundleSettings->errorPropagation()) {
         dSigmaLat = point->GetAdjustedSurfacePoint().GetLatSigmaDistance().meters();
         dSigmaLong = point->GetAdjustedSurfacePoint().GetLonSigmaDistance().meters();
         dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
@@ -4462,7 +4903,7 @@ namespace Isis {
     char buf[1056];
 
     QString ofname = "residuals.csv";
-    ofname = m_bundleSettings.outputFilePrefix() + ofname;
+    ofname = m_bundleSettings->outputFilePrefix() + ofname;
 
     std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out) {
@@ -4640,7 +5081,7 @@ namespace Isis {
       }
       ostr.str("");
       strcoeff--;
-      if (!m_bundleSettings.solveTwist()) {
+      if (!m_bundleSettings->solveTwist()) {
         break;
       }
     }
@@ -4705,7 +5146,7 @@ namespace Isis {
         ostr << strcoeff << "t" << i;
       }
       for (int j = 0; j < 5; j++) {
-        if (m_nNumberCamAngleCoefSolved == 1 || !m_bundleSettings.solveTwist()) {
+        if (m_nNumberCamAngleCoefSolved == 1 || !m_bundleSettings->solveTwist()) {
           output_columns.push_back("TWIST,");
         }
         else {
@@ -4717,7 +5158,7 @@ namespace Isis {
       }
       ostr.str("");
       strcoeff--;
-      if (!m_bundleSettings.solveTwist())
+      if (!m_bundleSettings->solveTwist())
         break;
     }
 
@@ -4743,9 +5184,9 @@ namespace Isis {
       nparams = 3 * m_nNumberCamPosCoefSolved;
 
     int numCameraAnglesSolved = 2;
-    if (m_bundleSettings.solveTwist()) numCameraAnglesSolved++;
+    if (m_bundleSettings->solveTwist()) numCameraAnglesSolved++;
     nparams += numCameraAnglesSolved*m_nNumberCamAngleCoefSolved;
-    if (!m_bundleSettings.solveTwist()) nparams += 1; // Report on twist only
+    if (!m_bundleSettings->solveTwist()) nparams += 1; // Report on twist only
     for (int i = 0; i < nparams; i++) {
       output_columns.push_back("Initial,");
       output_columns.push_back("Correction,");
@@ -4801,9 +5242,9 @@ namespace Isis {
       //  Image(i)
       nIndex = imageIndex(i) ;
 
-      if (m_bundleSettings.errorPropagation()
+      if (m_bundleSettings->errorPropagation()
           && m_bundleResults.converged()
-          && m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+          && m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
         vImageAdjustedSigmas = m_Image_AdjustedSigmas.at(i);
       }
 
@@ -4821,7 +5262,7 @@ namespace Isis {
       // (i.e. position and orientation angles). For others (linescan, radar)
       //  we retrieve the polynomial coefficients from which the Exterior
       // Pointing parameters are derived.
-      if (m_bundleSettings.instrumentPositionSolveOption() > 0) {
+      if (m_bundleSettings->instrumentPositionSolveOption() > 0) {
         pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
       }
       else { // not solving for position so report state at center of image
@@ -4833,11 +5274,11 @@ namespace Isis {
         coefZ.push_back(coordinate[2]);
       }
 
-      if (m_bundleSettings.instrumentPointingSolveOption() > 0)
+      if (m_bundleSettings->instrumentPointingSolveOption() > 0)
         pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
 //          else { // frame camera
       else if (pCamera->GetCameraType() != 3) {
-// This is for m_bundleSettings.instrumentPointingSolveOption() = BundleSettings::NoPointingFactors (except Radar which
+// This is for m_bundleSettings->instrumentPointingSolveOption() = BundleSettings::NoPointingFactors (except Radar which
 // has no pointing) and no polynomial fit has occurred
         angles = pSpiceRotation->GetCenterAngles();
         coefRA.push_back(angles.at(0));
@@ -4863,25 +5304,25 @@ namespace Isis {
       if (m_nNumberCamPosCoefSolved > 0) {
         for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
 
-            if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
+            if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
               dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
               dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
 
-          output_columns.push_back(toString(coefX[0] - m_imageCorrections(nIndex)));
+          output_columns.push_back(toString(coeQStringfX[0] - m_imageCorrections(nIndex)));
           output_columns.push_back(toString(m_imageCorrections(nIndex)));
           output_columns.push_back(toString(coefX[j]));
           output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma));
           }
           else {
@@ -4892,14 +5333,14 @@ namespace Isis {
         }
         for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
-            if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
+            if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
               dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
               dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
@@ -4909,7 +5350,7 @@ namespace Isis {
           output_columns.push_back(toString(coefY[j]));
           output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(
                 toString(dSigma));
           }
@@ -4921,14 +5362,14 @@ namespace Isis {
         }
         for (int j = 0; j < m_nNumberCamPosCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
-            if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
+            if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
               dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
               dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
@@ -4938,7 +5379,7 @@ namespace Isis {
           output_columns.push_back(toString(coefZ[j]));
           output_columns.push_back(toString(m_dGlobalSpacecraftPositionAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma));
           }
           else {
@@ -4969,14 +5410,14 @@ namespace Isis {
       if (m_nNumberCamAngleCoefSolved > 0) {
         for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
-            if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
+            if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
               dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
               dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
@@ -4986,7 +5427,7 @@ namespace Isis {
           output_columns.push_back(toString(coefRA[j] * RAD2DEG));
           output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma * RAD2DEG));
           }
           else {
@@ -4997,14 +5438,14 @@ namespace Isis {
         }
         for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
-            if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
+            if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
               dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
               dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
             }
-            else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+            else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
               dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
             }
           }
@@ -5014,7 +5455,7 @@ namespace Isis {
           output_columns.push_back(toString(coefDEC[j] * RAD2DEG));
           output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
 
-          if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
+          if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
             output_columns.push_back(toString(dSigma * RAD2DEG));
           }
           else {
@@ -5023,7 +5464,7 @@ namespace Isis {
           nIndex++;
           nSigmaIndex++;
         }
-        if (!m_bundleSettings.solveTwist()) {
+        if (!m_bundleSettings->solveTwist()) {
           output_columns.push_back(toString(coefTWI[0]*RAD2DEG));
           output_columns.push_back(toString(0.0));
           output_columns.push_back(toString(coefTWI[0]*RAD2DEG));
@@ -5033,14 +5474,14 @@ namespace Isis {
         else {
           for (int j = 0; j < m_nNumberCamAngleCoefSolved; j++) {
 
-            if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
-              if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
+            if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
+              if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
                 dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
               }
-              else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
+              else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
                 dSigma = sqrt(vImageAdjustedSigmas[nSigmaIndex]) * m_bundleResults.sigma0();
               }
-              else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+              else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
                 dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_bundleResults.sigma0();
               }
             }
@@ -5050,7 +5491,7 @@ namespace Isis {
             output_columns.push_back(toString(coefTWI[j] * RAD2DEG));
             output_columns.push_back(toString(m_dGlobalCameraAnglesAprioriSigma[j]));
 
-            if (m_bundleSettings.errorPropagation() && m_bundleResults.converged()) {
+            if (m_bundleSettings->errorPropagation() && m_bundleResults.converged()) {
               output_columns.push_back(toString(dSigma * RAD2DEG));
             }
             else {
@@ -5134,15 +5575,15 @@ namespace Isis {
 
   double BundleAdjust::solveMethodSigma(int normalEquationIndex, int sigmaIndex, int imageIndex) {
     double sigma = 0.0;
-    if (m_bundleSettings.solveMethod() == BundleSettings::OldSparse) {
-      gmm::row_matrix< gmm::rsvector<double> > lsqCovMatrix = m_pLsq->covarianceMatrix();
+    if (m_bundleSettings->solveMethod() == BundleSettings::OldSparse) {
+      gmm::row_matrix< gmm::rsvector< double > > lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
       sigma = sqrt((double)(lsqCovMatrix(normalEquationIndex, normalEquationIndex)));
     }
-    else if (m_bundleSettings.solveMethod() == BundleSettings::Sparse) {
-      boost::numeric::ublas::vector <double> imageAdjustedSigmas = m_Image_AdjustedSigmas.at(imageIndex);
+    else if (m_bundleSettings->solveMethod() == BundleSettings::Sparse) {
+      vector <double> imageAdjustedSigmas = m_Image_AdjustedSigmas.at(imageIndex);
       sigma = sqrt(imageAdjustedSigmas[sigmaIndex]) * m_bundleResults.sigma0();
     }
-    else if (m_bundleSettings.solveMethod() == BundleSettings::SpecialK) {
+    else if (m_bundleSettings->solveMethod() == BundleSettings::SpecialK) {
       sigma = sqrt((double)(m_Normals(normalEquationIndex, normalEquationIndex))) * m_bundleResults.sigma0();
     }
     return sigma;
@@ -5253,7 +5694,7 @@ namespace Isis {
     }
 
 
-    if (m_bundleSettings.errorPropagation()) {
+    if (m_bundleSettings->errorPropagation()) {
 
       // initialize lat/lon/rad boundaries
       Distance minSigmaLatDist;
@@ -5301,7 +5742,7 @@ namespace Isis {
         minSigmaLatPointId = maxSigmaLatPointId;
         minSigmaLonPointId = maxSigmaLatPointId;
 
-        if (m_bundleSettings.solveRadius()) {
+        if (m_bundleSettings->solveRadius()) {
           maxSigmaRadDist = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma();
           minSigmaRadDist = maxSigmaRadDist;
 
@@ -5334,7 +5775,7 @@ namespace Isis {
           maxSigmaLonDist = sigmaLonDist;
           maxSigmaLonPointId = point->GetId();
         }
-        if (m_bundleSettings.solveRadius()) {
+        if (m_bundleSettings->solveRadius()) {
           if (sigmaRadDist > maxSigmaRadDist) {
             maxSigmaRadDist = sigmaRadDist;
             maxSigmaRadPointId = point->GetId();
@@ -5348,7 +5789,7 @@ namespace Isis {
           minSigmaLonDist = sigmaLonDist;
           minSigmaLonPointId = point->GetId();
         }
-        if (m_bundleSettings.solveRadius()) {
+        if (m_bundleSettings->solveRadius()) {
           if (sigmaRadDist < minSigmaRadDist) {
             minSigmaRadDist = sigmaRadDist;
             minSigmaRadPointId = point->GetId();

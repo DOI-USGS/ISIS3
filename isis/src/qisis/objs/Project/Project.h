@@ -36,7 +36,9 @@ class QXmlStreamWriter;
 
 #include "ControlList.h"
 #include "Directory.h"
+#include "GuiCameraList.h"
 #include "ImageList.h"
+#include "TargetBody.h"
 #include "XmlStackedHandler.h"
 
 namespace Isis {
@@ -129,6 +131,10 @@ namespace Isis {
       QString imageDataRoot() const;
       QList<ImageList *> images();
 
+      static QString targetBodyRoot(QString projectRoot);
+      QString targetBodyRoot() const;
+      TargetBodyList targetBodies();
+
       static QString resultsRoot(QString projectRoot);
       QString resultsRoot() const;
       static QString bundleSolutionInfoRoot(QString projectRoot);
@@ -154,15 +160,65 @@ namespace Isis {
       void warn(QString text);
 
     signals:
-      void allImagesClosed();
+      /**
+       * apparently not used?
+       */
+//      void allImagesClosed();
+
+      /**
+       * Emitted when new ControlList added to Project
+       * receivers: ProjectTreeWidget
+       */
       void controlListAdded(ControlList *controls);
+
+      /**
+       * Emitted when new Control added to Project
+       * receivers: ProjectTreeWidget
+       */
       void controlAdded(Control *control);
-      // Emitted when new images are available.
+
+      /**
+       * Emitted when new images are available.
+       * receivers: Directory, Project, WorkOrder
+       */
       void imagesAdded(ImageList *images);
+
+      /**
+       * Emitted when new BundleSolutionInfo available from jigsaw
+       * receivers: ProjectTreeWidget (TODO: should this be the Directory?)
+       */
       void bundleSolutionInfoAdded(BundleSolutionInfo *bundleSolutionInfo);
+
+      /**
+       * Emitted when new TargetBody objects added to project
+       * receivers: Directory
+       */
+      void targetsAdded(TargetBodyList *targets);
+
+      /**
+       * Emitted when new GuiCamera objects added to project
+       * receivers: Directory
+       */
+      void guiCamerasAdded(GuiCameraList *targets);
+
+      /**
+       * Emitted when project name is changed
+       * receivers: ProjectTreeWidget
+       */
       void nameChanged(QString newName);
+
+      /**
+       * Emitted when project loaded
+       * receivers: CNetSuiteMainWindow, Directory, HistoryTreeWidget
+       */
       void projectLoaded(Project *);
+
+      /**
+       * Emitted when project location moved
+       * receivers: Control, BundleSolutionInfo, Image, TargetBody
+       */
       void projectRelocated(Project *);
+
       void workOrderStarting(WorkOrder *);
       void workOrderFinished(WorkOrder *);
 
@@ -173,9 +229,12 @@ namespace Isis {
       void controlClosed(QObject *control);
       void controlListDeleted(QObject *controlList);
       void imagesReady(ImageList);
+      void addTargetsFromImportedImagesToProject(ImageList *imageList);
+      void addCamerasFromImportedImagesToProject(ImageList *imageList);
       void imageClosed(QObject *image);
       void imageListDeleted(QObject *imageList);
       void bundleSolutionInfoClosed(QObject *bundleSolutionInfo);
+      void targetBodyClosed(QObject *targetBodyObj);
 
     private:
       Project(const Project &other);
@@ -226,6 +285,9 @@ namespace Isis {
       QPointer<Directory> m_directory;
       QList<ImageList *> *m_images;
       QList<ControlList *> *m_controls;
+      TargetBodyList *m_targets;
+      GuiCameraList *m_guiCameras;
+
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 
       // TODO: kle testing - this will almost certainly be changed
@@ -242,6 +304,8 @@ namespace Isis {
       QMap<QString, Control *> *m_idToControlMap;
       QMap<QString, Image *> *m_idToImageMap;
       QMap<QString, BundleSolutionInfo *> *m_idToBundleSolutionInfoMap;
+      QMap<QString, TargetBody *> *m_idToTargetBodyMap;
+      QMap<QString, GuiCamera *> *m_idToGuiCameraMap;
 
       QString m_name;
       QStringList *m_warnings;
