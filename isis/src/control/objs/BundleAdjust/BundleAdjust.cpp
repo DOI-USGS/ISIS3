@@ -3846,8 +3846,12 @@ namespace Isis {
 
         // only update point every 100 points
         if (j%100 == 0) {
-            printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", 
-                   i+1, nBlockColumns,  j+1, nObjectPoints);
+            printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", i+1,
+                   nBlockColumns,  j+1, nObjectPoints);
+//          str = QString("Inverse Block %1 of %2; Point %3 of %4").arg(i+1).arg(nBlockColumns)
+//              .arg(j+1).arg(nObjectPoints);
+
+            emit iterationUpdate(i+1, j+1);
         }
 
         // get corresponding Q matrix
