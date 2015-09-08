@@ -19,7 +19,7 @@
 #include "Quaternion.h"
 #include "Table.h"
 #include "TableField.h"
-#include "TrigBasis.h"
+//#include "TrigBasis.h"
 
 // Declarations for bindings for Naif Spicelib routines that do not have
 // a wrapper
