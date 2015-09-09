@@ -13,7 +13,7 @@
 # GuiStyle = windows | motif | cde | motifplus | 
 #            platinum | sgi | kde | aqua
 # GuiHelpBrowser = { your preferred browser, may need path }
-# GuiFontName = helvitica | times | charter | any legal font
+# GuiFontName = helvetica | times | charter | any legal font
 # GuiFontSize = 10 | 12 | 14 | any font point size
 # HistoryPath = { your preferred loaction for the application
 #                 .par files }
@@ -26,7 +26,7 @@ Group=UserInterface
   ProgressBarPercent = 10
   ProgressBar        = Off
   GuiHelpBrowser     = firefox
-  GuiFontName        = helvitica
+  GuiFontName        = helvetica
   GuiFontSize        = 10
   GuiWidth           = 460
   GuiHeight          = 600
