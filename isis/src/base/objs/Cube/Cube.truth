@@ -290,6 +290,7 @@ Testing errors ...
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
 **I/O ERROR** Failed to open [...] with read/write access.
 **ERROR** Cannot create the cube [shouldntExist.cub] with a pixel type set to None.
+**PROGRAMMER ERROR** Cannot add a group to the label of cube [IsisCube_06.cub] because it is opened read-only.
 
 Test creating an ecub
 Object = IsisCube

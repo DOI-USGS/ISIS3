@@ -498,7 +498,7 @@ namespace Isis {
 
 
   /**
-   * This method will open an isis sube for reading or reading/writing.
+   * This method will open an isis cube for reading or reading/writing.
    *
    * @param[in] cubeFileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
@@ -1624,6 +1624,13 @@ namespace Isis {
    * @param[in] group Label containing the group to put.
    */
   void Cube::putGroup(const PvlGroup &group) {
+    if (isReadOnly()) {
+      QString msg = "Cannot add a group to the label of cube [" + (QString)QFileInfo(fileName()).fileName() +
+          "] because it is opened read-only";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+      return;
+    }
+    
     PvlObject &isiscube = label()->findObject("IsisCube");
     if (isiscube.hasGroup(group.name())) {
       isiscube.findGroup(group.name()) = group;

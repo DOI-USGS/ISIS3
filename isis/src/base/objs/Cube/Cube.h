@@ -147,6 +147,8 @@ namespace Isis {
    *                           Added cases to test creating bsq and large bsq cubes.
    *                           References #1689.
    *   @history 2015-01-30 Ian Humphrey - Deallocated copied cubes in unittest. References #2082.
+   *   @history 2015-06-22 Makayla Shepherd - Using putGroup() a group on the label of a read-only 
+   *                           cube now throws an error.
    */
   class Cube {
     public:
