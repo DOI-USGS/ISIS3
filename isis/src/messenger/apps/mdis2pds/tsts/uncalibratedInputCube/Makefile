@@ -1,11 +1,7 @@
-# Tests mdis2pds with user-defined (manual) stretch of -1 to 1.
-#
-# parameters  type=manual, 
-#             min = -1, 
-#             max =  1, 
-# defaults to minper=0, 
-#             maxper=100, 
-#             bits=32
+# Tests export of uncalibrated cube
+#   - No RadiometricCalibration group, so 
+#     this case deals with cases where 
+#     DarkStripMean, SoftwareName, SoftwareVersionId = N/A
 APPNAME = mdis2pds
 
 output.cub.TOLERANCE = 0.0000000002
@@ -15,9 +11,9 @@ output.pvl.IGNORELINES = PRODUCT_CREATION_TIME
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/EN0108840044M.cal.cub \
-	to=$(OUTPUT)/output type=manual \
-	min=-1.0 max=1.0 > /dev/null;
+	$(APPNAME) from=$(INPUT)/EW0089565626A.cub \
+	to=$(OUTPUT)/output \
+	> /dev/null;
 	catlab from=$(OUTPUT)/output.IMG \
 	to=$(OUTPUT)/output.pvl > /dev/null;
 	pds2isis from=$(OUTPUT)/output.IMG \

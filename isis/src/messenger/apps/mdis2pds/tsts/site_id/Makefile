@@ -1,3 +1,11 @@
+# Site ID test for mdis2pds
+#
+# defaults to type=automatic, 
+#             default min, 
+#             default max, 
+#             minper=0, 
+#             maxper=100, 
+#             bits=32
 APPNAME = mdis2pds
 
 output.cub.TOLERANCE = 0.0000000002

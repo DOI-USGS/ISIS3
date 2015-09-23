@@ -7,12 +7,12 @@
   </brief>
 
   <description>
-    <b>mdis2pds</b> will process a Messenger  MDIS cube and export it to PDS/CDR
-    format.  The resulting file will have a PDS compliant label and data object 
-    according to the SIS document.    <b>mdis2pds</b> assumes the input file has 
-    at least been run through mdis2isis and mdiscal.  This will ensure that 
-    proper values of the  PRODUCT_ID and SOURCE_PRODUCT_ID are included in the 
-    output CDR label.  
+    The <b>mdis2pds</b> program will process a Messenger  MDIS cube and export it to CDR type PDS
+    product. The output file will have a PDS compliant label and a data object that contains the
+    keywords described in the MDIS CDR/RDR SIS document (see link below). The input file must
+    have been imported and calibrated using the ISIS programs mdis2isis and mdiscal, respectively.
+    This will ensure that the proper values of the PRODUCT_ID and SOURCE_PRODUCT_ID are included in
+    the output CDR label.  
   </description>
 
   <history>
@@ -21,7 +21,7 @@
     </change>
     <change name="Christopher Austin" date="2008-08-14">
       Shortened and optimized the code handling the histograms. Removed the
-      32 bit strech.
+      32 bit stretch.
     </change>
     <change name="Christopher Austin" date="2008-08-22">
       Fixed for correct source.  Previously was using incorrect comparison data.
@@ -40,25 +40,58 @@
       the Histogram.
     </change>
     <change name="Kris Becker" date="2008-09-19">
-        Fixed N/A quoting, misplaced units and data values that exceeded 20 
-        characters.  Also quoted the SOFTWARE_VERSION_ID and FILTER_NUMBER 
-        keyword values.  Added units to RETICLE_POINT_* keywords where missing.
+      Fixed N/A quoting, misplaced units and data values that exceeded 20 
+      characters.  Also quoted the SOFTWARE_VERSION_ID and FILTER_NUMBER 
+      keyword values.  Added units to RETICLE_POINT_* keywords were missing.
     </change>
     <change name="Steven Lambright" date="2011-03-31">
       The DarkStripMean keyword can now be "N/A"
     </change>
     <change name="Kris Becker" date="2011-06-15">
-        Added ORBIT_NUMBER to translation table for inclusion in output RDR 
-        (CDR) file.
+      Added ORBIT_NUMBER to translation table for inclusion in output RDR (CDR) file.
     </change>
     <change name="Kris Becker" date="2011-07-21">
-        Added quotes to the SITE_ID keyword.
+      Added quotes to the SITE_ID keyword.
+    </change>
+    <change name="Jeannie Backer" date="2015-09-01">
+      Added MESS:EC_FACTOR keyword to output label. Increased software version number to 1.1.
+      Made code more compliant with ISIS coding standards. Added PDS format template for
+      the output CDR product. Fixes #2333
     </change>
   </history>
 
   <category>
     <missionItem>Messenger</missionItem>
   </category>
+
+  <seeAlso>
+    <applications>
+      <item>
+        mdis2isis
+      </item>
+      <item>
+        spiceinit
+      </item>
+      <item>
+        mdiscal
+      </item>
+    </applications>
+    <documents>
+      <document>
+        <title>
+            MDIS CDR/RDR Software Interface Specification (SIS)
+        </title>
+        <source>
+          <filename>MDIS_CDR_RDRSIS.PDF</filename>
+          <path>http://pdsimage.wr.usgs.gov/Missions/MESSENGER/MSGRMDS_5001/DOCUMENT/</path>
+        </source>
+        <author>
+          Scott Murchie, Alan Mick, Louise Prockter, Andrew Rivkin, 
+          Edward Guinness, and Jennifer Ward
+        </author>
+      </document>
+    </documents>
+  </seeAlso>
 
   <groups>
 
@@ -69,7 +102,7 @@
         <fileMode>input</fileMode>
         <brief> Input Messenger cube </brief>
         <description>
-          Input filename of a messenger cube file to be exported into a cdr image.
+          Input filename of a messenger cube file to be exported into a CDR image.
         </description>
         <filter> *.cub </filter>
       </parameter>
@@ -78,7 +111,7 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Final output filename.
+          Final output filename
         </brief>
         <description>
           Output filename, by  default the filename will be generated from the
@@ -98,13 +131,13 @@
         </brief>
         <description>
           This parameter is used to select one of two ways to stretch output
-          pixels.  The are AUTOMATIC or MANUAL.
+          pixels.  They are AUTOMATIC or MANUAL.
         </description>
         <list>
           <option value="AUTOMATIC">
             <brief>Automatically calculate stretch</brief>
             <description>
-              Automatically calculate stretch from the input cube. No strecth
+              Automatically calculate stretch from the input cube. No stretch
               will be used if BITS equals 32, MINPER equals 0.0, and MAXPER
               equals 100.0.
             </description>
@@ -127,22 +160,22 @@
       </parameter>
 
       <parameter name="MIN">
-          <type>double</type>
-          <brief>
-              Lower bound of the stretch
-          </brief>
-          <description>
-             Lower bound for the manually specified stretch.
-          </description>
+        <type>double</type>
+        <brief>
+          Lower bound of the stretch
+        </brief>
+        <description>
+           Lower bound for the manually specified stretch.
+        </description>
       </parameter>
       <parameter name="MAX">
-          <type>double</type>
-          <brief>
-              Upper bound of the stretch
-          </brief>
-          <description>
-              Upper bound for the manually specified stretch.
-          </description>
+        <type>double</type>
+        <brief>
+          Upper bound of the stretch
+        </brief>
+        <description>
+          Upper bound for the manually specified stretch.
+        </description>
       </parameter>
 
       <parameter name="MINPER">
@@ -153,8 +186,8 @@
         </brief>
         <description>
           The cumulative percentage value to be mapped to the minimum 
-          valid pixel for the specified number of bits. For example: With BITS=10
-          and MINPER=1.0, the DN which corresponds to the cummulative
+          valid pixel for the specified number of bits. For example, with BITS=10
+          and MINPER=1.0, the DN which corresponds to the cumulative
           percent of 1.0 will be mapped to 3, where 0 represents NULL, 1
           represents LRS and 2 represents LIS.
         </description>
@@ -162,7 +195,7 @@
         <maximum inclusive="yes">100.0</maximum>
         <lessThanOrEqual>
           <item>
-              MAXPER
+            MAXPER
           </item>
         </lessThanOrEqual>
       </parameter>
@@ -170,12 +203,12 @@
         <type>double</type>
         <default><item>100.0</item></default>
         <brief>
-          Mazimum DN valid percentage
+          Maximum DN valid percentage
         </brief>
         <description>
           The cumulative percentage value to be mapped to the maximum 
-          valid pixel for the specified number of bits. For example: With BITS=10
-          and MINPER=99.0, the DN which corresponds to the cummulative
+          valid pixel for the specified number of bits. For example, with BITS=10
+          and MINPER=99.0, the DN which corresponds to the cumulative
           percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2. 
           Where 1023 represents HIS and 1022 represents HRS.
         </description>
@@ -192,26 +225,26 @@
 
     <group name="Output Controls">
 
-        <parameter name="BITS">
-          <type>integer</type>
-          <default><item>32</item></default>
-          <brief>
-            Number of bits for the output DN
-          </brief>
-          <description>
-            The number of bits to compress the input data to. The valid data as
-            well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
-            compressed into this number of bits. The output data type will be
-            automaticity choosen using this value. A value of 8 will create 
-            unsigned byte output files. Values from 9 to 16 will create unsigned
-            word output files. Unused bits in the unsigned word output file will be
-            set to zero.
-          </description>
-          <minimum inclusive="yes">8</minimum>
-          <maximum inclusive="yes">32</maximum>
-        </parameter>
+      <parameter name="BITS">
+        <type>integer</type>
+        <default><item>32</item></default>
+        <brief>
+          Number of bits for the output DN
+        </brief>
+        <description>
+          The number of bits to compress the input data to. The valid data as
+          well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
+          compressed to this number of bits. The output data type will be
+          automatically chosen using this value. A value of 8 will create 
+          unsigned byte output files. Values from 9 to 16 will create unsigned
+          word output files. Unused bits in the unsigned word output file will be
+          set to zero.
+        </description>
+        <minimum inclusive="yes">8</minimum>
+        <maximum inclusive="yes">32</maximum>
+      </parameter>
 
-      </group>
+    </group>
 
   </groups>
 

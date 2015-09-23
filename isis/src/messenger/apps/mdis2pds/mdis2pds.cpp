@@ -1,96 +1,96 @@
 #include "Isis.h"
 
 #include <cmath>
-#include <string>
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
-#include "UserInterface.h"
-#include "Progress.h"
-#include "FileName.h"
-#include "IException.h"
-#include "ProcessExportPds.h"
+#include "BufferManager.h"
 #include "Cube.h"
+#include "FileName.h"
 #include "Histogram.h"
+#include "IException.h"
+#include "IString.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
+#include "ProcessExportPds.h"
+#include "Progress.h"
 #include "PvlTranslationManager.h"
-#include "BufferManager.h"
-#include "LineManager.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
 
-inline QString Quote(const QString &value, const char qChar = '"') {
-  if(value.isEmpty()) return (value);
-  if(value[0] == qChar) return (value);
+inline QString quote(const QString &value, const char qChar='"') {
+  if (value.isEmpty()) return (value);
+  if (value[0] == qChar) return (value);
   return (QString(qChar + value + qChar));
 }
 
-inline double SetRound(double value, const int precision) {
+inline double setRound(double value, const int precision) {
   double scale = pow(10.0, precision);
   value = rint(value * scale) / scale;
   return (value);
 }
 
-inline void ValidateUnit(PvlKeyword &key, const QString &kunit) {
+inline void validateUnit(PvlKeyword &key, const QString &kunit) {
   PvlKeyword temp = key;
   key.clear();
-  for(int i = 0 ; i < temp.size() ; i++) {
+  for (int i = 0; i < temp.size(); i++) {
     try {
       //  If this works, check unit, otherwise an exception is thrown
-      (void) toDouble(temp[i]);
+      toDouble(temp[i]);
       QString unit = temp.unit(i);
-      if(unit.isEmpty()) unit = kunit;
+      if (unit.isEmpty()) unit = kunit;
       key.addValue(temp[i], unit);
     }
-    catch(...) {
+    catch (...) {
       key.addValue(temp[i]);
     }
   }
   return;
 }
 
-inline void FixUnit(PvlObject &obj, const QString &key, const QString &unit) {
-  if(obj.hasKeyword(key, PvlObject::Traverse)) {
-    ValidateUnit(obj.findKeyword(key, PvlObject::Traverse), unit);
+inline void fixUnit(PvlObject &obj, const QString &key, const QString &unit) {
+  if (obj.hasKeyword(key, PvlObject::Traverse)) {
+    validateUnit(obj.findKeyword(key, PvlObject::Traverse), unit);
   }
   return;
 }
 
-inline void FixQuotes(PvlContainer &kcont, const QString &value = "N/A") {
+inline void fixQuotes(PvlContainer &kcont, const QString &value="N/A") {
   PvlContainer::PvlKeywordIterator kiter;
-  for(kiter = kcont.begin() ; kiter != kcont.end() ; ++kiter) {
-    for(int nv = 0 ; nv < kiter->size() ; nv++) {
-      if((*kiter)[nv] == value)(*kiter)[nv] = Quote((*kiter)[nv]);
+  for (kiter = kcont.begin(); kiter != kcont.end(); ++kiter) {
+    for (int nv = 0; nv < kiter->size(); nv++) {
+      if ((*kiter)[nv] == value)(*kiter)[nv] = quote((*kiter)[nv]);
     }
   }
 }
 
-inline void FixLabels(PvlObject &obj) {
+inline void fixLabels(PvlObject &obj) {
   // Current object-owned keywords
-  FixQuotes(obj);
+  fixQuotes(obj);
 
   // Fix all nested objects
   PvlObject::PvlObjectIterator o;
-  for(o = obj.beginObject() ; o != obj.endObject() ; ++o) {
-    FixLabels(*o);
+  for (o = obj.beginObject(); o != obj.endObject(); ++o) {
+    fixLabels(*o);
   }
 
   // Fix local groups
   PvlObject::PvlGroupIterator g;
-  for(g = obj.beginGroup() ; g != obj.endGroup() ; ++g) {
-    FixQuotes(*g);
+  for (g = obj.beginGroup(); g != obj.endGroup(); ++g) {
+    fixQuotes(*g);
   }
   return;
 }
 
 
 void IsisMain() {
-  const QString mdis2pds_program = "mdis2pds";
-  const QString mdis2pds_version = "1.0";
-  const QString mdis2pds_revision = "$Revision$";
-  const QString mdis2pds_runtime = Application::DateTime();
+  const QString mdis2pdsProgram = "mdis2pds";
+  const QString mdis2pdsVersion = "1.1";
+  const QString mdis2pdsRevision = "$Revision$";
+  const QString mdis2pdsRuntime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
   FileName input(ui.GetFileName("FROM"));
@@ -104,7 +104,15 @@ void IsisMain() {
   Histogram *hist = incube->histogram(0);
   double minmin = 0.0;
   double maxmax = 0.0;
-  if(ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
+  // if the type of calibration is automatic and
+  //     1) the given min percent is valid, then set minmin to the percent obtained from this min
+  //     2) the given min percent is not valid, then set minmin to the histogram's min
+  //     3) the given max percent is valid, then set maxmax to the percent obtained from this max
+  //     4) the given max percent is not valid, then set maxmax to the histogram's max
+  // Otherwise, (calibration is manual)
+  //     set minmin to the given min value
+  //     set maxmax to the given max value
+  if (ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
     minmin = (ui.GetDouble("MINPER") <= 0.000001) ?
              hist->Minimum() :
              hist->Percent(ui.GetDouble("MINPER"));
@@ -125,7 +133,7 @@ void IsisMain() {
   // Set the output pixel type and the special pixel values
   QString dataSetID = "MESS-E/V/H-MDIS-";
   int nbits = ui.GetInteger("BITS");
-  if(nbits == 8) {
+  if (nbits == 8) {
     processPds.SetOutputType(UnsignedByte);
     processPds.SetOutputRange(VALID_MIN1, VALID_MAX1);
     processPds.SetOutputNull(NULL1);
@@ -135,7 +143,7 @@ void IsisMain() {
     processPds.SetOutputHrs(HIGH_REPR_SAT1);
     dataSetID += "1";
   }
-  else if(nbits == 16) {
+  else if (nbits == 16) {
     processPds.SetOutputType(UnsignedWord);
     processPds.SetOutputRange(VALID_MINU2, VALID_MAXU2);
     processPds.SetOutputNull(NULLU2);
@@ -145,7 +153,7 @@ void IsisMain() {
     processPds.SetOutputHrs(HIGH_REPR_SATU2);
     dataSetID += "2";
   }
-  else if(nbits == 32) {
+  else if (nbits == 32) {
     processPds.SetOutputType(Real);
     processPds.SetOutputRange(minmin, maxmax);
     processPds.SetOutputNull(NULL4);
@@ -155,7 +163,8 @@ void IsisMain() {
     processPds.SetOutputHis(HIGH_INSTR_SAT4);
     dataSetID += "4";
   }
-  else if(nbits > 8  &&  nbits < 16) {
+  else if (nbits < 16) { // 8 < nbits < 16
+                         // NOTE: xml restricts BITS to between 8 and 32, inclusive
     processPds.SetOutputType(UnsignedWord);
     processPds.SetOutputRange(3.0, pow(2.0, (double)(nbits)) - 3.0);
     processPds.SetOutputNull(0);
@@ -165,8 +174,8 @@ void IsisMain() {
     processPds.SetOutputHrs(pow(2.0, (double)(nbits)) - 1.0);
     dataSetID += "0";
   }
-  else {
-    QString msg = "[" + QString(nbits) + "] is not a supported bit length.";
+  else { // 16 < nbits < 32 
+    QString msg = "[" + toString(nbits) + "] is not a supported bit length.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   dataSetID += "-CDR-CALDATA-V1.0";
@@ -193,58 +202,31 @@ void IsisMain() {
   // Translates the ISIS labels along with the original EDR labels
   origLabel.addObject(*(incube->label()));
   PvlTranslationManager labels(origLabel,
-                               "$messenger/translations/mdisCdrLabel.trn");
+                               "$messenger/translations/mdisCDRLabel.trn");
   labels.Auto(pdsLabel);
 
   p.CheckStatus();
 
-  // Add keyword comments
-  PvlKeyword &recordType(pdsLabel.findKeyword("RECORD_TYPE"));
-  recordType.addComment("/*** FILE FORMAT ***/");
-
-  PvlKeyword &image(pdsLabel.findKeyword("^IMAGE"));
-  image.addComment("/*** POINTERS TO START BYTE OFFSET OF OBJECTS IN IMAGE FILE ***/");
-
-  PvlKeyword &missionName(pdsLabel.findKeyword("MISSION_NAME"));
-  missionName.addComment("/*** GENERAL DATA DESCRIPTION PARAMETERS ***/");
-
-  PvlKeyword &startTime(pdsLabel.findKeyword("START_TIME"));
-  startTime.addComment("/*** TIME PARAMETERS ***/");
-
-  PvlKeyword &instrumentName(pdsLabel.findKeyword("INSTRUMENT_NAME"));
-  instrumentName.addComment("/*** INSTRUMENT ENGINEERING PARAMETERS ***/");
-
-  PvlKeyword &messMetExp(pdsLabel.findKeyword("MESS:MET_EXP"));
-  messMetExp.addComment("/*** INSTRUMENT RAW PARAMETERS ***/");
-
-  PvlKeyword &geometry(pdsLabel.findKeyword("RIGHT_ASCENSION"));
-  geometry.addComment("/*** GEOMETRY INFORMATION ***/");
-
-  PvlKeyword &target(pdsLabel.findKeyword("SC_TARGET_POSITION_VECTOR"));
-  target.addComment("/*** TARGET PARAMETERS ***/");
-
-  PvlKeyword &sensor(pdsLabel.findKeyword("SLANT_DISTANCE"));
-  sensor.addComment("/*** TARGET WITHIN SENSOR FOV ***/");
-
-  PvlKeyword &spacecraftPosition(pdsLabel.findKeyword("SUB_SPACECRAFT_LATITUDE"));
-  spacecraftPosition.addComment("/*** SPACECRAFT POSITION WITH RESPECT TO CENTRAL BODY ***/");
-
-  PvlKeyword &spacecraftLocation(pdsLabel.findKeyword("SPACECRAFT_SOLAR_DISTANCE"));
-  spacecraftLocation.addComment("/*** SPACECRAFT LOCATION ***/");
-
-  PvlKeyword &solarDistance(pdsLabel.findKeyword("SOLAR_DISTANCE"));
-  solarDistance.addComment("/*** VIEWING AND LIGHTING GEOMETRY (SUN ON TARGET) ***/");
-
-  PvlGroup &subframe(pdsLabel.findGroup("SUBFRAME1_PARAMETERS"));
-  subframe.addComment("/*** GEOMETRY FOR EACH SUBFRAME ***/");
+  // The translation file automatically adds this keyword from
+  // "EmpiricalCorrectionFactor" using a default of "N/A" if not found. This
+  // keyword was previously named "ContaminationEventFactor"
+  // So here we replace the "N/A" with the value of the keyword
+  // "ContaminationEventFactor", if it exists.
+  PvlKeyword &empiricalCorrection(pdsLabel.findKeyword("MESS:EC_FACTOR"));
+  if (empiricalCorrection[0] == "N/A") {
+    if (incube->label()->hasKeyword("ContaminationEventFactor", Pvl::Traverse)) {
+      empiricalCorrection.setValue(incube->label()->findKeyword("ContaminationEventFactor", 
+                                                                Pvl::Traverse)[0]);
+    }
+  }
 
   p.CheckStatus();
 
   // Creates keywords from the input's hist above
-  PvlKeyword minDn("MINIMUM", toString(SetRound(hist->Minimum(), 16)));
-  PvlKeyword maxDn("MAXIMUM", toString(SetRound(hist->Maximum(), 16)));
-  PvlKeyword meanDn("MEAN", toString(SetRound(hist->Average(), 16)));
-  PvlKeyword stddev("STANDARD_DEVIATION", toString(SetRound(hist->StandardDeviation(), 16)));
+  PvlKeyword minDn("MINIMUM", toString(setRound(hist->Minimum(), 16)));
+  PvlKeyword maxDn("MAXIMUM", toString(setRound(hist->Maximum(), 16)));
+  PvlKeyword meanDn("MEAN", toString(setRound(hist->Average(), 16)));
+  PvlKeyword stddev("STANDARD_DEVIATION", toString(setRound(hist->StandardDeviation(), 16)));
 
   PvlKeyword saturated("SATURATED_PIXEL_COUNT", toString(hist->HisPixels()));
 
@@ -257,74 +239,101 @@ void IsisMain() {
   imageObj.addKeyword(stddev);
   saturated.addComment("/*** PIXEL COUNTS ***/");
   imageObj.addKeyword(saturated);
-  if(imageObj.hasKeyword("DARK_STRIP_MEAN")) {
-    PvlKeyword &darkStripMean = imageObj.findKeyword("DARK_STRIP_MEAN");
+  // This line is commented out since mdisCDRLabel.trn automatically creates a
+  // DARK_STRIP_MEAN keyword with default = N/A if it is not found in the input cube
+  // if (imageObj.hasKeyword("DARK_STRIP_MEAN")) {
+  PvlKeyword &darkStripMean = imageObj.findKeyword("DARK_STRIP_MEAN");
 
-    try {
-      if(darkStripMean.size() > 0) {
-        darkStripMean[0] = toString(SetRound(toDouble(darkStripMean[0]), 16));
-      }
-    }
-    catch(IException &) {
-      // If we fail to convert this keyword to a number, then preserve
-      // its existing value
-    }
+  try {
+    darkStripMean[0] = toString(setRound(toDouble(darkStripMean[0]), 16));
   }
+  catch (IException &) {
+    // If we fail to convert this keyword to a number, then preserve
+    // its existing value
+  }
+  //}
 
   p.CheckStatus();
 
   // Fixes bad keywords
-  PvlKeyword &data_set_id = pdsLabel.findKeyword("DATA_SET_ID", Pvl::Traverse);
-  data_set_id.setValue(dataSetID);
-  PvlKeyword &product_id = pdsLabel.findKeyword("PRODUCT_ID", Pvl::Traverse);
-  if((product_id.size() == 0) || ((product_id.size() > 0) && (product_id[0] == "N/A"))) {
-    product_id.setValue(output.baseName());
+  // data set id
+  PvlKeyword &dataSetIdKeyword = pdsLabel.findKeyword("DATA_SET_ID", 
+                                                      Pvl::Traverse);
+  dataSetIdKeyword.setValue(dataSetID);
+  
+  // product id
+  PvlKeyword &productIdKeyword = pdsLabel.findKeyword("PRODUCT_ID", 
+                                                      Pvl::Traverse);
+  if (productIdKeyword[0] == "N/A") {
+    productIdKeyword.setValue(output.baseName());
   }
-  PvlKeyword &product_creation_time = pdsLabel.findKeyword("PRODUCT_CREATION_TIME", Pvl::Traverse);
-  product_creation_time.setValue(mdis2pds_runtime);
-
-  PvlKeyword &software_name = pdsLabel.findKeyword("SOFTWARE_NAME", Pvl::Traverse);
-  if((software_name.size() > 0) && (software_name[0] == "N/A")) {
-    software_name.setValue(mdis2pds_program);
+  
+  // product creation time
+  PvlKeyword &productCreationTimeKeyword = pdsLabel.findKeyword("PRODUCT_CREATION_TIME", 
+                                                                Pvl::Traverse);
+  productCreationTimeKeyword.setValue(mdis2pdsRuntime);
+  
+  // software name
+  PvlKeyword &softwareNameKeyword = pdsLabel.findKeyword("SOFTWARE_NAME", 
+                                                         Pvl::Traverse);
+  if (softwareNameKeyword[0] == "N/A") {
+    softwareNameKeyword.setValue(mdis2pdsProgram);
   }
-
-  PvlKeyword &software_version_id = pdsLabel.findKeyword("SOFTWARE_VERSION_ID", Pvl::Traverse);
-  if(software_version_id.size() > 0) {
-    if(software_version_id[0] == "N/A") {
-      software_version_id.setValue(Quote(mdis2pds_version));
-    }
-    else {
-      software_version_id.setValue(software_version_id[0]);
-    }
+  
+  // software version id
+  PvlKeyword &softwareVersionIdKeyword = pdsLabel.findKeyword("SOFTWARE_VERSION_ID", 
+                                                              Pvl::Traverse);
+  if (softwareVersionIdKeyword[0] == "N/A") {
+    softwareVersionIdKeyword.setValue(quote(mdis2pdsVersion));
   }
-
-  PvlKeyword &filter_number = pdsLabel.findKeyword("FILTER_NUMBER", Pvl::Traverse);
-  if((filter_number.size() > 0)) {
-    filter_number.setValue(Quote(filter_number[0]));
+  else {
+    softwareVersionIdKeyword.setValue(softwareVersionIdKeyword[0]);
+  }
+  
+  // filter number
+  PvlKeyword &filterNumberKeyword = pdsLabel.findKeyword("FILTER_NUMBER", 
+                                                         Pvl::Traverse);
+  if ((filterNumberKeyword.size() > 0)) {
+    filterNumberKeyword.setValue(quote(filterNumberKeyword[0]));
   }
 
 
   // Add quotes
-  PvlKeyword &data_quality_id = pdsLabel.findKeyword("DATA_QUALITY_ID", Pvl::Traverse);
-  data_quality_id.setValue(Quote(data_quality_id));
-  PvlKeyword &sequence_name = pdsLabel.findKeyword("SEQUENCE_NAME", Pvl::Traverse);
-  sequence_name.setValue(Quote(sequence_name));
-
-  PvlKeyword &start_count = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT", Pvl::Traverse);
-  start_count.setValue(Quote(start_count));
-  PvlKeyword &stop_count = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT", Pvl::Traverse);
-  stop_count.setValue(Quote(stop_count));
-
-  PvlKeyword &site_id = pdsLabel.findKeyword("SITE_ID", Pvl::Traverse);
-  site_id.setValue(Quote(site_id));
-  PvlKeyword &source_product_id = pdsLabel.findKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
-  for(int i = 0; i < source_product_id.size(); i++) {
-    source_product_id[i] = Quote(source_product_id[i]);
+  // data quality id
+  PvlKeyword &dataQualityIdKeyword = pdsLabel.findKeyword("DATA_QUALITY_ID", 
+                                                          Pvl::Traverse);
+  dataQualityIdKeyword.setValue(quote(dataQualityIdKeyword));
+  
+  // sequence name
+  PvlKeyword &sequenceNameKeyword = pdsLabel.findKeyword("SEQUENCE_NAME", 
+                                                         Pvl::Traverse);
+  sequenceNameKeyword.setValue(quote(sequenceNameKeyword));
+  
+  // spacecraft clock start count
+  PvlKeyword &startCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_START_COUNT", 
+                                                       Pvl::Traverse);
+  startCountKeyword.setValue(quote(startCountKeyword));
+  
+  // spacecraft clock stop count
+  PvlKeyword &stopCountKeyword = pdsLabel.findKeyword("SPACECRAFT_CLOCK_STOP_COUNT", 
+                                                      Pvl::Traverse);
+  stopCountKeyword.setValue(quote(stopCountKeyword));
+  
+  // site id
+  PvlKeyword &siteIdKeyword = pdsLabel.findKeyword("SITE_ID", 
+                                                   Pvl::Traverse);
+  siteIdKeyword.setValue(quote(siteIdKeyword));
+  
+  // source product id
+  PvlKeyword &sourceProductIdKeyword = pdsLabel.findKeyword("SOURCE_PRODUCT_ID", 
+                                                            Pvl::Traverse);
+  for (int i = 0; i < sourceProductIdKeyword.size(); i++) {
+    sourceProductIdKeyword[i] = quote(sourceProductIdKeyword[i]);
   }
-
   //  Enforce parentheses for scalars
-  if(source_product_id.size() == 1)
-    source_product_id.setValue('(' + source_product_id[0] + ')');
+  if (sourceProductIdKeyword.size() == 1) {
+    sourceProductIdKeyword.setValue('(' + sourceProductIdKeyword[0] + ')');
+  }
 
   // Removes keywords
   PvlObject &imageObject(pdsLabel.findObject("IMAGE"));
@@ -335,30 +344,32 @@ void IsisMain() {
   p.CheckStatus();
 
   //  Fix all the hosed units upon ingest.  They are illformed.
-  FixUnit(pdsLabel, "RETICLE_POINT_RA", "DEG");
-  FixUnit(pdsLabel, "RETICLE_POINT_DECLINATION", "DEG");
-  FixUnit(pdsLabel, "RETICLE_POINT_LATITUDE", "DEG");
-  FixUnit(pdsLabel, "RETICLE_POINT_LONGITUDE", "DEG");
+  fixUnit(pdsLabel, "RETICLE_POINT_RA", "DEG");
+  fixUnit(pdsLabel, "RETICLE_POINT_DECLINATION", "DEG");
+  fixUnit(pdsLabel, "RETICLE_POINT_LATITUDE", "DEG");
+  fixUnit(pdsLabel, "RETICLE_POINT_LONGITUDE", "DEG");
 
   //  Now address nested keywords in SUBFRAME groups
-  for(int i = 1 ; i <= 5 ; i++) {
+  for (int i = 1; i <= 5; i++) {
     QString n(toString(i));
     QString group = "SUBFRAME" + n + "_PARAMETERS";
-    if(pdsLabel.hasGroup(group)) {
+    if (pdsLabel.hasGroup(group)) {
       PvlGroup &grp = pdsLabel.findGroup(group);
-      ValidateUnit(grp.findKeyword("RETICLE_POINT_LATITUDE"), "DEG");
-      ValidateUnit(grp.findKeyword("RETICLE_POINT_LONGITUDE"), "DEG");
+      validateUnit(grp.findKeyword("RETICLE_POINT_LATITUDE"), "DEG");
+      validateUnit(grp.findKeyword("RETICLE_POINT_LONGITUDE"), "DEG");
     }
   }
 
   p.CheckStatus();
 
 //  Finally, fix keywords by Quoting missing N/A values
-  FixLabels(pdsLabel);
+  fixLabels(pdsLabel);
   p.CheckStatus();
 
   // All done...write result.
-  ofstream outstream(output.expanded().toAscii().data());
+  pdsLabel.setFormatTemplate("$messenger/templates/labels/mdisPdsCDR.pft");
+  QString ofile(output.expanded());
+  ofstream outstream(ofile.toAscii().data());
   processPds.OutputLabel(outstream);
 
   processPds.StartProcess(outstream);

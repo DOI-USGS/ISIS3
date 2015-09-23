@@ -7,96 +7,219 @@
   </brief>
 
   <description>
-    Messenger images are corrected for the following, in order, during 
+    This program calibrates images from the Messenger mission's MDIS instrument.
+    The input image is corrected for the following, in order, during 
     calibration: <br />
     <ul>
-      <li>
-        Dark Current
-      </li>
-      <li>
-        Linearity
-      </li>
-      <li>
-        Smear
-      </li>
-      <li>
-        Uniformity (flat field)
-      </li>
-      <li>
-        Absolute coefficient
-      </li>
+      <li><a href="#DarkCurrent">Step 1: Dark current correction</a ></li>
+      <li><a href="#Linearity">Step 2: Linearity correction</a ></li>
+      <li><a href="#Smear">Step 3: Readout smear correction</a ></li>
+      <li><a href="#Uniformity">Step 4: Uniformity (flat field) correction</a ></li>
+      <li><a href="#AbsoluteCoefficient">Step 5: Absolute coefficient correction</a ></li>
+      <li><a href="#ConvertIOF">Step 6: Conversion to I over F</a ></li>
+      <li><a href="#EmpiricalCorrection">Step 7: Empirical correction</a ></li>
     </ul>
-    <br />
-    Dark current correction:
-    <ul>
-      <li>
-        None
-      </li>
-      No dark current correction is performed.
-      <li>
-        Standard
-      </li>
-      Messenger images have a strip of dark current data on the left-hand side. 
-      This will take a median of the first three sample colums (for unbinned 
-      data) and use that for the dark current on a line by line basis.
-      <li>
-        Linear
-      </li>
-      This will fit a line across the first column of data, which is dark 
-      current data, and use the line to determine the dark current correction.
-      <li>
-        Model
-      </li> 
-      There are independent dark models, developed on-ground. This will use the 
-      most recent of these models to correct the dark current.
-    </ul>
-    Linearity Correction: <br />
-    Linearity is the measure of how variable is each camera's DN level per unit 
-    exposure time and radiance, as a function of variation in exposure time or 
-    radiance. Using dark-corrected, desmeared DN values (DCDSI) taken from the 
-    center quarter of the images, response linearity was measured with both the 
-    NAC and WAC binned and not-binned. <br /><br />
 
-    Smear Correction: <br />
-    Frame transfer smear corrections for MDIS follow the technique described for  
-    NEAR MSI image by Murchie et al. (1999). In brief, an image is exposed for a  
-    nominal integration time and is then transferred in 3.84 ms to a memory zone 
-    on  the CCD, from which the analog signal is digitized line-by-line. 
-    Accumulation  of signal continues during the finite duration of frame 
-    transfer, inducing a  streak or frame-transfer smear in the wake of an 
-    illuminated object in the  field of view, parallel to the direction of frame 
-    transfer. Note that the frame transfer occurs in the calibration pixels as
-    well as on the imaging pixels. mdiscal accounts for the frame transfer smear
-    contributed from the 16 calibration lines (removed from the PDS-archived images).
-    <br /><br />
-    Uniformity Correction:<br />
-    Response uniformity, or flat field, is a measure of pixel-to-pixel
-    variations  in responsivity. Measurements of response uniformity of the WAC 
-    and NAC were  conducted in the OCF, at room temperature and while cold, by 
-    imaging the integrating sphere with the two 45W bulbs illuminating the 
-    interior. <br /><br />
-    Absolute Coefficient Correction:<br />
-    This converts the DN values from responsivity to radiance values.
-      <p>
-          The MODEL dark current option cannot be used if the exposure time 
-          exceeds 1 second.  In this case, the LINEAR model is selected and a 
-          message is issued to the user.
-      </p>
     <p>
-      Note that there are some extreme cases where an image could not be 
-      radiometrically calibrated.  When there is more than two factors of 
-      binning, FPU or PIXEL, then there are no valid dark pixel colums.  For 
-      this case, calibrations using STANDARD or LINEAR cannot be used, however, 
-      the MODEL can.  But, the MODEL cannot be used if the exposure time is 
-      exceeds 1 seconds.  And in this case, the image cannot be calibrated.  
-      When these conditions are detected, a message is issued, but calibration 
-      continues using either the MODEL or NONE as the calibration mode.
+      <h1><a id="DarkCurrent">Step 1: Dark current correction:</a ></h1>
+      <table border = "1">
+        <tr>
+          <th>Option</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <TD>None</TD>
+          <TD>
+            No dark current correction is performed.
+          </TD>
+        </tr>
+        <tr>
+          <TD>Standard</TD>
+          <TD>
+            Messenger images have a strip of dark current data on the left-hand side. 
+            This will take a median of the first three sample columns (for unbinned 
+            data) and use it for the dark current on a line by line basis.
+          </TD>
+        </tr>
+        <tr>
+          <TD>Linear</TD>
+          <TD>
+            This will fit a line across the first column of data, which is dark 
+            current data, and use the line to determine the dark current correction.
+          </TD>
+        </tr>
+        <tr>
+          <TD>Model</TD>
+          <TD> 
+            There are independent dark models, developed on-ground. This will use the 
+            most recent of these models to correct the dark current.
+          </TD>
+        </tr>
+      </table>
     </p>
     <p>
+      There are times when the user selections for dark current correction will be rejected
+      and altered by the program. In these cases a warning message will be printed to alert the
+      user to the change. Below is an explanation of what happens in some special cases:
+      <table border = "1">
+        <tr>
+          <th>DARKCURRENT parameter value</th>
+          <th>Valid dark pixels exist**</th>
+          <th>Exposure duration exceeds 1 second</th>
+          <th>Outcome</th>
+        </tr>
+        <tr>
+          <th>STANDARD</th>
+          <th>No</th>
+          <th>No</th>
+          <th>
+            Dark current correction method is changed to MODEL. The program prints a warning message.
+          </th>
+        </tr>
+        <tr>
+          <th>STANDARD</th>
+          <th>No</th>
+          <th>Yes</th>
+          <th>
+            Dark current correction is turned off, but the rest of the calibration is performed.
+            The program prints a warning message.
+          </th>
+        </tr>
+        <tr>
+          <th>STANDARD</th>
+          <th>Yes</th>
+          <th>Yes or No</th>
+          <th>
+            Dark current correction is performed with the original user input MODEL option.
+            No warning message is needed.
+          </th>
+        </tr>
+        <tr>
+          <th>LINEAR</th>
+          <th>No</th>
+          <th>No</th>
+          <th>
+            Dark current correction method is changed to MODEL. The program prints a warning message.
+          </th>
+        </tr>
+        <tr>
+          <th>LINEAR</th>
+          <th>No</th>
+          <th>Yes</th>
+          <th>
+            Dark current correction is turned off, but the rest of the calibration is performed.
+            The program prints a warning message.
+          </th>
+        </tr>
+        <tr>
+          <th>LINEAR</th>
+          <th>Yes</th>
+          <th>Yes or No</th>
+          <th>
+            Dark current correction is performed with the original user input MODEL option.
+            No warning message is needed.
+          </th>
+        </tr>
+        <tr>
+          <th>MODEL</th>
+          <th>Yes or No</th>
+          <th>No</th>
+          <th>
+            Dark current correction is performed with the original user input MODEL option.
+            No warning message is needed.
+          </th>
+        </tr>
+        <tr>
+          <th>MODEL</th>
+          <th>No</th>
+          <th>Yes</th>
+          <th>
+            Dark current correction is turned off, but the rest of the calibration is performed.
+            The program prints a warning message.
+          </th>
+        </tr>
+        <tr>
+          <th>MODEL</th>
+          <th>Yes</th>
+          <th>Yes</th>
+          <th>
+            Dark current correction method is changed to STANDARD.
+            The program prints a warning message.
+          </th>
+        </tr>
+      </table>
+      ** Note, there are two binning mode codes in the Instrument group of the input cube's labels,
+      the FpuBinningMode and the PixelBinningMode. The number of valid dark pixels referred to in
+      the table above is determined by using these values. If the sum of these two binning modes is
+      greater than one, then there are no valid dark pixels.
+    </p>
+    <p>
+      <h1><a id="Linearity">Step 2: Linearity correction:</a ></h1>
+      Linearity measures the variability of a camera's DN level per unit 
+      exposure time and radiance, as a function of variation in exposure time or 
+      radiance. Using dark-corrected, desmeared DN values (DCDSI) taken from the 
+      center quarter of the images, response linearity was measured with both the 
+      NAC and WAC binned and not-binned.
+    </p>
+    <p>
+      <h1><a id="Smear">Step 3: Smear correction:</a ></h1>
+      Frame transfer smear corrections for MDIS follow the technique described for  
+      NEAR MSI image by Murchie et al. (1999). In brief, an image is exposed for a  
+      nominal integration time and is then transferred in 3.84 ms to a memory zone 
+      on  the CCD, from which the analog signal is digitized line-by-line. 
+      Accumulation  of signal continues during the finite duration of frame 
+      transfer, inducing a  streak or frame-transfer smear in the wake of an 
+      illuminated object in the  field of view, parallel to the direction of frame 
+      transfer. Note that the frame transfer occurs in the calibration pixels as
+      well as on the imaging pixels. mdiscal accounts for the frame transfer smear
+      contributed from the 16 calibration lines (removed from the PDS-archived images).
+    </p>
+    <p>
+      <h1><a id="Uniformity">Step 4: Uniformity (flat field) correction:</a ></h1>
+      Response uniformity, or flat field, is a measure of pixel-to-pixel
+      variations  in responsivity. Measurements of response uniformity of the WAC 
+      and NAC were  conducted in the OCF, at room temperature and while cold, by 
+      imaging the integrating sphere with the two 45W bulbs illuminating the 
+      interior.
+    </p>
+    <p>
+      <h1><a id="AbsoluteCoefficient">Step 5: Absolute coefficient correction:</a ></h1>
+      This converts the DN values from responsivity to radiance values.
+    </p>
+    <p>
+      <h1><a id="ConvertIOF">Step 6: Convert units to I over F:</a ></h1>
+      This converts the DN values radiance values to I over F.
+    </p>
+    <p>
+      <h1><a id="EmpiricalCorrection">Step 7: Empirical correction:</a ></h1>
+      Performs an empirical correction on the DN values by scaling them using the 
+      EmpiricalCorrectionFactor. Note this correction is only applied to WAC images.
+    </p>
+    <p>
+      <h1>Output units</h1>
+      The output units of the DNs will depend on which calibration flags are turned on.
+      <ul>
+        <li>If IOF=TRUE, output units are measured in I/F</li>
+        <li>Otherwise if RADIOMETRIC=TRUE, output units are measured in W/(m**2 micrometer sr)</li>
+        <li>If RADIOMETRIC=FALSE, output units are DNs</li>
+      </ul>
+    </p>
+    <p>
+      <h1>General calibration limitations</h1>
+      This program will throw an error and exit in the following circumstances:
+      <ul>
+        <li>The input cube is multiband.</li>
+        <li>The input cube has less than 2 samples per line.</li>
+        <li>The input cube is not unlutted.</li>
+        <li>PixelBinningMode > 0 and unable to reduce.</li>
+      </ul>
+    </p>
+    <p>
+      <h1>MESSENGER MDIS calibration document excerpt</h1>
       The following is an excerpt from the MESSENGER MDIS calibration document 
       on this process
     </p>
-    <PRE>
+    <pre>
         USAGE
         =====
 
@@ -394,15 +517,7 @@
 
         The effective average solar radiance for each camera and bandpass is given
         in the SOLAR directory.
-    </PRE>
-
-    <p>
-       Additional corrective measures have been added to address a contamination 
-       event that occurred with the instruments on May 24, 2011 through January 
-       3, 2012 after Mercury orbital insertion.  The event and subsequent 
-       bake-off has been modeled as additional multiplicative component to the 
-       output values.
-    </p>
+    </pre>
   </description>
 
   <category>
@@ -420,24 +535,24 @@
       Original version
     </change>
     <change name="Kris Becker" date="2007-12-20">
-        Added computation of I/F reflectance for valid NAIF target bodies.
+      Added computation of I/F reflectance for valid NAIF target bodies.
     </change>
     <change name="Kris Becker" date="2008-01-19">
-        Corrected a bug that prevented the I/F correction from ever being 
-        applied.  The exposure time must be expressed throughout as seconds and 
-        not milliseconds (engineering units) with the exception being the dark 
-        current model, which requires them to be in engineering units.  There 
-        were incorrect values for the nominal filter wheel encoder values in the 
-        file $messenger/calibration/mdisCalibration.trn that incorrectly 
-        identified the filter.  This has been corrected, but it was also 
-        determined that the validation of the proper filter wheel should take 
-        place in mdis2isis.  Added loading of external file values as comma 
-        separated values (CSV) files.  This includes the absolute response and 
-        solar irradiance constants. 
+      Corrected a bug that prevented the I/F correction from ever being 
+      applied.  The exposure time must be expressed throughout as seconds and 
+      not milliseconds (engineering units) with the exception being the dark 
+      current model, which requires them to be in engineering units.  There 
+      were incorrect values for the nominal filter wheel encoder values in the 
+      file $messenger/calibration/mdisCalibration.trn that incorrectly 
+      identified the filter.  This has been corrected, but it was also 
+      determined that the validation of the proper filter wheel should take 
+      place in mdis2isis.  Added loading of external file values as comma 
+      separated values (CSV) files.  This includes the absolute response and 
+      solar irradiance constants. 
     </change>
     <change name="Kris Becker" date="2008-02-29">
-        Added filter dependant smear component support.  These values are 
-        externally maintained in calibration/responsivity directory.
+      Added filter dependant smear component support.  These values are 
+      externally maintained in calibration/responsivity directory.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
@@ -466,68 +581,80 @@
       Very minor change of watts unit expressed as W instead of w.
     </change>
     <change name="Kris Becker" date="2008-11-19"> 
-        Changed the exposure threshold for the dark current model from 2 seconds 
-        to 1 second and it now uses the LINEAR model instead of the STANDARD 
-        model in this case;  Implemented new quadratic responsivity equation for
-        both WAC and NAC instruments that adds an additional term to the 
-        responsivity files; updated documentation.
+      Changed the exposure threshold for the dark current model from 2 seconds 
+      to 1 second and it now uses the LINEAR model instead of the STANDARD 
+      model in this case;  Implemented new quadratic responsivity equation for
+      both WAC and NAC instruments that adds an additional term to the 
+      responsivity files; updated documentation.
     </change>
     <change name="Kris Becker" date="2008-11-25"> 
-        Corrected inclusion of dark current model file to SourceProductId when 
-        applicable; bumped the version number to 3.
+      Corrected inclusion of dark current model file to SourceProductId when 
+      applicable; bumped the version number to 3.
     </change>
     <change name="Mackenzie Boyd" date="2009-09-03">
-        Added parameter to the usage of reduce to accommodate changes to reduce.
+      Added parameter to the usage of reduce to accommodate changes to reduce.
     </change> 
     <change name="Mackenzie Boyd" date="2011-02-04">
-        Fixed reduce parameters to use MODE instead of REDUCTION_TYPE. Fixed typo in docs.
+      Fixed reduce parameters to use MODE instead of REDUCTION_TYPE. Fixed typo in docs.
     </change> 
     <change name="Mackenzie Boyd" date="2011-02-09">
-        Removed a cout, fixed calibration for images with nonzero pixel binning. 
+      Removed a cout, fixed calibration for images with nonzero pixel binning. 
     </change> 
     <change name="Kris Becker" date="2011-04-20">
-        Added FLATFIELD and RADIOMETRIC parameters so that users can create 
-        several different products.  When asking for dark columns to not be kept 
-        (KEEPDARK=FALSE), extra columns may be nulled as additional binning 
-        and  compression introduces artifacts in adjacent columns; added new 
-        keyword (LeftSamplesNulled) to the RadiometricCalibration group 
-        indicating the number of NULLed columns.  These changes result in 
-        version number 4 of the output calibration file.
+      Added FLATFIELD and RADIOMETRIC parameters so that users can create 
+      several different products.  When asking for dark columns to not be kept 
+      (KEEPDARK=FALSE), extra columns may be nulled as additional binning 
+      and  compression introduces artifacts in adjacent columns; added new 
+      keyword (LeftSamplesNulled) to the RadiometricCalibration group 
+      indicating the number of NULLed columns.  These changes result in 
+      version number 4 of the output calibration file.
     </change> 
     <change name="Kris Becker" date="2011-04-29">
-        Removed the From keyword from the RadiometricCalibration group created 
-        by this application.  Added ValidDarkColumns to this group.  This 
-        value indicates the number of samples used to compute the  
-        DarkStripMean.
+      Removed the From keyword from the RadiometricCalibration group created 
+      by this application.  Added ValidDarkColumns to this group.  This 
+      value indicates the number of samples used to compute the  
+      DarkStripMean.
     </change>
     <change name="Kris Becker" date="2011-04-29">
-        Set the version back to 3 as it was deemed not neccessary to change the 
-        version after discussion with the MESSENGER team.
+      Set the version back to 3 as it was deemed not neccessary to change the 
+      version after discussion with the MESSENGER team.
     </change>
-   <change name="Kris Becker" date="2012-10-23">
-       Several select calibration files were updated.  New flat fields are  
-       MDISWAC_BINNED_FLAT_FIL03_5.cub, MDISWAC_NOTBIN_FLAT_FIL03_5.cub, 
-       MDISWAC_BINNED_FLAT_FIL06_5.cub and  MDISWAC_NOTBIN_FLAT_FIL06_5.cub.  
-       Also updated was the frame transfer file MDISWAC_FRAME_TRANSFER_02.TAB.  
-       Added specific corrections for WAC images for a contamination event 
-       starting on May 24, 2011 through January 3, 2012  As a result, added new 
-       keywords to the RadiometricCalibration group to log this new correction. 
-       These keywords are: ContaminationEventFile, ContaminationEventDate and 
-       ContaminationEventFactor.  Also corrected computation of dark strip 
-       average to properly report 0 when all these pixels are NULL pixels.  
-       Software version number is now 1.4.
-   </change>
-   <change name="Kris Becker" date="2012-10-24">
-     Incremented the CDR version number from 3 to 4 per the request by the
-     MESSENGER team.
-   </change>
-   <change name="Moses Milazzo" date="2014-11-14">
-     Updated the smear correction to account for the 16 lines of calibration data
-     that are not on the PDS images but still contribute to frame transfer smearing.
-     Also updated the calibration tables (MDISWAC_FRAME_TRANSFER_??.TAB) with the 
-     correct frame transfer speed. Documentation was updated as well.
-     Software version number is now 1.5.
-   </change>
+    <change name="Kris Becker" date="2012-10-23">
+      Several select calibration files were updated.  New flat fields are  
+      MDISWAC_BINNED_FLAT_FIL03_5.cub, MDISWAC_NOTBIN_FLAT_FIL03_5.cub, 
+      MDISWAC_BINNED_FLAT_FIL06_5.cub and  MDISWAC_NOTBIN_FLAT_FIL06_5.cub.  
+      Also updated was the frame transfer file MDISWAC_FRAME_TRANSFER_02.TAB.  
+      Added specific corrections for WAC images for a contamination event 
+      starting on May 24, 2011 through January 3, 2012  As a result, added new 
+      keywords to the RadiometricCalibration group to log this new correction. 
+      These keywords are: ContaminationEventFile, ContaminationEventDate and 
+      ContaminationEventFactor.  Also corrected computation of dark strip 
+      average to properly report 0 when all these pixels are NULL pixels.  
+      Software version number is now 1.4.
+    </change>
+    <change name="Kris Becker" date="2012-10-24">
+      Incremented the CDR version number from 3 to 4 per the request by the
+      MESSENGER team.
+    </change>
+    <change name="Moses Milazzo" date="2014-11-14">
+      Updated the smear correction to account for the 16 lines of calibration data
+      that are not on the PDS images but still contribute to frame transfer smearing.
+      Also updated the calibration tables (MDISWAC_FRAME_TRANSFER_??.TAB) with the 
+      correct frame transfer speed. Documentation was updated as well.
+      Software version number is now 1.5.
+    </change>
+    <change name="Jeannie Backer" date="2015-08-31">
+      Added ECFACTOR option so that the user can decide whether to apply the empirical correction 
+      factor. Changed label keywords in Radiometric Calibration group from ContaminationEvent to 
+      EmpiricalCorrection. Increased software version number to 1.6. Increased CDR version to 5. 
+      Made code more compliant with ISIS coding standards. Fixes #2332
+    </change>
+    <change name="Jeannie Backer" date="2015-09-15">
+      Modified code so that linearity, responsivity (absolute coefficient), and smear corrections 
+      are always performed. Previously these were only applied if the flat field correction
+      was applied.  This will change the output DNs for any images where FLATFIELD=false. 
+      Updated documentation. Fixes #2338
+    </change>
   </history>
 
   <groups>
@@ -539,7 +666,7 @@
           Input cube
         </brief>
         <description>
-          This is the Isis Cube to be calibrated.
+          This is the ISIS cube from the Messenger mission to be calibrated.
         </description>
         <filter>
           *.cub
@@ -552,7 +679,7 @@
           Output cube
         </brief>
         <description>
-          This is the output file. The output cube will be a calibrated version 
+          This is the output file. The output cube will be a radiometrically calibrated version 
           of the input cube.
         </description>
         <filter>
@@ -571,115 +698,124 @@
           <option value="NONE">
             <brief>No correction</brief>
             <description>
-                No dark current correction will be applied
-              </description>
+              No dark current correction will be applied
+            </description>
           </option>
           <option value="STANDARD">
             <brief>Do a median dark current correction</brief>
-              <description>
-                  This will use the median of the three leftmost pixels to as 
-                  the dark current, on a line by line basis. 
-              </description>
+            <description>
+              This will use the median of the three leftmost pixels as the dark current, on a
+              line by line basis. 
+            </description>
           </option>
           <option value="LINEAR">
             <brief>Use a linear fit</brief>
             <description>
-              This will fit a line to the leftmost pixel values, which should be 
-              dark current data, through the lines. The equation derived from 
-              these pixels will be used to calculate the dark current 
-              correction, on a line by line basis.
+              This will fit a line to the leftmost pixel values, which should be dark current data,
+              through the lines. The equation derived from these pixels will be used to calculate
+              the dark current correction, on a line by line basis.
             </description>
           </option>
           <option value="MODEL">
             <brief>Use pre-developed model</brief>
-             <description>
-               Messenger has independent dark models, developed on-ground. 
-               This will use the most recent of these models to correct the dark
-               current.
-              </description>
+            <description>
+              Messenger has independent dark models, developed on-ground. This will use the most
+              recent of these models to correct the dark current. Note: this method cannot be used
+              if the exposure duration of the image exceeds one second.
+            </description>
           </option>
         </list>
       </parameter>
       <parameter name="KEEPDARK">
         <type>boolean</type>
+        <default><item>false</item></default>
         <brief>Do not set dark current data to null</brief>
         <description>
-            <p>
-                If this is selected, the dark current data is NULLed in the 
-                output image.   Binning affects the number of columns that are 
-                determined to be NULLed as well.   Thus, KEEPDARK is overloaded in 
-                terms of any columns that contain artifacts that are generated by 
-                binning (or wavelet compression)  are NULLed as well.
-            </p>
-            <p>
-                If no binning is applied, then four columns are set to NULL.  If 
-                any combination of DPU or MP (essentially on-board processing) 
-                binning is applied, three columns will be set to NULL.  When DPU 
-                and MP 2x2 binning occurs (essentially a 4x4 summing) three 
-                columns will be NULLed.  All other combinations of binning will 
-                have one column set to the NULL pixel value.
-            </p>
-            <p>
-                  If KEEPDARK = TRUE, then no columns are NULLed on output.
-            </p>
-          </description>
-        <default><item>false</item></default>
+          <p>
+            If this is selected, the dark current data are set to null in the output image. 
+          </p>
+          <p>
+            Binning affects the number of columns that are determined to be set to null.
+            Thus, KEEPDARK is overloaded in terms of any columns that contain artifacts that are
+            generated by binning (or wavelet compression). These columns are set to null as well.
+          </p>
+          <p>
+            If no binning is applied, then four columns are set to null.  If 
+            any combination of DPU or MP (essentially on-board processing) 
+            binning is applied, three columns will be set to null.  When DPU 
+            and MP 2x2 binning occurs (essentially a 4x4 summing) three 
+            columns will be set to null.  All other combinations of binning will 
+            have one column set to the null pixel value.
+          </p>
+          <p>
+            If KEEPDARK = TRUE, then no columns are set to null on output.
+          </p>
+        </description>
       </parameter>
       <parameter name="FLATFIELD">
-       <type>boolean</type>
+        <type>boolean</type>
         <default><item>True</item></default>
         <brief>
           Apply flat field correction
         </brief>
         <description>
-            This parameter is provided to allow the user to selectively apply 
-            the flatfield correction.  This parameter can be used in conjuction 
-            with DARKCURRENT and RADIOMETRIC to produce additional output 
-            products such as DNs (all parameters DARKCURRENT=MODEL and  
-            RADIOMETRIC=FALSE).
+          This parameter allows the user to selectively apply 
+          the flatfield correction.  This parameter can be used in conjunction 
+          with DARKCURRENT and RADIOMETRIC to produce additional output 
+          products such as DNs (all parameters DARKCURRENT=MODEL and  
+          RADIOMETRIC=FALSE).
         </description>        
       </parameter>
-     <parameter name="RADIOMETRIC">
-       <type>boolean</type>
+      <parameter name="RADIOMETRIC">
+        <type>boolean</type>
         <default><item>True</item></default>
         <brief>
           Apply radiometric correction
         </brief>
         <description>
-            This parameter is provided to allow the user to selectively apply 
-            the radiometric correction.  This parameter can be used in 
-            conjuction with DARKCURRENT and FLATFIELD to produce additional 
-            output products such as DNs (all parameters DARKCURRENT=MODEL and
-            FLATFIELD=FALSE).
+          This parameter allows the user to selectively apply the radiometric
+          correction.  This parameter can be used in conjunction with DARKCURRENT and FLATFIELD
+          to produce additional output products such as DNs (all parameters DARKCURRENT=MODEL and
+          FLATFIELD=FALSE). However, if RADIOMETRIC=FALSE, then  the program will turn IOF=FALSE.
         </description>
       </parameter>
-     <parameter name="IOF">
+      <parameter name="IOF">
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
           Convert to I/F units
         </brief>
         <description>
-            <p>
-            This option, when set, will convert the output to I/F from radiance 
-            values.  To convert from radiance to I/F (also known as radiance 
-            factor, the ratio of measured radiance to that which would be 
-            measured from a white perfectly Lambertian surface), the following 
-            expression should is applied: 
-            <PRE>
+          <p>
+            This option, when set, will convert the output to I/F from radiance values. To convert
+            from radiance to I/F (also known as radiance factor, the ratio of measured radiance to
+            that which would be measured from a white perfectly Lambertian surface), the following
+            expression is applied: 
+            <pre>
 I_over_F(f) = L(f) * PI * (SOLAR_DISTANCE/149597870.691)**2 / F(f)                
-            </PRE> 
+            </pre> 
             where L(f) is calibrated radiance calculated for some filter f,
             SOLAR_DISTANCE is that value for distance of the target object from
             the center of the sun in kilometers (as indicated by the keyword
             SOLAR_DISTANCE), 149597870.691 is the number of kilometers in 1 AU
             and F(f) is effective average solar irradiance sampled under the
             filter bandpass.
-            </p>
-            <p>
-                If the observed target is not of a valid body as recognized by 
-                NAIF, the output is left in radiance.
-            </p>
+          </p>
+          <p>
+            If the observed target is not of a valid body as recognized by 
+            NAIF, the output is left in radiance.
+          </p>
+        </description>
+      </parameter>
+      <parameter name="ECFACTOR">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Apply empirical correction factor
+        </brief>
+        <description>
+          This parameter is provided to allow the user to selectively apply the empirical
+          correction.
         </description>
       </parameter>
     </group>
@@ -691,20 +827,21 @@ I_over_F(f) = L(f) * PI * (SOLAR_DISTANCE/149597870.691)**2 / F(f)
         Calibrating an MDIS image
       </brief>
       <description>
-        This example will show the calibration process of a MDIS image
+        This example shows the calibration process of a MDIS image
       </description>
       <terminalInterface>
         <commandLine>FROM=EW0089565626A.cub 
           TO=EW0089565626A.calib.cub DARKCURRENT=MODEL</commandLine>
         <description>Calibration process of a MDIS image, using the MODEL dark 
-          current option</description>
+          current option
+        </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/mdiscal.jpg" width="608" height="550">
             <brief>Calibrate an MDIS image</brief>
             <description>
-              The is the GUI for mdiscal when converting the uncalibrated cube 
+              This is the GUI for mdiscal when converting the uncalibrated cube 
               EW0089565626A.cub to the calibrated cube EW0089565626A.calib.cub.
             </description>
             <thumbnail caption="Calibrating EW0089565626A.cub" src="assets/thumbs/mdiscal.jpg" width="200" height="181" />
@@ -715,7 +852,7 @@ I_over_F(f) = L(f) * PI * (SOLAR_DISTANCE/149597870.691)**2 / F(f)
         <image height="512" width="512" src="assets/images/EW0089565626A.jpg">
           <brief>Input Cube</brief>
           <description>
-            The is EW0089565626A.jpg before calibration
+            This is EW0089565626A.jpg before calibration.
           </description>
           <thumbnail src="assets/thumbs/EW0089565626A.jpg" width="200" height="200" caption="Input Image" />
         </image>
@@ -724,7 +861,7 @@ I_over_F(f) = L(f) * PI * (SOLAR_DISTANCE/149597870.691)**2 / F(f)
         <image width="550" height="550" src="assets/images/EW0089565626A.model.jpg">
           <brief>Output With Dark Model</brief>
           <description>
-            The is the output generated by the default options
+            This is the output generated by the default options.
           </description>
           <thumbnail src="assets/thumbs/EW0089565626A.model.jpg" width="200" height="200" caption="Output Image With Dark Model" />
         </image>

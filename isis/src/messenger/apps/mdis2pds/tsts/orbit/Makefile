@@ -1,3 +1,11 @@
+# Orbit tests for mdis2pds
+#
+# defaults to type=automatic, 
+#             min = -1, 
+#             max =  1, 
+#             minper=0, 
+#             maxper=100, 
+#             bits=32
 APPNAME = mdis2pds
 
 output.cub.TOLERANCE = 0.0000000002
