@@ -10,45 +10,55 @@ commands:
 	if [[ `$(APPNAME) \
 	FROM=$(INPUT)/EW0089565626A_modifiedExposure.cub \
 	to=$(OUTPUT)/model_longExposure.cub \
-	DARKCURRENT=model 2>> $(OUTPUT)/warnings.txt > /dev/null` ]]; \
+	DARKCURRENT=model \
+	2>> $(OUTPUT)/warnings.txt \
+	> /dev/null` ]]; \
 	then true; \
 	fi;
 	$(RM) $(OUTPUT)/model_longExposure.cub;
 
 
-	echo -e "\nTEST WARNING: DarkCurrent=Linear and no valid dark." &>> $(OUTPUT)/warnings.txt;
+	echo -e "\nTEST WARNING: DarkCurrent=Linear and no valid dark." >> $(OUTPUT)/warnings.txt;
 	if [[ `$(APPNAME) \
 	FROM=$(INPUT)/EW0089565626A_modifiedExposureAndPixelBin.cub \
 	to=$(OUTPUT)/linear.cub \
-	DARKCURRENT=Linear 2>> $(OUTPUT)/warnings.txt > /dev/null` ]]; \
+	DARKCURRENT=Linear \
+	2>> $(OUTPUT)/warnings.txt \
+	> /dev/null` ]]; \
 	then true; \
 	fi;
 
 
-	echo -e "\nTEST WARNING: DarkCurrent=Linear and no valid dark." &>> $(OUTPUT)/warnings.txt;
+	echo -e "\nTEST WARNING: DarkCurrent=Linear and no valid dark." >> $(OUTPUT)/warnings.txt;
 	if [[ `$(APPNAME) \
-	FROM=$(INPUT)/EW0089565626A_modifiedExposureAndPixelBin.cub \
-	to=$(OUTPUT)/standard.cub \
-	DARKCURRENT=standard 2>> $(OUTPUT)/warnings.txt > /dev/null` ]]; \
+	  FROM=$(INPUT)/EW0089565626A_modifiedExposureAndPixelBin.cub \
+	  to=$(OUTPUT)/standard.cub \
+	  DARKCURRENT=standard \
+	  2>> $(OUTPUT)/warnings.txt \
+	  > /dev/null` ]]; \
 	then true; \
 	fi;
 
 
 	echo -e "\nTEST WARNING: DarkCurrent=Model, exposure > 1, no valid dark." \
-	&>> $(OUTPUT)/warnings.txt;
+	>> $(OUTPUT)/warnings.txt;
 	if [[ `$(APPNAME) \
-	FROM=$(INPUT)/EW0089565626A_modifiedExposureAndPixelBin.cub \
-	to=$(OUTPUT)/model.cub \
-	DARKCURRENT=model 2>> $(OUTPUT)/warnings.txt > /dev/null` ]]; \
+	  FROM=$(INPUT)/EW0089565626A_modifiedExposureAndPixelBin.cub \
+	  to=$(OUTPUT)/model.cub \
+	  DARKCURRENT=model \
+	  2>> $(OUTPUT)/warnings.txt \
+	  > /dev/null` ]]; \
 	then true; \
 	fi;
 
 
-	echo -e "\nFOR TEST COVERAGE: DarkCurrent=None and no valid dark." &>> $(OUTPUT)/warnings.txt;
+	echo -e "\nFOR TEST COVERAGE: DarkCurrent=None and no valid dark." >> $(OUTPUT)/warnings.txt;
 	if [[ `$(APPNAME) \
-	FROM=$(INPUT)/EW0089565626A_modifiedExposureAndPixelBin.cub \
-	to=$(OUTPUT)/nodark.cub \
-	DARKCURRENT=none 2>> $(OUTPUT)/warnings.txt > /dev/null` ]]; \
+	  FROM=$(INPUT)/EW0089565626A_modifiedExposureAndPixelBin.cub \
+	  to=$(OUTPUT)/nodark.cub \
+	  DARKCURRENT=none \
+	  2>> $(OUTPUT)/warnings.txt \
+	  > /dev/null` ]]; \
 	then true; \
 	fi;
 
