@@ -35,6 +35,10 @@ bool descending(const spRange &r1, const spRange &r2);
 void addRange(QString minName, QString maxName, SpecPix pixel);
 
 
+
+
+
+
 vector <spRange> rangeList;
 int numRange;
 int nnull, nlis, nlrs, nhis, nhrs;

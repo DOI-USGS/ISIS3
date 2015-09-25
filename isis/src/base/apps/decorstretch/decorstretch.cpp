@@ -1,17 +1,21 @@
 #include "Isis.h"
-#include "tnt_array2d.h"
+
+#include  "GaussianStretch.h"
 #include "PrincipalComponentAnalysis.h"
 #include "ProcessBySpectra.h"
 #include "Statistics.h"
-#include  "GaussianStretch.h"
+
 #include <iomanip>
+
+//Third-party matrix library
+#include "tnt_array2d.h"
 
 using namespace std;
 using namespace Isis;
 
-void GetData(Buffer &in);
-void Transform(Buffer &in, Buffer &out);
-void NormalizeAndInvert(Buffer &in, Buffer &out);
+void getData(Buffer &in);
+void transform(Buffer &in, Buffer &out);
+void normalizeAndInvert(Buffer &in, Buffer &out);
 
 PrincipalComponentAnalysis pca(0);
 vector<GaussianStretch *> stretches;
@@ -35,52 +39,57 @@ void IsisMain() {
   ProcessByBrick p2;
   p2.SetBrickSize(128, 128, numDimensions);
   p2.SetInputCube("FROM");
-  p2.Progress()->SetText("Computing Transform");
-  p2.StartProcess(GetData);
+  p2.Progress()->SetText("Computing transform");
+  p2.StartProcess(getData);
   p2.EndProcess();
   pca.ComputeTransform();
 
   p.Progress()->SetText("Transforming Cube");
-  p.StartProcess(Transform);
+  p.StartProcess(transform);
   p.EndProcess();
 
   Isis::CubeAttributeInput cai;
 
   Cube *icube2 = p.SetInputCube(tmpFileName, cai);
-  for(int i = 0; i < numDimensions; i++) {
-    stretches.push_back(new GaussianStretch(*(icube2->histogram(i + 1))));
+  for (int i = 0; i < numDimensions; i++) {
+    stretches.push_back(new GaussianStretch(*(icube2->histogram(i + 1) ) ) );
   }
-  p.SetOutputCube("TO");
 
+  p.SetOutputCube("TO");
   p.SetBrickSize(128, 128, numDimensions);
   p.Progress()->SetText("Stretching Cube");
-  p.StartProcess(NormalizeAndInvert);
+  p.StartProcess(normalizeAndInvert);
 
-  for(int i = 0; i < numDimensions; i++) delete stretches[i];
+  for (int i = 0; i < numDimensions; i++) {
+     delete stretches[i];
+  }
+
   stretches.clear();
-
   p.EndProcess();
-
-  remove(tmpFileName.toAscii().data());
+  remove(tmpFileName.toAscii().data() );
 }
 
-void GetData(Buffer &in) {
-  pca.AddData(in.DoubleBuffer(), in.size() / in.BandDimension());
+
+void getData(Buffer &in) {
+  pca.AddData(in.DoubleBuffer(), in.size() / in.BandDimension() );
 }
 
 // Processing routine for the pca with one input cube
-void Transform(Buffer &in, Buffer &out) {
-  for(int i = 0; i < in.SampleDimension(); i++) {
-    for(int j = 0; j < in.LineDimension(); j++) {
+void transform(Buffer &in, Buffer &out) {
+
+  for (int i = 0; i < in.SampleDimension(); i++) {
+
+    for (int j = 0; j < in.LineDimension(); j++) {
+
       TNT::Array2D<double> pre(1, in.BandDimension());
-      for(int k = 0; k < pre.dim2(); k++) {
+      for (int k = 0; k < pre.dim2(); k++) {
         int index = i + j * in.SampleDimension() + k * in.SampleDimension() * in.LineDimension();
         pre[0][k] = in[index];
       }
 
       TNT::Array2D<double> post = pca.Transform(pre);
 
-      for(int k = 0; k < post.dim2(); k++) {
+      for (int k = 0; k < post.dim2(); k++) {
         int index = i + j * in.SampleDimension() + k * in.SampleDimension() * in.LineDimension();
         out[index] = post[0][k];
       }
@@ -89,11 +98,12 @@ void Transform(Buffer &in, Buffer &out) {
 }
 
 // Processing routine for the pca with two input cubes
-void NormalizeAndInvert(Buffer &in, Buffer &out) {
-  for(int i = 0; i < in.SampleDimension(); i++) {
-    for(int j = 0; j < in.LineDimension(); j++) {
-      TNT::Array2D<double> pre(1, in.BandDimension());
-      for(int k = 0; k < pre.dim2(); k++) {
+void normalizeAndInvert(Buffer &in, Buffer &out) {
+
+  for (int i = 0; i < in.SampleDimension(); i++) {
+    for (int j = 0; j < in.LineDimension(); j++) {
+      TNT::Array2D<double> pre(1, in.BandDimension() );
+      for (int k = 0; k < pre.dim2(); k++) {
         int index = i + j * in.SampleDimension() + k * in.SampleDimension() * in.LineDimension();
         // Stretch the data before inverting it
         // NOTE: this needs to be modified to use a GAUSSIAN STRETCH
@@ -103,7 +113,7 @@ void NormalizeAndInvert(Buffer &in, Buffer &out) {
 
       TNT::Array2D<double> post = pca.Inverse(pre);
 
-      for(int k = 0; k < post.dim2(); k++) {
+      for (int k = 0; k < post.dim2(); k++) {
         int index = i + j * in.SampleDimension() + k * in.SampleDimension() * in.LineDimension();
         out[index] = post[0][k];
       }
