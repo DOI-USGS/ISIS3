@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include  "GaussianStretch.h"
+#include "GaussianStretch.h"
 #include "PrincipalComponentAnalysis.h"
 #include "ProcessBySpectra.h"
 #include "Statistics.h"

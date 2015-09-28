@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application name="decorstretch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="decorstretch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Apply a Decorrelation Stretch to a cube
   </brief>
@@ -24,9 +26,13 @@
     </change>
     <change name="Brendan George" date="2006-09-28">
         Documentation fixes
-    </change>    
+    </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
+    </change>
+    <change name = "David Miller" date = "2015-07-29">
+      Brought application into compliance with ISIS
+      coding standards.
     </change>
   </history>
 
