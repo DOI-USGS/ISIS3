@@ -55,13 +55,13 @@ Test for missing Samples Keyword
 Test for invalid Lines Keyword
 ---------------------------------
 **USER ERROR** Improper format for AutoReg PVL [].
-**USER ERROR** Unable to set chip size to [90, -90].  Samples and lines must be greater than zero.
+**USER ERROR** Unable to set chip size to [90, -90]. Samples and lines must be greater than zero.
 
 ---------------------------------
 Test for invalid Samples Keyword
 ---------------------------------
 **USER ERROR** Improper format for AutoReg PVL [].
-**USER ERROR** Unable to set chip size to [-90, 90].  Samples and lines must be greater than zero.
+**USER ERROR** Unable to set chip size to [-90, 90]. Samples and lines must be greater than zero.
 
 ----------------------------------
 Test for missing SearchChip group
