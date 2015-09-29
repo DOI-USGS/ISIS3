@@ -1243,7 +1243,7 @@ namespace Isis {
     LineManager line(*this);
 
     // This range is for throwing out data; the default parameters are OK always
-    hist->SetValidRange(validMin, validMax);
+    //hist->SetValidRange(validMin, validMax);
 
     // We now need to know the binning range - ValidMinimum/Maximum are no longer
     //   acceptable, default to the bin range start/end.
@@ -1257,7 +1257,8 @@ namespace Isis {
       binMax = hist->BinRangeEnd();
     }
 
-    hist->SetBinRange(binMin, binMax);
+    //hist->SetBinRange(binMin, binMax);
+    hist->SetValidRange(binMin,binMax);
 
     // Loop and get the histogram
     progress.SetText(msg);

@@ -70,7 +70,8 @@ namespace Isis {
   * @history 2008-05-06 Steven Lambright - Added AboveRange, BelowRange methods
   * @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange function
   * @history 2011-06-13 Ken Edmundson - Added Rms method
-  *
+  * @history 2015-09-01 Tyler Wilson - Made SetValidRange and the destructor virtual.  
+  *                                    See Ref #2188.
   * @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the
   * class documentation
   *
@@ -78,7 +79,7 @@ namespace Isis {
   class Statistics {
     public:
       Statistics();
-      ~Statistics();
+      virtual ~Statistics();
 
       void Reset();
       void AddData(const double *data, const unsigned int count);
@@ -125,7 +126,8 @@ namespace Isis {
 
       void RemoveData(const double *data, const unsigned int count);
       void RemoveData(const double data);
-      void SetValidRange(const double minimum = Isis::ValidMinimum, const double maximum = Isis::ValidMaximum);
+      virtual void SetValidRange(const double minimum = Isis::ValidMinimum,
+                                  const double maximum = Isis::ValidMaximum);
 
       double ValidMinimum() const {
         return p_validMinimum;

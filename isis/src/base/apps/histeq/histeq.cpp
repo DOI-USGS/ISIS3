@@ -36,7 +36,7 @@ void IsisMain() {
 
   // Set "match" to have the same data range and number of bins as "to"
   match->SetBins(fromBins);
-  match->SetValidRange(fromMin, fromMax);
+  //match->SetValidRange(fromMin, fromMax);
   for(int i = 0; i < fromBins; i++) {
     data[i] = fromMin + (slope * i);
   }

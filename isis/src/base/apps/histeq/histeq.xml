@@ -41,6 +41,12 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
+   <change name="Tyler Wilson" date="2015-09-03">
+     Commented out a call to Histogram::SetValidRange(min,max)
+     Because of changes made to the Histogram class.
+     See Ref. #2188.
+   </change>
+
   </history>
 
   <groups>

@@ -66,9 +66,14 @@ namespace Isis {
    *   @history 2012-01-19 Steven Lambright and Jai Rideout - Added constructor
    *                           parameters to read from the Cube automatically.
    *   @history 2012-04-10 Orrin Thomas - Added constructor parameters to read
-                               from ControlNets automatically (For control measure
-                               data.)
+   *                            from ControlNets automatically (For control measure
+   *                            data.)
+   *   @history 2015-09-03  Tyler Wilson - Overrode Statistics::SetValidRange to 
+   *                        set the bin range as well as the statistical range 
+   *                        for the data.  The function Histogram::SetBinRange
+   *                        has been removed from this class.  
    */
+  
   class Histogram : public Statistics {
     public:
       Histogram(double minimum, double maximum,
@@ -109,7 +114,9 @@ namespace Isis {
       double BinRangeEnd() const {
         return p_binRangeEnd;
       }
-      void SetBinRange(double binStart, double binEnd);
+      //void SetBinRange(double binStart, double binEnd);
+      void SetValidRange(const double minimum = Isis::ValidMinimum,
+                                       const double maximum = Isis::ValidMaximum);
 
     private:
       void InitializeFromCube(Cube &cube, int statsBand, Progress *progress,

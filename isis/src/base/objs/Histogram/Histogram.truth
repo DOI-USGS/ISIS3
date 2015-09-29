@@ -22,7 +22,7 @@ Percent(99.5):       5
 BinCount(0):         0
 BinCount(20):      0
 
-**PROGRAMMER ERROR** Invalid Range: Minimum [1.0] must be less than the Maximum [0.0].
+**PROGRAMMER ERROR** The binning range start [1.0] must be less than the end [0.0].
 **PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent].
 **PROGRAMMER ERROR** Argument percent outside of the range 0 to 100 in [Histogram::Percent].
 **PROGRAMMER ERROR** Array subscript [-1] is out of array bounds.
@@ -31,3 +31,425 @@ BinCount(20):      0
 **PROGRAMMER ERROR** Array subscript [1024] is out of array bounds.
 **PROGRAMMER ERROR** Array subscript [-1] is out of array bounds.
 **PROGRAMMER ERROR** Array subscript [1024] is out of array bounds.
+
+End old unit test.
+/usgs/cpkgs/isis3/data/base/testData/enceladus_sp-Jig.net
+Loading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Constructor1:   
+Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,numbins)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (0.00973653,0.421463)
+Bin Range:              (0.00973653,0.421463)
+Average:               0.128848
+Std Deviation:         0.0848166
+Variance:              0.00719386
+Median:                0.118086
+Mode:                  0.074746
+Skew:                  0.380683
+Percent(0.5):          0.00973653
+Percent(99.5):         0.421463
+Minimum:               0.00973653
+Maximum:               0.421463
+# Bins:                20
+BinWidth:              0.0216698
+MaxBinCount:           9
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          74
+Valid pixels:          74
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               0.00973653
+Maximum:               0.421463
+Valid Minimum:         0.00973653
+Valid Maximum:         0.421463
+Sum:                   9.53478
+Sum Square:            1.75369
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Resetting bin range to (0.1469787,0.3299682)
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (0.146979,0.329968)
+Bin Range:              (0.146979,0.329968)
+Average:               -1.79769e+308
+Std Deviation:         -1.79769e+308
+Variance:              -1.79769e+308
+Median:                -1.79769e+308
+Mode:                  -1.79769e+308
+Skew:                  -1.79769e+308
+Percent(0.5):          -1.79769e+308
+Percent(99.5):         -1.79769e+308
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+# Bins:                20
+BinWidth:              0.00963103
+MaxBinCount:           0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          0
+Valid pixels:          0
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+Valid Minimum:         0.146979
+Valid Maximum:         0.329968
+Sum:                   0
+Sum Square:            0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Constructor2:   
+Histogram(net, &Isis::ControlMeasure::GetResidualMagnitude,double binwidth)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (0.00973653,0.421463)
+Bin Range:              (0.00973653,0.421463)
+Average:               0.128848
+Std Deviation:         0.0848166
+Variance:              0.00719386
+Median:                0.110158
+Mode:                  0.0699892
+Skew:                  0.661099
+Percent(0.5):          0.00973653
+Percent(99.5):         0.421463
+Minimum:               0.00973653
+Maximum:               0.421463
+# Bins:                42
+BinWidth:              0.0100421
+MaxBinCount:           6
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          74
+Valid pixels:          74
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               0.00973653
+Maximum:               0.421463
+Valid Minimum:         0.00973653
+Valid Maximum:         0.421463
+Sum:                   9.53478
+Sum Square:            1.75369
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Resetting bin range to (0.1469787,0.3299682)
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (0.146979,0.329968)
+Bin Range:              (0.146979,0.329968)
+Average:               -1.79769e+308
+Std Deviation:         -1.79769e+308
+Variance:              -1.79769e+308
+Median:                -1.79769e+308
+Mode:                  -1.79769e+308
+Skew:                  -1.79769e+308
+Percent(0.5):          -1.79769e+308
+Percent(99.5):         -1.79769e+308
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+# Bins:                42
+BinWidth:              0.00446316
+MaxBinCount:           0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          0
+Valid pixels:          0
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+Valid Minimum:         0.146979
+Valid Maximum:         0.329968
+Sum:                   0
+Sum Square:            0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Constructor3:   
+Histogram(icube,1)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (-1e+20,1e+20)
+Bin Range:              (-1e+20,1e+20)
+Average:               0
+Std Deviation:         3.10109e+19
+Variance:              9.61674e+38
+Median:                1.5259e+15
+Mode:                  1.5259e+15
+Skew:                  -0.000147616
+Percent(0.5):          -1e+20
+Percent(99.5):         1e+20
+Minimum:               -1e+20
+Maximum:               1e+20
+# Bins:                65536
+BinWidth:              3.0518e+15
+MaxBinCount:           5292
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          15876
+Valid pixels:          7056
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           1764
+Lis pixels:            1764
+His pixels:            1764
+Lrs pixels:            1764
+Hrs pixels:            1764
+Out of range pixels:   0
+Minimum:               -1e+20
+Maximum:               1e+20
+Valid Minimum:         -1e+20
+Valid Maximum:         1e+20
+Sum:                   0
+Sum Square:            6.78461e+42
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Resetting bin range to (70,110)
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (70,110)
+Bin Range:              (70,110)
+Average:               -1.79769e+308
+Std Deviation:         -1.79769e+308
+Variance:              -1.79769e+308
+Median:                -1.79769e+308
+Mode:                  -1.79769e+308
+Skew:                  -1.79769e+308
+Percent(0.5):          -1.79769e+308
+Percent(99.5):         -1.79769e+308
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+# Bins:                65536
+BinWidth:              0.000610361
+MaxBinCount:           0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          0
+Valid pixels:          0
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+Valid Minimum:         70
+Valid Maximum:         110
+Sum:                   0
+Sum Square:            0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Constructor4:   
+Histogram(double mim, double max,int nbins)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Data Vector a:  
+[ -1.79769e+308 -1.79769e+308 -1.79769e+308 -1.79769e+308 -1.79769e+308 1 2 2 3 ]
+
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (-10,10)
+Bin Range:              (-10,10)
+Average:               2
+Std Deviation:         0.816497
+Variance:              0.666667
+Median:                0
+Mode:                  0
+Skew:                  7.34847
+Percent(0.5):          0
+Percent(99.5):         5
+Minimum:               1
+Maximum:               3
+# Bins:                5
+BinWidth:              5
+MaxBinCount:           3
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Data Vector b:  
+[ -9 -7 -5 -0.5 2.3 5.5 7.1 8.2 8.3 ]
+
+
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          9
+Valid pixels:          9
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -9
+Maximum:               8.3
+Valid Minimum:         -10
+Valid Maximum:         10
+Sum:                   9.9
+Sum Square:            377.33
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (-10,10)
+Bin Range:              (-10,10)
+Average:               1.1
+Std Deviation:         6.76794
+Variance:              45.805
+Median:                0
+Mode:                  -5
+Skew:                  0.487593
+Percent(0.5):          -10
+Percent(99.5):         10
+Minimum:               -9
+Maximum:               8.3
+# Bins:                5
+BinWidth:              5
+MaxBinCount:           2
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+**********************Data Vector B Histogram**********************
+Bin 0: [-12.5,-7.5], Count = 1
+Bin 1: [-7.5,-2.5], Count = 2
+Bin 2: [-2.5,2.5], Count = 2
+Bin 3: [2.5,7.5], Count = 2
+Bin 4: [7.5,12.5], Count = 2
+*******************************************************************
+Removing:  -9,-7,-5
+**********************Data Vector B Histogram**********************
+Bin 0: [-12.5,-7.5], Count = 0
+Bin 1: [-7.5,-2.5], Count = 0
+Bin 2: [-2.5,2.5], Count = 2
+Bin 3: [2.5,7.5], Count = 2
+Bin 4: [7.5,12.5], Count = 2
+*******************************************************************
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (-10,10)
+Bin Range:              (-10,10)
+Average:               5.15
+Std Deviation:         3.55514
+Variance:              12.639
+Median:                5
+Mode:                  0
+Skew:                  0.126577
+Percent(0.5):          0
+Percent(99.5):         10
+**PROGRAMMER ERROR** Minimum is invalid since you removed data.
+Changing BinRange for b-vector's histogram...
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          0
+Valid pixels:          0
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+Valid Minimum:         0
+Valid Maximum:         10
+Sum:                   0
+Sum Square:            0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (0,10)
+Bin Range:              (0,10)
+Average:               -1.79769e+308
+Std Deviation:         -1.79769e+308
+Variance:              -1.79769e+308
+Median:                -1.79769e+308
+Mode:                  -1.79769e+308
+Skew:                  -1.79769e+308
+Percent(0.5):          -1.79769e+308
+Percent(99.5):         -1.79769e+308
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+# Bins:                5
+BinWidth:              2.5
+MaxBinCount:           0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
