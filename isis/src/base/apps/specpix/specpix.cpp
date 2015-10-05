@@ -1,12 +1,8 @@
 #include "Isis.h"
 
-#include <vector>
-#include <algorithm>
-#include <stdio.h>
-
+#include "IException.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "IException.h"
 
 using namespace std;
 using namespace Isis;
@@ -41,13 +37,20 @@ void addRange(QString minName, QString maxName, SpecPix pixel);
 
 vector <spRange> rangeList;
 int numRange;
-int nnull, nlis, nlrs, nhis, nhrs;
+//tjw:  int -> BigInt
+BigInt nnull, nlis, nlrs, nhis, nhrs;
+
+
 
 
 void IsisMain() {
   // We will be processing by line
   ProcessByLine p;
 
+
+  
+
+  
   nnull = nlis = nlrs = nhis = nhrs = 0;
 
   // Setup the input and output cubes
@@ -68,12 +71,12 @@ void IsisMain() {
   //  the min is less than the next max, there is overlap between those
   //  two sets of ranges.
   numRange = rangeList.size();
-  if(numRange > 1) {
+  if (numRange > 1) {
     vector <spRange> sortList(numRange);
     copy(rangeList.begin(), rangeList.end(), sortList.begin());
     sort(sortList.begin(), sortList.end(), descending);
-    for(int i = 0; i < numRange - 1; i++) {
-      if(sortList[i].min < sortList[i+1].max) {
+    for (int i = 0; i < numRange - 1; i++) {
+      if (sortList[i].min < sortList[i+1].max) {
         //  We have overlap
         string message = "Check the ranges entered for overlap between differing  ";
         message += "special pixels.  ";
@@ -100,7 +103,8 @@ void IsisMain() {
   results += PvlKeyword("Lis", toString(nlis));
   results += PvlKeyword("Hrs", toString(nhrs));
   results += PvlKeyword("His", toString(nhis));
-  int total = nnull + nlrs + nhrs + nlis + nhis;
+  //tjw:  int total -> BigInt total
+  BigInt total = nnull + nlrs + nhrs + nlis + nhis;
   results += PvlKeyword("Total", toString(total));
 
   Application::Log(results);
@@ -111,40 +115,41 @@ void IsisMain() {
 //  Line processing routine
 void specpix(Buffer &in, Buffer &out) {
 
-  for(int i = 0; i < in.size(); i++) {
+  for (int i = 0; i < in.size(); i++) {
     out[i] = in[i];
-    for(int rng = 0; rng < numRange; rng++) {
+    for (int rng = 0; rng < numRange; rng++) {
       switch(rangeList[rng].specPix) {
         case NULLP:
-          if(in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
+          if (in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
             out[i] = NULL8;
             nnull++;
+   
           }
           break;
 
         case LRS:
-          if(in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
+          if (in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
             out[i] = LOW_REPR_SAT8;
             nlrs++;
           }
           break;
 
         case HRS:
-          if(in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
+          if (in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
             out[i] = HIGH_REPR_SAT8;
             nhrs++;
           }
           break;
 
         case LIS:
-          if(in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
+          if (in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
             out[i] = LOW_INSTR_SAT8;
             nlis++;
           }
           break;
 
         case HIS:
-          if(in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
+          if (in[i] >= rangeList[rng].min && in[i] <= rangeList[rng].max) {
             out[i] = HIGH_INSTR_SAT8;
             nhis++;
           }

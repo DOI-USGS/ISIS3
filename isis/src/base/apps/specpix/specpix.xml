@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="specpix" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="specpix" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation=
+  "http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Replace user specified pixels with Isis special pixel values
@@ -41,6 +43,9 @@
     <change name="Travis Addair" date="2011-08-31">
       Changed to allow ranges of a single DN
     </change>
+    <change name = "David Miller" date = "2015-09-04">
+     	Changed type of count variables to BigInt to avoid wrap around
+    </change>	
 
   </history>
 
