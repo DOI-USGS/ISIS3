@@ -46,18 +46,22 @@ namespace Isis {
   KaguyaMiCamera::KaguyaMiCamera(Cube &cube) : LineScanCamera(cube) {
     m_spacecraftNameLong = "Kaguya";
     m_spacecraftNameShort = "Kaguya";
-    // MI-VIS instrument kernel code = -131335
-    if (naifIkCode() == -131335) {
+
+    int ikCode = naifIkCode();
+
+    // https://darts.isas.jaxa.jp/pub/spice/SELENE/kernels/ik/SEL_MI_V01.TI
+    // MI-VIS instrument kernel codes -131331 through -131335
+    if (ikCode <= -131331 && ikCode >= -131335) {
       m_instrumentNameLong = "Multi Band Imager Visible";
       m_instrumentNameShort = "MI-VIS";
     }
-    // MI-NIR instrument kernel code = -131341
-    else if (naifIkCode() == -131341) {
+    // MI-NIR instrument kernel codes -131341 through -131344
+    else if (ikCode <= -131341 && ikCode >= -131344) {
       m_instrumentNameLong = "Multi Band Imager Infrared";
       m_instrumentNameShort = "MI-NIR";
     }
     else {
-      QString msg = QString::number(naifIkCode());
+      QString msg = QString::number(ikCode);
       msg += " is not a supported instrument kernel code for Kaguya.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

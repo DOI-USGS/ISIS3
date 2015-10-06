@@ -51,18 +51,23 @@ namespace Isis {
 
     m_spacecraftNameLong = "Dawn";
     m_spacecraftNameShort = "Dawn";
-    
-    if (naifIkCode() == -203110) {
+
+    int ikCode = naifIkCode();
+
+    // http://naif.jpl.nasa.gov/pub/naif/DAWN/kernels/ik/dawn_fc_v10.ti
+    // FC1 has instrument codes -203110 to -203119 (to reference filters and radiator as well
+    if (ikCode <= -203110 && ikCode > -203120) {
       m_instrumentNameLong = "Framing Camera 1";
       m_instrumentNameShort = "FC1";
     }
-    else if (naifIkCode() == -203120) {
+    // Likewise, FC2 has instrument codes -203120 to -203129
+    else if (ikCode <= -203120 && ikCode > -203130) {
       m_instrumentNameLong = "Framing Camera 2";
       m_instrumentNameShort = "FC2";
     }
     else {
       QString msg = "File does not appear to be a Dawn Framing Camera image. ";
-      msg += "(" + QString::number(naifIkCode()) + " is not a Dawn FC instrument code)";
+      msg += "(" + QString::number(ikCode) + " is not a Dawn FC instrument code)";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     

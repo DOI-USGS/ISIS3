@@ -50,6 +50,9 @@ namespace Isis {
    *   @history 2015-08-25 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
+   *   @history 2015-10-01 Ian Humphrey and Makayla Shepherd - Modified check for determing 
+   *                           the instrument name to also accept filter instrument kernal codes. 
+   *                           References #2335.
    */
   class DawnFcCamera : public FramingCamera {
     public:

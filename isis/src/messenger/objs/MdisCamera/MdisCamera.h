@@ -99,6 +99,9 @@ namespace Isis {
    *   @history 2015-08-13 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
+   *   @history 2015-10-01 Ian Humphrey and Makayla Shepherd - Updated check for Wac instrument to
+   *                           include instrument codes that correspond to its filters. References
+   *                           #2335.
    */
   class MdisCamera : public FramingCamera {
     public:
