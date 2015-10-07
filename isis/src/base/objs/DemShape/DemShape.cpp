@@ -1,6 +1,7 @@
 #include "DemShape.h"
 
 // Qt third party includes
+#include <QDebug>
 #include <QVector>
 
 // c standard library third party includes
@@ -18,27 +19,48 @@
 
 #include "Cube.h"
 #include "CubeManager.h"
+#include "Distance.h"
 #include "EllipsoidShape.h"
+//#include "Geometry3D.h"
 #include "IException.h"
 #include "Interpolator.h"
 #include "Latitude.h"
+//#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Portal.h"
 #include "Projection.h"
 #include "Pvl.h"
+#include "Spice.h"
 #include "SurfacePoint.h"
+#include "Table.h"
+#include "Target.h"
 #include "UniqueIOCachingAlgorithm.h"
 
 using namespace std;
 
 namespace Isis {
   /**
+   * Construct a DemShape object. This method creates a ShapeModel object named 
+   * "DemShape". The member variables are set to Null. 
+   *
+   */
+  DemShape::DemShape() : ShapeModel () {
+    setName("DemShape");
+    m_demProj = NULL;
+    m_demCube = NULL;
+    m_interp = NULL;
+    m_portal = NULL;
+  }
+
+
+  /**
    * Construct a DemShape object. This method creates a ShapeModel object 
    * named "DemShape" and initializes member variables from the projection 
    * shape model using the given Target and Pvl. 
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param target Pointer to a valid target.
+   * @param pvl Valid ISIS cube label.
    */
   DemShape::DemShape(Target *target, Pvl &pvl) : ShapeModel (target, pvl) {
     setName("DemShape");
@@ -80,20 +102,6 @@ namespace Isis {
   }
 
 
-  /**
-   * Construct a DemShape object. This method creates a ShapeModel object named 
-   * "DemShape". The member variables are set to Null. 
-   *
-   */
-  DemShape::DemShape() : ShapeModel () {
-    setName("DemShape");
-    m_demProj = NULL;
-    m_demCube = NULL;
-    m_interp = NULL;
-    m_portal = NULL;
-  }
-
-
   //! Destroys the DemShape
   DemShape::~DemShape() {
     m_demProj = NULL;
@@ -124,16 +132,19 @@ namespace Isis {
    * @param observerPos
    * @param lookDirection
    *  
-   * @return Indicates whether the intersection was found.
+   * @return @b bool Indicates whether the intersection was found.
    */
   bool DemShape::intersectSurface(vector<double> observerPos,
                                   vector<double> lookDirection) {
     // try to intersect the target body ellipsoid as a first approximation
     // for the iterative DEM intersection method
-    // (this method is in the ShapeModel base class)
-    if (!intersectEllipsoid(observerPos, lookDirection))
+    // (this method is in the ShapeModel base class) 
+   
+    bool ellipseIntersected = intersectEllipsoid(observerPos, lookDirection);
+    if (!ellipseIntersected) {
       return false;
- 
+    }
+
     double tol = resolution()/100;  // 1/100 of a pixel
     static const int maxit = 100;
     int it = 1;
@@ -166,17 +177,17 @@ namespace Isis {
       }
 
       // The lat/lon calculations are done here by hand for speed & efficiency
-      //   With doing it in the SurfacePoint class using p_surfacePoint, there
-      //   is a 24% slowdown (which is significant in this very tightly looped
-      //   call).
+      // With doing it in the SurfacePoint class using p_surfacePoint, there
+      // is a 24% slowdown (which is significant in this very tightly looped call).
       double t = newIntersectPt[0] * newIntersectPt[0] +
           newIntersectPt[1] * newIntersectPt[1];
       
       latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
       lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
        
-      if (lonDD < 0)
+      if (lonDD < 0) {
         lonDD += 360;
+      }
 
       // Previous Sensor version used local version of this method with lat and lon doubles. 
       // Steven made the change to improve speed.  He said the difference was negilgible.  
@@ -196,10 +207,21 @@ namespace Isis {
       bool status;
       surfpt_c((SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
                (SpiceBoolean*) &status);
-      setHasIntersection(status);
 
-      if (!status)
+      // LinearAlgebra::Vector point = LinearAlgebra::vector(observerPos[0], 
+      //                                                     observerPos[1], 
+      //                                                     observerPos[2]);
+      // LinearAlgebra::Vector direction = LinearAlgebra::vector(lookDirection[0], 
+      //                                                         lookDirection[1], 
+      //                                                         lookDirection[2]);
+      // QList<double> ellipsoidRadii;
+      // ellipsoidRadii << r << r << r;
+      // LinearAlgebra::Vector newPt = Geometry3D::intersect(point, direction, ellipsoidRadii);
+
+      setHasIntersection(status);
+      if (!status) {
         return status;
+      }
 
       dX = currentIntersectPt[0] - newIntersectPt[0];
       dY = currentIntersectPt[1] - newIntersectPt[1];
@@ -231,7 +253,7 @@ namespace Isis {
    * @param lat Latitude
    * @param lon Longitude
    *  
-   * @return @b double Local radius from the DEM
+   * @return @b Distance Local radius from the DEM
    */
   Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
     
@@ -262,7 +284,7 @@ namespace Isis {
   /** 
    * Return the scale of the DEM shape, in pixels per degree.
    *  
-   * @return The scale of the DEM
+   * @return @b double The scale of the DEM.
    */
   double DemShape::demScale() {
     return m_pixPerDegree;
@@ -281,7 +303,7 @@ namespace Isis {
   /** 
    * Returns the DEM Cube object.
    *  
-   * @return The DEM cube associated with this shape model.
+   * @return @b Cube* A pointer to the DEM cube associated with this shape model.
    */
   Cube *DemShape::demCube() {
     return m_demCube;
@@ -295,7 +317,7 @@ namespace Isis {
    * implemented by all DemShape classes. This parent implementation returns 
    * true. 
    *  
-   * @return bool Indicates that this is a DEM shape model. 
+   * @return @b bool Indicates that this is a DEM shape model. 
    */ 
   bool DemShape::isDEM() const { 
     return true;

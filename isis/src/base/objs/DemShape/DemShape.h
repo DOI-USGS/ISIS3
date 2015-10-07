@@ -35,9 +35,9 @@ namespace Isis {
   /**
    * @brief Define shapes and provide utilities for targets stored as Isis3 maps
    *
-   * This class will define shapes of Isis3 target bodies with the shape defined by an 
-   * Isis 3 map fille (level 2 image), as well as provide utilities to retrieve radii and 
-   * photometric information for the intersection point.
+   * This class will define shapes of Isis3 target bodies with the shape defined by an ISIS 3 map 
+   * fille (level 2 image), as well as provide utilities to retrieve radii and photometric 
+   * information for the intersection point. 
    *
    * @author 2010-07-30 Debbie A. Cook
    *
@@ -49,6 +49,8 @@ namespace Isis {
    *   @history 2015-04-30 Jeannie Backer - Added isDEM() method. References #2243.
    *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
    *                             were signaled. References #2248.
+   *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
+   *                           closer to ISIS coding standards. References #1438
    */
   class DemShape : public ShapeModel {
     public:

@@ -2242,7 +2242,7 @@ namespace Isis {
       SetImage(0.5, 0.5);
       double etStart = time().Et();
       SetImage(p_alphaCube->BetaSamples() + 0.5,
-               p_alphaCube->BetaLines() + 0.5);
+               p_alphaCube->BetaLines() + 0.5); // need to do something if SetImage returns false???
       double etEnd = time().Et();
       if (band == 1) {
         startTime = min(etStart, etEnd);

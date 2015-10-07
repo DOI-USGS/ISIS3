@@ -34,9 +34,9 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Longitude.h"
+#include "PvlGroup.h"
 #include "SpecialPixel.h"
 #include "TProjection.h"
-#include "PvlGroup.h"
 
 using namespace Isis;
 using namespace std;
@@ -45,8 +45,7 @@ namespace Isis {
 
 
   /**
-   * Constructor, initializes CubeManager and other variables for
-   * use.
+   * Constructor, initializes CubeManager and other variables for use.
    *
    */
   CameraPointInfo::CameraPointInfo() {
@@ -56,6 +55,7 @@ namespace Isis {
     m_currentCube = NULL;
     m_camera = NULL;
   }
+
 
   /**
    * Destructor, deletes CubeManager object used.
@@ -70,11 +70,11 @@ namespace Isis {
 
 
   /**
-   * SetCube opens the given cube in a CubeManager. The
-   * CubeManager is for effeciency when working with control nets
-   * where cubes are accesed multiple times.
+   * SetCube opens the given cube in a CubeManager. 
+   * The CubeManager is for effeciency when working with control 
+   * nets where cubes are accesed multiple times. 
    *
-   * @param cubeFileName A cube filename
+   * @param cubeFileName A cube file name.
    */
   void CameraPointInfo::SetCube(const QString &cubeFileName) {
     m_currentCube = m_usedCubes->OpenCube(cubeFileName);
@@ -86,33 +86,41 @@ namespace Isis {
    * SetImage sets a sample, line image coordinate in the camera
    * so data can be accessed.
    *
-   * @param sample A sample coordinate in or almost in the cube
-   * @param line A line coordinate in or almost in the cubei
+   * @param sample A sample coordinate in or almost in the cube.
+   * @param line A line coordinate in or almost in the cube.
+   * @param allowOutside Indicates whether to allow extrapolation.
+   * @param allowErrors  Indicates whether to allow the program to 
+   *                     throw an error if a problem occurs.
    *
-   * @return PvlGroup* The pertinent data from the Camera class on
-   *         the point. Ownership is passed to caller.
+   * @return @b PvlGroup* The pertinent data from the Camera class on the point. 
+   *                      Ownership is passed to caller.
    */
   PvlGroup *CameraPointInfo::SetImage(const double sample, const double line,
-                                      const bool outside, const bool errors) {
+                                      const bool allowOutside, const bool allowErrors) {
     if (CheckCube()) {
       bool passed = m_camera->SetImage(sample, line);
-      return GetPointInfo(passed, outside, errors);
+      return GetPointInfo(passed, allowOutside, allowErrors);
     }
     // Should never get here, error will be thrown in CheckCube()
     return NULL;
   }
 
+
   /**
-   * SetCenter sets the image coordinates to the center of the image.
+   * SetCenter sets the image coordinates to the center of the image. 
+   *  
+   * @param allowOutside Indicates whether to allow extrapolation.
+   * @param allowErrors  Indicates whether to allow the program to 
+   *                     throw an error if a problem occurs.
    *
-   * @return PvlGroup* The pertinent data from the Camera class on
-   *         the point. Ownership is passed to caller.
+   * @return @b PvlGroup* The pertinent data from the Camera class on the point. 
+   *                      Ownership is passed to caller.
    */
-  PvlGroup *CameraPointInfo::SetCenter(const bool outside, const bool errors) {
+  PvlGroup *CameraPointInfo::SetCenter(const bool allowOutside, const bool allowErrors) {
     if (CheckCube()) {
       bool passed = m_camera->SetImage(m_currentCube->sampleCount() / 2.0, 
                                        m_currentCube->lineCount() / 2.0);
-      return GetPointInfo(passed, outside, errors);
+      return GetPointInfo(passed, allowOutside, allowErrors);
     }
     // Should never get here, error will be thrown in CheckCube()
     return NULL;
@@ -123,14 +131,20 @@ namespace Isis {
    * SetSample sets the image coordinates to the center line and the
    * given sample.
    *
-   * @return PvlGroup* The pertinent data from the Camera class on
-   *         the point. Ownership is passed to caller.
+   * @param sample A sample coordinate in or almost in the cube.
+   * @param allowOutside Indicates whether to allow extrapolation.
+   * @param allowErrors  Indicates whether to allow the program to 
+   *                     throw an error if a problem occurs.
+   *  
+   * @return @b PvlGroup* The pertinent data from the Camera class on the point. 
+   *                      Ownership is passed to caller.
    */
   PvlGroup *CameraPointInfo::SetSample(const double sample,
-                                       const bool outside, const bool errors) {
+                                       const bool allowOutside, 
+                                       const bool allowErrors) {
     if (CheckCube()) {
       bool passed = m_camera->SetImage(sample, m_currentCube->lineCount() / 2.0);
-      return GetPointInfo(passed, outside, errors);
+      return GetPointInfo(passed, allowOutside, allowErrors);
     }
     // Should never get here, error will be thrown in CheckCube()
     return NULL;
@@ -141,14 +155,20 @@ namespace Isis {
    * SetLine sets the image coordinates to the center sample and the
    * given line.
    *
-   * @return PvlGroup* The pertinent data from the Camera class on
-   *         the point. Ownership is passed to caller.
+   * @param line A line coordinate in or almost in the cube.
+   * @param allowOutside Indicates whether to allow extrapolation.
+   * @param allowErrors  Indicates whether to allow the program to 
+   *                     throw an error if a problem occurs.
+   *  
+   * @return @b PvlGroup* The pertinent data from the Camera class on the point. 
+   *                      Ownership is passed to caller.
    */
   PvlGroup *CameraPointInfo::SetLine(const double line,
-                                     const bool outside, const bool errors) {
+                                     const bool allowOutside,
+                                     const bool allowErrors) {
     if (CheckCube()) {
       bool passed = m_camera->SetImage(m_currentCube->sampleCount() / 2.0, line);
-      return GetPointInfo(passed, outside, errors);
+      return GetPointInfo(passed, allowOutside, allowErrors);
     }
     // Should never get here, error will be thrown in CheckCube()
     return NULL;
@@ -159,19 +179,20 @@ namespace Isis {
    * SetGround sets a latitude, longitude grrund coordinate in the
    * camera so data can be accessed.
    *
-   * @param latitude A latitude coordinate in or almost in the
-   *                 cube
-   * @param longitude A longitude coordinate in or almost in the
-   *                  cube
+   * @param latitude A latitude coordinate in or almost in the cube
+   * @param longitude A longitude coordinate in or almost in the cube
+   * @param allowOutside Indicates whether to allow extrapolation.
+   * @param allowErrors  Indicates whether to allow the program to 
+   *                     throw an error if a problem occurs.
    *
-   * @return PvlGroup* The pertinent data from the Camera class on
-   *         the point. Ownership is passed to caller.
+   * @return @b PvlGroup* The pertinent data from the Camera class on the point. 
+   *                      Ownership is passed to caller.
    */
   PvlGroup *CameraPointInfo::SetGround(const double latitude, const double longitude,
-                                       const bool outside, const bool errors) {
+                                       const bool allowOutside, const bool allowErrors) {
     if (CheckCube()) {
       bool passed = m_camera->SetUniversalGround(latitude, longitude);
-      return GetPointInfo(passed, outside, errors);
+      return GetPointInfo(passed, allowOutside, allowErrors);
     }
     // Should never get here, error will be thrown in CheckCube()
     return NULL;
@@ -182,7 +203,7 @@ namespace Isis {
    * CheckCube checks that a cube has been set before the data for
    * a point is accessed.
    *
-   * @return bool Whether or not a cube has been set, true if it has been.
+   * @return @b bool Indicates whether a cube has been set.
    */
   bool CameraPointInfo::CheckCube() {
     if (m_currentCube == NULL) {
@@ -193,12 +214,19 @@ namespace Isis {
     return true;
   }
 
+
   /**
    * GetPointInfo builds the PvlGroup containing all the important
-   * information derived from the Camera.
+   * information derived from the Camera. 
+   *  
+   * @param passed Indicates whether the call to SetImage() was successful.
+   * @param allowOutside Indicates whether to allow extrapolation.
+   * @param allowErrors  Indicates whether to allow the program to 
+   *                     throw an error if a problem occurs.
    *
-   * @return PvlGroup* Data taken directly from the Camera and
-   *         drived from Camera information. Ownership passed.
+   * @return @b PvlGroup* Data taken directly from the Camera and 
+   *                      derived from Camera information.
+   *                      Ownership is passed to caller.
    */
   PvlGroup *CameraPointInfo::GetPointInfo(bool passed, bool allowOutside, bool allowErrors) {
     PvlGroup *gp = new PvlGroup("GroundPoint");
@@ -286,7 +314,6 @@ namespace Isis {
       gp->findKeyword("SunPosition").addComment("Sun Information");
       gp->findKeyword("Phase").addComment("Illumination and Other");
     }
-
     else {
 
       Brick b(3, 3, 1, m_currentCube->pixelType());
@@ -434,10 +461,21 @@ namespace Isis {
   }
 
 
+  /** 
+   * Retrieves a pointer to the camera.
+   * 
+   * @return @b Camera* A pointer to the Camera. 
+   */
   Camera *CameraPointInfo::camera() {
     return m_camera;
   }
 
+
+  /** 
+   * Retrieves a pointer to the current cube.
+   * 
+   * @return @b Cube* A pointer to the current cube. 
+   */
   Cube *CameraPointInfo::cube() {
     return m_currentCube;
   }

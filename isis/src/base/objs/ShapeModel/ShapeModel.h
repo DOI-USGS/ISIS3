@@ -40,8 +40,8 @@ namespace Isis {
   /**
    * @brief Define shapes and provide utilities for Isis3 targets
    *
-   * This base class will define shapes of Isis3 target bodies as well as
-   * provide utilities to retrieve radii and photometric information.
+   * This base class will define shapes of Isis3 target bodies as well as provide utilities to 
+   * retrieve radii and photometric information.
    *
    *
    * @author 2010-07-30 Debbie A. Cook
@@ -49,19 +49,19 @@ namespace Isis {
    * @internal
    *   @history 2010-07-30 Debbie A. Cook - Original version.
    *   @history 2012-10-25 Jeannie Backer - Changed resolution() method and call to
-   *                           Spice::resolution() method to lower camel case.
-   *                           Added resolution() method test to improve unitTest code coverage.
-   *                           References #1181.
-   *   @history 2012-10-31 Ken Edmundson - Added another SetNormal method and
-   *                           fixed original to set the m_hasNormal to true.
+   *                           Spice::resolution() method to lower camel case. Added resolution()
+   *                           method test to improve unitTest code coverage. References #1181.
+   *   @history 2012-10-31 Ken Edmundson - Added another SetNormal method and fixed original to
+   *                           set the m_hasNormal to true.
    *   @history 2012-11-14 Jeannie Backer - Removed cout lines left in while testing code.
    *                           References #1181.
-   *   @history 2012-12-21 Debbie A. Cook - Added new members m_hasEllipsoidIntersection
-   *                           and method hasEllipsoidIntersection().
-   *                           Fixes Mantis ticket #1343
+   *   @history 2012-12-21 Debbie A. Cook - Added new members m_hasEllipsoidIntersection and
+   *                           method hasEllipsoidIntersection(). Fixes Mantis ticket #1343
    *   @history 2015-04-30 Jeannie Backer - Added pure virtual isDEM() method. References #2243.
    *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
-   *            were signaled. References #2248.
+   *                           were signaled. References #2248
+   *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
+   *                           closer to ISIS coding standards. References #1438
    */
   class ShapeModel {
     public:
@@ -157,12 +157,12 @@ namespace Isis {
       double resolution();
 
     private:
-      bool m_hasEllipsoidIntersection;  // Indicates the ellipsoid was successfully intersected
-      bool m_hasIntersection;       //!< indicates good intersection exists
-      bool m_hasNormal;             //!< indicates normal has been computed
-      std::vector<double> m_normal; //!< Local normal of current intersection point
-      QString *m_name;
-      SurfacePoint *m_surfacePoint; //!< Current intersection point
+      bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
+      bool m_hasIntersection;          //!< indicates good intersection exists
+      bool m_hasNormal;                //!< indicates normal has been computed
+      std::vector<double> m_normal;    //!< Local normal of current intersection point
+      QString *m_name;                 //! < Name of the shape
+      SurfacePoint *m_surfacePoint;    //!< Current intersection point
 
       Target *m_target;
   };
