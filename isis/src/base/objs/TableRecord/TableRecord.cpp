@@ -240,4 +240,55 @@ namespace Isis {
       }
     }
   }
+
+
+
+  QString TableRecord::toString(TableRecord record, QString fieldDelimiter, bool fieldNames, bool endLine) {
+    QString recordValues;
+    if (fieldNames) {
+      for (int fieldIndex = 0;fieldIndex < record.Fields();fieldIndex++) {
+        // write out the name of each field
+        if (record[fieldIndex].size() == 1) {
+          recordValues += record[fieldIndex].name();
+        }
+        else {
+          for (int fieldValueIndex = 0;fieldValueIndex < record[fieldIndex].size();fieldValueIndex++) {
+            recordValues += record[fieldIndex].name();
+            if (record[fieldIndex].isText()) {
+              // if it's a text field, exit the loop by adding the appropriate number of bytes
+              fieldValueIndex += record[fieldIndex].bytes();
+            }
+            else {
+              // if the field is multivalued, write the index of the field
+              recordValues += "(" + Isis::toString(fieldValueIndex) + ")";
+            }
+            if (fieldValueIndex != record[fieldIndex].size() - 1) {
+              // add a delimiter to all but the last value in this field
+              recordValues += fieldDelimiter;
+            }
+          }
+        }
+        // add a delimiter to all but the last field in this record
+        if (fieldIndex != record.Fields() - 1) {
+          recordValues += fieldDelimiter;
+        }
+      }
+      // end field names line
+      recordValues += "\n";
+    }
+
+    for (int fieldIndex = 0;fieldIndex < record.Fields();fieldIndex++) {
+      // add value for each field in the record
+      recordValues += TableField::toString(record[fieldIndex], fieldDelimiter);
+      if (fieldIndex != record.Fields() - 1) {
+        // add delimiter to all but the last field in the record
+        recordValues += fieldDelimiter;
+      }
+    }
+    if (endLine) {
+      recordValues += "\n";
+    }
+    return recordValues;
+  }
+
 } // end namespace isis

@@ -38,19 +38,16 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-03-18 Elizabeth Ribelin - Added documentation to class
-   *   @history 2007-05-28 Steven Lambright - Added 4 byte float
-   *                           capablilities.
-   *   @history 2008-06-19 Christopher Austin - Fixed the Packing of text
-   *                           TableFields
+   *   @history 2007-05-28 Steven Lambright - Added 4 byte float capablilities.
+   *   @history 2008-06-19 Christopher Austin - Fixed the Packing of text TableFields
    *   @history 2008-06-25 Christopher Austin - Fixed the swapping of text
-   *   @history 2012-10-04 Jeannie Backer Changed references to TableField
-   *                           methods in implementation and unitTest files to
-   *                           lower camel case. Added and ordered includes.
-   *                           Moved method implementation to cpp. Fixed header
-   *                           definition statement. Fixed indentation of
-   *                           history entries. Ordered methods in cpp file.
-   *                           Improved test coverage in all categories. Added
-   *                           padding to control statements. References #1169.
+   *   @history 2012-10-04 Jeannie Backer Changed references to TableField methods in implementation
+   *                           and unitTest files to lower camel case. Added and ordered includes.
+   *                           Moved method implementation to cpp. Fixed header definition
+   *                           statement. Fixed indentation of history entries. Ordered methods in
+   *                           cpp file. Improved test coverage in all categories. Added padding to
+   *                           control statements. References #1169.
+   *   @history 2015-10-04 Jeannie Backer Improved coding standards. References #1178
    *  
    *   @todo Finish class documentation
    */
@@ -59,8 +56,11 @@ namespace Isis {
       TableRecord();
       ~TableRecord();
 
+      
+      static QString toString(TableRecord record, QString fieldDelimiter = ",", bool fieldNames = false, bool endLine = true);
+        
       void operator+=(Isis::TableField &field);
-      TableField &operator[](const int field);
+      TableField&operator [](const int field);
       TableField &operator[](const QString &field);
 
       int Fields() const;

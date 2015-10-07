@@ -371,8 +371,8 @@ namespace Isis {
     }
     if (m_size > 1) {
       QString msg = "Unable to set field to the given int value. "
-                   "Field [" + m_name + "] has [" + toString(m_size) + "] "
-                  "Integer values. Use operator=(vector<int>).";
+                    "Field [" + m_name + "] has [" + Isis::toString(m_size) + "] "
+                    "Integer values. Use operator=(vector<int>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_ivalues[0] = value;
@@ -395,8 +395,8 @@ namespace Isis {
     }
     if (m_size > 1) {
       QString msg = "Unable to set field to the given double value. "
-                   "Field [" + m_name + "] has [" + toString(m_size) + "] "
-                   "Double values. Use operator=(vector<double>).";
+                    "Field [" + m_name + "] has [" + Isis::toString(m_size) + "] "
+                    "Double values. Use operator=(vector<double>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_dvalues[0] = value;
@@ -419,8 +419,8 @@ namespace Isis {
     }
     if (m_size > 1) {
       QString msg = "Unable to set field to the given float value. "
-                   "Field [" + m_name + "] has [" + toString(m_size) + "] "
-                   "Real values. Use operator=(vector<float>).";
+                    "Field [" + m_name + "] has [" + Isis::toString(m_size) + "] "
+                    "Real values. Use operator=(vector<float>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_rvalues[0] = value;
@@ -446,7 +446,7 @@ namespace Isis {
         if (val[i] != ' ' && val[i] != '\0') {
           QString msg = "Unable to set the Text TableField to the given string. "
                         "The number of bytes allowed for this field value [" 
-                        + toString(m_size) + "] is less than the length of the "
+                        + Isis::toString(m_size) + "] is less than the length of the "
                         "given string [" + value + "].";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -474,8 +474,8 @@ namespace Isis {
     }
     else if ((int) values.size() != m_size) {
       QString msg = "Unable to set field to the given vector of int values. "
-                   "Field [" + m_name + "] values has size [" 
-                    + toString(m_size) + "].";
+                    "Field [" + m_name + "] values has size [" 
+                    + Isis::toString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_ivalues = values;
@@ -499,7 +499,7 @@ namespace Isis {
     else if ((int) values.size() != m_size) {
       QString msg = "Unable to set field to the given vector of double values. "
                     "Field [" + m_name + "] values has size [" 
-                    + toString(m_size) + "].";
+                    + Isis::toString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_dvalues = values;
@@ -524,7 +524,7 @@ namespace Isis {
     else if ((int) values.size() != m_size) {
       QString msg = "Unable to set field to the given vector of float values. "
                     "Field [" + m_name + "] values has size [" 
-                    + toString(m_size) + "].";
+                    + Isis::toString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_rvalues = values;
@@ -617,9 +617,63 @@ namespace Isis {
     else if (m_type == TableField::Real) {
       group += PvlKeyword("Type", "Real");
     }
-    group += PvlKeyword("Size", toString(m_size));
+    group += PvlKeyword("Size", Isis::toString(m_size));
 
     return group;
+  }
+
+
+  QString TableField::toString(const TableField &field, QString delimiter){
+    QString fieldValues = "";
+    if (field.size()== 1){
+      if (field.isText()){
+        fieldValues = (QString)field;
+      }
+      else if (field.isInteger()){
+        fieldValues = Isis::toString((int)field);
+      }
+      else if (field.isDouble()){
+        fieldValues = Isis::toString((double)field);
+      }
+      else { //real
+        fieldValues = Isis::toString((float)field);
+      }
+    }
+    // Otherwise, build a vector to contain the entries
+    else {
+      if (field.isText()){
+        fieldValues +=(QString)field;
+      }
+      else if (field.isInteger()){
+        vector< int > currField = field;
+        for (int i = 0;i <(int)currField.size();i++){
+          fieldValues += Isis::toString(currField[i]);
+          if (i <(int)currField.size()- 1){
+            // add delimiter for all but the last element of the field
+            fieldValues += delimiter;
+          }
+        }
+      }
+      else if (field.isDouble()){
+        vector< double > currField = field;
+        for (int i = 0;i <(int)currField.size();i++){
+          fieldValues += Isis::toString(currField[i]);
+          if (i <(int)currField.size()- 1){
+            fieldValues += delimiter;
+          }
+        }
+      }
+      else { //if (field.isReal()) {
+        vector< float > currField = field;
+        for (int i = 0;i <(int)currField.size();i++){
+          fieldValues += Isis::toString(currField[i]);
+          if (i <(int)currField.size()- 1){
+            fieldValues += delimiter;
+          }
+        }
+      }
+    }
+    return fieldValues;
   }
 } // end namespace isis
 

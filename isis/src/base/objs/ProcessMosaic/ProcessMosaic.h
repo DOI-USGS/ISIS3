@@ -184,11 +184,11 @@ namespace Isis {
    *                           automos. Fixes #1620. Fixes #1623.
    *   @history 2014-07-23 Janet Barrett - Fixed the StartProcess method to allow the overlay of
    *                           an input file on a pre-existing output file. Fixed #751.
-   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
-   *                                            functions to ensure successful 
-   *                                            inheritance between Process and its
-   *                                            child classes.  Made destructor virtual.
-   *                                            References #2215.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several functions to ensure
+   *                           successful inheritance between Process and its child classes.
+   *                           Made destructor virtual. References #2215.
+   *   @history 2015-10-04 Jeannie Backer - Fixed SetMosaicOrigin() method to populate the input
+   *                           images table properly. Fixes #1178
    */
 
   class ProcessMosaic : public Process {

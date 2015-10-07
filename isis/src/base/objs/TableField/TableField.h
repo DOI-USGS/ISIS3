@@ -45,22 +45,18 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-03-18 Elizabeth Ribelin - Added documentation to the class
-   *   @history 2007-05-28 Steven Lambright - Added 4 byte floating point
-   *                           capabilities
-   *   @history 2012-10-04 Jeannie Backer - Added accessor method for FieldType.
-   *                           Moved method implementations to cpp file. Changed
-   *                           member variable prefix to m_. Changed methods to
-   *                           lower camel case. Added documentation. Moved
-   *                           PvlGroup from header include to forward
-   *                           declaration. Added includes to cpp and header.
-   *                           Ordered includes and changed methods to lower
-   *                           camel case in the unitTest. Improved test
-   *                           coverage in all categories. Added padding to
-   *                           control statements. Fixes #1169.
-   *   @history 2012-11-21 Jeannie Backer - Added documentation and error
-   *                           message if a Text type field is set to a string
-   *                           value that is longer than the number of allowed
-   *                           bytes for the field. References #700.
+   *   @history 2007-05-28 Steven Lambright - Added 4 byte floating point capabilities
+   *   @history 2012-10-04 Jeannie Backer - Added accessor method for FieldType. Moved method
+   *                           implementations to cpp file. Changed member variable prefix to m_.
+   *                           Changed methods to lower camel case. Added documentation. Moved
+   *                           PvlGroup from header include to forward declaration. Added includes
+   *                           to cpp and header. Ordered includes and changed methods to lower
+   *                           camel case in the unitTest. Improved test coverage in all categories.
+   *                           Added padding to control statements. Fixes #1169.
+   *   @history 2012-11-21 Jeannie Backer - Added documentation and error message if a Text type
+   *                           field is set to a string value that is longer than the number of
+   *                           allowed bytes for the field. References #700.
+   *   @history 2015-10-04 Jeannie Backer Improved coding standards. References #1178
    *  
    *   @todo Finish class documentation
    */
@@ -82,6 +78,7 @@ namespace Isis {
       TableField(PvlGroup &field);
       ~TableField();
 
+      
       QString name() const;
       Type type() const;
       bool isInteger() const;
@@ -110,6 +107,8 @@ namespace Isis {
       void operator=(const void *buf);
 
       PvlGroup pvlGroup();
+
+      static QString toString(const TableField &field, QString delimiter = ",");
 
     private:
       QString m_name;            //!< Field name

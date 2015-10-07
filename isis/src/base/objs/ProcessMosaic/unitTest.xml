@@ -65,6 +65,51 @@
         </filter>
         <default><item>isisMosaic_02.cub</item></default>
       </parameter>
+      <parameter name="INPUT_LEFT">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <pixelType>Real</pixelType>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>isisTruth2.left.cub</item></default>
+      </parameter>
+      <parameter name="INPUT_RIGHT">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <pixelType>Real</pixelType>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>isisTruth2.left.cub</item></default>
+      </parameter>
+      <parameter name="MOSAIC_LEFT_RIGHT">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <pixelType>Real</pixelType>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>isisMosaic_03.cub</item></default>
+      </parameter>
     </group>
   </groups>
 </application>

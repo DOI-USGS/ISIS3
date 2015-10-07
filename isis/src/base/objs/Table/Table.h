@@ -52,27 +52,24 @@ namespace Isis {
    * @internal
    *   @history 2005-03-18 Elizabeth Ribelin - Added documentation to class
    *   @history 2006-09-19 Jeff Anderson - Added clear method
-   *   @history 2006-09-19 Jeff Anderson - Fixed bug in ReadInit method which 
-   *                           needed to cleanup pointers to records if a
-   *                           re-read occurred.
-   *   @history 2009-02-18 Steven Lambright - Added copy constructor and
-   *                           assignment operator.
-   *   @history 2011-05-25 Janet Barrett and Steven Lambright Added a
-   *                           Constructor that takes the pvl labels so they do
-   *                           not have to be re-read, which is a very expensive
+   *   @history 2006-09-19 Jeff Anderson - Fixed bug in ReadInit method which needed to cleanup
+   *                           pointers to records if a re-read occurred.
+   *   @history 2009-02-18 Steven Lambright - Added copy constructor and assignment operator.
+   *   @history 2011-05-25 Janet Barrett and Steven Lambright Added a Constructor that takes the pvl
+   *                           labels so they do not have to be re-read, which is a very expensive
    *                           operation.
-   *   @history 2012-10-04 Jeannie Backer Changed references to TableField
-   *                           methods to lower camel case. Ordered includes.
-   *                           Added documentation. Added error check to
-   *                           operator+=(TableRecord) if the Table's record
-   *                           size does not match the added TableRecord's size.
-   *                           Fixed header definition statement. Added forward
-   *                           declaration and includes. Fixed indentation of
-   *                           history entries. Moved method implementation to
-   *                           cpp file. Ordered includes in unitTest. Added
-   *                           RecordFields() accessor method. Improved test
-   *                           coverage in all categories. Added padding to
-   *                           control statements. References #1169.
+   *   @history 2012-10-04 Jeannie Backer Changed references to TableField methods to lower camel
+   *                           case. Ordered includes. Added documentation. Added error check to
+   *                           operator+=(TableRecord) if the Table's record size does not match the
+   *                           added TableRecord's size. Fixed header definition statement. Added
+   *                           forward declaration and includes. Fixed indentation of history
+   *                           entries. Moved method implementation to cpp file. Ordered includes in
+   *                           unitTest. Added RecordFields() accessor method. Improved test
+   *                           coverage in all categories. Added padding to control statements.
+   *                           References #1169.
+   *   @history 2015-10-04 Jeannie Backer Improved coding standards. Uncommented error throw for
+   *                           operator+=(record) that verifies that the record sizes match.
+   *                           References #1178
    */
   class Table : public Isis::Blob {
     public:
@@ -97,6 +94,10 @@ namespace Isis {
 
       ~Table();
 
+      
+      friend std::istream&operator>>(std::istream &is, Table &table);
+      friend std::ostream&operator<<(std::ostream &os, Table &table);
+
       void SetAssociation(const Table::Association assoc);
       bool IsSampleAssociated();
       bool IsLineAssociated();
@@ -120,6 +121,8 @@ namespace Isis {
 
       void Clear();
 
+
+      static QString toString(Table table, QString fieldDelimiter=",");
 
     protected:
       void ReadInit();
