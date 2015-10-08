@@ -78,7 +78,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>isisTruth2.left.cub</item></default>
+        <default><item>$base/testData/isisTruth2.left.cub</item></default>
       </parameter>
       <parameter name="INPUT_RIGHT">
         <type>cube</type>
@@ -93,7 +93,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>isisTruth2.left.cub</item></default>
+        <default><item>$base/testData/isisTruth2.right.cub</item></default>
       </parameter>
       <parameter name="MOSAIC_LEFT_RIGHT">
         <type>cube</type>
