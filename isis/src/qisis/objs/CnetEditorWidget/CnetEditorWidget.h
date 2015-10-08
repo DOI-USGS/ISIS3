@@ -40,6 +40,8 @@ namespace Isis {
    * @author ????-??-?? Eric Hyer
    *
    * @internal
+   *   @history 2015-10-07 Ian Humphrey - Icons updated and no longer embedded (in order
+   *                           to not violate licensing terms). Fixes #1041.
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT

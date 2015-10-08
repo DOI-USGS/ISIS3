@@ -37,6 +37,7 @@
 #include "AbstractTreeItem.h"
 #include "CnetDisplayProperties.h"
 #include "CnetEditorSortConfigDialog.h"
+#include "FileName.h"
 #include "MeasureTableModel.h"
 #include "PointTableModel.h"
 #include "TableView.h"
@@ -270,7 +271,7 @@ namespace Isis {
   void CnetEditorWidget::createActions() {
     ASSERT(m_menuActions);
 
-    QAction *freezeTablesAct = new QAction(QIcon(":ice"),
+    QAction *freezeTablesAct = new QAction(QIcon(FileName("$base/icons/ice.png").expanded()),
         tr("&Freeze Tables"), this);
     freezeTablesAct->setCheckable(true);
     freezeTablesAct->setToolTip(tr("Freeze tables (filters will not take "
@@ -286,7 +287,7 @@ namespace Isis {
     freezeTablesLocation.append(tr("&Tables"));
     m_menuActions->insert(freezeTablesAct, freezeTablesLocation);
 
-    QAction *configureSortAct = new QAction(QIcon(":sort"),
+    QAction *configureSortAct = new QAction(QIcon(FileName("$base/icons/sort.png").expanded()),
         tr("&Sorting Options..."), this);
     QString configureSortToolTipText = tr("Configure table sorting options");
     configureSortAct->setToolTip(configureSortToolTipText);

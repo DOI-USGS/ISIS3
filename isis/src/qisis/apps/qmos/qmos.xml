@@ -102,5 +102,8 @@
       sometimes failed to cross the 0 boundary and the longitude extent sliders were in 0-360 still,
       instead of -180 to 180.
     </change>
+    <change name="Ian Humphrey" date="2015-10-07">
+      Updated icons. Fixes #1041.
+    </change>
   </history>
 </application>

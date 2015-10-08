@@ -488,7 +488,7 @@ namespace Isis {
     m_openDem->setWhatsThis(whatsThis);
     connect (m_openDem,SIGNAL(activated()),this,SLOT(openDem()));
 
-    m_saveNet = new QAction(QIcon(":save"), "Save Control Network ...",
+    m_saveNet = new QAction(QIcon(toolIconDir() + "/filesave.png"), "Save Control Network ...",
                             m_qnetTool);
     m_saveNet->setToolTip("Save current control network");
     m_saveNet->setStatusTip("Save current control network");
@@ -497,7 +497,7 @@ namespace Isis {
     m_saveNet->setWhatsThis(whatsThis);
     connect(m_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
 
-    m_saveAsNet = new QAction(QIcon(":saveAs"), "Save Control Network &As...",
+    m_saveAsNet = new QAction(QIcon(toolIconDir() + "/filesaveas.png"), "Save Control Network &As...",
                               m_qnetTool);
     m_saveAsNet->setToolTip("Save current control network to chosen file");
     m_saveAsNet->setStatusTip("Save current control network to chosen file");
@@ -506,7 +506,7 @@ namespace Isis {
     m_saveAsNet->setWhatsThis(whatsThis);
     connect(m_saveAsNet, SIGNAL(activated()), this, SLOT(saveAsNet()));
 
-    m_closeQnetTool = new QAction(QIcon(":close"), "&Close", m_qnetTool);
+    m_closeQnetTool = new QAction(QIcon(toolIconDir() + "/fileclose.png"), "&Close", m_qnetTool);
     m_closeQnetTool->setToolTip("Close this window");
     m_closeQnetTool->setStatusTip("Close this window");
     m_closeQnetTool->setShortcut(Qt::ALT + Qt::Key_F4);
@@ -515,7 +515,7 @@ namespace Isis {
     m_closeQnetTool->setWhatsThis(whatsThis);
     connect(m_closeQnetTool, SIGNAL(activated()), m_qnetTool, SLOT(close()));
 
-    m_showHideTemplateEditor = new QAction(QIcon(":view_edit"),
+    m_showHideTemplateEditor = new QAction(QIcon(toolIconDir() + "/view_text.png"),
         "&View/edit registration template", m_qnetTool);
     m_showHideTemplateEditor->setCheckable(true);
     m_showHideTemplateEditor->setToolTip("View and/or edit the registration "
@@ -528,7 +528,7 @@ namespace Isis {
     connect(m_showHideTemplateEditor, SIGNAL(activated()), this,
         SLOT(showHideTemplateEditor()));
 
-    m_saveChips = new QAction(QIcon(":window_new"), "Save registration chips",
+    m_saveChips = new QAction(QIcon(toolIconDir() + "/savechips.png"), "Save registration chips",
         m_qnetTool);
     m_saveChips->setToolTip("Save registration chips");
     m_saveChips->setStatusTip("Save registration chips");
@@ -537,7 +537,7 @@ namespace Isis {
     m_saveChips->setWhatsThis(whatsThis);
     connect(m_saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
 
-    m_openTemplateFile = new QAction(QIcon(":open"), "&Open registration "
+    m_openTemplateFile = new QAction(QIcon(toolIconDir() + "/fileopen.png"), "&Open registration "
         "template", m_qnetTool);
     m_openTemplateFile->setToolTip("Set registration template");
     m_openTemplateFile->setStatusTip("Set registration template");
@@ -546,7 +546,7 @@ namespace Isis {
     m_openTemplateFile->setWhatsThis(whatsThis);
     connect(m_openTemplateFile, SIGNAL(activated()), this, SLOT(openTemplateFile()));
 
-    m_saveTemplateFile = new QAction(QIcon(":save"), "&Save template file",
+    m_saveTemplateFile = new QAction(QIcon(toolIconDir() + "/filesave.png"), "&Save template file",
         m_qnetTool);
     m_saveTemplateFile->setToolTip("Save the template file");
     m_saveTemplateFile->setStatusTip("Save the template file");
@@ -554,11 +554,11 @@ namespace Isis {
     connect(m_saveTemplateFile, SIGNAL(triggered()), this,
         SLOT(saveTemplateFile()));
 
-    m_saveTemplateFileAs = new QAction(QIcon(":saveAs"), "&Save template as...",
+    m_saveTemplateFileAs = new QAction(QIcon(toolIconDir() + "/filesaveas.png"), "&Save template as...",
         m_qnetTool);
-    m_saveTemplateFileAs->setToolTip("Save the template file");
-    m_saveTemplateFileAs->setStatusTip("Save the template file");
-    m_saveTemplateFileAs->setWhatsThis("Save the registration template file");
+    m_saveTemplateFileAs->setToolTip("Save the template file as");
+    m_saveTemplateFileAs->setStatusTip("Save the template file as");
+    m_saveTemplateFileAs->setWhatsThis("Save the registration template file as");
     connect(m_saveTemplateFileAs, SIGNAL(triggered()), this,
         SLOT(saveTemplateFileAs()));
 
