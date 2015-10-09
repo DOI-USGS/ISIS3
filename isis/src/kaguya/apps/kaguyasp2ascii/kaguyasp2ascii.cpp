@@ -46,7 +46,8 @@ void IsisMain() {
   int wavptr = 0;
   int rawptr = 0;
   int radptr = 0;
-  int refptr = 0;
+  int refptr1 = 0;
+  int refptr2 = 0;
   int qaptr = 0;
 
   if (lab.hasKeyword("^SP_SPECTRUM_WAV")) {
@@ -58,11 +59,19 @@ void IsisMain() {
   if (lab.hasKeyword("^SP_SPECTRUM_RAD")) {
     radptr = toInt(lab.findKeyword("^SP_SPECTRUM_RAD")[0]) - 1;
   }
+  //older-format file without calibrated NIR2 data
   if (lab.hasKeyword("^SP_SPECTRUM_REF")) {
-    refptr = toInt(lab.findKeyword("^SP_SPECTRUM_REF")[0]) - 1;
+    refptr1 = toInt(lab.findKeyword("^SP_SPECTRUM_REF")[0]) - 1;
+  }
+  //newer-format file with calibrated NIR2 data and 2 different Reflectances
+  if (lab.hasKeyword("^SP_SPECTRUM_REF1")) {
+    refptr1 = toInt(lab.findKeyword("^SP_SPECTRUM_REF1")[0]) - 1;
+  }
+  if (lab.hasKeyword("^SP_SPECTRUM_REF2")) {
+    refptr2 = toInt(lab.findKeyword("^SP_SPECTRUM_REF2")[0]) - 1;
   }
   if (lab.hasKeyword("^SP_SPECTRUM_QA")) {
-    qaptr = toInt(lab.findKeyword("^SP_SPECTRUM_REF")[0]) - 1;
+    qaptr = toInt(lab.findKeyword("^SP_SPECTRUM_QA")[0]) - 1;
   }
 
   FILE *spcptr;
@@ -82,7 +91,8 @@ void IsisMain() {
   } obuf;
 
   if (!lab.hasObject("SP_SPECTRUM_WAV") || !lab.hasObject("SP_SPECTRUM_QA") ||
-      !lab.hasObject("SP_SPECTRUM_RAD") || !lab.hasObject("SP_SPECTRUM_REF")) {
+      !lab.hasObject("SP_SPECTRUM_RAD") || !(lab.hasObject("SP_SPECTRUM_REF") || 
+      (lab.hasObject("SP_SPECTRUM_REF1") && lab.hasObject("SP_SPECTRUM_REF2")))) {
     QString msg = "Input file [" + inFile.expanded() + "] is not a valid ";
     msg += "Kaguya Spectral Profiler file";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -241,7 +251,16 @@ void IsisMain() {
     }
   }
 
-  PvlObject refobj = lab.findObject("SP_SPECTRUM_REF");
+  PvlObject refobj;
+  PvlObject refobj2; 
+  if (lab.hasKeyword("^SP_SPECTRUM_REF")) {
+    refobj = lab.findObject("SP_SPECTRUM_REF");
+  } 
+  else {
+    refobj = lab.findObject("SP_SPECTRUM_REF1"); 
+    refobj2 = lab.findObject("SP_SPECTRUM_REF2"); 
+  }
+
   int reflines = toInt(refobj.findKeyword("LINES")[0]);
   int refsamps = toInt(refobj.findKeyword("LINE_SAMPLES")[0]);
   QString reftype = refobj.findKeyword("SAMPLE_TYPE");
@@ -264,8 +283,9 @@ void IsisMain() {
     refoffset = 0.0;
   }
 
+  //import reflectance or "reflectance 1" in newer files
   double ref[296*reflines];
-  fseek(spcptr,refptr,SEEK_SET);
+  fseek(spcptr,refptr1,SEEK_SET);
   for (int i=0; i<reflines; i++) {
     for (int j=0; j<refsamps; j++) {
       size_t results = fread((void *)ibuf.ichar,2,1,spcptr);
@@ -276,6 +296,48 @@ void IsisMain() {
       obuf.ichar[0] = ibuf.ichar[1];
       obuf.ichar[1] = ibuf.ichar[0];
       ref[j+i*296] = (float)obuf.iword * refscale + refoffset;
+    }
+  }
+  
+  //import reflectance 2 if it exists
+  double *ref2 = NULL; 
+  if (lab.hasKeyword("^SP_SPECTRUM_REF2")) {
+    int reflines2 = toInt(refobj2.findKeyword("LINES")[0]); 
+    int refsamps2 = toInt(refobj2.findKeyword("LINE_SAMPLES")[0]);
+    QString reftype2 = refobj2.findKeyword("SAMPLE_TYPE");
+    int refbits2 = toInt(refobj2.findKeyword("SAMPLE_BITS")[0]);
+    if (reflines2 != radlines || refsamps2 != 296 || reftype2 != "MSB_UNSIGNED_INTEGER" ||
+     refbits2 != 16) {
+     QString msg = "Reflectance #2 data in input file does not meet the following ";
+     msg += "requirements: Size=296 columns, DataType=MSB_UNSIGNED_INTEGER, ";
+     msg += "BitType=16";
+     throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    keyval = refobj2.findKeyword("SCALING_FACTOR")[0];
+    double refscale2 = keyval.toDouble(&ok);
+    if (!ok) {
+      refscale2 = 1.0;
+    }
+    keyval = refobj2.findKeyword("OFFSET")[0];
+    double refoffset2 = keyval.toDouble(&ok);
+    if (!ok) {
+      refoffset2 = 0.0;
+    }
+
+    ref2 = new double[296*reflines2];
+    fseek(spcptr,refptr2,SEEK_SET);
+    for (int i=0; i<reflines2; i++) {
+      for (int j=0; j<refsamps2; j++) {
+        size_t results = fread((void *)ibuf.ichar,2,1,spcptr);
+        if (results != 1) {
+          QString msg = "Error reading reflectance (Ref2) data from input file";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        obuf.ichar[0] = ibuf.ichar[1];
+        obuf.ichar[1] = ibuf.ichar[0];
+        ref2[j+i*296] = (float)obuf.iword * refscale2 + refoffset2;
+      }
     }
   }
 
@@ -292,18 +354,40 @@ void IsisMain() {
     minobs = rawlines;
   }
 
-  os << "WaveLength,";
-  for (int i=minobs; i<=maxobs; i++) {
-    os << "Raw" << i << ",Rad" << i << ",Ref" << i << ",QA" << i;
-  }
-  os << endl;
+  os << "Wavelength";
 
-  for (int j=0; j<296; j++) {
-    os << wavelength[j];
-    for (int i=minobs-1; i<maxobs; i++) {
-      os << "\t" << raw[j+i*296] << "\t" << rad[j+i*296] << "\t" << ref[j+i*296] << "\t" << (std::bitset<16>) qa[j+i*296];
+  //If we have a newer-format file with two Reflectances, output both
+  if (ref2 != NULL) { 
+    for (int i=minobs; i<=maxobs; i++) {
+      os << "\t" << "Raw" << i << "\t"<< "Rad" << i << "\t" <<"Ref1_" << i << "\t" << "Ref2_" << i 
+          << "\t" << "QA" << i;
     }
-    os << endl;
+    os << endl; 
+
+    for (int j = 0; j < 296; j++) {
+      os << wavelength[j];
+      for (int i=minobs-1; i<maxobs; i++) {
+        os << "\t" << raw[j+i*296] << "\t" << rad[j+i*296] << "\t" << ref[j+i*296] << "\t" 
+            << ref2[j+i*296] << "\t" << (std::bitset<16>) qa[j+i*296];
+      }
+      os << endl;
+     }
+     delete ref2; 
+  } 
+  else {
+    for (int i=minobs; i<=maxobs; i++) {
+      os << "\t" << "Raw" << i << "\t" << "Rad" << i << "\t" << "Ref" << i << "\t" << "QA" << i;
+    }
+    os << endl;    
+
+    for (int j = 0; j < 296; j++) {
+      os << wavelength[j];
+      for (int i=minobs-1; i<maxobs; i++) {
+        os << "\t" << raw[j+i*296] << "\t" << rad[j+i*296] << "\t" << ref[j+i*296] << "\t" 
+            << (std::bitset<16>) qa[j+i*296];
+      }
+       os << endl;
+    }
   }
 
   os.close();

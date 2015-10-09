@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="kaguyasp2ascii" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Converts Kaguya SP (Spectral Profiler) file to a tab delimited text file 
+  </brief>
+
+  <description>
+  <p>
+    This program will read a binary SELENE Kaguya SP (Spectral Profiler) data file 
+    (downloaded as a .spc file from <a href="http://l2db.selene.darts.isas.jaxa.jp/">the archive site</a>) and create a 
+    user-specified, tab-delimited text file.
+
+    The multi-column ASCII text file will contain one record for each of the 296 wavelengths (bands or channels) in the SP file. 
+    The bands are derived from 3 separate sensors, with wavelengths as follows: UVVIS wavelength = 512.6 -1010.7 nm; NIR1 
+    wavelength = 883.5 - 1676.0 nm; NIR2 wavelength = 702.1-2587.9 nm.  Each record in the output file will contain ancillary data 
+    and all of the observations for a specific wavelength. You can limit the number of observations that
+    are listed by using the MINOBS and MAXOBS parameters. The ancillary data include a quality assessment (QA) parameter, 
+    raw DN, radiance, and ref_1 and ref_2 (reflectance  values that have been photometrically corrected using values for
+    highlands and mare, respectively) for each wavelength and each observation. SP binary data files can have less than 10 observations
+    or more than 50. This program works on both Level 2B and Level 2C products from Kaguya, with two caveats:
+    the NIR portions of the Level 2B products are not calibrated or photometrically corrected, but the L2C products have been fully
+    calibrated and photometrically corrected. </p>
+
+  <p>
+    The documents in the kaguyasp2ascii/assets directory provide information about the Kaguya Spectral 
+    Profiler data. The directory also contains a summary of what the different Quality Assessment values 
+    mean (from p. 82 of the <a href="http://l2db.selene.darts.isas.jaxa.jp/help/en/LISM_SPICE_Fromat_en_V01-03.pdf">LISM SPICE documentation</a>).
+  </p>
+  <p>
+    Note that this program does not process the SP data in any way once the binary data is converted to ASCII.
+    For example, you likely would not want to work with SP data that have oblique viewing angles or are poorly illuminated 
+    (these must be filtered from the archive site), or you may want to remove redundant or erroneous data at the instrument joins 
+    (e.g., spikes in DN values at the ends of the VIS, NIR1, NIR2). For the latter, the QA values will help you to identify these.
+    QA values with any of the three left-most bits set to 1 can be removed from each spectrum. 
+  </p>
+  <p>
+    References: 
+    <br /> 
+     Yamamoto, S. et al. (2011) Preflight and in-flight calibration of the spectral profiler onboard the SELENE (Kaguya). IEEE Trans. Geosci. Remote Sens. 49 (11), p. 4660-4676.
+     <br />
+     Yamamoto, S. et al. (2014) Calibration of NIR2 of Spectral Profiler onboard Kaguya/SELENE, IEEE Trans. Geosci. Remote Sens. 52 (11), p. 6882-6898.
+     <br /> 
+     Yokota, Y., et al. (2011) Lunar photometric properties at wavelengths 0.5-1.6mm acquired by SELENE Spectral Profiler and their dependency on local albedo and latitudinal zones. Icarus, 215, 639-660, <a href="http://dx.doi.org/10.1016/j.icarus.2011.07.028">http://dx.doi.org/10.1016/j.icarus.2011.07.028</a>.
+  </p>
+  </description>
+
+  <history>
+    <change name="Janet Barrett" date="2014-02-19">
+      Original version. This program imports binary data
+      from a Kaguya Spectral Profiler file and puts the 
+      data into a tab delimited table.
+    </change>
+    <change name="Kristin Berry" date="2015-08-24">
+      Updated to deal with format change for newer files . Now will output both reflectances  
+      and calibrated NIR2 data if available. Also, updated to put actual QA information in 
+      the output file, which was not happening correctly before, and updated online
+      documentation to match Lisa Gaddis's rewrite.
+      Additionally, headers are now tab-separated, rather than comma-separated.
+      Fixes #2218
+    </change>
+    <change name="Kristin Berry" date="2015-09-18">
+      Backward Compatibility Issue: The application name was changed from kaguyasp2isis to 
+      kaguyasp2ascii since this application does not output an ISIS Cube, which could
+      impact processing scripts/pipelines which use the old application name. 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Kaguya SP file
+        </brief>
+        <description>
+          This is the input Kaguya SP file
+        </description>
+        <filter>
+          *.spc
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output Kaguya text file
+        </brief>
+        <description>
+          The output file will be formatted as a tab delimited
+          file and will contain all requested observations for
+          a single wavelength in each record of the file. Each
+          observation will include the raw, radiance, reflectance,
+          and QA information. If two reflectances are available,
+          as in newer-format files, both will be included in the output file.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Limit Parameters">
+      <parameter name="MINOBS">
+        <type>string</type>
+        <brief>Minimum observation</brief>
+        <description>
+          This is the minimum observation of the observation range
+          for which information will be obtained from the input
+          file. If no value is specified, then the minimum will be
+          set to 1.
+        </description>
+        <default><item>None</item></default>
+      </parameter>
+      <parameter name="MAXOBS">
+        <type>string</type>
+        <brief>Maximum observation</brief>
+        <description>
+          This is the maximum observation of the observation range
+          for which information will be obtained from the input 
+          file. If no value is specified, then the maximum will be
+          set to the maximum observation in the input file.
+        </description>
+        <default><item>None</item></default>
+      </parameter>
+    </group>
+  </groups>
+</application>

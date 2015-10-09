@@ -1,4 +1,4 @@
-APPNAME = kaguyasp2isis
+APPNAME = kaguyasp2ascii
 
 labels.txt.IGNORELINES = Bytes StartByte ByteOrder TileSamples TileLines
 
