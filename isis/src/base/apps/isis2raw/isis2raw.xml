@@ -7,19 +7,17 @@
   </brief>
 
   <description>
-    This program will export an Isis cube to a greyscale raw formatted file.
+    This program will export an ISIS cube to a grayscale raw formatted file.
     The raw image may be output into an 8-bit, 16-bit unsigned, 16-bit signed
     or 32-bit raw image.  This raw image can be in BSQ, BIL, or BIP format, and
-    can include or exclude Null, Lrs, Lis, His, and/or Hrs specific DN values.
-    If no special pixel parameters are selected, then the special pixels are
-    mapped in the following manner; Low Saturation values and Null values are
-    made black and High Saturation values are made white.
-    In order to ensure acceptable contrast in the output file, three stretch
-    options are given 1) no stretch 2) linear, and 3) manual.
-    A custom maximum and minimum DN value can be specified for 8-bit as well as
-    16-bit unsigned and 16-bit signed raw outputs.  For example, if a range of
-    0 to 1023 is selected in a 16-bit unsigned raw image, the DNs are stretched
-    to an effective 10-bit format.
+    can include or exclude Null, LRS, LIS, HIS, and/or HRS specific DN values.
+    If no special pixel parameters are selected, then Low Saturation values and 
+    Null values are set to black and High Saturation values are set to white.
+    To ensure acceptable contrast in the output file, the user may select from 
+    three stretch options are given 1) no stretch 2) linear, and 3) manual.
+    A custom maximum and minimum DN value can be specified for all output 
+    bittypes.  For example, if a range of 0 to 1023 is selected in a 16-bit 
+    unsigned raw image, the DNs are stretched to an effective 10-bit format.
   </description>
 
   <history>
@@ -37,7 +35,7 @@
       Added application test
     </change>
     <change name="Stuart Sides" date="2003-05-16">
-      Modified schema location from astogeology... to isis.astrogeology..."
+      Modified schema location from astrogeology... to isis.astrogeology..."
     </change>
     <change name="Jeff Anderson" date="2003-08-27">
       Changed default extension handling mechanism
@@ -69,6 +67,11 @@
     <change name="Christopher Austin" date="2008-07-07">
       Clarified some documentation and updated comments.
     </change>
+    <change name="Makayla Shepherd" date="2015-09-01">
+      Modified to fix an error when inputing OMIN and OMAX values for a 32-bit
+      output image. OMIN and OMAX are now calculated based on the stretch if 32-bit
+      is chosen and the OMIN and OMAX fields are left blank. Fixes #2194.
+    </change>
   </history>
 
   <category>
@@ -91,7 +94,7 @@
           Input cube to export
         </brief>
         <description>
-          Use this parameter to select the filename and band to export. For
+          Use this parameter to select the filename and the band number to export. For
           example, file.cub+5 will select band 5
         </description>
         <filter>
@@ -106,8 +109,8 @@
           Output raw file
         </brief>
         <description>
-	      Use this parameter to specify the name of the output raw file.
-          If you do not include an extension of .raw it will be added.
+          Use this parameter to specify the name of the output raw file.
+          If you do not specify an extension, .raw it will be used.
         </description>
       </parameter>
     </group>
@@ -155,9 +158,6 @@
               (-3.40282347e+38 to 3.40282347e+38)
             </description>
             <exclusions>
-              <item>STRETCH</item>
-              <item>MINPERCENT</item>
-              <item>MAXPERCENT</item>
               <item>NULL</item>
               <item>LRS</item>
               <item>LIS</item>
@@ -173,12 +173,18 @@
           The minimum output DN value including special pixels.
         </brief>
         <description>
-          If left blank, the minimum DN value used will default to the smallest
-          value possible for the provided bittype.  Otherwise, the provided
-          value will be the minimum DN used (including special pixels).
+          If a value is provided, the value will be the minimum DN used (including special 
+          pixels). If left blank and the BITTYPE is not 32BIT, the minimum DN value 
+          will default to the smallest value possible for the provided 
+          BITTYPE. If the BITTYPE is 32BIT and OMIN is left blank, the value
+          of OMIN will depend on the STRETCH type chosen. If LINEAR is 
+          chosen, the value for OMIN will be the DN value at the value 
+          entered for MINPERCENT on the data. If MANUAL is chosen, the OMIN 
+          will equal to the value of MINIMUM. If NONE is chosen, the value 
+          will default to the smallest value possible for 32 bit data. 
         </description>
         <internalDefault>
-          NULL
+          Refer to Documentation
         </internalDefault>
       </parameter>
       <parameter name="OMAX">
@@ -187,12 +193,18 @@
           The maximum output DN value including special pixels.
         </brief>
         <description>
-          If left blank, the maximum DN value used will default to the largest
-          value possible for the provided bittype.  Otherwise the provided
-          value will be the maximum DN used (including special pixels).
+          If a value is provided, the value will be the maximum DN used (including special 
+          pixels). If left blank and the BITTYPE is not 32BIT, the maximum DN value 
+          will default to the largest value possible for the provided 
+          BITTYPE. If the BITTYPE is 32BIT and OMAX is left blank, the value
+          of OMAX will depend on the STRETCH type chosen. If LINEAR is 
+          chosen, the value for OMAX will be the DN value at the value 
+          entered for MAXPERCENT on the data. If MANUAL is chosen, the OMIN 
+          will equal to the value of MAXIMUM. If NONE is chosen, the value 
+          will default to the largest value possible for 32 bit data.
         </description>
         <internalDefault>
-          NULL
+          Refer to Documentation
         </internalDefault>
       </parameter>
       <parameter name="NULL">
@@ -202,7 +214,7 @@
         <description>
           If set to true, the minimum value of the raw output data will be 
           reserved for null pixels.  The actual value used for null pixels will
-          be denoted in the print.prt file as well as displayed onscreen.
+          be denoted in the print.prt file and displayed onscreen.
         </description>
       </parameter>
       <parameter name="LRS">
@@ -210,9 +222,9 @@
         <default><item>false</item></default>
         <brief>Dedicates a DN value for LRS pixels.</brief>
         <description>
-          If set to true, then an output DN value is set aside for the LRS input pixels.
+          If set to true, an output DN value is set aside for the LRS input pixels.
           The actual DN value used for LRS pixels will be denoted in the print.prt
-          file as well as displayed onscreen.
+          file and displayed onscreen.
         </description>
       </parameter>
       <parameter name="LIS">
@@ -220,9 +232,9 @@
         <default><item>false</item></default>
         <brief>Dedicates a DN value for LIS pixels.</brief>
         <description>
-          If set to true, then an output DN value is set aside for the LIS input pixels.
+          If set to true, an output DN value is set aside for the LIS input pixels.
           The actual DN value used for LIS pixels will be denoted in the print.prt
-          file as well as displayed onscreen.
+          file and displayed onscreen.
         </description>
       </parameter>
       <parameter name="HIS">
@@ -230,9 +242,9 @@
         <default><item>false</item></default>
         <brief>Dedicates a DN value for HIS pixels.</brief>
         <description>
-          If set to true, then an output DN value is set aside for the HIS input pixels.
+          If set to true, an output DN value is set aside for the HIS input pixels.
           The actual DN value used for HIS pixels will be denoted in the print.prt
-          file as well as displayed onscreen.
+          file and displayed onscreen.
         </description>
       </parameter>
       <parameter name="HRS">
@@ -240,9 +252,9 @@
         <default><item>false</item></default>
         <brief>Dedicates a DN value for HRS pixels.</brief>
         <description>
-          If set to true, then an output DN value is set aside for the HRS input pixels.
+          If set to true, an output DN value is set aside for the HRS input pixels.
           The actual DN value used for HRS pixels will be denoted in the print.prt
-          file as well as displayed onscreen.
+          file and displayed onscreen.
         </description>
       </parameter>
     </group>
@@ -364,10 +376,10 @@
         <brief>Endianness of the output bytes</brief>
         <description>
           This parameter is used to select one whether the output will be
-	      streamed starting with the most significant byte (MSB) or starting
-	      with the least significant bytes (LSB). The choice should be made by
-	      the user depending upon the format read by the system architecture
-	      from which they plan to read the raw data.
+          streamed starting with the most significant byte (MSB) or starting
+          with the least significant bytes (LSB). The choice should be made by
+          the user depending upon the format read by the system architecture
+          from which they plan to read the raw data.
         </description>
         <list>
           <option value="LSB">
@@ -391,7 +403,7 @@
         </default>
         <brief>Storage order of output file.</brief>
         <description>
-          Sets the storage order of the raw ouput file to either BSQ, BIL, or 
+          Sets the storage order of the raw ouput file to BSQ, BIL, or 
           BIP.
         </description>
         <list>

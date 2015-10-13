@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-
+#include "Histogram.h"
 #include "ProcessExport.h"
 #include "UserInterface.h"
 #include "SpecialPixel.h"
@@ -20,20 +20,22 @@ void checkRange(UserInterface &ui, double &min, double &max);
 void setRangeAndPixels(UserInterface &ui, ProcessExport &p,
                        double &min, double &max, Pixtype ptype);
 
+Cube *p_cube;
+
 // Main program
 void IsisMain() {
   // Create an object for exporting Isis data
   ProcessExport p;
 
   // Open the input cube
-  p.SetInputCube("FROM");
+  p_cube = p.SetInputCube("FROM");
 
   UserInterface &ui = Application::GetUserInterface();
 
   // Applies the input to output stretch options
   if(ui.GetString("STRETCH") == "LINEAR") {
-    if(ui.GetString("BITTYPE") != "32BIT")
-      p.SetInputRange();
+//    if(ui.GetString("BITTYPE") != "32BIT")
+    p.SetInputRange();
   }
   if(ui.GetString("STRETCH") == "MANUAL")
     p.SetInputRange(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"));
@@ -114,6 +116,8 @@ void IsisMain() {
 
 // Validates provided range
 void checkRange(UserInterface &ui, double &min, double &max) {
+  Isis::Histogram *hist = p_cube->histogram(0);
+  
   if(ui.WasEntered("OMIN")) {
     if(ui.GetDouble("OMIN") < min) {
       QString message = "OMIN [" + toString(min) + "] is too small for the provided BITTYPE [";
@@ -124,6 +128,15 @@ void checkRange(UserInterface &ui, double &min, double &max) {
       min = ui.GetDouble("OMIN");
     }
   }
+  else if(!ui.WasEntered("OMIN") && ui.GetString("BITTYPE") == "32BIT"){
+    if(ui.GetString("STRETCH") == "LINEAR") {
+      min = hist->Percent(Application::GetUserInterface().GetDouble("MINPERCENT"));
+    }
+    else if(ui.GetString("STRETCH") == "MANUAL") {
+      min = ui.GetDouble("MINIMUM");
+    }
+  }
+    
   if(ui.WasEntered("OMAX")) {
     if(ui.GetDouble("OMAX") > max) {
       QString message = "OMAX [" + toString(max) + "] is too large for the provided BITTYPE [";
@@ -132,6 +145,14 @@ void checkRange(UserInterface &ui, double &min, double &max) {
     }
     else {
       max = ui.GetDouble("OMAX");
+    }
+  }
+  else if(!ui.WasEntered("OMIN") && ui.GetString("BITTYPE") == "32BIT"){
+    if(ui.GetString("STRETCH") == "LINEAR") {
+      max = hist->Percent(Application::GetUserInterface().GetDouble("MAXPERCENT"));
+    }
+    else if(ui.GetString("STRETCH") == "MANUAL") {
+      max = ui.GetDouble("MAXIMUM");
     }
   }
   if(min >= max) {
