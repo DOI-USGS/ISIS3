@@ -29,7 +29,7 @@ Deborah Lee Soltesz
     </div>
 
     <div>
-      <a href="http://isis.astrogeology.usgs.gov/IsisSupport" target="_blank" title="Launch the ISIS Support Center in a new window">
+      <a href="http://isis.astrogeology.usgs.gov/fixit" target="_blank" title="Launch the ISIS Support Center in a new window">
       Support</a>
     </div>
 
