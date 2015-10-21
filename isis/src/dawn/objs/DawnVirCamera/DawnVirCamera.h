@@ -57,6 +57,9 @@ namespace Isis {
      *   @history 2015-08-12 Ian Humphrey and Makayla Shepherd - Added new data members and methods
      *                           to get spacecraft and instrument names. Extended unit test to test
      *                           these methods.
+     *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+     *                           members and methods and removed implementation of these methods
+     *                           since Camera now handles this. References #2335.
      */
     class DawnVirCamera : public LineScanCamera {
       public:
@@ -72,11 +75,6 @@ namespace Isis {
 
         /** SPK Reference ID - J2000 */
         virtual int SpkReferenceId() const;
-        
-        virtual QString instrumentNameLong() const;
-        virtual QString instrumentNameShort() const;
-        virtual QString spacecraftNameLong() const;
-        virtual QString spacecraftNameShort() const;
 
       private:
         typedef TNT::Array2D<SpiceDouble> SMatrix;       //!<  2-D buffer
@@ -95,11 +93,6 @@ namespace Isis {
         double m_exposureTime;   ///!< Line exposure time
         int    m_summing;        ///!< Summing/binnning mode
         double m_scanRate;       ///!< Line scan rate
-        
-        QString m_instrumentNameLong; //!< Full instrument name
-        QString m_instrumentNameShort; //!< Shortened instrument name
-        QString m_spacecraftNameLong; //!< Full spacecraft name
-        QString m_spacecraftNameShort; //!< Shortened spacecraft name
 
         std::vector<LineRateChange> m_lineRates;
         std::vector<ScanMirrorInfo> m_mirrorData;

@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QList>
 #include <QPair>
+#include <QString>
 #include <QTime>
 #include <QVector>
 
@@ -63,6 +64,10 @@ namespace Isis {
    * @param lab Pvl label used to create the Camera object
    */
   Camera::Camera(Cube &cube) : Sensor(cube) {
+    m_instrumentNameLong = "Unknown";
+    m_instrumentNameShort = "Unknown";
+    m_spacecraftNameLong = "Unknown";
+    m_spacecraftNameShort = "Unknown";
     // Get the image size which can be different than the alpha cube size
     p_lines = cube.lineCount();
     p_samples = cube.sampleCount();
@@ -1164,7 +1169,6 @@ namespace Isis {
     map += PvlKeyword("ProjectionName", "Planar");
     pvl.addGroup(map);
   }
-
 
   //! Reads the focal length from the instrument kernel
   void Camera::SetFocalLength() {
@@ -2586,6 +2590,46 @@ namespace Isis {
    */
   CameraSkyMap *Camera::SkyMap() {
     return p_skyMap;
+  }
+  
+  
+  /**
+   * This method returns the full instrument name.
+   *
+   * @return QString
+   */
+  QString Camera::instrumentNameLong() const {
+    return m_instrumentNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened instrument name.
+   *
+   * @return QString
+   */
+  QString Camera::instrumentNameShort() const {
+    return m_instrumentNameShort;
+  }
+  
+  
+  /**
+   * This method returns the full spacecraft name.
+   * 
+   * @return QString
+   */
+  QString Camera::spacecraftNameLong() const {
+    return m_spacecraftNameLong;
+  }
+  
+  
+  /**
+   * This method returns the shortened spacecraft name.
+   *
+   * @return QString
+   */
+  QString Camera::spacecraftNameShort() const {
+    return m_spacecraftNameShort;
   }
 
   /**

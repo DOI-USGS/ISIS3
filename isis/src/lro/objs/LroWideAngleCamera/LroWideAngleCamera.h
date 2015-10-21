@@ -89,7 +89,9 @@ namespace Isis {
    *   @history 2015-08-25 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
-   *  
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *                           members and methods and removed implementation of these methods
+   *                           since Camera now handles this. References #2335.
    */
   class LroWideAngleCamera : public PushFrameCamera {
     public:
@@ -104,11 +106,6 @@ namespace Isis {
       virtual int CkFrameId() const;
       virtual int CkReferenceId() const;
       virtual int SpkReferenceId() const;
-      
-      virtual QString instrumentNameLong() const;
-      virtual QString instrumentNameShort() const;
-      virtual QString spacecraftNameLong() const;
-      virtual QString spacecraftNameShort() const;
 
     private:
       typedef QVector<int>    IntParameterList;
@@ -123,11 +120,6 @@ namespace Isis {
       DblParameterList p_focalLength;
       DblParameterList p_boreSightSample;
       DblParameterList p_boreSightLine;
-      QString m_instrumentNameLong; //!< Full instrument name
-      QString m_instrumentNameShort; //!< Shortened instrument name
-      QString m_spacecraftNameLong; //!< Full spacecraft name
-      QString m_spacecraftNameShort; //!< Shortened spacecraft name
-
 
       int PoolKeySize(const QString &key) const;
       IntParameterList GetVector(const QString &key);

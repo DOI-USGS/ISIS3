@@ -104,46 +104,6 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
-  
-  
-  /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString Chandrayaan1M3Camera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString Chandrayaan1M3Camera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString Chandrayaan1M3Camera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString Chandrayaan1M3Camera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 

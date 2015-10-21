@@ -163,46 +163,6 @@ namespace Isis {
     shuttertimes.second = time + (exposureDuration / 2);
     return shuttertimes;
   }
-  
-  
-  /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString LoHighCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString LoHighCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString LoHighCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString LoHighCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 

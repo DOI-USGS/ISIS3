@@ -27,6 +27,7 @@
 
 #include <QList>
 #include <QPointF>
+#include <QString>
 
 #include "AlphaCube.h"
 
@@ -209,6 +210,9 @@ namespace Isis {
    *                           intersection before attempting to map to surface. Fixes #2252.
    *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Modified unit test to override 
    *                           Sensor's pure virtual methods.
+   *   @history 2015-10-16 Ian Humphrey - Added protected members for spacecraft and instrument 
+   *                           names as well as public member getters. Updated unit test.
+   *                           References #2335.
    */
 
   class Camera : public Sensor {
@@ -280,6 +284,11 @@ namespace Isis {
       CameraDetectorMap *DetectorMap();
       CameraGroundMap *GroundMap();
       CameraSkyMap *SkyMap();
+      
+      QString instrumentNameLong() const;
+      QString instrumentNameShort() const;
+      QString spacecraftNameLong() const;
+      QString spacecraftNameShort() const;
 
       void SetDistortionMap(CameraDistortionMap *map);
       void SetFocalPlaneMap(CameraFocalPlaneMap *map);
@@ -428,6 +437,11 @@ namespace Isis {
 
 
     protected:
+      
+      QString m_instrumentNameLong; //!< Full instrument name
+      QString m_instrumentNameShort; //!< Shortened instrument name
+      QString m_spacecraftNameLong; //!< Full spacecraft name
+      QString m_spacecraftNameShort; //!< Shortened spacecraft name
 
       void SetFocalLength(double v);
       void SetPixelPitch(double v);

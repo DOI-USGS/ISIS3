@@ -144,47 +144,6 @@ namespace Isis {
     int DawnVirCamera::CkReferenceId() const { return (1); }
     /** Return PK reference frame */
     int DawnVirCamera::SpkReferenceId() const { return (1); }
-    
-    
-    /**
-     * This method returns the full instrument name.
-     *
-     * @return QString
-     */
-    QString DawnVirCamera::instrumentNameLong() const {
-      return m_instrumentNameLong;
-    }
-    
-    
-    /**
-     * This method returns the shortened instrument name.
-     *
-     * @return QString
-     */
-    QString DawnVirCamera::instrumentNameShort() const {
-      return m_instrumentNameShort;
-    }
-    
-    
-    /**
-     * This method returns the full spacecraft name.
-     * 
-     * @return QString
-     */
-    QString DawnVirCamera::spacecraftNameLong() const {
-      return m_spacecraftNameLong;
-    }
-    
-    
-    /**
-     * This method returns the shortened spacecraft name.
-     *
-     * @return QString
-     */
-    QString DawnVirCamera::spacecraftNameShort() const {
-      return m_spacecraftNameShort;
-    }
-    
 
    /**
     * @brief Scrubs a string coming out of the housekeeping table

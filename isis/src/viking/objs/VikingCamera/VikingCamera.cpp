@@ -239,46 +239,6 @@ namespace Isis {
     shuttertimes.second = shuttertimes.first.Et() + exposureDuration;
     return shuttertimes;
   }
-  
-  
-  /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString VikingCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString VikingCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString VikingCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString VikingCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 

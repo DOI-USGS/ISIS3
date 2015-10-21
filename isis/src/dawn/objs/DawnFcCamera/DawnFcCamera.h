@@ -22,8 +22,6 @@
 
 #include "FramingCamera.h"
 
-#include <QString>
-
 namespace Isis {
   /**
    * This is the camera model for the Dawn Framing Camera 
@@ -53,6 +51,9 @@ namespace Isis {
    *   @history 2015-10-01 Ian Humphrey and Makayla Shepherd - Modified check for determing 
    *                           the instrument name to also accept filter instrument kernal codes. 
    *                           References #2335.
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *                           members and methods and removed implementation of these methods
+   *                           since Camera now handles this. References #2335.
    */
   class DawnFcCamera : public FramingCamera {
     public:
@@ -85,17 +86,6 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
-      
-      virtual QString instrumentNameLong() const;
-      virtual QString instrumentNameShort() const;
-      virtual QString spacecraftNameLong() const;
-      virtual QString spacecraftNameShort() const;
-      
-    private:
-      QString m_instrumentNameLong; //!< Full instrument name
-      QString m_instrumentNameShort; //!< Shortened instrument name
-      QString m_spacecraftNameLong; //!< Full spacecraft name
-      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

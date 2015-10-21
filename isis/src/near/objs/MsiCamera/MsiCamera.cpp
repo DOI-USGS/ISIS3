@@ -165,46 +165,6 @@ namespace Isis {
    *         Kernel Reference ID
    */
   int MsiCamera::SpkReferenceId() const { return 1; }
-  
-  
-   /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString MsiCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString MsiCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString MsiCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString MsiCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 /**

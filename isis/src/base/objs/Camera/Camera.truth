@@ -1,4 +1,10 @@
 
+Testing Camera's spacecraft and instrument name methods...
+InstrumentNameLong: Unknown
+InstrumentNameShort: Unknown
+SpacecraftNameLong: Unknown
+SpacecraftNameShort: Unknown
+
 Camera* from: $mgs/testData/ab102401.lev2.cub
 Pixel Ifov: 
 -0.014 , -0.014

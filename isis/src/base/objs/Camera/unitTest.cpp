@@ -48,7 +48,8 @@ using namespace Isis;
  * @internal
  *   @history 2015-04-30 Jeannie Backer - Added call to GetLocalNormal() for cube ellipsoidal
  *                           (i.e. non-DEM) shape model. References #2243.
- *  
+ *   @history 2015-10-16 Ian Humphrey - Updated to test spacecraft and instrument name methods. 
+ *                           References #2335.
  *  
  *  
  *   testcoverage 2015-04-30 - 43.262% scope, 61.561% line, 87.5% function
@@ -76,10 +77,10 @@ class MyCamera : public Camera {
     virtual int CkReferenceId() const { return (1); }
     virtual int SpkReferenceId() const { return (1); }
     // These are pure virtual within Sensor that must be overriden
-    virtual QString instrumentNameLong() const { return QString("My Camera"); }
-    virtual QString instrumentNameShort() const { return QString("MyCam"); }
-    virtual QString spacecraftNameLong() const { return QString("My Camera 1"); }
-    virtual QString spacecraftNameShort() const { return QString("MyCam1"); }
+    QString instrumentNameLong() const { return m_instrumentNameLong; }
+    QString instrumentNameShort() const { return m_instrumentNameShort; }
+    QString spacecraftNameLong() const { return m_spacecraftNameLong; }
+    QString spacecraftNameShort() const { return m_spacecraftNameShort; }
 };
 
 int main() {
@@ -92,6 +93,11 @@ int main() {
     c = cube.camera();
     Pvl pvl = *cube.label();
     MyCamera cam(cube);
+    cout << endl << "Testing Camera's spacecraft and instrument name methods..." << endl;
+    cout << "InstrumentNameLong: " << cam.instrumentNameLong() << endl;
+    cout << "InstrumentNameShort: " << cam.instrumentNameShort() << endl;
+    cout << "SpacecraftNameLong: " << cam.spacecraftNameLong() << endl;
+    cout << "SpacecraftNameShort: " << cam.spacecraftNameShort() << endl;
     double line = 453.0;
     double sample = 534.0;
     Latitude lat(18.221, Angle::Degrees);

@@ -361,50 +361,6 @@ namespace Isis {
   int LroWideAngleCamera::SpkReferenceId() const {
     return (1);
   }
-  
-  
-  
-   /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString LroWideAngleCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString LroWideAngleCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString LroWideAngleCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString LroWideAngleCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 
