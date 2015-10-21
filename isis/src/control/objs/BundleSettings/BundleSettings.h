@@ -78,6 +78,8 @@ namespace Isis {
    *                           test code coverage is (scope 98.79%, line 98.698%, function 96.0%).
    *   @history 2015-09-03 Jeannie Backer - Changed a priori sigma defaults from -1.0 to Isis::Null.
    *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
+   *   @history 2015-10-14 Jeffrey Covington - Declared BundleSettingsQsp as a
+   *                           Qt metatype for use with QVariant.
    *  
    *   @todo Determine whether xml stuff needs a Project pointer
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
@@ -332,5 +334,8 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const BundleSettings &settings);
   QDataStream &operator>>(QDataStream &stream, BundleSettings &settings);
 };
+
+Q_DECLARE_METATYPE(Isis::BundleSettingsQsp);
+
 #endif
 

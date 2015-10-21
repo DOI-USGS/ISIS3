@@ -87,6 +87,8 @@ namespace Isis {
    *   @history 2015-09-03 Jeannie Backer - Removed svn merge conflict comment lines. Removed call
    *                           to save BundleSolutionInfo as an xml file. Added hdf5 preliminary
    *                           serialization calls. Some ISIS coding standards improvements.
+   *   @history 2015-10-14 Jeffrey Covington - Declared Project * as a Qt
+   *                           metatype for use with QVariant.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -324,5 +326,7 @@ namespace Isis {
 
   };
 }
+
+Q_DECLARE_METATYPE(Isis::Project *);
 
 #endif // Project_H

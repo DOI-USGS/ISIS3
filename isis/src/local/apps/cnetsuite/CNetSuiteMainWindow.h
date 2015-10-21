@@ -46,6 +46,10 @@ namespace Isis {
    *                          anyways before setting this flag, so it's an improvement. Example
    *                          change: If I close Footprint View 1, I'm no longer asked if I want
    *                          to view images in footprint view 1.
+   *   @history 2015-10-05 Jeffrey Covington - Replaced the ProjectTreeWidget
+   *                          with a ProjectItemTreeView. Added the
+   *                          eventFilter() method for intercepting some
+   *                          events from views.
    */
   class CNetSuiteMainWindow : public QMainWindow {
       Q_OBJECT
@@ -60,6 +64,7 @@ namespace Isis {
 
     protected:
       void closeEvent(QCloseEvent *event);
+      bool eventFilter(QObject *watched, QEvent *event);
 
     private slots:
       void configureThreadLimit();

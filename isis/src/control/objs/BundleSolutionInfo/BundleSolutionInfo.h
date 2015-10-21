@@ -59,6 +59,8 @@ namespace Isis {
    *                           operators and the read/write methods.
    *   @history 2014-12-04 Jeannie Backer - Renamed from BundleResults to BundleSolutionInfo.
    *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities.
+   *   @history 2015-10-14 Jeffrey Covington - Declared BundleSolutionInfo * as 
+   *                           a Qt metatype for use with QVariant.
    *  
    */
   class BundleSolutionInfo : public QObject {
@@ -154,4 +156,7 @@ namespace Isis {
                           QString attributeName, QString attributeValue);
   QString getStringAttribute(int locationId, QString locationName, QString attributeName);
 }; // end namespace Isis
+
+Q_DECLARE_METATYPE(Isis::BundleSolutionInfo *);
+
 #endif // BundleSolutionInfo_h

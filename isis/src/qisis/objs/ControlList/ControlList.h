@@ -25,6 +25,8 @@ namespace Isis {
    *
    * @internal 
    *   @history 2012-09-01 Tracie Sucharski - Original version. 
+   *   @history 2015-10-14 Jeffrey Covington - Declared ControlList * as a Qt
+   *                           metatype for use with QVariant.
    */
   class ControlList : public QObject, public QList<Control *> {
     Q_OBJECT
@@ -162,5 +164,7 @@ namespace Isis {
       QString m_path;
   };
 }
+
+Q_DECLARE_METATYPE(Isis::ControlList *);
 
 #endif

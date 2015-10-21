@@ -32,6 +32,9 @@
 // This is needed for the QVariant macro
 #include <QMetaType>
 
+#include "CorrelationMatrix.h"
+#include "GuiCamera.h"
+#include "TargetBody.h"
 #include "XmlStackedHandler.h"
 
 template<typename T> class QFutureWatcher;
@@ -40,13 +43,12 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class Control;
+  class ControlList;
   class Directory;
-  class GuiCamera;
   class ImageList;
-  class CorrelationMatrix;
   class ProgressBar;
   class Project;
-  class TargetBody;
+  class ProjectItem;
   class XmlStackedHandlerReader;
 
   /**
@@ -88,7 +90,9 @@ namespace Isis {
    *                           on MAC OS 10.8.2
    *   @history 2014-07-14 Kimberly Oyama - Added support for correlation matrix.
    *   @history 2015-06-12 Ken Edmundson - Added support for target body.
-   *
+   *   @history 2015-10-05 Jeffrey Covington - Added support for ProjectItem.
+   *                           Added new methods to support the types used by
+   *                           ProjectItem. Marked old methods as deprecated.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -116,20 +120,38 @@ namespace Isis {
       virtual ~WorkOrder();
 
       virtual WorkOrder *clone() const = 0;
+
       virtual bool isExecutable(Context);
-      virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(ImageList *images);
+      virtual bool isExecutable(ControlList *controls);
+      virtual bool isExecutable(CorrelationMatrix);
+      virtual bool isExecutable(TargetBodyQsp targetBody);
+      virtual bool isExecutable(GuiCameraQsp guiCamera);
+      virtual bool isExecutable(ProjectItem *item);
+
+      //Deprecated
+      virtual bool isExecutable(QList<Control *> controls);
       virtual bool isExecutable(CorrelationMatrix *correlationMatrix);
       virtual bool isExecutable(GuiCamera* guiCamera);
       virtual bool isExecutable(TargetBody* targetBody);
+
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
+
       virtual void setData(Context);
       virtual void setData(ImageList *images);
+      virtual void setData(ControlList *controls);
+      virtual void setData(CorrelationMatrix);
+      virtual void setData(TargetBodyQsp targetBody);
+      virtual void setData(GuiCameraQsp guiCamera);
+      virtual void setData(ProjectItem *item);
+
+      //Deprecated
       virtual void setData(QList<Control *> controls);
       virtual void setData(CorrelationMatrix *correlationMatrix);
       virtual void setData(GuiCamera *camera);
       virtual void setData(TargetBody *targetBody);
+
       void setNext(WorkOrder *nextWorkOrder);
       void setPrevious(WorkOrder *previousWorkOrder);
 
@@ -198,9 +220,9 @@ namespace Isis {
       
       QList<Control *> controlList();
 
-      TargetBody* targetBody();
+      TargetBodyQsp targetBody();
 
-      GuiCamera* guiCamera();
+      GuiCameraQsp guiCamera();
 
       virtual bool dependsOn(WorkOrder *other) const;
 
@@ -292,13 +314,19 @@ namespace Isis {
       int m_progressRangeMaxValue;
       int m_progressValue;
 
+
+
       Context m_context;
-      QStringList m_imageIds;
-      QPointer<ImageList> m_images;
-      CorrelationMatrix *m_correlationMatrix;
+      QPointer<ImageList> m_imageList;
+      QPointer<ControlList> m_controlList;
+      CorrelationMatrix m_correlationMatrix;
+      GuiCameraQsp m_guiCamera;
+      TargetBodyQsp m_targetBody;
+
+      //Deprecated.
       QList<Control *> m_controls;
-      GuiCamera* m_guiCamera;
-      TargetBody* m_targetBody;
+
+      QStringList m_imageIds;
       QStringList m_internalData;
       QPointer<WorkOrder> m_nextWorkOrder;
       QPointer<WorkOrder> m_previousWorkOrder;

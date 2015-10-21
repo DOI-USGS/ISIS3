@@ -64,6 +64,9 @@
 #include "OpenProjectWorkOrder.h"
 #include "OpenRecentProjectWorkOrder.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
+#include "ProjectItemTreeView.h"
 #include "ProjectTreeWidget.h"
 #include "RenameProjectWorkOrder.h"
 #include "SaveProjectWorkOrder.h"
@@ -113,6 +116,9 @@ namespace Isis {
 // 
 // >>>>>>> .r5959
     m_projectTreeWidget = new ProjectTreeWidget(this);
+
+    m_projectItemModel = new ProjectItemModel(this);
+    m_projectItemModel->addProject(m_project);
 
     try {
       createWorkOrder<CnetEditorViewWorkOrder>();
@@ -484,8 +490,8 @@ namespace Isis {
    *
    * @return TargetInfoWidget* The widget to view.
    */
-  TargetInfoWidget *Directory::addTargetInfoView(TargetBody *target) {
-    TargetInfoWidget *result = new TargetInfoWidget(target, this);
+  TargetInfoWidget *Directory::addTargetInfoView(TargetBodyQsp target) {
+    TargetInfoWidget *result = new TargetInfoWidget(target.data(), this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets() ) );
@@ -507,8 +513,8 @@ namespace Isis {
    *
    * @return SensorInfoWidget* The widget to view.
    */
-  SensorInfoWidget *Directory::addSensorInfoView(GuiCamera *camera) {
-    SensorInfoWidget *result = new SensorInfoWidget(camera, this);
+  SensorInfoWidget *Directory::addSensorInfoView(GuiCameraQsp camera) {
+    SensorInfoWidget *result = new SensorInfoWidget(camera.data(), this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupSensorInfoWidgets() ) );
@@ -576,6 +582,24 @@ namespace Isis {
     }
 
     updateControlNetEditConnections();
+  }
+
+
+  /**
+   * Adds a ProjectItemTreeView.
+   *
+   * @return (ProjectItemTreeView *) The added view.
+   */
+  ProjectItemTreeView *Directory::addProjectItemTreeView() {
+    ProjectItemTreeView *result = new ProjectItemTreeView(); 
+    result->setModel(m_projectItemModel);
+    
+    return result;
+  }
+  
+
+  ProjectItemModel *Directory::model() {
+    return m_projectItemModel;
   }
 
 

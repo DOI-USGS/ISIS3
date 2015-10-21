@@ -52,6 +52,9 @@ namespace Isis {
   class MosaicSceneWidget;
   class Project;
   class ProjectTreeWidget;
+  class ProjectItem;
+  class ProjectItemModel;
+  class ProjectItemTreeView;
   class SensorInfoWidget;
   class TargetBody;
   class TargetInfoWidget;
@@ -82,6 +85,9 @@ namespace Isis {
    *   @history 2012-10-03 Steven Lambright - Added 'All' option generation in restructureActions()
    *   @history 2014-07-14 Kimberly Oyama - Updated to better meet programming standards. Added
    *                           support for correlation matrix.
+   *   @history 2015-10-05 Jeffrey Covington - Added a ProjectItemModel and the
+   *                           addProjectItemTreeView() method to start
+   *                           supporting Qt's model-view framework.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -104,11 +110,15 @@ namespace Isis {
       Workspace *addCubeDnView();
       MosaicSceneWidget *addFootprint2DView();
       MatrixSceneWidget *addMatrixView();
-      TargetInfoWidget *addTargetInfoView(TargetBody *target);
-      SensorInfoWidget *addSensorInfoView(GuiCamera *camera);
+      TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
+      SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
       ImageFileListWidget *addImageFileListView();
       void addControlPointEditor(ControlNet *cnet, QString cnetFilename);
       QWidget *projectTreeWidget();
+
+      ProjectItemTreeView *addProjectItemTreeView();
+
+      ProjectItemModel *model();
 
       Project *project() const;
 
@@ -228,6 +238,8 @@ namespace Isis {
 
       static QList<QAction *> restructureActions(QList< QPair< QString, QList<QAction *> > >);
       static bool actionTextLessThan(QAction *lhs, QAction *rhs);
+
+      QPointer<ProjectItemModel> m_projectItemModel;
 
       QPointer<ProjectTreeWidget> m_projectTreeWidget;
       QPointer<HistoryTreeWidget> m_historyTreeWidget;

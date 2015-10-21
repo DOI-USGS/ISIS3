@@ -50,6 +50,8 @@ namespace Isis {
    *   @history 2012-08-02 Kimberly Oyama - Added comments to some of the methods and
    *                             member variables.
    *   @history 2012-09-11 Tracie Sucharski - Added new constructor that takes a ControlNet *. 
+   *   @history 2015-10-14 Jeffrey Covington - Declared Control * as a Qt
+   *                           metatype for use with QVariant.
    */
   class Control : public QObject {
     Q_OBJECT
@@ -109,5 +111,7 @@ namespace Isis {
       QUuid *m_id;
   };
 }
+
+Q_DECLARE_METATYPE(Isis::Control *);
 
 #endif // Control_H

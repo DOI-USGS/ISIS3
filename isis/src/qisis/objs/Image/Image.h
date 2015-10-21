@@ -74,6 +74,8 @@ namespace Isis {
    *                           methods to lower camel case. Fixed history
    *                           entry indentation. Added padding to control
    *                           statements. References #1169.
+   *   @history 2015-10-14 Jeffrey Covington - Declared Image * as a Qt
+   *                           metatype for use with QVariant.
    */
   class Image : public QObject {
     Q_OBJECT
@@ -200,5 +202,7 @@ namespace Isis {
   };
   // TODO: add QDataStream >> and << ???
 }
+
+Q_DECLARE_METATYPE(Isis::Image *);
 
 #endif

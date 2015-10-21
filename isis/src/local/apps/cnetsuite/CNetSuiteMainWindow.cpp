@@ -24,6 +24,7 @@
 
 #include <QtGui>
 #include <QSettings>
+#include <QTreeView>
 
 #include "Directory.h"
 #include "FileName.h"
@@ -32,6 +33,8 @@
 #include "MosaicSceneWidget.h"
 #include "ProgressWidget.h"
 #include "Project.h"
+#include "ProjectItemModel.h"
+#include "ProjectItemTreeView.h"
 #include "ProjectTreeWidget.h"
 #include "TargetInfoWidget.h"
 
@@ -101,7 +104,11 @@ namespace Isis {
     m_projectDock->setObjectName("projectDock");
     m_projectDock->setFeatures(QDockWidget::DockWidgetMovable |
                               QDockWidget::DockWidgetFloatable);
-    m_projectDock->setWidget(m_directory->projectTreeWidget());
+    //m_projectDock->setWidget(m_directory->projectTreeWidget());
+    ProjectItemTreeView *projectTreeView = m_directory->addProjectItemTreeView();
+    projectTreeView->setSourceModel( m_directory->model() );
+    projectTreeView->installEventFilter(this);
+    m_projectDock->setWidget(projectTreeView);
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
     QDockWidget *warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
@@ -144,6 +151,7 @@ namespace Isis {
     foreach (QProgressBar *progressBar, m_directory->progressBars()) {
       statusBar()->addWidget(progressBar);
     }
+    
   }
 
 
@@ -187,6 +195,59 @@ namespace Isis {
   CNetSuiteMainWindow::~CNetSuiteMainWindow() {
     delete m_directory;
   }
+
+  /**
+   * Filters out context menu events from views so they can be handled
+   * by the main window.
+   *
+   * @param[in] watched (QObject *) The object being filtered.
+   * @param[in] event (QEvent *) The event that may be filtered.
+   */
+  bool CNetSuiteMainWindow::eventFilter(QObject *watched, QEvent *event) {
+    if (event->type() == QEvent::DragEnter) {
+      return true;
+    }
+    else if (event->type() == QEvent::Drop) {
+      return true;
+    }
+    else if (event->type() == QEvent::ContextMenu) {
+
+      AbstractProjectItemView *view = qobject_cast<AbstractProjectItemView *>(watched);
+      if (view) {
+        QMenu contextMenu;
+
+        QList<QAction *> viewActions = view->contextMenuActions();
+
+        if ( !viewActions.isEmpty() ) {
+          foreach (QAction *action, viewActions) {
+            if (!action) {
+              contextMenu.addAction(action);
+            }
+            else {
+              contextMenu.addSeparator();
+            }
+          }
+          contextMenu.addSeparator();
+        }
+
+        QList<QAction *> workOrders = m_directory->supportedActions( view->currentItem() );
+
+        if ( !workOrders.isEmpty() ) {
+          foreach (QAction *action, workOrders) {
+            contextMenu.addAction(action);
+          }
+          contextMenu.addSeparator();
+        }
+
+        contextMenu.exec( static_cast<QContextMenuEvent *>(event)->globalPos() ); 
+
+        return true;
+      }
+    }
+
+    return QMainWindow::eventFilter(watched, event);
+  }
+
 
 
   /**

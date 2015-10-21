@@ -72,6 +72,8 @@ namespace Isis {
    *                           is used.
    *   @history 2015-09-03 Jeannie Backer - Added preliminary hdf5 read/write capabilities. Renamed
    *                           member variables to make names more descriptive.
+   *   @history 2015-10-14 Jeffrey Covington - Declared BundleResults as a Qt
+   *                           metatype for use with QVariant.
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -378,4 +380,7 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const BundleResults &bundleResults);
   QDataStream &operator>>(QDataStream &stream, BundleResults &bundleResults);
 };
+
+Q_DECLARE_METATYPE(Isis::BundleResults);
+
 #endif // BundleResults_h

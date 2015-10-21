@@ -36,6 +36,7 @@
 #include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
+#include "ProjectItem.h"
 #include "TargetBody.h"
 #include "XmlStackedHandlerReader.h"
 
@@ -50,6 +51,14 @@ namespace Isis {
   WorkOrder::WorkOrder(Project *project) : QAction(project) {
     m_project = project;
 
+    m_context = NoContext;
+    m_imageList = new ImageList;
+    m_controlList = NULL;
+    m_correlationMatrix = CorrelationMatrix();
+    m_guiCamera = GuiCameraQsp();
+    m_targetBody = TargetBodyQsp();
+
+
     m_createsCleanState = false;
     m_modifiesDiskState = false;
     m_status = WorkOrderNotStarted;
@@ -57,8 +66,6 @@ namespace Isis {
     m_transparentConstMutex = NULL;
     m_elapsedTimer = NULL;
 
-    m_context = NoContext;
-    m_images = new ImageList;
     m_futureWatcher = new QFutureWatcher<void>;
     m_transparentConstMutex = new QMutex;
 
@@ -81,7 +88,7 @@ namespace Isis {
 
 
   WorkOrder::~WorkOrder() {
-    delete m_images;
+    delete m_imageList;
     delete m_futureWatcher;
     delete m_progressBar;
     delete m_progressBarDeletionTimer;
@@ -110,7 +117,7 @@ namespace Isis {
 
     m_context = other.m_context;
     m_imageIds = other.m_imageIds;
-    m_images = new ImageList(*other.m_images);
+    m_imageList = new ImageList(*other.m_imageList);
     m_correlationMatrix = other.m_correlationMatrix;
     m_controls = other.m_controls;
     m_guiCamera = other.m_guiCamera;
@@ -160,19 +167,6 @@ namespace Isis {
     return false;
   }
 
-
-  /**
-   * Re-implement this method if your work order utilizes controls for data in order to operate. For
-   *   example, "CnetEditorViewWorkOrder" works sometimes on controls - the logic in side of
-   *   CnetEditorViewWorkOrder::isExecutable() determines whethere or not a user is
-   *   prompted with this work order as a possibility.
-   *
-   */
-  bool WorkOrder::isExecutable(QList<Control *> controls) {
-    return false;
-  }
-
-
   /**
    * Re-implement this method if your work order utilizes images for data in order to operate. For
    *   example, "Footprint2DViewWorkOrder" works sometimes on images - the logic in side of
@@ -185,8 +179,90 @@ namespace Isis {
     return false;
   }
 
+  
   /**
-   * 
+   *
+   */
+  bool WorkOrder::isExecutable(ControlList *controls) {
+    return false;
+  }
+
+
+  /**
+   *
+   */
+  bool WorkOrder::isExecutable(CorrelationMatrix) {
+    return false;
+  }
+
+
+  /**
+   *
+   */
+  bool WorkOrder::isExecutable(TargetBodyQsp targetBody) {
+    return false;
+  }
+
+
+  /**
+   *
+   */
+  bool WorkOrder::isExecutable(GuiCameraQsp guiCamera) {
+    return false;
+  }
+
+
+  /**
+   * Returns if the WorkOrder is execuatable on the data stored in
+   * a ProjectItem.
+   *
+   * @param[in] item (ProjectItem *) The item containing the data.
+   *
+   * @return (bool) Whether the WorkOrder is executable on the data.
+   */
+  bool WorkOrder::isExecutable(ProjectItem *item) {
+    if ( !item ) {
+      return false;
+    }
+    else if ( item->isProject() ) {
+      return isExecutable( ProjectContext );
+    }
+    else if ( item->isImageList() ) {
+      return isExecutable( item->imageList() );
+    }
+    else if ( item->isControlList() ) {
+      return isExecutable( item->controlList() ) || isExecutable( *item->controlList() );
+    }
+    else if ( item->isCorrelationMatrix() ) {
+      return isExecutable( item->correlationMatrix() );
+    }
+    else if ( item->isTargetBody() ) {
+      return isExecutable( item->targetBody() ) || isExecutable( item->targetBody().data() );
+    }
+    else if ( item->isGuiCamera() ) {
+      return isExecutable( item->guiCamera() ) || isExecutable( item->guiCamera().data() );
+    }
+ 
+    return false;
+  }
+
+
+  /**
+   * Deprecated.
+   *
+   * Re-implement this method if your work order utilizes controls for data in order to operate. For
+   *   example, "CnetEditorViewWorkOrder" works sometimes on controls - the logic in side of
+   *   CnetEditorViewWorkOrder::isExecutable() determines whethere or not a user is
+   *   prompted with this work order as a possibility.
+   *
+   */
+  bool WorkOrder::isExecutable(QList<Control *> controls) {
+    return false;
+  }
+
+
+  /**
+   * Deprecated.
    *
    * @param 
    */
@@ -196,7 +272,7 @@ namespace Isis {
 
 
   /**
-   *
+   * Deprecated.
    *
    * @param
    */
@@ -206,7 +282,7 @@ namespace Isis {
 
 
   /**
-   *
+   * Deprecated.
    *
    * @param
    */
@@ -291,37 +367,115 @@ namespace Isis {
   }
 
 
+  /**
+   *
+   */
   void WorkOrder::setData(Context context) {
     m_context = context;
   }
 
 
+  /**
+   *
+   */
   void WorkOrder::setData(ImageList *images) {
     m_imageIds.clear();
-    delete m_images;
+    delete m_imageList;
 
-    m_images = new ImageList(*images);
+    m_imageList = new ImageList(*images);
     listenForImageDestruction();
   }
 
 
+  /**
+   *
+   */
+  void WorkOrder::setData(ControlList *controls) {
+    m_controlList = controls;
+  }
+
+
+  /**
+   *
+   */
+  void WorkOrder::setData(CorrelationMatrix correlationMatrix) {
+    m_correlationMatrix = correlationMatrix;
+  }
+
+
+  /**
+   *
+   */
+  void WorkOrder::setData(TargetBodyQsp targetBody) {
+    m_targetBody = targetBody;
+  }
+
+
+  /**
+   *
+   */
+  void WorkOrder::setData(GuiCameraQsp guiCamera) {
+    m_guiCamera = guiCamera;
+  }
+
+
+  /**
+   * Sets the internal data to the data stored in a ProjectItem.
+   *
+   * @param item (ProjectItem *) The item containing the data.
+   */
+  void WorkOrder::setData(ProjectItem *item) {
+    if ( item->isProject() ) {
+      setData( ProjectContext );
+    }
+    else if ( item->isImageList() ) {
+      setData( item->imageList() );
+    }
+    else if ( item->isControlList() ) {
+      setData( item->controlList() );
+      setData( *item->controlList() );
+    }
+    else if ( item->isCorrelationMatrix() ) {
+      setData( item->correlationMatrix() );
+    }
+    else if ( item->isTargetBody() ) {
+      setData( item->targetBody() );
+    }
+    else if ( item->isGuiCamera() ) {
+      setData( item->guiCamera() );
+    }
+  }
+
+
+  /**
+   * Deprecated.
+   */
   void WorkOrder::setData(QList<Control *> controls) {
     m_controls = controls;
   }
 
 
+  /**
+   * Deprecated.
+   */
   void WorkOrder::setData(CorrelationMatrix *correlationMatrix) {
-    m_correlationMatrix = correlationMatrix;
+    m_correlationMatrix = *correlationMatrix;
   }
 
 
+  /**
+   * Deprecated.
+   */
   void WorkOrder::setData(GuiCamera *guiCamera) {
-    m_guiCamera = guiCamera;
+    m_guiCamera = GuiCameraQsp(guiCamera);
   }
 
 
+  /**
+   * Deprecated.
+   */
   void WorkOrder::setData(TargetBody *targetBody) {
-    m_targetBody = targetBody;
+    m_targetBody = TargetBodyQsp(targetBody);
   }
 
 
@@ -336,14 +490,14 @@ namespace Isis {
 
 
   ImageList *WorkOrder::imageList() {
-    if (!m_images) {
+    if (!m_imageList) {
       bool anyImagesAreNull = false;
 
-      m_images = new ImageList;
+      m_imageList = new ImageList;
 
       foreach (QString id, m_imageIds) {
         Image *image = project()->image(id);
-        m_images->append(image);
+        m_imageList->append(image);
 
         if (!image) {
           anyImagesAreNull = true;
@@ -351,19 +505,19 @@ namespace Isis {
       }
 
       if (anyImagesAreNull) {
-        delete m_images;
+        delete m_imageList;
       }
       else {
         listenForImageDestruction();
       }
     }
 
-    return m_images;
+    return m_imageList;
   }
 
 
   CorrelationMatrix WorkOrder::correlationMatrix() {
-    return *m_correlationMatrix;
+    return m_correlationMatrix;
   }
 
 
@@ -378,12 +532,12 @@ namespace Isis {
   }
 
 
-  TargetBody* WorkOrder::targetBody() {
+  TargetBodyQsp WorkOrder::targetBody() {
     return m_targetBody;
   }
 
 
-  GuiCamera* WorkOrder::guiCamera() {
+  GuiCameraQsp WorkOrder::guiCamera() {
     return m_guiCamera;
   }
 
@@ -894,7 +1048,7 @@ namespace Isis {
 
   void WorkOrder::listenForImageDestruction() {
     m_imageIds.clear();
-    foreach (Image *image, *m_images) {
+    foreach (Image *image, *m_imageList) {
       if (image) {
         m_imageIds.append(image->id());
 
@@ -1000,7 +1154,7 @@ namespace Isis {
 
 
   void WorkOrder::clearImageList() {
-    delete m_images;
+    delete m_imageList;
   }
 
 

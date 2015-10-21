@@ -65,6 +65,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-06-23 Ken Edmundson - Original version.
+   *   @history 2015-10-14 Jeffrey Covington - Declared GuiCameraQsp as a Qt
+   *                           metatype for use with QVariant.
    *  
    */
   class GuiCamera : public QObject {
@@ -174,4 +176,7 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const GuiCamera &GuiCamera);
   QDataStream &operator>>(QDataStream &stream, GuiCamera &GuiCamera);
 };
+
+Q_DECLARE_METATYPE(Isis::GuiCameraQsp);
+
 #endif // GuiCamera_h

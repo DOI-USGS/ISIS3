@@ -66,6 +66,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-06-08 Ken Edmundson - Original version.
+   *   @history 2015-10-14 Jeffrey Covington - Declared TargetBodyQsp as a Qt
+   *                           metatype for use with QVariant.
    *  
    */
   class TargetBody : public QObject {
@@ -214,4 +216,7 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const TargetBody &TargetBody);
   QDataStream &operator>>(QDataStream &stream, TargetBody &TargetBody);
 };
+
+Q_DECLARE_METATYPE(Isis::TargetBodyQsp);
+
 #endif // TargetBody_h

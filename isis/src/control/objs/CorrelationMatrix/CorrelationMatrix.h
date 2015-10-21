@@ -54,6 +54,8 @@ namespace Isis {
    *   @history 2014-07-23 Jeannie Backer - Added QDataStream >> and << operators and read/write
    *                           methods. Created unitTest. Added new operators to assignments in
    *                           copy constructor and operator= methods.
+   *   @history 2015-10-14 Jeffrey Covington - Declared CorrelationMatrix as a
+   *                           Qt metatype for use with QVariant.
    */
   class CorrelationMatrix {
     public:
@@ -121,5 +123,7 @@ namespace Isis {
   QDataStream &operator<<(QDataStream &stream, const CorrelationMatrix &matrix);
   QDataStream &operator>>(QDataStream &stream, CorrelationMatrix &matrix);
 };
+
+Q_DECLARE_METATYPE(Isis::CorrelationMatrix);
 
 #endif
