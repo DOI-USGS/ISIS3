@@ -288,7 +288,7 @@ void IsisMain() {
       inputLabels = FileName::createTempFile( ui.GetFileName("TEMPFILE") );
       label.write( inputLabels.expanded() );
       Cube cube;
-      cube.open(inputLabels.expanded(), "r");
+      cube.open(inputLabels.expanded(), "rw");
       kernelSuccess = tryKernels(cube, label, p, lk, pck, targetSpk,
                                  realCkKernel, fk, ik, sclk, spk,
                                  iak, dem, exk);

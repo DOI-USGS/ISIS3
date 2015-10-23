@@ -758,6 +758,16 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
+    try {
+      Cube externalData;
+      externalData.setDimensions(1024, 1024, 1);
+      externalData.create("IsisCube_06");
+      externalData.reopen("r");
+      externalData.putGroup(PvlGroup("TestGroup2"));
+    }
+    catch (IException &e) {
+      e.print();
+    }
   }
   catch (IException &e) {
     e.print();
@@ -823,8 +833,9 @@ int main(int argc, char *argv[]) {
   cerr << endl << "Test reading an ecub" << endl;
   {
     Cube externalData;
-    externalData.open("isisTruth_external");
+    externalData.open("isisTruth_external", "rw");
     externalData.putGroup(PvlGroup("TestGroup2"));
+    externalData.reopen("r");
     cerr << *externalData.label() << endl;
 
     Brick readBrick(3, 3, 2, externalData.pixelType());
@@ -944,6 +955,7 @@ int main(int argc, char *argv[]) {
   remove("IsisCube_03.cub");
   remove("IsisCube_04.cub");
   remove("IsisCube_05.cub");
+  remove("IsisCube_06.cub");
   remove("IsisCube_boundary.cub");
   remove("IsisCube_bsq.cub");
   remove("IsisCube_bsqOneLine.cub");

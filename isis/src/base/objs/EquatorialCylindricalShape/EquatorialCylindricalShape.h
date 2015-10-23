@@ -31,17 +31,22 @@ namespace Isis {
    * @brief Define shapes and provide utilities for shapes stored as Isis3 EquatorialCylindrical map
    *
    * This class will define shapes of Isis3 target bodies with the shape defined by an 
-   * EquatorialCylindrical map, as well as provide utilities to retrieve radii and
-   * photometric information for the intersection point.
+   * EquatorialCylindrical map, as well as provide utilities to retrieve radii and photometric 
+   * information for the intersection point.
    *
    * @author 2010-07-30 Debbie A. Cook
    *
    * @internal
-   *  @history 2012-12-19 Debbie A. Cook Added a check for an invalid radius in
-   *                          the intersectSurface method, that was causing applications to
-   *                          hang.  Also return a false if no ellipsoid itersection is found.
-   *  @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
-   *                          were signaled. References #2248.
+   *   @history 2012-12-19 Debbie A. Cook Added a check for an invalid radius in the
+   *                           intersectSurface() method, that was causing applications to hang.
+   *                           Also return a false if no ellipsoid itersection is found.
+   *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
+   *                           were signaled. References #2248.
+   *   @history 2015-10-01 Jeannie Backer - Made improvements to documentation and brought code
+   *                           closer to ISIS coding standards. Removed check for ellipsoid
+   *                           intersection in intersectSurface() method to prevent early return
+   *                           and attempt the iterative method even when the ellipsoid is not
+   *                           intersected. Fixes #1438
    */
   class EquatorialCylindricalShape : public DemShape {
     public:

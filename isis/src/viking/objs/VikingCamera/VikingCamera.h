@@ -24,8 +24,6 @@
 
 #include "FramingCamera.h"
 
-#include <QString>
-
 namespace Isis {
   /**
    * @brief Viking Camera Model
@@ -66,7 +64,9 @@ namespace Isis {
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods and added data for Viking1 VISA, Viking1 VISB, and
    *                           Viking2 VISA.
-   *  
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *                           members and methods and removed implementation of these methods
+   *                           since Camera now handles this. References #2335.
    */
   class VikingCamera : public FramingCamera {
     public:
@@ -116,19 +116,10 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (2); }
-      
-      virtual QString instrumentNameLong() const;
-      virtual QString instrumentNameShort() const;
-      virtual QString spacecraftNameLong() const;
-      virtual QString spacecraftNameShort() const;
 
     private:
       int p_ckFrameId;       //!< "Camera-matrix" Kernel Frame ID
       int p_spkTargetId;     //!< Spacecraft Kernel Target ID
-      QString m_instrumentNameLong; //!< Full instrument name
-      QString m_instrumentNameShort; //!< Shortened instrument name
-      QString m_spacecraftNameLong; //!< Full spacecraft name
-      QString m_spacecraftNameShort; //!< Shortened spacecraft name
   };
 };
 #endif

@@ -34,12 +34,19 @@ using namespace std;
 namespace Isis {
 
   /**
-   * This constructor creates a new table using the given name and record. The 
-   * Table::Association is set to None, the ByteOrder keyword in the labels is
-   * set to NULL, and the record information is added to the table. 
+   * This constructor creates a new table using the given name and record. 
    *  
-   * This constructor also calls the parent constructor 
-   * Blob(tableName, "Table").
+   * Note that the record is not added to this table.  It is used to read the 
+   * TableField names and set the record size (i.e. the number of bytes per 
+   * record). Thus any records added to this table will be required to match 
+   * this size. 
+   *  
+   * In this constructor, the Table::Association is set to None, the ByteOrder
+   * keyword in the labels is set to NULL, and the record information is added 
+   * to the table. 
+   *  
+   * This constructor also calls the parent constructor Blob(tableName, 
+   * "Table"). 
    *
    * @param tableName Name of the Table to be read
    * @param rec Name of the TableRecord to be read into the Table
@@ -259,26 +266,13 @@ namespace Isis {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    // TODO: Determine why this error message causes mapmos to fail.  
-    // The call comes from ProcessMapMosaic::StartProcess >>
-    // ProcessMosaic::StartProcess when the InputImages table is
-    // being filled  (see ProcessMosaic lines 704 - 732)
-    // if (RecordSize() != rec.RecordSize()) {
-    // IString msg = "Unable to add the given record with size = [" 
-    //               + IString(rec.RecordSize()) + " bytes] to to Isis Table [" 
-    //               + p_blobName + "] with record size = [" 
-    //               + IString(RecordSize()) + " bytes]. Record sizes must match.";
-    //   throw IException(IException::Unknown, msg, _FILEINFO_);
-    // }
-    // Temporary substitution?
-    if (RecordSize() < rec.RecordSize()) {
-      QString msg = "Unable to add the given record with size = [" 
-                    + toString(rec.RecordSize()) + " bytes] to to Isis Table [" 
-                    + p_blobName + "] with record size = [" 
-                    + toString(RecordSize()) + " bytes]. Added record size can "
-                    "not exceed table record size.";
-      throw IException(IException::Unknown, msg, _FILEINFO_);
-    }
+     if (RecordSize() != rec.RecordSize()) {
+       QString msg = "Unable to add the given record with size = [" 
+                     + Isis::toString(rec.RecordSize()) + " bytes] to to Isis Table [" 
+                     + p_blobName + "] with record size = [" 
+                     + Isis::toString(RecordSize()) + " bytes]. Record sizes must match.";
+       throw IException(IException::Unknown, msg, _FILEINFO_);
+     }
     char *newbuf = new char[RecordSize()];
     rec.Pack(newbuf);
     p_recbufs.push_back(newbuf);
@@ -359,7 +353,7 @@ namespace Isis {
                         (streampos)(rec * RecordSize());
       stream.seekg(sbyte, std::ios::beg);
       if (!stream.good()) {
-        QString msg = "Error preparing to read record [" + toString(rec + 1) +
+        QString msg = "Error preparing to read record [" + Isis::toString(rec + 1) + 
                      "] from Table [" + p_blobName + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -367,7 +361,7 @@ namespace Isis {
       char *buf = new char[RecordSize()];
       stream.read(buf, RecordSize());
       if (!stream.good()) {
-        QString msg = "Error reading record [" + toString(rec + 1) +
+        QString msg = "Error reading record [" + Isis::toString(rec + 1) + 
                       "] from Table [" + p_blobName + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -379,7 +373,7 @@ namespace Isis {
 
   //! Virtual Function to prepare labels for writing
   void Table::WriteInit() {
-    p_blobPvl["Records"] = toString(Records());
+    p_blobPvl["Records"] = Isis::toString(Records());
     p_nbytes = Records() * RecordSize();
 
     if (Isis::IsLsb()) {
@@ -412,6 +406,18 @@ namespace Isis {
     for (int rec = 0; rec < Records(); rec++) {
       os.write(p_recbufs[rec], RecordSize());
     }
+  }
+
+
+  QString Table::toString(Table table, QString fieldDelimiter) {
+    QString tableValues;
+    // add the first record with header, the given delimiter, and a new line after each record
+    tableValues += TableRecord::toString(table[0], fieldDelimiter, true, true);
+    // add remaining records without header, the same delimeter, and new line after each record
+    for (int recordIndex = 1; recordIndex < table.Records(); recordIndex++) {
+      tableValues += TableRecord::toString(table[recordIndex], fieldDelimiter);
+    }
+    return tableValues;
   }
 
 }

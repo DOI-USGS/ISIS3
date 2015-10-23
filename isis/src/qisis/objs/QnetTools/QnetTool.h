@@ -225,6 +225,8 @@ namespace Isis {
    *                           measureSaved() so that when the user selects no on the dialog box 
    *                           when changing the reference, the action is properly canceled (as 
    *                           intended). Fixes #2172.
+   *   @history 2015-10-07 Ian Humphrey - Updated icons and icons are no longer embedded as per
+   *                           licensing terms. Fixes #1041.
    *                           
    */
   class QnetTool : public Tool {

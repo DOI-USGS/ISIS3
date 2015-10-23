@@ -81,6 +81,8 @@ namespace Isis {
    *   @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange
    *                           function
    *   @history 2011-06-13 Ken Edmundson - Added Rms method.
+  *    @history 2015-09-01 Tyler Wilson - Made SetValidRange and the destructor virtual.  
+  *                                       See Ref #2188.
    *   @history 2011-06-23 Jeannie Backer - Added QDataStream read(), write() methods and added
    *                           QDataStream >> and << operators. Replaced std strings with QStrings.
    *   @history 2014-09-05 Jeannie Backer - Added xml read/write capabilities.  Moved method
@@ -101,7 +103,7 @@ namespace Isis {
       Statistics(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);   
       // TODO: does xml read/write stuff need Project input???
       Statistics(const Statistics &other);
-      ~Statistics();
+      virtual ~Statistics();
       Statistics &operator=(const Statistics &other);
 
       void Reset();
@@ -112,7 +114,7 @@ namespace Isis {
       void RemoveData(const double *data, const unsigned int count);
       void RemoveData(const double data);
 
-      void SetValidRange(const double minimum = Isis::ValidMinimum, 
+      void SetValidRange(const double minimum = Isis::ValidMinimum,
                          const double maximum = Isis::ValidMaximum);
 
       double ValidMinimum() const;

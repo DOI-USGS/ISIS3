@@ -95,7 +95,7 @@ void IsisMain() {
       hist = new Histogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
     }
     catch (IException &e) {
-      QString msg = "The follwoing error was thrown while building a histogram from netfile [" + 
+      QString msg = "The following error was thrown while building a histogram from netfile [" + 
                     fList[i].expanded() + "]: " +e.toString() + "\n";
       if (ui.IsInteractive())  //if in gui mode print the error message to the terminal
         Application::GuiLog(msg);

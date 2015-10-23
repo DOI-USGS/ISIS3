@@ -205,46 +205,6 @@ namespace Isis {
   double CrismCamera::getEtTime(const QString &sclk) {
     return (getClockTime(sclk, -74999).Et());
   }
-
-  
-   /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString CrismCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString CrismCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString CrismCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString CrismCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 

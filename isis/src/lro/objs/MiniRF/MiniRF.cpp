@@ -208,46 +208,6 @@ namespace Isis {
     std::string msg = "Cannot generate CK for MiniRF";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
-  
-   /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString MiniRF::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString MiniRF::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString MiniRF::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString MiniRF::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 /**

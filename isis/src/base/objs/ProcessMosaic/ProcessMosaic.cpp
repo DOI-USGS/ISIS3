@@ -655,17 +655,19 @@ namespace Isis {
    * @author Sharmila Prasad (8/28/2009)
    */
   void ProcessMosaic::SetMosaicOrigin(int &index) {
-    // Get only the file name
-    QString sInputFile = FileName(InputCubes[0]->fileName()).name();
-    QString sTableName = TRACKING_TABLE_NAME;
+    // Get the name of the file to be added
+    QString inputFileName   = FileName(InputCubes[0]->fileName()).name();
+    QString tableName       = TRACKING_TABLE_NAME;
+    int inputFileNameLength = inputFileName.length();
 
     // Get the serial number
-    QString sSerialNumber = SerialNumber::Compose(*(InputCubes[0]));
-    int iFileNameLen  = sInputFile.length();
-    int iSerialNumLen = sSerialNumber.length();
-    int iFieldLength = iSerialNumLen;
-    if (iFileNameLen > iSerialNumLen) {
-      iFieldLength = iFileNameLen;
+    QString inputFileSerialNumber   = SerialNumber::Compose(*(InputCubes[0]));
+    int inputFileSerialNumberLength = inputFileSerialNumber.length();
+
+    // the fields will be equal length, so choose the larger value
+    int fieldLength = inputFileSerialNumberLength;
+    if (inputFileNameLength > inputFileSerialNumberLength) {
+      fieldLength = inputFileNameLength;
     }
 
     // Get output file name
@@ -677,59 +679,56 @@ namespace Isis {
     TableRecord cFileRecord;
 
     // Populate with File Name
-    TableField cFileField("FileName", TableField::Text, iFieldLength);
-    cFileField = sInputFile;
+    TableField cFileField("FileName", TableField::Text, fieldLength);
+    cFileField = inputFileName;
     cFileRecord += cFileField;
 
     // Populate with Serial Number
-    TableField cSNField("SerialNumber", TableField::Text, iFieldLength);
-    cSNField = sSerialNumber;
+    TableField cSNField("SerialNumber", TableField::Text, fieldLength);
+    cSNField = inputFileSerialNumber;
     cFileRecord += cSNField;
 
     int iNumObjs = cPvlOut->objects();
     PvlObject cPvlObj;
 
-    // Check if the Table exists
+    // Check if a Table exists in the mosaic cube
     if (cPvlOut->hasObject("Table")) {
       for (int i = 0; i < iNumObjs; i++) {
         cPvlObj = cPvlOut->object(i);
         if (cPvlObj.hasKeyword("Name", Pvl::Traverse)) {
           PvlKeyword cNameKey = cPvlObj.findKeyword("Name", Pvl::Traverse);
-          if (cNameKey[0] == sTableName) {
-            PvlKeyword cFieldKey = cPvlObj.findGroup("Field").findKeyword("Size");
+          if (cNameKey[0] == tableName) {
+            int existingTableFieldLength = toInt(QString(cPvlObj.findGroup("Field")
+                                                         .findKeyword("Size")));
 
             //set the tracker flag to true as the tracking table exists
             m_trackingEnabled = true;
 
             // Create a new blank table
-            Table cFileTable(sTableName);
+            Table cFileTable(tableName);
 
             // Read and make a copy of the existing tracking table
-            Table cFileTable_Copy = Table(sTableName);
+            Table cFileTable_Copy = Table(tableName);
             OutputCubes[0]->read(cFileTable_Copy);
-
             // Records count
-            int iRecs = cFileTable_Copy.Records();
+            int existingTableRecords = cFileTable_Copy.Records();
 
             // Check if the image index can be accomadated in the pixel size
             bool bFull = false;
             switch (sizeof(OutputCubes[0]->pixelType())) {
               case 1:
                 // Index is 1 based as 0=Null invalid value
-                if (iRecs >= (VALID_MAX1 - 1))
-                  bFull = true;
+                if (existingTableRecords >= (VALID_MAX1 - 1)) bFull = true;
                 break;
               case 2:
                 // Signed 16bits with some special pixels
-                if (iRecs > (VALID_MAX2 - VALID_MIN2 + 1))
-                  bFull = true;
+                if (existingTableRecords > (VALID_MAX2 - VALID_MIN2 + 1)) bFull = true;
                 break;
 
               case 4:
                 // Max float mantissa
-                if (iRecs > (FLOAT_STORE_INT_PRECISELY_MAX_VALUE -
-                             FLOAT_STORE_INT_PRECISELY_MIN_VALUE + 1))
-                  bFull = true;
+                if (existingTableRecords > (FLOAT_STORE_INT_PRECISELY_MAX_VALUE -
+                                            FLOAT_STORE_INT_PRECISELY_MIN_VALUE + 1)) bFull = true;
                 break;
             }
 
@@ -738,7 +737,7 @@ namespace Isis {
               throw IException(IException::Programmer, msg, _FILEINFO_);
             }
 
-            for (int i = 0; i < iRecs; i++) {
+            for (int i = 0;i < existingTableRecords;i++) {
               // Get the file name and trim out the characters filled due to resizing
               QString sTableFile = QString(QString(cFileTable_Copy[i][0]).toAscii().data());
               int found = sTableFile.lastIndexOf(".cub");
@@ -747,52 +746,77 @@ namespace Isis {
                 sTableFile.remove(found + 4);
               }
 
-              if (sTableFile == sInputFile) {
+              if (sTableFile == inputFileName) {
                 index += i;
                 return;
               }
 
-              // To initialize the new table, on the first file name comparison, check the size of
-              // the existing table record with the size of the new record being added
-              if (!i) {
-                if (toInt(QString(cFieldKey[0])) < iFieldLength) {
-                  TableRecord cFileRecordUpdate;
-                  TableField cFileFieldUpdate("FileName", TableField::Text, iFieldLength);
-                  cFileFieldUpdate = (QString)cFileTable_Copy[i][0];
-                  cFileRecordUpdate += cFileFieldUpdate;
 
-                  // Populate with Serial Number
-                  TableField cSNFieldUpdate("SerialNumber", TableField::Text, iFieldLength);
-                  cSNFieldUpdate = (QString)cFileTable_Copy[i][1];
-                  cFileRecordUpdate += cSNFieldUpdate;
-                  // add new record and set the size for all the other records
-                  cFileTable = Table(sTableName, cFileRecordUpdate);
-                }
-                else {
-                  cFileTable = Table(sTableName, cFileTable_Copy[i]);
-                }
+              // compare the length of the fields in the current table to the length of the fields
+              // in the record to be added to the table, then create the new record to be added
+              TableRecord record;
+              if (existingTableFieldLength < fieldLength) {
+                // if the new field length is larger, create the new record to be added
+                // from the updated field size (i.e. resize each record in the exisiting
+                // table)
+                TableField  cFileFieldUpdate("FileName", TableField::Text, fieldLength);
+                cFileFieldUpdate  = (QString)cFileTable_Copy[i][0];
+                record += cFileFieldUpdate;
+
+                // Populate with Serial Number
+                TableField cSNFieldUpdate("SerialNumber", TableField::Text, fieldLength);
+                cSNFieldUpdate = (QString)cFileTable_Copy[i][1];
+                record += cSNFieldUpdate;
               }
-
-              // Add the existing records into the new table
-              cFileTable += cFileTable_Copy[i]; // what if record size was resized above??? new record does not match table record size
+              else {
+                // otherwise, keep the original record size
+                record = cFileTable_Copy[i];
+              }
+              
+              // if this is the first record, initialize the new table with by adding the record
+              // created above (this will also set the appropriate record size)
+              if (i == 0) {
+                cFileTable = Table(tableName, record);
+                cFileTable += record;
+              }
+              else {
+                // Add all other records from the existing table into the new table
+                cFileTable += record;
+              }
             }
             // Get the current image file index
-            index += iRecs;
+            index += existingTableRecords;
 
-            // Add the current input image record to the new table
-            cFileTable +=  cFileRecord;
+            // if we kept the original table record size and this record is smaller, then we
+            // need to resize
+            if (cFileRecord.RecordSize() < cFileTable.RecordSize()) { // fieldLength < existingTableFieldLength
+              TableRecord updateNewRecord;
+              TableField  cFileFieldUpdate("FileName", TableField::Text, existingTableFieldLength);
+              cFileFieldUpdate = (QString)cFileRecord[0];
+              updateNewRecord += cFileFieldUpdate;
+
+              // Populate with Serial Number
+              TableField cSNFieldUpdate("SerialNumber", TableField::Text, existingTableFieldLength);
+              cSNFieldUpdate = (QString)cFileRecord[1];
+              updateNewRecord += cSNFieldUpdate;
+              cFileTable +=  updateNewRecord;
+            }
+            else {
+              // Add the current input image record to the new table
+              cFileTable +=  cFileRecord;
+            }
 
             // Copy the new table to the output Mosaic
             OutputCubes[0]->write(cFileTable);
             break;   //break while loop
           }
         }
-      }//end for loop
+      } //end for loop
     }
 
     //creating new table if track flag is true
     if (m_createOutputMosaic && m_trackingEnabled) {
-      Table cFileTable(sTableName, cFileRecord);
+      Table cFileTable(tableName, cFileRecord);
       cFileTable += cFileRecord;
       OutputCubes[0]->write(cFileTable);
       //reset the origin band based on pixel type

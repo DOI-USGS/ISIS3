@@ -22,19 +22,20 @@
  */
 #include "Histogram.h"
 
-#include <string>
-#include <iostream>
-#include <stdio.h>
-
 #include "Brick.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "Message.h"
 #include "LineManager.h"
+#include "Message.h"
+
+#include <iostream>
 #include <math.h>
+#include <stdio.h>
+#include <string>
 
 using namespace std;
+
 namespace Isis {
 
   /**
@@ -46,8 +47,9 @@ namespace Isis {
    * @param nbins The number of bins to use
    */
   Histogram::Histogram(double minimum, double maximum, int nbins) {
+
     SetValidRange(minimum, maximum);
-    SetBinRange(minimum, maximum);
+    //SetBinRange(minimum, maximum);
     SetBins(nbins);
   }
 
@@ -77,6 +79,7 @@ namespace Isis {
       double startSample, double startLine,
       double endSample, double endLine,
       int bins, bool addCubeData) {
+
     InitializeFromCube(cube, statsBand, progress, bins, startSample, startLine,
                        endSample, endLine);
 
@@ -115,15 +118,16 @@ namespace Isis {
 
 
   /**
-   * Constructs a histogram from a control netowrk 
+   * Constructs a histogram from a control netowrk
    *
-   * @param net  reference to a ControlNetwork used to access all the measures
-   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
-   * @param bins   the number of bins to divide the histogram into
-   * @throws The number of Histogram Bins must be greater than 0
+   * @param net: Reference to a ControlNetwork used to access all the measures.
+   * @param statFunc: Pointer to a ControlMeasure acessor, the returns of this
+   *    function call will be used to build up the network.
+   * @param bins:  The number of bins to divide the histogram into.
+   * @throws The number of Histogram Bins must be greater than 0.
    */
   Histogram::Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, int bins) {
-    
+
     //check to make sure we have a reasonable number of bins
     if (bins < 1) {
       string msg = "The number of Histogram Bins must be greater than 0";
@@ -140,15 +144,17 @@ namespace Isis {
 
 
   /**
-   * Constructs a histogram from a control netowrk 
+   * Constructs a histogram from a control netowrk
    *
-   * @param net  reference to a ControlNetwork used to access all the measures
-   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
-   * @param binWidth   the width of histogram bins
-   * @throws The width of Histogram Bins must be greater than 0
+   * @param Net:  Reference to a ControlNetwork used to access all the measures.
+   * @param statFunc:  Pointer to a ControlMeasure acessor, the returns of this.
+   *    function call will be used to build up the network.
+   * @param binWidth:  The width of histogram bins.
+   * @throws The width of Histogram Bins must be greater than 0.
    */
-  Histogram::Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const, double binWidth) {
-    
+  Histogram::Histogram(ControlNet &net, double(ControlMeasure::*statFunc)() const,
+                       double binWidth) {
+
     //check to make sure we have a reasonable number of bins
     if (binWidth <= 0 ) {
       string msg = "The width of Histogram Bins must be greater than 0";
@@ -156,16 +162,24 @@ namespace Isis {
     }
 
    //get the range of the data
+
+
    rangesFromNet(net,statFunc);
 
-   
+
    //stretch the domain so that it is an even multiple of binWidth
-     //for some reason Histogram makes the end points of the bin range be at the center of
-     //bins.  Thus the +/-0.5 forces it to point the bin range at the ends of the bins.
-   SetBinRange(binWidth*(floor(this->ValidMinimum()/binWidth)+0.5),
-               binWidth*(ceil(this->ValidMaximum()/binWidth)-0.5));
-   SetValidRange(binWidth*floor(this->ValidMinimum()/binWidth),
-                 binWidth*ceil(this->ValidMaximum()/binWidth));
+   //for some reason Histogram makes the end points of the bin range be at the center of
+   //bins.  Thus the +/-0.5 forces it to point the bin range at the ends of the bins.
+   //SetBinRange(binWidth*( floor(this->ValidMinimum()/binWidth )+0.5),
+   //            binWidth*(ceil( this->ValidMaximum()/binWidth )-0.5) );
+
+
+   //Keep an eye on this to see if it breaks anything.  Also, I need to create
+   //a dataset to give this constructor for the unit test.
+
+    //tjw:  SetValidRange is moved into SetBinRange
+   //SetValidRange(binWidth*floor(this->ValidMinimum()/binWidth),
+   //              binWidth*ceil(this->ValidMaximum()/binWidth));
 
    //from the domain of the data and the requested bin width calculate the number of bins
    double domain = this->ValidMaximum() - this->ValidMinimum();
@@ -181,20 +195,26 @@ namespace Isis {
    * Iterates through all the measures in a network adding them to the histogram
    *
    * @param net  reference to a ControlNetwork used to access all the measures
-   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
+   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this
+   *    function call will be used to build up the network
    */
-  void Histogram::addMeasureDataFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const) {
+  void Histogram::addMeasureDataFromNet(ControlNet &net,
+                                        double(ControlMeasure::*statFunc)() const) {
+
     //get the number of object points
     int nObjPts =  net.GetNumPoints();
-    for (int i=0;i<nObjPts;i++) { //for each Object point
+    for (int i=0; i<nObjPts; i++) { //for each Object point
       const ControlPoint *point = net.GetPoint(i);
-      if (point->IsIgnored()) continue;  //if the point is ignored then continue
+      if (point->IsIgnored() ) continue;  //if the point is ignored then continue
 
       //get the number of measures
       int nObs = point->GetNumMeasures();
-      for (int j=0;j<nObs;j++) {  //for every measure
+      for (int j=0; j<nObs; j++) {  //for every measure
+
         const ControlMeasure *measure = point->GetMeasure(j);
+
         if (measure->IsIgnored())  continue;
+
         this->AddData((measure->*statFunc)());
       }
     }
@@ -205,7 +225,8 @@ namespace Isis {
    * Iterates through all the measures in a network in order to find the domain of the data
    *
    * @param net  reference to a ControlNetwork used to access all the measures
-   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call will be used to build up the network
+   * @param statFunc  pointer to a ControlMeasure acessor, the returns of this function call
+   *        will be used to build up the network
    * @throw The net file appears to have 1 or fewer measures, thus no histogram can be formed
    */
   void Histogram::rangesFromNet(ControlNet &net, double(ControlMeasure::*statFunc)() const) {
@@ -215,13 +236,16 @@ namespace Isis {
 
     //get the number of object points
     int nObjPts =  net.GetNumPoints();
-    for (int i=0;i<nObjPts;i++) { //for each Object point
+    for (int i=0; i<nObjPts; i++) { //for each Object point
+
       const ControlPoint *point = net.GetPoint(i);
       if (point->IsIgnored()) continue;  //if the point is ignored then continue
 
       //get the number of measures
       int nObs = point->GetNumMeasures();
-      for (int j=0;j<nObs;j++) {  //for every measure
+
+      for (int j=0; j<nObs; j++) {  //for every measure
+
         const ControlMeasure *measure = point->GetMeasure(j);
         if (measure->IsIgnored())  continue;
 
@@ -239,16 +263,18 @@ namespace Isis {
     }
 
     //set up the histogram ranges
+    
     SetValidRange(min, max);
-    SetBinRange(min, max);
+    //SetBinRange(min, max);
   }
 
 
   void Histogram::InitializeFromCube(Cube &cube, int statsBand,
       Progress *progress, int nbins, double startSample, double startLine,
       double endSample, double endLine) {
+
     // Make sure band is valid, 0 is valid (means all bands)
-    if ((statsBand < 0) || (statsBand > cube.bandCount())) {
+    if ( (statsBand < 0) || (statsBand > cube.bandCount() ) ) {
       string msg = "Cannot gather histogram for band [" + IString(statsBand) +
           "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -303,7 +329,7 @@ namespace Isis {
     if (minDnValue == Null || maxDnValue == Null) {
 
       Brick cubeDataBrick((int)(endSample - startSample + 1),
-                          1, 1, cube.pixelType());
+                          1, 1, cube.pixelType() );
       Statistics stats;
 
       // if band == 0, then we're gathering stats for all bands. I'm really
@@ -318,17 +344,20 @@ namespace Isis {
       }
 
       if (progress != NULL) {
+
         progress->SetText("Computing min/max for histogram");
         progress->SetMaximumSteps(
-          (int)(endLine - startLine + 1) * (int)(endBand - startBand + 1));
+          (int)(endLine - startLine + 1) * (int)(endBand - startBand + 1) );
         progress->CheckStatus();
       }
 
       for (int band = startBand; band <= endBand; band++) {
         for (int line = (int)startLine; line <= endLine; line++) {
+
           cubeDataBrick.SetBasePosition(qRound(startSample), line, band);
           cube.read(cubeDataBrick);
           stats.AddData(cubeDataBrick.DoubleBuffer(), cubeDataBrick.size());
+
           if (progress != NULL) {
             progress->CheckStatus();
           }
@@ -346,7 +375,7 @@ namespace Isis {
     }
 
     // Set the bins and range
-    SetBinRange(minDnValue, maxDnValue);
+    SetValidRange(minDnValue, maxDnValue);
     SetBins(nbins);
   }
 
@@ -355,13 +384,32 @@ namespace Isis {
   Histogram::~Histogram() {
   }
 
-  void Histogram::SetBinRange(double binStart, double binEnd) {
+  //2015-08-24,  Tyler Wilson:  Added Statistics::SetValidRange call to SetBinRange
+  //So the two functions do not have to be called together when setting
+  //up a histogram
+
+  /**
+   * Changes the range of the bins.  This function also sets the range
+   * of the parent statistics class and resets the stats/histogram
+   * counters.   So binRange = setValidRange.  Should only be called
+   * once, prior to Adding data to the histogram.
+   *
+   * @param binStart The start of the bin range
+   * @param binEnd   The end of the bin range
+   */
+
+  void Histogram::SetValidRange(double binStart, double binEnd) {
     if (binEnd < binStart) {
-      string msg = "The binning range start [" + IString(binStart) +
-                   " must be less than the end [" + IString(binEnd) + ".";
+      string msg = "The binning range start [" + IString(binStart) + "]"
+                   " must be less than the end [" + IString(binEnd) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
+    //(tjw): Flush the data buffers.  Since we are setting
+    //the statistical range for the data, any data loaded
+    //before this call is useless.
+    Reset();
+    Isis::Statistics::SetValidRange(binStart,binEnd);
     p_binRangeStart = binStart;
     p_binRangeEnd = binEnd;
   }
@@ -397,13 +445,13 @@ namespace Isis {
     int nbins = p_bins.size();
     int index;
     for (unsigned int i = 0; i < count; i++) {
-      if (IsValidPixel(data[i]) && InRange(data[i])) {
-        if (BinRangeStart() == BinRangeEnd()) {
+      if (IsValidPixel(data[i]) && InRange(data[i]) ) {
+        if (BinRangeStart() == BinRangeEnd() ) {
           index = 0;
         }
         else {
           index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
-                              (data[i] - BinRangeStart()) + 0.5);
+                              (data[i] - BinRangeStart() ) + 0.5);
         }
         if (index < 0) index = 0;
         if (index >= nbins) index = nbins - 1;
@@ -425,13 +473,13 @@ namespace Isis {
 
     int nbins = p_bins.size();
     int index;
-    if (IsValidPixel(data) && InRange(data)) {
-      if (BinRangeStart() == BinRangeEnd()) {
+    if (IsValidPixel(data) && InRange(data) ) {
+      if (BinRangeStart() == BinRangeEnd() ) {
         index = 0;
       }
       else {
-        index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart()) *
-                            (data - BinRangeStart()) + 0.5);
+        index = (int) floor((double)(nbins - 1) / (BinRangeEnd() - BinRangeStart() ) *
+                            (data - BinRangeStart() ) + 0.5);
       }
       if (index < 0) index = 0;
       if (index >= nbins) index = nbins - 1;
@@ -456,8 +504,9 @@ namespace Isis {
     int nbins = p_bins.size();
     int index;
     for (unsigned int i = 0; i < count; i++) {
-      if (IsValidPixel(data[i])) {
-        if (BinRangeStart() == BinRangeEnd()) {
+      if (IsValidPixel(data[i]) ) {
+
+        if (BinRangeStart() == BinRangeEnd() ) {
           index = 0;
         }
         else {
@@ -488,6 +537,7 @@ namespace Isis {
   double Histogram::Mode() const {
     int mode = 0;
     for (int i = 0; i < (int)p_bins.size(); i++) {
+
       if (p_bins[i] > p_bins[mode]) mode = i;
     }
 
@@ -508,7 +558,7 @@ namespace Isis {
    * @returns The value at X percent of the histogram.
    */
   double Histogram::Percent(double percent) const {
-    if ((percent < 0.0) || (percent > 100.0)) {
+    if ( (percent < 0.0) || (percent > 100.0) ) {
       string m = "Argument percent outside of the range 0 to 100 in";
       m += " [Histogram::Percent]";
       throw IException(IException::Programmer, m, _FILEINFO_);
@@ -520,14 +570,16 @@ namespace Isis {
     double currentPercent;
 
     for (int i = 0; i < (int)p_bins.size(); i++) {
+
       currentPixels += p_bins[i];
       currentPercent = (double) currentPixels / (double) ValidPixels() * 100.0;
+
       if (currentPercent >= percent) {
         return BinMiddle(i);
       }
     }
 
-    return BinMiddle((int)p_bins.size() - 1);
+    return BinMiddle( (int)p_bins.size() - 1);
   }
 
 
@@ -539,9 +591,13 @@ namespace Isis {
    * @return The skew.
    */
   double Histogram::Skew() const {
+
     if (ValidPixels() < 1) return NULL8;
+
     double sdev = StandardDeviation();
+
     if (sdev == 0.0) return 0.0;
+
     return 3.0 * (Average() - Median()) / sdev;
   }
 
@@ -554,8 +610,11 @@ namespace Isis {
    * @return The count at a bin position in the histogram.
    */
   BigInt Histogram::BinCount(const int index) const {
-    if ((index < 0) || (index >= (int)p_bins.size())) {
+
+    if ( (index < 0) || (index >= (int)p_bins.size() ) ) {
+
       QString message = Message::ArraySubscriptNotInRange(index);
+
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -576,7 +635,8 @@ namespace Isis {
    */
   void Histogram::BinRange(const int index,
                            double &low, double &high) const {
-    if ((index < 0) || (index >= (int)p_bins.size())) {
+    if ( (index < 0) || (index >= (int)p_bins.size() ) ) {
+
       QString message = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
@@ -596,8 +656,10 @@ namespace Isis {
    * @returns The middle value of the bin.
    */
   double Histogram::BinMiddle(const int index) const {
-    if ((index < 0) || (index >= (int)p_bins.size())) {
+    if ( (index < 0) || (index >= (int)p_bins.size() ) ) {
+
       QString message = Message::ArraySubscriptNotInRange(index);
+
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -615,6 +677,7 @@ namespace Isis {
    * @return The size of the individual bin.
    */
   double Histogram::BinSize() const {
+
     double low, high;
     BinRange(0, low, high);
     return high - low;

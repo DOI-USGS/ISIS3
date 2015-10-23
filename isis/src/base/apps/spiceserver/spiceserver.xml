@@ -47,6 +47,9 @@
       (from spiceinit), causing spiceserver to return an incorrect end time for the spice
       information. Added TEMPFILE parameter for testing purposes. Fixes #2030.
     </change>
+    <change name="Makayla Shepherd" date="2015-09-08">
+      Modified to open the temporary cube correctly. Fixes #2213.
+    </change>
   </history>
 
   <groups>

@@ -1,5 +1,7 @@
 #include "ShapeModel.h"
 
+#include <QDebug>
+
 #include <algorithm>
 #include <cfloat>
 #include <vector>
@@ -22,7 +24,10 @@ using namespace std;
 
 namespace Isis {
   /**
-   * default constructor
+   * Default constructor creates ShapeModel object, initializing name to an 
+   * empty string, surface point to an empty surface point, has intersection to 
+   * FALSE, has normal to FALSE, has ellipsoid intersection to FALSE, normal 
+   * vector size to 3, and target to NULL.
    */
   ShapeModel::ShapeModel() {
     Initialize();
@@ -31,9 +36,14 @@ namespace Isis {
 
 
   /**
-   * Construct and load a shape model from a pvl
+   * Constructs and loads a shape model from a pvl
+   *  
+   * This constructor creates ShapeModel object, initializing name to an 
+   * empty string, surface point to an empty surface point, has intersection to 
+   * FALSE, has normal to FALSE, has ellipsoid intersection to FALSE, normal 
+   * vector size to 3, and  target to the given target.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param pvl A valid ISIS cube label.
    */
   ShapeModel::ShapeModel(Target *target, Pvl &pvl) {
     Initialize();
@@ -42,9 +52,14 @@ namespace Isis {
 
 
   /**
-   * Construct and load a shape model from a target only
-   *
-   * @param target Valid Isis3 target.
+   * Constructs and loads a shape model from a target only
+   *  
+   * This constructor creates ShapeModel object, initializing name to an 
+   * empty string, surface point to an empty surface point, has intersection to 
+   * FALSE, has normal to FALSE, has ellipsoid intersection to FALSE, normal 
+   * vector size to 3, and  target to the given target.
+   *  
+   * @param target A pointer to a valid ISIS target.
    */
   ShapeModel::ShapeModel(Target *target) {
     Initialize();
@@ -53,7 +68,7 @@ namespace Isis {
 
 
   /**
-   * Initialize the ShapeModel private variables.
+   * Initializes the ShapeModel private variables.
    */
   void ShapeModel::Initialize() {
     m_name = new QString();
@@ -64,7 +79,8 @@ namespace Isis {
     m_hasEllipsoidIntersection = false;   
   }
 
-  //! Destroys the ShapeModel
+
+  //! Virtual destructor to destroy the ShapeModel object.
   ShapeModel::~ShapeModel() {
 
     delete m_name;
@@ -75,8 +91,8 @@ namespace Isis {
   }
 
 
-  /** Calculate ellipsoidal surface normal
-   *
+  /** 
+   *  Calculates the ellipsoidal surface normal.
    */
   void ShapeModel::calculateEllipsoidalSurfaceNormal()  {
     // The below code is not truly normal unless the ellipsoid is a sphere.  TODO Should this be
@@ -106,21 +122,24 @@ namespace Isis {
 
 
   /**
-   * Computes and returns emission angle in degrees given the observer position.
+   * Computes and returns emission angle, in degrees, given the observer 
+   * position. 
    *
    * Emission Angle: The angle between the surface normal vector at the
-   * intersection point and a vector from the intersection point to the
-   * spacecraft. The emission angle varies from 0 degrees when the spacecraft is
-   * viewing the sub-spacecraft point (nadir viewing) to 90 degrees when the
-   * intercept is tangent to the surface of the target body. Thus, higher values
-   * of emission angle indicate more oblique viewing of the target.
+   * intersection point and the vector from the intersection point to the 
+   * observer (usually the spacecraft). The emission angle varies from 0 degrees 
+   * when the observer is viewing the sub-spacecraft point (nadir viewing) to 90
+   * degrees when the intercept is tangent to the surface of the target body. 
+   * Thus, higher values of emission angle indicate more oblique viewing of the 
+   * target. 
    *
-   * @param sB: Spacecraft position in body-fixed coordinates
+   * @param observerBodyFixedPosition  Three dimensional position of the observer, 
+   *                                   in the coordinate system of the target body.
    *
-   * @return Emmision angle in decimal degrees
+   * @return The emission angle, in decimal degrees.
    *
    */
-  double ShapeModel::emissionAngle(const std::vector<double> & sB) {
+  double ShapeModel::emissionAngle(const std::vector<double> &observerBodyFixedPosition) {
 
     // Calculate the surface normal if we haven't yet
     if (!hasNormal()) calculateDefaultNormal();
@@ -133,7 +152,7 @@ namespace Isis {
 
     // Get vector from surface point to observer and normalize it
     SpiceDouble psB[3], upsB[3], dist;
-    vsub_c((ConstSpiceDouble *) &sB[0], pB, psB);
+    vsub_c((ConstSpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
     unorm_c(psB, upsB, &dist);
 
     double angle = vdot_c((SpiceDouble *) &m_normal[0], upsB);
@@ -145,7 +164,8 @@ namespace Isis {
 
   /**
    * Returns the status of the ellipsoid model intersection.
-   *
+   *  
+   * @return @b bool Indicates whether this shape model has a valid ellipsoid intersection.
    */
   bool ShapeModel::hasEllipsoidIntersection() {
     return m_hasEllipsoidIntersection;
@@ -153,11 +173,20 @@ namespace Isis {
 
 
   /**
-   * Returns the incidence angle in degrees. This does not use the surface model.
+   * Computes and returns incidence angle, in degrees, given the illuminator position. 
+   *  
+   * Incidence Angle: The angle between the surface normal vector at the intersection 
+   * point and the vector from the intersection point to the illuminator (usually the 
+   * sun). 
+   *  
+   * Note: this method does not use the surface model.
    *
+   * @param illuminatorBodyFixedPosition Three dimensional position for the illuminator, 
+   *                                     in the body-fixed coordinate system.
+   *  
    * @return @b double Incidence angle, in degrees.
    */
-  double ShapeModel::incidenceAngle(const std::vector<double> &uB) {
+  double ShapeModel::incidenceAngle(const std::vector<double> &illuminatorBodyFixedPosition) {
 
     // Calculate the surface normal if we haven't yet.
     if (!m_hasNormal) calculateDefaultNormal();
@@ -170,7 +199,7 @@ namespace Isis {
 
     // Get vector from surface point to sun and normalize it
     SpiceDouble puB[3], upuB[3], dist;
-    vsub_c((SpiceDouble *) &uB[0], pB, puB);
+    vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
     unorm_c(puB, upuB, &dist);
 
     double angle = vdot_c((SpiceDouble *) &m_normal[0], upuB);
@@ -181,10 +210,19 @@ namespace Isis {
 
 
   /** 
-   * Find the intersection point on the ellipsoid model
+   * Finds the intersection point on the ellipsoid model using the given 
+   * position of the observer (spacecraft) and direction vector from the
+   * observer to the target (body). 
+   *  
+   * @param observerBodyFixedPosition  Three dimensional position of the observer, 
+   *                                   in the coordinate system of the target body.
+   * @param observerLookVectorToTarget Three dimensional direction vector from 
+   *                                   the observer to the target.
+   *  
+   * @return @b bool Indicates whether this shape model found a valid ellipsoid intersection.
    */
   bool ShapeModel::intersectEllipsoid(const std::vector<double> observerBodyFixedPosition,
-                              const std::vector<double> &observerLookVectorToTarget) {
+                                      const std::vector<double> &observerLookVectorToTarget) {
 
     // Clear out previous surface point and normal
     clearSurfacePoint();
@@ -226,11 +264,22 @@ namespace Isis {
 
 
   /**
-   * Returns the phase angle in degrees.
-   *
+   * Computes and returns phase angle, in degrees, given the positions of the 
+   * observer and illuminator. 
+   *  
+   * Phase Angle: The angle between the vector from the intersection point to 
+   * the observer (usually the spacecraft) and the vector from the intersection 
+   * point to the illuminator (usually the sun). 
+   *  
+   * @param observerBodyFixedPosition  Three dimensional position of the observer, 
+   *                                   in the coordinate system of the target body.
+   * @param illuminatorBodyFixedPosition Three dimensional position for the illuminator, 
+   *                                     in the body-fixed coordinate system.
+   *  
    * @return @b double Phase angle, in degrees.
    */
-  double ShapeModel::phaseAngle(const std::vector<double> & sB, const std::vector<double> &uB) {
+  double ShapeModel::phaseAngle(const std::vector<double> &observerBodyFixedPosition,
+                                const std::vector<double> &illuminatorBodyFixedPosition) {
 
     // Get vector from center of body to surface point
     SpiceDouble pB[3];
@@ -240,12 +289,12 @@ namespace Isis {
 
     // Get vector from surface point to observer and normalize it
     SpiceDouble psB[3], upsB[3], dist;
-    vsub_c((SpiceDouble *) &sB[0], pB, psB);
+    vsub_c((SpiceDouble *) &observerBodyFixedPosition[0], pB, psB);
     unorm_c(psB, upsB, &dist);
 
     // Get vector from surface point to sun and normalize it
     SpiceDouble puB[3], upuB[3];
-    vsub_c((SpiceDouble *) &uB[0], pB, puB);
+    vsub_c((SpiceDouble *) &illuminatorBodyFixedPosition[0], pB, puB);
     unorm_c(puB, upuB, &dist);
 
     double angle = vdot_c(upsB, upuB);
@@ -258,7 +307,10 @@ namespace Isis {
 
 
   /** 
-   * Return the surface intersection
+   * Returns the surface intersection for this ShapeModel.
+   *  
+   * @return @b SurfacePoint Three dimensional position for the surface 
+   *         intersection, in body-fixed coordinate system.
    */
   SurfacePoint *ShapeModel::surfaceIntersection() const {
     return m_surfacePoint;
@@ -266,7 +318,9 @@ namespace Isis {
 
 
   /** 
-   * Return intersection status
+   * Returns intersection status.
+   *  
+   * @return @b bool Indicates whether this ShapeModel has an intersection.
    */
   bool ShapeModel::hasIntersection() {
     return m_hasIntersection;
@@ -274,7 +328,9 @@ namespace Isis {
 
 
   /** 
-   * Return surface point normal status
+   * Returns surface point normal status.
+   *  
+   * @return @b Indicates whether this ShapeModel has a surface normal.
    */
   bool ShapeModel::hasNormal() const {
     return m_hasNormal;
@@ -282,7 +338,7 @@ namespace Isis {
 
 
   /** 
-   * Clear or reset the current surface point
+   * Clears or resets the current surface point.
    */
   void ShapeModel::clearSurfacePoint() {
     setHasIntersection(false);
@@ -291,9 +347,13 @@ namespace Isis {
 
 
   /** 
-   * Return the local normal of the current intersection point.
+   * Returns the local surface normal at the current intersection point. 
+   * Note: This method will throw an error if the normal doesn't exist. Use the
+   * hasNormal() method to verify before calling this method. 
+   *  
+   * @see hasNormal() 
    *
-   * @param returns normal vector if it exists
+   * @return A surface normal vector, if it exists.
    */
   std::vector<double> ShapeModel::normal() {
     if (m_hasNormal ) {
@@ -307,13 +367,27 @@ namespace Isis {
   }
 
 
+  /** 
+   * Returns the status of the target. If it is NULL, this method
+   * returns false.
+   * 
+   * @return @b Indicates whether the target is valid.
+   */
   bool ShapeModel::hasValidTarget() const {
     return (m_target != NULL);
   }
 
+
   /**
    * Returns the radii of the body in km. The radii are obtained from the
-   * target.
+   * target. 
+   * Note: This method will throw an error if the ShapeModel does not 
+   * have a valid target. Use the hasValidTarget() method to verify before 
+   * calling this method. 
+   *  
+   * @see hasValidTarget() 
+   *  
+   * @return Three dimensional vector containing the ellipsoid radii values.
    */
   std::vector<Distance> ShapeModel::targetRadii() const {
     if (hasValidTarget()) {
@@ -326,7 +400,15 @@ namespace Isis {
   }
 
 
-  /** Set the normal for the currect intersection point
+  /** 
+   * Sets the normal for the currect intersection point. 
+   * Note: This method will throw an error if this ShapeModel doesn't have 
+   * and intersection. Use the hasIntersection() method to verify before 
+   * calling this method. 
+   *  
+   * @see hasIntersection()
+   * 
+   * @param normal Three dimensional surface normal vector.
    *
    */
   void ShapeModel::setNormal(const std::vector<double> normal) {
@@ -341,7 +423,17 @@ namespace Isis {
   }
 
 
-  /** Set the normal for the currect intersection point
+  /** 
+   * Sets the normal for the currect intersection point. 
+   * Note: This method will throw an error if this ShapeModel doesn't have and 
+   * intersection. Use the hasIntersection() method to verify before calling 
+   * this method. 
+   *  
+   * @see hasIntersection()
+   *  
+   * @param a First coordinate value for the three dimensional surface normal.
+   * @param b Second coordinate value for the three dimensional surface normal.
+   * @param c Third coordinate value for the three dimensional surface normal.
    *
    */
   void ShapeModel::setNormal(const double a, const double b, const double c) {
@@ -358,7 +450,10 @@ namespace Isis {
   }
   
   
-  /** Set the shape name
+  /** 
+   * Sets the shape name. 
+   *  
+   * @param name The name of the ShapeModel.
    *
    */
   void ShapeModel::setName(QString name) {
@@ -366,7 +461,10 @@ namespace Isis {
   }
 
 
-  /** Get the shape name
+  /** 
+   * Gets the shape name.
+   *  
+   * @return @b QString The name of the ShapeModel.
    *
    */
   QString ShapeModel::name() const{
@@ -374,7 +472,10 @@ namespace Isis {
   }
 
 
-  /** Set m_hasIntersection;
+  /** 
+   * Sets the flag to indicate whether this ShapeModel has an intersection. 
+   *  
+   * @param b Indicates whether there is an intersection. 
    *
    */
   void ShapeModel::setHasIntersection(bool b) {
@@ -383,7 +484,9 @@ namespace Isis {
   }
 
 
-  /** Set surface intersection point
+  /** 
+   * Set surface intersection point.
+   * @param surfacePoint Position coordinate for the surface point. 
    *
    */
   void ShapeModel::setSurfacePoint(const SurfacePoint &surfacePoint) {
@@ -396,7 +499,10 @@ namespace Isis {
   }
 
 
-  /** Set the hasNormal flag
+  /** 
+   * Sets the flag to indicate whether this ShapeModel has a surface normal.
+   *  
+   * @param b Indicates whether there is a normal.
    *
    */
   void ShapeModel::setHasNormal(bool status) {
@@ -404,8 +510,11 @@ namespace Isis {
   }
 
 
-  /** Convenience method to get pixel resolution (m/pix) at current intersection point
-   *
+  /** 
+   * Convenience method to get pixel resolution (m/pix) at current intersection 
+   * point. 
+   *  
+   * @return @double The pixel resolution at the surface intersection. 
    */
   double ShapeModel::resolution() {
     if (hasValidTarget() && m_hasIntersection) {

@@ -32,7 +32,7 @@
  document.write(" <br> ");
  document.write(" <i> ");
  document.write(" To contact us, please post comments and questions on the ");
- document.write(" <A HREF=\"http://isis.astrogeology.usgs.gov/IsisSupport\" target=\"_top\"> ");
+ document.write(" <A HREF=\"http://isis.astrogeology.usgs.gov/fixit\" target=\"_top\"> ");
  document.write(" ISIS Support Center</a></i><br> ");
  document.write(" ");
  document.write(" <script language=\"javaScript\" type=\"text/javascript\"> ");

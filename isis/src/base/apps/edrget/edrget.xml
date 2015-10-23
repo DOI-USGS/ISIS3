@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="edrget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="edrget" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Download network file using FTP or HTTP protocol.
   </brief>
@@ -32,7 +34,12 @@
     <change name="Steven Lambright" date="2007-08-14">
         Added an application test
     </change>
+    <change name="Tyler Wilson" date ="2015-09-14">
+        Added a timeout event handler to gracefully exit the application in the event
+        the ftp server response time becomes too long.
+    </change>
   </history>
+
 
 
   <groups>
@@ -49,9 +56,8 @@
          or<br></br>
                    http://host.gov/directory/sub_directory/image_name.QUB
           </p>
-        </description>
-      </parameter>
-
+        </description>      
+      </parameter>      
       <parameter name="TOPATH">
         <type>string</type>
         <brief>The path to the output file </brief>
@@ -65,6 +71,24 @@
       </parameter>
 
     </group>
+
+    <group name = "Timeout (ms)">
+    <parameter name ="TIMEOUT">
+        <type>integer</type>
+        <brief>Timeout (in milliseconds) for file requests.</brief>
+        <description>
+            If the application does not hear from the server in the
+            allotted amount of time, it quits and displays an error.
+        </description>
+        <internalDefault>
+            60000
+        </internalDefault>
+     </parameter>
+    </group>
+
+
   </groups>
+
+
 
 </application>

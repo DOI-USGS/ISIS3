@@ -26,8 +26,6 @@
 
 #include "LineScanCamera.h"
 
-#include <QString>
-
 namespace Isis {
   class PvlGroup;
     /**                                                                       
@@ -46,6 +44,10 @@ namespace Isis {
      *   @history 2012-07-10 Orrin Thomas - Updated to current coding standards
      *   @history 2015-09-01 Ian Humphrey and Makayla Shepherd - Added new data members and
      *                           methods to get spacecraft and instrument names.
+     *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+     *                           members and methods and removed implementation of these methods
+     *                           since Camera now handles this. References #2335. Fixed 
+     *                           indentation.
      */        
     class ApolloPanoramicCamera : public LineScanCamera {
     public:
@@ -92,12 +94,7 @@ namespace Isis {
 
       //! Standard deviation of interior orientation residual vector length, accesor
       double intOriResidualStdev() const { return m_residualStdev; }
-      
-      virtual QString instrumentNameLong() const;
-      virtual QString instrumentNameShort() const;
-      virtual QString spacecraftNameLong() const;
-      virtual QString spacecraftNameShort() const;
-      
+
     private:
       //! Max interior orientation residual vector length
       double m_residualMean;
@@ -110,11 +107,6 @@ namespace Isis {
 
       //! CK "Camera Matrix" kernel frame ID
       int m_CkFrameId;
-      
-      QString m_instrumentNameLong; //!< Full instrument name
-      QString m_instrumentNameShort; //!< Shortened instrument name
-      QString m_spacecraftNameLong; //!< Full spacecraft name
-      QString m_spacecraftNameShort; //!< Shortened spacecraft name
     };
 };
 

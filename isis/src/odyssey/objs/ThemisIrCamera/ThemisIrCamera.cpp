@@ -207,46 +207,6 @@ namespace Isis {
       (ThemisIrDistortionMap *) DistortionMap();
     distMap->SetBand(band);
   }
-  
-  
-   /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString ThemisIrCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString ThemisIrCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString ThemisIrCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString ThemisIrCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 

@@ -108,47 +108,6 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
-  
-  
-  /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString NewHorizonsMvicTdiCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString NewHorizonsMvicTdiCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString NewHorizonsMvicTdiCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString NewHorizonsMvicTdiCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
-
 }
 
 

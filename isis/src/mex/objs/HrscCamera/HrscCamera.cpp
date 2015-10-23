@@ -121,46 +121,6 @@ namespace Isis {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
-  
-  
-   /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString HrscCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString HrscCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString HrscCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString HrscCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
 }
 
 

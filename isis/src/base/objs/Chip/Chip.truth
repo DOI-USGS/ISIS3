@@ -167,33 +167,33 @@ cubic convolution: 4
 
 Generate Errors:
 Try to set interpolator to type 0 (Interpolator::None):
-**PROGRAMMER ERROR** Invalid Interpolator type.  Cannot use [0] to read cube into chip.
+**PROGRAMMER ERROR** Invalid Interpolator type. Cannot use [0] to read cube into chip.
 
 Try to set interpolator to type 3 (enum value not assigned):
-**PROGRAMMER ERROR** Invalid Interpolator type.  Cannot use [3] to read cube into chip.
+**PROGRAMMER ERROR** Invalid Interpolator type. Cannot use [3] to read cube into chip.
 
 Try to set chip size with input parameter equal to 0:
-**USER ERROR** Unable to set chip size to [0, 1].  Samples and lines must be greater than zero.
+**USER ERROR** Unable to set chip size to [0, 1]. Samples and lines must be greater than zero.
 
 Try to load a cube that is not camera or map projection:
-**USER ERROR** Can not geom chip.  Chip cube [] is not a camera or map projection.
+**USER ERROR** Can not geom chip. Chip cube [] is not a camera or map projection.
 **ERROR** Unable to initialize cube projection from file [].
 **ERROR** Unable to find PVL group [Mapping] in file [].
 **ERROR** Unable to initialize camera model from group [Instrument].
 **ERROR** Unable to find PVL group [Instrument] in file [].
 
 Try to load a cube with a match cube that is not camera or map projection:
-**USER ERROR** Can not geom chip.  Match chip cube [] is not a camera or map projection.
+**USER ERROR** Can not geom chip. Match chip cube [] is not a camera or map projection.
 **ERROR** Unable to initialize cube projection from file [].
 **ERROR** Unable to find PVL group [Mapping] in file [].
 **ERROR** Unable to initialize camera model from group [Instrument].
 **ERROR** Unable to find PVL group [Instrument] in file [].
 
 Try to load a cube with match chip and cube that can not find at least 3 points for Affine Transformation:
-**USER ERROR** Cannot find enough points to perform Affine transformation.  Unable to load chip from [] to match chip from [].
+**USER ERROR** Cannot find enough points to perform Affine transformation. Unable to load chip from [] to match chip from [].
 
 Try to set valid range with larger number passed in as first parameter:
-**PROGRAMMER ERROR** Unable to set valid chip range to [4.0, 3.0].  First parameter must be smaller than the second.
+**PROGRAMMER ERROR** Unable to set valid chip range to [4.0, 3.0]. First parameter must be smaller than the second.
 
 Try to extract a sub-chip with samples or lines greater than original chip:
 **PROGRAMMER ERROR** Cannot extract sub-chip of size [2, 5] from chip of size [4, 4].

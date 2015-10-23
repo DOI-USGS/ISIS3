@@ -68,6 +68,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
     
     // Set up detector constants
+    // Note that Wac has filters, -236800 through -236812
+    // http://naif.jpl.nasa.gov/pub/naif/pds/data/mess-e_v_h-spice-6-v1.0/messsp_1000/data/ik/msgr_mdis_v160.ti
     const int MdisWac(-236800);
     const int MdisNac(-236820);
     
@@ -75,7 +77,7 @@ namespace Isis {
       m_instrumentNameLong = "Mercury Dual Imaging System Narrow Angle Camera";
       m_instrumentNameShort = "MDIS-NAC";
     }
-    else if (naifIkCode() == MdisWac) {
+    else if (naifIkCode() <= MdisWac && naifIkCode() >= -236812) {
       m_instrumentNameLong = "Mercury Dual Imaging System Wide Angle Camera";
       m_instrumentNameShort = "MDIS-WAC";
     }
@@ -270,47 +272,7 @@ namespace Isis {
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
-  
-  
-  /**
-   * This method returns the full instrument name.
-   *
-   * @return QString
-   */
-  QString MdisCamera::instrumentNameLong() const {
-    return m_instrumentNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened instrument name.
-   *
-   * @return QString
-   */
-  QString MdisCamera::instrumentNameShort() const {
-    return m_instrumentNameShort;
-  }
-  
-  
-  /**
-   * This method returns the full spacecraft name.
-   * 
-   * @return QString
-   */
-  QString MdisCamera::spacecraftNameLong() const {
-    return m_spacecraftNameLong;
-  }
-  
-  
-  /**
-   * This method returns the shortened spacecraft name.
-   *
-   * @return QString
-   */
-  QString MdisCamera::spacecraftNameShort() const {
-    return m_spacecraftNameShort;
-  }
-  
+
 
 /**
  * @brief Computes temperature-dependent focal length 
