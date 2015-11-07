@@ -114,12 +114,10 @@ namespace Isis {
       void SetBrickSize(int ns, int nl, int nb);
 
       void SetInputBrickSize(int ns, int nl, int nb);
-      void SetInputBrickSize(int ns, int nl, int nb, 
-                             int cube);
+      void SetInputBrickSize(int ns, int nl, int nb, int cube);
 
       void SetOutputBrickSize(int ns, int nl, int nb);
-      void SetOutputBrickSize(int ns, int nl, int nb, 
-                              int cube);
+      void SetOutputBrickSize(int ns, int nl, int nb, int cube);
 
       // Overload the SetOutputCube() method to allow the user to pass in the
       // file name and attributes without the lines and samples.
@@ -127,7 +125,7 @@ namespace Isis {
       //process class due to the using statement below. 
       using Process::SetOutputCube;
       virtual Cube *SetOutputCube(const QString &fname,
-                          const CubeAttributeOutput &att);
+                                  const CubeAttributeOutput &att);
 
       void SetProcessingDirection(ProcessingDirection direction);
       ProcessingDirection GetProcessingDirection();
@@ -138,7 +136,7 @@ namespace Isis {
       virtual void StartProcess(void funct(Buffer &in));
       virtual void StartProcess(void funct(Buffer &in, Buffer &out));
       virtual void StartProcess(void funct(std::vector<Buffer *> &in,
-                                   std::vector<Buffer *> &out));
+                                           std::vector<Buffer *> &out));
       void EndProcess();// Depricated. Please use Finalize
       void Finalize();
 
@@ -669,7 +667,7 @@ namespace Isis {
             m_processingFunctor(functorBricks.first, functorBricks.second);
 
             // And copy them into the output cubes
-            for(int i = 0; i < (int)functorBricks.second.size(); i++) {
+            for (int i = 0; i < (int)functorBricks.second.size(); i++) {
               m_outputCubes[i]->write(*functorBricks.second[i]);
               delete functorBricks.second[i];
             }

@@ -1,0 +1,28 @@
+# target wavelengths test data
+# 1st col = target center
+# 2nd col = target width
+# 
+# (the center value = the band number)
+# (the width value with the first '9' removed = the band number) 
+#
+
+1,91
+2,92
+3,93
+4,94
+5,95
+6,96
+7,97
+8,98
+9,99
+10,910
+11,911
+12,912
+13,913
+14,914
+15,915
+16,916
+17,917
+18,918
+19,919
+20,920

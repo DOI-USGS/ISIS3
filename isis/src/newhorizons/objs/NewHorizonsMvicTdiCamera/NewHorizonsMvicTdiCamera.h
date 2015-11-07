@@ -42,6 +42,10 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2015-10-21 Stuart Sides - Changed the throw in the SetUndistortedFocalPlane
+   *                           mamber to a return false. The cases were the member was throwing
+   *                           were way outside the array, so this is not expexted to cause any
+   *                           problems. These routines should not ever throw. The calling
    */
   class NewHorizonsMvicTdiCamera : public LineScanCamera {
     public:

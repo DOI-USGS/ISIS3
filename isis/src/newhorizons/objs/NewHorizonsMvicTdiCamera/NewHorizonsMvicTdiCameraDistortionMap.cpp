@@ -115,7 +115,7 @@ namespace Isis {
 
     // scale x to lie in the range -1.0 to +1.0
     // this is required for Legendre Polynomials, man
-    double xscaled = -dx/m_focalPlaneHalf_x;
+    double xscaled = -dx / m_focalPlaneHalf_x;
 
     // compute distortion corrections in x using Legendre Polynomials
     // these corrections are also in the -1.0 to +1.0 range
@@ -189,11 +189,13 @@ namespace Isis {
     // in successive iterations is at or below the given tolerance
     for ( int i = 0; i < 50; i++ ) {
 
-      xtScaled = -xt/m_focalPlaneHalf_x;
+      xtScaled = -xt / m_focalPlaneHalf_x;
 
+      // Changed this failure mode from a throw to return false.  These functions should never
+      // throw, the callers are not catching, so bad things happen.  The callers should be checking
+      // the return status
       if (fabs(xtScaled) > 1.0) {
-        string msg = "value not in range -1.0 to +1.0 required for Legendre Polynomials";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
+        return bConverged;
       }
 
       // compute scaled distortion in x (scaled to -1.0 - +1.0) using Legendre Polynomials
@@ -203,7 +205,7 @@ namespace Isis {
       computeResidualDistortionCorrections(xt, deltax2, deltay2);
 
       // update unscaled coordinates
-      xt = -(uxScaled-scaledDeltax)*m_focalPlaneHalf_x - deltax2;
+      xt = -(uxScaled-scaledDeltax) * m_focalPlaneHalf_x - deltax2;
       yt = uy - deltay2;
 
       // check for convergenceyScaledDistortion

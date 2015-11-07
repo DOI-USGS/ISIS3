@@ -1,0 +1,39 @@
+# target wavelengths test data
+# 1st col = center wavelength
+# 2nd col = filter width
+# 
+# This definition has four sections in descending wavelength order
+#
+# Section 0 (length 8)
+8.0, 0.308
+7.0, 0.307
+6.0, 0.306
+5.0, 0.305
+4.0, 0.304
+3.0, 0.303
+2.0, 0.302
+1.0, 0.301
+# Section 1 (length 11)
+6.0, 0.1511
+5.5, 0.1510
+5.0, 0.1509
+4.5, 0.1508
+4.0, 0.1507
+3.5, 0.1506
+3.0, 0.1505
+2.5, 0.1504
+2.0, 0.1503
+1.5, 0.1502
+1.0, 0.1501
+# Section 2 (length 8) 
+6.25, 0.078
+6.00, 0.076
+5.75, 0.075
+5.50, 0.074
+5.25, 0.073
+5.00, 0.072
+4.75, 0.071
+4.50, 0.070
+# Section 3 (length 1) 
+10, 4.0
+

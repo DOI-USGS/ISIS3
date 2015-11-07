@@ -15,7 +15,14 @@
   <history>
     <change name="Kristin Berry" date="2014-08-28">
        Adapted from lorri2isis.
-    </change> 
+    </change>
+    <change name="Kristin Berry" date="2015-06-15">
+       Updated to read quality and error extensions in Band-interleaved (BIL) format (like the primary image) to work 
+       with new format files. 
+    </change>
+    <change name="Kristin Berry" date="2015-06-22">
+       Updated to add the option to change pixels in the input image to Nulls when the corresponding pixel in the QUALITY fits extension is  equal to 1, 2, or 8.
+    </change>
   </history>
 
   <seeAlso>
@@ -38,7 +45,7 @@
         </brief>
         <description>
           Use this parameter to select the filename of a New Horizons
-          LEISA file to be converted to a cube. This is expected to be a FITS formatted file. The associated PDS label file must be located in the same directory.
+          LEISA file to be converted to a cube. This is expected to be a FITS formatted file. 
         </description>
         <filter>
           *.fit
@@ -93,6 +100,19 @@
         </filter>
       </parameter>
 
+      </group>
+
+      <group name="Options">
+        <parameter name="REPLACE">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Replace flagged  pixels in the Data Quality extension with Nulls. 
+        </brief>
+        <description>
+          Replace pixels in the imported LEISA image with NULLS if they are set to 1 (for High Speed Header, Bond Joint, or Bad Pixels), 2 (for Cosmic Ray) , or 8 (for user-identified bad pixels) in the Data Quality fits extension. 
+        </description>
+        </parameter>
       </group>
   </groups>
 

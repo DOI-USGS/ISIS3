@@ -154,13 +154,13 @@ namespace Isis {
    * @param cube The index of the cube
    */
   void ProcessByBrick::SetInputBrickSize(int ns, int nl, int nb, int cube) {
-    if(cube > (int)InputCubes.size()) {
+    if (cube > (int)InputCubes.size()) {
       string m = "The specified cube is out of range";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // If a default size has already been set, use it to fill in
-    if(p_inputBrickSamples.size() > 0) {
+    if (p_inputBrickSamples.size() > 0) {
       p_inputBrickSamples.resize(InputCubes.size() + 1, p_inputBrickSamples[0]);
       p_inputBrickLines.resize(InputCubes.size() + 1, p_inputBrickLines[0]);
       p_inputBrickBands.resize(InputCubes.size() + 1, p_inputBrickBands[0]);

@@ -31,7 +31,8 @@
 
 using namespace std;
 namespace Isis {
-  /**
+
+/**
    * Opens an input cube specified by the user and verifies requirements are
    * met. This method is overloaded and adds the requirements of
    * ic_base::SpatialMatch which requires all input cubes to have the same
@@ -59,6 +60,7 @@ namespace Isis {
                                         Isis::SpatialMatch | requirements);
   }
 
+
   /**
    * Opens an input cube specified by the user with cube attributes and
    * requirements. For more information see Process::SetInputCube
@@ -78,6 +80,7 @@ namespace Isis {
                                         Isis::SpatialMatch | requirements);
   }
 
+
   /**
    * This method invokes the process by spectra operation over a single input or
    * output cube. It will be an input cube if the method SetInputCube was
@@ -95,6 +98,7 @@ namespace Isis {
     SetBrickSizesForProcessCubeInPlace();
     ProcessByBrick::StartProcess(funct);
   }
+
 
   /**
    * This method invokes the process by spectra operation over exactly one input
@@ -115,6 +119,7 @@ namespace Isis {
     ProcessByBrick::StartProcess(funct);
   }
 
+
   /**
    * This method invokes the process by spectra operation over multiple input
    * and output cubes. Typically, this method is used when two input cubes are
@@ -132,6 +137,7 @@ namespace Isis {
     ProcessByBrick::StartProcess(funct);
   }
 
+
   /**
    * Sets the spectra type to one of the following:
    * <UL>
@@ -142,7 +148,7 @@ namespace Isis {
    * @param type Integer value representing the spectra type.
    */
   void ProcessBySpectra::SetType(const int type) {
-    if(type != PerPixel && type != ByLine && type != BySample) {
+    if (type != PerPixel && type != ByLine && type != BySample) {
       string m = "The specified spectra type is invalid";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
@@ -155,17 +161,17 @@ namespace Isis {
    */
   void ProcessBySpectra::SetBrickSizesForProcessCubeInPlace() {
     // Error checks
-    if((InputCubes.size() + OutputCubes.size()) > 1) {
+    if ((InputCubes.size() + OutputCubes.size()) > 1) {
       string m = "You can only specify exactly one input or output cube";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
-    else if((InputCubes.size() + OutputCubes.size()) == 0) {
+    else if ((InputCubes.size() + OutputCubes.size()) == 0) {
       string m = "You haven't specified an input or output cube";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     int ns, nl, nb;
-    if(InputCubes.size() == 1) {
+    if (InputCubes.size() == 1) {
       ns = InputCubes[0]->sampleCount();
       nl = InputCubes[0]->lineCount();
       nb = InputCubes[0]->bandCount();
@@ -175,8 +181,8 @@ namespace Isis {
       nl = OutputCubes[0]->lineCount();
       nb = OutputCubes[0]->bandCount();
     }
-    if(Type() == PerPixel) SetBrickSize(1, 1, nb);
-    else if(Type() == ByLine) SetBrickSize(ns, 1, nb);
+    if (Type() == PerPixel) SetBrickSize(1, 1, nb);
+    else if (Type() == ByLine) SetBrickSize(ns, 1, nb);
     else SetBrickSize(1, nl, nb);
   }
 
@@ -186,20 +192,20 @@ namespace Isis {
    */
   void ProcessBySpectra::SetBrickSizesForProcessCube() {
     // Error checks ... there must be one input and output
-    if(InputCubes.size() != 1) {
+    if (InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
-    else if(OutputCubes.size() != 1) {
+    else if (OutputCubes.size() != 1) {
       string m = "You must specify exactly one output cube";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
-    if(Type() == PerPixel) {
+    if (Type() == PerPixel) {
       SetInputBrickSize(1, 1, InputCubes[0]->bandCount());
       SetOutputBrickSize(1, 1, OutputCubes[0]->bandCount());
     }
-    else if(Type() == ByLine) {
+    else if (Type() == ByLine) {
       SetInputBrickSize(InputCubes[0]->sampleCount(), 1,
                         InputCubes[0]->bandCount());
       SetOutputBrickSize(OutputCubes[0]->sampleCount(), 1,
@@ -218,30 +224,30 @@ namespace Isis {
    * This is a helper method for StartProcess() and ProcessCubes().
    */
   void ProcessBySpectra::SetBrickSizesForProcessCubes() {
-    if(Type() == PerPixel) {
-      for(unsigned int i = 0; i < InputCubes.size(); i++) {
+    if (Type() == PerPixel) {
+      for (unsigned int i = 0; i < InputCubes.size(); i++) {
         SetInputBrickSize(1, 1, InputCubes[i]->bandCount(), i + 1);
       }
-      for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+      for (unsigned int i = 0; i < OutputCubes.size(); i++) {
         SetOutputBrickSize(1, 1, OutputCubes[i]->bandCount(), i + 1);
       }
     }
-    else if(Type() == ByLine) {
-      for(unsigned int i = 0; i < InputCubes.size(); i++) {
+    else if (Type() == ByLine) {
+      for (unsigned int i = 0; i < InputCubes.size(); i++) {
         SetInputBrickSize(InputCubes[i]->sampleCount(), 1,
                           InputCubes[i]->bandCount(), i + 1);
       }
-      for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+      for (unsigned int i = 0; i < OutputCubes.size(); i++) {
         SetOutputBrickSize(OutputCubes[i]->sampleCount(), 1,
                            OutputCubes[i]->bandCount(), i + 1);
       }
     }
     else {
-      for(unsigned int i = 0; i < InputCubes.size(); i++) {
+      for (unsigned int i = 0; i < InputCubes.size(); i++) {
         SetInputBrickSize(1, InputCubes[i]->lineCount(),
                           InputCubes[i]->bandCount(), i + 1);
       }
-      for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+      for (unsigned int i = 0; i < OutputCubes.size(); i++) {
         SetOutputBrickSize(1, OutputCubes[i]->lineCount(),
                            OutputCubes[i]->bandCount(), i + 1);
       }

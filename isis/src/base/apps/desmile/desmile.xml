@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="desmile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  
+  <brief>
+    Resample an image to correct for spectral smile
+  </brief>
+  <description>
+   <!-- <p>
+      ROUGH DRAFT ONLY
+    </p>
+    <ul>
+      <li>TO DO:</li>
+      <li>Documentation</li>
+      <li>Add a band bin group to the output labels</li>
+      <li>Add option for running without a camera</li>
+      <li>Investigate output driven option</li>
+    </ul> -->
+    <p>
+      This program will spectrally resample an image. A common use is to correct for spectral smile.
+      The pixels of each spectrum must be spatially aligned (i.e., The pixel at 
+      (sample, line, band) (1,1,1) represents the same point on the target body as (1,1,2), and
+      (1,1,3), .... and so on for all spectra in the image.) For instruments where the 
+      spectra are not spatially aligned, the ISIS program cam2map can be used to project the cube. 
+    </p>
+    <p>
+      The program requires two spectral definition files as input. See the parameters SMILEDEF 
+      and OBJECTIVE for specifics. SMILEDEF  is used to define the wavelength and filter width of 
+      each element in the sensor. OBJECTIVE is used to define the wavelength and filter width of 
+      the pixels in the output cube.
+    </p>
+    <p>
+      Spectral definitions can have multiple sections. Each section represents the wavelength and 
+      filter width of a subset of bands. For example: a 256 band image may have two sections, where
+      the first 200 entries define the wavelength centers and filter widths for 2.489 to 1.2204 um, and 
+      the last 56 entries define the wavelength centers and filter widths for 2.2623 to 2.0898 um. 
+      Each section is defined by a reversal of the wavelength center values (i.e., 2.2, 2.3, 2.20, 2.25, 2.30
+      would define two sections with two entries in the first and three in the second). The input 
+      and output spectral definitions 
+      must have the same number of sections, and should contain wavelengths in the same range.
+      Spectral resampling will not cross section boundaries.
+    </p>
+    <p>
+      WARNING: This program is computationally intense and may take a long time to process
+      large cubes.
+    </p>
+    </description>
+  
+  <history>
+    <change name="Stuart Sides and Kristin Berry" date="2015-06-15">
+      Original version
+    </change> 
+    <change name="Kristin Berry" date="2015-11-06">
+      Added history to desmile output. 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Radiometric and Photometric Correction</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type> 
+        <fileMode>input</fileMode>
+        <brief>
+          Multi-band cube with a spectral smile that needs to be corrected.
+        </brief>
+        <description>
+          Use this parameter to select the file name of a multi-band cube with spectral smile that 
+          needs to be corrected. The cube must have an associated ISIS camera model and may 
+          be projected as long as the camera can still be used (i.e., The instrument and 
+          kernels groups in the label are intact). See the main description for information about 
+          how this cube must be spatially aligned.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS cube for the spectral smile corrected cube
+        </brief>
+        <description>
+          The output cube file that will contain the smile-corrected cube. This cube will be created
+          using the same number of samples and lines as the input cube (FROM) and the number
+          of bands in the OBJECTIVE spectral definition.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="SMILEDEF">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Spectral definition of the input cube
+        </brief>
+        <description>
+          <p>
+            Spectral definition file containing center wavelength and filter width information for each element
+            of the sensor. Typically elements are the pixels of the sensor, requiring a two-dimensional set of 
+            wavelength center and filter width pairs. Elements can also be defined as the lines of the sensor,
+            requiring a one-dimensional set of wavelength center and filter width pairs. The former case 
+            is typically used to correct spectral smile and the latter case to
+            to spectrally resample an image that does not contain spectral smile.
+          </p>
+          <p>
+            The two-dimensional definition is supported as a ISIS cube. The spectral definition
+            cube must have the same number of samples as the sensor, a number of bands equal to the number of lines
+	    on the sensor, and two lines. The first line contains the center wavelengths and the 
+            second contains the filter widths.
+          </p>
+          <p>
+            The one-dimensional definition is supported as a text file with comma separated values. Each line
+            contains the information for one band. Each line has center wavelength and filter width
+            separated by a comma. 
+          </p>
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="OBJECTIVE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Desired spectral definition of the output cube
+        </brief>
+        <description>
+          The spectral definition desired for the output cube. Each spectrum of the input cube
+          will be resampled to fit this definition. Both one-dimensional and two-dimensional
+          definitions are allowed. The one-dimensional type is used to flatten out a spectral
+          smile. See the description for the SMILEDEF parameter
+          for more information regarding spectral definition files.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

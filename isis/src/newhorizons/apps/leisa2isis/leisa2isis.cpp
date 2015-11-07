@@ -11,6 +11,7 @@
 #include "PvlKeyword.h"
 #include "UserInterface.h"
 #include "iTime.h"
+#include "ProgramLauncher.h"
 
 #include <fstream>
 #include <iostream>
@@ -18,6 +19,9 @@
 
 using namespace std;
 using namespace Isis;
+
+void processFunc(Buffer &in);
+Cube *outputCube; 
 
 void IsisMain() {
 
@@ -43,13 +47,15 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
+   bool replace = ui.GetBoolean("REPLACE"); 
+
   // Check to see if the calibration error image was requested from the FITS file and 
   // that it has the corresponding extension
   if (ui.WasEntered("ERRORMAP")) {
     PvlGroup extensionLabel; 
     try {
       extensionLabel = importFits.fitsLabel(5);
-      if (!extensionLabel.hasKeyword("XTENSION")) {
+/**      if (!extensionLabel.hasKeyword("XTENSION")) {
         QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
                       "LEISA FITS file. XTENSION keyword is missing in the fifth extension.")
                       .arg(ui.GetFileName("FROM"));
@@ -67,7 +73,7 @@ void IsisMain() {
                                   "calibrated image. FITS label value for EXTNAME is [%2]").
                                arg(ui.GetFileName("FROM")).arg(extensionLabel["EXTNAME"][0]);
         throw IException(IException::User, msg, _FILEINFO_);
-      }
+      } **/
     }
     catch (IException &e) {
       QString msg = QObject::tr("Unable to find errormap extension in [%1]").arg(ui.GetFileName("FROM"));
@@ -78,11 +84,11 @@ void IsisMain() {
 
   // Check to see if the quality image was requested from the FITS file and 
   // that it has the corresponding extension
-  if (ui.WasEntered("QUALITY")) {
+  if (ui.WasEntered("QUALITY") || replace) {
     PvlGroup  extensionLabel; 
     try {
       extensionLabel = importFits.fitsLabel(6); 
-      if (!extensionLabel.hasKeyword("XTENSION")) {
+/**      if (!extensionLabel.hasKeyword("XTENSION")) {
         QString msg = QObject::tr("Input file [%1] does not appear to be a calibrated New Horizons "
                       "LEISA FITS file. XTENSION keyword is missing in the sixth extension.")
                       .arg(ui.GetFileName("FROM"));
@@ -100,21 +106,36 @@ void IsisMain() {
                                   "calibrated image. FITS label value for EXTNAME is [%2]").
                                arg(ui.GetFileName("FROM")).arg(extensionLabel["EXTNAME"][0]);
         throw IException(IException::User, msg, _FILEINFO_);
-      }
+      } **/
     }
     catch (IException &e) {
       QString msg = QObject::tr("Unable to find quality extension in [%1]").arg(ui.GetFileName("FROM"));
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
-
-
   }
 
   // Import the primary image (LEISA raw/calibrated)
   importFits.SetOrganization(ProcessImport::BIL);
   importFits.setProcessFileStructure(0);
 
-  Cube *output = importFits.SetOutputCube("TO");
+  Cube *output = NULL; 
+  FileName outputFile; 
+  if (replace){
+    outputFile = FileName::createTempFile(FileName("$TEMPORARY/dn.cub"));
+
+    CubeAttributeOutput &att =
+      Application::GetUserInterface().GetOutputAttribute("TO");
+
+    //just set the PixelType to real
+    if (att.propagatePixelType()) {
+      att.setPixelType(Isis::Real); 
+    }
+
+    output = importFits.SetOutputCube(outputFile.toString(), att); 
+  } 
+  else {
+    output = importFits.SetOutputCube("TO");
+  }
 
   // Get the directory where the New Horizons translation tables are.
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
@@ -198,11 +219,45 @@ void IsisMain() {
   importFits.ClearCubes();
   importFits.Finalize();
 
+  //If replace was selected, add this with the bad pixel mask to get the final output file
+  if (replace) {
+    importFits.SetOrganization(ProcessImport::BIL);
+    importFits.setProcessFileStructure(6);
+
+    FileName qualityFile = FileName::createTempFile("$TEMPORARY/quality.cub"); 
+    CubeAttributeOutput &cao =
+      Application::GetUserInterface().GetOutputAttribute("TO");
+
+    //just set to Isis::Real
+    if (cao.propagatePixelType()) {
+      cao.setPixelType(Isis::Real); 
+    }
+
+    outputCube = importFits.SetOutputCube(qualityFile.toString(), cao); 
+
+    importFits.Progress()->SetText("Preparing quality image for comparing against LEISA pixels");
+    importFits.StartProcess(processFunc);
+    importFits.ClearCubes();
+    importFits.Finalize();
+
+    //now we have the temp cube and want to use fx to add it to the DN cube
+    //fx f1=temp_quality.cub f2=temp_dn.cub to=output_name.cub equation="f1 + f2"
+    QString parameters;
+    parameters += " F1= " + outputFile.toString();
+    parameters += " F2= " + qualityFile.toString();
+    parameters += " TO= " + ui.GetFileName("TO");
+    parameters += " EQUATION=" + QString("\"f1+f2\"");
+    ProgramLauncher::RunIsisProgram("fx", parameters);
+
+    // Cleanup by removing temporary cubes
+    remove(qualityFile.toString().toStdString().c_str());
+    remove(outputFile.toString().toStdString().c_str()); 
+  }
 
   // Import the ERRORMAP image. It is the 6th image in the FITS file (i.e., 5th extension)
   if (ui.WasEntered("ERRORMAP")) {
     PvlGroup extensionLabel = importFits.fitsLabel(5);
-    importFits.SetOrganization(ProcessImport::BSQ);
+    importFits.SetOrganization(ProcessImport::BIL);
     importFits.setProcessFileStructure(5);
     Cube *output = importFits.SetOutputCube("ERRORMAP");
 
@@ -221,7 +276,7 @@ void IsisMain() {
   // Import the quality image. It is the 7th image in the FITS file (i.e., 6th extension)
   if (ui.WasEntered("QUALITY")) {
     PvlGroup extensionLabel = importFits.fitsLabel(6);
-    importFits.SetOrganization(ProcessImport::BSQ);
+    importFits.SetOrganization(ProcessImport::BIL);
     importFits.setProcessFileStructure(6);
     Cube *output = importFits.SetOutputCube("QUALITY");
 
@@ -236,10 +291,17 @@ void IsisMain() {
     importFits.StartProcess();
     importFits.ClearCubes();
   }
-
-
-
 }
 
-
+void processFunc(Buffer &in){
+  for (int i = 0; i < in.size(); i++) {
+    if (((in[i] == 1) || (in[i] == 2)) || (in[i] == 8)) {
+      in[i] = Isis::NULL8;
+    } 
+    else {
+        in[i] = 0;
+    }
+  }
+  outputCube->write(in); 
+}
 

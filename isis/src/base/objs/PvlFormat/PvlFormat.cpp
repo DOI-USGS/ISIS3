@@ -274,7 +274,7 @@ namespace Isis {
       if (val[pos] == ' ' || val[pos] == '(' ||
           val[pos] == '(' || val[pos] == ')' ||
           val[pos] == '{' || val[pos] == '}' ||
-          val[pos] == ',') {
+          val[pos] == ',' || val[pos] == '=') {
         needQuotes = true;
       }
 

@@ -28,6 +28,7 @@
 
 #include "Brick.h"
 #include "Camera.h"
+#include "CameraFocalPlaneMap.h"
 #include "Cube.h"
 #include "CubeManager.h"
 #include "Distance.h"
@@ -79,6 +80,7 @@ namespace Isis {
   void CameraPointInfo::SetCube(const QString &cubeFileName) {
     m_currentCube = m_usedCubes->OpenCube(cubeFileName);
     m_camera = m_currentCube->camera();
+    m_camera->IgnoreProjection(true);
   }
 
 

@@ -44,10 +44,12 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -8.1469465758047175;
-    double knownLon = 210.2180045141801656;
+    double knownLat = -8.2967175607848702;
+    double knownLon = 210.1990629768775705;
+    // double knownLat = 0.0;
+    // double knownLon = 0.0;
 
-    Cube c("$newhorizons/testData/lor_0034821014_0x630_sci_1.cub", "r");
+    Cube c("$newhorizons/testData/lor_0034821014_0x630_sci_1_v2.cub", "r");
     NewHorizonsLorriCamera *cam = (NewHorizonsLorriCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -117,6 +119,7 @@ int main(void) {
     e.print();
   }
 }
+
 
 void TestLineSamp(Camera *cam, double samp, double line) {
   bool success = cam->SetImage(samp, line);

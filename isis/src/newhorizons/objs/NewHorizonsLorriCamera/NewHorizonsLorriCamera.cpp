@@ -44,7 +44,8 @@ namespace Isis {
    *
    * @param lab Pvl label from a New Horizons LORRI Framing Camera image.
    *
-   * @author Stuart Sides
+   * @author Stuart Sides 
+   *  
    * @internal
    */
 
@@ -58,11 +59,16 @@ namespace Isis {
 
     // The LORRI focal length is fixed and is designed not to change throught the operational 
     // temperature. The NAIF code, set in the ISIS labels, will be used to read a single focal 
-    // length from the SP:ICE kernels, but the units need to be changed from m to mm.
-    QString fl = "INS" + toString(naifIkCode()) + "_FOCAL_LENGTH";
-    double focalLength = Spice::getDouble(fl);
-    focalLength *= 1000.0;
-    SetFocalLength(focalLength);
+    // length from the SPICE kernels. Version 100 of the Lorri IK uses meters for focal length, 
+    // units, version 200 uses mm, and has a units keyword.
+    QString unitsKey = "INS" + toString(naifIkCode()) + "_FOCAL_LENGTH_UNITS";
+    QString focalLengthUnits = Spice::getString(unitsKey);
+    if (focalLengthUnits != "mm") {
+      QString msg = QObject::tr("SPICE keyword [%1] is expected to be mm. [%2] was found instead").
+                    arg(unitsKey).arg(focalLengthUnits);
+       throw IException(IException::User, msg, _FILEINFO_);      
+    }
+    SetFocalLength(Spice::getDouble("INS" + toString(naifIkCode()) + "_FOCAL_LENGTH"));
 
     // For setting the pixel pitch, the Naif keyword PIXEL_SIZE is used instead of the ISIS
     // default of PIXEL_PITCH, so set the value directly.
@@ -89,14 +95,16 @@ namespace Isis {
 
     // Setup distortion map. Start by reading the distortion coefficient from the instrument kernel.
     // Then construct the distortion model.
-//    new CameraDistortionMap(this, -1);
-//    CameraDistortionMap *distortionMap = new CameraDistortionMap(this, -1);
-//    distortionMap->SetDistortion(naifIkCode());
-    QString e2("INS" + toString(naifIkCode()) + "_EPSILON2");
-    QString e5("INS" + toString(naifIkCode()) + "_EPSILON5");
-    QString e6("INS" + toString(naifIkCode()) + "_EPSILON6");
-    new NewHorizonsLorriDistortionMap(this, getDouble(e2, 0), getDouble(e5, 0), 
-                                      getDouble(e6, 0), -1);
+    // Uncomment the 3 lines below to use the default distortion map (i.e., no distortion)
+    //    new CameraDistortionMap(this, -1);
+    //    CameraDistortionMap *distortionMap = new CameraDistortionMap(this, -1);
+    //    distortionMap->SetDistortion(naifIkCode());
+    // Changed the SPICE keyword names to work with LORRI IK version 200
+    QString e2("INS" + toString(naifIkCode()) + "_OOC_EM");
+    QString e5("INS" + toString(naifIkCode()) + "_OOC_EM");
+    QString e6("INS" + toString(naifIkCode()) + "_OOC_EM");
+    new NewHorizonsLorriDistortionMap(this, getDouble(e2, 0), getDouble(e5, 1), 
+                                      getDouble(e6, 2), -1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -136,7 +144,6 @@ namespace Isis {
     return FramingCamera::ShutterOpenCloseTimes(time - exposureDuration / 2.0, exposureDuration);
   }
 }
-
 
 /**
  * This is the function that is called in order to instantiate a NewHorizonsLorriCamera

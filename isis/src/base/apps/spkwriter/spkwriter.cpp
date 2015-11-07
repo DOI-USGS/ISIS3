@@ -66,7 +66,14 @@ void IsisMain() {
 
   for (int i = 0 ; i < flist.size() ; i++) {
     // Add and process each image
-    kernel.add(SpkSegment(flist[i].toString(), spkType));
+    try {
+      kernel.add(SpkSegment(flist[i].toString(), spkType)); 
+    } 
+    catch (IException &ie) {
+      QString mess = "Cannot create type 13 SPK. Please use type 9 or run jigsaw to create a "
+                     " polynomical solution for the Spice Position.";
+     throw IException(ie, IException::User, mess, _FILEINFO_);
+    }
     prog.CheckStatus();
   }
 

@@ -726,6 +726,17 @@ namespace Isis {
     // Framing cameras are already cached and don't need to be reduced.
     if(cacheTimeSize == 1) return Cache(tableName);
 
+    //If it's already a hermite cache, just return it.
+    if (p_source == HermiteCache) {
+      return Cache(tableName); 
+    }
+
+    // Make sure a polynomial function is already loaded
+    if(p_source != PolyFunction) {
+      QString msg = "A SpicePosition polynomial function has not been created yet";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     // Load the polynomial functions
     Isis::PolynomialUnivariate function1(p_degree);
     Isis::PolynomialUnivariate function2(p_degree);
@@ -733,12 +744,6 @@ namespace Isis {
     function1.SetCoefficients(p_coefficients[0]);
     function2.SetCoefficients(p_coefficients[1]);
     function3.SetCoefficients(p_coefficients[2]);
-
-    // Make sure a polynomial function is already loaded
-    if(p_source != PolyFunction) {
-      QString msg = "A SpicePosition polynomial function has not been created yet";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
 
     // Clear existing coordinates from cache
     ClearCache();
@@ -1314,7 +1319,7 @@ namespace Isis {
           zhermiteVelocities[i] = cacheVelocity[2];
         }
         else { // Not line scan camera
-          throw IException(IException::Io, "No velcities available.",
+          throw IException(IException::Io, "No velocities available.",
                            _FILEINFO_);
         }
       }
@@ -1548,7 +1553,7 @@ namespace Isis {
         zhermite.AddCubicHermiteDeriv(p_cacheVelocity[i][2]); // add z-velocity to z spline
       }
       else { // Not line scan camera
-        throw IException(IException::Io, "No velcities available.", _FILEINFO_);
+        throw IException(IException::Io, "No velocities available.", _FILEINFO_);
         // xhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
         // yhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
         // zhermite.AddCubicHermiteDeriv(0.0); // spacecraft didn't move => velocity = 0
