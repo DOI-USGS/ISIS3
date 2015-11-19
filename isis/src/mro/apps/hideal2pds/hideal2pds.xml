@@ -53,6 +53,9 @@
     <change name="Jeannie Backer" date="2012-11-21">
       Original Version of hideal2pds. Fixes #678.
     </change>
+    <change name="Makayla Shepherd" date="2015-10-06">
+      Added stretch parameters. Fixes #1761.
+    </change>
   </history>
 
   <groups>
@@ -120,7 +123,102 @@
           error.
         </description>
       </parameter>
-
     </group>
+    <group name="Stretch">
+          <parameter name="TYPE">
+        <type>string</type>
+        <default><item>AUTOMATIC</item></default>
+        <brief>
+          Select the type of stretch
+        </brief>
+        <description>
+          This parameter is used to select one of two ways to stretch output
+          pixels.  The are AUTOMATIC or MANUAL.
+        </description>
+        <list>
+          <option value="AUTOMATIC">
+            <brief>Automatically calculate stretch</brief>
+            <description>Automatically calculate stretch</description>
+            <exclusions>
+              <item>MIN</item> 
+              <item>MAX</item>
+            </exclusions>
+          </option>
+          <option value="MANUAL">
+            <brief>User defined stretch</brief>
+            <description>User defined stretch</description>
+              <exclusions>
+              <item>MINPER</item> 
+              <item>MAXPER</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+          <parameter name="MIN">
+              <type>double</type>
+              <brief>
+                  Lower bound of the stretch
+              </brief>
+              <description>
+                  Lower bound for the manually specified stretch.
+              </description>
+          </parameter>
+          <parameter name="MAX">
+              <type>double</type>
+              <brief>
+                  Upper bound of the stretch
+              </brief>
+              <description>
+                  Upper bound for the manually specified stretch.
+              </description>
+          </parameter>
+          <parameter name="MINPER">
+          <type>double</type>
+          <default>
+            <item>0.0</item>
+          </default>
+          <brief>
+            Minimum DN valid percentage
+          </brief>
+          <description>
+            The cumulative percentage value to be mapped to the minimum 
+            valid pixel for the specified number of bits. For example: With BITS=10
+            and MINPER=1.0, the DN which corresponds to the cummulative
+            percent of 1.0 will be mapped to 3, where 0 represents NULL, 1
+            represents LRS and 2 represents LIS.
+          </description>
+          <minimum inclusive="yes">0.0</minimum>
+          <maximum inclusive="yes">100.0</maximum>
+          <lessThanOrEqual>
+              <item>
+                  MAXPER
+                </item>
+          </lessThanOrEqual>
+        </parameter>
+
+        <parameter name="MAXPER">
+          <type>double</type>
+          <default>
+            <item>100.0</item>
+          </default>
+          <brief>
+            Mazimum DN valid percentage
+          </brief>
+          <description>
+            The cumulative percentage value to be mapped to the maximum 
+            valid pixel for the specified number of bits. For example: With BITS=10
+            and MINPER=99.0, the DN which corresponds to the cummulative
+            percent of 99.0 will be mapped to 1021, 1021=(2**bits)-1-2. 
+            Where 1023 represents HIS and 1022 represents HRS.
+          </description>
+          <minimum inclusive="yes">0.0</minimum>
+          <maximum inclusive="yes">100.0</maximum>
+          <greaterThanOrEqual>
+              <item>
+                MINPER
+              </item>
+          </greaterThanOrEqual>
+        </parameter>
+      </group>
   </groups>
 </application>

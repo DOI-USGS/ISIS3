@@ -29,6 +29,8 @@
 using namespace Isis;
 using namespace std;
 
+double *g_min, *g_max;
+
 pair<double, double> inputRange(Cube *inputCube);
 void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel);
 void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel);
@@ -38,6 +40,7 @@ void IsisMain() {
   // Get user interface and create a ProcessExportPds object
   UserInterface &ui = Application::GetUserInterface();  
   ProcessExportPds p;
+  Process pHist;
   Cube *inputCube = p.SetInputCube("FROM");
   PvlObject *isisCubeLab = inputCube->label();
 
@@ -64,11 +67,53 @@ void IsisMain() {
                   + target + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
+  
+  g_min = new double[inputCube->bandCount()];
+  g_max = new double[inputCube->bandCount()];
+
+  for (int band = 1; band <= inputCube->bandCount(); ++band) {
+
+    if (ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
+      // Set up a histogram for this band. This call sets the input range
+      // by making an initial stats pass to find the data min and max
+      Histogram hist(*inputCube, band, pHist.Progress());
+
+      // Loop and accumulate histogram
+      pHist.Progress()->SetText("Gathering Histogram");
+      pHist.Progress()->SetMaximumSteps(inputCube->lineCount());
+      pHist.Progress()->CheckStatus();
+      LineManager line(*inputCube);
+      for (int i = 1; i <= inputCube->lineCount(); i++) {
+        line.SetLine(i, band);
+        inputCube->read(line);
+        hist.AddData(line.DoubleBuffer(), line.size());
+        pHist.Progress()->CheckStatus();
+      }
+
+      // get the requested cumulative percentages
+      g_min[band-1] = ui.GetDouble("MINPER") == 0.0 ? hist.Minimum() : hist.Percent(ui.GetDouble("MINPER"));
+      g_max[band-1] = ui.GetDouble("MAXPER") == 100.0 ? hist.Maximum() : hist.Percent(ui.GetDouble("MAXPER"));
+    }
+    else {
+      g_min[band-1] = ui.GetDouble("MIN");
+      g_max[band-1] = ui.GetDouble("MAX");
+    }
+  }
+
+  // Find the minimum min and maximum max for all bands
+  double minmin = g_min[0];
+  double maxmax = g_max[0];
+  for (int band = 1; band < inputCube->bandCount(); ++band) {
+    if (g_min[band] < minmin) minmin = g_min[band];
+    if (g_max[band] > maxmax) maxmax = g_max[band];
+  }
+
+  pHist.EndProcess();
 
   // use histogram to calculate min/max for input range
   pair<double, double> inRange;
   inRange = inputRange(inputCube);
-  p.SetInputRange(inRange.first, inRange.second);
+  p.SetInputRange(minmin, maxmax);
   // output bit type will be 16bit unsigned word
   p.SetOutputType(Isis::UnsignedWord); 
   p.SetOutputNull(Isis::NULLU2);         
@@ -227,6 +272,9 @@ void IsisMain() {
   p.StartProcess(outputStream);
   p.EndProcess();
   outputStream.close();
+  
+  delete [] g_min;
+  delete [] g_max;
 }
 
 /**

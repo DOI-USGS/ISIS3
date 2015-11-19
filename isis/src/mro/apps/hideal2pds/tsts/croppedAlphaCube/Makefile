@@ -20,7 +20,8 @@ commands:
 	$(APPNAME) FROM=$(INPUT)/input.cub \
 	  to=$(OUTPUT)/output.img \
 	  rationale_desc="user entered" \
-	  version="2.0" > /dev/null;
+	  version="2.0" type=automatic \
+	  minper=.5 maxper=99.5 > /dev/null;
 	pds2hideal from=$(OUTPUT)/output.lbl \
 	  to=$(OUTPUT)/hideal2pds2hideal.cub > /dev/null;
 	tabledump from=$(OUTPUT)/hideal2pds2hideal.cub \
