@@ -367,8 +367,7 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-
-    if (Organization() == BIL) {
+    else if (Organization() == BIL) {
       if (toInt(label["NAXIS"][0]) == 2) {
         SetDimensions(toInt(label["NAXIS1"][0]) - (DataPrefixBytes()+DataSuffixBytes())/SizeOf(type),
                       1, toInt(label["NAXIS2"][0]));
@@ -381,6 +380,14 @@ namespace Isis {
         QString msg = "NAXIS count of [" + label["NAXIS"][0] + "] is not supported at this time";
         throw IException(IException::User, msg, _FILEINFO_);
       }
+    }
+    else if (Organization() == BIP) {
+      QString msg = "BIP (Band interleaved by pixel) organization is not supported at this time.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    else {
+      QString msg = "Unknown organization is not supported.";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Base and multiplier

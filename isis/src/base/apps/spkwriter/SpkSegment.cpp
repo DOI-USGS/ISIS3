@@ -120,7 +120,7 @@ void SpkSegment::import(Cube &cube) {
 
     getStates(*camera, load(spkCache), m_states, m_epochs, m_hasVV);
 
-      // Save current time
+    // Save current time
     SpicePosition *ipos(camera->instrumentPosition());
     double currentTime = ipos->EphemerisTime();
 
@@ -151,9 +151,9 @@ void SpkSegment::import(Cube &cube) {
     //  Restore saved time and determine degree of NAIF interpolation
     ipos->SetEphemerisTime(currentTime);
     m_degree = std::min((int) MaximumDegree, m_states.dim1()-1);
+
     //  Ensure the degree is odd and less that the even value
     m_degree = (((m_degree - 1) / 2) * 2) + 1;
-
 
 #if 0
     // Prints state vectors

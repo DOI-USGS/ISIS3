@@ -38,6 +38,8 @@ namespace Isis {
    *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           name methods.
+   * @history 2015-08-26 Kristin Berry - Updated error condition in SetBand and
+   *                          Camera::SetBand call to set the virtual band.
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.

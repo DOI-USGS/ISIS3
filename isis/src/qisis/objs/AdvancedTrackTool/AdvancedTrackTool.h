@@ -71,8 +71,10 @@ namespace Isis {
    *  @history 2014-06-17 Jeannie Backer - Modified to print set value to empty strings for
    *                          photometric angles, azimuths, resolutions if not valid.
    *                          References #1659.
-   *  @history 2015-05-13 Makayla Shepherd - Modified to improve handling of undefined slot behavior.
-   *                          References #2210.
+   *  @history 2015-05-13 Makayla Shepherd - Modified to improve handling of 
+   *                          undefined slot behavior. References #2210.
+   *  @history 2015-06-19 Makayla Shepherd - Added distorted Focal Plane and undistorted 
+   *                          Focal Plane to the table. References #1953.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -139,6 +141,11 @@ namespace Isis {
         DECLINATION,            //!< The declination for this point
         RESOLUTION,             //!< The resoultion for this point
         PHASE,                  //!< The phase for this point
+        DISTORTED_FOCAL_X,      //!< The x of the distorted focal plane
+        DISTORTED_FOCAL_Y,      //!< The y of the distorted focal plane
+        UNDISTORTED_FOCAL_X,    //!< The x of the undistorted focal plane
+        UNDISTORTED_FOCAL_Y,    //!< The y of the undistorted focal plane
+        UNDISTORTED_FOCAL_Z,    //!< The z of the undistorted focal plane
         INCIDENCE,              //!< The incidence for this point
         EMISSION,               //!< The emission for this point
         LOCAL_INCIDENCE,        //!< The local incidence for this point

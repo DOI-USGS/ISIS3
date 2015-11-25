@@ -61,7 +61,7 @@ namespace Isis {
    *                           of CKs using ckwriter. References #1737.  
    *   @history 2015-08-24 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test for these
-   *                           methods and added data for LO4 and LO5
+   *                           methods and added data for LO4 and LO5.
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.

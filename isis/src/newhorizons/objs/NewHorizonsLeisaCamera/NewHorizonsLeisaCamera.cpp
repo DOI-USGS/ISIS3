@@ -125,20 +125,20 @@ namespace Isis {
    *
    * @param vband The band number to set
    *
-   * @author 2014-09-24 Stuart Sides
+   * @author 2014-09-24 Stuart Sides 
+   *  
    */
   void NewHorizonsLeisaCamera::SetBand(const int vband) {
-
-    // Lookup the original band from the band bin group.
-    if (vband > (int) m_originalBand.size()) {
-     QString msg = QObject::tr("Band number out of array bounds in NewHorizonsLeisaCamera::SetBand legal "
-                                "bands are [1-%1], input was [%2]").
-                    arg(m_originalBand.size()).arg(vband);
+    if ( (vband < 1) || (vband > m_originalBand.size())) {
+     QString msg = QObject::tr("Band number out of array bounds in NewHorizonsLeisaCamera::SetBand "
+                               "legal bands are [1-%1], input was [%2]").
+                               arg(m_originalBand.size()).arg(vband);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     int band;
     band = m_originalBand[vband-1];
-
+    Camera::SetBand(vband);
+    
     // Get the affine coefficients from the focal plane map and adjust the constant terms to
     // provide the correct Y/Line offset for this band
     QVector<double> temp;

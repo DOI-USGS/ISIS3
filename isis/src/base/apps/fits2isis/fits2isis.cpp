@@ -24,6 +24,21 @@ void IsisMain() {
   ProcessImportFits pfits;
 
   pfits.setFitsFile(FileName(ui.GetFileName("FROM")));
+
+  if(ui.GetString("ORGANIZATION") == "BIL") {
+    pfits.SetOrganization(ProcessImport::BIL);
+  }
+  else if(ui.GetString("ORGANIZATION") == "BSQ") {
+    pfits.SetOrganization(ProcessImport::BSQ);
+  }
+  else if(ui.GetString("ORGANIZATION") == "BIP") {
+    pfits.SetOrganization(ProcessImport::BIP);
+  }
+  else {
+    QString msg = "Unknow value for ORGANIZATION [" + ui.GetString("ORGANIZATION") + "]";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
   pfits.setProcessFileStructure(ui.GetInteger("IMAGENUMBER"));
 
   Cube *output = pfits.SetOutputCube("TO");

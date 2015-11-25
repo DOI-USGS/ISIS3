@@ -1,0 +1,12 @@
+----- Testing SpectralDefinition (Abstract Class)  -----
+Sample count: 0
+Line count: 0
+Band count: 0
+Section count: 0
+----- getSpectel(s,l,b) -----
+Sample: 1
+Line: 2
+Band: 3
+DN: 0.1
+Wavelength Center: 0.2
+Filter width: 0.3

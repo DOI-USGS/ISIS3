@@ -1,0 +1,33 @@
+Unit test for Spectel
+Testing Spectel instantiation with all numerical inputs ...
+Sample:   1
+Line:   2
+Band:   100
+DN:   123.45
+Central wavelength:   0.1
+Filter width:   0.05
+
+Testing Spectel's copy constructor ...
+Sample:   1
+Line:   2
+Band:   100
+DN:   123.45
+Central wavelength:   0.1
+Filter width:   0.05
+
+Testing Spectel's copy assignemnet operator ...
+Sample:   1
+Line:   2
+Band:   100
+DN:   123.45
+Central wavelength:   0.1
+Filter width:   0.05
+
+Testing Spectel's constructor that takes a Pixel ...
+Sample:   1
+Line:   2
+Band:   3
+DN:   0.4
+Central wavelength:   0.5
+Filter width:   0.6
+

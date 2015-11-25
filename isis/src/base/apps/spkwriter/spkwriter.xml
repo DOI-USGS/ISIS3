@@ -242,6 +242,9 @@ User Comments
         instead of completely replacing them. Added OVERLAP parameter to allow 
         user to specify how start/end time conflicts are handled.  Fixes #1739.
     </change>
+    <change name="Kristin Berry" date="2015-11-06">
+       Updated to work on newly spiceinited images (no jigsaw or other position update) using SPICE SPK type 13.
+    </change>
 </history>
 
   <groups>

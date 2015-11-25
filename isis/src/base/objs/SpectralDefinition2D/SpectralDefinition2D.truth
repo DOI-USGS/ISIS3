@@ -1,0 +1,323 @@
+----- Testing Constructors -----
+
+Constructor given a 5x2x20 cube
+Constructor given a 5x2x20 cube
+Importing Spectral Definition Cube
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Spectel at (s,b) (1, 1) : Wavelength=1 Width=91
+Spectel at (s,b) (1, 2) : Wavelength=2 Width=92
+Spectel at (s,b) (1, 3) : Wavelength=3 Width=93
+Spectel at (s,b) (1, 4) : Wavelength=4 Width=94
+Spectel at (s,b) (1, 5) : Wavelength=5 Width=95
+Spectel at (s,b) (1, 6) : Wavelength=6 Width=96
+Spectel at (s,b) (1, 7) : Wavelength=7 Width=97
+Spectel at (s,b) (1, 8) : Wavelength=8 Width=98
+Spectel at (s,b) (1, 9) : Wavelength=9 Width=99
+Spectel at (s,b) (1, 10) : Wavelength=10 Width=910
+Spectel at (s,b) (1, 11) : Wavelength=11 Width=911
+Spectel at (s,b) (1, 12) : Wavelength=12 Width=912
+Spectel at (s,b) (1, 13) : Wavelength=13 Width=913
+Spectel at (s,b) (1, 14) : Wavelength=14 Width=914
+Spectel at (s,b) (1, 15) : Wavelength=15 Width=915
+Spectel at (s,b) (1, 16) : Wavelength=16 Width=916
+Spectel at (s,b) (1, 17) : Wavelength=17 Width=917
+Spectel at (s,b) (1, 18) : Wavelength=18 Width=918
+Spectel at (s,b) (1, 19) : Wavelength=19 Width=919
+Spectel at (s,b) (1, 20) : Wavelength=20 Width=920
+Spectel at (s,b) (2, 1) : Wavelength=1 Width=91
+Spectel at (s,b) (2, 2) : Wavelength=2 Width=92
+Spectel at (s,b) (2, 3) : Wavelength=3 Width=93
+Spectel at (s,b) (2, 4) : Wavelength=4 Width=94
+Spectel at (s,b) (2, 5) : Wavelength=5 Width=95
+Spectel at (s,b) (2, 6) : Wavelength=6 Width=96
+Spectel at (s,b) (2, 7) : Wavelength=7 Width=97
+Spectel at (s,b) (2, 8) : Wavelength=8 Width=98
+Spectel at (s,b) (2, 9) : Wavelength=9 Width=99
+Spectel at (s,b) (2, 10) : Wavelength=10 Width=910
+Spectel at (s,b) (2, 11) : Wavelength=11 Width=911
+Spectel at (s,b) (2, 12) : Wavelength=12 Width=912
+Spectel at (s,b) (2, 13) : Wavelength=13 Width=913
+Spectel at (s,b) (2, 14) : Wavelength=14 Width=914
+Spectel at (s,b) (2, 15) : Wavelength=15 Width=915
+Spectel at (s,b) (2, 16) : Wavelength=16 Width=916
+Spectel at (s,b) (2, 17) : Wavelength=17 Width=917
+Spectel at (s,b) (2, 18) : Wavelength=18 Width=918
+Spectel at (s,b) (2, 19) : Wavelength=19 Width=919
+Spectel at (s,b) (2, 20) : Wavelength=20 Width=920
+Spectel at (s,b) (3, 1) : Wavelength=1 Width=91
+Spectel at (s,b) (3, 2) : Wavelength=2 Width=92
+Spectel at (s,b) (3, 3) : Wavelength=3 Width=93
+Spectel at (s,b) (3, 4) : Wavelength=4 Width=94
+Spectel at (s,b) (3, 5) : Wavelength=5 Width=95
+Spectel at (s,b) (3, 6) : Wavelength=6 Width=96
+Spectel at (s,b) (3, 7) : Wavelength=7 Width=97
+Spectel at (s,b) (3, 8) : Wavelength=8 Width=98
+Spectel at (s,b) (3, 9) : Wavelength=9 Width=99
+Spectel at (s,b) (3, 10) : Wavelength=10 Width=910
+Spectel at (s,b) (3, 11) : Wavelength=11 Width=911
+Spectel at (s,b) (3, 12) : Wavelength=12 Width=912
+Spectel at (s,b) (3, 13) : Wavelength=13 Width=913
+Spectel at (s,b) (3, 14) : Wavelength=14 Width=914
+Spectel at (s,b) (3, 15) : Wavelength=15 Width=915
+Spectel at (s,b) (3, 16) : Wavelength=16 Width=916
+Spectel at (s,b) (3, 17) : Wavelength=17 Width=917
+Spectel at (s,b) (3, 18) : Wavelength=18 Width=918
+Spectel at (s,b) (3, 19) : Wavelength=19 Width=919
+Spectel at (s,b) (3, 20) : Wavelength=20 Width=920
+Spectel at (s,b) (4, 1) : Wavelength=1 Width=91
+Spectel at (s,b) (4, 2) : Wavelength=2 Width=92
+Spectel at (s,b) (4, 3) : Wavelength=3 Width=93
+Spectel at (s,b) (4, 4) : Wavelength=4 Width=94
+Spectel at (s,b) (4, 5) : Wavelength=5 Width=95
+Spectel at (s,b) (4, 6) : Wavelength=6 Width=96
+Spectel at (s,b) (4, 7) : Wavelength=7 Width=97
+Spectel at (s,b) (4, 8) : Wavelength=8 Width=98
+Spectel at (s,b) (4, 9) : Wavelength=9 Width=99
+Spectel at (s,b) (4, 10) : Wavelength=10 Width=910
+Spectel at (s,b) (4, 11) : Wavelength=11 Width=911
+Spectel at (s,b) (4, 12) : Wavelength=12 Width=912
+Spectel at (s,b) (4, 13) : Wavelength=13 Width=913
+Spectel at (s,b) (4, 14) : Wavelength=14 Width=914
+Spectel at (s,b) (4, 15) : Wavelength=15 Width=915
+Spectel at (s,b) (4, 16) : Wavelength=16 Width=916
+Spectel at (s,b) (4, 17) : Wavelength=17 Width=917
+Spectel at (s,b) (4, 18) : Wavelength=18 Width=918
+Spectel at (s,b) (4, 19) : Wavelength=19 Width=919
+Spectel at (s,b) (4, 20) : Wavelength=20 Width=920
+Spectel at (s,b) (5, 1) : Wavelength=1 Width=91
+Spectel at (s,b) (5, 2) : Wavelength=2 Width=92
+Spectel at (s,b) (5, 3) : Wavelength=3 Width=93
+Spectel at (s,b) (5, 4) : Wavelength=4 Width=94
+Spectel at (s,b) (5, 5) : Wavelength=5 Width=95
+Spectel at (s,b) (5, 6) : Wavelength=6 Width=96
+Spectel at (s,b) (5, 7) : Wavelength=7 Width=97
+Spectel at (s,b) (5, 8) : Wavelength=8 Width=98
+Spectel at (s,b) (5, 9) : Wavelength=9 Width=99
+Spectel at (s,b) (5, 10) : Wavelength=10 Width=910
+Spectel at (s,b) (5, 11) : Wavelength=11 Width=911
+Spectel at (s,b) (5, 12) : Wavelength=12 Width=912
+Spectel at (s,b) (5, 13) : Wavelength=13 Width=913
+Spectel at (s,b) (5, 14) : Wavelength=14 Width=914
+Spectel at (s,b) (5, 15) : Wavelength=15 Width=915
+Spectel at (s,b) (5, 16) : Wavelength=16 Width=916
+Spectel at (s,b) (5, 17) : Wavelength=17 Width=917
+Spectel at (s,b) (5, 18) : Wavelength=18 Width=918
+Spectel at (s,b) (5, 19) : Wavelength=19 Width=919
+Spectel at (s,b) (5, 20) : Wavelength=20 Width=920
+----- Testing searching -----
+
+Importing Spectral Definition Cube
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Spectel at (s,b) (1, 1) : Wavelength=2 Width=92
+Spectel at (s,b) (1, 1) : Wavelength=2 Width=92
+----- Testing sections -----
+
+Importing Spectral Definition Cube
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Number of section: 4
+Spectel at (s,b) (1, 1 ): Wavelength=1 Width=91
+Spectel at (s,b) (1, 2 ): Wavelength=2 Width=92
+Spectel at (s,b) (1, 3 ): Wavelength=3 Width=93
+Spectel at (s,b) (1, 4 ): Wavelength=4 Width=94
+Spectel at (s,b) (1, 5 ): Wavelength=5 Width=95
+Spectel at (s,b) (1, 6 ): Wavelength=1 Width=96
+Spectel at (s,b) (1, 7 ): Wavelength=2 Width=97
+Spectel at (s,b) (1, 8 ): Wavelength=3 Width=98
+Spectel at (s,b) (1, 9 ): Wavelength=4 Width=99
+Spectel at (s,b) (1, 10 ): Wavelength=5 Width=910
+Spectel at (s,b) (1, 11 ): Wavelength=1 Width=911
+Spectel at (s,b) (1, 12 ): Wavelength=2 Width=912
+Spectel at (s,b) (1, 13 ): Wavelength=3 Width=913
+Spectel at (s,b) (1, 14 ): Wavelength=4 Width=914
+Spectel at (s,b) (1, 15 ): Wavelength=5 Width=915
+Spectel at (s,b) (1, 16 ): Wavelength=1 Width=916
+Spectel at (s,b) (1, 17 ): Wavelength=2 Width=917
+Spectel at (s,b) (1, 18 ): Wavelength=3 Width=918
+Spectel at (s,b) (1, 19 ): Wavelength=4 Width=919
+Spectel at (s,b) (1, 20 ): Wavelength=5 Width=920
+Spectel at (s,b) (2, 1 ): Wavelength=1 Width=91
+Spectel at (s,b) (2, 2 ): Wavelength=2 Width=92
+Spectel at (s,b) (2, 3 ): Wavelength=3 Width=93
+Spectel at (s,b) (2, 4 ): Wavelength=4 Width=94
+Spectel at (s,b) (2, 5 ): Wavelength=5 Width=95
+Spectel at (s,b) (2, 6 ): Wavelength=1 Width=96
+Spectel at (s,b) (2, 7 ): Wavelength=2 Width=97
+Spectel at (s,b) (2, 8 ): Wavelength=3 Width=98
+Spectel at (s,b) (2, 9 ): Wavelength=4 Width=99
+Spectel at (s,b) (2, 10 ): Wavelength=5 Width=910
+Spectel at (s,b) (2, 11 ): Wavelength=1 Width=911
+Spectel at (s,b) (2, 12 ): Wavelength=2 Width=912
+Spectel at (s,b) (2, 13 ): Wavelength=3 Width=913
+Spectel at (s,b) (2, 14 ): Wavelength=4 Width=914
+Spectel at (s,b) (2, 15 ): Wavelength=5 Width=915
+Spectel at (s,b) (2, 16 ): Wavelength=1 Width=916
+Spectel at (s,b) (2, 17 ): Wavelength=2 Width=917
+Spectel at (s,b) (2, 18 ): Wavelength=3 Width=918
+Spectel at (s,b) (2, 19 ): Wavelength=4 Width=919
+Spectel at (s,b) (2, 20 ): Wavelength=5 Width=920
+Spectel at (s,b) (3, 1 ): Wavelength=1 Width=91
+Spectel at (s,b) (3, 2 ): Wavelength=2 Width=92
+Spectel at (s,b) (3, 3 ): Wavelength=3 Width=93
+Spectel at (s,b) (3, 4 ): Wavelength=4 Width=94
+Spectel at (s,b) (3, 5 ): Wavelength=5 Width=95
+Spectel at (s,b) (3, 6 ): Wavelength=1 Width=96
+Spectel at (s,b) (3, 7 ): Wavelength=2 Width=97
+Spectel at (s,b) (3, 8 ): Wavelength=3 Width=98
+Spectel at (s,b) (3, 9 ): Wavelength=4 Width=99
+Spectel at (s,b) (3, 10 ): Wavelength=5 Width=910
+Spectel at (s,b) (3, 11 ): Wavelength=1 Width=911
+Spectel at (s,b) (3, 12 ): Wavelength=2 Width=912
+Spectel at (s,b) (3, 13 ): Wavelength=3 Width=913
+Spectel at (s,b) (3, 14 ): Wavelength=4 Width=914
+Spectel at (s,b) (3, 15 ): Wavelength=5 Width=915
+Spectel at (s,b) (3, 16 ): Wavelength=1 Width=916
+Spectel at (s,b) (3, 17 ): Wavelength=2 Width=917
+Spectel at (s,b) (3, 18 ): Wavelength=3 Width=918
+Spectel at (s,b) (3, 19 ): Wavelength=4 Width=919
+Spectel at (s,b) (3, 20 ): Wavelength=5 Width=920
+Spectel at (s,b) (4, 1 ): Wavelength=1 Width=91
+Spectel at (s,b) (4, 2 ): Wavelength=2 Width=92
+Spectel at (s,b) (4, 3 ): Wavelength=3 Width=93
+Spectel at (s,b) (4, 4 ): Wavelength=4 Width=94
+Spectel at (s,b) (4, 5 ): Wavelength=5 Width=95
+Spectel at (s,b) (4, 6 ): Wavelength=1 Width=96
+Spectel at (s,b) (4, 7 ): Wavelength=2 Width=97
+Spectel at (s,b) (4, 8 ): Wavelength=3 Width=98
+Spectel at (s,b) (4, 9 ): Wavelength=4 Width=99
+Spectel at (s,b) (4, 10 ): Wavelength=5 Width=910
+Spectel at (s,b) (4, 11 ): Wavelength=1 Width=911
+Spectel at (s,b) (4, 12 ): Wavelength=2 Width=912
+Spectel at (s,b) (4, 13 ): Wavelength=3 Width=913
+Spectel at (s,b) (4, 14 ): Wavelength=4 Width=914
+Spectel at (s,b) (4, 15 ): Wavelength=5 Width=915
+Spectel at (s,b) (4, 16 ): Wavelength=1 Width=916
+Spectel at (s,b) (4, 17 ): Wavelength=2 Width=917
+Spectel at (s,b) (4, 18 ): Wavelength=3 Width=918
+Spectel at (s,b) (4, 19 ): Wavelength=4 Width=919
+Spectel at (s,b) (4, 20 ): Wavelength=5 Width=920
+Spectel at (s,b) (5, 1 ): Wavelength=1 Width=91
+Spectel at (s,b) (5, 2 ): Wavelength=2 Width=92
+Spectel at (s,b) (5, 3 ): Wavelength=3 Width=93
+Spectel at (s,b) (5, 4 ): Wavelength=4 Width=94
+Spectel at (s,b) (5, 5 ): Wavelength=5 Width=95
+Spectel at (s,b) (5, 6 ): Wavelength=1 Width=96
+Spectel at (s,b) (5, 7 ): Wavelength=2 Width=97
+Spectel at (s,b) (5, 8 ): Wavelength=3 Width=98
+Spectel at (s,b) (5, 9 ): Wavelength=4 Width=99
+Spectel at (s,b) (5, 10 ): Wavelength=5 Width=910
+Spectel at (s,b) (5, 11 ): Wavelength=1 Width=911
+Spectel at (s,b) (5, 12 ): Wavelength=2 Width=912
+Spectel at (s,b) (5, 13 ): Wavelength=3 Width=913
+Spectel at (s,b) (5, 14 ): Wavelength=4 Width=914
+Spectel at (s,b) (5, 15 ): Wavelength=5 Width=915
+Spectel at (s,b) (5, 16 ): Wavelength=1 Width=916
+Spectel at (s,b) (5, 17 ): Wavelength=2 Width=917
+Spectel at (s,b) (5, 18 ): Wavelength=3 Width=918
+Spectel at (s,b) (5, 19 ): Wavelength=4 Width=919
+Spectel at (s,b) (5, 20 ): Wavelength=5 Width=920
+Section number is: 0
+Section number is: 1
+----- Testing toString -----
+
+Spectel at (s,b) (0, 0) : Wavelength=1 Width=91
+Spectel at (s,b) (0, 1) : Wavelength=2 Width=92
+Spectel at (s,b) (0, 2) : Wavelength=3 Width=93
+Spectel at (s,b) (0, 3) : Wavelength=4 Width=94
+Spectel at (s,b) (0, 4) : Wavelength=5 Width=95
+Spectel at (s,b) (0, 5) : Wavelength=1 Width=96
+Spectel at (s,b) (0, 6) : Wavelength=2 Width=97
+Spectel at (s,b) (0, 7) : Wavelength=3 Width=98
+Spectel at (s,b) (0, 8) : Wavelength=4 Width=99
+Spectel at (s,b) (0, 9) : Wavelength=5 Width=910
+Spectel at (s,b) (0, 10) : Wavelength=1 Width=911
+Spectel at (s,b) (0, 11) : Wavelength=2 Width=912
+Spectel at (s,b) (0, 12) : Wavelength=3 Width=913
+Spectel at (s,b) (0, 13) : Wavelength=4 Width=914
+Spectel at (s,b) (0, 14) : Wavelength=5 Width=915
+Spectel at (s,b) (0, 15) : Wavelength=1 Width=916
+Spectel at (s,b) (0, 16) : Wavelength=2 Width=917
+Spectel at (s,b) (0, 17) : Wavelength=3 Width=918
+Spectel at (s,b) (0, 18) : Wavelength=4 Width=919
+Spectel at (s,b) (0, 19) : Wavelength=5 Width=920
+Spectel at (s,b) (1, 0) : Wavelength=1 Width=91
+Spectel at (s,b) (1, 1) : Wavelength=2 Width=92
+Spectel at (s,b) (1, 2) : Wavelength=3 Width=93
+Spectel at (s,b) (1, 3) : Wavelength=4 Width=94
+Spectel at (s,b) (1, 4) : Wavelength=5 Width=95
+Spectel at (s,b) (1, 5) : Wavelength=1 Width=96
+Spectel at (s,b) (1, 6) : Wavelength=2 Width=97
+Spectel at (s,b) (1, 7) : Wavelength=3 Width=98
+Spectel at (s,b) (1, 8) : Wavelength=4 Width=99
+Spectel at (s,b) (1, 9) : Wavelength=5 Width=910
+Spectel at (s,b) (1, 10) : Wavelength=1 Width=911
+Spectel at (s,b) (1, 11) : Wavelength=2 Width=912
+Spectel at (s,b) (1, 12) : Wavelength=3 Width=913
+Spectel at (s,b) (1, 13) : Wavelength=4 Width=914
+Spectel at (s,b) (1, 14) : Wavelength=5 Width=915
+Spectel at (s,b) (1, 15) : Wavelength=1 Width=916
+Spectel at (s,b) (1, 16) : Wavelength=2 Width=917
+Spectel at (s,b) (1, 17) : Wavelength=3 Width=918
+Spectel at (s,b) (1, 18) : Wavelength=4 Width=919
+Spectel at (s,b) (1, 19) : Wavelength=5 Width=920
+Spectel at (s,b) (2, 0) : Wavelength=1 Width=91
+Spectel at (s,b) (2, 1) : Wavelength=2 Width=92
+Spectel at (s,b) (2, 2) : Wavelength=3 Width=93
+Spectel at (s,b) (2, 3) : Wavelength=4 Width=94
+Spectel at (s,b) (2, 4) : Wavelength=5 Width=95
+Spectel at (s,b) (2, 5) : Wavelength=1 Width=96
+Spectel at (s,b) (2, 6) : Wavelength=2 Width=97
+Spectel at (s,b) (2, 7) : Wavelength=3 Width=98
+Spectel at (s,b) (2, 8) : Wavelength=4 Width=99
+Spectel at (s,b) (2, 9) : Wavelength=5 Width=910
+Spectel at (s,b) (2, 10) : Wavelength=1 Width=911
+Spectel at (s,b) (2, 11) : Wavelength=2 Width=912
+Spectel at (s,b) (2, 12) : Wavelength=3 Width=913
+Spectel at (s,b) (2, 13) : Wavelength=4 Width=914
+Spectel at (s,b) (2, 14) : Wavelength=5 Width=915
+Spectel at (s,b) (2, 15) : Wavelength=1 Width=916
+Spectel at (s,b) (2, 16) : Wavelength=2 Width=917
+Spectel at (s,b) (2, 17) : Wavelength=3 Width=918
+Spectel at (s,b) (2, 18) : Wavelength=4 Width=919
+Spectel at (s,b) (2, 19) : Wavelength=5 Width=920
+Spectel at (s,b) (3, 0) : Wavelength=1 Width=91
+Spectel at (s,b) (3, 1) : Wavelength=2 Width=92
+Spectel at (s,b) (3, 2) : Wavelength=3 Width=93
+Spectel at (s,b) (3, 3) : Wavelength=4 Width=94
+Spectel at (s,b) (3, 4) : Wavelength=5 Width=95
+Spectel at (s,b) (3, 5) : Wavelength=1 Width=96
+Spectel at (s,b) (3, 6) : Wavelength=2 Width=97
+Spectel at (s,b) (3, 7) : Wavelength=3 Width=98
+Spectel at (s,b) (3, 8) : Wavelength=4 Width=99
+Spectel at (s,b) (3, 9) : Wavelength=5 Width=910
+Spectel at (s,b) (3, 10) : Wavelength=1 Width=911
+Spectel at (s,b) (3, 11) : Wavelength=2 Width=912
+Spectel at (s,b) (3, 12) : Wavelength=3 Width=913
+Spectel at (s,b) (3, 13) : Wavelength=4 Width=914
+Spectel at (s,b) (3, 14) : Wavelength=5 Width=915
+Spectel at (s,b) (3, 15) : Wavelength=1 Width=916
+Spectel at (s,b) (3, 16) : Wavelength=2 Width=917
+Spectel at (s,b) (3, 17) : Wavelength=3 Width=918
+Spectel at (s,b) (3, 18) : Wavelength=4 Width=919
+Spectel at (s,b) (3, 19) : Wavelength=5 Width=920
+Spectel at (s,b) (4, 0) : Wavelength=1 Width=91
+Spectel at (s,b) (4, 1) : Wavelength=2 Width=92
+Spectel at (s,b) (4, 2) : Wavelength=3 Width=93
+Spectel at (s,b) (4, 3) : Wavelength=4 Width=94
+Spectel at (s,b) (4, 4) : Wavelength=5 Width=95
+Spectel at (s,b) (4, 5) : Wavelength=1 Width=96
+Spectel at (s,b) (4, 6) : Wavelength=2 Width=97
+Spectel at (s,b) (4, 7) : Wavelength=3 Width=98
+Spectel at (s,b) (4, 8) : Wavelength=4 Width=99
+Spectel at (s,b) (4, 9) : Wavelength=5 Width=910
+Spectel at (s,b) (4, 10) : Wavelength=1 Width=911
+Spectel at (s,b) (4, 11) : Wavelength=2 Width=912
+Spectel at (s,b) (4, 12) : Wavelength=3 Width=913
+Spectel at (s,b) (4, 13) : Wavelength=4 Width=914
+Spectel at (s,b) (4, 14) : Wavelength=5 Width=915
+Spectel at (s,b) (4, 15) : Wavelength=1 Width=916
+Spectel at (s,b) (4, 16) : Wavelength=2 Width=917
+Spectel at (s,b) (4, 17) : Wavelength=3 Width=918
+Spectel at (s,b) (4, 18) : Wavelength=4 Width=919
+Spectel at (s,b) (4, 19) : Wavelength=5 Width=920
+----- Testing outside of definition errors -----
+

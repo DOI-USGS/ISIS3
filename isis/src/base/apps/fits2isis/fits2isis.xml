@@ -20,6 +20,10 @@
     <change name="Stuart Sides" date="2014-08-29">
       Added the ability to read image extensions.
     </change> 
+    <change name="Kristin Berry" date="2015-06-02">
+	Added the ability to set the organization of the input file to BIL, BSQ, or BIP. 
+	Added tests for these new options.  
+    </change>
   </history>
 
   <seeAlso>
@@ -77,6 +81,39 @@
           is 0, the first  image extension is 1, the second image extension is 2, and so on. NOTE: 
           Image extensions following any non-image extension can not be accessed.
         </description>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="ORGANIZATION">
+        <type>string</type>
+        <default>
+          <item>BSQ</item>
+        </default>
+        <brief>Image Organization</brief>
+        <description>
+          The organization of lines, samples, and bands in the file. 
+        </description>
+        <list>
+          <option value="BSQ">
+            <brief>Band Sequential</brief>
+            <description>
+		The first line of data is followed immediately by the next line in the same spectral band.
+            </description>
+          </option>
+          <option value="BIL">
+            <brief>Band Interleaved By Line</brief>
+            <description>
+              The first line of data is followed immediately by the first line of data in the next band.
+            </description>
+          </option>
+	  <option value="BIP">
+            <brief>Band Interleaved By Pixel</brief>
+            <description>
+             The first pixel for all bands is followed by the second pixel for all bands.
+            </description>
+          </option>
+        </list>
       </parameter>
     </group>
   </groups>

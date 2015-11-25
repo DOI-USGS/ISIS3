@@ -87,5 +87,92 @@ int main(int argc, char *argv[]) {
   cout << "IsLrs:    " << Isis::Pixel::IsLrs(d) << endl;
   cout << "IsLis:    " << Isis::Pixel::IsLis(d) << endl;
   cout << endl;
+
+  float f = 0.0; 
+  cout << "Testing float 0.0 ... " << endl;
+  cout << "IsSpecial:     " << Isis::Pixel::IsSpecial(f) << endl;
+
+
+  cout << "Testing Pixel instantiation with normal DN ..." << endl;
+
+  Isis::Pixel pix(1,2,100, 123.45); 
+
+  cout << "Sample:   " << pix.sample() << endl;
+  cout << "Line:   " << pix.line() << endl;
+  cout << "Band:   " << pix.band() << endl;
+  cout << "DN:   " << pix.DN() << endl;
+
+  cout << "IsSpecial: " << pix.IsSpecial() << endl;
+  cout << "IsValid: " << pix.IsValid() << endl; 
+  cout << "IsNull: " << pix.IsNull() << endl; 
+  cout << "IsHigh: " << pix.IsHigh() << endl; 
+  cout << "IsLow: " << pix.IsLow() << endl; 
+  cout << "IsHrs: " << pix.IsHrs() << endl; 
+  cout << "IsHis: " << pix.IsHis() << endl; 
+  cout << "IsLrs: " << pix.IsLrs() << endl; 
+  cout << "IsLis: " << pix.IsLis() << endl; 
+  cout << "ToString: " << pix.ToString() << endl; 
+  cout << "ToFloat: " << pix.ToFloat() << endl; 
+  cout << "ToDouble: " << pix.ToDouble() << endl; 
+  cout << "To8Bit: " << static_cast<unsigned>(pix.To8Bit()) << endl; 
+  cout << "To16Bit: " << pix.To16Bit() << endl; 
+  cout << "To32Bit: " << pix.To32Bit() << endl; 
+  cout << endl; 
+
+  cout << "Testing Pixel instantiation with Hrs ..." << endl;
+  
+  Isis::Pixel pix2(1,20,37, Isis::Hrs);   
+  
+  cout << "Sample:   " << pix2.sample() << endl;
+  cout << "Line:   " << pix2.line() << endl;
+  cout << "Band:   " << pix2.band() << endl;
+  cout << "DN:   " << pix2.DN() << endl;
+
+  cout << "IsSpecial: " << pix2.IsSpecial() << endl;
+  cout << "IsValid: " << pix2.IsValid() << endl; 
+  cout << "IsNull: " << pix2.IsNull() << endl; 
+  cout << "IsHigh: " << pix2.IsHigh() << endl; 
+  cout << "IsLow: " << pix2.IsLow() << endl; 
+  cout << "IsHrs: " << pix2.IsHrs() << endl; 
+  cout << "IsHis: " << pix2.IsHis() << endl; 
+  cout << "IsLrs: " << pix2.IsLrs() << endl; 
+  cout << "IsLis: " << pix2.IsLis() << endl; 
+  cout << "ToString: " << pix2.ToString() << endl; 
+  cout << "ToDouble: " << pix2.ToDouble() << endl; 
+  cout << "ToFloat: " << (pix2.ToFloat() == Isis::HIGH_REPR_SAT4) << endl; 
+  cout << "To8Bit: " << (pix2.To8Bit() == Isis::HIGH_REPR_SAT1) << endl; 
+  cout << "To16Bit: " << (pix2.To16Bit() == Isis::HIGH_REPR_SAT2) << endl; 
+  cout << "To32Bit: " << (pix2.To32Bit() ==  Isis::HIGH_REPR_SAT4) << endl; 
+  cout << endl; 
+
+  cout << "Testing empty constructor" << endl; 
+
+  Isis::Pixel pix3; 
+  cout << "Sample:   " << pix3.sample() << endl;
+  cout << "Line:   " << pix3.line() << endl;
+  cout << "Band:   " << pix3.band() << endl;
+  cout << "DN:   " << pix3.DN() << endl;
+  cout << endl; 
+
+  cout << "Testing copy constructor" << endl; 
+
+  Isis::Pixel pix4(pix2);
+  cout << "Sample:   " << pix4.sample() << endl;
+  cout << "Line:   " << pix4.line() << endl;
+  cout << "Band:   " << pix4.band() << endl;
+  cout << "DN:   " << pix4.DN() << endl;
+  cout << endl; 
+
+  cout << "Testing copy assignment operator" << endl; 
+
+  Isis::Pixel pix5;
+  pix5 = pix3;
+  cout << "Sample:   " << pix5.sample() << endl;
+  cout << "Line:   " << pix5.line() << endl;
+  cout << "Band:   " << pix5.band() << endl;
+  cout << "DN:   " << pix5.DN() << endl;
+  cout << endl; 
+
+
 }
 

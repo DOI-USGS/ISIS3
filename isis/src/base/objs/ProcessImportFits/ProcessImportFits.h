@@ -42,6 +42,10 @@ namespace Isis {
    * @internal
    *   @history 2014-06-06 Stuart Sides - Added ability to read and process the FITS extension
    *   @history 2015-01-15 Sasha Brownsberger - Made destructor virtual.  References #2215.
+   *   @history 2015-06-02 Kristin Berry - Added error for use of
+   *                                  unsupported BIP
+   *                                  organization.
+   *             
    */
 
   class ProcessImportFits : public ProcessImport {

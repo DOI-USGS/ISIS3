@@ -508,7 +508,7 @@ namespace Isis {
       AlphaCube *p_alphaCube;          //!< A pointer to the AlphaCube
       double p_childSample;                  //!< Sample value for child
       double p_childLine;                    //!< Line value for child
-      int p_childBand;                       //!< Band value for child
+      int p_childBand;                       //!< Band value for child. Should be the virtual band not original band. 
       CameraDistortionMap *p_distortionMap;  //!< A pointer to the DistortionMap
       CameraFocalPlaneMap *p_focalPlaneMap;  //!< A pointer to the FocalPlaneMap
       CameraDetectorMap *p_detectorMap;      //!< A pointer to the DetectorMap

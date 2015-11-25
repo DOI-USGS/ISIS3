@@ -1,0 +1,187 @@
+----- Testing Constructors -----
+
+Constructor given a 20 row csv
+The number of sections is : 1
+Spectel at band: 1 : Wavelength=1 Width=91
+Spectel at band: 2 : Wavelength=2 Width=92
+Spectel at band: 3 : Wavelength=3 Width=93
+Spectel at band: 4 : Wavelength=4 Width=94
+Spectel at band: 5 : Wavelength=5 Width=95
+Spectel at band: 6 : Wavelength=6 Width=96
+Spectel at band: 7 : Wavelength=7 Width=97
+Spectel at band: 8 : Wavelength=8 Width=98
+Spectel at band: 9 : Wavelength=9 Width=99
+Spectel at band: 10 : Wavelength=10 Width=910
+Spectel at band: 11 : Wavelength=11 Width=911
+Spectel at band: 12 : Wavelength=12 Width=912
+Spectel at band: 13 : Wavelength=13 Width=913
+Spectel at band: 14 : Wavelength=14 Width=914
+Spectel at band: 15 : Wavelength=15 Width=915
+Spectel at band: 16 : Wavelength=16 Width=916
+Spectel at band: 17 : Wavelength=17 Width=917
+Spectel at band: 18 : Wavelength=18 Width=918
+Spectel at band: 19 : Wavelength=19 Width=919
+Spectel at band: 20 : Wavelength=20 Width=920
+
+----- Testing searching -----
+
+The number of sections is : 1
+Spectel at band: 9 : Wavelength=9 Width=99
+
+----- Testing multiple sections -----
+
+The number of sections is : 4
+Spectel at band: 28 : Wavelength=4 Width=10
+Spectel at band: 28 : Wavelength=4 Width=10
+Spectel at band: 17 : Wavelength=5 Width=0.1509
+Spectel at band: 5 : Wavelength=5 Width=0.305
+Spectel at band: 23 : Wavelength=5.25 Width=0.074
+Spectel at band: 1 : Wavelength=1 Width=0.301
+Spectel at band: 2 : Wavelength=2 Width=0.302
+Spectel at band: 3 : Wavelength=3 Width=0.303
+Spectel at band: 4 : Wavelength=4 Width=0.304
+Spectel at band: 5 : Wavelength=5 Width=0.305
+Spectel at band: 6 : Wavelength=6 Width=0.306
+Spectel at band: 7 : Wavelength=7 Width=0.307
+Spectel at band: 8 : Wavelength=8 Width=0.308
+Spectel at band: 9 : Wavelength=1 Width=0.1501
+Spectel at band: 10 : Wavelength=1.5 Width=0.1502
+Spectel at band: 11 : Wavelength=2 Width=0.1503
+Spectel at band: 12 : Wavelength=2.5 Width=0.1504
+Spectel at band: 13 : Wavelength=3 Width=0.1505
+Spectel at band: 14 : Wavelength=3.5 Width=0.1506
+Spectel at band: 15 : Wavelength=4 Width=0.1507
+Spectel at band: 16 : Wavelength=4.5 Width=0.1508
+Spectel at band: 17 : Wavelength=5 Width=0.1509
+Spectel at band: 18 : Wavelength=5.5 Width=0.151
+Spectel at band: 19 : Wavelength=6 Width=0.1511
+Spectel at band: 20 : Wavelength=4.5 Width=0.071
+Spectel at band: 21 : Wavelength=4.75 Width=0.072
+Spectel at band: 22 : Wavelength=5 Width=0.073
+Spectel at band: 23 : Wavelength=5.25 Width=0.074
+Spectel at band: 24 : Wavelength=5.5 Width=0.075
+Spectel at band: 25 : Wavelength=5.75 Width=0.076
+Spectel at band: 26 : Wavelength=6 Width=0.077
+Spectel at band: 27 : Wavelength=6.25 Width=0.078
+Spectel at band: 28 : Wavelength=4 Width=10
+Spectel at band: 29 : Wavelength=-1.7976931348623e+308 Width=-1.7976931348623e+308
+Section number is: 0
+Section number is: 1
+
+----- Testing multiple sections in opposite order-----
+
+----Section 0----
+Wavelength= 8, Width= 0.308
+Wavelength= 7, Width= 0.307
+Wavelength= 6, Width= 0.306
+Wavelength= 5, Width= 0.305
+Wavelength= 4, Width= 0.304
+Wavelength= 3, Width= 0.303
+Wavelength= 2, Width= 0.302
+Wavelength= 1, Width= 0.301
+----Section 1----
+Wavelength= 6, Width= 0.1511
+Wavelength= 5.5, Width= 0.151
+Wavelength= 5, Width= 0.1509
+Wavelength= 4.5, Width= 0.1508
+Wavelength= 4, Width= 0.1507
+Wavelength= 3.5, Width= 0.1506
+Wavelength= 3, Width= 0.1505
+Wavelength= 2.5, Width= 0.1504
+Wavelength= 2, Width= 0.1503
+Wavelength= 1.5, Width= 0.1502
+Wavelength= 1, Width= 0.1501
+----Section 2----
+Wavelength= 6.25, Width= 0.078
+Wavelength= 6, Width= 0.076
+Wavelength= 5.75, Width= 0.075
+Wavelength= 5.5, Width= 0.074
+Wavelength= 5.25, Width= 0.073
+Wavelength= 5, Width= 0.072
+Wavelength= 4.75, Width= 0.071
+Wavelength= 4.5, Width= 0.07
+----Section 3----
+Wavelength= 10, Width= 4
+The number of sections is : 4
+Spectel at band: 28 : Wavelength=10 Width=4
+Spectel at band: 28 : Wavelength=10 Width=4
+Spectel at band: 11 : Wavelength=5 Width=0.1509
+Spectel at band: 4 : Wavelength=5 Width=0.305
+Spectel at band: 24 : Wavelength=5.25 Width=0.073
+Spectel at band: 1 : Wavelength=8 Width=0.308
+Spectel at band: 2 : Wavelength=7 Width=0.307
+Spectel at band: 3 : Wavelength=6 Width=0.306
+Spectel at band: 4 : Wavelength=5 Width=0.305
+Spectel at band: 5 : Wavelength=4 Width=0.304
+Spectel at band: 6 : Wavelength=3 Width=0.303
+Spectel at band: 7 : Wavelength=2 Width=0.302
+Spectel at band: 8 : Wavelength=1 Width=0.301
+Spectel at band: 9 : Wavelength=6 Width=0.1511
+Spectel at band: 10 : Wavelength=5.5 Width=0.151
+Spectel at band: 11 : Wavelength=5 Width=0.1509
+Spectel at band: 12 : Wavelength=4.5 Width=0.1508
+Spectel at band: 13 : Wavelength=4 Width=0.1507
+Spectel at band: 14 : Wavelength=3.5 Width=0.1506
+Spectel at band: 15 : Wavelength=3 Width=0.1505
+Spectel at band: 16 : Wavelength=2.5 Width=0.1504
+Spectel at band: 17 : Wavelength=2 Width=0.1503
+Spectel at band: 18 : Wavelength=1.5 Width=0.1502
+Spectel at band: 19 : Wavelength=1 Width=0.1501
+Spectel at band: 20 : Wavelength=6.25 Width=0.078
+Spectel at band: 21 : Wavelength=6 Width=0.076
+Spectel at band: 22 : Wavelength=5.75 Width=0.075
+Spectel at band: 23 : Wavelength=5.5 Width=0.074
+Spectel at band: 24 : Wavelength=5.25 Width=0.073
+Spectel at band: 25 : Wavelength=5 Width=0.072
+Spectel at band: 26 : Wavelength=4.75 Width=0.071
+Spectel at band: 27 : Wavelength=4.5 Width=0.07
+Spectel at band: 28 : Wavelength=10 Width=4
+Spectel at band: 29 : Wavelength=-1.7976931348623e+308 Width=-1.7976931348623e+308
+Section number is: 0
+Section number is: 1
+
+---- Testing toString --- 
+
+----Section 0----
+Wavelength= 8, Width= 0.308
+Wavelength= 7, Width= 0.307
+Wavelength= 6, Width= 0.306
+Wavelength= 5, Width= 0.305
+Wavelength= 4, Width= 0.304
+Wavelength= 3, Width= 0.303
+Wavelength= 2, Width= 0.302
+Wavelength= 1, Width= 0.301
+----Section 1----
+Wavelength= 6, Width= 0.1511
+Wavelength= 5.5, Width= 0.151
+Wavelength= 5, Width= 0.1509
+Wavelength= 4.5, Width= 0.1508
+Wavelength= 4, Width= 0.1507
+Wavelength= 3.5, Width= 0.1506
+Wavelength= 3, Width= 0.1505
+Wavelength= 2.5, Width= 0.1504
+Wavelength= 2, Width= 0.1503
+Wavelength= 1.5, Width= 0.1502
+Wavelength= 1, Width= 0.1501
+----Section 2----
+Wavelength= 6.25, Width= 0.078
+Wavelength= 6, Width= 0.076
+Wavelength= 5.75, Width= 0.075
+Wavelength= 5.5, Width= 0.074
+Wavelength= 5.25, Width= 0.073
+Wavelength= 5, Width= 0.072
+Wavelength= 4.75, Width= 0.071
+Wavelength= 4.5, Width= 0.07
+----Section 3----
+Wavelength= 10, Width= 4
+
+---- Testing for errors --- 
+
+**USER ERROR** Input section number is greater than total number of sections.
+**ERROR** Unable to open input file [assets/broken.csv]. Is it a valid CSV?.
+**USER ERROR** Input calibration file [assets/broken.csv] must have 2 columns with the format: wavelength centers, wavelength widths.
+**ERROR** Unable to open input file [assets/morebroken.csv]. Is it a valid CSV?.
+**USER ERROR** Input calibration file [assets/morebroken.csv] must have at least 2 lines.
+
+----- Testing outside of definition errors -----
+
