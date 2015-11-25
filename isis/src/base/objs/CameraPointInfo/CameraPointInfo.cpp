@@ -80,7 +80,6 @@ namespace Isis {
   void CameraPointInfo::SetCube(const QString &cubeFileName) {
     m_currentCube = m_usedCubes->OpenCube(cubeFileName);
     m_camera = m_currentCube->camera();
-    m_camera->IgnoreProjection(true);
   }
 
 
