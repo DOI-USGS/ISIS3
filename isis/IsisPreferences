@@ -174,7 +174,8 @@ Group = DataDirectory
   Mgs          = $ISIS3DATA/mgs
   Mro          = $ISIS3DATA/mro
   Near         = $ISIS3DATA/near
-  NewHorizons  = $ISIS3DATA/newhorizons
+  # When setting this back to the normal area, do not forget objs/Preferences
+  NewHorizons  = $ISIS3DATA/../datalocal/newhorizons
   Odyssey      = $ISIS3DATA/odyssey
   Rolo         = $ISIS3DATA/rolo
   Smart1       = $ISIS3DATA/smart1
