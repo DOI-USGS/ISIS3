@@ -12,6 +12,7 @@
 #include <QWriteLocker>
 
 #include "AbstractFilter.h"
+#include "FileName.h"
 #include "PointIdFilter.h"
 
 
@@ -72,7 +73,7 @@ namespace Isis {
 
     void AbstractFilterSelector::createSelector() {
       m_closeButton = new QPushButton;
-      m_closeButton->setIcon(QIcon(":close"));
+      m_closeButton->setIcon(QIcon(FileName("$base/icons/editdelete.png").expanded()));
       connect(m_closeButton, SIGNAL(clicked()), this, SLOT(sendClose()));
 
       m_selector = new QComboBox;

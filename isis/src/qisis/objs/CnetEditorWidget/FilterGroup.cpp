@@ -14,6 +14,7 @@
 
 #include "IException.h"
 #include "IString.h"
+#include "FileName.h"
 
 #include "AbstractFilterSelector.h"
 #include "ImageImageFilterSelector.h"
@@ -142,7 +143,7 @@ namespace Isis {
       m_logicWidget->setLayout(logicLayout);
 
       m_newSelectorButton = new QPushButton;
-      m_newSelectorButton->setIcon(QIcon(":add"));
+      m_newSelectorButton->setIcon(QIcon(FileName("$base/icons/add.png").expanded()));
       QString newSelectorTooltip = "Add new filter";
       m_newSelectorButton->setToolTip(newSelectorTooltip);
       m_newSelectorButton->setStatusTip(newSelectorTooltip);

@@ -15,6 +15,7 @@
 
 #include "IException.h"
 #include "IString.h"
+#include "FileName.h"
 
 #include "FilterGroup.h"
 
@@ -206,7 +207,7 @@ namespace Isis {
       m_logicWidget->setLayout(buttonLayout);
 
       m_addGroupButton = new QPushButton;
-      m_addGroupButton->setIcon(QIcon(":add"));
+      m_addGroupButton->setIcon(QIcon(FileName("$base/icons/add.png").expanded()));
       QString addGroupTooltip = "Add new filter group";
       m_addGroupButton->setToolTip(addGroupTooltip);
       m_addGroupButton->setStatusTip(addGroupTooltip);
