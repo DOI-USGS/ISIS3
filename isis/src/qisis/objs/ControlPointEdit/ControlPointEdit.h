@@ -134,6 +134,8 @@ namespace Isis {
     *                           will undo registration if a point is already registered. Modified
     *                           saveMeasure() to handle exception thrown by
     *                           ControlMeasure::SetLogData(). Fixes #2041.
+    *   @history 2015-10-29 Ian Humphrey - Added shortcuts for Register (R), Save Measure (M),
+    *                           Undo Registration (U), and Find (F). Fixes #2324.
     *  
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but

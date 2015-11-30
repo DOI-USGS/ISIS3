@@ -177,7 +177,8 @@
       chosen from the combo-boxes under the labels "Left Measure" and
       "Right Measure".  Only the control measure in the right view can be
       moved, so if you want to move the reference measure, you must display it
-      in the right view.
+      in the right view. You can select the previous or next right measure with the
+      shortcuts <strong>PageUp</strong> and <strong>PageDown</strong>, respectively.
     </p>
     <h4>Changing Measure Locations</h4>
       <p>
@@ -206,28 +207,31 @@
       <p>Below the left view:</p>
       <ul>
         <li><strong>Blink controls:</strong>  Blink the left and right view in the
-        left view window using the "Blink Start" button (with play icon) and 
-        "Blink Stop" button (with stop icon).  Both arrow keys above the right view 
-        and the keyboard arrow keys may be used to move the right view while
-        blinking.</li>
+            left view window using the "Blink Start" button (with play icon) and 
+            "Blink Stop" button (with stop icon).  Both arrow keys above the right view 
+            and the keyboard arrow keys may be used to move the right view while
+            blinking.</li>
         <li><strong>Find:</strong> Center the right view so that the same latitude / 
-        longitude is under the crosshair as the left view.</li>
+            longitude is under the crosshair as the left view. <strong>Shortcut: F</strong></li>
       </ul>
       <p>Below the right view:</p>
       <ul>
         <li><strong>Register:</strong>  Sub-pixel register the the right view to
-            the left view.</li>
+            the left view. <strong>Shortcut: R</strong></li>
+        <li><strong>Undo Registration:</strong> Undo the sub-pixel registration.
+            <strong>Shortcut: U</strong></li>
         <li><strong>Save Measure:</strong>  Save the control measure under the
-            right view to the edit control point.</li>
+            right view to the edit control point. <strong>Shortcut: M</strong></li>
       </ul>
       <p>Along the bottom:</p>
       <ul>
         <li><strong>Add Measure(s) to Point:</strong>  Add control measure(s) to the 
-        current control point.  A dialog will show all cubes in the network with
-        those that fall at this control point's latitude and longitude highlighted.
-        All cubes chosen will be added as control measures to this control point.</li>
+            current control point.  A dialog will show all cubes in the network with
+            those that fall at this control point's latitude and longitude highlighted.
+            All cubes chosen will be added as control measures to this control point.
+            <strong>Shortcut: A</strong></li>
         <li><strong>Save Point:</strong> Save the edit control point to the control
-            network.</li>
+            network. <strong>Shortcut: P</strong></li>
       </ul>
     <h3>Measure Table window</h3>
     <p>This window will show all control measure data for the current edit control
@@ -537,6 +541,11 @@
     </change>
     <change name="Ian Humphrey" date="2015-10-07">
       Updated icons. Fixes #1041.
+    </change>
+    <change name="Ian Humphrey" date="2015-11-19">
+      Added shortcuts to Qnet Tool window for selecting right measures, registration, saving 
+      measures, saving a point, adding a new measure, find, and saving the control network. Fixes
+      #2324.
     </change>
   </history>
 </application>

@@ -202,6 +202,9 @@ namespace Isis {
    *                          Swapped checking for empty network and not allowing mouse clicks on
    *                          the ground source. First check if there are any points in the network.
    *                          If not print message and return.  References #1493.
+   * @history 2015-11-08 Ian Humphrey - Added shortcut for Save Point (P). Added shortcuts
+   *                         (PageUp/PageDown) for selecting right measures and added slots to
+   *                         handle these shortcuts. References #2324.
    */
   class MatchTool : public Tool {
     Q_OBJECT
@@ -276,6 +279,8 @@ namespace Isis {
       void setLockRightMeasure (bool ignore);
       void setIgnoreRightMeasure (bool ignore);
 
+      void nextRightMeasure();
+      void previousRightMeasure();
       void selectLeftMeasure (int index);
       void selectRightMeasure (int index);
       void updateLeftMeasureInfo ();

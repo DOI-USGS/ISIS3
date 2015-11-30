@@ -5,6 +5,7 @@
 #include <iomanip>
 
 #include <QtGui>
+#include <QShortcut>
 
 #include "QnetDeletePointDialog.h"
 #include "QnetNewMeasureDialog.h"
@@ -107,15 +108,17 @@ namespace Isis {
    *                           between Ignore checkbox toggle() slot and
    *                           ignoreChanged() signal
    *   @history 2008-12-29 Jeannie Walldren - Disabled ground point check box and
-   *                          commented out connection between check box and
-   *                          setGroundPoint() method.
+   *                           commented out connection between check box and
+   *                           setGroundPoint() method.
    *   @history 2008-12-30 Jeannie Walldren - Added connections to toggle
-   *                          measures' Ignore check boxes if ignoreLeftChanged()
-   *                          and ignoreRightChanged() are emitted. Replaced
-   *                          reference to ignoreChanged() with
-   *                          ignorePointChanged().
+   *                           measures' Ignore check boxes if ignoreLeftChanged()
+   *                           and ignoreRightChanged() are emitted. Replaced
+   *                           reference to ignoreChanged() with
+   *                           ignorePointChanged().
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
-   *                          namespace std"
+   *                           namespace std"
+   *   @history 2015-10-29 Ian Humphrey - Added shortcuts for the addMeasure (A) and savePoint (P) 
+   *                           button. References #2324.                          
    */
   void QnetTool::createQnetTool(QWidget *parent) {
 
@@ -139,8 +142,10 @@ namespace Isis {
     connect(this, SIGNAL(measureChanged()),
             m_pointEditor, SLOT(colorizeSaveButton()));
 
-    QPushButton * addMeasure = new QPushButton("Add Measure(s) to Point");
-    addMeasure->setToolTip("Add a new measure to the edit control point.");
+    QPushButton *addMeasure = new QPushButton("Add Measure(s) to Point");
+    addMeasure->setShortcut(Qt::Key_A);
+    addMeasure->setToolTip("Add a new measure to the edit control point. "
+                           "<strong>Shortcut: A</strong>");
     addMeasure->setWhatsThis("This allows a new control measure to be added "
                          "to the currently edited control point.  A selection "
                          "box with all cubes from the input list will be "
@@ -149,8 +154,9 @@ namespace Isis {
     connect(addMeasure, SIGNAL(clicked()), this, SLOT(addMeasure()));
 
     m_savePoint = new QPushButton ("Save Point");
-    m_savePoint->setToolTip("Save the edit control point to the control "
-                            "network.");
+    m_savePoint->setShortcut(Qt::Key_P);
+    m_savePoint->setToolTip("Save the edit control point to the control network. "
+                            "<strong>Shortcut: P</strong>");
     m_savePoint->setWhatsThis("Save the edit control point to the control "
                     "network which is loaded into memory in its entirety. "
                     "When a control point is selected for editing, "
@@ -377,15 +383,34 @@ namespace Isis {
   }
 
 
-  //! @returns The groupbox labeled "Right Measure"
+  /**
+   * Creates the right measure group box.
+   *
+   * @returns The groupbox labeled "Right Measure"
+   * 
+   * @internal
+   *   @history 2015-10-29 Ian Humphrey - Added shortcuts (PageUp/PageDown) for selecting previous
+   *                           or next measure in right measures box. References #2324.
+   */
   QGroupBox * QnetTool::createRightMeasureGroupBox() {
 
     // create widgets for the right groupbox
     m_rightCombo = new QComboBox;
     m_rightCombo->view()->installEventFilter(this);
-    m_rightCombo->setToolTip("Choose right control measure");
+
+    // Attach shortcuts to Qnet Tool's window for selecting right measures
+    // Note: Qt handles this memory for us since m_qnetTool is the parent of these shortcuts
+    QShortcut *nextMeasure = new QShortcut(Qt::Key_PageDown, m_qnetTool);
+    connect(nextMeasure, SIGNAL(activated()), this, SLOT(nextRightMeasure()));
+    QShortcut *prevMeasure = new QShortcut(Qt::Key_PageUp, m_qnetTool);
+    connect(prevMeasure, SIGNAL(activated()), this, SLOT(previousRightMeasure()));
+
+    m_rightCombo->setToolTip("Choose right control measure. " 
+                             "<strong>Shortcuts: PageUp/PageDown</strong>");
     m_rightCombo->setWhatsThis("Choose right control measure identified by "
-                               "cube filename.");
+                               "cube filename. "
+                               "Note: PageUp selects previous measure; "
+                               "PageDown selects next meausure.");
     connect(m_rightCombo, SIGNAL(activated(int)),
             this, SLOT(selectRightMeasure(int)));
     m_lockRightMeasure = new QCheckBox("Edit Lock Measure");
@@ -462,6 +487,13 @@ namespace Isis {
 
 
 
+  /**
+   * @brief Creates the menu actions for Qnet Tool.
+   *
+   * @internal
+   *   @author ???
+   *   @history Ian Humphrey - Added CTRL+S shortcut for saving control network. References #2324.
+   */
   void QnetTool::createActions() {
     m_openGround = new QAction(m_qnetTool);
     m_openGround->setText("Open &Ground Source");
@@ -490,6 +522,7 @@ namespace Isis {
 
     m_saveNet = new QAction(QIcon(toolIconDir() + "/filesave.png"), "Save Control Network ...",
                             m_qnetTool);
+    m_saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
     m_saveNet->setToolTip("Save current control network");
     m_saveNet->setStatusTip("Save current control network");
     whatsThis = "<b>Function:</b> Saves the current <i>"
@@ -603,7 +636,7 @@ namespace Isis {
 
   void QnetTool::createToolBars() {
 
-    QToolBar * toolBar = new QToolBar;
+    toolBar = new QToolBar;
     toolBar->setObjectName("TemplateEditorToolBar");
     toolBar->setFloatable(false);
     toolBar->addAction(m_saveNet);
@@ -2667,6 +2700,44 @@ namespace Isis {
 
   }
 
+
+
+  /**
+   * @brief Selects the next right measure when activated by key shortcut
+   *
+   * This slot is intended to handle selecting the next right measure when the attached shortcut 
+   * (PageDown) is activated. This slot checks if the next index is in bounds.
+   *
+   * @internal
+   *   @history 2015-10-29 Ian Humphrey - Created slot. References #2324.
+   */
+  void QnetTool::nextRightMeasure() {
+    int curIndex = m_rightCombo->currentIndex();
+    if (curIndex < m_rightCombo->count() - 1) {
+      // update the right measure list index and select that measure
+      m_rightCombo->setCurrentIndex(curIndex + 1);
+      selectRightMeasure(curIndex+1);
+    }
+  }
+
+
+  /**
+   * @brief Selects the previous right measure when activated by key shortcut
+   *
+   * This slot is intended to handle selecting the previous right measure when the attached
+   * shortcut (PageUp) is activated. This slot checks if the previous index is in bounds.
+   *
+   * @internal
+   *   @history 2015-10-29 Ian Humphrey - Created slot. References #2324.
+   */
+  void QnetTool::previousRightMeasure() {
+    int curIndex = m_rightCombo->currentIndex();
+    if (curIndex > 0) {
+      // update the right measure list index and select that measure
+      m_rightCombo->setCurrentIndex(curIndex - 1);
+      selectRightMeasure(curIndex-1);
+    }
+  }
 
 
 

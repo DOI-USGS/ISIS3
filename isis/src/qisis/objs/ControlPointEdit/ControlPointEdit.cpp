@@ -1,5 +1,8 @@
 #include "ControlPointEdit.h"
 
+//TEST
+#include <QDebug>
+
 #include <QApplication>
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -113,6 +116,9 @@ namespace Isis {
    *                           value of the new private variable,
    *                           p_templateFileName, to the previously hard-coded
    *                           template filename.
+   *   @history 2015-10-29 Ian Humphrey - Added shortcuts for Find (F), Register (R), 
+   *                           Undo Registration (U), and Save Measure (M) buttons.
+   *                           Fixes #2324. 
    */
   void ControlPointEdit::createPointEditor(QWidget *parent) {
     // Place everything in a grid
@@ -576,7 +582,9 @@ namespace Isis {
 
     if (p_useGeometry) {
       QPushButton *find = new QPushButton("Find");
-      find->setToolTip("Move right measure to same Latitude/Longitude as left.");
+      find->setShortcut(Qt::Key_F);
+      find->setToolTip("Move right measure to same Latitude/Longitude as left. "
+                       "<strong>Shortcut: F</strong>");
       find->setWhatsThis("Find the Latitude/Longitude under the crosshair in the "
                          "left measure and move the right measure to the same "
                          "latitude/longitude.");
@@ -589,7 +597,9 @@ namespace Isis {
 
     QHBoxLayout *rightLayout = new QHBoxLayout();
     p_autoReg = new QPushButton("Register");
-    p_autoReg->setToolTip("Sub-pixel register the right measure to the left");
+    p_autoReg->setShortcut(Qt::Key_R);
+    p_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                          "<strong>Shortcut: R</strong>");
     p_autoReg->setWhatsThis("Sub-pixel register the right measure to the left "
                        "and move the result under the crosshair.  After "
                        "viewing the results, the option exists to move the "
@@ -599,6 +609,7 @@ namespace Isis {
       p_saveMeasure = new QPushButton("Save Measures");
       p_saveMeasure->setToolTip("Save the both the left and right measure to the edit control "
                                 "point (control point currently being edited). "
+                                "<strong>Shortcut: M</strong>. "
                                 " <strong>Note: The edit control point "
                                 "will not be saved to the network until you select "
                                 "<strong>\"Save Point\"</strong>");
@@ -607,10 +618,12 @@ namespace Isis {
       p_saveMeasure = new QPushButton("Save Measure");
       p_saveMeasure->setToolTip("Save the right measure to the edit control "
                                 "point (control point currently being edited). "
+                                "<strong>Shortcut: M</strong>. "
                                 " <strong>Note: The edit control point "
                                 "will not be saved to the network until you select "
                                 "<strong>\"Save Point\"</strong>");
     }
+    p_saveMeasure->setShortcut(Qt::Key_M);
     p_saveDefaultPalette = p_saveMeasure->palette();
 
     rightLayout->addWidget(p_autoReg);
@@ -663,6 +676,9 @@ namespace Isis {
       p_autoRegShown = false;
       p_autoRegExtension->hide();
       p_autoReg->setText("Register");
+      p_autoReg->setToolTip("Sub-pixel register the right measure to the left."
+                            "<strong>Shortcut: R</strong>");
+      p_autoReg->setShortcut(Qt::Key_R);
     }
 
     p_leftMeasure = leftMeasure;
@@ -721,6 +737,7 @@ namespace Isis {
       p_autoRegShown = false;
       p_autoRegExtension->hide();
       p_autoReg->setText("Register");
+      p_autoReg->setShortcut(Qt::Key_R);
     }
     p_autoRegAttempted = false;
 
@@ -822,6 +839,9 @@ namespace Isis {
       p_autoRegShown = false;
       p_autoRegExtension->hide();
       p_autoReg->setText("Register");
+      p_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
+      p_autoReg->setShortcut(Qt::Key_R);
     }
 
     QString pos = "Sample: " + QString::number(p_rightView->tackSample()) +
@@ -932,6 +952,9 @@ namespace Isis {
       p_autoRegShown = false;
       p_autoRegExtension->hide();
       p_autoReg->setText("Register");
+      p_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
+      p_autoReg->setShortcut(Qt::Key_R);
 
       //  Reload chip with original measure
       emit updateRightView(p_rightMeasure->GetSample(),
@@ -1046,6 +1069,9 @@ namespace Isis {
     p_autoRegExtension->show();
     p_autoRegShown = true;
     p_autoReg->setText("Undo Registration");
+    p_autoReg->setToolTip("Undo sub-pixel registration. "
+                          "<strong>Shortcut: U</strong>");
+    p_autoReg->setShortcut(Qt::Key_U);
   }
 
   
@@ -1129,6 +1155,9 @@ namespace Isis {
         p_autoRegShown = false;
         p_autoRegExtension->hide();
         p_autoReg->setText("Register");
+        p_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                              "<strong>Shortcut: R</strong>");
+        p_autoReg->setShortcut(Qt::Key_R);
       }
       else {
         p_rightMeasure->SetChooserName(Application::UserName());

@@ -151,6 +151,7 @@ namespace Isis {
    *                          ignorePointChanged().
    *   @history 2010-06-03 Jeannie Walldren - Removed "std::" since "using
    *                          namespace std"
+   *   @history 2015-11-09 Ian Humphrey - Added shortcut for savePoint (P). References #2324.
    */
   void MatchTool::createMatchTool(QWidget *parent) {
 
@@ -175,8 +176,9 @@ namespace Isis {
             m_pointEditor, SLOT(colorizeSaveButton()));
 
     m_savePoint = new QPushButton ("Save Point");
-    m_savePoint->setToolTip("Save the edit control point to the control "
-                            "network.");
+    m_savePoint->setShortcut(Qt::Key_P);
+    m_savePoint->setToolTip("Save the edit control point to the control network. "
+                            "<strong>Shortcut: P</strong>");
     m_savePoint->setWhatsThis("Save the edit control point to the control "
                     "network which is loaded into memory in its entirety. "
                     "When a control point is selected for editing, "
@@ -348,15 +350,34 @@ namespace Isis {
   }
 
 
-  //! @returns The groupbox labeled "Right Measure"
+  /**
+   * Creates the right measure group box.
+   * 
+   * @returns The groupbox labeled "Right Measure"
+   * 
+   * @internal
+   *   @history 2015-11-08 Ian Humphrey - Added the shorcuts (PageUp/PageDown) for selecting
+   *                           previous or next measure in right measures box. Referecnes #2324.
+   */
   QGroupBox * MatchTool::createRightMeasureGroupBox() {
 
     // create widgets for the right groupbox
     m_rightCombo = new QComboBox;
     m_rightCombo->view()->installEventFilter(this);
-    m_rightCombo->setToolTip("Choose right control measure");
+    
+    // Attach shortcuts to Match TOol's window for selecting right measures
+    // Note: Qt handles this memory for us since m_matchTool is the parent of these shortcuts
+    QShortcut *nextMeasure = new QShortcut(Qt::Key_PageDown, m_matchTool);
+    connect(nextMeasure, SIGNAL(activated()), this, SLOT(nextRightMeasure()));
+    QShortcut *prevMeasure = new QShortcut(Qt::Key_PageUp, m_matchTool);
+    connect(prevMeasure, SIGNAL(activated()), this, SLOT(previousRightMeasure()));
+    
+    m_rightCombo->setToolTip("Choose right control measure. "
+                             "<strong>Shorcuts: PageUp/PageDown</strong>");
     m_rightCombo->setWhatsThis("Choose right control measure identified by "
-                               "cube filename.");
+                               "cube filename. "
+                               "Note: PageUp selects previous measure; "
+                               "PageDown selects next measure.");
     connect(m_rightCombo, SIGNAL(activated(int)),
             this, SLOT(selectRightMeasure(int)));
     m_lockRightMeasure = new QCheckBox("Edit Lock Measure");
@@ -420,12 +441,19 @@ namespace Isis {
   }
 
 
-
+/**
+   * @brief Creates the menu actions for Match Tool.
+   *
+   * @internal
+   *   @author ???
+   *   @history Ian Humphrey - Added CTRL+S shortcut for saving control network. References #2324.
+   */
   void MatchTool::createActions() {
 
     m_saveNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSave.png"),
                             "Save Control Network ...",
                             m_matchTool);
+    m_saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
     m_saveNet->setToolTip("Save current control network");
     m_saveNet->setStatusTip("Save current control network");
     QString whatsThis = "<b>Function:</b> Saves the current <i>"
@@ -2186,6 +2214,45 @@ namespace Isis {
 
 
   /**
+   * @brief Selects the next right measure when activated by key shortcut
+   *
+   * This slot is intended to handle selecting the next right measure when the attached shortcut 
+   * (PageDown) is activated. This slot checks if the next index is in bounds.
+   *
+   * @internal
+   *   @history 2015-11-08 Ian Humphrey - Created slot. References #2324.
+   */
+  void MatchTool::nextRightMeasure() {
+    int curIndex = m_rightCombo->currentIndex();
+    if (curIndex < m_rightCombo->count() - 1) {
+      // update the right measure list index and select that measure
+      m_rightCombo->setCurrentIndex(curIndex + 1);
+      selectRightMeasure(curIndex+1);
+    }
+  }
+
+
+  /**
+   * @brief Selects the previous right measure when activated by key shortcut
+   *
+   * This slot is intended to handle selecting the previous right measure when the attached
+   * shortcut (PageUp) is activated. This slot checks if the previous index is in bounds.
+   *
+   * @internal
+   *   @history 2015-11-08 Ian Humphrey - Created slot. References #2324.
+   */
+  void MatchTool::previousRightMeasure() {
+    int curIndex = m_rightCombo->currentIndex();
+    if (curIndex > 0) {
+      // update the right measure list index and select that measure
+      m_rightCombo->setCurrentIndex(curIndex - 1);
+      selectRightMeasure(curIndex-1);
+    }
+  }
+
+
+
+  /**
    * Select left measure
    *
    * @param index Index of file from the point files vector
@@ -3196,10 +3263,12 @@ namespace Isis {
               "template or edit the current loaded template to influence successful "
               "co-registration results.  For more information regarding the pattern matching "
               "functionlity or how to create a parameter template, refer to the Isis PatternMatch "
-              "document and the <i>autoregtemplate</i> application.</li>"
+              "document and the <i>autoregtemplate</i> application. <strong>Shortcut: R.</strong>"
+              "</li>"
         "<li><strong>Save Measures:</strong>  Save the two control measures using the sample, "
-              "line positions under the crosshairs.</li>"
-        "<li><strong>Save Point:</strong>  Save the control point to the control network.</li>"
+              "line positions under the crosshairs. <strong>Shortcut: M.</strong></li>"
+        "<li><strong>Save Point:</strong>  Save the control point to the control network. "
+              "<strong>Shortcut: P.</strong></li>"
         "</ul>");
     controlPointEditing->setWordWrap(true);
     controlPointLayout->addWidget(controlPointEditing);

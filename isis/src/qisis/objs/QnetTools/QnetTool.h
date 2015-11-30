@@ -227,6 +227,10 @@ namespace Isis {
    *                           intended). Fixes #2172.
    *   @history 2015-10-07 Ian Humphrey - Updated icons and icons are no longer embedded as per
    *                           licensing terms. Fixes #1041.
+   *   @history 2015-10-29 Ian Humphrey - Added shortcuts for Add Measure (A)  and Save Point (P)
+   *                           buttons. Added shortcuts (PageUp/PageDown) for selecting right
+   *                           measures and added slots to handle these shortcuts. Added save
+   *                           control network shortcut. Fixes #2324.
    *                           
    */
   class QnetTool : public Tool {
@@ -317,6 +321,8 @@ namespace Isis {
 
       void updateSurfacePointInfo ();
 
+      void nextRightMeasure();
+      void previousRightMeasure();
       void selectLeftMeasure (int index);
       void selectRightMeasure (int index);
       void updateLeftMeasureInfo ();
@@ -340,7 +346,6 @@ namespace Isis {
       void saveTemplateFileAs();
       void setTemplateModified();
       void writeTemplateFile(QString);
-
 
     private:
       void createActions();
@@ -383,6 +388,7 @@ namespace Isis {
       QPointer<QAction> m_openGround;
       QPointer<QAction> m_openDem;
       QPointer<QAction> m_saveNet;
+      QPointer<QToolBar> toolBar;
       QPointer<QAction> m_saveAsNet;
       QPointer<QAction> m_closeQnetTool;
 

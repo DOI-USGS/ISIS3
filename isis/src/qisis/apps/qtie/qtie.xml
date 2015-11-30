@@ -127,14 +127,16 @@
         and the keyboard arrow keys may be used to move the right view while
         blinking.</li>
         <li><strong>Find:</strong> Center the right view so that the same latitude / 
-        longitude is under the crosshair as the left view.</li>
+        longitude is under the crosshair as the left view. <strong>Shortcut: F</strong></li>
       </ul>
       <p>Below the right view:</p>
       <ul>
         <li><strong>Register:</strong>  Sub-pixel register the right view to
-            the left view.</li>
+            the left view. <strong>Shortcut: R</strong></li>
+        <li><strong>Undo Registration:</strong> Undo the sub-pixel registration.
+            <strong>Shortcut: U</strong></li>
         <li><strong>Save Measure:</strong>  Save the control measure under the
-            right view to the edit control point.</li>
+            right view to the edit control point. <strong>Shortcut: M</strong></li>
       </ul>
       <p>Along the bottom:</p>
       <ul>
@@ -201,6 +203,10 @@
     </change>
     <change name="Ian Humphrey" date="2015-10-07">
       Updated icons. Fixes #1041.
+    </change>
+    <change name="Ian Humphrey" date="2015-11-19">
+      Added shortcuts to Qtie Tool window for selecting right measures, registration, saving 
+      measures, and find. Fixes #2324.
     </change>
   </history>
 </application>
