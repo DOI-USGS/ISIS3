@@ -33,6 +33,7 @@ namespace Isis {
      *
      * @internal
      *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
+     *   @history 2015-11-16 Ian Humphrey - Removed embedded close button icon. References #1041.
      */
     class AbstractFilterSelector : public QWidget {
         Q_OBJECT

@@ -1,0 +1,76 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 800
+    TileLines   = 800
+
+    Group = Dimensions
+      Samples = 800
+      Lines   = 800
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = UnsignedByte
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = Instrument
+    SpacecraftName            = "Galileo Orbiter"
+    InstrumentId              = "SOLID STATE IMAGING SYSTEM"
+    TargetName                = IO
+    SpacecraftClockStartCount = 05207949.11
+    StartTime                 = 1999-10-11T04:51:12.894
+    ExposureDuration          = 0.00625 <seconds>
+    GainModeId                = 400000
+    TelemetryFormat           = AI8
+    LightFloodStateFlag       = OFF
+    InvertedClockStateFlag    = "NOT INVERTED"
+    BlemishProtectionFlag     = OFF
+    ExposureType              = NORMAL
+    ReadoutMode               = Contiguous
+    FrameDuration             = 2.333 <seconds>
+    Summing                   = 1
+    FrameModeId               = FULL
+  End_Group
+
+  Group = Archive
+    DataSetId     = GO-J/JSA-SSI-4-REDR-V1.0
+    ProductId     = 24I0068
+    ObservationId = 24ISCOLCHS02
+    DataType      = RADIANCE
+    CalTargetCode = 24
+  End_Group
+
+  Group = BandBin
+    FilterName   = CLEAR
+    FilterNumber = 0
+    Center       = 0.611 <micrometers>
+    Width        = .44 <micrometers>
+  End_Group
+
+  Group = Kernels
+    NaifFrameCode = -77001
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 705537
+  Bytes     = 588
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = 706125
+  Bytes     = 6302
+End_Object
+End

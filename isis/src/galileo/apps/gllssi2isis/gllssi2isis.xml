@@ -55,6 +55,12 @@
        contains "SSI-4-REDR-V1.0").  Modified code to set as FULL summing 
        mode if FRAMEMODE=AUTO and the image is reconstructed.
     </change>
+    <change name="Tyler Wilson" date="2015-10-02">
+       Added the fixPvl function that fixes Pvl files from orbit I24 which have
+       a comment tag that is not closed off.  #Ref 2344
+    </change>
+
+
   </history>
 
   <category>

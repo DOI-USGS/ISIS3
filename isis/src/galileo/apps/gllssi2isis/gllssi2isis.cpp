@@ -1,15 +1,21 @@
 #include "Isis.h"
 
-#include <cstdio>
-#include <QString>
-
-#include "ProcessImportPds.h"
-
-#include "UserInterface.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
+#include "ProcessImportPds.h"
+#include "UserInterface.h"
+
+#include <cstdio>
+#include <QString>
+#include <QByteArray>
+#include <QFileInfo>
+#include <QFile>
+
+
+
+
 
 using namespace std;
 using namespace Isis;
@@ -17,8 +23,9 @@ bool summed;
 
 Cube *summedOutput;
 
-void TranslateData(Buffer &inData);
-void TranslateLabels(Pvl &pdsLabel, Cube *ocube);
+void translateData(Buffer &inData);
+void translateLabels(Pvl &pdsLabel, Cube *ocube);
+void fixPvl(QString fileName);
 
 void IsisMain() {
 
@@ -31,7 +38,15 @@ void IsisMain() {
   FileName inFile = ui.GetFileName("FROM");
   FileName out = ui.GetFileName("TO");
 
+
+
+  fixPvl(inFile.toString());
+
+
+
+
   // Make sure it is a Galileo SSI image
+
   Pvl lab(inFile.expanded());
 
   //Checks if in file is rdr
@@ -47,7 +62,7 @@ void IsisMain() {
   dataSetId = (QString)lab["DATA_SET_ID"];
   try {
     if(!dataSetId.contains("SSI-2-REDR-V1.0")
-        && !dataSetId.contains("SSI-4-REDR-V1.0")) {
+        && !dataSetId.contains("SSI-4-REDR-V1.0") ) {
       QString msg = "Invalid DATA_SET_ID [" + dataSetId + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -59,7 +74,7 @@ void IsisMain() {
   }
 
   // set summing mode
-  if(ui.GetString("FRAMEMODE") == "AUTO") {
+  if (ui.GetString("FRAMEMODE") == "AUTO") {
     double frameDuration = lab["FRAME_DURATION"];
     // reconstructed images are 800x800 (i.e. not summed)
     // even though they have frame duration of 2.333
@@ -67,16 +82,16 @@ void IsisMain() {
     if(dataSetId.contains("SSI-4-REDR-V1.0")) {
       summed = false;
     }
-    else if(frameDuration > 2.0 && frameDuration < 3.0) {
+    else if (frameDuration > 2.0 && frameDuration < 3.0) {
       summed = true;
     }
     // seti documentation implies valid frame duration values are 2.333, 8.667, 30.333, 60.667
     // however some images have value 15.166 (see example 3700R.LBL)
-    else if(frameDuration > 15.0 && frameDuration < 16.0) {
+    else if (frameDuration > 15.0 && frameDuration < 16.0) {
       summed = true;
     }
   }
-  else if(ui.GetString("FRAMEMODE") == "SUMMED") {
+  else if (ui.GetString("FRAMEMODE") == "SUMMED") {
     summed = true;
   }
   else {
@@ -90,7 +105,7 @@ void IsisMain() {
   //Set up the output file
   Cube *ocube;
 
-  if(!summed) {
+  if (!summed) {
     ocube = p.SetOutputCube("TO");
     p.StartProcess();
   }
@@ -99,14 +114,14 @@ void IsisMain() {
     summedOutput->setDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
     summedOutput->setPixelType(p.PixelType());
     summedOutput->create(ui.GetFileName("TO"));
-    p.StartProcess(TranslateData);
+    p.StartProcess(translateData);
     ocube = summedOutput;
   }
 
-  TranslateLabels(pdsLabel, ocube);
+  translateLabels(pdsLabel, ocube);
   p.EndProcess();
 
-  if(summed) {
+  if (summed) {
     summedOutput->close();
     delete summedOutput;
   }
@@ -114,11 +129,64 @@ void IsisMain() {
   return;
 }
 
-void TranslateData(Buffer &inData) {
+
+
+/**
+  * This fixes a problem with some of the Pvl files where a comment
+  * was left open.  If the file has this error, the comment is closed
+  * and the file is saved.  If the file does not, it's closed without
+  * changing anything.
+  *
+  * @param fileName  The full path + file name of the Pvl file
+  *     being checked
+  *
+  */
+
+
+
+void fixPvl(QString fileName){
+
+    QFile pvlFile;
+
+    pvlFile.setFileName(fileName);
+    pvlFile.open(QFile::ReadWrite | QFile::Text);
+
+    //Read the Pvl file into a byte array
+    QByteArray fileData = pvlFile.readAll();
+
+    //Is this one of the messed up files?
+    if (!fileData.contains(QByteArray("/* Image Object /") ) ){
+            pvlFile.close();
+
+     //No - so return without doing anything
+     return;
+
+    }
+
+    //Otherwise, edit the file in place
+
+    fileData.replace(QByteArray("/* Image Object /"),QByteArray("/* Image Object */"));
+
+    pvlFile.seek(0);
+    pvlFile.write(fileData);
+    pvlFile.close();
+
+
+}
+
+
+
+
+
+
+
+
+
+void translateData(Buffer &inData) {
   summedOutput->write(inData);
 }
 
-void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
+void translateLabels(Pvl &pdsLabel, Cube *ocube) {
   // Get the directory where the MOC translation tables are.
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
 
