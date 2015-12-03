@@ -185,23 +185,23 @@ namespace Isis {
    *   @history 2014-03-11 Stuart Sides - Programmers notes - Fixed a bug in the copy constructor
    *                           that was going out of array bounds.
    *   @history 2015-02-20 Jeannie Backer - Improved error messages.
-   *   @history 2015-07-05 Debbie A. Cook - Programmer notes - Modified LoadCache, 
+   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() calls to see if
+   *                           any NAIF errors were signaled. References #2248.
+   *   @history 2015-08-05 Debbie A. Cook - Programmer notes - Modified LoadCache, 
    *                           and ComputeAv.
    *                           Added new methods 
-   *                           LoadPCFromSpice, LoadPCFromTable, ToJ2000Partial, PoleRaCoefs,
-   *                           PoleDecCoefs, PmCoefs, PoleRaNutPrecCoefs, PoleDecNutPrecCoefs, 
-   *                           PmNutPrecCoefs, SysNutPrecConstants, SysNutPrecCoefs,
-   *                           SetPckPolynomial(), setPckPolynomial(raCoef, decCoef, pmCoef),
-   *                           GetPckPolynomial, SetEphemerisTimePckPolyFunction,
-   *                           and members p_frameType, p_tOrientationAvailable, 
-   *                           p_raPole, p_decPole, p_pm, p_raNutPrec, p_decNutPrec, p_pmNutPrec,
-   *                           p_sysNutPrec0, p_sysNutPrec1, p_dscale, p_Tscale  to support request for 
+   *                           loadPCFromSpice, loadPCFromTable, toJ2000Partial, poleRaCoefs,
+   *                           poleDecCoefs, pmCoefs, poleRaNutPrecCoefs, poleDecNutPrecCoefs, 
+   *                           mNutPrecCoefs, sysNutPrecConstants, sysNutPrecCoefs,
+   *                           usePckPolynomial, setPckPolynomial(raCoef, decCoef, pmCoef),
+   *                           getPckPolynomial, setEphemerisTimePckPolyFunction, getFrameType
+   *                           and members m_frameType, m_tOrientationAvailable, 
+   *                           m_raPole, m_decPole, m_pm, m_raNutPrec, m_decNutPrec, m_pmNutPrec,
+   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale  to support request for 
    *                           solving for target body parameters.
    *                           Also added a new enumerated value for Source, PckPolyFunction, 
    *                            and 
    *                           PartialType, WRT_RotationRate.
-   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() calls to see if
-   *                           any NAIF errors were signaled. References #2248.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    *  @todo Consider making this a base class with child classes based on frame type or 
@@ -242,12 +242,13 @@ namespace Isis {
        *       PckPolyFunction - The rotation is calculated using the IAU fit 
        *                  polynomials in one variable (time in Julian centuries and days).
        */
-      enum Source { Spice,                                       //!< Directly from the kernels 
-                               Nadir,                                       //!< Nadir pointing
-                               Memcache,                               //!< From cached table
-                               PolyFunction,                            //!< From nth degree polynomial
-                               PolyFunctionOverSpice ,            //!< Kernels plus nth degree polynomial 
-                               PckPolyFunction                        //!< Quadratic polynomial function with 
+      enum Source { Spice,                              //!< Directly from the kernels 
+                               Nadir,                   //!< Nadir pointing
+                               Memcache,                //!< From cached table
+                               PolyFunction,            //!< From nth degree polynomial
+                               PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
+                               PckPolyFunction          //!< Quadratic polynomial function with
+                                                        //   linear trignometric terms
                   };            
 
       /** 
@@ -270,11 +271,14 @@ namespace Isis {
       /** 
        *  
        */ 
-      enum NaifFrameType { INERTL = 1,       //!< 
-                           PCK  = INERTL + 1, //!< 
-                           CK = PCK + 1,     //!< 
-                           TK = CK + 1,      //!< 
-                           DYN = TK + 1      //!< 
+      enum FrameType {UNKNOWN = 0,  // Isis specific code for unknown frame type
+                           INERTL = 1,       //!< See Naif Frames.req document for 
+                           PCK  = 2,         //!< definitions
+                           CK = 3,           //!< 
+                           TK = 4,           //!< 
+                           DYN = 5,          //!<
+                           BPC = 6,          //!< Isis specific code for binary pck
+                           NOTJ2000PCK = 7   //!< PCK frame not referenced to J2000
       };                                   
 
       void SetEphemerisTime(double et);
@@ -317,8 +321,8 @@ namespace Isis {
 
       std::vector<double> EvaluatePolyFunction();
 
-      void LoadPCFromSpice();
-      void LoadPCFromTable(const PvlObject &Label);
+      void loadPCFromSpice();
+      void loadPCFromTable(const PvlObject &Label);
 
       void MinimizeCache(DownsizeStatus status);
 
@@ -358,7 +362,7 @@ namespace Isis {
                          std::vector<double>& abcAng2,
                          std::vector<double>& abcAng3);
 
-      void GetPckPolynomial(std::vector<Angle>& raCoeff,
+      void getPckPolynomial(std::vector<Angle>& raCoeff,
                             std::vector<Angle>& decCoeff,
                             std::vector<Angle>& pmCoeff);
 
@@ -367,18 +371,22 @@ namespace Isis {
       Source GetSource();
       void SetSource(Source source);
       void ComputeBaseTime();
+      FrameType getFrameType();
       double GetBaseTime();
       double GetTimeScale();
 
       void SetOverrideBaseTime(double baseTime, double timeScale);
 
+      // Derivative methods
       double DPolynomial(const int coeffIndex);
       double DPckPolynomial(PartialType partialVar, const int coeffIndex);
 
-      std::vector<double> ToJ2000Partial(const std::vector<double>& lookT,
+      std::vector<double> toJ2000Partial(const std::vector<double>& lookT,
                                              PartialType partialVar, int coeffIndex);
       std::vector<double> ToReferencePartial(std::vector<double>& lookJ,
                                              PartialType partialVar, int coeffIndex);
+      void DCJdt(std::vector<double> &dRJ);
+
       double WrapAngle(double compareAngle, double angle);
       void SetAxes(int axis1, int axis2, int axis3);
       std::vector<double> GetFullCacheTime();
@@ -388,21 +396,21 @@ namespace Isis {
       std::vector<int>  ConstantFrameChain();
       std::vector<int>  TimeFrameChain();
       void InitConstantRotation(double et);
-      void DCJdt(std::vector<double> &dRJ);
       bool HasAngularVelocity();
 
       void ComputeAv();
       std::vector<double> Extrapolate(double timeEt);
 
+      void checkForBinaryPck();
 
     protected:
       void SetFullCacheParameters(double startTime, double endTime, int cacheSize);
-      void SetEphemerisTimeMemcache();
-      void SetEphemerisTimeNadir();
-      void SetEphemerisTimeSpice();
-      void SetEphemerisTimePolyFunction();
-      void SetEphemerisTimePolyFunctionOverSpice();
-      void SetEphemerisTimePckPolyFunction();
+      void setEphemerisTimeMemcache();
+      void setEphemerisTimeNadir();
+      void setEphemerisTimeSpice();
+      void setEphemerisTimePolyFunction();
+      void setEphemerisTimePolyFunctionOverSpice();
+      void setEphemerisTimePckPolyFunction();
       std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
       std::vector<std::vector<double> > p_cache; /**< Cached rotations, stored as 
                                                       rotation matrix from J2000 
@@ -428,10 +436,10 @@ namespace Isis {
                                                                   rotation at et*/
 
       bool p_matrixSet;                    //!< Flag indicating p_TJ has been set
-      bool p_tOrientationAvailable;  //!< Target orientation constants are available
+      bool m_tOrientationAvailable;  //!< Target orientation constants are available
  
 
-      NaifFrameType p_frameType;          //!< The type of rotation frame
+      FrameType m_frameType;  //!< The type of rotation frame
       Source p_source;                    //!< The source of the rotation data
       int p_axisP;                        /**< The axis defined by the spacecraft
                                                vector for defining a nadir rotation*/
