@@ -57,7 +57,8 @@
     </change>
     <change name="Tyler Wilson" date="2015-10-02">
        Added the fixPvl function that fixes Pvl files from orbit I24 which have
-       a comment tag that is not closed off.  #Ref 2344
+       a comment tag that is not closed off.  Also a new test pvlFix to test this
+       change.  #Ref 2344.
     </change>
 
 
