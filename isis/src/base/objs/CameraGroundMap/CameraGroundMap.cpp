@@ -323,9 +323,9 @@ namespace Isis {
       double *dx, double *dy) {
 
     //  TODO  add a check to make sure p_pB and p_lookJ have been set. 
-    // 0.  calculate or save from previous GetXY call lookB.  We need ToJ2000Partial that is 
+    // 0.  calculate or save from previous GetXY call lookB.  We need toJ2000Partial that is 
     //     like a derivative form of J2000Vector  
-    // 1.  we will call d_lookJ = bodyrot->ToJ2000Partial (Make sure the partials are correct for the target body
+    // 1.  we will call d_lookJ = bodyrot->toJ2000Partial (Make sure the partials are correct for the target body
     //             orientation matrix.
     // 2.  we will then call d_lookC = instRot->ReferenceVector(d_lookJ)
     // 3.  the rest should be the same.
@@ -336,7 +336,7 @@ namespace Isis {
     // Rotate body-fixed look vector into J2000 through the derivative rotation
     SpiceRotation *bodyRot = p_camera->bodyRotation();
     SpiceRotation *instRot = p_camera->instrumentRotation();
-    std::vector<double> dlookJ = bodyRot->ToJ2000Partial(p_pB, varType, coefIndex);
+    std::vector<double> dlookJ = bodyRot->toJ2000Partial(p_pB, varType, coefIndex);
     std::vector <double> lookC(3);
     std::vector <double> dlookC(3);
 
