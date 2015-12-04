@@ -521,7 +521,6 @@ parameter list:  ()
 image names:     () 
 "parameter weights :     0.0     0.0     0.0     
 parameter corrections : 0.0     0.0     0.0     
-parameter solution    : 0.0     0.0     0.0     
 apriori sigmas :        -1.79769313486231e+308     -1.79769313486231e+308     -1.79769313486231e+308     
 adjusted sigmas :       0.0     0.0     0.0     " 
     output bundle observation... 

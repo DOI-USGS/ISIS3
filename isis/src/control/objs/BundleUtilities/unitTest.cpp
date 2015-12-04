@@ -423,10 +423,19 @@ int main(int argc, char *argv[]) {
         6) formatBundleOutputString - with instrumentPosition/instrumentRotation not NULL
     #endif
     BundleObservation bo;
+    BundleTargetBodyQsp bundleTargetBody;// ???
     qDebug() << "Constructing BundleObservation object from BundleImage...";
-    BundleObservation bo2(bi2, "ObservationNumber2", "InstrumentId2");
+    BundleObservation bo2(bi2, 
+                          "ObservationNumber2", 
+                          "InstrumentId2", 
+                          bundleTargetBody);
+
     BundleImage *nullImage = NULL;
-    BundleObservation nullBO(nullImage, "NullObservationNumber", "NullInstrumentId");
+    BundleObservation nullBO(nullImage, 
+                             "NullObservationNumber", 
+                             "NullInstrumentId", 
+                             bundleTargetBody);
+
     qDebug() << "Testing assignment operator to set this equal to itself...";
     bo2 = bo2;
     qDebug() << "Testing assignment operator to create a new object...";
@@ -475,7 +484,6 @@ int main(int argc, char *argv[]) {
     #endif
     boost::numeric::ublas::vector< double > paramWts = bo3.parameterWeights();
     boost::numeric::ublas::vector< double > paramCor = bo3.parameterCorrections();
-    boost::numeric::ublas::vector< double > paramSol = bo3.parameterSolution();
     boost::numeric::ublas::vector< double > aprSigma = bo3.aprioriSigmas();
     boost::numeric::ublas::vector< double > adjSigma = bo3.adjustedSigmas();
     QString vectors = "parameter weights :     ";
@@ -486,11 +494,6 @@ int main(int argc, char *argv[]) {
     vectors.append("\nparameter corrections : ");
     for (unsigned int i = 0; i < paramCor.size(); i++) {
       vectors.append(toString(paramCor[i]));
-      vectors.append("     ");
-    }
-    vectors.append("\nparameter solution    : ");
-    for (unsigned int i = 0; i < paramSol.size(); i++) {
-      vectors.append(toString(paramSol[i]));
       vectors.append("     ");
     }
     vectors.append("\napriori sigmas :        ");
@@ -521,24 +524,24 @@ int main(int argc, char *argv[]) {
     #if 0
     TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 21%
     Need:
-      1) addNew - settings.solveObservationMode() == false
+      1) addNew - settings->solveObservationMode() == false
                   map.contains(obsNumber)
-      2) addNew - settings.solveObservationMode()
+      2) addNew - settings->solveObservationMode()
                   map.contains(obsNumber) == false
-      3) addNew - settings.solveObservationMode()
+      3) addNew - settings->solveObservationMode()
                   map.contains(obsNumber)
                   bo.instId() == this.instId
-      4) addNew - settings.solveObservationMode()
+      4) addNew - settings->solveObservationMode()
                   map.contains(obsNumber)
                   bo.instId() != this.instId
                   bundleObservation != null
                   bundleSettings.numberSolveSettings() == 1
-      5) addNew - settings.solveObservationMode()
+      5) addNew - settings->solveObservationMode()
                   map.contains(obsNumber)
                   bo.instId() != this.instId
                   bundleObservation != null
                   bundleSettings.numberSolveSettings() != 1
-      6) addNew - settings.solveObservationMode()
+      6) addNew - 
                   map.contains(obsNumber)
                   bo.instId() != this.instId
                   bundleObservation == null
@@ -640,9 +643,9 @@ int main(int argc, char *argv[]) {
     qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters); // ??? these print outs are not pretty... fix???
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=false";
-    BundleSettings settings; // default solveRadius=false
+    BundleSettingsQsp settings; // default solveRadius=false
     double metersToRadians = 1.0 / radiansToMeters;
-    bcp1.setWeights(&settings, metersToRadians);
+    bcp1.setWeights(settings, metersToRadians);
     qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     boost::numeric::ublas::bounded_vector< double, 3 > aprioriSigmas = bcp1.aprioriSigmas();
@@ -661,8 +664,8 @@ int main(int argc, char *argv[]) {
     qDebug();
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0";
-    settings.setSolveOptions(BundleSettings::Sparse, false, false, false, true, Isis::Null);
-    bcp1.setWeights(&settings, metersToRadians);
+    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, Isis::Null);
+    bcp1.setWeights(settings, metersToRadians);
     qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp1.aprioriSigmas();
@@ -672,8 +675,8 @@ int main(int argc, char *argv[]) {
     qDebug();
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0";
-    settings.setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
-    bcp1.setWeights(&settings, metersToRadians);
+    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
+    bcp1.setWeights(settings, metersToRadians);
     qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp1.aprioriSigmas();
@@ -703,7 +706,7 @@ int main(int argc, char *argv[]) {
     qDebug() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
 
     qDebug() << "Modify FixedPoint - setWeights()";
-    bcp3->setWeights(&settings, metersToRadians);
+    bcp3->setWeights(settings, metersToRadians);
     qDebug() << bcp3->formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp3->aprioriSigmas();
@@ -721,8 +724,8 @@ int main(int argc, char *argv[]) {
     qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - solveRadius=false";
-    settings.setSolveOptions(BundleSettings::Sparse, false, false, false, false);
-    bcp4.setWeights(&settings, metersToRadians);
+    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, false);
+    bcp4.setWeights(settings, metersToRadians);
     qDebug() << bcp4.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp4.aprioriSigmas();
@@ -733,8 +736,8 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
                 "apriori lat/lon/rad <= 0";
-    settings.setSolveOptions(BundleSettings::Sparse, false, false, false, true);
-    bcp4.setWeights(&settings, metersToRadians);
+    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true);
+    bcp4.setWeights(settings, metersToRadians);
     qDebug() << bcp4.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp4.aprioriSigmas();
@@ -745,8 +748,8 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
                 "apriori lat/lon/rad > 0";
-    settings.setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
-    bcp4.setWeights(&settings, metersToRadians);
+    settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
+    bcp4.setWeights(settings, metersToRadians);
     qDebug() << bcp4.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp4.aprioriSigmas();
@@ -787,7 +790,7 @@ int main(int argc, char *argv[]) {
     qDebug() << bcp5.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
     qDebug() << "Modify ConstrainedPoint - setWeights() - solveRadius=t, lat/lon/rad constrained";
-    bcp5.setWeights(&settings, metersToRadians);
+    bcp5.setWeights(settings, metersToRadians);
     qDebug() << bcp5.formatBundleOutputSummaryString(errorProp);
     qDebug() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp5.aprioriSigmas(); // these values were verified by comparing against
