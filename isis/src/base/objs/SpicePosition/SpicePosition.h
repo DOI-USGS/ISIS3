@@ -166,15 +166,16 @@ namespace Isis {
    *                           protected, ssupport routines for this
    *                           generalization. Fixes (mostly) #0909, #1136 and
    *                           #1223.
-   *  @history 2013-03-28 Debbie A. Cook - Fixed bug causing jigsaw to fail with a singular definite
+   *   @history 2013-03-28 Debbie A. Cook - Fixed bug causing jigsaw to fail with a singular definite
    *                           matrix on radar data.  The bug was in the method VelocityPartial and 
    *                           occurred when the et = baseTime and the coeffIndex was 0.  This caused
    *                           the derivative equation to be 0 * 0 ** -1.  This update fixes issue #1582.
-   *  @history 2015-08-25 Kristin Berry - Moved check to make sure a polynomial exists to earlier in
+   *   @history 2015-02-20 Jeannie Backer - Improved error messages.
+   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if
+   *                            any NAIF errors were signaled. References #2248.
+   *   @history 2015-08-25 Kristin Berry - Moved check to make sure a polynomial exists to earlier in
    *                           LoadHermiteCache. Was failing due to lack of a polynomial with a
    *                           confusing error message before the check. 
-   *  @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if
-   *                            any NAIF errors were signaled. References #2248.
    */
   class SpicePosition {
     public:
