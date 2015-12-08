@@ -185,10 +185,9 @@ namespace Isis {
    *   @history 2014-03-11 Stuart Sides - Programmers notes - Fixed a bug in the copy constructor
    *                           that was going out of array bounds.
    *   @history 2015-02-20 Jeannie Backer - Improved error messages.
-   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() calls to see if
-   *                           any NAIF errors were signaled. References #2248.
-   *   @history 2015-08-05 Debbie A. Cook - Programmer notes - Modified LoadCache, 
-   *                           and ComputeAv.
+   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() calls to see
+   *                           if any NAIF errors were signaled. References #2248.
+   *   @history 2015-08-05 Debbie A. Cook - Programmer notes - Modified LoadCache, and ComputeAv.
    *                           Added new methods 
    *                           loadPCFromSpice, loadPCFromTable, toJ2000Partial, poleRaCoefs,
    *                           poleDecCoefs, pmCoefs, poleRaNutPrecCoefs, poleDecNutPrecCoefs, 
@@ -197,11 +196,9 @@ namespace Isis {
    *                           getPckPolynomial, setEphemerisTimePckPolyFunction, getFrameType
    *                           and members m_frameType, m_tOrientationAvailable, 
    *                           m_raPole, m_decPole, m_pm, m_raNutPrec, m_decNutPrec, m_pmNutPrec,
-   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale  to support request for 
-   *                           solving for target body parameters.
-   *                           Also added a new enumerated value for Source, PckPolyFunction, 
-   *                            and 
-   *                           PartialType, WRT_RotationRate.
+   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale  to support request
+   *                           for solving for target body parameters. Also added a new enumerated
+   *                           value for Source, PckPolyFunction, and PartialType, WRT_RotationRate.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    *  @todo Consider making this a base class with child classes based on frame type or 
