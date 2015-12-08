@@ -99,7 +99,10 @@ namespace Isis {
       derivative = 1;
     }
     else {
-      IString msg = "Coeff index, " + Isis::IString(coefIndex) + " exceeds degree of polynomial";
+      QString msg = "Unable to evaluate the derivative of the univariate polynomial for the given "
+                    "coefficient index [" + toString(coefIndex) + "]. "
+                    "Index is negative or exceeds degree of polynomial ["
+                    + toString(Coefficients()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return derivative;

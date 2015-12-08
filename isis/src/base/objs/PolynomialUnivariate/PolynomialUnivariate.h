@@ -43,10 +43,9 @@ namespace Isis {
    *
    * @internal
    *
-   *  @history 2008-01-11 Tracie Sucharski,  Renamed from Poly1D, add derivative
-   *           methods.
-   *  @history 2008-02-05 Jeannie Walldren,Renamed from
-   *           Polynomial1Variable.
+   *   @history 2008-01-11 Tracie Sucharski - Renamed from Poly1D, add derivative methods.
+   *   @history 2008-02-05 Jeannie Walldren - Renamed from Polynomial1Variable.
+   *   @history 2015-02-20 Jeannie Backer - Improved error messages.
    */
 
   class PolynomialUnivariate : public Isis::Basis1VariableFunction {
