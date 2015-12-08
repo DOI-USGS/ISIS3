@@ -150,6 +150,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Sets the sample/line values of the image to get the lat/lon values
    *
@@ -270,6 +271,7 @@ namespace Isis {
     shape->clearSurfacePoint();
     return false;
   }
+
 
   /**
    * Sets the lat/lon values to get the sample/line values
