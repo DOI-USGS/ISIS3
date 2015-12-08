@@ -145,7 +145,7 @@ namespace Isis {
       Q_OBJECT
 
     public:
-      ControlPointEdit(ControlNet * cnetQ, QWidget *parent = 0,
+      ControlPointEdit(ControlNet * cnet, QWidget *parent = 0,
                        bool allowLeftMouse = false, bool useGeometry = true);
       ~ControlPointEdit();
       QString templateFileName() {
