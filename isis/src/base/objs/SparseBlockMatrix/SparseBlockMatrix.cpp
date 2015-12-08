@@ -312,6 +312,7 @@ namespace Isis {
     return stream;
   }
 
+
   /**
    * Writes matrix to QDebug stream (dbg)
    */
@@ -485,6 +486,7 @@ namespace Isis {
      }
   }
 
+
   /**
    * Prints matrix blocks to std output stream out for debugging.
    */
@@ -561,6 +563,7 @@ namespace Isis {
     }
   }
 
+
   /**
      * TODO
      */
@@ -591,6 +594,7 @@ namespace Isis {
 
       return nLeadingColumnsElements;
     }
+
 
   /**
    * Writes matrix to binary disk file pointed to by QDataStream stream
@@ -659,6 +663,7 @@ namespace Isis {
     return stream;
   }
 
+
   /**
    * Writes matrix to QDebug stream (dbg)
    */
@@ -723,6 +728,7 @@ namespace Isis {
   SparseBlockMatrix::SparseBlockMatrix(const SparseBlockMatrix& src) {
     copy(src);
   }
+
 
   /**
    * Copy method.

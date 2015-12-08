@@ -74,9 +74,9 @@ namespace Isis {
    *                        the negative z axis.  Fixes Mantis ticket #1524
    *   @history 2014-04-17 Jeannie Backer - Replaced local variable names with more
    *                           descriptive names. References #1659.
-   *  @history 2015-07-24 Debbie A. Cook Added new methods GetdXYdTOrientation, 
-   *                        EllipsoidPartial, and MeanRadiusPartial along with new member 
-   *                        p_lookB.   References Mantis ticket TBD.
+   *   @history 2015-07-24 Debbie A. Cook - Added new methods GetdXYdTOrientation, 
+   *                           EllipsoidPartial, and MeanRadiusPartial along with new member
+   *                           p_lookB. References Mantis ticket TBD.
    *
    */
   class CameraGroundMap {
@@ -136,9 +136,9 @@ namespace Isis {
       double p_focalPlaneY;
 
     private:
-      void LookCtoFocalPlaneXY();     //!< Calculate focalplane x/y from lookvector in camera
-      std::vector<double> p_pB;  //!< Surface point calculated from ground coordinates in GetXY and used for partials
-      std::vector<double> p_lookJ;   //!< Look vector in J2000 calculated from ground coordinates in GetXY and used for partials
+      void LookCtoFocalPlaneXY();  //!< Calculate focalplane x/y from lookvector in camera
+      std::vector<double> p_pB;    //!< Surface point calculated from ground coordinates in GetXY and used for partials
+      std::vector<double> p_lookJ; //!< Look vector in J2000 calculated from ground coordinates in GetXY and used for partials
   };
 };
 #endif
