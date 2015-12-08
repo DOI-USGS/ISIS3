@@ -1,3 +1,5 @@
+#ifndef FileName_h
+#define FileName_h
 /**
  * @file
  * $Revision: 1.3 $
@@ -20,10 +22,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef FileName_H
-#define FileName_H
 
-#include <string>
 #include <QSharedData>
 
 class QDate;
@@ -105,6 +104,7 @@ namespace Isis {
    *                           unpredictable (safe) names.
    *   @history 2012-06-04 Steven Lambright and Stuart Sides - Added operator!= and improved unit
    *                           test to include tests of operator== and operator!=. Fixes #903.
+   *   @history 2014-07-23 Jeannie Backer - Removed include for std::string.
    */
   class FileName {
     public:
