@@ -55,8 +55,9 @@ namespace Isis {
    *
    * @internal
    *   @todo Add coded example
-   *   @history 2005-03-16 Leah Dahmer modified file to support Doxygen
-   *   documentation.
+   *   @history 2005-03-16 Leah Dahmer - modified file to support Doxygen documentation.
+   *   @history 2015-02-20 Jeannie Backer - Improved error messages.
+   *   
    */
   class BasisFunction {
     public:
