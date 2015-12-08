@@ -18,6 +18,14 @@ using namespace Isis;
 using namespace std;
 using namespace boost::numeric::ublas;
 
+/**
+ *
+ * @author 2010-07-30 Tracie Sucharski, Ken L. Edmunson, and Debbie A. Cook
+ *
+ * @internal
+ *   @history 2015-02-20 Jeannie Backer - Added print statement for
+ *            latitude, longitude and radius weight accessor methods.
+ */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
   symmetric_matrix<double,upper> cvRect,cvOc;
@@ -72,6 +80,10 @@ int main(int argc, char *argv[]) {
          " m, longitude sigma=" << spRec.GetLonSigmaDistance().meters() <<
          " m, radius sigma=" << spRec.GetLocalRadiusSigma().meters()
          <<  " m" << endl;
+    cout << "    latitude weight =" << spRec.GetLatWeight() <<
+         ", longitude weight =" << spRec.GetLonWeight() <<
+         ", radius weight =" << spRec.GetLocalRadiusWeight() << endl;
+
     cout << "    spherical covariance matrix = " << covarSphere(0,0) << "  " <<
          covarSphere(0,1) << "  " << covarSphere(0,2) << endl;
     cout << "                                  " << covarSphere(1,0) << "  " <<
