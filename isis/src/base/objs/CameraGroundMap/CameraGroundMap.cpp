@@ -160,7 +160,7 @@ namespace Isis {
 
     // Should a check be added to make sure SetImage has been called???
 
-    // Get spacecraft vector in body-fixed coordinates
+    // Get spacecraft vector in j2000 coordinates
     SpiceRotation *bodyRot = p_camera->bodyRotation();
     SpiceRotation *instRot = p_camera->instrumentRotation();
     std::vector<double> pJ = bodyRot->J2000Vector(pB);
@@ -387,7 +387,7 @@ namespace Isis {
   /** Compute derivative of focal plane coordinate w/r to one of the ellipsoidal radii (a, b, or c)
    *
    * This method will compute the derivative of the undistorted focal plane coordinate for
-   * a ground position with respect to the a (major axis), b (minor axis), or c (polar axis) radius, 
+   *a a ground position with respect to the a (major axis), b (minor axis), or c (polar axis) radius, 
    * using the current Spice settings (time and kernels) without resetting the current point 
    * values for lat/lon/radius/x/y.
    *
