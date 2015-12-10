@@ -77,9 +77,6 @@ namespace Isis {
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
                                                              double exposureDuration);
 
-      //QString name();
-      //void setName(QString name);
-
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK
        *  

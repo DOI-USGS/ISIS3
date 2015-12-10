@@ -70,10 +70,6 @@ namespace Isis {
       ~VoyagerCamera () {};
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
                                                              double exposureDuration);
-
-      //QString name();
-      //void setName(QString name);
-
       /** 
        * CK frame ID -
        * Voyager 1 instrument code (VG1_SCAN_PLATFORM) = -31100
