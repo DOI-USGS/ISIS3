@@ -244,6 +244,15 @@ CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
 CHOLMODLIB    = -lcholmod -lamd -lcolamd -llapack
 
 #---------------------------------------------------------------------------
+# Set up for HDF5 libraries 
+#---------------------------------------------------------------------------
+HDF5INCDIR = -I$(ISIS3LOCAL)/include/hdf5
+HDF5LIBDIR = -L$(ISIS3LOCAL)/lib
+# HDF5INCDIR = -I/work/projects/progteam/jlaura/hdf5-1.8.14/build/include
+# HDF5LIBDIR = -L/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib
+HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
+
+#---------------------------------------------------------------------------
 #  Define the third party distribution libraries (patterns)
 #---------------------------------------------------------------------------
 
@@ -296,8 +305,10 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libprotobuf.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos-*.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos_c.so*"
+
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsklib.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice.so*"
+
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_4.3.a"
 #THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.so"
@@ -318,6 +329,15 @@ THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"
 #THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libcrypto.so*"
 #THIRDPARTYLIBS    += "/lib64/libreadline.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libkdu_a63R.so*"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_cpp.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl_cpp.so*"
+#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5.so*"
+#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5_hl.so*"
+#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5_cpp.so*"
+#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5_hl_cpp.so*"
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"
