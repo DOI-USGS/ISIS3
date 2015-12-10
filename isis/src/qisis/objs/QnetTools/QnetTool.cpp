@@ -2605,7 +2605,7 @@ namespace Isis {
 
     SurfacePoint aprioriPoint = m_editPoint->GetAprioriSurfacePoint();
     if (aprioriPoint.GetLatitude().degrees() == Null) {
-      s = "AprioriLatitude:  Null";
+      s = "Apriori Latitude:  Null";
     }
     else {
       s = "Apriori Latitude:  " +
