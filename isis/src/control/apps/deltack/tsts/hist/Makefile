@@ -1,6 +1,5 @@
-APPNAME  = deltack
-#
 # 2014-07-23 JWB - Removed extraneous "\"s
+APPNAME  = deltack
 
 include $(ISISROOT)/make/isismake.tsts
 

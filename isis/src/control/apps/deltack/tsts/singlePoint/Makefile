@@ -1,7 +1,7 @@
-APPNAME = deltack
 #This file tests the single point (don't solve for twist) option
 #
 # 2014-07-23 JWB - Added semicolon to first command.
+APPNAME = deltack
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -14,7 +14,7 @@ commands:
 	line1=669.375 \
 	lat1=-26.439008370134 \
 	lon1= 352.19745020451 > /dev/null;
-	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
