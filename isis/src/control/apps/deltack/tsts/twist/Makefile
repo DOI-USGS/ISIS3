@@ -1,6 +1,6 @@
-APPNAME = deltack
 #This file tests the twist (2-point) option
 #	tol=0.4194172 \
+APPNAME = deltack
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -17,7 +17,7 @@ commands:
 	line2=8264.78 \
 	lat2=-0.3270664209085 \
 	lon2=355.70986410595 > /dev/null;
-	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
+	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
@@ -28,7 +28,7 @@ commands:
 	# 1. remove cube filename paths
 	# 2. remove digits beyond the fifth decimal place of decimal numbers
 	# 3. remove date and time
-	cat residuals.csv \
+	$(CAT) residuals.csv \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/residuals.csv
 	$(RM) bundleout.txt > /dev/null;

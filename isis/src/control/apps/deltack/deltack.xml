@@ -54,40 +54,43 @@
       Original version
     </change>
     <change name="Tracie Sucharski" date="2007-05-02">
-        Added inclusion of TWIST to SAMP2,LINE2,LAT2,LON2,RAD2.  
-        Without this inclusion, the AML was requiring these parameters
-        even if TWIST was false.
+      Added inclusion of TWIST to SAMP2,LINE2,LAT2,LON2,RAD2.  
+      Without this inclusion, the AML was requiring these parameters
+      even if TWIST was false.
     </change>
     <change name="Debbie A. Cook" date="2007-07-12">
-        Added pvl status report for a successful update.
+      Added pvl status report for a successful update.
     </change>
     <change name="Steven Koechle" date="2007-10-05">
       Added check to see if cube has existing polygon, if so delete it.
     </change>
     <change name="Debbie A. Cook" date="2011-06-06">
-        Updated to current version of BundleAdjust class.
+      Updated to current version of BundleAdjust class.
     </change>
     <change name="Debbie A. Cook" date="2011-06-07">
-        Changed point type "Ground" to "Fixed".
+      Changed point type "Ground" to "Fixed".
     </change>
     <change name="Debbie A. Cook" date="2011-09-28">
-        Updated documentation in response to Mantis issue #187.
+      Updated documentation in response to Mantis issue #187.
     </change>
     <change name="Brent A. Archinal" date="2011-09-30">
-        Updated documentation, mostly to indicate units.
+      Updated documentation, mostly to indicate units.
     </change>
     <change name="Debbie A. Cook" date="2011-10-04">
-        Added documentation for output files and removed creation of 
-        output csv tables because the tables are not useful for
-        only one or two points.  The information is already listed
-        in bundleout.txt.
+      Added documentation for output files and removed creation of 
+      output csv tables because the tables are not useful for
+      only one or two points.  The information is already listed
+      in bundleout.txt.
     </change>
     <change name="Kimberly Oyama" date="2014-03-28">
-       Added check for history group in input cube. If it's there, add a new entry. If not, add a
-       new history group. Added an app test. Fixes #1350.
+      Added check for history group in input cube. If it's there, add a new entry. If not, add a
+      new history group. Added an app test. Fixes #1350.
+    </change>
+    <change name="Jeannie Backer" date="2014-07-23">
+      Modified to create a bundle settings object for the bundle adjustment.
     </change>
     <change name="Ian Humphrey and Makayla Shepherd" date="2015-09-01">
-        Changed code to accommodate changes in Sensor and Camera relationships.
+      Changed code to accommodate changes in Sensor and Camera relationships.
     </change>
   </history>
 
