@@ -42,19 +42,10 @@ namespace Isis {
       void paint(QPainter *, const QStyleOptionGraphicsItem *,
                  QWidget * widget = 0);
 
-      ControlPoint *controlPoint() { return m_controlPoint; }
+      ControlPoint *controlPoint();
 
       void setArrowVisible(bool visible, bool colorByMeasureCount, int measureCount,
-                           bool colorByResidualMagnitude, double residualMagnitude) {
-        m_showArrow = visible;
-        m_colorByMeasureCount = colorByMeasureCount;
-        m_measureCount = measureCount;
-        m_colorByResidualMagnitude = colorByResidualMagnitude;
-        m_residualMagnitude = residualMagnitude;
-        setRect(calcRect());
-        update();
-      }
-
+                           bool colorByResidualMagnitude, double residualMagnitude);
 //  signals:
 //    void newControlPointSelected(ControlPoint *controlPoint);
 

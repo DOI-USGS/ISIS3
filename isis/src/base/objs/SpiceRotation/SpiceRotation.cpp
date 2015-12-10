@@ -1166,7 +1166,7 @@ namespace Isis {
    */
   std::vector<double> SpiceRotation::J2000Vector(const std::vector<double>& rVec) {
     NaifStatus::CheckErrors();
-    
+
     std::vector<double> jVec;
 
     if (rVec.size() == 3) {

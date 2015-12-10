@@ -66,8 +66,9 @@ namespace Isis {
 
     m_systemName = new QString;
 
-    if (kernels.hasKeyword("NaifFrameCode"))
+    if (kernels.hasKeyword("NaifFrameCode")) {
       trykey = "NaifFrameCode";
+    }
 
     if (name().toUpper() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
@@ -75,8 +76,9 @@ namespace Isis {
       int ikCode = toInt(kernels[trykey][0]);
       *m_bodyCode  = ikCode / 1000;
       // Check for override in kernel group
-      if (kernels.hasKeyword("NaifSpkCode"))
+      if (kernels.hasKeyword("NaifSpkCode")) {
         *m_bodyCode = (int) kernels["NaifSpkCode"];
+      }
 
       *m_systemCode = -1;
       (*m_systemName).append("THE COSMOS");
@@ -122,7 +124,7 @@ namespace Isis {
     m_systemName = NULL;
     m_spice = NULL;
     init();
- }
+  }
 
 
   /**

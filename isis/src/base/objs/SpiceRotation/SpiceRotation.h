@@ -239,14 +239,15 @@ namespace Isis {
        *       PckPolyFunction - The rotation is calculated using the IAU fit 
        *                  polynomials in one variable (time in Julian centuries and days).
        */
-      enum Source { Spice,                              //!< Directly from the kernels 
-                               Nadir,                   //!< Nadir pointing
-                               Memcache,                //!< From cached table
-                               PolyFunction,            //!< From nth degree polynomial
-                               PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
-                               PckPolyFunction          //!< Quadratic polynomial function with
+      enum Source { Spice,                   //!< Directly from the kernels 
+                    Nadir,                   //!< Nadir pointing
+                    Memcache,                //!< From cached table
+                    PolyFunction,            //!< From nth degree polynomial
+                    PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
+                    PckPolyFunction          //!< Quadratic polynomial function with
                                                         //   linear trignometric terms
-                  };            
+      };            
+
 
       /** 
        * This enumeration indicates whether the partial derivative is taken with 
@@ -255,7 +256,8 @@ namespace Isis {
       enum PartialType { WRT_RightAscension, //!< With respect to Right Ascension
                          WRT_Declination,    //!< With respect to Declination
                          WRT_Twist          //!< With respect to Twist or Prime Meridian Rotation
-                       };
+      };
+
 
       /** 
        *  
@@ -263,7 +265,8 @@ namespace Isis {
       enum DownsizeStatus { Yes,  //!< 
                             Done, //!< 
                             No    //!< 
-                          };
+      };
+
 
       /** 
        *  
@@ -428,15 +431,18 @@ namespace Isis {
                                                be 1 (J2000 code)*/
       double p_timeBias;                  //!< iTime bias when reading kernels
 
-      double p_et;                           //!< Current ephemeris time
+      double p_et;                        //!< Current ephemeris time
       Quaternion p_quaternion;            /**< Quaternion for J2000 to reference
-                                                                  rotation at et*/
+                                               rotation at et*/
 
-      bool p_matrixSet;                    //!< Flag indicating p_TJ has been set
-      bool m_tOrientationAvailable;  //!< Target orientation constants are available
+      bool p_matrixSet;                   //!< Flag indicating p_TJ has been set
+      bool m_tOrientationAvailable;       //!< Target orientation constants are available
  
 
-      FrameType m_frameType;  //!< The type of rotation frame
+      FrameType m_frameType;              
+      //! 
+      //! 
+      //!< The type of rotation frame
       Source p_source;                    //!< The source of the rotation data
       int p_axisP;                        /**< The axis defined by the spacecraft
                                                vector for defining a nadir rotation*/

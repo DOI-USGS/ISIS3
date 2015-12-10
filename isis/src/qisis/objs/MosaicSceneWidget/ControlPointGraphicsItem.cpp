@@ -44,16 +44,21 @@ namespace Isis {
 
     m_origPoint = new QPointF(apriori);
 
-    if (cp->IsIgnored())
+    if (cp->IsIgnored()) {
       setPen(QPen(Qt::red));
-    else if (cp->IsEditLocked())
+    }
+    else if (cp->IsEditLocked()) {
       setPen(QPen(Qt::magenta));
-    else if (cp->GetType() == ControlPoint::Fixed)
+    }
+    else if (cp->GetType() == ControlPoint::Fixed) {
       setPen(QPen(Qt::green));
-    else if (cp->GetType() == ControlPoint::Constrained)
+    }
+    else if (cp->GetType() == ControlPoint::Constrained) {
       setPen(QPen(Qt::darkGreen));
-    else // Free
+    }
+    else {// Free
       setPen(QPen(Qt::blue));
+    }
 
     setBrush(Qt::NoBrush);
 
@@ -89,8 +94,9 @@ namespace Isis {
     QRectF fullRect = calcRect();
     QRectF crosshairRect = calcCrosshairRect();
 
-    if (crosshairRect.isNull())
+    if (crosshairRect.isNull()) {
       return;
+    }
 
     if (rect() != fullRect) {
       setRect(fullRect);
@@ -161,6 +167,25 @@ namespace Isis {
         painter->drawPolygon(arrowHead);
       }
     }
+  }
+
+
+  ControlPoint *ControlPointGraphicsItem::controlPoint() { 
+    return m_controlPoint; 
+  }
+
+  void ControlPointGraphicsItem::setArrowVisible(bool visible, 
+                                                 bool colorByMeasureCount, 
+                                                 int measureCount,
+                                                 bool colorByResidualMagnitude, 
+                                                 double residualMagnitude) {
+    m_showArrow = visible;
+    m_colorByMeasureCount = colorByMeasureCount;
+    m_measureCount = measureCount;
+    m_colorByResidualMagnitude = colorByResidualMagnitude;
+    m_residualMagnitude = residualMagnitude;
+    setRect(calcRect());
+    update();
   }
 
 
@@ -294,8 +319,9 @@ namespace Isis {
       for(int snIndex = 0; snIndex < serialNums.size(); snIndex ++) {
         QString serialNum = serialNums[snIndex];
 
-        if (snIndex > 0)
+        if (snIndex > 0) {
           toolTip += "<br />";
+        }
 
         if (snList->HasSerialNumber(serialNum)) {
           toolTip +=

@@ -656,7 +656,10 @@ namespace Isis {
   }
 
 
-  void Image::initCamStats() {    
+  /** 
+   * TODO 
+   */ 
+  void Image::initCamStats() {
     bool hasCamStats = false;
 
     Pvl &label = *cube()->label();
