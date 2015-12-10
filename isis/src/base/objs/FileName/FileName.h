@@ -104,7 +104,8 @@ namespace Isis {
    *                           unpredictable (safe) names.
    *   @history 2012-06-04 Steven Lambright and Stuart Sides - Added operator!= and improved unit
    *                           test to include tests of operator== and operator!=. Fixes #903.
-   *   @history 2014-07-23 Jeannie Backer - Removed include for std::string.
+   *   @history 2014-07-23 Jeannie Backer - Moved ifndef to top of file to bring class closer to
+   *                           ISIS coding standards and removed include for std::string.
    */
   class FileName {
     public:
