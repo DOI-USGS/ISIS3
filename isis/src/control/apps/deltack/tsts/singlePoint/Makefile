@@ -26,7 +26,7 @@ commands:
 	# 1. remove cube filename paths
 	# 2. remove digits beyond the fifth decimal place of decimal numbers
 	# 3. remove date and time
-	$(CAT) $(OUTPUT)/residuals.csv \
+	$(CAT) residuals.csv \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/residuals.csv
 	$(RM) bundleout.txt > /dev/null;
