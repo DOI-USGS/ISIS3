@@ -1,5 +1,5 @@
 #This file tests the twist (2-point) option
-#	tol=0.4194172 \
+#	tol=0.4194172
 APPNAME = deltack
 
 include $(ISISROOT)/make/isismake.tsts
