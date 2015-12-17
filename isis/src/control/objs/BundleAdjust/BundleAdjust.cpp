@@ -6480,17 +6480,15 @@ namespace Isis {
       if (m_maxLikelihoodFlag[tier]) {
         sprintf(buf, "\n                         Tier %d Enabled: TRUE",tier);
         fp_out << buf;
-        sprintf(buf,"\n               Maximum Likelihood Model: ");
+        sprintf(buf,"\n               Maximum Likelihood Model:  %s", 
+                MaximumLikelihoodWFunctions::modelToString(m_wFunc[tier]->model()).toAscii().data());
         fp_out << buf;
-        m_wFunc[tier]->maximumLikelihoodModel(buf);
+        sprintf(buf, "\n    Quantile used for tweaking constant: %lf", m_maxLikelihoodQuan[tier]);
         fp_out << buf;
-        sprintf(buf, "\n    Quantile used for tweaking constant: %lf",m_maxLikelihoodQuan[tier]);
+        sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf", m_wFunc[tier]->tweakingConstant());
         fp_out << buf;
-        sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf",m_wFunc[tier]->tweakingConstant());
-        fp_out << buf;
-        sprintf(buf, "\n       Approx. weighted Residual cutoff: ");
-        fp_out << buf;
-        m_wFunc[tier]->weightedResidualCutoff(buf);
+        sprintf(buf, "\n       Approx. weighted Residual cutoff: %s", 
+                m_wFunc[tier]->weightedResidualCutoff().toAscii().data());
         fp_out << buf;
         if (tier != 2) fp_out << "\n";
       }
