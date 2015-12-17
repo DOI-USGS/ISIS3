@@ -21,88 +21,149 @@
  *  http://www.usgs.gov/privacy.html.
  */
 
-#include <vector>
+#include <QList>
+#include <QObject>
+#include <QVector>
+
+#include "XmlStackedHandler.h"
+
+class QDataStream;
+class QUuid;
+class QXmlStreamWriter;
 
 namespace Isis {
-  /**
-  * @brief This class is used to approximate cumulative probibility distributions of a stream of observations without storing the observations or having any apriori knowlege of the range of the data.  
+  class Project;// ??? does xml stuff need project???
+  class XmlStackedHandlerReader;
+
+ /**
+  * @brief This class is used to approximate cumulative probibility distributions of a stream of
+  *        observations without storing the observations or having any apriori knowlege of the range
+  *        of the data.  
   *
-  * This class is used to approximate cumulative probibility distributions of a stream of observations without storing the observations or having any apriori knowlege of the range of the data.
-  * "The P^2 algorithim for dynamic calculation of Quantiles and Histograms without storing Obswervations" Raj Jain and Imrich Chlamtac, Communication of the ACM Oct 1985, is used.
-  * A finite set of evenly spaced qunatiles are dynamically updated as more observations are added.  The number of quantiles is set in the construtor, and has a defualt of 20.
-  * After sufficient data points (number of observations >> number of quantiles to track) the class provides cumulative probility as a function of value or vice versa.
-  * Thus it can be used to build histograms or find any number of discrete quantiles.  Specific points on the function are evaluated by fiting piece wise parabolic functions to the three nearest adjacent nodes.
-  * Preformance of algorithim is within a few percent error for most of the distribution (given sufficient data), however care should be taken if the points to be querried are within 200/(numberOfQuantiles-1)% of the edges of the distributions.
-  * Near the edges the individual quantiles are still well calculated, but the piece wise parabolic function doesn't always fit the tails well, so interpolated points are more unrealiable.
-  * Developement note: Two possible ways to improve the fitting of the tails: caculate more densely place quantiles near the edges, use exponential regression (or some other alternative--perhaps adaptively selected).
+  * This class is used to approximate cumulative probibility distributions of a stream of
+  * observations without storing the observations or having any apriori knowlege of the range of the 
+  * data. "The P^2 algorithim for dynamic calculation of Quantiles and Histograms without storing 
+  * Observations" Raj Jain and Imrich Chlamtac, Communication of the ACM Oct 1985, is used. A finite 
+  * set of evenly spaced qunatiles are dynamically updated as more observations are added.  The 
+  * number of quantiles is set in the construtor, and has a defualt of 20. After sufficient data 
+  * points (number of observations >> number of quantiles to track) the class provides cumulative 
+  * probility as a function of value or vice versa. Thus it can be used to build histograms or find 
+  * any number of discrete quantiles.  Specific points on the function are evaluated by fiting piece 
+  * wise parabolic functions to the three nearest adjacent nodes. Preformance of algorithim is 
+  * within a few percent error for most of the distribution (given sufficient data), however care 
+  * should be taken if the points to be querried are within 200/(numberOfQuantiles-1)% of the edges 
+  * of the distributions. Near the edges the individual quantiles are still well calculated, but the 
+  * piece wise parabolic function doesn't always fit the tails well, so interpolated points are more 
+  * unrealiable. Developement note: Two possible ways to improve the fitting of the tails: caculate 
+  * more densely place quantiles near the edges, use exponential regression (or some other 
+  * alternative--perhaps adaptively selected).
   *
   *
   *
+  * @ingroup Math
   * @ingroup Statistics
   *
   * @author 2012-03-23 Orrin Thomas
   *
   * @internal
-  * @history 2012-03-23 Orrin Thomas - Original Version
+  *   @history 2012-03-23 Orrin Thomas - Original Version
+  *   @history 2014-07-19 Jeannie Backer - Added QDataStream >> and << operator methods. Brought
+  *                           code closer to ISIS standards. Updated unitTest to include these
+  *                           methods.
+  *   @history 2014-09-11 Jeannie Backer - Added xml write/read capabilities. Fixed bug in cumPro()
+  *                           method for previously untested lines (case where the given value is
+  *                           closest to the last quantile value). Renamed member variables for
+  *                           clarity.
   *
   */
-  class StatCumProbDistDynCalc{
-    //class uses the P^2 Algorithim to calculate equiprobability cell histograms from a stream of data without storing the data
-    //  see "The p^2 Algorithim for Dynamic Calculations of Quantiles and Histograms Without Storing Observations"
-  public:
-    StatCumProbDistDynCalc(unsigned int nodes=20);  //individual qunatile value to be calculated
-    ~StatCumProbDistDynCalc() { }; //empty destructor
+  class StatCumProbDistDynCalc : public QObject {
+    Q_OBJECT
+    // class uses the P^2 Algorithim to calculate equiprobability cell histograms from a stream of 
+    // data without storing the data 
+    //  see "The p^2 Algorithim for Dynamic Calculations of Quantiles and Histograms Without Storing
+    //  Observations"
+    public:
+      StatCumProbDistDynCalc(unsigned int nodes=20, QObject *parent = 0);  //individual qunatile value to be calculated
+      StatCumProbDistDynCalc(Project *project, XmlStackedHandlerReader *xmlReader, 
+                             QObject *parent = 0);   // TODO: does xml stuff need project???
+      StatCumProbDistDynCalc(const StatCumProbDistDynCalc &other);
+      ~StatCumProbDistDynCalc();
+      StatCumProbDistDynCalc &operator=(const StatCumProbDistDynCalc &other);
+    
+      void initialize(); // clears the member lists and initializes the rest of the member data to 0 
+      void setQuantiles(unsigned int nodes); // initializes/resets the class to start new calculation
 
-    void addObs(double obs); //
+      void validate();
+      void addObs(double obs);
+    
+      double cumProb(double value); //given a value return the cumulative probility
+      double value(double cumProb); //given a cumulative probibility return a value
+      double max(); //return the largest value so far
+      double min(); //return the smallest values so far
+    
+      void save(QXmlStreamWriter &stream, const Project *project) const;   // TODO: does xml stuff need project???
+    
+      QDataStream &write(QDataStream &stream) const;
+      QDataStream &read(QDataStream &stream);
 
-    double cumProb(double value); //given a value return the cumulative probility
-    double value(double cumProb); //given a cumulative probibility return a value
-    double max(); //return the largest value so far
-    double min(); //return the smallest values so far
-    void initialize(unsigned int nodes=20); //resets the class to start a new dynamic calculation
+    private:
+      /**
+       *
+       * @author 2014-07-28 Jeannie Backer
+       *
+       * @internal
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          XmlHandler(StatCumProbDistDynCalc *probabilityCalc, Project *project);   // TODO: does xml stuff need project???
+          ~XmlHandler();
+   
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool characters(const QString &ch);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName);
+   
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+   
+          StatCumProbDistDynCalc *m_xmlHandlerCumProbCalc;
+          Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
+          QString m_xmlHandlerCharacters;
+      };
 
-  private:
+      QUuid *m_id; /**< A unique ID for this object (useful for others to reference this object when
+                                      saving to disk).*/
 
-    /** The number of cells or bins that being used to model the probility density function
-     */
-    unsigned int m_nCells;     //the number of cells in the histogram
+      unsigned int m_numberCells; /**< The number of cells or histogram bins that are being used to
+                                      model the probility density function.*/
+      
+      unsigned int m_numberQuantiles; /**< The number of quantiles being used to model the probility
+                                      density function. This value is one more than the number of
+                                      cells, (i.e. m_numberQuantiles=m_cells+1).*/
+      
+      unsigned int m_numberObservations; /**< The number of observations, note this is dynamically
+                                      changing as observations are added.*/
 
+      QList<double> m_quantiles; /**< The target quantiles being modeled, between 0 and 1.*/
+      
+      QList<double> m_observationValues; /**< The calculated values of the quantiles, note this is
+                                      dynamically changing as observations are added.*/
 
-    /** The number of quantiles being used to model the probility density function
-     *    This is one more than the number of cells.
-     */
-    unsigned int m_nQuan;     //the number of quantiles being calculated (m_cells+1)
-
-
-
-    /** the quantiles being modeled begining at 0 and going to 1
-     */
-    std::vector<double> m_quan;        //the target quantile
-
-
-
-    /** The ideal number of observations that should be less than or equal to the value of the corresponding quantiles, note this is dynamically changing as observations are added
-     */
-    std::vector<double> m_nIdeal;      //ideal positions of quantiles
-
-
-
-    /** The actual number of observations that are less than or equal to the value of the corresponding quantiles, note this is dynamically changing as observations are added
-     */
-    std::vector<int> m_n;
-
-
-
-    /**  The calculated values of the quantiles, note this is dynamically changing as observations are added
-     */
-    std::vector<double> m_q;
-
-
-
-    /**  The number of observations, note this is dynamically changing as observations are added
-     */
-    unsigned int m_nObs;  //the number of observations
+      QList<double> m_idealNumObsBelowQuantile; /**< The ideal number of observations that
+                                      should be less than or equal to the value of the corresponding
+                                      quantiles, note this is dynamically changing as observations
+                                      are added.*/
+      
+      QList<int> m_numObsBelowQuantile; /**< The actual number of observations that are less
+                                      than or equal to the value of the corresponding quantiles,
+                                      note this is dynamically changing as observations are added.*/
+            
   };
+
+  // operators to read/write StatCumProbDistDynCalc to/from binary data
+  QDataStream &operator<<(QDataStream &stream, const StatCumProbDistDynCalc &scpddc);
+  QDataStream &operator>>(QDataStream &stream, StatCumProbDistDynCalc &scpddc);
 
 } //end namespace Isis
 

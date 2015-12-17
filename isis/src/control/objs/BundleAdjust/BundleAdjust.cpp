@@ -74,7 +74,7 @@ namespace Isis {
  
     //cumulative residual probability distribution calculator
     m_cumProRes = new StatCumProbDistDynCalc;
-    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+    m_cumProRes->setQuantiles(101);  //set up the cum probibility solver to have a node at every percent of the distribution
 
     //initialize maximum likelihood estimation parameters
     m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
@@ -103,7 +103,7 @@ namespace Isis {
 
     //cumulative residual probability distribution calculator
     m_cumProRes = new StatCumProbDistDynCalc;
-    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+    m_cumProRes->setQuantiles(101); //set up the cum probibility solver to have a node at every percent of the distribution
 
     //initialize maximum likelihood estimation parameters
     m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
@@ -130,7 +130,7 @@ namespace Isis {
 
     //cumulative residual probability distribution calculator
     m_cumProRes = new StatCumProbDistDynCalc;
-    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+    m_cumProRes->setQuantiles(101); //set up the cum probibility solver to have a node at every percent of the distribution
 
     //initialize maximum likelihood estimation parameters
     m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
@@ -157,7 +157,7 @@ namespace Isis {
 
     //cumulative residual probability distribution calculator
     m_cumProRes = new StatCumProbDistDynCalc;
-    m_cumProRes->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+    m_cumProRes->setQuantiles(101); //set up the cum probibility solver to have a node at every percent of the distribution
 
     //initialize maximum likelihood estimation parameters
     m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
@@ -1129,7 +1129,7 @@ namespace Isis {
         m_maxLikelihoodMedianR2Residuals = m_cumPro->value(0.5);
         printf("Median of R^2 residuals:  %lf\n",m_maxLikelihoodMedianR2Residuals);
         //restart the dynamic calculation of the cumulative probility distribution of |R^2 residuals| --so it will be up to date for the next iteration
-        m_cumPro->initialize(101);
+        m_cumPro->setQuantiles(101);
       }
 
       clock_t iterationclock2 = clock();
@@ -1147,7 +1147,7 @@ namespace Isis {
 
       // restart the dynamic calculation of the cumulative probility distribution of residuals (in unweighted pixels) --so it will be up to date for the next iteration
       if (!m_bConverged)
-        m_cumProRes->initialize(101);
+        m_cumProRes->setQuantiles(101);
 
       // if we're using CHOLMOD and still going, release cholmod_factor (if we don't, memory leaks will occur),
       // otherwise we need it for error propagation
@@ -8850,7 +8850,7 @@ namespace Isis {
      }
      else {
        m_cumPro = new StatCumProbDistDynCalc;
-       m_cumPro->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+       m_cumPro->setQuantiles(101);  //set up the cum probibility solver to have a node at every percent of the distribution
        for (int i=0;i<models.size() && i<3;i++) {
          m_maxLikelihoodFlag[i] = true;
          m_wFunc[i] = new MaximumLikelihoodWFunctions;

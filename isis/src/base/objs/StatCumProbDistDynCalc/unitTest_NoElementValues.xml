@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statCumProbDistDynCalc>
+    <id></id>
+    <numberQuantiles></numberQuantiles>
+    <numberCells></numberCells>
+    <numberObservations></numberObservations>
+    <observationData>
+        <observation />
+    </observationData>
+</statCumProbDistDynCalc>
