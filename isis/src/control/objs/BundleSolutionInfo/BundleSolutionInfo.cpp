@@ -63,6 +63,8 @@ namespace Isis {
     m_statisticsResults = NULL;
     m_statisticsResults = new BundleResults();
 
+    m_settings = BundleSettingsQsp(new BundleSettings);
+
     m_images = NULL;
     m_images = new QList<ImageList *>;// change to QList<QStringList> ???
 

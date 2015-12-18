@@ -79,10 +79,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "Printing PVL group with results from the settings/cnet/statistics constructor...";
 
     // create default settings and statistics objects to pass into results object
-    BundleSettingsQsp settings;
+    BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
     FileName cnetFile("cnetfile.net");
     BundleResults statistics;
-
     QObject *parent = NULL;
     BundleSolutionInfo results(settings, cnetFile, statistics, parent);
 
