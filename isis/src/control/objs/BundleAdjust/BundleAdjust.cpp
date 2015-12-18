@@ -6480,7 +6480,7 @@ namespace Isis {
       if (m_maxLikelihoodFlag[tier]) {
         sprintf(buf, "\n                         Tier %d Enabled: TRUE",tier);
         fp_out << buf;
-        sprintf(buf,"\n               Maximum Likelihood Model:  %s", 
+        sprintf(buf,"\n               Maximum Likelihood Model: %s", 
                 MaximumLikelihoodWFunctions::modelToString(m_wFunc[tier]->model()).toAscii().data());
         fp_out << buf;
         sprintf(buf, "\n    Quantile used for tweaking constant: %lf", m_maxLikelihoodQuan[tier]);

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statistics>
+    <id></id>
+    <sum></sum>
+    <sumSquares></sumSquares>
+    <range>
+        <minimum></minimum>
+        <maximum></maximum>
+        <validMinimum></validMinimum>
+        <validMaximum></validMaximum>
+    </range>
+    <pixelCounts>
+        <totalPixels></totalPixels>
+        <validPixels></validPixels>
+        <nullPixels></nullPixels>
+        <lisPixels></lisPixels>
+        <lrsPixels></lrsPixels>
+        <hisPixels></hisPixels>
+        <hrsPixels></hrsPixels>
+        <underRangePixels></underRangePixels>
+        <overRangePixels></overRangePixels>
+    </pixelCounts>
+    <removedData></removedData>
+</statistics>
