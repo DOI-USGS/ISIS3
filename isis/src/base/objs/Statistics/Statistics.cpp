@@ -874,49 +874,64 @@ namespace Isis {
     size_t offset = 0;
     compoundDataType.insertMember("Sum", offset, H5::PredType::NATIVE_DOUBLE);
 
-    offset += sizeof(m_sum);
+    // offset += sizeof(m_sum);
+    offset += sizeof(double);
     compoundDataType.insertMember("SumSquared", offset, H5::PredType::NATIVE_DOUBLE);
 
-    offset += sizeof(m_sumsum);
+    // offset += sizeof(m_sumsum);
+    offset += sizeof(double);
     compoundDataType.insertMember("Minimum", offset, H5::PredType::NATIVE_DOUBLE);
 
-    offset += sizeof(m_minimum);
+    // offset += sizeof(m_minimum);
+    offset += sizeof(double);
     compoundDataType.insertMember("Maximum", offset, H5::PredType::NATIVE_DOUBLE);
 
-    offset += sizeof(m_maximum);
+    // offset += sizeof(m_maximum);
+    offset += sizeof(double);
     compoundDataType.insertMember("ValidMinimum", offset, H5::PredType::NATIVE_DOUBLE);
 
-    offset += sizeof(m_validMinimum);
+    // offset += sizeof(m_validMinimum);
+    offset += sizeof(double);
     compoundDataType.insertMember("ValidMaximum", offset, H5::PredType::NATIVE_DOUBLE);
 
-    offset += sizeof(m_validMaximum);
+    // offset += sizeof(m_validMaximum);
+    offset += sizeof(double);
     compoundDataType.insertMember("TotalPixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_totalPixels);
+    // offset += sizeof(m_totalPixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("ValidPixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_validPixels);
+    // offset += sizeof(m_validPixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("NullPixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_nullPixels);
+    // offset += sizeof(m_nullPixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("LRSPixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_lrsPixels);
+    // offset += sizeof(m_lrsPixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("LISPixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_lisPixels);
+    // offset += sizeof(m_lisPixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("HRSPixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_hrsPixels);
+    // offset += sizeof(m_hrsPixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("HISPixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_hisPixels);
+    // offset += sizeof(m_hisPixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("UnderRangePixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_underRangePixels);
+    // offset += sizeof(m_underRangePixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("OverRangePixels", offset, H5::PredType::NATIVE_INT64);
 
-    offset += sizeof(m_overRangePixels);
+    // offset += sizeof(m_overRangePixels);
+    offset += sizeof(BigInt);
     compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_HBOOL);
 
     return compoundDataType;
