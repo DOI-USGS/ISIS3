@@ -655,7 +655,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
 
 " 
-aprioriSigmas:   2 3 4 
+aprioriSigmas:   "2.0" "3.0" "4.0" 
 weights:         25 11.1111 62500 
 
 Raw control point equal to original?     "Yes" 
@@ -761,7 +761,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
 
 " 
-aprioriSigmas:   2 3 4 
+aprioriSigmas:   "2.0" "3.0" "4.0" 
 weights:         25 11.1111 62500 
 
 
@@ -795,7 +795,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000       38.45488734       38.45488734
 
 " 
-aprioriSigmas:   28.657 36.7882 38.4549 
+aprioriSigmas:   "28.656964947064" "36.788158835093" "38.454887341483" 
 weights:         1217.7 1027.41 676.234 
 
 Create copy of FreePoint using copy constructor... 

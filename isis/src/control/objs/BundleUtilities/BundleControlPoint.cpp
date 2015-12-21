@@ -11,8 +11,10 @@
 
 namespace Isis {
 
+
   /**
-   * constructor
+   *  
+   * @param controlPoint 
    */
   BundleControlPoint::BundleControlPoint(ControlPoint *controlPoint) {
     m_controlPoint = controlPoint;
@@ -38,7 +40,8 @@ namespace Isis {
 
 
   /**
-   * copy constructor
+   * 
+   * @param src 
    */
   BundleControlPoint::BundleControlPoint(const BundleControlPoint &src) {
     copy(src);
@@ -55,7 +58,8 @@ namespace Isis {
 
 
   /**
-   * copy method
+   * 
+   * @param src 
    */
   void BundleControlPoint::copy(const BundleControlPoint &src) {
 
@@ -78,6 +82,12 @@ namespace Isis {
   }
 
 
+  /**
+   * 
+   * @param controlMeasure 
+   * 
+   * @return @b BundleMeasure* 
+   */
   BundleMeasure *BundleControlPoint::addMeasure(ControlMeasure *controlMeasure) {
 
     BundleMeasure *bundleMeasure = new BundleMeasure(controlMeasure, this);
@@ -88,11 +98,20 @@ namespace Isis {
   }
 
 
+  /**
+   * 
+   * @param surfacePoint 
+   */
   void BundleControlPoint::setAdjustedSurfacePoint(SurfacePoint surfacePoint) {
     m_controlPoint->SetAdjustedSurfacePoint(surfacePoint);
   }
 
 
+  /**
+   * 
+   * @param settings 
+   * @param metersToRadians 
+   */
   void BundleControlPoint::setWeights(const BundleSettingsQsp settings, double metersToRadians) {
 
     double d;
@@ -170,75 +189,124 @@ namespace Isis {
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b ControlPoint* 
+   */
   ControlPoint *BundleControlPoint::rawControlPoint() const {
     return m_controlPoint;
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b bool 
+   */
   bool BundleControlPoint::isRejected() const {
     return m_controlPoint->IsRejected();
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b int 
+   */
   int BundleControlPoint::numberMeasures() const {
     return m_controlPoint->GetNumMeasures();
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b SurfacePoint 
+   */
   SurfacePoint BundleControlPoint::getAdjustedSurfacePoint() const {
     return m_controlPoint->GetAdjustedSurfacePoint();
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::getId() const {
     return m_controlPoint->GetId();
   }
 
 
-
   // ??? why bounded vector ??? can we use linear algebra vector ??? 
+  /**
+   * 
+   * 
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& 
+   */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::corrections() {
     return m_corrections;
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& 
+   */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() {
     return m_aprioriSigmas;
 
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& 
+   */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() {
     return m_adjustedSigmas;
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& 
+   */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() {
     return m_weights;
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b boost::numeric::ublas::bounded_vector<double,3>& 
+   */
   boost::numeric::ublas::bounded_vector<double, 3> &BundleControlPoint::nicVector() {
     return m_nicVector;
   }
 
 
-
+  /**
+   * 
+   * 
+   * @return @b SparseBlockRowMatrix& 
+   */
   SparseBlockRowMatrix &BundleControlPoint::cholmod_QMatrix() {
     return m_cholmod_QMatrix;
   }
 
 
-
+  /**
+   * 
+   * @param errorPropagation 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatBundleOutputSummaryString(bool errorPropagation) const {
 
     int numRays        = numberMeasures(); // should this depend on the raw point, as written, or this->size()???
@@ -267,7 +335,13 @@ namespace Isis {
   }
 
 
-
+  /**
+   * 
+   * @param errorPropagation 
+   * @param RTM 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
                                                              double RTM) const {
 
@@ -349,7 +423,14 @@ namespace Isis {
   }
 
 
-
+  /**
+   * 
+   * @param value 
+   * @param fieldWidth 
+   * @param precision 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatValue(double value, int fieldWidth, int precision) const {
     QString output;
     IsNullPixel(value) ? 
@@ -359,7 +440,14 @@ namespace Isis {
   }
 
 
-
+  /**
+   * 
+   * @param type 
+   * @param fieldWidth 
+   * @param precision 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatAprioriSigmaString(int type, int fieldWidth, 
                                                        int precision) const {
     QString aprioriSigmaStr;
@@ -374,27 +462,53 @@ namespace Isis {
   }
 
 
-
+  /**
+   * 
+   * @param fieldWidth 
+   * @param precision 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatLatitudeAprioriSigmaString(int fieldWidth, 
                                                                int precision) const {
     return formatAprioriSigmaString(0, fieldWidth, precision);
   }
 
 
-
+  /**
+   * 
+   * @param fieldWidth 
+   * @param precision 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatLongitudeAprioriSigmaString(int fieldWidth, 
                                                                 int precision) const {
     return formatAprioriSigmaString(1, fieldWidth, precision);
   }
 
 
-
+  /**
+   * 
+   * @param fieldWidth 
+   * @param precision 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatRadiusAprioriSigmaString(int fieldWidth, int precision) const {
     return formatAprioriSigmaString(2, fieldWidth, precision);
   }
 
 
-
+  /**
+   * 
+   * @param type 
+   * @param fieldWidth 
+   * @param precision 
+   * @param errorPropagation 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatAdjustedSigmaString(int type, int fieldWidth, int precision,
                                                         bool errorPropagation) const {
     QString adjustedSigmaStr;
@@ -425,23 +539,44 @@ namespace Isis {
   }
 
 
-
+  /**
+   * 
+   * @param fieldWidth 
+   * @param precision 
+   * @param errorPropagation 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
                                                                 bool errorPropagation) const {
     return formatAdjustedSigmaString(0, fieldWidth, precision, errorPropagation);
   }
 
 
-
+  /**
+   * 
+   * @param fieldWidth 
+   * @param precision 
+   * @param errorPropagation 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatLongitudeAdjustedSigmaString(int fieldWidth, int precision,
                                                                  bool errorPropagation) const {
     return formatAdjustedSigmaString(1, fieldWidth, precision, errorPropagation);
   }
 
 
-
   // TODO: what do we do if we're not solving for radius, how do we know that here?????????????????
   // TODO: sigma is not == 0.0, if not solving for radius it's like something crazy e-22
+  /**
+   * 
+   * @param fieldWidth 
+   * @param precision 
+   * @param errorPropagation 
+   * 
+   * @return @b QString 
+   */
   QString BundleControlPoint::formatRadiusAdjustedSigmaString(int fieldWidth, int precision,
                                                               bool errorPropagation) const {
     return formatAdjustedSigmaString(2, fieldWidth, precision, errorPropagation);

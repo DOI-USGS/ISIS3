@@ -55,9 +55,9 @@ int main() {
   // Make Dummy Covariance Matrix
   SparseBlockMatrix tmpMat;
   tmpMat.setNumberOfColumns(2);
-  tmpMat.InsertMatrixBlock(0, 0, 2, 2);
-  tmpMat.InsertMatrixBlock(1, 0, 2, 2);
-  tmpMat.InsertMatrixBlock(1, 1, 2, 2);
+  tmpMat.insertMatrixBlock(0, 0, 2, 2);
+  tmpMat.insertMatrixBlock(1, 0, 2, 2);
+  tmpMat.insertMatrixBlock(1, 1, 2, 2);
   int initVal = 1;
   for (int sbcm = 0; sbcm < 2; sbcm++) {
     for (int block = 0; block < tmpMat[sbcm]->size(); block++) {
