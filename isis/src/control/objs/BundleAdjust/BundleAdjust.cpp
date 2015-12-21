@@ -1069,7 +1069,7 @@ namespace Isis {
       N11 = prod(trans(coeff_target), coeff_target);
 
       // insert submatrix at column, row
-      m_SparseNormals.InsertMatrixBlock(0, 0, nTargetPartials, nTargetPartials);
+      m_SparseNormals.insertMatrixBlock(0, 0, nTargetPartials, nTargetPartials);
 
 //std::cout << "SparseNormals: " << 0 << std::endl << N11 << std::endl;
 
@@ -1082,7 +1082,7 @@ namespace Isis {
       NTargetImage.clear();
       NTargetImage = prod(trans(coeff_target),coeff_image);
 
-      m_SparseNormals.InsertMatrixBlock(observationIndex+1, 0, nTargetPartials, coeff_image.size2());
+      m_SparseNormals.insertMatrixBlock(observationIndex+1, 0, nTargetPartials, coeff_image.size2());
       (*(*m_SparseNormals[observationIndex+1])[0]) += NTargetImage;
 
       // form N12_Target
@@ -1095,7 +1095,7 @@ namespace Isis {
 //std::cout << N12_Target << std::endl;
 
       // insert N12_Target into N12
-      N12.InsertMatrixBlock(0, nTargetPartials, 3);
+      N12.insertMatrixBlock(0, nTargetPartials, 3);
       *N12[0] += N12_Target;
 
       // form n1
@@ -1142,7 +1142,7 @@ namespace Isis {
     t += nTargetPartials;
 
     // insert submatrix at column, row
-    m_SparseNormals.InsertMatrixBlock(blockIndex, blockIndex, nImagePartials,
+    m_SparseNormals.insertMatrixBlock(blockIndex, blockIndex, nImagePartials,
                                       nImagePartials);
 
 //std::cout << "SparseNormals: " << blockIndex << std::endl << N11 << std::endl;
@@ -1164,7 +1164,7 @@ namespace Isis {
 //std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
 
     // insert N12_Image into N12
-    N12.InsertMatrixBlock(blockIndex, nImagePartials, 3);
+    N12.insertMatrixBlock(blockIndex, nImagePartials, 3);
     *N12[blockIndex] += N12_Image;
 
 //printf("N12\n");
@@ -1761,7 +1761,7 @@ namespace Isis {
       int ncol = iN12.key();
 
       // insert submatrix in Q at block "ncol"
-      Q.InsertMatrixBlock(ncol, 3, iN12.value()->size1());
+      Q.insertMatrixBlock(ncol, 3, iN12.value()->size1());
 
       *(Q[ncol]) = prod(N22,trans(*(iN12.value())));
     }
@@ -1807,7 +1807,7 @@ namespace Isis {
         boost::numeric::ublas::matrix<double> *iq = iQ.value();
 
         // insert submatrix at column, row
-        m_SparseNormals.InsertMatrixBlock(ncol, nrow,
+        m_SparseNormals.insertMatrixBlock(ncol, nrow,
             in12->size1(), iq->size2());
 
         (*(*m_SparseNormals[ncol])[nrow]) -= prod(*in12,*iq);
@@ -3755,13 +3755,13 @@ namespace Isis {
       if (i == 0) {
         ncolsCurrentBlockColumn = normalsColumn->numberOfColumns();
         int nRows = m_SparseNormals.at(i)->numberOfRows();
-        sbcMatrix.InsertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
+        sbcMatrix.insertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
         sbcMatrix.zeroBlocks();
       }
       else {
         if (normalsColumn->numberOfColumns() == ncolsCurrentBlockColumn) {
           int nRows = m_SparseNormals.at(i)->numberOfRows();
-          sbcMatrix.InsertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
+          sbcMatrix.insertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
           sbcMatrix.zeroBlocks();
         }
         else {
@@ -3775,7 +3775,7 @@ namespace Isis {
             SparseBlockColumnMatrix* normalsRow = m_SparseNormals.at(j);
             int nRows = normalsRow->numberOfRows();
 
-            sbcMatrix.InsertMatrixBlock(j, nRows, ncolsCurrentBlockColumn);
+            sbcMatrix.insertMatrixBlock(j, nRows, ncolsCurrentBlockColumn);
           }
         }
       }

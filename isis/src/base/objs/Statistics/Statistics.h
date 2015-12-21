@@ -90,6 +90,10 @@ namespace Isis {
    *                           code closer to standards.
    *   @history 2015-09-03 Jeannie Backer - Added hdf5 read/write capabilities by adding
    *                           compoundH5DataType() static method.
+   *   @history 2015-12-21 Jeannie Backer - Changed compoundH5DataType() method to update offset by
+   *                           using member variabl datatypes directly. This was done so that MAC
+   *                           OSX will compile.
+   *
    *
    *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
    *   @todo 2015-08-13 Jeannie Backer - Clean up header and implementation files once
