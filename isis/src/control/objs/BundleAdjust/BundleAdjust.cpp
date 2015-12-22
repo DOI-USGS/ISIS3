@@ -1394,7 +1394,7 @@ namespace Isis {
     int t = m_nNumImagePartials * nImageIndex;
 
     // insert submatrix at column, row
-    m_SparseNormals.InsertMatrixBlock(nImageIndex, nImageIndex,
+    m_SparseNormals.insertMatrixBlock(nImageIndex, nImageIndex,
         m_nNumImagePartials, m_nNumImagePartials );
 
     (*(*m_SparseNormals[nImageIndex])[nImageIndex]) += N11;
@@ -1417,7 +1417,7 @@ namespace Isis {
 //    for (i = 0; i < m_nNumImagePartials; i++)
 //      for (j = 0; j < 3; j++)
 //        N12(i + t, j) += N12_Image(i, j);
-    N12.InsertMatrixBlock(nImageIndex, m_nNumImagePartials, 3);
+    N12.insertMatrixBlock(nImageIndex, m_nNumImagePartials, 3);
     *N12[nImageIndex] += N12_Image;
 
 //    printf("N12\n");
@@ -2103,7 +2103,7 @@ namespace Isis {
       int ncol = iN12.key();
 
       // insert submatrix in Q at block "ncol"
-      Q.InsertMatrixBlock(ncol, 3, m_nNumImagePartials);
+      Q.insertMatrixBlock(ncol, 3, m_nNumImagePartials);
 
       *(Q[ncol]) = prod(N22,trans(*(iN12.value())));
     }
@@ -2144,7 +2144,7 @@ namespace Isis {
           continue;
 
         // insert submatrix at column, row
-        m_SparseNormals.InsertMatrixBlock(ncol, nrow,
+        m_SparseNormals.insertMatrixBlock(ncol, nrow,
             m_nNumImagePartials, m_nNumImagePartials );
 
         (*(*m_SparseNormals[ncol])[nrow]) -= prod(*a,*(iQ.value()));
@@ -5694,13 +5694,13 @@ namespace Isis {
       if (i == 0) {
         ncolsCurrentBlockColumn = normalsColumn->numberOfColumns();
         int nRows = m_SparseNormals.at(i)->numberOfRows();
-        sbcMatrix.InsertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
+        sbcMatrix.insertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
         sbcMatrix.zeroBlocks();
       }
       else {
         if (normalsColumn->numberOfColumns() == ncolsCurrentBlockColumn) {
           int nRows = m_SparseNormals.at(i)->numberOfRows();
-          sbcMatrix.InsertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
+          sbcMatrix.insertMatrixBlock(i, nRows, ncolsCurrentBlockColumn);
           sbcMatrix.zeroBlocks();
         }
         else {
@@ -5714,7 +5714,7 @@ namespace Isis {
             SparseBlockColumnMatrix* normalsRow = m_SparseNormals.at(j);
             int nRows = normalsRow->numberOfRows();
 
-            sbcMatrix.InsertMatrixBlock(j, nRows, ncolsCurrentBlockColumn);
+            sbcMatrix.insertMatrixBlock(j, nRows, ncolsCurrentBlockColumn);
           }
         }
       }

@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- Insert boost block matrix of zeros" << endl;
     SparseBlockColumnMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     cerr << "  # of matrix blocks: " << spcm.size() << endl;
     cerr << "# of matrix elements: " << spcm.numberOfElements() << endl;
     spcm.print(std::cerr);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- Insert boost block matrix of zeros and set values" << endl;
     SparseBlockColumnMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- copy method" << endl;
     SparseBlockColumnMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- copy constructor" << endl;
     SparseBlockColumnMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- = operator" << endl;
     SparseBlockColumnMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- zero blocks" << endl;
     SparseBlockColumnMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- wipe" << endl;
     SparseBlockColumnMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- Insert boost block matrix of zeros" << endl;
     SparseBlockRowMatrix sprm;
-    sprm.InsertMatrixBlock(0, 3, 3);
+    sprm.insertMatrixBlock(0, 3, 3);
     cerr << "  # of matrix blocks: " << sprm.size() << endl;
     cerr << "# of matrix elements: " << sprm.numberOfElements() << endl;
     sprm.print(std::cerr);
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- Insert boost block matrix of zeros and set values" << endl;
     SparseBlockRowMatrix sprm;
-    sprm.InsertMatrixBlock(0, 3, 3);
+    sprm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(sprm[0]))(i,j) = 3*i+j;
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- copy method" << endl;
     SparseBlockRowMatrix sprm;
-    sprm.InsertMatrixBlock(0, 3, 3);
+    sprm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(sprm[0]))(i,j) = 3*i+j;
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- copy constructor" << endl;
     SparseBlockRowMatrix sprm;
-    sprm.InsertMatrixBlock(0, 3, 3);
+    sprm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(sprm[0]))(i,j) = 3*i+j;
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- = operator" << endl;
     SparseBlockRowMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- zero blocks" << endl;
     SparseBlockRowMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
   try {
     cerr << "----- wipe" << endl;
     SparseBlockRowMatrix spcm;
-    spcm.InsertMatrixBlock(0, 3, 3);
+    spcm.insertMatrixBlock(0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(spcm[0]))(i,j) = 3*i+j;
@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- Insert boost block matrix of zeros" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     cerr << "             # matrix blocks: " << sbm.numberOfBlocks() << endl;
     cerr << "    # diagonal matrix blocks: " << sbm.numberOfDiagonalBlocks() << endl;
     cerr << "# off-diagonal matrix blocks: " << sbm.numberOfOffDiagonalBlocks() << endl;
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- Insert boost block matrix of zeros and set values" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[1])[1])(i,j) = 3*i+j;
@@ -348,7 +348,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- copy method" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[1])[1])(i,j) = 3*i+j;
@@ -370,7 +370,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- copy constructor" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[1])[1])(i,j) = 3*i+j;
@@ -391,7 +391,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- = operator" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[1])[1])(i,j) = 3*i+j;
@@ -412,7 +412,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- zero blocks" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[1])[1])(i,j) = 3*i+j;
@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- wipe" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[1])[1])(i,j) = 3*i+j;
@@ -454,13 +454,13 @@ int main(int argc, char *argv[]) {
     cerr << endl << "----- diagonal and off-diagonal blocks" << endl;
     SparseBlockMatrix sbm;
     sbm.setNumberOfColumns(3);
-    sbm.InsertMatrixBlock(1, 1, 3, 3);
+    sbm.insertMatrixBlock(1, 1, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[1])[1])(i,j) = 3*i+j;
       }
     }
-    sbm.InsertMatrixBlock(2, 0, 3, 3);
+    sbm.insertMatrixBlock(2, 0, 3, 3);
     for ( int i = 0; i < 3; i++ ) {
       for ( int j = 0; j < 3; j++ ) {
         (*(*sbm[2])[0])(i,j) = 3*i+j+9;
@@ -470,6 +470,8 @@ int main(int argc, char *argv[]) {
     cerr << "    # diagonal matrix blocks: " << sbm.numberOfDiagonalBlocks() << endl;
     cerr << "# off-diagonal matrix blocks: " << sbm.numberOfOffDiagonalBlocks() << endl;
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
+    cerr << "# leading columns for block2: " << sbm.getLeadingColumnsForBlock(2) << endl;
+    cerr << "   # leading rows for block1: " << sbm.getLeadingRowsForBlock(1) << endl;
     sbm.print(std::cerr);
   }
   catch(IException &e) {
