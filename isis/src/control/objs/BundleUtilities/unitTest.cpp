@@ -654,12 +654,14 @@ int main(int argc, char *argv[]) {
     boost::numeric::ublas::bounded_vector< double, 3 > adjustedSigmas = bcp1.adjustedSigmas(); //??? never set 000??? 1.0e+50???
     boost::numeric::ublas::bounded_vector<double, 3> nicVector = bcp1.nicVector(); //??? never set 000c??? 1.0e+50???
     SparseBlockRowMatrix qMatrix = bcp1.cholmod_QMatrix(); //??? empty matrix...
-    qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
-                                   << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
-                                   << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
+    qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
+                                   << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))
+                                   << (Isis::IsSpecial(aprioriSigmas[2]) ? "N/A" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug() << "corrections:    " << corrections[0] << corrections[1] << corrections[2];
-    qDebug() << "adjustedSigmas: " << adjustedSigmas[0] << adjustedSigmas[1] << adjustedSigmas[2];
+    qDebug() << "adjustedSigmas: " << (Isis::IsSpecial(adjustedSigmas[0]) ? "N/A" : Isis::toString(adjustedSigmas[0]))
+                                   << (Isis::IsSpecial(adjustedSigmas[1]) ? "N/A" : Isis::toString(adjustedSigmas[1]))
+                                   << (Isis::IsSpecial(adjustedSigmas[2]) ? "N/A" : Isis::toString(adjustedSigmas[2]));
     qDebug() << "nicVector:      " << nicVector[0] << nicVector[1] << nicVector[2];
     qDebug() << "qMatrix:";
     qDebug() << qMatrix;
@@ -672,9 +674,9 @@ int main(int argc, char *argv[]) {
     qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp1.aprioriSigmas();
     weights = bcp1.weights();
-    qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
-                                   << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
-                                   << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
+    qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
+                                   << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))
+                                   << (Isis::IsSpecial(aprioriSigmas[2]) ? "N/A" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug();
 
@@ -685,9 +687,9 @@ int main(int argc, char *argv[]) {
     qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp1.aprioriSigmas();
     weights = bcp1.weights();
-    qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
-                                   << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
-                                   << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
+    qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
+                                   << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))
+                                   << (Isis::IsSpecial(aprioriSigmas[2]) ? "N/A" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
     qDebug();
 

@@ -613,10 +613,10 @@ Coordinate          Value             Correction          Correction            
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
 " 
-aprioriSigmas:   -1.79769e+308 -1.79769e+308 -1.79769e+308 
+aprioriSigmas:   "N/A" "N/A" "N/A" 
 weights:         0 0 1e+50 
 corrections:     0 0 0 
-adjustedSigmas:  0 0 0 
+adjustedSigmas:  "N/A" "N/A" "N/A" 
 nicVector:       0 0 0 
 qMatrix: 
  New Block 
@@ -637,7 +637,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
 " 
-aprioriSigmas:   -1.79769e+308 -1.79769e+308 -1.79769e+308 
+aprioriSigmas:   "N/A" "N/A" "N/A" 
 weights:         0 0 1e+50 
 
 Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0 
@@ -692,7 +692,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
 " 
-aprioriSigmas:   -1.79769e+308 -1.79769e+308 -1.79769e+308 
+aprioriSigmas:   "NULL" "NULL" "NULL" 
 weights:         1e+50 1e+50 1e+50 
 
 Create ConstrainedPoint from empty constrained point, surface point (0, 0, 10)... 
@@ -725,7 +725,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
 " 
-aprioriSigmas:   -1.79769e+308 -1.79769e+308 -1.79769e+308 
+aprioriSigmas:   "NULL" "NULL" "NULL" 
 weights:         0 0 1e+50 
 
 Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad <= 0 
@@ -743,7 +743,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
 " 
-aprioriSigmas:   -1.79769e+308 -1.79769e+308 -1.79769e+308 
+aprioriSigmas:   "NULL" "NULL" "NULL" 
 weights:         0 0 1e+50 
 
 Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad > 0 

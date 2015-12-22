@@ -791,7 +791,7 @@ namespace Isis {
                         toString(solvePolyOverPointing())); 
       PvlKeyword angleSigmas("AngleAprioriSigmas");
       for (int i = 0; i < aprioriPointingSigmas().size(); i++) {
-        if (IsNullPixel(m_anglesAprioriSigma[i])) {
+        if (IsSpecial(m_anglesAprioriSigma[i])) {
           angleSigmas.addValue("N/A");
         }
         else {
@@ -827,7 +827,7 @@ namespace Isis {
     
       PvlKeyword positionSigmas("PositionAprioriSigmas");
       for (int i = 0; i < aprioriPositionSigmas().size(); i++) {
-        if (IsNullPixel(m_positionAprioriSigma[i])) {
+        if (IsSpecial(m_positionAprioriSigma[i])) {
           positionSigmas.addValue("N/A");
         }
         else {
@@ -871,7 +871,7 @@ namespace Isis {
 
     stream.writeStartElement("aprioriPointingSigmas");
     for (int i = 0; i < m_anglesAprioriSigma.size(); i++) {
-      if (IsNullPixel(m_anglesAprioriSigma[i])) {
+      if (IsSpecial(m_anglesAprioriSigma[i])) {
         stream.writeTextElement("sigma", "N/A");
       }
       else {
@@ -893,7 +893,7 @@ namespace Isis {
 
     stream.writeStartElement("aprioriPositionSigmas");
     for (int i = 0; i < m_positionAprioriSigma.size(); i++) {
-      if (IsNullPixel(m_positionAprioriSigma[i])) {
+      if (IsSpecial(m_positionAprioriSigma[i])) {
         stream.writeTextElement("sigma", "N/A");
       }
       else {

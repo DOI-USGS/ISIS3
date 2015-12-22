@@ -4145,7 +4145,7 @@ namespace Isis {
     }
 
     if (m_bundleSettings->createResidualsFile()) {
-//    outputResiduals();
+      outputResiduals();
     }
 
     return true;
@@ -4390,7 +4390,6 @@ namespace Isis {
     fp_out << buf;
 */
 
-    fp_out << buf;
     if (m_bundleSettings->solveTargetBody()) {
       sprintf(buf, "\n\nINPUT: TARGET BODY OPTIONS\n==============================\n");
       fp_out << buf;

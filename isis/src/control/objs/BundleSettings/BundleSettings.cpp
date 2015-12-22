@@ -715,20 +715,20 @@ namespace Isis {
     if (m_outlierRejection) {
       pvl += PvlKeyword("OutlierMultiplier", toString(outlierRejectionMultiplier()));
     }
-    if ( !IsNullPixel(globalLatitudeAprioriSigma()) ) {
+    if ( !IsSpecial(globalLatitudeAprioriSigma()) ) {
       pvl += PvlKeyword("GlobalLatitudeAprioriSigma", toString(globalLatitudeAprioriSigma()));
     }
     else {
       pvl += PvlKeyword("GlobalLatitudeAprioriSigma", "None");
     }
-    if (!IsNullPixel(globalLongitudeAprioriSigma())) {
+    if (!IsSpecial(globalLongitudeAprioriSigma())) {
       pvl += PvlKeyword("GlobalLongitudeAprioriSigma", toString(globalLongitudeAprioriSigma()));
     }
     else {
       pvl += PvlKeyword("GlobalLongitudeAprioriSigma", "None");
     }
     if (m_solveRadius) {
-      if ( !IsNullPixel(globalLongitudeAprioriSigma()) ) {
+      if ( !IsSpecial(globalLongitudeAprioriSigma()) ) {
       pvl += PvlKeyword("GlobalRadiiAprioriSigma", toString(globalRadiusAprioriSigma()));
       }
       else {
@@ -810,19 +810,19 @@ namespace Isis {
     stream.writeEndElement();
 
     stream.writeStartElement("aprioriSigmas");
-    if (IsNullPixel(globalLatitudeAprioriSigma())) {
+    if (IsSpecial(globalLatitudeAprioriSigma())) {
       stream.writeAttribute("latitude", "N/A");
     }
     else {
       stream.writeAttribute("latitude", toString(globalLatitudeAprioriSigma()));
     }
-    if (IsNullPixel(globalLongitudeAprioriSigma())) {
+    if (IsSpecial(globalLongitudeAprioriSigma())) {
       stream.writeAttribute("longitude", "N/A");
     }
     else {
       stream.writeAttribute("longitude", toString(globalLongitudeAprioriSigma()));
     }
-    if (IsNullPixel(globalRadiusAprioriSigma())) {
+    if (IsSpecial(globalRadiusAprioriSigma())) {
       stream.writeAttribute("radius", "N/A");
     }
     else {
