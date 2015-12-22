@@ -932,7 +932,10 @@ namespace Isis {
 
     // offset += sizeof(m_overRangePixels);
     offset += sizeof(BigInt);
-    compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_HBOOL);
+    // compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_HBOOL);
+    // mac osx has problem with commented lines. will consider this later when
+    // ready to add serialization.
+    compoundDataType.insertMember("RemovedData", offset, H5::PredType::NATIVE_INT64);
 
     return compoundDataType;
   }

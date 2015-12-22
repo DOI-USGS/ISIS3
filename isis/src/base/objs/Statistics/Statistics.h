@@ -81,8 +81,7 @@ namespace Isis {
    *   @history 2010-03-18 Sharmila Prasad  - Error message more meaningful for SetValidRange
    *                           function
    *   @history 2011-06-13 Ken Edmundson - Added Rms method.
-  *    @history 2015-09-01 Tyler Wilson - Made SetValidRange and the destructor virtual.  
-  *                                       See Ref #2188.
+  *    @history 2015-09-01 Tyler Wilson - Made SetValidRange and the destructor virtual. Ref #2188.
    *   @history 2011-06-23 Jeannie Backer - Added QDataStream read(), write() methods and added
    *                           QDataStream >> and << operators. Replaced std strings with QStrings.
    *   @history 2014-09-05 Jeannie Backer - Added xml read/write capabilities.  Moved method
@@ -93,7 +92,9 @@ namespace Isis {
    *   @history 2015-12-21 Jeannie Backer - Changed compoundH5DataType() method to update offset by
    *                           using member variabl datatypes directly. This was done so that MAC
    *                           OSX will compile.
-   *
+   *   @history 2015-12-21 Jeannie Backer - Changed H5::PredType::NATIVE_HBOOL to
+   *                           H5::PredType::NATIVE_INT64 in compoundH5DataType() method. This was
+   *                           done so that MAC OSX will compile.
    *
    *   @todo 2005-02-07 Deborah Lee Soltesz - add example using cube data to the class documentation
    *   @todo 2015-08-13 Jeannie Backer - Clean up header and implementation files once
