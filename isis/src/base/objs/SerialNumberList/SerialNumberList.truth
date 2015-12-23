@@ -1,31 +1,124 @@
-size   = 5
-hasXYZ = 0
-ab102401.cub = MGS/561812335:32/MOC-WA/RED
-m0402852.cub = MGS/619971158:28/MOC-NA/BROAD_BAND
-3133_h1.cub = LO3/HRC/3133/1
-ab102402.lev2.cub = ab102402.lev2.cub
-m0402852.cub = m0402852.cub
-
-SN->File: ab102401.cub
-File->SN:MGS/561812335:32/MOC-WA/RED
-MGS/561812335:32/MOC-WA/RED = 0
-MGS/619971158:28/MOC-NA/BROAD_BAND = 1
-LO3/HRC/3133/1 = 2
-ab102402.lev2.cub = 3
-m0402852.cub = 4
-
-SN->File (0): ab102401.cub
-
-SN->File (1): m0402852.cub
-
-SN->File (2): 3133_h1.cub
-
-SN->File (3): ab102402.lev2.cub
-
-SN->File (4): m0402852.cub
-
-Index->observationNumber (2):  LO3/HRC/3133
 
 
-**USER ERROR** File [.../blobTruth.cub] can not be added to serial number list.
+SerialNumberList size = 5
+SerialNumberList has SerialNumber XYZ?          0
+SerialNumberList has SerialNumber m0402852.cub? 1
+1
+  FileName from index                  = ab102401.cub
+  FileName from SerialNumber           = ab102401.cub
+  FileName index from FileName         = 0
+  SerialNumber from index              = MGS/561812335:32/MOC-WA/RED
+  SerialNumber from FileName           = MGS/561812335:32/MOC-WA/RED
+  SerialNumber index from SerialNumber = 0
+  Observation number from index        = MGS/561812335:32/MOC-WA
+  Spacecraft Instrument ID from index  = MARSGLOBALSURVEYOR/MOC-WA
+  Spacecraft ID from SerialNumber      = MARSGLOBALSURVEYOR/MOC-WA
+2
+  FileName from index                  = m0402852.cub
+  FileName from SerialNumber           = m0402852.cub
+  FileName index from FileName         = 1
+  SerialNumber from index              = MGS/619971158:28/MOC-NA/BROAD_BAND
+  SerialNumber from FileName           = MGS/619971158:28/MOC-NA/BROAD_BAND
+  SerialNumber index from SerialNumber = 1
+  Observation number from index        = MGS/619971158:28/MOC-NA
+  Spacecraft Instrument ID from index  = MARSGLOBALSURVEYOR/MOC-NA
+  Spacecraft ID from SerialNumber      = MARSGLOBALSURVEYOR/MOC-NA
+3
+  FileName from index                  = 3133_h1.cub
+  FileName from SerialNumber           = 3133_h1.cub
+  FileName index from FileName         = 2
+  SerialNumber from index              = LO3/HRC/3133/1
+  SerialNumber from FileName           = LO3/HRC/3133/1
+  SerialNumber index from SerialNumber = 2
+  Observation number from index        = LO3/HRC/3133
+  Spacecraft Instrument ID from index  = LUNARORBITER3/HIGHRESOLUTIONCAMERA
+  Spacecraft ID from SerialNumber      = LUNARORBITER3/HIGHRESOLUTIONCAMERA
+4
+  FileName from index                  = ab102402.lev2.cub
+  FileName from SerialNumber           = ab102402.lev2.cub
+  FileName index from FileName         = 3
+  SerialNumber from index              = ab102402.lev2.cub
+  SerialNumber from FileName           = ab102402.lev2.cub
+  SerialNumber index from SerialNumber = 3
+  Observation number from index        = ab102402.lev2.cub
+  Spacecraft Instrument ID from index  = /
+  Spacecraft ID from SerialNumber      = /
+5
+  FileName from index                  = m0402852.cub
+  FileName from SerialNumber           = m0402852.cub
+  FileName index from FileName         = 1
+  SerialNumber from index              = m0402852.cub
+  SerialNumber from FileName           = MGS/619971158:28/MOC-NA/BROAD_BAND
+  SerialNumber index from SerialNumber = 4
+  Observation number from index        = Unknown
+  Spacecraft Instrument ID from index  = MARSGLOBALSURVEYOR/MOC-NA
+  Spacecraft ID from SerialNumber      = MARSGLOBALSURVEYOR/MOC-NA
+
+
+Deleting first SerialNumber in the list...
+new list size = 4
+new list serial numbers: 
+  MGS/619971158:28/MOC-NA/BROAD_BAND
+  LO3/HRC/3133/1
+  ab102402.lev2.cub
+  m0402852.cub
+
+
+Possible SerialNumbers for Observation Number: MGS/619971158:28/MOC-NA
+  MGS/619971158:28/MOC-NA/BROAD_BAND
+Possible SerialNumbers for Observation Number: LO3/HRC/3133
+  LO3/HRC/3133/1
+Possible SerialNumbers for Observation Number: ab102402.lev2.cub
+  ab102402.lev2.cub
+Possible SerialNumbers for Observation Number: Unknown
+  m0402852.cub
+
+
+**USER ERROR** FileName [.../blobTruth.cub] can not be added to serial number list.
 **USER ERROR** Target name of [SKY] from file [.../blobTruth.cub] does not match [MARS].
+
+
+**USER ERROR** FileName [.../isisTruth.cub] can not be added to serial number list.
+**USER ERROR** Unable to find Instrument or Mapping group in $base/testData/isisTruth.cub for comparing target.
+
+
+**USER ERROR** FileName [.../isisTruth.cub] can not be added to serial number list.
+**USER ERROR** Unable to find Instrument group in $base/testData/isisTruth.cub for comparing target.
+
+
+**USER ERROR** [SerialNumber, FileName] = [.../blobTruth.cub] can not be added to serial number list.
+**USER ERROR** Target name of [SKY] from file [.../blobTruth.cub] does not match [MARS].
+
+
+**USER ERROR** [SerialNumber, FileName] = [.../isisTruth.cub] can not be added to serial number list.
+**USER ERROR** Unable to find Instrument or Mapping group in $base/testData/isisTruth.cub for comparing target.
+
+
+**PROGRAMMER ERROR** Unable to get the FileName. The given serial number [Nonsense] does not exist in the list.
+
+
+**PROGRAMMER ERROR** Unable to get the SerialNumber. The given file name [Nonsense] does not exist in the list.
+
+
+**PROGRAMMER ERROR** Unable to get the SerialNumber. The given index [17] is invalid.
+
+
+**PROGRAMMER ERROR** Unable to get the ObservationNumber. The given index [17] is invalid.
+
+
+**PROGRAMMER ERROR** Unable to get the SerialNumber index. The given serial number [Nonsense] does not exist in the list.
+
+
+**PROGRAMMER ERROR** Unable to get the FileName index. The given file name [Nonsense] does not exist in the list.
+
+
+**PROGRAMMER ERROR** Unable to get the FileName. The given index [17] is invalid.
+
+
+**PROGRAMMER ERROR** Unable to get the Spacecraft InstrumentId. The given index [17] is invalid.
+
+
+**PROGRAMMER ERROR** Unable to get the Spacecraft InstrumentId. The given serial number [Nonsense] does not exist in the list.
+
+
+**PROGRAMMER ERROR** Unable to get the possible serial numbers. The given observation number [Nonsense] does not exist in the list.
