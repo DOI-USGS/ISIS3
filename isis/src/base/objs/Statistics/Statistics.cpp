@@ -862,6 +862,12 @@ namespace Isis {
     return statistics.read(stream);
   }
 
+#if 0
+//??? not working for prog14/15???
+dyld: Symbol not found: __ZN2H58PredType12NATIVE_INT64E
+  Referenced from: /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
+  Expected in: flat namespace
+ in /usgs/pkgs/isis3beta2015-12-24/isis/bin/../lib/libisis3.4.12.dylib
 
   /** 
    *  H5 compound data type uses the offesets from the QDataStream returned by
@@ -939,4 +945,6 @@ namespace Isis {
 
     return compoundDataType;
   }
+#endif
+
 } // end namespace isis
