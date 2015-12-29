@@ -47,7 +47,7 @@ void IsisMain() {
       msg += fsc + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    QString sn(snl.SerialNumber(f));
+    QString sn(snl.serialNumber(f));
     fscMap.insert(std::pair<int, QString>(f, fsc));
     snMap.insert(std::pair<QString, int>(sn, f));
   }

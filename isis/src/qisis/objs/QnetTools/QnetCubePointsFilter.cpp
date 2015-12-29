@@ -95,7 +95,7 @@ namespace Isis {
         // Check to see if it has a measure on the current image
         for (int cm = 0; cm < cp.GetNumMeasures(); cm++) {
           // Increment the count if it does
-          if ((cp[cm]->GetCubeSerialNumber()) == ((*serialNumberList()).SerialNumber(filteredImages()[i]))) {
+          if ((cp[cm]->GetCubeSerialNumber()) == ((*serialNumberList()).serialNumber(filteredImages()[i]))) {
             count++;
             break;
           }

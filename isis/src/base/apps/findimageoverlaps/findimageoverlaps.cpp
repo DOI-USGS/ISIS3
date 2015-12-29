@@ -32,7 +32,7 @@ void IsisMain() {
 
   // Add the serial numbers in sorted order now
   for(unsigned int i = 0; i < sortedList.size(); i++) {
-    serialNumbers.Add(sortedList[i].second);
+    serialNumbers.add(sortedList[i].second);
   }
 
   // Now we want the ImageOverlapSet to calculate our overlaps

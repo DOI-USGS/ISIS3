@@ -91,31 +91,35 @@ namespace Isis {
                        Progress *progress = NULL);
       virtual ~SerialNumberList();
 
-      void Add(const QString &filename, bool def2filename = false);
-      void Add(const QString &serialNumber, const QString &filename);
-      void Add(const char *serialNumber, const char *filename);
-      bool HasSerialNumber(QString sn);
+      void add(const QString &filename, bool def2filename = false);
+      void add(const QString &serialNumber, const QString &filename);
+      void add(const char *serialNumber, const char *filename);
+      bool hasSerialNumber(QString sn);
       
       //!< Delete a serial number off of the list
       void Delete(const QString &sn);
 
-      int Size() const;
-      QString FileName(const QString &sn);
-      QString FileName(int index);
-      QString SerialNumber(const QString &filename);
-      QString SerialNumber(int index);
-      QString ObservationNumber(int index);
+      int size() const;
+      QString fileName(const QString &sn);
+      QString fileName(int index);
+      QString serialNumber(const QString &filename);
+      QString serialNumber(int index);
+      QString observationNumber(int index);
+      QString spacecraftInstrumentId(int index);
+      QString spacecraftInstrumentId(const QString &sn);
 
-      int SerialNumberIndex(const QString &sn);
-      int FileNameIndex(const QString &filename);
+      int serialNumberIndex(const QString &sn);
+      int fileNameIndex(const QString &filename);
 
-      std::vector<QString> PossibleSerialNumbers(const QString &on);
+      std::vector<QString> possibleSerialNumbers(const QString &on);
 
     protected:
       struct Pair {
         QString filename;
         QString serialNumber;
         QString observationNumber;
+        QString spacecraftName;
+        QString instrumentId;
       };
 
       std::vector<Pair> p_pairs;

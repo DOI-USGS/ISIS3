@@ -71,7 +71,7 @@ namespace Isis {
     // Loop through each image in the filtered list
     // Loop in reverse order since removal list of elements affects index number
     for (int i = filteredImages().size() - 1; i >= 0; i--) {
-      QString tempFileName = serialNumberList()->FileName(filteredImages()[i]);
+      QString tempFileName = serialNumberList()->fileName(filteredImages()[i]);
       // this name contains the string, keep it in the filtered list
       if (rx.indexIn(QString(tempFileName)) != -1) {
         continue;

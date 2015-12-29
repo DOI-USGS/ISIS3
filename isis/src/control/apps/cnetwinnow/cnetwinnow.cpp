@@ -51,7 +51,7 @@ void IsisMain() {
   bool serFlag=true; 
   for (int i=0;i<cubeSerials.size();i++) {
     QString msg = "No file paths for the following serial numbers:\n";
-    if (!serialNumList.HasSerialNumber(cubeSerials[i])) {
+    if (!serialNumList.hasSerialNumber(cubeSerials[i])) {
       msg += cubeSerials[i] + "\n";
       serFlag = false;
     }
@@ -359,7 +359,7 @@ void IsisMain() {
     for( int j=0;j<measGroup.size();j++) {
       sprintf(line,"%s,%s,%s,%lf,%4.2lf,%4.2lf,%d,%d,%s,%s,%s\n",
                     measGroup[j]->Parent()->GetId().toStdString().data(),
-                    serialNumList.FileName(measGroup[j]->GetCubeSerialNumber()
+                    serialNumList.fileName(measGroup[j]->GetCubeSerialNumber()
                       ).toAscii().data(),
                     measGroup[j]->GetCubeSerialNumber().toAscii().data(),
                     measGroup[j]->GetResidualMagnitude(),

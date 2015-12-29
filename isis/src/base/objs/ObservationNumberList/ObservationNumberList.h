@@ -43,8 +43,8 @@ namespace Isis {
    *   @history 2007-09-17 Debbie A. Cook - Original version
    *   @history 2008-01-11 Christopher Austin - Made class more
    *            general, inheriting SerialNumberList among others
-   *   @history 2008-05-01 Debbie A. Cook - Removed upper bound check
-   *            in ObservationNumberMapIndex because when entries are
+   *   @history 2008-05-01 Debbie A. Cook - Removed upper bound check in
+   *            ObservationNumberMapIndex because when entries are
    *            removed from the observation list, the serialNumberIndex
    *            may exceed the size of the map
    *   @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
@@ -57,19 +57,19 @@ namespace Isis {
       ObservationNumberList(Isis::SerialNumberList *snlist);
       ~ObservationNumberList();
 
-      void Add(int isn, const int observationIndex, QString observationNumber) ;
-      int ObservationSize() const;
+      void add(int isn, const int observationIndex, QString observationNumber) ;
+      int observationSize() const;
 
-      int ObservationNumberMapIndex(const int serialNumberIndex);
+      int observationNumberMapIndex(const int serialNumberIndex);
 
       void Remove(Isis::SerialNumberList *snlist);
       void Remove(const QString &listfile);
 
-      bool HasObservationNumber(const QString &on);
+      bool hasObservationNumber(const QString &on);
 
-      QString ObservationNumber(const QString &filename);
-      QString ObservationNumber(int index);
-      std::vector<QString> PossibleFileNames(const QString &on);
+      QString observationNumber(const QString &filename);
+      QString observationNumber(int index);
+      std::vector<QString> possibleFileNames(const QString &on);
 
     private:
       struct ObservationSet {

@@ -66,15 +66,15 @@ namespace Isis {
 
     //  Add all entries in the SerialNumberList
     SerialNumberList *snList = m_qnetTool->serialNumberList();
-    for (int i = 0; i < snList->Size(); i++) {
-      QString curSerialNum = snList->SerialNumber(i);
+    for (int i = 0; i < snList->size(); i++) {
+      QString curSerialNum = snList->serialNumber(i);
 
       //  Don't add if already in this point
       if (point.HasSerialNumber(curSerialNum))
         continue;
 
       // build new item...
-      QString label(snList->FileName(i));
+      QString label(snList->fileName(i));
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then

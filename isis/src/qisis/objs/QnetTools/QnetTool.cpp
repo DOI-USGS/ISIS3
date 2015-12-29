@@ -871,7 +871,7 @@ namespace Isis {
       if (response == QMessageBox::Yes) {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
-        QString file = m_serialNumberList->FileName(m_leftMeasure->GetCubeSerialNumber());
+        QString file = m_serialNumberList->fileName(m_leftMeasure->GetCubeSerialNumber());
         QString fname = FileName(file).name();
         int iref = m_leftCombo->findText(fname);
 
@@ -881,7 +881,7 @@ namespace Isis {
         iref = m_rightCombo->findText(fname);
         m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
-        file = m_serialNumberList->FileName(refMeasure->GetCubeSerialNumber());
+        file = m_serialNumberList->fileName(refMeasure->GetCubeSerialNumber());
         fname = FileName(file).name();
         iref = m_leftCombo->findText(fname);
         m_leftCombo->setItemData(iref,font,Qt::FontRole);
@@ -1186,7 +1186,7 @@ namespace Isis {
       ControlMeasure *groundMeasure = createTemporaryGroundMeasure();
       
       // Add to measure combo boxes
-      QString file = m_serialNumberList->FileName(groundMeasure->GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(groundMeasure->GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
       
@@ -1519,7 +1519,7 @@ namespace Isis {
     QString file = cvp->cube()->fileName();
     QString sn;
     try {
-      sn = m_serialNumberList->SerialNumber(file);
+      sn = m_serialNumberList->serialNumber(file);
     }
     catch (IException &e) {
       QString message = "Cannot get serial number for " + file + ".  Is file contained in the ";
@@ -1550,7 +1550,7 @@ namespace Isis {
       }
 
       //  Find closest control point in network
-      QString sn = m_serialNumberList->SerialNumber(file);
+      QString sn = m_serialNumberList->serialNumber(file);
       
       // since we are in a connected slot, we need to handle exceptions thrown by FindClosest
       try {
@@ -1673,8 +1673,8 @@ namespace Isis {
     QStringList pointFiles;
 
     Camera *cam;
-    for(int i = 0; i < m_serialNumberList->Size(); i++) {
-      if (m_serialNumberList->SerialNumber(i) == m_groundSN) continue;
+    for(int i = 0; i < m_serialNumberList->size(); i++) {
+      if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
       cam = m_controlNet->Camera(i);
       if(cam->SetUniversalGround(lat, lon)) {
         //  Make sure point is within image boundary
@@ -1682,7 +1682,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<m_serialNumberList->FileName(i);
+          pointFiles<<m_serialNumberList->fileName(i);
         }
       }
     }
@@ -1715,10 +1715,10 @@ namespace Isis {
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
         QString sn =
-                  m_serialNumberList->SerialNumber(selectedFile);
+                  m_serialNumberList->serialNumber(selectedFile);
         m->SetCubeSerialNumber(sn);
         int camIndex =
-              m_serialNumberList->FileNameIndex(selectedFile);
+              m_serialNumberList->fileNameIndex(selectedFile);
         cam = m_controlNet->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -1786,8 +1786,8 @@ namespace Isis {
     QStringList pointFiles;
 
     Camera *cam;
-    for (int i=0; i<m_serialNumberList->Size(); i++) {
-      if (m_serialNumberList->SerialNumber(i) == m_groundSN) continue;
+    for (int i=0; i<m_serialNumberList->size(); i++) {
+      if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
       cam = m_controlNet->Camera(i);
       if (cam->SetUniversalGround(lat,lon)) {
         //  Make sure point is within image boundary
@@ -1795,7 +1795,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<m_serialNumberList->FileName(i);
+          pointFiles<<m_serialNumberList->fileName(i);
         }
       }
     }
@@ -1840,14 +1840,14 @@ namespace Isis {
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
         QString sn =
-            m_serialNumberList->SerialNumber(selectedFile);
+            m_serialNumberList->serialNumber(selectedFile);
 
         //  If ground, do not add measure, it will be added in loadPoint
         if (sn == m_groundSN) continue;
 
         m->SetCubeSerialNumber(sn);
         int camIndex =
-                 m_serialNumberList->FileNameIndex(selectedFile);
+                 m_serialNumberList->fileNameIndex(selectedFile);
         cam = m_controlNet->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -1975,7 +1975,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      QString file = m_serialNumberList->FileName(m.GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
       deletePointDialog->fileList->addItem(file);
     }
 
@@ -2166,7 +2166,7 @@ namespace Isis {
       }
       else {
         ControlMeasure m = *(m_editPoint->GetRefMeasure());
-        int camIndex = m_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
+        int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
         Camera *cam;
         cam = m_controlNet->Camera(camIndex);
         cam->SetImage(m.GetSample(),m.GetLine());
@@ -2286,7 +2286,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      QString file = m_serialNumberList->FileName(m.GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
       m_leftCombo->addItem(tempFileName);
@@ -2388,7 +2388,7 @@ namespace Isis {
       int column = 0;
       ControlMeasure &m = *(*m_editPoint)[row];
 
-      QString file = m_serialNumberList->FileName(m.GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
       m_measureTable->setItem(row,column++,tableItem);
 
@@ -2755,7 +2755,7 @@ namespace Isis {
   void QnetTool::selectLeftMeasure(int index) {
     QString file = m_pointFiles[index];
 
-    QString serial = m_serialNumberList->SerialNumber(file);
+    QString serial = m_serialNumberList->serialNumber(file);
 
     // Make sure to clear out leftMeasure before making a copy of the selected
     // measure.
@@ -2790,7 +2790,7 @@ namespace Isis {
   void QnetTool::selectRightMeasure(int index) {
     QString file = m_pointFiles[index];
 
-    QString serial = m_serialNumberList->SerialNumber(file);
+    QString serial = m_serialNumberList->serialNumber(file);
 
     // Make sure to clear out rightMeasure before making a copy of the selected
     // measure.
@@ -3014,7 +3014,7 @@ namespace Isis {
     double lon = m_editPoint->GetBestSurfacePoint().GetLongitude().degrees();
     if (lat == Null || lon == Null) {
       ControlMeasure m = *(m_editPoint->GetRefMeasure());
-      int camIndex = m_serialNumberList->SerialNumberIndex(m.GetCubeSerialNumber());
+      int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
       cam = m_controlNet->Camera(camIndex);
       //cam = m.Camera();
       cam->SetImage(m.GetSample(),m.GetLine());
@@ -3022,16 +3022,16 @@ namespace Isis {
       lon = cam->UniversalLongitude();
     }
 
-    for (int i=0; i<m_serialNumberList->Size(); i++) {
+    for (int i=0; i<m_serialNumberList->size(); i++) {
       cam = m_controlNet->Camera(i);
-      if (m_serialNumberList->SerialNumber(i) == m_groundSN) continue;
+      if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
       if (cam->SetUniversalGround(lat,lon)) {
         //  Make sure point is within image boundary
         double samp = cam->Sample();
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<m_serialNumberList->FileName(i);
+          pointFiles<<m_serialNumberList->fileName(i);
         }
       }
     }
@@ -3044,10 +3044,10 @@ namespace Isis {
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
-        QString sn = m_serialNumberList->SerialNumber(selectedFile);
+        QString sn = m_serialNumberList->serialNumber(selectedFile);
         m->SetCubeSerialNumber(sn);
         int camIndex =
-              m_serialNumberList->FileNameIndex(selectedFile);
+              m_serialNumberList->fileNameIndex(selectedFile);
         cam = m_controlNet->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -3171,7 +3171,7 @@ namespace Isis {
     }
     if (!m_controlNet->GetCubeSerials().contains(
                       serialNumber)) return;
-    if (!m_serialNumberList->HasSerialNumber(serialNumber)) return;
+    if (!m_serialNumberList->hasSerialNumber(serialNumber)) return;
     QList<ControlMeasure *> measures =
         m_controlNet->GetMeasuresInCube(serialNumber);
     // loop through all measures contained in this cube
@@ -3662,7 +3662,7 @@ namespace Isis {
 
     //  Make sure there are not serial number conflicts.  If there are serial number conflicts,
     //  simply return, retaining current ground source.
-    if (newGroundSN != m_groundSN && m_serialNumberList->HasSerialNumber(newGroundSN)) {
+    if (newGroundSN != m_groundSN && m_serialNumberList->hasSerialNumber(newGroundSN)) {
       //  TODO  If it already exists, are the files different?  Now what?
       //     For now, do not allow.
       QString message = "A cube in the cube list has the same serial number as this ground file.  ";
@@ -3703,7 +3703,7 @@ namespace Isis {
       m_groundCube.reset(newGroundCube.take());
       m_groundGmap.reset(newGroundGmap.take());
 
-      m_serialNumberList->Add(ground, true);
+      m_serialNumberList->add(ground, true);
     }
     catch (IException &e) {
       QApplication::restoreOverrideCursor();

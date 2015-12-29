@@ -32,25 +32,27 @@ namespace Isis {
    *   @history 2009-11-05 Jeannie Walldren - Modified number
    *                          of maximum steps for Progress flag
    */
-  SerialNumberList::SerialNumberList(const QString &listfile, bool checkTarget, Progress *progress) {
+  SerialNumberList::SerialNumberList(const QString &listfile, 
+                                     bool checkTarget, 
+                                     Progress *progress) {
     p_checkTarget = checkTarget;
     p_target.clear();
     try {
       FileList flist(listfile);
-      if(progress != NULL) {
+      if (progress != NULL) {
         progress->SetText("Creating Isis 3 serial numbers from list file.");
         progress->SetMaximumSteps((int) flist.size() + 1);
         progress->CheckStatus();
       }
-      for(int i = 0; i < flist.size(); i++) {
-        Add(flist[i].toString());
-        if(progress != NULL) {
+      for (int i = 0; i < flist.size(); i++) {
+        add(flist[i].toString());
+        if (progress != NULL) {
           progress->CheckStatus();
         }
       }
     }
-    catch(IException &e) {
-      QString msg = "Can't open or invalid file list [" + listfile + "]";
+    catch (IException &e) {
+      QString msg = "Can't open or invalid file list [" + listfile + "].";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
@@ -69,10 +71,9 @@ namespace Isis {
    *
    * @param sn - serial number
    */
-  void SerialNumberList::Delete(const QString &sn)
-  {
-    int index = SerialNumberIndex(sn);
-    QString sFileName = FileName(sn);
+  void SerialNumberList::Delete(const QString &sn) {
+    int index = serialNumberIndex(sn);
+    QString sFileName = fileName(sn);
 
     // Delete the reference to this serial number in the
     // vector and the maps
@@ -101,7 +102,7 @@ namespace Isis {
    *                        if p_checkTarget is True.  If def2filename is True,
    *                        check for Mapping group if Target does not exist.
    */
-  void SerialNumberList::Add(const QString &filename, bool def2filename) {
+  void SerialNumberList::add(const QString &filename, bool def2filename) {
 
     Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
@@ -119,15 +120,15 @@ namespace Isis {
             targetGroup = cubeObj.findGroup("Mapping");
           }
           else {
-            QString msg = "Unable to find Instrument or Mapping group in ";
-            msg += filename + " for comparing target";
+            QString msg = "Unable to find Instrument or Mapping group in "
+                          + filename + " for comparing target.";
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }
         else {
           // No Instrument group
-          QString msg = "Unable to find Instrument group in " + filename;
-          msg += " for comparing target";
+          QString msg = "Unable to find Instrument group in " + filename
+                        + " for comparing target.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -137,8 +138,8 @@ namespace Isis {
           p_target = target;
         }
         else if (p_target != target) {
-          QString msg = "Target name of [" + target + "] from file [";
-          msg += filename + "] does not match [" + p_target + "]";
+          QString msg = "Target name of [" + target + "] from file ["
+                        + filename + "] does not match [" + p_target + "].";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -146,37 +147,55 @@ namespace Isis {
       // Create the SN
       QString sn = SerialNumber::Compose(p, def2filename);
       QString on = ObservationNumber::Compose(p, def2filename);
-      if(sn == "Unknown") {
-        QString msg = "Invalid serial number [Unknown] from file [";
-        msg += filename + "]";
+      if (sn == "Unknown") {
+        QString msg = "Invalid serial number [Unknown] from file ["
+                      + filename + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      else if(HasSerialNumber(sn)) {
-        int index = SerialNumberIndex(sn);
-        QString msg = "Duplicate, serial number [" + sn + "] from files [";
-        msg += SerialNumberList::FileName(sn) + "] and [" + FileName(index) + "].";
+      else if (hasSerialNumber(sn)) {
+        int index = serialNumberIndex(sn);
+        QString msg = "Duplicate, serial number [" + sn + "] from files ["
+                      + SerialNumberList::fileName(sn) + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
+
       Pair nextpair;
       nextpair.filename = Isis::FileName(filename).expanded();
       nextpair.serialNumber = sn;
       nextpair.observationNumber = on;
+
+      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      if (cubeObj.hasGroup("Instrument")) {
+        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
+          nextpair.instrumentId = cubeObj.findGroup("Instrument")["InstrumentId"][0];
+        }
+      }
+
       p_pairs.push_back(nextpair);
       p_serialMap.insert(std::pair<QString, int>(sn, (int)(p_pairs.size() - 1)));
       p_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
     }
-    catch(IException &e) {
-      QString msg = "File [" + Isis::FileName(filename).expanded() +
-                        "] can not be added to ";
-      msg += "serial number list";
+    catch (IException &e) {
+      QString msg = "FileName [" + Isis::FileName(filename).expanded() +
+                        "] can not be added to serial number list.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
 
 
-  void SerialNumberList::Add(const char *serialNumber, const char *filename) {
+  /**
+   * 
+   * @param serialNumber 
+   * @param filename 
+   * 
+   * @see add(QString, QString)
+   */
+  void SerialNumberList::add(const char *serialNumber, const char *filename) {
 
-    Add((QString)serialNumber, (QString)filename);
+    add((QString)serialNumber, (QString)filename);
   }
 
 
@@ -190,7 +209,7 @@ namespace Isis {
    *  
    * @internal
    */
-  void SerialNumberList::Add(const QString &serialNumber, const QString &filename) {
+  void SerialNumberList::add(const QString &serialNumber, const QString &filename) {
 
     Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
@@ -204,14 +223,12 @@ namespace Isis {
         }
         else if (cubeObj.hasGroup("Mapping")) {
           // No instrument, try Mapping
-          if (cubeObj.hasGroup("Mapping")) {
-            targetGroup = cubeObj.findGroup("Mapping");
-          }
+          targetGroup = cubeObj.findGroup("Mapping");
+        }
         else {
-            QString msg = "Unable to find Instrument or Mapping group in ";
-            msg += filename + " for comparing target";
+            QString msg = "Unable to find Instrument or Mapping group in "
+                          + filename + " for comparing target.";
             throw IException(IException::User, msg, _FILEINFO_);
-          }
         }
 
         target = targetGroup["TargetName"][0];
@@ -220,36 +237,63 @@ namespace Isis {
           p_target = target;
         }
         else if (p_target != target) {
-          QString msg = "Target name of [" + target + "] from file [";
-          msg += filename + "] does not match [" + p_target + "]";
+          QString msg = "Target name of [" + target + "] from file ["
+                        + filename + "] does not match [" + p_target + "].";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
 
       QString observationNumber = "Unknown";
       if (serialNumber == "Unknown") {
-        QString msg = "Invalid serial number [Unknown] from file [";
-        msg += filename + "]";
+        QString msg = "Invalid serial number [Unknown] from file ["
+                      + filename + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      else if (HasSerialNumber(serialNumber)) {
-        int index = SerialNumberIndex(serialNumber);
-        QString msg = "Duplicate, serial number [" + serialNumber + "] from files [";
-        msg += SerialNumberList::FileName(serialNumber) + "] and [" + FileName(index) + "].";
+      else if (hasSerialNumber(serialNumber)) {
+        int index = serialNumberIndex(serialNumber);
+        QString msg = "Duplicate, serial number [" + serialNumber + "] from files ["
+                      + SerialNumberList::fileName(serialNumber) 
+                      + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
+
+      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      if (!cubeObj.hasGroup("Instrument")) {
+        QString msg = "Unable to find Instrument group in " + filename
+                      + " needed for performing bundle adjustment.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      PvlGroup instGroup = cubeObj.findGroup("Instrument");
+      if (!instGroup.hasKeyword("SpacecraftName") || !instGroup.hasKeyword("InstrumentId")) {
+        QString msg = "Unable to find SpacecraftName or InstrumentId keywords in " + filename
+                      + " needed for performing bundle adjustment.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
       Pair nextpair;
       nextpair.filename = Isis::FileName(filename).expanded();
       nextpair.serialNumber = serialNumber;
       nextpair.observationNumber = observationNumber;
+
+      // Need to obtain the SpacecraftName and InstrumentId from the Instrument
+      // group for use in bundle adjustment
+      if (cubeObj.hasGroup("Instrument")) {
+        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
+          nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
+          nextpair.instrumentId = cubeObj.findGroup("Instrument")["InstrumentId"][0];
+        }
+      }
+
       p_pairs.push_back(nextpair);
       p_serialMap.insert(std::pair<QString, int>(serialNumber, (int)(p_pairs.size() - 1)));
       p_fileMap.insert(std::pair<QString, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
     }
-    catch(IException &e) {
-      QString msg = "File [" + Isis::FileName(filename).expanded() +
-                        "] can not be added to ";
-      msg += "serial number list";
+    catch (IException &e) {
+      QString msg = "[SerialNumber, FileName] = [" + serialNumber + ", " 
+                    + Isis::FileName(filename).expanded() 
+                    + "] can not be added to serial number list.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
@@ -263,8 +307,8 @@ namespace Isis {
    *
    * @return bool
    */
-  bool SerialNumberList::HasSerialNumber(QString sn) {
-    if(p_serialMap.find(sn) == p_serialMap.end()) return false;
+  bool SerialNumberList::hasSerialNumber(QString sn) {
+    if (p_serialMap.find(sn) == p_serialMap.end()) return false;
     return true;
   }
 
@@ -274,7 +318,7 @@ namespace Isis {
    *
    * @return int Returns number of serial numbers current in the list
    */
-  int SerialNumberList::Size() const {
+  int SerialNumberList::size() const {
     return p_pairs.size();
   }
 
@@ -287,14 +331,14 @@ namespace Isis {
    * @return QString The filename matching the input serial
    *         number
    */
-  QString SerialNumberList::FileName(const QString &sn) {
-    if(HasSerialNumber(sn)) {
+  QString SerialNumberList::fileName(const QString &sn) {
+    if (hasSerialNumber(sn)) {
       int index = p_serialMap.find(sn)->second;
       return p_pairs[index].filename;
     }
     else {
-      QString msg = "Requested serial number [" + sn + "] ";
-      msg += "does not exist in the list";
+      QString msg = "Unable to get the FileName. The given serial number ["
+                    + sn + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -311,14 +355,13 @@ namespace Isis {
    * @history 2007-06-04 Tracie Sucharski - Expand filename to include full
    *                        path before searching list.
    */
-  QString SerialNumberList::SerialNumber(const QString &filename) {
-    if(p_fileMap.find(Isis::FileName(filename).expanded()) == p_fileMap.end()) {
-      QString msg = "Requested filename [" +
-                        Isis::FileName(filename).expanded() + "]";
-      msg += "does not exist in the list";
+  QString SerialNumberList::serialNumber(const QString &filename) {
+    if (p_fileMap.find(Isis::FileName(filename).expanded()) == p_fileMap.end()) {
+      QString msg = "Unable to get the SerialNumber. The given file name ["
+                    + Isis::FileName(filename).expanded() + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    int index = FileNameIndex(filename);
+    int index = fileNameIndex(filename);
     return p_pairs[index].serialNumber;
   }
 
@@ -329,13 +372,13 @@ namespace Isis {
    *
    * @return QString The serial number returned
    */
-  QString SerialNumberList::SerialNumber(int index) {
-    if(index >= 0 && index < (int) p_pairs.size()) {
+  QString SerialNumberList::serialNumber(int index) {
+    if (index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].serialNumber;
     }
     else {
-      QString num = QString(index);
-      QString msg = "Index [" + (QString) num + "] is invalid";
+      QString msg = "Unable to get the SerialNumber. The given index [" 
+                    + toString(index) + "] is invalid.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -347,13 +390,13 @@ namespace Isis {
    *
    * @return QString The observation number returned
    */
-  QString SerialNumberList::ObservationNumber(int index) {
-    if(index >= 0 && index < (int) p_pairs.size()) {
+  QString SerialNumberList::observationNumber(int index) {
+    if (index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].observationNumber;
     }
     else {
-      QString num = QString(index);
-      QString msg = "Index [" + (QString) num + "] is invalid";
+      QString msg = "Unable to get the ObservationNumber. The given index [" 
+                    + toString(index) + "] is invalid.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -365,13 +408,13 @@ namespace Isis {
    *
    * @return int The index of the serial number
    */
-  int SerialNumberList::SerialNumberIndex(const QString &sn) {
-    if(HasSerialNumber(sn)) {
+  int SerialNumberList::serialNumberIndex(const QString &sn) {
+    if (hasSerialNumber(sn)) {
       return p_serialMap.find(sn)->second;
     }
     else {
-      QString msg = "Requested serial number [" + sn + "] ";
-      msg += "does not exist in the list";
+      QString msg = "Unable to get the SerialNumber index. The given serial number [" 
+                    + sn + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -388,13 +431,12 @@ namespace Isis {
    *  @internal @history 2007-07-11 Stuart Sides - Fixed bug where
    *                        the correct index was not returned.
    */
-  int SerialNumberList::FileNameIndex(const QString &filename) {
+  int SerialNumberList::fileNameIndex(const QString &filename) {
 
     std::map<QString, int>::iterator  pos;
-    if((pos = p_fileMap.find(Isis::FileName(filename).expanded())) == p_fileMap.end()) {
-      QString msg = "Requested filename [" +
-                        Isis::FileName(filename).expanded() + "]";
-      msg += "does not exist in the list";
+    if ((pos = p_fileMap.find(Isis::FileName(filename).expanded())) == p_fileMap.end()) {
+      QString msg = "Unable to get the FileName index. The given file name ["
+                    + Isis::FileName(filename).expanded() + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return pos->second;
@@ -407,13 +449,55 @@ namespace Isis {
    *
    * @return QString The filename at the given index
    */
-  QString SerialNumberList::FileName(int index) {
-    if(index >= 0 && index < (int) p_pairs.size()) {
+  QString SerialNumberList::fileName(int index) {
+    if (index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].filename;
     }
     else {
-      QString num = toString(index);
-      QString msg = "Index [" + num + "] is invalid";
+      QString msg = "Unable to get the FileName. The given index [" 
+                    + toString(index) + "] is invalid.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  /**
+   * Return the spacecraftname/instrumentid at the given index
+   *
+   * @param index The index of the desired spacecraftname/instrumentid
+   *
+   * @return QString The spacecraftname/instrumentid at the given index
+   */
+  QString SerialNumberList::spacecraftInstrumentId(int index) {
+    if (index >= 0 && index < (int) p_pairs.size()) {
+      QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
+      scid.simplified();
+      return scid.replace(" ","");
+    }
+    else {
+      QString msg = "Unable to get the Spacecraft InstrumentId. The given index [" 
+                    + toString(index) + "] is invalid.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+
+  /**
+   * Return the spacecraftname/instrumentid given a serial number
+   *
+   * @param sn  The serial number of the desired spacecraftname/instrumentid 
+   *
+   * @return QString The spacecraftname/instrumentid matching the input serial
+   *         number
+   */
+  QString SerialNumberList::spacecraftInstrumentId(const QString &sn) {
+    if (hasSerialNumber(sn)) {
+      int index = p_serialMap.find(sn)->second;
+      QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
+      scid.simplified();
+      return scid.replace(" ","");
+    }
+    else {
+      QString msg = "Unable to get the Spacecraft InstrumentId. The given serial number [" 
+                    + sn + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -428,19 +512,19 @@ namespace Isis {
    * @return vector<QString> The list of possible serial
    *         numbers matching the input observation number
    */
-  std::vector<QString> SerialNumberList::PossibleSerialNumbers(const QString &on) {
+  std::vector<QString> SerialNumberList::possibleSerialNumbers(const QString &on) {
     std::vector<QString> numbers;
-    for(unsigned index = 0; index < p_pairs.size(); index++) {
-      if(p_pairs[index].observationNumber == on) {
+    for (unsigned index = 0; index < p_pairs.size(); index++) {
+      if (p_pairs[index].observationNumber == on) {
         numbers.push_back(p_pairs[index].serialNumber);
       }
     }
-    if(numbers.size() > 0) {
+    if (numbers.size() > 0) {
       return numbers;
     }
     else {
-      QString msg = "Requested observation number [" + on + "] ";
-      msg += "does not exist in the list";
+      QString msg = "Unable to get the possible serial numbers. The given observation number [" 
+                    + on + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

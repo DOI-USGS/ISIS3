@@ -145,9 +145,9 @@ namespace Isis {
    */
   std::vector<QString> ObservationNumber::PossibleSerial(const QString &on, SerialNumberList &list) {
     std::vector<QString> sn;
-    for(int i = 0; i < list.Size(); i++) {
-      if(list.SerialNumber(i).startsWith(on)) {
-        sn.push_back(list.SerialNumber(i));
+    for(int i = 0; i < list.size(); i++) {
+      if(list.serialNumber(i).startsWith(on)) {
+        sn.push_back(list.serialNumber(i));
       }
     }
     return sn;

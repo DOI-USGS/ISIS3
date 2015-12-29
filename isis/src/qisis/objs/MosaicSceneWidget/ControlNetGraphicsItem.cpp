@@ -182,9 +182,9 @@ namespace Isis {
   QString ControlNetGraphicsItem::snToFileName(QString sn) {
     QString result;
 
-    if(m_serialNumbers && m_serialNumbers->Size()) {
+    if(m_serialNumbers && m_serialNumbers->size()) {
       try {
-        result = m_serialNumbers->FileName(sn);
+        result = m_serialNumbers->fileName(sn);
       }
       catch(IException &) {
       }
@@ -241,7 +241,7 @@ namespace Isis {
       QString filename;
       foreach(filename, cubeFiles) {
         try {
-          m_serialNumbers->Add(filename);
+          m_serialNumbers->add(filename);
         }
         catch(IException &) {
         }

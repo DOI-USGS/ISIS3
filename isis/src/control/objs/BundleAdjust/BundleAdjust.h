@@ -187,7 +187,7 @@ namespace Isis {
       Isis::ControlNet *ControlNet() { return m_pCnet; }
 
       Isis::SerialNumberList *SerialNumberList() { return m_pSnList; }
-      int Images() const { return m_pSnList->Size(); }
+      int Images() const { return m_pSnList->size(); }
       int Observations() const;
       QString FileName(int index);
       bool IsHeld(int index);

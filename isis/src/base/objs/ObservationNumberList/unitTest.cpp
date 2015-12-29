@@ -14,39 +14,39 @@ int main(int argc, char *argv[]) {
   try {
     SerialNumberList snl(false);
 
-    snl.Add("$mgs/testData/ab102401.cub");
-    snl.Add("$mgs/testData/m0402852.cub");
-    snl.Add("$lo/testData/3133_h1.cub");
-    snl.Add("$odyssey/testData/I00824006RDR.lev2.cub");
+    snl.add("$mgs/testData/ab102401.cub");
+    snl.add("$mgs/testData/m0402852.cub");
+    snl.add("$lo/testData/3133_h1.cub");
+    snl.add("$odyssey/testData/I00824006RDR.lev2.cub");
 
     ObservationNumberList onl(&snl);
 
-    cout << "size   = " << onl.Size() << endl;
-    cout << "hasXYZ = " << onl.HasObservationNumber("XYZ") << endl;
+    cout << "size   = " << onl.size() << endl;
+    cout << "hasXYZ = " << onl.hasObservationNumber("XYZ") << endl;
 
-    for(int i = 0; i < onl.Size(); i++) {
-      cout << FileName(onl.FileName(i)).name() << " = " << onl.ObservationNumber(i) << endl;
+    for(int i = 0; i < onl.size(); i++) {
+      cout << FileName(onl.fileName(i)).name() << " = " << onl.observationNumber(i) << endl;
     }
 
     cout << endl;
-    vector<QString> filenames = onl.PossibleFileNames(onl.ObservationNumber(2));
+    vector<QString> filenames = onl.possibleFileNames(onl.observationNumber(2));
     for(unsigned i = 0; i < filenames.size(); i++) {
-      cout << "Possible filename for [" << onl.ObservationNumber(2)
+      cout << "Possible filename for [" << onl.observationNumber(2)
            << "]: " << FileName(filenames[i]).name() << endl;
     }
-    vector<QString> serials = onl.PossibleSerialNumbers(onl.ObservationNumber(2));
+    vector<QString> serials = onl.possibleSerialNumbers(onl.observationNumber(2));
     for(unsigned i = 0; i < serials.size(); i++) {
-      cout << "Possible serial number for [" << onl.ObservationNumber(2)
+      cout << "Possible serial number for [" << onl.observationNumber(2)
            << "]: " << serials[i] << endl;
     }
 
-    cout << "File->ON:" << onl.ObservationNumber("$mgs/testData/ab102401.cub") << endl;
+    cout << "File->ON:" << onl.observationNumber("$mgs/testData/ab102401.cub") << endl;
 
-    cout << endl << "SN->File (0): " << FileName(snl.FileName(0)).name() << endl;
-    cout << "SN->File (1): " << FileName(snl.FileName(1)).name() << endl;
-    cout << "SN->File (2): " << FileName(snl.FileName(2)).name() << endl << endl;
+    cout << endl << "SN->File (0): " << FileName(snl.fileName(0)).name() << endl;
+    cout << "SN->File (1): " << FileName(snl.fileName(1)).name() << endl;
+    cout << "SN->File (2): " << FileName(snl.fileName(2)).name() << endl << endl;
 
-    if(onl.HasObservationNumber("NotAnObservation"))
+    if(onl.hasObservationNumber("NotAnObservation"))
       cout << "This line shouldn't be showing!" << endl;
     else
       cout << "[NotAnObservation] is not an existing ObservationNumber" << endl;
@@ -56,6 +56,6 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 
-  cout << endl << endl;;
+  cout << endl << endl;
 
 }

@@ -112,7 +112,7 @@ namespace Isis {
 
         cm1 = *cp1.GetRefMeasure();
 
-        int camIndex1 = serialNumberList()->SerialNumberIndex(cm1.GetCubeSerialNumber());
+        int camIndex1 = serialNumberList()->serialNumberIndex(cm1.GetCubeSerialNumber());
         cam1 = controlNet()->Camera(camIndex1);
         cam1->SetImage(cm1.GetSample(), cm1.GetLine());
         sp1 = cam1->GetSurfacePoint();
@@ -132,7 +132,7 @@ namespace Isis {
           Camera *cam2;
           ControlMeasure cm2;
           cm2 = *cp2.GetRefMeasure();
-          int camIndex2 = serialNumberList()->SerialNumberIndex(cm2.GetCubeSerialNumber());
+          int camIndex2 = serialNumberList()->serialNumberIndex(cm2.GetCubeSerialNumber());
           cam2 = controlNet()->Camera(camIndex2);
           cam2->SetImage(cm2.GetSample(), cm2.GetLine());
           sp2 = cam2->GetSurfacePoint();

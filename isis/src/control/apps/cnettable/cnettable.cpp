@@ -272,7 +272,7 @@ void IsisMain() {
       const ControlMeasure * cmeasure = (*cpoint)[j];
 
       // Set and then get CameraPointInfo information
-      camPoint.SetCube(serials.FileName(cmeasure->GetCubeSerialNumber()));
+      camPoint.SetCube(serials.fileName(cmeasure->GetCubeSerialNumber()));
 
       grp = camPoint.SetImage(cmeasure->GetSample(), cmeasure->GetLine(), outside, errors);
       // Shouldn't ever happen, but, being safe...

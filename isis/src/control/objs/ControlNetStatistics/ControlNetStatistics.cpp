@@ -91,10 +91,10 @@ namespace Isis {
    * @author Sharmila Prasad (12/20/2011)
    */
   void ControlNetStatistics::InitSerialNumMap() {
-    int numSn = mSerialNumList.Size();
+    int numSn = mSerialNumList.size();
     numCNetImages = 0;
     for (int i=0; i<numSn; i++) {
-      QString sn = mSerialNumList.SerialNumber(i);
+      QString sn = mSerialNumList.serialNumber(i);
       mSerialNumMap[sn] = false;
     }
   }
@@ -111,7 +111,7 @@ namespace Isis {
    */
   void ControlNetStatistics::GenerateControlNetStats(PvlGroup &pStatsGrp) {
     pStatsGrp = PvlGroup("ControlNetSummary");
-    int numSN = mSerialNumList.Size();
+    int numSN = mSerialNumList.size();
 
     if (numSN) {
       pStatsGrp += PvlKeyword("TotalImages",             toString(numSN));
@@ -193,7 +193,7 @@ namespace Isis {
     pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Null ? "NA" : toString(dValue)));
 
     // Convex Hull
-    if (mSerialNumList.Size()) {
+    if (mSerialNumList.size()) {
       dValue = mConvexHullRatioStats.Minimum();
       pStatsGrp += PvlKeyword("MinConvexHullRatio", (dValue == Null ? "Null" : toString(dValue)));
 
@@ -236,7 +236,7 @@ namespace Isis {
 
       // Open the cube to get the dimensions
       QString sn = node->getSerialNumber();
-      Cube *cube = cubeMgr.OpenCube(mSerialNumList.FileName(sn));
+      Cube *cube = cubeMgr.OpenCube(mSerialNumList.fileName(sn));
 
       mSerialNumMap[sn] = true;
       numCNetImages++;
@@ -319,7 +319,7 @@ namespace Isis {
    */
   void ControlNetStatistics::PrintImageStats(const QString &psImageFile) {
     // Check if the image list has been provided
-    if (!mSerialNumList.Size()) {
+    if (!mSerialNumList.size()) {
       QString msg = "Serial Number of Images has not been provided to get Image Stats";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -342,7 +342,7 @@ namespace Isis {
     ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free, ConvexHullRatio" <<  endl;
     //for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
     for (it = mSerialNumMap.begin(); it != mSerialNumMap.end(); it++) {
-        ostm << mSerialNumList.FileName((*it).first) << ", " << (*it).first << ", ";
+        ostm << mSerialNumList.fileName((*it).first) << ", " << (*it).first << ", ";
         bool serialNumExists = (*it).second ;
         if (serialNumExists) {
           vector<double>imgStats = mImageMap[(*it).first] ;

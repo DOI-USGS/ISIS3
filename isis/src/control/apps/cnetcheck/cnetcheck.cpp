@@ -48,7 +48,7 @@ QVector< set<QString> > findIslands(
   QMap< QString, set<QString> > adjCubes);
 
 QList< ControlCubeGraphNode * > checkSerialList(
-    SerialNumberList * serialNumbers, ControlNet * controlNet);
+    SerialNumberList *serialNumbers, ControlNet * controlNet);
 
 void writeOutput(SerialNumberList num2cube,
                  QString filename,
@@ -108,8 +108,8 @@ void IsisMain() {
   }
 
   for (int index = 0; index < inlist.size(); index++) {
-    num2cube.Add(inlist[index].toString());
-    QString st = num2cube.SerialNumber(inlist[index].toString());
+    num2cube.add(inlist[index].toString());
+    QString st = num2cube.serialNumber(inlist[index].toString());
     inListNums.insert(st);
     listedSerialNumbers.push_back(st);   // Used with nonListedSerialNumbers
     progress.CheckStatus();
@@ -222,7 +222,7 @@ void IsisMain() {
     for (set<QString>::iterator island = islands[i].begin();
          island != islands[i].end(); 
          island++) {
-      if (num2cube.HasSerialNumber(*island)) {
+      if (num2cube.hasSerialNumber(*island)) {
         outputRow(out_stream, buildRow(num2cube, *island));
         hasList = true;
       }
@@ -307,9 +307,9 @@ void IsisMain() {
       foreach (ControlCubeGraphNode * node, nodes) {
         QString sn = node->getSerialNumber();
 
-        if (num2cube.HasSerialNumber(sn)) {
+        if (num2cube.hasSerialNumber(sn)) {
           // Create a convex hull
-          Cube *cube = cbman.OpenCube(num2cube.FileName(sn));
+          Cube *cube = cbman.OpenCube(num2cube.fileName(sn));
           double controlFitness = getControlFitness(node, tolerance, cube);
 
           if (controlFitness < tolerance) {
@@ -605,8 +605,8 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     ControlCubeGraphNode *graphNode = graphNodes[sn];
     QString serialNumber = graphNode->getSerialNumber();
 
-    if (num2cube.HasSerialNumber(serialNumber)) {
-      Cube *cube = manager.OpenCube(num2cube.FileName(serialNumber));
+    if (num2cube.hasSerialNumber(serialNumber)) {
+      Cube *cube = manager.OpenCube(num2cube.fileName(serialNumber));
 
       // Try to create
       Camera *cam = NULL;
@@ -645,8 +645,8 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
 
 
 QString buildRow(SerialNumberList &serials, QString sn) {
-  QString cubeName = serials.HasSerialNumber(sn) ?
-      FileName(serials.FileName(sn)).expanded() : "UnknownFilename";
+  QString cubeName = serials.hasSerialNumber(sn) ?
+      FileName(serials.fileName(sn)).expanded() : "UnknownFilename";
   return cubeName + g_delimiter + sn;
 }
 

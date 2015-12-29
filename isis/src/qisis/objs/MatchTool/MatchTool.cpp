@@ -676,20 +676,20 @@ namespace Isis {
         //  use filenames as serial numbers for both cubes.  This needs to be checked because
         //  coreg networks will often have 2 cubes with the same serial number.make cl
         QString sn = SerialNumber::Compose(mvp->cube()->fileName(), true);
-        if (list.HasSerialNumber(sn)) {
+        if (list.hasSerialNumber(sn)) {
           // TODO  Before removing serial number, make sure current network does not have
           // measures with old serial number.  If it does, now what?  Print error?
           // 
           // Remove old serial number & change to filename
-          FileName fileName = Isis::FileName(list.FileName(sn));
+          FileName fileName = Isis::FileName(list.fileName(sn));
           list.Delete(sn);
-          list.Add(fileName.name(),fileName.expanded());
+          list.add(fileName.name(),fileName.expanded());
           // Add new serial number as filename
-          list.Add(Isis::FileName(mvp->cube()->fileName()).name(),
+          list.add(Isis::FileName(mvp->cube()->fileName()).name(),
                                   mvp->cube()->fileName());
         }
         else {
-          list.Add(mvp->cube()->fileName(), true);
+          list.add(mvp->cube()->fileName(), true);
         }
       }
       catch (...) {
@@ -705,7 +705,7 @@ namespace Isis {
     QString serialNumber;
     try {
       SerialNumberList list = serialNumberList();
-      serialNumber = list.SerialNumber(mvp->cube()->fileName());
+      serialNumber = list.serialNumber(mvp->cube()->fileName());
 //    serialNumber = serialNumberList().SerialNumber(mvp->cube()->fileName());
     }
     catch (IException &e) {
@@ -962,7 +962,7 @@ namespace Isis {
           if (response == QMessageBox::Yes) {
             //  Update measure file combo boxes:  old reference normal font,
             //    new reference bold font
-            QString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+            QString file = serialNumberList().fileName(m_leftMeasure->GetCubeSerialNumber());
             QString fname = FileName(file).name();
             int iref = m_leftCombo->findText(fname);
 
@@ -972,7 +972,7 @@ namespace Isis {
             iref = m_rightCombo->findText(fname);
             m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
-            file = serialNumberList().FileName(refMeasure->GetCubeSerialNumber());
+            file = serialNumberList().fileName(refMeasure->GetCubeSerialNumber());
             fname = FileName(file).name();
             iref = m_leftCombo->findText(fname);
             m_leftCombo->setItemData(iref,font,Qt::FontRole);
@@ -1025,7 +1025,7 @@ namespace Isis {
       if (response == QMessageBox::Yes) {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
-        QString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+        QString file = serialNumberList().fileName(m_leftMeasure->GetCubeSerialNumber());
         QString fname = FileName(file).name();
         int iref = m_leftCombo->findText(fname);
 
@@ -1035,7 +1035,7 @@ namespace Isis {
         iref = m_rightCombo->findText(fname);
         m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
-        file = serialNumberList().FileName(refMeasure->GetCubeSerialNumber());
+        file = serialNumberList().fileName(refMeasure->GetCubeSerialNumber());
         fname = FileName(file).name();
         iref = m_leftCombo->findText(fname);
         m_leftCombo->setItemData(iref,font,Qt::FontRole);
@@ -1443,7 +1443,7 @@ namespace Isis {
     if (mvp  == NULL) return;
 
     QString file = mvp->cube()->fileName();
-    QString sn = serialNumberList().SerialNumber(file);
+    QString sn = serialNumberList().serialNumber(file);
 
     double samp,line;
     mvp->viewportToCube(p.x(),p.y(),samp,line);
@@ -1458,7 +1458,7 @@ namespace Isis {
       }
 
       //  Find closest control point in network
-      QString sn = serialNumberList().SerialNumber(file);
+      QString sn = serialNumberList().serialNumber(file);
       ControlPoint *point = NULL;
       try {
         point = m_controlNet->FindClosest(sn, samp, line);
@@ -1519,7 +1519,7 @@ namespace Isis {
     QStringList missingCubes;
     for (int i=0; i<point->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*point)[i];
-      if (!serialNumberList().HasSerialNumber(m.GetCubeSerialNumber())) {
+      if (!serialNumberList().hasSerialNumber(m.GetCubeSerialNumber())) {
         missingCubes << m.GetCubeSerialNumber();
       }
     }
@@ -1725,8 +1725,8 @@ namespace Isis {
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
       QString file;
-      if (serialNumberList().HasSerialNumber(m.GetCubeSerialNumber())) {
-        file = serialNumberList().FileName(m.GetCubeSerialNumber());
+      if (serialNumberList().hasSerialNumber(m.GetCubeSerialNumber())) {
+        file = serialNumberList().fileName(m.GetCubeSerialNumber());
       }
       else {
         file = m.GetCubeSerialNumber();
@@ -1948,7 +1948,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      QString file = serialNumberList().FileName(m.GetCubeSerialNumber());
+      QString file = serialNumberList().fileName(m.GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
       m_leftCombo->addItem(tempFileName);
@@ -2037,7 +2037,7 @@ namespace Isis {
       int column = 0;
       ControlMeasure &m = *(*m_editPoint)[row];
 
-      QString file = serialNumberList().FileName(m.GetCubeSerialNumber());
+      QString file = serialNumberList().fileName(m.GetCubeSerialNumber());
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
       m_measureTable->setItem(row,column++,tableItem);
 
@@ -2270,7 +2270,7 @@ namespace Isis {
 
     QString serial;
     try {
-      serial = serialNumberList().SerialNumber(file);
+      serial = serialNumberList().serialNumber(file);
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
@@ -2279,7 +2279,7 @@ namespace Isis {
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      QString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+      QString file = serialNumberList().fileName(m_leftMeasure->GetCubeSerialNumber());
       int i = m_leftCombo->findText(FileName(file).name());
       if (i < 0) i = 0;
       m_leftCombo->setCurrentIndex(i);
@@ -2326,7 +2326,7 @@ namespace Isis {
 
     QString serial;
     try {
-      serial = serialNumberList().SerialNumber(file);
+      serial = serialNumberList().serialNumber(file);
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
@@ -2335,7 +2335,7 @@ namespace Isis {
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      QString file = serialNumberList().FileName(m_rightMeasure->GetCubeSerialNumber());
+      QString file = serialNumberList().fileName(m_rightMeasure->GetCubeSerialNumber());
       int i = m_rightCombo->findText(FileName(file).name());
       if (i < 0) i = 0;
       m_rightCombo->setCurrentIndex(i);

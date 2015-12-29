@@ -65,15 +65,15 @@ namespace Isis {
    */
   void ImageOverlapSet::FindImageOverlaps(SerialNumberList &sns) {
     // Create an ImageOverlap for each image boundary
-    for(int i = 0; i < sns.Size(); i++) {
+    for(int i = 0; i < sns.size(); i++) {
       // Open the cube
       Cube cube;
       try {
-        cube.open(sns.FileName(i));
+        cube.open(sns.fileName(i));
       }
       catch(IException &error) {
         QString msg = "Unable to open cube for serial number [";
-        msg += sns.SerialNumber(i) + "] filename [" + sns.FileName(i) + "]";
+        msg += sns.serialNumber(i) + "] filename [" + sns.fileName(i) + "]";
 
         HandleError(error, &sns, msg);
       }
@@ -97,7 +97,7 @@ namespace Isis {
       if(!tmp->isValid()) {
         delete tmp;
         tmp = NULL;
-        IString msg = "The image [" + sns.FileName(sns.SerialNumber(i)) +
+        IString msg = "The image [" + sns.fileName(sns.serialNumber(i)) +
                       "] has an invalid footprint";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -118,7 +118,7 @@ namespace Isis {
         }
       }
 
-      p_lonLatOverlaps.push_back(CreateNewOverlap(sns.SerialNumber(i), mp));
+      p_lonLatOverlaps.push_back(CreateNewOverlap(sns.serialNumber(i), mp));
 
       if(mp) {
         delete mp;
@@ -507,7 +507,7 @@ namespace Isis {
       p_calculatedSoFar = outside - 1;
 
       // unblock the writing process after every 10 polygons if we need to write
-      if(p_calculatedSoFar % 10 == 0 && (!snlist || p_lonLatOverlaps.size() > snlist->Size())) {
+      if(p_calculatedSoFar % 10 == 0 && (!snlist || p_lonLatOverlaps.size() > snlist->size())) {
         if(p_threadedCalculate) p_calculatePolygonMutex.unlock();
       }
 
@@ -733,7 +733,7 @@ namespace Isis {
 
     // Do not write empty overlap files
     if(snlist) {
-      if(p_lonLatOverlaps.size() == snlist->Size()) {
+      if(p_lonLatOverlaps.size() == snlist->size()) {
         p_lonLatOverlaps.clear();
       }
     }
@@ -826,7 +826,7 @@ namespace Isis {
         serialNumbers += (*p_lonLatOverlaps.at(overlap1))[i];
 
         if(snlist != NULL) {
-          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap1))[i]);
+          filename += snlist->fileName((*p_lonLatOverlaps.at(overlap1))[i]);
         }
       }
       polygon += p_lonLatOverlaps.at(overlap1)->Polygon()->toString().c_str();
@@ -849,7 +849,7 @@ namespace Isis {
         serialNumbers += (*p_lonLatOverlaps.at(overlap2))[i];
 
         if(snlist != NULL) {
-          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap2))[i]);
+          filename += snlist->fileName((*p_lonLatOverlaps.at(overlap2))[i]);
         }
       }
       polygon += p_lonLatOverlaps.at(overlap2)->Polygon()->toString().c_str();
@@ -895,7 +895,7 @@ namespace Isis {
         serialNumbers += (*p_lonLatOverlaps.at(overlap1))[i];
 
         if(snlist != NULL) {
-          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap1))[i]);
+          filename += snlist->fileName((*p_lonLatOverlaps.at(overlap1))[i]);
         }
       }
 
@@ -914,7 +914,7 @@ namespace Isis {
         serialNumbers += (*p_lonLatOverlaps.at(overlap2))[i];
 
         if(snlist != NULL) {
-          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap2))[i]);
+          filename += snlist->fileName((*p_lonLatOverlaps.at(overlap2))[i]);
         }
       }
 
@@ -963,7 +963,7 @@ namespace Isis {
         serialNumbers += (*p_lonLatOverlaps.at(overlap1))[i];
 
         if(snlist != NULL) {
-          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap1))[i]);
+          filename += snlist->fileName((*p_lonLatOverlaps.at(overlap1))[i]);
         }
       }
 
@@ -982,7 +982,7 @@ namespace Isis {
         serialNumbers += (*p_lonLatOverlaps.at(overlap2))[i];
 
         if(snlist != NULL) {
-          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap2))[i]);
+          filename += snlist->fileName((*p_lonLatOverlaps.at(overlap2))[i]);
         }
       }
 

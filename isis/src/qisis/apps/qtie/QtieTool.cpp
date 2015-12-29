@@ -308,7 +308,7 @@ namespace Isis {
     p_baseSN = SerialNumber::Compose(*p_baseCube, true);
     p_matchSN = SerialNumber::Compose(*p_matchCube);
 
-    p_serialNumberList->Add(matchCube->fileName());
+    p_serialNumberList->add(matchCube->fileName());
 
     //  Save off universal ground maps
     try {
@@ -447,7 +447,7 @@ namespace Isis {
     //    If we allow on both, need to find samp,line on level1 if
     //    they clicked on basemap.
     QString file = cvp->cube()->fileName();
-    QString sn = p_serialNumberList->SerialNumber(file);
+    QString sn = p_serialNumberList->serialNumber(file);
 
     double samp, line;
     cvp->viewportToCube(p.x(), p.y(), samp, line);
