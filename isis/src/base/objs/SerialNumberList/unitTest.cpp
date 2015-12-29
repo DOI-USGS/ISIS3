@@ -19,10 +19,10 @@ using namespace std;
  *   @todo Test SerialNumberList(QString list, bool checkTarget, non-NULL Progress);
  *   @todo Test error throws from SerialNumberList(QString, bool, Progress) :
  *         "Can't open or invalid file list."
- *   @todo Test error throws from Add(const QString &filename, bool def2filename) :
+ *   @todo Test error throws from add(const QString &filename, bool def2filename) :
  *         "Invalid serial number [Unknown]"
  *         "Duplicate, serial number from files"
- *   @todo Test error throws from Add(const QString &serialNumber, const QString &filename) :
+ *   @todo Test error throws from add(const QString &serialNumber, const QString &filename) :
  *         "Invalid serial number [Unknown] from file"
  *         "Duplicate, serial number from files"
  *         "Unable to find Instrument group needed for performing bundle adjustment"
@@ -35,50 +35,50 @@ int main(int argc, char *argv[]) {
     SerialNumberList snl(false);
     cout << endl << endl;
     // add filename, def2filename=false
-    snl.Add("$mgs/testData/ab102401.cub");
-    snl.Add("$mgs/testData/m0402852.cub");
-    snl.Add("$lo/testData/3133_h1.cub");
+    snl.add("$mgs/testData/ab102401.cub");
+    snl.add("$mgs/testData/m0402852.cub");
+    snl.add("$lo/testData/3133_h1.cub");
     // add filename, def2filename=true
-    snl.Add("$mgs/testData/ab102402.lev2.cub",true);
+    snl.add("$mgs/testData/ab102402.lev2.cub",true);
     // Test adding by giving a serial number and filename
-    snl.Add("m0402852.cub", "$mgs/testData/m0402852.cub");
+    snl.add("m0402852.cub", "$mgs/testData/m0402852.cub");
 
-    cout << "SerialNumberList size = " << snl.Size() << endl;
+    cout << "SerialNumberList size = " << snl.size() << endl;
     cout << "SerialNumberList has SerialNumber XYZ?          "
-         << snl.HasSerialNumber(QString("XYZ")) << endl;
+         << snl.hasSerialNumber(QString("XYZ")) << endl;
     cout << "SerialNumberList has SerialNumber m0402852.cub? "
-         << snl.HasSerialNumber(QString("m0402852.cub")) << endl;
+         << snl.hasSerialNumber(QString("m0402852.cub")) << endl;
 
-    for(int i = 0; i < snl.Size(); i++) {
+    for(int i = 0; i < snl.size(); i++) {
       cout << toString(i+1) << endl;
-      QString file = snl.FileName(i);
-      QString sn = snl.SerialNumber(i);
+      QString file = snl.fileName(i);
+      QString sn = snl.serialNumber(i);
       cout << "  FileName from index                  = " << FileName(file).name() << endl;
-      cout << "  FileName from SerialNumber           = " << FileName(snl.FileName(sn)).name() << endl;
-      cout << "  FileName index from FileName         = " << snl.FileNameIndex(file) << endl;
+      cout << "  FileName from SerialNumber           = " << FileName(snl.fileName(sn)).name() << endl;
+      cout << "  FileName index from FileName         = " << snl.fileNameIndex(file) << endl;
       cout << "  SerialNumber from index              = " << sn << endl;
-      cout << "  SerialNumber from FileName           = " << snl.SerialNumber(file) << endl;
-      cout << "  SerialNumber index from SerialNumber = " << snl.SerialNumberIndex(sn) << endl;
-      cout << "  Observation number from index        = " << snl.ObservationNumber(i) << endl;
-      cout << "  Spacecraft Instrument ID from index  = " << snl.SpacecraftInstrumentId(i) << endl;
-      cout << "  Spacecraft ID from SerialNumber      = " << snl.SpacecraftInstrumentId(sn) << endl;
+      cout << "  SerialNumber from FileName           = " << snl.serialNumber(file) << endl;
+      cout << "  SerialNumber index from SerialNumber = " << snl.serialNumberIndex(sn) << endl;
+      cout << "  Observation number from index        = " << snl.observationNumber(i) << endl;
+      cout << "  Spacecraft Instrument ID from index  = " << snl.spacecraftInstrumentId(i) << endl;
+      cout << "  Spacecraft ID from SerialNumber      = " << snl.spacecraftInstrumentId(sn) << endl;
     }
 
     cout << endl << endl;
     cout << "Deleting first SerialNumber in the list..." << endl;
-    snl.Delete(snl.SerialNumber(0));
-    cout << "new list size = " << snl.Size() << endl;
+    snl.Delete(snl.serialNumber(0));
+    cout << "new list size = " << snl.size() << endl;
     cout << "new list serial numbers: " << endl;
-    for(int i = 0; i < snl.Size(); i++) {
-      QString sn = snl.SerialNumber(i);
+    for(int i = 0; i < snl.size(); i++) {
+      QString sn = snl.serialNumber(i);
       cout << "  " << sn << endl;
     }
 
     cout << endl << endl;
-    for (int i = 0; i < snl.Size(); i++) {
-      QString obsNum = snl.ObservationNumber(i);
+    for (int i = 0; i < snl.size(); i++) {
+      QString obsNum = snl.observationNumber(i);
       cout << "Possible SerialNumbers for Observation Number: " << obsNum << endl;
-      std::vector<QString> possibles = snl.PossibleSerialNumbers(obsNum);
+      std::vector<QString> possibles = snl.possibleSerialNumbers(obsNum);
       for (unsigned int j = 0; j < possibles.size(); j++) {
         cout << "  " << possibles[j] << endl;
       }
@@ -93,9 +93,9 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // Test to make sure all targets being the same works
-    snl.Add("$mgs/testData/ab102401.cub", true);
-    snl.Add("$base/testData/blobTruth.cub");
-    snl.Add("$lo/testData/3133_h1.cub");
+    snl.add("$mgs/testData/ab102401.cub", true);
+    snl.add("$base/testData/blobTruth.cub");
+    snl.add("$lo/testData/3133_h1.cub");
   }
   catch(IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     // no inst group, def2filename, no mapping
     QString filename("$base/testData/isisTruth.cub");
-    snl.Add(filename, true);
+    snl.add(filename, true);
   }
   catch(IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     // no inst group, no def2filename
     QString filename("$base/testData/isisTruth.cub");
-    snl.Add(filename, false);
+    snl.add(filename, false);
   }
   catch(IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -126,9 +126,9 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl << endl;
     // Test to make sure all targets being the same works
-    snl.Add("sn1", "$mgs/testData/ab102401.cub");
-    snl.Add("sn2", "$base/testData/blobTruth.cub");
-    snl.Add("sn3", "$lo/testData/3133_h1.cub");
+    snl.add("sn1", "$mgs/testData/ab102401.cub");
+    snl.add("sn2", "$base/testData/blobTruth.cub");
+    snl.add("sn3", "$lo/testData/3133_h1.cub");
   }
   catch(IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     cout << endl << endl;
     // no inst group, def2filename, no mapping
     QString filename("$base/testData/isisTruth.cub");
-    snl.Add("sn1", filename);
+    snl.add("sn1", filename);
   }
   catch(IException &e) {
     QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
@@ -148,70 +148,70 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << endl << endl;
-    snl.FileName("Nonsense");
+    snl.fileName("Nonsense");
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.SerialNumber("Nonsense");
+    snl.serialNumber("Nonsense");
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.SerialNumber(17);
+    snl.serialNumber(17);
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.ObservationNumber(17);
+    snl.observationNumber(17);
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.SerialNumberIndex("Nonsense");
+    snl.serialNumberIndex("Nonsense");
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.FileNameIndex("Nonsense");
+    snl.fileNameIndex("Nonsense");
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.FileName(17);
+    snl.fileName(17);
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.SpacecraftInstrumentId(17);
+    snl.spacecraftInstrumentId(17);
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.SpacecraftInstrumentId("Nonsense");
+    snl.spacecraftInstrumentId("Nonsense");
   }
   catch (IException &e) {
     e.print();
   }
   try {
     cout << endl << endl;
-    snl.PossibleSerialNumbers("Nonsense");
+    snl.possibleSerialNumbers("Nonsense");
   }
   catch (IException &e) {
     e.print();

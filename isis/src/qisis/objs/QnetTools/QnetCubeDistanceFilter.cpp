@@ -116,7 +116,7 @@ namespace Isis {
         // Loop through each control measure of this point until we find this image
         for (int cm1 = 0; cm1 < controlPt1.GetNumMeasures(); cm1++) {
           // Check control measure to see if this point is in the current image
-          if (controlPt1[cm1]->GetCubeSerialNumber() == serialNumberList()->SerialNumber(filteredImages()[i])) {
+          if (controlPt1[cm1]->GetCubeSerialNumber() == serialNumberList()->serialNumber(filteredImages()[i])) {
             // this measure matches the image, set controlMeas1 variable and break out of loop
             controlMeas1 = *controlPt1[cm1];
             break;
@@ -154,7 +154,7 @@ namespace Isis {
           // Loop through each measure of the second point until we find this image
           for (int cm2 = 0; cm2 < controlPt2.GetNumMeasures(); cm2++) {
             // Check to see if this point is in the image
-            if (controlPt2[cm2]->GetCubeSerialNumber() == serialNumberList()->SerialNumber(filteredImages()[i])) {
+            if (controlPt2[cm2]->GetCubeSerialNumber() == serialNumberList()->serialNumber(filteredImages()[i])) {
               // this measure matches the image, set controlMeas2 variable and break out of loop
               controlMeas2 = *controlPt2[cm2];
               break;

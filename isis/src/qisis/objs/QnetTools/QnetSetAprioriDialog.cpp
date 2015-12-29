@@ -205,7 +205,7 @@ namespace Isis {
         if (referenceMeasureRadioButton->isChecked()) {
           ControlMeasure *m = pt->GetRefMeasure();
           // Find camera from network camera list
-          int camIndex = m_qnetTool->serialNumberList()->SerialNumberIndex(
+          int camIndex = m_qnetTool->serialNumberList()->serialNumberIndex(
               m->GetCubeSerialNumber());
           Camera *cam = m_qnetTool->controlNet()->Camera(camIndex);
           cam->SetImage(m->GetSample(),m->GetLine());

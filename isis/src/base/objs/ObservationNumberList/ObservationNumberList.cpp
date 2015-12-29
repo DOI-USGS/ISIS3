@@ -38,7 +38,7 @@ namespace Isis {
    */
   void ObservationNumberList::init(Isis::SerialNumberList *snlist) {
 
-    if(snlist->Size() == 0) {
+    if(snlist->size() == 0) {
       QString msg = "Serial number list is empty";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -49,8 +49,8 @@ namespace Isis {
     int observationIndex;
 
     // Fill the temporary map to generate observation sets
-    for(int isn = 0; isn < snlist->Size(); isn++) {
-      observationNumber = snlist->ObservationNumber(isn);
+    for(int isn = 0; isn < snlist->size(); isn++) {
+      observationNumber = snlist->observationNumber(isn);
 
       if(observationMap.find(observationNumber) == observationMap.end()) {
         observationMap.insert(std::pair<QString, int>(observationNumber, currentIndex));
@@ -60,7 +60,7 @@ namespace Isis {
         observationIndex = observationMap.find(observationNumber)->second;
       }
 
-      Add(isn, observationIndex, observationNumber);
+      add(isn, observationIndex, observationNumber);
     }
     p_numberObservations = currentIndex;
   }
@@ -78,7 +78,7 @@ namespace Isis {
    */
   void ObservationNumberList::Remove(Isis::SerialNumberList *snlist) {
 
-    if(snlist->Size() == 0) {
+    if(snlist->size() == 0) {
       QString msg = "Removing serial number list is empty";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -92,9 +92,9 @@ namespace Isis {
     int observationIndex;
 
     // Fill the temporary map to generate observation sets
-    for(int isn = 0; isn < this->Size(); isn++) {
-      if((snlist->HasSerialNumber(this->SerialNumber(isn)))) continue;
-      observationNumber = this->ObservationNumber(isn);
+    for(int isn = 0; isn < this->size(); isn++) {
+      if((snlist->hasSerialNumber(this->serialNumber(isn)))) continue;
+      observationNumber = this->observationNumber(isn);
 
       if(observationMap.find(observationNumber) == observationMap.end()) {
         observationMap.insert(std::pair<QString, int>(observationNumber, currentIndex));
@@ -104,7 +104,7 @@ namespace Isis {
         observationIndex = observationMap.find(observationNumber)->second;
       }
 
-      Add(isn, observationIndex, observationNumber);
+      add(isn, observationIndex, observationNumber);
     }
     p_numberObservations = currentIndex;
   }
@@ -132,7 +132,7 @@ namespace Isis {
    *                         be added
    *
    */
-  void ObservationNumberList::Add(const int isn, const int observationIndex,
+  void ObservationNumberList::add(const int isn, const int observationIndex,
                                   QString observationNumber) {
 
     ObservationSet nextset;
@@ -149,7 +149,7 @@ namespace Isis {
    *
    * @return int Returns number of unique observations currently in the list
    */
-  int ObservationNumberList::ObservationSize() const {
+  int ObservationNumberList::observationSize() const {
     return p_numberObservations;
   }
 
@@ -162,7 +162,7 @@ namespace Isis {
    *
    * @return bool
    */
-  bool ObservationNumberList::HasObservationNumber(const QString &on) {
+  bool ObservationNumberList::hasObservationNumber(const QString &on) {
     for(unsigned index = 0; index < p_pairs.size(); index++) {
       if(p_pairs[index].observationNumber == on) {
         return true;
@@ -178,7 +178,7 @@ namespace Isis {
    *
    * @return int The observation index mapped to the serial number
    */
-  int ObservationNumberList::ObservationNumberMapIndex(int serialNumberIndex) {
+  int ObservationNumberList::observationNumberMapIndex(int serialNumberIndex) {
     //    if (serialNumberIndex >= 0 && serialNumberIndex < (int) p_indexMap.size()) {
     if(serialNumberIndex >= 0) {
       return p_indexMap.find(serialNumberIndex)->second;
@@ -198,14 +198,14 @@ namespace Isis {
    * @return QString The observation number corresponding to
    *         the input filename
    */
-  QString ObservationNumberList::ObservationNumber(const QString &filename) {
+  QString ObservationNumberList::observationNumber(const QString &filename) {
     if(p_fileMap.find(Isis::FileName(filename).expanded()) == p_fileMap.end()) {
       QString msg = "Requested filename [" +
                         Isis::FileName(filename).expanded() + "]";
       msg += "does not exist in the list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    int index = FileNameIndex(filename);
+    int index = fileNameIndex(filename);
     return p_pairs[index].observationNumber;
   }
 
@@ -216,7 +216,7 @@ namespace Isis {
    *
    * @return QString The observation number returned
    */
-  QString ObservationNumberList::ObservationNumber(int index) {
+  QString ObservationNumberList::observationNumber(int index) {
     if(index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].observationNumber;
     }
@@ -234,7 +234,7 @@ namespace Isis {
    * @return vector<QString> The list of possible filenames
    *         matching the input observation number
    */
-  std::vector<QString> ObservationNumberList::PossibleFileNames(const QString &on) {
+  std::vector<QString> ObservationNumberList::possibleFileNames(const QString &on) {
     std::vector<QString> filenames;
     for(unsigned index = 0; index < p_pairs.size(); index++) {
       if(p_pairs[index].observationNumber == on) {

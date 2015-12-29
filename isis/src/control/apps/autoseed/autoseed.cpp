@@ -139,7 +139,7 @@ void IsisMain() {
 
   // Grab the labels from the first filename in the SerialNumberList to get
   // some info
-  Pvl cubeLab(serialNumbers.FileName(0));
+  Pvl cubeLab(serialNumbers.fileName(0));
 
   // Construct a Projection for converting between Lon/Lat and X/Y
   // This is used inside the seeding algorithms.
@@ -168,7 +168,7 @@ void IsisMain() {
   }
   else if(seedDomain == SampleLine) {
     Cube cube;
-    cube.open(serialNumbers.FileName(0));
+    cube.open(serialNumbers.fileName(0));
     ugmap = new UniversalGroundMap(cube);
   }
 
@@ -192,11 +192,11 @@ void IsisMain() {
   int stats_tolerance = 0;
 
   map<QString, UniversalGroundMap *> gMaps;
-  for(int sn = 0; sn < serialNumbers.Size(); ++sn) {
+  for(int sn = 0; sn < serialNumbers.size(); ++sn) {
     // Create the UGM for the cube associated with this SN
-    Cube cube(serialNumbers.FileName(sn), "r");
+    Cube cube(serialNumbers.fileName(sn), "r");
     gMaps.insert(std::pair<QString, UniversalGroundMap *>
-                 (serialNumbers.SerialNumber(sn), new UniversalGroundMap(cube)));
+                 (serialNumbers.serialNumber(sn), new UniversalGroundMap(cube)));
   }
 
   stringstream errors(stringstream::in | stringstream::out);
@@ -221,7 +221,7 @@ void IsisMain() {
     for(int i = 0 ; i < precnet.GetNumPoints(); i ++) {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetRefMeasure();
-      QString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
+      QString c = serialNumbers.fileName(cm->GetCubeSerialNumber());
       Cube cube(c);
       Camera *cam = CameraFactory::Create(cube);
       cam->SetImage(cm->GetSample(), cm->GetLine());
@@ -393,7 +393,7 @@ void IsisMain() {
         // Check the DNs with the cube, Note: this is costly to do
         if(hasDNRestriction) {
           Cube cube;
-          QString c = serialNumbers.FileName((*overlaps[ov])[sn]);
+          QString c = serialNumbers.fileName((*overlaps[ov])[sn]);
           cube.open(c);
           Isis::Brick brick(1, 1, 1, cube.pixelType());
           brick.SetBasePosition((int)gmap->Camera()->Sample(), (int)gmap->Camera()->Line(), (int)gmap->Camera()->Band());
@@ -444,7 +444,7 @@ void IsisMain() {
 
   // All done with the UGMs so delete them
   for(unsigned int sn = 0; sn < gMaps.size(); ++sn) {
-    UniversalGroundMap *gmap = gMaps[serialNumbers.SerialNumber(sn)];
+    UniversalGroundMap *gmap = gMaps[serialNumbers.serialNumber(sn)];
     delete gmap;
   }
   gMaps.clear();

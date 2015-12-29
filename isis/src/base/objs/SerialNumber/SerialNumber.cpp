@@ -172,7 +172,7 @@ namespace Isis {
    * @return Calculated SerialNumber or FileName
   */
   QString SerialNumber::ComposeObservation(const QString &sn, SerialNumberList &list, bool def2filename) {
-    QString filename = list.FileName(sn);
+    QString filename = list.fileName(sn);
     return ObservationNumber::Compose(filename, def2filename);
   }
 }

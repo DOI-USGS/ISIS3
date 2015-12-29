@@ -233,8 +233,8 @@ void GetSourceProductID(QString psSrcListFile, QString psSrcType, Pvl &pcPdsLbl)
   // List File name
   if(psSrcType == "LIST") {
     SerialNumberList cSnl = psSrcListFile;
-    for(int i = 0; i < cSnl.Size(); i++) {
-      cKeySrcPrdId += cSnl.SerialNumber(i);
+    for(int i = 0; i < cSnl.size(); i++) {
+      cKeySrcPrdId += cSnl.serialNumber(i);
     }
   }
   // ID's - add directly to the PvlKeyword

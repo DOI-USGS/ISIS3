@@ -151,7 +151,7 @@ namespace Isis {
    * @param pcMeasure - Measure's Cube and Serial #
    */
   void ControlNetFilter::PrintCubeFileSerialNum(const ControlMeasure &pcMeasure) {
-    mOstm << mSerialNumList.FileName(pcMeasure.GetCubeSerialNumber()) << ", ";
+    mOstm << mSerialNumList.fileName(pcMeasure.GetCubeSerialNumber()) << ", ";
     mOstm << pcMeasure.GetCubeSerialNumber();
   }
 
@@ -676,7 +676,7 @@ namespace Isis {
         const ControlMeasure *cm = cPoint->GetRefMeasure();
 
         QString sn = cm->GetCubeSerialNumber();
-        QString filename = mSerialNumList.FileName(sn);
+        QString filename = mSerialNumList.fileName(sn);
         Cube cube(filename, "r");
 
         Camera *camera = CameraFactory::Create(cube);
@@ -750,7 +750,7 @@ namespace Isis {
 
         if (!surfacePt1.Valid()) {
           QString sn1 = cp1RefMeasure->GetCubeSerialNumber();
-          QString filename1 = mSerialNumList.FileName(sn1);
+          QString filename1 = mSerialNumList.fileName(sn1);
           Cube cube1(filename1, "r");
           cam1 = CameraFactory::Create(cube1);
           if (cam1->SetImage(cp1RefMeasure->GetSample(),
@@ -788,7 +788,7 @@ namespace Isis {
 
           if (!surfacePt2.Valid()) {
             QString sn2 = cp2RefMeasure->GetCubeSerialNumber();
-            QString filename2 = mSerialNumList.FileName(sn2);
+            QString filename2 = mSerialNumList.fileName(sn2);
             Cube cube2(filename2, "r");
             cam2 = CameraFactory::Create(cube2);
 
@@ -981,7 +981,7 @@ namespace Isis {
           if (pbLastFilter) {
             PointStats(*cPoint);
             QString sn = cMeasure->GetCubeSerialNumber();
-            mOstm << mSerialNumList.FileName(sn) << ", " << sn << ","
+            mOstm << mSerialNumList.fileName(sn) << ", " << sn << ","
                 << sBoolean[(int) cMeasure->IsIgnored()] << ", "
                 << cMeasure->GetMeasureTypeString() << ", "
                 << sBoolean[cMeasure->IsEditLocked()] << ", "
@@ -1074,7 +1074,7 @@ namespace Isis {
           // Image Details
           QString sn = cMeasure->GetCubeSerialNumber();
           vector <double> imgStats = GetImageStatsBySerialNum(sn);
-          mOstm << mSerialNumList.FileName(sn)   << ", " << sn << ", "
+          mOstm << mSerialNumList.fileName(sn)   << ", " << sn << ", "
                 << imgStats[imgTotalPoints] << ", " << imgStats[imgIgnoredPoints] << ", "
                 << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", "
                 << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
@@ -1126,10 +1126,10 @@ namespace Isis {
       mOstm << endl;
     }
 
-    int iNumCubes  = mSerialNumFilter.Size();
+    int iNumCubes  = mSerialNumFilter.size();
 
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
-      QString sSerialNum = mSerialNumFilter.SerialNumber(sn);
+      QString sSerialNum = mSerialNumFilter.serialNumber(sn);
       vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
       double convexHullRatio = imgStats[imgConvexHullRatio];
       if (convexHullRatio < dGreater || convexHullRatio > dLesser){
@@ -1137,7 +1137,7 @@ namespace Isis {
         mSerialNumFilter.Delete(sSerialNum);
       }
       else if (pbLastFilter) {
-        mOstm << mSerialNumFilter.FileName(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumFilter.fileName(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", "
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
               <<  imgStats[imgConvexHullRatio]<< endl;
@@ -1167,7 +1167,7 @@ namespace Isis {
     QStringList strTokens = sCubeExpr.split(sSeparator, QString::SkipEmptyParts);
 
     int iTokenSize = (int)strTokens.size();
-    int iNumCubes  = mSerialNumFilter.Size();
+    int iNumCubes  = mSerialNumFilter.size();
 
     if (pbLastFilter) {
       CubeStatsHeader();
@@ -1175,8 +1175,8 @@ namespace Isis {
     }
 
     for (int i = (iNumCubes - 1); i >= 0;  i--) {
-      QString sCubeName = mSerialNumFilter.FileName(i);
-      QString sSerialNum = mSerialNumFilter.SerialNumber(i);
+      QString sCubeName = mSerialNumFilter.fileName(i);
+      QString sSerialNum = mSerialNumFilter.serialNumber(i);
       int iPosition = 0;
       for (int j = (iTokenSize - 1); j >= 0; j--) {
         int iLen = strTokens[j].length();
@@ -1202,13 +1202,13 @@ namespace Isis {
     GenerateImageStats();
 
     if (pbLastFilter) {
-      iNumCubes = mSerialNumFilter.Size();
+      iNumCubes = mSerialNumFilter.size();
       for (int i = 0; i < iNumCubes; i++) {
-        QString sSerialNum = mSerialNumFilter.SerialNumber(i);
+        QString sSerialNum = mSerialNumFilter.serialNumber(i);
 
-        mOstm << mSerialNumFilter.FileName(i) << ", " << sSerialNum << ", ";
+        mOstm << mSerialNumFilter.fileName(i) << ", " << sSerialNum << ", ";
         vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
-        mOstm << mSerialNumFilter.FileName(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumFilter.fileName(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", "
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
               << imgStats[imgConvexHullRatio]<< endl;
@@ -1248,10 +1248,10 @@ namespace Isis {
       mOstm << endl;
     }
 
-    int iNumCubes  = mSerialNumFilter.Size();
+    int iNumCubes  = mSerialNumFilter.size();
 
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
-      QString sSerialNum = mSerialNumFilter.SerialNumber(sn);
+      QString sSerialNum = mSerialNumFilter.serialNumber(sn);
       vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
       double numPoints = imgStats[imgTotalPoints];
       if (numPoints < iGreaterPoints || numPoints > iLessPoints){
@@ -1259,7 +1259,7 @@ namespace Isis {
         mSerialNumFilter.Delete(sSerialNum);
       }
       else if (pbLastFilter) {
-        mOstm << mSerialNumFilter.FileName(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumFilter.fileName(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", "
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
               <<  imgStats[imgConvexHullRatio] << endl;
@@ -1304,10 +1304,10 @@ namespace Isis {
       mOstm << "Distance_PointIDs >>, " << endl;
     }
 
-    int iNumCubes = mSerialNumFilter.Size();
+    int iNumCubes = mSerialNumFilter.size();
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
-      QString sSerialNum = mSerialNumFilter.SerialNumber(sn);
-      Cube cube(mSerialNumList.FileName(sSerialNum), "r");
+      QString sSerialNum = mSerialNumFilter.serialNumber(sn);
+      Cube cube(mSerialNumList.fileName(sSerialNum), "r");
       Camera *cam = CameraFactory::Create(cube);
       double dDist = 0;
       bool bMatchDistance = false;
@@ -1444,7 +1444,7 @@ namespace Isis {
       }
       else if (pbLastFilter) {
         vector <double> imgStats = GetImageStatsBySerialNum((sSerialNum));
-        mOstm << mSerialNumList.FileName(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumList.fileName(sSerialNum) << ", " << sSerialNum << ", "
               << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsLocked << ", "
               << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", "
               << imgStats[ imgConvexHullRatio] << ", ";

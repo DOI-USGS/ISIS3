@@ -296,7 +296,7 @@ namespace Isis {
       }
 
       if (!newMeasure->IsIgnored()) {
-        Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
+        Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
 
         MeasureValidationResults results =
           ValidStandardOptions(newMeasure, measureCube);
@@ -417,7 +417,7 @@ namespace Isis {
         double dReferenceLat = 0, dReferenceLon = 0;
         if (iBestMeasureIndex >= 0) {
           QString sn = mtInterestResults[iBestMeasureIndex].msSerialNum;
-          Cube *bestCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
+          Cube *bestCube = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
 
           // Get the Camera for the reference image and get the lat/lon from that measurment
           Camera *bestCamera;
@@ -425,7 +425,7 @@ namespace Isis {
             bestCamera = bestCube->camera();
           }
           catch (IException &e) {
-            QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
+            QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.fileName(sn);
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
@@ -458,7 +458,7 @@ namespace Isis {
           // Initialize the UGM of this cube with the reference lat/lon
           if (!newMeasure->IsIgnored() && iBestMeasureIndex >= 0 &&
               mtInterestResults[iBestMeasureIndex].mdInterest != WorstInterest()) {
-            Cube *measureCube =  mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
+            Cube *measureCube =  mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
 
             // default setting
             newMeasure->SetIgnored(false);
@@ -470,7 +470,7 @@ namespace Isis {
               measureCamera = measureCube->camera();
             }
             catch (IException &e) {
-              QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
+              QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.fileName(sn);
               throw IException(e, IException::User, msg, _FILEINFO_);
             }
 
@@ -672,7 +672,7 @@ namespace Isis {
       try {
         if (!origMsr->IsIgnored()) {
           InitInterestResults(measure);
-          Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
+          Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
 
           // Set the clipping polygon for this point
           // Convert the lon/lat overlap polygon to samp/line using the UGM for
@@ -793,7 +793,7 @@ namespace Isis {
         camera = pCube.camera();
       }
       catch (IException &e) {
-        QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(serialNum);
+        QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.fileName(serialNum);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -888,12 +888,12 @@ namespace Isis {
 
     // Create Multipolygon for the first Control Measure
     QString sn1 = pCnetPoint[0]->GetCubeSerialNumber();
-    Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn1));
+    Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn1));
     inCube1->read((Blob &)measPolygon1);
 
     // Create Multipolygon for the Second Control Measure
     QString sn2 = pCnetPoint[1]->GetCubeSerialNumber();
-    Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn2));
+    Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn2));
     inCube2->read((Blob &)measPolygon2);
 
     // Get the interesection for the first 2 polgons
@@ -902,7 +902,7 @@ namespace Isis {
 
     for (int measureIndex = 2; measureIndex < pCnetPoint.GetNumMeasures(); measureIndex ++) {
       QString sn3 = pCnetPoint[measureIndex]->GetCubeSerialNumber();
-      Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn3));
+      Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn3));
       inCube3->read((Blob &)measPolygon3);
 
       // Get the intersection of the intersection and the measure Image Polygon

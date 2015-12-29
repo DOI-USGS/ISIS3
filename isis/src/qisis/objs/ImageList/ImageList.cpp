@@ -130,7 +130,7 @@ namespace Isis {
     SerialNumberList result;
 
     for (int i = 0; i < count(); i++) {
-      result.Add((*this)[i]->fileName());
+      result.add((*this)[i]->fileName());
     }
     return result;
   }

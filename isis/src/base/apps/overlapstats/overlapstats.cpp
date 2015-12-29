@@ -45,7 +45,7 @@ void IsisMain() {
     ImageOverlap const * currOverlap = overlaps[i];
     for (int j = 0; j < currOverlap->Size(); j++) {
       QString currSerialNum = (*currOverlap)[j];
-      if (!serialNumbers.HasSerialNumber(currSerialNum)) {
+      if (!serialNumbers.hasSerialNumber(currSerialNum)) {
         IString msg = "Found serial number [" + currSerialNum + "] in overlap "
             "list that was not in the provided cube list. Please ensure that "
             "the cube list is the same one used to generate your overlap list "
@@ -57,8 +57,8 @@ void IsisMain() {
 
   // Sets up the no overlap list
   set<QString> nooverlap;
-  for(int i = 0; i < serialNumbers.Size(); i ++) {
-    nooverlap.insert(serialNumbers.SerialNumber(i));
+  for(int i = 0; i < serialNumbers.size(); i ++) {
+    nooverlap.insert(serialNumbers.serialNumber(i));
   }
 
   // Create the output
@@ -113,7 +113,7 @@ void IsisMain() {
       const geos::geom::MultiPolygon *mpLatLon = overlaps[index]->Polygon();
 
       // Construct a Projection for converting between Lon/Lat and X/Y
-      Pvl cubeLab(serialNumbers.FileName(0));
+      Pvl cubeLab(serialNumbers.fileName(0));
       PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
       QString target = inst["TargetName"];
       PvlGroup radii = TProjection::TargetRadii(target);
@@ -161,14 +161,14 @@ void IsisMain() {
           }
           output << delim << overlaps[index]->Size() << pretty;
           output << delim << (*overlaps[index])[0];
-          output << delim << serialNumbers.FileName((*overlaps[index])[0]);
+          output << delim << serialNumbers.fileName((*overlaps[index])[0]);
           for(int sn = 1; sn < overlaps[index]->Size(); sn ++) {
             if(!singleLine) {
               output << endl << pretty << delim << pretty << delim << pretty << delim;
               output << pretty << pretty;
             }
             output << delim << pretty << (*overlaps[index])[sn];
-            output << delim << serialNumbers.FileName((*overlaps[index])[sn]);
+            output << delim << serialNumbers.fileName((*overlaps[index])[sn]);
           }
           output << endl;
         }
@@ -240,7 +240,7 @@ void IsisMain() {
   // Add non-overlapping cubes to the output
   if(!nooverlap.empty()) {
     for(set<QString>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
-      brief += PvlKeyword("NoOverlap", serialNumbers.FileName(*itt));
+      brief += PvlKeyword("NoOverlap", serialNumbers.fileName(*itt));
     }
   }
 

@@ -125,7 +125,7 @@ namespace Isis {
             pvlMeasureGrp += Isis::PvlKeyword("EditLock", "True");
 
           if (!newMsr->IsIgnored()) {
-            Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
+            Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.fileName(sn));
             
             MeasureValidationResults results =
               ValidStandardOptions(newMsr, measureCube, &pvlMeasureGrp);

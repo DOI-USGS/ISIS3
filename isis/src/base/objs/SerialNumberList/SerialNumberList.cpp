@@ -45,7 +45,7 @@ namespace Isis {
         progress->CheckStatus();
       }
       for (int i = 0; i < flist.size(); i++) {
-        Add(flist[i].toString());
+        add(flist[i].toString());
         if (progress != NULL) {
           progress->CheckStatus();
         }
@@ -72,8 +72,8 @@ namespace Isis {
    * @param sn - serial number
    */
   void SerialNumberList::Delete(const QString &sn) {
-    int index = SerialNumberIndex(sn);
-    QString sFileName = FileName(sn);
+    int index = serialNumberIndex(sn);
+    QString sFileName = fileName(sn);
 
     // Delete the reference to this serial number in the
     // vector and the maps
@@ -102,7 +102,7 @@ namespace Isis {
    *                        if p_checkTarget is True.  If def2filename is True,
    *                        check for Mapping group if Target does not exist.
    */
-  void SerialNumberList::Add(const QString &filename, bool def2filename) {
+  void SerialNumberList::add(const QString &filename, bool def2filename) {
 
     Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
@@ -152,10 +152,10 @@ namespace Isis {
                       + filename + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      else if (HasSerialNumber(sn)) {
-        int index = SerialNumberIndex(sn);
+      else if (hasSerialNumber(sn)) {
+        int index = serialNumberIndex(sn);
         QString msg = "Duplicate, serial number [" + sn + "] from files ["
-                      + SerialNumberList::FileName(sn) + "] and [" + FileName(index) + "].";
+                      + SerialNumberList::fileName(sn) + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -191,11 +191,11 @@ namespace Isis {
    * @param serialNumber 
    * @param filename 
    * 
-   * @see Add(QString, QString)
+   * @see add(QString, QString)
    */
-  void SerialNumberList::Add(const char *serialNumber, const char *filename) {
+  void SerialNumberList::add(const char *serialNumber, const char *filename) {
 
-    Add((QString)serialNumber, (QString)filename);
+    add((QString)serialNumber, (QString)filename);
   }
 
 
@@ -209,7 +209,7 @@ namespace Isis {
    *  
    * @internal
    */
-  void SerialNumberList::Add(const QString &serialNumber, const QString &filename) {
+  void SerialNumberList::add(const QString &serialNumber, const QString &filename) {
 
     Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.findObject("IsisCube");
@@ -249,11 +249,11 @@ namespace Isis {
                       + filename + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      else if (HasSerialNumber(serialNumber)) {
-        int index = SerialNumberIndex(serialNumber);
+      else if (hasSerialNumber(serialNumber)) {
+        int index = serialNumberIndex(serialNumber);
         QString msg = "Duplicate, serial number [" + serialNumber + "] from files ["
-                      + SerialNumberList::FileName(serialNumber) 
-                      + "] and [" + FileName(index) + "].";
+                      + SerialNumberList::fileName(serialNumber) 
+                      + "] and [" + fileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -307,7 +307,7 @@ namespace Isis {
    *
    * @return bool
    */
-  bool SerialNumberList::HasSerialNumber(QString sn) {
+  bool SerialNumberList::hasSerialNumber(QString sn) {
     if (p_serialMap.find(sn) == p_serialMap.end()) return false;
     return true;
   }
@@ -318,7 +318,7 @@ namespace Isis {
    *
    * @return int Returns number of serial numbers current in the list
    */
-  int SerialNumberList::Size() const {
+  int SerialNumberList::size() const {
     return p_pairs.size();
   }
 
@@ -331,8 +331,8 @@ namespace Isis {
    * @return QString The filename matching the input serial
    *         number
    */
-  QString SerialNumberList::FileName(const QString &sn) {
-    if (HasSerialNumber(sn)) {
+  QString SerialNumberList::fileName(const QString &sn) {
+    if (hasSerialNumber(sn)) {
       int index = p_serialMap.find(sn)->second;
       return p_pairs[index].filename;
     }
@@ -355,13 +355,13 @@ namespace Isis {
    * @history 2007-06-04 Tracie Sucharski - Expand filename to include full
    *                        path before searching list.
    */
-  QString SerialNumberList::SerialNumber(const QString &filename) {
+  QString SerialNumberList::serialNumber(const QString &filename) {
     if (p_fileMap.find(Isis::FileName(filename).expanded()) == p_fileMap.end()) {
       QString msg = "Unable to get the SerialNumber. The given file name ["
                     + Isis::FileName(filename).expanded() + "] does not exist in the list.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    int index = FileNameIndex(filename);
+    int index = fileNameIndex(filename);
     return p_pairs[index].serialNumber;
   }
 
@@ -372,7 +372,7 @@ namespace Isis {
    *
    * @return QString The serial number returned
    */
-  QString SerialNumberList::SerialNumber(int index) {
+  QString SerialNumberList::serialNumber(int index) {
     if (index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].serialNumber;
     }
@@ -390,7 +390,7 @@ namespace Isis {
    *
    * @return QString The observation number returned
    */
-  QString SerialNumberList::ObservationNumber(int index) {
+  QString SerialNumberList::observationNumber(int index) {
     if (index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].observationNumber;
     }
@@ -408,8 +408,8 @@ namespace Isis {
    *
    * @return int The index of the serial number
    */
-  int SerialNumberList::SerialNumberIndex(const QString &sn) {
-    if (HasSerialNumber(sn)) {
+  int SerialNumberList::serialNumberIndex(const QString &sn) {
+    if (hasSerialNumber(sn)) {
       return p_serialMap.find(sn)->second;
     }
     else {
@@ -431,7 +431,7 @@ namespace Isis {
    *  @internal @history 2007-07-11 Stuart Sides - Fixed bug where
    *                        the correct index was not returned.
    */
-  int SerialNumberList::FileNameIndex(const QString &filename) {
+  int SerialNumberList::fileNameIndex(const QString &filename) {
 
     std::map<QString, int>::iterator  pos;
     if ((pos = p_fileMap.find(Isis::FileName(filename).expanded())) == p_fileMap.end()) {
@@ -449,7 +449,7 @@ namespace Isis {
    *
    * @return QString The filename at the given index
    */
-  QString SerialNumberList::FileName(int index) {
+  QString SerialNumberList::fileName(int index) {
     if (index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].filename;
     }
@@ -467,7 +467,7 @@ namespace Isis {
    *
    * @return QString The spacecraftname/instrumentid at the given index
    */
-  QString SerialNumberList::SpacecraftInstrumentId(int index) {
+  QString SerialNumberList::spacecraftInstrumentId(int index) {
     if (index >= 0 && index < (int) p_pairs.size()) {
       QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
       scid.simplified();
@@ -488,8 +488,8 @@ namespace Isis {
    * @return QString The spacecraftname/instrumentid matching the input serial
    *         number
    */
-  QString SerialNumberList::SpacecraftInstrumentId(const QString &sn) {
-    if (HasSerialNumber(sn)) {
+  QString SerialNumberList::spacecraftInstrumentId(const QString &sn) {
+    if (hasSerialNumber(sn)) {
       int index = p_serialMap.find(sn)->second;
       QString scid = (p_pairs[index].spacecraftName + "/" + p_pairs[index].instrumentId).toUpper();
       scid.simplified();
@@ -512,7 +512,7 @@ namespace Isis {
    * @return vector<QString> The list of possible serial
    *         numbers matching the input observation number
    */
-  std::vector<QString> SerialNumberList::PossibleSerialNumbers(const QString &on) {
+  std::vector<QString> SerialNumberList::possibleSerialNumbers(const QString &on) {
     std::vector<QString> numbers;
     for (unsigned index = 0; index < p_pairs.size(); index++) {
       if (p_pairs[index].observationNumber == on) {

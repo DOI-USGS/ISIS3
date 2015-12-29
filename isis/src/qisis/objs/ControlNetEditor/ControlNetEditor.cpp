@@ -202,7 +202,7 @@ namespace Isis {
 
 
   void ControlNetEditor::createPoint(QString serialNumber, double sample, double line) {
-    int index = m_serialNumberList->SerialNumberIndex(serialNumber);
+    int index = m_serialNumberList->serialNumberIndex(serialNumber);
     Camera *cam = m_controlNet->Camera(index);
     cam->SetImage(sample, line);
     createPoint( serialNumber, 
@@ -266,7 +266,7 @@ namespace Isis {
 
     Camera *cam;
     //qDebug()<<"ControlNetEditor::createPoint  serialNumberList.size() =  "<<m_serialNumberList->Size();
-    for(int i = 0; i < m_serialNumberList->Size(); i++) {
+    for(int i = 0; i < m_serialNumberList->size(); i++) {
 //    if (m_serialNumberList->SerialNumber(i) == m_groundSN) continue;
       cam = m_controlNet->Camera(i);
       if( cam->SetUniversalGround( lat.degrees(), lon.degrees() ) ) {
@@ -275,7 +275,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles << m_serialNumberList->FileName(i);
+          pointFiles << m_serialNumberList->fileName(i);
         }
       }
     }
@@ -308,10 +308,10 @@ namespace Isis {
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
         QString sn =
-                  m_serialNumberList->SerialNumber(selectedFile);
+                  m_serialNumberList->serialNumber(selectedFile);
         m->SetCubeSerialNumber(sn);
         int camIndex =
-              m_serialNumberList->FileNameIndex(selectedFile);
+              m_serialNumberList->fileNameIndex(selectedFile);
         camera = m_controlNet->Camera(camIndex);
         camera->SetUniversalGround(lat.degrees(), lon.degrees());
         m->SetCoordinate(camera->Sample(), camera->Line());
@@ -542,7 +542,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i = 0; i < m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      QString file = m_serialNumberList->FileName( m.GetCubeSerialNumber() );
+      QString file = m_serialNumberList->fileName( m.GetCubeSerialNumber() );
       deletePointDialog->fileList->addItem(file);
     }
 

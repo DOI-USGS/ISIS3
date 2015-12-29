@@ -502,7 +502,7 @@ namespace Isis {
       m_filteredPoints.push_back(i);
     }
     // copy the serial number indices into the filtered images list
-    int numSns = m_qnetTool->serialNumberList()->Size();
+    int numSns = m_qnetTool->serialNumberList()->size();
     m_filteredImages.reserve(numSns);
     for (int i = 0; i < numSns; i++) {
       m_filteredImages.push_back(i);
@@ -537,13 +537,13 @@ namespace Isis {
       connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(load(QListWidgetItem *)), Qt::UniqueConnection);
       //m_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
-      for (int i = 0; i < serialNumberList()->Size(); i++) {
-        FileName filename = FileName(serialNumberList()->FileName(i));
+      for (int i = 0; i < serialNumberList()->size(); i++) {
+        FileName filename = FileName(serialNumberList()->fileName(i));
         QString tempFileName = filename.name();
         m_listBox->insertItem(i, tempFileName);
       }
       QString msg = "Filter Count: " + QString::number(m_listBox->count()) +
-          " / " + QString::number(serialNumberList()->Size());
+          " / " + QString::number(serialNumberList()->size());
       m_filterCountLabel->setText(msg);
 
     }
@@ -648,12 +648,12 @@ namespace Isis {
       connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(load(QListWidgetItem *)), Qt::UniqueConnection);
       for (int i = 0; i < m_filteredImages.size(); i++) {
-        FileName filename = FileName(serialNumberList()->FileName(m_filteredImages[i]));
+        FileName filename = FileName(serialNumberList()->fileName(m_filteredImages[i]));
         QString tempFileName = filename.name();
         m_listBox->insertItem(i, tempFileName);
       }
       QString msg = "Filter Count: " + QString::number(m_listBox->count()) +
-          " / " + QString::number(serialNumberList()->Size());
+          " / " + QString::number(serialNumberList()->size());
       m_filterCountLabel->setText(msg);
     }
   }
@@ -705,12 +705,12 @@ namespace Isis {
       // Tell the filetool to load the given image
       else if (m_listCombo->currentIndex() == Cubes) {
         if (m_filteredImages.size() == 0) {
-          QString serialNumber = (*serialNumberList()).SerialNumber(index);
+          QString serialNumber = (*serialNumberList()).serialNumber(index);
           QString sn = serialNumber;
           emit loadImage(sn);
         }
         else {
-          QString serialNumber = (*serialNumberList()).SerialNumber(m_filteredImages[index]);
+          QString serialNumber = (*serialNumberList()).serialNumber(m_filteredImages[index]);
           QString sn = serialNumber;
           emit loadImage(sn);
         }

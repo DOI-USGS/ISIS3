@@ -1492,13 +1492,13 @@ namespace Isis {
     // Prep for reporting progress
     if (progress != NULL) {
       progress->SetText("Setting input images...");
-      progress->SetMaximumSteps(list.Size());
+      progress->SetMaximumSteps(list.size());
       progress->CheckStatus();
     }
     // Open the camera for all the images in the serial number list
-    for (int i = 0; i < list.Size(); i++) {
-      QString serialNumber = list.SerialNumber(i);
-      QString filename = list.FileName(i);
+    for (int i = 0; i < list.size(); i++) {
+      QString serialNumber = list.serialNumber(i);
+      QString filename = list.fileName(i);
       Cube cube(filename, "r");
 
       try {
@@ -1529,7 +1529,7 @@ namespace Isis {
         ControlMeasure *curMeasure = (*curPoint)[serialNums[m]];
 
         QString serialNumber = curMeasure->GetCubeSerialNumber();
-        if (list.HasSerialNumber(serialNumber)) {
+        if (list.hasSerialNumber(serialNumber)) {
           curMeasure->SetCamera(p_cameraMap[serialNumber]);
 
           // increment number of measures for this image (camera)

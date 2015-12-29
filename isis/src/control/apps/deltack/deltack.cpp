@@ -32,7 +32,7 @@ void IsisMain() {
   try {
     // Create a serial number list
     SerialNumberList serialNumberList;
-    serialNumberList.Add(inputFile);
+    serialNumberList.add(inputFile);
     
     // Get the coordinate for updating the camera pointing
     // We will want to make the camera pointing match the lat/lon at this
@@ -52,7 +52,7 @@ void IsisMain() {
     // In order to use the bundle adjustment class we will need a control
     // network
     ControlMeasure * m = new ControlMeasure;
-    m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
+    m->SetCubeSerialNumber(serialNumberList.serialNumber(0));
     m->SetCoordinate(samp1, line1);
 //   m->SetType(ControlMeasure::Manual);
     m->SetType(ControlMeasure::RegisteredPixel);
@@ -94,7 +94,7 @@ void IsisMain() {
       }
     
       ControlMeasure * m = new ControlMeasure;
-      m->SetCubeSerialNumber(serialNumberList.SerialNumber(0));
+      m->SetCubeSerialNumber(serialNumberList.serialNumber(0));
       m->SetCoordinate(samp2, line2);
       m->SetType(ControlMeasure::Manual);
     

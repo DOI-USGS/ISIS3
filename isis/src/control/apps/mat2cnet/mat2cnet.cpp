@@ -42,7 +42,7 @@ void IsisMain() {
   SerialNumberList snl(ui.GetFileName("LIST3"), true, &progress);
   progress.CheckStatus();
 
-  if (list2.size() != snl.Size()) {
+  if (list2.size() != snl.size()) {
     QString msg = "Invalid input file number of lines. The ISIS2 file list [";
     msg += ui.GetAsString("LIST2") + "] must contain the same number of lines ";
     msg += "as the ISIS3 file list [" + ui.GetAsString("LIST3") + "]";
@@ -78,7 +78,7 @@ void IsisMain() {
           _FILEINFO_);
     }
 
-    QString sn(snl.SerialNumber(f));
+    QString sn(snl.serialNumber(f));
     snMap.insert(std::pair<int, QString>((int)fsc, sn));
   }
   progress.CheckStatus();

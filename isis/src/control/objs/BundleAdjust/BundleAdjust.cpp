@@ -209,8 +209,8 @@ namespace Isis {
     m_pSnList = new SerialNumberList;
     foreach (ImageList *imgList, imgLists) {
       foreach (Image *image, *imgList) {
-        m_pSnList->Add(image->fileName());
-//      m_pSnList->Add(image->serialNumber(), image->fileName());
+        m_pSnList->add(image->fileName());
+//      m_pSnList->add(image->serialNumber(), image->fileName());
       }
     }
 
@@ -277,14 +277,14 @@ namespace Isis {
     m_pCnet->ClearJigsawRejected();
 
     // initialize held variables
-    int nImages = m_pSnList->Size();
+    int nImages = m_pSnList->size();
 
     // get count of held image and ensure they're in the control net
     if (m_pHeldSnList != NULL) {
       checkHeldList();
 
       for (int i = 0; i < nImages; i++) {
-        if (m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))) {
+        if (m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i))) {
           m_bundleResults.incrementHeldImages();
         }
       }
@@ -328,10 +328,10 @@ namespace Isis {
       for (int i = 0; i < nImages; i++) {
 
         Camera* camera = m_pCnet->Camera(i);
-        QString observationNumber = m_pSnList->ObservationNumber(i);
-        QString instrumentId = m_pSnList->SpacecraftInstrumentId(i);
-        QString serialNumber = m_pSnList->SerialNumber(i);
-        QString fileName = m_pSnList->FileName(i);
+        QString observationNumber = m_pSnList->observationNumber(i);
+        QString instrumentId = m_pSnList->spacecraftInstrumentId(i);
+        QString serialNumber = m_pSnList->serialNumber(i);
+        QString fileName = m_pSnList->fileName(i);
 
         // create a new BundleImage and add to new (or existing if observation mode is on)
         // BundleObservation
@@ -495,9 +495,9 @@ namespace Isis {
    * input list.
    */
   void BundleAdjust::checkHeldList() {
-    for (int ih = 0; ih < m_pHeldSnList->Size(); ih++) {
-      if (!(m_pSnList->HasSerialNumber(m_pHeldSnList->SerialNumber(ih)))) {
-        QString msg = "Held image [" + m_pHeldSnList->SerialNumber(ih)
+    for (int ih = 0; ih < m_pHeldSnList->size(); ih++) {
+      if (!(m_pSnList->hasSerialNumber(m_pHeldSnList->serialNumber(ih)))) {
+        QString msg = "Held image [" + m_pHeldSnList->serialNumber(ih)
                           + "not in FROMLIST";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -3034,7 +3034,7 @@ namespace Isis {
       for (int i = 0; i < nImages; i++) {
 
           if ( m_bundleResults.numberHeldImages() > 0 ) {
-              if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)))) {
+              if ((m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i)))) {
                   continue;
               }
           }
@@ -3979,7 +3979,7 @@ namespace Isis {
     if (!m_bundleSettings->solveObservationMode())
       return m_nImageIndexMap[i] * m_nNumImagePartials;
     else
-      return m_pObsNumList->ObservationNumberMapIndex(i) * m_nNumImagePartials;
+      return m_pObsNumList->observationNumberMapIndex(i) * m_nNumImagePartials;
   }
 */
 
@@ -3989,7 +3989,7 @@ namespace Isis {
    */
   // TODO: probably don't need this, can get from BundleObservation
   QString BundleAdjust::fileName(int i) {
-    return m_pSnList->FileName(i);
+    return m_pSnList->fileName(i);
   }
 
 
@@ -3999,7 +3999,7 @@ namespace Isis {
    */
   bool BundleAdjust::isHeld(int i) {
     if ( m_bundleResults.numberHeldImages() > 0 )
-         if ((m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i))))
+         if ((m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i))))
            return true;
     return false;
   }
@@ -4026,8 +4026,8 @@ namespace Isis {
    */
 //  int BundleAdjust::observations() const {
 //    if (!m_bundleSettings->solveObservationMode()) {
-//      return m_pSnList->Size();
-//      //    return m_pSnList->Size() - m_bundleResults.numberHeldImages();
+//      return m_pSnList->size();
+//      //    return m_pSnList->size() - m_bundleResults.numberHeldImages();
 //    }
 //    else {
 //      return m_pObsNumList->ObservationSize();
@@ -4590,21 +4590,21 @@ namespace Isis {
       double rmsLineResiduals = m_bundleResults.rmsImageLineResiduals()[i].Rms();
       double rmsLandSResiduals = m_bundleResults.rmsImageResiduals()[i].Rms();
 
-      nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->SerialNumber(i));
+      nMeasures = m_pCnet->GetNumberOfValidMeasuresInImage(m_pSnList->serialNumber(i));
       nRejectedMeasures =
-          m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->SerialNumber(i));
+          m_pCnet->GetNumberOfJigsawRejectedMeasuresInImage(m_pSnList->serialNumber(i));
 
       nUsed = nMeasures - nRejectedMeasures;
 
       if (nUsed == nMeasures) {
         sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                m_pSnList->FileName(i).toAscii().data(),
+                m_pSnList->fileName(i).toAscii().data(),
                 (nMeasures-nRejectedMeasures), nMeasures,
                 rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
       }
       else {
         sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                m_pSnList->FileName(i).toAscii().data(),
+                m_pSnList->fileName(i).toAscii().data(),
                 (nMeasures-nRejectedMeasures), nMeasures,
                 rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
       }
@@ -4666,7 +4666,7 @@ namespace Isis {
 
     for (int i = 0; i < nObservations; i++) {
 
-      //if ( m_bundleResults.numberHeldImages() > 0 && m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+      //if ( m_bundleResults.numberHeldImages() > 0 && m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i)) )
       //    bHeld = true;
 
       observation = m_bundleObservations.at(i);
@@ -4947,13 +4947,13 @@ namespace Isis {
         }
 
         // Determine the image index
-        nImageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+        nImageIndex = m_pSnList->serialNumberIndex(measure->GetCubeSerialNumber());
 
         if (measure->IsRejected()) {
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
                   point->GetId().toAscii().data(),
-                  m_pSnList->FileName(nImageIndex).toAscii().data(),
-                  m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
+                  m_pSnList->fileName(nImageIndex).toAscii().data(),
+                  m_pSnList->serialNumber(nImageIndex).toAscii().data(),
                   measure->GetFocalPlaneMeasuredX(),
                   measure->GetFocalPlaneMeasuredY(),
                   measure->GetSample(),
@@ -4965,8 +4965,8 @@ namespace Isis {
         else {
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
                   point->GetId().toAscii().data(),
-                  m_pSnList->FileName(nImageIndex).toAscii().data(),
-                  m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
+                  m_pSnList->fileName(nImageIndex).toAscii().data(),
+                  m_pSnList->serialNumber(nImageIndex).toAscii().data(),
                   measure->GetFocalPlaneMeasuredX(),
                   measure->GetFocalPlaneMeasuredY(),
                   measure->GetSample(),
@@ -5234,7 +5234,7 @@ namespace Isis {
     for (int i = 0; i < nImages; i++) {
 
       //if (m_bundleResults.numberHeldImages() > 0 &&
-      //    m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+      //    m_pHeldSnList->hasSerialNumber(m_pSnList->serialNumber(i)) )
       //  bHeld = true;
 
       pCamera = m_pCnet->Camera(i);
@@ -5293,7 +5293,7 @@ namespace Isis {
       output_columns.clear();
 
       // add filename
-      output_columns.push_back(m_pSnList->FileName(i).toAscii().data());
+      output_columns.push_back(m_pSnList->fileName(i).toAscii().data());
 
       // add rms of sample, line, total image coordinate residuals
       output_columns.push_back(
@@ -5653,7 +5653,7 @@ namespace Isis {
     // use qvectors so that we can set the size.
     // this will be useful later when adding data.
     // data may added out of index order
-    int numberImages = m_pSnList->Size();
+    int numberImages = m_pSnList->size();
     QVector<Statistics> rmsImageSampleResiduals(numberImages);
     QVector<Statistics> rmsImageLineResiduals(numberImages);
     QVector<Statistics> rmsImageResiduals(numberImages);
@@ -5686,7 +5686,7 @@ namespace Isis {
         double lineResidual = fabs(measure->GetLineResidual());
 
         // Determine the index for this measure's serial number
-        int imageIndex = m_pSnList->SerialNumberIndex(measure->GetCubeSerialNumber());
+        int imageIndex = m_pSnList->serialNumberIndex(measure->GetCubeSerialNumber());
 
         // add residual data to the statistics object at the appropriate serial number index
         rmsImageSampleResiduals[imageIndex].AddData(sampleResidual);

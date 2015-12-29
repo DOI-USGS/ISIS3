@@ -789,11 +789,11 @@ namespace Isis {
     m_rightSN = SerialNumber::Compose(*m_rightCube);
 
     //  TODO   Do I need list?
-    if ( !m_serialNumberList->HasSerialNumber(m_leftSN) ) {
-      m_serialNumberList->Add( m_leftCube->fileName() );
+    if ( !m_serialNumberList->hasSerialNumber(m_leftSN) ) {
+      m_serialNumberList->add( m_leftCube->fileName() );
     }
-    if ( !m_serialNumberList->HasSerialNumber(m_rightSN) ) {
-      m_serialNumberList->Add( m_rightCube->fileName() );
+    if ( !m_serialNumberList->hasSerialNumber(m_rightSN) ) {
+      m_serialNumberList->add( m_rightCube->fileName() );
     }
 
     vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
@@ -905,7 +905,7 @@ namespace Isis {
     QString file = cvp->cube()->fileName();
     QString sn;
     try {
-      sn = m_serialNumberList->SerialNumber(file);
+      sn = m_serialNumberList->serialNumber(file);
     }
     catch (IException &e) {
       QString message = "This cube is not linked as a stereo pair.  Make ";

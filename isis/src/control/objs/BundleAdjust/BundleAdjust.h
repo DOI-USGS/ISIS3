@@ -244,7 +244,7 @@ namespace Isis {
       // accessors
       ControlNet       *controlNet() { return m_pCnet; } // TODO: change from pointer to const ref???
       SerialNumberList *serialNumberList() { return m_pSnList; } // TODO: move implementation to cpp per ISIS standards
-      int              images() const { return m_pSnList->Size(); }// TODO: move implementation to cpp per ISIS standards
+      int              images() const { return m_pSnList->size(); }// TODO: move implementation to cpp per ISIS standards
 //      int              observations() const;
       QString          fileName(int index);
       bool             isHeld(int index);

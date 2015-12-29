@@ -176,7 +176,7 @@ namespace Isis {
 
       //  Determine target from first file in cube list
       QScopedPointer<Cube> cube(new Cube());
-      cube->open(serialNumberList()->FileName(0));
+      cube->open(serialNumberList()->fileName(0));
       controlNet()->SetTarget(cube->camera()->target()->name());
     }
     else {
@@ -319,7 +319,7 @@ namespace Isis {
    */
   void QnetFileTool::loadImage(const QString &serialNumber) {
 
-    QString tempFileName = serialNumberList()->FileName(serialNumber);
+    QString tempFileName = serialNumberList()->fileName(serialNumber);
     QString filename = tempFileName;
     QVector< MdiCubeViewport * > * cvpList = m_qnetTool->workspace()->cubeViewportList();
     bool found = false;

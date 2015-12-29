@@ -139,8 +139,8 @@ namespace Isis {
     //  Add all files to list , selecting those in pointFiles which are
     //  those files which contain the point.
     SerialNumberList *snList = m_qnetTool->serialNumberList();
-    for (int i = 0; i < snList->Size(); i++) {
-      QString label = snList->FileName(i);
+    for (int i = 0; i < snList->size(); i++) {
+      QString label = snList->fileName(i);
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then

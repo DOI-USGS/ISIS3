@@ -91,18 +91,18 @@ void IsisMain() {
     SerialNumberList addSerials(ui.GetFileName("ADDLIST"));
 
     //Check for duplicate files in the lists by serial number
-    for (int i = 0; i < addSerials.Size(); i++) {
+    for (int i = 0; i < addSerials.size(); i++) {
 
       // Check for duplicate SNs accross the lists
-      if (fromSerials->HasSerialNumber(addSerials.SerialNumber(i))) {
-        duplicates.addValue(addSerials.FileName(i));
+      if (fromSerials->hasSerialNumber(addSerials.serialNumber(i))) {
+        duplicates.addValue(addSerials.fileName(i));
       }
 
       // Check for duplicate SNs within the addlist
-      for (int j = i + 1; j < addSerials.Size(); j++) {
-        if (addSerials.SerialNumber(i) == addSerials.SerialNumber(j)) {
-          QString msg = "Add list files [" + addSerials.FileName(i) + "] and [";
-          msg += addSerials.FileName(j) + "] share the same serial number.";
+      for (int j = i + 1; j < addSerials.size(); j++) {
+        if (addSerials.serialNumber(i) == addSerials.serialNumber(j)) {
+          QString msg = "Add list files [" + addSerials.fileName(i) + "] and [";
+          msg += addSerials.fileName(j) + "] share the same serial number.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -326,10 +326,10 @@ void IsisMain() {
     for (int i = 0; i < snList.size(); i++) {
       QString sn = snList[i];
 
-      if (addSerials.HasSerialNumber(sn))
-        toList.Add(addSerials.FileName(sn));
-      else if (fromSerials->HasSerialNumber(sn))
-        toList.Add(fromSerials->FileName(sn));
+      if (addSerials.hasSerialNumber(sn))
+        toList.add(addSerials.fileName(sn));
+      else if (fromSerials->hasSerialNumber(sn))
+        toList.add(fromSerials->fileName(sn));
     }
 
     IString name(ui.GetFileName("TOLIST"));
@@ -337,8 +337,8 @@ void IsisMain() {
     out_stream.open(name.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
 
-    for (int f = 0; f < (int) toList.Size(); f++)
-      out_stream << toList.FileName(f) << std::endl;
+    for (int f = 0; f < (int) toList.size(); f++)
+      out_stream << toList.fileName(f) << std::endl;
 
     out_stream.close();
   }
@@ -368,14 +368,14 @@ void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
     ControlPoint *point = cnet.GetPoint(cp);
     ControlMeasure *cm = point->GetRefMeasure();
 
-    Cube *cube = manager.OpenCube(snl.FileName(cm->GetCubeSerialNumber()));
+    Cube *cube = manager.OpenCube(snl.fileName(cm->GetCubeSerialNumber()));
     try {
       cube->camera()->SetImage(cm->GetSample(), cm->GetLine());
       g_surfacePoints[point->GetId()] = cube->camera()->GetSurfacePoint();
     }
     catch (IException &e) {
       QString msg = "Unable to create camera for cube file [";
-      msg += snl.FileName(cm->GetCubeSerialNumber()) + "]";
+      msg += snl.fileName(cm->GetCubeSerialNumber()) + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     cube = NULL; //Do not delete, manager still has ownership

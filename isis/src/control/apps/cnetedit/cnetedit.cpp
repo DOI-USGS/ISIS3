@@ -611,7 +611,7 @@ void unlockCubes(ControlNet &cnet, SerialNumberList &snl) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
       QString serialNumber = measure->GetCubeSerialNumber();
-      if (measure->IsEditLocked() && snl.HasSerialNumber(serialNumber)) {
+      if (measure->IsEditLocked() && snl.hasSerialNumber(serialNumber)) {
         measure->SetEditLock(false);
       }
     }
@@ -651,7 +651,7 @@ void ignoreCubes(ControlNet &cnet, SerialNumberList &snl) {
 
       QString serialNumber = measure->GetCubeSerialNumber();
 
-      if (snl.HasSerialNumber(serialNumber)) {
+      if (snl.hasSerialNumber(serialNumber)) {
         QString cause = "Serial Number in CUBELIST";
         if (cm == point->IndexOfRefMeasure() && retainRef) {
           logResult(retainedReferences, point->GetId(), cause);
@@ -694,7 +694,7 @@ void lockCubes(ControlNet &cnet, SerialNumberList &snl) {
       ControlMeasure *measure = point->GetMeasure(cm);
 
       QString serialNumber = measure->GetCubeSerialNumber();
-      if (!measure->IsEditLocked() && snl.HasSerialNumber(serialNumber)) {
+      if (!measure->IsEditLocked() && snl.hasSerialNumber(serialNumber)) {
         measure->SetEditLock(true);
       }
     }
@@ -842,14 +842,14 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
     Cube *cube = NULL;
     Camera *camera = NULL;
     if (validator->IsCubeRequired()) {
-      if (!serialNumbers.HasSerialNumber(serialNumber)) {
+      if (!serialNumbers.hasSerialNumber(serialNumber)) {
         QString msg = "Serial Number [" + serialNumber + "] contains no ";
         msg += "matching cube in FROMLIST";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       cube = new Cube;
-      cube->open(serialNumbers.FileName(serialNumber));
+      cube->open(serialNumbers.fileName(serialNumber));
 
       if (validator->IsCameraRequired()) {
         try {

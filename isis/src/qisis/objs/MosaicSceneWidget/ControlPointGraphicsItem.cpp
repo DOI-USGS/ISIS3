@@ -323,9 +323,9 @@ namespace Isis {
           toolTip += "<br />";
         }
 
-        if (snList->HasSerialNumber(serialNum)) {
+        if (snList->hasSerialNumber(serialNum)) {
           toolTip +=
-              FileName(snList->FileName(serialNum)).name();
+              FileName(snList->fileName(serialNum)).name();
           toolTip += " (" + serialNum + ")";
         }
         else {

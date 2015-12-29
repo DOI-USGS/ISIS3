@@ -62,9 +62,9 @@ class Validation {
       m_test = test;
       m_pointId = registered->Parent()->GetId();
       m_heldId = FileName(
-          files->FileName(held->GetCubeSerialNumber())).baseName();
+          files->fileName(held->GetCubeSerialNumber())).baseName();
       m_registeredId = FileName(
-          files->FileName(registered->GetCubeSerialNumber())).baseName();
+          files->fileName(registered->GetCubeSerialNumber())).baseName();
 
       m_aprioriSample = registered->GetSample();
       m_aprioriLine = registered->GetLine();
@@ -392,7 +392,7 @@ void IsisMain() {
 
           QString pointId = outPoint->GetId();
 
-          QString fullName = files->FileName(cmTrans->GetCubeSerialNumber());
+          QString fullName = files->fileName(cmTrans->GetCubeSerialNumber());
           QString filename = FileName(fullName).baseName();
 
           QString measureType = cmTrans->MeasureTypeToString(
@@ -528,7 +528,7 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
     QString registerMeasures, bool outputFailed) {
 
   Cube &patternCube = *cubeMgr->OpenCube(
-      files->FileName(patternCM->GetCubeSerialNumber()));
+      files->fileName(patternCM->GetCubeSerialNumber()));
 
   ar->PatternChip()->TackCube(patternCM->GetSample(), patternCM->GetLine());
   ar->PatternChip()->Load(patternCube);
@@ -554,9 +554,9 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
       else if (!measure->IsMeasured() || registerMeasures != "CANDIDATES") {
 
         // refresh pattern cube pointer to ensure it stays valid
-        Cube &patternCube = *cubeMgr->OpenCube(files->FileName(
+        Cube &patternCube = *cubeMgr->OpenCube(files->fileName(
               patternCM->GetCubeSerialNumber()));
-        Cube &searchCube = *cubeMgr->OpenCube(files->FileName(
+        Cube &searchCube = *cubeMgr->OpenCube(files->fileName(
               measure->GetCubeSerialNumber()));
 
         ar->SearchChip()->TackCube(measure->GetSample(), measure->GetLine());
@@ -725,9 +725,9 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
   Validation validation(
       "Back-Registration", measure, reference, shiftTolerance);
 
-  Cube &patternCube = *cubeMgr->OpenCube(files->FileName(
+  Cube &patternCube = *cubeMgr->OpenCube(files->fileName(
         measure->GetCubeSerialNumber()));
-  Cube &searchCube = *cubeMgr->OpenCube(files->FileName(
+  Cube &searchCube = *cubeMgr->OpenCube(files->fileName(
         reference->GetCubeSerialNumber()));
 
   double patternRes = getResolution(patternCube, *measure);

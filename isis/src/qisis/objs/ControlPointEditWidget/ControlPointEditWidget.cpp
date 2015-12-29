@@ -794,7 +794,7 @@ namespace Isis {
         if (response == QMessageBox::Yes) {
           //  Update measure file combo boxes:  old reference normal font,
           //    new reference bold font
-          QString file = m_serialNumberList->FileName(m_leftMeasure->GetCubeSerialNumber());
+          QString file = m_serialNumberList->fileName(m_leftMeasure->GetCubeSerialNumber());
           QString fname = FileName(file).name();
           int iref = m_leftCombo->findText(fname);
 
@@ -804,7 +804,7 @@ namespace Isis {
           iref = m_rightCombo->findText(fname);
           m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
-          file = m_serialNumberList->FileName(refMeasure->GetCubeSerialNumber());
+          file = m_serialNumberList->fileName(refMeasure->GetCubeSerialNumber());
           fname = FileName(file).name();
           iref = m_leftCombo->findText(fname);
           m_leftCombo->setItemData(iref,font,Qt::FontRole);
@@ -856,7 +856,7 @@ namespace Isis {
       if (response == QMessageBox::Yes) {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
-        QString file = m_serialNumberList->FileName(m_leftMeasure->GetCubeSerialNumber());
+        QString file = m_serialNumberList->fileName(m_leftMeasure->GetCubeSerialNumber());
         QString fname = FileName(file).name();
         int iref = m_leftCombo->findText(fname);
 
@@ -866,7 +866,7 @@ namespace Isis {
         iref = m_rightCombo->findText(fname);
         m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
-        file = m_serialNumberList->FileName(refMeasure->GetCubeSerialNumber());
+        file = m_serialNumberList->fileName(refMeasure->GetCubeSerialNumber());
         fname = FileName(file).name();
         iref = m_leftCombo->findText(fname);
         m_leftCombo->setItemData(iref,font,Qt::FontRole);
@@ -1254,7 +1254,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      QString file = m_serialNumberList->FileName(m.GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
       m_leftCombo->addItem(tempFileName);
@@ -1345,7 +1345,7 @@ namespace Isis {
       int column = 0;
       ControlMeasure &m = *(*m_editPoint)[row];
 
-      QString file = m_serialNumberList->FileName(m.GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
       m_measureTable->setItem(row,column++,tableItem);
 
@@ -1539,7 +1539,7 @@ namespace Isis {
 
     QString serial;
     try {
-      serial = m_serialNumberList->SerialNumber(file);
+      serial = m_serialNumberList->serialNumber(file);
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
@@ -1548,7 +1548,7 @@ namespace Isis {
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      QString file = m_serialNumberList->FileName(m_leftMeasure->GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(m_leftMeasure->GetCubeSerialNumber());
       int i = m_leftCombo->findText(FileName(file).name());
       if (i < 0) i = 0;
       m_leftCombo->setCurrentIndex(i);
@@ -1593,7 +1593,7 @@ namespace Isis {
 
     QString serial;
     try {
-      serial = m_serialNumberList->SerialNumber(file);
+      serial = m_serialNumberList->serialNumber(file);
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
@@ -1602,7 +1602,7 @@ namespace Isis {
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      QString file = m_serialNumberList->FileName(m_rightMeasure->GetCubeSerialNumber());
+      QString file = m_serialNumberList->fileName(m_rightMeasure->GetCubeSerialNumber());
       int i = m_rightCombo->findText(FileName(file).name());
       if (i < 0) i = 0;
       m_rightCombo->setCurrentIndex(i);
