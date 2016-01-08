@@ -75,6 +75,9 @@ namespace Isis {
    *                          undefined slot behavior. References #2210.
    *  @history 2015-06-19 Makayla Shepherd - Added distorted Focal Plane and undistorted 
    *                          Focal Plane to the table. References #1953.
+   *  @history 2015-12-21 Makayla Shepherd - Changed the ordering of the enum to match the order
+   *                          of when the columns are added, in order to fix the incidence and 
+   *                          emission angle columns from reporting incorrect numbers. Fixes #2381.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -141,11 +144,6 @@ namespace Isis {
         DECLINATION,            //!< The declination for this point
         RESOLUTION,             //!< The resoultion for this point
         PHASE,                  //!< The phase for this point
-        DISTORTED_FOCAL_X,      //!< The x of the distorted focal plane
-        DISTORTED_FOCAL_Y,      //!< The y of the distorted focal plane
-        UNDISTORTED_FOCAL_X,    //!< The x of the undistorted focal plane
-        UNDISTORTED_FOCAL_Y,    //!< The y of the undistorted focal plane
-        UNDISTORTED_FOCAL_Z,    //!< The z of the undistorted focal plane
         INCIDENCE,              //!< The incidence for this point
         EMISSION,               //!< The emission for this point
         LOCAL_INCIDENCE,        //!< The local incidence for this point
@@ -158,6 +156,11 @@ namespace Isis {
         SPACECRAFT_Z,           //!< The spacecraft z position for this cube
         SPACECRAFT_AZIMUTH,     //!< The spacecraft azimuth for this cube
         SLANT,                  //!< The slant for this cube
+        DISTORTED_FOCAL_X,      //!< The x of the distorted focal plane
+        DISTORTED_FOCAL_Y,      //!< The y of the distorted focal plane
+        UNDISTORTED_FOCAL_X,    //!< The x of the undistorted focal plane
+        UNDISTORTED_FOCAL_Y,    //!< The y of the undistorted focal plane
+        UNDISTORTED_FOCAL_Z,    //!< The z of the undistorted focal plane
         EPHEMERIS_TIME,         //!< The ephemeris time for this cube
         SOLAR_TIME,             //!< The local solar time for this cube
         UTC,                    //!< The UTC for this cube
