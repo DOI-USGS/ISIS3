@@ -54,7 +54,18 @@ namespace Isis {
   ProjectItemModel::~ProjectItemModel() {
 
   }
+
   
+  /**
+   *
+   */
+  bool ProjectItemModel::canDropMimeData(const QMimeData *data,
+                                         Qt::DropAction action,
+                                         int row, int column,
+                                         const QModelIndex &parent) const {
+    return false;
+  }
+
   
   /**
    * Returns the internal selection model.

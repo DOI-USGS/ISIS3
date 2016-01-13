@@ -27,6 +27,8 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 
+#include <QMimeData>
+
 namespace Isis {
   /**
    * Constructs the proxy model.
@@ -106,7 +108,8 @@ namespace Isis {
 
 
   /**
-   * Returns a QItemSelection of items in the source model that corresponds with a QItemSelection of itesm in the proxy model.
+   * Returns a QItemSelection of items in the source model that
+   * corresponds with a QItemSelection of itesm in the proxy model.
    *
    * @param[in] proxySelection (const QItemSelection &) The selection of items
    *                                                    in the proxy model.
@@ -141,7 +144,8 @@ namespace Isis {
 
 
   /**
-   * Returns the ProjectItem in the source model that corresponds with a ProjectItem in the source model.
+   * Returns the ProjectItem in the source model that corresponds with
+   * a ProjectItem in the source model.
    *
    * @param[in] proxyItem (ProjectItem *) The item in the proxy model.
    *
@@ -396,5 +400,31 @@ namespace Isis {
    */
   void ProjectItemProxyModel::onItemChanged(QStandardItem *item) {
     updateItem( static_cast<ProjectItem *>(item) );
+  }
+
+
+  /**
+   *
+   */
+  bool ProjectItemProxyModel::canDropMimeData(const QMimeData *data,
+                                           Qt::DropAction action,
+                                           int row, int column,
+                                           const QModelIndex & parent) const {
+    return true;
+  }
+
+  
+  /**
+   *
+   */
+  bool ProjectItemProxyModel::dropMimeData(const QMimeData *data,
+                                           Qt::DropAction action,
+                                           int row, int column,
+                                           const QModelIndex & parent) {
+    if ( data->hasFormat("application/x-qabstractitemmodeldatalist") ) {
+      addItems( sourceModel()->selectedItems() );
+      return true;
+    }
+    return false;
   }
 }

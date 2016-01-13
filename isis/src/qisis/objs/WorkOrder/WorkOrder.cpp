@@ -230,8 +230,22 @@ namespace Isis {
     else if ( item->isImageList() ) {
       return isExecutable( item->imageList() );
     }
+    else if ( item->isImage() ) {
+      ImageList *imageList = new ImageList();
+      imageList->append( item->image() );
+      bool ret = isExecutable(imageList);
+      imageList->deleteLater();
+      return ret;
+    }
     else if ( item->isControlList() ) {
       return isExecutable( item->controlList() ) || isExecutable( *item->controlList() );
+    }
+    else if ( item->isControl() ) {
+      ControlList *controlList = new ControlList();
+      controlList->append( item->control() );
+      bool ret = isExecutable(controlList);
+      controlList->deleteLater();
+      return ret;
     }
     else if ( item->isCorrelationMatrix() ) {
       return isExecutable( item->correlationMatrix() );
@@ -431,9 +445,20 @@ namespace Isis {
     else if ( item->isImageList() ) {
       setData( item->imageList() );
     }
+    else if ( item->isImage() ) {
+      ImageList *imageList = new ImageList(this);
+      imageList->append( item->image() );
+      setData(imageList);
+    }
     else if ( item->isControlList() ) {
       setData( item->controlList() );
       setData( *item->controlList() );
+    }
+    else if ( item->isControl() ) {
+      ControlList *controlList = new ControlList(this);
+      controlList->append( item->control() );
+      setData(controlList);
+      setData(*controlList);
     }
     else if ( item->isCorrelationMatrix() ) {
       setData( item->correlationMatrix() );

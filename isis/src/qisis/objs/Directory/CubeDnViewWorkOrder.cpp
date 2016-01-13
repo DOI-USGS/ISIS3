@@ -20,7 +20,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "Footprint2DViewWorkOrder.h"
+#include "CubeDnViewWorkOrder.h"
 
 #include <QtDebug>
 
@@ -28,62 +28,54 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
+#include "CubeDnView.h"
 #include "Directory.h"
-#include "Footprint2DView.h"
-#include "MosaicSceneItem.h"
-#include "MosaicSceneWidget.h"
+#include "MdiCubeViewport.h"
 #include "Project.h"
+#include "Workspace.h"
 
 namespace Isis {
 
-  Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(Project *project) :
+  CubeDnViewWorkOrder::CubeDnViewWorkOrder(Project *project) :
       WorkOrder(project) {
-    QAction::setText(tr("View &Footprints..."));
+    QAction::setText(tr("View Raw &Cubes..."));
   }
 
 
-  Footprint2DViewWorkOrder::Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other) :
+  CubeDnViewWorkOrder::CubeDnViewWorkOrder(const CubeDnViewWorkOrder &other) :
       WorkOrder(other) {
   }
 
 
-  Footprint2DViewWorkOrder::~Footprint2DViewWorkOrder() {
+  CubeDnViewWorkOrder::~CubeDnViewWorkOrder() {
   }
 
 
-  Footprint2DViewWorkOrder *Footprint2DViewWorkOrder::clone() const {
-
-    return new Footprint2DViewWorkOrder(*this);
-
+  CubeDnViewWorkOrder *CubeDnViewWorkOrder::clone() const {
+    return new CubeDnViewWorkOrder(*this);
   }
 
 
-  bool Footprint2DViewWorkOrder::isExecutable(ImageList *images) {
-    bool result = false;
-
-    foreach (Image *image, *images) {
-      result = result || image->isFootprintable();
-    }
-
-    return result;
+  bool CubeDnViewWorkOrder::isExecutable(ImageList *images) {
+    return (images->count() > 0 && images->count() < 50);
   }
 
 
-  bool Footprint2DViewWorkOrder::execute() {
+  bool CubeDnViewWorkOrder::execute() {
     bool success = WorkOrder::execute();
     return success;
   }
 
 
-  bool Footprint2DViewWorkOrder::dependsOn(WorkOrder *other) const {
+  bool CubeDnViewWorkOrder::dependsOn(WorkOrder *other) const {
     // depend on types of ourselves.
-    return dynamic_cast<Footprint2DViewWorkOrder *>(other);
+    return dynamic_cast<CubeDnViewWorkOrder *>(other);
   }
 
 
-  void Footprint2DViewWorkOrder::syncRedo() {
+  void CubeDnViewWorkOrder::syncRedo() {
     ProjectItem *currentItem = project()->directory()->model()->currentItem();
-    Footprint2DView *view = project()->directory()->addFootprint2DView();
+    CubeDnView *view = project()->directory()->addCubeDnView();
     view->addItem( currentItem );
   }
 }

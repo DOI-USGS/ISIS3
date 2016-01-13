@@ -46,8 +46,10 @@ namespace Isis {
   class ControlNet;
   class ControlNetEditor;
   class ControlPointEditWidget;
+  class CubeDnView;
   class HistoryTreeWidget;
   class ImageFileListWidget;
+  class Footprint2DView;
   class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
@@ -88,6 +90,8 @@ namespace Isis {
    *   @history 2015-10-05 Jeffrey Covington - Added a ProjectItemModel and the
    *                           addProjectItemTreeView() method to start
    *                           supporting Qt's model-view framework.
+   *   @history 2016-01-04 Jeffrey Covington - Added support for CubeDnView and
+   *                           Footprint2DView, replacing old classes.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -98,17 +102,12 @@ namespace Isis {
       void populateMainMenu(QMenuBar *);
       void setHistoryContainer(QDockWidget *historyContainer);
       void setWarningContainer(QDockWidget *warningContainer);
-
-// <<<<<<< .mine
-// =======
-      // TODO
       void setRecentProjectsList(QStringList recentProjects);
       QStringList recentProjectsList();
 
-// >>>>>>> .r5959
       CnetEditorWidget *addCnetEditorView(Control *network);
-      Workspace *addCubeDnView();
-      MosaicSceneWidget *addFootprint2DView();
+      CubeDnView *addCubeDnView();
+      Footprint2DView *addFootprint2DView();
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
@@ -122,9 +121,20 @@ namespace Isis {
 
       Project *project() const;
 
+      QList<QAction *> fileMenuActions();
+      QList<QAction *> projectMenuActions();
+      QList<QAction *> editMenuActions();
+      QList<QAction *> viewMenuActions();
+      QList<QAction *> settingsMenuActions();
+      QList<QAction *> helpMenuActions();
+
+      QList<QAction *> permToolBarActions();
+      QList<QAction *> activeToolBarActions();
+      QList<QAction *> toolPadActions();
+      
       QList<CnetEditorWidget *> cnetEditorViews();
-      QList<Workspace *> cubeDnViews();
-      QList<MosaicSceneWidget *> footprint2DViews();
+      QList<CubeDnView *> cubeDnViews();
+      QList<Footprint2DView *> footprint2DViews();
       QList<MatrixSceneWidget *> matrixViews();
       QList<SensorInfoWidget *> sensorInfoViews();
       QList<TargetInfoWidget *> targetInfoViews();
@@ -137,18 +147,18 @@ namespace Isis {
       QList<QAction *> supportedActions(DataType data) {
         QList<QAction *> results;
 
-        QList< QPair< QString, QList<QAction *> > > actionPairings;
+        //QList< QPair< QString, QList<QAction *> > > actionPairings;
 
-        foreach (MosaicSceneWidget *footprint2DView, m_footprint2DViewWidgets) {
-          actionPairings.append(
-              qMakePair(footprint2DView->windowTitle(), footprint2DView->supportedActions(data)));
-        }
+        //foreach (MosaicSceneWidget *footprint2DView, m_footprint2DViewWidgets) {
+        //  actionPairings.append(
+        //      qMakePair(footprint2DView->windowTitle(), footprint2DView->supportedActions(data)));
+        //}
 
-        results.append(restructureActions(actionPairings));
+        //results.append(restructureActions(actionPairings));
 
-        if (!results.isEmpty()) {
-          results.append(NULL);
-        }
+        //if (!results.isEmpty()) {
+        //  results.append(NULL);
+        //}
         //qDebug()<<"Directory.h::supportedActions  #workorders = "<<m_workOrders.size();
         foreach (WorkOrder *workOrder, m_workOrders) {
           if (workOrder->isExecutable(data)) {
@@ -177,9 +187,7 @@ namespace Isis {
       void save(QXmlStreamWriter &stream, FileName newProjectRoot) const;
 
     signals:
-      void newWidgetAvailable(QWidget *newWidget, Qt::DockWidgetArea area,
-                              Qt::Orientation orientation,
-                              Qt::DockWidgetArea allowedAreas=Qt::AllDockWidgetAreas);
+      void newWidgetAvailable(QWidget *newWidget);
 
     public slots:
       void cleanupCnetEditorViewWidgets();
@@ -239,6 +247,8 @@ namespace Isis {
       static QList<QAction *> restructureActions(QList< QPair< QString, QList<QAction *> > >);
       static bool actionTextLessThan(QAction *lhs, QAction *rhs);
 
+      void initializeActions(); 
+      
       QPointer<ProjectItemModel> m_projectItemModel;
 
       QPointer<ProjectTreeWidget> m_projectTreeWidget;
@@ -247,9 +257,9 @@ namespace Isis {
       QPointer<WarningTreeWidget> m_warningTreeWidget;
 
       QList< QPointer<CnetEditorWidget> > m_cnetEditorViewWidgets;
-      QList< QPointer<Workspace> > m_cubeDnViewWidgets;
+      QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;
-      QList< QPointer<MosaicSceneWidget> > m_footprint2DViewWidgets;
+      QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets;
       QPointer<ControlPointEditWidget> m_controlPointEditWidget;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets;
       QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets;
@@ -278,6 +288,17 @@ namespace Isis {
       ////////// TODO: This is test code. It will be deleted.
 //    void testControlNetEditor();
       QPointer<ControlNetEditor> m_cnetEditor;
+
+      QList<QAction *> m_fileMenuActions;
+      QList<QAction *> m_projectMenuActions;
+      QList<QAction *> m_editMenuActions;
+      QList<QAction *> m_viewMenuActions;
+      QList<QAction *> m_settingsMenuActions;
+      QList<QAction *> m_helpMenuActions;
+
+      QList<QAction *> m_permToolBarActions;
+      QList<QAction *> m_activeToolBarActions;
+      QList<QAction *> m_toolPadActions;
   };
 }
 

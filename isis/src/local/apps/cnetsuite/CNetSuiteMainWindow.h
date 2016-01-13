@@ -26,14 +26,18 @@
 #include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
+#include <QMdiSubWindow>
 
 namespace Isis {
+  class AbstractProjectItemView;
   class Directory;
   class Project;
 
   /**
+   * The main window for the cnetsuite appication. This handles most of the top-level GUI aspects of the program.
+   *
    * @author 2012-??-?? Steven Lambright and Stuart Sides
-   * 
+   *
    * @internal
    *   @history 2012-07-27 Kimberly Oyama and Steven Lambright - Removed progress and warnings
    *                           tab widgets. They are now dock widgets.
@@ -50,6 +54,14 @@ namespace Isis {
    *                          with a ProjectItemTreeView. Added the
    *                          eventFilter() method for intercepting some
    *                          events from views.
+   *   @history 2016-01-04 Jeffrey Covington - Added a QMdiArea as the central widget
+   *                          of the main window. The menus and toolbars are now solely
+   *                          handled by the main window. Menus, context menus, and
+   *                          toolbars are populated with actions recieved from the Directory
+   *                          the active view, and the main window. Both WorkOrders and
+   *                          regular QActions can be used in menus and toolbars. Views can
+   *                          now be detached from the main window into their own independent
+   *                          window with internalized menus and toolbars.
    */
   class CNetSuiteMainWindow : public QMainWindow {
       Q_OBJECT
@@ -58,8 +70,10 @@ namespace Isis {
       ~CNetSuiteMainWindow();
 
     public slots:
-      void addDock(QWidget *newWidgetForDock, Qt::DockWidgetArea area, Qt::Orientation orientation,
-                   Qt::DockWidgetArea allowedAreas = Qt::AllDockWidgetAreas);
+      void addView(QWidget *newWidget);
+      void setActiveView(AbstractProjectItemView *view);
+      void updateMenuActions();
+      void updateToolBarActions();
       void readSettings(Project *);
 
     protected:
@@ -69,7 +83,14 @@ namespace Isis {
     private slots:
       void configureThreadLimit();
       void enterWhatsThisMode();
-      void removeCentralWidgetTab(int);
+      void onSubWindowActivated(QMdiSubWindow *);
+
+      void toggleViewMode();
+      void setTabbedViewMode();
+      void setSubWindowViewMode();
+
+      void detachActiveView();
+      void reattachView();
 
     private:
       Q_DISABLE_COPY(CNetSuiteMainWindow);
@@ -77,6 +98,8 @@ namespace Isis {
       void applyMaxThreadCount();
       void createMenus();
       void writeSettings();
+
+      void initializeActions();
 
     private:
       /**
@@ -94,6 +117,33 @@ namespace Isis {
        *   should perform a best-guess for best perfomance.
        */
       int m_maxThreadCount;
+
+      QToolBar *m_permToolBar; //!< The toolbar for actions that rarely need to be changed.
+      QToolBar *m_activeToolBar; //<! The toolbar for the actions of the current tool.
+      QToolBar *m_toolPad; //<! The toolbar for the actions that activate tools.
+
+      QMenu *m_fileMenu; //!< Menu for the file actions
+      QMenu *m_projectMenu; //!< Menu for the project actions
+      QMenu *m_editMenu; //!< Menu for edit actions
+      QMenu *m_viewMenu; //!< Menu for view and window actions
+      QMenu *m_settingsMenu; //!< Menu for settings actions
+      QMenu *m_helpMenu; //!< Menu for help actions
+
+      QList<QAction *> m_fileMenuActions; //!< Internal list of file actions
+      QList<QAction *> m_projectMenuActions;//!< Internal list of project actions
+      QList<QAction *> m_editMenuActions;//!< Internal list of edit actions
+      QList<QAction *> m_viewMenuActions;//!< Internal list of view actions
+      QList<QAction *> m_settingsMenuActions;//!< Internal list of settings actions
+      QList<QAction *> m_helpMenuActions;//!< Internal list of help actions
+
+      QList<QAction *> m_permToolBarActions;//!< Internal list of permanent toolbar actions
+      QList<QAction *> m_activeToolBarActions;//!< Internal list of active toolbar actions
+      QList<QAction *> m_toolPadActions;//!< Internal list of toolpad actions
+
+      QAction *m_cascadeViewsAction; //!< Action that cascades the mdi area
+      QAction *m_tileViewsAction; //!< Action that tiles the mdi area
+
+      AbstractProjectItemView *m_activeView; //!< The active view
   };
 }
 

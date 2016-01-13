@@ -93,6 +93,7 @@ namespace Isis {
    *   @history 2015-10-05 Jeffrey Covington - Added support for ProjectItem.
    *                           Added new methods to support the types used by
    *                           ProjectItem. Marked old methods as deprecated.
+   *   @history 2016-01-04 Jeffrey Covington - Improved support for ProjectItem.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT

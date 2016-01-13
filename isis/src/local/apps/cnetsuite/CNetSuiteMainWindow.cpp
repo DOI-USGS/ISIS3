@@ -26,6 +26,7 @@
 #include <QSettings>
 #include <QTreeView>
 
+#include "AbstractProjectItemView.h"
 #include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
@@ -36,6 +37,7 @@
 #include "ProjectItemModel.h"
 #include "ProjectItemTreeView.h"
 #include "ProjectTreeWidget.h"
+#include "SensorInfoWidget.h"
 #include "TargetInfoWidget.h"
 
 namespace Isis {
@@ -48,38 +50,21 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-    QWidget *centralWidget = new QWidget;
-//  centralWidget->hide();
-//  QTabWidget *centralWidget = new QTabWidget;
-//  centralWidget->setTabsClosable(true);
-//  centralWidget->setMovable(true);
+    QMdiArea *centralWidget = new QMdiArea;
+    centralWidget->setActivationOrder(QMdiArea::StackingOrder);
 
-
-//  connect(centralWidget, SIGNAL(tabCloseRequested(int)),
-//          this, SLOT(removeCentralWidgetTab(int)));
+    connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
+            this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
 
     setCentralWidget(centralWidget);
-
-    // TLS 2013-07-23 Comment out to see if the behaviour improves
     setDockNestingEnabled(true);
 
     try {
-      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before create Directory";
       m_directory = new Directory(this);
-      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  after create Directory";
-//      connect(m_directory,
-//              SIGNAL(newWidgetAvailable(QWidget *, Qt::DockWidgetArea, Qt::Orientation)),
-//              this, SLOT(addDock(QWidget *, Qt::DockWidgetArea, Qt::Orientation)));
-      connect(m_directory,
-              SIGNAL(newWidgetAvailable(QWidget *, Qt::DockWidgetArea, Qt::Orientation,
-                                        Qt::DockWidgetArea)),
-              this, SLOT(addDock(QWidget *, Qt::DockWidgetArea, Qt::Orientation,
-                                 Qt::DockWidgetArea)));
-      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow before projectLoaded connection";
+      connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
+              this, SLOT( addView(QWidget *) ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
-      //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow after projectLoaded connection";
-//    connect(m_directory->project(), SIGNAL(restoreWindow(
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
@@ -95,20 +80,18 @@ namespace Isis {
       m_directory->project()->open(args.last());
     }
 
-    //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before createMenus";
-    createMenus();
-
-    //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  before docks";
-//    QDockWidget *projectDock = new QDockWidget("Project", this, Qt::SubWindow);
     m_projectDock = new QDockWidget("Project", this, Qt::SubWindow);
     m_projectDock->setObjectName("projectDock");
     m_projectDock->setFeatures(QDockWidget::DockWidgetMovable |
                               QDockWidget::DockWidgetFloatable);
-    //m_projectDock->setWidget(m_directory->projectTreeWidget());
+    m_projectDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
     ProjectItemTreeView *projectTreeView = m_directory->addProjectItemTreeView();
-    projectTreeView->setSourceModel( m_directory->model() );
+    projectTreeView->setInternalModel( m_directory->model() );
+    projectTreeView->treeView()->expandAll();
     projectTreeView->installEventFilter(this);
     m_projectDock->setWidget(projectTreeView);
+
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
     QDockWidget *warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
@@ -118,6 +101,7 @@ namespace Isis {
                          QDockWidget::DockWidgetFloatable);
     warningsDock->setWhatsThis(tr("This shows notices and warnings from all operations "
                           "on the current project."));
+    warningsDock->setAllowedAreas(Qt::BottomDockWidgetArea);
     m_directory->setWarningContainer(warningsDock);
     addDockWidget(Qt::BottomDockWidgetArea, warningsDock);
 
@@ -127,6 +111,7 @@ namespace Isis {
                          QDockWidget::DockWidgetMovable |
                          QDockWidget::DockWidgetFloatable);
     historyDock->setWhatsThis(tr("This shows all operations performed on the current project."));
+    historyDock->setAllowedAreas(Qt::BottomDockWidgetArea);
     addDockWidget(Qt::BottomDockWidgetArea, historyDock);
     m_directory->setHistoryContainer(historyDock);
     tabifyDockWidget(warningsDock, historyDock);
@@ -136,14 +121,22 @@ namespace Isis {
     progressDock->setFeatures(QDockWidget::DockWidgetClosable |
                          QDockWidget::DockWidgetMovable |
                          QDockWidget::DockWidgetFloatable);
+    progressDock->setAllowedAreas(Qt::BottomDockWidgetArea);
     //m_directory->setProgressContainer(progressDock);
     addDockWidget(Qt::BottomDockWidgetArea, progressDock);
     tabifyDockWidget(historyDock, progressDock);
 
     warningsDock->raise();
-    //qDebug()<<"CNetSuiteMainWindow::CNetSuiteMainWindow  after docks";
+
 
 //  readSettings();
+
+    resize(800, 600);
+    setTabPosition(Qt::TopDockWidgetArea, QTabWidget::North);
+    setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
+    setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
+    setCorner(Qt::BottomRightCorner, Qt::BottomDockWidgetArea);
 
     statusBar()->showMessage("Ready");
     statusBar()->addWidget(m_directory->project()->progress());
@@ -151,41 +144,43 @@ namespace Isis {
     foreach (QProgressBar *progressBar, m_directory->progressBars()) {
       statusBar()->addWidget(progressBar);
     }
-    
+
+    createMenus();
+    initializeActions();
+    updateMenuActions();
+
+    m_permToolBar = new QToolBar(this);
+    m_activeToolBar = new QToolBar(this);
+    m_toolPad = new QToolBar(this);
+
+    addToolBar(m_permToolBar);
+    addToolBar(m_activeToolBar);
+    addToolBar(m_toolPad);
+    updateToolBarActions();
+
+    setTabbedViewMode();
+    centralWidget->setTabsMovable(true);
+    centralWidget->setTabsClosable(true);
   }
 
 
-  void CNetSuiteMainWindow::addDock(QWidget *newWidgetForDock, Qt::DockWidgetArea area,
-                                    Qt::Orientation orientation,
-                                    Qt::DockWidgetArea allowedAreas) {
-
-    QDockWidget *dock = new QDockWidget(newWidgetForDock->windowTitle());
-
-    dock->setWidget(newWidgetForDock);
-
-    //qDebug()<<"CNetSuiteMainWindow::addDock objectName = "<<newWidgetForDock->objectName();
-    dock->setObjectName(newWidgetForDock->objectName());
-
-    // This needs to eventually be a work order...
-    dock->setAttribute(Qt::WA_DeleteOnClose);
-
-//    dock->setAllowedAreas(allowedAreas);
-
-
-    // TODO ken testing
-    dock->setMinimumWidth(newWidgetForDock->minimumWidth());
-
-    splitDockWidget(m_projectDock, dock, Qt::Vertical);
-
-
-    //dock->setMaximumWidth(newWidgetForDock->maximumWidth());
-    // TODO ken testing
-
-
-    connect(newWidgetForDock, SIGNAL(destroyed(QObject *)),
-            dock, SLOT(deleteLater()));
-
-    //addDockWidget(area, dock, orientation);
+  /**
+   * 
+   *
+   * @param[in] newWidget (QWidget *)
+   */
+  void CNetSuiteMainWindow::addView(QWidget *newWidget) {
+    if ( qobject_cast<SensorInfoWidget *>(newWidget) || qobject_cast<TargetInfoWidget *>(newWidget) ) {
+      QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
+      dock->setWidget(newWidget);
+      splitDockWidget(m_projectDock, dock, Qt::Vertical);
+    }
+    else {
+      if ( QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() ) ) {
+        mdiArea->addSubWindow(newWidget);
+        newWidget->show();
+      }
+    }
   }
 
 
@@ -193,34 +188,181 @@ namespace Isis {
    * Cleans up the directory.
    */
   CNetSuiteMainWindow::~CNetSuiteMainWindow() {
-    delete m_directory;
+    m_directory->deleteLater();
   }
 
+
   /**
-   * Filters out context menu events from views so they can be handled
-   * by the main window.
+   * Sets the active view and updates the toolbars and menus.
+   *
+   * @param[in] view (AbstractProjectItemView *) The active view.
+   */
+  void CNetSuiteMainWindow::setActiveView(AbstractProjectItemView *view) {
+    m_activeView = view;
+    updateMenuActions();
+    updateToolBarActions();
+  }
+
+
+  /**
+   * Clears all the menus, then populates the menus with QActions from
+   * several sources. The QActions come from an internal list of
+   * QActions, the Directory, and the active view.
+   */
+  void CNetSuiteMainWindow::updateMenuActions() {
+
+    m_fileMenu->clear();
+    foreach ( QAction *action, m_directory->fileMenuActions() ) {
+      m_fileMenu->addAction(action);
+    }
+    m_fileMenu->addSeparator();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->fileMenuActions() ) {
+        m_fileMenu->addAction(action);
+      }
+    }
+    m_fileMenu->addSeparator();
+    foreach ( QAction *action, m_fileMenuActions ) {
+      m_fileMenu->addAction(action);
+    }
+
+    m_projectMenu->clear();
+    foreach ( QAction *action, m_directory->projectMenuActions() ) {
+      m_projectMenu->addAction(action);
+    }
+    m_projectMenu->addSeparator();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->projectMenuActions() ) {
+        m_projectMenu->addAction(action);
+      }
+    }
+    m_projectMenu->addSeparator();
+    foreach ( QAction *action, m_projectMenuActions ) {
+      m_projectMenu->addAction(action);
+    }
+
+    m_editMenu->clear();
+    foreach ( QAction *action, m_directory->editMenuActions() ) {
+      m_editMenu->addAction(action);
+    }
+    m_editMenu->addSeparator();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->editMenuActions() ) {
+        m_editMenu->addAction(action);
+      }
+    }
+    m_editMenu->addSeparator();
+    foreach ( QAction *action, m_editMenuActions ) {
+      m_editMenu->addAction(action);
+    }
+
+    m_viewMenu->clear();
+    foreach ( QAction *action, m_directory->viewMenuActions() ) {
+      m_viewMenu->addAction(action);
+    }
+    m_viewMenu->addSeparator();
+    foreach ( QAction *action, m_viewMenuActions ) {
+      m_viewMenu->addAction(action);
+    }
+    m_viewMenu->addSeparator();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->viewMenuActions() ) {
+        m_viewMenu->addAction(action);
+      }
+    }
+
+    m_settingsMenu->clear();
+    foreach ( QAction *action, m_directory->settingsMenuActions() ) {
+      m_settingsMenu->addAction(action);
+    }
+    m_settingsMenu->addSeparator();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->settingsMenuActions() ) {
+        m_settingsMenu->addAction(action);
+      }
+    }
+    m_settingsMenu->addSeparator();
+    foreach ( QAction *action, m_settingsMenuActions ) {
+      m_settingsMenu->addAction(action);
+    }
+
+    m_helpMenu->clear();
+    foreach ( QAction *action, m_directory->helpMenuActions() ) {
+      m_helpMenu->addAction(action);
+    }
+    m_helpMenu->addSeparator();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->helpMenuActions() ) {
+        m_helpMenu->addAction(action);
+      }
+    }
+    m_helpMenu->addSeparator();
+    foreach ( QAction *action, m_helpMenuActions ) {
+      m_helpMenu->addAction(action);
+    }
+  }
+
+
+  /**
+   * Clears the tool bars and repopulates them with QActions from
+   * several sources. Actions are taken from an internal list of
+   * QActions, the Directory, and the active view.
+   */
+  void CNetSuiteMainWindow::updateToolBarActions() {
+    m_permToolBar->clear();
+    foreach( QAction *action, m_directory->permToolBarActions() ) {
+      m_permToolBar->addAction(action);
+    }
+    foreach(QAction *action, m_permToolBarActions) {
+      m_permToolBar->addAction(action);
+    }
+    m_permToolBar->addSeparator();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->permToolBarActions() ) {
+        m_permToolBar->addAction(action);
+      }
+    }
+
+    m_activeToolBar->clear();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->activeToolBarActions() ) {
+        m_activeToolBar->addAction(action);
+      }
+    }
+
+    m_toolPad->clear();
+    if (m_activeView) {
+      foreach ( QAction *action, m_activeView->toolPadActions() ) {
+        m_toolPad->addAction(action);
+      }
+    }
+  }
+
+
+  /**
+   * Filters out events from views so they can be handled by the main
+   * window. Filters out DragEnter Drop and ContextMenu events from
+   * views.
    *
    * @param[in] watched (QObject *) The object being filtered.
    * @param[in] event (QEvent *) The event that may be filtered.
    */
   bool CNetSuiteMainWindow::eventFilter(QObject *watched, QEvent *event) {
-    if (event->type() == QEvent::DragEnter) {
-      return true;
-    }
-    else if (event->type() == QEvent::Drop) {
-      return true;
-    }
-    else if (event->type() == QEvent::ContextMenu) {
-
-      AbstractProjectItemView *view = qobject_cast<AbstractProjectItemView *>(watched);
-      if (view) {
+    if ( AbstractProjectItemView *view = qobject_cast<AbstractProjectItemView *>(watched) ) {
+      if (event->type() == QEvent::DragEnter) {
+        return true;
+      }
+      else if (event->type() == QEvent::Drop) {
+        return true;
+      }
+      else if (event->type() == QEvent::ContextMenu) {
         QMenu contextMenu;
 
         QList<QAction *> viewActions = view->contextMenuActions();
 
         if ( !viewActions.isEmpty() ) {
           foreach (QAction *action, viewActions) {
-            if (!action) {
+            if (action) {
               contextMenu.addAction(action);
             }
             else {
@@ -239,19 +381,19 @@ namespace Isis {
           contextMenu.addSeparator();
         }
 
-        contextMenu.exec( static_cast<QContextMenuEvent *>(event)->globalPos() ); 
+        contextMenu.exec( static_cast<QContextMenuEvent *>(event)->globalPos() );
 
         return true;
       }
     }
-
+ 
     return QMainWindow::eventFilter(watched, event);
   }
 
 
-
   /**
-   * This method takes the max thread count setting and asks QtConcurrent to respect it.
+   * This method takes the max thread count setting and asks
+   * QtConcurrent to respect it.
    */
   void CNetSuiteMainWindow::applyMaxThreadCount() {
     if (m_maxThreadCount <= 1) {
@@ -266,43 +408,52 @@ namespace Isis {
 
 
   /**
-   * Create the main menus. This will ask the directory to populate the menu.
+   * Initializes the internal lists of actions of the main window for
+   * use in the menus and toolbars.
    */
-  void CNetSuiteMainWindow::createMenus() {
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->setObjectName("fileMenu");
-
-    QMenu *projectMenu = menuBar()->addMenu(tr("&Project"));
-    projectMenu->setObjectName("projectMenu");
-
-    m_directory->populateMainMenu(menuBar());
-
-    QAction *exitAction = fileMenu->addAction(tr("E&xit"));
+  void CNetSuiteMainWindow::initializeActions() {
+    QAction *exitAction = new QAction("E&xit", this);
+    exitAction->setIcon( QIcon::fromTheme("window-close") );
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
-
-
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->setObjectName("editMenu");
+    m_fileMenuActions.append(exitAction);
+    m_permToolBarActions.append(exitAction);
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
-    editMenu->addAction(undoAction);
 
     QAction *redoAction = m_directory->redoAction();
     redoAction->setShortcut(Qt::Key_Z | Qt::CTRL | Qt::SHIFT);
-    editMenu->addAction(redoAction);
 
-    QMenu *settingsMenu = menuBar()->addMenu("&Settings");
-    settingsMenu->setObjectName("settingsMenu");
-    settingsMenu->addActions(m_directory->project()->userPreferenceActions());
+    m_editMenuActions.append(undoAction);
+    m_editMenuActions.append(redoAction);
+
+
+    QAction *viewModeAction = new QAction("Toggle View Mode", this);
+    connect(viewModeAction, SIGNAL( triggered() ),
+            this, SLOT( toggleViewMode() ) );
+    m_viewMenuActions.append(viewModeAction);
+
+    m_cascadeViewsAction = new QAction("Cascade Views", this);
+    connect(m_cascadeViewsAction, SIGNAL( triggered() ),
+            centralWidget(), SLOT( cascadeSubWindows() ) );
+    m_viewMenuActions.append(m_cascadeViewsAction);
+
+    m_tileViewsAction = new QAction("Tile Views", this);
+    connect(m_tileViewsAction, SIGNAL( triggered() ),
+            centralWidget(), SLOT( tileSubWindows() ) );
+    m_viewMenuActions.append(m_tileViewsAction);
+
+    QAction *detachActiveViewAction = new QAction("Detach Active View", this);
+    connect(detachActiveViewAction, SIGNAL( triggered() ),
+            this, SLOT( detachActiveView() ) );
+    m_viewMenuActions.append(detachActiveViewAction);
 
     QAction *threadLimitAction = new QAction("Set Thread &Limit", this);
     connect(threadLimitAction, SIGNAL(triggered()),
             this, SLOT(configureThreadLimit()));
-    settingsMenu->addAction(threadLimitAction);
 
-    QMenu *helpMenu = menuBar()->addMenu("&Help");
-    helpMenu->setObjectName("helpMenu");
+    m_settingsMenuActions.append(m_directory->project()->userPreferenceActions());
+    m_settingsMenuActions.append(threadLimitAction);
 
     QAction *activateWhatsThisAct = new QAction("&What's This", this);
     activateWhatsThisAct->setShortcut(Qt::SHIFT | Qt::Key_F1);
@@ -312,25 +463,48 @@ namespace Isis {
         "this program to see more information about them");
     connect(activateWhatsThisAct, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
 
-    helpMenu->addAction(activateWhatsThisAct);
+    m_helpMenuActions.append(activateWhatsThisAct);
   }
 
 
   /**
-   * Write the window positioning and state information out to a config file. This allows us to
-   *   restore the settings when we create another main window (the next time this program is run).
+   * Creates the main menus of the menu bar.
+   */
+  void CNetSuiteMainWindow::createMenus() {
+    m_fileMenu = menuBar()->addMenu(tr("&File"));
+    m_fileMenu->setObjectName("fileMenu");
+
+    m_projectMenu = menuBar()->addMenu(tr("&Project"));
+    m_projectMenu->setObjectName("projectMenu");
+
+    m_editMenu = menuBar()->addMenu(tr("&Edit"));
+    m_editMenu->setObjectName("editMenu");
+
+    m_viewMenu = menuBar()->addMenu("&View");
+    m_viewMenu->setObjectName("viewMenu");
+
+    m_settingsMenu = menuBar()->addMenu("&Settings");
+    m_settingsMenu->setObjectName("settingsMenu");
+
+    m_helpMenu = menuBar()->addMenu("&Help");
+    m_helpMenu->setObjectName("helpMenu");
+  }
+
+
+  /**
+   * Write the window positioning and state information out to a
+   * config file. This allows us to restore the settings when we
+   * create another main window (the next time this program is run).
    *
    * The config file used is $HOME/.Isis/$APPNAME/$APPNAME.config
    */
   void CNetSuiteMainWindow::writeSettings() {
-    //qDebug()<<"CNetSuiteMainwindow::writeSettings";
     QString appName = QApplication::applicationName();
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + ".config")
           .expanded(),
         QSettings::NativeFormat);
 
-//    settings.beginGroup("MainWindow");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
     settings.setValue("size", size());
@@ -344,16 +518,17 @@ namespace Isis {
    * Read the window positioning and state information from the config file.
    *
    * The config file read is $HOME/.Isis/$APPNAME/$APPNAME.config
+   *
+   * @param[in] project (Project *) The project that was loaded.
    */
-  void CNetSuiteMainWindow::readSettings(Project *) {
-    //qDebug()<<"CNetSuiteMainwindow::readSettings";
+  void CNetSuiteMainWindow::readSettings(Project *project) {
+    setWindowTitle( project->name() );
     QString appName = QApplication::applicationName();
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + ".config")
           .expanded(),
         QSettings::NativeFormat);
 
-//    settings.beginGroup("MainWindow");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
 
@@ -370,18 +545,18 @@ namespace Isis {
 
 
   /**
-   * Handle the close event by writing the window positioning and state information before
-   *   forwarding the event to the QMainWindow.
+   * Handle the close event by writing the window positioning and
+   * state information before forwarding the event to the QMainWindow.
    */
   void CNetSuiteMainWindow::closeEvent(QCloseEvent *event) {
-    //qDebug()<<"CNetSuiteMainWindow::closeEvent";
     writeSettings();
     QMainWindow::closeEvent(event);
   }
 
 
   /**
-   * Ask te user how many threads to use in this program. This includes the GUI thread.
+   * Ask the user how many threads to use in this program. This
+   * includes the GUI thread.
    */
   void CNetSuiteMainWindow::configureThreadLimit() {
     bool ok = false;
@@ -415,7 +590,8 @@ namespace Isis {
 
 
   /**
-   * Activate the What's This? cursor. This is useful for the What's This? action in the help menu.
+   * Activate the What's This? cursor. This is useful for he What's
+   * This? action in the help menu.
    */
   void CNetSuiteMainWindow::enterWhatsThisMode() {
     QWhatsThis::enterWhatsThisMode();
@@ -423,14 +599,198 @@ namespace Isis {
 
 
   /**
-   * Close the tab at index. This requires that the central widget is a tab widget.
+   * Slot to connect to the subWindowActivated signal from the central
+   * QMdiArea. Updates the active view to the active sub window, or
+   * sets it to null if the active window is not an AbstractProjectItemView.
+   *
+   * @param[in] window (QMdiSubWindow *) The active sub window.
    */
-  void CNetSuiteMainWindow::removeCentralWidgetTab(int index) {
-    QTabWidget *centralTabWidget = qobject_cast<QTabWidget *>(centralWidget());
-
-    if (centralTabWidget) {
-      delete centralTabWidget->widget(index);
-      centralTabWidget->removeTab(index);
+  void CNetSuiteMainWindow::onSubWindowActivated(QMdiSubWindow * window) {
+    if (window) {
+      setActiveView( qobject_cast<AbstractProjectItemView *>( window->widget() ) );
+    }
+    else {
+      setActiveView(0);
     }
   }
+
+
+  /**
+   * Toggles the view mode of the central QMdiArea between tabbed and
+   * sub window mode.
+   */
+  void CNetSuiteMainWindow::toggleViewMode() {
+    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
+    if (mdiArea->viewMode() == QMdiArea::SubWindowView) {
+      setTabbedViewMode();
+    }
+    else {
+      setSubWindowViewMode();
+    }
+  }
+
+
+  /**
+   * Sets the QMdiArea in the central widget to the tabbed view mode
+   * and updates the appropriate actions.
+   */
+  void CNetSuiteMainWindow::setTabbedViewMode() {
+    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
+    mdiArea->setViewMode(QMdiArea::TabbedView);
+    m_cascadeViewsAction->setEnabled(false);
+    m_tileViewsAction->setEnabled(false);
+  }
+
+
+  /**
+   * Sets the QMdiArea in the central widget to the sub window view
+   * mode and updates the appropriate actions.
+   */
+  void CNetSuiteMainWindow::setSubWindowViewMode() {
+    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
+    mdiArea->setViewMode(QMdiArea::SubWindowView);
+    m_cascadeViewsAction->setEnabled(true);
+    m_tileViewsAction->setEnabled(true);
+  }
+
+
+  /**
+   * Moves the active view from the mdi area to its own independent
+   * window. The view, its toolbars, and menu actions, are removed
+   * from the main window and placed in an independent
+   * QMainWindow. The new window contains the view as well as its
+   * toolbars and menu actions. A detached view will not be set as the
+   * active view when it is activated.
+   */
+  void CNetSuiteMainWindow::detachActiveView() {
+    AbstractProjectItemView *view = m_activeView;
+
+    if (!m_activeView) {
+      return;
+    }
+
+    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
+    if (mdiArea) {
+      mdiArea->removeSubWindow(view);
+      mdiArea->closeActiveSubWindow();
+    }
+
+    QMainWindow *newWindow = new QMainWindow(this, Qt::Window);
+    newWindow->setCentralWidget(view);
+    newWindow->setWindowTitle( view->windowTitle() );
+
+    if ( !view->permToolBarActions().isEmpty() ) {
+      QToolBar *permToolBar = new QToolBar(newWindow);
+      foreach ( QAction *action, view->permToolBarActions() ) {
+        permToolBar->addAction(action);
+      }
+      newWindow->addToolBar(permToolBar);
+    }
+
+    if ( !view->activeToolBarActions().isEmpty() ) {
+      QToolBar *activeToolBar = new QToolBar(newWindow);
+      foreach ( QAction *action, view->activeToolBarActions() ) {
+        activeToolBar->addAction(action);
+      }
+      newWindow->addToolBar(activeToolBar);
+    }
+
+    if ( !view->toolPadActions().isEmpty() ) {
+      QToolBar *toolPad = new QToolBar(newWindow);
+      foreach ( QAction *action, view->toolPadActions() ) {
+        toolPad->addAction(action);
+      }
+      newWindow->addToolBar(Qt::RightToolBarArea, toolPad);
+    }
+
+    QMenuBar *menuBar = new QMenuBar(newWindow);
+    newWindow->setMenuBar(menuBar);
+
+    if ( !view->fileMenuActions().isEmpty() ) {
+      QMenu *fileMenu = new QMenu("&File", newWindow);
+      foreach ( QAction *action, view->fileMenuActions() ) {
+        fileMenu->addAction(action);
+      }
+      menuBar->addMenu(fileMenu);
+    }
+
+    if ( !view->projectMenuActions().isEmpty() ) {
+      QMenu *projectMenu = new QMenu("&Project", newWindow);
+      foreach ( QAction *action, view->projectMenuActions() ) {
+        projectMenu->addAction(action);
+      }
+      menuBar->addMenu(projectMenu);
+    }
+
+    if ( !view->editMenuActions().isEmpty() ) {
+      QMenu *editMenu = new QMenu("&Edit", newWindow);
+      foreach ( QAction *action, view->editMenuActions() ) {
+        editMenu->addAction(action);
+      }
+      menuBar->addMenu(editMenu);
+    }
+
+    QAction *reattachAction = new QAction("Reattach View", newWindow);
+    connect( reattachAction, SIGNAL( triggered() ),
+             this, SLOT( reattachView() ) );
+
+    QMenu *viewMenu = new QMenu("&View", newWindow);
+
+    viewMenu->addAction(reattachAction);
+
+    if ( !view->viewMenuActions().isEmpty() ) {
+      foreach ( QAction *action, view->viewMenuActions() ) {
+        viewMenu->addAction(action);
+      }
+    }
+    menuBar->addMenu(viewMenu);
+
+    if ( !view->settingsMenuActions().isEmpty() ) {
+      QMenu *settingsMenu = new QMenu("&Settings", newWindow);
+      foreach ( QAction *action, view->settingsMenuActions() ) {
+        settingsMenu->addAction(action);
+      }
+      menuBar->addMenu(settingsMenu);
+    }
+
+    if ( !view->helpMenuActions().isEmpty() ) {
+      QMenu *helpMenu = new QMenu("&Help", newWindow);
+      foreach ( QAction *action, view->helpMenuActions() ) {
+        helpMenu->addAction(action);
+      }
+      menuBar->addMenu(helpMenu);
+    }
+    newWindow->show();
+
+  }
+
+
+  /**
+   * Reattaches a detached view. This slot can only be called by a QAction
+   * from a QMainWindow that contains the view. The view is added to
+   * the main window and the window that previously contained it is
+   * deleted.
+   */
+  void CNetSuiteMainWindow::reattachView() {
+    QAction *reattachAction = qobject_cast<QAction *>( sender() );
+    if (!reattachAction) {
+      return;
+    }
+
+    QMainWindow *viewWindow = qobject_cast<QMainWindow *>( reattachAction->parent() );
+    if (!viewWindow) {
+      return;
+    }
+
+    AbstractProjectItemView *view = qobject_cast<AbstractProjectItemView *>( viewWindow->centralWidget() );
+    if (!view) {
+      return;
+    }
+
+    view->setParent(this);
+    viewWindow->deleteLater();
+
+    addView(view);
+  }
+
 }

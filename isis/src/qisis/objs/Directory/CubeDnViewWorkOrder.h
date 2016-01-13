@@ -1,5 +1,5 @@
-#ifndef Footprint2DViewWorkOrder_H
-#define Footprint2DViewWorkOrder_H
+#ifndef CubeDnViewWorkOrder_H
+#define CubeDnViewWorkOrder_H
 /**
  * @file
  * $Revision: 1.19 $
@@ -27,21 +27,20 @@
 namespace Isis {
 
   /**
-   * View an image list's footprints in a footprint view.
+   * This work order is designed to bring up a qview-like view for a small number of cubes.
    *
-   * @author 2012-??-?? ???
+   * @author 2012-09-19 Steven Lambright
    *
    * @internal
-   *   @history 2016-01-08 Jeffrey Covington - Updated for new Footprint2DView
    */
-  class Footprint2DViewWorkOrder : public WorkOrder {
+  class CubeDnViewWorkOrder : public WorkOrder {
       Q_OBJECT
     public:
-      Footprint2DViewWorkOrder(Project *project);
-      Footprint2DViewWorkOrder(const Footprint2DViewWorkOrder &other);
-      ~Footprint2DViewWorkOrder();
+      CubeDnViewWorkOrder(Project *project);
+      CubeDnViewWorkOrder(const CubeDnViewWorkOrder &other);
+      ~CubeDnViewWorkOrder();
 
-      virtual Footprint2DViewWorkOrder *clone() const;
+      virtual CubeDnViewWorkOrder *clone() const;
 
       virtual bool isExecutable(ImageList *images);
       bool execute();
@@ -51,7 +50,7 @@ namespace Isis {
       void syncRedo();
 
     private:
-      Footprint2DViewWorkOrder &operator=(const Footprint2DViewWorkOrder &rhs);
+      CubeDnViewWorkOrder &operator=(const CubeDnViewWorkOrder &rhs);
   };
 }
 #endif

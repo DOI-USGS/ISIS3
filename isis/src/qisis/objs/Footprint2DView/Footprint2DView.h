@@ -1,5 +1,5 @@
-#ifndef ProjectItemTreeView_h
-#define ProjectTreeView_h
+#ifndef Footprint2DView_h
+#define Footprint2DView_h
 /**
  * @file
  * $Date$
@@ -22,40 +22,50 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include <QTreeView>
+#include <QToolBar>
+#include <QWidgetAction>
 
 #include "AbstractProjectItemView.h"
-#include "ProjectItemProxyModel.h"
+#include "MosaicSceneWidget.h"
+#include "ToolPad.h"
 
 namespace Isis {
+  
   /**
-   * A ProjectItemTreeView displays items from a ProjectItemProxyModel
-   * in a tree structure. The view can display the contents of the
-   * model directly without adding items to the model using the
-   * setSourceModel() method instead of setModel().
+   * View for displaying footprints of images in a QMos like way.
    *
    * @author Jeffrey Covington
    */
-  class ProjectItemTreeView : public AbstractProjectItemView {
+  class Footprint2DView : public AbstractProjectItemView {
 
     Q_OBJECT
 
     public:
-      ProjectItemTreeView(QWidget *parent=0);
-      ~ProjectItemTreeView();
-      
-      virtual void setInternalModel(ProjectItemModel *model);
+      Footprint2DView(QWidget *parent=0);
+      ~Footprint2DView();
 
-      QTreeView *treeView();
+      virtual QList<QAction *> permToolBarActions();
+      virtual QList<QAction *> activeToolBarActions();
+      virtual QList<QAction *> toolPadActions();
+ 
+      QSize sizeHint() const;
+
     protected:
       bool eventFilter(QObject *watched, QEvent *event);
 
     private slots:
-      void onItemAdded(ProjectItem *item);  
+      void onItemAdded(ProjectItem *item);
+      void onQueueSelectionChanged();
 
     private:
-      QTreeView *m_treeView;
+      MosaicSceneWidget *m_sceneWidget; //!< The scene widget
+      QMap<Image *, ProjectItem *> m_imageItemMap; //!< Maps images to their items
+
+      QToolBar *m_permToolBar; //!< The permanent tool bar
+      QToolBar *m_activeToolBar; //!< The active tool bar
+      ToolPad *m_toolPad; //!< The tool pad
+
+      QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
   };
 }
 

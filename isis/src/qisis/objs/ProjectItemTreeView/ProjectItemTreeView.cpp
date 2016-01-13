@@ -34,10 +34,7 @@ namespace Isis {
         
     m_treeView = new QTreeView(this);
     m_treeView->installEventFilter(this);
-    m_treeView->setModel( proxyModel() );
-    m_treeView->setSelectionModel( proxyModel()->selectionModel() );
-    m_treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
+    setInternalModel( internalModel() );
     m_treeView->setDragEnabled(true);
     m_treeView->setAcceptDrops(false);
     m_treeView->setHeaderHidden(true);
@@ -50,7 +47,21 @@ namespace Isis {
 
     setLayout(layout);
   }
+
   
+  /**
+   * Default destructor.
+   */
+  ProjectItemTreeView::~ProjectItemTreeView() {}
+
+
+  /**
+   *
+   */
+  QTreeView *ProjectItemTreeView::treeView() {
+    return m_treeView;
+  }
+
   
   /**
    * Sets the model so that the internal proxy model exactly matches the
@@ -58,18 +69,34 @@ namespace Isis {
    *
    * @param[in] model (ProjectItemModel *) The source model.
    */
-  void ProjectItemTreeView::setSourceModel(ProjectItemModel *model) {
-    proxyModel()->clear();
-    proxyModel()->setSourceModel(model);
-    for (int row=0; row < model->rowCount(); row++) {
-      proxyModel()->addItem( model->item(row) );
-    }
+  void ProjectItemTreeView::setInternalModel(ProjectItemModel *model) {
+    disconnect(internalModel(), 0, this, 0);
+
+    AbstractProjectItemView::setInternalModel(model);
+    m_treeView->reset();
+    m_treeView->setModel(model);
+    m_treeView->setSelectionModel( model->selectionModel() );
+    m_treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
     connect( model, SIGNAL( itemAdded(ProjectItem *) ),
-             proxyModel(), SLOT( addItem(ProjectItem *) ) );
-    
+             this, SLOT( onItemAdded(ProjectItem *) ) );
   }
 
 
+  /**
+   *
+   */
+  void ProjectItemTreeView::onItemAdded(ProjectItem *item) {
+    ProjectItem *parent = item->parent();
+    if (!parent) {
+      return;
+    }
+    if ( !parent->isImageList() && !parent->isControlList() ) {
+      m_treeView->expand( parent->index() );
+    }
+  }
+  
+  
   /**
    * Filters out drag and drop events so that they are handled by the
    * ProjectItemTreeView.

@@ -83,6 +83,11 @@ namespace Isis {
       ProjectItem *addProject(Project *project);
 
       ProjectItem *findItemData(const QVariant &data, int role = Qt::UserRole+1);
+
+      virtual bool canDropMimeData(const QMimeData *data,
+                                   Qt::DropAction action,
+                                   int row, int column,
+                                   const QModelIndex& parent) const;
       
       virtual void removeItem(ProjectItem *item);
       virtual void removeItems(QList<ProjectItem *> items);

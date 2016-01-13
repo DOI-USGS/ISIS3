@@ -86,6 +86,11 @@ namespace Isis {
 
     void setSourceModel(ProjectItemModel *sourceModel);
     ProjectItemModel *sourceModel();
+
+    virtual bool canDropMimeData(const QMimeData * data, Qt::DropAction action,
+                      int row, int column, const QModelIndex & parent) const;
+    virtual bool dropMimeData(const QMimeData * data, Qt::DropAction action,
+                      int row, int column, const QModelIndex & parent);
   
   public slots:
     ProjectItem *addItem(ProjectItem *sourceItem);

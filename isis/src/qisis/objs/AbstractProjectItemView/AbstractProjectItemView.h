@@ -60,28 +60,37 @@ namespace Isis {
       AbstractProjectItemView(QWidget *parent=0);
 
       virtual void setModel(ProjectItemModel *model);
+      virtual ProjectItemModel *model();
+      
+      virtual void dragEnterEvent(QDragEnterEvent *event);
+      virtual void dragMoveEvent(QDragMoveEvent *event);
+      virtual void dropEvent(QDropEvent *event);
 
-      void dragEnterEvent(QDragEnterEvent *event);
-      void dragMoveEvent(QDragMoveEvent *event);
-      void dropEvent(QDropEvent *event);
-
-      virtual QList<QAction *> toolBarActions();
-      virtual QList<QAction *> menuActions();
+      virtual QList<QAction *> permToolBarActions();
+      virtual QList<QAction *> activeToolBarActions();
+      virtual QList<QAction *> toolPadActions();
+ 
       virtual QList<QAction *> contextMenuActions();
 
+      virtual QList<QAction *> fileMenuActions();
+      virtual QList<QAction *> projectMenuActions();
+      virtual QList<QAction *> editMenuActions();
+      virtual QList<QAction *> viewMenuActions();
+      virtual QList<QAction *> settingsMenuActions();
+      virtual QList<QAction *> helpMenuActions();
+      
       virtual ProjectItem *currentItem();
       virtual QList<ProjectItem *> selectedItems();
+
+      virtual ProjectItemModel *internalModel();
+      virtual void setInternalModel(ProjectItemModel *model);
 
     public slots:
       virtual void addItem(ProjectItem *item);
       virtual void addItems(QList<ProjectItem *> items);
 
-    protected:
-      ProjectItemProxyModel *proxyModel();
-      void setProxyModel(ProjectItemProxyModel *proxyModel);
-
     private:
-      ProjectItemProxyModel *m_proxyModel;
+      ProjectItemModel *m_internalModel;
   };
 
 }

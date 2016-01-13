@@ -31,100 +31,230 @@
 namespace Isis {
 
   /**
-   * Constructs the AbstractProjectItemView
+   * Constructs the AbstractProjectItemView.
    *
-   * @param[in] parent (QWidget *)
+   * @param[in] parent (QWidget *) The parent widget
    */
   AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QWidget(parent) {
-    m_proxyModel = new ProjectItemProxyModel(this);
+    m_internalModel = new ProjectItemProxyModel(this);
     setAcceptDrops(true);
   }
 
 
   /**
-   * 
+   * Sets the model used by the view. If the internal model is a proxy
+   * model, it sets the source model.
    *
-   * @param[in] model (ProjectItemModel *)
+   * @param[in] model (ProjectItemModel *) The new model
    */
   void AbstractProjectItemView::setModel(ProjectItemModel *model) {
-    proxyModel()->setSourceModel(model);
+    if (ProjectItemProxyModel *proxyModel = 
+        qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
+      proxyModel->setSourceModel(model);
+    }
   }
 
 
   /**
-   * @param[in] event (QDragEnterEvent *)
+   * Returns the model used by the view. If the internal model is a
+   * proxy model, it returns the source model.
+   *
+   * @return (ProjectItemModel *) The model.
+   */
+  ProjectItemModel *AbstractProjectItemView::model() {
+    if (ProjectItemProxyModel *proxyModel = 
+        qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
+      return proxyModel->sourceModel();
+    }
+    return internalModel();
+  }
+
+  /**
+   * Accepts the drag enter event if the internal model can accept the
+   * mime data.
+   *
+   * @param[in] event (QDragEnterEvent *) The drag event
    */
   void AbstractProjectItemView::dragEnterEvent(QDragEnterEvent *event) {
-    event->acceptProposedAction();
+    if (internalModel()->canDropMimeData( event->mimeData(),
+                                          event->dropAction(),
+                                          0, 0, QModelIndex() ) ) {
+      event->acceptProposedAction();
+    }
   }
 
 
   /**
-   * @param[in] event (QDragMoveEvent *)
+   * Accepts the drag event if the internal model can accept the mime
+   * data.
+   *
+   * @param[in] event (QDragMoveEvent *) The drag event
    */
   void AbstractProjectItemView::dragMoveEvent(QDragMoveEvent *event) {
-    event->acceptProposedAction();
+    if (internalModel()->canDropMimeData( event->mimeData(),
+                                          event->dropAction(),
+                                          0, 0, QModelIndex() ) ) {
+      event->acceptProposedAction();
+    }
   }
 
+  
   /**
-   * @param[in] event (QDropEvent *)
+   * Drops the data into the internal model if it can accept the data.
+   *
+   * @param[in] event (QDropEvent *) The drop event
    */
   void AbstractProjectItemView::dropEvent(QDropEvent *event) {
-    addItems( proxyModel()->sourceModel()->selectedItems() );
-    event->acceptProposedAction();
+    if (internalModel()->canDropMimeData( event->mimeData(),
+                                          event->dropAction(),
+                                          0, 0, QModelIndex() ) ) {
+      internalModel()->dropMimeData( event->mimeData(), event->dropAction(),
+                                     0, 0, QModelIndex() );
+      event->acceptProposedAction();
+    }
   }
 
-
+  
   /**
-   * @return (QList<QAction *>)
+   * Returns a list of actions appropriate for the permanent tool bar.
+   *
+   * @return (QList<QAction *>) The actions
    */
-  QList<QAction *> AbstractProjectItemView::menuActions() {
-    return toolBarActions();
-  }
-
-
-  /**
-   * @return (QList<QAction *>)
-   */
-  QList<QAction *> AbstractProjectItemView::toolBarActions() {
+  QList<QAction *> AbstractProjectItemView::permToolBarActions() {
     return QList<QAction *>();
   }
 
 
   /**
-   * @return (QList<QAction *>)
+   * Returns a list of actions appropriate for the active tool bar.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> AbstractProjectItemView::activeToolBarActions() {
+    return QList<QAction *>();
+  }
+
+
+  /**
+   * Returns a list of actions appropriate for the tool pad.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> AbstractProjectItemView::toolPadActions() {
+    return QList<QAction *>();
+  }
+
+
+  /**
+   * Returns a list of actions appropriate for a context menu.
+   *
+   * @return (QList<QAction *>) The actions
    */
   QList<QAction *> AbstractProjectItemView::contextMenuActions() {
-    return menuActions();
+    return QList<QAction *>();
   }
 
 
   /**
-   * @return (ProjectItem *)
+   * Returns a list of actions appropriate for a file menu.
+   *
+   * @return (QList<QAction *>) The actions
    */
-  ProjectItem *AbstractProjectItemView::currentItem() {
-    return proxyModel()->sourceModel()->currentItem();
+  QList<QAction *> AbstractProjectItemView::fileMenuActions() {
+    return QList<QAction *>();
   }
 
 
   /**
-   * @return (QList<ProjectItem *>)
+   * Returns a list of actions appropriate for a project menu.
+   *
+   * @return (QList<QAction *>) The actions
    */
-  QList<ProjectItem *> AbstractProjectItemView::selectedItems() {
-    return proxyModel()->selectedItems();
+  QList<QAction *> AbstractProjectItemView::projectMenuActions() {
+    return QList<QAction *>();
+  }
+
+
+  /**
+   * Returns a list of actions appropriate for an edit menu.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> AbstractProjectItemView::editMenuActions() {
+    return QList<QAction *>();
+  }
+
+
+  /**
+   * Returns a list of actions appropriate for a view menu.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> AbstractProjectItemView::viewMenuActions() {
+    return QList<QAction *>();
   }
 
   
   /**
-   * @param[in] item (ProjectItem *)
+   * Returns a list of actions appropriate for a settings menu.
+   *
+   * @return (QList<QAction *>) The actions
    */
-  void AbstractProjectItemView::addItem(ProjectItem *item) {
-    proxyModel()->addItem(item);
+  QList<QAction *> AbstractProjectItemView::settingsMenuActions() {
+    return QList<QAction *>();
   }
 
 
   /**
-   * @param[in] items (QList<ProjectItem *>)
+   * Returns a list of actions appropriate for a help menu.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> AbstractProjectItemView::helpMenuActions() {
+    return QList<QAction *>();
+  }
+
+  
+  /**
+   * Returns the current item of the model.
+   * 
+   * @return (ProjectItem *) The item
+   */
+  ProjectItem *AbstractProjectItemView::currentItem() {
+    return model()->currentItem();
+  }
+
+
+  /**
+   * Return the selected items of the model.
+   *
+   * @return (QList<ProjectItem *>) The items
+   */
+  QList<ProjectItem *> AbstractProjectItemView::selectedItems() {
+    return model()->selectedItems();
+  }
+
+  
+  /**
+   * Adds an item to the view. The item must be part of the view's
+   * model. This method can be overriden in a subclass to filter out
+   * unneeded items.
+   *
+   * @param[in] item (ProjectItem *) The item to add.
+   */
+  void AbstractProjectItemView::addItem(ProjectItem *item) {
+        if (ProjectItemProxyModel *proxyModel = 
+        qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
+      proxyModel->addItem(item);
+    }
+  }
+
+
+  /**
+   * Adds several items to the view. The items must be a part of the
+   * view's model.
+   *
+   * @param[in] items (QList<ProjectItem *>) The items to add.
    */
   void AbstractProjectItemView::addItems(QList<ProjectItem *> items) {
     foreach (ProjectItem *item, items) {
@@ -134,19 +264,22 @@ namespace Isis {
   
 
   /**
-   * @return (ProjectItemProxyModel *)
+   * Returns the internal model of the view. By default it is a proxy
+   * model.
+   *
+   * @return (ProjectItemModel *) The internal model
    */
-  ProjectItemProxyModel *AbstractProjectItemView::proxyModel() {
-    return m_proxyModel;
+  ProjectItemModel *AbstractProjectItemView::internalModel() {
+    return m_internalModel;
   }
 
 
   /**
-   * @param[in] proxyModel (ProjectItemProxyModel *)
+   * Sets the internal model of the view.
+   *
+   * @param[in] model (ProjectItemModel *) The new internal model
    */
-  void AbstractProjectItemView::setProxyModel(ProjectItemProxyModel *proxyModel) {
-    m_proxyModel = proxyModel;
+  void AbstractProjectItemView::setInternalModel(ProjectItemModel *model) {
+    m_internalModel = model;
   }
-
-
 }
