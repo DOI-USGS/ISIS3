@@ -330,9 +330,10 @@ namespace Isis {
     // Make sure the constant frame is loaded.  This method also does the frame trace.
     if (p_timeFrames.size() == 0) InitConstantRotation(startTime);
 
-    // Load the PCK information while it is available and set member values
-    if (p_source == Spice) 
-      loadPCFromSpice();
+    // Set the frame type.  If the frame class is PCK, load the constants.
+    if (p_source == Spice) {
+      setFrameType();
+    }
 
     LoadTimeCache();
     int cacheSize = p_cacheTime.size();
@@ -772,27 +773,17 @@ namespace Isis {
    * Retrieve planetary orientation constants from a Spice PCK and store them in the class.
    *
    */
-  void SpiceRotation::loadPCFromSpice() {
+  void SpiceRotation::loadPCFromSpice(int centerBody) {
     NaifStatus::CheckErrors();
+    SpiceInt centerBodyCode = (SpiceInt) centerBody;
 
-    SpiceInt frameCode = p_constantFrames[0];
-    SpiceBoolean found;
-    SpiceInt centerBodyCode;
-    SpiceInt frameClass;
-    SpiceInt classId;
-
-    // Retrieve the frame type from Naif.  We distinguish PCK types into text PCK,
+    // Retrieve the frame class from Naif.  We distinguish PCK types into text PCK,
     // binary PCK, and PCK not referenced to J2000.  Isis binary PCK can
     // not be used to solve for target body orientation because of the variety and 
     // complexity models used with binary PCK.  Currently ISIS does not solve for
     // target body orientation on bodies not referenced to J2000, but it could be
     // changed to handle that case.
-    frinfo_c(frameCode, &centerBodyCode, &frameClass, &classId, &found);
-
-    if (found  &&  (frameClass == 2 || centerBodyCode > 0)) {      // Frame type is PCK
-      m_frameType = PCK;
-      checkForBinaryPck();
-    }
+    checkForBinaryPck();
     
     if (m_frameType == PCK) {
       // Make sure the reference frame is J2000.  We will need to modify FrameTrace and
@@ -805,6 +796,7 @@ namespace Isis {
       SpiceInt numReturned;
       SpiceChar naifType;
       SpiceDouble relativeFrameCode = 0;
+      SpiceBoolean found;
       dtpool_c(naifKeyword.toAscii().data(), &found, &numExpected, &naifType);
 
       if (found) {
@@ -1166,7 +1158,7 @@ namespace Isis {
    */
   std::vector<double> SpiceRotation::J2000Vector(const std::vector<double>& rVec) {
     NaifStatus::CheckErrors();
-
+    
     std::vector<double> jVec;
 
     if (rVec.size() == 3) {
@@ -2254,7 +2246,7 @@ namespace Isis {
 //      double DIRSIZ = 100;
 
       SpiceChar file[FILESIZ];
-      SpiceChar filtyp[TYPESIZ];
+      SpiceChar filtyp[TYPESIZ];  // kernel type (ck, ek, etc.)
       SpiceChar source[SOURCESIZ];
 
       SpiceBoolean found;
@@ -2816,7 +2808,6 @@ namespace Isis {
    }
 
 
-
    /** Check loaded pck to see if any are binary and set frame type to indicate binary pck.
     *
     * This is strictly a local method to be called only when the source is Spice.  Its purpose is
@@ -2854,7 +2845,58 @@ namespace Isis {
   }
   
 
-   void SpiceRotation::setEphemerisTimeMemcache() {
+   /** Set the frame type (m_frameType).
+    *
+    * This is strictly a local method to be called only when the source is Spice.  Its purpose is
+    * to determine the frame type.  If the frame type is PCK, this method also loads the
+    * planetary constants.  See SpiceRotation.h to see the valid frame types.
+    *
+    */
+  void SpiceRotation::setFrameType() {
+    SpiceInt frameCode = p_constantFrames[0];
+    SpiceBoolean found;
+    SpiceInt centerBodyCode;
+    SpiceInt frameClass;
+    SpiceInt classId;
+    frinfo_c(frameCode, &centerBodyCode, &frameClass, &classId, &found);
+
+    if (found) {
+      if (frameClass == 2  ||  centerBodyCode > 0) {
+        m_frameType = PCK;
+        // Load the PC information while it is available and set member values
+        loadPCFromSpice(centerBodyCode);
+      }
+      else if (p_constantFrames.size() > 1) {
+        for (std::vector<int>::size_type idx = 1; idx < p_constantFrames.size(); idx++) {
+          frameCode = p_constantFrames[idx];
+          frinfo_c(frameCode, &centerBodyCode, &frameClass, &classId, &found);
+          if (frameClass == 3) m_frameType = CK;
+        }
+      }
+      else {
+        switch (frameClass) {
+        case 1:
+          m_frameType = INERTL;
+          break;
+          // case 2:  handled in first if block
+        case 3:
+          m_frameType = CK;
+          break;
+        case 4:
+          m_frameType = TK;
+          break;
+        case 5:
+          m_frameType = DYN;
+          break;
+        default:
+          m_frameType = UNKNOWN;
+        }
+      }
+    }      
+  }
+
+
+void SpiceRotation::setEphemerisTimeMemcache() {
     // If the cache has only one rotation, set it
     NaifStatus::CheckErrors();
 

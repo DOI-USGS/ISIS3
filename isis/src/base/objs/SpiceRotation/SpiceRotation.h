@@ -185,9 +185,10 @@ namespace Isis {
    *   @history 2014-03-11 Stuart Sides - Programmers notes - Fixed a bug in the copy constructor
    *                           that was going out of array bounds.
    *   @history 2015-02-20 Jeannie Backer - Improved error messages.
-   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() calls to see
-   *                           if any NAIF errors were signaled. References #2248.
-   *   @history 2015-08-05 Debbie A. Cook - Programmer notes - Modified LoadCache, and ComputeAv.
+   *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() calls to see if
+   *                           any NAIF errors were signaled. References #2248.
+   *   @history 2015-08-05 Debbie A. Cook - Programmer notes - Modified LoadCache, 
+   *                           and ComputeAv.
    *                           Added new methods 
    *                           loadPCFromSpice, loadPCFromTable, toJ2000Partial, poleRaCoefs,
    *                           poleDecCoefs, pmCoefs, poleRaNutPrecCoefs, poleDecNutPrecCoefs, 
@@ -196,9 +197,14 @@ namespace Isis {
    *                           getPckPolynomial, setEphemerisTimePckPolyFunction, getFrameType
    *                           and members m_frameType, m_tOrientationAvailable, 
    *                           m_raPole, m_decPole, m_pm, m_raNutPrec, m_decNutPrec, m_pmNutPrec,
-   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale  to support request
-   *                           for solving for target body parameters. Also added a new enumerated
-   *                           value for Source, PckPolyFunction, and PartialType, WRT_RotationRate.
+   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale  to support request for 
+   *                           solving for target body parameters.
+   *                           Also added a new enumerated value for Source, PckPolyFunction, 
+   *                            and 
+   *                           PartialType, WRT_RotationRate.
+   *   @history 2016-02-15 Debbie A. Cook - Programmer notes - Added private method
+   *                           setFrameType to set the frame type.  It also loads the planetary 
+   *                           constants for a PCK type. 
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    *  @todo Consider making this a base class with child classes based on frame type or 
@@ -239,15 +245,14 @@ namespace Isis {
        *       PckPolyFunction - The rotation is calculated using the IAU fit 
        *                  polynomials in one variable (time in Julian centuries and days).
        */
-      enum Source { Spice,                   //!< Directly from the kernels 
-                    Nadir,                   //!< Nadir pointing
-                    Memcache,                //!< From cached table
-                    PolyFunction,            //!< From nth degree polynomial
-                    PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
-                    PckPolyFunction          //!< Quadratic polynomial function with
+      enum Source { Spice,                              //!< Directly from the kernels 
+                               Nadir,                   //!< Nadir pointing
+                               Memcache,                //!< From cached table
+                               PolyFunction,            //!< From nth degree polynomial
+                               PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
+                               PckPolyFunction          //!< Quadratic polynomial function with
                                                         //   linear trignometric terms
-      };            
-
+                  };            
 
       /** 
        * This enumeration indicates whether the partial derivative is taken with 
@@ -256,8 +261,7 @@ namespace Isis {
       enum PartialType { WRT_RightAscension, //!< With respect to Right Ascension
                          WRT_Declination,    //!< With respect to Declination
                          WRT_Twist          //!< With respect to Twist or Prime Meridian Rotation
-      };
-
+                       };
 
       /** 
        *  
@@ -265,8 +269,7 @@ namespace Isis {
       enum DownsizeStatus { Yes,  //!< 
                             Done, //!< 
                             No    //!< 
-      };
-
+                          };
 
       /** 
        *  
@@ -321,7 +324,7 @@ namespace Isis {
 
       std::vector<double> EvaluatePolyFunction();
 
-      void loadPCFromSpice();
+      void loadPCFromSpice(int CenterBodyCode);
       void loadPCFromTable(const PvlObject &Label);
 
       void MinimizeCache(DownsizeStatus status);
@@ -423,6 +426,8 @@ namespace Isis {
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
 
     private:
+      // method
+      void setFrameType();
       std::vector<int> p_constantFrames;  /**< Chain of Naif frame codes in constant 
                                                rotation TC. The first entry will always 
                                                be the target frame code*/
@@ -431,18 +436,15 @@ namespace Isis {
                                                be 1 (J2000 code)*/
       double p_timeBias;                  //!< iTime bias when reading kernels
 
-      double p_et;                        //!< Current ephemeris time
+      double p_et;                           //!< Current ephemeris time
       Quaternion p_quaternion;            /**< Quaternion for J2000 to reference
-                                               rotation at et*/
+                                                                  rotation at et*/
 
-      bool p_matrixSet;                   //!< Flag indicating p_TJ has been set
-      bool m_tOrientationAvailable;       //!< Target orientation constants are available
+      bool p_matrixSet;                    //!< Flag indicating p_TJ has been set
+      bool m_tOrientationAvailable;  //!< Target orientation constants are available
  
 
-      FrameType m_frameType;              
-      //! 
-      //! 
-      //!< The type of rotation frame
+      FrameType m_frameType;  //!< The type of rotation frame
       Source p_source;                    //!< The source of the rotation data
       int p_axisP;                        /**< The axis defined by the spacecraft
                                                vector for defining a nadir rotation*/
