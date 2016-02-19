@@ -332,6 +332,9 @@ namespace Isis {
    *                           coordinates. References #1653.
    *   @history 2013-11-13 Kimberly Oyama - Added missing member variables to == operator and
    *                           made sure the comparisons are being done correctly. Fixes #1014.
+   *   @history 2015-11-05 Kris Becker - invalid flag was not properly
+   *                           initialized in ControlPointFileEntryV0002 
+   *                           constructor (Merged by Kristin Berry. Fixes #2392) 
    */
   class ControlPoint : public QObject {
 

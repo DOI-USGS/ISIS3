@@ -183,8 +183,12 @@ namespace Isis {
    *                           was expecting the method GetNumberOfMeasuresInImage to only return
    *                           the number of VALID (Ignore=False) measures.  Renamed
    *                           method to GetNumberOfValidMeasuresInImage and the private
-   *                           variable p_cameraMeasuresMap to p_cameraValidMeasuresMap.
-   *                           References #1603.
+   *                           variable p_cameraMeasuresMap to p_cameraValidMeasuresMap. References
+   *                           #1603.
+   *    @history 2016-02-15 Kris Becker - Added feature to take ownership of
+   *                           points from ControlNet. To support this option,
+   *                           added clear() and take() methods.
+   *                           (Merged by Kristin Berry. References #2392)
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -198,6 +202,9 @@ namespace Isis {
       ControlNet(const QString &filename, Progress *progress = 0);
 
       ~ControlNet();
+
+      void clear();
+      QList< ControlPoint * > take();
 
       void ReadControl(const QString &filename, Progress *progress = 0);
       void Write(const QString &filename, bool pvl = false);
@@ -414,6 +421,7 @@ namespace Isis {
       std::vector<Distance> p_targetRadii;        //!< Radii of target body
 
       bool p_invalid;  //!< If the Control Network is currently invalid
+      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object. 
   };
 }
 
