@@ -234,6 +234,29 @@ CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
 CHOLMODLIB   = -lcholmod -lamd -lcolamd -framework Accelerate
 
 #---------------------------------------------------------------------------
+# Set up for OpenCV libraries 
+#---------------------------------------------------------------------------
+OPENCVINCDIR =  -I$(ISIS3LOCAL)/include
+#OPENCVLIBDIR =  -L$(ISIS3LOCAL)/lib   # Redundant
+OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
+               -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
+               -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
+               -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
+               -lopencv_video -lopencv_videostab
+
+#---------------------------------------------------------------------------
+# Set up for Natural Neigbor Library (NN)
+#---------------------------------------------------------------------------
+NNINCDIR = -I$(ISIS3LOCAL)/include/nn
+#NNLIBDIR = -L$(ISIS3LOCAL)/lib
+NNLIB = -lnn
+
+#---------------------------------------------------------------------------
+# Final generic setip for includes at the top level
+#---------------------------------------------------------------------------
+DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
+
+#---------------------------------------------------------------------------
 #  Define the third party distribution libraries (patterns)
 #---------------------------------------------------------------------------
 
@@ -276,6 +299,11 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libufconfig.dylib"
 THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
+# Add all the OpenCV libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libopencv_*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb*.dylib"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libnn.a"
 
 # libxerces-c depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"

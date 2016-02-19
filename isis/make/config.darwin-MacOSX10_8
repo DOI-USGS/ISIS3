@@ -287,6 +287,31 @@ CHOLMODINCDIR = -I$(ISIS3LOCAL)/include
 CHOLMODLIBDIR = -L$(ISIS3LOCAL)/lib
 CHOLMODLIB   = -lcholmod -lamd -lcolamd -lcamd -framework Accelerate
 
+
+#---------------------------------------------------------------------------
+# Set up for OpenCV libraries 
+#---------------------------------------------------------------------------
+OPENCVINCDIR =  -I$(ISIS3OPT)/include
+#OPENCVLIBDIR =  -L$(ISIS3OPT)/lib   # Redundant
+OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
+               -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
+               -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
+               -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
+               -lopencv_video -lopencv_videostab
+
+#---------------------------------------------------------------------------
+# Set up for Natural Neigbor Library (NN)
+#---------------------------------------------------------------------------
+NNINCDIR = -I$(ISIS3LOCAL)/include/nn
+#NNLIBDIR = -L$(ISIS3LOCAL)/lib
+NNLIB = -lnn
+
+#---------------------------------------------------------------------------
+# Final generic setup for includes at the top level
+#---------------------------------------------------------------------------
+DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
+
+
 #---------------------------------------------------------------------------
 #  Define the third party distribution libraries (patterns)
 #---------------------------------------------------------------------------
@@ -332,6 +357,12 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libcamd.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libcholmod.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libcolamd.dylib"
 THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
+
+# Add all the OpenCV libraries
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopencv_*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtbb*.dylib"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libnn.a"
 
 # libxerces-c depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
