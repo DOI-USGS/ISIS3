@@ -8,11 +8,6 @@ CK Reference ID = 1
 SPK Target ID = -98
 SPK Reference ID = 1
 
-Spacecraft Name Long: New Horizons
-Spacecraft Name Short: NewHorizons
-Instrument Name Long: Long Range Reconnaissance Imager
-Instrument Name Short: LORRI
-
 Shutter open = 225787161.551337481
 Shutter close = 225787161.551341474
 
@@ -33,5 +28,5 @@ DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
 For center pixel position ...
-Latitude off by: 0.0255589466259298
-Longitude off by: 0.0032366246724109
+Latitude OK
+Longitude OK

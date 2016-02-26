@@ -33,10 +33,6 @@ namespace Isis {
    *    @history 2014-06-08 Staurt Sides - Original version. Equations and coefficients
    *    taken from Jet Propulsion Laboratory Interoffice Memorandum 2011/06/08 "New Horizons
    *    LORRI Geometric Calibration of August 2006" From: W. M. Owen Jr. and D. O'Coonnell
-   *  
-   *    @history 2016-02-24 Staurt Sides - New Horizons LORRI distortion model changed to
-   *    subtract the distortion when going from distorted to undistorted instead of adding, and
-   *    adding the distortion when going from undistorted to destorted.
    */
   class NewHorizonsLorriDistortionMap : public CameraDistortionMap {
     public:
