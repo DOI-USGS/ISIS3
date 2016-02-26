@@ -1,12 +1,21 @@
 #include "Isis.h"
 
-#include <QFile>
 
 #include "ProcessImportPds.h"
 #include "Application.h"
 #include "IString.h"
 #include "OriginalLabel.h"
 #include "Statistics.h"
+#include <QByteArray>
+#include <QFile>
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <istream>
+
+
 
 using namespace std;
 using namespace Isis;
@@ -14,13 +23,19 @@ using namespace Isis;
  * @internal
  *   @history 2012-05-08 Tracie Sucharski - Moved test data to /usgs/cpks/mer/testData and
  *                         /usgs/cpkgs/clementine1/testData.  Added test for invalid label.
+ *   @history 2016-02-25 Tyler Wilson - Moved new test data to /usgs/cpks/base/testData and
+ *                         Added a check in ProcessPdsQubeLabel for determing if we are
+ *                         processing a Galileo NIMS qub saved in VAX format.
+ *
+ *
  */
 void IsisMain() {
 
   Isis::Preference::Preferences(true);
   void ReportError(QString err);
-
+  QByteArray grabPvl(QString fileName);
   // Test an IMAGE file
+
   try {
     cout << "Testing PDS file containing an ^IMAGE pointer" << endl;
     Isis::ProcessImportPds p;
@@ -82,6 +97,79 @@ void IsisMain() {
   catch(Isis::IException &e) {
     e.print();
   }
+
+  //Test a Galileo NIMS file
+
+  try{
+ 
+        cout << endl;
+        cout << "Testing a Galileo NIMS qub file"  << endl;
+        Isis::ProcessImportPds pnims;
+        Pvl *nimslab = new Pvl();
+
+        FileName inFile("$base/testData/30i001ci.qub");
+
+        //Open a stream to the PVL file and load it into memory
+
+        QByteArray pvlData= grabPvl(inFile.expanded());
+        QTextStream pvlTextStream(&pvlData);
+        istringstream pvlStream(pvlTextStream.readAll().toStdString());
+
+
+        try{
+            pvlStream >> *nimslab;
+        }
+        catch(IException &e) {
+            ReportError(e.toString());
+        }
+
+
+
+
+        // Convert the pds file to a cube
+        try {
+
+        pnims.SetPdsFile(*nimslab,inFile.expanded(),ProcessImportPds::Qube);
+
+        }
+        catch(IException &e) {
+            ReportError(e.toString());
+        }
+
+
+        Isis::CubeAttributeOutput coreatt = CubeAttributeOutput("+REAL");
+
+
+        QString nimsfile = Isis::Application::GetUserInterface().GetFileName("TO1");
+
+        try {
+
+        pnims.SetOutputCube(nimsfile,coreatt);
+
+        }
+        catch (IException &e) {
+
+            ReportError(e.toString());
+
+        }
+
+
+        pnims.StartProcess();
+        pnims.EndProcess();
+
+        QFile::remove(nimsfile);
+
+    }//end outer try
+
+    catch(Isis::IException &e) {
+
+        ReportError(e.toString());
+
+
+    }
+
+
+
 
   // Test an Isis2 file
   try {
@@ -154,6 +242,8 @@ void IsisMain() {
   catch (Isis::IException &e) {
     e.print();
   }
+
+
 }
 
 /**
@@ -166,4 +256,54 @@ void IsisMain() {
 void ReportError(QString err) {
   cout << err.replace(QRegExp("\\[[^\\]]*\\]"), "[]") << endl;
 }
+
+
+
+
+/**
+ * Grabs the Pvl file from the input file and returns it as
+ * a byte array which can be easily searched.
+ * @param fileName
+ * @author Tyler Wilson
+ */
+
+
+
+QByteArray grabPvl(QString fileName){
+
+
+    QByteArray null;
+    QFile pvlFile;
+
+    pvlFile.setFileName(fileName);
+
+     if ( !pvlFile.open(QFile::ReadOnly|QIODevice::Text))
+         return null;
+
+
+     //Read the Pvl file into a byte array
+     QByteArray fileData = pvlFile.readAll();
+     QByteArray pvlData;
+
+     QString pvlEnd("QUBE\nEND");
+     int ix = fileData.lastIndexOf(pvlEnd);
+
+     pvlData = fileData.left(ix+pvlEnd.size());
+
+
+
+    return pvlData;
+
+
+}
+
+
+
+
+
+
+
+
+
+
 

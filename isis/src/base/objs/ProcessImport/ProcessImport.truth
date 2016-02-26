@@ -8,6 +8,10 @@ Average: 0
 
 Variance: 3.69653e+38
 
+unittest: Importing
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+unittest: Importing
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Check the settings of the special pixel ranges
 
 **USER ERROR** The LRS range [35.0,55.0] overlaps the NULL range [0.0,45.0].

@@ -182,7 +182,7 @@ namespace Isis {
    *  @history 2013-03-12 Steven Lambright and Tracie Sucharski - Added ProcessPdsRdnLabel() to
    *                          handle Chandrayaan M3 RDN files.  Added a file type to handle
    *                          Chandrayaan Loc and Obs files on the same import as the Rdn files.
-   *                          Also added support for 64 bit input data. 
+   *                          Also added support for 64 bit input data.
    *                          Note:  There may be loss of precision since the output type is 32-bit.
    *                          Return reference to imported table.  Needed so that M3 table data
    *                          can be flipped to match image data depending on yaw and orbit limb
@@ -204,11 +204,17 @@ namespace Isis {
    *                          ProcessImportPds objects. Marked
    *                          EndProcess as deprecated.
    *  @history 2015-01-19 Sasha Brownsberger - Made destructor virtual. References #2215.
-   *                     
+   *
+   *  @history 2016-02-25 Tyler Wilson - Added a check in ProcessPdsQubeLabel to determine
+   *                          if a Galileo NIMS qub is being process.   If it is, then
+   *                          SetVAXConvert(true) is called which turns on a VAX conversion
+   *                          routine in ProcessImport.  If it is not, then nothing happens.
+   *                          References #2368.
+   *
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
-  
+
    */
   class ProcessImportPds : public ProcessImport {
 
@@ -338,3 +344,5 @@ namespace Isis {
 };
 
 #endif
+
+
