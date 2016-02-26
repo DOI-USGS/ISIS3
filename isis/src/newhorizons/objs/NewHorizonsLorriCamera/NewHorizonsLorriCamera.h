@@ -22,9 +22,11 @@
 
 #include "FramingCamera.h"
 
+#include <QString>
+
 namespace Isis {
   /**
-   * This is the camera model for the Dawn Framing Camera 
+   * This is the camera model for the LORRI Framing Camera 
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup New Horizons
@@ -32,10 +34,15 @@ namespace Isis {
    * @author 2013-11-12 Stuart Sides
    *
    * @internal 
-   *  
-   *  @history 2015-08-27 Stuart Sides - Modified to work with new Lorri IK with different units
-   *           (mm) for the focal length. Incremented camera version to 2.
-   *  
+   *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
+   *                           to get spacecraft and instrument names. Extended unit test to test 
+   *                           added methods.
+   *   @history 2015-08-27 Stuart Sides - Modified to work with new Lorri IK with different unit
+   *                          (mm) for the focal length. Incremented camera version to 2.
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *                           members and methods and removed implementation of these methods
+   *                           since Camera now handles this. References #2335.
+
    */
   class NewHorizonsLorriCamera : public FramingCamera {
     public:
@@ -84,7 +91,6 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
-
   };
 };
 #endif

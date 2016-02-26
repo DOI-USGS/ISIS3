@@ -20,6 +20,8 @@
 
 #include "NewHorizonsLorriCamera.h"
 
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -48,6 +50,11 @@ namespace Isis {
    */
 
   NewHorizonsLorriCamera::NewHorizonsLorriCamera(Cube &cube) : FramingCamera(cube) {
+    m_instrumentNameLong = "Long Range Reconnaissance Imager";
+    m_instrumentNameShort = "LORRI";
+    m_spacecraftNameLong = "New Horizons";
+    m_spacecraftNameShort = "NewHorizons";
+    
     NaifStatus::CheckErrors();
 
     // The LORRI focal length is fixed and is designed not to change throught the operational 
