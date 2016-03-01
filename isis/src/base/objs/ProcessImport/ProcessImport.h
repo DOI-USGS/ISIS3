@@ -37,10 +37,10 @@ namespace Isis {
   /**
    * @brief  Byte swapper
    *
-   * This class is used to import an image into Isis. It is a powerful base
-   * class which can be used to skip over header bytes, trailer bytes, prefix
-   * and/or suffix bytes. By deriving off of this class it can be used to Import
-   * vicar, PDS, fits, or many other standard format images.
+   * This class is used to import an image into Isis. It is a powerful base 
+   * class which can be used to skip over header bytes, trailer bytes, prefix 
+   * and/or suffix bytes. By deriving off of this class it can be used to Import 
+   * vicar, PDS, fits, or many other standard format images. 
    *
    * Here is an example of how to use ProcessImport
    * @code
@@ -135,16 +135,15 @@ namespace Isis {
    *                           to exercise the modified methods. Fixes #819.
    *  @history 2013-03-12 Steven Lambright and Tracie Sucharski - Added support for 64 bit input
    *                           data.  Note:  Possibility of lost precision since ouput is in 32 bit.
-   *  @history 2013-03-27 Jeannie Backer - Added programmer comments and
+   *   @history 2013-03-27 Jeannie Backer - Added programmer comments and
    *                           documentation. Changed parameter name from
    *                           "parameter" to "fname" in SetOutputCube() method.
    *                           References #1248.
-   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several
-   *                                            functions to ensure successful
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
+   *                                            functions to ensure successful 
    *                                            inheritance between Process and its
    *                                            child classes.  Added virtual keyword
    *                                            to destructor.  References #2215.
-   *
    *   @history 2016-02-23 Tyler Wilson - Added VAXConversion(...) and IsVAXSpecial(...) routines 
    *                        for importing Galileo NIMS qubs which were originally saved in VAX format.  
    *                        References #2368.
