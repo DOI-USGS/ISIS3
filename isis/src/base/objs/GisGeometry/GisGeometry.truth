@@ -1,0 +1,337 @@
+
+Testing GisGeometry... 
+
+GisGeometry::Types: 
+    wkt      =  "WKT" 
+    wkb      =  "WKB" 
+    cube     =  "IsisCube" 
+    isiscube =  "IsisCube" 
+    geometry =  "GeosGis" 
+    geosgis  =  "GeosGis" 
+    gis      =  "GeosGis" 
+    geos     =  "GeosGis" 
+    other    =  "None" 
+
+
+"Construct Geometry from Lat/Lon" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             0 
+    length?           0 
+    points?           1 
+
+"Construct Geometry from Cube" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "IsisCube" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Construct Geometry from WKT GIS source" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "WKT" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Construct Geometry from WKB GIS source" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "WKB" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Construct Geometry from IsisCube GIS source" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "IsisCube" 
+    area?             4.05913 
+    length?           8.38034 
+    points?           209 
+
+"Construct Geometry from GEOSGeometry" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Construct Empty Default Geometry" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Construct Copy Geometry from GisGeometry from Cube" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "IsisCube" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Construct Copy Geometry from Undefined Geometry" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Construct Equal Geometry from GisGeometry from Cube" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "IsisCube" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Construct Equal Geometry from Equal Geometry" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "IsisCube" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Construct Equal Geometry from Undefined Geometry" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Clone Geometry from GisGeometry from Cube" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "IsisCube" 
+    area?             50.218 
+    length?           29.6669 
+    points?           413 
+
+"Clone Geometry from Undefined Geometry" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Source: Invalid Geometry, Target: WKT Geometry" 
+    distance?         "0.0" 
+    intersects?       "No" 
+    contains?         "No" 
+    disjoint?         "No" 
+    overlaps?         "No" 
+    intersect ratio?  "0.0" 
+
+"Source: WKT Geometry, Target: Invalid Geometry" 
+    distance?         "0.0" 
+    intersects?       "No" 
+    contains?         "No" 
+    disjoint?         "No" 
+    overlaps?         "No" 
+    intersect ratio?  "0.0" 
+
+"Source: GisIsisCube Geometry, Target: WKT Geometry" 
+    distance?         "0.0" 
+    intersects?       "Yes" 
+    contains?         "No" 
+    disjoint?         "No" 
+    overlaps?         "Yes" 
+    intersect ratio?  "0.95216803927449" 
+
+"Source: WKT Geometry, Target: WKB Geometry (equal geometries)" 
+    distance?         "0.0" 
+    intersects?       "Yes" 
+    contains?         "Yes" 
+    disjoint?         "No" 
+    overlaps?         "No" 
+    intersect ratio?  "1.0" 
+
+"Source: WKT Geometry, Target: Lat/Lon Geometry" 
+    distance?         "288.73577074892" 
+    intersects?       "No" 
+    contains?         "No" 
+    disjoint?         "Yes" 
+    overlaps?         "No" 
+    intersect ratio?  "0.0" 
+
+Intersect Ratio of WKT Geometry with Lat/Lon (single point) Geometry:  0 
+ 
+"Envelope Geometry from GisGeometry from Cube" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             97.1265 
+    length?           40.3919 
+    points?           5 
+
+"Envelope Geometry from Invalid Geometry" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Convex Hull Geometry from Geometry from Cube" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             51.236 
+    length?           29.6587 
+    points?           211 
+
+"Convex Hull Geometry from Invalid Geometry" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Simplified Geometry from Geometry from Cube" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             50.2148 
+    length?           29.6512 
+    points?           5 
+
+Simplified Geometry from Invalid Geometry is NULL. 
+ 
+"Intersection Geometry of Invalid Geometry with WKT Geometry as target" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Intersection Geometry of WKT Geometry with Invalid Geometry as target" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Intersection Geometry of GisIsisCube Geometry with WKT Geometry" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             3.86497 
+    length?           8.20245 
+    points?           188 
+
+"Union Geometry of Invalid Geometry with WKT Geometry as target" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Union Geometry of WKT Geometry with Invalid Geometry as target" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Union Geometry of GisIsisCube Geometry with WKT Geometry" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             50.4122 
+    length?           29.8448 
+    points?           438 
+
+"Centroid Geometry of Invalid Geometry" 
+    isDefined?        false 
+    isValid?          false 
+    isValidReason?    "Not defined!" 
+    isEmpty?          true 
+    type?             "None" 
+    area?             0 
+    length?           0 
+    points?           0 
+
+"Centroid Geometry of WKT Geometry" 
+    isDefined?        true 
+    isValid?          true 
+    isValidReason?    "Valid Geometry" 
+    isEmpty?          false 
+    type?             "GeosGis" 
+    area?             0 
+    length?           0 
+    points?           1 
+
+Centroid found for Invalid Geometry?  false 
+ 
+Centroid found for WKT Geometry?  true 
+	Longitude:  290.491 
+	Latitude:   50.1643 
+ 
+Testing Errors... 
+**PROGRAMMER ERROR** Unknown GIS type given [None].
