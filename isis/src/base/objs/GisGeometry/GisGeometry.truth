@@ -159,6 +159,7 @@ GisGeometry::Types:
     contains?         "No" 
     disjoint?         "No" 
     overlaps?         "No" 
+    equals?           "No" 
     intersect ratio?  "0.0" 
 
 "Source: WKT Geometry, Target: Invalid Geometry" 
@@ -167,6 +168,7 @@ GisGeometry::Types:
     contains?         "No" 
     disjoint?         "No" 
     overlaps?         "No" 
+    equals?           "No" 
     intersect ratio?  "0.0" 
 
 "Source: GisIsisCube Geometry, Target: WKT Geometry" 
@@ -175,6 +177,7 @@ GisGeometry::Types:
     contains?         "No" 
     disjoint?         "No" 
     overlaps?         "Yes" 
+    equals?           "No" 
     intersect ratio?  "0.95216803927449" 
 
 "Source: WKT Geometry, Target: WKB Geometry (equal geometries)" 
@@ -183,6 +186,7 @@ GisGeometry::Types:
     contains?         "Yes" 
     disjoint?         "No" 
     overlaps?         "No" 
+    equals?           "Yes" 
     intersect ratio?  "1.0" 
 
 "Source: WKT Geometry, Target: Lat/Lon Geometry" 
@@ -191,6 +195,7 @@ GisGeometry::Types:
     contains?         "No" 
     disjoint?         "Yes" 
     overlaps?         "No" 
+    equals?           "No" 
     intersect ratio?  "0.0" 
 
 Intersect Ratio of WKT Geometry with Lat/Lon (single point) Geometry:  0 

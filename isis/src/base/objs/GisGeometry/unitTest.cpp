@@ -31,6 +31,9 @@ void printTypes();
  *   @history 2016-02-23 Jeannie Backer - Original version.
  *   @history 2016-03-02 Ian Humphrey - Added tests for remaining untested methods.
  *                           References #2398.
+ *   @history 2016-03-04 Ian Humphrey - Updated test and truthdata for equals() method. 
+ *                           References #2398.
+ *
  *
  * NOTE - distance(), intersects(), contains(), disjoin(), overlaps() methods
  *          are not completely tested.
@@ -264,7 +267,7 @@ void printTargetInfo(GisGeometry geom,  GisGeometry target, QString description)
   qDebug() << "    contains?        " << toString(geom.contains(target));
   qDebug() << "    disjoint?        " << toString(geom.disjoint(target));
   qDebug() << "    overlaps?        " << toString(geom.overlaps(target));
-  //qDebug() << "    equals?          " << toString(geom.equals(target));
+  qDebug() << "    equals?          " << toString(geom.equals(target));
   qDebug() << "    intersect ratio? " << toString(geom.intersectRatio(target));
   qDebug();                            
 }

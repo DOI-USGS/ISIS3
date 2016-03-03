@@ -45,7 +45,7 @@ using namespace std;
 namespace Isis {
 
   /** 
-   *  
+   * Fundamental constructor of an empty object
    */  
   GisGeometry::GisGeometry() : m_type(None), m_geom(0), m_preparedGeom(0) { 
     // Must ensure GEOS is initialized
@@ -54,8 +54,15 @@ namespace Isis {
   
 
   /** 
-   * @param xlongitude
-   * @param ylatitude
+   * @brief Construct a point geometry 
+   *  
+   * This constructor will create a point geometry. Note this can either be used 
+   * to create a geometric geometry with a longitude/latitude or a grid geometry 
+   * in any system with an X/Y value. It is up to the caller to maintain the 
+   * coordinate system. 
+   *  
+   * @param xlongitude X or longitude coordinate
+   * @param ylatitude  Y or latitude coordinate
    */  
   GisGeometry::GisGeometry(const double xlongitude, const double ylatitude) :
                            m_type(GeosGis), m_geom(0), m_preparedGeom(0){
@@ -68,7 +75,12 @@ namespace Isis {
   
   
   /** 
-   * @param cube  
+   * @brief Create a geometry from a cube file. 
+   *  
+   * This constructor will read the contents of the Polygon blob of an ISIS cube 
+   * file and create a geometry from its contents. 
+   *  
+   * @param cube  Cube object to create the geomtery from
    */  
   GisGeometry::GisGeometry(Cube &cube) : m_type(IsisCube), m_geom(0), m_preparedGeom(0) {
   
@@ -80,9 +92,11 @@ namespace Isis {
   
 
   /** 
-   * @param gisSource The GIS Source. This might be a wkt string, a wkb string, 
-   *                  or the file name of an ISIS cube.
-   * @param t Type of GisGeometry to construct.
+   * @brief Create a geometry from a character WKT/WKB source 
+   * 
+   * @param gisSource String containing the text representation of a GIS 
+   *                  geometry. This can be either a WKT or WKB formatted string
+   * @param t Type of GisGeometry - WKT or WKB
    * 
    */  
   GisGeometry::GisGeometry(const QString &gisSource, const GisGeometry::Type t) : 
@@ -113,7 +127,12 @@ namespace Isis {
   
 
   /** 
-   * @param geom  
+   * @brief Create a geometry from another geometry by cloning 
+   *  
+   * This contructor uses the GISTopology clone method to generate a new 
+   * geometry. 
+   *  
+   * @param geom  GISGeometry to create new geometry from
    */  
   GisGeometry::GisGeometry(const GisGeometry &geom) : m_type(geom.m_type),
                                                       m_geom(0),
@@ -128,7 +147,12 @@ namespace Isis {
   
 
   /** 
-   * @param geom 
+   * @brief Create a GISGeometry directly from a GEOS-C GEOSGeometry 
+   *  
+   * This constructor will create a new GISGeometry object that takes ownership 
+   * from the caller and is managed for the life of this new object. 
+   *  
+   * @param geom GEOSGeometry instance to use
    */  
   GisGeometry::GisGeometry(GEOSGeometry *geom) : m_type(GeosGis), m_geom(geom),
                                                  m_preparedGeom(0) {
@@ -139,7 +163,7 @@ namespace Isis {
   
 
   /** 
-   *  
+   * Destructor
    */  
   GisGeometry::~GisGeometry() {  
     destroy(); 
@@ -147,8 +171,12 @@ namespace Isis {
   
 
   /** 
-   * @param geom
-   * @return GisGeometry
+   * @brief Assignment operator for GISGeomtries 
+   *  
+   * This assignment operator essentially clones the right side geomemtry 
+   *  
+   * @param geom Geometry to assign to current object
+   * @return GisGeometry New geometry
    */  
   GisGeometry &GisGeometry::operator=(GisGeometry const &geom) {
     if ( this != &geom ) {
@@ -166,10 +194,12 @@ namespace Isis {
   
   /**
    * @brief Set the geometry directly taking ownership 
+   *  
+   * This method will replace the current geoemetry with the geom parameter 
+   * contents. The existing contents of this object is destroyed before taking 
+   * ownership of the geom paramter object. 
    * 
-   * @author 2012-07-14 Kris Becker
-   * 
-   * @param geom 
+   * @param geom GEOSGeometry to incoporate into this object
    */
   void GisGeometry::setGeometry(GEOSGeometry *geom) {
     destroy();
@@ -180,7 +210,9 @@ namespace Isis {
   
   
   /** 
-   * @return bool
+   * Determines if the current geometry is valid 
+   *  
+   * @return bool True if contents are valid, otherwise false
    */  
   bool GisGeometry::isDefined() const {
     return (m_geom != 0);
@@ -188,8 +220,12 @@ namespace Isis {
   
 
   /** 
+   * Determines validity of the geometry contained in this object
    *  
-   * @return bool
+   *  First determines if it contains a geometry and then validates with the
+   *  GEOS toolkit.
+   *  
+   * @return bool True if valid, false if invalid or non-existant
    */  
   bool GisGeometry::isValid() const {
     if (!isDefined()) {
@@ -201,8 +237,9 @@ namespace Isis {
   
 
   /** 
+   * Returns a string describing reason for invalid geometry
    *  
-   * @return QString 
+   * @return QString Description of the reason the geometry is invalid
    */  
   QString GisGeometry::isValidReason() const {
     QString result = "Not defined!";
@@ -217,8 +254,9 @@ namespace Isis {
   
 
   /** 
+   * Returns the type (origin) of the geometry
    *  
-   * @return GisGeometry::Type
+   * @return GisGeometry::Type Enum type of geometry origin
    */  
   GisGeometry::Type GisGeometry::type() const {
     return (m_type);
@@ -226,9 +264,11 @@ namespace Isis {
   
 
   /** 
+   * Returns enum representation of the geometry origin from string type
    *  
-   * @param gstrType
-   * @return GisGeometry::Type
+   * @see type(QString)
+   * @param gstrType  Character representation of geometry origin
+   * @return GisGeometry::Type Enum type of origin 
    */  
   GisGeometry::Type GisGeometry::type(const QString &gstrType) {
     QString gtype = gstrType.toLower();
@@ -245,9 +285,11 @@ namespace Isis {
 
 
   /** 
-   *  
-   * @param gstrType
-   * @return GisGeometry::Type
+   * Returns the type of the Geometry as a QString. 
+   *
+   * @see type(QString)
+   * @param gstrType Enum type of origin
+   * @return GisGeometry::Type Character representation of geometry or origin
    */  
   QString GisGeometry::typeToString(const GisGeometry::Type &type) {
     if (WKT == type) return "WKT";
@@ -259,8 +301,9 @@ namespace Isis {
   
 
   /** 
-   *  
-   * @return GEOSGeometry
+   * Returns the GEOSGeometry object to extend functionality
+   *
+   * @return GEOSGeometry Pointer to GEOSGeometry structure
    */  
   const GEOSGeometry *GisGeometry::geometry() const {
     return (m_geom);
@@ -268,17 +311,26 @@ namespace Isis {
   
 
   /** 
+   * @brief Returns special GEOS prepared geometry if it exists
    *  
-   * @return GEOSPreparedGeometry
+   * This method will return a pointer to the prepared version of the
+   * GEOSGeometry data. Caller should test for a NULL pointer as it may be
+   * disabled or non-existant.
+   *  
+   * @return GEOSPreparedGeometry Pointer to prepared geometry
    */  
   const GEOSPreparedGeometry *GisGeometry::preparedGeometry() const {
     return (m_preparedGeom);
   }
   
   
-  /** 
+  /**
+   * @brief Clones the contents of this geometry to a new instance
    *  
-   * @return GisGeometry
+   * This method will clone the contents of this geometry and return a new
+   * instance to the caller.
+   *  
+   * @return GisGeometry Geometry to clone
    */  
   GisGeometry *GisGeometry::clone() const {
     if (!isDefined()) {
@@ -296,8 +348,9 @@ namespace Isis {
   
   
   /** 
+   * Tests for a defined but empty geometry
    *  
-   * @return bool
+   * @return bool True if empty, false if has content
    */  
   bool GisGeometry::isEmpty() const {
     if ( !isValid() ) { 
@@ -308,8 +361,17 @@ namespace Isis {
   
 
   /** 
+   * @brief Computes the area of a geometry
    *  
-   * @return double
+   * This method will compute the area of a geometry. Note the area is in the
+   * units of the coordinates. For example, if the coordinates of the geometry
+   * are in latitude/longitude, then the units are in degrees. Callers must
+   * maintain the units of the coordinates.
+   *  
+   * Point geometries will have 0 area.
+   *  
+   * @return double Area of the geometry in units of data coordinates of the 
+   *                geometry
    */  
   double GisGeometry::area( ) const {
     if ( !isValid() ) { 
@@ -327,8 +389,12 @@ namespace Isis {
   
 
   /** 
+   * @brief Computes the length of a geometry
    *  
-   * @return double
+   * This method will compute the length of a geometry. This is suitable for
+   * Linestring and spatial geometries.
+   *  
+   * @return double Length of the geometry in units of the coordinates
    */  
   double GisGeometry::length( ) const {
     if ( !isValid() ) { 
@@ -346,8 +412,13 @@ namespace Isis {
   
 
   /** 
-   * @param target
-   * @return double
+   * @brief Computes the distance between two geometries
+   *  
+   * This method computes the distance between two geometries. Refer to the
+   * GEOS documentation as to the details of this computation.
+   *  
+   * @param target Target geometry to compute distance to
+   * @return double Distance in units of geometry coordinates
    */  
   double GisGeometry::distance(const GisGeometry &target) const {
     if ( !isValid() ) { 
@@ -369,6 +440,8 @@ namespace Isis {
 
   /** 
    * Get number of points in geometry 
+   *  
+   * @return int Number of points contained in the geometry
    */
   int GisGeometry::points() const {
     if (!isValid() ) { return (0); }
@@ -384,9 +457,13 @@ namespace Isis {
 
 
   /** 
+   * @brief Computes a new geometry from the intersection of the two geomtries
    *  
-   * @param target
-   * @return bool
+   * This method will compute the union of two geometries and return a new
+   * geometry that represents the combination of them.
+   *  
+   * @param target Other geometry to combine by union opertor
+   * @return bool  True if operation is successful, false otherwise
    */  
   bool GisGeometry::intersects(const GisGeometry &target) const {
     if ( !isValid() ) { 
@@ -409,9 +486,11 @@ namespace Isis {
   
 
   /** 
-   * @param target
-   * @return bool
+   * Test if the target geometry is contained within this geometry
    *  
+   * @param target Other geometry to test
+   * @return bool  True if target is contained with this geometry, false 
+   *               otherwise
    */  
   bool GisGeometry::contains(const GisGeometry &target) const {
     if ( !isValid() ) { 
@@ -434,9 +513,10 @@ namespace Isis {
   
 
   /** 
+   * Tests for disjoint geometries
    *  
-   * @param target
-   * @return bool
+   * @param target Other geometry to test
+   * @return bool  True if geometries are disjoint, false otherwise
    */  
   bool GisGeometry::disjoint(const GisGeometry &target) const {
     if ( !isValid() ) { 
@@ -459,9 +539,11 @@ namespace Isis {
   
 
   /** 
+   * Test for overlapping geometries
    *  
-   * @param target
-   * @return bool
+   * @param target Geometry to test for overlap with this geometry
+   * @return bool  True if target geometry overlaps with this geometry, false 
+   *               otherwise
    */  
   bool GisGeometry::overlaps(const GisGeometry &target) const {
     if ( !isValid() ) { 
@@ -483,10 +565,36 @@ namespace Isis {
   }
   
 
+/** 
+ * Test if target and this geometry are equal
+ * 
+ * @param target Geometry to test for equality
+ * @return bool  True if geometries are equal, false if not
+ */
+  bool GisGeometry::equals(const GisGeometry &target) const {    
+    if ( !isValid() ) { 
+      return (false); 
+    }
+
+    if ( !target.isValid() ) { 
+      return (false); 
+    }
+   
+    int result = GEOSEquals(this->m_geom, target.geometry());
+    return ( 1 == result );
+  }
+
+
   /** 
+   * @brief Computes intersect ratio between two geometries
    *  
-   * @param target
-   * @return double
+   * This method computes the intersection of two geometries and the returns
+   * the ratio of the area of intersection with this geometry. Units must be
+   * the same for both geometries or result will not be valid.
+   *  
+   * @param target  Geometry to compute intersect ratio for
+   * @return double  Area of common intersection of two geometries in units of 
+   *                 the two geometries.
    */  
   double GisGeometry::intersectRatio(const GisGeometry &target) const {
     if ( !isValid() ) { 
@@ -495,7 +603,6 @@ namespace Isis {
     if ( !target.isValid() ) { 
       return (0.0); 
     }
-  
   
     //  Check for any intersection at all
   //  if ( !intersects(target) ) {  
@@ -514,7 +621,17 @@ namespace Isis {
   
   
   /** 
-   * @return GisGeometry  
+   * @brief Computes the envelope or bounding box of this geometry
+   *  
+   * This method computes the envelope or bounding box of the geometry in this
+   * object. A new geometry is computed and a pointer is returned to the
+   * caller. The caller assumes ownership of this geometry.
+   *  
+   * A null geometry will be returned if an error is occured or the current
+   * geometry is invalid.
+   *  
+   * @return GisGeometry  Pointer to envelope/bounding box. A null geometry, not 
+   *                      NULL pointer, is returned in problems occur.
    */  
   GisGeometry *GisGeometry::envelope() const {
     if ( !isValid() ) { 
@@ -526,9 +643,12 @@ namespace Isis {
   }
   
 
-  /** 
+  /**
+   * Computes the convex hull of the geometry
    *  
-   * @return GisGeometry
+   * @return GisGeometry Pointer to new geometry that represents the convex 
+   *                     hull of this geometry. A null geometry, not NULL
+   *                     pointer is returned if problems occur.
    */  
   GisGeometry *GisGeometry::convexHull() const {
     if ( !isValid() ) { 
@@ -547,7 +667,6 @@ namespace Isis {
   * a tolerance specifying the maximum distance from the original (multi)polygon. 
   * The use of this algorithm is designed to prevent oversimplification 
   * 
-  * @author 2015-06-16 Kris Becker
   * 
   * @param tolerance Maximum distance from the original geometry expressed in the
   *                  coordinate system of the geometry.
@@ -568,9 +687,13 @@ namespace Isis {
 
 
   /** 
+   * @brief Computes the intersection of two geometries
    *  
-   * @param target
-   * @return GisGeometry
+   * The area of common interesction of the target geometry and this geometry
+   * are computed and returned to the caller.
+   *  
+   * @param target       Other geometry to compute intersection
+   * @return GisGeometry Intersection geometry
    */  
   GisGeometry *GisGeometry::intersection(const GisGeometry &target) const {
     //  Non-valid geometries return empty geometries
@@ -587,9 +710,10 @@ namespace Isis {
   
 
   /** 
+   * Computes the union of two geometries
    *  
-   * @param target
-   * @return GisGeometry
+   * @param target  Other geometry to union with this geometry
+   * @return GisGeometry Result of unioning the two geometries
    */  
   GisGeometry *GisGeometry::g_union(const GisGeometry &target) const {
     if ( !isValid() ) { 
@@ -605,10 +729,13 @@ namespace Isis {
   
 
   /** 
+   * @brief Computes the centroid of a spatial geometry
    *  
-   * @param xlongitude
-   * @param ylatitude
-   * @return bool
+   * This method will compute the coordinate centroid of a spatial geometry.
+   *  
+   * @param xlongitude X/longitude coordinate of centroid
+   * @param ylatitude  Y/latitude coordinate of centroid
+   * @return bool      True if successful, false if failed
    */  
   bool GisGeometry::centroid(double &xlongitude, double &ylatitude) const {
     xlongitude = ylatitude = Null;
@@ -629,8 +756,9 @@ namespace Isis {
   
 
   /** 
+   * Computes the centroid of the geometry and returns it as a new geometry
    *  
-   * @return GisGeometry
+   * @return GisGeometry Pointer to point geometry of centroid of this geometry
    */  
   GisGeometry *GisGeometry::centroid() const { 
     if ( !isValid() ) { 
@@ -643,6 +771,7 @@ namespace Isis {
   
 
   /** 
+   * Creates a prepared geometry of current geometry
    *  
    * @param geom
    * @return GEOSPreparedGeometry
@@ -659,10 +788,10 @@ namespace Isis {
   
 
   /** 
+   * Create a point geometry
    *  
-   * @param x
-   * @param y
-   * @return GEOSGeometry
+   * @param y  Y or latitude coordinate
+   * @return GEOSGeometry Pointer to point geometry. Caller assumes ownership
    */  
   GEOSGeometry *GisGeometry::makePoint(const double x, const double y) const {
   
@@ -675,9 +804,10 @@ namespace Isis {
   
 
   /** 
-   *  
-   * @param cube
-   * @return GEOSGeometry
+   * Reads Polygon from ISIS Cube and returns geometry from contents
+   *
+   * @param cube ISIS Cube contaning a Polygon geometry object
+   * @return GEOSGeometry Pointer to GEOS-C type geometry from Polygon BLOB
    */  
   GEOSGeometry *GisGeometry::fromCube(Cube &cube) const {
     GisBlob myGis(cube);
@@ -687,7 +817,7 @@ namespace Isis {
   
 
   /** 
-   *  
+   * Destroys the GEOS elements of this geometry object     
    */  
   void GisGeometry::destroy() {
     GisTopology *gis(GisTopology::instance());

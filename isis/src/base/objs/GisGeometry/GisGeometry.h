@@ -37,6 +37,23 @@ namespace Isis {
 
   class Cube;
   /**
+   * @brief Encapsulation class provides support for GEOS-C API 
+   *  
+   * The Geometry Engine, Open Source (GEOS) software package, developed in C++ 
+   * from a port of the Java Toplogy Suite (JTS) provides a simplied, generic C 
+   * API using an opaque C pointer. This layer is to provide stable API from 
+   * which to develop and maintain applications that are relatively immune from 
+   * changes to the underlying C++ implementation. 
+   *  
+   * This class provides much of the basic elements to support simplified 
+   * development of C++ applications with similiar goals - to provide immmunity 
+   * from developmental changes to code using the GEOS-C API in a C++ 
+   * development environment. 
+   *  
+   * The GEOS home page is http://trac.osgeo.org/geos/. The documentation for 
+   * the GEOS-C package can be found at 
+   * http://geos.osgeo.org/doxygen/c_iface.html. 
+   *  
    * @author 2012-07-15 Kris Becker 
    * @internal 
    *   @history 2012-07-15 Kris Becker - Original version.
@@ -44,12 +61,15 @@ namespace Isis {
    *   @history 2016-03-02 Ian Humphrey - Updated for coding standards compliance. Added to 
    *                           jwbacker's original unit test to prepare for adding this class to
    *                           ISIS. Fixes #2398.
+   *   @history 2016-03-04 Kris Becker - Completed the documentation and implmented the equals()
+   *                           method.
    */   
   class GisGeometry {
   
     public:
-      
-      //! Source type of the geometry.
+      /**
+       * Source type of the geometry.
+       */
       enum Type { 
           None,     //!< No geometry. A geometry object cannot be created with this geometry type.
           WKT,      //!< The GEOS library WKT reader is used to create the geometry.
@@ -112,8 +132,8 @@ namespace Isis {
       GEOSPreparedGeometry const *makePrepared(const GEOSGeometry *geom) const;
       void destroy();
 
-      Type                 m_type;  //!< Source type of the geometry.
-      GEOSGeometry         *m_geom; //!< The geometry from the GEOS library.
+      Type                 m_type;  //!< Geometry type of GIS source
+      GEOSGeometry         *m_geom; //!< Pointer to GEOS-C opaque structure
       GEOSPreparedGeometry const *m_preparedGeom; //!< A prepared geometry from the GEOS library.
   
   };
@@ -123,6 +143,7 @@ namespace Isis {
 
 } // Namespace Isis
 
+// Declaration so this type can be used in Qt's QVariant class
 Q_DECLARE_METATYPE(Isis::SharedGisGeometry);
 
 #endif
