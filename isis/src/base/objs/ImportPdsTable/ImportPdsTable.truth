@@ -93,6 +93,50 @@ Double Value	Integer Value	Text Value	Real Value
 3.14159			3				PI			3.1428570747375
 2.71828			2				e			2.0
 
+
+
+Testing name() (default TABLE): TABLE
+
+Testing setName("My Table"): My Table
+
+
+Testing ImportPdsTable protected methods with file data/edrindex.lbl
+
+Constructing new ImportPdsTable where the PDS table object name is INDEX_TABLE
+
+Testing getColumnFields...
+
+Column TELEMETRY_SOURCE_NAME items: 1
+  030_009_f0006-000-0000_003_0128278505-223.dat               
+
+Column Description for this column: 
+m_name: TELEMETRY_SOURCE_NAME
+m_colnum: 42
+m_dataType: CHARACTER
+m_startByte: 658
+m_numBytes: 60
+m_itemBytes: 60
+m_items: 1
+
+
+Column ROVER_MOTION_COUNTER items: 5
+  0     
+  0     
+  0     
+  0     
+  0     
+
+Column Description for this column: 
+m_name: ROVER_MOTION_COUNTER
+m_colnum: 43
+m_dataType: INTEGER
+m_startByte: 720
+m_numBytes: 34
+m_itemBytes: 6
+m_items: 5
+
+
+
 Throw error for invalid table file name: 
 **ERROR** Unable to import PDS table.  Neither of the following possible table files were found: [INVALID_TABLE_FILE_NAME.DAT]  or [./invalid_table_file_name.dat].
 **ERROR** Failed to convert string [INVALID_TABLE_FILE_NAME] to an integer.
@@ -100,8 +144,8 @@ Throw error for invalid table file name:
 Throw error for attempt to access invalid column index: 
 **PROGRAMMER ERROR** Unable to import the binary PDS table [TABLE] into Isis. The requested column index [5] exceeds the last column index [3].
 
-Throw error for attempt to export non-existant columns: 
-**PROGRAMMER ERROR** Unable to import the PDS table [TABLE] into Isis. The requested column name [Invalid Column Name] does not exist in table.
+Throw error for attempt to export non-existent columns: 
+**PROGRAMMER ERROR** Unable to import the PDS table [My Table] into Isis. The requested column name [Invalid Column Name] does not exist in table.
 
 Throw error for missing table location in label file:
 **ERROR** The PDS file data/lsb_pds_binary_table.lbl does not have the required TABLE object, [MISSING_TABLE]. The PDS label file is probably invalid.
@@ -140,7 +184,14 @@ Throw error for invalid column DATA_TYPE in label file:
 
 Throw error for inconsistent byte order in label file: 
 **ERROR** Unable to import the PDS table [TABLE] from the PDS file [data/lsb_pds_binary_table.dat] into Isis.
-**ERROR** Unable import the binary PDS table [TABLE]. The column DATA_TYPE values indicate differing byte orders.
+**ERROR** Unable to import the binary PDS table [TABLE]. The column DATA_TYPE values indicate differing byte orders.
+
+Throw error if index used to request a column description 
+is greater than the number of columns in the table: 
+**PROGRAMMER ERROR** Index (100) into Columns invalid (max: 48).
+
+Throw error if index used to request a column description is less than 0: 
+**PROGRAMMER ERROR** Index (-1) into Columns invalid (max: 48).
 
 cols = 4
 rows = 0

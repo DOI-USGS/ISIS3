@@ -23,6 +23,8 @@
  */
 
 #include <QString>
+#include <QList>
+#include <QStringList>
 
 #include <fstream>
 #include <vector>
@@ -95,6 +97,11 @@ namespace Isis {
    *                           binary PDS tables. Changed method name from
    *                           "exportAsTable" to "importTable". Improved
    *                           unitTest coverage. References #700.
+   *   @history 2015-07-17 Kris Becker - Declare destructor as virtual to make
+   *                           it iheritable. Reorganized to support interception
+   *                           of storage methods for derivedå class use.
+   *   @history 2016-02-24 Ian Humphrey - Updated documentation and unit test. Added edrindex.lbl
+   *                           and edrindex.tab files to data directory (for tests). Fixes #2397.
    *  
    *  
    * @todo The binary table import methods were written after the ascii table 
@@ -108,56 +115,76 @@ namespace Isis {
       ImportPdsTable();
       ImportPdsTable(const QString &pdsLabFile, 
                      const QString &pdsTabFile="",
-                     const QString &pdsTableName="TABLE");
-      ~ImportPdsTable();
-  
+                     const QString &pdsTableName ="TABLE");
+      virtual ~ImportPdsTable();
+
+      QString name() const;
+      void setName(const QString &name = "TABLE");
+
       int columns() const;
       int rows() const;
-  
-      void load(const QString &pdsLabFile, const QString &pdsTabFile = "");
-  
+
+      void load(const QString &pdsLabFile, const QString &pdsTabFile = "", 
+                const QString &pdsTableName = "TABLE");
+
       bool hasColumn(const QString &colName) const;
       QString getColumnName(const unsigned int &index = 0, 
                                 const bool &formatted = true) const;
       QStringList getColumnNames(const bool &formatted = true) const;
       QString getFormattedName(const QString &colname) const;
-  
+
       QString getType(const QString &colName) const;
       bool setType(const QString &colName, const QString &dataType);
- 
+
       Table importTable(const QString &isisTableName);
       Table importTable(const QString &colNames,
                         const QString &isisTableName);
       Table importTable(const QStringList &colNames,
                         const QString &isisTableName);
-  
-    private:
-  
+
+
+  protected:
       struct ColumnDescr {
         QString m_name;       //!< Name of column
-        int         m_colnum;     //!< Column number
+        int     m_colnum;     //!< Column number
         QString m_dataType;   //!< PDS table DATA_TYPE of column
-        int         m_startByte;  //!< Starting byte of data
-        int         m_numBytes;     //!< Number bytes in column
-        int         m_itemBytes;  //!<
+        int     m_startByte;  //!< Starting byte of data
+        int     m_numBytes;   //!< Number bytes in column
+        int     m_itemBytes;  //!< Number bytes per item 
+        int     m_items;      //!< Number of items in column
       };
-  
-      typedef std::vector<ColumnDescr> ColumnTypes;
-      typedef std::vector<QString>     Columns;
-      typedef std::vector<Columns>     Rows;
-  
-      void init();
 
-      void loadLabel(const QString &labfile, QString &tblfile);
-      void loadTable(const QString &tabfile);
+      // Internal types
+      typedef QList<ColumnDescr> ColumnTypes;
+      typedef QStringList        Columns;
+      typedef QList<Columns>     Rows;
 
-      ColumnDescr getColumnDescription(PvlObject &colobj, int nth) const;
+      const ColumnDescr &getColumnDescriptor(const int &nth) const;
       ColumnDescr *findColumn(const QString &colName);
       const ColumnDescr *findColumn(const QString &colName) const;
 
+
       QString getColumnValue(const QString &tline,
-                                 const ColumnDescr &cdesc) const;
+                             const ColumnDescr &cdesc,
+                             const QString &delimiter = "") const;
+      QStringList getColumnFields(const QString &tline,
+                                  const ColumnDescr &cdesc,
+                                  const QString &delimiter = "") const;
+
+
       QString getGenericType(const QString &ttype) const;
+
+      virtual bool processRow(const int &row, const QString &rowdata);
+
+
+  private:
+      void init();
+
+      void loadLabel(const QString &labfile, QString &tblfile,
+                     const QString &tblname = "");
+      void loadTable(const QString &tabfile);
+
+      ColumnDescr getColumnDescription(PvlObject &colobj, int nth) const;
 
       TableRecord makeRecord(const ColumnTypes &ctypes);
       TableField makeField(const ColumnDescr &cdesc);
@@ -172,7 +199,7 @@ namespace Isis {
 
       void fillTable(Table &table, const ColumnTypes &columns,
                      TableRecord &record) const;
-      
+
       //private instance variables
       int         m_trows;      //!< Number rows in table according to label
       ColumnTypes m_coldesc;    //!< Column descriptions
@@ -185,7 +212,6 @@ namespace Isis {
       int      m_pdsTableStart; //!< The start byte of the PDS table data.
       QString  m_byteOrder;     /**< The byte order of the PDS table file, if 
                                      binary. Valid values are "MSB" or "LSB".*/
-
   };
 
 }

@@ -1,0 +1,580 @@
+PDS_VERSION_ID                = PDS3
+RECORD_TYPE                   = FIXED_LENGTH
+RECORD_BYTES                  = 773
+FILE_RECORDS                  = 9
+^INDEX_TABLE                  = "EDRINDEX.TAB"
+MISSION_NAME                  = "MARS EXPLORATION ROVER"
+PRODUCER_INSTITUTION_NAME     = "MULTIMISSION IMAGE PROCESSING 
+                                 SUBSYSTEM, JET PROPULSION LAB"
+DESCRIPTION                   = "This index file lists information
+                                 about each of the EDR data products 
+                                 contained on this archive volume."
+
+OBJECT                        = INDEX_TABLE
+  INTERCHANGE_FORMAT          = ASCII
+  ROW_BYTES                   = 773
+  ROWS                        = 9
+  COLUMNS                     = 48
+  INDEX_TYPE                  = SINGLE
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 1
+    NAME                      = VOLUME_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 2
+    BYTES                     = 11
+    DESCRIPTION               = "The volume on which this product is 
+                                 stored."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 2
+    NAME                      = DATA_SET_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 16
+    BYTES                     = 40
+    DESCRIPTION               = "A unique identifier for the dataset."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 3
+    NAME                      = INSTRUMENT_HOST_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 59
+    BYTES                     = 4
+    DESCRIPTION               = "The identifier for the host on which the
+                                 instrument is based." 
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 4
+    NAME                      = INSTRUMENT_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 66
+    BYTES                     = 18
+    DESCRIPTION               = "The instrument identifier."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 5
+    NAME                      = RELEASE_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 87
+    BYTES                     = 4
+    DESCRIPTION               = "Specifies the unique identifier 
+                                 associated with a specific release 
+                                 of a data set." 
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 6
+    NAME                      = PRODUCT_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 94
+    BYTES                     = 27
+    DESCRIPTION               = "Unique identifier for this product."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 7
+    NAME                      = PRODUCT_CREATION_TIME
+    DATA_TYPE                 = TIME
+    START_BYTE                = 123
+    BYTES                     = 20
+    DESCRIPTION               = "UTC date and time that this product 
+                                 was created, in the format 
+                                 yyyy-mm-ddThh:mm:ssZ."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 8
+    NAME                      = TARGET_NAME
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 145
+    BYTES                     = 6
+    DESCRIPTION               = "Planetary body that is the target of
+                                 the observation."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 9
+    NAME                      = MISSION_PHASE_NAME
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 154
+    BYTES                     = 30
+    DESCRIPTION               = "Mission phase during which data 
+                                 were acquired."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 10
+    NAME                      = PLANET_DAY_NUMBER
+    DATA_TYPE                 = ASCII_INTEGER
+    START_BYTE                = 186
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the number of sidereal days
+                                 (rotation of 360 degrees) elapsed since 
+                                 a reference day (e.g., the day on which 
+                                 the landing vehicle set down). Days are
+                                 measured in rotations of the planet 
+                                 from the reference day."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 11
+    NAME                      = START_TIME
+    DATA_TYPE                 = TIME
+    START_BYTE                = 191
+    BYTES                     = 20
+    DESCRIPTION               = "UTC date and time at the start of
+                                 data acquisition for this product, 
+                                 in the format 
+                                 yyyy-mm-ddThh:mm:ssZ."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 12
+    NAME                      = STOP_TIME
+    DATA_TYPE                 = TIME
+    START_BYTE                = 212
+    BYTES                     = 20
+    DESCRIPTION               = "UTC date and time at the end of
+                                 data acquisition for this product, 
+                                 in the format 
+                                 yyyy-mm-ddThh:mm:ssZ."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 13
+    NAME                      = EARTH_RECEIVED_START_TIME
+    DATA_TYPE                 = TIME
+    START_BYTE                = 233
+    BYTES                     = 20
+    DESCRIPTION               = "UTC date and time at the start of
+                                 receipt of this product on Earth, 
+                                 in the format 
+                                 yyyy-mm-ddThh:mm:ssZ."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 14
+    NAME                      = EARTH_RECEIVED_STOP_TIME
+    DATA_TYPE                 = TIME
+    START_BYTE                = 254
+    BYTES                     = 20
+    DESCRIPTION               = "UTC date and time at the end of
+                                 receipt of this product on Earth, 
+                                 in the format 
+                                 yyyy-mm-ddThh:mm:ssZ."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 15
+    NAME                      = SPACECRAFT_CLOCK_START_COUNT
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 276
+    BYTES                     = 30
+    DESCRIPTION               = "Specifies the value of the spacecraft
+                                 clock at the beginning of a time 
+                                 period of interest."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 16
+    NAME                      = SPACECRAFT_CLOCK_STOP_COUNT
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 309
+    BYTES                     = 30
+    DESCRIPTION               = "Specifies the value of the spacecraft
+                                 clock at the end of a time period of
+                                 interest."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 17
+    NAME                      = SEQUENCE_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 341
+    BYTES                     = 30
+    DESCRIPTION               = "Identifies the spacecraft sequence 
+                                 associated with the given product."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 18
+    NAME                      = OBSERVATION_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 375
+    BYTES                     = 20
+    DESCRIPTION               = "Unique identifier for a scientific
+                                 observation within a data set."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 19
+    NAME                      = LOCAL_TRUE_SOLAR_TIME
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 398
+    BYTES                     = 12
+    DESCRIPTION               = "Specifies the local true solar time. 
+                                 Measured relative to the true position
+                                 of the sun as seen from a point on the 
+                                 surface of the planet."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 20
+    NAME                      = LINES
+    DATA_TYPE                 = ASCII_INTEGER
+    START_BYTE                = 412
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the total number of data instances
+                                 along the vertical axis of an image."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 21
+    NAME                      = LINE_SAMPLES
+    DATA_TYPE                 = ASCII_INTEGER
+    START_BYTE                = 417
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the total number of data instances
+                                 along the horizontal axis of an image."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 22
+    NAME                      = FIRST_LINE
+    DATA_TYPE                 = ASCII_INTEGER 
+    START_BYTE                = 422
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the line within a source
+                                 image that corresponds to the first line 
+                                 in a sub-image."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 23
+    NAME                      = FIRST_LINE_SAMPLE
+    DATA_TYPE                 = ASCII_INTEGER 
+    START_BYTE                = 427
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the sample within a source 
+                                 Image that corresponds to the first 
+                                 Sample in a sub-image."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 24
+    NAME                      = INSTRUMENT_SERIAL_NUMBER
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 433
+    BYTES                     = 4
+    DESCRIPTION               = "Specifies the serial number assigned
+                                 to an instrument."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 25
+    NAME                      = INSTRUMENT_MODE_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 440
+    BYTES                     = 20 
+    DESCRIPTION               = "Specifies an instrument-dependent
+                                 designation of operating mode."
+  END_OBJECT                  = COLUMN
+
+OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 26
+    NAME                      = IMAGE_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 463
+    BYTES                     = 12
+    DESCRIPTION               = "Specifies an image."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 27
+    NAME                      = IMAGE_TYPE
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 478
+    BYTES                     = 10
+    DESCRIPTION               = "Specifies the type of image acquired."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 28
+    NAME                      = EXPOSURE_DURATION
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 490
+    BYTES                     = 13
+    FORMAT                    = "F13.6"
+    DESCRIPTION               = "Specifies the value of the time between
+                                 the opening and closing of an instrument
+                                 aperture (such as camera shutter)."
+  END_OBJECT                  = COLUMN
+
+OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 29
+    NAME                      = FILTER_NAME
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 505
+    BYTES                     = 22
+    DESCRIPTION               = "Specifies the commonly used name of the 
+                                 instrument filter through which an image 
+                                 or measurement was acquired."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 30
+    NAME                      = FILTER_NUMBER
+    DATA_TYPE                 = ASCII_INTEGER
+    START_BYTE                = 529
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the number of an instrument
+                                 filter through which an image or
+                                 measurement was acquired."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 31
+    NAME                      = FRAME_ID
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 535
+    BYTES                     = 5 
+    DESCRIPTION               = "Specifies an identification for a 
+                                 particular instrument measurement frame.
+                                 A frame consists of a sequence of 
+                                 measurements made over a specified time
+                                 interval, and may include measurements
+                                 from different instrument modes."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 32
+    NAME                      = FRAME_TYPE
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 543
+    BYTES                     = 6 
+    DESCRIPTION               = "Specifies whether the image was 
+                                 commanded as part of a stereo pair or
+                                 as single left or right monoscopic
+                                 image."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 33
+    NAME                      = AZIMUTH_FOV
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 551
+    BYTES                     = 10
+    FORMAT                    = "F10.6"
+    DESCRIPTION               = "Specifies the angular measure of the 
+                                 horizontal field of view of an imaged 
+                                 scene."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 34
+    NAME                      = ELEVATION_FOV
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 562
+    BYTES                     = 10
+    FORMAT                    = "F10.6"
+    DESCRIPTION               = "Specifies the angular measure of the
+                                 vertical field of view of an imaged
+                                 scene."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 35
+    NAME                      = SITE_INSTRUMENT_AZIMUTH
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 573
+    BYTES                     = 10
+    FORMAT                    = "F10.6" 
+    DESCRIPTION               = "Specifies the value for the rotation of the
+                                 instrument in the horizontal direction relative
+                                 to the surface of Mars."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 36
+    NAME                      = SITE_INSTRUMENT_ELEVATION
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 584
+    BYTES                     = 10
+    FORMAT                    = "F10.6"
+    DESCRIPTION               = "Specifies a value for the rotation of the
+                                 instrument in the vertical direction relative
+                                 to the surface of Mars."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 37
+    NAME                      = ROVER_INSTRUMENT_AZIMUTH
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 595
+    BYTES                     = 10
+    FORMAT                    = "F10.6" 
+    DESCRIPTION               = "Specifies the value for the rotation of the
+                                 instrument in the horizontal direction relative
+                                 to the rover."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 38
+    NAME                      = ROVER_INSTRUMENT_ELEVATION
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 606
+    BYTES                     = 10
+    FORMAT                    = "F10.6"
+    DESCRIPTION               = "Specifies a value for the rotation of the
+                                 instrument in the vertical direction relative
+                                 to the rover."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 39
+    NAME                      = SOLAR_AZIMUTH 
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 617
+    BYTES                     = 11
+    FORMAT                    = "F11.6"
+    DESCRIPTION               = "Specifies one of two angular measurements
+                                 indicating the direction to the Sun as
+                                 measured from a specific point on the 
+                                 surface of a planet."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 40
+    NAME                      = SOLAR_ELEVATION
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 629
+    BYTES                     = 11
+    FORMAT                    = "F11.6"
+    DESCRIPTION               = "Specifies one of two angular measurements
+                                 indicating the direction to the Sun as
+                                 measured from a specific point on the 
+                                 surface of a planet."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 41
+    NAME                      = SOLAR_LONGITUDE
+    DATA_TYPE                 = ASCII_REAL
+    START_BYTE                = 641
+    BYTES                     = 11
+    FORMAT                    = "F11.6"
+    DESCRIPTION               = "Specifies the value of the angle between
+                                 the body_Sun line at the time of interest
+                                 the body_Sun line at vernal equinox.  
+                                 This provides a measure of season on the
+                                 target body."           
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 42
+    NAME                      = APPLICATION_PROCESS_ID
+    DATA_TYPE                 = INTEGER
+    START_BYTE                = 653
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the process, or source, which
+                                 created the data."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 43
+    NAME                      = TELEMETRY_SOURCE_NAME
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 659
+    BYTES                     = 60
+    DESCRIPTION               = "Specifies the name of the telemetry source
+                                 used in creation of this data."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 44
+    NAME                      = ROVER_MOTION_COUNTER
+    DATA_TYPE                 = ASCII_INTEGER
+    START_BYTE                = 721
+    BYTES                     = 34
+    ITEMS                     = 5
+    ITEM_BYTES                = 6
+    ITEM_OFFSET               = 7
+    FORMAT                    = "I6"
+    DESCRIPTION               = "Specifies an array of integers which 
+                                 describe location for the rover. 
+                                 The motion counter consists of five 
+                                 values in the following order: Site, 
+                                 Drive, I, PMA and HGA.  The Site value
+                                 increments whenever a new major Site
+                                 frame is declared.  The Drive value
+                                 increments any time intentional driving
+                                 occurs.  Changes to either Site or Drive
+                                 reset all later indices to 0. The IDD, 
+                                 PMA and HGA increment independently,
+                                 whenever the corresponding articulation
+                                 device moves."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 45
+    NAME                      = FLAT_FIELD_CORRECTION_FLAG
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 757
+    BYTES                     = 1
+    DESCRIPTION               = "Specifies whether or not a flat field
+                                 correction was applied to an image. 0 
+				          means no flat field correction was 
+                                 applied."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 46
+    NAME                      = SHUTTER_EFFECT_CORRECTION_FLAG
+    DATA_TYPE                 = CHARACTER
+    START_BYTE                = 761
+    BYTES                     = 1
+    DESCRIPTION               = "Specifies whether or not correction was
+                                 applied to remove the image of the shutter.
+                                 0 means no shutter effect correction was
+                                 applied."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 47
+    NAME                      = PIXEL_AVERAGING_HEIGHT
+    DATA_TYPE                 = ASCII_INTEGER
+    START_BYTE                = 764
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the vertical dimension, in pixels,
+                                 of the area over which pixels were averaged
+                                 prior to image compression."
+  END_OBJECT                  = COLUMN
+
+  OBJECT                      = COLUMN
+    COLUMN_NUMBER             = 48
+    NAME                      = PIXEL_AVERAGING_WIDTH
+    DATA_TYPE                 = ASCII_INTEGER
+    START_BYTE                = 769
+    BYTES                     = 4
+    FORMAT                    = "I4"
+    DESCRIPTION               = "Specifies the horizontal dimension, in 
+                                 pixels, of the area over which pixels were
+                                 averaged prior to image compression."
+  END_OBJECT                  = COLUMN
+
+END_OBJECT                    = INDEX_TABLE
+
+END
+
