@@ -74,7 +74,9 @@ namespace Isis {
       Resource();
       Resource(const QString &name);
       Resource(const QString &name, const PvlFlatMap &profile);
-      Resource(const QString &name, const PvlContainer &profile);
+      //Resource(const QString &name, const PvlContainer &profile);
+      Resource(const QString &name, const PvlGroup &profile);
+      Resource(const QString &name, const PvlObject &profile);
       Resource(const Resource &other);
       virtual ~Resource();
 
