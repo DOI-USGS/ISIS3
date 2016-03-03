@@ -1,0 +1,247 @@
+Testing default constructor:   
+
+Creating empty strategy: 
+Name:          "Strategy" 
+Type:          "Counter" 
+Description:   "Strategy::Strategy is running a Counter algorithm." 
+Testing constructors: 
+
+Testing Strategy(const PvlObject &def,const ResourceList &globals) constructor: 
+"**PROGRAMMER ERROR** Keyword Name does not exist!." 
+"Elven Dictionary" 
+
+"strat4" 
+
+Name:          "Derived Strategy Name" 
+Type:          "Derived Strategy Type" 
+Testing getGlobalDefaults:   
+
+Elven Word List 1
+Elven Word List 2
+************************************************ 
+
+
+Testing getGlobals:   
+
+Elven Word List 3
+Elven Word List 1
+Elven Word List 2
+************************************************ 
+
+
+Testing getDefinition:   
+
+"Elven Dictionary" 
+
+************************************************ 
+
+
+Testing getDefinitionMap:   
+
+	ApplyToDiscarded = false
+	Debug = true
+	Name = "Elven Dictionary"
+	Type = Dictionary
+************************************************ 
+
+
+Testing setApplyToDiscarded(), isApplytToDiscarded(), setDoNotApplyToDiscarded() 
+
+isApplyToDiscarded =  
+false 
+
+Testing setApplyToDiscarded:   
+
+isApplyToDiscarded =  
+true 
+
+Testing setDoNotApplyToDiscarded:   
+
+isApplyToDiscarded =  
+false 
+
+************************************************ 
+
+
+Testing applyToResources(....) 
+
+Number of resources processed =  2 
+
+************************************************ 
+
+
+************************************************ 
+
+
+Testing processed/resetProcessed:   
+
+Processed =  3 
+
+Resetting Processed:   
+
+Processed =  1 
+
+************************************************ 
+
+
+Testing countActive/countDiscard:   
+
+Active Resources in lstA: 2 
+
+Discarded Resources in lstA: 0 
+
+************************************************ 
+
+Testing findReplacement:   
+
+Empty apply is called...
+Empty apply is called...
+Elven Word List 3
+Elven Word List 1
+Elven Word List 2
+Searching for elvish word for demon (with default args):  balrog
+Searching for value not in the ResourceList:  
+Could not find fluffy bunny
+************************************************ 
+
+Testing qualifiers (more elvish words):   
+
+Aaye
+Aelin
+Adan
+Adanedhel
+Aduial
+Aglarond
+
+Testing qualifiers with default delimiter (::):   
+
+Aaye
+Aelin
+Adan
+Adanedhel
+Aduial
+Aglarond
+************************************************ 
+
+Testing scanAndReplace:   
+
+Original sentence:  Balrogs require much fnord love and fnord attention.
+Fixed sentence:  Balrogs require much  love and  attention.
+************************************************ 
+
+Testing translateKeywordArgs:   
+
+blah
+************************************************ 
+
+Testing processArgs:   
+
+balrog
+************************************************ 
+
+Testing propagateKeys:   
+
+	daisy = eirien
+	Identity = "Elven Word List 3"
+	pipe-weed = galena
+	Sun = Anor
+	daisy = eirien
+	Identity = "Elven Word List 3"
+	pipe-weed = galena
+	Sun = Anor
+************************************************ 
+
+Testing activeList 
+
+Elven Word List 3
+Elven Word List 1
+Elven Word List 2
+Number of active resources =  3 
+
+************************************************ 
+
+Testing deactivateList 
+
+Number of active resources =  0 
+
+************************************************ 
+
+Testing activateList 
+
+Number of active resources =  3 
+
+************************************************ 
+
+Testing copyList (globals -> l5) 
+
+Elven Word List 3
+Elven Word List 1
+Elven Word List 2
+Decativating l5 Resources (global resources are active) 
+
+Number of active resources in l5 =  0 
+
+Number of active resources in global =  3 
+
+************************************************ 
+
+Testing cloneList (globals -> l6) 
+
+Elven Word List 3
+Elven Word List 1
+Elven Word List 2
+************************************************ 
+
+Testing applyToIntersectedGeometry 
+
+************************************************ 
+
+Testing isDebug(): 
+
+isDebug() =  true 
+
+************************************************ 
+
+Testing doShowProgress(): 
+
+doShowProgress() =  false 
+
+************************************************ 
+
+Testing initProgress(): 
+
+Calling with no args, initProgress =   false 
+
+Calling:  initProgress(2,"some text") =  false 
+
+************************************************ 
+
+Testing composite(...): 
+
+"Elven Word List 1_Elven Word List 3" 
+
+************************************************ 
+
+Testing importGeometry(...): 
+
+importGeometry =  
+true 
+
+************************************************ 
+
+getObjectList:   
+
+************************************************ 
+
+getObjectList:   
+
+"O1" 
+
+"O2" 
+
+"O3" 
+
+Testing applyToIntersected Geometry  
+"**PROGRAMMER ERROR** Dictionary:Elven DictionaryCannot apply RTree search to bad geometry." 
+
+  Dictionary:Elven Dictionary does not have a geometry!
