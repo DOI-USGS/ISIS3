@@ -161,7 +161,7 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.4.2
 GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
-GEOSLIB    = -lgeos-3.4.2
+GEOSLIB    = -lgeos-3.4.2 -lgeos_c
 
 #---------------------------------------------------------------------------
 # Set up for the GNU Scientific Library (GSL).  Note that this setup
