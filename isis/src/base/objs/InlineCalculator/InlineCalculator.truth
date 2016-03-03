@@ -1,0 +1,51 @@
+Testing empty constrctor...
+Testing constrctor with argument...
+Testing eval right away
+The empty size is:  "0" 
+The size is:  "3" 
+The empty equation is:  "" 
+The equation is:  "1 + 2" 
+Does the empty one compile correctly: 1
+Did this compile correctly: 1
+Testing compile's exception.
+"**USER ERROR** Missing an operator before @." 
+This should throw an exception: 
+"**USER ERROR** Missing an operator before 2." 
+1 + 2 to postfix:  "1 2 +" 
+(1 + 2) * (3+4) to postfix:  "1 2 + 3 4 + *" 
+1*2*4*5*0 to postfix:  "1 2 * 4 * 5 * 0 *" 
+1+2 * 3+4 to postfix:  "1 2 3 * + 4 +" 
+1+a *4 to postfix:  "1 a 4 * +" 
+IsScalar: 0
+IsScalar: 1
+IsScalar: 0
+IsScalar: 0
+IsVariable: 0
+IsVariable: 1
+IsVariable: 0
+IsVariable: 1
+Function doens't exist: 0
+Function does exist: 1
+Variable doesn't exist, as expected.
+Testing modulus operator 9%7...
+calc.PrintTop()
+[ 2 ]
+Testing conversion to degrees and radians...
+calc.PrintTop()
+[ 1.5708 ]
+calc.PrintTop()
+[ 89.9544 ]
+Testing pushing e and pi onto the stack...
+calc.PrintTop()
+[ 3.14159 ]
+calc.PrintTop()
+[ 2.71828 ]
+Orphan Handler should be false:0
+Testing CalculatorVariablePool class...
+CVP's default value is true: 1
+Expected exception
+Expected add exception
+Testing evaluate(1+2) =...
+"3" 
+Testing evaluate(3*5) with a CalculatorVariablePool...
+"15" 
