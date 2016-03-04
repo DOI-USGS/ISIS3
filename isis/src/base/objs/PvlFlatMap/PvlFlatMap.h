@@ -230,6 +230,8 @@ namespace Isis {
    *   @history 2016-02-28 Jeannie Backer - Moved from isisminer app to base class area.
    *                           Brought closer to ISIS coding standards. Improved documentation.
    *                           Created unit test. Fixes #2399
+   *   @history 2016-02-28 Jeannie Backer - Changed readKeyListFile() to read the keylist
+   *                           in as an Isis::TextFile. References #2262
    */
   class PvlFlatMap : public QMap<QString, PvlKeyword> {
   
@@ -241,24 +243,33 @@ namespace Isis {
   
       PvlFlatMap();
       PvlFlatMap(const PvlFlatMap &other);
-      PvlFlatMap(const PvlFlatMap &pmap1, const PvlFlatMap &pmap2);
-      PvlFlatMap(const PvlObject &pvl, const PvlConstraints &constraints = PvlConstraints());
-      PvlFlatMap(const PvlGroup &pvl, const PvlConstraints &constraints = PvlConstraints());
+      PvlFlatMap(const PvlFlatMap &pmap1, 
+                 const PvlFlatMap &pmap2);
+      PvlFlatMap(const PvlObject &pvl, 
+                 const PvlConstraints &constraints = PvlConstraints());
+      PvlFlatMap(const PvlContainer &pvl, 
+                 const PvlConstraints &constraints = PvlConstraints());
       virtual ~PvlFlatMap();
   
       bool exists(const QString &key) const;
       int  count(const QString &key) const;
-      bool isNull(const QString &key, const int index = 0) const;
-      void add(const QString &key, const QString &value);
+      bool isNull(const QString &key, 
+                  const int index = 0) const;
+
+      void add(const QString &key, 
+               const QString &value);
       void add(const PvlKeyword &keyword);
   
       void append(const PvlKeyword &key);
-      void append(const QString &key, const QString &value);
+      void append(const QString &key, 
+                  const QString &value);
   
       bool erase(const QString &key);
   
-      QString get(const QString &key, const int &index = 0) const;
-      QString get(const QString &key, const QString &defValue, 
+      QString get(const QString &key, 
+                  const int &index = 0) const;
+      QString get(const QString &key, 
+                  const QString &defValue, 
                   const int &index = 0) const;
   
       // QString value(const QString &key) const;
@@ -272,10 +283,14 @@ namespace Isis {
       static QStringList keywordValues(const PvlKeyword &keyword);
   
     private:
-      int loadObject(const PvlObject &object, const PvlConstraints &constraints);
-      int loadGroups(const PvlObject &object, const PvlConstraints &constraints);
-      int loadGroup(const PvlGroup &group, const PvlConstraints &constraints);
-      int loadKeywords(const PvlContainer &pvl, const PvlConstraints &constraints);
+      int loadObject(const PvlObject &object, 
+                     const PvlConstraints &constraints);
+      int loadGroups(const PvlObject &object, 
+                     const PvlConstraints &constraints);
+      int loadGroup(const PvlGroup &group, 
+                    const PvlConstraints &constraints);
+      int loadKeywords(const PvlContainer &pvl, 
+                       const PvlConstraints &constraints);
   };
 
 } // Namespace Isis

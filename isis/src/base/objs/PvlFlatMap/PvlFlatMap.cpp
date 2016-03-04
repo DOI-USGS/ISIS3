@@ -34,6 +34,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include "TextFile.h"
 
 using namespace std;
 
@@ -318,14 +319,38 @@ namespace Isis {
    * @param keyListFile
    */  
   void PvlConstraints::readKeyListFile(const FileName &keyListFile) {
-    Pvl pvl(keyListFile.expanded());
-    PvlContainer keylist = pvl.findObject("KeyList");
-    PvlContainer::ConstPvlKeywordIterator k = keylist.begin();
-    while (k != keylist.end()) {
-      addKeyToList(k->name());
-      ++k;
+    // Pvl pvl(keyListFile.expanded());
+    // 
+    // if (pvl.hasObject("KeyList")) {
+    //   PvlContainer keylist = pvl.findObject("KeyList");
+    //   PvlContainer::ConstPvlKeywordIterator k = keylist.begin();
+    //   while (k != keylist.end()) {
+    //     addKeyToList(k->name());
+    //     ++k;
+    //   }
+    // }
+    // else {
+    //   PvlContainer::ConstPvlKeywordIterator k = pvl.begin();
+    //   while (k != pvl.end()) {
+    //     addKeyToList(k->name());
+    //     ++k;
+    //   }
+    // }
+    // return;
+
+//     Pvl pvl(keyListFile.expanded());
+//     qDebug() << "INPUT FILE = ";
+//     qDebug() << keyListFile.expanded();
+//     for (int k = 0; k < pvl.keywords(); k++) {
+//       cout << "HI!" << endl;
+//       addKeyToList(pvl[k].name());
+//     }
+    TextFile keyList(keyListFile.expanded());
+    QString keywordName = "";
+    while (keyList.GetLine(keywordName)) {
+      addKeyToList(keywordName);
     }
-    return;
+
   }
     
       
@@ -338,7 +363,7 @@ namespace Isis {
   
   /** 
    * Constructs a PvlFlatMap from another PvlFlatMap object.
-   *  
+   * 
    * @param other The PvlFlatMap to copy 
    */  
   PvlFlatMap::PvlFlatMap(const PvlFlatMap &other) : 
@@ -375,7 +400,7 @@ namespace Isis {
    * 
    * This Constructor creates a PvlFlatMap from a PvlObject according to any constraints
    * passed to the constructor. If no PvlConstraints object is provided, the PvlFlatMap will
-   * be created from all the objects and groups within the passed PvlObject. 
+   * be created from all the objects and groups within the passed PvlObject.
    *  
    * @see loadObject() 
    * 
@@ -391,7 +416,8 @@ namespace Isis {
   
   
   /** 
-   * Constructs a PvlFlatMap (with constraints) from a PvlGroup.
+   * Constructs a PvlFlatMap (with constraints) from the keywords in a PvlContainer (i.e 
+   * PvlObject or PvlGroup). 
    * 
    * This constructor creates a PvlFlatMap from a PvlGroup object according to any constraints 
    * passed to the constructor. If no PvlConstraints object is provided, the PvlFlatMap will be 
@@ -399,11 +425,11 @@ namespace Isis {
    *  
    * @see loadKeywords() 
    * 
-   * @param pvl The PvlGroup to use for creating the PvlFlatMap
+   * @param pvl The PvlContainer to use for creating the PvlFlatMap
    * @param constraints The PvlConstraints that determine which Pvl objects/groups are
    *                    included or excluded in the constructed PvlFlatMap
    */  
-  PvlFlatMap::PvlFlatMap(const PvlGroup &pvl, 
+  PvlFlatMap::PvlFlatMap(const PvlContainer &pvl, 
                          const PvlConstraints &constraints) : 
                          QMap<QString, PvlKeyword> () {
     loadKeywords(pvl, constraints);
@@ -420,7 +446,7 @@ namespace Isis {
   /** 
    * Determines whether a given keyword exists in the PvlFlatMap.
    * 
-   * @param key The name of the keyword 
+   * @param key The name of the keyword
    *  
    * @return bool True if the keyword exists in the PvlFlatMap
    */  
@@ -434,7 +460,7 @@ namespace Isis {
    * 
    * If the keyword does not exist, this method returns 0.
    * 
-   * @param key The name of the keyword 
+   * @param key The name of the keyword
    *  
    * @return int The number of values associated with the keyword.
    */  
@@ -453,7 +479,7 @@ namespace Isis {
    * passed keyword. If the keyword does not exist, this method returns true.
    * 
    * @param key The name of the keyword
-   * @param index The index of the value associated with the keyword 
+   * @param index The index of the value associated with the keyword
    *  
    * @return bool True if the keyword's value at the given index is Null
    *              or if the keyword does not exist

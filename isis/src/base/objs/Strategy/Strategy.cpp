@@ -423,7 +423,6 @@ namespace Isis {
                                            const QString &name) const {
     ResourceList alist;
     if ( resource->hasAsset(name) ) {
-        cout <<"assetResourceList" << endl;
       QVariant v_asset = resource->asset(name);
       if ( v_asset.canConvert<ResourceList>() ) {
          alist = v_asset.value<ResourceList>();

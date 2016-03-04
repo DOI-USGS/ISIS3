@@ -109,35 +109,7 @@ namespace Isis {
    * @param name     A string containing the resource name.
    * @param profile  A PvlContainer of keywords.
    */
-  /*Resource::Resource(const QString &name, const PvlContainer &profile) :
-                     m_data( new ResourceData(name, PvlFlatMap(profile) ) ),
-                     m_discard(false) {
-    setName(name);
-  }*/
-
-
-  /**
-   * Constructs a Resource object with the given name and profile of keywords.
-   * Discard is set to false. The asset list is left empty.
-   *
-   * @param name     A string containing the resource name.
-   * @param profile  A PvlGroup of keywords.
-   */
-  Resource::Resource(const QString &name, const PvlGroup &profile) :
-                     m_data( new ResourceData(name, PvlFlatMap(profile) ) ),
-                     m_discard(false) {
-    setName(name);
-  }
-
-  
-  /**
-   * Constructs a Resource object with the given name and profile of keywords.
-   * Discard is set to false. The asset list is left empty.
-   *
-   * @param name     A string containing the resource name.
-   * @param profile  A PvlObject of keywords.
-   */ 
-  Resource::Resource(const QString &name, const PvlObject &profile) :
+  Resource::Resource(const QString &name, const PvlContainer &profile) :
                      m_data( new ResourceData(name, PvlFlatMap(profile) ) ),
                      m_discard(false) {
     setName(name);

@@ -1,0 +1,23 @@
+# Define sub region in 10 degree increments below the NP
+# Define lower left and upper right coordinates
+Region = "Equi035N235ED10"
+
+RegionGisGeometry = "LINESTRING(230 30, 240 40)"
+RegionBoundingBox = True
+
+RegionCenterLongitude     = 235
+RegionCenterLatitude      = 35
+
+RegionLowerLeftLongitude  = 230
+RegionLowerLeftLatitude   = 30
+
+RegionUpperLeftLongitude  = 230
+RegionUpperLeftLatitude   = 40
+
+RegionUpperRightLongitude = 240
+RegionUpperRightLatitude  = 40
+
+RegionLowerRightLongitude = 240
+RegionLowerRightLatitude  = 30
+
+End

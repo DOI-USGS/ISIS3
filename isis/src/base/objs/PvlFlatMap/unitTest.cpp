@@ -11,6 +11,7 @@
 #include "PvlGroup.h"
 #include "PvlFlatMap.h"
 #include "PvlObject.h"
+#include "TextFile.h"
 
 using namespace Isis;
 using namespace std;
@@ -133,17 +134,16 @@ int main() {
   print(map1e);
 
   // Testing PvlConstraints from file
-  QString keyListFile = FileName("$temporary/keyListFile.txt").expanded();
+  QString keyListFileName = FileName("$temporary/keyListFile.txt").expanded();
   keyList.replaceInStrings("cat", "dog");
-  PvlObject keyListObj("KeyList");
+  // write the keylist to a text file
+  TextFile keyListFile(keyListFileName, "output");
   for (int i = 0; i < keyList.size(); i++) {
-    keyListObj += PvlKeyword(keyList[i], "True");
+    keyListFile.PutLine(keyList[i]);
   }
-  Pvl pvl;
-  pvl += keyListObj;
-  pvl.write(keyListFile);
-  PvlConstraints constraintsFromFile(keyListFile);
-  if (!QFile::remove(keyListFile)) {
+  keyListFile.Close();
+  PvlConstraints constraintsFromFile(keyListFileName);
+  if (!QFile::remove(keyListFileName)) {
     throw IException(IException::Io, "Unable to remove file, [keyListFile.txt]", _FILEINFO_);
   }
   qDebug() << "Map1F Constraints:";
