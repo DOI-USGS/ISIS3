@@ -255,7 +255,8 @@ HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 #---------------------------------------------------------------------------
 # Set up for OpenCV libraries 
 #
-# * See NN notes as OPENCVLIBS is not in isismake.os
+# Add the following line to your app's Makefile (see the NN notes)
+# ALLLIBS += $(OPENCVLIBS)
 #---------------------------------------------------------------------------
 OPENCVINCDIR =  -I$(ISIS3LOCAL)/include
 OPENCVLIBDIR =  -L$(ISIS3LOCAL)/lib
@@ -273,7 +274,7 @@ OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features
 #
 # For now, if you want to use this library, modify your app's Makefile. 
 # Add an empty line after the last line in the Makefile, then add
-# ALLLIBDIRS += $(NNLIB)
+# ALLLIBS += $(NNLIB)
 # on a new line.
 #---------------------------------------------------------------------------
 NNINCDIR = -I$(ISIS3LOCAL)/include/nn
