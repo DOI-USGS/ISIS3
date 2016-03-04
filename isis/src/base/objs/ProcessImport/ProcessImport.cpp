@@ -41,6 +41,12 @@
 #include "PvlTokenizer.h"
 #include "SpecialPixel.h"
 
+
+//tjw
+//VAX Conversion
+#define EXPONENT_MASK ((char) 0x7F)
+
+
 using namespace std;
 namespace Isis {
 
@@ -215,92 +221,93 @@ namespace Isis {
    * @return double the converted value
    */
 
-
   double ProcessImport::VAXConversion(void *ibuf) {
 
 
 
-      float result;
-      double dresult;
-      bool swap_bytes = false;
-      bool swap_words = true;
-      int exp_adjust = -1;
-      int exp_mask = 0;
-      int exp_word = 1;
-      int exp_byte;
-      Isis::ByteOrder in_order = p_byteOrder;
-      Isis::ByteOrder out_order;
+       float result;
+       double dresult;
+       bool swap_bytes = false;
+       bool swap_words = true;
+       int exp_adjust = -1;
+       int exp_mask = 0;
+       int exp_word = 1;
+       int exp_byte;
+       Isis::ByteOrder in_order = p_byteOrder;
+       Isis::ByteOrder out_order;
 
 
-      unsigned int *oli, *ili;   //4-byte buffer io ptrs
-      unsigned short *osi;       //2-byte buffer io ptrs
-      char *oci;                 //1-byte buffer io ptrs
+       unsigned int *oli, *ili;   //4-byte buffer io ptrs
+       unsigned short *osi;       //2-byte buffer io ptrs
+       char *oci;                 //1-byte buffer io ptrs
 
-      if ( Isis::IsLsb() ) {
+       if ( Isis::IsLsb() ) {
 
-          exp_byte  = 1;
-          out_order = Isis::Lsb;
+           exp_byte  = 1;
+           out_order = Isis::Lsb;
 
+       }
+
+       //Byte order = MSB
+       else {
+           exp_byte = 0;
+           out_order = Isis::Msb;
+       }
+
+       if (in_order != out_order) {
+           swap_bytes =true;
+
+       }
+
+       oli = (unsigned int * ) ibuf;
+       ili = (unsigned int * ) ibuf;
+
+       if (IsVAXSpecial(oli,ProcessImport::VAX_NULL4) )
+         return Isis::NULL8;
+
+       if (IsVAXSpecial(oli,ProcessImport::VAX_LIS4) )
+         return Isis::LOW_INSTR_SAT8;
+
+       if (IsVAXSpecial(oli,ProcessImport::VAX_LRS4) )
+         return Isis::LOW_REPR_SAT8;
+
+       if (IsVAXSpecial(oli,ProcessImport::VAX_HIS4) )
+         return Isis::HIGH_INSTR_SAT8;
+
+       if (IsVAXSpecial(oli,ProcessImport::VAX_HRS4) )
+         return Isis::HIGH_REPR_SAT8;
+
+       if (IsVAXSpecial(oli,ProcessImport::VAX_MIN4) )
+         return Isis::VALID_MIN8;
+
+       //test for word swapping
+      if (swap_words) {
+
+          *oli = (*ili <<16) | (*ili >> 16);
       }
 
-      //Byte order = MSB
-      else {
-          exp_byte = 0;
-          out_order = Isis::Msb;
-      }
+       osi = (unsigned short* ) oli;
 
-      if (in_order != out_order) {
-          swap_bytes =true;
+       //test for byte swapping
 
-      }
+       if (swap_bytes) {
+           osi[0] = (osi[0] >> 8 ) | (osi[0] << 8);
+           osi[1] = (osi[1] >> 8 ) | (osi[1] << 8);
+       }
 
-      oli = (unsigned int * ) ibuf;
-      ili = (unsigned int * ) ibuf;
+       //Isolate the exponent and do the conversion
+       oci = (char *) &osi[exp_word];
 
-      if (IsVAXSpecial(oli,Isis::VAX_NULL4) )
-        return Isis::NULL8;
+       if ( (oci[exp_byte] & EXPONENT_MASK) != exp_mask)
+           oci[exp_byte] += exp_adjust;
 
-      if (IsVAXSpecial(oli,Isis::VAX_LIS4) )
-        return Isis::LOW_INSTR_SAT8;
+       result = *(float *)oli;
+       dresult = static_cast<double>(result);
+       return dresult;
 
-      if (IsVAXSpecial(oli,Isis::VAX_LRS4) )
-        return Isis::LOW_REPR_SAT8;
+   }
 
-      if (IsVAXSpecial(oli,Isis::VAX_HIS4) )
-        return Isis::HIGH_INSTR_SAT8;
 
-      if (IsVAXSpecial(oli,Isis::VAX_HRS4) )
-        return Isis::HIGH_REPR_SAT8;
-
-      if (IsVAXSpecial(oli,Isis::VAX_MIN4) )
-        return Isis::VALID_MIN8;
-
-      //test for word swapping
-     if (swap_words) {
-
-         *oli = (*ili <<16) | (*ili >> 16);
-     }
-
-      osi = (unsigned short* ) oli;
-
-      //test for byte swapping
-
-      if (swap_bytes) {          
-          osi[0] = (osi[0] >> 8 ) | (osi[0] << 8);
-          osi[1] = (osi[1] >> 8 ) | (osi[1] << 8);
-      }
-
-      //Isolate the exponent and do the conversion
-      oci = (char *) &osi[exp_word];
-
-      if ( (oci[exp_byte] & EXPONENT_MASK) != exp_mask)
-          oci[exp_byte] += exp_adjust;
-
-      result = *(float *)oli;
-      dresult = static_cast<double>(result);
-      return dresult;
-
-  }
 
 
 
