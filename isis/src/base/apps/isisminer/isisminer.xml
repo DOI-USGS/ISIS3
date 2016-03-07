@@ -85,7 +85,7 @@
       The GLOBALS parameter can specify the name of a file that contains PVL 
       keywords and values. The complete contents of all the keywords found in 
       the file, regardless of Object/Group structure are loaded immediately when 
-      <b>IsisMiner</b> first runs.  The keywords contained in this file can be used as 
+      isisminer first runs.  The keywords contained in this file can be used as 
       substitutions in all or part of many keyword value specifications used 
       within most Strategies (described below).
     </p>
@@ -101,8 +101,8 @@
       signs are not allowed in ISIS application parameters, keyword names and 
       values are separated by a colon.  Multiple keywords can be specified and 
       are separated by the @ symbol. For example, 
-      PARAMETERS=&quot;inputdir:$PWD@outputdir:$PWD/Results&quot; will create 
-      two keywords, inputdir and outputdir, with inputdir set to the full path 
+      <em>PARAMETERS=&quot;inputdir:$PWD@outputdir:$PWD/Results&quot;</em>
+      will create two keywords, inputdir and outputdir, with inputdir set to the full path 
       of the current directory running the job and outputdir set to a 
       subdirectory in the current directory called <em>Results</em>.
     </p>
@@ -140,7 +140,7 @@
     <p>
       The following section describes all the Strategy algorithms currently 
       available in <b>IsisMiner</b>. Strategies iterate through all <em>active</em> 
-      Resources. One of the features in isisminer that provides alot of 
+      Resources. One of the features in isisminer that provides a lot of 
       flexibility in the system is that Resources are never deleted unless users 
       provide explicit instructions to do so (see  <a href="#ResourceManager">ResourceManager</a>). 
       Each Resource has an inherent state that indicates if it is active, meaning 
@@ -155,9 +155,9 @@
       Strategy provides options to select an additional processing set of 
       Resources (see <a href="#GisOverlap">GisOverlap</a>, 
       <a href="#StereoPair">StereoPair</a> and <a href="#Sidebar">Sidebar</a>). 
-      Those Resources accept a complete <b>IsisMiner</b> configuration where the 
+      Those Resources accept a complete isisminer configuration where the 
       object specification can be embedded within the Strategy object or a file 
-      name can be provided that contains a complete <b>IsisMiner</b> configuration 
+      name can be provided that contains a complete isisminer configuration 
       (much like provided in CONFIG). This design allows users to progressively 
       select Resources for processing and reactivate the entire list at any 
       point in the execution of Strategies.  The Strategies below provide the 
@@ -246,9 +246,9 @@
         <TD>ApplyToDiscarded</TD>
         <TD>Optional</TD>
         <TD>
-          When <em>True</em>, all Resources, regardless of active or discard state, are 
-          processed in the current Strategy. This is handy when you want all 
-          Resources to be processed and would otherwise require use of a <a href="#Sidebar">Sidebar</a> 
+          When <em>True</em>, all Resources regardless of active or discard state, are 
+          processed in the current Strategy. This is handy when you want all Resources
+         to be processed and would otherwise require use of a <a href="#Sidebar">Sidebar</a> 
           strategy to set states for all Resources.  
         </TD>
       </TR>
@@ -365,11 +365,11 @@
          <TD>Optional</TD>
          <TD>
             If provided when GisSimplifyTolerance is specified, this is the base 
-            name of set of keywords that describe the simplified geometry. Three 
+            name of a set of keywords that describe the simplified geometry. Three 
             keywords are created from the GIS geometry simplification process. 
             If the value of GisGeometryPointsKey = GisSimplePoints, then the 
             keywords GisSimplePoints contains the total number of points after 
-            simplification, GisSimplePointsOriginal contains the total number of 
+            simplification. GisSimplePointsOriginal contains the total number of 
             points prior to simplification and GisSimplePointsTolerance is the 
             value of GisSimplifyTolerance. These keywords are written to each 
             Resource from which GIS geometries are converted from text.
@@ -436,7 +436,7 @@
       <em>Operation</em> keyword, the specified Strategy in the AssetSidebar strategy
       will not be applied to any existing Assets contained in the active Resources. In fact, 
       any Asset that exists in a Resource of the same name will be deleted and replaced with
-      the results of the AssetSIdebar processing. Note that some Strategies create Assets
+      the results of the AssetSidebar processing. Note that some Strategies create Assets
       directly in the course of executing its algorithm and do not require an AssetSidebar
       to create them.
     </p>
@@ -559,7 +559,7 @@
               <TR>
               <TD>None</TD>
               <TD>
-                Starts from scratch and generates and initial empty list of 
+                Starts from scratch and generates an initial empty list of 
                 Resources for the Asset prior to executing Strategies. It is 
                 assumed other Strategy options available in  
                 <em>isisminer</em> will be used to create the Resources in 
@@ -1062,28 +1062,28 @@ EndObject
         <TD>Required</TD>
         <TD>
           Identifies the CnetReader strategy - must be <em>CnetReader</em> or it will
-          not be recognized as a valid Strategy by isisminer
+          not be recognized as a valid Strategy by isisminer.
         </TD>
       </TR>
       <TR>
         <TD>Description</TD>
         <TD>Optional</TD>
         <TD>
-          User provides a description of the CnetReader strategy
+          User provides a description of the CnetReader strategy.
         </TD>
       </TR>
       <TR>
         <TD>CnetFile</TD>
         <TD>Required</TD>
         <TD>
-          User provided control network file
+          User provided control network file.
         </TD>
       </TR>
       <TR>
         <TD>CnetFileArgs</TD>
         <TD>Optional</TD>
         <TD>
-          Used for providing any arguments to be substituted in CnetFile's value
+          Used for providing any arguments to be substituted in CnetFile's value.
         </TD>
       </TR>
       <TR>
@@ -1364,7 +1364,7 @@ EndObject
       The <strong>CsvWriter</strong> strategy provides users with the
       ability to export Resources to a Comma-Separated Values (CSV) file.
       Each row corresponds to a Resource and each column corresponds to a
-      keyword specified by the Keywords parameter. If a the Header parameter
+      keyword specified by the Keywords parameter. If the Header parameter
       is set to <em>True</em>, the keyword names are stored in the first row of the CSV
       file. Each Resource is written to the CSV file as a row with the
       corresponding keyword values written to each column. If a Resource does
@@ -1410,14 +1410,14 @@ EndObject
         <TD>Required</TD>
         <TD>
           Identifies the CsvWriter strategy - must be <em>CsvWriter</em> or 
-          it will not be recognized as a valid Strategy by isisminer
+          it will not be recognized as a valid Strategy by isisminer.
         </TD>
       </TR>
       <TR>
         <TD>Description</TD>
         <TD>Optional</TD>
         <TD>
-          User provides a description of the CsvWriter strategy
+          User provides a description of the CsvWriter strategy.
         </TD>
       </TR>
       <TR>
@@ -1431,7 +1431,7 @@ EndObject
         <TD>CsvFileArgs</TD>
         <TD>Optional</TD>
         <TD>
-          Replace arguments in the CsvFIle keyword of the form <em>%1</em>,
+          Replace arguments in the CsvFile keyword of the form <em>%1</em>,
           <em>%2</em>,..., <em>%99</em>, 
           with the values of the assumed keywords specified in this keyword 
           parameter.  Each argument is replaced by its corresponding keyword value 
@@ -1443,9 +1443,9 @@ EndObject
         <TD>Mode</TD>
         <TD>Optional</TD>
         <TD>
-          The mode in which to write the CSV file. If <em>Create</em> a new
+          The mode in which to write the CSV file. If <em>Create</em>, a new
           file is created or an existing file with the same name is overwritten. 
-          If <em>Append</em> the output CSV file will be appended to the file. 
+          If <em>Append</em>, the output CSV file will be appended to the file. 
           Defaults to <em>Create</em>.
         </TD>
       </TR>
@@ -1579,9 +1579,9 @@ EndObject
        can accept SQL queries. This typically includes PostgreSQL, MySQL and 
        SQLite. When specifying the query in the <em>Query</em>, some special 
        quoting may  be needed in order to comply with SQL syntax. Before a query 
-       is sent to the database, all occurrences of &amp;quot; and &amp;apos; in 
-       the query string are replaced with double quotes <b>[ " ]</b> and single quotes 
-       <b>[ ' ]</b>, respectively.
+       is sent to the database, all occurrences of <em>&amp;quot;</em> and 
+       <em>&amp;apos;</em> in the query string are replaced with double quotes
+       <b>[ " ]</b> and single quotes <b>[ ' ]</b>, respectively.
     </p>
     <TABLE BORDER="1">
       <CAPTION><h4>DatabaseReader Strategy Object Keywords</h4></CAPTION> 
@@ -1664,7 +1664,7 @@ EndObject
         <TD>Required</TD>
         <TD>
           The SQL query to be sent to the database. Double quotes should be
-          escaped by using "&amp;quot;".
+          escaped by using <em>&amp;quot;</em>.
         </TD>
       </TR>
       <TR>
@@ -1792,9 +1792,9 @@ EndObject
         <TD>Optional</TD>
         <TD>
           Whether the Keyword containing the Geometry should be removed from
-          the new Resources .If this parameter is set to <em>True</em> the Geometry
-          Keyword will be removed. If <em>False</em> the Keyword will remain in the new
-          Resources. Defaults to <em>False</em>
+          the new Resources. If this parameter is set to <em>True</em> the Geometry
+          Keyword will be removed. If it is set to <em>False</em> the Keyword will remain 
+          in the new Resources. Defaults to <em>False</em>.
         </TD>
       </TR>
     </TABLE>
@@ -1863,7 +1863,7 @@ EndObject
     </p>
     <p>
       All comparisons are case-insensitive. The keyword used to filter Resources 
-      is specified in the <em>Keyword</em> key in the Filter strategy object 
+      is specified in the <em>Keyword</em> key in the Filter Strategy object 
       definition found in the Strategy object. Only the first value in the 
       named Resource <em>Keyword</em> will be checked unless the [optional] 
       <em>CheckAll</em> keyword is set to <em>True</em>. 
@@ -1878,7 +1878,7 @@ EndObject
     </p>
     <p>
       Both <em>Include</em> and <em>Exclude</em> keywords may exist in the 
-      Filter strategy object. In this case, values are first checked in the 
+      Filter Strategy object. In this case, values are first checked in the 
       <em>Include</em> list then the <em>Exclude</em> list. Whichever occurs 
       first, that action is taken for the Resource. If none of the keyword 
       values exist in either <em>Include</em> or <em>Exclude</em> keywords, 
@@ -1888,11 +1888,11 @@ EndObject
       as active.
     </p>
     <p>
-       If needed, uesrs can provide a regular expression string that will use  
+       If needed, users can provide a regular expression string that will use  
        Qt's <a href="http://doc.qt.io/qt-4.8/qregexp.html">QRegExp</a> class 
-       implementation to apply to ketword values. If given, this test is applied 
+       implementation to apply to keyword values. If given, this test is applied 
        after the <em>Include</em> and before the <em>Exclude</em> test to 
-       determine if the value satisfies the reqular expression. If after all the 
+       determine if the value satisfies the regular expression. If after all the 
        tests are applied and this string was supplied, the Resource is discarded 
        since it did not succeed in its test.
     </p>
@@ -1965,7 +1965,7 @@ EndObject
           test values in the keyword. The syntax in the regular expression must 
           strictly follow the requirements of the Qt  
           <a href="http://doc.qt.io/qt-4.8/qregexp.html">QRegExp</a> 
-          class. If the string satisifies the regular expression, it is retained 
+          class. If the string satisfies the regular expression, it is retained 
           as active or it will be discarded.
         </TD>
       </TR>
@@ -2054,11 +2054,11 @@ EndObject
         <TD>GisType</TD>
         <TD>Required</TD>
         <TD>
-          Specifies the type of the geometry. Valid options are: WKT, WKB, pvlWKT, pvlWKB, or 
+          Specifies the type of the geometry. Valid options are WKT, WKB, pvlWKT, pvlWKB, or 
           IsisCube. WKT and WKB are common GIS file formats that indicate well-known-text and
           well-known-binary, respectively.
           <p>
-	          If GisType is pvlWKT or pvlWKB, GisGeometry must be the path to a pvl file which 
+	          If GisType is pvlWKT or pvlWKB, GisGeometry must be the path to a PVL file which 
             contains a valid WKT or WKB geometry. 
           </p>
         </TD>
@@ -2070,8 +2070,8 @@ EndObject
           The actual geometry or geometry source. This can either be directly equal to a WKB or 
           WKT value like 
           <em>POLYGON ((0.00 22.50, 90.00 22.50, 90.00 65.00, 0.00 65.00, 0.00 22.50))</em>
-          or can be set to the path to a pvl file containing a valid geometry.  If GisGeometry is set to a
-          filename, the associated file must be a pvl file with a valid WKT or WKB geometry, or be
+          or can be set to the path to a PVL file containing a valid geometry.  If GisGeometry is set to a
+          file name, the associated file must be a PVL file with a valid WKT or WKB geometry, or be
           an ISIS cube. 
         </TD>
       </TR>
@@ -2116,8 +2116,8 @@ EndObject
         <TD>GisGeometryRef</TD>
         <TD>Optional</TD>
         <TD>
-          Used when using a filename as a GisGeometry source. This indicates the 
-        Keyword in the associated pvl file that the WKT or WKB geometry value 
+          Used when using a file name as a GisGeometry source. This indicates the 
+        Keyword in the associated PVL file that the WKT or WKB geometry value 
         will be found in. 
         </TD>
       </TR>
@@ -2161,7 +2161,7 @@ EndObject
         Overlap candidates are determined from other Resources for every 
         incoming active Resource and a list of Resources that are determined 
         from another isisminer Strategy configuration. The configuration can 
-        either be specified directly in the GisOverlap strategy object (an   
+        either be specified directly in the GisOverlap Strategy object (an   
         embedded <em>IsisMiner</em> object called a <em>CandidateMiner</em>) or come from 
         an external file called <em>CandidateConfigFile</em>. Candidate overlap 
         Resources can be either part of the incoming Resource list (active and 
@@ -2181,7 +2181,7 @@ EndObject
        identities separated by an underscore character. 
     </p>
     <p>
-       Once the list of overlapping Resources is determined, user can option to 
+       Once the list of overlapping Resources is determined, the user can opt to 
        immediately process the overlaps. If a second isisminer configuration is 
        provided called <em>OverlapMiner</em> or <em>OverlapConfigFile</em>, the 
        list of overlapping Resources that are contained combined Resources and 
@@ -2362,9 +2362,9 @@ EndObject
           This option can be used in lieu of a <em>CandidateMiner</em> object to 
           specify a set of Strategies to select overlap candidates. You may also 
           provide arguments to that can be translated when executed to resolve 
-          the filename by providing a keyword called 
+          the file name by providing a keyword called 
           <em>CandidateConfigFileArgs</em> that contains keywords that translate 
-           occurrences of %1...%n strings in the name of the file. 
+           occurrences of <em>%1</em> to <em>%n</em> strings in the name of the file. 
         </TD>
       </TR>
       <TR>
@@ -2392,9 +2392,9 @@ EndObject
           This option can be used in lieu of a <em>OverlapMiner</em> object to 
           specify a set of Strategies to process overlap Resource results. You 
           may also provide arguments to that can be translated when executed to 
-          resolve the filename by providing a keyword called 
+          resolve the file name by providing a keyword called 
           <em>OverlapConfigFileArgs</em> that contains keywords that translate 
-           occurrences of %1...%n strings in the name of the file. 
+           occurrences of <em>%1</em> to <em>%n</em> strings in the name of the file. 
         </TD>
       </TR>
 
@@ -2619,7 +2619,7 @@ EndObject
     </p>
     <p>
       A keyword value is considered numeric if it can be converted to a floating
-      point number. If the keyword does not exist in the Resource then it's value
+      point number. If the keyword does not exist in the Resource, then its value
       is not considered numeric.
     </p>
 
@@ -2744,7 +2744,7 @@ EndObject
     </TABLE>
 
     <p>
-      The following is few examples of a Limit strategy:
+      Following are few examples of Limit strategies:
       <pre>
 Object = Strategy 
   Type = Limit
@@ -2752,7 +2752,7 @@ Object = Strategy
   Equation = "((emissionangle &gt; 30) &amp;&amp; (emissionangle &lt; 80))"
 EndObject
       </pre>
-      This shows an example of using a series of equations to determine limits
+      This shows an example of using a series of equations to determine limits:
       <pre>
 Object = Strategy
   # This algorithm will select only images where the center latitude
@@ -3193,7 +3193,7 @@ EndObject
         <TD>Optional</TD>
         <TD>
           User may need to provide the name of the table file containing data. This 
-          may not be needed if the base filename is the same as the label file but 
+          may not be needed if the base file name is the same as the label file but 
           ends in <b>.tab</b>.
         </TD>
       </TR>
@@ -3215,7 +3215,7 @@ EndObject
           The name given to each Resource. Intended to be used with the
           IdentityArgs parameter to give each Resource a unique name.
           If Identity does not have a value, the Resource names are set as PvlN, N being
-          the position of the Pvl file in FromList.
+          the position of the PVL file in FromList.
         </TD>
       </TR>
       <TR>
@@ -3234,7 +3234,7 @@ EndObject
         <TD>Optional</TD>
         <TD>
           The name of the table object in the label file may use different names. 
-          Users will need to provide the name of the Pvl object containing the 
+          Users will need to provide the name of the PVL object containing the 
           descriptions of each column. Defaults to <em>TABLE</em>.
         </TD>
       </TR>
@@ -3247,9 +3247,9 @@ EndObject
           characters are converted to spaces.  Spaces are then compressed to one 
           space. Any left/right parentheses are removed.  Then the conversion to 
           camel-case is performed. Camel case always converts the first character 
-          in the name to uppercase. Any space or '_' character are removed and the 
-          following character is converted to uppercase.  All other characters are 
-          converted to lowercase. 
+          in the name to uppercase. Each space or underscore character is removed
+          and the following character is converted to uppercase.  All other characters 
+          are converted to lowercase. 
         </TD>
       </TR>
     </TABLE>
@@ -3280,8 +3280,8 @@ EndObject
     <p>
       <h1><a name="PvlReader">PVL Reader Strategy Description</a></h1>
       The <strong>PvlReader</strong> strategy creates Resources from a list of 
-      paths to Pvl files (contained in <em>FromList</em>). Each Pvl file becomes 
-      a Resource where the keywords in the Pvl file become the keywords of the 
+      paths to PVL files (contained in <em>FromList</em>). Each PVL file becomes 
+      a Resource where the keywords in the PVL file become the keywords of the 
       Resource. Resources may be created against any provided constraints (                                                           
       <em>Includes</em>, <em>Excludes</em>, and <em>KeyListFile</em>), which 
       describe which keywords become part of the created Resource.
@@ -3289,19 +3289,19 @@ EndObject
     <p>
       If the <em>Identity</em> keyword is not provided or its value is an empty string, 
       each Resource created will be named as PvlN. N is the position number (starting at 0)
-      of the Pvl file contained in <em>FromList</em>. The basename, Pvl, can be changed by
+      of the PVL file contained in <em>FromList</em>. The basename, Pvl, can be changed by
       setting <em>PvlBaseName</em>.
     </p>
     <p>
-      For example, if <em>FromList</em> contains Pvl Files ~/somepvl.pvl and ~/someotherpvl.pvl,
+      For example, if <em>FromList</em> contains PVL Files ~/somepvl.pvl and ~/someotherpvl.pvl,
       their default <em>Identity</em> values would be Pvl0 and Pvl1, respectively.
     </p>
     <p> 
-      The <em>Includes</em> keyword operates on Pvl Objects and Groups (containers). 
+      The <em>Includes</em> keyword operates on PVL Objects and Groups (containers). 
       When provided by itself, the <em>Includes</em> keyword will exclusively include the
       keywords belonging to the containers specified. Since Groups must be contained in Objects,
       you cannot include a Group without also including its containing Object. Similarly, you 
-      must include the Root Object since all Pvl's have a Root Object container. For example:
+      must include the Root Object since all PVL files have a Root Object container. For example:
       <pre>
 Object = Outer
     Id = 001
@@ -3320,12 +3320,12 @@ Object = Outer
     EndObject
 EndObject
       </pre>
-      To include the ExtraInfo Group, the <em>Includes</em> keyword should be specfied
+      To include the ExtraInfo Group, the <em>Includes</em> keyword should be specified
       <pre>Includes = (Root, Outer, ExtraInfo)</pre>, which will include the Id, Name, and Time 
       keywords in the created Resource.
     </p>
     <p> 
-      The <em>Excludes</em> keyword operates on Pvl Objects and Groups (containers). 
+      The <em>Excludes</em> keyword operates on PVL Objects and Groups (containers). 
       When provided by itself, the <em>Excludes</em> keyword will exclude the keywords belonging
       to the containers specified, while all other containers and keywords will be included.
     </p>
@@ -3343,8 +3343,8 @@ Excludes = OtherInfo
       </pre>
     </p>
     <p> 
-      The <em>KeyListFile</em> keyword operates on Pvl Keywords and expects a file containing
-      Pvl Keywords. If provided, only the keywords in the file will be included in the 
+      The <em>KeyListFile</em> keyword operates on PVL Keywords and expects a file containing
+      PVL Keywords. If provided, only the keywords in the file will be included in the 
       created Resource. Note that these keywords will only be included if their containers 
       are included or not excluded.
     </p>
@@ -3382,7 +3382,7 @@ Excludes = OtherInfo
         <TD>FromList</TD>
         <TD>Required</TD>
         <TD>
-          User provides file containing a list of paths to Pvl files.
+          User provides file containing a list of paths to PVL files.
         </TD>
       </TR>
       <TR>
@@ -3403,7 +3403,7 @@ Excludes = OtherInfo
           The name given to each Resource. Intended to be used with the
           IdentityArgs parameter to give each Resource a unique name.
           If Identity does not have a value, the Resource names are set as PvlN, N being
-          the position of the Pvl file in FromList.
+          the position of the PVL file in FromList.
         </TD>
       </TR>
       <TR>
@@ -3422,14 +3422,14 @@ Excludes = OtherInfo
         <TD>Optional</TD>
         <TD>
           Used to exclusively include Objects and Groups when creating a Resource from a read
-          Pvl file.
+          PVL file.
         </TD>
       </TR>
       <TR>
         <TD>Excludes</TD>
         <TD>Optional</TD>
         <TD>
-          Used to ignore/exclude Objects and Groups when creating a Resource from a read Pvl 
+          Used to ignore/exclude Objects and Groups when creating a Resource from a read PVL 
           file.
         </TD>
       </TR>
@@ -3437,8 +3437,8 @@ Excludes = OtherInfo
         <TD>KeyListFile</TD>
         <TD>Optional</TD>
         <TD>
-          Used to exclusively include any Pvl Keywords in the provided file when creating a 
-          Resource from a read Pvl file.
+          Used to exclusively include any PVL Keywords in the provided file when creating a 
+          Resource from a read PVL file.
         </TD>
       </TR>
       <TR>
@@ -3490,7 +3490,7 @@ EndObject
     <p>
       <h1><a name="ResourceManager">Resource Manager Strategy Description</a></h1> 
       The <strong>ResourceManager</strong> strategy provides users with the ability to apply 
-      simple operations to Resources.  These operations are: ResetDiscard, 
+      simple operations to Resources.  These operations are ResetDiscard, 
       ToggleDiscard, DeleteDiscard, DeleteAsset, and HasAsset. For more 
       information, please see the table below.  
     </p>
@@ -3614,7 +3614,7 @@ EndObject
         Commands can be formulated using the keyword argument substitution 
         options available for using global parameter pools for replacing 
         arguments in commands with Resource keyword values. One keyword, 
-        <em>CommandArgs</em>, is availble to list all the Resource and global 
+        <em>CommandArgs</em>, is available to list all the Resource and global 
         pool variables that are to be used in replacement. All commands can use 
         a <em>%1</em> to <em>%n</em> where n is the total number of keywords list in the 
         <em>CommandArgs</em> keyword. This one list of keywords is used to 
@@ -3692,17 +3692,16 @@ EndObject
         <TD>Optional</TD>
         <TD>
           This keyword contains keywords that will be used to substitute any 
-          occurences of keyword arguments (i.e., <em>%1</em>, <em>%2</em>,...) in all commands 
+          occurrences of keyword arguments (i.e., <em>%1</em>, <em>%2</em>,...) in all commands 
           regardless of which group it the command is from.
         </TD>
       </TR>
     </TABLE>
     <p>
-      The following is an example of a RunCommand strategy. The &amp;quot; 
+      The following is an example of a RunCommand strategy. The <em>&amp;quot;</em> 
       text is required and should be included in the configuration of your 
-      command. The &amp;quot; and &amp;apos; are substituted prior to issuing 
-      the command to the shell for execution. This is required because of PVL 
-      syntax rules.
+      command. The <em>&amp;quot;</em> and <em>&amp;apos;</em> are substituted prior to issuing 
+      the command to the shell for execution. This is required because of PVL syntax rules.
       <pre>
 Object = Strategy
   Name         = RunManyCommands
@@ -3740,7 +3739,7 @@ EndObject
     </p>
     <p>
        Sidebar strategies are useful for running Strategies that have the 
-       potential to throw out Resources are alter a current state that may be 
+       potential to throw out Resources or alter a current state that may be 
        undesirable. For these cases, you can use a Sidebar that saves all the 
        Resources, activated and deactivated, their current states and preserves 
        any operations that may alter or discard Resources. It can also be used 
@@ -3795,8 +3794,8 @@ EndObject
         <TD>StrategyConfigFile</TD>
         <TD>Optional (File)</TD>
         <TD>
-          File containing a to run on the Resources. Either this or an <b>IsisMiner</b>
-          object must be specified.
+          File containing run parameters on the Resources. If this file is not given, 
+          an <b>IsisMiner</b> object must be specified.
         </TD>
       </TR>
       <TR>
@@ -3898,7 +3897,8 @@ EndObject
       <em>StereoStrength</em>:   <strong>LimitKey = (t0, t1, t2, t3)</strong>
       where all t0 through t3 values are numerical numbers and t0 is the 
       minimum, t1 is maximum, t2 is the best value in the range and t3 is a 
-      weighting factor.  The formula to compute the rank of each keyword is:
+      weighting factor.  The formula to compute the rank of each keyword is as
+      follows:
       <pre>
 range = max(abs(t2-t0), abs(t1-t2))
 rank = 1 - abs(t2-value)/range
@@ -4113,9 +4113,9 @@ Result = StereoPairRank
           This option can be used in lieu of a <em>CandidateMiner</em> object to 
           specify a set of Strategies to select stereo candidates. You may also 
           provide arguments to that can be translated when executed to resolve 
-          the filename by providing a keyword called 
+          the file name by providing a keyword called 
           <em>CandidateConfigFileArgs</em> that contains keywords that translate 
-          occurences of %1...%n strings in the name of the file. 
+          occurrences of <em>%1</em> to <em>%n</em> strings in the name of the file. 
         </TD>
       </TR>
       <TR>
@@ -4124,12 +4124,12 @@ Result = StereoPairRank
         <TD>
           For efficiency purposes only, users can immediately process the 
           stereo list of a given Resource at the time it is completely 
-          determined. Simply provide an <strong>isisminer</strong> 
+          determined. Simply provide an isisminer
           configuration object called (and named) 
           <em>OverlapMiner</em> that will be executed on the 
           stereo Resource at the time each one is fully determined.  This 
           configuration must be a compliant, properly formatted                     
-          <em>isisminer</em>object with the only difference being the name of 
+          <em>IsisMiner</em> object with the only difference being the name of 
           the object. It may also be provided in a file called         
           <em>OverlapConfigFile</em>. Either an OverlapMiner object or configuration 
           file may be provided, but not both.  If no overlap options are 
@@ -4143,9 +4143,9 @@ Result = StereoPairRank
           This option can be used in lieu of a <em>OverlapMiner</em> object to 
           specify a set of Strategies to process stereo Resource results. You 
           may also provide arguments to that can be translated when executed to 
-          resolve the filename by providing a keyword called 
+          resolve the file name by providing a keyword called 
           <em>OverlapConfigFileArgs</em> that contains keywords that translate 
-          occurences of %1...%n strings in the name of the file. 
+          occurrences of <em>%1</em> to <em>%n</em> strings in the name of the file. 
         </TD>
       </TR>
       <TR>
@@ -4397,7 +4397,7 @@ Result = StereoPairRank
     <p>
       The following is an example using the StereoPair strategy. In this example 
       we are reading image data from an SQLite database containing WAC and NAC 
-      MESSENGER data created from caminfo runs. It determines strereo from 
+      MESSENGER data created from caminfo runs. It determines stereo from 
       overlapping images in the vicinity of Degas crater on Mercury.
       <pre>
 Object = IsisMiner
@@ -4640,12 +4640,12 @@ End
        GisOverlap strategy (since we now have two of them) to CandidateMiner and 
        OverlapMiner. Added feature to simplify geometry whilst preserving 
        topology using GEOS' Douglas-Peucker algorithm when reading in 
-       geoemtries. It is automatically detected in Strategies like CsvReader and 
+       geometries. It is automatically detected in Strategies like CsvReader and 
        DatabaseReader. Added many new parameters to various Strategies. 
     </change>
     <change name="Kris Becker" date="2015-06-28">
        Add ability to process the set of GisOverlap results for each Resource
-       as they are matched. This is handled in the OverlapMiner strategy object.
+       as they are matched. This is handled in the OverlapMiner Strategy object.
     </change>
    <change name="Kris Becker" date="2015-07-07">
        Added more content to documentation and added an example demonstrating a 
@@ -4663,7 +4663,7 @@ End
        argument replacement in the Initializers group.
    </change> 
     <change name="Kris Becker" date="2015-11-01">
-        Modifed CsvReader strategy to have the provided header length determine 
+        Modified CsvReader strategy to have the provided header length determine 
         the number of keywords created/Resource. This allows the jigsaw residual 
         file to read the rejected column.
     </change>
@@ -4697,8 +4697,8 @@ End
         </brief> 
         <description>
             All keywords contained in this file are loaded in the global 
-            variable pool. Unique keywords, keywords that do not exist in 
-            Resources, can be used as keyword value substitutions in your 
+            variable pool. Unique keywords that do not exist in 
+            Resources can be used as keyword value substitutions in your 
             Strategies.
         </description>
           <default><item>None</item></default>
@@ -4766,7 +4766,7 @@ End
              <li><em>XXX</em> is the center longitude of the section,</li>
              <li><em>E</em> indicates positive east longitude, and </li>
              <li>
-               <em>D10</em> indicates the spacing is 10 degress in both latitude and longitude.
+               <em>D10</em> indicates the spacing is 10 degrees in both latitude and longitude.
              </li>
            </ul>
         </p>
@@ -4814,8 +4814,8 @@ End
             to process the data - one for equatorial data between 65N and 65S degrees 
             and one for polar from 65N/S to 90 N/S degrees. The isisminer configuration 
             file must consider this when processing stereo and it is driven by the 
-            map section input file which one is selected.  The easiest way to do 
-            this is provide the name of the stereo configuration file as a PARAMETER to 
+            map section input file as to which one is selected. The easiest way to do 
+            this is to provide the name of the stereo configuration file as a PARAMETER to 
             isisminer.  The main isisminer CONFIG file is named 
             mdis_overlaps_and_stereo.conf and its contents with comments is 
             shown in the  mdis_overlaps_and_stereo.conf file below.
@@ -4839,17 +4839,17 @@ End
 
         </p>
         <p>
-          Finally, we have a complete configuration that has command line 
+          Finally, there is a complete configuration that has command line 
           control depending upon which latitude region is being processed and 
           input/output directories. To process the entire global dataset of MDIS 
           images collected by MESSENGER, 267,769 of them, will require vast 
           computing Resources.  It is highly recommended that a processing 
-          cluster be used if you have one! Below is the command line used to 
+          cluster be used if available. Below is the command line used to 
           process this map section.
         </p>
         <p>
-          The results summarized here show the output of the command shown 
-          below and a summary of the results.
+          The results summarized here show the output of the command and a summary
+          of the results below.
           <pre>
 Creating Strategies...
 Finished creating 24 strategies...
@@ -4898,9 +4898,9 @@ ElapsedTime(s): 4866
 
 Session complete in 01:55:36.555 of elapsed time
           </pre>
-             This run completed in about 2 hours which is typical for most  
-             regions. There were 557 images identified in this region and the 
-             results are stored in 
+             This run completed in about 2 hours. This is typical for most regions
+             when run on machines with similar CPU speed. There were 557
+             images identified in this region and the results are stored in 
              /scratch/kbecker/MESSENGER/Region10D/Global/ImagesEqui035N235ED10_images.csv.
              For each image, and average of several hundred images were 
              determined to overlap. There are now 557 files in the directory 
@@ -4910,7 +4910,7 @@ Session complete in 01:55:36.555 of elapsed time
              total of 230,389 image overlaps found.  In the directory 
              /scratch/kbecker/MESSENGER/Region10D/Global/Stereo/Equi035N235ED10, 
              there are 308 files (249 had no stereo images or did not pass 
-             level1 image constraints for stereo) with similar filenaming 
+             level1 image constraints for stereo) with similar file naming 
              conventions used in the Overlaps directory (example: 
              EW1067331895I_stereopairs.csv has 11 stereo images) where a total 
              of 7,497 stereo images were identified.
@@ -4951,16 +4951,16 @@ Session complete in 01:55:36.555 of elapsed time
           <description>
             The contents of this file contain a sequence of Strategy object 
             definitions used to process the global MESSENGER MDIS image dataset. 
-            The objectives of this configuraiton is to
+            The objectives of this configuration is to
             <ol>
-              <li>identify all images in a given map section, </li>
+              <li>identify all images in a given map section</li>
               <li>
                 from the global image dataset, find all images that intersect the regional 
-                images, and
+                images
               </li>
               <li>
                 from overlapping images, find all images pairs that satisfy stereo parameters 
-                (defined in the mdis_global_stereo_equatorial.conf).
+                (defined in the mdis_global_stereo_equatorial.conf)
               </li>
             </ol>
             Results of all objectives are written to CSV files for future processing and/or 
@@ -4976,7 +4976,7 @@ Session complete in 01:55:36.555 of elapsed time
             This file contains a sequence of Strategy object 
             definitions used to process overlapping images for stereo potential.  
             This configuration is designed to be run independently or as the
-            <a href="#GisOverlap">GisOverlap</a>optional set of algorithms.
+            <a href="#GisOverlap">GisOverlap</a> optional set of algorithms.
             The input source is a file containing individual image overlaps. This overlap file
             is indicated by the user with the input parameter called 
             <em>PARAMETERS</em>.
