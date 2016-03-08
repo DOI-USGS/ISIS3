@@ -127,7 +127,11 @@ namespace Isis {
  
 
   /**
-   * This is a simple class to model a Calculator Variable Pool.
+   * This is a simple class to model a Calculator Variable Pool. 
+   *  
+   * @author 2012-07-15 Kris Becker
+   * @internal
+   *   @history 2012-07-15 Kris Becker - Original version.
    */
   class CalculatorVariablePool {
     public:
@@ -142,7 +146,11 @@ namespace Isis {
  
  
   /**
-   * This is the parent class to the various function classes.
+   * This is the parent class to the various function classes. 
+   *  
+   * @author 2012-07-15 Kris Becker
+   * @internal
+   *   @history 2012-07-15 Kris Becker - Original version.
    */  
   class FxBinder {
     public:
@@ -167,7 +175,11 @@ namespace Isis {
  
   /**
    * This class is used to bind function names with corresponding
-   * InlineCalculator functions that do not take parameters.
+   * InlineCalculator functions that do not take parameters. 
+   *  
+   * @author 2012-07-15 Kris Becker
+   * @internal
+   *   @history 2012-07-15 Kris Becker - Original version.
    */  
   class InlineVoidFx : public FxBinder {
     public:
@@ -187,7 +199,11 @@ namespace Isis {
  
   /**
    * This class is used to bind function names with corresponding Calculator
-   * functions that take a parameter.
+   * functions that take a parameter. 
+   *  
+   * @author 2012-07-15 Kris Becker
+   * @internal
+   *   @history 2012-07-15 Kris Becker - Original version.
    */  
   class ParameterFx : public FxBinder {
     public:
@@ -207,7 +223,11 @@ namespace Isis {
 
   /**
    * This class is used to bind function names with corresponding Calculator
-   * functions that do not take parameters.
+   * functions that do not take parameters. 
+   *  
+   * @author 2012-07-15 Kris Becker
+   * @internal
+   *   @history 2012-07-15 Kris Becker - Original version.
    */  
   class VoidFx : public FxBinder {
     public:

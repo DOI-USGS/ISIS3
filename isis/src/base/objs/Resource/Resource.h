@@ -130,7 +130,13 @@ namespace Isis {
       //! Defintion for VariantList, a map between a string and a variant type variable.
       typedef QMap<QString, QVariant> VariantList;
 
-      /** Shared Resource data pointer */
+      /** 
+       * Shared Resource data pointer
+       *  
+       * @author 2012-07-15 Kris Becker 
+       * @internal 
+       *   @history 2012-07-15 Kris Becker - Original version.
+       */
       class ResourceData : public QSharedData {
         public:
           ResourceData() : m_name("Resource"), m_keys(), 
