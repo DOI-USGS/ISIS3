@@ -154,6 +154,8 @@ namespace Isis {
    * lookup and provide variables in equations from Pvl sources.
    * 
    * @author 2013-02-19 Kris Becker 
+   * @internal 
+   *   @history 2013-02-19 Kris Becker - Original version.
    */
   class PvlFlatMapCalculatorVariablePool : public CalculatorVariablePool {
     public:

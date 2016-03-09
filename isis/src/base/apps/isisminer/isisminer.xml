@@ -116,7 +116,7 @@
       PARAMETERS and GLOBALS. Argument substitutions are specified using the 
       <em>%n</em> symbol in keyword values. Here, the <em>n</em> is a number from 1 to the 
       number of values corresponding to an associated keyword with the same name 
-      but with <em>Args</em> appended to.  The nth value of this keyword is 
+      but with <em>Args</em> appended to it.  The <em>n</em>th value of this keyword is 
       itself a keyword where its value is substituted in the corresponding %n 
       occurrence in the original keyword. For example, in the CSVReader strategy, 
       the name of a file to read the contents from is specified in the <em>CsvFile</em>
@@ -147,7 +147,7 @@
       it is available for processing, or inactive. Strategies like the 
       <a href="#Limit">Limit</a> or <a href="#Filter">Filter</a> will evaluate 
       values of keywords for boolean equations or strings, respectively, where 
-      true conditions keep Resource states as active and false conditions sets 
+      true conditions keep Resource states as active, and false conditions set
       their states to inactive. Inactive Resources are not processed in 
       subsequent Strategies unless explicitly reactivated (again using the 
       <a href="#ResourceManager">ResourceManager</a>). Strategies typically 
@@ -450,7 +450,7 @@
       keywords,  other Assets, and the GIS Geometry remain identical to those of the 
       parent Resource. To create a completely independent 
       copy of the Resources, set <em>CreateSource</em>  to <em>Clone</em>. 
-      This option clones all the status and data of each Resource creating 
+      This option clones all the status and data of each Resource and creates a
       completely new Resource.  To start from scratch and create an Asset by 
       other means, use <em>None</em>. Defaults to <em>Copy</em> the 
       Resource list.
@@ -630,16 +630,16 @@ EndObject
     <p>
       <h1><a name="Calculator">Calculator Strategy Description</a></h1>
       The <strong>Calculator</strong> provides the ability to do calculations
-      on Resource keywords and store the results in a keyword that is 
-      immediately added to the Resource. If any equation fails for a Resource, 
+      on Resource keywords and to store the results in a keyword that is 
+      immediately added to the Resource. If any equation fails for a Resource, then
       that Resource is discarded and no further equations are executed for that 
       Resource.
     </p>
     <p>
       There are two ways equations can be specified. The basic method 
-      requires two keywords to compute, execute and store the results in each 
+      requires two keywords to compute, execute, and store the results in each 
       Resource. The <em>Equation</em> keyword stores the complete equation to 
-      execute for each Resource and use the <em>Result</em> keyword value to 
+      execute for each Resource and uses the <em>Result</em> keyword value to 
       name the keyword to store the result of the equation. 
     </p>
     <p>
@@ -653,10 +653,10 @@ EndObject
     </p>
     <p>
       Currently this Strategy supports scalars in the form of integers and doubles.
-      In addition it supports the circle constant <b>pi</b> and Euler's constant <b>e</b>.
+      In addition, it supports the circle constant <b>pi</b> and Euler's constant <b>e</b>.
       Functions, such as <b>sin</b> and <b>cos</b>, are followed by parentheses and a list of
       arguments. Operators such as <b>*</b> and <b>+</b> are placed in between their arguments.
-      If a token is not recognized as a scalar, operator, or function, it is assumed
+      If a token is not recognized as a scalar, operator, or function, then it is assumed
       to be a keyword, and will be replaced by the corresponding value in the
       Resource.
     </p>
@@ -1000,7 +1000,7 @@ EndObject
           The PVL Group where all keyword values are an equation. The names of 
           the keywords containing the equations in the Equations group are used 
           to store the results of the calculation in each active Resource as a 
-          new keyword. If Equation is specified these equations will be executed 
+          new keyword. If Equation is specified, these equations will be executed 
           after the equation specified in the Equation keyword value.
         </TD>
       </TR>
@@ -1198,9 +1198,9 @@ EndObject
         <TD>HasHeader</TD>
         <TD>Optional</TD>
         <TD>
-          If <em>True</em> then the first row of the CSV file will be assumed 
+          If <em>True</em>, then the first row of the CSV file will be assumed 
           to be the header and used to create keywords of column header names 
-          in each Resource (row). If <em>False</em> the first row is assumed to be data 
+          in each Resource (row). If <em>False</em>, the first row is assumed to be data 
           and the keyword will be named using the combination of the 
           ColumnBaseName appended with the column index number. Defaults to 
           <em>True</em>.
@@ -1247,7 +1247,7 @@ EndObject
         <TD>
           The name given to each Resource. Intended to be used with the
           IdentityArgs parameter to give each Resource a unique name.
-          If Identity is not specified the Resource names are created according 
+          If Identity is not specified, the Resource names are created according 
           to the RowBaseName description.
         </TD>
       </TR>
@@ -1293,7 +1293,7 @@ EndObject
           added to the Resource (row) as its defining geometry. This keyword, if 
           provided, takes precedence over GisGeometry and GisGeometryRef. Note 
           that special GIS keywords described above will apply to the conversion 
-          of these GIS columns to its binary form.
+          of these GIS columns to their binary form.
         </TD>
       </TR>
       <TR>
@@ -1318,7 +1318,7 @@ EndObject
         <TD>GisType</TD>
         <TD>Optional</TD>
         <TD>
-          The text format of the Geometry. If a Geometry is specified this
+          The text format of the Geometry. If a Geometry is specified, this
           keyword is required. Supports WKT (well-known-text) and
           WKB (well-known-binary).
         </TD>
@@ -1327,7 +1327,7 @@ EndObject
         <TD>RemoveGisKeywordAfterImport</TD>
         <TD>Optional</TD>
         <TD>
-          If <em>True</em> the Geometry keyword will be removed from the Resources
+          If <em>True</em>, the Geometry keyword will be removed from the Resources
           after the Geometry has been added to the Resources. These GIS geometry 
           definitions can be quite large consisting of many characters. To help 
           manage memory, remove these keywords once they are converted to reduce 
@@ -1368,7 +1368,7 @@ EndObject
       is set to <em>True</em>, the keyword names are stored in the first row of the CSV
       file. Each Resource is written to the CSV file as a row with the
       corresponding keyword values written to each column. If a Resource does
-      not have specified keyword, the value of the DefaultValue parameter is
+      not have a specified keyword, the value of the DefaultValue parameter is
       written instead.
     </p>
     <p>
@@ -1494,7 +1494,7 @@ EndObject
         <TD>SkipEmptyLists</TD>
         <TD>Optional</TD>
         <TD>
-          If <em>True</em> it will not add empty Resources to the CSV file.
+          If <em>True</em>, it will not add empty Resources to the CSV file.
           Defaults to <em>False</em>.
         </TD>                
       </TR>
@@ -1684,7 +1684,7 @@ EndObject
         <TD>Optional</TD>
         <TD>
           The Keyword to store the Query used to create the Resource in the
-          new Resources. If this parameter is not specified the Keyword will
+          new Resources. If this parameter is not specified, the Keyword will
           not be stored in the Resources.
         </TD>
       </TR>
@@ -1693,9 +1693,9 @@ EndObject
         <TD>Required</TD>
         <TD>
           Specify how resulting query rows will be stored. If this parameter is 
-          set to <em>Resource</em> the Query will be executed once and each retrieved 
+          set to <em>Resource</em>, the Query will be executed once and each retrieved 
           row will be stored as a new Resource. If this parameter is set to 
-          <em>Asset</em> the Query will be executed once for each Resource, and all 
+          <em>Asset</em>, the Query will be executed once for each Resource, and all 
           rows retrieved for the Query will be stored in each Resource as an 
           Asset containing the list of new Resources, one Resource per row.
         </TD>
@@ -1704,9 +1704,9 @@ EndObject
         <TD>Asset</TD>
         <TD>Optional</TD>
         <TD>
-          If the Target parameter is set to <em>Asset</em> this parameter is the name
+          If the Target parameter is set to <em>Asset</em>, this parameter is the name
           of the Asset added to each Resource. If the Target parameter is set
-          to <em>Asset</em> this parameter is required.
+          to <em>Asset</em>, this parameter is required.
         </TD>
       </TR>
       <TR>
@@ -1745,7 +1745,7 @@ EndObject
         <TD>
           The default Geometry to be added to each new Resource. It must be in
           either well-known-text or well-known-binary format. If the default
-          Geometry is used and this parameter is not specified no Geometry will
+          Geometry is used and this parameter is not specified, no Geometry will
           be added to the new Resources.
         </TD>
       </TR>
@@ -1781,8 +1781,8 @@ EndObject
         <TD>Optional</TD>
         <TD>
           The text format of the Geometry to be added to each new Resource. If
-          this parameter is set to <em>WKT</em> the Geometry is interpreted as
-          well-known-text. If <em>WKB</em> it is interpreted as well-known-binary.
+          this parameter is set to <em>WKT</em>, the Geometry is interpreted as
+          well-known-text. If <em>WKB</em>, it is interpreted as well-known-binary.
           This parameter is required if GisGeometry, GisGeometryKey, or
           GisGeometryRef are specified.
         </TD>
@@ -1792,8 +1792,8 @@ EndObject
         <TD>Optional</TD>
         <TD>
           Whether the Keyword containing the Geometry should be removed from
-          the new Resources. If this parameter is set to <em>True</em> the Geometry
-          Keyword will be removed. If it is set to <em>False</em> the Keyword will remain 
+          the new Resources. If this parameter is set to <em>True</em>, the Geometry
+          Keyword will be removed. If it is set to <em>False</em>, the Keyword will remain 
           in the new Resources. Defaults to <em>False</em>.
         </TD>
       </TR>
@@ -1871,7 +1871,7 @@ EndObject
     <p>
       Values contained in the <em>Include</em> keyword in the Strategy object 
       will be compared with values in the Resource key specified in the 
-      <em>Keyword</em> key.  If a value exists in both keywords the Resource 
+      <em>Keyword</em> key.  If a value exists in both keywords, then the Resource 
       is retained (as active).
       Values contained in the <em>Exclude</em> keyword in the Strategy 
       object that exist in the Resource key will deactivate a Resource. 
@@ -1943,7 +1943,7 @@ EndObject
         <TD>Optional</TD>
         <TD>
           Boolean flag to check all values in the keyword (<em>True</em>) or 
-          just the first value  (<em>False</em>).  Defaults to <em>True</em>
+          just the first value  (<em>False</em>).  Defaults to <em>True</em>.
         </TD>
       </TR>
       <TR>
@@ -1983,10 +1983,9 @@ EndObject
         <TD>Exclude</TD>
         <TD>Optional</TD>
         <TD>
-          Specify one or more values to check in the Keyword for  
-          existence.  If it exists, the keyword is deactivated. If it doesn't 
-          exist as a value in the keyword, and <em>Include</em> is not 
-          specified, it is retained.
+          Specify one or more values to look for in the Keyword.
+          If found, the Keyword is deactivated. Otherwise, if <em>Include</em> is not 
+          specified, the Keyword is retained.
         </TD>
       </TR>
     </TABLE>
@@ -2056,11 +2055,8 @@ EndObject
         <TD>
           Specifies the type of the geometry. Valid options are WKT, WKB, pvlWKT, pvlWKB, or 
           IsisCube. WKT and WKB are common GIS file formats that indicate well-known-text and
-          well-known-binary, respectively.
-          <p>
-	          If GisType is pvlWKT or pvlWKB, GisGeometry must be the path to a PVL file which 
-            contains a valid WKT or WKB geometry. 
-          </p>
+          well-known-binary, respectively. If GisType is pvlWKT or pvlWKB, GisGeometry must be
+          the path to a PVL file which contains a valid WKT or WKB geometry. 
         </TD>
       </TR>
       <TR>
@@ -2382,7 +2378,7 @@ EndObject
            the object. It may also be provided in a file called         
            <em>OverlapConfigFile</em>. Either an OverlapMiner object or a configuration 
            file may be provided, but not both.  If no overlap options are 
-           provided no action is taken on the overlap list.
+           provided, no action is taken on the overlap list.
         </TD>
       </TR>
       <TR>
@@ -2936,9 +2932,9 @@ EndObject
         <TD>Mode</TD>
         <TD>Required</TD>
         <TD>
-          The mode in which to write the Pds Table file. If <em>Create</em> a new
+          The mode in which to write the Pds Table file. If <em>Create</em>, a new
           file is created or an existing file with the same name is
-          overwritten. If <em>Append</em> the output Pds Table file will be appended
+          overwritten. If <em>Append</em>, the output Pds Table file will be appended
           to the file. Defaults to <em>Create</em>.
         </TD>
       </TR>
@@ -3248,8 +3244,8 @@ EndObject
           space. Any left/right parentheses are removed.  Then the conversion to 
           camel-case is performed. Camel case always converts the first character 
           in the name to uppercase. Each space or underscore character is removed
-          and the following character is converted to uppercase.  All other characters 
-          are converted to lowercase. 
+          and the character following it is converted to uppercase.
+          All other characters are converted to lowercase. 
         </TD>
       </TR>
     </TABLE>
@@ -3320,9 +3316,9 @@ Object = Outer
     EndObject
 EndObject
       </pre>
-      To include the ExtraInfo Group, the <em>Includes</em> keyword should be specified
-      <pre>Includes = (Root, Outer, ExtraInfo)</pre>, which will include the Id, Name, and Time 
-      keywords in the created Resource.
+      To include the ExtraInfo Group, the <em>Includes</em> keyword should be specified,
+      which will include the Id, Name, and Time keywords in the created Resource.
+      <pre>Includes = (Root, Outer, ExtraInfo)</pre>
     </p>
     <p> 
       The <em>Excludes</em> keyword operates on PVL Objects and Groups (containers). 
@@ -3336,7 +3332,7 @@ EndObject
     </p>
     <p> 
       Referring to the <em>Includes</em> example, to include the Outer Object except for its 
-      OtherInfo Group, you would specify
+      OtherInfo Group, you would specify the following:
       <pre>
 Includes = (Root, Outer)
 Excludes = OtherInfo
@@ -3457,7 +3453,7 @@ Excludes = OtherInfo
         <TD>Optional</TD>
         <TD>
           The base of the default name of each Resource. The default Resource names are the base
-          name and a number. For example <em>Pvl0</em>, <em>Pvl1</em>, etc. Defaults to 
+          name and a number. For example: <em>Pvl0</em>, <em>Pvl1</em>, etc. Defaults to 
           <em>Pvl</em>.
         </TD>
       </TR>
@@ -3693,7 +3689,7 @@ EndObject
         <TD>
           This keyword contains keywords that will be used to substitute any 
           occurrences of keyword arguments (i.e., <em>%1</em>, <em>%2</em>,...) in all commands 
-          regardless of which group it the command is from.
+          regardless of which group the command is from.
         </TD>
       </TR>
     </TABLE>
@@ -3812,7 +3808,7 @@ EndObject
         <TD>Optional</TD>
         <TD>
           If <em>True</em>, the activeness of all the Resources will be retained after
-          the sidebar configuration has run. If <em>False</em> any Resources that are
+          the sidebar configuration has run. If <em>False</em>, any Resources that are
           discarded during the configuration will remain discarded and lost to 
           subsequent processing. Defaults to <em>True</em>.
         </TD>
@@ -3822,7 +3818,7 @@ EndObject
         <TD>Optional</TD>
         <TD>
           If <em>True</em>, any Resources that are deleted by the side configuration
-          will be restored. In addition any Resources that are created during
+          will be restored. In addition, any Resources that are created during
           the configuration will be deleted. If <em>False</em>, deleted Resources will
           remain deleted and created Resources will remain. Defaults to 
           the value of SavePoint.
@@ -3949,10 +3945,10 @@ Result = StereoPairRank
        <em>KeywordMap</em> group as <strong>CenterLongitude = 
        GisOverlapCentroidX</strong> and <strong>CenterLatitude = 
        GisOverlapCentroidY</strong> the <em>StereoAngle</em> is computed from a 
-       common surface point. If desired, the user can specify to use the stereo 
-       angle in the computation of the <em>VerticalPrecision</em> stereo keyword 
-       rather than the <em>ParallaxHeightRatio</em>. Take note the equation to 
-       compute <em>StereoPairRank</em> can be changed as desired or weights can 
+       common surface point. If desired, the user can specify whether to use the
+       stereo angle in the computation of the <em>VerticalPrecision</em> stereo
+       keyword rather than the <em>ParallaxHeightRatio</em>. Take note the equation
+       to compute <em>StereoPairRank</em> can be changed as desired or weights can 
        be provided in the fourth limit keyword value to emphasize or 
        de-emphasize any limit.
     </p>
@@ -4133,7 +4129,7 @@ Result = StereoPairRank
           the object. It may also be provided in a file called         
           <em>OverlapConfigFile</em>. Either an OverlapMiner object or configuration 
           file may be provided, but not both.  If no overlap options are 
-          provided no action is taken on the stereo list.
+          provided, no action is taken on the stereo list.
         </TD>
       </TR>
       <TR>
@@ -4290,10 +4286,10 @@ Result = StereoPairRank
               <TD>
                 Differences in illumination between two images reduce the 
                 accuracy of stereo matching. Compatibility of the images can 
-                be measured in terms of the Shadow-Tip Distance. Defined as 
-                the distance between the tips of the shadows in the two 
-                images for a hypothetical vertical post of unit height, this 
-                quantity is computed analogously to ParallaxHeightRatio. The 
+                be measured in terms of the Shadow-Tip Distance. This measurement 
+                is defined as the distance between the tips of the shadows in the 
+                two images for a hypothetical vertical post of unit height,
+                and it is computed analogously to ParallaxHeightRatio. The 
                 keywords <em>ShadowX</em> and <em>ShadowY</em> are required in both pair 
                 Resources but can be mapped to different keywords in the 
                 KeywordMap group. 
@@ -4899,8 +4895,9 @@ ElapsedTime(s): 4866
 Session complete in 01:55:36.555 of elapsed time
           </pre>
              This run completed in about 2 hours. This is typical for most regions
-             when run on machines with similar CPU speed. There were 557
-             images identified in this region and the results are stored in 
+             when run on machines with similar CPU processing power. 
+
+             There were 557 images identified in this region and the results are stored in 
              /scratch/kbecker/MESSENGER/Region10D/Global/ImagesEqui035N235ED10_images.csv.
              For each image, and average of several hundred images were 
              determined to overlap. There are now 557 files in the directory 

@@ -87,6 +87,8 @@ namespace Isis {
    * SortKey keyword and using the less than operator.
    * 
    * @author 2012-07-25 Kris Becker
+   * @internal
+   *   @history 2012-07-25 Kris Becker - Original version.
    */
   class SortAscending {
     public:
@@ -106,6 +108,8 @@ namespace Isis {
    * SortKey keyword and using the greater than operator.
    * 
    * @author 2012-07-25 Kris Becker
+   * @internal
+   *   @history 2012-07-25 Kris Becker - Original version.
    */
   class SortDescending {
     public:
