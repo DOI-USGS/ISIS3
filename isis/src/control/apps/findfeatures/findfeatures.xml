@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: findfeatures.xml 6564 2016-02-11 00:14:44Z kbecker@GS.DOI.NET $ -->
+<application name="findfeatures" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+      Use OpenCV feature-based matching algorithms to create image-based ISIS 
+  control networks 
+  </brief>
+
+  <description>
+    <p>
+      This application offers an alternative image matching option to 
+      <i>autoseed</i>, <i>seedgrid</i> and <i>coreg</i>. Whereas applications 
+      like <i>coreg</i> and <i>pointreg</i> are area-based matching (ABM), 
+      <i>findfeatures</i> utilizes feature-based matching (FBM) techniques.  The 
+      <a href="http://opencv.org/">OpenCV</a> feature matching framework is used 
+      extensively in this application to implement some of the the concepts 
+      contained in  a 
+      <a href="https://www.packtpub.com/books/content/opencv-estimating-projective-relations-images">robust feature matching 
+      algorithm</a> on overlapping single pairs or multiple image sets.
+    </p>
+    <p>
+       Feature based algorithms (FBM) are comprised of three basic processes: 
+       detection of interest points (or keypoints), extraction of interest point 
+       descriptors and finally matching of interest point descriptors from two 
+       image sources. 
+    </p>
+   </description>
+
+  <category>
+    <categoryItem>Registration and Pattern Matching</categoryItem>
+    <categoryItem>Control Networks</categoryItem>
+  </category>  
+
+  <seeAlso>
+    <applications>
+      <item>autoseed</item>
+      <item>seedgrid</item>
+      <item>coreg</item>
+      <item>pointreg</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Kris Becker" date="2015-08-28">
+      Original Version.
+    </change>
+    <change name="Kris Becker" date="2015-09-29">
+      Throws an error when no control points are created if user opt to create a 
+      network file. Line/Samp coordinate was transposed when determining the 
+      apriori laitude/longitude.
+    </change>
+    <change name="Kris Becker" date="2015-11-13">
+      Apply the RANSAC homography outlier detection before fundamental epipolar 
+      outlier detection followed by final refined point transform homography 
+      matrix - addresses a false positive issue. 
+    </change> 
+    <change name="Kris Becker" date="2016-02-10"> 
+      Updated the ImageSource class for proper use of the Histogram class for 
+      conversion to 8-bit. 
+    </change>
+  </history> 
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Image to be Translated
+        </brief>
+        <description>
+          This cube (train) will be translated to register to the MATCH (query) 
+          cube/image. This application supports other common image formats such 
+          as PNG, TIFF or JPEG. Essentially any image that can be read by OpenCV 
+          is supported.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>None</item></default>
+      </parameter>
+
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          List of input cubes/images for which to create a control network
+        </brief>
+        <description>
+          <p>
+          Use this parameter to select a filename which contains a list of
+          cube filenames. The cubes identified inside this file will be used
+          to create the control network. The following is an example of the 
+          contents of a typical FROMLIST file:
+          </p>
+          <pre>
+            AS15-M-0582_16b.cub
+            AS15-M-0583_16b.cub
+            AS15-M-0584_16b.cub
+            AS15-M-0585_16b.cub
+            AS15-M-0586_16b.cub
+            AS15-M-0587_16b.cub
+          </pre>
+          <p>
+            Each file name in a FROMLIST file should be on a separate line.
+          </p>
+        </description>
+        <internalDefault>None</internalDefault>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="MATCH">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The input reference image (query)
+        </brief>
+        <description>
+            Name of the image to match to. This will be the reference image in 
+            the output control network. It is also referred to as the query 
+            image in OpenCV documentation.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>None</item></default>
+      </parameter>
+
+        <parameter name="ONET">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>Output ControlNet network file of matched features</brief>
+          <description>
+               This file will contain the Control Point network results of 
+               findfeatures in a binary format.  There will be no false or 
+               failed matches in the output control network file. 
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+            *.net *.txt
+          </filter>
+        </parameter>
+
+        <parameter name="TOLIST">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>Output list of ControlNet network cube files</brief> 
+          <description>
+             This file will contain the list of (cube) files in the control 
+             network. For multi-image matching, some files may not have matches 
+             detected. These files will not be written to TOLIST. The MATCH file 
+             is always added first and all other images that have matches are 
+             added to TOLIST.
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.lis</filter>
+        </parameter>
+
+        <parameter name="TONOTMATCHED">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+              Output list of FROM/FROMLIST cube files that were not matched 
+          </brief> 
+          <description>
+              <p>
+                 This file will contain the list of (cube) files that were not 
+                 successfully matched. This can be used to run through individually 
+                 with more specifically tailored matcher algorithm specifications.
+              </p>
+              <p>
+                  NOTE this file is appended to so that continual runs will               
+              accumulate failures making it easier to handle failed runs.
+              </p>
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.lis</filter>
+        </parameter>
+    </group>
+
+    <group name= "Algorithms">
+        <parameter name= "ALGORITHM">
+            <type>string</type>
+            <brief>
+               Provide algorithm or algorithms specifications to apply
+            </brief> 
+            <description>
+                This parameter provides user control over selecting a wide 
+                variety of feature detectors and matcher combinations.  This 
+                parameter also provides a mechanism to set any of the valid 
+                parameters of the algoritms.
+            </description>
+            <internalDefault>None</internalDefault>
+        </parameter>
+
+        <parameter name= "ALGOSPECFILE">
+            <type>filename</type>
+            <brief>
+               Provide algorithm or algorithms in a text file
+            </brief> 
+            <description>
+               To accomodate a potentially large set of feature algorithms, 
+               you can provide them in a file.  This format is the same as the 
+               ALGORITHM format, but each unique algorithm must be specifed  
+               on a seperate line.  Thoeretically, the number you specify is 
+               unlimited. This option is particularly useful to generate a 
+               series of algorithms that vary parameters for any of the 
+               elements of the feature algorithm.
+            </description>
+            <internalDefault>None</internalDefault>
+            <filter>*.lis</filter>
+        </parameter>
+
+        <parameter name= "LISTALL">
+            <type>boolean</type>
+            <brief>
+               List all OpenCV algorithms irregardles of origin
+            </brief> 
+            <description>
+              This parameter will retrieve all the registered OpenCV 
+              algorithms  available that can created by name.  The ones 
+              pertinent to this application are those prepended with 
+              "Feature2D" and "DescriptorMatcher".  However, this option lists 
+              all of the registered OpenCV algorithms.
+            </description>
+           <default><item>No</item></default>
+        </parameter>
+
+        <parameter name= "LISTMATCHERS">
+            <type>boolean</type>
+            <brief> List OpenCV matcher related algorithms</brief> 
+            <description>
+              This parameter will retrieve all registered OpenCV feature 
+              matcher related algorithms available that can created by name.  
+              These algorithms will have "Feature2D" and "DescriptorMatcher" 
+              prepended to the name of the algorithm.  Many of the Detector 
+              and Extractor algorithms are not registered so they will not 
+              appear in this list. This option will create a PVL structure of 
+              individual algorithms and all their parameters.
+            </description>
+           <default><item>No</item></default>
+        </parameter>
+
+       <parameter name= "LISTSPEC">
+            <type>boolean</type>
+            <brief>
+               List result of ALGORITHM specification
+            </brief> 
+            <description>
+              This parameter will retrieve all the registered OpenCV 
+              algorithms available that can created by name.  The ones 
+              pertinent to this application are those prepended with 
+              "Feature2D" and "DescriptorMatcher".  However, this option lists
+              all of the registered OpenCV algorithms.
+            </description>
+           <default><item>No</item></default>
+        </parameter>
+
+        <parameter name= "TOINFO">
+            <type>filename</type>
+            <brief>
+               Optional output file/device to write information requests to
+            </brief> 
+            <description>
+              <p>
+                When an information option is requested (LISTALL or LISTSPEC), 
+                the user can provide the name of an output file here where the 
+                information, in the form of a PVL structure, will be written.  
+                If any of those options are selected by the user and 
+                a file is not provided in this option, the output is written 
+                to the screen or GUI.
+              </p>
+              <p>
+                One very nifty option that works well is to specify the 
+                terminal device as the output file.  This will list the 
+                results to the screen so that your input can be quickly 
+                checked for accuracy.  Here is an example
+                <b/>
+                  findfeatures listspec=true 
+              algorithm=extractor.orb/detector.SimpleBlob@minrepeatability:1 
+              toinfo=/dev/tty 
+              </p>
+            </description>
+          <default><item>/dev/tty</item></default>
+        </parameter>
+       
+      <parameter name= "DEBUG">
+            <type>boolean</type>
+            <brief>Print debugging statements of the matcher algorithm</brief>
+            <description>
+              At times, things go wrong. By setting DEBUG=TRUE, information is 
+              printed as elements of the matching algorithm are executed. 
+            </description>
+          <default><item>false</item></default>
+        </parameter>
+
+      <parameter name= "DEBUGLOG">
+            <type>filename</type>
+            <brief>File that debugging information will be appended to</brief>
+            <description>
+                Provide a file that will have all the debugging contents.
+            </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.log</filter> 
+        </parameter> 
+
+      <parameter name= "PARAMETERS">
+            <type>filename</type>
+            <brief>File containing special algorithm parameters</brief>
+            <description>
+                This file can contain specialized parameters that will modify 
+                certain  behaviors in the robust matcher algorithm. They can 
+                vary over time and are documented in the application 
+                descriptions.
+            </description>
+          <internalDefault>None</internalDefault>
+          <filter>*.conf</filter>  
+      </parameter>
+
+
+      <parameter name= "MAXPOINTS">
+            <type>integer</type>
+          <brief>Maximum number of keypoints to detect</brief>
+            <description>
+                Specifies the maximum number of keypoints to save in the 
+                detection phase. If a value is not provided for this 
+                parameter, there will be no restriction set on the number of 
+                keypoints that will be used to match.
+            </description>
+          <internalDefault>0</internalDefault>
+      </parameter>
+
+    </group>
+
+     <group name= "Constraints">
+
+       <parameter name="RATIO">
+           <type>double</type>
+           <brief>
+              Specify the maximum distance allowed between ratio test points
+           </brief>
+           <description>
+
+           </description>
+           <internalDefault>0.65</internalDefault>
+       </parameter>
+
+          <parameter name= "EPITOLERANCE">
+              <type>double</type>
+              <brief>
+                  Specifes tolerance for determining good Eqpipolar points
+              </brief>
+              <description>
+                   The tolerance specifies the maximum distance in pixels that 
+                   feature may deviate from the Epipolar lines for each matching 
+                   feature.
+              </description>
+            <internalDefault>3.0</internalDefault>
+          </parameter>
+
+         <parameter name= "EPICONFIDENCE">
+              <type>double</type>
+              <brief>
+                  Specifes the level of confidence required in epipolar quality
+              </brief>
+              <description>
+                   This parameter indicates the confidence level of the epipolar 
+                   determination ratio. A value of 1.0 requires that all pixels 
+                   be valid in the epipolar computation.
+              </description>
+            <internalDefault>0.99</internalDefault>
+          </parameter>
+
+          <parameter name= "HMGTOLERANCE">
+              <type>double</type>
+              <brief>
+                  Specifes tolerance for determining good homography points
+              </brief>
+              <description>
+                   The is used as a tolerance in the computation of the distance 
+                   between keypoints using the homography matrix relationship 
+                   between the MATCH image and each FROM/FROMLIST image.  This 
+                   will throw points out that are (dist > TOLERANCE * min_dist), 
+                   the smallest distance between points.
+              </description>
+            <internalDefault>3.0</internalDefault>
+          </parameter>
+
+       <parameter name="MAXTHREADS">
+           <type>integer</type>
+           <brief>
+              Specify the maximum threads to use
+           </brief>
+           <description>
+
+           </description>
+           <internalDefault>0</internalDefault>
+       </parameter>
+     </group>
+
+    <group name="Image Transformation Options">
+      <parameter name= "FASTGEOM">
+            <type>boolean</type>
+            <brief>Perform fast geometry image transform</brief>
+            <description>
+               When TRUE, this option will perform a fast geometric linear 
+               transformation that <em>projects</em> each FROM/FROMLIST image to 
+               the camera space of the MATCH image. Note this option 
+              <em>theoretically</em> is not needed for scale/rotation invariant 
+              feature matchers such as SIFT and SURF but there are limitations as 
+              to the invariance of these matchers. For matchers that are not scale 
+              and rotation invariant, this (or something like it) will be required 
+              to orient each image to a similar views. Users should determine the 
+              capabilities of the matchers used.
+            </description>
+          <default><item>false</item></default>
+        </parameter>
+
+       <parameter name="FASTGEOMPOINTS">
+           <type>integer</type>
+           <brief>
+              Specify the maximum number of geometry points used to compute the 
+              fast geometry reprojection 
+           </brief>
+           <description>
+           </description>
+           <internalDefault>25</internalDefault>
+       </parameter>
+
+      <parameter name="GEOMTYPE">
+        <type>string</type>
+        <default><item>CAMERA</item></default>
+        <brief>Type of fast geom mapping to apply</brief>
+        <description>
+           Provide options as to how FASTGEOM projects data in the FROM (train) 
+           image to the MATCH (query) image space.
+        </description>
+        <list>
+           <option value="CAMERA">
+               <brief>
+                  Fastgeom will project the FROM image into the MATCH space 
+               </brief>
+               <description>
+                   This option projects the image in the same manner as cam2map. 
+                   The common area of the FROM image is projected into an image 
+                   of the same size as the MATCH image. This is comparable to 
+                   cam2map in that it projects the FROM image into the camera 
+                   space of the MATCH image. Features should be located at the 
+                   same general line and sample location in both images.
+               </description>
+           </option>
+           <option value="CROP">
+               <brief>
+                  Fastgeom will crop the FROM image to common area of MATCH
+               </brief>
+               <description>
+                  Fastgeom will crop the FROM image to common area of MATCH and 
+                  retain on the approximate size of the cropped region. This 
+                  option is useful to limit features to be identified in the 
+                  comming region in both images. 
+               </description>
+           </option>
+
+           <option value="MAP">
+               <brief>
+                   Fastgeom will fully map project all of the FROM image                    
+               </brief>
+               <description>
+                   Fastgeom will preserve all of the FROM image using the  
+                   translation computed from common space. This is comparable 
+                   to map2map in that the whole from is projected using the 
+                   MATCH geometry. The size of the image is determined by 
+                   projecting the corners of the FROM image using the MATCH 
+                   geometry. Images can be quite large or small if there is a 
+                   large resolution difference. 
+               </description>
+           </option>
+        </list>
+      </parameter>
+
+      <parameter name="FILTER">
+        <type>string</type>
+        <default><item>None</item></default>
+        <brief>Image filtering options for enhanced macthing</brief>
+        <description>
+         Apply an image filter to both images before matching
+        </description>
+        <list>
+            <option value="None">
+                <brief>
+                   No filters will be applied 
+                </brief>
+                <description>
+                </description>
+            </option>
+
+           <option value="SOBEL">
+               <brief>
+                  Apply Sobel filtering to both FROM and MATCH images
+               </brief>
+               <description>
+               </description>
+           </option>
+
+           <option value="SCHARR">
+               <brief>
+                  Apply Scharr filtering to both FROM and MATCH images
+               </brief>
+               <description>
+               </description>
+           </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Control">
+      <parameter name="NETWORKID">
+        <type>string</type>
+        <brief>Name of this control network</brief>
+        <description>
+            The ID or name of this particular control network. This string
+            will be added to the ouput control network file, and can be used
+            by you to identify the network.
+        </description>
+       <default><item>Features</item></default>
+      </parameter>
+
+      <parameter name="POINTID">
+        <type>string</type>
+        <brief>
+            The pattern to be used to create point ids.
+        </brief>
+        <description>
+          <p>
+            This string will be used to create unique IDs for each control
+            point created by this program. The string must contain a
+            single series
+            of question marks ("?"). For example: "VallesMarineris????"
+          </p>
+          <p>
+            The question marks will be replaced
+            with a number beginning with zero and incremented by one each time
+            a new control point is created. The example above would cause the
+            first control point to have an ID of "VallesMarineris0000", the
+            second ID would be "VallesMarineris0001" and so on.
+            The maximum number of new control points for this example would be
+            10000 with the final ID being "VallesMarineris9999".
+          </p>
+          <p>
+            Note: Make sure there are enough "?"s for all the control
+            points that might be created during this run. If all the possible
+            point IDs are exausted, the program will exit with an error and 
+            will not produce an output control network file. The number of
+            control points created depends on the size and quantity of 
+            image overlaps and the density of control points as defined
+            by the DEFFILE parameter. 
+          </p>
+          <p>
+            Examples of POINTID:
+          </p>
+          <ul>
+            <li>POINTID="JohnDoe?????"</li>
+            <li>POINTID="Quad1_????></li>
+            <li>POINTID="JD_???_test1"</li>
+          </ul>
+        </description>
+        <default><item>FeatureId_?????</item></default>
+      </parameter>
+
+      <parameter name= "POINTINDEX">
+          <type>integer</type>
+          <brief>Start numerical POINTID index with this number</brief>
+          <description>
+              This parameter can be used to specify the starting POINTID index 
+              number to assist in the creation of unique control point 
+              identifiers. Users must determine the highest used index and use 
+              the next number in the sequence to provide unique point ids.
+          </description>
+        <default><item>1</item></default>
+      </parameter>
+
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <brief>
+            The description of the network.
+        </brief>
+        <description>
+            A text description of the contents of the output control network.
+            The text can contain anything the user wants. For example it 
+            could be used to describe the area of interest the control network
+            is being made for. 
+        </description>
+        <default><item>Find features in image pairs or list</item></default>
+      </parameter>
+
+       <parameter name="NETTYPE">
+            <type>string</type>
+            <brief>Specify type of control network to create</brief>
+            <description>
+               There are two types of control network files that can be created             
+               in this application: IMAGE and GROUND.  For IMAGE types, the pair 
+               is assumed to be overlapping pairs where control measures for 
+               both images are crate.  For NETTYPE=GROUND, only the FROM file 
+               measure is recorded for purposes of dead reckoning of the image 
+               using jigsaw.
+            </description>
+            <default><item>IMAGE</item></default>
+            <list>
+                <option value="IMAGE">
+                    <brief>
+                       Create control network using both images
+                    </brief>
+                    <description>
+                        Create a control network of image pairs that have been 
+                        measured for both to be controlled. 
+                    </description>
+                </option>
+               <option value="GROUND">
+                    <brief>Only create a ground network file for dead 
+                        reconing</brief>
+                    <description>
+                       Create a control network with only the FROM image so that 
+                       only its pointing will be updated.
+                    </description>
+                </option>
+            </list>
+        </parameter>        
+
+       <parameter name="GEOMSOURCE">
+            <type>string</type>
+            <brief>Specify which input file provides lat/lons for control 
+              point</brief>
+            <description>
+               For input files that provide geometry, specify which one provides 
+               the latitude/longitude values for each control point.  NONE is 
+               an acceptable option for which there is no geometry available.  
+               Otherwise, the user must choose FROM or MATCH as the cube file 
+               that wil provide geometry. 
+            </description>
+            <default><item>MATCH</item></default>
+            <list>
+                <option value="NONE">
+                    <brief>
+                        Neither image provides geometry
+                    </brief>
+                    <description>
+                        Use this option if geometry is not available in either 
+                        the FROM or MATCH image 
+                    </description>
+                </option>
+                <option value="FROM">
+                    <brief>
+                       Use the FROM file to compute geomtries for control points 
+                    </brief>
+                    <description>
+                        Selection of the FROM option indicates use of the FROM 
+                        file to compute the latitude and longitude of each 
+                        control point.   Note this option cannot be used when 
+                        there are more than one FROM (via FROMLIST) is given. 
+                        Must use MATCH for these cases.
+                    </description>
+                </option>
+               <option value="MATCH">
+                    <brief>
+                       Use the MATCH file to compute geomtries for control 
+                    points 
+                    </brief>
+                    <description>
+                        Selection of the MATCH option indicates use of the MATCH 
+                        file to compute the latitude and longitude of each 
+                        control point.
+                    </description>
+                </option>
+            </list>
+        </parameter> 
+ 
+          
+        <parameter name="TARGET">
+          <type>string</type>
+          <brief>
+              The description of the network.
+          </brief>
+          <description>
+              A text description of the contents of the output control network.
+              The text can contain anything the user wants. For example it 
+              could be used to describe the area of interest the control network
+              is being made for. 
+          </description>
+          <internalDefault>None</internalDefault>
+        </parameter>
+             
+    </group>
+  </groups>
+
+</application>
