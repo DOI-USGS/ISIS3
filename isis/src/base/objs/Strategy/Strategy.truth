@@ -1,73 +1,202 @@
-Testing default constructor:   
+************************************************ 
 
-Creating empty strategy: 
-Name:          "Strategy" 
-Type:          "Counter" 
-Description:   "Strategy::Strategy is running a Counter algorithm." 
-Testing constructors: 
+*                Constructors                  * 
 
-Testing Strategy(const PvlObject &def,const ResourceList &globals) constructor: 
-"**PROGRAMMER ERROR** Keyword Name does not exist!." 
-"Elven Dictionary" 
-
-"strat4" 
-
-Name:          "Derived Strategy Name" 
-Type:          "Derived Strategy Type" 
-Testing getGlobalDefaults:   
-
-Elven Word List 1
-Elven Word List 2
 ************************************************ 
 
 
-Testing getGlobals:   
+
+Testing default constructor Strategy()   
+
+Name:          "Strategy" 
+Type:          "Counter" 
+Description:   "Strategy::Strategy is running a Counter algorithm." 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+Testing Strategy(const PvlObject &def,const ResourceList &globals) constructor: 
+
+
+"**PROGRAMMER ERROR** Keyword Name does not exist!." 
+"Elven Dictionary" 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+Testing Strategy(const QString &name,const QString &type) constructor: 
+
+"strat4name" 
+
+"strat4type" 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+
+
+************************************************ 
+
+*              Protected Members               * 
+
+************************************************ 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             setName, setType                 % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+Name:          "Derived Strategy Name" 
+Type:          "Derived Strategy Type" 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             getGlobalDefaults                % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+Elven Word List 1
+Elven Word List 2
+Elven Word List 3
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             getGlobals                       % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
 
 Elven Word List 3
 Elven Word List 1
 Elven Word List 2
-************************************************ 
+Elven Word List 3
 
 
-Testing getDefinition:   
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             assetResourceList                % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+assetResourceList
+"Resource 1" 
+
+"Resource 2" 
+
+"Resource 3" 
+
+"Resource 4" 
+
+"Resource 5" 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             getDefinition                    % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
 
 "Elven Dictionary" 
 
-************************************************ 
 
 
-Testing getDefinitionMap:   
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             getDefinitionMap                 % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
 
 	ApplyToDiscarded = false
 	Debug = true
 	Name = "Elven Dictionary"
+	PropagateKeyword = Middle-Earth
+	PropagateKeywords = wolf
 	Type = Dictionary
 ************************************************ 
 
 
 Testing setApplyToDiscarded(), isApplytToDiscarded(), setDoNotApplyToDiscarded() 
 
-isApplyToDiscarded =  
-false 
 
-Testing setApplyToDiscarded:   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-isApplyToDiscarded =  
-true 
+%             isApplyToDiscarded               % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-Testing setDoNotApplyToDiscarded:   
+
 
 isApplyToDiscarded =  
 false 
 
-************************************************ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             setApplyToDiscarded              % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
-Testing applyToResources(....) 
 
+Calling setApplyToDiscarded:   
+isApplyToDiscarded =  
+false 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%         setDoNotApplyToDiscarded             % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+Calling setDoNotApplyToDiscarded:   
+isApplyToDiscarded =  
+false 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%               applyToResources               % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+Calling apply(SharedResource &resource, const ResourceList &globals)
+Calling apply(SharedResource &resource, const ResourceList &globals)
 Number of resources processed =  2 
 
-************************************************ 
+Calling apply(SharedResource &resource, const ResourceList &globals)
+Number of resources processed (after discarding resource 0) =  
+1 
+
+Call setApplyToDiscarded: 
+
+Calling apply(SharedResource &resource, const ResourceList &globals)
+Calling apply(SharedResource &resource, const ResourceList &globals)
+Number of resources processed (after discarding resource 0) =  
+2 
+
+Calling apply(SharedResource &resource, const ResourceList &globals)
+Calling apply(SharedResource &resource, const ResourceList &globals)
+Number of resources processed (after activiating resource 0) =  
+2 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%           processed/resetProcessed           % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 
 
 ************************************************ 
@@ -81,88 +210,158 @@ Resetting Processed:
 
 Processed =  1 
 
-************************************************ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                  countActive                 % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 
 
 Testing countActive/countDiscard:   
 
-Active Resources in lstA: 2 
+Active Resources in ResourseList lst: 3 
 
-Discarded Resources in lstA: 0 
+Discarded Resources in ResourceList lst: 0 
 
-************************************************ 
+Discarding the first resource in ResourceList lst: 
 
-Testing findReplacement:   
+Discarded Resources in ResourceList lst: 1 
 
-Empty apply is called...
-Empty apply is called...
-Elven Word List 3
-Elven Word List 1
-Elven Word List 2
-Searching for elvish word for demon (with default args):  balrog
-Searching for value not in the ResourceList:  
-Could not find fluffy bunny
-************************************************ 
+Active Resources in ResourceList lst: 2 
 
-Testing qualifiers (more elvish words):   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-Aaye
-Aelin
-Adan
-Adanedhel
-Aduial
-Aglarond
+%             findreplacement                  % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+Searching for elvish word for demon (with default args):   
+"red balrog" 
+
+Searching for value not in the ResourceList:   
+
+"Could not find fluffy bunny" 
+
+Searching for the 100th demon (which is not in lst:   
+
+"100th demon not in lst" 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                qualifiers                    % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+"Aaye" 
+
+"Aelin" 
+
+"Adan" 
+
+"Adanedhel" 
+
+"Aduial" 
+
+"Aglarond" 
+
+
 
 Testing qualifiers with default delimiter (::):   
 
-Aaye
-Aelin
-Adan
-Adanedhel
-Aduial
-Aglarond
-************************************************ 
+"Aaye" 
 
-Testing scanAndReplace:   
+"Aelin" 
 
-Original sentence:  Balrogs require much fnord love and fnord attention.
-Fixed sentence:  Balrogs require much  love and  attention.
-************************************************ 
+"Adan" 
 
-Testing translateKeywordArgs:   
+"Adanedhel" 
 
-blah
-************************************************ 
+"Aduial" 
 
-Testing processArgs:   
+"Aglarond" 
 
-balrog
-************************************************ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-Testing propagateKeys:   
+%               scanAndReplace                 % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+Original sentence:   "Balrogs require much fnord love and fnord attention." 
+
+Fixed sentence:   "Balrogs require much  love and  attention." 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%             translateKeywordArgs             % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+"blah" 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                 processArgs                  % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+"balrog" 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                propagateKeys                 % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+Propagating keys from Shared Resource elven2 -> elven3 
+
+elven3 keys before propagation: 
 
 	daisy = eirien
 	Identity = "Elven Word List 3"
 	pipe-weed = galena
 	Sun = Anor
+
+
+elven3 keys after propagation: 
+
 	daisy = eirien
 	Identity = "Elven Word List 3"
 	pipe-weed = galena
 	Sun = Anor
-************************************************ 
+	wolf = draug
 
-Testing activeList 
 
-Elven Word List 3
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%    activeList/deactivateList/activateList    % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
 Elven Word List 1
 Elven Word List 2
-Number of active resources =  3 
+Elven Word List 3
+Number of active resources in DerivedStrategy dstrat4 =  
+3 
 
 ************************************************ 
 
 Testing deactivateList 
 
-Number of active resources =  0 
+Number of active resources in DerivedStrategy dstrat4 =  
+0 
 
 ************************************************ 
 
@@ -172,68 +371,126 @@ Number of active resources =  3
 
 ************************************************ 
 
+Deactivating Resource 0 in ResourceList lst: 
+
+Number of active resources =  2 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                  copyList                    % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
 Testing copyList (globals -> l5) 
 
 Elven Word List 3
 Elven Word List 1
 Elven Word List 2
+Elven Word List 3
 Decativating l5 Resources (global resources are active) 
 
 Number of active resources in l5 =  0 
 
-Number of active resources in global =  3 
+Number of active resources in global =  4 
 
-************************************************ 
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                  cloneList                   % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
 
 Testing cloneList (globals -> l6) 
 
 Elven Word List 3
 Elven Word List 1
 Elven Word List 2
-************************************************ 
+Elven Word List 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-Testing applyToIntersectedGeometry 
+%                  isDebug                     % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-************************************************ 
+
 
 Testing isDebug(): 
 
 isDebug() =  true 
 
-************************************************ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                doShowProgress                % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
 
 Testing doShowProgress(): 
 
 doShowProgress() =  false 
 
-************************************************ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                initProgress                  % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
 
 Testing initProgress(): 
 
-Calling with no args, initProgress =   false 
+Calling: initProgress() =   false 
 
-Calling:  initProgress(2,"some text") =  false 
+Calling: initProgress(2,"some text") =  
+false 
 
-************************************************ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                  composite                   % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+
 
 Testing composite(...): 
 
-"Elven Word List 1_Elven Word List 3" 
+	Identity = "Elven Word List 2_Elven Word List 3"
+	wolfA = draug
+	wolfB = draug
 
-************************************************ 
 
-Testing importGeometry(...): 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                 importGeometry               % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
+
 
 importGeometry =  
 true 
 
-************************************************ 
 
-getObjectList:   
 
-************************************************ 
 
-getObjectList:   
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%                  getObjectList               % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
 
 "O1" 
 
@@ -241,7 +498,17 @@ getObjectList:
 
 "O3" 
 
-Testing applyToIntersected Geometry  
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%         applyToIntersectedGeometry           % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+
+
 "**PROGRAMMER ERROR** Dictionary:Elven DictionaryCannot apply RTree search to bad geometry." 
 
   Dictionary:Elven Dictionary does not have a geometry!

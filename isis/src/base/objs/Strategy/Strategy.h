@@ -41,11 +41,10 @@ namespace Isis {
 
   class GisGeometry;
   class Progress;
-//  class PvlObject;
+
 
   /**
-   * @brief Strategy - Supports algorithm development Planning 
-   *        Resource.
+   * @brief Strategy - Supports algorithm development
    *  
    * This base class provides a framework to develop strategic 
    * planning tools used to process and/or rank ISIS resources. 
@@ -96,30 +95,10 @@ namespace Isis {
    *                          and replaced. Once the count of arguments reached
    *                          above 9, %1 was replaced for %10. Scan for
    *                          replacements in reverse order fixes this issue.
-   *  
-   *  
-   *   @todo Test coverage - Unable to test constructors Strategy(),
-   *         Strategy(name,type,globals) as a support class for isisminer.
-   *  
-   *   NOTE: Some of the following may be taken care of when we finish testing strategies.
-   *   @todo Test coverge - Never called methods: resetProcessed(),
-   *         assetResourceList(), propagateKeys(), activeList(),
-   *         activateList(), deactivateList(), applyToIntersectedGeometry(),
-   *         queryCallback()
-   *  
-   *   @todo Test coverage - empty resource list - apply(), countActive(),
-   *         processArgs(), propagateKeys(), activateList(), deactivateList(),
-   *         applyToIntersectedGeometry()
-   *  
-   *   @todo Test coverage - applyDiscarded=t - apply() 
-   *  
-   *   @todo Test coverage - keyBase+"Keyword" exists in PVL def - (1) keyBase
-   *         exists, (2) keyBase DNE -  translateKeywordArgs()
-   *  
-   *   @todo Test coverage - def file has GisGeometryRef, GisGeometryKey,
-   *         GisGeometryArgs, RemoveGisKeywordAfterImport - importGeometry()
-   *  
+   * @history 2016-03-07  Tyler Wilson - Corrected documentation, and created a
+   *                          unit test to test most of this classe's methods.
    */
+
   class Strategy {
   
     public:
@@ -131,11 +110,11 @@ namespace Isis {
       QString type() const;
       QString description() const;
   
-      // Not intended to be reimplemnented but available for direct calls
+      // Not intended to be reimplemented but available for direct calls
       int apply(ResourceList &resources);
       int apply(SharedResource &resource);
 
-      // Inheriting strategies must reimplement either one  or both of these
+      // Inheriting strategies must reimplement either one or both of these
       virtual int apply(ResourceList &resources, const ResourceList &globals);
       virtual int apply(SharedResource &resource, const ResourceList &globals);
   
@@ -187,8 +166,7 @@ namespace Isis {
   
      void propagateKeys(SharedResource &source, SharedResource &target) const;
      SharedResource composite(SharedResource &resourceA, SharedResource &resourceB,
-                              const QPair<QString, QString> &keySuffix = qMakePair(QString("A"),QString("B"))) 
-                              const;
+        const QPair<QString, QString> &keySuffix = qMakePair(QString("A"),QString("B"))) const;
      bool importGeometry(SharedResource &resource, 
                          const ResourceList &globals) const;
   
@@ -253,7 +231,7 @@ namespace Isis {
                                           or processed() methods, and can be reset to zero by
                                           calling resetProcessed().*/ 
       bool         m_applyDiscarded; /**< Indicates whether to apply strategy to discarded 
-                                          resources.This value is initialized to false if not found
+                                          resources. This value is initialized to false if not found
                                           in the Pvl definition object.*/
       bool         m_debug;          /**< Indicates whether to print debug messages. This value is
                                           initialized to false if not found in the Pvl definition

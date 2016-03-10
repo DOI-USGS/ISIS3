@@ -55,12 +55,11 @@ namespace Isis {
   
   
   /** 
-   * Constructs Strategy object from the given name, type, and shared resource
+   * Constructs a Strategy object from the given name, type, and shared resource
    * globals. Debug and apply discarded are set to false.
    * 
    * @param name A string containing the strategy name.
    * @param type A string containing the strategy type.
-   * @param globals A shared pointer to a global Resource of keywords.
    */ 
   Strategy::Strategy(const QString &name, const QString &type) : 
                      m_globals(),
@@ -129,27 +128,42 @@ namespace Isis {
   QString Strategy::type() const {
     return (m_type);
   }
-  
-  /** Allow derived strategies to reset name (mostly for default
-   *  constructors)  */
+
+
+  /**
+   * Allow derived strategies to reset name (mostly for default
+   * constructors)
+   * @param   A string containing the new name of the strategy.
+   */
   void Strategy::setName(const QString &name) {
     m_name = name;
     return;
   }
 
+
   /** Allow derived strategies to reset type (mostly for default
-   *  constructors)  */
+   *  constructors)
+   * @param A string containing the new type of the strategy.
+
+
+   */
   void Strategy::setType(const QString &type) {
     m_type = type;
     return;
   }
 
+
+  /**
+   * Accessor method to get the global defaults
+   *
+   * @return ResourceList containing the global defaults.
+   */
    ResourceList Strategy::getGlobalDefaults() const {
      return (m_globals);
    }
 
+
 /**
- * 
  * 
  * @history kbecker (5/11/2015)
  * 
@@ -172,9 +186,11 @@ namespace Isis {
      return ( v_globals );
    }
 
+
    const PvlObject &Strategy::getDefinition() const {
      return (*m_definition);
    }
+
 
 /**
  * @brief Returns the keyword definitions found in the Strategy object 
@@ -184,7 +200,7 @@ namespace Isis {
  * @return PvlFlatMap Set of keywords found in strategy object
  */
    PvlFlatMap Strategy::getDefinitionMap() const {
-     return ( PvlFlatMap(*m_definition, PvlConstraints::withExcludes(getObjectList(*m_definition))) );
+   return ( PvlFlatMap(*m_definition, PvlConstraints::withExcludes(getObjectList(*m_definition))) );
    }
 
 
@@ -209,6 +225,7 @@ namespace Isis {
       return (descr);
     }
   }
+
   
 /**
  * @brief Apply algorithm to resource list 
@@ -242,6 +259,7 @@ namespace Isis {
   int Strategy::apply(SharedResource &resource) {
     return ( apply( resource, getGlobalDefaults()) );
   }
+
   
   /**
    * @brief Apply strategy algorithms to list of Resources 
@@ -330,7 +348,7 @@ namespace Isis {
    * Applies the strategy algorithms to the resources in the given list. 
    *  
    * @param resources A list of resources to which the strategy will be applied.
-   *  
+   * @param globals A list of global resources.
    * @return int The number of resources processed.
    */ 
   int Strategy::applyToResources(ResourceList &resources, const ResourceList &globals) { 
@@ -415,9 +433,10 @@ namespace Isis {
    * Searches the given resource for an asset with the given name and converts 
    * it to a ResourceList, if possible. 
    *  
-   * @param resource
-   * @param name
-   * @return ResourceList 
+   * @param resource The resource to be searched
+   * @param name The name of the asset being searched for
+   * @return ResourceList If the asset can be converted to a ResourceList, it
+   * is returned.  Otherwise an empty ResourceList is returned.
    */ 
   ResourceList Strategy::assetResourceList(const SharedResource &resource, 
                                            const QString &name) const {
@@ -431,16 +450,17 @@ namespace Isis {
   
     return (alist);
   }
+
   
 /**
  * @brief Find keyword replacement value in globals list 
  * 
  * @author 2015-05-07 Kris Becker
  * 
- * @param globals 
- * @param target 
- * @param index 
- * @param defValue 
+ * @param globals ResourceList A list of resources to be searched.
+ * @param target QString The keyword of the target resource.
+ * @param index int The index of the last resource in the list with keyword == target.
+ * @param defValue QString The value to return in the event the resource is not found.
  * 
  * @return QString 
  */
@@ -476,6 +496,7 @@ namespace Isis {
     QStringList parts = keyspec.split(delimiter);
     return (parts);
   }
+
   
   /** 
    * Performs a case insensitive scan of the input string for a substring 
@@ -505,11 +526,12 @@ namespace Isis {
    * passing it to processArgs() along with using the argument list, resource,
    * and default resource pointers. 
    *  
-   * If a keyword does not exist, an empty string is returned. 
+   * If a keyword does not exist, the string provided by defValue is returned.
+   * The empty string is returned in the event that defValue is not given an argument.
    *  
    * @param keyBase A string containing the base of the keyword name.
-   * @param resource A pointer to the resource
-   * @param defaults A pointer to the resource 
+   * @param globals A list of resources that will be searched.
+   * @param defValue The default value to return if the keyBase does not exist
    *  
    * @return QString A modified keyword value with appropriate arguments 
    *                 inserted into the appropriate locations.
@@ -554,9 +576,9 @@ namespace Isis {
    *              resources.
    * @param argKeys A list of string arguments representing the resource values
    *                to be found in the resource's PVL flat map.
-   * @param resource A pointer to the resource whose PVL flat map will be 
-   *                 searched for the arguments.
-   * @param defaults A pointer to the default resource whose PVL flat map will 
+   * @param globals  A list of resources that will be searched.
+   *
+   * @param defValue A pointer to the default resource whose PVL flat map will
    *                 be searched for the arguments if they are not found in the
    *                 main resource PVL flat map.
    *  
@@ -596,6 +618,7 @@ namespace Isis {
     }
     return;
   }
+
   
 /**
  * @brief Create a composite Resource from a pair by merging keywords 
@@ -692,6 +715,7 @@ namespace Isis {
    *  
    * @param resource A shared pointer to the resource from which the geometry 
    *                 will be imported.
+   * @param globals  The resource list to be searched.
    * @return bool Indicates whether the geometry was successfully imported.
    */ 
   bool Strategy::importGeometry(SharedResource &resource, 
@@ -822,9 +846,10 @@ namespace Isis {
       resource->discard();
     }
   }
+
   
 /**
- * @brief Make a copy of the resource list that is idependently managed 
+ * @brief Make a copy of the resource list that is independently managed
  *  
  * This method creates a copy of the resources but provides independent 
  * management of its status from its parent. All Resource data, name, keywords,
@@ -841,7 +866,7 @@ namespace Isis {
  * 
  * @param resources Input list of Resources to copy
  * 
- * @return ResourceList List of copied (data) Resources
+ * @return resources of copied (data) Resources
  */
   ResourceList Strategy::copyList(const ResourceList &resources) const {
     ResourceList v_copy;
@@ -850,6 +875,7 @@ namespace Isis {
     }
     return ( v_copy);
   }
+
 
 /**
  *  @brief Create a clone of a Resource list
@@ -878,6 +904,7 @@ namespace Isis {
     }
     return ( v_clone );
   }
+
 
   /**
    * @brief Identify and apply Strategy to Resources that intersect a geometry
@@ -1054,6 +1081,7 @@ namespace Isis {
     return ( m_debug );
   }
 
+
   /** 
    *  
    * @return bool 
@@ -1061,6 +1089,7 @@ namespace Isis {
   bool Strategy::doShowProgress() const {
     return ( !m_progress.isNull() );
   }
+
 
 
   /**
@@ -1103,6 +1132,7 @@ namespace Isis {
       }
     }
 
+
     // No check if progress is requested
     if ( doShowProgress() ) {
       if ( !p_text.isEmpty() ) m_progress->SetText(p_text);
@@ -1125,5 +1155,6 @@ namespace Isis {
     }
     return (objList);
   }
+
 
 }  //namespace Isis
