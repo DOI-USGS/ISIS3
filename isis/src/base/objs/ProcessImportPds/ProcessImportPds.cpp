@@ -74,7 +74,7 @@ namespace Isis {
    * keywords like TARGET_NAME) before this class loads them. See the kaguyatc2isis
    * program for an example.
    *
-   * @param pdsLabelPvl The PVL containing the PDS label.
+   * @param pdsLabelPvl The PVL containing the PDS label. 
    *
    * @param pdsDataFile The name of the PDS data file where the actual image/cube
    *                    data is stored. This parameter cannot be empty.
@@ -188,9 +188,31 @@ namespace Isis {
     trnsStrm << "  InputPosition = COMPRESSED_FILE" << endl;
     trnsStrm << "  InputKey = FILE_NAME" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
-    trnsStrm << "EndGroup" << endl;
+    trnsStrm << "EndGroup" << endl;   
     trnsStrm << "END";
 
+
+    //tjw
+    //Determine if we are processing a QUBE whose
+    //core data type is VAX_REAL
+
+    try{
+
+    PvlObject obj = p_pdsLabel.findObject("QUBE");
+    PvlKeyword coreKey = obj.findKeyword("CORE_ITEM_TYPE");
+    PvlKeyword suffixKey = obj.findKeyword("BAND_SUFFIX_ITEM_TYPE");
+      //if ( (coreKey[0] == "VAX_REAL") && (suffixKey[0] =="VAX_REAL") )
+
+      if (coreKey[0] == "VAX_REAL") {
+
+            ProcessImport::SetVAXConvert(true);
+        }
+
+    }
+    catch(IException &e){
+
+
+    }
 
 
 
@@ -273,6 +295,8 @@ namespace Isis {
 
     // Find out if this is a PDS file or an ISIS2 file
     IdentifySource(p_pdsLabel);
+
+
 
 
     return;
@@ -433,8 +457,7 @@ namespace Isis {
   /**
    * Handles all special pixel setting, ultimately, calls SetSpecialValues.
    */
-  void ProcessImportPds::ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater,
-                                              const bool & isQube) {
+  void ProcessImportPds::ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube) {
     QString str;
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
@@ -536,7 +559,7 @@ namespace Isis {
 
     ProcessPixelBitandType(pdsXlater);
 
-    str = pdsXlater.Translate("CoreByteOrder");
+    str = pdsXlater.Translate("CoreByteOrder");    
     SetByteOrder(Isis::ByteOrderEnumeration(str));
 
     str = pdsXlater.Translate("CoreSamples");
@@ -629,36 +652,6 @@ namespace Isis {
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.expanded());
 
     QString str;
-
-
-    //tjw
-    //Determine if we are processing a QUBE whose
-    //core data type is VAX_REAL
-
-    try{
-
-
-        PvlObject obj = p_pdsLabel.findObject("QUBE");
-        PvlKeyword coreKey = obj.findKeyword("CORE_ITEM_TYPE");
-
-
-
-        if (coreKey[0] == "VAX_REAL") {
-
-            ProcessImport::SetVAXConvert(true);
-        }
-
-    }
-    catch(IException &e){
-
-
-        //If we're not dealing with a Galileo NIMS cube, then
-        //catch the exception and move on
-
-    }
-
-
-
 
 
     // Find the organization of the image data
@@ -1289,7 +1282,7 @@ namespace Isis {
 
 
   /**
-  * @deprecated. Please use Finalize.
+  * @deprecated. Please use Finalize. 
   */
   void ProcessImportPds::EndProcess() {
     ProcessImportPds::Finalize();
@@ -1299,7 +1292,7 @@ namespace Isis {
   /**
   * End the processing sequence and cleans up by closing cubes,
   * freeing memory, etc. Adds the OriginalLabel data to the end of
-  * the cube file, unless OmitOriginalLabel() has been called.
+  * the cube file, unless OmitOriginalLabel() has been called. 
   */
   void ProcessImportPds::Finalize() {
     if (p_keepOriginalLabel) {
@@ -1567,8 +1560,8 @@ namespace Isis {
 
 
   /**
-   * Process the input file and send data to a method for specialized processing. The method is
-   * expected to write the data after it has processed it if necessary.
+   * Process the input file and send data to a method for specialized processing. The method is 
+   * expected to write the data after it has processed it if necessary. 
    *
    * @param funct Method that accepts Isis::Buffer as an input
    *              parameter, processes the image, and has no

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="gllnims2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import a Galileo Near Infrared Mapping Spectrometer (NIMS) cube into ISIS3 cube format.
+  </brief>
+
+  <description>
+    <p>
+    This program will read and convert a PDS formatted Galileo Near Infrared Mapping Spectrometer
+    file (downloaded as a *.qub file from a
+    <a href="http://pdsimage.wr.usgs.gov/Missions/Galileo/NIMS/">USGS PDS imaging node server</a>)
+    into two ISIS cubes.  The first (CORE) cube contains primary mission data, and the second
+    (SUFFIX) cube contains additional backplane data.  The user must choose a path to an input
+    NIMS cube, and an output path and name for both the core and suffix cubes.
+    </p>
+    <p>
+    See Also:
+
+    <ul>
+        <li>
+        <a href="http://pdsimage.wr.usgs.gov/Missions/Galileo/NIMS/go_1001/document/nimsinst/instpub.asc">
+        The Near Infrared Mapping Spectrometer Experiment on Galileo</a>
+        </li>
+        <p>
+        A detailed description of the Galileo NIMS instrument.
+        </p>
+        <li>
+        <a href="https://pds.nasa.gov/documents/psdd/PSDDmain_1r71.pdf">
+        Planetary Science Data Dictionary Document</a>
+        <p>
+        A standard reference for data product descriptions contained in Planetary Data System (PDS)
+        data catalogs.
+        </p>
+        </li>
+
+
+    </ul>
+
+    </p>
+
+  </description>
+
+  <history>
+    <change name="Tyler Wilson" date="2016-02-25">
+      Original version
+    </change>
+
+  </history>
+
+  <category>
+    <missionItem>Galileo</missionItem>
+  </category>
+<!--  This doesn't work.  There's a bug in the make script that generates the documentation
+  <seeAlso>
+    <documents>
+      <document>
+        <title>
+          Planetary Science Data Dictionary Document
+        </title>
+        <source>
+          <filename>
+            PSDDmain_1r71.pdf
+          </filename>
+          <path>
+            https://pds.nasa.gov/documents/psdd/
+          </path>
+        </source>
+        <author>
+          Jet Propulsion Laboratory
+        </author>
+        <publisher>
+          California Institute of Technology
+        </publisher>
+      </document>
+    </documents>
+  </seeAlso>
+-->
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS Galileo NIMS cube
+        </brief>
+        <description>
+          Use this parameter to select the path to the NIMS cube.
+        </description>
+        <filter>
+          *.qub
+        </filter>
+      </parameter>
+
+      <parameter name="CORE">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis core data for a Galileo NIMS cube.
+         </brief>
+         <description>
+           Use this parameter to select the output core data filename.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+       <parameter name="SUFFIX">
+          <type>cube</type>
+          <fileMode>output</fileMode>
+          <brief>
+            Output Isis suffix cube data for a Galileo NIMS cube.
+          </brief>
+          <description>
+            Use this parameter to select the output cube for the Isis backplane data.
+          </description>
+          <filter>
+            *.cub
+          </filter>
+        </parameter>
+    </group>
+  </groups>
+
+
+  <examples>
+    <example>
+      <brief>Importing a NIMS cube</brief>
+      <description>
+        This example shows how to import Galileo NIMS cubes into ISIS 3.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=../go_1120/jupiter/33j002tr.qub
+          core=../go_1120/jupiter/33j002tr_core.cub
+          suffix=../go_1120/jupiter/33j002tr_suffix.cub
+        </commandLine>
+        <description>
+          Run the gllnims2isis application
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="804" height="1057" src="assets/images/gllnims2isisGUI.png">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters filled in to execute the
+              gllnims2isis application.  Output cubes for core and suffix data are always
+              required.
+            </description>
+            <thumbnail width="257" height="338" caption="gllnims2isis GUI."
+            src="assets/thumbs/gllnims2isisGUIThumb.png"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <outputImages>
+        <image width="538" height="583" src="assets/images/gllnims2isisCORE.png">
+          <brief>
+            Output image of core data.
+          </brief>
+          <description>
+            Output image of core data after gllnims2isis has imported it to ISIS3.
+          </description>
+          <thumbnail width="172" height="187" caption="Output core data cube."
+          src="assets/thumbs/gllnims2isisCOREThumb.png" />
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+
+        <image width="538" height="581" src="assets/images/gllnims2isisSUFFIX.png">
+          <brief>
+            Output image of suffix data.
+          </brief>
+          <description>
+            Output image of suffix (backplane) data after gllnims2isis has imported it to ISIS3.
+          </description>
+          <thumbnail width="172" height="186" caption="Output suffix data cube."
+          src="assets/thumbs/gllnims2isisSUFFIXThumb.png" />
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+
+</application>

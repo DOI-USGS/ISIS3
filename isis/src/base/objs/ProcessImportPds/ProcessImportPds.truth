@@ -956,10 +956,6 @@ isisimportpds: Gathering statistics
 **I/O ERROR** Unable to read OriginalLabel [].
 **PROGRAMMER ERROR** Unable to find OriginalLabel [].
 
-Testing a Galileo NIMS qub file
-isisimportpds: Importing
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-
 Testing Isis2 file
 isisimportpds: Importing
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed

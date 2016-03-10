@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<application name="isisimportpds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="isisimportpds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Unit test for IsisImportPds class
   </brief>
@@ -44,20 +43,6 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
           *.cub
         </filter>
         <default><item>$temporary/unitTest.cub</item></default>
-      </parameter>
-      <parameter name="TO1">
-        <type>cube</type>
-        <fileMode>output</fileMode>
-        <brief>
-          Test cube
-        </brief>
-        <description>
-          Test cube
-        </description>
-        <filter>
-          *.cub
-        </filter>
-        <default><item>$temporary/NIMSTest.cub</item></default>
       </parameter>
     </group>
   </groups>

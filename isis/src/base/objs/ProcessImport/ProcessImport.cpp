@@ -482,7 +482,10 @@ namespace Isis {
 
   void ProcessImport::SetSuffixOffset(int samples,int lines, int coreBands,int itemBytes){
 
+
         p_suffixData = samples*lines*coreBands*itemBytes;
+
+
 
 
   };
@@ -1429,6 +1432,8 @@ namespace Isis {
     // Handle the file header
     streampos pos = fin.tellg();
     //tjw
+
+
     if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
       fin.read(p_fileHeader, p_fileHeaderBytes);
@@ -1436,7 +1441,7 @@ namespace Isis {
     }
     else {
         fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-        fin.seekg(p_fileHeaderBytes, ios_base::beg);
+
     }
 
     // Check the last io
@@ -1714,7 +1719,7 @@ namespace Isis {
     }
     else {
         fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-        fin.seekg(p_fileHeaderBytes, ios_base::beg);
+        //fin.seekg(p_fileHeaderBytes, ios_base::beg);
     }
 
 
@@ -1970,7 +1975,7 @@ namespace Isis {
     }
     else {
         fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-        fin.seekg(p_fileHeaderBytes, ios_base::beg);
+        //fin.seekg(p_fileHeaderBytes, ios_base::beg);
     }
 
 
