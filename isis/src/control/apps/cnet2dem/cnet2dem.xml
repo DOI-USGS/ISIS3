@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnet2dem" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+     Create a digital elevation model from one or more control network files. 
+  </brief>
+
+  <description>
+    <p>
+       The <i>cnet2dem</i> applicaton produces an interpolated digital elevation model (DEM) from
+       one or more control networks.  There are fourteen different algorithms that 
+       may be selected that provide either absolute radius values or other information,
+       such as radius and point distance statistics, computed at each output DEM 
+       pixel value. The range and type of the DEM generated from <i>cnet2dem</i> is 
+       a standard ISIS map definition or a projected ISIS cube file containing a
+       map definition. You can select any number of algorithms in the ALGORITHM 
+       parameter. The output cube will contain the same number of bands in the 
+       same order algorithms are specified in the parameter. The BandBin group 
+       Name parameter will also contain the name of the algorithm that 
+       cooresponds to the data contained in each band.
+    </p>
+    <p>
+        Note that the control network is expected to be the output results of 
+        the bundle adjustment computed by <i>jigsaw</i>. Additionally, 
+        <i>jigsaw</i> must have been used to solve for radius. Otherwise, you 
+        will be using the apriori radius which is typically the PCK defininition 
+        (will will result in the ellipsoid).
+    </p>
+    <p>
+         The adjusted latitude/longitude coordinate is used to compute the 
+         location of all the control points. The adjusted coordinates are 
+         compute by <i>jigsaw</i>. If it doesn't exist, the apriori coordinate 
+         will be used but know that this coordinate is typically computed from 
+         each reference image in each control point (so it may not be 
+         consistent).
+    </p>
+    <p>
+        Also, in some cases, one or more of the algorithm radius bands in the 
+        output of <i>cnet2dem</i> may be sufficient for direct use as an ISIS 
+        shape model (after <i>demprep</i> is run!). However, this is generally 
+        not the case and some of the radius bands may require a series of 
+        filters to smooth out the results.
+    </p>
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2015-11-13">
+        Original Version
+    </change>
+    <change name="Tyler Wilson" date="2016-03-10">
+       Minor documentation corrections.
+    </change>
+</history>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Input">
+
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>           
+        <internalDefault>None</internalDefault>
+        <brief>Master control network file to match.</brief>
+        <description>
+            A single control network file used to create the point cloud to 
+            produce the interpolated output DEM radius at each output 
+            pixel. 
+        </description>
+        <filter>*.net</filter>
+      </parameter>
+
+      <parameter name="CNETLIST">
+          <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>List of merger control network files.</brief>
+        <description>
+            A list of control network files that are combined into the point 
+           cloud to produce the interpolated output DEM radius at each output 
+            pixel. 
+        </description>
+        <filter>*.lis</filter>
+      </parameter>
+      <parameter name="MAP">
+          <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>Specifies a file containing the output map specfications.</brief>
+        <description>
+            A standard ISIS map definition file or a map projected ISIS cube
+            file containing a mapping group. This file will be used to create
+            the output DEM ISIS cube.
+        </description>
+        <filter>
+          *.map *.cub
+        </filter>
+      </parameter>
+    </group> 
+
+    <group name="Output">
+      <parameter name="TO">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>output</fileMode>
+        <brief>Output DEM ISIS cube</brief>
+        <description>
+             Specifies the name of an output ISIS cube file that is created to 
+             write the DEM. The output DEM may require <i>demprep</i> to be run 
+             on it before it can be used as an ISIS DEM shape model.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+
+
+      <parameter name="TRIM">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Null all pixels outside lat/lon boundaries.
+        </brief>
+        <description>
+          If this option is selected, pixels outside the latitude/longtiude
+          range will be trimmed (set to null).
+          This is useful for certain projections whose lines of latitude and
+          longitude are not parallel to image lines and sample columns.
+        </description>
+      </parameter>
+
+    </group>
+
+    <group name="Parameters">
+        <parameter name="SEARCH">
+            <type>string</type>
+           <default><item>RADIAL</item></default>
+          <brief>Optional tolerance for radial search range (meters).</brief>
+          <description>
+              This parameter allows the user to specify the size of the radius 
+              search at each output map pixel.  If not provided, the pixel 
+              resolution of the projection is used to specify the search 
+              diameter.
+          </description>
+            <list>
+               <option value="RADIAL">
+                    <brief>Search for points within a given DISTANCE.</brief> 
+                    <description>
+                        Specify the point cloud to be searched with a radial 
+                        distance query. The point of origin is the center of 
+                        each output map pixel geometric (i.e., 
+                        latitude/longitude) coordinate. Use the DISTANCE 
+                        parameter to specify the maximum search range.
+                    </description> 
+                </option>
+               <option value="NEIGHBORS">
+                    <brief>Find NEIGHBORS closest points.</brief>
+                    <description>
+                        Populate the map with the control points nearest the 
+                        output DEM pixel center geometric (i.e., 
+                        latitude/longitude) coordinate. Use the NEIGHBORS 
+                        parameter to specify how many nearest points to use.
+                    </description>
+                </option>
+               <option value="BOTH">
+                    <brief>Appy both RADIAL and NEIGHBOR searches if needed.
+                    </brief>
+                    <description>
+                        Use both the RADIAL and NEIGHBORS options to determine 
+                        the result at the output DEM pixel center geometric 
+                        (i.e., latitude/longitude) coordinate. The RADIAL option 
+                        is applied first. If MINPOINTS are not found from this 
+                        query, then the NEIGHBORS option is applied.
+                    </description>
+                </option>
+            </list>
+        </parameter>
+
+        <parameter name="DISTANCE">
+           <type>double</type>
+           <internalDefault>None</internalDefault>
+           <brief>
+               Specifies the radial search distance to search.
+           </brief> 
+           <description>
+               Radial distance in meters to search for control points measured 
+               from the center of the ouput map pixel. 
+           </description>
+        </parameter>
+        
+        <parameter name="KDNODES"> 
+           <type>integer</type>
+           <default><item>10</item></default>
+           <brief>Specify the leaf size of the kd-tree.</brief>
+           <description>
+              Number of leafs in the kd-tree structure.
+           </description>
+        </parameter>
+        
+        <parameter name="NEIGHBORS">
+            <type>integer</type>
+            <default><item>0</item></default>
+          <brief>Specify the number of nearest NEIGHBOR points</brief> 
+          <description>
+            Specify number of control points that will be selected in the 
+            nearest NEIGHBOR search query to produce the output DEM pixel 
+            values.
+          </description>
+        </parameter>
+
+        <parameter name="MINPOINTS">
+            <type>integer</type>
+            <default><item>0</item></default>
+          <brief>Specify the minimum number of search points per pixel.</brief>
+          <description>
+            Specify number of minimum number of points to accept from the RADIAL 
+            search query of the point cloud at each output DEM pixel.  If the 
+            result set for each pixel does not have at least MINPOINTS, NULL 
+            values will be written to the output DEM pixel.
+          </description>
+        </parameter>
+
+        <parameter name="SIGMARADIUS">
+           <type>double</type>
+           <internalDefault>None</internalDefault>
+           <brief>
+               Specifies noise tolerance in radius.
+           </brief> 
+           <description>
+               If provided, a noise filter is applied to the radius of the point 
+               set at each output pixel. The SIGMARADIUS is the number of 
+               standard deviations from the median radius from all control 
+               points.
+           </description>
+        </parameter>
+
+        <parameter name="ALGORITHM">
+            <type>string</type>
+            <brief>Type of data to provide a each output pixel location.</brief>
+            <description>
+              <p>
+                This parameter provides numerous methods to compute the 
+                output radius value for a given latitude, longitude and map grid 
+                point.  Any number of methods can be specified by enetering
+                a comma-delimited lisf of the method names.
+              </p>
+               <TABLE border = "1">
+                 <CAPTION>
+                     <h4>DEM Data Value Output Function Options</h4>
+                  </CAPTION>
+                  <TR>
+                    <TH>Name</TH>
+                    <TH>Parameters</TH>
+                    <TH>Description</TH>
+                  </TR>
+                  <TR>
+                    <TD>AverageRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                      For all control points found in the RADIAL and/or 
+                      NEARESTNEIGHBOR kd-tree search, computes the average radius
+                      value (the average Euclidean distance of all points from the surface
+                      to the center of the body).
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>MaximumRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                       Computes the maximum radius (in meters) of the control points.
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>MinimumRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                      Computes the minimum radius (in meters) of all control points.
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>MedianRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Computes the median radius (in meters) of all control points.
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>StandardDeviationRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                      Computes the standard deviation (in meters) of the radii of
+                      the control points.
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>MaximumDistance</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Computes the maximum surface distance (in meters) of all control points
+                    with respect to the latitude, longitude coordinates of the central pixel.
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>MinimumDistance</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Computes the minimum surface distance (in meters) of all control points
+                    with respect to the latitude, longitude coordinates of the central pixel.
+                    </TD>
+                  </TR>
+
+                  <TR>
+                    <TD>MedianDistance</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Computes the median surface distance (in meters) of all control points
+                    with respect to the latitude, longitude coordinates of the central pixel.
+                    </TD>
+                    </TR>
+                    <TR>
+                      <TD>AverageDistance</TD>
+                      <TD>None</TD>
+                      <TD>
+                      Computes the average surface distance (in meters) of all control points
+                      with respect to the latitude, longitude coordinates of the central pixel.
+                      </TD>
+                    </TR>
+                  <TR>
+                    <TD>StandardDeviationDistance</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Computes the standard deviation (in meters) of the surface distance of
+                    all control points with respect to the latitude, longitude coordinates
+                    of the central pixel.
+                    </TD>
+                  </TR>
+
+                  <TR>
+                    <TD>FrankeNelsonRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                     Computes the radius of the control points (in meters)
+                     using the Franke-Nelson method.
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>ShepardsRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Computes the radius of the control points (in meters)
+                    using Shepard's weighted algorithm.
+                    </TD>
+                  </TR>
+                  <TR>
+                    <TD>NaturalNeighborRadius</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Computes the radius of the control points (in meters)
+                    using the Nearest Neighbor interpolation algorithm.
+                    </TD>
+                  </TR>
+
+                  <TR>
+                    <TD>TypeCount</TD>
+                    <TD>None</TD>
+                    <TD>
+                    Returns the total number of pixels in the point collection. It
+                    additionally applies a signed (+/-1) value to indicate
+                    if the FLANN (Fast Library for Approximate Nearest Neighbors) search type
+                    was nearest neighbor (-1) or radius (+1).
+                    </TD>
+                  </TR>
+                </TABLE>
+            </description>
+        </parameter>
+
+    </group>
+  </groups>
+</application>
