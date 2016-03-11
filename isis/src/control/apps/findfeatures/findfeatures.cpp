@@ -15,8 +15,6 @@
 #include <boost/foreach.hpp>
 
 #define HAVE_ISNAN
-#include "geos_opencv.h"
-
 
 #include "Application.h"
 #include "Camera.h"

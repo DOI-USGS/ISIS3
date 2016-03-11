@@ -43,9 +43,9 @@ class QDebug;
  * @brief Container for a feature match pair of data sources
  *  
  *  
- * @author 2015-8-18 Kris Becker 
+ * @author 2015-08-18 Kris Becker 
  * @internal 
- *   @history 2015-8-18 Kris Becker - Original Version 
+ *   @history 2015-08-18 Kris Becker - Original Version 
  */
   class RobustMatcher : public QLogger {
   
