@@ -18,13 +18,13 @@ commands:
 	           PARAMSPVL=$(INPUT)/dtmParams.pvl \
 	           > /dev/null;
 
-	catlab from=$(OUTPUT)/DTEED_042252_1930_042753_1930_A01.IMG \
-	       to=$(OUTPUT)/DTEED_042252_1930_042753_1930_A01.pvl \
+	catlab from=$(OUTPUT)/DTEED_042252_1930_042753_1930_A15.IMG \
+	       to=$(OUTPUT)/DTEED_042252_1930_042753_1930_A15.pvl \
 	       > /dev/null;  
 	
-	pds2isis from=$(OUTPUT)/DTEED_042252_1930_042753_1930_A01.IMG \
-	         to=$(OUTPUT)/DTEED_042252_1930_042753_1930_A01.cub \
+	pds2isis from=$(OUTPUT)/DTEED_042252_1930_042753_1930_A15.IMG \
+	         to=$(OUTPUT)/DTEED_042252_1930_042753_1930_A15.cub \
 	         > /dev/null;
 	
-	$(RM) $(OUTPUT)/DTEED_042252_1930_042753_1930_A01.IMG;
+	$(RM) $(OUTPUT)/DTEED_042252_1930_042753_1930_A15.IMG;
 

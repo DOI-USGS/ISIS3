@@ -631,8 +631,10 @@ QString versionNumber(const Pvl &paramsPvl, const UserInterface &ui) {
   // 0 - <1, if 0.#, is 0#, is 0.#####, is first two ##
   else if (version >= 0.001) { // Any less and we get E... not dealing with that.
     vers = toString(version).remove(QChar('.'));
-    int nonZero = vers.lastIndexOf('0');
-    if (vers.size() > 2) vers = vers.mid(nonZero-1, 2);
+    int nonZero = vers.lastIndexOf("0");
+    if (vers.size() > 2) {
+      vers = vers.mid(nonZero+1, 2);
+    }
   }
   // It was negative, or something else crazy?
   else {

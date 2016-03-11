@@ -17,7 +17,7 @@ commands:
 	           OUTPUTDIR=$(OUTPUT) \
 	           DTM=$(INPUT)/DTM_Zumba_1m_forPDS.cub \
 	           ORTHOFROMLIST=$(OUTPUT)/orthoInputList.txt \
-	           PARAMSPVL=$(INPUT)/hidtmgenDefaults.pvl \
+	           PARAMSPVL=$(INPUT)/params.pvl \
 	           ORTHOSEQUENCENUMBERLIST=$(INPUT)/sequenceNumbers.txt \
 	           > /dev/null;
 

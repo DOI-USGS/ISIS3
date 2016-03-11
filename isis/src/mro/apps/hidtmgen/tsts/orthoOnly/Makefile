@@ -12,7 +12,7 @@ APPNAME = hidtmgen
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	ls $(INPUT)/*.cub > $(OUTPUT)/orthoFromList.txt;
+	$(LS) $(INPUT)/*.cub > $(OUTPUT)/orthoFromList.txt;
 	$(APPNAME) DEFAULTNAMES=TRUE \
 	           OUTPUTDIR=$(OUTPUT) \
 	           ORTHOFROMLIST=$(OUTPUT)/orthoFromList.txt \
