@@ -12,46 +12,51 @@ APPNAME = hidtmgen
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) DTM=$(INPUT)/DTM_Zumba_1m_forPDS.cub \
-	  ORTHO1=$(INPUT)/PSP_002118_1510_1m_o_forPDS.cub \
-	  ORTHO2=$(INPUT)/PSP_002118_1510_25cm_o_forPDS.cub \
-  	  ORTHO3=$(INPUT)/PSP_003608_1510_1m_o_forPDS.cub \
-	  ORTHO4=$(INPUT)/PSP_003608_1510_25cm_o_forPDS.cub \
-	  OUTPUTDIR=$(OUTPUT) \
-	  PRODUCT_VERSION_ID=2.0 \
-	  RATIONALE_DESC=Rationale \
-	  > /dev/null;
+	$(LS) $(INPUT)/PSP*.cub > $(OUTPUT)/orthoInputList.txt;
+	$(APPNAME) DEFAULTNAMES=TRUE \
+	           OUTPUTDIR=$(OUTPUT) \
+	           DTM=$(INPUT)/DTM_Zumba_1m_forPDS.cub \
+	           ORTHOFROMLIST=$(OUTPUT)/orthoInputList.txt \
+	           PARAMSPVL=$(INPUT)/hidtmgenDefaults.pvl \
+	           ORTHOSEQUENCENUMBERLIST=$(INPUT)/sequenceNumbers.txt \
+	           > /dev/null;
 
-	head -n 93 $(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.IMG \
-	  > $(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.pvl;
-	head -n 92 $(OUTPUT)/DT1EA_002118_1510_003608_1510_A02.IMG \
-	  > $(OUTPUT)/DT1EA_002118_1510_003608_1510_A02.pvl;
-	head -n 92 $(OUTPUT)/DT1EC_002118_1510_003608_1510_A02.IMG \
-	  > $(OUTPUT)/DT1EC_002118_1510_003608_1510_A02.pvl;
-	head -n 92 $(OUTPUT)/DT2EA_002118_1510_003608_1510_A02.IMG \
-	  > $(OUTPUT)/DT2EA_002118_1510_003608_1510_A02.pvl;
-	head -n 92 $(OUTPUT)/DT2EC_002118_1510_003608_1510_A02.IMG \
-	  > $(OUTPUT)/DT2EC_002118_1510_003608_1510_A02.pvl;
+	catlab from=$(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.IMG \
+	       to=$(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.pvl \
+	       > /dev/null;  
+	catlab from=$(OUTPUT)/PSP_002118_1510_RED_C_01_ORTHO.IMG \
+	       to=$(OUTPUT)/PSP_002118_1510_RED_C_01_ORTHO.pvl \
+	       > /dev/null;  
+	catlab from=$(OUTPUT)/PSP_002118_1510_RED_A_02_ORTHO.IMG \
+	       to=$(OUTPUT)/PSP_002118_1510_RED_A_02_ORTHO.pvl \
+	       > /dev/null;  
+	catlab from=$(OUTPUT)/PSP_003608_1510_RED_C_03_ORTHO.IMG \
+	       to=$(OUTPUT)/PSP_003608_1510_RED_C_03_ORTHO.pvl \
+	       > /dev/null;  
+	catlab from=$(OUTPUT)/PSP_003608_1510_RED_A_04_ORTHO.IMG \
+	       to=$(OUTPUT)/PSP_003608_1510_RED_A_04_ORTHO.pvl \
+	       > /dev/null;  
 	
 	pds2isis from=$(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.IMG \
-	  to=$(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.cub \
-	  > /dev/null;  
-	pds2isis from=$(OUTPUT)/DT1EA_002118_1510_003608_1510_A02.IMG \
-	  to=$(OUTPUT)/DT1EA_002118_1510_003608_1510_A02.cub \
-	  > /dev/null;  
-	pds2isis from=$(OUTPUT)/DT1EC_002118_1510_003608_1510_A02.IMG \
-	  to=$(OUTPUT)/DT1EC_002118_1510_003608_1510_A02.cub \
-	  > /dev/null;  
-	pds2isis from=$(OUTPUT)/DT2EA_002118_1510_003608_1510_A02.IMG \
-	  to=$(OUTPUT)/DT2EA_002118_1510_003608_1510_A02.cub \
-	  > /dev/null;  
-	pds2isis from=$(OUTPUT)/DT2EC_002118_1510_003608_1510_A02.IMG \
-	  to=$(OUTPUT)/DT2EC_002118_1510_003608_1510_A02.cub \
-	  > /dev/null;  
+	         to=$(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.cub \
+	         > /dev/null;
+	pds2isis from=$(OUTPUT)/PSP_002118_1510_RED_C_01_ORTHO.IMG \
+	         to=$(OUTPUT)/PSP_002118_1510_RED_C_01_ORTHO.cub \
+	         > /dev/null;
+	pds2isis from=$(OUTPUT)/PSP_002118_1510_RED_A_02_ORTHO.IMG \
+	         to=$(OUTPUT)/PSP_002118_1510_RED_A_02_ORTHO.cub \
+	         > /dev/null;
+	pds2isis from=$(OUTPUT)/PSP_003608_1510_RED_C_03_ORTHO.IMG \
+	         to=$(OUTPUT)/PSP_003608_1510_RED_C_03_ORTHO.cub \
+	         > /dev/null;  
+	pds2isis from=$(OUTPUT)/PSP_003608_1510_RED_A_04_ORTHO.IMG \
+	         to=$(OUTPUT)/PSP_003608_1510_RED_A_04_ORTHO.cub \
+	         > /dev/null;  
 
-	rm $(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.IMG;
-	rm $(OUTPUT)/DT1EA_002118_1510_003608_1510_A02.IMG;
-	rm $(OUTPUT)/DT1EC_002118_1510_003608_1510_A02.IMG;
-	rm $(OUTPUT)/DT2EA_002118_1510_003608_1510_A02.IMG;
-	rm $(OUTPUT)/DT2EC_002118_1510_003608_1510_A02.IMG;
+	$(RM) $(OUTPUT)/DTEEC_002118_1510_003608_1510_A02.IMG;
+	$(RM) $(OUTPUT)/PSP_002118_1510_RED_C_01_ORTHO.IMG;
+	$(RM) $(OUTPUT)/PSP_002118_1510_RED_A_02_ORTHO.IMG;
+	$(RM) $(OUTPUT)/PSP_003608_1510_RED_C_03_ORTHO.IMG;
+	$(RM) $(OUTPUT)/PSP_003608_1510_RED_A_04_ORTHO.IMG;
+	$(RM) $(OUTPUT)/orthoInputList.txt;
 
