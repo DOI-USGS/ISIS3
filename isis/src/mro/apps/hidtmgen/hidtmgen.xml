@@ -528,7 +528,7 @@ NOTE: The first 15 characters of the product ID pSP_xxxxxx_xxxx are taken
 
       <parameter name="PARAMSPVL">
         <type>filename</type>
-        <default><item>$mro/templates/labels/hidtmgenDefaults.pvl</item></default>
+        <default><item>$mro/templates/labels/hidtmgenParamsTemplate.pvl</item></default>
         <brief>
           PVL-formatted file containing required keyword values.
         </brief>
