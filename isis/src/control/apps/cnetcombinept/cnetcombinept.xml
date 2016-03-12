@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="cnetcombinept" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Combine one to many control networks with common control points.
+  </brief>
+
+  <description>
+    <p>
+      This program will create a control network by combining control points
+      from one or more control networks into single points that satisfy either
+      ground or image distance criteria. It employs a more robust technique than
+      <em>cnetmerge</em>. This technique evaluates
+      each control point in the combined network by applying a search of radial 
+      spatial distance (in meters) to collect all points that may be of the same feature.
+      This search will find a list of <em>candidate</em> control points, i.e. points
+      that the algorithm has found might be matches. Distance statistics of common
+      control measures from the image are computed using the source point and each
+      candidate control point. The MODE parameter for this program specifies the
+      maximum distance, in IMAGE (pixel units) or GROUND (meter units), allowed 
+      to determine whether the two control points are measurements of the same 
+      image feature. If the average of all common measures is less than or equal to
+      the distance (in the given IMAGE or GROUND units), then all control 
+      measures from the candidate control point are copied to the source control 
+      point (increasing image match depth) and the candidate control point is 
+      disabled so that it will never be considered for another merger.  The now 
+      augmented control point is added back to the search pool for further merger 
+      considerations.
+    </p>
+    <p>
+       When all control points have been searched and all mergers have taken
+       place, a new single combined control network is created. 
+    </p>
+    <p>
+        Note that this application can be ran more than once and directly on the 
+        output of any past run (in other words, you need only provide a single 
+        network, if desired). 
+    </p>
+  </description>
+
+  <seeAlso>
+    <applications>
+      <item>cnetmerge</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Kris Becker" date="2015-10-11">
+      Original Version
+    </change>
+    <change name="Kris Becker" date="2015-10-22">
+      Corrected the count when SAVEMINS=TRUE.
+    </change>
+    <change name="Kris Becker" date="2015-11-13">
+      Uses modified ControlNet class  which provides the ability to take 
+      ownership of all points in the control net efficiently. This is needed 
+      in order to ensure only a single copies of control points are utlized to 
+      minimize memory overhead.
+    </change>
+    <change name="Jeannie Backer" date="2016-03-11">
+      Added program to ISIS package.
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Input">
+
+      <parameter name="CNETBASE">
+        <type>filename</type>
+        <fileMode>input</fileMode>           
+        <internalDefault>None</internalDefault>
+        <brief>Master control network file to match</brief>
+        <description>
+          The base control network file to which others will be matched. 
+        </description>
+        <filter>*.net *.cnet *.ctl</filter>
+      </parameter>
+
+      <parameter name="CNETFROM">
+         <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>Merger control network file</brief>
+        <description>
+          A control network that will be matched to the base (i.e. master) network.
+        </description>
+        <filter>*.net *.cnet *.ctl</filter>
+      </parameter>
+
+      <parameter name="CNETLIST">
+          <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>List of merger control network files</brief>
+        <description>
+          A list of control network file names that will be matched to the base (i.e. master) network.
+        </description>
+        <filter>*.lis *.txt</filter>
+      </parameter>
+
+
+      <parameter name="REFERENCE">
+          <type>cube</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>Cube file to use as a reference image for IMAGE mode</brief>
+        <description>
+          The reference cube for matching by image. 
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+
+    <group name="Output">
+      <parameter name="ONET">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Merged Control Network
+        </brief>
+        <description>
+          The output Control Network, which is the combined result of the input
+          networks.
+        </description>
+        <filter>*.net *.cnet *.ctl</filter>
+      </parameter>
+
+      <parameter name="NETWORKID">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>The NetworkId keyword value for the merged ControlNet</brief>
+        <description>
+          The NetworkId keyword for the newly merged ControlNet will be set to
+          this given value. The Networkid is a single word identifier or name
+          assigned to a Control Network.
+        </description>
+      </parameter>
+
+      <parameter name="DESCRIPTION">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>The Description keyword value for the merged ControlNet</brief>
+        <description>
+          The Description keyword for the newly merged ControlNet will be set
+          to this given value.  This should be a brief description of the
+          purpose of the merged control network.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+        <parameter name="MODE">
+            <type>string</type>
+           <default><item>GROUND</item></default>
+          <brief>Type of control point merger to apply</brief>
+          <description>
+            The MODE parameter indicates whether to use ground or image coordinates to determine
+            merge points. 
+          </description>
+            <list>
+               <option value="GROUND">
+                    <brief>
+                        Use ground coordinates to determine merge points 
+                    </brief>
+                    <description>
+                      Measure point distance in ground units (i.e. meters or kilometers).
+                    </description>
+                    <!--
+                    <inclusions>
+                      <item>GROUNDTOL</item>
+                    </inclusions>
+                    !-->
+                </option>
+               <option value="IMAGE">
+                    <brief>
+                        Use image coordinates from a specfied named reference 
+                        cube 
+                    </brief>
+                    <description>
+                      Measure point distance in pixel units.
+                    </description>
+                    <!--
+                    <inclusions>
+                      <item>REFERENCE</item>
+                      <item>IMAGETOL</item>
+                    </inclusions>
+                    !-->
+                </option>
+            </list>
+        </parameter>
+
+        <parameter name="DISTANCE">
+           <type>double</type>
+           <brief>
+               Specifies the radial search distance for merge candidates 
+           </brief> 
+           <description>
+               The radial search range from the source control point to find all 
+               candidate control points to consider for merging. This distance is 
+               specified in meters. Users must carefully consider this value as 
+               it must be large enough to include the maximum uncertainity in the 
+               SPICE ephemeris data for all images. Note if the adjusted 
+               latitude/longitude coordiate exists in the point, it will be used 
+               to determine the ground coordinate, otherwise apriori 
+               latitude/longitudes are used to compute distances from each 
+               control point. It also should not be so small that it will not 
+               find all the points of the same feature.
+           </description>
+        </parameter>
+
+        <parameter name="IMAGETOL">
+            <type>double</type>
+            <default><item>1.0</item></default>
+           <brief>Pixel distance tolerance to determine merge of point</brief>
+           <description>
+             The acceptable distance, in pixels, for merging points.
+           </description>
+        </parameter>
+
+        <parameter name="GROUNDTOL">
+            <type>double</type>
+            <default><item>0.0</item></default>
+          <brief>
+             Specifies distance on ground to merge point if no common image measures .
+          </brief> 
+          <description>
+             The acceptable distance, in ground measurements, for merging points.
+          </description>
+        </parameter>
+        
+        <parameter name="KDNODES"> 
+           <type>integer</type>
+           <default><item>10</item></default>
+           <brief>Specify the leaf size of the kd-tree</brief> 
+           <description>
+              Number of leafs in the kd-tree structure.
+           </description>
+        </parameter>
+
+       <parameter name="SETAPRIORIBEST">
+           <type>boolean</type>
+           <brief>
+              Reset the apriori surface point to best available
+           </brief>
+           <description>
+               When TRUE, all points apriori latitude/longitude surface point is 
+               updated to use the best one available. This is often the 
+               resulting coordinate after jigsaw has adjusted the surface point.
+           </description>
+           <default><item>false</item></default>
+       </parameter>
+
+       <parameter name="REJECTEDMEASURES">
+           <type>string</type>
+          <default><item>NOACTION</item></default>
+         <brief>Tweek rejected measures</brief>
+         <description>
+           Determeines how to deal with rejected measures.
+         </description>
+           <list>
+              <option value="NOACTION">
+                   <brief>
+                       Do not perform any action on non-normal measures
+                   </brief>
+                   <description>
+                     If selected, the program will leave rejected measures with their current settings.
+                   </description>
+               </option>
+              <option value="IGNORE">
+                   <brief>  Set (jigsaw) rejected measures to IGNORE</brief>
+                   <description>
+                     If selected, the program will set rejected measures to Ignore.
+                   </description>
+               </option>
+              <option value="REMOVE">
+                   <brief>  Remove (jigsaw) rejected measures from point</brief>
+                   <description>
+                     If selected, the program will remove rejected measures from the control point.
+                   </description>
+               </option>
+           </list>
+       </parameter>
+
+        <parameter name="MINMEASURES">
+            <type>integer</type>
+            <default><item>0</item></default>
+            <brief>Select minimim number of measures that are valid</brief> 
+            <description>
+                 This allows users to disable (by setting measures as ignored) 
+                 points that have less than MINMEASURES control 
+                 measures/control point. For example, if you want to flag all 
+                 points as ignored with 2 measures or less, set MINMEASURES=3. 
+            </description>
+        </parameter>
+
+       <parameter name="SAVEMINS">
+           <type>boolean</type>
+           <brief>
+              Save points that have less than the mininum measures
+           </brief>
+           <description>
+               When TRUE, all points found to have the minimum number of            
+               measures are set to ignore and written to the output control 
+               network. When FALSE, they are excluded(removed) from the output 
+               network.
+           </description>
+           <default><item>false</item></default>
+       </parameter>
+    </group>
+  </groups>
+</application>
