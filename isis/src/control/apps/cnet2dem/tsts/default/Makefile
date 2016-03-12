@@ -9,4 +9,7 @@ commands:
 	  to=$(OUTPUT)/truthDemNet \
 	  map=$(INPUT)/truthMap.map \
 	  search=both \
-	  algorithm=FrankeNelsonRadius,ShepardsRadius,AverageRadius,MedianRadius,MinimumRadius,MaximumRadius,StandardDeviationRadius,TypeCount,AverageDistance,MinimumDistance,MaximumDistance,StandardDeviationDistance,MedianDistance,NaturalNeighborRadius \
+	  algorithm="FrankeNelsonRadius,ShepardsRadius,AverageRadius,MedianRadius,MinimumRadius,MaximumRadius,StandardDeviationRadius,TypeCount,AverageDistance,MinimumDistance,MaximumDistance,StandardDeviationDistance,MedianDistance,NaturalNeighborRadius" \
+	  > /dev/null;
+
+	$(RM) $(OUTPUT)/networks.lis;
