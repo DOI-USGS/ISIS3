@@ -144,8 +144,9 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   catch(IException &e) {
     QString msg = "Input file [" + inFile.expanded() +
                  "] is not a valid PVL file.";
-    cerr << msg  << e.toString() << endl;
-    throw IException(e, IException::User, msg, _FILEINFO_);
+    // not appending the caught exception to this message.
+    // we were picking up non-utf8 characters in the message
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 
