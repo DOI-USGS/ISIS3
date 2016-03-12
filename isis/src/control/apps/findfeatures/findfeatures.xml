@@ -59,6 +59,9 @@
       Updated the ImageSource class for proper use of the Histogram class for 
       conversion to 8-bit. 
     </change>
+    <change name="Jeannie Backer" date="2016-03-11">
+      Added program to ISIS package.
+    </change>
   </history> 
 
   <groups>

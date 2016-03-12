@@ -25,3 +25,4 @@ commands:
 	       >& $(OUTPUT)/cubes.txt;
 	$(RM) $(OUTPUT)/toList.txt;
 	$(RM) $(OUTPUT)/apollo_nadir.lis;
+	$(RM) $(OUTPUT)/apolloAS15_1583.net;
