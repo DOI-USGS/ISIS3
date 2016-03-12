@@ -158,6 +158,22 @@ commands:
 	fi;
 
 	# given ORTHOFROMLIST cube has invalid band size
+	echo -e "\nError Test: given DTM has invalid band size" \
+	  >> $(OUTPUT)/error_temp.txt;
+	if [[ `$(APPNAME) \
+	           DEFAULTNAMES=TRUE \
+	           OUTPUTDIR=$(OUTPUT) \
+	           DTM=$(INPUT)/DTM_2Bands.cub \
+	           ORTHOFROMLIST=$(OUTPUT)/orthoInputList.txt \
+	           PARAMSPVL=$(INPUT)/params.pvl \
+	           ORTHOSEQUENCENUMBERLIST=$(INPUT)/sequenceNumbers1.txt \
+	           2>> $(OUTPUT)/error_temp.txt \
+	           > /dev/null` ]]; \
+	then \
+	  true; \
+	fi;
+
+	# given ORTHOFROMLIST cube has invalid band size
 	$(LS) $(INPUT)/2Band*cub >> $(OUTPUT)/orthoInputList.txt;
 	echo -e "\nError Test: given ORTHOFROMLIST cube has invalid band size" \
 	  >> $(OUTPUT)/error_temp.txt;
