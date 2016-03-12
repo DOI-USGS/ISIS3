@@ -342,7 +342,7 @@ void IsisMain() {
     }
   } 
   catch (IException &e) {
-    throw IException(e, IException::Unknown, "hidtmgen: Unable to generate pds products.", _FILEINFO_);
+    throw IException(e, IException::Unknown, "hidtmgen: Unable to HiRISE generate pds products.", _FILEINFO_);
   }
 }// end main
 
@@ -715,7 +715,7 @@ void setIdentificationInformation(Pvl &pdsLabel,
 void verifyDTM(Cube *inCube, const FileName &inputCubeFile) {
   if (inCube->bandCount() > 1 ||
       inCube->label()->hasObject("Instrument")) {
-    QString msg = "Input cube [" + inputCubeFile.expanded() + "] does not appear"
+    QString msg = "Input cube [" + inputCubeFile.expanded() + "] does not appear "
                 + "to be a DTM";
     throw IException(IException::User, msg, _FILEINFO_);
   }
