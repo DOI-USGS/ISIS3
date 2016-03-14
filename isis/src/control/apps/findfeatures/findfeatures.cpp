@@ -1,15 +1,21 @@
-
 // Gotta include this before most all other includes due to int64 definition
 // conflict between GEOS and OpenCV
-#include <cmath>
-#define USE_GUI_QAPP 1
 #include "Isis.h"
+
+#include <cmath>
+/*#define USE_GUI_QAPP 1*/
 
 #include <QApplication>
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QFile>
 #include <QTextStream>
+
+// OpenCV stuff
+#include "opencv2/core/core.hpp"
+#include "opencv2/nonfree/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
 
 // boost library
 #include <boost/foreach.hpp>
@@ -56,15 +62,6 @@
 #include "SurfacePoint.h"
 #include "TextFile.h"
 #include "UserInterface.h"
-
-// OpenCV stuff
-#include "opencv2/core/core.hpp"
-#include "opencv2/nonfree/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/calib3d/calib3d.hpp"
-
-// boost library
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Isis;
