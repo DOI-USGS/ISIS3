@@ -26,8 +26,8 @@
 
 #include <QExplicitlySharedDataPointer>
 #include <QSharedData>
-#include <QVector>
 #include <QtGlobal>
+#include <QVector>
 
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
@@ -42,8 +42,10 @@ namespace Isis {
  *  The ControlPoint container is required to not change its content for the
  *  duration of use of the nanoflann kd-tree built from the points.
  *  
+ * @author 2015-10-11 Kris Becker
+ *  
  * @internal 
- * @history 2015-10-11 Kris Becker Original Version 
+ *   @history 2015-10-11 Kris Becker - Original Version 
  */
 
 class ControlPointCloudPt {
@@ -196,7 +198,14 @@ class ControlPointCloudPt {
     }
 
   private:
-    /** Shared ControlPoint data pointer */
+    /** 
+     * @brief Shared ControlPoint data pointer 
+     * 
+     * @author 2015-10-11 Kris Becker
+     *  
+     * @internal 
+     *   @history 2015-10-11 Kris Becker - Original Version
+     */
     class ControlPointData : public QSharedData {
       typedef ControlPointCloudPt::Ownership Ownership;
       public:

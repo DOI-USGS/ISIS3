@@ -1,12 +1,7 @@
-include $(ISISROOT)/make/isismake.apps
-
-ifeq ($(HOST_ARCH),Darwin)
-ALLINCDIRS += -I/work/users/kbecker/NaturalNeighbors/include
-ALLLIBDIRS += -L/work/users/kbecker/NaturalNeighbors/lib
+ifeq ($(ISISROOT), $(BLANK))
+.SILENT:
+error:
+	echo "Please set ISISROOT";
 else
-ALLINCDIRS += -I$(ISISROOT)/3rdParty/extras/include
-ALLLIBDIRS += -L$(ISISROOT)/3rdParty/extras/lib
+	include $(ISISROOT)/make/isismake.apps
 endif
-
-ALLLIBS += -lnn
-
