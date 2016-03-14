@@ -38,7 +38,14 @@ using namespace Isis;
 // Control network manager
 typedef QList<QSharedPointer<ControlNet> >    ControlNetList;
 
-/** Functor for normalized 3D-to-2D Euclidean distances */
+/** 
+ * Functor for normalized 3D-to-2D Euclidean distances
+ * 
+ * @author 2015-03-14 Kris Becker
+ * 
+ * @internal
+ *   @history 2015-03-14 Kris Becker - Original version.
+ */
 template <class T> class Dist3Dto2D {
 public:
   enum { Dimension = 3 };  // Needs all three coordinates
