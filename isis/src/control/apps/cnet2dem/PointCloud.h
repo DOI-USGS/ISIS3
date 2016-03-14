@@ -30,10 +30,10 @@ namespace Isis {
   /** 
    * Functor to compute 3-d Euclidean distances
    *
-   * @author Kris Becker 2014-02-17 
+   * @author 2014-02-17 Kris Becker
    *  
    * @internal 
-   *   @history Kris Becker 2014-02-17 - Original version.
+   *   @history 2014-02-17 Kris Becker - Original version.
    */
   template <class T> class Dist3d {
     public:
@@ -64,10 +64,10 @@ namespace Isis {
   /** 
    * Functor to compute 2-d Euclidean distances
    *
-   * @author Kris Becker 2014-02-17 
+   * @author 2014-02-17 Kris Becker
    *  
    * @internal 
-   *   @history Kris Becker 2014-02-17 - Original version.
+   *   @history 2014-02-17 Kris Becker - Original version.
    */
   template <class T> class Dist2d {
     public:
@@ -96,10 +96,10 @@ namespace Isis {
   /** 
    * Functor to compute 1-d Manhattan distances 
    *  
-   * @author Kris Becker 2014-02-17 
+   * @author 2014-02-17 Kris Becker
    *  
    * @internal 
-   *   @history Kris Becker 2014-02-17 - Original version.
+   *   @history 2014-02-17 Kris Becker - Original version.
    */
   template <class T> class Dist1d {
     public:
@@ -168,10 +168,10 @@ namespace Isis {
    * but this is not required - as long as Euclidean distances apply to the point
    * dataset, any 3D vector representation could utilize this class.
    *  
-   * @author Kris Becker 2014-02-17 
+   * @author 2014-02-17 Kris Becker
    *  
    * @internal 
-   *   @history Kris Becker 2014-02-17 - Original version.
+   *   @history 2014-02-17 Kris Becker - Original version.
    */
   template <class T, class Distance = Dist3d<T> > class PointCloud {
     public:
