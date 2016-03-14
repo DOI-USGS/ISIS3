@@ -289,18 +289,18 @@ CHOLMODLIB   = -lcholmod -lamd -lcolamd -framework Accelerate
 # Set up for OpenCV libraries 
 #---------------------------------------------------------------------------
 OPENCVINCDIR =  -I$(ISIS3OPT)/include
-##OPENCVLIBDIR =  -L$(ISIS3OPT)/lib   # Redundant
-OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
-               -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
-               -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
-               -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
-               -lopencv_video -lopencv_videostab
+OPENCVLIBDIR =  -L$(ISIS3OPT)/lib
+OPENCVLIB   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
+              -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
+              -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
+              -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
+              -lopencv_video -lopencv_videostab
 
 #---------------------------------------------------------------------------
 # Set up for Natural Neigbor Library (NN)
 #---------------------------------------------------------------------------
 NNINCDIR = -I$(ISIS3LOCAL)/include/nn
-#NNLIBDIR = -L$(ISIS3LOCAL)/lib
+NNLIBDIR = -L$(ISIS3LOCAL)/lib
 NNLIB = -lnn
 
 #---------------------------------------------------------------------------
