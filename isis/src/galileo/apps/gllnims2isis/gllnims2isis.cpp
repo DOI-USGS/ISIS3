@@ -133,8 +133,6 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   FileName inFile = ui.GetFileName("FROM");
   QFileInfo fi(inFile.expanded());
 
-  //cout << "Processing:  " << inFile.expanded() << endl;
-
   //Fix the broken XML tags in the pvl file
   QByteArray pvlData= pvlFix(inFile.expanded());
   QTextStream pvlTextStream(&pvlData);
@@ -147,8 +145,10 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   catch(IException &e) {
     QString msg = "Input file [" + inFile.expanded() +
                  "] is not a valid PVL file.";
-
-    throw IException(e, IException::User, msg, _FILEINFO_);
+    // not appending the caught exception to this message.
+    // we were picking up non-utf8 characters in the message
+    // throw IException(e, IException::User, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
 

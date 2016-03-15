@@ -48,6 +48,10 @@ xsi:noNamespaceSchemaLocation=
     <change name="Tyler Wilson" date="2016-02-25">
       Original version
     </change>
+    <change name="Jeannie Backer" date="2016-03-15">
+      Modified error throw to not append a caught message to the current message.
+      This was printing non UTF-8 characters on some platforms. Updated truth data. 
+    </change>
 
   </history>
 
