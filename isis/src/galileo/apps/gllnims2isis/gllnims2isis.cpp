@@ -43,13 +43,13 @@
 
 using namespace std;
 using namespace Isis;
+enum CubeType {CORE,SUFFIX};
 
 
 void importQubs(QString coreParamName,QString suffixParamName);
 void ProcessBands(Pvl &pdsLab, Cube *nimsCube, ProcessImportPds &importPds);
-void translateNIMSLabels(Pvl &pdsLab, Cube *ocube, FileName inFile);
+void translateNIMSLabels(Pvl &pdsLab, Cube *ocube, FileName inFile, CubeType ctype);
 QByteArray pvlFix(QString fileName);
-
 
 
 Cube *g_oCube;
@@ -130,7 +130,10 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   importPds.Progress()->SetText((QString)"Writing " + coreParamName + " file");
 
 
-  FileName inFile = ui.GetFileName("FROM");   
+  FileName inFile = ui.GetFileName("FROM");
+  QFileInfo fi(inFile.expanded());
+
+  //cout << "Processing:  " << inFile.expanded() << endl;
 
   //Fix the broken XML tags in the pvl file
   QByteArray pvlData= pvlFix(inFile.expanded());
@@ -144,14 +147,15 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   catch(IException &e) {
     QString msg = "Input file [" + inFile.expanded() +
                  "] is not a valid PVL file.";
-    // not appending the caught exception to this message.
-    // we were picking up non-utf8 characters in the message
-    throw IException(IException::User, msg, _FILEINFO_);
+
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
 
   // Create holder for original label
   OriginalLabel origLabel(*pdsLabel);
+  //pdsLabel->write(fi.baseName()+".pvl");
+
 
   //QFileInfo inputFileInfo(inFile.expanded());
   //pdsLabel->write(inputFileInfo.baseName()+".pvl");
@@ -239,29 +243,9 @@ void importQubs(QString coreParamName, QString suffixParamName) {
 
   g_coreCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
-  //Grab ISISs Labels
-  Pvl otherLabels;
-
-
-  importPds.TranslateIsis2Labels(otherLabels);
-
-  if(otherLabels.hasGroup("Mapping") &&
-    (otherLabels.findGroup("Mapping").keywords() > 0) ) {
-      g_coreCube->putGroup(otherLabels.findGroup("Mapping"));
-  }
-  if(otherLabels.hasGroup("Instrument") &&
-    (otherLabels.findGroup("Instrument").keywords() > 0) ) {
-      g_coreCube->putGroup(otherLabels.findGroup("Instrument"));
-  }
-
-  if(otherLabels.hasGroup("Archive") &&
-    (otherLabels.findGroup("Archive").keywords() > 0) ) {
-      g_coreCube->putGroup(otherLabels.findGroup("Archive"));
-  }
-
 
   importPds.StartProcess();
-  translateNIMSLabels(*pdsLabel,g_coreCube,inFile);
+  translateNIMSLabels(*pdsLabel,g_coreCube,inFile,CORE);
   importPds.EndProcess();
 
   importPds.Progress()->SetText((QString)"Writing " + suffixParamName + " file");
@@ -275,18 +259,14 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   importPds.ClearOutputCubes();
   g_suffixCube = importPds.SetOutputCube("SUFFIX");
 
-  if(otherLabels.hasGroup("BandBin") &&
-    (otherLabels.findGroup("BandBin").keywords() > 0)) {
-      g_suffixCube->putGroup(otherLabels.findGroup("BandBin"));
-  }
+
 
   importPds.SetSuffixOffset(importPds.Samples(),importPds.Lines(),g_coreBands,g_coreItemBytes);
   g_suffixCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
 
-  importPds.StartProcess();
-  ProcessBands(*pdsLabel,g_suffixCube ,importPds);
-  translateNIMSLabels(*pdsLabel,g_suffixCube,inFile);
+  importPds.StartProcess(); 
+  translateNIMSLabels(*pdsLabel,g_suffixCube,inFile,SUFFIX);
   importPds.EndProcess();
 
 }
@@ -356,14 +336,19 @@ QByteArray pvlFix(QString fileName){
  */
 
 
-void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile){
+void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile,CubeType ctype){
 
 
-  Pvl outLabel;
+  Pvl archiveLabel;
+  Pvl instrumentLabel;
+  Pvl bandBinLabel;
+
+
   Pvl pdsLabel(pdsLab);
-  QFileInfo fi(inFile.expanded());
+  //QFileInfo fi(inFile.expanded());
 
   PvlObject qube(pdsLab.findObject("Qube"));
+
 
 
   // Directory containing translation tables
@@ -372,17 +357,46 @@ void translateNIMSLabels(Pvl &pdsLab, Cube *ocube,FileName inFile){
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
   QString transDir = (QString) dataDir["galileo"] + "/translations/";
 
-  QString coreTrans = "galileoNIMS.trn";
 
-  FileName transFile(transDir+coreTrans);
+  QString instrument="galileoNIMSInstrument.trn";
+  QString archive = "galileoNIMSArchive.trn";
+  QString coreBandBin = "galileoNIMSCoreBandBin.trn";
+  QString suffixBandBin = "galileoNIMSSuffixBandBin.trn";
 
-  PvlTranslationManager coreXlator(pdsLabel, transFile.expanded());
 
-  coreXlator.Auto(outLabel);
-  //outLabel.write(fi.baseName()+".pvl");
+  FileName coreBandBinFile(transDir+coreBandBin);
+  FileName suffixBandBinFile(transDir+suffixBandBin);
 
-  ocube->putGroup(outLabel.findGroup("Instrument",Pvl::Traverse));
-  ocube->putGroup(outLabel.findGroup("Archive",Pvl::Traverse));
+  FileName instrumentFile(transDir+instrument);
+  FileName archiveFile(transDir+archive);
+
+  PvlTranslationManager archiveXlator(pdsLabel, archiveFile.expanded());
+  PvlTranslationManager instrumentXlator(pdsLabel, instrumentFile.expanded());
+  PvlTranslationManager coreBandBinXlator(pdsLabel,coreBandBinFile.expanded());
+  PvlTranslationManager suffixBandBinXlator(pdsLabel,suffixBandBinFile.expanded());
+
+
+
+  archiveXlator.Auto(archiveLabel);
+
+  if (ctype==CORE) {
+
+    coreBandBinXlator.Auto(bandBinLabel);
+
+  }
+  else {
+
+    suffixBandBinXlator.Auto(bandBinLabel);
+
+  }
+
+  instrumentXlator.Auto(instrumentLabel);
+
+
+  ocube->putGroup(archiveLabel.findGroup("Archive",Pvl::Traverse));
+  ocube->putGroup(instrumentLabel.findGroup("Instrument",Pvl::Traverse));
+  ocube->putGroup(bandBinLabel.findGroup("BandBin",Pvl::Traverse));
+
 
 
 }
