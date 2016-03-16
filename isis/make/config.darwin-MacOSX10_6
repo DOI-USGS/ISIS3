@@ -289,18 +289,18 @@ CHOLMODLIB   = -lcholmod -lamd -lcolamd -framework Accelerate
 # Set up for OpenCV libraries 
 #---------------------------------------------------------------------------
 OPENCVINCDIR =  -I$(ISIS3OPT)/include
-OPENCVLIBDIR =  -L$(ISIS3OPT)/lib
-OPENCVLIB   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
-              -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
-              -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
-              -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
-              -lopencv_video -lopencv_videostab
+##OPENCVLIBDIR =  -L$(ISIS3OPT)/lib   # Redundant
+OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
+               -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
+               -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
+               -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
+               -lopencv_video -lopencv_videostab
 
 #---------------------------------------------------------------------------
 # Set up for Natural Neigbor Library (NN)
 #---------------------------------------------------------------------------
 NNINCDIR = -I$(ISIS3LOCAL)/include/nn
-NNLIBDIR = -L$(ISIS3LOCAL)/lib
+#NNLIBDIR = -L$(ISIS3LOCAL)/lib
 NNLIB = -lnn
 
 #---------------------------------------------------------------------------
@@ -353,11 +353,61 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libcholmod.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libcolamd.dylib"
 THIRDPARTYLIBS    += "/System/Library/Frameworks/Accelerate.framework"
 
-# Add all the OpenCV libraries
+# Add all the OpenCV libraries and its dependancies
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopencv_*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtbb*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libjasper*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libImath*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libIlmImf*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libIex*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libHalf*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libIlmThread*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavcodec*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavformat*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavutil*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libswscale*.dylib"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libnn.a"
+# Secondary requirements to all OpenCV dependancies (Yuck!)
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libjack*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libSDL-1*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libnettle*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhogweed*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgmp*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxvidcore*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libx264*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libvorbisenc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libvorbis*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libogg*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtheoraenc*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libtheoradec*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libspeex*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libschroedinger-1*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopus*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libopenjpeg*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libmp3lame*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libmodplug*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libfreetype*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libbluray*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libass*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libgnutls*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libbz2*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXrandr*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXext*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXrender*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libX11*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxcb*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXau*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libXdmcp*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/liborc-0*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libxml2*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libfribidi*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libfontconfig*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libenca*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libexpat*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libintl*.dylib"
+#THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/lib*.dylib"
+
 
 # libxerces-c depends on these libraries
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libicui18n*.dylib"
