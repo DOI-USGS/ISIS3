@@ -336,7 +336,6 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos_c.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsk.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice.so*"
 
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_4.3.a"
 #THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.so"
@@ -365,8 +364,6 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl_cpp.so*"
 # Add all the OpenCV libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libopencv_*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb.so*"
-
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libnn.a"
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"

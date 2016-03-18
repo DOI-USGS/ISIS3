@@ -372,7 +372,6 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavformat*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavutil*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libswscale*.dylib"
 
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libnn.a"
 # Secondary requirements to all OpenCV dependancies (Yuck!)
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libjack*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libSDL-1*.dylib"
