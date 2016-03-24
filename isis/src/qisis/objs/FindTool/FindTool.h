@@ -121,6 +121,9 @@ namespace Isis {
    *                          Find Latitude/Longitude Coordinate dialog window. Added help text
    *                          to Find Tool menu option. Minor coding standards fixes. 
    *                          Fixes #2087.
+   *  @history 2016-03-23 Makayla Shepherd - Added a check on the latitude
+   *                          entered that caused an error message to pop up
+   *                          continuously. Fixes #2130.
    */
   class FindTool : public Tool {
       Q_OBJECT
@@ -162,7 +165,7 @@ namespace Isis {
     private: // methods
       void centerLinkedViewports();
       Distance distancePerPixel(MdiCubeViewport *viewport,
-                                double lat, double lon) const;
+                                double lat, double lon);
       void refresh();
 
     private:
