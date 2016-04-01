@@ -369,6 +369,10 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl_cpp.so*"
 # Add all the OpenCV libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libopencv_*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb.so*"
+THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavcodec.so*)
+THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavformat.so*)
+THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavutil.so*)
+
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"

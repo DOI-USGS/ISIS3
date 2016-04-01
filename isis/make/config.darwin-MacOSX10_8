@@ -373,7 +373,6 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libavutil*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libswscale*.dylib"
 
 # Secondary requirements to all OpenCV dependancies (Yuck!)
-THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libjack*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libSDL-1*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libnettle*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libhogweed*.dylib"
@@ -410,6 +409,9 @@ THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libfontconfig*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libenca*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libexpat*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libintl*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libglib-*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libp11-kit*.dylib"
+THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/libffi*.dylib"
 #THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/lib*.dylib"
 
 
