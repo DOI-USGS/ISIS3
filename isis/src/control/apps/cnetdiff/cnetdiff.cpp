@@ -128,7 +128,7 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
   if(net1NumPts != net2NumPts) {
     differenceReason = "The number of control points in the networks, [" +
                        toString(net1NumPts) + "] and [" +
-                       toString(net2NumPts) + ", differ";
+                       toString(net2NumPts) + "], differ.";
     filesMatch = false;
     return;
   }
@@ -139,7 +139,7 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
   if(id1 != id2) {
     differenceReason = "The network IDs [" +
                        id1 + "] and [" +
-                       id2 + " differ";
+                       id2 + "] differ.";
     filesMatch = false;
     return;
   }
@@ -150,7 +150,7 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
   if(target1 != target2) {
     differenceReason = "The targets [" +
                        target1 + "] and [" +
-                       target2 + " differ";
+                       target2 + "] differ.";
     filesMatch = false;
     return;
   }
@@ -176,7 +176,7 @@ void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   // both names must be at least equal, should be named ControlPoint
   if(point1Pvl.name() != point2Pvl.name()) {
     QString msg = "The control points' CreatePvlOject method returned an "
-                  "unexpected result";
+                  "unexpected result.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -184,7 +184,7 @@ void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
     filesMatch = false;
     differenceReason = "The number of control measures, [" +
                        toString(point1Pvl.groups()) + "] and [" +
-                       toString(point2Pvl.groups()) + "] does not match";
+                       toString(point2Pvl.groups()) + "] does not match.";
   }
 
   // Start by comparing top level control point keywords.
@@ -248,7 +248,7 @@ void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2) {
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(pvl1.name().compare(pvl2.name()) != 0) {
     QString msg = "CompareKeywords should always be called with keywords that "
-                  "have the same name";
+                  "have the same name.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
