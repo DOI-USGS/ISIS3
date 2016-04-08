@@ -177,6 +177,7 @@ Group = DataDirectory
   NewHorizons  = $ISIS3DATA/newhorizons
   Odyssey      = $ISIS3DATA/odyssey
   Rolo         = $ISIS3DATA/rolo
+  Rosetta      = $ISIS3DATA/rosetta
   Smart1       = $ISIS3DATA/smart1
   Viking1      = $ISIS3DATA/viking1
   Viking2      = $ISIS3DATA/viking2

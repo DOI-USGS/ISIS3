@@ -1,0 +1,12 @@
+Group = ROSETTA-ORBITER/OSINAC
+  Version = 1
+  Library = OsirisCamera
+  Routine = OsirisCameraPlugin
+EndGroup
+
+Group = ROSETTA-ORBITER/OSIWAC
+  Version = 1
+  Library = OsirisCamera
+  Routine = OsirisCameraPlugin
+EndGroup
+
