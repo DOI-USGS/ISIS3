@@ -1,0 +1,34 @@
+Unit Test for OsirisCamera...
+FileName: n20100710t154539230id20f22.cub
+CK Frame: -226111
+
+Kernel IDs: 
+CK Frame ID = -226000
+CK Reference ID = 1
+SPK Target ID = -226
+SPK Reference ID = 1
+
+Spacecraft Name Long: Rosetta
+Spacecraft Name Short: Rosetta
+Instrument Name Long: Optical, Spectroscopic, and Infrared Remote Imaging System
+Instrument Name Short: OSIRIS
+
+For upper left of asteroid ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner of asteriod ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner of asteriod...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner of asteroid...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
