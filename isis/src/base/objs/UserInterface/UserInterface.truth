@@ -286,7 +286,7 @@ TO:      Worked
 GUI:     0
 
 Testing -RESTORE with corrupt .par file
-**USER ERROR** The history file [unitTestCorrupt.par] is corrupt, please fix or delete this file.
+**USER ERROR** The history file [unitTestCorrupt.par] is for a different application or corrupt, please fix or delete this file.
 
 Testing -RESTORE with invalid (non-existing) .par file
 **USER ERROR** The history file [junk.par] does not exist.
