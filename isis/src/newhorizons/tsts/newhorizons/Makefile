@@ -25,44 +25,44 @@ commands:
 	cp $(INPUT)/$(LORRI) $(OUTPUT) > /dev/null;
 
 	#initial spiceinit 
-	spiceinit from=$(OUTPUT)/$(MVIC) > /dev/null;
-	spiceinit from=$(OUTPUT)/$(LEISA) > /dev/null;
-	spiceinit from=$(OUTPUT)/$(LORRI) > /dev/null;
+	spiceinit $(TSTARGS) from=$(OUTPUT)/$(MVIC) > /dev/null;
+	spiceinit $(TSTARGS) from=$(OUTPUT)/$(LEISA) > /dev/null;
+	spiceinit $(TSTARGS) from=$(OUTPUT)/$(LORRI) > /dev/null;
 
 	#initial campt
 
 	#9 points from MVIC image
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2570 line=1000 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=1144 line=688 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2542 line=618 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=3798 line=557 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=3727 line=1033 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2664 line=1023 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=1398 line=1083 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=1843 line=1479 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2380 line=1894 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2570 line=1000 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=1144 line=688 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2542 line=618 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=3798 line=557 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=3727 line=1033 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2664 line=1023 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=1398 line=1083 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=1843 line=1479 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh.pvl sample=2380 line=1894 > /dev/null; 
 
 	# 9 points from LEISA image
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=150 line=480 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=40 line=210 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=221 line=123 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=169 line=409 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=221 line=568 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=24 line=668 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=106 line=710 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=207 line=849 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=242 line=933 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=150 line=480 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=40 line=210 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=221 line=123 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=169 line=409 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=221 line=568 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=24 line=668 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=106 line=710 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=207 line=849 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh.pvl sample=242 line=933 > /dev/null;
 
 	# 9 points from LORRI image
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=345 line=580 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=305 line=545 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=336 line=594 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=390 line=574 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=370 line=533 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=348 line=631 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=299 line=588 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=347 line=572 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=372 line=611 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=345 line=580 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=305 line=545 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=336 line=594 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=390 line=574 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=370 line=533 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=348 line=631 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=299 line=588 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=347 line=572 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh.pvl sample=372 line=611 > /dev/null; 
 
 	#ckwriter from spiceinit'd image to ckernel
 	$(APPNAME) from=$(OUTPUT)/$(MVIC) TO=$(OUTPUT)/ck_mvic.bc > /dev/null; 
@@ -70,52 +70,52 @@ commands:
 	$(APPNAME) from=$(OUTPUT)/$(LORRI) TO=$(OUTPUT)/ck_lorri.bc > /dev/null; 
 
 	#spkwriter from spiceinit'd image to spkernel 
-	$(APPNAME2) from=$(OUTPUT)/$(MVIC) TO=$(OUTPUT)/spk_mvic.bsp > /dev/null;
-	$(APPNAME2) from=$(OUTPUT)/$(LEISA) TO=$(OUTPUT)/spk_leisa.bsp > /dev/null;
-	$(APPNAME2) from=$(OUTPUT)/$(LORRI) TO=$(OUTPUT)/spk_lorri.bsp > /dev/null;
+	$(APPNAME2) $(TSTARGS) from=$(OUTPUT)/$(MVIC) TO=$(OUTPUT)/spk_mvic.bsp > /dev/null;
+	$(APPNAME2) $(TSTARGS) from=$(OUTPUT)/$(LEISA) TO=$(OUTPUT)/spk_leisa.bsp > /dev/null;
+	$(APPNAME2) $(TSTARGS) from=$(OUTPUT)/$(LORRI) TO=$(OUTPUT)/spk_lorri.bsp > /dev/null;
 
 	#re-spiceinit inputs to generated kernels
-	spiceinit from=$(OUTPUT)/$(MVIC)  CK=$(OUTPUT)/ck_mvic.bc SPK=$(OUTPUT)/spk_mvic.bsp > /dev/null;   
-	spiceinit from=$(OUTPUT)/$(LEISA) CK=$(OUTPUT)/ck_leisa.bc SPK=$(OUTPUT)/spk_leisa.bsp > /dev/null; 
-	spiceinit from=$(OUTPUT)/$(LORRI) CK=$(OUTPUT)/ck_lorri.bc SPK=$(OUTPUT)/spk_lorri.bsp > /dev/null;
+	spiceinit $(TSTARGS) from=$(OUTPUT)/$(MVIC)  CK=$(OUTPUT)/ck_mvic.bc SPK=$(OUTPUT)/spk_mvic.bsp > /dev/null;   
+	spiceinit $(TSTARGS) from=$(OUTPUT)/$(LEISA) CK=$(OUTPUT)/ck_leisa.bc SPK=$(OUTPUT)/spk_leisa.bsp > /dev/null; 
+	spiceinit $(TSTARGS) from=$(OUTPUT)/$(LORRI) CK=$(OUTPUT)/ck_lorri.bc SPK=$(OUTPUT)/spk_lorri.bsp > /dev/null;
  
 	#final campt
 
 # 9 points from MVIC image
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2570 line=1000 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=1144 line=688 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2542 line=618 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=3798 line=557 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=3727 line=1033 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2664 line=1023 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=1398 line=1083 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=1843 line=1479 > /dev/null; 
-	campt from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2380 line=1894 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2570 line=1000 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=1144 line=688 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2542 line=618 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=3798 line=557 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=3727 line=1033 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2664 line=1023 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=1398 line=1083 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=1843 line=1479 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(MVIC) to=$(OUTPUT)/nh2.pvl sample=2380 line=1894 > /dev/null; 
 
 # 9 points from LEISA image
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=150 line=480 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=40 line=210 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=221 line=123 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=169 line=409 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=221 line=568 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=24 line=668 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=106 line=710 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=207 line=849 > /dev/null;
-	campt from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=242 line=933 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=150 line=480 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=40 line=210 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=221 line=123 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=169 line=409 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=221 line=568 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=24 line=668 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=106 line=710 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=207 line=849 > /dev/null;
+	campt $(TSTARGS) from=$(OUTPUT)/$(LEISA) to=$(OUTPUT)/nh2.pvl sample=242 line=933 > /dev/null;
 
 # 9 points form LORRI image
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=345 line=580 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=305 line=545 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=336 line=594 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=390 line=574 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=370 line=533 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=348 line=631 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=299 line=588 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=347 line=572 > /dev/null; 
-	campt from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=372 line=611 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=345 line=580 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=305 line=545 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=336 line=594 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=390 line=574 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=370 line=533 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=348 line=631 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=299 line=588 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=347 line=572 > /dev/null; 
+	campt $(TSTARGS) from=$(OUTPUT)/$(LORRI) to=$(OUTPUT)/nh2.pvl sample=372 line=611 > /dev/null; 
 
 	#compare initial and final pvl
-	pvldiff from=$(OUTPUT)/nh.pvl from2=$(OUTPUT)/nh2.pvl diff=$(INPUT)/tolerances.pvl \
+	pvldiff $(TSTARGS) from=$(OUTPUT)/nh.pvl from2=$(OUTPUT)/nh2.pvl diff=$(INPUT)/tolerances.pvl \
 	to=$(OUTPUT)/diff.pvl > /dev/null;
 
 	#cleanup
