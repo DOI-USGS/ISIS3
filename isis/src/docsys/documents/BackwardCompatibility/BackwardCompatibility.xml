@@ -108,6 +108,16 @@
         </p>
 
         <h3>
+          Create Command Lines Alias (expect in March 2013 release)
+        </h3>
+        <p>
+          In the future we will modify the ISIS API to allow for aliases of command
+          line
+          parameter names.  This allows us to standardize parameter names
+          without breaking scripts and pipelines.
+        </p>
+
+        <h3>
           Program and Parameter Deprecation
         </h3>
         <p>
@@ -186,7 +196,7 @@
           Footnotes
         </h2>
         <p>
-          None
+  [1]	http://developer.joomla.org/strategy/backward-compatibility.html
         </p>
 
 

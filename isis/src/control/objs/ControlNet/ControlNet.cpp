@@ -56,7 +56,6 @@ namespace Isis {
     pointIds = new QStringList;
 
     p_invalid = false;
-    m_ownPoints = true; 
     p_created = Application::DateTime();
     p_modified = Application::DateTime();
   }
@@ -73,8 +72,6 @@ namespace Isis {
       ControlPoint *newPoint = new ControlPoint(*other.GetPoint(cpIndex));
       AddPoint(newPoint);
     }
-
-    m_ownPoints = true; 
 
     p_targetName = other.p_targetName;
     p_targetRadii = other.p_targetRadii;
@@ -103,50 +100,20 @@ namespace Isis {
     pointIds = new QStringList;
 
     p_invalid = false;
-    m_ownPoints = true;
     ReadControl(ptfile, progress);
   }
 
 
- /**
-  *  @brief Destructor removes allocated memory
-  * 
-  * @author Kris Becker 
-  */
   ControlNet::~ControlNet() {
-    clear();
-
-    delete points;
-    delete cubeGraphNodes;
-    delete pointIds;
-
-    nullify(); 
-  }
- 
-
- /**
-  *  @brief Clear the contents of this object
-  * 
-  *  The contents of the ControlNet object are deleted. The internal variables
-  *  that hold the contents are not. See the destructor.
-  * 
-  * @author Kris Becker
-  */
-  void ControlNet::clear() {
-
-    // Now must also own points to delete them. 
-    if ( points ) {
-      if ( GetNumPoints() > 0 ) {
-        if ( m_ownPoints ) {
-          QHashIterator<QString, ControlPoint*> i(*points); 
-          while (i.hasNext()) {
-            i.next();
-            delete(*points)[i.key()];
-            (*points)[i.key()] = NULL;
-          }
-        }
+    if (points) {
+      QHashIterator< QString, ControlPoint * > i(*points);
+      while (i.hasNext()) {
+        i.next();
+        delete(*points)[i.key()];
+        (*points)[i.key()] = NULL;
       }
-      points->clear();
+      delete points;
+      points = NULL;
     }
 
     if (cubeGraphNodes) {
@@ -156,52 +123,17 @@ namespace Isis {
         delete(*cubeGraphNodes)[i.key()];
         (*cubeGraphNodes)[i.key()] = NULL;
       }
-      cubeGraphNodes->clear();
+      delete cubeGraphNodes;
+      cubeGraphNodes = NULL;
     }
 
     if (pointIds) {
-      pointIds->clear();
+      delete pointIds;
+      pointIds = NULL;
     }
- 
-    return;
+
+    m_mutex = NULL;
   }
-
-
-  /**
-   * @brief Transfer ownership of all points to caller 
-   *  
-   * This method is used to transfer ownership to the caller. This method is not 
-   * reintrant in the sense that if someone else has already made this call, it is 
-   * an error to attempt to take ownership again. 
-   *  
-   * Note that it now becomes the responsibility of the caller to delete all the 
-   * pointers to ControlPoints that are returned in the list. 
-   *  
-   * WARNING!!! This call alone can create a situation where the owner could 
-   * delete point memory after the point list is exported from this class creating
-   * a problem. For this reason, the clear() method be called!!!
-   * 
-   * @author Kris Becker 
-   * 
-   * @return QList<ControlPoint*> Returns the list of all control points to caller
-   */
-    QList< ControlPoint * > ControlNet::take() {
-      // First check to see if someone else has taken ownership
-      if ( !m_ownPoints ) {
-        throw IException(IException::Programmer, "Ownership has already been taken",
-                         _FILEINFO_);
-      }
-
-      QList<ControlPoint *> points = GetPoints();
-      m_ownPoints = false;
-      clear();
-
-      // Disconnect the parent network reference
-      for (int i = 0 ; i < points.size() ; i++) {
-        points[i]->parentNetwork = NULL;
-      }
-      return (points);
-    }
 
 
   /**

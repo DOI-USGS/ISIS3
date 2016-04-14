@@ -37,8 +37,6 @@
 #include "Projection.h"
 #include "TProjection.h"
 #include "Pvl.h"
-#include "PvlKeyword.h"
-#include "PvlGroup.h"
 #include "PvlObject.h"
 #include "PvlTokenizer.h"
 #include "PvlTranslationManager.h"
@@ -188,36 +186,10 @@ namespace Isis {
     trnsStrm << "  InputPosition = COMPRESSED_FILE" << endl;
     trnsStrm << "  InputKey = FILE_NAME" << endl;
     trnsStrm << "  Translation = (*,*)" << endl;
-    trnsStrm << "EndGroup" << endl;   
+    trnsStrm << "EndGroup" << endl;
     trnsStrm << "END";
 
-
-    //tjw
-    //Determine if we are processing a QUBE whose
-    //core data type is VAX_REAL
-
-    try{
-
-    PvlObject obj = p_pdsLabel.findObject("QUBE");
-    PvlKeyword coreKey = obj.findKeyword("CORE_ITEM_TYPE");
-    PvlKeyword suffixKey = obj.findKeyword("BAND_SUFFIX_ITEM_TYPE");
-      //if ( (coreKey[0] == "VAX_REAL") && (suffixKey[0] =="VAX_REAL") )
-
-      if (coreKey[0] == "VAX_REAL") {
-
-            ProcessImport::SetVAXConvert(true);
-        }
-
-    }
-    catch(IException &e){
-
-
-    }
-
-
-
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, trnsStrm);
-
 
     // Check to see if we are dealing with a JPEG2000 file
     QString str;
@@ -253,37 +225,27 @@ namespace Isis {
       }
     }
 
-
-
-
     // Call the correct label processing
     if ((allowedTypes & Image) == Image && pdsXlater.InputHasKeyword("PdsTypeImage")) {
-
       ProcessPdsImageLabel(pdsDataFile);
     }
     else if ((allowedTypes & Qube) == Qube && pdsXlater.InputHasKeyword("PdsTypeQube")) {
-
       ProcessPdsQubeLabel(pdsDataFile, "pdsQube.trn");
     }
     else if ((allowedTypes & SpectralQube) == SpectralQube &&
              pdsXlater.InputHasKeyword("PdsTypeSpectralQube")) {
-
       ProcessPdsQubeLabel(pdsDataFile, "pdsSpectralQube.trn");
     }
     else if ((allowedTypes & L0) == L0 && pdsXlater.InputHasKeyword("PdsTypeL0")) {
-
       ProcessPdsM3Label(pdsDataFile, L0);
     }
     else if ((allowedTypes & Rdn) == Rdn && pdsXlater.InputHasKeyword("PdsTypeRdn")) {
-
       ProcessPdsM3Label(pdsDataFile, Rdn);
     }
     else if ((allowedTypes & Loc) == Loc && pdsXlater.InputHasKeyword("PdsTypeLoc")) {
-
       ProcessPdsM3Label(pdsDataFile, Loc);
     }
     else if ((allowedTypes & Obs) == Obs && pdsXlater.InputHasKeyword("PdsTypeObs")) {
-
       ProcessPdsM3Label(pdsDataFile, Obs);
     }
     else {
@@ -291,13 +253,8 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-
-
     // Find out if this is a PDS file or an ISIS2 file
     IdentifySource(p_pdsLabel);
-
-
-
 
     return;
   }
@@ -309,9 +266,7 @@ namespace Isis {
    * SetInputFile and SetFileHeaderBytes, both are called during this method.
    * Will not do SetInputFile if calcOffsetOnly is true
    */
-  void ProcessImportPds::ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater,
-        const bool & calcOffsetOnly) {
-
+  void ProcessImportPds::ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater, const bool & calcOffsetOnly) {
     const PvlKeyword & dataFilePointer = pdsXlater.InputKeyword("DataFilePointer");
 
     QString dataFileName;
@@ -415,9 +370,7 @@ namespace Isis {
     str = pdsXlater.Translate("CoreBitsPerPixel");
     int bitsPerPixel = toInt(str);
     str = pdsXlater.Translate("CorePixelType");
-
     if ((str == "Real") && (bitsPerPixel == 64)) {
-
       SetPixelType(Isis::Double);
     }
     else if ((str == "Real") && (bitsPerPixel == 32)) {
@@ -444,8 +397,6 @@ namespace Isis {
     else if ((str == "Natural") && (bitsPerPixel == 32)) {
       SetPixelType(Isis::UnsignedInteger);
     }
-
-
     else {
       QString msg = "Invalid PixelType and BitsPerPixel combination [" + str +
                    ", " + toString(bitsPerPixel) + "]";
@@ -559,7 +510,7 @@ namespace Isis {
 
     ProcessPixelBitandType(pdsXlater);
 
-    str = pdsXlater.Translate("CoreByteOrder");    
+    str = pdsXlater.Translate("CoreByteOrder");
     SetByteOrder(Isis::ByteOrderEnumeration(str));
 
     str = pdsXlater.Translate("CoreSamples");
@@ -568,7 +519,6 @@ namespace Isis {
     int nl = toInt(str);
     str = pdsXlater.Translate("CoreBands");
     int nb = toInt(str);
-
     SetDimensions(ns, nl, nb);
 
     // Set any special pixel values, not qube, so use false
@@ -646,13 +596,11 @@ namespace Isis {
   void ProcessImportPds::ProcessPdsQubeLabel(const QString &pdsDataFile,
       const QString &transFile) {
 
-
     Isis::FileName tFile(p_transDir + "/translations/" + transFile);
 
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.expanded());
 
     QString str;
-
 
     // Find the organization of the image data
     // Save off which axis the samples, lines and bands are on
@@ -726,20 +674,8 @@ namespace Isis {
     ProcessPixelBitandType(pdsXlater);
 
     // Set the byte order
-
-    //tjw:
     str = pdsXlater.Translate("CoreByteOrder");
-
     SetByteOrder(Isis::ByteOrderEnumeration(str));
-
-    //if(str == "LSB" || str == "MSB")
-    //    SetByteOrder(Isis::ByteOrderEnumeration(str));
-    //else {
-    //    QString msg = "Unrecognized byte order ["+str+"]";
-    //    throw IException(IException::Programmer,msg,_FILEINFO_);
-    //}
-
-
 
     // Set the number of samples, lines and bands
     str = pdsXlater.Translate("CoreSamples", samplePos);
@@ -749,7 +685,6 @@ namespace Isis {
     str = pdsXlater.Translate("CoreBands", bandPos);
     int nb = toInt(str);
     SetDimensions(ns, nl, nb);
-
 
     // Set any special pixels values, qube, so use true
     ProcessSpecialPixels(pdsXlater, true);
@@ -1361,14 +1296,11 @@ namespace Isis {
   bool ProcessImportPds::IsIsis2() {
 
     if (p_source == ISIS2) {
-
       return true;
     }
     else {
       return false;
     }
-
-
   }
 
 
@@ -1574,5 +1506,3 @@ namespace Isis {
     return;
   }
 }
-
-

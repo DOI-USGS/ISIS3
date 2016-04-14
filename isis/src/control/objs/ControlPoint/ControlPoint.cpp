@@ -117,11 +117,10 @@ namespace Isis {
    *
    * @history 2008-06-18  Debbie A. Cook, Swapped Init with SetRadii
    *          calls to avoid resetting the surface points with no radii
-   * @history 2015-11-03  Kris Becker - invalid flag was not being initialized
    */
   ControlPoint::ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
       const Distance &majorRad, const Distance &minorRad,
-      const Distance &polarRad) : invalid(false)  {
+      const Distance &polarRad) {
     measures = NULL;
     cubeSerials = NULL;
     referenceMeasure = NULL;

@@ -104,9 +104,6 @@ NOOUTPUT =echo Error ... Output folder does not exist
 FILECOUNTMISMATCH =echo Failed ... Number of files in truth and output folder do not match
 NOTALLMATCH =echo Failed ... Not all files in truth and output folders match
 
-# Set test arguments for use in category tests
-TSTARGS = -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences
-
 DIRPATTERN=2774
 FILEPATTERN=2664
 DIRLISTPATTERN="drwxrwsr--"
@@ -346,7 +343,7 @@ comparefiles: FORCE
 	      fi;                                                                  \
 	                                                                           \
 	      $(ISISROOT)/bin/cubediff                                             \
-	          $(TSTARGS)                                                       \
+	          -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	          from=$(TRUTH)/$$FILE                                             \
 	          from2=$(OUTPUT)/$$FILE                                           \
 	          to=compare.txt                                                   \
@@ -410,7 +407,7 @@ comparefiles: FORCE
 	      fi;                                                                  \
 	                                                                           \
 	      $(ISISROOT)/bin/pvldiff                                              \
-	          $(TSTARGS)                                                       \
+	          -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	          from=$(TRUTH)/$$FILE                                             \
 	          from2=$(OUTPUT)/$$FILE                                           \
 	          to=compare.txt                                                   \
@@ -444,7 +441,7 @@ comparefiles: FORCE
 	      fi;                                                                  \
 	                                                                           \
 	      $(ISISROOT)/bin/cnetdiff                                             \
-	          $(TSTARGS)                                                       \
+	          -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences \
 	          from=$(TRUTH)/$$FILE                                             \
 	          from2=$(OUTPUT)/$$FILE                                           \
 	          to=compare.txt                                                   \
