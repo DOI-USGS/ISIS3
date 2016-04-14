@@ -325,9 +325,32 @@
 
         <h3>Writing a Test for a category</h3>
         <p>
-          Category tests work the same way as application tests do.  The difference is that category tests don't test a
+          <!--Category tests work the same way as application tests do.  The difference is that category tests don't test a
           single program but a sequence of programs.  Therefore the APPNAME isn't needed for a category test and
-          can be deleted safely. All of the variables for testing an application also work for the category test.
+          can be deleted safely. All of the variables for testing an application also work for the category test.-->
+	  Category tests work the same way as application tests do.  The difference is that category tests don't test a
+          single program but a sequence of programs.  Therefore the APPNAME variable should not be used.  Instead use
+	  variables such as APP1NAME, APP2NAME, etc.  In addition, all ISIS application names need to be followed by
+	  $(TSTARGS) to guarantee proper testing parameters.  Currently, this ensures that they use the default
+	  preference file.  All of the variables for testing an application also work for category tests.  A brief
+	  example is shown below.
+	  <pre>
+          <code>
+            APP1NAME = clem2isis
+	    APP2NAME = spiceinit
+	    APP3NAME = campt
+	    APP4NAME = getsn
+
+	    include $(ISISROOT)/make/isismake.tsts
+
+	    commands:
+	    &#09;$(APP1NAME) $(TSTARGS) from= $(INPUT)/lna3819k.045 \
+	    &#09;to= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub > /dev/null
+
+	    &#09;$(APP2NAME) $(TSTARGS) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
+	    &#09;> /dev/nul
+          </code>
+        </pre>
         </p>
 
         <!-- Comparing Files -->
@@ -747,6 +770,9 @@
     <change name="Travis Addair" date="2011-05-13">
       Added section for Comparing Files, moved PVL diff discussion into this
       section and added new discussion for CSV file diffing.
+    </change>
+    <change name="Jesse Mapel" date="2016-04-05">
+      Updated section on category tests.  Fixes #3884.
     </change>
   </history>
 </documentation>

@@ -6,10 +6,19 @@
 #include "Cube.h"
 #include "Application.h"
 #include "Preference.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
 #include "Statistics.h"
 
 using namespace Isis;
 using namespace std;
+
+
+/**
+ * @internal
+ *   @history 2016-02-25 Tyler Wilson - Moved new test data to /usgs/cpks/base/testData and
+ *                         Added test for processing Galileo NIMS qubs
+ */
 
 void IsisMain() {
 
@@ -45,6 +54,62 @@ void IsisMain() {
   cout << endl << "Variance: " << stat->Variance() << endl;
   p2.EndProcess();
   cout << endl;
+
+
+
+  ProcessImport core_cub;
+  core_cub.SetInputFile("$base/testData/30i001ci.qub");
+  QString coreFile = Application::GetUserInterface().GetFileName("CORE_CUBE");
+  core_cub.SetVAXConvert(true);
+  core_cub.SetPixelType(Isis::Real);
+  core_cub.SetByteOrder(Isis::Lsb);
+  core_cub.SetDimensions(47,46,12);
+
+  core_cub.SetFileHeaderBytes(134144);
+  core_cub.SaveFileHeader();
+  core_cub.SetDataHeaderBytes(0);
+  core_cub.SetDataPrefixBytes(0);
+  core_cub.SetDataSuffixBytes(0);
+  core_cub.SetDataTrailerBytes(0);
+  core_cub.SetBase(0.0);
+  core_cub.SetMultiplier(1.0);
+  core_cub.SetOrganization(ProcessImport::BSQ);
+  core_cub.SetOutputCube("CORE_CUBE");
+  core_cub.StartProcess();
+  core_cub.EndProcess();
+
+ 
+
+  ProcessImport suffix_cub;
+  
+  
+  suffix_cub.SetInputFile("$base/testData/30i001ci.qub");
+  QString suffixFile = Application::GetUserInterface().GetFileName("SUFFIX_CUBE");
+  suffix_cub.SetVAXConvert(true);
+  suffix_cub.SetPixelType(Isis::Real);
+  suffix_cub.SetByteOrder(Isis::Lsb);
+  suffix_cub.SetDimensions(47,46,9);
+
+  suffix_cub.SetFileHeaderBytes(134144);
+  suffix_cub.SaveFileHeader();
+  suffix_cub.SetDataHeaderBytes(0);
+  suffix_cub.SetDataPrefixBytes(0);
+  suffix_cub.SetDataSuffixBytes(0);
+  suffix_cub.SetDataTrailerBytes(0);
+  suffix_cub.SetBase(0.0);
+  suffix_cub.SetMultiplier(1.0);
+  suffix_cub.SetOrganization(ProcessImport::BSQ);
+  suffix_cub.SetOutputCube("SUFFIX_CUBE");
+
+  suffix_cub.SetSuffixOffset(47,46,12,4);  
+
+  suffix_cub.StartProcess();
+  suffix_cub.EndProcess();
+ 
+
+
+
+
 
   //Checks the setting of special pixel ranges
 
@@ -114,6 +179,7 @@ void IsisMain() {
 
   cout << "Testing ProcessBil()" << endl;
   ProcessImport p3;
+ 
   p3.SetInputFile("$base/testData/isisTruth.dat");
   p3.SetBase(0.0);
   p3.SetMultiplier(1.0);
@@ -149,4 +215,6 @@ void IsisMain() {
   p4.EndProcess();
 
   QFile::remove(file);
+  QFile::remove(coreFile);
+  QFile::remove(suffixFile);
 }

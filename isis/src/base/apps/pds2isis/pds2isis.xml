@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="pds2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="pds2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>Import PDS or ISIS2 image into ISIS3 cube format</brief>
 
@@ -116,6 +118,13 @@
     <change name="Kimberly Oyama" date="2012-11-21">
       Added app tests for BIP and BIL formatted input. References #819.
     </change>
+    <change name="Tyler Wilson" data ="2016-02-25">
+     Added an app test for opening Galileo NIMS qubes saved in VAX format.  Modified the filter
+     tag on FROM parameter in this document to also recognize *.qub files.  All changes
+     relating to converting VAX to IEEE were made in ProcessImport, ProcessImportPds.
+     References:  #2368.
+    </change>
+	
   </history>
 
   <category>
@@ -140,7 +149,7 @@
 	  enter the label file name.
         </description>
         <filter>
-          *.lbl *.img
+          *.lbl *.img *.qub
         </filter>
       </parameter>
 

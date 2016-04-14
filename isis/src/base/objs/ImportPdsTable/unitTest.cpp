@@ -3,15 +3,86 @@
 #include <iostream>
 #include <vector>
 
+#include <QString>
+#include <QStringList>
+
 #include "IException.h"
 #include "ImportPdsTable.h"
 #include "IString.h"
 #include "Preference.h"
 #include "Table.h"
+#include "TextFile.h"
 
 using namespace std;
 using namespace Isis;
 
+
+/**
+ * Test class that allows testing protected methods in ImportPdsTable
+ * 
+ * @author 2016-02-24 Ian Humphrey
+ * 
+ * @internal
+ *   @history 2016-02-24 Ian Humphrey - Original version (created for #2397).
+ */
+class ImportPdsTableTester : public ImportPdsTable {
+
+  public:
+    ImportPdsTableTester(const QString &labelFile, const QString &tableFile,
+                         QString tableName = "TABLE") 
+      : ImportPdsTable(labelFile, tableFile, tableName) {}
+
+    // Wrapper around ImportPdsTable protected method
+    const ColumnDescr &getColumnDescriptorWrap(const int nth) const {
+      return getColumnDescriptor(nth);
+    }
+
+    // Wrapper around ImportPdsTable protected method
+    QStringList getColumnFieldsWrap(const QString &tline,
+                                    const ColumnDescr &cdesc,
+                                    const QString &delimiter="") {
+      return getColumnFields(tline, cdesc, delimiter);
+    }
+
+    // Test method to check that ColumnDescr are correctly storing label data
+    static void printColumnDescr(const ColumnDescr &cd) {
+      cout << "m_name: " << cd.m_name << endl;
+      cout << "m_colnum: " << cd.m_colnum << endl;
+      cout << "m_dataType: " << cd.m_dataType << endl;
+      cout << "m_startByte: " << cd.m_startByte << endl;
+      cout << "m_numBytes: " << cd.m_numBytes << endl;
+      cout << "m_itemBytes: " << cd.m_itemBytes << endl;
+      cout << "m_items: " << cd.m_items << endl;
+    }
+};
+
+
+/**
+ * Unit test for ImportPdsTable
+ * 
+ * NOTE - exception thrown by fill Table "Unable to open file containing PDS table" seems untestable
+ *        as the exception is thrown if a std::ifstream is incorrectly created.
+ *
+ *      - Need to test getColumnFields where the condition where item size is not specified. More
+ *        specifically, if (1 >= colDesc.m_itemBytes) is true.
+ *        * I changed this from the original (1 < coldescr.m_itemBytes), as this condition doesn't
+ *        * suggest that there is not item size specified
+ * 
+ *      - Need to test getColumnFields with delimited column fields in table.
+ * 
+ *      - makeFieldFromBinaryTable has untested conditions (such as INTEGER, SUN_INTEGER, etc.)
+ * 
+ *      - TODO does makeField or makeFieldFromBinaryTable actually account for multi-field columns?
+ *        * colDesc.m_items and colDesc.m_itemBytes only used in getColumnDescriptor and 
+ *        * getColumnFields.
+ * 
+ * @author original unknown
+ * 
+ * @internal
+ *   @history 2016-06-24 Ian Humphrey - Updated to test Kris' changes to ImportPdsTable. Added tests
+ *                           for getColumnDescriptor.
+ *                           Fixes #2397.
+ */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
   QString inputFile = "data/VIR_IR_1A_1_332974737_1_HK.LBL";
@@ -20,6 +91,7 @@ int main(int argc, char *argv[]) {
   cout << "\n\nTesting ImportPdsTable class using file " << inputFile << "\n";
 
   ImportPdsTable myTable(inputFile);
+
   cout << "\n\nList of Columns found - Total: " << myTable.columns() << "\n";
   QStringList kfiles = myTable.getColumnNames();
   cout << kfiles.join("\n");
@@ -56,6 +128,7 @@ int main(int argc, char *argv[]) {
     cout << newTable[0][i].name() << "\t";
   }
   cout << endl;
+
 
   // this test was commented out since the output is not what was expected.
   // See mantis ticket
@@ -137,8 +210,75 @@ int main(int argc, char *argv[]) {
   //??? cout << IString((float) isisTableFromLsb[1][1]) << endl;
   //??? cout << endl;
 
+
+
+  // Testing new changes made to ImportPdsTable class
+
+  // Testing name() and setName()
+  cout << "\n\nTesting name() (default TABLE): " << myTable.name() << "\n";
+  cout << "\nTesting setName(\"My Table\"): ";
+  myTable.setName(QString("My Table"));
+  cout << myTable.name() << "\n";
+
+
+  QString merLabelFile = "data/edrindex.lbl";
+  QString merTableFile = "data/edrindex.tab";
+  cout << "\n\nTesting ImportPdsTable protected methods with file " << merLabelFile;
+
+  cout << "\n\nConstructing new ImportPdsTable where the PDS table object name is ";
+
+  ImportPdsTableTester myTestTable(merLabelFile, merTableFile, QString("INDEX_TABLE"));
+
+  cout << myTestTable.name() << "\n";
+
+  // Testing getColumnFields method
+  // NOTE - this is NOT using ImportPdsTable's public interface, as we need access to
+  //        m_rows in order to get table row data to pass to getColumnFields
+  cout << "\nTesting getColumnFields..." << "\n";
+  TextFile tf(merTableFile);
+  // Grab the first data record (first row) in the table
+  QString rowData;
+  tf.GetLine(rowData);
+
+  //   Testing if the column's item count is 1 (i.e. no ITEMS or ITEM_BYTES keywords)
+  //   Using edrindex.lbl's 43th column
+  cout << "\nColumn TELEMETRY_SOURCE_NAME items: ";
+  QStringList oneItem = myTestTable.getColumnFieldsWrap(rowData,
+                            myTestTable.getColumnDescriptorWrap(42));
+  cout << oneItem.size() << "\n";
+  foreach (QString item, oneItem)
+    cout << "  " << item << "\n";
+
+  cout << "\nColumn Description for this column: " << endl;
+  ImportPdsTableTester::printColumnDescr(myTestTable.getColumnDescriptorWrap(42));
+  cout << "\n";
+
+  //   Testing if the column has more than one item (i.e. has ITEMS and ITEM_BYTES keywords)
+  //   Use edrindex.lbl's 44th column
+  cout << "\nColumn ROVER_MOTION_COUNTER items: ";
+  QStringList manyItems = myTestTable.getColumnFieldsWrap(rowData,
+                              myTestTable.getColumnDescriptorWrap(43));
+  cout << manyItems.size() << "\n";
+  foreach (QString item, manyItems)
+    cout << "  " << item << "\n";
+
+  cout << "\nColumn Description for this column: " << endl;
+  ImportPdsTableTester::printColumnDescr(myTestTable.getColumnDescriptorWrap(43));
+  cout << "\n";
+
+  //   Testing the delimiter parameter TODO - find table data with delimited column fields
+//   QString fieldsDelimiter = ";";
+//   QStringList manyDelimited = myTestTable.getColumnFieldsWrap(rowData,
+//                                   myTestTable.getColumnDescriptorWrap(43),
+//                                   fieldsDelimiter);
+  
+  cout << "\n\n";
+
+
+
   //  test error throws...
-  // 1) load(pdsLabFile, pdsTabFile) -  Unable to import PDS table.  Neither of the following possible table files were found.
+  // 1) load(pdsLabFile, pdsTabFile) -  Unable to import PDS table.  
+  //        Neither of the following possible table files were found.
   try {
     cout << "Throw error for invalid table file name: " << endl;
     ImportPdsTable error(pdsLabelFile, "INVALID_TABLE_FILE_NAME.DAT", "TABLE");
@@ -148,7 +288,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  // 2) getColumnName(index) - Unable to import the binary PDS table into Isis. The requested column index exceeds the number of columns.
+  // 2) getColumnName(index) - Unable to import the binary PDS table into Isis. 
+  //        The requested column index exceeds the number of columns.
   try {
     cout << "Throw error for attempt to access invalid column index: " << endl;
     pdsLsbTable.getColumnName(5);
@@ -158,9 +299,10 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  // 3) importTable(vector<string> colNames, string tableName) - Unable to import the PDS table into Isis. The requested column name does not exist in the table.
+  // 3) importTable(QStringList colNames, Qtring tableName) - Unable to import the PDS table into 
+  //        Isis. The requested column name does not exist in the table.
   try {
-    cout << "Throw error for attempt to export non-existant columns: " << endl;
+    cout << "Throw error for attempt to export non-existent columns: " << endl;
     QStringList columnNames;
     columnNames.append("Invalid Column Name");
     myTable.importTable(columnNames, "VIR_DATA");
@@ -170,7 +312,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
   
-  // 4) loadLabel(labFile, tabFile) - The PDS file does not have the required TABLE object. The PDS label file is probably invalid.
+  // 4) loadLabel(labFile, tabFile) - The PDS file does not have the required TABLE object. 
+  //        The PDS label file is probably invalid.
   try {
     cout << "Throw error for missing table location in label file:" << endl;
     ImportPdsTable error(pdsLabelFile, pdsTableFile, "MISSING_TABLE");
@@ -180,7 +323,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  // 5) loadLabel(labFile, tabFile) - Unable to import the PDS table from the PDS file. The PDS INTERCHANGE_FORMAT is not supported. Valid values are ASCII or BINARY.
+  // 5) loadLabel(labFile, tabFile) - Unable to import the PDS table from the PDS file.
+  //        The PDS INTERCHANGE_FORMAT is not supported. Valid values are ASCII or BINARY.
   try {
     cout << "Throw error for invalid table format type in label file:" << endl;
     ImportPdsTable error(pdsTableDir + "invalidFormatType.lbl");
@@ -190,7 +334,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
   }
 
-  // 6) loadLabel(labFile, tabFile) - Number of columns in the COLUMNS label keyword does not match number of COLUMN objects found
+  // 6) loadLabel(labFile, tabFile) - Number of columns in the COLUMNS label keyword does not
+  //        match number of COLUMN objects found
   try {
     cout << "Print message when COLUMNS value not matching number of COLUMN objects:" << endl;
     ImportPdsTable error(pdsTableDir + "invalidColumnsValue.lbl");
@@ -214,7 +359,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Not sure how to cause this error
-  // 9) importFromBinaryPds() - Unable to open file containing PDS table.
+  // 9) fillTable() - Unable to open file containing PDS table.
   // try {
   //   cout << "Throw error :" << endl;
   //   ImportPdsTable error(pdsLabelFile, "nonExistantFile.dat");
@@ -317,6 +462,30 @@ int main(int argc, char *argv[]) {
     e.print();
     cout << endl;
   }
+
+  // 17) getColumnDescriptor(nth) - The nth index used to request the nth column is invalid.
+  // There are two if conditions to test:
+  //     This tests the nth >= columns() condition
+  try {
+    cout << "Throw error if index used to request a column description " << endl;
+    cout << "is greater than the number of columns in the table: " << endl;
+    myTestTable.getColumnDescriptorWrap(100);
+  }
+  catch (IException &e) {
+    e.print();
+    cout << endl;
+  }
+
+  //     This tests the nth < 0 condition
+  try {
+    cout << "Throw error if index used to request a column description is less than 0: " << endl;
+    myTestTable.getColumnDescriptorWrap(-1);
+  }
+  catch (IException &e) {
+    e.print();
+    cout << endl;
+  }
+
 
   //  Untested methods:
   cout << "cols = " << pdsLsbTable.columns()                 << endl;

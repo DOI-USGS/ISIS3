@@ -143,7 +143,9 @@ namespace Isis {
    *                           resolveParameter() to give appropriate error message to user
    *                           when using an invalid reserved parameter (e.g. -x).
    *   @history 2014-06-18 Ian Humphrey - Finished developing unitTest.cpp and reorganized. 
-   *                           Added lacking [at]throws documentation to UserInterface.cpp.                         
+   *                           Added lacking [at]throws documentation to UserInterface.cpp.
+   *   @history 2016-04-05 Jesse Mapel - Changed bad histroy file error message to reflect that
+   *                           the history file could be for a different application. Fixes #2366
    *                           
    */
 

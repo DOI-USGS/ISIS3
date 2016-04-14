@@ -6,11 +6,13 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(IMPORT) \
+	  $(TSTARGS) \
 	  from=$(INPUT)/$(INPUTFILE).lbl \
 	  to=$(OUTPUT)/$(INPUTFILE).cub \
 	  > /dev/null;
 	catlab from=$(OUTPUT)/$(INPUTFILE).cub > $(OUTPUT)/importLabel.pvl;
 	$(CALIBRATE) \
+	  $(TSTARGS) \
 	  from=$(OUTPUT)/$(INPUTFILE).cub \
 	  to=$(OUTPUT)/$(INPUTFILE).rad.cub \
 	  bitweighting=true \

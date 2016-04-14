@@ -143,12 +143,26 @@ namespace Isis {
    *                                            functions to ensure successful 
    *                                            inheritance between Process and its
    *                                            child classes.  Added virtual keyword
-   *                                            to destructor.  References #2215. 
+   *                                            to destructor.  References #2215.
+   *
+   * *                                            to destructor.  References #2215.
+   *   @history 2016-02-23 Tyler Wilson - Added VAXConversion(...) and IsVAXSpecial(...) routines
+   *                        for importing Galileo NIMS qubs which were originally saved in
+   *                        VAX format.  Also added SetSuffixOffset for reading suffix
+   *                        band data from NIMS cubes. References #2368.
+   *
    *
    */
 
+
+
+
+
   class ProcessImport : public Isis::Process {
     public:
+      enum VAXDataType {VAX_REAL, VAX_INT};
+      enum VAXSpecialPixel { VAX_MIN4,VAX_NULL4,VAX_LRS4,VAX_LIS4,VAX_HIS4,VAX_HRS4};
+
       ProcessImport();
       virtual ~ProcessImport();
       virtual void StartProcess();
@@ -205,6 +219,16 @@ namespace Isis {
       Isis::ByteOrder ByteOrder() {
         return p_byteOrder;
       }
+
+
+      //tjw:  VAX_REAL -> IEEE_REAL
+
+      bool IsVAXSpecial(unsigned int *vax,VAXSpecialPixel pix);
+      double VAXConversion(void *ibuf);
+      void SetSuffixOffset(int samples,int lines, int coreBands,int itemBytes);
+      void SetSuffixPixelType(const Isis::PixelType type);
+      void SetVAXConvert(const bool vax_convert);
+
 
       void SetFileHeaderBytes(const int bytes);
       void SetFileTrailerBytes(const int bytes);
@@ -280,10 +304,19 @@ namespace Isis {
     private:
       QString p_inFile;        //!< Input file name
       Isis::PixelType p_pixelType; //!< Pixel type of input data
+
+      //tjw
+      Isis::PixelType p_suffixPixelType; //!< Pixel type of suffix data (for Galileo NIMS cubes)
       int p_ns;                    //!< Number of samples
       int p_nl;                    //!< Number of lines
       int p_nb;                    //!< Number of bands
       Isis::ByteOrder p_byteOrder; //!< Byte order of data
+
+      //tjw
+      int p_suffixData;            //!< Number of bytes past the file header bytes
+                                    //!< where the suffix data bands are stored
+
+
       int p_fileHeaderBytes;       /**< The number of bytes of non-image data at
                                         the beginning of a file. This does not
                                         include any section headers such as band
@@ -317,13 +350,19 @@ namespace Isis {
       bool p_saveDataPost;         /**< Flag indicating whether to save the data 
                                         suffix or not */
       bool p_saveFileTrailer;      /**< Flag indicating whether to save the file 
-                                        trailer or not. */
+                                        trailer or not. */            
       char *p_fileHeader;                          //!< The file header
       std::vector<char *>p_dataHeader;             //!< The data header
       std::vector<char *>p_dataTrailer;            //!< The data trailer
       std::vector<std::vector<char *> >p_dataPre;  //!< The data prefix
       std::vector<std::vector<char *> >p_dataPost; //!< The data suffix
       char *p_fileTrailer;                         //!< The file trailer
+
+
+
+      //tjw
+
+      bool p_vax_convert;
 
       ProcessImport::Interleave p_organization; /**< The format of the input 
                                                      file. Possible values are 

@@ -6,29 +6,29 @@ APP4NAME = getsn
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APP1NAME) from= $(INPUT)/lna3819k.045 \
+	$(APP1NAME) $(TSTARGS) from= $(INPUT)/lna3819k.045 \
 	  to= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub > /dev/null
 
-	$(APP2NAME) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
+	$(APP2NAME) $(TSTARGS) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
 	  > /dev/null
 
-	$(APP3NAME) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
+	$(APP3NAME) $(TSTARGS) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
 	  to= $(OUTPUT)/lna3819k.045--finalOutput.pvl SAMPLE=2 LINE=2 ALLOWOUTSIDE=no \
 	  > /dev/null
 
-	$(APP3NAME) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
+	$(APP3NAME) $(TSTARGS) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
 	  to= $(OUTPUT)/lna3819k.045--finalOutput.pvl SAMPLE=254 LINE=2 ALLOWOUTSIDE=no \
 	  > /dev/null
 
-	$(APP3NAME) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
+	$(APP3NAME) $(TSTARGS) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
 	  to= $(OUTPUT)/lna3819k.045--finalOutput.pvl SAMPLE=254 LINE=254 ALLOWOUTSIDE=no \
 	  > /dev/null
 
-	$(APP3NAME) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
+	$(APP3NAME) $(TSTARGS) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
 	  to= $(OUTPUT)/lna3819k.045--finalOutput.pvl SAMPLE=2 LINE=254 ALLOWOUTSIDE=no \
 	  > /dev/null
 
-	$(APP3NAME) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
+	$(APP3NAME) $(TSTARGS) from= $(OUTPUT)/lna3819k.045--clem2isis-spiceinit.cub \
 	  to= $(OUTPUT)/lna3819k.045--finalOutput.pvl SAMPLE=128 LINE=128 ALLOWOUTSIDE=no \
 	  > /dev/null
 

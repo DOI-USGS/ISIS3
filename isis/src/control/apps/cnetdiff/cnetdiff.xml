@@ -29,6 +29,9 @@
       Added REPORT radio button allowing users to select the FULL option and get
       a complete PVL report of all differences between two networks.
     </change>
+    <change name="Jesse Mapel" date="2016-03-29">
+      Added missing "]" in results message.  Error messages are now complete sentences. Fixes #3871.
+    </change>
   </history>
 
   <category>

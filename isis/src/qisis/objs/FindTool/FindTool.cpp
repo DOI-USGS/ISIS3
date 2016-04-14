@@ -376,6 +376,13 @@ namespace Isis {
     if (p_tabWidget->tabText( p_tabWidget->currentIndex() ) == "Ground") {
       p_lat = p_groundTab->p_latLineEdit->text().toDouble();
       p_lon = p_groundTab->p_lonLineEdit->text().toDouble();
+      if (p_lat > 90 || p_lat < -90) {
+        QString mess = QString::number(p_lat) + " is an invalid latitude value. "
+                         + "Please enter a latitude between -90 and 90.";
+        QMessageBox::warning((QWidget *)parent(), "Warning", mess);
+        p_lat = DBL_MAX;
+        p_lon = DBL_MAX;
+      }
     }
     else if (p_tabWidget->tabText( p_tabWidget->currentIndex() ) == "Image") {
       p_line = p_imageTab->p_lineLineEdit->text().toDouble();
@@ -609,41 +616,50 @@ namespace Isis {
    *         distance will be in a unit other than pixels.
    */
   Distance FindTool::distancePerPixel(MdiCubeViewport *viewport,
-                                      double lat, double lon) const {
+                                      double lat, double lon) {
     UniversalGroundMap *groundMap = viewport->universalGroundMap();
     Distance viewportResolution;
 
-    if ( groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&
-         lat != DBL_MAX && lon != DBL_MAX &&
-         groundMap->SetUniversalGround(lat, lon) ) {
-      // Distance/pixel
-      viewportResolution = Distance(groundMap->Resolution(), Distance::Meters);
-      double samp = groundMap->Sample();
-      double line = groundMap->Line();
+    try {
+      if ( groundMap && !IsSpecial(lat) && !IsSpecial(lon) &&
+           lat != DBL_MAX && lon != DBL_MAX &&
+           groundMap->SetUniversalGround(lat, lon) ) {
+        // Distance/pixel
+        viewportResolution = Distance(groundMap->Resolution(), Distance::Meters);
+        double samp = groundMap->Sample();
+        double line = groundMap->Line();
 
-      if ( groundMap->SetImage(samp - 0.5, line - 0.5) ) {
-        double lat1 = groundMap->UniversalLatitude();
-        double lon1 = groundMap->UniversalLongitude();
+        if ( groundMap->SetImage(samp - 0.5, line - 0.5) ) {
+          double lat1 = groundMap->UniversalLatitude();
+          double lon1 = groundMap->UniversalLongitude();
 
-        if ( groundMap->SetImage(samp + 0.5, line + 0.5) ) {
-          double lat2 = groundMap->UniversalLatitude();
-          double lon2 = groundMap->UniversalLongitude();
+          if ( groundMap->SetImage(samp + 0.5, line + 0.5) ) {
+            double lat2 = groundMap->UniversalLatitude();
+            double lon2 = groundMap->UniversalLongitude();
 
-          double radius = groundMap->HasProjection()?
-              groundMap->Projection()->LocalRadius() :
-              groundMap->Camera()->LocalRadius().meters();
+            double radius = groundMap->HasProjection()?
+                groundMap->Projection()->LocalRadius() :
+                groundMap->Camera()->LocalRadius().meters();
 
-          SurfacePoint point1( Latitude(lat1, Angle::Degrees),
-                               Longitude(lon1, Angle::Degrees),
-                               Distance(radius, Distance::Meters) );
+            SurfacePoint point1( Latitude(lat1, Angle::Degrees),
+                                 Longitude(lon1, Angle::Degrees),
+                                 Distance(radius, Distance::Meters) );
 
-          SurfacePoint point2( Latitude(lat2, Angle::Degrees),
-                               Longitude(lon2, Angle::Degrees),
-                               Distance(radius, Distance::Meters) );
+            SurfacePoint point2( Latitude(lat2, Angle::Degrees),
+                                 Longitude(lon2, Angle::Degrees),
+                                 Distance(radius, Distance::Meters) );
 
-          viewportResolution = point1.GetDistanceToPoint(point2);
+            viewportResolution = point1.GetDistanceToPoint(point2);
+          }
         }
       }
+    }
+    catch (IException &e) {
+      p_samp = DBL_MAX;
+      p_line = DBL_MAX;
+      p_lat = DBL_MAX;
+      p_lon = DBL_MAX;
+      QMessageBox::warning((QWidget *)parent(), "Warning", e.toString());
     }
 
     return viewportResolution;

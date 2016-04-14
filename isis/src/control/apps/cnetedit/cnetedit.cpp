@@ -351,6 +351,43 @@ void IsisMain() {
  *
  * @return Whether or not the point should be deleted
  */
+
+bool shouldDelete(ControlPoint *point){
+
+    if(!deleteIgnored)
+        return false;
+
+
+    else{
+
+        if ( point->GetNumMeasures() == 0 && !preservePoints)
+            return true;
+
+
+        if (point->GetType() != ControlPoint::Fixed && point->GetNumMeasures()< 2 ){
+
+            if(preservePoints  && point->GetNumMeasures() == 1)
+                return false;
+
+            return true;  //deleteIgnore = TRUE or else we would not be here
+        }
+
+
+        if( point->IsIgnored() )
+            return true;
+
+        return false;
+
+    }
+
+
+}
+
+
+
+
+
+/*
 bool shouldDelete(ControlPoint *point) {
   // If the point only has one measure, then unless it's a fixed point or the
   // user wishes to preserve such points, it should be deleted. As a side
@@ -372,7 +409,7 @@ bool shouldDelete(ControlPoint *point) {
   // Otherwise, the point looks good
   return false;
 }
-
+*/
 
 /**
  * Set the point at the given index in the control network to ignored, and add
@@ -1027,4 +1064,5 @@ void EditDefFile(void) {
 
   GuiEditFile::EditFile(ui, sDefFile);
 }
+
 

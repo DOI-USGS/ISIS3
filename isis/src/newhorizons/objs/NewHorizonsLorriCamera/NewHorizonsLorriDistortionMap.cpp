@@ -71,8 +71,19 @@ namespace Isis {
     // r is the distance between the principal point and the measured point on the image
     double rr = x * x + y * y;
 
-    //  dr is the radial distortion contribution
-    double dr = 1.0 + rr * p_e2 + y * p_e5 + x * p_e6;
+    // dr is the radial distortion contribution
+    // The equation below was changed from all + to all - to adjust the distortion model to fit
+    // the definition of the LORRI distortion. The original version with +, was defined from Bill
+    // Owen's paper with an assumption the xs and ys in the equations were distorted x,ys. After
+    // meeting with the LORRI team +s were changed to -s to account for the x,ys actually being
+    // undistorted focal plane positions. That is, the undistorted focal plane positions are
+    // closer to the center of the image than the distorted focal plane positions.
+    // NOTE: The discussions showed the Ky and e5 values needed to be negated. The e5 value has
+    // now been negated in the LORRI IK, and the y is now negated in the equation below.
+    // NOTE: The Y and Line values can not be negated in the transY and transL affines because
+    // this would cause the p_xxxxx class member variables to be in a flipped (top to bottom) 
+    // coordinate system relative to the SPICE defined focal plane coordinate system.
+    double dr = 1.0 - rr * p_e2 - y * p_e5 - x * p_e6;
 
     // Image coordinates corrected for distortion
     p_undistortedFocalPlaneX = x * dr;
@@ -130,12 +141,13 @@ namespace Isis {
       ydistortion = yt * rr * p_e2 + yy * p_e5 + xy * p_e6;
 
       // Updated image coordinates
-      xt = ux - xdistortion;
-      yt = uy - ydistortion;
+      // Changed to + instead of -. See comment in SetFocalPlane above
+      xt = ux + xdistortion;
+      yt = uy + ydistortion;
 
       // Distorted point corrected for principal point
-      xdistorted = xt; // No PP for Lorrie
-      ydistorted = yt; // No PP for Lorrie
+      xdistorted = xt; // No PP for LORRI
+      ydistorted = yt; // No PP for LORRI
 
       // Check for convergence
       if ((fabs(xt - xprevious) <= tolerance) && (fabs(yt - yprevious) <= tolerance)) {

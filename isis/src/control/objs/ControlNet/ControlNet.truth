@@ -360,3 +360,10 @@ Testing MinimumSpanningTree()
     Included Measures = 0
     Excluded Measures = 1
       m9 (EPSILON -> p5, residual = 1.41421)
+
+Testing take() functionality to take owernship of the points in a ControlNet:
+Original control net number of points: 1
+Number of points taken out: 1
+Now there should be zero points in the original control net. There are: 0
+And zero pointIDs in the original control net. There are: 0
+And zero cubeGraphNodes in the original control net. There are: 0

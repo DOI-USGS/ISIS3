@@ -1,0 +1,59 @@
+astrovm1.wr.usgs.gov[101]: ./runit.csh 
+
+Creating strategies...
+Finished creating 14 strategies...
+
+Running DatabaseReader::MDISSelectRegionOct2014 (TimeIn:  02:10:24.658)
+Description: Strategy::MDISSelectRegionOct2014 is running a DatabaseReader algorithm.
+248586 of 0 processed in DatabaseReader::MDISSelectRegionOct2014 (TimeOut: 02:15:26.956)
+ElapsedTime(s): 302
+
+Running DatabaseReader::MDISSelectRegionMay2015 (TimeIn:  02:15:26.960)
+Description: Strategy::MDISSelectRegionMay2015 is running a DatabaseReader algorithm.
+19183 of 0 processed in DatabaseReader::MDISSelectRegionMay2015 (TimeOut: 02:15:50.845)
+ElapsedTime(s): 23
+
+Running IsNumeric::FindBadOnes (TimeIn:  02:15:50.846)
+Description: Identify images with no values center pixel geometry
+267474 of 267769 processed in IsNumeric::FindBadOnes (TimeOut: 02:15:51.627)
+ElapsedTime(s): 0
+
+Running ResourceManager::DeleteBadOnes (TimeIn:  02:15:51.627)
+Description: Delete resources with bad values in required keywords
+295 of 0 processed in ResourceManager::DeleteBadOnes (TimeOut: 02:15:51.657)
+ElapsedTime(s): 0
+
+Running Limit::SelectRegion (TimeIn:  02:15:51.657)
+Description: Find all MDIS images with center image geometry in the defined region
+5 of 267474 processed in Limit::SelectRegion (TimeOut: 02:16:05.768)
+ElapsedTime(s): 14
+
+Running RunCommand::MakeOutputDirectory (TimeIn:  02:16:05.768)
+Description: Ensure output directories exists
+Running Mkdir1 PRE command: mkdir -p /work/projects/messenger/Stereo/ImageOverlaps/Equi015S035ED10
+Running Mkdir2 PRE command: mkdir -p /work/projects/messenger/Stereo/ImageOverlaps/Regions
+2 of 0 processed in RunCommand::MakeOutputDirectory (TimeOut: 02:16:06.420)
+ElapsedTime(s): 0
+
+Running CsvWriter::WriteRegionImages (TimeIn:  02:16:06.420)
+Description: Write images that are in the defined region to a file
+5 of 5 processed in CsvWriter::WriteRegionImages (TimeOut: 02:16:06.697)
+ElapsedTime(s): 0
+
+Running GisOverlap::ImageOverlap (TimeIn:  02:16:06.697)
+Description: Find all overlaps images in specfied region
+362 of 362 processed in NumericalSort::SortByOverLapRatio
+362 of 362 processed in CsvWriter::WriteOverlapPair
+345 of 345 processed in NumericalSort::SortByOverLapRatio
+345 of 345 processed in CsvWriter::WriteOverlapPair
+327 of 327 processed in NumericalSort::SortByOverLapRatio
+327 of 327 processed in CsvWriter::WriteOverlapPair
+303 of 303 processed in NumericalSort::SortByOverLapRatio
+303 of 303 processed in CsvWriter::WriteOverlapPair
+298 of 298 processed in NumericalSort::SortByOverLapRatio
+298 of 298 processed in CsvWriter::WriteOverlapPair
+5 of 5 processed in GisOverlap::ImageOverlap (TimeOut: 02:20:41.796)
+ElapsedTime(s): 275
+
+Session complete in 00:10:17.146 of elapsed time
+
