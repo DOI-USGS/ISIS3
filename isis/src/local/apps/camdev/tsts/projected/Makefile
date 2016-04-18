@@ -1,7 +1,7 @@
 APPNAME = camdev
 
 # 1.52587890625e-05
-camdevTruth.cub.TOLERANCE = .0000153
+camdev_projected_bands.cub.TOLERANCE = .0000153
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -17,4 +17,5 @@ commands:
 	  distortedfocalplane=yes \
 	  undistortedfocalplane=yes \
 	  ephemeristime=yes \
-	  utc=yes> /dev/null;
+	  utc=yes > /dev/null;
+	  $(RM) print.prt > /dev/null;

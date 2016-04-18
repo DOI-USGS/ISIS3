@@ -453,7 +453,7 @@ void camdev(Buffer &out) {
         double pe360Lon, pw360Lon;
         if (positiveEast360Longitude) {
           if(noCamera) {
-              pe360Lon = proj->UniversalLongitude();
+            pe360Lon = proj->UniversalLongitude();
           }
           else {
             pe360Lon = cam->UniversalLongitude();
@@ -462,6 +462,7 @@ void camdev(Buffer &out) {
           index += 64 * 64;
         }
         if (!noCamera) {
+          pe360Lon = cam->UniversalLongitude();
           pw360Lon = TProjection::ToPositiveWest(pe360Lon, 360);
           if (positiveEast180Longitude) {
             out[index] = TProjection::To180Domain(pe360Lon);

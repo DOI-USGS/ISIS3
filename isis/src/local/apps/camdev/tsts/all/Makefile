@@ -1,7 +1,7 @@
 APPNAME = camdev
 
 # 1.52587890625e-05
-camdevTruth.cub.TOLERANCE = .0000153
+all_camdev_bands.cub.TOLERANCE = .0000153
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -49,4 +49,5 @@ commands:
 	  localsolartime=yes \
 	  solarlongitude=yes \
 	  morphology=yes \
-	  albedo=yes> /dev/null; 
+	  albedo=yes > /dev/null; 
+	  $(RM) print.prt > /dev/null;
