@@ -41,9 +41,6 @@
 #include "PvlTokenizer.h"
 #include "SpecialPixel.h"
 
-
-//tjw
-//VAX Conversion
 #define EXPONENT_MASK ((char) 0x7F)
 
 
@@ -86,7 +83,6 @@ namespace Isis {
     p_saveFileTrailer = false;
     p_vax_convert = false;
 
-
     p_fileHeader = NULL;
     p_fileTrailer = NULL;
   }
@@ -123,9 +119,6 @@ namespace Isis {
     }
   }
 
-//tjw:
-
-
 
   /**
    * Determines if the VAX encoded pixel value is special or not
@@ -136,83 +129,52 @@ namespace Isis {
    *         type matches that pointed to by vax.  Returns false
    *         otherwise.
    */
+  bool ProcessImport::IsVAXSpecial(unsigned int *vax, VAXSpecialPixel pix) {
 
+    unsigned int VAX_NULL = 0xFFFFFFFF;
+    unsigned int VAX_MIN  = 0xFFEFFFFF;
+    unsigned int VAX_LRS  = 0xFFFEFFFF;
+    unsigned int VAX_LIS  = 0xFFFDFFFF;
+    unsigned int VAX_HIS  = 0xFFFCFFFF;
+    unsigned int VAX_HRS  = 0xFFFBFFFF;
+    int n;
 
-  bool ProcessImport::IsVAXSpecial(unsigned int *vax, VAXSpecialPixel pix){
+    unsigned int x;
+    memcpy(&x, vax, sizeof(unsigned int));
 
-
-
-     unsigned int VAX_NULL = 0xFFFFFFFF;
-     unsigned int VAX_MIN  = 0xFFEFFFFF;
-     unsigned int VAX_LRS  = 0xFFFEFFFF;
-     unsigned int VAX_LIS  = 0xFFFDFFFF;
-     unsigned int VAX_HIS  = 0xFFFCFFFF;
-     unsigned int VAX_HRS  = 0xFFFBFFFF;
-     int n;
-
-     unsigned int x;
-     memcpy(&x,vax,sizeof(unsigned int));
-
-     switch(pix) {
-
-        case VAX_NULL4:
-            n=memcmp(&VAX_NULL,&x,sizeof(unsigned int));
-            if (n==0){    
-                return true;
-
-      }
+    switch(pix) {
+      case VAX_NULL4:
+        n = memcmp(&VAX_NULL, &x, sizeof(unsigned int));
+        if (n == 0) return true;
         break;
-
-        case VAX_LRS4:
-            n=memcmp(&VAX_LRS,&x,sizeof(unsigned int));
-            if (n==0){
-
-                return true;
-      }
+      case VAX_LRS4:
+        n = memcmp(&VAX_LRS, &x, sizeof(unsigned int));
+        if (n == 0) return true;
         break;
-
-        case VAX_LIS4:
-            n=memcmp(&VAX_LIS,&x,sizeof(unsigned int));
-            if (n==0) {
-
-                return true;
-      }
+      case VAX_LIS4:
+        n = memcmp(&VAX_LIS, &x, sizeof(unsigned int));
+        if (n == 0) return true;
         break;
-
-        case VAX_HIS4:
-            n=memcmp(&VAX_HIS,&x,sizeof(unsigned int));
-            if (n==0){
-
-                return true;
-      }
+      case VAX_HIS4:
+        n = memcmp(&VAX_HIS, &x, sizeof(unsigned int));
+        if (n == 0) return true;
         break;
-
-        case VAX_HRS4:
-            n=memcmp(&VAX_HRS,&x,sizeof(unsigned int));
-            if (n==0){
-
-              return true;
-      }
+      case VAX_HRS4:
+        n = memcmp(&VAX_HRS, &x, sizeof(unsigned int));
+        if (n == 0) return true;
         break;
-
-        case VAX_MIN4:
-            n=memcmp(&VAX_MIN,&x,sizeof(unsigned int));
-        if (n==0){
-
-            return true;
-        }
+      case VAX_MIN4:
+        n = memcmp(&VAX_MIN, &x, sizeof(unsigned int));
+        if (n == 0) return true;
         break;
-
-        default:
-            return false;
-
+      default:
+        return false;
       }
 
     return false;
 
  }
 
-  //tjw
 
   /**
    * Conversion routine which translates VAX_REAL to IEEE_REAL
@@ -220,95 +182,89 @@ namespace Isis {
    * @param ibuf Memory buffer of input data to be converted
    * @return double the converted value
    */
-
   double ProcessImport::VAXConversion(void *ibuf) {
 
+    float result;
+    double dresult;
+    bool swap_bytes = false;
+    bool swap_words = true;
+    int exp_adjust = -1;
+    int exp_mask = 0;
+    int exp_word = 1;
+    int exp_byte;
+    Isis::ByteOrder in_order = p_byteOrder;
+    Isis::ByteOrder out_order;
 
+    unsigned int *oli, *ili;   //4-byte buffer io ptrs
+    unsigned short *osi;       //2-byte buffer io ptrs
+    char *oci;                 //1-byte buffer io ptrs
 
-       float result;
-       double dresult;
-       bool swap_bytes = false;
-       bool swap_words = true;
-       int exp_adjust = -1;
-       int exp_mask = 0;
-       int exp_word = 1;
-       int exp_byte;
-       Isis::ByteOrder in_order = p_byteOrder;
-       Isis::ByteOrder out_order;
+    if ( Isis::IsLsb() ) {
+      exp_byte  = 1;
+      out_order = Isis::Lsb;
+    }
+    else {
+      exp_byte = 0;
+      out_order = Isis::Msb;
+    }
 
+    if (in_order != out_order) {
+      swap_bytes =true;
+    }
 
-       unsigned int *oli, *ili;   //4-byte buffer io ptrs
-       unsigned short *osi;       //2-byte buffer io ptrs
-       char *oci;                 //1-byte buffer io ptrs
+    oli = (unsigned int * ) ibuf;
+    ili = (unsigned int * ) ibuf;
 
-       if ( Isis::IsLsb() ) {
+    if (IsVAXSpecial(oli, ProcessImport::VAX_NULL4) ) {
+      return Isis::NULL8;
+    }
 
-           exp_byte  = 1;
-           out_order = Isis::Lsb;
+    if (IsVAXSpecial(oli, ProcessImport::VAX_LIS4) ) {
+      return Isis::LOW_INSTR_SAT8;
+    }
 
-       }
+    if (IsVAXSpecial(oli, ProcessImport::VAX_LRS4) ) {
+      return Isis::LOW_REPR_SAT8;
+    }
 
-       //Byte order = MSB
-       else {
-           exp_byte = 0;
-           out_order = Isis::Msb;
-       }
+    if (IsVAXSpecial(oli, ProcessImport::VAX_HIS4) ) {
+      return Isis::HIGH_INSTR_SAT8;
+    }
 
-       if (in_order != out_order) {
-           swap_bytes =true;
+    if (IsVAXSpecial(oli, ProcessImport::VAX_HRS4) ) {
+      return Isis::HIGH_REPR_SAT8;
+    }
 
-       }
+    if (IsVAXSpecial(oli, ProcessImport::VAX_MIN4) ) {
+      return Isis::VALID_MIN8;
+    }
 
-       oli = (unsigned int * ) ibuf;
-       ili = (unsigned int * ) ibuf;
+    //test for word swapping
+    if (swap_words) {
+      *oli = (*ili <<16) | (*ili >> 16);
+    }
 
-       if (IsVAXSpecial(oli,ProcessImport::VAX_NULL4) )
-         return Isis::NULL8;
+    osi = (unsigned short* ) oli;
 
-       if (IsVAXSpecial(oli,ProcessImport::VAX_LIS4) )
-         return Isis::LOW_INSTR_SAT8;
+    //test for byte swapping
 
-       if (IsVAXSpecial(oli,ProcessImport::VAX_LRS4) )
-         return Isis::LOW_REPR_SAT8;
+    if (swap_bytes) {
+      osi[0] = (osi[0] >> 8 ) | (osi[0] << 8);
+      osi[1] = (osi[1] >> 8 ) | (osi[1] << 8);
+    }
 
-       if (IsVAXSpecial(oli,ProcessImport::VAX_HIS4) )
-         return Isis::HIGH_INSTR_SAT8;
+    //Isolate the exponent and do the conversion
+    oci = (char *) &osi[exp_word];
 
-       if (IsVAXSpecial(oli,ProcessImport::VAX_HRS4) )
-         return Isis::HIGH_REPR_SAT8;
+    if ( (oci[exp_byte] & EXPONENT_MASK) != exp_mask) {
+      oci[exp_byte] += exp_adjust;
+    }
 
-       if (IsVAXSpecial(oli,ProcessImport::VAX_MIN4) )
-         return Isis::VALID_MIN8;
-
-       //test for word swapping
-      if (swap_words) {
-
-          *oli = (*ili <<16) | (*ili >> 16);
-      }
-
-       osi = (unsigned short* ) oli;
-
-       //test for byte swapping
-
-       if (swap_bytes) {
-           osi[0] = (osi[0] >> 8 ) | (osi[0] << 8);
-           osi[1] = (osi[1] >> 8 ) | (osi[1] << 8);
-       }
-
-       //Isolate the exponent and do the conversion
-       oci = (char *) &osi[exp_word];
-
-       if ( (oci[exp_byte] & EXPONENT_MASK) != exp_mask)
-           oci[exp_byte] += exp_adjust;
-
-       result = *(float *)oli;
-       dresult = static_cast<double>(result);
-       return dresult;
+    result = *(float *)oli;
+    dresult = static_cast<double>(result);
+    return dresult;
 
    }
-
-
-
 
 
   /**
@@ -322,7 +278,8 @@ namespace Isis {
   void ProcessImport::SetPixelType(const Isis::PixelType type) {
 
     if ((type == Isis::Double) || (type == Isis::Real) || (type == Isis::SignedWord) ||
-        (type == Isis::UnsignedWord) || (type == Isis::UnsignedByte)) {
+        (type == Isis::UnsignedWord) || (type == Isis::UnsignedByte) ||
+        (type == Isis::SignedInteger)) {
       p_pixelType = type;
     }
     else {
@@ -330,7 +287,7 @@ namespace Isis {
                    Isis::PixelTypeName(type) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
   void ProcessImport::SetSuffixPixelType(const Isis::PixelType type) {
 
@@ -343,7 +300,7 @@ namespace Isis {
                    Isis::PixelTypeName(type) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
   /**
@@ -360,20 +317,16 @@ namespace Isis {
    */
   void ProcessImport::SetDimensions(const int ns, const int nl, const int nb) {
     if (ns > 0 && nl > 0 && nb > 0) {
-
-
       p_ns = ns;
       p_nl = nl;
       p_nb = nb;
-
-
     }
     else {
       QString msg = "Illegal dimension [" + toString(ns) + ", " +
                    toString(nl) + ", " + toString(nb) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
   /**
@@ -384,7 +337,7 @@ namespace Isis {
    */
   void ProcessImport::SetByteOrder(const Isis::ByteOrder order) {
     p_byteOrder = order;
-  };
+  }
 
 
   /**
@@ -410,13 +363,12 @@ namespace Isis {
   void ProcessImport::SetFileHeaderBytes(const int bytes) {
     if (bytes >= 0) {
       p_fileHeaderBytes = bytes;
-
     }
     else {
       QString msg = "Illegal file header size [" + toString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
   /**
@@ -446,7 +398,7 @@ namespace Isis {
       QString msg = "Illegal file trailer size [" + toString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
   /**
@@ -469,26 +421,18 @@ namespace Isis {
    */
   void ProcessImport::SetDataHeaderBytes(const int bytes) {
     if (bytes >= 0) {
-
       p_dataHeaderBytes = bytes;
-
     }
     else {
       QString msg = "Illegal data header size [" + toString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
-  void ProcessImport::SetSuffixOffset(int samples,int lines, int coreBands,int itemBytes){
-
-
-        p_suffixData = samples*lines*coreBands*itemBytes;
-
-
-
-
-  };
+  void ProcessImport::SetSuffixOffset(int samples, int lines, int coreBands, int itemBytes) {
+    p_suffixData = samples*lines*coreBands*itemBytes;
+  }
 
 
   /**
@@ -519,7 +463,7 @@ namespace Isis {
       QString msg = "Illegal data trailer size [" + toString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
   /**
@@ -544,13 +488,12 @@ namespace Isis {
 
     if (bytes >= 0) {
       p_dataPreBytes = bytes;
-
     }
     else {
       QString msg = "Illegal data prefix size [" + toString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
   /**
@@ -575,13 +518,12 @@ namespace Isis {
 
     if (bytes >= 0) {
       p_dataPostBytes = bytes;
-
     }
     else {
       QString msg = "Illegal data suffix size [" + toString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-  };
+  }
 
 
   /**
@@ -608,7 +550,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_saveFileHeader = true;
-  };
+  }
 
 
   /**
@@ -636,7 +578,7 @@ namespace Isis {
                                 _FILEINFO_);
     }
     p_saveFileTrailer = true;
-  };
+  }
 
 
   /**
@@ -665,7 +607,7 @@ namespace Isis {
                                 _FILEINFO_);
     }
     p_saveDataHeader = true;
-  };
+  }
 
 
   /**
@@ -694,7 +636,7 @@ namespace Isis {
                                 _FILEINFO_);
     }
     p_saveDataTrailer = true;
-  };
+  }
 
 
   /**
@@ -722,7 +664,7 @@ namespace Isis {
                                 _FILEINFO_);
     }
     p_saveDataPre = true;
-  };
+  }
 
 
   /**
@@ -751,7 +693,7 @@ namespace Isis {
                                 _FILEINFO_);
     }
     p_saveDataPost = true;
-  };
+  }
 
 
   /**
@@ -828,7 +770,7 @@ namespace Isis {
     }
     QString msg = "File header was not saved.  Use SaveFileHeader().";
     throw IException(IException::Programmer, msg, _FILEINFO_);
-  };
+  }
 
 
   /**
@@ -854,7 +796,7 @@ namespace Isis {
     }
     QString msg = "File trailer was not saved.  Use SaveFileTrailer()";
     throw IException(IException::Programmer, msg, _FILEINFO_);
-  };
+  }
 
 
   /**
@@ -882,7 +824,7 @@ namespace Isis {
     }
     QString msg = "Data header was not saved.  Use SaveDataHeader()";
     throw IException(IException::Programmer, msg, _FILEINFO_);
-  };
+  }
 
 
   /**
@@ -910,7 +852,7 @@ namespace Isis {
     }
     QString msg = "Data trailer was not saved.  Use SaveDataTrailer()";
     throw IException(IException::Programmer, msg, _FILEINFO_);
-  };
+  }
 
 
   /**
@@ -938,7 +880,7 @@ namespace Isis {
     }
     QString msg = "Data prefix was not saved.  Use SaveDataPrefix()";
     throw IException(IException::Programmer, msg, _FILEINFO_);
-  };
+  }
 
 
   /**
@@ -966,7 +908,7 @@ namespace Isis {
     }
     QString msg = "Data suffix was not saved.  Use SaveDataSuffix()";
     throw IException(IException::Programmer, msg, _FILEINFO_);
-  };
+  }
 
 
   /**
@@ -978,11 +920,9 @@ namespace Isis {
    */
   void ProcessImport::SetOrganization(const ProcessImport::Interleave org) {
     p_organization = org;
+  }
 
-  };
 
-
-  //tjw:
   /**
    * Sets the VAX flag of the input cube.  If true, then the core pixel type of
    * the input cube is VAX, and VAX conversion routines need to be run to
@@ -990,15 +930,9 @@ namespace Isis {
    *
    * @param vax_convert Flag indicating whether or not to run VAX conersion methods
    */
-
-
-
-  void ProcessImport::SetVAXConvert(const bool vax_convert){
-
-
-      p_vax_convert = vax_convert;
-
-  };
+  void ProcessImport::SetVAXConvert(const bool vax_convert) {
+    p_vax_convert = vax_convert;
+  }
 
 
   /**
@@ -1007,7 +941,7 @@ namespace Isis {
    */
   ProcessImport::Interleave ProcessImport::Organization() const {
     return p_organization;
-  };
+  }
 
 
   /**
@@ -1018,7 +952,7 @@ namespace Isis {
   void ProcessImport::SetBase(const double base) {
     p_base.clear();
     p_base.push_back(base);
-  };
+  }
 
 
   /**
@@ -1028,7 +962,7 @@ namespace Isis {
    */
   void ProcessImport::SetBase(const std::vector<double> base) {
     p_base = base;
-  };
+  }
 
 
   /**
@@ -1039,7 +973,7 @@ namespace Isis {
   void ProcessImport::SetMultiplier(const double mult) {
     p_mult.clear();
     p_mult.push_back(mult);
-  };
+  }
 
 
   /**
@@ -1049,7 +983,7 @@ namespace Isis {
    */
   void ProcessImport::SetMultiplier(const std::vector<double> mult) {
     p_mult = mult;
-  };
+  }
 
 
   /**
@@ -1078,7 +1012,7 @@ namespace Isis {
     SetLIS(lis, lis);
     SetHRS(hrs, hrs);
     SetHIS(his, his);
-  };
+  }
 
 
   /**
@@ -1288,6 +1222,10 @@ namespace Isis {
         min = Isis::VALID_MIN4;
         max = Isis::VALID_MAX4;
       }
+      else if (p_pixelType == Isis::SignedInteger) {
+        min = Isis::IVALID_MIN4;
+        max = Isis::IVALID_MAX4;
+      }
       else if (p_pixelType == Isis::SignedWord) {
         min = Isis::VALID_MIN2 * p_mult[0] + p_base[0];
         max = Isis::VALID_MAX2 * p_mult[0] + p_base[0];
@@ -1313,7 +1251,8 @@ namespace Isis {
       if ((p_base.size() > 1) || (p_mult.size() > 1)) {
         att.setPixelType(Isis::Real);
       }
-      else if (p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::Double) {
+      else if (p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::Double ||
+               p_pixelType == Isis::SignedInteger) {
         att.setPixelType(Isis::Real);
       }
       else {
@@ -1370,8 +1309,8 @@ namespace Isis {
    * Process the input file and send data to method
    *
    * @param funct Method that accepts Isis::Buffer as an input
-  *              parameter, processes the image, and has no
-  *              return value.
+   *              parameter, processes the image, and has no
+   *              return value.
    * @throws Isis::iException::Message "File is not a supported
    *             organization."
    */
@@ -1407,9 +1346,7 @@ namespace Isis {
    *             Position[]. Byte count[]"
    */
   void ProcessImport::ProcessBsq(void funct(Isis::Buffer &out)) {
-
-
-   // Figure out the number of bytes to read for a single line
+    // Figure out the number of bytes to read for a single line
     int readBytes = Isis::SizeOf(p_pixelType);
     readBytes = readBytes * p_ns;
     char *in = new char [readBytes];
@@ -1431,13 +1368,10 @@ namespace Isis {
 
     // Handle the file header
     streampos pos = fin.tellg();
-    //tjw
-
-
     if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
       fin.read(p_fileHeader, p_fileHeaderBytes);
-      fin.seekg(p_suffixData+p_fileHeaderBytes,ios_base::beg);
+      fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
     }
     else {
         fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
@@ -1479,19 +1413,14 @@ namespace Isis {
         mult = p_mult[0];
       }
 
-
       // Handle any data headers (e.g., the data at the beginning of each band)
       pos = fin.tellg();
       if (p_saveDataHeader) {
         p_dataHeader.push_back(new char[p_dataHeaderBytes]);
         fin.read(p_dataHeader.back(), p_dataHeaderBytes);
-
       }
       else {
-        //cout << p_suffixData << endl;
         fin.seekg(p_dataHeaderBytes, ios_base::cur);
-
-
        }
 
       // Check the last io
@@ -1526,7 +1455,6 @@ namespace Isis {
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
-
         // Get a line of data from the input file
         pos = fin.tellg();
         fin.read(in, readBytes);
@@ -1542,36 +1470,33 @@ namespace Isis {
         for(int samp = 0; samp < p_ns; samp++) {
           switch(p_pixelType) {
             case Isis::UnsignedByte:
-              //cout << "UnsignedByte" << endl;
               (*out)[samp] = (double)((unsigned char *)in)[samp];
               break;
             case Isis::UnsignedWord:
-              //cout << "Unsigned word."<< endl;
               (*out)[samp] =
                 (double)swapper.UnsignedShortInt((unsigned short int *)in+samp);
               break;
             case Isis::SignedWord:
-            //cout << "Signed Word." << endl;
               (*out)[samp] = (double)swapper.ShortInt((short int *)in+samp);
               break;
+            case Isis::SignedInteger:
+              (*out)[samp] = (double)swapper.Int((int *)in+samp);
+              break;
             case Isis::Real:
-              //tjw:
-              if(p_vax_convert)
+              if(p_vax_convert) {
                 (*out)[samp]= VAXConversion( (float *)in+samp );
-              else
+              }
+              else {
                 (*out)[samp] = (double)swapper.Float((float *)in+samp);
-
+              }
               break;
             case Isis::Double:
               //cout << "Double"  << endl;
               (*out)[samp] = (double)swapper.Double((double *)in+samp);
               break;
-
-
             default:
               break;
           }
-
 
           (*out)[samp] = TestPixel((*out)[samp]);
 
@@ -1671,10 +1596,6 @@ namespace Isis {
   }
 
 
-
-
-
-
   /**
    * Function to process files stored as Band Interleaved by Line
    *
@@ -1710,29 +1631,14 @@ namespace Isis {
     // Handle the file header
     streampos pos = fin.tellg();
 
-
-
     if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
       fin.read(p_fileHeader, p_fileHeaderBytes);
-      fin.seekg(p_suffixData+p_fileHeaderBytes,ios_base::beg);
+      fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
     }
     else {
         fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-        //fin.seekg(p_fileHeaderBytes, ios_base::beg);
     }
-
-
-#if 0
-    if (p_saveFileHeader) {
-      p_fileHeader = new char[p_fileHeaderBytes];
-      fin.read(p_fileHeader, p_fileHeaderBytes);
-    }
-    else {
-      fin.seekg(p_fileHeaderBytes, ios_base::beg);
-    }
-#endif
-
 
     // Check the last io
     if (!fin.good()) {
@@ -1828,12 +1734,16 @@ namespace Isis {
             case Isis::SignedWord:
               (*out)[samp] = (double)swapper.ShortInt((short int *)in+samp);
               break;
+            case Isis::SignedInteger:
+              (*out)[samp] = (double)swapper.Int((int *)in+samp);
+              break;
             case Isis::Real:
-              //tjw:
-              if(p_vax_convert)
+              if(p_vax_convert) {
                 (*out)[samp]= VAXConversion( (float *)in+samp );
-              else
+              }
+              else {
                 (*out)[samp] = (double)swapper.Float((float *)in+samp);
+              }
               break;
             case Isis::Double:
               (*out)[samp] = (double)swapper.Double((double *)in+samp);
@@ -1878,7 +1788,6 @@ namespace Isis {
                        toString(p_dataPreBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
-
 
         // Save off the prefix bytes vector
         if (p_saveDataPre) {
@@ -1927,7 +1836,6 @@ namespace Isis {
     // Close the file and clean up
     fin.close();
     delete [] in;
-
   }
 
 
@@ -1942,7 +1850,6 @@ namespace Isis {
    *             Position[]. Byte count[]"
    */
   void ProcessImport::ProcessBip(void funct(Isis::Buffer &out)) {
-
 
     // Figure out the number of bytes to read for a single line
     int readBytes = Isis::SizeOf(p_pixelType);
@@ -1965,32 +1872,15 @@ namespace Isis {
     }
 
     // Handle the file header
-
-    //tjw
     streampos pos = fin.tellg();
     if (p_saveFileHeader) {
       p_fileHeader = new char[p_fileHeaderBytes];
       fin.read(p_fileHeader, p_fileHeaderBytes);
-      fin.seekg(p_suffixData+p_fileHeaderBytes,ios_base::beg);
+      fin.seekg(p_suffixData+p_fileHeaderBytes, ios_base::beg);
     }
     else {
         fin.seekg(p_fileHeaderBytes+p_suffixData, ios_base::beg);
-        //fin.seekg(p_fileHeaderBytes, ios_base::beg);
     }
-
-
-
-#if 0
-
-    if (p_saveFileHeader) {
-      p_fileHeader = new char[p_fileHeaderBytes];
-      fin.read(p_fileHeader, p_fileHeaderBytes);
-    }
-    else {
-      fin.seekg(p_fileHeaderBytes, ios_base::beg);
-    }
-
-#endif
 
     // Check the last io
     if (!fin.good()) {
@@ -2028,7 +1918,6 @@ namespace Isis {
 
       // Space for storing prefix and suffix data pointers
       vector<char *> tempPre, tempPost;
-
 
       // Handle any line prefix bytes
       pos = fin.tellg();
@@ -2087,12 +1976,16 @@ namespace Isis {
             case Isis::SignedWord:
               (*out)[osamp] = (double)swapper.ShortInt((short int *)in+samp);
               break;
+            case Isis::SignedInteger:
+              (*out)[samp] = (double)swapper.Int((int *)in+samp);
+              break;
             case Isis::Real:
-              //tjw:
-              if(p_vax_convert)
+              if(p_vax_convert) {
                 (*out)[osamp]= VAXConversion( (float *)in+samp );
-              else
+              }
+              else {
                 (*out)[osamp] = (double)swapper.Float((float *)in+samp);
+              }
               break;
             case Isis::Double:
               (*out)[osamp] = (double)swapper.Double((double *)in+samp);
@@ -2410,8 +2303,4 @@ namespace Isis {
     return p_inFile;
   }
 
-
 }
-
-
-
