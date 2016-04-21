@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<application name="unitTest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Unit test for IsisImport class
+  </brief>
+
+  <description>
+    Just a test only a test
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <history>
+    <change name="Stuart Sides" date="2002-02-13">
+      Original Version
+    </change>
+    <change name="Stuart Sides" date="2003-05-16">
+      Modified schema from astrogeology... isis.astrogeology...
+    </change>
+    <change name="Christopher Austin" date="2008-09-16">
+      Added the special pixel range error throwing.
+    </change>
+    <change name="Jeannie Backer" date="2011-08-19">
+      Replaced test cube path /tmp/... with $temporary/...
+    </change>
+    <change name="Kimberly Oyama" date="2012-10-26">
+      Added tests for the ProcessBil() and ProcessBip() methods. References #819.
+    </change>
+    <change name="Tyler Wilson" date="2016-02-25">
+      Added tests for processing Galileo NIMS qubs (which are saved in
+      VAX floating point format). References #2368.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test cube
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>$temporary/isisImport.cub</item></default>
+      </parameter>
+      <parameter name="CORE_CUBE">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Test Cube containing core data
+        </brief>
+        <description>
+          Test cube
+        </description>
+        <filter>
+          *.cub
+        </filter>
+        <default><item>$temporary/30i001ci_core.cub</item></default>
+      </parameter>
+       <parameter name="SUFFIX_CUBE">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Test cube containing backplane data
+         </brief>
+         <description>
+           Test cube
+         </description>
+         <filter>
+          *.cub
+         </filter>
+         <default><item>$temporary/30i001ci_suffix.cub</item></default>
+      </parameter>
+    </group>
+
+    <group name="Special Pixels">
+      <parameter name="CREATESPECIAL">
+        <type>string</type>
+        <default>
+          <item>YES</item>
+        </default>
+        <brief>Create special pixel values (LRS and HRS)</brief>
+        <description>
+      Create special pixel values for LRS and HRS
+        </description>
+        <list>
+          <option value="YES">
+            <brief> Create Special Pixel values </brief>
+            <description>
+              Create special pixel values
+            </description>
+            <inclusions>
+              <item>MINIMUM</item>
+              <item>MAXIMUM</item>
+            </inclusions>
+          </option>
+          <option value="NO">
+            <brief> No special pixels </brief>
+            <description>
+              Do not create any special pixels in ISIS
+              cube.
+            </description>
+            <exclusions>
+              <item> MINIMUM </item>
+              <item> MAXIMUM </item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="MINIMUM">
+        <type>double</type>
+        <default>
+          <item>0</item>
+        </default>
+        <brief> Minimum valid value </brief>
+        <description>
+          Minimum valid value.  Anything below this value will be
+          set to LRS.
+        </description>
+      </parameter>
+      <parameter name="MAXIMUM">
+        <type>double</type>
+        <default>
+          <item>100</item>
+        </default>
+        <brief> Maximum valid value </brief>
+        <description>
+          Maximum valid value.  Anything above this value will be
+          set to HRS.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+</application>
+

@@ -155,7 +155,7 @@ JAMALIB    =
 #---------------------------------------------------------------------------
 GEOSINCDIR = -I$(ISIS3LOCAL)/include/geos/geos3.3.2
 GEOSLIBDIR = -L$(ISIS3LOCAL)/lib
-GEOSLIB    = -lgeos-3.3.2
+GEOSLIB    = -lgeos-3.3.2 -lgeos_c
 
 #---------------------------------------------------------------------------
 # Set up for the GNU Scientific Library (GSL).  Note that this setup
@@ -248,9 +248,41 @@ CHOLMODLIB    = -lcholmod -lamd -lcolamd -llapack
 #---------------------------------------------------------------------------
 HDF5INCDIR = -I$(ISIS3LOCAL)/include/hdf5
 HDF5LIBDIR = -L$(ISIS3LOCAL)/lib
-# HDF5INCDIR = -I/work/projects/progteam/jlaura/hdf5-1.8.14/build/include
-# HDF5LIBDIR = -L/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib
 HDF5LIB    = -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
+
+#---------------------------------------------------------------------------
+# Set up for OpenCV libraries 
+#
+# Add the following line to your app's Makefile (see the NN notes)
+# ALLLIBS += $(OPENCVLIBS)
+#---------------------------------------------------------------------------
+OPENCVINCDIR =  -I$(ISIS3LOCAL)/include
+OPENCVLIBDIR =  -L$(ISIS3LOCAL)/lib
+OPENCVLIBS   = -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d \
+               -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc \
+               -lopencv_legacy -lopencv_ml -lopencv_nonfree -lopencv_objdetect \
+               -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts \
+               -lopencv_video -lopencv_videostab
+
+#---------------------------------------------------------------------------
+# Set up for Natural Neigbor Library (NN)
+#
+# * Note that NNINCDIR is not added to ALLINCDIRS in isismake.os
+# * and NNLIB is not added to ALLLIBDIRS in isismake.os
+#
+# For now, if you want to use this library, modify your app's Makefile. 
+# Add an empty line after the last line in the Makefile, then add
+# ALLLIBS += $(NNLIB)
+# on a new line.
+#---------------------------------------------------------------------------
+NNINCDIR = -I$(ISIS3LOCAL)/include/nn
+#NNLIBDIR = -L$(ISIS3LOCAL)/lib
+NNLIB = -lnn
+
+#---------------------------------------------------------------------------
+# Final generic setup for includes at the top level
+#---------------------------------------------------------------------------
+DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 
 #---------------------------------------------------------------------------
 #  Define the third party distribution libraries (patterns)
@@ -309,7 +341,6 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos_c.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libdsklib.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice.so*"
 
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu_4.3.a"
 #THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcwd_r.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.so"
@@ -334,10 +365,14 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_cpp.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libhdf5_hl_cpp.so*"
-#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5.so*"
-#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5_hl.so*"
-#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5_cpp.so*"
-#THIRDPARTYLIBS += "/work/projects/progteam/jlaura/hdf5-1.8.14/build/lib/libhdf5_hl_cpp.so*"
+
+# Add all the OpenCV libraries
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libopencv_*.so*"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb.so*"
+THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavcodec.so*)
+THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavformat.so*)
+THIRDPARTYLIBS    += $(wildcard $(ISIS3ALTSYSLIB)/libavutil.so*)
+
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"

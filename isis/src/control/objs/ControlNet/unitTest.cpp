@@ -458,6 +458,23 @@ int main() {
 
   testConnectivity();
 
+  cout << "\nTesting take() functionality to take owernship of the points in a ControlNet:" << endl;
+
+  cout << "Original control net number of points: " << QString::number(net.GetNumPoints()) << endl; 
+
+  QList<ControlPoint*> points = net.take(); 
+  
+  cout << "Number of points taken out: " << QString::number(points.length()) << endl; 
+  
+  cout << "Now there should be zero points in the original control net. There are: " 
+       << QString::number(net.GetNumPoints()) << endl; 
+
+  cout << "And zero pointIDs in the original control net. There are: " 
+       << QString::number(net.GetPointIds().length()) << endl; 
+
+  cout << "And zero cubeGraphNodes in the original control net. There are: " 
+       << QString::number(net.GetCubeGraphNodes().length()) << endl; 
+
   //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
   //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");
 

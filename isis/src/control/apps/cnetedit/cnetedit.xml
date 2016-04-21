@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="cnetedit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="cnetedit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation=
+"http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Edit control networks
@@ -135,6 +137,11 @@
       Updated so that behavior is consistent with documentation. Now when a reference
       measure is removed, the whole point is only removed if IGNOREALL is true. 
       Fixes #2238.
+    </change>
+    <change name="Tyler Wilson" date="2016-01-04">
+      Fixed a problem with single measure points being deleted when running a validity
+      check even when delete = false.  Zero measure points are now deleted no matter what.
+      Ref #2342.
     </change>
   </history>
 
@@ -435,3 +442,4 @@
   </groups>
 
 </application>
+

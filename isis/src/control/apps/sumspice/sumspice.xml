@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: sumspice.xml 6565 2016-02-11 00:15:35Z kbecker@GS.DOI.NET $ -->
+<application name="sumspice" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Update ISIS start times, pointing and spacecraft position with Gaskell 
+  SUMFILEs 
+  </brief>
+
+  <description>
+   <h3>Overview</h3>
+    <p>
+      This program allows the user to update a cube's labels, spaceraft attitude 
+      (pointing) and position with more accurate information found in the 
+      appropriate Gaskell SUMFILE. There are multiple options for the how the 
+      labels should be updated. See the MODE parameter documentation for a 
+      description of these options.
+    </p>
+    <p>
+      The Gaskell SUMFILEs provided are expected to have a format
+      described below:
+      <ul>
+        <li>
+          Line 1: An ID for the SUMFILE (usually the image name).
+        </li>
+        <li>
+          Line 2: The correct start UTC for the image.
+        </li>
+        <li>
+          Line 3: The number of pixels, the number of lines, the lower DN 
+          threshold, and the upper DN threshold.
+        </li>
+        <li>
+          Line 4: The focal length (in mm), followed by the pixel center and the 
+          line center (i.e. boresight/optical axis).
+        </li>
+        <li>
+          Line 5: The vector from the spacecraft to the object center (i.e. the 
+        spacecraft position in body fixed coordinates). 
+        </li>
+        <li>
+          Line 6: The pixel (x) unit vector, in body fixed coordinates.
+        </li>
+        <li>
+          Line 7: The line (y) unit vector, in body fixed coordinates.
+        </li>
+        <li>
+          Line 8: The boresight (z) unit vector, in body fixed coordinates.
+        </li>
+        <li>
+          Line 9: The sun direction unit vector, in body fixed coordinates.
+        </li>
+        <li>
+          Line 10: The k matrix
+        </li>
+        <li>
+          Line 11: Used to contain distortion information, but it is always zero now.
+        </li>
+        <li>
+          Line 12: The formal spacecraft position uncertainty , ie. the sigma VSO.
+        </li>
+        <li>
+          Line 13: The formal spacecraft orientation uncertainty , ie. the sigma PTG.
+        </li>
+        <li>
+          A list of landmarks containing the ID, pixel center, and line center.
+        </li>
+        <li>
+          A list of limb fits containing the landmark-on-limb centers.
+        </li>
+      </ul>
+
+      Here is an example:
+      <pre>
+  W46908480918
+  2014 NOV 12 17:20:03.128
+    2048  2048   500 65535                                       NPX, NLN, THRSH
+      0.1356800000D+03    0.1044000000D+04    0.9380000000D+03   MMFL, CTR
+     -0.9665063720D+01    0.1326644487D+02   -0.6673084308D+01   SCOBJ    
+     -0.6442479111D+00   -0.1829032409D-01    0.7645979944D+00   CX       
+      0.5935707119D+00    0.6184779444D+00    0.5149357652D+00   CY       
+     -0.4823053379D+00    0.7855892670D+00   -0.3875965231D+00   CZ       
+      0.7254908676D+00   -0.3292717307D+00    0.6043534796D+00   SZ       
+    74.07410   0.00000   0.00000   0.00000  74.07410   0.00000   K-MATRIX 
+    0.00000D+00    0.00000D+00    0.00000D+00    0.00000D+00   DISTORTION 
+    0.1007758363D-02    0.1482813397D-02    0.8902614968D-03   SIGMA_VSO  
+    0.3071768580D-04    0.3093941486D-04    0.1565302183D-04   SIGMA_PTG  
+LANDMARKS                                                                       
+AO0001   2049.39    668.15                                                      
+AO0002   2020.70    644.81                                                      
+AO0003   2035.17    708.66
+BD0009   1902.39    884.05                                                      
+BD0010   1891.13    909.86                                                      
+   ...
+EK0022    675.73   1371.97                                                      
+EQ0088    721.76    738.13                                                      
+FI0002    727.77    220.40                                                      
+LIMB FITS
+END FILE                                                                        
+    </pre>
+    </p>
+   <h3>Usage</h3>
+    <p>
+      <i>sumspice</i> has been used to apply Gaskell control to Hayabusa Itokawa 
+      AMICA images. There is up to 12 seconds of uncertainty in the start times 
+      of these images. The Hayabusa team improved the start time with brute 
+      force comparisons of the position of Itokawa in the AMICA field of view. 
+      The SUMFILEs contained the correction of the start time. This was the 
+      motivation behind adding support for the start time adjustment.
+    </p>
+    <p>
+      To apply the complete functionality of <i>sumspice</i>, the start time 
+      must be updated first if required. Note that it is rather uncommon the 
+      start time will need to be updated. If it is, this option will recompute 
+      the SpacecraftClockStartTIme which is used primarily by most camera models 
+      for best accuracy of image acquisition times. This mode will require a 
+      rerun of  <i>spiceinit</i> mainly to reestablish the body orientation for 
+      the new start time. 
+    </p>
+    <p>
+      The update of pointing attitude and spacecraft position requires 
+      <i>spiceinit</i> to be applied to the image. This operation will update 
+      the InstrumentPointing and InstrumentPosition Tables in the label of the 
+      ISIS cube with the contents of the Gaskell SUMFILE. Note that SUMFILEs 
+      contain vectors in body-fixed format, so you must ensure the proper PCK is 
+      used with the image. NAIF routines are used to apply any required 
+      transformations to retain the integrity of the data. Once the fidelity of 
+      the updates are confirmed, new CK and SPK kernels can be created using the 
+      ISIS <i>ckwriter</i> and <i>spkwriter</i> applications, respectively.
+    </p>
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2015-02-25">
+      Original Version
+    </change>
+    <change name="Jeannie Backer" date="2015-12-07">
+      Generalized to program work with Dawn and Hayabusa data. Clock times are 
+      now updated in the instrument group and the original times are saved in 
+      the Archive group of the cube labels.
+    </change>
+    <change name="Kris Becker" date="2016-02-09">
+      Added implementation to support NAIF META kernel files. Updated 
+      documentation. 
+    </change>
+  </history>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+
+      <parameter name= "FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A single cube to process.
+        </brief> 
+        <description>
+          The name of a single input cube whose labels will be updated using a 
+          Gaskell SUMFILE.  <b>Note: </b>Use the FROMLIST parameter instead of 
+          this one if there are multiple cubes to process.
+        </description>
+        <default><item>None</item></default>
+        <exclusions>
+          <item>FROMLIST</item>
+        </exclusions>
+      </parameter>
+
+      <parameter name= "FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A list of cubes to process.
+        </brief> 
+        <description>
+          A text file containing a list of input cubes whose labels will be 
+          updated using Gaskell SUMFILEs. <b>Note: </b>Use the FROM parameter 
+          instead of this one if there is only one cube to process.
+        </description>
+        <default><item>None</item></default>
+        <exclusions>
+          <item>FROM</item>
+        </exclusions>
+      </parameter>
+
+
+      <parameter name="SUMFILE">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The name of the SUMFILE to be used to update the input cube(s).
+        </brief>
+        <description>
+          The name of a single Gaskell SUMFILE containing an updated start time 
+          and SPICE information. <b>Note: </b>Use the SUMFILELIST parameter 
+          instead of this one if the exact SUMFILE that should be used 
+          to update the cube(s) is unknown or if there are more than one.
+        </description>
+        <filter>*.SUM</filter>
+        <default><item>None</item></default>
+        <exclusions>
+          <item>SUMFILELIST</item>
+          <item>TIMEDIFF</item>
+        </exclusions>
+      </parameter>
+
+     <parameter name="SUMFILELIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A list of SUMFILEs to search for the best match to update the given 
+        cube(s). 
+        </brief>
+        <description>
+          A text file containing a list of Gaskell SUMFILEs that each contain an 
+          updated start time and SPICE information.  <b>Note: </b>Use the 
+          SUMFILE parameter instead of this one if the exact SUMFILE is known 
+          for the given cube(s). 
+        </description>
+        <filter>*.lis</filter>
+        <default><item>None</item></default>
+        <exclusions>
+          <item>SUMFILE</item>
+        </exclusions>
+      </parameter>
+
+      <parameter name="MODE">
+        <type>string</type>
+        <brief>
+          Determines how the program will use the appropriate SUMFILE to update 
+          the labels. 
+        </brief>
+        <description>
+          Determines how the program will use the appropriate SUMFILE to update 
+          the labels. Note that there are input requirements for each option.
+        </description>
+        <list>
+          <option value="UPDATETIMES">
+            <brief>
+              Update the start and end times in the cube's label.
+            </brief>
+            <description>
+              If the UPDATETIMES option is selected, the program update the time 
+              and clock values in the cube's Instrument group. If a single 
+              SUMFILE is given, the program will use this file. If a SUMFILELIST 
+              was provided, the program will search for the file in the given 
+              list whose time is within the specified TIMEDIFF tolerance and is 
+              the closest to the SpacecraftClockStartCount in the cube. If 
+              multiple files in the SUMFILELIST have the same time, this program 
+              will choose to use the first one in the list with the closest 
+              time. If no SUMFILE is found within this tolerance, a warning will 
+              be printed to the output log and the program will exit without 
+              updating the input cube's labels. Otherwise, the UTC on the second 
+              line of the SUMFILE will replace the StartTime value in the cube's 
+              Instrument group. The ExposureDuration in the label is then used 
+              to find the new StopTime. These new start/stop time values are 
+              used to determine the new SpacecraftClockStartCount and the new 
+              SpacecraftClockStopCount. The original values of these keywords 
+              and the SUMFILE used to update the keywords will be saved in the 
+              cube's Archive group.
+            </description>
+          </option>
+          <option value="UPDATESPICETABLES">
+            <brief>
+              Update the InstrumentPosition and InstrumentPointing tables in the cube's label.
+            </brief>
+            <description>
+              If the UPDATESPICETABLES option is selected, the program will 
+              search for the SumFile keyword in the cube's Archive group. If 
+              no such keyword exists or if the SumFile saved to the labels is 
+              not found in the given SUMFILELIST, a warning will be printed to 
+              the output log and the program will exit without updating the 
+              SPICE tables. Otherwise, the spacecraft position and pointing 
+              information will be updated using the information provided in the 
+              matching SUMFILE. Requirements: to run sumspice using the 
+              UPDATESPICETABLES option, the input cube must have already been 
+              run through sumspice with the UPDATETIMES option and then run 
+              through spiceinit.
+            </description>
+            <exclusions>
+              <item>TIMEDIFF</item>
+            </exclusions>
+          </option>
+        </list>
+        <default><item>UPDATETIMES</item></default>
+      </parameter>
+
+      <parameter name="TIMEDIFF">
+          <type>double</type>
+        <brief>
+          The maximum allowed time difference between the cube's current start 
+          time and the time found in the SUMFILE.
+        </brief>
+        <description>
+          This value is used when the UPDATETIME option is selected and a 
+          SUMFILELIST is provided. The file in the SUMFILELIST with the time 
+          that is closest to the cube's start clock must be within this 
+          tolerance for the cube to be updated.
+        </description>
+        <default><item>0.0</item></default>
+      </parameter>
+
+      <parameter name="METAKERNEL">
+          <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>List of SPICE kernels to support conversions</brief>
+        <description>
+            In some cases, additional kernels may be required in order to 
+            compute some of the data acquired from the NAIF toolkit. If the ISIS 
+            labels do not contain sufficient kernels, this parameter can specify 
+            a NAIF meta kernel, or a single kernel of any supported NAIF type 
+            that will be loaded prior to any computations. These kernels remain 
+            loaded for all files and for the entirety of the runtime of this 
+            application. See <a href="https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/kernel.html">
+            SPICE Kernel Required Reading for additional</a> information about 
+            NAIF meta kernels.
+        </description>
+        <filter>*.meta *.tm</filter>
+        <default><item>None</item></default>
+      </parameter>
+
+      </group>
+  </groups>
+</application>

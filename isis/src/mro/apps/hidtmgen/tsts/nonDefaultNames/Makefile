@@ -12,60 +12,58 @@ APPNAME = hidtmgen
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) DTM=$(INPUT)/DTM_Zumba_1m_forPDS.cub \
-	  ORTHO1=$(INPUT)/PSP_002118_1510_1m_o_forPDS.cub \
-	  ORTHO2=$(INPUT)/PSP_002118_1510_25cm_o_forPDS.cub \
-  	  ORTHO3=$(INPUT)/PSP_003608_1510_1m_o_forPDS.cub \
-	  ORTHO4=$(INPUT)/PSP_003608_1510_25cm_o_forPDS.cub \
-	  OUTPUTDIR=$(OUTPUT) \
-	  DEFAULTNAMES=FALSE \
-	  DTMTO=$(OUTPUT)/DTM.IMG \
-	  ORTHO1TO=$(OUTPUT)/ORTHO1.IMG \
-	  ORTHO2TO=$(OUTPUT)/ORTHO2.IMG \
-	  ORTHO3TO=$(OUTPUT)/ORTHO3.IMG \
-	  ORTHO4TO=$(OUTPUT)/ORTHO4.IMG \
-	  PARAMSPVL=$(INPUT)/parameters.pvl \
-	  PRODUCER_FULL_NAME="Producer Full Name User Entered" \
-	  RATIONALE_DESC=Rationale \
-	  PRODUCT_VERSION_ID=3.0 \
-	  DTM_PRODUCT_ID=DtmProduct \
-	  ORTHO1_PRODUCT_ID=Ortho1Product \
-	  ORTHO2_PRODUCT_ID=Ortho2Product \
-	  ORTHO3_PRODUCT_ID=Ortho3Product \
-	  ORTHO4_PRODUCT_ID=Ortho4Product \
-	  SOURCE_PRODUCT_ID=SourceId \
-	  > /dev/null;
+	$(LS) $(INPUT)/PSP*.cub > $(OUTPUT)/orthoInputList.txt;
+	echo $(OUTPUT)/ORTHO1.IMG > $(OUTPUT)/orthoOutputList.txt;
+	echo $(OUTPUT)/ORTHO2.IMG >> $(OUTPUT)/orthoOutputList.txt;
+	echo $(OUTPUT)/ORTHO3.IMG >> $(OUTPUT)/orthoOutputList.txt;
+	echo $(OUTPUT)/ORTHO4.IMG >> $(OUTPUT)/orthoOutputList.txt;
+	$(APPNAME) DEFAULTNAMES=FALSE \
+	           DTM=$(INPUT)/DTM_Zumba_1m_forPDS.cub \
+	           DTMTO=$(OUTPUT)/DTM.IMG \
+	           ORTHOFROMLIST=$(OUTPUT)/orthoInputList.txt \
+	           ORTHOTOLIST=$(OUTPUT)/orthoOutputList.txt \
+	           ORTHOPRODUCTIDLIST=$(INPUT)/orthoOutputProductIds.lis \
+	           PARAMSPVL=$(INPUT)/parameters.pvl \
+	           DTM_PRODUCT_ID=DtmProduct \
+	           > /dev/null;
 	
-	head -n 93 $(OUTPUT)/DTM.IMG \
-	  > $(OUTPUT)/DTM.pvl;
-	head -n 92 $(OUTPUT)/ORTHO1.IMG \
-	  > $(OUTPUT)/ORTHO1.pvl;
-	head -n 92 $(OUTPUT)/ORTHO2.IMG \
-	  > $(OUTPUT)/ORTHO2.pvl;
-	head -n 92 $(OUTPUT)/ORTHO3.IMG \
-	  > $(OUTPUT)/ORTHO3.pvl;
-	head -n 92 $(OUTPUT)/ORTHO4.IMG \
-	  > $(OUTPUT)/ORTHO4.pvl;
+	catlab from=$(OUTPUT)/DTM.IMG \
+	       to=$(OUTPUT)/DTM.pvl \
+	       > /dev/null;
+	catlab from=$(OUTPUT)/ORTHO1.IMG \
+	       to=$(OUTPUT)/ORTHO1.pvl \
+	       > /dev/null;
+	catlab from=$(OUTPUT)/ORTHO2.IMG \
+	       to=$(OUTPUT)/ORTHO2.pvl \
+	       > /dev/null;
+	catlab from=$(OUTPUT)/ORTHO3.IMG \
+	       to=$(OUTPUT)/ORTHO3.pvl \
+	       > /dev/null;
+	catlab from=$(OUTPUT)/ORTHO4.IMG \
+	       to=$(OUTPUT)/ORTHO4.pvl \
+	       > /dev/null;
 	
 	pds2isis from=$(OUTPUT)/DTM.IMG \
-	  to=$(OUTPUT)/DTM.cub \
-	  > /dev/null;  
+	          to=$(OUTPUT)/DTM.cub \
+	          > /dev/null;  
 	pds2isis from=$(OUTPUT)/ORTHO1.IMG \
-	  to=$(OUTPUT)/ORTHO1.cub \
-	  > /dev/null;  
+	          to=$(OUTPUT)/ORTHO1.cub \
+	          > /dev/null;  
 	pds2isis from=$(OUTPUT)/ORTHO2.IMG \
-	  to=$(OUTPUT)/ORTHO2.cub \
-	  > /dev/null;  
+	          to=$(OUTPUT)/ORTHO2.cub \
+	          > /dev/null;  
 	pds2isis from=$(OUTPUT)/ORTHO3.IMG \
-	  to=$(OUTPUT)/ORTHO3.cub \
-	  > /dev/null;  
+	          to=$(OUTPUT)/ORTHO3.cub \
+	          > /dev/null;  
 	pds2isis from=$(OUTPUT)/ORTHO4.IMG \
-	  to=$(OUTPUT)/ORTHO4.cub \
-	  > /dev/null;  
+	          to=$(OUTPUT)/ORTHO4.cub \
+	          > /dev/null;  
 	
-	rm $(OUTPUT)/DTM.IMG;
-	rm $(OUTPUT)/ORTHO1.IMG;
-	rm $(OUTPUT)/ORTHO2.IMG;
-	rm $(OUTPUT)/ORTHO3.IMG;
-	rm $(OUTPUT)/ORTHO4.IMG;
+	$(RM) $(OUTPUT)/DTM.IMG;
+	$(RM) $(OUTPUT)/ORTHO1.IMG;
+	$(RM) $(OUTPUT)/ORTHO2.IMG;
+	$(RM) $(OUTPUT)/ORTHO3.IMG;
+	$(RM) $(OUTPUT)/ORTHO4.IMG;
+	$(RM) $(OUTPUT)/orthoInputList.txt;
+	$(RM) $(OUTPUT)/orthoOutputList.txt;
 

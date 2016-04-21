@@ -557,7 +557,8 @@ namespace Isis {
          throw Isis::iException::Message( Isis::iException::User, msg, _FILEINFO_ );*/
       }
       catch (...) {
-        QString msg = "The history file [" + file + "] is corrupt, please fix or delete this file";
+        QString msg = "The history file [" + file + "] is for a different application or corrupt, "\
+                      "please fix or delete this file";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }

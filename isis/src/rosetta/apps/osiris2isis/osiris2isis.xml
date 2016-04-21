@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="osiris2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import PDS formatted Rosetta OSIRIS image into an ISIS cube
+  </brief>
+
+  <description>
+    <p>
+    This program will import and convert a PDS-formatted Rosetta OSIRIS image into an ISIS cube. 
+    The input file can be in compressed or decompressed form, and can be from OSIRIS's Wide-Angle
+    Camera (WAC) or its Narrow-Angle Camera (NAC.) Input PDS files are converted to 32-bit if they are not already
+    32-bit. 
+    </p>
+    <h3> Requirements </h3>
+    <ul>
+      <li>
+        Input PDS file (.img) (<em>FROM</em>)
+      </li>
+      <li>
+        Output ISIS file name (.cub) (<em>TO</em>)
+      </li>
+    </ul>
+    <br/>
+    <h2>Instrument Overview</h2>
+   <p>
+   OSIRIS contains a high-resolution Narrow-Angle Camera (NAC) and a Wide-Angle Camera (WAC) that share a common shutter,
+   filter wheel, and detector. The detector is a custom backside-illuminated 2048 x 2048 CCD with a UV-antireflection coating. 
+
+   OSIRIS-NAC has an off-axis three mirror system that minimizes the stray light hitting the CCD, and a field of view of 2.20 x 2.22 degrees. 
+   OSIRIS-WAC has an off-axis two mirror system which is also designed to minimize stray light and has a wider field of view of 11.34 x 12.11 degrees. 
+
+   OSIRIS-NAC has 12 filters that cover wavelengths 250-1000 nm at a resolution of 18.6 microradians/pixel, and OSIRIS-WAC has 14 filters  over 240 -  720 nm at a resolution of 101 microradians/pixel. More detailed filter specifications are provided in the tables below. 
+   </p>
+   <h2>Narrow-Angle Filters</h2>
+    <p>
+       The following table provides the specifications for each of the 16
+       OSIRIS-NAC filters. 
+    </p>
+      <TABLE BORDER="1">
+            <CAPTION>
+                OSIRIS NAC Filter Specifications
+              </CAPTION>
+          <TR>
+            <TH>Name</TH>
+            <TH>Wavelength (nm)</TH>
+            <TH>FWHM (nm)</TH>
+          </TR>
+          <TR>
+              <TD>FFP-UV</TD>
+              <TD>600</TD>
+              <TD>600</TD>
+          </TR>
+          <TR>
+              <TD>FFP-IR</TD>
+              <TD>600</TD>
+              <TD>600</TD>
+          </TR>
+          <TR>
+              <TD>Neutral</TD>
+              <TD>640</TD>
+              <TD>520</TD>
+          </TR>
+          <TR>
+              <TD>NFP-Vis</TD>
+              <TD>600</TD>
+              <TD>600</TD>
+          </TR>
+          <TR>
+              <TD>Far-UV</TD>
+              <TD>269.3</TD>
+              <TD>53.6</TD>
+          </TR>
+          <TR>
+              <TD>Near-UV</TD>
+              <TD>360.0</TD>
+              <TD>51.1</TD>
+          </TR>
+          <TR>
+              <TD>Blue</TD>
+              <TD>480.7</TD>
+              <TD>74.9</TD>
+          </TR>
+          <TR>
+              <TD>Green</TD>
+              <TD>535.7</TD>
+              <TD>62.4</TD>
+          </TR>
+           <TR>
+              <TD>FFP-Vis</TD>
+              <TD>600</TD>
+              <TD>600</TD>
+          </TR>
+           <TR>
+              <TD>Orange</TD>
+              <TD>649.2</TD>
+              <TD>84.5</TD>
+          </TR>
+           <TR>
+              <TD>Hydra</TD>
+              <TD>701.2</TD>
+              <TD>22.1</TD>
+          </TR>
+          <TR>
+              <TD>Red</TD>
+              <TD>743.7</TD>
+              <TD>64.1</TD>
+          </TR>
+          <TR>
+              <TD>Ortho</TD>
+              <TD>805.3</TD>
+              <TD>40.5</TD>
+          </TR>
+          <TR>
+              <TD>Near-IR</TD>
+              <TD>882.1</TD>
+              <TD>65.9</TD>
+          </TR>
+          <TR>
+              <TD>Fe203</TD>
+              <TD>931.9</TD>
+              <TD>34.9</TD>
+          </TR>
+          <TR>
+              <TD>IR</TD>
+              <TD> 989.3</TD>
+              <TD>38.2</TD>
+          </TR>
+      </TABLE>
+
+ <h2>Wide-Angle Filters</h2>
+    <p>
+       The following table provides the specifications for each of the 14
+       OSIRIS-WAC filters. One of the filter wheels is always set to Empty because of hardware constraints.
+       The wavelengths and full-width half maximums (FWHMs) for the Empty filters are set to 0 in the ISIS cube label. 
+    </p>
+      <TABLE BORDER="1">
+            <CAPTION>
+                OSIRIS WAC Filter Specifications
+              </CAPTION>
+          <TR>
+            <TH>Name</TH>
+            <TH>Wavelength (nm)</TH>
+            <TH>FWHM (nm)</TH>
+          </TR>
+          <TR>
+              <TD>Empty - allow use of filter wheel 2 </TD>
+              <TD>None (set to 0 in ISIS label )</TD>
+              <TD>None (set to 0 in ISIS label )</TD>
+          </TR>
+          <TR>
+              <TD>Empty - allow use of filter wheel 1</TD>
+              <TD>None (set to 0 in ISIS label )</TD>
+              <TD>None (set to 0 in ISIS label )</TD>
+          </TR>
+          <TR>
+              <TD>UV245</TD>
+              <TD>246.2</TD>
+              <TD>14.1</TD>
+          </TR>
+          <TR>
+              <TD>CS</TD>
+              <TD>259.0</TD>
+              <TD>10.9</TD>
+          </TR>
+          <TR>
+              <TD>UV295</TD>
+              <TD>295.9</TD>
+              <TD>10.9</TD>
+          </TR>
+          <TR>
+              <TD>OH-WAC</TD>
+              <TD>309.7</TD>
+              <TD>4.1</TD>
+          </TR>
+          <TR>
+              <TD>UV325</TD>
+              <TD>325.8</TD>
+              <TD>10.7</TD>
+          </TR>
+          <TR>
+              <TD>NH</TD>
+              <TD>335.9</TD>
+              <TD>4.1</TD>
+          </TR>
+          <TR>
+              <TD>UV375</TD>
+              <TD>375.6</TD>
+              <TD>9.8</TD>
+          </TR>
+          <TR>
+              <TD>CN</TD>
+              <TD>388.4</TD>
+              <TD>5.2</TD>
+          </TR>
+          <TR>
+              <TD>Green</TD>
+              <TD>537.2</TD>
+              <TD>63.2</TD>
+          </TR>
+          <TR>
+              <TD>NH2</TD>
+              <TD>572.1</TD>
+              <TD>11.5</TD>
+          </TR>
+          <TR>
+              <TD>Na</TD>
+              <TD>590.7</TD>
+              <TD>4.7</TD>
+          </TR>
+          <TR>
+              <TD>VIS610</TD>
+              <TD>612.6</TD>
+              <TD>9.8</TD>
+          </TR>
+          <TR>
+              <TD>OI</TD>
+              <TD>631.6</TD>
+              <TD>4.0</TD>
+          </TR>
+          <TR>
+              <TD>R</TD>
+              <TD>629.8</TD>
+              <TD>156.8</TD>
+          </TR>
+          </TABLE>
+ <br/>
+    <h2>Data Archive</h2>
+    <p>
+      The Rosetta data are available from the
+      <a href="http://pds-smallbodies.astro.umd.edu/data_sb/missions/rosetta/index.shtml">NASA PDS Small 
+      Bodies Node</a>.
+    </p>
+  <p>
+     The file-naming convention for OSIRIS images on the PDS archive is: {C}{YYYYMM DD}T{HHMMSSUUU}{FF}{L}{I}F{A}{B}.img, where: {C} is set to either N or W to indicate a NAC or WAC image, respectively, {YYYYMM DD} is the year, month, and day, of image acquisition; T is a separator that stands for "Time", and {HHMMSSUUU} is the hour, minute, second, and milli-second of acquisition. {FF} indicates the image file type: ID is a normal image, TH is a thumbnail image, and PA, PB, and OL indicate different  kinds of calibration data; {L} is the processing level of the image; {I} is the instance id of the image, F is a separator that stands for "Filter", {A} indicates the position of filter wheel #1, and {B} indicates the position of filter wheel #2. 
+    </p>
+
+    <h2>References</h2>
+    <cite>
+       Hviid, Stubbe F. "Osiris Experiment Data Record and Software Interface 
+       Specification (EDR/SIS) " Issue 3, 04/04/2011
+    </cite>
+    <br /> 
+    <cite> 
+       H. U. Keller et al. "OSIRIS - The Scientific Camera System Onboard Rosetta." 
+       Space Science Reviews. Volume 128, Issue 1-4, pp 433-506. 
+    </cite>
+    <br/>
+
+  </description>
+
+  <history>
+    <change name="Sasha Brownsberger" date="2015-05-01">
+      Original Version
+    </change>
+    <change name="Kristin Berry" date="2016-03-29">
+      Update to work with WAC images, in addition to NAC. Significantly 
+      expanded documentation. Fixes #1900.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Rosetta</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS formatted Rosetta Osiris image file
+        </brief>
+        <description>
+          Use this parameter to select the Rosetta Osiris filename. 
+        </description>
+        <filter>
+          *.imq  *.img
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output Isis cube
+         </brief>
+         <description>
+           Use this parameter to select the output filename.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>
