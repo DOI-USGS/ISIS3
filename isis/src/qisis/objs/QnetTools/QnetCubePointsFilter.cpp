@@ -1,6 +1,10 @@
 #include "QnetCubePointsFilter.h"
 
 #include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QRadioButton>
 #include <QtGui>
 
 #include "QnetNavTool.h"

@@ -1,5 +1,7 @@
 #include "HistogramItem.h"
 
+#include <iostream>
+
 #include <QPainter>
 #include <QScopedPointer>
 #include <QString>
@@ -8,8 +10,6 @@
 #include <qwt_painter.h>
 #include <qwt_scale_map.h>
 #include <qwt_series_data.h>
-
-#include <iostream>
 
 namespace Isis {
 

@@ -160,7 +160,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
     SpiceInt code;
     SpiceBoolean found;
-    bodn2c_c(m_name->toAscii().data(), &code, &found);
+    bodn2c_c(m_name->toLatin1().data(), &code, &found);
     if (!found) {
       IString msg = "Could not convert Target [" + *m_name +
                    "] to NAIF code";

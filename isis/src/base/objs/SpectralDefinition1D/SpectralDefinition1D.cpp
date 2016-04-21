@@ -23,6 +23,7 @@
 
 #include <cmath>
 #include <QList>
+#include <QObject>
 
 #include "SpectralDefinition1D.h"
 #include "CSVReader.h"

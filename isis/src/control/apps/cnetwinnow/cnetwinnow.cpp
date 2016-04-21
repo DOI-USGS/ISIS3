@@ -72,7 +72,7 @@ void IsisMain() {
 
   FILE *guiltyFile;
   char fileName[1028];
-  strcpy(fileName,ui.GetString("FILE_PREFIX").toAscii().data());
+  strcpy(fileName,ui.GetString("FILE_PREFIX").toLatin1().data());
   strcat(fileName,"Guilty.csv");
   guiltyFile = fopen(fileName,"w");
   if (guiltyFile == NULL) {
@@ -82,7 +82,7 @@ void IsisMain() {
   }
 
   FILE *ignoredReport;
-  strcpy(fileName,ui.GetString("FILE_PREFIX").toAscii().data());
+  strcpy(fileName,ui.GetString("FILE_PREFIX").toLatin1().data());
   strcat(fileName,"Ignored.csv");
   ignoredReport = fopen(fileName,"w");
   if (guiltyFile == NULL) {
@@ -360,8 +360,8 @@ void IsisMain() {
       sprintf(line,"%s,%s,%s,%lf,%4.2lf,%4.2lf,%d,%d,%s,%s,%s\n",
                     measGroup[j]->Parent()->GetId().toStdString().data(),
                     serialNumList.fileName(measGroup[j]->GetCubeSerialNumber()
-                      ).toAscii().data(),
-                    measGroup[j]->GetCubeSerialNumber().toAscii().data(),
+                      ).toLatin1().data(),
+                    measGroup[j]->GetCubeSerialNumber().toLatin1().data(),
                     measGroup[j]->GetResidualMagnitude(),
                     hullReduction[j]*100.0,
                     measReduction[j]*100.0,

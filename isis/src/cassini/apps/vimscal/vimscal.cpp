@@ -420,7 +420,7 @@ void calculateVisDarkCurrent(Cube *icube) {
 
   EndianSwapper swapper("LSB");
 
-  FILE *calFilePtr = fopen(calFile.toAscii().data(), "r");
+  FILE *calFilePtr = fopen(calFile.toLatin1().data(), "r");
 
   double visExposure = toDouble(inst["ExposureDuration"][1]);
 

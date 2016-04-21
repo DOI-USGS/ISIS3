@@ -411,7 +411,7 @@ void CleanUp(vector<QString> & psTempFiles, QString psInfile)
 {
   // more clean up
   for (int i=0; i<(int)psTempFiles.size(); i++) {
-    remove(psTempFiles[i].toAscii().data());
+    remove(psTempFiles[i].toLatin1().data());
   }
   psTempFiles.clear();
 
@@ -422,7 +422,7 @@ void CleanUp(vector<QString> & psTempFiles, QString psInfile)
     ipos = sLogFile.lastIndexOf("/");
     sLogFile.replace(0, ipos+1, "./");
     //cerr << "Log=" << sLogFile << endl;
-    remove(sLogFile.toAscii().data());
+    remove(sLogFile.toLatin1().data());
   }
 }
 

@@ -16,6 +16,7 @@
 #include "IException.h"
 #include "Image.h"
 #include "ImageDisplayProperties.h"
+#include "IString.h"
 #include "FileName.h"
 #include "ProgressBar.h"
 #include "PvlObject.h"

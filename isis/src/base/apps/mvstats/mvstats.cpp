@@ -132,7 +132,7 @@ void MakeStats(vector<Buffer *> &in, vector<Buffer *> &out) {
 //Function to generate a flatfile to represent the matrices
 void WriteText(int size, QString filename) {
   ofstream outputFile;
-  outputFile.open(filename.toAscii().data());
+  outputFile.open(filename.toLatin1().data());
   QString line = " ";
   outputFile << "Correlation:" << endl << endl;
   for(int i = 0; i < size; ++i) {

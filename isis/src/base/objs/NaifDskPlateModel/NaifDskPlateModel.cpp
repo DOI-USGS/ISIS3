@@ -379,7 +379,7 @@ namespace Isis {
     QScopedPointer<NaifDskDescriptor> dsk(new NaifDskDescriptor());
     dsk->m_dskfile = dskfile;
     NaifStatus::CheckErrors();
-    dasopr_c( dskFile.expanded().toAscii().data(), &dsk->m_handle );
+    dasopr_c( dskFile.expanded().toLatin1().data(), &dsk->m_handle );
     NaifStatus::CheckErrors();
   
     // Search to the first DLA segment

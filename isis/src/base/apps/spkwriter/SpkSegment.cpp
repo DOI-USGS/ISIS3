@@ -231,7 +231,7 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
     NaifStatus::CheckErrors();
     for (int n = 0 ; n < nrecs ; n++) {
       SpiceDouble xform[6][6];
-      sxform_c(j2000.toAscii().data(), m_refFrame.toAscii().data(), epochs[n], xform);
+      sxform_c(j2000.toLatin1().data(), m_refFrame.toLatin1().data(), epochs[n], xform);
       mxvg_c(xform, states[n], 6, 6, states[n]);
     }
     NaifStatus::CheckErrors();

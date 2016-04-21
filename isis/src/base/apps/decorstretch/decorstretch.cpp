@@ -66,7 +66,7 @@ void IsisMain() {
 
   stretches.clear();
   p.EndProcess();
-  remove(tmpFileName.toAscii().data() );
+  remove(tmpFileName.toLatin1().data());
 }
 
 

@@ -795,7 +795,7 @@ void WriteCubeOutList(ControlNet cnet,
 
   QString toList = ui.GetFileName("TOLIST");
   std::ofstream out_stream;
-  out_stream.open(toList.toAscii().data(), std::ios::out);
+  out_stream.open(toList.toLatin1().data(), std::ios::out);
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
   for(std::set<QString>::iterator sn = outputsn.begin(); sn != outputsn.end(); sn ++) {
@@ -834,7 +834,7 @@ void WriteResults(QString filename,
 
   // Set up the output file for writing
   std::ofstream out_stream;
-  out_stream.open(filename.toAscii().data(), std::ios::out);
+  out_stream.open(filename.toLatin1().data(), std::ios::out);
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
   out_stream << notExtracted[0];

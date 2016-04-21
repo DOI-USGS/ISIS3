@@ -78,7 +78,7 @@ namespace Isis {
     p_nbytes = wkt.size();
     p_buffer = new char[p_nbytes+1];
     for (int i = 0 ; i < p_nbytes ; i++) {
-      p_buffer[i] = wkt[i].toAscii();
+      p_buffer[i] = wkt[i].toLatin1();
     }
     p_buffer[p_nbytes] = 0;
     m_wkt = scrub(p_buffer, p_nbytes);
@@ -101,7 +101,7 @@ namespace Isis {
       if (rawbuf[i] != 0) break;
     }
     int nbytes =  rbytes - i;
-    return (QString::fromAscii(&rawbuf[i], nbytes));
+    return (QString::fromLatin1(&rawbuf[i], nbytes));
   }
 
 } // Namespace Isis

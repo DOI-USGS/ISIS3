@@ -4,8 +4,6 @@
 // Only Parents of classes defined in this file should be included in this file!
 #include "PlotWindow.h"
 
-#include <qwt_double_range.h>
-
 #include <QList>
 #include <QScopedPointer>
 

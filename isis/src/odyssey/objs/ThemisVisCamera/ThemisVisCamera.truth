@@ -1,79 +1,79 @@
-Unit Test for ThemisVisCamera... 
+Unit Test for ThemisVisCamera...
 
-FileName:  "V14093008RDR.even.cub" 
-CK Frame:  -53032 
+FileName:  "V14093008RDR.even.cub"
+CK Frame:  -53032
 
-Kernel IDs:  
-CK Frame ID      =  -53000 
-CK Reference ID  =  16 
-SPK Target ID    =  -53 
-SPK Reference ID =  1 
+Kernel IDs: 
+CK Frame ID      =  -53000
+CK Reference ID  =  16
+SPK Target ID    =  -53
+SPK Reference ID =  1
 
-Is Band Independent:  false 
+Is Band Independent:  false
 
-For upper left corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
+For upper left corner ...
+DeltaSample:  OK
+DeltaLine:    OK
 
-For upper right corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
+For upper right corner ...
+DeltaSample:  OK
+DeltaLine:    OK
 
-For lower left corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
+For lower left corner ...
+DeltaSample:  OK
+DeltaLine:    OK
 
-For lower right corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
+For lower right corner ...
+DeltaSample:  OK
+DeltaLine:    OK
 
-For center framelet 14 pixel position ... 
-Latitude:     OK 
-Longitude:    OK 
-DeltaSample:  OK 
-DeltaLine:    OK 
-
-
+For center framelet 14 pixel position ...
+Latitude:     OK
+Longitude:    OK
+DeltaSample:  OK
+DeltaLine:    OK
 
 
-FileName:  "V14093008RDR.odd.cub" 
-CK Frame:  -53032 
-
-Kernel IDs:  
-CK Frame ID      =  -53000 
-CK Reference ID  =  16 
-SPK Target ID    =  -53 
-SPK Reference ID =  1 
-
-For upper left corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
-
-For upper right corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
-
-For lower left corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
-
-For lower right corner ... 
-DeltaSample:  OK 
-DeltaLine:    OK 
-
-For center framelet 13 pixel position ... 
-Latitude:     OK 
-Longitude:    OK 
-DeltaSample:  OK 
-DeltaLine:    OK 
 
 
-Testing name methods ... 
-Spacecraft Name Long:  "Mars Odyssey" 
-Spacecraft Name Short:  "Odyssey" 
-Instrument Name Long:  "Thermal Emission Imaging System Visual" 
-Instrument Name Short:  "Themis-VIS" 
+FileName:  "V14093008RDR.odd.cub"
+CK Frame:  -53032
+
+Kernel IDs: 
+CK Frame ID      =  -53000
+CK Reference ID  =  16
+SPK Target ID    =  -53
+SPK Reference ID =  1
+
+For upper left corner ...
+DeltaSample:  OK
+DeltaLine:    OK
+
+For upper right corner ...
+DeltaSample:  OK
+DeltaLine:    OK
+
+For lower left corner ...
+DeltaSample:  OK
+DeltaLine:    OK
+
+For lower right corner ...
+DeltaSample:  OK
+DeltaLine:    OK
+
+For center framelet 13 pixel position ...
+Latitude:     OK
+Longitude:    OK
+DeltaSample:  OK
+DeltaLine:    OK
 
 
-Testing errors 
+Testing name methods ...
+Spacecraft Name Long:  "Mars Odyssey"
+Spacecraft Name Short:  "Odyssey"
+Instrument Name Long:  "Thermal Emission Imaging System Visual"
+Instrument Name Short:  "Themis-VIS"
+
+
+Testing errors
 **USER ERROR** Unable to create Themis VIS camera model from an image with InstrumentId [THEMIS_IR].

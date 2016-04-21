@@ -4,8 +4,20 @@
 #include <vector>
 #include <iomanip>
 
-#include <QtGui>
+#include <QAction>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMenuBar>
 #include <QMessageBox>
+#include <QScrollBar>
+#include <QShortcut>
+#include <QSplitter>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QtGui>
+#include <QWhatsThis>
 
 #include "Application.h"
 #include "ControlMeasure.h"
@@ -459,7 +471,7 @@ namespace Isis {
     QString whatsThis = "<b>Function:</b> Saves the current <i>"
                         "control network</i>";
     m_saveNet->setWhatsThis(whatsThis);
-    connect(m_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+    connect(m_saveNet, SIGNAL(triggered()), this, SLOT(saveNet()));
 
     m_saveAsNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSaveAs.png"),
                               "Save Control Network &As...",
@@ -469,7 +481,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Saves the current <i>"
         "control network</i> under chosen filename";
     m_saveAsNet->setWhatsThis(whatsThis);
-    connect(m_saveAsNet, SIGNAL(activated()), this, SLOT(saveAsNet()));
+    connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
 
     m_closeMatchTool = new QAction(QPixmap(toolIconDir() + "/fileclose.png"),
                                    "&Close",
@@ -480,7 +492,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Closes the Match Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closeMatchTool->setWhatsThis(whatsThis);
-    connect(m_closeMatchTool, SIGNAL(activated()), m_matchTool, SLOT(close()));
+    connect(m_closeMatchTool, SIGNAL(triggered()), m_matchTool, SLOT(close()));
 
     m_showHideTemplateEditor = new QAction(QPixmap(toolIconDir() + "/view_text.png"),
                                            "&View/edit registration template",
@@ -491,7 +503,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Displays the curent registration template.  "
        "The user may edit and save changes under a chosen filename.";
     m_showHideTemplateEditor->setWhatsThis(whatsThis);
-    connect(m_showHideTemplateEditor, SIGNAL(activated()), this,
+    connect(m_showHideTemplateEditor, SIGNAL(triggered()), this,
         SLOT(showHideTemplateEditor()));
 
     m_saveChips = new QAction(QPixmap(toolIconDir() + "/window_new.png"),
@@ -502,7 +514,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Save registration chips to file.  "
        "Each chip: pattern, search, fit will be saved to a separate file.";
     m_saveChips->setWhatsThis(whatsThis);
-    connect(m_saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
+    connect(m_saveChips, SIGNAL(triggered()), this, SLOT(saveChips()));
 
     m_openTemplateFile = new QAction(QPixmap(toolIconDir() + "/fileopen.png"),
                                      "&Open registration template",
@@ -512,7 +524,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Allows user to select a new file to set as "
         "the registration template";
     m_openTemplateFile->setWhatsThis(whatsThis);
-    connect(m_openTemplateFile, SIGNAL(activated()), this, SLOT(openTemplateFile()));
+    connect(m_openTemplateFile, SIGNAL(triggered()), this, SLOT(openTemplateFile()));
 
     m_saveTemplateFile = new QAction(QPixmap(toolIconDir() + "/mActionFileSave.png"),
                                      "&Save template file",
@@ -538,11 +550,11 @@ namespace Isis {
     m_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     m_whatsThis->setToolTip("Activate What's This and click on items on "
         "user interface to see more information.");
-    connect(m_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+    connect(m_whatsThis, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     m_showHelp = new QAction(QPixmap(toolIconDir() + "/help-contents.png"), "Help", m_matchTool);
     m_showHelp->setToolTip("Help");
-    connect(m_showHelp, SIGNAL(activated()), this, SLOT(showHelp()));
+    connect(m_showHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
 
   }
 
@@ -614,7 +626,7 @@ namespace Isis {
 
   QWidget *MatchTool::createToolBarWidget(QStackedWidget *parent) {
 
-    QWidget *hbox = new QWidget(parent);
+    QWidget *hbox = new QWidget;
 
     QToolButton *openNetButton = new QToolButton(hbox);
     openNetButton->setIcon(QPixmap(toolIconDir() + "/fileopen.png"));
@@ -1301,7 +1313,7 @@ namespace Isis {
         if (response == QMessageBox::Yes) {
           saveAsNet();
         }
-        m_matchTool->setShown(false);
+        m_matchTool->setVisible(false);
       }
       delete m_controlNet;
       m_controlNet = NULL;
@@ -1633,7 +1645,7 @@ namespace Isis {
     
     //  Load new point in MatchTool
     loadPoint();
-    m_matchTool->setShown(true);
+    m_matchTool->setVisible(true);
     m_matchTool->raise();
 
     emit editPointChanged();
@@ -1694,7 +1706,7 @@ namespace Isis {
         return;
       }
       else {
-        m_matchTool->setShown(false);
+        m_matchTool->setVisible(false);
       }
 
     }
@@ -1756,7 +1768,7 @@ namespace Isis {
           }
         }
 
-        m_matchTool->setShown(false);
+        m_matchTool->setVisible(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint(m_editPoint->GetId()) == ControlPoint::PointLocked) {
           QMessageBox::information(m_matchTool, "EditLocked Point",
@@ -1815,7 +1827,7 @@ namespace Isis {
 
         if (mCubes.size() == 0) {
           loadPoint();
-          m_matchTool->setShown(true);
+          m_matchTool->setVisible(true);
           m_matchTool->raise();
 
           loadTemplateFile(
@@ -1890,7 +1902,7 @@ namespace Isis {
     *m_editPoint = *point;
 
     loadPoint();
-    m_matchTool->setShown(true);
+    m_matchTool->setVisible(true);
     m_matchTool->raise();
     loadTemplateFile(
         m_pointEditor->templateFileName());

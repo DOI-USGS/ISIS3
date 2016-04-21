@@ -28,7 +28,7 @@ namespace Isis {
 
     QAction *escapeKeyHit = new QAction(this);
     escapeKeyHit->setShortcut(Qt::Key_Escape);
-    connect(escapeKeyHit, SIGNAL(activated()), m_tool->rubberBandTool(), SLOT(escapeKeyPress()));
+    connect(escapeKeyHit, SIGNAL(triggered()), m_tool->rubberBandTool(), SLOT(escapeKeyPress()));
     addAction(escapeKeyHit);
 
     // The tool tip and what's this need to be set. The tool tip won't change, but the what's this should detail how to use the

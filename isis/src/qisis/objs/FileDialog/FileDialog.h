@@ -1,10 +1,14 @@
 #ifndef FileDialog_h
 #define FileDialog_h
+
 #include <QFileDialog>
 #include <QtGui>
 #include <QSettings>
 #include "FileName.h"
 #include "FileTool.h"
+
+class QComboBox;
+class QLineEdit;
 
 namespace Isis {
   /**

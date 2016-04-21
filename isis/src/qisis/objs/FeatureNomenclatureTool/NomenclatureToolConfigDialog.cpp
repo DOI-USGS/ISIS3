@@ -1,6 +1,13 @@
 #include "NomenclatureToolConfigDialog.h"
 
+#include <QCheckBox>
+#include <QColorDialog>
+#include <QComboBox>
+#include <QGridLayout>
 #include <QtGui>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 #include "FeatureNomenclatureTool.h"
 

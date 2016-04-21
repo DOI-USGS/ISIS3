@@ -98,7 +98,7 @@ namespace Isis {
      QFile::remove(full_kf);
    }
    SpiceInt  myHandle;
-   ckopn_c(kf.expanded().toAscii().data(), intCkName.toAscii().data(), _comSize, &myHandle);
+   ckopn_c(kf.expanded().toLatin1().data(), intCkName.toLatin1().data(), _comSize, &myHandle);
    _handle = myHandle;
 
    NaifStatus::CheckErrors();
@@ -140,7 +140,7 @@ namespace Isis {
      for ( int i = 0 ; i < comment.size() ; i++ ) {
         if ( comment[i] == '\n' ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(_handle, 1, commOut.size(), commOut.toAscii().data());
+          dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
           _comCharsWritten += commOut.size();
           NaifStatus::CheckErrors();
           commOut.clear();
@@ -153,7 +153,7 @@ namespace Isis {
      // See if there is residual to write
      if ( commOut.size() > 0 ) {
        while ( commOut.size() < 2 ) { commOut.append(" "); }
-       dafac_c(_handle, 1, commOut.size(), commOut.toAscii().data());
+       dafac_c(_handle, 1, commOut.size(), commOut.toLatin1().data());
        _comCharsWritten += commOut.size();
        NaifStatus::CheckErrors();
      }
@@ -192,7 +192,7 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
     ckw01_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.toAscii().data(), hasAvvs, segId.toAscii().data(), nrecs, &sclks[0],
+             refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
              quats[0], avvs);
     NaifStatus::CheckErrors();
     return;
@@ -222,7 +222,7 @@ namespace Isis {
     SpiceSegment::SVector rates(nrecs, segment.TickRate());
     NaifStatus::CheckErrors();
     ckw02_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.toAscii().data(), segId.toAscii().data(), nrecs, &sclks[0],
+             refFrame.toLatin1().data(), segId.toLatin1().data(), nrecs, &sclks[0],
              &stops[0], quats[0], avvs[0], &rates[0]);
     NaifStatus::CheckErrors();
     return;
@@ -247,7 +247,7 @@ namespace Isis {
     segment.FurnshKernelType("FK");
     NaifStatus::CheckErrors();
     ckw03_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.toAscii().data(), hasAvvs, segId.toAscii().data(), nrecs, &sclks[0],
+             refFrame.toLatin1().data(), hasAvvs, segId.toLatin1().data(), nrecs, &sclks[0],
              quats[0], avvs, 1, &sclks[0]);
     segment.UnloadKernelType("FK");
 

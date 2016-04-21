@@ -1,6 +1,7 @@
 #ifndef TableMainWindow_h
 #define TableMainWindow_h
 
+#include <QMainWindow>
 #include <QMenu>
 
 #include <QListWidgetItem>
@@ -8,6 +9,7 @@
 
 #include "MainWindow.h"
 
+class QTableWidget;
 
 namespace Isis {
   /**

@@ -72,7 +72,7 @@ void IsisMain() {
     if(!pckLoaded) {
       FileName pck("$base/kernels/pck/pck?????.tpc");
       pck = pck.highestVersion();
-      furnsh_c(pck.expanded().toAscii().data());
+      furnsh_c(pck.expanded().toLatin1().data());
       pckLoaded = true;
     }
 
@@ -80,7 +80,7 @@ void IsisMain() {
     PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
     SpiceInt tcode;
     SpiceBoolean found;
-    (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
+    (void) bodn2c_c(target[0].toLatin1().data(), &tcode, &found);
     if(found) {
       // Get radii and fix labels
       SpiceInt n;

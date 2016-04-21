@@ -461,7 +461,7 @@ namespace Isis {
   void IException::print() const {
     QString errorString = toString();
     if (errorString != "")
-      cerr << errorString.toAscii().data() << endl;
+      cerr << errorString.toLatin1().data() << endl;
   }
 
 
@@ -477,7 +477,7 @@ namespace Isis {
   void IException::print(bool printFileInfo) const {
     QString errorString = toString(printFileInfo);
     if (errorString != "")
-      cerr << errorString.toAscii().data() << endl;
+      cerr << errorString.toLatin1().data() << endl;
   }
 
 
@@ -767,7 +767,7 @@ namespace Isis {
     QString whatStr = toString();
 
     char *result = new char[whatStr.size() + 1];
-    strncpy(result, whatStr.toAscii().data(), whatStr.size());
+    strncpy(result, whatStr.toLatin1().data(), whatStr.size());
     result[whatStr.size()] = '\0';
 
     return result;

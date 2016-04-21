@@ -21,10 +21,10 @@
  */
 
 
+#include <iostream>
+
 #include <QMap>
 #include <QList>
-
-#include <iostream>
 
 #include <boost/numeric/ublas/fwd.hpp>
 

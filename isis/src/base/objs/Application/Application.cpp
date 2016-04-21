@@ -39,6 +39,7 @@ extern int errno;
 #include <locale.h>
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QLocalSocket>
 #include <QString>
 
@@ -137,7 +138,7 @@ namespace Isis {
         p_startClock = clock();
         
         if (p_applicationForceGuiApp) {
-          new QApplication(argc, argv, QApplication::Tty);
+          new QApplication(argc, argv);
         }
         else {
           new QCoreApplication(argc, argv);
@@ -172,6 +173,7 @@ namespace Isis {
   Application::~Application() {
     if (p_ui) {
       delete p_ui;
+      p_ui = NULL;
     }
   }
 
@@ -521,7 +523,7 @@ namespace Isis {
     data += char(27);
     data += '\n';
 
-    if (p_connectionToParent->write(data.toAscii().data(), data.toAscii().size()) == -1) {
+    if (p_connectionToParent->write(data.toLatin1().data(), data.toLatin1().size()) == -1) {
       QString msg = "This process (program) was executed by an exiting Isis 3 "
           "process. A communication channel was established with the parent "
           "(launcher) process, but when we tried to send data to the parent "
@@ -582,7 +584,7 @@ namespace Isis {
       if (filename.compare("") != 0) {
 
         if (p_BatchlistPass == 0) {
-          ofstream debugingLog(filename.toAscii().data());
+          ofstream debugingLog(filename.toLatin1().data());
           if (!debugingLog.good()) {
             QString msg = "Error opening debugging log file [" + filename + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
@@ -597,7 +599,7 @@ namespace Isis {
           debugingLog.close();
         }
         else {
-          ofstream debugingLog(filename.toAscii().data(), ios_base::app);
+          ofstream debugingLog(filename.toLatin1().data(), ios_base::app);
           debugingLog << SessionLog::TheLog() << endl;
           debugingLog.close();
         }
@@ -667,7 +669,7 @@ namespace Isis {
       // Write to file
       if (filename.compare("") != 0) {
         if (p_BatchlistPass == 0) {
-          ofstream debugingLog(filename.toAscii().data());
+          ofstream debugingLog(filename.toLatin1().data());
           if (!debugingLog.good()) {
             QString msg = "Error opening debugging log file [" + filename + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
@@ -682,7 +684,7 @@ namespace Isis {
           debugingLog.close();
         }
         else {
-          ofstream debugingLog(filename.toAscii().data(), ios_base::app);
+          ofstream debugingLog(filename.toLatin1().data(), ios_base::app);
           debugingLog << SessionLog::TheLog() << endl;
           debugingLog.close();
         }
@@ -872,7 +874,7 @@ namespace Isis {
     ProgramLauncher::RunSystemCommand("uname -a > " + tempFile);
     // Read data from temp file
     char value[256];
-    readTemp.open(tempFile.toAscii().data(), ifstream::in);
+    readTemp.open(tempFile.toLatin1().data(), ifstream::in);
     readTemp.getline(value, 256);
     unameGroup.addKeyword(PvlKeyword("MachineHardware", value));
     readTemp.getline(value, 256);
@@ -901,7 +903,7 @@ namespace Isis {
 
     // Read data from temp file
     char value[256];
-    readTemp.open(tempFile.toAscii().data(), ifstream::in);
+    readTemp.open(tempFile.toLatin1().data(), ifstream::in);
     readTemp.getline(value, 256);
     unameGroup.addKeyword(PvlKeyword("MachineHardware", value));
     readTemp.getline(value, 256);
@@ -917,7 +919,7 @@ namespace Isis {
 #endif
 
     // remove temp file and return
-    remove(tempFile.toAscii().data());
+    remove(tempFile.toLatin1().data());
     return unameGroup;
   }
 
@@ -947,7 +949,7 @@ namespace Isis {
     ProgramLauncher::RunSystemCommand(env6);
     // Read data from temp file
     char value[511];
-    readTemp.open(tempFile.toAscii().data(), ifstream::in);
+    readTemp.open(tempFile.toLatin1().data(), ifstream::in);
     readTemp.getline(value, 255);
     envGroup.addKeyword(PvlKeyword("Shell", value));
     readTemp.getline(value, 255);
@@ -976,7 +978,7 @@ namespace Isis {
     ifstream readTemp;
     QString diskspace = "df >| " + tempFile;
     ProgramLauncher::RunSystemCommand(diskspace);
-    readTemp.open(tempFile.toAscii().data(), ifstream::in);
+    readTemp.open(tempFile.toLatin1().data(), ifstream::in);
 
     QString results = "";
     char tmp[512];
@@ -1010,7 +1012,7 @@ namespace Isis {
     dependencies = "ldd -v " + file + " >| " + tempFile;
 #endif
     ProgramLauncher::RunSystemCommand(dependencies);
-    readTemp.open(tempFile.toAscii().data(), ifstream::in);
+    readTemp.open(tempFile.toLatin1().data(), ifstream::in);
 
     QString results = "";
     char tmp[512];

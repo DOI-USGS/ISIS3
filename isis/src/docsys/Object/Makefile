@@ -148,12 +148,12 @@ doApps:
 doProg:
 	echo "        ...building Programmer documentation"
 	$(DOXYGEN) build/Programmer_temp.conf
-	cd $(ISISROOT)/doc/Object/Programmer ; perl installdox -l apps_fix.tag@../apps/ -q ; cd $(ISISROOT)/src/docsys/Object/
-	
+	cd $(ISISROOT)/doc/Object/Programmer ; cd $(ISISROOT)/src/docsys/Object/
+
 doDev:
 	echo "        ...building Developer documentation"
 	$(DOXYGEN) build/Developer_temp.conf
-	cd $(ISISROOT)/doc/Object/Developer ; perl installdox -l apps_fix.tag@../apps/ -q ; cd $(ISISROOT)/src/docsys/Object/
+	cd $(ISISROOT)/doc/Object/Developer ; cd $(ISISROOT)/src/docsys/Object/
 
 doProgTest:
 	echo "Building ProgTester configuration"

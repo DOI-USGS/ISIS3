@@ -70,7 +70,7 @@ void IsisMain() {
   if (ui.WasEntered("SUMMARY")) {
     QString fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
     ofstream os;
-    os.open(fFile.toAscii().data(),ios::out);
+    os.open(fFile.toLatin1().data(),ios::out);
     if (!os) {
       QString mess = "Cannot create SUMMARY output file " + fFile;
       throw IException(IException::User, mess, _FILEINFO_);

@@ -127,7 +127,7 @@ void IsisMain() {
 
   if (ui.WasEntered("TO")) {
     QString outfile(FileName(ui.GetFileName("TO")).expanded());
-    ofstream outFile(outfile.toAscii().data());
+    ofstream outFile(outfile.toLatin1().data());
     outFile << ss.str();
     outFile.close();
   }

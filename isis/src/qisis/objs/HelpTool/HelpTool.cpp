@@ -1,8 +1,10 @@
 #include "HelpTool.h"
 
+#include <QAction>
 #include <QApplication>
 #include <QMenu>
 #include <QString>
+#include <QToolBar>
 #include <QWhatsThis>
 
 #include "IException.h"
@@ -24,14 +26,14 @@ namespace Isis {
       functions \
       <p><b>Shortcut:</b> Shift+F1</p>";
     p_whatsThis->setWhatsThis(whatsThis);
-    connect(p_whatsThis, SIGNAL(activated()), this, SLOT(whatsThis()));
+    connect(p_whatsThis, SIGNAL(triggered()), this, SLOT(whatsThis()));
 
     p_aboutProgram = new QAction(parent);
     p_aboutProgram->setShortcut(Qt::CTRL + Qt::Key_H);
     QString s = "About ";
     s += QApplication::applicationName();
     p_aboutProgram->setText(s);
-    connect(p_aboutProgram, SIGNAL(activated()), this, SLOT(aboutProgram()));
+    connect(p_aboutProgram, SIGNAL(triggered()), this, SLOT(aboutProgram()));
 
   }
 
@@ -66,7 +68,7 @@ namespace Isis {
     PvlGroup &uig = Preference::Preferences().findGroup("UserInterface");
     QString command = (QString) uig["GuiHelpBrowser"] +
                       (QString)" file:" + file.expanded() + " &";
-    if(system(command.toAscii().data()) != 0) {
+    if(system(command.toLatin1().data()) != 0) {
       IString msg = "Failed to execute [" + command + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

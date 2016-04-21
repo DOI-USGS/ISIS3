@@ -79,7 +79,7 @@ void IsisMain() {
   // Open the cube for writing
   QString to = ui.GetFileName("TO", "raw");
   ofstream fout;
-  fout.open(to.toAscii().data(), ios::out | ios::binary);
+  fout.open(to.toLatin1().data(), ios::out | ios::binary);
   if(!fout.is_open()) {
     string msg = "Cannot open raw output file";
     throw IException(IException::Programmer, msg, _FILEINFO_);

@@ -86,7 +86,7 @@ namespace Isis {
     m_open->setToolTip("Open File");
     QString whatsThis = "Open a file to edit";
     m_open->setWhatsThis(whatsThis);
-    connect(m_open, SIGNAL(activated()), this, SLOT(open()));
+    connect(m_open, SIGNAL(triggered()), this, SLOT(open()));
     fileMenu->addAction(m_open);
 
     // Action File-> Save
@@ -95,7 +95,7 @@ namespace Isis {
     m_save->setText("&Save...");
     m_save->setToolTip("Save File");
     m_save->setWhatsThis("Save the current file");
-    connect(m_save, SIGNAL(activated()), this, SLOT(saveFile()));
+    connect(m_save, SIGNAL(triggered()), this, SLOT(saveFile()));
     fileMenu->addAction(m_save);
 
     // Action File->Save As
@@ -104,7 +104,7 @@ namespace Isis {
     m_saveAs->setShortcut(Qt::CTRL + Qt::Key_A);
     m_saveAs->setToolTip("Save As File");
     m_saveAs->setWhatsThis("Save the current file into another file");
-    connect(m_saveAs, SIGNAL(activated()), this, SLOT(saveAs()));
+    connect(m_saveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
     fileMenu->addAction(m_saveAs);
 
     // Action File->close
@@ -113,7 +113,7 @@ namespace Isis {
     m_close->setShortcut(Qt::CTRL + Qt::Key_C);
     m_close->setToolTip("Close File");
     m_close->setWhatsThis("Close the current file");
-    connect(m_close, SIGNAL(activated()), this, SLOT(closeFile()));
+    connect(m_close, SIGNAL(triggered()), this, SLOT(closeFile()));
     fileMenu->addAction(m_close);
 
     // Action Exit
@@ -122,8 +122,8 @@ namespace Isis {
     m_exit->setText("&Exit...");
     m_exit->setToolTip("Exit");
     m_exit->setWhatsThis("Exit the Editor");
-    //connect(m_exit, SIGNAL(activated()), m_editWin, SLOT(close()));
-    connect(m_exit, SIGNAL(activated()), this, SLOT(closeWin()));
+    //connect(m_exit, SIGNAL(triggered()), m_editWin, SLOT(close()));
+    connect(m_exit, SIGNAL(triggered()), this, SLOT(closeWin()));
 
     m_editWin->setMenuBar(menuBar);
 

@@ -219,16 +219,16 @@ namespace Isis {
     // Temporarily load some naif kernels
     QString lsk = p_lsk.expanded();
     QString sclk = p_sclk.expanded();
-    furnsh_c(lsk.toAscii().data());
-    furnsh_c(sclk.toAscii().data());
+    furnsh_c(lsk.toLatin1().data());
+    furnsh_c(sclk.toLatin1().data());
 
     // Compute the starting ephemeris time
-    scs2e_c(-94, p_clockCount.toAscii().data(), &p_etStart);
+    scs2e_c(-94, p_clockCount.toLatin1().data(), &p_etStart);
     p_etEnd = EphemerisTime((double)p_nl);
 
     // Unload the naif kernels
-    unload_c(lsk.toAscii().data());
-    unload_c(sclk.toAscii().data());
+    unload_c(lsk.toLatin1().data());
+    unload_c(sclk.toLatin1().data());
   }
 
   /**
@@ -421,14 +421,14 @@ namespace Isis {
     // Load naif kernels
     QString lskKern = p_lsk.expanded();
     QString sclkKern = p_sclk.expanded();
-    furnsh_c(lskKern.toAscii().data());
-    furnsh_c(sclkKern.toAscii().data());
+    furnsh_c(lskKern.toLatin1().data());
+    furnsh_c(sclkKern.toLatin1().data());
 
     //Set up file for reading
     FileName wagoFile("$mgs/calibration/MGSC_????_wago.tab");
     wagoFile = wagoFile.highestVersion();
     QString nameOfFile = wagoFile.expanded();
-    ifstream temp(nameOfFile.toAscii().data());
+    ifstream temp(nameOfFile.toLatin1().data());
     vector<int> wholeFile;
 
     // Read file into a vector of bytes, ignoring EOL chars
@@ -557,8 +557,8 @@ namespace Isis {
           p = p_gainMapWA.find(gainId);
           if(p == p_gainMapWA.end()) {
             // Unload the naif kernels
-            unload_c(lskKern.toAscii().data());
-            unload_c(sclkKern.toAscii().data());
+            unload_c(lskKern.toLatin1().data());
+            unload_c(sclkKern.toLatin1().data());
 
             QString msg = "Invalid GainModeId [" + gainId + "] in wago table";
             throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -593,8 +593,8 @@ namespace Isis {
     unique(p_wagos.begin(), p_wagos.end());
 
     // Unload the naif kernels
-    unload_c(lskKern.toAscii().data());
-    unload_c(sclkKern.toAscii().data());
+    unload_c(lskKern.toLatin1().data());
+    unload_c(sclkKern.toLatin1().data());
   }
 }
 

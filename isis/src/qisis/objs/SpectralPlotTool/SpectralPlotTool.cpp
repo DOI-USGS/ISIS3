@@ -8,6 +8,15 @@
 #include "geos/geom/CoordinateArraySequence.h"
 #include "geos/geom/Point.h"
 
+#include <QAction>
+#include <QCheckBox>
+#include <QHBoxLayout>
+#include <QGridLayout>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QPushButton>
+
 #include "Brick.h"
 #include "Cube.h"
 #include "CubePlotCurve.h"
@@ -160,7 +169,7 @@ namespace Isis {
    * @return QWidget*
    */
   QWidget *SpectralPlotTool::createToolBarWidget(QStackedWidget *parent) {
-    QWidget *wrapper = new QWidget(parent);
+    QWidget *wrapper = new QWidget;
     wrapper->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     m_plotAvgAction = new QAction("Average", this);

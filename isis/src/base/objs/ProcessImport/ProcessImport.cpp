@@ -1423,7 +1423,7 @@ namespace Isis {
     // Open input file
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
-    fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
+    fin.open(inFileName.toLatin1().data(), ios::in | ios::binary);
     if (!fin.is_open()) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1701,7 +1701,7 @@ namespace Isis {
     // Open input file
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
-    fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
+    fin.open(inFileName.toLatin1().data(), ios::in | ios::binary);
     if (!fin.is_open()) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1958,7 +1958,7 @@ namespace Isis {
     // Open input file
     Isis::FileName inFile(p_inFile);
     QString inFileName(inFile.expanded());
-    fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
+    fin.open(inFileName.toLatin1().data(), ios::in | ios::binary);
     if (!fin.is_open()) {
       QString msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);

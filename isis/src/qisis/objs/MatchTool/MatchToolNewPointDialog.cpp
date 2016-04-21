@@ -1,7 +1,15 @@
 #include "MatchToolNewPointDialog.h"
 
-#include <QtGui>
 #include <algorithm>
+
+#include <QAbstractItemView>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QPushButton>
+#include <QtGui>
 
 #include "ControlNet.h"
 #include "IString.h"

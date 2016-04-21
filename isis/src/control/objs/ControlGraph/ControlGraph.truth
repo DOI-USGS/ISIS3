@@ -30,10 +30,10 @@ but that island does not exist!!!
 
 There are 2 islands numbered from 0 to 1.
 
-GetCubeList() returns:
-    D
-    E
+GetCubeList() returns (NOTE: sorted in unittest):
     A
     B
     C
+    D
+    E
 

@@ -137,7 +137,7 @@ namespace Isis {
         QString val = (QString)field;
         for (int i = 0; i < field.size(); i++) {
           if (i < (int)val.length()) {
-            buf[sbyte] = val[i].toAscii();
+            buf[sbyte] = val[i].toLatin1();
           }
           else {
             buf[sbyte] = 0;

@@ -1285,7 +1285,7 @@ namespace Isis {
 
         if( point->IsRejected() ) {
             nRejected3DPoints++;
-//            sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_dRejectionLimit);
+//            sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toLatin1().data(),nPointIndex,n3DPoints,m_dRejectionLimit);
 //            m_fp_log << buf;
 
             nPointIndex++;
@@ -1642,7 +1642,7 @@ namespace Isis {
 
       if( point->IsRejected() ) {
         nRejected3DPoints++;
-//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_dRejectionLimit);
+//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toLatin1().data(),nPointIndex,n3DPoints,m_dRejectionLimit);
 //      m_fp_log << buf;
 
         nPointIndex++;
@@ -4326,7 +4326,7 @@ namespace Isis {
 
     int nClosetApproaches = 0;
 
-//  const char* buf = rPoint.Id().toAscii().data();
+//  const char* buf = rPoint.Id().toLatin1().data();
 
     // loop over observations (in Astro Terms "measures")
     int nObservations = rPoint.GetNumMeasures();
@@ -4534,7 +4534,7 @@ namespace Isis {
              (double) rPoint.GetAdjustedSurfacePoint().GetLatitude().radians(),
              pB);
 
-//    printf("%s: %lf   %lf   %lf\n",rPoint.Id().toAscii().data(), AveragePoint[0],AveragePoint[1],AveragePoint[2]);
+//    printf("%s: %lf   %lf   %lf\n",rPoint.Id().toLatin1().data(), AveragePoint[0],AveragePoint[1],AveragePoint[2]);
 //    printf("    %lf   %lf   %lf\n", avglat,avglon,avgrad);
 //    printf("    %lf   %lf   %lf\n", lat,lon,rad);
 //    printf("    %lf   %lf   %lf\n",pB[0],pB[1],pB[2]);
@@ -4691,8 +4691,8 @@ namespace Isis {
       dLongCorr = NIC(1);
       dRadCorr = NIC(2);
 
-//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toAscii().data(),dLatCorr, dLongCorr, dRadCorr);
-//      std::cout <<"Point " <<  point->GetId().toAscii().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
+//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toLatin1().data(),dLatCorr, dLongCorr, dRadCorr);
+//      std::cout <<"Point " <<  point->GetId().toLatin1().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
       double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
       double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
@@ -4742,7 +4742,7 @@ namespace Isis {
 //               (dLon * DEG2RAD),
 //               (dLat * DEG2RAD),
 //               pB);
-//      printf("%s %lf %lf %lf\n",point->Id().toAscii().data(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().toLatin1().data(),pB[0],pB[1],pB[2]);
     } // end loop over point corrections
   }
 
@@ -4883,8 +4883,8 @@ namespace Isis {
       dLongCorr = NIC(1);
       dRadCorr = NIC(2);
 
-//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toAscii().data(),dLatCorr, dLongCorr, dRadCorr);
-//      std::cout <<"Point " <<  point->GetId().toAscii().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
+//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toLatin1().data(),dLatCorr, dLongCorr, dRadCorr);
+//      std::cout <<"Point " <<  point->GetId().toLatin1().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
       double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
       double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
@@ -4934,7 +4934,7 @@ namespace Isis {
 //               (dLon * DEG2RAD),
 //               (dLat * DEG2RAD),
 //               pB);
-//      printf("%s %lf %lf %lf\n",point->Id().toAscii().data(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().toLatin1().data(),pB[0],pB[1],pB[2]);
     } // end loop over point corrections
   }
 
@@ -4997,7 +4997,7 @@ namespace Isis {
         m_Statsrxy.AddData(vx);
         m_Statsrxy.AddData(vy);
 
-//      printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point->Id().toAscii().data(),rx,ry);
+//      printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point->Id().toLatin1().data(),rx,ry);
 
         vtpv += vx * vx * dWeight + vy * vy * dWeight;
       }
@@ -5017,7 +5017,7 @@ namespace Isis {
       bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
       bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
 
-      //printf("Point: %s PointIndex: %d Loop(i): %d\n",point->GetId().toAscii().data(),nPointIndex,i);
+      //printf("Point: %s PointIndex: %d Loop(i): %d\n",point->GetId().toLatin1().data(),nPointIndex,i);
       //std::cout << weights << std::endl;
       //std::cout << corrections << std::endl;
 
@@ -5376,7 +5376,7 @@ namespace Isis {
 
             // was it previously rejected?
             if( measure->IsRejected() ) {
-                  printf("Coming back in: %s\r",point->GetId().toAscii().data());
+                  printf("Coming back in: %s\r",point->GetId().toLatin1().data());
                   nComingBack++;
                   m_pCnet->DecrementNumberOfRejectedMeasuresInImage(measure->GetCubeSerialNumber());
               }
@@ -5425,14 +5425,14 @@ namespace Isis {
       // do we still have sufficient remaining observations for this 3D point?
       if( ( nMeasures-nRejected ) < 2 ) {
           point->SetRejected(true);
-          printf("Rejecting Entire Point: %s\r",point->GetId().toAscii().data());
+          printf("Rejecting Entire Point: %s\r",point->GetId().toLatin1().data());
       }
       else
           point->SetRejected(false);
 
 //      int ndummy = point->GetNumberOfRejectedMeasures();
-//      printf("Rejected for point %s = %d\n", point->GetId().toAscii().data(), ndummy);
-//      printf("%s: %20.10lf  %20.10lf*\n",point->GetId().toAscii().data(), rejected->GetSampleResidual(), rejected->GetLineResidual());
+//      printf("Rejected for point %s = %d\n", point->GetId().toLatin1().data(), ndummy);
+//      printf("%s: %20.10lf  %20.10lf*\n",point->GetId().toLatin1().data(), rejected->GetSampleResidual(), rejected->GetLineResidual());
   }
 
     m_nRejectedObservations = 2*ntotalrejected;
@@ -5575,7 +5575,7 @@ namespace Isis {
       if ( point->IsRejected() )
         continue;
 
-      printf("\rProcessing point %d of %d   Time: %s",i+1, nObjectPoints, Isis::iTime::CurrentLocalTime().toAscii().data());
+      printf("\rProcessing point %d of %d   Time: %s",i+1, nObjectPoints, Isis::iTime::CurrentLocalTime().toLatin1().data());
       
       T.clear();
       QS.clear();
@@ -5661,7 +5661,7 @@ namespace Isis {
 
     int nObjectPoints = m_pCnet->GetNumPoints();
 
-    std::string strTime = Isis::iTime::CurrentLocalTime().toAscii().data();
+    std::string strTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
     printf("     Time: %s\n\n", strTime.c_str());
 
     // create and initialize array of 3x3 matrices for all object points
@@ -5826,7 +5826,7 @@ namespace Isis {
     m_SparseNormals.wipe();
 
     printf("\n\n");
-    strTime = Isis::iTime::CurrentLocalTime().toAscii().data();
+    strTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
     printf("\rFilling point covariance matrices: Time %s", strTime.c_str());
     printf("\n\n");
 
@@ -6007,7 +6007,7 @@ namespace Isis {
                (dLon * DEG2RAD),
                (dLat * DEG2RAD),
                pB);
-//      printf("%s %lf %lf %lf\n",point->Id().toAscii().data(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().toLatin1().data(),pB[0],pB[1],pB[2]);
 
       /*      else {  // Recompute radius to match updated lat/lon... Should this be removed?
               ControlMeasure &m = ((*m_pCnet)[i])[0];
@@ -6175,7 +6175,7 @@ namespace Isis {
     }
 
     std::ostringstream ostr;
-    ostr<<gp<<endl;
+    ostr << gp << std::endl;
     m_iterationSummary += QString::fromStdString(ostr.str());
     if (m_bPrintSummary) Application::Log(gp);
   }
@@ -6215,7 +6215,7 @@ namespace Isis {
     }
 
     std::ostringstream ostr;
-    ostr<<gp<<endl;
+    ostr << gp << std::endl;
     m_iterationSummary += QString::fromStdString(ostr.str());
     if (m_bPrintSummary) Application::Log(gp);
   }
@@ -6439,15 +6439,15 @@ namespace Isis {
       sprintf(buf, "JIGSAW (DELTACK or QTIE): BUNDLE ADJUSTMENT\n=========================\n");
 
     fp_out << buf;
-    sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().toAscii().data());
+    sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().toLatin1().data());
     fp_out << buf;
-    sprintf(buf,"\n               Network Filename: %s", m_strCnetFileName.toAscii().data());
+    sprintf(buf,"\n               Network Filename: %s", m_strCnetFileName.toLatin1().data());
     fp_out << buf;
-    sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().toAscii().data());
+    sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().toLatin1().data());
     fp_out << buf;
-    sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().toAscii().data());
+    sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().toLatin1().data());
     fp_out << buf;
-    sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().toAscii().data());
+    sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().toLatin1().data());
     fp_out << buf;
     sprintf(buf,"\n\n                   Linear Units: kilometers");
     fp_out << buf;
@@ -6464,7 +6464,7 @@ namespace Isis {
     m_bUpdateCubes ? sprintf(buf, "\n                         UPDATE: YES"):
         sprintf(buf, "\n                         UPDATE: NO");
     fp_out << buf;
-    sprintf(buf,"\n                  SOLUTION TYPE: %s", m_strSolutionMethod.toAscii().data());
+    sprintf(buf,"\n                  SOLUTION TYPE: %s", m_strSolutionMethod.toLatin1().data());
     fp_out << buf;
     m_bErrorPropagation ? sprintf(buf, "\n              ERROR PROPAGATION: ON"):
         sprintf(buf, "\n              ERROR PROPAGATION: OFF");
@@ -6481,14 +6481,14 @@ namespace Isis {
         sprintf(buf, "\n                         Tier %d Enabled: TRUE",tier);
         fp_out << buf;
         sprintf(buf,"\n               Maximum Likelihood Model: %s", 
-                MaximumLikelihoodWFunctions::modelToString(m_wFunc[tier]->model()).toAscii().data());
+                MaximumLikelihoodWFunctions::modelToString(m_wFunc[tier]->model()).toLatin1().data());
         fp_out << buf;
         sprintf(buf, "\n    Quantile used for tweaking constant: %lf", m_maxLikelihoodQuan[tier]);
         fp_out << buf;
         sprintf(buf, "\n   Quantile weighted R^2 Residual value: %lf", m_wFunc[tier]->tweakingConstant());
         fp_out << buf;
         sprintf(buf, "\n       Approx. weighted Residual cutoff: %s", 
-                m_wFunc[tier]->weightedResidualCutoff().toAscii().data());
+                m_wFunc[tier]->weightedResidualCutoff().toLatin1().data());
         fp_out << buf;
         if (tier != 2) fp_out << "\n";
       }
@@ -6724,12 +6724,12 @@ namespace Isis {
 
       if (nUsed == nMeasures)
         sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                m_pSnList->fileName(i).toAscii().data(),
+                m_pSnList->fileName(i).toLatin1().data(),
                 (nMeasures-nRejectedMeasures), nMeasures,
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
       else
         sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                m_pSnList->fileName(i).toAscii().data(),
+                m_pSnList->fileName(i).toLatin1().data(),
                 (nMeasures-nRejectedMeasures), nMeasures,
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
       fp_out << buf;
@@ -6748,7 +6748,7 @@ namespace Isis {
     if( m_strOutputFilePrefix.length() != 0 )
         ofname = m_strOutputFilePrefix + "_" + ofname;
 
-    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
     if (!fp_out)
       return false;
 
@@ -6830,9 +6830,9 @@ namespace Isis {
         coefTWI.push_back(angles.at(2));
       }
 
-      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->fileName(i).toAscii().data());
+      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->fileName(i).toLatin1().data());
       fp_out << buf;
-      sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->serialNumber(i).toAscii().data());
+      sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->serialNumber(i).toLatin1().data());
       fp_out << buf;
       sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
               "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
@@ -7076,27 +7076,27 @@ namespace Isis {
     sprintf(buf, " RMS Sigma Latitude(m)%20.8lf\n", m_drms_sigmaLat);
     fp_out << buf;
     sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
-            m_dminSigmaLatitude,m_idMinSigmaLatitude.toAscii().data());
+            m_dminSigmaLatitude,m_idMinSigmaLatitude.toLatin1().data());
     fp_out << buf;
     sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
-            m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.toAscii().data());
+            m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.toLatin1().data());
     fp_out << buf;
     sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n", m_drms_sigmaLon);
     fp_out << buf;
     sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
-            m_dminSigmaLongitude,m_idMinSigmaLongitude.toAscii().data());
+            m_dminSigmaLongitude,m_idMinSigmaLongitude.toLatin1().data());
     fp_out << buf;
     sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
-            m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.toAscii().data());
+            m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.toLatin1().data());
     fp_out << buf;
     if (m_bSolveRadii) {
       sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n", m_drms_sigmaRad);
       fp_out << buf;
       sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
-              m_dminSigmaRadius,m_idMinSigmaRadius.toAscii().data());
+              m_dminSigmaRadius,m_idMinSigmaRadius.toLatin1().data());
       fp_out << buf;
       sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
-              m_dmaxSigmaRadius,m_idMaxSigmaRadius.toAscii().data());
+              m_dmaxSigmaRadius,m_idMaxSigmaRadius.toLatin1().data());
       fp_out << buf;
     }
     else {
@@ -7152,7 +7152,7 @@ namespace Isis {
         strStatus = "UNKNOWN";
 
       sprintf(buf, "%16s%15s%5d of %d%6.2lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-              point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays,
+              point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nGoodRays, nRays,
               dResidualRms, dLat, dLon, dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
       fp_out << buf;
       nPointIndex++;
@@ -7203,7 +7203,7 @@ namespace Isis {
         strStatus = "UNKNOWN";
 
       sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-              point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays);
+              point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nGoodRays, nRays);
       fp_out << buf;
 
       sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
@@ -7243,7 +7243,7 @@ namespace Isis {
       if( m_strOutputFilePrefix.length() != 0 )
           ofname = m_strOutputFilePrefix + "_" + ofname;
 
-      std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+      std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
       if (!fp_out)
           return false;
 
@@ -7323,9 +7323,9 @@ namespace Isis {
             coefTWI.push_back(angles.at(2));
           }
 
-          sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->fileName(i).toAscii().data());
+          sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->fileName(i).toLatin1().data());
           fp_out << buf;
-          sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->serialNumber(i).toAscii().data());
+          sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->serialNumber(i).toLatin1().data());
           fp_out << buf;
           sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
                   "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
@@ -7549,29 +7549,29 @@ namespace Isis {
               m_drms_sigmaLat);
       fp_out << buf;
       sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
-              m_dminSigmaLatitude,m_idMinSigmaLatitude.toAscii().data());
+              m_dminSigmaLatitude,m_idMinSigmaLatitude.toLatin1().data());
       fp_out << buf;
       sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
-              m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.toAscii().data());
+              m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.toLatin1().data());
       fp_out << buf;
       sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n",
               m_drms_sigmaLon);
       fp_out << buf;
       sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
-              m_dminSigmaLongitude,m_idMinSigmaLongitude.toAscii().data());
+              m_dminSigmaLongitude,m_idMinSigmaLongitude.toLatin1().data());
       fp_out << buf;
       sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
-              m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.toAscii().data());
+              m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.toLatin1().data());
       fp_out << buf;
       if ( m_bSolveRadii ) {
         sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n",
                 m_drms_sigmaRad);
         fp_out << buf;
         sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
-                m_dminSigmaRadius,m_idMinSigmaRadius.toAscii().data());
+                m_dminSigmaRadius,m_idMinSigmaRadius.toLatin1().data());
         fp_out << buf;
         sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
-                m_dmaxSigmaRadius,m_idMaxSigmaRadius.toAscii().data());
+                m_dmaxSigmaRadius,m_idMaxSigmaRadius.toLatin1().data());
         fp_out << buf;
       }
       else {
@@ -7627,7 +7627,7 @@ namespace Isis {
               strStatus = "UNKNOWN";
 
           sprintf(buf, "%16s%15s%5d of %d%6.2lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-                  point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays, dResidualRms, dLat,
+                  point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nGoodRays, nRays, dResidualRms, dLat,
                   dLon, dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
           fp_out << buf;
           nPointIndex++;
@@ -7678,7 +7678,7 @@ namespace Isis {
               strStatus = "UNKNOWN";
 
           sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-                  point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays);
+                  point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nGoodRays, nRays);
           fp_out << buf;
 
           sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
@@ -7725,7 +7725,7 @@ namespace Isis {
     if (!m_strOutputFilePrefix.isEmpty())
       ofname = m_strOutputFilePrefix + "_" + ofname;
 
-    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
     if (!fp_out)
       return false;
 
@@ -7797,9 +7797,9 @@ namespace Isis {
         coefTWI.push_back(angles.at(2));
       }
 
-      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->fileName(i).toAscii().data());
+      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->fileName(i).toLatin1().data());
       fp_out << buf;
-      sprintf(buf, "\n Image Serial Number: %s\n", m_pSnList->serialNumber(i).toAscii().data());
+      sprintf(buf, "\n Image Serial Number: %s\n", m_pSnList->serialNumber(i).toLatin1().data());
       fp_out << buf;
       sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
               "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
@@ -8032,7 +8032,7 @@ namespace Isis {
         strStatus = "UNKNOWN";
 
       sprintf(buf, "%16s%12s%4d of %d%6.2lf%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
-              point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays,
+              point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nGoodRays, nRays,
               dResidualRms, dLat, dLon, dRadius * 0.001,"N/A","N/A","N/A");
 
       fp_out << buf;
@@ -8079,7 +8079,7 @@ namespace Isis {
         strStatus = "UNKNOWN";
 
       sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-              point->GetId().toAscii().data(),strStatus.toAscii().data(),nGoodRays,nRays);
+              point->GetId().toLatin1().data(),strStatus.toLatin1().data(),nGoodRays,nRays);
       fp_out << buf;
 
       sprintf(buf,"\n     Point         Initial               Total               Total              Final             Initial             Final\n"
@@ -8119,7 +8119,7 @@ namespace Isis {
     if (!m_strOutputFilePrefix.isEmpty())
       ofname = m_strOutputFilePrefix + "_" + ofname;
 
-    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
     if (!fp_out)
       return false;
 
@@ -8194,12 +8194,12 @@ namespace Isis {
         dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
 
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
+                point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
                 dSigmaLat, dSigmaLong, dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
       }
       else
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
+                point->GetId().toLatin1().data(), strStatus.toLatin1().data(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
                 cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
 
       fp_out << buf;
@@ -8224,7 +8224,7 @@ namespace Isis {
     if (!m_strOutputFilePrefix.isEmpty())
       ofname = m_strOutputFilePrefix + "_" + ofname;
 
-    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
     if (!fp_out)
       return false;
 
@@ -8261,13 +8261,13 @@ namespace Isis {
 
         if (measure->IsRejected())
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-                  point->GetId().toAscii().data(), m_pSnList->fileName(nImageIndex).toAscii().data(), m_pSnList->serialNumber(nImageIndex).toAscii().data(),
+                  point->GetId().toLatin1().data(), m_pSnList->fileName(nImageIndex).toLatin1().data(), m_pSnList->serialNumber(nImageIndex).toLatin1().data(),
                   measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
                   measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(),
                   measure->GetResidualMagnitude());
         else
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                  point->GetId().toAscii().data(), m_pSnList->fileName(nImageIndex).toAscii().data(), m_pSnList->serialNumber(nImageIndex).toAscii().data(),
+                  point->GetId().toLatin1().data(), m_pSnList->fileName(nImageIndex).toLatin1().data(), m_pSnList->serialNumber(nImageIndex).toLatin1().data(),
                   measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
                   measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(), measure->GetResidualMagnitude());
         fp_out << buf;
@@ -8289,7 +8289,7 @@ namespace Isis {
     if (!m_strOutputFilePrefix.isEmpty())
       ofname = m_strOutputFilePrefix + "_" + ofname;
 
-    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+    std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
     if (!fp_out)
       return false;
 
@@ -8445,7 +8445,7 @@ namespace Isis {
     int ncolumns = output_columns.size();
     for (int i = 0; i < ncolumns; i++) {
       QString str = output_columns.at(i);
-      sprintf(buf, "%s", (const char*)str.toAscii().data());
+      sprintf(buf, "%s", (const char*)str.toLatin1().data());
       fp_out << buf;
     }
     sprintf(buf, "\n");
@@ -8478,7 +8478,7 @@ namespace Isis {
     ncolumns = output_columns.size();
     for (int i = 0; i < ncolumns; i++) {
       QString str = output_columns.at(i);
-      sprintf(buf, "%s", (const char*)str.toAscii().data());
+      sprintf(buf, "%s", (const char*)str.toLatin1().data());
       fp_out << buf;
     }
     sprintf(buf, "\n");
@@ -8571,7 +8571,7 @@ namespace Isis {
       output_columns.clear();
 
       // add filename
-      output_columns.push_back(m_pSnList->fileName(i).toAscii().data());
+      output_columns.push_back(m_pSnList->fileName(i).toLatin1().data());
 
       // add rms of sample, line, total image coordinate residuals
       output_columns.push_back(
@@ -8814,9 +8814,9 @@ namespace Isis {
         QString str = output_columns.at(i);
 
         if (i < ncolumns-1)
-          sprintf(buf, "%s,", (const char*)str.toAscii().data());
+          sprintf(buf, "%s,", (const char*)str.toLatin1().data());
         else
-          sprintf(buf, "%s", (const char*)str.toAscii().data());
+          sprintf(buf, "%s", (const char*)str.toLatin1().data());
         fp_out << buf;
       }
       sprintf(buf, "\n");

@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
     qDebug() << "Unit test for NaifDskPlateModel.";
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Default constructor.";
     NaifDskPlateModel naifPlateModel;
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "File name:          " << naifPlateModel.filename();
     qDebug() << "Number of Plates:   " << naifPlateModel.numberPlates();
     qDebug() << "Number of Vertices: " << naifPlateModel.numberVertices();
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Construct NaifDskPlateModel object from NAIF DSK file and retrieve basic info.";
     FileName dskFile("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Size:               " << naifPlateModelFromDSK.size();
     qDebug() << "Number of plates:   " << naifPlateModelFromDSK.numberPlates();
     qDebug() << "Number of vertices: " << naifPlateModelFromDSK.numberVertices();
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Look for surface point at equator, lon 0.0";
     Latitude lat(0.0, Angle::Degrees);
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
                                   << sp->GetY().meters()
                                   << sp->GetZ().meters()
                                   << " meters";
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Look for intercept with obsever position and look direction ray:";
     NaifVertex obsPos(3);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
     qDebug() << "intercept plateID                    =  " 
              << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Get plate info from id:";
     qDebug() << "Is plate ID = 0 valid? " << naifPlateModelFromDSK.isPlateIdValid(0);
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
              << naifPlateModel.isPlateIdValid(1);
     qDebug() << "Triangular Plate for ID = 1:";
     qDebug() << naifPlateModelFromDSK.plate(1);
-    qDebug();
+    qDebug() << "";
 
     // currently there is a clone() method prototype, but no implementation.
     // the following is a test if the method is ever implemented...
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
     // qDebug() << clonePlateModel->size();
     // qDebug() << clonePlateModel->numberPlates();
     // qDebug() << clonePlateModel->numberVertices();
-    // qDebug();
+    // qDebug() << "";
 
     qDebug() << "================================= Error Throws ==================================";
 //  qDebug() << "Thrown from Constructor: Create object where openDSK() returns NULL.";
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 //    catch (IException &e) {
 //      e.print();
 //    }
-//    qDebug();
+//    qDebug() << "";
     qDebug() << "Thrown from plateIdOfIntercept(): Get plate ID of intercept with invalid obsPos.";
     try {
       NaifVertex badObs(2);
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Thrown from plate(): Get plate from invalid plate ID.";
     try {
       naifPlateModelFromDSK.plate(0);
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Thrown from openDSK(): Open DSK file that doesn't exist.";
     try {
       FileName junkFile("./junk.bds");
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
 //    qDebug() << "Thrown from openDSK(): Open DSK file with no segments.";
 //    try {
 //      FileName noSegmentsFile("");
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 //    catch (IException &e) {
 //      e.print();
 //    }
-//    qDebug();
+//    qDebug() << "";
     qDebug() << "~NaifDskDescriptor(): Unknown NAIF error has occured.";
     try {
       FileName junkFile("$base/kernels/spk/de405.bsp");
@@ -188,8 +188,8 @@ int main(int argc, char *argv[]) {
  
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     IException(e, IException::Programmer,
               "\n------------Unit Test Failed.------------",
               _FILEINFO_).print();

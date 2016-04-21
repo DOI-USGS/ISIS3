@@ -252,7 +252,7 @@ void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outF
   ifstream fin;
   // Open input file
   Isis::FileName inFile(inFileName);
-  fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
+  fin.open(inFileName.toLatin1().data(), ios::in | ios::binary);
   if(!fin.is_open()) {
     QString msg = "Cannot open input file [" + inFileName + "]";
     throw IException(IException::Io, msg, _FILEINFO_);

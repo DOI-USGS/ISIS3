@@ -1,23 +1,23 @@
-Unit test for NaifDskApi utility methods. 
+Unit test for NaifDskApi utility methods.
 vertex A =  "( 1.0, 2.0, 3.0 )"
-vertex A is valid? true 
+vertex A is valid? true
 vertex B =  "( 4.0, 5.0 )"
-vertex B is valid? false 
+vertex B is valid? false
 vector A =  "( 6.0, 7.0, 8.0 )"
-vector A is valid? true 
+vector A is valid? true
 vector B =  "(  )"
-vector B is valid? false 
+vector B is valid? false
 triangle A =      "9.0"     "8.0"     "7.0"     
     "6.0"     "5.0"     "4.0"     
     "3.0"     "2.0"     "1.0"     
 
-triangle A is valid? true 
+triangle A is valid? true
 triangle B =      "0.0"     "-1.0"     "-2.0"     
     "-3.0"     "-4.0"     "-5.0"     
 
-triangle B is valid? false 
+triangle B is valid? false
 triangle C =      "-6.0"     "-7.0"     
     "-8.0"     "-9.0"     
     "-10.0"     "-11.0"     
 
-triangle C is valid? false 
+triangle C is valid? false

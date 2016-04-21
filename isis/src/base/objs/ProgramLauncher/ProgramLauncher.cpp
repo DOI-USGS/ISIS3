@@ -201,7 +201,7 @@ namespace Isis {
         int eline = g["Line"];
 
         errors.append(
-          IException((IException::ErrorType)ecode, emsg, efile.toAscii().data(), eline));
+          IException((IException::ErrorType)ecode, emsg, efile.toLatin1().data(), eline));
       }
     }
 
@@ -221,7 +221,7 @@ namespace Isis {
    *                    you would type in a terminal
    */
   void ProgramLauncher::RunSystemCommand(QString fullCommand) {
-    int status = system(fullCommand.toAscii().data());
+    int status = system(fullCommand.toLatin1().data());
 
     if(status != 0) {
       QString msg = "Executing command [" + fullCommand +

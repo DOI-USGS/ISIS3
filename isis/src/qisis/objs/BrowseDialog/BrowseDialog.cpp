@@ -1,6 +1,9 @@
 #include "BrowseDialog.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QPushButton>
+
 #include <iostream>
 
 namespace Isis {

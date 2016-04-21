@@ -1,3 +1,4 @@
+#include <QMessageBox>
 #include <QtGui>
 
 #include "QnetSetAprioriDialog.h"

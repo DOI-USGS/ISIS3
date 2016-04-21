@@ -167,7 +167,7 @@ namespace Isis {
       if ( isDebug() ) { 
         cout << "Running " << command.m_name << " PRE command: " << cmd << "\n"; 
       }
-      int status = system(cmd.toAscii().data());
+      int status = system(cmd.toLatin1().data());
       if ( 0 != status) {
         if ( !m_onPreCommandErrorContinue ) {
           QString mess = command.m_name + " RunCommand::PreCommand failed - " + 
@@ -195,7 +195,7 @@ namespace Isis {
       }
 
       // Check status and disposition
-      int status = system(cmd.toAscii().data());
+      int status = system(cmd.toLatin1().data());
       if ( 0 != status) {
         if ( !m_onPostCommandErrorContinue ) {
           QString mess = command.m_name + " RunCommand::PostCommand failed - " + 
@@ -233,7 +233,7 @@ namespace Isis {
       if ( isDebug() ) { 
         cout << "Running " << command.m_name << " command: " << cmd << "\n"; 
       }
-      int status = system(cmd.toAscii().data());
+      int status = system(cmd.toLatin1().data());
 
       // If command failed, deactivate the resource
       if (status != 0 ) {

@@ -139,7 +139,7 @@ int main() {
 
     cout << endl << "Output: " << endl;
     try {
-      stream.write(keywordsToTry[key].toAscii().data(), keywordsToTry[key].size());
+      stream.write(keywordsToTry[key].toLatin1().data(), keywordsToTry[key].size());
       stream >> someKey;
       cout << someKey << endl;
     }

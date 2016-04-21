@@ -81,7 +81,7 @@ namespace Isis {
           return (Column) i;
       }
 
-      IString msg = "Column title [" + columnTitle + "] does not match any of "
+      QString msg = "Column title [" + columnTitle + "] does not match any of "
           "the defined column types";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -353,20 +353,20 @@ namespace Isis {
     void AbstractMeasureItem::deleteSource() {
       if (m_measure) {
         if (m_measure->Parent()->IsEditLocked()) {
-          IString msg = "Measures in point [" +
+          QString msg = "Measures in point [" +
               getFormattedData(getColumnName(PointId)) +
               "] cannot be deleted because point is edit locked";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
         else if (m_measure->IsEditLocked()) {
-          IString msg = "Measure [" + getFormattedData() + "] in point [" +
+          QString msg = "Measure [" + getFormattedData() + "] in point [" +
               getFormattedData(getColumnName(PointId)) +
               "] cannot be deleted because m_measure is edit locked";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         //       else if (m_measure->Parent()->GetRefMeasure() == m_measure) {
-        //         IString msg = "Measure [" + getData() + "] in point [" +
+        //         QString msg = "Measure [" + getData() + "] in point [" +
         //             getData(getColumnName(PointId)) + "] cannot be deleted because "
         //             "it is the reference";
         //         throw iException::Message(iException::User, msg, _FILEINFO_);

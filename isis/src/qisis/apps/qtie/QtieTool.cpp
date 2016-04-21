@@ -1,25 +1,27 @@
 #include "QtieTool.h"
 
-#include <QDebug>
 #include <QApplication>
-#include <QDialog>
-#include <QMenuBar>
-#include <QMenu>
-#include <QToolButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QTabWidget>
-#include <QLineEdit>
-#include <QRadioButton>
 #include <QCheckBox>
-#include <QSpinBox>
-#include <QPoint>
-#include <QStringList>
-#include <QSizePolicy>
-#include <QTimer>
-#include <QMessageBox>
+#include <QDebug>
+#include <QDialog>
+#include <QHBoxLayout>
+#include <QInputDialog>
 #include <QFileDialog>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QPoint>
+#include <QRadioButton>
+#include <QSizePolicy>
+#include <QSpinBox>
+#include <QStringList>
+#include <QTabWidget>
 #include <QtGui>
+#include <QTimer>
+#include <QToolButton>
+#include <QVBoxLayout>
+#include <QWhatsThis>
 
 #include <vector>
 
@@ -213,7 +215,7 @@ namespace Isis {
     QString whatsThis = "<b>Function:</b> Saves the current <i>"
                         "control network</i> under chosen filename";
     p_saveNet->setWhatsThis(whatsThis);
-    connect(p_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+    connect(p_saveNet, SIGNAL(triggered()), this, SLOT(saveNet()));
 
     QAction *closeQtieTool = new QAction(p_tieTool);
     closeQtieTool->setText("&Close");
@@ -222,7 +224,7 @@ namespace Isis {
       "<b>Function:</b> Closes the Qtie Tool window for this point \
        <p><b>Shortcut:</b> Alt+F4 </p>";
     closeQtieTool->setWhatsThis(whatsThis);
-    connect(closeQtieTool, SIGNAL(activated()), p_tieTool, SLOT(close()));
+    connect(closeQtieTool, SIGNAL(triggered()), p_tieTool, SLOT(close()));
 
     QMenu *fileMenu = p_tieTool->menuBar()->addMenu("&File");
     fileMenu->addAction(p_saveNet);
@@ -233,7 +235,7 @@ namespace Isis {
     whatsThis =
       "<b>Function:</b> Allows user to select a new file to set as the registration template";
     templateFile->setWhatsThis(whatsThis);
-    connect(templateFile, SIGNAL(activated()), this, SLOT(setTemplateFile()));
+    connect(templateFile, SIGNAL(triggered()), this, SLOT(setTemplateFile()));
 
     QAction *viewTemplate = new QAction(p_tieTool);
     viewTemplate->setText("&View/edit registration template");
@@ -241,7 +243,7 @@ namespace Isis {
       "<b>Function:</b> Displays the curent registration template.  \
        The user may edit and save changes under a chosen filename.";
     viewTemplate->setWhatsThis(whatsThis);
-    connect(viewTemplate, SIGNAL(activated()), this, SLOT(viewTemplateFile()));
+    connect(viewTemplate, SIGNAL(triggered()), this, SLOT(viewTemplateFile()));
 
 
     QMenu *optionMenu = p_tieTool->menuBar()->addMenu("&Options");
@@ -257,7 +259,7 @@ namespace Isis {
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     p_whatsThis->setToolTip("Activate What's This and click on items on "
                           "user interface to see more information.");
-    connect(p_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+    connect(p_whatsThis, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     QMenu *helpMenu = p_tieTool->menuBar()->addMenu("&Help");
     helpMenu->addAction(p_whatsThis);
@@ -348,7 +350,7 @@ namespace Isis {
    *                            
    */
   void QtieTool::clearFiles() {
-    p_tieTool->setShown(false);
+    p_tieTool->setVisible(false);
 
     delete p_serialNumberList;
     p_serialNumberList = NULL;
@@ -616,7 +618,7 @@ namespace Isis {
     p_controlPoint = p_controlNet->GetPoint((QString) newPoint->GetId());
     //  Load new point in QtieTool
     loadPoint();
-    p_tieTool->setShown(true);
+    p_tieTool->setVisible(true);
     p_tieTool->raise();
 
     emit editPointChanged();
@@ -647,7 +649,7 @@ namespace Isis {
     //loadPoint();
 
     p_controlNet->DeletePoint(p_controlPoint->GetId());
-    p_tieTool->setShown(false);
+    p_tieTool->setVisible(false);
     p_controlPoint = NULL;
 
     emit editPointChanged();
@@ -664,7 +666,7 @@ namespace Isis {
 
     p_controlPoint = point;
     loadPoint();
-    p_tieTool->setShown(true);
+    p_tieTool->setVisible(true);
     p_tieTool->raise();
     emit editPointChanged();
   }

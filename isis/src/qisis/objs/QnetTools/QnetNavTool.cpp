@@ -221,14 +221,14 @@ namespace Isis {
     gridLayout->addLayout(layout, 3, 0, 1, 2);
     m_navDialog->setLayout(gridLayout);
 
-    IString settingsFileName =
+    QString settingsFileName =
         FileName("$HOME/.Isis/" + QApplication::applicationName() + "/NavTool.config").expanded();
-    QSettings settings(settingsFileName.c_str(), QSettings::NativeFormat);
+    QSettings settings(settingsFileName, QSettings::NativeFormat);
     m_navDialog->resize(settings.value("size").toSize());
     
     // View the dialog - we need this to get the size of the dialog which we're using
-    //   for positioning it.
-    m_navDialog->setShown(true);
+    // for positioning it.
+    m_navDialog->setVisible(true);
 
     QPoint defaultPos = parent->pos() +
                         QPoint(parent->size().width() / 2,
@@ -241,9 +241,9 @@ namespace Isis {
 
 
   QnetNavTool::~QnetNavTool() {
-    IString settingsFileName =
+    QString settingsFileName =
         FileName("$HOME/.Isis/" + QApplication::applicationName() + "/NavTool.config").expanded();
-    QSettings settings(settingsFileName.c_str(), QSettings::NativeFormat);
+    QSettings settings(settingsFileName, QSettings::NativeFormat);
 
     settings.setValue("size", m_navDialog->size());
     settings.setValue("pos", m_navDialog->pos());
@@ -1160,7 +1160,7 @@ namespace Isis {
    *   @history 2010-07-01 Jeannie Walldren - Original version.
    */
   void QnetNavTool::showNavTool() {
-    m_navDialog->setShown(true);
+    m_navDialog->setVisible(true);
   }
 
 #if 0

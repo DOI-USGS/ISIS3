@@ -1,7 +1,7 @@
 #ifndef TableColumnList_H
 #define TableColumnList_H
-#include <SpecialPixel.h>
 
+#include <QObject>
 
 template<typename A, typename B> class QPair;
 

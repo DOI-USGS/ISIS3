@@ -278,7 +278,7 @@ namespace Isis {
 
     // Input
     if(p_openmode == 1) {
-      p_stream.open(p_filename.toAscii().data(), fstream::in);
+      p_stream.open(p_filename.toLatin1().data(), fstream::in);
     }
     // Output
     else if(p_openmode == 2) {
@@ -289,21 +289,21 @@ namespace Isis {
         throw IException(IException::Io, message, _FILEINFO_);
       }
 
-      p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::trunc);
+      p_stream.open(p_filename.toLatin1().data(), fstream::in | fstream::out | fstream::trunc);
       p_stream.clear();
     }
     // Overwrite
     else if(p_openmode == 3) {
-      p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::trunc);
+      p_stream.open(p_filename.toLatin1().data(), fstream::in | fstream::out | fstream::trunc);
     }
     // Append
     else if(p_openmode == 4) {
       // Open in append if it does exist, otherwise, open in overwrite mode
       if(filenameTmp.fileExists()) {
-        p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::ate);
+        p_stream.open(p_filename.toLatin1().data(), fstream::in | fstream::out | fstream::ate);
       }
       else {
-        p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::trunc);
+        p_stream.open(p_filename.toLatin1().data(), fstream::in | fstream::out | fstream::trunc);
       }
     }
 
@@ -522,7 +522,7 @@ namespace Isis {
    * @param line IString to be written to file. Defaults to ""
    */
   void TextFile::PutLine(const QString &line) {
-    PutLine(line.toAscii().data());
+    PutLine(line.toLatin1().data());
   }
 
   /**

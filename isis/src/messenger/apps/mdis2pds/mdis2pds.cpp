@@ -369,7 +369,7 @@ void IsisMain() {
   // All done...write result.
   pdsLabel.setFormatTemplate("$messenger/templates/labels/mdisPdsCDR.pft");
   QString ofile(output.expanded());
-  ofstream outstream(ofile.toAscii().data());
+  ofstream outstream(ofile.toLatin1().data());
   processPds.OutputLabel(outstream);
 
   processPds.StartProcess(outstream);

@@ -76,7 +76,7 @@ namespace Isis {
     csv.setComment(comments);
     csv.setSkip(skip);
     csv.setHeader(colHeader);
-    csv.setDelimiter(separator[0].toAscii());
+    csv.setDelimiter(separator[0].toLatin1());
     if (separator[0] == ' ') csv.setSkipEmptyParts();
 
     //  Now read the file

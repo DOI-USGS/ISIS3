@@ -224,7 +224,7 @@ namespace Isis {
         if (!id.isEmpty()) {
           delete m_control->m_id;
           m_control->m_id = NULL;
-          m_control->m_id = new QUuid(id.toAscii());
+          m_control->m_id = new QUuid(id.toLatin1());
         }
 
         if (!fileName.isEmpty()) {

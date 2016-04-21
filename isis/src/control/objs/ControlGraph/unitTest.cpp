@@ -139,10 +139,18 @@ int main() {
     e.print();
   }
 
-  cerr << "\nGetCubeList() returns:\n";
+  cerr << "\nGetCubeList() returns (NOTE: sorted in unittest):\n";
   QVector< QString > cubeList = cg.GetCubeList();
+
+  // We will sort the output since QHash's don't guarantee order, which could impact test results
+  QStringList sortedCubeList; 
   for (int i = 0; i < cubeList.size(); i++) {
-    cerr << "    " << cubeList[i].toStdString() << "\n";
+    sortedCubeList << cubeList[i];
+  }
+  sortedCubeList.sort();
+  
+  for (int i = 0; i < sortedCubeList.size(); i++) {
+    cerr << "    " << sortedCubeList[i].toStdString() << "\n";
   }
 
   cerr << "\n";

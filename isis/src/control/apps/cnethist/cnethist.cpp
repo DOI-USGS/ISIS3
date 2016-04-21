@@ -51,12 +51,12 @@ void IsisMain() {
 
     // Create the QHistogram, set the title & load the Isis::Histogram into it
 
-    plot = new HistogramPlotWindow(title.toAscii().data(), ui.TheGui());
+    plot = new HistogramPlotWindow(title.toLatin1().data(), ui.TheGui());
 
     // Set the xaxis title if they entered one
     if(ui.WasEntered("XAXIS")) {
       QString xaxis(ui.GetString("XAXIS"));
-      plot->setAxisLabel(QwtPlot::xBottom, xaxis.toAscii().data());
+      plot->setAxisLabel(QwtPlot::xBottom, xaxis.toLatin1().data());
     }
 
     // Set the yLeft axis title if they entered one
@@ -83,7 +83,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     QString outfile = ui.GetFileName("TO");     
-    fout.open(outfile.toAscii().data());
+    fout.open(outfile.toLatin1().data());
   }
 
   //loop throught the control nets writing reports and drawing histograms as needed
@@ -169,9 +169,7 @@ void IsisMain() {
       pen->setWidth(2);
       histCurve->setYAxis(QwtPlot::yLeft);
       histCurve->setPen(*pen);  
-      QwtSymbol symbol(histCurve->markerSymbol());
-      symbol.setStyle(QwtSymbol::NoSymbol);
-      histCurve->setMarkerSymbol(symbol);
+      histCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
   
       histCurve->setData(new QwtPointSeriesData(binCountData));
 

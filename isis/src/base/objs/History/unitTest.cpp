@@ -20,5 +20,5 @@ void IsisMain() {
   Isis::PvlObject o = h2.ReturnHist();
   std::cout << o << std::endl;
 
-  remove(file.toAscii().data());
+  remove(file.toLatin1().data());
 }

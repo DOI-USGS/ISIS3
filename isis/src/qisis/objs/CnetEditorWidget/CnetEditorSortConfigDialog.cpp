@@ -2,6 +2,11 @@
 
 #include <limits>
 
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QtGui>
 
 #include "AbstractTableModel.h"

@@ -2,6 +2,8 @@
 #include "SunShadowTool.h"
 
 #include <QApplication>
+#include <QComboBox>
+#include <QCheckBox>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLineEdit>
@@ -9,6 +11,9 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QStackedWidget>
+#include <QTableWidget>
+#include <QToolButton>
 
 #include "Angle.h"
 #include "Camera.h"

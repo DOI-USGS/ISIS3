@@ -1,5 +1,6 @@
 #include "PanTool.h"
 
+#include <QAction>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
@@ -7,6 +8,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QStackedWidget>
 #include <QToolButton>
 
 #include "IString.h"
@@ -20,25 +22,25 @@ namespace Isis {
     p_panRight->setShortcut(Qt::CTRL + Qt::Key_Right);
     p_panRight->setText("&Pan Right");
     p_panRight->setIcon(QPixmap(toolIconDir() + "/forward.png"));
-    connect(p_panRight, SIGNAL(activated()), this, SLOT(panRight()));
+    connect(p_panRight, SIGNAL(triggered()), this, SLOT(panRight()));
 
     p_panLeft = new QAction(parent);
     p_panLeft->setShortcut(Qt::CTRL + Qt::Key_Left);
     p_panLeft->setText("&Pan Left");
     p_panLeft->setIcon(QPixmap(toolIconDir() + "/back.png"));
-    connect(p_panLeft, SIGNAL(activated()), this, SLOT(panLeft()));
+    connect(p_panLeft, SIGNAL(triggered()), this, SLOT(panLeft()));
 
     p_panUp = new QAction(parent);
     p_panUp->setShortcut(Qt::CTRL + Qt::Key_Up);
     p_panUp->setText("&Pan Up");
     p_panUp->setIcon(QPixmap(toolIconDir() + "/up.png"));
-    connect(p_panUp, SIGNAL(activated()), this, SLOT(panUp()));
+    connect(p_panUp, SIGNAL(triggered()), this, SLOT(panUp()));
 
     p_panDown = new QAction(parent);
     p_panDown->setShortcut(Qt::CTRL + Qt::Key_Down);
     p_panDown->setText("&Pan Down");
     p_panDown->setIcon(QPixmap(toolIconDir() + "/down.png"));
-    connect(p_panDown, SIGNAL(activated()), this, SLOT(panDown()));
+    connect(p_panDown, SIGNAL(triggered()), this, SLOT(panDown()));
 
     p_dragPan = false;
   }

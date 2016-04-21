@@ -61,14 +61,14 @@ int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
     qDebug() << "Unit test for NaifDskShape.";
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Default constructor.";
     NaifDskShape shapeModel;
     qDebug() << "Shape name is " << shapeModel.name();
     qDebug() << "Shape is DEM type? " << toString(shapeModel.isDEM());
 
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Construct NaifDskShape object from a plate model.";    
     FileName dskFile("$hayabusa/kernels/dsk/hay_a_amica_5_itokawashape_v1_0_512q.bds");
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     lookDir.push_back(1.0);  lookDir.push_back(1.0);  lookDir.push_back(1.0);
     bool success = shapeModelFromPlate.intersectSurface(obsPos, lookDir);
     qDebug() << "Intersection successful? " << toString(success);
-    qDebug();
+    qDebug() << "";
      
     qDebug() << "Construct NaifDskShape object from cube labels with ShapeModel=DSK file.";
     Pvl pvlWithShape("./st_2530292409_v_DskShapeModel.lbl");
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     success = shapeModelFromPvlShape.intersectSurface(obsPos, lookDir);
     qDebug() << "Intersection successful?     " << toString(success);
 
-    qDebug();
+    qDebug() << "";
     qDebug() << "Construct NaifDskShape object from cube labels with ElevationModel=DSK file.";    
     Pvl pvlWithElevation("./st_2530292409_v_DskElevationModel.lbl");
     Target targetEl(NULL, pvlWithElevation);
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
     xpoint[1] = xp.GetY().meters();
     xpoint[2] = xp.GetZ().meters();
     qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Find local radius given lat/lon";
     Latitude lat(0, Angle::Degrees);
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Local radius at (" << lat.degrees() << ", " 
                                     << lon.degrees() << ") is valid? " << rad.isValid();
     qDebug() << "Local radius:                " << rad.meters() << "meters";
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Access the associated NaifDskPlateModel.";
     NaifDskPlateModel plateModelFromShape = shapeModelFromPvlElevation.model();
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Plate size:                  " << plateModelFromShape.size();
     qDebug() << "Number of plates:            " << plateModelFromShape.numberPlates();
     qDebug() << "Number of vertices:          " << plateModelFromShape.numberVertices();
-    qDebug();
+    qDebug() << "";
 
 
     qDebug() << "Try to calculate norms using valid shape model...";
@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has local normal?                    " << shapeModelFromPvlElevation.hasNormal();
     qDebug() << "Local normal from neighbor points:   "
              << QVector<double>::fromStdVector(shapeModelFromPvlElevation.normal());
-    qDebug();
+    qDebug() << "";
 
 
     qDebug() << "================================= Error Throws ==================================";
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Thrown by setLocalNormalFromIntercept() - Failed to find intercept. ";
     try {
       shapeModelFromPvlShape.setLocalNormalFromIntercept();
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Thrown by calculateLocalNormal() - Failed to find intercept for normal vector. ";
     try {
       shapeModel.calculateLocalNormal(cornerNeighborPoints);
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Thrown by ellipsoidNormal() - No intersection. ";
     try {
       shapeModel.ellipsoidNormal();
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Thrown by ellipsoidNormal() - Invalid intersection. ";
     try {
       // if the surface point is accidentally reset to an invalid point, but hasIntercept still 
@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Thrown by ellipsoidNormal() - Invalid target. ";
     try {
       // get valid intersection
@@ -222,8 +222,8 @@ int main(int argc, char *argv[]) {
 
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     QString msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }

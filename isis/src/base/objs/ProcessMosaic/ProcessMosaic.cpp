@@ -739,7 +739,7 @@ namespace Isis {
 
             for (int i = 0;i < existingTableRecords;i++) {
               // Get the file name and trim out the characters filled due to resizing
-              QString sTableFile = QString(QString(cFileTable_Copy[i][0]).toAscii().data());
+              QString sTableFile = QString(QString(cFileTable_Copy[i][0]).toLatin1().data());
               int found = sTableFile.lastIndexOf(".cub");
               if (found != -1) {
                 // clear the packing characters - get only the file name

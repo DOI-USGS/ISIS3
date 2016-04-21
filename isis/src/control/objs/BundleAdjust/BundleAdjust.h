@@ -29,27 +29,21 @@
 #include <vector>
 #include <fstream>
 
-#include "ControlNet.h"
-#include "SerialNumberList.h"
-#include "ObservationNumberList.h"
+#include <cholmod.h>
+
 #include "Camera.h"
-#include "Statistics.h"
-//#include "SpicePosition.h"
-//#include "SpiceRotation.h"
-#include "Progress.h"
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ObservationNumberList.h"
+#include "Progress.h"
+#include "SerialNumberList.h"
 #include "SparseBlockMatrix.h"
-
-#include <CHOLMOD/cholmod.h>
-#include <CHOLMOD/UFconfig.h>
+#include "Statistics.h"
 
 template< typename T > class QList;
 template< typename A, typename B > class QMap;
 
-#ifndef __sun__
-#include "gmm/gmm.h"
-#endif
 
 namespace Isis {
   class BasisFunction;
@@ -168,6 +162,8 @@ namespace Isis {
    *   @history 2014-11-05 Ken Edmundson - Fixed memory bug. Wasn't releasing cholmod_factor m_L
    *                         every iteration. Now release every iteration but the last since we
    *                         need m_L for error propagation. References #2189.
+   *   @history 2015-09-10 Ian Humphrey - Fixed include for cholmod header after updating v005
+                              libraries.
    */
   class BundleAdjust {
     public:

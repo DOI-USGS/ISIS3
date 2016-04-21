@@ -77,7 +77,7 @@ void IsisMain() {
 
   // Open output line scanner keyword file
   ofstream toStrm;
-  toStrm.open(to.toAscii().data(), ios::trunc);
+  toStrm.open(to.toLatin1().data(), ios::trunc);
   if (toStrm.bad()) {
     QString msg = "Unable to open output TO file";
     throw IException(IException::User, msg, _FILEINFO_);

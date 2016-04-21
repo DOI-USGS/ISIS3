@@ -156,7 +156,7 @@ class KernelWriter {
         for ( int i = 0 ; i < comment.size() ; i++ ) {
            if ( comment[i] == '\n' ) {
              while ( commOut.size() < 2 ) { commOut.append(" "); }
-             dafac_c(handle, 1, commOut.size(), commOut.toAscii().data());
+             dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
              NaifStatus::CheckErrors();
              commOut.clear();
            }
@@ -168,7 +168,7 @@ class KernelWriter {
         // See if there is residual to write
         if ( commOut.size() > 0 ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(handle, 1, commOut.size(), commOut.toAscii().data());
+          dafac_c(handle, 1, commOut.size(), commOut.toLatin1().data());
           NaifStatus::CheckErrors();
         }
       }

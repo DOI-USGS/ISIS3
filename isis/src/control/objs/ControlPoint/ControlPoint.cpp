@@ -2207,7 +2207,7 @@ namespace Isis {
   ControlPointFileEntryV0002 ControlPoint::ToFileEntry() const {
     ControlPointFileEntryV0002 fileEntry;
 
-    fileEntry.set_id(GetId().toAscii().data());
+    fileEntry.set_id(GetId().toLatin1().data());
     switch (GetType()) {
       case ControlPoint::Free:
         fileEntry.set_type(ControlPointFileEntryV0002::Free);
@@ -2221,10 +2221,10 @@ namespace Isis {
     }
 
     if (!GetChooserName().isEmpty()) {
-      fileEntry.set_choosername(GetChooserName().toAscii().data());
+      fileEntry.set_choosername(GetChooserName().toLatin1().data());
     }
     if (!GetDateTime().isEmpty()) {
-      fileEntry.set_datetime(GetDateTime().toAscii().data());
+      fileEntry.set_datetime(GetDateTime().toLatin1().data());
     }
     if (IsEditLocked())
       fileEntry.set_editlock(true);
@@ -2259,7 +2259,7 @@ namespace Isis {
         break;
     }
     if (!GetAprioriSurfacePointSourceFile().isEmpty()) {
-      fileEntry.set_apriorisurfpointsourcefile(GetAprioriSurfacePointSourceFile().toAscii().data());
+      fileEntry.set_apriorisurfpointsourcefile(GetAprioriSurfacePointSourceFile().toLatin1().data());
     }
 
     switch (GetAprioriRadiusSource()) {
@@ -2285,7 +2285,7 @@ namespace Isis {
     }
 
     if (!GetAprioriRadiusSourceFile().isEmpty()) {
-      fileEntry.set_aprioriradiussourcefile(GetAprioriRadiusSourceFile().toAscii().data());
+      fileEntry.set_aprioriradiussourcefile(GetAprioriRadiusSourceFile().toLatin1().data());
     }
 
     if (GetAprioriSurfacePoint().Valid()) {

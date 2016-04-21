@@ -1,7 +1,11 @@
 #include "SaveAsDialog.h"
 
-#include <QFileDialog>
 #include <iostream>
+
+#include <QButtonGroup>
+#include <QLayout>
+#include <QFileDialog>
+#include <QPushButton>
 
 using namespace std;
 

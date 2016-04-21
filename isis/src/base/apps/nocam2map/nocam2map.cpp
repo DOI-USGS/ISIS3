@@ -241,13 +241,13 @@ void IsisMain() {
       QString pckFileName = pckFile.expanded();
 
       NaifStatus::CheckErrors();
-      furnsh_c(pckFileName.toAscii().data());
+      furnsh_c(pckFileName.toLatin1().data());
 
       QString target = targetName[0];
       SpiceInt code;
       SpiceBoolean found;
 
-      bodn2c_c(target.toAscii().data(), &code, &found);
+      bodn2c_c(target.toLatin1().data(), &code, &found);
       NaifStatus::CheckErrors();
 
       if(!found) {
@@ -911,7 +911,7 @@ void ComputeInputRange() {
       QString pckFileName = pckFile.expanded();
 
       NaifStatus::CheckErrors();
-      furnsh_c(pckFileName.toAscii().data());
+      furnsh_c(pckFileName.toLatin1().data());
 
       QString target;
 
@@ -929,7 +929,7 @@ void ComputeInputRange() {
       SpiceInt code;
       SpiceBoolean found;
 
-      bodn2c_c(target.toAscii().data(), &code, &found);
+      bodn2c_c(target.toLatin1().data(), &code, &found);
       NaifStatus::CheckErrors();
 
       if(!found) {

@@ -62,7 +62,7 @@ void IsisMain() {
   }
 
   
-  fin.open(from.toAscii().data(), std::ios::in);
+  fin.open(from.toLatin1().data(), std::ios::in);
   if (!fin.is_open()) {
     QString msg = "Cannot open input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);

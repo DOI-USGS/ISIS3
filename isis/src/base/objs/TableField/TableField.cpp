@@ -291,7 +291,7 @@ namespace Isis {
       QString msg = "Field [" + m_name + "] is not Text.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    return QString(m_svalue.toAscii().data());
+    return QString(m_svalue.toLatin1().data());
   }
 
   /**

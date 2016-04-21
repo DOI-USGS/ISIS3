@@ -503,13 +503,13 @@ SpiceSegment::SMatrix SpiceSegment::computeStateRotation(const QString &frame1,
 
   try {
     // Get pointing w/AVs
-    sxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
+    sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
              (SpiceDouble (*)[6]) state[0]);
     NaifStatus::CheckErrors();
   } catch ( IException & ) {
     try {
       SMatrix rot(3,3);
-      pxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
+      pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                (SpiceDouble (*)[3]) rot[0]);
       NaifStatus::CheckErrors();
       SVector av(3, 0.0);

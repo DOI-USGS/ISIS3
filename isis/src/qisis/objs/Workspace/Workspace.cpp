@@ -1,5 +1,7 @@
 #include "Workspace.h"
 
+#include <QMenuBar>
+#include <QMessageBox>
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QToolBar>
@@ -400,7 +402,7 @@ namespace Isis {
   void Workspace::addBrowseView(QString cubename) {
     /* Close the last browse window if necessary.  */
     if (m_mdi->subWindowList().size()) {
-      QWeakPointer<QMdiSubWindow> windowToRemove =
+      QPointer<QMdiSubWindow> windowToRemove =
           m_mdi->subWindowList().last();
 
       m_mdi->removeSubWindow(windowToRemove.data());

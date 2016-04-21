@@ -97,8 +97,8 @@ namespace Isis {
        */
       void removing();
 
-    private slots:
-      void updateLegendItemWidget();
+    public slots:
+      void updateLegendItemWidget(QWidget *legendItem);
 
     private:
       QMimeData *createMimeData() const;

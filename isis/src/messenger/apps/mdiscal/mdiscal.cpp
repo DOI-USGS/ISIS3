@@ -360,7 +360,7 @@ void IsisMain() {
       reducedFlat = newflat.expanded();
     }
     catch (IException&) {
-      remove(reducedFlat.toAscii().data());
+      remove(reducedFlat.toLatin1().data());
       throw;
     }
     CubeAttributeInput att;
@@ -379,12 +379,12 @@ void IsisMain() {
     p.StartProcess(calibrate);
   }
   catch (...) {
-    if (!reducedFlat.isEmpty()) remove(reducedFlat.toAscii().data());
+    if (!reducedFlat.isEmpty()) remove(reducedFlat.toLatin1().data());
     throw;
   }
 
   // Remove the temporary reduced input file if generated
-  if (!reducedFlat.isEmpty()) remove(reducedFlat.toAscii().data());
+  if (!reducedFlat.isEmpty()) remove(reducedFlat.toLatin1().data());
 
   // Log calibration activity
   PvlGroup calibrationLog("RadiometricCalibration");

@@ -16,6 +16,7 @@
 #include <QVariant>
 
 #include "CubePlotCurve.h"
+#include "IString.h"
 #include "ScatterPlotData.h"
 
 namespace Isis {
@@ -102,7 +103,7 @@ namespace Isis {
 
 
   /**
-   * This is called when the user finally wants the best fit line. The already
+   * This is called when the user wants the best fit line. The already
    *   populated m_curveMultivariateStats is used to give us the current
    *   best-fit coefficients. We create y-data points based on the best fit for
    *   every x value inside of the curve we're fitting. The curve is then added
@@ -135,9 +136,7 @@ namespace Isis {
         newCurve->setData(new QwtPointSeriesData(data));
         newCurve->setColor(selected->color());
 
-        QwtSymbol newSymbol(newCurve->markerSymbol());
-        newSymbol.setStyle(QwtSymbol::NoSymbol);
-        newCurve->setMarkerSymbol(newSymbol);
+        newCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
 
         QPen pen(newCurve->pen());
         pen.setStyle(Qt::SolidLine);
@@ -182,9 +181,7 @@ namespace Isis {
         newCurve->setData(new QwtPointSeriesData(data));
         newCurve->setColor(Qt::red);
 
-        QwtSymbol newSymbol(newCurve->markerSymbol());
-        newSymbol.setStyle(QwtSymbol::NoSymbol);
-        newCurve->setMarkerSymbol(newSymbol);
+        newCurve->setMarkerSymbol(QwtSymbol::NoSymbol);
 
         QPen pen(newCurve->pen());
         pen.setStyle(Qt::SolidLine);

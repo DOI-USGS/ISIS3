@@ -70,7 +70,7 @@ int main(void) {
     double exposureDuration = ((double) inst["ExposureDuration"])/1000;
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.toAscii().data(), &et);
+    str2et_c(stime.toLatin1().data(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
     cout << "Shutter open = " << shuttertimes.first.Et() << endl;
     cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;

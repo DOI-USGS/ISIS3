@@ -76,10 +76,10 @@ namespace Isis {
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString stime = (QString)inst["StartTime"];  
     SpiceDouble etStart;
-    str2et_c(stime.toAscii().data(), &etStart);
+    str2et_c(stime.toLatin1().data(), &etStart);
     stime = (QString) inst["StopTime"];
     SpiceDouble etStop;
-    str2et_c(stime.toAscii().data(), &etStop);
+    str2et_c(stime.toLatin1().data(), &etStop);
     iTime isisTime( (QString) inst["StartTime"]);
     
     // Get other info from labels

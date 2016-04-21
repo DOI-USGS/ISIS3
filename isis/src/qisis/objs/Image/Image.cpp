@@ -163,7 +163,7 @@ namespace Isis {
     displayProperties()->fromPvl(pvl.findObject("DisplayProperties"));
 
     if (pvl.hasKeyword("ID")) {
-      QByteArray hexValues(pvl["ID"][0].toAscii());
+      QByteArray hexValues(pvl["ID"][0].toLatin1());
       QDataStream valuesStream(QByteArray::fromHex(hexValues));
       valuesStream >> *m_id;
     }
@@ -742,7 +742,7 @@ namespace Isis {
         if (!id.isEmpty()) {
           delete m_image->m_id;
           m_image->m_id = NULL;
-          m_image->m_id = new QUuid(id.toAscii());
+          m_image->m_id = new QUuid(id.toLatin1());
         }
 
         if (!fileName.isEmpty()) {

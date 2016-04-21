@@ -22,7 +22,14 @@
  */
 #include "CNetSuiteMainWindow.h"
 
+#include <QApplication>
+#include <QDockWidget>
+#include <QInputDialog>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStatusBar>
 #include <QtGui>
+#include <QWhatsThis>
 
 #include "Directory.h"
 #include "FileName.h"

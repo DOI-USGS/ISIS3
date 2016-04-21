@@ -2,7 +2,10 @@
 
 #include <iostream>
 
+#include <QAction>
 #include <QMenu>
+#include <QMenuBar>
+#include <QToolBar>
 
 #include "MdiCubeViewport.h"
 #include "MainWindow.h"
@@ -27,7 +30,7 @@ namespace Isis {
     p_resizeWindows = new QAction(parent);
     p_resizeWindows->setText("Resize");
     p_resizeWindows->setEnabled(true);
-    connect(p_resizeWindows, SIGNAL(activated()), this, SLOT(resizeWindows()));
+    connect(p_resizeWindows, SIGNAL(triggered()), this, SLOT(resizeWindows()));
     QString text = "<b>Function: </b> Resize all linked viewports to the same \
                    size as the active viewport.";
     p_resizeWindows->setWhatsThis(text);
@@ -82,7 +85,7 @@ namespace Isis {
                                    together. <p><b>Shortcut: </b> Ctrl+Shift+L");
     p_linkAllWindows->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_L);
     p_linkAllWindows->setEnabled(false);
-    connect(p_linkAllWindows, SIGNAL(activated()), this, SLOT(linkWindows()));
+    connect(p_linkAllWindows, SIGNAL(triggered()), this, SLOT(linkWindows()));
 
     p_unlinkAllWindows = new QAction(parent);
     p_unlinkAllWindows->setText("&Unlink All");
@@ -91,7 +94,7 @@ namespace Isis {
                                      <p><b>Shortcut: </b> Ctrl+Shift+U");
     p_unlinkAllWindows->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_U);
     p_unlinkAllWindows->setEnabled(false);
-    connect(p_unlinkAllWindows, SIGNAL(activated()), this, SLOT(unlinkWindows()));
+    connect(p_unlinkAllWindows, SIGNAL(triggered()), this, SLOT(unlinkWindows()));
 
     p_changeCursor = new QAction(parent);
     p_changeCursor->setText("Change cursor to arrow.");
@@ -99,7 +102,7 @@ namespace Isis {
                                  and arrow and crosshair cursor when cursor is over the \
                                  viewport window.");
     p_changeCursor->setEnabled(false);
-    connect(p_changeCursor, SIGNAL(activated()), this, SLOT(changeCursor()));
+    connect(p_changeCursor, SIGNAL(triggered()), this, SLOT(changeCursor()));
 
     activate(true);
   }
@@ -113,12 +116,12 @@ namespace Isis {
    */
   void WindowTool::addTo(Workspace *ws) {
     Tool::addTo(ws);
-    connect(p_cascadeWindows, SIGNAL(activated()), ws->mdiArea(), SLOT(cascadeSubWindows()));
-    connect(p_tileWindows, SIGNAL(activated()), ws->mdiArea(), SLOT(tileSubWindows()));
-    connect(p_prevWindow, SIGNAL(activated()), ws->mdiArea(), SLOT(activatePreviousSubWindow()));
-    connect(p_nextWindow, SIGNAL(activated()), ws->mdiArea(), SLOT(activateNextSubWindow()));
-    connect(p_closeWindow, SIGNAL(activated()), ws->mdiArea(), SLOT(closeActiveSubWindow()));
-    connect(p_closeAllWindows, SIGNAL(activated()), ws->mdiArea(), SLOT(closeAllSubWindows()));
+    connect(p_cascadeWindows, SIGNAL(triggered()), ws->mdiArea(), SLOT(cascadeSubWindows()));
+    connect(p_tileWindows, SIGNAL(triggered()), ws->mdiArea(), SLOT(tileSubWindows()));
+    connect(p_prevWindow, SIGNAL(triggered()), ws->mdiArea(), SLOT(activatePreviousSubWindow()));
+    connect(p_nextWindow, SIGNAL(triggered()), ws->mdiArea(), SLOT(activateNextSubWindow()));
+    connect(p_closeWindow, SIGNAL(triggered()), ws->mdiArea(), SLOT(closeActiveSubWindow()));
+    connect(p_closeAllWindows, SIGNAL(triggered()), ws->mdiArea(), SLOT(closeAllSubWindows()));
     connect(ws, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
             this, SLOT(updateViewportCursor(MdiCubeViewport *)));
   }

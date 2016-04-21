@@ -3,6 +3,7 @@
 #include <float.h>
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
 #include <QDialog>
 #include <QDoubleValidator>

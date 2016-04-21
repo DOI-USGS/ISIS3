@@ -57,7 +57,7 @@ void IsisMain() {
     // Get the control point file
     QString rFile = FileName(ui.GetFileName("RESULTS")).expanded();
     ofstream os;
-    os.open(rFile.toAscii().data(), ios::out);
+    os.open(rFile.toLatin1().data(), ios::out);
     os << "#  Slither Transform Results\n"
        << "#  RunDate: " << iTime::CurrentLocalTime() << endl
        << "#    FROM:     " << icube->fileName() << endl

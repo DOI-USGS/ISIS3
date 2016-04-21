@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <iomanip>
+
+#include <QDataStream>
 #include <QDebug>
 #include <QMapIterator>
 #include <QListIterator>

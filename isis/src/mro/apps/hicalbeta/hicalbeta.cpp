@@ -394,7 +394,7 @@ void IsisMain(){
       procStep = "logging/reporting phase";
       FileName hdump(hiconf.getMatrixSource("DumpHistoryFile",hiprof));
       QString hdumpFile = hdump.expanded();
-      ofstream ofile(hdumpFile.toAscii().data(), ios::out);
+      ofstream ofile(hdumpFile.toLatin1().data(), ios::out);
       if (!ofile) {
         QString mess = "Unable to open/create history dump file " +
                       hdump.expanded();

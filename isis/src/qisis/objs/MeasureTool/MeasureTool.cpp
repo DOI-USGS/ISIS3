@@ -2,13 +2,17 @@
 #include "MeasureTool.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QStackedWidget>
 #include <QStatusBar>
+#include <QTableWidget>
+#include <QToolButton>
 
 #include <geos/geom/Geometry.h>
 #include <geos/geom/Point.h>

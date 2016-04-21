@@ -1,391 +1,391 @@
-Testing failure modes 
-Querying minimum before the number of observations is greater than or equal to the number of quantiles:  
+Testing failure modes
+Querying minimum before the number of observations is greater than or equal to the number of quantiles: 
 **PROGRAMMER ERROR** StatCumProbDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
-Querying maximum before the number of observations is greater than or equal to the number of quantiles:  
+Querying maximum before the number of observations is greater than or equal to the number of quantiles: 
 **PROGRAMMER ERROR** StatCumProbDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
-Querying a value (as a function of cumulative probability) before the number of observations is greater than or equal to the number of quantiles:  
+Querying a value (as a function of cumulative probability) before the number of observations is greater than or equal to the number of quantiles: 
 **PROGRAMMER ERROR** StatCumProbDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
-Querying a cumulative probability (as a function of value) before the number of observations is greater than or equal to the number of quantiles:  
+Querying a cumulative probability (as a function of value) before the number of observations is greater than or equal to the number of quantiles: 
 **PROGRAMMER ERROR** StatCumProbDistDynCalc will return no data until the number of observations added [20] matches the number of quantiles [51] (i.e. number of nodes) selected.
-Querying a nonsense cumulative probability (2.0):  
+Querying a nonsense cumulative probability (2.0): 
 **PROGRAMMER ERROR** Invalid cumulative probability [2.0] passed in to StatCumProbDistDynCalc::value(double cumProb). Must be on the domain [0, 1].
-Querying a nonsense cumulative probability (-1.0):  
+Querying a nonsense cumulative probability (-1.0): 
 **PROGRAMMER ERROR** Invalid cumulative probability [-1.0] passed in to StatCumProbDistDynCalc::value(double cumProb). Must be on the domain [0, 1].
-Testing XML: read XML with no attributes or values to StatCumProbDistDynCalc object... Then try to get min from object with no observations. 
+Testing XML: read XML with no attributes or values to StatCumProbDistDynCalc object... Then try to get min from object with no observations.
 **PROGRAMMER ERROR** StatCumProbDistDynCalc will return no data until the quantiles have been set. Number of cells = [0].
 
-Testing successful construction of StatCumProbDistDynCalc object 
-Min =  -1.27253 
-Max =  9.07652 
+Testing successful construction of StatCumProbDistDynCalc object
+Min =  -1.27253
+Max =  9.07652
 
-0.0 approximated Quantile:  -1.27253 
-0.0 theoretical Quantile: -1.272533598... 
-percent error:  0 % 
+0.0 approximated Quantile:  -1.27253
+0.0 theoretical Quantile: -1.272533598...
+percent error:  0 %
 
-0.005 approximated Quantile:  -1.05122 
+0.005 approximated Quantile:  -1.05122
 
-0.25 approximated Quantile:  2.84146 
-0.25 theoretical Quantile: 2.6510204996078... 
-percent error:  7.18374 % 
+0.25 approximated Quantile:  2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error:  7.18374 %
 
-0.50 approximated Quantile:  4.09981 
-0.50 theoretical Quantile: 4.0 
-percent error:  2.49513 % 
+0.50 approximated Quantile:  4.09981
+0.50 theoretical Quantile: 4.0
+percent error:  2.49513 %
 
-0.75 approximated Quantile:  5.31623 
-0.75 theoretical Quantile: 5.34897950039216... 
-percent error:  -0.612173 % 
+0.75 approximated Quantile:  5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error:  -0.612173 %
 
-0.995 approximated Quantile:  8.98943 
+0.995 approximated Quantile:  8.98943
 
-0.0 approximated Quantile:  9.07652 
-0.0 theoretical Quantile: 9.07652065... 
-percent error:  0 % 
+0.0 approximated Quantile:  9.07652
+0.0 theoretical Quantile: 9.07652065...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -2.0]:  0 
-theoretical: 0.0... 
-percent error:  0 % 
+approximated cumprobabilty [-oo, -2.0]:  0
+theoretical: 0.0...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -1.2]:  0.00163608 
+approximated cumprobabilty [-oo, -1.2]:  0.00163608
 
-approximated cumprobabilty [-oo, 0]:  0.0290357 
-theoretical: 0.022750131948179... 
-percent error:  27.6285 % 
+approximated cumprobabilty [-oo, 0]:  0.0290357
+theoretical: 0.022750131948179...
+percent error:  27.6285 %
 
-approximated cumprobabilty [-oo, 2.0]:  0.144109 
-theoretical: 0.158655253931457... 
-percent error:  -9.16825 % 
+approximated cumprobabilty [-oo, 2.0]:  0.144109
+theoretical: 0.158655253931457...
+percent error:  -9.16825 %
 
-approximate cumprobabilty [-oo, 5.0]:  0.691477 
-theoretical: 0.691462461274013... 
-percent error:  0.00216297 % 
+approximate cumprobabilty [-oo, 5.0]:  0.691477
+theoretical: 0.691462461274013...
+percent error:  0.00216297 %
 
-approximate cumprobabilty [-oo, 9.0]:  0.996511 
+approximate cumprobabilty [-oo, 9.0]:  0.996511
 
-approximate cumprobabilty [-oo, 9.07652065]:  1 
-theoretical: 1.0... 
-percent error:  0 % 
+approximate cumprobabilty [-oo, 9.07652065]:  1
+theoretical: 1.0...
+percent error:  0 %
 
 
 
-reinitialize the class and redo the tests 
-Min =  -1.27253 
-Max =  9.07652 
+reinitialize the class and redo the tests
+Min =  -1.27253
+Max =  9.07652
 
-0.0 approximated Quantile:  -1.27253 
-0.0 theoretical Quantile: -1.272533598... 
-percent error:  0 % 
+0.0 approximated Quantile:  -1.27253
+0.0 theoretical Quantile: -1.272533598...
+percent error:  0 %
 
-0.005 approximated Quantile:  -1.05122 
+0.005 approximated Quantile:  -1.05122
 
-0.25 approximated Quantile:  2.84146 
-0.25 theoretical Quantile: 2.6510204996078... 
-percent error:  7.18374 % 
+0.25 approximated Quantile:  2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error:  7.18374 %
 
-0.50 approximated Quantile:  4.09981 
-0.50 theoretical Quantile: 4.0 
-percent error:  2.49513 % 
+0.50 approximated Quantile:  4.09981
+0.50 theoretical Quantile: 4.0
+percent error:  2.49513 %
 
-0.75 approximated Quantile:  5.31623 
-0.75 theoretical Quantile: 5.34897950039216... 
-percent error:  -0.612173 % 
+0.75 approximated Quantile:  5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error:  -0.612173 %
 
-0.995 approximated Quantile:  8.98943 
+0.995 approximated Quantile:  8.98943
 
-0.0 approximated Quantile:  9.07652 
-0.0 theoretical Quantile: 9.07652065... 
-percent error:  0 % 
+0.0 approximated Quantile:  9.07652
+0.0 theoretical Quantile: 9.07652065...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -2.0]:  0 
-theoretical: 0.0... 
-percent error:  0 % 
+approximated cumprobabilty [-oo, -2.0]:  0
+theoretical: 0.0...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -1.2]:  0.00163608 
+approximated cumprobabilty [-oo, -1.2]:  0.00163608
 
-approximated cumprobabilty [-oo, 0]:  0.0290357 
-theoretical: 0.022750131948179... 
-percent error:  27.6285 % 
+approximated cumprobabilty [-oo, 0]:  0.0290357
+theoretical: 0.022750131948179...
+percent error:  27.6285 %
 
-approximated cumprobabilty [-oo, 2.0]:  0.144109 
-theoretical: 0.158655253931457... 
-percent error:  -9.16825 % 
+approximated cumprobabilty [-oo, 2.0]:  0.144109
+theoretical: 0.158655253931457...
+percent error:  -9.16825 %
 
-approximate cumprobabilty [-oo, 5.0]:  0.691477 
-theoretical: 0.691462461274013... 
-percent error:  0.00216297 % 
+approximate cumprobabilty [-oo, 5.0]:  0.691477
+theoretical: 0.691462461274013...
+percent error:  0.00216297 %
 
-approximate cumprobabilty [-oo, 9.0]:  0.996511 
+approximate cumprobabilty [-oo, 9.0]:  0.996511
 
-approximate cumprobabilty [-oo, 9.07652065]:  1 
-theoretical: 1.0... 
-percent error:  0 % 
+approximate cumprobabilty [-oo, 9.07652065]:  1
+theoretical: 1.0...
+percent error:  0 %
 
 
 
-Testing copy constructor... 
-Min =  -1.27253 
-Max =  9.07652 
+Testing copy constructor...
+Min =  -1.27253
+Max =  9.07652
 
-0.0 approximated Quantile:  -1.27253 
-0.0 theoretical Quantile: -1.272533598... 
-percent error:  0 % 
+0.0 approximated Quantile:  -1.27253
+0.0 theoretical Quantile: -1.272533598...
+percent error:  0 %
 
-0.005 approximated Quantile:  -1.05122 
+0.005 approximated Quantile:  -1.05122
 
-0.25 approximated Quantile:  2.84146 
-0.25 theoretical Quantile: 2.6510204996078... 
-percent error:  7.18374 % 
+0.25 approximated Quantile:  2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error:  7.18374 %
 
-0.50 approximated Quantile:  4.09981 
-0.50 theoretical Quantile: 4.0 
-percent error:  2.49513 % 
+0.50 approximated Quantile:  4.09981
+0.50 theoretical Quantile: 4.0
+percent error:  2.49513 %
 
-0.75 approximated Quantile:  5.31623 
-0.75 theoretical Quantile: 5.34897950039216... 
-percent error:  -0.612173 % 
+0.75 approximated Quantile:  5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error:  -0.612173 %
 
-0.995 approximated Quantile:  8.98943 
+0.995 approximated Quantile:  8.98943
 
-0.0 approximated Quantile:  9.07652 
-0.0 theoretical Quantile: 9.07652065... 
-percent error:  0 % 
+0.0 approximated Quantile:  9.07652
+0.0 theoretical Quantile: 9.07652065...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -2.0]:  0 
-theoretical: 0.0... 
-percent error:  0 % 
+approximated cumprobabilty [-oo, -2.0]:  0
+theoretical: 0.0...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -1.2]:  0.00163608 
+approximated cumprobabilty [-oo, -1.2]:  0.00163608
 
-approximated cumprobabilty [-oo, 0]:  0.0290357 
-theoretical: 0.022750131948179... 
-percent error:  27.6285 % 
+approximated cumprobabilty [-oo, 0]:  0.0290357
+theoretical: 0.022750131948179...
+percent error:  27.6285 %
 
-approximated cumprobabilty [-oo, 2.0]:  0.144109 
-theoretical: 0.158655253931457... 
-percent error:  -9.16825 % 
+approximated cumprobabilty [-oo, 2.0]:  0.144109
+theoretical: 0.158655253931457...
+percent error:  -9.16825 %
 
-approximate cumprobabilty [-oo, 5.0]:  0.691477 
-theoretical: 0.691462461274013... 
-percent error:  0.00216297 % 
+approximate cumprobabilty [-oo, 5.0]:  0.691477
+theoretical: 0.691462461274013...
+percent error:  0.00216297 %
 
-approximate cumprobabilty [-oo, 9.0]:  0.996511 
+approximate cumprobabilty [-oo, 9.0]:  0.996511
 
-approximate cumprobabilty [-oo, 9.07652065]:  1 
-theoretical: 1.0... 
-percent error:  0 % 
+approximate cumprobabilty [-oo, 9.07652065]:  1
+theoretical: 1.0...
+percent error:  0 %
 
 
 
-Testing assignment operator=... 
-Min =  -1.27253 
-Max =  9.07652 
+Testing assignment operator=...
+Min =  -1.27253
+Max =  9.07652
 
-0.0 approximated Quantile:  -1.27253 
-0.0 theoretical Quantile: -1.272533598... 
-percent error:  0 % 
+0.0 approximated Quantile:  -1.27253
+0.0 theoretical Quantile: -1.272533598...
+percent error:  0 %
 
-0.005 approximated Quantile:  -1.05122 
+0.005 approximated Quantile:  -1.05122
 
-0.25 approximated Quantile:  2.84146 
-0.25 theoretical Quantile: 2.6510204996078... 
-percent error:  7.18374 % 
+0.25 approximated Quantile:  2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error:  7.18374 %
 
-0.50 approximated Quantile:  4.09981 
-0.50 theoretical Quantile: 4.0 
-percent error:  2.49513 % 
+0.50 approximated Quantile:  4.09981
+0.50 theoretical Quantile: 4.0
+percent error:  2.49513 %
 
-0.75 approximated Quantile:  5.31623 
-0.75 theoretical Quantile: 5.34897950039216... 
-percent error:  -0.612173 % 
+0.75 approximated Quantile:  5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error:  -0.612173 %
 
-0.995 approximated Quantile:  8.98943 
+0.995 approximated Quantile:  8.98943
 
-0.0 approximated Quantile:  9.07652 
-0.0 theoretical Quantile: 9.07652065... 
-percent error:  0 % 
+0.0 approximated Quantile:  9.07652
+0.0 theoretical Quantile: 9.07652065...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -2.0]:  0 
-theoretical: 0.0... 
-percent error:  0 % 
+approximated cumprobabilty [-oo, -2.0]:  0
+theoretical: 0.0...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -1.2]:  0.00163608 
+approximated cumprobabilty [-oo, -1.2]:  0.00163608
 
-approximated cumprobabilty [-oo, 0]:  0.0290357 
-theoretical: 0.022750131948179... 
-percent error:  27.6285 % 
+approximated cumprobabilty [-oo, 0]:  0.0290357
+theoretical: 0.022750131948179...
+percent error:  27.6285 %
 
-approximated cumprobabilty [-oo, 2.0]:  0.144109 
-theoretical: 0.158655253931457... 
-percent error:  -9.16825 % 
+approximated cumprobabilty [-oo, 2.0]:  0.144109
+theoretical: 0.158655253931457...
+percent error:  -9.16825 %
 
-approximate cumprobabilty [-oo, 5.0]:  0.691477 
-theoretical: 0.691462461274013... 
-percent error:  0.00216297 % 
+approximate cumprobabilty [-oo, 5.0]:  0.691477
+theoretical: 0.691462461274013...
+percent error:  0.00216297 %
 
-approximate cumprobabilty [-oo, 9.0]:  0.996511 
+approximate cumprobabilty [-oo, 9.0]:  0.996511
 
-approximate cumprobabilty [-oo, 9.07652065]:  1 
-theoretical: 1.0... 
-percent error:  0 % 
+approximate cumprobabilty [-oo, 9.07652065]:  1
+theoretical: 1.0...
+percent error:  0 %
 
 
-Min =  -1.27253 
-Max =  9.07652 
+Min =  -1.27253
+Max =  9.07652
 
-0.0 approximated Quantile:  -1.27253 
-0.0 theoretical Quantile: -1.272533598... 
-percent error:  0 % 
+0.0 approximated Quantile:  -1.27253
+0.0 theoretical Quantile: -1.272533598...
+percent error:  0 %
 
-0.005 approximated Quantile:  -1.05122 
+0.005 approximated Quantile:  -1.05122
 
-0.25 approximated Quantile:  2.84146 
-0.25 theoretical Quantile: 2.6510204996078... 
-percent error:  7.18374 % 
+0.25 approximated Quantile:  2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error:  7.18374 %
 
-0.50 approximated Quantile:  4.09981 
-0.50 theoretical Quantile: 4.0 
-percent error:  2.49513 % 
+0.50 approximated Quantile:  4.09981
+0.50 theoretical Quantile: 4.0
+percent error:  2.49513 %
 
-0.75 approximated Quantile:  5.31623 
-0.75 theoretical Quantile: 5.34897950039216... 
-percent error:  -0.612173 % 
+0.75 approximated Quantile:  5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error:  -0.612173 %
 
-0.995 approximated Quantile:  8.98943 
+0.995 approximated Quantile:  8.98943
 
-0.0 approximated Quantile:  9.07652 
-0.0 theoretical Quantile: 9.07652065... 
-percent error:  0 % 
+0.0 approximated Quantile:  9.07652
+0.0 theoretical Quantile: 9.07652065...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -2.0]:  0 
-theoretical: 0.0... 
-percent error:  0 % 
+approximated cumprobabilty [-oo, -2.0]:  0
+theoretical: 0.0...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -1.2]:  0.00163608 
+approximated cumprobabilty [-oo, -1.2]:  0.00163608
 
-approximated cumprobabilty [-oo, 0]:  0.0290357 
-theoretical: 0.022750131948179... 
-percent error:  27.6285 % 
+approximated cumprobabilty [-oo, 0]:  0.0290357
+theoretical: 0.022750131948179...
+percent error:  27.6285 %
 
-approximated cumprobabilty [-oo, 2.0]:  0.144109 
-theoretical: 0.158655253931457... 
-percent error:  -9.16825 % 
+approximated cumprobabilty [-oo, 2.0]:  0.144109
+theoretical: 0.158655253931457...
+percent error:  -9.16825 %
 
-approximate cumprobabilty [-oo, 5.0]:  0.691477 
-theoretical: 0.691462461274013... 
-percent error:  0.00216297 % 
+approximate cumprobabilty [-oo, 5.0]:  0.691477
+theoretical: 0.691462461274013...
+percent error:  0.00216297 %
 
-approximate cumprobabilty [-oo, 9.0]:  0.996511 
+approximate cumprobabilty [-oo, 9.0]:  0.996511
 
-approximate cumprobabilty [-oo, 9.07652065]:  1 
-theoretical: 1.0... 
-percent error:  0 % 
+approximate cumprobabilty [-oo, 9.07652065]:  1
+theoretical: 1.0...
+percent error:  0 %
 
 
 
-Testing serialization... 
-Min =  -1.27253 
-Max =  9.07652 
+Testing serialization...
+Min =  -1.27253
+Max =  9.07652
 
-0.0 approximated Quantile:  -1.27253 
-0.0 theoretical Quantile: -1.272533598... 
-percent error:  0 % 
+0.0 approximated Quantile:  -1.27253
+0.0 theoretical Quantile: -1.272533598...
+percent error:  0 %
 
-0.005 approximated Quantile:  -1.05122 
+0.005 approximated Quantile:  -1.05122
 
-0.25 approximated Quantile:  2.84146 
-0.25 theoretical Quantile: 2.6510204996078... 
-percent error:  7.18374 % 
+0.25 approximated Quantile:  2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error:  7.18374 %
 
-0.50 approximated Quantile:  4.09981 
-0.50 theoretical Quantile: 4.0 
-percent error:  2.49513 % 
+0.50 approximated Quantile:  4.09981
+0.50 theoretical Quantile: 4.0
+percent error:  2.49513 %
 
-0.75 approximated Quantile:  5.31623 
-0.75 theoretical Quantile: 5.34897950039216... 
-percent error:  -0.612173 % 
+0.75 approximated Quantile:  5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error:  -0.612173 %
 
-0.995 approximated Quantile:  8.98943 
+0.995 approximated Quantile:  8.98943
 
-0.0 approximated Quantile:  9.07652 
-0.0 theoretical Quantile: 9.07652065... 
-percent error:  0 % 
+0.0 approximated Quantile:  9.07652
+0.0 theoretical Quantile: 9.07652065...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -2.0]:  0 
-theoretical: 0.0... 
-percent error:  0 % 
+approximated cumprobabilty [-oo, -2.0]:  0
+theoretical: 0.0...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -1.2]:  0.00163608 
+approximated cumprobabilty [-oo, -1.2]:  0.00163608
 
-approximated cumprobabilty [-oo, 0]:  0.0290357 
-theoretical: 0.022750131948179... 
-percent error:  27.6285 % 
+approximated cumprobabilty [-oo, 0]:  0.0290357
+theoretical: 0.022750131948179...
+percent error:  27.6285 %
 
-approximated cumprobabilty [-oo, 2.0]:  0.144109 
-theoretical: 0.158655253931457... 
-percent error:  -9.16825 % 
+approximated cumprobabilty [-oo, 2.0]:  0.144109
+theoretical: 0.158655253931457...
+percent error:  -9.16825 %
 
-approximate cumprobabilty [-oo, 5.0]:  0.691477 
-theoretical: 0.691462461274013... 
-percent error:  0.00216297 % 
+approximate cumprobabilty [-oo, 5.0]:  0.691477
+theoretical: 0.691462461274013...
+percent error:  0.00216297 %
 
-approximate cumprobabilty [-oo, 9.0]:  0.996511 
+approximate cumprobabilty [-oo, 9.0]:  0.996511
 
-approximate cumprobabilty [-oo, 9.07652065]:  1 
-theoretical: 1.0... 
-percent error:  0 % 
+approximate cumprobabilty [-oo, 9.07652065]:  1
+theoretical: 1.0...
+percent error:  0 %
 
 
 
-Testing XML: write XML from StatCumProbDistDynCalc object... 
-Testing XML: read XML to StatCumProbDistDynCalc object... 
-Min =  -1.27253 
-Max =  9.07652 
+Testing XML: write XML from StatCumProbDistDynCalc object...
+Testing XML: read XML to StatCumProbDistDynCalc object...
+Min =  -1.27253
+Max =  9.07652
 
-0.0 approximated Quantile:  -1.27253 
-0.0 theoretical Quantile: -1.272533598... 
-percent error:  0 % 
+0.0 approximated Quantile:  -1.27253
+0.0 theoretical Quantile: -1.272533598...
+percent error:  0 %
 
-0.005 approximated Quantile:  -1.05122 
+0.005 approximated Quantile:  -1.05122
 
-0.25 approximated Quantile:  2.84146 
-0.25 theoretical Quantile: 2.6510204996078... 
-percent error:  7.18374 % 
+0.25 approximated Quantile:  2.84146
+0.25 theoretical Quantile: 2.6510204996078...
+percent error:  7.18374 %
 
-0.50 approximated Quantile:  4.09981 
-0.50 theoretical Quantile: 4.0 
-percent error:  2.49513 % 
+0.50 approximated Quantile:  4.09981
+0.50 theoretical Quantile: 4.0
+percent error:  2.49513 %
 
-0.75 approximated Quantile:  5.31623 
-0.75 theoretical Quantile: 5.34897950039216... 
-percent error:  -0.612173 % 
+0.75 approximated Quantile:  5.31623
+0.75 theoretical Quantile: 5.34897950039216...
+percent error:  -0.612173 %
 
-0.995 approximated Quantile:  8.98943 
+0.995 approximated Quantile:  8.98943
 
-0.0 approximated Quantile:  9.07652 
-0.0 theoretical Quantile: 9.07652065... 
-percent error:  0 % 
+0.0 approximated Quantile:  9.07652
+0.0 theoretical Quantile: 9.07652065...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -2.0]:  0 
-theoretical: 0.0... 
-percent error:  0 % 
+approximated cumprobabilty [-oo, -2.0]:  0
+theoretical: 0.0...
+percent error:  0 %
 
-approximated cumprobabilty [-oo, -1.2]:  0.00163608 
+approximated cumprobabilty [-oo, -1.2]:  0.00163608
 
-approximated cumprobabilty [-oo, 0]:  0.0290357 
-theoretical: 0.022750131948179... 
-percent error:  27.6285 % 
+approximated cumprobabilty [-oo, 0]:  0.0290357
+theoretical: 0.022750131948179...
+percent error:  27.6285 %
 
-approximated cumprobabilty [-oo, 2.0]:  0.144109 
-theoretical: 0.158655253931457... 
-percent error:  -9.16825 % 
+approximated cumprobabilty [-oo, 2.0]:  0.144109
+theoretical: 0.158655253931457...
+percent error:  -9.16825 %
 
-approximate cumprobabilty [-oo, 5.0]:  0.691477 
-theoretical: 0.691462461274013... 
-percent error:  0.00216297 % 
+approximate cumprobabilty [-oo, 5.0]:  0.691477
+theoretical: 0.691462461274013...
+percent error:  0.00216297 %
 
-approximate cumprobabilty [-oo, 9.0]:  0.996511 
+approximate cumprobabilty [-oo, 9.0]:  0.996511
 
-approximate cumprobabilty [-oo, 9.07652065]:  1 
-theoretical: 1.0... 
-percent error:  0 % 
+approximate cumprobabilty [-oo, 9.07652065]:  1
+theoretical: 1.0...
+percent error:  0 %
 

@@ -247,7 +247,7 @@ void CleanPsf() {
     QString psfTempFile = FileName(ui.GetAsString("PSF")).expanded();
 
     if(ui.GetBoolean("CLEANUP")) {
-      remove(psfTempFile.toAscii().data());
+      remove(psfTempFile.toLatin1().data());
     }
 
     ui.Clear("PSF");

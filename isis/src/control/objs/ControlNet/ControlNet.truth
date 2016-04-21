@@ -78,9 +78,9 @@ testing point deletion.................................
 ******* Done testing cube graph ***************
 
 
-testing GetCubeSerials...
-  DELTA
+testing GetCubeSerials... (NOTE: unittest sorts the results)
   ALPHA
+  DELTA
 
 Test adding control points with identical id numbers ...
 **PROGRAMMER ERROR** ControlPoint must have unique Id.

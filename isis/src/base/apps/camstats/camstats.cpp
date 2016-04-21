@@ -53,13 +53,13 @@ void IsisMain() {
       ofstream os;
       bool writeHeader = true;
       if(append) {
-        os.open(outfile.toAscii().data(), ios::app);
+        os.open(outfile.toLatin1().data(), ios::app);
         if(exists) {
           writeHeader = false;
         }
       }
       else {
-        os.open(outfile.toAscii().data(), ios::out);
+        os.open(outfile.toLatin1().data(), ios::out);
       }
 
       // if new file or append and no file exists then write header

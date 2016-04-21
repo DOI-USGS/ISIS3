@@ -194,7 +194,7 @@ void IsisMain() {
 
   if(runXY) {
     QString tmp(tempFile.expanded());
-    remove(tmp.toAscii().data());
+    remove(tmp.toLatin1().data());
     QString msg = "Camera did not intersect images to gather stats";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -269,7 +269,7 @@ void IsisMain() {
 
   // Clean up the temporary automos list file
   QString tmp(tempFile.expanded());
-  remove(tmp.toAscii().data());
+  remove(tmp.toLatin1().data());
 } // end of isis main
 
 

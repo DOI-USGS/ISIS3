@@ -427,7 +427,7 @@ namespace Isis {
         }
         // Take care of scientific notiation where the exponent is negative
         else if((i > 1) && equation[i] == '-' && equation[i-1].toLower() == 'e' && equation[i-2].isLetterOrNumber()) {
-          output += equation[i].toAscii();
+          output += equation[i].toLatin1();
         }
         // Look for negative operator disguised as '-'
         else if(equation[i] == '-') {
@@ -457,12 +457,12 @@ namespace Isis {
         }
         else {
           output += ' ';
-          output += equation[i].toAscii();
+          output += equation[i].toLatin1();
           output += ' ';
         }
       }
       else {
-        output += equation[i].toAscii();
+        output += equation[i].toLatin1();
       }
     }
 

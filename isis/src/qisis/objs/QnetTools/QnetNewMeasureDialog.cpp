@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <string>
 
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QPushButton>
 #include <QtGui>
 
 #include "ControlPoint.h"

@@ -311,9 +311,9 @@ namespace Isis {
     if (!IsSpecial(hillshade.resolution()))
       resolution = toString(hillshade.resolution());
 
-    debug << "Hillshade[ azimuth =" << hillshade.azimuth().toString().toAscii().data()
-          << "zenith =" << hillshade.zenith().toString().toAscii().data()
-          << "resolution =" << resolution.toAscii().data() << "]";
+    debug << "Hillshade[ azimuth =" << hillshade.azimuth().toString().toLatin1().data()
+          << "zenith =" << hillshade.zenith().toString().toLatin1().data()
+          << "resolution =" << resolution.toLatin1().data() << "]";
 
     return debug;
   }

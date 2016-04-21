@@ -232,7 +232,7 @@ void IsisMain() {
     gsTempFile = FileName(sTempListFile).expanded();
     sTempFiles.push_back(gsTempFile);
     fstream ostm;
-    ostm.open(gsTempFile.toAscii().data(), std::ios::out);
+    ostm.open(gsTempFile.toLatin1().data(), std::ios::out);
     ostm << FileName(sTempFile5).expanded() << endl;
     ostm << FileName(sTempFile6).expanded() << endl;
     ostm.close();
@@ -256,7 +256,7 @@ void IsisMain() {
   #endif
     p7.Run();
 
-    remove(gsTempFile.toAscii().data());
+    remove(gsTempFile.toLatin1().data());
 
     // ****************************************************************************
     // Perform noise filter 3 times
@@ -385,7 +385,7 @@ void IsisMain() {
     // Enter the outputs of lowpass and highpass filenames to a list file
     gsTempFile = FileName(sTempListFile).expanded();
     sTempFiles.push_back(gsTempFile);
-    ostm.open(gsTempFile.toAscii().data(), std::ios::out);
+    ostm.open(gsTempFile.toLatin1().data(), std::ios::out);
     ostm << FileName(sTempFile9).expanded() << endl;
     ostm << FileName(sTempFile10).expanded() << endl;
     ostm.close();
@@ -464,7 +464,7 @@ void IsisMain() {
 
     // more clean up
     for (int i=0; i<(int)sTempFiles.size(); i++) {
-      remove(sTempFiles[i].toAscii().data());
+      remove(sTempFiles[i].toLatin1().data());
     }
     sTempFiles.clear();
   }
@@ -602,8 +602,8 @@ void ProcessCubeNormStats(QString psStatsFile, int piChannel, int piSumming)
 
   // Write the results of the filtered cubenorm data into 2 output files
   FILE * file1, *file2;
-  file1 = fopen(gsCubeStats1.toAscii().data(), "w");
-  file2 = fopen(gsCubeStats2.toAscii().data(), "w");
+  file1 = fopen(gsCubeStats1.toLatin1().data(), "w");
+  file2 = fopen(gsCubeStats2.toLatin1().data(), "w");
 
   fprintf (file1, "%8s%8s%15s%15s%15s%15s%15s%15s\n","Band", "RowCol", "ValidPoints",
            "Average", "Median", "StdDev", "Minimum", "Maximim");

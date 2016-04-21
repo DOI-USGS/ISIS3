@@ -12,7 +12,7 @@ namespace Isis {
    * @param parent
    * @param flags
    */
-  MainWindow::MainWindow(QString title, QWidget *parent, Qt::WFlags flags) :
+  MainWindow::MainWindow(QString title, QWidget *parent, Qt::WindowFlags flags) :
       QMainWindow(parent, flags) {
     setWindowTitle(title);
   }
@@ -40,7 +40,7 @@ namespace Isis {
 
 
   QString MainWindow::settingsFileName(QString objectTitle) {
-    if (QApplication::applicationName() == "") {
+    if (QCoreApplication::applicationName() == "") {
       throw IException(IException::Programmer, "You must set QApplication's "
           "application name before using the Isis::MainWindow class. Window "
           "state and geometry can not be saved and restored", _FILEINFO_);
@@ -53,7 +53,7 @@ namespace Isis {
     }
 
     QDir programSettings =
-        QDir(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path());
+        QDir(FileName("$HOME/.Isis/" + QCoreApplication::applicationName() + "/").path());
     QString windowSettings = programSettings.filePath(objectTitle + ".config");
 
     return windowSettings;
@@ -92,7 +92,7 @@ namespace Isis {
 
 
   QString MainWindow::settingsFileName() const {
-    if (QApplication::applicationName() == "") {
+    if (QCoreApplication::applicationName() == "") {
       throw IException(IException::Programmer, "You must set QApplication's "
           "application name before using the Isis::MainWindow class. Window "
           "state and geometry can not be saved and restored", _FILEINFO_);
@@ -106,7 +106,7 @@ namespace Isis {
     }
 
     QDir programSettings =
-        QDir(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path());
+        QDir(FileName("$HOME/.Isis/" + QCoreApplication::applicationName() + "/").path());
     QString windowSettings = programSettings.filePath(objectName() + ".config");
 
     return windowSettings;

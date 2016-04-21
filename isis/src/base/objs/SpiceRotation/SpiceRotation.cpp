@@ -101,7 +101,7 @@ namespace Isis {
     SpiceInt number;
     SpiceBoolean found;
     //Read starting at element 1 (skipping element 0)
-    gdpool_c(key.toAscii().data(), 1, 2, &number, transX, &found);
+    gdpool_c(key.toLatin1().data(), 1, 2, &number, transX, &found);
 
     if (!found) {
       QString msg = "Cannot find [" + key + "] in text kernels";

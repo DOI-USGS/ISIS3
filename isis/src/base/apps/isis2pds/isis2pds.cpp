@@ -70,7 +70,7 @@ void IsisMain() {
 
   FileName outFile(ui.GetFileName("TO", "img"));
   QString outFileName(outFile.expanded());
-  ofstream oCube(outFileName.toAscii().data());
+  ofstream oCube(outFileName.toLatin1().data());
   p.OutputLabel(oCube);
   p.StartProcess(oCube);
   oCube.close();

@@ -1,12 +1,12 @@
 include $(ISISROOT)/make/isismake.os
 
-.PHONY: libs plugins
+.PHONY: libs license plugins
 
 all:  install
 
 install: libs plugins
 
-libs:
+libs: license
 	@for library in $(THIRDPARTYLIBS); do                                \
 	  $(INSTALL3P) $(INSTALL3POPTS) $$library $(ISISROOT)/3rdParty/lib/; \
 	  echo $(CURTIMESTAMP) "  Installing [$$library]";                   \
@@ -51,6 +51,11 @@ libs:
 	  $(RM) DarwinErrors.lis DarwinLibs.lis;                             \
 	fi                                                                 
 
+license:
+	echo $(CURTIMESTAMP) "  Obtaining licenses";                         \
+	$(RSYNC) -a /usgs/pkgs/local/$(ISISLOCALVERSION)/license/            \
+	  $(ISISROOT)/3rdParty/license/
+
 plugins:
 	@for plugs in $(THIRDPARTYPLUGINS); do                               \
 	  echo $(CURTIMESTAMP) "  Installing [$$plugs...]";                  \
@@ -75,6 +80,7 @@ plugins:
 clean:
 	rm -f lib/lib*.so* lib/lib*.dylib lib/lib*.a
 	cd lib && rm -rf *.framework
+	$(RM) -rf license
 	@for plugs in plugins/*; do \
 	  if [ -d $$plugs -a $$plugs != "plugins/CVS" ]; \
 	  then \

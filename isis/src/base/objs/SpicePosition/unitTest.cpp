@@ -23,9 +23,9 @@ int main(int argc, char *argv[]) {
   QString moc(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
   QString pck(dir + "pck00006.tpc");
-  furnsh_c(moc.toAscii().data());
-  furnsh_c(de.toAscii().data());
-  furnsh_c(pck.toAscii().data());
+  furnsh_c(moc.toLatin1().data());
+  furnsh_c(de.toLatin1().data());
+  furnsh_c(pck.toLatin1().data());
 
   double startTime = -69382819.0;
   double endTime = -69382512.0;

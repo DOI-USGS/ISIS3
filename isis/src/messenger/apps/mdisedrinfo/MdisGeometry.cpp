@@ -116,7 +116,7 @@ namespace Isis {
     SpiceBoolean found;
 
     NaifStatus::CheckErrors(); 
-    (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
+    (void) bodn2c_c(target[0].toLatin1().data(), &tcode, &found);
     NaifStatus::CheckErrors(); 
 
     if(found) return (true);
@@ -725,7 +725,7 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
     (void) bodn2c_c("MESSENGER", &scCode, &found);
-    (void) bodn2c_c(target.toAscii().data(), &targCode, &found);
+    (void) bodn2c_c(target.toLatin1().data(), &targCode, &found);
     if(!found) {
       return (false);
     }

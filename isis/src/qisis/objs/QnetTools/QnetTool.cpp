@@ -4,8 +4,17 @@
 #include <vector>
 #include <iomanip>
 
-#include <QtGui>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QScrollBar>
 #include <QShortcut>
+#include <QSplitter>
+#include <QStackedWidget>
+#include <QtGui>
+#include <QTableWidget>
+#include <QWhatsThis>
 
 #include "QnetDeletePointDialog.h"
 #include "QnetNewMeasureDialog.h"
@@ -506,7 +515,7 @@ namespace Isis {
       "ground control points, both Fixed and Constrained."
       "This cube can be a level1, level2 or dem cube.";
     m_openGround->setWhatsThis(whatsThis);
-    connect (m_openGround,SIGNAL(activated()),this,SLOT(openGround()));
+    connect (m_openGround,SIGNAL(triggered()),this,SLOT(openGround()));
 
     m_openDem = new QAction(m_qnetTool);
     m_openDem->setText("Open &Radius Source");
@@ -518,7 +527,7 @@ namespace Isis {
       "displayed for visually picking points.  This is strictly used to "
       "determine the radius value for ground control points.";
     m_openDem->setWhatsThis(whatsThis);
-    connect (m_openDem,SIGNAL(activated()),this,SLOT(openDem()));
+    connect (m_openDem,SIGNAL(triggered()),this,SLOT(openDem()));
 
     m_saveNet = new QAction(QIcon(toolIconDir() + "/filesave.png"), "Save Control Network ...",
                             m_qnetTool);
@@ -528,7 +537,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Saves the current <i>"
         "control network</i>";
     m_saveNet->setWhatsThis(whatsThis);
-    connect(m_saveNet, SIGNAL(activated()), this, SLOT(saveNet()));
+    connect(m_saveNet, SIGNAL(triggered()), this, SLOT(saveNet()));
 
     m_saveAsNet = new QAction(QIcon(toolIconDir() + "/filesaveas.png"), "Save Control Network &As...",
                               m_qnetTool);
@@ -537,7 +546,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Saves the current <i>"
         "control network</i> under chosen filename";
     m_saveAsNet->setWhatsThis(whatsThis);
-    connect(m_saveAsNet, SIGNAL(activated()), this, SLOT(saveAsNet()));
+    connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
 
     m_closeQnetTool = new QAction(QIcon(toolIconDir() + "/fileclose.png"), "&Close", m_qnetTool);
     m_closeQnetTool->setToolTip("Close this window");
@@ -546,7 +555,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Closes the Qnet Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closeQnetTool->setWhatsThis(whatsThis);
-    connect(m_closeQnetTool, SIGNAL(activated()), m_qnetTool, SLOT(close()));
+    connect(m_closeQnetTool, SIGNAL(triggered()), m_qnetTool, SLOT(close()));
 
     m_showHideTemplateEditor = new QAction(QIcon(toolIconDir() + "/view_text.png"),
         "&View/edit registration template", m_qnetTool);
@@ -558,7 +567,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Displays the curent registration template.  "
        "The user may edit and save changes under a chosen filename.";
     m_showHideTemplateEditor->setWhatsThis(whatsThis);
-    connect(m_showHideTemplateEditor, SIGNAL(activated()), this,
+    connect(m_showHideTemplateEditor, SIGNAL(triggered()), this,
         SLOT(showHideTemplateEditor()));
 
     m_saveChips = new QAction(QIcon(toolIconDir() + "/savechips.png"), "Save registration chips",
@@ -568,7 +577,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Save registration chips to file.  "
        "Each chip: pattern, search, fit will be saved to a separate file.";
     m_saveChips->setWhatsThis(whatsThis);
-    connect(m_saveChips, SIGNAL(activated()), this, SLOT(saveChips()));
+    connect(m_saveChips, SIGNAL(triggered()), this, SLOT(saveChips()));
 
     m_openTemplateFile = new QAction(QIcon(toolIconDir() + "/fileopen.png"), "&Open registration "
         "template", m_qnetTool);
@@ -577,7 +586,7 @@ namespace Isis {
     whatsThis = "<b>Function:</b> Allows user to select a new file to set as "
         "the registration template";
     m_openTemplateFile->setWhatsThis(whatsThis);
-    connect(m_openTemplateFile, SIGNAL(activated()), this, SLOT(openTemplateFile()));
+    connect(m_openTemplateFile, SIGNAL(triggered()), this, SLOT(openTemplateFile()));
 
     m_saveTemplateFile = new QAction(QIcon(toolIconDir() + "/filesave.png"), "&Save template file",
         m_qnetTool);
@@ -600,7 +609,7 @@ namespace Isis {
     m_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     m_whatsThis->setToolTip("Activate What's This and click on items on "
         "user interface to see more information.");
-    connect(m_whatsThis, SIGNAL(activated()), this, SLOT(enterWhatsThisMode()));
+    connect(m_whatsThis, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
   }
 
@@ -1745,7 +1754,7 @@ namespace Isis {
 
       //  Load new point in QnetTool
       loadPoint();
-      m_qnetTool->setShown(true);
+      m_qnetTool->setVisible(true);
       m_qnetTool->raise();
 
       loadTemplateFile(
@@ -1915,7 +1924,7 @@ namespace Isis {
 
       //  Load new point in QnetTool
       loadPoint();
-      m_qnetTool->setShown(true);
+      m_qnetTool->setVisible(true);
       m_qnetTool->raise();
 
       delete fixedPointDialog;
@@ -2005,7 +2014,7 @@ namespace Isis {
         //  need index in control net for pt
         //int i = m_controlNet->
         //m_filteredPoints.
-        m_qnetTool->setShown(false);
+        m_qnetTool->setVisible(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint(m_editPoint->GetId()) ==
                                           ControlPoint::PointLocked) {
@@ -2066,7 +2075,7 @@ namespace Isis {
         }
 
         loadPoint();
-        m_qnetTool->setShown(true);
+        m_qnetTool->setVisible(true);
         m_qnetTool->raise();
 
         loadTemplateFile(m_pointEditor->templateFileName());
@@ -2131,7 +2140,7 @@ namespace Isis {
     //  TODO: better way - have 2 slots
     if (sender() != this) m_leftFile.clear();
     loadPoint();
-    m_qnetTool->setShown(true);
+    m_qnetTool->setVisible(true);
     m_qnetTool->raise();
     loadTemplateFile(m_pointEditor->templateFileName());
 
@@ -3058,7 +3067,7 @@ namespace Isis {
         m_editPoint->Add(m);
       }
       loadPoint();
-      m_qnetTool->setShown(true);
+      m_qnetTool->setVisible(true);
       m_qnetTool->raise();
 
       loadTemplateFile(
@@ -3554,8 +3563,8 @@ namespace Isis {
         delete m_editPoint;
         m_editPoint = NULL;
         emit editPointChanged("");
-        m_qnetTool->setShown(false);
-        m_measureWindow->setShown(false);
+        m_qnetTool->setVisible(false);
+        m_measureWindow->setVisible(false);
       }
     }
 

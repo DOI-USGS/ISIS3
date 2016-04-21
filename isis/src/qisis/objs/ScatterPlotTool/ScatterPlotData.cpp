@@ -3,8 +3,6 @@
 
 #include <algorithm>
 
-#include <qwt_double_range.h>
-
 #include <QtCore>
 
 #include "Brick.h"
@@ -256,8 +254,8 @@ namespace Isis {
     }
 
 
-    IString msg = "Bin at index [" + IString(index) + "] not found. "
-                  "There are [" + IString(numberOfBins()) + "] bins";
+    QString msg = "Bin at index [" + QString::number(index) + "] not found. "
+                  "There are [" + QString::number(numberOfBins()) + "] bins";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -450,8 +448,8 @@ namespace Isis {
     int xIndex = binIndex;
 
     if (xIndex < 0 || yIndex < 0 || xIndex >= xSize || yIndex >= ySize) {
-      IString msg = "Bin at index [" + IString(binIndex) + "] not found. "
-                    "There are [" + IString(numberOfBins()) + "] bins";
+      QString msg = "Bin at index [" + QString::number(binIndex) + "] not found. "
+                    "There are [" + QString::number(numberOfBins()) + "] bins";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

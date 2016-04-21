@@ -426,7 +426,7 @@ int ck3sdn(double sdntol, bool avflag, int *nrec,
       /*           to see if interpolated pointing is within tolerance of the */
       /*           actual pointing. */
 
-      fitok = TRUE;
+      fitok = true;
       j = keepf + 1;
       while(j <= keepl - 1 && fitok) {
 
