@@ -133,35 +133,40 @@ namespace Isis {
    *                           BoxcarCachingAlgorithm instead of the
    *                           RegionalCachingAlgorithm. Also added unit tests
    *                           to exercise the modified methods. Fixes #819.
-   *  @history 2013-03-12 Steven Lambright and Tracie Sucharski - Added support for 64 bit input
+   *   @history 2013-03-12 Steven Lambright and Tracie Sucharski - Added support for 64 bit input
    *                           data.  Note:  Possibility of lost precision since ouput is in 32 bit.
    *   @history 2013-03-27 Jeannie Backer - Added programmer comments and
    *                           documentation. Changed parameter name from
    *                           "parameter" to "fname" in SetOutputCube() method.
    *                           References #1248.
-   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
-   *                                            functions to ensure successful 
-   *                                            inheritance between Process and its
-   *                                            child classes.  Added virtual keyword
-   *                                            to destructor.  References #2215.
-   *
-   * *                                            to destructor.  References #2215.
+   *   @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several functions
+   *                           to ensure successful inheritance between Process and its
+   *                           child classes. Added virtual keyword to destructor. References #2215.
    *   @history 2016-02-23 Tyler Wilson - Added VAXConversion(...) and IsVAXSpecial(...) routines
-   *                        for importing Galileo NIMS qubs which were originally saved in
-   *                        VAX format.  Also added SetSuffixOffset for reading suffix
-   *                        band data from NIMS cubes. References #2368.
+   *                           for importing Galileo NIMS qubs which were originally saved in
+   *                           VAX format.  Also added SetSuffixOffset for reading suffix
+   *                           band data from NIMS cubes. References #2368.
+   *   @history 2016-04-20 Jeannie Backer - Merged Janet Barret's changes to handle SignedInteger
+   *                           imports. Brought code closer to coding standards.
    *
    *
    */
-
-
-
-
-
   class ProcessImport : public Isis::Process {
     public:
-      enum VAXDataType {VAX_REAL, VAX_INT};
-      enum VAXSpecialPixel { VAX_MIN4,VAX_NULL4,VAX_LRS4,VAX_LIS4,VAX_HIS4,VAX_HRS4};
+      enum VAXDataType { 
+        VAX_REAL,  
+        VAX_INT
+      };
+
+
+      enum VAXSpecialPixel { 
+        VAX_MIN4,
+        VAX_NULL4,
+        VAX_LRS4,
+        VAX_LIS4,
+        VAX_HIS4,
+        VAX_HRS4
+      };
 
       ProcessImport();
       virtual ~ProcessImport();
@@ -176,6 +181,7 @@ namespace Isis {
       Isis::Cube *SetOutputCube(const QString &parameter);
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 Isis::CubeAttributeOutput &att);
+
       void SetPixelType(const Isis::PixelType type);
       /**
        * Returns the pixel type
@@ -184,6 +190,8 @@ namespace Isis {
       Isis::PixelType PixelType() {
         return p_pixelType;
       }
+
+
       void SetDimensions(const int ns, const int nl, const int nb);
 
       /**
@@ -194,6 +202,7 @@ namespace Isis {
         return p_ns;
       }
 
+
       /**
        * Returns the number of lines
        * @return The number of lines
@@ -202,6 +211,7 @@ namespace Isis {
         return p_nl;
       }
 
+
       /**
        * Returns the number of bands
        * @return The number of bands
@@ -209,6 +219,7 @@ namespace Isis {
       int Bands() {
         return p_nb;
       }
+
 
       void SetByteOrder(const Isis::ByteOrder order);
 
@@ -220,15 +231,11 @@ namespace Isis {
         return p_byteOrder;
       }
 
-
-      //tjw:  VAX_REAL -> IEEE_REAL
-
-      bool IsVAXSpecial(unsigned int *vax,VAXSpecialPixel pix);
+      bool IsVAXSpecial(unsigned int *vax, VAXSpecialPixel pix);
       double VAXConversion(void *ibuf);
-      void SetSuffixOffset(int samples,int lines, int coreBands,int itemBytes);
+      void SetSuffixOffset(int samples,int lines, int coreBands, int itemBytes);
       void SetSuffixPixelType(const Isis::PixelType type);
       void SetVAXConvert(const bool vax_convert);
-
 
       void SetFileHeaderBytes(const int bytes);
       void SetFileTrailerBytes(const int bytes);
@@ -276,6 +283,8 @@ namespace Isis {
                                   all bands is followed by the second pixel for 
                                   all bands.*/
       };
+
+
       void SetOrganization(const ProcessImport::Interleave org);
       Interleave Organization() const;
 
@@ -295,6 +304,13 @@ namespace Isis {
 
       double TestPixel(const double pixel);
 
+      void ProcessBsq(void funct(Isis::Buffer &out) = NULL);
+      void ProcessBil(void funct(Isis::Buffer &out) = NULL);
+      void ProcessBip(void funct(Isis::Buffer &out) = NULL);
+      void ProcessJp2(void funct(Isis::Buffer &out) = NULL);
+
+      void CheckPixelRange(QString pixelName, double min, double max);
+
 #if 0
       void AddImportLabel(Isis::Pvl &importLab);
       void AddLabel(Isis::Pvl &label);
@@ -302,19 +318,17 @@ namespace Isis {
 
 
     private:
-      QString p_inFile;        //!< Input file name
+      QString p_inFile;            //!< Input file name
       Isis::PixelType p_pixelType; //!< Pixel type of input data
 
-      //tjw
-      Isis::PixelType p_suffixPixelType; //!< Pixel type of suffix data (for Galileo NIMS cubes)
+      Isis::PixelType p_suffixPixelType; //!< The pixel type of the suffix data.
       int p_ns;                    //!< Number of samples
       int p_nl;                    //!< Number of lines
       int p_nb;                    //!< Number of bands
       Isis::ByteOrder p_byteOrder; //!< Byte order of data
 
-      //tjw
-      int p_suffixData;            //!< Number of bytes past the file header bytes
-                                    //!< where the suffix data bands are stored
+      int p_suffixData;             /**< The number of bytes past the file header bytes
+                                         where the suffix data bands are stored.*/
 
 
       int p_fileHeaderBytes;       /**< The number of bytes of non-image data at
@@ -350,17 +364,13 @@ namespace Isis {
       bool p_saveDataPost;         /**< Flag indicating whether to save the data 
                                         suffix or not */
       bool p_saveFileTrailer;      /**< Flag indicating whether to save the file 
-                                        trailer or not. */            
+                                        trailer or not. */
       char *p_fileHeader;                          //!< The file header
       std::vector<char *>p_dataHeader;             //!< The data header
       std::vector<char *>p_dataTrailer;            //!< The data trailer
       std::vector<std::vector<char *> >p_dataPre;  //!< The data prefix
       std::vector<std::vector<char *> >p_dataPost; //!< The data suffix
       char *p_fileTrailer;                         //!< The file trailer
-
-
-
-      //tjw
 
       bool p_vax_convert;
 
@@ -419,13 +429,6 @@ namespace Isis {
       double p_lis_max;     /**< The pixel value which is the upper bound of LIS
                                  data. All pixels between this value and the min
                                  will be converted to the Isis LIS value.*/
-
-      void ProcessBsq(void funct(Isis::Buffer &out) = NULL);
-      void ProcessBil(void funct(Isis::Buffer &out) = NULL);
-      void ProcessBip(void funct(Isis::Buffer &out) = NULL);
-      void ProcessJp2(void funct(Isis::Buffer &out) = NULL);
-
-      void CheckPixelRange(QString pixelName, double min, double max);
   };
 };
 #endif
