@@ -18,7 +18,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "OsirisCamera.h"
+#include "RosettaOsirisCamera.h"
 
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
@@ -44,7 +44,7 @@ namespace Isis {
    * @internal
    */
 
-  OsirisCamera::OsirisCamera(Cube &cube) : FramingCamera(cube) {
+  RosettaOsirisCamera::RosettaOsirisCamera(Cube &cube) : FramingCamera(cube) {
     m_instrumentNameLong = "Optical, Spectroscopic, and Infrared Remote Imaging System";
     m_instrumentNameShort = "OSIRIS";
     m_spacecraftNameLong = "Rosetta";
@@ -125,7 +125,7 @@ namespace Isis {
   /* This should not be an issue with the Osiris cameras, so this can likely be deleted.
      It has been left here just in case something of importance in it was missed.   -Sasha
   */
-  pair<iTime, iTime> OsirisCamera::ShutterOpenCloseTimes(double time,
+  pair<iTime, iTime> RosettaOsirisCamera::ShutterOpenCloseTimes(double time,
                                                          double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
@@ -142,6 +142,6 @@ namespace Isis {
  *   @history 2015-05-21 Sasha Brownsberger - Added documentation.  Removed Lorri
  *            namespace.  Added OsirisNac name.  
  */
-extern "C" Isis::Camera *OsirisCameraPlugin(Isis::Cube &cube) {
-  return new Isis::OsirisCamera(cube);
+extern "C" Isis::Camera *RosettaOsirisCameraPlugin(Isis::Cube &cube) {
+  return new Isis::RosettaOsirisCamera(cube);
 }

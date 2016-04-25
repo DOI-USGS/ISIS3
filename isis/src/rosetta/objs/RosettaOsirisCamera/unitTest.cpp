@@ -3,7 +3,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "OsirisCamera.h"
+#include "RosettaOsirisCamera.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -18,7 +18,7 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-  cout << "Unit Test for OsirisCamera..." << endl;
+  cout << "Unit Test for RosettaOsirisCamera..." << endl;
   try {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
@@ -27,7 +27,7 @@ int main(void) {
     double knownLon = 95.8202502845144437;
 
     Cube c("$rosetta/testData/n20100710t154539230id20f22.cub", "r");
-    OsirisCamera *cam = (OsirisCamera *) CameraFactory::Create(c);
+    RosettaOsirisCamera *cam = (RosettaOsirisCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
