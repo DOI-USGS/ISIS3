@@ -98,6 +98,10 @@ namespace Isis {
       //! Destroys the ProcessByBrick object
       virtual ~ProcessByBrick();
 
+      enum IOCubes{InPlace,
+                   InputOutput,
+                   InputOutputList};
+
       enum ProcessingDirection {
         LinesFirst,
         BandsFirst
@@ -110,6 +114,9 @@ namespace Isis {
       Cube *SetInputCube(const QString &fname,
                          const CubeAttributeInput &att,
                          int requirements = 0);
+
+      virtual void SetBricks(IOCubes cn);
+      void VerifyCubes(IOCubes cn);
 
       void SetBrickSize(int ns, int nl, int nb);
 
@@ -130,6 +137,7 @@ namespace Isis {
       void SetProcessingDirection(ProcessingDirection direction);
       ProcessingDirection GetProcessingDirection();
 
+      void SetOutputRequirements(int outputRequirements);
       void SetWrap(bool wrap);
       bool Wraps();
 
@@ -820,6 +828,10 @@ namespace Isis {
                                       set*/
       bool p_outputBrickSizeSet; /**< Indicates whether the brick size has been
                                       set*/
+
+      int p_outputRequirements;
+
+
       std::vector<int> p_inputBrickSamples;  /**< Number of samples in the input
                                                   bricks*/
       std::vector<int> p_inputBrickLines;    /**< Number of lines in the input
@@ -832,6 +844,10 @@ namespace Isis {
                                                   bricks*/
       std::vector<int> p_outputBrickBands;   /**< Number of bands in the output
                                                   bricks*/
+
+
+
+
   };
 
 };

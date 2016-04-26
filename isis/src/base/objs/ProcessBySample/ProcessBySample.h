@@ -74,9 +74,13 @@ namespace Isis {
        * @param funct
        * @param threaded
        */
+
+
       template <typename Functor>
       void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
-        SetBrickSizesForProcessCubeInPlace();
+          VerifyCubes(InPlace);
+          SetBricks(InPlace);
+        //SetBrickSizesForProcessCubeInPlace();
         ProcessByBrick::ProcessCubeInPlace(funct, threaded);
       }
 
@@ -85,9 +89,12 @@ namespace Isis {
        * @param funct
        * @param threaded
        */
+
       template <typename Functor>
       void ProcessCube(const Functor & funct, bool threaded = true) {
-        SetBrickSizesForProcessCube();
+          VerifyCubes(InputOutput);
+          SetBricks(InputOutput);
+        //SetBrickSizesForProcessCube();
         ProcessByBrick::ProcessCube(funct, threaded);
       }
 
@@ -96,17 +103,23 @@ namespace Isis {
        * @param funct
        * @param threaded
        */
+
       template <typename Functor>
       void ProcessCubes(const Functor & funct, bool threaded = true) {
-        SetBrickSizesForProcessCubes();
+          VerifyCubes(InputOutputList);
+          SetBricks(InputOutputList);
+        //SetBrickSizesForProcessCubes();
         ProcessByBrick::ProcessCubes(funct, threaded);
       }
 
 
     private:
-      void SetBrickSizesForProcessCubeInPlace();
-      void SetBrickSizesForProcessCube();
-      void SetBrickSizesForProcessCubes();
+
+      void SetBricks(IOCubes cn);
+
+      //void SetBrickSizesForProcessCubeInPlace();
+      //void SetBrickSizesForProcessCube();
+      //void SetBrickSizesForProcessCubes();
   };
 };
 

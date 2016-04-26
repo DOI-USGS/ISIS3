@@ -98,31 +98,53 @@ namespace Isis {
     Process::SetInputCube(inCube);
   }
 
-  /**
-   * Verify input and output cubes and set brick size.
-   *
-   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess
-   *                             (void funct(Isis::Buffer &inout))
-   */
-  void ProcessByLine::VerifyCubeInPlace(void){
-     // Error checks
-     if((InputCubes.size() + OutputCubes.size()) > 1) {
-       string m = "You can only specify exactly one input or output cube";
-       throw IException(IException::Programmer, m, _FILEINFO_);
-     }
-     else if((InputCubes.size() + OutputCubes.size()) == 0) {
-       string m = "You haven't specified an input or output cube";
-       throw IException(IException::Programmer, m, _FILEINFO_);
-     }
 
-     // Determine if we have an input or output
-     if(InputCubes.size() == 1) {
-       SetBrickSize(InputCubes[0]->sampleCount(), 1, 1);
-     }
-     else {
-       SetBrickSize(OutputCubes[0]->sampleCount(), 1, 1);
-     }
-   }
+
+  void ProcessByLine::SetBricks(IOCubes cn){
+
+      switch(cn){
+
+        case InPlace:
+
+          if(InputCubes.size() == 1) {
+            SetBrickSize(InputCubes[0]->sampleCount(), 1, 1);
+          }
+
+          else {
+            SetBrickSize(OutputCubes[0]->sampleCount(), 1, 1);
+          }
+
+          break;
+
+
+        case InputOutput:
+
+          SetInputBrickSize(InputCubes[0]->sampleCount(), 1, 1);
+          SetOutputBrickSize(OutputCubes[0]->sampleCount(), 1, 1);
+
+          break;
+
+
+        case InputOutputList:
+
+          for(unsigned int i = 0; i < InputCubes.size(); i++) {
+            SetInputBrickSize(InputCubes[i]->sampleCount(), 1, 1, i + 1);
+          }
+          for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+            SetOutputBrickSize(OutputCubes[i]->sampleCount(), 1, 1, i + 1);
+          }
+
+
+          break;
+
+
+      }
+
+
+
+  }
+
+
 
   /**
    * This method invokes the process by line operation over a single input or
@@ -144,46 +166,14 @@ namespace Isis {
    *                                     written.
    */
   void ProcessByLine::StartProcess(void funct(Isis::Buffer &inout)) {
-    // Error checks
-    VerifyCubeInPlace();
+
+
+    VerifyCubes(InPlace);
+    SetBricks(InPlace);    
     ProcessByBrick::StartProcess(funct);
   }
 
-  /**
-   * Verify input and output cubes and set brick size for StartProcess(in,out)
-   *
-   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess
-   *                 (void funct(Isis::Buffer &in, Isis::Buffer &out))
-   */
-  void ProcessByLine::VerifyCubeIO(void)
-  {
-    // Error checks ... there must be one input and output
-    if(InputCubes.size() != 1) {
-      string m = "You must specify exactly one input cube";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-    else if(OutputCubes.size() != 1) {
-      string m = "You must specify exactly one output cube";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
 
-    // The lines in the input and output must match
-    if(InputCubes[0]->lineCount() != OutputCubes[0]->lineCount()) {
-      string m = "The number of lines in the input and output cubes ";
-      m += "must match";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-
-    // The bands in the input and output must match
-    if(InputCubes[0]->bandCount() != OutputCubes[0]->bandCount()) {
-      string m = "The number of bands in the input and output cubes ";
-      m += "must match";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-
-    SetInputBrickSize(InputCubes[0]->sampleCount(), 1, 1);
-    SetOutputBrickSize(OutputCubes[0]->sampleCount(), 1, 1);
-  }
 
   /**
    * This method invokes the process by line operation over exactly one input
@@ -197,52 +187,16 @@ namespace Isis {
    *
    * @throws Isis::IException::Message
    */
-  void ProcessByLine::StartProcess(void
-                                   funct(Isis::Buffer &in, Isis::Buffer &out)) {
+  void ProcessByLine::StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out)) {
 
-    VerifyCubeIO();
-    ProcessByBrick::StartProcess(funct);
+      VerifyCubes(InputOutput);
+      SetBricks(InputOutput);
+      ProcessByBrick::StartProcess(funct);
   }
 
-  /**
-   * Verify input and output cubes and set brick size for
-   * StartProcessIOList(Functor funct) and
-   * StartProcess(func(vector<Isis::Buffer> &in, vector<Isis::Buffer *> &out))
-   *
-   * @history 4-22-2011 Sharmila Prasad - Ported from StartProcess(void
-   *                        func(vector<Isis::Buffer *> &in,
-   *                        vector<Isis::Buffer*> &out))
-   */
-  void ProcessByLine::VerifyCubeIOList(void)
-  {
-    // Make sure we had an image
-    if(InputCubes.size() + OutputCubes.size() < 1) {
-      string m = "You have not specified any input or output cubes";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
 
-    // Make sure all the output images have the same number of bands as
-    // the first input/output cube
-    for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      if(OutputCubes[i]->lineCount() != OutputCubes[0]->lineCount()) {
-        string m = "All output cubes must have the same number of lines ";
-        m += "as the first input cube or output cube";
-        throw IException(IException::Programmer, m, _FILEINFO_);
-      }
-      if(OutputCubes[i]->bandCount() != OutputCubes[0]->bandCount()) {
-        string m = "All output cubes must have the same number of bands ";
-        m += "as the first input cube or output cube";
-        throw IException(IException::Programmer, m, _FILEINFO_);
-      }
-    }
 
-    for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      SetInputBrickSize(InputCubes[i]->sampleCount(), 1, 1, i + 1);
-    }
-    for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      SetOutputBrickSize(OutputCubes[i]->sampleCount(), 1, 1, i + 1);
-    }
-  }
+
   /**
    * This method invokes the process by line operation over multiple input and
    * output cubes. Typically, this method is used when two input cubes are
@@ -254,11 +208,11 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  void ProcessByLine::StartProcess(
-       void funct(std::vector<Isis::Buffer *> &in,
+  void ProcessByLine::StartProcess( void funct(std::vector<Isis::Buffer *> &in,
                   std::vector<Isis::Buffer *> &out)) {
 
-    VerifyCubeIOList();
-    ProcessByBrick::StartProcess(funct);
+      VerifyCubes(InputOutputList);
+      SetBricks(InputOutputList);    
+      ProcessByBrick::StartProcess(funct);
   }
 }

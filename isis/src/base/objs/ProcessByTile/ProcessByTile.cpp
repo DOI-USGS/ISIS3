@@ -55,8 +55,11 @@ namespace Isis {
    */
   void ProcessByTile::StartProcess(void
                                    funct(Buffer &in, Buffer &out)) {
-    SetBrickSizesForProcessCube();
-    ProcessByBrick::StartProcess(funct);
+
+    //SetBrickSizesForProcessCube();
+      VerifyCubes(InputOutput);
+      SetBricks(InputOutput);
+      ProcessByBrick::StartProcess(funct);
   }
 
 
@@ -74,7 +77,10 @@ namespace Isis {
    * @throws iException::Programmer
    */
   void ProcessByTile::StartProcess(void funct(Buffer &in)) {
-    SetBrickSizesForProcessCubeInPlace();
+
+      VerifyCubes(InPlace);
+      SetBricks(InPlace);
+    //SetBrickSizesForProcessCubeInPlace();
     ProcessByBrick::StartProcess(funct);
   }
 
@@ -95,7 +101,9 @@ namespace Isis {
    */
   void ProcessByTile::StartProcess(void funct(std::vector<Buffer *> &in,
                                    std::vector<Buffer *> &out)) {
-    SetBrickSizesForProcessCubes();
+    //SetBrickSizesForProcessCubes();
+      VerifyCubes(InputOutputList);
+      SetBricks(InputOutputList);
     ProcessByBrick::StartProcess(funct);
   }
 
@@ -121,82 +129,51 @@ namespace Isis {
   }
 
 
-  /**
-   * This is a helper method for StartProcess() and ProcessCubeInPlace().
-   */
-  void ProcessByTile::SetBrickSizesForProcessCubeInPlace() {
-    // Error checks ... there must be one input and output
-    if(InputCubes.size() != 1) {
-      string m = "You must specify exactly one input cube";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+  void ProcessByTile::SetBricks(IOCubes cn){
 
-    //  Make sure the tile size has been set
-    if(!p_tileSizeSet) {
-      string m = "Use the SetTileSize method to set the tile size";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+      switch(cn) {
 
-    ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
-  }
+        case InPlace:
+
+          //  Make sure the tile size has been set
+          if(!p_tileSizeSet) {
+            string m = "Use the SetTileSize method to set the tile size";
+            throw IException(IException::Programmer, m, _FILEINFO_);
+          }
+
+          ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
+
+          break;
 
 
-  /**
-   * This is a helper method for StartProcess() and ProcessCube().
-   */
-  void ProcessByTile::SetBrickSizesForProcessCube() {
-    // The lines in the input and output must match
-    if(InputCubes[0]->lineCount() != OutputCubes[0]->lineCount()) {
-      string m = "The number of lines in the input and output cubes ";
-      m += "must match";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+        case InputOutput:
+          if(!p_tileSizeSet) {
+            string m = "Use the SetTileSize method to set the tile size";
+            throw IException(IException::Programmer, m, _FILEINFO_);
+          }
 
-    // The samples in the input and output must match
-    if(InputCubes[0]->sampleCount() != OutputCubes[0]->sampleCount()) {
-      string m = "The number of samples in the input and output cubes ";
-      m += "must match";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+          ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
 
-    // The bands in the input and output must match
-    if(InputCubes[0]->bandCount() != OutputCubes[0]->bandCount()) {
-      string m = "The number of bands in the input and output cubes ";
-      m += "must match";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+          break;
 
-    //  Make sure the tile size has been set
-    if(!p_tileSizeSet) {
-      string m = "Use the SetTileSize method to set the tile size";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+        case InputOutputList:
 
-    ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
-  }
+          if(!p_tileSizeSet) {
+            string m = "Use the SetTileSize method to set the tile size";
+            throw IException(IException::Programmer, m, _FILEINFO_);
+          }
+
+           ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
+
+          break;
 
 
-  /**
-   * This is a helper method for StartProcess() and ProcessCubes().
-   */
-  void ProcessByTile::SetBrickSizesForProcessCubes() {
-    // Make sure we had an image
-    if(InputCubes.size() == 0 && OutputCubes.size() == 0) {
-      string m = "You have not specified any input or output cubes";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-
-    // Make sure all the output images have the same number of bands as
-    // the first input/output cube
-    for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      if(OutputCubes[i]->bandCount() != InputCubes[0]->bandCount()) {
-        string m = "All output cubes must have the same number of bands ";
-        m += "as the first input cube or output cube";
-        throw IException(IException::Programmer, m, _FILEINFO_);
       }
-    }
 
-    ProcessByBrick::SetBrickSize(p_tileSamples, p_tileLines, 1);
+
   }
+
+
+
 } // end namespace isis
 

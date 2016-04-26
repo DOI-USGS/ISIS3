@@ -37,11 +37,14 @@ namespace Isis {
     p_outputBrickLines.clear();
     p_outputBrickBands.clear();
 
+    p_outputRequirements = 0;
     p_inputBrickSizeSet = false;
     p_outputBrickSizeSet = false;
     p_wrapOption = false;
     p_reverse = false;
   }
+
+
 
 
   ProcessByBrick::~ProcessByBrick() {
@@ -104,6 +107,136 @@ namespace Isis {
   }
 
 
+void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
+
+  p_outputRequirements = outputRequirements;
+
+
+}
+
+  void ProcessByBrick::SetBricks(IOCubes cn){
+
+      ;
+
+  }
+
+  /**
+    *  Verifies the dimensions of the input/output cubes.
+    *
+    * @param cn  An IOCubes enumeration for one of three possible Input/Output
+    * situations:
+    *     InPlace:          The input cube is the output cube
+    *     InputOutput:      One input cube and one output cube
+    *     InputOutputList:  A vector of input and output cubes.  The input vector
+    *                       is not necessarily the same length as the output vector
+    *
+    * @throws iException::Message
+    */
+
+
+
+
+  void ProcessByBrick::VerifyCubes(IOCubes cn){
+
+
+      switch(cn){
+
+           //Error check
+            case InPlace:
+
+              if (InputCubes.size() +OutputCubes.size() > 1) {
+                string m = "You can only specify exactly one input or output cube";
+                throw IException(IException::Programmer,m,_FILEINFO_);
+              }
+              else if ( (InputCubes.size() + OutputCubes.size() == 0) ){
+
+                  string m = "You haven't specified an input or output cube";
+                       throw IException(IException::Programmer, m, _FILEINFO_);
+
+              }
+
+              break;
+
+            case InputOutput:
+
+              //Error checks ... there must be one input and output
+              if(InputCubes.size() != 1) {
+                    string m = "You must specify exactly one input cube";
+                    throw IException(IException::Programmer, m, _FILEINFO_);
+                  }
+                  else if(OutputCubes.size() != 1) {
+                    string m = "You must specify exactly one output cube";
+                    throw IException(IException::Programmer, m, _FILEINFO_);
+                  }
+
+              // The lines in the input and output must match
+
+
+               if(InputCubes[0]->lineCount() != OutputCubes[0]->lineCount()) {
+                   string m = "The number of lines in the input and output cubes ";
+                   m += "must match";
+                   throw IException(IException::Programmer, m, _FILEINFO_);
+                 }
+
+               if(InputCubes[0]->sampleCount() != OutputCubes[0]->sampleCount()) {
+                   string m = "The number of samples in the input and output cubes ";
+                   m += "must match";
+                   throw IException(IException::Programmer, m, _FILEINFO_);
+                 }
+
+
+                 // The bands in the input and output must match
+
+               //If we are only looking for a spatial match (just match lines/samples)
+               //but not bands, then we skip over this check.
+
+               if ( !(p_outputRequirements & Isis::SpatialMatch ) ) {
+               if(InputCubes[0]->bandCount() != OutputCubes[0]->bandCount()) {
+                   string m = "The number of bands in the input and output cubes ";
+                   m += "must match";
+                   throw IException(IException::Programmer, m, _FILEINFO_);
+                 }
+
+              }
+
+              break;
+
+
+
+            case InputOutputList:
+
+              // Make sure we had an image
+              if (InputCubes.size() + OutputCubes.size() < 1) {
+                string m = "You have not specified any input or output cubes";
+                throw IException(IException::Programmer, m, _FILEINFO_);
+              }
+
+              for (unsigned int i = 0; i < OutputCubes.size(); i++) {
+                    if (OutputCubes[i]->lineCount() != OutputCubes[0]->lineCount() ) {
+                      string m = "All output cubes must have the same number of lines ";
+                      m += "as the first input cube or output cube";
+                      throw IException(IException::Programmer, m, _FILEINFO_);
+                    }
+                   //If we are only looking for a spatial match (just match lines/samples)
+                   //but not bands, then we skip over this check.
+                   if ( !(p_outputRequirements & Isis::SpatialMatch ) ) {
+                    if (OutputCubes[i]->bandCount() != OutputCubes[0]->bandCount() ) {
+                      string m = "All output cubes must have the same number of bands ";
+                      m += "as the first input cube or output cube";
+                      throw IException(IException::Programmer, m, _FILEINFO_);
+                    }
+                    }
+                  }
+
+              break;
+
+
+          }//end switch
+
+  }
+
+
+
   /**
   * Sets the input and output bricks sizes to the given number of samples, 
   * lines, and bands. 
@@ -114,6 +247,8 @@ namespace Isis {
   *
   * @param nb Number of bands
   */
+
+
   void ProcessByBrick::SetBrickSize(int ns, int nl, int nb) {
     SetInputBrickSize(ns, nl, nb);
     SetOutputBrickSize(ns, nl, nb);

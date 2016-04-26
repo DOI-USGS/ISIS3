@@ -92,6 +92,13 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *                           Added some documentation to methods.
+   *   @history 2015-09-25 Tyler Wilson  - Combined SetBrickSizesForProcessCube,
+   *   SetBrickSizesForProcessCubeInPlace, and SetBrickSizesForProcessCubes into one
+   *   function:  SetBricks(CubeNum) which takes in the enumerated date type enum
+   *   as an argument  (CubeNum = {InPlace, InputOutput, InputOutputList}).  Also moved
+   *   the verification of cubes out of the SetBrick functions and into
+   *   ProcessByBrick:: VerifyCubes(CubeNum) in parent class.
+   *
    */
   class ProcessByLine : public Isis::ProcessByBrick {
 
@@ -105,7 +112,9 @@ namespace Isis {
       Isis::Cube *SetInputCube(const QString &file,
                                Isis::CubeAttributeInput &att,
                                const int requirements = 0);
+
       void SetInputCube(Isis::Cube *inCube);
+
 
       void StartProcess(void funct(Isis::Buffer &inout));
 
@@ -115,10 +124,11 @@ namespace Isis {
                         funct(std::vector<Isis::Buffer *> &in, 
                               std::vector<Isis::Buffer *> &out));
 
-      //! Verify input and output cubes and set brick size for 
-      //! StartProcessInPlace(Functor funct) & StartProcess(funct(inout))
-      void VerifyCubeInPlace(void);
-      
+
+      void SetBricks(IOCubes cn);
+      //void VerifyCubes(IOCubes cn);
+
+
       /**
        * Same functionality as StartProcess(void funct(Isis::Buffer &inout)) 
        * using Functors. The Functor operator(), takes the parameter 
@@ -129,17 +139,16 @@ namespace Isis {
        * @param funct - Functor with overloaded operator()(Isis::Buffer &)
        * @param threaded @see ProcessByBrick::ProcessCubeInPlace()
        */
+
       template <typename Functor> 
       void ProcessCubeInPlace(const Functor & funct, bool threaded = true) {
-        VerifyCubeInPlace();
+
+        VerifyCubes(InPlace);
+        SetBricks(InPlace);       
         ProcessByBrick::ProcessCubeInPlace(funct, threaded);
       }
 
-      /** 
-       * Verify input and output cubes and set brick size for 
-       * StartProcessIO(Functor funct) and StartProcess(funct(in,out))
-       */ 
-      void VerifyCubeIO(void);
+
 
       /**
        * Same functionality as 
@@ -155,17 +164,12 @@ namespace Isis {
        */
       template <typename Functor> 
       void ProcessCube(const Functor & funct, bool threaded = true) {
-        VerifyCubeIO();
+
+        VerifyCubes(InputOutput);
+        SetBricks(InputOutput);      
         ProcessByBrick::ProcessCube(funct, threaded);
       }
 
-      /** 
-       * Verify input and output cubes and set brick size for 
-       * StartProcessIOList(Functor funct) and 
-       * StartProcess(func(vector<Isis::Buffer *> &in, vector<Isis::Buffer *> 
-       * &out)) 
-       */ 
-      void VerifyCubeIOList(void);
 
       /**
        * Same functionality as StartProcess(std::vector<Isis::Buffer *> &in, 
@@ -182,7 +186,9 @@ namespace Isis {
        */
       template <typename Functor> 
       void ProcessCubes(const Functor & funct, bool threaded = true) {
-        VerifyCubeIOList();
+
+        VerifyCubes(InputOutputList);
+        SetBricks(InputOutputList);      
         ProcessByBrick::ProcessCubes(funct, threaded);
       }
   };
