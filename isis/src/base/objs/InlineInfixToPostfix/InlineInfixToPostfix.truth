@@ -6,9 +6,9 @@ Empty string should be False: 0
 mod should be true: 1
 Testing InlineInfixToPostfix::findOperator...
 Valid input equation strings should have some output: 
-"2 + 7" 
-"2 - 7" 
-"2 a 7" 
+"2 + 7"
+"2 - 7"
+"2 a 7"
 Invalid input strings should throw an exception: 
-"**USER ERROR** The token '' is not recognized as an operator, function or variable.
-**USER ERROR** The operator '' is not recognized." 
+**USER ERROR** The token '' is not recognized as an operator, function or variable.
+**USER ERROR** The operator '' is not recognized.

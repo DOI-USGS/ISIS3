@@ -1,50 +1,50 @@
-Creating empty resource: 
+Creating empty resource:
 	Identity = Resource
 
-Creating  "Named"  resource: 
+Creating  "Named"  resource:
 	Identity = Named
 
-Creating  "Animals"  resource from PvlFlatMap: 
+Creating  "Animals"  resource from PvlFlatMap:
 	Bee = "Une Abeille"
 	Cat = "Un Chat"
 	Dog = "Un Chien"
 	Frog = "Une Grenouille"
 	Identity = Animals
 
-Creating  "Colors"  resource from PvlObject: 
+Creating  "Colors"  resource from PvlObject:
 	Blue = (Bleu, Bleue, NULL)
 	Green = (Vert, Verte)
 	Identity = Colors
 	Red = Rouge
 
-Copying the Animals resource: 
+Copying the Animals resource:
 	Bee = "Une Abeille"
 	Cat = "Un Chat"
 	Dog = "Un Chien"
 	Frog = "Une Grenouille"
 	Identity = Animals
 
-Are the Animals resources equal?  true 
-Are the Animals and Colors resources equal?  false 
- 
-"Red" keyword in Colors resource has  1  value. 
-"Green" keyword in Colors resource has  2  values. 
-"Purple" keyword does not exist in Colors. It has  0  values. 
- 
-"Blue" keyword's 2nd value is null?  false 
-"Blue" keyword's 3rd value is null?  true 
-"Purple" keyword is null?  true 
- 
-Grabbing "Green" keyword:  
+Are the Animals resources equal?  true
+Are the Animals and Colors resources equal?  false
+
+"Red" keyword in Colors resource has  1  value.
+"Green" keyword in Colors resource has  2  values.
+"Purple" keyword does not exist in Colors. It has  0  values.
+
+"Blue" keyword's 2nd value is null?  false
+"Blue" keyword's 3rd value is null?  true
+"Purple" keyword is null?  true
+
+Grabbing "Green" keyword: 
 	Green = (Vert, Verte)
-Grabbing non-existent "Purple" keyword:  
+Grabbing non-existent "Purple" keyword: 
 	purple = Null
- 
-Grabbing two keywords using "NoColor" as default value: 
-	Grabbing "Green" keyword's 1st value:  "Vert" 
-	Grabbing non-existent "Purple" keyword's value:  "NoColor" 
- 
-Adding Rabbit, Octopus, Shark, and Eel to Animals... 
+
+Grabbing two keywords using "NoColor" as default value:
+	Grabbing "Green" keyword's 1st value:  "Vert"
+	Grabbing non-existent "Purple" keyword's value:  "NoColor"
+
+Adding Rabbit, Octopus, Shark, and Eel to Animals...
 	Bee = "Une Abeille"
 	Cat = "Un Chat"
 	Dog = "Un Chien"
@@ -56,7 +56,7 @@ Adding Rabbit, Octopus, Shark, and Eel to Animals...
 	Shark = "Un Requin"
 	Snake = "Un Serpent"
 
-Adding another value to the "Bee" keyword:  
+Adding another value to the "Bee" keyword: 
 	Bee = ("Une Abeille", "Un Bourdon")
 	Cat = "Un Chat"
 	Dog = "Un Chien"
@@ -68,7 +68,7 @@ Adding another value to the "Bee" keyword:
 	Shark = "Un Requin"
 	Snake = "Un Serpent"
 
-Erasing the "Octopus" keyword.  1  keywords erased. 
+Erasing the "Octopus" keyword.  1  keywords erased.
 	Bee = ("Une Abeille", "Un Bourdon")
 	Cat = "Un Chat"
 	Dog = "Un Chien"
@@ -79,59 +79,59 @@ Erasing the "Octopus" keyword.  1  keywords erased.
 	Shark = "Un Requin"
 	Snake = "Un Serpent"
 
-Erasing non-existing "Squirrel" keyword.  0  keywords erased. 
- 
-Does Animals resource have a valid geometry?  false 
-Adding an empty geometry to Animals resource. 
-Is the added geometry valid?  false 
-Adding a valid geometry to Animals resource. 
-Is the added geometry valid?  true 
-Grabbing the geometry:  
-	Has  1  points 
- 
-Is Colors resource active?  true 
- 
-Discarding Colors resource. 
-Colors is now discarded:  true 
- 
-Reactivating Colors resource. 
-Colors is now active:  true 
- 
-Adding "Int Asset" and "Double Asset" assets to Colors resource: 
-Does Colors have an asset called "DNE Asset"?  false 
-Does Colors have an asset called "Int Asset"?  true 
-The value of the Int Asset is:  127 
-Removing the Double Asset. Removed assets:  1 
- 
-Discarding Colors resource, then copying it: 
+Erasing non-existing "Squirrel" keyword.  0  keywords erased.
+
+Does Animals resource have a valid geometry?  false
+Adding an empty geometry to Animals resource.
+Is the added geometry valid?  false
+Adding a valid geometry to Animals resource.
+Is the added geometry valid?  true
+Grabbing the geometry: 
+	Has  1  points
+
+Is Colors resource active?  true
+
+Discarding Colors resource.
+Colors is now discarded:  true
+
+Reactivating Colors resource.
+Colors is now active:  true
+
+Adding "Int Asset" and "Double Asset" assets to Colors resource:
+Does Colors have an asset called "DNE Asset"?  false
+Does Colors have an asset called "Int Asset"?  true
+The value of the Int Asset is:  127
+Removing the Double Asset. Removed assets:  1
+
+Discarding Colors resource, then copying it:
 	Blue = (Bleu, Bleue, NULL)
 	Green = (Vert, Verte)
 	Identity = Colors
 	Red = Rouge
 
-Is Colors copy discarded?  true 
-Does Colors copy have the "Int Asset"?  true 
- 
-Cloning Colors resource (without assets): 
+Is Colors copy discarded?  true
+Does Colors copy have the "Int Asset"?  true
+
+Cloning Colors resource (without assets):
 	Blue = (Bleu, Bleue, NULL)
 	Green = (Vert, Verte)
 	Identity = Colors
 	Red = Rouge
 
-Is Colors clone active?  true 
-Does Colors clone have the "Int Asset "?  false 
- 
-Cloning colors resource with assets: 
+Is Colors clone active?  true
+Does Colors clone have the "Int Asset "?  false
+
+Cloning colors resource with assets:
 	Blue = (Bleu, Bleue, NULL)
 	Green = (Vert, Verte)
 	Identity = Colors
 	Red = Rouge
 
-Does Colors clone have the "Int Asset"?  true 
- 
-Clearing assets from Colors resource.  1  assets removed 
- 
-Creating Pvl from Animals Resource: 
+Does Colors clone have the "Int Asset"?  true
+
+Clearing assets from Colors resource.  1  assets removed
+
+Creating Pvl from Animals Resource:
 Object = Resource
   Bee      = ("Une Abeille", "Un Bourdon")
   Cat      = "Un Chat"
@@ -143,7 +143,7 @@ Object = Resource
   Shark    = "Un Requin"
   Snake    = "Un Serpent"
 End_Object
- 
- 
-Testing exceptions... 
-**PROGRAMMER ERROR** Requested asset MysteriousAsset does not exist. 
+
+
+Testing exceptions...
+**PROGRAMMER ERROR** Requested asset MysteriousAsset does not exist.

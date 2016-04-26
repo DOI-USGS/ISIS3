@@ -53,11 +53,11 @@ void printTypes();
 int main() {
   try {
     Preference::Preferences(true);
-    qDebug();
+    qDebug() << "";
     qDebug() << "Testing GisGeometry...";
-    qDebug();
+    qDebug() << "";
     printTypes();
-    qDebug();
+    qDebug() << "";
     GisTopology *topo = GisTopology::instance();
 
     double xlongitude = 0;
@@ -232,8 +232,8 @@ int main() {
 
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     QString msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
@@ -253,7 +253,7 @@ void printBasicInfo(GisGeometry geom, QString description) {
   qDebug() << "    area?            " << geom.area();
   qDebug() << "    length?          " << geom.length();
   qDebug() << "    points?          " << geom.points();
-  qDebug();
+  qDebug() << "";
 }
 
 
@@ -269,7 +269,7 @@ void printTargetInfo(GisGeometry geom,  GisGeometry target, QString description)
   qDebug() << "    overlaps?        " << toString(geom.overlaps(target));
   qDebug() << "    equals?          " << toString(geom.equals(target));
   qDebug() << "    intersect ratio? " << toString(geom.intersectRatio(target));
-  qDebug();                            
+  qDebug() << "";                            
 }
 
 
@@ -287,7 +287,7 @@ void printTypes() {
   qDebug() << "    gis      = " << GisGeometry::typeToString(GisGeometry::type("gis"));
   qDebug() << "    geos     = " << GisGeometry::typeToString(GisGeometry::type("geos"));
   qDebug() << "    other    = " << GisGeometry::typeToString(GisGeometry::type("other"));
-  qDebug();
+  qDebug() << "";
 
 }
 

@@ -326,8 +326,8 @@ Reading ControlNet from temp2.bin
 Diffing temp.bin and temp2.bin
 Read/Write of binary files OK.
 Testing GetCubeGraphNodes
-    DELTA
     ALPHA
+    DELTA
 
 Testing getGraphNode: ALPHA
 

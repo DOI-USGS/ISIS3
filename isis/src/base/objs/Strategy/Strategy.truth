@@ -8,15 +8,15 @@
 
 Testing default constructor Strategy()   
 
-Name:          "Strategy" 
-Type:          "Counter" 
-Description:   "Strategy::Strategy is running a Counter algorithm." 
+Name:          "Strategy"
+Type:          "Counter"
+Description:   "Strategy::Strategy is running a Counter algorithm."
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-Testing Strategy(const PvlObject &def,const ResourceList &globals) constructor: 
+Testing Strategy(const PvlObject &def,const ResourceList &globals) constructor:
 
 
-"**PROGRAMMER ERROR** Keyword Name does not exist!." 
+"**PROGRAMMER ERROR** Keyword Name does not exist!."
 "Elven Dictionary" 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -41,18 +41,18 @@ Testing Strategy(const QString &name,const QString &type) constructor:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             setName, setType                 % 
+%             setName, setType                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 
-Name:          "Derived Strategy Name" 
-Type:          "Derived Strategy Type" 
+Name:          "Derived Strategy Name"
+Type:          "Derived Strategy Type"
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             getGlobalDefaults                % 
+%             getGlobalDefaults                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -66,7 +66,7 @@ Elven Word List 3
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             getGlobals                       % 
+%             getGlobals                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -81,7 +81,7 @@ Elven Word List 3
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             assetResourceList                % 
+%             assetResourceList                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -102,7 +102,7 @@ Elven Word List 3
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             getDefinition                    % 
+%             getDefinition                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -115,7 +115,7 @@ Elven Word List 3
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             getDefinitionMap                 % 
+%             getDefinitionMap                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -126,47 +126,47 @@ Elven Word List 3
 	PropagateKeyword = Middle-Earth
 	PropagateKeywords = wolf
 	Type = Dictionary
-************************************************ 
+************************************************
 
 
-Testing setApplyToDiscarded(), isApplytToDiscarded(), setDoNotApplyToDiscarded() 
+Testing setApplyToDiscarded(), isApplytToDiscarded(), setDoNotApplyToDiscarded()
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             isApplyToDiscarded               % 
+%             isApplyToDiscarded               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 
-isApplyToDiscarded =  
+isApplyToDiscarded = 
 false 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             setApplyToDiscarded              % 
+%             setApplyToDiscarded              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 
-Calling setApplyToDiscarded:   
-isApplyToDiscarded =  
+Calling setApplyToDiscarded:  
+isApplyToDiscarded = 
 false 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%         setDoNotApplyToDiscarded             % 
+%         setDoNotApplyToDiscarded             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 
-Calling setDoNotApplyToDiscarded:   
-isApplyToDiscarded =  
+Calling setDoNotApplyToDiscarded:  
+isApplyToDiscarded = 
 false 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%               applyToResources               % 
+%               applyToResources               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -176,29 +176,29 @@ Calling apply(SharedResource &resource, const ResourceList &globals)
 Number of resources processed =  2 
 
 Calling apply(SharedResource &resource, const ResourceList &globals)
-Number of resources processed (after discarding resource 0) =  
+Number of resources processed (after discarding resource 0) = 
 1 
 
 Call setApplyToDiscarded: 
 
 Calling apply(SharedResource &resource, const ResourceList &globals)
 Calling apply(SharedResource &resource, const ResourceList &globals)
-Number of resources processed (after discarding resource 0) =  
+Number of resources processed (after discarding resource 0) = 
 2 
 
 Calling apply(SharedResource &resource, const ResourceList &globals)
 Calling apply(SharedResource &resource, const ResourceList &globals)
-Number of resources processed (after activiating resource 0) =  
+Number of resources processed (after activiating resource 0) = 
 2 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%           processed/resetProcessed           % 
+%           processed/resetProcessed           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 
-************************************************ 
+************************************************
 
 
 Testing processed/resetProcessed:   
@@ -211,7 +211,7 @@ Processed =  1
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                  countActive                 % 
+%                  countActive                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -230,12 +230,12 @@ Active Resources in ResourceList lst: 2
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             findreplacement                  % 
+%             findreplacement                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 
-Searching for elvish word for demon (with default args):   
+Searching for elvish word for demon (with default args):  
 "red balrog" 
 
 Searching for value not in the ResourceList:   
@@ -252,7 +252,7 @@ Searching for the 100th demon (which is not in lst:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                qualifiers                    % 
+%                qualifiers                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -287,7 +287,7 @@ Testing qualifiers with default delimiter (::):
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%               scanAndReplace                 % 
+%               scanAndReplace                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -298,7 +298,7 @@ Fixed sentence:   "Balrogs require much  love and  attention."
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%             translateKeywordArgs             % 
+%             translateKeywordArgs             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -307,7 +307,7 @@ Fixed sentence:   "Balrogs require much  love and  attention."
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                 processArgs                  % 
+%                 processArgs                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -316,7 +316,7 @@ Fixed sentence:   "Balrogs require much  love and  attention."
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                propagateKeys                 % 
+%                propagateKeys                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -344,7 +344,7 @@ elven3 keys after propagation:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%    activeList/deactivateList/activateList    % 
+%    activeList/deactivateList/activateList    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -352,14 +352,14 @@ elven3 keys after propagation:
 Elven Word List 1
 Elven Word List 2
 Elven Word List 3
-Number of active resources in DerivedStrategy dstrat4 =  
+Number of active resources in DerivedStrategy dstrat4 = 
 3 
 
 ************************************************ 
 
 Testing deactivateList 
 
-Number of active resources in DerivedStrategy dstrat4 =  
+Number of active resources in DerivedStrategy dstrat4 = 
 0 
 
 ************************************************ 
@@ -380,7 +380,7 @@ Number of active resources =  2
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                  copyList                    % 
+%                  copyList                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -403,7 +403,7 @@ Number of active resources in global =  4
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                  cloneList                   % 
+%                  cloneList                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -416,7 +416,7 @@ Elven Word List 2
 Elven Word List 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                  isDebug                     % 
+%                  isDebug                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -427,7 +427,7 @@ isDebug() =  true
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                doShowProgress                % 
+%                doShowProgress                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -438,7 +438,7 @@ doShowProgress() =  false
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                initProgress                  % 
+%                initProgress                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -447,12 +447,12 @@ Testing initProgress():
 
 Calling: initProgress() =   false 
 
-Calling: initProgress(2,"some text") =  
+Calling: initProgress(2,"some text") = 
 false 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                  composite                   % 
+%                  composite                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -470,14 +470,14 @@ Testing composite(...):
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                 importGeometry               % 
+%                 importGeometry               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
 
 
 
-importGeometry =  
+importGeometry = 
 true 
 
 
@@ -486,7 +486,7 @@ true
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%                  getObjectList               % 
+%                  getObjectList               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
@@ -503,7 +503,7 @@ true
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-%         applyToIntersectedGeometry           % 
+%         applyToIntersectedGeometry           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 
