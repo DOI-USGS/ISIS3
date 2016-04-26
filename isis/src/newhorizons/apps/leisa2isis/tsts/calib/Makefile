@@ -26,7 +26,7 @@ commands:
 	if [ `$(APPNAME) \
 	  from=$(OUTPUT)/temp.fit \
 	  to=$(OUTPUT)/junk.cub \
-	  errormap=true \
+	  errormap=$(OUTPUT)/errormap.cub \
 	  >& $(OUTPUT)/temp.txt` ]; then \
 	  true; \
 	fi;
@@ -38,7 +38,7 @@ commands:
 	if [ `$(APPNAME) \
 	  from=$(OUTPUT)/temp.fit \
 	  to=$(OUTPUT)/junk.cub \
-	  errormap=true \
+	  errormap=$(OUTPUT)/errormap.cub \
 	  >& $(OUTPUT)/temp.txt` ]; then \
 	  true; \
 	fi;
@@ -50,7 +50,7 @@ commands:
 	if [ `$(APPNAME) \
 	  from=$(OUTPUT)/temp.fit \
 	  to=$(OUTPUT)/junk.cub \
-	  errormap=true \
+	  errormap=$(OUTPUT)/errormap.cub \
 	  >& $(OUTPUT)/temp.txt` ]; then \
 	  true; \
 	fi;
@@ -62,7 +62,7 @@ commands:
 	if [ `$(APPNAME) \
 	  from=$(OUTPUT)/temp.fit \
 	  to=$(OUTPUT)/junk.cub \
-	  quality=true \
+	  quality=$(OUTPUT)/quality.cub \
 	  >& $(OUTPUT)/temp.txt` ]; then \
 	  true; \
 	fi;
@@ -74,7 +74,7 @@ commands:
 	if [ `$(APPNAME) \
 	  from=$(OUTPUT)/temp.fit \
 	  to=$(OUTPUT)/junk.cub \
-	  quality=true \
+	  quality=$(OUTPUT)/quality.cub \
 	  >& $(OUTPUT)/temp.txt` ]; then \
 	  true; \
 	fi;
@@ -86,7 +86,7 @@ commands:
 	if [ `$(APPNAME) \
 	  from=$(OUTPUT)/temp.fit \
 	  to=$(OUTPUT)/junk.cub \
-	  quality=true \
+	  quality=$(OUTPUT)/quality.cub \
 	  >& $(OUTPUT)/temp.txt` ]; then \
 	  true; \
 	fi;

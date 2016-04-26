@@ -67,69 +67,6 @@ void IsisMain() {
   m1.EndProcess();
   testIn(1, 1, 1, 5, 5, 1);
   testOut(2, 2, 1, ProcessMosaic::PlaceImagesOnTop, 2);
-  p.SetOutputCube("MOSAIC_LEFT_RIGHT", 5, 5, 2);
-  p.EndProcess();
-  
-//  // Test for left mosaic
-//  ProcessMosaic m1b;
-//  m1b.SetTrackFlag(true);
-//  m1b.SetCreateFlag(true);
-//  m1b.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
-//  m1b.SetInputCube("INPUT_LEFT", 1, 1, 1, 10, 5, 1);
-//
-//    qDebug() << 0;
-//  Cube *mosaicCube2 = m1b.SetOutputCube("MOSAIC_LEFT_RIGHT");
-//  
-//    qDebug() << 1;
-//  m1b.StartProcess(5, 2, 1); // This should be overwritten by the next StartProcess call
-//    qDebug() << 2;
-//  m1b.StartProcess(2, 2, 1);
-//    qDebug() << 3;
-//
-//  try {
-//    Table trackTable(ProcessMosaic::TRACKING_TABLE_NAME);
-//    qDebug() << 4;
-//    mosaicCube2->read(trackTable);
-//    qDebug() << 5;
-//    qDebug();
-//    qDebug() << "b. SUCCESS - Left Mosaic Succeeds";
-//    qDebug() << Table::toString(trackTable, "\t");
-//  }
-//  catch (IException&) {
-//    qDebug();
-//    qDebug() << "b. FAILURE - Left Mosaic Fails";
-//  }
-//  m1b.EndProcess();
-//  testIn(1, 1, 1, 5, 5, 1);
-//  testOut(2, 2, 1, ProcessMosaic::PlaceImagesOnTop, 2);
-//  p.EndProcess();
-//
-//  // Test for right mosaic
-//  m1b.SetTrackFlag(true);
-//  m1b.SetCreateFlag(false);
-//  m1b.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
-//  m1b.SetInputCube("INPUT_RIGHT", 1, 1, 1, 10, 5, 1);
-//
-//  Cube *mosaicCube3 = m1b.SetOutputCube("MOSAIC_LEFT_RIGHT");
-//
-//  m1b.StartProcess(5, 2, 1); // This should be overwritten by the next StartProcess call
-//  m1b.StartProcess(2, 2, 1);
-//  
-//  try {
-//    Table trackTable(ProcessMosaic::TRACKING_TABLE_NAME);
-//    mosaicCube3->read(trackTable);
-//    qDebug();
-//    qDebug() << "c. SUCCESS - Right Mosaic Succeeds";
-//    qDebug() << Table::toString(trackTable, "\t");
-//  }
-//  catch (IException&) {
-//    qDebug();
-//    qDebug() << "c. FAILURE - Right Mosaic Fails";
-//  }
-//  m1b.EndProcess();
-//  testIn(1, 1, 1, 5, 5, 1);
-//  testOut(2, 2, 1, ProcessMosaic::PlaceImagesOnTop, 2);
-//  p.EndProcess();
 
   remove("isisMosaic_01.cub");
   qDebug() << "***********************************************************************************";
