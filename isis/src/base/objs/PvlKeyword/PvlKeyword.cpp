@@ -147,7 +147,7 @@ namespace Isis {
     }
 
     if (final != "") {
-      QByteArray finalAscii = final.toAscii();
+      QByteArray finalAscii = final.toLatin1();
       m_name = new char[finalAscii.size() + 1];
       strncpy(m_name, finalAscii.data(), final.size() + 1);
     }

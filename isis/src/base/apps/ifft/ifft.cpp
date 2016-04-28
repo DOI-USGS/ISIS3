@@ -71,8 +71,8 @@ void IsisMain() {
   sProc.ProcessCubes(&IFFT1);
   sProc.Finalize();
 
-  remove(tmpMagFileName.toAscii().data());
-  remove(tmpPhaseFileName.toAscii().data());
+  remove(tmpMagFileName.toLatin1().data());
+  remove(tmpPhaseFileName.toLatin1().data());
 }
 
 // Processing routine for the inverse fft

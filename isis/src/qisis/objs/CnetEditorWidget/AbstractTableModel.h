@@ -2,9 +2,10 @@
 #define AbstractTableModel_H
 
 
+#include <QException>
 #include <QExplicitlySharedDataPointer>
 #include <QObject>
-#include <qtconcurrentexception.h>
+#include <QtConcurrent>
 
 // can't forward declare the InternalPointerType or InterestingItems enums
 #include "AbstractTreeItem.h"
@@ -212,10 +213,10 @@ namespace Isis {
          *
          * @internal
          */
-        class SortingCanceledException : public QtConcurrent::Exception {
+        class SortingCanceledException : public QException {
           public:
             void raise() const { throw *this; }
-            Exception *clone() const {
+            QException *clone() const {
               return new SortingCanceledException(*this);
             }
         };

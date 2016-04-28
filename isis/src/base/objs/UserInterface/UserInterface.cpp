@@ -216,7 +216,7 @@ namespace Isis {
     if (p_errList != "") {
       std::ofstream os;
       QString fileName( FileName(p_errList).expanded() );
-      os.open(fileName.toAscii().data(), std::ios::app);
+      os.open(fileName.toLatin1().data(), std::ios::app);
 
       // did not unit test since it is assumed ofstream will be instantiated correctly
       if ( !os.good() ) {

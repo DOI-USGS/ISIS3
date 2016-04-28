@@ -1,6 +1,16 @@
 #include "QnetFixedPointDialog.h"
 
-#include <QtGui>
+
+#include <QDialog>
+#include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QtWidgets>
+#include <QVBoxLayout>
+
 
 #include <algorithm>
 

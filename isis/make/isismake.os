@@ -63,26 +63,12 @@ ifndef ISISCPPFLAGS
 endif
 
 
-# Set up Xalan's command-line option names. Some version of Xalan use different
-# option names (e.g. Ubuntu's and Debian's Xalan).
+# Set up Xalan's command-line option names. 
 XALAN_VALIDATE_OPTION := -v
 XALAN_OUTFILE_OPTION := -o
 XALAN_PARAM_OPTION := -p
 XALAN_INFILE_OPTION :=
 XALAN_XSL_OPTION :=
-
-# Ubuntu and Debian have a different executable name for Xalan, and it also
-# does not accept the same command-line argument names as the version of Xalan
-# available on the other systems. So, set up some variables to match the
-# argument names that this version of Xalan is expecting.
-ifneq "$(or $(findstring Ubuntu10_04, $(HOST_OS)), $(findstring Debian, $(HOST_OS)))" ""
-  XALAN := xalan
-  XALAN_VALIDATE_OPTION := -validate
-  XALAN_OUTFILE_OPTION := -out
-  XALAN_PARAM_OPTION := -param
-  XALAN_INFILE_OPTION := -in
-  XALAN_XSL_OPTION := -xsl
-endif
 
 ifneq "$(or $(findstring Fedora, $(HOST_OS)), $(findstring ScientificLinux, $(HOST_OS)))" ""
   XALAN = $(ISIS3LOCAL)/bin/Xalan

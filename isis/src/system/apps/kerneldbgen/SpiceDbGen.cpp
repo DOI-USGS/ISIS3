@@ -170,12 +170,12 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
   //finalize the filename so that it may be used in spice routines
   QString tmp = fileIn.expanded();
 //  const char* file = fileIn.expanded().c_str();
-  furnsh_c(tmp.toAscii().data());
+  furnsh_c(tmp.toLatin1().data());
   SpiceChar fileType[32], source[2048];
   SpiceInt handle;
 
   SpiceBoolean found;
-  kinfo_c(tmp.toAscii().data(), 32, 2048, fileType, source, &handle, &found);
+  kinfo_c(tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
   QString currFile = fileType;
 
   //create a spice cell capable of containing all the objects in the kernel.
@@ -189,10 +189,10 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
   //will be returned here and weeded out at the end of Direct(). This helps
   //to protect the user from inadvertently adding "." and ".." to their filters
   if (currFile == "SPK") {
-    spkobj_c(tmp.toAscii().data(), &currCell);
+    spkobj_c(tmp.toLatin1().data(), &currCell);
   }
   else if (currFile == "CK") {
-    ckobj_c(tmp.toAscii().data(), &currCell);
+    ckobj_c(tmp.toLatin1().data(), &currCell);
   }
   else if (currFile == "TEXT") {
     return PvlGroup("No coverage");
@@ -216,7 +216,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
         SPICEDOUBLE_CELL(cover, 2000);
         ssize_c(0, &cover);
         ssize_c(2000, &cover);
-        spkcov_c(tmp.toAscii().data(), body, &cover);
+        spkcov_c(tmp.toLatin1().data(), body, &cover);
 
         NaifStatus::CheckErrors();
 
@@ -227,7 +227,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
         SPICEDOUBLE_CELL(cover, 200000);
         ssize_c(0, &cover);
         ssize_c(200000, &cover);
-        ckcov_c(tmp.toAscii().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
+        ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
 
         NaifStatus::CheckErrors();
 
@@ -242,7 +242,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
   NaifStatus::CheckErrors();
 
   // Unfurnishes tmp file to prevent file table overflow
-  unload_c(tmp.toAscii().data());
+  unload_c(tmp.toLatin1().data());
 
   return result;
 }
@@ -279,17 +279,17 @@ void SpiceDbGen::FurnishDependencies(QList<FileName> sclks, QList<FileName> lsks
 
   // furnish the lsk files
   foreach (FileName lsk, lsks) {
-    furnsh_c(lsk.expanded().toAscii().data());
+    furnsh_c(lsk.expanded().toLatin1().data());
   }
 
   // furnish the sclk files
   foreach (FileName sclk, sclks) {
-    furnsh_c(sclk.expanded().toAscii().data());
+    furnsh_c(sclk.expanded().toLatin1().data());
   }
 
   // furnish the extra files
   foreach (FileName extra, extras) {
-    furnsh_c(extra.expanded().toAscii().data());
+    furnsh_c(extra.expanded().toLatin1().data());
   }
 
   NaifStatus::CheckErrors();

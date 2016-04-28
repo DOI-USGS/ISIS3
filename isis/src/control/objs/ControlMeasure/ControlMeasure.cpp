@@ -1148,7 +1148,7 @@ namespace Isis {
   ControlPointFileEntryV0002_Measure ControlMeasure::ToProtocolBuffer() const {
     ControlPointFileEntryV0002_Measure protoBufMeasure;
 
-    protoBufMeasure.set_serialnumber(GetCubeSerialNumber().toAscii().data());
+    protoBufMeasure.set_serialnumber(GetCubeSerialNumber().toLatin1().data());
     switch (GetType()) {
       case ControlMeasure::Candidate:
         protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::Candidate);
@@ -1165,10 +1165,10 @@ namespace Isis {
     }
 
     if (GetChooserName() != "") {
-      protoBufMeasure.set_choosername(GetChooserName().toAscii().data());
+      protoBufMeasure.set_choosername(GetChooserName().toLatin1().data());
     }
     if (GetDateTime() != "") {
-      protoBufMeasure.set_datetime(GetDateTime().toAscii().data());
+      protoBufMeasure.set_datetime(GetDateTime().toLatin1().data());
     }
     if (IsEditLocked())
       protoBufMeasure.set_editlock(true);

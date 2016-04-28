@@ -492,7 +492,7 @@ namespace Isis {
         // get the BundleSolutionInfo group
         QString root = "/";
         QString bundleRunGroupName = root + "BundleSolutionInfo";
-        H5::Group bundleRunGroup = hdfFile.openGroup(bundleRunGroupName.toAscii());
+        H5::Group bundleRunGroup = hdfFile.openGroup(bundleRunGroupName.toLatin1());
 
         /* 
          * Add basic attributes
@@ -514,7 +514,7 @@ namespace Isis {
 
         // ???Let's just save off the image list file names for now...
         QString   imagesGroupName = bundleRunGroupName + "/imageLists";
-        H5::Group imagesGroup     = bundleRunGroup.openGroup(imagesGroupName.toAscii());
+        H5::Group imagesGroup     = bundleRunGroup.openGroup(imagesGroupName.toLatin1());
         int imagesGroupSize = (int)imagesGroup.getNumObjs();
 
         for (int i = 0; i < imagesGroupSize; i++) {
@@ -544,7 +544,7 @@ namespace Isis {
   #if 0
         
         QString   imagesGroupName = bundleRunGroupName + "/imageLists";
-        H5::Group imagesGroup     = bundleRunGroup.openGroup(imagesGroupName.toAscii());
+        H5::Group imagesGroup     = bundleRunGroup.openGroup(imagesGroupName.toLatin1());
         int imagesGroupSize = (int)imagesGroup.getNumObjs();
 
         for (int i = 0; i < imagesGroupSize; i++) {
@@ -610,7 +610,7 @@ namespace Isis {
         // create BundleSolutionInfo group
         QString   root               = "/";
         QString   bundleRunGroupName = root + "BundleSolutionInfo";
-        H5::Group bundleRunGroup     = hdfFile.createGroup(bundleRunGroupName.toAscii());
+        H5::Group bundleRunGroup     = hdfFile.createGroup(bundleRunGroupName.toLatin1());
 
         /* 
          * Add basic attributes
@@ -633,7 +633,7 @@ namespace Isis {
 
         // Let's just save off the image list file names for now...
         QString   imagesGroupName = bundleRunGroupName + "/imageLists";
-        H5::Group imagesGroup     = bundleRunGroup.createGroup(imagesGroupName.toAscii());
+        H5::Group imagesGroup     = bundleRunGroup.createGroup(imagesGroupName.toLatin1());
 
         QString listGroupName = "";
         int     stringSize    = 0;
@@ -641,7 +641,7 @@ namespace Isis {
         for (int i = 0; i < m_images->size(); i++) {
           listGroupName = imagesGroupName + "/" + (*m_images)[i]->name();
 
-          H5::Group listGroup = imagesGroup.createGroup(listGroupName.toAscii());
+          H5::Group listGroup = imagesGroup.createGroup(listGroupName.toLatin1());
 
           attValue = (*m_images)[i]->path();
           strDataType = H5::StrType(H5::PredType::C_S1, attValue.length());

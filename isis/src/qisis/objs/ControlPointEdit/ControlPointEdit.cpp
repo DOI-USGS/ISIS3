@@ -639,7 +639,7 @@ namespace Isis {
     //p_pointEditor->setCentralWidget(cw);
     p_autoRegExtension->hide();
 
-    //p_pointEditor->setShown(true);
+    //p_pointEditor->setVisible(true);
     //p_pointEditor->raise();
   }
 

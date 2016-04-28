@@ -3,7 +3,11 @@
 #include <algorithm>
 #include <string>
 
-#include <QtGui>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QPushButton>
+#include <QtWidgets>
 
 #include "ControlPoint.h"
 #include "IString.h"

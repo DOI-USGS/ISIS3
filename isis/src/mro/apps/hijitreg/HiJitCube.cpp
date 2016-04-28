@@ -162,8 +162,8 @@ namespace Isis {
       NaifStatus::CheckErrors();
       QString lsk = leapseconds.expanded();
       QString sClock = sclk.expanded();
-      furnsh_c(lsk.toAscii().data());
-      furnsh_c(sClock.toAscii().data());
+      furnsh_c(lsk.toLatin1().data());
+      furnsh_c(sClock.toLatin1().data());
 
 //  Ensure it is loaded only once
       naifLoaded = true;
@@ -182,7 +182,7 @@ namespace Isis {
 
     if(!jdata.scStartTime.isEmpty()) {
       QString scStartTimeString = jdata.scStartTime;
-      scs2e_c(-74999, scStartTimeString.toAscii().data(), &jdata.obsStartTime);
+      scs2e_c(-74999, scStartTimeString.toLatin1().data(), &jdata.obsStartTime);
       NaifStatus::CheckErrors();
       // Adjust the start time so that it is the effective time for
       // the first line in the image file

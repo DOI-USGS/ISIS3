@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   FileName dbfile("$TEMPORARY/test.db");
   Database testdb("testdb", "SQLite");
   QString dbfileName(dbfile.expanded());
-  testdb.setDatabaseName(dbfileName.toAscii().data());
+  testdb.setDatabaseName(dbfileName.toLatin1().data());
   if(!testdb.open()) {
     throw IException(IException::User, "Connection failed", _FILEINFO_);
   }

@@ -67,7 +67,7 @@ int main(void) {
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.toAscii().data(), &et);
+    str2et_c(stime.toLatin1().data(), &et);
     // approximate 1 tenth of a second since Apollo did not provide
     double exposureDuration = .1; 
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);

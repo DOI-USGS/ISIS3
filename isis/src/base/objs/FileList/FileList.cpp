@@ -66,7 +66,7 @@ namespace Isis {
   void FileList::read(FileName listFile) {
     // Open the file
     ifstream istm;
-    istm.open(listFile.toString().toAscii().data(), std::ios::in);
+    istm.open(listFile.toString().toLatin1().data(), std::ios::in);
     if(!istm) {
       QString message = Isis::Message::FileOpen(listFile.toString());
       throw IException(IException::Io, message, _FILEINFO_);
@@ -174,7 +174,7 @@ namespace Isis {
   void FileList::write(FileName outputFileList) {
     // Open the file
     ofstream ostm;
-    ostm.open(outputFileList.toString().toAscii().data(), std::ios::out);
+    ostm.open(outputFileList.toString().toLatin1().data(), std::ios::out);
     if (!ostm) {
       QString message = Message::FileOpen(outputFileList.toString());
       throw IException(IException::Io, message, _FILEINFO_);

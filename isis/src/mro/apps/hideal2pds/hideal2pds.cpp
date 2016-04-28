@@ -268,7 +268,7 @@ void IsisMain() {
   // completed
   p.OutputDetachedLabel();
   QString outFileName(outPdsFile.expanded());
-  ofstream outputStream(outFileName.toAscii().data());
+  ofstream outputStream(outFileName.toLatin1().data());
   p.StartProcess(outputStream);
   p.EndProcess();
   outputStream.close();

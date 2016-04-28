@@ -442,9 +442,9 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     QString startTime = label->findGroup("Instrument",Pvl::Traverse)["SpacecraftClockStartCount"][0];
     Isis::FileName sclk(label->findGroup("Kernels",Pvl::Traverse)["SpacecraftClock"][0]);
     QString sclkName(sclk.expanded());
-    furnsh_c(sclkName.toAscii().data());
+    furnsh_c(sclkName.toLatin1().data());
     double obsStartTime;
-    scs2e_c(-77, startTime.toAscii().data(), &obsStartTime);
+    scs2e_c(-77, startTime.toLatin1().data(), &obsStartTime);
     spicegll.setTime(obsStartTime);
     double sunv[3];
     spicegll.sunPosition(sunv);

@@ -272,7 +272,7 @@ namespace Isis {
 
     // Open the file
     fstream istm;
-    istm.open(temp.toAscii().data(), std::ios::in);
+    istm.open(temp.toLatin1().data(), std::ios::in);
     if (!istm) {
       QString message = Message::FileOpen(temp);
       throw IException(IException::Io, message, _FILEINFO_);
@@ -306,7 +306,7 @@ namespace Isis {
       ReadInit();
       if (p_detached != "") {
         fstream dstm;
-        dstm.open(p_detached.toAscii().data(), std::ios::in);
+        dstm.open(p_detached.toLatin1().data(), std::ios::in);
         if (!dstm) {
           QString message = Message::FileOpen(p_detached);
           throw IException(IException::Io, message, _FILEINFO_);
@@ -384,7 +384,7 @@ namespace Isis {
       // Prepare and write the binary data
       fstream stream;
       ios::openmode flags = std::ios::in | std::ios::binary | std::ios::out;
-      stream.open(file.toAscii().data(), flags);
+      stream.open(file.toLatin1().data(), flags);
       if (!stream) {
         QString message = "Unable to open [" + file + "]";
         throw IException(IException::Io, message, _FILEINFO_);

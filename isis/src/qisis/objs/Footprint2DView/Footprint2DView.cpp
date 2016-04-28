@@ -25,7 +25,7 @@
 #include "Footprint2DView.h"
 #include "MosaicGraphicsView.h"
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QVBoxLayout>
 
 namespace Isis {

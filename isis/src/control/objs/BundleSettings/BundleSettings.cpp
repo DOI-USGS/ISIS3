@@ -1282,7 +1282,7 @@ namespace Isis {
 
         // create a settings group to add to the given H5 object
         QString settingsGroupName = locationName + "/BundleSettings"; 
-        H5::Group settingsGroup = locationObject.createGroup(settingsGroupName.toAscii());
+        H5::Group settingsGroup = locationObject.createGroup(settingsGroupName.toLatin1());
 
         // use H5S_SCALAR data space type for single valued spaces
         H5::DataSpace spc;
@@ -1483,7 +1483,7 @@ namespace Isis {
 
         // create a settings group to add to the given H5 object
         QString settingsGroupName = locationName + "/BundleSettings"; 
-        H5::Group settingsGroup = locationObject.openGroup(settingsGroupName.toAscii());
+        H5::Group settingsGroup = locationObject.openGroup(settingsGroupName.toLatin1());
 
         Attribute att;
 

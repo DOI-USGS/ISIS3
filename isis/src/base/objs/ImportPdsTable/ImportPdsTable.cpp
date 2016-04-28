@@ -970,7 +970,7 @@ namespace Isis {
 
     else {
       QString tempTblFile = m_pdsTableFile;
-      ifstream pdsFileStream(tempTblFile.toAscii().data(), ifstream::binary);
+      ifstream pdsFileStream(tempTblFile.toLatin1().data(), ifstream::binary);
 
       if (!pdsFileStream) {
         IString msg = "Unable to open file containing PDS table [" 

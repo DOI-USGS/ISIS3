@@ -141,7 +141,7 @@ namespace Isis {
     // directory. This run time directory will contain the output files for
     // this run (along with correlation matrix and serialized bundle
     // information files).
-    QString runTime = Isis::iTime::CurrentLocalTime().toAscii().data();
+    QString runTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
     QDir cwd = m_project->addBundleSolutionInfoFolder(runTime);
     QString path = cwd.absolutePath() + "/";
     m_bundleSettings->setOutputFiles(path, true, true, true);
@@ -299,7 +299,7 @@ namespace Isis {
    */
   void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
     if ( bundleSolutionInfo->bundleResults().converged() ) {
-      bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toAscii().data() );
+      bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
       m_project->addBundleSolutionInfo( new BundleSolutionInfo(*bundleSolutionInfo) );
 
       //TODO: move correlation matrix to correct position in project directory

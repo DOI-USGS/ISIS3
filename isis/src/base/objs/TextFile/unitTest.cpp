@@ -494,7 +494,7 @@ int main(int argc, char *argv[]) {
   // create file that doesn't end in a newline and then test GetLine
   FILE *fp;
   FileName testFileName(testFile);
-  fp = fopen(testFileName.expanded().toAscii().data(), "w");
+  fp = fopen(testFileName.expanded().toLatin1().data(), "w");
   fprintf(fp, "this file has no newline chars in it!");   //???SEG FAULT HERE!!!!!!!
   fclose(fp);
   TextFile tf;
@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
 
   cout << "11) Remove temp file -> " << testFile << " <-\n" << endl;
 
-  if(std::remove(testFileName.expanded().toAscii().data())) {                    // cleanup tmp file
+  if(std::remove(testFileName.expanded().toLatin1().data())) {                    // cleanup tmp file
     cout << "*** Failed to remove tmp file: " << testFile << endl;
   }
 }

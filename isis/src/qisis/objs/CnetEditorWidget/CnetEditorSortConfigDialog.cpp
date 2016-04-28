@@ -2,7 +2,12 @@
 
 #include <limits>
 
-#include <QtGui>
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QtWidgets>
 
 #include "AbstractTableModel.h"
 #include "CnetEditorWidget.h"

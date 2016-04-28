@@ -642,7 +642,7 @@ namespace Isis {
 //    QString target = getFrameName((const int)camera->naifBodyFrameCode());
 //
 //    vector<double> rotation(9);
-//    pxform_c(target.toAscii().data(), "J2000", camera->time().Et(), 
+//    pxform_c(target.toLatin1().data(), "J2000", camera->time().Et(), 
 //             (SpiceDouble (*)[3]) &rotation[0]);
 //    NaifStatus::CheckErrors();
 //  
@@ -672,7 +672,7 @@ namespace Isis {
 //    QString toFrame   = getFrameName(toId);
 //  
 //    vector<double> rotation(9);
-//    pxform_c(fromFrame.toAscii().data(), toFrame.toAscii().data(), 
+//    pxform_c(fromFrame.toLatin1().data(), toFrame.toAscii().data(), 
 //             timeEt, (SpiceDouble (*)[3]) &rotation[0]);
 //    NaifStatus::CheckErrors();
 //    return (Quaternion(rotation));
@@ -702,7 +702,7 @@ namespace Isis {
 //   */
 //   int SumFile::getFrameCode(const QString &frameName) const {
 //     int frmcode;
-//     (void) namfrm_c(frameName.toAscii().data(), &frmcode);
+//     (void) namfrm_c(frameName.toLatin1().data(), &frmcode);
 //     return (frmcode);
 //   }
   

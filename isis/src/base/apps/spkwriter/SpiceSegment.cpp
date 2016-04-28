@@ -396,7 +396,7 @@ double SpiceSegment::UTCtoET(const QString &utc) const {
   SpiceDouble et;
 
   NaifStatus::CheckErrors();
-  utc2et_c(utc.toAscii().data(), &et);
+  utc2et_c(utc.toLatin1().data(), &et);
   NaifStatus::CheckErrors();
 
   return (et);

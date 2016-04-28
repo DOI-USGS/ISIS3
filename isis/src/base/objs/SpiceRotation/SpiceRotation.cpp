@@ -107,7 +107,7 @@ namespace Isis {
     SpiceInt number;
     SpiceBoolean found;
     //Read starting at element 1 (skipping element 0)
-    gdpool_c(key.toAscii().data(), 1, 2, &number, transX, &found);
+    gdpool_c(key.toLatin1().data(), 1, 2, &number, transX, &found);
 
     if (!found) {
       QString msg = "Cannot find [" + key + "] in text kernels";
@@ -797,7 +797,7 @@ namespace Isis {
       SpiceChar naifType;
       SpiceDouble relativeFrameCode = 0;
       SpiceBoolean found;
-      dtpool_c(naifKeyword.toAscii().data(), &found, &numExpected, &naifType);
+      dtpool_c(naifKeyword.toLatin1().data(), &found, &numExpected, &naifType);
 
       if (found) {
         // Go get the frame name if it is not the default J2000
@@ -811,7 +811,7 @@ namespace Isis {
         // Make sure the standard coefficients are available for the body code by 
         // checking for ra
         naifKeyword = "BODY" + toString(centerBodyCode) + "_POLE_RA" ;
-        dtpool_c(naifKeyword.toAscii().data(), &found, &numExpected, &naifType);
+        dtpool_c(naifKeyword.toLatin1().data(), &found, &numExpected, &naifType);
 
         if (found) {
           std::vector<SpiceDouble> d(3);
@@ -840,13 +840,13 @@ namespace Isis {
           // Now check for nutation/precession terms.  Check for nut/prec ra values
           // first to see if the terms are even used for this body.
           naifKeyword = "BODY" + toString(centerBodyCode) + "_NUT_PREC_RA" ;
-          dtpool_c(naifKeyword.toAscii().data(), &found, &numReturned, &naifType);
+          dtpool_c(naifKeyword.toLatin1().data(), &found, &numReturned, &naifType);
           if (found) {
             // Get the barycenter (bc) linear coefficients first (2 for each period).
             // Then we can get the maximum expected coefficients.
             SpiceInt bcCode = centerBodyCode/100;  // Ex: bc code for Jupiter (599) & its moons is 5
             naifKeyword = "BODY" + toString(bcCode) + "_NUT_PREC_ANGLES" ;
-            dtpool_c(naifKeyword.toAscii().data(), &found, &numExpected, &naifType);
+            dtpool_c(naifKeyword.toLatin1().data(), &found, &numExpected, &naifType);
             std::vector<double>npAngles(numExpected, 0.);
             bodvcd_c(bcCode, "NUT_PREC_ANGLES", numExpected, &numReturned, &npAngles[0]);
             numExpected /= 2.;

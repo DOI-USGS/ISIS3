@@ -6,11 +6,13 @@
 #include <sstream>
 
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 #include <QtXml>
+#include <QGraphicsSceneMouseEvent>
 #include <QList>
 #include <QPen>
 #include <QMap>
+#include <QTransform>
 #include <QGraphicsRectItem>
 
 #include "CorrelationMatrix.h"
@@ -346,9 +348,11 @@ namespace Isis {
 
     switch( event->type() ) {
       case QMouseEvent::GraphicsSceneMousePress: {
-        if (m_graphicsScene->itemAt( ( (QGraphicsSceneMouseEvent *)event )->scenePos() ) ) {
+        if (m_graphicsScene->itemAt( ( (QGraphicsSceneMouseEvent *)event )->scenePos(),
+                                        QTransform() ) ) {
           emit elementClicked(m_graphicsScene->itemAt(
-                                ( (QGraphicsSceneMouseEvent *)event )->scenePos() )->toolTip() );
+                                ( (QGraphicsSceneMouseEvent *)event )->scenePos(),
+                                   QTransform() )->toolTip() );
         }
         stopProcessingEvent = false;
         break;

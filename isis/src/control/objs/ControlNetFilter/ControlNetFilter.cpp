@@ -57,7 +57,7 @@ namespace Isis {
   void ControlNetFilter::SetOutputFile(QString psPrintFile) {
     Isis::FileName outFile(psPrintFile);
     QString outName(outFile.expanded());
-    mOstm.open(outName.toAscii().data(), std::ios::out);
+    mOstm.open(outName.toLatin1().data(), std::ios::out);
     mOstm.precision(dbl::digits10);
   }
 

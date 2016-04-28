@@ -215,7 +215,7 @@ void IsisMain() {
   for (int i = 0; i < (int)islands.size(); i++) {
     QString name(FileName(prefix + "Island." + toString(i + 1)).expanded());
     ofstream out_stream;
-    out_stream.open(name.toAscii().data(), std::ios::out);
+    out_stream.open(name.toLatin1().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     bool hasList = false;
@@ -231,7 +231,7 @@ void IsisMain() {
     out_stream.close();
 
     if (!hasList) {
-      remove(name.toAscii().data());
+      remove(name.toLatin1().data());
     }
   }
 
@@ -300,7 +300,7 @@ void IsisMain() {
     if (nodes.size() > 0) {
       QString name(FileName(prefix + coverageOp + ".txt").expanded());
       ofstream out_stream;
-      out_stream.open(name.toAscii().data(), std::ios::out);
+      out_stream.open(name.toLatin1().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg); // Start writing from file beginning
 
       double tolerance = ui.GetDouble("TOLERANCE");
@@ -343,7 +343,7 @@ void IsisMain() {
 
     QString name(FileName(prefix + "NoControl.txt").expanded());
     ofstream out_stream;
-    out_stream.open(name.toAscii().data(), std::ios::out);
+    out_stream.open(name.toLatin1().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     for (set<QString>::iterator sn = inListNums.begin();
@@ -371,7 +371,7 @@ void IsisMain() {
 
     QString name(FileName(prefix + "NoCube.txt").expanded());
     ofstream out_stream;
-    out_stream.open(name.toAscii().data(), std::ios::out);
+    out_stream.open(name.toLatin1().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     for (int sn = 0; sn < (int)nonListedSerialNumbers.size(); sn++) {
@@ -413,7 +413,7 @@ void IsisMain() {
 
       QString name(FileName(prefix + "SingleCube.txt").expanded());
       ofstream out_stream;
-      out_stream.open(name.toAscii().data(), std::ios::out);
+      out_stream.open(name.toLatin1().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
       for (set<QString>::iterator sn = singleMeasureCubes.begin();
@@ -538,7 +538,7 @@ void writeOutput(SerialNumberList num2cube, QString filename,
 
   // Set up the output file for writing
   ofstream out_stream;
-  out_stream.open(filename.toAscii().data(), std::ios::out);
+  out_stream.open(filename.toLatin1().data(), std::ios::out);
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
   for (set<QString>::iterator sn = sns.begin();

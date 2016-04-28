@@ -38,6 +38,9 @@ xsi:noNamespaceSchemaLocation=
         Added a timeout event handler to gracefully exit the application in the event
         the ftp server response time becomes too long.
     </change>
+    <change name="Ian Humphrey" date="2016-04-14">
+        Replaced httpget and ftpget classes with ResourceGet class for updating to Qt5.
+    </change>
   </history>
 
 

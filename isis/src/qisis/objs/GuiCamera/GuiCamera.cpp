@@ -481,17 +481,17 @@ namespace Isis {
 //      hid_t fileId = hdfFile.getId();
 
 //      QString objectName = "/GuiCamera";
-//      H5LTset_attribute_string(fileId, objectName.toAscii(), "runTime", m_runTime.toAscii());
-//      H5LTset_attribute_string(fileId, objectName.toAscii(), "controlNetworkFileName",
-//                               m_controlNetworkFileName->expanded().toAscii());
+//      H5LTset_attribute_string(fileId, objectName.toLatin1(), "runTime", m_runTime.toAscii());
+//      H5LTset_attribute_string(fileId, objectName.toLatin1(), "controlNetworkFileName",
+//                               m_controlNetworkFileName->expanded().toLatin1());
 
 //      //??? H5::Group settingsGroup = H5::Group(hdfFile.createGroup("/GuiCamera/BundleSettings"));//???
 //      //???H5::Group settingsGroup = hdfFile.createGroup("/GuiCamera/BundleSettings");
 //      QString groupName = objectName + "/BundleSettings";
-//      hid_t groupId = H5Gcreate(fileId, groupName.toAscii(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-//      m_settings->savehdf5(groupId, groupName.toAscii());
+//      hid_t groupId = H5Gcreate(fileId, groupName.toLatin1(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+//      m_settings->savehdf5(groupId, groupName.toLatin1());
 //      groupName = objectName + "/BundleResults";
-//      H5::Group resultsGroup  = H5::Group(hdfFile.createGroup(groupName.toAscii()));
+//      H5::Group resultsGroup  = H5::Group(hdfFile.createGroup(groupName.toLatin1()));
 //      m_statisticsResults->savehdf5(fileId, resultsGroup);
       
 //    }

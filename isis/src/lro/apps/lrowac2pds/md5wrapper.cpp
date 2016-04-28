@@ -32,7 +32,7 @@ QString md5wrapper::hashit(QString text) {
   md5->MD5Init(&ctx);
   //update with our string
   md5->MD5Update(&ctx,
-                 (unsigned char *)text.toAscii().data(),
+                 (unsigned char *)text.toLatin1().data(),
                  text.length());
 
   //create the hash
@@ -99,7 +99,7 @@ QString md5wrapper::getHashFromFile(QString filename) {
   unsigned char buffer[1024], digest[16];
 
   //open file
-  if((file = fopen(filename.toAscii().data(), "rb")) == NULL) {
+  if((file = fopen(filename.toLatin1().data(), "rb")) == NULL) {
     return "-1";
   }
 

@@ -2,6 +2,9 @@
 
 #include "SpectralPlotWindow.h"
 
+#include <QAction>
+#include <QMenu>
+#include <QMenuBar>
 #include <QString>
 
 #include "Cube.h"

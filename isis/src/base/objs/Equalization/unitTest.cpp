@@ -103,10 +103,10 @@ int main(int argc, char *argv[]) {
       p.ProcessCubeInPlace(func, false);
     }
 
-    remove(outputStatsFile.expanded().toAscii());
+    remove(outputStatsFile.expanded().toLatin1());
     FileList toFileList(toList);
     for (int i = 0; i < toFileList.size(); i++) {
-      remove(toFileList[i].expanded().toAscii());
+      remove(toFileList[i].expanded().toLatin1());
     }
 
 

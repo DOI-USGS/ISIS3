@@ -196,7 +196,7 @@ namespace Isis {
         */
         FileName f(_kernlist[i]);
         QString kernName(f.expanded());
-        unload_c(kernName.toAscii().data());
+        unload_c(kernName.toLatin1().data());
       }
     }
     _kernlist.clear();
@@ -231,7 +231,7 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       QString fileName(file.expanded());
-      if(_furnish) furnsh_c(fileName.toAscii().data());
+      if(_furnish) furnsh_c(fileName.toLatin1().data());
       addKernelName((QString)key[i]);
     }
     NaifStatus::CheckErrors(); 

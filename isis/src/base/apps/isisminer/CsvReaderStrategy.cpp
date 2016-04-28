@@ -104,7 +104,7 @@ namespace Isis {
     csv.setComment(m_ignoreComments);
     csv.setSkip(m_skipLines);
     csv.setHeader(m_hasHeader);
-    csv.setDelimiter(m_delimiter[0].toAscii());
+    csv.setDelimiter(m_delimiter[0].toLatin1());
     if ( ' ' == m_delimiter[0] ) csv.setSkipEmptyParts();  // needed if space
   
     //  Fetch input file name

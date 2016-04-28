@@ -4,7 +4,7 @@
 #include <vector>
 #include <iomanip>
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "NewControlPointDialog.h"
 #include "DeleteControlPointDialog.h"
@@ -479,7 +479,7 @@ namespace Isis {
 
       //  Load new point in ControlNetEditor
       loadPoint();
-      m_parent->setShown(true);
+      m_parent->setVisible(true);
       m_parent->raise();
 
       delete fixedPointDialog;
@@ -570,7 +570,7 @@ namespace Isis {
 
         // First get rid of deleted point from m_filteredPoints list. Need index
         // in control net for pt int i = m_controlNet->m_filteredPoints.
-        m_parent->setShown(false);
+        m_parent->setVisible(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint( m_editPoint->GetId() ) == ControlPoint::PointLocked) {
           QMessageBox::information(m_parent, "EditLocked Point",
@@ -632,7 +632,7 @@ namespace Isis {
         }
 
 //         loadPoint();
-//         m_parent->setShown(true);
+//         m_parent->setVisible(true);
 //         m_parent->raise();
 
 //         loadTemplateFile( m_pointEditor->templateFileName() );
@@ -698,7 +698,7 @@ namespace Isis {
     //  TODO: better way - have 2 slots
     if (sender() != this) m_leftFile.clear();
     loadPoint();
-    m_qnetTool->setShown(true);
+    m_qnetTool->setVisible(true);
     m_qnetTool->raise();
     loadTemplateFile(m_pointEditor->templateFileName());
 

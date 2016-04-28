@@ -2,7 +2,6 @@
 #define GridGraphicsItem_h
 
 #include <QGraphicsItem>
-
 #include <QScopedPointer>
 
 class QPointF;

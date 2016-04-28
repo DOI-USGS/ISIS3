@@ -1,6 +1,8 @@
 #include "ScatterPlotTool.h"
 
-#include <qwt_double_range.h>
+#include <QAction>
+#include <QHBoxLayout>
+#include <QPushButton>
 
 #include "IString.h"
 #include "MdiCubeViewport.h"
@@ -59,7 +61,7 @@ namespace Isis {
     m_action->setIcon(QPixmap(toolIconDir() + "/scatterplot.png"));
     m_action->setToolTip("Scatter Plot");
     //action->setShortcut(Qt::Key_C);
-    connect(m_action, SIGNAL(activated()),
+    connect(m_action, SIGNAL(triggered()),
             this, SLOT(showNewScatterPlotConfig()));
 
     QString text  =
@@ -87,7 +89,7 @@ namespace Isis {
    * @return A widget containing detailed options for this tool
    */
   QWidget *ScatterPlotTool::createToolBarWidget(QStackedWidget *parent) {
-    QWidget *wrapper = new QWidget(parent);
+    QWidget *wrapper = new QWidget;
 
     QPushButton *create = new QPushButton("New Scatter Plot");
     connect(create, SIGNAL(clicked()),

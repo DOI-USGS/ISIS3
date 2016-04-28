@@ -22,6 +22,7 @@
 #include "IException.h"
 #include "ImageTreeWidget.h"
 #include "ImageTreeWidgetItem.h"
+#include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
 #include "PvlObject.h"
@@ -185,7 +186,7 @@ namespace Isis {
     QAction *saveList = new QAction(this);
     saveList->setText(
         "Save Entire Cube List (ordered by &file list/groups)...");
-    connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
+    connect(saveList, SIGNAL(triggered()), this, SLOT(saveList()));
 
     exportActs.append(saveList);
 
@@ -208,10 +209,14 @@ namespace Isis {
 
     QPixmap preview;
     if (!fileListContainer) {
-      QWeakPointer<ImageFileListWidget> tmp = new ImageFileListWidget;
-      tmp.data()->resize(QSize(500, 200));
-      preview = QPixmap::grabWidget(tmp.data());
-      delete tmp.data();
+//      QWeakPointer<ImageFileListWidget> tmp = new ImageFileListWidget;
+//      tmp.data()->resize(QSize(500, 200));
+//      preview = QPixmap::grabWidget(tmp.data());
+//      delete tmp.data();
+      ImageFileListWidget *tmp = new ImageFileListWidget;
+      tmp->resize(QSize(500, 200));
+      preview = QPixmap::grabWidget(tmp);
+      delete tmp;
     }
     else {
       QPixmap previewPixmap = QPixmap::grabWidget(fileListContainer).scaled(
@@ -595,7 +600,7 @@ namespace Isis {
 
 //    if (localName == "geometry") {
 //      QByteArray
-//      restoreGeometry(atts.value("value").toAscii());
+//      restoreGeometry(atts.value("value").toLatin1());
 //    }
 
       if (localName == "position") {

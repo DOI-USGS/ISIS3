@@ -59,7 +59,7 @@ void IsisMain() {
   long int lines = 0;
   long int samps = 0;
   QString filename = in.expanded();
-  pdsi = PDSR(filename.toAscii().data(), &lines, &samps);
+  pdsi = PDSR(filename.toLatin1().data(), &lines, &samps);
 
   ProcessByLine p;
   CubeAttributeOutput cubeAtt("+unsignedByte+1.0:254.0");

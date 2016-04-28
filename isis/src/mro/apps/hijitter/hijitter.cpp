@@ -290,14 +290,14 @@ void IsisMain() {
       pcrop.Application(tag).AddConstParameter ("NLINES", toString(numLines));
       pcrop.Run();
 
-      remove(inFile.toAscii().data());
-      rename(outFile.toAscii().data(), inFile.toAscii().data());
+      remove(inFile.toLatin1().data());
+      rename(outFile.toLatin1().data(), inFile.toLatin1().data());
       cropProg.CheckStatus();
     }
   }
 
   for (unsigned int tempFile = 0; tempFile < g_tempFiles.size(); tempFile++) {
-    remove(g_tempFiles[tempFile].toAscii().data());
+    remove(g_tempFiles[tempFile].toLatin1().data());
   }
 
 

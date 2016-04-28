@@ -69,7 +69,7 @@ void IsisMain() {
     // Output the resultant polygon
     QString outname = ui.GetFileName("TO");
     std::ofstream outfile;
-    outfile.open(outname.toAscii().data());
+    outfile.open(outname.toLatin1().data());
     outfile << result;
     outfile.close();
     if(outfile.fail()) {
@@ -90,7 +90,7 @@ void IsisMain() {
  */
 geos::geom::Geometry *GetPolygon(QString name) {
   ifstream is;
-  is.open(name.toAscii().data());
+  is.open(name.toLatin1().data());
 
   std::string fileData = "";
   while(is.good()) {

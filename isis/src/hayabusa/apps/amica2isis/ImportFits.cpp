@@ -130,7 +130,7 @@ namespace Isis {
 
       // Setup to read headers/labels
     ifstream input;
-    input.open(m_file.expanded().toAscii().data(), ios::in | ios::binary);
+    input.open(m_file.expanded().toLatin1().data(), ios::in | ios::binary);
 
   // Check stream open status
     if ( !input.is_open() ) {

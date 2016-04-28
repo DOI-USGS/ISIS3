@@ -31,6 +31,7 @@
 #include <string>
 
 #include <QMap>
+#include <QObject>
 
 #include "IException.h"
 #include "SpecialPixel.h"
@@ -1396,7 +1397,7 @@ namespace Isis {
    * @return The modified output stream
    */
   std::ostream &operator<<(std::ostream &outputStream, const QString &string) {
-    return (outputStream << string.toAscii().data());
+    return (outputStream << string.toLatin1().data());
   }
 
 
@@ -1412,6 +1413,6 @@ namespace Isis {
    * @return The modified output stream
    */
   std::ostream &operator<<(std::ostream &outputStream, const QStringRef &string) {
-    return (outputStream << string.toString().toAscii().data());
+    return (outputStream << string.toString().toLatin1().data());
   }
 }

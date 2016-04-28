@@ -52,7 +52,7 @@ namespace XERCES = XERCES_CPP_NAMESPACE;
  * @param xmlfile Indicates the pull path of the XML file to be parsed.
  */
 IsisAml::IsisAml(const QString &xmlfile) {
-  StartParser(xmlfile.toAscii().data());
+  StartParser(xmlfile.toLatin1().data());
 }
 
 /**

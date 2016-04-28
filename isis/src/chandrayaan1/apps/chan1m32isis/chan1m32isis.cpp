@@ -304,23 +304,23 @@ void translateChandrayaan1M3Labels(Pvl& pdsLabel, Cube *ocube, Table& utcTable,
     QString lsk = "$base/kernels/lsk/naif????.tls";
     FileName lskName(lsk);
     lskName = lskName.highestVersion();
-    furnsh_c(lskName.expanded().toAscii().data());
+    furnsh_c(lskName.expanded().toLatin1().data());
 
     QString sclk = "$chandrayaan1/kernels/sclk/aig_ch1_sclk_complete_biased_m1p???.tsc";
     FileName sclkName(sclk);
     sclkName = sclkName.highestVersion();
-    furnsh_c(sclkName.expanded().toAscii().data());
+    furnsh_c(sclkName.expanded().toLatin1().data());
 
     SpiceInt sclkCode = -86;
 
     QString startTime = inst["SpacecraftClockStartCount"];
     double et;
-    scs2e_c(sclkCode, startTime.toAscii().data(), &et);
+    scs2e_c(sclkCode, startTime.toLatin1().data(), &et);
     iTime startEt(et);
     inst.findKeyword("StartTime").setValue(startEt.UTC());
 
     QString stopTime = inst["SpacecraftClockStopCount"];
-    scs2e_c(sclkCode, stopTime.toAscii().data(), &et);
+    scs2e_c(sclkCode, stopTime.toLatin1().data(), &et);
     iTime stopEt(et);
     inst.findKeyword("StopTime").setValue(stopEt.UTC());
   }

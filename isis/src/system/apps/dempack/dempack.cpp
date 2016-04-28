@@ -86,7 +86,7 @@ void IsisMain() {
   // Prepare to write out the output XML.
   FileName outFile = ui.GetFileName("TO");
   ofstream os;
-  os.open(outFile.expanded().toAscii().data(), ios::out);
+  os.open(outFile.expanded().toLatin1().data(), ios::out);
 
   // Write the installation XML
   os << "<packs>";

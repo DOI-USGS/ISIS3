@@ -27,7 +27,7 @@ void IsisMain() {
                       QString(" TO = ")      + ui.GetFileName("TO") +
                       QString(" PROPLAB = ") + redFile;
   ProgramLauncher::RunIsisProgram("cubeit", parameters);
-  remove(tempFile.expanded().toAscii().data());
+  remove(tempFile.expanded().toLatin1().data());
 
   // Get the instrument group from each file
   Pvl redLab(redFile);

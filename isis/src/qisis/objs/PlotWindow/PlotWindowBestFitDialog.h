@@ -12,6 +12,7 @@ class QwtPlotSpectrogram;
 
 class QCheckBox;
 class QComboBox;
+class QLabel;
 class QLineEdit;
 class QPushButton;
 class QWidget;

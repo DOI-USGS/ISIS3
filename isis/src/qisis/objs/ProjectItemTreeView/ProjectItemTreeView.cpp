@@ -22,7 +22,7 @@
  */
 #include "ProjectItemTreeView.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 namespace Isis {
   /**

@@ -22,7 +22,7 @@
  */
 #include "AbstractProjectItemView.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"

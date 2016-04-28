@@ -462,7 +462,7 @@ namespace Isis {
    * @param cl QString containing comma separated list
    */
   void PvlTokenizer::ParseCommaList(Isis::PvlToken &t, const QString &cl) {
-    stringstream stream(cl.toAscii().data());
+    stringstream stream(cl.toLatin1().data());
     int c;
     QString s;
 

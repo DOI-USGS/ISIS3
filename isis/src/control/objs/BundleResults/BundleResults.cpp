@@ -1,6 +1,6 @@
-  #include "BundleResults.h"
-  #include <QDataStream>
+#include "BundleResults.h"
 
+#include <QDataStream>
 #include <QDebug>
 #include <QString>
 #include <QtGlobal> // qMax()
@@ -1913,7 +1913,7 @@ namespace Isis {
 
         // create a results group to add to the given H5 object
         QString resultsGroupName = locationName + "/BundleResults"; 
-        H5::Group resultsGroup = locationObject.createGroup(resultsGroupName.toAscii());
+        H5::Group resultsGroup = locationObject.createGroup(resultsGroupName.toLatin1());
 
         // use H5S_SCALAR data space type for single valued spaces
         H5::DataSpace spc(H5S_SCALAR);
@@ -2081,7 +2081,7 @@ namespace Isis {
           H5::DataSpace dataSetSpace(1, dims);
 
           dataSetName = resultsGroupName + "/RmsImageLineResidualsStatistics"; 
-          dataSet = resultsGroup.createDataSet(dataSetName.toAscii(),
+          dataSet = resultsGroup.createDataSet(dataSetName.toLatin1(),
                                                compoundDataType,
                                                dataSetSpace);
 
@@ -2108,7 +2108,7 @@ namespace Isis {
           H5::DataSpace dataSetSpace(1, dims);
 
           dataSetName = resultsGroupName + "/RmsImageSampleResidualsStatistics"; 
-          dataSet = resultsGroup.createDataSet(dataSetName.toAscii(),
+          dataSet = resultsGroup.createDataSet(dataSetName.toLatin1(),
                                                compoundDataType,
                                                dataSetSpace);
 
@@ -2135,7 +2135,7 @@ namespace Isis {
           H5::DataSpace dataSetSpace(1, dims);
 
           dataSetName = resultsGroupName + "/RmsImageResidualsStatistics"; 
-          dataSet = resultsGroup.createDataSet(dataSetName.toAscii(),
+          dataSet = resultsGroup.createDataSet(dataSetName.toLatin1(),
                                                compoundDataType,
                                                dataSetSpace);
 
@@ -2228,7 +2228,7 @@ namespace Isis {
 
         // create a results group to add to the given H5 object
         QString resultsGroupName = locationName + "/BundleResults"; 
-        H5::Group resultsGroup = locationObject.openGroup(resultsGroupName.toAscii());
+        H5::Group resultsGroup = locationObject.openGroup(resultsGroupName.toLatin1());
 
         Attribute att;
 
@@ -2343,7 +2343,7 @@ namespace Isis {
         // IMAGE LINE RESIDUALS LIST
         {
           dataSetName = resultsGroupName + "/RmsImageLineResidualsStatistics";
-          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toAscii(), 0, NULL);
+          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toLatin1(), 0, NULL);
           if (status != 0) {
             // group DNE...
             qDebug() << "didn't find or couldn't read stats list.";//???
@@ -2352,9 +2352,9 @@ namespace Isis {
 
             // if this doesn't throw an error, then the group exists???
             H5G_stat_t info;
-            resultsGroup.getObjinfo(dataSetName.toAscii(), info);
+            resultsGroup.getObjinfo(dataSetName.toLatin1(), info);
 
-            dataSet = resultsGroup.openDataSet(dataSetName.toAscii());
+            dataSet = resultsGroup.openDataSet(dataSetName.toLatin1());
             H5::DataSpace dataSetSpace = dataSet.getSpace();
 
             char statsList[dataSet.getStorageSize()];
@@ -2381,7 +2381,7 @@ namespace Isis {
         // IMAGE SAMPLE RESIDUALS LIST
         {
           dataSetName = resultsGroupName + "/RmsImageSampleResidualsStatistics"; 
-          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toAscii(), 0, NULL);
+          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toLatin1(), 0, NULL);
           if (status != 0) {
             // group DNE...
             qDebug() << "didn't find or couldn't read stats list.";
@@ -2390,9 +2390,9 @@ namespace Isis {
 
             // if this doesn't throw an error, then the group exists???
             H5G_stat_t info;
-            resultsGroup.getObjinfo(dataSetName.toAscii(), info);
+            resultsGroup.getObjinfo(dataSetName.toLatin1(), info);
 
-            dataSet = resultsGroup.openDataSet(dataSetName.toAscii());
+            dataSet = resultsGroup.openDataSet(dataSetName.toLatin1());
             H5::DataSpace dataSetSpace = dataSet.getSpace();
 
             char statsList[dataSet.getStorageSize()];
@@ -2418,7 +2418,7 @@ namespace Isis {
         // IMAGE RESIDUALS LIST
         {
           dataSetName = resultsGroupName + "/RmsImageResidualsStatistics"; 
-          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toAscii(), 0, NULL);
+          herr_t status = H5Gget_objinfo(resultsGroup.getId(), dataSetName.toLatin1(), 0, NULL);
           if (status != 0) {
             // group DNE...
             qDebug() << "didn't find or couldn't read stats list.";//???
@@ -2427,9 +2427,9 @@ namespace Isis {
 
             // if this doesn't throw an error, then the group exists???
             H5G_stat_t info;
-            resultsGroup.getObjinfo(dataSetName.toAscii(), info);
+            resultsGroup.getObjinfo(dataSetName.toLatin1(), info);
 
-            dataSet = resultsGroup.openDataSet(dataSetName.toAscii());
+            dataSet = resultsGroup.openDataSet(dataSetName.toLatin1());
             H5::DataSpace dataSetSpace = dataSet.getSpace();
 
             char statsList[dataSet.getStorageSize()];

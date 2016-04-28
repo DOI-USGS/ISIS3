@@ -22,7 +22,7 @@
  */
 #include "CNetSuiteMainWindow.h"
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QSettings>
 #include <QTreeView>
 

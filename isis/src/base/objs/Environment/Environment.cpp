@@ -85,7 +85,7 @@ namespace Isis {
       
     QString value = defaultValue;
     
-    char *envValue = getenv(variable.toAscii().data());
+    char *envValue = getenv(variable.toLatin1().data());
     if (envValue)
       value = envValue;
       

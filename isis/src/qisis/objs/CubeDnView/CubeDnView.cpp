@@ -22,7 +22,7 @@
  */
 #include "CubeDnView.h"
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 

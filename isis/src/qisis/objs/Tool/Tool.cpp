@@ -2,6 +2,7 @@
 
 #include <QLayout>
 #include <QMenuBar>
+#include <QStackedWidget>
 #include <QVector>
 
 #include "CubeViewport.h"

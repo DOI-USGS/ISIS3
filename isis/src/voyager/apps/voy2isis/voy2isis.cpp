@@ -96,7 +96,7 @@ void ConvertComments(FileName file) {
   unsigned int lineStartPos = 0;
   fstream stream;
   QString filename = file.expanded();
-  stream.open(filename.toAscii().data(), fstream::in | fstream::out | fstream::binary);
+  stream.open(filename.toLatin1().data(), fstream::in | fstream::out | fstream::binary);
 
   lineStartPos = stream.tellg();
   stream.getline(tmp, sizeof(tmp) / sizeof(char));
@@ -108,7 +108,7 @@ void ConvertComments(FileName file) {
       lineOfData = lineOfData.mid(0, lineOfData.indexOf("/*")) + "# " +
                    lineOfData.mid(lineOfData.indexOf("/*") + 2);
       stream.seekp(lineStartPos);
-      stream.write(lineOfData.toAscii().data(), lineOfData.length());
+      stream.write(lineOfData.toLatin1().data(), lineOfData.length());
     }
 
     lineStartPos = stream.tellg();
@@ -312,7 +312,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   QString lsk = "$ISIS3DATA/base/kernels/lsk/naif????.tls";
   FileName lskName(lsk);
   lskName = lskName.highestVersion();
-  furnsh_c(lskName.expanded().toAscii().data());
+  furnsh_c(lskName.expanded().toLatin1().data());
 
   // Spacecraft clock kernel
   QString sclk = "$ISIS3DATA/voyager";
@@ -322,12 +322,12 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   sclk.append("?????.tsc");
   FileName sclkName(sclk);
   sclkName = sclkName.highestVersion();
-  furnsh_c(sclkName.expanded().toAscii().data());
+  furnsh_c(sclkName.expanded().toLatin1().data());
 
   // The purpose of the next two steps, getting the spacecraft clock count,
   // are simply to get get the partition, the very first number 1/...
   double approxEphemeris = 0.0;
-  utc2et_c(inst["StartTime"][0].toAscii().data(), &approxEphemeris);
+  utc2et_c(inst["StartTime"][0].toLatin1().data(), &approxEphemeris);
   char approxSpacecraftClock[80];
 
   // sce2s_c requires the spacecraft number, not the instrument number as
@@ -362,7 +362,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // I lied ;) get the last two digits.
   newClockCount.append(imgNumber.mid(5, 2));
 
-  scs2e_c(spacecraftClockNumber, newClockCount.toAscii().data(), &approxEphemeris);
+  scs2e_c(spacecraftClockNumber, newClockCount.toLatin1().data(), &approxEphemeris);
 
   //* 4 *//
   char utcOut[25];

@@ -29,12 +29,7 @@
 #include <vector>
 #include <fstream>
 
-#include <CHOLMOD/cholmod.h>
-#include <CHOLMOD/UFconfig.h>
-
-#ifndef __sun__
-#include <gmm/gmm.h>
-#endif
+#include <cholmod.h>
 
 #include "BundleObservationSolveSettings.h"
 #include "BundleControlPointVector.h"

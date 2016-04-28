@@ -104,7 +104,7 @@ void IsisMain() {
 
     if ( !hexCode.isEmpty() ) {
       // Convert HEX to XML
-      QString xml( QByteArray::fromHex( QByteArray( hexCode.toAscii() ) ).constData() );
+      QString xml( QByteArray::fromHex( QByteArray( hexCode.toLatin1() ) ).constData() );
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
       QDomDocument document;
@@ -121,7 +121,7 @@ void IsisMain() {
           // Store off the other isis version
           if (element.tagName() == "isis_version") {
             QString encoded = element.firstChild().toText().data();
-            otherVersion = QByteArray::fromHex( encoded.toAscii() ).constData();
+            otherVersion = QByteArray::fromHex( encoded.toLatin1() ).constData();
           }
           else if (element.tagName() == "parameters") {
             // Read the spiceinit parameters
@@ -131,7 +131,7 @@ void IsisMain() {
             // Get the cube label
             QString encoded = element.firstChild().toText().data();
             stringstream labStream;
-            labStream << QString( QByteArray::fromHex( encoded.toAscii() ).constData() );
+            labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
             labStream >> label;
           }
         }
@@ -300,7 +300,7 @@ void IsisMain() {
     else {
       packageKernels( ui.GetFileName("TO") );
     }
-    remove( inputLabels.expanded().toAscii() ); //clean up
+    remove( inputLabels.expanded().toLatin1() ); //clean up
     p.EndProcess();
   }
   catch (...) {
@@ -639,10 +639,10 @@ void packageKernels(QString toFile) {
 
   xml += "  </tables>\n";
   xml += "</spice_data>\n";
-  QString encodedXml( QByteArray( xml.toAscii() ).toHex().constData() );
+  QString encodedXml( QByteArray( xml.toLatin1() ).toHex().constData() );
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);
-  finalOutput.write( encodedXml.toAscii() );
+  finalOutput.write( encodedXml.toLatin1() );
   finalOutput.close();
 }

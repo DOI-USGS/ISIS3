@@ -390,7 +390,7 @@ namespace Isis {
       // Convert the target name to a NAIF code
       SpiceInt code;
       SpiceBoolean found;
-      bodn2c_c(target.toAscii().data(), &code, &found);
+      bodn2c_c(target.toLatin1().data(), &code, &found);
       if (!found) {
         QString msg = "Could not convert target name [" + target +"] to NAIF code";
         throw IException(IException::Io, msg, _FILEINFO_);
@@ -400,14 +400,14 @@ namespace Isis {
       FileName kern("$Base/kernels/pck/pck?????.tpc");
       kern = kern.highestVersion();
       QString kernName(kern.expanded());
-      furnsh_c(kernName.toAscii().data());
+      furnsh_c(kernName.toLatin1().data());
 
       // Get the radii from NAIF
       NaifStatus::CheckErrors();
       SpiceInt n;
       SpiceDouble radii[3];
       bodvar_c(code, "RADII", &n, radii);
-      unload_c(kernName.toAscii().data());
+      unload_c(kernName.toLatin1().data());
 
       try {
         NaifStatus::CheckErrors();

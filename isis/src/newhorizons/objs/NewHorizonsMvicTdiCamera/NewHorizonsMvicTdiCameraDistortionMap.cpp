@@ -339,7 +339,7 @@ namespace Isis {
 //bool NewHorizonsMvicTdiCameraDistortionMap::outputResidualDeltas() {
 //
 //  QString ofname("mvic_tdi_residual_deltas.csv");
-//  std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
+//  std::ofstream fp_out(ofname.toLatin1().data(), std::ios::out);
 //  if (!fp_out)
 //    return false;
 //

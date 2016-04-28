@@ -278,7 +278,7 @@ void IsisMain() {
 
     // Set up the output file for writing
     std::ofstream out_stream;
-    out_stream.open(pointList.expanded().toAscii().data(), std::ios::out);
+    out_stream.open(pointList.expanded().toLatin1().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     QList<QString> modifiedPointsList = g_modifications.keys();

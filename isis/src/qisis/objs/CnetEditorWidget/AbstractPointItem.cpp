@@ -83,7 +83,7 @@ namespace Isis {
           return (Column)i;
       }
 
-      IString msg = "Column title [" + columnTitle + "] does not match any of "
+      QString msg = "Column title [" + columnTitle + "] does not match any of "
           "the defined column types";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -310,17 +310,17 @@ namespace Isis {
                 Distance(catchNull(newData), Distance::Meters)));
             break;
           case AdjustedSPLatSigma: {
-            IString msg = "Cannot set adjusted surface point latitude sigma";
+            QString msg = "Cannot set adjusted surface point latitude sigma";
             throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
           case AdjustedSPLonSigma: {
-            IString msg = "Cannot set adjusted surface point longitude sigma";
+            QString msg = "Cannot set adjusted surface point longitude sigma";
             throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
           case AdjustedSPRadiusSigma: {
-            IString msg = "Cannot set adjusted surface point radius sigma";
+            QString msg = "Cannot set adjusted surface point radius sigma";
             throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
@@ -438,12 +438,12 @@ namespace Isis {
     void AbstractPointItem::deleteSource() {
       if (m_point) {
         if (m_point->IsEditLocked()) {
-          IString msg = "Point [" + getFormattedData() + "] is edit locked and "
+          QString msg = "Point [" + getFormattedData() + "] is edit locked and "
               "cannot be deleted";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         else if (m_point->GetNumLockedMeasures() > 0) {
-          IString msg = "Point [" + getFormattedData() + "] has at least one "
+          QString msg = "Point [" + getFormattedData() + "] has at least one "
               "edit locked measure and cannot be deleted";
           throw IException(IException::User, msg, _FILEINFO_);
         }

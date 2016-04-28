@@ -9,7 +9,9 @@
 #include <geos/geom/Point.h>
 
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QMenu>
+#include <QMessageBox>
 #include <QStackedWidget>
 
 #include "Brick.h"

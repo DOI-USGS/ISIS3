@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   PvlObject metadata = exportedTable.exportTable(buf, tableRecBytes, "lsb");
   // Create a label file containing the needed information.
   FileName lsbLabelFile("$temporary/lsbPdsTable.lbl");
-  ofstream outputLsbLabel((lsbLabelFile.expanded()).toAscii().data());
+  ofstream outputLsbLabel((lsbLabelFile.expanded()).toLatin1().data());
   outputLsbLabel << PvlKeyword("RECORD_TYPE", "FIXED_LENGTH") << endl;
   outputLsbLabel << PvlKeyword("RECORD_BYTES", toString(tableRecBytes)) << endl;
   QString tableName = ExportPdsTable::formatPdsTableName(table.Name());
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
   outputLsbLabel << metadata;
   outputLsbLabel.close();
   FileName lsbTableFile("$temporary/lsbPdsTable.dat");
-  ofstream outputLsbTable((lsbTableFile.expanded()).toAscii().data());
+  ofstream outputLsbTable((lsbTableFile.expanded()).toLatin1().data());
   outputLsbTable.write(buf, tableRecBytes*table.Records());
   outputLsbTable.close();
   ImportPdsTable lsbTable(lsbLabelFile.expanded(), lsbTableFile.expanded(), tableName);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
   metadata = exportedTable.exportTable(buf, tableRecBytes, "msb");
   // Create a label file containing the needed information.
   FileName msbLabelFile("$temporary/msbPdsTable.lbl");
-  ofstream outputMsbLabel((msbLabelFile.expanded()).toAscii().data());
+  ofstream outputMsbLabel((msbLabelFile.expanded()).toLatin1().data());
   outputMsbLabel << PvlKeyword("RECORD_TYPE", "FIXED_LENGTH") << endl;
   outputMsbLabel << PvlKeyword("RECORD_BYTES", toString(tableRecBytes)) << endl;
   outputMsbLabel << PvlKeyword("^" + tableName, "msbPdsTable.dat") << endl;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
   outputMsbLabel << metadata;
   outputMsbLabel.close();
   FileName msbTableFile("$temporary/msbPdsTable.dat");
-  ofstream outputMsbTable((msbTableFile.expanded()).toAscii().data());
+  ofstream outputMsbTable((msbTableFile.expanded()).toLatin1().data());
   outputMsbTable.write(buf, tableRecBytes*table.Records());
   outputMsbTable.close();
   ImportPdsTable msbTable(msbLabelFile.expanded(), msbTableFile.expanded(), tableName);

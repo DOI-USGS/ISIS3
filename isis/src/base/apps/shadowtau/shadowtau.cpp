@@ -75,7 +75,7 @@ void IsisMain() {
   // Output datafile
   QString sOutFile = ui.GetFileName("TO");
   ofstream outfile;
-  outfile.open (sOutFile.toAscii().data());
+  outfile.open (sOutFile.toLatin1().data());
 
   // Get Hapke function and parameters
   QString sPhotoFunc = ui.GetAsString("PHTNAME");

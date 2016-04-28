@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QString>
 #include <QMap>
+#include <QObject>
 #include <QStringList>
 
 namespace Isis {

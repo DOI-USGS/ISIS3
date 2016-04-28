@@ -1227,7 +1227,7 @@
           std::string or const char * as input. If your class is interfacing with one of these APIs,
           please have your class take QStrings as arguments and convert to a std::string with
           QString::toStdString(). If you need to convert to a const char *, you can also
-          use QString().toAscii().data().
+          use QString().toLatin1().data().
         </p>
         <p align="right"><a href="#top"><font size="1">
           Return to Table of Contents

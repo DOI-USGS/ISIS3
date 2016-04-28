@@ -6,7 +6,9 @@
 #include <QMetaType>
 #include <QSettings>
 #include <QSignalSpy>
-#include <QtGui>
+#include <QStatusBar>
+#include <QTest>
+#include <QtWidgets>
 #include <QTreeWidgetItem>
 
 #include "FileName.h"
@@ -24,7 +26,7 @@ namespace Isis {
 
     MosaicSceneWidget widget(&status, true, true, NULL);
     widget.show();
-    QTest::qWaitForWindowShown(&widget);
+    QTest::qWaitForWindowExposed(widget.windowHandle());
     QVERIFY(widget.getProgress());
     QVERIFY(widget.getView());
     QVERIFY(widget.getScene());
@@ -58,7 +60,7 @@ namespace Isis {
 
     MosaicSceneWidget widget(&status, true, true, NULL);
     widget.show();
-    QTest::qWaitForWindowShown(&widget);
+    QTest::qWaitForWindowExposed(widget.windowHandle());
 
     Image *image = new Image(QString("./lub3994m.342.lev1.cub"));
     QScopedPointer<QMutex> cameraMutex(new QMutex);

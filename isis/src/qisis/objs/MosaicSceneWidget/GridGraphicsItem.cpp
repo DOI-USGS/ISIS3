@@ -332,7 +332,7 @@ namespace Isis {
   QRectF GridGraphicsItem::calcRect() const {
     QRectF sceneRect;
 
-    foreach (QGraphicsItem *child, children()) {
+    foreach (QGraphicsItem *child, childItems()) {
       sceneRect = sceneRect.united(child->boundingRect());
     }
 

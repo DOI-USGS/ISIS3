@@ -66,7 +66,7 @@ namespace Isis {
 
       // Open the JP2 file stream
       JP2_Stream = new jp2_family_src();
-      JP2_Stream->open(p_jp2File.toAscii().data());
+      JP2_Stream->open(p_jp2File.toLatin1().data());
 
       // Open the JP2 source
       JP2_Source = new jp2_source();
@@ -232,7 +232,7 @@ namespace Isis {
   bool JP2Decoder::IsJP2(QString filename) {
 #if ENABLEJP2K
     jp2_family_src *stream = new jp2_family_src();
-    stream->open(filename.toAscii().data());
+    stream->open(filename.toLatin1().data());
     jp2_source *source = new jp2_source();
 
     bool result = source->open(stream);

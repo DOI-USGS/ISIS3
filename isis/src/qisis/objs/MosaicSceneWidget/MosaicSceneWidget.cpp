@@ -4,8 +4,21 @@
 
 #include <sstream>
 
+#include <QFileDialog>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QMenu>
+#include <QRubberBand>
+#include <QScrollBar>
+#include <QStatusBar>
+#include <QString>
+#include <QToolButton>
+#include <QToolTip>
 #include <QtCore>
-#include <QtGui>
+#include <QtWidgets>
 #include <QtXml>
 
 #include "Camera.h"
@@ -485,7 +498,7 @@ namespace Isis {
   MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(Image *image) {
 //  //qDebug()<<"::cubeToMosaic(Image *image)";
     if (image == NULL) {
-      IString msg = tr("Can not find a NULL image in the mosaic");
+      QString msg = tr("Can not find a NULL image in the mosaic");
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -687,7 +700,7 @@ namespace Isis {
   MosaicSceneItem *MosaicSceneWidget::cubeToMosaic(DisplayProperties *props) {
 //  //qDebug()<<"::cubeToMosaic(DisplayProperties *)";
     if (props == NULL) {
-      IString msg = tr("Can not find a NULL Display Properties in the mosaic");
+      QString msg = tr("Can not find a NULL Display Properties in the mosaic");
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -776,11 +789,11 @@ namespace Isis {
 
     QAction *exportView = new QAction(this);
     exportView->setText("&Export View...");
-    connect(exportView, SIGNAL(activated()), this, SLOT(exportView()));
+    connect(exportView, SIGNAL(triggered()), this, SLOT(exportView()));
 
     QAction *saveList = new QAction(this);
     saveList->setText("Save Entire Cube List (ordered by &view)...");
-    connect(saveList, SIGNAL(activated()), this, SLOT(saveList()));
+    connect(saveList, SIGNAL(triggered()), this, SLOT(saveList()));
 
     exportActs.append(exportView);
     exportActs.append(saveList);
@@ -1379,7 +1392,7 @@ namespace Isis {
     if (m_projectViewTransform) {
 //    //qDebug()<<"MosaicSceneWidget::addImages";
       PvlObject &positionInfo = *m_projectViewTransform;
-      QByteArray hexValues(positionInfo["ViewTransform"][0].toAscii());
+      QByteArray hexValues(positionInfo["ViewTransform"][0].toLatin1());
       QDataStream transformStream(QByteArray::fromHex(hexValues));
 
       QTransform viewTransform;
@@ -1692,10 +1705,10 @@ namespace Isis {
         mosaicSceneItem->reproject();
       }
       catch(IException &e) {
-        IString msg = "The file [";
+        QString msg = "The file [";
 
         if (mosaicSceneItem->image())
-          msg += (IString)mosaicSceneItem->image()->displayProperties()->displayName();
+          msg += mosaicSceneItem->image()->displayProperties()->displayName();
 
         msg += "] is being removed due to not being able to project onto the scene";
 
@@ -2170,7 +2183,7 @@ namespace Isis {
         m_scene->setProjection(mappingGroup);
       }
       else if (localName == "viewTransform") {
-        QByteArray hexValues(m_characterData.toAscii());
+        QByteArray hexValues(m_characterData.toLatin1());
         QDataStream transformStream(QByteArray::fromHex(hexValues));
 
         QTransform viewTransform;

@@ -8,6 +8,7 @@
 #include "IString.h"
 #include "TableMainWindow.h"
 
+class QCheckBox;
 class QComboBox;
 class QDialog;
 class QLineEdit;

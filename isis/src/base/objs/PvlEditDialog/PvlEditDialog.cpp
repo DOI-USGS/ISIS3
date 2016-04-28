@@ -1,13 +1,19 @@
-#include <QtGui>
-#include <QString>
-#include <QMessageBox>
+#include "PvlEditDialog.h"
 
 #include <fstream>
 #include <sstream>
 
+#include <QFileDialog>
+#include <QListWidget>
+#include <QString>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QtGui>
+#include <QVBoxLayout>
+
 #include "IException.h"
 #include "Pvl.h"
-#include "PvlEditDialog.h"
 
 using namespace std;
 
@@ -26,11 +32,11 @@ namespace Isis {
   PvlEditDialog::PvlEditDialog(Pvl &pvl, QWidget *parent) : QDialog(parent) {
 
     // Create text edit box and fill it with pvl file contents
-    p_textEdit = new QTextEdit();
+    p_textEdit = new QTextEdit;
     fstream input;
 
     // open as input from pvl file
-    input.open(pvl.fileName().toAscii().data(), ios::in);
+    input.open(pvl.fileName().toLatin1().data(), ios::in);
     string output;
 
     // read first line of input and write as first output line

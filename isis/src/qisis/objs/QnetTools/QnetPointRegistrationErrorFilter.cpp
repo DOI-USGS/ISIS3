@@ -1,6 +1,11 @@
 #include "QnetPointRegistrationErrorFilter.h"
 
-#include <QtGui>
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QtWidgets>
 
 #include "QnetNavTool.h"
 #include "ControlNet.h"

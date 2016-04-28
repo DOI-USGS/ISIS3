@@ -738,7 +738,7 @@ namespace Isis {
 
       // Compute the number of bytes in the cube + label bytes and if the
       // endpos of the file // is not greater than this then seek to that position.
-      fstream stream(m_labelFileName->expanded().toAscii().data(),
+      fstream stream(m_labelFileName->expanded().toLatin1().data(),
                      ios::in | ios::out | ios::binary);
       stream.seekp(0, ios::end);
 
@@ -768,7 +768,7 @@ namespace Isis {
       QString blobFile(blobFileName.expanded());
       ios::openmode flags = ios::in | ios::binary | ios::out | ios::trunc;
       fstream detachedStream;
-      detachedStream.open(blobFile.toAscii().data(), flags);
+      detachedStream.open(blobFile.toLatin1().data(), flags);
       if (!detachedStream) {
         QString message = "Unable to open data file [" +
                           blobFileName.expanded() + "]";

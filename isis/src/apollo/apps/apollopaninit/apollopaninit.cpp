@@ -253,7 +253,7 @@ void IsisMain() {
   cidfrm_c(301, sizeof(frameName), &frameCode, frameName, &found);  
   if(!found) {
     QString naifTarget = QString("IAU_MOOM");
-    namfrm_c(naifTarget.toAscii().data(), &frameCode);
+    namfrm_c(naifTarget.toLatin1().data(), &frameCode);
     if(frameCode == 0) {
       QString msg = "Can not find NAIF code for [" + naifTarget + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -822,7 +822,7 @@ void Load_Kernel(Isis::PvlKeyword &key) {
        throw IException(IException::Io, msg, _FILEINFO_);
      }
      QString fileName(file.expanded());
-     furnsh_c(fileName.toAscii().data());
+     furnsh_c(fileName.toLatin1().data());
   }
 
   NaifStatus::CheckErrors();

@@ -317,7 +317,7 @@ bool HiCalConf::_naifLoaded = false;
 
     QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
     double obsStartTime;
-    scs2e_c (-74999,scStartTime.toAscii().data(),&obsStartTime);
+    scs2e_c (-74999,scStartTime.toLatin1().data(),&obsStartTime);
 
     QString targetName = getKey("TargetName", "Instrument");
     if (targetName.toLower() == "sky" ||
@@ -328,7 +328,7 @@ bool HiCalConf::_naifLoaded = false;
     }
     double sunv[3];
     double lt;
-    (void) spkpos_c(targetName.toAscii().data(), obsStartTime, "J2000", "LT+S", "sun",
+    (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
     double sunkm = vnorm_c(sunv);
     NaifStatus::CheckErrors(); 
@@ -423,9 +423,9 @@ void HiCalConf::loadNaifTiming( ) {
     QString lsk = leapseconds.expanded();
     QString sClock = sclk.expanded();
     QString pConstants = pck.expanded();
-    furnsh_c(lsk.toAscii().data());
-    furnsh_c(sClock.toAscii().data());
-    furnsh_c(pConstants.toAscii().data());
+    furnsh_c(lsk.toLatin1().data());
+    furnsh_c(sClock.toLatin1().data());
+    furnsh_c(pConstants.toLatin1().data());
     NaifStatus::CheckErrors(); 
 
 //  Ensure it is loaded only once

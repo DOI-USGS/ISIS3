@@ -206,7 +206,7 @@ namespace Isis {
       SpiceInt  handle;
       SpiceBoolean found;
       //  Get info on SPK kernel mainly the NAIF handle for comment parsing
-      (void) kinfo_c(spkFile.toAscii().data(), sizeof(ktype), sizeof(source), ktype,
+      (void) kinfo_c(spkFile.toLatin1().data(), sizeof(ktype), sizeof(source), ktype,
                      source, &handle, &found);
       if (found == SPICETRUE) {
         // SPK is open so read and parse all the comments.

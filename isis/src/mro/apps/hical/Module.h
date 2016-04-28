@@ -146,7 +146,7 @@ namespace Isis {
       void Dump(const QString &fname) const {
         FileName dumpc(fname);
         QString dumpcFile = dumpc.expanded();
-        std::ofstream ofile(dumpcFile.toAscii().data(), std::ios::out);
+        std::ofstream ofile(dumpcFile.toLatin1().data(), std::ios::out);
         if (!ofile) {
           QString mess = "Unable to open/create module dump file " +
                              dumpc.expanded();

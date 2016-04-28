@@ -513,7 +513,7 @@ void IsisMain() {
   }
   else {
     FileName outFile(ui.GetFileName("TO"));
-    ofstream oCube(outFile.expanded().toAscii().data());
+    ofstream oCube(outFile.expanded().toLatin1().data());
     p.OutputLabel(oCube);
     p.StartProcess(oCube);
     oCube.close();

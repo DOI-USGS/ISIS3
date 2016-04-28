@@ -603,7 +603,7 @@ iTime clock2time(QString spacecraftClockCount) {
   // The -74999 is the code to select the transformation from
   // high-precision MRO SCLK to ET
   NaifStatus::CheckErrors();
-  scs2e_c(-74999, spacecraftClockCount.toAscii().data(), &timeOutput);
+  scs2e_c(-74999, spacecraftClockCount.toLatin1().data(), &timeOutput);
   NaifStatus::CheckErrors();
   QVariant clockTime = timeOutput;
   iTime time = clockTime.toDouble();

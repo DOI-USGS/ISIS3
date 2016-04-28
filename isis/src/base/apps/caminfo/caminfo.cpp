@@ -387,9 +387,9 @@ void GenerateCSVOutput(Cube *incube,
   QString sOutFile = ui.GetAsString("TO");
   bool appending = ui.GetBoolean("APPEND") && FileName(sOutFile).fileExists();
   if(appending)
-    outFile.open(sOutFile.toAscii().data(), std::ios::out | std::ios::app);
+    outFile.open(sOutFile.toLatin1().data(), std::ios::out | std::ios::app);
   else
-    outFile.open(sOutFile.toAscii().data(), std::ios::out);
+    outFile.open(sOutFile.toLatin1().data(), std::ios::out);
 
   // Add some common/general things
   for(int i = 0; i < general->size(); i++)

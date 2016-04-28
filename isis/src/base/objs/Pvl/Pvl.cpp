@@ -80,7 +80,7 @@ namespace Isis {
 
     // Open the file
     ifstream istm;
-    istm.open(m_filename.toAscii().data(), std::ios::in);
+    istm.open(m_filename.toLatin1().data(), std::ios::in);
     if(!istm) {
       QString message = Message::FileOpen(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
@@ -127,7 +127,7 @@ namespace Isis {
     // Open the file
     ofstream ostm;
     QString tempName(temp.expanded());
-    ostm.open(tempName.toAscii().data(), std::ios::out);
+    ostm.open(tempName.toLatin1().data(), std::ios::out);
     ostm.seekp(0, std::ios::beg);
     if(!ostm) {
       QString message = Isis::Message::FileCreate(temp.expanded());
@@ -181,7 +181,7 @@ namespace Isis {
     // Open the file
     ofstream ostm;
     QString tempName(temp.expanded());
-    ostm.open(tempName.toAscii().data(), std::ios::app);
+    ostm.open(tempName.toLatin1().data(), std::ios::app);
     ostm.seekp(0, std::ios::end);
     if(!ostm) {
       QString message = Message::FileOpen(temp.expanded());

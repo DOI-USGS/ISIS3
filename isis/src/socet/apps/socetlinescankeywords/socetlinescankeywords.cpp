@@ -77,7 +77,7 @@ void IsisMain() {
 
   // Open output line scanner keyword file
   ofstream toStrm;
-  toStrm.open(to.toAscii().data(), ios::trunc);
+  toStrm.open(to.toLatin1().data(), ios::trunc);
   if (toStrm.bad()) {
     QString msg = "Unable to open output TO file";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -100,11 +100,11 @@ void IsisMain() {
 //    PvlGroup band = cube.label()->findGroup("BandBin", Pvl::Traverse);
 //    QString filter = (QString) band["FilterName"];
 //
-//    if (strcmp(filter.toAscii().data(), "BROAD_BAND") == 0)
+//    if (strcmp(filter.toLatin1().data(), "BROAD_BAND") == 0)
 //      isMocNA = true;
-//    else if (strcmp(filter.toAscii().data(), "RED") == 0)
+//    else if (strcmp(filter.toLatin1().data(), "RED") == 0)
 //      isMocWARed = true;
-//    else if (strcmp(filter.toAscii().data(), "BLUE") == 0) {
+//    else if (strcmp(filter.toLatin1().data(), "BLUE") == 0) {
 //      QString msg = "MOC WA Blue filter images not supported for Socet Set mapping";
 //      throw IException(IException::User, msg, _FILEINFO_);
 //    }
@@ -845,7 +845,7 @@ void IsisMain() {
 //  // system call to ISIS function tabledump to dump LineScanTimes
 //  char syscmd[1056];
 //  sprintf(syscmd, "tabledump from=%s to=%s name=LineScanTimes",
-//          cubefname.expanded().toAscii().data(), tablefname.expanded().toAscii().data());
+//          cubefname.expanded().toLatin1().data(), tablefname.expanded().toAscii().data());
 //
 //  int n = system(syscmd);
 //  if (n != 0)
@@ -855,7 +855,7 @@ void IsisMain() {
 //  // HrscCamera::ReadLineRates(IString filename) is private
 //
 //  // open tabledump.txt for reading
-//  ifstream fpIn(tablefname.expanded().toAscii().data(), ifstream::in);
+//  ifstream fpIn(tablefname.expanded().toLatin1().data(), ifstream::in);
 //  if (!fpIn)
 //    return -1;
 //
@@ -893,7 +893,7 @@ void IsisMain() {
 // // get alpha cube start line
 // PvlGroup alphacube = cube->group("AlphaCube");
 // QString str = (QString) alphacube["AlphaStartingLine"];
-// double dAlphaStartLine = atof(str.toAscii().data());
+// double dAlphaStartLine = atof(str.toLatin1().data());
 // double dAlphaLastLine = dAlphaStartLine + dtotalLines;
 // cam->SetImage(1, 0.5);
 // double dStartETime = cam->time().Et();

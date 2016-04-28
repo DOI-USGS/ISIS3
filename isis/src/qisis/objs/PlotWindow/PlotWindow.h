@@ -37,11 +37,13 @@ class QwtPlot;
 class QwtPlotGrid;
 class QwtPlotSpectrogram;
 class QwtPlotZoomer;
+class QwtLegend;
 
 class QDockWidget;
 class QListWidgetItem;
 class QLineEdit;
 class QComboBox;
+class QCheckBox;
 
 template <typename A, typename B> class QPair;
 
@@ -320,6 +322,9 @@ namespace Isis {
       bool m_autoscaleAxes;
 
       QwtPlot *m_plot;//!< The plot in this window
+      QwtLegend *m_legend; //!< The legend inserted in this plot
+      bool m_plotXLogScale; //!< Tracks if the plot X axis is using a log (true) or linear (false) scale 
+      bool m_plotYLogScale; //!< Tracks if the plot Y axis is using a log (true) or linear (false) scale 
       TableMainWindow *m_tableWindow;//!< Table window
       QToolBar *m_toolBar;//!< Tool bar on the plot window
 
@@ -333,6 +338,7 @@ Q_DECLARE_METATYPE(Isis::PlotWindow *);
 // There isn't a great place to put this currently since it's not a class we
 //   can manage the header for.
 //! We have scatter plot types as QVariant data types, so here it's enabled.
+Q_DECLARE_OPAQUE_POINTER(QwtPlotSpectrogram *);
 Q_DECLARE_METATYPE(QwtPlotSpectrogram *);
 
 #endif

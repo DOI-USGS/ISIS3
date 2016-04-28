@@ -96,12 +96,12 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       FileName kf(kfile);
       if ( kf.fileExists() ) {
         QString full_kf = kf.expanded();
-        std::remove(full_kf.toAscii().data());
+        std::remove(full_kf.toLatin1().data());
       }
       SpiceInt  myHandle;
 
       NaifStatus::CheckErrors();
-      spkopn_c(kf.expanded().toAscii().data(), "USGS_SPK_FILE", comsize, &myHandle);
+      spkopn_c(kf.expanded().toLatin1().data(), "USGS_SPK_FILE", comsize, &myHandle);
       NaifStatus::CheckErrors();
       return (myHandle);
     }
@@ -150,8 +150,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         segment.LoadKernelType("FK");
         NaifStatus::CheckErrors();
 
-        spkw09_c(_handle, body, center, frame.toAscii().data(), epochs[0], epochs[nrecs-1],
-                 segId.toAscii().data(), degree, nrecs, states[0], &epochs[0]);
+        spkw09_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+                 segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
 
         NaifStatus::CheckErrors();
         segment.UnloadKernelType("FK");
@@ -184,8 +184,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         // Ensure the FK is loaded
         segment.LoadKernelType("FK");
         NaifStatus::CheckErrors();
-        spkw13_c(_handle, body, center, frame.toAscii().data(), epochs[0], epochs[nrecs-1],
-                 segId.toAscii().data(), degree, nrecs, states[0], &epochs[0]);
+        spkw13_c(_handle, body, center, frame.toLatin1().data(), epochs[0], epochs[nrecs-1],
+                 segId.toLatin1().data(), degree, nrecs, states[0], &epochs[0]);
         NaifStatus::CheckErrors();
         segment.UnloadKernelType("FK");
         return;

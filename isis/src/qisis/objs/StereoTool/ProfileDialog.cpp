@@ -1,6 +1,10 @@
-#include <QtGui>
-
 #include "ProfileDialog.h"
+
+#include <QComboBox>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QStackedWidget>
 
 
 ProfileDialog::ProfileDialog(QWidget *parent) : QDialog(parent) {

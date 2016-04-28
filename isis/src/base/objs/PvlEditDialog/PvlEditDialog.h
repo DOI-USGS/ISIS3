@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QString>
+
 #include "Pvl.h"
 
 class QLabel;
@@ -37,7 +38,6 @@ namespace Isis {
    */
   class PvlEditDialog : public QDialog {
       Q_OBJECT
-
 
     public:
       PvlEditDialog(Pvl &pvl, QWidget *parent = 0);

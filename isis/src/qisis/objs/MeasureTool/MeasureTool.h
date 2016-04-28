@@ -10,6 +10,7 @@
 #include "IString.h"
 
 
+class QCheckBox;
 class QComboBox;
 class QDialog;
 class QMenu;

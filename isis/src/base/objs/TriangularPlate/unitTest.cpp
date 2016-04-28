@@ -41,7 +41,7 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   try {
     qDebug() << "Unit test for TriangularPlate.";
-    qDebug();
+    qDebug() << "";
     Preference::Preferences(true);
 
     NaifTriangle plate(3,3);
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
     qDebug() << "Area:       " << tp.area();
     qDebug() << "Normal:     " << tp.normal();
     qDebug() << "Center:     " << tp.center();
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
 
 
     NaifVector raydir(3);
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     Intercept *i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // No Plate Intercept - Case (en < 0 && tdot12 > 0)
     raydir[0] = 0.0;    raydir[1] = 0.0;    raydir[2] = 1.0;
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] =  2.0;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // No Plate Intercept - Case (en < 0, tdot12 == 0, && tdot23 > 0)
     raydir[0] = -1.0;    raydir[1] = 1.0;    raydir[2] = 0.0;
     vertex[0] =  0.0;    vertex[1] = 0.0;    vertex[2] = 2.0;
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // No Plate Intercept - Case (en < 0, tdot12 == 0, tdot23 < 0, && tdot31 > 0)
     raydir[0] = 1.0;    raydir[1] = -1.0;    raydir[2] = 0.0;
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] =  2.0;
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // No Plate Intercept - Case (en > 0 && tdot12 < 0)
     raydir[0] = 0.0;    raydir[1] = 0.0;    raydir[2] = -1.0;
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] =  0.0;
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // No Plate Intercept - Case (en > 0, tdot12 == 0, && tdot23 < 0)
     raydir[0] = -1.0;    raydir[1] = 0.0;    raydir[2] = 0.0;
     vertex[0] =  0.0;    vertex[1] = 0.0;    vertex[2] = 0.0;
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // No Plate Intercept - Case (en > 0, tdot12 == tdot23 == 0, && tdot31 < 0)
     raydir[0] = 0.0;    raydir[1] = -1.0;    raydir[2] = 0.0;
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] =  0.0;
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // No Plate Intercept - Case (en != 0 && tdot12 == tdot23 == tdot31 == 0)
     raydir[0] = 0.0;    raydir[1] = 0.0;    raydir[2] = 0.0;
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] =  0.0;
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has intercept?      " << tp.hasIntercept(vertex, raydir);
     i = tp.intercept(vertex, raydir);
     qDebug() << "Intercept is null?     " << toString(i == NULL);
-    qDebug();
+    qDebug() << "";
     // Plate Intercept = true 
     raydir[0] = 1.0;    raydir[1] = 1.0;    raydir[2] = 1.0;
     vertex[0] = 0.0;    vertex[1] = 0.0;    vertex[2] =  0.0;
@@ -161,8 +161,8 @@ int main(int argc, char *argv[]) {
                                        << i->location().GetZ().meters()
                                        << " meters";
     qDebug() << "Sep Angle:          " << tp.separationAngle(raydir);
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
 
 
     Latitude pole(-90.0, Angle::Degrees);
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Has point?     " << tp.hasPoint(pole, lon);
     SurfacePoint *spPole = tp.point(pole, lon);
     qDebug() << "Surface point at pole is null?     " << toString(spPole == NULL);
-    qDebug();
+    qDebug() << "";
     Latitude equator(0.0, Angle::Degrees);
     qDebug() << "Look for surface point using equator";
     qDebug() << "Latitude:      " << equator;
@@ -184,8 +184,8 @@ int main(int argc, char *argv[]) {
                                   << sp->GetY().meters()
                                   << sp->GetZ().meters()
                                   << " meters";
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
 
 
     AbstractPlate *cloneTP = tp.clone();
@@ -195,14 +195,14 @@ int main(int argc, char *argv[]) {
     qDebug() << "Clone Max Radius: " << cloneTP->maxRadius().meters() << " meters";
     qDebug() << "Clone Area:       " << cloneTP->area();
     qDebug() << "Clone Normal:     " << cloneTP->normal();
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
 
 
     qDebug() << "Get vertex at index 0";
     qDebug() << tp.vertex(0);
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
 
 
     qDebug() << "================================= Error Throws ==================================";
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "Get vertex at index 5";
     try {
       tp.vertex(5);
@@ -223,8 +223,8 @@ int main(int argc, char *argv[]) {
     }
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     IException(e, IException::Programmer,
               "\n------------Unit Test Failed.------------",
               _FILEINFO_).print();

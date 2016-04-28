@@ -98,14 +98,14 @@ namespace Isis {
       void attachMarkers();
 
       QColor color() const;
-      QwtSymbol markerSymbol() const;
+      QwtSymbol *markerSymbol() const;
       Units xUnits() const;
       Units yUnits() const;
 
       void setColor(const QColor &color);
       void setData(QwtSeriesData<QPointF> *data);
       void setPen(const QPen &pen);
-      void setMarkerSymbol(QwtSymbol symbol);
+      void setMarkerSymbol(QwtSymbol::Style style);
       void setMarkerVisible(bool visible);
 
     protected:
@@ -121,7 +121,7 @@ namespace Isis {
 
     private:
       QColor m_color;
-      QwtSymbol m_markerSymbol; //!< Marker's styles
+      QwtSymbol *m_markerSymbol; //!< Marker's styles
       QList<QwtPlotMarker *> m_valuePointMarkers;
       Units m_xUnits;
       Units m_yUnits;

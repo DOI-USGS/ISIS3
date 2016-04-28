@@ -56,7 +56,7 @@ namespace Isis {
       "This can be level1, level2 or dem cube.";
     m_openGround->setWhatsThis(whatsThis);
     m_openGround->setEnabled(false);
-    connect (m_openGround,SIGNAL(activated()),this,SIGNAL(newGroundFile()));
+    connect (m_openGround,SIGNAL(triggered()),this,SIGNAL(newGroundFile()));
 
     m_openDem = new QAction(parent);
     m_openDem->setText("Open &Radius Source");
@@ -67,7 +67,7 @@ namespace Isis {
       "determine the radius value.";
     m_openDem->setWhatsThis(whatsThis);
     m_openDem->setEnabled(false);
-    connect (m_openDem,SIGNAL(activated()),this,SIGNAL(newDemFile()));
+    connect (m_openDem,SIGNAL(triggered()),this,SIGNAL(newDemFile()));
   }
 
 

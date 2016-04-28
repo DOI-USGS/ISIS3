@@ -1,6 +1,6 @@
 #include "NewControlPointDialog.h"
 
-#include <QtGui>
+#include <QtWidgets>
 #include <algorithm>
 
 #include "ControlNet.h"

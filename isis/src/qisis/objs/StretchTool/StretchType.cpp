@@ -2,15 +2,15 @@
 
 #include <iostream>
 
-#include <QTableWidget>
-#include <QHeaderView>
 #include <QColor>
-#include <QString>
 #include <QGridLayout>
 #include <QFileDialog>
+#include <QHeaderView>
 #include <QMessageBox>
-#include <QTextStream>
 #include <QPushButton>
+#include <QString>
+#include <QTableWidget>
+#include <QTextStream>
 
 #include "Stretch.h"
 #include "Histogram.h"
@@ -107,7 +107,7 @@ namespace Isis {
     labels << "Input" << "Output";
     table->setHorizontalHeaderLabels(labels);
 
-    table->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setSelectionMode(QAbstractItemView::NoSelection);
     table->setMinimumSize(QSize(50, 20));

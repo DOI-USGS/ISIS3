@@ -2,9 +2,14 @@
 
 #include <iostream>
 
-#include <QGraphicsItem>
+#include <QGraphicsScene>
+#include <QHBoxLayout>
+#include <QInputDialog>
+#include <QLabel>
 #include <QMenu>
 #include <QPointF>
+#include <QMessageBox>
+#include <QPushButton>
 
 #include "Control.h"
 #include "ControlList.h"

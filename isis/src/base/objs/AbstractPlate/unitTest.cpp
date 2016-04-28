@@ -135,8 +135,8 @@ int main(int argc, char *argv[]) {
     ipoint = NULL;
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     IException(e, IException::Programmer,
               "\n------------Unit Test Failed.------------",
               _FILEINFO_).print();

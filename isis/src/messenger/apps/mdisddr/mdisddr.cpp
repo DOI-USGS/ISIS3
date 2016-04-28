@@ -361,7 +361,7 @@ void IsisMain() {
     // All done...write result.
     pdsLabel.setFormatTemplate("$messenger/templates/labels/mdisPdsDDR.pft");
     QString ofile(output.expanded());
-    ofstream outstream(ofile.toAscii().data());
+    ofstream outstream(ofile.toLatin1().data());
     processPds.OutputLabel(outstream);
 
     // Writing out the 5 bands is a bit tricky for this product.  The bands
@@ -379,14 +379,14 @@ void IsisMain() {
     writeBand(processPds, outstream, pfile, bandmap.get("Phase Angle"));
     outstream.close();
     processPds.EndProcess();
-    remove(pfile.toAscii().data());
+    remove(pfile.toLatin1().data());
   }
   catch (IException &) {
-    remove(pfile.toAscii().data());
+    remove(pfile.toLatin1().data());
     throw;
   }
   catch (...) {
-    remove(pfile.toAscii().data());
+    remove(pfile.toLatin1().data());
     throw IException(IException::Unknown, "Unexpected exception caught!",
                      _FILEINFO_);
   }

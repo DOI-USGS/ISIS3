@@ -85,13 +85,13 @@ void IsisMain() {
       ofstream os;
       bool writeHeader = false;
       if(append) {
-        os.open(outFile.toAscii().data(), ios::app);
+        os.open(outFile.toLatin1().data(), ios::app);
         if(!exists) {
           writeHeader = true;
         }
       }
       else {
-        os.open(outFile.toAscii().data(), ios::out);
+        os.open(outFile.toLatin1().data(), ios::out);
         writeHeader = true;
       }
 

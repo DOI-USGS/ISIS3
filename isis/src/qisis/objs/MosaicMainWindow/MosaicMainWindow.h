@@ -6,6 +6,7 @@
 #include "MainWindow.h"
 
 class QString;
+class QProgressBar;
 
 namespace Isis {
   class Cube;

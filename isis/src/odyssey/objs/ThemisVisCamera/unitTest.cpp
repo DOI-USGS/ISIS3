@@ -39,7 +39,7 @@ int main(void) {
   Preference::Preferences(true);
 
   qDebug() << "Unit Test for ThemisVisCamera...";
-  qDebug();
+  qDebug() << "";
   /**
    * unit test changed for themis vis camera
    */
@@ -60,7 +60,7 @@ int main(void) {
     Camera *evenCam = CameraFactory::Create(evenCube);
     qDebug() << "FileName: " << FileName(evenCube.fileName()).name();
     qDebug() << "CK Frame: " << evenCam->instrumentRotation()->Frame();
-    qDebug();
+    qDebug() << "";
 
     // Test kernel IDs
     qDebug() << "Kernel IDs: ";
@@ -68,9 +68,9 @@ int main(void) {
     qDebug() << "CK Reference ID  = " << evenCam->CkReferenceId();
     qDebug() << "SPK Target ID    = " << evenCam->SpkTargetId();
     qDebug() << "SPK Reference ID = " << evenCam->SpkReferenceId();
-    qDebug();
+    qDebug() << "";
     qDebug() << "Is Band Independent: " << evenCam->IsBandIndependent();
-    qDebug();
+    qDebug() << "";
 
     // Test all four corners to make sure the conversions are right
     qDebug() << "For upper left corner ...";
@@ -112,14 +112,14 @@ int main(void) {
     }
     TestSampLine(evenCam, samp, line);
 
-    qDebug();
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
+    qDebug() << "";
     Cube oddCube("$odyssey/testData/V14093008RDR.odd.cub", "r");
     Camera *oddCam = CameraFactory::Create(oddCube);
     qDebug()<< "FileName: " << FileName(oddCube.fileName()).name();
     qDebug()<< "CK Frame: " << oddCam->instrumentRotation()->Frame();
-    qDebug();
+    qDebug() << "";
 
     // Test kernel IDs
     qDebug()<< "Kernel IDs: ";
@@ -127,7 +127,7 @@ int main(void) {
     qDebug()<< "CK Reference ID  = " << oddCam->CkReferenceId();
     qDebug()<< "SPK Target ID    = " << oddCam->SpkTargetId();
     qDebug()<< "SPK Reference ID = " << oddCam->SpkReferenceId();
-    qDebug();
+    qDebug() << "";
 
     // Test all four corners to make sure the conversions are right
     qDebug()<< "For upper left corner ...";
@@ -170,7 +170,7 @@ int main(void) {
     }
     TestSampLine(oddCam, samp, line);
 
-    qDebug();
+    qDebug() << "";
     
     // Test name methods
     qDebug() << "Testing name methods ...";
@@ -178,8 +178,8 @@ int main(void) {
     qDebug() << "Spacecraft Name Short: " << evenCam->spacecraftNameShort();
     qDebug() << "Instrument Name Long: " << evenCam->instrumentNameLong();
     qDebug() << "Instrument Name Short: " << evenCam->instrumentNameShort();
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     
     qDebug() << "Testing errors";
     try {
@@ -227,6 +227,6 @@ void TestSampLine(Camera *cam, double samp, double line) {
     qDebug() << "DeltaLine   = ERROR";
   }
 
-  qDebug();
+  qDebug() << "";
 }
 

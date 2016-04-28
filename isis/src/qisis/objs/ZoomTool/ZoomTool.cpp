@@ -18,13 +18,18 @@
  *  http://www.usgs.gov/privacy.html.
  */
 
+#include <QAction>
+#include <QApplication>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QPushButton>
-#include <QLabel>
+#include <QStackedWidget>
+#include <QToolButton>
 #include <QValidator>
-#include <QHBoxLayout>
-#include <QApplication>
 
 #include "IException.h"
 #include "IString.h"
@@ -47,45 +52,45 @@ namespace Isis {
     p_zoomIn2X->setShortcut(Qt::Key_Plus);
     p_zoomIn2X->setText("Zoom In");
     p_zoomIn2X->setIcon(QPixmap(toolIconDir() + "/viewmag+.png"));
-    connect(p_zoomIn2X, SIGNAL(activated()), this, SLOT(zoomIn2X()));
+    connect(p_zoomIn2X, SIGNAL(triggered()), this, SLOT(zoomIn2X()));
 
     p_zoomIn4X = new QAction(parent);
     p_zoomIn4X->setText("Zoom In 4X");
     p_zoomIn4X->setShortcut(Qt::CTRL + Qt::Key_Plus);
-    connect(p_zoomIn4X, SIGNAL(activated()), this, SLOT(zoomIn4X()));
+    connect(p_zoomIn4X, SIGNAL(triggered()), this, SLOT(zoomIn4X()));
 
     p_zoomIn8X = new QAction(parent);
     p_zoomIn8X->setShortcut(Qt::ALT + Qt::Key_Plus);
     p_zoomIn8X->setText("Zoom In 8X");
-    connect(p_zoomIn8X, SIGNAL(activated()), this, SLOT(zoomIn8X()));
+    connect(p_zoomIn8X, SIGNAL(triggered()), this, SLOT(zoomIn8X()));
 
     p_zoomOut2X = new QAction(parent);
     p_zoomOut2X->setShortcut(Qt::Key_Minus);
     p_zoomOut2X->setText("Zoom Out");
     p_zoomOut2X->setIcon(QPixmap(toolIconDir() + "/viewmag-.png"));
-    connect(p_zoomOut2X, SIGNAL(activated()), this, SLOT(zoomOut2X()));
+    connect(p_zoomOut2X, SIGNAL(triggered()), this, SLOT(zoomOut2X()));
 
     p_zoomOut4X = new QAction(parent);
     p_zoomOut4X->setShortcut(Qt::CTRL + Qt::Key_Minus);
     p_zoomOut4X->setText("Zoom Out 4X");
-    connect(p_zoomOut4X, SIGNAL(activated()), this, SLOT(zoomOut4X()));
+    connect(p_zoomOut4X, SIGNAL(triggered()), this, SLOT(zoomOut4X()));
 
     p_zoomOut8X = new QAction(parent);
     p_zoomOut8X->setShortcut(Qt::ALT + Qt::Key_Minus);
     p_zoomOut8X->setText("Zoom Out 8X");
-    connect(p_zoomOut8X, SIGNAL(activated()), this, SLOT(zoomOut8X()));
+    connect(p_zoomOut8X, SIGNAL(triggered()), this, SLOT(zoomOut8X()));
 
     p_zoomActual = new QAction(parent);
     p_zoomActual->setShortcut(Qt::Key_Slash);
     p_zoomActual->setText("&Actual Pixels");
     p_zoomActual->setIcon(QPixmap(toolIconDir() + "/viewmag1.png"));
-    connect(p_zoomActual, SIGNAL(activated()), this, SLOT(zoomActual()));
+    connect(p_zoomActual, SIGNAL(triggered()), this, SLOT(zoomActual()));
 
     p_zoomFit = new QAction(parent);
     p_zoomFit->setShortcut(Qt::Key_Asterisk);
     p_zoomFit->setText("&Fit in Window");
     p_zoomFit->setIcon(QPixmap(toolIconDir() + "/viewmagfit.png"));
-    connect(p_zoomFit, SIGNAL(activated()), this, SLOT(zoomFit()));
+    connect(p_zoomFit, SIGNAL(triggered()), this, SLOT(zoomFit()));
 
   }
 

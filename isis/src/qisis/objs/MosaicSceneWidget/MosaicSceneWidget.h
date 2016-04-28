@@ -6,6 +6,7 @@
 #include "ImageList.h"
 
 template <typename A> class QList;
+
 class QGraphicsPolygonItem;
 class QGraphicsRectItem;
 class QGraphicsScene;

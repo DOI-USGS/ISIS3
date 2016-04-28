@@ -1,5 +1,6 @@
 #include "StatisticsTool.h"
 
+#include <QAction>
 #include <QCheckBox>
 #include <QDebug>
 #include <QDialog>
@@ -182,7 +183,7 @@ namespace Isis {
     QAction *action = new QAction("Statistics", toolpad);
     action->setIcon(QPixmap(toolIconDir() + "/statistics.png"));
     action->setToolTip("Statistics");
-    QObject::connect(action, SIGNAL(activated()), p_dialog, SLOT(show()));
+    QObject::connect(action, SIGNAL(triggered()), p_dialog, SLOT(show()));
 
     QString text  = "";
 

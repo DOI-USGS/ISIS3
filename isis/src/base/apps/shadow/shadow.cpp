@@ -46,7 +46,7 @@ void IsisMain() {
 
     foreach (QString kernelFile, allKernelFiles) {
       kernelsUsed += kernelFile;
-      furnsh_c(FileName(kernelFile).expanded().toAscii().data());
+      furnsh_c(FileName(kernelFile).expanded().toLatin1().data());
     }
 
     // Find the NAIF target code for the DEM's target
@@ -59,14 +59,14 @@ void IsisMain() {
 
     // Get actual sun position, relative to target
     QString bodyFixedFrame = QString("IAU_%1").arg(name.toUpper());
-    spkpos_c("SUN", time.Et(), bodyFixedFrame.toAscii().data(), "NONE",
-             name.toUpper().toAscii().data(), sunPosition, &lightTime);
+    spkpos_c("SUN", time.Et(), bodyFixedFrame.toLatin1().data(), "NONE",
+             name.toUpper().toLatin1().data(), sunPosition, &lightTime);
 
     NaifStatus::CheckErrors();
 
     // Adjusted for light time
-    spkpos_c("SUN", time.Et() - lightTime, bodyFixedFrame.toAscii().data(), "NONE",
-             name.toUpper().toAscii().data(), sunPosition, &lightTime);
+    spkpos_c("SUN", time.Et() - lightTime, bodyFixedFrame.toLatin1().data(), "NONE",
+             name.toUpper().toLatin1().data(), sunPosition, &lightTime);
 
     NaifStatus::CheckErrors();
 
@@ -76,7 +76,7 @@ void IsisMain() {
     sunPosition[2] *= 1000;
 
     foreach (QString kernelFile, allKernelFiles) {
-      unload_c(FileName(kernelFile).expanded().toAscii().data());
+      unload_c(FileName(kernelFile).expanded().toLatin1().data());
     }
 
     NaifStatus::CheckErrors();
@@ -147,10 +147,10 @@ QStringList kernels(QString kernelType, Kernel (KernelDb::*kernelDbAccessor)(Pvl
   QStringList results;
 
   UserInterface &ui = Application::GetUserInterface();
-  if (ui.WasEntered(kernelType.toUpper().toAscii().data())) {
+  if (ui.WasEntered(kernelType.toUpper().toLatin1().data())) {
     std::vector<QString> userInput;
 
-    ui.GetAsString(kernelType.toUpper().toAscii().data(), userInput);
+    ui.GetAsString(kernelType.toUpper().toLatin1().data(), userInput);
 
     for (int i = 0; i < (int)userInput.size(); i++) {
       results.append(userInput[i]);

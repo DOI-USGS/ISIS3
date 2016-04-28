@@ -119,7 +119,7 @@ namespace Isis {
 #if ENABLEJP2K
     // Open the JP2 file stream
     JP2_Stream = new jp2_family_tgt();
-    JP2_Stream->open(p_jp2File.toAscii().data());
+    JP2_Stream->open(p_jp2File.toLatin1().data());
 
     // Open the JP2 boxes
     JP2_Boxes = new jp2_target();

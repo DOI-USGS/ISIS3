@@ -56,12 +56,12 @@ void IsisMain() {
   try {
     Table trackTable(ProcessMosaic::TRACKING_TABLE_NAME);
     mosaicCube1->read(trackTable);
-    qDebug();
+    qDebug() << "";
     qDebug() << "a. SUCCESS - Track Table Exists";
-    qDebug() << Table::toString( trackTable, "\t" );
+    qDebug().noquote() << Table::toString( trackTable, "\t" );
   }
   catch (IException&) {
-    qDebug();
+    qDebug() << "";
     qDebug() << "a. FAILURE - Track Table does not Exist";
   }
   m1.EndProcess();
@@ -91,12 +91,12 @@ void IsisMain() {
 //    qDebug() << 4;
 //    mosaicCube2->read(trackTable);
 //    qDebug() << 5;
-//    qDebug();
+//    qDebug() << "";
 //    qDebug() << "b. SUCCESS - Left Mosaic Succeeds";
 //    qDebug() << Table::toString(trackTable, "\t");
 //  }
 //  catch (IException&) {
-//    qDebug();
+//    qDebug() << "";
 //    qDebug() << "b. FAILURE - Left Mosaic Fails";
 //  }
 //  m1b.EndProcess();
@@ -118,12 +118,12 @@ void IsisMain() {
 //  try {
 //    Table trackTable(ProcessMosaic::TRACKING_TABLE_NAME);
 //    mosaicCube3->read(trackTable);
-//    qDebug();
+//    qDebug() << "";
 //    qDebug() << "c. SUCCESS - Right Mosaic Succeeds";
 //    qDebug() << Table::toString(trackTable, "\t");
 //  }
 //  catch (IException&) {
-//    qDebug();
+//    qDebug() << "";
 //    qDebug() << "c. FAILURE - Right Mosaic Fails";
 //  }
 //  m1b.EndProcess();
@@ -318,7 +318,7 @@ void IsisMain() {
 
   // ***********************************************************
   // Test Average Priority
-  qDebug();
+  qDebug() << "";
   qDebug() << "10. Test Average Priority";
   // Create the default output cube
   p.SetOutputCube("TO_AVG", 5, 5, 2);
@@ -398,7 +398,7 @@ void IsisMain() {
   // Testing Errors
 
   // Try to open two input cubes
-  qDebug();
+  qDebug() << "";
   qDebug() << "*** Test Error Handling ***";
   qDebug() << "Test multiple input error";
   try {
@@ -411,7 +411,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
 
   // ***********************************************************
@@ -427,7 +427,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
 
   // ***********************************************************
@@ -443,7 +443,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
 
   qDebug() << "Test input does not overlap mosaic";
@@ -457,7 +457,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
 
   // ***********************************************************
@@ -472,7 +472,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
 
   //***********************************************************
@@ -487,7 +487,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
 
   //***********************************************************
@@ -507,7 +507,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
 
   // ***********************************************************
@@ -527,7 +527,7 @@ void IsisMain() {
   catch (IException &e) {
     e.print();
     p.EndProcess();
-    qDebug();
+    qDebug() << "";
   }
   remove("isisMosaic_01.cub");
 }
@@ -552,7 +552,7 @@ void testIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   QString sFrom = ui.GetFileName("FROM");
   cInCube.open(sFrom);
   
-  qDebug();
+  qDebug() << "";
   qDebug() << "***  Input Image  ***  ";
   if (ins == 0) ins = cInCube.sampleCount() - iss + 1;
   if (inl == 0) inl = cInCube.lineCount()   - isl + 1;
@@ -570,14 +570,14 @@ void testIn(int iss, int isl, int isb, int ins, int inl, int inb) {
       cInCube.read(ciPortal);
       for (int iPixel = 0; iPixel < ciPortal.size(); iPixel++) {
         if (iPixel == 5) {
-          qDebug();
+          qDebug() << "";
         }
         qDebug() << "(" << Isis::toString(line) << "," << Isis::toString(iS++) << "," 
                  << Isis::toString(band) << ")=" << Isis::toString((int)ciPortal[iPixel]);
       }
-      qDebug();
+      qDebug() << "";
     }
-    qDebug();
+    qDebug() << "";
   }
   cInCube.close();
 }
@@ -606,7 +606,7 @@ void testOut(int piSamples, int piLines,
 
   int iBands = cOutCube.bandCount();
 
-  qDebug();
+  qDebug() << "";
   qDebug() << "***  Mosaic Image  ***  ";
   qDebug() << "Start Stats " << Isis::toString(piLines) << ", " << Isis::toString(piSamples) 
            << ", " << Isis::toString(piBands);
@@ -653,9 +653,9 @@ void testOut(int piSamples, int piLines,
                    << "," << Isis::toString(band) << ")=" << Isis::toString((int)coPortal[iPixel]);
         }
       }
-      qDebug();
+      qDebug() << "";
     }
-    qDebug();
+    qDebug() << "";
     band++;
     if (band > iBands) {
       break;

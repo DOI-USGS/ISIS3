@@ -1,7 +1,13 @@
 #include "QnetPointTypeFilter.h"
 
-#include <QtGui>
+#include <QCheckBox>
+#include <QHBoxLayout>
 #include <QGroupBox>
+#include <QMessageBox>
+#include <QRadioButton>
+#include <QtWidgets>
+#include <QVBoxLayout>
+
 
 #include "ControlMeasure.h"
 #include "ControlNet.h"

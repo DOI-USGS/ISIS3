@@ -879,7 +879,7 @@ namespace Isis {
                     "output PDS label file name.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-    std::ofstream sOutLabelStream(m_detachedPdsLabelFile.toAscii().data());
+    std::ofstream sOutLabelStream(m_detachedPdsLabelFile.toLatin1().data());
     OutputLabel(sOutLabelStream);
     sOutLabelStream.close();
   }
@@ -1031,7 +1031,7 @@ namespace Isis {
       FileName labelFile(m_detachedPdsLabelFile);
       QString tableFileWithPath = labelFile.path() + "/" 
                                   + detachedPdsTableFileName;
-      ofstream os(tableFileWithPath.toAscii().data());
+      ofstream os(tableFileWithPath.toLatin1().data());
       os.write(tableBuffer, isisTable.Records() * fileRecordBytes);
       os.close();
     }

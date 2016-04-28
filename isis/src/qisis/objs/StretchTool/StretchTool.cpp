@@ -1,11 +1,17 @@
 #include "StretchTool.h"
 
+#include <QAction>
+#include <QComboBox>
 #include <QHBoxLayout>
+#include <QLineEdit>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPixmap>
+#include <QPushButton>
 #include <QSizePolicy>
+#include <QStackedWidget>
 #include <QToolBar>
+#include <QToolButton>
 #include <QValidator>
 
 #include "AdvancedStretchDialog.h"
@@ -53,12 +59,12 @@ namespace Isis {
     m_stretchGlobal = new QAction(parent);
     m_stretchGlobal->setShortcut(Qt::CTRL + Qt::Key_G);
     m_stretchGlobal->setText("Global Stretch");
-    connect(m_stretchGlobal, SIGNAL(activated()), this, SLOT(stretchGlobal()));
+    connect(m_stretchGlobal, SIGNAL(triggered()), this, SLOT(stretchGlobal()));
 
     m_stretchRegional = new QAction(parent);
     m_stretchRegional->setShortcut(Qt::CTRL + Qt::Key_R);
     m_stretchRegional->setText("Regional Stretch");
-    connect(m_stretchRegional, SIGNAL(activated()), this, SLOT(stretchRegional()));
+    connect(m_stretchRegional, SIGNAL(triggered()), this, SLOT(stretchRegional()));
 
     // Emit a signal when an exception occurs and connect to the Warning object
     // to display Warning icon and the message
@@ -433,18 +439,18 @@ namespace Isis {
 
     if(cvp && cvp->isGray()) {
       m_copyBands->setEnabled(true);
-      m_stretchBandComboBox->setShown(false);
+      m_stretchBandComboBox->setVisible(false);
       m_stretchMinEdit->show();
       m_stretchMaxEdit->show();
     }
     else if(cvp) {
       m_copyBands->setEnabled(true);
-      m_stretchBandComboBox->setShown(true);
+      m_stretchBandComboBox->setVisible(true);
       stretchBandChanged(0);
     }
     else {
       m_copyBands->setEnabled(false);
-      m_stretchBandComboBox->setShown(false);
+      m_stretchBandComboBox->setVisible(false);
     }
 
     if(m_advancedStretch->isVisible()) {

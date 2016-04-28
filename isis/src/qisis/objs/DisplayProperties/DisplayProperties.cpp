@@ -1,6 +1,7 @@
 #include "DisplayProperties.h"
 
 #include <QBuffer>
+#include <QDataStream>
 #include <QXmlStreamWriter>
 
 #include "FileName.h"
@@ -45,7 +46,7 @@ namespace Isis {
   void DisplayProperties::fromPvl(const PvlObject &pvl) {
     setDisplayName(((IString)pvl["DisplayName"][0]).ToQt());
 
-    QByteArray hexValues(pvl["Values"][0].toAscii());
+    QByteArray hexValues(pvl["Values"][0].toLatin1());
     QDataStream valuesStream(QByteArray::fromHex(hexValues));
     valuesStream >> *m_propertyValues;
   }
@@ -197,7 +198,7 @@ namespace Isis {
   bool DisplayProperties::XmlHandler::endElement(const QString &namespaceURI,
       const QString &localName, const QString &qName) {
     if (localName == "displayProperties") {
-      QByteArray hexValues(m_hexData.toAscii());
+      QByteArray hexValues(m_hexData.toLatin1());
       QDataStream valuesStream(QByteArray::fromHex(hexValues));
       valuesStream >> *m_displayProperties->m_propertyValues;
     }

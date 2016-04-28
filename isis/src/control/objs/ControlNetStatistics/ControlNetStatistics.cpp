@@ -327,7 +327,7 @@ namespace Isis {
     FileName outFile(psImageFile);
     ofstream ostm;
     QString outName(outFile.expanded());
-    ostm.open(outName.toAscii().data(), std::ios::out);
+    ostm.open(outName.toLatin1().data(), std::ios::out);
 
     if ( ostm.fail() ) {
       QString msg = QObject::tr("Cannot open file [%1]").arg(psImageFile);
@@ -392,7 +392,7 @@ namespace Isis {
 
     ofstream ostm;
     QString outName(outFile.expanded());
-    ostm.open(outName.toAscii().data(), std::ios::out);
+    ostm.open(outName.toLatin1().data(), std::ios::out);
 
     if ( ostm.fail() ) {
       QString msg = QObject::tr("Cannot open file [%1]").arg(psPointFile);

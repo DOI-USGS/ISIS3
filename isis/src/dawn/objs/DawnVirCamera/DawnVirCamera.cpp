@@ -46,7 +46,7 @@ namespace Isis {
       QString channelId = inst["ChannelId"];
 
       QString instMode = inst["InstrumentModeId"];
-      m_slitMode = instMode[14].toAscii();   // "F" for full slit, Q for quarter slit
+      m_slitMode = instMode[14].toLatin1();   // "F" for full slit, Q for quarter slit
 
       // Check for presence of articulation kernel
       bool hasArtCK = hasArticulationKernel(lab);
@@ -144,7 +144,8 @@ namespace Isis {
     int DawnVirCamera::CkReferenceId() const { return (1); }
     /** Return PK reference frame */
     int DawnVirCamera::SpkReferenceId() const { return (1); }
-
+    
+    
    /**
     * @brief Scrubs a string coming out of the housekeeping table
     *
@@ -437,14 +438,14 @@ namespace Isis {
     NaifStatus::CheckErrors();
     try {
       // Get pointing w/AVs
-      sxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
+      sxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                (SpiceDouble (*)[6]) state[0]);
       NaifStatus::CheckErrors();
     }
     catch (IException &) {
       try {
         SMatrix rot(3,3);
-        pxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
+        pxform_c(frame1.toLatin1().data(), frame2.toLatin1().data(), etTime,
                  (SpiceDouble (*)[3]) rot[0]);
         NaifStatus::CheckErrors();
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };

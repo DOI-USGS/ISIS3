@@ -120,7 +120,7 @@ namespace Isis {
     //  Now open the filename
     ofstream os;
     QString ofFile = FileName(fname).expanded();
-    QByteArray qofFile = ofFile.toAscii();
+    QByteArray qofFile = ofFile.toLatin1();
     if ( "append" == m_mode ) {
       os.open(qofFile.data(), ios::out | ios::app);
     }

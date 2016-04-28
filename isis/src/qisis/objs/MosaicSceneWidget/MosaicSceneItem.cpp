@@ -7,7 +7,9 @@
 #include <QBrush>
 #include <QEvent>
 #include <QGraphicsItem>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QList>
+#include <QMenu>
 #include <QPainter>
 #include <QPen>
 #include <QStyleOptionGraphicsItem>
@@ -271,7 +273,7 @@ namespace Isis {
 
         QRectF boundingRect = polyItem->boundingRect();
         if(boundingRect.width() < boundingRect.height())
-          label->rotate(90);
+          label->setRotation(90.0);
       }
 
       m_polygons->append(polyItem);

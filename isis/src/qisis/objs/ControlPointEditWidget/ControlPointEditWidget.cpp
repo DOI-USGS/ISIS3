@@ -6,7 +6,7 @@
 #include <vector>
 #include <iomanip>
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QMessageBox>
 
 #include "Application.h"
@@ -547,7 +547,7 @@ namespace Isis {
     //qDebug()<<"ControlPointEditWidget::setEditPoint m_editPoint Id = "<<m_editPoint->GetId();
 
     loadPoint();
-    this->setShown(true);
+    this->setVisible(true);
     this->raise();
     loadTemplateFile(m_measureEditor->templateFileName());
 
@@ -2219,8 +2219,8 @@ namespace Isis {
 //        delete m_editPoint;
 //        m_editPoint = NULL;
 //        emit controlPointChanged();
-////      this->setShown(false);
-////      m_measureWindow->setShown(false);
+////      this->setVisible(false);
+////      m_measureWindow->setVisible(false);
 //      }
 //    }
 //  }

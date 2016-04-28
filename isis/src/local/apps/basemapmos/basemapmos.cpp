@@ -43,7 +43,7 @@ void IsisMain() {
   //Creates the first highpass cubes
   std::ofstream firstHighPassList;
   QString firstHighPass(cubeListBaseName + "_FirstHighPassList.lis");
-  firstHighPassList.open(firstHighPass.toAscii().data());
+  firstHighPassList.open(firstHighPass.toLatin1().data());
   for (int i = 0; i < cubes.size(); i++) {
     FileName inFile = cubes[i];
     QString outParam = pathName + inFile.baseName() + "_hpffirst.cub";
@@ -60,7 +60,7 @@ void IsisMain() {
   //Creates the second highpass cubes
   std::ofstream secondHighPassList;
   QString secondHighPass(cubeListBaseName + "_SecondHighPassList.lis");
-  secondHighPassList.open(secondHighPass.toAscii().data());
+  secondHighPassList.open(secondHighPass.toLatin1().data());
   for(int i = 0; i < cubes.size(); i++) {
     FileName inFile = cubes[i];
     QString outParam = pathName + inFile.baseName() + "_hpfsecond.cub";
