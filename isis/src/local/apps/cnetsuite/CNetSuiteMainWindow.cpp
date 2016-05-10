@@ -59,6 +59,8 @@ namespace Isis {
     setCentralWidget(centralWidget);
     setDockNestingEnabled(true);
 
+    m_activeView = NULL;
+
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
@@ -161,6 +163,10 @@ namespace Isis {
     setTabbedViewMode();
     centralWidget->setTabsMovable(true);
     centralWidget->setTabsClosable(true);
+
+    // ken testing
+    setActiveView(projectTreeView);
+    // ken testing
   }
 
 
@@ -170,8 +176,10 @@ namespace Isis {
    * @param[in] newWidget (QWidget *)
    */
   void CNetSuiteMainWindow::addView(QWidget *newWidget) {
-    if ( qobject_cast<SensorInfoWidget *>(newWidget) || qobject_cast<TargetInfoWidget *>(newWidget) ) {
+    if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
+         qobject_cast<TargetInfoWidget *>(newWidget) ) {
       QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
+      dock->setAttribute(Qt::WA_DeleteOnClose, true);
       dock->setWidget(newWidget);
       splitDockWidget(m_projectDock, dock, Qt::Vertical);
     }
