@@ -128,7 +128,7 @@ namespace Isis {
     connect(load, SIGNAL(clicked()),
         this, SLOT(load()));
     m_tie = new QPushButton("&Modify Point");
-    m_tie->setAutoDefault(false);
+    m_tie->setAutoDefault(true);
     m_tie->setToolTip("Modify Selected Point");
     m_tie->setWhatsThis("<b>Function: </b> Opens the tie tool to modify the \
                          selected point from the list.  This option is only \
@@ -173,7 +173,7 @@ namespace Isis {
     connect(m_setApriori, SIGNAL(clicked()), this, SLOT(aprioriDialog()));
 
     m_filter = new QPushButton("&Filter");
-    m_filter->setAutoDefault(true);
+    m_filter->setAutoDefault(false);
     m_filter->setToolTip("Filter Current List");
     m_filter->setWhatsThis("<b>Function: </b> Filters the current list by user \
                             specifications made in the selected filter. \
