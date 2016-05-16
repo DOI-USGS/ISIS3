@@ -32,7 +32,10 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  ProcessBySpectra procSpectra; 
+  ProcessBySpectra procSpectra;
+
+
+  procSpectra.SetOutputRequirements(Isis::SpatialMatch);
 
   Cube *inCube = procSpectra.SetInputCube("FROM");
 

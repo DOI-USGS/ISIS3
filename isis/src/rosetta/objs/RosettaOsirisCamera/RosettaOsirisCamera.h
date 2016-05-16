@@ -1,5 +1,5 @@
-#ifndef OsirisCamera_h
-#define OsirisCamera_h
+#ifndef RosettaOsirisCamera_h
+#define RosettaOsirisCamera_h
 /**
  * @file
  *
@@ -34,13 +34,13 @@ namespace Isis {
    * @internal 
    *  
    */
-  class OsirisCamera : public FramingCamera {
+  class RosettaOsirisCamera : public FramingCamera {
     public:
       //! Create a OsirisNacCamera object
-      OsirisCamera(Cube &cube);
+      RosettaOsirisCamera(Cube &cube);
 
       //! Destroys the NewHorizonsLorriCamera object
-      ~OsirisCamera() {};
+      ~RosettaOsirisCamera() {};
 
     /** 
      * Reimplemented from FrameCamera 

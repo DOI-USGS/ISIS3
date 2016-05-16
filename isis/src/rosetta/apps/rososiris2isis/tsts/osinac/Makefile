@@ -1,4 +1,4 @@
-APPNAME = osiris2isis
+APPNAME = rososiris2isis
 
 include $(ISISROOT)/make/isismake.tsts
 

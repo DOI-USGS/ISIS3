@@ -44,30 +44,232 @@ class Functor5 {
 
 void IsisMain() {
   Preference::Preferences(true);
+  Cube *icube;
   ProcessByBrick p;
 
   cout << "Testing Functors\n";
   {
     cout << "Functor2 - ProcessCube One Thread\n";
-    Cube *icube = p.SetInputCube("FROM");
+    //No cubes entered...will fail
+    try{
+    p.VerifyCubes(ProcessByBrick::InPlace);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "1:" + exMsg.toStdString() << endl;
+
+    }
+
+    //InputCubes.size() !=1, will fail
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutput);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "2:" + exMsg.toStdString() << endl;
+
+    }
+
+
+
+
+    icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+
+
+    //Input cube set, but output cube unset.  Will fail
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutput);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "3:" + exMsg.toStdString() << endl;
+
+    }
+
+    p.EndProcess();
+
+
+
+
+    icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->sampleCount()+10, icube->lineCount(),
+                    icube->bandCount());
+
+
+    //Samples don't match
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutput);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "4:" + exMsg.toStdString() << endl;
+
+    }
+
+    p.EndProcess();
+
+    icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount()+10,
+                    icube->bandCount());
+
+
+    //Lines don't match
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutput);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "5:" + exMsg.toStdString() << endl;
+
+    }
+
+    p.EndProcess();
+
+    icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(),
+                    icube->bandCount()+10);
+
+
+    //Bands don't match
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutput);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "6:" + exMsg.toStdString() << endl;
+
+    }
+
+    p.EndProcess();
+
+    icube = p.SetInputCube("FROM");
     p.SetBrickSize(10, 10, 2);
     p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(),
                     icube->bandCount());
+    p.VerifyCubes(ProcessByBrick::InputOutput);  //Everything is correct
+
+
+
+
+
+    icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(),
+                    icube->bandCount());
+
+
+
+
+
+
+    try{
+    p.VerifyCubes(ProcessByBrick::InPlace);  //Will fail
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "7:" + exMsg.toStdString() << endl;
+
+    }
+
+
+    p.EndProcess();
     Functor2 functor;
+    icube = p.SetInputCube("FROM");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(),
+                    icube->bandCount());
+
     p.ProcessCube(functor, false);
+
     p.EndProcess();
     cout << "\n";
   }
 
   {
     cout << "Functor3 - ProcessCubes One Thread\n";
+
+
+    // No input cubes specified, will fail
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutputList);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "8:" + exMsg.toStdString() << endl;
+
+    }
+
+    p.EndProcess();
+
     Cube *icube = p.SetInputCube("FROM");
     p.SetInputCube("FROM2");
     p.SetBrickSize(10, 10, 2);
-    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(), icube->bandCount());
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount()+10, icube->bandCount());
+    p.SetOutputCube("TO2", icube->sampleCount(), icube->lineCount(), icube->bandCount());
+  }
+  {
+
+    //Output[0] cube does not have the same number of lines as input[0] cube
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutputList);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "9:" + exMsg.toStdString() << endl;
+
+    }
+
+    p.EndProcess();
+
+
+  }
+  {
+
+    Cube *icube = p.SetInputCube("FROM");
+    p.SetInputCube("FROM2");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(), icube->bandCount()+10);
     p.SetOutputCube("TO2", icube->sampleCount(), icube->lineCount(), icube->bandCount());
 
+
+    //Output[0] cube does not have the same number of bands as input[0] cube
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutputList);
+    }
+    catch(Isis::IException &ex){
+
+        QString exMsg = ex.toString();
+        cout << "10:" + exMsg.toStdString() << endl;
+
+    }
+
+
+    p.EndProcess();
+  }
+
+  {
+
     Functor3 functor;
+    Cube *icube = p.SetInputCube("FROM");
+    p.SetInputCube("FROM2");
+    p.SetBrickSize(10, 10, 2);
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(), icube->bandCount()+10);
+    p.SetOutputCube("TO2", icube->sampleCount(), icube->lineCount(), icube->bandCount());
+
+
     p.ProcessCubes(functor, false);
     p.EndProcess();
     cout << "\n";
@@ -80,7 +282,7 @@ void IsisMain() {
     p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(),
                     icube->bandCount());
     Functor4 functor;
-    p.ProcessCube(functor);
+    p.ProcessCube(functor,false);
     p.EndProcess();
     Cube cube;
     cube.open(Application::GetUserInterface().GetFileName("TO"));
@@ -98,7 +300,20 @@ void IsisMain() {
     p.SetBrickSize(10, 10, 2);
     p.SetInputCube(cube);
     Functor5 functor;
-    p.ProcessCubeInPlace(functor);
+    try{
+    p.VerifyCubes(ProcessByBrick::InputOutputList);
+    }
+    catch(Isis::IException &ex){
+
+        QString msg = ex.toString();
+        cout << msg.toStdString() << endl;
+
+    }
+
+
+    p.VerifyCubes(ProcessByBrick::InPlace);
+
+    p.ProcessCubeInPlace(functor,false);
     p.EndProcess();
     cube->close();
     cube = new Cube;

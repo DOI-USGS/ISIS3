@@ -60,6 +60,10 @@
        a comment tag that is not closed off.  Also a new test pvlFix to test this
        change.  #Ref 2344.
     </change>
+    <change name="Jesse Mapel" date="2016-04-26">
+      Changed documentation to have the correct link to the Planetary Science Data
+      Dictionary Document.  Fixes #3867
+    </change>
 
 
   </history>
@@ -75,12 +79,8 @@
           Planetary Science Data Dictionary Document
         </title>
         <source>
-          <filename>
-            PSDDmain_1r71.pdf
-          </filename>
-          <path>
-            http://pds.jpl.nasa.gov/documents/psdd/
-          </path>
+          <filename>PSDDmain_1r71.pdf</filename>
+          <path>http://pds.jpl.nasa.gov/documents/psdd/</path>
         </source>
         <author>
           Jet Propulsion Laboratory

@@ -61,19 +61,21 @@ namespace Isis {
    * @author 2002-04-11 Kris Becker
    *
    * @internal
-   *  @history 2003-02-11 Jeff Anderson - Wrote unitTest and documentation
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
-   *  @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2005-05-18 Jeff Anderson - Changed long to int for 64-bit port
-   *  @history 2008-01-09 Jeannie Walldren - Added new unitTests
-   *                      and new method, StringToPixel()
-   *  @history 2008-01-10 Jeannie Walldren - Added new unitTests
-   *                      and modified StringToPixel() to allow
-   *                      the user to enter any legal and unique
-   *                      shortened version of special pixels.
-   *
+   *   @history 2003-02-11 Jeff Anderson - Wrote unitTest and documentation
+   *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
+   *                           isis.astrogeology...
+   *   @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2005-05-18 Jeff Anderson - Changed long to int for 64-bit port
+   *   @history 2008-01-09 Jeannie Walldren - Added new unitTests
+   *                           and new method, StringToPixel()
+   *   @history 2008-01-10 Jeannie Walldren - Added new unitTests
+   *                           and modified StringToPixel() to allow
+   *                           the user to enter any legal and unique
+   *                           shortened version of special pixels.
+   *   @history 2016-04-20 Jeannie Backer - Added Janet Barret's changes
+   *                           IVALID_MAX4 definition to handle SignedInteger
+   *                           imports.
    *
    *  @todo 2005-02-15 Kris Becker - finish class documentation
    *
@@ -95,26 +97,26 @@ namespace Isis {
 
   // Define 8-byte special pixel values for IEEE floating point
   const DBL_UNION IVALID_MIN8 = { DBL_INIT(0xFFEFFFFF, 0xFFFFFFFA) };
-  const double VALID_MIN8          = IVALID_MIN8.d;
-  const double ValidMinimum        = IVALID_MIN8.d; /**<The minimum valid double
-                                                        value for Isis pixels.
-                                                        All special pixels have
-                                                        a value lower than this
-                                                        minimum.*/
+  const double VALID_MIN8     = IVALID_MIN8.d;
+  const double ValidMinimum   = IVALID_MIN8.d; /**< The minimum valid double
+                                                    value for Isis pixels.
+                                                    All special pixels have
+                                                    a value lower than this
+                                                    minimum.*/
 
   const DBL_UNION INULL8 = { DBL_INIT(0xFFEFFFFF, 0xFFFFFFFB) };
-  const double NULL8               = INULL8.d;
-  const double Null                = INULL8.d;  //!<Value for an Isis Null pixel
+  const double NULL8     = INULL8.d;
+  const double Null      = INULL8.d;  //!<Value for an Isis Null pixel
 
   const DBL_UNION ILOW_REPR_SAT8 = { DBL_INIT(0xFFEFFFFF, 0xFFFFFFFC) };
-  const double LOW_REPR_SAT8       = ILOW_REPR_SAT8.d;
-  const double Lrs                 = ILOW_REPR_SAT8.d;  /**<Value for an Isis
+  const double LOW_REPR_SAT8     = ILOW_REPR_SAT8.d;
+  const double Lrs               = ILOW_REPR_SAT8.d;  /**< Value for an Isis
                                                             Low Representation
                                                             Saturation pixel.*/
 
   const DBL_UNION ILOW_INSTR_SAT8 = { DBL_INIT(0xFFEFFFFF, 0xFFFFFFFD) };
-  const double LOW_INSTR_SAT8      = ILOW_INSTR_SAT8.d;
-  const double Lis                 = ILOW_INSTR_SAT8.d;  /**<Value for an Isis
+  const double LOW_INSTR_SAT8     = ILOW_INSTR_SAT8.d;
+  const double Lis                = ILOW_INSTR_SAT8.d;  /**< Value for an Isis
                                                              Low Instrument
                                                              Saturation pixel.*/
 
@@ -130,7 +132,7 @@ namespace Isis {
                                                              High Representation
                                                              Saturation pixel.*/
 
-  const double VALID_MAX8 = DBL_MAX;
+  const double VALID_MAX8   = DBL_MAX;
   const double ValidMaximum = DBL_MAX;  /**<The maximum valid double value for
                                             Isis pixels.*/
 
@@ -138,25 +140,26 @@ namespace Isis {
 #undef DBL_INIT
 
   // Define 4-byte special pixel values for IEEE floating point
-  const int  IVALID_MIN4      = 0xFF7FFFFA;
-  const float VALID_MIN4       = (*((const float *) &IVALID_MIN4));
+  const int  IVALID_MIN4 = 0xFF7FFFFA;
+  const float VALID_MIN4 = (*((const float *) &IVALID_MIN4));
 
-  const int  INULL4           =         0xFF7FFFFB;
-  const float NULL4            = (*((const float *) &INULL4));
+  const int  INULL4 = 0xFF7FFFFB;
+  const float NULL4 = (*((const float *) &INULL4));
 
-  const int  ILOW_REPR_SAT4   =         0xFF7FFFFC;
-  const float LOW_REPR_SAT4    = (*((const float *) &ILOW_REPR_SAT4));
+  const int  ILOW_REPR_SAT4 = 0xFF7FFFFC;
+  const float LOW_REPR_SAT4 = (*((const float *) &ILOW_REPR_SAT4));
 
-  const int  ILOW_INSTR_SAT4  =         0xFF7FFFFD;
-  const float LOW_INSTR_SAT4   = (*((const float *) &ILOW_INSTR_SAT4));
+  const int  ILOW_INSTR_SAT4 = 0xFF7FFFFD;
+  const float LOW_INSTR_SAT4 = (*((const float *) &ILOW_INSTR_SAT4));
 
-  const int  IHIGH_INSTR_SAT4 =         0xFF7FFFFE;
-  const float HIGH_INSTR_SAT4  = (*((const float *) &IHIGH_INSTR_SAT4));
+  const int  IHIGH_INSTR_SAT4 = 0xFF7FFFFE;
+  const float HIGH_INSTR_SAT4 = (*((const float *) &IHIGH_INSTR_SAT4));
 
-  const int  IHIGH_REPR_SAT4  =         0xFF7FFFFF;
-  const float HIGH_REPR_SAT4   = (*((const float *) &IHIGH_REPR_SAT4));
+  const int  IHIGH_REPR_SAT4 = 0xFF7FFFFF;
+  const float HIGH_REPR_SAT4 = (*((const float *) &IHIGH_REPR_SAT4));
 
-  const float VALID_MAX4       = FLT_MAX;
+  const float VALID_MAX4 = FLT_MAX;
+  const int IVALID_MAX4  = (*((const int *) &VALID_MAX4));
 
   // 2-byte signed special pixel values
   const short VALID_MIN2     = ((short)(-32752));
@@ -168,22 +171,22 @@ namespace Isis {
   const short VALID_MAX2      = ((short)   32767);
 
   // 2-byte unsigned special pixel values
-  const unsigned short VALID_MINU2     = ((unsigned short)       3);
-  const unsigned short NULLU2          = ((unsigned short)       0);
-  const unsigned short LOW_REPR_SATU2  = ((unsigned short)       1);
-  const unsigned short LOW_INSTR_SATU2 = ((unsigned short)       2);
+  const unsigned short VALID_MINU2      = ((unsigned short)       3);
+  const unsigned short NULLU2           = ((unsigned short)       0);
+  const unsigned short LOW_REPR_SATU2   = ((unsigned short)       1);
+  const unsigned short LOW_INSTR_SATU2  = ((unsigned short)       2);
   const unsigned short HIGH_INSTR_SATU2 = ((unsigned short)   65534);
   const unsigned short HIGH_REPR_SATU2  = ((unsigned short)   65535);
   const unsigned short VALID_MAXU2      = ((unsigned short)   65522);
 
   // 1-byte special pixel values
-  const unsigned char VALID_MIN1  = ((unsigned char) 1);
-  const unsigned char NULL1       = ((unsigned char) 0);
-  const unsigned char LOW_REPR_SAT1 = ((unsigned char) 0);
-  const unsigned char LOW_INSTR_SAT1 = ((unsigned char) 0);
+  const unsigned char VALID_MIN1      = ((unsigned char) 1);
+  const unsigned char NULL1           = ((unsigned char) 0);
+  const unsigned char LOW_REPR_SAT1   = ((unsigned char) 0);
+  const unsigned char LOW_INSTR_SAT1  = ((unsigned char) 0);
   const unsigned char HIGH_INSTR_SAT1 = ((unsigned char) 255);
-  const unsigned char HIGH_REPR_SAT1 = ((unsigned char) 255);
-  const unsigned char VALID_MAX1    = ((unsigned char) 254);
+  const unsigned char HIGH_REPR_SAT1  = ((unsigned char) 255);
+  const unsigned char VALID_MAX1      = ((unsigned char) 254);
 
   /**
    * Returns if the input pixel is special. Not special implies it is valid to
@@ -196,6 +199,7 @@ namespace Isis {
   inline bool IsSpecial(const double d) {
     return (d < VALID_MIN8);
   }
+
 
   /**
    * Returns if the input pixel is special. Not special implies it is valid to
@@ -210,6 +214,7 @@ namespace Isis {
     return (f < VALID_MIN4);
   }
 
+
   /**
    * Returns if the input pixel is valid
    *
@@ -220,6 +225,7 @@ namespace Isis {
   inline bool IsValidPixel(const double d) {
     return (d >= VALID_MIN8);
   }
+
 
   /**
    * Returns if the input pixel is null
@@ -232,6 +238,7 @@ namespace Isis {
     return (d == NULL8);
   }
 
+
   /**
    * Returns if the input pixel is one of the high saturation types
    *
@@ -242,6 +249,7 @@ namespace Isis {
   inline bool IsHighPixel(const double d) {
     return (d == HIGH_REPR_SAT8) || (d == HIGH_INSTR_SAT8);
   }
+
 
   /**
    * Returns if the input pixel is one of the low saturation types
@@ -254,6 +262,7 @@ namespace Isis {
     return (d == LOW_REPR_SAT8) || (d == LOW_INSTR_SAT8);
   }
 
+
   /**
    * Returns if the input pixel is high representation saturation
    *
@@ -264,6 +273,7 @@ namespace Isis {
   inline bool IsHrsPixel(const double d) {
     return (d == HIGH_REPR_SAT8);
   }
+
 
   /**
    * Returns if the input pixel is high instrument saturation
@@ -276,6 +286,7 @@ namespace Isis {
     return (d == HIGH_INSTR_SAT8);
   }
 
+
   /**
    * Returns if the input pixel is low instrument saturation
    *
@@ -287,6 +298,7 @@ namespace Isis {
     return (d == LOW_INSTR_SAT8);
   }
 
+
   /**
    * Returns if the input pixel is low representation saturation
    *
@@ -297,6 +309,7 @@ namespace Isis {
   inline bool IsLrsPixel(const double d) {
     return (d == LOW_REPR_SAT8);
   }
+
 
   /**
    * Converts float pixels to double pixels with special pixel translations
@@ -321,6 +334,7 @@ namespace Isis {
       return ((double) t);
     }
   }
+
 
   /**
    * Converts double to float with special pixel translations and
@@ -347,6 +361,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Takes a double pixel value and returns the name of the pixel type as a
    * string
@@ -368,6 +383,8 @@ namespace Isis {
     QString result;
     return result.setNum(d, 'g', 8);
   }
+
+
   /**
    * Takes the name of the pixel type as a string and returns a
    * double pixel value.
