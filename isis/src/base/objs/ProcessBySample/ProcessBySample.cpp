@@ -96,9 +96,12 @@ namespace Isis {
    * @throws Isis::iException::Message
    *
    */
+
   void ProcessBySample::StartProcess(void funct(Isis::Buffer &inout)) {
-    SetBrickSizesForProcessCubeInPlace();
-    ProcessByBrick::StartProcess(funct);
+      VerifyCubes(InPlace);
+      SetBricks(InPlace);
+    //SetBrickSizesForProcessCubeInPlace();
+      ProcessByBrick::StartProcess(funct);
   }
 
 
@@ -114,10 +117,14 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
+
   void ProcessBySample::StartProcess(void
                                      funct(Isis::Buffer &in, Isis::Buffer &out)) {
-    SetBrickSizesForProcessCube();
-    ProcessByBrick::StartProcess(funct);
+
+      VerifyCubes(InputOutput);
+      SetBricks(InputOutput);
+    //SetBrickSizesForProcessCube();
+      ProcessByBrick::StartProcess(funct);
   }
 
 
@@ -132,96 +139,55 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
+
   void ProcessBySample::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                                      std::vector<Isis::Buffer *> &out)) {
-    SetBrickSizesForProcessCubes();
+
+     VerifyCubes(InputOutputList) ;
+     SetBricks(InputOutputList);
+    //SetBrickSizesForProcessCubes();
     ProcessByBrick::StartProcess(funct);
   }
 
+  void ProcessBySample::SetBricks(IOCubes cn){
 
-  /**
-   * This is a helper method for StartProcess() and ProcessCubeInPlace().
-   */
-  void ProcessBySample::SetBrickSizesForProcessCubeInPlace() {
-    // Error checks
-    if((InputCubes.size() + OutputCubes.size()) > 1) {
-      string m = "You can only specify exactly one input or output cube";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-    else if((InputCubes.size() + OutputCubes.size()) == 0) {
-      string m = "You haven't specified an input or output cube";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+      switch(cn){
 
-    // Determine if we have an input or output
-    if(InputCubes.size() == 1) SetBrickSize(1, InputCubes[0]->lineCount(), 1);
-    else SetBrickSize(1, OutputCubes[0]->lineCount(), 1);
-  }
+        case InPlace:
+          if(InputCubes.size() == 1) SetBrickSize(1, InputCubes[0]->lineCount(), 1);
+          else SetBrickSize(1, OutputCubes[0]->lineCount(), 1);
+
+          break;
+
+        case InputOutput:
+
+          SetInputBrickSize(1, InputCubes[0]->lineCount(), 1);
+          SetOutputBrickSize(1, OutputCubes[0]->lineCount(), 1);
 
 
-  /**
-   * This is a helper method for StartProcess() and ProcessCube().
-   */
-  void ProcessBySample::SetBrickSizesForProcessCube() {
-    // Error checks ... there must be one input and output
-    if(InputCubes.size() != 1) {
-      string m = "You must specify exactly one input cube";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-    else if(OutputCubes.size() != 1) {
-      string m = "You must specify exactly one output cube";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-
-    // The samples in the input and output must match
-    if(InputCubes[0]->sampleCount() != OutputCubes[0]->sampleCount()) {
-      string m = "The number of samples in the input and output cubes ";
-      m += "must match";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-
-    // The bands in the input and output must match
-    if(InputCubes[0]->bandCount() != OutputCubes[0]->bandCount()) {
-      string m = "The number of bands in the input and output cubes ";
-      m += "must match";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
-
-    SetInputBrickSize(1, InputCubes[0]->lineCount(), 1);
-    SetOutputBrickSize(1, OutputCubes[0]->lineCount(), 1);
-  }
 
 
-  /**
-   * This is a helper method for StartProcess() and ProcessCubes().
-   */
-  void ProcessBySample::SetBrickSizesForProcessCubes() {
-    // Make sure we had an image
-    if(InputCubes.size() + OutputCubes.size() < 1) {
-      string m = "You have not specified any input or output cubes";
-      throw IException(IException::Programmer, m, _FILEINFO_);
-    }
+          break;
 
-    // Make sure all the output images have the same number of bands as
-    // the first input/output cube
-    for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      if(OutputCubes[i]->sampleCount() != OutputCubes[0]->sampleCount()) {
-        string m = "All output cubes must have the same number of samples ";
-        m += "as the first input cube or output cube";
-        throw IException(IException::Programmer, m, _FILEINFO_);
+        case InputOutputList:
+
+          for(unsigned int i = 0; i < InputCubes.size(); i++) {
+            SetInputBrickSize(1, InputCubes[i]->lineCount(), 1, i + 1);
+          }
+          for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+            SetOutputBrickSize(1, OutputCubes[i]->lineCount(), 1, i + 1);
+          }
+
+          break;
+
+
+
       }
-      if(OutputCubes[i]->bandCount() != OutputCubes[0]->bandCount()) {
-        string m = "All output cubes must have the same number of bands ";
-        m += "as the first input cube or output cube";
-        throw IException(IException::Programmer, m, _FILEINFO_);
-      }
-    }
 
-    for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      SetInputBrickSize(1, InputCubes[i]->lineCount(), 1, i + 1);
-    }
-    for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      SetOutputBrickSize(1, OutputCubes[i]->lineCount(), 1, i + 1);
-    }
+
   }
+
+
+
+
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="osiris2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="rososiris2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Import PDS formatted Rosetta OSIRIS image into an ISIS cube
@@ -257,6 +257,10 @@
     <change name="Kristin Berry" date="2016-03-29">
       Update to work with WAC images, in addition to NAC. Significantly 
       expanded documentation. Fixes #1900.
+    </change>
+    <change name="Kristin Berry" date="2016-04-25">
+      Renamed application to rososiris2isis to disambiguate from osiris-rex
+      mission utilities. 
     </change>
   </history>
 

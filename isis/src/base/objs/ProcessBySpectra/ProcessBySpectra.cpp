@@ -95,7 +95,11 @@ namespace Isis {
    * @throws Isis::iException::Message
    */
   void ProcessBySpectra::StartProcess(void funct(Isis::Buffer &in)) {
-    SetBrickSizesForProcessCubeInPlace();
+
+
+    VerifyCubes(InPlace);
+    SetBricks(InPlace);
+    //SetBrickSizesForProcessCubeInPlace();
     ProcessByBrick::StartProcess(funct);
   }
 
@@ -115,7 +119,10 @@ namespace Isis {
   void ProcessBySpectra::StartProcess(void
                                       funct(Isis::Buffer &in,
                                             Isis::Buffer &out)) {
-    SetBrickSizesForProcessCube();
+
+      VerifyCubes(InputOutput);
+      SetBricks(InputOutput);
+    //SetBrickSizesForProcessCube();
     ProcessByBrick::StartProcess(funct);
   }
 
@@ -133,8 +140,10 @@ namespace Isis {
    */
   void ProcessBySpectra::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                                       std::vector<Isis::Buffer *> &out)) {
-    SetBrickSizesForProcessCubes();
-    ProcessByBrick::StartProcess(funct);
+    //SetBrickSizesForProcessCubes();
+      VerifyCubes(InputOutputList);
+      SetBricks(InputOutputList);
+      ProcessByBrick::StartProcess(funct);
   }
 
 
@@ -156,9 +165,101 @@ namespace Isis {
   }
 
 
+  void ProcessBySpectra::SetBricks(IOCubes cn){
+
+
+
+
+      switch(cn){
+
+        case InPlace:
+            int ns, nl, nb;
+            if(InputCubes.size() == 1) {
+
+              ns = InputCubes[0]->sampleCount();
+              nl = InputCubes[0]->lineCount();
+              nb = InputCubes[0]->bandCount();
+            }
+            else {
+              ns = OutputCubes[0]->sampleCount();
+              nl = OutputCubes[0]->lineCount();
+              nb = OutputCubes[0]->bandCount();
+            }
+
+            if(Type() == PerPixel) SetBrickSize(1, 1, nb);
+
+            else if(Type() == ByLine) SetBrickSize(ns, 1, nb);
+
+            else SetBrickSize(1, nl, nb);
+
+          break;
+
+        case InputOutput:
+
+          if(Type() == PerPixel) {
+            SetInputBrickSize(1, 1, InputCubes[0]->bandCount());
+            SetOutputBrickSize(1, 1, OutputCubes[0]->bandCount());
+          }
+          else if(Type() == ByLine) {
+            SetInputBrickSize(InputCubes[0]->sampleCount(), 1,
+                              InputCubes[0]->bandCount());
+            SetOutputBrickSize(OutputCubes[0]->sampleCount(), 1,
+                               OutputCubes[0]->bandCount());
+          }
+          else {
+            SetInputBrickSize(1, InputCubes[0]->lineCount(),
+                              InputCubes[0]->bandCount());
+            SetOutputBrickSize(1, OutputCubes[0]->lineCount(),
+                               OutputCubes[0]->bandCount());
+          }
+
+          break;
+
+
+        case InputOutputList:
+
+          if(Type() == PerPixel) {
+            for(unsigned int i = 0; i < InputCubes.size(); i++) {
+              SetInputBrickSize(1, 1, InputCubes[i]->bandCount(), i + 1);
+            }
+            for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+              SetOutputBrickSize(1, 1, OutputCubes[i]->bandCount(), i + 1);
+            }
+          }
+          else if(Type() == ByLine) {
+            for(unsigned int i = 0; i < InputCubes.size(); i++) {
+              SetInputBrickSize(InputCubes[i]->sampleCount(), 1,
+                                InputCubes[i]->bandCount(), i + 1);
+            }
+            for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+              SetOutputBrickSize(OutputCubes[i]->sampleCount(), 1,
+                                 OutputCubes[i]->bandCount(), i + 1);
+            }
+          }
+          else {
+            for(unsigned int i = 0; i < InputCubes.size(); i++) {
+              SetInputBrickSize(1, InputCubes[i]->lineCount(),
+                                InputCubes[i]->bandCount(), i + 1);
+            }
+            for(unsigned int i = 0; i < OutputCubes.size(); i++) {
+              SetOutputBrickSize(1, OutputCubes[i]->lineCount(),
+                                 OutputCubes[i]->bandCount(), i + 1);
+            }
+          }
+
+          break;
+
+        }
+
+
+  }
+
+
   /**
    * This is a helper method for StartProcess() and ProcessCubeInPlace().
    */
+
+  /*
   void ProcessBySpectra::SetBrickSizesForProcessCubeInPlace() {
     // Error checks
     if ((InputCubes.size() + OutputCubes.size()) > 1) {
@@ -186,10 +287,11 @@ namespace Isis {
     else SetBrickSize(1, nl, nb);
   }
 
-
+*/
   /**
    * This is a helper method for StartProcess() and ProcessCube().
    */
+  /*
   void ProcessBySpectra::SetBrickSizesForProcessCube() {
     // Error checks ... there must be one input and output
     if (InputCubes.size() != 1) {
@@ -219,10 +321,11 @@ namespace Isis {
     }
   }
 
-
+*/
   /**
    * This is a helper method for StartProcess() and ProcessCubes().
    */
+  /*
   void ProcessBySpectra::SetBrickSizesForProcessCubes() {
     if (Type() == PerPixel) {
       for (unsigned int i = 0; i < InputCubes.size(); i++) {
@@ -253,4 +356,7 @@ namespace Isis {
       }
     }
   }
+  */
+
+
 }

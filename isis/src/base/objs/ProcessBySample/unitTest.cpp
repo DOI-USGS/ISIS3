@@ -4,43 +4,129 @@
 #include <string>
 
 using namespace std;
+
 void oneInput(Isis::Buffer &b);
 void oneOutput(Isis::Buffer &b);
 void oneInAndOut(Isis::Buffer &ob, Isis::Buffer &ib);
 void twoInAndOut(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob);
 
+
+class InPlaceFunctor{
+public:
+    void operator()(Isis::Buffer &in) const{
+
+
+        oneInput(in);
+    }
+
+
+};
+
+class InputOutputFunctor{
+public:
+    void operator()(Isis::Buffer &in, Isis::Buffer &out) const {
+
+
+
+
+        oneInAndOut(in,out);
+    }
+
+
+
+
+
+};
+
+
+class InputOutputListFunctor{
+public:
+    void operator()(vector<Isis::Buffer *> &ib, vector<Isis::Buffer *> &ob) const {
+
+
+
+        twoInAndOut(ib,ob);
+
+    }
+
+
+
+};
+
+
 void IsisMain() {
 
-  Isis::Preference::Preferences(true);
 
-  cout << "Testing Isis::ProcessBySample Class ... " << endl;
-  Isis::ProcessBySample p;
+    Isis::Preference::Preferences(true);
+    Isis::ProcessBySample p;
 
-  p.SetInputCube("FROM");
-  p.StartProcess(oneInput);
-  p.EndProcess();
+    cout << "Testing StartProcess routines that accept processing functions:" << endl;
 
-  p.SetOutputCube("TO", 10, 20, 3);
-  p.StartProcess(oneOutput);
-  p.EndProcess();
 
-  p.SetInputCube("FROM");
-  p.SetOutputCube("TO");
-  p.StartProcess(oneInAndOut);
-  p.EndProcess();
+    p.SetInputCube("FROM");
+    p.StartProcess(oneInput);
+    p.EndProcess();
 
-  p.SetInputCube("FROM");
-  p.SetInputCube("FROM2");
-  p.SetOutputCube("TO");
-  p.SetOutputCube("TO2");
-  p.StartProcess(twoInAndOut);
-  p.EndProcess();
 
-  Isis::Cube cube;
-  cube.open("$temporary/isisProcessBySample_01");
-  cube.close(true);
-  cube.open("$temporary/isisProcessBySample_02");
-  cube.close(true);
+
+
+    p.SetOutputCube("TO", 10, 20, 3);
+    p.StartProcess(oneOutput);
+    p.EndProcess();
+
+    p.SetInputCube("FROM");
+    p.SetOutputCube("TO");
+    p.StartProcess(oneInAndOut);
+    p.EndProcess();
+
+
+    p.SetInputCube("FROM");
+    p.SetInputCube("FROM2");
+    p.SetOutputCube("TO");
+    p.SetOutputCube("TO2");
+    p.StartProcess(twoInAndOut);
+    p.EndProcess();
+
+
+
+
+
+
+
+
+    cout << "Testing Process routines which accept functors:" << endl;
+
+    InPlaceFunctor inPlace;
+    InputOutputFunctor inputOutput;
+    InputOutputListFunctor inputOutputList;
+
+    p.SetInputCube("FROM");
+    p.ProcessCubeInPlace(inPlace,false);
+    p.EndProcess();
+
+
+    p.SetInputCube("FROM");
+    p.SetOutputCube("TO");
+    p.ProcessCube(inputOutput,false);
+    p.EndProcess();
+
+    p.SetInputCube("FROM");
+    p.SetInputCube("FROM2");
+    p.SetOutputCube("TO");
+    p.SetOutputCube("TO2");
+    p.ProcessCubes(inputOutputList,false);
+    p.EndProcess();
+
+    Isis::Cube cube;
+    cube.open("$temporary/isisProcessBySample_01");
+    cube.close(true);
+    cube.open("$temporary/isisProcessBySample_02");
+    cube.close(true);
+
+
+
+
+
 }
 
 void oneInput(Isis::Buffer &b) {

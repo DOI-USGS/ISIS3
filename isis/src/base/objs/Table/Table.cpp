@@ -152,6 +152,7 @@ namespace Isis {
    * @return @b Table The copied table.
    */
   Table &Table::operator=(const Isis::Table &other) {
+    Clear();
     *((Isis::Blob *)this) = *((Isis::Blob *)&other);
     p_record = other.p_record;
     p_records = other.p_records;

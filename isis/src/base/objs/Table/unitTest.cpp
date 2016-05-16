@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
     // use operator=
     Table t4 = t3;
-    cout << "Testing operator= method..." << endl;
+    cout << "Testing operator= method with empty table..." << endl;
     for (int i = 0; i < t4.Records(); i++) {
       for (int j = 0; j < t4.RecordFields(); j++) {
         if (j == 0) {
@@ -119,6 +119,25 @@ int main(int argc, char *argv[]) {
         }
         else if (j == 2) {
           cout << QString(t4[i][j]) << "\t";
+        }
+      }
+      cout << endl;
+    }
+    cout << endl;
+    
+    Table t5 = t2;
+    t5 = t4;
+    cout << "Testing operator= method with non empty table..." << endl;
+    for (int i = 0; i < t5.Records(); i++) {
+      for (int j = 0; j < t5.RecordFields(); j++) {
+        if (j == 0) {
+          cout << (int) t5[i][j] << "\t";
+        }
+        else if (j == 1 || j == 3) {
+          cout << (double) t5[i][j] << "\t";
+        }
+        else if (j == 2) {
+          cout << QString(t5[i][j]) << "\t";
         }
       }
       cout << endl;

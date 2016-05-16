@@ -294,8 +294,8 @@ namespace Isis {
    * (DataPrefixBytes + DataSuffixByte) / PixelSize is subtracted from the number of samples before 
    * the output file is created. 
    *  
-   * @param labelNumber FITS label number. zero (0) is the first/main label. one (1) is the first 
-   * extension, ... 
+   * @param labelNumber FITS label number. Zero indicates the first/main label, one indicates the 
+   *                    first extension, etc...
    * 
    */
   void ProcessImportFits::setProcessFileStructure(int labelNumber) {
@@ -325,8 +325,7 @@ namespace Isis {
         type = Isis::SignedWord;
         break;
       case 32:
-        msg = "Signed 32 bit integer (int) pixel type is not supported at this time";
-        throw IException(IException::User, msg, _FILEINFO_);
+        type = Isis::SignedInteger;
         break;
       case -32:
         type = Isis::Real;
