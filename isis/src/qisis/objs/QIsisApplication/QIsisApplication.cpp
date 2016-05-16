@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QMessageBox>
 #include <QUrl>
-#include <QWebView>
+#include <QWebEngineView>
 
 #include "FileName.h"
 #include "IException.h"
@@ -61,7 +61,7 @@ namespace Isis {
    * Open a URL in the browser specified by Isis.
    */
   void QIsisApplication::openUrl(QUrl url) {
-     QWebView *view = new QWebView(NULL);
+     QWebEngineView *view = new QWebEngineView(NULL);
      view->setAttribute(Qt::WA_DeleteOnClose);
      view->load(url);
      view->show();

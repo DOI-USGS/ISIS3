@@ -389,6 +389,10 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Widgets.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Widgets.so.5"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Widgets.so.5.6*[^g]"
 
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XcbQpa.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XcbQpa.so.5"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5XcbQpa.so.5.6*[^g]"
+
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Xml.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Xml.so.5"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Xml.so.5.6*[^g]"

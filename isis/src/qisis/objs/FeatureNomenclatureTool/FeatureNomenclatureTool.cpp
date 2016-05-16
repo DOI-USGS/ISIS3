@@ -17,7 +17,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
-#include <QWebView>
+#include <QWebEngineView>
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>
