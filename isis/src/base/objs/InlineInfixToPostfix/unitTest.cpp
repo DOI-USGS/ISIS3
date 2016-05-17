@@ -51,6 +51,6 @@ int main(int argc, char *argv[]) {
     qDebug() << test.findOperatorWrap("")->inputString(); 
   } 
   catch (Isis::IException &e) {
-    qDebug() << e.toString(); 
+    e.print();
   }
 }

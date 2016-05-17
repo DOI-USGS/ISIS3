@@ -59,6 +59,10 @@ typedef QSharedPointer<QDebugLogger> QDebugStream;
  * @author 2015-09-09 Kris Becker 
  * @internal 
  *   @history 2015-09-09 Kris Becker - Original Version 
+ *   @history 2016-04-26 Ian Humphrey - Modified open mode for /dev/null so that QIODevice::Append
+ *                           is not set. This causes a seek to occur (to end of device) on a
+ *                           sequential device (see Qt5 documentation on QIODevice::isSequential),
+ *                           which Qt5 does not allow.
  */
 
 class QDebugLogger {
@@ -131,7 +135,7 @@ class QDebugLogger {
     }
 
     static QDebugStream null() {
-      return ( create( "/dev/null" ) );
+      return ( create( "/dev/null", QIODevice::WriteOnly | QIODevice::Unbuffered ) );
     }
 
 

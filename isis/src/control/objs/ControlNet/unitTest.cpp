@@ -452,8 +452,14 @@ int main() {
   cout << "Testing GetCubeGraphNodes\n";
 
   QList< ControlCubeGraphNode * > graphnodes = net.GetCubeGraphNodes();
+  // Use this to sort the output
+  QList<QString> sortedSNs;
   foreach ( ControlCubeGraphNode * node, graphnodes ) {
-    cout << "    " << node->getSerialNumber() << "\n";
+    sortedSNs.append(node->getSerialNumber());
+  }
+  sort(sortedSNs.begin(), sortedSNs.end());
+  foreach ( QString sn, sortedSNs ) {
+    cout << "    " << sn << "\n";
   }
   
   cout << "\nTesting getGraphNode: "

@@ -233,6 +233,14 @@ namespace Isis {
               *p_error += ". The background request is not allowed";
               break;
 
+            case QNetworkReply::TooManyRedirectsError:
+              *p_error += ". The maximum limit of redirects was reached";
+              break;
+
+            case QNetworkReply::InsecureRedirectError:
+              *p_error += ". A redirect from https to http occurred";
+              break;
+
             case QNetworkReply::ProxyConnectionRefusedError:
               *p_error += ". The proxy server refused the connection";
               break;

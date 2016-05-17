@@ -638,6 +638,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
     int lastProgressValue = future.progressValue();
     // Using a mutex with a timeout isn't as bad of a hack as inheriting QThread
     //   but there ought to be a better way.
+    // Does having a local mutex make sense?
     QMutex sleeper;
     sleeper.lock();
     while (!future.isFinished()) {
@@ -659,6 +660,9 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
       p_progress->CheckStatus();
       isisReportedProgress++;
     }
+
+    // Need to unlock the mutex before it goes out of scope, otherwise Qt5 issues a warning
+    sleeper.unlock();
   }
 
 

@@ -29,9 +29,9 @@ using namespace std;
 int main() {
   try {
     Preference::Preferences(true);
-    qDebug();
+    qDebug() << "";
     qDebug() << "Testing GisTopology...";
-    qDebug();
+    qDebug() << "";
 
     GisTopology *topo = GisTopology::instance();
 
@@ -51,9 +51,9 @@ int main() {
     // since we passed GisTopology::PreserveGeometry, check that GEOSGeometry * is still valid
     if (fromWKT)
       qDebug() << "GEOSGeometry from cube is preserved.";
-    qDebug();
+    qDebug() << "";
     qDebug() << "==============================================================================";
-    qDebug();
+    qDebug() << "";
 
     // get wkb string from previous geometry and use it to create a new geometry from wkb 
     QString wkbFromGeom = topo->wkb(fromWKT, GisTopology::PreserveGeometry);
@@ -64,9 +64,9 @@ int main() {
     QString wkbFromNewGeom = topo->wkb(fromWKB, GisTopology::PreserveGeometry);
     qDebug() << "wkb from original geometry == wkb from new geometry? "
              << (wkbFromGeom == wkbFromNewGeom);
-    qDebug();
+    qDebug() << "";
     qDebug() << "==============================================================================";
-    qDebug();
+    qDebug() << "";
 
     // create GEOSGeometry clone from GisGeometry (same blob)
     // and compare wkb/wkt to previous results
@@ -78,9 +78,9 @@ int main() {
     QString wkbFromClone = topo->wkb(clone, GisTopology::PreserveGeometry);
     qDebug() << "wkb from clone == wkb from original geometry? "
              << (wkbFromClone == wkbFromGeom);
-    qDebug();
+    qDebug() << "";
     qDebug() << "==============================================================================";
-    qDebug();
+    qDebug() << "";
 
     // grab the wkt and destroy the geometry using fromWKT pointer
     QString wktFromGeomToDestroy = topo->wkt(fromWKT, GisTopology::DestroyGeometry);
@@ -97,15 +97,15 @@ int main() {
     // QString crash = topo->wkb(fromWKB, GisTopology::PreserveGeometry);
 
     qDebug() << "==============================================================================";
-    qDebug();
+    qDebug() << "";
    
     // create a "clone" using NULL
     GEOSGeometry *nullClone = topo->clone(NULL);
     if (!nullClone)
       qDebug() << "clone(NULL) gave us a null pointer...";
-    qDebug();
+    qDebug() << "";
     qDebug() << "==============================================================================";
-    qDebug();
+    qDebug() << "";
 
     // Verify we can create prepared geometry
     qDebug() << "Prepared geometry created...";
@@ -115,11 +115,11 @@ int main() {
     topo->preparedGeometry(g);
     //QString wktFromPrep = topo->wkt(prep, GisTopology::PreserveGeometry);
     //QString wkbFromPrep = topo->wkb(prep, GisTopology::PreserveGeometry);
-    qDebug();
+    qDebug() << "";
     qDebug() << "==============================================================================";
 // Once test coverage tool works again, we can see if we need this test for full coverage.
 #if 0
-    qDebug();
+    qDebug() << "";
     //inputFile = "/work/users/kbecker/EW0213634118G.lev1.cub";
     QFile file("unitTest.wkb");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -132,7 +132,7 @@ int main() {
     QString wkb = topo->wkb(fromWKBFile, GisTopology::PreserveGeometry);
     qDebug() << "wkb from file == wkb from geometry? "
              << (wkbFromFile.trimmed() == wkb.trimmed());
-    qDebug();
+    qDebug() << "";
     qDebug() << "==============================================================================";
 #endif
     /* These tests produce ParseExceptions (from libgeos)...
@@ -160,8 +160,8 @@ int main() {
   
   }
   catch (IException &e) {
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
     QString msg = "**************** UNIT TEST FAILED! **************** ";
     IException(e, IException::Unknown, msg, _FILEINFO_).print();
   }
