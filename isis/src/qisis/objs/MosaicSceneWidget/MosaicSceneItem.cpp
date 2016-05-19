@@ -626,7 +626,10 @@ namespace Isis {
         QColor opaqueColor(color());
         opaqueColor.setAlpha(255);
         if (m_image->displayProperties()->getValue(ImageDisplayProperties::ShowOutline).toBool()) {
-          polygon->setPen(opaqueColor);
+          // Make sure the outline is cosmetic (i.e. is always 1 pixel width on screen)
+          QPen pen(opaqueColor);
+          pen.setCosmetic(true);
+          polygon->setPen(pen);
         }
         else {
           polygon->setPen(Qt::NoPen);
