@@ -92,6 +92,10 @@
     <change name="Ian Humphrey and Makayla Shepherd" date="2015-09-01">
       Changed code to accommodate changes in Sensor and Camera relationships.
     </change>
+    <change name="Jeannie Backer" date="2016-04-22">
+      Modified to use the FROM cube labels to set output control net's 'target instead of the TargetName. 
+      Removed check for TargetName since this happens when the ControlNet target is set. References #3892
+    </change>
   </history>
 
   <groups>

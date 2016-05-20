@@ -43,7 +43,6 @@
 #include "TextFile.h"
 #include "Target.h"
 #include "ToolPad.h"
-#include "TProjection.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -240,12 +239,12 @@ namespace Isis {
   }
 
 
-  void MosaicSceneWidget::setProjection(const PvlGroup &mapping) {
+  void MosaicSceneWidget::setProjection(const PvlGroup &mapping, Pvl label) {
     Pvl tmp;
     tmp += mapping;
 
     if (!mapping.hasKeyword("EquatorialRadius")) {
-      PvlGroup radii = TProjection::TargetRadii(mapping["TargetName"]);
+      PvlGroup radii = Target::radiiGroup(label, mapping);
       tmp.findGroup("Mapping") += radii["EquatorialRadius"];
       tmp.findGroup("Mapping") += radii["PolarRadius"];
     }
@@ -253,6 +252,7 @@ namespace Isis {
     setProjection(ProjectionFactory::Create(tmp));
     m_ownProjection = true;
   }
+
 
   /**
    * This method takes ownership of proj
@@ -311,7 +311,7 @@ namespace Isis {
       proj = ProjectionFactory::CreateFromCube(*label);
       return proj->Mapping();
     }
-    catch(IException &) {
+    catch (IException &) {
       Pvl mappingPvl("$base/templates/maps/equirectangular.map");
       PvlGroup &mappingGrp = mappingPvl.findGroup("Mapping");
       mappingGrp += PvlKeyword("LatitudeType", "Planetocentric");
@@ -336,7 +336,7 @@ namespace Isis {
                                  "meters");
 
       }
-      catch(IException &) {
+      catch (IException &) {
         mappingGrp +=
             label->findGroup("Instrument", Pvl::Traverse)["TargetName"];
       }
@@ -379,7 +379,7 @@ namespace Isis {
     m_mapButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     connect(m_mapButton, SIGNAL(clicked()), this, SLOT(configProjectionParameters()));
 
-    if(m_projection) {
+    if (m_projection) {
       PvlKeyword projectionKeyword =
           m_projection->Mapping().findKeyword("ProjectionName");
       QString projName = projectionKeyword[0];
@@ -1207,7 +1207,7 @@ namespace Isis {
 
   MosaicSceneItem *MosaicSceneWidget::addImage(Image *image) {
     if (m_projection == NULL) {
-      setProjection(createInitialProjection(image));
+      setProjection(createInitialProjection(image), *image->cube()->label());
     }
 
     MosaicSceneItem *mosItem = NULL;
@@ -1304,7 +1304,7 @@ namespace Isis {
       try {
         addImage(image);
       }
-      catch(IException &e) {
+      catch (IException &e) {
         e.print();
       }
 
@@ -1623,7 +1623,7 @@ namespace Isis {
       try {
         mosaicSceneItem->reproject();
       }
-      catch(IException &e) {
+      catch (IException &e) {
         IString msg = "The file [";
 
         if (mosaicSceneItem->image())

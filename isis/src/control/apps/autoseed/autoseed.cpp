@@ -14,9 +14,11 @@
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "ID.h"
+#include "IException.h"
 #include "ImageOverlap.h"
 #include "ImageOverlapSet.h"
 #include "ImagePolygon.h"
+#include "IString.h"
 #include "PolygonSeeder.h"
 #include "PolygonSeederFactory.h"
 #include "PolygonTools.h"
@@ -26,10 +28,9 @@
 #include "PvlKeyword.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
+#include "Target.h"
 #include "TProjection.h"
 #include "UniversalGroundMap.h"
-#include "IException.h"
-#include "IString.h"
 
 enum SeedDomain {
   XY,
@@ -55,37 +56,37 @@ void IsisMain() {
 
   // Get the distance from the edge of an image a measure must be
   double pixelsFromEdge = -1.0;
-  if(seedDef.hasKeyword("PixelsFromEdge", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("PixelsFromEdge", Pvl::Traverse)) {
     pixelsFromEdge = seedDef.findKeyword("PixelsFromEdge", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("PixelsFromEdge"))
+    if (unusedDefKeywords.hasKeyword("PixelsFromEdge"))
       unusedDefKeywords.deleteKeyword("PixelsFromEdge");
   }
 
   // Get the Emission range
   double minEmission = 0.0;
   double maxEmission = 180.0;
-  if(seedDef.hasKeyword("MinEmission", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MinEmission", Pvl::Traverse)) {
     minEmission = seedDef.findKeyword("MinEmission", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("MinEmission"))
+    if (unusedDefKeywords.hasKeyword("MinEmission"))
       unusedDefKeywords.deleteKeyword("MinEmission");
   }
-  if(seedDef.hasKeyword("MaxEmission", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MaxEmission", Pvl::Traverse)) {
     maxEmission = seedDef.findKeyword("MaxEmission", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("MaxEmission"))
+    if (unusedDefKeywords.hasKeyword("MaxEmission"))
       unusedDefKeywords.deleteKeyword("MaxEmission");
   }
 
   // Get the Incidence range
   double minIncidence = 0.0;
   double maxIncidence = 180.0;
-  if(seedDef.hasKeyword("MinIncidence", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MinIncidence", Pvl::Traverse)) {
     minIncidence = seedDef.findKeyword("MinIncidence", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("MinIncidence"))
+    if (unusedDefKeywords.hasKeyword("MinIncidence"))
       unusedDefKeywords.deleteKeyword("MinIncidence");
   }
-  if(seedDef.hasKeyword("MaxIncidence", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MaxIncidence", Pvl::Traverse)) {
     maxIncidence = seedDef.findKeyword("MaxIncidence", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("MaxIncidence"))
+    if (unusedDefKeywords.hasKeyword("MaxIncidence"))
       unusedDefKeywords.deleteKeyword("MaxIncidence");
   }
 
@@ -93,44 +94,44 @@ void IsisMain() {
   bool hasDNRestriction = false;
   double minDN = -DBL_MAX;
   double maxDN = DBL_MAX;
-  if(seedDef.hasKeyword("MinDN", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MinDN", Pvl::Traverse)) {
     minDN = seedDef.findKeyword("MinDN", Pvl::Traverse);
     hasDNRestriction = true;
-    if(unusedDefKeywords.hasKeyword("MinDN"))
+    if (unusedDefKeywords.hasKeyword("MinDN"))
       unusedDefKeywords.deleteKeyword("MinDN");
   }
-  if(seedDef.hasKeyword("MaxDN", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MaxDN", Pvl::Traverse)) {
     maxDN = seedDef.findKeyword("MaxDN", Pvl::Traverse);
     hasDNRestriction = true;
-    if(unusedDefKeywords.hasKeyword("MaxDN"))
+    if (unusedDefKeywords.hasKeyword("MaxDN"))
       unusedDefKeywords.deleteKeyword("MaxDN");
   }
 
   // Get the resolution
   double minResolution = 0.0;
   double maxResolution = 0.0;
-  if(seedDef.hasKeyword("MinResolution", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MinResolution", Pvl::Traverse)) {
     minResolution  = seedDef.findKeyword("MinResolution", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("MinResolution"))
+    if (unusedDefKeywords.hasKeyword("MinResolution"))
       unusedDefKeywords.deleteKeyword("MinResolution");
   }
-  if(seedDef.hasKeyword("MaxResolution", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("MaxResolution", Pvl::Traverse)) {
     maxResolution  = seedDef.findKeyword("MaxResolution", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("MaxResolution"))
+    if (unusedDefKeywords.hasKeyword("MaxResolution"))
       unusedDefKeywords.deleteKeyword("MaxResolution");
   }
 
   // Get seed domain for unit conversion, no keyword == XY
   SeedDomain seedDomain = XY;
-  if(seedDef.hasKeyword("SeedDomain", Pvl::Traverse)) {
+  if (seedDef.hasKeyword("SeedDomain", Pvl::Traverse)) {
     IString domain = (QString) seedDef.findKeyword("SeedDomain", Pvl::Traverse);
-    if(unusedDefKeywords.hasKeyword("SeedDomain"))
+    if (unusedDefKeywords.hasKeyword("SeedDomain"))
       unusedDefKeywords.deleteKeyword("SeedDomain");
 
-    if(domain.UpCase() == "SAMPLELINE") {
+    if (domain.UpCase() == "SAMPLELINE") {
       seedDomain = SampleLine;
     }
-    else if(domain.UpCase() != "XY") {
+    else if (domain.UpCase() != "XY") {
       IString msg = "Invalid value provided for keywork [SeedDomain]";
       msg += " Possible values include [XY, SampleLine]";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -144,29 +145,28 @@ void IsisMain() {
   // Construct a Projection for converting between Lon/Lat and X/Y
   // This is used inside the seeding algorithms.
   // Note: Should this be an option to include this in the program?
-  PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
-  QString target = inst["TargetName"];
-  PvlGroup radii = TProjection::TargetRadii(target);
-  Isis::Pvl maplab;
-  maplab.addGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
-  mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
-  mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
-  mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
-  mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += Isis::PvlKeyword("LongitudeDomain", toString(360));
-  mapGroup += Isis::PvlKeyword("CenterLatitude", toString(0));
-  mapGroup += Isis::PvlKeyword("CenterLongitude", toString(0));
-  mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
+  Pvl maplab;
+  maplab.addGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = maplab.findGroup("Mapping");
 
+  // overwrite empty mapping group with TargetName, EquatorialRadius, PolarRadius
+  mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+  // add rest of keywords to new mapping group
+  mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
+  mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGroup += PvlKeyword("LongitudeDomain", "360");
+  mapGroup += PvlKeyword("CenterLatitude", "0.0");
+  mapGroup += PvlKeyword("CenterLongitude", "0.0");
+  mapGroup += PvlKeyword("ProjectionName", "Sinusoidal");
   //PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
 
   TProjection *proj = NULL;
   UniversalGroundMap *ugmap = NULL;
-  if(seedDomain == XY) {
-    proj = (Isis::TProjection *) Isis::ProjectionFactory::Create(maplab);
+  mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+  if (seedDomain == XY) {
+    proj = (TProjection *) ProjectionFactory::Create(maplab);
   }
-  else if(seedDomain == SampleLine) {
+  else if (seedDomain == SampleLine) {
     Cube cube;
     cube.open(serialNumbers.fileName(0));
     ugmap = new UniversalGroundMap(cube);
@@ -174,9 +174,9 @@ void IsisMain() {
 
   // Create the control net to store the points in.
   ControlNet cnet;
-  cnet.SetTarget(target);
+  cnet.SetTarget(maplab);
   cnet.SetNetworkId(ui.GetString("NETWORKID"));
-  cnet.SetUserName(Isis::Application::UserName());
+  cnet.SetUserName(Application::UserName());
   cnet.SetDescription(ui.GetString("DESCRIPTION"));
 
   // Set up an automatic id generator for the point ids
@@ -192,7 +192,7 @@ void IsisMain() {
   int stats_tolerance = 0;
 
   map<QString, UniversalGroundMap *> gMaps;
-  for(int sn = 0; sn < serialNumbers.size(); ++sn) {
+  for (int sn = 0; sn < serialNumbers.size(); ++sn) {
     // Create the UGM for the cube associated with this SN
     Cube cube(serialNumbers.fileName(sn), "r");
     gMaps.insert(std::pair<QString, UniversalGroundMap *>
@@ -209,7 +209,7 @@ void IsisMain() {
   bool previousControlNet = ui.WasEntered("CNET");
 
   vector< geos::geom::Point *> points;
-  if(previousControlNet) {
+  if (previousControlNet) {
 
     ControlNet precnet(ui.GetFileName("CNET"));
 
@@ -218,7 +218,7 @@ void IsisMain() {
     progress.SetMaximumSteps(precnet.GetNumPoints());
     progress.CheckStatus();
 
-    for(int i = 0 ; i < precnet.GetNumPoints(); i ++) {
+    for (int i = 0 ; i < precnet.GetNumPoints(); i ++) {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetRefMeasure();
       QString c = serialNumbers.fileName(cm->GetCubeSerialNumber());
@@ -246,31 +246,31 @@ void IsisMain() {
   int cpIgnoredCount = 0;
   int cmIgnoredCount = 0;
 
-  for(int ov = 0; ov < overlaps.Size(); ++ov) {
+  for (int ov = 0; ov < overlaps.Size(); ++ov) {
     progress.CheckStatus();
 
-    if(overlaps[ov]->Size() == 1) {
+    if (overlaps[ov]->Size() == 1) {
       stats_noOverlap++;
       continue;
     }
 
     // Checks if this overlap was already seeded
-    if(previousControlNet) {
+    if (previousControlNet) {
 
       // Grabs the Multipolygon's Envelope for Lat/Lon comparison
       const geos::geom::MultiPolygon *lonLatPoly = overlaps[ov]->Polygon();
 
       bool overlapSeeded = false;
-      for(unsigned int j = 0; j < lonLatPoly->getNumGeometries()  &&  !overlapSeeded; j ++) {
+      for (unsigned int j = 0; j < lonLatPoly->getNumGeometries()  &&  !overlapSeeded; j ++) {
         const geos::geom::Geometry *lonLatGeom = lonLatPoly->getGeometryN(j);
 
         // Checks if Control Point is in the MultiPolygon using Lon/Lat
-        for(unsigned int i = 0 ; i < points.size()  &&  !overlapSeeded; i ++) {
-          if(lonLatGeom->contains(points[i])) overlapSeeded = true;
+        for (unsigned int i = 0 ; i < points.size()  &&  !overlapSeeded; i ++) {
+          if (lonLatGeom->contains(points[i])) overlapSeeded = true;
         }
       }
 
-      if(overlapSeeded) continue;
+      if (overlapSeeded) continue;
     }
 
     // Seed this overlap with points
@@ -279,26 +279,26 @@ void IsisMain() {
 
     try {
       geos::geom::MultiPolygon *mp = NULL;
-      if(seedDomain == XY) {
+      if (seedDomain == XY) {
         mp = PolygonTools::LatLonToXY(*polygonOverlaps, proj);
       }
-      else if(seedDomain == SampleLine) {
+      else if (seedDomain == SampleLine) {
         mp = PolygonTools::LatLonToSampleLine(*polygonOverlaps, ugmap);
       }
       points = seeder->Seed(mp);
     }
-    catch(IException &e) {
+    catch (IException &e) {
 
-      if(ui.WasEntered("ERRORS")) {
+      if (ui.WasEntered("ERRORS")) {
 
-        if(errorNum > 0) {
+        if (errorNum > 0) {
           errors << endl;
         }
         errorNum ++;
 
         errors << e.toPvl().group(0).findKeyword("Message")[0];
-        for(int serNum = 0; serNum < overlaps[ov]->Size(); serNum++) {
-          if(serNum == 0) {
+        for (int serNum = 0; serNum < overlaps[ov]->Size(); serNum++) {
+          if (serNum == 0) {
             errors << ": ";
           }
           else {
@@ -312,16 +312,16 @@ void IsisMain() {
     }
 
     // No points were seeded in this polygon, so collect some stats and move on
-    if(points.size() == 0) {
+    if (points.size() == 0) {
       stats_tolerance++;
       continue;
     }
 
     vector<geos::geom::Point *> seed;
-    if(seedDomain == XY) {
+    if (seedDomain == XY) {
       // Convert the X/Y points back to Lat/Lon points
-      for(unsigned int pt = 0; pt < points.size(); pt ++) {
-        if(proj->SetCoordinate(points[pt]->getX(), points[pt]->getY())) {
+      for (unsigned int pt = 0; pt < points.size(); pt ++) {
+        if (proj->SetCoordinate(points[pt]->getX(), points[pt]->getY())) {
           seed.push_back(Isis::globalFactory.createPoint(
                            geos::geom::Coordinate(proj->UniversalLongitude(),
                                                   proj->UniversalLatitude())));
@@ -332,10 +332,10 @@ void IsisMain() {
         }
       }
     }
-    else if(seedDomain == SampleLine) {
+    else if (seedDomain == SampleLine) {
       // Convert the Sample/Line points back to Lat/Lon points
-      for(unsigned int pt = 0; pt < points.size(); pt ++) {
-        if(ugmap->SetImage(points[pt]->getX(), points[pt]->getY())) {
+      for (unsigned int pt = 0; pt < points.size(); pt ++) {
+        if (ugmap->SetImage(points[pt]->getX(), points[pt]->getY())) {
           seed.push_back(Isis::globalFactory.createPoint(
                            geos::geom::Coordinate(ugmap->UniversalLongitude(),
                                                   ugmap->UniversalLatitude())));
@@ -348,63 +348,63 @@ void IsisMain() {
     }
 
     //   Create a control point for each seeded point in this overlap
-    for(unsigned int point = 0; point < seed.size(); ++point) {
+    for (unsigned int point = 0; point < seed.size(); ++point) {
 
       ControlPoint *controlpt = new ControlPoint();
       controlpt->SetId(pointId.Next());
       controlpt->SetType(ControlPoint::Free);
 
       // Create a measurment at this point for each image in the overlap area
-      for(int sn = 0; sn < overlaps[ov]->Size(); ++sn) {
+      for (int sn = 0; sn < overlaps[ov]->Size(); ++sn) {
         bool ignore = false;
 
         // Get the line/sample of the lat/lon for this cube
         UniversalGroundMap *gmap = gMaps[(*overlaps[ov])[sn]];
 
-        if(!gmap) {
+        if (!gmap) {
           QString msg = "Unable to create a Universal Ground for Serial Number [";
           msg += (*overlaps[ov])[sn] + "] The associated image is more than ";
           msg += "likely missing from your FROMLIST.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
-        if(!gmap->SetUniversalGround(seed[point]->getY(), seed[point]->getX())) {
+        if (!gmap->SetUniversalGround(seed[point]->getY(), seed[point]->getX())) {
           // This error is more than likely due to floating point roundoff
           continue;
         }
 
         // Check the line/sample with the gmap for image edge
-        if(pixelsFromEdge > gmap->Sample() || pixelsFromEdge > gmap->Line()
+        if (pixelsFromEdge > gmap->Sample() || pixelsFromEdge > gmap->Line()
             || gmap->Sample() > gmap->Camera()->Samples() - pixelsFromEdge
             || gmap->Line() > gmap->Camera()->Lines() - pixelsFromEdge) {
           ignore = true;
         }
 
         // Check the Emission/Incidence Angle with the camera from the gmap
-        if(gmap->Camera()->EmissionAngle() < minEmission ||
+        if (gmap->Camera()->EmissionAngle() < minEmission ||
             gmap->Camera()->EmissionAngle() > maxEmission) {
           ignore = true;
         }
-        if(gmap->Camera()->IncidenceAngle() < minIncidence ||
+        if (gmap->Camera()->IncidenceAngle() < minIncidence ||
             gmap->Camera()->IncidenceAngle() > maxIncidence) {
           ignore = true;
         }
 
         // Check the DNs with the cube, Note: this is costly to do
-        if(hasDNRestriction) {
+        if (hasDNRestriction) {
           Cube cube;
           QString c = serialNumbers.fileName((*overlaps[ov])[sn]);
           cube.open(c);
-          Isis::Brick brick(1, 1, 1, cube.pixelType());
+          Brick brick(1, 1, 1, cube.pixelType());
           brick.SetBasePosition((int)gmap->Camera()->Sample(), (int)gmap->Camera()->Line(), (int)gmap->Camera()->Band());
           cube.read(brick);
-          if(Isis::IsSpecial(brick[0]) || brick[0] > maxDN || brick[0] < minDN) {
+          if (Isis::IsSpecial(brick[0]) || brick[0] > maxDN || brick[0] < minDN) {
             ignore = true;
           }
         }
 
         // Check the Resolution with the camera from the gmap
-        if(gmap->Resolution() < minResolution ||
+        if (gmap->Resolution() < minResolution ||
             (maxResolution > 0.0 && gmap->Resolution() > maxResolution)) {
           ignore = true;
         }
@@ -420,7 +420,7 @@ void IsisMain() {
         measurement->SetCubeSerialNumber((*(overlaps[ov]))[sn]);
         measurement->SetIgnored(ignore);
 
-        if(ignore) {
+        if (ignore) {
           cmIgnoredCount ++;
         }
 
@@ -428,12 +428,12 @@ void IsisMain() {
         measurement = NULL;
       }
 
-      if(controlpt->GetNumValidMeasures() < 2) {
+      if (controlpt->GetNumValidMeasures() < 2) {
         controlpt->SetIgnored(true);
         cpIgnoredCount ++;
       }
 
-      if(controlpt->GetNumMeasures() > 0) {
+      if (controlpt->GetNumMeasures() > 0) {
         cnet.AddPoint(controlpt); //cnet takes ownership
       }
       delete seed[point];
@@ -443,19 +443,19 @@ void IsisMain() {
   } // End of seeding loop
 
   // All done with the UGMs so delete them
-  for(unsigned int sn = 0; sn < gMaps.size(); ++sn) {
+  for (unsigned int sn = 0; sn < gMaps.size(); ++sn) {
     UniversalGroundMap *gmap = gMaps[serialNumbers.serialNumber(sn)];
     delete gmap;
   }
   gMaps.clear();
 
-  for(unsigned int i = 0 ; i < points.size(); i ++) {
+  for (unsigned int i = 0 ; i < points.size(); i ++) {
     delete points[i];
     points[i] = NULL;
   }
 
   //Log the ERRORS file
-  if(ui.WasEntered("ERRORS") && errorNum > 0) {
+  if (ui.WasEntered("ERRORS") && errorNum > 0) {
     QString errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
     errorsfile.open(errorname.toAscii().data());
@@ -464,7 +464,7 @@ void IsisMain() {
   }
 
   // Make sure the control network is not empty
-  if(cnet.GetNumPoints() == 0) {
+  if (cnet.GetNumPoints() == 0) {
     QString msg = "The ouput control network is empty. This is likely due";
     msg += " to the input cubes failing to overlap.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -480,7 +480,7 @@ void IsisMain() {
   Application::Log(pluginInfo);
 
   // inform user of any unused (invalid) keywords found in the def file
-  if(unusedDefKeywords.keywords() != 0) {
+  if (unusedDefKeywords.keywords() != 0) {
     PvlGroup unusedKeywords(unusedDefKeywords);
     unusedKeywords.setName("InvalidKeyordsFoundInDefFile");
     Application::Log(unusedKeywords);
@@ -489,7 +489,7 @@ void IsisMain() {
   // calc # of points and measures for results group in print.prt
   int cpCount = cnet.GetNumPoints();
   int msCount = 0;
-  for(int i = 0; i < cpCount; i++) {
+  for (int i = 0; i < cpCount; i++) {
     msCount += cnet.GetPoint(i)->GetNumMeasures();
   }
 
@@ -507,11 +507,11 @@ void IsisMain() {
 
   Application::Log(resultsGrp);
 
-  if(seedDomain == XY) {
+  if (seedDomain == XY) {
     delete proj;
     proj = NULL;
   }
-  else if(seedDomain == SampleLine) {
+  else if (seedDomain == SampleLine) {
     delete ugmap;
     ugmap = NULL;
   }

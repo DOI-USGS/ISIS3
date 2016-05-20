@@ -17,12 +17,12 @@
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Progress.h"
-#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -471,7 +471,7 @@ namespace Isis {
 
     PvlGroup radii;
     try {
-      radii = TProjection::TargetRadii(network["TargetName"]);
+      radii = Target::radiiGroup(network["TargetName"][0]);
     }
     catch(IException &e) {
       try {
@@ -480,7 +480,7 @@ namespace Isis {
       catch (IException &) {
       }
 
-      QString msg = "The target name is not recognized";
+      QString msg = "Unable to get convert ControlNet Version 1 to Version 2.";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 

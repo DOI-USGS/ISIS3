@@ -235,6 +235,10 @@
     <change name="Kimberly Oyama" date="2013-12-30">
       Replaced the spaces in the point ID with underscores. References #1551.
     </change>
+    <change name="Jeannie Backer" date="2016-04-22">
+      Modified to use the FROM cube labels to set target instead of the TargetName. 
+      Updated the truth data for the cnet test. Added notarget test. References #3892
+    </change>
   </history>
 
   <groups>

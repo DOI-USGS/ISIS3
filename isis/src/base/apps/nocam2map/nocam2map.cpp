@@ -21,9 +21,9 @@
 #include "ProcessRubberSheet.h"
 #include "ProjectionFactory.h"
 #include "Statistics.h"
+#include "Target.h"
 #include "TextFile.h"
 #include "TProjection.h"
-#include "NaifStatus.h"
 
 using namespace std;
 using namespace Isis;
@@ -63,12 +63,12 @@ void IsisMain() {
 
   //Set the sample and line increments
   int sinc = (int)(inCube->sampleCount() * 0.10);
-  if(ui.WasEntered("SINC")) {
+  if (ui.WasEntered("SINC")) {
     sinc = ui.GetInteger("SINC");
   }
 
   int linc = (int)(inCube->lineCount() * 0.10);
-  if(ui.WasEntered("LINC")) {
+  if (ui.WasEntered("LINC")) {
     linc = ui.GetInteger("LINC");
   }
 
@@ -97,15 +97,15 @@ void IsisMain() {
    * points to stereographic x and y and adding these points to the LeastSquares
    * matrix.
    */
-  for(int i = 1; i <= inCube->lineCount(); i += linc) {
-    for(int j = 1; j <= inCube->sampleCount(); j += sinc) {
+  for (int i = 1; i <= inCube->lineCount(); i += linc) {
+    for (int j = 1; j <= inCube->sampleCount(); j += sinc) {
       latBrick.SetBasePosition(j, i, 1);
       latCube->read(latBrick);
-      if(IsSpecial(latBrick.at(0))) continue;
+      if (IsSpecial(latBrick.at(0))) continue;
       double lat = latBrick.at(0) * PI / 180.0;
       lonBrick.SetBasePosition(j, i, 1);
       lonCube->read(lonBrick);
-      if(IsSpecial(lonBrick.at(0))) continue;
+      if (IsSpecial(lonBrick.at(0))) continue;
       double lon = lonBrick.at(0) * PI / 180.0;
 
       //Project lat and lon to x and y using a stereographic projection
@@ -122,13 +122,13 @@ void IsisMain() {
 
       //If the sample increment goes past the last sample in the line, we want to
       //always read the last sample..
-      if(j != inCube->sampleCount() && j + sinc > inCube->sampleCount()) {
+      if (j != inCube->sampleCount() && j + sinc > inCube->sampleCount()) {
         j = inCube->sampleCount() - sinc;
       }
     }
     //If the line increment goes past the last line in the cube, we want to
     //always read the last line..
-    if(i != inCube->lineCount() && i + linc > inCube->lineCount()) {
+    if (i != inCube->lineCount() && i + linc > inCube->lineCount()) {
       i = inCube->lineCount() - linc;
     }
   }
@@ -140,7 +140,7 @@ void IsisMain() {
   //If the user wants to save the residuals to a file, create a file and write
   //the column titles to it.
   TextFile oFile;
-  if(ui.WasEntered("RESIDUALS")) {
+  if (ui.WasEntered("RESIDUALS")) {
     oFile.Open(ui.GetFileName("RESIDUALS"), "overwrite");
     oFile.PutLine("Sample,\tLine,\tX,\tY,\tSample Error,\tLine Error\n");
   }
@@ -150,14 +150,14 @@ void IsisMain() {
   Statistics lineErr;
   vector<double> sampResiduals = sampSol.Residuals();
   vector<double> lineResiduals = lineSol.Residuals();
-  for(int i = 0; i < (int)sampResiduals.size(); i++) {
+  for (int i = 0; i < (int)sampResiduals.size(); i++) {
     sampErr.AddData(sampResiduals[i]);
     lineErr.AddData(lineResiduals[i]);
   }
 
   //If a residuals file was specified, write the previous data, and the errors to the file.
-  if(ui.WasEntered("RESIDUALS")) {
-    for(int i = 0; i < sampSol.Rows(); i++) {
+  if (ui.WasEntered("RESIDUALS")) {
+    for (int i = 0; i < sampSol.Rows(); i++) {
       vector<double> data = sampSol.GetInput(i);
       QString tmp = "";
       tmp += toString(sampSol.GetExpected(i));
@@ -194,7 +194,7 @@ void IsisMain() {
   p.EndProcess();
 
   //If we want to warp the image, then continue, otherwise return
-  if(!ui.GetBoolean("NOWARP")) {
+  if (!ui.GetBoolean("NOWARP")) {
     //Creates the mapping group
     Pvl mapFile;
     mapFile.read(ui.GetFileName("MAP"));
@@ -212,7 +212,7 @@ void IsisMain() {
     PvlKeyword targetName;
 
     //If the user entered the target name
-    if(ui.WasEntered("TARGET")) {
+    if (ui.WasEntered("TARGET")) {
       targetName = PvlKeyword("TargetName", ui.GetString("TARGET"));
     }
     //Else read the target name from the input cube
@@ -226,52 +226,24 @@ void IsisMain() {
 
     PvlKeyword equRadius;
     PvlKeyword polRadius;
-
-
     //If the user entered the equatorial and polar radii
-    if(ui.WasEntered("EQURADIUS") && ui.WasEntered("POLRADIUS")) {
+    if (ui.WasEntered("EQURADIUS") && ui.WasEntered("POLRADIUS")) {
       equRadius = PvlKeyword("EquatorialRadius", toString(ui.GetDouble("EQURADIUS")));
       polRadius = PvlKeyword("PolarRadius", toString(ui.GetDouble("POLRADIUS")));
     }
     //Else read them from the pck
     else {
-      FileName pckFile("$base/kernels/pck/pck?????.tpc");
-      pckFile = pckFile.highestVersion();
-
-      QString pckFileName = pckFile.expanded();
-
-      NaifStatus::CheckErrors();
-      furnsh_c(pckFileName.toAscii().data());
-
-      QString target = targetName[0];
-      SpiceInt code;
-      SpiceBoolean found;
-
-      bodn2c_c(target.toAscii().data(), &code, &found);
-      NaifStatus::CheckErrors();
-
-      if(!found) {
-        QString msg = "Could not convert Target [" + target +
-                     "] to NAIF code";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
-      SpiceInt n;
-      SpiceDouble radii[3];
-
-      bodvar_c(code, "RADII", &n, radii);
-
-      equRadius = PvlKeyword("EquatorialRadius", toString(radii[0] * 1000));
-      polRadius = PvlKeyword("PolarRadius", toString(radii[2] * 1000));
+      PvlGroup radii = Target::radiiGroup(targetName[0]);
+      equRadius = radii["EquatorialRadius"];
+      polRadius = radii["PolarRadius"];
     }
-
     mapGrp.addKeyword(equRadius, Pvl::Replace);
     mapGrp.addKeyword(polRadius, Pvl::Replace);
 
 
     //If the latitude type is not in the mapping group, copy it from the input
-    if(!mapGrp.hasKeyword("LatitudeType")) {
-      if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
+    if (!mapGrp.hasKeyword("LatitudeType")) {
+      if (ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
         mapGrp.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"), Pvl::Replace);
       }
       else {
@@ -280,8 +252,8 @@ void IsisMain() {
     }
 
     //If the longitude direction is not in the mapping group, copy it from the input
-    if(!mapGrp.hasKeyword("LongitudeDirection")) {
-      if(ui.GetString("LONDIR") == "POSITIVEEAST") {
+    if (!mapGrp.hasKeyword("LongitudeDirection")) {
+      if (ui.GetString("LONDIR") == "POSITIVEEAST") {
         mapGrp.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"), Pvl::Replace);
       }
       else {
@@ -290,12 +262,12 @@ void IsisMain() {
     }
 
     //If the longitude domain is not in the mapping group, assume it is 360
-    if(!mapGrp.hasKeyword("LongitudeDomain")) {
+    if (!mapGrp.hasKeyword("LongitudeDomain")) {
       mapGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
     }
 
     //If the default range is to be computed, use the input lat/long cubes to determine the range
-    if(ui.GetString("DEFAULTRANGE") == "COMPUTE") {
+    if (ui.GetString("DEFAULTRANGE") == "COMPUTE") {
       //NOTE - When computing the min/max longitude this application does not account for the
       //longitude seam if it exists. Since the min/max are calculated from the statistics of
       //the input longitude cube and then converted to the mapping group's domain they may be
@@ -309,14 +281,14 @@ void IsisMain() {
 
       bool isOcentric = ((QString)mapGrp.findKeyword("LatitudeType")) == "Planetocentric";
 
-      if(isOcentric) {
-        if(ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
+      if (isOcentric) {
+        if (ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
           minLat = TProjection::ToPlanetocentric(minLat, (double)equRadius, (double)polRadius);
           maxLat = TProjection::ToPlanetocentric(maxLat, (double)equRadius, (double)polRadius);
         }
       }
       else {
-        if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
+        if (ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
           minLat = TProjection::ToPlanetographic(minLat, (double)equRadius, (double)polRadius);
           maxLat = TProjection::ToPlanetographic(maxLat, (double)equRadius, (double)polRadius);
         }
@@ -330,20 +302,20 @@ void IsisMain() {
 
       bool isPosEast = ((QString)mapGrp.findKeyword("LongitudeDirection")) == "PositiveEast";
 
-      if(isPosEast) {
-        if(ui.GetString("LONDIR") != "POSITIVEEAST") {
+      if (isPosEast) {
+        if (ui.GetString("LONDIR") != "POSITIVEEAST") {
           minLon = TProjection::ToPositiveEast(minLon, lonDomain);
           maxLon = TProjection::ToPositiveEast(maxLon, lonDomain);
         }
       }
       else {
-        if(ui.GetString("LONDIR") == "POSITIVEEAST") {
+        if (ui.GetString("LONDIR") == "POSITIVEEAST") {
           minLon = TProjection::ToPositiveWest(minLon, lonDomain);
           maxLon = TProjection::ToPositiveWest(maxLon, lonDomain);
         }
       }
 
-      if(minLon > maxLon) {
+      if (minLon > maxLon) {
         double temp = minLon;
         minLon = maxLon;
         maxLon = temp;
@@ -356,28 +328,28 @@ void IsisMain() {
     }
 
     //If the user decided to enter a ground range then override
-    if(ui.WasEntered("MINLAT")) {
+    if (ui.WasEntered("MINLAT")) {
       mapGrp.addKeyword(PvlKeyword("MinimumLatitude",
                                    toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
     }
 
-    if(ui.WasEntered("MAXLAT")) {
+    if (ui.WasEntered("MAXLAT")) {
       mapGrp.addKeyword(PvlKeyword("MaximumLatitude",
                                    toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
     }
 
-    if(ui.WasEntered("MINLON")) {
+    if (ui.WasEntered("MINLON")) {
       mapGrp.addKeyword(PvlKeyword("MinimumLongitude",
                                    toString(ui.GetDouble("MINLON"))), Pvl::Replace);
     }
 
-    if(ui.WasEntered("MAXLON")) {
+    if (ui.WasEntered("MAXLON")) {
       mapGrp.addKeyword(PvlKeyword("MaximumLongitude",
                                    toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
     }
 
     //If the pixel resolution is to be computed, compute the pixels/degree from the input
-    if(ui.GetString("PIXRES") == "COMPUTE") {
+    if (ui.GetString("PIXRES") == "COMPUTE") {
       latBrick.SetBasePosition(1, 1, 1);
       latCube->read(latBrick);
 
@@ -410,26 +382,26 @@ void IsisMain() {
       mapGrp.addKeyword(PvlKeyword("Scale",
                                    toString(pixels / angle), "pixels/degree"),
                         Pvl::Replace);
-      if(mapGrp.hasKeyword("PixelResolution")) {
+      if (mapGrp.hasKeyword("PixelResolution")) {
         mapGrp.deleteKeyword("PixelResolution");
       }
     }
 
 
     // If the user decided to enter a resolution then override
-    if(ui.GetString("PIXRES") == "MPP") {
+    if (ui.GetString("PIXRES") == "MPP") {
       mapGrp.addKeyword(PvlKeyword("PixelResolution",
                                    toString(ui.GetDouble("RESOLUTION")), "meters/pixel"),
                         Pvl::Replace);
-      if(mapGrp.hasKeyword("Scale")) {
+      if (mapGrp.hasKeyword("Scale")) {
         mapGrp.deleteKeyword("Scale");
       }
     }
-    else if(ui.GetString("PIXRES") == "PPD") {
+    else if (ui.GetString("PIXRES") == "PPD") {
       mapGrp.addKeyword(PvlKeyword("Scale",
                                    toString(ui.GetDouble("RESOLUTION")), "pixels/degree"),
                         Pvl::Replace);
-      if(mapGrp.hasKeyword("PixelResolution")) {
+      if (mapGrp.hasKeyword("PixelResolution")) {
         mapGrp.deleteKeyword("PixelResolution");
       }
     }
@@ -481,13 +453,13 @@ void IsisMain() {
 
     //Determine which interpolation to use
     Interpolator *interp = NULL;
-    if(ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
+    if (ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
       interp = new Interpolator(Interpolator::NearestNeighborType);
     }
-    else if(ui.GetString("INTERP") == "BILINEAR") {
+    else if (ui.GetString("INTERP") == "BILINEAR") {
       interp = new Interpolator(Interpolator::BiLinearType);
     }
-    else if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
+    else if (ui.GetString("INTERP") == "CUBICCONVOLUTION") {
       interp = new Interpolator(Interpolator::CubicConvolutionType);
     }
 
@@ -541,30 +513,30 @@ nocam2map::nocam2map(LeastSquares sample, LeastSquares line, TProjection *outmap
 // Transform method mapping output line/samps to lat/lons to input line/samps
 bool nocam2map::Xform(double &inSample, double &inLine,
                       const double outSample, const double outLine) {
-  if(!p_outmap->SetWorld(outSample, outLine)) return false;
+  if (!p_outmap->SetWorld(outSample, outLine)) return false;
 
-  if(outSample > p_outputSamples) return false;
-  if(outLine > p_outputLines) return false;
+  if (outSample > p_outputSamples) return false;
+  if (outLine > p_outputLines) return false;
 
   //Get the known latitude and longitudes from the projection
   //Convert to the input's latitude/longitude domain if necessary
   double lat_known, lon_known;
 
-  if(p_outmap->IsPlanetocentric()) {
-    if(!p_isOcentric) lat_known = p_outmap->ToPlanetographic(p_outmap->Latitude());
+  if (p_outmap->IsPlanetocentric()) {
+    if (!p_isOcentric) lat_known = p_outmap->ToPlanetographic(p_outmap->Latitude());
     else lat_known = p_outmap->Latitude();
   }
   else {
-    if(p_isOcentric) lat_known = p_outmap->ToPlanetocentric(p_outmap->Latitude());
+    if (p_isOcentric) lat_known = p_outmap->ToPlanetocentric(p_outmap->Latitude());
     else lat_known = p_outmap->Latitude();
   }
 
-  if(p_outmap->IsPositiveEast()) {
-    if(!p_isPosEast) lon_known = p_outmap->ToPositiveWest(p_outmap->Longitude(), 360);
+  if (p_outmap->IsPositiveEast()) {
+    if (!p_isPosEast) lon_known = p_outmap->ToPositiveWest(p_outmap->Longitude(), 360);
     else lon_known = p_outmap->Longitude();
   }
   else {
-    if(p_isPosEast) lon_known = p_outmap->ToPositiveEast(p_outmap->Longitude(), 360);
+    if (p_isPosEast) lon_known = p_outmap->ToPositiveEast(p_outmap->Longitude(), 360);
     else lon_known = p_outmap->Longitude();
   }
 
@@ -585,15 +557,15 @@ bool nocam2map::Xform(double &inSample, double &inLine,
   double line_guess = p_lineSol->Evaluate(data_known);
 
   //If the sample/line guess is out of bounds return false
-  if(sample_guess < -1.5) return false;
-  if(line_guess < -1.5) return false;
-  if(sample_guess > p_inputSamples + 1.5) return false;
-  if(line_guess > p_inputLines + 1.5) return false;
+  if (sample_guess < -1.5) return false;
+  if (line_guess < -1.5) return false;
+  if (sample_guess > p_inputSamples + 1.5) return false;
+  if (line_guess > p_inputLines + 1.5) return false;
 
-  if(sample_guess < 0.5) sample_guess = 1;
-  if(line_guess < 0.5) line_guess = 1;
-  if(sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples;
-  if(line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
+  if (sample_guess < 0.5) sample_guess = 1;
+  if (line_guess < 0.5) line_guess = 1;
+  if (sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples;
+  if (line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
 
   //Create a bilinear interpolator
   Interpolator interp(Interpolator::BiLinearType);
@@ -630,7 +602,7 @@ bool nocam2map::Xform(double &inSample, double &inLine,
   //If the difference is above the tolerance, correct it until it is below the tolerance or we have iterated through a set amount of times
   int iteration = 0;
   while(x_diff > p_tolerance || y_diff > p_tolerance) {
-    if(iteration++ >= p_iterations) return false;
+    if (iteration++ >= p_iterations) return false;
 
     //Create a 1st order polynomial function
     PolynomialBivariate sampFunct(1);
@@ -641,21 +613,21 @@ bool nocam2map::Xform(double &inSample, double &inLine,
     LeastSquares lineConverge(lineFunct);
 
     //Add the points around the line/sample guess point to the least squares matrix
-    for(int i = (int)(line_guess + 0.5) - 1; i <= (int)(line_guess + 0.5) + 1; i++) {
+    for (int i = (int)(line_guess + 0.5) - 1; i <= (int)(line_guess + 0.5) + 1; i++) {
       //If the line is out of bounds, then skip it
-      if(i < 1 || i > p_inputLines) continue;
-      for(int j = (int)(sample_guess + 0.5) - 1; j <= (int)(sample_guess + 0.5) + 1; j++) {
+      if (i < 1 || i > p_inputLines) continue;
+      for (int j = (int)(sample_guess + 0.5) - 1; j <= (int)(sample_guess + 0.5) + 1; j++) {
         //If the sample is out of bounds, then skip it
-        if(j < 1 || j > p_inputSamples) continue;
+        if (j < 1 || j > p_inputSamples) continue;
 
         latPortal.SetPosition(j, i, 1);
         p_latCube->read(latPortal);
-        if(IsSpecial(latPortal.at(0))) continue;
+        if (IsSpecial(latPortal.at(0))) continue;
         double n_lat = latPortal.at(0) * PI / 180.0;
 
         lonPortal.SetPosition(j, i, 1);
         p_lonCube->read(lonPortal);
-        if(IsSpecial(lonPortal.at(0))) continue;
+        if (IsSpecial(lonPortal.at(0))) continue;
         double n_lon = lonPortal.at(0) * PI / 180.0;
 
         //Conver the lat/lon to x/y using the stereographic projection
@@ -682,15 +654,15 @@ bool nocam2map::Xform(double &inSample, double &inLine,
     line_guess = lineConverge.Evaluate(data_known);
 
     //If the new sample/line is out of bounds return false
-    if(sample_guess < -1.5) return false;
-    if(line_guess < -1.5) return false;
-    if(sample_guess > p_inputSamples + 1.5) return false;
-    if(line_guess > p_inputLines + 1.5) return false;
+    if (sample_guess < -1.5) return false;
+    if (line_guess < -1.5) return false;
+    if (sample_guess > p_inputSamples + 1.5) return false;
+    if (line_guess > p_inputLines + 1.5) return false;
 
-    if(sample_guess < 0.5) sample_guess = 1;
-    if(line_guess < 0.5) line_guess = 1;
-    if(sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples;
-    if(line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
+    if (sample_guess < 0.5) sample_guess = 1;
+    if (line_guess < 0.5) line_guess = 1;
+    if (sample_guess > p_inputSamples + 0.5) sample_guess = p_inputSamples;
+    if (line_guess > p_inputLines + 0.5) line_guess = p_inputLines;
 
     //Set the buffers positions to the sample/line guess and read from the lat/long cubes
     latPortal.SetPosition(sample_guess, line_guess, 1);
@@ -762,7 +734,7 @@ void DeleteTables(Pvl *label, PvlGroup kernels) {
     PvlObject &currentObject=(*label).object(k);
     if (currentObject.name() == tableStr) {
       PvlKeyword &nameKeyword = currentObject.findKeyword(nameStr);
-      for(int l=0; l < tablesToDeleteSize; l++) {
+      for (int l=0; l < tablesToDeleteSize; l++) {
         if ( nameKeyword[0] == tablesToDelete[l] ) {
           indecesToDelete.push_back(k-indecesToDeleteSize);
           indecesToDeleteSize++;
@@ -851,13 +823,13 @@ void LoadMapRes() {
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
-  if(userGrp.hasKeyword("Scale")) {
+  if (userGrp.hasKeyword("Scale")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["Scale"]);
     ui.Clear("PIXRES");
     ui.PutAsString("PIXRES", "PPD");
   }
-  else if(userGrp.hasKeyword("PixelResolution")) {
+  else if (userGrp.hasKeyword("PixelResolution")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["PixelResolution"]);
     ui.Clear("PIXRES");
@@ -892,31 +864,23 @@ void ComputeInputRange() {
   double maxLon = lonDomain == 360 ? TProjection::To360Domain(lonStats->Maximum()) :
                                        TProjection::To180Domain(lonStats->Maximum());
 
-  if(userGrp.hasKeyword("LatitudeType")) {
+  if (userGrp.hasKeyword("LatitudeType")) {
     bool isOcentric = ((QString)userGrp.findKeyword("LatitudeType")) == "Planetocentric";
 
     double equRadius;
     double polRadius;
 
     //If the user entered the equatorial and polar radii
-    if(ui.WasEntered("EQURADIUS") && ui.WasEntered("POLRADIUS")) {
+    if (ui.WasEntered("EQURADIUS") && ui.WasEntered("POLRADIUS")) {
       equRadius = ui.GetDouble("EQURADIUS");
       polRadius = ui.GetDouble("POLRADIUS");
     }
     //Else read them from the pck
     else {
-      FileName pckFile("$base/kernels/pck/pck?????.tpc");
-      pckFile = pckFile.highestVersion();
-
-      QString pckFileName = pckFile.expanded();
-
-      NaifStatus::CheckErrors();
-      furnsh_c(pckFileName.toAscii().data());
-
       QString target;
 
       //If user entered target
-      if(ui.WasEntered("TARGET")) {
+      if (ui.WasEntered("TARGET")) {
         target = ui.GetString("TARGET");
       }
       //Else read the target name from the input cube
@@ -926,50 +890,34 @@ void ComputeInputRange() {
         target = (QString)fromFile.findKeyword("TargetName", Pvl::Traverse);
       }
 
-      SpiceInt code;
-      SpiceBoolean found;
-
-      bodn2c_c(target.toAscii().data(), &code, &found);
-      NaifStatus::CheckErrors();
-
-      if(!found) {
-        QString msg = "Could not convert Target [" + target +
-                     "] to NAIF code";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
-      SpiceInt n;
-      SpiceDouble radii[3];
-
-      bodvar_c(code, "RADII", &n, radii);
-
-      equRadius = radii[0] * 1000;
-      polRadius = radii[2] * 1000;
+      PvlGroup radii = Target::radiiGroup(target);
+      equRadius = double(radii["EquatorialRadius"]);
+      polRadius = double(radii["PolarRadius"]);
     }
 
-    if(isOcentric) {
-      if(ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
+    if (isOcentric) {
+      if (ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
         minLat = TProjection::ToPlanetocentric(minLat, (double)equRadius, (double)polRadius);
         maxLat = TProjection::ToPlanetocentric(maxLat, (double)equRadius, (double)polRadius);
       }
     }
     else {
-      if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
+      if (ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
         minLat = TProjection::ToPlanetographic(minLat, (double)equRadius, (double)polRadius);
         maxLat = TProjection::ToPlanetographic(maxLat, (double)equRadius, (double)polRadius);
       }
     }
   }
 
-  if(userGrp.hasKeyword("LongitudeDirection")) {
+  if (userGrp.hasKeyword("LongitudeDirection")) {
     bool isPosEast = ((QString)userGrp.findKeyword("LongitudeDirection")) == "PositiveEast";
 
-    if(isPosEast) {
-      if(ui.GetString("LONDIR") != "POSITIVEEAST") {
+    if (isPosEast) {
+      if (ui.GetString("LONDIR") != "POSITIVEEAST") {
         minLon = TProjection::ToPositiveEast(minLon, lonDomain);
         maxLon = TProjection::ToPositiveEast(maxLon, lonDomain);
 
-        if(minLon > maxLon) {
+        if (minLon > maxLon) {
           double temp = minLon;
           minLon = maxLon;
           maxLon = temp;
@@ -977,11 +925,11 @@ void ComputeInputRange() {
       }
     }
     else {
-      if(ui.GetString("LONDIR") == "POSITIVEEAST") {
+      if (ui.GetString("LONDIR") == "POSITIVEEAST") {
         minLon = TProjection::ToPositiveWest(minLon, lonDomain);
         maxLon = TProjection::ToPositiveWest(maxLon, lonDomain);
 
-        if(minLon > maxLon) {
+        if (minLon > maxLon) {
           double temp = minLon;
           minLon = maxLon;
           maxLon = temp;
@@ -1022,19 +970,19 @@ void LoadMapRange() {
   ui.Clear("MAXLAT");
   ui.Clear("MINLON");
   ui.Clear("MAXLON");
-  if(userGrp.hasKeyword("MinimumLatitude")) {
+  if (userGrp.hasKeyword("MinimumLatitude")) {
     ui.PutDouble("MINLAT", userGrp["MinimumLatitude"]);
     count++;
   }
-  if(userGrp.hasKeyword("MaximumLatitude")) {
+  if (userGrp.hasKeyword("MaximumLatitude")) {
     ui.PutDouble("MAXLAT", userGrp["MaximumLatitude"]);
     count++;
   }
-  if(userGrp.hasKeyword("MinimumLongitude")) {
+  if (userGrp.hasKeyword("MinimumLongitude")) {
     ui.PutDouble("MINLON", userGrp["MinimumLongitude"]);
     count++;
   }
-  if(userGrp.hasKeyword("MaximumLongitude")) {
+  if (userGrp.hasKeyword("MaximumLongitude")) {
     ui.PutDouble("MAXLON", userGrp["MaximumLongitude"]);
     count++;
   }
@@ -1043,7 +991,7 @@ void LoadMapRange() {
   ui.Clear("DEFAULTRANGE");
   ui.PutAsString("DEFAULTRANGE", "MAP");
 
-  if(count < 4) {
+  if (count < 4) {
     QString msg = "One or more of the values for the ground range was not found";
     msg += " in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);

@@ -32,23 +32,26 @@ namespace Isis {
   class UniversalGroundMap;
 
   /**
-    * @brief Tool for computing parallax
-    *
-    * @ingroup Visualization Tools
-    *
-    * @author 2011-12-07 Tracie Sucharski
-    * @internal
-    * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-    *                         coding standards. References #972.
-    * @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
-    *                        #775 and #1114.
-    * @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
-    *                           network immediately print warning and return.  References #1493.
-    * @history 2014-05-15 Ian Humphrey - Removed the shortcut from StereoTool to avoid conflict 
-    *                         with StretchTool shortcut. Minor corrections for coding standards.
-    *                         Fixes #2086.
-    *
-    */
+   * @brief Tool for computing parallax
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2011-12-07 Tracie Sucharski
+   * @internal
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                           coding standards. References #972.
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
+   *                          #775 and #1114.
+   *   @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
+   *                             network immediately print warning and return.  References #1493.
+   *   @history 2014-05-15 Ian Humphrey - Removed the shortcut from StereoTool to avoid conflict 
+   *                           with StretchTool shortcut. Minor corrections for coding standards.
+   *                           Fixes #2086.
+   *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
+   *                           ControlNet's target instead of the TargetName.
+   *                           References #3892
+   *
+   */
   class StereoTool : public AbstractPlotTool {
       Q_OBJECT
 

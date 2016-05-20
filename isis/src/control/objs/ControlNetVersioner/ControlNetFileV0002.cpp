@@ -17,9 +17,9 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
-#include "TProjection.h"
 #include "Pvl.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace google::protobuf;
 using namespace google::protobuf::io;
@@ -89,8 +89,8 @@ namespace Isis {
       IstreamInputStream *pointInStream = NULL;
       CodedInputStream *pointCodedInStream = NULL;
 
-      for(int cp = 0; cp < p_networkHeader->pointmessagesizes_size(); cp ++) {
-        if(cp % 50000 == 0 && pointCodedInStream && pointInStream) {
+      for (int cp = 0; cp < p_networkHeader->pointmessagesizes_size(); cp ++) {
+        if (cp % 50000 == 0 && pointCodedInStream && pointInStream) {
           delete pointCodedInStream;
           pointCodedInStream = NULL;
 
@@ -98,7 +98,7 @@ namespace Isis {
           pointInStream = NULL;
         }
 
-        if(pointInStream == NULL) {
+        if (pointInStream == NULL) {
           input.close();
           input.open(file.expanded().toAscii().data(), ios::in | ios::binary);
           input.seekg(filePos, ios::beg);
@@ -127,12 +127,12 @@ namespace Isis {
         pointCodedInStream->PopLimit(oldLimit);
       }
 
-      if(pointCodedInStream) {
+      if (pointCodedInStream) {
         delete pointCodedInStream;
         pointCodedInStream = NULL;
       }
 
-      if(pointInStream) {
+      if (pointInStream) {
         delete pointInStream;
         pointInStream = NULL;
       }
@@ -148,7 +148,7 @@ namespace Isis {
     p_networkHeader->clear_pointmessagesizes();
     BigInt pointsSize = 0;
     BigInt numMeasures = 0;
-    for(int cpIndex = 0; cpIndex < p_controlPoints->size(); cpIndex ++) {
+    for (int cpIndex = 0; cpIndex < p_controlPoints->size(); cpIndex ++) {
       numMeasures += p_controlPoints->at(cpIndex).measures_size();
       int size = p_controlPoints->at(cpIndex).ByteSize();
       pointsSize += size;
@@ -175,15 +175,15 @@ namespace Isis {
     }
 
     streampos curPosition = startCoreHeaderPos + coreHeaderSize;
-    for(int cpIndex = 0; cpIndex < p_controlPoints->size(); cpIndex ++) {
-      if(!p_controlPoints->at(cpIndex).IsInitialized()) {
+    for (int cpIndex = 0; cpIndex < p_controlPoints->size(); cpIndex ++) {
+      if (!p_controlPoints->at(cpIndex).IsInitialized()) {
         IString msg = "Failed to write output control network file [" +
             file.name() + "] because control points are missing required "
             "fields";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
-      if(!p_controlPoints->at(cpIndex).SerializeToOstream(&output)) {
+      if (!p_controlPoints->at(cpIndex).SerializeToOstream(&output)) {
         IString msg = "Failed to write output control network file [" +
             file.name() + "] while attempting to write control points";
         throw IException(IException::Io, msg, _FILEINFO_);
@@ -231,16 +231,16 @@ namespace Isis {
    * Converts binary control net version 2 to pvl version 3
    *
    * @internal
-   * @history 2011-05-02 Debbie A. Cook - Converted to version pvl 3
-   *                     instead of 2
-   * @history 2011-05-09 Tracie Sucharski - Add comments for printing apriori
-   *                     and adjusted values as lat/lon/radius, and sigmas.
-   * @history 2011-05-16 Tracie Sucharski - Before trying to get radii, make
-   *                     sure network has a TargetName.  If not, do not add
-   *                     lat/lon/radius comments for SurfacePoints.
-   * @history 2011-06-07 Tracie Sucharski/Debbie A. Cook - Point Type changes
-   *                          Ground ----> Fixed
-   *                          Tie    ----> Free
+   *   @history 2011-05-02 Debbie A. Cook - Converted to version pvl 3
+   *                           instead of 2
+   *   @history 2011-05-09 Tracie Sucharski - Add comments for printing apriori
+   *                           and adjusted values as lat/lon/radius, and sigmas.
+   *   @history 2011-05-16 Tracie Sucharski - Before trying to get radii, make
+   *                           sure network has a TargetName.  If not, do not add
+   *                           lat/lon/radius comments for SurfacePoints.
+   *   @history 2011-06-07 Tracie Sucharski/Debbie A. Cook - Point Type changes
+   *                           Ground ----> Fixed
+   *                           Tie    ----> Free
    *
    */
   Pvl ControlNetFileV0002::toPvl() const {
@@ -264,11 +264,10 @@ namespace Isis {
     if (target != "") {
       try {
         NaifStatus::CheckErrors();
-        pvlRadii = TProjection::TargetRadii(target);
+        pvlRadii = Target::radiiGroup(target);
       }
-      catch(IException &e) {
-        IString msg = "The target name, " + target + ", is not recognized.";
-        throw IException(e, IException::Unknown, msg, _FILEINFO_);
+      catch (IException) {
+        // leave pvlRadii empty if target is not recognized by NAIF 
       }
     }
 
@@ -276,12 +275,15 @@ namespace Isis {
     foreach(binaryPoint, *p_controlPoints) {
       PvlObject pvlPoint("ControlPoint");
 
-      if(binaryPoint.type() == ControlPointFileEntryV0002::Fixed)
+      if (binaryPoint.type() == ControlPointFileEntryV0002::Fixed) {
         pvlPoint += PvlKeyword("PointType", "Fixed");
-      else if(binaryPoint.type() == ControlPointFileEntryV0002::Constrained)
+      }
+      else if (binaryPoint.type() == ControlPointFileEntryV0002::Constrained) {
         pvlPoint += PvlKeyword("PointType", "Constrained");
-      else
+      }
+      else {
         pvlPoint += PvlKeyword("PointType", "Free");
+      }
 
       pvlPoint += PvlKeyword("PointId", binaryPoint.id().c_str());
       pvlPoint += PvlKeyword("ChooserName", binaryPoint.choosername().c_str());
@@ -352,7 +354,7 @@ namespace Isis {
         pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
                         binaryPoint.aprioriradiussourcefile().c_str());
 
-      if(binaryPoint.has_apriorix()) {
+      if (binaryPoint.has_apriorix()) {
         pvlPoint += PvlKeyword("AprioriX", toString(binaryPoint.apriorix()), "meters");
         pvlPoint += PvlKeyword("AprioriY", toString(binaryPoint.aprioriy()), "meters");
         pvlPoint += PvlKeyword("AprioriZ", toString(binaryPoint.aprioriz()), "meters");
@@ -373,7 +375,7 @@ namespace Isis {
                                  toString(apriori.GetLocalRadius().meters()) +
                                  " <meters>");
 
-        if(binaryPoint.aprioricovar_size()) {
+        if (binaryPoint.aprioricovar_size()) {
           PvlKeyword matrix("AprioriCovarianceMatrix");
           matrix += toString(binaryPoint.aprioricovar(0));
           matrix += toString(binaryPoint.aprioricovar(1));
@@ -410,16 +412,16 @@ namespace Isis {
         }
       }
 
-      if(binaryPoint.latitudeconstrained())
+      if (binaryPoint.latitudeconstrained())
         pvlPoint += PvlKeyword("LatitudeConstrained", "True");
 
-      if(binaryPoint.longitudeconstrained())
+      if (binaryPoint.longitudeconstrained())
         pvlPoint += PvlKeyword("LongitudeConstrained", "True");
 
-      if(binaryPoint.radiusconstrained())
+      if (binaryPoint.radiusconstrained())
         pvlPoint += PvlKeyword("RadiusConstrained", "True");
 
-      if(binaryPoint.has_adjustedx()) {
+      if (binaryPoint.has_adjustedx()) {
         pvlPoint += PvlKeyword("AdjustedX", toString(binaryPoint.adjustedx()), "meters");
         pvlPoint += PvlKeyword("AdjustedY", toString(binaryPoint.adjustedy()), "meters");
         pvlPoint += PvlKeyword("AdjustedZ", toString(binaryPoint.adjustedz()), "meters");
@@ -440,7 +442,7 @@ namespace Isis {
                                  toString(adjusted.GetLocalRadius().meters()) +
                                  " <meters>");
 
-        if(binaryPoint.adjustedcovar_size()) {
+        if (binaryPoint.adjustedcovar_size()) {
           PvlKeyword matrix("AdjustedCovarianceMatrix");
           matrix += toString(binaryPoint.adjustedcovar(0));
           matrix += toString(binaryPoint.adjustedcovar(1));
@@ -498,22 +500,22 @@ namespace Isis {
             break;
         }
 
-        if(binaryMeasure.has_choosername())
+        if (binaryMeasure.has_choosername())
           pvlMeasure += PvlKeyword("ChooserName", binaryMeasure.choosername().c_str());
 
-        if(binaryMeasure.has_datetime())
+        if (binaryMeasure.has_datetime())
           pvlMeasure += PvlKeyword("DateTime", binaryMeasure.datetime().c_str());
 
-        if(binaryMeasure.editlock())
+        if (binaryMeasure.editlock())
           pvlMeasure += PvlKeyword("EditLock", "True");
 
-        if(binaryMeasure.ignore())
+        if (binaryMeasure.ignore())
           pvlMeasure += PvlKeyword("Ignore", "True");
 
-        if(binaryMeasure.has_sample())
+        if (binaryMeasure.has_sample())
           pvlMeasure += PvlKeyword("Sample", toString(binaryMeasure.sample()));
 
-        if(binaryMeasure.has_line())
+        if (binaryMeasure.has_line())
           pvlMeasure += PvlKeyword("Line", toString(binaryMeasure.line()));
 
         if (binaryMeasure.has_diameter())
@@ -533,19 +535,19 @@ namespace Isis {
           pvlMeasure += PvlKeyword("LineSigma", toString(binaryMeasure.linesigma()),
                                    "pixels");
 
-        if(binaryMeasure.has_sampleresidual())
+        if (binaryMeasure.has_sampleresidual())
           pvlMeasure += PvlKeyword("SampleResidual", toString(binaryMeasure.sampleresidual()),
                                    "pixels");
 
-        if(binaryMeasure.has_lineresidual())
+        if (binaryMeasure.has_lineresidual())
           pvlMeasure += PvlKeyword("LineResidual", toString(binaryMeasure.lineresidual()),
                                    "pixels");
 
-        if(binaryMeasure.has_jigsawrejected()) {
+        if (binaryMeasure.has_jigsawrejected()) {
          pvlMeasure += PvlKeyword("JigsawRejected", toString(binaryMeasure.jigsawrejected()));
         }
 
-        for(int logEntry = 0;
+        for (int logEntry = 0;
             logEntry < binaryMeasure.log_size();
             logEntry ++) {
           const ControlPointFileEntryV0002_Measure_MeasureLogData &log =
@@ -555,7 +557,7 @@ namespace Isis {
           pvlMeasure += interpreter.ToKeyword();
         }
 
-        if(binaryPoint.has_referenceindex() &&
+        if (binaryPoint.has_referenceindex() &&
            binaryPoint.referenceindex() == j)
           pvlMeasure += PvlKeyword("Reference", "True");
 

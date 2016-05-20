@@ -177,7 +177,7 @@ namespace Isis {
       //  Determine target from first file in cube list
       QScopedPointer<Cube> cube(new Cube());
       cube->open(serialNumberList()->fileName(0));
-      controlNet()->SetTarget(cube->camera()->target()->name());
+      controlNet()->SetTarget(*cube->label());
     }
     else {
       try {

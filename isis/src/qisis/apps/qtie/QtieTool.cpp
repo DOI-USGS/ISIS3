@@ -770,7 +770,7 @@ namespace Isis {
     //  Create temporary network for solution which will not contain measures for
     //  the basemap.
     ControlNet net;
-    net.SetTarget(p_matchCube->camera()->target()->name());
+    net.SetTarget(*p_matchCube->label());
 
     // Bundle adjust to solve for new pointing
     try {

@@ -65,6 +65,10 @@
     <change name="Jeannie Backer" date="2011-10-03">
       Added appTests, improved error message, added documentation.
     </change>
+    <change name="Jeannie Backer" date="2016-04-22">
+      Modified to set the new control net's target and radii by using the input control net's 
+      values. References #3892
+    </change>
   </history>
 
 <groups>

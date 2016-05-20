@@ -9,6 +9,7 @@
 #include "Statistics.h"
 #include "PvlGroup.h"
 #include "Pvl.h"
+#include "Target.h"
 #include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "PolygonTools.h"
@@ -57,7 +58,7 @@ void IsisMain() {
 
   // Sets up the no overlap list
   set<QString> nooverlap;
-  for(int i = 0; i < serialNumbers.size(); i ++) {
+  for (int i = 0; i < serialNumbers.size(); i ++) {
     nooverlap.insert(serialNumbers.serialNumber(i));
   }
 
@@ -69,15 +70,15 @@ void IsisMain() {
   QString delim = "";
   QString pretty = ""; // Makes tab tables look pretty, ignored in CSV
   bool singleLine = false;
-  if(ui.WasEntered("DETAIL")) {
-    if(ui.GetString("TABLETYPE") == "CSV") {
+  if (ui.WasEntered("DETAIL")) {
+    if (ui.GetString("TABLETYPE") == "CSV") {
       delim = ",";
       singleLine = ui.GetBoolean("SINGLELINE");
       // This line was removed because readability (ios::showpoint) was more
       // important than an extra decimal place of precision.
       //output.setf(ios::scientific,ios::floatfield);
     }
-    else if(ui.GetString("TABLETYPE") == "TAB") {
+    else if (ui.GetString("TABLETYPE") == "TAB") {
       delim = "\t";
       pretty = "\t";
       tab = true;
@@ -96,13 +97,13 @@ void IsisMain() {
   Statistics area;
   Statistics sncount;
   int overlapnum = 0;//Makes sure there are overlaps
-  for(int index = 0; index < overlaps.Size(); index ++) {
+  for (int index = 0; index < overlaps.Size(); index ++) {
 
-    if(overlaps[index]->Size() > 1) {
+    if (overlaps[index]->Size() > 1) {
       overlapnum++;
 
       // Removes the overlapping Serial Numbers for the nooverlap set
-      for(int i = 0; i < overlaps[index]->Size(); i ++) {
+      for (int i = 0; i < overlaps[index]->Size(); i ++) {
         nooverlap.erase((*overlaps[index])[i]);
       }
 
@@ -114,21 +115,23 @@ void IsisMain() {
 
       // Construct a Projection for converting between Lon/Lat and X/Y
       Pvl cubeLab(serialNumbers.fileName(0));
-      PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
-      QString target = inst["TargetName"];
-      PvlGroup radii = TProjection::TargetRadii(target);
-      Isis::Pvl maplab;
-      maplab.addGroup(Isis::PvlGroup("Mapping"));
-      Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
-      mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
-      mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
-      mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
-      mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-      mapGroup += Isis::PvlKeyword("LongitudeDomain", toString(360));
-      mapGroup += Isis::PvlKeyword("CenterLatitude", toString(0));
-      mapGroup += Isis::PvlKeyword("CenterLongitude", toString(0));
-      mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
-      TProjection *proj = (TProjection *) Isis::ProjectionFactory::Create(maplab);
+
+      // Get empty mapping label
+      Pvl maplab;
+      maplab.addGroup(PvlGroup("Mapping"));
+      PvlGroup &mapGroup = maplab.findGroup("Mapping");
+
+      // This call adds TargetName, EquatorialRadius and PolarRadius to mapGroup
+      mapGroup = Target::radiiGroup(cubeLab, mapGroup);
+
+      // mapGroup started as empty, so no need to replace here, just add keywords 
+      mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
+      mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+      mapGroup += PvlKeyword("LongitudeDomain", "360");
+      mapGroup += PvlKeyword("CenterLatitude", "0.0");
+      mapGroup += PvlKeyword("CenterLongitude", "0.0");
+      mapGroup += PvlKeyword("ProjectionName", "Sinusoidal");
+      TProjection *proj = (TProjection *) ProjectionFactory::Create(maplab);
 
       // Sets up the thickness and area stats
       try {
@@ -140,8 +143,8 @@ void IsisMain() {
         double areaValue = mpXY->getArea();
         area.AddData(areaValue);
 
-        if(full) {
-          if(firstFullOutput) {
+        if (full) {
+          if (firstFullOutput) {
             output << "Overlap ID";
             output << delim << "Thickness";
             output << delim << pretty << "Area";
@@ -153,7 +156,7 @@ void IsisMain() {
           }
           output << index << pretty;
           output << delim << thicknessValue;
-          if(tab) {
+          if (tab) {
             output << delim << FormatString(areaValue, 18, 4);
           }
           else {
@@ -162,8 +165,8 @@ void IsisMain() {
           output << delim << overlaps[index]->Size() << pretty;
           output << delim << (*overlaps[index])[0];
           output << delim << serialNumbers.fileName((*overlaps[index])[0]);
-          for(int sn = 1; sn < overlaps[index]->Size(); sn ++) {
-            if(!singleLine) {
+          for (int sn = 1; sn < overlaps[index]->Size(); sn ++) {
+            if (!singleLine) {
               output << endl << pretty << delim << pretty << delim << pretty << delim;
               output << pretty << pretty;
             }
@@ -177,14 +180,14 @@ void IsisMain() {
         mpXY = NULL;
 
       }
-      catch(IException &e) {
+      catch (IException &e) {
         errorNum++;
 
-        if(ui.WasEntered("ERRORS")) {
+        if (ui.WasEntered("ERRORS")) {
           errors << e.toPvl().group(0).findKeyword("Message")[0];
 
-          for(int serNum = 0; serNum < overlaps[index]->Size(); serNum++) {
-            if(serNum == 0) {
+          for (int serNum = 0; serNum < overlaps[index]->Size(); serNum++) {
+            if (serNum == 0) {
               errors << ": ";
             }
             else {
@@ -205,7 +208,7 @@ void IsisMain() {
   }
 
   // Checks if there were overlaps to output results from
-  if(overlapnum == 0) {
+  if (overlapnum == 0) {
     QString msg = "The overlap file [";
     msg += FileName(ui.GetFileName("OVERLAPLIST")).name();
     msg += "] does not contain any overlaps across the provided cubes [";
@@ -238,8 +241,8 @@ void IsisMain() {
   brief += PvlKeyword("PolygonCount", toString(overlaps.Size()));
 
   // Add non-overlapping cubes to the output
-  if(!nooverlap.empty()) {
-    for(set<QString>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
+  if (!nooverlap.empty()) {
+    for (set<QString>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
       brief += PvlKeyword("NoOverlap", serialNumbers.fileName(*itt));
     }
   }
@@ -248,7 +251,7 @@ void IsisMain() {
 
 
   //Log the ERRORS file
-  if(ui.WasEntered("ERRORS")) {
+  if (ui.WasEntered("ERRORS")) {
     QString errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
     errorsfile.open(errorname.toAscii().data());
@@ -257,7 +260,7 @@ void IsisMain() {
   }
 
   //Log error num in print.prt if there were errors
-  if(errorNum > 0) {
+  if (errorNum > 0) {
     PvlGroup grp("OverlapStats");
     PvlKeyword key("ErrorNumber", toString(errorNum));
     grp.addKeyword(key);
@@ -265,13 +268,13 @@ void IsisMain() {
   }
 
   // Display FULL output
-  if(full) {
+  if (full) {
     QString outname = ui.GetFileName("TO");
     std::ofstream outfile;
     outfile.open(outname.toAscii().data());
     outfile << output.str();
     outfile.close();
-    if(outfile.fail()) {
+    if (outfile.fail()) {
       IString msg = "Unable to write the statistics to [" + ui.GetFileName("TO") + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -300,11 +303,11 @@ QString FormatString(double input, int head, int tail) {
   QString resultHead(result.mid(0, point));
   QString resultTail(result.mid(point + 1, result.size() - point - 1));
 
-  for(int place = resultHead.size(); place < head; place ++) {
+  for (int place = resultHead.size(); place < head; place ++) {
     resultHead = " " + resultHead;
   }
 
-  for(int place = resultTail.size(); place < tail; place ++) {
+  for (int place = resultTail.size(); place < tail; place ++) {
     resultTail = resultTail + "0";
   }
 

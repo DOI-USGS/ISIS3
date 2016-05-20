@@ -53,6 +53,23 @@ namespace Isis {
    * in the labels.
    *
    * @param lab Label containing Instrument and Kernels groups.
+   */
+
+  // TODO: DOCUMENT EVERYTHING
+  Spice::Spice(Pvl &lab) {
+    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
+    bool hasTables = (kernels["TargetPosition"][0] == "Table");
+
+    init(lab, !hasTables);
+  }
+
+
+  /**
+   * Constructs a Spice object and loads SPICE kernels using information from the
+   * label object. The constructor expects an Instrument and Kernels group to be
+   * in the labels.
+   *
+   * @param lab Label containing Instrument and Kernels groups.
    *
    * @internal
    * @history 2005-10-07 Jim Torson  -   Modified the constructor so it can
@@ -107,7 +124,6 @@ namespace Isis {
     m_solarLongitude = new Longitude;
     m_et = NULL;
     m_kernels = new QVector<QString>;
-    m_target = new Target(this, lab);
 
     m_startTime = new iTime;
     m_endTime = new iTime;
@@ -190,6 +206,14 @@ namespace Isis {
         load(kernels["Extra"], noTables);
       }
 
+      // Moved the construction of the Target after the NAIF kenels have been loaded or the 
+      // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
+      // that are defined in kernels and not just body codes build into spicelib
+      // TODO: Move this below the else once the rings code below has been refactored
+      m_target = new Target(this, lab);
+
+      // This should not be here. Consider having spiceinit add the necessary rings kernels to the 
+      // Extra parameter if the user has set the shape model to RingPlane.
       // If Target is Saturn and ShapeModel is RingPlane, load the extra rings pck file
       //  which changes the prime meridian values to report longitudes with respect to
       // the ascending node of the ringplane.
@@ -200,7 +224,15 @@ namespace Isis {
     }
     else {
       *m_naifKeywords = lab.findObject("NaifKeywords");
+
+      // Moved the construction of the Target after the NAIF kenels have been loaded or the 
+      // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
+      // that are defined in kernels and not just body codes build into spicelib
+      // TODO: Move this below the else once the rings code above has been refactored
+      m_target = new Target(this, lab);
+
     }
+
 
     // Get NAIF ik, spk, sclk, and ck codes
     //
@@ -226,7 +258,7 @@ namespace Isis {
     *m_ckCode   = *m_ikCode;
 
     if (!m_target->isSky()) {
-      QString radiiKey = "BODY" + toString(m_target->naifBodyCode()) + "_RADII";
+      QString radiiKey = "BODY" + Isis::toString(m_target->naifBodyCode()) + "_RADII";
       std::vector<Distance> radii(3,Distance());
       radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
       radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
@@ -261,30 +293,28 @@ namespace Isis {
       m_bodyRotation = new SpiceRotation(1);
     }
     else {
-      // JAA - Modified to stored and look for the frame body code in the
-      // cube labels
+      // JAA - Modified to store and look for the frame body code in the cube labels
       SpiceInt frameCode;
       if ((m_usingNaif) || (!m_naifKeywords->hasKeyword("BODY_FRAME_CODE"))) {
         char frameName[32];
         SpiceBoolean found;
-        cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName,
-                 &found);
+        cidfrm_c(*m_spkBodyCode, sizeof(frameName), &frameCode, frameName, &found);
 
         if (!found) {
-          QString naifTarget = "IAU_" + QString(m_target->name()).toUpper();
+          QString naifTarget = "IAU_" + m_target->name().toUpper();
           namfrm_c(naifTarget.toAscii().data(), &frameCode);
           if (frameCode == 0) {
-            string msg = "Can not find NAIF BODY_FRAME_CODE for target [" 
-                         + IString(m_target->name()) + "]";
+            QString msg = "Can not find NAIF BODY_FRAME_CODE for target [" 
+                         + m_target->name() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
         }
 
         QVariant result = (int)frameCode;
-        storeValue("BODY_FRAME_CODE",0,SpiceIntType,result);
+        storeValue("BODY_FRAME_CODE", 0, SpiceIntType, result);
       }
       else {
-        frameCode = getInteger("BODY_FRAME_CODE",0);
+        frameCode = getInteger("BODY_FRAME_CODE", 0);
       }
 
       m_bodyRotation = new SpiceRotation(frameCode);
@@ -377,18 +407,18 @@ namespace Isis {
 
     for (int i = 0; i < key.size(); i++) {
       if (key[i] == "") continue;
-      if (IString(key[i]).UpCase() == "NULL") break;
-      if (IString(key[i]).UpCase() == "NADIR") break;
-      if (IString(key[i]).UpCase() == "TABLE" && !noTables) break;
-      if (IString(key[i]).UpCase() == "TABLE" && noTables) continue;
+      if (key[i].toUpper() == "NULL") break;
+      if (key[i].toUpper() == "NADIR") break;
+      if (key[i].toUpper() == "TABLE" && !noTables) break;
+      if (key[i].toUpper() == "TABLE" && noTables) continue;
       FileName file(key[i]);
       if (!file.fileExists()) {
         QString msg = "Spice file does not exist [" + file.expanded() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-      QString fileName(file.expanded());
+      QString fileName = file.expanded();
       furnsh_c(fileName.toAscii().data());
-      m_kernels->push_back((QString)key[i]);
+      m_kernels->push_back(key[i]);
     }
 
     NaifStatus::CheckErrors();
@@ -493,7 +523,7 @@ namespace Isis {
     // Unload the kernels (TODO: Can this be done faster)
     for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
       FileName file(m_kernels->at(i));
-      QString fileName(file.expanded());
+      QString fileName = file.expanded();
       unload_c(fileName.toAscii().data());
     }
 
@@ -542,27 +572,27 @@ namespace Isis {
 
     // Check for errors
     if (cacheSize <= 0) {
-      string msg = "Argument cacheSize must be greater than zero";
+      QString msg = "Argument cacheSize must be greater than zero";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (startTime > endTime) {
-      string msg = "Argument startTime must be less than or equal to endTime";
+      QString msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (*m_cacheSize > 0) {
-      string msg = "A cache has already been created";
+      QString msg = "A cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (cacheSize == 1 && (*m_startTimePadding != 0 || *m_endTimePadding != 0)) {
-      string msg = "This instrument does not support time padding";
+      QString msg = "This instrument does not support time padding";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     string abcorr;
-    if (getSpkAbCorrState(abcorr) ) {
+    if (getSpkAbCorrState(abcorr)) {
       instrumentPosition()->SetAberrationCorrection("NONE");
     }
 
@@ -613,7 +643,7 @@ namespace Isis {
     // Unload the kernels (TODO: Can this be done faster)
     for (int i = 0; i < m_kernels->size(); i++) {
       FileName file(m_kernels->at(i));
-      QString fileName(file.expanded());
+      QString fileName = file.expanded();
       unload_c(fileName.toAscii().data());
     }
 
@@ -723,7 +753,8 @@ namespace Isis {
    */
   void Spice::instrumentBodyFixedPosition(double p[3]) const {
     if (m_et == NULL) {
-      std::string msg = "You must call SetTime first";
+      QString msg = "Unable to retrieve instrument's body fixed position."
+                    " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -740,7 +771,8 @@ namespace Isis {
    */
   void Spice::instrumentBodyFixedVelocity(double v[3]) const {
     if (m_et == NULL) {
-      std::string msg = "You must call SetTime first";
+      QString msg = "Unable to retrieve instrument's body fixed velocity."
+                    " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -778,7 +810,8 @@ namespace Isis {
    */
   void Spice::sunPosition(double p[3]) const {
     if (m_et == NULL) {
-      std::string msg = "You must call SetTime first";
+      QString msg = "Unable to retrieve sun's position."
+                    " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p[0] = m_uB[0];
@@ -929,7 +962,7 @@ namespace Isis {
 
     iTime result;
 
-    QString key = "CLOCK_ET_" + toString(sclkCode) + "_" + clockValue;
+    QString key = "CLOCK_ET_" + Isis::toString(sclkCode) + "_" + clockValue;
     QVariant storedClockTime = getStoredResult(key, SpiceDoubleType);
 
     if (storedClockTime.isNull()) {
@@ -1008,8 +1041,8 @@ namespace Isis {
       result = readStoredValue(key, type, index);
 
       if (result.isNull()) {
-        IString msg = "The camera is requesting spice data [" + key + "] that "
-            "was not attached, please re-run spiceinit";
+        QString msg = "The camera is requesting spice data [" + key + "] that "
+                      "was not attached, please re-run spiceinit";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -1079,7 +1112,7 @@ namespace Isis {
       storedKey[index] = toString(value.toInt());
     }
     else {
-      IString msg = "Unable to store variant in labels for key [" + key + "]";
+      QString msg = "Unable to store variant in labels for key [" + key + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -1121,7 +1154,7 @@ namespace Isis {
    * @param key Name of NAIF keyword to obtain from the pool
    * @param index If the keyword is an array, the element to obtain. Defaults to 0
    *
-   * @return @b string Value from the NAIF text pool
+   * @return @b QString Value from the NAIF text pool
    *
    * @throw Isis::IException::Io - "Can not find key in instrument kernels."
    */
@@ -1146,7 +1179,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     if (m_et == NULL) {
-      std::string msg = "You must call SetTime first";
+      QString msg = "Unable to retrieve subspacecraft position."
+                    " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1194,7 +1228,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     if (m_et == NULL) {
-      std::string msg = "You must call SetTime first";
+      QString msg = "Unable to retrieve subsolar point."
+                    " Spice::SetTime must be called first.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1234,9 +1269,9 @@ namespace Isis {
 
 
   /**
-    * Returns the string name of the target
+    * Returns the QString name of the target
     *
-    * @return string
+    * @return QString
     */
   QString Spice::targetName() const {
     return m_target->name();
@@ -1366,9 +1401,9 @@ namespace Isis {
 
       for (int i = 0; i < key.size(); i++) {
         if (key[i] == "") return false;
-        if (IString(key[i]).UpCase() == "NULL") return false;
-        if (IString(key[i]).UpCase() == "NADIR") return false;
-        if (IString(key[i]).UpCase() == "TABLE") return false;
+        if (key[i].toUpper() == "NULL") return false;
+        if (key[i].toUpper() == "NADIR") return false;
+        if (key[i].toUpper() == "TABLE") return false;
       }
     }
     return true;

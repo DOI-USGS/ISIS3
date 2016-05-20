@@ -719,8 +719,7 @@ namespace Isis {
         m_stereoTool->setShown(false);
         clearNetData();
         m_controlNet = new ControlNet();
-        m_controlNet->SetTarget(
-                                m_linkedViewports.at(0)->cube()->camera()->target()->name() );
+        m_controlNet->SetTarget(*m_linkedViewports.at(0)->cube()->label());
         m_serialNumberList = new SerialNumberList(false);
       }
     }
@@ -1580,8 +1579,8 @@ namespace Isis {
     QString filename;
 
     //Make sure the filename is valid
-    if( !fn.isEmpty() ) {
-      if( !fn.endsWith(".csv") ) {
+    if ( !fn.isEmpty() ) {
+      if ( !fn.endsWith(".csv") ) {
         filename = fn + ".csv";
       }
       else {
@@ -1606,7 +1605,7 @@ namespace Isis {
     if ( m_currentFile.fileName().isEmpty() ) return;
 
     bool success = m_currentFile.open(QIODevice::WriteOnly);
-    if(!success) {
+    if (!success) {
       QMessageBox::critical(m_stereoTool, "Error",
                             "Cannot open file, please check permissions");
       m_currentFile.setFileName("");

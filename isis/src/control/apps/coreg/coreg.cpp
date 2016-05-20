@@ -37,9 +37,9 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Make sure the correct parameters are entered
-  if(ui.WasEntered("TO")) {
-    if(ui.GetString("TRANSFORM") == "WARP") {
-      if(!ui.WasEntered("ONET")) {
+  if (ui.WasEntered("TO")) {
+    if (ui.GetString("TRANSFORM") == "WARP") {
+      if (!ui.WasEntered("ONET")) {
         QString msg = "A Control Net file must be entered if the TO parameter is ";
         msg += "entered";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -54,7 +54,6 @@ void IsisMain() {
   trans.setVirtualBands(bandTrans);
   trans.open(ui.GetFileName("FROM"), "r");
 
-
   // Open the second cube, it is held in place.  We will be matching the
   // first to this one by attempting to compute a sample/line translation
   Cube match;
@@ -65,13 +64,13 @@ void IsisMain() {
 
   // Input cube Lines and Samples must be the same and each must have only
   // one band
-  if((trans.lineCount() != match.lineCount()) ||
+  if ((trans.lineCount() != match.lineCount()) ||
       (trans.sampleCount() != match.sampleCount())) {
     QString msg = "Input Cube Lines and Samples must be equal!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(trans.bandCount() != 1 || match.bandCount() != 1) {
+  if (trans.bandCount() != 1 || match.bandCount() != 1) {
     QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -81,10 +80,10 @@ void IsisMain() {
   QString serialMatch = SerialNumber::Compose(match, true);
 
 //  This still precludes band to band registrations.
-  if(serialTrans == serialMatch) {
+  if (serialTrans == serialMatch) {
     QString sTrans = FileName(trans.fileName()).name();
     QString sMatch = FileName(match.fileName()).name();
-    if(sTrans == sMatch) {
+    if (sTrans == sMatch) {
       QString msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
                    ", MATCH=" + serialMatch;
       throw IException(IException::User, msg, _FILEINFO_);
@@ -104,13 +103,13 @@ void IsisMain() {
   // Get row and column variables, if not entered, default to 1% of the input
   // image size
   int rows, cols;
-  if(ui.WasEntered("ROWS")) {
+  if (ui.WasEntered("ROWS")) {
     rows = ui.GetInteger("ROWS");
   }
   else {
     rows = (int)((trans.lineCount() - 1) / ar->SearchChip()->Lines() + 1);
   }
-  if(ui.WasEntered("COLUMNS")) {
+  if (ui.WasEntered("COLUMNS")) {
     cols = ui.GetInteger("COLUMNS");
   }
   else {
@@ -133,16 +132,14 @@ void IsisMain() {
   cn.SetNetworkId("Coreg");
   if (match.hasGroup("Instrument")) {
     PvlGroup inst = match.group("Instrument");
-    PvlKeyword &targname = inst.findKeyword("TargetName");
-    QString targetname = targname;
-    cn.SetTarget(targetname);
+    cn.SetTarget(*trans.label());
   }
 
   // Loop through grid of points and get statistics to compute
   // translation values
   Statistics sStats, lStats;
-  for(int r = 0; r < rows; r++) {
-    for(int c = 0; c < cols; c++) {
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
       int line = (int)(lSpacing / 2.0 + lSpacing * r + 0.5);
       int samp = (int)(sSpacing / 2.0 + sSpacing * c + 0.5);
       ar->PatternChip()->TackCube(samp, line);
@@ -165,7 +162,7 @@ void IsisMain() {
       ar->Register();
 
       // Match found
-      if(ar->Success()) {
+      if (ar->Success()) {
         double sDiff = samp - ar->CubeSample();
         double lDiff = line - ar->CubeLine();
         sStats.AddData(&sDiff, (unsigned int)1);
@@ -185,7 +182,7 @@ void IsisMain() {
       cp->Add(cmTrans);
       cp->Add(cmMatch);
       cp->SetRefMeasure(cmMatch);
-      if(!cmTrans->IsMeasured()) cp->SetIgnored(true);
+      if (!cmTrans->IsMeasured()) cp->SetIgnored(true);
       cn.AddPoint(cp);
       prog.CheckStatus();
     }
@@ -214,7 +211,7 @@ void IsisMain() {
 
   Pvl arPvl = ar->RegistrationStatistics();
 
-  for(int i = 0; i < arPvl.groups(); i++) {
+  for (int i = 0; i < arPvl.groups(); i++) {
     Application::Log(arPvl.group(i));
   }
 
@@ -223,7 +220,7 @@ void IsisMain() {
   Application::Log(autoRegTemplate);
 
   // If none of the points registered, throw an error
-  if(sStats.TotalPixels() < 1) {
+  if (sStats.TotalPixels() < 1) {
     QString msg = "Coreg was unable to register any points. Check your algorithm definition.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -233,22 +230,22 @@ void IsisMain() {
   match.close();
 
   // If a cnet file was entered, write the ControlNet pvl to the file
-  if(ui.WasEntered("ONET")) {
+  if (ui.WasEntered("ONET")) {
     cn.Write(ui.GetFileName("ONET"));
   }
 
   // If flatfile was entered, create the flatfile
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
-  if(ui.WasEntered("FLATFILE")) {
+  if (ui.WasEntered("FLATFILE")) {
     QString fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
     ofstream os;
     os.open(fFile.toAscii().data(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
        "SampleDifference,LineDifference,GoodnessOfFit" << endl;
-    for(int i = 0; i < cn.GetNumPoints(); i++) {
+    for (int i = 0; i < cn.GetNumPoints(); i++) {
       const ControlPoint * cp = cn[i];
-      if(cp->IsIgnored()) continue;
+      if (cp->IsIgnored()) continue;
       const ControlMeasure * cmTrans = cp->GetMeasure(0);
       const ControlMeasure * cmMatch = cp->GetMeasure(1);
 
@@ -264,8 +261,8 @@ void IsisMain() {
 
   // If a TO parameter was specified, apply the average translation found to the
   // second input image
-  if(ui.WasEntered("TO")) {
-    if(ui.GetString("TRANSFORM") == "TRANSLATE") {
+  if (ui.WasEntered("TO")) {
+    if (ui.GetString("TRANSFORM") == "TRANSLATE") {
       QString params = " from="   + ui.GetFileName("FROM") +
                       " to="     + ui.GetFileName("TO") +
                       " strans=" + toString(sTrans) +

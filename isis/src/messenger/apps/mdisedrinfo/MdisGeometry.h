@@ -58,23 +58,24 @@ namespace Isis {
    * @ingroup Utility
    * @author 2007-08-14 Kris Becker
    * @internal
-   * @history 2008-04-14 Kris Becker - Removed the isTargetValid() method as it
-   *          was not implemented; Corrected computation of
-   *          SC_TARGET_POSITION_VECTOR and TARGET_CENTER_DISTANCE when target
-   *          is anything but Sky (it was previously only computed when the
-   *          center reference pixel intersected the target).
-   * @history 2009-09-18 Debbie A. Cook - corrected pxlscl and explen in 
-   *                       MdisGeometry
-   * @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to 
-   *                       ensure it is restricted to the 0-360 degree domain.
-   * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                       coding standards.  References #972..
-   * @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
-   *                       #775 and #1114.
-   * @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
-   *                       References #775.
-   * @history 2015-07-22 Kristin Berry -  Added NaifStatus::CheckErrors() to see if any NAIF errors
-   *                       were signaled. References #2248.
+   *   @history 2008-04-14 Kris Becker - Removed the isTargetValid() method as it was not
+   *                           implemented. Corrected computation of SC_TARGET_POSITION_VECTOR and
+   *                           TARGET_CENTER_DISTANCE when target is anything but
+   *                           Sky (it was previously only computed when the
+   *                           center reference pixel intersected the target).
+   *   @history 2009-09-18 Debbie A. Cook - corrected pxlscl and explen in MdisGeometry
+   *   @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to 
+   *                           ensure it is restricted to the 0-360 degree domain.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                           coding standards.  References #972..
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References  
+   *                           #775 and #1114.
+   *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
+   *   @history 2015-07-22 Kristin Berry -  Added NaifStatus::CheckErrors() to see if any NAIF
+   *                           errors were signaled. References #2248.
+   *   @history 2016-05-10 Jeannie Backer - Replaced call to NAIF routine bodn2c with call to static 
+   *                           method Isis::Target::lookupNaifBodyCode. Reference #3934
    */
   class MdisGeometry {
     public:

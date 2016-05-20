@@ -8,22 +8,30 @@
 #include <QList>
 #include <QSet>
 #include <QString>
+#include <QVector>
 
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
+#include "Distance.h"
+#include "IException.h"
+#include "Preference.h"
 #include "SurfacePoint.h"
 #include "SpecialPixel.h"
 #include "TextFile.h"
-#include "IException.h"
-#include "Preference.h"
 
 using namespace std;
 using namespace Isis;
 
-
+/**
+ * Unit test for ControlNet class 
+ *  
+ * @author ????-??-?? Unknown
+ * @internal
+ *   @history 2016-05-11 Jeannie Backer - Added tests for setTarget methods.
+ */
 bool lessThan(const ControlMeasure *m1, const ControlMeasure *m2) {
   return m1->GetResidualMagnitude() < m2->GetResidualMagnitude();
 }
@@ -278,6 +286,80 @@ int main() {
 
 
   ControlNet cn1;
+
+  cout << "testing set target.................................\n";
+
+  cout << "Set target/radii directly. Invalid radii." << endl;
+  QVector<Distance> targetRadii;
+  try {
+    cn1.SetTarget("Fail", targetRadii);
+  }
+  catch (IException &e) {
+    e.print();
+  }
+  cout << endl;
+  cout << "Set target/radii directly. Valid radii." << endl;
+  targetRadii += Distance(Isis::PI, Distance::Meters);
+  targetRadii += Distance(Isis::HALFPI, Distance::Meters);
+  targetRadii += Distance(Isis::E, Distance::Meters);
+  cn1.SetTarget("SomethingStrange", targetRadii);
+  vector<Distance> targRad = cn1.GetTargetRadii();
+  cout << "        TargetName = " << cn1.GetTarget() << endl;
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+                                    << targRad[1].meters() << ", "
+                                    << targRad[2].meters() << ")" << endl;
+  cout << endl;
+  cout << "Set target/radii using empty PVL." << endl;
+  Pvl label;
+  // no mapping group, (i.e. target name empty, no equatorial radius)
+  // catch exception and set radii to nulls
+  cn1.SetTarget(label);
+  targRad = cn1.GetTargetRadii();
+  cout << "        TargetName = " << cn1.GetTarget() << endl;
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+                                    << targRad[1].meters() << ", "
+                                    << targRad[2].meters() << ")" << endl;
+  cout << endl;
+  cout << "Set target/radii using PVL with no PolarRadius." << endl;
+  label += PvlGroup("Mapping");
+  PvlGroup &mapping = label.findGroup("Mapping");
+  mapping += PvlKeyword("TargetName", "Mars");
+  mapping += PvlKeyword("EquatorialRadius", "");
+  cout << label << endl;
+  cn1.SetTarget(label);
+  targRad = cn1.GetTargetRadii();
+  cout << "        TargetName = " << cn1.GetTarget() << endl;
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+                                    << targRad[1].meters() << ", "
+                                    << targRad[2].meters() << ")" << endl;
+  cout << endl;
+  cout << "Set target/radii using PVL containing both radii." << endl;
+  mapping.addKeyword(PvlKeyword("EquatorialRadius", "6.0"), PvlContainer::Replace);
+  mapping.addKeyword(PvlKeyword("PolarRadius", "1.0"), PvlContainer::Replace);
+  cout << label << endl;
+  cn1.SetTarget(label);
+  targRad = cn1.GetTargetRadii();
+  cout << "        TargetName = " << cn1.GetTarget() << endl;
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+                                    << targRad[1].meters() << ", "
+                                    << targRad[2].meters() << ")" << endl;
+  cout << endl;
+  cout << "Set empty target." << endl;
+  cn1.SetTarget("");
+  targRad = cn1.GetTargetRadii();
+  cout << "        TargetName = " << cn1.GetTarget() << endl;
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+                                    << targRad[1].meters() << ", "
+                                    << targRad[2].meters() << ")" << endl;
+  cout << endl;
+  cout << "Set Mars target." << endl;
+  cn1.SetTarget("Mars");
+  targRad = cn1.GetTargetRadii();
+  cout << "        TargetName = " << cn1.GetTarget() << endl;
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+                                    << targRad[1].meters() << ", "
+                                    << targRad[2].meters() << ")" << endl;
+  cout << endl;
 
   cn1.SetTarget("Mars");
   cn1.SetNetworkId("Test");

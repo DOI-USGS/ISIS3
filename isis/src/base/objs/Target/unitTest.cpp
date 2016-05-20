@@ -29,22 +29,14 @@
 #include "Target.h"
 #include "Preference.h"
 
-  /**
-   * @file
-   *
-   * This application tests the Target class.
-   *
-   * @author 2012-03-20 Debbie A. Cook
-   *
-   * @internal
-   *   @history
-   */
-
 using namespace Isis;
 using namespace std;
 
+void printRadiiGroupInfo(bool found, Pvl &label, PvlGroup &mappingGroup);
+
 /**
  * UnitTest for Target class.
+ * @author 2012-03-20 Debbie A. Cook
  *
  * @internal
  * @history 2009-03-23  Tracie Sucharski - Removed old keywords
@@ -126,8 +118,10 @@ int main(int argc, char *argv[]) {
   // Use a Spice object to test radii
   vector<Distance> r(3);
   r = spi.target()->radii();
-  cout << "     Target radii = " << r[0].kilometers() << "/" << r[1].kilometers() << "/" << r[2].kilometers();
-  cout << endl;
+  cout << "     Target radii = " << r[0].kilometers()
+                                 << "/" << r[1].kilometers() 
+                                 << "/" << r[2].kilometers()
+                                 << endl;
 
   // Test Sky
   Pvl lab2;
@@ -158,8 +152,7 @@ int main(int argc, char *argv[]) {
   Pvl lab4;
   // Test without instrument group
   try {
-    cout << endl;
-    cout << "  Testing no instrument group ..." << endl;
+    cout << endl << "  Testing no instrument group ..." << endl;
     lab4.addGroup(kern2);
     Target tNoInstrument(NULL, lab4);
   }
@@ -173,8 +166,7 @@ int main(int argc, char *argv[]) {
 
   // Test without kernels group
   try {
-    cout << endl;
-    cout << "  Testing no kernels group ..." << endl;
+    cout << endl << "  Testing no kernels group ..." << endl;
     Target tNoKernels(NULL, lab5);
   }
   catch(IException &e) {
@@ -184,22 +176,13 @@ int main(int argc, char *argv[]) {
 
   // Test bad target
   try {
-    cout << endl;
-    cout << "  Testing unknown target ..." << endl;
+    cout << endl << "  Testing unknown target ..." << endl;
     Target tUnknownTarget(NULL, lab4);
   }
   catch(IException &e) {
     e.print();
     cout << endl;
   }
-
-  // Test case with override of body code
-  // lab5.addGroup(inst2);
-  // lab5.addGroup(kern4);
-  // Target tOverrideBodyCode(&spi, lab5);
-  // cout << endl;
-  // cout << "  Testing case with bodycode override" << endl;
-  // cout << "     NaifBodyCode = " << tOverrideBodyCode.naifBodyCode() << endl;
 
   // Test methods setShapeEllipsoid and restoreShape
   Pvl lab6;
@@ -218,4 +201,165 @@ int main(int argc, char *argv[]) {
   cout << endl << "  Testing default constructor..." << endl << "    Is it Sky? "  << defaultTarget.isSky() << endl;
   cout << "    Number of radii = " << defaultTarget.radii().size() << endl;
 
+  cout << endl << endl;
+  cout << "///////////////////////////////////////////////////////////" << endl << endl << endl;
+  cout << "Testing radiiGroup() static methods " << endl;
+  Pvl label;
+  PvlGroup mappingGroup("Mapping");
+
+  // Throw errors for incomplete label/mapping info
+  try {
+    // Mapping group does not have TargetRadii
+    // Mapping group does not have TargetName
+    // No IsisCube in label
+    Target::radiiGroup(label, mappingGroup);
+  }
+  catch (IException &error) {
+    printRadiiGroupInfo(false, label, mappingGroup);
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+
+  label += PvlObject("IsisCube");
+  try {
+    // Mapping group does not have TargetRadii
+    // Mapping group does not have TargetName
+    // Instrument group not found in label
+    Target::radiiGroup(label, mappingGroup);
+  }
+  catch (IException &error) {
+    printRadiiGroupInfo(false, label, mappingGroup);
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+
+  mappingGroup += PvlKeyword("TargetName", "");
+  label.findObject("IsisCube").addGroup(PvlGroup("Instrument"));
+  try {
+    // Mapping group has TargetName=""
+    // Instrument group found in label
+    //     Instrument group does not have TargetName 
+    Target::radiiGroup(label, mappingGroup);
+  }
+  catch (IException &error) {
+    printRadiiGroupInfo(false, label, mappingGroup);
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+
+  label.findObject("IsisCube").findGroup("Instrument").addKeyword(PvlKeyword("TargetName", ""));
+  try {
+    // Mapping group has TargetName=""
+    // Instrument group found in label
+    //     Instrument group has TargetName=""
+    Target::radiiGroup(label, mappingGroup);
+  }
+  catch (IException &error) {
+    printRadiiGroupInfo(false, label, mappingGroup);
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+
+  mappingGroup.addKeyword(PvlKeyword("TargetName", "Chewbaca"), PvlContainer::Replace);
+  try {
+    // Mapping group has TargetName="Chewbaca" (not recognized by NAIF)
+    // NaifKeywords object not found in label
+    Target::radiiGroup(label, mappingGroup);
+  }
+  catch (IException &error) {
+    printRadiiGroupInfo(false, label, mappingGroup);
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+
+  label += PvlObject("NaifKeywords");
+  try {
+    // Mapping group has TargetName="Chewbaca" (not recognized by NAIF)
+    // NaifKeywords object exists
+    //     BODY_FRAME_CODE not found 
+    Target::radiiGroup(label, mappingGroup);
+  }
+  catch (IException &error) {
+    printRadiiGroupInfo(false, label, mappingGroup);
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+
+  PvlObject &naifKeywords = label.findObject("NaifKeywords");
+  naifKeywords += PvlKeyword("BODY_FRAME_CODE", "2101955");
+  try {
+    // Mapping group has TargetName="Chewbaca" (not recognized by NAIF)
+    // NaifKeywords object exists
+    //     BODY_FRAME_CODE exists
+    //     BODY<code>_RADII does not exist
+    //     BODY_FRAME_CODE not recognized by NAIF
+    Target::radiiGroup(label, mappingGroup);
+  }
+  catch (IException &error) {
+    printRadiiGroupInfo(false, label, mappingGroup);
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+
+  // TargetName="Chewbaca" (not recognized by NAIF)
+  // NaifKeywords object exists
+  //     BODY_FRAME_CODE exists
+  //     BODY<code>_RADII exists
+  PvlKeyword bennuRadii("BODY2101955_RADII", "0.2825");
+  bennuRadii.addValue("0.2675");
+  bennuRadii.addValue("0.254");
+  naifKeywords.addKeyword(bennuRadii);
+  PvlGroup radii = Target::radiiGroup(label, mappingGroup);
+  printRadiiGroupInfo(true, label, mappingGroup);
+  radii.addComment("Set radii to BODY RADII values in NaifKeywords Object.");
+  cout << radii;
+  cout << endl << "-------------------------------" << endl << endl;
+
+  // Valid TargetName found in Mapping group is recognized by NAIF
+  mappingGroup.addKeyword(PvlKeyword("TargetName", "Mars"), PvlContainer::Replace);
+  radii = Target::radiiGroup(label, mappingGroup);
+  printRadiiGroupInfo(true, label, mappingGroup);
+  radii.addComment("Find radii using known NAIF TargetName, Mars.");
+  cout << radii;
+  cout << endl << "-------------------------------" << endl << endl;
+
+  // Radii values found in given mapping group
+  printRadiiGroupInfo(true, label, radii);
+  radii = Target::radiiGroup(label, radii);
+  radii.addComment("Read radii from given Mapping group.");
+  cout << radii;
+  cout << endl << "-------------------------------" << endl << endl;
+
+  cout << "///////////////////////////////////////////////////////////" << endl << endl << endl;
+  cout << "Testing lookupNaifBodyCode() methods " << endl << endl;
+  // known target
+  cout << "FOUND NAIF BODY CODE FOR TARGET 'Mars': " 
+       << toString((int)Target::lookupNaifBodyCode("Mars"))
+       << endl << endl;
+  try {
+    // unknown target
+    cout << Target::lookupNaifBodyCode("HanSolo");
+  }
+  catch (IException &error) {
+    cout << "FAILED TO FIND NAIF BODY CODE FOR TARGET 'HanSolo." << endl;
+    cout << "THROWS:" << endl << endl;
+    error.print();
+    cout << "-------------------------------" << endl << endl;
+  }
+  cout << endl << "///////////////////////////////////////////////////////////" << endl << endl << endl;
+
+}
+
+void printRadiiGroupInfo(bool found, Pvl &label, PvlGroup &mappingGroup) {
+  cout << "-------------------------------" << endl;
+  if (!found) {
+    cout << "FAILED TO FIND RADII FOR LABEL: " << endl;
+  }
+  else {
+    cout << "FOUND RADII FOR LABEL: " << endl;
+  }
+  cout << endl << label << endl << endl;
+  cout << "AND MAPPING GROUP: " << endl;
+  cout << endl << mappingGroup << endl << endl;
+  cout << "RETURNS: " << endl << endl;
 }

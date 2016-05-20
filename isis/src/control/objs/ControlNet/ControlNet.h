@@ -185,10 +185,17 @@ namespace Isis {
    *                           method to GetNumberOfValidMeasuresInImage and the private
    *                           variable p_cameraMeasuresMap to p_cameraValidMeasuresMap. References
    *                           #1603.
-   *    @history 2016-02-15 Kris Becker - Added feature to take ownership of
+   *   @history 2016-02-15 Kris Becker - Added feature to take ownership of
    *                           points from ControlNet. To support this option,
    *                           added clear() and take() methods.
    *                           (Merged by Kristin Berry. References #2392)
+   *   @history 2016-04-22 Jeannie Backer - Added try/catch to SetTarget()'s call to
+   *                           TProjection::TargetRadii(). If an error is thrown, the radii are
+   *                           now set to Isis:Null. Added SetTarget(Pvl), SetTarget(ControlNet),
+   *                           and SetTarget(QString, vector) methods to attempt to read radii from
+   *                           various sources, if not found using the TargetName. References #3892
+   *   @history 2016-05-10 Jeannie Backer - Replaced calls to TProjection::TargetRadii() with calls
+   *                           to Target::radiiGroup(). References #3934
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -276,6 +283,10 @@ namespace Isis {
       void SetMutex(QMutex *mutex);
       void SetNetworkId(const QString &id);
       void SetTarget(const QString &target);
+      void SetTarget(Pvl label);
+      void SetTarget(const ControlNet &other);
+      void SetTarget(const QString &target,
+                     const QVector<Distance> &radii);
       void SetUserName(const QString &name);
 
       void swap(ControlNet &other);

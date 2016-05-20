@@ -1,39 +1,40 @@
 #define GUIHELPERS
 
 #include "Isis.h"
-#include "Camera.h"
-#include "TProjection.h"
-#include "ProjectionFactory.h"
-#include "ProcessRubberSheet.h"
-#include "IException.h"
+
 #include "cam2map.h"
-#include "Pvl.h"
+#include "Camera.h"
+#include "IException.h"
 #include "IString.h"
+#include "ProcessRubberSheet.h"
+#include "ProjectionFactory.h"
 #include "PushFrameCameraDetectorMap.h"
+#include "Pvl.h"
 #include "Target.h"
+#include "TProjection.h"
 
 using namespace std;
 using namespace Isis;
 
-void PrintMap();
-void LoadMapRes();
-void LoadCameraRes();
-void LoadMapRange();
-void LoadCameraRange();
+void printMap();
+void loadMapRes();
+void loadCameraRes();
+void loadMapRange();
+void loadCameraRange();
 
 map <QString, void *> GuiHelpers() {
   map <QString, void *> helper;
-  helper ["PrintMap"] = (void *) PrintMap;
-  helper ["LoadMapRes"] = (void *) LoadMapRes;
-  helper ["LoadCameraRes"] = (void *) LoadCameraRes;
-  helper ["LoadMapRange"] = (void *) LoadMapRange;
-  helper ["LoadCameraRange"] = (void *) LoadCameraRange;
+  helper ["PrintMap"] = (void *) printMap;
+  helper ["LoadMapRes"] = (void *) loadMapRes;
+  helper ["LoadCameraRes"] = (void *) loadCameraRes;
+  helper ["LoadMapRange"] = (void *) loadMapRange;
+  helper ["LoadCameraRange"] = (void *) loadCameraRange;
   return helper;
 }
 
 
 // Global variables
-void BandChange(const int band);
+void bandChange(const int band);
 Cube *icube;
 Camera *incam;
 
@@ -52,7 +53,7 @@ void IsisMain() {
   incam = icube->camera();
 
   // Make sure it is not the sky
-  if(incam->target()->isSky()) {
+  if (incam->target()->isSky()) {
     QString msg = "The image [" + ui.GetFileName("FROM") +
                   "] is targeting the sky, use skymap instead.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -82,8 +83,8 @@ void IsisMain() {
   TProjection *outmap = NULL;
   bool trim = ui.GetBoolean("TRIM");
 
-  if( !ui.GetBoolean("MATCHMAP") ) {
-    if(ui.GetString("DEFAULTRANGE") == "MAP") {
+  if ( !ui.GetBoolean("MATCHMAP") ) {
+    if (ui.GetString("DEFAULTRANGE") == "MAP") {
       camGrp.deleteKeyword("MinimumLatitude");
       camGrp.deleteKeyword("MaximumLatitude");
       camGrp.deleteKeyword("MinimumLongitude");
@@ -107,64 +108,64 @@ void IsisMain() {
     }
 
     // If the user decided to enter a ground range then override
-    if( ui.WasEntered("MINLON") ) {
+    if ( ui.WasEntered("MINLON") ) {
       userGrp.addKeyword(PvlKeyword("MinimumLongitude",
                                     toString(ui.GetDouble("MINLON"))), Pvl::Replace);
     }
 
-    if( ui.WasEntered("MAXLON") ) {
+    if ( ui.WasEntered("MAXLON") ) {
       userGrp.addKeyword(PvlKeyword("MaximumLongitude",
                                     toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
     }
 
-    if( ui.WasEntered("MINLAT") ) {
+    if ( ui.WasEntered("MINLAT") ) {
       userGrp.addKeyword(PvlKeyword("MinimumLatitude",
                                     toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
     }
 
-    if( ui.WasEntered("MAXLAT") ) {
+    if ( ui.WasEntered("MAXLAT") ) {
       userGrp.addKeyword(PvlKeyword("MaximumLatitude",
                                     toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
     }
 
     // If they want the res. from the mapfile, delete it from the camera so
     // nothing gets overriden
-    if(ui.GetString("PIXRES") == "MAP") {
+    if (ui.GetString("PIXRES") == "MAP") {
       camGrp.deleteKeyword("PixelResolution");
     }
     // Otherwise, delete any resolution keywords from the mapfile so the camera
     // info is propogated over
-    else if(ui.GetString("PIXRES") == "CAMERA") {
-      if(userGrp.hasKeyword("Scale")) {
+    else if (ui.GetString("PIXRES") == "CAMERA") {
+      if (userGrp.hasKeyword("Scale")) {
         userGrp.deleteKeyword("Scale");
       }
-      if(userGrp.hasKeyword("PixelResolution")) {
+      if (userGrp.hasKeyword("PixelResolution")) {
         userGrp.deleteKeyword("PixelResolution");
       }
     }
 
     // Copy any defaults that are not in the user map from the camera map file
-    for(int k = 0; k < camGrp.keywords(); k++) {
-      if(!userGrp.hasKeyword(camGrp[k].name())) {
+    for (int k = 0; k < camGrp.keywords(); k++) {
+      if (!userGrp.hasKeyword(camGrp[k].name())) {
         userGrp += camGrp[k];
       }
     }
 
     // If the user decided to enter a resolution then override
-    if(ui.WasEntered("PIXRES")) {
-      if(ui.GetString("PIXRES") == "MPP") {
+    if (ui.WasEntered("PIXRES")) {
+      if (ui.GetString("PIXRES") == "MPP") {
         userGrp.addKeyword(PvlKeyword("PixelResolution",
                                       toString(ui.GetDouble("RESOLUTION"))),
                           Pvl::Replace);
-        if(userGrp.hasKeyword("Scale")) {
+        if (userGrp.hasKeyword("Scale")) {
           userGrp.deleteKeyword("Scale");
         }
       }
-      else if(ui.GetString("PIXRES") == "PPD") {
+      else if (ui.GetString("PIXRES") == "PPD") {
         userGrp.addKeyword(PvlKeyword("Scale",
                                       toString(ui.GetDouble("RESOLUTION"))),
                           Pvl::Replace);
-        if(userGrp.hasKeyword("PixelResolution")) {
+        if (userGrp.hasKeyword("PixelResolution")) {
           userGrp.deleteKeyword("PixelResolution");
         }
       }
@@ -173,19 +174,19 @@ void IsisMain() {
     // See if the user want us to handle the longitude seam
 
 
-    if( (ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") ) {
-      if(incam->IntersectsLongitudeDomain(userMap)) {
-        if(ui.GetString("LONSEAM") == "AUTO") {
-          if((int) userGrp["LongitudeDomain"] == 360) {
+    if ( (ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") ) {
+      if (incam->IntersectsLongitudeDomain(userMap)) {
+        if (ui.GetString("LONSEAM") == "AUTO") {
+          if ((int) userGrp["LongitudeDomain"] == 360) {
             userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"), Pvl::Replace);
-            if(incam->IntersectsLongitudeDomain(userMap)) {
+            if (incam->IntersectsLongitudeDomain(userMap)) {
               // Its looks like a global image so switch back to the users preference
               userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
             }
           }
           else {
             userGrp.addKeyword(PvlKeyword("LongitudeDomain", "360"), Pvl::Replace);
-            if(incam->IntersectsLongitudeDomain(userMap)) {
+            if (incam->IntersectsLongitudeDomain(userMap)) {
               // Its looks like a global image so switch back to the
               // users preference
               userGrp.addKeyword(PvlKeyword("LongitudeDomain", "180"), Pvl::Replace);
@@ -194,21 +195,21 @@ void IsisMain() {
           // Make the target info match the new longitude domain
           double minlat, maxlat, minlon, maxlon;
           incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
-          if(!ui.WasEntered("MINLAT")) {
+          if (!ui.WasEntered("MINLAT")) {
             userGrp.addKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
           }
-          if(!ui.WasEntered("MAXLAT")) {
+          if (!ui.WasEntered("MAXLAT")) {
             userGrp.addKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
           }
-          if(!ui.WasEntered("MINLON")) {
+          if (!ui.WasEntered("MINLON")) {
             userGrp.addKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
           }
-          if(!ui.WasEntered("MAXLON")) {
+          if (!ui.WasEntered("MAXLON")) {
             userGrp.addKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
           }
         }
 
-        else if(ui.GetString("LONSEAM") == "ERROR") {
+        else if (ui.GetString("LONSEAM") == "ERROR") {
           QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
                         "longitude seam";
           throw IException(IException::User, msg, _FILEINFO_);
@@ -217,11 +218,11 @@ void IsisMain() {
     }
 
     // Determine the image size
-    if(ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
+    if (ui.GetString("DEFAULTRANGE") == "MINIMIZE") {
       outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, *incam);
       trim = false;
     }
-    else {//if(ui.GetString("DEFAULTRANGE") == "CAMERA" || DEFAULTRANGE = MAP) {
+    else {//if (ui.GetString("DEFAULTRANGE") == "CAMERA" || DEFAULTRANGE = MAP) {
       outmap = (TProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, false);
     }
 //     else {
@@ -254,19 +255,19 @@ void IsisMain() {
 
   // Set up the interpolator
   Interpolator *interp = NULL;
-  if(ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
+  if (ui.GetString("INTERP") == "NEARESTNEIGHBOR") {
     interp = new Interpolator(Interpolator::NearestNeighborType);
   }
-  else if(ui.GetString("INTERP") == "BILINEAR") {
+  else if (ui.GetString("INTERP") == "BILINEAR") {
     interp = new Interpolator(Interpolator::BiLinearType);
   }
-  else if(ui.GetString("INTERP") == "CUBICCONVOLUTION") {
+  else if (ui.GetString("INTERP") == "CUBICCONVOLUTION") {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
 
   // See if we need to deal with band dependent camera models
-  if(!incam->IsBandIndependent()) {
-    p.BandChange(BandChange);
+  if (!incam->IsBandIndependent()) {
+    p.BandChange(bandChange);
   }
 
   //  See if center of input image projects.  If it does, force tile
@@ -274,14 +275,14 @@ void IsisMain() {
   //  TODO:  WEIRD ... why is this needed ... Talk to Tracie ... JAA??
   double centerSamp = icube->sampleCount() / 2.;
   double centerLine = icube->lineCount() / 2.;
-  if(incam->SetImage(centerSamp, centerLine)) {
-    if(outmap->SetUniversalGround(incam->UniversalLatitude(),
+  if (incam->SetImage(centerSamp, centerLine)) {
+    if (outmap->SetUniversalGround(incam->UniversalLatitude(),
                                   incam->UniversalLongitude())) {
       p.ForceTile(outmap->WorldX(), outmap->WorldY());
     }
   }
   // Create an alpha cube group for the output cube
-  if(!ocube->hasGroup("AlphaCube")) {
+  if (!ocube->hasGroup("AlphaCube")) {
     PvlGroup alpha("AlphaCube");
     alpha += PvlKeyword("AlphaSamples", toString(icube->sampleCount()));
     alpha += PvlKeyword("AlphaLines", toString(icube->lineCount()));
@@ -301,8 +302,12 @@ void IsisMain() {
   // Does the user want to define how it is done?
   if (ui.GetString("WARPALGORITHM") == "FORWARDPATCH") {
     transform = new cam2mapForward(icube->sampleCount(),
-                                   icube->lineCount(), incam, samples,lines,
-                                   outmap, trim);
+                                   icube->lineCount(), 
+                                   incam, 
+                                   samples,
+                                   lines,
+                                   outmap, 
+                                   trim);
 
     int patchSize = ui.GetInteger("PATCHSIZE");
     if (patchSize <= 1) {
@@ -445,21 +450,21 @@ cam2mapForward::cam2mapForward(const int inputSamples, const int inputLines,
 
 // Transform method mapping input line/samps to lat/lons to output line/samps
 bool cam2mapForward::Xform(double &outSample, double &outLine,
-                    const double inSample, const double inLine) {
+                           const double inSample, const double inLine) {
   // See if the input image coordinate converts to a lat/lon
   if (!p_incam->SetImage(inSample,inLine)) return false;
 
   // Does that ground coordinate work in the map projection
   double lat = p_incam->UniversalLatitude();
   double lon = p_incam->UniversalLongitude();
-  if(!p_outmap->SetUniversalGround(lat,lon)) return false;
+  if (!p_outmap->SetUniversalGround(lat,lon)) return false;
 
   // See if we should trim
-  if((p_trim) && (p_outmap->HasGroundRange())) {
-    if(p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
-    if(p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
-    if(p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
-    if(p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
+  if ((p_trim) && (p_outmap->HasGroundRange())) {
+    if (p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
+    if (p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
+    if (p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
+    if (p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
   }
 
   // Get the output sample/line coordinate
@@ -467,10 +472,10 @@ bool cam2mapForward::Xform(double &outSample, double &outLine,
   outLine = p_outmap->WorldY();
 
   // Make sure the point is inside the output image
-  if(outSample < 0.5) return false;
-  if(outLine < 0.5) return false;
-  if(outSample > p_outputSamples + 0.5) return false;
-  if(outLine > p_outputLines + 0.5) return false;
+  if (outSample < 0.5) return false;
+  if (outLine < 0.5) return false;
+  if (outSample > p_outputSamples + 0.5) return false;
+  if (outLine > p_outputLines + 0.5) return false;
 
   // Everything is good
   return true;
@@ -505,27 +510,27 @@ cam2mapReverse::cam2mapReverse(const int inputSamples, const int inputLines,
 bool cam2mapReverse::Xform(double &inSample, double &inLine,
                            const double outSample, const double outLine) {
   // See if the output image coordinate converts to lat/lon
-  if(!p_outmap->SetWorld(outSample, outLine)) return false;
+  if (!p_outmap->SetWorld(outSample, outLine)) return false;
 
   // See if we should trim
-  if((p_trim) && (p_outmap->HasGroundRange())) {
-    if(p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
-    if(p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
-    if(p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
-    if(p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
+  if ((p_trim) && (p_outmap->HasGroundRange())) {
+    if (p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
+    if (p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
+    if (p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
+    if (p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
   }
 
   // Get the universal lat/lon and see if it can be converted to input line/samp
   double lat = p_outmap->UniversalLatitude();
   double lon = p_outmap->UniversalLongitude();
 
-  if(!p_incam->SetUniversalGround(lat, lon)) return false;
+  if (!p_incam->SetUniversalGround(lat, lon)) return false;
 
   // Make sure the point is inside the input image
-  if(p_incam->Sample() < 0.5) return false;
-  if(p_incam->Line() < 0.5) return false;
-  if(p_incam->Sample() > p_inputSamples + 0.5) return false;
-  if(p_incam->Line() > p_inputLines + 0.5) return false;
+  if (p_incam->Sample() < 0.5) return false;
+  if (p_incam->Line() < 0.5) return false;
+  if (p_incam->Sample() > p_inputSamples + 0.5) return false;
+  if (p_incam->Line() > p_inputLines + 0.5) return false;
 
   // Everything is good
   inSample = p_incam->Sample();
@@ -542,12 +547,12 @@ int cam2mapReverse::OutputLines() const {
   return p_outputLines;
 }
 
-void BandChange(const int band) {
+void bandChange(const int band) {
   incam->SetBand(band);
 }
 
 // Helper function to print out mapfile to session log
-void PrintMap() {
+void printMap() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get mapping group from map file
@@ -560,7 +565,7 @@ void PrintMap() {
 }
 
 // Helper function to get mapping resolution.
-void LoadMapRes() {
+void loadMapRes() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get mapping group from map file
@@ -569,13 +574,13 @@ void LoadMapRes() {
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
-  if(userGrp.hasKeyword("Scale")) {
+  if (userGrp.hasKeyword("Scale")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["Scale"]);
     ui.Clear("PIXRES");
     ui.PutAsString("PIXRES", "PPD");
   }
-  else if(userGrp.hasKeyword("PixelResolution")) {
+  else if (userGrp.hasKeyword("PixelResolution")) {
     ui.Clear("RESOLUTION");
     ui.PutDouble("RESOLUTION", userGrp["PixelResolution"]);
     ui.Clear("PIXRES");
@@ -588,7 +593,7 @@ void LoadMapRes() {
 }
 
 //Helper function to get camera resolution.
-void LoadCameraRes() {
+void loadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
   QString file = ui.GetFileName("FROM");
 
@@ -608,7 +613,7 @@ void LoadCameraRes() {
 }
 
 //Helper function to get ground range from map file.
-void LoadMapRange() {
+void loadMapRange() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get map file
@@ -622,19 +627,19 @@ void LoadMapRange() {
   ui.Clear("MAXLAT");
   ui.Clear("MINLON");
   ui.Clear("MAXLON");
-  if(userGrp.hasKeyword("MinimumLatitude")) {
+  if (userGrp.hasKeyword("MinimumLatitude")) {
     ui.PutDouble("MINLAT", userGrp["MinimumLatitude"]);
     count++;
   }
-  if(userGrp.hasKeyword("MaximumLatitude")) {
+  if (userGrp.hasKeyword("MaximumLatitude")) {
     ui.PutDouble("MAXLAT", userGrp["MaximumLatitude"]);
     count++;
   }
-  if(userGrp.hasKeyword("MinimumLongitude")) {
+  if (userGrp.hasKeyword("MinimumLongitude")) {
     ui.PutDouble("MINLON", userGrp["MinimumLongitude"]);
     count++;
   }
-  if(userGrp.hasKeyword("MaximumLongitude")) {
+  if (userGrp.hasKeyword("MaximumLongitude")) {
     ui.PutDouble("MAXLON", userGrp["MaximumLongitude"]);
     count++;
   }
@@ -643,7 +648,7 @@ void LoadMapRange() {
   ui.Clear("DEFAULTRANGE");
   ui.PutAsString("DEFAULTRANGE", "MAP");
 
-  if(count < 4) {
+  if (count < 4) {
     QString msg = "One or more of the values for the ground range was not found";
     msg += " in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -651,7 +656,7 @@ void LoadMapRange() {
 }
 
 //Helper function to load camera range.
-void LoadCameraRange() {
+void loadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
   QString file = ui.GetFileName("FROM");
 

@@ -8,6 +8,7 @@
 #include "UserInterface.h"
 #include "FileName.h"
 #include "Spice.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;
@@ -57,7 +58,7 @@ void IsisMain() {
   PvlKeyword tempccdBin = ccdBin;
   PvlKeyword tempccdTdi = ccdTdi;
   const unsigned int cpmmByCcd[] = {0, 1, 2, 3, 5, 8, 10, 11, 12, 13, 6, 7, 4, 9};
-  for(int ccd = 0; ccd < 14; ++ccd) {
+  for (int ccd = 0; ccd < 14; ++ccd) {
     ccdFlag[cpmmByCcd[ccd]] = tempccdFlag[ccd];
     ccdBin[cpmmByCcd[ccd]]  = tempccdBin[ccd];
     ccdTdi[cpmmByCcd[ccd]]  = tempccdTdi[ccd];
@@ -67,41 +68,26 @@ void IsisMain() {
 //  Modify the output Mosaic group if the Projection is of type
 //  Equirectangular.
   PvlGroup mapgrp = otherLabels.findGroup("Mapping");
-  if(mapgrp["ProjectionName"][0].toUpper() == "EQUIRECTANGULAR") {
-    static bool pckLoaded(false);
-    if(!pckLoaded) {
-      FileName pck("$base/kernels/pck/pck?????.tpc");
-      pck = pck.highestVersion();
-      furnsh_c(pck.expanded().toAscii().data());
-      pckLoaded = true;
-    }
+  if (mapgrp["ProjectionName"][0].toUpper() == "EQUIRECTANGULAR") {
 
     //  Get the target and check for validity
-    PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
-    SpiceInt tcode;
-    SpiceBoolean found;
-    (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
-    if(found) {
-      // Get radii and fix labels
-      SpiceInt n;
-      SpiceDouble radii[3];
-      bodvar_c(tcode, "RADII", &n, radii);
+    QString target = label.findKeyword("TargetName", PvlObject::Traverse)[0];
+    PvlGroup radii = Target::radiiGroup(target);
 
-      // Set existing radius to CenterLatitudeRadius
-      PvlKeyword &eqRadius =  mapgrp.findKeyword("EquatorialRadius");
-      PvlKeyword &polRadius = mapgrp.findKeyword("PolarRadius");
+    // Set existing radius to CenterLatitudeRadius
+    PvlKeyword &eqRadius =  mapgrp.findKeyword("EquatorialRadius");
+    PvlKeyword &polRadius = mapgrp.findKeyword("PolarRadius");
 
-      // Derive (copy, actually) the center radius from the equator radii and
-      // update the name
-      PvlKeyword clatrad =  eqRadius;
-      clatrad.setName("CenterLatitudeRadius");
+    // Derive (copy, actually) the center radius from the equator radii and
+    // update the name
+    PvlKeyword clatrad =  eqRadius;
+    clatrad.setName("CenterLatitudeRadius");
 
-      //  Assign the proper radii to the group keywords
-      eqRadius.setValue(toString(radii[0] * 1000.0), "meters");
-      polRadius.setValue(toString(radii[2] * 1000.0), "meters");
-      mapgrp += clatrad;  // Don't do this before updating the above
-      // keyword references!  Bad things happen!
-    }
+    //  Assign the proper radii to the group keywords
+    eqRadius = radii["EquatorialRadius"];
+    polRadius = radii["PolarRadius"];
+    mapgrp += clatrad;  // Don't do this before updating the above
+    // keyword references!  Bad things happen!
   }
 
   //  Write the group to the label

@@ -72,7 +72,7 @@ void IsisMain() {
 
 //  Open the shift definitions file
   Pvl shiftdef;
-  if(ui.WasEntered("SHIFTDEF")) {
+  if (ui.WasEntered("SHIFTDEF")) {
     shiftdef.read(ui.GetFileName("SHIFTDEF"));
   }
   else {
@@ -99,7 +99,7 @@ void IsisMain() {
   match.OpenCube(ui.GetFileName("MATCH"), stitch);
 
 //  Ensure only one band
-  if((trans.bandCount() != 1) || (match.bandCount() != 1)) {
+  if ((trans.bandCount() != 1) || (match.bandCount() != 1)) {
     QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -108,7 +108,7 @@ void IsisMain() {
   trans.Compatable(match);
 
 //  Determine intersection
-  if(!trans.intersects(match)) {
+  if (!trans.intersects(match)) {
     QString msg = "Input Cubes do not overlap!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -147,7 +147,7 @@ void IsisMain() {
   // Get row and column variables, if not entered, default to 1% of the input
   // image size
   int rows(1), cols(1);
-  if(ui.WasEntered("ROWS")) {
+  if (ui.WasEntered("ROWS")) {
     rows = ui.GetInteger("ROWS");
   }
   else {
@@ -155,7 +155,7 @@ void IsisMain() {
   }
 
   cols = ui.GetInteger("COLUMNS");
-  if(cols == 0) {
+  if (cols == 0) {
     cols = (int)(((fsamps - 1.0) / ar->SearchChip()->Samples()) + 1);
   }
 
@@ -186,8 +186,7 @@ void IsisMain() {
   QString transSN = SerialNumber::Compose(trans, true);
   QString matchSN = SerialNumber::Compose(match, true);
 
-  PvlGroup &instrument = trans.label()->findGroup("Instrument", Pvl::Traverse);
-  cn.SetTarget(instrument["TargetName"][0]);
+  cn.SetTarget(*trans.label());
   cn.SetDescription("Records s/c jitter between two adjacent HiRISE images");
 
 //  Set up results parameter saves
@@ -209,9 +208,9 @@ void IsisMain() {
   double fline0(fcorns.topLeft.line - 1.0), fsamp0(fcorns.topLeft.sample - 1.0);
   double mline0(mcorns.topLeft.line - 1.0), msamp0(mcorns.topLeft.sample - 1.0);
 
-  for(int r = 0; r < rows; r++) {
+  for (int r = 0; r < rows; r++) {
     int line = (int)(lSpacing / 2.0 + lSpacing * r + 0.5);
-    for(int c = 0; c < cols; c++) {
+    for (int c = 0; c < cols; c++) {
       int samp = (int)(sSpacing / 2.0 + sSpacing * c + 0.5);
 
       ar->PatternChip()->TackCube(msamp0 + samp, mline0 + line);
@@ -236,7 +235,7 @@ void IsisMain() {
       ar->Register();
 
       // Match found
-      if(ar->Success()) {
+      if (ar->Success()) {
         RegData reg;
         reg.fLine = fline0 + line;
         reg.fSamp = fsamp0 + samp;
@@ -249,7 +248,7 @@ void IsisMain() {
         reg.regCorr = ar->GoodnessOfFit();
 
 
-        if(fabs(reg.regCorr) > 1.0) jparms.nSuspects++;
+        if (fabs(reg.regCorr) > 1.0) jparms.nSuspects++;
 
         double sDiff = reg.fSamp - reg.regSamp;
         double lDiff = reg.fLine - reg.regLine;
@@ -284,8 +283,8 @@ void IsisMain() {
 #endif
 
           MultivariateStatistics mstats;
-          for(int line = 1 ; line <= fchip.Lines() ; line++) {
-            for(int sample = 1; sample < fchip.Samples(); sample++) {
+          for (int line = 1 ; line <= fchip.Lines() ; line++) {
+            for (int sample = 1; sample < fchip.Samples(); sample++) {
               double fchipValue = fchip.GetValue(sample, line);
               double pchipValue = pchip.GetValue(sample, line);
               mstats.AddData(&fchipValue, &pchipValue, 1);
@@ -295,11 +294,11 @@ void IsisMain() {
 //  Get regression and correlation values
           mstats.LinearRegression(reg.B0, reg.B1);
           reg.Bcorr = mstats.Correlation();
-          if(IsSpecial(reg.B0)) throw 1;
-          if(IsSpecial(reg.B1)) throw 2;
-          if(IsSpecial(reg.Bcorr)) throw 3;
+          if (IsSpecial(reg.B0)) throw 1;
+          if (IsSpecial(reg.B1)) throw 2;
+          if (IsSpecial(reg.Bcorr)) throw 3;
         }
-        catch(...) {
+        catch (...) {
 //  If fails, flag this condition
           reg.B0 = 0.0;
           reg.B1 = 0.0;
@@ -316,7 +315,7 @@ void IsisMain() {
       cp->Add(cmTrans);
       cp->Add(cmMatch);
       cp->SetRefMeasure(cmMatch);
-      if(!cmTrans->IsMeasured()) cp->SetIgnored(true);
+      if (!cmTrans->IsMeasured()) cp->SetIgnored(true);
       cn.AddPoint(cp);
       prog.CheckStatus();
     }
@@ -325,7 +324,7 @@ void IsisMain() {
   // If flatfile was entered, create the flatfile
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
-  if(ui.WasEntered("FLATFILE")) {
+  if (ui.WasEntered("FLATFILE")) {
     QString fFile = ui.GetFileName("FLATFILE");
     ofstream os;
     QString fFileExpanded = FileName(fFile).expanded();
@@ -334,7 +333,7 @@ void IsisMain() {
   }
 
   // If a cnet file was entered, write the ControlNet pvl to the file
-  if(ui.WasEntered("CNETFILE")) {
+  if (ui.WasEntered("CNETFILE")) {
     cn.Write(ui.GetFileName("CNETFILE"));
   }
 
@@ -345,7 +344,7 @@ void IsisMain() {
 
   // Write translation to log
   PvlGroup results("AverageTranslation");
-  if(jparms.sStats.ValidPixels() > 0) {
+  if (jparms.sStats.ValidPixels() > 0) {
     double sTrans = (int)(jparms.sStats.Average() * 100.0) / 100.0;
     double lTrans = (int)(jparms.lStats.Average() * 100.0) / 100.0;
     results += PvlKeyword("Sample", toString(sTrans));
@@ -447,7 +446,7 @@ static ostream &dumpResults(ostream &out, const RegList &regs,
   out << "#   Total Registers:  " << regs.size() << " of "
       << (jparms.rows * jparms.cols) << endl;
   out << "#   Number Suspect:   " << jparms.nSuspects << endl;
-  if(jparms.sStats.ValidPixels() > 0) {
+  if (jparms.sStats.ValidPixels() > 0) {
     out << "#   Average Sample Offset: " << setprecision(4)
         << jparms.sStats.Average()
         << "  StdDev: " << setprecision(4) << jparms.sStats.StandardDeviation()
@@ -481,7 +480,7 @@ static ostream &dumpResults(ostream &out, const RegList &regs,
       << endl;
 
   RegList::const_iterator reg;
-  for(reg = regs.begin() ; reg != regs.end() ; ++reg) {
+  for (reg = regs.begin() ; reg != regs.end() ; ++reg) {
     out << setw(20) << setprecision(8) << reg->fLTime
         << setw(10) << setprecision(0) << reg->fSamp
         << setw(10) << setprecision(0) << reg->fLine

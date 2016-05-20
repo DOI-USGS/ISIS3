@@ -42,6 +42,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "SpecialPixel.h"
+#include "Target.h"
 #include "WorldMapper.h"
 
 using namespace std;
@@ -110,27 +111,27 @@ namespace Isis {
         m_equatorialRadius = m_mappingGrp["EquatorialRadius"];
         m_polarRadius = m_mappingGrp["PolarRadius"];
       }
-      // Get the radii using the "TargetName" keyword and NAIF
-      else  if (m_mappingGrp.hasKeyword("TargetName")) {
-        PvlGroup radii = TargetRadii((QString) m_mappingGrp["TargetName"]);
-        m_equatorialRadius = radii["EquatorialRadius"];
-        m_polarRadius = radii["PolarRadius"];
+      // Get the radii
+      try {
+         PvlGroup radii = Target::radiiGroup(label, m_mappingGrp);
+         m_equatorialRadius = radii["EquatorialRadius"];
+         m_polarRadius = radii["PolarRadius"];
       }
-      else {
-        IString msg = "Projection failed. No target radii are available "
+      catch (IException &e) {
+        QString msg = "Projection failed. No target radii are available "
                       "through keywords [EquatorialRadius and PolarRadius] "
                       "or [TargetName].";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       // Check the radii for validity
       if (m_equatorialRadius <= 0.0) {
-        IString msg = "Projection failed. Invalid value for keyword "
+        QString msg = "Projection failed. Invalid value for keyword "
                       "[EquatorialRadius]. It must be greater than zero";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       if (m_polarRadius <= 0.0) {
-        IString msg = "Projection failed. Invalid value for keyword "
+        QString msg = "Projection failed. Invalid value for keyword "
                       "[PolarRadius]. It must be greater than zero";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -143,7 +144,7 @@ namespace Isis {
         m_latitudeType = Planetocentric;
       }
       else {
-        IString msg = "Projection failed. Invalid value for keyword "
+        QString msg = "Projection failed. Invalid value for keyword "
                       "[LatitudeType] must be "
                       "[Planetographic or Planetocentric]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -157,7 +158,7 @@ namespace Isis {
         m_longitudeDirection = PositiveEast;
       }
       else {
-        IString msg = "Projection failed. Invalid value for keyword "
+        QString msg = "Projection failed. Invalid value for keyword "
                       "[LongitudeDirection] must be "
                       "[PositiveWest or PositiveEast]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -171,7 +172,7 @@ namespace Isis {
         m_longitudeDomain = 180;
       }
       else {
-        IString msg = "Projection failed. Invalid value for keyword "
+        QString msg = "Projection failed. Invalid value for keyword "
                       "[LongitudeDomain] must be [180 or 360]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -188,33 +189,33 @@ namespace Isis {
         m_maximumLongitude = m_mappingGrp["MaximumLongitude"];
 
         if ((m_minimumLatitude < -90.0) || (m_minimumLatitude > 90.0)) {
-          IString msg = "Projection failed. "
-                        "[MinimumLatitude] of [" + IString(m_minimumLatitude)
+          QString msg = "Projection failed. "
+                        "[MinimumLatitude] of [" + toString(m_minimumLatitude)
                         + "] is outside the range of [-90:90]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if ((m_maximumLatitude < -90.0) || (m_maximumLatitude > 90.0)) {
-          IString msg = "Projection failed. "
-                        "[MaximumLatitude] of [" + IString(m_maximumLatitude)
+          QString msg = "Projection failed. "
+                        "[MaximumLatitude] of [" + toString(m_maximumLatitude)
                         + "] is outside the range of [-90:90]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if (m_minimumLatitude >= m_maximumLatitude) {
-          IString msg = "Projection failed. "
+          QString msg = "Projection failed. "
                         "[MinimumLatitude,MaximumLatitude] of ["
-                        + IString(m_minimumLatitude) + ","
-                        + IString(m_maximumLatitude) + "] are not "
+                        + toString(m_minimumLatitude) + ","
+                        + toString(m_maximumLatitude) + "] are not "
                         + "properly ordered";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if (m_minimumLongitude >= m_maximumLongitude) {
-          IString msg = "Projection failed. "
+          QString msg = "Projection failed. "
                         "[MinimumLongitude,MaximumLongitude] of ["
-                        + IString(m_minimumLongitude) + "," 
-                        + IString(m_maximumLongitude) + "] are not "
+                        + toString(m_minimumLongitude) + "," 
+                        + toString(m_maximumLongitude) + "] are not "
                         + "properly ordered";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -231,10 +232,10 @@ namespace Isis {
 
       // Initialize miscellaneous protected data elements
       if (m_equatorialRadius < m_polarRadius) {
-        IString msg = "Projection failed. Invalid keyword value(s). "
-                      "[EquatorialRadius] = " + IString(m_equatorialRadius)
+        QString msg = "Projection failed. Invalid keyword value(s). "
+                      "[EquatorialRadius] = " + toString(m_equatorialRadius)
                       + " must be greater than or equal to [PolarRadius] = "
-                      + IString(m_polarRadius);
+                      + toString(m_polarRadius);
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
@@ -251,8 +252,8 @@ namespace Isis {
       // If we made it to this point, we have what we need for a triaxial projection
       setProjectionType(Triaxial);
     }
-    catch(IException &e) {
-      IString msg = "Projection failed.  Invalid label group [Mapping]";
+    catch (IException &e) {
+      QString msg = "Projection failed.  Invalid label group [Mapping]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -341,7 +342,7 @@ namespace Isis {
     if (latitude == Null) {
       throw IException(IException::Unknown, 
                        "Unable to calculate local radius. The given latitude value [" 
-                       + IString(latitude) + "] is invalid.", 
+                       + toString(latitude) + "] is invalid.", 
                        _FILEINFO_);
     }
     double a = m_equatorialRadius;
@@ -368,112 +369,6 @@ namespace Isis {
     return LocalRadius(m_latitude);
   }
 
-  /**
-   * Creates a Pvl Group with keywords TargetName, EquitorialRadius, and 
-   * PolarRadius. The values for the radii will be retrieved from the most 
-   * recent Target Attitude and Shape Naif kernel available in the Isis data 
-   * area. 
-   *
-   * @param target The name of the body for which the radii will be retrieved.
-   *
-   * @throw IException::Io - "Could not convert target name to NAIF code."
-   *  
-   * @return PvlGroup Group named "Mapping" with keywords TargetName, 
-   *             EquatorialRadius, and PolarRadius.
-   */
-
-  PvlGroup TProjection::TargetRadii(QString target) {
-    static QMap<QString, PvlGroup> cachedResults;
-
-    PvlGroup mapping("Mapping");
-    if (!cachedResults.contains(target)) {
-      // Convert the target name to a NAIF code
-      SpiceInt code;
-      SpiceBoolean found;
-      bodn2c_c(target.toAscii().data(), &code, &found);
-      if (!found) {
-        QString msg = "Could not convert target name [" + target +"] to NAIF code";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
-      // Load the most recent target attitude and shape kernel for NAIF
-      FileName kern("$Base/kernels/pck/pck?????.tpc");
-      kern = kern.highestVersion();
-      QString kernName(kern.expanded());
-      furnsh_c(kernName.toAscii().data());
-
-      // Get the radii from NAIF
-      NaifStatus::CheckErrors();
-      SpiceInt n;
-      SpiceDouble radii[3];
-      bodvar_c(code, "RADII", &n, radii);
-      unload_c(kernName.toAscii().data());
-
-      try {
-        NaifStatus::CheckErrors();
-      }
-      catch (IException &e) {
-        throw IException(e,
-                         IException::Unknown,
-                         QObject::tr("The target name [%1] does not correspond to a target body "
-                                     "with known radii").arg(target),
-                         _FILEINFO_);
-      }
-
-      mapping += PvlKeyword("TargetName",  target);
-      mapping += PvlKeyword("EquatorialRadius",  toString(radii[0] * 1000.0), "meters");
-      mapping += PvlKeyword("PolarRadius", toString(radii[2] * 1000.0), "meters");
-      cachedResults[target] = mapping;
-    }
-    else {
-      mapping = cachedResults[target];
-    }
-
-    return mapping;
-  }
-
-  /**
-   * Convenience method to add the Target Radii information to the given Pvl 
-   * Mapping Group. This method 
-   *
-   * @param cubeLab Pvl labels for the image.
-   * @param mapGroup PvlGroup that contains mapping parameters for the
-   *                 projection.
-   *
-   * @return PvlGroup The Mapping Group for the projection with keywords 
-   *                 EquatorialRadius and PolarRadius. 
-   *  
-   */
-  PvlGroup TProjection::TargetRadii(Pvl &cubeLab, PvlGroup &mapGroup) {
-    //Check to see if the mapGroup already has the target radii.
-    //If BOTH radii are already in the mapGroup then just return back the map 
-    //Group. 
-    if (mapGroup.hasKeyword("EquatorialRadius") 
-        && mapGroup.hasKeyword("PolarRadius")) {
-      return mapGroup;
-    }
-    //If the mapping group only has one or the other of the radii keywords, then
-    //we are going to replace both, so delete which ever one it does have.
-    if (mapGroup.hasKeyword("EquatorialRadius") 
-        && !mapGroup.hasKeyword("PolarRadius")) {
-      mapGroup.deleteKeyword("EquatorialRadius");
-    }
-    if (!mapGroup.hasKeyword("EquatorialRadius") 
-        && mapGroup.hasKeyword("PolarRadius")) {
-      mapGroup.deleteKeyword("PolarRadius");
-    }
-
-    PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
-    QString target = inst["TargetName"];
-    PvlGroup radii = TProjection::TargetRadii(target);
-    //Now INSERT the EquatorialRadius and PolorRadius into the mapGroup pvl.
-    mapGroup += PvlKeyword("EquatorialRadius",  
-                           radii.findKeyword("EquatorialRadius")[0], "meters");
-    mapGroup += PvlKeyword("PolarRadius", 
-                           radii.findKeyword("PolarRadius")[0], "meters");
-
-    return mapGroup;
-  }
 
   /**
    * This method returns the latitude of true scale. It is a virtual function 
@@ -556,7 +451,7 @@ namespace Isis {
     if (lat == Null || abs(lat) > 90.0) {
       throw IException(IException::Unknown, 
                        "Unable to convert to Planetocentric. The given latitude value [" 
-                       + IString(lat) + "] is invalid.", 
+                       + toString(lat) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylat = lat;
@@ -606,7 +501,7 @@ namespace Isis {
     if (lat == Null || fabs(lat) > 90.0) {
       throw IException(IException::Unknown, 
                        "Unable to convert to Planetographic. The given latitude value [" 
-                       + IString(lat) + "] is invalid.", 
+                       + toString(lat) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylat = lat;
@@ -669,7 +564,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to PositiveEast. The given longitude value [" 
-                       + IString(lon) + "] is invalid.", 
+                       + toString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylon = lon;
@@ -683,7 +578,7 @@ namespace Isis {
       mylon = To180Domain(mylon);
     }
     else {
-      IString msg = "Unable to convert longitude.  Domain [" + IString(domain) 
+      QString msg = "Unable to convert longitude.  Domain [" + toString(domain) 
                     + "] is not 180 or 360.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -708,7 +603,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to PositiveWest. The given longitude value [" 
-                       + IString(lon) + "] is invalid.", 
+                       + toString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylon = lon;
@@ -722,7 +617,7 @@ namespace Isis {
       mylon = To180Domain(mylon);
     }
     else {
-      IString msg = "Unable to convert longitude.  Domain [" + IString(domain)
+      QString msg = "Unable to convert longitude.  Domain [" + toString(domain)
                     + "] is not 180 or 360.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -778,7 +673,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to 180 degree domain. The given longitude value [" 
-                       + IString(lon) + "] is invalid.", 
+                       + toString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     return Isis::Longitude(lon, Angle::Degrees).force180Domain().degrees();
@@ -796,7 +691,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to 360 degree domain. The given longitude value [" 
-                       + IString(lon) + "] is invalid.", 
+                       + toString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     double result = lon;
@@ -1746,7 +1641,7 @@ namespace Isis {
    */
   double TProjection::qCompute(const double sinPhi) const {
     if (m_eccentricity < DBL_EPSILON) {
-      IString msg = "Snyder's q variable should only be computed for "
+      QString msg = "Snyder's q variable should only be computed for "
                     "ellipsoidal projections.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -1800,7 +1695,7 @@ namespace Isis {
     }
 
     if (iteration >= MAX_ITERATIONS) {
-      IString msg = "Failed to converge in TProjection::phi2Compute()";
+      QString msg = "Failed to converge in TProjection::phi2Compute()";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

@@ -36,13 +36,13 @@
 #include "CameraFactory.h"
 #include "IException.h"
 #include "IString.h"
+#include "NaifStatus.h"
 #include "OriginalLabel.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "SpiceManager.h"
 #include "Target.h"
 #include "TProjection.h"
-#include "NaifStatus.h"
 
 using namespace std;
 
@@ -112,19 +112,18 @@ namespace Isis {
 
     //  Get the target and check for validity
     PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
-    SpiceInt tcode;
-    SpiceBoolean found;
-
-    NaifStatus::CheckErrors(); 
-    (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
-    NaifStatus::CheckErrors(); 
-
-    if(found) return (true);
-
-    if(makeValid) {
-      target.setValue("Sky");
+    
+    try {
+      Target::lookupNaifBodyCode(target);
+      return (true);
     }
-    return (false);
+    catch (...) {
+      if (makeValid) {
+        target.setValue("Sky");
+      }
+      return (false);
+    }
+
   }
 
   /**
@@ -138,7 +137,7 @@ namespace Isis {
    */
   void MdisGeometry::refCenterCoord(double &sample, double &line) const {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
       throw IException(IException::Programmer, mess.c_str(),
                        _FILEINFO_);
@@ -177,7 +176,7 @@ namespace Isis {
    */
   void MdisGeometry::refUpperRightCoord(double &sample, double &line) const {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
       throw IException(IException::Programmer, mess.c_str(),
                        _FILEINFO_);
@@ -200,7 +199,7 @@ namespace Isis {
    */
   void MdisGeometry::refLowerLeftCoord(double &sample, double &line) const {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
       throw IException(IException::Programmer, mess.c_str(),
                        _FILEINFO_);
@@ -223,7 +222,7 @@ namespace Isis {
    */
   void MdisGeometry::refLowerRightCoord(double &sample, double &line) const {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for reference pixel!";
       throw IException(IException::Programmer, mess.c_str(),
                        _FILEINFO_);
@@ -310,7 +309,7 @@ namespace Isis {
    */
   void MdisGeometry::GeometryKeys(Pvl &geom) {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for Geometry keys!";
       throw IException(IException::Programmer, mess.c_str(),
                        _FILEINFO_);
@@ -338,7 +337,7 @@ namespace Isis {
     double y = _camera->Line() - refLine;
     double rot = atan2(-y, x) * 180.0 / Isis::PI;
     rot = 90.0 - rot;
-    if(rot < 0.0) rot += 360.0;
+    if (rot < 0.0) rot += 360.0;
     // Above completes celestial north, below is twist angle
     double twist_angle = (180.0 - rot);
     twist_angle = TProjection::To360Domain(fmod(twist_angle, 360.0));
@@ -406,7 +405,7 @@ namespace Isis {
    */
   void MdisGeometry::TargetKeys(Pvl &geom) {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for Target keys!";
       throw IException(IException::Programmer, mess.c_str(),
                        _FILEINFO_);
@@ -414,7 +413,7 @@ namespace Isis {
 
     // Get sc_target_position_vector and target_center_distance for all targets
     // except Sky
-    if(!_camera->target()->isSky()) {
+    if (!_camera->target()->isSky()) {
       SpicePosition *scpos = _camera->instrumentPosition();
       std::vector<double> jVec;
       jVec = scpos->Coordinate();
@@ -424,7 +423,7 @@ namespace Isis {
       geom += format("TARGET_CENTER_DISTANCE", _camera->targetCenterDistance(),
                      "KM");
     }
-    else if(_doUpdate) {
+    else if (_doUpdate) {
       geom += format("SC_TARGET_POSITION_VECTOR", Null);
       geom += format("TARGET_CENTER_DISTANCE", Null);
     }
@@ -435,7 +434,7 @@ namespace Isis {
 
     //  Set point at center
     _camera->SetImage(refSamp, refLine);
-    if(_camera->HasSurfaceIntersection()) {
+    if (_camera->HasSurfaceIntersection()) {
 
       geom += format("SLANT_DISTANCE", _camera->SlantDistance(), "KM");
 
@@ -450,11 +449,11 @@ namespace Isis {
 //  COMPUTE SMEAR MAGNITUDE AND AZIMUTH
 
       double smear_magnitude, smear_azimuth;
-      if(SmearComponents(smear_magnitude, smear_azimuth)) {
+      if (SmearComponents(smear_magnitude, smear_azimuth)) {
         geom += format("SMEAR_MAGNITUDE", smear_magnitude, "PIXELS");
         geom += format("SMEAR_AZIMUTH", smear_azimuth, "DEG");
       }
-      else if(_doUpdate) {
+      else if (_doUpdate) {
         geom += format("SMEAR_MAGNITUDE", Null);
         geom += format("SMEAR_AZIMUTH", Null);
       }
@@ -462,7 +461,7 @@ namespace Isis {
       //  Other angles
       geom += format("NORTH_AZIMUTH", _camera->NorthAzimuth(), "DEG");
     }
-    else if(_doUpdate) {
+    else if (_doUpdate) {
       geom += format("SLANT_DISTANCE", Null);
       geom += format("CENTER_LATITUDE", Null);
       geom += format("CENTER_LONGITUDE", Null);
@@ -479,7 +478,7 @@ namespace Isis {
 
     refUpperLeftCoord(refSamp, refLine);
     _camera->SetImage(refSamp, refLine);
-    if(_camera->HasSurfaceIntersection()) {
+    if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
       nGood++;
@@ -491,7 +490,7 @@ namespace Isis {
 
     refUpperRightCoord(refSamp, refLine);
     _camera->SetImage(refSamp, refLine);
-    if(_camera->HasSurfaceIntersection()) {
+    if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
       nGood++;
@@ -503,7 +502,7 @@ namespace Isis {
 
     refLowerLeftCoord(refSamp, refLine);
     _camera->SetImage(refSamp, refLine);
-    if(_camera->HasSurfaceIntersection()) {
+    if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
       nGood++;
@@ -515,7 +514,7 @@ namespace Isis {
 
     refLowerRightCoord(refSamp, refLine);
     _camera->SetImage(refSamp, refLine);
-    if(_camera->HasSurfaceIntersection()) {
+    if (_camera->HasSurfaceIntersection()) {
       retLat.push_back(_camera->UniversalLatitude());
       retLon.push_back(_camera->UniversalLongitude());
       nGood++;
@@ -525,11 +524,11 @@ namespace Isis {
       retLon.push_back(Null);
     }
 
-    if(nGood > 0) {
+    if (nGood > 0) {
       geom += format("RETICLE_POINT_LATITUDE", retLat, "DEG");
       geom += format("RETICLE_POINT_LONGITUDE", retLon, "DEG");
     }
-    else if(_doUpdate) {
+    else if (_doUpdate) {
       geom += format("RETICLE_POINT_LATITUDE", retLat);
       geom += format("RETICLE_POINT_LONGITUDE", retLon);
     }
@@ -550,19 +549,19 @@ namespace Isis {
    */
   void MdisGeometry::SubframeTargetKeys(Pvl &geom) {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for Target keys!";
       throw IException(IException::Programmer, mess.c_str(),
                        _FILEINFO_);
     }
 
     //  Now compute the reticle points of all subframes if they exist
-    for(int i = 1 ; i <= 5 ; i++) {
-      QString n(i);
+    for (int i = 1 ; i <= 5 ; i++) {
+      QString n = Isis::toString(i);
       QString object = "SUBFRAME" + n + "_PARAMETERS/";
 
       double sample, line, width, height;
-      if(!getSubframeCoordinates(i, sample, line, width, height)) {
+      if (!getSubframeCoordinates(i, sample, line, width, height)) {
         //  Subframe does not exist
         std::vector<double> retLat(4, Null), retLon(4, Null);
         geom += format(object + "RETICLE_POINT_LATITUDE", retLat);
@@ -575,7 +574,7 @@ namespace Isis {
 
         double refSamp(sample), refLine(line);
         _camera->SetImage(refSamp, refLine);
-        if(_camera->HasSurfaceIntersection()) {
+        if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
           nGood++;
@@ -588,7 +587,7 @@ namespace Isis {
         refSamp = sample + width - 1.0;
         refLine = line;
         _camera->SetImage(refSamp, refLine);
-        if(_camera->HasSurfaceIntersection()) {
+        if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
           nGood++;
@@ -601,7 +600,7 @@ namespace Isis {
         refSamp = sample;
         refLine = line + height - 1.0;
         _camera->SetImage(refSamp, refLine);
-        if(_camera->HasSurfaceIntersection()) {
+        if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
           nGood++;
@@ -614,7 +613,7 @@ namespace Isis {
         refSamp = sample + width - 1.0;
         refLine = line + height - 1.0;
         _camera->SetImage(refSamp, refLine);
-        if(_camera->HasSurfaceIntersection()) {
+        if (_camera->HasSurfaceIntersection()) {
           retLat.push_back(_camera->UniversalLatitude());
           retLon.push_back(_camera->UniversalLongitude());
           nGood++;
@@ -624,11 +623,11 @@ namespace Isis {
           retLon.push_back(Null);
         }
 
-        if(nGood > 0) {
+        if (nGood > 0) {
           geom += format(object + "RETICLE_POINT_LATITUDE", retLat, "DEG");
           geom += format(object + "RETICLE_POINT_LONGITUDE", retLon, "DEG");
         }
-        else if(_doUpdate) {
+        else if (_doUpdate) {
           geom += format(object + "RETICLE_POINT_LATITUDE", retLat);
           geom += format(object + "RETICLE_POINT_LONGITUDE", retLon);
         }
@@ -660,14 +659,14 @@ namespace Isis {
       double &width, double &height) {
 
     //  Does the subframe exist?
-    if((frameno < 1) || (frameno > _nSubframes)) {
+    if ((frameno < 1) || (frameno > _nSubframes)) {
       //  No
       sample = line = width = height = 0.0;
       return (false);
     }
     else {
       //  It does exist, extract coordinates from original image label
-      QString n(toString(frameno));
+      QString n = Isis::toString(frameno);
       sample  = (double) _orglabel.findKeyword("MESS:SUBF_X" + n,
                 PvlObject::Traverse);
       line    = (double) _orglabel.findKeyword("MESS:SUBF_Y" + n,
@@ -713,7 +712,7 @@ namespace Isis {
     smear_azimuth = Null;
 
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image/camera model established for smear components!";
       throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
@@ -721,13 +720,15 @@ namespace Isis {
     // Get NAIF body codes
     SpiceInt scCode(-236), targCode(0);
     SpiceBoolean found;
-    QString target(_camera->target()->name());
+    QString target = _camera->target()->name();
 
-    NaifStatus::CheckErrors();
-    (void) bodn2c_c("MESSENGER", &scCode, &found);
-    (void) bodn2c_c(target.toAscii().data(), &targCode, &found);
-    if(!found) {
-      return (false);
+    try {
+      scCode = Target::lookupNaifBodyCode("MESSENGER");
+      targCode = Target::lookupNaifBodyCode(target.toAscii().data());
+    }
+    catch (...) {
+      found = false;
+      return found;
     }
 
     //  Get the target state (starg)
@@ -750,22 +751,22 @@ namespace Isis {
 
     //  Determine instrument ID (inst)
     PvlKeyword &key = _label.findKeyword("NaifIkCode", PvlObject::Traverse);
+    QString iCode = key[0];
     SpiceInt inst = (int) key;
-    IString iCode((int) inst);
     key = _label.findKeyword("Number", PvlObject::Traverse);
     inst -= (int) key;
 
     // Get CK time tolerance (tol)
     SpiceDouble tol;
     SpiceInt tmp;
-    gdpool_c(IString("INS" + iCode + "_CK_TIME_TOLERANCE").c_str(),
+    gdpool_c(QString("INS" + iCode + "_CK_TIME_TOLERANCE").toAscii().data(),
              0, 1, &tmp, &tol, &found);
 
     // Finally get av
     SpiceDouble cmat[3][3], av[3], clkout;
     (void) ckgpav_c((scCode * 1000), sclkdp, tol, "J2000", cmat, av, &clkout,
                     &found);
-    if(!found) {
+    if (!found) {
 #if defined(DEBUG)
       cout << "Cannot get angular camera velocity for time "
            << setprecision(12) << sclkdp << "!\n";
@@ -777,7 +778,7 @@ namespace Isis {
     SpiceChar frname[40];
     SpiceInt frcode;
     (void) cidfrm_c(targCode, sizeof(frname), &frcode, frname, &found);
-    if(!found) {
+    if (!found) {
       return (false);
     }
 
@@ -792,8 +793,8 @@ namespace Isis {
 
 //--  Now implement the SMEAR routine (smrimg)
     SpiceDouble tipm[3][3], dtipm[3][3];
-    for(int i = 0 ; i < 3 ; i++) {
-      for(int j = 0 ; j < 3 ; j++) {
+    for (int i = 0 ; i < 3 ; i++) {
+      for (int j = 0 ; j < 3 ; j++) {
         tipm[i][j] = tsipm[i][j];
         dtipm[i][j] = tsipm[i][j+3];
       }
@@ -835,7 +836,7 @@ namespace Isis {
     vadd_c(dvc1, dvc2, dvc);
 
     // Make sure we Vf can be computed
-    if(vc[2] == 0.0) {
+    if (vc[2] == 0.0) {
       return (false);
     }
 
@@ -856,12 +857,12 @@ namespace Isis {
     smear_magnitude = vnormg_c(smear, 2);
     NaifStatus::CheckErrors();
 
-    if(smear_magnitude == 0.0) {
+    if (smear_magnitude == 0.0) {
       smear_azimuth = 0.0;
     }
     else {
       smear_azimuth = atan2(smear[1], smear[0]) * dpr_c();
-      if(smear_azimuth  < 0.0) smear_azimuth += 360.0;
+      if (smear_azimuth  < 0.0) smear_azimuth += 360.0;
     }
 
     return (true);
@@ -888,7 +889,7 @@ namespace Isis {
    */
   void MdisGeometry::SpacecraftKeys(Pvl &geom) {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for Spacecraft keys!";
       throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
@@ -899,22 +900,22 @@ namespace Isis {
 
     // Get the center ra/dec
     _camera->SetImage(refSamp, refLine);
-    if(!_camera->target()->isSky()) {
+    if (!_camera->target()->isSky()) {
       double lat, lon;
       _camera->subSpacecraftPoint(lat, lon);
       geom += format("SUB_SPACECRAFT_LATITUDE", lat, "DEG");
       geom += format("SUB_SPACECRAFT_LONGITUDE", lon, "DEG");
       geom += format("SPACECRAFT_ALTITUDE", _camera->SpacecraftAltitude(), "KM");
 
-      if(_camera->HasSurfaceIntersection()) {
+      if (_camera->HasSurfaceIntersection()) {
         geom += format("SUB_SPACECRAFT_AZIMUTH", _camera->SpacecraftAzimuth(),
                        "DEG");
       }
-      else if(_doUpdate) {
+      else if (_doUpdate) {
         geom += format("SUB_SPACECRAFT_AZIMUTH", Null);
       }
     }
-    else if(_doUpdate) {
+    else if (_doUpdate) {
       geom += format("SUB_SPACECRAFT_LATITUDE", Null);
       geom += format("SUB_SPACECRAFT_LONGITUDE", Null);
       geom += format("SPACECRAFT_ALTITUDE", Null);
@@ -961,17 +962,15 @@ namespace Isis {
    */
   std::vector<double> MdisGeometry::ScVelocityVector() {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image/camera model established for Spacecraft Velocity keys!";
       throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
 
     // Get NAIF body codes
     SpiceInt sc(-236), sun(10);
-    SpiceBoolean found;
-    NaifStatus::CheckErrors(); 
-    (void) bodn2c_c("MESSENGER", &sc, &found);
-    (void) bodn2c_c("SUN", &sun, &found);
+    sc = Target::lookupNaifBodyCode("MESSENGER");
+    sun = Target::lookupNaifBodyCode("SUN");
 
     //  Get the Sun to Messenger state matrix
     SpiceRotation *rotate = _camera->bodyRotation();
@@ -1006,7 +1005,7 @@ namespace Isis {
    */
   void MdisGeometry::ViewingAndLightingKeys(Pvl &geom) {
     // Ensure there is a camera model instantiated!
-    if(!_camera) {
+    if (!_camera) {
       string mess = "No image (camera model) established for Viewing & Lighting keys!";
       throw IException(IException::Programmer, mess.c_str(), _FILEINFO_);
     }
@@ -1019,7 +1018,7 @@ namespace Isis {
     _camera->SetImage(refSamp, refLine);
 
     //  These parameters only require a target other than the Sky
-    if(!_camera->target()->isSky()) {
+    if (!_camera->target()->isSky()) {
       double sslat, sslon;
       _camera->subSolarPoint(sslat, sslon);
       geom += format("SUB_SOLAR_LATITUDE", sslat, "DEG");
@@ -1032,14 +1031,14 @@ namespace Isis {
       geom += format("SOLAR_DISTANCE", solar_dist, "KM");
 
     }
-    else if(_doUpdate) {
+    else if (_doUpdate) {
       geom += format("SUB_SOLAR_LATITUDE", Null);
       geom += format("SUB_SOLAR_LONGITUDE", Null);
       geom += format("SOLAR_DISTANCE", Null);
     }
 
     //  These require surface intersections
-    if(_camera->HasSurfaceIntersection()) {
+    if (_camera->HasSurfaceIntersection()) {
 // Solar information
       geom += format("SUB_SOLAR_AZIMUTH", _camera->SunAzimuth(), "DEG");
       geom += format("INCIDENCE_ANGLE", _camera->IncidenceAngle(), "DEG");
@@ -1047,7 +1046,7 @@ namespace Isis {
       geom += format("EMISSION_ANGLE", _camera->EmissionAngle(), "DEG");
       geom += format("LOCAL_HOUR_ANGLE", _camera->LocalSolarTime() * 15.0, "DEG");
     }
-    else if(_doUpdate) {
+    else if (_doUpdate) {
       geom += format("SUB_SOLAR_AZIMUTH", Null);
       geom += format("INCIDENCE_ANGLE", Null);
       geom += format("PHASE_ANGLE", Null);
@@ -1078,7 +1077,7 @@ namespace Isis {
    */
   PvlKeyword MdisGeometry::format(const QString &name, const double &value,
                                   const QString &unit) const {
-    if(IsSpecial(value)) {
+    if (IsSpecial(value)) {
       return (PvlKeyword(name, _NullDefault));
     }
     else  {
@@ -1108,8 +1107,8 @@ namespace Isis {
                                   const std::vector<double> &values,
                                   const QString &unit) const {
     PvlKeyword key(name);
-    for(unsigned int i = 0 ; i < values.size() ; i++) {
-      if(IsSpecial(values[i])) {
+    for (unsigned int i = 0 ; i < values.size() ; i++) {
+      if (IsSpecial(values[i])) {
         key.addValue(_NullDefault);
       }
       else {
@@ -1138,8 +1137,8 @@ namespace Isis {
                                   const std::vector<std::string> &values,
                                   const QString &unit) const {
     PvlKeyword key(name);
-    for(unsigned int i = 0 ; i < values.size() ; i++) {
-      if(values[i].empty()) {
+    for (unsigned int i = 0 ; i < values.size() ; i++) {
+      if (values[i].empty()) {
         key.addValue(_NullDefault);
       }
       else {
@@ -1168,8 +1167,8 @@ namespace Isis {
                                   const std::vector<QString> &values,
                                   const QString &unit) const {
     PvlKeyword key(name);
-    for(unsigned int i = 0 ; i < values.size() ; i++) {
-      if(values[i].isEmpty()) {
+    for (unsigned int i = 0 ; i < values.size() ; i++) {
+      if (values[i].isEmpty()) {
         key.addValue(_NullDefault);
       }
       else {
@@ -1188,18 +1187,18 @@ namespace Isis {
    *
    * @param value Double value to convert to string
    *
-   * @return IString Returns the converted string
+   * @return QString Returns the converted string
    */
   QString MdisGeometry::DoubleToString(const double &value) const {
-    if(IsSpecial(value)) {
-      return (QString(_NullDefault));
+    if (IsSpecial(value)) {
+      return (_NullDefault);
     }
 
     //  Format the string to specs
     ostringstream strcnv;
     strcnv.setf(std::ios::fixed);
     strcnv << setprecision(_digitsPrecision) << value;
-    return (QString(strcnv.str().c_str()));
+    return (QString::fromStdString(strcnv.str().c_str()));
   }
 }  // namespace Isis
 

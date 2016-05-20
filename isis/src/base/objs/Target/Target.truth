@@ -25,7 +25,10 @@ Unit test for Isis::Target
 
 
   Testing unknown target ...
-**I/O ERROR** Could not convert Target [Mard] to NAIF code.
+**ERROR** Unable to look up NAIF body code for this Target.
+**I/O ERROR** Could not convert Target [Mard] to NAIF body code.
+**ERROR** BODY_FRAME_CODE not found for this Target.
+**I/O ERROR** Could not convert Target [Mard] to NAIF body code.
 
 
   Testing methods setShapeEllipsoid and restoreShape...
@@ -36,3 +39,273 @@ Unit test for Isis::Target
   Testing default constructor...
     Is it Sky? 0
     Number of radii = 0
+
+
+///////////////////////////////////////////////////////////
+
+
+Testing radiiGroup() static methods 
+-------------------------------
+FAILED TO FIND RADII FOR LABEL: 
+
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+End_Group
+
+RETURNS: 
+
+**ERROR** Unable to find Equatorial and Polar radii for target [].
+**ERROR** Unable to find PVL object [IsisCube].
+-------------------------------
+
+-------------------------------
+FAILED TO FIND RADII FOR LABEL: 
+
+Object = IsisCube
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+End_Group
+
+RETURNS: 
+
+**ERROR** Unable to find Equatorial and Polar radii for target [].
+**ERROR** Unable to find a TargetName keyword in the given PVL.
+-------------------------------
+
+-------------------------------
+FAILED TO FIND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+  End_Group
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Null
+End_Group
+
+RETURNS: 
+
+**ERROR** Unable to find Equatorial and Polar radii for target [].
+**ERROR** Unable to find a TargetName keyword in the given PVL.
+-------------------------------
+
+-------------------------------
+FAILED TO FIND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+    TargetName = Null
+  End_Group
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Null
+End_Group
+
+RETURNS: 
+
+**ERROR** Unable to find Equatorial and Polar radii for target [].
+**ERROR** Unable to find a TargetName keyword in the given PVL.
+-------------------------------
+
+-------------------------------
+FAILED TO FIND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+    TargetName = Null
+  End_Group
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Chewbaca
+End_Group
+
+RETURNS: 
+
+**ERROR** Unable to find Equatorial and Polar radii for target [Chewbaca].
+**I/O ERROR** Unable to find target radii for given target [Chewbaca].
+-------------------------------
+
+-------------------------------
+FAILED TO FIND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+    TargetName = Null
+  End_Group
+End_Object
+
+Object = NaifKeywords
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Chewbaca
+End_Group
+
+RETURNS: 
+
+**ERROR** Unable to find Equatorial and Polar radii for target [Chewbaca].
+**I/O ERROR** Unable to find target radii for given target [Chewbaca].
+-------------------------------
+
+-------------------------------
+FAILED TO FIND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+    TargetName = Null
+  End_Group
+End_Object
+
+Object = NaifKeywords
+  BODY_FRAME_CODE = 2101955
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Chewbaca
+End_Group
+
+RETURNS: 
+
+**ERROR** Unable to find radii for target code [2101955]. Target code was not found in furnished kernels.
+**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(KERNELVARNOTFOUND)]. The Naif error is [The variable BODY2101955_RADII could not be found in the kernel pool.].
+-------------------------------
+
+-------------------------------
+FOUND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+    TargetName = Null
+  End_Group
+End_Object
+
+Object = NaifKeywords
+  BODY_FRAME_CODE   = 2101955
+  BODY2101955_RADII = (0.2825, 0.2675, 0.254)
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Chewbaca
+End_Group
+
+RETURNS: 
+
+# Set radii to BODY RADII values in NaifKeywords Object.
+Group = Mapping
+  TargetName       = Chewbaca
+  EquatorialRadius = 282.5 <meters>
+  PolarRadius      = 254.0 <meters>
+End_Group
+-------------------------------
+
+-------------------------------
+FOUND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+    TargetName = Null
+  End_Group
+End_Object
+
+Object = NaifKeywords
+  BODY_FRAME_CODE   = 2101955
+  BODY2101955_RADII = (0.2825, 0.2675, 0.254)
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Mars
+End_Group
+
+RETURNS: 
+
+# Find radii using known NAIF TargetName, Mars.
+Group = Mapping
+  TargetName       = Mars
+  EquatorialRadius = 3396190.0 <meters>
+  PolarRadius      = 3376200.0 <meters>
+End_Group
+-------------------------------
+
+-------------------------------
+FOUND RADII FOR LABEL: 
+
+Object = IsisCube
+  Group = Instrument
+    TargetName = Null
+  End_Group
+End_Object
+
+Object = NaifKeywords
+  BODY_FRAME_CODE   = 2101955
+  BODY2101955_RADII = (0.2825, 0.2675, 0.254)
+End_Object
+End
+
+AND MAPPING GROUP: 
+
+# Find radii using known NAIF TargetName, Mars.
+Group = Mapping
+  TargetName       = Mars
+  EquatorialRadius = 3396190.0 <meters>
+  PolarRadius      = 3376200.0 <meters>
+End_Group
+
+RETURNS: 
+
+# Find radii using known NAIF TargetName, Mars.
+# Read radii from given Mapping group.
+Group = Mapping
+  TargetName       = Mars
+  EquatorialRadius = 3396190.0 <meters>
+  PolarRadius      = 3376200.0 <meters>
+End_Group
+-------------------------------
+
+///////////////////////////////////////////////////////////
+
+
+Testing lookupNaifBodyCode() methods 
+
+FOUND NAIF BODY CODE FOR TARGET 'Mars': 499
+
+FAILED TO FIND NAIF BODY CODE FOR TARGET 'HanSolo.
+THROWS:
+
+**I/O ERROR** Could not convert Target [HanSolo] to NAIF body code.
+-------------------------------
+
+
+///////////////////////////////////////////////////////////
+
+

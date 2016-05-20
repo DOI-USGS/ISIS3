@@ -15,6 +15,7 @@
 #include <QScopedPointer>
 #include <QSet>
 #include <QTime>
+#include <QVector>
 
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -30,10 +31,10 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Progress.h"
-#include "TProjection.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "Target.h"
 
 using namespace std;
 using namespace boost::numeric::ublas;
@@ -256,7 +257,7 @@ namespace Isis {
       ControlPointFileEntryV0002 fileDataPoint;
       foreach(fileDataPoint, fileDataPoints) {
         AddPoint(new ControlPoint(fileDataPoint,
-              p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]));
+                 p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]));
 
         if (progress != NULL)
           progress->CheckStatus();
@@ -1647,8 +1648,14 @@ namespace Isis {
 
 
   /**
-   * Set the target name
+   * Sets the target name and target radii, if available. 
+   *  
+   * Note: The target radii are found using NAIF target codes. If the given 
+   * target name is not recognized, the target radii vector will be filled with 
+   * Isis::Null values. 
    *
+   * @see Target::radiiGroup(QString) 
+   *  
    * @param target The name of the target of this Control Network
    */
   void ControlNet::SetTarget(const QString &target) {
@@ -1661,8 +1668,8 @@ namespace Isis {
     p_targetName = target;
 
     p_targetRadii.clear();
-    if (p_targetName != "") {
-      PvlGroup pvlRadii = TProjection::TargetRadii(target);
+    try {
+      PvlGroup pvlRadii = Target::radiiGroup(target);
       p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
                                        Distance::Meters));
       // The method Projection::Radii does not provide the B radius
@@ -1671,7 +1678,8 @@ namespace Isis {
       p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"],
                                        Distance::Meters));
     }
-    else {
+    catch (IException &e) {
+      // Fill target radii vector will Null-valued distances
       p_targetRadii.push_back(Distance());
       p_targetRadii.push_back(Distance());
       p_targetRadii.push_back(Distance());
@@ -1680,9 +1688,95 @@ namespace Isis {
 
 
   /**
-   * Set the user name
+   * Sets the target name and radii using values found in the mapping group of 
+   * the given label, if available. If this fails, calls SetTarget(QString).
+   *  
+   * @param label A PVL Containing Target information (usually in a Mapping 
+   *              group or NaifKeywords object).
+   */
+  void ControlNet::SetTarget(Pvl label) {
+    QScopedPointer <QMutexLocker> locker;
+
+    if (m_mutex) {
+      locker.reset(new QMutexLocker(m_mutex));
+    }
+
+    PvlGroup mapping;
+    p_targetRadii.clear();
+    try {
+      if ( (label.hasObject("IsisCube") && label.findObject("IsisCube").hasGroup("Mapping"))
+           || label.hasGroup("Mapping") ) {
+        mapping = label.findGroup("Mapping", Pvl::Traverse);
+      }
+      // If radii values don't exist in the labels
+      // or if they are set to null,
+      // try to get target radii using the TargetName or NaifKeywords object values
+      Distance equatorialRadius, polarRadius;
+      if (!mapping.hasKeyword("EquatorialRadius") 
+          || !mapping.hasKeyword("PolarRadius")) {
+      
+        mapping = Target::radiiGroup(label, mapping);
+      
+      }
+
+      equatorialRadius = Distance(mapping["EquatorialRadius"], Distance::Meters);
+      polarRadius      = Distance(mapping["PolarRadius"],      Distance::Meters);
+      
+      p_targetRadii.push_back(equatorialRadius);
+      p_targetRadii.push_back(equatorialRadius);
+      p_targetRadii.push_back(polarRadius);
+    }
+    catch (IException &e) {
+      // leave equatorialRadius and polarRadius as Null-valued distances if this fails
+      p_targetRadii.push_back(Distance());
+      p_targetRadii.push_back(Distance());
+      p_targetRadii.push_back(Distance());
+    }
+
+    if (mapping.hasKeyword("TargetName")) {
+      p_targetName = mapping["TargetName"][0];
+    }
+    else {
+      p_targetName = "";
+    }
+  }
+
+
+  /**
+   * Directly sets the target name and radii using the given information. 
+   *  
+   * @see Target::radiiGroup(Pvl, PvlGroup) 
+   *  
+   * @param target The name of the target for this Control Network
+   * @param target A 3-dimensional vector containing the A (equatorial major), B
+   *               (equatorial minor), and C (polar) triaxial radii values of
+   *               the target for this Control Network
+   *  
+   */
+  void ControlNet::SetTarget(const QString &target,
+                             const QVector<Distance> &radii) {
+    QScopedPointer <QMutexLocker> locker;
+
+    if (m_mutex) {
+      locker.reset(new QMutexLocker(m_mutex));
+    }
+
+    if (radii.size() != 3) {
+      throw IException(IException::Unknown,
+                       "Unable to set target radii. The given list must have length 3.",
+                       _FILEINFO_);
+    }
+
+    p_targetName = target;
+    p_targetRadii = radii.toStdVector();
+
+  }
+
+
+  /**
+   * Set the user name of the control network.
    *
-   * @param name The name of the user creating or modifying this Control Net
+   * @param name The name of the user creating or modifying this ControlNet
    */
   void ControlNet::SetUserName(const QString &name) {
     p_userName = name;
