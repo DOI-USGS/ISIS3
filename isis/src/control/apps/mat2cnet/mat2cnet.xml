@@ -108,6 +108,10 @@
       Added appTests for new parameters and gave more meaningful names to 
       existing appTests.
     </change>
+    <change name="Jeannie Backer" date="2016-04-22">
+      Modified to use cube labels to set control net target if unable to set with only the user
+      given TARGET. References #3892
+    </change>
   </history>
 
   <groups>

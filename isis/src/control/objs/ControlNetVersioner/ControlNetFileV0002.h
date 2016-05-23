@@ -55,6 +55,9 @@ namespace Isis {
    *                           instead of Projection.  References #775.
    *   @history 2013-05-22 Kimberly Oyama and Tracie Sucharski - Added the JIGSAWREJECTED
    *                           keyword to the toPvl() method. Fixes #661.
+   *   @history 2016-04-22 Jeannie Backer - Removed thrown exception in
+   *                           toPvl() when unable to find TargetRadii values. Instead, we
+   *                           will just leave these values blank. References #3892
    */
   class ControlNetFileV0002 : public ControlNetFile {
     public:

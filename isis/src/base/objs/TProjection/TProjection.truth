@@ -10,10 +10,14 @@ Test for missing Mapping Group
 Test for missing Equatorial Radius in the mapping group
 **ERROR** Projection failed.  Invalid label group [Mapping].
 **ERROR** Projection failed. No target radii are available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+**ERROR** Unable to find Equatorial and Polar radii for target [].
+**ERROR** Unable to find PVL object [IsisCube].
 
 Test for missing polar radius in the mapping group
 **ERROR** Projection failed.  Invalid label group [Mapping].
 **ERROR** Projection failed. No target radii are available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+**ERROR** Unable to find Equatorial and Polar radii for target [].
+**ERROR** Unable to find PVL object [IsisCube].
 
 Test for invalid Equatoral Radius value
 **ERROR** Projection failed.  Invalid label group [Mapping].
@@ -322,13 +326,6 @@ Test Error Throws for invalid inputs to conversion methods
 **ERROR** Unable to convert to world y.  The given y-value [-1.79769313486231e+308] is invalid.
 ///////////////////////////////////////////////////////////
 
-
-Testing other static methods 
-Mars equatorial radius: EquatorialRadius = 3396190.0 <meters>
-Mars polar radius: PolarRadius = 3376200.0 <meters>
-
-**ERROR** The target name [Mo] does not correspond to a target body with known radii.
-**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(KERNELVARNOTFOUND)]. The Naif error is [The variable BODY-94_RADII could not be found in the kernel pool.].
 
 Rotation Tests
 Rotation:     90

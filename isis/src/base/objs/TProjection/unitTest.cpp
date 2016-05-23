@@ -12,6 +12,7 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "SpecialPixel.h"
+#include "Target.h"
 #include "TProjection.h"
 #include "WorldMapper.h"
 
@@ -680,24 +681,6 @@ int main(int argc, char *argv[]) {
   }
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
-  cout << endl;
-
-  cout << "Testing other static methods " << endl;
-  try {
-    PvlGroup radii = TProjection::TargetRadii("Mars");
-    cout << "Mars equatorial radius: " << radii["EquatorialRadius"] << endl;
-    cout << "Mars polar radius: " << radii["PolarRadius"] << endl << endl;
-  }
-  catch(IException &error) {
-    error.print();
-  }
-
-  try {
-    TProjection::TargetRadii("Mo");
-  }
-  catch (IException &error) {
-    error.print();
-  }
   cout << endl;
 
   cout << "Rotation Tests" << endl;

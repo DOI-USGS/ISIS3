@@ -168,7 +168,7 @@ namespace Isis {
       };
 
       // The using statements below are used to make the PvlContainer's version
-      // of FindKeyword and HasKeyword vissible to other code that otherwise would not be
+      // of FindKeyword and HasKeyword visible to other code that otherwise would not be
       // able to see those versions.
       using PvlContainer::findKeyword;
 

@@ -155,6 +155,15 @@ namespace Isis {
    *                           error/crashing with inputs that have non-target naif codes.
    *   @history 2012-11-18 Debbie A. Cook - Branched Projection into another level of parent classes
    *                           that inherit from Projection.
+   *   @history 2016-04-22 Jeannie Backer - Modified TargetRadii(cubeLab, mapGroup) to
+   *                           look for radii values in the NaifKeywords object of the labels
+   *                           if we fail to find these values elsewhere. Modified
+   *                           constructor to call TargetRadii(cubeLab, mapGroup), which will
+   *                           in turn call TargetRadii(targetName), if needed. Added the
+   *                           private method targetRadii() which is called by the public
+   *                           TargetRadii() methods to find radii values using the given
+   *                           NAIF target code. Fixes #3892
+   *   @history 2016-05-10 Jeannie Backer - Moved TargetRadii() methods to Target class.
    *  
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove
@@ -270,10 +279,6 @@ namespace Isis {
       virtual PvlGroup Mapping();
       virtual PvlGroup MappingLatitudes();
       virtual PvlGroup MappingLongitudes();
-
-      // Static conversion methods
-      static PvlGroup TargetRadii(QString target);
-      static PvlGroup TargetRadii(Pvl &cubeLab, PvlGroup &mapGroup);
 
       // change latitude type
       static double ToPlanetocentric(double lat,

@@ -122,14 +122,24 @@ void IsisMain() {
   QString netid;
   QString target;
   QString description;
+  QVector<Distance> radii;
   BigInt allPoints(0);
   BOOST_FOREACH ( QString cfile, cnetfiles ) {
     std::cout << "\nLoading " << cfile << "...\n";
     Progress c_progress;
     QScopedPointer<ControlNet> cnet( new ControlNet(cfile, &c_progress) );
-    if ( netid.isEmpty() )       { netid = cnet->GetNetworkId(); }
-    if ( target.isEmpty() )      { target = cnet->GetTarget(); }
-    if ( description.isEmpty() ) { description = cnet->Description(); }
+    if ( netid.isEmpty() ) { 
+      netid = cnet->GetNetworkId(); 
+    }
+    if ( target.isEmpty() ) { 
+      target = cnet->GetTarget(); 
+    }
+    if ( description.isEmpty() ) { 
+      description = cnet->Description(); 
+    }
+    if ( radii.isEmpty() )  { 
+      radii = QVector<Distance>::fromStdVector(cnet->GetTargetRadii()); 
+    }
 
     // Get all control points by taking ownership from the control net
     int npoints(0);
@@ -214,7 +224,7 @@ void IsisMain() {
 
   cnet.SetDescription(description); 
   cnet.SetCreatedDate(Application::DateTime());
-  cnet.SetTarget( target );
+  cnet.SetTarget(target, radii);
 
   // Gotta transfer all points/measures
   for ( int i = 0 ; i < v_cloud.size() ; i++) {

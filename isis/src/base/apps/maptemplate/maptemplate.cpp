@@ -10,7 +10,7 @@
 #include "FileList.h"
 #include "IException.h"
 #include "IString.h"
-#include "TProjection.h"
+#include "Target.h"
 #include "ProjectionFactory.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
@@ -21,7 +21,7 @@ using namespace std;
 using namespace Isis;
 
 
-//functions in the code
+// functions in the code
 void addProject(PvlGroup &mapping);
 void addTarget(PvlGroup &mapping);
 void addRange(PvlGroup &mapping);
@@ -30,7 +30,7 @@ void calcRange(double &minLat, double &maxLat,
 void addResolution(PvlGroup &mapping);
 double calcResolution();
 
-//helper button functins in the code
+// helper button functins in the code
 void helperButtonLogMap();
 void helperButtonLoadMap();
 void helperButtonLogTargDef();
@@ -52,7 +52,7 @@ map <QString, void *> GuiHelpers() {
 }
 
 void IsisMain() {
-// Make the mapping pvl group and add info to it.
+  // Make the mapping pvl group and add info to it.
   PvlGroup mapping("Mapping");
   addProject(mapping);
   addTarget(mapping);
@@ -73,7 +73,7 @@ void IsisMain() {
   p.write(output);
 }
 
-//Helper function to output map file to log.
+// Helper function to output map file to log.
 void helperButtonLogMap() {
   UserInterface &ui = Application::GetUserInterface();
   QString mapFile(ui.GetFileName("MAP"));
@@ -86,14 +86,14 @@ void helperButtonLogMap() {
 }
 //...........end of helper function LogMap ........
 
-//Helper 2 function to update GUI with map file values.
+// Helper 2 function to update GUI with map file values.
 void helperButtonLoadMap() {
   UserInterface &ui = Application::GetUserInterface();
   QString mapFile(ui.GetFileName("MAP"));
   Pvl p;
   p.read(mapFile);
   PvlGroup t = p.findGroup("mapping", Pvl::Traverse);
-//Projection Stuff
+  // Projection Stuff
   ui.Clear("CLON");
   ui.Clear("CLAT");
   ui.Clear("SCALEFACTOR");
@@ -156,7 +156,7 @@ void helperButtonLoadMap() {
     ui.PutDouble("DIST", distIn);
   }
 
-//Target Parameters stuff
+  // Target Parameters stuff
   QString use = "NONE";
   ui.Clear("TARGOPT");
   ui.PutAsString("TARGOPT", use);
@@ -196,7 +196,8 @@ void helperButtonLoadMap() {
     ui.Clear("POLRADIUS");
     ui.PutAsString("POLRADIUS", PRIn);
   }
-//Ground Range Parameter stuff
+
+  // Ground Range Parameter stuff
   ui.Clear("MINLAT");
   ui.Clear("MAXLAT");
   ui.Clear("MINLON");
@@ -222,7 +223,8 @@ void helperButtonLoadMap() {
     ui.Clear("MAXLON");
     ui.PutDouble("MAXLON", maxlonIn);
   }
-//Resolution Parameter stuff
+
+  // Resolution Parameter stuff
   if(t.hasKeyword("PixelResolution")) {
     QString useM = "MPP";
     ui.Clear("RESOPT");
@@ -242,7 +244,7 @@ void helperButtonLoadMap() {
 }
 //----------End Helper function to load map file into GUI -----------
 
-//helper function to output targdef to log
+// helper function to output targdef to log
 void helperButtonLogTargDef() {
   UserInterface &ui = Application::GetUserInterface();
   QString targetFile(ui.GetFileName("FILE"));
@@ -255,16 +257,16 @@ void helperButtonLogTargDef() {
 }
 //------------End Helper function to display targdef info to log -----
 
-//helper function to load target def. to GUI
+// helper function to load target def. to GUI
 void helperButtonLoadTargDef() {
   UserInterface &ui = Application::GetUserInterface();
   QString targetFile(ui.GetFileName("FILE"));
 
-// test if targdef was entered
+  // test if targdef was entered
   Pvl p;
   p.read(targetFile);
   PvlGroup t = p.findGroup("mapping", Pvl::Traverse);
-//Load the targdef values into the GUI
+  // Load the targdef values into the GUI
   QString tOpt = "USER";
   ui.Clear("TARGOPT");
   ui.PutAsString("TARGOPT", tOpt);
@@ -303,31 +305,40 @@ void helperButtonLoadTargDef() {
 }
 //-----------end Helper Function to Load target def into GUI --------
 
-//Helper function to show system radius in log.
+// Helper function to show system radius in log.
 void helperButtonLogRadius() {
   UserInterface &ui = Application::GetUserInterface();
   QString targetName = ui.GetString("TARGETNAME");
   Pvl tMap;
-//call function to get system radius
-  PvlGroup tGrp = TProjection::TargetRadii(targetName);
+  PvlGroup tGrp;
+  // call function to get system radius
+  try {
+    tGrp = Target::radiiGroup(targetName);
+  }
+  catch (IException &e) {
+    throw IException(e, 
+                     IException::Unknown, 
+                     "Unrecognized target. User must enter EQRADIUS and POLRADIUS values.", 
+                     _FILEINFO_);
+  }
   tMap.addGroup(tGrp);
   QString OQString = "***** System radii for " + targetName + "*****";
-//writh to log QString(OQString and mapping group
+  // write to log QString(OQString and mapping group
   Application::GuiLog(OQString);
   Application::GuiLog(tMap);
 }
 //-----------end ot log radius helper function---------
 
-//Helper function to run calcRange function.
+// Helper function to run calcRange function.
 void helperButtonCalcRange() {
   UserInterface &ui = Application::GetUserInterface();
   double minLat;
   double maxLat;
   double minLon;
   double maxLon;
-// Run the function calcRange of calculate range info
+  // Run the function calcRange of calculate range info
   calcRange(minLat, maxLat, minLon, maxLon);
-// Write ranges to the GUI
+  // Write ranges to the GUI
   QString use = "USER";
   ui.Clear("RNGOPT");
   ui.PutAsString("RNGOPT", use);
@@ -342,12 +353,12 @@ void helperButtonCalcRange() {
 }
 //--------------End Helper function to run calcRange ----------------
 
-//Helper function to run calcResolution function.
+// Helper function to run calcResolution function.
 double helperButtonCalcResolution() {
   UserInterface &ui = Application::GetUserInterface();
-// Call calcResolution which will return a double
+  // Call calcResolution which will return a double
   double Res = calcResolution();
-//update the GUI with the new resolution
+  // update the GUI with the new resolution
   QString resUse = "MPP";
   ui.Clear("RESOPT");
   ui.PutAsString("RESOPT", resUse);
@@ -361,7 +372,7 @@ double helperButtonCalcResolution() {
 void addProject(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
   QString projName = ui.GetString("PROJECTION");
-//setup a look up table for projection names
+  // setup a look up table for projection names
   map <QString, QString> projLUT;
   projLUT ["SINUSOIDAL"] = "Sinusoidal";
   projLUT ["MERCATOR"] = "Mercator";
@@ -376,7 +387,7 @@ void addProject(PvlGroup &mapping) {
   projLUT ["POINTPERSPECTIVE"] = "PointPerspective";
   projLUT ["ROBINSON"] = "Robinson";
 
-// Add Projection keywords to the mappping PVL
+  // Add Projection keywords to the mappping PVL
   mapping += PvlKeyword("ProjectionName", projLUT[projName]);
   if(ui.WasEntered("CLON")) {
     double clonOut = ui.GetDouble("CLON");
@@ -440,49 +451,64 @@ void addTarget(PvlGroup &mapping) {
       mapping += t["LongitudeDirection"];
     }
   }
-// if TARGOPT is user and no radii enter the run TargetRadii to get
-// the system radii for target name.
+  // if TARGOPT is user and no radii have been entered by the user,
+  // then call TargetRadii to get the system radii for target name.
   else if(ui.GetString("TARGOPT") == "USER") {
+
     QString targetName = ui.GetString("TARGETNAME");
-    PvlGroup grp = TProjection::TargetRadii(targetName);
-    double equatorialRad = grp["EquatorialRadius"];
-    double polarRad = grp["PolarRadius"];
-// if radii were entered in GUI then set radii to entered value
-    if(ui.WasEntered("EQRADIUS")) {
-      equatorialRad = ui.GetDouble("EQRADIUS");
-    }
-    if(ui.WasEntered("POLRADIUS")) {
-      polarRad = ui.GetDouble("POLRADIUS");
-    }
-    QString latType = ui.GetString("LATTYPE");
-    if(latType == "PLANETOCENTRIC") {
-      latType = "Planetocentric";
-    }
-    else if(latType == "PLANETOGRAPHIC") {
-      latType = "Planetographic";
-    }
-    QString lonDir = ui.GetString("LONDIR");
-    if(lonDir == "POSITIVEEAST") {
-      lonDir = "PositiveEast";
-    }
-    else if(lonDir == "POSITIVEWEST") {
-      lonDir = "PositiveWest";
-    }
-    QString lonDom = ui.GetString("LONDOM");
-//Add targdef values to the mapping pvl
     mapping += PvlKeyword("TargetName", targetName);
-    mapping += PvlKeyword("EquatorialRadius", toString(equatorialRad), "meters");
-    mapping += PvlKeyword("PolarRadius", toString(polarRad), "meters");
-    mapping += PvlKeyword("LatitudeType", latType);
-    mapping += PvlKeyword("LongitudeDirection", lonDir);
-    mapping += PvlKeyword("LongitudeDomain", lonDom);
+
+    PvlGroup radii;
+    // if either radius value was not entered, then we will attempt to get it from the target name
+    if ( !ui.WasEntered("EQRADIUS") || !ui.WasEntered("POLRADIUS") ) {
+      try {
+        // this group will contain TargetName, EquatorialRadius, and PolarRadius
+        radii = Target::radiiGroup(targetName);
+      }
+      catch (IException &e) {
+        QString msg = "Unable to find target radii automatically. "
+                      "User must provide EQRADIUS and POLRADIUS values for this target.";
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
+      }
+    }
+
+    if(ui.WasEntered("EQRADIUS")) {
+      mapping += PvlKeyword("EquatorialRadius", ui.GetAsString("EQRADIUS"), "meters");
+    }
+    else {
+      mapping += radii.findKeyword("EquatorialRadius"); // already formatted in meters
+    }
+
+    if(ui.WasEntered("POLRADIUS")) {
+      mapping += PvlKeyword("PolarRadius", ui.GetAsString("POLRADIUS"), "meters");
+    }
+    else {
+      mapping += radii.findKeyword("PolarRadius"); // already formatted in meters
+    }
+
+    if (QString::compare(ui.GetString("LATTYPE"), "Planetocentric", Qt::CaseInsensitive) == 0) {
+      mapping += PvlKeyword("LatitudeType", "Planetocentric");
+    }
+    else {
+      mapping += PvlKeyword("LatitudeType", "Planetographic");
+    }
+
+
+    if (QString::compare(ui.GetString("LONDIR"), "PositiveEast", Qt::CaseInsensitive) == 0) {
+      mapping += PvlKeyword("LongitudeDirection", "PositiveEast");
+    }
+    else {
+      mapping += PvlKeyword("LongitudeDirection", "PositiveWest");
+    }
+
+    mapping += PvlKeyword("LongitudeDomain", ui.GetString("LONDOM"));
   }
 }
 
 // Function to add the range information to the mapping PVL
 void addRange(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
-//Use the values that have been entered in the GUI
+  // Use the values that have been entered in the GUI
   if(ui.GetString("RNGOPT") == "USER") {
     double minLat = ui.GetDouble("MINLAT");
     mapping += PvlKeyword("MinimumLatitude", toString(minLat));
@@ -494,12 +520,12 @@ void addRange(PvlGroup &mapping) {
     mapping += PvlKeyword("MaximumLongitude", toString(maxLon));
   }
   else if(ui.GetString("RNGOPT") == "CALC") {
-// calculate range values using function calcRange and fromlist
+    // calculate range values using function calcRange and fromlist
     double minLat;
     double maxLat;
     double minLon;
     double maxLon;
-//Call calcRange to calculate min and max ground range values
+    // Call calcRange to calculate min and max ground range values
     calcRange(minLat, maxLat, minLon, maxLon);
     mapping += PvlKeyword("MinimumLatitude", toString(minLat));
     mapping += PvlKeyword("MaximumLatitude", toString(maxLat));
@@ -510,7 +536,7 @@ void addRange(PvlGroup &mapping) {
 
 // Function to add the resolution information to the mapping PVL
 void addResolution(PvlGroup &mapping) {
-// Use values that have been entered in GUI
+  // Use values that have been entered in GUI
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("RESOPT") == "PPD") {
     double res = ui.GetDouble("RESOLUTION");
@@ -521,7 +547,7 @@ void addResolution(PvlGroup &mapping) {
     mapping += PvlKeyword("PixelResolution", toString(res), "meters/pixel");
   }
   else if(ui.GetString("RESOPT") == "CALC") {
-// run the function to calculate the resolution
+    // run the function to calculate the resolution
     double Res = calcResolution();
     mapping += PvlKeyword("PixelResolution", toString(Res), "meters/pixel");
   }
@@ -536,7 +562,7 @@ void calcRange(double &minLat, double &maxLat,
   maxLat = -DBL_MAX;
   minLon = DBL_MAX;
   maxLon = -DBL_MAX;
-  //set up PVL of mapping info from GUI:: need to do this so we use the
+  // set up PVL of mapping info from GUI:: need to do this so we use the
   // most current info from GUI to calculate the range
   Pvl userMap;
   PvlGroup userGrp("Mapping");
@@ -544,43 +570,63 @@ void calcRange(double &minLat, double &maxLat,
     userMap.read(ui.GetFileName("FILE"));
   }
   else if(ui.GetString("TARGOPT") == "USER") {
-    userGrp += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
     QString targetName = ui.GetString("TARGETNAME");
-    PvlGroup grp = TProjection::TargetRadii(targetName);
-    double equatorialRad = grp["EquatorialRadius"];
-    double polarRad = grp["PolarRadius"];
 
-// if radii were entered in GUI then set radii to entered value
+    PvlGroup radii;
+    // if either radius value was not entered, then we will attempt to get it from the target name
+    if ( !ui.WasEntered("EQRADIUS") || !ui.WasEntered("POLRADIUS") ) {
+      try {
+        // this ensures that we look for the target radii of the TARGET specified by the user
+        radii += PvlKeyword("TargetName", targetName);
+        // this group will contain TargetName, EquatorialRadius, and PolarRadius
+        Pvl cubeLab(flist[0].expanded());
+        radii = Target::radiiGroup(cubeLab, radii);
+      }
+      catch (IException &e) {
+        QString msg = "Unable to find target radii automatically. "
+                      "User must provide EQRADIUS and POLRADIUS values for this target.";
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
+      }
+    }
+
+    userGrp += PvlKeyword("TargetName", targetName);
+
+    // if radii were entered in GUI then set radii to entered value
     if(ui.WasEntered("EQRADIUS")) {
-      equatorialRad = ui.GetDouble("EQRADIUS");
+      userGrp += PvlKeyword("EquatorialRadius", ui.GetAsString("EQRADIUS"), "Meters");
     }
+    else {
+      userGrp += radii.findKeyword("EquatorialRadius");
+    }
+
     if(ui.WasEntered("POLRADIUS")) {
-      polarRad = ui.GetDouble("POLRADIUS");
+      userGrp += PvlKeyword("PolarRadius", ui.GetAsString("POLRADIUS"), "Meters");
     }
-    if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
-      QString latType = "Planetocentric";
-      userGrp += PvlKeyword("LatitudeType", latType);
+    else {
+      userGrp += radii.findKeyword("PolarRadius");
     }
-    else if(ui.GetString("LATTYPE") == "PLANETOGRAPHIC") {
-      QString latType = "Planetographic";
-      userGrp += PvlKeyword("LatitudeType", latType);
+
+    if (QString::compare(ui.GetString("LATTYPE"), "Planetocentric", Qt::CaseInsensitive) == 0) {
+      userGrp += PvlKeyword("LatitudeType", "Planetocentric");
     }
-    if(ui.GetString("LONDIR") == "POSITIVEEAST") {
-      QString lonD = "PositiveEast";
-      userGrp += PvlKeyword("LongitudeDirection", lonD);
+    else {
+      userGrp += PvlKeyword("LatitudeType", "Planetographic");
     }
-    else if(ui.GetString("LONDIR") == "POSITIVEWEST") {
-      QString lonD = "PositiveWest";
-      userGrp += PvlKeyword("LongitudeDirection", lonD);
+
+
+    if (QString::compare(ui.GetString("LONDIR"), "PositiveEast", Qt::CaseInsensitive) == 0) {
+      userGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
     }
+    else {
+      userGrp += PvlKeyword("LongitudeDirection", "PositiveWest");
+    }
+
     userGrp += PvlKeyword("LongitudeDomain", ui.GetString("LONDOM"));
-    userGrp += PvlKeyword("EquatorialRadius", toString(equatorialRad));
-    userGrp += PvlKeyword("PolarRadius", toString(polarRad));
     userMap.addGroup(userGrp);
   }
 
   for(int i = 0; i < flist.size(); i++) {
-// Get the mapping group from the camera
+    // Get the mapping group from the camera
     double camMinLat;
     double camMaxLat;
     double camMinLon;
@@ -591,14 +637,14 @@ void calcRange(double &minLat, double &maxLat,
     Pvl defaultMap;
     cam->BasicMapping(defaultMap);
     PvlGroup &defaultGrp = defaultMap.findGroup("Mapping");
-//Move any defaults that are not in the user map
+    // Move any defaults that are not in the user map
     for(int k = 0; k < defaultGrp.keywords(); k++) {
       if(!userGrp.hasKeyword(defaultGrp[k].name())) {
         userGrp += defaultGrp[k];
       }
     }
     userMap.addGroup(userGrp);
-//get the camera ground range min and max and solve for range
+    // get the camera ground range min and max and solve for range
     cam->GroundRange(camMinLat, camMaxLat, camMinLon, camMaxLon, userMap);
     if(camMinLat < minLat) {
       minLat = camMinLat;
@@ -623,7 +669,7 @@ double calcResolution() {
   double sumRes = 0.0;
   double highRes = DBL_MAX;
   double lowRes = -DBL_MAX;
-// Loop through the from list at get high and low camera resolution
+  // Loop through the from list at get high and low camera resolution
   for(int i = 0; i < flist.size(); i++) {
     Cube c;
     c.open(flist[i].toString());
@@ -634,8 +680,9 @@ double calcResolution() {
     if(camHighRes < highRes) highRes = camHighRes;
     sumRes = sumRes + (camLowRes + camHighRes) / 2.0;
   }
-//user input (RESCALCOPT) at GUI will determain what is output
-// highest, lowest, or avg
+
+  // user input (RESCALCOPT) at GUI will determain what is output
+  // highest, lowest, or avg
   if(ui.GetString("RESCALCOPT") == "HIGH") return highRes;
   if(ui.GetString("RESCALCOPT") == "LOW") return lowRes;
   return(sumRes / flist.size());

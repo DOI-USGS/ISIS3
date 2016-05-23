@@ -275,6 +275,10 @@
         Updated examples #1-4 GUI illustrations, and clarified some of the "Description" paragraphs.
         Fixes #2389.
      </change>
+     <change name="Jac Shinaman" date="2016-02-09">
+        Brought code closer to ISIS coding standards. Added test to read NAIF body frame info from labels.
+        References #3934
+     </change>
   </history>
 
   <oldName>

@@ -27,41 +27,44 @@ namespace Isis {
   class MdiCubeViewport;
 
   /**
-    * @brief Tool for picking Tie points
-    *
-    * @ingroup Visualization Tools
-    *
-    * @author 2008-09-09 Tracie Sucharski
-    *
-    * @internal
-    *   @history 2008-11-19 Tracie Sucharski - Addition option to constructor
-    *                           to allow mouse events on leftChipViewport.
-    *   @history 2009-06-10 Tracie Sucharski - Added new slot, clearFiles which
-    *                           allow new files to be opened.
-    *   @history 2010-05-18 Jeannie Walldren - Modified createPoint() method
-    *                           Point ID Dialog to return if "Cancel" is
-    *                           clicked.
-    *   @history 2010-05-18 Tracie Sucharski - Added pointId to the Tie tool
-    *                           Dialog.
-    *   @history 2010-11-23 Eric Hyer - Added stretchChipViewport SIGNAL for
-    *                           forwarding of SIGNAL from StretchTool to
-    *                           ChipViewport
-    *   @history 2010-12-17 Eric Hyer - Code for open dialog for setting the
-    *                           registration template now in this class, not in
-    *                           ControlPointEdit
-    *   @history 2012-05-10 Tracie Sucharski - Reset pointers to NULL, when creating
-    *                           new control point, if doesn't exist on basemap, return.
-    *   @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of this class 
-    *                           and into the QtieFileTool class.
-    *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-    *                           coding standards. References #972.
-    * @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
-    *                           #775 and #1114.
-    * @history 2012-11-23 Debbie A. Cook, Removed unnecessary Projection include.  References Mantis
-    *                           ticket #775. 
-    * @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
-    *                           network immediately print warning and return.  References #1493.
-    */
+   * @brief Tool for picking Tie points
+   *
+   * @ingroup Visualization Tools
+   *
+   * @author 2008-09-09 Tracie Sucharski
+   *
+   * @internal
+   *   @history 2008-11-19 Tracie Sucharski - Addition option to constructor
+   *                           to allow mouse events on leftChipViewport.
+   *   @history 2009-06-10 Tracie Sucharski - Added new slot, clearFiles which
+   *                           allow new files to be opened.
+   *   @history 2010-05-18 Jeannie Walldren - Modified createPoint() method
+   *                           Point ID Dialog to return if "Cancel" is
+   *                           clicked.
+   *   @history 2010-05-18 Tracie Sucharski - Added pointId to the Tie tool
+   *                           Dialog.
+   *   @history 2010-11-23 Eric Hyer - Added stretchChipViewport SIGNAL for
+   *                           forwarding of SIGNAL from StretchTool to
+   *                           ChipViewport
+   *   @history 2010-12-17 Eric Hyer - Code for open dialog for setting the
+   *                           registration template now in this class, not in
+   *                           ControlPointEdit
+   *   @history 2012-05-10 Tracie Sucharski - Reset pointers to NULL, when creating
+   *                           new control point, if doesn't exist on basemap, return.
+   *   @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of this class 
+   *                           and into the QtieFileTool class.
+   *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                           coding standards. References #972.
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
+   *                             #775 and #1114.
+   *   @history 2012-11-23 Debbie A. Cook, Removed unnecessary Projection include.  References Mantis
+   *                             ticket #775. 
+   *   @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
+   *                             network immediately print warning and return.  References #1493.
+   *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
+   *                           ControlNet's target instead of the TargetName.
+   *                           References #3892
+   */
   class QtieTool : public Tool {
       Q_OBJECT
 

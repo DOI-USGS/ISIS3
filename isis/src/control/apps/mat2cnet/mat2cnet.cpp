@@ -17,6 +17,7 @@
 #include "PvlGroup.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
+#include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "TextFile.h"
 #include "UserInterface.h"
@@ -86,7 +87,14 @@ void IsisMain() {
   // Create a new control network
   ControlNet cnet;
   cnet.SetNetworkId(ui.GetString("NETWORKID"));
+
+  // first try to set target from user entered TargetName
   cnet.SetTarget(ui.GetString("TARGET"));
+  // if that fails, look in a cube label for the info
+  if ( !cnet.GetTargetRadii()[0].isValid() ) {
+    Pvl isis3Lab(snl.fileName(0));
+    cnet.SetTarget(isis3Lab);
+  }
   cnet.SetUserName(Application::UserName());
   cnet.SetCreatedDate(Application::DateTime());
   cnet.SetDescription(ui.GetString("DESCRIPTION"));
@@ -240,7 +248,7 @@ void IsisMain() {
     //Set Diameter
     try {
       //Check to see if the column was, in fact, a double
-      if((double)IString(diam) != 0.0)
+      if ((double)IString(diam) != 0.0)
         cmeasure->SetDiameter(diam);
     }
     catch (IException &) {
