@@ -46,6 +46,9 @@ namespace Isis {
    *                           and the latitude type. References #604.
    *   @history 2013-03-06 Steven Lambright - Added support for getting Radii from TargetName
    *                           keyword. References #1534.
+   *   @history 2016-04-22 Jeannie Backer - Added try/catch around calls to
+   *                           Target::radiiGroup() in constructors and add(angle, mapGroup). 
+   *                           Appended message to caught exceptions. References #3892,3896
    */
   class Latitude : public Angle {
     public:

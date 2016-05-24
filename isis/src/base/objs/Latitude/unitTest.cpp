@@ -201,4 +201,17 @@ int main(int argc, char *argv[]) {
   }
 
   cout << endl;
+  PvlGroup mappingGroup("Mapping");
+  mappingGroup += PvlKeyword("TargetName", "Yoda");
+  try {
+    Latitude( Angle(PI, Angle::Radians), mappingGroup);
+  }
+  catch (IException &e) {
+    cout << "-------------------------------------------------------" << endl;
+    cout << "FAILED TO CONSTRUCT LATITUDE OBJECT FROM MAPPING GROUP: " << endl;
+    cout << endl << mappingGroup << endl << endl;
+    cout << "THROWS: " << endl << endl;
+    e.print();
+    cout << "-------------------------------------------------------" << endl << endl;
+  }
 }

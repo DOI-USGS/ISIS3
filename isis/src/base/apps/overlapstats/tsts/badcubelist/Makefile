@@ -7,8 +7,9 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
 	if [ `$(APPNAME) from=$(OUTPUT)/list.lis \
-	OVERLAPLIST=$(INPUT)/overlaps.lis \
-	>& $(OUTPUT)/error.txt` ]; then \
+	                 OVERLAPLIST=$(INPUT)/overlaps.lis \
+	                 >& $(OUTPUT)/error.txt` ]; \
+	then \
 	  true; \
-        fi; \
+    fi; \
 	$(RM) $(OUTPUT)/list.lis;

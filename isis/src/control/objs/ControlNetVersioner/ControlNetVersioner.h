@@ -123,6 +123,11 @@ namespace Isis {
    *                           networks (specifically, isis3.2.1 hijitreg output networks with
    *                           measures that lack Sample/Line and are set to unmeasured). Fixes
    *                           #1554.
+   *   @history 2016-04-22 Jeannie Backer - Updated error message in
+   *                           ConvertVersion1ToVersion2() to make it specific to this class
+   *                           call. This was done to reduce redundancy since the original
+   *                           message for this error was very similar to the caught exception
+   *                           to which it is appended. References #3892
    */
   class ControlNetVersioner {
     public:

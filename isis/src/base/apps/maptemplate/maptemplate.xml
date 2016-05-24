@@ -392,6 +392,10 @@ Group = Mapping
       changed from SYSTEM to SELECT, IMAGE to NONE, and TARGDEF to FILE. The
       description was modified to describe the behavior when selected, fixes #845.
     </change>
+    <change name="Jeannie Backer" date="2016-04-22">
+      Added error message to alert to the user when the program fails to find TargetRadii. 
+      Added errors appTest. References #3892
+    </change>
   </history>
 
   <seeAlso>
@@ -1097,14 +1101,14 @@ Group = Mapping
           This option specifies how the ground range information will be
           created. NONE is the default value. The other options are USER
           and CALC. For the NONE option, none of the ground range information 
-	  is written to the map template file, allowing the range to be
+          is written to the map template file, allowing the range to be
           calculated from the image at the time of projection. For the USER
           option, the user enters their values for the ground range.  For
-	  the CALC option, <i>maptemplate</i> calculates the ground range using
+          the CALC option, <i>maptemplate</i> calculates the ground range using
           the files in the input list (FROMLIST). If CALC option is used,
           the MinimumLatitude, MaximumLatitude, MinimumLongitude, and
           MaximumLongitude are added to the mapping group after the calculation
-	  is performed.
+          is performed.
         </description>
         <default>
           <item>NONE</item>
@@ -1115,9 +1119,9 @@ Group = Mapping
             <brief>Calculate Ranges using FROMLIST</brief>
             <description>
               Upon clicking this button, the program will calculate the latitude 
-	      and longitude range using the files in the FROMLIST.
+              and longitude range using the files in the FROMLIST.
               The ranges will be calculated using the target information in the GUI.  
-	      If no target information is entered, then the camera defaults will be used.
+              If no target information is entered, then the camera defaults will be used.
             </description>
             <icon>$ISIS3DATA/base/icons/exec.png</icon>
           </helper>

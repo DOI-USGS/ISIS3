@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "ImageList.h"
+#include "Pvl.h"
 
 template <typename A> class QList;
 
@@ -109,6 +110,14 @@ namespace Isis {
    *                           uninitialized values were causing the qmos selection tool to not
    *                           work properly.  Fixes #1742.
    *   @history 2014-07-18 Kimberly Oyama and Tracie Sucharski - Added selectedCubes() and  .
+   *   @history 2016-04-22 Jeannie Backer - Added label parameter to setProjection(mapGroup, label).
+   *                           The default value for label is an empty Pvl. Also, modified
+   *                           addImage() to pass the label from the cube of the image to be added
+   *                           into setProjection(mapGroup, label). This was done to be able to call
+   *                           TProjection::TargetRadii(label,mapGroup), which will
+   *                           in turn will now call Target::radiiGroup(targetName), if needed. 
+   *                           References #3892   
+   * 
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT
@@ -261,8 +270,8 @@ namespace Isis {
       virtual bool eventFilter(QObject *obj, QEvent *ev);
 
     private:
-      void setProjection(const PvlGroup &);
-      MosaicSceneItem *addImage(Image *);
+      void setProjection(const PvlGroup &mappingGroup, Pvl label=Pvl());
+      MosaicSceneItem *addImage(Image *image);
       void reprojectItems();
       double maximumZ();
       double minimumZ();

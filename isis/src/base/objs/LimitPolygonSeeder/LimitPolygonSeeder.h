@@ -23,10 +23,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "geos/geom/Point.h"
-#include "geos/geom/MultiPolygon.h"
-#include "geos/geom/CoordinateArraySequence.h"
-#include "geos/geom/Polygon.h"
+#include <geos/geom/Point.h>
+#include <geos/geom/MultiPolygon.h>
+#include <geos/geom/CoordinateArraySequence.h>
+#include <geos/geom/Polygon.h>
+
 #include "PolygonSeeder.h"
 
 namespace Isis {

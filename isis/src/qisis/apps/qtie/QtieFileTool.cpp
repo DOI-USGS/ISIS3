@@ -212,7 +212,7 @@ namespace Isis {
         cnet->SetNetworkId("Qtie");
         cnet->SetUserName(Application::UserName());
         //  Set control net target
-        cnet->SetTarget(target);
+        cnet->SetTarget(*matchCube->label());
         netOk = true;
       }
       else {

@@ -37,6 +37,7 @@ namespace Isis {
   class Angle;
   class Distance;
   class Pvl;
+  class PvlGroup;
   class ShapeModel;
   class Spice;
 
@@ -47,7 +48,17 @@ namespace Isis {
    *
    * @internal
    *  @history 2015-07-31 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if any
-   *           NAIF errors were signaled. References #2248.
+   *                          NAIF errors were signaled. References #2248.
+   *  @history 2016-05-18 Jeannie Backer - Moved TProjection::TargetRadii() methods to
+   *                          Target::radiiGroup() methods. Added overloaded 
+   *                          lookupNaifBodyCode(QString) to have a generic static method that 
+   *                          takes the TargetName as an input parameter. Added overloaded 
+   *                          lookupNaifBodyCode(Pvl) to use the label passed into Target's 
+   *                          constructor to find the code if not found using
+   *                          the name or spice pointer provided. References #3934.
+   *  @history 2016-05-18 Jeannie Backer - Removed unused lookupNaifBodyCode() method that takes no
+   *                          input parameters (since it was replaced with lookupNaifBodyCode(Pvl)).
+   *                          References #3934.
    */
   class Target {
 
@@ -76,6 +87,11 @@ namespace Isis {
       std::vector<Angle> poleDecCoefs();
       std::vector<Angle> pmCoefs();
 
+      static SpiceInt lookupNaifBodyCode(QString name);
+      // Static conversion methods
+      static PvlGroup radiiGroup(QString target);
+      static PvlGroup radiiGroup(Pvl &cubeLab, const PvlGroup &mapGroup);
+
       std::vector<double> poleRaNutPrecCoefs();
       std::vector<double> poleDecNutPrecCoefs();
 
@@ -85,7 +101,8 @@ namespace Isis {
       std::vector<Angle> sysNutPrecCoefs();
 
     private:
-      SpiceInt lookupNaifBodyCode() const;
+      SpiceInt lookupNaifBodyCode(Pvl &lab) const;
+      static PvlGroup radiiGroup(int bodyFrameCode);
       SpiceInt *m_bodyCode;          /**< The NaifBodyCode value, if it exists in the
                                        labels. Otherwise, if the target is sky,
                                        it's the SPK code and if not sky then it's
