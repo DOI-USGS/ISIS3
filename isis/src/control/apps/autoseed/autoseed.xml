@@ -176,6 +176,12 @@ End_Group
     <change name="Debbie A. Cook" date="2012-11-23">
       Changed to use TProjection instead of Projection.  References #775.
     </change>
+    <change name="Jeannie Backer" date="2016-04-22">
+      Modified code to get TargetRadii using the cube label and mapping group if these
+      values can not be found using the TargetName alone. Sets control net using these
+      radii values rather than attempting to find them again. 
+      References #3892
+    </change>
   </history>
 
   <groups>

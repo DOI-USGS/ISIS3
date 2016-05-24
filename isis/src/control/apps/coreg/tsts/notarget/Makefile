@@ -8,7 +8,7 @@ APPNAME = coreg
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/CRU_000004_1200_IR10_0.equi.cub \
+	$(APPNAME) from=$(INPUT)/nullTarget.cub \
 	           match=$(INPUT)/CRU_000004_1200_RED4_0.equi.cub \
 	           deffile=$(INPUT)/coregtemp.def \
 	           to=$(OUTPUT)/coregTruth.cub \

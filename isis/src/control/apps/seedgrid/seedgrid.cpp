@@ -9,9 +9,10 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Progress.h"
-#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "SurfacePoint.h"
+#include "Target.h"
+#include "TProjection.h"
 
 using namespace std;
 using namespace Isis;
@@ -31,99 +32,108 @@ void IsisMain() {
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
 
+  // get the pvl containing a mapping group
+  Pvl userMap;
+  userMap.read(ui.GetFileName("MAP"));
+  PvlGroup &mapGroup = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QString target;
+  if (ui.WasEntered("TARGET")) {
+    target = ui.GetString("TARGET");
+  }
+  else if (mapGroup.hasKeyword("TargetName")) {
+    target = mapGroup.findKeyword("TargetName")[0];
+    ui.PutAsString("TARGET", target);
+  }
+  else {
+    QString msg = "A target must be specified either by the [TARGET] "
+        "parameter or included as a value for keyword [TargetName] in the "
+        "projection file [MAP].";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+  mapGroup.addKeyword(PvlKeyword("TargetName", target), PvlContainer::Replace);
+
+  // Use the target name to create the control net to store the points in.
   ControlNet cnet;
+  cnet.SetTarget(target); 
 
+  // The cnet.SetTarget(target) call above will call Target::radiiGroup(target) to
+  // attempt to find the target radii values using the target name.
+  // Add those values, if not already in the mapping group.
   double equatorialRadius = 0.0;
+  vector<Distance> targetRadii = cnet.GetTargetRadii();
+  if (mapGroup.hasKeyword("EquatorialRadius")) {
+    equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius")[0]);
+  }
+  else if (targetRadii[0].isValid()) {
+    equatorialRadius = targetRadii[0].meters();
+    mapGroup += PvlKeyword("EquatorialRadius", toString(equatorialRadius), "Meters");
+    // if we successfully found equatorial radius, then polar should have worked too.
+    mapGroup += PvlKeyword("PolarRadius", toString(targetRadii[2].meters()), "Meters");
+  }
+  else {
+    QString msg = "Unable to get target radii values from the given target [" + target + "]. "
+                  "User must add EquatorialRadius and PolarRadius values to the input MAP file.";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
 
-  QString spacing = ui.GetString("SPACING");
-  if (spacing == "METER") {
-    Pvl userMap;
-    userMap.read(ui.GetFileName("MAP"));
-    PvlGroup &mapGroup = userMap.findGroup("Mapping", Pvl::Traverse);
+  QString networkId;
+  if (ui.WasEntered("NETWORKID")) {
+    networkId = ui.GetString("NETWORKID");
+    cnet.SetNetworkId(networkId);
+  }
+  cnet.SetUserName(Isis::Application::UserName());
+  if (ui.WasEntered("DESCRIPTION")) {
+    cnet.SetDescription(ui.GetString("DESCRIPTION"));
+  }
 
-    // Construct a Projection for converting between Lon/Lat and X/Y
-    // TODO: Should this be an option to include this in the program?
-    QString target;
-    if (ui.WasEntered("TARGET")) {
-      target = ui.GetString("TARGET");
+  // Set up an automatic id generator for the point ids
+  ID pointId = ID(ui.GetString("POINTID"));
+
+  // lat/lon boundaries
+  double minLat = ui.GetDouble("MINLAT");
+  double maxLat = ui.GetDouble("MAXLAT");
+  double minLon = ui.GetDouble("MINLON");
+  double maxLon = ui.GetDouble("MAXLON");
+  checkLatitude(minLat, maxLat);
+  int lonDomain = 
+      (mapGroup.hasKeyword("LongitudeDomain") ?
+          toInt(mapGroup.findKeyword("LongitudeDomain")[0]) :
+          360);
+  checkLongitude(minLon, maxLon, lonDomain);
+
+  if (QString::compare(ui.GetString("SPACING"), "METER") == 0) {
+
+    // To construct a Projection for converting between Lon/Lat and
+    // X/Y, we first add appropriate keywords to the userMap.
+
+    // append/replace more keywords
+    if (!ui.WasEntered("MAP")) { // if the default map template was kept
+      mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
+      mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+      mapGroup += PvlKeyword("LongitudeDomain", "360");
+      mapGroup += PvlKeyword("CenterLatitude", "0.0");
+      mapGroup += PvlKeyword("CenterLongitude", "0.0");
     }
-    else if (mapGroup.hasKeyword("TargetName")) {
-      target = mapGroup.findKeyword("TargetName")[0];
-      ui.PutAsString("TARGET", target);
-    }
-    else {
-      QString msg = "A target must be specified either by the [TARGET] "
-          "parameter or included as a value for keyword [TargetName] in the "
-          "projection file";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    mapGroup.addKeyword(PvlKeyword("TargetName", target), Pvl::Replace);
-
-    if (!mapGroup.hasKeyword("EquatorialRadius") ||
-        !mapGroup.hasKeyword("PolarRadius")) {
-
-      PvlGroup radii = TProjection::TargetRadii(target);
-      mapGroup.addKeyword(PvlKeyword("EquatorialRadius",
-            (QString) radii["EquatorialRadius"]));
-      mapGroup.addKeyword(PvlKeyword("PolarRadius",
-            (QString) radii["PolarRadius"]));
-    }
-
-    if (!ui.WasEntered("MAP")) {
-      mapGroup.addKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
-      mapGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
-      mapGroup.addKeyword(PvlKeyword("LongitudeDomain", toString(360)));
-      mapGroup.addKeyword(PvlKeyword("CenterLatitude", toString(0)));
-      mapGroup.addKeyword(PvlKeyword("CenterLongitude", toString(0)));
-    }
-
-    double minLat = ui.GetDouble("MINLAT");
-    double maxLat = ui.GetDouble("MAXLAT");
-    double minLon = ui.GetDouble("MINLON");
-    double maxLon = ui.GetDouble("MAXLON");
-    checkLatitude(minLat, maxLat);
 
     mapGroup.addKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
     mapGroup.addKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
     mapGroup.addKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
     mapGroup.addKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
 
+    // create the projection from the editted map
     TProjection *proj = (TProjection *) ProjectionFactory::Create(userMap);
 
-    int lonDomain = (int) IString(proj->LongitudeDomainString());
-    checkLongitude(minLon, maxLon, lonDomain);
-
     // Convert the Lat/Lon range to an X/Y range.
-    double minX;
-    double minY;
-    double maxX;
-    double maxY;
+    double minX, minY, maxX, maxY;
     bool foundRange = proj->XYRange(minX, maxX, minY, maxY);
     if (!foundRange) {
       QString msg = "Cannot convert Lat/Long range to an X/Y range";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // Create the control net to store the points in.
-    cnet.SetTarget(target);
-    QString networkId;
-    if (ui.WasEntered("NETWORKID")) {
-      networkId = ui.GetString("NETWORKID");
-      cnet.SetNetworkId(networkId);
-    }
-    cnet.SetUserName(Isis::Application::UserName());
-    if (ui.WasEntered("DESCRIPTION")) {
-      cnet.SetDescription(ui.GetString("DESCRIPTION"));
-    }
-
-    // Set up an automatic id generator for the point ids
-    ID pointId = ID(ui.GetString("POINTID"));
-
     double xStepSize = ui.GetDouble("XSTEP");
     double yStepSize = ui.GetDouble("YSTEP");
-
-    equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius")[0]);
 
     Progress gridStatus;
 
@@ -155,7 +165,7 @@ void IsisMain() {
             proj->Longitude() > ui.GetDouble("MINLON")) {
           SurfacePoint pt(Latitude(proj->Latitude(), Angle::Degrees),
                           Longitude(proj->Longitude(), Angle::Degrees),
-                          Distance(equatorialRadius, Distance::Meters));
+                          Distance(proj->EquatorialRadius(), Distance::Meters));
           ControlPoint * control = new ControlPoint;
           control->SetId(pointId.Next());
           control->SetIgnored(true);
@@ -170,40 +180,8 @@ void IsisMain() {
   }
   else {
 
-    if (!ui.WasEntered("TARGET")) {
-      QString msg = "A target must be specified by the [TARGET] parameter ";
-      msg += "or included as a value for keyword [TargetName] in the projection file";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    QString target = ui.GetString("TARGET");
-    PvlGroup radii = TProjection::TargetRadii(target);
-    equatorialRadius = radii["EquatorialRadius"];
-
-    // Create the control net to store the points in.
-    cnet.SetTarget(target);
-    QString networkId;
-    if (ui.WasEntered("NETWORKID")) {
-      networkId = ui.GetString("NETWORKID");
-      cnet.SetNetworkId(networkId);
-    }
-    cnet.SetUserName(Isis::Application::UserName());
-    if (ui.WasEntered("DESCRIPTION")) {
-      cnet.SetDescription(ui.GetString("DESCRIPTION"));
-    }
-
-    // Set up an automatic id generator for the point ids
-    ID pointId = ID(ui.GetString("POINTID"));
-
-    double minLat = ui.GetDouble("MINLAT");
-    double maxLat = ui.GetDouble("MAXLAT");
     double latStep = ui.GetDouble("LATSTEP");
-    checkLatitude(minLat, maxLat);
-
-    double minLon = ui.GetDouble("MINLON");
-    double maxLon = ui.GetDouble("MAXLON");
     double lonStep = ui.GetDouble("LONSTEP");
-    checkLongitude(minLon, maxLon, 360);
 
     Progress gridStatus;
 
@@ -314,4 +292,3 @@ void printMap() {
   //Write map file out to the log
   Isis::Application::GuiLog(userGrp);
 }
-

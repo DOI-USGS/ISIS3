@@ -36,23 +36,27 @@
     <change name="Janet Barrett" date="2007-08-17">
       Original version
     </change>
-      <change name="Kris Becker" date="2007-12-05">
-          The following modifications where made to more closely adhere to the
-          orginal ISIS himos source:  map the PDS Archive group back to the
-          ISIS Mosaic group; PDS NULL values of -9998 are mapped back to
-          ISIS Null; order of the groups are written in the same order as the 
-          ISIS input file;  Target radius values are updated for the 
-          Equirectangular projection only such that the existing 
-          (EquatorialRadius) radius value is copied to the CenterLatitudeRadius 
-          keyword and the actual NAIF radii replace EquatorialRadius and 
-          PolarRadius values if it is a valid NAIF target; the order of the 
-          values in keywords cpmmTdiFlag, cpmmSummingFlag and 
-          SpecialProcessingFlag are reordered according to CPMM order as it is 
-          in the original source; and added a bit more documentation.
-      </change>
-      <change name="Steven Lambright" date="2008-05-13">
-        Removed references to CubeInfo 
-      </change>
+    <change name="Kris Becker" date="2007-12-05">
+      The following modifications where made to more closely adhere to the
+      orginal ISIS himos source:  map the PDS Archive group back to the
+      ISIS Mosaic group; PDS NULL values of -9998 are mapped back to
+      ISIS Null; order of the groups are written in the same order as the 
+      ISIS input file;  Target radius values are updated for the 
+      Equirectangular projection only such that the existing 
+      (EquatorialRadius) radius value is copied to the CenterLatitudeRadius 
+      keyword and the actual NAIF radii replace EquatorialRadius and 
+      PolarRadius values if it is a valid NAIF target; the order of the 
+      values in keywords cpmmTdiFlag, cpmmSummingFlag and 
+      SpecialProcessingFlag are reordered according to CPMM order as it is 
+      in the original source; and added a bit more documentation.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13">
+      Removed references to CubeInfo 
+    </change>
+    <change name="Jeannie Backer" date="2016-05-10">
+      Replaced calls to NAIF routines (bodn2c and bodvar) with call to static method
+      Isis::Target::radiiGroup. References #3934
+    </change>
   </history>
 
   <category>

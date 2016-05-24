@@ -823,14 +823,14 @@ namespace Isis {
                            "from the nomenclature database. "
                            "The XML result was invalid. The parse is [" +
                            errorMsg + "] on line [" +
-                           QString(errorLine) +"], column [" +
-                           QString(errorCol) + "]");
+                           QString::number(errorLine) +"], column [" +
+                           QString::number(errorCol) + "]");
       }
     }
     else {
       QMessageBox::warning(NULL, "Failed to query nomenclature database",
                            "An error occurred when querying the nomenclature "
-                           "database for features that intersect the qeuried "
+                           "database for features that intersect the queried "
                            "ground range. Please make sure you have an active "
                            "internet connection. The error returned was [" +
                            reply->errorString() + "]");
@@ -957,6 +957,6 @@ namespace Isis {
     formQuery.addQueryItem("southernLatitude",
                                  QString::number(startLat.degrees()));
 
-    m_networkMgr->post(*m_request, QUrl::toPercentEncoding(formQuery.query()));
+    m_networkMgr->post(*m_request, formQuery.query(QUrl::FullyEncoded).toUtf8()); 
   }
 }

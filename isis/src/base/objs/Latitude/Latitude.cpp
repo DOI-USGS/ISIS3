@@ -27,7 +27,7 @@
 #include "IString.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
-#include "TProjection.h"
+#include "Target.h"
 
 namespace Isis {
   /**
@@ -103,20 +103,25 @@ namespace Isis {
           Distance::Meters);
     }
     else {
-      PvlGroup radiiGrp = TProjection::TargetRadii(mapping["TargetName"]);
-
-      m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
-          Distance::Meters);
-      m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
-          Distance::Meters);
+      try {
+        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
+        m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+            Distance::Meters);
+        m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
+            Distance::Meters);
+      }
+      catch (IException &e) {
+        QString msg = "Unable to create Latitude object from given mapping group.";
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
+      }
     }
 
     m_errors = errors;
 
-    if(mapping["LatitudeType"][0] == "Planetographic") {
+    if (mapping["LatitudeType"][0] == "Planetographic") {
       setPlanetographic(latitude.radians(), Radians);
     }
-    else if(mapping["LatitudeType"][0] == "Planetocentric") {
+    else if (mapping["LatitudeType"][0] == "Planetocentric") {
       setPlanetocentric(latitude.radians(), Radians);
     }
     else {
@@ -153,20 +158,25 @@ namespace Isis {
           Distance::Meters);
     }
     else {
-      PvlGroup radiiGrp = TProjection::TargetRadii(mapping["TargetName"]);
-
-      m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
-          Distance::Meters);
-      m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
-          Distance::Meters);
+      try {
+        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
+        m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+            Distance::Meters);
+        m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
+            Distance::Meters);
+      }
+      catch (IException &e) {
+        QString msg = "Unable to create Latitude object from given mapping group.";
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
+      }
     }
 
     m_errors = errors;
 
-    if(mapping["LatitudeType"][0] == "Planetographic") {
+    if (mapping["LatitudeType"][0] == "Planetographic") {
       setPlanetographic(latitude, latitudeUnits);
     }
-    else if(mapping["LatitudeType"][0] == "Planetocentric") {
+    else if (mapping["LatitudeType"][0] == "Planetocentric") {
       setPlanetocentric(latitude, latitudeUnits);
     }
     else {
@@ -228,11 +238,11 @@ namespace Isis {
 
     m_errors = latitudeToCopy.m_errors;
 
-    if(latitudeToCopy.m_equatorialRadius) {
+    if (latitudeToCopy.m_equatorialRadius) {
       m_equatorialRadius = new Distance(*latitudeToCopy.m_equatorialRadius);
     }
 
-    if(latitudeToCopy.m_polarRadius) {
+    if (latitudeToCopy.m_polarRadius) {
       m_polarRadius = new Distance(*latitudeToCopy.m_polarRadius);
     }
   }
@@ -301,7 +311,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(!isValid()) {
+    if (!isValid()) {
       IString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -340,7 +350,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(IsSpecial(latitude)) {
+    if (IsSpecial(latitude)) {
       IString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -397,18 +407,18 @@ namespace Isis {
     * @return The result, a reference to this
     */
   Latitude& Latitude::operator=(const Latitude & latitudeToCopy) {
-    if(this == &latitudeToCopy) return *this;
+    if (this == &latitudeToCopy) return *this;
 
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
     m_errors = latitudeToCopy.m_errors;
 
-    if(latitudeToCopy.m_equatorialRadius) {
+    if (latitudeToCopy.m_equatorialRadius) {
       m_equatorialRadius = new Distance(*latitudeToCopy.m_equatorialRadius);
     }
 
-    if(latitudeToCopy.m_polarRadius) {
+    if (latitudeToCopy.m_polarRadius) {
       m_polarRadius = new Distance(*latitudeToCopy.m_polarRadius);
     }
 
@@ -439,15 +449,20 @@ namespace Isis {
           Distance::Meters);
     }
     else {
-      PvlGroup radiiGrp = TProjection::TargetRadii(mapping["TargetName"]);
-
-      equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
-          Distance::Meters);
-      polarRadius = Distance(toDouble(radiiGrp["PolarRadius"][0]),
-          Distance::Meters);
+      try {
+        PvlGroup radiiGrp = Target::radiiGroup(mapping["TargetName"][0]);
+        equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+            Distance::Meters);
+        polarRadius = Distance(toDouble(radiiGrp["PolarRadius"][0]),
+            Distance::Meters);
+      }
+      catch (IException &e) {
+        QString msg = "Unable to add angle to Latitude object from given mapping group.";
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
+      }
     }
 
-    if(mapping["LatitudeType"][0] == "Planetocentric")
+    if (mapping["LatitudeType"][0] == "Planetocentric")
       latType = Planetocentric;
     else if (mapping["LatitudeType"][0] == "Planetographic")
       latType = Planetographic;
@@ -500,7 +515,7 @@ namespace Isis {
     // Check for passing 90 degrees if that error checking is on
     if (!IsSpecial(angle) && (m_errors & AllowPastPole) != AllowPastPole) {
       Angle tmpAngle(angle, units);
-      if(tmpAngle > Angle(90, Angle::Degrees) ||
+      if (tmpAngle > Angle(90, Angle::Degrees) ||
          tmpAngle < Angle(-90, Angle::Degrees)) {
         IString msg = "Latitudes past 90 degrees are not valid. The latitude "
             "[" + IString(tmpAngle.degrees()) + " degrees] is not allowed";

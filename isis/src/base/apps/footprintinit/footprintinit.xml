@@ -150,6 +150,10 @@
     <change name="Jeannie Backer" date="2014-08-22">
       Updated pushframe truth data due to modification of THEMIS VIS distortion model. References #1659.
     </change>
+    <change name="Jeannie Backer" date="2016-04-22">
+      Modified code to get TargetRadii using the cube label and mapping group rather than just the TargetName.
+      References #3892
+    </change>
   </history>
   
   <groups>

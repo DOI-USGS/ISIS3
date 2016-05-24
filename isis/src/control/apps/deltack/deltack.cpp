@@ -42,7 +42,7 @@ void IsisMain() {
     Latitude lat1(ui.GetDouble("LAT1"), Angle::Degrees);
     Longitude lon1(ui.GetDouble("LON1"), Angle::Degrees);
     Distance rad1;
-    if(ui.WasEntered("RAD1")) {
+    if (ui.WasEntered("RAD1")) {
       rad1 = Distance(ui.GetDouble("RAD1"), Distance::Meters);
     }
     else {
@@ -70,23 +70,18 @@ void IsisMain() {
     // We need the target body
     Cube c;
     c.open(inputFile, "rw");
-    //check for target name
-    if(c.label()->hasKeyword("TargetName", PvlObject::Traverse)) {
-//       c.Label()->findKeyword("TargetName");
-      PvlGroup inst = c.label()->findGroup("Instrument", PvlObject::Traverse);
-      QString targetName = inst["TargetName"];
-      cnet.SetTarget(targetName);
-    }
+    // we will check for target name inside the SetTarget() call
+    cnet.SetTarget(*c.label());
     // ??? c.close();
 
     // See if they wanted to solve for twist
-    if(ui.GetBoolean("TWIST")) {
+    if (ui.GetBoolean("TWIST")) {
       double samp2 = ui.GetDouble("SAMP2");
       double line2 = ui.GetDouble("LINE2");
       Latitude lat2(ui.GetDouble("LAT2"), Angle::Degrees);
       Longitude lon2(ui.GetDouble("LON2"), Angle::Degrees);
       Distance rad2;
-      if(ui.WasEntered("RAD2")) {
+      if (ui.WasEntered("RAD2")) {
         rad2 = Distance(ui.GetDouble("RAD2"), Distance::Meters);
       }
       else {
@@ -119,7 +114,7 @@ void IsisMain() {
     // ??? c.open(inputFile, "rw");
 
     //check for existing polygon, if exists delete it
-    if(c.label()->hasObject("Polygon")) {
+    if (c.label()->hasObject("Polygon")) {
       c.label()->deleteObject("Polygon");
     }
 
@@ -138,7 +133,7 @@ void IsisMain() {
       // read history from cube, if it exists.
       c.read(hist);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       // if the history does not exist in the cube, the cube's write method will add it.
     }
       c.write(cmatrix); 
@@ -152,7 +147,7 @@ void IsisMain() {
     gp += PvlKeyword("Status", "Camera pointing updated");
     Application::Log(gp);
   }
-  catch(IException &e) {
+  catch (IException &e) {
     QString msg = "Unable to update camera pointing for [" + inputFile + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
@@ -165,7 +160,7 @@ Distance GetRadius(QString inputFile, Latitude lat, Longitude lon) {
   Camera *sensor = CameraFactory::Create(cube);
   sensor->SetGround(SurfacePoint(lat, lon, sensor->LocalRadius(lat, lon)));
   Distance radius = sensor->LocalRadius();
-  if(!radius.isValid()) {
+  if (!radius.isValid()) {
     QString msg = "Could not determine radius from DEM at lat/lon [";
     msg += toString(lat.degrees()) + "," + toString(lon.degrees()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);

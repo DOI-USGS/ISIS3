@@ -42,3 +42,16 @@ Adding an angle to a planetographic latitude with the add methods.
 Adding an angle to a planetographic latitude with the + operator.
 25 + 30 = 31.069
 
+-------------------------------------------------------
+FAILED TO CONSTRUCT LATITUDE OBJECT FROM MAPPING GROUP: 
+
+Group = Mapping
+  TargetName = Yoda
+End_Group
+
+THROWS: 
+
+**ERROR** Unable to create Latitude object from given mapping group.
+**I/O ERROR** Unable to find target radii for given target [Yoda].
+-------------------------------------------------------
+

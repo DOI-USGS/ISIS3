@@ -70,14 +70,15 @@ ControlPoint CreatePoint(const SmtkPoint &spnt, const QString &pid,
   return (pnt);
 }
 
+
 /** Function that creates and writes a control network from a SmtkQStack */
 void WriteCnet(const QString &netfile, SmtkQStack &points,
-               const QString &target, const QString &lcn,
+               const Pvl &label, const QString &lcn,
                const QString &rcn) {
    // Initialize control point network
   ControlNet cn;
-//  cn.SetType(ControlNet::ImageToImage);
-  cn.SetTarget(target);
+  //  cn.SetType(ControlNet::ImageToImage);
+  cn.SetTarget(label);
   cn.SetUserName(Application::UserName());
   cn.SetCreatedDate(iTime::CurrentLocalTime());
   SmtkQStackIter pnt = points.begin();
@@ -184,7 +185,7 @@ void IsisMain() {
 
       if (!cp->IsIgnored()) {
         ControlMeasure *cmLeft(0), *cmRight(0);
-        for(int cmIndex = 0; cmIndex < cp->GetNumMeasures(); cmIndex ++) {
+        for (int cmIndex = 0; cmIndex < cp->GetNumMeasures(); cmIndex ++) {
           ControlMeasure *cm = cp->GetMeasure(cmIndex);
           if (!cm->IsIgnored()) {
             if (cm->GetCubeSerialNumber() == serialLeft)
@@ -282,7 +283,7 @@ void IsisMain() {
     // If a user wants to see the seed network, write it out here
     if (ui.WasEntered("OSEEDNET")) {
       WriteCnet(ui.GetFileName("OSEEDNET"), gstack,
-                lhCamera->target()->name(), serialLeft, serialRight);
+                *lhImage.label(), serialLeft, serialRight);
     }
 
   }
@@ -389,7 +390,7 @@ void IsisMain() {
 
                 // double check we don't have a finalized result at this position
                 SmtkQStackIter temp = bmf.find(growpt);
-                if(temp == bmf.end()) {
+                if (temp == bmf.end()) {
                   gstack.insert(growpt, gpnt);
                 }
               }
@@ -475,7 +476,7 @@ void IsisMain() {
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if (ui.WasEntered("ONET")) {
-    WriteCnet(ui.GetFileName("ONET"), bmf, lhCamera->target()->name(), serialLeft,
+    WriteCnet(ui.GetFileName("ONET"), bmf, *lhImage.label(), serialLeft,
               serialRight);
   }
 
@@ -494,7 +495,7 @@ void IsisMain() {
   smtkresultsPvl += PvlKeyword("SpiceDistanceError", toString(matcher.SpiceErrorCount()));
   arPvl.addGroup(smtkresultsPvl);
 
-  for(int i = 0; i < arPvl.groups(); i++) {
+  for (int i = 0; i < arPvl.groups(); i++) {
     Application::Log(arPvl.group(i));
   }
 

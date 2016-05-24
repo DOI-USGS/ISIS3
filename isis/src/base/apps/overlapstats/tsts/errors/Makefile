@@ -7,7 +7,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
 	$(APPNAME) FROM=$(OUTPUT)/list.lis \
-	  ERRORS=$(OUTPUT)/errors.txt \
-	  OVERLAPLIST=$(INPUT)/overlaps.lis \
-	  > /dev/null;
+	           ERRORS=$(OUTPUT)/errors.txt \
+	           OVERLAPLIST=$(INPUT)/overlaps.lis \
+	           > /dev/null;
 	$(RM) $(OUTPUT)/list.lis;

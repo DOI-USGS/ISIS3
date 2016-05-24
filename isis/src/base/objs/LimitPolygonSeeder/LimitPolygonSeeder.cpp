@@ -26,13 +26,13 @@
 #include <cmath>
 #include <iomanip>
 
-#include "geos/util/TopologyException.h"
+#include <geos/util/TopologyException.h>
 
+#include "IException.h"
+#include "LimitPolygonSeeder.h"
+#include "PolygonTools.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "IException.h"
-#include "PolygonTools.h"
-#include "LimitPolygonSeeder.h"
 
 namespace Isis {
 

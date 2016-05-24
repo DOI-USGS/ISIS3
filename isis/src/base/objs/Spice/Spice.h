@@ -268,11 +268,17 @@ namespace Isis {
    *                           getClockTime. Avoids a segfault. Fixes #2247.
    *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if any
    *                           NAIF errors were signaled. References #2248.
-   *                           
+   *   @history 2016-05-18 Jeannie Backer and Stuart Sides - Moved the construction of the Target
+   *                           after the NAIF kenels have been loaded or the NAIF keywords
+   *                           have been pulled from the cube labels, so we can find target
+   *                           body codes that are defined in kernels and not just body codes
+   *                           build into spicelib. References #3934
+
    */
   class Spice {
     public:
       // constructors
+      Spice(Pvl &cubeLabel);
       Spice(Cube &cube);
       Spice(Cube &cube, bool noTables);
 
