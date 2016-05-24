@@ -20,10 +20,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-09-27 Steven Lambright - Improved user documentation
-   *   @history 2012-04-16 Jeannie Backer - Added forward declaration for PvlObject. Added #include
-   *                           for PvlKeyword and PvlObject classes in implementation file.
-   *   @history 2016-05-18 Ian Humphrey - Explicity made bounding lines cosmetic so that they
-   *                           always appear as 1 pixel wide on screen (Qt4 to Qt5).
+   *   @history 2012-04-16 Jeannie Backer - Added forward declaration for
+   *                           PvlObject. Added #include for PvlKeyword and
+   *                           PvlObject classes in implementation file.
    */
   class MosaicAreaTool : public MosaicTool {
       Q_OBJECT

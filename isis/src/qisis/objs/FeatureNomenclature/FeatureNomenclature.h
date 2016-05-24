@@ -106,10 +106,8 @@ namespace Isis {
        *
        * @internal
        *   @history 2012-06-06 Steven Lambright and Kimberly Oyama - Added approval status to the
-       *                           list of characteristics of the feature and added the accessor
-       *                           (status()). Fixes #852. Fixes #892.
-       *   @history 2016-05-23 Ian Humphrey - Modified runQuery() to correctly send POST request
-       *                           to find the features for the feature nomenclature tool (Qt5).
+       *                            list of characteristics of the feature and added the accessor
+       *                            (status()). Fixes #852. Fixes #892.
        */
       class Feature {
       public:          

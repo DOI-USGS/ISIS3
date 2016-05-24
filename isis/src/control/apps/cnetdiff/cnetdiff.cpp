@@ -148,7 +148,7 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
   QString target2 = net2Obj["TargetName"][0];
 
   if(target1 != target2) {
-    differenceReason = "The TargetName values [" +
+    differenceReason = "The targets [" +
                        target1 + "] and [" +
                        target2 + "] differ.";
     filesMatch = false;

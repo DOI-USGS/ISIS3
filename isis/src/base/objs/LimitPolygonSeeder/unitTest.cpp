@@ -3,20 +3,19 @@
 #include <cmath>
 #include <iomanip>
 
-#include <geos/geom/CoordinateArraySequence.h>
-#include <geos/geom/Geometry.h>
-#include <geos/geom/Polygon.h>
+#include "geos/geom/CoordinateArraySequence.h"
+#include "geos/geom/Geometry.h"
+#include "geos/geom/Polygon.h"
 
-#include "GridPolygonSeeder.h"
 #include "IException.h"
 #include "PolygonTools.h"
 #include "PolygonSeeder.h"
 #include "PolygonSeederFactory.h"
-#include "Preference.h"
-#include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "Target.h"
+#include "ProjectionFactory.h"
+#include "GridPolygonSeeder.h"
+#include "Preference.h"
 #include "TProjection.h"
 
 using namespace std;
@@ -72,7 +71,7 @@ int main() {
 
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
       // Create the projection necessary for seeding
-      PvlGroup radii = Target::radiiGroup("MARS");
+      PvlGroup radii = TProjection::TargetRadii("MARS");
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");
@@ -135,7 +134,7 @@ int main() {
       cout << "Lon/Lat polygon = " << mp->toString() << endl;
 
       // Create the projection necessary for seeding
-      PvlGroup radii = Target::radiiGroup("MARS");
+      PvlGroup radii = TProjection::TargetRadii("MARS");
       Isis::Pvl maplab;
       maplab.addGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.findGroup("Mapping");

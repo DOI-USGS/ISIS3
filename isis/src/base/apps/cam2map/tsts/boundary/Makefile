@@ -7,8 +7,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) from= $(INPUT)/test.cub \
-	           to=$(OUTPUT)/cam2mapTruth.cub \
-	           map=$(INPUT)/test.map \
-	           lonseam=continue \
-	           pixres=map \
-	           >& /dev/null;
+	  to=$(OUTPUT)/cam2mapTruth.cub \
+	  map=$(INPUT)/test.map \
+	  lonseam=continue \
+	  pixres=map > /dev/null;

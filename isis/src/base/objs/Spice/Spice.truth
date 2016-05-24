@@ -1,8 +1,6 @@
 Unit test for Isis::Spice
 Testing unknown target ...
-**ERROR** Unable to look up NAIF body code for this Target.
-**I/O ERROR** Could not convert Target [Mard] to NAIF body code.
-**I/O ERROR** Can not find [BODY_FRAME_CODE] in text kernels.
+**I/O ERROR** Could not convert Target [Mard] to NAIF code.
 
 Creating Spice object ...
 BodyCode        = 499
@@ -545,7 +543,7 @@ BP is
 -0.1248838113
 0.732561542
 0.6691469352
--0.9680984548
+-0.9680984549
 0.05769283776
 -0.2438378933
 Cache Start Time = -69382784.89

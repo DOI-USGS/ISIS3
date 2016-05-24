@@ -1,11 +1,8 @@
 #include "Isis.h"
 #include "IsisDebug.h"
 
-#include <QVector>
-
 #include <string.h>
 
-#include "Distance.h"
 #include "ID.h"
 #include "IException.h"
 #include "ControlNet.h"
@@ -66,7 +63,7 @@ void IsisMain() {
       oNet.SetCreatedDate(Application::DateTime());
       oNet.SetDescription(cNet.Description());
       oNet.SetNetworkId(cNet.GetNetworkId());
-      oNet.SetTarget(cNet.GetTarget(), QVector<Distance>::fromStdVector(cNet.GetTargetRadii()));
+      oNet.SetTarget(cNet.GetTarget());
       oNet.SetUserName(Application::UserName());
 
       startIndex = endIndex;

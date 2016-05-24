@@ -1,7 +1,6 @@
 #ifndef cam2map_h
 #define cam2map_h
 
-#include "TProjection.h"
 #include "Transform.h"
 
 using namespace Isis;

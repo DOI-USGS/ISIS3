@@ -19,19 +19,18 @@ namespace Isis {
    * @author 2011-05-07 Steven Lambright
    *
    * @internal
-   *   @history 2011-05-09 Steven Lambright - Fixed known issue with paint() when zoomed in.
-   *   @history 2011-05-10 Steven Lambright - Added arrow capabilities, fixed problem with 
-   *                           boundingRect() that seemed to cause a crash.
+   *   @history 2011-05-09 Steven Lambright - Fixed known issue with paint()
+   *                       when zoomed in.
+   *   @history 2011-05-10 Steven Lambright - Added arrow capabilities, fixed
+   *                       problem with boundingRect() that seemed to cause a
+   *                       crash.
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
-   *                           Ground ------> Fixed
-   *                           Tie----------> Free
+   *                       Ground ------> Fixed
+   *                       Tie----------> Free
    *   @history 2013-01-02 Steven Lambright - Updated setArrowVisible() to support new coloring
    *                           options. The design of this configuration is wrong/needs fixed, but
    *                           I'm leaving it alone due to time constraints. Updated paint() method
    *                           to appropriately apply colors. Fixes #479.
-   *   @history 2016-05-18 Ian Humphrey - Updated the control point crosses to be cosmetic so that
-   *                           they always appear on screen (Qt4 to Qt5).
-   *                   
    */
   class ControlPointGraphicsItem : public QGraphicsRectItem {
     public:

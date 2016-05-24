@@ -44,21 +44,20 @@ namespace Isis {
 
     m_origPoint = new QPointF(apriori);
 
-    // Providing a width of 0 makes pens cosmetic (i.e. always appear as 1 pixel on screen)
     if (cp->IsIgnored()) {
-      setPen(QPen(Qt::red, 0.0));
+      setPen(QPen(Qt::red));
     }
     else if (cp->IsEditLocked()) {
-      setPen(QPen(Qt::magenta, 0.0));
+      setPen(QPen(Qt::magenta));
     }
     else if (cp->GetType() == ControlPoint::Fixed) {
-      setPen(QPen(Qt::green, 0.0));
+      setPen(QPen(Qt::green));
     }
     else if (cp->GetType() == ControlPoint::Constrained) {
-      setPen(QPen(Qt::darkGreen, 0.0));
+      setPen(QPen(Qt::darkGreen));
     }
     else {// Free
-      setPen(QPen(Qt::blue, 0.0));
+      setPen(QPen(Qt::blue));
     }
 
     setBrush(Qt::NoBrush);

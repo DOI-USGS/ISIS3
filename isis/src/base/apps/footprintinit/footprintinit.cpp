@@ -7,7 +7,6 @@
 #include "Progress.h"
 #include "PvlGroup.h"
 #include "SerialNumber.h"
-#include "Target.h"
 #include "TProjection.h"
 
 
@@ -24,7 +23,7 @@ void IsisMain() {
   try {
     cube.camera();
   }
-  catch (IException &e) {
+  catch(IException &e) {
     if (!cube.projection()) {
       string msg = "Spiceinit must be run before initializing the polygon";
       throw IException(e, IException::User, msg, _FILEINFO_);
@@ -39,20 +38,20 @@ void IsisMain() {
   QString sn = SerialNumber::Compose(cube);
 
   ImagePolygon poly;
-  if (ui.WasEntered("MAXEMISSION")) {
+  if(ui.WasEntered("MAXEMISSION")) {
     poly.Emission(ui.GetDouble("MAXEMISSION"));
   }
-  if (ui.WasEntered("MAXINCIDENCE")) {
+  if(ui.WasEntered("MAXINCIDENCE")) {
     poly.Incidence(ui.GetDouble("MAXINCIDENCE"));
   }
-  if (ui.GetString("LIMBTEST") == "ELLIPSOID") {
+  if(ui.GetString("LIMBTEST") == "ELLIPSOID") {
     poly.EllipsoidLimb(true);
   }
 
   int sinc = 1;
   int linc = 1;
   IString incType = ui.GetString("INCTYPE");
-  if (incType.UpCase() == "VERTICES") {
+  if(incType.UpCase() == "VERTICES") {
     poly.initCube(cube);
     sinc = linc = (int)(0.5 + (((poly.validSampleDim() * 2) +
                        (poly.validLineDim() * 2) - 3.0) /
@@ -78,25 +77,31 @@ void IsisMain() {
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
-  if (testXY) {
+  if(testXY) {
+    Pvl cubeLab(ui.GetFileName("FROM"));
+    PvlGroup inst = cubeLab.findGroup("Instrument", Pvl::Traverse);
+    QString target = inst["TargetName"];
+    PvlGroup radii = TProjection::TargetRadii(target);
 
     Pvl map(ui.GetFileName("MAP"));
-    PvlGroup &mapGroup = map.findGroup("MAPPING");
+    PvlGroup &mapping = map.findGroup("MAPPING");
 
-    Pvl cubeLab(ui.GetFileName("FROM"));
-    // This call adds TargetName, EquatorialRadius and PolarRadius to mapGroup
-    mapGroup = Target::radiiGroup(cubeLab, mapGroup);
-    // add/replace the rest of the keywords
-    mapGroup.addKeyword( PvlKeyword("LatitudeType", "Planetocentric"), 
-                         PvlContainer::Replace );
-    mapGroup.addKeyword( PvlKeyword("LongitudeDirection", "PositiveEast"), 
-                         PvlContainer::Replace );
-    mapGroup.addKeyword( PvlKeyword("LongitudeDomain", "360"), 
-                         PvlContainer::Replace );
-    mapGroup.addKeyword( PvlKeyword("CenterLatitude", "0.0"), 
-                         PvlContainer::Replace );
-    mapGroup.addKeyword( PvlKeyword("CenterLongitude", "0.0"), 
-                         PvlContainer::Replace);
+    if(!mapping.hasKeyword("TargetName"))
+      mapping += Isis::PvlKeyword("TargetName", target);
+    if(!mapping.hasKeyword("EquatorialRadius"))
+      mapping += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
+    if(!mapping.hasKeyword("PolarRadius"))
+      mapping += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
+    if(!mapping.hasKeyword("LatitudeType"))
+      mapping += Isis::PvlKeyword("LatitudeType", "Planetocentric");
+    if(!mapping.hasKeyword("LongitudeDirection"))
+      mapping += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
+    if(!mapping.hasKeyword("LongitudeDomain"))
+      mapping += Isis::PvlKeyword("LongitudeDomain", "360");
+    if(!mapping.hasKeyword("CenterLatitude"))
+      mapping += Isis::PvlKeyword("CenterLatitude", "0");
+    if(!mapping.hasKeyword("CenterLongitude"))
+      mapping += Isis::PvlKeyword("CenterLongitude", "0");
 
     sinc = poly.getSinc();
     linc = poly.getLinc();
@@ -135,7 +140,7 @@ void IsisMain() {
   cube.deleteBlob("Polygon", sn);
   cube.write(poly);
 
-  if (precision) {
+  if(precision) {
     PvlGroup results("Results");
     results.addKeyword(PvlKeyword("SINC", toString(sinc)));
     results.addKeyword(PvlKeyword("LINC", toString(linc)));

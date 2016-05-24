@@ -6,7 +6,6 @@
 
 #include <QDebug>
 #include <QGraphicsScene>
-#include <QPen>
 
 #include "Angle.h"
 #include "Distance.h"
@@ -194,13 +193,7 @@ namespace Isis {
 
                 if(havePrevious) {
                   if(previousX != x || previousY != y) {
-                    QGraphicsLineItem* latLine = 
-                        new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
-                    // Ensure the line is cosmetic
-                    // (i.e. the line width is always 1 pixel wide on screen)
-                    QPen pen;
-                    pen.setCosmetic(true);
-                    latLine->setPen(pen);
+                    new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
                   }
                 }
               }
@@ -256,7 +249,6 @@ namespace Isis {
           atMaxLat = false;
           atMaxLon = false;
 
-          // Create the longitude grid lines
           for (Longitude lon = minLon; lon != maxLon + lonInc; lon += lonInc) {
 
             if (lon > endLon && lon < maxLon) {
@@ -287,13 +279,7 @@ namespace Isis {
                   y = -1 * proj->YCoord();
 
                   if(previousX != x || previousY != y) {
-                    QGraphicsLineItem* lonLine = 
-                        new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
-                    // Ensure the line is cosmetic 
-                    // (i.e. the line width is always 1 pixel wide on screen)
-                    QPen pen;
-                    pen.setCosmetic(true);
-                    lonLine->setPen(pen);
+                    new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
                   }
                 }
               }
