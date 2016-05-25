@@ -189,6 +189,10 @@ namespace Isis {
 
               m_box = new QGraphicsPolygonItem(boxPoly);
               m_box->setZValue(DBL_MAX);
+              // Ensure lines are cosmetic (i.e. always 1 pixel on screen)
+              QPen pen;
+              pen.setCosmetic(true);
+              m_box->setPen(pen);
 
               getWidget()->getScene()->addItem(m_box);
               getWidget()->getView()->centerOn(scenePos);

@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
       results.incrementMaximumLikelihoodModelIndex();
 
     }
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing assignment operator=...";
     results = results;
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
     results.incrementIgnoredPoints();
     pvl = results.pvlObject("MutatedResultsObject");
     cout << pvl << endl << endl;
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing more computation methods...";
     results.computeSigma0(28.0, BundleSettings::Sigma0);
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
     imgsAndParams.insert("img1", list1);
     imgsAndParams.insert("img2", list2);
     results.setCorrMatImgsAndParams(imgsAndParams);
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing accessor methods...";
     qDebug() << "maximum likelihood index = " << toString(results.maximumLikelihoodModelIndex());
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
   //??       QList< QPair< MaximumLikelihoodWFunctions, double > > maximumLikelihoodModels() const;
     }
 
-    qDebug();
+    qDebug() << "";
  
   
     qDebug() << "Testing serialization...";
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
     inputData >> newResults;
     pvl = newResults.pvlObject();
     cout << pvl << endl;
-    qDebug();
+    qDebug() << "";
  
     qDebug() << "Testing XML write/read...";
     // write xml 

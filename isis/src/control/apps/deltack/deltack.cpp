@@ -27,12 +27,12 @@ BundleSettingsQsp bundleSettings();
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  QString inputFile = ui.GetFileName("FROM");
+  QString filename = ui.GetFileName("FROM");
 
   try {
     // Create a serial number list
     SerialNumberList serialNumberList;
-    serialNumberList.add(inputFile);
+    serialNumberList.add(filename);
     
     // Get the coordinate for updating the camera pointing
     // We will want to make the camera pointing match the lat/lon at this
@@ -70,7 +70,7 @@ void IsisMain() {
 
     // We need the target body
     Cube c;
-    c.open(inputFile, "rw");
+    c.open(filename, "rw");
     // we will check for target name inside the SetTarget() call
     cnet.SetTarget(*c.label());
     // ??? c.close();
@@ -112,7 +112,7 @@ void IsisMain() {
 //    bundleAdjust.solveCholeskyBR();
 
     // ??? Cube c;
-    // ??? c.open(inputFile, "rw");
+    // ??? c.open(filename, "rw");
 
     //check for existing polygon, if exists delete it
     if (c.label()->hasObject("Polygon")) {
@@ -149,15 +149,15 @@ void IsisMain() {
     Application::Log(gp);
   }
   catch (IException &e) {
-    QString msg = "Unable to update camera pointing for [" + inputFile + "]";
+    QString msg = "Unable to update camera pointing for [" + filename + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
 }
 
 // Compute the radius at the lat/lon
-Distance GetRadius(QString inputFile, Latitude lat, Longitude lon) {
-  Cube cube(inputFile, "r");
+Distance GetRadius(QString filename, Latitude lat, Longitude lon) {
+  Cube cube(filename, "r");
   Camera *sensor = CameraFactory::Create(cube);
   sensor->SetGround(SurfacePoint(lat, lon, sensor->LocalRadius(lat, lon)));
   Distance radius = sensor->LocalRadius();

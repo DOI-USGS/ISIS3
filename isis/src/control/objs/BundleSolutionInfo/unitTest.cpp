@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
     // but we will call the method for test coverage
     results.id();
     qDebug() << "runTime = " << results.runTime();
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing error throws...";
     try {
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
 
 
 
@@ -228,7 +228,7 @@ int main(int argc, char *argv[]) {
 // ???     pvl = bsToFill.pvlObject("BundleSolutionInfoFromXml");
 // ???     cout << pvl << endl << endl;
 #endif
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing HDF5 write/read...";
     // write hdf

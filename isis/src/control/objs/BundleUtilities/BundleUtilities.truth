@@ -1,9 +1,9 @@
-Unit test for BundleUtilities... 
+Unit test for BundleUtilities...
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleObservationSolveSettings... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleObservationSolveSettings...
 
-Printing PVL group with settings from the default constructor... 
+Printing PVL group with settings from the default constructor...
 Object = DefaultBundleObservationSolveSettings
   InstrumentPointingSolveOption       = AnglesOnly
   NumberAngleCoefficientsSolved       = 1
@@ -22,7 +22,7 @@ Object = DefaultBundleObservationSolveSettings
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-Testing copy constructor... 
+Testing copy constructor...
 Object = CopySettingsObject
   InstrumentPointingSolveOption       = AnglesOnly
   NumberAngleCoefficientsSolved       = 1
@@ -41,7 +41,7 @@ Object = CopySettingsObject
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-Testing assignment operator to set this equal to itself... 
+Testing assignment operator to set this equal to itself...
 Object = SelfAssignedSettingsObject
   InstrumentPointingSolveOption       = AnglesOnly
   NumberAngleCoefficientsSolved       = 1
@@ -60,7 +60,7 @@ Object = SelfAssignedSettingsObject
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-Testing assignment operator to create a new settings object... 
+Testing assignment operator to create a new settings object...
 Object = AssignedSettingsObject
   InstrumentPointingSolveOption       = AnglesOnly
   NumberAngleCoefficientsSolved       = 1
@@ -79,8 +79,8 @@ Object = AssignedSettingsObject
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-Testing mutator methods... 
-setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings() 
+Testing mutator methods...
+setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings()
 Object = MyInstrumentId
   InstrumentPointingSolveOption       = AnglesAndVelocity
   NumberAngleCoefficientsSolved       = 2
@@ -99,7 +99,7 @@ Object = MyInstrumentId
   InstrumentPositionInterpolationType = 4
 End_Object
 
-setFromPvl() 
+setFromPvl()
 Object = SettingsFromPvlGroup-SolveForNone
   InstrumentPointingSolveOption       = None
   NumberAngleCoefficientsSolved       = N/A
@@ -190,19 +190,19 @@ Object = SettingsFromPvlGroup-SolveForAllCoefficients
   InstrumentPositionInterpolationType = 4
 End_Object
 
-Testing static unused enum-to-string and string-to-enum methods... 
-"None" 
-"AnglesOnly" 
-"AnglesAndVelocity" 
-"AnglesVelocityAndAcceleration" 
-"AllPolynomialCoefficients" 
-"None" 
-"PositionOnly" 
-"PositionAndVelocity" 
-"PositionVelocityAndAcceleration" 
-"AllPolynomialCoefficients" 
+Testing static unused enum-to-string and string-to-enum methods...
+"None"
+"AnglesOnly"
+"AnglesAndVelocity"
+"AnglesVelocityAndAcceleration"
+"AllPolynomialCoefficients"
+"None"
+"PositionOnly"
+"PositionAndVelocity"
+"PositionVelocityAndAcceleration"
+"AllPolynomialCoefficients"
 
-Testing serialization... 
+Testing serialization...
 Object = SerializedSettings
   InstrumentPointingSolveOption       = AllPolynomialCoefficients
   NumberAngleCoefficientsSolved       = 6
@@ -221,8 +221,8 @@ Object = SerializedSettings
   InstrumentPositionInterpolationType = 4
 End_Object
 
-Testing XML: write XML from BundleObservationSolveSettings object... 
-Testing XML: read XML to BundleObservationSolveSettings object... 
+Testing XML: write XML from BundleObservationSolveSettings object...
+Testing XML: read XML to BundleObservationSolveSettings object...
 Object = FromXml-1
   InstrumentPointingSolveOption       = None
   NumberAngleCoefficientsSolved       = N/A
@@ -241,7 +241,7 @@ Object = FromXml-1
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-Testing XML: read XML to BundleObservationSolveSettings object... 
+Testing XML: read XML to BundleObservationSolveSettings object...
 Object = FromXml-2
   InstrumentPointingSolveOption       = AnglesOnly
   NumberAngleCoefficientsSolved       = 1
@@ -260,7 +260,7 @@ Object = FromXml-2
   InstrumentPositionInterpolationType = 3
 End_Object
 
-Testing XML: read XML to BundleObservationSolveSettings object... 
+Testing XML: read XML to BundleObservationSolveSettings object...
 Object = FromXml-3
   InstrumentPointingSolveOption       = AnglesAndVelocity
   NumberAngleCoefficientsSolved       = 2
@@ -279,7 +279,7 @@ Object = FromXml-3
   InstrumentPositionInterpolationType = 3
 End_Object
 
-Testing XML: read XML to BundleObservationSolveSettings object... 
+Testing XML: read XML to BundleObservationSolveSettings object...
 Object = FromXml-4
   InstrumentPointingSolveOption       = AnglesVelocityAndAcceleration
   NumberAngleCoefficientsSolved       = 3
@@ -298,7 +298,7 @@ Object = FromXml-4
   InstrumentPositionInterpolationType = 3
 End_Object
 
-Testing XML: read XML to BundleObservationSolveSettings object... 
+Testing XML: read XML to BundleObservationSolveSettings object...
 Object = FromXml
   InstrumentPointingSolveOption       = AllPolynomialCoefficients
   NumberAngleCoefficientsSolved       = 6
@@ -317,7 +317,7 @@ Object = FromXml
   InstrumentPositionInterpolationType = 4
 End_Object
 
-Testing XML: read XML with no attributes or values to object... 
+Testing XML: read XML with no attributes or values to object...
 Object = DefaultSettingsFromEmptyXml
   InstrumentPointingSolveOption       = AnglesOnly
   NumberAngleCoefficientsSolved       = 1
@@ -336,7 +336,7 @@ Object = DefaultSettingsFromEmptyXml
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-Testing error throws... 
+Testing error throws...
 **ERROR** Unknown bundle instrument pointing solve option Nonsense.
 **PROGRAMMER ERROR** Unknown pointing solve option enum [-1].
 **ERROR** Unknown bundle instrument position solve option Nonsense.
@@ -348,36 +348,36 @@ Testing error throws...
 **USER ERROR** Unable to set bundle adjust options from the given PVL.
 **USER ERROR** The TWIST parameter must be a valid boolean value.
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleImage... 
-Constructing BundleImage object from null camera... 
-setting null parentBundleObservation to BundleImage... 
-Access camera and parentObservation ... 
-serial number =  "TestImageSerialNumber" 
-file name     =  "TestImageFileName" 
-Testing copy constructor... 
-serial number =  "TestImageSerialNumber" 
-file name     =  "TestImageFileName" 
-Testing assignment operator to set this equal to itself... 
-serial number =  "TestImageSerialNumber" 
-file name     =  "TestImageFileName" 
-Testing assignment operator to create a new object... 
-serial number =  "TestImageSerialNumber" 
-file name     =  "TestImageFileName" 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleImage...
+Constructing BundleImage object from null camera...
+setting null parentBundleObservation to BundleImage...
+Access camera and parentObservation ...
+serial number =  "TestImageSerialNumber"
+file name     =  "TestImageFileName"
+Testing copy constructor...
+serial number =  "TestImageSerialNumber"
+file name     =  "TestImageFileName"
+Testing assignment operator to set this equal to itself...
+serial number =  "TestImageSerialNumber"
+file name     =  "TestImageFileName"
+Testing assignment operator to create a new object...
+serial number =  "TestImageSerialNumber"
+file name     =  "TestImageFileName"
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleObservation... 
-Constructing empty BundleObservation object... 
-Constructing BundleObservation object from BundleImage... 
-Testing assignment operator to set this equal to itself... 
-Testing assignment operator to create a new object... 
-Testing copy constructor... 
-Testing mutators and accessors... 
-    Set/get solve settings using with CAMESOLVE=NONE... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleObservation...
+Constructing empty BundleObservation object...
+Constructing BundleObservation object from BundleImage...
+Testing assignment operator to set this equal to itself...
+Testing assignment operator to create a new object...
+Testing copy constructor...
+Testing mutators and accessors...
+    Set/get solve settings using with CAMESOLVE=NONE...
 Object = NoCamAngles
   InstrumentPointingSolveOption       = None
   NumberAngleCoefficientsSolved       = N/A
@@ -396,10 +396,10 @@ Object = NoCamAngles
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-    output bundle observation... 
-"" 
-"" 
-    Set solve settings using with TWIST=FALSE... 
+    output bundle observation...
+
+
+    Set solve settings using with TWIST=FALSE...
 Object = NoTwist
   InstrumentPointingSolveOption       = AllPolynomialCoefficients
   NumberAngleCoefficientsSolved       = 6
@@ -418,8 +418,8 @@ Object = NoTwist
   InstrumentPositionInterpolationType = 4
 End_Object
 
-    output bundle observation... 
-"  X  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
+    output bundle observation...
+  X  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
      (t1)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
      (t2)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
      (t3)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
@@ -455,8 +455,8 @@ DEC  (t0)       0.00000000           0.00000000          0.00000000             
      (t3)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
      (t4)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
      (t5)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
-" 
-"  X  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
+
+  X  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
      (t1)       0.00000000           0.00000000          0.00000000               9.0               N/A
      (t2)       0.00000000           0.00000000          0.00000000               N/A               N/A
      (t3)       0.00000000           0.00000000          0.00000000               N/A               N/A
@@ -492,8 +492,8 @@ DEC  (t0)       0.00000000           0.00000000          0.00000000             
      (t3)       0.00000000           0.00000000          0.00000000               N/A               N/A
      (t4)       0.00000000           0.00000000          0.00000000               N/A               N/A
      (t5)       0.00000000           0.00000000          0.00000000               N/A               N/A
-" 
-    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE... 
+
+    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...
 Object = SettingsFromBundleObservation
   InstrumentPointingSolveOption       = AnglesOnly
   NumberAngleCoefficientsSolved       = 1
@@ -512,51 +512,51 @@ Object = SettingsFromBundleObservation
   InstrumentPositionInterpolationType = N/A
 End_Object
 
-index =  "1" 
-instrument id =  "InstrumentId2" 
-number parameters =      "3" 
-number position param =  "0" 
-number pointing param =  "3" 
-parameter list:  () 
-image names:     () 
-"parameter weights :     0.0     0.0     0.0     
+index =  "1"
+instrument id =  "InstrumentId2"
+number parameters =      "3"
+number position param =  "0"
+number pointing param =  "3"
+parameter list:  ()
+image names:     ()
+parameter weights :     0.0     0.0     0.0     
 parameter corrections : 0.0     0.0     0.0     
 apriori sigmas :        -1.79769313486231e+308     -1.79769313486231e+308     -1.79769313486231e+308     
-adjusted sigmas :       0.0     0.0     0.0     " 
-    output bundle observation... 
-" RA  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+adjusted sigmas :       0.0     0.0     0.0     
+    output bundle observation...
+ RA  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
 DEC  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
 TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-" 
-" RA  (t0)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
+
+ RA  (t0)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
 DEC  (t0)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
 TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A        0.00000000
-" 
-init exterior orientiation successful?   "Yes" 
-apply param corrections successful?      "Yes" 
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+init exterior orientiation successful?   "Yes"
+apply param corrections successful?      "Yes"
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleObservationVector... 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-number of position parameters:  "0" 
-number of pointing parameters:  "0" 
-number of parameters:  "0" 
-init exterior orientiation successful?   "Yes" 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleObservationVector...
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleMeasure... 
+number of position parameters:  "0"
+number of pointing parameters:  "0"
+number of parameters:  "0"
+init exterior orientiation successful?   "Yes"
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleMeasure...
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleControlPoint... 
-Create FreePoint with free point containing 2 measures... 
-"       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
-" 
-" Label: FreePoint
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleControlPoint...
+Create FreePoint with free point containing 2 measures...
+       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
+
+ Label: FreePoint
 Status: FREE
   Rays: 2 of 2
 
@@ -567,10 +567,10 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE             Null           0.00000000          0.00000000                Null               N/A               N/A
     RADIUS             Null           0.00000000          0.00000000                Null               N/A               N/A
 
-" 
-"       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
-" 
-" Label: FreePoint
+
+       FreePoint           FREE    2 of 2  3.54            Null            Null            Null             N/A             N/A             N/A
+
+ Label: FreePoint
 Status: FREE
   Rays: 2 of 2
 
@@ -581,12 +581,12 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE             Null           0.00000000          0.00000000                Null               N/A               N/A
     RADIUS             Null           0.00000000          0.00000000                Null               N/A               N/A
 
-" 
 
-Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure() 
-"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FreePoint
+
+Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure()
+       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FreePoint
 Status: FREE
   Rays: 2 of 2
 
@@ -597,11 +597,11 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-Modify FreePoint - setWeights() - solveRadius=false 
-"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FreePoint
+
+Modify FreePoint - setWeights() - solveRadius=false
+       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FreePoint
 Status: FREE
   Rays: 2 of 2
 
@@ -612,20 +612,20 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-aprioriSigmas:   "N/A" "N/A" "N/A" 
-weights:         0 0 1e+50 
-corrections:     0 0 0 
-adjustedSigmas:  "N/A" "N/A" "N/A" 
-nicVector:       0 0 0 
-qMatrix: 
+
+aprioriSigmas:   "N/A" "N/A" "N/A"
+weights:         0 0 1e+50
+corrections:     0 0 0
+adjustedSigmas:  "N/A" "N/A" "N/A"
+nicVector:       0 0 0
+qMatrix:
  New Block 
 
 
-Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0 
-"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FreePoint
+Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0
+       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FreePoint
 Status: FREE
   Rays: 2 of 2
 
@@ -636,14 +636,14 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-aprioriSigmas:   "N/A" "N/A" "N/A" 
-weights:         0 0 1e+50 
 
-Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0 
-"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FreePoint
+aprioriSigmas:   "N/A" "N/A" "N/A"
+weights:         0 0 1e+50
+
+Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0
+       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FreePoint
 Status: FREE
   Rays: 2 of 2
 
@@ -654,18 +654,18 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000        3.00000000               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
 
-" 
-aprioriSigmas:   "2.0" "3.0" "4.0" 
-weights:         25 11.1111 62500 
 
-Raw control point equal to original?     "Yes" 
-Raw control point is rejected?           "No" 
-Adjusted SurfacePoint (Lat, Lon, Rad) =  "0.0" "0.0" "10.0" 
+aprioriSigmas:   "2.0" "3.0" "4.0"
+weights:         25 11.1111 62500
 
-Create FixedPoint from empty fixed point, adjusted surface point (90, 180, 10)... 
-"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FixedPoint
+Raw control point equal to original?     "Yes"
+Raw control point is rejected?           "No"
+Adjusted SurfacePoint (Lat, Lon, Rad) =  "0.0" "0.0" "10.0"
+
+Create FixedPoint from empty fixed point, adjusted surface point (90, 180, 10)...
+      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FixedPoint
 Status: FIXED
   Rays: 0 of 0
 
@@ -676,11 +676,11 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE     180.00000000           0.00000000          0.00000000        180.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-Modify FixedPoint - setWeights() 
-"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FixedPoint
+
+Modify FixedPoint - setWeights()
+      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FixedPoint
 Status: FIXED
   Rays: 0 of 0
 
@@ -691,14 +691,14 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE     180.00000000           0.00000000          0.00000000        180.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-aprioriSigmas:   "NULL" "NULL" "NULL" 
-weights:         1e+50 1e+50 1e+50 
 
-Create ConstrainedPoint from empty constrained point, surface point (0, 0, 10)... 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: ConstrainedPoint
+aprioriSigmas:   "NULL" "NULL" "NULL"
+weights:         1e+50 1e+50 1e+50
+
+Create ConstrainedPoint from empty constrained point, surface point (0, 0, 10)...
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: ConstrainedPoint
 Status: CONSTRAINED
   Rays: 0 of 0
 
@@ -709,11 +709,11 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-Modify ConstrainedPoint - setWeights() - solveRadius=false 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: ConstrainedPoint
+
+Modify ConstrainedPoint - setWeights() - solveRadius=false
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: ConstrainedPoint
 Status: CONSTRAINED
   Rays: 0 of 0
 
@@ -724,14 +724,14 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-aprioriSigmas:   "NULL" "NULL" "NULL" 
-weights:         0 0 1e+50 
 
-Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad <= 0 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: ConstrainedPoint
+aprioriSigmas:   "NULL" "NULL" "NULL"
+weights:         0 0 1e+50
+
+Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad <= 0
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: ConstrainedPoint
 Status: CONSTRAINED
   Rays: 0 of 0
 
@@ -742,14 +742,14 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
-aprioriSigmas:   "NULL" "NULL" "NULL" 
-weights:         0 0 1e+50 
 
-Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad > 0 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: ConstrainedPoint
+aprioriSigmas:   "NULL" "NULL" "NULL"
+weights:         0 0 1e+50
+
+Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, apriori lat/lon/rad > 0
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: ConstrainedPoint
 Status: CONSTRAINED
   Rays: 0 of 0
 
@@ -760,15 +760,15 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000        3.00000000               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
 
-" 
-aprioriSigmas:   "2.0" "3.0" "4.0" 
-weights:         25 11.1111 62500 
+
+aprioriSigmas:   "2.0" "3.0" "4.0"
+weights:         25 11.1111 62500
 
 
-Create ConstrainedPoint from constrained point with adjusted surface point (32, 120, 1000)... 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
-" 
-" Label: ConstrainedPoint
+Create ConstrainedPoint from constrained point with adjusted surface point (32, 120, 1000)...
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+
+ Label: ConstrainedPoint
 Status: CONSTRAINED
   Rays: 0 of 0
 
@@ -779,11 +779,11 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000               N/A       36.78815890
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000               N/A       38.45488734
 
-" 
-Modify ConstrainedPoint - setWeights() - solveRadius=t, lat/lon/rad constrained 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
-" 
-" Label: ConstrainedPoint
+
+Modify ConstrainedPoint - setWeights() - solveRadius=t, lat/lon/rad constrained
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+
+ Label: ConstrainedPoint
 Status: CONSTRAINED
   Rays: 0 of 0
 
@@ -794,14 +794,14 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000       36.78815884       36.78815890
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000       38.45488734       38.45488734
 
-" 
-aprioriSigmas:   "28.656964947064" "36.788158835093" "38.454887341483" 
-weights:         1217.7 1027.41 676.234 
 
-Create copy of FreePoint using copy constructor... 
-"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FreePoint
+aprioriSigmas:   "28.656964947064" "36.788158835093" "38.454887341483"
+weights:         1217.7 1027.41 676.234
+
+Create copy of FreePoint using copy constructor...
+       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FreePoint
 Status: FREE
   Rays: 2 of 2
 
@@ -812,12 +812,12 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE       0.00000000           0.00000000          0.00000000          0.00000000        3.00000000               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000        4.00000000               N/A
 
-" 
 
-Overwrite existing object with FixedPoint information... 
-"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
-" 
-" Label: FixedPoint
+
+Overwrite existing object with FixedPoint information...
+      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+
+ Label: FixedPoint
 Status: FIXED
   Rays: 0 of 0
 
@@ -828,39 +828,39 @@ Coordinate          Value             Correction          Correction            
  LONGITUDE     180.00000000           0.00000000          0.00000000        180.00000000               N/A               N/A
     RADIUS       0.01000000           0.00000000          0.00000000          0.01000000               N/A               N/A
 
-" 
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleControlPointVector... 
-FreePoint 
-"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-"       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
-" 
-FixedPoint 
-"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
-" 
-"      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
-" 
-ConstrainedPoint 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
-" 
-"ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
-" 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleControlPointVector...
+FreePoint
+       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-Testing BundleMeasure... 
-rejected? "No" 
-measure sample  "0.0" 
-measure line    "0.0" 
-measure serial number "Ignored" 
-focal x "-1.79769313486231e+308" 
-focal y "-1.79769313486231e+308" 
-observation index "0" 
+       FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+FixedPoint
+      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+
+      FixedPoint          FIXED    0 of 0  0.00     90.00000000    180.00000000      0.01000000             N/A             N/A             N/A
+
+ConstrainedPoint
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Testing BundleMeasure...
+rejected? "No"
+measure sample  "0.0"
+measure line    "0.0"
+measure serial number "Ignored"
+focal x "-1.79769313486231e+308"
+focal y "-1.79769313486231e+308"
+observation index "0"
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

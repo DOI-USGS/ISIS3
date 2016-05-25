@@ -1,5 +1,5 @@
-Unit test for BundleResults... 
-Printing PVL group with results from the default constructor... 
+Unit test for BundleResults...
+Printing PVL group with results from the default constructor...
 Object = DefaultResultsObject
   NumberFixedPoints                 = 0
   NumberIgnoredPoints               = 0
@@ -46,7 +46,7 @@ Object = DefaultResultsObject
   End_Object
 End_Object
 
-Testing copy constructor... 
+Testing copy constructor...
 Object = CopyResultsObject
   NumberFixedPoints                 = 0
   NumberIgnoredPoints               = 0
@@ -93,9 +93,9 @@ Object = CopyResultsObject
   End_Object
 End_Object
 
-Add maximum likelihood models, then test the assignment operator... 
+Add maximum likelihood models, then test the assignment operator...
 
-Testing assignment operator=... 
+Testing assignment operator=...
 Maximum Likelihood Tier: 0
 Median of R^2 residuals:  0.495050
 Maximum Likelihood Tier: 1
@@ -202,7 +202,7 @@ Object = AssignedNewResultsObject
   End_Object
 End_Object
 
-Testing mutator methods... 
+Testing mutator methods...
 Object = MutatedResultsObject
   NumberFixedPoints                  = 1
   NumberIgnoredPoints                = 1
@@ -253,18 +253,18 @@ Object = MutatedResultsObject
 End_Object
 
 
-Testing more computation methods... 
-sigma0 =  "1.2139539573338" 
-sigma0 =  "0.0" 
+Testing more computation methods...
+sigma0 =  "1.2139539573338"
+sigma0 =  "0.0"
 
-Testing accessor methods... 
-maximum likelihood index =  "4" 
-maximum likelihood median r2 residuals =  "0.49504950495049" 
-maximum likelihood index,model,quantile = [ "0" ,  "Huber" ,  "0.1" ] 
-maximum likelihood index,model,quantile = [ "1" ,  "Welsch" ,  "0.2" ] 
-maximum likelihood index,model,quantile = [ "2" ,  "Chen" ,  "0.3" ] 
+Testing accessor methods...
+maximum likelihood index =  "4"
+maximum likelihood median r2 residuals =  "0.49504950495049"
+maximum likelihood index,model,quantile = [ "0" ,  "Huber" ,  "0.1" ]
+maximum likelihood index,model,quantile = [ "1" ,  "Welsch" ,  "0.2" ]
+maximum likelihood index,model,quantile = [ "2" ,  "Chen" ,  "0.3" ]
 
-Testing serialization... 
+Testing serialization...
 Object = BundleResults
   NumberFixedPoints                  = 1
   NumberIgnoredPoints                = 1
@@ -316,7 +316,7 @@ Object = BundleResults
   End_Object
 End_Object
 
-Testing XML write/read... 
+Testing XML write/read...
 Object = BundleResultsFromXml
   NumberFixedPoints                  = 1
   NumberIgnoredPoints                = 1
@@ -414,6 +414,6 @@ Object = BundleResultsFromEmptyXml
   End_Object
 End_Object
 
-Testing error throws... 
+Testing error throws...
 **I/O ERROR** Computed degrees of freedom [-1] is invalid.
 **I/O ERROR** Computed degrees of freedom [0] is invalid.

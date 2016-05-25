@@ -1,9 +1,9 @@
-Test Default Constructor 
-Test Copy Constructor 
-Test Equal Operator ( = ) 
-Does the matrix exist? false 
-Creating Covariance Matrix. 
-Covariance Matrix: 
+Test Default Constructor
+Test Copy Constructor
+Test Equal Operator ( = )
+Does the matrix exist? false
+Creating Covariance Matrix.
+Covariance Matrix:
  New Block 
        1           2           
        3           4           
@@ -16,8 +16,8 @@ Covariance Matrix:
       11          12           
        
 
-Testing Compute Correlation Matrix Method. 
-Correlation Matrix: 
+Testing Compute Correlation Matrix Method.
+Correlation Matrix:
  New Block 
        1           1           
      1.5           1           
@@ -31,16 +31,16 @@ Correlation Matrix:
     1.0584755           1           
        
 
-Does the matrix exist? true 
+Does the matrix exist? true
 
-***Correlation Matrix Information*** 
+***Correlation Matrix Information***
 
-Covariance File Name: "covMat.dat" 
-Correlation File Name: "corrMat.dat" 
-Images and Parameters: 
-	 "Image1" 
-		 "X" 
-		 "Y" 
-	 "Image2" 
-		 "X" 
-		 "Y" 
+Covariance File Name: "covMat.dat"
+Correlation File Name: "corrMat.dat"
+Images and Parameters:
+	 "Image1"
+		 "X"
+		 "Y"
+	 "Image2"
+		 "X"
+		 "Y"

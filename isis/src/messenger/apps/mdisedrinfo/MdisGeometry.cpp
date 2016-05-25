@@ -724,7 +724,7 @@ namespace Isis {
 
     try {
       scCode = Target::lookupNaifBodyCode("MESSENGER");
-      targCode = Target::lookupNaifBodyCode(target.toAscii().data());
+      targCode = Target::lookupNaifBodyCode(target.toLatin1().data());
     }
     catch (...) {
       found = false;
@@ -759,7 +759,7 @@ namespace Isis {
     // Get CK time tolerance (tol)
     SpiceDouble tol;
     SpiceInt tmp;
-    gdpool_c(QString("INS" + iCode + "_CK_TIME_TOLERANCE").toAscii().data(),
+    gdpool_c(QString("INS" + iCode + "_CK_TIME_TOLERANCE").toLatin1().data(),
              0, 1, &tmp, &tol, &found);
 
     // Finally get av

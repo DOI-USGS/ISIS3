@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
       qDebug() << MaximumLikelihoodWFunctions::modelToString(models[i].first)
                << toString(models[i].second);
     }
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing static enum-to-string and string-to-enum methods...";
     qDebug() << BundleSettings::solveMethodToString(BundleSettings::stringToSolveMethod("SPARSE"));
@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
                                BundleSettings::stringToConvergenceCriteria("SIGMA0")); 
     qDebug() << BundleSettings::convergenceCriteriaToString(
                                BundleSettings::stringToConvergenceCriteria("PARAMETERCORRECTIONS")); 
-    qDebug();
+    qDebug() << "";
  
     qDebug() << "Testing serialization...";
     QByteArray byteArray;
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
     inputData >> newSettings;
     pvl = newSettings.pvlObject();
     cout << pvl << endl;
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing XML: write XML from BundleSettings object...";
     // write xml 
@@ -313,7 +313,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();    // read xml with no attributes or values
+    qDebug() << "";    // read xml with no attributes or values
     qDebug() << "Testing XML: read XML with no attributes or values to object...";
     FileName emptyXmlFile("./unitTest_NoElementValues.xml");
     BundleSettingsXmlHandlerTester bsFromEmptyXml(project, &reader, emptyXmlFile);

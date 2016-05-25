@@ -83,12 +83,12 @@ int main(int argc, char *argv[]) {
 
   cout.precision(6);
   qDebug() << "Unit test for BundleUtilities...";
-  qDebug();
+  qDebug() << "";
 
   try {
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleObservationSolveSettings...";
-    qDebug();
+    qDebug() << "";
     // default constructor
     qDebug() << "Printing PVL group with settings from the default constructor...";
     BundleObservationSolveSettings boss;
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                       "AllPolynomialCoefficients"));
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing serialization...";
     QByteArray byteArray;
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 //    file.open(QIODevice::ReadOnly);
 //    QDataStream in(&file);
 //    in >> newBoss;
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Testing XML: write XML from BundleObservationSolveSettings object...";
     // write xml 
@@ -373,9 +373,9 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleImage...";
     #if 0
@@ -405,9 +405,9 @@ int main(int argc, char *argv[]) {
     bi3 = bi;
     qDebug() << "serial number = " << bi3.serialNumber();
     qDebug() << "file name     = " << bi3.fileName();
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleObservation...";
     qDebug() << "Constructing empty BundleObservation object...";
@@ -449,16 +449,16 @@ int main(int argc, char *argv[]) {
     pvl = bossFromBo.pvlObject("NoCamAngles");
     cout << pvl << endl << endl;
     qDebug() << "    output bundle observation...";
-    qDebug() << bo2.formatBundleOutputString(true);
-    qDebug() << bo2.formatBundleOutputString(false);
+    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatBundleOutputString(false);
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();
     pvl = bossFromBo.pvlObject("NoTwist");
     cout << pvl << endl << endl;
     qDebug() << "    output bundle observation...";
-    qDebug() << bo2.formatBundleOutputString(true);
-    qDebug() << bo2.formatBundleOutputString(false);
+    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatBundleOutputString(false);
     qDebug() << "    Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...";
     bo3.setSolveSettings(bsFromEmptyXml);
     bossFromBo = *bo3.solveSettings();
@@ -506,21 +506,21 @@ int main(int argc, char *argv[]) {
       vectors.append(toString(adjSigma[i]));
       vectors.append("     ");
     }
-    qDebug() << vectors;
+    qDebug().noquote() << vectors;
     //???qDebug() << "apply param corrections successful?     " << toString(bo3.applyParameterCorrections(paramCor));
     qDebug() << "    output bundle observation...";
-    qDebug() << bo3.formatBundleOutputString(false);
-    qDebug() << bo3.formatBundleOutputString(true);
+    qDebug().noquote() << bo3.formatBundleOutputString(false);
+    qDebug().noquote() << bo3.formatBundleOutputString(true);
     qDebug() << "init exterior orientiation successful?  " << toString(bo3.initializeExteriorOrientation());
     qDebug() << "apply param corrections successful?     " << toString(bo3.applyParameterCorrections(paramCor));
 //    SpiceRotation *spicePos = bo3.spiceRotation();
 //    SpicePosition *spiceRot = bo3.spicePosition();
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleObservationVector...";
-    qDebug();
+    qDebug() << "";
     #if 0
     TEST COVERAGE (SCOPE) FOR THIS SOURCE FILE: 21%
     Need:
@@ -576,7 +576,7 @@ int main(int argc, char *argv[]) {
 #endif
     qDebug() << "init exterior orientiation successful?  " << toString(bov.initializeExteriorOrientation());
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleMeasure...";
     #if 0
@@ -601,9 +601,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "focal y" << toString(bundleMeasure.focalPlaneMeasuredY());
     qDebug() << "focal z" << toString(bundleMeasure.observationIndex());
     #endif
-    qDebug();    
+    qDebug() << "";    
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleControlPoint...";
     #if 0
@@ -624,12 +624,12 @@ int main(int argc, char *argv[]) {
     BundleControlPoint bcp1(freePoint);
     bool errorProp = false;
     double radiansToMeters = 10.0;
-    qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);    // ??? these print outs are not pretty... fix???
-    qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters); // ??? these print outs are not pretty... fix???
+    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);    // ??? these print outs are not pretty... fix???
+    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters); // ??? these print outs are not pretty... fix???
     errorProp = true;
-    qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);    // ??? these print outs are not pretty... fix???
-    qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters); // ??? these print outs are not pretty... fix???
-    qDebug();
+    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);    // ??? these print outs are not pretty... fix???
+    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters); // ??? these print outs are not pretty... fix???
+    qDebug() << "";
 
     qDebug() << "Modify FreePoint - setAdjustedSurfacePoint(0,0,10) and addMeasure()";
     SurfacePoint sp1(Latitude(0.0, Angle::Degrees), 
@@ -639,15 +639,15 @@ int main(int argc, char *argv[]) {
     BundleMeasure bcm = *(bcp1.addMeasure(cm1)); // ???? this appears to do nothing! measure is added to the internal QVector of measures, not the member control point...
                                                // probably need to fix the format string methods to use "this" instead of member control point???
                                                // and accessor methods???
-    qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);    // ??? these print outs are not pretty... fix???
-    qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters); // ??? these print outs are not pretty... fix???
+    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);    // ??? these print outs are not pretty... fix???
+    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters); // ??? these print outs are not pretty... fix???
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=false";
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings); // default solveRadius=false
     double metersToRadians = 1.0 / radiansToMeters;
     bcp1.setWeights(settings, metersToRadians);
-    qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     boost::numeric::ublas::bounded_vector< double, 3 > aprioriSigmas = bcp1.aprioriSigmas();
     boost::numeric::ublas::bounded_vector< double, 3 > weights = bcp1.weights();
     boost::numeric::ublas::bounded_vector< double, 3 > corrections = bcp1.corrections(); //??? never set 000??? init to 1.0e+50???
@@ -665,33 +665,33 @@ int main(int argc, char *argv[]) {
     qDebug() << "nicVector:      " << nicVector[0] << nicVector[1] << nicVector[2];
     qDebug() << "qMatrix:";
     qDebug() << qMatrix;
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad <= 0";
     settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, Isis::Null);
     bcp1.setWeights(settings, metersToRadians);
-    qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp1.aprioriSigmas();
     weights = bcp1.weights();
     qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
                                    << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))
                                    << (Isis::IsSpecial(aprioriSigmas[2]) ? "N/A" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Modify FreePoint - setWeights() - solveRadius=true, apriori lat/lon/rad > 0";
     settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
     bcp1.setWeights(settings, metersToRadians);
-    qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp1.aprioriSigmas();
     weights = bcp1.weights();
     qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
                                    << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))
                                    << (Isis::IsSpecial(aprioriSigmas[2]) ? "N/A" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
-    qDebug();
+    qDebug() << "";
 
     ControlPoint *cp = bcp1.rawControlPoint();
     qDebug() << "Raw control point equal to original?    " << toString(*cp == *freePoint);
@@ -700,7 +700,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Adjusted SurfacePoint (Lat, Lon, Rad) = " << toString(sp.GetLatitude().degrees())
                                                            << toString(sp.GetLongitude().degrees())
                                                            << toString(sp.GetLocalRadius().meters());
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Create FixedPoint from empty fixed point, adjusted surface point (90, 180, 10)...";
     ControlPoint *fixedPoint = new ControlPoint("FixedPoint");
@@ -710,70 +710,70 @@ int main(int argc, char *argv[]) {
                      Longitude(180.0, Angle::Degrees), 
                      Distance(10.0, Distance::Meters));
     bcp3->setAdjustedSurfacePoint(sp2);
-    qDebug() << bcp3->formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp3->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
 
     qDebug() << "Modify FixedPoint - setWeights()";
     bcp3->setWeights(settings, metersToRadians);
-    qDebug() << bcp3->formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp3->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp3->formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp3->aprioriSigmas();
     weights = bcp3->weights();
     qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                                    << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
                                    << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Create ConstrainedPoint from empty constrained point, surface point (0, 0, 10)...";
     ControlPoint *constrainedPoint = new ControlPoint("ConstrainedPoint");
     constrainedPoint->SetType(ControlPoint::Constrained);
     BundleControlPoint bcp4(constrainedPoint);
     bcp4.setAdjustedSurfacePoint(sp1);
-    qDebug() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - solveRadius=false";
     settings->setSolveOptions(BundleSettings::Sparse, false, false, false, false);
     bcp4.setWeights(settings, metersToRadians);
-    qDebug() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp4.aprioriSigmas();
     weights = bcp4.weights();
     qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                                    << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
                                    << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
                 "apriori lat/lon/rad <= 0";
     settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true);
     bcp4.setWeights(settings, metersToRadians);
-    qDebug() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp4.aprioriSigmas();
     weights = bcp4.weights();
     qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                                    << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
                                    << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Modify ConstrainedPoint - setWeights() - no constraints, solveRadius=true, "
                 "apriori lat/lon/rad > 0";
     settings->setSolveOptions(BundleSettings::Sparse, false, false, false, true, 2.0, 3.0, 4.0);
     bcp4.setWeights(settings, metersToRadians);
-    qDebug() << bcp4.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp4.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp4.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp4.aprioriSigmas();
     weights = bcp4.weights();
     qDebug() << "aprioriSigmas:  " << (Isis::IsSpecial(aprioriSigmas[0]) ? "NULL" : Isis::toString(aprioriSigmas[0]))
                                    << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
                                    << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
-    qDebug();
-    qDebug();
+    qDebug() << "";
+    qDebug() << "";
 
     qDebug() << "Create ConstrainedPoint from constrained point with adjusted surface point "
                 "(32, 120, 1000)...";
@@ -803,12 +803,12 @@ int main(int argc, char *argv[]) {
                             Distance(1000.0, Distance::Meters),
                             Distance(1000.0, Distance::Meters));
     bcp5.setAdjustedSurfacePoint(adjustedSurfPt);
-    qDebug() << bcp5.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp5.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
     qDebug() << "Modify ConstrainedPoint - setWeights() - solveRadius=t, lat/lon/rad constrained";
     bcp5.setWeights(settings, metersToRadians);
-    qDebug() << bcp5.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug().noquote() << bcp5.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);
     aprioriSigmas = bcp5.aprioriSigmas(); // these values were verified by comparing against
                                           // SurfacePoint truth data
     weights = bcp5.weights();
@@ -816,21 +816,21 @@ int main(int argc, char *argv[]) {
                                    << (Isis::IsSpecial(aprioriSigmas[1]) ? "NULL" : Isis::toString(aprioriSigmas[1]))
                                    << (Isis::IsSpecial(aprioriSigmas[2]) ? "NULL" : Isis::toString(aprioriSigmas[2]));
     qDebug() << "weights:        " << weights[0] << weights[1] << weights[2];
-    qDebug();
+    qDebug() << "";
 
     qDebug() << "Create copy of FreePoint using copy constructor...";
     BundleControlPoint bcp2(bcp1);
-    qDebug() << bcp2.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    qDebug();
+    qDebug().noquote() << bcp2.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug() << "";
 
     qDebug() << "Overwrite existing object with FixedPoint information...";
     bcp2.copy(*bcp3);
-    qDebug() << bcp2.formatBundleOutputSummaryString(errorProp);
-    qDebug() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters);
-    qDebug();
+    qDebug().noquote() << bcp2.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp2.formatBundleOutputDetailString(errorProp, radiansToMeters);
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleControlPointVector...";
     #if 0
@@ -841,17 +841,17 @@ int main(int argc, char *argv[]) {
     BundleControlPoint *fixedBCP  = bcpvector.addControlPoint(fixedPoint);
     BundleControlPoint *constrBCP = bcpvector.addControlPoint(constrainedPoint);
     qDebug() << "FreePoint";
-    qDebug() << bcp1.formatBundleOutputSummaryString(errorProp);
-    qDebug() << freeBCP->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp1.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << freeBCP->formatBundleOutputSummaryString(errorProp);
     qDebug() << "FixedPoint";
-    qDebug() << bcp3->formatBundleOutputSummaryString(errorProp);
-    qDebug() << fixedBCP->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << bcp3->formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << fixedBCP->formatBundleOutputSummaryString(errorProp);
     qDebug() << "ConstrainedPoint";
-    qDebug() << bcp5.formatBundleOutputSummaryString(errorProp);
-    qDebug() << constrBCP->formatBundleOutputSummaryString(errorProp);
-    qDebug();
+    qDebug().noquote() << bcp5.formatBundleOutputSummaryString(errorProp);
+    qDebug().noquote() << constrBCP->formatBundleOutputSummaryString(errorProp);
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
     qDebug() << "Testing BundleMeasure...";
     #if 0
@@ -872,9 +872,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "focal x" << toString(bundleMeasure.focalPlaneMeasuredX());
     qDebug() << "focal y" << toString(bundleMeasure.focalPlaneMeasuredY());
     qDebug() << "observation index" << toString(bundleMeasure.observationIndex());
-    qDebug();    
+    qDebug() << "";    
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-    qDebug();
+    qDebug() << "";
   } 
   catch (IException &e) {
     e.print();

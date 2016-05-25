@@ -2,6 +2,7 @@
 
 #include <boost/numeric/ublas/symmetric.hpp>
 
+#include <QDataStream>
 #include <QDebug>
 #include <QFile>
 
@@ -104,9 +105,9 @@ int main() {
 
   corrMat.setImagesAndParameters(imgsAndParams);
 
-  qDebug();
+  qDebug() << "";
   qDebug() << "***Correlation Matrix Information***";
-  qDebug();
+  qDebug() << "";
   qDebug() << "Covariance File Name:" << corrMat.covarianceFileName().expanded();
   qDebug() << "Correlation File Name:" << corrMat.correlationFileName().expanded();
   qDebug() << "Images and Parameters:";
@@ -131,9 +132,9 @@ int main() {
 //   try {
 //     CorrelationMatrix corrMat4(corrMatObject);
 // 
-//     qDebug();
+//     qDebug() << "";
 //     qDebug() << "***Correlation Matrix Information***";
-//     qDebug();
+//     qDebug() << "";
 //     qDebug() << "Covariance File Name:" << corrMat4.correlationFileName().expanded();
 //     qDebug() << "Correlation File Name:" << corrMat4.correlationFileName().expanded();
 //     qDebug() << "Images and Parameters:";

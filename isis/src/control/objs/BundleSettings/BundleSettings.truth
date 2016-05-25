@@ -1,5 +1,5 @@
-Unit test for BundleSettings... 
-Printing PVL group with settings from the default constructor... 
+Unit test for BundleSettings...
+Printing PVL group with settings from the default constructor...
 Object = DefaultSettingsObject
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
@@ -38,7 +38,7 @@ Object = DefaultSettingsObject
   End_Object
 End_Object
 
-Testing copy constructor... 
+Testing copy constructor...
 Object = CopySettingsObject
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
@@ -77,7 +77,7 @@ Object = CopySettingsObject
   End_Object
 End_Object
 
-Testing assignment operator to set this equal to itself... 
+Testing assignment operator to set this equal to itself...
 Object = SelfAssignedSettingsObject
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
@@ -116,7 +116,7 @@ Object = SelfAssignedSettingsObject
   End_Object
 End_Object
 
-Testing assignment operator to create a new settings object... 
+Testing assignment operator to create a new settings object...
 Object = AssignedSettingsObject
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
@@ -155,7 +155,7 @@ Object = AssignedSettingsObject
   End_Object
 End_Object
 
-Testing mutator methods... 
+Testing mutator methods...
 Object = ResetAllOptions
   NetworkValidated                     = Yes
   SolveMethod                          = SpecialK
@@ -291,8 +291,8 @@ Object = ResetOutputOptions
   End_Object
 End_Object
 
-Testing accessor methods... 
-Get BundleObservationSolveSettings with name InstrumentId = Instrument1 
+Testing accessor methods...
+Get BundleObservationSolveSettings with name InstrumentId = Instrument1
 Object = Instrument1
   InstrumentPointingSolveOption       = None
   NumberAngleCoefficientsSolved       = N/A
@@ -311,7 +311,7 @@ Object = Instrument1
   InstrumentPositionInterpolationType = 4
 End_Object
 
-Now get BundleObservationSolveSettings at index 1 
+Now get BundleObservationSolveSettings at index 1
 Object = Instrument2
   InstrumentPointingSolveOption       = AllPolynomialCoefficients
   NumberAngleCoefficientsSolved       = 2
@@ -330,18 +330,18 @@ Object = Instrument2
   InstrumentPositionInterpolationType = 4
 End_Object
 
-"Huber" "0.27" 
-"Welsch" "28.0" 
-"HuberModified" "29.0" 
-"Chen" "30.0" 
+"Huber" "0.27"
+"Welsch" "28.0"
+"HuberModified" "29.0"
+"Chen" "30.0"
 
-Testing static enum-to-string and string-to-enum methods... 
-"Sparse" 
-"SpecialK" 
-"Sigma0" 
-"ParameterCorrections" 
+Testing static enum-to-string and string-to-enum methods...
+"Sparse"
+"SpecialK"
+"Sigma0"
+"ParameterCorrections"
 
-Testing serialization... 
+Testing serialization...
 Object = BundleSettings
   NetworkValidated                     = Yes
   SolveMethod                          = SpecialK
@@ -401,8 +401,8 @@ Object = BundleSettings
   End_Object
 End_Object
 
-Testing XML: write XML from BundleSettings object... 
-Testing XML: read XML to BundleSettings object... 
+Testing XML: write XML from BundleSettings object...
+Testing XML: read XML to BundleSettings object...
 Object = BundleSettingsFromXml
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
@@ -441,7 +441,7 @@ Object = BundleSettingsFromXml
   End_Object
 End_Object
 
-Testing XML: read XML to BundleSettings object... 
+Testing XML: read XML to BundleSettings object...
 Object = BundleSettingsFromXml
   NetworkValidated                     = Yes
   SolveMethod                          = SpecialK
@@ -465,7 +465,7 @@ Object = BundleSettingsFromXml
   NumberObservationSolveSettings       = 0
 End_Object
 
-Testing error throws... 
+Testing error throws...
 **PROGRAMMER ERROR** Unknown bundle solve method [Nonsense].
 **PROGRAMMER ERROR** Unknown solve method enum [31].
 **ERROR** Unable to find BundleObservationSolveSettings with InstrumentId = [NoSuchInstrumentId].
@@ -475,7 +475,7 @@ Testing error throws...
 **PROGRAMMER ERROR** Unknown convergence criteria enum [33].
 **PROGRAMMER ERROR** For bundle adjustments with multiple maximum likelihood estimators, the first model must be of type HUBER or HUBER_MODIFIED.
 
-Testing XML: read XML with no attributes or values to object... 
+Testing XML: read XML with no attributes or values to object...
 Object = DefaultBundleSettingsFromEmptyXml
   NetworkValidated                     = Yes
   SolveMethod                          = Sparse
@@ -514,4 +514,4 @@ Object = DefaultBundleSettingsFromEmptyXml
   End_Object
 End_Object
 
-Testing HDF5 write/read... 
+Testing HDF5 write/read...

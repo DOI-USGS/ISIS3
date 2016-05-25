@@ -427,7 +427,7 @@ namespace Isis {
     QString kernName = kern.expanded();
 
     if(!pckLoaded) {
-      furnsh_c(kernName.toAscii().data());
+      furnsh_c(kernName.toLatin1().data());
       pckLoaded = true;
     }
     
