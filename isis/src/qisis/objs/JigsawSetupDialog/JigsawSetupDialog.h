@@ -87,6 +87,8 @@ namespace Isis {
     private:
     void makeReadOnly()    ;
     void fillFromSettings(BundleSettingsQsp settings);
+    void showTargetAngleWidgets();
+    void hideTargetAngleWidgets();
 
   private:
     Ui::JigsawSetupDialog *m_ui;

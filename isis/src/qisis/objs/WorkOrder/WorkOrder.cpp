@@ -243,7 +243,7 @@ namespace Isis {
     else if ( item->isControl() ) {
       ControlList *controlList = new ControlList();
       controlList->append( item->control() );
-      bool ret = isExecutable(controlList);
+      bool ret = isExecutable(*controlList);
       controlList->deleteLater();
       return ret;
     }

@@ -32,6 +32,8 @@ namespace Isis {
 
     m_systemName = target->systemName();
 
+    m_frametype = target->frameType();
+
     // TODO - initialize TargetBody members from target
     *m_bodyCode = target->naifBodyCode();
     *m_systemCode = target->naifPlanetSystemCode();
@@ -198,6 +200,12 @@ namespace Isis {
 //    return pvl;
 
 //  }
+
+
+  int TargetBody::frameType() {
+    return m_frametype;
+  }
+
 
   std::vector<Angle> TargetBody::poleRaCoefs() {
     return m_raPole;

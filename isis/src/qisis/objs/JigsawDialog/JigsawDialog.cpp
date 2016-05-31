@@ -141,15 +141,19 @@ namespace Isis {
     // directory. This run time directory will contain the output files for
     // this run (along with correlation matrix and serialized bundle
     // information files).
-    QString runTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
-    QDir cwd = m_project->addBundleSolutionInfoFolder(runTime);
-    QString path = cwd.absolutePath() + "/";
-    m_bundleSettings->setOutputFiles(path, true, true, true);
+
+// KLE - test commenting out 2016-05-30
+//    QString runTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
+//    QDir cwd = m_project->addBundleSolutionInfoFolder(runTime);
+//    QString path = cwd.absolutePath() + "/";
+//    m_bundleSettings->setOutputFiles(path, true, true, true);
        
-    m_bundleAdjust = new BundleAdjust(m_bundleSettings,
-                                           *m_selectedControl,
-                                           m_project->images(),
-                                           false);
+//     m_bundleAdjust = new BundleAdjust(m_bundleSettings,
+//                                            *m_selectedControl,
+//                                            m_project->images(),
+//                                            false);
+    m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
+                                      false);
 
        m_bundleAdjust->moveToThread(bundleThread);
 
@@ -348,7 +352,7 @@ namespace Isis {
   }
 
   // TODO: Give user the option to keep or throw away the bundle. Even if the bundle converged it
-  //       coulde still be worthless.
+  //       could still be worthless.
   }  
 }
 

@@ -89,6 +89,8 @@ namespace Isis {
       QString id() const;
 //    void deleteFromDisk();
 
+      int frameType();
+
       std::vector<Angle> poleRaCoefs();
       std::vector<Angle> poleDecCoefs();
       std::vector<Angle> pmCoefs();
@@ -192,6 +194,8 @@ namespace Isis {
        * The GUI information for how this Target will be displayed.
        */
       TargetBodyDisplayProperties *m_displayProperties;
+
+      int m_frametype;
 
       // The next three vectors will have length 3 (for a quadratic polynomial) if used.
       std::vector<Angle> m_raPole;      //!< Coefficients of a quadratic polynomial fitting pole ra

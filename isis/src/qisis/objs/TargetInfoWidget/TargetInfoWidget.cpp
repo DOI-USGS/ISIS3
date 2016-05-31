@@ -4,6 +4,7 @@
 #include <QPixmap>
 
 #include "Directory.h"
+#include "SpiceRotation.h"
 #include "TargetBody.h"
 #include "TargetBodyDisplayProperties.h"
 
@@ -52,9 +53,16 @@ namespace Isis {
 
     m_ui->tabWidget->setCurrentIndex(0);
 
-    m_ui->poleRightAscensionLabel->setText(formatPoleRaString());
-    m_ui->poleDeclinationLabel->setText(formatPoleDecString());
-    m_ui->polePMOffsetLabel->setText(formatPmString());
+    if (target->frameType() == Isis::SpiceRotation::BPC) {
+      m_ui->poleRightAscensionLabel->hide();
+      m_ui->poleDeclinationLabel->hide();
+      m_ui->polePMOffsetLabel->hide();
+    }
+    else {
+      m_ui->poleRightAscensionLabel->setText(formatPoleRaString());
+      m_ui->poleDeclinationLabel->setText(formatPoleDecString());
+      m_ui->polePMOffsetLabel->setText(formatPmString());
+    }
 
     m_ui->aRadiiLabel->setText(tr("%1").arg(m_target->radiusA().kilometers()));
     m_ui->bRadiiLabel->setText(tr("%1").arg(m_target->radiusB().kilometers()));

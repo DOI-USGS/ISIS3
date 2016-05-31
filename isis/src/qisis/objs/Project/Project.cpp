@@ -669,6 +669,9 @@ namespace Isis {
     QDir bundleDir = addBundleSolutionInfoFolder(runTime); //???
                                                            // save solution information to a file
     QString bundleFileName = bundleDir.absolutePath() + "/" + "BundleSolutionInfo.hdf";
+
+    bundleSolutionInfo->bundleSettings()->setOutputFiles(bundleDir.absolutePath() + "/",
+                                                         true, true, true);
     bundleSolutionInfo->createH5File(FileName(bundleFileName));
 
     loadBundleSolutionInfo(bundleSolutionInfo);

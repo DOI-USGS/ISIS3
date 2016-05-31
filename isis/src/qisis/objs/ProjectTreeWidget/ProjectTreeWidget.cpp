@@ -149,6 +149,26 @@ namespace Isis {
           }
         }
       }
+
+//      ControlTreeWidgetItem *controlItem = dynamic_cast<ControlTreeWidgetItem *>(item);
+
+//      if (controlItem) {
+//        selectedControls.append(controlItem->control());
+//      }
+
+//      ControlGroupTreeWidgetItem *controlGroupItem =
+//          dynamic_cast<ControlGroupTreeWidgetItem *>(item);
+
+//      if (controlGroupItem) {
+//        for (int childIndex = 0; childIndex < controlGroupItem->childCount(); childIndex++) {
+//          ControlTreeWidgetItem *controlItem =
+//              dynamic_cast<ControlTreeWidgetItem *>(controlGroupItem->child(childIndex));
+
+//          if (controlItem) {
+//            selectedControls.append(controlItem->control());
+//          }
+//        }
+//      }
       
       corrMatItem = dynamic_cast<CorrMatTreeWidgetItem *>(item);
 
@@ -428,7 +448,7 @@ namespace Isis {
 
 //     QString group = bundleSolutionInfo->id();
 //     QList<QTreeWidgetItem *> found = findItems(group, Qt::MatchRecursive, 0);
-
+/*
     QTreeWidgetItem *item = new BundleSolutionInfoTreeWidgetItem(bundleSolutionInfo);
     m_resultsParentItem->addChild(item);
 
@@ -447,11 +467,11 @@ namespace Isis {
     QTreeWidgetItem *statisticsItem = new BundleResultsTreeWidgetItem(&bundleResults);
     statisticsItem->addChild(corrMatItem);
 
-    /*
-     * At this point the covariance (actually the inverse) matrix may exist but the correlation
-     * matrix shouldn't have been created yet. The correlation matrix will be created when
-     * "View Correlation Matrix" is selected in the context menu of the following tree item.
-     */
+    //
+    // At this point the covariance (actually the inverse) matrix may exist but the correlation
+    // matrix shouldn't have been created yet. The correlation matrix will be created when
+    // "View Correlation Matrix" is selected in the context menu of the following tree item.
+    //
     if ( bundleResults.correlationMatrix().hasCovMat() ) {
       //qDebug() << "CovMatFileName:" << bundleResults.correlationMatrix().covarianceFileName().name();
       //qDebug() << "imgs and parmas:" << bundleResults.correlationMatrix().imagesAndParameters()->size();
@@ -474,6 +494,7 @@ namespace Isis {
 //      QTreeWidgetItem *item = new BundleSolutionInfoTreeWidgetItem(bundleSolutionInfo);
 //      found.at(0)->addChild(item);
 //    }
+*/
   }
 
 }

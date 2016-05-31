@@ -907,16 +907,24 @@ namespace Isis {
 
     TargetBodyQsp target = m_project->targetBodies().at(index);
     if (target) {
-      std::vector<Angle> raCoefs = target->poleRaCoefs();
-      std::vector<Angle> decCoefs = target->poleDecCoefs();
-      std::vector<Angle> pmCoefs = target->pmCoefs();
 
-      m_ui->rightAscensionLineEdit->setText(toString(raCoefs[0].degrees()));
-      m_ui->rightAscensionVelocityLineEdit->setText(toString(raCoefs[1].degrees()));
-      m_ui->declinationLineEdit->setText(toString(decCoefs[0].degrees()));
-      m_ui->declinationVelocityLineEdit->setText(toString(decCoefs[1].degrees()));
-      m_ui->primeMeridianOffsetLineEdit->setText(toString(pmCoefs[0].degrees()));
-      m_ui->spinRateLineEdit->setText(toString(pmCoefs[1].degrees()));
+      if (target->frameType() != Isis::SpiceRotation::BPC) {
+        std::vector<Angle> raCoefs = target->poleRaCoefs();
+        std::vector<Angle> decCoefs = target->poleDecCoefs();
+        std::vector<Angle> pmCoefs = target->pmCoefs();
+
+        showTargetAngleWidgets();
+
+        m_ui->rightAscensionLineEdit->setText(toString(raCoefs[0].degrees()));
+        m_ui->rightAscensionVelocityLineEdit->setText(toString(raCoefs[1].degrees()));
+        m_ui->declinationLineEdit->setText(toString(decCoefs[0].degrees()));
+        m_ui->declinationVelocityLineEdit->setText(toString(decCoefs[1].degrees()));
+        m_ui->primeMeridianOffsetLineEdit->setText(toString(pmCoefs[0].degrees()));
+        m_ui->spinRateLineEdit->setText(toString(pmCoefs[1].degrees()));
+      }
+      else {
+        hideTargetAngleWidgets();
+      }
 
       m_ui->aRadiusLineEdit->setText(toString(target->radiusA().kilometers()));
       //m_ui->aRadiusSigmaLineEdit->setText(toString(target->sigmaRadiusA().kilometers()));
@@ -1049,5 +1057,60 @@ namespace Isis {
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     }
     update();
+  }
+
+  void JigsawSetupDialog::showTargetAngleWidgets() {
+    m_ui->rightAscensionLineEdit->show();
+    m_ui->rightAscensionVelocityLineEdit->show();
+    m_ui->declinationLineEdit->show();
+    m_ui->declinationVelocityLineEdit->show();
+    m_ui->primeMeridianOffsetLineEdit->show();
+    m_ui->spinRateLineEdit->show();
+
+    m_ui->rightAscensionSigmaLineEdit->show();
+    m_ui->rightAscensionVelocitySigmaLineEdit->show();
+    m_ui->declinationSigmaLineEdit->show();
+    m_ui->declinationVelocitySigmaLineEdit->show();
+    m_ui->primeMeridianOffsetSigmaLineEdit->show();
+    m_ui->spinRateSigmaLineEdit->show();
+
+    m_ui->poleRaCheckBox->show();
+    m_ui->poleRaVelocityCheckBox->show();
+    m_ui->poleDecCheckBox->show();
+    m_ui->poleDecVelocityCheckBox->show();
+    m_ui->primeMeridianOffsetCheckBox->show();
+    m_ui->spinRateCheckBox->show();
+
+    m_ui->parameterLabel->show();
+    m_ui->valueLabel->show();
+    m_ui->sigmaLabel->show();
+  }
+
+
+  void JigsawSetupDialog::hideTargetAngleWidgets() {
+    m_ui->rightAscensionLineEdit->hide();
+    m_ui->rightAscensionVelocityLineEdit->hide();
+    m_ui->declinationLineEdit->hide();
+    m_ui->declinationVelocityLineEdit->hide();
+    m_ui->primeMeridianOffsetLineEdit->hide();
+    m_ui->spinRateLineEdit->hide();
+
+    m_ui->rightAscensionSigmaLineEdit->hide();
+    m_ui->rightAscensionVelocitySigmaLineEdit->hide();
+    m_ui->declinationSigmaLineEdit->hide();
+    m_ui->declinationVelocitySigmaLineEdit->hide();
+    m_ui->primeMeridianOffsetSigmaLineEdit->hide();
+    m_ui->spinRateSigmaLineEdit->hide();
+
+    m_ui->poleRaCheckBox->hide();
+    m_ui->poleRaVelocityCheckBox->hide();
+    m_ui->poleDecCheckBox->hide();
+    m_ui->poleDecVelocityCheckBox->hide();
+    m_ui->primeMeridianOffsetCheckBox->hide();
+    m_ui->spinRateCheckBox->hide();
+
+    m_ui->parameterLabel->hide();
+    m_ui->valueLabel->hide();
+    m_ui->sigmaLabel->hide();
   }
 }

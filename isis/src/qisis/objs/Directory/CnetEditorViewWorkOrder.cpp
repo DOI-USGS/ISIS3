@@ -59,7 +59,12 @@ namespace Isis {
 
 
   bool CnetEditorViewWorkOrder::isExecutable(QList<Control *> controls) {
-    return (controls.count() == 1);
+//  return (controls.count() == 1);
+
+    if (controls.count() >= 1)
+      return true;
+    else
+      return false;
   }
 
 
@@ -82,9 +87,11 @@ namespace Isis {
 
 
   void CnetEditorViewWorkOrder::syncRedo() {
-    project()->directory()->addCnetEditorView(controlList().first());
+    for (int i = 0; i < controlList().size(); i++) {
+      //project()->directory()->addCnetEditorView(controlList().first());
+      project()->directory()->addCnetEditorView(controlList().at(i));
+    }
   }
-
 
   void CnetEditorViewWorkOrder::syncUndo() {
     delete project()->directory()->cnetEditorViews().last();
