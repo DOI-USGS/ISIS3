@@ -83,6 +83,8 @@ namespace Isis {
       ShapeModel *shape() const;
       Spice *spice() const;
 
+      int frameType();
+
       std::vector<Angle> poleRaCoefs();
       std::vector<Angle> poleDecCoefs();
       std::vector<Angle> pmCoefs();

@@ -501,6 +501,11 @@ namespace Isis {
   }
 
 
+  int Target::frameType() {
+    return spice()->bodyRotation()->getFrameType();
+  }
+
+
   std::vector<Angle> Target::poleRaCoefs() {
     return spice()->bodyRotation()->poleRaCoefs();
   }
