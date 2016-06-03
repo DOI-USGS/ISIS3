@@ -41,8 +41,8 @@ namespace Isis {
   class PvlObject;
 
   /**
-   * This represents an ISIS control net in a project-based GUI interface. This encapsulates ideas about a control net
-   * such as it's filename and display properties.
+   * This represents an ISIS control net in a project-based GUI interface. 
+   * This encapsulates ideas about a control net such as it's filename and display properties.
    *
    * @author 2012-06-12 Ken Edmundson and Tracie Sucharski
    *
@@ -80,8 +80,8 @@ namespace Isis {
 
     private:
       /**
-       * Nested class used to write the Control object information to an XML file for the purpose
-       * of saving and restoring the state of the project.
+       * Nested class used to write the Control object information to an XML file for the 
+       * purpose of saving and restoring the state of the project.
        *
        * @author 2012-??-?? Steven Lambright
        *
