@@ -1,4 +1,3 @@
-
 #ifndef Control_H
 #define Control_H
 /**
@@ -23,35 +22,37 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <QObject>
+#include <QObject> // parent
 
 #include <QString>
 
 #include "FileName.h"
 #include "XmlStackedHandler.h"
 
-class QUuid;
 class QMutex;
+class QUuid;
 class QXmlStreamWriter;
 
 namespace Isis {
-  class ControlNet;
   class ControlDisplayProperties;
+  class ControlNet;
   class FileName;
   class Project;
   class PvlObject;
 
   /**
-   * @brief 
+   * This represents an ISIS control net in a project-based GUI interface. This encapsulates ideas about a control net
+   * such as it's filename and display properties.
    *
    * @author 2012-06-12 Ken Edmundson and Tracie Sucharski
    *
    * @internal
    *   @history 2012-08-02 Kimberly Oyama - Added comments to some of the methods and
-   *                             member variables.
+   *                           member variables.
    *   @history 2012-09-11 Tracie Sucharski - Added new constructor that takes a ControlNet *. 
    *   @history 2015-10-14 Jeffrey Covington - Declared Control * as a Qt
-   *                           metatype for use with QVariant.
+   *                           metatype for use with QVariant. References #3949
+   *   @history 2016-06-02 Jeannie Backer - Updated documentation. Fixes #3949
    */
   class Control : public QObject {
     Q_OBJECT
@@ -79,7 +80,10 @@ namespace Isis {
 
     private:
       /**
-       * @author 2012-??-?? ???
+       * Nested class used to write the Control object information to an XML file for the purpose
+       * of saving and restoring the state of the project.
+       *
+       * @author 2012-??-?? Steven Lambright
        *
        * @internal
        */
@@ -93,20 +97,24 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
-          Control *m_control;
-          FileName m_cnetFolder;
+          Control *m_xmlHandlerControl;        /**< A pointer to the Control object to be read or
+                                                    written.*/
+          FileName m_xmlHandlerCnetFolderName; /**< The name of the folder for the control xml.*/
       };
 
     private:
       Control(const Control &other);
       Control &operator=(const Control &rhs);
 
-      ControlNet *m_controlNet;
-      ControlDisplayProperties *m_displayProperties;
-      QString m_fileName; //! File name of the control net associated with this control.
+      ControlNet *m_controlNet; /**< A pointer to the ControlNet object associated with this
+                                     Control object.*/
+      ControlDisplayProperties *m_displayProperties; /**< Contains the display properties for this
+                                                          Control object.*/
+      QString m_fileName; /**< File name of the control net associated with this control.*/
 
       /**
-       * A unique ID for this Control (useful for others to reference this Control when saving to disk).
+       * A unique ID for this Control.
+       * (useful for others to reference this Control when saving to disk).
        */
       QUuid *m_id;
   };
