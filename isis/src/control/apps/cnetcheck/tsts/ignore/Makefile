@@ -17,4 +17,8 @@ commands:
 	  base=`basename $$i`; \
 	  cat $$i | sed 's/.*\/\(.*\.cub\)/\1/g' | sed 's/\([0-9]\.[0-9]\{12\}\)\([0-9]*\)/\1/g' > $$base; \
 	  $(MV) $$base $$i; \
-	done
+	done;
+
+	# Sort LowCoverage.txt output file, since it gets data from a QHash
+	$(CAT) $(OUTPUT)/*LowCoverage.txt | sort > $(OUTPUT)/sorted_LowCoverage.txt;
+	$(MV) $(OUTPUT)/sorted_LowCoverage.txt $(OUTPUT)/catLowCoverage.txt;

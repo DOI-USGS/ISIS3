@@ -14,7 +14,8 @@ commands:
 	  extract=modified modifiedpoints=$(OUTPUT)/modified.txt \
 	  onet=$(OUTPUT)/modifiednet.net log=$(OUTPUT)/modifiedlog.pvl \
 	  > /dev/null;
-	$(CAT) $(OUTPUT)/outlist.txt | sed 's#.*/##' > $(OUTPUT)/temp.txt;
+	# Pipe to sort since output is obtained from a QHash
+	$(CAT) $(OUTPUT)/outlist.txt | sed 's#.*/##' | sort > $(OUTPUT)/temp.txt
 	$(MV) $(OUTPUT)/temp.txt $(OUTPUT)/outlist.txt;
 	$(RM) $(OUTPUT)/add.lis;
 	$(RM) $(OUTPUT)/files.lis;
