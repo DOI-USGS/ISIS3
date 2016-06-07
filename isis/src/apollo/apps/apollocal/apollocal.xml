@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application name="apollocal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Radiometric correction of Apollo Planetary images
+    Calibration of Apollo 15 metric images.
   </brief>
 
   <description>
-    This program will perform radiometric corrections on apollo plenetary
-    images.
+    This program will perform calibrations on images from the Apollo 15 mission's metric camera.
+    Two calibrations are performed. First, dark current is subtracted. Then, the image is divided
+    by the flat field image to remove vignetting effects.
   </description>
 
   <category>
@@ -23,6 +24,10 @@
     <change name="Jacob Danton" date="2007-05-09">
       Original version
     </change>
+    <change name="Curtis Rose" date="2016-04-20">
+      Fixed typo and improved documentation by clarifying information and
+      adding examples. Added image data to test. Fixes #2410.
+    </change>
   </history>
 
   <groups>
@@ -31,7 +36,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input cube file name
+          Input cube file name.
         </brief>
         <description>
           The cube to be calibrated.  
@@ -46,7 +51,7 @@
         <pixelType>real</pixelType>
         <fileMode>output</fileMode>
         <brief>
-          Output cube
+          Output cube.
         </brief>
         <description>
           The resultant cube containing the calibrated data.
@@ -58,4 +63,61 @@
     </group>
   </groups>
 
+  <examples>
+    <example>
+      <brief>
+        Cube callibrated.
+      </brief>
+      <description>
+        This example shows how to calibrate an Apollo cube.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=../inputCube.cub to=../outputCube.cub
+        </commandLine>
+        <description>
+          Run the <strong>apollocal</strong> application to calibrate the cube.
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="1900" height="1000" src="./assets/ApollocalGUI.png">
+            <brief>Example Gui</brief>
+            <description>
+              This is an example of the GUI for apollocal with parameters entered.            
+            </description>
+            <thumbnail width="180" height="200" caption="Apollocal GUI example." src="./assets/ApollocalGUI.png" />
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+       <inputImages>
+        <image width="1900" height="1000" src="./assets/InputCub.png">
+          <brief>
+            Input image
+          </brief>
+          <description>
+            This is the example apollo image used for the input.
+          </description>
+          <thumbnail width="180" height="200" src="./assets/InputCub.png" caption="Input image."/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image width="1900" height="1000" src="./assets/OutputCub.png">
+          <brief>
+            Output image
+          </brief>
+          <description>
+            This is the example output image after apollocal is run.
+          </description>
+          <thumbnail width="180" height="200" src="./assets/OutputCub.png" caption="Output image."/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
 </application>

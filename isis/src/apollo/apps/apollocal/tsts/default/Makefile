@@ -3,4 +3,5 @@ APPNAME = apollocal
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	cp $(INPUT)/deferred.txt $(OUTPUT)/deferred.txt > /dev/null;
+	$(APPNAME) FROM=$(INPUT)/apollowarptrimmed.cub TO=$(OUTPUT)/apollocaltrimmed.cub > /dev/null;
+

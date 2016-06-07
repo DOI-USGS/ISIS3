@@ -1,15 +1,16 @@
 #include "Isis.h"
-#include "SpecialPixel.h"
+
+#include "CubeAttribute.h"
 #include "ProcessByTile.h"
 #include "Pvl.h"
-#include "CubeAttribute.h"
 #include "PvlTranslationTable.h"
+#include "SpecialPixel.h"
 
 using namespace std;
 using namespace Isis;
 
-void cal (vector<Buffer *> &in, 
-          vector<Buffer *> &out);
+void cal(vector<Buffer *> &in, 
+         vector<Buffer *> &out);
 
 void IsisMain() {
   // We will be processing by line
@@ -41,7 +42,8 @@ void IsisMain() {
   p.EndProcess();
 }
 
-void cal (vector<Buffer *> &in, vector<Buffer *> &out) {
+
+void cal(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer &inp = *in[0];      // Input Cube
   Buffer &fff = *in[1];      // Flat Field File
   Buffer &outp = *out[0];    // Output Cube
@@ -56,7 +58,8 @@ void cal (vector<Buffer *> &in, vector<Buffer *> &out) {
       outp[i] = Null;
     }
     else {
-      outp[i] = 65535.0*(1.0 - log(65536 - inp[i])/log(2.0)/16.0);    // Log Filter the film negative (and multiply by 2^16/16 to maintain the range of values)
+      // Log Filter the film negative (and multiply by 2^16/16 to maintain the range of values)
+      outp[i] = 65535.0*(1.0 - log(65536 - inp[i])/log(2.0)/16.0);
       outp[i] -=  1300.0;    // subtract dark current
       outp[i] /= fff[i];    // divide flat field to remove vignetting effects
     }
