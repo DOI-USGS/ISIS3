@@ -74,6 +74,24 @@
             Special Pixels are defined to distinguish valid pixels from
             non-valid pixels.
           </definition>
+	  
+	  <definition name="Planetary Data System">
+            The Planetary Data System (PDS) is an archive of scientific data acquired 
+	    from NASA planetary missions, astronomical observations, and laboratory 
+	    measurements. By developing standards for data and archive formats and 
+	    architectures for use within the archive, the PDS ensures long-term access 
+	    and usability of NASA planetary data.
+	    
+	    <p>
+	      The PDS is organized as a federation of ten teams (nodes) geographically 
+	      distributed throughout the United States. Science disciplines represented 
+	      by the PDS include the Atmospheres Node, Geosciences Node, Cartography and 
+	      Imaging Sciences Node, Planetary Plasma Interactions Node, Ring-Moon Systems 
+	      Node, and Small Bodies Node. Two support entities include the Engineering Node 
+	      and the Navigation and Ancillary Information Facility (NAIF) Node. Additional 
+	      functions include a Radio Science specialist and a User-Centered Design team.
+	    </p>
+          </definition>
 
           <definition name="NULL">
             NULL is a Special Pixel value that is tracked and reported to the
