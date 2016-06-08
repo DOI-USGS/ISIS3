@@ -10,6 +10,7 @@ commands:
 	  onet=$(OUTPUT)/outnet.net log=$(OUTPUT)/outlog.pvl \
 	  retrieval=POINT tolist=$(OUTPUT)/outlist.txt \
 	  > /dev/null;
-	$(CAT) $(OUTPUT)/outlist.txt | sed 's#.*/##' > $(OUTPUT)/temp.txt;
+	# Pipe to sort since output is obtained from a QHash
+	$(CAT) $(OUTPUT)/outlist.txt | sed 's#.*/##' | sort > $(OUTPUT)/temp.txt;
 	$(MV) $(OUTPUT)/temp.txt $(OUTPUT)/outlist.txt;
 	$(RM) $(OUTPUT)/add.lis;
