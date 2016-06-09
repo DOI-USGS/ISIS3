@@ -772,7 +772,7 @@ namespace Isis {
       }
     }
 
-    // Dump into left chipViewport
+    // Dump into right chipViewport
     p_rightView->setChip(p_rightChip, p_rightCube);
 
     updateRightGeom();

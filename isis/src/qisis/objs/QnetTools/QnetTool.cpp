@@ -2997,6 +2997,9 @@ namespace Isis {
    *                           implementation of binary control networks.
    * @history 2011-04-06  Tracie Sucharski - If not a fixed point, use the
    *                           Reference measure to get lat,lon.
+   * @history 2016-03-17  Makayla Shepherd - All new measures added use the 
+   *                           Reference Measure to get the lat, lon, in order
+   *                           to make keep behavior consistant. Fixes #2326.
    *
    */
   void QnetTool::addMeasure() {
@@ -3009,18 +3012,17 @@ namespace Isis {
     //  TODO::   Needs to be moved to QnetFileTool.cpp
     Camera *cam;
 
-    // If no apriori or adjusted lat/lon for this point, use lat/lon of first measure
-    double lat = m_editPoint->GetBestSurfacePoint().GetLatitude().degrees();
-    double lon = m_editPoint->GetBestSurfacePoint().GetLongitude().degrees();
-    if (lat == Null || lon == Null) {
-      ControlMeasure m = *(m_editPoint->GetRefMeasure());
-      int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
-      cam = m_controlNet->Camera(camIndex);
-      //cam = m.Camera();
-      cam->SetImage(m.GetSample(),m.GetLine());
-      lat = cam->UniversalLatitude();
-      lon = cam->UniversalLongitude();
-    }
+    // Use lat/lon of first measure
+    double lat;
+    double lon;
+    
+    ControlMeasure m = *(m_editPoint->GetRefMeasure());
+    int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
+    cam = m_controlNet->Camera(camIndex);
+    //cam = m.Camera();
+    cam->SetImage(m.GetSample(),m.GetLine());
+    lat = cam->UniversalLatitude();
+    lon = cam->UniversalLongitude();
 
     for (int i=0; i<m_serialNumberList->size(); i++) {
       cam = m_controlNet->Camera(i);
