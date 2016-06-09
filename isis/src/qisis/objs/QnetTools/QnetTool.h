@@ -231,6 +231,9 @@ namespace Isis {
    *                           buttons. Added shortcuts (PageUp/PageDown) for selecting right
    *                           measures and added slots to handle these shortcuts. Added save
    *                           control network shortcut. Fixes #2324.
+   *   @history 2016-03-17 Makayla Shepherd - Modified addMeasures so that new measures use the
+   *                           Reference Measure in order to keep the behavior consistent. 
+   *                           Fixes #2326.
    *                           
    */
   class QnetTool : public Tool {
